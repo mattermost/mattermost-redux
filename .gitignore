@@ -1,0 +1,22 @@
+# OSX
+#
+.DS_Store
+
+
+*.iml
+.idea
+
+# node.js
+#
+node_modules/
+npm-debug.log
+.npminstall
+
+# Vim
+[._]*.s[a-w][a-z]
+[._]s[a-w][a-z]
+*.un~
+Session.vim
+.netrwhist
+*~
+tags
