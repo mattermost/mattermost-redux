@@ -11,8 +11,6 @@ import {RequestStatus} from 'constants';
 
 import TestHelper from 'test/test_helper';
 
-const DEFAULT_SERVER = 'http://localhost:8065';
-
 describe('Actions.General', () => {
     let store;
     before(async () => {
@@ -28,15 +26,16 @@ describe('Actions.General', () => {
     });
 
     it('getPing - Invalid URL', async () => {
-        Client.setUrl('https://google.com/fake/url');
+        const serverUrl = Client.getUrl();
+        Client.setUrl('notarealurl');
         await Actions.getPing()(store.dispatch, store.getState);
 
         const {server} = store.getState().requests.general;
         assert.ok(server.status === RequestStatus.FAILURE && server.error);
+        Client.setUrl(serverUrl);
     });
 
     it('getPing', async () => {
-        TestHelper.basicClient.setUrl(DEFAULT_SERVER);
         await Actions.getPing()(store.dispatch, store.getState);
 
         const {server} = store.getState().requests.general;
