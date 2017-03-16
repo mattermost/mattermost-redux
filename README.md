@@ -1,4 +1,4 @@
-# Mattermost Redux (unreleased) 
+# Mattermost Redux (unreleased)
 
 **Supported Server Versions:** Master (no released versions are currently supported) 
 
@@ -10,6 +10,6 @@ Mattermost is an open source Slack-alternative used by thousands of companies ar
 
 # How to Contribute
 
-### Contribute Code 
+### Contribute Code
 
 We're not quite ready to accept external contributions yet - when things are ready, issues with a [Help Wanted] title will be posted in the [GitHub Issues section](https://github.com/mattermost/mattermost-mobile/issues).
