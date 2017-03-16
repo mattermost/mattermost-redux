@@ -1,4 +1,4 @@
-.PHONY: check-style clean pre-run test
+.PHONY: check-style clean pre-run test install
 
 
 .npminstall: package.json
@@ -39,3 +39,5 @@ pre-run:
 
 test: check-style
 	npm test
+
+install: .npminstall
