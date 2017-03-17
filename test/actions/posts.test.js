@@ -4,10 +4,12 @@
 import assert from 'assert';
 
 import * as Actions from 'actions/posts';
+import {login} from 'actions/users';
 import Client from 'client';
 import configureStore from 'store';
-import {Constants, RequestStatus} from 'constants';
+import {Constants, Preferences, RequestStatus} from 'constants';
 import TestHelper from 'test/test_helper';
+import {getPreferenceKey} from 'utils/preference_utils';
 
 describe('Actions.Posts', () => {
     let store;
@@ -401,5 +403,48 @@ describe('Actions.Posts', () => {
         assert.equal(postsInChannel[0], post3a.id, 'wrong order for post3a');
         assert.equal(postsInChannel[1], post3.id, 'wrong order for post3');
         assert.equal(postsInChannel.length, 2, 'wrong size');
+    });
+
+    it('flagPost', async () => {
+        const {dispatch, getState} = store;
+        const teamId = TestHelper.basicTeam.id;
+        const channelId = TestHelper.basicChannel.id;
+        await TestHelper.basicClient.logout();
+        await login(TestHelper.basicUser.email, 'password1')(store.dispatch, store.getState);
+
+        const post1 = await Client.createPost(
+            teamId,
+            TestHelper.fakePost(channelId)
+        );
+
+        await Actions.flagPost(post1.id)(dispatch, getState);
+        const state = getState();
+        const prefKey = getPreferenceKey(Preferences.CATEGORY_FLAGGED_POST, post1.id);
+        const preference = state.entities.preferences.myPreferences[prefKey];
+        assert.ok(preference);
+    });
+
+    it('unflagPost', async () => {
+        const {dispatch, getState} = store;
+        const teamId = TestHelper.basicTeam.id;
+        const channelId = TestHelper.basicChannel.id;
+        await TestHelper.basicClient.logout();
+        await login(TestHelper.basicUser.email, 'password1')(store.dispatch, store.getState);
+
+        const post1 = await Client.createPost(
+            teamId,
+            TestHelper.fakePost(channelId)
+        );
+
+        await Actions.flagPost(post1.id)(dispatch, getState);
+        let state = getState();
+        const prefKey = getPreferenceKey(Preferences.CATEGORY_FLAGGED_POST, post1.id);
+        const preference = state.entities.preferences.myPreferences[prefKey];
+        assert.ok(preference);
+
+        await Actions.unflagPost(post1.id)(dispatch, getState);
+        state = getState();
+        const unflagged = state.entities.preferences.myPreferences[prefKey];
+        assert.ifError(unflagged);
     });
 });
