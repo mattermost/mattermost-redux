@@ -2,39 +2,14 @@
 // See License.txt for license information.
 
 import {batchActions} from 'redux-batched-actions';
+
 import Client from 'client';
+import {Constants, PostsTypes, Preferences} from 'constants';
+
 import {bindClientFunc, forceLogoutIfNecessary} from './helpers';
-import {Constants, PostsTypes} from 'constants';
 import {getLogErrorAction} from './errors';
+import {deletePreferences, savePreferences} from './preferences';
 import {getProfilesByIds, getStatusesByIds} from './users';
-
-async function getProfilesAndStatusesForPosts(list, dispatch, getState) {
-    const {profiles, statuses} = getState().entities.users;
-    const posts = list.posts;
-    const profilesToLoad = [];
-    const statusesToLoad = [];
-
-    Object.keys(posts).forEach((key) => {
-        const post = posts[key];
-        const userId = post.user_id;
-
-        if (!profiles[userId]) {
-            profilesToLoad.push(userId);
-        }
-
-        if (!statuses[userId]) {
-            statusesToLoad.push(userId);
-        }
-    });
-
-    if (profilesToLoad.length) {
-        await getProfilesByIds(profilesToLoad)(dispatch, getState);
-    }
-
-    if (statusesToLoad.length) {
-        await getStatusesByIds(statusesToLoad)(dispatch, getState);
-    }
-}
 
 export function createPost(teamId, post) {
     return bindClientFunc(
@@ -42,17 +17,6 @@ export function createPost(teamId, post) {
         PostsTypes.CREATE_POST_REQUEST,
         [PostsTypes.RECEIVED_POST, PostsTypes.CREATE_POST_SUCCESS],
         PostsTypes.CREATE_POST_FAILURE,
-        teamId,
-        post
-    );
-}
-
-export function editPost(teamId, post) {
-    return bindClientFunc(
-        Client.editPost,
-        PostsTypes.EDIT_POST_REQUEST,
-        [PostsTypes.RECEIVED_POST, PostsTypes.EDIT_POST_SUCCESS],
-        PostsTypes.EDIT_POST_FAILURE,
         teamId,
         post
     );
@@ -85,12 +49,28 @@ export function deletePost(teamId, post) {
     };
 }
 
-export function removePost(post) {
+export function editPost(teamId, post) {
+    return bindClientFunc(
+        Client.editPost,
+        PostsTypes.EDIT_POST_REQUEST,
+        [PostsTypes.RECEIVED_POST, PostsTypes.EDIT_POST_SUCCESS],
+        PostsTypes.EDIT_POST_FAILURE,
+        teamId,
+        post
+    );
+}
+
+export function flagPost(postId) {
     return async (dispatch, getState) => {
-        dispatch({
-            type: PostsTypes.REMOVE_POST,
-            data: {...post}
-        }, getState);
+        const {currentUserId} = getState().entities.users;
+        const preference = {
+            user_id: currentUserId,
+            category: Preferences.CATEGORY_FLAGGED_POST,
+            name: postId,
+            value: 'true'
+        };
+
+        return savePreferences([preference])(dispatch, getState);
     };
 }
 
@@ -252,12 +232,62 @@ export function getPostsAfter(teamId, channelId, postId, offset = 0, limit = Con
     };
 }
 
+async function getProfilesAndStatusesForPosts(list, dispatch, getState) {
+    const {profiles, statuses} = getState().entities.users;
+    const posts = list.posts;
+    const profilesToLoad = [];
+    const statusesToLoad = [];
+
+    Object.keys(posts).forEach((key) => {
+        const post = posts[key];
+        const userId = post.user_id;
+
+        if (!profiles[userId]) {
+            profilesToLoad.push(userId);
+        }
+
+        if (!statuses[userId]) {
+            statusesToLoad.push(userId);
+        }
+    });
+
+    if (profilesToLoad.length) {
+        await getProfilesByIds(profilesToLoad)(dispatch, getState);
+    }
+
+    if (statusesToLoad.length) {
+        await getStatusesByIds(statusesToLoad)(dispatch, getState);
+    }
+}
+
+export function removePost(post) {
+    return async (dispatch, getState) => {
+        dispatch({
+            type: PostsTypes.REMOVE_POST,
+            data: {...post}
+        }, getState);
+    };
+}
+
 export function selectPost(postId) {
     return async (dispatch, getState) => {
         dispatch({
             type: PostsTypes.RECEIVED_POST_SELECTED,
             data: postId
         }, getState);
+    };
+}
+
+export function unflagPost(postId) {
+    return async (dispatch, getState) => {
+        const {currentUserId} = getState().entities.users;
+        const preference = {
+            user_id: currentUserId,
+            category: Preferences.CATEGORY_FLAGGED_POST,
+            name: postId
+        };
+
+        return deletePreferences([preference])(dispatch, getState);
     };
 }
 
