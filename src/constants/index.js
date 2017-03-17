@@ -15,6 +15,7 @@ import WebsocketEvents from './websocket';
 
 const Preferences = {
     CATEGORY_DIRECT_CHANNEL_SHOW: 'direct_channel_show',
+    CATEGORY_FLAGGED_POST: 'flagged_post',
     CATEGORY_NOTIFICATIONS: 'notifications',
     CATEGORY_THEME: 'theme',
     EMAIL_INTERVAL: 'email_interval',

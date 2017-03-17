@@ -1,15 +1,9 @@
 // Copyright (c) 2016 Mattermost, Inc. All Rights Reserved.
 // See License.txt for license information.
 
-import {Constants} from 'constants';
+import {Constants, Preferences} from 'constants';
 
-export function isSystemMessage(post) {
-    return post.type && post.type.startsWith(Constants.SYSTEM_MESSAGE_PREFIX);
-}
-
-export function shouldIgnorePost(post) {
-    return Constants.IGNORE_POST_TYPES.includes(post.type);
-}
+import {getPreferenceKey} from './preference_utils';
 
 export function addDatesToPostList(posts, options = {}) {
     const {indicateNewMessages, currentUserId, lastViewedAt} = options;
@@ -49,3 +43,17 @@ export function addDatesToPostList(posts, options = {}) {
 
     return out;
 }
+
+export function isPostFlagged(postId, myPreferences) {
+    const key = getPreferenceKey(Preferences.CATEGORY_FLAGGED_POST, postId);
+    return myPreferences.hasOwnProperty(key);
+}
+
+export function isSystemMessage(post) {
+    return post.type && post.type.startsWith(Constants.SYSTEM_MESSAGE_PREFIX);
+}
+
+export function shouldIgnorePost(post) {
+    return Constants.IGNORE_POST_TYPES.includes(post.type);
+}
+
