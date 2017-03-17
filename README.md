@@ -1,4 +1,4 @@
-# Mattermost Redux (unreleased) 
+# Mattermost Redux (unreleased)  
 
 **Supported Server Versions:** Master (no released versions are currently supported) 
 
