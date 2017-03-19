@@ -1,48 +1,32 @@
-// Copyright (c) 2016 Mattermost, Inc. All Rights Reserved.
+// Copyright (c) 2017 Mattermost, Inc. All Rights Reserved.
 // See License.txt for license information.
 
-import keyMirror from 'utils/key_mirror';
+const PostTypes = {
+    ADD_REMOVE: 'system_add_remove',
+    ADD_TO_CHANNEL: 'system_add_to_channel',
+    CHANNEL_DELETED: 'system_channel_deleted',
+    DISPLAYNAME_CHANGE: 'system_displayname_change',
+    EPHEMERAL: 'system_ephemeral',
+    HEADER_CHANGE: 'system_header_change',
+    JOIN_CHANNEL: 'system_join_channel',
+    JOIN_LEAVE: 'system_join_leave',
+    LEAVE_CHANNEL: 'system_leave_channel',
+    PURPOSE_CHANGE: 'system_purpose_change',
+    REMOVE_FROM_CHANNEL: 'system_remove_from_channel'
+};
 
-const PostsTypes = keyMirror({
-    CREATE_POST_REQUEST: null,
-    CREATE_POST_SUCCESS: null,
-    CREATE_POST_FAILURE: null,
-
-    EDIT_POST_REQUEST: null,
-    EDIT_POST_SUCCESS: null,
-    EDIT_POST_FAILURE: null,
-
-    DELETE_POST_REQUEST: null,
-    DELETE_POST_SUCCESS: null,
-    DELETE_POST_FAILURE: null,
-
-    GET_POST_REQUEST: null,
-    GET_POST_SUCCESS: null,
-    GET_POST_FAILURE: null,
-
-    GET_POSTS_REQUEST: null,
-    GET_POSTS_SUCCESS: null,
-    GET_POSTS_FAILURE: null,
-
-    GET_POSTS_SINCE_REQUEST: null,
-    GET_POSTS_SINCE_SUCCESS: null,
-    GET_POSTS_SINCE_FAILURE: null,
-
-    GET_POSTS_BEFORE_REQUEST: null,
-    GET_POSTS_BEFORE_SUCCESS: null,
-    GET_POSTS_BEFORE_FAILURE: null,
-
-    GET_POSTS_AFTER_REQUEST: null,
-    GET_POSTS_AFTER_SUCCESS: null,
-    GET_POSTS_AFTER_FAILURE: null,
-
-    RECEIVED_POST: null,
-    RECEIVED_POSTS: null,
-    RECEIVED_FOCUSED_POST: null,
-    RECEIVED_POST_SELECTED: null,
-    RECEIVED_EDIT_POST: null,
-    POST_DELETED: null,
-    REMOVE_POST: null
-});
-
-export default PostsTypes;
+export default {
+    POST_CHUNK_SIZE: 60,
+    POST_DELETED: 'DELETED',
+    SYSTEM_MESSAGE_PREFIX: 'system_',
+    POST_TYPES: PostTypes,
+    IGNORE_POST_TYPES: [
+        PostTypes.ADD_REMOVE,
+        PostTypes.ADD_TO_CHANNEL,
+        PostTypes.CHANNEL_DELETED,
+        PostTypes.JOIN_LEAVE,
+        PostTypes.JOIN_CHANNEL,
+        PostTypes.LEAVE_CHANNEL,
+        PostTypes.REMOVE_FROM_CHANNEL
+    ]
+};

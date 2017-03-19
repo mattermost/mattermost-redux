@@ -7,7 +7,7 @@ import * as Actions from 'actions/posts';
 import {login} from 'actions/users';
 import Client from 'client';
 import configureStore from 'store';
-import {Constants, Preferences, RequestStatus} from 'constants';
+import {Preferences, Posts, RequestStatus} from 'constants';
 import TestHelper from 'test/test_helper';
 import {getPreferenceKey} from 'utils/preference_utils';
 
@@ -124,7 +124,7 @@ describe('Actions.Posts', () => {
 
         assert.strictEqual(
             posts[created.id].state,
-            Constants.POST_DELETED
+            Posts.POST_DELETED
         );
     });
 

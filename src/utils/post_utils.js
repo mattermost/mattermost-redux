@@ -1,7 +1,7 @@
 // Copyright (c) 2016 Mattermost, Inc. All Rights Reserved.
 // See License.txt for license information.
 
-import {Constants, Preferences} from 'constants';
+import {General, Posts, Preferences} from 'constants';
 
 import {getPreferenceKey} from './preference_utils';
 
@@ -15,12 +15,12 @@ export function addDatesToPostList(posts, options = {}) {
     let subsequentPostUserId;
     let postIsUnread;
     for (const post of posts) {
-        if (post.state === Constants.POST_DELETED && post.user_id === currentUserId) {
+        if (post.state === Posts.POST_DELETED && post.user_id === currentUserId) {
             continue;
         }
         postIsUnread = post.create_at > lastViewedAt;
         if (indicateNewMessages && subsequentPostIsUnread && !postIsUnread && subsequentPostUserId !== currentUserId) {
-            out.push(Constants.START_OF_NEW_MESSAGES);
+            out.push(General.START_OF_NEW_MESSAGES);
         }
         subsequentPostIsUnread = postIsUnread;
         subsequentPostUserId = post.user_id;
@@ -50,10 +50,10 @@ export function isPostFlagged(postId, myPreferences) {
 }
 
 export function isSystemMessage(post) {
-    return post.type && post.type.startsWith(Constants.SYSTEM_MESSAGE_PREFIX);
+    return post.type && post.type.startsWith(Posts.SYSTEM_MESSAGE_PREFIX);
 }
 
 export function shouldIgnorePost(post) {
-    return Constants.IGNORE_POST_TYPES.includes(post.type);
+    return Posts.IGNORE_POST_TYPES.includes(post.type);
 }
 

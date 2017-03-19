@@ -5,7 +5,7 @@ import {batchActions} from 'redux-batched-actions';
 
 import Client from 'client';
 import {bindClientFunc, FormattedError} from './helpers.js';
-import {GeneralTypes} from 'constants';
+import {GeneralTypes} from 'action_types';
 import {getMyChannelMembers} from './channels';
 import {getLogErrorAction} from './errors';
 import {loadMe} from './users';

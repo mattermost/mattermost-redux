@@ -1,12 +1,12 @@
 // Copyright (c) 2016 Mattermost, Inc. All Rights Reserved.
 // See License.txt for license information.
 
-import {Constants} from '../constants';
+import {General, Preferences} from '../constants';
 import {displayUsername} from './user_utils';
 import {getPreferencesByCategory} from './preference_utils';
 
 const defaultPrefix = 'D'; // fallback for future types
-const typeToPrefixMap = {[Constants.OPEN_CHANNEL]: 'A', [Constants.PRIVATE_CHANNEL]: 'B', [Constants.DM_CHANNEL]: 'C'};
+const typeToPrefixMap = {[General.OPEN_CHANNEL]: 'A', [General.PRIVATE_CHANNEL]: 'B', [General.DM_CHANNEL]: 'C'};
 
 export function buildDisplayableChannelList(usersState, teamsState, allChannels, myPreferences) {
     const missingDMChannels = createMissingDirectChannels(usersState.currentUserId, allChannels, myPreferences);
@@ -72,11 +72,11 @@ export function getChannelByName(channels, name) {
 }
 
 function isOpenChannel(channel) {
-    return channel.type === Constants.OPEN_CHANNEL;
+    return channel.type === General.OPEN_CHANNEL;
 }
 
 function isPrivateChannel(channel) {
-    return channel.type === Constants.PRIVATE_CHANNEL;
+    return channel.type === General.PRIVATE_CHANNEL;
 }
 
 function isConnectedToTeamMember(members, channel) {
@@ -91,23 +91,23 @@ function isNotConnectedToTeamMember(members, channel) {
 }
 
 function isDirectChannel(channel) {
-    return channel.type === Constants.DM_CHANNEL;
+    return channel.type === General.DM_CHANNEL;
 }
 
 export function isDirectChannelVisible(userId, myPreferences, channel) {
     const channelId = getUserIdFromChannelName(userId, channel.name);
-    const dm = myPreferences[`${Constants.CATEGORY_DIRECT_CHANNEL_SHOW}--${channelId}`];
+    const dm = myPreferences[`${Preferences.CATEGORY_DIRECT_CHANNEL_SHOW}--${channelId}`];
     return dm && dm.value === 'true';
 }
 
 function isFavoriteChannel(myPreferences, channel) {
-    const fav = myPreferences[`${Constants.CATEGORY_FAVORITE_CHANNEL}--${channel.id}`];
+    const fav = myPreferences[`${Preferences.CATEGORY_FAVORITE_CHANNEL}--${channel.id}`];
     channel.isFavorite = fav && fav.value === 'true';
     return channel.isFavorite;
 }
 
 function createMissingDirectChannels(currentUserId, allChannels, myPreferences) {
-    const preferences = getPreferencesByCategory(myPreferences, Constants.CATEGORY_DIRECT_CHANNEL_SHOW);
+    const preferences = getPreferencesByCategory(myPreferences, Preferences.CATEGORY_DIRECT_CHANNEL_SHOW);
 
     return Array.
     from(preferences).
@@ -118,7 +118,7 @@ function createMissingDirectChannels(currentUserId, allChannels, myPreferences) 
 }
 
 function isDirectChannelForUser(userId, otherUserId, channel) {
-    return channel.type === Constants.DM_CHANNEL && getUserIdFromChannelName(userId, channel.name) === otherUserId;
+    return channel.type === General.DM_CHANNEL && getUserIdFromChannelName(userId, channel.name) === otherUserId;
 }
 
 function isNotMemberOf(myMembers, channel) {
@@ -142,7 +142,7 @@ function createFakeChannel(userId, otherUserId) {
         name: getDirectChannelName(userId, otherUserId),
         last_post_at: 0,
         total_msg_count: 0,
-        type: Constants.DM_CHANNEL,
+        type: General.DM_CHANNEL,
         fake: true
     };
 }

@@ -2,11 +2,11 @@
 // See License.txt for license information.
 
 import {combineReducers} from 'redux';
-import {FilesTypes, UsersTypes} from 'constants';
+import {FileTypes, UserTypes} from 'action_types';
 
 function files(state = {}, action) {
     switch (action.type) {
-    case FilesTypes.RECEIVED_FILES_FOR_POST: {
+    case FileTypes.RECEIVED_FILES_FOR_POST: {
         const filesById = action.data.reduce((filesMap, file) => {
             return {...filesMap,
                 [file.id]: file
@@ -17,7 +17,7 @@ function files(state = {}, action) {
         };
     }
 
-    case UsersTypes.LOGOUT_SUCCESS:
+    case UserTypes.LOGOUT_SUCCESS:
         return {};
     default:
         return state;
@@ -26,7 +26,7 @@ function files(state = {}, action) {
 
 function fileIdsByPostId(state = {}, action) {
     switch (action.type) {
-    case FilesTypes.RECEIVED_FILES_FOR_POST: {
+    case FileTypes.RECEIVED_FILES_FOR_POST: {
         const {data, postId} = action;
         const filesIdsForPost = data.map((file) => file.id);
         return {...state,
@@ -34,7 +34,7 @@ function fileIdsByPostId(state = {}, action) {
         };
     }
 
-    case UsersTypes.LOGOUT_SUCCESS:
+    case UserTypes.LOGOUT_SUCCESS:
         return {};
     default:
         return state;

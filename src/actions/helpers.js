@@ -3,15 +3,15 @@
 
 import {batchActions} from 'redux-batched-actions';
 import Client from 'client';
-import {UsersTypes} from 'constants';
+import {UserTypes} from 'action_types';
 import {getLogErrorAction} from './errors';
 const HTTP_UNAUTHORIZED = 401;
 
 export async function forceLogoutIfNecessary(err, dispatch) {
     if (err.status_code === HTTP_UNAUTHORIZED && err.url.indexOf('/login') === -1) {
-        dispatch({type: UsersTypes.LOGOUT_REQUEST});
+        dispatch({type: UserTypes.LOGOUT_REQUEST});
         await Client.logout();
-        dispatch({type: UsersTypes.LOGOUT_SUCCESS});
+        dispatch({type: UserTypes.LOGOUT_SUCCESS});
     }
 }
 

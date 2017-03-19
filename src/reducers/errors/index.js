@@ -1,7 +1,7 @@
 // Copyright (c) 2017 Mattermost, Inc. All Rights Reserved.
 // See License.txt for license information.
 
-import {ErrorTypes} from 'constants';
+import {ErrorTypes} from 'action_types';
 
 export default (state = [], action) => {
     switch (action.type) {

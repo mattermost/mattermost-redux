@@ -1,7 +1,7 @@
 // Copyright (c) 2016 Mattermost, Inc. All Rights Reserved.
 // See License.txt for license information.
 
-import {Constants} from 'constants';
+import {General, Preferences} from 'constants';
 
 export function getFullName(user) {
     if (user.first_name && user.last_name) {
@@ -17,16 +17,16 @@ export function getFullName(user) {
 
 export function displayUsername(user, myPreferences) {
     let nameFormat = 'false';
-    const pref = myPreferences[`${Constants.CATEGORY_DISPLAY_SETTINGS}--name_format`];
+    const pref = myPreferences[`${Preferences.CATEGORY_DISPLAY_SETTINGS}--name_format`];
     if (pref && pref.value) {
         nameFormat = pref.value;
     }
     let username = '';
 
     if (user) {
-        if (nameFormat === Constants.DISPLAY_PREFER_NICKNAME) {
+        if (nameFormat === Preferences.DISPLAY_PREFER_NICKNAME) {
             username = user.nickname || getFullName(user);
-        } else if (nameFormat === Constants.DISPLAY_PREFER_FULL_NAME) {
+        } else if (nameFormat === Preferences.DISPLAY_PREFER_FULL_NAME) {
             username = getFullName(user);
         }
 
@@ -42,9 +42,9 @@ export function isAdmin(roles) {
 }
 
 export function isTeamAdmin(roles) {
-    return roles.includes(Constants.TEAM_ADMIN_ROLE);
+    return roles.includes(General.TEAM_ADMIN_ROLE);
 }
 
 export function isSystemAdmin(roles) {
-    return roles.includes(Constants.SYSTEM_ADMIN_ROLE);
+    return roles.includes(General.SYSTEM_ADMIN_ROLE);
 }

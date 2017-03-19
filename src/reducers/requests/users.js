@@ -2,22 +2,23 @@
 // See License.txt for license information.
 
 import {combineReducers} from 'redux';
-import {UsersTypes, RequestStatus} from 'constants';
+import {RequestStatus} from 'constants';
+import {UserTypes} from 'action_types';
 
 import {handleRequest, initialRequestState} from './helpers';
 
 function checkMfa(state = initialRequestState(), action) {
     switch (action.type) {
-    case UsersTypes.CHECK_MFA_REQUEST:
+    case UserTypes.CHECK_MFA_REQUEST:
         return {...state, status: RequestStatus.STARTED};
 
-    case UsersTypes.CHECK_MFA_SUCCESS:
+    case UserTypes.CHECK_MFA_SUCCESS:
         return {...state, status: RequestStatus.SUCCESS, error: null};
 
-    case UsersTypes.CHECK_MFA_FAILURE:
+    case UserTypes.CHECK_MFA_FAILURE:
         return {...state, status: RequestStatus.FAILURE, error: action.error};
 
-    case UsersTypes.LOGOUT_SUCCESS:
+    case UserTypes.LOGOUT_SUCCESS:
         return {...state, status: RequestStatus.NOT_STARTED, error: null};
 
     default:
@@ -27,16 +28,16 @@ function checkMfa(state = initialRequestState(), action) {
 
 function login(state = initialRequestState(), action) {
     switch (action.type) {
-    case UsersTypes.LOGIN_REQUEST:
+    case UserTypes.LOGIN_REQUEST:
         return {...state, status: RequestStatus.STARTED};
 
-    case UsersTypes.LOGIN_SUCCESS:
+    case UserTypes.LOGIN_SUCCESS:
         return {...state, status: RequestStatus.SUCCESS, error: null};
 
-    case UsersTypes.LOGIN_FAILURE:
+    case UserTypes.LOGIN_FAILURE:
         return {...state, status: RequestStatus.FAILURE, error: action.error};
 
-    case UsersTypes.LOGOUT_SUCCESS:
+    case UserTypes.LOGOUT_SUCCESS:
         return {...state, status: RequestStatus.NOT_STARTED, error: null};
 
     default:
@@ -46,16 +47,16 @@ function login(state = initialRequestState(), action) {
 
 function logout(state = initialRequestState(), action) {
     switch (action.type) {
-    case UsersTypes.LOGOUT_REQUEST:
+    case UserTypes.LOGOUT_REQUEST:
         return {...state, status: RequestStatus.STARTED};
 
-    case UsersTypes.LOGOUT_SUCCESS:
+    case UserTypes.LOGOUT_SUCCESS:
         return {...state, status: RequestStatus.SUCCESS, error: null};
 
-    case UsersTypes.LOGOUT_FAILURE:
+    case UserTypes.LOGOUT_FAILURE:
         return {...state, status: RequestStatus.FAILURE, error: action.error};
 
-    case UsersTypes.RESET_LOGOUT_STATE:
+    case UserTypes.RESET_LOGOUT_STATE:
         return initialRequestState();
 
     default:
@@ -65,9 +66,9 @@ function logout(state = initialRequestState(), action) {
 
 function getProfiles(state = initialRequestState(), action) {
     return handleRequest(
-        UsersTypes.PROFILES_REQUEST,
-        UsersTypes.PROFILES_SUCCESS,
-        UsersTypes.PROFILES_FAILURE,
+        UserTypes.PROFILES_REQUEST,
+        UserTypes.PROFILES_SUCCESS,
+        UserTypes.PROFILES_FAILURE,
         state,
         action
     );
@@ -75,9 +76,9 @@ function getProfiles(state = initialRequestState(), action) {
 
 function getProfilesInTeam(state = initialRequestState(), action) {
     return handleRequest(
-        UsersTypes.PROFILES_IN_TEAM_REQUEST,
-        UsersTypes.PROFILES_IN_TEAM_SUCCESS,
-        UsersTypes.PROFILES_IN_TEAM_FAILURE,
+        UserTypes.PROFILES_IN_TEAM_REQUEST,
+        UserTypes.PROFILES_IN_TEAM_SUCCESS,
+        UserTypes.PROFILES_IN_TEAM_FAILURE,
         state,
         action
     );
@@ -85,9 +86,9 @@ function getProfilesInTeam(state = initialRequestState(), action) {
 
 function getProfilesInChannel(state = initialRequestState(), action) {
     return handleRequest(
-        UsersTypes.PROFILES_IN_CHANNEL_REQUEST,
-        UsersTypes.PROFILES_IN_CHANNEL_SUCCESS,
-        UsersTypes.PROFILES_IN_CHANNEL_FAILURE,
+        UserTypes.PROFILES_IN_CHANNEL_REQUEST,
+        UserTypes.PROFILES_IN_CHANNEL_SUCCESS,
+        UserTypes.PROFILES_IN_CHANNEL_FAILURE,
         state,
         action
     );
@@ -95,9 +96,9 @@ function getProfilesInChannel(state = initialRequestState(), action) {
 
 function getProfilesNotInChannel(state = initialRequestState(), action) {
     return handleRequest(
-        UsersTypes.PROFILES_NOT_IN_CHANNEL_REQUEST,
-        UsersTypes.PROFILES_NOT_IN_CHANNEL_SUCCESS,
-        UsersTypes.PROFILES_NOT_IN_CHANNEL_FAILURE,
+        UserTypes.PROFILES_NOT_IN_CHANNEL_REQUEST,
+        UserTypes.PROFILES_NOT_IN_CHANNEL_SUCCESS,
+        UserTypes.PROFILES_NOT_IN_CHANNEL_FAILURE,
         state,
         action
     );
@@ -105,9 +106,9 @@ function getProfilesNotInChannel(state = initialRequestState(), action) {
 
 function getStatusesByIds(state = initialRequestState(), action) {
     return handleRequest(
-        UsersTypes.PROFILES_STATUSES_REQUEST,
-        UsersTypes.PROFILES_STATUSES_SUCCESS,
-        UsersTypes.PROFILES_STATUSES_FAILURE,
+        UserTypes.PROFILES_STATUSES_REQUEST,
+        UserTypes.PROFILES_STATUSES_SUCCESS,
+        UserTypes.PROFILES_STATUSES_FAILURE,
         state,
         action
     );
@@ -115,9 +116,9 @@ function getStatusesByIds(state = initialRequestState(), action) {
 
 function getSessions(state = initialRequestState(), action) {
     return handleRequest(
-        UsersTypes.SESSIONS_REQUEST,
-        UsersTypes.SESSIONS_SUCCESS,
-        UsersTypes.SESSIONS_FAILURE,
+        UserTypes.SESSIONS_REQUEST,
+        UserTypes.SESSIONS_SUCCESS,
+        UserTypes.SESSIONS_FAILURE,
         state,
         action
     );
@@ -125,9 +126,9 @@ function getSessions(state = initialRequestState(), action) {
 
 function revokeSession(state = initialRequestState(), action) {
     return handleRequest(
-        UsersTypes.REVOKE_SESSION_REQUEST,
-        UsersTypes.REVOKE_SESSION_SUCCESS,
-        UsersTypes.REVOKE_SESSION_FAILURE,
+        UserTypes.REVOKE_SESSION_REQUEST,
+        UserTypes.REVOKE_SESSION_SUCCESS,
+        UserTypes.REVOKE_SESSION_FAILURE,
         state,
         action
     );
@@ -135,9 +136,9 @@ function revokeSession(state = initialRequestState(), action) {
 
 function getAudits(state = initialRequestState(), action) {
     return handleRequest(
-        UsersTypes.AUDITS_REQUEST,
-        UsersTypes.AUDITS_SUCCESS,
-        UsersTypes.AUDITS_FAILURE,
+        UserTypes.AUDITS_REQUEST,
+        UserTypes.AUDITS_SUCCESS,
+        UserTypes.AUDITS_FAILURE,
         state,
         action
     );
@@ -145,9 +146,9 @@ function getAudits(state = initialRequestState(), action) {
 
 function autocompleteUsersInChannel(state = initialRequestState(), action) {
     return handleRequest(
-        UsersTypes.AUTOCOMPLETE_IN_CHANNEL_REQUEST,
-        UsersTypes.AUTOCOMPLETE_IN_CHANNEL_SUCCESS,
-        UsersTypes.AUTOCOMPLETE_IN_CHANNEL_FAILURE,
+        UserTypes.AUTOCOMPLETE_IN_CHANNEL_REQUEST,
+        UserTypes.AUTOCOMPLETE_IN_CHANNEL_SUCCESS,
+        UserTypes.AUTOCOMPLETE_IN_CHANNEL_FAILURE,
         state,
         action
     );
@@ -155,9 +156,9 @@ function autocompleteUsersInChannel(state = initialRequestState(), action) {
 
 function searchProfiles(state = initialRequestState(), action) {
     return handleRequest(
-        UsersTypes.SEARCH_PROFILES_REQUEST,
-        UsersTypes.SEARCH_PROFILES_SUCCESS,
-        UsersTypes.SEARCH_PROFILES_FAILURE,
+        UserTypes.SEARCH_PROFILES_REQUEST,
+        UserTypes.SEARCH_PROFILES_SUCCESS,
+        UserTypes.SEARCH_PROFILES_FAILURE,
         state,
         action
     );
@@ -165,9 +166,9 @@ function searchProfiles(state = initialRequestState(), action) {
 
 function updateUserNotifyProps(state = initialRequestState(), action) {
     return handleRequest(
-        UsersTypes.UPDATE_NOTIFY_PROPS_REQUEST,
-        UsersTypes.UPDATE_NOTIFY_PROPS_SUCCESS,
-        UsersTypes.UPDATE_NOTIFY_PROPS_FAILURE,
+        UserTypes.UPDATE_NOTIFY_PROPS_REQUEST,
+        UserTypes.UPDATE_NOTIFY_PROPS_SUCCESS,
+        UserTypes.UPDATE_NOTIFY_PROPS_FAILURE,
         state,
         action
     );

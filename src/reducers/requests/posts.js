@@ -2,15 +2,15 @@
 // See License.txt for license information.
 
 import {combineReducers} from 'redux';
-import {PostsTypes} from 'constants';
+import {PostTypes} from 'action_types';
 
 import {handleRequest, initialRequestState} from './helpers';
 
 function createPost(state = initialRequestState(), action) {
     return handleRequest(
-        PostsTypes.CREATE_POST_REQUEST,
-        PostsTypes.CREATE_POST_SUCCESS,
-        PostsTypes.CREATE_POST_FAILURE,
+        PostTypes.CREATE_POST_REQUEST,
+        PostTypes.CREATE_POST_SUCCESS,
+        PostTypes.CREATE_POST_FAILURE,
         state,
         action
     );
@@ -18,9 +18,9 @@ function createPost(state = initialRequestState(), action) {
 
 function editPost(state = initialRequestState(), action) {
     return handleRequest(
-        PostsTypes.EDIT_POST_REQUEST,
-        PostsTypes.EDIT_POST_SUCCESS,
-        PostsTypes.EDIT_POST_FAILURE,
+        PostTypes.EDIT_POST_REQUEST,
+        PostTypes.EDIT_POST_SUCCESS,
+        PostTypes.EDIT_POST_FAILURE,
         state,
         action
     );
@@ -28,9 +28,9 @@ function editPost(state = initialRequestState(), action) {
 
 function deletePost(state = initialRequestState(), action) {
     return handleRequest(
-        PostsTypes.DELETE_POST_REQUEST,
-        PostsTypes.DELETE_POST_SUCCESS,
-        PostsTypes.DELETE_POST_FAILURE,
+        PostTypes.DELETE_POST_REQUEST,
+        PostTypes.DELETE_POST_SUCCESS,
+        PostTypes.DELETE_POST_FAILURE,
         state,
         action
     );
@@ -38,9 +38,9 @@ function deletePost(state = initialRequestState(), action) {
 
 function getPost(state = initialRequestState(), action) {
     return handleRequest(
-        PostsTypes.GET_POST_REQUEST,
-        PostsTypes.GET_POST_SUCCESS,
-        PostsTypes.GET_POST_FAILURE,
+        PostTypes.GET_POST_REQUEST,
+        PostTypes.GET_POST_SUCCESS,
+        PostTypes.GET_POST_FAILURE,
         state,
         action
     );
@@ -48,9 +48,9 @@ function getPost(state = initialRequestState(), action) {
 
 function getPosts(state = initialRequestState(), action) {
     return handleRequest(
-        PostsTypes.GET_POSTS_REQUEST,
-        PostsTypes.GET_POSTS_SUCCESS,
-        PostsTypes.GET_POSTS_FAILURE,
+        PostTypes.GET_POSTS_REQUEST,
+        PostTypes.GET_POSTS_SUCCESS,
+        PostTypes.GET_POSTS_FAILURE,
         state,
         action
     );
@@ -58,9 +58,9 @@ function getPosts(state = initialRequestState(), action) {
 
 function getPostsSince(state = initialRequestState(), action) {
     return handleRequest(
-        PostsTypes.GET_POSTS_SINCE_REQUEST,
-        PostsTypes.GET_POSTS_SINCE_SUCCESS,
-        PostsTypes.GET_POSTS_SINCE_FAILURE,
+        PostTypes.GET_POSTS_SINCE_REQUEST,
+        PostTypes.GET_POSTS_SINCE_SUCCESS,
+        PostTypes.GET_POSTS_SINCE_FAILURE,
         state,
         action
     );
@@ -68,9 +68,9 @@ function getPostsSince(state = initialRequestState(), action) {
 
 function getPostsBefore(state = initialRequestState(), action) {
     return handleRequest(
-        PostsTypes.GET_POSTS_BEFORE_REQUEST,
-        PostsTypes.GET_POSTS_BEFORE_SUCCESS,
-        PostsTypes.GET_POSTS_BEFORE_FAILURE,
+        PostTypes.GET_POSTS_BEFORE_REQUEST,
+        PostTypes.GET_POSTS_BEFORE_SUCCESS,
+        PostTypes.GET_POSTS_BEFORE_FAILURE,
         state,
         action
     );
@@ -78,9 +78,9 @@ function getPostsBefore(state = initialRequestState(), action) {
 
 function getPostsAfter(state = initialRequestState(), action) {
     return handleRequest(
-        PostsTypes.GET_POSTS_AFTER_REQUEST,
-        PostsTypes.GET_POSTS_AFTER_SUCCESS,
-        PostsTypes.GET_POSTS_AFTER_FAILURE,
+        PostTypes.GET_POSTS_AFTER_REQUEST,
+        PostTypes.GET_POSTS_AFTER_SUCCESS,
+        PostTypes.GET_POSTS_AFTER_FAILURE,
         state,
         action
     );

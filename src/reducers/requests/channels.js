@@ -2,7 +2,7 @@
 // See License.txt for license information.
 
 import {combineReducers} from 'redux';
-import {ChannelTypes} from 'constants';
+import {ChannelTypes} from 'action_types';
 
 import {handleRequest, initialRequestState} from './helpers';
 

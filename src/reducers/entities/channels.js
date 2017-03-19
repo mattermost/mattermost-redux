@@ -2,13 +2,13 @@
 // See License.txt for license information.
 
 import {combineReducers} from 'redux';
-import {ChannelTypes, TeamsTypes, UsersTypes} from 'constants';
+import {ChannelTypes, TeamTypes, UserTypes} from 'action_types';
 
 function currentChannelId(state = '', action) {
     switch (action.type) {
     case ChannelTypes.SELECT_CHANNEL:
         return action.data;
-    case UsersTypes.LOGOUT_SUCCESS:
+    case UserTypes.LOGOUT_SUCCESS:
         return '';
     default:
         return state;
@@ -70,8 +70,8 @@ function channels(state = {}, action) {
             }
         };
     }
-    case UsersTypes.LOGOUT_SUCCESS:
-    case TeamsTypes.SELECT_TEAM:
+    case UserTypes.LOGOUT_SUCCESS:
+    case TeamTypes.SELECT_TEAM:
         return {};
 
     default:
@@ -126,8 +126,8 @@ function myMembers(state = {}, action) {
         Reflect.deleteProperty(nextState, action.data);
         return nextState;
 
-    case UsersTypes.LOGOUT_SUCCESS:
-    case TeamsTypes.SELECT_TEAM:
+    case UserTypes.LOGOUT_SUCCESS:
+    case TeamTypes.SELECT_TEAM:
         return {};
     default:
         return state;
@@ -143,8 +143,8 @@ function stats(state = {}, action) {
 
         return nextState;
     }
-    case UsersTypes.LOGOUT_SUCCESS:
-    case TeamsTypes.SELECT_TEAM:
+    case UserTypes.LOGOUT_SUCCESS:
+    case TeamTypes.SELECT_TEAM:
         return {};
     default:
         return state;

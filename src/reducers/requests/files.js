@@ -2,15 +2,15 @@
 // See License.txt for license information.
 
 import {combineReducers} from 'redux';
-import {FilesTypes} from 'constants';
+import {FileTypes} from 'action_types';
 
 import {handleRequest, initialRequestState} from './helpers';
 
 function getFilesForPost(state = initialRequestState(), action) {
     return handleRequest(
-        FilesTypes.FETCH_FILES_FOR_POST_REQUEST,
-        FilesTypes.FETCH_FILES_FOR_POST_SUCCESS,
-        FilesTypes.FETCH_FILES_FOR_POST_FAILURE,
+        FileTypes.FETCH_FILES_FOR_POST_REQUEST,
+        FileTypes.FETCH_FILES_FOR_POST_SUCCESS,
+        FileTypes.FETCH_FILES_FOR_POST_FAILURE,
         state,
         action
     );

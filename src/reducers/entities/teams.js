@@ -2,14 +2,14 @@
 // See License.txt for license information.
 
 import {combineReducers} from 'redux';
-import {TeamsTypes, UsersTypes} from 'constants';
+import {TeamTypes, UserTypes} from 'action_types';
 
 function currentTeamId(state = '', action) {
     switch (action.type) {
-    case TeamsTypes.SELECT_TEAM:
+    case TeamTypes.SELECT_TEAM:
         return action.data;
 
-    case UsersTypes.LOGOUT_SUCCESS:
+    case UserTypes.LOGOUT_SUCCESS:
         return '';
     default:
         return state;
@@ -18,18 +18,18 @@ function currentTeamId(state = '', action) {
 
 function teams(state = {}, action) {
     switch (action.type) {
-    case TeamsTypes.RECEIVED_ALL_TEAMS:
-    case TeamsTypes.RECEIVED_TEAM_LISTINGS:
+    case TeamTypes.RECEIVED_ALL_TEAMS:
+    case TeamTypes.RECEIVED_TEAM_LISTINGS:
         return Object.assign({}, state, action.data);
 
-    case TeamsTypes.CREATED_TEAM:
-    case TeamsTypes.UPDATED_TEAM:
+    case TeamTypes.CREATED_TEAM:
+    case TeamTypes.UPDATED_TEAM:
         return {
             ...state,
             [action.data.id]: action.data
         };
 
-    case UsersTypes.LOGOUT_SUCCESS:
+    case UserTypes.LOGOUT_SUCCESS:
         return {};
 
     default:
@@ -39,7 +39,7 @@ function teams(state = {}, action) {
 
 function myMembers(state = {}, action) {
     switch (action.type) {
-    case TeamsTypes.RECEIVED_MY_TEAM_MEMBERS: {
+    case TeamTypes.RECEIVED_MY_TEAM_MEMBERS: {
         const nextState = {};
         const members = action.data;
         for (const m of members) {
@@ -48,13 +48,13 @@ function myMembers(state = {}, action) {
         return nextState;
     }
 
-    case TeamsTypes.LEAVE_TEAM: {
+    case TeamTypes.LEAVE_TEAM: {
         const nextState = {...state};
         const data = action.data;
         Reflect.deleteProperty(nextState, data.id);
         return nextState;
     }
-    case UsersTypes.LOGOUT_SUCCESS:
+    case UserTypes.LOGOUT_SUCCESS:
         return {};
 
     default:
@@ -64,7 +64,7 @@ function myMembers(state = {}, action) {
 
 function membersInTeam(state = {}, action) {
     switch (action.type) {
-    case TeamsTypes.RECEIVED_MEMBER_IN_TEAM: {
+    case TeamTypes.RECEIVED_MEMBER_IN_TEAM: {
         const data = action.data;
         const members = new Set(state[data.team_id]);
         members.add(data.user_id);
@@ -73,7 +73,7 @@ function membersInTeam(state = {}, action) {
             [data.team_id]: members
         };
     }
-    case TeamsTypes.RECEIVED_MEMBERS_IN_TEAM: {
+    case TeamTypes.RECEIVED_MEMBERS_IN_TEAM: {
         const data = action.data;
         if (data.length) {
             const teamId = data[0].team_id;
@@ -90,7 +90,7 @@ function membersInTeam(state = {}, action) {
 
         return state;
     }
-    case TeamsTypes.REMOVE_MEMBER_FROM_TEAM: {
+    case TeamTypes.REMOVE_MEMBER_FROM_TEAM: {
         const data = action.data;
         const members = state[data.team_id];
         if (members) {
@@ -104,7 +104,7 @@ function membersInTeam(state = {}, action) {
 
         return state;
     }
-    case UsersTypes.LOGOUT_SUCCESS:
+    case UserTypes.LOGOUT_SUCCESS:
         return {};
     default:
         return state;
@@ -113,14 +113,14 @@ function membersInTeam(state = {}, action) {
 
 function stats(state = {}, action) {
     switch (action.type) {
-    case TeamsTypes.RECEIVED_TEAM_STATS: {
+    case TeamTypes.RECEIVED_TEAM_STATS: {
         const stat = action.data;
         return {
             ...state,
             [stat.team_id]: stat
         };
     }
-    case UsersTypes.LOGOUT_SUCCESS:
+    case UserTypes.LOGOUT_SUCCESS:
         return {};
     default:
         return state;
@@ -129,7 +129,7 @@ function stats(state = {}, action) {
 
 function openTeamIds(state = new Set(), action) {
     switch (action.type) {
-    case TeamsTypes.RECEIVED_TEAM_LISTINGS: {
+    case TeamTypes.RECEIVED_TEAM_LISTINGS: {
         const teamsData = action.data;
         const newState = new Set();
         for (const teamId in teamsData) {

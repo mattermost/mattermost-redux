@@ -4,13 +4,13 @@
 import {batchActions} from 'redux-batched-actions';
 
 import Client from 'client';
-import {FilesTypes} from 'constants';
+import {FileTypes} from 'action_types';
 import {getLogErrorAction} from './errors';
 import {forceLogoutIfNecessary} from './helpers';
 
 export function getFilesForPost(teamId, channelId, postId) {
     return async (dispatch, getState) => {
-        dispatch({type: FilesTypes.FETCH_FILES_FOR_POST_REQUEST}, getState);
+        dispatch({type: FileTypes.FETCH_FILES_FOR_POST_REQUEST}, getState);
         let files;
 
         try {
@@ -18,7 +18,7 @@ export function getFilesForPost(teamId, channelId, postId) {
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch);
             dispatch(batchActions([
-                {type: FilesTypes.FETCH_FILES_FOR_POST_FAILURE, error},
+                {type: FileTypes.FETCH_FILES_FOR_POST_FAILURE, error},
                 getLogErrorAction(error)
             ]), getState);
             return;
@@ -26,12 +26,12 @@ export function getFilesForPost(teamId, channelId, postId) {
 
         dispatch(batchActions([
             {
-                type: FilesTypes.RECEIVED_FILES_FOR_POST,
+                type: FileTypes.RECEIVED_FILES_FOR_POST,
                 data: files,
                 postId
             },
             {
-                type: FilesTypes.FETCH_FILES_FOR_POST_SUCCESS
+                type: FileTypes.FETCH_FILES_FOR_POST_SUCCESS
             }
         ]), getState);
     };

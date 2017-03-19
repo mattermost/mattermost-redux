@@ -4,7 +4,8 @@
 import {batchActions} from 'redux-batched-actions';
 
 import Client from 'client';
-import {Constants, PostsTypes, Preferences} from 'constants';
+import {Preferences, Posts} from 'constants';
+import {PostTypes} from 'action_types';
 
 import {bindClientFunc, forceLogoutIfNecessary} from './helpers';
 import {getLogErrorAction} from './errors';
@@ -14,9 +15,9 @@ import {getProfilesByIds, getStatusesByIds} from './users';
 export function createPost(teamId, post) {
     return bindClientFunc(
         Client.createPost,
-        PostsTypes.CREATE_POST_REQUEST,
-        [PostsTypes.RECEIVED_POST, PostsTypes.CREATE_POST_SUCCESS],
-        PostsTypes.CREATE_POST_FAILURE,
+        PostTypes.CREATE_POST_REQUEST,
+        [PostTypes.RECEIVED_POST, PostTypes.CREATE_POST_SUCCESS],
+        PostTypes.CREATE_POST_FAILURE,
         teamId,
         post
     );
@@ -24,14 +25,14 @@ export function createPost(teamId, post) {
 
 export function deletePost(teamId, post) {
     return async (dispatch, getState) => {
-        dispatch({type: PostsTypes.DELETE_POST_REQUEST}, getState);
+        dispatch({type: PostTypes.DELETE_POST_REQUEST}, getState);
 
         try {
             await Client.deletePost(teamId, post.channel_id, post.id);
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch);
             dispatch(batchActions([
-                {type: PostsTypes.DELETE_POST_FAILURE, error},
+                {type: PostTypes.DELETE_POST_FAILURE, error},
                 getLogErrorAction(error)
             ]), getState);
             return;
@@ -39,11 +40,11 @@ export function deletePost(teamId, post) {
 
         dispatch(batchActions([
             {
-                type: PostsTypes.POST_DELETED,
+                type: PostTypes.POST_DELETED,
                 data: {...post}
             },
             {
-                type: PostsTypes.DELETE_POST_SUCCESS
+                type: PostTypes.DELETE_POST_SUCCESS
             }
         ]), getState);
     };
@@ -52,9 +53,9 @@ export function deletePost(teamId, post) {
 export function editPost(teamId, post) {
     return bindClientFunc(
         Client.editPost,
-        PostsTypes.EDIT_POST_REQUEST,
-        [PostsTypes.RECEIVED_POST, PostsTypes.EDIT_POST_SUCCESS],
-        PostsTypes.EDIT_POST_FAILURE,
+        PostTypes.EDIT_POST_REQUEST,
+        [PostTypes.RECEIVED_POST, PostTypes.EDIT_POST_SUCCESS],
+        PostTypes.EDIT_POST_FAILURE,
         teamId,
         post
     );
@@ -76,7 +77,7 @@ export function flagPost(postId) {
 
 export function getPost(teamId, channelId, postId) {
     return async (dispatch, getState) => {
-        dispatch({type: PostsTypes.GET_POST_REQUEST}, getState);
+        dispatch({type: PostTypes.GET_POST_REQUEST}, getState);
 
         let post;
         try {
@@ -85,7 +86,7 @@ export function getPost(teamId, channelId, postId) {
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch);
             dispatch(batchActions([
-                {type: PostsTypes.GET_POST_FAILURE, error},
+                {type: PostTypes.GET_POST_FAILURE, error},
                 getLogErrorAction(error)
             ]), getState);
             return;
@@ -93,20 +94,20 @@ export function getPost(teamId, channelId, postId) {
 
         dispatch(batchActions([
             {
-                type: PostsTypes.RECEIVED_POSTS,
+                type: PostTypes.RECEIVED_POSTS,
                 data: {...post},
                 channelId
             },
             {
-                type: PostsTypes.GET_POST_SUCCESS
+                type: PostTypes.GET_POST_SUCCESS
             }
         ]), getState);
     };
 }
 
-export function getPosts(teamId, channelId, offset = 0, limit = Constants.POST_CHUNK_SIZE) {
+export function getPosts(teamId, channelId, offset = 0, limit = Posts.POST_CHUNK_SIZE) {
     return async (dispatch, getState) => {
-        dispatch({type: PostsTypes.GET_POSTS_REQUEST}, getState);
+        dispatch({type: PostTypes.GET_POSTS_REQUEST}, getState);
         let posts;
 
         try {
@@ -115,7 +116,7 @@ export function getPosts(teamId, channelId, offset = 0, limit = Constants.POST_C
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch);
             dispatch(batchActions([
-                {type: PostsTypes.GET_POSTS_FAILURE, error},
+                {type: PostTypes.GET_POSTS_FAILURE, error},
                 getLogErrorAction(error)
             ]), getState);
             return null;
@@ -123,12 +124,12 @@ export function getPosts(teamId, channelId, offset = 0, limit = Constants.POST_C
 
         dispatch(batchActions([
             {
-                type: PostsTypes.RECEIVED_POSTS,
+                type: PostTypes.RECEIVED_POSTS,
                 data: posts,
                 channelId
             },
             {
-                type: PostsTypes.GET_POSTS_SUCCESS
+                type: PostTypes.GET_POSTS_SUCCESS
             }
         ]), getState);
 
@@ -138,7 +139,7 @@ export function getPosts(teamId, channelId, offset = 0, limit = Constants.POST_C
 
 export function getPostsSince(teamId, channelId, since) {
     return async (dispatch, getState) => {
-        dispatch({type: PostsTypes.GET_POSTS_SINCE_REQUEST}, getState);
+        dispatch({type: PostTypes.GET_POSTS_SINCE_REQUEST}, getState);
 
         let posts;
         try {
@@ -147,7 +148,7 @@ export function getPostsSince(teamId, channelId, since) {
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch);
             dispatch(batchActions([
-                {type: PostsTypes.GET_POSTS_SINCE_FAILURE, error},
+                {type: PostTypes.GET_POSTS_SINCE_FAILURE, error},
                 getLogErrorAction(error)
             ]), getState);
             return null;
@@ -155,12 +156,12 @@ export function getPostsSince(teamId, channelId, since) {
 
         dispatch(batchActions([
             {
-                type: PostsTypes.RECEIVED_POSTS,
+                type: PostTypes.RECEIVED_POSTS,
                 data: posts,
                 channelId
             },
             {
-                type: PostsTypes.GET_POSTS_SINCE_SUCCESS
+                type: PostTypes.GET_POSTS_SINCE_SUCCESS
             }
         ]), getState);
 
@@ -168,9 +169,9 @@ export function getPostsSince(teamId, channelId, since) {
     };
 }
 
-export function getPostsBefore(teamId, channelId, postId, offset = 0, limit = Constants.POST_CHUNK_SIZE) {
+export function getPostsBefore(teamId, channelId, postId, offset = 0, limit = Posts.POST_CHUNK_SIZE) {
     return async (dispatch, getState) => {
-        dispatch({type: PostsTypes.GET_POSTS_BEFORE_REQUEST}, getState);
+        dispatch({type: PostTypes.GET_POSTS_BEFORE_REQUEST}, getState);
 
         let posts;
         try {
@@ -179,7 +180,7 @@ export function getPostsBefore(teamId, channelId, postId, offset = 0, limit = Co
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch);
             dispatch(batchActions([
-                {type: PostsTypes.GET_POSTS_BEFORE_FAILURE, error},
+                {type: PostTypes.GET_POSTS_BEFORE_FAILURE, error},
                 getLogErrorAction(error)
             ]), getState);
             return null;
@@ -187,12 +188,12 @@ export function getPostsBefore(teamId, channelId, postId, offset = 0, limit = Co
 
         dispatch(batchActions([
             {
-                type: PostsTypes.RECEIVED_POSTS,
+                type: PostTypes.RECEIVED_POSTS,
                 data: posts,
                 channelId
             },
             {
-                type: PostsTypes.GET_POSTS_BEFORE_SUCCESS
+                type: PostTypes.GET_POSTS_BEFORE_SUCCESS
             }
         ]), getState);
 
@@ -200,9 +201,9 @@ export function getPostsBefore(teamId, channelId, postId, offset = 0, limit = Co
     };
 }
 
-export function getPostsAfter(teamId, channelId, postId, offset = 0, limit = Constants.POST_CHUNK_SIZE) {
+export function getPostsAfter(teamId, channelId, postId, offset = 0, limit = Posts.POST_CHUNK_SIZE) {
     return async (dispatch, getState) => {
-        dispatch({type: PostsTypes.GET_POSTS_AFTER_REQUEST}, getState);
+        dispatch({type: PostTypes.GET_POSTS_AFTER_REQUEST}, getState);
 
         let posts;
         try {
@@ -211,7 +212,7 @@ export function getPostsAfter(teamId, channelId, postId, offset = 0, limit = Con
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch);
             dispatch(batchActions([
-                {type: PostsTypes.GET_POSTS_AFTER_FAILURE, error},
+                {type: PostTypes.GET_POSTS_AFTER_FAILURE, error},
                 getLogErrorAction(error)
             ]), getState);
             return null;
@@ -219,12 +220,12 @@ export function getPostsAfter(teamId, channelId, postId, offset = 0, limit = Con
 
         dispatch(batchActions([
             {
-                type: PostsTypes.RECEIVED_POSTS,
+                type: PostTypes.RECEIVED_POSTS,
                 data: posts,
                 channelId
             },
             {
-                type: PostsTypes.GET_POSTS_AFTER_SUCCESS
+                type: PostTypes.GET_POSTS_AFTER_SUCCESS
             }
         ]), getState);
 
@@ -263,7 +264,7 @@ async function getProfilesAndStatusesForPosts(list, dispatch, getState) {
 export function removePost(post) {
     return async (dispatch, getState) => {
         dispatch({
-            type: PostsTypes.REMOVE_POST,
+            type: PostTypes.REMOVE_POST,
             data: {...post}
         }, getState);
     };
@@ -272,7 +273,7 @@ export function removePost(post) {
 export function selectPost(postId) {
     return async (dispatch, getState) => {
         dispatch({
-            type: PostsTypes.RECEIVED_POST_SELECTED,
+            type: PostTypes.RECEIVED_POST_SELECTED,
             data: postId
         }, getState);
     };
