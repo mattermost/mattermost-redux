@@ -19,7 +19,10 @@ import {
     getPosts,
     getPostsSince
 } from './posts';
-import {makeDirectChannelVisibleIfNecessary} from './preferences';
+import {
+    makeDirectChannelVisibleIfNecessary,
+    makeGroupMessageVisibleIfNecessary
+} from './preferences';
 import {
     Constants,
     ChannelTypes,
@@ -193,6 +196,8 @@ async function handleNewPostEvent(msg, dispatch, getState) {
         const otherUserId = getUserIdFromChannelName(users.currentUserId, msg.data.channel_name);
 
         makeDirectChannelVisibleIfNecessary(otherUserId)(dispatch, getState);
+    } else if (msg.data.channel_type === Constants.GM_CHANNEL) {
+        makeGroupMessageVisibleIfNecessary(post.channel_id)(dispatch, getState);
     }
 
     if (post.root_id && !posts[post.root_id]) {

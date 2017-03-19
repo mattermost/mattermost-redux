@@ -6,11 +6,13 @@ import {batchActions} from 'redux-batched-actions';
 import Client from 'client';
 import {Preferences, PreferencesTypes} from 'constants';
 import {getMyPreferences as getMyPreferencesSelector} from 'selectors/entities/preferences';
+import {getCurrentTeamId} from 'selectors/entities/teams';
 import {getCurrentUserId} from 'selectors/entities/users';
 import {getPreferenceKey} from 'utils/preference_utils';
 
 import {bindClientFunc, forceLogoutIfNecessary} from './helpers';
 import {getLogErrorAction} from './errors';
+import {getProfilesInChannel} from './users';
 
 export function deletePreferences(preferences) {
     return async (dispatch, getState) => {
@@ -64,6 +66,29 @@ export function makeDirectChannelVisibleIfNecessary(otherUserId) {
                 value: 'true'
             };
 
+            await savePreferences([preference])(dispatch, getState);
+        }
+    };
+}
+
+export function makeGroupMessageVisibleIfNecessary(channelId) {
+    return async (dispatch, getState) => {
+        const state = getState();
+        const myPreferences = getMyPreferencesSelector(state);
+        const currentTeamId = getCurrentTeamId(state);
+        const currentUserId = getCurrentUserId(state);
+
+        let preference = myPreferences[getPreferenceKey(Preferences.CATEGORY_GROUP_CHANNEL_SHOW, channelId)];
+
+        if (!preference || preference.value === 'false') {
+            preference = {
+                user_id: currentUserId,
+                category: Preferences.CATEGORY_GROUP_CHANNEL_SHOW,
+                name: channelId,
+                value: 'true'
+            };
+
+            getProfilesInChannel(currentTeamId, channelId, 0)(dispatch, getState);
             await savePreferences([preference])(dispatch, getState);
         }
     };
