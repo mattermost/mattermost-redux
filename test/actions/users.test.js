@@ -243,7 +243,7 @@ describe('Actions.Users', () => {
 
         const sessionsLength = sessions.length;
 
-        await Actions.revokeSession(sessions[0].id)(store.dispatch, store.getState);
+        await Actions.revokeSession(TestHelper.basicUser.id, sessions[0].id)(store.dispatch, store.getState);
 
         const revokeRequest = store.getState().requests.users.revokeSession;
         if (revokeRequest.status === RequestStatus.FAILURE) {
@@ -265,7 +265,7 @@ describe('Actions.Users', () => {
             throw new Error(JSON.stringify(sessionsRequest.error));
         }
 
-        await Actions.revokeSession(sessions[0].id)(store.dispatch, store.getState);
+        await Actions.revokeSession(TestHelper.basicUser.id, sessions[0].id)(store.dispatch, store.getState);
 
         const revokeRequest = store.getState().requests.users.revokeSession;
         if (revokeRequest.status === RequestStatus.FAILURE) {
@@ -280,9 +280,9 @@ describe('Actions.Users', () => {
         }
     });
 
-    it('getAudits', async () => {
-        await TestHelper.basicClient.login(TestHelper.basicUser.email, 'password1');
-        await Actions.getAudits(TestHelper.basicUser.id)(store.dispatch, store.getState);
+    it('getUserAudits', async () => {
+        await TestHelper.basicClient4.login(TestHelper.basicUser.email, 'password1');
+        await Actions.getUserAudits(TestHelper.basicUser.id)(store.dispatch, store.getState);
 
         const auditsRequest = store.getState().requests.users.getAudits;
         const audits = store.getState().entities.users.myAudits;
@@ -296,6 +296,7 @@ describe('Actions.Users', () => {
     });
 
     it('autocompleteUsersInChannel', async () => {
+        await TestHelper.basicClient.login(TestHelper.basicUser.email, 'password1');
         await Actions.autocompleteUsersInChannel(
             TestHelper.basicTeam.id,
             TestHelper.basicChannel.id,

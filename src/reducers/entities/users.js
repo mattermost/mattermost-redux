@@ -59,7 +59,7 @@ function mySessions(state = [], action) {
         let index = -1;
         const length = state.length;
         for (let i = 0; i < length; i++) {
-            if (state[i].id === action.data.id) {
+            if (state[i].id === action.sessionId) {
                 index = i;
                 break;
             }

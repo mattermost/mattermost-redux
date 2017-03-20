@@ -412,7 +412,7 @@ export function getStatusesByIds(userIds) {
 
 export function getSessions(userId) {
     return bindClientFunc(
-        Client.getSessions,
+        Client4.getSessions,
         UserTypes.SESSIONS_REQUEST,
         [UserTypes.RECEIVED_SESSIONS, UserTypes.SESSIONS_SUCCESS],
         UserTypes.SESSIONS_FAILURE,
@@ -420,23 +420,44 @@ export function getSessions(userId) {
     );
 }
 
-export function revokeSession(id) {
-    return bindClientFunc(
-        Client.revokeSession,
-        UserTypes.REVOKE_SESSION_REQUEST,
-        [UserTypes.RECEIVED_REVOKED_SESSION, UserTypes.REVOKE_SESSION_SUCCESS],
-        UserTypes.REVOKE_SESSION_FAILURE,
-        id
-    );
+export function revokeSession(userId, sessionId) {
+    return async (dispatch, getState) => {
+        dispatch({type: UserTypes.REVOKE_SESSION_REQUEST}, getState);
+
+        try {
+            await Client4.revokeSession(userId, sessionId);
+        } catch (error) {
+            forceLogoutIfNecessary(error, dispatch);
+            dispatch(batchActions([
+                {type: UserTypes.REVOKE_SESSION_FAILURE, error},
+                getLogErrorAction(error)
+            ]), getState);
+            return false;
+        }
+
+        dispatch(batchActions([
+            {
+                type: UserTypes.RECEIVED_REVOKED_SESSION,
+                sessionId
+            },
+            {
+                type: UserTypes.REVOKE_SESSION_SUCCESS
+            }
+        ]), getState);
+
+        return true;
+    };
 }
 
-export function getAudits(userId) {
+export function getUserAudits(userId, page = 0, perPage = General.AUDITS_CHUNK_SIZE) {
     return bindClientFunc(
-        Client.getAudits,
+        Client4.getUserAudits,
         UserTypes.AUDITS_REQUEST,
         [UserTypes.RECEIVED_AUDITS, UserTypes.AUDITS_SUCCESS],
         UserTypes.AUDITS_FAILURE,
-        userId
+        userId,
+        page,
+        perPage
     );
 }
 
@@ -552,7 +573,7 @@ export default {
     getStatusesByIds,
     getSessions,
     revokeSession,
-    getAudits,
+    getUserAudits,
     searchProfiles,
     startPeriodicStatusUpdates,
     stopPeriodicStatusUpdates,

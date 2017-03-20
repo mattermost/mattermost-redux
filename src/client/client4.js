@@ -188,6 +188,27 @@ export default class Client4 {
         );
     };
 
+    getSessions = async (userId) => {
+        return this.doFetch(
+            `${this.getUserRoute(userId)}/sessions`,
+            {method: 'get'}
+        );
+    };
+
+    revokeSession = async (userId, sessionId) => {
+        return this.doFetch(
+            `${this.getUserRoute(userId)}/sessions/revoke`,
+            {method: 'post', body: JSON.stringify({session_id: sessionId})}
+        );
+    };
+
+    getUserAudits = async (userId, page, perPage) => {
+        return this.doFetch(
+            `${this.getUserRoute(userId)}/audits${buildQueryString({page, per_page: perPage})}`,
+            {method: 'get'}
+        );
+    };
+
     // Preference Routes
 
     savePreferences = async (userId, preferences) => {
