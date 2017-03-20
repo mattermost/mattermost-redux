@@ -12,7 +12,7 @@ import {getPreferenceKey} from 'utils/preference_utils';
 
 import {bindClientFunc, forceLogoutIfNecessary} from './helpers';
 import {getLogErrorAction} from './errors';
-import {getProfilesInChannel} from './users';
+import {getProfilesByIds, getProfilesInChannel} from './users';
 
 export function deletePreferences(preferences) {
     return async (dispatch, getState) => {
@@ -65,7 +65,7 @@ export function makeDirectChannelVisibleIfNecessary(otherUserId) {
                 name: otherUserId,
                 value: 'true'
             };
-
+            getProfilesByIds([otherUserId])(dispatch, getState);
             await savePreferences([preference])(dispatch, getState);
         }
     };

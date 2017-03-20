@@ -112,10 +112,18 @@ export function getUserIdFromChannelName(userId, channelName) {
     return otherUserId;
 }
 
+export function isDirectChannel(channel) {
+    return channel.type === Constants.DM_CHANNEL;
+}
+
 export function isDirectChannelVisible(userId, myPreferences, channel) {
     const channelId = getUserIdFromChannelName(userId, channel.name);
     const dm = myPreferences[`${Constants.CATEGORY_DIRECT_CHANNEL_SHOW}--${channelId}`];
     return dm && dm.value === 'true';
+}
+
+export function isGroupChannel(channel) {
+    return channel.type === Constants.GM_CHANNEL;
 }
 
 export function isGroupChannelVisible(myPreferences, channel) {
@@ -174,10 +182,6 @@ function completeDirectGroupInfo(usersState, myPreferences, channel) {
     return channel;
 }
 
-function isDirectChannel(channel) {
-    return channel.type === Constants.DM_CHANNEL;
-}
-
 function isDirectChannelForUser(userId, otherUserId, channel) {
     return channel.type === Constants.DM_CHANNEL && getUserIdFromChannelName(userId, channel.name) === otherUserId;
 }
@@ -186,10 +190,6 @@ function isFavoriteChannel(myPreferences, channel) {
     const fav = myPreferences[`${Constants.CATEGORY_FAVORITE_CHANNEL}--${channel.id}`];
     channel.isFavorite = fav && fav.value === 'true';
     return channel.isFavorite;
-}
-
-function isGroupChannel(channel) {
-    return channel.type === Constants.GM_CHANNEL;
 }
 
 function isNotDeletedChannel(channel) {

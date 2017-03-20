@@ -3,10 +3,24 @@
 
 import {batchActions} from 'redux-batched-actions';
 import Client from 'client';
+
 import {Constants, PreferencesTypes, UsersTypes, TeamsTypes} from 'constants';
-import {fetchTeams} from './teams';
+
+import {
+    getUserIdFromChannelName,
+    isDirectChannel,
+    isDirectChannelVisible,
+    isGroupChannel,
+    isGroupChannelVisible
+} from 'utils/channel_utils';
+
 import {getLogErrorAction} from './errors';
 import {bindClientFunc, forceLogoutIfNecessary, debounce} from './helpers';
+import {
+    makeDirectChannelVisibleIfNecessary,
+    makeGroupMessageVisibleIfNecessary
+} from './preferences';
+import {fetchTeams} from './teams';
 
 export function checkMfa(loginId) {
     return async (dispatch, getState) => {
@@ -356,6 +370,34 @@ export function getSessions(userId) {
     );
 }
 
+export function loadProfilesForDirect() {
+    return async (dispatch, getState) => {
+        const state = getState();
+        const {channels, myMembers} = state.entities.channels;
+        const {myPreferences} = state.entities.preferences;
+        const {currentUserId} = state.entities.users;
+
+        const values = Object.values(channels);
+        for (let i = 0; i < values.length; i++) {
+            const channel = values[i];
+            const member = myMembers[channel.id];
+            if (!isDirectChannel(channel) && !isGroupChannel(channel)) {
+                continue;
+            }
+
+            if (member) {
+                if (member.mention_count > 0 && isDirectChannel(channel) && !isDirectChannelVisible(currentUserId, myPreferences, channel)) {
+                    const otherUserId = getUserIdFromChannelName(currentUserId, channel.name);
+                    makeDirectChannelVisibleIfNecessary(otherUserId)(dispatch, getState);
+                } else if ((member.mention_count > 0 || member.msg_count < channel.total_msg_count) &&
+                    isGroupChannel(channel) && !isGroupChannelVisible(myPreferences, channel)) {
+                    makeGroupMessageVisibleIfNecessary(channel.id)(dispatch, getState);
+                }
+            }
+        }
+    };
+}
+
 export function revokeSession(id) {
     return bindClientFunc(
         Client.revokeSession,
@@ -479,6 +521,7 @@ export default {
     getProfilesNotInChannel,
     getStatusesByIds,
     getSessions,
+    loadProfilesForDirect,
     revokeSession,
     getAudits,
     searchProfiles,
