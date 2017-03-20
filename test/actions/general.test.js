@@ -6,7 +6,7 @@ import assert from 'assert';
 import configureStore from 'store';
 
 import * as Actions from 'actions/general';
-import {Client} from 'client';
+import {Client, Client4} from 'client';
 import {RequestStatus} from 'constants';
 
 import TestHelper from 'test/test_helper';
@@ -14,7 +14,7 @@ import TestHelper from 'test/test_helper';
 describe('Actions.General', () => {
     let store;
     before(async () => {
-        await TestHelper.initBasic(Client);
+        await TestHelper.initBasic(Client, Client4);
     });
 
     beforeEach(() => {
@@ -23,6 +23,7 @@ describe('Actions.General', () => {
 
     after(async () => {
         await TestHelper.basicClient.logout();
+        await TestHelper.basicClient4.logout();
     });
 
     it('getPing - Invalid URL', async () => {

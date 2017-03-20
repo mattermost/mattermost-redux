@@ -5,7 +5,7 @@ import fs from 'fs';
 import assert from 'assert';
 
 import * as Actions from 'actions/files';
-import {Client} from 'client';
+import {Client, Client4} from 'client';
 import configureStore from 'store';
 import {RequestStatus} from 'constants';
 import TestHelper from 'test/test_helper';
@@ -15,7 +15,7 @@ const FormData = require('form-data');
 describe('Actions.Files', () => {
     let store;
     before(async () => {
-        await TestHelper.initBasic(Client);
+        await TestHelper.initBasic(Client, Client4);
     });
 
     beforeEach(() => {
@@ -24,6 +24,7 @@ describe('Actions.Files', () => {
 
     after(async () => {
         await TestHelper.basicClient.logout();
+        await TestHelper.basicClient4.logout();
     });
 
     it('getFilesForPost', async () => {

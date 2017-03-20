@@ -6,7 +6,7 @@ import {General} from 'constants';
 
 import fetch from './fetch_etag';
 
-//const HEADER_TOKEN = 'Token';
+const HEADER_TOKEN = 'Token';
 const HEADER_AUTH = 'Authorization';
 const HEADER_BEARER = 'BEARER';
 const HEADER_REQUESTED_WITH = 'X-Requested-With';
@@ -64,6 +64,14 @@ export default class Client4 {
         return `${this.getBaseRoute()}/users`;
     }
 
+    getUserRoute(userId) {
+        return `${this.getUsersRoute()}/${userId}`;
+    }
+
+    getPreferencesRoute(userId) {
+        return `${this.getUserRoute(userId)}/preferences`;
+    }
+
     getOptions(options) {
         const headers = {
             [HEADER_REQUESTED_WITH]: 'XMLHttpRequest'
@@ -109,6 +117,57 @@ export default class Client4 {
             {method: 'post', body: JSON.stringify(user)}
         );
     }
+
+    login = async (loginId, password, token = '', deviceId = '') => {
+        const body = {
+            device_id: deviceId,
+            login_id: loginId,
+            password,
+            token
+        };
+
+        const {headers, data} = await this.doFetchWithResponse(
+            `${this.getUsersRoute()}/login`,
+            {method: 'post', body: JSON.stringify(body)}
+        );
+
+        if (headers.has(HEADER_TOKEN)) {
+            this.token = headers.get(HEADER_TOKEN);
+        }
+
+        return data;
+    };
+
+    logout = async () => {
+        const {response} = await this.doFetchWithResponse(
+            `${this.getUsersRoute()}/logout`,
+            {method: 'post'}
+        );
+
+        if (response.ok) {
+            this.token = '';
+        }
+
+        this.serverVersion = '';
+
+        return response;
+    };
+
+    // Preference Routes
+
+    savePreferences = async (userId, preferences) => {
+        return this.doFetch(
+            `${this.getPreferencesRoute(userId)}`,
+            {method: 'put', body: JSON.stringify(preferences)}
+        );
+    };
+
+    deletePreferences = async (userId, preferences) => {
+        return this.doFetch(
+            `${this.getPreferencesRoute(userId)}/delete`,
+            {method: 'post', body: JSON.stringify(preferences)}
+        );
+    };
 
     // Client helpers
     doFetch = async (url, options) => {

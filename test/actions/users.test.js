@@ -21,6 +21,7 @@ describe('Actions.Users', () => {
 
     after(async () => {
         await TestHelper.basicClient.logout();
+        await TestHelper.basicClient4.logout();
     });
 
     it('createUser', async () => {
@@ -41,7 +42,7 @@ describe('Actions.Users', () => {
 
     it('login', async () => {
         const user = TestHelper.basicUser;
-        await TestHelper.basicClient.logout();
+        await TestHelper.basicClient4.logout();
         await Actions.login(user.email, 'password1')(store.dispatch, store.getState);
 
         const state = store.getState();
@@ -226,6 +227,8 @@ describe('Actions.Users', () => {
             throw new Error(JSON.stringify(sessionsRequest.error));
         }
 
+        const sessionsLength = sessions.length;
+
         await Actions.revokeSession(sessions[0].id)(store.dispatch, store.getState);
 
         const revokeRequest = store.getState().requests.users.revokeSession;
@@ -234,7 +237,7 @@ describe('Actions.Users', () => {
         }
 
         sessions = store.getState().entities.users.mySessions;
-        assert.ok(sessions.length === 0);
+        assert.ok(sessions.length === sessionsLength - 1);
     });
 
     it('revokeSession and logout', async () => {

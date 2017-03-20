@@ -3,7 +3,7 @@
 
 import {batchActions} from 'redux-batched-actions';
 
-import {Client} from 'client';
+import {Client, Client4} from 'client';
 import {Preferences} from 'constants';
 import {PreferenceTypes} from 'action_types';
 import {getMyPreferences as getMyPreferencesSelector} from 'selectors/entities/preferences';
@@ -13,12 +13,12 @@ import {getPreferenceKey} from 'utils/preference_utils';
 import {bindClientFunc, forceLogoutIfNecessary} from './helpers';
 import {getLogErrorAction} from './errors';
 
-export function deletePreferences(preferences) {
+export function deletePreferences(userId, preferences) {
     return async (dispatch, getState) => {
         dispatch({type: PreferenceTypes.DELETE_PREFERENCES_REQUEST}, getState);
 
         try {
-            await Client.deletePreferences(preferences);
+            await Client4.deletePreferences(userId, preferences);
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch);
             dispatch(batchActions([
@@ -65,17 +65,17 @@ export function makeDirectChannelVisibleIfNecessary(otherUserId) {
                 value: 'true'
             };
 
-            await savePreferences([preference])(dispatch, getState);
+            await savePreferences(currentUserId, [preference])(dispatch, getState);
         }
     };
 }
 
-export function savePreferences(preferences) {
+export function savePreferences(userId, preferences) {
     return async (dispatch, getState) => {
         dispatch({type: PreferenceTypes.SAVE_PREFERENCES_REQUEST}, getState);
 
         try {
-            await Client.savePreferences(preferences);
+            await Client4.savePreferences(userId, preferences);
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch);
             dispatch(batchActions([

@@ -59,7 +59,7 @@ export function login(loginId, password, mfaToken = '') {
 
         const deviceId = getState().entities.general.deviceToken;
 
-        return Client.login(loginId, password, mfaToken, deviceId).
+        return Client4.login(loginId, password, mfaToken, deviceId).
         then(async (data) => {
             let teamMembers;
             let preferences;
@@ -201,7 +201,7 @@ export function loadMe() {
 
 export function logout() {
     return bindClientFunc(
-        Client.logout,
+        Client4.logout,
         UserTypes.LOGOUT_REQUEST,
         UserTypes.LOGOUT_SUCCESS,
         UserTypes.LOGOUT_FAILURE,
