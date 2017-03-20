@@ -5,7 +5,7 @@ import {createSelector} from 'reselect';
 import {getCurrentTeamId, getCurrentTeamMembership} from 'selectors/entities/teams';
 import {getCurrentUserId, getUsers} from 'selectors/entities/users';
 import {buildDisplayableChannelList, getNotMemberChannels, completeDirectChannelInfo} from 'utils/channel_utils';
-import {Constants} from 'constants';
+import {General} from 'constants';
 
 function getAllChannels(state) {
     return state.entities.channels.channels;
@@ -95,7 +95,7 @@ export const getDefaultChannel = createSelector(
     getAllChannels,
     getCurrentTeamId,
     (channels, teamId) => {
-        return Object.values(channels).find((c) => c.team_id === teamId && c.name === Constants.DEFAULT_CHANNEL);
+        return Object.values(channels).find((c) => c.team_id === teamId && c.name === General.DEFAULT_CHANNEL);
     }
 );
 
@@ -161,10 +161,10 @@ export const canManageChannelMembers = createSelector(
     (channel, channelMembership, teamMembership, allUsers, currentUserId) => {
         const user = allUsers[currentUserId];
         const roles = `${channelMembership.roles} ${teamMembership.roles} ${user.roles}`;
-        if (channel.type === Constants.DM_CHANNEL || channel.name === Constants.DEFAULT_CHANNEL) {
+        if (channel.type === General.DM_CHANNEL || channel.name === General.DEFAULT_CHANNEL) {
             return false;
         }
-        if (channel.type === Constants.OPEN_CHANNEL) {
+        if (channel.type === General.OPEN_CHANNEL) {
             return true;
         }
         return roles.includes('_admin');

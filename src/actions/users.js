@@ -3,21 +3,22 @@
 
 import {batchActions} from 'redux-batched-actions';
 import Client from 'client';
-import {Constants, PreferencesTypes, UsersTypes, TeamsTypes} from 'constants';
+import {General} from 'constants';
+import {PreferenceTypes, UserTypes, TeamTypes} from 'action_types';
 import {fetchTeams} from './teams';
 import {getLogErrorAction} from './errors';
 import {bindClientFunc, forceLogoutIfNecessary, debounce} from './helpers';
 
 export function checkMfa(loginId) {
     return async (dispatch, getState) => {
-        dispatch({type: UsersTypes.CHECK_MFA_REQUEST}, getState);
+        dispatch({type: UserTypes.CHECK_MFA_REQUEST}, getState);
         try {
             const mfa = await Client.checkMfa(loginId);
-            dispatch({type: UsersTypes.CHECK_MFA_SUCCESS}, getState);
+            dispatch({type: UserTypes.CHECK_MFA_SUCCESS}, getState);
             return mfa;
         } catch (error) {
             dispatch(batchActions([
-                {type: UsersTypes.CHECK_MFA_FAILURE, error},
+                {type: UserTypes.CHECK_MFA_FAILURE, error},
                 getLogErrorAction(error)
             ]), getState);
             return null;
@@ -27,7 +28,7 @@ export function checkMfa(loginId) {
 
 export function login(loginId, password, mfaToken = '') {
     return async (dispatch, getState) => {
-        dispatch({type: UsersTypes.LOGIN_REQUEST}, getState);
+        dispatch({type: UserTypes.LOGIN_REQUEST}, getState);
 
         const deviceId = getState().entities.general.deviceToken;
 
@@ -43,7 +44,7 @@ export function login(loginId, password, mfaToken = '') {
                 preferences = await preferencesRequest;
             } catch (error) {
                 dispatch(batchActions([
-                    {type: UsersTypes.LOGIN_FAILURE, error},
+                    {type: UserTypes.LOGIN_FAILURE, error},
                     getLogErrorAction(error)
                 ]), getState);
                 return;
@@ -54,7 +55,7 @@ export function login(loginId, password, mfaToken = '') {
             } catch (error) {
                 forceLogoutIfNecessary(error, dispatch);
                 dispatch(batchActions([
-                    {type: UsersTypes.LOGIN_FAILURE, error},
+                    {type: UserTypes.LOGIN_FAILURE, error},
                     getLogErrorAction(error)
                 ]), getState);
                 return;
@@ -62,25 +63,25 @@ export function login(loginId, password, mfaToken = '') {
 
             dispatch(batchActions([
                 {
-                    type: UsersTypes.RECEIVED_ME,
+                    type: UserTypes.RECEIVED_ME,
                     data
                 },
                 {
-                    type: PreferencesTypes.RECEIVED_PREFERENCES,
+                    type: PreferenceTypes.RECEIVED_PREFERENCES,
                     data: await preferences
                 },
                 {
-                    type: TeamsTypes.RECEIVED_MY_TEAM_MEMBERS,
+                    type: TeamTypes.RECEIVED_MY_TEAM_MEMBERS,
                     data: await teamMembers
                 },
                 {
-                    type: UsersTypes.LOGIN_SUCCESS
+                    type: UserTypes.LOGIN_SUCCESS
                 }
             ]), getState);
         }).
         catch((error) => {
             dispatch(batchActions([
-                {type: UsersTypes.LOGIN_FAILURE, error},
+                {type: UserTypes.LOGIN_FAILURE, error},
                 getLogErrorAction(error)
             ]), getState);
             return;
@@ -91,13 +92,13 @@ export function login(loginId, password, mfaToken = '') {
 export function loadMe() {
     return async (dispatch, getState) => {
         let user;
-        dispatch({type: UsersTypes.LOGIN_REQUEST}, getState);
+        dispatch({type: UserTypes.LOGIN_REQUEST}, getState);
         try {
             user = await Client.getMe();
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch);
             dispatch(batchActions([
-                {type: UsersTypes.LOGIN_FAILURE, error},
+                {type: UserTypes.LOGIN_FAILURE, error},
                 getLogErrorAction(error)
             ]), getState);
             return;
@@ -109,13 +110,13 @@ export function loadMe() {
         }
 
         let preferences;
-        dispatch({type: PreferencesTypes.MY_PREFERENCES_REQUEST}, getState);
+        dispatch({type: PreferenceTypes.MY_PREFERENCES_REQUEST}, getState);
         try {
             preferences = await Client.getMyPreferences();
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch);
             dispatch(batchActions([
-                {type: PreferencesTypes.MY_PREFERENCES_FAILURE, error},
+                {type: PreferenceTypes.MY_PREFERENCES_FAILURE, error},
                 getLogErrorAction(error)
             ]), getState);
             return;
@@ -126,20 +127,20 @@ export function loadMe() {
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch);
             dispatch(batchActions([
-                {type: TeamsTypes.FETCH_TEAMS_FAILURE, error},
+                {type: TeamTypes.FETCH_TEAMS_FAILURE, error},
                 getLogErrorAction(error)
             ]), getState);
             return;
         }
 
         let teamMembers;
-        dispatch({type: TeamsTypes.MY_TEAM_MEMBERS_REQUEST}, getState);
+        dispatch({type: TeamTypes.MY_TEAM_MEMBERS_REQUEST}, getState);
         try {
             teamMembers = await Client.getMyTeamMembers();
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch);
             dispatch(batchActions([
-                {type: TeamsTypes.MY_TEAM_MEMBERS_FAILURE, error},
+                {type: TeamTypes.MY_TEAM_MEMBERS_FAILURE, error},
                 getLogErrorAction(error)
             ]), getState);
             return;
@@ -147,25 +148,25 @@ export function loadMe() {
 
         dispatch(batchActions([
             {
-                type: UsersTypes.RECEIVED_ME,
+                type: UserTypes.RECEIVED_ME,
                 data: user
             },
             {
-                type: UsersTypes.LOGIN_SUCCESS
+                type: UserTypes.LOGIN_SUCCESS
             },
             {
-                type: PreferencesTypes.RECEIVED_PREFERENCES,
+                type: PreferenceTypes.RECEIVED_PREFERENCES,
                 data: preferences
             },
             {
-                type: PreferencesTypes.MY_PREFERENCES_SUCCESS
+                type: PreferenceTypes.MY_PREFERENCES_SUCCESS
             },
             {
-                type: TeamsTypes.RECEIVED_MY_TEAM_MEMBERS,
+                type: TeamTypes.RECEIVED_MY_TEAM_MEMBERS,
                 data: teamMembers
             },
             {
-                type: TeamsTypes.MY_TEAM_MEMBERS_SUCCESS
+                type: TeamTypes.MY_TEAM_MEMBERS_SUCCESS
             }
         ]), getState);
     };
@@ -174,15 +175,15 @@ export function loadMe() {
 export function logout() {
     return bindClientFunc(
         Client.logout,
-        UsersTypes.LOGOUT_REQUEST,
-        UsersTypes.LOGOUT_SUCCESS,
-        UsersTypes.LOGOUT_FAILURE,
+        UserTypes.LOGOUT_REQUEST,
+        UserTypes.LOGOUT_SUCCESS,
+        UserTypes.LOGOUT_FAILURE,
     );
 }
 
-export function getProfiles(offset, limit = Constants.PROFILE_CHUNK_SIZE) {
+export function getProfiles(offset, limit = General.PROFILE_CHUNK_SIZE) {
     return async (dispatch, getState) => {
-        dispatch({type: UsersTypes.PROFILES_REQUEST}, getState);
+        dispatch({type: UserTypes.PROFILES_REQUEST}, getState);
 
         let profiles;
         try {
@@ -190,7 +191,7 @@ export function getProfiles(offset, limit = Constants.PROFILE_CHUNK_SIZE) {
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch);
             dispatch(batchActions([
-                {type: UsersTypes.PROFILES_FAILURE, error},
+                {type: UserTypes.PROFILES_FAILURE, error},
                 getLogErrorAction(error)
             ]), getState);
             return null;
@@ -198,11 +199,11 @@ export function getProfiles(offset, limit = Constants.PROFILE_CHUNK_SIZE) {
 
         dispatch(batchActions([
             {
-                type: UsersTypes.RECEIVED_PROFILES,
+                type: UserTypes.RECEIVED_PROFILES,
                 data: profiles
             },
             {
-                type: UsersTypes.PROFILES_SUCCESS
+                type: UserTypes.PROFILES_SUCCESS
             }
         ]), getState);
 
@@ -213,16 +214,16 @@ export function getProfiles(offset, limit = Constants.PROFILE_CHUNK_SIZE) {
 export function getProfilesByIds(userIds) {
     return bindClientFunc(
         Client.getProfilesByIds,
-        UsersTypes.PROFILES_REQUEST,
-        [UsersTypes.RECEIVED_PROFILES, UsersTypes.PROFILES_SUCCESS],
-        UsersTypes.PROFILES_FAILURE,
+        UserTypes.PROFILES_REQUEST,
+        [UserTypes.RECEIVED_PROFILES, UserTypes.PROFILES_SUCCESS],
+        UserTypes.PROFILES_FAILURE,
         userIds
     );
 }
 
-export function getProfilesInTeam(teamId, offset, limit = Constants.PROFILE_CHUNK_SIZE) {
+export function getProfilesInTeam(teamId, offset, limit = General.PROFILE_CHUNK_SIZE) {
     return async (dispatch, getState) => {
-        dispatch({type: UsersTypes.PROFILES_IN_TEAM_REQUEST}, getState);
+        dispatch({type: UserTypes.PROFILES_IN_TEAM_REQUEST}, getState);
 
         let profiles;
         try {
@@ -230,7 +231,7 @@ export function getProfilesInTeam(teamId, offset, limit = Constants.PROFILE_CHUN
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch);
             dispatch(batchActions([
-                {type: UsersTypes.PROFILES_IN_TEAM_FAILURE, error},
+                {type: UserTypes.PROFILES_IN_TEAM_FAILURE, error},
                 getLogErrorAction(error)
             ]), getState);
             return;
@@ -238,24 +239,24 @@ export function getProfilesInTeam(teamId, offset, limit = Constants.PROFILE_CHUN
 
         dispatch(batchActions([
             {
-                type: UsersTypes.RECEIVED_PROFILES_IN_TEAM,
+                type: UserTypes.RECEIVED_PROFILES_IN_TEAM,
                 data: profiles,
                 id: teamId
             },
             {
-                type: UsersTypes.RECEIVED_PROFILES,
+                type: UserTypes.RECEIVED_PROFILES,
                 data: profiles
             },
             {
-                type: UsersTypes.PROFILES_IN_TEAM_SUCCESS
+                type: UserTypes.PROFILES_IN_TEAM_SUCCESS
             }
         ]), getState);
     };
 }
 
-export function getProfilesInChannel(teamId, channelId, offset, limit = Constants.PROFILE_CHUNK_SIZE) {
+export function getProfilesInChannel(teamId, channelId, offset, limit = General.PROFILE_CHUNK_SIZE) {
     return async (dispatch, getState) => {
-        dispatch({type: UsersTypes.PROFILES_IN_CHANNEL_REQUEST}, getState);
+        dispatch({type: UserTypes.PROFILES_IN_CHANNEL_REQUEST}, getState);
 
         let profiles;
         try {
@@ -263,7 +264,7 @@ export function getProfilesInChannel(teamId, channelId, offset, limit = Constant
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch);
             dispatch(batchActions([
-                {type: UsersTypes.PROFILES_IN_CHANNEL_FAILURE, error},
+                {type: UserTypes.PROFILES_IN_CHANNEL_FAILURE, error},
                 getLogErrorAction(error)
             ]), getState);
             return;
@@ -271,24 +272,24 @@ export function getProfilesInChannel(teamId, channelId, offset, limit = Constant
 
         dispatch(batchActions([
             {
-                type: UsersTypes.RECEIVED_PROFILES_IN_CHANNEL,
+                type: UserTypes.RECEIVED_PROFILES_IN_CHANNEL,
                 data: profiles,
                 id: channelId
             },
             {
-                type: UsersTypes.RECEIVED_PROFILES,
+                type: UserTypes.RECEIVED_PROFILES,
                 data: profiles
             },
             {
-                type: UsersTypes.PROFILES_IN_CHANNEL_SUCCESS
+                type: UserTypes.PROFILES_IN_CHANNEL_SUCCESS
             }
         ]), getState);
     };
 }
 
-export function getProfilesNotInChannel(teamId, channelId, offset, limit = Constants.PROFILE_CHUNK_SIZE) {
+export function getProfilesNotInChannel(teamId, channelId, offset, limit = General.PROFILE_CHUNK_SIZE) {
     return async (dispatch, getState) => {
-        dispatch({type: UsersTypes.PROFILES_NOT_IN_CHANNEL_REQUEST}, getState);
+        dispatch({type: UserTypes.PROFILES_NOT_IN_CHANNEL_REQUEST}, getState);
 
         let profiles;
         try {
@@ -296,7 +297,7 @@ export function getProfilesNotInChannel(teamId, channelId, offset, limit = Const
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch);
             dispatch(batchActions([
-                {type: UsersTypes.PROFILES_NOT_IN_CHANNEL_FAILURE, error},
+                {type: UserTypes.PROFILES_NOT_IN_CHANNEL_FAILURE, error},
                 getLogErrorAction(error)
             ]), getState);
             return;
@@ -304,16 +305,16 @@ export function getProfilesNotInChannel(teamId, channelId, offset, limit = Const
 
         dispatch(batchActions([
             {
-                type: UsersTypes.RECEIVED_PROFILES_NOT_IN_CHANNEL,
+                type: UserTypes.RECEIVED_PROFILES_NOT_IN_CHANNEL,
                 data: profiles,
                 id: channelId
             },
             {
-                type: UsersTypes.RECEIVED_PROFILES,
+                type: UserTypes.RECEIVED_PROFILES,
                 data: profiles
             },
             {
-                type: UsersTypes.PROFILES_NOT_IN_CHANNEL_SUCCESS
+                type: UserTypes.PROFILES_NOT_IN_CHANNEL_SUCCESS
             }
         ]), getState);
     };
@@ -339,9 +340,9 @@ export function getStatusesByIdsBatchedDebounced(id) {
 export function getStatusesByIds(userIds) {
     return bindClientFunc(
         Client.getStatusesByIds,
-        UsersTypes.PROFILES_STATUSES_REQUEST,
-        [UsersTypes.RECEIVED_STATUSES, UsersTypes.PROFILES_STATUSES_SUCCESS],
-        UsersTypes.PROFILES_STATUSES_FAILURE,
+        UserTypes.PROFILES_STATUSES_REQUEST,
+        [UserTypes.RECEIVED_STATUSES, UserTypes.PROFILES_STATUSES_SUCCESS],
+        UserTypes.PROFILES_STATUSES_FAILURE,
         userIds
     );
 }
@@ -349,9 +350,9 @@ export function getStatusesByIds(userIds) {
 export function getSessions(userId) {
     return bindClientFunc(
         Client.getSessions,
-        UsersTypes.SESSIONS_REQUEST,
-        [UsersTypes.RECEIVED_SESSIONS, UsersTypes.SESSIONS_SUCCESS],
-        UsersTypes.SESSIONS_FAILURE,
+        UserTypes.SESSIONS_REQUEST,
+        [UserTypes.RECEIVED_SESSIONS, UserTypes.SESSIONS_SUCCESS],
+        UserTypes.SESSIONS_FAILURE,
         userId
     );
 }
@@ -359,9 +360,9 @@ export function getSessions(userId) {
 export function revokeSession(id) {
     return bindClientFunc(
         Client.revokeSession,
-        UsersTypes.REVOKE_SESSION_REQUEST,
-        [UsersTypes.RECEIVED_REVOKED_SESSION, UsersTypes.REVOKE_SESSION_SUCCESS],
-        UsersTypes.REVOKE_SESSION_FAILURE,
+        UserTypes.REVOKE_SESSION_REQUEST,
+        [UserTypes.RECEIVED_REVOKED_SESSION, UserTypes.REVOKE_SESSION_SUCCESS],
+        UserTypes.REVOKE_SESSION_FAILURE,
         id
     );
 }
@@ -369,16 +370,16 @@ export function revokeSession(id) {
 export function getAudits(userId) {
     return bindClientFunc(
         Client.getAudits,
-        UsersTypes.AUDITS_REQUEST,
-        [UsersTypes.RECEIVED_AUDITS, UsersTypes.AUDITS_SUCCESS],
-        UsersTypes.AUDITS_FAILURE,
+        UserTypes.AUDITS_REQUEST,
+        [UserTypes.RECEIVED_AUDITS, UserTypes.AUDITS_SUCCESS],
+        UserTypes.AUDITS_FAILURE,
         userId
     );
 }
 
 export function autocompleteUsersInChannel(teamId, channelId, term) {
     return async (dispatch, getState) => {
-        dispatch({type: UsersTypes.AUTOCOMPLETE_IN_CHANNEL_REQUEST}, getState);
+        dispatch({type: UserTypes.AUTOCOMPLETE_IN_CHANNEL_REQUEST}, getState);
 
         let data;
         try {
@@ -386,7 +387,7 @@ export function autocompleteUsersInChannel(teamId, channelId, term) {
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch);
             dispatch(batchActions([
-                {type: UsersTypes.AUTOCOMPLETE_IN_CHANNEL_FAILURE, error},
+                {type: UserTypes.AUTOCOMPLETE_IN_CHANNEL_FAILURE, error},
                 getLogErrorAction(error)
             ]), getState);
             return;
@@ -394,12 +395,12 @@ export function autocompleteUsersInChannel(teamId, channelId, term) {
 
         dispatch(batchActions([
             {
-                type: UsersTypes.RECEIVED_AUTOCOMPLETE_IN_CHANNEL,
+                type: UserTypes.RECEIVED_AUTOCOMPLETE_IN_CHANNEL,
                 data,
                 channelId
             },
             {
-                type: UsersTypes.AUTOCOMPLETE_IN_CHANNEL_SUCCESS
+                type: UserTypes.AUTOCOMPLETE_IN_CHANNEL_SUCCESS
             }
         ]), getState);
     };
@@ -408,9 +409,9 @@ export function autocompleteUsersInChannel(teamId, channelId, term) {
 export function searchProfiles(term, options) {
     return bindClientFunc(
         Client.searchProfiles,
-        UsersTypes.SEARCH_PROFILES_REQUEST,
-        [UsersTypes.RECEIVED_SEARCH_PROFILES, UsersTypes.SEARCH_PROFILES_SUCCESS],
-        UsersTypes.SEARCH_PROFILES_FAILURE,
+        UserTypes.SEARCH_PROFILES_REQUEST,
+        [UserTypes.RECEIVED_SEARCH_PROFILES, UserTypes.SEARCH_PROFILES_SUCCESS],
+        UserTypes.SEARCH_PROFILES_FAILURE,
         term,
         options
     );
@@ -436,7 +437,7 @@ export function startPeriodicStatusUpdates() {
 
                 getStatusesByIds(userIds)(dispatch, getState);
             },
-            Constants.STATUS_INTERVAL
+            General.STATUS_INTERVAL
         );
     };
 }
@@ -451,19 +452,19 @@ export function stopPeriodicStatusUpdates() {
 
 export function updateUserNotifyProps(notifyProps) {
     return async (dispatch, getState) => {
-        dispatch({type: UsersTypes.UPDATE_NOTIFY_PROPS_REQUEST}, getState);
+        dispatch({type: UserTypes.UPDATE_NOTIFY_PROPS_REQUEST}, getState);
 
         let data;
         try {
             data = await Client.updateUserNotifyProps(notifyProps);
         } catch (error) {
-            dispatch({type: UsersTypes.UPDATE_NOTIFY_PROPS_FAILURE, error}, getState);
+            dispatch({type: UserTypes.UPDATE_NOTIFY_PROPS_FAILURE, error}, getState);
             return;
         }
 
         dispatch(batchActions([
-            {type: UsersTypes.RECEIVED_ME, data},
-            {type: UsersTypes.UPDATE_NOTIFY_PROPS_SUCCESS}
+            {type: UserTypes.RECEIVED_ME, data},
+            {type: UserTypes.UPDATE_NOTIFY_PROPS_SUCCESS}
         ]), getState);
     };
 }

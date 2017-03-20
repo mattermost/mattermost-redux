@@ -3,7 +3,7 @@
 
 import keyMirror from 'utils/key_mirror';
 
-const TeamTypes = keyMirror({
+export default keyMirror({
     FETCH_TEAMS_REQUEST: null,
     FETCH_TEAMS_SUCCESS: null,
     FETCH_TEAMS_FAILURE: null,
@@ -52,5 +52,3 @@ const TeamTypes = keyMirror({
     RECEIVED_TEAM_STATS: null,
     LEAVE_TEAM: null
 });
-
-export default TeamTypes;

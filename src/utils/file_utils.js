@@ -1,7 +1,7 @@
 // Copyright (c) 2017 Mattermost, Inc. All Rights Reserved.
 // See License.txt for license information.
 
-import {Constants} from 'constants';
+import {General} from 'constants';
 
 export function getFormattedFileSize(file) {
     const bytes = file.size;
@@ -36,7 +36,7 @@ export function getFileType(file) {
     ];
     return fileTypes.find((fileType) => {
         const constForFileTypeExtList = `${fileType}_types`.toUpperCase();
-        const fileTypeExts = Constants[constForFileTypeExtList];
+        const fileTypeExts = General[constForFileTypeExtList];
         return fileTypeExts.indexOf(fileExt) > -1;
     }) || 'other';
 }

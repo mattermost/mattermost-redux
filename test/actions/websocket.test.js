@@ -9,7 +9,7 @@ import * as GeneralActions from 'actions/general';
 
 import Client from 'client';
 import configureStore from 'store';
-import {Constants, RequestStatus} from 'constants';
+import {General, Posts, RequestStatus} from 'constants';
 import TestHelper from 'test/test_helper';
 
 describe('Actions.Websocket', () => {
@@ -115,7 +115,7 @@ describe('Actions.Websocket', () => {
         store.subscribe(async () => {
             const entities = store.getState().entities;
             const {posts} = entities.posts;
-            assert.strictEqual(posts[post.id].state, Constants.POST_DELETED);
+            assert.strictEqual(posts[post.id].state, Posts.POST_DELETED);
         });
     });
 
@@ -246,7 +246,7 @@ describe('Actions.Websocket', () => {
                 const entities = state.entities;
                 const {channels, currentChannelId} = entities.channels;
 
-                assert.ok(channels[currentChannelId].name === Constants.DEFAULT_CHANNEL);
+                assert.ok(channels[currentChannelId].name === General.DEFAULT_CHANNEL);
                 done();
             }, 500);
         }

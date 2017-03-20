@@ -2,7 +2,7 @@
 // See License.txt for license information.
 
 import {combineReducers} from 'redux';
-import {PreferencesTypes, UsersTypes} from 'constants';
+import {PreferenceTypes, UserTypes} from 'action_types';
 
 function getKey(preference) {
     return `${preference.category}--${preference.name}`;
@@ -10,7 +10,7 @@ function getKey(preference) {
 
 function myPreferences(state = {}, action) {
     switch (action.type) {
-    case PreferencesTypes.RECEIVED_PREFERENCES: {
+    case PreferenceTypes.RECEIVED_PREFERENCES: {
         const nextState = {...state};
 
         for (const preference of action.data) {
@@ -19,7 +19,7 @@ function myPreferences(state = {}, action) {
 
         return nextState;
     }
-    case PreferencesTypes.DELETED_PREFERENCES: {
+    case PreferenceTypes.DELETED_PREFERENCES: {
         const nextState = {...state};
 
         for (const preference of action.data) {
@@ -29,7 +29,7 @@ function myPreferences(state = {}, action) {
         return nextState;
     }
 
-    case UsersTypes.LOGOUT_SUCCESS:
+    case UserTypes.LOGOUT_SUCCESS:
         return {};
     default:
         return state;

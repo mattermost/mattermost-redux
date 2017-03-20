@@ -3,7 +3,8 @@
 
 import {batchActions} from 'redux-batched-actions';
 import Client from 'client';
-import {Constants, TeamsTypes} from 'constants';
+import {General} from 'constants';
+import {TeamTypes} from 'action_types';
 import {getLogErrorAction} from './errors';
 import {bindClientFunc, forceLogoutIfNecessary} from './helpers';
 import {getProfilesByIds, getStatusesByIds} from './users';
@@ -34,7 +35,7 @@ async function getProfilesAndStatusesForMembers(userIds, dispatch, getState) {
 
 export function selectTeam(team) {
     return async (dispatch, getState) => dispatch({
-        type: TeamsTypes.SELECT_TEAM,
+        type: TeamTypes.SELECT_TEAM,
         data: team.id
     }, getState);
 }
@@ -42,24 +43,24 @@ export function selectTeam(team) {
 export function fetchTeams() {
     return bindClientFunc(
         Client.getAllTeams,
-        TeamsTypes.FETCH_TEAMS_REQUEST,
-        [TeamsTypes.RECEIVED_ALL_TEAMS, TeamsTypes.FETCH_TEAMS_SUCCESS],
-        TeamsTypes.FETCH_TEAMS_FAILURE
+        TeamTypes.FETCH_TEAMS_REQUEST,
+        [TeamTypes.RECEIVED_ALL_TEAMS, TeamTypes.FETCH_TEAMS_SUCCESS],
+        TeamTypes.FETCH_TEAMS_FAILURE
     );
 }
 
 export function getAllTeamListings() {
     return bindClientFunc(
         Client.getAllTeamListings,
-        TeamsTypes.TEAM_LISTINGS_REQUEST,
-        [TeamsTypes.RECEIVED_TEAM_LISTINGS, TeamsTypes.TEAM_LISTINGS_SUCCESS],
-        TeamsTypes.TEAM_LISTINGS_FAILURE
+        TeamTypes.TEAM_LISTINGS_REQUEST,
+        [TeamTypes.RECEIVED_TEAM_LISTINGS, TeamTypes.TEAM_LISTINGS_SUCCESS],
+        TeamTypes.TEAM_LISTINGS_FAILURE
     );
 }
 
 export function createTeam(userId, team) {
     return async (dispatch, getState) => {
-        dispatch({type: TeamsTypes.CREATE_TEAM_REQUEST}, getState);
+        dispatch({type: TeamTypes.CREATE_TEAM_REQUEST}, getState);
 
         let created;
         try {
@@ -67,7 +68,7 @@ export function createTeam(userId, team) {
         } catch (err) {
             forceLogoutIfNecessary(err, dispatch);
             dispatch(batchActions([
-                {type: TeamsTypes.CREATE_TEAM_FAILURE, error: err},
+                {type: TeamTypes.CREATE_TEAM_FAILURE, error: err},
                 getLogErrorAction(err)
             ]), getState);
             return;
@@ -76,7 +77,7 @@ export function createTeam(userId, team) {
         const member = {
             team_id: created.id,
             user_id: userId,
-            roles: `${Constants.TEAM_ADMIN_ROLE} ${Constants.TEAM_USER_ROLE}`,
+            roles: `${General.TEAM_ADMIN_ROLE} ${General.TEAM_USER_ROLE}`,
             delete_at: 0,
             msg_count: 0,
             mention_count: 0
@@ -84,19 +85,19 @@ export function createTeam(userId, team) {
 
         dispatch(batchActions([
             {
-                type: TeamsTypes.CREATED_TEAM,
+                type: TeamTypes.CREATED_TEAM,
                 data: created
             },
             {
-                type: TeamsTypes.RECEIVED_MY_TEAM_MEMBERS,
+                type: TeamTypes.RECEIVED_MY_TEAM_MEMBERS,
                 data: [member]
             },
             {
-                type: TeamsTypes.SELECT_TEAM,
+                type: TeamTypes.SELECT_TEAM,
                 data: created.id
             },
             {
-                type: TeamsTypes.CREATE_TEAM_SUCCESS
+                type: TeamTypes.CREATE_TEAM_SUCCESS
             }
         ]), getState);
     };
@@ -105,9 +106,9 @@ export function createTeam(userId, team) {
 export function updateTeam(team) {
     return bindClientFunc(
         Client.updateTeam,
-        TeamsTypes.UPDATE_TEAM_REQUEST,
-        [TeamsTypes.UPDATED_TEAM, TeamsTypes.UPDATE_TEAM_SUCCESS],
-        TeamsTypes.UPDATE_TEAM_FAILURE,
+        TeamTypes.UPDATE_TEAM_REQUEST,
+        [TeamTypes.UPDATED_TEAM, TeamTypes.UPDATE_TEAM_SUCCESS],
+        TeamTypes.UPDATE_TEAM_FAILURE,
         team
     );
 }
@@ -115,15 +116,15 @@ export function updateTeam(team) {
 export function getMyTeamMembers() {
     return bindClientFunc(
         Client.getMyTeamMembers,
-        TeamsTypes.MY_TEAM_MEMBERS_REQUEST,
-        [TeamsTypes.RECEIVED_MY_TEAM_MEMBERS, TeamsTypes.MY_TEAM_MEMBERS_SUCCESS],
-        TeamsTypes.MY_TEAM_MEMBERS_FAILURE
+        TeamTypes.MY_TEAM_MEMBERS_REQUEST,
+        [TeamTypes.RECEIVED_MY_TEAM_MEMBERS, TeamTypes.MY_TEAM_MEMBERS_SUCCESS],
+        TeamTypes.MY_TEAM_MEMBERS_FAILURE
     );
 }
 
 export function getTeamMember(teamId, userId) {
     return async (dispatch, getState) => {
-        dispatch({type: TeamsTypes.TEAM_MEMBERS_REQUEST}, getState);
+        dispatch({type: TeamTypes.TEAM_MEMBERS_REQUEST}, getState);
 
         let member;
         try {
@@ -132,7 +133,7 @@ export function getTeamMember(teamId, userId) {
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch);
             dispatch(batchActions([
-                {type: TeamsTypes.TEAM_MEMBERS_FAILURE, error},
+                {type: TeamTypes.TEAM_MEMBERS_FAILURE, error},
                 getLogErrorAction(error)
             ]), getState);
             return;
@@ -140,11 +141,11 @@ export function getTeamMember(teamId, userId) {
 
         dispatch(batchActions([
             {
-                type: TeamsTypes.RECEIVED_MEMBERS_IN_TEAM,
+                type: TeamTypes.RECEIVED_MEMBERS_IN_TEAM,
                 data: [member]
             },
             {
-                type: TeamsTypes.TEAM_MEMBERS_SUCCESS
+                type: TeamTypes.TEAM_MEMBERS_SUCCESS
             }
         ]), getState);
     };
@@ -152,7 +153,7 @@ export function getTeamMember(teamId, userId) {
 
 export function getTeamMembersByIds(teamId, userIds) {
     return async (dispatch, getState) => {
-        dispatch({type: TeamsTypes.TEAM_MEMBERS_REQUEST}, getState);
+        dispatch({type: TeamTypes.TEAM_MEMBERS_REQUEST}, getState);
 
         let members;
         try {
@@ -161,18 +162,18 @@ export function getTeamMembersByIds(teamId, userIds) {
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch);
             dispatch(batchActions([
-                {type: TeamsTypes.TEAM_MEMBERS_FAILURE, error},
+                {type: TeamTypes.TEAM_MEMBERS_FAILURE, error},
                 getLogErrorAction(error)
             ]), getState);
         }
 
         dispatch(batchActions([
             {
-                type: TeamsTypes.RECEIVED_MEMBERS_IN_TEAM,
+                type: TeamTypes.RECEIVED_MEMBERS_IN_TEAM,
                 data: members
             },
             {
-                type: TeamsTypes.TEAM_MEMBERS_SUCCESS
+                type: TeamTypes.TEAM_MEMBERS_SUCCESS
             }
         ]), getState);
     };
@@ -181,23 +182,23 @@ export function getTeamMembersByIds(teamId, userIds) {
 export function getTeamStats(teamId) {
     return bindClientFunc(
         Client.getTeamStats,
-        TeamsTypes.TEAM_STATS_REQUEST,
-        [TeamsTypes.RECEIVED_TEAM_STATS, TeamsTypes.TEAM_STATS_SUCCESS],
-        TeamsTypes.TEAM_STATS_FAILURE,
+        TeamTypes.TEAM_STATS_REQUEST,
+        [TeamTypes.RECEIVED_TEAM_STATS, TeamTypes.TEAM_STATS_SUCCESS],
+        TeamTypes.TEAM_STATS_FAILURE,
         teamId
     );
 }
 
 export function addUserToTeam(teamId, userId) {
     return async (dispatch, getState) => {
-        dispatch({type: TeamsTypes.ADD_TEAM_MEMBER_REQUEST}, getState);
+        dispatch({type: TeamTypes.ADD_TEAM_MEMBER_REQUEST}, getState);
 
         try {
             await Client.addUserToTeam(teamId, userId);
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch);
             dispatch(batchActions([
-                {type: TeamsTypes.ADD_TEAM_MEMBER_FAILURE, error},
+                {type: TeamTypes.ADD_TEAM_MEMBER_FAILURE, error},
                 getLogErrorAction(error)
             ]), getState);
             return;
@@ -210,11 +211,11 @@ export function addUserToTeam(teamId, userId) {
 
         dispatch(batchActions([
             {
-                type: TeamsTypes.RECEIVED_MEMBER_IN_TEAM,
+                type: TeamTypes.RECEIVED_MEMBER_IN_TEAM,
                 data: member
             },
             {
-                type: TeamsTypes.ADD_TEAM_MEMBER_SUCCESS
+                type: TeamTypes.ADD_TEAM_MEMBER_SUCCESS
             }
         ]), getState);
     };
@@ -222,14 +223,14 @@ export function addUserToTeam(teamId, userId) {
 
 export function removeUserFromTeam(teamId, userId) {
     return async (dispatch, getState) => {
-        dispatch({type: TeamsTypes.REMOVE_TEAM_MEMBER_REQUEST}, getState);
+        dispatch({type: TeamTypes.REMOVE_TEAM_MEMBER_REQUEST}, getState);
 
         try {
             await Client.removeUserFromTeam(teamId, userId);
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch);
             dispatch(batchActions([
-                {type: TeamsTypes.REMOVE_TEAM_MEMBER_FAILURE, error},
+                {type: TeamTypes.REMOVE_TEAM_MEMBER_FAILURE, error},
                 getLogErrorAction(error)
             ]), getState);
             return;
@@ -242,11 +243,11 @@ export function removeUserFromTeam(teamId, userId) {
 
         dispatch(batchActions([
             {
-                type: TeamsTypes.REMOVE_MEMBER_FROM_TEAM,
+                type: TeamTypes.REMOVE_MEMBER_FROM_TEAM,
                 data: member
             },
             {
-                type: TeamsTypes.REMOVE_TEAM_MEMBER_SUCCESS
+                type: TeamTypes.REMOVE_TEAM_MEMBER_SUCCESS
             }
         ]), getState);
     };

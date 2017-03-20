@@ -2,15 +2,15 @@
 // See License.txt for license information.
 
 import {combineReducers} from 'redux';
-import {TeamsTypes} from 'constants';
+import {TeamTypes} from 'action_types';
 
 import {handleRequest, initialRequestState} from './helpers';
 
 function allTeams(state = initialRequestState(), action) {
     return handleRequest(
-        TeamsTypes.FETCH_TEAMS_REQUEST,
-        TeamsTypes.FETCH_TEAMS_SUCCESS,
-        TeamsTypes.FETCH_TEAMS_FAILURE,
+        TeamTypes.FETCH_TEAMS_REQUEST,
+        TeamTypes.FETCH_TEAMS_SUCCESS,
+        TeamTypes.FETCH_TEAMS_FAILURE,
         state,
         action
     );
@@ -18,9 +18,9 @@ function allTeams(state = initialRequestState(), action) {
 
 function getAllTeamListings(state = initialRequestState(), action) {
     return handleRequest(
-        TeamsTypes.TEAM_LISTINGS_REQUEST,
-        TeamsTypes.TEAM_LISTINGS_SUCCESS,
-        TeamsTypes.TEAM_LISTINGS_FAILURE,
+        TeamTypes.TEAM_LISTINGS_REQUEST,
+        TeamTypes.TEAM_LISTINGS_SUCCESS,
+        TeamTypes.TEAM_LISTINGS_FAILURE,
         state,
         action
     );
@@ -28,9 +28,9 @@ function getAllTeamListings(state = initialRequestState(), action) {
 
 function createTeam(state = initialRequestState(), action) {
     return handleRequest(
-        TeamsTypes.CREATE_TEAM_REQUEST,
-        TeamsTypes.CREATE_TEAM_SUCCESS,
-        TeamsTypes.CREATE_TEAM_FAILURE,
+        TeamTypes.CREATE_TEAM_REQUEST,
+        TeamTypes.CREATE_TEAM_SUCCESS,
+        TeamTypes.CREATE_TEAM_FAILURE,
         state,
         action
     );
@@ -38,9 +38,9 @@ function createTeam(state = initialRequestState(), action) {
 
 function updateTeam(state = initialRequestState(), action) {
     return handleRequest(
-        TeamsTypes.UPDATE_TEAM_REQUEST,
-        TeamsTypes.UPDATE_TEAM_SUCCESS,
-        TeamsTypes.UPDATE_TEAM_FAILURE,
+        TeamTypes.UPDATE_TEAM_REQUEST,
+        TeamTypes.UPDATE_TEAM_SUCCESS,
+        TeamTypes.UPDATE_TEAM_FAILURE,
         state,
         action
     );
@@ -48,9 +48,9 @@ function updateTeam(state = initialRequestState(), action) {
 
 function getMyTeamMembers(state = initialRequestState(), action) {
     return handleRequest(
-        TeamsTypes.MY_TEAM_MEMBERS_REQUEST,
-        TeamsTypes.MY_TEAM_MEMBERS_SUCCESS,
-        TeamsTypes.MY_TEAM_MEMBERS_FAILURE,
+        TeamTypes.MY_TEAM_MEMBERS_REQUEST,
+        TeamTypes.MY_TEAM_MEMBERS_SUCCESS,
+        TeamTypes.MY_TEAM_MEMBERS_FAILURE,
         state,
         action
     );
@@ -58,9 +58,9 @@ function getMyTeamMembers(state = initialRequestState(), action) {
 
 function getTeamMembers(state = initialRequestState(), action) {
     return handleRequest(
-        TeamsTypes.TEAM_MEMBERS_REQUEST,
-        TeamsTypes.TEAM_MEMBERS_SUCCESS,
-        TeamsTypes.TEAM_MEMBERS_FAILURE,
+        TeamTypes.TEAM_MEMBERS_REQUEST,
+        TeamTypes.TEAM_MEMBERS_SUCCESS,
+        TeamTypes.TEAM_MEMBERS_FAILURE,
         state,
         action
     );
@@ -68,9 +68,9 @@ function getTeamMembers(state = initialRequestState(), action) {
 
 function getTeamStats(state = initialRequestState(), action) {
     return handleRequest(
-        TeamsTypes.TEAM_STATS_REQUEST,
-        TeamsTypes.TEAM_STATS_SUCCESS,
-        TeamsTypes.TEAM_STATS_FAILURE,
+        TeamTypes.TEAM_STATS_REQUEST,
+        TeamTypes.TEAM_STATS_SUCCESS,
+        TeamTypes.TEAM_STATS_FAILURE,
         state,
         action
     );
@@ -78,9 +78,9 @@ function getTeamStats(state = initialRequestState(), action) {
 
 function addUserToTeam(state = initialRequestState(), action) {
     return handleRequest(
-        TeamsTypes.ADD_TEAM_MEMBER_REQUEST,
-        TeamsTypes.ADD_TEAM_MEMBER_SUCCESS,
-        TeamsTypes.ADD_TEAM_MEMBER_FAILURE,
+        TeamTypes.ADD_TEAM_MEMBER_REQUEST,
+        TeamTypes.ADD_TEAM_MEMBER_SUCCESS,
+        TeamTypes.ADD_TEAM_MEMBER_FAILURE,
         state,
         action
     );
@@ -88,9 +88,9 @@ function addUserToTeam(state = initialRequestState(), action) {
 
 function removeUserFromTeam(state = initialRequestState(), action) {
     return handleRequest(
-        TeamsTypes.REMOVE_TEAM_MEMBER_REQUEST,
-        TeamsTypes.REMOVE_TEAM_MEMBER_SUCCESS,
-        TeamsTypes.REMOVE_TEAM_MEMBER_FAILURE,
+        TeamTypes.REMOVE_TEAM_MEMBER_REQUEST,
+        TeamTypes.REMOVE_TEAM_MEMBER_SUCCESS,
+        TeamTypes.REMOVE_TEAM_MEMBER_FAILURE,
         state,
         action
     );

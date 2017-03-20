@@ -1,38 +1,36 @@
-// Copyright (c) 2016 Mattermost, Inc. All Rights Reserved.
+// Copyright (c) 2017 Mattermost, Inc. All Rights Reserved.
 // See License.txt for license information.
 
-import keyMirror from 'utils/key_mirror';
+export default {
+    CONFIG_CHANGED: 'config_changed',
 
-const GeneralTypes = keyMirror({
-    RECEIVED_APP_STATE: null,
-    RECEIVED_APP_CREDENTIALS: null,
-    REMOVED_APP_CREDENTIALS: null,
-    RECEIVED_APP_DEVICE_TOKEN: null,
+    PROFILE_CHUNK_SIZE: 100,
+    CHANNELS_CHUNK_SIZE: 50,
+    SEARCH_TIMEOUT_MILLISECONDS: 100,
+    STATUS_INTERVAL: 60000,
 
-    PING_REQUEST: null,
-    PING_SUCCESS: null,
-    PING_FAILURE: null,
-    PING_RESET: null,
+    MENTION: 'mention',
 
-    RECEIVED_SERVER_VERSION: null,
+    OFFLINE: 'offline',
+    AWAY: 'away',
+    ONLINE: 'online',
 
-    CLIENT_CONFIG_REQUEST: null,
-    CLIENT_CONFIG_SUCCESS: null,
-    CLIENT_CONFIG_FAILURE: null,
-    CLIENT_CONFIG_RECEIVED: null,
+    TEAM_USER_ROLE: 'team_user',
+    TEAM_ADMIN_ROLE: 'team_admin',
 
-    CLIENT_LICENSE_REQUEST: null,
-    CLIENT_LICENSE_SUCCESS: null,
-    CLIENT_LICENSE_FAILURE: null,
-    CLIENT_LICENSE_RECEIVED: null,
+    CHANNEL_USER_ROLE: 'channel_user',
+    CHANNEL_ADMIN_ROLE: 'channel_admin',
 
-    LOG_CLIENT_ERROR_REQUEST: null,
-    LOG_CLIENT_ERROR_SUCCESS: null,
-    LOG_CLIENT_ERROR_FAILURE: null,
+    SYSTEM_USER_ROLE: 'system_user',
+    SYSTEM_ADMIN_ROLE: 'system_admin',
 
-    WEBSOCKET_REQUEST: null,
-    WEBSOCKET_SUCCESS: null,
-    WEBSOCKET_FAILURE: null
-});
+    DEFAULT_CHANNEL: 'town-square',
+    DM_CHANNEL: 'D',
+    OPEN_CHANNEL: 'O',
+    PRIVATE_CHANNEL: 'P',
 
-export default GeneralTypes;
+    START_OF_NEW_MESSAGES: 'start-of-new-messages',
+
+    PUSH_NOTIFY_APPLE_REACT_NATIVE: 'apple_rn',
+    PUSH_NOTIFY_ANDROID_REACT_NATIVE: 'android_rn'
+};

@@ -1,7 +1,8 @@
 // Copyright (c) 2016 Mattermost, Inc. All Rights Reserved.
 // See License.txt for license information.
 
-import {Constants, PostsTypes, UsersTypes} from 'constants';
+import {PostTypes, UserTypes} from 'action_types';
+import {Posts} from 'constants';
 
 function handleReceivedPost(posts = {}, postsByChannel = {}, action) {
     const post = action.data;
@@ -80,7 +81,7 @@ function handlePostDeleted(posts = {}, postsByChannel = {}, action) {
 
         nextPosts[post.id] = {
             ...posts[post.id],
-            state: Constants.POST_DELETED,
+            state: Posts.POST_DELETED,
             file_ids: [],
             has_reactions: false
         };
@@ -132,16 +133,16 @@ function handleRemovePost(posts = {}, postsByChannel = {}, action) {
 
 function handlePosts(posts = {}, postsByChannel = {}, action) {
     switch (action.type) {
-    case PostsTypes.RECEIVED_POST:
+    case PostTypes.RECEIVED_POST:
         return handleReceivedPost(posts, postsByChannel, action);
-    case PostsTypes.RECEIVED_POSTS:
+    case PostTypes.RECEIVED_POSTS:
         return handleReceivedPosts(posts, postsByChannel, action);
-    case PostsTypes.POST_DELETED:
+    case PostTypes.POST_DELETED:
         return handlePostDeleted(posts, postsByChannel, action);
-    case PostsTypes.REMOVE_POST:
+    case PostTypes.REMOVE_POST:
         return handleRemovePost(posts, postsByChannel, action);
 
-    case UsersTypes.LOGOUT_SUCCESS:
+    case UserTypes.LOGOUT_SUCCESS:
         return {
             posts: {},
             postsByChannel: {}
@@ -156,9 +157,9 @@ function handlePosts(posts = {}, postsByChannel = {}, action) {
 
 function selectedPostId(state = '', action) {
     switch (action.type) {
-    case PostsTypes.RECEIVED_POST_SELECTED:
+    case PostTypes.RECEIVED_POST_SELECTED:
         return action.data;
-    case UsersTypes.LOGOUT_SUCCESS:
+    case UserTypes.LOGOUT_SUCCESS:
         return '';
     default:
         return state;
@@ -167,7 +168,7 @@ function selectedPostId(state = '', action) {
 
 function currentFocusedPostId(state = '', action) {
     switch (action.type) {
-    case UsersTypes.LOGOUT_SUCCESS:
+    case UserTypes.LOGOUT_SUCCESS:
         return '';
     default:
         return state;

@@ -20,16 +20,15 @@ import {
     getPostsSince
 } from './posts';
 import {makeDirectChannelVisibleIfNecessary} from './preferences';
+import {General, WebsocketEvents, Preferences, Posts} from 'constants';
 import {
-    Constants,
     ChannelTypes,
     GeneralTypes,
-    PostsTypes,
-    PreferencesTypes,
-    TeamsTypes,
-    UsersTypes,
-    WebsocketEvents
-} from 'constants';
+    PostTypes,
+    PreferenceTypes,
+    TeamTypes,
+    UserTypes
+} from 'action_types';
 import {getCurrentChannelStats} from 'selectors/entities/channels';
 import {getUserIdFromChannelName} from 'utils/channel_utils';
 import {isSystemMessage, shouldIgnorePost} from 'utils/post_utils';
@@ -176,20 +175,20 @@ async function handleNewPostEvent(msg, dispatch, getState) {
         getProfilesByIds([userId])(dispatch, getState);
     }
 
-    if (status !== Constants.ONLINE) {
+    if (status !== General.ONLINE) {
         getStatusesByIds([userId])(dispatch, getState);
     }
 
     switch (post.type) {
-    case Constants.POST_HEADER_CHANGE:
+    case Posts.POST_TYPES.HEADER_CHANGE:
         updateChannelHeader(post.channel_id, post.props.new_header)(dispatch, getState);
         break;
-    case Constants.POST_PURPOSE_CHANGE:
+    case Posts.POST_TYPES.PURPOSE_CHANGE:
         updateChannelPurpose(post.channel_id, post.props.new_purpose)(dispatch, getState);
         break;
     }
 
-    if (msg.data.channel_type === Constants.DM_CHANNEL) {
+    if (msg.data.channel_type === General.DM_CHANNEL) {
         const otherUserId = getUserIdFromChannelName(users.currentUserId, msg.data.channel_name);
 
         makeDirectChannelVisibleIfNecessary(otherUserId)(dispatch, getState);
@@ -203,12 +202,12 @@ async function handleNewPostEvent(msg, dispatch, getState) {
                 getProfilesByIds([rootUserId])(dispatch, getState);
             }
 
-            if (rootStatus !== Constants.ONLINE) {
+            if (rootStatus !== General.ONLINE) {
                 getStatusesByIds([rootUserId])(dispatch, getState);
             }
 
             dispatch({
-                type: PostsTypes.RECEIVED_POSTS,
+                type: PostTypes.RECEIVED_POSTS,
                 data,
                 channelId: post.channel_id
             }, getState);
@@ -217,7 +216,7 @@ async function handleNewPostEvent(msg, dispatch, getState) {
 
     dispatch(batchActions([
         {
-            type: PostsTypes.RECEIVED_POSTS,
+            type: PostTypes.RECEIVED_POSTS,
             data: {
                 order: [],
                 posts: {
@@ -259,12 +258,12 @@ async function handleNewPostEvent(msg, dispatch, getState) {
 function handlePostEdited(msg, dispatch, getState) {
     const data = JSON.parse(msg.data.post);
 
-    dispatch({type: PostsTypes.RECEIVED_POST, data}, getState);
+    dispatch({type: PostTypes.RECEIVED_POST, data}, getState);
 }
 
 function handlePostDeleted(msg, dispatch, getState) {
     const data = JSON.parse(msg.data.post);
-    dispatch({type: PostsTypes.POST_DELETED, data}, getState);
+    dispatch({type: PostTypes.POST_DELETED, data}, getState);
 }
 
 function handleLeaveTeamEvent(msg, dispatch, getState) {
@@ -273,7 +272,7 @@ function handleLeaveTeamEvent(msg, dispatch, getState) {
     const {currentUserId} = entities.users;
 
     if (currentUserId === msg.data.user_id) {
-        dispatch({type: TeamsTypes.LEAVE_TEAM, data: teams[msg.data.team_id]}, getState);
+        dispatch({type: TeamTypes.LEAVE_TEAM, data: teams[msg.data.team_id]}, getState);
 
         // if they are on the team being removed deselect the current team and channel
         if (currentTeamId === msg.data.team_id) {
@@ -322,7 +321,7 @@ function handleUserUpdatedEvent(msg, dispatch, getState) {
 
     if (user.id !== currentUserId) {
         dispatch({
-            type: UsersTypes.RECEIVED_PROFILES,
+            type: UserTypes.RECEIVED_PROFILES,
             data: {
                 [user.id]: user
             }
@@ -349,7 +348,7 @@ function handleChannelDeletedEvent(msg, dispatch, getState) {
     if (msg.broadcast.team_id === currentTeamId) {
         if (msg.data.channel_id === currentChannelId) {
             let channelId = '';
-            const channel = Object.keys(channels).filter((key) => channels[key].name === Constants.DEFAULT_CHANNEL);
+            const channel = Object.keys(channels).filter((key) => channels[key].name === General.DEFAULT_CHANNEL);
 
             if (channel.length) {
                 channelId = channel[0];
@@ -372,9 +371,9 @@ function handleDirectAddedEvent(msg, dispatch, getState) {
 
 function handlePreferenceChangedEvent(msg, dispatch, getState) {
     const preference = JSON.parse(msg.data.preference);
-    dispatch({type: PreferencesTypes.RECEIVED_PREFERENCES, data: [preference]}, getState);
+    dispatch({type: PreferenceTypes.RECEIVED_PREFERENCES, data: [preference]}, getState);
 
-    if (preference.category === Constants.CATEGORY_DIRECT_CHANNEL_SHOW) {
+    if (preference.category === Preferences.CATEGORY_DIRECT_CHANNEL_SHOW) {
         const state = getState();
         const users = state.entities.users;
         const userId = preference.name;
@@ -384,7 +383,7 @@ function handlePreferenceChangedEvent(msg, dispatch, getState) {
             getProfilesByIds([userId])(dispatch, getState);
         }
 
-        if (status !== Constants.ONLINE) {
+        if (status !== General.ONLINE) {
             getStatusesByIds([userId])(dispatch, getState);
         }
     }
@@ -392,7 +391,7 @@ function handlePreferenceChangedEvent(msg, dispatch, getState) {
 
 function handleStatusChangedEvent(msg, dispatch, getState) {
     dispatch({
-        type: UsersTypes.RECEIVED_STATUSES,
+        type: UserTypes.RECEIVED_STATUSES,
         data: {
             [msg.data.user_id]: msg.data.status
         }
@@ -403,7 +402,7 @@ function handleHelloEvent(msg) {
     const serverVersion = msg.data.server_version;
     if (serverVersion && Client.serverVersion !== serverVersion) {
         Client.serverVersion = serverVersion;
-        EventEmitter.emit(Constants.CONFIG_CHANGED, serverVersion);
+        EventEmitter.emit(General.CONFIG_CHANGED, serverVersion);
     }
 }
 
@@ -448,7 +447,7 @@ function handleUserTypingEvent(msg, dispatch, getState) {
     }
 
     const status = statuses[userId];
-    if (status !== Constants.ONLINE) {
+    if (status !== General.ONLINE) {
         getStatusesByIds([userId])(dispatch, getState);
     }
 }
@@ -465,7 +464,7 @@ function loadPostsHelper(teamId, channelId, dispatch, getState) {
         latestPostTime = posts[latestPostId].create_at || 0;
     }
 
-    if (Object.keys(posts).length === 0 || postsArray.length < Constants.POST_CHUNK_SIZE || latestPostTime === 0) {
+    if (Object.keys(posts).length === 0 || postsArray.length < Posts.POST_CHUNK_SIZE || latestPostTime === 0) {
         getPosts(teamId, channelId)(dispatch, getState);
     } else {
         getPostsSince(teamId, channelId, latestPostTime)(dispatch, getState);

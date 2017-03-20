@@ -2,7 +2,7 @@
 // See License.txt for license information.
 
 import EventEmitter from 'utils/event_emitter';
-import {Constants} from 'constants';
+import {General} from 'constants';
 
 import fetch from './fetch_etag';
 
@@ -754,7 +754,7 @@ export default class Client {
             const serverVersion = headers.get(HEADER_X_VERSION_ID);
             if (serverVersion && this.serverVersion !== serverVersion) {
                 this.serverVersion = serverVersion;
-                EventEmitter.emit(Constants.CONFIG_CHANGED, serverVersion);
+                EventEmitter.emit(General.CONFIG_CHANGED, serverVersion);
             }
         }
 

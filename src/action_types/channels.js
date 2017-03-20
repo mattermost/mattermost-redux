@@ -3,7 +3,7 @@
 
 import keyMirror from 'utils/key_mirror';
 
-const ChannelTypes = keyMirror({
+export default keyMirror({
     CHANNEL_REQUEST: null,
     CHANNEL_SUCCESS: null,
     CHANNEL_FAILURE: null,
@@ -79,5 +79,3 @@ const ChannelTypes = keyMirror({
     UPDATE_CHANNEL_HEADER: null,
     UPDATE_CHANNEL_PURPOSE: null
 });
-
-export default ChannelTypes;

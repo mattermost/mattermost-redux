@@ -3,7 +3,7 @@
 
 import keyMirror from 'utils/key_mirror';
 
-const UserTypes = keyMirror({
+export default keyMirror({
     LOGIN_REQUEST: null,
     LOGIN_SUCCESS: null,
     LOGIN_FAILURE: null,
@@ -75,5 +75,3 @@ const UserTypes = keyMirror({
     RECEIVED_AUTOCOMPLETE_IN_CHANNEL: null,
     RESET_LOGOUT_STATE: null
 });
-
-export default UserTypes;

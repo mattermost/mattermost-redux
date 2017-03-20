@@ -1,13 +1,8 @@
 // Copyright (c) 2016 Mattermost, Inc. All Rights Reserved.
 // See License.txt for license information.
 
-import {
-    Constants,
-    ChannelTypes,
-    Preferences,
-    PreferencesTypes,
-    UsersTypes
-} from 'constants';
+import {General, Preferences} from 'constants';
+import {ChannelTypes, PreferenceTypes, UserTypes} from 'action_types';
 import {batchActions} from 'redux-batched-actions';
 
 import Client from 'client';
@@ -61,7 +56,7 @@ export function createChannel(channel, userId) {
         const member = {
             channel_id: created.id,
             user_id: userId,
-            roles: `${Constants.CHANNEL_USER_ROLE} ${Constants.CHANNEL_ADMIN_ROLE}`,
+            roles: `${General.CHANNEL_USER_ROLE} ${General.CHANNEL_ADMIN_ROLE}`,
             last_viewed_at: 0,
             msg_count: 0,
             mention_count: 0,
@@ -114,7 +109,7 @@ export function createDirectChannel(teamId, userId, otherUserId) {
         const member = {
             channel_id: created.id,
             user_id: userId,
-            roles: `${Constants.CHANNEL_USER_ROLE} ${Constants.CHANNEL_ADMIN_ROLE}`,
+            roles: `${General.CHANNEL_USER_ROLE} ${General.CHANNEL_ADMIN_ROLE}`,
             last_viewed_at: 0,
             msg_count: 0,
             mention_count: 0,
@@ -132,7 +127,7 @@ export function createDirectChannel(teamId, userId, otherUserId) {
                 data: member
             },
             {
-                type: PreferencesTypes.RECEIVED_PREFERENCES,
+                type: PreferenceTypes.RECEIVED_PREFERENCES,
                 data: [{category: Preferences.CATEGORY_DIRECT_CHANNEL_SHOW, name: otherUserId, value: 'true'}]
             },
             {
@@ -371,7 +366,7 @@ export function joinChannel(userId, teamId, channelId, channelName) {
         const channelMember = {
             channel_id: channel.id,
             user_id: userId,
-            roles: `${Constants.CHANNEL_USER_ROLE}`,
+            roles: `${General.CHANNEL_USER_ROLE}`,
             last_viewed_at: 0,
             msg_count: 0,
             mention_count: 0,
@@ -413,7 +408,7 @@ export function deleteChannel(teamId, channelId) {
         const entities = getState().entities;
         const {channels, currentChannelId} = entities.channels;
         if (channelId === currentChannelId) {
-            const channel = Object.keys(channels).filter((key) => channels[key].name === Constants.DEFAULT_CHANNEL);
+            const channel = Object.keys(channels).filter((key) => channels[key].name === General.DEFAULT_CHANNEL);
             let defaultChannelId = '';
             if (channel.length) {
                 defaultChannelId = channel[0];
@@ -462,7 +457,7 @@ export function viewChannel(teamId, channelId) {
     };
 }
 
-export function getMoreChannels(teamId, offset, limit = Constants.CHANNELS_CHUNK_SIZE) {
+export function getMoreChannels(teamId, offset, limit = General.CHANNELS_CHUNK_SIZE) {
     return async (dispatch, getState) => {
         dispatch({type: ChannelTypes.MORE_CHANNELS_REQUEST}, getState);
 
@@ -565,7 +560,7 @@ export function addChannelMember(teamId, channelId, userId) {
 
         dispatch(batchActions([
             {
-                type: UsersTypes.RECEIVED_PROFILE_IN_CHANNEL,
+                type: UserTypes.RECEIVED_PROFILE_IN_CHANNEL,
                 data: {user_id: userId},
                 id: channelId
             },
@@ -593,7 +588,7 @@ export function removeChannelMember(teamId, channelId, userId) {
 
         dispatch(batchActions([
             {
-                type: UsersTypes.RECEIVED_PROFILE_NOT_IN_CHANNEL,
+                type: UserTypes.RECEIVED_PROFILE_NOT_IN_CHANNEL,
                 data: {user_id: userId},
                 id: channelId
             },
@@ -675,7 +670,7 @@ export function markChannelAsUnread(channelId, mentionsArray) {
 
         if (channel && member) {
             channel.total_msg_count++;
-            if (member.notify_props && member.notify_props.mark_unread === Constants.MENTION) {
+            if (member.notify_props && member.notify_props.mark_unread === General.MENTION) {
                 member.msg_count++;
             }
 

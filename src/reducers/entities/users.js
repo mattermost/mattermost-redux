@@ -2,7 +2,7 @@
 // See License.txt for license information.
 
 import {combineReducers} from 'redux';
-import {UsersTypes} from 'constants';
+import {UserTypes} from 'action_types';
 
 function profilesToSet(state, action) {
     const id = action.id;
@@ -39,10 +39,10 @@ function removeProfileFromSet(state, action) {
 
 function currentUserId(state = '', action) {
     switch (action.type) {
-    case UsersTypes.RECEIVED_ME:
+    case UserTypes.RECEIVED_ME:
         return action.data.id;
 
-    case UsersTypes.LOGOUT_SUCCESS:
+    case UserTypes.LOGOUT_SUCCESS:
         return '';
 
     }
@@ -52,10 +52,10 @@ function currentUserId(state = '', action) {
 
 function mySessions(state = [], action) {
     switch (action.type) {
-    case UsersTypes.RECEIVED_SESSIONS:
+    case UserTypes.RECEIVED_SESSIONS:
         return [...action.data];
 
-    case UsersTypes.RECEIVED_REVOKED_SESSION: {
+    case UserTypes.RECEIVED_REVOKED_SESSION: {
         let index = -1;
         const length = state.length;
         for (let i = 0; i < length; i++) {
@@ -70,7 +70,7 @@ function mySessions(state = [], action) {
 
         return state;
     }
-    case UsersTypes.LOGOUT_SUCCESS:
+    case UserTypes.LOGOUT_SUCCESS:
         return [];
 
     default:
@@ -80,10 +80,10 @@ function mySessions(state = [], action) {
 
 function myAudits(state = [], action) {
     switch (action.type) {
-    case UsersTypes.RECEIVED_AUDITS:
+    case UserTypes.RECEIVED_AUDITS:
         return [...action.data];
 
-    case UsersTypes.LOGOUT_SUCCESS:
+    case UserTypes.LOGOUT_SUCCESS:
         return [];
 
     default:
@@ -93,16 +93,16 @@ function myAudits(state = [], action) {
 
 function profiles(state = {}, action) {
     switch (action.type) {
-    case UsersTypes.RECEIVED_ME: {
+    case UserTypes.RECEIVED_ME: {
         return {
             ...state,
             [action.data.id]: {...action.data}
         };
     }
-    case UsersTypes.RECEIVED_PROFILES:
+    case UserTypes.RECEIVED_PROFILES:
         return Object.assign({}, state, action.data);
 
-    case UsersTypes.LOGOUT_SUCCESS:
+    case UserTypes.LOGOUT_SUCCESS:
         return {};
 
     default:
@@ -112,10 +112,10 @@ function profiles(state = {}, action) {
 
 function profilesInTeam(state = {}, action) {
     switch (action.type) {
-    case UsersTypes.RECEIVED_PROFILES_IN_TEAM:
+    case UserTypes.RECEIVED_PROFILES_IN_TEAM:
         return profilesToSet(state, action);
 
-    case UsersTypes.LOGOUT_SUCCESS:
+    case UserTypes.LOGOUT_SUCCESS:
         return {};
 
     default:
@@ -125,16 +125,16 @@ function profilesInTeam(state = {}, action) {
 
 function profilesInChannel(state = {}, action) {
     switch (action.type) {
-    case UsersTypes.RECEIVED_PROFILE_IN_CHANNEL:
+    case UserTypes.RECEIVED_PROFILE_IN_CHANNEL:
         return addProfileToSet(state, action);
 
-    case UsersTypes.RECEIVED_PROFILES_IN_CHANNEL:
+    case UserTypes.RECEIVED_PROFILES_IN_CHANNEL:
         return profilesToSet(state, action);
 
-    case UsersTypes.RECEIVED_PROFILE_NOT_IN_CHANNEL:
+    case UserTypes.RECEIVED_PROFILE_NOT_IN_CHANNEL:
         return removeProfileFromSet(state, action);
 
-    case UsersTypes.LOGOUT_SUCCESS:
+    case UserTypes.LOGOUT_SUCCESS:
         return {};
 
     default:
@@ -144,16 +144,16 @@ function profilesInChannel(state = {}, action) {
 
 function profilesNotInChannel(state = {}, action) {
     switch (action.type) {
-    case UsersTypes.RECEIVED_PROFILE_NOT_IN_CHANNEL:
+    case UserTypes.RECEIVED_PROFILE_NOT_IN_CHANNEL:
         return addProfileToSet(state, action);
 
-    case UsersTypes.RECEIVED_PROFILES_NOT_IN_CHANNEL:
+    case UserTypes.RECEIVED_PROFILES_NOT_IN_CHANNEL:
         return profilesToSet(state, action);
 
-    case UsersTypes.RECEIVED_PROFILE_IN_CHANNEL:
+    case UserTypes.RECEIVED_PROFILE_IN_CHANNEL:
         return removeProfileFromSet(state, action);
 
-    case UsersTypes.LOGOUT_SUCCESS:
+    case UserTypes.LOGOUT_SUCCESS:
         return {};
 
     default:
@@ -163,10 +163,10 @@ function profilesNotInChannel(state = {}, action) {
 
 function statuses(state = {}, action) {
     switch (action.type) {
-    case UsersTypes.RECEIVED_STATUSES: {
+    case UserTypes.RECEIVED_STATUSES: {
         return Object.assign({}, state, action.data);
     }
-    case UsersTypes.LOGOUT_SUCCESS:
+    case UserTypes.LOGOUT_SUCCESS:
         return {};
 
     default:
@@ -176,7 +176,7 @@ function statuses(state = {}, action) {
 
 function autocompleteUsersInChannel(state = {}, action) {
     switch (action.type) {
-    case UsersTypes.RECEIVED_AUTOCOMPLETE_IN_CHANNEL:
+    case UserTypes.RECEIVED_AUTOCOMPLETE_IN_CHANNEL:
         return Object.assign({}, state, {[action.channelId]: action.data});
     default:
         return state;
@@ -185,10 +185,10 @@ function autocompleteUsersInChannel(state = {}, action) {
 
 function search(state = {}, action) {
     switch (action.type) {
-    case UsersTypes.RECEIVED_SEARCH_PROFILES:
+    case UserTypes.RECEIVED_SEARCH_PROFILES:
         return action.data;
 
-    case UsersTypes.LOGOUT_SUCCESS:
+    case UserTypes.LOGOUT_SUCCESS:
         return {};
 
     default:

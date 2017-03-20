@@ -4,7 +4,8 @@
 import {batchActions} from 'redux-batched-actions';
 
 import Client from 'client';
-import {Preferences, PreferencesTypes} from 'constants';
+import {Preferences} from 'constants';
+import {PreferenceTypes} from 'action_types';
 import {getMyPreferences as getMyPreferencesSelector} from 'selectors/entities/preferences';
 import {getCurrentUserId} from 'selectors/entities/users';
 import {getPreferenceKey} from 'utils/preference_utils';
@@ -14,14 +15,14 @@ import {getLogErrorAction} from './errors';
 
 export function deletePreferences(preferences) {
     return async (dispatch, getState) => {
-        dispatch({type: PreferencesTypes.DELETE_PREFERENCES_REQUEST}, getState);
+        dispatch({type: PreferenceTypes.DELETE_PREFERENCES_REQUEST}, getState);
 
         try {
             await Client.deletePreferences(preferences);
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch);
             dispatch(batchActions([
-                {type: PreferencesTypes.DELETE_PREFERENCES_FAILURE, error},
+                {type: PreferenceTypes.DELETE_PREFERENCES_FAILURE, error},
                 getLogErrorAction(error)
             ]), getState);
             return;
@@ -29,11 +30,11 @@ export function deletePreferences(preferences) {
 
         dispatch(batchActions([
             {
-                type: PreferencesTypes.DELETED_PREFERENCES,
+                type: PreferenceTypes.DELETED_PREFERENCES,
                 data: preferences
             },
             {
-                type: PreferencesTypes.DELETE_PREFERENCES_SUCCESS
+                type: PreferenceTypes.DELETE_PREFERENCES_SUCCESS
             }
         ]), getState);
     };
@@ -42,9 +43,9 @@ export function deletePreferences(preferences) {
 export function getMyPreferences() {
     return bindClientFunc(
         Client.getMyPreferences,
-        PreferencesTypes.MY_PREFERENCES_REQUEST,
-        [PreferencesTypes.RECEIVED_PREFERENCES, PreferencesTypes.MY_PREFERENCES_SUCCESS],
-        PreferencesTypes.MY_PREFERENCES_FAILURE
+        PreferenceTypes.MY_PREFERENCES_REQUEST,
+        [PreferenceTypes.RECEIVED_PREFERENCES, PreferenceTypes.MY_PREFERENCES_SUCCESS],
+        PreferenceTypes.MY_PREFERENCES_FAILURE
     );
 }
 
@@ -71,14 +72,14 @@ export function makeDirectChannelVisibleIfNecessary(otherUserId) {
 
 export function savePreferences(preferences) {
     return async (dispatch, getState) => {
-        dispatch({type: PreferencesTypes.SAVE_PREFERENCES_REQUEST}, getState);
+        dispatch({type: PreferenceTypes.SAVE_PREFERENCES_REQUEST}, getState);
 
         try {
             await Client.savePreferences(preferences);
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch);
             dispatch(batchActions([
-                {type: PreferencesTypes.SAVE_PREFERENCES_FAILURE, error},
+                {type: PreferenceTypes.SAVE_PREFERENCES_FAILURE, error},
                 getLogErrorAction(error)
             ]), getState);
             return;
@@ -86,11 +87,11 @@ export function savePreferences(preferences) {
 
         dispatch(batchActions([
             {
-                type: PreferencesTypes.RECEIVED_PREFERENCES,
+                type: PreferenceTypes.RECEIVED_PREFERENCES,
                 data: preferences
             },
             {
-                type: PreferencesTypes.SAVE_PREFERENCES_SUCCESS
+                type: PreferenceTypes.SAVE_PREFERENCES_SUCCESS
             }
         ]), getState);
     };

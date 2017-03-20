@@ -2,15 +2,15 @@
 // See License.txt for license information.
 
 import {combineReducers} from 'redux';
-import {PreferencesTypes} from 'constants';
+import {PreferenceTypes} from 'action_types';
 
 import {handleRequest, initialRequestState} from './helpers';
 
 function getMyPreferences(state = initialRequestState(), action) {
     return handleRequest(
-        PreferencesTypes.MY_PREFERENCES_REQUEST,
-        PreferencesTypes.MY_PREFERENCES_SUCCESS,
-        PreferencesTypes.MY_PREFERENCES_FAILURE,
+        PreferenceTypes.MY_PREFERENCES_REQUEST,
+        PreferenceTypes.MY_PREFERENCES_SUCCESS,
+        PreferenceTypes.MY_PREFERENCES_FAILURE,
         state,
         action
     );
@@ -18,9 +18,9 @@ function getMyPreferences(state = initialRequestState(), action) {
 
 function savePreferences(state = initialRequestState(), action) {
     return handleRequest(
-        PreferencesTypes.SAVE_PREFERENCES_REQUEST,
-        PreferencesTypes.SAVE_PREFERENCES_SUCCESS,
-        PreferencesTypes.SAVE_PREFERENCES_FAILURE,
+        PreferenceTypes.SAVE_PREFERENCES_REQUEST,
+        PreferenceTypes.SAVE_PREFERENCES_SUCCESS,
+        PreferenceTypes.SAVE_PREFERENCES_FAILURE,
         state,
         action
     );
@@ -28,9 +28,9 @@ function savePreferences(state = initialRequestState(), action) {
 
 function deletePreferences(state = initialRequestState(), action) {
     return handleRequest(
-        PreferencesTypes.DELETE_PREFERENCES_REQUEST,
-        PreferencesTypes.DELETE_PREFERENCES_SUCCESS,
-        PreferencesTypes.DELETE_PREFERENCES_FAILURE,
+        PreferenceTypes.DELETE_PREFERENCES_REQUEST,
+        PreferenceTypes.DELETE_PREFERENCES_SUCCESS,
+        PreferenceTypes.DELETE_PREFERENCES_FAILURE,
         state,
         action
     );
