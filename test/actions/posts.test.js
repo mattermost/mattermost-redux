@@ -5,7 +5,7 @@ import assert from 'assert';
 
 import * as Actions from 'actions/posts';
 import {login} from 'actions/users';
-import Client from 'client';
+import {Client} from 'client';
 import configureStore from 'store';
 import {Preferences, Posts, RequestStatus} from 'constants';
 import TestHelper from 'test/test_helper';

@@ -1,6 +1,13 @@
-// Copyright (c) 2016 Mattermost, Inc. All Rights Reserved.
+// Copyright (c) 2017 Mattermost, Inc. All Rights Reserved.
 // See License.txt for license information.
 
-import Client from './client.js';
+import ClientClass from './client.js';
+import ClientClass4 from './client4.js';
 
-export default new Client();
+const Client = new ClientClass();
+const Client4 = new ClientClass4();
+
+export {
+    Client,
+    Client4
+};

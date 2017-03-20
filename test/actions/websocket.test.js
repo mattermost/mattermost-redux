@@ -7,7 +7,7 @@ import * as ChannelActions from 'actions/channels';
 import * as TeamActions from 'actions/teams';
 import * as GeneralActions from 'actions/general';
 
-import Client from 'client';
+import {Client} from 'client';
 import configureStore from 'store';
 import {General, Posts, RequestStatus} from 'constants';
 import TestHelper from 'test/test_helper';

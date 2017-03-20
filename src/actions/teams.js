@@ -2,7 +2,7 @@
 // See License.txt for license information.
 
 import {batchActions} from 'redux-batched-actions';
-import Client from 'client';
+import {Client} from 'client';
 import {General} from 'constants';
 import {TeamTypes} from 'action_types';
 import {getLogErrorAction} from './errors';

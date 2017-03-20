@@ -6,7 +6,7 @@ import assert from 'assert';
 import configureStore from 'store';
 
 import * as Actions from 'actions/general';
-import Client from 'client';
+import {Client} from 'client';
 import {RequestStatus} from 'constants';
 
 import TestHelper from 'test/test_helper';

@@ -3,7 +3,7 @@
 
 import {batchActions} from 'redux-batched-actions';
 
-import Client from 'client';
+import {Client} from 'client';
 import {FileTypes} from 'action_types';
 import {getLogErrorAction} from './errors';
 import {forceLogoutIfNecessary} from './helpers';

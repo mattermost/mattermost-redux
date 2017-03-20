@@ -4,6 +4,7 @@
 import assert from 'assert';
 
 import Client from 'client/client';
+import Client4 from 'client/client4';
 
 const DEFAULT_SERVER = 'http://localhost:8065';
 const PASSWORD = 'password1';
@@ -11,6 +12,7 @@ const PASSWORD = 'password1';
 class TestHelper {
     constructor() {
         this.basicClient = null;
+        this.basicClient4 = null;
 
         this.basicUser = null;
         this.basicTeam = null;
@@ -45,6 +47,14 @@ class TestHelper {
 
     createClient = () => {
         const client = new Client();
+
+        client.setUrl(DEFAULT_SERVER);
+
+        return client;
+    };
+
+    createClient4 = () => {
+        const client = new Client4();
 
         client.setUrl(DEFAULT_SERVER);
 
@@ -108,9 +118,11 @@ class TestHelper {
         };
     };
 
-    initBasic = async (client = this.createClient()) => {
+    initBasic = async (client = this.createClient(), client4 = this.createClient4()) => {
         client.setUrl(DEFAULT_SERVER);
+        client4.setUrl(DEFAULT_SERVER);
         this.basicClient = client;
+        this.basicClient4 = client4;
 
         this.basicUser = await client.createUser(this.fakeUser());
         await client.login(this.basicUser.email, PASSWORD);

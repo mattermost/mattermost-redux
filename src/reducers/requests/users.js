@@ -174,10 +174,21 @@ function updateUserNotifyProps(state = initialRequestState(), action) {
     );
 }
 
+function create(state = initialRequestState(), action) {
+    return handleRequest(
+        UserTypes.CREATE_USER_REQUEST,
+        UserTypes.CREATE_USER_SUCCESS,
+        UserTypes.CREATE_USER_FAILURE,
+        state,
+        action
+    );
+}
+
 export default combineReducers({
     checkMfa,
     login,
     logout,
+    create,
     getProfiles,
     getProfilesInTeam,
     getProfilesInChannel,

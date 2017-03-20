@@ -3,7 +3,7 @@
 
 import {batchActions} from 'redux-batched-actions';
 
-import Client from 'client';
+import {Client} from 'client';
 import {Preferences} from 'constants';
 import {PreferenceTypes} from 'action_types';
 import {getMyPreferences as getMyPreferencesSelector} from 'selectors/entities/preferences';

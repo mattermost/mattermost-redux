@@ -4,7 +4,7 @@
 import assert from 'assert';
 
 import * as Actions from 'actions/users';
-import Client from 'client';
+import {Client, Client4} from 'client';
 import configureStore from 'store';
 import {RequestStatus} from 'constants';
 import TestHelper from 'test/test_helper';
@@ -12,7 +12,7 @@ import TestHelper from 'test/test_helper';
 describe('Actions.Users', () => {
     let store;
     before(async () => {
-        await TestHelper.initBasic(Client);
+        await TestHelper.initBasic(Client, Client4);
     });
 
     beforeEach(() => {
@@ -21,6 +21,22 @@ describe('Actions.Users', () => {
 
     after(async () => {
         await TestHelper.basicClient.logout();
+    });
+
+    it('createUser', async () => {
+        let user = TestHelper.fakeUser();
+        user = await Actions.createUser(user)(store.dispatch, store.getState);
+
+        const state = store.getState();
+        const createRequest = state.requests.users.create;
+        const {profiles} = state.entities.users;
+
+        if (createRequest.status === RequestStatus.FAILURE) {
+            throw new Error(JSON.stringify(createRequest.error));
+        }
+
+        assert.ok(profiles);
+        assert.ok(profiles[user.id]);
     });
 
     it('login', async () => {
