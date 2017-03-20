@@ -27,6 +27,7 @@ const Constants = {
 
     DEFAULT_CHANNEL: 'town-square',
     DM_CHANNEL: 'D',
+    GM_CHANNEL: 'G',
     OPEN_CHANNEL: 'O',
     PRIVATE_CHANNEL: 'P',
 

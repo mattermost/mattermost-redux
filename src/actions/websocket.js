@@ -5,7 +5,7 @@ import {batchActions} from 'redux-batched-actions';
 
 import Client from 'client';
 import websocketClient from 'client/websocket_client';
-import {getProfilesByIds, getStatusesByIds} from './users';
+import {getProfilesByIds, getStatusesByIds, loadProfilesForDirect} from './users';
 import {
     fetchMyChannelsAndMembers,
     getChannel,
@@ -19,7 +19,10 @@ import {
     getPosts,
     getPostsSince
 } from './posts';
-import {makeDirectChannelVisibleIfNecessary} from './preferences';
+import {
+    makeDirectChannelVisibleIfNecessary,
+    makeGroupMessageVisibleIfNecessary
+} from './preferences';
 import {
     Constants,
     ChannelTypes,
@@ -94,14 +97,14 @@ function handleFirstConnect(dispatch, getState) {
     dispatch({type: GeneralTypes.WEBSOCKET_SUCCESS}, getState);
 }
 
-function handleReconnect(dispatch, getState) {
+async function handleReconnect(dispatch, getState) {
     const entities = getState().entities;
     const {currentTeamId} = entities.teams;
     const {currentChannelId} = entities.channels;
 
     if (currentTeamId) {
-        fetchMyChannelsAndMembers(currentTeamId)(dispatch, getState);
-
+        await fetchMyChannelsAndMembers(currentTeamId)(dispatch, getState);
+        loadProfilesForDirect()(dispatch, getState);
         if (currentChannelId) {
             loadPostsHelper(currentTeamId, currentChannelId, dispatch, getState);
         }
@@ -193,6 +196,8 @@ async function handleNewPostEvent(msg, dispatch, getState) {
         const otherUserId = getUserIdFromChannelName(users.currentUserId, msg.data.channel_name);
 
         makeDirectChannelVisibleIfNecessary(otherUserId)(dispatch, getState);
+    } else if (msg.data.channel_type === Constants.GM_CHANNEL) {
+        makeGroupMessageVisibleIfNecessary(post.channel_id)(dispatch, getState);
     }
 
     if (post.root_id && !posts[post.root_id]) {
