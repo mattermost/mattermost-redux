@@ -110,8 +110,8 @@ describe('Actions.Users', () => {
     });
 
     it('getProfiles', async () => {
-        await TestHelper.basicClient.login(TestHelper.basicUser.email, 'password1');
-        await TestHelper.basicClient.createUser(TestHelper.fakeUser());
+        await TestHelper.basicClient4.login(TestHelper.basicUser.email, 'password1');
+        await TestHelper.basicClient4.createUser(TestHelper.fakeUser());
         await Actions.getProfiles(0)(store.dispatch, store.getState);
 
         const profilesRequest = store.getState().requests.users.getProfiles;
@@ -122,6 +122,21 @@ describe('Actions.Users', () => {
         }
 
         assert.ok(Object.keys(profiles).length);
+    });
+
+    it('getProfilesByIds', async () => {
+        await TestHelper.basicClient4.login(TestHelper.basicUser.email, 'password1');
+        const user = await TestHelper.basicClient4.createUser(TestHelper.fakeUser());
+        await Actions.getProfilesByIds([user.id])(store.dispatch, store.getState);
+
+        const profilesRequest = store.getState().requests.users.getProfiles;
+        const {profiles} = store.getState().entities.users;
+
+        if (profilesRequest.status === RequestStatus.FAILURE) {
+            throw new Error(JSON.stringify(profilesRequest.error));
+        }
+
+        assert.ok(profiles[user.id]);
     });
 
     it('getProfilesInTeam', async () => {
@@ -142,7 +157,6 @@ describe('Actions.Users', () => {
 
     it('getProfilesInChannel', async () => {
         await Actions.getProfilesInChannel(
-            TestHelper.basicTeam.id,
             TestHelper.basicChannel.id,
             0
         )(store.dispatch, store.getState);
@@ -241,7 +255,7 @@ describe('Actions.Users', () => {
     });
 
     it('revokeSession and logout', async () => {
-        await TestHelper.basicClient.login(TestHelper.basicUser.email, 'password1');
+        await TestHelper.basicClient4.login(TestHelper.basicUser.email, 'password1');
         await Actions.getSessions(TestHelper.basicUser.id)(store.dispatch, store.getState);
 
         const sessionsRequest = store.getState().requests.users.getSessions;
