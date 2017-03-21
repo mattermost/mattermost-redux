@@ -3,7 +3,7 @@
 
 import {batchActions} from 'redux-batched-actions';
 
-import Client from 'client';
+import {Client} from 'client';
 import websocketClient from 'client/websocket_client';
 import {getProfilesByIds, getStatusesByIds} from './users';
 import {

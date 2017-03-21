@@ -4,7 +4,7 @@
 import assert from 'assert';
 
 import * as Actions from 'actions/teams';
-import Client from 'client';
+import {Client} from 'client';
 import configureStore from 'store';
 import {RequestStatus} from 'constants';
 import TestHelper from 'test/test_helper';

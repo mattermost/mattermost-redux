@@ -5,7 +5,7 @@ import {General, Preferences} from 'constants';
 import {ChannelTypes, PreferenceTypes, UserTypes} from 'action_types';
 import {batchActions} from 'redux-batched-actions';
 
-import Client from 'client';
+import {Client} from 'client';
 
 import {logError, getLogErrorAction} from './errors';
 import {forceLogoutIfNecessary} from './helpers';

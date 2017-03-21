@@ -3,7 +3,7 @@
 
 import {batchActions} from 'redux-batched-actions';
 
-import Client from 'client';
+import {Client} from 'client';
 import {Preferences, Posts} from 'constants';
 import {PostTypes} from 'action_types';
 

@@ -7,7 +7,7 @@ import configureStore from 'store';
 
 import * as Actions from 'actions/preferences';
 import {login} from 'actions/users';
-import Client from 'client';
+import {Client} from 'client';
 import {Preferences, RequestStatus} from 'constants';
 
 import TestHelper from 'test/test_helper';

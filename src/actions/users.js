@@ -2,7 +2,7 @@
 // See License.txt for license information.
 
 import {batchActions} from 'redux-batched-actions';
-import Client from 'client';
+import {Client, Client4} from 'client';
 import {General} from 'constants';
 import {PreferenceTypes, UserTypes, TeamTypes} from 'action_types';
 import {fetchTeams} from './teams';
@@ -23,6 +23,33 @@ export function checkMfa(loginId) {
             ]), getState);
             return null;
         }
+    };
+}
+
+export function createUser(user) {
+    return async (dispatch, getState) => {
+        dispatch({type: UserTypes.CREATE_USER_REQUEST}, getState);
+
+        let created;
+        try {
+            created = await Client4.createUser(user);
+        } catch (error) {
+            forceLogoutIfNecessary(error, dispatch);
+            dispatch(batchActions([
+                {
+                    type: UserTypes.CREATE_USER_FAILURE,
+                    error
+                },
+                getLogErrorAction(error)
+            ]), getState);
+            return null;
+        }
+
+        const profiles = {};
+        profiles[created.id] = created;
+        dispatch({type: UserTypes.RECEIVED_PROFILES, data: profiles});
+
+        return created;
     };
 }
 

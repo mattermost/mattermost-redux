@@ -2,7 +2,7 @@
 // See License.txt for license information.
 
 import {batchActions} from 'redux-batched-actions';
-import Client from 'client';
+import {Client} from 'client';
 import {UserTypes} from 'action_types';
 import {getLogErrorAction} from './errors';
 const HTTP_UNAUTHORIZED = 401;
