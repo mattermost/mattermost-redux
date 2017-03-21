@@ -13,6 +13,8 @@ const HEADER_REQUESTED_WITH = 'X-Requested-With';
 const HEADER_USER_AGENT = 'User-Agent';
 const HEADER_X_VERSION_ID = 'X-Version-Id';
 
+const PER_PAGE_DEFAULT = 60;
+
 export default class Client4 {
     constructor() {
         this.logToConsole = false;
@@ -66,6 +68,22 @@ export default class Client4 {
 
     getUserRoute(userId) {
         return `${this.getUsersRoute()}/${userId}`;
+    }
+
+    getTeamsRoute() {
+        return `${this.getBaseRoute()}/teams`;
+    }
+
+    getTeamRoute(teamId) {
+        return `${this.getTeamsRoute()}/${teamId}`;
+    }
+
+    getTeamMembersRoute(teamId) {
+        return `${this.getTeamRoute(teamId)}/members`;
+    }
+
+    getTeamMemberRoute(teamId, userId) {
+        return `${this.getTeamMembersRoute(teamId)}/${userId}`;
     }
 
     getPreferencesRoute(userId) {
@@ -153,7 +171,7 @@ export default class Client4 {
         return response;
     };
 
-    getProfiles = async (page, perPage) => {
+    getProfiles = async (page = 0, perPage = PER_PAGE_DEFAULT) => {
         return this.doFetch(
             `${this.getUsersRoute()}${buildQueryString({page, per_page: perPage})}`,
             {method: 'get'}
@@ -167,21 +185,21 @@ export default class Client4 {
         );
     };
 
-    getProfilesInTeam = async (teamId, page, perPage) => {
+    getProfilesInTeam = async (teamId, page = 0, perPage = PER_PAGE_DEFAULT) => {
         return this.doFetch(
             `${this.getUsersRoute()}${buildQueryString({in_team: teamId, page, per_page: perPage})}`,
             {method: 'get'}
         );
     };
 
-    getProfilesInChannel = async (channelId, page, perPage) => {
+    getProfilesInChannel = async (channelId, page = 0, perPage = PER_PAGE_DEFAULT) => {
         return this.doFetch(
             `${this.getUsersRoute()}${buildQueryString({in_channel: channelId, page, per_page: perPage})}`,
             {method: 'get'}
         );
     };
 
-    getProfilesNotInChannel = async (teamId, channelId, page, perPage) => {
+    getProfilesNotInChannel = async (teamId, channelId, page = 0, perPage = PER_PAGE_DEFAULT) => {
         return this.doFetch(
             `${this.getUsersRoute()}${buildQueryString({in_team: teamId, not_in_channel: channelId, page, per_page: perPage})}`,
             {method: 'get'}
@@ -202,9 +220,60 @@ export default class Client4 {
         );
     };
 
-    getUserAudits = async (userId, page, perPage) => {
+    getUserAudits = async (userId, page = 0, perPage = PER_PAGE_DEFAULT) => {
         return this.doFetch(
             `${this.getUserRoute(userId)}/audits${buildQueryString({page, per_page: perPage})}`,
+            {method: 'get'}
+        );
+    };
+
+    // Team Routes
+
+    createTeam = async (team) => {
+        return this.doFetch(
+            `${this.getTeamsRoute()}`,
+            {method: 'post', body: JSON.stringify(team)}
+        );
+    };
+
+    updateTeam = async (team) => {
+        return this.doFetch(
+            `${this.getTeamRoute(team.id)}`,
+            {method: 'put', body: JSON.stringify(team)}
+        );
+    };
+
+    getTeams = async (page = 0, perPage = PER_PAGE_DEFAULT) => {
+        return this.doFetch(
+            `${this.getTeamsRoute()}${buildQueryString({page, per_page: perPage})}`,
+            {method: 'get'}
+        );
+    };
+
+    getMyTeams = async () => {
+        return this.doFetch(
+            `${this.getUserRoute('me')}/teams`,
+            {method: 'get'}
+        );
+    };
+
+    getTeamMember = async (teamId, userId) => {
+        return this.doFetch(
+            `${this.getTeamMemberRoute(teamId, userId)}`,
+            {method: 'get'}
+        );
+    };
+
+    getTeamMembersByIds = async (teamId, userIds) => {
+        return this.doFetch(
+            `${this.getTeamMembersRoute(teamId)}/ids`,
+            {method: 'post', body: JSON.stringify(userIds)}
+        );
+    };
+
+    getTeamStats = async (teamId) => {
+        return this.doFetch(
+            `${this.getTeamRoute(teamId)}/stats`,
             {method: 'get'}
         );
     };

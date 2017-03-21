@@ -5,7 +5,7 @@ import {batchActions} from 'redux-batched-actions';
 import {Client, Client4} from 'client';
 import {General} from 'constants';
 import {PreferenceTypes, UserTypes, TeamTypes} from 'action_types';
-import {fetchTeams} from './teams';
+import {getMyTeams} from './teams';
 import {getLogErrorAction} from './errors';
 import {bindClientFunc, forceLogoutIfNecessary, debounce} from './helpers';
 
@@ -78,7 +78,7 @@ export function login(loginId, password, mfaToken = '') {
             }
 
             try {
-                await fetchTeams()(dispatch, getState);
+                await getMyTeams()(dispatch, getState);
             } catch (error) {
                 forceLogoutIfNecessary(error, dispatch);
                 dispatch(batchActions([
@@ -150,11 +150,11 @@ export function loadMe() {
         }
 
         try {
-            await fetchTeams()(dispatch, getState);
+            await getMyTeams()(dispatch, getState);
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch);
             dispatch(batchActions([
-                {type: TeamTypes.FETCH_TEAMS_FAILURE, error},
+                {type: TeamTypes.MY_TEAMS_FAILURE, error},
                 getLogErrorAction(error)
             ]), getState);
             return;

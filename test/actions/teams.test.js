@@ -4,6 +4,7 @@
 import assert from 'assert';
 
 import * as Actions from 'actions/teams';
+import {login} from 'actions/users';
 import {Client, Client4} from 'client';
 import configureStore from 'store';
 import {RequestStatus} from 'constants';
@@ -32,10 +33,11 @@ describe('Actions.Teams', () => {
         assert.equal(currentTeamId, TestHelper.basicTeam.id);
     });
 
-    it('fetchTeams', async () => {
-        await Actions.fetchTeams()(store.dispatch, store.getState);
+    it('getMyTeams', async () => {
+        await login(TestHelper.basicUser.email, 'password1')(store.dispatch, store.getState);
+        await Actions.getMyTeams()(store.dispatch, store.getState);
 
-        const teamsRequest = store.getState().requests.teams.allTeams;
+        const teamsRequest = store.getState().requests.teams.getMyTeams;
         const {teams} = store.getState().entities.teams;
 
         if (teamsRequest.status === RequestStatus.FAILURE) {
@@ -46,25 +48,29 @@ describe('Actions.Teams', () => {
         assert.ok(teams[TestHelper.basicTeam.id]);
     });
 
-    it('getAllTeamListings', async () => {
-        const team = {...TestHelper.fakeTeam(), allow_open_invite: true};
+    it('getTeams', async () => {
+        let team = {...TestHelper.fakeTeam(), allow_open_invite: true};
 
-        await Client.createTeam(team);
-        await Actions.getAllTeamListings()(store.dispatch, store.getState);
+        team = await Client.createTeam(team);
+        await Actions.getTeams()(store.dispatch, store.getState);
 
-        const teamsRequest = store.getState().requests.teams.getAllTeamListings;
-        const {teams, openTeamIds} = store.getState().entities.teams;
+        const teamsRequest = store.getState().requests.teams.getTeams;
+        const {teams} = store.getState().entities.teams;
 
         if (teamsRequest.status === RequestStatus.FAILURE) {
             throw new Error(JSON.stringify(teamsRequest.error));
         }
 
         assert.ok(Object.keys(teams).length > 0);
+        let found = false;
         for (const teamId in teams) {
-            if (teams.hasOwnProperty(teamId)) {
-                assert.ok(openTeamIds.has(teamId));
+            if (teams.hasOwnProperty(teamId) && teamId === team.id) {
+                found = true;
+                break;
             }
         }
+
+        assert.ok(found);
     });
 
     it('createTeam', async () => {

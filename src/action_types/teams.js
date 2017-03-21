@@ -4,9 +4,13 @@
 import keyMirror from 'utils/key_mirror';
 
 export default keyMirror({
-    FETCH_TEAMS_REQUEST: null,
-    FETCH_TEAMS_SUCCESS: null,
-    FETCH_TEAMS_FAILURE: null,
+    GET_TEAMS_REQUEST: null,
+    GET_TEAMS_SUCCESS: null,
+    GET_TEAMS_FAILURE: null,
+
+    MY_TEAMS_REQUEST: null,
+    MY_TEAMS_SUCCESS: null,
+    MY_TEAMS_FAILURE: null,
 
     CREATE_TEAM_REQUEST: null,
     CREATE_TEAM_SUCCESS: null,
@@ -19,10 +23,6 @@ export default keyMirror({
     MY_TEAM_MEMBERS_REQUEST: null,
     MY_TEAM_MEMBERS_SUCCESS: null,
     MY_TEAM_MEMBERS_FAILURE: null,
-
-    TEAM_LISTINGS_REQUEST: null,
-    TEAM_LISTINGS_SUCCESS: null,
-    TEAM_LISTINGS_FAILURE: null,
 
     TEAM_MEMBERS_REQUEST: null,
     TEAM_MEMBERS_SUCCESS: null,
@@ -43,9 +43,9 @@ export default keyMirror({
     CREATED_TEAM: null,
     SELECT_TEAM: null,
     UPDATED_TEAM: null,
-    RECEIVED_ALL_TEAMS: null,
+    RECEIVED_TEAMS: null,
+    RECEIVED_TEAMS_LIST: null,
     RECEIVED_MY_TEAM_MEMBERS: null,
-    RECEIVED_TEAM_LISTINGS: null,
     RECEIVED_MEMBERS_IN_TEAM: null,
     RECEIVED_MEMBER_IN_TEAM: null,
     REMOVE_MEMBER_FROM_TEAM: null,
