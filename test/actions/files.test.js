@@ -39,7 +39,7 @@ describe('Actions.Files', () => {
         const formBoundary = imageFormData.getBoundary();
 
         const fileUploadResp = await basicClient.
-            uploadFile(basicTeam.id, basicChannel.id, clientId, imageFormData, formBoundary);
+            uploadFile(basicTeam.id, basicChannel.id, imageFormData, formBoundary);
         const fileId = fileUploadResp.file_infos[0].id;
 
         const fakePostForFile = TestHelper.fakePost(basicChannel.id);

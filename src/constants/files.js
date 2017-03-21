@@ -8,7 +8,14 @@ const FilesTypes = keyMirror({
     FETCH_FILES_FOR_POST_SUCCESS: null,
     FETCH_FILES_FOR_POST_FAILURE: null,
 
-    RECEIVED_FILES_FOR_POST: null
+    RECEIVED_FILES_FOR_POST: null,
+
+    UPLOAD_FILES_REQUEST: null,
+    UPLOAD_FILES_SUCCESS: null,
+    UPLOAD_FILES_FAILURE: null,
+    UPLOAD_FILES_CANCEL: null,
+
+    RECEIVED_UPLOAD_FILES: null
 });
 
 export default FilesTypes;

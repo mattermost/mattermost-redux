@@ -16,7 +16,6 @@ function files(state = {}, action) {
             ...filesById
         };
     }
-
     case UsersTypes.LOGOUT_SUCCESS:
         return {};
     default:

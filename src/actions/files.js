@@ -36,3 +36,48 @@ export function getFilesForPost(teamId, channelId, postId) {
         ]), getState);
     };
 }
+
+const uploadFileRequests = {};
+export function uploadFile(teamId, channelId, fileFormData, formBoundary, rootId, requestId) {
+    return async (dispatch, getState) => {
+        dispatch({type: FilesTypes.UPLOAD_FILES_REQUEST}, getState);
+
+        uploadFileRequests[requestId] = true;
+
+        let files;
+        try {
+            files = await Client.uploadFile(teamId, channelId, fileFormData, formBoundary);
+        } catch (error) {
+            forceLogoutIfNecessary(error, dispatch);
+            dispatch(batchActions([
+                {type: FilesTypes.UPLOAD_FILES_FAILURE, error},
+                getLogErrorAction(error)
+            ]), getState);
+            return;
+        }
+
+        // check to see if our upload file request was cancelled
+        if (!uploadFileRequests[requestId]) {
+            return;
+        }
+
+        dispatch(batchActions([
+            {
+                type: FilesTypes.RECEIVED_UPLOAD_FILES,
+                data: files.file_infos,
+                channelId,
+                rootId
+            },
+            {
+                type: FilesTypes.UPLOAD_FILES_SUCCESS
+            }
+        ]), getState);
+    };
+}
+
+export function cancelUploadFileRequest(requestId) {
+    uploadFileRequests[requestId] = false;
+    return {
+        type: FilesTypes.UPLOAD_FILES_CANCEL
+    };
+}

@@ -4,22 +4,57 @@
 import {batchActions} from 'redux-batched-actions';
 
 import Client from 'client';
-import {Constants, PostsTypes, Preferences} from 'constants';
+import {Constants, FilesTypes, PostsTypes, Preferences} from 'constants';
 
 import {bindClientFunc, forceLogoutIfNecessary} from './helpers';
 import {getLogErrorAction} from './errors';
 import {deletePreferences, savePreferences} from './preferences';
 import {getProfilesByIds, getStatusesByIds} from './users';
 
-export function createPost(teamId, post) {
-    return bindClientFunc(
-        Client.createPost,
-        PostsTypes.CREATE_POST_REQUEST,
-        [PostsTypes.RECEIVED_POST, PostsTypes.CREATE_POST_SUCCESS],
-        PostsTypes.CREATE_POST_FAILURE,
-        teamId,
-        post
-    );
+export function createPost(teamId, post, files) {
+    return async (dispatch, getState) => {
+        dispatch({type: PostsTypes.CREATE_POST_REQUEST}, getState);
+
+        let newPost = post;
+        if (files) {
+            const fileIds = files.map((file) => file.id);
+            newPost = {
+                ...newPost,
+                file_ids: fileIds
+            };
+        }
+
+        let createdPost;
+        try {
+            createdPost = await Client.createPost(teamId, newPost);
+        } catch (error) {
+            forceLogoutIfNecessary(error, dispatch);
+            dispatch(batchActions([
+                {type: PostsTypes.CREATE_POST_FAILURE, error},
+                getLogErrorAction(error)
+            ]), getState);
+            return;
+        }
+
+        const actions = [{
+            type: PostsTypes.RECEIVED_POST,
+            data: {...createdPost}
+        }];
+
+        if (files) {
+            actions.push({
+                type: FilesTypes.RECEIVED_FILES_FOR_POST,
+                postId: createdPost.id,
+                data: files
+            });
+        }
+
+        actions.push({
+            type: PostsTypes.CREATE_POST_SUCCESS
+        });
+
+        dispatch(batchActions(actions), getState);
+    };
 }
 
 export function deletePost(teamId, post) {
