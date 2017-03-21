@@ -7,8 +7,8 @@ function getAllFiles(state) {
     return state.entities.files.files;
 }
 
-function getFilesIdsForPost(state, props) {
-    return state.entities.files.fileIdsByPostId[props.post.id] || [];
+function getFilesIdsForPost(state, post) {
+    return state.entities.files.fileIdsByPostId[post.id] || [];
 }
 
 export function makeGetFilesForPost() {

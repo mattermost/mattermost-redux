@@ -6,6 +6,7 @@ import {FilesTypes, UsersTypes} from 'constants';
 
 function files(state = {}, action) {
     switch (action.type) {
+    case FilesTypes.RECEIVED_UPLOAD_FILES:
     case FilesTypes.RECEIVED_FILES_FOR_POST: {
         const filesById = action.data.reduce((filesMap, file) => {
             return {...filesMap,
@@ -16,7 +17,6 @@ function files(state = {}, action) {
             ...filesById
         };
     }
-
     case UsersTypes.LOGOUT_SUCCESS:
         return {};
     default:
