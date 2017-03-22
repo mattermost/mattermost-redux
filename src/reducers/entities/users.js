@@ -3,12 +3,26 @@
 
 import {combineReducers} from 'redux';
 import {UserTypes} from 'action_types';
+import {profileListToMap} from 'utils/user_utils';
 
 function profilesToSet(state, action) {
     const id = action.id;
     const nextSet = new Set(state[id]);
     Object.keys(action.data).forEach((key) => {
         nextSet.add(key);
+    });
+
+    return {
+        ...state,
+        [id]: nextSet
+    };
+}
+
+function profileListToSet(state, action) {
+    const id = action.id;
+    const nextSet = new Set(state[id]);
+    action.data.forEach((profile) => {
+        nextSet.add(profile.id);
     });
 
     return {
@@ -99,6 +113,8 @@ function profiles(state = {}, action) {
             [action.data.id]: {...action.data}
         };
     }
+    case UserTypes.RECEIVED_PROFILES_LIST:
+        return Object.assign({}, state, profileListToMap(action.data));
     case UserTypes.RECEIVED_PROFILES:
         return Object.assign({}, state, action.data);
 
@@ -112,6 +128,9 @@ function profiles(state = {}, action) {
 
 function profilesInTeam(state = {}, action) {
     switch (action.type) {
+    case UserTypes.RECEIVED_PROFILES_LIST_IN_TEAM:
+        return profileListToSet(state, action);
+
     case UserTypes.RECEIVED_PROFILES_IN_TEAM:
         return profilesToSet(state, action);
 
@@ -127,6 +146,9 @@ function profilesInChannel(state = {}, action) {
     switch (action.type) {
     case UserTypes.RECEIVED_PROFILE_IN_CHANNEL:
         return addProfileToSet(state, action);
+
+    case UserTypes.RECEIVED_PROFILES_LIST_IN_CHANNEL:
+        return profileListToSet(state, action);
 
     case UserTypes.RECEIVED_PROFILES_IN_CHANNEL:
         return profilesToSet(state, action);
@@ -146,6 +168,9 @@ function profilesNotInChannel(state = {}, action) {
     switch (action.type) {
     case UserTypes.RECEIVED_PROFILE_NOT_IN_CHANNEL:
         return addProfileToSet(state, action);
+
+    case UserTypes.RECEIVED_PROFILES_LIST_NOT_IN_CHANNEL:
+        return profileListToSet(state, action);
 
     case UserTypes.RECEIVED_PROFILES_NOT_IN_CHANNEL:
         return profilesToSet(state, action);

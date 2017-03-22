@@ -16,7 +16,7 @@ function getChannel(state = initialRequestState(), action) {
     );
 }
 
-function getChannels(state = initialRequestState(), action) {
+function myChannels(state = initialRequestState(), action) {
     return handleRequest(
         ChannelTypes.CHANNELS_REQUEST,
         ChannelTypes.CHANNELS_SUCCESS,
@@ -106,11 +106,11 @@ function updateLastViewedAt(state = initialRequestState(), action) {
     );
 }
 
-function getMoreChannels(state = initialRequestState(), action) {
+function getChannels(state = initialRequestState(), action) {
     return handleRequest(
-        ChannelTypes.MORE_CHANNELS_REQUEST,
-        ChannelTypes.MORE_CHANNELS_SUCCESS,
-        ChannelTypes.MORE_CHANNELS_FAILURE,
+        ChannelTypes.GET_CHANNELS_REQUEST,
+        ChannelTypes.GET_CHANNELS_SUCCESS,
+        ChannelTypes.GET_CHANNELS_FAILURE,
         state,
         action
     );
@@ -160,6 +160,7 @@ export default combineReducers({
     getChannel,
     getChannels,
     myMembers,
+    myChannels,
     createChannel,
     updateChannel,
     updateChannelNotifyProps,
@@ -167,7 +168,6 @@ export default combineReducers({
     joinChannel,
     deleteChannel,
     updateLastViewedAt,
-    getMoreChannels,
     getChannelStats,
     addChannelMember,
     removeChannelMember,

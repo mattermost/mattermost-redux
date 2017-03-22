@@ -5,7 +5,7 @@ import {batchActions} from 'redux-batched-actions';
 import {Client, Client4} from 'client';
 import {General} from 'constants';
 import {PreferenceTypes, UserTypes, TeamTypes} from 'action_types';
-import {fetchTeams} from './teams';
+import {getMyTeams} from './teams';
 import {getLogErrorAction} from './errors';
 import {bindClientFunc, forceLogoutIfNecessary, debounce} from './helpers';
 
@@ -78,7 +78,7 @@ export function login(loginId, password, mfaToken = '') {
             }
 
             try {
-                await fetchTeams()(dispatch, getState);
+                await getMyTeams()(dispatch, getState);
             } catch (error) {
                 forceLogoutIfNecessary(error, dispatch);
                 dispatch(batchActions([
@@ -150,11 +150,11 @@ export function loadMe() {
         }
 
         try {
-            await fetchTeams()(dispatch, getState);
+            await getMyTeams()(dispatch, getState);
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch);
             dispatch(batchActions([
-                {type: TeamTypes.FETCH_TEAMS_FAILURE, error},
+                {type: TeamTypes.MY_TEAMS_FAILURE, error},
                 getLogErrorAction(error)
             ]), getState);
             return;
@@ -208,77 +208,34 @@ export function logout() {
     );
 }
 
-export function getProfiles(page, perPage = General.PROFILE_CHUNK_SIZE) {
-    return async (dispatch, getState) => {
-        dispatch({type: UserTypes.PROFILES_REQUEST}, getState);
-
-        let profilesList;
-        try {
-            profilesList = await Client4.getProfiles(page, perPage);
-        } catch (error) {
-            forceLogoutIfNecessary(error, dispatch);
-            dispatch(batchActions([
-                {type: UserTypes.PROFILES_FAILURE, error},
-                getLogErrorAction(error)
-            ]), getState);
-            return null;
-        }
-
-        const profiles = profileListToMap(profilesList);
-
-        dispatch(batchActions([
-            {
-                type: UserTypes.RECEIVED_PROFILES,
-                data: profiles
-            },
-            {
-                type: UserTypes.PROFILES_SUCCESS
-            }
-        ]), getState);
-
-        return profiles;
-    };
+export function getProfiles(page = 0, perPage = General.PROFILE_CHUNK_SIZE) {
+    return bindClientFunc(
+        Client4.getProfiles,
+        UserTypes.PROFILES_REQUEST,
+        [UserTypes.RECEIVED_PROFILES_LIST, UserTypes.PROFILES_SUCCESS],
+        UserTypes.PROFILES_FAILURE,
+        page,
+        perPage
+    );
 }
 
 export function getProfilesByIds(userIds) {
-    return async (dispatch, getState) => {
-        dispatch({type: UserTypes.PROFILES_REQUEST}, getState);
-
-        let profilesList;
-        try {
-            profilesList = await Client4.getProfilesByIds(userIds);
-        } catch (error) {
-            forceLogoutIfNecessary(error, dispatch);
-            dispatch(batchActions([
-                {type: UserTypes.PROFILES_FAILURE, error},
-                getLogErrorAction(error)
-            ]), getState);
-            return null;
-        }
-
-        const profiles = profileListToMap(profilesList);
-
-        dispatch(batchActions([
-            {
-                type: UserTypes.RECEIVED_PROFILES,
-                data: profiles
-            },
-            {
-                type: UserTypes.PROFILES_SUCCESS
-            }
-        ]), getState);
-
-        return profiles;
-    };
+    return bindClientFunc(
+        Client4.getProfilesByIds,
+        UserTypes.PROFILES_REQUEST,
+        [UserTypes.RECEIVED_PROFILES_LIST, UserTypes.PROFILES_SUCCESS],
+        UserTypes.PROFILES_FAILURE,
+        userIds
+    );
 }
 
 export function getProfilesInTeam(teamId, page, perPage = General.PROFILE_CHUNK_SIZE) {
     return async (dispatch, getState) => {
         dispatch({type: UserTypes.PROFILES_IN_TEAM_REQUEST}, getState);
 
-        let profilesList;
+        let profiles;
         try {
-            profilesList = await Client4.getProfilesInTeam(teamId, page, perPage);
+            profiles = await Client4.getProfilesInTeam(teamId, page, perPage);
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch);
             dispatch(batchActions([
@@ -288,16 +245,14 @@ export function getProfilesInTeam(teamId, page, perPage = General.PROFILE_CHUNK_
             return null;
         }
 
-        const profiles = profileListToMap(profilesList);
-
         dispatch(batchActions([
             {
-                type: UserTypes.RECEIVED_PROFILES_IN_TEAM,
+                type: UserTypes.RECEIVED_PROFILES_LIST_IN_TEAM,
                 data: profiles,
                 id: teamId
             },
             {
-                type: UserTypes.RECEIVED_PROFILES,
+                type: UserTypes.RECEIVED_PROFILES_LIST,
                 data: profiles
             },
             {
@@ -313,9 +268,9 @@ export function getProfilesInChannel(channelId, page, perPage = General.PROFILE_
     return async (dispatch, getState) => {
         dispatch({type: UserTypes.PROFILES_IN_CHANNEL_REQUEST}, getState);
 
-        let profilesList;
+        let profiles;
         try {
-            profilesList = await Client4.getProfilesInChannel(channelId, page, perPage);
+            profiles = await Client4.getProfilesInChannel(channelId, page, perPage);
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch);
             dispatch(batchActions([
@@ -325,16 +280,14 @@ export function getProfilesInChannel(channelId, page, perPage = General.PROFILE_
             return null;
         }
 
-        const profiles = profileListToMap(profilesList);
-
         dispatch(batchActions([
             {
-                type: UserTypes.RECEIVED_PROFILES_IN_CHANNEL,
+                type: UserTypes.RECEIVED_PROFILES_LIST_IN_CHANNEL,
                 data: profiles,
                 id: channelId
             },
             {
-                type: UserTypes.RECEIVED_PROFILES,
+                type: UserTypes.RECEIVED_PROFILES_LIST,
                 data: profiles
             },
             {
@@ -350,9 +303,9 @@ export function getProfilesNotInChannel(teamId, channelId, page, perPage = Gener
     return async (dispatch, getState) => {
         dispatch({type: UserTypes.PROFILES_NOT_IN_CHANNEL_REQUEST}, getState);
 
-        let profilesList;
+        let profiles;
         try {
-            profilesList = await Client4.getProfilesNotInChannel(teamId, channelId, page, perPage);
+            profiles = await Client4.getProfilesNotInChannel(teamId, channelId, page, perPage);
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch);
             dispatch(batchActions([
@@ -362,16 +315,14 @@ export function getProfilesNotInChannel(teamId, channelId, page, perPage = Gener
             return null;
         }
 
-        const profiles = profileListToMap(profilesList);
-
         dispatch(batchActions([
             {
-                type: UserTypes.RECEIVED_PROFILES_NOT_IN_CHANNEL,
+                type: UserTypes.RECEIVED_PROFILES_LIST_NOT_IN_CHANNEL,
                 data: profiles,
                 id: channelId
             },
             {
-                type: UserTypes.RECEIVED_PROFILES,
+                type: UserTypes.RECEIVED_PROFILES_LIST,
                 data: profiles
             },
             {
@@ -551,14 +502,6 @@ export function updateUserNotifyProps(notifyProps) {
             {type: UserTypes.UPDATE_NOTIFY_PROPS_SUCCESS}
         ]), getState);
     };
-}
-
-function profileListToMap(profilesList) {
-    const profiles = {};
-    for (let i = 0; i < profilesList.length; i++) {
-        profiles[profilesList[i].id] = profilesList[i];
-    }
-    return profiles;
 }
 
 export default {

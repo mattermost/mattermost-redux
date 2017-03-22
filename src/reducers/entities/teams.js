@@ -3,6 +3,7 @@
 
 import {combineReducers} from 'redux';
 import {TeamTypes, UserTypes} from 'action_types';
+import {teamListToMap} from 'utils/team_utils';
 
 function currentTeamId(state = '', action) {
     switch (action.type) {
@@ -18,8 +19,9 @@ function currentTeamId(state = '', action) {
 
 function teams(state = {}, action) {
     switch (action.type) {
-    case TeamTypes.RECEIVED_ALL_TEAMS:
-    case TeamTypes.RECEIVED_TEAM_LISTINGS:
+    case TeamTypes.RECEIVED_TEAMS_LIST:
+        return Object.assign({}, state, teamListToMap(action.data));
+    case TeamTypes.RECEIVED_TEAMS:
         return Object.assign({}, state, action.data);
 
     case TeamTypes.CREATED_TEAM:
@@ -127,23 +129,6 @@ function stats(state = {}, action) {
     }
 }
 
-function openTeamIds(state = new Set(), action) {
-    switch (action.type) {
-    case TeamTypes.RECEIVED_TEAM_LISTINGS: {
-        const teamsData = action.data;
-        const newState = new Set();
-        for (const teamId in teamsData) {
-            if (teamsData.hasOwnProperty(teamId)) {
-                newState.add(teamId);
-            }
-        }
-        return newState;
-    }
-    default:
-        return state;
-    }
-}
-
 export default combineReducers({
 
     // the current selected team
@@ -159,8 +144,5 @@ export default combineReducers({
     membersInTeam,
 
     // object where every key is the team id and has an object with the team stats
-    stats,
-
-    // Set with the team ids the user is not a member of
-    openTeamIds
+    stats
 });

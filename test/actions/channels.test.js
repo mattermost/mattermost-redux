@@ -4,7 +4,7 @@
 import assert from 'assert';
 
 import * as Actions from 'actions/channels';
-import {getProfilesByIds} from 'actions/users';
+import {getProfilesByIds, login} from 'actions/users';
 import {Client, Client4} from 'client';
 import configureStore from 'store';
 import {RequestStatus} from 'constants';
@@ -75,7 +75,7 @@ describe('Actions.Channels', () => {
         );
 
         await getProfilesByIds([user.id])(store.dispatch, store.getState);
-        await Actions.createDirectChannel(TestHelper.basicTeam.id, TestHelper.basicUser.id, user.id)(store.dispatch, store.getState);
+        await Actions.createDirectChannel(TestHelper.basicUser.id, user.id)(store.dispatch, store.getState);
 
         const createRequest = store.getState().requests.channels.createChannel;
         if (createRequest.status === RequestStatus.FAILURE) {
@@ -124,7 +124,19 @@ describe('Actions.Channels', () => {
     });
 
     it('getChannel', async () => {
-        await Actions.getChannel(TestHelper.basicTeam.id, TestHelper.basicChannel.id)(store.dispatch, store.getState);
+        await Actions.getChannel(TestHelper.basicChannel.id)(store.dispatch, store.getState);
+
+        const channelRequest = store.getState().requests.channels.getChannel;
+        if (channelRequest.status === RequestStatus.FAILURE) {
+            throw new Error(JSON.stringify(channelRequest.error));
+        }
+
+        const {channels} = store.getState().entities.channels;
+        assert.ok(channels[TestHelper.basicChannel.id]);
+    });
+
+    it('getChannelAndMyMember', async () => {
+        await Actions.getChannelAndMyMember(TestHelper.basicChannel.id)(store.dispatch, store.getState);
 
         const channelRequest = store.getState().requests.channels.getChannel;
         if (channelRequest.status === RequestStatus.FAILURE) {
@@ -139,7 +151,7 @@ describe('Actions.Channels', () => {
     it('fetchMyChannelsAndMembers', async () => {
         await Actions.fetchMyChannelsAndMembers(TestHelper.basicTeam.id)(store.dispatch, store.getState);
 
-        const channelsRequest = store.getState().requests.channels.getChannels;
+        const channelsRequest = store.getState().requests.channels.myChannels;
         const membersRequest = store.getState().requests.channels.myMembers;
         if (channelsRequest.status === RequestStatus.FAILURE) {
             throw new Error(JSON.stringify(channelsRequest.error));
@@ -181,8 +193,8 @@ describe('Actions.Channels', () => {
     });
 
     it('leaveChannel', async () => {
+        await login(TestHelper.basicUser.email, 'password1')(store.dispatch, store.getState);
         await Actions.leaveChannel(
-            TestHelper.basicTeam.id,
             TestHelper.basicChannel.id
         )(store.dispatch, store.getState);
 
@@ -246,7 +258,6 @@ describe('Actions.Channels', () => {
     it('deleteChannel', async () => {
         await Actions.fetchMyChannelsAndMembers(TestHelper.basicTeam.id)(store.dispatch, store.getState);
         await Actions.deleteChannel(
-            TestHelper.basicTeam.id,
             secondChannel.id
         )(store.dispatch, store.getState);
 
@@ -272,7 +283,6 @@ describe('Actions.Channels', () => {
         assert.ok(otherMember);
 
         await Actions.viewChannel(
-            TestHelper.basicTeam.id,
             TestHelper.basicChannel.id,
             userChannel.id
         )(store.dispatch, store.getState);
@@ -283,7 +293,7 @@ describe('Actions.Channels', () => {
         }
     });
 
-    it('getMoreChannels', async () => {
+    it('getChannels', async () => {
         const userClient = TestHelper.createClient();
         const user = await TestHelper.basicClient.createUserWithInvite(
             TestHelper.fakeUser(),
@@ -297,9 +307,9 @@ describe('Actions.Channels', () => {
             TestHelper.fakeChannel(TestHelper.basicTeam.id)
         );
 
-        await Actions.getMoreChannels(TestHelper.basicTeam.id, 0)(store.dispatch, store.getState);
+        await Actions.getChannels(TestHelper.basicTeam.id, 0)(store.dispatch, store.getState);
 
-        const moreRequest = store.getState().requests.channels.getMoreChannels;
+        const moreRequest = store.getState().requests.channels.getChannels;
         if (moreRequest.status === RequestStatus.FAILURE) {
             throw new Error(JSON.stringify(moreRequest.error));
         }
@@ -313,7 +323,6 @@ describe('Actions.Channels', () => {
 
     it('getChannelStats', async () => {
         await Actions.getChannelStats(
-            TestHelper.basicTeam.id,
             TestHelper.basicChannel.id
         )(store.dispatch, store.getState);
 
@@ -337,7 +346,6 @@ describe('Actions.Channels', () => {
         );
 
         await Actions.addChannelMember(
-            TestHelper.basicTeam.id,
             TestHelper.basicChannel.id,
             user.id
         )(store.dispatch, store.getState);
@@ -365,13 +373,11 @@ describe('Actions.Channels', () => {
         );
 
         await Actions.addChannelMember(
-            TestHelper.basicTeam.id,
             TestHelper.basicChannel.id,
             user.id
         )(store.dispatch, store.getState);
 
         await Actions.removeChannelMember(
-            TestHelper.basicTeam.id,
             TestHelper.basicChannel.id,
             user.id
         )(store.dispatch, store.getState);
@@ -391,7 +397,7 @@ describe('Actions.Channels', () => {
     });
 
     it('updateChannelHeader', async () => {
-        await Actions.getChannel(TestHelper.basicTeam.id, TestHelper.basicChannel.id)(store.dispatch, store.getState);
+        await Actions.getChannel(TestHelper.basicChannel.id)(store.dispatch, store.getState);
 
         const channelRequest = store.getState().requests.channels.getChannel;
         if (channelRequest.status === RequestStatus.FAILURE) {
@@ -410,7 +416,7 @@ describe('Actions.Channels', () => {
     });
 
     it('updateChannelPurpose', async () => {
-        await Actions.getChannel(TestHelper.basicTeam.id, TestHelper.basicChannel.id)(store.dispatch, store.getState);
+        await Actions.getChannel(TestHelper.basicChannel.id)(store.dispatch, store.getState);
 
         const channelRequest = store.getState().requests.channels.getChannel;
         if (channelRequest.status === RequestStatus.FAILURE) {

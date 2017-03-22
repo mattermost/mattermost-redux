@@ -6,21 +6,21 @@ import {TeamTypes} from 'action_types';
 
 import {handleRequest, initialRequestState} from './helpers';
 
-function allTeams(state = initialRequestState(), action) {
+function getMyTeams(state = initialRequestState(), action) {
     return handleRequest(
-        TeamTypes.FETCH_TEAMS_REQUEST,
-        TeamTypes.FETCH_TEAMS_SUCCESS,
-        TeamTypes.FETCH_TEAMS_FAILURE,
+        TeamTypes.MY_TEAMS_REQUEST,
+        TeamTypes.MY_TEAMS_SUCCESS,
+        TeamTypes.MY_TEAMS_FAILURE,
         state,
         action
     );
 }
 
-function getAllTeamListings(state = initialRequestState(), action) {
+function getTeams(state = initialRequestState(), action) {
     return handleRequest(
-        TeamTypes.TEAM_LISTINGS_REQUEST,
-        TeamTypes.TEAM_LISTINGS_SUCCESS,
-        TeamTypes.TEAM_LISTINGS_FAILURE,
+        TeamTypes.GET_TEAMS_REQUEST,
+        TeamTypes.GET_TEAMS_SUCCESS,
+        TeamTypes.GET_TEAMS_FAILURE,
         state,
         action
     );
@@ -97,8 +97,8 @@ function removeUserFromTeam(state = initialRequestState(), action) {
 }
 
 export default combineReducers({
-    allTeams,
-    getAllTeamListings,
+    getMyTeams,
+    getTeams,
     createTeam,
     updateTeam,
     getMyTeamMembers,

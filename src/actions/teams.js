@@ -2,7 +2,7 @@
 // See License.txt for license information.
 
 import {batchActions} from 'redux-batched-actions';
-import {Client} from 'client';
+import {Client, Client4} from 'client';
 import {General} from 'constants';
 import {TeamTypes} from 'action_types';
 import {getLogErrorAction} from './errors';
@@ -40,21 +40,23 @@ export function selectTeam(team) {
     }, getState);
 }
 
-export function fetchTeams() {
+export function getMyTeams() {
     return bindClientFunc(
-        Client.getAllTeams,
-        TeamTypes.FETCH_TEAMS_REQUEST,
-        [TeamTypes.RECEIVED_ALL_TEAMS, TeamTypes.FETCH_TEAMS_SUCCESS],
-        TeamTypes.FETCH_TEAMS_FAILURE
+        Client4.getMyTeams,
+        TeamTypes.MY_TEAMS_REQUEST,
+        [TeamTypes.RECEIVED_TEAMS_LIST, TeamTypes.MY_TEAMS_SUCCESS],
+        TeamTypes.MY_TEAMS_FAILURE
     );
 }
 
-export function getAllTeamListings() {
+export function getTeams(page = 0, perPage = General.TEAMS_CHUNK_SIZE) {
     return bindClientFunc(
-        Client.getAllTeamListings,
-        TeamTypes.TEAM_LISTINGS_REQUEST,
-        [TeamTypes.RECEIVED_TEAM_LISTINGS, TeamTypes.TEAM_LISTINGS_SUCCESS],
-        TeamTypes.TEAM_LISTINGS_FAILURE
+        Client4.getTeams,
+        TeamTypes.GET_TEAMS_REQUEST,
+        [TeamTypes.RECEIVED_TEAMS_LIST, TeamTypes.GET_TEAMS_SUCCESS],
+        TeamTypes.GET_TEAMS_FAILURE,
+        page,
+        perPage
     );
 }
 
@@ -64,7 +66,7 @@ export function createTeam(userId, team) {
 
         let created;
         try {
-            created = await Client.createTeam(team);
+            created = await Client4.createTeam(team);
         } catch (err) {
             forceLogoutIfNecessary(err, dispatch);
             dispatch(batchActions([
@@ -105,7 +107,7 @@ export function createTeam(userId, team) {
 
 export function updateTeam(team) {
     return bindClientFunc(
-        Client.updateTeam,
+        Client4.updateTeam,
         TeamTypes.UPDATE_TEAM_REQUEST,
         [TeamTypes.UPDATED_TEAM, TeamTypes.UPDATE_TEAM_SUCCESS],
         TeamTypes.UPDATE_TEAM_FAILURE,
@@ -128,7 +130,7 @@ export function getTeamMember(teamId, userId) {
 
         let member;
         try {
-            member = await Client.getTeamMember(teamId, userId);
+            member = await Client4.getTeamMember(teamId, userId);
             getProfilesAndStatusesForMembers([userId], dispatch, getState);
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch);
@@ -157,7 +159,7 @@ export function getTeamMembersByIds(teamId, userIds) {
 
         let members;
         try {
-            members = await Client.getTeamMemberByIds(teamId, userIds);
+            members = await Client4.getTeamMembersByIds(teamId, userIds);
             getProfilesAndStatusesForMembers(userIds, dispatch, getState);
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch);
@@ -181,7 +183,7 @@ export function getTeamMembersByIds(teamId, userIds) {
 
 export function getTeamStats(teamId) {
     return bindClientFunc(
-        Client.getTeamStats,
+        Client4.getTeamStats,
         TeamTypes.TEAM_STATS_REQUEST,
         [TeamTypes.RECEIVED_TEAM_STATS, TeamTypes.TEAM_STATS_SUCCESS],
         TeamTypes.TEAM_STATS_FAILURE,

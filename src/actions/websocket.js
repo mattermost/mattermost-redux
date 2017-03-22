@@ -293,7 +293,7 @@ function handleUserAddedEvent(msg, dispatch, getState) {
     }
 
     if (teamId === currentTeamId && msg.data.user_id === currentUserId) {
-        getChannel(teamId, msg.broadcast.channel_id)(dispatch, getState);
+        getChannel(msg.broadcast.channel_id)(dispatch, getState);
     }
 }
 
@@ -336,7 +336,7 @@ function handleChannelCreatedEvent(msg, dispatch, getState) {
     const {currentTeamId} = state.entities.teams;
 
     if (teamId === currentTeamId && !channels[channelId]) {
-        getChannel(teamId, channelId)(dispatch, getState);
+        getChannel(channelId)(dispatch, getState);
     }
 }
 
@@ -363,10 +363,7 @@ function handleChannelDeletedEvent(msg, dispatch, getState) {
 }
 
 function handleDirectAddedEvent(msg, dispatch, getState) {
-    const state = getState();
-    const {currentTeamId} = state.entities.teams;
-
-    getChannel(currentTeamId, msg.broadcast.channel_id)(dispatch, getState);
+    getChannel(msg.broadcast.channel_id)(dispatch, getState);
 }
 
 function handlePreferenceChangedEvent(msg, dispatch, getState) {
