@@ -48,3 +48,11 @@ export function isTeamAdmin(roles) {
 export function isSystemAdmin(roles) {
     return roles.includes(General.SYSTEM_ADMIN_ROLE);
 }
+
+export function profileListToMap(profileList) {
+    const profiles = {};
+    for (let i = 0; i < profileList.length; i++) {
+        profiles[profileList[i].id] = profileList[i];
+    }
+    return profiles;
+}
