@@ -5,7 +5,7 @@ import {General, Preferences} from 'constants';
 import {ChannelTypes, PreferenceTypes, UserTypes} from 'action_types';
 import {batchActions} from 'redux-batched-actions';
 
-import {Client} from 'client';
+import {Client, Client4} from 'client';
 
 import {logError, getLogErrorAction} from './errors';
 import {forceLogoutIfNecessary} from './helpers';
@@ -36,7 +36,7 @@ export function createChannel(channel, userId) {
 
         let created;
         try {
-            created = await Client.createChannel(channel);
+            created = await Client4.createChannel(channel);
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch);
             dispatch(batchActions([
@@ -89,13 +89,13 @@ export function createChannel(channel, userId) {
     };
 }
 
-export function createDirectChannel(teamId, userId, otherUserId) {
+export function createDirectChannel(userId, otherUserId) {
     return async (dispatch, getState) => {
         dispatch({type: ChannelTypes.CREATE_CHANNEL_REQUEST}, getState);
 
         let created;
         try {
-            created = await Client.createDirectChannel(teamId, otherUserId);
+            created = await Client4.createDirectChannel([userId, otherUserId]);
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch);
             dispatch(batchActions([
@@ -145,7 +145,7 @@ export function updateChannel(channel) {
 
         let updated;
         try {
-            updated = await Client.updateChannel(channel);
+            updated = await Client4.updateChannel(channel);
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch);
 
@@ -206,13 +206,13 @@ export function updateChannelNotifyProps(userId, teamId, channelId, props) {
     };
 }
 
-export function getChannel(teamId, channelId) {
+export function getChannel(channelId) {
     return async (dispatch, getState) => {
         dispatch({type: ChannelTypes.CHANNEL_REQUEST}, getState);
 
         let data;
         try {
-            data = await Client.getChannel(teamId, channelId);
+            data = await Client4.getChannel(channelId);
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch);
             dispatch(batchActions([
@@ -225,14 +225,44 @@ export function getChannel(teamId, channelId) {
         dispatch(batchActions([
             {
                 type: ChannelTypes.RECEIVED_CHANNEL,
-                data: data.channel
+                data
+            },
+            {
+                type: ChannelTypes.CHANNEL_SUCCESS
+            }
+        ]), getState);
+    };
+}
+
+export function getChannelAndMyMember(channelId) {
+    return async (dispatch, getState) => {
+        dispatch({type: ChannelTypes.CHANNEL_REQUEST}, getState);
+
+        let channel;
+        let member;
+        try {
+            channel = await Client4.getChannel(channelId);
+            member = await Client4.getMyChannelMember(channelId);
+        } catch (error) {
+            forceLogoutIfNecessary(error, dispatch);
+            dispatch(batchActions([
+                {type: ChannelTypes.CHANNELS_FAILURE, error},
+                getLogErrorAction(error)
+            ]), getState);
+            return;
+        }
+
+        dispatch(batchActions([
+            {
+                type: ChannelTypes.RECEIVED_CHANNEL,
+                data: channel
             },
             {
                 type: ChannelTypes.CHANNEL_SUCCESS
             },
             {
                 type: ChannelTypes.RECEIVED_MY_CHANNEL_MEMBER,
-                data: data.member
+                data: member
             }
         ]), getState);
     };
@@ -253,7 +283,7 @@ export function fetchMyChannelsAndMembers(teamId) {
         let channelMembers;
         try {
             const channelsRequest = Client.getChannels(teamId);
-            const channelMembersRequest = Client.getMyChannelMembers(teamId);
+            const channelMembersRequest = Client4.getMyChannelMembers(teamId);
 
             channels = await channelsRequest;
             channelMembers = await channelMembersRequest;
@@ -292,7 +322,7 @@ export function getMyChannelMembers(teamId) {
 
         let channelMembers;
         try {
-            const channelMembersRequest = Client.getMyChannelMembers(teamId);
+            const channelMembersRequest = Client4.getMyChannelMembers(teamId);
 
             channelMembers = await channelMembersRequest;
         } catch (error) {
@@ -316,12 +346,14 @@ export function getMyChannelMembers(teamId) {
     };
 }
 
-export function leaveChannel(teamId, channelId) {
+export function leaveChannel(channelId) {
     return async (dispatch, getState) => {
         dispatch({type: ChannelTypes.LEAVE_CHANNEL_REQUEST}, getState);
 
+        const {currentUserId} = getState().entities.users;
+
         try {
-            await Client.leaveChannel(teamId, channelId);
+            await Client4.removeFromChannel(currentUserId, channelId);
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch);
             dispatch(batchActions([
@@ -347,12 +379,15 @@ export function joinChannel(userId, teamId, channelId, channelName) {
     return async (dispatch, getState) => {
         dispatch({type: ChannelTypes.JOIN_CHANNEL_REQUEST}, getState);
 
+        let member;
         let channel;
         try {
             if (channelId) {
-                channel = await Client.joinChannel(teamId, channelId);
+                member = await Client4.addToChannel(userId, channelId);
+                channel = await Client4.getChannel(channelId);
             } else if (channelName) {
-                channel = await Client.joinChannelByName(teamId, channelName);
+                channel = await Client4.getChannelByName(teamId, channelName);
+                member = await Client4.addToChannel(userId, channel.id);
             }
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch);
@@ -363,17 +398,6 @@ export function joinChannel(userId, teamId, channelId, channelName) {
             return;
         }
 
-        const channelMember = {
-            channel_id: channel.id,
-            user_id: userId,
-            roles: `${General.CHANNEL_USER_ROLE}`,
-            last_viewed_at: 0,
-            msg_count: 0,
-            mention_count: 0,
-            notify_props: {desktop: 'default', mark_unread: 'all'},
-            last_update_at: new Date().getTime()
-        };
-
         dispatch(batchActions([
             {
                 type: ChannelTypes.RECEIVED_CHANNEL,
@@ -381,7 +405,7 @@ export function joinChannel(userId, teamId, channelId, channelName) {
             },
             {
                 type: ChannelTypes.RECEIVED_MY_CHANNEL_MEMBER,
-                data: channelMember
+                data: member
             },
             {
                 type: ChannelTypes.JOIN_CHANNEL_SUCCESS
@@ -390,12 +414,12 @@ export function joinChannel(userId, teamId, channelId, channelName) {
     };
 }
 
-export function deleteChannel(teamId, channelId) {
+export function deleteChannel(channelId) {
     return async (dispatch, getState) => {
         dispatch({type: ChannelTypes.DELETE_CHANNEL_REQUEST}, getState);
 
         try {
-            await Client.deleteChannel(teamId, channelId);
+            await Client4.deleteChannel(channelId);
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch);
             dispatch(batchActions([
@@ -429,7 +453,7 @@ export function deleteChannel(teamId, channelId) {
     };
 }
 
-export function viewChannel(teamId, channelId) {
+export function viewChannel(channelId) {
     return async (dispatch, getState) => {
         const state = getState();
         const {currentChannelId} = state.entities.channels;
@@ -442,8 +466,7 @@ export function viewChannel(teamId, channelId) {
         dispatch({type: ChannelTypes.UPDATE_LAST_VIEWED_REQUEST}, getState);
 
         try {
-            // this API should return the timestamp that was set
-            await Client.viewChannel(teamId, channelId, prevChannelId);
+            await Client4.viewMyChannel(channelId, prevChannelId);
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch);
             dispatch(batchActions([
@@ -457,17 +480,17 @@ export function viewChannel(teamId, channelId) {
     };
 }
 
-export function getMoreChannels(teamId, offset, limit = General.CHANNELS_CHUNK_SIZE) {
+export function getChannels(teamId, page = 0, perPage = General.CHANNELS_CHUNK_SIZE) {
     return async (dispatch, getState) => {
-        dispatch({type: ChannelTypes.MORE_CHANNELS_REQUEST}, getState);
+        dispatch({type: ChannelTypes.GET_CHANNELS_REQUEST}, getState);
 
         let channels;
         try {
-            channels = await Client.getMoreChannels(teamId, offset, limit);
+            channels = await Client4.getChannels(teamId, page, perPage);
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch);
             dispatch(batchActions([
-                {type: ChannelTypes.MORE_CHANNELS_FAILURE, error},
+                {type: ChannelTypes.GET_CHANNELS_FAILURE, error},
                 getLogErrorAction(error)
             ]), getState);
             return null;
@@ -475,11 +498,11 @@ export function getMoreChannels(teamId, offset, limit = General.CHANNELS_CHUNK_S
 
         dispatch(batchActions([
             {
-                type: ChannelTypes.RECEIVED_MORE_CHANNELS,
+                type: ChannelTypes.RECEIVED_CHANNELS,
                 data: await channels
             },
             {
-                type: ChannelTypes.MORE_CHANNELS_SUCCESS
+                type: ChannelTypes.GET_CHANNELS_SUCCESS
             }
         ]), getState);
 
@@ -505,7 +528,7 @@ export function searchMoreChannels(teamId, term) {
 
         dispatch(batchActions([
             {
-                type: ChannelTypes.RECEIVED_MORE_CHANNELS,
+                type: ChannelTypes.RECEIVED_CHANNELS,
                 data: await channels
             },
             {
@@ -515,13 +538,13 @@ export function searchMoreChannels(teamId, term) {
     };
 }
 
-export function getChannelStats(teamId, channelId) {
+export function getChannelStats(channelId) {
     return async (dispatch, getState) => {
         dispatch({type: ChannelTypes.CHANNEL_STATS_REQUEST}, getState);
 
         let stat;
         try {
-            stat = await Client.getChannelStats(teamId, channelId);
+            stat = await Client4.getChannelStats(channelId);
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch);
             dispatch(batchActions([
@@ -543,12 +566,12 @@ export function getChannelStats(teamId, channelId) {
     };
 }
 
-export function addChannelMember(teamId, channelId, userId) {
+export function addChannelMember(channelId, userId) {
     return async (dispatch, getState) => {
         dispatch({type: ChannelTypes.ADD_CHANNEL_MEMBER_REQUEST}, getState);
 
         try {
-            await Client.addChannelMember(teamId, channelId, userId);
+            await Client4.addToChannel(userId, channelId);
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch);
             dispatch(batchActions([
@@ -571,12 +594,12 @@ export function addChannelMember(teamId, channelId, userId) {
     };
 }
 
-export function removeChannelMember(teamId, channelId, userId) {
+export function removeChannelMember(channelId, userId) {
     return async (dispatch, getState) => {
         dispatch({type: ChannelTypes.REMOVE_CHANNEL_MEMBER_REQUEST}, getState);
 
         try {
-            await Client.removeChannelMember(teamId, channelId, userId);
+            await Client4.removeFromChannel(userId, channelId);
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch);
             dispatch(batchActions([
@@ -735,7 +758,7 @@ export default {
     joinChannel,
     deleteChannel,
     viewChannel,
-    getMoreChannels,
+    getChannels,
     searchMoreChannels,
     getChannelStats,
     addChannelMember,

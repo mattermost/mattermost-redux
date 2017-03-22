@@ -153,7 +153,6 @@ describe('Actions.Websocket', () => {
         await TeamActions.selectTeam(TestHelper.basicTeam)(store.dispatch, store.getState);
 
         await ChannelActions.addChannelMember(
-            TestHelper.basicTeam.id,
             TestHelper.basicChannel.id,
             user.id
         )(store.dispatch, store.getState);
@@ -174,13 +173,11 @@ describe('Actions.Websocket', () => {
         );
 
         await ChannelActions.addChannelMember(
-            TestHelper.basicTeam.id,
             TestHelper.basicChannel.id,
             user.id
         )(store.dispatch, store.getState);
 
         await ChannelActions.removeChannelMember(
-            TestHelper.basicTeam.id,
             TestHelper.basicChannel.id,
             user.id
         )(store.dispatch, store.getState);
@@ -221,10 +218,9 @@ describe('Actions.Websocket', () => {
             setTimeout(() => {
                 const state = store.getState();
                 const entities = state.entities;
-                const {channels, myMembers} = entities.channels;
+                const {channels} = entities.channels;
 
                 assert.ok(channels[channel.id]);
-                assert.ok(myMembers[channel.id]);
                 done();
             }, 1000);
         }
@@ -237,8 +233,7 @@ describe('Actions.Websocket', () => {
             await TeamActions.selectTeam(TestHelper.basicTeam)(store.dispatch, store.getState);
             await ChannelActions.fetchMyChannelsAndMembers(TestHelper.basicTeam.id)(store.dispatch, store.getState);
             await ChannelActions.selectChannel(TestHelper.basicChannel.id)(store.dispatch, store.getState);
-            await Client.deleteChannel(
-                TestHelper.basicTeam.id,
+            await Client4.deleteChannel(
                 TestHelper.basicChannel.id
             );
 

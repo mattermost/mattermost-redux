@@ -106,11 +106,11 @@ function updateLastViewedAt(state = initialRequestState(), action) {
     );
 }
 
-function getMoreChannels(state = initialRequestState(), action) {
+function getChannels(state = initialRequestState(), action) {
     return handleRequest(
-        ChannelTypes.MORE_CHANNELS_REQUEST,
-        ChannelTypes.MORE_CHANNELS_SUCCESS,
-        ChannelTypes.MORE_CHANNELS_FAILURE,
+        ChannelTypes.GET_CHANNELS_REQUEST,
+        ChannelTypes.GET_CHANNELS_SUCCESS,
+        ChannelTypes.GET_CHANNELS_FAILURE,
         state,
         action
     );
@@ -167,7 +167,7 @@ export default combineReducers({
     joinChannel,
     deleteChannel,
     updateLastViewedAt,
-    getMoreChannels,
+    getChannels,
     getChannelStats,
     addChannelMember,
     removeChannelMember,
