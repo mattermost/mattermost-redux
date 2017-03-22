@@ -151,7 +151,7 @@ describe('Actions.Channels', () => {
     it('fetchMyChannelsAndMembers', async () => {
         await Actions.fetchMyChannelsAndMembers(TestHelper.basicTeam.id)(store.dispatch, store.getState);
 
-        const channelsRequest = store.getState().requests.channels.getChannels;
+        const channelsRequest = store.getState().requests.channels.myChannels;
         const membersRequest = store.getState().requests.channels.myMembers;
         if (channelsRequest.status === RequestStatus.FAILURE) {
             throw new Error(JSON.stringify(channelsRequest.error));

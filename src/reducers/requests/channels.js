@@ -16,7 +16,7 @@ function getChannel(state = initialRequestState(), action) {
     );
 }
 
-function getChannels(state = initialRequestState(), action) {
+function myChannels(state = initialRequestState(), action) {
     return handleRequest(
         ChannelTypes.CHANNELS_REQUEST,
         ChannelTypes.CHANNELS_SUCCESS,
@@ -160,6 +160,7 @@ export default combineReducers({
     getChannel,
     getChannels,
     myMembers,
+    myChannels,
     createChannel,
     updateChannel,
     updateChannelNotifyProps,
@@ -167,7 +168,6 @@ export default combineReducers({
     joinChannel,
     deleteChannel,
     updateLastViewedAt,
-    getChannels,
     getChannelStats,
     addChannelMember,
     removeChannelMember,

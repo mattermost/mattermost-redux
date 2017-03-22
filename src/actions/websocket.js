@@ -363,9 +363,6 @@ function handleChannelDeletedEvent(msg, dispatch, getState) {
 }
 
 function handleDirectAddedEvent(msg, dispatch, getState) {
-    const state = getState();
-    const {currentTeamId} = state.entities.teams;
-
     getChannel(msg.broadcast.channel_id)(dispatch, getState);
 }
 
