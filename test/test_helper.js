@@ -126,6 +126,7 @@ class TestHelper {
 
         this.basicUser = await client.createUser(this.fakeUser());
         await client.login(this.basicUser.email, PASSWORD);
+        await client4.login(this.basicUser.email, PASSWORD);
 
         this.basicTeam = await client.createTeam(this.fakeTeam());
 
@@ -134,6 +135,7 @@ class TestHelper {
 
         return {
             client: this.basicClient,
+            client4: this.basicClient4,
             user: this.basicUser,
             team: this.basicTeam,
             channel: this.basicChannel,

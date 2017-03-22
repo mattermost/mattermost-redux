@@ -5,7 +5,7 @@ import assert from 'assert';
 
 import * as Actions from 'actions/posts';
 import {login} from 'actions/users';
-import {Client} from 'client';
+import {Client, Client4} from 'client';
 import configureStore from 'store';
 import {Preferences, Posts, RequestStatus} from 'constants';
 import TestHelper from 'test/test_helper';
@@ -14,7 +14,7 @@ import {getPreferenceKey} from 'utils/preference_utils';
 describe('Actions.Posts', () => {
     let store;
     before(async () => {
-        await TestHelper.initBasic(Client);
+        await TestHelper.initBasic(Client, Client4);
     });
 
     beforeEach(() => {
@@ -23,6 +23,7 @@ describe('Actions.Posts', () => {
 
     after(async () => {
         await TestHelper.basicClient.logout();
+        await TestHelper.basicClient4.logout();
     });
 
     it('createPost', async () => {
@@ -409,7 +410,7 @@ describe('Actions.Posts', () => {
         const {dispatch, getState} = store;
         const teamId = TestHelper.basicTeam.id;
         const channelId = TestHelper.basicChannel.id;
-        await TestHelper.basicClient.logout();
+        await TestHelper.basicClient4.logout();
         await login(TestHelper.basicUser.email, 'password1')(store.dispatch, store.getState);
 
         const post1 = await Client.createPost(
@@ -428,7 +429,7 @@ describe('Actions.Posts', () => {
         const {dispatch, getState} = store;
         const teamId = TestHelper.basicTeam.id;
         const channelId = TestHelper.basicChannel.id;
-        await TestHelper.basicClient.logout();
+        await TestHelper.basicClient4.logout();
         await login(TestHelper.basicUser.email, 'password1')(store.dispatch, store.getState);
 
         const post1 = await Client.createPost(

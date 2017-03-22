@@ -6,7 +6,7 @@ import {General} from 'constants';
 
 import fetch from './fetch_etag';
 
-//const HEADER_TOKEN = 'Token';
+const HEADER_TOKEN = 'Token';
 const HEADER_AUTH = 'Authorization';
 const HEADER_BEARER = 'BEARER';
 const HEADER_REQUESTED_WITH = 'X-Requested-With';
@@ -64,6 +64,14 @@ export default class Client4 {
         return `${this.getBaseRoute()}/users`;
     }
 
+    getUserRoute(userId) {
+        return `${this.getUsersRoute()}/${userId}`;
+    }
+
+    getPreferencesRoute(userId) {
+        return `${this.getUserRoute(userId)}/preferences`;
+    }
+
     getOptions(options) {
         const headers = {
             [HEADER_REQUESTED_WITH]: 'XMLHttpRequest'
@@ -105,12 +113,120 @@ export default class Client4 {
         }
 
         return this.doFetch(
-            `${this.getUsersRoute()}` + buildQueryString(queryParams),
+            `${this.getUsersRoute()}${buildQueryString(queryParams)}`,
             {method: 'post', body: JSON.stringify(user)}
         );
     }
 
-    // Client helpers
+    login = async (loginId, password, token = '', deviceId = '') => {
+        const body = {
+            device_id: deviceId,
+            login_id: loginId,
+            password,
+            token
+        };
+
+        const {headers, data} = await this.doFetchWithResponse(
+            `${this.getUsersRoute()}/login`,
+            {method: 'post', body: JSON.stringify(body)}
+        );
+
+        if (headers.has(HEADER_TOKEN)) {
+            this.token = headers.get(HEADER_TOKEN);
+        }
+
+        return data;
+    };
+
+    logout = async () => {
+        const {response} = await this.doFetchWithResponse(
+            `${this.getUsersRoute()}/logout`,
+            {method: 'post'}
+        );
+
+        if (response.ok) {
+            this.token = '';
+        }
+
+        this.serverVersion = '';
+
+        return response;
+    };
+
+    getProfiles = async (page, perPage) => {
+        return this.doFetch(
+            `${this.getUsersRoute()}${buildQueryString({page, per_page: perPage})}`,
+            {method: 'get'}
+        );
+    };
+
+    getProfilesByIds = async (userIds) => {
+        return this.doFetch(
+            `${this.getUsersRoute()}/ids`,
+            {method: 'post', body: JSON.stringify(userIds)}
+        );
+    };
+
+    getProfilesInTeam = async (teamId, page, perPage) => {
+        return this.doFetch(
+            `${this.getUsersRoute()}${buildQueryString({in_team: teamId, page, per_page: perPage})}`,
+            {method: 'get'}
+        );
+    };
+
+    getProfilesInChannel = async (channelId, page, perPage) => {
+        return this.doFetch(
+            `${this.getUsersRoute()}${buildQueryString({in_channel: channelId, page, per_page: perPage})}`,
+            {method: 'get'}
+        );
+    };
+
+    getProfilesNotInChannel = async (teamId, channelId, page, perPage) => {
+        return this.doFetch(
+            `${this.getUsersRoute()}${buildQueryString({in_team: teamId, not_in_channel: channelId, page, per_page: perPage})}`,
+            {method: 'get'}
+        );
+    };
+
+    getSessions = async (userId) => {
+        return this.doFetch(
+            `${this.getUserRoute(userId)}/sessions`,
+            {method: 'get'}
+        );
+    };
+
+    revokeSession = async (userId, sessionId) => {
+        return this.doFetch(
+            `${this.getUserRoute(userId)}/sessions/revoke`,
+            {method: 'post', body: JSON.stringify({session_id: sessionId})}
+        );
+    };
+
+    getUserAudits = async (userId, page, perPage) => {
+        return this.doFetch(
+            `${this.getUserRoute(userId)}/audits${buildQueryString({page, per_page: perPage})}`,
+            {method: 'get'}
+        );
+    };
+
+    // Preference Routes
+
+    savePreferences = async (userId, preferences) => {
+        return this.doFetch(
+            `${this.getPreferencesRoute(userId)}`,
+            {method: 'put', body: JSON.stringify(preferences)}
+        );
+    };
+
+    deletePreferences = async (userId, preferences) => {
+        return this.doFetch(
+            `${this.getPreferencesRoute(userId)}/delete`,
+            {method: 'post', body: JSON.stringify(preferences)}
+        );
+    };
+
+    // Client Helpers
+
     doFetch = async (url, options) => {
         const {data} = await this.doFetchWithResponse(url, options);
 

@@ -7,7 +7,7 @@ import * as ChannelActions from 'actions/channels';
 import * as TeamActions from 'actions/teams';
 import * as GeneralActions from 'actions/general';
 
-import {Client} from 'client';
+import {Client, Client4} from 'client';
 import configureStore from 'store';
 import {General, Posts, RequestStatus} from 'constants';
 import TestHelper from 'test/test_helper';
@@ -16,7 +16,7 @@ describe('Actions.Websocket', () => {
     let store;
     before(async () => {
         store = configureStore();
-        await TestHelper.initBasic(Client);
+        await TestHelper.initBasic(Client, Client4);
         const webSocketConnector = require('ws');
         return await Actions.init(
             'ios',
@@ -29,6 +29,7 @@ describe('Actions.Websocket', () => {
     after(async () => {
         Actions.close()();
         await TestHelper.basicClient.logout();
+        await TestHelper.basicClient4.logout();
     });
 
     it('WebSocket Connect', () => {

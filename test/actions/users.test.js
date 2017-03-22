@@ -21,6 +21,7 @@ describe('Actions.Users', () => {
 
     after(async () => {
         await TestHelper.basicClient.logout();
+        await TestHelper.basicClient4.logout();
     });
 
     it('createUser', async () => {
@@ -41,7 +42,7 @@ describe('Actions.Users', () => {
 
     it('login', async () => {
         const user = TestHelper.basicUser;
-        await TestHelper.basicClient.logout();
+        await TestHelper.basicClient4.logout();
         await Actions.login(user.email, 'password1')(store.dispatch, store.getState);
 
         const state = store.getState();
@@ -109,8 +110,8 @@ describe('Actions.Users', () => {
     });
 
     it('getProfiles', async () => {
-        await TestHelper.basicClient.login(TestHelper.basicUser.email, 'password1');
-        await TestHelper.basicClient.createUser(TestHelper.fakeUser());
+        await TestHelper.basicClient4.login(TestHelper.basicUser.email, 'password1');
+        await TestHelper.basicClient4.createUser(TestHelper.fakeUser());
         await Actions.getProfiles(0)(store.dispatch, store.getState);
 
         const profilesRequest = store.getState().requests.users.getProfiles;
@@ -121,6 +122,21 @@ describe('Actions.Users', () => {
         }
 
         assert.ok(Object.keys(profiles).length);
+    });
+
+    it('getProfilesByIds', async () => {
+        await TestHelper.basicClient4.login(TestHelper.basicUser.email, 'password1');
+        const user = await TestHelper.basicClient4.createUser(TestHelper.fakeUser());
+        await Actions.getProfilesByIds([user.id])(store.dispatch, store.getState);
+
+        const profilesRequest = store.getState().requests.users.getProfiles;
+        const {profiles} = store.getState().entities.users;
+
+        if (profilesRequest.status === RequestStatus.FAILURE) {
+            throw new Error(JSON.stringify(profilesRequest.error));
+        }
+
+        assert.ok(profiles[user.id]);
     });
 
     it('getProfilesInTeam', async () => {
@@ -141,7 +157,6 @@ describe('Actions.Users', () => {
 
     it('getProfilesInChannel', async () => {
         await Actions.getProfilesInChannel(
-            TestHelper.basicTeam.id,
             TestHelper.basicChannel.id,
             0
         )(store.dispatch, store.getState);
@@ -226,7 +241,9 @@ describe('Actions.Users', () => {
             throw new Error(JSON.stringify(sessionsRequest.error));
         }
 
-        await Actions.revokeSession(sessions[0].id)(store.dispatch, store.getState);
+        const sessionsLength = sessions.length;
+
+        await Actions.revokeSession(TestHelper.basicUser.id, sessions[0].id)(store.dispatch, store.getState);
 
         const revokeRequest = store.getState().requests.users.revokeSession;
         if (revokeRequest.status === RequestStatus.FAILURE) {
@@ -234,11 +251,11 @@ describe('Actions.Users', () => {
         }
 
         sessions = store.getState().entities.users.mySessions;
-        assert.ok(sessions.length === 0);
+        assert.ok(sessions.length === sessionsLength - 1);
     });
 
     it('revokeSession and logout', async () => {
-        await TestHelper.basicClient.login(TestHelper.basicUser.email, 'password1');
+        await TestHelper.basicClient4.login(TestHelper.basicUser.email, 'password1');
         await Actions.getSessions(TestHelper.basicUser.id)(store.dispatch, store.getState);
 
         const sessionsRequest = store.getState().requests.users.getSessions;
@@ -248,7 +265,7 @@ describe('Actions.Users', () => {
             throw new Error(JSON.stringify(sessionsRequest.error));
         }
 
-        await Actions.revokeSession(sessions[0].id)(store.dispatch, store.getState);
+        await Actions.revokeSession(TestHelper.basicUser.id, sessions[0].id)(store.dispatch, store.getState);
 
         const revokeRequest = store.getState().requests.users.revokeSession;
         if (revokeRequest.status === RequestStatus.FAILURE) {
@@ -263,9 +280,9 @@ describe('Actions.Users', () => {
         }
     });
 
-    it('getAudits', async () => {
-        await TestHelper.basicClient.login(TestHelper.basicUser.email, 'password1');
-        await Actions.getAudits(TestHelper.basicUser.id)(store.dispatch, store.getState);
+    it('getUserAudits', async () => {
+        await TestHelper.basicClient4.login(TestHelper.basicUser.email, 'password1');
+        await Actions.getUserAudits(TestHelper.basicUser.id)(store.dispatch, store.getState);
 
         const auditsRequest = store.getState().requests.users.getAudits;
         const audits = store.getState().entities.users.myAudits;
@@ -279,6 +296,7 @@ describe('Actions.Users', () => {
     });
 
     it('autocompleteUsersInChannel', async () => {
+        await TestHelper.basicClient.login(TestHelper.basicUser.email, 'password1');
         await Actions.autocompleteUsersInChannel(
             TestHelper.basicTeam.id,
             TestHelper.basicChannel.id,

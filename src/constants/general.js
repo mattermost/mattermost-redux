@@ -4,6 +4,7 @@
 export default {
     CONFIG_CHANGED: 'config_changed',
 
+    AUDITS_CHUNK_SIZE: 100,
     PROFILE_CHUNK_SIZE: 100,
     CHANNELS_CHUNK_SIZE: 50,
     SEARCH_TIMEOUT_MILLISECONDS: 100,

@@ -59,7 +59,7 @@ export function login(loginId, password, mfaToken = '') {
 
         const deviceId = getState().entities.general.deviceToken;
 
-        return Client.login(loginId, password, mfaToken, deviceId).
+        return Client4.login(loginId, password, mfaToken, deviceId).
         then(async (data) => {
             let teamMembers;
             let preferences;
@@ -201,20 +201,20 @@ export function loadMe() {
 
 export function logout() {
     return bindClientFunc(
-        Client.logout,
+        Client4.logout,
         UserTypes.LOGOUT_REQUEST,
         UserTypes.LOGOUT_SUCCESS,
         UserTypes.LOGOUT_FAILURE,
     );
 }
 
-export function getProfiles(offset, limit = General.PROFILE_CHUNK_SIZE) {
+export function getProfiles(page, perPage = General.PROFILE_CHUNK_SIZE) {
     return async (dispatch, getState) => {
         dispatch({type: UserTypes.PROFILES_REQUEST}, getState);
 
-        let profiles;
+        let profilesList;
         try {
-            profiles = await Client.getProfiles(offset, limit);
+            profilesList = await Client4.getProfiles(page, perPage);
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch);
             dispatch(batchActions([
@@ -223,6 +223,8 @@ export function getProfiles(offset, limit = General.PROFILE_CHUNK_SIZE) {
             ]), getState);
             return null;
         }
+
+        const profiles = profileListToMap(profilesList);
 
         dispatch(batchActions([
             {
@@ -239,30 +241,54 @@ export function getProfiles(offset, limit = General.PROFILE_CHUNK_SIZE) {
 }
 
 export function getProfilesByIds(userIds) {
-    return bindClientFunc(
-        Client.getProfilesByIds,
-        UserTypes.PROFILES_REQUEST,
-        [UserTypes.RECEIVED_PROFILES, UserTypes.PROFILES_SUCCESS],
-        UserTypes.PROFILES_FAILURE,
-        userIds
-    );
+    return async (dispatch, getState) => {
+        dispatch({type: UserTypes.PROFILES_REQUEST}, getState);
+
+        let profilesList;
+        try {
+            profilesList = await Client4.getProfilesByIds(userIds);
+        } catch (error) {
+            forceLogoutIfNecessary(error, dispatch);
+            dispatch(batchActions([
+                {type: UserTypes.PROFILES_FAILURE, error},
+                getLogErrorAction(error)
+            ]), getState);
+            return null;
+        }
+
+        const profiles = profileListToMap(profilesList);
+
+        dispatch(batchActions([
+            {
+                type: UserTypes.RECEIVED_PROFILES,
+                data: profiles
+            },
+            {
+                type: UserTypes.PROFILES_SUCCESS
+            }
+        ]), getState);
+
+        return profiles;
+    };
 }
 
-export function getProfilesInTeam(teamId, offset, limit = General.PROFILE_CHUNK_SIZE) {
+export function getProfilesInTeam(teamId, page, perPage = General.PROFILE_CHUNK_SIZE) {
     return async (dispatch, getState) => {
         dispatch({type: UserTypes.PROFILES_IN_TEAM_REQUEST}, getState);
 
-        let profiles;
+        let profilesList;
         try {
-            profiles = await Client.getProfilesInTeam(teamId, offset, limit);
+            profilesList = await Client4.getProfilesInTeam(teamId, page, perPage);
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch);
             dispatch(batchActions([
                 {type: UserTypes.PROFILES_IN_TEAM_FAILURE, error},
                 getLogErrorAction(error)
             ]), getState);
-            return;
+            return null;
         }
+
+        const profiles = profileListToMap(profilesList);
 
         dispatch(batchActions([
             {
@@ -278,24 +304,28 @@ export function getProfilesInTeam(teamId, offset, limit = General.PROFILE_CHUNK_
                 type: UserTypes.PROFILES_IN_TEAM_SUCCESS
             }
         ]), getState);
+
+        return profiles;
     };
 }
 
-export function getProfilesInChannel(teamId, channelId, offset, limit = General.PROFILE_CHUNK_SIZE) {
+export function getProfilesInChannel(channelId, page, perPage = General.PROFILE_CHUNK_SIZE) {
     return async (dispatch, getState) => {
         dispatch({type: UserTypes.PROFILES_IN_CHANNEL_REQUEST}, getState);
 
-        let profiles;
+        let profilesList;
         try {
-            profiles = await Client.getProfilesInChannel(teamId, channelId, offset, limit);
+            profilesList = await Client4.getProfilesInChannel(channelId, page, perPage);
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch);
             dispatch(batchActions([
                 {type: UserTypes.PROFILES_IN_CHANNEL_FAILURE, error},
                 getLogErrorAction(error)
             ]), getState);
-            return;
+            return null;
         }
+
+        const profiles = profileListToMap(profilesList);
 
         dispatch(batchActions([
             {
@@ -311,24 +341,28 @@ export function getProfilesInChannel(teamId, channelId, offset, limit = General.
                 type: UserTypes.PROFILES_IN_CHANNEL_SUCCESS
             }
         ]), getState);
+
+        return profiles;
     };
 }
 
-export function getProfilesNotInChannel(teamId, channelId, offset, limit = General.PROFILE_CHUNK_SIZE) {
+export function getProfilesNotInChannel(teamId, channelId, page, perPage = General.PROFILE_CHUNK_SIZE) {
     return async (dispatch, getState) => {
         dispatch({type: UserTypes.PROFILES_NOT_IN_CHANNEL_REQUEST}, getState);
 
-        let profiles;
+        let profilesList;
         try {
-            profiles = await Client.getProfilesNotInChannel(teamId, channelId, offset, limit);
+            profilesList = await Client4.getProfilesNotInChannel(teamId, channelId, page, perPage);
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch);
             dispatch(batchActions([
                 {type: UserTypes.PROFILES_NOT_IN_CHANNEL_FAILURE, error},
                 getLogErrorAction(error)
             ]), getState);
-            return;
+            return null;
         }
+
+        const profiles = profileListToMap(profilesList);
 
         dispatch(batchActions([
             {
@@ -344,6 +378,8 @@ export function getProfilesNotInChannel(teamId, channelId, offset, limit = Gener
                 type: UserTypes.PROFILES_NOT_IN_CHANNEL_SUCCESS
             }
         ]), getState);
+
+        return profiles;
     };
 }
 
@@ -376,7 +412,7 @@ export function getStatusesByIds(userIds) {
 
 export function getSessions(userId) {
     return bindClientFunc(
-        Client.getSessions,
+        Client4.getSessions,
         UserTypes.SESSIONS_REQUEST,
         [UserTypes.RECEIVED_SESSIONS, UserTypes.SESSIONS_SUCCESS],
         UserTypes.SESSIONS_FAILURE,
@@ -384,23 +420,44 @@ export function getSessions(userId) {
     );
 }
 
-export function revokeSession(id) {
-    return bindClientFunc(
-        Client.revokeSession,
-        UserTypes.REVOKE_SESSION_REQUEST,
-        [UserTypes.RECEIVED_REVOKED_SESSION, UserTypes.REVOKE_SESSION_SUCCESS],
-        UserTypes.REVOKE_SESSION_FAILURE,
-        id
-    );
+export function revokeSession(userId, sessionId) {
+    return async (dispatch, getState) => {
+        dispatch({type: UserTypes.REVOKE_SESSION_REQUEST}, getState);
+
+        try {
+            await Client4.revokeSession(userId, sessionId);
+        } catch (error) {
+            forceLogoutIfNecessary(error, dispatch);
+            dispatch(batchActions([
+                {type: UserTypes.REVOKE_SESSION_FAILURE, error},
+                getLogErrorAction(error)
+            ]), getState);
+            return false;
+        }
+
+        dispatch(batchActions([
+            {
+                type: UserTypes.RECEIVED_REVOKED_SESSION,
+                sessionId
+            },
+            {
+                type: UserTypes.REVOKE_SESSION_SUCCESS
+            }
+        ]), getState);
+
+        return true;
+    };
 }
 
-export function getAudits(userId) {
+export function getUserAudits(userId, page = 0, perPage = General.AUDITS_CHUNK_SIZE) {
     return bindClientFunc(
-        Client.getAudits,
+        Client4.getUserAudits,
         UserTypes.AUDITS_REQUEST,
         [UserTypes.RECEIVED_AUDITS, UserTypes.AUDITS_SUCCESS],
         UserTypes.AUDITS_FAILURE,
-        userId
+        userId,
+        page,
+        perPage
     );
 }
 
@@ -496,6 +553,14 @@ export function updateUserNotifyProps(notifyProps) {
     };
 }
 
+function profileListToMap(profilesList) {
+    const profiles = {};
+    for (let i = 0; i < profilesList.length; i++) {
+        profiles[profilesList[i].id] = profilesList[i];
+    }
+    return profiles;
+}
+
 export default {
     checkMfa,
     login,
@@ -508,7 +573,7 @@ export default {
     getStatusesByIds,
     getSessions,
     revokeSession,
-    getAudits,
+    getUserAudits,
     searchProfiles,
     startPeriodicStatusUpdates,
     stopPeriodicStatusUpdates,

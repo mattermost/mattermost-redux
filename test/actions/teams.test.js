@@ -4,7 +4,7 @@
 import assert from 'assert';
 
 import * as Actions from 'actions/teams';
-import {Client} from 'client';
+import {Client, Client4} from 'client';
 import configureStore from 'store';
 import {RequestStatus} from 'constants';
 import TestHelper from 'test/test_helper';
@@ -12,7 +12,7 @@ import TestHelper from 'test/test_helper';
 describe('Actions.Teams', () => {
     let store;
     before(async () => {
-        await TestHelper.initBasic(Client);
+        await TestHelper.initBasic(Client, Client4);
     });
 
     beforeEach(() => {
@@ -21,6 +21,7 @@ describe('Actions.Teams', () => {
 
     after(async () => {
         await TestHelper.basicClient.logout();
+        await TestHelper.basicClient4.logout();
     });
 
     it('selectTeam', async () => {
