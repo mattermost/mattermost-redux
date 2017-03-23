@@ -13,7 +13,8 @@
     "reducers",
     "selectors",
     "store",
-    "utils"
+    "utils",
+    "src"
   ],
   "dependencies": {
     "deep-equal": "1.0.1",
