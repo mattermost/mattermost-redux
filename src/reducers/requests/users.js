@@ -104,6 +104,26 @@ function getProfilesNotInChannel(state = initialRequestState(), action) {
     );
 }
 
+function getUser(state = initialRequestState(), action) {
+    return handleRequest(
+        UserTypes.USER_REQUEST,
+        UserTypes.USER_SUCCESS,
+        UserTypes.USER_FAILURE,
+        state,
+        action
+    );
+}
+
+function getUserByUsername(state = initialRequestState(), action) {
+    return handleRequest(
+        UserTypes.USER_BY_USERNAME_REQUEST,
+        UserTypes.USER_BY_USERNAME_SUCCESS,
+        UserTypes.USER_BY_USERNAME_FAILURE,
+        state,
+        action
+    );
+}
+
 function getStatusesByIds(state = initialRequestState(), action) {
     return handleRequest(
         UserTypes.PROFILES_STATUSES_REQUEST,
@@ -193,6 +213,8 @@ export default combineReducers({
     getProfilesInTeam,
     getProfilesInChannel,
     getProfilesNotInChannel,
+    getUser,
+    getUserByUsername,
     getStatusesByIds,
     getSessions,
     revokeSession,
