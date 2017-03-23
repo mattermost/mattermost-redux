@@ -16,9 +16,9 @@ export default keyMirror({
     DELETE_POST_SUCCESS: null,
     DELETE_POST_FAILURE: null,
 
-    GET_POST_REQUEST: null,
-    GET_POST_SUCCESS: null,
-    GET_POST_FAILURE: null,
+    GET_POST_THREAD_REQUEST: null,
+    GET_POST_THREAD_SUCCESS: null,
+    GET_POST_THREAD_FAILURE: null,
 
     GET_POSTS_REQUEST: null,
     GET_POSTS_SUCCESS: null,
