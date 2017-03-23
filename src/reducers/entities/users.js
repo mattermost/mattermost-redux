@@ -93,7 +93,8 @@ function myAudits(state = [], action) {
 
 function profiles(state = {}, action) {
     switch (action.type) {
-    case UsersTypes.RECEIVED_ME: {
+    case UsersTypes.RECEIVED_ME:
+    case UsersTypes.RECEIVED_PROFILE: {
         return {
             ...state,
             [action.data.id]: {...action.data}
