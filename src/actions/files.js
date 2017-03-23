@@ -37,12 +37,10 @@ export function getFilesForPost(teamId, channelId, postId) {
     };
 }
 
-const uploadFileRequests = {};
-export function uploadFile(teamId, channelId, fileFormData, formBoundary, rootId, requestId) {
+// The ClientId's that the server returns are passed in with the fileFormData arg.
+export function uploadFile(teamId, channelId, fileFormData, formBoundary, rootId) {
     return async (dispatch, getState) => {
         dispatch({type: FilesTypes.UPLOAD_FILES_REQUEST}, getState);
-
-        uploadFileRequests[requestId] = true;
 
         let files;
         try {
@@ -56,15 +54,17 @@ export function uploadFile(teamId, channelId, fileFormData, formBoundary, rootId
             return;
         }
 
-        // check to see if our upload file request was cancelled
-        if (!uploadFileRequests[requestId]) {
-            return;
-        }
+        const data = files.file_infos.map((file, index) => {
+            return {
+                ...file,
+                clientId: files.client_ids[index]
+            };
+        });
 
         dispatch(batchActions([
             {
                 type: FilesTypes.RECEIVED_UPLOAD_FILES,
-                data: files.file_infos,
+                data,
                 channelId,
                 rootId
             },
@@ -72,12 +72,5 @@ export function uploadFile(teamId, channelId, fileFormData, formBoundary, rootId
                 type: FilesTypes.UPLOAD_FILES_SUCCESS
             }
         ]), getState);
-    };
-}
-
-export function cancelUploadFileRequest(requestId) {
-    uploadFileRequests[requestId] = false;
-    return {
-        type: FilesTypes.UPLOAD_FILES_CANCEL
     };
 }
