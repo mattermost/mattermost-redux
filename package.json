@@ -2,6 +2,19 @@
   "name": "mattermost-redux",
   "version": "0.0.1",
   "private": true,
+  "files": [
+    "LICENSE.txt",
+    "NOTICE.txt",
+    "README.md",
+    "action_types",
+    "actions",
+    "client",
+    "constants",
+    "reducers",
+    "selectors",
+    "store",
+    "utils"
+  ],
   "dependencies": {
     "deep-equal": "1.0.1",
     "harmony-reflect": "1.5.1",
@@ -35,6 +48,6 @@
     "build": "babel src --out-dir lib",
     "check": "node_modules/.bin/eslint --ext \".js\" --ignore-pattern node_modules --quiet .",
     "test": "NODE_ENV=test mocha --opts test/mocha.opts",
-    "postinstall": "npm run build && mv lib/* ./ && rm -rf src lib"
+    "postinstall": "npm run build && mv lib/* ./ && rm -rf lib"
   }
 }
