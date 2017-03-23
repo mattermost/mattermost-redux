@@ -175,7 +175,7 @@ async function handleNewPostEvent(msg, dispatch, getState) {
     const teamId = msg.data.team_id;
     const status = users.statuses[userId];
 
-    if (!users.profiles[userId]) {
+    if (!users.profiles[userId] && userId !== users.currentUserId()) {
         getProfilesByIds([userId])(dispatch, getState);
     }
 
@@ -204,7 +204,7 @@ async function handleNewPostEvent(msg, dispatch, getState) {
         await Client.getPost(teamId, post.channel_id, post.root_id).then((data) => {
             const rootUserId = data.posts[post.root_id].user_id;
             const rootStatus = users.statuses[rootUserId];
-            if (!users.profiles[rootUserId]) {
+            if (!users.profiles[rootUserId] && rootUserId !== users.currentUserId) {
                 getProfilesByIds([rootUserId])(dispatch, getState);
             }
 
@@ -385,7 +385,7 @@ function handlePreferenceChangedEvent(msg, dispatch, getState) {
         const userId = preference.name;
         const status = users.statuses[userId];
 
-        if (!users.profiles[userId]) {
+        if (!users.profiles[userId] && userId !== users.currentUserId) {
             getProfilesByIds([userId])(dispatch, getState);
         }
 
@@ -415,7 +415,7 @@ function handleHelloEvent(msg) {
 const typingUsers = {};
 function handleUserTypingEvent(msg, dispatch, getState) {
     const state = getState();
-    const {profiles, statuses} = state.entities.users;
+    const {currentUserId, profiles, statuses} = state.entities.users;
     const {config} = state.entities.general;
     const userId = msg.data.user_id;
     const id = msg.broadcast.channel_id + msg.data.parent_id;
@@ -448,7 +448,7 @@ function handleUserTypingEvent(msg, dispatch, getState) {
         data
     }, getState);
 
-    if (!profiles[userId]) {
+    if (!profiles[userId] && userId !== currentUserId) {
         getProfilesByIds([userId])(dispatch, getState);
     }
 

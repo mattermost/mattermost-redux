@@ -268,7 +268,7 @@ export function getPostsAfter(teamId, channelId, postId, offset = 0, limit = Con
 }
 
 async function getProfilesAndStatusesForPosts(list, dispatch, getState) {
-    const {profiles, statuses} = getState().entities.users;
+    const {currentUserId, profiles, statuses} = getState().entities.users;
     const posts = list.posts;
     const profilesToLoad = [];
     const statusesToLoad = [];
@@ -277,11 +277,11 @@ async function getProfilesAndStatusesForPosts(list, dispatch, getState) {
         const post = posts[key];
         const userId = post.user_id;
 
-        if (!profiles[userId]) {
+        if (!profiles[userId] && !profilesToLoad.includes(userId) && userId !== currentUserId) {
             profilesToLoad.push(userId);
         }
 
-        if (!statuses[userId]) {
+        if (!statuses[userId] && !statusesToLoad.includes(userId) && userId !== currentUserId) {
             statusesToLoad.push(userId);
         }
     });
