@@ -336,7 +336,7 @@ export function getProfilesNotInChannel(teamId, channelId, page, perPage = Gener
 
 export function getUser(id) {
     return bindClientFunc(
-        Client.getUser,
+        Client4.getUser,
         UserTypes.USER_REQUEST,
         [UserTypes.RECEIVED_PROFILE, UserTypes.USER_SUCCESS],
         UserTypes.USER_FAILURE,
@@ -346,9 +346,9 @@ export function getUser(id) {
 
 export function getUserByUsername(username) {
     return bindClientFunc(
-        Client.getUserByUsername,
+        Client4.getUserByUsername,
         UserTypes.USER_BY_USERNAME_REQUEST,
-        [UsersTypes.RECEIVED_PROFILE, UserTypes.USER_BY_USERNAME_SUCCESS],
+        [UserTypes.RECEIVED_PROFILE, UserTypes.USER_BY_USERNAME_SUCCESS],
         UserTypes.USER_BY_USERNAME_FAILURE,
         username
     );

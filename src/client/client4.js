@@ -222,6 +222,20 @@ export default class Client4 {
         );
     };
 
+    getUser = async (userId) => {
+        return this.doFetch(
+            `${this.getUserRoute(userId)}`,
+            {method: 'get'}
+        );
+    };
+
+    getUserByUsername = async (username) => {
+        return this.doFetch(
+            `${this.getUsersRoute()}/username/${username}`,
+            {method: 'get'}
+        );
+    };
+
     getSessions = async (userId) => {
         return this.doFetch(
             `${this.getUserRoute(userId)}/sessions`,
