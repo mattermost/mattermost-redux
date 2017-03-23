@@ -345,6 +345,13 @@ export default class Client {
         );
     };
 
+    getUserByUsername = async (username) => {
+        return this.doFetch(
+            `${this.getUsersRoute()}/name/${username}`,
+            {method: 'get'}
+        );
+    };
+
     getStatusesByIds = async (userIds) => {
         return this.doFetch(
             `${this.getUsersRoute()}/status/ids`,

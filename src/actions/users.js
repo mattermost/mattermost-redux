@@ -333,6 +333,26 @@ export function getProfilesNotInChannel(teamId, channelId, offset, limit = Const
     };
 }
 
+export function getUser(id) {
+    return bindClientFunc(
+        Client.getUser,
+        UsersTypes.USER_REQUEST,
+        [UsersTypes.RECEIVED_PROFILE, UsersTypes.USER_SUCCESS],
+        UsersTypes.USER_FAILURE,
+        id
+    );
+}
+
+export function getUserByUsername(username) {
+    return bindClientFunc(
+        Client.getUserByUsername,
+        UsersTypes.USER_BY_USERNAME_REQUEST,
+        [UsersTypes.RECEIVED_PROFILE, UsersTypes.USER_BY_USERNAME_SUCCESS],
+        UsersTypes.USER_BY_USERNAME_FAILURE,
+        username
+    );
+}
+
 // We create an array to hold the id's that we want to get a status for. We build our
 // debounced function that will get called after a set period of idle time in which
 // the array of id's will be passed to the getStatusesByIds with a cb that clears out
@@ -519,6 +539,8 @@ export default {
     getProfilesInTeam,
     getProfilesInChannel,
     getProfilesNotInChannel,
+    getUser,
+    getUserByUsername,
     getStatusesByIds,
     getSessions,
     loadProfilesForDirect,
