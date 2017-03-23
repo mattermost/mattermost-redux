@@ -198,6 +198,54 @@ describe('Actions.Users', () => {
         assert.equal(Object.keys(profiles).length, channel.size, 'profiles != profiles in channel');
     });
 
+    it('getUser', async () => {
+        const user = await TestHelper.basicClient.createUserWithInvite(
+            TestHelper.fakeUser(),
+            null,
+            null,
+            TestHelper.basicTeam.invite_id
+        );
+
+        await Actions.getUser(
+            user.id
+        )(store.dispatch, store.getState);
+
+        const state = store.getState();
+        const profileRequest = state.requests.users.getUser;
+        const {profiles} = state.entities.users;
+
+        if (profileRequest.status === RequestStatus.FAILURE) {
+            throw new Error(JSON.stringify(profileRequest.error));
+        }
+
+        assert.ok(profiles[user.id]);
+        assert.equal(profiles[user.id].id, user.id);
+    });
+
+    it('getUserByUsername', async () => {
+        const user = await TestHelper.basicClient.createUserWithInvite(
+            TestHelper.fakeUser(),
+            null,
+            null,
+            TestHelper.basicTeam.invite_id
+        );
+
+        await Actions.getUserByUsername(
+            user.username
+        )(store.dispatch, store.getState);
+
+        const state = store.getState();
+        const profileRequest = state.requests.users.getUserByUsername;
+        const {profiles} = state.entities.users;
+
+        if (profileRequest.status === RequestStatus.FAILURE) {
+            throw new Error(JSON.stringify(profileRequest.error));
+        }
+
+        assert.ok(profiles[user.id]);
+        assert.equal(profiles[user.id].username, user.username);
+    });
+
     it('getStatusesByIds', async () => {
         const user = await TestHelper.basicClient.createUser(TestHelper.fakeUser());
 

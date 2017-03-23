@@ -32,6 +32,14 @@ export default keyMirror({
     PROFILES_NOT_IN_CHANNEL_SUCCESS: null,
     PROFILES_NOT_IN_CHANNEL_FAILURE: null,
 
+    USER_REQUEST: null,
+    USER_SUCCESS: null,
+    USER_FAILURE: null,
+
+    USER_BY_USERNAME_REQUEST: null,
+    USER_BY_USERNAME_SUCCESS: null,
+    USER_BY_USERNAME_FAILURE: null,
+
     PROFILES_STATUSES_REQUEST: null,
     PROFILES_STATUSES_SUCCESS: null,
     PROFILES_STATUSES_FAILURE: null,
@@ -65,6 +73,7 @@ export default keyMirror({
     UPDATE_NOTIFY_PROPS_FAILURE: null,
 
     RECEIVED_ME: null,
+    RECEIVED_PROFILE: null,
     RECEIVED_PROFILES: null,
     RECEIVED_PROFILES_LIST: null,
     RECEIVED_SEARCH_PROFILES: null,
