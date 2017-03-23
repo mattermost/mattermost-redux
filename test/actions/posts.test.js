@@ -30,10 +30,7 @@ describe('Actions.Posts', () => {
         const channelId = TestHelper.basicChannel.id;
         const post = TestHelper.fakePost(channelId);
 
-        await Actions.createPost(
-            TestHelper.basicTeam.id,
-            post
-        )(store.dispatch, store.getState);
+        await Actions.createPost(post)(store.dispatch, store.getState);
 
         const state = store.getState();
         const createRequest = state.requests.posts.createPost;
@@ -66,18 +63,15 @@ describe('Actions.Posts', () => {
     });
 
     it('editPost', async () => {
-        const teamId = TestHelper.basicTeam.id;
         const channelId = TestHelper.basicChannel.id;
 
-        const post = await Client.createPost(
-            teamId,
+        const post = await Client4.createPost(
             TestHelper.fakePost(channelId)
         );
         const message = post.message;
 
         post.message = `${message} (edited)`;
         await Actions.editPost(
-            teamId,
             post
         )(store.dispatch, store.getState);
 
@@ -99,18 +93,14 @@ describe('Actions.Posts', () => {
     });
 
     it('deletePost', async () => {
-        const teamId = TestHelper.basicTeam.id;
         const channelId = TestHelper.basicChannel.id;
 
-        await Actions.createPost(
-            teamId,
-            TestHelper.fakePost(channelId)
-        )(store.dispatch, store.getState);
+        await Actions.createPost(TestHelper.fakePost(channelId))(store.dispatch, store.getState);
 
         const initialPosts = store.getState().entities.posts;
         const created = initialPosts.posts[initialPosts.postsByChannel[channelId][0]];
 
-        await Actions.deletePost(teamId, created)(store.dispatch, store.getState);
+        await Actions.deletePost(created)(store.dispatch, store.getState);
 
         const state = store.getState();
         const deleteRequest = state.requests.posts.deletePost;
@@ -130,17 +120,14 @@ describe('Actions.Posts', () => {
     });
 
     it('removePost', async () => {
-        const teamId = TestHelper.basicTeam.id;
         const channelId = TestHelper.basicChannel.id;
         const postId = TestHelper.basicPost.id;
 
-        const post1a = await Client.createPost(
-            teamId,
+        const post1a = await Client4.createPost(
             {...TestHelper.fakePost(channelId), root_id: postId}
         );
 
         await Actions.getPosts(
-            teamId,
             channelId
         )(store.dispatch, store.getState);
 
@@ -162,23 +149,17 @@ describe('Actions.Posts', () => {
         assert.ok(!posts[post1a.id]);
     });
 
-    it('getPost', async () => {
-        const teamId = TestHelper.basicTeam.id;
+    it('getPostThread', async () => {
         const channelId = TestHelper.basicChannel.id;
 
-        const post = await Client.createPost(
-            teamId,
+        const post = await Client4.createPost(
             TestHelper.fakePost(channelId)
         );
 
-        await Actions.getPost(
-            teamId,
-            channelId,
-            post.id
-        )(store.dispatch, store.getState);
+        await Actions.getPostThread(post.id)(store.dispatch, store.getState);
 
         const state = store.getState();
-        const getRequest = state.requests.posts.getPost;
+        const getRequest = state.requests.posts.getPostThread;
         const {posts, postsByChannel} = state.entities.posts;
 
         if (getRequest.status === RequestStatus.FAILURE) {
@@ -202,32 +183,25 @@ describe('Actions.Posts', () => {
     });
 
     it('getPosts', async () => {
-        const teamId = TestHelper.basicTeam.id;
         const channelId = TestHelper.basicChannel.id;
 
-        const post1 = await Client.createPost(
-            teamId,
+        const post1 = await Client4.createPost(
             TestHelper.fakePost(channelId)
         );
-        const post1a = await Client.createPost(
-            teamId,
+        const post1a = await Client4.createPost(
             {...TestHelper.fakePost(channelId), root_id: post1.id}
         );
-        const post2 = await Client.createPost(
-            teamId,
+        const post2 = await Client4.createPost(
             TestHelper.fakePost(channelId)
         );
-        const post3 = await Client.createPost(
-            teamId,
+        const post3 = await Client4.createPost(
             TestHelper.fakePost(channelId)
         );
-        const post3a = await Client.createPost(
-            teamId,
+        const post3a = await Client4.createPost(
             {...TestHelper.fakePost(channelId), root_id: post3.id}
         );
 
         await Actions.getPosts(
-            teamId,
             channelId
         )(store.dispatch, store.getState);
 
@@ -259,24 +233,19 @@ describe('Actions.Posts', () => {
         const teamId = TestHelper.basicTeam.id;
         const channelId = TestHelper.basicChannel.id;
 
-        const post1 = await Client.createPost(
-            teamId,
+        const post1 = await Client4.createPost(
             TestHelper.fakePost(channelId)
         );
-        await Client.createPost(
-            teamId,
+        await Client4.createPost(
             {...TestHelper.fakePost(channelId), root_id: post1.id}
         );
-        const post2 = await Client.createPost(
-            teamId,
+        const post2 = await Client4.createPost(
             TestHelper.fakePost(channelId)
         );
-        const post3 = await Client.createPost(
-            teamId,
+        const post3 = await Client4.createPost(
             TestHelper.fakePost(channelId)
         );
-        const post3a = await Client.createPost(
-            teamId,
+        const post3a = await Client4.createPost(
             {...TestHelper.fakePost(channelId), root_id: post3.id}
         );
 
@@ -308,24 +277,19 @@ describe('Actions.Posts', () => {
         const teamId = TestHelper.basicTeam.id;
         const channelId = TestHelper.basicChannel.id;
 
-        const post1 = await Client.createPost(
-            teamId,
+        const post1 = await Client4.createPost(
             TestHelper.fakePost(channelId)
         );
-        const post1a = await Client.createPost(
-            teamId,
+        const post1a = await Client4.createPost(
             {...TestHelper.fakePost(channelId), root_id: post1.id}
         );
-        const post2 = await Client.createPost(
-            teamId,
+        const post2 = await Client4.createPost(
             TestHelper.fakePost(channelId)
         );
-        const post3 = await Client.createPost(
-            teamId,
+        const post3 = await Client4.createPost(
             TestHelper.fakePost(channelId)
         );
-        await Client.createPost(
-            teamId,
+        await Client4.createPost(
             {...TestHelper.fakePost(channelId), root_id: post3.id}
         );
 
@@ -359,24 +323,19 @@ describe('Actions.Posts', () => {
         const teamId = TestHelper.basicTeam.id;
         const channelId = TestHelper.basicChannel.id;
 
-        const post1 = await Client.createPost(
-            teamId,
+        const post1 = await Client4.createPost(
             TestHelper.fakePost(channelId)
         );
-        await Client.createPost(
-            teamId,
+        await Client4.createPost(
             {...TestHelper.fakePost(channelId), root_id: post1.id}
         );
-        const post2 = await Client.createPost(
-            teamId,
+        const post2 = await Client4.createPost(
             TestHelper.fakePost(channelId)
         );
-        const post3 = await Client.createPost(
-            teamId,
+        const post3 = await Client4.createPost(
             TestHelper.fakePost(channelId)
         );
-        const post3a = await Client.createPost(
-            teamId,
+        const post3a = await Client4.createPost(
             {...TestHelper.fakePost(channelId), root_id: post3.id}
         );
 
@@ -408,13 +367,11 @@ describe('Actions.Posts', () => {
 
     it('flagPost', async () => {
         const {dispatch, getState} = store;
-        const teamId = TestHelper.basicTeam.id;
         const channelId = TestHelper.basicChannel.id;
         await TestHelper.basicClient4.logout();
         await login(TestHelper.basicUser.email, 'password1')(store.dispatch, store.getState);
 
-        const post1 = await Client.createPost(
-            teamId,
+        const post1 = await Client4.createPost(
             TestHelper.fakePost(channelId)
         );
 
@@ -427,13 +384,11 @@ describe('Actions.Posts', () => {
 
     it('unflagPost', async () => {
         const {dispatch, getState} = store;
-        const teamId = TestHelper.basicTeam.id;
         const channelId = TestHelper.basicChannel.id;
         await TestHelper.basicClient4.logout();
         await login(TestHelper.basicUser.email, 'password1')(store.dispatch, store.getState);
 
-        const post1 = await Client.createPost(
-            teamId,
+        const post1 = await Client4.createPost(
             TestHelper.fakePost(channelId)
         );
 

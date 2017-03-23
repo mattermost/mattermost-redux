@@ -3,7 +3,7 @@
 
 import {batchActions} from 'redux-batched-actions';
 
-import {Client} from 'client';
+import {Client, Client4} from 'client';
 import websocketClient from 'client/websocket_client';
 import {getProfilesByIds, getStatusesByIds} from './users';
 import {
@@ -168,7 +168,6 @@ async function handleNewPostEvent(msg, dispatch, getState) {
     const {posts} = state.entities.posts;
     const post = JSON.parse(msg.data.post);
     const userId = post.user_id;
-    const teamId = msg.data.team_id;
     const status = users.statuses[userId];
 
     if (!users.profiles[userId]) {
@@ -195,7 +194,7 @@ async function handleNewPostEvent(msg, dispatch, getState) {
     }
 
     if (post.root_id && !posts[post.root_id]) {
-        await Client.getPost(teamId, post.channel_id, post.root_id).then((data) => {
+        await Client4.getPostThread(post.root_id).then((data) => {
             const rootUserId = data.posts[post.root_id].user_id;
             const rootStatus = users.statuses[rootUserId];
             if (!users.profiles[rootUserId]) {

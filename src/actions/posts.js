@@ -3,7 +3,7 @@
 
 import {batchActions} from 'redux-batched-actions';
 
-import {Client} from 'client';
+import {Client, Client4} from 'client';
 import {Preferences, Posts} from 'constants';
 import {PostTypes} from 'action_types';
 
@@ -12,23 +12,22 @@ import {getLogErrorAction} from './errors';
 import {deletePreferences, savePreferences} from './preferences';
 import {getProfilesByIds, getStatusesByIds} from './users';
 
-export function createPost(teamId, post) {
+export function createPost(post) {
     return bindClientFunc(
-        Client.createPost,
+        Client4.createPost,
         PostTypes.CREATE_POST_REQUEST,
         [PostTypes.RECEIVED_POST, PostTypes.CREATE_POST_SUCCESS],
         PostTypes.CREATE_POST_FAILURE,
-        teamId,
         post
     );
 }
 
-export function deletePost(teamId, post) {
+export function deletePost(post) {
     return async (dispatch, getState) => {
         dispatch({type: PostTypes.DELETE_POST_REQUEST}, getState);
 
         try {
-            await Client.deletePost(teamId, post.channel_id, post.id);
+            await Client4.deletePost(post.id);
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch);
             dispatch(batchActions([
@@ -50,13 +49,12 @@ export function deletePost(teamId, post) {
     };
 }
 
-export function editPost(teamId, post) {
+export function editPost(post) {
     return bindClientFunc(
-        Client.editPost,
+        Client4.updatePost,
         PostTypes.EDIT_POST_REQUEST,
         [PostTypes.RECEIVED_POST, PostTypes.EDIT_POST_SUCCESS],
         PostTypes.EDIT_POST_FAILURE,
-        teamId,
         post
     );
 }
@@ -75,43 +73,45 @@ export function flagPost(postId) {
     };
 }
 
-export function getPost(teamId, channelId, postId) {
+export function getPostThread(postId) {
     return async (dispatch, getState) => {
-        dispatch({type: PostTypes.GET_POST_REQUEST}, getState);
+        dispatch({type: PostTypes.GET_POST_THREAD_REQUEST}, getState);
 
-        let post;
+        let posts;
         try {
-            post = await Client.getPost(teamId, channelId, postId);
-            getProfilesAndStatusesForPosts(post, dispatch, getState);
+            posts = await Client4.getPostThread(postId);
+            getProfilesAndStatusesForPosts(posts, dispatch, getState);
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch);
             dispatch(batchActions([
-                {type: PostTypes.GET_POST_FAILURE, error},
+                {type: PostTypes.GET_POST_THREAD_FAILURE, error},
                 getLogErrorAction(error)
             ]), getState);
             return;
         }
 
+        const post = posts.posts[postId];
+
         dispatch(batchActions([
             {
                 type: PostTypes.RECEIVED_POSTS,
-                data: {...post},
-                channelId
+                data: posts,
+                channelId: post.channel_id
             },
             {
-                type: PostTypes.GET_POST_SUCCESS
+                type: PostTypes.GET_POST_THREAD_SUCCESS
             }
         ]), getState);
     };
 }
 
-export function getPosts(teamId, channelId, offset = 0, limit = Posts.POST_CHUNK_SIZE) {
+export function getPosts(channelId, page = 0, perPage = Posts.POST_CHUNK_SIZE) {
     return async (dispatch, getState) => {
         dispatch({type: PostTypes.GET_POSTS_REQUEST}, getState);
         let posts;
 
         try {
-            posts = await Client.getPosts(teamId, channelId, offset, limit);
+            posts = await Client4.getPosts(channelId, page, perPage);
             getProfilesAndStatusesForPosts(posts, dispatch, getState);
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch);
@@ -297,7 +297,7 @@ export default {
     editPost,
     deletePost,
     removePost,
-    getPost,
+    getPostThread,
     getPosts,
     getPostsSince,
     getPostsBefore,

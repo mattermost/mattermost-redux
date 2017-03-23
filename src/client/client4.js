@@ -102,6 +102,14 @@ export default class Client4 {
         return `${this.getChannelMembersRoute(channelId)}/${userId}`;
     }
 
+    getPostsRoute() {
+        return `${this.getBaseRoute()}/posts`;
+    }
+
+    getPostRoute(postId) {
+        return `${this.getPostsRoute()}/${postId}`;
+    }
+
     getPreferencesRoute(userId) {
         return `${this.getUserRoute(userId)}/preferences`;
     }
@@ -400,6 +408,43 @@ export default class Client4 {
         return this.doFetch(
             `${this.getChannelsRoute()}/members/me/view`,
             {method: 'post', body: JSON.stringify(data)}
+        );
+    };
+
+    // Post Routes
+
+    createPost = async (post) => {
+        return this.doFetch(
+            `${this.getPostsRoute()}`,
+            {method: 'post', body: JSON.stringify(post)}
+        );
+    };
+
+    updatePost = async (post) => {
+        return this.doFetch(
+            `${this.getPostRoute(post.id)}`,
+            {method: 'put', body: JSON.stringify(post)}
+        );
+    };
+
+    deletePost = async (postId) => {
+        return this.doFetch(
+            `${this.getPostRoute(postId)}`,
+            {method: 'delete'}
+        );
+    };
+
+    getPostThread = async (postId) => {
+        return this.doFetch(
+            `${this.getPostRoute(postId)}/thread`,
+            {method: 'get'}
+        );
+    };
+
+    getPosts = async (channelId, page = 0, perPage = PER_PAGE_DEFAULT) => {
+        return this.doFetch(
+            `${this.getChannelRoute(channelId)}/posts${buildQueryString({page, per_page: perPage})}`,
+            {method: 'get'}
         );
     };
 
