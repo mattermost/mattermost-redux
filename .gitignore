@@ -20,3 +20,5 @@ Session.vim
 .netrwhist
 *~
 tags
+
+mattermost-redux-*.tgz
