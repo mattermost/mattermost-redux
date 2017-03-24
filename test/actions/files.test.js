@@ -47,9 +47,7 @@ describe('Actions.Files', () => {
         fakePostForFile.file_ids = [fileId];
         const postForFile = await basicClient.createPost(basicTeam.id, fakePostForFile);
 
-        await Actions.getFilesForPost(
-            basicTeam.id, basicChannel.id, postForFile.id
-        )(store.dispatch, store.getState);
+        await Actions.getFilesForPost(postForFile.id)(store.dispatch, store.getState);
 
         const filesRequest = store.getState().requests.files.getFilesForPost;
         const {files: allFiles, fileIdsByPostId} = store.getState().entities.files;

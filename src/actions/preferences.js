@@ -3,7 +3,7 @@
 
 import {batchActions} from 'redux-batched-actions';
 
-import {Client, Client4} from 'client';
+import {Client4} from 'client';
 import {Preferences} from 'constants';
 import {PreferenceTypes} from 'action_types';
 import {getMyPreferences as getMyPreferencesSelector} from 'selectors/entities/preferences';
@@ -42,7 +42,7 @@ export function deletePreferences(userId, preferences) {
 
 export function getMyPreferences() {
     return bindClientFunc(
-        Client.getMyPreferences,
+        Client4.getMyPreferences,
         PreferenceTypes.MY_PREFERENCES_REQUEST,
         [PreferenceTypes.RECEIVED_PREFERENCES, PreferenceTypes.MY_PREFERENCES_SUCCESS],
         PreferenceTypes.MY_PREFERENCES_FAILURE

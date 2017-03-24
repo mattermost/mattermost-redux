@@ -3,7 +3,7 @@
 
 import {batchActions} from 'redux-batched-actions';
 
-import {Client} from 'client';
+import {Client, Client4} from 'client';
 import {bindClientFunc, FormattedError} from './helpers.js';
 import {GeneralTypes} from 'action_types';
 import {getMyChannelMembers} from './channels';
@@ -14,21 +14,12 @@ export function getPing() {
     return async (dispatch, getState) => {
         dispatch({type: GeneralTypes.PING_REQUEST}, getState);
 
-        let data;
         const pingError = new FormattedError(
             'mobile.server_ping_failed',
             'Cannot connect to the server. Please check your server URL and internet connection.'
         );
         try {
-            data = await Client.getPing();
-            if (!data.version) {
-                // successful ping but not the right return data
-                dispatch(batchActions([
-                    {type: GeneralTypes.PING_FAILURE, error: pingError},
-                    getLogErrorAction(pingError)
-                ]), getState);
-                return;
-            }
+            await Client4.getPing();
         } catch (error) {
             dispatch(batchActions([
                 {type: GeneralTypes.PING_FAILURE, error: pingError},
@@ -37,7 +28,7 @@ export function getPing() {
             return;
         }
 
-        dispatch({type: GeneralTypes.PING_SUCCESS, data}, getState);
+        dispatch({type: GeneralTypes.PING_SUCCESS}, getState);
     };
 }
 
