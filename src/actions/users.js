@@ -269,11 +269,13 @@ export function getProfilesInTeam(teamId, offset, limit = Constants.PROFILE_CHUN
 
 export function getProfilesInChannel(teamId, channelId, offset, limit = Constants.PROFILE_CHUNK_SIZE) {
     return async (dispatch, getState) => {
+        const {currentUserId} = getState().entities.users;
         dispatch({type: UsersTypes.PROFILES_IN_CHANNEL_REQUEST}, getState);
 
         let profiles;
         try {
             profiles = await Client.getProfilesInChannel(teamId, channelId, offset, limit);
+            Reflect.deleteProperty(profiles, currentUserId);
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch);
             dispatch(batchActions([
@@ -302,11 +304,13 @@ export function getProfilesInChannel(teamId, channelId, offset, limit = Constant
 
 export function getProfilesNotInChannel(teamId, channelId, offset, limit = Constants.PROFILE_CHUNK_SIZE) {
     return async (dispatch, getState) => {
+        const {currentUserId} = getState().entities.users;
         dispatch({type: UsersTypes.PROFILES_NOT_IN_CHANNEL_REQUEST}, getState);
 
         let profiles;
         try {
             profiles = await Client.getProfilesNotInChannel(teamId, channelId, offset, limit);
+            Reflect.deleteProperty(profiles, currentUserId);
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch);
             dispatch(batchActions([
