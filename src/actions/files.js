@@ -3,18 +3,18 @@
 
 import {batchActions} from 'redux-batched-actions';
 
-import {Client} from 'client';
+import {Client4} from 'client';
 import {FileTypes} from 'action_types';
 import {getLogErrorAction} from './errors';
 import {forceLogoutIfNecessary} from './helpers';
 
-export function getFilesForPost(teamId, channelId, postId) {
+export function getFilesForPost(postId) {
     return async (dispatch, getState) => {
         dispatch({type: FileTypes.FETCH_FILES_FOR_POST_REQUEST}, getState);
         let files;
 
         try {
-            files = await Client.getFileInfosForPost(teamId, channelId, postId);
+            files = await Client4.getFileInfosForPost(postId);
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch);
             dispatch(batchActions([

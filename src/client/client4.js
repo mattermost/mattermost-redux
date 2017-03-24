@@ -448,6 +448,13 @@ export default class Client4 {
         );
     };
 
+    getFileInfosForPost = async (postId) => {
+        return this.doFetch(
+            `${this.getPostRoute(postId)}/files/info`,
+            {method: 'get'}
+        );
+    };
+
     // Preference Routes
 
     savePreferences = async (userId, preferences) => {
@@ -457,10 +464,26 @@ export default class Client4 {
         );
     };
 
+    getMyPreferences = async () => {
+        return this.doFetch(
+            `${this.getPreferencesRoute('me')}`,
+            {method: 'get'}
+        );
+    };
+
     deletePreferences = async (userId, preferences) => {
         return this.doFetch(
             `${this.getPreferencesRoute(userId)}/delete`,
             {method: 'post', body: JSON.stringify(preferences)}
+        );
+    };
+
+    // General Routes
+
+    ping = async () => {
+        return this.doFetch(
+            `${this.getBaseRoute()}/system/ping`,
+            {method: 'get'}
         );
     };
 
