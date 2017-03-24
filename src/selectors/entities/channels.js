@@ -107,15 +107,16 @@ export const getMoreChannels = createSelector(
 );
 
 export const getUnreads = createSelector(
+    getCurrentChannelId,
     getAllChannels,
     getChannelMemberships,
-    (channels, myMembers) => {
+    (currentChannelId, channels, myMembers) => {
         let messageCount = 0;
         let mentionCount = 0;
         Object.keys(myMembers).forEach((channelId) => {
             const channel = channels[channelId];
             const m = myMembers[channelId];
-            if (channel && m) {
+            if (channel && m && channel.id !== currentChannelId) {
                 if (channel.type === 'D') {
                     mentionCount += channel.total_msg_count - m.msg_count;
                 } else if (m.mention_count > 0) {
