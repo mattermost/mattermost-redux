@@ -175,7 +175,7 @@ async function handleNewPostEvent(msg, dispatch, getState) {
     const teamId = msg.data.team_id;
     const status = users.statuses[userId];
 
-    if (!users.profiles[userId] && userId !== users.currentUserId()) {
+    if (!users.profiles[userId] && userId !== users.currentUserId) {
         getProfilesByIds([userId])(dispatch, getState);
     }
 
