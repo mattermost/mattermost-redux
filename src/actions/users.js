@@ -478,7 +478,7 @@ export function searchProfiles(term, options) {
         [UsersTypes.RECEIVED_SEARCH_PROFILES, UsersTypes.SEARCH_PROFILES_SUCCESS],
         UsersTypes.SEARCH_PROFILES_FAILURE,
         term,
-        options
+        options || {}
     );
 }
 
