@@ -1,6 +1,9 @@
 // Copyright (c) 2017 Mattermost, Inc. All Rights Reserved.
 // See License.txt for license information.
 
+import serializeError from 'serialize-error';
+
+import Client from 'client';
 import {ErrorTypes} from 'constants';
 
 export function dismissErrorObject(index) {
@@ -24,12 +27,16 @@ export function getLogErrorAction(error, displayable = true) {
     };
 }
 
-export function logError(error, displayable = true) {
-    return async (dispatch) => {
-        // do something with the incoming error
-        // like sending it to analytics
-
-        dispatch(getLogErrorAction(error, displayable));
+export function logError(error) {
+    return async () => {
+        try {
+            const serializedError = serializeError(error);
+            const stringifiedSerializedError = JSON.stringify(serializedError).toString();
+            await Client.logClientError(stringifiedSerializedError);
+        } catch (err) {
+          // avoid crashing the app if an error sending
+          // the error occurs.
+        }
     };
 }
 
