@@ -10,7 +10,8 @@
     "redux": "3.6.0",
     "redux-batched-actions": "0.1.5",
     "redux-thunk": "2.2.0",
-    "reselect": "2.5.4"
+    "reselect": "2.5.4",
+    "serialize-error": "^2.1.0"
   },
   "devDependencies": {
     "babel-cli": "6.23.0",

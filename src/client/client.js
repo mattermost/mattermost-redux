@@ -186,7 +186,7 @@ export default class Client {
 
         return this.doFetch(
             `${this.getGeneralRoute()}/log_client`,
-            {method: 'post', body}
+            {method: 'post', body: JSON.stringify(body)}
         );
     };
 
