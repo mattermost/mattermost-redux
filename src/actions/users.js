@@ -13,9 +13,9 @@ export function checkMfa(loginId) {
     return async (dispatch, getState) => {
         dispatch({type: UserTypes.CHECK_MFA_REQUEST}, getState);
         try {
-            const mfa = await Client.checkMfa(loginId);
+            const data = await Client4.checkUserMfa(loginId);
             dispatch({type: UserTypes.CHECK_MFA_SUCCESS}, getState);
-            return mfa;
+            return data.mfa_required;
         } catch (error) {
             dispatch(batchActions([
                 {type: UserTypes.CHECK_MFA_FAILURE, error},
@@ -64,8 +64,8 @@ export function login(loginId, password, mfaToken = '') {
             let teamMembers;
             let preferences;
             try {
-                const teamMembersRequest = Client.getMyTeamMembers();
-                const preferencesRequest = Client.getMyPreferences();
+                const teamMembersRequest = Client4.getMyTeamMembers();
+                const preferencesRequest = Client4.getMyPreferences();
 
                 teamMembers = await teamMembersRequest;
                 preferences = await preferencesRequest;
@@ -121,7 +121,7 @@ export function loadMe() {
         let user;
         dispatch({type: UserTypes.LOGIN_REQUEST}, getState);
         try {
-            user = await Client.getMe();
+            user = await Client4.getMe();
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch);
             dispatch(batchActions([
@@ -133,13 +133,13 @@ export function loadMe() {
 
         const deviceId = getState().entities.general.deviceToken;
         if (deviceId) {
-            Client.attachDevice(deviceId);
+            Client4.attachDevice(deviceId);
         }
 
         let preferences;
         dispatch({type: PreferenceTypes.MY_PREFERENCES_REQUEST}, getState);
         try {
-            preferences = await Client.getMyPreferences();
+            preferences = await Client4.getMyPreferences();
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch);
             dispatch(batchActions([
@@ -163,7 +163,7 @@ export function loadMe() {
         let teamMembers;
         dispatch({type: TeamTypes.MY_TEAM_MEMBERS_REQUEST}, getState);
         try {
-            teamMembers = await Client.getMyTeamMembers();
+            teamMembers = await Client4.getMyTeamMembers();
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch);
             dispatch(batchActions([
@@ -438,7 +438,7 @@ export function autocompleteUsersInChannel(teamId, channelId, term) {
 
         let data;
         try {
-            data = await Client.autocompleteUsersInChannel(teamId, channelId, term);
+            data = await Client4.autocompleteUsersInChannel(teamId, channelId, term);
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch);
             dispatch(batchActions([
@@ -450,9 +450,18 @@ export function autocompleteUsersInChannel(teamId, channelId, term) {
 
         dispatch(batchActions([
             {
-                type: UserTypes.RECEIVED_AUTOCOMPLETE_IN_CHANNEL,
-                data,
-                channelId
+                type: UserTypes.RECEIVED_PROFILES_LIST_IN_CHANNEL,
+                data: data.users,
+                id: channelId
+            },
+            {
+                type: UserTypes.RECEIVED_PROFILES_LIST_NOT_IN_CHANNEL,
+                data: data.out_of_channel,
+                id: channelId
+            },
+            {
+                type: UserTypes.RECEIVED_PROFILES_LIST,
+                data: Object.assign([], data.users, data.out_of_channel)
             },
             {
                 type: UserTypes.AUTOCOMPLETE_IN_CHANNEL_SUCCESS
@@ -511,11 +520,13 @@ export function updateUserNotifyProps(notifyProps) {
 
         let data;
         try {
-            data = await Client.updateUserNotifyProps(notifyProps);
+            data = await Client4.patchMe({notify_props: notifyProps});
         } catch (error) {
             dispatch({type: UserTypes.UPDATE_NOTIFY_PROPS_FAILURE, error}, getState);
             return;
         }
+
+        data.notify_props = notifyProps;
 
         dispatch(batchActions([
             {type: UserTypes.RECEIVED_ME, data},
