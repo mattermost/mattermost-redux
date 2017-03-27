@@ -472,14 +472,41 @@ export function autocompleteUsersInChannel(teamId, channelId, term) {
 }
 
 export function searchProfiles(term, options) {
-    return bindClientFunc(
-        Client.searchProfiles,
-        UsersTypes.SEARCH_PROFILES_REQUEST,
-        [UsersTypes.RECEIVED_SEARCH_PROFILES, UsersTypes.SEARCH_PROFILES_SUCCESS],
-        UsersTypes.SEARCH_PROFILES_FAILURE,
-        term,
-        options || {}
-    );
+    return async (dispatch, getState) => {
+        const {currentUserId} = getState().entities.users;
+
+        dispatch({type: UsersTypes.SEARCH_PROFILES_REQUEST}, getState);
+
+        const profiles = {};
+        let search;
+        try {
+            search = await Client.searchProfiles(term, options || {});
+            search.forEach((p) => {
+                if (p.id !== currentUserId) {
+                    profiles[p.id] = p;
+                }
+            });
+        } catch (error) {
+            forceLogoutIfNecessary(error, dispatch);
+            dispatch(batchActions([
+                {type: UsersTypes.SEARCH_PROFILES_FAILURE, error},
+                getLogErrorAction(error)
+            ]), getState);
+            return null;
+        }
+
+        dispatch(batchActions([
+            {
+                type: UsersTypes.RECEIVED_PROFILES,
+                data: profiles
+            },
+            {
+                type: UsersTypes.SEARCH_PROFILES_SUCCESS
+            }
+        ]), getState);
+
+        return profiles;
+    };
 }
 
 let statusIntervalId = '';

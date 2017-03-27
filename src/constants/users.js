@@ -71,7 +71,6 @@ const UserTypes = keyMirror({
     RECEIVED_ME: null,
     RECEIVED_PROFILE: null,
     RECEIVED_PROFILES: null,
-    RECEIVED_SEARCH_PROFILES: null,
     RECEIVED_PROFILES_IN_TEAM: null,
     RECEIVED_PROFILES_IN_CHANNEL: null,
     RECEIVED_PROFILE_IN_CHANNEL: null,
