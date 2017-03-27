@@ -2,7 +2,7 @@
 // See License.txt for license information.
 
 import {batchActions} from 'redux-batched-actions';
-import {Client} from 'client';
+import {Client4} from 'client';
 import {UserTypes} from 'action_types';
 import {getLogErrorAction} from './errors';
 const HTTP_UNAUTHORIZED = 401;
@@ -10,7 +10,7 @@ const HTTP_UNAUTHORIZED = 401;
 export async function forceLogoutIfNecessary(err, dispatch) {
     if (err.status_code === HTTP_UNAUTHORIZED && err.url.indexOf('/login') === -1) {
         dispatch({type: UserTypes.LOGOUT_REQUEST});
-        await Client.logout();
+        await Client4.logout();
         dispatch({type: UserTypes.LOGOUT_SUCCESS});
     }
 }

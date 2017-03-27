@@ -3,7 +3,7 @@
 
 import {batchActions} from 'redux-batched-actions';
 
-import {Client, Client4} from 'client';
+import {Client4} from 'client';
 import {Preferences, Posts} from 'constants';
 import {PostTypes} from 'action_types';
 
@@ -137,13 +137,13 @@ export function getPosts(channelId, page = 0, perPage = Posts.POST_CHUNK_SIZE) {
     };
 }
 
-export function getPostsSince(teamId, channelId, since) {
+export function getPostsSince(channelId, since) {
     return async (dispatch, getState) => {
         dispatch({type: PostTypes.GET_POSTS_SINCE_REQUEST}, getState);
 
         let posts;
         try {
-            posts = await Client.getPostsSince(teamId, channelId, since);
+            posts = await Client4.getPostsSince(channelId, since);
             getProfilesAndStatusesForPosts(posts, dispatch, getState);
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch);
@@ -169,13 +169,13 @@ export function getPostsSince(teamId, channelId, since) {
     };
 }
 
-export function getPostsBefore(teamId, channelId, postId, offset = 0, limit = Posts.POST_CHUNK_SIZE) {
+export function getPostsBefore(channelId, postId, page = 0, perPage = Posts.POST_CHUNK_SIZE) {
     return async (dispatch, getState) => {
         dispatch({type: PostTypes.GET_POSTS_BEFORE_REQUEST}, getState);
 
         let posts;
         try {
-            posts = await Client.getPostsBefore(teamId, channelId, postId, offset, limit);
+            posts = await Client4.getPostsBefore(channelId, postId, page, perPage);
             getProfilesAndStatusesForPosts(posts, dispatch, getState);
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch);
@@ -201,13 +201,13 @@ export function getPostsBefore(teamId, channelId, postId, offset = 0, limit = Po
     };
 }
 
-export function getPostsAfter(teamId, channelId, postId, offset = 0, limit = Posts.POST_CHUNK_SIZE) {
+export function getPostsAfter(channelId, postId, page = 0, perPage = Posts.POST_CHUNK_SIZE) {
     return async (dispatch, getState) => {
         dispatch({type: PostTypes.GET_POSTS_AFTER_REQUEST}, getState);
 
         let posts;
         try {
-            posts = await Client.getPostsAfter(teamId, channelId, postId, offset, limit);
+            posts = await Client4.getPostsAfter(channelId, postId, page, perPage);
             getProfilesAndStatusesForPosts(posts, dispatch, getState);
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch);

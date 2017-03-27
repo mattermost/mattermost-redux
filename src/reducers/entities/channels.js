@@ -151,15 +151,6 @@ function stats(state = {}, action) {
     }
 }
 
-function autocompleteChannels(state = [], action) {
-    switch (action.type) {
-    case ChannelTypes.RECEIVED_AUTOCOMPLETE_CHANNELS:
-        return action.data;
-    default:
-        return state;
-    }
-}
-
 export default combineReducers({
 
     // the current selected channel
@@ -172,8 +163,5 @@ export default combineReducers({
     myMembers,
 
     // object where every key is the channel id and has an object with the channel stats
-    stats,
-
-    // array containing channel objects that have been matched to the current channel mention term
-    autocompleteChannels
+    stats
 });

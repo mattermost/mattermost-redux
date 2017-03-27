@@ -146,16 +146,6 @@ function removeChannelMember(state = initialRequestState(), action) {
     );
 }
 
-function autocompleteChannels(state = initialRequestState(), action) {
-    return handleRequest(
-        ChannelTypes.AUTOCOMPLETE_CHANNELS_REQUEST,
-        ChannelTypes.AUTOCOMPLETE_CHANNELS_SUCCESS,
-        ChannelTypes.AUTOCOMPLETE_CHANNELS_FAILURE,
-        state,
-        action
-    );
-}
-
 export default combineReducers({
     getChannel,
     getChannels,
@@ -170,6 +160,5 @@ export default combineReducers({
     updateLastViewedAt,
     getChannelStats,
     addChannelMember,
-    removeChannelMember,
-    autocompleteChannels
+    removeChannelMember
 });

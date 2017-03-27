@@ -200,28 +200,6 @@ function statuses(state = {}, action) {
     }
 }
 
-function autocompleteUsersInChannel(state = {}, action) {
-    switch (action.type) {
-    case UserTypes.RECEIVED_AUTOCOMPLETE_IN_CHANNEL:
-        return Object.assign({}, state, {[action.channelId]: action.data});
-    default:
-        return state;
-    }
-}
-
-function search(state = {}, action) {
-    switch (action.type) {
-    case UserTypes.RECEIVED_SEARCH_PROFILES:
-        return action.data;
-
-    case UserTypes.LOGOUT_SUCCESS:
-        return {};
-
-    default:
-        return state;
-    }
-}
-
 export default combineReducers({
 
     // the current selected user
@@ -246,11 +224,5 @@ export default combineReducers({
     profilesNotInChannel,
 
     // object where every key is the user id and has a value with the current status of each user
-    statuses,
-
-    // object where every key is a channel id and has a [channelId] object that contains members that are in and out of the current channel
-    autocompleteUsersInChannel,
-
-    // object where every key is a user id and has an object with the users details
-    search
+    statuses
 });

@@ -23,10 +23,6 @@ export function getChannelMemberships(state) {
     return state.entities.channels.myMembers;
 }
 
-export function getAutocompleteChannels(state) {
-    return state.entities.channels.autocompleteChannels;
-}
-
 export const getCurrentChannel = createSelector(
     getAllChannels,
     getCurrentChannelId,
@@ -129,26 +125,6 @@ export const getUnreads = createSelector(
         });
 
         return {messageCount, mentionCount};
-    }
-);
-
-export const getAutocompleteChannelWithSections = createSelector(
-    getChannelMemberships,
-    getAutocompleteChannels,
-    (myMembers, autocompleteChannels) => {
-        const channels = {
-            myChannels: [],
-            otherChannels: []
-        };
-        autocompleteChannels.forEach((c) => {
-            if (myMembers[c.id]) {
-                channels.myChannels.push(c);
-            } else {
-                channels.otherChannels.push(c);
-            }
-        });
-
-        return channels;
     }
 );
 

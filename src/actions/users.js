@@ -472,9 +472,9 @@ export function autocompleteUsersInChannel(teamId, channelId, term) {
 
 export function searchProfiles(term, options) {
     return bindClientFunc(
-        Client.searchProfiles,
+        Client4.searchUsers,
         UserTypes.SEARCH_PROFILES_REQUEST,
-        [UserTypes.RECEIVED_SEARCH_PROFILES, UserTypes.SEARCH_PROFILES_SUCCESS],
+        [UserTypes.RECEIVED_PROFILES_LIST, UserTypes.SEARCH_PROFILES_SUCCESS],
         UserTypes.SEARCH_PROFILES_FAILURE,
         term,
         options

@@ -38,8 +38,8 @@ describe('Actions.Websocket', () => {
     });
 
     it('Websocket Handle New Post', async () => {
-        const client = TestHelper.createClient();
-        const user = await client.createUserWithInvite(
+        const client = TestHelper.createClient4();
+        const user = await client.createUser(
             TestHelper.fakeUser(),
             null,
             null,
@@ -47,13 +47,10 @@ describe('Actions.Websocket', () => {
         );
         await client.login(user.email, 'password1');
 
-        await Client.addChannelMember(
-            TestHelper.basicTeam.id,
-            TestHelper.basicChannel.id,
-            user.id);
+        await Client4.addToChannel(user.id, TestHelper.basicChannel.id);
 
         const post = {...TestHelper.fakePost(), channel_id: TestHelper.basicChannel.id};
-        await client.createPost(TestHelper.basicTeam.id, post);
+        await client.createPost(post);
 
         const entities = store.getState().entities;
         const {posts, postsByChannel} = entities.posts;
@@ -65,25 +62,21 @@ describe('Actions.Websocket', () => {
 
     it('Websocket Handle Post Edited', async () => {
         let post = {...TestHelper.fakePost(), channel_id: TestHelper.basicChannel.id};
-        const client = TestHelper.createClient();
-        const user = await client.createUserWithInvite(
+        const client = TestHelper.createClient4();
+        const user = await client.createUser(
             TestHelper.fakeUser(),
             null,
             null,
             TestHelper.basicTeam.invite_id
         );
 
-        await Client.addChannelMember(
-            TestHelper.basicTeam.id,
-            TestHelper.basicChannel.id,
-            user.id);
-
+        await Client4.addToChannel(user.id, TestHelper.basicChannel.id);
         await client.login(user.email, 'password1');
 
-        post = await client.createPost(TestHelper.basicTeam.id, post);
+        post = await client.createPost(post);
         post.message += ' (edited)';
 
-        await client.editPost(TestHelper.basicTeam.id, post);
+        await client.updatePost(post);
 
         store.subscribe(async () => {
             const entities = store.getState().entities;
@@ -93,25 +86,21 @@ describe('Actions.Websocket', () => {
     });
 
     it('Websocket Handle Post Deleted', async () => {
-        const client = TestHelper.createClient();
-        const user = await client.createUserWithInvite(
+        const client = TestHelper.createClient4();
+        const user = await client.createUser(
             TestHelper.fakeUser(),
             null,
             null,
             TestHelper.basicTeam.invite_id
         );
 
-        await Client.addChannelMember(
-            TestHelper.basicTeam.id,
-            TestHelper.basicChannel.id,
-            user.id);
-
+        await Client4.addToChannel(user.id, TestHelper.basicChannel.id);
         await client.login(user.email, 'password1');
         let post = TestHelper.fakePost();
         post.channel_id = TestHelper.basicChannel.id;
-        post = await client.createPost(TestHelper.basicTeam.id, post);
+        post = await client.createPost(post);
 
-        await client.deletePost(TestHelper.basicTeam.id, post.channel_id, post.id);
+        await client.deletePost(post.id);
 
         store.subscribe(async () => {
             const entities = store.getState().entities;
@@ -121,29 +110,29 @@ describe('Actions.Websocket', () => {
     });
 
     it('WebSocket Leave Team', async () => {
-        const client = TestHelper.createClient();
+        const client = TestHelper.createClient4();
         const user = await client.createUser(TestHelper.fakeUser());
         await client.login(user.email, 'password1');
         const team = await client.createTeam(TestHelper.fakeTeam());
         const channel = await client.createChannel(TestHelper.fakeChannel(team.id));
-        await client.addUserToTeam(team.id, TestHelper.basicUser.id);
-        await client.addChannelMember(team.id, channel.id, TestHelper.basicUser.id);
+        await client.addToTeam(team.id, TestHelper.basicUser.id);
+        await client.addToChannel(TestHelper.basicUser.id, channel.id);
 
         await GeneralActions.setStoreFromLocalData({
-            url: Client.getUrl(),
-            token: Client.getToken()
+            url: Client4.getUrl(),
+            token: Client4.getToken()
         })(store.dispatch, store.getState);
         await TeamActions.selectTeam(team)(store.dispatch, store.getState);
         await ChannelActions.selectChannel(channel.id)(store.dispatch, store.getState);
-        await client.removeUserFromTeam(team.id, TestHelper.basicUser.id);
+        await client.removeFromTeam(team.id, TestHelper.basicUser.id);
 
         const {myMembers} = store.getState().entities.teams;
         assert.ifError(myMembers[team.id]);
     }).timeout(3000);
 
     it('Websocket Handle User Added', async () => {
-        const client = TestHelper.createClient();
-        const user = await client.createUserWithInvite(
+        const client = TestHelper.createClient4();
+        const user = await client.createUser(
             TestHelper.fakeUser(),
             null,
             null,
@@ -165,7 +154,7 @@ describe('Actions.Websocket', () => {
     it('Websocket Handle User Removed', async () => {
         await TeamActions.selectTeam(TestHelper.basicTeam)(store.dispatch, store.getState);
 
-        const user = await TestHelper.basicClient.createUserWithInvite(
+        const user = await TestHelper.basicClient4.createUser(
             TestHelper.fakeUser(),
             null,
             null,
@@ -190,8 +179,8 @@ describe('Actions.Websocket', () => {
     });
 
     it('Websocket Handle User Updated', async () => {
-        const client = TestHelper.createClient();
-        const user = await client.createUserWithInvite(
+        const client = TestHelper.createClient4();
+        const user = await client.createUser(
             TestHelper.fakeUser(),
             null,
             null,
@@ -213,7 +202,7 @@ describe('Actions.Websocket', () => {
     it('Websocket Handle Channel Created', (done) => {
         async function test() {
             await TeamActions.selectTeam(TestHelper.basicTeam)(store.dispatch, store.getState);
-            const channel = await Client.createChannel(TestHelper.fakeChannel(TestHelper.basicTeam.id));
+            const channel = await Client4.createChannel(TestHelper.fakeChannel(TestHelper.basicTeam.id));
 
             setTimeout(() => {
                 const state = store.getState();
@@ -252,8 +241,8 @@ describe('Actions.Websocket', () => {
 
     it('Websocket Handle Direct Channel', (done) => {
         async function test() {
-            const client = TestHelper.createClient();
-            const user = await client.createUserWithInvite(
+            const client = TestHelper.createClient4();
+            const user = await client.createUser(
                 TestHelper.fakeUser(),
                 null,
                 null,
@@ -270,7 +259,7 @@ describe('Actions.Websocket', () => {
                 done();
             }, 500);
 
-            await client.createDirectChannel(TestHelper.basicTeam.id, TestHelper.basicUser.id);
+            await client.createDirectChannel([user.id, TestHelper.basicUser.id]);
         }
 
         test();

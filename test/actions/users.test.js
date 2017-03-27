@@ -246,6 +246,25 @@ describe('Actions.Users', () => {
         assert.equal(profiles[user.id].username, user.username);
     });
 
+    it('searchProfiles', async () => {
+        const user = TestHelper.basicUser;
+
+        await Actions.searchProfiles(
+            user.username
+        )(store.dispatch, store.getState);
+
+        const state = store.getState();
+        const searchRequest = state.requests.users.searchProfiles;
+        const {profiles} = state.entities.users;
+
+        if (searchRequest.status === RequestStatus.FAILURE) {
+            throw new Error(JSON.stringify(searchRequest.error));
+        }
+
+        assert.ok(profiles[user.id]);
+        assert.equal(profiles[user.id].id, user.id);
+    });
+
     it('getStatusesByIds', async () => {
         const user = await TestHelper.basicClient4.createUser(TestHelper.fakeUser());
 

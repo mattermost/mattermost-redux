@@ -282,7 +282,7 @@ export function fetchMyChannelsAndMembers(teamId) {
         let channels;
         let channelMembers;
         try {
-            const channelsRequest = Client.getChannels(teamId);
+            const channelsRequest = Client4.getMyChannels(teamId);
             const channelMembersRequest = Client4.getMyChannelMembers(teamId);
 
             channels = await channelsRequest;
@@ -516,7 +516,7 @@ export function searchMoreChannels(teamId, term) {
 
         let channels;
         try {
-            channels = await Client.searchMoreChannels(teamId, term);
+            channels = await Client4.searchChannels(teamId, term);
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch);
             dispatch(batchActions([
@@ -716,35 +716,6 @@ export function markChannelAsUnread(channelId, mentionsArray) {
     };
 }
 
-export function autocompleteChannels(teamId, term) {
-    return async (dispatch, getState) => {
-        dispatch({type: ChannelTypes.AUTOCOMPLETE_CHANNELS_REQUEST}, getState);
-
-        let data;
-        try {
-            data = await Client.autocompleteChannels(teamId, term);
-        } catch (error) {
-            forceLogoutIfNecessary(error, dispatch);
-            dispatch(batchActions([
-                {type: ChannelTypes.AUTOCOMPLETE_CHANNELS_FAILURE, error},
-                getLogErrorAction(error)
-            ]), getState);
-            return;
-        }
-
-        dispatch(batchActions([
-            {
-                type: ChannelTypes.RECEIVED_AUTOCOMPLETE_CHANNELS,
-                data,
-                teamId
-            },
-            {
-                type: ChannelTypes.AUTOCOMPLETE_CHANNELS_SUCCESS
-            }
-        ]), getState);
-    };
-}
-
 export default {
     selectChannel,
     createChannel,
@@ -766,6 +737,5 @@ export default {
     updateChannelHeader,
     updateChannelPurpose,
     markChannelAsRead,
-    markChannelAsUnread,
-    autocompleteChannels
+    markChannelAsUnread
 };
