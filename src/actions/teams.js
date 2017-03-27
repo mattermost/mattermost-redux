@@ -117,7 +117,7 @@ export function updateTeam(team) {
 
 export function getMyTeamMembers() {
     return bindClientFunc(
-        Client.getMyTeamMembers,
+        Client4.getMyTeamMembers,
         TeamTypes.MY_TEAM_MEMBERS_REQUEST,
         [TeamTypes.RECEIVED_MY_TEAM_MEMBERS, TeamTypes.MY_TEAM_MEMBERS_SUCCESS],
         TeamTypes.MY_TEAM_MEMBERS_FAILURE

@@ -160,6 +160,13 @@ export default class Client4 {
         );
     }
 
+    patchMe = async (user) => {
+        return this.doFetch(
+            `${this.getUserRoute('me')}/patch`,
+            {method: 'put', body: JSON.stringify(user)}
+        );
+    }
+
     login = async (loginId, password, token = '', deviceId = '') => {
         const body = {
             device_id: deviceId,
@@ -230,6 +237,13 @@ export default class Client4 {
         );
     };
 
+    getMe = async () => {
+        return this.doFetch(
+            `${this.getUserRoute('me')}`,
+            {method: 'get'}
+        );
+    };
+
     getUser = async (userId) => {
         return this.doFetch(
             `${this.getUserRoute(userId)}`,
@@ -240,6 +254,13 @@ export default class Client4 {
     getUserByUsername = async (username) => {
         return this.doFetch(
             `${this.getUsersRoute()}/username/${username}`,
+            {method: 'get'}
+        );
+    };
+
+    autocompleteUsersInChannel = async (teamId, channelId, name) => {
+        return this.doFetch(
+            `${this.getUsersRoute()}/autocomplete${buildQueryString({in_team: teamId, in_channel: channelId, name})}`,
             {method: 'get'}
         );
     };
@@ -262,6 +283,20 @@ export default class Client4 {
         return this.doFetch(
             `${this.getUserRoute(userId)}/audits${buildQueryString({page, per_page: perPage})}`,
             {method: 'get'}
+        );
+    };
+
+    checkUserMfa = async (loginId) => {
+        return this.doFetch(
+            `${this.getUsersRoute()}/mfa`,
+            {method: 'post', body: JSON.stringify({login_id: loginId})}
+        );
+    };
+
+    attachDevice = async (deviceId) => {
+        return this.doFetch(
+            `${this.getUsersRoute()}/sessions/device`,
+            {method: 'put', body: JSON.stringify({device_id: deviceId})}
         );
     };
 
@@ -291,6 +326,13 @@ export default class Client4 {
     getMyTeams = async () => {
         return this.doFetch(
             `${this.getUserRoute('me')}/teams`,
+            {method: 'get'}
+        );
+    };
+
+    getMyTeamMembers = async () => {
+        return this.doFetch(
+            `${this.getUserRoute('me')}/teams/members`,
             {method: 'get'}
         );
     };

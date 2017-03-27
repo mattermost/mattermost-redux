@@ -173,7 +173,7 @@ describe('Actions.Users', () => {
     });
 
     it('getProfilesNotInChannel', async () => {
-        const user = await TestHelper.basicClient.createUserWithInvite(
+        const user = await TestHelper.basicClient4.createUser(
             TestHelper.fakeUser(),
             null,
             null,
@@ -199,7 +199,7 @@ describe('Actions.Users', () => {
     });
 
     it('getUser', async () => {
-        const user = await TestHelper.basicClient.createUserWithInvite(
+        const user = await TestHelper.basicClient4.createUser(
             TestHelper.fakeUser(),
             null,
             null,
@@ -223,7 +223,7 @@ describe('Actions.Users', () => {
     });
 
     it('getUserByUsername', async () => {
-        const user = await TestHelper.basicClient.createUserWithInvite(
+        const user = await TestHelper.basicClient4.createUser(
             TestHelper.fakeUser(),
             null,
             null,
@@ -247,7 +247,7 @@ describe('Actions.Users', () => {
     });
 
     it('getStatusesByIds', async () => {
-        const user = await TestHelper.basicClient.createUser(TestHelper.fakeUser());
+        const user = await TestHelper.basicClient4.createUser(TestHelper.fakeUser());
 
         await Actions.getStatusesByIds(
             [TestHelper.basicUser.id, user.id]
@@ -343,7 +343,14 @@ describe('Actions.Users', () => {
     });
 
     it('autocompleteUsersInChannel', async () => {
-        await TestHelper.basicClient.login(TestHelper.basicUser.email, 'password1');
+        const user = await TestHelper.basicClient4.createUser(
+            TestHelper.fakeUser(),
+            null,
+            null,
+            TestHelper.basicTeam.invite_id
+        );
+
+        await TestHelper.basicClient4.login(TestHelper.basicUser.email, 'password1');
         await Actions.autocompleteUsersInChannel(
             TestHelper.basicTeam.id,
             TestHelper.basicChannel.id,
@@ -351,15 +358,17 @@ describe('Actions.Users', () => {
         )(store.dispatch, store.getState);
 
         const autocompleteRequest = store.getState().requests.users.autocompleteUsersInChannel;
-        const data = store.getState().entities.users.autocompleteUsersInChannel;
+        const {profiles, profilesNotInChannel, profilesInChannel} = store.getState().entities.users;
 
         if (autocompleteRequest.status === RequestStatus.FAILURE) {
             throw new Error(JSON.stringify(autocompleteRequest.error));
         }
 
-        assert.ok(data[TestHelper.basicChannel.id]);
-        assert.ok(data[TestHelper.basicChannel.id].in_channel);
-        assert.ok(data[TestHelper.basicChannel.id].out_of_channel);
+        const notInChannel = profilesNotInChannel[TestHelper.basicChannel.id];
+        const inChannel = profilesInChannel[TestHelper.basicChannel.id];
+        assert.ok(notInChannel.has(user.id));
+        assert.ok(inChannel.has(TestHelper.basicUser.id));
+        assert.ok(profiles[user.id]);
     });
 
     it('updateUserNotifyProps', async () => {
@@ -378,15 +387,31 @@ describe('Actions.Users', () => {
             user_id: currentUser.id
         })(store.dispatch, store.getState);
 
-        setTimeout(() => {
-            const updatedState = store.getState();
-            const updatedCurrentUser = updatedState.entities.users.profiles[state.entities.users.currentUserId];
-            const updateNotifyProps = updatedCurrentUser.notify_props;
+        const updateRequest = store.getState().requests.users.updateUserNotifyProps;
+        const {currentUserId, profiles} = store.getState().entities.users;
+        const updateNotifyProps = profiles[currentUserId].notify_props;
 
-            assert.equal(updateNotifyProps.comments, 'any');
-            assert.equal(updateNotifyProps.email, 'false');
-            assert.equal(updateNotifyProps.first_name, 'false');
-            assert.equal(updateNotifyProps.mention_keys, '');
-        }, 1000);
+        if (updateRequest.status === RequestStatus.FAILURE) {
+            throw new Error(JSON.stringify(updateRequest.error));
+        }
+
+        assert.equal(updateNotifyProps.comments, 'any');
+        assert.equal(updateNotifyProps.email, 'false');
+        assert.equal(updateNotifyProps.first_name, 'false');
+        assert.equal(updateNotifyProps.mention_keys, '');
+    });
+
+    it('checkMfa', async () => {
+        const user = TestHelper.basicUser;
+        const mfaRequired = await Actions.checkMfa(user.email)(store.dispatch, store.getState);
+
+        const state = store.getState();
+        const mfaRequest = state.requests.users.checkMfa;
+
+        if (mfaRequest.status === RequestStatus.FAILURE) {
+            throw new Error(JSON.stringify(mfaRequest.error));
+        }
+
+        assert.ok(!mfaRequired);
     });
 });
