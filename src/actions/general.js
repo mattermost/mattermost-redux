@@ -94,6 +94,8 @@ export function setServerVersion(serverVersion) {
 
 export function setStoreFromLocalData(data) {
     return async (dispatch, getState) => {
+        Client.setToken(data.token);
+        Client.setUrl(data.url);
         Client4.setToken(data.token);
         Client4.setUrl(data.url);
 
