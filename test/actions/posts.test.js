@@ -230,7 +230,6 @@ describe('Actions.Posts', () => {
     });
 
     it('getPostsSince', async () => {
-        const teamId = TestHelper.basicTeam.id;
         const channelId = TestHelper.basicChannel.id;
 
         const post1 = await Client4.createPost(
@@ -250,7 +249,6 @@ describe('Actions.Posts', () => {
         );
 
         await Actions.getPostsSince(
-            teamId,
             channelId,
             post2.create_at
         )(store.dispatch, store.getState);
@@ -274,7 +272,6 @@ describe('Actions.Posts', () => {
     });
 
     it('getPostsBefore', async () => {
-        const teamId = TestHelper.basicTeam.id;
         const channelId = TestHelper.basicChannel.id;
 
         const post1 = await Client4.createPost(
@@ -294,7 +291,6 @@ describe('Actions.Posts', () => {
         );
 
         await Actions.getPostsBefore(
-            teamId,
             channelId,
             post2.id,
             0,
@@ -320,7 +316,6 @@ describe('Actions.Posts', () => {
     });
 
     it('getPostsAfter', async () => {
-        const teamId = TestHelper.basicTeam.id;
         const channelId = TestHelper.basicChannel.id;
 
         const post1 = await Client4.createPost(
@@ -340,7 +335,6 @@ describe('Actions.Posts', () => {
         );
 
         await Actions.getPostsAfter(
-            teamId,
             channelId,
             post2.id,
             0,

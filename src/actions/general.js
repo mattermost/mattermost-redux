@@ -40,7 +40,7 @@ export function resetPing() {
 
 export function getClientConfig() {
     return bindClientFunc(
-        Client.getClientConfig,
+        Client4.getClientConfigOld,
         GeneralTypes.CLIENT_CONFIG_REQUEST,
         [GeneralTypes.CLIENT_CONFIG_RECEIVED, GeneralTypes.CLIENT_CONFIG_SUCCESS],
         GeneralTypes.CLIENT_CONFIG_FAILURE
@@ -49,7 +49,7 @@ export function getClientConfig() {
 
 export function getLicenseConfig() {
     return bindClientFunc(
-        Client.getLicenseConfig,
+        Client4.getClientLicenseOld,
         GeneralTypes.CLIENT_LICENSE_REQUEST,
         [GeneralTypes.CLIENT_LICENSE_RECEIVED, GeneralTypes.CLIENT_LICENSE_SUCCESS],
         GeneralTypes.CLIENT_LICENSE_FAILURE
@@ -96,6 +96,8 @@ export function setStoreFromLocalData(data) {
     return async (dispatch, getState) => {
         Client.setToken(data.token);
         Client.setUrl(data.url);
+        Client4.setToken(data.token);
+        Client4.setUrl(data.url);
 
         return loadMe()(dispatch, getState);
     };

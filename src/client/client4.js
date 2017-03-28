@@ -110,6 +110,14 @@ export default class Client4 {
         return `${this.getPostsRoute()}/${postId}`;
     }
 
+    getFilesRoute() {
+        return `${this.getBaseRoute()}/files`;
+    }
+
+    getFileRoute(fileId) {
+        return `${this.getFilesRoute()}/${fileId}`;
+    }
+
     getPreferencesRoute(userId) {
         return `${this.getUserRoute(userId)}/preferences`;
     }
@@ -163,6 +171,13 @@ export default class Client4 {
     patchMe = async (user) => {
         return this.doFetch(
             `${this.getUserRoute('me')}/patch`,
+            {method: 'put', body: JSON.stringify(user)}
+        );
+    }
+
+    updateUser = async (user) => {
+        return this.doFetch(
+            `${this.getUserRoute(user.id)}`,
             {method: 'put', body: JSON.stringify(user)}
         );
     }
@@ -300,6 +315,13 @@ export default class Client4 {
         );
     };
 
+    searchUsers = (term, options) => {
+        return this.doFetch(
+            `${this.getUsersRoute()}/search`,
+            {method: 'post', body: JSON.stringify({term, ...options})}
+        );
+    };
+
     // Team Routes
 
     createTeam = async (team) => {
@@ -348,6 +370,21 @@ export default class Client4 {
         return this.doFetch(
             `${this.getTeamMembersRoute(teamId)}/ids`,
             {method: 'post', body: JSON.stringify(userIds)}
+        );
+    };
+
+    addToTeam = async (teamId, userId) => {
+        const member = {user_id: userId, team_id: teamId};
+        return this.doFetch(
+            `${this.getTeamMembersRoute(teamId)}`,
+            {method: 'post', body: JSON.stringify(member)}
+        );
+    };
+
+    removeFromTeam = async (teamId, userId) => {
+        return this.doFetch(
+            `${this.getTeamMemberRoute(teamId, userId)}`,
+            {method: 'delete'}
         );
     };
 
@@ -409,6 +446,13 @@ export default class Client4 {
         );
     };
 
+    getMyChannels = async (teamId) => {
+        return this.doFetch(
+            `${this.getUserRoute('me')}/teams/${teamId}/channels`,
+            {method: 'get'}
+        );
+    };
+
     getMyChannelMember = async (channelId) => {
         return this.doFetch(
             `${this.getChannelMemberRoute(channelId, 'me')}`,
@@ -453,6 +497,13 @@ export default class Client4 {
         );
     };
 
+    searchChannels = async (teamId, term) => {
+        return this.doFetch(
+            `${this.getTeamRoute(teamId)}/channels/search`,
+            {method: 'post', body: JSON.strinify({term})}
+        );
+    };
+
     // Post Routes
 
     createPost = async (post) => {
@@ -490,10 +541,46 @@ export default class Client4 {
         );
     };
 
+    getPostsSince = async (channelId, since) => {
+        return this.doFetch(
+            `${this.getChannelRoute(channelId)}/posts${buildQueryString({since})}`,
+            {method: 'get'}
+        );
+    };
+
+    getPostsBefore = async (channelId, postId, page = 0, perPage = PER_PAGE_DEFAULT) => {
+        return this.doFetch(
+            `${this.getChannelRoute(channelId)}/posts${buildQueryString({before: postId, page, per_page: perPage})}`,
+            {method: 'get'}
+        );
+    };
+
+    getPostsAfter = async (channelId, postId, page = 0, perPage = PER_PAGE_DEFAULT) => {
+        return this.doFetch(
+            `${this.getChannelRoute(channelId)}/posts${buildQueryString({after: postId, page, per_page: perPage})}`,
+            {method: 'get'}
+        );
+    };
+
     getFileInfosForPost = async (postId) => {
         return this.doFetch(
             `${this.getPostRoute(postId)}/files/info`,
             {method: 'get'}
+        );
+    };
+
+    // Files Routes
+
+    uploadFile = async (fileFormData, formBoundary) => {
+        return this.doFetch(
+            `${this.getFilesRoute()}`,
+            {
+                method: 'post',
+                headers: {
+                    'Content-Type': `multipart/form-data; boundary=${formBoundary}`
+                },
+                body: fileFormData
+            }
         );
     };
 
@@ -525,6 +612,20 @@ export default class Client4 {
     ping = async () => {
         return this.doFetch(
             `${this.getBaseRoute()}/system/ping`,
+            {method: 'get'}
+        );
+    };
+
+    getClientConfigOld = async () => {
+        return this.doFetch(
+            `${this.getBaseRoute()}/config/client?format=old`,
+            {method: 'get'}
+        );
+    };
+
+    getClientLicenseOld = async () => {
+        return this.doFetch(
+            `${this.getBaseRoute()}/license/client?format=old`,
             {method: 'get'}
         );
     };

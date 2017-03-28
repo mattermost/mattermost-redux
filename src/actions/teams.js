@@ -2,7 +2,7 @@
 // See License.txt for license information.
 
 import {batchActions} from 'redux-batched-actions';
-import {Client, Client4} from 'client';
+import {Client4} from 'client';
 import {General} from 'constants';
 import {TeamTypes} from 'action_types';
 import {getLogErrorAction} from './errors';
@@ -196,7 +196,7 @@ export function addUserToTeam(teamId, userId) {
         dispatch({type: TeamTypes.ADD_TEAM_MEMBER_REQUEST}, getState);
 
         try {
-            await Client.addUserToTeam(teamId, userId);
+            await Client4.addToTeam(teamId, userId);
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch);
             dispatch(batchActions([
@@ -228,7 +228,7 @@ export function removeUserFromTeam(teamId, userId) {
         dispatch({type: TeamTypes.REMOVE_TEAM_MEMBER_REQUEST}, getState);
 
         try {
-            await Client.removeUserFromTeam(teamId, userId);
+            await Client4.removeFromTeam(teamId, userId);
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch);
             dispatch(batchActions([

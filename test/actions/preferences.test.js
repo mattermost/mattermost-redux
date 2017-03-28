@@ -154,7 +154,7 @@ describe('Actions.Preferences', () => {
 
     it('makeDirectChannelVisibleIfNecessary', async () => {
         const user = TestHelper.basicUser;
-        const user2 = await TestHelper.createClient().createUser(TestHelper.fakeUser());
+        const user2 = await TestHelper.createClient4().createUser(TestHelper.fakeUser());
 
         await login(user.email, 'password1')(store.dispatch, store.getState);
 

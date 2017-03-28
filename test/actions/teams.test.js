@@ -51,7 +51,7 @@ describe('Actions.Teams', () => {
     it('getTeams', async () => {
         let team = {...TestHelper.fakeTeam(), allow_open_invite: true};
 
-        team = await Client.createTeam(team);
+        team = await Client4.createTeam(team);
         await Actions.getTeams()(store.dispatch, store.getState);
 
         const teamsRequest = store.getState().requests.teams.getTeams;
@@ -131,7 +131,7 @@ describe('Actions.Teams', () => {
     });
 
     it('getTeamMember', async () => {
-        const user = await TestHelper.basicClient.createUserWithInvite(
+        const user = await TestHelper.basicClient4.createUser(
             TestHelper.fakeUser(),
             null,
             null,
@@ -152,14 +152,14 @@ describe('Actions.Teams', () => {
     });
 
     it('getTeamMembersByIds', async () => {
-        const user1 = await TestHelper.basicClient.createUserWithInvite(
+        const user1 = await TestHelper.basicClient4.createUser(
             TestHelper.fakeUser(),
             null,
             null,
             TestHelper.basicTeam.invite_id
         );
 
-        const user2 = await TestHelper.basicClient.createUserWithInvite(
+        const user2 = await TestHelper.basicClient4.createUser(
             TestHelper.fakeUser(),
             null,
             null,
@@ -202,7 +202,7 @@ describe('Actions.Teams', () => {
     });
 
     it('addUserToTeam', async () => {
-        const user = await TestHelper.basicClient.createUser(TestHelper.fakeUser());
+        const user = await TestHelper.basicClient4.createUser(TestHelper.fakeUser());
 
         await Actions.addUserToTeam(TestHelper.basicTeam.id, user.id)(store.dispatch, store.getState);
 
@@ -218,7 +218,7 @@ describe('Actions.Teams', () => {
     });
 
     it('removeUserFromTeam', async () => {
-        const user = await TestHelper.basicClient.createUser(TestHelper.fakeUser());
+        const user = await TestHelper.basicClient4.createUser(TestHelper.fakeUser());
 
         await Actions.addUserToTeam(TestHelper.basicTeam.id, user.id)(store.dispatch, store.getState);
 

@@ -67,7 +67,7 @@ describe('Actions.Channels', () => {
     });
 
     it('createDirectChannel', async () => {
-        const user = await TestHelper.basicClient.createUserWithInvite(
+        const user = await TestHelper.basicClient4.createUser(
             TestHelper.fakeUser(),
             null,
             null,
@@ -226,8 +226,8 @@ describe('Actions.Channels', () => {
     });
 
     it('joinChannelByName', async () => {
-        const secondClient = TestHelper.createClient();
-        const user = await TestHelper.basicClient.createUserWithInvite(
+        const secondClient = TestHelper.createClient4();
+        const user = await TestHelper.basicClient4.createUser(
             TestHelper.fakeUser(),
             null,
             null,
@@ -272,7 +272,7 @@ describe('Actions.Channels', () => {
     });
 
     it('viewChannel', async () => {
-        const userChannel = await Client.createChannel(
+        const userChannel = await Client4.createChannel(
             TestHelper.fakeChannel(TestHelper.basicTeam.id)
         );
         await Actions.fetchMyChannelsAndMembers(TestHelper.basicTeam.id)(store.dispatch, store.getState);
@@ -294,8 +294,8 @@ describe('Actions.Channels', () => {
     });
 
     it('getChannels', async () => {
-        const userClient = TestHelper.createClient();
-        const user = await TestHelper.basicClient.createUserWithInvite(
+        const userClient = TestHelper.createClient4();
+        const user = await TestHelper.basicClient4.createUser(
             TestHelper.fakeUser(),
             null,
             null,
@@ -338,7 +338,7 @@ describe('Actions.Channels', () => {
     });
 
     it('addChannelMember', async () => {
-        const user = await TestHelper.basicClient.createUserWithInvite(
+        const user = await TestHelper.basicClient4.createUser(
             TestHelper.fakeUser(),
             null,
             null,
@@ -365,7 +365,7 @@ describe('Actions.Channels', () => {
     });
 
     it('removeChannelMember', async () => {
-        const user = await TestHelper.basicClient.createUserWithInvite(
+        const user = await TestHelper.basicClient4.createUser(
             TestHelper.fakeUser(),
             null,
             null,
@@ -432,25 +432,5 @@ describe('Actions.Channels', () => {
         const channel = channels[TestHelper.basicChannel.id];
         assert.ok(channel);
         assert.deepEqual(channel.purpose, purpose);
-    });
-
-    it('autocompleteChannels', async () => {
-        await Actions.autocompleteChannels(
-            TestHelper.basicTeam.id,
-            ''
-        )(store.dispatch, store.getState);
-
-        const autocompleteRequest = store.getState().requests.channels.autocompleteChannels;
-        const data = store.getState().entities.channels.autocompleteChannels;
-
-        if (autocompleteRequest.status === RequestStatus.FAILURE) {
-            throw new Error(JSON.stringify(autocompleteRequest.error));
-        }
-
-        assert.ok(data.length);
-
-        const channel = data.find((c) => c.id === TestHelper.basicChannel.id);
-
-        assert.ok(channel);
     });
 });
