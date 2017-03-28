@@ -30,6 +30,7 @@ export default {
     DM_CHANNEL: 'D',
     OPEN_CHANNEL: 'O',
     PRIVATE_CHANNEL: 'P',
+    GM_CHANNEL: 'G',
 
     START_OF_NEW_MESSAGES: 'start-of-new-messages',
 

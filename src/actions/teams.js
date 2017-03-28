@@ -10,16 +10,16 @@ import {bindClientFunc, forceLogoutIfNecessary} from './helpers';
 import {getProfilesByIds, getStatusesByIds} from './users';
 
 async function getProfilesAndStatusesForMembers(userIds, dispatch, getState) {
-    const {profiles, statuses} = getState().entities.users;
+    const {currentUserId, profiles, statuses} = getState().entities.users;
     const profilesToLoad = [];
     const statusesToLoad = [];
 
     userIds.forEach((userId) => {
-        if (!profiles[userId]) {
+        if (!profiles[userId] && !profilesToLoad.includes(userId) && userId !== currentUserId) {
             profilesToLoad.push(userId);
         }
 
-        if (!statuses[userId]) {
+        if (!statuses[userId] && !statusesToLoad.includes(userId) && userId !== currentUserId) {
             statusesToLoad.push(userId);
         }
     });

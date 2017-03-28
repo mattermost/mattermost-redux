@@ -186,7 +186,7 @@ export default class Client {
 
         return this.doFetch(
             `${this.getGeneralRoute()}/log_client`,
-            {method: 'post', body}
+            {method: 'post', body: JSON.stringify(body)}
         );
     };
 
@@ -672,13 +672,18 @@ export default class Client {
         );
     };
 
-    uploadFile = async (teamId, channelId, clientId, fileFormData, formBoundary) => {
+    uploadFile = async (teamId, channelId, fileFormData, formBoundary) => {
+        let contentType = 'multipart/form-data';
+        if (formBoundary) {
+            contentType += `; boundary=${formBoundary}`;
+        }
+
         return this.doFetch(
             `${this.getTeamNeededRoute(teamId)}/files/upload`,
             {
                 method: 'post',
                 headers: {
-                    'Content-Type': `multipart/form-data; boundary=${formBoundary}`
+                    'Content-Type': contentType
                 },
                 body: fileFormData
             }
@@ -722,16 +727,31 @@ export default class Client {
     };
 
     // File routes
-    getFileUrl(fileId) {
-        return `${this.getFilesRoute()}/${fileId}/get`;
+    getFileUrl(fileId, timestamp) {
+        let url = `${this.getFilesRoute()}/${fileId}/get`;
+        if (timestamp) {
+            url += `?${timestamp}`;
+        }
+
+        return url;
     }
 
-    getFileThumbnailUrl(fileId) {
-        return `${this.getFilesRoute()}/${fileId}/get_thumbnail`;
+    getFileThumbnailUrl(fileId, timestamp) {
+        let url = `${this.getFilesRoute()}/${fileId}/get_thumbnail`;
+        if (timestamp) {
+            url += `?${timestamp}`;
+        }
+
+        return url;
     }
 
-    getFilePreviewUrl(fileId) {
-        return `${this.getFilesRoute()}/${fileId}/get_preview`;
+    getFilePreviewUrl(fileId, timestamp) {
+        let url = `${this.getFilesRoute()}/${fileId}/get_preview`;
+        if (timestamp) {
+            url += `?${timestamp}`;
+        }
+
+        return url;
     }
 
     // Client helpers

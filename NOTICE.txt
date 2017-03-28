@@ -1,7 +1,7 @@
 Mattermost Redux
 © 2016 Mattermost, Inc.  All Rights Reserved.  See LICENSE.txt for license information.
 
-NOTICES: 
+NOTICES:
 --------
 
 This document includes a list of open source components used in Mattermost Redux, including those that have been modified.
@@ -55,10 +55,10 @@ License.
 
 This product contains 'isomorphic-fetch', to provide the fetch function for node by Matt Andrews.
 
-* HOMEPAGE: 
+* HOMEPAGE:
   * https://github.com/matthew-andrews/isomorphic-fetch
-  
-* LICENSE: 
+
+* LICENSE:
 
 The MIT License (MIT)
 
@@ -88,10 +88,10 @@ SOFTWARE.
 
 This product contains 'redux', a predictable state container for JavaScript apps by Dan Abramov.
 
-* HOMEPAGE: 
+* HOMEPAGE:
   * https://github.com/reactjs/redux
-  
-* LICENSE: 
+
+* LICENSE:
 
 The MIT License (MIT)
 
@@ -121,10 +121,10 @@ SOFTWARE.
 
 This product contains 'redux-batched-actions', a batching action creator and higher order reducer for Redux by Tim Shelburne.
 
-* HOMEPAGE: 
+* HOMEPAGE:
   * https://github.com/tshelburne/redux-batched-actions
-  
-* LICENSE: 
+
+* LICENSE:
 
 MIT License
 
@@ -154,10 +154,10 @@ SOFTWARE.
 
 This product contains 'redux-thunk', middleware to allow asynchronous actions in Redux by Dan Abramov.
 
-* HOMEPAGE: 
+* HOMEPAGE:
   * https://github.com/gaearon/redux-thunk
-  
-* LICENSE: 
+
+* LICENSE:
 
 The MIT License (MIT)
 
@@ -180,5 +180,71 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
+
+---
+
+## mime-db
+
+A database of all mime types
+
+* HOMEPAGE
+  * https://github.com/jshttp/mime-db
+
+* LICENSE
+
+The MIT License (MIT)
+
+Copyright (c) 2014 Jonathan Ong me@jongleberry.com
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE.
+
+---
+
+## serialize-error
+
+Useful if you for example need to JSON.stringify() or process.send() the error.
+
+* HOMEPAGE
+  * https://github.com/sindresorhus/serialize-error
+
+* LICENSE
+
+The MIT License (MIT)
+
+Copyright (c) Sindre Sorhus <sindresorhus@gmail.com> (sindresorhus.com)
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE.
 
 ---

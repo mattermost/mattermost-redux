@@ -5,21 +5,57 @@ import {batchActions} from 'redux-batched-actions';
 
 import {Client4} from 'client';
 import {Preferences, Posts} from 'constants';
-import {PostTypes} from 'action_types';
+import {PostTypes, FileTypes} from 'action_types';
 
 import {bindClientFunc, forceLogoutIfNecessary} from './helpers';
 import {getLogErrorAction} from './errors';
 import {deletePreferences, savePreferences} from './preferences';
 import {getProfilesByIds, getStatusesByIds} from './users';
 
-export function createPost(post) {
-    return bindClientFunc(
-        Client4.createPost,
-        PostTypes.CREATE_POST_REQUEST,
-        [PostTypes.RECEIVED_POST, PostTypes.CREATE_POST_SUCCESS],
-        PostTypes.CREATE_POST_FAILURE,
-        post
-    );
+export function createPost(post, files) {
+    return async (dispatch, getState) => {
+        dispatch({type: PostTypes.CREATE_POST_REQUEST}, getState);
+
+        let newPost = post;
+        if (files) {
+            const fileIds = files.map((file) => file.id);
+            newPost = {
+                ...newPost,
+                file_ids: fileIds
+            };
+        }
+
+        let createdPost;
+        try {
+            createdPost = await Client4.createPost(newPost);
+        } catch (error) {
+            forceLogoutIfNecessary(error, dispatch);
+            dispatch(batchActions([
+                {type: PostTypes.CREATE_POST_FAILURE, error},
+                getLogErrorAction(error)
+            ]), getState);
+            return;
+        }
+
+        const actions = [{
+            type: PostTypes.RECEIVED_POST,
+            data: {...createdPost}
+        }];
+
+        if (files) {
+            actions.push({
+                type: FileTypes.RECEIVED_FILES_FOR_POST,
+                postId: createdPost.id,
+                data: files
+            });
+        }
+
+        actions.push({
+            type: PostTypes.CREATE_POST_SUCCESS
+        });
+
+        dispatch(batchActions(actions), getState);
+    };
 }
 
 export function deletePost(post) {
@@ -234,7 +270,7 @@ export function getPostsAfter(channelId, postId, page = 0, perPage = Posts.POST_
 }
 
 async function getProfilesAndStatusesForPosts(list, dispatch, getState) {
-    const {profiles, statuses} = getState().entities.users;
+    const {currentUserId, profiles, statuses} = getState().entities.users;
     const posts = list.posts;
     const profilesToLoad = [];
     const statusesToLoad = [];
@@ -243,11 +279,11 @@ async function getProfilesAndStatusesForPosts(list, dispatch, getState) {
         const post = posts[key];
         const userId = post.user_id;
 
-        if (!profiles[userId]) {
+        if (!profiles[userId] && !profilesToLoad.includes(userId) && userId !== currentUserId) {
             profilesToLoad.push(userId);
         }
 
-        if (!statuses[userId]) {
+        if (!statuses[userId] && !statusesToLoad.includes(userId) && userId !== currentUserId) {
             statusesToLoad.push(userId);
         }
     });

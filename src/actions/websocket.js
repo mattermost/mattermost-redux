@@ -5,7 +5,7 @@ import {batchActions} from 'redux-batched-actions';
 
 import {Client, Client4} from 'client';
 import websocketClient from 'client/websocket_client';
-import {getProfilesByIds, getStatusesByIds} from './users';
+import {getProfilesByIds, getStatusesByIds, loadProfilesForDirect} from './users';
 import {
     fetchMyChannelsAndMembers,
     getChannel,
@@ -19,8 +19,12 @@ import {
     getPosts,
     getPostsSince
 } from './posts';
-import {makeDirectChannelVisibleIfNecessary} from './preferences';
-import {General, WebsocketEvents, Preferences, Posts} from 'constants';
+
+import {
+    makeDirectChannelVisibleIfNecessary,
+    makeGroupMessageVisibleIfNecessary
+} from './preferences';
+
 import {
     ChannelTypes,
     GeneralTypes,
@@ -29,6 +33,8 @@ import {
     TeamTypes,
     UserTypes
 } from 'action_types';
+import {General, WebsocketEvents, Preferences, Posts} from 'constants';
+
 import {getCurrentChannelStats} from 'selectors/entities/channels';
 import {getUserIdFromChannelName} from 'utils/channel_utils';
 import {isSystemMessage, shouldIgnorePost} from 'utils/post_utils';
@@ -93,14 +99,14 @@ function handleFirstConnect(dispatch, getState) {
     dispatch({type: GeneralTypes.WEBSOCKET_SUCCESS}, getState);
 }
 
-function handleReconnect(dispatch, getState) {
+async function handleReconnect(dispatch, getState) {
     const entities = getState().entities;
     const {currentTeamId} = entities.teams;
     const {currentChannelId} = entities.channels;
 
     if (currentTeamId) {
-        fetchMyChannelsAndMembers(currentTeamId)(dispatch, getState);
-
+        await fetchMyChannelsAndMembers(currentTeamId)(dispatch, getState);
+        loadProfilesForDirect()(dispatch, getState);
         if (currentChannelId) {
             loadPostsHelper(currentTeamId, currentChannelId, dispatch, getState);
         }
@@ -170,7 +176,7 @@ async function handleNewPostEvent(msg, dispatch, getState) {
     const userId = post.user_id;
     const status = users.statuses[userId];
 
-    if (!users.profiles[userId]) {
+    if (!users.profiles[userId] && userId !== users.currentUserId) {
         getProfilesByIds([userId])(dispatch, getState);
     }
 
@@ -191,13 +197,15 @@ async function handleNewPostEvent(msg, dispatch, getState) {
         const otherUserId = getUserIdFromChannelName(users.currentUserId, msg.data.channel_name);
 
         makeDirectChannelVisibleIfNecessary(otherUserId)(dispatch, getState);
+    } else if (msg.data.channel_type === General.GM_CHANNEL) {
+        makeGroupMessageVisibleIfNecessary(post.channel_id)(dispatch, getState);
     }
 
     if (post.root_id && !posts[post.root_id]) {
         await Client4.getPostThread(post.root_id).then((data) => {
             const rootUserId = data.posts[post.root_id].user_id;
             const rootStatus = users.statuses[rootUserId];
-            if (!users.profiles[rootUserId]) {
+            if (!users.profiles[rootUserId] && rootUserId !== users.currentUserId) {
                 getProfilesByIds([rootUserId])(dispatch, getState);
             }
 
@@ -375,7 +383,7 @@ function handlePreferenceChangedEvent(msg, dispatch, getState) {
         const userId = preference.name;
         const status = users.statuses[userId];
 
-        if (!users.profiles[userId]) {
+        if (!users.profiles[userId] && userId !== users.currentUserId) {
             getProfilesByIds([userId])(dispatch, getState);
         }
 
@@ -405,7 +413,7 @@ function handleHelloEvent(msg) {
 const typingUsers = {};
 function handleUserTypingEvent(msg, dispatch, getState) {
     const state = getState();
-    const {profiles, statuses} = state.entities.users;
+    const {currentUserId, profiles, statuses} = state.entities.users;
     const {config} = state.entities.general;
     const userId = msg.data.user_id;
     const id = msg.broadcast.channel_id + msg.data.parent_id;
@@ -438,7 +446,7 @@ function handleUserTypingEvent(msg, dispatch, getState) {
         data
     }, getState);
 
-    if (!profiles[userId]) {
+    if (!profiles[userId] && userId !== currentUserId) {
         getProfilesByIds([userId])(dispatch, getState);
     }
 

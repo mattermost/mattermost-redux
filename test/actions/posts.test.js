@@ -62,6 +62,46 @@ describe('Actions.Posts', () => {
         assert.ok(found, 'failed to find new post in postsByChannel');
     });
 
+    it('createPost with file attachments', async () => {
+        const channelId = TestHelper.basicChannel.id;
+        const post = TestHelper.fakePost(channelId);
+        const files = TestHelper.fakeFiles(3);
+
+        await Actions.createPost(
+            post,
+            files
+        )(store.dispatch, store.getState);
+
+        const state = store.getState();
+        const createRequest = state.requests.posts.createPost;
+        if (createRequest.status === RequestStatus.FAILURE) {
+            throw new Error(JSON.stringify(createRequest.error));
+        }
+
+        let newPost;
+        for (const storedPost of Object.values(state.entities.posts.posts)) {
+            if (storedPost.message === post.message) {
+                newPost = storedPost;
+                break;
+            }
+        }
+        assert.ok(newPost, 'failed to find new post in posts');
+
+        let found = true;
+        for (const file of files) {
+            if (!state.entities.files.files[file.id]) {
+                found = false;
+                break;
+            }
+        }
+        assert.ok(found, 'failed to find uploaded files in files');
+
+        const postIdForFiles = state.entities.files.fileIdsByPostId[newPost.id];
+        assert.ok(postIdForFiles, 'failed to find files for post id in files Ids by post id');
+
+        assert.equal(postIdForFiles.length, files.length);
+    });
+
     it('editPost', async () => {
         const channelId = TestHelper.basicChannel.id;
 

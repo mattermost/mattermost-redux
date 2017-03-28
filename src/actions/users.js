@@ -6,8 +6,23 @@ import {Client, Client4} from 'client';
 import {General} from 'constants';
 import {PreferenceTypes, UserTypes, TeamTypes} from 'action_types';
 import {getMyTeams} from './teams';
+
+import {
+    getUserIdFromChannelName,
+    isDirectChannel,
+    isDirectChannelVisible,
+    isGroupChannel,
+    isGroupChannelVisible
+} from 'utils/channel_utils';
+
+import {removeUserFromList} from 'utils/user_utils';
+
 import {getLogErrorAction} from './errors';
 import {bindClientFunc, forceLogoutIfNecessary, debounce} from './helpers';
+import {
+    makeDirectChannelVisibleIfNecessary,
+    makeGroupMessageVisibleIfNecessary
+} from './preferences';
 
 export function checkMfa(loginId) {
     return async (dispatch, getState) => {
@@ -268,9 +283,12 @@ export function getProfilesInChannel(channelId, page, perPage = General.PROFILE_
     return async (dispatch, getState) => {
         dispatch({type: UserTypes.PROFILES_IN_CHANNEL_REQUEST}, getState);
 
+        const {currentUserId} = getState().entities.users;
+
         let profiles;
         try {
             profiles = await Client4.getProfilesInChannel(channelId, page, perPage);
+            removeUserFromList(currentUserId, profiles);
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch);
             dispatch(batchActions([
@@ -303,9 +321,12 @@ export function getProfilesNotInChannel(teamId, channelId, page, perPage = Gener
     return async (dispatch, getState) => {
         dispatch({type: UserTypes.PROFILES_NOT_IN_CHANNEL_REQUEST}, getState);
 
+        const {currentUserId} = getState().entities.users;
+
         let profiles;
         try {
             profiles = await Client4.getProfilesNotInChannel(teamId, channelId, page, perPage);
+            removeUserFromList(currentUserId, profiles);
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch);
             dispatch(batchActions([
@@ -420,6 +441,34 @@ export function revokeSession(userId, sessionId) {
     };
 }
 
+export function loadProfilesForDirect() {
+    return async (dispatch, getState) => {
+        const state = getState();
+        const {channels, myMembers} = state.entities.channels;
+        const {myPreferences} = state.entities.preferences;
+        const {currentUserId} = state.entities.users;
+
+        const values = Object.values(channels);
+        for (let i = 0; i < values.length; i++) {
+            const channel = values[i];
+            const member = myMembers[channel.id];
+            if (!isDirectChannel(channel) && !isGroupChannel(channel)) {
+                continue;
+            }
+
+            if (member) {
+                if (member.mention_count > 0 && isDirectChannel(channel) && !isDirectChannelVisible(currentUserId, myPreferences, channel)) {
+                    const otherUserId = getUserIdFromChannelName(currentUserId, channel.name);
+                    makeDirectChannelVisibleIfNecessary(otherUserId)(dispatch, getState);
+                } else if ((member.mention_count > 0 || member.msg_count < channel.total_msg_count) &&
+                    isGroupChannel(channel) && !isGroupChannelVisible(myPreferences, channel)) {
+                    makeGroupMessageVisibleIfNecessary(channel.id)(dispatch, getState);
+                }
+            }
+        }
+    };
+}
+
 export function getUserAudits(userId, page = 0, perPage = General.AUDITS_CHUNK_SIZE) {
     return bindClientFunc(
         Client4.getUserAudits,
@@ -471,14 +520,36 @@ export function autocompleteUsersInChannel(teamId, channelId, term) {
 }
 
 export function searchProfiles(term, options) {
-    return bindClientFunc(
-        Client4.searchUsers,
-        UserTypes.SEARCH_PROFILES_REQUEST,
-        [UserTypes.RECEIVED_PROFILES_LIST, UserTypes.SEARCH_PROFILES_SUCCESS],
-        UserTypes.SEARCH_PROFILES_FAILURE,
-        term,
-        options
-    );
+    return async (dispatch, getState) => {
+        dispatch({type: UserTypes.SEARCH_PROFILES_REQUEST}, getState);
+
+        const {currentUserId} = getState().entities.users;
+
+        let profiles;
+        try {
+            profiles = await Client4.searchUsers(term, options || {});
+            removeUserFromList(currentUserId, profiles);
+        } catch (error) {
+            forceLogoutIfNecessary(error, dispatch);
+            dispatch(batchActions([
+                {type: UserTypes.SEARCH_PROFILES_FAILURE, error},
+                getLogErrorAction(error)
+            ]), getState);
+            return null;
+        }
+
+        dispatch(batchActions([
+            {
+                type: UserTypes.RECEIVED_PROFILES_LIST,
+                data: profiles
+            },
+            {
+                type: UserTypes.SEARCH_PROFILES_SUCCESS
+            }
+        ]), getState);
+
+        return profiles;
+    };
 }
 
 let statusIntervalId = '';
@@ -548,6 +619,7 @@ export default {
     getUserByUsername,
     getStatusesByIds,
     getSessions,
+    loadProfilesForDirect,
     revokeSession,
     getUserAudits,
     searchProfiles,

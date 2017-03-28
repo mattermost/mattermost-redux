@@ -3,6 +3,7 @@
 
 export default {
     CATEGORY_DIRECT_CHANNEL_SHOW: 'direct_channel_show',
+    CATEGORY_GROUP_CHANNEL_SHOW: 'group_channel_show',
     CATEGORY_FLAGGED_POST: 'flagged_post',
     CATEGORY_NOTIFICATIONS: 'notifications',
     CATEGORY_DISPLAY_SETTINGS: 'display_settings',

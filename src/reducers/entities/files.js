@@ -6,6 +6,7 @@ import {FileTypes, UserTypes} from 'action_types';
 
 function files(state = {}, action) {
     switch (action.type) {
+    case FileTypes.RECEIVED_UPLOAD_FILES:
     case FileTypes.RECEIVED_FILES_FOR_POST: {
         const filesById = action.data.reduce((filesMap, file) => {
             return {...filesMap,

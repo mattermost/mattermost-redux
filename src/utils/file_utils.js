@@ -2,6 +2,7 @@
 // See License.txt for license information.
 
 import {General} from 'constants';
+import mimeDB from 'mime-db';
 
 export function getFormattedFileSize(file) {
     const bytes = file.size;
@@ -39,4 +40,27 @@ export function getFileType(file) {
         const fileTypeExts = General[constForFileTypeExtList];
         return fileTypeExts.indexOf(fileExt) > -1;
     }) || 'other';
+}
+
+let extToMime;
+function buildExtToMime() {
+    extToMime = {};
+    Object.keys(mimeDB).forEach((key) => {
+        const mime = mimeDB[key];
+        if (mime.extensions) {
+            mime.extensions.forEach((ext) => {
+                extToMime[ext] = key;
+            });
+        }
+    });
+}
+
+export function lookupMimeType(filename) {
+    if (!extToMime) {
+        buildExtToMime();
+    }
+
+    const ext = filename.split('.').pop();
+
+    return extToMime[ext] || 'application/octet-stream';
 }

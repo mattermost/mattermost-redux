@@ -118,6 +118,17 @@ class TestHelper {
         };
     };
 
+    fakeFiles = (count) => {
+        const files = [];
+        while (files.length < count) {
+            files.push({
+                id: this.generateId()
+            });
+        }
+
+        return files;
+    }
+
     initBasic = async (client = this.createClient(), client4 = this.createClient4()) => {
         client.setUrl(DEFAULT_SERVER);
         client4.setUrl(DEFAULT_SERVER);

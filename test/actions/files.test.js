@@ -27,6 +27,31 @@ describe('Actions.Files', () => {
         await TestHelper.basicClient4.logout();
     });
 
+    it('uploadFile', async () => {
+        const {basicChannel} = TestHelper;
+        const testFileName = 'test.png';
+        const testImageData = fs.createReadStream(`test/assets/images/${testFileName}`);
+        const clientId = TestHelper.generateId();
+
+        const imageFormData = new FormData();
+        imageFormData.append('files', testImageData);
+        imageFormData.append('channel_id', basicChannel.id);
+        imageFormData.append('client_ids', clientId);
+        const formBoundary = imageFormData.getBoundary();
+
+        await Actions.uploadFile(imageFormData, formBoundary)(store.dispatch, store.getState);
+
+        const state = store.getState();
+        const uploadRequest = state.requests.files.uploadFiles;
+        if (uploadRequest.status === RequestStatus.FAILED) {
+            throw new Error('Upload file request failed');
+        }
+
+        const files = state.entities.files.files;
+        const file = Object.keys(files).find((f) => files[f].name === testFileName);
+        assert.ok(file, 'Could not find uploaded file.');
+    });
+
     it('getFilesForPost', async () => {
         const {basicClient4, basicChannel} = TestHelper;
         const testFileName = 'test.png';

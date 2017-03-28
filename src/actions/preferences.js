@@ -12,6 +12,7 @@ import {getPreferenceKey} from 'utils/preference_utils';
 
 import {bindClientFunc, forceLogoutIfNecessary} from './helpers';
 import {getLogErrorAction} from './errors';
+import {getProfilesByIds, getProfilesInChannel} from './users';
 
 export function deletePreferences(userId, preferences) {
     return async (dispatch, getState) => {
@@ -64,7 +65,29 @@ export function makeDirectChannelVisibleIfNecessary(otherUserId) {
                 name: otherUserId,
                 value: 'true'
             };
+            getProfilesByIds([otherUserId])(dispatch, getState);
+            await savePreferences(currentUserId, [preference])(dispatch, getState);
+        }
+    };
+}
 
+export function makeGroupMessageVisibleIfNecessary(channelId) {
+    return async (dispatch, getState) => {
+        const state = getState();
+        const myPreferences = getMyPreferencesSelector(state);
+        const currentUserId = getCurrentUserId(state);
+
+        let preference = myPreferences[getPreferenceKey(Preferences.CATEGORY_GROUP_CHANNEL_SHOW, channelId)];
+
+        if (!preference || preference.value === 'false') {
+            preference = {
+                user_id: currentUserId,
+                category: Preferences.CATEGORY_GROUP_CHANNEL_SHOW,
+                name: channelId,
+                value: 'true'
+            };
+
+            getProfilesInChannel(channelId, 0)(dispatch, getState);
             await savePreferences(currentUserId, [preference])(dispatch, getState);
         }
     };

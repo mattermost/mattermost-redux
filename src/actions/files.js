@@ -36,3 +36,38 @@ export function getFilesForPost(postId) {
         ]), getState);
     };
 }
+
+export function uploadFile(fileFormData, formBoundary) {
+    return async (dispatch, getState) => {
+        dispatch({type: FileTypes.UPLOAD_FILES_REQUEST}, getState);
+
+        let files;
+        try {
+            files = await Client4.uploadFile(fileFormData, formBoundary);
+        } catch (error) {
+            forceLogoutIfNecessary(error, dispatch);
+            dispatch(batchActions([
+                {type: FileTypes.UPLOAD_FILES_FAILURE, error},
+                getLogErrorAction(error)
+            ]), getState);
+            return;
+        }
+
+        const data = files.file_infos.map((file, index) => {
+            return {
+                ...file,
+                clientId: files.client_ids[index]
+            };
+        });
+
+        dispatch(batchActions([
+            {
+                type: FileTypes.RECEIVED_UPLOAD_FILES,
+                data
+            },
+            {
+                type: FileTypes.UPLOAD_FILES_SUCCESS
+            }
+        ]), getState);
+    };
+}

@@ -75,15 +75,14 @@ export const getChannelsByCategory = createSelector(
     (state) => state.entities.channels.myMembers,
     (state) => state.entities.users,
     (state) => state.entities.preferences.myPreferences,
-    (state) => state.entities.teams,
-    (currentChannelId, channels, myMembers, usersState, myPreferences, teamsState) => {
+    (currentChannelId, channels, myMembers, usersState, myPreferences) => {
         const allChannels = channels.map((c) => {
             const channel = {...c};
             channel.isCurrent = c.id === currentChannelId;
             return channel;
         }).filter((c) => myMembers.hasOwnProperty(c.id));
 
-        return buildDisplayableChannelList(usersState, teamsState, allChannels, myPreferences);
+        return buildDisplayableChannelList(usersState, allChannels, myPreferences);
     }
 );
 
@@ -104,15 +103,16 @@ export const getMoreChannels = createSelector(
 );
 
 export const getUnreads = createSelector(
+    getCurrentChannelId,
     getAllChannels,
     getChannelMemberships,
-    (channels, myMembers) => {
+    (currentChannelId, channels, myMembers) => {
         let messageCount = 0;
         let mentionCount = 0;
         Object.keys(myMembers).forEach((channelId) => {
             const channel = channels[channelId];
             const m = myMembers[channelId];
-            if (channel && m) {
+            if (channel && m && channel.id !== currentChannelId) {
                 if (channel.type === 'D') {
                     mentionCount += channel.total_msg_count - m.msg_count;
                 } else if (m.mention_count > 0) {
@@ -137,7 +137,9 @@ export const canManageChannelMembers = createSelector(
     (channel, channelMembership, teamMembership, allUsers, currentUserId) => {
         const user = allUsers[currentUserId];
         const roles = `${channelMembership.roles} ${teamMembership.roles} ${user.roles}`;
-        if (channel.type === General.DM_CHANNEL || channel.name === General.DEFAULT_CHANNEL) {
+        if (channel.type === General.DM_CHANNEL ||
+            channel.type === General.GM_CHANNEL ||
+            channel.name === General.DEFAULT_CHANNEL) {
             return false;
         }
         if (channel.type === General.OPEN_CHANNEL) {

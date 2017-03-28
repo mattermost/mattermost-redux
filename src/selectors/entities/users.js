@@ -30,6 +30,22 @@ export function getUsers(state) {
     return state.entities.users.profiles;
 }
 
+export const getUsersByUsername = createSelector(
+    getUsers,
+    (users) => {
+        const usersByUsername = {};
+
+        for (const id in users) {
+            if (users.hasOwnProperty(id)) {
+                const user = users[id];
+                usersByUsername[user.username] = user;
+            }
+        }
+
+        return usersByUsername;
+    }
+);
+
 export const getCurrentUser = createSelector(
     getUsers,
     getCurrentUserId,

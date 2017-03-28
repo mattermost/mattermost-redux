@@ -13,7 +13,7 @@ export default function typing(state = {}, action) {
             return {
                 ...state,
                 [id]: {
-                    ...state[id],
+                    ...state[id] || {},
                     [userId]: true
                 }
             };
@@ -23,13 +23,13 @@ export default function typing(state = {}, action) {
     case WebsocketEvents.STOP_TYPING: {
         const nextState = {...state};
         const {id, userId} = data;
-        const users = {...nextState[id]};
+        const users = {...nextState[id] || {}};
         if (users) {
             Reflect.deleteProperty(users, userId);
         }
 
         nextState[id] = users;
-        if (!Object.keys(nextState[id]).length) {
+        if (!Object.keys(users).length) {
             Reflect.deleteProperty(nextState, id);
         }
 
