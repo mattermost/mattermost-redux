@@ -168,11 +168,12 @@ function handleEvent(msg, dispatch, getState) {
 async function handleNewPostEvent(msg, dispatch, getState) {
     const state = getState();
     const {currentChannelId} = state.entities.channels;
+    const {currentTeamId} = state.entities.teams;
     const users = state.entities.users;
     const {posts} = state.entities.posts;
     const post = JSON.parse(msg.data.post);
     const userId = post.user_id;
-    const teamId = msg.data.team_id;
+    const teamId = msg.data.team_id || currentTeamId;
     const status = users.statuses[userId];
 
     if (!users.profiles[userId] && userId !== users.currentUserId) {
