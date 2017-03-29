@@ -471,7 +471,7 @@ export function autocompleteUsersInChannel(teamId, channelId, term) {
     };
 }
 
-export function searchProfiles(term, options) {
+export function searchProfiles(term, options = {}) {
     return async (dispatch, getState) => {
         const {currentUserId} = getState().entities.users;
 
@@ -480,7 +480,7 @@ export function searchProfiles(term, options) {
         const profiles = {};
         let search;
         try {
-            search = await Client.searchProfiles(term, options || {});
+            search = await Client.searchProfiles(term, options);
             search.forEach((p) => {
                 if (p.id !== currentUserId) {
                     profiles[p.id] = p;
@@ -495,11 +495,34 @@ export function searchProfiles(term, options) {
             return null;
         }
 
+        const actions = [{type: UsersTypes.RECEIVED_PROFILES, data: profiles}];
+
+        if (options.in_channel_id) {
+            actions.push({
+                type: UsersTypes.RECEIVED_PROFILES_IN_CHANNEL,
+                data: profiles,
+                id: options.in_channel_id
+            });
+        }
+
+        if (options.not_in_channel_id) {
+            actions.push({
+                type: UsersTypes.RECEIVED_PROFILES_NOT_IN_CHANNEL,
+                data: profiles,
+                id: options.not_in_channel_id
+            });
+        }
+
+        if (options.team_id) {
+            actions.push({
+                type: UsersTypes.RECEIVED_PROFILES_IN_TEAM,
+                data: profiles,
+                id: options.team_id
+            });
+        }
+
         dispatch(batchActions([
-            {
-                type: UsersTypes.RECEIVED_PROFILES,
-                data: profiles
-            },
+            ...actions,
             {
                 type: UsersTypes.SEARCH_PROFILES_SUCCESS
             }
