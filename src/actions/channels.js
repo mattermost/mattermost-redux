@@ -676,28 +676,26 @@ export function markChannelAsUnread(channelId, mentionsArray) {
             const channel = {...channels[channelId]};
             const member = {...myMembers[channelId]};
 
-            if (channel && member) {
-                channel.total_msg_count++;
-                if (member.notify_props && member.notify_props.mark_unread === Constants.MENTION) {
-                    member.msg_count++;
-                }
-
-                let mentions = [];
-                if (mentionsArray) {
-                    mentions = JSON.parse(mentionsArray);
-                    if (mentions.indexOf(currentUserId) !== -1) {
-                        member.mention_count++;
-                    }
-                }
-
-                dispatch(batchActions([{
-                    type: ChannelTypes.RECEIVED_MY_CHANNEL_MEMBER,
-                    data: member
-                }, {
-                    type: ChannelTypes.RECEIVED_CHANNEL,
-                    data: channel
-                }]), getState);
+            channel.total_msg_count++;
+            if (member.notify_props && member.notify_props.mark_unread === Constants.MENTION) {
+                member.msg_count++;
             }
+
+            let mentions = [];
+            if (mentionsArray) {
+                mentions = JSON.parse(mentionsArray);
+                if (mentions.indexOf(currentUserId) !== -1) {
+                    member.mention_count++;
+                }
+            }
+
+            dispatch(batchActions([{
+                type: ChannelTypes.RECEIVED_MY_CHANNEL_MEMBER,
+                data: member
+            }, {
+                type: ChannelTypes.RECEIVED_CHANNEL,
+                data: channel
+            }]), getState);
         }
     };
 }
