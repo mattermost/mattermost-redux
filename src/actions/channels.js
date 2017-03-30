@@ -670,30 +670,34 @@ export function markChannelAsUnread(channelId, mentionsArray) {
         const state = getState();
         const {channels, myMembers} = state.entities.channels;
         const {currentUserId} = state.entities.users;
-        const channel = {...channels[channelId]};
-        const member = {...myMembers[channelId]};
 
-        if (channel && member) {
-            channel.total_msg_count++;
-            if (member.notify_props && member.notify_props.mark_unread === Constants.MENTION) {
-                member.msg_count++;
-            }
+        // if we have the channel and the channel member in the store
+        if (channels[channelId] && myMembers[channelId]) {
+            const channel = {...channels[channelId]};
+            const member = {...myMembers[channelId]};
 
-            let mentions = [];
-            if (mentionsArray) {
-                mentions = JSON.parse(mentionsArray);
-                if (mentions.indexOf(currentUserId) !== -1) {
-                    member.mention_count++;
+            if (channel && member) {
+                channel.total_msg_count++;
+                if (member.notify_props && member.notify_props.mark_unread === Constants.MENTION) {
+                    member.msg_count++;
                 }
-            }
 
-            dispatch(batchActions([{
-                type: ChannelTypes.RECEIVED_MY_CHANNEL_MEMBER,
-                data: member
-            }, {
-                type: ChannelTypes.RECEIVED_CHANNEL,
-                data: channel
-            }]), getState);
+                let mentions = [];
+                if (mentionsArray) {
+                    mentions = JSON.parse(mentionsArray);
+                    if (mentions.indexOf(currentUserId) !== -1) {
+                        member.mention_count++;
+                    }
+                }
+
+                dispatch(batchActions([{
+                    type: ChannelTypes.RECEIVED_MY_CHANNEL_MEMBER,
+                    data: member
+                }, {
+                    type: ChannelTypes.RECEIVED_CHANNEL,
+                    data: channel
+                }]), getState);
+            }
         }
     };
 }
