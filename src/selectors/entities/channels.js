@@ -3,8 +3,8 @@
 
 import {createSelector} from 'reselect';
 import {getCurrentTeamId, getCurrentTeamMembership} from 'selectors/entities/teams';
-import {getCurrentUserId, getUsers} from 'selectors/entities/users';
-import {buildDisplayableChannelList, getNotMemberChannels, completeDirectChannelInfo} from 'utils/channel_utils';
+import {getCurrentUser, getCurrentUserId, getUsers} from 'selectors/entities/users';
+import {buildDisplayableChannelList, getNotMemberChannels, completeDirectChannelInfo, sortChannelsByDisplayName} from 'utils/channel_utils';
 import {General} from 'constants';
 
 function getAllChannels(state) {
@@ -13,6 +13,10 @@ function getAllChannels(state) {
 
 function getAllChannelStats(state) {
     return state.entities.channels.stats;
+}
+
+export function getChannelsInTeam(state) {
+    return state.entities.channels.channelsInTeam;
 }
 
 export function getCurrentChannelId(state) {
@@ -53,25 +57,39 @@ export const getCurrentChannelStats = createSelector(
     }
 );
 
-export const getChannelsOnCurrentTeam = createSelector(
-    getAllChannels,
+export const getChannelSetInCurrentTeam = createSelector(
     getCurrentTeamId,
-    (allChannels, currentTeamId) => {
-        const channels = [];
+    getChannelsInTeam,
+    (currentTeamId, channelsInTeam) => {
+        return channelsInTeam[currentTeamId];
+    }
+);
 
-        for (const channel of Object.values(allChannels)) {
-            if (channel.team_id === currentTeamId || channel.team_id === '') {
-                channels.push(channel);
-            }
-        }
+function sortAndInjectChannels(channels, channelSet, locale) {
+    const currentChannels = [];
+    if (typeof channelSet === 'undefined') {
+        return currentChannels;
+    }
 
-        return channels;
+    channelSet.forEach((c) => {
+        currentChannels.push(channels[c]);
+    });
+
+    return currentChannels.sort(sortChannelsByDisplayName.bind(null, locale));
+}
+
+export const getChannelsInCurrentTeam = createSelector(
+    getAllChannels,
+    getChannelSetInCurrentTeam,
+    getCurrentUser,
+    (channels, currentTeamChannelSet, currentUser) => {
+        return sortAndInjectChannels(channels, currentTeamChannelSet, currentUser.locale);
     }
 );
 
 export const getChannelsByCategory = createSelector(
     getCurrentChannelId,
-    getChannelsOnCurrentTeam,
+    getChannelsInCurrentTeam,
     (state) => state.entities.channels.myMembers,
     (state) => state.entities.users,
     (state) => state.entities.preferences.myPreferences,

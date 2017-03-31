@@ -300,6 +300,7 @@ export function fetchMyChannelsAndMembers(teamId) {
         dispatch(batchActions([
             {
                 type: ChannelTypes.RECEIVED_CHANNELS,
+                teamId,
                 data: channels
             },
             {
@@ -499,6 +500,7 @@ export function getChannels(teamId, page = 0, perPage = General.CHANNELS_CHUNK_S
         dispatch(batchActions([
             {
                 type: ChannelTypes.RECEIVED_CHANNELS,
+                teamId,
                 data: await channels
             },
             {
@@ -529,6 +531,7 @@ export function searchMoreChannels(teamId, term) {
         dispatch(batchActions([
             {
                 type: ChannelTypes.RECEIVED_CHANNELS,
+                teamId,
                 data: await channels
             },
             {
