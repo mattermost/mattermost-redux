@@ -53,9 +53,9 @@ describe('Actions.Websocket', () => {
         await client.createPost(post);
 
         const entities = store.getState().entities;
-        const {posts, postsByChannel} = entities.posts;
+        const {posts, postsInChannel} = entities.posts;
         const channelId = TestHelper.basicChannel.id;
-        const postId = postsByChannel[channelId][0];
+        const postId = postsInChannel[channelId][0];
 
         assert.ok(posts[postId].message.indexOf('Unit Test') > -1);
     });

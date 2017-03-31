@@ -459,8 +459,8 @@ function handleUserTypingEvent(msg, dispatch, getState) {
 // Helpers
 
 function loadPostsHelper(teamId, channelId, dispatch, getState) {
-    const {posts, postsByChannel} = getState().entities.posts;
-    const postsArray = postsByChannel[channelId];
+    const {posts, postsInChannel} = getState().entities.posts;
+    const postsArray = postsInChannel[channelId];
     const latestPostId = postsArray[postsArray.length - 1];
 
     let latestPostTime = 0;

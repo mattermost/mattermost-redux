@@ -38,10 +38,10 @@ describe('Actions.Posts', () => {
             throw new Error(JSON.stringify(createRequest.error));
         }
 
-        const {posts, postsByChannel} = state.entities.posts;
+        const {posts, postsInChannel} = state.entities.posts;
         assert.ok(posts);
-        assert.ok(postsByChannel);
-        assert.ok(postsByChannel[channelId]);
+        assert.ok(postsInChannel);
+        assert.ok(postsInChannel[channelId]);
 
         let found = false;
         for (const storedPost of Object.values(posts)) {
@@ -53,13 +53,13 @@ describe('Actions.Posts', () => {
         assert.ok(found, 'failed to find new post in posts');
 
         found = false;
-        for (const postIdInChannel of postsByChannel[channelId]) {
+        for (const postIdInChannel of postsInChannel[channelId]) {
             if (posts[postIdInChannel].message === post.message) {
                 found = true;
                 break;
             }
         }
-        assert.ok(found, 'failed to find new post in postsByChannel');
+        assert.ok(found, 'failed to find new post in postsInChannel');
     });
 
     it('createPost with file attachments', async () => {
@@ -138,7 +138,7 @@ describe('Actions.Posts', () => {
         await Actions.createPost(TestHelper.fakePost(channelId))(store.dispatch, store.getState);
 
         const initialPosts = store.getState().entities.posts;
-        const created = initialPosts.posts[initialPosts.postsByChannel[channelId][0]];
+        const created = initialPosts.posts[initialPosts.postsInChannel[channelId][0]];
 
         await Actions.deletePost(created)(store.dispatch, store.getState);
 
@@ -171,20 +171,20 @@ describe('Actions.Posts', () => {
             channelId
         )(store.dispatch, store.getState);
 
-        const postsCount = store.getState().entities.posts.postsByChannel[channelId].length;
+        const postsCount = store.getState().entities.posts.postsInChannel[channelId].length;
 
         await Actions.removePost(
             TestHelper.basicPost
         )(store.dispatch, store.getState);
 
-        const {posts, postsByChannel} = store.getState().entities.posts;
+        const {posts, postsInChannel} = store.getState().entities.posts;
 
         assert.ok(posts);
-        assert.ok(postsByChannel);
-        assert.ok(postsByChannel[channelId]);
+        assert.ok(postsInChannel);
+        assert.ok(postsInChannel[channelId]);
 
         // this should count that the basic post and post1a were removed
-        assert.equal(postsByChannel[channelId].length, postsCount - 2);
+        assert.equal(postsInChannel[channelId].length, postsCount - 2);
         assert.ok(!posts[postId]);
         assert.ok(!posts[post1a.id]);
     });
@@ -200,26 +200,26 @@ describe('Actions.Posts', () => {
 
         const state = store.getState();
         const getRequest = state.requests.posts.getPostThread;
-        const {posts, postsByChannel} = state.entities.posts;
+        const {posts, postsInChannel} = state.entities.posts;
 
         if (getRequest.status === RequestStatus.FAILURE) {
             throw new Error(JSON.stringify(getRequest.error));
         }
 
         assert.ok(posts);
-        assert.ok(postsByChannel);
-        assert.ok(postsByChannel[channelId]);
+        assert.ok(postsInChannel);
+        assert.ok(postsInChannel[channelId]);
 
         assert.ok(posts[post.id]);
 
         let found = false;
-        for (const postIdInChannel of postsByChannel[channelId]) {
+        for (const postIdInChannel of postsInChannel[channelId]) {
             if (postIdInChannel === post.id) {
                 found = true;
                 break;
             }
         }
-        assert.ok(found, 'failed to find post in postsByChannel');
+        assert.ok(found, 'failed to find post in postsInChannel');
     });
 
     it('getPosts', async () => {
@@ -247,20 +247,20 @@ describe('Actions.Posts', () => {
 
         const state = store.getState();
         const getRequest = state.requests.posts.getPosts;
-        const {posts, postsByChannel} = state.entities.posts;
+        const {posts, postsInChannel} = state.entities.posts;
 
         if (getRequest.status === RequestStatus.FAILURE) {
             throw new Error(JSON.stringify(getRequest.error));
         }
 
         assert.ok(posts);
-        assert.ok(postsByChannel);
-
-        const postsInChannel = postsByChannel[channelId];
         assert.ok(postsInChannel);
-        assert.equal(postsInChannel[0], post3a.id, 'wrong order for post3a');
-        assert.equal(postsInChannel[1], post3.id, 'wrong order for post3');
-        assert.equal(postsInChannel[3], post1a.id, 'wrong order for post1a');
+
+        const postsForChannel = postsInChannel[channelId];
+        assert.ok(postsForChannel);
+        assert.equal(postsForChannel[0], post3a.id, 'wrong order for post3a');
+        assert.equal(postsForChannel[1], post3.id, 'wrong order for post3');
+        assert.equal(postsForChannel[3], post1a.id, 'wrong order for post1a');
 
         assert.ok(posts[post1.id]);
         assert.ok(posts[post1a.id]);
@@ -295,20 +295,20 @@ describe('Actions.Posts', () => {
 
         const state = store.getState();
         const getRequest = state.requests.posts.getPostsSince;
-        const {posts, postsByChannel} = state.entities.posts;
+        const {posts, postsInChannel} = state.entities.posts;
 
         if (getRequest.status === RequestStatus.FAILURE) {
             throw new Error(JSON.stringify(getRequest.error));
         }
 
         assert.ok(posts);
-        assert.ok(postsByChannel);
-
-        const postsInChannel = postsByChannel[channelId];
         assert.ok(postsInChannel);
-        assert.equal(postsInChannel[0], post3a.id, 'wrong order for post3a');
-        assert.equal(postsInChannel[1], post3.id, 'wrong order for post3');
-        assert.equal(postsInChannel.length, 2, 'wrong size');
+
+        const postsForChannel = postsInChannel[channelId];
+        assert.ok(postsForChannel);
+        assert.equal(postsForChannel[0], post3a.id, 'wrong order for post3a');
+        assert.equal(postsForChannel[1], post3.id, 'wrong order for post3');
+        assert.equal(postsForChannel.length, 2, 'wrong size');
     });
 
     it('getPostsBefore', async () => {
@@ -339,20 +339,20 @@ describe('Actions.Posts', () => {
 
         const state = store.getState();
         const getRequest = state.requests.posts.getPostsBefore;
-        const {posts, postsByChannel} = state.entities.posts;
+        const {posts, postsInChannel} = state.entities.posts;
 
         if (getRequest.status === RequestStatus.FAILURE) {
             throw new Error(JSON.stringify(getRequest.error));
         }
 
         assert.ok(posts);
-        assert.ok(postsByChannel);
-
-        const postsInChannel = postsByChannel[channelId];
         assert.ok(postsInChannel);
-        assert.equal(postsInChannel[0], post1a.id, 'wrong order for post1a');
-        assert.equal(postsInChannel[1], post1.id, 'wrong order for post1');
-        assert.equal(postsInChannel.length, 10, 'wrong size');
+
+        const postsForChannel = postsInChannel[channelId];
+        assert.ok(postsForChannel);
+        assert.equal(postsForChannel[0], post1a.id, 'wrong order for post1a');
+        assert.equal(postsForChannel[1], post1.id, 'wrong order for post1');
+        assert.equal(postsForChannel.length, 10, 'wrong size');
     });
 
     it('getPostsAfter', async () => {
@@ -383,20 +383,20 @@ describe('Actions.Posts', () => {
 
         const state = store.getState();
         const getRequest = state.requests.posts.getPostsAfter;
-        const {posts, postsByChannel} = state.entities.posts;
+        const {posts, postsInChannel} = state.entities.posts;
 
         if (getRequest.status === RequestStatus.FAILURE) {
             throw new Error(JSON.stringify(getRequest.error));
         }
 
         assert.ok(posts);
-        assert.ok(postsByChannel);
-
-        const postsInChannel = postsByChannel[channelId];
         assert.ok(postsInChannel);
-        assert.equal(postsInChannel[0], post3a.id, 'wrong order for post3a');
-        assert.equal(postsInChannel[1], post3.id, 'wrong order for post3');
-        assert.equal(postsInChannel.length, 2, 'wrong size');
+
+        const postsForChannel = postsInChannel[channelId];
+        assert.ok(postsForChannel);
+        assert.equal(postsForChannel[0], post3a.id, 'wrong order for post3a');
+        assert.equal(postsForChannel[1], post3.id, 'wrong order for post3');
+        assert.equal(postsForChannel.length, 2, 'wrong size');
     });
 
     it('flagPost', async () => {

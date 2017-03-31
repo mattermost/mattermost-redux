@@ -4,7 +4,7 @@
 import {PostTypes, UserTypes} from 'action_types';
 import {Posts} from 'constants';
 
-function handleReceivedPost(posts = {}, postsByChannel = {}, action) {
+function handleReceivedPost(posts = {}, postsInChannel = {}, action) {
     const post = action.data;
     const channelId = post.channel_id;
 
@@ -13,30 +13,30 @@ function handleReceivedPost(posts = {}, postsByChannel = {}, action) {
         [post.id]: post
     };
 
-    let nextPostsByChannel = postsByChannel;
+    let nextPostsForChannel = postsInChannel;
 
-    // Only change postsByChannel if the order of the posts needs to change
-    if (!postsByChannel[channelId] || postsByChannel[channelId].indexOf(post.id) === -1) {
+    // Only change postsInChannel if the order of the posts needs to change
+    if (!postsInChannel[channelId] || postsInChannel[channelId].indexOf(post.id) === -1) {
         // If we don't already have the post, assume it's the most recent one
-        const postsInChannel = postsByChannel[channelId] || [];
+        const postsForChannel = postsInChannel[channelId] || [];
 
-        nextPostsByChannel = {...postsByChannel};
-        nextPostsByChannel[channelId] = [
+        nextPostsForChannel = {...postsInChannel};
+        nextPostsForChannel[channelId] = [
             post.id,
-            ...postsInChannel
+            ...postsForChannel
         ];
     }
 
-    return {posts: nextPosts, postsByChannel: nextPostsByChannel};
+    return {posts: nextPosts, postsInChannel: nextPostsForChannel};
 }
 
-function handleReceivedPosts(posts = {}, postsByChannel = {}, action) {
+function handleReceivedPosts(posts = {}, postsInChannel = {}, action) {
     const newPosts = action.data.posts;
     const channelId = action.channelId;
 
     const nextPosts = {...posts};
-    const nextPostsByChannel = {...postsByChannel};
-    const postsInChannel = postsByChannel[channelId] ? [...postsByChannel[channelId]] : [];
+    const nextPostsForChannel = {...postsInChannel};
+    const postsForChannel = postsInChannel[channelId] ? [...postsInChannel[channelId]] : [];
 
     for (const newPost of Object.values(newPosts)) {
         if (newPost.delete_at > 0) {
@@ -48,14 +48,14 @@ function handleReceivedPosts(posts = {}, postsByChannel = {}, action) {
             nextPosts[newPost.id] = newPost;
         }
 
-        if (postsInChannel.indexOf(newPost.id) === -1) {
+        if (postsForChannel.indexOf(newPost.id) === -1) {
             // Just add the post id to the end of the order and we'll sort it out later
-            postsInChannel.push(newPost.id);
+            postsForChannel.push(newPost.id);
         }
     }
 
     // Sort to ensure that the most recent posts are first
-    postsInChannel.sort((a, b) => {
+    postsForChannel.sort((a, b) => {
         if (nextPosts[a].create_at > nextPosts[b].create_at) {
             return -1;
         } else if (nextPosts[a].create_at < nextPosts[b].create_at) {
@@ -65,12 +65,12 @@ function handleReceivedPosts(posts = {}, postsByChannel = {}, action) {
         return 0;
     });
 
-    nextPostsByChannel[channelId] = postsInChannel;
+    nextPostsForChannel[channelId] = postsForChannel;
 
-    return {posts: nextPosts, postsByChannel: nextPostsByChannel};
+    return {posts: nextPosts, postsInChannel: nextPostsForChannel};
 }
 
-function handlePostDeleted(posts = {}, postsByChannel = {}, action) {
+function handlePostDeleted(posts = {}, postsInChannel = {}, action) {
     const post = action.data;
 
     let nextPosts = posts;
@@ -89,68 +89,68 @@ function handlePostDeleted(posts = {}, postsByChannel = {}, action) {
         // No changes to the order until the user actually removes the post
     }
 
-    return {posts: nextPosts, postsByChannel};
+    return {posts: nextPosts, postsInChannel};
 }
 
-function handleRemovePost(posts = {}, postsByChannel = {}, action) {
+function handleRemovePost(posts = {}, postsInChannel = {}, action) {
     const post = action.data;
     const channelId = post.channel_id;
 
     let nextPosts = posts;
-    let nextPostsByChannel = postsByChannel;
+    let nextPostsForChannel = postsInChannel;
 
     // We only need to do something if already have the post
     if (nextPosts[post.id]) {
         nextPosts = {...posts};
-        nextPostsByChannel = {...postsByChannel};
-        const postsInChannel = postsByChannel[channelId] ? [...postsByChannel[channelId]] : [];
+        nextPostsForChannel = {...postsInChannel};
+        const postsForChannel = postsInChannel[channelId] ? [...postsInChannel[channelId]] : [];
 
         // Remove the post itself
         Reflect.deleteProperty(nextPosts, post.id);
 
-        const index = postsInChannel.indexOf(post.id);
+        const index = postsForChannel.indexOf(post.id);
         if (index !== -1) {
-            postsInChannel.splice(index, 1);
+            postsForChannel.splice(index, 1);
         }
 
         // Remove any of its comments
-        for (const id of postsInChannel) {
+        for (const id of postsForChannel) {
             if (nextPosts[id].root_id === post.id) {
                 Reflect.deleteProperty(nextPosts, id);
 
-                const commentIndex = postsInChannel.indexOf(id);
+                const commentIndex = postsForChannel.indexOf(id);
                 if (commentIndex !== -1) {
-                    postsInChannel.splice(commentIndex, 1);
+                    postsForChannel.splice(commentIndex, 1);
                 }
             }
         }
 
-        nextPostsByChannel[channelId] = postsInChannel;
+        nextPostsForChannel[channelId] = postsForChannel;
     }
 
-    return {posts: nextPosts, postsByChannel: nextPostsByChannel};
+    return {posts: nextPosts, postsInChannel: nextPostsForChannel};
 }
 
-function handlePosts(posts = {}, postsByChannel = {}, action) {
+function handlePosts(posts = {}, postsInChannel = {}, action) {
     switch (action.type) {
     case PostTypes.RECEIVED_POST:
-        return handleReceivedPost(posts, postsByChannel, action);
+        return handleReceivedPost(posts, postsInChannel, action);
     case PostTypes.RECEIVED_POSTS:
-        return handleReceivedPosts(posts, postsByChannel, action);
+        return handleReceivedPosts(posts, postsInChannel, action);
     case PostTypes.POST_DELETED:
-        return handlePostDeleted(posts, postsByChannel, action);
+        return handlePostDeleted(posts, postsInChannel, action);
     case PostTypes.REMOVE_POST:
-        return handleRemovePost(posts, postsByChannel, action);
+        return handleRemovePost(posts, postsInChannel, action);
 
     case UserTypes.LOGOUT_SUCCESS:
         return {
             posts: {},
-            postsByChannel: {}
+            postsInChannel: {}
         };
     default:
         return {
             posts,
-            postsByChannel
+            postsInChannel
         };
     }
 }
@@ -176,7 +176,7 @@ function currentFocusedPostId(state = '', action) {
 }
 
 export default function(state = {}, action) {
-    const {posts, postsByChannel} = handlePosts(state.posts, state.postsByChannel, action);
+    const {posts, postsInChannel} = handlePosts(state.posts, state.postsInChannel, action);
 
     const nextState = {
 
@@ -184,7 +184,7 @@ export default function(state = {}, action) {
         posts,
 
         // Object mapping channel ids to an list of posts ids in that channel with the most recent post first
-        postsByChannel,
+        postsInChannel,
 
         // The current selected post
         selectedPostId: selectedPostId(state.selectedPostId, action),
@@ -193,7 +193,7 @@ export default function(state = {}, action) {
         currentFocusedPostId: currentFocusedPostId(state.currentFocusedPostId, action)
     };
 
-    if (state.posts === nextState.posts && state.postsByChannel === nextState.postsByChannel &&
+    if (state.posts === nextState.posts && state.postsInChannel === nextState.postsInChannel &&
         state.selectedPostId === nextState.selectedPostId &&
         state.currentFocusedPostId === nextState.currentFocusedPostId) {
         // None of the children have changed so don't even let the parent object change

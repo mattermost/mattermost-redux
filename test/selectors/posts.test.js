@@ -20,7 +20,7 @@ describe('Selectors.Posts', () => {
             entities: {
                 posts: {
                     posts,
-                    postsByChannel: {
+                    postsInChannel: {
                         1: ['a', 'b', 'c', 'd', 'e', 'f']
                     }
                 }
