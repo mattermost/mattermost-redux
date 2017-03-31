@@ -70,9 +70,18 @@ class WebSocketClient {
                 this.connectingCallback(dispatch, getState);
             }
 
-            const regex = platform === 'android' ? /^(?:https?|wss?):\/\/[^/]*[^!(:443)]/ : /^(?:https?|wss?):\/\/[^/]*/;
+            const regex = /^(?:https?|wss?):\/\/[^/]*/;
             const captured = (regex).exec(connectionUrl);
-            const origin = captured ? captured[0] : null;
+            let origin = captured[0];
+            if (platform === 'android') {
+                // this is done cause for android having the port 80 or 443 will fail the connection
+                // the websocket will append them
+                const split = origin.split(':');
+                const port = split[2];
+                if (port === '80' || port === '443') {
+                    origin = `${split[0]}:${split[1]}`;
+                }
+            }
 
             this.conn = new Socket(connectionUrl, null, {origin});
             this.connectionUrl = connectionUrl;

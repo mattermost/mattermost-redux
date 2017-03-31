@@ -214,18 +214,18 @@ function sortChannelsByDisplayName(locale, a, b) {
     }
 
     if (a.display_name !== b.display_name) {
-        return a.display_name.localeCompare(b.display_name, locale, {numeric: true});
+        return a.display_name.toLowerCase().localeCompare(b.display_name.toLowerCase(), locale, {numeric: true});
     }
 
-    return a.name.localeCompare(b.name, locale, {numeric: true});
+    return a.name.toLowerCase().localeCompare(b.name.toLowerCase(), locale, {numeric: true});
 }
 
 function sortFavorites(locale, a, b) {
     if (a.display_name !== b.display_name) {
-        return a.display_name.localeCompare(b.display_name, locale, {numeric: true});
+        return a.display_name.toLowerCase().localeCompare(b.display_name.toLowerCase(), locale, {numeric: true});
     }
 
-    return a.name.localeCompare(b.name, locale, {numeric: true});
+    return a.name.toLowerCase().localeCompare(b.name.toLowerCase(), locale, {numeric: true});
 }
 
 function not(f) {

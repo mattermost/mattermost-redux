@@ -102,13 +102,17 @@ function sortAndInjectProfiles(profiles, profileSet) {
 export const getProfilesInCurrentChannel = createSelector(
     getUsers,
     getProfileSetInCurrentChannel,
-    (profiles, currentChannelProfileSet) => sortAndInjectProfiles(profiles, currentChannelProfileSet)
+    (profiles, currentChannelProfileSet) => {
+        return sortAndInjectProfiles(profiles, currentChannelProfileSet);
+    }
 );
 
 export const getProfilesNotInCurrentChannel = createSelector(
     getUsers,
     getProfileSetNotInCurrentChannel,
-    (profiles, notInCurrentChannelProfileSet) => sortAndInjectProfiles(profiles, notInCurrentChannelProfileSet)
+    (profiles, notInCurrentChannelProfileSet) => {
+        return sortAndInjectProfiles(profiles, notInCurrentChannelProfileSet);
+    }
 );
 
 export function getStatusForUserId(state, userId) {

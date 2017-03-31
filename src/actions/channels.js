@@ -688,10 +688,12 @@ export function markChannelAsUnread(channelId, mentionsArray) {
         const state = getState();
         const {channels, myMembers} = state.entities.channels;
         const {currentUserId} = state.entities.users;
-        const channel = {...channels[channelId]};
-        const member = {...myMembers[channelId]};
 
-        if (channel && member) {
+        // if we have the channel and the channel member in the store
+        if (channels[channelId] && myMembers[channelId]) {
+            const channel = {...channels[channelId]};
+            const member = {...myMembers[channelId]};
+
             channel.total_msg_count++;
             if (member.notify_props && member.notify_props.mark_unread === General.MENTION) {
                 member.msg_count++;

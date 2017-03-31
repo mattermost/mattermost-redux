@@ -519,7 +519,7 @@ export function autocompleteUsersInChannel(teamId, channelId, term) {
     };
 }
 
-export function searchProfiles(term, options) {
+export function searchProfiles(term, options = {}) {
     return async (dispatch, getState) => {
         dispatch({type: UserTypes.SEARCH_PROFILES_REQUEST}, getState);
 
@@ -527,7 +527,7 @@ export function searchProfiles(term, options) {
 
         let profiles;
         try {
-            profiles = await Client4.searchUsers(term, options || {});
+            profiles = await Client4.searchUsers(term, options);
             removeUserFromList(currentUserId, profiles);
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch);
@@ -538,11 +538,34 @@ export function searchProfiles(term, options) {
             return null;
         }
 
+        const actions = [{type: UserTypes.RECEIVED_PROFILES_LIST, data: profiles}];
+
+        if (options.in_channel_id) {
+            actions.push({
+                type: UserTypes.RECEIVED_PROFILES_LIST_IN_CHANNEL,
+                data: profiles,
+                id: options.in_channel_id
+            });
+        }
+
+        if (options.not_in_channel_id) {
+            actions.push({
+                type: UserTypes.RECEIVED_PROFILES_LIST_NOT_IN_CHANNEL,
+                data: profiles,
+                id: options.not_in_channel_id
+            });
+        }
+
+        if (options.team_id) {
+            actions.push({
+                type: UserTypes.RECEIVED_PROFILES_LIST_IN_TEAM,
+                data: profiles,
+                id: options.team_id
+            });
+        }
+
         dispatch(batchActions([
-            {
-                type: UserTypes.RECEIVED_PROFILES_LIST,
-                data: profiles
-            },
+            ...actions,
             {
                 type: UserTypes.SEARCH_PROFILES_SUCCESS
             }
