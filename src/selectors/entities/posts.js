@@ -8,7 +8,7 @@ export function getAllPosts(state) {
 }
 
 function getPostIdsInCurrentChannel(state) {
-    return state.entities.posts.postsByChannel[state.entities.channels.currentChannelId] || [];
+    return state.entities.posts.postsInChannel[state.entities.channels.currentChannelId] || [];
 }
 
 export const getPostsInCurrentChannel = createSelector(
@@ -25,7 +25,7 @@ export const getPostsInCurrentChannel = createSelector(
 export function makeGetPostsForThread() {
     return createSelector(
         getAllPosts,
-        (state, props) => state.entities.posts.postsByChannel[props.channelId],
+        (state, props) => state.entities.posts.postsInChannel[props.channelId],
         (state, props) => props,
         (posts, postIds, {rootId}) => {
             const thread = [];

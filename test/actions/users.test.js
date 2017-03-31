@@ -104,7 +104,7 @@ describe('Actions.Users', () => {
         assert.strictEqual(posts.selectedPostId, '', 'selected post id is not empty');
         assert.strictEqual(posts.currentFocusedPostId, '', 'current focused post id is not empty');
         assert.deepStrictEqual(posts.posts, {}, 'posts is not empty');
-        assert.deepStrictEqual(posts.postsByChannel, {}, 'posts by channel is not empty');
+        assert.deepStrictEqual(posts.postsInChannel, {}, 'posts by channel is not empty');
         assert.deepStrictEqual(preferences.myPreferences, {}, 'user preferences not empty');
     });
 
