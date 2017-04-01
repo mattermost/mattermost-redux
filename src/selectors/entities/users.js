@@ -3,7 +3,7 @@
 
 import {createSelector} from 'reselect';
 
-import {getCurrentChannelId, getCurrentChannelMembership} from './channels';
+import {getCurrentChannelId, getMyCurrentChannelMembership} from './channels';
 import {getCurrentTeamMembership} from './teams';
 
 export function getCurrentUserId(state) {
@@ -51,7 +51,7 @@ export function getCurrentUser(state) {
 }
 
 export const getCurrentUserRoles = createSelector(
-    getCurrentChannelMembership,
+    getMyCurrentChannelMembership,
     getCurrentTeamMembership,
     getCurrentUser,
     (currentChannelMembership, currentTeamMembership, currentUser) => {

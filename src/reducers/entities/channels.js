@@ -20,7 +20,7 @@ function channelListToSet(state, action) {
 function removeChannelFromSet(state, action) {
     const id = action.data.team_id;
     const nextSet = new Set(state[id]);
-    nextSet.delete(action.data);
+    nextSet.delete(action.data.id);
     return {
         ...state,
         [id]: nextSet
@@ -55,7 +55,7 @@ function channels(state = {}, action) {
         return nextState;
     }
     case ChannelTypes.RECEIVED_CHANNEL_DELETED:
-        Reflect.deleteProperty(nextState, action.data);
+        Reflect.deleteProperty(nextState, action.data.id);
         return nextState;
     case ChannelTypes.RECEIVED_LAST_VIEWED: {
         const channelId = action.data.channel_id;
@@ -166,11 +166,43 @@ function myMembers(state = {}, action) {
     }
     case ChannelTypes.LEAVE_CHANNEL:
     case ChannelTypes.RECEIVED_CHANNEL_DELETED:
-        Reflect.deleteProperty(nextState, action.data);
+        Reflect.deleteProperty(nextState, action.data.id);
         return nextState;
 
     case UserTypes.LOGOUT_SUCCESS:
     case TeamTypes.SELECT_TEAM:
+        return {};
+    default:
+        return state;
+    }
+}
+
+function members(state = {}, action) {
+    const nextState = {...state};
+
+    switch (action.type) {
+    case ChannelTypes.RECEIVED_MY_CHANNEL_MEMBER:
+    case ChannelTypes.RECEIVED_CHANNEL_MEMBER: {
+        const channelMember = action.data;
+        return {
+            ...state,
+            [channelMember.channel_id + channelMember.user_id]: channelMember
+        };
+    }
+    case ChannelTypes.RECEIVED_MY_CHANNEL_MEMBERS:
+    case ChannelTypes.RECEIVED_CHANNEL_MEMBERS: {
+        for (const cm of action.data) {
+            nextState[cm.channel_id + cm.user_id] = cm;
+        }
+        return nextState;
+    }
+
+    case ChannelTypes.LEAVE_CHANNEL:
+    case UserTypes.RECEIVED_PROFILE_NOT_IN_CHANNEL:
+        Reflect.deleteProperty(nextState, action.data.id + action.data.user_id);
+        return nextState;
+
+    case UserTypes.LOGOUT_SUCCESS:
         return {};
     default:
         return state;
@@ -205,8 +237,11 @@ export default combineReducers({
     // object where every key is a team id and has set of channel ids that are on the team
     channelsInTeam,
 
-    // object where every key is the channel id and has and object with the channel members detail
+    // object where every key is the channel id and has an object with the channel members detail
     myMembers,
+
+    // object where every key is the channel id concatenated with the user id and has an object with the channel members detail
+    members,
 
     // object where every key is the channel id and has an object with the channel stats
     stats

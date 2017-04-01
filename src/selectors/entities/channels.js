@@ -23,8 +23,12 @@ export function getCurrentChannelId(state) {
     return state.entities.channels.currentChannelId;
 }
 
-export function getChannelMemberships(state) {
+export function getMyChannelMemberships(state) {
     return state.entities.channels.myMembers;
+}
+
+export function getChannelMembers(state) {
+    return state.entities.channels.members;
 }
 
 export const getCurrentChannel = createSelector(
@@ -41,9 +45,9 @@ export const getCurrentChannel = createSelector(
     }
 );
 
-export const getCurrentChannelMembership = createSelector(
+export const getMyCurrentChannelMembership = createSelector(
     getCurrentChannelId,
-    getChannelMemberships,
+    getMyChannelMemberships,
     (currentChannelId, channelMemberships) => {
         return channelMemberships[currentChannelId] || {};
     }
@@ -114,16 +118,24 @@ export const getDefaultChannel = createSelector(
 
 export const getMoreChannels = createSelector(
     getAllChannels,
-    getChannelMemberships,
+    getMyChannelMemberships,
     (allChannels, myMembers) => {
         return getNotMemberChannels(Object.values(allChannels), myMembers);
+    }
+);
+
+export const getMembersInCurrentChannel = createSelector(
+    getCurrentChannelId,
+    getChannelMembers,
+    (currentChannelId, members) => {
+        return Object.values(members).filter((m) => m.channel_id === currentChannelId);
     }
 );
 
 export const getUnreads = createSelector(
     getCurrentChannelId,
     getAllChannels,
-    getChannelMemberships,
+    getMyChannelMemberships,
     (currentChannelId, channels, myMembers) => {
         let messageCount = 0;
         let mentionCount = 0;
@@ -148,7 +160,7 @@ export const getUnreads = createSelector(
 
 export const canManageChannelMembers = createSelector(
     getCurrentChannel,
-    getCurrentChannelMembership,
+    getMyCurrentChannelMembership,
     getCurrentTeamMembership,
     getUsers,
     getCurrentUserId,

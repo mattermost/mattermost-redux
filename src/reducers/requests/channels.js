@@ -28,6 +28,16 @@ function myChannels(state = initialRequestState(), action) {
 
 function myMembers(state = initialRequestState(), action) {
     return handleRequest(
+        ChannelTypes.CHANNEL_MY_MEMBERS_REQUEST,
+        ChannelTypes.CHANNEL_MY_MEMBERS_SUCCESS,
+        ChannelTypes.CHANNEL_MY_MEMBERS_FAILURE,
+        state,
+        action
+    );
+}
+
+function members(state = initialRequestState(), action) {
+    return handleRequest(
         ChannelTypes.CHANNEL_MEMBERS_REQUEST,
         ChannelTypes.CHANNEL_MEMBERS_SUCCESS,
         ChannelTypes.CHANNEL_MEMBERS_FAILURE,
@@ -150,6 +160,7 @@ export default combineReducers({
     getChannel,
     getChannels,
     myMembers,
+    members,
     myChannels,
     createChannel,
     updateChannel,
