@@ -70,7 +70,15 @@ class TestHelper {
             email: this.fakeEmail(),
             allow_marketing: true,
             password: PASSWORD,
+            locale: 'en',
             username: this.generateId()
+        };
+    };
+
+    fakeUserWithId = () => {
+        return {
+            ...this.fakeUser(),
+            id: this.generateId()
         };
     };
 
@@ -91,6 +99,13 @@ class TestHelper {
         };
     };
 
+    fakeTeamWithId = () => {
+        return {
+            ...this.fakeTeam(),
+            id: this.generateId()
+        };
+    };
+
     fakeChannel = (teamId) => {
         const name = this.generateId();
 
@@ -99,6 +114,13 @@ class TestHelper {
             team_id: teamId,
             display_name: `Unit Test ${name}`,
             type: 'O'
+        };
+    };
+
+    fakeChannelWithId = (teamId) => {
+        return {
+            ...this.fakeChannel(teamId),
+            id: this.generateId()
         };
     };
 

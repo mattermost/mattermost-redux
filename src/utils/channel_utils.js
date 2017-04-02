@@ -208,7 +208,7 @@ function isPrivateChannel(channel) {
     return channel.type === General.PRIVATE_CHANNEL;
 }
 
-function sortChannelsByDisplayName(locale, a, b) {
+export function sortChannelsByDisplayName(locale, a, b) {
     if (a.type !== b.type && typeToPrefixMap[a.type] !== typeToPrefixMap[b.type]) {
         return (typeToPrefixMap[a.type] || defaultPrefix).localeCompare((typeToPrefixMap[b.type] || defaultPrefix), locale);
     }

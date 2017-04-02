@@ -46,13 +46,9 @@ export const getUsersByUsername = createSelector(
     }
 );
 
-export const getCurrentUser = createSelector(
-    getUsers,
-    getCurrentUserId,
-    (profiles, currentUserId) => {
-        return profiles[currentUserId];
-    }
-);
+export function getCurrentUser(state) {
+    return state.entities.users.profiles[getCurrentUserId(state)];
+}
 
 export const getCurrentUserRoles = createSelector(
     getCurrentChannelMembership,

@@ -99,6 +99,7 @@ describe('Actions.Users', () => {
         assert.deepStrictEqual(teams.stats, {}, 'team stats is not empty');
         assert.strictEqual(channels.currentChannelId, '', 'current channel id is not empty');
         assert.deepStrictEqual(channels.channels, {}, 'channels is not empty');
+        assert.deepStrictEqual(channels.channelsInTeam, {}, 'channelsInTeam is not empty');
         assert.deepStrictEqual(channels.myMembers, {}, 'channel members is not empty');
         assert.deepStrictEqual(channels.stats, {}, 'channel stats is not empty');
         assert.strictEqual(posts.selectedPostId, '', 'selected post id is not empty');

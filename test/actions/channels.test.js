@@ -149,6 +149,15 @@ describe('Actions.Channels', () => {
     });
 
     it('fetchMyChannelsAndMembers', async () => {
+        const user = await TestHelper.basicClient4.createUser(
+            TestHelper.fakeUser(),
+            null,
+            null,
+            TestHelper.basicTeam.invite_id
+        );
+
+        const directChannel = await Actions.createDirectChannel(TestHelper.basicUser.id, user.id)(store.dispatch, store.getState);
+
         await Actions.fetchMyChannelsAndMembers(TestHelper.basicTeam.id)(store.dispatch, store.getState);
 
         const channelsRequest = store.getState().requests.channels.myChannels;
@@ -159,11 +168,12 @@ describe('Actions.Channels', () => {
             throw new Error(JSON.stringify(membersRequest.error));
         }
 
-        const {channels, myMembers} = store.getState().entities.channels;
+        const {channels, channelsInTeam, myMembers} = store.getState().entities.channels;
         assert.ok(channels);
         assert.ok(myMembers);
         assert.ok(channels[Object.keys(myMembers)[0]]);
         assert.ok(myMembers[Object.keys(channels)[0]]);
+        assert.ok(channelsInTeam[''].has(directChannel.id));
         assert.equal(Object.keys(channels).length, Object.keys(myMembers).length);
     });
 
@@ -314,10 +324,13 @@ describe('Actions.Channels', () => {
             throw new Error(JSON.stringify(moreRequest.error));
         }
 
-        const {channels, myMembers} = store.getState().entities.channels;
+        const {channels, channelsInTeam, myMembers} = store.getState().entities.channels;
         const channel = channels[userChannel.id];
+        const team = channelsInTeam[userChannel.team_id];
 
         assert.ok(channel);
+        assert.ok(team);
+        assert.ok(team.has(userChannel.id));
         assert.ifError(myMembers[channel.id]);
     });
 
