@@ -334,6 +334,20 @@ describe('Actions.Channels', () => {
         assert.ifError(myMembers[channel.id]);
     });
 
+    it('getChannelMembers', async () => {
+        await Actions.getChannelMembers(TestHelper.basicChannel.id)(store.dispatch, store.getState);
+
+        const membersRequest = store.getState().requests.channels.members;
+        if (membersRequest.status === RequestStatus.FAILURE) {
+            throw new Error(JSON.stringify(membersRequest.error));
+        }
+
+        const {members} = store.getState().entities.channels;
+
+        assert.ok(members);
+        assert.ok(members[TestHelper.basicChannel.id + TestHelper.basicUser.id]);
+    });
+
     it('getChannelStats', async () => {
         await Actions.getChannelStats(
             TestHelper.basicChannel.id

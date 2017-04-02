@@ -6,7 +6,7 @@ import assert from 'assert';
 import deepFreezeAndThrowOnMutation from 'utils/deep_freeze';
 import TestHelper from 'test/test_helper';
 import {sortChannelsByDisplayName} from 'utils/channel_utils';
-import {getChannelsInCurrentTeam} from 'selectors/entities/channels';
+import * as Selectors from 'selectors/entities/channels';
 
 describe('Selectors.Channels', () => {
     const team1 = TestHelper.fakeTeamWithId();
@@ -32,6 +32,12 @@ describe('Selectors.Channels', () => {
     const profiles = {};
     profiles[user.id] = user;
 
+    const members = {};
+    members[channel1.id + user.id] = {channel_id: channel1.id, user_id: user.id};
+    members[channel2.id + user.id] = {channel_id: channel2.id, user_id: user.id};
+    members[channel3.id + user.id] = {channel_id: channel3.id, user_id: user.id};
+    members[channel4.id + user.id] = {channel_id: channel4.id, user_id: user.id};
+
     const testState = deepFreezeAndThrowOnMutation({
         entities: {
             users: {
@@ -42,14 +48,20 @@ describe('Selectors.Channels', () => {
                 currentTeamId: team1.id
             },
             channels: {
+                currentChannelId: channel1.id,
                 channels,
-                channelsInTeam
+                channelsInTeam,
+                members
             }
         }
     });
 
     it('should return channels in current team', () => {
         const channelsInCurrentTeam = [channel1, channel2].sort(sortChannelsByDisplayName.bind(null, []));
-        assert.deepEqual(getChannelsInCurrentTeam(testState), channelsInCurrentTeam);
+        assert.deepEqual(Selectors.getChannelsInCurrentTeam(testState), channelsInCurrentTeam);
+    });
+
+    it('should return members in current channel', () => {
+        assert.deepEqual(Selectors.getMembersInCurrentChannel(testState), [members[channel1.id + user.id]]);
     });
 });

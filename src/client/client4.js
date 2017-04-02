@@ -467,6 +467,13 @@ export default class Client4 {
         );
     };
 
+    getChannelMembers = async (channelId, page = 0, perPage = PER_PAGE_DEFAULT) => {
+        return this.doFetch(
+            `${this.getChannelMembersRoute(channelId)}${buildQueryString({page, per_page: perPage})}`,
+            {method: 'get'}
+        );
+    };
+
     addToChannel = async (userId, channelId) => {
         const member = {user_id: userId, channel_id: channelId};
         return this.doFetch(

@@ -319,7 +319,7 @@ export function fetchMyChannelsAndMembers(teamId) {
 
 export function getMyChannelMembers(teamId) {
     return async (dispatch, getState) => {
-        dispatch({type: ChannelTypes.CHANNEL_MEMBERS_REQUEST}, getState);
+        dispatch({type: ChannelTypes.CHANNEL_MY_MEMBERS_REQUEST}, getState);
 
         let channelMembers;
         try {
@@ -329,7 +329,7 @@ export function getMyChannelMembers(teamId) {
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch);
             dispatch(batchActions([
-                {type: ChannelTypes.CHANNEL_MEMBERS_FAILURE, error},
+                {type: ChannelTypes.CHANNEL_MY_MEMBERS_FAILURE, error},
                 getLogErrorAction(error)
             ]), getState);
             return;
@@ -341,9 +341,41 @@ export function getMyChannelMembers(teamId) {
                 data: channelMembers
             },
             {
+                type: ChannelTypes.CHANNEL_MY_MEMBERS_SUCCESS
+            }
+        ]), getState);
+    };
+}
+
+export function getChannelMembers(channelId, page = 0, perPage = General.CHANNELS_CHUNK_SIZE) {
+    return async (dispatch, getState) => {
+        dispatch({type: ChannelTypes.CHANNEL_MEMBERS_REQUEST}, getState);
+
+        let channelMembers;
+        try {
+            const channelMembersRequest = Client4.getChannelMembers(channelId, page, perPage);
+
+            channelMembers = await channelMembersRequest;
+        } catch (error) {
+            forceLogoutIfNecessary(error, dispatch);
+            dispatch(batchActions([
+                {type: ChannelTypes.CHANNEL_MEMBERS_FAILURE, error},
+                getLogErrorAction(error)
+            ]), getState);
+            throw error;
+        }
+
+        dispatch(batchActions([
+            {
+                type: ChannelTypes.RECEIVED_CHANNEL_MEMBERS,
+                data: channelMembers
+            },
+            {
                 type: ChannelTypes.CHANNEL_MEMBERS_SUCCESS
             }
         ]), getState);
+
+        return channelMembers;
     };
 }
 
@@ -367,7 +399,7 @@ export function leaveChannel(channelId) {
         dispatch(batchActions([
             {
                 type: ChannelTypes.LEAVE_CHANNEL,
-                data: channelId
+                data: {id: channelId, user_id: currentUserId}
             },
             {
                 type: ChannelTypes.LEAVE_CHANNEL_SUCCESS
@@ -442,10 +474,12 @@ export function deleteChannel(channelId) {
             dispatch({type: ChannelTypes.SELECT_CHANNEL, data: defaultChannelId}, getState);
         }
 
+        const teamId = channels[channelId] ? channels[channelId].team_id : '';
+
         dispatch(batchActions([
             {
                 type: ChannelTypes.RECEIVED_CHANNEL_DELETED,
-                data: channelId
+                data: {id: channelId, team_id: teamId}
             },
             {
                 type: ChannelTypes.DELETE_CHANNEL_SUCCESS
