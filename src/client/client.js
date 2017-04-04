@@ -6,6 +6,8 @@ import {General} from 'constants';
 
 import fetch from './fetch_etag';
 
+const FormData = require('form-data');
+
 const HEADER_AUTH = 'Authorization';
 const HEADER_BEARER = 'BEARER';
 const HEADER_REQUESTED_WITH = 'X-Requested-With';
@@ -753,6 +755,44 @@ export default class Client {
 
         return url;
     }
+
+    // Emoji routes
+    createCustomEmoji = async (emoji, image) => {
+        const imageFormData = new FormData();
+        imageFormData.append('image', image);
+        imageFormData.append('emoji', JSON.stringify(emoji));
+        const formBoundary = imageFormData.getBoundary();
+
+        let contentType = 'multipart/form-data';
+        if (formBoundary) {
+            contentType += `; boundary=${formBoundary}`;
+        }
+
+        return this.doFetch(
+            `${this.getEmojiRoute()}/create`,
+            {
+                method: 'post',
+                headers: {
+                    'Content-Type': contentType
+                },
+                body: imageFormData
+            }
+        );
+    };
+
+    getCustomEmojis = async () => {
+        return this.doFetch(
+            `${this.getEmojiRoute()}/list`,
+            {method: 'get'}
+        );
+    };
+
+    deleteCustomEmoji = async (emojiId) => {
+        return this.doFetch(
+            `${this.getEmojiRoute()}/delete`,
+            {method: 'post', body: JSON.stringify({id: emojiId})}
+        );
+    };
 
     // Client helpers
     doFetch = async (url, options) => {
