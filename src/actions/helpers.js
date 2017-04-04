@@ -56,7 +56,7 @@ export function bindClientFunc(clientFunc, request, success, failure, ...args) {
                 requestFailure(failure, err),
                 getLogErrorAction(err)
             ]), getState);
-            return;
+            return null;
         }
 
         if (Array.isArray(success)) {
@@ -66,6 +66,8 @@ export function bindClientFunc(clientFunc, request, success, failure, ...args) {
         } else {
             dispatcher(success, data, dispatch, getState);
         }
+
+        return data;
     };
 }
 

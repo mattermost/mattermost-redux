@@ -9,6 +9,7 @@ import TeamTypes from './teams';
 import PostTypes from './posts';
 import FileTypes from './files';
 import PreferenceTypes from './preferences';
+import IntegrationTypes from './integrations';
 
 export {
     ErrorTypes,
@@ -18,5 +19,6 @@ export {
     ChannelTypes,
     PostTypes,
     FileTypes,
-    PreferenceTypes
+    PreferenceTypes,
+    IntegrationTypes
 };
