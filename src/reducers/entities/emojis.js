@@ -2,7 +2,7 @@
 // See License.txt for license information.
 
 import {combineReducers} from 'redux';
-import {EmojiTypes} from 'action_types';
+import {EmojiTypes, UserTypes} from 'action_types';
 
 function customEmoji(state = {}, action) {
     const nextState = {...state};
@@ -22,7 +22,7 @@ function customEmoji(state = {}, action) {
         Reflect.deleteProperty(nextState, action.data.id);
         return nextState;
     }
-    case EmojiTypes.LOGOUT_SUCCESS:
+    case UserTypes.LOGOUT_SUCCESS:
         return {};
 
     default:

@@ -11,7 +11,7 @@
     "redux-batched-actions": "0.1.5",
     "redux-thunk": "2.2.0",
     "reselect": "3.0.0",
-    "serialize-error": "^2.1.0"
+    "serialize-error": "2.1.0"
   },
   "devDependencies": {
     "babel-cli": "6.24.0",
@@ -27,6 +27,7 @@
     "fetch-mock": "5.9.4",
     "form-data": "2.1.2",
     "mocha": "3.2.0",
+    "nock": "9.0.11",
     "remote-redux-devtools": "0.5.7",
     "remote-redux-devtools-on-debugger": "0.7.0",
     "ws": "2.2.3"

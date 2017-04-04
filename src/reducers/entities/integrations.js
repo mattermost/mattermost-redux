@@ -2,7 +2,7 @@
 // See License.txt for license information.
 
 import {combineReducers} from 'redux';
-import {IntegrationTypes} from 'action_types';
+import {IntegrationTypes, UserTypes} from 'action_types';
 
 function incomingHooks(state = {}, action) {
     const nextState = {...state};
@@ -22,7 +22,7 @@ function incomingHooks(state = {}, action) {
         Reflect.deleteProperty(nextState, action.data.id);
         return nextState;
     }
-    case IntegrationTypes.LOGOUT_SUCCESS:
+    case UserTypes.LOGOUT_SUCCESS:
         return {};
 
     default:
@@ -48,7 +48,7 @@ function outgoingHooks(state = {}, action) {
         Reflect.deleteProperty(nextState, action.data.id);
         return nextState;
     }
-    case IntegrationTypes.LOGOUT_SUCCESS:
+    case UserTypes.LOGOUT_SUCCESS:
         return {};
 
     default:

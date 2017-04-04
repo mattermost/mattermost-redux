@@ -19,7 +19,7 @@ export function getPing() {
             'Cannot connect to the server. Please check your server URL and internet connection.'
         );
         try {
-            await Client4.getPing();
+            await Client4.ping();
         } catch (error) {
             dispatch(batchActions([
                 {type: GeneralTypes.PING_FAILURE, error: pingError},
