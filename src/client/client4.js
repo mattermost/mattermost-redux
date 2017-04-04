@@ -122,6 +122,22 @@ export default class Client4 {
         return `${this.getUserRoute(userId)}/preferences`;
     }
 
+    getIncomingHooksRoute() {
+        return `${this.getBaseRoute()}/hooks/incoming`;
+    }
+
+    getIncomingHookRoute(hookId) {
+        return `${this.getBaseRoute()}/hooks/incoming/${hookId}`;
+    }
+
+    getOutgoingHooksRoute() {
+        return `${this.getBaseRoute()}/hooks/outgoing`;
+    }
+
+    getOutgoingHookRoute(hookId) {
+        return `${this.getBaseRoute()}/hooks/outgoing/${hookId}`;
+    }
+
     getOptions(options) {
         const headers = {
             [HEADER_REQUESTED_WITH]: 'XMLHttpRequest'
@@ -634,6 +650,94 @@ export default class Client4 {
         return this.doFetch(
             `${this.getBaseRoute()}/license/client?format=old`,
             {method: 'get'}
+        );
+    };
+
+    // Integration Routes
+
+    createIncomingWebhook = async (hook) => {
+        return this.doFetch(
+            `${this.getIncomingHooksRoute()}`,
+            {method: 'post', body: JSON.stringify(hook)}
+        );
+    };
+
+    getIncomingWebhook = async (hookId) => {
+        return this.doFetch(
+            `${this.getIncomingHookRoute(hookId)}`,
+            {method: 'get'}
+        );
+    };
+
+    getIncomingWebhooks = async (teamId = '', page = 0, perPage = PER_PAGE_DEFAULT) => {
+        const queryParams = {page, per_page: perPage};
+
+        if (teamId) {
+            queryParams.team_id = teamId;
+        }
+
+        return this.doFetch(
+            `${this.getIncomingHooksRoute()}${buildQueryString(queryParams)}`,
+            {method: 'get'}
+        );
+    };
+
+    removeIncomingWebhook = async (hookId) => {
+        return this.doFetch(
+            `${this.getIncomingHookRoute(hookId)}`,
+            {method: 'delete'}
+        );
+    };
+
+    updateIncomingWebhook = async (hook) => {
+        return this.doFetch(
+            `${this.getIncomingHookRoute(hook.id)}`,
+            {method: 'put', body: JSON.stringify(hook)}
+        );
+    };
+
+    createOutgoingWebhook = async (hook) => {
+        return this.doFetch(
+            `${this.getOutgoingHooksRoute()}`,
+            {method: 'post', body: JSON.stringify(hook)}
+        );
+    };
+
+    getOutgoingWebhook = async (hookId) => {
+        return this.doFetch(
+            `${this.getOutgoingHookRoute(hookId)}`,
+            {method: 'get'}
+        );
+    };
+
+    getOutgoingWebhooks = async (channelId = '', teamId = '', page = 0, perPage = PER_PAGE_DEFAULT) => {
+        const queryParams = {page, per_page: perPage};
+
+        if (channelId) {
+            queryParams.channel_id = channelId;
+        }
+
+        if (teamId) {
+            queryParams.team_id = teamId;
+        }
+
+        return this.doFetch(
+            `${this.getOutgoingHooksRoute()}${buildQueryString(queryParams)}`,
+            {method: 'get'}
+        );
+    };
+
+    removeOutgoingWebhook = async (hookId) => {
+        return this.doFetch(
+            `${this.getOutgoingHookRoute(hookId)}`,
+            {method: 'delete'}
+        );
+    };
+
+    updateOutgoingWebhook = async (hook) => {
+        return this.doFetch(
+            `${this.getOutgoingHookRoute(hook.id)}`,
+            {method: 'put', body: JSON.stringify(hook)}
         );
     };
 

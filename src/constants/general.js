@@ -4,6 +4,7 @@
 export default {
     CONFIG_CHANGED: 'config_changed',
 
+    PAGE_SIZE_DEFAULT: 60,
     AUDITS_CHUNK_SIZE: 100,
     PROFILE_CHUNK_SIZE: 100,
     CHANNELS_CHUNK_SIZE: 50,

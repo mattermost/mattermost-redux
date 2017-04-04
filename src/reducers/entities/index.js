@@ -11,6 +11,7 @@ import posts from './posts';
 import files from './files';
 import preferences from './preferences';
 import typing from './typing';
+import integrations from './integrations';
 
 export default combineReducers({
     general,
@@ -20,5 +21,6 @@ export default combineReducers({
     posts,
     files,
     preferences,
-    typing
+    typing,
+    integrations
 });

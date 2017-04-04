@@ -10,6 +10,7 @@ import posts from './posts';
 import teams from './teams';
 import users from './users';
 import preferences from './preferences';
+import integrations from './integrations';
 
 export default combineReducers({
     channels,
@@ -18,5 +19,6 @@ export default combineReducers({
     posts,
     teams,
     users,
-    preferences
+    preferences,
+    integrations
 });
