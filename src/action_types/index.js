@@ -10,6 +10,7 @@ import PostTypes from './posts';
 import FileTypes from './files';
 import PreferenceTypes from './preferences';
 import IntegrationTypes from './integrations';
+import EmojiTypes from './emojis';
 
 export {
     ErrorTypes,
@@ -20,5 +21,6 @@ export {
     PostTypes,
     FileTypes,
     PreferenceTypes,
-    IntegrationTypes
+    IntegrationTypes,
+    EmojiTypes
 };
