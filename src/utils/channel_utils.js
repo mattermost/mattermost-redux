@@ -137,15 +137,15 @@ export function showCreateOption(config, license, channelType, isAdmin, isSystem
     }
 
     if (channelType === Constants.OPEN_CHANNEL) {
-        if (config.RestrictPublicChannelCreation === Constants.PERMISSIONS_SYSTEM_ADMIN && !isSystemAdmin) {
+        if (config.RestrictPublicChannelCreation === Constants.SYSTEM_ADMIN_ROLE && !isSystemAdmin) {
             return false;
-        } else if (config.RestrictPublicChannelCreation === Constants.PERMISSIONS_TEAM_ADMIN && !isAdmin) {
+        } else if (config.RestrictPublicChannelCreation === Constants.TEAM_ADMIN_ROLE && !isAdmin) {
             return false;
         }
     } else if (channelType === Constants.PRIVATE_CHANNEL) {
-        if (config.RestrictPrivateChannelCreation === Constants.PERMISSIONS_SYSTEM_ADMIN && !isSystemAdmin) {
+        if (config.RestrictPrivateChannelCreation === Constants.SYSTEM_ADMIN_ROLE && !isSystemAdmin) {
             return false;
-        } else if (config.RestrictPrivateChannelCreation === Constants.PERMISSIONS_TEAM_ADMIN && !isAdmin) {
+        } else if (config.RestrictPrivateChannelCreation === Constants.TEAM_ADMIN_ROLE && !isAdmin) {
             return false;
         }
     }
@@ -159,23 +159,23 @@ export function showManagementOptions(config, license, channel, isAdmin, isSyste
     }
 
     if (channel.type === Constants.OPEN_CHANNEL) {
-        if (config.RestrictPublicChannelManagement === Constants.PERMISSIONS_SYSTEM_ADMIN && !isSystemAdmin) {
+        if (config.RestrictPublicChannelManagement === Constants.SYSTEM_ADMIN_ROLE && !isSystemAdmin) {
             return false;
         }
-        if (config.RestrictPublicChannelManagement === Constants.PERMISSIONS_TEAM_ADMIN && !isAdmin) {
+        if (config.RestrictPublicChannelManagement === Constants.TEAM_ADMIN_ROLE && !isAdmin) {
             return false;
         }
-        if (config.RestrictPublicChannelManagement === Constants.PERMISSIONS_CHANNEL_ADMIN && !isChannelAdmin && !isAdmin) {
+        if (config.RestrictPublicChannelManagement === Constants.CHANNEL_ADMIN_ROLE && !isChannelAdmin && !isAdmin) {
             return false;
         }
     } else if (channel.type === Constants.PRIVATE_CHANNEL) {
-        if (config.RestrictPrivateChannelManagement === Constants.PERMISSIONS_SYSTEM_ADMIN && !isSystemAdmin) {
+        if (config.RestrictPrivateChannelManagement === Constants.SYSTEM_ADMIN_ROLE && !isSystemAdmin) {
             return false;
         }
-        if (config.RestrictPrivateChannelManagement === Constants.PERMISSIONS_TEAM_ADMIN && !isAdmin) {
+        if (config.RestrictPrivateChannelManagement === Constants.TEAM_ADMIN_ROLE && !isAdmin) {
             return false;
         }
-        if (config.RestrictPrivateChannelManagement === Constants.PERMISSIONS_CHANNEL_ADMIN && !isChannelAdmin && !isAdmin) {
+        if (config.RestrictPrivateChannelManagement === Constants.CHANNEL_ADMIN_ROLE && !isChannelAdmin && !isAdmin) {
             return false;
         }
     }
@@ -189,23 +189,23 @@ export function showDeleteOption(config, license, channel, isAdmin, isSystemAdmi
     }
 
     if (channel.type === Constants.OPEN_CHANNEL) {
-        if (config.RestrictPublicChannelDeletion === Constants.PERMISSIONS_SYSTEM_ADMIN && !isSystemAdmin) {
+        if (config.RestrictPublicChannelDeletion === Constants.SYSTEM_ADMIN_ROLE && !isSystemAdmin) {
             return false;
         }
-        if (config.RestrictPublicChannelDeletion === Constants.PERMISSIONS_TEAM_ADMIN && !isAdmin) {
+        if (config.RestrictPublicChannelDeletion === Constants.TEAM_ADMIN_ROLE && !isAdmin) {
             return false;
         }
-        if (config.RestrictPublicChannelDeletion === Constants.PERMISSIONS_CHANNEL_ADMIN && !isChannelAdmin && !isAdmin) {
+        if (config.RestrictPublicChannelDeletion === Constants.CHANNEL_ADMIN_ROLE && !isChannelAdmin && !isAdmin) {
             return false;
         }
     } else if (channel.type === Constants.PRIVATE_CHANNEL) {
-        if (config.RestrictPrivateChannelDeletion === Constants.PERMISSIONS_SYSTEM_ADMIN && !isSystemAdmin) {
+        if (config.RestrictPrivateChannelDeletion === Constants.SYSTEM_ADMIN_ROLE && !isSystemAdmin) {
             return false;
         }
-        if (config.RestrictPrivateChannelDeletion === Constants.PERMISSIONS_TEAM_ADMIN && !isAdmin) {
+        if (config.RestrictPrivateChannelDeletion === Constants.TEAM_ADMIN_ROLE && !isAdmin) {
             return false;
         }
-        if (config.RestrictPrivateChannelDeletion === Constants.PERMISSIONS_CHANNEL_ADMIN && !isChannelAdmin && !isAdmin) {
+        if (config.RestrictPrivateChannelDeletion === Constants.CHANNEL_ADMIN_ROLE && !isChannelAdmin && !isAdmin) {
             return false;
         }
     }
