@@ -741,6 +741,36 @@ export default class Client4 {
         );
     };
 
+    // Admin Routes
+
+    getLogs = async (page = 0, perPage = PER_PAGE_DEFAULT) => {
+        return this.doFetch(
+            `${this.getBaseRoute()}/logs${buildQueryString({page, per_page: perPage})}`,
+            {method: 'get'}
+        );
+    };
+
+    getAudits = async (page = 0, perPage = PER_PAGE_DEFAULT) => {
+        return this.doFetch(
+            `${this.getBaseRoute()}/audits${buildQueryString({page, per_page: perPage})}`,
+            {method: 'get'}
+        );
+    };
+
+    getConfig = async () => {
+        return this.doFetch(
+            `${this.getBaseRoute()}/config`,
+            {method: 'get'}
+        );
+    };
+
+    updateConfig = async (config) => {
+        return this.doFetch(
+            `${this.getBaseRoute()}/config`,
+            {method: 'put', body: JSON.stringify(config)}
+        );
+    };
+
     // Client Helpers
 
     doFetch = async (url, options) => {

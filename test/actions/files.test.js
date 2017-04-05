@@ -43,7 +43,7 @@ describe('Actions.Files', () => {
 
         const state = store.getState();
         const uploadRequest = state.requests.files.uploadFiles;
-        if (uploadRequest.status === RequestStatus.FAILED) {
+        if (uploadRequest.status === RequestStatus.FAILURE) {
             throw new Error('Upload file request failed');
         }
 

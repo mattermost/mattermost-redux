@@ -37,7 +37,7 @@ describe('Actions.Emojis', () => {
 
         const state = store.getState();
         const request = state.requests.emojis.createCustomEmoji;
-        if (request.status === RequestStatus.FAILED) {
+        if (request.status === RequestStatus.FAILURE) {
             throw new Error('createCustomEmoji request failed');
         }
 
@@ -46,7 +46,7 @@ describe('Actions.Emojis', () => {
         assert.ok(emojis[created.id]);
     });
 
-    it('getOutgoingWebemojis', async () => {
+    it('getCustomEmojis', async () => {
         const testImageData = fs.createReadStream('test/assets/images/test.png');
         const created = await Actions.createCustomEmoji(
             {
@@ -60,7 +60,7 @@ describe('Actions.Emojis', () => {
 
         const state = store.getState();
         const request = state.requests.emojis.getCustomEmojis;
-        if (request.status === RequestStatus.FAILED) {
+        if (request.status === RequestStatus.FAILURE) {
             throw new Error('getCustomEmojis request failed');
         }
 
@@ -83,7 +83,7 @@ describe('Actions.Emojis', () => {
 
         const state = store.getState();
         const request = state.requests.emojis.deleteCustomEmoji;
-        if (request.status === RequestStatus.FAILED) {
+        if (request.status === RequestStatus.FAILURE) {
             throw new Error('removeCustomEmoji request failed');
         }
 

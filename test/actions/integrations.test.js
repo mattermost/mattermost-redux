@@ -35,7 +35,7 @@ describe('Actions.Integrations', () => {
 
         const state = store.getState();
         const request = state.requests.integrations.createIncomingHook;
-        if (request.status === RequestStatus.FAILED) {
+        if (request.status === RequestStatus.FAILURE) {
             throw new Error('createIncomingHook request failed');
         }
 
@@ -57,7 +57,7 @@ describe('Actions.Integrations', () => {
 
         const state = store.getState();
         const request = state.requests.integrations.getIncomingHooks;
-        if (request.status === RequestStatus.FAILED) {
+        if (request.status === RequestStatus.FAILURE) {
             throw new Error('getIncomingHooks request failed');
         }
 
@@ -79,7 +79,7 @@ describe('Actions.Integrations', () => {
 
         const state = store.getState();
         const request = state.requests.integrations.deleteIncomingHook;
-        if (request.status === RequestStatus.FAILED) {
+        if (request.status === RequestStatus.FAILURE) {
             throw new Error('removeIncomingHook request failed');
         }
 
@@ -102,7 +102,7 @@ describe('Actions.Integrations', () => {
 
         const state = store.getState();
         const request = state.requests.integrations.updateIncomingHook;
-        if (request.status === RequestStatus.FAILED) {
+        if (request.status === RequestStatus.FAILURE) {
             throw new Error('updateIncomingHook request failed');
         }
 
@@ -124,7 +124,7 @@ describe('Actions.Integrations', () => {
 
         const state = store.getState();
         const request = state.requests.integrations.createOutgoingHook;
-        if (request.status === RequestStatus.FAILED) {
+        if (request.status === RequestStatus.FAILURE) {
             throw new Error('createOutgoingHook request failed');
         }
 
@@ -148,7 +148,7 @@ describe('Actions.Integrations', () => {
 
         const state = store.getState();
         const request = state.requests.integrations.getOutgoingHooks;
-        if (request.status === RequestStatus.FAILED) {
+        if (request.status === RequestStatus.FAILURE) {
             throw new Error('getOutgoingHooks request failed');
         }
 
@@ -172,7 +172,7 @@ describe('Actions.Integrations', () => {
 
         const state = store.getState();
         const request = state.requests.integrations.deleteOutgoingHook;
-        if (request.status === RequestStatus.FAILED) {
+        if (request.status === RequestStatus.FAILURE) {
             throw new Error('removeOutgoingHook request failed');
         }
 
@@ -197,7 +197,7 @@ describe('Actions.Integrations', () => {
 
         const state = store.getState();
         const request = state.requests.integrations.updateOutgoingHook;
-        if (request.status === RequestStatus.FAILED) {
+        if (request.status === RequestStatus.FAILURE) {
             throw new Error('updateOutgoingHook request failed');
         }
 

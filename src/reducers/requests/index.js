@@ -12,6 +12,7 @@ import users from './users';
 import preferences from './preferences';
 import integrations from './integrations';
 import emojis from './emojis';
+import admin from './admin';
 
 export default combineReducers({
     channels,
@@ -22,5 +23,6 @@ export default combineReducers({
     users,
     preferences,
     integrations,
-    emojis
+    emojis,
+    admin
 });

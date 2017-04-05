@@ -40,7 +40,7 @@ describe('Actions.General', () => {
         await Actions.getPing()(store.dispatch, store.getState);
 
         const {server} = store.getState().requests.general;
-        if (server.status === RequestStatus.FAILED) {
+        if (server.status === RequestStatus.FAILURE) {
             throw new Error(JSON.stringify(server.error));
         }
     });
