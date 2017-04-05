@@ -1,7 +1,7 @@
 // Copyright (c) 2016 Mattermost, Inc. All Rights Reserved.
 // See License.txt for license information.
 
-import {General, Preferences} from '../constants';
+import {General, Preferences} from 'constants';
 import {displayUsername} from './user_utils';
 import {getPreferencesByCategory} from './preference_utils';
 
@@ -129,6 +129,88 @@ export function isGroupChannel(channel) {
 export function isGroupChannelVisible(myPreferences, channel) {
     const gm = myPreferences[`${Preferences.CATEGORY_GROUP_CHANNEL_SHOW}--${channel.id}`];
     return gm && gm.value === 'true';
+}
+
+export function showCreateOption(config, license, channelType, isAdmin, isSystemAdmin) {
+    if (license.IsLicensed !== 'true') {
+        return true;
+    }
+
+    if (channelType === General.OPEN_CHANNEL) {
+        if (config.RestrictPublicChannelCreation === General.SYSTEM_ADMIN_ROLE && !isSystemAdmin) {
+            return false;
+        } else if (config.RestrictPublicChannelCreation === General.TEAM_ADMIN_ROLE && !isAdmin) {
+            return false;
+        }
+    } else if (channelType === General.PRIVATE_CHANNEL) {
+        if (config.RestrictPrivateChannelCreation === General.SYSTEM_ADMIN_ROLE && !isSystemAdmin) {
+            return false;
+        } else if (config.RestrictPrivateChannelCreation === General.TEAM_ADMIN_ROLE && !isAdmin) {
+            return false;
+        }
+    }
+
+    return true;
+}
+
+export function showManagementOptions(config, license, channel, isAdmin, isSystemAdmin, isChannelAdmin) {
+    if (license.IsLicensed !== 'true') {
+        return true;
+    }
+
+    if (channel.type === General.OPEN_CHANNEL) {
+        if (config.RestrictPublicChannelManagement === General.SYSTEM_ADMIN_ROLE && !isSystemAdmin) {
+            return false;
+        }
+        if (config.RestrictPublicChannelManagement === General.TEAM_ADMIN_ROLE && !isAdmin) {
+            return false;
+        }
+        if (config.RestrictPublicChannelManagement === General.CHANNEL_ADMIN_ROLE && !isChannelAdmin && !isAdmin) {
+            return false;
+        }
+    } else if (channel.type === General.PRIVATE_CHANNEL) {
+        if (config.RestrictPrivateChannelManagement === General.SYSTEM_ADMIN_ROLE && !isSystemAdmin) {
+            return false;
+        }
+        if (config.RestrictPrivateChannelManagement === General.TEAM_ADMIN_ROLE && !isAdmin) {
+            return false;
+        }
+        if (config.RestrictPrivateChannelManagement === General.CHANNEL_ADMIN_ROLE && !isChannelAdmin && !isAdmin) {
+            return false;
+        }
+    }
+
+    return true;
+}
+
+export function showDeleteOption(config, license, channel, isAdmin, isSystemAdmin, isChannelAdmin) {
+    if (license.IsLicensed !== 'true') {
+        return true;
+    }
+
+    if (channel.type === General.OPEN_CHANNEL) {
+        if (config.RestrictPublicChannelDeletion === General.SYSTEM_ADMIN_ROLE && !isSystemAdmin) {
+            return false;
+        }
+        if (config.RestrictPublicChannelDeletion === General.TEAM_ADMIN_ROLE && !isAdmin) {
+            return false;
+        }
+        if (config.RestrictPublicChannelDeletion === General.CHANNEL_ADMIN_ROLE && !isChannelAdmin && !isAdmin) {
+            return false;
+        }
+    } else if (channel.type === General.PRIVATE_CHANNEL) {
+        if (config.RestrictPrivateChannelDeletion === General.SYSTEM_ADMIN_ROLE && !isSystemAdmin) {
+            return false;
+        }
+        if (config.RestrictPrivateChannelDeletion === General.TEAM_ADMIN_ROLE && !isAdmin) {
+            return false;
+        }
+        if (config.RestrictPrivateChannelDeletion === General.CHANNEL_ADMIN_ROLE && !isChannelAdmin && !isAdmin) {
+            return false;
+        }
+    }
+
+    return true;
 }
 
 //====================================================

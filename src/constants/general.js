@@ -18,6 +18,11 @@ export default {
     AWAY: 'away',
     ONLINE: 'online',
 
+    PERMISSIONS_ALL: 'all',
+    PERMISSIONS_DELETE_POST_ALL: 'all',
+    PERMISSIONS_DELETE_POST_TEAM_ADMIN: 'team_admin',
+    PERMISSIONS_DELETE_POST_SYSTEM_ADMIN: 'system_admin',
+
     TEAM_USER_ROLE: 'team_user',
     TEAM_ADMIN_ROLE: 'team_admin',
 
@@ -26,6 +31,11 @@ export default {
 
     SYSTEM_USER_ROLE: 'system_user',
     SYSTEM_ADMIN_ROLE: 'system_admin',
+
+    ALLOW_EDIT_POST_ALWAYS: 'always',
+    ALLOW_EDIT_POST_NEVER: 'never',
+    ALLOW_EDIT_POST_TIME_LIMIT: 'time_limit',
+    DEFAULT_POST_EDIT_TIME_LIMIT: 300,
 
     DEFAULT_CHANNEL: 'town-square',
     DM_CHANNEL: 'D',
