@@ -48,6 +48,28 @@ function config(state = {}, action) {
     }
 }
 
+function complianceReports(state = {}, action) {
+    const nextState = {...state};
+
+    switch (action.type) {
+    case AdminTypes.RECEIVED_COMPLIANCE_REPORT: {
+        nextState[action.data.id] = action.data;
+        return nextState;
+    }
+    case AdminTypes.RECEIVED_COMPLIANCE_REPORTS: {
+        for (const report of action.data) {
+            nextState[report.id] = report;
+        }
+        return nextState;
+    }
+    case UserTypes.LOGOUT_SUCCESS:
+        return {};
+
+    default:
+        return state;
+    }
+}
+
 export default combineReducers({
 
     // array of strings each representing a log entry
@@ -57,7 +79,10 @@ export default combineReducers({
     audits,
 
     // object representing the server configuration
-    config
+    config,
+
+    // object where every key is a report id and has an object with report details
+    complianceReports
 
 });
 

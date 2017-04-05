@@ -46,10 +46,76 @@ function updateConfig(state = initialRequestState(), action) {
     );
 }
 
+function reloadConfig(state = initialRequestState(), action) {
+    return handleRequest(
+        AdminTypes.RELOAD_CONFIG_REQUEST,
+        AdminTypes.RELOAD_CONFIG_SUCCESS,
+        AdminTypes.RELOAD_CONFIG_FAILURE,
+        state,
+        action
+    );
+}
+
+function testEmail(state = initialRequestState(), action) {
+    return handleRequest(
+        AdminTypes.TEST_EMAIL_REQUEST,
+        AdminTypes.TEST_EMAIL_SUCCESS,
+        AdminTypes.TEST_EMAIL_FAILURE,
+        state,
+        action
+    );
+}
+
+function invalidateCaches(state = initialRequestState(), action) {
+    return handleRequest(
+        AdminTypes.INVALIDATE_CACHES_REQUEST,
+        AdminTypes.INVALIDATE_CACHES_SUCCESS,
+        AdminTypes.INVALIDATE_CACHES_FAILURE,
+        state,
+        action
+    );
+}
+
+function recycleDatabase(state = initialRequestState(), action) {
+    return handleRequest(
+        AdminTypes.RECYCLE_DATABASE_REQUEST,
+        AdminTypes.RECYCLE_DATABASE_SUCCESS,
+        AdminTypes.RECYCLE_DATABASE_FAILURE,
+        state,
+        action
+    );
+}
+
+function createCompliance(state = initialRequestState(), action) {
+    return handleRequest(
+        AdminTypes.CREATE_COMPLIANCE_REQUEST,
+        AdminTypes.CREATE_COMPLIANCE_SUCCESS,
+        AdminTypes.CREATE_COMPLIANCE_FAILURE,
+        state,
+        action
+    );
+}
+
+function getCompliance(state = initialRequestState(), action) {
+    return handleRequest(
+        AdminTypes.GET_COMPLIANCE_REQUEST,
+        AdminTypes.GET_COMPLIANCE_SUCCESS,
+        AdminTypes.GET_COMPLIANCE_FAILURE,
+        state,
+        action
+    );
+}
+
 export default combineReducers({
     getLogs,
     getAudits,
     getConfig,
-    updateConfig
+    updateConfig,
+    reloadConfig,
+    testEmail,
+    invalidateCaches,
+    recycleDatabase,
+    createCompliance,
+    getCompliance
 });
 

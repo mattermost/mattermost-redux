@@ -771,6 +771,55 @@ export default class Client4 {
         );
     };
 
+    reloadConfig = async () => {
+        return this.doFetch(
+            `${this.getBaseRoute()}/config/reload`,
+            {method: 'post'}
+        );
+    };
+
+    testEmail = async () => {
+        return this.doFetch(
+            `${this.getBaseRoute()}/email/test`,
+            {method: 'post'}
+        );
+    };
+
+    invalidateCaches = async () => {
+        return this.doFetch(
+            `${this.getBaseRoute()}/caches/invalidate`,
+            {method: 'post'}
+        );
+    };
+
+    recycleDatabase = async () => {
+        return this.doFetch(
+            `${this.getBaseRoute()}/database/recycle`,
+            {method: 'post'}
+        );
+    };
+
+    createComplianceReport = async (job) => {
+        return this.doFetch(
+            `${this.getBaseRoute()}/compliance/reports`,
+            {method: 'post', body: JSON.stringify(job)}
+        );
+    };
+
+    getComplianceReport = async (reportId) => {
+        return this.doFetch(
+            `${this.getBaseRoute()}/compliance/reports/${reportId}`,
+            {method: 'get'}
+        );
+    };
+
+    getComplianceReports = async (page = 0, perPage = PER_PAGE_DEFAULT) => {
+        return this.doFetch(
+            `${this.getBaseRoute()}/compliance/reports${buildQueryString({page, per_page: perPage})}`,
+            {method: 'get'}
+        );
+    };
+
     // Client Helpers
 
     doFetch = async (url, options) => {

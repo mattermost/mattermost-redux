@@ -48,3 +48,70 @@ export function updateConfig() {
     );
 }
 
+export function reloadConfig() {
+    return bindClientFunc(
+        Client4.reloadConfig,
+        AdminTypes.RELOAD_CONFIG_REQUEST,
+        AdminTypes.RELOAD_CONFIG_SUCCESS,
+        AdminTypes.RELOAD_CONFIG_FAILURE
+    );
+}
+
+export function testEmail() {
+    return bindClientFunc(
+        Client4.testEmail,
+        AdminTypes.TEST_EMAIL_REQUEST,
+        AdminTypes.TEST_EMAIL_SUCCESS,
+        AdminTypes.TEST_EMAIL_FAILURE
+    );
+}
+
+export function invalidateCaches() {
+    return bindClientFunc(
+        Client4.invalidateCaches,
+        AdminTypes.INVALIDATE_CACHES_REQUEST,
+        AdminTypes.INVALIDATE_CACHES_SUCCESS,
+        AdminTypes.INVALIDATE_CACHES_FAILURE
+    );
+}
+
+export function recycleDatabase() {
+    return bindClientFunc(
+        Client4.recycleDatabase,
+        AdminTypes.RECYCLE_DATABASE_REQUEST,
+        AdminTypes.RECYCLE_DATABASE_SUCCESS,
+        AdminTypes.RECYCLE_DATABASE_FAILURE
+    );
+}
+
+export function createComplianceReport(job) {
+    return bindClientFunc(
+        Client4.createComplianceReport,
+        AdminTypes.CREATE_COMPLIANCE_REQUEST,
+        [AdminTypes.RECEIVED_COMPLIANCE_REPORT, AdminTypes.CREATE_COMPLIANCE_SUCCESS],
+        AdminTypes.CREATE_COMPLIANCE_FAILURE,
+        job
+    );
+}
+
+export function getComplianceReport(reportId) {
+    return bindClientFunc(
+        Client4.getComplianceReport,
+        AdminTypes.GET_COMPLIANCE_REQUEST,
+        [AdminTypes.RECEIVED_COMPLIANCE_REPORT, AdminTypes.GET_COMPLIANCE_SUCCESS],
+        AdminTypes.GET_COMPLIANCE_FAILURE,
+        reportId
+    );
+}
+
+export function getComplianceReports(page = 0, perPage = General.PER_PAGE_DEFAULT) {
+    return bindClientFunc(
+        Client4.getComplianceReports,
+        AdminTypes.GET_COMPLIANCE_REQUEST,
+        [AdminTypes.RECEIVED_COMPLIANCE_REPORTS, AdminTypes.GET_COMPLIANCE_SUCCESS],
+        AdminTypes.GET_COMPLIANCE_FAILURE,
+        page,
+        perPage
+    );
+}
+

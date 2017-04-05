@@ -10,6 +10,8 @@ import configureStore from 'store';
 import {RequestStatus} from 'constants';
 import TestHelper from 'test/test_helper';
 
+const OK_RESPONSE = {status: 'OK'};
+
 describe('Actions.Admin', () => {
     let store;
     before(async () => {
@@ -116,7 +118,7 @@ describe('Actions.Admin', () => {
         await Actions.updateConfig(updated)(store.dispatch, store.getState);
 
         const state = store.getState();
-        const request = state.requests.admin.getConfig;
+        const request = state.requests.admin.updateConfig;
         if (request.status === RequestStatus.FAILURE) {
             throw new Error('updateConfig request failed');
         }
@@ -125,6 +127,165 @@ describe('Actions.Admin', () => {
         assert.ok(config);
         assert.ok(config.ServiceSettings);
         assert.ok(config.ServiceSettings.SiteURL === updated.ServiceSettings.SiteURL);
+    });
+
+    it('reloadConfig', async () => {
+        nock(Client4.getBaseRoute()).
+            post('/config/reload').
+            reply(200, OK_RESPONSE);
+
+        await Actions.reloadConfig()(store.dispatch, store.getState);
+
+        const state = store.getState();
+        const request = state.requests.admin.reloadConfig;
+        if (request.status === RequestStatus.FAILURE) {
+            throw new Error('reloadConfig request failed');
+        }
+    });
+
+    it('testEmail', async () => {
+        nock(Client4.getBaseRoute()).
+            post('/email/test').
+            reply(200, OK_RESPONSE);
+
+        await Actions.testEmail()(store.dispatch, store.getState);
+
+        const state = store.getState();
+        const request = state.requests.admin.testEmail;
+        if (request.status === RequestStatus.FAILURE) {
+            throw new Error('testEmail request failed');
+        }
+    });
+
+    it('invalidateCaches', async () => {
+        nock(Client4.getBaseRoute()).
+            post('/caches/invalidate').
+            reply(200, OK_RESPONSE);
+
+        await Actions.invalidateCaches()(store.dispatch, store.getState);
+
+        const state = store.getState();
+        const request = state.requests.admin.invalidateCaches;
+        if (request.status === RequestStatus.FAILURE) {
+            throw new Error('invalidateCaches request failed');
+        }
+    });
+
+    it('recycleDatabase', async () => {
+        nock(Client4.getBaseRoute()).
+            post('/database/recycle').
+            reply(200, OK_RESPONSE);
+
+        await Actions.recycleDatabase()(store.dispatch, store.getState);
+
+        const state = store.getState();
+        const request = state.requests.admin.recycleDatabase;
+        if (request.status === RequestStatus.FAILURE) {
+            throw new Error('recycleDatabase request failed');
+        }
+    });
+
+    it('createComplianceReport', async () => {
+        const job = {
+            desc: 'testjob',
+            emails: 'joram@example.com',
+            keywords: 'testkeyword',
+            start_at: 1457654400000,
+            end_at: 1458000000000
+        };
+
+        nock(Client4.getBaseRoute()).
+            post('/compliance/reports').
+            reply(201, {
+                id: 'six4h67ja7ntdkek6g13dp3wka',
+                create_at: 1491399241953,
+                user_id: 'ua7yqgjiq3dabc46ianp3yfgty',
+                status: 'running',
+                count: 0,
+                desc: 'testjob',
+                type: 'adhoc',
+                start_at: 1457654400000,
+                end_at: 1458000000000,
+                keywords: 'testkeyword',
+                emails: 'joram@example.com'
+            });
+
+        const created = await Actions.createComplianceReport(job)(store.dispatch, store.getState);
+
+        const state = store.getState();
+        const request = state.requests.admin.createCompliance;
+        if (request.status === RequestStatus.FAILURE) {
+            throw new Error('createComplianceReport request failed');
+        }
+
+        const reports = state.entities.admin.complianceReports;
+        assert.ok(reports);
+        assert.ok(reports[created.id]);
+    });
+
+    it('getComplianceReport', async () => {
+        const report = {
+            id: 'lix4h67ja7ntdkek6g13dp3wka',
+            create_at: 1491399241953,
+            user_id: 'ua7yqgjiq3dabc46ianp3yfgty',
+            status: 'running',
+            count: 0,
+            desc: 'testjob',
+            type: 'adhoc',
+            start_at: 1457654400000,
+            end_at: 1458000000000,
+            keywords: 'testkeyword',
+            emails: 'joram@example.com'
+        };
+
+        nock(Client4.getBaseRoute()).
+            get(`/compliance/reports/${report.id}`).
+            reply(200, report);
+
+        await Actions.getComplianceReport(report.id)(store.dispatch, store.getState);
+
+        const state = store.getState();
+        const request = state.requests.admin.getCompliance;
+        if (request.status === RequestStatus.FAILURE) {
+            throw new Error('getComplianceReport request failed err=' + request.error);
+        }
+
+        const reports = state.entities.admin.complianceReports;
+        assert.ok(reports);
+        assert.ok(reports[report.id]);
+    });
+
+    it('getComplianceReports', async () => {
+        const report = {
+            id: 'aix4h67ja7ntdkek6g13dp3wka',
+            create_at: 1491399241953,
+            user_id: 'ua7yqgjiq3dabc46ianp3yfgty',
+            status: 'running',
+            count: 0,
+            desc: 'testjob',
+            type: 'adhoc',
+            start_at: 1457654400000,
+            end_at: 1458000000000,
+            keywords: 'testkeyword',
+            emails: 'joram@example.com'
+        };
+
+        nock(Client4.getBaseRoute()).
+            get('/compliance/reports').
+            query(true).
+            reply(200, [report]);
+
+        await Actions.getComplianceReports()(store.dispatch, store.getState);
+
+        const state = store.getState();
+        const request = state.requests.admin.getCompliance;
+        if (request.status === RequestStatus.FAILURE) {
+            throw new Error('getComplianceReports request failed err=' + request.error);
+        }
+
+        const reports = state.entities.admin.complianceReports;
+        assert.ok(reports);
+        assert.ok(reports[report.id]);
     });
 });
 
