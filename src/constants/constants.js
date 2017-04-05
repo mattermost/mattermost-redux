@@ -16,15 +16,6 @@ const Constants = {
     AWAY: 'away',
     ONLINE: 'online',
 
-    TEAM_USER_ROLE: 'team_user',
-    TEAM_ADMIN_ROLE: 'team_admin',
-
-    CHANNEL_USER_ROLE: 'channel_user',
-    CHANNEL_ADMIN_ROLE: 'channel_admin',
-
-    SYSTEM_USER_ROLE: 'system_user',
-    SYSTEM_ADMIN_ROLE: 'system_admin',
-
     DEFAULT_CHANNEL: 'town-square',
     DM_CHANNEL: 'D',
     GM_CHANNEL: 'G',
@@ -75,10 +66,35 @@ const PostsTypes = {
     REMOVE_FROM_CHANNEL: 'system_remove_from_channel'
 };
 
+const Permissions = {
+    PERMISSIONS_ALL: 'all',
+    PERMISSIONS_CHANNEL_ADMIN: 'channel_admin',
+    PERMISSIONS_TEAM_ADMIN: 'team_admin',
+    PERMISSIONS_SYSTEM_ADMIN: 'system_admin',
+    PERMISSIONS_DELETE_POST_ALL: 'all',
+    PERMISSIONS_DELETE_POST_TEAM_ADMIN: 'team_admin',
+    PERMISSIONS_DELETE_POST_SYSTEM_ADMIN: 'system_admin',
+
+    TEAM_USER_ROLE: 'team_user',
+    TEAM_ADMIN_ROLE: 'team_admin',
+
+    CHANNEL_USER_ROLE: 'channel_user',
+    CHANNEL_ADMIN_ROLE: 'channel_admin',
+
+    SYSTEM_USER_ROLE: 'system_user',
+    SYSTEM_ADMIN_ROLE: 'system_admin',
+
+    ALLOW_EDIT_POST_ALWAYS: 'always',
+    ALLOW_EDIT_POST_NEVER: 'never',
+    ALLOW_EDIT_POST_TIME_LIMIT: 'time_limit',
+    DEFAULT_POST_EDIT_TIME_LIMIT: 300
+};
+
 export default {
     ...Constants,
     ...FileConstants,
     ...PostsTypes,
+    ...Permissions,
     IGNORE_POST_TYPES: [
         PostsTypes.ADD_REMOVE,
         PostsTypes.ADD_TO_CHANNEL,

@@ -131,6 +131,88 @@ export function isGroupChannelVisible(myPreferences, channel) {
     return gm && gm.value === 'true';
 }
 
+export function showCreateOption(config, license, channelType, isAdmin, isSystemAdmin) {
+    if (license.IsLicensed !== 'true') {
+        return true;
+    }
+
+    if (channelType === Constants.OPEN_CHANNEL) {
+        if (config.RestrictPublicChannelCreation === Constants.PERMISSIONS_SYSTEM_ADMIN && !isSystemAdmin) {
+            return false;
+        } else if (config.RestrictPublicChannelCreation === Constants.PERMISSIONS_TEAM_ADMIN && !isAdmin) {
+            return false;
+        }
+    } else if (channelType === Constants.PRIVATE_CHANNEL) {
+        if (config.RestrictPrivateChannelCreation === Constants.PERMISSIONS_SYSTEM_ADMIN && !isSystemAdmin) {
+            return false;
+        } else if (config.RestrictPrivateChannelCreation === Constants.PERMISSIONS_TEAM_ADMIN && !isAdmin) {
+            return false;
+        }
+    }
+
+    return true;
+}
+
+export function showManagementOptions(config, license, channel, isAdmin, isSystemAdmin, isChannelAdmin) {
+    if (license.IsLicensed !== 'true') {
+        return true;
+    }
+
+    if (channel.type === Constants.OPEN_CHANNEL) {
+        if (config.RestrictPublicChannelManagement === Constants.PERMISSIONS_SYSTEM_ADMIN && !isSystemAdmin) {
+            return false;
+        }
+        if (config.RestrictPublicChannelManagement === Constants.PERMISSIONS_TEAM_ADMIN && !isAdmin) {
+            return false;
+        }
+        if (config.RestrictPublicChannelManagement === Constants.PERMISSIONS_CHANNEL_ADMIN && !isChannelAdmin && !isAdmin) {
+            return false;
+        }
+    } else if (channel.type === Constants.PRIVATE_CHANNEL) {
+        if (config.RestrictPrivateChannelManagement === Constants.PERMISSIONS_SYSTEM_ADMIN && !isSystemAdmin) {
+            return false;
+        }
+        if (config.RestrictPrivateChannelManagement === Constants.PERMISSIONS_TEAM_ADMIN && !isAdmin) {
+            return false;
+        }
+        if (config.RestrictPrivateChannelManagement === Constants.PERMISSIONS_CHANNEL_ADMIN && !isChannelAdmin && !isAdmin) {
+            return false;
+        }
+    }
+
+    return true;
+}
+
+export function showDeleteOption(config, license, channel, isAdmin, isSystemAdmin, isChannelAdmin) {
+    if (license.IsLicensed !== 'true') {
+        return true;
+    }
+
+    if (channel.type === Constants.OPEN_CHANNEL) {
+        if (config.RestrictPublicChannelDeletion === Constants.PERMISSIONS_SYSTEM_ADMIN && !isSystemAdmin) {
+            return false;
+        }
+        if (config.RestrictPublicChannelDeletion === Constants.PERMISSIONS_TEAM_ADMIN && !isAdmin) {
+            return false;
+        }
+        if (config.RestrictPublicChannelDeletion === Constants.PERMISSIONS_CHANNEL_ADMIN && !isChannelAdmin && !isAdmin) {
+            return false;
+        }
+    } else if (channel.type === Constants.PRIVATE_CHANNEL) {
+        if (config.RestrictPrivateChannelDeletion === Constants.PERMISSIONS_SYSTEM_ADMIN && !isSystemAdmin) {
+            return false;
+        }
+        if (config.RestrictPrivateChannelDeletion === Constants.PERMISSIONS_TEAM_ADMIN && !isAdmin) {
+            return false;
+        }
+        if (config.RestrictPrivateChannelDeletion === Constants.PERMISSIONS_CHANNEL_ADMIN && !isChannelAdmin && !isAdmin) {
+            return false;
+        }
+    }
+
+    return true;
+}
+
 //====================================================
 
 function createFakeChannel(userId, otherUserId) {

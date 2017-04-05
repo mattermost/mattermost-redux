@@ -48,3 +48,7 @@ export function isTeamAdmin(roles) {
 export function isSystemAdmin(roles) {
     return roles.includes(Constants.SYSTEM_ADMIN_ROLE);
 }
+
+export function isChannelAdmin(roles) {
+    return roles.includes(Constants.CHANNEL_ADMIN_ROLE);
+}
