@@ -7,6 +7,7 @@ import WebsocketEvents from './websocket';
 import Preferences from './preferences';
 import Posts from './posts';
 import Files from './files';
+import Alerts from './alerts';
 
 export {
     General,
@@ -14,6 +15,7 @@ export {
     Posts,
     Files,
     RequestStatus,
-    WebsocketEvents
+    WebsocketEvents,
+    Alerts
 };
 

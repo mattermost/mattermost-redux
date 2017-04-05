@@ -12,6 +12,7 @@ import PreferenceTypes from './preferences';
 import IntegrationTypes from './integrations';
 import EmojiTypes from './emojis';
 import AdminTypes from './admin';
+import AlertTypes from './alerts';
 
 export {
     ErrorTypes,
@@ -24,5 +25,6 @@ export {
     PreferenceTypes,
     IntegrationTypes,
     EmojiTypes,
-    AdminTypes
+    AdminTypes,
+    AlertTypes
 };
