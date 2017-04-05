@@ -57,3 +57,40 @@ export function shouldIgnorePost(post) {
     return Posts.IGNORE_POST_TYPES.includes(post.type);
 }
 
+export function isPostOwner(userId, post) {
+    return userId === post.user_id;
+}
+
+export function isEdited(post) {
+    return post.edit_at > 0;
+}
+
+export function canDeletePost(config, license, userId, post, isAdmin, isSystemAdmin) {
+    const isOwner = isPostOwner(userId, post);
+
+    if (license.IsLicensed === 'true') {
+        return (config.RestrictPostDelete === General.PERMISSIONS_DELETE_POST_ALL && (isOwner || isAdmin)) ||
+            (config.RestrictPostDelete === General.PERMISSIONS_DELETE_POST_TEAM_ADMIN && isAdmin) ||
+            (config.RestrictPostDelete === General.PERMISSIONS_DELETE_POST_SYSTEM_ADMIN && isSystemAdmin);
+    }
+    return isOwner || isAdmin;
+}
+
+export function canEditPost(config, license, userId, post, editDisableAction) {
+    const isOwner = isPostOwner(userId, post);
+    let canEdit = isOwner && !isSystemMessage(post);
+
+    if (canEdit && license.IsLicensed === 'true') {
+        if (config.AllowEditPost === General.ALLOW_EDIT_POST_NEVER) {
+            canEdit = false;
+        } else if (config.AllowEditPost === General.ALLOW_EDIT_POST_TIME_LIMIT) {
+            const timeLeft = (post.create_at + (config.PostEditTimeLimit * 1000)) - Date.now();
+            if (timeLeft > 0) {
+                editDisableAction.fireAfter(timeLeft + 1000);
+            } else {
+                canEdit = false;
+            }
+        }
+    }
+    return canEdit;
+}
