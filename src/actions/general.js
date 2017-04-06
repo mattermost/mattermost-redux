@@ -1,13 +1,11 @@
 // Copyright (c) 2016 Mattermost, Inc. All Rights Reserved.
 // See License.txt for license information.
 
-import {batchActions} from 'redux-batched-actions';
-
 import Client from 'client';
-import {bindClientFunc, FormattedError} from './helpers.js';
 import {GeneralTypes} from 'constants';
+
+import {bindClientFunc, FormattedError} from './helpers.js';
 import {getMyChannelMembers} from './channels';
-import {getLogErrorAction} from './errors';
 import {loadMe} from './users';
 
 export function getPing() {
@@ -23,17 +21,11 @@ export function getPing() {
             data = await Client.getPing();
             if (!data.version) {
                 // successful ping but not the right return data
-                dispatch(batchActions([
-                    {type: GeneralTypes.PING_FAILURE, error: pingError},
-                    getLogErrorAction(pingError)
-                ]), getState);
+                dispatch({type: GeneralTypes.PING_FAILURE, error: pingError}, getState);
                 return;
             }
         } catch (error) {
-            dispatch(batchActions([
-                {type: GeneralTypes.PING_FAILURE, error: pingError},
-                getLogErrorAction(error)
-            ]), getState);
+            dispatch({type: GeneralTypes.PING_FAILURE, error: pingError}, getState);
             return;
         }
 
