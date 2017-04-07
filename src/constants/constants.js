@@ -37,7 +37,10 @@ const Constants = {
     POST_PURPOSE_CHANGE: 'system_purpose_change',
 
     PUSH_NOTIFY_APPLE_REACT_NATIVE: 'apple_rn',
-    PUSH_NOTIFY_ANDROID_REACT_NATIVE: 'android_rn'
+    PUSH_NOTIFY_ANDROID_REACT_NATIVE: 'android_rn',
+
+    STORE_REHYDRATION_COMPLETE: 'store_hydration_complete',
+    OFFLINE_STORE_RESET: 'offline_store_reset'
 };
 
 const FileConstants = {
