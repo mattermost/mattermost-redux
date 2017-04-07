@@ -8,7 +8,9 @@
     "isomorphic-fetch": "2.2.1",
     "mime-db": "1.27.0",
     "redux": "3.6.0",
+    "redux-action-buffer": "1.0.1",
     "redux-batched-actions": "0.1.5",
+    "redux-offline": "git+https://github.com/enahum/redux-offline.git",
     "redux-thunk": "2.2.0",
     "reselect": "3.0.0",
     "serialize-error": "2.1.0"
@@ -28,6 +30,7 @@
     "form-data": "2.1.2",
     "mocha": "3.2.0",
     "nock": "9.0.11",
+    "react": "15.4.2",
     "remote-redux-devtools": "0.5.7",
     "remote-redux-devtools-on-debugger": "0.7.0",
     "ws": "2.2.3"
