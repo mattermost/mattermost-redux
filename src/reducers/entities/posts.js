@@ -89,7 +89,7 @@ function handlePostDeleted(posts = {}, postsInChannel = {}, action) {
 
         // Remove any of its comments
         const postsForChannel = postsInChannel[channelId] ? [...postsInChannel[channelId]] : [];
-        for (const id of postsInChannel) {
+        for (const id of postsForChannel) {
             if (nextPosts[id].root_id === post.id) {
                 Reflect.deleteProperty(nextPosts, id);
 
