@@ -86,7 +86,7 @@ export function close() {
     return async (dispatch, getState) => {
         websocketClient.close(true);
         if (dispatch) {
-            dispatch({type: GeneralTypes.WEBSOCKET_FAILURE, error: 'Closed'}, getState);
+            dispatch({type: GeneralTypes.WEBSOCKET_CLOSED}, getState);
         }
     };
 }
