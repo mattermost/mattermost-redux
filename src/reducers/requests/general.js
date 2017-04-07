@@ -41,6 +41,10 @@ function license(state = initialRequestState(), action) {
 }
 
 function websocket(state = initialRequestState(), action) {
+    if (action.type === GeneralTypes.WEBSOCKET_CLOSED) {
+        return initialRequestState();
+    }
+
     return handleRequest(
         GeneralTypes.WEBSOCKET_REQUEST,
         GeneralTypes.WEBSOCKET_SUCCESS,
