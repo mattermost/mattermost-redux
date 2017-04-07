@@ -72,13 +72,14 @@ function handleReceivedPosts(posts = {}, postsInChannel = {}, action) {
 
 function handlePostDeleted(posts = {}, postsInChannel = {}, action) {
     const post = action.data;
+    const channelId = post.channel_id;
 
-    let nextPosts = posts;
+    const nextPosts = {...posts};
+    const nextPostsForChannel = {...postsInChannel};
 
     // We only need to do something if already have the post
     if (posts[post.id]) {
-        nextPosts = {...posts};
-
+        // Mark the post as deleted
         nextPosts[post.id] = {
             ...posts[post.id],
             state: Posts.POST_DELETED,
@@ -86,10 +87,23 @@ function handlePostDeleted(posts = {}, postsInChannel = {}, action) {
             has_reactions: false
         };
 
-        // No changes to the order until the user actually removes the post
+        // Remove any of its comments
+        const postsForChannel = postsInChannel[channelId] ? [...postsInChannel[channelId]] : [];
+        for (const id of postsForChannel) {
+            if (nextPosts[id].root_id === post.id) {
+                Reflect.deleteProperty(nextPosts, id);
+
+                const commentIndex = postsForChannel.indexOf(id);
+                if (commentIndex !== -1) {
+                    postsForChannel.splice(commentIndex, 1);
+                }
+            }
+        }
+
+        nextPostsForChannel[channelId] = postsForChannel;
     }
 
-    return {posts: nextPosts, postsInChannel};
+    return {posts: nextPosts, postsByChannel: nextPostsForChannel};
 }
 
 function handleRemovePost(posts = {}, postsInChannel = {}, action) {
