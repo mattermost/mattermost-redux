@@ -153,6 +153,9 @@ function profilesInTeam(state = {}, action) {
     case UserTypes.RECEIVED_PROFILES_IN_TEAM:
         return profilesToSet(state, action);
 
+    case UserTypes.RECEIVED_PROFILE_NOT_IN_TEAM:
+        return removeProfileFromSet(state, action);
+
     case UserTypes.LOGOUT_SUCCESS:
         return {};
 
