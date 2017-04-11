@@ -11,12 +11,14 @@ import createActionBuffer from 'redux-action-buffer';
 
 import {General} from 'constants';
 import serviceReducer from 'reducers';
+import initialState from './initial_state';
 
 export default function configureServiceStore(preloadedState, appReducer) {
     const baseReducer = combineReducers(Object.assign({}, serviceReducer, appReducer));
+    const baseState = Object.assign({}, initialState, preloadedState);
     return createStore(
         enableBatching(baseReducer),
-        preloadedState,
+        baseState,
         applyMiddleware(thunk)
     );
 }

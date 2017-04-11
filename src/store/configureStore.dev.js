@@ -13,11 +13,14 @@ import createActionBuffer from 'redux-action-buffer';
 import {General} from 'constants';
 import serviceReducer from 'reducers';
 import deepFreezeAndThrowOnMutation from 'utils/deep_freeze';
+import initialState from './initial_state';
 
 export default function configureServiceStore(preloadedState, appReducer, getAppReducer) {
+    const baseState = Object.assign({}, initialState, preloadedState);
+
     const store = createStore(
         createReducer(serviceReducer, appReducer),
-        preloadedState,
+        baseState,
         compose(
             applyMiddleware(thunk),
             devTools({

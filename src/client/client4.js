@@ -139,12 +139,16 @@ export default class Client4 {
     }
 
     getOptions(options) {
+        const newOptions = Object.assign({}, options);
+
         const headers = {
             [HEADER_REQUESTED_WITH]: 'XMLHttpRequest'
         };
 
         if (this.token) {
             headers[HEADER_AUTH] = `${HEADER_BEARER} ${this.token}`;
+        } else {
+            newOptions.credentials = 'include';
         }
 
         if (this.userAgent) {
@@ -152,11 +156,11 @@ export default class Client4 {
         }
 
         if (options.headers) {
-            Object.assign(headers, options.headers);
+            Object.assign(headers, newOptions.headers);
         }
 
         return {
-            ...options,
+            ...newOptions,
             headers
         };
     }
