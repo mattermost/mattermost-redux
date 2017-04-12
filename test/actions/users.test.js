@@ -10,6 +10,8 @@ import {RequestStatus} from 'constants';
 import TestHelper from 'test/test_helper';
 import configureStore from 'test/test_store';
 
+const OK_RESPONSE = {status: 'OK'};
+
 describe('Actions.Users', () => {
     let store;
     before(async () => {
@@ -185,7 +187,9 @@ describe('Actions.Users', () => {
             TestHelper.fakeUser(),
         );
 
-        nock.activate();
+        if (!nock.isActive()) {
+            nock.activate();
+        }
         nock(Client4.getBaseRoute()).
             get('/users').
             query(true).
@@ -472,6 +476,33 @@ describe('Actions.Users', () => {
         assert.equal(updateNotifyProps.email, 'false');
         assert.equal(updateNotifyProps.first_name, 'false');
         assert.equal(updateNotifyProps.mention_keys, '');
+    });
+
+    it('updateUserRoles', async () => {
+        await Actions.login(TestHelper.basicUser.email, 'password1')(store.dispatch, store.getState);
+
+        const state = store.getState();
+        const currentUser = state.entities.users.profiles[state.entities.users.currentUserId];
+
+        if (!nock.isActive()) {
+            nock.activate();
+        }
+        nock(Client4.getBaseRoute()).
+            put(`/users/${currentUser.id}/roles`).
+            reply(200, OK_RESPONSE);
+
+        await Actions.updateUserRoles(currentUser.id, 'system_user system_admin')(store.dispatch, store.getState);
+        nock.restore();
+
+        const updateRequest = store.getState().requests.users.updateUser;
+        const {currentUserId, profiles} = store.getState().entities.users;
+        const currentUserRoles = profiles[currentUserId].roles;
+
+        if (updateRequest.status === RequestStatus.FAILURE) {
+            throw new Error(JSON.stringify(updateRequest.error));
+        }
+
+        assert.equal(currentUserRoles, 'system_user system_admin');
     });
 
     it('checkMfa', async () => {

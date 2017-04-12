@@ -596,7 +596,7 @@ export function autocompleteUsers(term, teamId = '', channelId = '') {
                 {type: UserTypes.AUTOCOMPLETE_USERS_FAILURE, error},
                 getLogErrorAction(error)
             ]), getState);
-            return;
+            return null;
         }
 
         const actions = [
@@ -637,6 +637,8 @@ export function autocompleteUsers(term, teamId = '', channelId = '') {
         }
 
         dispatch(batchActions(actions), getState);
+
+        return data;
     };
 }
 
@@ -738,13 +740,41 @@ export function updateMe(user) {
             data = await Client4.patchMe(user);
         } catch (error) {
             dispatch({type: UserTypes.UPDATE_ME_FAILURE, error}, getState);
-            return;
+            return null;
         }
 
         dispatch(batchActions([
             {type: UserTypes.RECEIVED_ME, data},
             {type: UserTypes.UPDATE_ME_SUCCESS}
         ]), getState);
+
+        return data;
+    };
+}
+
+export function updateUserRoles(userId, roles) {
+    return async (dispatch, getState) => {
+        dispatch({type: UserTypes.UPDATE_USER_REQUEST}, getState);
+
+        try {
+            await Client4.updateUserRoles(userId, roles);
+        } catch (error) {
+            dispatch({type: UserTypes.UPDATE_USER_FAILURE, error}, getState);
+            return null;
+        }
+
+        const actions = [
+            {type: UserTypes.UPDATE_USER_SUCCESS}
+        ];
+
+        const profile = getState().entities.users.profiles[userId];
+        if (profile) {
+            actions.push({type: UserTypes.RECEIVED_PROFILE, data: Object.assign({}, profile, {roles})});
+        }
+
+        dispatch(batchActions(actions), getState);
+
+        return true;
     };
 }
 
@@ -767,5 +797,6 @@ export default {
     searchProfiles,
     startPeriodicStatusUpdates,
     stopPeriodicStatusUpdates,
-    updateMe
+    updateMe,
+    updateUserRoles
 };

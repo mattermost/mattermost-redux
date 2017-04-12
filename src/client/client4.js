@@ -202,6 +202,13 @@ export default class Client4 {
         );
     }
 
+    updateUserRoles = async (userId, roles) => {
+        return this.doFetch(
+            `${this.getUserRoute(userId)}/roles`,
+            {method: 'put', body: JSON.stringify({roles})}
+        );
+    }
+
     login = async (loginId, password, token = '', deviceId = '') => {
         const body = {
             device_id: deviceId,

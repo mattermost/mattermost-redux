@@ -80,6 +80,10 @@ export default keyMirror({
     UPDATE_ME_SUCCESS: null,
     UPDATE_ME_FAILURE: null,
 
+    UPDATE_USER_REQUEST: null,
+    UPDATE_USER_SUCCESS: null,
+    UPDATE_USER_FAILURE: null,
+
     RECEIVED_ME: null,
     RECEIVED_PROFILE: null,
     RECEIVED_PROFILES: null,

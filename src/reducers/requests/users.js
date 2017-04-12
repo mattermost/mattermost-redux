@@ -214,6 +214,16 @@ function updateMe(state = initialRequestState(), action) {
     );
 }
 
+function updateUser(state = initialRequestState(), action) {
+    return handleRequest(
+        UserTypes.UPDATE_USER_REQUEST,
+        UserTypes.UPDATE_USER_SUCCESS,
+        UserTypes.UPDATE_USER_FAILURE,
+        state,
+        action
+    );
+}
+
 function create(state = initialRequestState(), action) {
     return handleRequest(
         UserTypes.CREATE_USER_REQUEST,
@@ -243,5 +253,6 @@ export default combineReducers({
     getAudits,
     autocompleteUsers,
     searchProfiles,
-    updateMe
+    updateMe,
+    updateUser
 });
