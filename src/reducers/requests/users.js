@@ -84,6 +84,26 @@ function getProfilesInTeam(state = initialRequestState(), action) {
     );
 }
 
+function getProfilesNotInTeam(state = initialRequestState(), action) {
+    return handleRequest(
+        UserTypes.PROFILES_NOT_IN_TEAM_REQUEST,
+        UserTypes.PROFILES_NOT_IN_TEAM_SUCCESS,
+        UserTypes.PROFILES_NOT_IN_TEAM_FAILURE,
+        state,
+        action
+    );
+}
+
+function getProfilesWithoutTeam(state = initialRequestState(), action) {
+    return handleRequest(
+        UserTypes.PROFILES_WITHOUT_TEAM_REQUEST,
+        UserTypes.PROFILES_WITHOUT_TEAM_SUCCESS,
+        UserTypes.PROFILES_WITHOUT_TEAM_FAILURE,
+        state,
+        action
+    );
+}
+
 function getProfilesInChannel(state = initialRequestState(), action) {
     return handleRequest(
         UserTypes.PROFILES_IN_CHANNEL_REQUEST,
@@ -211,6 +231,8 @@ export default combineReducers({
     create,
     getProfiles,
     getProfilesInTeam,
+    getProfilesNotInTeam,
+    getProfilesWithoutTeam,
     getProfilesInChannel,
     getProfilesNotInChannel,
     getUser,

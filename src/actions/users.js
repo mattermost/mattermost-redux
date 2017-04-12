@@ -312,6 +312,75 @@ export function getProfilesInTeam(teamId, page, perPage = General.PROFILE_CHUNK_
     };
 }
 
+export function getProfilesNotInTeam(teamId, page, perPage = General.PROFILE_CHUNK_SIZE) {
+    return async (dispatch, getState) => {
+        dispatch({type: UserTypes.PROFILES_NOT_IN_TEAM_REQUEST}, getState);
+
+        let profiles;
+        try {
+            profiles = await Client4.getProfilesNotInTeam(teamId, page, perPage);
+        } catch (error) {
+            forceLogoutIfNecessary(error, dispatch);
+            dispatch(batchActions([
+                {type: UserTypes.PROFILES_NOT_IN_TEAM_FAILURE, error},
+                getLogErrorAction(error)
+            ]), getState);
+            return null;
+        }
+
+        dispatch(batchActions([
+            {
+                type: UserTypes.RECEIVED_PROFILES_LIST_NOT_IN_TEAM,
+                data: profiles,
+                id: teamId
+            },
+            {
+                type: UserTypes.RECEIVED_PROFILES_LIST,
+                data: profiles
+            },
+            {
+                type: UserTypes.PROFILES_NOT_IN_TEAM_SUCCESS
+            }
+        ]), getState);
+
+        return profiles;
+    };
+}
+
+export function getProfilesWithoutTeam(page, perPage = General.PROFILE_CHUNK_SIZE) {
+    return async (dispatch, getState) => {
+        dispatch({type: UserTypes.PROFILES_WITHOUT_TEAM_REQUEST}, getState);
+
+        let profiles;
+        try {
+            profiles = await Client4.getProfilesWithoutTeam(page, perPage);
+        } catch (error) {
+            forceLogoutIfNecessary(error, dispatch);
+            dispatch(batchActions([
+                {type: UserTypes.PROFILES_WITHOUT_TEAM_FAILURE, error},
+                getLogErrorAction(error)
+            ]), getState);
+            return null;
+        }
+
+        dispatch(batchActions([
+            {
+                type: UserTypes.RECEIVED_PROFILES_LIST_WITHOUT_TEAM,
+                data: profiles
+            },
+            {
+                type: UserTypes.RECEIVED_PROFILES_LIST,
+                data: profiles
+            },
+            {
+                type: UserTypes.PROFILES_WITHOUT_TEAM_SUCCESS
+            }
+        ]), getState);
+
+        return profiles;
+    };
+}
+
 export function getProfilesInChannel(channelId, page, perPage = General.PROFILE_CHUNK_SIZE) {
     return async (dispatch, getState) => {
         dispatch({type: UserTypes.PROFILES_IN_CHANNEL_REQUEST}, getState);

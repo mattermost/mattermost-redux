@@ -258,6 +258,20 @@ export default class Client4 {
         );
     };
 
+    getProfilesNotInTeam = async (teamId, page = 0, perPage = PER_PAGE_DEFAULT) => {
+        return this.doFetch(
+            `${this.getUsersRoute()}${buildQueryString({not_in_team: teamId, page, per_page: perPage})}`,
+            {method: 'get'}
+        );
+    };
+
+    getProfilesWithoutTeam = async (page = 0, perPage = PER_PAGE_DEFAULT) => {
+        return this.doFetch(
+            `${this.getUsersRoute()}${buildQueryString({without_team: 1, page, per_page: perPage})}`,
+            {method: 'get'}
+        );
+    };
+
     getProfilesInChannel = async (channelId, page = 0, perPage = PER_PAGE_DEFAULT) => {
         return this.doFetch(
             `${this.getUsersRoute()}${buildQueryString({in_channel: channelId, page, per_page: perPage})}`,

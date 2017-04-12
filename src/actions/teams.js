@@ -4,7 +4,7 @@
 import {batchActions} from 'redux-batched-actions';
 import {Client4} from 'client';
 import {General} from 'constants';
-import {TeamTypes} from 'action_types';
+import {TeamTypes, UserTypes} from 'action_types';
 import {getLogErrorAction} from './errors';
 import {bindClientFunc, forceLogoutIfNecessary} from './helpers';
 import {getProfilesByIds, getStatusesByIds} from './users';
@@ -213,6 +213,11 @@ export function addUserToTeam(teamId, userId) {
 
         dispatch(batchActions([
             {
+                type: UserTypes.RECEIVED_PROFILE_IN_TEAM,
+                data: {user_id: userId},
+                id: teamId
+            },
+            {
                 type: TeamTypes.RECEIVED_MEMBER_IN_TEAM,
                 data: member
             },
@@ -244,6 +249,11 @@ export function removeUserFromTeam(teamId, userId) {
         };
 
         dispatch(batchActions([
+            {
+                type: UserTypes.RECEIVED_PROFILE_NOT_IN_TEAM,
+                data: {user_id: userId},
+                id: teamId
+            },
             {
                 type: TeamTypes.REMOVE_MEMBER_FROM_TEAM,
                 data: member

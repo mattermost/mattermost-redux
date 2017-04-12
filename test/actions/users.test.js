@@ -2,6 +2,7 @@
 // See License.txt for license information.
 
 import assert from 'assert';
+import nock from 'nock';
 
 import * as Actions from 'actions/users';
 import {Client, Client4} from 'client';
@@ -153,6 +154,56 @@ describe('Actions.Users', () => {
         assert.ok(team);
         assert.ok(team.has(TestHelper.basicUser.id));
         assert.equal(Object.keys(profiles).length, team.size, 'profiles != profiles in team');
+    });
+
+    it('getProfilesNotInTeam', async () => {
+        await TestHelper.basicClient4.createUser(
+            TestHelper.fakeUser(),
+            null,
+            null,
+            TestHelper.basicTeam.invite_id
+        );
+
+        const team = await Client4.createTeam({...TestHelper.fakeTeam(), allow_open_invite: true});
+
+        await Actions.getProfilesNotInTeam(team.id, 0)(store.dispatch, store.getState);
+
+        const profilesRequest = store.getState().requests.users.getProfilesNotInTeam;
+        const {profilesNotInTeam} = store.getState().entities.users;
+
+        if (profilesRequest.status === RequestStatus.FAILURE) {
+            throw new Error(JSON.stringify(profilesRequest.error));
+        }
+
+        const notInTeam = profilesNotInTeam[team.id];
+        assert.ok(notInTeam);
+        assert.ok(notInTeam.size > 0);
+    });
+
+    it('getProfilesWithoutTeam', async () => {
+        const user = await TestHelper.basicClient4.createUser(
+            TestHelper.fakeUser(),
+        );
+
+        nock.activate();
+        nock(Client4.getBaseRoute()).
+            get('/users').
+            query(true).
+            reply(200, [user]);
+
+        await Actions.getProfilesWithoutTeam(0)(store.dispatch, store.getState);
+        nock.restore();
+
+        const profilesRequest = store.getState().requests.users.getProfilesWithoutTeam;
+        const {profilesWithoutTeam, profiles} = store.getState().entities.users;
+
+        if (profilesRequest.status === RequestStatus.FAILURE) {
+            throw new Error(JSON.stringify(profilesRequest.error));
+        }
+
+        assert.ok(profilesWithoutTeam);
+        assert.ok(profilesWithoutTeam.has(user.id));
+        assert.ok(profiles[user.id]);
     });
 
     it('getProfilesInChannel', async () => {

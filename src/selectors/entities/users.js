@@ -10,12 +10,24 @@ export function getCurrentUserId(state) {
     return state.entities.users.currentUserId;
 }
 
-export function getProfilesInChannel(state) {
-    return state.entities.users.profilesInChannel;
+export function getUserIdsInChannel(state, id) {
+    return state.entities.users.profilesInChannel[id];
 }
 
-export function getProfilesNotInChannel(state) {
-    return state.entities.users.profilesNotInChannel;
+export function getUserIdsNotInChannel(state, id) {
+    return state.entities.users.profilesNotInChannel[id];
+}
+
+export function getUserIdsInTeam(state, id) {
+    return state.entities.users.profilesInTeam[id];
+}
+
+export function getUserIdsNotInTeam(state, id) {
+    return state.entities.users.profilesNotInTeam[id];
+}
+
+export function getUserIdsWithoutTeam(state) {
+    return state.entities.users.profilesWithoutTeam;
 }
 
 export function getUserStatuses(state) {
@@ -61,7 +73,7 @@ export const getCurrentUserRoles = createSelector(
 
 export const getProfileSetInCurrentChannel = createSelector(
     getCurrentChannelId,
-    getProfilesInChannel,
+    getUserIdsInChannel,
     (currentChannel, channelProfiles) => {
         return channelProfiles[currentChannel];
     }
@@ -69,7 +81,7 @@ export const getProfileSetInCurrentChannel = createSelector(
 
 export const getProfileSetNotInCurrentChannel = createSelector(
     getCurrentChannelId,
-    getProfilesNotInChannel,
+    getUserIdsNotInChannel,
     (currentChannel, channelProfiles) => {
         return channelProfiles[currentChannel];
     }
