@@ -209,6 +209,18 @@ export default class Client4 {
         );
     }
 
+    updateUserMfa = async (userId, activate, code) => {
+        const body = {activate};
+        if (activate) {
+            body.code = code;
+        }
+
+        return this.doFetch(
+            `${this.getUserRoute(userId)}/mfa`,
+            {method: 'put', body: JSON.stringify(body)}
+        );
+    }
+
     login = async (loginId, password, token = '', deviceId = '') => {
         const body = {
             device_id: deviceId,

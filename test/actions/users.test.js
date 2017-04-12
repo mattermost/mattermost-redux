@@ -187,9 +187,7 @@ describe('Actions.Users', () => {
             TestHelper.fakeUser(),
         );
 
-        if (!nock.isActive()) {
-            nock.activate();
-        }
+        TestHelper.activateMocking();
         nock(Client4.getBaseRoute()).
             get('/users').
             query(true).
@@ -481,21 +479,18 @@ describe('Actions.Users', () => {
     it('updateUserRoles', async () => {
         await Actions.login(TestHelper.basicUser.email, 'password1')(store.dispatch, store.getState);
 
-        const state = store.getState();
-        const currentUser = state.entities.users.profiles[state.entities.users.currentUserId];
+        const currentUserId = store.getState().entities.users.currentUserId;
 
-        if (!nock.isActive()) {
-            nock.activate();
-        }
+        TestHelper.activateMocking();
         nock(Client4.getBaseRoute()).
-            put(`/users/${currentUser.id}/roles`).
+            put(`/users/${currentUserId}/roles`).
             reply(200, OK_RESPONSE);
 
-        await Actions.updateUserRoles(currentUser.id, 'system_user system_admin')(store.dispatch, store.getState);
+        await Actions.updateUserRoles(currentUserId, 'system_user system_admin')(store.dispatch, store.getState);
         nock.restore();
 
         const updateRequest = store.getState().requests.users.updateUser;
-        const {currentUserId, profiles} = store.getState().entities.users;
+        const {profiles} = store.getState().entities.users;
         const currentUserRoles = profiles[currentUserId].roles;
 
         if (updateRequest.status === RequestStatus.FAILURE) {
@@ -503,6 +498,30 @@ describe('Actions.Users', () => {
         }
 
         assert.equal(currentUserRoles, 'system_user system_admin');
+    });
+
+    it('updateUserMfa', async () => {
+        await Actions.login(TestHelper.basicUser.email, 'password1')(store.dispatch, store.getState);
+
+        const currentUserId = store.getState().entities.users.currentUserId;
+
+        TestHelper.activateMocking();
+        nock(Client4.getBaseRoute()).
+            put(`/users/${currentUserId}/mfa`).
+            reply(200, OK_RESPONSE);
+
+        await Actions.updateUserMfa(currentUserId, true, '123456')(store.dispatch, store.getState);
+        nock.restore();
+
+        const updateRequest = store.getState().requests.users.updateUser;
+        const {profiles} = store.getState().entities.users;
+        const currentUserMfa = profiles[currentUserId].mfa_active;
+
+        if (updateRequest.status === RequestStatus.FAILURE) {
+            throw new Error(JSON.stringify(updateRequest.error));
+        }
+
+        assert.equal(currentUserMfa, true);
     });
 
     it('checkMfa', async () => {

@@ -778,6 +778,32 @@ export function updateUserRoles(userId, roles) {
     };
 }
 
+export function updateUserMfa(userId, activate, code = '') {
+    return async (dispatch, getState) => {
+        dispatch({type: UserTypes.UPDATE_USER_REQUEST}, getState);
+
+        try {
+            await Client4.updateUserMfa(userId, activate, code);
+        } catch (error) {
+            dispatch({type: UserTypes.UPDATE_USER_FAILURE, error}, getState);
+            return null;
+        }
+
+        const actions = [
+            {type: UserTypes.UPDATE_USER_SUCCESS}
+        ];
+
+        const profile = getState().entities.users.profiles[userId];
+        if (profile) {
+            actions.push({type: UserTypes.RECEIVED_PROFILE, data: Object.assign({}, profile, {mfa_active: activate})});
+        }
+
+        dispatch(batchActions(actions), getState);
+
+        return true;
+    };
+}
+
 export default {
     checkMfa,
     login,
@@ -798,5 +824,6 @@ export default {
     startPeriodicStatusUpdates,
     stopPeriodicStatusUpdates,
     updateMe,
-    updateUserRoles
+    updateUserRoles,
+    updateUserMfa
 };
