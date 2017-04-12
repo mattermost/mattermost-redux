@@ -583,41 +583,60 @@ export function getUserAudits(userId, page = 0, perPage = General.AUDITS_CHUNK_S
     );
 }
 
-export function autocompleteUsersInChannel(teamId, channelId, term) {
+export function autocompleteUsers(term, teamId = '', channelId = '') {
     return async (dispatch, getState) => {
-        dispatch({type: UserTypes.AUTOCOMPLETE_IN_CHANNEL_REQUEST}, getState);
+        dispatch({type: UserTypes.AUTOCOMPLETE_USERS_REQUEST}, getState);
 
         let data;
         try {
-            data = await Client4.autocompleteUsersInChannel(teamId, channelId, term);
+            data = await Client4.autocompleteUsers(term, teamId, channelId);
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch);
             dispatch(batchActions([
-                {type: UserTypes.AUTOCOMPLETE_IN_CHANNEL_FAILURE, error},
+                {type: UserTypes.AUTOCOMPLETE_USERS_FAILURE, error},
                 getLogErrorAction(error)
             ]), getState);
             return;
         }
 
-        dispatch(batchActions([
-            {
-                type: UserTypes.RECEIVED_PROFILES_LIST_IN_CHANNEL,
-                data: data.users,
-                id: channelId
-            },
-            {
-                type: UserTypes.RECEIVED_PROFILES_LIST_NOT_IN_CHANNEL,
-                data: data.out_of_channel,
-                id: channelId
-            },
+        const actions = [
             {
                 type: UserTypes.RECEIVED_PROFILES_LIST,
                 data: Object.assign([], data.users, data.out_of_channel)
             },
             {
-                type: UserTypes.AUTOCOMPLETE_IN_CHANNEL_SUCCESS
+                type: UserTypes.AUTOCOMPLETE_USERS_SUCCESS
             }
-        ]), getState);
+        ];
+
+        if (channelId) {
+            actions.push(
+                {
+                    type: UserTypes.RECEIVED_PROFILES_LIST_IN_CHANNEL,
+                    data: data.users,
+                    id: channelId
+                }
+            );
+            actions.push(
+                {
+                    type: UserTypes.RECEIVED_PROFILES_LIST_NOT_IN_CHANNEL,
+                    data: data.out_of_channel,
+                    id: channelId
+                }
+            );
+        }
+
+        if (teamId) {
+            actions.push(
+                {
+                    type: UserTypes.RECEIVED_PROFILES_LIST_IN_TEAM,
+                    data: Object.assign([], data.users, data.out_of_channel),
+                    id: teamId
+                }
+            );
+        }
+
+        dispatch(batchActions(actions), getState);
     };
 }
 

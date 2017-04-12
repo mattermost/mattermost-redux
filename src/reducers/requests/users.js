@@ -184,11 +184,11 @@ function getAudits(state = initialRequestState(), action) {
     );
 }
 
-function autocompleteUsersInChannel(state = initialRequestState(), action) {
+function autocompleteUsers(state = initialRequestState(), action) {
     return handleRequest(
-        UserTypes.AUTOCOMPLETE_IN_CHANNEL_REQUEST,
-        UserTypes.AUTOCOMPLETE_IN_CHANNEL_SUCCESS,
-        UserTypes.AUTOCOMPLETE_IN_CHANNEL_FAILURE,
+        UserTypes.AUTOCOMPLETE_USERS_REQUEST,
+        UserTypes.AUTOCOMPLETE_USERS_SUCCESS,
+        UserTypes.AUTOCOMPLETE_USERS_FAILURE,
         state,
         action
     );
@@ -241,7 +241,7 @@ export default combineReducers({
     getSessions,
     revokeSession,
     getAudits,
-    autocompleteUsersInChannel,
+    autocompleteUsers,
     searchProfiles,
     updateUserNotifyProps
 });

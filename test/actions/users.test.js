@@ -413,7 +413,7 @@ describe('Actions.Users', () => {
         assert.equal(audits[0].user_id, TestHelper.basicUser.id);
     });
 
-    it('autocompleteUsersInChannel', async () => {
+    it('autocompleteUsers', async () => {
         const user = await TestHelper.basicClient4.createUser(
             TestHelper.fakeUser(),
             null,
@@ -422,13 +422,13 @@ describe('Actions.Users', () => {
         );
 
         await TestHelper.basicClient4.login(TestHelper.basicUser.email, 'password1');
-        await Actions.autocompleteUsersInChannel(
+        await Actions.autocompleteUsers(
+            '',
             TestHelper.basicTeam.id,
-            TestHelper.basicChannel.id,
-            ''
+            TestHelper.basicChannel.id
         )(store.dispatch, store.getState);
 
-        const autocompleteRequest = store.getState().requests.users.autocompleteUsersInChannel;
+        const autocompleteRequest = store.getState().requests.users.autocompleteUsers;
         const {profiles, profilesNotInChannel, profilesInChannel} = store.getState().entities.users;
 
         if (autocompleteRequest.status === RequestStatus.FAILURE) {
