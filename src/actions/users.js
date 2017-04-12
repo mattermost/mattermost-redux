@@ -729,28 +729,22 @@ export function stopPeriodicStatusUpdates() {
     };
 }
 
-export function updateUserNotifyProps(notifyProps) {
+export function updateMe(user) {
     return async (dispatch, getState) => {
-        const state = getState();
-        const currentUserId = state.entities.users.currentUserId;
-        const currentNotifyProps = state.entities.users.profiles[currentUserId].notify_props;
+        dispatch({type: UserTypes.UPDATE_ME_REQUEST}, getState);
 
-        dispatch({
-            type: UserTypes.UPDATE_NOTIFY_PROPS,
-            notifyProps,
-            meta: {
-                offline: {
-                    effect: () => Client4.patchMe({notify_props: notifyProps}),
-                    commit: {
-                        type: UserTypes.RECEIVED_ME
-                    },
-                    rollback: {
-                        type: UserTypes.UPDATE_NOTIFY_PROPS,
-                        notifyProps: currentNotifyProps
-                    }
-                }
-            }
-        });
+        let data;
+        try {
+            data = await Client4.patchMe(user);
+        } catch (error) {
+            dispatch({type: UserTypes.UPDATE_ME_FAILURE, error}, getState);
+            return;
+        }
+
+        dispatch(batchActions([
+            {type: UserTypes.RECEIVED_ME, data},
+            {type: UserTypes.UPDATE_ME_SUCCESS}
+        ]), getState);
     };
 }
 
@@ -773,5 +767,5 @@ export default {
     searchProfiles,
     startPeriodicStatusUpdates,
     stopPeriodicStatusUpdates,
-    updateUserNotifyProps
+    updateMe
 };

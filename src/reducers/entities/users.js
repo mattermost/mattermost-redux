@@ -131,15 +131,6 @@ function profiles(state = {}, action) {
     case UserTypes.LOGOUT_SUCCESS:
         return {};
 
-    case UserTypes.UPDATE_NOTIFY_PROPS:
-        return {
-            ...state,
-            [action.notifyProps.user_id]: {
-                ...state[action.notifyProps.user_id],
-                notify_props: action.notifyProps
-            }
-        };
-
     default:
         return state;
     }

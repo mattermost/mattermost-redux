@@ -288,7 +288,7 @@ const state = {
                 status: 'not_started',
                 error: null
             },
-            updateUserNotifyProps: {
+            updateMe: {
                 status: 'not_started',
                 error: null
             }

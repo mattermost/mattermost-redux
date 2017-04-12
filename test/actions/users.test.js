@@ -442,23 +442,25 @@ describe('Actions.Users', () => {
         assert.ok(profiles[user.id]);
     });
 
-    it('updateUserNotifyProps', async () => {
+    it('updateMe', async () => {
         await Actions.login(TestHelper.basicUser.email, 'password1')(store.dispatch, store.getState);
 
         const state = store.getState();
         const currentUser = state.entities.users.profiles[state.entities.users.currentUserId];
         const notifyProps = currentUser.notify_props;
 
-        await Actions.updateUserNotifyProps({
-            ...notifyProps,
-            comments: 'any',
-            email: 'false',
-            first_name: 'false',
-            mention_keys: '',
-            user_id: currentUser.id
+        await Actions.updateMe({
+            notify_props: {
+                ...notifyProps,
+                comments: 'any',
+                email: 'false',
+                first_name: 'false',
+                mention_keys: '',
+                user_id: currentUser.id
+            }
         })(store.dispatch, store.getState);
 
-        const updateRequest = store.getState().requests.users.updateUserNotifyProps;
+        const updateRequest = store.getState().requests.users.updateMe;
         const {currentUserId, profiles} = store.getState().entities.users;
         const updateNotifyProps = profiles[currentUserId].notify_props;
 

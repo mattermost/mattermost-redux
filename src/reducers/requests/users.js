@@ -204,11 +204,11 @@ function searchProfiles(state = initialRequestState(), action) {
     );
 }
 
-function updateUserNotifyProps(state = initialRequestState(), action) {
+function updateMe(state = initialRequestState(), action) {
     return handleRequest(
-        UserTypes.UPDATE_NOTIFY_PROPS_REQUEST,
-        UserTypes.UPDATE_NOTIFY_PROPS_SUCCESS,
-        UserTypes.UPDATE_NOTIFY_PROPS_FAILURE,
+        UserTypes.UPDATE_ME_REQUEST,
+        UserTypes.UPDATE_ME_SUCCESS,
+        UserTypes.UPDATE_ME_FAILURE,
         state,
         action
     );
@@ -243,5 +243,5 @@ export default combineReducers({
     getAudits,
     autocompleteUsers,
     searchProfiles,
-    updateUserNotifyProps
+    updateMe
 });
