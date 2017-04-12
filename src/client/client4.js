@@ -221,6 +221,13 @@ export default class Client4 {
         );
     }
 
+    updateUserPassword = async (userId, currentPassword, newPassword) => {
+        return this.doFetch(
+            `${this.getUserRoute(userId)}/password`,
+            {method: 'put', body: JSON.stringify({current_password: currentPassword, new_password: newPassword})}
+        );
+    }
+
     login = async (loginId, password, token = '', deviceId = '') => {
         const body = {
             device_id: deviceId,

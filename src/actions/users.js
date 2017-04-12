@@ -804,6 +804,32 @@ export function updateUserMfa(userId, activate, code = '') {
     };
 }
 
+export function updateUserPassword(userId, currentPassword, newPassword) {
+    return async (dispatch, getState) => {
+        dispatch({type: UserTypes.UPDATE_USER_REQUEST}, getState);
+
+        try {
+            await Client4.updateUserPassword(userId, currentPassword, newPassword);
+        } catch (error) {
+            dispatch({type: UserTypes.UPDATE_USER_FAILURE, error}, getState);
+            return null;
+        }
+
+        const actions = [
+            {type: UserTypes.UPDATE_USER_SUCCESS}
+        ];
+
+        const profile = getState().entities.users.profiles[userId];
+        if (profile) {
+            actions.push({type: UserTypes.RECEIVED_PROFILE, data: Object.assign({}, profile, {last_password_update_at: new Date().getTime()})});
+        }
+
+        dispatch(batchActions(actions), getState);
+
+        return true;
+    };
+}
+
 export default {
     checkMfa,
     login,
@@ -825,5 +851,6 @@ export default {
     stopPeriodicStatusUpdates,
     updateMe,
     updateUserRoles,
-    updateUserMfa
+    updateUserMfa,
+    updateUserPassword
 };

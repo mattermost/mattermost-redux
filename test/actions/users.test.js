@@ -524,6 +524,26 @@ describe('Actions.Users', () => {
         assert.equal(currentUserMfa, true);
     });
 
+    it('updateUserPassword', async () => {
+        await Actions.login(TestHelper.basicUser.email, 'password1')(store.dispatch, store.getState);
+
+        const beforeTime = new Date().getTime();
+        const currentUserId = store.getState().entities.users.currentUserId;
+
+        await Actions.updateUserPassword(currentUserId, 'password1', 'password1')(store.dispatch, store.getState);
+
+        const updateRequest = store.getState().requests.users.updateUser;
+        const {profiles} = store.getState().entities.users;
+        const currentUser = profiles[currentUserId];
+
+        if (updateRequest.status === RequestStatus.FAILURE) {
+            throw new Error(JSON.stringify(updateRequest.error));
+        }
+
+        assert.ok(currentUser);
+        assert.ok(currentUser.last_password_update_at > beforeTime);
+    });
+
     it('checkMfa', async () => {
         const user = TestHelper.basicUser;
         const mfaRequired = await Actions.checkMfa(user.email)(store.dispatch, store.getState);
