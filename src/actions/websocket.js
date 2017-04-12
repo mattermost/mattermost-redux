@@ -82,8 +82,10 @@ export function init(platform, siteUrl, token, optionalWebSocket) {
     };
 }
 
-export function close() {
+let reconnect = false;
+export function close(shouldReconnect = false) {
     return async (dispatch, getState) => {
+        reconnect = shouldReconnect;
         websocketClient.close(true);
         if (dispatch) {
             dispatch({type: GeneralTypes.WEBSOCKET_CLOSED}, getState);
@@ -97,6 +99,13 @@ function handleConnecting(dispatch, getState) {
 
 function handleFirstConnect(dispatch, getState) {
     dispatch({type: GeneralTypes.WEBSOCKET_SUCCESS}, getState);
+    if (reconnect) {
+        reconnect = false;
+
+        handleReconnect(dispatch, getState).catch(() => {
+            //just do nothing
+        });
+    }
 }
 
 async function handleReconnect(dispatch, getState) {
@@ -459,16 +468,17 @@ function handleUserTypingEvent(msg, dispatch, getState) {
 // Helpers
 
 function loadPostsHelper(teamId, channelId, dispatch, getState) {
-    const {posts, postsInChannel} = getState().entities.posts;
-    const postsArray = postsInChannel[channelId];
-    const latestPostId = postsArray[postsArray.length - 1];
+    const {posts, postsByChannel} = getState().entities.posts;
+    const postsArray = postsByChannel[channelId];
+    const postsLength = postsArray ? postsArray.length : 0;
+    const latestPostId = postsLength ? postsArray[postsLength - 1] : null;
 
     let latestPostTime = 0;
     if (latestPostId) {
         latestPostTime = posts[latestPostId].create_at || 0;
     }
 
-    if (Object.keys(posts).length === 0 || postsArray.length < Posts.POST_CHUNK_SIZE || latestPostTime === 0) {
+    if (Object.keys(posts).length === 0 || postsLength < General.POST_CHUNK_SIZE || latestPostTime === 0) {
         getPosts(teamId, channelId)(dispatch, getState);
     } else {
         getPostsSince(teamId, channelId, latestPostTime)(dispatch, getState);
@@ -481,7 +491,8 @@ export function userTyping(channelId, parentPostId) {
         const state = getState();
         const config = state.entities.general.config;
         const t = Date.now();
-        const membersInChannel = getCurrentChannelStats(state).member_count;
+        const stats = getCurrentChannelStats(state);
+        const membersInChannel = stats ? stats.member_count : 0;
 
         if (((t - lastTimeTypingSent) > config.TimeBetweenUserTypingUpdatesMilliseconds) &&
             (membersInChannel < config.MaxNotificationsPerChannel) && (config.EnableUserTypingMessages === 'true')) {
