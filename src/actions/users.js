@@ -42,13 +42,13 @@ export function checkMfa(loginId) {
     };
 }
 
-export function createUser(user) {
+export function createUser(user, data, hash, inviteId) {
     return async (dispatch, getState) => {
         dispatch({type: UserTypes.CREATE_USER_REQUEST}, getState);
 
         let created;
         try {
-            created = await Client4.createUser(user);
+            created = await Client4.createUser(user, data, hash, inviteId);
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch);
             dispatch(batchActions([
