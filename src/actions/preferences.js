@@ -13,6 +13,7 @@ import {getPreferenceKey} from 'utils/preference_utils';
 import {bindClientFunc, forceLogoutIfNecessary} from './helpers';
 import {getLogErrorAction} from './errors';
 import {getProfilesByIds, getProfilesInChannel} from './users';
+import {getChannel} from './channels';
 
 export function deletePreferences(preferences) {
     return async (dispatch, getState) => {
@@ -87,6 +88,10 @@ export function makeGroupMessageVisibleIfNecessary(channelId) {
                 name: channelId,
                 value: 'true'
             };
+
+            if (!state.channels.channels[channelId]) {
+                getChannel(currentTeamId, channelId)(dispatch, getState);
+            }
 
             getProfilesInChannel(currentTeamId, channelId, 0)(dispatch, getState);
             await savePreferences([preference])(dispatch, getState);
