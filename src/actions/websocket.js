@@ -20,6 +20,7 @@ import {
     getPostsSince
 } from './posts';
 import {
+    getMyPreferences,
     makeDirectChannelVisibleIfNecessary,
     makeGroupMessageVisibleIfNecessary
 } from './preferences';
@@ -110,6 +111,8 @@ async function handleReconnect(dispatch, getState) {
     const entities = getState().entities;
     const {currentTeamId} = entities.teams;
     const {currentChannelId} = entities.channels;
+
+    await getMyPreferences()(dispatch, getState);
 
     if (currentTeamId) {
         await fetchMyChannelsAndMembers(currentTeamId)(dispatch, getState);
@@ -387,6 +390,7 @@ function handleDirectAddedEvent(msg, dispatch, getState) {
 
 function handlePreferenceChangedEvent(msg, dispatch, getState) {
     const preference = JSON.parse(msg.data.preference);
+    console.warn('got preference changed', JSON.stringify(preference));
     dispatch({type: PreferencesTypes.RECEIVED_PREFERENCES, data: [preference]}, getState);
 
     if (preference.category === Constants.CATEGORY_DIRECT_CHANNEL_SHOW) {
