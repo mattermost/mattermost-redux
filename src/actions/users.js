@@ -390,7 +390,6 @@ export function getProfilesInChannel(channelId, page, perPage = General.PROFILE_
         let profiles;
         try {
             profiles = await Client4.getProfilesInChannel(channelId, page, perPage);
-            removeUserFromList(currentUserId, profiles);
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch);
             dispatch(batchActions([
@@ -408,7 +407,7 @@ export function getProfilesInChannel(channelId, page, perPage = General.PROFILE_
             },
             {
                 type: UserTypes.RECEIVED_PROFILES_LIST,
-                data: profiles
+                data: removeUserFromList(currentUserId, Object.assign([], profiles))
             },
             {
                 type: UserTypes.PROFILES_IN_CHANNEL_SUCCESS
@@ -428,7 +427,6 @@ export function getProfilesNotInChannel(teamId, channelId, page, perPage = Gener
         let profiles;
         try {
             profiles = await Client4.getProfilesNotInChannel(teamId, channelId, page, perPage);
-            removeUserFromList(currentUserId, profiles);
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch);
             dispatch(batchActions([
@@ -446,7 +444,7 @@ export function getProfilesNotInChannel(teamId, channelId, page, perPage = Gener
             },
             {
                 type: UserTypes.RECEIVED_PROFILES_LIST,
-                data: profiles
+                data: removeUserFromList(currentUserId, Object.assign([], profiles))
             },
             {
                 type: UserTypes.PROFILES_NOT_IN_CHANNEL_SUCCESS
@@ -651,7 +649,6 @@ export function searchProfiles(term, options = {}) {
         let profiles;
         try {
             profiles = await Client4.searchUsers(term, options);
-            removeUserFromList(currentUserId, profiles);
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch);
             dispatch(batchActions([
@@ -661,7 +658,7 @@ export function searchProfiles(term, options = {}) {
             return null;
         }
 
-        const actions = [{type: UserTypes.RECEIVED_PROFILES_LIST, data: profiles}];
+        const actions = [{type: UserTypes.RECEIVED_PROFILES_LIST, data: removeUserFromList(currentUserId, Object.assign([], profiles))}];
 
         if (options.in_channel_id) {
             actions.push({

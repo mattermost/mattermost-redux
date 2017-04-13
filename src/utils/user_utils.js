@@ -65,9 +65,11 @@ export function removeUserFromList(userId, list) {
     for (let i = list.length - 1; i >= 0; i--) {
         if (list[i].id === userId) {
             list.splice(i, 1);
-            return;
+            return list;
         }
     }
+
+    return list;
 }
 
 export function filterProfiles(profiles, term) {
