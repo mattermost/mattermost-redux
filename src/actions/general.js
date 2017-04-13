@@ -56,6 +56,12 @@ export function getLicenseConfig() {
     );
 }
 
+export function getClientConfigAndLicense() {
+    return async (dispatch, getState) => {
+        await Promise.all([getLicenseConfig()(dispatch, getState), getClientConfig()(dispatch, getState)]);
+    };
+}
+
 export function logClientError(message, level = 'ERROR') {
     return bindClientFunc(
         Client4.logClientError,
@@ -101,13 +107,21 @@ export function setStoreFromLocalData(data) {
     };
 }
 
+export function setUrl(url) {
+    Client.setUrl(url);
+    Client4.setUrl(url);
+    return true;
+}
+
 export default {
     getPing,
     getClientConfig,
     getLicenseConfig,
+    getClientConfigAndLicense,
     logClientError,
     setAppState,
     setDeviceToken,
     setServerVersion,
-    setStoreFromLocalData
+    setStoreFromLocalData,
+    setUrl
 };
