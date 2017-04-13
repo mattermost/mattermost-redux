@@ -75,64 +75,68 @@ export function login(loginId, password, mfaToken = '') {
 
         const deviceId = getState().entities.general.deviceToken;
 
-        return Client4.login(loginId, password, mfaToken, deviceId).
-        then(async (data) => {
-            let teamMembers;
-            try {
-                const teamMembersRequest = Client4.getMyTeamMembers();
-
-                teamMembers = await teamMembersRequest;
-            } catch (error) {
-                dispatch(batchActions([
-                    {type: UserTypes.LOGIN_FAILURE, error},
-                    getLogErrorAction(error)
-                ]), getState);
-                return;
-            }
-
-            try {
-                await getMyTeams()(dispatch, getState);
-            } catch (error) {
-                forceLogoutIfNecessary(error, dispatch);
-                dispatch(batchActions([
-                    {type: UserTypes.LOGIN_FAILURE, error},
-                    getLogErrorAction(error)
-                ]), getState);
-                return;
-            }
-
-            try {
-                await getMyPreferences()(dispatch, getState);
-            } catch (error) {
-                forceLogoutIfNecessary(error, dispatch);
-                dispatch(batchActions([
-                    {type: UserTypes.LOGIN_FAILURE, error},
-                    getLogErrorAction(error)
-                ]), getState);
-                return;
-            }
-
+        let data;
+        try {
+            data = await Client4.login(loginId, password, mfaToken, deviceId);
+        } catch (error) {
             dispatch(batchActions([
                 {
-                    type: UserTypes.RECEIVED_ME,
-                    data
+                    type: UserTypes.LOGIN_FAILURE,
+                    error
                 },
-                {
-                    type: TeamTypes.RECEIVED_MY_TEAM_MEMBERS,
-                    data: await teamMembers
-                },
-                {
-                    type: UserTypes.LOGIN_SUCCESS
-                }
+                getLogErrorAction(error)
             ]), getState);
-        }).
-        catch((error) => {
+            return null;
+        }
+
+        let teamMembers;
+        try {
+            teamMembers = await Client4.getMyTeamMembers();
+        } catch (error) {
             dispatch(batchActions([
                 {type: UserTypes.LOGIN_FAILURE, error},
                 getLogErrorAction(error)
             ]), getState);
-            return;
-        });
+            return null;
+        }
+
+        try {
+            await getMyPreferences()(dispatch, getState);
+        } catch (error) {
+            forceLogoutIfNecessary(error, dispatch);
+            dispatch(batchActions([
+                {type: UserTypes.LOGIN_FAILURE, error},
+                getLogErrorAction(error)
+            ]), getState);
+            return null;
+        }
+
+        try {
+            await getMyTeams()(dispatch, getState);
+        } catch (error) {
+            forceLogoutIfNecessary(error, dispatch);
+            dispatch(batchActions([
+                {type: UserTypes.LOGIN_FAILURE, error},
+                getLogErrorAction(error)
+            ]), getState);
+            return null;
+        }
+
+        dispatch(batchActions([
+            {
+                type: UserTypes.RECEIVED_ME,
+                data
+            },
+            {
+                type: TeamTypes.RECEIVED_MY_TEAM_MEMBERS,
+                data: await teamMembers
+            },
+            {
+                type: UserTypes.LOGIN_SUCCESS
+            }
+        ]), getState);
+
+        return true;
     };
 }
 
@@ -207,9 +211,6 @@ export function loadMe() {
             },
             {
                 type: UserTypes.LOGIN_SUCCESS
-            },
-            {
-                type: PreferenceTypes.MY_PREFERENCES_SUCCESS
             },
             {
                 type: TeamTypes.RECEIVED_MY_TEAM_MEMBERS,
