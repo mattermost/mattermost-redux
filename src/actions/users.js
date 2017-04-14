@@ -20,6 +20,7 @@ import {removeUserFromList} from 'utils/user_utils';
 import {getLogErrorAction} from './errors';
 import {bindClientFunc, forceLogoutIfNecessary, debounce} from './helpers';
 import {
+    getMyPreferences,
     makeDirectChannelVisibleIfNecessary,
     makeGroupMessageVisibleIfNecessary
 } from './preferences';
@@ -77,13 +78,10 @@ export function login(loginId, password, mfaToken = '') {
         return Client4.login(loginId, password, mfaToken, deviceId).
         then(async (data) => {
             let teamMembers;
-            let preferences;
             try {
                 const teamMembersRequest = Client4.getMyTeamMembers();
-                const preferencesRequest = Client4.getMyPreferences();
 
                 teamMembers = await teamMembersRequest;
-                preferences = await preferencesRequest;
             } catch (error) {
                 dispatch(batchActions([
                     {type: UserTypes.LOGIN_FAILURE, error},
@@ -103,14 +101,21 @@ export function login(loginId, password, mfaToken = '') {
                 return;
             }
 
+            try {
+                await getMyPreferences()(dispatch, getState);
+            } catch (error) {
+                forceLogoutIfNecessary(error, dispatch);
+                dispatch(batchActions([
+                    {type: UserTypes.LOGIN_FAILURE, error},
+                    getLogErrorAction(error)
+                ]), getState);
+                return;
+            }
+
             dispatch(batchActions([
                 {
                     type: UserTypes.RECEIVED_ME,
                     data
-                },
-                {
-                    type: PreferenceTypes.RECEIVED_PREFERENCES,
-                    data: await preferences
                 },
                 {
                     type: TeamTypes.RECEIVED_MY_TEAM_MEMBERS,
@@ -151,10 +156,8 @@ export function loadMe() {
             Client4.attachDevice(deviceId);
         }
 
-        let preferences;
-        dispatch({type: PreferenceTypes.MY_PREFERENCES_REQUEST}, getState);
         try {
-            preferences = await Client4.getMyPreferences();
+            await getMyPreferences()(dispatch, getState);
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch);
             dispatch(batchActions([
@@ -195,10 +198,6 @@ export function loadMe() {
             },
             {
                 type: UserTypes.LOGIN_SUCCESS
-            },
-            {
-                type: PreferenceTypes.RECEIVED_PREFERENCES,
-                data: preferences
             },
             {
                 type: PreferenceTypes.MY_PREFERENCES_SUCCESS
