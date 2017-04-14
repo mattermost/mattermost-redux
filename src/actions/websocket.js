@@ -164,6 +164,12 @@ function handleEvent(msg, dispatch, getState) {
     case WebsocketEvents.PREFERENCE_CHANGED:
         handlePreferenceChangedEvent(msg, dispatch, getState);
         break;
+    case WebsocketEvents.PREFERENCES_CHANGED:
+        handlePreferencesChangedEvent(msg, dispatch, getState);
+        break;
+    case WebsocketEvents.PREFERENCES_DELETED:
+        handlePreferencesDeletedEvent(msg, dispatch, getState);
+        break;
     case WebsocketEvents.STATUS_CHANGED:
         handleStatusChangedEvent(msg, dispatch, getState);
         break;
@@ -386,20 +392,57 @@ function handlePreferenceChangedEvent(msg, dispatch, getState) {
     const preference = JSON.parse(msg.data.preference);
     dispatch({type: PreferenceTypes.RECEIVED_PREFERENCES, data: [preference]}, getState);
 
-    if (preference.category === Preferences.CATEGORY_DIRECT_CHANNEL_SHOW) {
-        const state = getState();
-        const users = state.entities.users;
-        const userId = preference.name;
-        const status = users.statuses[userId];
+    getAddedDmUsersIfNecessary([preference], dispatch, getState);
+}
 
-        if (!users.profiles[userId] && userId !== users.currentUserId) {
-            getProfilesByIds([userId])(dispatch, getState);
-        }
+function handlePreferencesChangedEvent(msg, dispatch, getState) {
+    const preferences = JSON.parse(msg.data.preferences);
+    dispatch({type: PreferenceTypes.RECEIVED_PREFERENCES, data: preferences}, getState);
 
-        if (status !== General.ONLINE) {
-            getStatusesByIds([userId])(dispatch, getState);
+    getAddedDmUsersIfNecessary(preferences, dispatch, getState);
+}
+
+function getAddedDmUsersIfNecessary(preferences, dispatch, getState) {
+    const userIds = [];
+
+    for (const preference of preferences) {
+        if (preference.category === Preferences.CATEGORY_DIRECT_CHANNEL_SHOW && preference.value === 'true') {
+            userIds.push(preference.name);
         }
     }
+
+    if (userIds.length === 0) {
+        return;
+    }
+
+    const state = getState();
+    const {currentUserId, profiles, statuses} = state.entities.users;
+
+    const needProfiles = [];
+    const needStatuses = [];
+
+    for (const userId of userIds) {
+        if (!profiles[userId] && userId !== currentUserId) {
+            needProfiles.push(userId);
+        }
+
+        if (statuses[userId] !== General.ONLINE) {
+            needStatuses.push(userId);
+        }
+    }
+
+    if (needProfiles.length > 0) {
+        getProfilesByIds(needProfiles)(dispatch, getState);
+    }
+
+    if (needStatuses.length > 0) {
+        getStatusesByIds(needStatuses)(dispatch, getState);
+    }
+}
+
+function handlePreferencesDeletedEvent(msg, dispatch, getState) {
+    const preferences = JSON.parse(msg.data.preferences);
+    dispatch({type: PreferenceTypes.DELETED_PREFERENCES, data: preferences}, getState);
 }
 
 function handleStatusChangedEvent(msg, dispatch, getState) {
