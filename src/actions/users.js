@@ -106,7 +106,7 @@ export function login(loginId, password, mfaToken = '') {
             } catch (error) {
                 forceLogoutIfNecessary(error, dispatch);
                 dispatch(batchActions([
-                    {type: UsersTypes.LOGIN_FAILURE, error},
+                    {type: UserTypes.LOGIN_FAILURE, error},
                     getLogErrorAction(error)
                 ]), getState);
                 return;
@@ -161,7 +161,7 @@ export function loadMe() {
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch);
             dispatch(batchActions([
-                {type: PreferencesTypes.MY_PREFERENCES_FAILURE, error},
+                {type: PreferenceTypes.MY_PREFERENCES_FAILURE, error},
                 getLogErrorAction(error)
             ]), getState);
             return;
