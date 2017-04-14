@@ -390,7 +390,6 @@ function handleDirectAddedEvent(msg, dispatch, getState) {
 
 function handlePreferenceChangedEvent(msg, dispatch, getState) {
     const preference = JSON.parse(msg.data.preference);
-    console.warn('got preference changed', JSON.stringify(preference));
     dispatch({type: PreferencesTypes.RECEIVED_PREFERENCES, data: [preference]}, getState);
 
     if (preference.category === Constants.CATEGORY_DIRECT_CHANNEL_SHOW) {
