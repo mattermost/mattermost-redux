@@ -276,6 +276,21 @@ describe('Actions.Users', () => {
         assert.equal(profiles[user.id].id, user.id);
     });
 
+    it('getMe', async () => {
+        await Actions.getMe()(store.dispatch, store.getState);
+
+        const state = store.getState();
+        const profileRequest = state.requests.users.getUser;
+        const {profiles, currentUserId} = state.entities.users;
+
+        if (profileRequest.status === RequestStatus.FAILURE) {
+            throw new Error(JSON.stringify(profileRequest.error));
+        }
+
+        assert.ok(profiles[currentUserId]);
+        assert.equal(profiles[currentUserId].id, currentUserId);
+    });
+
     it('getUserByUsername', async () => {
         const user = await TestHelper.basicClient4.createUser(
             TestHelper.fakeUser(),

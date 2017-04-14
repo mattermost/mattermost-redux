@@ -456,6 +456,15 @@ export function getProfilesNotInChannel(teamId, channelId, page, perPage = Gener
     };
 }
 
+export function getMe() {
+    return bindClientFunc(
+        Client4.getMe,
+        UserTypes.USER_REQUEST,
+        [UserTypes.RECEIVED_ME, UserTypes.USER_SUCCESS],
+        UserTypes.USER_FAILURE
+    );
+}
+
 export function getUser(id) {
     return bindClientFunc(
         Client4.getUser,
@@ -838,6 +847,7 @@ export default {
     getProfilesInChannel,
     getProfilesNotInChannel,
     getUser,
+    getMe,
     getUserByUsername,
     getStatusesByIds,
     getSessions,
