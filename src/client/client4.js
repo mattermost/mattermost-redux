@@ -527,7 +527,7 @@ export default class Client4 {
     searchChannels = async (teamId, term) => {
         return this.doFetch(
             `${this.getTeamRoute(teamId)}/channels/search`,
-            {method: 'post', body: JSON.strinify({term})}
+            {method: 'post', body: JSON.stringify({term})}
         );
     };
 
@@ -640,6 +640,18 @@ export default class Client4 {
         return this.doFetch(
             `${this.getBaseRoute()}/system/ping`,
             {method: 'get'}
+        );
+    };
+
+    logClientError = async (message, level = 'ERROR') => {
+        const body = {
+            message,
+            level
+        };
+
+        return this.doFetch(
+            `${this.getBaseRoute()}/general/log_client`,
+            {method: 'post', body: JSON.stringify(body)}
         );
     };
 
