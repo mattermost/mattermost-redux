@@ -230,7 +230,7 @@ function createFakeChannelCurried(userId) {
 }
 
 function createMissingDirectChannels(currentUserId, allChannels, myPreferences) {
-    const directChannelsDisplayPreferences = getPreferencesByCategory(myPreferences, General.CATEGORY_DIRECT_CHANNEL_SHOW);
+    const directChannelsDisplayPreferences = getPreferencesByCategory(myPreferences, Preferences.CATEGORY_DIRECT_CHANNEL_SHOW);
 
     return Array.
     from(directChannelsDisplayPreferences).
@@ -269,7 +269,7 @@ function isDirectChannelForUser(userId, otherUserId, channel) {
 }
 
 function isFavoriteChannel(myPreferences, channel) {
-    const fav = myPreferences[`${General.CATEGORY_FAVORITE_CHANNEL}--${channel.id}`];
+    const fav = myPreferences[`${Preferences.CATEGORY_FAVORITE_CHANNEL}--${channel.id}`];
     channel.isFavorite = fav && fav.value === 'true';
     return channel.isFavorite;
 }
