@@ -21,14 +21,18 @@ function profilesToSet(state, action) {
 function profileListToSet(state, action) {
     const id = action.id;
     const nextSet = new Set(state[id]);
-    action.data.forEach((profile) => {
-        nextSet.add(profile.id);
-    });
+    if (action.data) {
+        action.data.forEach((profile) => {
+            nextSet.add(profile.id);
+        });
 
-    return {
-        ...state,
-        [id]: nextSet
-    };
+        return {
+            ...state,
+            [id]: nextSet
+        };
+    }
+
+    return state;
 }
 
 function addProfileToSet(state, action) {
