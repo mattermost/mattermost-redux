@@ -3,7 +3,7 @@
 
 import {batchActions} from 'redux-batched-actions';
 
-import {Client, Client4} from 'client';
+import {Client4} from 'client';
 import websocketClient from 'client/websocket_client';
 import {getProfilesByIds, getStatusesByIds, loadProfilesForDirect} from './users';
 import {
@@ -43,8 +43,8 @@ import EventEmitter from 'utils/event_emitter';
 export function init(platform, siteUrl, token, optionalWebSocket) {
     return async (dispatch, getState) => {
         const config = getState().entities.general.config;
-        let connUrl = siteUrl || Client.getUrl();
-        const authToken = token || Client.getToken();
+        let connUrl = siteUrl || Client4.getUrl();
+        const authToken = token || Client4.getToken();
 
         // replace the protocol with a websocket one
         if (connUrl.startsWith('https:')) {
@@ -62,7 +62,7 @@ export function init(platform, siteUrl, token, optionalWebSocket) {
             }
         }
 
-        connUrl += `${Client.getUrlVersion()}/users/websocket`;
+        connUrl += `${Client4.getUrlVersion()}/websocket`;
         websocketClient.setFirstConnectCallback(handleFirstConnect);
         websocketClient.setEventCallback(handleEvent);
         websocketClient.setReconnectCallback(handleReconnect);
@@ -413,8 +413,8 @@ function handleStatusChangedEvent(msg, dispatch, getState) {
 
 function handleHelloEvent(msg) {
     const serverVersion = msg.data.server_version;
-    if (serverVersion && Client.serverVersion !== serverVersion) {
-        Client.serverVersion = serverVersion;
+    if (serverVersion && Client4.serverVersion !== serverVersion) {
+        Client4.serverVersion = serverVersion;
         EventEmitter.emit(General.CONFIG_CHANGED, serverVersion);
     }
 }
