@@ -156,9 +156,20 @@ function removeChannelMember(state = initialRequestState(), action) {
     );
 }
 
+function getMoreChannels(state = initialRequestState(), action) {
+    return handleRequest(
+        ChannelTypes.MORE_CHANNELS_REQUEST,
+        ChannelTypes.MORE_CHANNELS_SUCCESS,
+        ChannelTypes.MORE_CHANNELS_FAILURE,
+        state,
+        action
+    );
+}
+
 export default combineReducers({
     getChannel,
     getChannels,
+    getMoreChannels,
     myMembers,
     members,
     myChannels,
