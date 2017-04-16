@@ -548,7 +548,7 @@ export function getChannels(teamId, page = 0, perPage = General.CHANNELS_CHUNK_S
 
 export function searchMoreChannels(teamId, term) {
     return async (dispatch, getState) => {
-        dispatch({type: ChannelTypes.MORE_CHANNELS_REQUEST}, getState);
+        dispatch({type: ChannelTypes.GET_CHANNELS_REQUEST}, getState);
 
         let channels;
         try {
@@ -556,7 +556,7 @@ export function searchMoreChannels(teamId, term) {
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch);
             dispatch(batchActions([
-                {type: ChannelTypes.MORE_CHANNELS_FAILURE, error},
+                {type: ChannelTypes.GET_CHANNELS_FAILURE, error},
                 getLogErrorAction(error)
             ]), getState);
             return;
@@ -569,7 +569,7 @@ export function searchMoreChannels(teamId, term) {
                 data: await channels
             },
             {
-                type: ChannelTypes.MORE_CHANNELS_SUCCESS
+                type: ChannelTypes.GET_CHANNELS_SUCCESS
             }
         ]), getState);
     };

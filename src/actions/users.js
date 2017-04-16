@@ -245,7 +245,7 @@ export function getProfiles(page = 0, perPage = General.PROFILE_CHUNK_SIZE) {
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch);
             dispatch(batchActions([
-                {type: UsersTypes.PROFILES_FAILURE, error},
+                {type: UserTypes.PROFILES_FAILURE, error},
                 getLogErrorAction(error)
             ]), getState);
             return null;

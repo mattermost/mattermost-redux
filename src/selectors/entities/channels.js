@@ -5,7 +5,7 @@ import {createSelector} from 'reselect';
 import {getMyPreferences} from 'selectors/entities/preferences';
 import {getCurrentTeamId, getCurrentTeamMembership} from 'selectors/entities/teams';
 import {getCurrentUser, getCurrentUserId, getUsers} from 'selectors/entities/users';
-import {buildDisplayableChannelList, getNotMemberChannels, completeDirectChannelInfo, sortChannelsByDisplayName} from 'utils/channel_utils';
+import {buildDisplayableChannelList, completeDirectChannelInfo, sortChannelsByDisplayName} from 'utils/channel_utils';
 import {General} from 'constants';
 
 function getAllChannels(state) {
@@ -129,14 +129,6 @@ export const getDefaultChannel = createSelector(
     getCurrentTeamId,
     (channels, teamId) => {
         return Object.values(channels).find((c) => c.team_id === teamId && c.name === General.DEFAULT_CHANNEL);
-    }
-);
-
-export const getMoreChannels = createSelector(
-    getAllChannels,
-    getMyChannelMemberships,
-    (allChannels, myMembers) => {
-        return getNotMemberChannels(Object.values(allChannels), myMembers);
     }
 );
 

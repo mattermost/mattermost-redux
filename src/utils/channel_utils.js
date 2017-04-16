@@ -96,10 +96,6 @@ export function getDirectChannelName(id, otherId) {
     return handle;
 }
 
-export function getNotMemberChannels(allChannels, myMembers) {
-    return allChannels.filter(not(isNotMemberOf.bind(this, myMembers)));
-}
-
 export function getUserIdFromChannelName(userId, channelName) {
     const ids = channelName.split('__');
     let otherUserId = '';
@@ -276,10 +272,6 @@ function isFavoriteChannel(myPreferences, channel) {
 
 function isNotDeletedChannel(channel) {
     return channel.delete_at === 0;
-}
-
-function isNotMemberOf(myMembers, channel) {
-    return myMembers[channel.id];
 }
 
 function isOpenChannel(channel) {
