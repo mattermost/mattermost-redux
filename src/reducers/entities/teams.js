@@ -77,7 +77,7 @@ function membersInTeam(state = {}, action) {
     }
     case TeamTypes.RECEIVED_MEMBERS_IN_TEAM: {
         const data = action.data;
-        if (data.length) {
+        if (data && data.length) {
             const teamId = data[0].team_id;
             const members = new Set(state[teamId]);
             for (const member of data) {
