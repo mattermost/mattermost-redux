@@ -117,7 +117,7 @@ async function handleReconnect(dispatch, getState) {
         await fetchMyChannelsAndMembers(currentTeamId)(dispatch, getState);
         loadProfilesForDirect()(dispatch, getState);
         if (currentChannelId) {
-            loadPostsHelper(currentTeamId, currentChannelId, dispatch, getState);
+            loadPostsHelper(currentChannelId, dispatch, getState);
         }
     }
 
@@ -467,7 +467,7 @@ function handleUserTypingEvent(msg, dispatch, getState) {
 
 // Helpers
 
-function loadPostsHelper(teamId, channelId, dispatch, getState) {
+function loadPostsHelper(channelId, dispatch, getState) {
     const {posts, postsByChannel} = getState().entities.posts;
     const postsArray = postsByChannel[channelId];
     const postsLength = postsArray ? postsArray.length : 0;
@@ -479,9 +479,9 @@ function loadPostsHelper(teamId, channelId, dispatch, getState) {
     }
 
     if (Object.keys(posts).length === 0 || postsLength < General.POST_CHUNK_SIZE || latestPostTime === 0) {
-        getPosts(teamId, channelId)(dispatch, getState);
+        getPosts(channelId)(dispatch, getState);
     } else {
-        getPostsSince(teamId, channelId, latestPostTime)(dispatch, getState);
+        getPostsSince(channelId, latestPostTime)(dispatch, getState);
     }
 }
 
