@@ -6,7 +6,7 @@ import {createSelector} from 'reselect';
 import {getCurrentChannelId, getMyCurrentChannelMembership} from './channels';
 import {getCurrentTeamId, getCurrentTeamMembership} from './teams';
 
-import {userMatchesSearchTerm, sortByUsername} from 'utils/user_utils';
+import {filterProfilesMatchingTerm, sortByUsername} from 'utils/user_utils';
 
 export function getCurrentUserId(state) {
     return state.entities.users.currentUserId;
@@ -165,25 +165,25 @@ export function getStatusForUserId(state, userId) {
 }
 
 export function searchProfiles(state, term) {
-    return Object.values(getUsers(state)).filter((u) => userMatchesSearchTerm(u, term));
+    return filterProfilesMatchingTerm(Object.values(getUsers(state)), term);
 }
 
 export function searchProfilesInCurrentChannel(state, term) {
-    return Object.values(getProfilesInCurrentChannel(state)).filter((u) => userMatchesSearchTerm(u, term));
+    return filterProfilesMatchingTerm(getProfilesInCurrentChannel(state), term);
 }
 
 export function searchProfilesNotInCurrentChannel(state, term) {
-    return Object.values(getProfilesNotInCurrentChannel(state)).filter((u) => userMatchesSearchTerm(u, term));
+    return filterProfilesMatchingTerm(getProfilesNotInCurrentChannel(state), term);
 }
 
 export function searchProfilesInCurrentTeam(state, term) {
-    return Object.values(getProfilesInCurrentTeam(state)).filter((u) => userMatchesSearchTerm(u, term));
+    return filterProfilesMatchingTerm(getProfilesInCurrentTeam(state), term);
 }
 
 export function searchProfilesNotInCurrentTeam(state, term) {
-    return Object.values(getProfilesNotInCurrentTeam(state)).filter((u) => userMatchesSearchTerm(u, term));
+    return filterProfilesMatchingTerm(getProfilesNotInCurrentTeam(state), term);
 }
 
 export function searchProfilesWithoutTeam(state, term) {
-    return Object.values(getProfilesWithoutTeam(state)).filter((u) => userMatchesSearchTerm(u, term));
+    return filterProfilesMatchingTerm(getProfilesWithoutTeam(state), term);
 }

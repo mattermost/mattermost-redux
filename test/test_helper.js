@@ -78,7 +78,9 @@ class TestHelper {
             allow_marketing: true,
             password: PASSWORD,
             locale: 'en',
-            username: this.generateId()
+            username: this.generateId(),
+            first_name: this.generateId(),
+            last_name: this.generateId()
         };
     };
 

@@ -82,12 +82,25 @@ export function filterProfilesMatchingTerm(users, term) {
         const username = user.username || '';
         const first = user.first_name || '';
         const last = user.last_name || '';
+        const full = first + ' ' + last;
         const email = user.email || '';
+        const nickname = user.nickname || '';
+
+        let emailPrefix = '';
+        let emailDomain = '';
+        const split = email.split('@');
+        emailPrefix = split[0];
+        if (split.length > 1) {
+            emailDomain = split[1];
+        }
 
         return username.startsWith(lowercasedTerm) ||
             first.startsWith(lowercasedTerm) ||
             last.startsWith(lowercasedTerm) ||
-            email.startsWith(lowercasedTerm);
+            full.startsWith(lowercasedTerm) ||
+            nickname.startsWith(term) ||
+            emailPrefix.startsWith(term) ||
+            emailDomain.startsWith(term);
     });
 }
 

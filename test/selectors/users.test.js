@@ -103,6 +103,7 @@ describe('Selectors.Users', () => {
 
     it('searchProfiles', () => {
         assert.deepEqual(Selectors.searchProfiles(testState, user1.username), [user1]);
+        assert.deepEqual(Selectors.searchProfiles(testState, user2.first_name + ' ' + user2.last_name), [user2]);
     });
 
     it('searchProfilesInCurrentChannel', () => {
