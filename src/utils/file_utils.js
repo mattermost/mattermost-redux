@@ -1,7 +1,7 @@
 // Copyright (c) 2017-present Mattermost, Inc. All Rights Reserved.
 // See License.txt for license information.
 
-import {General} from 'constants';
+import {Files} from 'constants';
 import mimeDB from 'mime-db';
 
 export function getFormattedFileSize(file) {
@@ -37,7 +37,7 @@ export function getFileType(file) {
     ];
     return fileTypes.find((fileType) => {
         const constForFileTypeExtList = `${fileType}_types`.toUpperCase();
-        const fileTypeExts = General[constForFileTypeExtList];
+        const fileTypeExts = Files[constForFileTypeExtList];
         return fileTypeExts.indexOf(fileExt) > -1;
     }) || 'other';
 }
