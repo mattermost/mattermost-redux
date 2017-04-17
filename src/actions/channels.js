@@ -687,16 +687,18 @@ export function markChannelAsRead(channelId, prevChannelId) {
     return async (dispatch, getState) => {
         const state = getState();
 
-        const {channels} = state.entities.channels;
+        const {channels, myMembers} = state.entities.channels;
         let totalMsgCount = 0;
         if (channels[channelId]) {
             totalMsgCount = channels[channelId].total_msg_count;
         }
+
+        const channelMember = myMembers[channelId];
         const actions = [{
             type: ChannelTypes.RECEIVED_LAST_VIEWED,
             data: {
                 channel_id: channelId,
-                last_viewed_at: new Date().getTime(),
+                last_viewed_at: channelMember.last_viewed_at,
                 total_msg_count: totalMsgCount
             }
         }];
