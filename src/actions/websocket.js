@@ -38,7 +38,7 @@ import {General, WebsocketEvents, Preferences, Posts} from 'constants';
 
 import {getCurrentChannelStats} from 'selectors/entities/channels';
 import {getUserIdFromChannelName} from 'utils/channel_utils';
-import {isSystemMessage, shouldIgnorePost} from 'utils/post_utils';
+import {isSystemMessage, getLastUpdateAt, shouldIgnorePost} from 'utils/post_utils';
 import EventEmitter from 'utils/event_emitter';
 
 export function init(platform, siteUrl, token, optionalWebSocket) {
@@ -515,16 +515,15 @@ function handleUserTypingEvent(msg, dispatch, getState) {
 
 function loadPostsHelper(channelId, dispatch, getState) {
     const {posts, postsInChannel} = getState().entities.posts;
-    const postsArray = postsInChannel[channelId];
-    const postsLength = postsArray ? postsArray.length : 0;
-    const latestPostId = postsLength ? postsArray[postsLength - 1] : null;
+    const postsIds = postsInChannel[channelId];
 
     let latestPostTime = 0;
-    if (latestPostId) {
-        latestPostTime = posts[latestPostId].create_at || 0;
+    if (postsIds && postsIds.length) {
+        const postsForChannel = postsIds.map((id) => posts[id]);
+        latestPostTime = getLastUpdateAt(postsForChannel);
     }
 
-    if (Object.keys(posts).length === 0 || postsLength < General.POST_CHUNK_SIZE || latestPostTime === 0) {
+    if (latestPostTime === 0) {
         getPosts(channelId)(dispatch, getState);
     } else {
         getPostsSince(channelId, latestPostTime)(dispatch, getState);
