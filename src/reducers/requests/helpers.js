@@ -25,9 +25,8 @@ export function handleRequest(REQUEST, SUCCESS, FAILURE, state, action) {
         };
     case FAILURE: {
         let error = action.error;
-
         if (error instanceof Error) {
-            error = error.hasOwnProperty('intl') ? {...error} : error.toString();
+            error = error.hasOwnProperty('intl') ? JSON.parse(JSON.stringify(error)) : error.toString();
         }
 
         return {

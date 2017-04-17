@@ -548,7 +548,7 @@ export function getChannels(teamId, page = 0, perPage = General.CHANNELS_CHUNK_S
 
 export function searchMoreChannels(teamId, term) {
     return async (dispatch, getState) => {
-        dispatch({type: ChannelTypes.MORE_CHANNELS_REQUEST}, getState);
+        dispatch({type: ChannelTypes.GET_CHANNELS_REQUEST}, getState);
 
         let channels;
         try {
@@ -556,7 +556,7 @@ export function searchMoreChannels(teamId, term) {
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch);
             dispatch(batchActions([
-                {type: ChannelTypes.MORE_CHANNELS_FAILURE, error},
+                {type: ChannelTypes.GET_CHANNELS_FAILURE, error},
                 getLogErrorAction(error)
             ]), getState);
             return;
@@ -569,7 +569,7 @@ export function searchMoreChannels(teamId, term) {
                 data: await channels
             },
             {
-                type: ChannelTypes.MORE_CHANNELS_SUCCESS
+                type: ChannelTypes.GET_CHANNELS_SUCCESS
             }
         ]), getState);
     };
@@ -687,16 +687,18 @@ export function markChannelAsRead(channelId, prevChannelId) {
     return async (dispatch, getState) => {
         const state = getState();
 
-        const {channels} = state.entities.channels;
+        const {channels, myMembers} = state.entities.channels;
         let totalMsgCount = 0;
         if (channels[channelId]) {
             totalMsgCount = channels[channelId].total_msg_count;
         }
+
+        const channelMember = myMembers[channelId];
         const actions = [{
             type: ChannelTypes.RECEIVED_LAST_VIEWED,
             data: {
                 channel_id: channelId,
-                last_viewed_at: new Date().getTime(),
+                last_viewed_at: channelMember.last_viewed_at,
                 total_msg_count: totalMsgCount
             }
         }];

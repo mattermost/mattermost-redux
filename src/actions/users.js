@@ -138,10 +138,19 @@ export function login(loginId, password, mfaToken = '') {
 
 export function loadMe() {
     return async (dispatch, getState) => {
+        const {currentUserId, profiles} = getState().entities.users;
+        const currentUser = profiles[currentUserId];
         let user;
+
         dispatch({type: UserTypes.LOGIN_REQUEST}, getState);
         try {
             user = await Client4.getMe();
+
+            // getMe is not returning the notify props, if we have it already from login
+            // we are going to use it, needs to be fixed at server side before removing this
+            if (currentUser && currentUser.notify_props) {
+                user.notify_props = currentUser.notify_props;
+            }
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch);
             dispatch(batchActions([
@@ -223,14 +232,36 @@ export function logout() {
 }
 
 export function getProfiles(page = 0, perPage = General.PROFILE_CHUNK_SIZE) {
-    return bindClientFunc(
-        Client4.getProfiles,
-        UserTypes.PROFILES_REQUEST,
-        [UserTypes.RECEIVED_PROFILES_LIST, UserTypes.PROFILES_SUCCESS],
-        UserTypes.PROFILES_FAILURE,
-        page,
-        perPage
-    );
+    return async (dispatch, getState) => {
+        dispatch({type: UserTypes.PROFILES_REQUEST}, getState);
+
+        const {currentUserId} = getState().entities.users;
+
+        let profiles;
+        try {
+            profiles = await Client4.getProfiles(page, perPage);
+            removeUserFromList(currentUserId, profiles);
+        } catch (error) {
+            forceLogoutIfNecessary(error, dispatch);
+            dispatch(batchActions([
+                {type: UserTypes.PROFILES_FAILURE, error},
+                getLogErrorAction(error)
+            ]), getState);
+            return null;
+        }
+
+        dispatch(batchActions([
+            {
+                type: UserTypes.RECEIVED_PROFILES_LIST,
+                data: profiles
+            },
+            {
+                type: UserTypes.PROFILES_SUCCESS
+            }
+        ]), getState);
+
+        return profiles;
+    };
 }
 
 export function getProfilesByIds(userIds) {
@@ -247,9 +278,12 @@ export function getProfilesInTeam(teamId, page, perPage = General.PROFILE_CHUNK_
     return async (dispatch, getState) => {
         dispatch({type: UserTypes.PROFILES_IN_TEAM_REQUEST}, getState);
 
+        const {currentUserId} = getState().entities.users;
+
         let profiles;
         try {
             profiles = await Client4.getProfilesInTeam(teamId, page, perPage);
+            removeUserFromList(currentUserId, profiles);
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch);
             dispatch(batchActions([

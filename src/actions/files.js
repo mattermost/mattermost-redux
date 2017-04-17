@@ -37,7 +37,7 @@ export function getFilesForPost(postId) {
     };
 }
 
-export function uploadFile(fileFormData, formBoundary) {
+export function uploadFile(channelId, rootId, fileFormData, formBoundary) {
     return async (dispatch, getState) => {
         dispatch({type: FileTypes.UPLOAD_FILES_REQUEST}, getState);
 
@@ -63,7 +63,9 @@ export function uploadFile(fileFormData, formBoundary) {
         dispatch(batchActions([
             {
                 type: FileTypes.RECEIVED_UPLOAD_FILES,
-                data
+                data,
+                channelId,
+                rootId
             },
             {
                 type: FileTypes.UPLOAD_FILES_SUCCESS

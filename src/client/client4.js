@@ -155,7 +155,7 @@ export default class Client4 {
             headers[HEADER_USER_AGENT] = this.userAgent;
         }
 
-        if (options.headers) {
+        if (newOptions.headers) {
             Object.assign(headers, newOptions.headers);
         }
 
@@ -291,6 +291,15 @@ export default class Client4 {
             `${this.getUsersRoute()}/username/${username}`,
             {method: 'get'}
         );
+    };
+
+    getProfilePictureUrl = (userId, lastPictureUpdate) => {
+        const params = {};
+        if (lastPictureUpdate) {
+            params.time = lastPictureUpdate;
+        }
+
+        return `${this.getUserRoute(userId)}/image${buildQueryString(params)}`;
     };
 
     autocompleteUsersInChannel = async (teamId, channelId, name) => {
@@ -527,7 +536,7 @@ export default class Client4 {
     searchChannels = async (teamId, term) => {
         return this.doFetch(
             `${this.getTeamRoute(teamId)}/channels/search`,
-            {method: 'post', body: JSON.strinify({term})}
+            {method: 'post', body: JSON.stringify({term})}
         );
     };
 
@@ -597,6 +606,32 @@ export default class Client4 {
     };
 
     // Files Routes
+    getFileUrl(fileId, timestamp) {
+        let url = `${this.getFileRoute(fileId)}`;
+        if (timestamp) {
+            url += `?${timestamp}`;
+        }
+
+        return url;
+    }
+
+    getFileThumbnailUrl(fileId, timestamp) {
+        let url = `${this.getFileRoute(fileId)}/thumbnail`;
+        if (timestamp) {
+            url += `?${timestamp}`;
+        }
+
+        return url;
+    }
+
+    getFilePreviewUrl(fileId, timestamp) {
+        let url = `${this.getFileRoute(fileId)}/preview`;
+        if (timestamp) {
+            url += `?${timestamp}`;
+        }
+
+        return url;
+    }
 
     uploadFile = async (fileFormData, formBoundary) => {
         return this.doFetch(
@@ -640,6 +675,18 @@ export default class Client4 {
         return this.doFetch(
             `${this.getBaseRoute()}/system/ping`,
             {method: 'get'}
+        );
+    };
+
+    logClientError = async (message, level = 'ERROR') => {
+        const body = {
+            message,
+            level
+        };
+
+        return this.doFetch(
+            `${this.url}/api/v3/general/log_client`,
+            {method: 'post', body: JSON.stringify(body)}
         );
     };
 

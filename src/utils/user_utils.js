@@ -69,3 +69,11 @@ export function removeUserFromList(userId, list) {
         }
     }
 }
+
+export function filterProfiles(profiles, term) {
+    return profiles.filter((p) => {
+        return p.username.toLowerCase().includes(term) || p.email.toLowerCase().includes(term) ||
+            p.first_name.toLowerCase().includes(term) || p.last_name.toLowerCase().includes(term) ||
+            `${p.first_name} ${p.last_name}`.toLowerCase().includes(term);
+    });
+}

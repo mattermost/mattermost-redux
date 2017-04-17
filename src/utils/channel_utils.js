@@ -96,10 +96,6 @@ export function getDirectChannelName(id, otherId) {
     return handle;
 }
 
-export function getNotMemberChannels(allChannels, myMembers) {
-    return allChannels.filter(not(isNotMemberOf.bind(this, myMembers)));
-}
-
 export function getUserIdFromChannelName(userId, channelName) {
     const ids = channelName.split('__');
     let otherUserId = '';
@@ -230,7 +226,7 @@ function createFakeChannelCurried(userId) {
 }
 
 function createMissingDirectChannels(currentUserId, allChannels, myPreferences) {
-    const directChannelsDisplayPreferences = getPreferencesByCategory(myPreferences, General.CATEGORY_DIRECT_CHANNEL_SHOW);
+    const directChannelsDisplayPreferences = getPreferencesByCategory(myPreferences, Preferences.CATEGORY_DIRECT_CHANNEL_SHOW);
 
     return Array.
     from(directChannelsDisplayPreferences).
@@ -269,17 +265,13 @@ function isDirectChannelForUser(userId, otherUserId, channel) {
 }
 
 function isFavoriteChannel(myPreferences, channel) {
-    const fav = myPreferences[`${General.CATEGORY_FAVORITE_CHANNEL}--${channel.id}`];
+    const fav = myPreferences[`${Preferences.CATEGORY_FAVORITE_CHANNEL}--${channel.id}`];
     channel.isFavorite = fav && fav.value === 'true';
     return channel.isFavorite;
 }
 
 function isNotDeletedChannel(channel) {
     return channel.delete_at === 0;
-}
-
-function isNotMemberOf(myMembers, channel) {
-    return myMembers[channel.id];
 }
 
 function isOpenChannel(channel) {
