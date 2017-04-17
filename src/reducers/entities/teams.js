@@ -137,7 +137,7 @@ export default combineReducers({
     // object where every key is the team id and has and object with the team detail
     teams,
 
-    //object where every key is the team id and has and object with the team members detail
+    // object where every key is the team id and has and object with the team members detail
     myMembers,
 
     // object where every key is the team id and has a Set of user ids that are members in the team
