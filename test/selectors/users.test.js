@@ -130,6 +130,7 @@ describe('Selectors.Users', () => {
 
     it('searchProfilesInTeam', () => {
         assert.deepEqual(Selectors.searchProfilesInTeam(testState, team1.id, user1.username), [user1]);
+        assert.deepEqual(Selectors.searchProfilesInTeam(testState, team1.id, user1.username, true), []);
     });
 
     it('searchProfilesNotInCurrentTeam', () => {

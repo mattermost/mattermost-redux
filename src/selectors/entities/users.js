@@ -210,12 +210,12 @@ export function searchProfilesInCurrentTeam(state, term, skipCurrent = false) {
 }
 
 export function searchProfilesInTeam(state, teamId, term, skipCurrent = false) {
-    return Object.values(getProfilesInTeam(state, teamId)).filter((u) => {
-        if (skipCurrent && u.id === getCurrentUserId(state)) {
-            return false;
-        }
-        return userMatchesSearchTerm(u, term);
-    });
+    const profiles = filterProfilesMatchingTerm(getProfilesInTeam(state, teamId), term);
+    if (skipCurrent) {
+        removeCurrentUserFromList(profiles, getCurrentUserId(state));
+    }
+
+    return profiles;
 }
 
 export function searchProfilesNotInCurrentTeam(state, term, skipCurrent = false) {
