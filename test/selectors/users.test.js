@@ -4,6 +4,7 @@
 import assert from 'assert';
 
 import deepFreezeAndThrowOnMutation from 'utils/deep_freeze';
+import {sortByUsername} from 'utils/user_utils';
 import TestHelper from 'test/test_helper';
 import * as Selectors from 'selectors/entities/users';
 
@@ -16,11 +17,13 @@ describe('Selectors.Users', () => {
     const user2 = TestHelper.fakeUserWithId();
     const user3 = TestHelper.fakeUserWithId();
     const user4 = TestHelper.fakeUserWithId();
+    const user5 = TestHelper.fakeUserWithId();
     const profiles = {};
     profiles[user1.id] = user1;
     profiles[user2.id] = user2;
     profiles[user3.id] = user3;
     profiles[user4.id] = user4;
+    profiles[user5.id] = user5;
 
     const profilesInTeam = {};
     profilesInTeam[team1.id] = new Set([user1.id, user2.id]);
@@ -28,7 +31,7 @@ describe('Selectors.Users', () => {
     const profilesNotInTeam = {};
     profilesNotInTeam[team1.id] = new Set([user3.id, user4.id]);
 
-    const profilesWithoutTeam = new Set([user4.id]);
+    const profilesWithoutTeam = new Set([user5.id]);
 
     const profilesInChannel = {};
     profilesInChannel[channel1.id] = new Set([user1.id]);
@@ -56,20 +59,20 @@ describe('Selectors.Users', () => {
         }
     });
 
-    it('getUserIdsInChannel', () => {
-        assert.deepEqual(Selectors.getUserIdsInChannel(testState, channel1.id), profilesInChannel[channel1.id]);
+    it('getUserIdsInChannels', () => {
+        assert.deepEqual(Selectors.getUserIdsInChannels(testState), profilesInChannel);
     });
 
-    it('getUserIdsNotInChannel', () => {
-        assert.deepEqual(Selectors.getUserIdsNotInChannel(testState, channel1.id), profilesNotInChannel[channel1.id]);
+    it('getUserIdsNotInChannels', () => {
+        assert.deepEqual(Selectors.getUserIdsNotInChannels(testState), profilesNotInChannel);
     });
 
-    it('getUserIdsInTeam', () => {
-        assert.deepEqual(Selectors.getUserIdsInTeam(testState, team1.id), profilesInTeam[team1.id]);
+    it('getUserIdsInTeams', () => {
+        assert.deepEqual(Selectors.getUserIdsInTeams(testState), profilesInTeam);
     });
 
-    it('getUserIdsNotInTeam', () => {
-        assert.deepEqual(Selectors.getUserIdsNotInTeam(testState, team1.id), profilesNotInTeam[team1.id]);
+    it('getUserIdsNotInTeams', () => {
+        assert.deepEqual(Selectors.getUserIdsNotInTeams(testState), profilesNotInTeam);
     });
 
     it('getUserIdsWithoutTeam', () => {
@@ -82,6 +85,44 @@ describe('Selectors.Users', () => {
 
     it('getUsers', () => {
         assert.deepEqual(Selectors.getUsers(testState), profiles);
+    });
+
+    it('getProfilesInCurrentTeam', () => {
+        const users = [user1, user2].sort(sortByUsername);
+        assert.deepEqual(Selectors.getProfilesInCurrentTeam(testState), users);
+    });
+
+    it('getProfilesNotInCurrentTeam', () => {
+        const users = [user3, user4].sort(sortByUsername);
+        assert.deepEqual(Selectors.getProfilesNotInCurrentTeam(testState), users);
+    });
+
+    it('getProfilesWithoutTeam', () => {
+        assert.deepEqual(Selectors.getProfilesWithoutTeam(testState), [user5]);
+    });
+
+    it('searchProfiles', () => {
+        assert.deepEqual(Selectors.searchProfiles(testState, user1.username), [user1]);
+    });
+
+    it('searchProfilesInCurrentChannel', () => {
+        assert.deepEqual(Selectors.searchProfilesInCurrentChannel(testState, user1.username), [user1]);
+    });
+
+    it('searchProfilesNotInCurrentChannel', () => {
+        assert.deepEqual(Selectors.searchProfilesNotInCurrentChannel(testState, user2.username), [user2]);
+    });
+
+    it('searchProfilesInCurrentTeam', () => {
+        assert.deepEqual(Selectors.searchProfilesInCurrentTeam(testState, user1.username), [user1]);
+    });
+
+    it('searchProfilesNotInCurrentTeam', () => {
+        assert.deepEqual(Selectors.searchProfilesNotInCurrentTeam(testState, user3.username), [user3]);
+    });
+
+    it('searchProfilesWithoutTeam', () => {
+        assert.deepEqual(Selectors.searchProfilesWithoutTeam(testState, user5.username), [user5]);
     });
 });
 

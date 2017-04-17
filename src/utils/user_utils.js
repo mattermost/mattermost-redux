@@ -72,10 +72,28 @@ export function removeUserFromList(userId, list) {
     return list;
 }
 
-export function filterProfiles(profiles, term) {
-    return profiles.filter((p) => {
-        return p.username.toLowerCase().includes(term) || p.email.toLowerCase().includes(term) ||
-            p.first_name.toLowerCase().includes(term) || p.last_name.toLowerCase().includes(term) ||
-            `${p.first_name} ${p.last_name}`.toLowerCase().includes(term);
+export function filterProfilesMatchingTerm(users, term) {
+    const lowercasedTerm = term.toLowerCase();
+
+    return users.filter((user) => {
+        if (!user) {
+            return false;
+        }
+        const username = user.username || '';
+        const first = user.first_name || '';
+        const last = user.last_name || '';
+        const email = user.email || '';
+
+        return username.startsWith(lowercasedTerm) ||
+            first.startsWith(lowercasedTerm) ||
+            last.startsWith(lowercasedTerm) ||
+            email.startsWith(lowercasedTerm);
     });
+}
+
+export function sortByUsername(a, b) {
+    const nameA = a.username;
+    const nameB = b.username;
+
+    return nameA.localeCompare(nameB);
 }
