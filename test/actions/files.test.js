@@ -39,12 +39,12 @@ describe('Actions.Files', () => {
         imageFormData.append('client_ids', clientId);
         const formBoundary = imageFormData.getBoundary();
 
-        await Actions.uploadFile(imageFormData, formBoundary)(store.dispatch, store.getState);
+        await Actions.uploadFile(basicChannel.id, null, imageFormData, formBoundary)(store.dispatch, store.getState);
 
         const state = store.getState();
         const uploadRequest = state.requests.files.uploadFiles;
         if (uploadRequest.status === RequestStatus.FAILURE) {
-            throw new Error('Upload file request failed');
+            throw uploadRequest.error;
         }
 
         const files = state.entities.files.files;
