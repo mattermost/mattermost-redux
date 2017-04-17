@@ -164,26 +164,63 @@ export function getStatusForUserId(state, userId) {
     return getUserStatuses(state)[userId];
 }
 
-export function searchProfiles(state, term) {
-    return filterProfilesMatchingTerm(Object.values(getUsers(state)), term);
+export function searchProfiles(state, term, skipCurrent = false) {
+    const profiles = filterProfilesMatchingTerm(Object.values(getUsers(state)), term);
+    if (skipCurrent) {
+        removeCurrentUserFromList(profiles, getCurrentUserId(state));
+    }
+
+    return profiles;
 }
 
-export function searchProfilesInCurrentChannel(state, term) {
-    return filterProfilesMatchingTerm(getProfilesInCurrentChannel(state), term);
+export function searchProfilesInCurrentChannel(state, term, skipCurrent = false) {
+    const profiles = filterProfilesMatchingTerm(getProfilesInCurrentChannel(state), term);
+    if (skipCurrent) {
+        removeCurrentUserFromList(profiles, getCurrentUserId(state));
+    }
+
+    return profiles;
 }
 
-export function searchProfilesNotInCurrentChannel(state, term) {
-    return filterProfilesMatchingTerm(getProfilesNotInCurrentChannel(state), term);
+export function searchProfilesNotInCurrentChannel(state, term, skipCurrent = false) {
+    const profiles = filterProfilesMatchingTerm(getProfilesNotInCurrentChannel(state), term);
+    if (skipCurrent) {
+        removeCurrentUserFromList(profiles, getCurrentUserId(state));
+    }
+
+    return profiles;
 }
 
-export function searchProfilesInCurrentTeam(state, term) {
-    return filterProfilesMatchingTerm(getProfilesInCurrentTeam(state), term);
+export function searchProfilesInCurrentTeam(state, term, skipCurrent = false) {
+    const profiles = filterProfilesMatchingTerm(getProfilesInCurrentTeam(state), term);
+    if (skipCurrent) {
+        removeCurrentUserFromList(profiles, getCurrentUserId(state));
+    }
+
+    return profiles;
 }
 
-export function searchProfilesNotInCurrentTeam(state, term) {
-    return filterProfilesMatchingTerm(getProfilesNotInCurrentTeam(state), term);
+export function searchProfilesNotInCurrentTeam(state, term, skipCurrent = false) {
+    const profiles = filterProfilesMatchingTerm(getProfilesNotInCurrentTeam(state), term);
+    if (skipCurrent) {
+        removeCurrentUserFromList(profiles, getCurrentUserId(state));
+    }
+
+    return profiles;
 }
 
-export function searchProfilesWithoutTeam(state, term) {
-    return filterProfilesMatchingTerm(getProfilesWithoutTeam(state), term);
+export function searchProfilesWithoutTeam(state, term, skipCurrent = false) {
+    const profiles = filterProfilesMatchingTerm(getProfilesWithoutTeam(state), term);
+    if (skipCurrent) {
+        removeCurrentUserFromList(profiles, getCurrentUserId(state));
+    }
+
+    return profiles;
+}
+
+function removeCurrentUserFromList(profiles, currentUserId) {
+    const index = profiles.findIndex((p) => p.id === currentUserId);
+    if (index >= 0) {
+        profiles.splice(index, 1);
+    }
 }

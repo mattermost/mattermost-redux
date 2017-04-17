@@ -104,26 +104,32 @@ describe('Selectors.Users', () => {
     it('searchProfiles', () => {
         assert.deepEqual(Selectors.searchProfiles(testState, user1.username), [user1]);
         assert.deepEqual(Selectors.searchProfiles(testState, user2.first_name + ' ' + user2.last_name), [user2]);
+        assert.deepEqual(Selectors.searchProfiles(testState, user1.username, true), []);
     });
 
     it('searchProfilesInCurrentChannel', () => {
         assert.deepEqual(Selectors.searchProfilesInCurrentChannel(testState, user1.username), [user1]);
+        assert.deepEqual(Selectors.searchProfilesInCurrentChannel(testState, user1.username, true), []);
     });
 
     it('searchProfilesNotInCurrentChannel', () => {
         assert.deepEqual(Selectors.searchProfilesNotInCurrentChannel(testState, user2.username), [user2]);
+        assert.deepEqual(Selectors.searchProfilesNotInCurrentChannel(testState, user2.username, true), [user2]);
     });
 
     it('searchProfilesInCurrentTeam', () => {
         assert.deepEqual(Selectors.searchProfilesInCurrentTeam(testState, user1.username), [user1]);
+        assert.deepEqual(Selectors.searchProfilesInCurrentTeam(testState, user1.username, true), []);
     });
 
     it('searchProfilesNotInCurrentTeam', () => {
         assert.deepEqual(Selectors.searchProfilesNotInCurrentTeam(testState, user3.username), [user3]);
+        assert.deepEqual(Selectors.searchProfilesNotInCurrentTeam(testState, user3.username, true), [user3]);
     });
 
     it('searchProfilesWithoutTeam', () => {
         assert.deepEqual(Selectors.searchProfilesWithoutTeam(testState, user5.username), [user5]);
+        assert.deepEqual(Selectors.searchProfilesWithoutTeam(testState, user5.username, true), [user5]);
     });
 });
 
