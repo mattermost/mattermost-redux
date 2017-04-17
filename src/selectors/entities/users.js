@@ -144,6 +144,15 @@ export const getProfilesInCurrentTeam = createSelector(
     }
 );
 
+export const getProfilesInTeam = createSelector(
+    getUsers,
+    getUserIdsInTeams,
+    (state, teamId) => teamId,
+    (profiles, usersInTeams, teamId) => {
+        return sortAndInjectProfiles(profiles, usersInTeams[teamId] || new Set());
+    }
+);
+
 export const getProfilesNotInCurrentTeam = createSelector(
     getUsers,
     getProfileSetNotInCurrentTeam,
@@ -198,6 +207,15 @@ export function searchProfilesInCurrentTeam(state, term, skipCurrent = false) {
     }
 
     return profiles;
+}
+
+export function searchProfilesInTeam(state, teamId, term, skipCurrent = false) {
+    return Object.values(getProfilesInTeam(state, teamId)).filter((u) => {
+        if (skipCurrent && u.id === getCurrentUserId(state)) {
+            return false;
+        }
+        return userMatchesSearchTerm(u, term);
+    });
 }
 
 export function searchProfilesNotInCurrentTeam(state, term, skipCurrent = false) {

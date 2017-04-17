@@ -92,6 +92,12 @@ describe('Selectors.Users', () => {
         assert.deepEqual(Selectors.getProfilesInCurrentTeam(testState), users);
     });
 
+    it('getProfilesInTeam', () => {
+        const users = [user1, user2].sort(sortByUsername);
+        assert.deepEqual(Selectors.getProfilesInTeam(testState, team1.id), users);
+        assert.deepEqual(Selectors.getProfilesInTeam(testState, 'junk'), []);
+    });
+
     it('getProfilesNotInCurrentTeam', () => {
         const users = [user3, user4].sort(sortByUsername);
         assert.deepEqual(Selectors.getProfilesNotInCurrentTeam(testState), users);
@@ -120,6 +126,10 @@ describe('Selectors.Users', () => {
     it('searchProfilesInCurrentTeam', () => {
         assert.deepEqual(Selectors.searchProfilesInCurrentTeam(testState, user1.username), [user1]);
         assert.deepEqual(Selectors.searchProfilesInCurrentTeam(testState, user1.username, true), []);
+    });
+
+    it('searchProfilesInTeam', () => {
+        assert.deepEqual(Selectors.searchProfilesInTeam(testState, team1.id, user1.username), [user1]);
     });
 
     it('searchProfilesNotInCurrentTeam', () => {
