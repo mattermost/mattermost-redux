@@ -17,6 +17,7 @@ import {
 import {getLogErrorAction} from './errors';
 import {bindClientFunc, forceLogoutIfNecessary, debounce} from './helpers';
 import {
+    getMyPreferences,
     makeDirectChannelVisibleIfNecessary,
     makeGroupMessageVisibleIfNecessary
 } from './preferences';
@@ -48,13 +49,8 @@ export function login(loginId, password, mfaToken = '') {
         return Client.login(loginId, password, mfaToken, deviceId).
         then(async (data) => {
             let teamMembers;
-            let preferences;
             try {
-                const teamMembersRequest = Client.getMyTeamMembers();
-                const preferencesRequest = Client.getMyPreferences();
-
-                teamMembers = await teamMembersRequest;
-                preferences = await preferencesRequest;
+                teamMembers = await Client.getMyTeamMembers();
             } catch (error) {
                 dispatch(batchActions([
                     {type: UsersTypes.LOGIN_FAILURE, error},
@@ -74,18 +70,25 @@ export function login(loginId, password, mfaToken = '') {
                 return;
             }
 
+            try {
+                await getMyPreferences()(dispatch, getState);
+            } catch (error) {
+                forceLogoutIfNecessary(error, dispatch);
+                dispatch(batchActions([
+                    {type: UsersTypes.LOGIN_FAILURE, error},
+                    getLogErrorAction(error)
+                ]), getState);
+                return;
+            }
+
             dispatch(batchActions([
                 {
                     type: UsersTypes.RECEIVED_ME,
                     data
                 },
                 {
-                    type: PreferencesTypes.RECEIVED_PREFERENCES,
-                    data: await preferences
-                },
-                {
                     type: TeamsTypes.RECEIVED_MY_TEAM_MEMBERS,
-                    data: await teamMembers
+                    data: teamMembers
                 },
                 {
                     type: UsersTypes.LOGIN_SUCCESS
@@ -122,10 +125,8 @@ export function loadMe() {
             Client.attachDevice(deviceId);
         }
 
-        let preferences;
-        dispatch({type: PreferencesTypes.MY_PREFERENCES_REQUEST}, getState);
         try {
-            preferences = await Client.getMyPreferences();
+            await getMyPreferences()(dispatch, getState);
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch);
             dispatch(batchActions([
@@ -166,10 +167,6 @@ export function loadMe() {
             },
             {
                 type: UsersTypes.LOGIN_SUCCESS
-            },
-            {
-                type: PreferencesTypes.RECEIVED_PREFERENCES,
-                data: preferences
             },
             {
                 type: PreferencesTypes.MY_PREFERENCES_SUCCESS

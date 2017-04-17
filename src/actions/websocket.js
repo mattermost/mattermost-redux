@@ -20,6 +20,7 @@ import {
     getPostsSince
 } from './posts';
 import {
+    getMyPreferences,
     makeDirectChannelVisibleIfNecessary,
     makeGroupMessageVisibleIfNecessary
 } from './preferences';
@@ -110,6 +111,8 @@ async function handleReconnect(dispatch, getState) {
     const entities = getState().entities;
     const {currentTeamId} = entities.teams;
     const {currentChannelId} = entities.channels;
+
+    await getMyPreferences()(dispatch, getState);
 
     if (currentTeamId) {
         await fetchMyChannelsAndMembers(currentTeamId)(dispatch, getState);
