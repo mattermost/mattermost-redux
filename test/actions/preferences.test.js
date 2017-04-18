@@ -3,14 +3,13 @@
 
 import assert from 'assert';
 
-import configureStore from 'store';
-
 import * as Actions from 'actions/preferences';
 import {login} from 'actions/users';
 import {Client, Client4} from 'client';
-import {Preferences, RequestStatus} from 'constants';
+import {General, Preferences, RequestStatus} from 'constants';
 
 import TestHelper from 'test/test_helper';
+import configureStore from 'test/test_store';
 
 describe('Actions.Preferences', () => {
     let store;
@@ -18,8 +17,8 @@ describe('Actions.Preferences', () => {
         await TestHelper.initBasic(Client, Client4);
     });
 
-    beforeEach(() => {
-        store = configureStore();
+    beforeEach(async () => {
+        store = await configureStore();
     });
 
     after(async () => {
@@ -90,7 +89,7 @@ describe('Actions.Preferences', () => {
             }
         ];
 
-        await Actions.savePreferences(user.id, preferences)(store.dispatch, store.getState);
+        Actions.savePreferences(preferences)(store.dispatch, store.getState);
 
         const state = store.getState();
         const request = state.requests.preferences.savePreferences;
@@ -174,7 +173,7 @@ describe('Actions.Preferences', () => {
         assert.equal(state, state2, 'store should not change since direct channel is already visible');
 
         // Test that the preference is updated if it already exists and is false
-        await Actions.savePreferences(user.id, [{
+        Actions.savePreferences([{
             ...preference,
             value: 'false'
         }])(store.dispatch, store.getState);

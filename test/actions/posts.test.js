@@ -6,9 +6,9 @@ import assert from 'assert';
 import * as Actions from 'actions/posts';
 import {login} from 'actions/users';
 import {Client, Client4} from 'client';
-import configureStore from 'store';
 import {Preferences, Posts, RequestStatus} from 'constants';
 import TestHelper from 'test/test_helper';
+import configureStore from 'test/test_store';
 import {getPreferenceKey} from 'utils/preference_utils';
 
 describe('Actions.Posts', () => {
@@ -17,8 +17,8 @@ describe('Actions.Posts', () => {
         await TestHelper.initBasic(Client, Client4);
     });
 
-    beforeEach(() => {
-        store = configureStore();
+    beforeEach(async () => {
+        store = await configureStore();
     });
 
     after(async () => {
@@ -409,7 +409,7 @@ describe('Actions.Posts', () => {
             TestHelper.fakePost(channelId)
         );
 
-        await Actions.flagPost(post1.id)(dispatch, getState);
+        Actions.flagPost(post1.id)(dispatch, getState);
         const state = getState();
         const prefKey = getPreferenceKey(Preferences.CATEGORY_FLAGGED_POST, post1.id);
         const preference = state.entities.preferences.myPreferences[prefKey];
@@ -426,13 +426,13 @@ describe('Actions.Posts', () => {
             TestHelper.fakePost(channelId)
         );
 
-        await Actions.flagPost(post1.id)(dispatch, getState);
+        Actions.flagPost(post1.id)(dispatch, getState);
         let state = getState();
         const prefKey = getPreferenceKey(Preferences.CATEGORY_FLAGGED_POST, post1.id);
         const preference = state.entities.preferences.myPreferences[prefKey];
         assert.ok(preference);
 
-        await Actions.unflagPost(post1.id)(dispatch, getState);
+        Actions.unflagPost(post1.id)(dispatch, getState);
         state = getState();
         const unflagged = state.entities.preferences.myPreferences[prefKey];
         assert.ifError(unflagged);

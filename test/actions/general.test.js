@@ -3,13 +3,12 @@
 
 import assert from 'assert';
 
-import configureStore from 'store';
-
 import * as Actions from 'actions/general';
 import {Client, Client4} from 'client';
 import {RequestStatus} from 'constants';
 
 import TestHelper from 'test/test_helper';
+import configureStore from 'test/test_store';
 
 describe('Actions.General', () => {
     let store;
@@ -17,8 +16,8 @@ describe('Actions.General', () => {
         await TestHelper.initBasic(Client, Client4);
     });
 
-    beforeEach(() => {
-        store = configureStore();
+    beforeEach(async () => {
+        store = await configureStore();
     });
 
     after(async () => {
@@ -79,7 +78,7 @@ describe('Actions.General', () => {
     it('setServerVersion', async () => {
         const version = '3.7.0';
         await Actions.setServerVersion(version)(store.dispatch, store.getState);
-
+        await TestHelper.wait(100);
         const {serverVersion} = store.getState().entities.general;
         assert.deepEqual(serverVersion, version);
     });

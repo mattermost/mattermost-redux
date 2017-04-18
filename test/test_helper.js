@@ -175,6 +175,8 @@ class TestHelper {
             post: this.basicPost
         };
     };
+
+    wait = (time) => new Promise((resolve) => setTimeout(resolve, time))
 }
 
 export default new TestHelper();

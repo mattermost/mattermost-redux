@@ -8,14 +8,14 @@ import * as TeamActions from 'actions/teams';
 import * as GeneralActions from 'actions/general';
 
 import {Client, Client4} from 'client';
-import configureStore from 'store';
 import {General, Posts, RequestStatus} from 'constants';
 import TestHelper from 'test/test_helper';
+import configureStore from 'test/test_store';
 
 describe('Actions.Websocket', () => {
     let store;
     before(async () => {
-        store = configureStore();
+        store = await configureStore();
         await TestHelper.initBasic(Client, Client4);
         const webSocketConnector = require('ws');
         return await Actions.init(

@@ -10,6 +10,7 @@ function getKey(preference) {
 
 function myPreferences(state = {}, action) {
     switch (action.type) {
+    case PreferenceTypes.SAVE_PREFERENCES:
     case PreferenceTypes.RECEIVED_PREFERENCES: {
         const nextState = {...state};
 
@@ -19,6 +20,7 @@ function myPreferences(state = {}, action) {
 
         return nextState;
     }
+    case PreferenceTypes.DELETE_PREFERENCES:
     case PreferenceTypes.DELETED_PREFERENCES: {
         const nextState = {...state};
 

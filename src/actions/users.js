@@ -642,23 +642,19 @@ export function stopPeriodicStatusUpdates() {
 }
 
 export function updateUserNotifyProps(notifyProps) {
-    return async (dispatch, getState) => {
-        dispatch({type: UserTypes.UPDATE_NOTIFY_PROPS_REQUEST}, getState);
-
-        let data;
-        try {
-            data = await Client4.patchMe({notify_props: notifyProps});
-        } catch (error) {
-            dispatch({type: UserTypes.UPDATE_NOTIFY_PROPS_FAILURE, error}, getState);
-            return;
-        }
-
-        data.notify_props = notifyProps;
-
-        dispatch(batchActions([
-            {type: UserTypes.RECEIVED_ME, data},
-            {type: UserTypes.UPDATE_NOTIFY_PROPS_SUCCESS}
-        ]), getState);
+    return async (dispatch) => {
+        dispatch({
+            type: UserTypes.UPDATE_NOTIFY_PROPS,
+            notifyProps,
+            meta: {
+                offline: {
+                    effect: () => Client.updateUserNotifyProps(notifyProps),
+                    commit: {
+                        type: UserTypes.RECEIVED_ME
+                    }
+                }
+            }
+        });
     };
 }
 
