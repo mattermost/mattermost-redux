@@ -566,7 +566,11 @@ export function stopPeriodicStatusUpdates() {
 }
 
 export function updateUserNotifyProps(notifyProps) {
-    return async (dispatch) => {
+    return async (dispatch, getState) => {
+        const state = getState();
+        const currentUserId = state.entities.users.currentUserId;
+        const currentNotifyProps = state.entities.users.profiles[currentUserId].notify_props;
+
         dispatch({
             type: UsersTypes.UPDATE_NOTIFY_PROPS,
             notifyProps,
@@ -575,6 +579,10 @@ export function updateUserNotifyProps(notifyProps) {
                     effect: () => Client.updateUserNotifyProps(notifyProps),
                     commit: {
                         type: UsersTypes.RECEIVED_ME
+                    },
+                    rollback: {
+                        type: UsersTypes.UPDATE_NOTIFY_PROPS,
+                        notifyProps: currentNotifyProps
                     }
                 }
             }

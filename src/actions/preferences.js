@@ -12,15 +12,23 @@ import {bindClientFunc} from './helpers';
 import {getProfilesByIds, getProfilesInChannel} from './users';
 
 export function deletePreferences(preferences) {
-    return async (dispatch) => {
+    return async (dispatch, getState) => {
+        const state = getState();
+        const myPreferences = getMyPreferencesSelector(state);
+        const currentPreferences = preferences.map((pref) => myPreferences[getPreferenceKey(pref.category, pref.name)]);
+
         dispatch({
-            type: PreferencesTypes.DELETE_PREFERENCES,
+            type: PreferencesTypes.DELETED_PREFERENCES,
             data: preferences,
             meta: {
                 offline: {
                     effect: () => Client.deletePreferences(preferences),
                     commit: {
                         type: PreferencesTypes.DELETED_PREFERENCES
+                    },
+                    rollback: {
+                        type: PreferencesTypes.RECEIVED_PREFERENCES,
+                        data: currentPreferences
                     }
                 }
             }
@@ -84,13 +92,17 @@ export function makeGroupMessageVisibleIfNecessary(channelId) {
 export function savePreferences(preferences) {
     return async (dispatch) => {
         dispatch({
-            type: PreferencesTypes.SAVE_PREFERENCES,
+            type: PreferencesTypes.RECEIVED_PREFERENCES,
             data: preferences,
             meta: {
                 offline: {
                     effect: () => Client.savePreferences(preferences),
                     commit: {
                         type: PreferencesTypes.RECEIVED_PREFERENCES
+                    },
+                    rollback: {
+                        type: PreferencesTypes.DELETED_PREFERENCES,
+                        data: preferences
                     }
                 }
             }
