@@ -40,11 +40,21 @@ function handleReceivedPosts(posts = {}, postsInChannel = {}, action) {
 
     for (const newPost of Object.values(newPosts)) {
         if (newPost.delete_at > 0) {
-            continue;
+            // Mark the post as deleted if we have it
+            if (nextPosts[newPost.id]) {
+                nextPosts[newPost.id] = {
+                    ...newPost,
+                    state: Posts.POST_DELETED,
+                    file_ids: [],
+                    has_reactions: false
+                };
+            } else {
+                continue;
+            }
         }
 
         // Only change the stored post if it's changed since we last received it
-        if (!nextPosts[newPost.id] || nextPosts[newPost.id].update_at > newPost.update_at) {
+        if (!nextPosts[newPost.id] || nextPosts[newPost.id].update_at < newPost.update_at) {
             nextPosts[newPost.id] = newPost;
         }
 
