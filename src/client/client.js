@@ -179,7 +179,7 @@ export default class Client {
 
     getPing = async () => {
         return this.doFetch(
-            `${this.getGeneralRoute()}/ping`,
+            `${this.getGeneralRoute()}/ping?time=${Date.now()}`,
             {method: 'get'}
         );
     };
