@@ -2,31 +2,38 @@
 // See License.txt for license information.
 /* eslint-disable no-undefined */
 
-import {applyMiddleware, createStore, combineReducers} from 'redux';
+import {applyMiddleware, combineReducers} from 'redux';
 import {enableBatching} from 'redux-batched-actions';
 import thunk from 'redux-thunk';
 import {REHYDRATE} from 'redux-persist/constants';
 import {createOfflineStore} from 'redux-offline';
 import createActionBuffer from 'redux-action-buffer';
 
+import {Constants} from 'constants';
 import serviceReducer from 'reducers';
 
-export default function configureServiceStore(preloadedState, appReducer) {
-    const baseReducer = combineReducers(Object.assign({}, serviceReducer, appReducer));
-    return createStore(
-        enableBatching(baseReducer),
-        preloadedState,
-        applyMiddleware(thunk)
-    );
-}
+import {offlineConfig} from './helpers';
 
-export function configureOfflineServiceStore(appReducer, offlineConfig) {
+export default function configureServiceStore(preloadedState, appReducer, userOfflineConfig) {
     const baseReducer = combineReducers(Object.assign({}, serviceReducer, appReducer));
+
+    const baseOfflineConfig = Object.assign({}, offlineConfig, userOfflineConfig);
+
+    // Root reducer wrapper that listens for reset events.
+    // Returns whatever is passed for the data property
+    // as the new state.
+    function offlineReducer(state = {}, action) {
+        if (action.type === Constants.OFFLINE_STORE_RESET) {
+            return baseReducer(undefined, action);
+        }
+
+        return baseReducer(state, action);
+    }
 
     return createOfflineStore(
-        baseReducer,
+        enableBatching(offlineReducer),
         undefined,
         applyMiddleware(thunk, createActionBuffer(REHYDRATE)),
-        offlineConfig
+        baseOfflineConfig
     );
 }

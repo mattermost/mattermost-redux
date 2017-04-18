@@ -39,8 +39,11 @@ function removeProfileFromSet(state, action) {
 
 function currentUserId(state = '', action) {
     switch (action.type) {
-    case UsersTypes.RECEIVED_ME:
-        return action.data.id;
+    case UsersTypes.RECEIVED_ME: {
+        const data = action.data || action.payload;
+
+        return data.id;
+    }
 
     case UsersTypes.LOGOUT_SUCCESS:
         return '';
@@ -95,9 +98,11 @@ function profiles(state = {}, action) {
     switch (action.type) {
     case UsersTypes.RECEIVED_ME:
     case UsersTypes.RECEIVED_PROFILE: {
+        const data = action.data || action.payload;
+
         return {
             ...state,
-            [action.data.id]: {...action.data}
+            [action.data.id]: {...data}
         };
     }
     case UsersTypes.RECEIVED_PROFILES:
@@ -105,6 +110,15 @@ function profiles(state = {}, action) {
 
     case UsersTypes.LOGOUT_SUCCESS:
         return {};
+
+    case UsersTypes.UPDATE_NOTIFY_PROPS:
+        return {
+            ...state,
+            [action.notifyProps.user_id]: {
+                ...state[action.notifyProps.user_id],
+                notify_props: action.notifyProps
+            }
+        };
 
     default:
         return state;
