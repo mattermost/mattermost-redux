@@ -27,6 +27,7 @@ describe('Actions.Teams', () => {
 
     it('selectTeam', async () => {
         await Actions.selectTeam(TestHelper.basicTeam)(store.dispatch, store.getState);
+        await TestHelper.wait(100);
         const {currentTeamId} = store.getState().entities.teams;
 
         assert.ok(currentTeamId);
