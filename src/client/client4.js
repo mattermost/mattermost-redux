@@ -673,7 +673,7 @@ export default class Client4 {
 
     ping = async () => {
         return this.doFetch(
-            `${this.getBaseRoute()}/system/ping`,
+            `${this.getBaseRoute()}/system/ping?time=${Date.now()}`,
             {method: 'get'}
         );
     };
