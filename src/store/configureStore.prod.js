@@ -11,23 +11,15 @@ import createActionBuffer from 'redux-action-buffer';
 
 import {General} from 'constants';
 import serviceReducer from 'reducers';
-import initialState from './initial_state';
 
-export default function configureServiceStore(preloadedState, appReducer, offlineConfig) {
+import initialState from './initial_state';
+import {offlineConfig} from './helpers';
+
+export default function configureServiceStore(preloadedState, appReducer, userOfflineConfig) {
     const baseReducer = combineReducers(Object.assign({}, serviceReducer, appReducer));
     const baseState = Object.assign({}, initialState, preloadedState);
 
-    const baseOfflineConfig = Object.assign({}, {
-        effect: (effect, action) => {
-            if (typeof effect !== 'function') {
-                throw new Error('Offline Action: effect must be a function.');
-            } else if (!action.meta.offline.commit) {
-                throw new Error('Offline Action: commit action must be preset.');
-            }
-
-            return effect();
-        }
-    }, offlineConfig);
+    const baseOfflineConfig = Object.assign({}, offlineConfig, userOfflineConfig);
 
     // Root reducer wrapper that listens for reset events.
     // Returns whatever is passed for the data property

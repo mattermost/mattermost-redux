@@ -12,17 +12,16 @@ import {bindClientFunc} from './helpers';
 import {getProfilesByIds, getProfilesInChannel} from './users';
 import {getChannel} from './channels';
 
-export function deletePreferences(preferences) {
+export function deletePreferences(userId, preferences) {
     return async (dispatch) => {
         dispatch({
             type: PreferenceTypes.DELETE_PREFERENCES,
             data: preferences,
             meta: {
                 offline: {
-                    effect: () => Client4.deletePreferences(preferences),
+                    effect: () => Client4.deletePreferences(userId, preferences),
                     commit: {
-                        type: PreferenceTypes.DELETED_PREFERENCES,
-                        data: preferences
+                        type: PreferenceTypes.DELETED_PREFERENCES
                     }
                 }
             }
@@ -86,17 +85,16 @@ export function makeGroupMessageVisibleIfNecessary(channelId) {
     };
 }
 
-export function savePreferences(preferences) {
+export function savePreferences(userId, preferences) {
     return async (dispatch) => {
         dispatch({
             type: PreferenceTypes.SAVE_PREFERENCES,
             data: preferences,
             meta: {
                 offline: {
-                    effect: () => Client4.savePreferences(preferences),
+                    effect: () => Client4.savePreferences(userId, preferences),
                     commit: {
-                        type: PreferenceTypes.RECEIVED_PREFERENCES,
-                        data: preferences
+                        type: PreferenceTypes.RECEIVED_PREFERENCES
                     }
                 }
             }

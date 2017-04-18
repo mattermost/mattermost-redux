@@ -13,22 +13,14 @@ import createActionBuffer from 'redux-action-buffer';
 import {General} from 'constants';
 import serviceReducer from 'reducers';
 import deepFreezeAndThrowOnMutation from 'utils/deep_freeze';
+
+import {offlineConfig} from './helpers';
 import initialState from './initial_state';
 
-export default function configureOfflineServiceStore(preloadedState, appReducer, getAppReducer, offlineConfig) {
+export default function configureOfflineServiceStore(preloadedState, appReducer, getAppReducer, userOfflineConfig) {
     const baseState = Object.assign({}, initialState, preloadedState);
 
-    const baseOfflineConfig = Object.assign({}, {
-        effect: (effect, action) => {
-            if (typeof effect !== 'function') {
-                throw new Error('Offline Action: effect must be a function.');
-            } else if (!action.meta.offline.commit) {
-                throw new Error('Offline Action: commit action must be present.');
-            }
-
-            return effect();
-        }
-    }, offlineConfig);
+    const baseOfflineConfig = Object.assign({}, offlineConfig, userOfflineConfig);
 
     const store = createOfflineStore(
         createReducer(serviceReducer, appReducer),

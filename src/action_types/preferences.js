@@ -8,6 +8,7 @@ export default keyMirror({
     MY_PREFERENCES_SUCCESS: null,
     MY_PREFERENCES_FAILURE: null,
 
+    SAVE_PREFERENCES: null,
     SAVE_PREFERENCES_REQUEST: null,
     SAVE_PREFERENCES_SUCCESS: null,
     SAVE_PREFERENCES_FAILURE: null,

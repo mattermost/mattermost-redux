@@ -14,8 +14,10 @@ function myPreferences(state = {}, action) {
     case PreferenceTypes.RECEIVED_PREFERENCES: {
         const nextState = {...state};
 
-        for (const preference of action.data) {
-            nextState[getKey(preference)] = preference;
+        if (action.data) {
+            for (const preference of action.data) {
+                nextState[getKey(preference)] = preference;
+            }
         }
 
         return nextState;
@@ -24,8 +26,10 @@ function myPreferences(state = {}, action) {
     case PreferenceTypes.DELETED_PREFERENCES: {
         const nextState = {...state};
 
-        for (const preference of action.data) {
-            Reflect.deleteProperty(nextState, getKey(preference));
+        if (action.data) {
+            for (const preference of action.data) {
+                Reflect.deleteProperty(nextState, getKey(preference));
+            }
         }
 
         return nextState;
