@@ -20,8 +20,7 @@ export function deletePreferences(preferences) {
                 offline: {
                     effect: () => Client.deletePreferences(preferences),
                     commit: {
-                        type: PreferencesTypes.DELETED_PREFERENCES,
-                        data: preferences
+                        type: PreferencesTypes.DELETED_PREFERENCES
                     }
                 }
             }
@@ -91,8 +90,7 @@ export function savePreferences(preferences) {
                 offline: {
                     effect: () => Client.savePreferences(preferences),
                     commit: {
-                        type: PreferencesTypes.RECEIVED_PREFERENCES,
-                        data: preferences
+                        type: PreferencesTypes.RECEIVED_PREFERENCES
                     }
                 }
             }
