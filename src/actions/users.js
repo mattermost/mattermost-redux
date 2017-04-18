@@ -564,20 +564,26 @@ export function stopPeriodicStatusUpdates() {
 
 export function updateUserNotifyProps(notifyProps) {
     return async (dispatch, getState) => {
-        dispatch({type: UsersTypes.UPDATE_NOTIFY_PROPS_REQUEST}, getState);
+        const state = getState();
+        const currentUserId = state.entities.users.currentUserId;
+        const currentNotifyProps = state.entities.users.profiles[currentUserId].notify_props;
 
-        let data;
-        try {
-            data = await Client.updateUserNotifyProps(notifyProps);
-        } catch (error) {
-            dispatch({type: UsersTypes.UPDATE_NOTIFY_PROPS_FAILURE, error}, getState);
-            return;
-        }
-
-        dispatch(batchActions([
-            {type: UsersTypes.RECEIVED_ME, data},
-            {type: UsersTypes.UPDATE_NOTIFY_PROPS_SUCCESS}
-        ]), getState);
+        dispatch({
+            type: UsersTypes.UPDATE_NOTIFY_PROPS,
+            notifyProps,
+            meta: {
+                offline: {
+                    effect: () => Client.updateUserNotifyProps(notifyProps),
+                    commit: {
+                        type: UsersTypes.RECEIVED_ME
+                    },
+                    rollback: {
+                        type: UsersTypes.UPDATE_NOTIFY_PROPS,
+                        notifyProps: currentNotifyProps
+                    }
+                }
+            }
+        });
     };
 }
 

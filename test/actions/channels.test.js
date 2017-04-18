@@ -6,9 +6,9 @@ import assert from 'assert';
 import * as Actions from 'actions/channels';
 import {getProfilesByIds} from 'actions/users';
 import Client from 'client';
-import configureStore from 'store';
 import {RequestStatus} from 'constants';
 import TestHelper from 'test/test_helper';
+import configureStore from 'test/test_store';
 
 describe('Actions.Channels', () => {
     let store;
@@ -17,8 +17,8 @@ describe('Actions.Channels', () => {
         await TestHelper.initBasic(Client);
     });
 
-    beforeEach(() => {
-        store = configureStore();
+    beforeEach(async () => {
+        store = await configureStore();
     });
 
     after(async () => {
@@ -29,8 +29,9 @@ describe('Actions.Channels', () => {
         const channelId = TestHelper.generateId();
 
         await Actions.selectChannel(channelId)(store.dispatch, store.getState);
-
+        await TestHelper.wait(100);
         const state = store.getState();
+
         assert.equal(state.entities.channels.currentChannelId, channelId);
     });
 
