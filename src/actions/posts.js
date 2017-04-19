@@ -105,7 +105,7 @@ export function flagPost(postId) {
             value: 'true'
         };
 
-        return savePreferences(currentUserId, [preference])(dispatch, getState);
+        savePreferences(currentUserId, [preference])(dispatch, getState);
     };
 }
 
@@ -324,7 +324,7 @@ export function unflagPost(postId) {
             name: postId
         };
 
-        return deletePreferences(currentUserId, [preference])(dispatch, getState);
+        deletePreferences(currentUserId, [preference])(dispatch, getState);
     };
 }
 

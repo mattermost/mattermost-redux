@@ -6,9 +6,10 @@ import assert from 'assert';
 
 import * as Actions from 'actions/emojis';
 import {Client, Client4} from 'client';
-import configureStore from 'store';
+
 import {RequestStatus} from 'constants';
 import TestHelper from 'test/test_helper';
+import configureStore from 'test/test_store';
 
 describe('Actions.Emojis', () => {
     let store;
@@ -16,8 +17,8 @@ describe('Actions.Emojis', () => {
         await TestHelper.initBasic(Client, Client4);
     });
 
-    beforeEach(() => {
-        store = configureStore();
+    beforeEach(async () => {
+        store = await configureStore();
     });
 
     after(async () => {
@@ -91,4 +92,3 @@ describe('Actions.Emojis', () => {
         assert.ok(!emojis[created.id]);
     });
 });
-

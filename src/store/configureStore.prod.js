@@ -2,7 +2,7 @@
 // See License.txt for license information.
 /* eslint-disable no-undefined */
 
-import {applyMiddleware, createStore, combineReducers} from 'redux';
+import {applyMiddleware, combineReducers} from 'redux';
 import {enableBatching} from 'redux-batched-actions';
 import thunk from 'redux-thunk';
 import {REHYDRATE} from 'redux-persist/constants';
@@ -11,38 +11,31 @@ import createActionBuffer from 'redux-action-buffer';
 
 import {General} from 'constants';
 import serviceReducer from 'reducers';
-import initialState from './initial_state';
 
-export default function configureServiceStore(preloadedState, appReducer) {
+import initialState from './initial_state';
+import {offlineConfig} from './helpers';
+
+export default function configureServiceStore(preloadedState, appReducer, userOfflineConfig) {
     const baseReducer = combineReducers(Object.assign({}, serviceReducer, appReducer));
     const baseState = Object.assign({}, initialState, preloadedState);
-    return createStore(
-        enableBatching(baseReducer),
-        baseState,
-        applyMiddleware(thunk)
-    );
-}
 
-export function configureOfflineServiceStore(appReducer, offlineConfig) {
-    const baseReducer = combineReducers(Object.assign({}, serviceReducer, appReducer));
+    const baseOfflineConfig = Object.assign({}, offlineConfig, userOfflineConfig);
 
     // Root reducer wrapper that listens for reset events.
     // Returns whatever is passed for the data property
     // as the new state.
     function offlineReducer(state = {}, action) {
         if (action.type === General.OFFLINE_STORE_RESET) {
-            return {
-                ...action.data
-            };
+            return baseReducer(baseState, action);
         }
 
         return baseReducer(state, action);
     }
 
     return createOfflineStore(
-        offlineReducer,
-        undefined,
+        enableBatching(offlineReducer),
+        baseState,
         applyMiddleware(thunk, createActionBuffer(REHYDRATE)),
-        offlineConfig
+        baseOfflineConfig
     );
 }

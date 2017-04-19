@@ -6,9 +6,9 @@ import assert from 'assert';
 
 import * as Actions from 'actions/files';
 import {Client, Client4} from 'client';
-import configureStore from 'store';
 import {RequestStatus} from 'constants';
 import TestHelper from 'test/test_helper';
+import configureStore from 'test/test_store';
 
 const FormData = require('form-data');
 
@@ -18,8 +18,8 @@ describe('Actions.Files', () => {
         await TestHelper.initBasic(Client, Client4);
     });
 
-    beforeEach(() => {
-        store = configureStore();
+    beforeEach(async () => {
+        store = await configureStore();
     });
 
     after(async () => {

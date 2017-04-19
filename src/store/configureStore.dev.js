@@ -2,7 +2,7 @@
 // See License.txt for license information.
 /* eslint-disable no-undefined */
 
-import {applyMiddleware, compose, createStore, combineReducers} from 'redux';
+import {applyMiddleware, compose, combineReducers} from 'redux';
 import {enableBatching} from 'redux-batched-actions';
 import devTools from 'remote-redux-devtools';
 import thunk from 'redux-thunk';
@@ -13,43 +13,18 @@ import createActionBuffer from 'redux-action-buffer';
 import {General} from 'constants';
 import serviceReducer from 'reducers';
 import deepFreezeAndThrowOnMutation from 'utils/deep_freeze';
+
+import {offlineConfig} from './helpers';
 import initialState from './initial_state';
 
-export default function configureServiceStore(preloadedState, appReducer, getAppReducer) {
+export default function configureOfflineServiceStore(preloadedState, appReducer, getAppReducer, userOfflineConfig) {
     const baseState = Object.assign({}, initialState, preloadedState);
 
-    const store = createStore(
+    const baseOfflineConfig = Object.assign({}, offlineConfig, userOfflineConfig);
+
+    const store = createOfflineStore(
         createReducer(serviceReducer, appReducer),
         baseState,
-        compose(
-            applyMiddleware(thunk),
-            devTools({
-                name: 'Mattermost',
-                hostname: 'localhost',
-                port: 5678
-            })
-        )
-    );
-
-    if (module.hot) {
-        // Enable Webpack hot module replacement for reducers
-        module.hot.accept(() => {
-            const nextServiceReducer = require('../reducers').default; // eslint-disable-line global-require
-            let nextAppReducer;
-            if (getAppReducer) {
-                nextAppReducer = getAppReducer(); // eslint-disable-line global-require
-            }
-            store.replaceReducer(createReducer(nextServiceReducer, nextAppReducer));
-        });
-    }
-
-    return store;
-}
-
-export function configureOfflineServiceStore(appReducer, offlineConfig, getAppReducer) {
-    const store = createOfflineStore(
-        createOfflineReducer(serviceReducer, appReducer),
-        undefined, // Have to use undefined here for the initialState to make sure hydration works correctly.
         compose(
             applyMiddleware(thunk, createActionBuffer(REHYDRATE)),
             devTools({
@@ -58,7 +33,7 @@ export function configureOfflineServiceStore(appReducer, offlineConfig, getAppRe
                 port: 5678
             })
         ),
-        offlineConfig
+        baseOfflineConfig
     );
 
     if (module.hot) {
@@ -79,20 +54,12 @@ export function configureOfflineServiceStore(appReducer, offlineConfig, getAppRe
 function createReducer(...reducers) {
     const baseReducer = combineReducers(Object.assign({}, ...reducers));
 
-    return enableFreezing(enableBatching(baseReducer));
-}
-
-function createOfflineReducer(...reducers) {
-    const baseReducer = combineReducers(Object.assign({}, ...reducers));
-
     // Root reducer wrapper that listens for reset events.
     // Returns whatever is passed for the data property
     // as the new state.
     function offlineReducer(state = {}, action) {
         if (action.type === General.OFFLINE_STORE_RESET) {
-            return {
-                ...action.data
-            };
+            return baseReducer(undefined, action);
         }
 
         return baseReducer(state, action);

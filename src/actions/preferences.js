@@ -1,8 +1,6 @@
 // Copyright (c) 2016-present Mattermost, Inc. All Rights Reserved.
 // See License.txt for license information.
 
-import {batchActions} from 'redux-batched-actions';
-
 import {Client4} from 'client';
 import {Preferences} from 'constants';
 import {PreferenceTypes} from 'action_types';
@@ -10,35 +8,32 @@ import {getMyPreferences as getMyPreferencesSelector} from 'selectors/entities/p
 import {getCurrentUserId} from 'selectors/entities/users';
 import {getPreferenceKey} from 'utils/preference_utils';
 
-import {bindClientFunc, forceLogoutIfNecessary} from './helpers';
-import {getLogErrorAction} from './errors';
+import {bindClientFunc} from './helpers';
 import {getProfilesByIds, getProfilesInChannel} from './users';
 import {getChannel} from './channels';
 
 export function deletePreferences(userId, preferences) {
     return async (dispatch, getState) => {
-        dispatch({type: PreferenceTypes.DELETE_PREFERENCES_REQUEST}, getState);
+        const state = getState();
+        const myPreferences = getMyPreferencesSelector(state);
+        const currentPreferences = preferences.map((pref) => myPreferences[getPreferenceKey(pref.category, pref.name)]);
 
-        try {
-            await Client4.deletePreferences(userId, preferences);
-        } catch (error) {
-            forceLogoutIfNecessary(error, dispatch);
-            dispatch(batchActions([
-                {type: PreferenceTypes.DELETE_PREFERENCES_FAILURE, error},
-                getLogErrorAction(error)
-            ]), getState);
-            return;
-        }
-
-        dispatch(batchActions([
-            {
-                type: PreferenceTypes.DELETED_PREFERENCES,
-                data: preferences
-            },
-            {
-                type: PreferenceTypes.DELETE_PREFERENCES_SUCCESS
+        dispatch({
+            type: PreferenceTypes.DELETED_PREFERENCES,
+            data: preferences,
+            meta: {
+                offline: {
+                    effect: () => Client4.deletePreferences(userId, preferences),
+                    commit: {
+                        type: PreferenceTypes.DELETED_PREFERENCES
+                    },
+                    rollback: {
+                        type: PreferenceTypes.RECEIVED_PREFERENCES,
+                        data: currentPreferences
+                    }
+                }
             }
-        ]), getState);
+        });
     };
 }
 
@@ -99,29 +94,22 @@ export function makeGroupMessageVisibleIfNecessary(channelId) {
 }
 
 export function savePreferences(userId, preferences) {
-    return async (dispatch, getState) => {
-        dispatch({type: PreferenceTypes.SAVE_PREFERENCES_REQUEST}, getState);
-
-        try {
-            await Client4.savePreferences(userId, preferences);
-        } catch (error) {
-            forceLogoutIfNecessary(error, dispatch);
-            dispatch(batchActions([
-                {type: PreferenceTypes.SAVE_PREFERENCES_FAILURE, error},
-                getLogErrorAction(error)
-            ]), getState);
-            return;
-        }
-
-        dispatch(batchActions([
-            {
-                type: PreferenceTypes.RECEIVED_PREFERENCES,
-                data: preferences
-            },
-            {
-                type: PreferenceTypes.SAVE_PREFERENCES_SUCCESS
+    return async (dispatch) => {
+        dispatch({
+            type: PreferenceTypes.RECEIVED_PREFERENCES,
+            data: preferences,
+            meta: {
+                offline: {
+                    effect: () => Client4.savePreferences(userId, preferences),
+                    commit: {
+                        type: PreferenceTypes.RECEIVED_PREFERENCES
+                    },
+                    rollback: {
+                        type: PreferenceTypes.DELETE_PREFERENCES,
+                        data: preferences
+                    }
+                }
             }
-        ]), getState);
+        });
     };
 }
-

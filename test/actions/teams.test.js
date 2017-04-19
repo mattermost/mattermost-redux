@@ -6,9 +6,9 @@ import assert from 'assert';
 import * as Actions from 'actions/teams';
 import {login} from 'actions/users';
 import {Client, Client4} from 'client';
-import configureStore from 'store';
 import {RequestStatus} from 'constants';
 import TestHelper from 'test/test_helper';
+import configureStore from 'test/test_store';
 
 describe('Actions.Teams', () => {
     let store;
@@ -16,8 +16,8 @@ describe('Actions.Teams', () => {
         await TestHelper.initBasic(Client, Client4);
     });
 
-    beforeEach(() => {
-        store = configureStore();
+    beforeEach(async () => {
+        store = await configureStore();
     });
 
     after(async () => {
@@ -27,6 +27,7 @@ describe('Actions.Teams', () => {
 
     it('selectTeam', async () => {
         await Actions.selectTeam(TestHelper.basicTeam)(store.dispatch, store.getState);
+        await TestHelper.wait(100);
         const {currentTeamId} = store.getState().entities.teams;
 
         assert.ok(currentTeamId);

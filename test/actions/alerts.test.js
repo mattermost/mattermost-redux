@@ -5,13 +5,13 @@ import assert from 'assert';
 
 import * as Actions from 'actions/alerts';
 import {Alerts} from 'constants';
-import configureStore from 'store';
+import configureStore from 'test/test_store';
 
 describe('Actions.Alerts', () => {
     let store;
 
-    beforeEach(() => {
-        store = configureStore();
+    beforeEach(async () => {
+        store = await configureStore();
     });
 
     it('push and clear alerts', async () => {
@@ -43,4 +43,3 @@ describe('Actions.Alerts', () => {
         assert.ok(alerts.length === 0);
     });
 });
-
