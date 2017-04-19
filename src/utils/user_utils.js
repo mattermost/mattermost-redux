@@ -79,12 +79,12 @@ export function filterProfilesMatchingTerm(users, term) {
         if (!user) {
             return false;
         }
-        const username = user.username || '';
-        const first = user.first_name || '';
-        const last = user.last_name || '';
+        const username = (user.username || '').toLowerCase();
+        const first = (user.first_name || '').toLowerCase();
+        const last = (user.last_name || '').toLowerCase();
         const full = first + ' ' + last;
-        const email = user.email || '';
-        const nickname = user.nickname || '';
+        const email = (user.email || '').toLowerCase();
+        const nickname = (user.nickname || '').toLowerCase();
 
         let emailPrefix = '';
         let emailDomain = '';
