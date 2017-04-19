@@ -652,7 +652,7 @@ export function updateUserNotifyProps(notifyProps) {
             notifyProps,
             meta: {
                 offline: {
-                    effect: () => Client.updateUserNotifyProps(notifyProps),
+                    effect: () => Client4.patchMe({notify_props: notifyProps}),
                     commit: {
                         type: UserTypes.RECEIVED_ME
                     },
