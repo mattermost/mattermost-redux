@@ -17,6 +17,8 @@ const state = {
             myAudits: [],
             profiles: {},
             profilesInTeam: {},
+            profilesNotInTeam: {},
+            profilesWithoutTeam: new Set(),
             profilesInChannel: {},
             profilesNotInChannel: {},
             statuses: {}
@@ -278,7 +280,7 @@ const state = {
                 status: 'not_started',
                 error: null
             },
-            autocompleteUsersInChannel: {
+            autocompleteUsers: {
                 status: 'not_started',
                 error: null
             },
@@ -286,7 +288,7 @@ const state = {
                 status: 'not_started',
                 error: null
             },
-            updateUserNotifyProps: {
+            updateMe: {
                 status: 'not_started',
                 error: null
             }

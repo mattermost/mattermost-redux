@@ -17,7 +17,7 @@ import deepFreezeAndThrowOnMutation from 'utils/deep_freeze';
 
 import {offlineConfig} from './helpers';
 
-export default function configureOfflineServiceStore(preloadedState, appReducer, getAppReducer, userOfflineConfig) {
+export default function configureServiceStore(preloadedState, appReducer, userOfflineConfig, getAppReducer) {
     const baseOfflineConfig = Object.assign({}, defaultOfflineConfig, offlineConfig, userOfflineConfig);
 
     const store = createStore(

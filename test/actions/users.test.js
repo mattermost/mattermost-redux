@@ -2,12 +2,15 @@
 // See License.txt for license information.
 
 import assert from 'assert';
+import nock from 'nock';
 
 import * as Actions from 'actions/users';
 import {Client, Client4} from 'client';
 import {RequestStatus} from 'constants';
 import TestHelper from 'test/test_helper';
 import configureStore from 'test/test_store';
+
+const OK_RESPONSE = {status: 'OK'};
 
 describe('Actions.Users', () => {
     let store;
@@ -155,6 +158,56 @@ describe('Actions.Users', () => {
         assert.equal(Object.keys(profiles).length, team.size, 'profiles != profiles in team');
     });
 
+    it('getProfilesNotInTeam', async () => {
+        await TestHelper.basicClient4.createUser(
+            TestHelper.fakeUser(),
+            null,
+            null,
+            TestHelper.basicTeam.invite_id
+        );
+
+        const team = await Client4.createTeam({...TestHelper.fakeTeam(), allow_open_invite: true});
+
+        await Actions.getProfilesNotInTeam(team.id, 0)(store.dispatch, store.getState);
+
+        const profilesRequest = store.getState().requests.users.getProfilesNotInTeam;
+        const {profilesNotInTeam} = store.getState().entities.users;
+
+        if (profilesRequest.status === RequestStatus.FAILURE) {
+            throw new Error(JSON.stringify(profilesRequest.error));
+        }
+
+        const notInTeam = profilesNotInTeam[team.id];
+        assert.ok(notInTeam);
+        assert.ok(notInTeam.size > 0);
+    });
+
+    it('getProfilesWithoutTeam', async () => {
+        const user = await TestHelper.basicClient4.createUser(
+            TestHelper.fakeUser(),
+        );
+
+        TestHelper.activateMocking();
+        nock(Client4.getBaseRoute()).
+            get('/users').
+            query(true).
+            reply(200, [user]);
+
+        await Actions.getProfilesWithoutTeam(0)(store.dispatch, store.getState);
+        nock.restore();
+
+        const profilesRequest = store.getState().requests.users.getProfilesWithoutTeam;
+        const {profilesWithoutTeam, profiles} = store.getState().entities.users;
+
+        if (profilesRequest.status === RequestStatus.FAILURE) {
+            throw new Error(JSON.stringify(profilesRequest.error));
+        }
+
+        assert.ok(profilesWithoutTeam);
+        assert.ok(profilesWithoutTeam.has(user.id));
+        assert.ok(profiles[user.id]);
+    });
+
     it('getProfilesInChannel', async () => {
         await Actions.getProfilesInChannel(
             TestHelper.basicChannel.id,
@@ -221,6 +274,21 @@ describe('Actions.Users', () => {
 
         assert.ok(profiles[user.id]);
         assert.equal(profiles[user.id].id, user.id);
+    });
+
+    it('getMe', async () => {
+        await Actions.getMe()(store.dispatch, store.getState);
+
+        const state = store.getState();
+        const profileRequest = state.requests.users.getUser;
+        const {profiles, currentUserId} = state.entities.users;
+
+        if (profileRequest.status === RequestStatus.FAILURE) {
+            throw new Error(JSON.stringify(profileRequest.error));
+        }
+
+        assert.ok(profiles[currentUserId]);
+        assert.equal(profiles[currentUserId].id, currentUserId);
     });
 
     it('getUserByUsername', async () => {
@@ -362,7 +430,7 @@ describe('Actions.Users', () => {
         assert.equal(audits[0].user_id, TestHelper.basicUser.id);
     });
 
-    it('autocompleteUsersInChannel', async () => {
+    it('autocompleteUsers', async () => {
         const user = await TestHelper.basicClient4.createUser(
             TestHelper.fakeUser(),
             null,
@@ -371,13 +439,13 @@ describe('Actions.Users', () => {
         );
 
         await TestHelper.basicClient4.login(TestHelper.basicUser.email, 'password1');
-        await Actions.autocompleteUsersInChannel(
+        await Actions.autocompleteUsers(
+            '',
             TestHelper.basicTeam.id,
-            TestHelper.basicChannel.id,
-            ''
+            TestHelper.basicChannel.id
         )(store.dispatch, store.getState);
 
-        const autocompleteRequest = store.getState().requests.users.autocompleteUsersInChannel;
+        const autocompleteRequest = store.getState().requests.users.autocompleteUsers;
         const {profiles, profilesNotInChannel, profilesInChannel} = store.getState().entities.users;
 
         if (autocompleteRequest.status === RequestStatus.FAILURE) {
@@ -391,23 +459,25 @@ describe('Actions.Users', () => {
         assert.ok(profiles[user.id]);
     });
 
-    it('updateUserNotifyProps', async () => {
+    it('updateMe', async () => {
         await Actions.login(TestHelper.basicUser.email, 'password1')(store.dispatch, store.getState);
 
         const state = store.getState();
         const currentUser = state.entities.users.profiles[state.entities.users.currentUserId];
         const notifyProps = currentUser.notify_props;
 
-        await Actions.updateUserNotifyProps({
-            ...notifyProps,
-            comments: 'any',
-            email: 'false',
-            first_name: 'false',
-            mention_keys: '',
-            user_id: currentUser.id
+        await Actions.updateMe({
+            notify_props: {
+                ...notifyProps,
+                comments: 'any',
+                email: 'false',
+                first_name: 'false',
+                mention_keys: '',
+                user_id: currentUser.id
+            }
         })(store.dispatch, store.getState);
 
-        const updateRequest = store.getState().requests.users.updateUserNotifyProps;
+        const updateRequest = store.getState().requests.users.updateMe;
         const {currentUserId, profiles} = store.getState().entities.users;
         const updateNotifyProps = profiles[currentUserId].notify_props;
 
@@ -419,6 +489,74 @@ describe('Actions.Users', () => {
         assert.equal(updateNotifyProps.email, 'false');
         assert.equal(updateNotifyProps.first_name, 'false');
         assert.equal(updateNotifyProps.mention_keys, '');
+    });
+
+    it('updateUserRoles', async () => {
+        await Actions.login(TestHelper.basicUser.email, 'password1')(store.dispatch, store.getState);
+
+        const currentUserId = store.getState().entities.users.currentUserId;
+
+        TestHelper.activateMocking();
+        nock(Client4.getBaseRoute()).
+            put(`/users/${currentUserId}/roles`).
+            reply(200, OK_RESPONSE);
+
+        await Actions.updateUserRoles(currentUserId, 'system_user system_admin')(store.dispatch, store.getState);
+        nock.restore();
+
+        const updateRequest = store.getState().requests.users.updateUser;
+        const {profiles} = store.getState().entities.users;
+        const currentUserRoles = profiles[currentUserId].roles;
+
+        if (updateRequest.status === RequestStatus.FAILURE) {
+            throw new Error(JSON.stringify(updateRequest.error));
+        }
+
+        assert.equal(currentUserRoles, 'system_user system_admin');
+    });
+
+    it('updateUserMfa', async () => {
+        await Actions.login(TestHelper.basicUser.email, 'password1')(store.dispatch, store.getState);
+
+        const currentUserId = store.getState().entities.users.currentUserId;
+
+        TestHelper.activateMocking();
+        nock(Client4.getBaseRoute()).
+            put(`/users/${currentUserId}/mfa`).
+            reply(200, OK_RESPONSE);
+
+        await Actions.updateUserMfa(currentUserId, true, '123456')(store.dispatch, store.getState);
+        nock.restore();
+
+        const updateRequest = store.getState().requests.users.updateUser;
+        const {profiles} = store.getState().entities.users;
+        const currentUserMfa = profiles[currentUserId].mfa_active;
+
+        if (updateRequest.status === RequestStatus.FAILURE) {
+            throw new Error(JSON.stringify(updateRequest.error));
+        }
+
+        assert.equal(currentUserMfa, true);
+    });
+
+    it('updateUserPassword', async () => {
+        await Actions.login(TestHelper.basicUser.email, 'password1')(store.dispatch, store.getState);
+
+        const beforeTime = new Date().getTime();
+        const currentUserId = store.getState().entities.users.currentUserId;
+
+        await Actions.updateUserPassword(currentUserId, 'password1', 'password1')(store.dispatch, store.getState);
+
+        const updateRequest = store.getState().requests.users.updateUser;
+        const {profiles} = store.getState().entities.users;
+        const currentUser = profiles[currentUserId];
+
+        if (updateRequest.status === RequestStatus.FAILURE) {
+            throw new Error(JSON.stringify(updateRequest.error));
+        }
+
+        assert.ok(currentUser);
+        assert.ok(currentUser.last_password_update_at > beforeTime);
     });
 
     it('checkMfa', async () => {

@@ -84,6 +84,26 @@ function getProfilesInTeam(state = initialRequestState(), action) {
     );
 }
 
+function getProfilesNotInTeam(state = initialRequestState(), action) {
+    return handleRequest(
+        UserTypes.PROFILES_NOT_IN_TEAM_REQUEST,
+        UserTypes.PROFILES_NOT_IN_TEAM_SUCCESS,
+        UserTypes.PROFILES_NOT_IN_TEAM_FAILURE,
+        state,
+        action
+    );
+}
+
+function getProfilesWithoutTeam(state = initialRequestState(), action) {
+    return handleRequest(
+        UserTypes.PROFILES_WITHOUT_TEAM_REQUEST,
+        UserTypes.PROFILES_WITHOUT_TEAM_SUCCESS,
+        UserTypes.PROFILES_WITHOUT_TEAM_FAILURE,
+        state,
+        action
+    );
+}
+
 function getProfilesInChannel(state = initialRequestState(), action) {
     return handleRequest(
         UserTypes.PROFILES_IN_CHANNEL_REQUEST,
@@ -164,11 +184,11 @@ function getAudits(state = initialRequestState(), action) {
     );
 }
 
-function autocompleteUsersInChannel(state = initialRequestState(), action) {
+function autocompleteUsers(state = initialRequestState(), action) {
     return handleRequest(
-        UserTypes.AUTOCOMPLETE_IN_CHANNEL_REQUEST,
-        UserTypes.AUTOCOMPLETE_IN_CHANNEL_SUCCESS,
-        UserTypes.AUTOCOMPLETE_IN_CHANNEL_FAILURE,
+        UserTypes.AUTOCOMPLETE_USERS_REQUEST,
+        UserTypes.AUTOCOMPLETE_USERS_SUCCESS,
+        UserTypes.AUTOCOMPLETE_USERS_FAILURE,
         state,
         action
     );
@@ -184,11 +204,21 @@ function searchProfiles(state = initialRequestState(), action) {
     );
 }
 
-function updateUserNotifyProps(state = initialRequestState(), action) {
+function updateMe(state = initialRequestState(), action) {
     return handleRequest(
-        UserTypes.UPDATE_NOTIFY_PROPS_REQUEST,
-        UserTypes.UPDATE_NOTIFY_PROPS_SUCCESS,
-        UserTypes.UPDATE_NOTIFY_PROPS_FAILURE,
+        UserTypes.UPDATE_ME_REQUEST,
+        UserTypes.UPDATE_ME_SUCCESS,
+        UserTypes.UPDATE_ME_FAILURE,
+        state,
+        action
+    );
+}
+
+function updateUser(state = initialRequestState(), action) {
+    return handleRequest(
+        UserTypes.UPDATE_USER_REQUEST,
+        UserTypes.UPDATE_USER_SUCCESS,
+        UserTypes.UPDATE_USER_FAILURE,
         state,
         action
     );
@@ -211,6 +241,8 @@ export default combineReducers({
     create,
     getProfiles,
     getProfilesInTeam,
+    getProfilesNotInTeam,
+    getProfilesWithoutTeam,
     getProfilesInChannel,
     getProfilesNotInChannel,
     getUser,
@@ -219,7 +251,8 @@ export default combineReducers({
     getSessions,
     revokeSession,
     getAudits,
-    autocompleteUsersInChannel,
+    autocompleteUsers,
     searchProfiles,
-    updateUserNotifyProps
+    updateMe,
+    updateUser
 });

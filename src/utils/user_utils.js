@@ -65,15 +65,48 @@ export function removeUserFromList(userId, list) {
     for (let i = list.length - 1; i >= 0; i--) {
         if (list[i].id === userId) {
             list.splice(i, 1);
-            return;
+            return list;
         }
     }
+
+    return list;
 }
 
-export function filterProfiles(profiles, term) {
-    return profiles.filter((p) => {
-        return p.username.toLowerCase().includes(term) || p.email.toLowerCase().includes(term) ||
-            p.first_name.toLowerCase().includes(term) || p.last_name.toLowerCase().includes(term) ||
-            `${p.first_name} ${p.last_name}`.toLowerCase().includes(term);
+export function filterProfilesMatchingTerm(users, term) {
+    const lowercasedTerm = term.toLowerCase();
+
+    return users.filter((user) => {
+        if (!user) {
+            return false;
+        }
+        const username = (user.username || '').toLowerCase();
+        const first = (user.first_name || '').toLowerCase();
+        const last = (user.last_name || '').toLowerCase();
+        const full = first + ' ' + last;
+        const email = (user.email || '').toLowerCase();
+        const nickname = (user.nickname || '').toLowerCase();
+
+        let emailPrefix = '';
+        let emailDomain = '';
+        const split = email.split('@');
+        emailPrefix = split[0];
+        if (split.length > 1) {
+            emailDomain = split[1];
+        }
+
+        return username.startsWith(lowercasedTerm) ||
+            first.startsWith(lowercasedTerm) ||
+            last.startsWith(lowercasedTerm) ||
+            full.startsWith(lowercasedTerm) ||
+            nickname.startsWith(term) ||
+            emailPrefix.startsWith(term) ||
+            emailDomain.startsWith(term);
     });
+}
+
+export function sortByUsername(a, b) {
+    const nameA = a.username;
+    const nameB = b.username;
+
+    return nameA.localeCompare(nameB);
 }

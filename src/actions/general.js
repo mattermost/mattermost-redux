@@ -1,7 +1,7 @@
 // Copyright (c) 2016-present Mattermost, Inc. All Rights Reserved.
 // See License.txt for license information.
 
-import {Client4} from 'client';
+import {Client, Client4} from 'client';
 import {bindClientFunc, FormattedError} from './helpers.js';
 import {GeneralTypes} from 'action_types';
 import {getMyChannelMembers} from './channels';
@@ -94,11 +94,19 @@ export function setServerVersion(serverVersion) {
 
 export function setStoreFromLocalData(data) {
     return async (dispatch, getState) => {
+        Client.setToken(data.token);
+        Client.setUrl(data.url);
         Client4.setToken(data.token);
         Client4.setUrl(data.url);
 
         return loadMe()(dispatch, getState);
     };
+}
+
+export function setUrl(url) {
+    Client.setUrl(url);
+    Client4.setUrl(url);
+    return true;
 }
 
 export default {
@@ -109,5 +117,6 @@ export default {
     setAppState,
     setDeviceToken,
     setServerVersion,
-    setStoreFromLocalData
+    setStoreFromLocalData,
+    setUrl
 };

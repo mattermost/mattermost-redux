@@ -202,6 +202,32 @@ export default class Client4 {
         );
     }
 
+    updateUserRoles = async (userId, roles) => {
+        return this.doFetch(
+            `${this.getUserRoute(userId)}/roles`,
+            {method: 'put', body: JSON.stringify({roles})}
+        );
+    }
+
+    updateUserMfa = async (userId, activate, code) => {
+        const body = {activate};
+        if (activate) {
+            body.code = code;
+        }
+
+        return this.doFetch(
+            `${this.getUserRoute(userId)}/mfa`,
+            {method: 'put', body: JSON.stringify(body)}
+        );
+    }
+
+    updateUserPassword = async (userId, currentPassword, newPassword) => {
+        return this.doFetch(
+            `${this.getUserRoute(userId)}/password`,
+            {method: 'put', body: JSON.stringify({current_password: currentPassword, new_password: newPassword})}
+        );
+    }
+
     login = async (loginId, password, token = '', deviceId = '') => {
         const body = {
             device_id: deviceId,
@@ -258,6 +284,20 @@ export default class Client4 {
         );
     };
 
+    getProfilesNotInTeam = async (teamId, page = 0, perPage = PER_PAGE_DEFAULT) => {
+        return this.doFetch(
+            `${this.getUsersRoute()}${buildQueryString({not_in_team: teamId, page, per_page: perPage})}`,
+            {method: 'get'}
+        );
+    };
+
+    getProfilesWithoutTeam = async (page = 0, perPage = PER_PAGE_DEFAULT) => {
+        return this.doFetch(
+            `${this.getUsersRoute()}${buildQueryString({without_team: 1, page, per_page: perPage})}`,
+            {method: 'get'}
+        );
+    };
+
     getProfilesInChannel = async (channelId, page = 0, perPage = PER_PAGE_DEFAULT) => {
         return this.doFetch(
             `${this.getUsersRoute()}${buildQueryString({in_channel: channelId, page, per_page: perPage})}`,
@@ -302,7 +342,7 @@ export default class Client4 {
         return `${this.getUserRoute(userId)}/image${buildQueryString(params)}`;
     };
 
-    autocompleteUsersInChannel = async (teamId, channelId, name) => {
+    autocompleteUsers = async (name, teamId, channelId) => {
         return this.doFetch(
             `${this.getUsersRoute()}/autocomplete${buildQueryString({in_team: teamId, in_channel: channelId, name})}`,
             {method: 'get'}

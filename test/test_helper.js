@@ -2,6 +2,7 @@
 // See License.txt for license information.
 
 import assert from 'assert';
+import nock from 'nock';
 
 import Client from 'client/client';
 import Client4 from 'client/client4';
@@ -18,6 +19,12 @@ class TestHelper {
         this.basicTeam = null;
         this.basicChannel = null;
         this.basicPost = null;
+    }
+
+    activateMocking() {
+        if (!nock.isActive()) {
+            nock.activate();
+        }
     }
 
     assertStatusOkay = (data) => {
@@ -71,7 +78,9 @@ class TestHelper {
             allow_marketing: true,
             password: PASSWORD,
             locale: 'en',
-            username: this.generateId()
+            username: this.generateId(),
+            first_name: this.generateId(),
+            last_name: this.generateId()
         };
     };
 

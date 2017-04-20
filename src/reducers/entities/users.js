@@ -131,15 +131,6 @@ function profiles(state = {}, action) {
     case UserTypes.LOGOUT_SUCCESS:
         return {};
 
-    case UserTypes.UPDATE_NOTIFY_PROPS:
-        return {
-            ...state,
-            [action.notifyProps.user_id]: {
-                ...state[action.notifyProps.user_id],
-                notify_props: action.notifyProps
-            }
-        };
-
     default:
         return state;
     }
@@ -147,14 +138,63 @@ function profiles(state = {}, action) {
 
 function profilesInTeam(state = {}, action) {
     switch (action.type) {
+    case UserTypes.RECEIVED_PROFILE_IN_TEAM:
+        return addProfileToSet(state, action);
+
     case UserTypes.RECEIVED_PROFILES_LIST_IN_TEAM:
         return profileListToSet(state, action);
 
     case UserTypes.RECEIVED_PROFILES_IN_TEAM:
         return profilesToSet(state, action);
 
+    case UserTypes.RECEIVED_PROFILE_NOT_IN_TEAM:
+        return removeProfileFromSet(state, action);
+
     case UserTypes.LOGOUT_SUCCESS:
         return {};
+
+    default:
+        return state;
+    }
+}
+
+function profilesNotInTeam(state = {}, action) {
+    switch (action.type) {
+    case UserTypes.RECEIVED_PROFILE_NOT_IN_TEAM:
+        return addProfileToSet(state, action);
+
+    case UserTypes.RECEIVED_PROFILES_LIST_NOT_IN_TEAM:
+        return profileListToSet(state, action);
+
+    case UserTypes.RECEIVED_PROFILE_IN_TEAM:
+        return removeProfileFromSet(state, action);
+
+    case UserTypes.LOGOUT_SUCCESS:
+        return {};
+
+    default:
+        return state;
+    }
+}
+
+function profilesWithoutTeam(state = new Set(), action) {
+    const nextSet = new Set(state);
+
+    switch (action.type) {
+    case UserTypes.RECEIVED_PROFILE_WITHOUT_TEAM:
+        Object.values(action.data).forEach((id) => nextSet.add(id));
+        return nextSet;
+
+    case UserTypes.RECEIVED_PROFILES_LIST_WITHOUT_TEAM:
+        action.data.forEach((user) => nextSet.add(user.id));
+        return nextSet;
+
+    case UserTypes.RECEIVED_PROFILE_IN_TEAM:
+        nextSet.delete(action.id);
+        return nextSet;
+
+    case UserTypes.LOGOUT_SUCCESS:
+        return new Set();
 
     default:
         return state;
@@ -235,10 +275,16 @@ export default combineReducers({
     // object where every key is a team id and has a Set with the users id that are members of the team
     profilesInTeam,
 
+    // object where every key is a team id and has a Set with the users id that are not members of the team
+    profilesNotInTeam,
+
+    // set with user ids for users that are not on any team
+    profilesWithoutTeam,
+
     // object where every key is a channel id and has a Set with the users id that are members of the channel
     profilesInChannel,
 
-    // object where every key is a channel id and has a Set with the users id that are members of the channel
+    // object where every key is a channel id and has a Set with the users id that are not members of the channel
     profilesNotInChannel,
 
     // object where every key is the user id and has a value with the current status of each user
