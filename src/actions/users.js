@@ -408,7 +408,7 @@ export function getProfilesInChannel(channelId, page, perPage = General.PROFILE_
             },
             {
                 type: UserTypes.RECEIVED_PROFILES_LIST,
-                data: removeUserFromList(currentUserId, Object.assign([], profiles))
+                data: removeUserFromList(currentUserId, [...profiles])
             },
             {
                 type: UserTypes.PROFILES_IN_CHANNEL_SUCCESS
@@ -445,7 +445,7 @@ export function getProfilesNotInChannel(teamId, channelId, page, perPage = Gener
             },
             {
                 type: UserTypes.RECEIVED_PROFILES_LIST,
-                data: removeUserFromList(currentUserId, Object.assign([], profiles))
+                data: removeUserFromList(currentUserId, [...profiles])
             },
             {
                 type: UserTypes.PROFILES_NOT_IN_CHANNEL_SUCCESS
@@ -595,6 +595,8 @@ export function autocompleteUsers(term, teamId = '', channelId = '') {
     return async (dispatch, getState) => {
         dispatch({type: UserTypes.AUTOCOMPLETE_USERS_REQUEST}, getState);
 
+        const {currentUserId} = getState().entities.users;
+
         let data;
         try {
             data = await Client4.autocompleteUsers(term, teamId, channelId);
@@ -607,10 +609,16 @@ export function autocompleteUsers(term, teamId = '', channelId = '') {
             return null;
         }
 
+        let users = [...data.users];
+        if (data.out_of_channel) {
+            users = [...users, ...data.out_of_channel];
+        }
+        removeUserFromList(currentUserId, users);
+
         const actions = [
             {
                 type: UserTypes.RECEIVED_PROFILES_LIST,
-                data: Object.assign([], data.users, data.out_of_channel)
+                data: users
             },
             {
                 type: UserTypes.AUTOCOMPLETE_USERS_SUCCESS
@@ -638,7 +646,7 @@ export function autocompleteUsers(term, teamId = '', channelId = '') {
             actions.push(
                 {
                     type: UserTypes.RECEIVED_PROFILES_LIST_IN_TEAM,
-                    data: Object.assign([], data.users, data.out_of_channel),
+                    data: users,
                     id: teamId
                 }
             );
@@ -668,7 +676,7 @@ export function searchProfiles(term, options = {}) {
             return null;
         }
 
-        const actions = [{type: UserTypes.RECEIVED_PROFILES_LIST, data: removeUserFromList(currentUserId, Object.assign([], profiles))}];
+        const actions = [{type: UserTypes.RECEIVED_PROFILES_LIST, data: removeUserFromList(currentUserId, [...profiles])}];
 
         if (options.in_channel_id) {
             actions.push({
@@ -776,7 +784,7 @@ export function updateUserRoles(userId, roles) {
 
         const profile = getState().entities.users.profiles[userId];
         if (profile) {
-            actions.push({type: UserTypes.RECEIVED_PROFILE, data: Object.assign({}, profile, {roles})});
+            actions.push({type: UserTypes.RECEIVED_PROFILE, data: {...profile, roles}});
         }
 
         dispatch(batchActions(actions), getState);
@@ -802,7 +810,7 @@ export function updateUserMfa(userId, activate, code = '') {
 
         const profile = getState().entities.users.profiles[userId];
         if (profile) {
-            actions.push({type: UserTypes.RECEIVED_PROFILE, data: Object.assign({}, profile, {mfa_active: activate})});
+            actions.push({type: UserTypes.RECEIVED_PROFILE, data: {...profile, mfa_active: activate}});
         }
 
         dispatch(batchActions(actions), getState);
@@ -828,7 +836,7 @@ export function updateUserPassword(userId, currentPassword, newPassword) {
 
         const profile = getState().entities.users.profiles[userId];
         if (profile) {
-            actions.push({type: UserTypes.RECEIVED_PROFILE, data: Object.assign({}, profile, {last_password_update_at: new Date().getTime()})});
+            actions.push({type: UserTypes.RECEIVED_PROFILE, data: {...profile, last_password_update_at: new Date().getTime()}});
         }
 
         dispatch(batchActions(actions), getState);
