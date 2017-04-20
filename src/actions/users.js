@@ -504,7 +504,7 @@ export function getStatusesByIdsBatchedDebounced(id) {
 
 export function getStatusesByIds(userIds) {
     return bindClientFunc(
-        Client.getStatusesByIds,
+        Client4.getStatusesByIds,
         UserTypes.PROFILES_STATUSES_REQUEST,
         [UserTypes.RECEIVED_STATUSES, UserTypes.PROFILES_STATUSES_SUCCESS],
         UserTypes.PROFILES_STATUSES_FAILURE,

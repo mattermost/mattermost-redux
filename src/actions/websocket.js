@@ -451,9 +451,7 @@ function handlePreferencesDeletedEvent(msg, dispatch, getState) {
 function handleStatusChangedEvent(msg, dispatch, getState) {
     dispatch({
         type: UserTypes.RECEIVED_STATUSES,
-        data: {
-            [msg.data.user_id]: msg.data.status
-        }
+        data: [{user_id: msg.data.user_id, status: msg.data.status}]
     }, getState);
 }
 

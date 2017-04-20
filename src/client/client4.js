@@ -391,6 +391,13 @@ export default class Client4 {
         );
     };
 
+    getStatusesByIds = async (userIds) => {
+        return this.doFetch(
+            `${this.getUsersRoute()}/status/ids`,
+            {method: 'post', body: JSON.stringify(userIds)}
+        );
+    };
+
     // Team Routes
 
     createTeam = async (team) => {
