@@ -113,7 +113,7 @@ function handlePostDeleted(posts = {}, postsInChannel = {}, action) {
         nextPostsForChannel[channelId] = postsForChannel;
     }
 
-    return {posts: nextPosts, postsByChannel: nextPostsForChannel};
+    return {posts: nextPosts, postsInChannel: nextPostsForChannel};
 }
 
 function handleRemovePost(posts = {}, postsInChannel = {}, action) {
@@ -162,7 +162,10 @@ function handlePosts(posts = {}, postsInChannel = {}, action) {
     case PostTypes.RECEIVED_POSTS:
         return handleReceivedPosts(posts, postsInChannel, action);
     case PostTypes.POST_DELETED:
-        return handlePostDeleted(posts, postsInChannel, action);
+        if (action.data) {
+            return handlePostDeleted(posts, postsInChannel, action);
+        }
+        return {posts, postsInChannel};
     case PostTypes.REMOVE_POST:
         return handleRemovePost(posts, postsInChannel, action);
 
