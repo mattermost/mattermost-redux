@@ -2,12 +2,13 @@
 // See License.txt for license information.
 /* eslint-disable no-undefined */
 
-import {applyMiddleware, compose, combineReducers} from 'redux';
+import {createStore, combineReducers} from 'redux';
 import {enableBatching} from 'redux-batched-actions';
 import devTools from 'remote-redux-devtools';
 import thunk from 'redux-thunk';
 import {REHYDRATE} from 'redux-persist/constants';
-import {createOfflineStore} from 'redux-offline';
+import {createOfflineReducer, networkStatusChangedAction, offlineCompose} from 'redux-offline';
+import defaultOfflineConfig from 'redux-offline/lib/defaults';
 import createActionBuffer from 'redux-action-buffer';
 
 import {General} from 'constants';
@@ -15,26 +16,34 @@ import serviceReducer from 'reducers';
 import deepFreezeAndThrowOnMutation from 'utils/deep_freeze';
 
 import {offlineConfig} from './helpers';
-import initialState from './initial_state';
 
 export default function configureOfflineServiceStore(preloadedState, appReducer, getAppReducer, userOfflineConfig) {
-    const baseState = Object.assign({}, initialState, preloadedState);
+    const baseOfflineConfig = Object.assign({}, defaultOfflineConfig, offlineConfig, userOfflineConfig);
 
-    const baseOfflineConfig = Object.assign({}, offlineConfig, userOfflineConfig);
-
-    const store = createOfflineStore(
-        createReducer(serviceReducer, appReducer),
-        baseState,
-        compose(
-            applyMiddleware(thunk, createActionBuffer(REHYDRATE)),
-            devTools({
+    const store = createStore(
+        createOfflineReducer(createReducer(serviceReducer, appReducer)),
+        undefined,
+        // eslint-disable-line - offlineCompose(config)(middleware, other funcs)
+        offlineCompose(baseOfflineConfig)(
+            [thunk, createActionBuffer(REHYDRATE)],
+            [devTools({
                 name: 'Mattermost',
                 hostname: 'localhost',
                 port: 5678
-            })
-        ),
-        baseOfflineConfig
+            })]
+        )
     );
+
+    // launch store persistor
+    if (baseOfflineConfig.persist) {
+        baseOfflineConfig.persist(store, baseOfflineConfig.persistOptions, baseOfflineConfig.persistCallback);
+    }
+
+    if (baseOfflineConfig.detectNetwork) {
+        baseOfflineConfig.detectNetwork((online) => {
+            store.dispatch(networkStatusChangedAction(online));
+        });
+    }
 
     if (module.hot) {
         // Enable Webpack hot module replacement for reducers

@@ -59,29 +59,23 @@ export function createPost(post, files) {
 }
 
 export function deletePost(post) {
-    return async (dispatch, getState) => {
-        dispatch({type: PostTypes.DELETE_POST_REQUEST}, getState);
+    return async (dispatch) => {
+        const delPost = {...post};
 
-        try {
-            await Client4.deletePost(post.id);
-        } catch (error) {
-            forceLogoutIfNecessary(error, dispatch);
-            dispatch(batchActions([
-                {type: PostTypes.DELETE_POST_FAILURE, error},
-                getLogErrorAction(error)
-            ]), getState);
-            return;
-        }
-
-        dispatch(batchActions([
-            {
-                type: PostTypes.POST_DELETED,
-                data: {...post}
-            },
-            {
-                type: PostTypes.DELETE_POST_SUCCESS
+        dispatch({
+            type: PostTypes.POST_DELETED,
+            data: delPost,
+            meta: {
+                offline: {
+                    effect: () => Client4.deletePost(post.id),
+                    commit: {type: PostTypes.POST_DELETED},
+                    rollback: {
+                        type: PostTypes.RECEIVED_POST,
+                        data: delPost
+                    }
+                }
             }
-        ]), getState);
+        });
     };
 }
 
