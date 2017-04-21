@@ -36,7 +36,8 @@ export default function configureOfflineServiceStore(preloadedState, appReducer,
         createOfflineReducer(enableBatching(offlineReducer)),
         baseState,
         offlineCompose(baseOfflineConfig)(
-            [thunk, createActionBuffer(REHYDRATE)]
+            [thunk, createActionBuffer(REHYDRATE)],
+            []
         )
     );
 
