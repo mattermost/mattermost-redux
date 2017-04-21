@@ -4,7 +4,6 @@
 import {createSelector} from 'reselect';
 
 import {getCurrentUrl} from './general';
-import {Teams} from 'constants';
 
 export function getCurrentTeamId(state) {
     return state.entities.teams.currentTeamId;
@@ -83,12 +82,12 @@ export function getTeamMember(state, teamId, userId) {
     return null;
 }
 
-export const getOpenTeams = createSelector(
+export const getJoinableTeams = createSelector(
     getTeams,
     (teams) => {
         const openTeams = {};
         Object.values(teams).forEach((t) => {
-            if (t.type === Teams.TEAM_TYPE_OPEN) {
+            if (t.allow_open_invite) {
                 openTeams[t.id] = t;
             }
         });

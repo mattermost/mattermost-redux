@@ -6,18 +6,18 @@ import assert from 'assert';
 import deepFreezeAndThrowOnMutation from 'utils/deep_freeze';
 import TestHelper from 'test/test_helper';
 import * as Selectors from 'selectors/entities/teams';
-import {General, Teams} from 'constants';
+import {General} from 'constants';
 
 describe('Selectors.Teams', () => {
     const team1 = TestHelper.fakeTeamWithId();
     const team2 = TestHelper.fakeTeamWithId();
     const team3 = TestHelper.fakeTeamWithId();
-    team3.type = Teams.TEAM_TYPE_INVITE;
 
     const teams = {};
     teams[team1.id] = team1;
     teams[team2.id] = team2;
     teams[team3.id] = team3;
+    team3.allow_open_invite = true;
 
     const user = TestHelper.fakeUserWithId();
     const user2 = TestHelper.fakeUserWithId();
@@ -63,10 +63,9 @@ describe('Selectors.Teams', () => {
         assert.deepEqual(Selectors.getTeamMember(testState, team1.id, user2.id), membersInTeam[team1.id][user2.id]);
     });
 
-    it('getOpenTeams', () => {
+    it('getJoinableTeams', () => {
         const openTeams = {};
-        openTeams[team1.id] = team1;
-        openTeams[team2.id] = team2;
-        assert.deepEqual(Selectors.getOpenTeams(testState), openTeams);
+        openTeams[team3.id] = team3;
+        assert.deepEqual(Selectors.getJoinableTeams(testState), openTeams);
     });
 });
