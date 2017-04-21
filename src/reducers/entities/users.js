@@ -178,21 +178,22 @@ function profilesNotInTeam(state = {}, action) {
 }
 
 function profilesWithoutTeam(state = new Set(), action) {
-    const nextSet = new Set(state);
-
     switch (action.type) {
-    case UserTypes.RECEIVED_PROFILE_WITHOUT_TEAM:
+    case UserTypes.RECEIVED_PROFILE_WITHOUT_TEAM: {
+        const nextSet = new Set(state);
         Object.values(action.data).forEach((id) => nextSet.add(id));
         return nextSet;
-
-    case UserTypes.RECEIVED_PROFILES_LIST_WITHOUT_TEAM:
+    }
+    case UserTypes.RECEIVED_PROFILES_LIST_WITHOUT_TEAM: {
+        const nextSet = new Set(state);
         action.data.forEach((user) => nextSet.add(user.id));
         return nextSet;
-
-    case UserTypes.RECEIVED_PROFILE_IN_TEAM:
+    }
+    case UserTypes.RECEIVED_PROFILE_IN_TEAM: {
+        const nextSet = new Set(state);
         nextSet.delete(action.id);
         return nextSet;
-
+    }
     case UserTypes.LOGOUT_SUCCESS:
         return new Set();
 

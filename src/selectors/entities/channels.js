@@ -88,7 +88,11 @@ export const getChannelsInCurrentTeam = createSelector(
     getChannelSetInCurrentTeam,
     getCurrentUser,
     (channels, currentTeamChannelSet, currentUser) => {
-        return sortAndInjectChannels(channels, currentTeamChannelSet, currentUser.locale);
+        let locale = 'en';
+        if (currentUser) {
+            locale = currentUser.locale;
+        }
+        return sortAndInjectChannels(channels, currentTeamChannelSet, locale);
     }
 );
 
