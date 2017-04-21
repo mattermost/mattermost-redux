@@ -2,7 +2,7 @@
 // See License.txt for license information.
 
 import {batchActions} from 'redux-batched-actions';
-import {Client, Client4} from 'client';
+import {Client4} from 'client';
 import {General} from 'constants';
 import {PreferenceTypes, UserTypes, TeamTypes} from 'action_types';
 import {getMyTeams} from './teams';
@@ -504,7 +504,7 @@ export function getStatusesByIdsBatchedDebounced(id) {
 
 export function getStatusesByIds(userIds) {
     return bindClientFunc(
-        Client.getStatusesByIds,
+        Client4.getStatusesByIds,
         UserTypes.PROFILES_STATUSES_REQUEST,
         [UserTypes.RECEIVED_STATUSES, UserTypes.PROFILES_STATUSES_SUCCESS],
         UserTypes.PROFILES_STATUSES_FAILURE,
