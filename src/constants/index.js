@@ -8,6 +8,7 @@ import Preferences from './preferences';
 import Posts from './posts';
 import Files from './files';
 import Alerts from './alerts';
+import Teams from './teams';
 
 export {
     General,
@@ -16,6 +17,7 @@ export {
     Files,
     RequestStatus,
     WebsocketEvents,
-    Alerts
+    Alerts,
+    Teams
 };
 
