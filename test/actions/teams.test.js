@@ -6,7 +6,7 @@ import assert from 'assert';
 import * as Actions from 'actions/teams';
 import {login} from 'actions/users';
 import {Client, Client4} from 'client';
-import {RequestStatus} from 'constants';
+import {General, RequestStatus} from 'constants';
 import TestHelper from 'test/test_helper';
 import configureStore from 'test/test_store';
 
@@ -267,5 +267,24 @@ describe('Actions.Teams', () => {
         members = state.entities.teams.membersInTeam;
         assert.ok(members[TestHelper.basicTeam.id]);
         assert.ok(!members[TestHelper.basicTeam.id][user.id]);
+    });
+
+    it('updateTeamMemberRoles', async () => {
+        const user = await TestHelper.basicClient4.createUser(TestHelper.fakeUser());
+        await Actions.addUserToTeam(TestHelper.basicTeam.id, user.id)(store.dispatch, store.getState);
+
+        const roles = General.TEAM_USER_ROLE + ' ' + General.TEAM_ADMIN_ROLE;
+        await Actions.updateTeamMemberRoles(TestHelper.basicTeam.id, user.id, roles)(store.dispatch, store.getState);
+
+        const membersRequest = store.getState().requests.teams.updateTeamMember;
+        const members = store.getState().entities.teams.membersInTeam;
+
+        if (membersRequest.status === RequestStatus.FAILURE) {
+            throw new Error(JSON.stringify(membersRequest.error));
+        }
+
+        assert.ok(members[TestHelper.basicTeam.id]);
+        assert.ok(members[TestHelper.basicTeam.id][user.id]);
+        assert.ok(members[TestHelper.basicTeam.id][user.id].roles === roles);
     });
 });

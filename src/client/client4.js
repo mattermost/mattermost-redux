@@ -480,6 +480,13 @@ export default class Client4 {
         );
     };
 
+    updateTeamMemberRoles = async (teamId, userId, roles) => {
+        return this.doFetch(
+            `${this.getTeamMemberRoute(teamId, userId)}/roles`,
+            {method: 'put', body: JSON.stringify({roles})}
+        );
+    };
+
     // Channel Routes
 
     createChannel = async (channel) => {

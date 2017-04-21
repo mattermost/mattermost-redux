@@ -40,6 +40,10 @@ export default keyMirror({
     REMOVE_TEAM_MEMBER_SUCCESS: null,
     REMOVE_TEAM_MEMBER_FAILURE: null,
 
+    UPDATE_TEAM_MEMBER_REQUEST: null,
+    UPDATE_TEAM_MEMBER_SUCCESS: null,
+    UPDATE_TEAM_MEMBER_FAILURE: null,
+
     CREATED_TEAM: null,
     SELECT_TEAM: null,
     UPDATED_TEAM: null,

@@ -302,3 +302,40 @@ export function removeUserFromTeam(teamId, userId) {
         return true;
     };
 }
+
+export function updateTeamMemberRoles(teamId, userId, roles) {
+    return async (dispatch, getState) => {
+        dispatch({type: TeamTypes.UPDATE_TEAM_MEMBER_REQUEST}, getState);
+
+        try {
+            await Client4.updateTeamMemberRoles(teamId, userId, roles);
+        } catch (error) {
+            forceLogoutIfNecessary(error, dispatch);
+            dispatch(batchActions([
+                {type: TeamTypes.UPDATE_TEAM_MEMBER_FAILURE, error},
+                getLogErrorAction(error)
+            ]), getState);
+            return null;
+        }
+
+        const actions = [
+            {
+                type: TeamTypes.UPDATE_TEAM_MEMBER_SUCCESS
+            }
+        ];
+
+        const membersInTeam = getState().entities.teams.membersInTeam[teamId];
+        if (membersInTeam && membersInTeam[userId]) {
+            actions.push(
+                {
+                    type: TeamTypes.RECEIVED_MEMBER_IN_TEAM,
+                    data: {...membersInTeam[userId], roles}
+                }
+            );
+        }
+
+        dispatch(batchActions(actions), getState);
+
+        return true;
+    };
+}

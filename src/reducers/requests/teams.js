@@ -96,6 +96,16 @@ function removeUserFromTeam(state = initialRequestState(), action) {
     );
 }
 
+function updateTeamMember(state = initialRequestState(), action) {
+    return handleRequest(
+        TeamTypes.UPDATE_TEAM_MEMBER_REQUEST,
+        TeamTypes.UPDATE_TEAM_MEMBER_SUCCESS,
+        TeamTypes.UPDATE_TEAM_MEMBER_FAILURE,
+        state,
+        action
+    );
+}
+
 export default combineReducers({
     getMyTeams,
     getTeams,
@@ -105,5 +115,6 @@ export default combineReducers({
     getTeamMembers,
     getTeamStats,
     addUserToTeam,
-    removeUserFromTeam
+    removeUserFromTeam,
+    updateTeamMember
 });
