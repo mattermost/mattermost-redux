@@ -218,6 +218,28 @@ describe('Actions.Teams', () => {
         assert.ok(members[TestHelper.basicTeam.id][user.id]);
     });
 
+    it('addUsersToTeam', async () => {
+        const user = await TestHelper.basicClient4.createUser(TestHelper.fakeUser());
+        const user2 = await TestHelper.basicClient4.createUser(TestHelper.fakeUser());
+
+        await Actions.addUsersToTeam(TestHelper.basicTeam.id, [user.id, user2.id])(store.dispatch, store.getState);
+
+        const membersRequest = store.getState().requests.teams.addUserToTeam;
+        const members = store.getState().entities.teams.membersInTeam;
+        const profilesInTeam = store.getState().entities.users.profilesInTeam;
+
+        if (membersRequest.status === RequestStatus.FAILURE) {
+            throw new Error(JSON.stringify(membersRequest.error));
+        }
+
+        assert.ok(members[TestHelper.basicTeam.id]);
+        assert.ok(members[TestHelper.basicTeam.id][user.id]);
+        assert.ok(members[TestHelper.basicTeam.id][user2.id]);
+        assert.ok(profilesInTeam[TestHelper.basicTeam.id]);
+        assert.ok(profilesInTeam[TestHelper.basicTeam.id].has(user.id));
+        assert.ok(profilesInTeam[TestHelper.basicTeam.id].has(user2.id));
+    });
+
     it('removeUserFromTeam', async () => {
         const user = await TestHelper.basicClient4.createUser(TestHelper.fakeUser());
 

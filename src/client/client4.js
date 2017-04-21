@@ -457,6 +457,15 @@ export default class Client4 {
         );
     };
 
+    addUsersToTeam = async (teamId, userIds) => {
+        const members = [];
+        userIds.forEach((id) => members.push({team_id: teamId, user_id: id}));
+        return this.doFetch(
+            `${this.getTeamMembersRoute(teamId)}/batch`,
+            {method: 'post', body: JSON.stringify(members)}
+        );
+    };
+
     removeFromTeam = async (teamId, userId) => {
         return this.doFetch(
             `${this.getTeamMemberRoute(teamId, userId)}`,
