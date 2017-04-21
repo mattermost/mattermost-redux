@@ -149,7 +149,7 @@ describe('Actions.Teams', () => {
         }
 
         assert.ok(members[TestHelper.basicTeam.id]);
-        assert.ok(members[TestHelper.basicTeam.id].has(user.id));
+        assert.ok(members[TestHelper.basicTeam.id][user.id]);
     });
 
     it('getTeamMembersByIds', async () => {
@@ -180,8 +180,8 @@ describe('Actions.Teams', () => {
         }
 
         assert.ok(members[TestHelper.basicTeam.id]);
-        assert.ok(members[TestHelper.basicTeam.id].has(user1.id));
-        assert.ok(members[TestHelper.basicTeam.id].has(user2.id));
+        assert.ok(members[TestHelper.basicTeam.id][user1.id]);
+        assert.ok(members[TestHelper.basicTeam.id][user2.id]);
     });
 
     it('getTeamStats', async () => {
@@ -215,7 +215,7 @@ describe('Actions.Teams', () => {
         }
 
         assert.ok(members[TestHelper.basicTeam.id]);
-        assert.ok(members[TestHelper.basicTeam.id].has(user.id));
+        assert.ok(members[TestHelper.basicTeam.id][user.id]);
     });
 
     it('removeUserFromTeam', async () => {
@@ -232,7 +232,7 @@ describe('Actions.Teams', () => {
         }
 
         assert.ok(members[TestHelper.basicTeam.id]);
-        assert.ok(members[TestHelper.basicTeam.id].has(user.id));
+        assert.ok(members[TestHelper.basicTeam.id][user.id]);
         await Actions.removeUserFromTeam(TestHelper.basicTeam.id, user.id)(store.dispatch, store.getState);
         state = store.getState();
 
@@ -244,6 +244,6 @@ describe('Actions.Teams', () => {
 
         members = state.entities.teams.membersInTeam;
         assert.ok(members[TestHelper.basicTeam.id]);
-        assert.ok(!members[TestHelper.basicTeam.id].has(user.id));
+        assert.ok(!members[TestHelper.basicTeam.id][user.id]);
     });
 });

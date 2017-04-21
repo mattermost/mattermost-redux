@@ -68,8 +68,8 @@ function membersInTeam(state = {}, action) {
     switch (action.type) {
     case TeamTypes.RECEIVED_MEMBER_IN_TEAM: {
         const data = action.data;
-        const members = new Set(state[data.team_id]);
-        members.add(data.user_id);
+        const members = {...(state[data.team_id] || {})};
+        members[data.user_id] = data;
         return {
             ...state,
             [data.team_id]: members
@@ -79,9 +79,9 @@ function membersInTeam(state = {}, action) {
         const data = action.data;
         if (data && data.length) {
             const teamId = data[0].team_id;
-            const members = new Set(state[teamId]);
+            const members = {...(state[teamId] || {})};
             for (const member of data) {
-                members.add(member.user_id);
+                members[member.user_id] = member;
             }
 
             return {
@@ -96,11 +96,11 @@ function membersInTeam(state = {}, action) {
         const data = action.data;
         const members = state[data.team_id];
         if (members) {
-            const set = new Set(members);
-            set.delete(data.user_id);
+            const nextState = {...members};
+            Reflect.deleteProperty(nextState, data.user_id);
             return {
                 ...state,
-                [data.team_id]: set
+                [data.team_id]: nextState
             };
         }
 
@@ -140,7 +140,7 @@ export default combineReducers({
     // object where every key is the team id and has and object with the team members detail
     myMembers,
 
-    // object where every key is the team id and has a Set of user ids that are members in the team
+    // object where every key is the team id and has an of members in the team where the key is user id
     membersInTeam,
 
     // object where every key is the team id and has an object with the team stats

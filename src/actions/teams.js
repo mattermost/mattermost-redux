@@ -208,7 +208,8 @@ export function addUserToTeam(teamId, userId) {
 
         const member = {
             team_id: teamId,
-            user_id: userId
+            user_id: userId,
+            roles: General.TEAM_USER_ROLE
         };
 
         dispatch(batchActions([
