@@ -2,7 +2,7 @@
 // See License.txt for license information.
 
 import {batchActions} from 'redux-batched-actions';
-import {Client, Client4} from 'client';
+import {Client4} from 'client';
 import {General} from 'constants';
 import {PreferenceTypes, UserTypes, TeamTypes} from 'action_types';
 import {getMyTeams} from './teams';
