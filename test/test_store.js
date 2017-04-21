@@ -24,7 +24,7 @@ export default async function testConfigureStore() {
         }
     };
 
-    const store = configureStore(undefined, {}, () => ({}), offlineConfig);
+    const store = configureStore(undefined, {}, offlineConfig, () => ({}));
 
     const wait = () => new Promise((resolve) => setTimeout(resolve), 300); //eslint-disable-line
     await wait();
