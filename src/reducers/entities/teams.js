@@ -90,7 +90,9 @@ function membersInTeam(state = {}, action) {
         if (data && data.length) {
             const nextState = {...state};
             for (const member of data) {
-                if (!nextState[member.team_id]) {
+                if (nextState[member.team_id]) {
+                    nextState[member.team_id] = {...nextState[member.team_id]};
+                } else {
                     nextState[member.team_id] = {};
                 }
                 nextState[member.team_id][member.user_id] = member;
