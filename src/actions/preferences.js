@@ -105,7 +105,7 @@ export function savePreferences(userId, preferences) {
                         type: PreferenceTypes.RECEIVED_PREFERENCES
                     },
                     rollback: {
-                        type: PreferenceTypes.DELETE_PREFERENCES,
+                        type: PreferenceTypes.DELETED_PREFERENCES,
                         data: preferences
                     }
                 }
