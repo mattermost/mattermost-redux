@@ -45,7 +45,9 @@ function myMembers(state = {}, action) {
         const nextState = {};
         const members = action.data;
         for (const m of members) {
-            nextState[m.team_id] = m;
+            if (m.delete_at == null || m.delete_at === 0) {
+                nextState[m.team_id] = m;
+            }
         }
         return nextState;
     }
