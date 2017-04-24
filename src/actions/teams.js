@@ -73,7 +73,7 @@ export function createTeam(team) {
                 {type: TeamTypes.CREATE_TEAM_FAILURE, error: err},
                 getLogErrorAction(err)
             ]), getState);
-            return;
+            return null;
         }
 
         const member = {
@@ -102,6 +102,8 @@ export function createTeam(team) {
                 type: TeamTypes.CREATE_TEAM_SUCCESS
             }
         ]), getState);
+
+        return true;
     };
 }
 
@@ -138,7 +140,7 @@ export function getTeamMember(teamId, userId) {
                 {type: TeamTypes.TEAM_MEMBERS_FAILURE, error},
                 getLogErrorAction(error)
             ]), getState);
-            return;
+            return null;
         }
 
         dispatch(batchActions([
@@ -150,6 +152,8 @@ export function getTeamMember(teamId, userId) {
                 type: TeamTypes.TEAM_MEMBERS_SUCCESS
             }
         ]), getState);
+
+        return member;
     };
 }
 
