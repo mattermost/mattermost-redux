@@ -247,6 +247,8 @@ describe('Actions.Teams', () => {
 
         let state = store.getState();
         let members = state.entities.teams.membersInTeam;
+        let profilesInTeam = state.entities.users.profilesInTeam;
+        let profilesNotInTeam = state.entities.users.profilesNotInTeam;
         const addRequest = state.requests.teams.addUserToTeam;
 
         if (addRequest.status === RequestStatus.FAILURE) {
@@ -255,6 +257,8 @@ describe('Actions.Teams', () => {
 
         assert.ok(members[TestHelper.basicTeam.id]);
         assert.ok(members[TestHelper.basicTeam.id][user.id]);
+        assert.ok(profilesInTeam[TestHelper.basicTeam.id].has(user.id));
+        assert.ok(!profilesNotInTeam[TestHelper.basicTeam.id].has(user.id));
         await Actions.removeUserFromTeam(TestHelper.basicTeam.id, user.id)(store.dispatch, store.getState);
         state = store.getState();
 
@@ -265,8 +269,12 @@ describe('Actions.Teams', () => {
         }
 
         members = state.entities.teams.membersInTeam;
+        profilesInTeam = state.entities.users.profilesInTeam;
+        profilesNotInTeam = state.entities.users.profilesNotInTeam;
         assert.ok(members[TestHelper.basicTeam.id]);
         assert.ok(!members[TestHelper.basicTeam.id][user.id]);
+        assert.ok(!profilesInTeam[TestHelper.basicTeam.id].has(user.id));
+        assert.ok(profilesNotInTeam[TestHelper.basicTeam.id].has(user.id));
     });
 
     it('updateTeamMemberRoles', async () => {

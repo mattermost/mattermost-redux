@@ -210,7 +210,7 @@ export function addUserToTeam(teamId, userId) {
         dispatch(batchActions([
             {
                 type: UserTypes.RECEIVED_PROFILE_IN_TEAM,
-                data: {id: userId},
+                data: {user_id: userId},
                 id: teamId
             },
             {
