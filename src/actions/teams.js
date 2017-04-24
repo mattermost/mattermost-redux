@@ -260,7 +260,7 @@ export function addUsersToTeam(teamId, userIds) {
             }
         ]), getState);
 
-        return true;
+        return members;
     };
 }
 
