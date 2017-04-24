@@ -91,8 +91,8 @@ export function createTeam(team) {
                 data: created
             },
             {
-                type: TeamTypes.RECEIVED_MY_TEAM_MEMBERS,
-                data: [member]
+                type: TeamTypes.RECEIVED_MY_TEAM_MEMBER,
+                data: member
             },
             {
                 type: TeamTypes.SELECT_TEAM,
@@ -103,7 +103,7 @@ export function createTeam(team) {
             }
         ]), getState);
 
-        return true;
+        return created;
     };
 }
 

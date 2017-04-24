@@ -41,6 +41,14 @@ function teams(state = {}, action) {
 
 function myMembers(state = {}, action) {
     switch (action.type) {
+    case TeamTypes.RECEIVED_MY_TEAM_MEMBER: {
+        const nextState = {...state};
+        const member = action.data;
+        if (member.delete_at === 0) {
+            nextState[member.team_id] = member;
+        }
+        return nextState;
+    }
     case TeamTypes.RECEIVED_MY_TEAM_MEMBERS: {
         const nextState = {};
         const members = action.data;
