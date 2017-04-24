@@ -78,6 +78,10 @@ export default class Client4 {
         return `${this.getTeamsRoute()}/${teamId}`;
     }
 
+    getTeamNameRoute(teamName) {
+        return `${this.getTeamsRoute()}/name/${teamName}`;
+    }
+
     getTeamMembersRoute(teamId) {
         return `${this.getTeamRoute(teamId)}/members`;
     }
@@ -414,6 +418,13 @@ export default class Client4 {
         );
     };
 
+    checkIfTeamExists = async (teamName) => {
+        return this.doFetch(
+            `${this.getTeamNameRoute(teamName)}/exists`,
+            {method: 'get'}
+        );
+    };
+
     getTeams = async (page = 0, perPage = PER_PAGE_DEFAULT) => {
         return this.doFetch(
             `${this.getTeamsRoute()}${buildQueryString({page, per_page: perPage})}`,
@@ -428,9 +439,23 @@ export default class Client4 {
         );
     };
 
+    getTeamsForUser = async (userId) => {
+        return this.doFetch(
+            `${this.getUserRoute(userId)}/teams`,
+            {method: 'get'}
+        );
+    };
+
     getMyTeamMembers = async () => {
         return this.doFetch(
             `${this.getUserRoute('me')}/teams/members`,
+            {method: 'get'}
+        );
+    };
+
+    getTeamMembersForUser = async (userId) => {
+        return this.doFetch(
+            `${this.getUserRoute(userId)}/teams/members`,
             {method: 'get'}
         );
     };
@@ -457,6 +482,15 @@ export default class Client4 {
         );
     };
 
+    addUsersToTeam = async (teamId, userIds) => {
+        const members = [];
+        userIds.forEach((id) => members.push({team_id: teamId, user_id: id}));
+        return this.doFetch(
+            `${this.getTeamMembersRoute(teamId)}/batch`,
+            {method: 'post', body: JSON.stringify(members)}
+        );
+    };
+
     removeFromTeam = async (teamId, userId) => {
         return this.doFetch(
             `${this.getTeamMemberRoute(teamId, userId)}`,
@@ -468,6 +502,20 @@ export default class Client4 {
         return this.doFetch(
             `${this.getTeamRoute(teamId)}/stats`,
             {method: 'get'}
+        );
+    };
+
+    updateTeamMemberRoles = async (teamId, userId, roles) => {
+        return this.doFetch(
+            `${this.getTeamMemberRoute(teamId, userId)}/roles`,
+            {method: 'put', body: JSON.stringify({roles})}
+        );
+    };
+
+    sendEmailInvitesToTeam = async (teamId, emails) => {
+        return this.doFetch(
+            `${this.getTeamRoute(teamId)}/invite/email`,
+            {method: 'post', body: JSON.stringify(emails)}
         );
     };
 

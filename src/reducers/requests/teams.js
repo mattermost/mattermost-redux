@@ -26,6 +26,16 @@ function getTeams(state = initialRequestState(), action) {
     );
 }
 
+function getTeam(state = initialRequestState(), action) {
+    return handleRequest(
+        TeamTypes.GET_TEAM_REQUEST,
+        TeamTypes.GET_TEAM_SUCCESS,
+        TeamTypes.GET_TEAM_FAILURE,
+        state,
+        action
+    );
+}
+
 function createTeam(state = initialRequestState(), action) {
     return handleRequest(
         TeamTypes.CREATE_TEAM_REQUEST,
@@ -96,14 +106,37 @@ function removeUserFromTeam(state = initialRequestState(), action) {
     );
 }
 
+function updateTeamMember(state = initialRequestState(), action) {
+    return handleRequest(
+        TeamTypes.UPDATE_TEAM_MEMBER_REQUEST,
+        TeamTypes.UPDATE_TEAM_MEMBER_SUCCESS,
+        TeamTypes.UPDATE_TEAM_MEMBER_FAILURE,
+        state,
+        action
+    );
+}
+
+function emailInvite(state = initialRequestState(), action) {
+    return handleRequest(
+        TeamTypes.TEAM_EMAIL_INVITE_REQUEST,
+        TeamTypes.TEAM_EMAIL_INVITE_SUCCESS,
+        TeamTypes.TEAM_EMAIL_INVITE_FAILURE,
+        state,
+        action
+    );
+}
+
 export default combineReducers({
     getMyTeams,
     getTeams,
+    getTeam,
     createTeam,
     updateTeam,
     getMyTeamMembers,
     getTeamMembers,
     getTeamStats,
     addUserToTeam,
-    removeUserFromTeam
+    removeUserFromTeam,
+    updateTeamMember,
+    emailInvite
 });

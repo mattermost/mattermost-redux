@@ -41,11 +41,21 @@ function teams(state = {}, action) {
 
 function myMembers(state = {}, action) {
     switch (action.type) {
+    case TeamTypes.RECEIVED_MY_TEAM_MEMBER: {
+        const nextState = {...state};
+        const member = action.data;
+        if (member.delete_at === 0) {
+            nextState[member.team_id] = member;
+        }
+        return nextState;
+    }
     case TeamTypes.RECEIVED_MY_TEAM_MEMBERS: {
         const nextState = {};
         const members = action.data;
         for (const m of members) {
-            nextState[m.team_id] = m;
+            if (m.delete_at == null || m.delete_at === 0) {
+                nextState[m.team_id] = m;
+            }
         }
         return nextState;
     }
@@ -68,20 +78,38 @@ function membersInTeam(state = {}, action) {
     switch (action.type) {
     case TeamTypes.RECEIVED_MEMBER_IN_TEAM: {
         const data = action.data;
-        const members = new Set(state[data.team_id]);
-        members.add(data.user_id);
+        const members = {...(state[data.team_id] || {})};
+        members[data.user_id] = data;
         return {
             ...state,
             [data.team_id]: members
         };
     }
+    case TeamTypes.RECEIVED_TEAM_MEMBERS: {
+        const data = action.data;
+        if (data && data.length) {
+            const nextState = {...state};
+            for (const member of data) {
+                if (nextState[member.team_id]) {
+                    nextState[member.team_id] = {...nextState[member.team_id]};
+                } else {
+                    nextState[member.team_id] = {};
+                }
+                nextState[member.team_id][member.user_id] = member;
+            }
+
+            return nextState;
+        }
+
+        return state;
+    }
     case TeamTypes.RECEIVED_MEMBERS_IN_TEAM: {
         const data = action.data;
         if (data && data.length) {
             const teamId = data[0].team_id;
-            const members = new Set(state[teamId]);
+            const members = {...(state[teamId] || {})};
             for (const member of data) {
-                members.add(member.user_id);
+                members[member.user_id] = member;
             }
 
             return {
@@ -96,11 +124,11 @@ function membersInTeam(state = {}, action) {
         const data = action.data;
         const members = state[data.team_id];
         if (members) {
-            const set = new Set(members);
-            set.delete(data.user_id);
+            const nextState = {...members};
+            Reflect.deleteProperty(nextState, data.user_id);
             return {
                 ...state,
-                [data.team_id]: set
+                [data.team_id]: nextState
             };
         }
 
@@ -140,7 +168,7 @@ export default combineReducers({
     // object where every key is the team id and has and object with the team members detail
     myMembers,
 
-    // object where every key is the team id and has a Set of user ids that are members in the team
+    // object where every key is the team id and has an of members in the team where the key is user id
     membersInTeam,
 
     // object where every key is the team id and has an object with the team stats

@@ -21,6 +21,10 @@ export function getTeamMemberships(state) {
     return state.entities.teams.myMembers;
 }
 
+export function getMembersInTeams(state) {
+    return state.entities.teams.membersInTeam;
+}
+
 export const getCurrentTeam = createSelector(
     getTeams,
     getCurrentTeamId,
@@ -58,5 +62,36 @@ export const getMyTeams = createSelector(
     getTeamMemberships,
     (teams, members) => {
         return Object.values(teams).filter((t) => members[t.id]);
+    }
+);
+
+export const getMembersInCurrentTeam = createSelector(
+    getCurrentTeamId,
+    getMembersInTeams,
+    (currentTeamId, teamMembers) => {
+        return teamMembers[currentTeamId];
+    }
+);
+
+export function getTeamMember(state, teamId, userId) {
+    const members = getMembersInTeams(state)[teamId];
+    if (members) {
+        return members[userId];
+    }
+
+    return null;
+}
+
+export const getJoinableTeams = createSelector(
+    getTeams,
+    (teams) => {
+        const openTeams = {};
+        Object.values(teams).forEach((t) => {
+            if (t.allow_open_invite) {
+                openTeams[t.id] = t;
+            }
+        });
+
+        return openTeams;
     }
 );

@@ -284,7 +284,6 @@ export function getProfilesInTeam(teamId, page, perPage = General.PROFILE_CHUNK_
         let profiles;
         try {
             profiles = await Client4.getProfilesInTeam(teamId, page, perPage);
-            removeUserFromList(currentUserId, profiles);
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch);
             dispatch(batchActions([
@@ -302,7 +301,7 @@ export function getProfilesInTeam(teamId, page, perPage = General.PROFILE_CHUNK_
             },
             {
                 type: UserTypes.RECEIVED_PROFILES_LIST,
-                data: profiles
+                data: removeUserFromList(currentUserId, [...profiles])
             },
             {
                 type: UserTypes.PROFILES_IN_TEAM_SUCCESS

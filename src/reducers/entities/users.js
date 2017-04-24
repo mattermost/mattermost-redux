@@ -35,6 +35,23 @@ function profileListToSet(state, action) {
     return state;
 }
 
+function removeProfileListFromSet(state, action) {
+    const id = action.id;
+    const nextSet = new Set(state[id]);
+    if (action.data) {
+        action.data.forEach((profile) => {
+            nextSet.delete(profile.id);
+        });
+
+        return {
+            ...state,
+            [id]: nextSet
+        };
+    }
+
+    return state;
+}
+
 function addProfileToSet(state, action) {
     const id = action.id;
     const nextSet = new Set(state[id]);
@@ -150,6 +167,9 @@ function profilesInTeam(state = {}, action) {
     case UserTypes.RECEIVED_PROFILE_NOT_IN_TEAM:
         return removeProfileFromSet(state, action);
 
+    case UserTypes.RECEIVED_PROFILES_LIST_NOT_IN_TEAM:
+        return removeProfileListFromSet(state, action);
+
     case UserTypes.LOGOUT_SUCCESS:
         return {};
 
@@ -168,6 +188,9 @@ function profilesNotInTeam(state = {}, action) {
 
     case UserTypes.RECEIVED_PROFILE_IN_TEAM:
         return removeProfileFromSet(state, action);
+
+    case UserTypes.RECEIVED_PROFILES_LIST_IN_TEAM:
+        return removeProfileListFromSet(state, action);
 
     case UserTypes.LOGOUT_SUCCESS:
         return {};
