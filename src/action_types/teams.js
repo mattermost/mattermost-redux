@@ -44,6 +44,10 @@ export default keyMirror({
     UPDATE_TEAM_MEMBER_SUCCESS: null,
     UPDATE_TEAM_MEMBER_FAILURE: null,
 
+    TEAM_EMAIL_INVITE_REQUEST: null,
+    TEAM_EMAIL_INVITE_SUCCESS: null,
+    TEAM_EMAIL_INVITE_FAILURE: null,
+
     CREATED_TEAM: null,
     SELECT_TEAM: null,
     UPDATED_TEAM: null,

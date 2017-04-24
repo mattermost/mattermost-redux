@@ -487,6 +487,13 @@ export default class Client4 {
         );
     };
 
+    sendEmailInvitesToTeam = async (teamId, emails) => {
+        return this.doFetch(
+            `${this.getTeamRoute(teamId)}/invite/email`,
+            {method: 'post', body: JSON.stringify(emails)}
+        );
+    };
+
     // Channel Routes
 
     createChannel = async (channel) => {

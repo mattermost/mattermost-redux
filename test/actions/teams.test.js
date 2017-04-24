@@ -287,4 +287,14 @@ describe('Actions.Teams', () => {
         assert.ok(members[TestHelper.basicTeam.id][user.id]);
         assert.ok(members[TestHelper.basicTeam.id][user.id].roles === roles);
     });
+
+    it('sendEmailInvitesToTeam', async () => {
+        await Actions.sendEmailInvitesToTeam(TestHelper.basicTeam.id, ['fakeemail1@example.com', 'fakeemail2@example.com'])(store.dispatch, store.getState);
+
+        const inviteRequest = store.getState().requests.teams.emailInvite;
+
+        if (inviteRequest.status === RequestStatus.FAILURE) {
+            throw new Error(JSON.stringify(inviteRequest.error));
+        }
+    });
 });

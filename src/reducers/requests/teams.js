@@ -106,6 +106,16 @@ function updateTeamMember(state = initialRequestState(), action) {
     );
 }
 
+function emailInvite(state = initialRequestState(), action) {
+    return handleRequest(
+        TeamTypes.TEAM_EMAIL_INVITE_REQUEST,
+        TeamTypes.TEAM_EMAIL_INVITE_SUCCESS,
+        TeamTypes.TEAM_EMAIL_INVITE_FAILURE,
+        state,
+        action
+    );
+}
+
 export default combineReducers({
     getMyTeams,
     getTeams,
@@ -116,5 +126,6 @@ export default combineReducers({
     getTeamStats,
     addUserToTeam,
     removeUserFromTeam,
-    updateTeamMember
+    updateTeamMember,
+    emailInvite
 });

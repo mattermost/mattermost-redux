@@ -339,3 +339,14 @@ export function updateTeamMemberRoles(teamId, userId, roles) {
         return true;
     };
 }
+
+export function sendEmailInvitesToTeam(teamId, emails) {
+    return bindClientFunc(
+        Client4.sendEmailInvitesToTeam,
+        TeamTypes.TEAM_EMAIL_INVITE_REQUEST,
+        [TeamTypes.TEAM_EMAIL_INVITE_SUCCESS],
+        TeamTypes.TEAM_EMAIL_INVITE_FAILURE,
+        teamId,
+        emails
+    );
+}
