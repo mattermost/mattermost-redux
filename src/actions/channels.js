@@ -381,30 +381,34 @@ export function getChannelMembers(channelId, page = 0, perPage = General.CHANNEL
 
 export function leaveChannel(channelId) {
     return async (dispatch, getState) => {
-        dispatch({type: ChannelTypes.LEAVE_CHANNEL_REQUEST}, getState);
+        const state = getState();
+        const {currentUserId} = state.entities.users;
+        const {channels, myMembers} = state.entities.channels;
+        const channel = channels[channelId];
+        const member = myMembers[channelId];
 
-        const {currentUserId} = getState().entities.users;
-
-        try {
-            await Client4.removeFromChannel(currentUserId, channelId);
-        } catch (error) {
-            forceLogoutIfNecessary(error, dispatch);
-            dispatch(batchActions([
-                {type: ChannelTypes.LEAVE_CHANNEL_FAILURE, error},
-                getLogErrorAction(error)
-            ]), getState);
-            return;
-        }
-
-        dispatch(batchActions([
-            {
-                type: ChannelTypes.LEAVE_CHANNEL,
-                data: {id: channelId, user_id: currentUserId}
-            },
-            {
-                type: ChannelTypes.LEAVE_CHANNEL_SUCCESS
+        dispatch({
+            type: ChannelTypes.LEAVE_CHANNEL,
+            data: {id: channelId, user_id: currentUserId},
+            meta: {
+                offline: {
+                    effect: () => Client4.removeFromChannel(currentUserId, channelId),
+                    commit: {type: ChannelTypes.LEAVE_CHANNEL},
+                    rollback: () => {
+                        dispatch(batchActions([
+                            {
+                                type: ChannelTypes.RECEIVED_CHANNEL,
+                                data: channel
+                            },
+                            {
+                                type: ChannelTypes.RECEIVED_MY_CHANNEL_MEMBER,
+                                data: member
+                            }
+                        ]));
+                    }
+                }
             }
-        ]), getState);
+        });
     };
 }
 

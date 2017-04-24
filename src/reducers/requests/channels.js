@@ -76,16 +76,6 @@ function updateChannelNotifyProps(state = initialRequestState(), action) {
     );
 }
 
-function leaveChannel(state = initialRequestState(), action) {
-    return handleRequest(
-        ChannelTypes.LEAVE_CHANNEL_REQUEST,
-        ChannelTypes.LEAVE_CHANNEL_SUCCESS,
-        ChannelTypes.LEAVE_CHANNEL_FAILURE,
-        state,
-        action
-    );
-}
-
 function joinChannel(state = initialRequestState(), action) {
     return handleRequest(
         ChannelTypes.JOIN_CHANNEL_REQUEST,
@@ -165,7 +155,6 @@ export default combineReducers({
     createChannel,
     updateChannel,
     updateChannelNotifyProps,
-    leaveChannel,
     joinChannel,
     deleteChannel,
     updateLastViewedAt,
