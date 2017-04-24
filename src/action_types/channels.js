@@ -32,10 +32,6 @@ export default keyMirror({
     NOTIFY_PROPS_SUCCESS: null,
     NOTIFY_PROPS_FAILURE: null,
 
-    LEAVE_CHANNEL_REQUEST: null,
-    LEAVE_CHANNEL_SUCCESS: null,
-    LEAVE_CHANNEL_FAILURE: null,
-
     JOIN_CHANNEL_REQUEST: null,
     JOIN_CHANNEL_SUCCESS: null,
     JOIN_CHANNEL_FAILURE: null,

@@ -166,8 +166,12 @@ function myMembers(state = {}, action) {
     }
     case ChannelTypes.LEAVE_CHANNEL:
     case ChannelTypes.RECEIVED_CHANNEL_DELETED:
-        Reflect.deleteProperty(nextState, action.data.id);
-        return nextState;
+        if (action.data) {
+            Reflect.deleteProperty(nextState, action.data.id);
+            return nextState;
+        }
+
+        return state;
 
     case UserTypes.LOGOUT_SUCCESS:
     case TeamTypes.SELECT_TEAM:
