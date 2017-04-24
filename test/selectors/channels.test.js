@@ -32,11 +32,15 @@ describe('Selectors.Channels', () => {
     const profiles = {};
     profiles[user.id] = user;
 
-    const members = {};
-    members[channel1.id + user.id] = {channel_id: channel1.id, user_id: user.id};
-    members[channel2.id + user.id] = {channel_id: channel2.id, user_id: user.id};
-    members[channel3.id + user.id] = {channel_id: channel3.id, user_id: user.id};
-    members[channel4.id + user.id] = {channel_id: channel4.id, user_id: user.id};
+    const membersInChannel = {};
+    membersInChannel[channel1.id] = {};
+    membersInChannel[channel1.id][user.id] = {channel_id: channel1.id, user_id: user.id};
+    membersInChannel[channel2.id] = {};
+    membersInChannel[channel2.id][user.id] = {channel_id: channel2.id, user_id: user.id};
+    membersInChannel[channel3.id] = {};
+    membersInChannel[channel3.id][user.id] = {channel_id: channel3.id, user_id: user.id};
+    membersInChannel[channel4.id] = {};
+    membersInChannel[channel4.id][user.id] = {channel_id: channel4.id, user_id: user.id};
 
     const testState = deepFreezeAndThrowOnMutation({
         entities: {
@@ -51,7 +55,7 @@ describe('Selectors.Channels', () => {
                 currentChannelId: channel1.id,
                 channels,
                 channelsInTeam,
-                members
+                membersInChannel
             }
         }
     });
@@ -62,6 +66,6 @@ describe('Selectors.Channels', () => {
     });
 
     it('should return members in current channel', () => {
-        assert.deepEqual(Selectors.getMembersInCurrentChannel(testState), [members[channel1.id + user.id]]);
+        assert.deepEqual(Selectors.getMembersInCurrentChannel(testState), membersInChannel[channel1.id]);
     });
 });

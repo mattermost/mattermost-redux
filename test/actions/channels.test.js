@@ -368,10 +368,11 @@ describe('Actions.Channels', () => {
             throw new Error(JSON.stringify(membersRequest.error));
         }
 
-        const {members} = store.getState().entities.channels;
+        const {membersInChannel} = store.getState().entities.channels;
 
-        assert.ok(members);
-        assert.ok(members[TestHelper.basicChannel.id + TestHelper.basicUser.id]);
+        assert.ok(membersInChannel);
+        assert.ok(membersInChannel[TestHelper.basicChannel.id]);
+        assert.ok(membersInChannel[TestHelper.basicChannel.id][TestHelper.basicUser.id]);
     });
 
     it('getChannelStats', async () => {

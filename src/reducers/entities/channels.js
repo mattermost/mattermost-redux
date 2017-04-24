@@ -181,33 +181,45 @@ function myMembers(state = {}, action) {
     }
 }
 
-function members(state = {}, action) {
-    const nextState = {...state};
-
+function membersInChannel(state = {}, action) {
     switch (action.type) {
     case ChannelTypes.RECEIVED_MY_CHANNEL_MEMBER:
     case ChannelTypes.RECEIVED_CHANNEL_MEMBER: {
-        const channelMember = action.data;
+        const member = action.data;
+        const members = {...(state[member.channel_id] || {})};
+        members[member.channel_id] = member;
         return {
             ...state,
-            [channelMember.channel_id + channelMember.user_id]: channelMember
+            [member.channel_id]: member
         };
     }
     case ChannelTypes.RECEIVED_MY_CHANNEL_MEMBERS:
     case ChannelTypes.RECEIVED_CHANNEL_MEMBERS: {
+        const nextState = {...state};
         for (const cm of action.data) {
-            nextState[cm.channel_id + cm.user_id] = cm;
+            if (nextState[cm.channel_id]) {
+                nextState[cm.channel_id] = {...nextState[cm.channel_id]};
+            } else {
+                nextState[cm.channel_id] = {};
+            }
+            nextState[cm.channel_id][cm.user_id] = cm;
         }
         return nextState;
     }
-
     case ChannelTypes.LEAVE_CHANNEL:
-    case UserTypes.RECEIVED_PROFILE_NOT_IN_CHANNEL:
-        if (action.data) {
-            Reflect.deleteProperty(nextState, action.data.id + action.data.user_id);
+    case UserTypes.RECEIVED_PROFILE_NOT_IN_CHANNEL: {
+        const data = action.data;
+        const members = {...(state[data.id] || {})};
+        if (members) {
+            Reflect.deleteProperty(members, data.user_id);
+            return {
+                ...state,
+                [data.id]: members
+            };
         }
-        return nextState;
 
+        return state;
+    }
     case UserTypes.LOGOUT_SUCCESS:
         return {};
     default:
@@ -278,8 +290,8 @@ export default combineReducers({
     // object where every key is the channel id and has an object with the channel members detail
     myMembers,
 
-    // object where every key is the channel id concatenated with the user id and has an object with the channel members detail
-    members,
+    // object where every key is the channel id with an object where key is a user id and has an object with the channel members detail
+    membersInChannel,
 
     // object where every key is the channel id and has an object with the channel stats
     stats

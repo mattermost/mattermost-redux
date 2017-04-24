@@ -28,8 +28,8 @@ export function getMyChannelMemberships(state) {
     return state.entities.channels.myMembers;
 }
 
-export function getChannelMembers(state) {
-    return state.entities.channels.members;
+export function getChannelMembersInChannels(state) {
+    return state.entities.channels.membersInChannel;
 }
 
 export const getCurrentChannel = createSelector(
@@ -138,9 +138,9 @@ export const getDefaultChannel = createSelector(
 
 export const getMembersInCurrentChannel = createSelector(
     getCurrentChannelId,
-    getChannelMembers,
+    getChannelMembersInChannels,
     (currentChannelId, members) => {
-        return Object.values(members).filter((m) => m.channel_id === currentChannelId);
+        return members[currentChannelId];
     }
 );
 
