@@ -26,6 +26,16 @@ function getTeams(state = initialRequestState(), action) {
     );
 }
 
+function getTeam(state = initialRequestState(), action) {
+    return handleRequest(
+        TeamTypes.GET_TEAM_REQUEST,
+        TeamTypes.GET_TEAM_SUCCESS,
+        TeamTypes.GET_TEAM_FAILURE,
+        state,
+        action
+    );
+}
+
 function createTeam(state = initialRequestState(), action) {
     return handleRequest(
         TeamTypes.CREATE_TEAM_REQUEST,
@@ -119,6 +129,7 @@ function emailInvite(state = initialRequestState(), action) {
 export default combineReducers({
     getMyTeams,
     getTeams,
+    getTeam,
     createTeam,
     updateTeam,
     getMyTeamMembers,

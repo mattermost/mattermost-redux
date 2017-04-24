@@ -78,6 +78,10 @@ export default class Client4 {
         return `${this.getTeamsRoute()}/${teamId}`;
     }
 
+    getTeamNameRoute(teamName) {
+        return `${this.getTeamsRoute()}/name/${teamName}`;
+    }
+
     getTeamMembersRoute(teamId) {
         return `${this.getTeamRoute(teamId)}/members`;
     }
@@ -411,6 +415,13 @@ export default class Client4 {
         return this.doFetch(
             `${this.getTeamRoute(team.id)}`,
             {method: 'put', body: JSON.stringify(team)}
+        );
+    };
+
+    checkIfTeamExists = async (teamName) => {
+        return this.doFetch(
+            `${this.getTeamNameRoute(teamName)}/exists`,
+            {method: 'get'}
         );
     };
 

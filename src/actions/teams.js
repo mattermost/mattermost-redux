@@ -350,3 +350,25 @@ export function sendEmailInvitesToTeam(teamId, emails) {
         emails
     );
 }
+
+export function checkIfTeamExists(teamName) {
+    return async (dispatch, getState) => {
+        dispatch({type: TeamTypes.GET_TEAM_REQUEST}, getState);
+
+        let data;
+        try {
+            data = await Client4.checkIfTeamExists(teamName);
+        } catch (error) {
+            forceLogoutIfNecessary(error, dispatch);
+            dispatch(batchActions([
+                {type: TeamTypes.GET_TEAM_FAILURE, error},
+                getLogErrorAction(error)
+            ]));
+            return null;
+        }
+
+        dispatch({type: TeamTypes.GET_TEAM_SUCCESS});
+
+        return data.exists;
+    };
+}

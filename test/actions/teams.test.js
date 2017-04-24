@@ -297,4 +297,26 @@ describe('Actions.Teams', () => {
             throw new Error(JSON.stringify(inviteRequest.error));
         }
     });
+
+    it('checkIfTeamExists', async () => {
+        let exists = await Actions.checkIfTeamExists(TestHelper.basicTeam.name)(store.dispatch, store.getState);
+
+        let teamRequest = store.getState().requests.teams.getTeam;
+
+        if (teamRequest.status === RequestStatus.FAILURE) {
+            throw new Error(JSON.stringify(teamRequest.error));
+        }
+
+        assert.ok(exists === true);
+
+        exists = await Actions.checkIfTeamExists('junk')(store.dispatch, store.getState);
+
+        teamRequest = store.getState().requests.teams.getTeam;
+
+        if (teamRequest.status === RequestStatus.FAILURE) {
+            throw new Error(JSON.stringify(teamRequest.error));
+        }
+
+        assert.ok(exists === false);
+    });
 });
