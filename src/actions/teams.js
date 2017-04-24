@@ -181,6 +181,26 @@ export function getTeamMembersByIds(teamId, userIds) {
     };
 }
 
+export function getTeamsForUser(userId) {
+    return bindClientFunc(
+        Client4.getTeamsForUser,
+        TeamTypes.GET_TEAMS_REQUEST,
+        [TeamTypes.RECEIVED_TEAMS_LIST, TeamTypes.GET_TEAMS_SUCCESS],
+        TeamTypes.GET_TEAMS_FAILURE,
+        userId
+    );
+}
+
+export function getTeamMembersForUser(userId) {
+    return bindClientFunc(
+        Client4.getTeamMembersForUser,
+        TeamTypes.TEAM_MEMBERS_REQUEST,
+        [TeamTypes.RECEIVED_TEAM_MEMBERS, TeamTypes.TEAM_MEMBERS_SUCCESS],
+        TeamTypes.TEAM_MEMBERS_FAILURE,
+        userId
+    );
+}
+
 export function getTeamStats(teamId) {
     return bindClientFunc(
         Client4.getTeamStats,

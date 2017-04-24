@@ -49,6 +49,20 @@ describe('Actions.Teams', () => {
         assert.ok(teams[TestHelper.basicTeam.id]);
     });
 
+    it('getTeamsForUser', async () => {
+        await Actions.getTeamsForUser(TestHelper.basicUser.id)(store.dispatch, store.getState);
+
+        const teamsRequest = store.getState().requests.teams.getTeams;
+        const {teams} = store.getState().entities.teams;
+
+        if (teamsRequest.status === RequestStatus.FAILURE) {
+            throw new Error(JSON.stringify(teamsRequest.error));
+        }
+
+        assert.ok(teams);
+        assert.ok(teams[TestHelper.basicTeam.id]);
+    });
+
     it('getTeams', async () => {
         let team = {...TestHelper.fakeTeam(), allow_open_invite: true};
 
@@ -129,6 +143,21 @@ describe('Actions.Teams', () => {
 
         assert.ok(members);
         assert.ok(members[TestHelper.basicTeam.id]);
+    });
+
+    it('getTeamMembersForUser', async () => {
+        await Actions.getTeamMembersForUser(TestHelper.basicUser.id)(store.dispatch, store.getState);
+
+        const membersRequest = store.getState().requests.teams.getTeamMembers;
+        const membersInTeam = store.getState().entities.teams.membersInTeam;
+
+        if (membersRequest.status === RequestStatus.FAILURE) {
+            throw new Error(JSON.stringify(membersRequest.error));
+        }
+
+        assert.ok(membersInTeam);
+        assert.ok(membersInTeam[TestHelper.basicTeam.id]);
+        assert.ok(membersInTeam[TestHelper.basicTeam.id][TestHelper.basicUser.id]);
     });
 
     it('getTeamMember', async () => {

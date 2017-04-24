@@ -75,6 +75,22 @@ function membersInTeam(state = {}, action) {
             [data.team_id]: members
         };
     }
+    case TeamTypes.RECEIVED_TEAM_MEMBERS: {
+        const data = action.data;
+        if (data && data.length) {
+            const nextState = {...state};
+            for (const member of data) {
+                if (!nextState[member.team_id]) {
+                    nextState[member.team_id] = {};
+                }
+                nextState[member.team_id][member.user_id] = member;
+            }
+
+            return nextState;
+        }
+
+        return state;
+    }
     case TeamTypes.RECEIVED_MEMBERS_IN_TEAM: {
         const data = action.data;
         if (data && data.length) {

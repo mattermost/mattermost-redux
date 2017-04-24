@@ -28,6 +28,10 @@ export default keyMirror({
     MY_TEAM_MEMBERS_SUCCESS: null,
     MY_TEAM_MEMBERS_FAILURE: null,
 
+    GET_TEAM_MEMBERS_REQUEST: null,
+    GET_TEAM_MEMBERS_SUCCESS: null,
+    GET_TEAM_MEMBERS_FAILURE: null,
+
     TEAM_MEMBERS_REQUEST: null,
     TEAM_MEMBERS_SUCCESS: null,
     TEAM_MEMBERS_FAILURE: null,
@@ -58,6 +62,7 @@ export default keyMirror({
     RECEIVED_TEAMS: null,
     RECEIVED_TEAMS_LIST: null,
     RECEIVED_MY_TEAM_MEMBERS: null,
+    RECEIVED_TEAM_MEMBERS: null,
     RECEIVED_MEMBERS_IN_TEAM: null,
     RECEIVED_MEMBER_IN_TEAM: null,
     REMOVE_MEMBER_FROM_TEAM: null,
