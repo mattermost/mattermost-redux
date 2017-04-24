@@ -203,7 +203,9 @@ function members(state = {}, action) {
 
     case ChannelTypes.LEAVE_CHANNEL:
     case UserTypes.RECEIVED_PROFILE_NOT_IN_CHANNEL:
-        Reflect.deleteProperty(nextState, action.data.id + action.data.user_id);
+        if (action.data) {
+            Reflect.deleteProperty(nextState, action.data.id + action.data.user_id);
+        }
         return nextState;
 
     case UserTypes.LOGOUT_SUCCESS:

@@ -2,6 +2,7 @@
 // See License.txt for license information.
 
 import assert from 'assert';
+import nock from 'nock';
 
 import * as Actions from 'actions/channels';
 import {getProfilesByIds, login} from 'actions/users';
@@ -203,20 +204,44 @@ describe('Actions.Channels', () => {
         assert.equal(member.notify_props.desktop, 'none');
     });
 
-    it('leaveChannel', async () => {
-        await login(TestHelper.basicUser.email, 'password1')(store.dispatch, store.getState);
-        await Actions.leaveChannel(
-            TestHelper.basicChannel.id
-        )(store.dispatch, store.getState);
+    it('leaveChannel', (done) => {
+        async function test() {
+            await login(TestHelper.basicUser.email, 'password1')(store.dispatch, store.getState);
+            await Actions.joinChannel(
+                TestHelper.basicUser.id,
+                TestHelper.basicTeam.id,
+                TestHelper.basicChannel.id
+            )(store.dispatch, store.getState);
 
-        const leaveRequest = store.getState().requests.channels.leaveChannel;
-        if (leaveRequest.status === RequestStatus.FAILURE) {
-            throw new Error(JSON.stringify(leaveRequest.error));
+            TestHelper.activateMocking();
+            nock(Client4.getBaseRoute()).
+            delete(`/channels/${TestHelper.basicChannel.id}/members/${TestHelper.basicUser.id}`).
+            reply(400);
+
+            await Actions.leaveChannel(
+                TestHelper.basicChannel.id
+            )(store.dispatch, store.getState);
+            nock.restore();
+
+            setTimeout(test2, 100);
         }
 
-        const {channels, myMembers} = store.getState().entities.channels;
-        assert.ifError(channels[TestHelper.basicChannel.id]);
-        assert.ifError(myMembers[TestHelper.basicChannel.id]);
+        async function test2() {
+            let {channels, myMembers} = store.getState().entities.channels;
+            assert.ok(channels[TestHelper.basicChannel.id]);
+            assert.ok(myMembers[TestHelper.basicChannel.id]);
+
+            await Actions.leaveChannel(
+                TestHelper.basicChannel.id
+            )(store.dispatch, store.getState);
+            channels = store.getState().entities.channels.channels;
+            myMembers = store.getState().entities.channels.myMembers;
+            assert.ok(channels[TestHelper.basicChannel.id]);
+            assert.ifError(myMembers[TestHelper.basicChannel.id]);
+            done();
+        }
+
+        test();
     });
 
     it('joinChannel', async () => {
