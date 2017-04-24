@@ -167,6 +167,7 @@ export function getTeamMembersByIds(teamId, userIds) {
                 {type: TeamTypes.TEAM_MEMBERS_FAILURE, error},
                 getLogErrorAction(error)
             ]), getState);
+            return null;
         }
 
         dispatch(batchActions([
@@ -178,6 +179,8 @@ export function getTeamMembersByIds(teamId, userIds) {
                 type: TeamTypes.TEAM_MEMBERS_SUCCESS
             }
         ]), getState);
+
+        return members;
     };
 }
 
