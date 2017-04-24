@@ -1,3 +1,4 @@
+.babelrc
 node_modules/
 .idea
 test
@@ -9,3 +10,4 @@ PULL_REQUEST_TEMPLATE.md
 .gitignore
 .npmignore
 .npminstall
+.tmp
