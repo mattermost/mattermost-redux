@@ -90,7 +90,6 @@ describe('Actions.Teams', () => {
 
     it('createTeam', async () => {
         await Actions.createTeam(
-            TestHelper.basicUser.id,
             TestHelper.fakeTeam()
         )(store.dispatch, store.getState);
 

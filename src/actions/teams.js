@@ -60,7 +60,7 @@ export function getTeams(page = 0, perPage = General.TEAMS_CHUNK_SIZE) {
     );
 }
 
-export function createTeam(userId, team) {
+export function createTeam(team) {
     return async (dispatch, getState) => {
         dispatch({type: TeamTypes.CREATE_TEAM_REQUEST}, getState);
 
@@ -78,7 +78,7 @@ export function createTeam(userId, team) {
 
         const member = {
             team_id: created.id,
-            user_id: userId,
+            user_id: getState().entities.users.currentUserId,
             roles: `${General.TEAM_ADMIN_ROLE} ${General.TEAM_USER_ROLE}`,
             delete_at: 0,
             msg_count: 0,
