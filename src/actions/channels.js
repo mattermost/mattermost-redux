@@ -383,8 +383,9 @@ export function leaveChannel(channelId) {
     return async (dispatch, getState) => {
         const state = getState();
         const {currentUserId} = state.entities.users;
-        const {channels} = state.entities.channels;
+        const {channels, myMembers} = state.entities.channels;
         const channel = channels[channelId];
+        const member = myMembers[channelId];
 
         dispatch({
             type: ChannelTypes.LEAVE_CHANNEL,
@@ -393,9 +394,17 @@ export function leaveChannel(channelId) {
                 offline: {
                     effect: () => Client4.removeFromChannel(currentUserId, channelId),
                     commit: {type: ChannelTypes.LEAVE_CHANNEL},
-                    rollback: {
-                        type: ChannelTypes.RECEIVED_CHANNEL,
-                        data: channel
+                    rollback: () => {
+                        dispatch(batchActions([
+                            {
+                                type: ChannelTypes.RECEIVED_CHANNEL,
+                                data: channel
+                            },
+                            {
+                                type: ChannelTypes.RECEIVED_MY_CHANNEL_MEMBER,
+                                data: member
+                            }
+                        ]));
                     }
                 }
             }
