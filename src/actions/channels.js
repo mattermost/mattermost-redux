@@ -6,10 +6,10 @@ import {ChannelTypes, PreferenceTypes, UserTypes} from 'action_types';
 import {savePreferences} from 'actions/preferences';
 import {batchActions} from 'redux-batched-actions';
 
-import {Client, Client4} from 'client';
+import {Client4} from 'client';
 
 import {logError, getLogErrorAction} from './errors';
-import {forceLogoutIfNecessary} from './helpers';
+import {bindClientFunc, forceLogoutIfNecessary} from './helpers';
 
 export function selectChannel(channelId) {
     return async (dispatch, getState) => {
@@ -865,15 +865,28 @@ export function markChannelAsUnread(channelId, mentionsArray) {
     };
 }
 
+export function getChannelMembersByIds(channelId, userIds) {
+    return bindClientFunc(
+        Client4.getChannelMembersByIds,
+        ChannelTypes.CHANNEL_MEMBERS_REQUEST,
+        [ChannelTypes.RECEIVED_CHANNEL_MEMBERS, ChannelTypes.CHANNEL_MEMBERS_SUCCESS],
+        ChannelTypes.CHANNEL_MEMBERS_FAILURE,
+        channelId,
+        userIds
+    );
+}
+
 export default {
     selectChannel,
     createChannel,
     createDirectChannel,
     updateChannel,
+    patchChannel,
     updateChannelNotifyProps,
     getChannel,
     fetchMyChannelsAndMembers,
     getMyChannelMembers,
+    getChannelMembersByIds,
     leaveChannel,
     joinChannel,
     deleteChannel,
