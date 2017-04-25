@@ -3,16 +3,17 @@
 
 import {batchActions} from 'redux-batched-actions';
 
+import {PostTypes, FileTypes} from 'action_types';
 import {Client, Client4} from 'client';
 import {Preferences, Posts} from 'constants';
-import {PostTypes, FileTypes} from 'action_types';
+import {getUsersByUsername} from 'selectors/entities/users';
 
 import * as Selectors from 'selectors/entities/posts';
 
 import {bindClientFunc, forceLogoutIfNecessary} from './helpers';
 import {getLogErrorAction} from './errors';
 import {deletePreferences, savePreferences} from './preferences';
-import {getProfilesByIds, getStatusesByIds} from './users';
+import {getProfilesByIds, getProfilesByUsernames, getStatusesByIds} from './users';
 
 export function createPost(post, files = []) {
     return async (dispatch, getState) => {
@@ -472,31 +473,87 @@ export function getPostsAfter(channelId, postId, page = 0, perPage = Posts.POST_
 }
 
 async function getProfilesAndStatusesForPosts(list, dispatch, getState) {
-    const {currentUserId, profiles, statuses} = getState().entities.users;
+    const state = getState();
+    const {currentUserId, profiles, statuses} = state.entities.users;
     const posts = list.posts;
-    const profilesToLoad = [];
-    const statusesToLoad = [];
 
-    Object.keys(posts).forEach((key) => {
-        const post = posts[key];
+    const userIdsToLoad = new Set();
+    const statusesToLoad = new Set();
+
+    Object.keys(posts).forEach((postId) => {
+        const post = posts[postId];
         const userId = post.user_id;
 
-        if (!profiles[userId] && !profilesToLoad.includes(userId) && userId !== currentUserId) {
-            profilesToLoad.push(userId);
+        if (userId === currentUserId) {
+            return;
         }
 
-        if (!statuses[userId] && !statusesToLoad.includes(userId)) {
-            statusesToLoad.push(userId);
+        if (!profiles[userId]) {
+            userIdsToLoad.add(userId);
+        }
+
+        if (!statuses[userId]) {
+            statusesToLoad.add(userId);
         }
     });
 
-    if (profilesToLoad.length) {
-        await getProfilesByIds(profilesToLoad)(dispatch, getState);
+    const promises = [];
+    if (userIdsToLoad.size > 0) {
+        promises.push(getProfilesByIds(Array.from(userIdsToLoad))(dispatch, getState));
     }
 
-    if (statusesToLoad.length) {
-        await getStatusesByIds(statusesToLoad)(dispatch, getState);
+    if (statusesToLoad.size > 0) {
+        promises.push(getStatusesByIds(Array.from(statusesToLoad))(dispatch, getState));
     }
+
+    // Do this after firing the other requests as it's more expensive
+    const usernamesToLoad = getNeededAtMentionedUsernames(state, posts);
+
+    if (usernamesToLoad.size > 0) {
+        promises.push(getProfilesByUsernames(Array.from(usernamesToLoad))(dispatch, getState));
+    }
+
+    return Promise.all(promises);
+}
+
+export function getNeededAtMentionedUsernames(state, posts) {
+    let usersByUsername; // Populate this lazily since it's relatively expensive
+
+    const usernamesToLoad = new Set();
+
+    Object.keys(posts).forEach((postId) => {
+        const post = posts[postId];
+
+        if (!post.message.includes('@')) {
+            return;
+        }
+
+        if (!usersByUsername) {
+            usersByUsername = getUsersByUsername(state);
+        }
+
+        const pattern = /\B@(([a-z0-9_.-]*[a-z0-9_])[.-]*)/gi;
+
+        while (true) {
+            // match[1] is the matched mention including trailing punctuation
+            // match[2] is the matched mention without trailing punctuation
+            const match = pattern.exec(post.message);
+
+            if (!match) {
+                // No more matches in this post
+                break;
+            } else if (usersByUsername[match[1]] || usersByUsername[match[2]]) {
+                // We have the user, go to the next match
+                continue;
+            }
+
+            // If there's no trailing punctuation, this will only add 1 item to the set
+            usernamesToLoad.add(match[1]);
+            usernamesToLoad.add(match[2]);
+        }
+    });
+
+    return usernamesToLoad;
 }
 
 export function removePost(post) {
