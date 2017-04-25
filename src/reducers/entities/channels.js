@@ -187,10 +187,10 @@ function membersInChannel(state = {}, action) {
     case ChannelTypes.RECEIVED_CHANNEL_MEMBER: {
         const member = action.data;
         const members = {...(state[member.channel_id] || {})};
-        members[member.channel_id] = member;
+        members[member.user_id] = member;
         return {
             ...state,
-            [member.channel_id]: member
+            [member.channel_id]: members
         };
     }
     case ChannelTypes.RECEIVED_MY_CHANNEL_MEMBERS:

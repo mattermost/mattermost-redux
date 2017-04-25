@@ -652,6 +652,10 @@ export function addChannelMember(channelId, userId) {
                 id: channelId
             },
             {
+                type: ChannelTypes.RECEIVED_CHANNEL_MEMBER,
+                data: member
+            },
+            {
                 type: ChannelTypes.ADD_CHANNEL_MEMBER_SUCCESS
             }
         ]), getState);
@@ -685,6 +689,43 @@ export function removeChannelMember(channelId, userId) {
                 type: ChannelTypes.REMOVE_CHANNEL_MEMBER_SUCCESS
             }
         ]), getState);
+
+        return true;
+    };
+}
+
+export function updateChannelMemberRoles(channelId, userId, roles) {
+    return async (dispatch, getState) => {
+        dispatch({type: ChannelTypes.UPDATE_CHANNEL_MEMBER_REQUEST}, getState);
+
+        try {
+            await Client4.updateChannelMemberRoles(channelId, userId, roles);
+        } catch (error) {
+            forceLogoutIfNecessary(error, dispatch);
+            dispatch(batchActions([
+                {type: ChannelTypes.UPDATE_CHANNEL_MEMBER_FAILURE, error},
+                getLogErrorAction(error)
+            ]), getState);
+            return null;
+        }
+
+        const actions = [
+            {
+                type: ChannelTypes.UPDATE_CHANNEL_MEMBER_SUCCESS
+            }
+        ];
+
+        const membersInChannel = getState().entities.channels.membersInChannel[channelId];
+        if (membersInChannel && membersInChannel[userId]) {
+            actions.push(
+                {
+                    type: ChannelTypes.RECEIVED_CHANNEL_MEMBER,
+                    data: {...membersInChannel[userId], roles}
+                }
+            );
+        }
+
+        dispatch(batchActions(actions), getState);
 
         return true;
     };
