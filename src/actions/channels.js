@@ -619,7 +619,7 @@ export function addChannelMember(channelId, userId) {
                 {type: ChannelTypes.ADD_CHANNEL_MEMBER_FAILURE, error},
                 getLogErrorAction(error)
             ]), getState);
-            return;
+            return null;
         }
 
         dispatch(batchActions([
@@ -629,9 +629,12 @@ export function addChannelMember(channelId, userId) {
                 id: channelId
             },
             {
-                type: ChannelTypes.ADD_CHANNEL_MEMBER_SUCCESS
+                type: ChannelTypes.ADD_CHANNEL_MEMBER_SUCCESS,
+                id: channelId
             }
-        ]), getState);
+        ], 'ADD_CHANNEL_MEMBER.BATCH'), getState);
+
+        return true;
     };
 }
 
@@ -647,7 +650,7 @@ export function removeChannelMember(channelId, userId) {
                 {type: ChannelTypes.REMOVE_CHANNEL_MEMBER_FAILURE, error},
                 getLogErrorAction(error)
             ]), getState);
-            return;
+            return null;
         }
 
         dispatch(batchActions([
@@ -657,9 +660,12 @@ export function removeChannelMember(channelId, userId) {
                 id: channelId
             },
             {
-                type: ChannelTypes.REMOVE_CHANNEL_MEMBER_SUCCESS
+                type: ChannelTypes.REMOVE_CHANNEL_MEMBER_SUCCESS,
+                id: channelId
             }
-        ]), getState);
+        ], 'REMOVE_CHANNEL_MEMBER.BATCH'), getState);
+
+        return true;
     };
 }
 
