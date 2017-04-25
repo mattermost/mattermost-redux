@@ -549,6 +549,13 @@ export default class Client4 {
         );
     };
 
+    patchChannel = async (channelId, patch) => {
+        return this.doFetch(
+            `${this.getChannelRoute(channelId)}/patch`,
+            {method: 'put', body: JSON.stringify(patch)}
+        );
+    };
+
     updateChannelNotifyProps = async (props) => {
         return this.doFetch(
             `${this.getChannelMemberRoute(props.channel_id, props.user_id)}/notify_props`,
