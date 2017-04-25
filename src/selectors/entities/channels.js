@@ -8,11 +8,11 @@ import {getCurrentUser, getCurrentUserId, getUsers} from 'selectors/entities/use
 import {buildDisplayableChannelList, completeDirectChannelInfo, sortChannelsByDisplayName} from 'utils/channel_utils';
 import {General} from 'constants';
 
-function getAllChannels(state) {
+export function getAllChannels(state) {
     return state.entities.channels.channels;
 }
 
-function getAllChannelStats(state) {
+export function getAllChannelStats(state) {
     return state.entities.channels.stats;
 }
 
