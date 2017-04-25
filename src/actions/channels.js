@@ -144,6 +144,37 @@ export function createDirectChannel(userId, otherUserId) {
     };
 }
 
+export function patchChannel(channelId, patch) {
+    return async (dispatch, getState) => {
+        dispatch({type: ChannelTypes.UPDATE_CHANNEL_REQUEST}, getState);
+
+        let updated;
+        try {
+            updated = await Client4.patchChannel(channelId, patch);
+        } catch (error) {
+            forceLogoutIfNecessary(error, dispatch);
+
+            dispatch(batchActions([
+                {type: ChannelTypes.UPDATE_CHANNEL_FAILURE, error},
+                getLogErrorAction(error)
+            ]), getState);
+            return null;
+        }
+
+        dispatch(batchActions([
+            {
+                type: ChannelTypes.RECEIVED_CHANNEL,
+                data: updated
+            },
+            {
+                type: ChannelTypes.UPDATE_CHANNEL_SUCCESS
+            }
+        ]), getState);
+
+        return updated;
+    };
+}
+
 export function updateChannel(channel) {
     return async (dispatch, getState) => {
         dispatch({type: ChannelTypes.UPDATE_CHANNEL_REQUEST}, getState);

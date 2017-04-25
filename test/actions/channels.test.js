@@ -125,6 +125,25 @@ describe('Actions.Channels', () => {
         assert.strictEqual(channels[channelId].header, 'MM with Redux');
     });
 
+    it('patchChannel', async () => {
+        const channel = {
+            header: 'MM with Redux2'
+        };
+
+        await Actions.patchChannel(TestHelper.basicChannel.id, channel)(store.dispatch, store.getState);
+
+        const updateRequest = store.getState().requests.channels.updateChannel;
+        if (updateRequest.status === RequestStatus.FAILURE) {
+            throw new Error(JSON.stringify(updateRequest.error));
+        }
+
+        const {channels} = store.getState().entities.channels;
+        const channelId = Object.keys(channels)[0];
+        assert.ok(channelId);
+        assert.ok(channels[channelId]);
+        assert.strictEqual(channels[channelId].header, 'MM with Redux2');
+    });
+
     it('getChannel', async () => {
         await Actions.getChannel(TestHelper.basicChannel.id)(store.dispatch, store.getState);
 
