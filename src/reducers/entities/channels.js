@@ -187,10 +187,10 @@ function membersInChannel(state = {}, action) {
     case ChannelTypes.RECEIVED_CHANNEL_MEMBER: {
         const member = action.data;
         const members = {...(state[member.channel_id] || {})};
-        members[member.channel_id] = member;
+        members[member.user_id] = member;
         return {
             ...state,
-            [member.channel_id]: member
+            [member.channel_id]: members
         };
     }
     case ChannelTypes.RECEIVED_MY_CHANNEL_MEMBERS:
@@ -236,8 +236,8 @@ function stats(state = {}, action) {
 
         return nextState;
     }
-    case ChannelTypes.ADD_CHANNEL_MEMBER_SUCCESS: {
-        const id = action.id;
+    case ChannelTypes.RECEIVED_CHANNEL_MEMBER: {
+        const id = action.channel_id;
         const nextStat = nextState[id];
         if (nextStat) {
             const count = nextStat.member_count + 1;

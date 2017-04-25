@@ -613,6 +613,13 @@ export default class Client4 {
         );
     };
 
+    updateChannelMemberRoles = async (channelId, userId, roles) => {
+        return this.doFetch(
+            `${this.getChannelMemberRoute(channelId, userId)}/roles`,
+            {method: 'put', body: JSON.stringify({roles})}
+        );
+    };
+
     getChannelStats = async (channelId) => {
         return this.doFetch(
             `${this.getChannelRoute(channelId)}/stats`,

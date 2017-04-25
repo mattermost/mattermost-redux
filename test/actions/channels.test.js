@@ -5,9 +5,10 @@ import assert from 'assert';
 import nock from 'nock';
 
 import * as Actions from 'actions/channels';
+import {addUserToTeam} from 'actions/teams';
 import {getProfilesByIds, login} from 'actions/users';
 import {Client, Client4} from 'client';
-import {RequestStatus} from 'constants';
+import {General, RequestStatus} from 'constants';
 import TestHelper from 'test/test_helper';
 import configureStore from 'test/test_store';
 
@@ -391,6 +392,26 @@ describe('Actions.Channels', () => {
         assert.ok(notChannel);
         assert.ok(notChannel.has(user.id));
         assert.ifError(channel.has(user.id));
+    });
+
+    it('updateChannelMemberRoles', async () => {
+        const user = await TestHelper.basicClient4.createUser(TestHelper.fakeUser());
+        await addUserToTeam(TestHelper.basicTeam.id, user.id)(store.dispatch, store.getState);
+        await Actions.addChannelMember(TestHelper.basicChannel.id, user.id)(store.dispatch, store.getState);
+
+        const roles = General.CHANNEL_USER_ROLE + ' ' + General.CHANNEL_ADMIN_ROLE;
+        await Actions.updateChannelMemberRoles(TestHelper.basicChannel.id, user.id, roles)(store.dispatch, store.getState);
+
+        const membersRequest = store.getState().requests.channels.updateChannelMember;
+        const members = store.getState().entities.channels.membersInChannel;
+
+        if (membersRequest.status === RequestStatus.FAILURE) {
+            throw new Error(JSON.stringify(membersRequest.error));
+        }
+
+        assert.ok(members[TestHelper.basicChannel.id]);
+        assert.ok(members[TestHelper.basicChannel.id][user.id]);
+        assert.ok(members[TestHelper.basicChannel.id][user.id].roles === roles);
     });
 
     it('updateChannelHeader', async () => {
