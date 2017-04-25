@@ -3,6 +3,7 @@
 
 import {General, Preferences} from 'constants';
 import {ChannelTypes, PreferenceTypes, UserTypes} from 'action_types';
+import {savePreferences} from 'actions/preferences';
 import {batchActions} from 'redux-batched-actions';
 
 import {Client, Client4} from 'client';
@@ -117,6 +118,10 @@ export function createDirectChannel(userId, otherUserId) {
             last_update_at: created.create_at
         };
 
+        const preference = [{category: Preferences.CATEGORY_DIRECT_CHANNEL_SHOW, name: otherUserId, value: 'true'}];
+
+        savePreferences(userId, preference);
+
         dispatch(batchActions([
             {
                 type: ChannelTypes.RECEIVED_CHANNEL,
@@ -128,7 +133,7 @@ export function createDirectChannel(userId, otherUserId) {
             },
             {
                 type: PreferenceTypes.RECEIVED_PREFERENCES,
-                data: [{category: Preferences.CATEGORY_DIRECT_CHANNEL_SHOW, name: otherUserId, value: 'true'}]
+                data: preference
             },
             {
                 type: ChannelTypes.CREATE_CHANNEL_SUCCESS
