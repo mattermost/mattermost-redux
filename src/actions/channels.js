@@ -175,19 +175,18 @@ export function updateChannel(channel) {
     };
 }
 
-export function updateChannelNotifyProps(userId, teamId, channelId, props) {
+export function updateChannelNotifyProps(userId, channelId, props) {
     return async (dispatch, getState) => {
         dispatch({type: ChannelTypes.NOTIFY_PROPS_REQUEST}, getState);
 
-        const data = {
+        const notifyProps = {
             user_id: userId,
             channel_id: channelId,
             ...props
         };
 
-        let notifyProps;
         try {
-            notifyProps = await Client.updateChannelNotifyProps(teamId, data);
+            await Client4.updateChannelNotifyProps(notifyProps);
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch);
 
@@ -211,7 +210,7 @@ export function updateChannelNotifyProps(userId, teamId, channelId, props) {
             }
         ]), getState);
 
-        return notifyProps;
+        return true;
     };
 }
 
@@ -573,7 +572,7 @@ export function getChannels(teamId, page = 0, perPage = General.CHANNELS_CHUNK_S
     };
 }
 
-export function searchMoreChannels(teamId, term) {
+export function searchChannels(teamId, term) {
     return async (dispatch, getState) => {
         dispatch({type: ChannelTypes.GET_CHANNELS_REQUEST}, getState);
 
@@ -849,7 +848,7 @@ export default {
     deleteChannel,
     viewChannel,
     getChannels,
-    searchMoreChannels,
+    searchChannels,
     getChannelStats,
     addChannelMember,
     removeChannelMember,

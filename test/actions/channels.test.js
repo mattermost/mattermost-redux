@@ -188,7 +188,6 @@ describe('Actions.Channels', () => {
         await Actions.fetchMyChannelsAndMembers(TestHelper.basicTeam.id)(store.dispatch, store.getState);
         await Actions.updateChannelNotifyProps(
             TestHelper.basicUser.id,
-            TestHelper.basicTeam.id,
             TestHelper.basicChannel.id,
             notifyProps)(store.dispatch, store.getState);
 
