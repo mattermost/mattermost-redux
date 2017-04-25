@@ -288,6 +288,16 @@ export function getProfilesByIds(userIds) {
     );
 }
 
+export function getProfilesByUsernames(usernames) {
+    return bindClientFunc(
+        Client4.getProfilesByUsernames,
+        UserTypes.PROFILES_REQUEST,
+        [UserTypes.RECEIVED_PROFILES_LIST, UserTypes.PROFILES_SUCCESS],
+        UserTypes.PROFILES_FAILURE,
+        usernames
+    );
+}
+
 export function getProfilesInTeam(teamId, page, perPage = General.PROFILE_CHUNK_SIZE) {
     return async (dispatch, getState) => {
         dispatch({type: UserTypes.PROFILES_IN_TEAM_REQUEST}, getState);
