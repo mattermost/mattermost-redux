@@ -545,15 +545,11 @@ export function getNeededAtMentionedUsernames(state, posts) {
 
         const pattern = /\B@(([a-z0-9_.-]*[a-z0-9_])[.-]*)/gi;
 
-        while (true) {
+        let match;
+        while ((match = pattern.exec(post.message)) !== null) {
             // match[1] is the matched mention including trailing punctuation
             // match[2] is the matched mention without trailing punctuation
-            const match = pattern.exec(post.message);
-
-            if (!match) {
-                // No more matches in this post
-                break;
-            } else if (usersByUsername[match[1]] || usersByUsername[match[2]]) {
+            if (usersByUsername[match[1]] || usersByUsername[match[2]]) {
                 // We have the user, go to the next match
                 continue;
             }
