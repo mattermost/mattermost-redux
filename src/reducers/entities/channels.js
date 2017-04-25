@@ -208,14 +208,16 @@ function membersInChannel(state = {}, action) {
     }
     case ChannelTypes.LEAVE_CHANNEL:
     case UserTypes.RECEIVED_PROFILE_NOT_IN_CHANNEL: {
-        const data = action.data;
-        const members = {...(state[data.id] || {})};
-        if (members) {
-            Reflect.deleteProperty(members, data.user_id);
-            return {
-                ...state,
-                [data.id]: members
-            };
+        if (action.data) {
+            const data = action.data;
+            const members = {...(state[data.id] || {})};
+            if (members) {
+                Reflect.deleteProperty(members, data.user_id);
+                return {
+                    ...state,
+                    [data.id]: members
+                };
+            }
         }
 
         return state;
