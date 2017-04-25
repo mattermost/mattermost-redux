@@ -281,6 +281,13 @@ export default class Client4 {
         );
     };
 
+    getProfilesByUsernames = async (usernames) => {
+        return this.doFetch(
+            `${this.getUsersRoute()}/usernames`,
+            {method: 'post', body: JSON.stringify(usernames)}
+        );
+    };
+
     getProfilesInTeam = async (teamId, page = 0, perPage = PER_PAGE_DEFAULT) => {
         return this.doFetch(
             `${this.getUsersRoute()}${buildQueryString({in_team: teamId, page, per_page: perPage})}`,
