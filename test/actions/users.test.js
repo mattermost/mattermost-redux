@@ -178,6 +178,21 @@ describe('Actions.Users', () => {
         assert.ok(profiles[user.id]);
     });
 
+    it('getProfilesByUsernames', async () => {
+        await TestHelper.basicClient4.login(TestHelper.basicUser.email, 'password1');
+        const user = await TestHelper.basicClient4.createUser(TestHelper.fakeUser());
+        await Actions.getProfilesByUsernames([user.username])(store.dispatch, store.getState);
+
+        const profilesRequest = store.getState().requests.users.getProfiles;
+        const {profiles} = store.getState().entities.users;
+
+        if (profilesRequest.status === RequestStatus.FAILURE) {
+            throw new Error(JSON.stringify(profilesRequest.error));
+        }
+
+        assert.ok(profiles[user.id]);
+    });
+
     it('getProfilesInTeam', async () => {
         await Actions.getProfilesInTeam(TestHelper.basicTeam.id, 0)(store.dispatch, store.getState);
 

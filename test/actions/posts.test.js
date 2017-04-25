@@ -367,6 +367,70 @@ describe('Actions.Posts', () => {
         assert.ok(posts[post3a.id]);
     });
 
+    it('getNeededAtMentionedUsernames', async () => {
+        const state = {
+            entities: {
+                users: {
+                    profiles: {
+                        1: {
+                            id: '1',
+                            username: 'aaa'
+                        }
+                    }
+                }
+            }
+        };
+
+        assert.deepEqual(
+            Actions.getNeededAtMentionedUsernames(state, {
+                abcd: {message: 'aaa'}
+            }),
+            new Set()
+        );
+
+        assert.deepEqual(
+            Actions.getNeededAtMentionedUsernames(state, {
+                abcd: {message: '@aaa'}
+            }),
+            new Set()
+        );
+
+        assert.deepEqual(
+            Actions.getNeededAtMentionedUsernames(state, {
+                abcd: {message: '@aaa @bbb @ccc'}
+            }),
+            new Set(['bbb', 'ccc'])
+        );
+
+        assert.deepEqual(
+            Actions.getNeededAtMentionedUsernames(state, {
+                abcd: {message: '@bbb. @ccc.ddd'}
+            }),
+            new Set(['bbb.', 'bbb', 'ccc.ddd'])
+        );
+
+        assert.deepEqual(
+            Actions.getNeededAtMentionedUsernames(state, {
+                abcd: {message: '@bbb- @ccc-ddd'}
+            }),
+            new Set(['bbb-', 'bbb', 'ccc-ddd'])
+        );
+
+        assert.deepEqual(
+            Actions.getNeededAtMentionedUsernames(state, {
+                abcd: {message: '@bbb_ @ccc_ddd'}
+            }),
+            new Set(['bbb_', 'ccc_ddd'])
+        );
+
+        assert.deepEqual(
+            Actions.getNeededAtMentionedUsernames(state, {
+                abcd: {message: '(@bbb/@ccc) ddd@eee'}
+            }),
+            new Set(['bbb', 'ccc'])
+        );
+    });
+
     it('getPostsSince', async () => {
         const channelId = TestHelper.basicChannel.id;
 
