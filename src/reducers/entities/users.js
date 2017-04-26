@@ -134,10 +134,9 @@ function profiles(state = {}, action) {
     case UserTypes.RECEIVED_ME:
     case UserTypes.RECEIVED_PROFILE: {
         const data = action.data || action.payload;
-
         return {
             ...state,
-            [action.data.id]: {...data}
+            [data.id]: {...data}
         };
     }
     case UserTypes.RECEIVED_PROFILES_LIST:

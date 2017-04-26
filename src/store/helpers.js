@@ -6,9 +6,16 @@ export const offlineConfig = {
         if (typeof effect !== 'function') {
             throw new Error('Offline Action: effect must be a function.');
         } else if (!action.meta.offline.commit) {
-            throw new Error('Offline Action: commit action must be preset.');
+            throw new Error('Offline Action: commit action must be present.');
         }
 
         return effect();
+    },
+    discard: (error, action, retries) => {
+        if (action.meta && action.meta.offline.hasOwnProperty('maxRetry')) {
+            return retries === action.meta.offline.maxRetry;
+        }
+
+        return retries < 10;
     }
 };

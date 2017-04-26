@@ -62,6 +62,16 @@ function handleReceivedPosts(posts = {}, postsInChannel = {}, action) {
             // Just add the post id to the end of the order and we'll sort it out later
             postsForChannel.push(newPost.id);
         }
+
+        // Remove any temporary posts
+        if (nextPosts[newPost.pending_post_id]) {
+            Reflect.deleteProperty(nextPosts, newPost.pending_post_id);
+
+            const index = postsForChannel.indexOf(newPost.pending_post_id);
+            if (index !== -1) {
+                postsForChannel.splice(index, 1);
+            }
+        }
     }
 
     // Sort to ensure that the most recent posts are first
