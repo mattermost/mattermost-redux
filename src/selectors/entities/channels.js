@@ -108,7 +108,7 @@ export const getOtherChannels = createSelector(
     getChannelsInCurrentTeam,
     getMyChannelMemberships,
     (channels, myMembers) => {
-        return channels.filter((c) => !myMembers.hasOwnProperty(c.id));
+        return channels.filter((c) => !myMembers.hasOwnProperty(c.id) && c.type === General.OPEN_CHANNEL);
     }
 );
 
