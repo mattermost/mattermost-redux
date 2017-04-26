@@ -216,13 +216,45 @@ function members(state = {}, action) {
 }
 
 function stats(state = {}, action) {
+    const nextState = {...state};
     switch (action.type) {
     case ChannelTypes.RECEIVED_CHANNEL_STATS: {
-        const nextState = {...state};
         const stat = action.data;
         nextState[stat.channel_id] = stat;
 
         return nextState;
+    }
+    case ChannelTypes.ADD_CHANNEL_MEMBER_SUCCESS: {
+        const id = action.id;
+        const nextStat = nextState[id];
+        if (nextStat) {
+            const count = nextStat.member_count + 1;
+            return {
+                ...nextState,
+                [id]: {
+                    ...nextStat,
+                    member_count: count
+                }
+            };
+        }
+
+        return state;
+    }
+    case ChannelTypes.REMOVE_CHANNEL_MEMBER_SUCCESS: {
+        const id = action.id;
+        const nextStat = nextState[id];
+        if (nextStat) {
+            const count = nextStat.member_count - 1;
+            return {
+                ...nextState,
+                [id]: {
+                    ...nextStat,
+                    member_count: count || 1
+                }
+            };
+        }
+
+        return state;
     }
     case UserTypes.LOGOUT_SUCCESS:
     case TeamTypes.SELECT_TEAM:

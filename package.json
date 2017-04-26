@@ -9,7 +9,7 @@
     "mime-db": "1.27.0",
     "redux": "3.6.0",
     "redux-action-buffer": "1.0.1",
-    "redux-batched-actions": "0.1.5",
+    "redux-batched-actions": "0.2.0",
     "redux-offline": "git+https://github.com/enahum/redux-offline.git",
     "redux-thunk": "2.2.0",
     "reselect": "3.0.0",
@@ -40,9 +40,9 @@
     "ws": "2.2.3"
   },
   "scripts": {
-    "build": "babel src --out-dir lib",
+    "build": "babel src --out-dir .",
     "check": "node_modules/.bin/eslint --ext \".js\" --ignore-pattern node_modules --quiet .",
     "test": "NODE_ENV=test mocha --opts test/mocha.opts",
-    "postinstall": "npm run build && mv lib/* ./ && rm -rf src lib"
+    "postinstall": "npm run build"
   }
 }
