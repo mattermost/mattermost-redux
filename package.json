@@ -11,6 +11,7 @@
     "redux-action-buffer": "1.0.1",
     "redux-batched-actions": "0.2.0",
     "redux-offline": "git+https://github.com/enahum/redux-offline.git",
+    "redux-persist": "4.6.0",
     "redux-thunk": "2.2.0",
     "reselect": "3.0.0",
     "serialize-error": "2.1.0"

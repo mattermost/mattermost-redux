@@ -3,6 +3,8 @@
 
 import {createSelector} from 'reselect';
 
+import {Posts} from 'constants';
+
 export function getAllPosts(state) {
     return state.entities.posts.posts;
 }
@@ -53,7 +55,7 @@ export function makeGetCommentCountForPost() {
               if (posts.hasOwnProperty(id)) {
                   const post = posts[id];
 
-                  if (post.root_id === currentPost.id) {
+                  if (post.root_id === currentPost.id && post.state !== Posts.POST_DELETED) {
                       count += 1;
                   }
               }

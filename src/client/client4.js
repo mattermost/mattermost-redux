@@ -636,7 +636,6 @@ export default class Client4 {
     };
 
     // Post Routes
-
     createPost = async (post) => {
         return this.doFetch(
             `${this.getPostsRoute()}`,
@@ -729,12 +728,17 @@ export default class Client4 {
     }
 
     uploadFile = async (fileFormData, formBoundary) => {
+        let contentType = 'multipart/form-data';
+        if (formBoundary) {
+            contentType += `; boundary=${formBoundary}`;
+        }
+
         return this.doFetch(
             `${this.getFilesRoute()}`,
             {
                 method: 'post',
                 headers: {
-                    'Content-Type': `multipart/form-data; boundary=${formBoundary}`
+                    'Content-Type': contentType
                 },
                 body: fileFormData
             }

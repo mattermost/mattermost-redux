@@ -12,49 +12,82 @@ import {getLogErrorAction} from './errors';
 import {deletePreferences, savePreferences} from './preferences';
 import {getProfilesByIds, getStatusesByIds} from './users';
 
-export function createPost(post, files) {
+export function createPost(post, files = []) {
     return async (dispatch, getState) => {
-        dispatch({type: PostTypes.CREATE_POST_REQUEST}, getState);
+        const state = getState();
+        const currentUserId = state.entities.users.currentUserId;
 
-        let newPost = post;
-        if (files) {
+        const timestamp = Date.now();
+        const pendingPostId = post.pending_post_id || `${currentUserId}:${timestamp}`;
+
+        let newPost = {
+            ...post,
+            pending_post_id: pendingPostId,
+            create_at: timestamp,
+            update_at: timestamp
+        };
+
+        // We are retrying a pending post that had files
+        if (newPost.file_ids && !files.length) {
+            files = newPost.file_ids.map((id) => state.entities.files.files[id]); // eslint-disable-line
+        }
+
+        if (files.length) {
             const fileIds = files.map((file) => file.id);
+
             newPost = {
                 ...newPost,
                 file_ids: fileIds
             };
-        }
 
-        let createdPost;
-        try {
-            createdPost = await Client4.createPost(newPost);
-        } catch (error) {
-            forceLogoutIfNecessary(error, dispatch);
-            dispatch(batchActions([
-                {type: PostTypes.CREATE_POST_FAILURE, error},
-                getLogErrorAction(error)
-            ]), getState);
-            return;
-        }
-
-        const actions = [{
-            type: PostTypes.RECEIVED_POST,
-            data: {...createdPost}
-        }];
-
-        if (files) {
-            actions.push({
+            dispatch({
                 type: FileTypes.RECEIVED_FILES_FOR_POST,
-                postId: createdPost.id,
+                postId: pendingPostId,
                 data: files
             });
         }
 
-        actions.push({
-            type: PostTypes.CREATE_POST_SUCCESS
-        });
+        dispatch({
+            type: PostTypes.RECEIVED_POST,
+            data: {
+                id: pendingPostId,
+                ...newPost
+            },
+            meta: {
+                offline: {
+                    effect: () => Client4.createPost(newPost),
+                    commit: (success, payload) => {
+                        const actions = [];
+                        if (files) {
+                            actions.push({
+                                type: FileTypes.RECEIVED_FILES_FOR_POST,
+                                postId: payload.id,
+                                data: files
+                            });
+                        }
 
-        dispatch(batchActions(actions), getState);
+                        actions.push({
+                            type: PostTypes.CREATE_POST_SUCCESS
+                        });
+
+                        dispatch(batchActions(actions), getState);
+                    },
+                    maxRetry: 0,
+                    rollback: () => {
+                        const data = {
+                            ...newPost,
+                            id: pendingPostId,
+                            failed: true
+                        };
+
+                        dispatch({
+                            type: PostTypes.RECEIVED_POST,
+                            data
+                        });
+                    }
+                }
+            }
+        });
     };
 }
 
