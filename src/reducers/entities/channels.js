@@ -5,16 +5,14 @@ import {combineReducers} from 'redux';
 import {ChannelTypes, TeamTypes, UserTypes} from 'action_types';
 
 function channelListToSet(state, action) {
-    const id = action.teamId;
-    const nextSet = new Set(state[id]);
+    const nextState = {...state};
     action.data.forEach((channel) => {
+        const nextSet = new Set(nextState[channel.team_id]);
         nextSet.add(channel.id);
+        nextState[channel.team_id] = nextSet;
     });
 
-    return {
-        ...state,
-        [id]: nextSet
-    };
+    return nextState;
 }
 
 function removeChannelFromSet(state, action) {

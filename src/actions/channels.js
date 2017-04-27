@@ -101,7 +101,6 @@ export function createDirectChannel(userId, otherUserId) {
             forceLogoutIfNecessary(error, dispatch);
             dispatch(batchActions([
                 {type: ChannelTypes.CREATE_CHANNEL_FAILURE, error},
-                {type: ChannelTypes.CHANNEL_MEMBERS_FAILURE, error},
                 getLogErrorAction(error)
             ]), getState);
             return null;

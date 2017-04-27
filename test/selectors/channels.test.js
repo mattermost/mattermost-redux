@@ -54,6 +54,7 @@ describe('Selectors.Channels', () => {
     myMembers[channel1.id] = {channel_id: channel1.id, user_id: user.id};
     myMembers[channel2.id] = {channel_id: channel2.id, user_id: user.id};
     myMembers[channel3.id] = {channel_id: channel3.id, user_id: user.id};
+    myMembers[channel4.id] = {channel_id: channel4.id, user_id: user.id};
 
     const testState = deepFreezeAndThrowOnMutation({
         entities: {
@@ -75,8 +76,13 @@ describe('Selectors.Channels', () => {
     });
 
     it('should return channels in current team', () => {
-        const channelsInCurrentTeam = [channel1, channel2].sort(sortChannelsByDisplayName.bind(null, []));
+        const channelsInCurrentTeam = [channel1, channel2, channel5, channel6].sort(sortChannelsByDisplayName.bind(null, []));
         assert.deepEqual(Selectors.getChannelsInCurrentTeam(testState), channelsInCurrentTeam);
+    });
+
+    it('get my channels in current team and DMs', () => {
+        const channelsInCurrentTeam = [channel1, channel2].sort(sortChannelsByDisplayName.bind(null, []));
+        assert.deepEqual(Selectors.getMyChannels(testState), [...channelsInCurrentTeam, channel4]);
     });
 
     it('should return members in current channel', () => {
