@@ -559,7 +559,7 @@ export default class Client4 {
     updateChannelNotifyProps = async (props) => {
         return this.doFetch(
             `${this.getChannelMemberRoute(props.channel_id, props.user_id)}/notify_props`,
-            {method: 'put', body: JSON.stringify({notify_props: props})}
+            {method: 'put', body: JSON.stringify(props)}
         );
     };
 
