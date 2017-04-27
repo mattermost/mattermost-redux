@@ -227,12 +227,15 @@ export function updateChannelNotifyProps(userId, channelId, props) {
             return null;
         }
 
+        const member = getState().entities.channels.myMembers[channelId] || {};
+        const currentNotifyProps = member.notify_props || {};
+
         dispatch(batchActions([
             {
                 type: ChannelTypes.RECEIVED_CHANNEL_PROPS,
                 data: {
                     channel_id: channelId,
-                    notifyProps
+                    notifyProps: {...currentNotifyProps, ...notifyProps}
                 }
             },
             {
