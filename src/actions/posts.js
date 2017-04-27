@@ -491,8 +491,7 @@ async function getProfilesAndStatusesForPosts(list, dispatch, getState) {
     const userIdsToLoad = new Set();
     const statusesToLoad = new Set();
 
-    Object.keys(posts).forEach((postId) => {
-        const post = posts[postId];
+    Object.values(posts).forEach((post) => {
         const userId = post.user_id;
 
         if (userId === currentUserId) {
@@ -532,9 +531,7 @@ export function getNeededAtMentionedUsernames(state, posts) {
 
     const usernamesToLoad = new Set();
 
-    Object.keys(posts).forEach((postId) => {
-        const post = posts[postId];
-
+    Object.values(posts).forEach((post) => {
         if (!post.message.includes('@')) {
             return;
         }
