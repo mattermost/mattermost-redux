@@ -20,6 +20,10 @@ export function getChannelsInTeam(state) {
     return state.entities.channels.channelsInTeam;
 }
 
+export function getDirectChannelsSet(state) {
+    return state.entities.channels.channelsInTeam[''] || new Set();
+}
+
 export function getCurrentChannelId(state) {
     return state.entities.channels.currentChannelId;
 }
@@ -96,11 +100,24 @@ export const getChannelsInCurrentTeam = createSelector(
     }
 );
 
+export const getDirectChannels = createSelector(
+    getAllChannels,
+    getDirectChannelsSet,
+    (channels, channelSet) => {
+        const dmChannels = [];
+        channelSet.forEach((c) => {
+            dmChannels.push(channels[c]);
+        });
+        return dmChannels;
+    }
+);
+
 export const getMyChannels = createSelector(
     getChannelsInCurrentTeam,
+    getDirectChannels,
     getMyChannelMemberships,
-    (channels, myMembers) => {
-        return channels.filter((c) => myMembers.hasOwnProperty(c.id));
+    (channels, directChannels, myMembers) => {
+        return [...channels, ...directChannels].filter((c) => myMembers.hasOwnProperty(c.id));
     }
 );
 
