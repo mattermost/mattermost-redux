@@ -64,7 +64,6 @@ export default keyMirror({
     UPDATE_CHANNEL_MEMBER_SUCCESS: null,
     UPDATE_CHANNEL_MEMBER_FAILURE: null,
 
-
     SELECT_CHANNEL: null,
     LEAVE_CHANNEL: null,
     RECEIVED_CHANNEL: null,
