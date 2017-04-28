@@ -146,6 +146,16 @@ function removeChannelMember(state = initialRequestState(), action) {
     );
 }
 
+function updateChannelMember(state = initialRequestState(), action) {
+    return handleRequest(
+        ChannelTypes.UPDATE_CHANNEL_MEMBER_REQUEST,
+        ChannelTypes.UPDATE_CHANNEL_MEMBER_SUCCESS,
+        ChannelTypes.UPDATE_CHANNEL_MEMBER_FAILURE,
+        state,
+        action
+    );
+}
+
 export default combineReducers({
     getChannel,
     getChannels,
@@ -160,5 +170,6 @@ export default combineReducers({
     updateLastViewedAt,
     getChannelStats,
     addChannelMember,
-    removeChannelMember
+    removeChannelMember,
+    updateChannelMember
 });

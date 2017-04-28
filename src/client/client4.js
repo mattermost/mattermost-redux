@@ -549,6 +549,20 @@ export default class Client4 {
         );
     };
 
+    patchChannel = async (channelId, patch) => {
+        return this.doFetch(
+            `${this.getChannelRoute(channelId)}/patch`,
+            {method: 'put', body: JSON.stringify(patch)}
+        );
+    };
+
+    updateChannelNotifyProps = async (props) => {
+        return this.doFetch(
+            `${this.getChannelMemberRoute(props.channel_id, props.user_id)}/notify_props`,
+            {method: 'put', body: JSON.stringify(props)}
+        );
+    };
+
     getChannel = async (channelId) => {
         return this.doFetch(
             `${this.getChannelRoute(channelId)}`,
@@ -598,6 +612,20 @@ export default class Client4 {
         );
     };
 
+    getChannelMember = async (channelId, userId) => {
+        return this.doFetch(
+            `${this.getChannelMemberRoute(channelId, userId)}`,
+            {method: 'get'}
+        );
+    };
+
+    getChannelMembersByIds = async (channelId, userIds) => {
+        return this.doFetch(
+            `${this.getChannelMembersRoute(channelId)}/ids`,
+            {method: 'post', body: JSON.stringify(userIds)}
+        );
+    };
+
     addToChannel = async (userId, channelId) => {
         const member = {user_id: userId, channel_id: channelId};
         return this.doFetch(
@@ -610,6 +638,13 @@ export default class Client4 {
         return this.doFetch(
             `${this.getChannelMemberRoute(channelId, userId)}`,
             {method: 'delete'}
+        );
+    };
+
+    updateChannelMemberRoles = async (channelId, userId, roles) => {
+        return this.doFetch(
+            `${this.getChannelMemberRoute(channelId, userId)}/roles`,
+            {method: 'put', body: JSON.stringify({roles})}
         );
     };
 

@@ -8,16 +8,20 @@ import {getCurrentUser, getCurrentUserId, getUsers} from 'selectors/entities/use
 import {buildDisplayableChannelList, completeDirectChannelInfo, sortChannelsByDisplayName} from 'utils/channel_utils';
 import {General} from 'constants';
 
-function getAllChannels(state) {
+export function getAllChannels(state) {
     return state.entities.channels.channels;
 }
 
-function getAllChannelStats(state) {
+export function getAllChannelStats(state) {
     return state.entities.channels.stats;
 }
 
 export function getChannelsInTeam(state) {
     return state.entities.channels.channelsInTeam;
+}
+
+export function getDirectChannelsSet(state) {
+    return state.entities.channels.channelsInTeam[''] || new Set();
 }
 
 export function getCurrentChannelId(state) {
@@ -28,8 +32,8 @@ export function getMyChannelMemberships(state) {
     return state.entities.channels.myMembers;
 }
 
-export function getChannelMembers(state) {
-    return state.entities.channels.members;
+export function getChannelMembersInChannels(state) {
+    return state.entities.channels.membersInChannel;
 }
 
 export const getCurrentChannel = createSelector(
@@ -96,11 +100,24 @@ export const getChannelsInCurrentTeam = createSelector(
     }
 );
 
+export const getDirectChannels = createSelector(
+    getAllChannels,
+    getDirectChannelsSet,
+    (channels, channelSet) => {
+        const dmChannels = [];
+        channelSet.forEach((c) => {
+            dmChannels.push(channels[c]);
+        });
+        return dmChannels;
+    }
+);
+
 export const getMyChannels = createSelector(
     getChannelsInCurrentTeam,
+    getDirectChannels,
     getMyChannelMemberships,
-    (channels, myMembers) => {
-        return channels.filter((c) => myMembers.hasOwnProperty(c.id));
+    (channels, directChannels, myMembers) => {
+        return [...channels, ...directChannels].filter((c) => myMembers.hasOwnProperty(c.id));
     }
 );
 
@@ -108,7 +125,7 @@ export const getOtherChannels = createSelector(
     getChannelsInCurrentTeam,
     getMyChannelMemberships,
     (channels, myMembers) => {
-        return channels.filter((c) => !myMembers.hasOwnProperty(c.id));
+        return channels.filter((c) => !myMembers.hasOwnProperty(c.id) && c.type === General.OPEN_CHANNEL);
     }
 );
 
@@ -138,9 +155,9 @@ export const getDefaultChannel = createSelector(
 
 export const getMembersInCurrentChannel = createSelector(
     getCurrentChannelId,
-    getChannelMembers,
+    getChannelMembersInChannels,
     (currentChannelId, members) => {
-        return Object.values(members).filter((m) => m.channel_id === currentChannelId);
+        return members[currentChannelId];
     }
 );
 

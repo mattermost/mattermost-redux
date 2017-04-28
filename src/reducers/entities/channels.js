@@ -5,16 +5,14 @@ import {combineReducers} from 'redux';
 import {ChannelTypes, TeamTypes, UserTypes} from 'action_types';
 
 function channelListToSet(state, action) {
-    const id = action.teamId;
-    const nextSet = new Set(state[id]);
+    const nextState = {...state};
     action.data.forEach((channel) => {
+        const nextSet = new Set(nextState[channel.team_id]);
         nextSet.add(channel.id);
+        nextState[channel.team_id] = nextSet;
     });
 
-    return {
-        ...state,
-        [id]: nextSet
-    };
+    return nextState;
 }
 
 function removeChannelFromSet(state, action) {
@@ -181,33 +179,47 @@ function myMembers(state = {}, action) {
     }
 }
 
-function members(state = {}, action) {
-    const nextState = {...state};
-
+function membersInChannel(state = {}, action) {
     switch (action.type) {
     case ChannelTypes.RECEIVED_MY_CHANNEL_MEMBER:
     case ChannelTypes.RECEIVED_CHANNEL_MEMBER: {
-        const channelMember = action.data;
+        const member = action.data;
+        const members = {...(state[member.channel_id] || {})};
+        members[member.user_id] = member;
         return {
             ...state,
-            [channelMember.channel_id + channelMember.user_id]: channelMember
+            [member.channel_id]: members
         };
     }
     case ChannelTypes.RECEIVED_MY_CHANNEL_MEMBERS:
     case ChannelTypes.RECEIVED_CHANNEL_MEMBERS: {
+        const nextState = {...state};
         for (const cm of action.data) {
-            nextState[cm.channel_id + cm.user_id] = cm;
+            if (nextState[cm.channel_id]) {
+                nextState[cm.channel_id] = {...nextState[cm.channel_id]};
+            } else {
+                nextState[cm.channel_id] = {};
+            }
+            nextState[cm.channel_id][cm.user_id] = cm;
         }
         return nextState;
     }
-
     case ChannelTypes.LEAVE_CHANNEL:
-    case UserTypes.RECEIVED_PROFILE_NOT_IN_CHANNEL:
+    case UserTypes.RECEIVED_PROFILE_NOT_IN_CHANNEL: {
         if (action.data) {
-            Reflect.deleteProperty(nextState, action.data.id + action.data.user_id);
+            const data = action.data;
+            const members = {...(state[data.id] || {})};
+            if (members) {
+                Reflect.deleteProperty(members, data.user_id);
+                return {
+                    ...state,
+                    [data.id]: members
+                };
+            }
         }
-        return nextState;
 
+        return state;
+    }
     case UserTypes.LOGOUT_SUCCESS:
         return {};
     default:
@@ -224,8 +236,8 @@ function stats(state = {}, action) {
 
         return nextState;
     }
-    case ChannelTypes.ADD_CHANNEL_MEMBER_SUCCESS: {
-        const id = action.id;
+    case ChannelTypes.RECEIVED_CHANNEL_MEMBER: {
+        const id = action.channel_id;
         const nextStat = nextState[id];
         if (nextStat) {
             const count = nextStat.member_count + 1;
@@ -278,8 +290,8 @@ export default combineReducers({
     // object where every key is the channel id and has an object with the channel members detail
     myMembers,
 
-    // object where every key is the channel id concatenated with the user id and has an object with the channel members detail
-    members,
+    // object where every key is the channel id with an object where key is a user id and has an object with the channel members detail
+    membersInChannel,
 
     // object where every key is the channel id and has an object with the channel stats
     stats
