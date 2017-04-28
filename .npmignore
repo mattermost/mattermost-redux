@@ -1,3 +1,4 @@
+.babelrc
 node_modules/
 .idea
 test
