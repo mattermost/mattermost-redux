@@ -340,6 +340,20 @@ describe('Actions.Channels', () => {
         assert.ok(membersInChannel[TestHelper.basicChannel.id][TestHelper.basicUser.id]);
     });
 
+    it('getMyChannelMember', async () => {
+        await Actions.getMyChannelMember(TestHelper.basicChannel.id)(store.dispatch, store.getState);
+
+        const membersRequest = store.getState().requests.channels.members;
+        if (membersRequest.status === RequestStatus.FAILURE) {
+            throw new Error(JSON.stringify(membersRequest.error));
+        }
+
+        const {myMembers} = store.getState().entities.channels;
+
+        assert.ok(myMembers);
+        assert.ok(myMembers[TestHelper.basicChannel.id]);
+    });
+
     it('getChannelMembersByIds', async () => {
         await Actions.getChannelMembersByIds(TestHelper.basicChannel.id, [TestHelper.basicUser.id])(store.dispatch, store.getState);
 
