@@ -86,6 +86,16 @@ function getPostsAfter(state = initialRequestState(), action) {
     );
 }
 
+function reaction(state = initialRequestState(), action) {
+    return handleRequest(
+        PostTypes.REACTION_REQUEST,
+        PostTypes.REACTION_SUCCESS,
+        PostTypes.REACTION_FAILURE,
+        state,
+        action
+    );
+}
+
 export default combineReducers({
     createPost,
     editPost,
@@ -94,5 +104,6 @@ export default combineReducers({
     getPosts,
     getPostsSince,
     getPostsBefore,
-    getPostsAfter
+    getPostsAfter,
+    reaction
 });

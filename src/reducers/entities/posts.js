@@ -217,6 +217,49 @@ function currentFocusedPostId(state = '', action) {
     }
 }
 
+function reactions(state = {}, action) {
+    switch (action.type) {
+    case PostTypes.RECEIVED_REACTIONS: {
+        const reactionsList = action.data;
+        const nextReactions = {...(state[action.postId] || {})};
+        reactionsList.forEach((reaction) => {
+            nextReactions[reaction.user_id + '-' + reaction.emoji_name] = reaction;
+        });
+
+        return {
+            ...state,
+            [action.postId]: nextReactions
+        };
+    }
+    case PostTypes.RECEIVED_REACTION: {
+        const reaction = action.data;
+        const nextReactions = {...(state[reaction.post_id] || {})};
+        nextReactions[reaction.user_id + '-' + reaction.emoji_name] = reaction;
+
+        return {
+            ...state,
+            [reaction.post_id]: nextReactions
+        };
+    }
+    case PostTypes.REACTION_DELETED: {
+        const reaction = action.data;
+        const nextReactions = {...(state[reaction.post_id] || {})};
+        if (!nextReactions[reaction.user_id + '-' + reaction.emoji_name]) {
+            return state;
+        }
+
+        Reflect.deleteProperty(nextReactions, reaction.user_id + '-' + reaction.emoji_name);
+
+        return {
+            ...state,
+            [reaction.post_id]: nextReactions
+        };
+    }
+    default:
+        return state;
+    }
+}
+
 export default function(state = {}, action) {
     const {posts, postsInChannel} = handlePosts(state.posts, state.postsInChannel, action);
 
@@ -232,12 +275,16 @@ export default function(state = {}, action) {
         selectedPostId: selectedPostId(state.selectedPostId, action),
 
         // The current selected focused post (permalink view)
-        currentFocusedPostId: currentFocusedPostId(state.currentFocusedPostId, action)
+        currentFocusedPostId: currentFocusedPostId(state.currentFocusedPostId, action),
+
+        // Object mapping post ids to an object of emoji reactions using userId-emojiName as keys
+        reactions: reactions(state.reactions, action)
     };
 
     if (state.posts === nextState.posts && state.postsInChannel === nextState.postsInChannel &&
         state.selectedPostId === nextState.selectedPostId &&
-        state.currentFocusedPostId === nextState.currentFocusedPostId) {
+        state.currentFocusedPostId === nextState.currentFocusedPostId &&
+        state.reactions === nextState.reactions) {
         // None of the children have changed so don't even let the parent object change
         return state;
     }

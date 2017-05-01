@@ -54,6 +54,14 @@ export const getCurrentChannel = createSelector(
     }
 );
 
+export const getMyChannelMember = createSelector(
+    getMyChannelMemberships,
+    (state, channelId) => channelId,
+    (channelMemberships, channelId) => {
+        return channelMemberships[channelId] || {};
+    }
+);
+
 export const getMyCurrentChannelMembership = createSelector(
     getCurrentChannelId,
     getMyChannelMemberships,
