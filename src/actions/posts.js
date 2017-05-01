@@ -483,7 +483,7 @@ export function getPostsAfter(channelId, postId, page = 0, perPage = Posts.POST_
     };
 }
 
-async function getProfilesAndStatusesForPosts(list, dispatch, getState) {
+export async function getProfilesAndStatusesForPosts(list, dispatch, getState) {
     const state = getState();
     const {currentUserId, profiles, statuses} = state.entities.users;
     const posts = list.posts;
