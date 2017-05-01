@@ -36,10 +36,10 @@ export function getFileType(file) {
         'patch'
     ];
     return fileTypes.find((fileType) => {
-        const constForFileTypeExtList = `${fileType}_types`.toUpperCase();
-        const fileTypeExts = Files[constForFileTypeExtList];
-        return fileTypeExts.indexOf(fileExt) > -1;
-    }) || 'other';
+            const constForFileTypeExtList = `${fileType}_types`.toUpperCase();
+            const fileTypeExts = Files[constForFileTypeExtList];
+            return fileTypeExts.indexOf(fileExt) > -1;
+        }) || 'other';
 }
 
 let extToMime;
@@ -63,4 +63,14 @@ export function lookupMimeType(filename) {
     const ext = filename.split('.').pop();
 
     return extToMime[ext] || 'application/octet-stream';
+}
+
+export function parseClientIdsFromFormData(formdata) {
+    const parts = formdata._parts; // eslint-disable-line
+    const index = parts.findIndex((p) => p[0] === 'client_ids');
+
+    const clientIds = parts[index];
+    clientIds.shift();
+
+    return clientIds;
 }
