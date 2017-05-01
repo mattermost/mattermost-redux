@@ -17,15 +17,19 @@ import deepFreezeAndThrowOnMutation from 'utils/deep_freeze';
 
 import {offlineConfig} from './helpers';
 
-export default function configureServiceStore(preloadedState, appReducer, userOfflineConfig, getAppReducer) {
+export default function configureServiceStore(preloadedState, appReducer, userOfflineConfig, getAppReducer, enableBuffer = true) {
     const baseOfflineConfig = Object.assign({}, defaultOfflineConfig, offlineConfig, userOfflineConfig);
+    const middleware = [thunk];
+    if (enableBuffer) {
+        middleware.push(createActionBuffer(REHYDRATE));
+    }
 
     const store = createStore(
         createOfflineReducer(createReducer(serviceReducer, appReducer)),
         undefined,
         // eslint-disable-line - offlineCompose(config)(middleware, other funcs)
         offlineCompose(baseOfflineConfig)(
-            [thunk, createActionBuffer(REHYDRATE)],
+            middleware,
             [devTools({
                 name: 'Mattermost',
                 hostname: 'localhost',
