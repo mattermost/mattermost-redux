@@ -2,7 +2,7 @@
 // See License.txt for license information.
 
 import {combineReducers} from 'redux';
-import {ChannelTypes, TeamTypes, UserTypes} from 'action_types';
+import {ChannelTypes, UserTypes} from 'action_types';
 
 function channelListToSet(state, action) {
     const nextState = {...state};
@@ -172,7 +172,6 @@ function myMembers(state = {}, action) {
         return state;
 
     case UserTypes.LOGOUT_SUCCESS:
-    case TeamTypes.SELECT_TEAM:
         return {};
     default:
         return state;
@@ -237,8 +236,6 @@ function stats(state = {}, action) {
         return nextState;
     }
     case UserTypes.LOGOUT_SUCCESS:
-    case TeamTypes.SELECT_TEAM:
-        return {};
     default:
         return state;
     }
