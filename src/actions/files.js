@@ -37,7 +37,7 @@ export function getFilesForPost(postId) {
     };
 }
 
-export function uploadFile(channelId, rootId, fileFormData, formBoundary) {
+export function uploadFile(channelId, rootId, clientIds, fileFormData, formBoundary) {
     return async (dispatch, getState) => {
         dispatch({type: FileTypes.UPLOAD_FILES_REQUEST}, getState);
 
@@ -46,10 +46,16 @@ export function uploadFile(channelId, rootId, fileFormData, formBoundary) {
             files = await Client4.uploadFile(fileFormData, formBoundary);
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch);
-            dispatch(batchActions([
-                {type: FileTypes.UPLOAD_FILES_FAILURE, error},
-                getLogErrorAction(error)
-            ]), getState);
+
+            const failure = {
+                type: FileTypes.UPLOAD_FILES_FAILURE,
+                clientIds,
+                channelId,
+                rootId,
+                error
+            };
+
+            dispatch(batchActions([failure, getLogErrorAction(error)]), getState);
             return;
         }
 

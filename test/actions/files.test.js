@@ -39,7 +39,7 @@ describe('Actions.Files', () => {
         imageFormData.append('client_ids', clientId);
         const formBoundary = imageFormData.getBoundary();
 
-        await Actions.uploadFile(basicChannel.id, null, imageFormData, formBoundary)(store.dispatch, store.getState);
+        await Actions.uploadFile(basicChannel.id, null, [clientId], imageFormData, formBoundary)(store.dispatch, store.getState);
 
         const state = store.getState();
         const uploadRequest = state.requests.files.uploadFiles;
