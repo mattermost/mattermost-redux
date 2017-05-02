@@ -7,7 +7,6 @@ import {Client4} from 'client';
 import {FileTypes} from 'action_types';
 import {getLogErrorAction} from './errors';
 import {forceLogoutIfNecessary} from './helpers';
-import {parseClientIdsFromFormData} from 'utils/file_utils';
 
 export function getFilesForPost(postId) {
     return async (dispatch, getState) => {
@@ -38,7 +37,7 @@ export function getFilesForPost(postId) {
     };
 }
 
-export function uploadFile(channelId, rootId, fileFormData, formBoundary) {
+export function uploadFile(channelId, rootId, clientIds, fileFormData, formBoundary) {
     return async (dispatch, getState) => {
         dispatch({type: FileTypes.UPLOAD_FILES_REQUEST}, getState);
 
@@ -47,15 +46,16 @@ export function uploadFile(channelId, rootId, fileFormData, formBoundary) {
             files = await Client4.uploadFile(fileFormData, formBoundary);
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch);
-            dispatch(batchActions([{
+
+            const failure = {
                 type: FileTypes.UPLOAD_FILES_FAILURE,
-                clientIds: parseClientIdsFromFormData(fileFormData),
+                clientIds,
                 channelId,
                 rootId,
                 error
-            },
-                getLogErrorAction(error)
-            ]), getState);
+            };
+
+            dispatch(batchActions([failure, getLogErrorAction(error)]), getState);
             return;
         }
 
