@@ -118,9 +118,9 @@ export function createDirectChannel(userId, otherUserId) {
             last_update_at: created.create_at
         };
 
-        const preference = [{category: Preferences.CATEGORY_DIRECT_CHANNEL_SHOW, name: otherUserId, value: 'true'}];
+        const preference = [{user_id: userId, category: Preferences.CATEGORY_DIRECT_CHANNEL_SHOW, name: otherUserId, value: 'true'}];
 
-        savePreferences(userId, preference);
+        savePreferences(userId, preference)(dispatch, getState);
 
         dispatch(batchActions([
             {
