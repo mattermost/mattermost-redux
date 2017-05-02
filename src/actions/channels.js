@@ -889,6 +889,16 @@ export function getChannelMember(channelId, userId) {
     );
 }
 
+export function getMyChannelMember(channelId) {
+    return bindClientFunc(
+        Client4.getMyChannelMember,
+        ChannelTypes.CHANNEL_MEMBERS_REQUEST,
+        [ChannelTypes.RECEIVED_MY_CHANNEL_MEMBER, ChannelTypes.CHANNEL_MEMBERS_SUCCESS],
+        ChannelTypes.CHANNEL_MEMBERS_FAILURE,
+        channelId
+    );
+}
+
 export default {
     selectChannel,
     createChannel,
