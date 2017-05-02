@@ -36,10 +36,10 @@ export function getFileType(file) {
         'patch'
     ];
     return fileTypes.find((fileType) => {
-            const constForFileTypeExtList = `${fileType}_types`.toUpperCase();
-            const fileTypeExts = Files[constForFileTypeExtList];
-            return fileTypeExts.indexOf(fileExt) > -1;
-        }) || 'other';
+        const constForFileTypeExtList = `${fileType}_types`.toUpperCase();
+        const fileTypeExts = Files[constForFileTypeExtList];
+        return fileTypeExts.indexOf(fileExt) > -1;
+    }) || 'other';
 }
 
 let extToMime;
