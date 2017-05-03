@@ -100,4 +100,14 @@ describe('Selectors.Channels', () => {
     it('get unreads for current team', () => {
         assert.equal(Selectors.getUnreadsInCurrentTeam(testState).mentionCount, 1);
     });
+
+    it('get channel map for current team', () => {
+        const channelMap = {
+            [channel1.name]: channel1,
+            [channel2.name]: channel2,
+            [channel5.name]: channel5,
+            [channel6.name]: channel6
+        };
+        assert.deepEqual(Selectors.getChannelsNameMapInCurrentTeam(testState), channelMap);
+    });
 });

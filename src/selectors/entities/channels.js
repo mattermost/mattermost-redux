@@ -112,6 +112,19 @@ export const getChannelsInCurrentTeam = createSelector(
     }
 );
 
+export const getChannelsNameMapInCurrentTeam = createSelector(
+    getAllChannels,
+    getChannelSetInCurrentTeam,
+    (channels, currentTeamChannelSet) => {
+        const channelMap = {};
+        currentTeamChannelSet.forEach((id) => {
+            const channel = channels[id];
+            channelMap[channel.name] = channel;
+        });
+        return channelMap;
+    }
+);
+
 export const getDirectChannels = createSelector(
     getAllChannels,
     getDirectChannelsSet,
