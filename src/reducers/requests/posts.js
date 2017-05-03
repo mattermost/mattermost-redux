@@ -96,6 +96,16 @@ function reaction(state = initialRequestState(), action) {
     );
 }
 
+function openGraph(state = initialRequestState(), action) {
+    return handleRequest(
+        PostTypes.OPEN_GRAPH_REQUEST,
+        PostTypes.OPEN_GRAPH_SUCCESS,
+        PostTypes.OPEN_GRAPH_FAILURE,
+        state,
+        action
+    );
+}
+
 export default combineReducers({
     createPost,
     editPost,
@@ -105,5 +115,6 @@ export default combineReducers({
     getPostsSince,
     getPostsBefore,
     getPostsAfter,
-    reaction
+    reaction,
+    openGraph
 });

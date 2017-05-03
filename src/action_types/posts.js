@@ -40,6 +40,10 @@ export default keyMirror({
     REACTION_SUCCESS: null,
     REACTION_FAILURE: null,
 
+    OPEN_GRAPH_REQUEST: null,
+    OPEN_GRAPH_SUCCESS: null,
+    OPEN_GRAPH_FAILURE: null,
+
     RECEIVED_POST: null,
     RECEIVED_POSTS: null,
     RECEIVED_FOCUSED_POST: null,
@@ -49,5 +53,6 @@ export default keyMirror({
     REMOVE_POST: null,
     RECEIVED_REACTION: null,
     RECEIVED_REACTIONS: null,
-    REACTION_DELETED: null
+    REACTION_DELETED: null,
+    RECEIVED_OPEN_GRAPH_METADATA: null
 });

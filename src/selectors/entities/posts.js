@@ -23,6 +23,14 @@ export function getReactionsForPost(state, postId) {
     return state.entities.posts.reactions[postId];
 }
 
+export function getOpenGraphMetadata(state) {
+    return state.entities.posts.openGraph;
+}
+
+export function getOpenGraphMetadataForUrl(state, url) {
+    return state.entities.posts.openGraph[url];
+}
+
 function getPostIdsInCurrentChannel(state) {
     return state.entities.posts.postsInChannel[state.entities.channels.currentChannelId] || [];
 }

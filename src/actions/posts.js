@@ -3,7 +3,7 @@
 
 import {batchActions} from 'redux-batched-actions';
 
-import {Client4} from 'client';
+import {Client, Client4} from 'client';
 import {Preferences, Posts} from 'constants';
 import {PostTypes, FileTypes} from 'action_types';
 
@@ -525,6 +525,37 @@ export function unflagPost(postId) {
         };
 
         deletePreferences(currentUserId, [preference])(dispatch, getState);
+    };
+}
+
+export function getOpenGraphMetadata(url) {
+    return async (dispatch, getState) => {
+        dispatch({type: PostTypes.OPEN_GRAPH_REQUEST}, getState);
+
+        let data;
+        try {
+            data = await Client.getOpenGraphMetadata(url);
+        } catch (error) {
+            forceLogoutIfNecessary(error, dispatch);
+            dispatch(batchActions([
+                {type: PostTypes.OPEN_GRAPH_FAILURE, error},
+                getLogErrorAction(error)
+            ]), getState);
+            return null;
+        }
+
+        dispatch(batchActions([
+            {
+                type: PostTypes.RECEIVED_OPEN_GRAPH_METADATA,
+                data,
+                url
+            },
+            {
+                type: PostTypes.OPEN_GRAPH_SUCCESS
+            }
+        ]), getState);
+
+        return data;
     };
 }
 

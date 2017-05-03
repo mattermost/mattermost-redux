@@ -255,6 +255,23 @@ function reactions(state = {}, action) {
             [reaction.post_id]: nextReactions
         };
     }
+    case UserTypes.LOGOUT_SUCCESS:
+        return {};
+    default:
+        return state;
+    }
+}
+
+function openGraph(state = {}, action) {
+    switch (action.type) {
+    case PostTypes.RECEIVED_OPEN_GRAPH_METADATA: {
+        const nextState = {...state};
+        nextState[action.url] = action.data;
+
+        return nextState;
+    }
+    case UserTypes.LOGOUT_SUCCESS:
+        return {};
     default:
         return state;
     }
@@ -278,13 +295,17 @@ export default function(state = {}, action) {
         currentFocusedPostId: currentFocusedPostId(state.currentFocusedPostId, action),
 
         // Object mapping post ids to an object of emoji reactions using userId-emojiName as keys
-        reactions: reactions(state.reactions, action)
+        reactions: reactions(state.reactions, action),
+
+        // Object mapping URLs to their relevant opengraph metadata for link previews
+        openGraph: openGraph(state.openGraph, action)
     };
 
     if (state.posts === nextState.posts && state.postsInChannel === nextState.postsInChannel &&
         state.selectedPostId === nextState.selectedPostId &&
         state.currentFocusedPostId === nextState.currentFocusedPostId &&
-        state.reactions === nextState.reactions) {
+        state.reactions === nextState.reactions &&
+        state.openGraph === nextState.openGraph) {
         // None of the children have changed so don't even let the parent object change
         return state;
     }

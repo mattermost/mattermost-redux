@@ -617,4 +617,23 @@ describe('Actions.Posts', () => {
         assert.ok(reactions);
         assert.ok(reactions[TestHelper.basicUser.id + '-' + emojiName]);
     });
+
+    it('getOpenGraphMetadata', async () => {
+        const {dispatch, getState} = store;
+
+        const url = 'https://about.mattermost.com';
+
+        await Actions.getOpenGraphMetadata(url)(dispatch, getState);
+
+        const openGraphRequest = getState().requests.posts.openGraph;
+
+        if (openGraphRequest.status === RequestStatus.FAILURE) {
+            throw new Error(JSON.stringify(openGraphRequest.error));
+        }
+
+        const state = getState();
+        const metadata = state.entities.posts.openGraph;
+        assert.ok(metadata);
+        assert.ok(metadata[url]);
+    });
 });
