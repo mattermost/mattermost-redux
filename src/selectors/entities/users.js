@@ -86,6 +86,37 @@ export const getCurrentUserRoles = createSelector(
     }
 );
 
+export const getCurrentUserMentionKeys = createSelector(
+    getCurrentUser,
+    (user) => {
+        let keys = [];
+
+        if (!user || !user.notify_props) {
+            return keys;
+        }
+
+        if (user.notify_props.mention_keys) {
+            keys = keys.concat(user.notify_props.mention_keys.split(','));
+        }
+
+        if (user.notify_props.first_name === 'true' && user.first_name) {
+            keys.push(user.first_name);
+        }
+
+        if (user.notify_props.channel === 'true') {
+            keys.push('@channel');
+            keys.push('@all');
+        }
+
+        const usernameKey = '@' + user.username;
+        if (keys.indexOf(usernameKey) === -1) {
+            keys.push(usernameKey);
+        }
+
+        return keys;
+    }
+);
+
 export const getProfileSetInCurrentChannel = createSelector(
     getCurrentChannelId,
     getUserIdsInChannels,
