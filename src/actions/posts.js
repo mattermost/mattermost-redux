@@ -73,6 +73,7 @@ export function createPost(post, files = []) {
                         dispatch(batchActions(actions), getState);
                     },
                     maxRetry: 0,
+                    offlineRollback: true,
                     rollback: () => {
                         const data = {
                             ...newPost,
