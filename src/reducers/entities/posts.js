@@ -108,8 +108,9 @@ function handlePostDeleted(posts = {}, postsInChannel = {}, action) {
         };
 
         // Remove any of its comments
-        const postsForChannel = postsInChannel[channelId] ? [...postsInChannel[channelId]] : [];
-        for (const id of postsForChannel) {
+        const channelPosts = postsInChannel[channelId] ? [...postsInChannel[channelId]] : [];
+        const postsForChannel = [...channelPosts]; // make sure we don't modify the array we loop over
+        for (const id of channelPosts) {
             if (nextPosts[id].root_id === post.id) {
                 Reflect.deleteProperty(nextPosts, id);
 
@@ -137,7 +138,8 @@ function handleRemovePost(posts = {}, postsInChannel = {}, action) {
     if (nextPosts[post.id]) {
         nextPosts = {...posts};
         nextPostsForChannel = {...postsInChannel};
-        const postsForChannel = postsInChannel[channelId] ? [...postsInChannel[channelId]] : [];
+        const channelPosts = postsInChannel[channelId] ? [...postsInChannel[channelId]] : [];
+        const postsForChannel = [...channelPosts]; // make sure we don't modify the array we loop over
 
         // Remove the post itself
         Reflect.deleteProperty(nextPosts, post.id);
