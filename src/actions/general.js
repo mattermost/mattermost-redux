@@ -4,7 +4,6 @@
 import {Client, Client4} from 'client';
 import {bindClientFunc, FormattedError} from './helpers.js';
 import {GeneralTypes} from 'action_types';
-import {getMyChannelMembers} from './channels';
 import {loadMe} from './users';
 
 export function getPing() {
@@ -70,13 +69,6 @@ export function logClientError(message, level = 'ERROR') {
 export function setAppState(state) {
     return async (dispatch, getState) => {
         dispatch({type: GeneralTypes.RECEIVED_APP_STATE, data: state}, getState);
-
-        if (state) {
-            const {currentTeamId} = getState().entities.teams;
-            if (currentTeamId) {
-                getMyChannelMembers(currentTeamId)(dispatch, getState);
-            }
-        }
     };
 }
 
