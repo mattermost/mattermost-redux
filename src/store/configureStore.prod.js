@@ -4,10 +4,8 @@
 import {createStore, combineReducers} from 'redux';
 import {enableBatching} from 'redux-batched-actions';
 import thunk from 'redux-thunk';
-import {REHYDRATE} from 'redux-persist/constants';
 import {createOfflineReducer, networkStatusChangedAction, offlineCompose} from 'redux-offline';
 import defaultOfflineConfig from 'redux-offline/lib/defaults';
-import createActionBuffer from 'redux-action-buffer';
 
 import {General} from 'constants';
 import serviceReducer from 'reducers';
@@ -36,7 +34,7 @@ export default function configureOfflineServiceStore(preloadedState, appReducer,
         createOfflineReducer(enableBatching(offlineReducer)),
         baseState,
         offlineCompose(baseOfflineConfig)(
-            [thunk, createActionBuffer(REHYDRATE)],
+            [thunk],
             []
         )
     );

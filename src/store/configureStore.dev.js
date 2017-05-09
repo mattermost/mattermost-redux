@@ -6,10 +6,8 @@ import {createStore, combineReducers} from 'redux';
 import {enableBatching} from 'redux-batched-actions';
 import devTools from 'remote-redux-devtools';
 import thunk from 'redux-thunk';
-import {REHYDRATE} from 'redux-persist/constants';
 import {createOfflineReducer, networkStatusChangedAction, offlineCompose} from 'redux-offline';
 import defaultOfflineConfig from 'redux-offline/lib/defaults';
-import createActionBuffer from 'redux-action-buffer';
 
 import {General} from 'constants';
 import serviceReducer from 'reducers';
@@ -25,7 +23,7 @@ export default function configureServiceStore(preloadedState, appReducer, userOf
         undefined,
         // eslint-disable-line - offlineCompose(config)(middleware, other funcs)
         offlineCompose(baseOfflineConfig)(
-            [thunk, createActionBuffer(REHYDRATE)],
+            [thunk],
             [devTools({
                 name: 'Mattermost',
                 hostname: 'localhost',
