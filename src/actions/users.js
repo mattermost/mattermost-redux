@@ -638,6 +638,14 @@ export function searchProfiles(term, options = {}) {
             });
         }
 
+        if (options.not_in_team_id) {
+            actions.push({
+                type: UserTypes.RECEIVED_PROFILES_LIST_NOT_IN_TEAM,
+                data: profiles,
+                id: options.not_in_team_id
+            });
+        }
+
         dispatch(batchActions([
             ...actions,
             {
