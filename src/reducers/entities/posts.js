@@ -108,8 +108,9 @@ function handlePostDeleted(posts = {}, postsInChannel = {}, action) {
         };
 
         // Remove any of its comments
-        const postsForChannel = postsInChannel[channelId] ? [...postsInChannel[channelId]] : [];
-        for (const id of postsForChannel) {
+        const channelPosts = postsInChannel[channelId] ? [...postsInChannel[channelId]] : [];
+        const postsForChannel = [...channelPosts]; // make sure we don't modify the array we loop over
+        for (const id of channelPosts) {
             if (nextPosts[id].root_id === post.id) {
                 Reflect.deleteProperty(nextPosts, id);
 
@@ -137,18 +138,22 @@ function handleRemovePost(posts = {}, postsInChannel = {}, action) {
     if (nextPosts[post.id]) {
         nextPosts = {...posts};
         nextPostsForChannel = {...postsInChannel};
-        const postsForChannel = postsInChannel[channelId] ? [...postsInChannel[channelId]] : [];
+        const channelPosts = postsInChannel[channelId] ? [...postsInChannel[channelId]] : [];
 
         // Remove the post itself
         Reflect.deleteProperty(nextPosts, post.id);
 
-        const index = postsForChannel.indexOf(post.id);
+        const index = channelPosts.indexOf(post.id);
         if (index !== -1) {
-            postsForChannel.splice(index, 1);
+            channelPosts.splice(index, 1);
         }
 
+        // Create a copy of the channelPosts after we splice the
+        // parent post so we can safely loop and have the latest changes
+        const postsForChannel = [...channelPosts];
+
         // Remove any of its comments
-        for (const id of postsForChannel) {
+        for (const id of channelPosts) {
             if (nextPosts[id].root_id === post.id) {
                 Reflect.deleteProperty(nextPosts, id);
 
