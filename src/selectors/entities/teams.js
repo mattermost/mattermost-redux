@@ -5,6 +5,8 @@ import {createSelector} from 'reselect';
 
 import {getCurrentUrl} from './general';
 
+import {isTeamAdmin} from 'utils/user_utils';
+
 export function getCurrentTeamId(state) {
     return state.entities.teams.currentTeamId;
 }
@@ -38,6 +40,14 @@ export const getCurrentTeamMembership = createSelector(
     getTeamMemberships,
     (currentTeamId, teamMemberships) => {
         return teamMemberships[currentTeamId];
+    }
+);
+
+export const isCurrentUserCurrentTeamAdmin = createSelector(
+    getCurrentTeamMembership,
+    (member) => {
+        const roles = member.roles || '';
+        return isTeamAdmin(roles);
     }
 );
 

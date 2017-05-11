@@ -68,4 +68,8 @@ describe('Selectors.Teams', () => {
         openTeams[team3.id] = team3;
         assert.deepEqual(Selectors.getJoinableTeams(testState), openTeams);
     });
+
+    it('isCurrentUserCurrentTeamAdmin', () => {
+        assert.deepEqual(Selectors.isCurrentUserCurrentTeamAdmin(testState), false);
+    });
 });

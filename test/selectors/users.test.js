@@ -142,5 +142,9 @@ describe('Selectors.Users', () => {
         assert.deepEqual(Selectors.searchProfilesWithoutTeam(testState, user5.username), [user5]);
         assert.deepEqual(Selectors.searchProfilesWithoutTeam(testState, user5.username, true), [user5]);
     });
+
+    it('isCurrentUserSystemAdmin', () => {
+        assert.deepEqual(Selectors.isCurrentUserSystemAdmin(testState), false);
+    });
 });
 
