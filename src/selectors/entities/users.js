@@ -6,7 +6,7 @@ import {createSelector} from 'reselect';
 import {getCurrentChannelId, getMyCurrentChannelMembership} from './channels';
 import {getCurrentTeamId, getCurrentTeamMembership} from './teams';
 
-import {filterProfilesMatchingTerm, sortByUsername} from 'utils/user_utils';
+import {filterProfilesMatchingTerm, sortByUsername, isSystemAdmin} from 'utils/user_utils';
 
 export function getCurrentUserId(state) {
     return state.entities.users.currentUserId;
@@ -63,6 +63,14 @@ export const getUsersByUsername = createSelector(
 export function getCurrentUser(state) {
     return state.entities.users.profiles[getCurrentUserId(state)];
 }
+
+export const isCurrentUserSystemAdmin = createSelector(
+    getCurrentUser,
+    (user) => {
+        const roles = user.roles || '';
+        return isSystemAdmin(roles);
+    }
+);
 
 export const getCurrentUserRoles = createSelector(
     getMyCurrentChannelMembership,
