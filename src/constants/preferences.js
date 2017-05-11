@@ -8,6 +8,7 @@ export default {
     CATEGORY_NOTIFICATIONS: 'notifications',
     CATEGORY_DISPLAY_SETTINGS: 'display_settings',
     CATEGORY_FAVORITE_CHANNEL: 'favorite_channel',
+    CATEGORY_ADVANCED_SETTINGS: 'advanced_settings',
     CATEGORY_THEME: 'theme',
     DISPLAY_PREFER_NICKNAME: 'nickname_full_name',
     DISPLAY_PREFER_FULL_NAME: 'full_name',
