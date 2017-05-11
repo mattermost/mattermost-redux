@@ -69,7 +69,7 @@ export function parseClientIdsFromFormData(formdata) {
     const parts = formdata._parts; // eslint-disable-line
     const index = parts.findIndex((p) => p[0] === 'client_ids');
 
-    const clientIds = parts[index];
+    const clientIds = [...parts[index]];
     clientIds.shift();
 
     return clientIds;
