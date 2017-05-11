@@ -4,6 +4,7 @@
 import {General, Preferences} from 'constants';
 import {ChannelTypes, PreferenceTypes, UserTypes} from 'action_types';
 import {savePreferences} from 'actions/preferences';
+import {setServerVersion} from 'actions/general';
 import {batchActions} from 'redux-batched-actions';
 
 import {Client4} from 'client';
@@ -545,16 +546,8 @@ export function deleteChannel(channelId) {
     };
 }
 
-export function viewChannel(channelId) {
+export function viewChannel(channelId, prevChannelId = '') {
     return async (dispatch, getState) => {
-        const state = getState();
-        const {currentChannelId} = state.entities.channels;
-        let prevChannelId = '';
-
-        if (channelId !== currentChannelId) {
-            prevChannelId = currentChannelId;
-        }
-
         dispatch({type: ChannelTypes.UPDATE_LAST_VIEWED_REQUEST}, getState);
 
         try {
@@ -567,6 +560,8 @@ export function viewChannel(channelId) {
             ]), getState);
             return null;
         }
+
+        setServerVersion(Client4.getServerVersion())(dispatch, getState);
 
         dispatch({type: ChannelTypes.UPDATE_LAST_VIEWED_SUCCESS}, getState);
 
