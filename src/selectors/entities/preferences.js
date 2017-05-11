@@ -1,16 +1,14 @@
 // Copyright (c) 2016-present Mattermost, Inc. All Rights Reserved.
 // See License.txt for license information.
 
+import {getPreferenceKey} from 'utils/preference_utils';
+
 export function getMyPreferences(state) {
     return state.entities.preferences.myPreferences;
 }
 
-function getKey(category, name) {
-    return `${category}--${name}`;
-}
-
 export function get(state, category, name, defaultValue = '') {
-    const key = getKey(category, name);
+    const key = getPreferenceKey(category, name);
     const prefs = getMyPreferences(state);
 
     if (!(key in prefs)) {
