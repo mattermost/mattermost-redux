@@ -327,15 +327,19 @@ export function removeUserFromTeam(teamId, userId) {
         ];
 
         const state = getState();
-        const {channels, myMembers} = state.entities.channels;
+        const {currentUserId} = state.entities.users;
 
-        for (const channelMember of Object.values(myMembers)) {
-            const channel = channels[channelMember.channel_id];
-            if (channel && channel.team_id === teamId) {
-                actions.push({
-                    type: ChannelTypes.LEAVE_CHANNEL,
-                    data: channel
-                });
+        if (currentUserId === userId) {
+            const {channels, myMembers} = state.entities.channels;
+
+            for (const channelMember of Object.values(myMembers)) {
+                const channel = channels[channelMember.channel_id];
+                if (channel && channel.team_id === teamId) {
+                    actions.push({
+                        type: ChannelTypes.LEAVE_CHANNEL,
+                        data: channel
+                    });
+                }
             }
         }
 
