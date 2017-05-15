@@ -4,7 +4,9 @@
 import {Client, Client4} from 'client';
 import {bindClientFunc, FormattedError} from './helpers.js';
 import {GeneralTypes} from 'action_types';
+import {General} from 'constants';
 import {loadMe} from './users';
+import EventEmitter from 'utils/event_emitter';
 
 export function getPing() {
     return async (dispatch, getState) => {
@@ -77,6 +79,8 @@ export function setDeviceToken(token) {
         dispatch({type: GeneralTypes.RECEIVED_APP_DEVICE_TOKEN, data: token}, getState);
     };
 }
+
+EventEmitter.on(General.CONFIG_CHANGED, setServerVersion);
 
 export function setServerVersion(serverVersion) {
     return async (dispatch, getState) => {

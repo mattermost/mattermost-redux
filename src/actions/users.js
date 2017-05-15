@@ -4,8 +4,8 @@
 import {batchActions} from 'redux-batched-actions';
 import {Client4} from 'client';
 import {General} from 'constants';
-import {PreferenceTypes, UserTypes, TeamTypes} from 'action_types';
-import {getMyTeams} from './teams';
+import {UserTypes, TeamTypes} from 'action_types';
+import {getMyTeams, getMyTeamMembers} from './teams';
 
 import {
     getUserIdFromChannelName,
@@ -142,84 +142,20 @@ export function login(loginId, password, mfaToken = '') {
 
 export function loadMe() {
     return async (dispatch, getState) => {
-        const {currentUserId, profiles} = getState().entities.users;
-        const currentUser = profiles[currentUserId];
-        let user;
-
-        dispatch({type: UserTypes.LOGIN_REQUEST}, getState);
-        try {
-            user = await Client4.getMe();
-
-            // getMe is not returning the notify props, if we have it already from login
-            // we are going to use it, needs to be fixed at server side before removing this
-            if (currentUser && currentUser.notify_props) {
-                user.notify_props = currentUser.notify_props;
-            }
-        } catch (error) {
-            forceLogoutIfNecessary(error, dispatch);
-            dispatch(batchActions([
-                {type: UserTypes.LOGIN_FAILURE, error},
-                getLogErrorAction(error)
-            ]), getState);
-            return;
-        }
-
         const deviceId = getState().entities.general.deviceToken;
         if (deviceId) {
             Client4.attachDevice(deviceId);
         }
 
-        try {
-            await getMyPreferences()(dispatch, getState);
-        } catch (error) {
-            forceLogoutIfNecessary(error, dispatch);
-            dispatch(batchActions([
-                {type: PreferenceTypes.MY_PREFERENCES_FAILURE, error},
-                getLogErrorAction(error)
-            ]), getState);
-            return;
-        }
+        const me = getMe()(dispatch, getState);
+        const prefs = getMyPreferences()(dispatch, getState);
+        const teams = getMyTeams()(dispatch, getState);
+        const members = getMyTeamMembers()(dispatch, getState);
 
-        try {
-            await getMyTeams()(dispatch, getState);
-        } catch (error) {
-            forceLogoutIfNecessary(error, dispatch);
-            dispatch(batchActions([
-                {type: TeamTypes.MY_TEAMS_FAILURE, error},
-                getLogErrorAction(error)
-            ]), getState);
-            return;
-        }
-
-        let teamMembers;
-        dispatch({type: TeamTypes.MY_TEAM_MEMBERS_REQUEST}, getState);
-        try {
-            teamMembers = await Client4.getMyTeamMembers();
-        } catch (error) {
-            forceLogoutIfNecessary(error, dispatch);
-            dispatch(batchActions([
-                {type: TeamTypes.MY_TEAM_MEMBERS_FAILURE, error},
-                getLogErrorAction(error)
-            ]), getState);
-            return;
-        }
-
-        dispatch(batchActions([
-            {
-                type: UserTypes.RECEIVED_ME,
-                data: user
-            },
-            {
-                type: UserTypes.LOGIN_SUCCESS
-            },
-            {
-                type: TeamTypes.RECEIVED_MY_TEAM_MEMBERS,
-                data: teamMembers
-            },
-            {
-                type: TeamTypes.MY_TEAM_MEMBERS_SUCCESS
-            }
-        ]), getState);
+        await me;
+        await prefs;
+        await teams;
+        await members;
     };
 }
 
@@ -698,6 +634,14 @@ export function searchProfiles(term, options = {}) {
                 type: UserTypes.RECEIVED_PROFILES_LIST_IN_TEAM,
                 data: profiles,
                 id: options.team_id
+            });
+        }
+
+        if (options.not_in_team_id) {
+            actions.push({
+                type: UserTypes.RECEIVED_PROFILES_LIST_NOT_IN_TEAM,
+                data: profiles,
+                id: options.not_in_team_id
             });
         }
 

@@ -545,16 +545,8 @@ export function deleteChannel(channelId) {
     };
 }
 
-export function viewChannel(channelId) {
+export function viewChannel(channelId, prevChannelId = '') {
     return async (dispatch, getState) => {
-        const state = getState();
-        const {currentChannelId} = state.entities.channels;
-        let prevChannelId = '';
-
-        if (channelId !== currentChannelId) {
-            prevChannelId = currentChannelId;
-        }
-
         dispatch({type: ChannelTypes.UPDATE_LAST_VIEWED_REQUEST}, getState);
 
         try {
