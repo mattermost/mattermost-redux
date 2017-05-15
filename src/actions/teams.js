@@ -4,7 +4,7 @@
 import {batchActions} from 'redux-batched-actions';
 import {Client4} from 'client';
 import {General} from 'constants';
-import {TeamTypes, UserTypes} from 'action_types';
+import {ChannelTypes, TeamTypes, UserTypes} from 'action_types';
 import {getLogErrorAction} from './errors';
 import {bindClientFunc, forceLogoutIfNecessary} from './helpers';
 import {getProfilesByIds, getStatusesByIds} from './users';
@@ -311,7 +311,7 @@ export function removeUserFromTeam(teamId, userId) {
             user_id: userId
         };
 
-        dispatch(batchActions([
+        const actions = [
             {
                 type: UserTypes.RECEIVED_PROFILE_NOT_IN_TEAM,
                 data: {user_id: userId},
@@ -324,7 +324,22 @@ export function removeUserFromTeam(teamId, userId) {
             {
                 type: TeamTypes.REMOVE_TEAM_MEMBER_SUCCESS
             }
-        ]), getState);
+        ];
+
+        const state = getState();
+        const {channels, myMembers} = state.entities.channels;
+
+        for (const channelMember of Object.values(myMembers)) {
+            const channel = channels[channelMember.channel_id];
+            if (channel && channel.team_id === teamId) {
+                actions.push({
+                    type: ChannelTypes.LEAVE_CHANNEL,
+                    data: channel
+                });
+            }
+        }
+
+        dispatch(batchActions(actions), getState);
 
         return true;
     };
