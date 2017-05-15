@@ -40,9 +40,9 @@
     "ws": "2.2.3"
   },
   "scripts": {
-    "build": "babel src --out-dir lib",
+    "build": "babel src --out-dir .",
     "check": "node_modules/.bin/eslint --ext \".js\" --ignore-pattern node_modules --quiet .",
     "test": "NODE_ENV=test mocha --opts test/mocha.opts",
-    "postinstall": "npm run build && mv lib/* ./ && rm -rf src lib"
+    "postinstall": "npm run build"
   }
 }
