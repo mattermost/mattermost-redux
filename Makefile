@@ -30,6 +30,7 @@ pre-run:
 	@echo Make sure no previous build are in the folder
 
 	@rm -rf actions
+	@rm -rf action_types
 	@rm -rf client
 	@rm -rf constants
 	@rm -rf reducers
