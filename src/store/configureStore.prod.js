@@ -15,11 +15,16 @@ import serviceReducer from 'reducers';
 import initialState from './initial_state';
 import {offlineConfig} from './helpers';
 
-export default function configureOfflineServiceStore(preloadedState, appReducer, userOfflineConfig) {
+export default function configureOfflineServiceStore(preloadedState, appReducer, userOfflineConfig, enableBuffer = true) {
     const baseReducer = combineReducers(Object.assign({}, serviceReducer, appReducer));
     const baseState = Object.assign({}, initialState, preloadedState);
 
     const baseOfflineConfig = Object.assign({}, defaultOfflineConfig, offlineConfig, userOfflineConfig);
+
+    const middleware = [thunk];
+    if (enableBuffer) {
+        middleware.push(createActionBuffer(REHYDRATE));
+    }
 
     // Root reducer wrapper that listens for reset events.
     // Returns whatever is passed for the data property
@@ -36,7 +41,7 @@ export default function configureOfflineServiceStore(preloadedState, appReducer,
         createOfflineReducer(enableBatching(offlineReducer)),
         baseState,
         offlineCompose(baseOfflineConfig)(
-            [thunk, createActionBuffer(REHYDRATE)],
+            middleware,
             []
         )
     );
