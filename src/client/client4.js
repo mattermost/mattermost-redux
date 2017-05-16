@@ -146,6 +146,10 @@ export default class Client4 {
         return `${this.getBaseRoute()}/hooks/outgoing/${hookId}`;
     }
 
+    getEmojiRoute(emojiId) {
+        return `${this.getBaseRoute()}/emoji/${emojiId}`;
+    }
+
     getOptions(options) {
         const newOptions = Object.assign({}, options);
 
