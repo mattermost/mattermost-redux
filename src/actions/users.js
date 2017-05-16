@@ -201,6 +201,25 @@ export function getProfiles(page = 0, perPage = General.PROFILE_CHUNK_SIZE) {
     };
 }
 
+export function getMissingProfilesByIds(userIds) {
+    return async (dispatch, getState) => {
+        const {profiles} = getState().entities.users;
+
+        const missingIds = [];
+        userIds.forEach((id) => {
+            if (!profiles[id]) {
+                missingIds.push(id);
+            }
+        });
+
+        if (missingIds.length > 0) {
+            return await getProfilesByIds(missingIds)(dispatch, getState);
+        }
+
+        return [];
+    };
+}
+
 export function getProfilesByIds(userIds) {
     return bindClientFunc(
         Client4.getProfilesByIds,

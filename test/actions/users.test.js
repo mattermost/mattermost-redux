@@ -142,6 +142,15 @@ describe('Actions.Users', () => {
         assert.ok(profiles[user.id]);
     });
 
+    it('getMissingProfilesByIds', async () => {
+        await TestHelper.basicClient4.login(TestHelper.basicUser.email, 'password1');
+        const user = await TestHelper.basicClient4.createUser(TestHelper.fakeUser());
+        await Actions.getMissingProfilesByIds([user.id])(store.dispatch, store.getState);
+
+        const {profiles} = store.getState().entities.users;
+        assert.ok(profiles[user.id]);
+    });
+
     it('getProfilesInTeam', async () => {
         await Actions.getProfilesInTeam(TestHelper.basicTeam.id, 0)(store.dispatch, store.getState);
 
