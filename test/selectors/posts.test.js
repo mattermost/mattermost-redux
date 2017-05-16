@@ -3,11 +3,17 @@
 
 import assert from 'assert';
 
-import {makeGetPostsForThread} from 'selectors/entities/posts';
+import {makeGetPostsForThread, getReactionsForPost} from 'selectors/entities/posts';
+import {makeGetProfilesForReactions} from 'selectors/entities/users';
 import deepFreezeAndThrowOnMutation from 'utils/deep_freeze';
+import TestHelper from 'test/test_helper';
 
 describe('Selectors.Posts', () => {
     describe('makeGetPostsForThread', () => {
+        const user1 = TestHelper.fakeUserWithId();
+        const profiles = {};
+        profiles[user1.id] = user1;
+
         const posts = {
             a: {id: 'a', channel_id: '1'},
             b: {id: 'b', channel_id: '1'},
@@ -16,13 +22,24 @@ describe('Selectors.Posts', () => {
             e: {id: 'e', root_id: 'a', channel_id: '1'},
             f: {id: 'f', channel_id: 'f'}
         };
+
+        const reaction1 = {user_id: user1.id, emoji_name: '+1'};
+        const reactions = {
+            a: {[reaction1.user_id + '-' + reaction1.emoji_name]: reaction1}
+        };
+
         const testState = deepFreezeAndThrowOnMutation({
             entities: {
+                users: {
+                    currentUserId: user1.id,
+                    profiles
+                },
                 posts: {
                     posts,
                     postsInChannel: {
                         1: ['a', 'b', 'c', 'd', 'e', 'f']
-                    }
+                    },
+                    reactions
                 }
             }
         });
@@ -69,6 +86,15 @@ describe('Selectors.Posts', () => {
 
             assert.equal(result1, getPostsForThread1(testState, props1));
             assert.equal(result2, getPostsForThread2(testState, props2));
+        });
+
+        it('should return reactions for post', () => {
+            assert.deepEqual(getReactionsForPost(testState, posts.a.id), [reaction1]);
+        });
+
+        it('should return profiles for reactions', () => {
+            const getProfilesForReactions = makeGetProfilesForReactions();
+            assert.deepEqual(getProfilesForReactions(testState, [reaction1]), [user1]);
         });
     });
 });

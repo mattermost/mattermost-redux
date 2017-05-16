@@ -300,3 +300,19 @@ export const getUsersInVisibleDMs = createSelector(
         return dmUsers;
     }
 );
+
+export function makeGetProfilesForReactions() {
+    return createSelector(
+        getUsers,
+        (state, reactions) => reactions,
+        (users, reactions) => {
+            const profiles = [];
+            reactions.forEach((r) => {
+                if (users[r.user_id]) {
+                    profiles.push(users[r.user_id]);
+                }
+            });
+            return profiles;
+        }
+    );
+}

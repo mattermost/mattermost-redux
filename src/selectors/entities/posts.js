@@ -20,7 +20,7 @@ export function getReactionsForPosts(state) {
 }
 
 export function getReactionsForPost(state, postId) {
-    return state.entities.posts.reactions[postId];
+    return Object.values(state.entities.posts.reactions[postId] || {});
 }
 
 export function getOpenGraphMetadata(state) {
