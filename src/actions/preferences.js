@@ -10,7 +10,7 @@ import {getPreferenceKey} from 'utils/preference_utils';
 
 import {bindClientFunc} from './helpers';
 import {getProfilesByIds, getProfilesInChannel} from './users';
-import {getChannel} from './channels';
+import {getChannelAndMyMember, getMyChannelMember} from './channels';
 
 export function deletePreferences(userId, preferences) {
     return async (dispatch, getState) => {
@@ -62,7 +62,7 @@ export function makeDirectChannelVisibleIfNecessary(otherUserId) {
                 value: 'true'
             };
             getProfilesByIds([otherUserId])(dispatch, getState);
-            await savePreferences(currentUserId, [preference])(dispatch, getState);
+            savePreferences(currentUserId, [preference])(dispatch, getState);
         }
     };
 }
@@ -72,6 +72,7 @@ export function makeGroupMessageVisibleIfNecessary(channelId) {
         const state = getState();
         const myPreferences = getMyPreferencesSelector(state);
         const currentUserId = getCurrentUserId(state);
+        const {channels} = state.entities.channels;
 
         let preference = myPreferences[getPreferenceKey(Preferences.CATEGORY_GROUP_CHANNEL_SHOW, channelId)];
 
@@ -83,12 +84,14 @@ export function makeGroupMessageVisibleIfNecessary(channelId) {
                 value: 'true'
             };
 
-            if (!state.channels.channels[channelId]) {
-                getChannel(channelId)(dispatch, getState);
+            if (channels[channelId]) {
+                getMyChannelMember(channelId)(dispatch, getState);
+            } else {
+                getChannelAndMyMember(channelId)(dispatch, getState);
             }
 
             getProfilesInChannel(channelId, 0)(dispatch, getState);
-            await savePreferences(currentUserId, [preference])(dispatch, getState);
+            savePreferences(currentUserId, [preference])(dispatch, getState);
         }
     };
 }

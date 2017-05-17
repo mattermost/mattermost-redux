@@ -8,7 +8,7 @@ import websocketClient from 'client/websocket_client';
 import {getProfilesByIds, getStatusesByIds, loadProfilesForDirect} from './users';
 import {
     fetchMyChannelsAndMembers,
-    getChannel,
+    getChannelAndMyMember,
     getChannelStats,
     updateChannelHeader,
     updateChannelPurpose,
@@ -213,7 +213,6 @@ async function handleNewPostEvent(msg, dispatch, getState) {
 
     if (msg.data.channel_type === General.DM_CHANNEL) {
         const otherUserId = getUserIdFromChannelName(users.currentUserId, msg.data.channel_name);
-
         makeDirectChannelVisibleIfNecessary(otherUserId)(dispatch, getState);
     } else if (msg.data.channel_type === General.GM_CHANNEL) {
         makeGroupMessageVisibleIfNecessary(post.channel_id)(dispatch, getState);
@@ -318,7 +317,7 @@ function handleUserAddedEvent(msg, dispatch, getState) {
     }
 
     if (teamId === currentTeamId && msg.data.user_id === currentUserId) {
-        getChannel(msg.broadcast.channel_id)(dispatch, getState);
+        getChannelAndMyMember(msg.broadcast.channel_id)(dispatch, getState);
     }
 }
 
@@ -361,7 +360,7 @@ function handleChannelCreatedEvent(msg, dispatch, getState) {
     const {currentTeamId} = state.entities.teams;
 
     if (teamId === currentTeamId && !channels[channelId]) {
-        getChannel(channelId)(dispatch, getState);
+        getChannelAndMyMember(channelId)(dispatch, getState);
     }
 }
 
@@ -388,7 +387,7 @@ function handleChannelDeletedEvent(msg, dispatch, getState) {
 }
 
 function handleDirectAddedEvent(msg, dispatch, getState) {
-    getChannel(msg.broadcast.channel_id)(dispatch, getState);
+    getChannelAndMyMember(msg.broadcast.channel_id)(dispatch, getState);
 }
 
 function handlePreferenceChangedEvent(msg, dispatch, getState) {
