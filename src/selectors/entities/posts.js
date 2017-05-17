@@ -46,9 +46,13 @@ export const getPostsInCurrentChannel = createSelector(
 export function makeGetPostsInChannel() {
     return createSelector(
         getAllPosts,
-        (state, channelId) => state.entities.posts.postsInChannel[channelId] || [],
+        (state, channelId) => state.entities.posts.postsInChannel[channelId],
         getCurrentUser,
         (allPosts, postIds, currentUser) => {
+            if (postIds == null) {
+                return null;
+            }
+
             const posts = [];
 
             for (let i = 0; i < postIds.length; i++) {
