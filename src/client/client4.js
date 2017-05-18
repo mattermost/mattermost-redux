@@ -360,6 +360,11 @@ export default class Client4 {
         );
     };
 
+    getCurrentSession = async (userId, token) => {
+        const sessions = await this.getSessions(userId);
+        return sessions.find((s) => s.token === token);
+    };
+
     revokeSession = async (userId, sessionId) => {
         return this.doFetch(
             `${this.getUserRoute(userId)}/sessions/revoke`,
