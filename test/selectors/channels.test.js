@@ -92,4 +92,8 @@ describe('Selectors.Channels', () => {
     it('get public channels not member of', () => {
         assert.deepEqual(Selectors.getOtherChannels(testState), [channel6]);
     });
+
+    it('get channel', () => {
+        assert.deepEqual(Selectors.getChannel(testState, channel1.id), channel1);
+    });
 });

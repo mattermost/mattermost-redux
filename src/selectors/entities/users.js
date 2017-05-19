@@ -60,6 +60,10 @@ export const getUsersByUsername = createSelector(
     }
 );
 
+export function getUserByUsername(state, username) {
+    return getUsersByUsername(state)[username];
+}
+
 export function getCurrentUser(state) {
     return state.entities.users.profiles[getCurrentUserId(state)];
 }
