@@ -36,6 +36,10 @@ export function getChannelMembersInChannels(state) {
     return state.entities.channels.membersInChannel;
 }
 
+export function getChannel(state, id) {
+    return getAllChannels(state)[id];
+}
+
 export const getCurrentChannel = createSelector(
     getAllChannels,
     getCurrentChannelId,

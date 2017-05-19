@@ -146,5 +146,9 @@ describe('Selectors.Users', () => {
     it('isCurrentUserSystemAdmin', () => {
         assert.deepEqual(Selectors.isCurrentUserSystemAdmin(testState), false);
     });
+
+    it('getUserByUsername', () => {
+        assert.deepEqual(Selectors.getUserByUsername(testState, user1.username), user1);
+    });
 });
 
