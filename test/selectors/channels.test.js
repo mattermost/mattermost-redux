@@ -52,8 +52,8 @@ describe('Selectors.Channels', () => {
 
     const myMembers = {};
     myMembers[channel1.id] = {channel_id: channel1.id, user_id: user.id};
-    myMembers[channel2.id] = {channel_id: channel2.id, user_id: user.id};
-    myMembers[channel3.id] = {channel_id: channel3.id, user_id: user.id};
+    myMembers[channel2.id] = {channel_id: channel2.id, user_id: user.id, mention_count: 1};
+    myMembers[channel3.id] = {channel_id: channel3.id, user_id: user.id, mention_count: 1};
     myMembers[channel4.id] = {channel_id: channel4.id, user_id: user.id};
 
     const testState = deepFreezeAndThrowOnMutation({
@@ -95,5 +95,9 @@ describe('Selectors.Channels', () => {
 
     it('get channel', () => {
         assert.deepEqual(Selectors.getChannel(testState, channel1.id), channel1);
+    });
+
+    it('get unreads for current team', () => {
+        assert.equal(Selectors.getUnreadsInCurrentTeam(testState).mentionCount, 1);
     });
 });
