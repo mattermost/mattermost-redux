@@ -7,6 +7,7 @@ import deepFreezeAndThrowOnMutation from 'utils/deep_freeze';
 import {sortByUsername} from 'utils/user_utils';
 import TestHelper from 'test/test_helper';
 import * as Selectors from 'selectors/entities/users';
+import {Preferences} from 'constants';
 
 describe('Selectors.Users', () => {
     const team1 = TestHelper.fakeTeamWithId();
@@ -39,6 +40,10 @@ describe('Selectors.Users', () => {
     const profilesNotInChannel = {};
     profilesNotInChannel[channel1.id] = new Set([user2.id]);
 
+    const myPreferences = {};
+    myPreferences[`${Preferences.CATEGORY_DIRECT_CHANNEL_SHOW}--${user2.id}`] = {category: Preferences.CATEGORY_DIRECT_CHANNEL_SHOW, name: user2.id, value: 'true'};
+    myPreferences[`${Preferences.CATEGORY_DIRECT_CHANNEL_SHOW}--${user3.id}`] = {category: Preferences.CATEGORY_DIRECT_CHANNEL_SHOW, name: user3.id, value: 'false'};
+
     const testState = deepFreezeAndThrowOnMutation({
         entities: {
             users: {
@@ -55,6 +60,9 @@ describe('Selectors.Users', () => {
             },
             channels: {
                 currentChannelId: channel1.id
+            },
+            preferences: {
+                myPreferences
             }
         }
     });
@@ -149,6 +157,10 @@ describe('Selectors.Users', () => {
 
     it('getUserByUsername', () => {
         assert.deepEqual(Selectors.getUserByUsername(testState, user1.username), user1);
+    });
+
+    it('getUsersInVisibleDMs', () => {
+        assert.deepEqual(Selectors.getUsersInVisibleDMs(testState), [user2]);
     });
 });
 

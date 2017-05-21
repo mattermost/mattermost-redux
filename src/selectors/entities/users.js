@@ -5,6 +5,7 @@ import {createSelector} from 'reselect';
 
 import {getCurrentChannelId, getMyCurrentChannelMembership} from './channels';
 import {getCurrentTeamId, getCurrentTeamMembership} from './teams';
+import {getDirectShowPreferences} from './preferences';
 
 import {filterProfilesMatchingTerm, sortByUsername, isSystemAdmin} from 'utils/user_utils';
 
@@ -254,3 +255,17 @@ function removeCurrentUserFromList(profiles, currentUserId) {
         profiles.splice(index, 1);
     }
 }
+
+export const getUsersInVisibleDMs = createSelector(
+    getUsers,
+    getDirectShowPreferences,
+    (users, preferences) => {
+        const dmUsers = [];
+        preferences.forEach((pref) => {
+            if (pref.value === 'true' && users[pref.name]) {
+                dmUsers.push(users[pref.name]);
+            }
+        });
+        return dmUsers;
+    }
+);
