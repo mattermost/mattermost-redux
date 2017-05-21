@@ -5,15 +5,20 @@ import assert from 'assert';
 
 import deepFreezeAndThrowOnMutation from 'utils/deep_freeze';
 import * as Selectors from 'selectors/entities/preferences';
+import {Preferences} from 'constants';
 
 describe('Selectors.Preferences', () => {
     const category1 = 'testcategory1';
     const name1 = 'testname1';
     const value1 = 'true';
     const pref1 = {category: category1, name: name1, value: value1};
+    const category2 = Preferences.CATEGORY_DIRECT_CHANNEL_SHOW;
+    const name2 = 'testname2';
+    const pref2 = {category: category2, name: name2, value: 'true'};
 
     const myPreferences = {};
     myPreferences[`${category1}--${name1}`] = pref1;
+    myPreferences[`${category2}--${name2}`] = pref2;
 
     const testState = deepFreezeAndThrowOnMutation({
         entities: {
@@ -29,6 +34,15 @@ describe('Selectors.Preferences', () => {
 
     it('get bool preference', () => {
         assert.deepEqual(Selectors.getBool(testState, category1, name1), value1 === 'true');
+    });
+
+    it('get preferences by category', () => {
+        const getCategory = Selectors.makeGetCategory();
+        assert.deepEqual(getCategory(testState, category1), [pref1]);
+    });
+
+    it('get direct channel show preferences', () => {
+        assert.deepEqual(Selectors.getDirectShowPreferences(testState), [pref2]);
     });
 });
 
