@@ -15,10 +15,14 @@ describe('Selectors.Preferences', () => {
     const category2 = Preferences.CATEGORY_DIRECT_CHANNEL_SHOW;
     const name2 = 'testname2';
     const pref2 = {category: category2, name: name2, value: 'true'};
+    const category3 = Preferences.CATEGORY_GROUP_CHANNEL_SHOW;
+    const name3 = 'testname3';
+    const pref3 = {category: category3, name: name3, value: 'true'};
 
     const myPreferences = {};
     myPreferences[`${category1}--${name1}`] = pref1;
     myPreferences[`${category2}--${name2}`] = pref2;
+    myPreferences[`${category3}--${name3}`] = pref3;
 
     const testState = deepFreezeAndThrowOnMutation({
         entities: {
@@ -43,6 +47,10 @@ describe('Selectors.Preferences', () => {
 
     it('get direct channel show preferences', () => {
         assert.deepEqual(Selectors.getDirectShowPreferences(testState), [pref2]);
+    });
+
+    it('get group channel show preferences', () => {
+        assert.deepEqual(Selectors.getGroupShowPreferences(testState), [pref3]);
     });
 });
 

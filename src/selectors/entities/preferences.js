@@ -50,3 +50,9 @@ const getDirectShowCategory = makeGetCategory();
 export function getDirectShowPreferences(state) {
     return getDirectShowCategory(state, Preferences.CATEGORY_DIRECT_CHANNEL_SHOW);
 }
+
+const getGroupShowCategory = makeGetCategory();
+
+export function getGroupShowPreferences(state) {
+    return getGroupShowCategory(state, Preferences.CATEGORY_GROUP_CHANNEL_SHOW);
+}
