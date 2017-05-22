@@ -36,9 +36,19 @@ export function getChannelMembersInChannels(state) {
     return state.entities.channels.membersInChannel;
 }
 
-export function getChannel(state, id) {
-    return getAllChannels(state)[id];
-}
+export const getChannel = createSelector(
+    getAllChannels,
+    (state, id) => id,
+    (state) => state.entities.users,
+    (state) => state.entities.preferences.myPreferences,
+    (allChannels, channelId, users, myPreferences) => {
+        const channel = allChannels[channelId];
+        if (channel) {
+            return completeDirectChannelInfo(users, myPreferences, channel);
+        }
+        return channel;
+    }
+);
 
 export const getCurrentChannel = createSelector(
     getAllChannels,
