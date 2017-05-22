@@ -46,8 +46,11 @@ export const getCurrentTeamMembership = createSelector(
 export const isCurrentUserCurrentTeamAdmin = createSelector(
     getCurrentTeamMembership,
     (member) => {
-        const roles = member.roles || '';
-        return isTeamAdmin(roles);
+        if (member) {
+            const roles = member.roles || '';
+            return isTeamAdmin(roles);
+        }
+        return false;
     }
 );
 
