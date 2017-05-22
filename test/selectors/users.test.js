@@ -15,6 +15,7 @@ describe('Selectors.Users', () => {
     const channel1 = TestHelper.fakeChannelWithId(team1.id);
 
     const user1 = TestHelper.fakeUserWithId();
+    user1.notify_props = {mention_keys: 'testkey1,testkey2'};
     const user2 = TestHelper.fakeUserWithId();
     const user3 = TestHelper.fakeUserWithId();
     const user4 = TestHelper.fakeUserWithId();
@@ -93,6 +94,10 @@ describe('Selectors.Users', () => {
 
     it('getUsers', () => {
         assert.deepEqual(Selectors.getUsers(testState), profiles);
+    });
+
+    it('getCurrentUserMentionKeys', () => {
+        assert.deepEqual(Selectors.getCurrentUserMentionKeys(testState), ['testkey1', 'testkey2', '@' + user1.username]);
     });
 
     it('getProfilesInCurrentTeam', () => {

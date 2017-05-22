@@ -20,6 +20,7 @@ export default {
     POST_DELETED: 'DELETED',
     SYSTEM_MESSAGE_PREFIX: 'system_',
     POST_TYPES: PostTypes,
+    POST_COLLAPSE_TIMEOUT: 1000 * 60 * 5, // five minutes
     IGNORE_POST_TYPES: [
         PostTypes.ADD_REMOVE,
         PostTypes.ADD_TO_CHANNEL,

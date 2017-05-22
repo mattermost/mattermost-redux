@@ -696,6 +696,13 @@ export default class Client {
         );
     };
 
+    getOpenGraphMetadata = async (url) => {
+        return this.doFetch(
+            `${this.getBaseRoute()}/get_opengraph_metadata`,
+            {method: 'post', body: JSON.stringify({url})}
+        );
+    };
+
     // Preferences routes
     getMyPreferences = async () => {
         return this.doFetch(

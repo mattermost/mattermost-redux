@@ -36,11 +36,23 @@ export default keyMirror({
     GET_POSTS_AFTER_SUCCESS: null,
     GET_POSTS_AFTER_FAILURE: null,
 
+    REACTION_REQUEST: null,
+    REACTION_SUCCESS: null,
+    REACTION_FAILURE: null,
+
+    OPEN_GRAPH_REQUEST: null,
+    OPEN_GRAPH_SUCCESS: null,
+    OPEN_GRAPH_FAILURE: null,
+
     RECEIVED_POST: null,
     RECEIVED_POSTS: null,
     RECEIVED_FOCUSED_POST: null,
     RECEIVED_POST_SELECTED: null,
     RECEIVED_EDIT_POST: null,
     POST_DELETED: null,
-    REMOVE_POST: null
+    REMOVE_POST: null,
+    RECEIVED_REACTION: null,
+    RECEIVED_REACTIONS: null,
+    REACTION_DELETED: null,
+    RECEIVED_OPEN_GRAPH_METADATA: null
 });

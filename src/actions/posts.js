@@ -3,9 +3,11 @@
 
 import {batchActions} from 'redux-batched-actions';
 
-import {Client4} from 'client';
+import {Client, Client4} from 'client';
 import {Preferences, Posts} from 'constants';
 import {PostTypes, FileTypes} from 'action_types';
+
+import * as Selectors from 'selectors/entities/posts';
 
 import {bindClientFunc, forceLogoutIfNecessary} from './helpers';
 import {getLogErrorAction} from './errors';
@@ -121,6 +123,176 @@ export function editPost(post) {
         PostTypes.EDIT_POST_FAILURE,
         post
     );
+}
+
+export function pinPost(postId) {
+    return async (dispatch, getState) => {
+        dispatch({type: PostTypes.EDIT_POST_REQUEST}, getState);
+        let posts;
+
+        try {
+            posts = await Client4.pinPost(postId);
+        } catch (error) {
+            forceLogoutIfNecessary(error, dispatch);
+            dispatch(batchActions([
+                {type: PostTypes.EDIT_POST_FAILURE, error},
+                getLogErrorAction(error)
+            ]), getState);
+            return null;
+        }
+
+        const actions = [
+            {
+                type: PostTypes.EDIT_POST_SUCCESS
+            }
+        ];
+
+        const post = Selectors.getPost(getState(), postId);
+        if (post) {
+            actions.push(
+                {
+                    type: PostTypes.RECEIVED_POST,
+                    data: {...post, is_pinned: true}
+                }
+            );
+        }
+
+        dispatch(batchActions(actions), getState);
+
+        return posts;
+    };
+}
+
+export function unpinPost(postId) {
+    return async (dispatch, getState) => {
+        dispatch({type: PostTypes.EDIT_POST_REQUEST}, getState);
+        let posts;
+
+        try {
+            posts = await Client4.unpinPost(postId);
+        } catch (error) {
+            forceLogoutIfNecessary(error, dispatch);
+            dispatch(batchActions([
+                {type: PostTypes.EDIT_POST_FAILURE, error},
+                getLogErrorAction(error)
+            ]), getState);
+            return null;
+        }
+
+        const actions = [
+            {
+                type: PostTypes.EDIT_POST_SUCCESS
+            }
+        ];
+
+        const post = Selectors.getPost(getState(), postId);
+        if (post) {
+            actions.push(
+                {
+                    type: PostTypes.RECEIVED_POST,
+                    data: {...post, is_pinned: false}
+                }
+            );
+        }
+
+        dispatch(batchActions(actions), getState);
+
+        return posts;
+    };
+}
+
+export function addReaction(postId, emojiName) {
+    return async (dispatch, getState) => {
+        dispatch({type: PostTypes.REACTION_REQUEST}, getState);
+
+        const currentUserId = getState().entities.users.currentUserId;
+
+        let reaction;
+        try {
+            reaction = await Client4.addReaction(currentUserId, postId, emojiName);
+        } catch (error) {
+            forceLogoutIfNecessary(error, dispatch);
+            dispatch(batchActions([
+                {type: PostTypes.REACTION_FAILURE, error},
+                getLogErrorAction(error)
+            ]), getState);
+            return null;
+        }
+
+        dispatch(batchActions([
+            {
+                type: PostTypes.REACTION_SUCCESS
+            },
+            {
+                type: PostTypes.RECEIVED_REACTION,
+                data: reaction
+            }
+        ]));
+
+        return true;
+    };
+}
+
+export function removeReaction(postId, emojiName) {
+    return async (dispatch, getState) => {
+        dispatch({type: PostTypes.REACTION_REQUEST}, getState);
+
+        const currentUserId = getState().entities.users.currentUserId;
+
+        try {
+            await Client4.removeReaction(currentUserId, postId, emojiName);
+        } catch (error) {
+            forceLogoutIfNecessary(error, dispatch);
+            dispatch(batchActions([
+                {type: PostTypes.REACTION_FAILURE, error},
+                getLogErrorAction(error)
+            ]), getState);
+            return null;
+        }
+
+        dispatch(batchActions([
+            {
+                type: PostTypes.REACTION_SUCCESS
+            },
+            {
+                type: PostTypes.REACTION_DELETED,
+                data: {user_id: currentUserId, post_id: postId, emoji_name: emojiName}
+            }
+        ]));
+
+        return true;
+    };
+}
+
+export function getReactionsForPost(postId) {
+    return async (dispatch, getState) => {
+        dispatch({type: PostTypes.REACTION_REQUEST}, getState);
+
+        let reactions;
+        try {
+            reactions = await Client4.getReactionsForPost(postId);
+        } catch (error) {
+            forceLogoutIfNecessary(error, dispatch);
+            dispatch(batchActions([
+                {type: PostTypes.REACTION_FAILURE, error},
+                getLogErrorAction(error)
+            ]), getState);
+            return null;
+        }
+
+        dispatch(batchActions([
+            {
+                type: PostTypes.REACTION_SUCCESS
+            },
+            {
+                type: PostTypes.RECEIVED_REACTIONS,
+                data: reactions,
+                postId
+            }
+        ]));
+
+        return reactions;
+    };
 }
 
 export function flagPost(postId) {
@@ -353,6 +525,37 @@ export function unflagPost(postId) {
         };
 
         deletePreferences(currentUserId, [preference])(dispatch, getState);
+    };
+}
+
+export function getOpenGraphMetadata(url) {
+    return async (dispatch, getState) => {
+        dispatch({type: PostTypes.OPEN_GRAPH_REQUEST}, getState);
+
+        let data;
+        try {
+            data = await Client.getOpenGraphMetadata(url);
+        } catch (error) {
+            forceLogoutIfNecessary(error, dispatch);
+            dispatch(batchActions([
+                {type: PostTypes.OPEN_GRAPH_FAILURE, error},
+                getLogErrorAction(error)
+            ]), getState);
+            return null;
+        }
+
+        dispatch(batchActions([
+            {
+                type: PostTypes.RECEIVED_OPEN_GRAPH_METADATA,
+                data,
+                url
+            },
+            {
+                type: PostTypes.OPEN_GRAPH_SUCCESS
+            }
+        ]), getState);
+
+        return data;
     };
 }
 

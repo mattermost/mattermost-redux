@@ -8,6 +8,7 @@ import * as Actions from 'actions/posts';
 import {login} from 'actions/users';
 import {Client, Client4} from 'client';
 import {Preferences, Posts, RequestStatus} from 'constants';
+import {PostTypes} from 'action_types';
 import TestHelper from 'test/test_helper';
 import configureStore from 'test/test_store';
 import {getPreferenceKey} from 'utils/preference_utils';
@@ -487,5 +488,152 @@ describe('Actions.Posts', () => {
         state = getState();
         const unflagged = state.entities.preferences.myPreferences[prefKey];
         assert.ifError(unflagged);
+    });
+
+    it('pinPost', async () => {
+        const {dispatch, getState} = store;
+
+        const post1 = await Client4.createPost(
+            TestHelper.fakePost(TestHelper.basicChannel.id)
+        );
+
+        await Actions.getPostThread(post1.id)(dispatch, getState);
+        await Actions.pinPost(post1.id)(dispatch, getState);
+
+        const editRequest = getState().requests.posts.editPost;
+
+        if (editRequest.status === RequestStatus.FAILURE) {
+            throw new Error(JSON.stringify(editRequest.error));
+        }
+
+        const state = getState();
+        const post = state.entities.posts.posts[post1.id];
+        assert.ok(post);
+        assert.ok(post.is_pinned === true);
+    });
+
+    it('unpinPost', async () => {
+        const {dispatch, getState} = store;
+
+        const post1 = await Client4.createPost(
+            TestHelper.fakePost(TestHelper.basicChannel.id)
+        );
+
+        await Actions.getPostThread(post1.id)(dispatch, getState);
+        await Actions.pinPost(post1.id)(dispatch, getState);
+        await Actions.unpinPost(post1.id)(dispatch, getState);
+
+        const editRequest = getState().requests.posts.editPost;
+
+        if (editRequest.status === RequestStatus.FAILURE) {
+            throw new Error(JSON.stringify(editRequest.error));
+        }
+
+        const state = getState();
+        const post = state.entities.posts.posts[post1.id];
+        assert.ok(post);
+        assert.ok(post.is_pinned === false);
+    });
+
+    it('addReaction', async () => {
+        const {dispatch, getState} = store;
+
+        await login(TestHelper.basicUser.email, 'password1')(dispatch, getState);
+
+        const post1 = await Client4.createPost(
+            TestHelper.fakePost(TestHelper.basicChannel.id)
+        );
+
+        const emojiName = '+1';
+
+        await Actions.addReaction(post1.id, emojiName)(dispatch, getState);
+
+        const reactionRequest = getState().requests.posts.reaction;
+
+        if (reactionRequest.status === RequestStatus.FAILURE) {
+            throw new Error(JSON.stringify(reactionRequest.error));
+        }
+
+        const state = getState();
+        const reactions = state.entities.posts.reactions[post1.id];
+        assert.ok(reactions);
+        assert.ok(reactions[TestHelper.basicUser.id + '-' + emojiName]);
+    });
+
+    it('removeReaction', async () => {
+        const {dispatch, getState} = store;
+
+        await login(TestHelper.basicUser.email, 'password1')(dispatch, getState);
+
+        const post1 = await Client4.createPost(
+            TestHelper.fakePost(TestHelper.basicChannel.id)
+        );
+
+        const emojiName = '+1';
+
+        await Actions.addReaction(post1.id, emojiName)(dispatch, getState);
+        await Actions.removeReaction(post1.id, emojiName)(dispatch, getState);
+
+        const reactionRequest = getState().requests.posts.reaction;
+
+        if (reactionRequest.status === RequestStatus.FAILURE) {
+            throw new Error(JSON.stringify(reactionRequest.error));
+        }
+
+        const state = getState();
+        const reactions = state.entities.posts.reactions[post1.id];
+        assert.ok(reactions);
+        assert.ok(!reactions[TestHelper.basicUser.id + '-' + emojiName]);
+    });
+
+    it('getReactionsForPost', async () => {
+        const {dispatch, getState} = store;
+
+        await login(TestHelper.basicUser.email, 'password1')(dispatch, getState);
+
+        const post1 = await Client4.createPost(
+            TestHelper.fakePost(TestHelper.basicChannel.id)
+        );
+
+        const emojiName = '+1';
+
+        await Actions.addReaction(post1.id, emojiName)(dispatch, getState);
+
+        dispatch({
+            type: PostTypes.REACTION_DELETED,
+            data: {user_id: TestHelper.basicUser.id, post_id: post1.id, emoji_name: emojiName}
+        });
+
+        await Actions.getReactionsForPost(post1.id)(dispatch, getState);
+
+        const reactionRequest = getState().requests.posts.reaction;
+
+        if (reactionRequest.status === RequestStatus.FAILURE) {
+            throw new Error(JSON.stringify(reactionRequest.error));
+        }
+
+        const state = getState();
+        const reactions = state.entities.posts.reactions[post1.id];
+        assert.ok(reactions);
+        assert.ok(reactions[TestHelper.basicUser.id + '-' + emojiName]);
+    });
+
+    it('getOpenGraphMetadata', async () => {
+        const {dispatch, getState} = store;
+
+        const url = 'https://about.mattermost.com';
+
+        await Actions.getOpenGraphMetadata(url)(dispatch, getState);
+
+        const openGraphRequest = getState().requests.posts.openGraph;
+
+        if (openGraphRequest.status === RequestStatus.FAILURE) {
+            throw new Error(JSON.stringify(openGraphRequest.error));
+        }
+
+        const state = getState();
+        const metadata = state.entities.posts.openGraph;
+        assert.ok(metadata);
+        assert.ok(metadata[url]);
     });
 });

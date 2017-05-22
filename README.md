@@ -16,6 +16,6 @@ We're not quite ready to accept external contributions yet - when things are rea
 
 ### Running the Tests
 
-To run the tests you need to have a Mattermost server running locally on port 8065 with "EnableOpenServer" and "EnableCustomEmoji" set to `true`.
+To run the tests you need to have a Mattermost server running locally on port 8065 with "EnableOpenServer", "EnableCustomEmoji" and "EnableLinkPreviews" set to `true` in your config.json.
 
 With that set up, you can run the tests with `make test`.

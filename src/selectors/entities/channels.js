@@ -54,6 +54,14 @@ export const getCurrentChannel = createSelector(
     }
 );
 
+export const getMyChannelMember = createSelector(
+    getMyChannelMemberships,
+    (state, channelId) => channelId,
+    (channelMemberships, channelId) => {
+        return channelMemberships[channelId] || {};
+    }
+);
+
 export const getMyCurrentChannelMembership = createSelector(
     getCurrentChannelId,
     getMyChannelMemberships,
@@ -101,6 +109,19 @@ export const getChannelsInCurrentTeam = createSelector(
             locale = currentUser.locale;
         }
         return sortAndInjectChannels(channels, currentTeamChannelSet, locale);
+    }
+);
+
+export const getChannelsNameMapInCurrentTeam = createSelector(
+    getAllChannels,
+    getChannelSetInCurrentTeam,
+    (channels, currentTeamChannelSet) => {
+        const channelMap = {};
+        currentTeamChannelSet.forEach((id) => {
+            const channel = channels[id];
+            channelMap[channel.name] = channel;
+        });
+        return channelMap;
     }
 );
 

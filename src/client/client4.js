@@ -114,6 +114,10 @@ export default class Client4 {
         return `${this.getPostsRoute()}/${postId}`;
     }
 
+    getReactionsRoute() {
+        return `${this.getBaseRoute()}/reactions`;
+    }
+
     getFilesRoute() {
         return `${this.getBaseRoute()}/files`;
     }
@@ -140,6 +144,10 @@ export default class Client4 {
 
     getOutgoingHookRoute(hookId) {
         return `${this.getBaseRoute()}/hooks/outgoing/${hookId}`;
+    }
+
+    getEmojiRoute(emojiId) {
+        return `${this.getBaseRoute()}/emoji/${emojiId}`;
     }
 
     getOptions(options) {
@@ -735,6 +743,41 @@ export default class Client4 {
     getFileInfosForPost = async (postId) => {
         return this.doFetch(
             `${this.getPostRoute(postId)}/files/info`,
+            {method: 'get'}
+        );
+    };
+
+    pinPost = async (postId) => {
+        return this.doFetch(
+            `${this.getPostRoute(postId)}/pin`,
+            {method: 'post'}
+        );
+    };
+
+    unpinPost = async (postId) => {
+        return this.doFetch(
+            `${this.getPostRoute(postId)}/unpin`,
+            {method: 'post'}
+        );
+    };
+
+    addReaction = async (userId, postId, emojiName) => {
+        return this.doFetch(
+            `${this.getReactionsRoute()}`,
+            {method: 'post', body: JSON.stringify({user_id: userId, post_id: postId, emoji_name: emojiName})}
+        );
+    };
+
+    removeReaction = async (userId, postId, emojiName) => {
+        return this.doFetch(
+            `${this.getUserRoute(userId)}/posts/${postId}/reactions/${emojiName}`,
+            {method: 'delete'}
+        );
+    };
+
+    getReactionsForPost = async (postId) => {
+        return this.doFetch(
+            `${this.getPostRoute(postId)}/reactions`,
             {method: 'get'}
         );
     };
