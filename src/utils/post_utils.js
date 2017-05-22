@@ -53,6 +53,10 @@ export function isSystemMessage(post) {
     return post.type && post.type.startsWith(Posts.SYSTEM_MESSAGE_PREFIX);
 }
 
+export function isFromWebhook(post) {
+    return post.props && post.props.from_webhook;
+}
+
 export function shouldIgnorePost(post) {
     return Posts.IGNORE_POST_TYPES.includes(post.type);
 }
