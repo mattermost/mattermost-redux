@@ -20,7 +20,7 @@ describe('Selectors.Posts', () => {
         c: {id: 'c', root_id: 'a', channel_id: '1', create_at: 3, user_id: 'b'},
         d: {id: 'd', root_id: 'b', channel_id: '1', create_at: 4, user_id: 'b'},
         e: {id: 'e', root_id: 'a', channel_id: '1', create_at: 5, user_id: 'b'},
-        f: {id: 'f', channel_id: 'f', create_at: 6, user_id: 'b'}
+        f: {id: 'f', channel_id: '2', create_at: 6, user_id: 'b'}
     };
 
     const reaction1 = {user_id: user1.id, emoji_name: '+1'};
@@ -37,7 +37,8 @@ describe('Selectors.Posts', () => {
             posts: {
                 posts,
                 postsInChannel: {
-                    1: ['e', 'd', 'c', 'b', 'a']
+                    1: ['e', 'd', 'c', 'b', 'a'],
+                    2: ['f']
                 },
                 reactions
             }
@@ -47,13 +48,13 @@ describe('Selectors.Posts', () => {
     it('should return single post with no children', () => {
         const getPostsForThread = makeGetPostsForThread();
 
-        assert.deepEqual(getPostsForThread(testState, {channelId: '1', rootId: 'f'}), [posts.f]);
+        assert.deepEqual(getPostsForThread(testState, {channelId: '2', rootId: 'f'}), [posts.f]);
     });
 
     it('should return post with children', () => {
         const getPostsForThread = makeGetPostsForThread();
 
-        assert.deepEqual(getPostsForThread(testState, {channelId: '1', rootId: 'a'}), [posts.a, posts.c, posts.e]);
+        assert.deepEqual(getPostsForThread(testState, {channelId: '1', rootId: 'a'}), [posts.e, posts.c, posts.a]);
     });
 
     it('should return memoized result for identical props', () => {
