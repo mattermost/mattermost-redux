@@ -193,7 +193,7 @@ export const getUnreads = createSelector(
 
 export const getUnreadsInCurrentTeam = createSelector(
     getCurrentChannelId,
-    getChannelsInCurrentTeam,
+    getMyChannels,
     getMyChannelMemberships,
     (currentChannelId, channels, myMembers) => {
         let messageCount = 0;
