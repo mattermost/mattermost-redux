@@ -38,7 +38,7 @@ import {General, WebsocketEvents, Preferences, Posts} from 'constants';
 
 import {getCurrentChannelStats} from 'selectors/entities/channels';
 import {getUserIdFromChannelName} from 'utils/channel_utils';
-import {isSystemMessage, getLastUpdateAt, shouldIgnorePost} from 'utils/post_utils';
+import {isFromWebhook, isSystemMessage, getLastUpdateAt, shouldIgnorePost} from 'utils/post_utils';
 import EventEmitter from 'utils/event_emitter';
 
 export function init(platform, siteUrl, token, optionalWebSocket) {
@@ -264,7 +264,7 @@ async function handleNewPostEvent(msg, dispatch, getState) {
     }
 
     let markAsRead = false;
-    if (userId === users.currentUserId && !isSystemMessage(post)) {
+    if (userId === users.currentUserId && !isSystemMessage(post) && !isFromWebhook(post)) {
         // In case the current user posted the message and that message wasn't triggered by a system message
         markAsRead = true;
     } else if (post.channel_id === currentChannelId) {

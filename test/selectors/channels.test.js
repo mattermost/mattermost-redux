@@ -56,6 +56,8 @@ describe('Selectors.Channels', () => {
     myMembers[channel3.id] = {channel_id: channel3.id, user_id: user.id, mention_count: 1};
     myMembers[channel4.id] = {channel_id: channel4.id, user_id: user.id};
 
+    const myPreferences = {};
+
     const testState = deepFreezeAndThrowOnMutation({
         entities: {
             users: {
@@ -71,6 +73,9 @@ describe('Selectors.Channels', () => {
                 channelsInTeam,
                 membersInChannel,
                 myMembers
+            },
+            preferences: {
+                myPreferences
             }
         }
     });
