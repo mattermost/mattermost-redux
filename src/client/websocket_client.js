@@ -90,7 +90,9 @@ class WebSocketClient {
             this.getState = getState;
 
             this.conn.onopen = () => {
-                if (token) {
+                if (token && platform !== 'android') {
+                    // we check for the platform as a workaround until we fix on the server that further authentications
+                    // are ignored
                     this.sendMessage('authentication_challenge', {token});
                 }
 
@@ -157,7 +159,7 @@ class WebSocketClient {
                 const msg = JSON.parse(evt.data);
                 if (msg.seq_reply) {
                     if (msg.error) {
-                        console.log(msg); //eslint-disable-line no-console
+                        console.warn(msg); //eslint-disable-line no-console
                     }
                 } else if (this.eventCallback) {
                     this.eventCallback(msg, this.dispatch, this.getState);
