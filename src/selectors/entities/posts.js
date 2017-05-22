@@ -120,8 +120,6 @@ export function makeGetPostsInChannel() {
                     }
                 }
 
-                const isLastPost = i === postIds.length - 1;
-
                 posts.push({
                     ...post,
                     isFirstReply,
@@ -129,8 +127,7 @@ export function makeGetPostsInChannel() {
                     commentedOnPost,
                     consecutivePostByUser,
                     replyCount,
-                    isCommentMention,
-                    isLastPost
+                    isCommentMention
                 });
             }
 
