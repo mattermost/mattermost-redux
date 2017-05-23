@@ -5,7 +5,12 @@ import {createSelector} from 'reselect';
 import {getMyPreferences} from 'selectors/entities/preferences';
 import {getCurrentTeamId, getCurrentTeamMembership} from 'selectors/entities/teams';
 import {getCurrentUser, getCurrentUserId, getUsers} from 'selectors/entities/users';
-import {buildDisplayableChannelList, completeDirectChannelInfo, sortChannelsByDisplayName} from 'utils/channel_utils';
+import {
+    buildDisplayableChannelList,
+    buildDisplayableChannelListWithUnreadSection,
+    completeDirectChannelInfo,
+    sortChannelsByDisplayName
+} from 'utils/channel_utils';
 import {General} from 'constants';
 
 export function getAllChannels(state) {
@@ -177,6 +182,23 @@ export const getChannelsByCategory = createSelector(
         });
 
         return buildDisplayableChannelList(usersState, allChannels, myPreferences);
+    }
+);
+
+export const getChannelsWithUnreadSection = createSelector(
+    getCurrentChannelId,
+    getMyChannels,
+    getMyChannelMemberships,
+    getMyPreferences,
+    (state) => state.entities.users,
+    (currentChannelId, channels, myMembers, myPreferences, usersState) => {
+        const allChannels = channels.map((c) => {
+            const channel = {...c};
+            channel.isCurrent = c.id === currentChannelId;
+            return channel;
+        });
+
+        return buildDisplayableChannelListWithUnreadSection(usersState, allChannels, myMembers, myPreferences);
     }
 );
 
