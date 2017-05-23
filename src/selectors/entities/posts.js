@@ -6,6 +6,7 @@ import {createSelector} from 'reselect';
 import {getCurrentUser} from 'selectors/entities/users';
 
 import {Posts} from 'constants';
+import {isSystemMessage} from 'utils/post_utils';
 
 export function getAllPosts(state) {
     return state.entities.posts.posts;
@@ -80,7 +81,8 @@ function formatPostInChannel(post, previousPost, index, allPosts, postIds, curre
     let consecutivePostByUser = false;
     if (previousPost.user_id === post.user_id &&
             post.create_at - previousPost.create_at <= Posts.POST_COLLAPSE_TIMEOUT &&
-            !postFromWebhook && !prevPostFromWebhook) {
+            !postFromWebhook && !prevPostFromWebhook &&
+            !isSystemMessage(post) && !isSystemMessage(previousPost)) {
         // The last post and this post were made by the same user within some time
         consecutivePostByUser = true;
     }
