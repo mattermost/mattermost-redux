@@ -70,6 +70,11 @@ function formatPostInChannel(post, previousPost, index, allPosts, postIds, curre
         }
     }
 
+    let previousPostIsComment = false;
+    if (previousPost.root_id) {
+        previousPostIsComment = true;
+    }
+
     const postFromWebhook = Boolean(post.props && post.props.from_webhook);
     const prevPostFromWebhook = Boolean(previousPost.props && previousPost.props.from_webhook);
     let consecutivePostByUser = false;
@@ -116,6 +121,7 @@ function formatPostInChannel(post, previousPost, index, allPosts, postIds, curre
         ...post,
         isFirstReply,
         isLastReply,
+        previousPostIsComment,
         commentedOnPost,
         consecutivePostByUser,
         replyCount,
