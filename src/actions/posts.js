@@ -485,7 +485,7 @@ async function getProfilesAndStatusesForPosts(list, dispatch, getState) {
             profilesToLoad.push(userId);
         }
 
-        if (!statuses[userId] && !statusesToLoad.includes(userId) && userId !== currentUserId) {
+        if (!statuses[userId] && !statusesToLoad.includes(userId)) {
             statusesToLoad.push(userId);
         }
     });
