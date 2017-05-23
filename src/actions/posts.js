@@ -323,7 +323,7 @@ export function getPostThread(postId) {
                 {type: PostTypes.GET_POST_THREAD_FAILURE, error},
                 getLogErrorAction(error)
             ]), getState);
-            return;
+            return null;
         }
 
         const post = posts.posts[postId];
@@ -338,6 +338,8 @@ export function getPostThread(postId) {
                 type: PostTypes.GET_POST_THREAD_SUCCESS
             }
         ]), getState);
+
+        return posts;
     };
 }
 
