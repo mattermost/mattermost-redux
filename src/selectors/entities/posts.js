@@ -19,8 +19,14 @@ export function getReactionsForPosts(state) {
     return state.entities.posts.reactions;
 }
 
-export function getReactionsForPost(state, postId) {
-    return Object.values(state.entities.posts.reactions[postId] || {});
+export function makeGetReactionsForPost() {
+    return createSelector(
+        getReactionsForPosts,
+        (state, postId) => postId,
+        (reactions, postId) => {
+            return Object.values(reactions[postId] || {});
+        }
+    );
 }
 
 export function getOpenGraphMetadata(state) {

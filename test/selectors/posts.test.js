@@ -3,7 +3,7 @@
 
 import assert from 'assert';
 
-import {makeGetPostsForThread, getReactionsForPost, makeGetPostsInChannel, makeGetPostsAroundPost} from 'selectors/entities/posts';
+import {makeGetPostsForThread, makeGetReactionsForPost, makeGetPostsInChannel, makeGetPostsAroundPost} from 'selectors/entities/posts';
 import {makeGetProfilesForReactions} from 'selectors/entities/users';
 import deepFreezeAndThrowOnMutation from 'utils/deep_freeze';
 import TestHelper from 'test/test_helper';
@@ -90,6 +90,7 @@ describe('Selectors.Posts', () => {
     });
 
     it('should return reactions for post', () => {
+        const getReactionsForPost = makeGetReactionsForPost();
         assert.deepEqual(getReactionsForPost(testState, posts.a.id), [reaction1]);
     });
 
