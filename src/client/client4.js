@@ -698,6 +698,13 @@ export default class Client4 {
         );
     };
 
+    patchPost = async (post) => {
+        return this.doFetch(
+            `${this.getPostRoute(post.id)}/patch`,
+            {method: 'put', body: JSON.stringify(post)}
+        );
+    };
+
     deletePost = async (postId) => {
         return this.doFetch(
             `${this.getPostRoute(postId)}`,

@@ -117,7 +117,7 @@ export function deletePost(post) {
 
 export function editPost(post) {
     return bindClientFunc(
-        Client4.updatePost,
+        Client4.patchPost,
         PostTypes.EDIT_POST_REQUEST,
         [PostTypes.RECEIVED_POST, PostTypes.EDIT_POST_SUCCESS],
         PostTypes.EDIT_POST_FAILURE,
