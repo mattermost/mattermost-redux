@@ -24,23 +24,33 @@ export function buildDisplayableChannelList(usersState, allChannels, myPreferenc
     const {currentUserId, profiles} = usersState;
     const locale = profiles && profiles[currentUserId] ? profiles[currentUserId].locale : 'en';
 
-    const channels = allChannels.
-    concat(missingDirectChannels).
-    map(completeDirectChannelInfo.bind(null, usersState, myPreferences)).
-    filter(isNotDeletedChannel).
-    sort(sortChannelsByDisplayName.bind(null, locale));
-
-    const favoriteChannels = channels.filter(isFavoriteChannel.bind(null, myPreferences)).sort(sortFavorites.bind(null, locale));
-    const notFavoriteChannels = channels.filter(not(isFavoriteChannel.bind(null, myPreferences)));
-    const directAndGroupChannels = notFavoriteChannels.filter(orX(andX(
-        isGroupChannel,
-        isGroupChannelVisible.bind(null, myPreferences)
-    ), andX(
-        isDirectChannel,
-        isDirectChannelVisible.bind(null, currentUserId, myPreferences)
-    )));
+    const channels = buildChannels(usersState, allChannels, missingDirectChannels, myPreferences, locale);
+    const favoriteChannels = buildFavoriteChannels(channels, myPreferences, locale);
+    const notFavoriteChannels = buildNotFavoriteChannels(channels, myPreferences);
+    const directAndGroupChannels = buildDirectAndGroupChannels(notFavoriteChannels, myPreferences, currentUserId);
 
     return {
+        favoriteChannels,
+        publicChannels: notFavoriteChannels.filter(isOpenChannel),
+        privateChannels: notFavoriteChannels.filter(isPrivateChannel),
+        directAndGroupChannels
+    };
+}
+
+export function buildDisplayableChannelListWithUnreadSection(usersState, myChannels, myMembers, myPreferences) {
+    const {currentUserId, profiles} = usersState;
+    const locale = profiles && profiles[currentUserId] ? profiles[currentUserId].locale : 'en';
+
+    const missingDirectChannels = createMissingDirectChannels(currentUserId, myChannels, myPreferences);
+    const channels = buildChannels(usersState, myChannels, missingDirectChannels, myPreferences, locale);
+    const unreadChannels = [...buildChannelsWithMentions(channels, myMembers, locale), ...buildUnreadChannels(channels, myMembers, locale)];
+    const notUnreadChannels = channels.filter(not(isUnreadChannel.bind(null, myMembers)));
+    const favoriteChannels = buildFavoriteChannels(notUnreadChannels, myPreferences, locale);
+    const notFavoriteChannels = buildNotFavoriteChannels(notUnreadChannels, myPreferences);
+    const directAndGroupChannels = buildDirectAndGroupChannels(notFavoriteChannels, myPreferences, currentUserId);
+
+    return {
+        unreadChannels,
         favoriteChannels,
         publicChannels: notFavoriteChannels.filter(isOpenChannel),
         privateChannels: notFavoriteChannels.filter(isPrivateChannel),
@@ -270,6 +280,36 @@ function isFavoriteChannel(myPreferences, channel) {
     return channel.isFavorite;
 }
 
+function channelHasMentions(members, channel) {
+    const member = members[channel.id];
+    if (member) {
+        return member.mention_count > 0;
+    }
+    return false;
+}
+
+function channelHasUnreadMessages(members, channel) {
+    const member = members[channel.id];
+    if (member) {
+        const msgCount = channel.total_msg_count - member.msg_count;
+        const onlyMentions = member.notify_props && member.notify_props.mark_unread === General.MENTION;
+        return (msgCount && !onlyMentions && member.mention_count === 0);
+    }
+
+    return false;
+}
+
+function isUnreadChannel(members, channel) {
+    const member = members[channel.id];
+    if (member) {
+        const msgCount = channel.total_msg_count - member.msg_count;
+        const onlyMentions = member.notify_props && member.notify_props.mark_unread === General.MENTION;
+        return (member.mention_count > 0 || (msgCount && !onlyMentions));
+    }
+
+    return false;
+}
+
 function isNotDeletedChannel(channel) {
     return channel.delete_at === 0;
 }
@@ -312,4 +352,40 @@ function andX(...fns) {
 
 function orX(...fns) {
     return (...args) => fns.some((f) => f(...args));
+}
+
+function buildChannels(usersState, channels, missingDirectChannels, myPreferences, locale) {
+    return channels.
+    concat(missingDirectChannels).
+    map(completeDirectChannelInfo.bind(null, usersState, myPreferences)).
+    filter(isNotDeletedChannel).
+    sort(sortChannelsByDisplayName.bind(null, locale));
+}
+
+function buildFavoriteChannels(channels, myPreferences, locale) {
+    return channels.filter(isFavoriteChannel.bind(null, myPreferences)).sort(sortFavorites.bind(null, locale));
+}
+
+function buildNotFavoriteChannels(channels, myPreferences) {
+    return channels.filter(not(isFavoriteChannel.bind(null, myPreferences)));
+}
+
+function buildDirectAndGroupChannels(channels, myPreferences, currentUserId) {
+    return channels.filter(orX(andX(
+        isGroupChannel,
+        isGroupChannelVisible.bind(null, myPreferences)
+    ), andX(
+        isDirectChannel,
+        isDirectChannelVisible.bind(null, currentUserId, myPreferences)
+    )));
+}
+
+function buildChannelsWithMentions(channels, members, locale) {
+    return channels.filter(channelHasMentions.bind(null, members)).
+    sort(sortFavorites.bind(null, locale));
+}
+
+function buildUnreadChannels(channels, members, locale) {
+    return channels.filter(channelHasUnreadMessages.bind(null, members)).
+        sort(sortFavorites.bind(null, locale));
 }

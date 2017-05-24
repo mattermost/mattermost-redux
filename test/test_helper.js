@@ -122,7 +122,8 @@ class TestHelper {
             name,
             team_id: teamId,
             display_name: `Unit Test ${name}`,
-            type: 'O'
+            type: 'O',
+            delete_at: 0
         };
     };
 

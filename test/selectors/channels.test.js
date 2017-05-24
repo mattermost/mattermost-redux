@@ -7,7 +7,7 @@ import deepFreezeAndThrowOnMutation from 'utils/deep_freeze';
 import TestHelper from 'test/test_helper';
 import {sortChannelsByDisplayName} from 'utils/channel_utils';
 import * as Selectors from 'selectors/entities/channels';
-import {General} from 'constants';
+import {General, Preferences} from 'constants';
 
 describe('Selectors.Channels', () => {
     const team1 = TestHelper.fakeTeamWithId();
@@ -56,7 +56,13 @@ describe('Selectors.Channels', () => {
     myMembers[channel3.id] = {channel_id: channel3.id, user_id: user.id, mention_count: 1};
     myMembers[channel4.id] = {channel_id: channel4.id, user_id: user.id};
 
-    const myPreferences = {};
+    const myPreferences = {
+        [`${Preferences.CATEGORY_FAVORITE_CHANNEL}--${channel1.id}`]: {
+            name: channel1.id,
+            category: Preferences.CATEGORY_FAVORITE_CHANNEL,
+            value: 'true'
+        }
+    };
 
     const testState = deepFreezeAndThrowOnMutation({
         entities: {
@@ -114,5 +120,37 @@ describe('Selectors.Channels', () => {
             [channel6.name]: channel6
         };
         assert.deepEqual(Selectors.getChannelsNameMapInCurrentTeam(testState), channelMap);
+    });
+
+    it('get channels by category', () => {
+        const categories = Selectors.getChannelsByCategory(testState);
+        const {
+            favoriteChannels,
+            publicChannels,
+            privateChannels,
+            directAndGroupChannels
+        } = categories;
+
+        assert.equal(favoriteChannels.length, 1);
+        assert.equal(publicChannels.length, 2);
+        assert.equal(privateChannels.length, 0);
+        assert.equal(directAndGroupChannels.length, 0);
+    });
+
+    it('get channels by category including unreads', () => {
+        const categories = Selectors.getChannelsWithUnreadSection(testState);
+        const {
+            unreadChannels,
+            favoriteChannels,
+            publicChannels,
+            privateChannels,
+            directAndGroupChannels
+        } = categories;
+
+        assert.equal(unreadChannels.length, 1);
+        assert.equal(favoriteChannels.length, 1);
+        assert.equal(publicChannels.length, 1);
+        assert.equal(privateChannels.length, 0);
+        assert.equal(directAndGroupChannels.length, 0);
     });
 });
