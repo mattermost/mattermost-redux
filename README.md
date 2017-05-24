@@ -12,7 +12,9 @@ Mattermost is an open source Slack-alternative used by thousands of companies ar
 
 ### Contribute Code
 
-We're not quite ready to accept external contributions yet - when things are ready, issues with a [Help Wanted] title will be posted in the [GitHub Issues section](https://github.com/mattermost/mattermost-mobile/issues).
+If you're contributing to help [migrate the webapp to Redux](https://docs.mattermost.com/developer/webapp-to-redux.html) go ahead and submit your PR. If you're just fixing a small bug or adding a small improvement then feel free to submit a PR for it. For everything else, please either work on an issue labeled `[Help Wanted]` or open an issue if there's something else that you'd like to work on.
+
+Feel free to drop by [the Redux channel](https://pre-release.mattermost.com/core/channels/redux) on our Mattermost instance.
 
 ### Running the Tests
 
