@@ -3,6 +3,7 @@
 
 import {combineReducers} from 'redux';
 import {ChannelTypes, UserTypes} from 'action_types';
+import {General} from 'constants';
 
 function channelListToSet(state, action) {
     const nextState = {...state};
@@ -90,6 +91,13 @@ function channels(state = {}, action) {
             }
         };
     }
+    case ChannelTypes.LEAVE_CHANNEL: {
+        if (action.data.type === General.PRIVATE_CHANNEL) {
+            Reflect.deleteProperty(nextState, action.data.id);
+            return nextState;
+        }
+        return state;
+    }
     case UserTypes.LOGOUT_SUCCESS:
         return {};
 
@@ -113,6 +121,12 @@ function channelsInTeam(state = {}, action) {
     }
     case ChannelTypes.RECEIVED_CHANNEL_DELETED:
         return removeChannelFromSet(state, action);
+    case ChannelTypes.LEAVE_CHANNEL: {
+        if (action.data.type === General.PRIVATE_CHANNEL) {
+            return removeChannelFromSet(state, action);
+        }
+        return state;
+    }
     case UserTypes.LOGOUT_SUCCESS:
         return {};
     default:
