@@ -20,6 +20,8 @@ describe('Selectors.Channels', () => {
     const channel5 = TestHelper.fakeChannelWithId(team1.id);
     channel5.type = General.PRIVATE_CHANNEL;
     const channel6 = TestHelper.fakeChannelWithId(team1.id);
+    const channel7 = TestHelper.fakeChannelWithId('');
+    channel7.type = General.GM_CHANNEL;
 
     const channels = {};
     channels[channel1.id] = channel1;
@@ -28,11 +30,12 @@ describe('Selectors.Channels', () => {
     channels[channel4.id] = channel4;
     channels[channel5.id] = channel5;
     channels[channel6.id] = channel6;
+    channels[channel7.id] = channel7;
 
     const channelsInTeam = {};
     channelsInTeam[team1.id] = [channel1.id, channel2.id, channel5.id, channel6.id];
     channelsInTeam[team2.id] = [channel3.id];
-    channelsInTeam[''] = [channel4.id];
+    channelsInTeam[''] = [channel4.id, channel7.id];
 
     const user = TestHelper.fakeUserWithId();
     const profiles = {};
@@ -55,6 +58,7 @@ describe('Selectors.Channels', () => {
     myMembers[channel2.id] = {channel_id: channel2.id, user_id: user.id, mention_count: 1};
     myMembers[channel3.id] = {channel_id: channel3.id, user_id: user.id, mention_count: 1};
     myMembers[channel4.id] = {channel_id: channel4.id, user_id: user.id};
+    myMembers[channel7.id] = {channel_id: channel7.id, user_id: user.id};
 
     const myPreferences = {
         [`${Preferences.CATEGORY_FAVORITE_CHANNEL}--${channel1.id}`]: {
@@ -152,5 +156,9 @@ describe('Selectors.Channels', () => {
         assert.equal(publicChannels.length, 1);
         assert.equal(privateChannels.length, 0);
         assert.equal(directAndGroupChannels.length, 0);
+    });
+
+    it('get group channels', () => {
+        assert.deepEqual(Selectors.getGroupChannels(testState), [channel7]);
     });
 });
