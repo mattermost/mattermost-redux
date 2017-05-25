@@ -554,6 +554,29 @@ describe('Actions.Channels', () => {
         test();
     });
 
+    it('leave private channel', async() => {
+        let channel = {
+            team_id: TestHelper.basicTeam.id,
+            name: 'redux-test-private',
+            display_name: 'Redux Test',
+            purpose: 'This is to test redux',
+            header: 'MM with Redux',
+            type: 'P'
+        };
+
+        channel = await Actions.createChannel(channel, TestHelper.basicUser.id)(store.dispatch, store.getState);
+        let channels = store.getState().entities.channels.channels;
+        assert.ok(channels[channel.id]);
+
+        await Actions.leaveChannel(
+            channel.id
+        )(store.dispatch, store.getState);
+        channels = store.getState().entities.channels.channels;
+        const myMembers = store.getState().entities.channels.myMembers;
+        assert.ok(!channels[channel.id]);
+        assert.ok(!myMembers[channel.id]);
+    });
+
     it('joinChannel', async () => {
         await Actions.joinChannel(
             TestHelper.basicUser.id,

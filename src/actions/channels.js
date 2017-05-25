@@ -438,7 +438,12 @@ export function leaveChannel(channelId) {
 
         dispatch({
             type: ChannelTypes.LEAVE_CHANNEL,
-            data: {id: channelId, user_id: currentUserId},
+            data: {
+                id: channelId,
+                user_id: currentUserId,
+                team_id: channel.team_id,
+                type: channel.type
+            },
             meta: {
                 offline: {
                     effect: () => Client4.removeFromChannel(currentUserId, channelId),
