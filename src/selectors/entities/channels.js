@@ -140,6 +140,7 @@ export const getChannelsNameMapInCurrentTeam = createSelector(
     }
 );
 
+// Returns both DMs and GMs
 export const getDirectChannels = createSelector(
     getAllChannels,
     getDirectChannelsSet,
@@ -149,6 +150,22 @@ export const getDirectChannels = createSelector(
             dmChannels.push(channels[c]);
         });
         return dmChannels;
+    }
+);
+
+// Returns only GMs
+export const getGroupChannels = createSelector(
+    getAllChannels,
+    getDirectChannelsSet,
+    (channels, channelSet) => {
+        const gmChannels = [];
+        channelSet.forEach((id) => {
+            const channel = channels[id];
+            if (channel.type === General.GM_CHANNEL) {
+                gmChannels.push(channel);
+            }
+        });
+        return gmChannels;
     }
 );
 
