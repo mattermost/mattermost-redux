@@ -72,7 +72,8 @@ describe('Selectors.Channels', () => {
         entities: {
             users: {
                 currentUserId: user.id,
-                profiles
+                profiles,
+                profilesInChannel: {[channel7.id]: [user.id]}
             },
             teams: {
                 currentTeamId: team1.id
@@ -97,7 +98,7 @@ describe('Selectors.Channels', () => {
 
     it('get my channels in current team and DMs', () => {
         const channelsInCurrentTeam = [channel1, channel2].sort(sortChannelsByDisplayName.bind(null, []));
-        assert.deepEqual(Selectors.getMyChannels(testState), [...channelsInCurrentTeam, channel4]);
+        assert.deepEqual(Selectors.getMyChannels(testState), [...channelsInCurrentTeam, channel4, channel7]);
     });
 
     it('should return members in current channel', () => {
