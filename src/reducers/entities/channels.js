@@ -92,7 +92,7 @@ function channels(state = {}, action) {
         };
     }
     case ChannelTypes.LEAVE_CHANNEL: {
-        if (action.data.type === General.PRIVATE_CHANNEL) {
+        if (action.data && action.data.type === General.PRIVATE_CHANNEL) {
             Reflect.deleteProperty(nextState, action.data.id);
             return nextState;
         }
@@ -122,7 +122,7 @@ function channelsInTeam(state = {}, action) {
     case ChannelTypes.RECEIVED_CHANNEL_DELETED:
         return removeChannelFromSet(state, action);
     case ChannelTypes.LEAVE_CHANNEL: {
-        if (action.data.type === General.PRIVATE_CHANNEL) {
+        if (action.data && action.data.type === General.PRIVATE_CHANNEL) {
             return removeChannelFromSet(state, action);
         }
         return state;
