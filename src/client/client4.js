@@ -818,20 +818,20 @@ export default class Client4 {
     }
 
     uploadFile = async (fileFormData, formBoundary) => {
-        let contentType = 'multipart/form-data';
+        const request = {
+            method: 'post',
+            body: fileFormData
+        };
+
         if (formBoundary) {
-            contentType += `; boundary=${formBoundary}`;
+            request.headers = {
+                'Content-Type': `multipart/form-data; boundary=${formBoundary}`
+            };
         }
 
         return this.doFetch(
             `${this.getFilesRoute()}`,
-            {
-                method: 'post',
-                headers: {
-                    'Content-Type': contentType
-                },
-                body: fileFormData
-            }
+            request
         );
     };
 
