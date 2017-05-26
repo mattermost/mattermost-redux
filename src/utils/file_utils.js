@@ -2,6 +2,7 @@
 // See License.txt for license information.
 
 import {Files} from 'constants';
+import {Client4} from 'client';
 import mimeDB from 'mime-db';
 
 export function getFormattedFileSize(file) {
@@ -73,4 +74,16 @@ export function parseClientIdsFromFormData(formdata) {
     clientIds.shift();
 
     return clientIds;
+}
+
+export function getFileUrl(fileId) {
+    return Client4.getFileRoute(fileId);
+}
+
+export function getFileThumbnailUrl(fileId) {
+    return `${Client4.getFileRoute(fileId)}/thumbnail`;
+}
+
+export function getFilePreviewUrl(fileId) {
+    return `${Client4.getFileRoute(fileId)}/preview`;
 }
