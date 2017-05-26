@@ -494,16 +494,16 @@ export async function getProfilesAndStatusesForPosts(list, dispatch, getState) {
     Object.values(posts).forEach((post) => {
         const userId = post.user_id;
 
+        if (!statuses[userId]) {
+            statusesToLoad.add(userId);
+        }
+
         if (userId === currentUserId) {
             return;
         }
 
         if (!profiles[userId]) {
             userIdsToLoad.add(userId);
-        }
-
-        if (!statuses[userId]) {
-            statusesToLoad.add(userId);
         }
     });
 
