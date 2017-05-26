@@ -37,6 +37,19 @@ export function getFilesForPost(postId) {
     };
 }
 
+export function getMissingFilesForPost(postId) {
+    return async (dispatch, getState) => {
+        const {fileIdsByPostId} = getState().entities.files;
+
+        let posts = [];
+        if (!fileIdsByPostId[postId]) {
+            posts = await getFilesForPost(postId)(dispatch, getState);
+        }
+
+        return posts;
+    };
+}
+
 export function uploadFile(channelId, rootId, clientIds, fileFormData, formBoundary) {
     return async (dispatch, getState) => {
         dispatch({type: FileTypes.UPLOAD_FILES_REQUEST}, getState);
