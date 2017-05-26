@@ -69,7 +69,7 @@ export function uploadFile(channelId, rootId, clientIds, fileFormData, formBound
             };
 
             dispatch(batchActions([failure, getLogErrorAction(error)]), getState);
-            return;
+            return null;
         }
 
         const data = files.file_infos.map((file, index) => {
@@ -90,5 +90,7 @@ export function uploadFile(channelId, rootId, clientIds, fileFormData, formBound
                 type: FileTypes.UPLOAD_FILES_SUCCESS
             }
         ]), getState);
+
+        return files;
     };
 }
