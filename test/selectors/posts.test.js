@@ -3,7 +3,7 @@
 
 import assert from 'assert';
 
-import {makeGetPostsForThread, getReactionsForPost, makeGetPostsInChannel} from 'selectors/entities/posts';
+import {makeGetPostsForThread, makeGetReactionsForPost, makeGetPostsInChannel, makeGetPostsAroundPost} from 'selectors/entities/posts';
 import {makeGetProfilesForReactions} from 'selectors/entities/users';
 import deepFreezeAndThrowOnMutation from 'utils/deep_freeze';
 import TestHelper from 'test/test_helper';
@@ -90,6 +90,7 @@ describe('Selectors.Posts', () => {
     });
 
     it('should return reactions for post', () => {
+        const getReactionsForPost = makeGetReactionsForPost();
         assert.deepEqual(getReactionsForPost(testState, posts.a.id), [reaction1]);
     });
 
@@ -103,6 +104,7 @@ describe('Selectors.Posts', () => {
             ...posts.a,
             isFirstReply: false,
             isLastReply: false,
+            previousPostIsComment: false,
             commentedOnPost: undefined,
             consecutivePostByUser: false,
             replyCount: 2,
@@ -113,6 +115,7 @@ describe('Selectors.Posts', () => {
             ...posts.b,
             isFirstReply: false,
             isLastReply: false,
+            previousPostIsComment: false,
             commentedOnPost: undefined,
             consecutivePostByUser: true,
             replyCount: 1,
@@ -123,6 +126,7 @@ describe('Selectors.Posts', () => {
             ...posts.c,
             isFirstReply: true,
             isLastReply: true,
+            previousPostIsComment: false,
             commentedOnPost: posts.a,
             consecutivePostByUser: false,
             replyCount: 2,
@@ -133,6 +137,7 @@ describe('Selectors.Posts', () => {
             ...posts.d,
             isFirstReply: true,
             isLastReply: true,
+            previousPostIsComment: true,
             commentedOnPost: posts.b,
             consecutivePostByUser: true,
             replyCount: 1,
@@ -143,6 +148,7 @@ describe('Selectors.Posts', () => {
             ...posts.e,
             isFirstReply: true,
             isLastReply: true,
+            previousPostIsComment: true,
             commentedOnPost: posts.a,
             consecutivePostByUser: true,
             replyCount: 2,
@@ -151,5 +157,66 @@ describe('Selectors.Posts', () => {
 
         const getPostsInChannel = makeGetPostsInChannel();
         assert.deepEqual(getPostsInChannel(testState, '1'), [post5, post4, post3, post2, post1]);
+    });
+
+    it('get posts around post in channel', () => {
+        const post1 = {
+            ...posts.a,
+            isFirstReply: false,
+            isLastReply: false,
+            previousPostIsComment: false,
+            commentedOnPost: undefined,
+            consecutivePostByUser: false,
+            replyCount: 2,
+            isCommentMention: false
+        };
+
+        const post2 = {
+            ...posts.b,
+            isFirstReply: false,
+            isLastReply: false,
+            previousPostIsComment: false,
+            commentedOnPost: undefined,
+            consecutivePostByUser: true,
+            replyCount: 1,
+            isCommentMention: false
+        };
+
+        const post3 = {
+            ...posts.c,
+            isFirstReply: true,
+            isLastReply: true,
+            previousPostIsComment: false,
+            commentedOnPost: posts.a,
+            consecutivePostByUser: false,
+            replyCount: 2,
+            isCommentMention: false,
+            highlight: true
+        };
+
+        const post4 = {
+            ...posts.d,
+            isFirstReply: true,
+            isLastReply: true,
+            previousPostIsComment: true,
+            commentedOnPost: posts.b,
+            consecutivePostByUser: true,
+            replyCount: 1,
+            isCommentMention: false
+        };
+
+        const post5 = {
+            ...posts.e,
+            isFirstReply: true,
+            isLastReply: true,
+            previousPostIsComment: true,
+            commentedOnPost: posts.a,
+            consecutivePostByUser: true,
+            replyCount: 2,
+            isCommentMention: false
+        };
+
+        const getPostsAroundPost = makeGetPostsAroundPost();
+        assert.deepEqual(getPostsAroundPost(testState, post3.id, '1'), [post5, post4, post3, post2, post1]);
     });
 });

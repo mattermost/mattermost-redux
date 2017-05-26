@@ -15,7 +15,7 @@ import serviceReducer from 'reducers';
 import initialState from './initial_state';
 import {offlineConfig} from './helpers';
 
-export default function configureOfflineServiceStore(preloadedState, appReducer, userOfflineConfig, enableBuffer = true) {
+export default function configureOfflineServiceStore(preloadedState, appReducer, userOfflineConfig, getAppReducer, enableBuffer = true) {
     const baseReducer = combineReducers(Object.assign({}, serviceReducer, appReducer));
     const baseState = Object.assign({}, initialState, preloadedState);
 

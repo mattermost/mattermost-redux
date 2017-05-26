@@ -37,6 +37,19 @@ export function getFilesForPost(postId) {
     };
 }
 
+export function getMissingFilesForPost(postId) {
+    return async (dispatch, getState) => {
+        const {fileIdsByPostId} = getState().entities.files;
+
+        let posts = [];
+        if (!fileIdsByPostId[postId]) {
+            posts = await getFilesForPost(postId)(dispatch, getState);
+        }
+
+        return posts;
+    };
+}
+
 export function uploadFile(channelId, rootId, clientIds, fileFormData, formBoundary) {
     return async (dispatch, getState) => {
         dispatch({type: FileTypes.UPLOAD_FILES_REQUEST}, getState);
@@ -56,7 +69,7 @@ export function uploadFile(channelId, rootId, clientIds, fileFormData, formBound
             };
 
             dispatch(batchActions([failure, getLogErrorAction(error)]), getState);
-            return;
+            return null;
         }
 
         const data = files.file_infos.map((file, index) => {
@@ -77,5 +90,7 @@ export function uploadFile(channelId, rootId, clientIds, fileFormData, formBound
                 type: FileTypes.UPLOAD_FILES_SUCCESS
             }
         ]), getState);
+
+        return files;
     };
 }

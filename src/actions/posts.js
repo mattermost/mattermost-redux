@@ -117,7 +117,7 @@ export function deletePost(post) {
 
 export function editPost(post) {
     return bindClientFunc(
-        Client4.updatePost,
+        Client4.patchPost,
         PostTypes.EDIT_POST_REQUEST,
         [PostTypes.RECEIVED_POST, PostTypes.EDIT_POST_SUCCESS],
         PostTypes.EDIT_POST_FAILURE,
@@ -323,7 +323,7 @@ export function getPostThread(postId) {
                 {type: PostTypes.GET_POST_THREAD_FAILURE, error},
                 getLogErrorAction(error)
             ]), getState);
-            return;
+            return null;
         }
 
         const post = posts.posts[postId];
@@ -338,6 +338,8 @@ export function getPostThread(postId) {
                 type: PostTypes.GET_POST_THREAD_SUCCESS
             }
         ]), getState);
+
+        return posts;
     };
 }
 
@@ -483,7 +485,7 @@ async function getProfilesAndStatusesForPosts(list, dispatch, getState) {
             profilesToLoad.push(userId);
         }
 
-        if (!statuses[userId] && !statusesToLoad.includes(userId) && userId !== currentUserId) {
+        if (!statuses[userId] && !statusesToLoad.includes(userId)) {
             statusesToLoad.push(userId);
         }
     });

@@ -90,4 +90,46 @@ describe('Actions.Files', () => {
         assert.ok(fileIdsByPostId[postForFile.id]);
         assert.equal(fileIdsByPostId[postForFile.id][0], fileId);
     });
+
+    it('getMissingFilesForPost', async () => {
+        const {basicClient4, basicChannel} = TestHelper;
+        const testFileName = 'test.png';
+        const testImageData = fs.createReadStream(`test/assets/images/${testFileName}`);
+        const clientId = TestHelper.generateId();
+
+        const imageFormData = new FormData();
+        imageFormData.append('files', testImageData);
+        imageFormData.append('channel_id', basicChannel.id);
+        imageFormData.append('client_ids', clientId);
+        const formBoundary = imageFormData.getBoundary();
+
+        const fileUploadResp = await basicClient4.
+            uploadFile(imageFormData, formBoundary);
+        const fileId = fileUploadResp.file_infos[0].id;
+
+        const fakePostForFile = TestHelper.fakePost(basicChannel.id);
+        fakePostForFile.file_ids = [fileId];
+        const postForFile = await basicClient4.createPost(fakePostForFile);
+
+        await Actions.getMissingFilesForPost(postForFile.id)(store.dispatch, store.getState);
+
+        const filesRequest = store.getState().requests.files.getFilesForPost;
+        const {files: allFiles, fileIdsByPostId} = store.getState().entities.files;
+
+        if (filesRequest.status === RequestStatus.FAILURE) {
+            throw new Error(JSON.stringify(filesRequest.error));
+        }
+
+        assert.ok(allFiles);
+        assert.ok(allFiles[fileId]);
+        assert.equal(allFiles[fileId].id, fileId);
+        assert.equal(allFiles[fileId].name, testFileName);
+
+        assert.ok(fileIdsByPostId);
+        assert.ok(fileIdsByPostId[postForFile.id]);
+        assert.equal(fileIdsByPostId[postForFile.id][0], fileId);
+
+        const files = await Actions.getMissingFilesForPost(postForFile.id)(store.dispatch, store.getState);
+        assert.ok(files.length === 0);
+    });
 });
