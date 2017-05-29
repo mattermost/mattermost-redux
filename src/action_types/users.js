@@ -52,6 +52,10 @@ export default keyMirror({
     PROFILES_STATUSES_SUCCESS: null,
     PROFILES_STATUSES_FAILURE: null,
 
+    PROFILE_STATUS_REQUEST: null,
+    PROFILE_STATUS_SUCCESS: null,
+    PROFILE_STATUS_FAILURE: null,
+
     SESSIONS_REQUEST: null,
     SESSIONS_SUCCESS: null,
     SESSIONS_FAILURE: null,
@@ -104,6 +108,7 @@ export default keyMirror({
     RECEIVED_SESSIONS: null,
     RECEIVED_REVOKED_SESSION: null,
     RECEIVED_AUDITS: null,
+    RECEIVED_STATUS: null,
     RECEIVED_STATUSES: null,
     RECEIVED_AUTOCOMPLETE_IN_CHANNEL: null,
     RESET_LOGOUT_STATE: null

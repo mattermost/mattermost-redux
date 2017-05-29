@@ -475,6 +475,16 @@ export function getStatusesByIds(userIds) {
     );
 }
 
+export function getStatus(userId) {
+    return bindClientFunc(
+        Client4.getStatus,
+        UserTypes.PROFILE_STATUS_REQUEST,
+        [UserTypes.RECEIVED_STATUS, UserTypes.PROFILE_STATUS_SUCCESS],
+        UserTypes.PROFILE_STATUS_FAILURE,
+        userId
+    );
+}
+
 export function getSessions(userId) {
     return bindClientFunc(
         Client4.getSessions,
@@ -828,6 +838,7 @@ export default {
     getUser,
     getMe,
     getUserByUsername,
+    getStatus,
     getStatusesByIds,
     getSessions,
     loadProfilesForDirect,

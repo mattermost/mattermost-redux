@@ -270,6 +270,12 @@ function profilesNotInChannel(state = {}, action) {
 
 function statuses(state = {}, action) {
     switch (action.type) {
+    case UserTypes.RECEIVED_STATUS: {
+        const nextState = Object.assign({}, state);
+        nextState[action.data.user_id] = action.data.status;
+
+        return nextState;
+    }
     case UserTypes.RECEIVED_STATUSES: {
         const nextState = Object.assign({}, state);
 
