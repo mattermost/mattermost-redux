@@ -49,6 +49,15 @@ export function getMyTeams() {
     );
 }
 
+export function getMyTeamUnreads() {
+    return bindClientFunc(
+        Client4.getMyTeamUnreads,
+        TeamTypes.MY_TEAM_UNREADS_REQUEST,
+        [TeamTypes.RECEIVED_MY_TEAM_UNREADS, TeamTypes.MY_TEAM_UNREADS_SUCCESS],
+        TeamTypes.MY_TEAM_UNREADS_FAILURE
+    );
+}
+
 export function getTeams(page = 0, perPage = General.TEAMS_CHUNK_SIZE) {
     return bindClientFunc(
         Client4.getTeams,

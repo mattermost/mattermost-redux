@@ -5,7 +5,7 @@ import {batchActions} from 'redux-batched-actions';
 import {Client4} from 'client';
 import {General} from 'constants';
 import {UserTypes, TeamTypes} from 'action_types';
-import {getMyTeams, getMyTeamMembers} from './teams';
+import {getMyTeams, getMyTeamMembers, getMyTeamUnreads} from './teams';
 
 import {
     getUserIdFromChannelName,
@@ -92,6 +92,13 @@ export function login(loginId, password, mfaToken = '') {
         let teamMembers;
         try {
             teamMembers = await Client4.getMyTeamMembers();
+            const teamUnreads = await Client4.getMyTeamUnreads();
+            for (const u of teamUnreads) {
+                const index = teamMembers.findIndex((m) => m.team_id === u.team_id);
+                const member = teamMembers[index];
+                member.mention_count = u.mention_count;
+                member.msg_count = u.msg_count;
+            }
         } catch (error) {
             dispatch(batchActions([
                 {type: UserTypes.LOGIN_FAILURE, error},
@@ -151,11 +158,13 @@ export function loadMe() {
         const prefs = getMyPreferences()(dispatch, getState);
         const teams = getMyTeams()(dispatch, getState);
         const members = getMyTeamMembers()(dispatch, getState);
+        const teamUnreads = getMyTeamUnreads()(dispatch, getState);
 
         await me;
         await prefs;
         await teams;
         await members;
+        await teamUnreads;
     };
 }
 

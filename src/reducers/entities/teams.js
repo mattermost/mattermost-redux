@@ -60,6 +60,21 @@ function myMembers(state = {}, action) {
         return nextState;
     }
 
+    case TeamTypes.RECEIVED_MY_TEAM_UNREADS: {
+        const nextState = {...state};
+        const unreads = action.data;
+        for (const u of unreads) {
+            const m = {
+                ...state[u.team_id],
+                mention_count: u.mention_count,
+                msg_count: u.msg_count
+            };
+            nextState[u.team_id] = m;
+        }
+
+        return nextState;
+    }
+
     case TeamTypes.LEAVE_TEAM: {
         const nextState = {...state};
         const data = action.data;

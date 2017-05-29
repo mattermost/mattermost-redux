@@ -66,6 +66,16 @@ function getMyTeamMembers(state = initialRequestState(), action) {
     );
 }
 
+function getMyTeamUnreads(state = initialRequestState(), action) {
+    return handleRequest(
+        TeamTypes.MY_TEAM_UNREADS_REQUEST,
+        TeamTypes.MY_TEAM_UNREADS_SUCCESS,
+        TeamTypes.MY_TEAM_UNREADS_FAILURE,
+        state,
+        action
+    );
+}
+
 function getTeamMembers(state = initialRequestState(), action) {
     return handleRequest(
         TeamTypes.TEAM_MEMBERS_REQUEST,
@@ -133,6 +143,7 @@ export default combineReducers({
     createTeam,
     updateTeam,
     getMyTeamMembers,
+    getMyTeamUnreads,
     getTeamMembers,
     getTeamStats,
     addUserToTeam,
