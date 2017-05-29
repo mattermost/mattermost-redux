@@ -5,8 +5,8 @@ import assert from 'assert';
 import nock from 'nock';
 
 import * as Actions from 'actions/channels';
-import {addUserToTeam} from 'actions/teams';
-import {getProfilesByIds, login} from 'actions/users';
+import {addUserToTeam, getMyTeams, getMyTeamMembers, getMyTeamUnreads} from 'actions/teams';
+import {getMe, getProfilesByIds, login} from 'actions/users';
 import {Client, Client4} from 'client';
 import {General, RequestStatus} from 'constants';
 import TestHelper from 'test/test_helper';
@@ -277,6 +277,53 @@ describe('Actions.Channels', () => {
         if (updateRequest.status === RequestStatus.FAILURE) {
             throw new Error(JSON.stringify(updateRequest.error));
         }
+    });
+
+    it('markChannelAsUnread and markChannelAsRead', async () => {
+        await getMe()(store.dispatch, store.getState);
+        await getMyTeams()(store.dispatch, store.getState);
+        await getMyTeamMembers()(store.dispatch, store.getState);
+        await getMyTeamUnreads()(store.dispatch, store.getState);
+
+        const userChannel = await Client4.createChannel(
+            TestHelper.fakeChannel(TestHelper.basicTeam.id)
+        );
+        await Actions.fetchMyChannelsAndMembers(TestHelper.basicTeam.id)(store.dispatch, store.getState);
+
+        const {channels} = store.getState().entities.channels;
+        assert.ok(channels);
+
+        const channelId = userChannel.id;
+        await Actions.markChannelAsUnread(
+            TestHelper.basicTeam.id,
+            channelId,
+            JSON.stringify([TestHelper.basicUser.id])
+        )(store.dispatch, store.getState);
+
+        let state = store.getState();
+        let {channels: myChannels, myMembers: channelMembers} = state.entities.channels;
+        let {myMembers: teamMembers} = state.entities.teams;
+        let channel = myChannels[channelId];
+        let channelMember = channelMembers[channelId];
+        let teamMember = teamMembers[TestHelper.basicTeam.id];
+
+        assert.equal((channel.total_msg_count - channelMember.msg_count), 1);
+        assert.equal(channelMember.mention_count, 1);
+        assert.equal(teamMember.msg_count, 1);
+        assert.equal(teamMember.mention_count, 1);
+
+        await Actions.markChannelAsRead(channelId)(store.dispatch, store.getState);
+        state = store.getState();
+        myChannels = state.entities.channels.channels;
+        channelMembers = state.entities.channels.myMembers;
+        teamMembers = state.entities.teams.myMembers;
+        channel = myChannels[channelId];
+        channelMember = channelMembers[channelId];
+        teamMember = teamMembers[TestHelper.basicTeam.id];
+        assert.equal((channel.total_msg_count - channelMember.msg_count), 0);
+        assert.equal(channelMember.mention_count, 0);
+        assert.equal(teamMember.msg_count, 0);
+        assert.equal(teamMember.mention_count, 0);
     });
 
     it('getChannels', async () => {

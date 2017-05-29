@@ -2,7 +2,7 @@
 // See License.txt for license information.
 
 import {General, Preferences} from 'constants';
-import {ChannelTypes, PreferenceTypes, UserTypes} from 'action_types';
+import {ChannelTypes, PreferenceTypes, TeamTypes, UserTypes} from 'action_types';
 import {savePreferences} from 'actions/preferences';
 import {batchActions} from 'redux-batched-actions';
 
@@ -793,14 +793,27 @@ export function updateChannelPurpose(channelId, purpose) {
 export function markChannelAsRead(channelId, prevChannelId) {
     return async (dispatch, getState) => {
         const state = getState();
-
+        const {myMembers: teamMembers} = state.entities.teams;
         const {channels, myMembers} = state.entities.channels;
+        const channel = channels[channelId];
         const channelMember = myMembers[channelId];
         const actions = [];
 
         let totalMsgCount = 0;
-        if (channels[channelId] && channelMember) {
-            totalMsgCount = channels[channelId].total_msg_count;
+        let teamMember;
+        if (channel && channelMember) {
+            totalMsgCount = channel.total_msg_count;
+
+            if (channel.team_id) {
+                teamMember = {...teamMembers[channel.team_id]};
+                teamMember.mention_count = teamMember.mention_count - channelMember.mention_count;
+
+                let teamMsgCount = 0;
+                if (totalMsgCount) {
+                    teamMsgCount = totalMsgCount - channelMember.msg_count;
+                }
+                teamMember.msg_count = teamMember.msg_count - teamMsgCount;
+            }
 
             actions.push({
                 type: ChannelTypes.RECEIVED_LAST_VIEWED,
@@ -812,10 +825,23 @@ export function markChannelAsRead(channelId, prevChannelId) {
             });
         }
 
-        if (prevChannelId) {
+        if (prevChannelId && channelId !== prevChannelId) {
+            const prevChannel = channels[prevChannelId];
+            const prevChannelMember = myMembers[prevChannelId];
             let prevTotalMsgCount = 0;
-            if (channels[prevChannelId]) {
-                prevTotalMsgCount = channels[prevChannelId].total_msg_count;
+            if (prevChannel && prevChannelMember) {
+                prevTotalMsgCount = prevChannel.total_msg_count;
+
+                if (prevChannel.team_id) {
+                    teamMember.mention_count = teamMember.mention_count - prevChannelMember.mention_count;
+
+                    let teamMsgCount = 0;
+                    if (prevTotalMsgCount) {
+                        teamMsgCount = prevTotalMsgCount - prevChannelMember.msg_count;
+                    }
+                    teamMember.msg_count = teamMember.msg_count - teamMsgCount;
+                }
+
                 actions.push({
                     type: ChannelTypes.RECEIVED_LAST_VIEWED,
                     data: {
@@ -827,17 +853,34 @@ export function markChannelAsRead(channelId, prevChannelId) {
             }
         }
 
+        if (teamMember) {
+            actions.push({
+                type: TeamTypes.RECEIVED_MY_TEAM_UNREADS,
+                data: [teamMember]
+            });
+        }
+
         if (actions.length) {
             dispatch(batchActions([...actions]), getState);
         }
     };
 }
 
-export function markChannelAsUnread(channelId, mentionsArray) {
+export function markChannelAsUnread(teamId, channelId, mentionsArray) {
     return async (dispatch, getState) => {
         const state = getState();
         const {channels, myMembers} = state.entities.channels;
+        const {myMembers: teamMembers} = state.entities.teams;
         const {currentUserId} = state.entities.users;
+        const actions = [];
+
+        let wasMentioned = false;
+        if (mentionsArray) {
+            const mentions = JSON.parse(mentionsArray);
+            if (mentions.indexOf(currentUserId) !== -1) {
+                wasMentioned = true;
+            }
+        }
 
         // if we have the channel and the channel member in the store
         if (channels[channelId] && myMembers[channelId]) {
@@ -849,21 +892,34 @@ export function markChannelAsUnread(channelId, mentionsArray) {
                 member.msg_count++;
             }
 
-            let mentions = [];
-            if (mentionsArray) {
-                mentions = JSON.parse(mentionsArray);
-                if (mentions.indexOf(currentUserId) !== -1) {
-                    member.mention_count++;
-                }
+            if (wasMentioned) {
+                member.mention_count++;
             }
 
-            dispatch(batchActions([{
+            actions.push({
                 type: ChannelTypes.RECEIVED_MY_CHANNEL_MEMBER,
                 data: member
             }, {
                 type: ChannelTypes.RECEIVED_CHANNEL,
                 data: channel
-            }]), getState);
+            });
+        }
+
+        if (teamId) {
+            const teamMember = {...teamMembers[teamId]};
+            teamMember.msg_count++;
+            if (wasMentioned) {
+                teamMember.mention_count++;
+            }
+
+            actions.push({
+                type: TeamTypes.RECEIVED_MY_TEAM_UNREADS,
+                data: [teamMember]
+            });
+        }
+
+        if (actions.length) {
+            dispatch(batchActions(actions), getState);
         }
     };
 }

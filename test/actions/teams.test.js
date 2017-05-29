@@ -130,18 +130,27 @@ describe('Actions.Teams', () => {
         assert.strictEqual(updated.description, description);
     });
 
-    it('getMyTeamMembers', async () => {
+    it('getMyTeamMembers and getMyTeamUnreads', async () => {
         await Actions.getMyTeamMembers()(store.dispatch, store.getState);
+        await Actions.getMyTeamUnreads()(store.dispatch, store.getState);
 
-        const membersRequest = store.getState().requests.teams.getMyTeamMembers;
+        const {
+            getMyTeamMembers: membersRequest,
+            getMyTeamUnreads: unreadRequest
+        } = store.getState().requests.teams;
         const members = store.getState().entities.teams.myMembers;
 
         if (membersRequest.status === RequestStatus.FAILURE) {
             throw new Error(JSON.stringify(membersRequest.error));
         }
 
-        assert.ok(members);
-        assert.ok(members[TestHelper.basicTeam.id]);
+        if (unreadRequest.status === RequestStatus.FAILURE) {
+            throw new Error(JSON.stringify(unreadRequest.error));
+        }
+
+        const member = members[TestHelper.basicTeam.id];
+        assert.ok(member);
+        assert.ok(member.hasOwnProperty('mention_count'));
     });
 
     it('getTeamMembersForUser', async () => {

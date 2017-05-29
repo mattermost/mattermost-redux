@@ -26,6 +26,8 @@ import {
     makeGroupMessageVisibleIfNecessary
 } from './preferences';
 
+import {getMyTeams, getMyTeamUnreads} from './teams';
+
 import {
     ChannelTypes,
     GeneralTypes,
@@ -117,7 +119,9 @@ async function handleReconnect(dispatch, getState) {
     await getMyPreferences()(dispatch, getState);
 
     if (currentTeamId) {
+        await getMyTeams()(dispatch, getState);
         await fetchMyChannelsAndMembers(currentTeamId)(dispatch, getState);
+        getMyTeamUnreads()(dispatch, getState);
         loadProfilesForDirect()(dispatch, getState);
         if (currentChannelId) {
             loadPostsHelper(currentChannelId, dispatch, getState);
@@ -275,7 +279,7 @@ async function handleNewPostEvent(msg, dispatch, getState) {
     if (markAsRead) {
         markChannelAsRead(post.channel_id)(dispatch, getState);
     } else {
-        markChannelAsUnread(post.channel_id, msg.data.mentions)(dispatch, getState);
+        markChannelAsUnread(msg.data.team_id, post.channel_id, msg.data.mentions)(dispatch, getState);
     }
 }
 

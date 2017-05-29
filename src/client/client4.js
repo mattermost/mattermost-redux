@@ -466,6 +466,13 @@ export default class Client4 {
         );
     };
 
+    getMyTeamUnreads = async () => {
+        return this.doFetch(
+            `${this.getUserRoute('me')}/teams/unread`,
+            {method: 'get'}
+        );
+    };
+
     getTeamMembersForUser = async (userId) => {
         return this.doFetch(
             `${this.getUserRoute(userId)}/teams/members`,
@@ -1066,7 +1073,7 @@ export default class Client4 {
         const {data} = await this.doFetchWithResponse(url, options);
 
         return data;
-    }
+    };
 
     doFetchWithResponse = async (url, options) => {
         const response = await fetch(url, this.getOptions(options));

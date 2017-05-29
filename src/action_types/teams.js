@@ -32,6 +32,10 @@ export default keyMirror({
     GET_TEAM_MEMBERS_SUCCESS: null,
     GET_TEAM_MEMBERS_FAILURE: null,
 
+    MY_TEAM_UNREADS_REQUEST: null,
+    MY_TEAM_UNREADS_SUCCESS: null,
+    MY_TEAM_UNREADS_FAILURE: null,
+
     TEAM_MEMBERS_REQUEST: null,
     TEAM_MEMBERS_SUCCESS: null,
     TEAM_MEMBERS_FAILURE: null,
@@ -68,5 +72,6 @@ export default keyMirror({
     RECEIVED_MEMBER_IN_TEAM: null,
     REMOVE_MEMBER_FROM_TEAM: null,
     RECEIVED_TEAM_STATS: null,
+    RECEIVED_MY_TEAM_UNREADS: null,
     LEAVE_TEAM: null
 });
