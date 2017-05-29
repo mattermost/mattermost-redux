@@ -807,7 +807,12 @@ export function markChannelAsRead(channelId, prevChannelId) {
             if (channel.team_id) {
                 teamMember = {...teamMembers[channel.team_id]};
                 teamMember.mention_count = teamMember.mention_count - channelMember.mention_count;
-                teamMember.msg_count = teamMember.msg_count - (totalMsgCount ? (totalMsgCount - channelMember.msg_count) : totalMsgCount);
+
+                let teamMsgCount = 0;
+                if (totalMsgCount) {
+                    teamMsgCount =  totalMsgCount - channelMember.msg_count;
+                }
+                teamMember.msg_count = teamMember.msg_count - teamMsgCount;
             }
 
             actions.push({
@@ -829,7 +834,12 @@ export function markChannelAsRead(channelId, prevChannelId) {
 
                 if (prevChannel.team_id) {
                     teamMember.mention_count = teamMember.mention_count - prevChannelMember.mention_count;
-                    teamMember.msg_count = teamMember.msg_count - (prevTotalMsgCount ? (prevTotalMsgCount - prevChannelMember.msg_count) : prevTotalMsgCount);
+
+                    let teamMsgCount = 0;
+                    if (prevTotalMsgCount) {
+                        teamMsgCount =  prevTotalMsgCount - prevChannelMember.msg_count;
+                    }
+                    teamMember.msg_count = teamMember.msg_count - teamMsgCount;
                 }
 
                 actions.push({

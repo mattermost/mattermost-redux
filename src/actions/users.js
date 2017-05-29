@@ -158,13 +158,13 @@ export function loadMe() {
         const prefs = getMyPreferences()(dispatch, getState);
         const teams = getMyTeams()(dispatch, getState);
         const members = getMyTeamMembers()(dispatch, getState);
-        const teamUnreads = getMyTeamUnreads()(dispatch, getState);
 
         await me;
         await prefs;
         await teams;
         await members;
-        await teamUnreads;
+
+        getMyTeamUnreads()(dispatch, getState);
     };
 }
 
