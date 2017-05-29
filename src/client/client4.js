@@ -415,6 +415,13 @@ export default class Client4 {
         );
     };
 
+    getStatus = async (userId) => {
+        return this.doFetch(
+            `${this.getUserRoute(userId)}/status`,
+            {method: 'get'}
+        );
+    };
+
     // Team Routes
 
     createTeam = async (team) => {

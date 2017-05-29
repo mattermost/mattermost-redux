@@ -362,6 +362,23 @@ describe('Actions.Users', () => {
         assert.equal(Object.keys(statuses).length, 2);
     });
 
+    it('getStatus', async () => {
+        const user = await TestHelper.basicClient4.createUser(TestHelper.fakeUser());
+
+        await Actions.getStatus(
+            user.id
+        )(store.dispatch, store.getState);
+
+        const statusRequest = store.getState().requests.users.getStatus;
+        const statuses = store.getState().entities.users.statuses;
+
+        if (statusRequest.status === RequestStatus.FAILURE) {
+            throw new Error(JSON.stringify(statusRequest.error));
+        }
+
+        assert.ok(statuses[user.id]);
+    });
+
     it('getSessions', async () => {
         await Actions.getSessions(TestHelper.basicUser.id)(store.dispatch, store.getState);
 

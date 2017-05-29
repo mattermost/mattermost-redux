@@ -154,6 +154,16 @@ function getStatusesByIds(state = initialRequestState(), action) {
     );
 }
 
+function getStatus(state = initialRequestState(), action) {
+    return handleRequest(
+        UserTypes.PROFILES_STATUS_REQUEST,
+        UserTypes.PROFILES_STATUS_SUCCESS,
+        UserTypes.PROFILES_STATUS_FAILURE,
+        state,
+        action
+    );
+}
+
 function getSessions(state = initialRequestState(), action) {
     return handleRequest(
         UserTypes.SESSIONS_REQUEST,
@@ -248,6 +258,7 @@ export default combineReducers({
     getUser,
     getUserByUsername,
     getStatusesByIds,
+    getStatus,
     getSessions,
     revokeSession,
     getAudits,
