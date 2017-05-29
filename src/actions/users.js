@@ -478,9 +478,9 @@ export function getStatusesByIds(userIds) {
 export function getStatus(userId) {
     return bindClientFunc(
         Client4.getStatus,
-        UserTypes.PROFILES_STATUS_REQUEST,
-        [UserTypes.RECEIVED_STATUS, UserTypes.PROFILES_STATUS_SUCCESS],
-        UserTypes.PROFILES_STATUS_FAILURE,
+        UserTypes.PROFILE_STATUS_REQUEST,
+        [UserTypes.RECEIVED_STATUS, UserTypes.PROFILE_STATUS_SUCCESS],
+        UserTypes.PROFILE_STATUS_FAILURE,
         userId
     );
 }

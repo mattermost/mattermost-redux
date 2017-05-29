@@ -156,9 +156,9 @@ function getStatusesByIds(state = initialRequestState(), action) {
 
 function getStatus(state = initialRequestState(), action) {
     return handleRequest(
-        UserTypes.PROFILES_STATUS_REQUEST,
-        UserTypes.PROFILES_STATUS_SUCCESS,
-        UserTypes.PROFILES_STATUS_FAILURE,
+        UserTypes.PROFILE_STATUS_REQUEST,
+        UserTypes.PROFILE_STATUS_SUCCESS,
+        UserTypes.PROFILE_STATUS_FAILURE,
         state,
         action
     );
