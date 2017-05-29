@@ -810,7 +810,7 @@ export function markChannelAsRead(channelId, prevChannelId) {
 
                 let teamMsgCount = 0;
                 if (totalMsgCount) {
-                    teamMsgCount =  totalMsgCount - channelMember.msg_count;
+                    teamMsgCount = totalMsgCount - channelMember.msg_count;
                 }
                 teamMember.msg_count = teamMember.msg_count - teamMsgCount;
             }
@@ -837,7 +837,7 @@ export function markChannelAsRead(channelId, prevChannelId) {
 
                     let teamMsgCount = 0;
                     if (prevTotalMsgCount) {
-                        teamMsgCount =  prevTotalMsgCount - prevChannelMember.msg_count;
+                        teamMsgCount = prevTotalMsgCount - prevChannelMember.msg_count;
                     }
                     teamMember.msg_count = teamMember.msg_count - teamMsgCount;
                 }
