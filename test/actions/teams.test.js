@@ -146,6 +146,23 @@ describe('Actions.Teams', () => {
         assert.strictEqual(updated.description, description);
     });
 
+    it('Join Open Team', async () => {
+        const client = TestHelper.createClient4();
+        const user = await client.createUser(
+            TestHelper.fakeUser(),
+            null,
+            null,
+            TestHelper.basicTeam.invite_id
+        );
+        await client.login(user.email, 'password1');
+        const team = await client.createTeam({...TestHelper.fakeTeam(), allow_open_invite: true});
+
+        await Actions.joinTeam(team.invite_id, team.id)(store.dispatch, store.getState);
+        const {teams, myMembers} = store.getState().entities.teams;
+        assert.ok(teams[team.id]);
+        assert.ok(myMembers[team.id]);
+    });
+
     it('getMyTeamMembers and getMyTeamUnreads', async () => {
         await Actions.getMyTeamMembers()(store.dispatch, store.getState);
         await Actions.getMyTeamUnreads()(store.dispatch, store.getState);
@@ -251,8 +268,8 @@ describe('Actions.Teams', () => {
         assert.ok(stat);
 
         // we need to take into account the members of the tests above
-        assert.equal(stat.total_member_count, 4);
-        assert.equal(stat.active_member_count, 4);
+        assert.equal(stat.total_member_count, 5);
+        assert.equal(stat.active_member_count, 5);
     });
 
     it('addUserToTeam', async () => {

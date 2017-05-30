@@ -437,3 +437,27 @@ export function checkIfTeamExists(teamName) {
         return data.exists;
     };
 }
+
+export function joinTeam(inviteId, teamId) {
+    return async (dispatch, getState) => {
+        dispatch({type: TeamTypes.ADD_TEAM_MEMBER_REQUEST}, getState);
+
+        try {
+            await Client4.joinTeam(inviteId, teamId);
+        } catch (err) {
+            forceLogoutIfNecessary(err, dispatch);
+            dispatch(batchActions([
+                {type: TeamTypes.ADD_TEAM_MEMBER_FAILURE, error: err},
+                getLogErrorAction(err)
+            ]), getState);
+            return null;
+        }
+
+        await getTeam(teamId)(dispatch, getState);
+        await getMyTeamMembers()(dispatch, getState);
+        getMyTeamUnreads()(dispatch, getState);
+
+        dispatch({type: TeamTypes.ADD_TEAM_MEMBER_SUCCESS}, getState);
+        return true;
+    };
+}

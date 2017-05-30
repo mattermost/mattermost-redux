@@ -532,6 +532,15 @@ export default class Client4 {
         );
     };
 
+    joinTeam = async (inviteId, teamId) => {
+        const member = {team_id: teamId};
+        const query = buildQueryString({invite_id: inviteId});
+        return this.doFetch(
+            `${this.getTeamMembersRoute(teamId)}${query}`,
+            {method: 'post', body: JSON.stringify(member)}
+        );
+    };
+
     removeFromTeam = async (teamId, userId) => {
         return this.doFetch(
             `${this.getTeamMemberRoute(teamId, userId)}`,
