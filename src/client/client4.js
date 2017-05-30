@@ -459,6 +459,13 @@ export default class Client4 {
         );
     };
 
+    getTeam = async (teamId) => {
+        return this.doFetch(
+            this.getTeamRoute(teamId),
+            {method: 'get'}
+        );
+    };
+
     getMyTeams = async () => {
         return this.doFetch(
             `${this.getUserRoute('me')}/teams`,

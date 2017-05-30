@@ -26,7 +26,7 @@ import {
     makeGroupMessageVisibleIfNecessary
 } from './preferences';
 
-import {getMyTeams, getMyTeamUnreads} from './teams';
+import {getTeam, getTeams, getMyTeamMembers, getMyTeamUnreads} from './teams';
 
 import {
     ChannelTypes,
@@ -119,8 +119,9 @@ async function handleReconnect(dispatch, getState) {
     await getMyPreferences()(dispatch, getState);
 
     if (currentTeamId) {
-        await getMyTeams()(dispatch, getState);
+        await getTeams()(dispatch, getState);
         await fetchMyChannelsAndMembers(currentTeamId)(dispatch, getState);
+        await getMyTeamMembers()(dispatch, getState);
         getMyTeamUnreads()(dispatch, getState);
         loadProfilesForDirect()(dispatch, getState);
         if (currentChannelId) {
@@ -149,6 +150,13 @@ function handleEvent(msg, dispatch, getState) {
         break;
     case WebsocketEvents.LEAVE_TEAM:
         handleLeaveTeamEvent(msg, dispatch, getState);
+        break;
+    case WebsocketEvents.UPDATE_TEAM:
+        handleUpdateTeamEvent(msg, dispatch, getState);
+        break;
+
+    case WebsocketEvents.ADDED_TO_TEAM:
+        handleTeamAddedEvent(msg, dispatch, getState);
         break;
     case WebsocketEvents.USER_ADDED:
         handleUserAddedEvent(msg, dispatch, getState);
@@ -307,6 +315,16 @@ function handleLeaveTeamEvent(msg, dispatch, getState) {
             EventEmitter.emit('leave_team');
         }
     }
+}
+
+function handleUpdateTeamEvent(msg, dispatch, getState) {
+    dispatch({type: TeamTypes.UPDATED_TEAM, data: JSON.parse(msg.data.team)}, getState);
+}
+
+async function handleTeamAddedEvent(msg, dispatch, getState) {
+    await getTeam(msg.data.team_id)(dispatch, getState);
+    await getMyTeamMembers()(dispatch, getState);
+    await getMyTeamUnreads()(dispatch, getState);
 }
 
 function handleUserAddedEvent(msg, dispatch, getState) {

@@ -26,6 +26,7 @@ function teams(state = {}, action) {
 
     case TeamTypes.CREATED_TEAM:
     case TeamTypes.UPDATED_TEAM:
+    case TeamTypes.RECEIVED_TEAM:
         return {
             ...state,
             [action.data.id]: action.data

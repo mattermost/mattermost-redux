@@ -97,10 +97,11 @@ export function getTeamMember(state, teamId, userId) {
 
 export const getJoinableTeams = createSelector(
     getTeams,
-    (teams) => {
+    getTeamMemberships,
+    (teams, myMembers) => {
         const openTeams = {};
         Object.values(teams).forEach((t) => {
-            if (t.allow_open_invite) {
+            if (t.allow_open_invite && !myMembers[t.id]) {
                 openTeams[t.id] = t;
             }
         });
