@@ -485,6 +485,35 @@ export function getStatus(userId) {
     );
 }
 
+export function setStatus(status) {
+    return async (dispatch, getState) => {
+        dispatch({type: UserTypes.SET_STATUS_REQUEST}, getState);
+
+        try {
+            await Client4.updateStatus(status);
+        } catch (error) {
+            forceLogoutIfNecessary(error, dispatch);
+            dispatch(batchActions([
+                {type: UserTypes.SET_STATUS_FAILURE, error},
+                getLogErrorAction(error)
+            ]), getState);
+            return null;
+        }
+
+        dispatch(batchActions([
+            {
+                type: UserTypes.RECEIVED_STATUS,
+                data: status
+            },
+            {
+                type: UserTypes.SET_STATUS_SUCCESS
+            }
+        ]), getState);
+
+        return status;
+    };
+}
+
 export function getSessions(userId) {
     return bindClientFunc(
         Client4.getSessions,
