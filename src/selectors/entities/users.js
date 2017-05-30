@@ -82,7 +82,17 @@ export const getCurrentUserRoles = createSelector(
     getCurrentTeamMembership,
     getCurrentUser,
     (currentChannelMembership, currentTeamMembership, currentUser) => {
-        return `${currentTeamMembership.roles} ${currentChannelMembership.roles} ${currentUser.roles}`;
+        let roles = '';
+        if (currentTeamMembership) {
+            roles += `${currentTeamMembership.roles} `;
+        }
+
+        if (currentChannelMembership) {
+            roles += `${currentChannelMembership.roles} `;
+        }
+
+        roles += currentUser.roles;
+        return roles.trim();
     }
 );
 
