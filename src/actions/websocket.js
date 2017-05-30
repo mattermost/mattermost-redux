@@ -26,7 +26,7 @@ import {
     makeGroupMessageVisibleIfNecessary
 } from './preferences';
 
-import {getTeam, getMyTeams, getMyTeamMembers, getMyTeamUnreads} from './teams';
+import {getTeam, getTeams, getMyTeamMembers, getMyTeamUnreads} from './teams';
 
 import {
     ChannelTypes,
@@ -119,8 +119,9 @@ async function handleReconnect(dispatch, getState) {
     await getMyPreferences()(dispatch, getState);
 
     if (currentTeamId) {
-        await getMyTeams()(dispatch, getState);
+        await getTeams()(dispatch, getState);
         await fetchMyChannelsAndMembers(currentTeamId)(dispatch, getState);
+        await getMyTeamMembers()(dispatch, getState);
         getMyTeamUnreads()(dispatch, getState);
         loadProfilesForDirect()(dispatch, getState);
         if (currentChannelId) {
