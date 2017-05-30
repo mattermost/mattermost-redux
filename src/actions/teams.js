@@ -452,12 +452,12 @@ export function joinTeam(inviteId, teamId) {
             ]), getState);
             return null;
         }
-        console.log('joinTeam');
 
         await getTeam(teamId)(dispatch, getState);
         await getMyTeamMembers()(dispatch, getState);
         getMyTeamUnreads()(dispatch, getState);
 
         dispatch({type: TeamTypes.ADD_TEAM_MEMBER_SUCCESS}, getState);
+        return true;
     };
 }
