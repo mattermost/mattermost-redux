@@ -26,7 +26,7 @@ import {
     makeGroupMessageVisibleIfNecessary
 } from './preferences';
 
-import {getTeam, getTeams, getMyTeamMembers, getMyTeamUnreads} from './teams';
+import {getTeam, getTeams, getMyTeams, getMyTeamMembers, getMyTeamUnreads} from './teams';
 
 import {
     ChannelTypes,
@@ -119,7 +119,7 @@ async function handleReconnect(dispatch, getState) {
     await getMyPreferences()(dispatch, getState);
 
     if (currentTeamId) {
-        await getTeams()(dispatch, getState);
+        await getMyTeams()(dispatch, getState);
         await fetchMyChannelsAndMembers(currentTeamId)(dispatch, getState);
         await getMyTeamMembers()(dispatch, getState);
         getMyTeamUnreads()(dispatch, getState);
@@ -127,6 +127,7 @@ async function handleReconnect(dispatch, getState) {
         if (currentChannelId) {
             loadPostsHelper(currentChannelId, dispatch, getState);
         }
+        getTeams()(dispatch, getState);
     }
 
     dispatch({type: GeneralTypes.WEBSOCKET_SUCCESS}, getState);
