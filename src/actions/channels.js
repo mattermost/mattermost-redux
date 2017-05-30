@@ -833,6 +833,10 @@ export function markChannelAsRead(channelId, prevChannelId) {
                 prevTotalMsgCount = prevChannel.total_msg_count;
 
                 if (prevChannel.team_id) {
+                    // if the channel is a GM or DM we don't have the teamMember
+                    if (!teamMember) {
+                        teamMember = teamMembers[prevChannel.team_id];
+                    }
                     teamMember.mention_count = teamMember.mention_count - prevChannelMember.mention_count;
 
                     let teamMsgCount = 0;
