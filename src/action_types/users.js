@@ -56,6 +56,10 @@ export default keyMirror({
     PROFILE_STATUS_SUCCESS: null,
     PROFILE_STATUS_FAILURE: null,
 
+    SET_STATUS_REQUEST: null,
+    SET_STATUS_SUCCESS: null,
+    SET_STATUS_FAILURE: null,
+
     SESSIONS_REQUEST: null,
     SESSIONS_SUCCESS: null,
     SESSIONS_FAILURE: null,

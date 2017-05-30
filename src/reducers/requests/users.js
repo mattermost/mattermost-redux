@@ -164,6 +164,16 @@ function getStatus(state = initialRequestState(), action) {
     );
 }
 
+function setStatus(state = initialRequestState(), action) {
+    return handleRequest(
+        UserTypes.SET_STATUS_REQUEST,
+        UserTypes.SET_STATUS_SUCCESS,
+        UserTypes.SET_STATUS_FAILURE,
+        state,
+        action
+    );
+}
+
 function getSessions(state = initialRequestState(), action) {
     return handleRequest(
         UserTypes.SESSIONS_REQUEST,
@@ -259,6 +269,7 @@ export default combineReducers({
     getUserByUsername,
     getStatusesByIds,
     getStatus,
+    setStatus,
     getSessions,
     revokeSession,
     getAudits,

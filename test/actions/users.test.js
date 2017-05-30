@@ -379,6 +379,21 @@ describe('Actions.Users', () => {
         assert.ok(statuses[user.id]);
     });
 
+    it('setStatus', async () => {
+        await Actions.setStatus(
+            {user_id: TestHelper.basicUser.id, status: 'away'}
+        )(store.dispatch, store.getState);
+
+        const statusRequest = store.getState().requests.users.setStatus;
+        const statuses = store.getState().entities.users.statuses;
+
+        if (statusRequest.status === RequestStatus.FAILURE) {
+            throw new Error(JSON.stringify(statusRequest.error));
+        }
+
+        assert.ok(statuses[TestHelper.basicUser.id] === 'away');
+    });
+
     it('getSessions', async () => {
         await Actions.getSessions(TestHelper.basicUser.id)(store.dispatch, store.getState);
 
