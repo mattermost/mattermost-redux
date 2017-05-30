@@ -268,8 +268,8 @@ describe('Actions.Teams', () => {
         assert.ok(stat);
 
         // we need to take into account the members of the tests above
-        assert.equal(stat.total_member_count, 4);
-        assert.equal(stat.active_member_count, 4);
+        assert.equal(stat.total_member_count, 5);
+        assert.equal(stat.active_member_count, 5);
     });
 
     it('addUserToTeam', async () => {
