@@ -109,6 +109,30 @@ describe('Actions.Websocket', () => {
         });
     });
 
+    // If we move this test lower it will fail cause of a permissions issue
+    it('Websocket handle team updated', (done) => {
+        async function test() {
+            await TeamActions.getMyTeams()(store.dispatch, store.getState);
+            const {teams: myTeams} = store.getState().entities.teams;
+            assert.ok(Object.keys(myTeams));
+
+            const team = {...Object.values(myTeams)[0]};
+            team.allow_open_invite = true;
+            TestHelper.basicClient4.updateTeam(team);
+
+            setTimeout(() => {
+                const entities = store.getState().entities;
+                const {teams} = entities.teams;
+                const updated = teams[team.id];
+                assert.ok(updated);
+                assert.strictEqual(updated.allow_open_invite, true);
+                done();
+            }, 500);
+        }
+
+        test();
+    });
+
     it('WebSocket Leave Team', async () => {
         const client = TestHelper.createClient4();
         const user = await client.createUser(TestHelper.fakeUser());
@@ -260,6 +284,35 @@ describe('Actions.Websocket', () => {
             }, 500);
 
             await client.createDirectChannel([user.id, TestHelper.basicUser.id]);
+        }
+
+        test();
+    });
+
+    it('Websocket handle user added to team', (done) => {
+        async function test() {
+            const client = TestHelper.createClient4();
+            const user = await client.createUser(
+                TestHelper.fakeUser(),
+                null,
+                null,
+                TestHelper.basicTeam.invite_id
+            );
+            await client.login(user.email, 'password1');
+
+            const team = await client.createTeam(TestHelper.fakeTeam());
+            client.addToTeam(team.id, TestHelper.basicUser.id);
+
+            setTimeout(() => {
+                const entities = store.getState().entities;
+                const {teams, myMembers} = entities.teams;
+                assert.ok(teams[team.id]);
+                assert.ok(myMembers[team.id]);
+
+                const member = myMembers[team.id];
+                assert.ok(member.hasOwnProperty('mention_count'));
+                done();
+            }, 500);
         }
 
         test();

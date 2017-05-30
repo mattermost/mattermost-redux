@@ -88,6 +88,22 @@ describe('Actions.Teams', () => {
         assert.ok(found);
     });
 
+    it('getTeam', async () => {
+        const team = await Client4.createTeam(TestHelper.fakeTeam());
+        await Actions.getTeam(team.id)(store.dispatch, store.getState);
+
+        const state = store.getState();
+        const {getTeam: teamRequest} = state.requests.teams;
+        const {teams} = state.entities.teams;
+
+        if (teamRequest.status === RequestStatus.FAILURE) {
+            throw new Error(JSON.stringify(teamRequest.error));
+        }
+
+        assert.ok(teams);
+        assert.ok(teams[team.id]);
+    });
+
     it('createTeam', async () => {
         await Actions.createTeam(
             TestHelper.fakeTeam()
