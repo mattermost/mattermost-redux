@@ -39,12 +39,13 @@ export function getConfig() {
     );
 }
 
-export function updateConfig() {
+export function updateConfig(config) {
     return bindClientFunc(
         Client4.updateConfig,
         AdminTypes.UPDATE_CONFIG_REQUEST,
         [AdminTypes.RECEIVED_CONFIG, AdminTypes.UPDATE_CONFIG_SUCCESS],
-        AdminTypes.UPDATE_CONFIG_FAILURE
+        AdminTypes.UPDATE_CONFIG_FAILURE,
+        config
     );
 }
 
