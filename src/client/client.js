@@ -739,6 +739,28 @@ export default class Client {
         );
     };
 
+    // Integration Routes
+    addCommand = async (teamId, command) => {
+        return this.doFetch(
+            `${this.getCommandsRoute(teamId)}/create`,
+            {method: 'post', body: JSON.stringify(command)}
+        );
+    };
+
+    regenCommandToken = async (teamId, id) => {
+        return this.doFetch(
+            `${this.getCommandsRoute(teamId)}/regen_token`,
+            {method: 'post', body: JSON.stringify({id})}
+        );
+    };
+
+    deleteCommand = async (teamId, id) => {
+        return this.doFetch(
+            `${this.getCommandsRoute(teamId)}/delete`,
+            {method: 'post', body: JSON.stringify({id})}
+        );
+    };
+
     // File routes
     getFileUrl(fileId, timestamp) {
         let url = `${this.getFilesRoute()}/${fileId}/get`;

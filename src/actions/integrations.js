@@ -5,7 +5,7 @@ import {IntegrationTypes} from 'action_types';
 import {General} from 'constants';
 import {batchActions} from 'redux-batched-actions';
 
-import {Client4} from 'client';
+import {Client, Client4} from 'client';
 
 import {getLogErrorAction} from './errors';
 import {bindClientFunc, forceLogoutIfNecessary} from './helpers';
@@ -132,5 +132,38 @@ export function updateOutgoingHook(hook) {
         [IntegrationTypes.RECEIVED_OUTGOING_HOOK, IntegrationTypes.UPDATE_OUTGOING_HOOK_SUCCESS],
         IntegrationTypes.UPDATE_OUTGOING_HOOK_FAILURE,
         hook
+    );
+}
+
+export function addCommand(teamId, command) {
+    return bindClientFunc(
+        Client.addCommand,
+        IntegrationTypes.ADD_COMMAND_REQUEST,
+        [IntegrationTypes.RECEIVED_COMMAND, IntegrationTypes.ADD_COMMAND_SUCCESS],
+        IntegrationTypes.ADD_COMMAND_FAILURE,
+        teamId,
+        command
+    );
+}
+
+export function regenCommandToken(teamId, id) {
+    return bindClientFunc(
+        Client.regenCommandToken,
+        IntegrationTypes.REGEN_COMMAND_TOKEN_REQUEST,
+        [IntegrationTypes.RECEIVED_COMMAND, IntegrationTypes.REGEN_COMMAND_TOKEN_SUCCESS],
+        IntegrationTypes.REGEN_COMMAND_TOKEN_FAILURE,
+        teamId,
+        id
+    );
+}
+
+export function deleteCommand(teamId, id) {
+    return bindClientFunc(
+        Client.deleteCommand,
+        IntegrationTypes.DELETE_COMMAND_REQUEST,
+        [IntegrationTypes.DELETED_COMMAND, IntegrationTypes.DELETE_COMMAND_SUCCESS],
+        IntegrationTypes.DELETE_COMMAND_FAILURE,
+        teamId,
+        id
     );
 }

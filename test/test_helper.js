@@ -115,6 +115,21 @@ class TestHelper {
         };
     };
 
+    testCommand = () => {
+        return {
+            trigger: 'test',
+            method: 'P',
+            username: 'test',
+            icon_url: 'http://localhost/notarealendpoint',
+            auto_complete: true,
+            auto_complete_desc: 'test',
+            auto_complete_hint: 'test',
+            display_name: 'test',
+            description: 'test',
+            url: 'http://localhost/notarealendpoint'
+        };
+    };
+
     fakeChannel = (teamId) => {
         const name = this.generateId();
 

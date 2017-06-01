@@ -58,7 +58,8 @@ const state = {
         },
         integrations: {
             incomingHooks: {},
-            outgoingHooks: {}
+            outgoingHooks: {},
+            commands: {}
         },
         files: {
             files: {},
@@ -405,10 +406,21 @@ const state = {
             updateOutgoingHook: {
                 status: 'not_started',
                 error: null
+            },
+            addCommand: {
+                status: 'not_started',
+                error: null
+            },
+            regenCommandToken: {
+                status: 'not_started',
+                error: null
+            },
+            deleteCommand: {
+                status: 'not_started',
+                error: null
             }
         }
     }
 };
 
 export default state;
-
