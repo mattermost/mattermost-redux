@@ -12,6 +12,7 @@ const HEADER_BEARER = 'BEARER';
 const HEADER_REQUESTED_WITH = 'X-Requested-With';
 const HEADER_USER_AGENT = 'User-Agent';
 const HEADER_X_VERSION_ID = 'X-Version-Id';
+const HEADER_X_CLUSTER_ID = 'X-Cluster-Id';
 
 const PER_PAGE_DEFAULT = 60;
 
@@ -19,6 +20,7 @@ export default class Client4 {
     constructor() {
         this.logToConsole = false;
         this.serverVersion = '';
+        this.clusterId = '';
         this.token = '';
         this.url = '';
         this.urlVersion = '/api/v4';
@@ -1143,6 +1145,13 @@ export default class Client4 {
             if (serverVersion && this.serverVersion !== serverVersion) {
                 this.serverVersion = serverVersion;
                 EventEmitter.emit(General.CONFIG_CHANGED, serverVersion);
+            }
+        }
+
+        if (headers.has(HEADER_X_CLUSTER_ID)) {
+            const clusterId = headers.get(HEADER_X_CLUSTER_ID);
+            if (clusterId && this.clusterId !== clusterId) {
+                this.clusterId = clusterId;
             }
         }
 
