@@ -1,6 +1,7 @@
 // Copyright (c) 2017 Mattermost, Inc. All Rights Reserved.
 // See License.txt for license information.
 
+import fs from 'fs';
 import assert from 'assert';
 import nock from 'nock';
 
@@ -287,5 +288,21 @@ describe('Actions.Admin', () => {
         const reports = state.entities.admin.complianceReports;
         assert.ok(reports);
         assert.ok(reports[report.id]);
+    });
+
+    it('uploadBrandImage', async () => {
+        const testImageData = fs.createReadStream('test/assets/images/test.png');
+
+        nock(Client4.getBaseRoute()).
+            post('/brand/image').
+            reply(200, OK_RESPONSE);
+
+        await Actions.uploadBrandImage(testImageData)(store.dispatch, store.getState);
+
+        const state = store.getState();
+        const request = state.requests.admin.uploadBrandImage;
+        if (request.status === RequestStatus.FAILURE) {
+            throw new Error('uploadBrandImage request failed');
+        }
     });
 });

@@ -116,3 +116,12 @@ export function getComplianceReports(page = 0, perPage = General.PER_PAGE_DEFAUL
     );
 }
 
+export function uploadBrandImage(imageData) {
+    return bindClientFunc(
+        Client4.uploadBrandImage,
+        AdminTypes.UPLOAD_BRAND_IMAGE_REQUEST,
+        [AdminTypes.UPLOAD_BRAND_IMAGE_SUCCESS],
+        AdminTypes.UPLOAD_BRAND_IMAGE_FAILURE,
+        imageData
+    );
+}

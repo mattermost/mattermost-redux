@@ -150,6 +150,10 @@ export default class Client4 {
         return `${this.getBaseRoute()}/emoji/${emojiId}`;
     }
 
+    getBrandRoute() {
+        return `${this.getBaseRoute()}/brand`;
+    }
+
     getOptions(options) {
         const newOptions = Object.assign({}, options);
 
@@ -1094,6 +1098,19 @@ export default class Client4 {
         return this.doFetch(
             `${this.getBaseRoute()}/compliance/reports${buildQueryString({page, per_page: perPage})}`,
             {method: 'get'}
+        );
+    };
+
+    uploadBrandImage = async (imageData) => {
+        const formData = new FormData();
+        formData.append('image', imageData);
+
+        return this.doFetch(
+            `${this.getBrandRoute()}/image`,
+            {
+                method: 'post',
+                body: formData
+            }
         );
     };
 
