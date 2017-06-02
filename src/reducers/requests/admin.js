@@ -106,6 +106,16 @@ function getCompliance(state = initialRequestState(), action) {
     );
 }
 
+function uploadBrandImage(state = initialRequestState(), action) {
+    return handleRequest(
+        AdminTypes.UPLOAD_BRAND_IMAGE_REQUEST,
+        AdminTypes.UPLOAD_BRAND_IMAGE_SUCCESS,
+        AdminTypes.UPLOAD_BRAND_IMAGE_FAILURE,
+        state,
+        action
+    );
+}
+
 export default combineReducers({
     getLogs,
     getAudits,
@@ -116,6 +126,7 @@ export default combineReducers({
     invalidateCaches,
     recycleDatabase,
     createCompliance,
-    getCompliance
+    getCompliance,
+    uploadBrandImage
 });
 

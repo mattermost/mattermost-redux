@@ -44,6 +44,10 @@ export default keyMirror({
     GET_COMPLIANCE_SUCCESS: null,
     GET_COMPLIANCE_FAILURE: null,
 
+    UPLOAD_BRAND_IMAGE_REQUEST: null,
+    UPLOAD_BRAND_IMAGE_SUCCESS: null,
+    UPLOAD_BRAND_IMAGE_FAILURE: null,
+
     RECEIVED_LOGS: null,
     RECEIVED_AUDITS: null,
     RECEIVED_CONFIG: null,
