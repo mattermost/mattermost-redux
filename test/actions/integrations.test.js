@@ -228,11 +228,10 @@ describe('Actions.Integrations', () => {
         const expected = TestHelper.testCommand();
 
         assert.ok(actual.token);
-        assert.ok(actual.create_at);
-        assert.ok(actual.update_at);
+        assert.equal(actual.create_at, actual.update_at);
         assert.equal(actual.delete_at, 0);
         assert.ok(actual.creator_id);
-        assert.ok(actual.team_id);
+        assert.equal(actual.team_id, team.id);
         assert.equal(actual.trigger, expected.trigger);
         assert.equal(actual.method, expected.method);
         assert.equal(actual.username, expected.username);
@@ -254,7 +253,7 @@ describe('Actions.Integrations', () => {
           TestHelper.testCommand()
         )(store.dispatch, store.getState);
 
-        await Actions.regenCommandToken(team.id,
+        await Actions.regenCommandToken(
           created.id
         )(store.dispatch, store.getState);
 
@@ -270,7 +269,7 @@ describe('Actions.Integrations', () => {
         assert.equal(updated.id, created.id);
         assert.notEqual(updated.token, created.token);
         assert.equal(updated.create_at, created.create_at);
-        assert.notEqual(updated.update_at, created.update_at);
+        assert.equal(updated.update_at, created.update_at);
         assert.equal(updated.delete_at, created.delete_at);
         assert.equal(updated.creator_id, created.creator_id);
         assert.equal(updated.team_id, created.team_id);
@@ -295,7 +294,7 @@ describe('Actions.Integrations', () => {
           TestHelper.testCommand()
         )(store.dispatch, store.getState);
 
-        await Actions.deleteCommand(team.id,
+        await Actions.deleteCommand(
           created.id
         )(store.dispatch, store.getState);
 

@@ -55,5 +55,6 @@ export default keyMirror({
     RECEIVED_OUTGOING_HOOKS: null,
     DELETED_OUTGOING_HOOK: null,
     RECEIVED_COMMAND: null,
+    RECEIVED_COMMAND_TOKEN: null,
     DELETED_COMMAND: null
 });

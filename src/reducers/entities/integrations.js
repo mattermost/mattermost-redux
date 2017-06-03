@@ -64,6 +64,16 @@ function commands(state = {}, action) {
             ...state,
             [action.data.id]: action.data
         };
+    case IntegrationTypes.RECEIVED_COMMAND_TOKEN: {
+        const {id, token} = action.data;
+        return {
+            ...state,
+            [id]: {
+                ...state[id],
+                token
+            }
+        };
+    }
     case IntegrationTypes.DELETED_COMMAND: {
         Reflect.deleteProperty(nextState, action.data.id);
         return nextState;
