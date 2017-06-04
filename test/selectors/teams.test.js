@@ -51,6 +51,10 @@ describe('Selectors.Teams', () => {
         }
     });
 
+    it('getTeamsList', () => {
+        assert.deepEqual(Selectors.getTeamsList(testState), [team1, team2, team3]);
+    });
+
     it('getMyTeams', () => {
         assert.deepEqual(Selectors.getMyTeams(testState), [team1, team2]);
     });

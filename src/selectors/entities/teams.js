@@ -27,6 +27,13 @@ export function getMembersInTeams(state) {
     return state.entities.teams.membersInTeam;
 }
 
+export const getTeamsList = createSelector(
+    getTeams,
+    (teams) => {
+        return Object.values(teams);
+    }
+);
+
 export const getCurrentTeam = createSelector(
     getTeams,
     getCurrentTeamId,
