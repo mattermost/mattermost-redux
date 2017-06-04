@@ -192,3 +192,30 @@ export function uploadIdpSamlCertificate(fileData) {
         fileData
     );
 }
+
+export function removePublicSamlCertificate() {
+    return bindClientFunc(
+        Client4.deletePublicSamlCertificate,
+        AdminTypes.DELETE_SAML_PUBLIC_REQUEST,
+        AdminTypes.DELETE_SAML_PUBLIC_SUCCESS,
+        AdminTypes.DELETE_SAML_PUBLIC_FAILURE
+    );
+}
+
+export function removePrivateSamlCertificate() {
+    return bindClientFunc(
+        Client4.deletePrivateSamlCertificate,
+        AdminTypes.DELETE_SAML_PRIVATE_REQUEST,
+        AdminTypes.DELETE_SAML_PRIVATE_SUCCESS,
+        AdminTypes.DELETE_SAML_PRIVATE_FAILURE
+    );
+}
+
+export function removeIdpSamlCertificate() {
+    return bindClientFunc(
+        Client4.deleteIdpSamlCertificate,
+        AdminTypes.DELETE_SAML_IDP_REQUEST,
+        AdminTypes.DELETE_SAML_IDP_SUCCESS,
+        AdminTypes.DELETE_SAML_IDP_FAILURE
+    );
+}

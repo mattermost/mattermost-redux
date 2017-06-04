@@ -186,6 +186,36 @@ function uploadIdpSamlCertificate(state = initialRequestState(), action) {
     );
 }
 
+function removePublicSamlCertificate(state = initialRequestState(), action) {
+    return handleRequest(
+        AdminTypes.DELETE_SAML_PUBLIC_REQUEST,
+        AdminTypes.DELETE_SAML_PUBLIC_SUCCESS,
+        AdminTypes.DELETE_SAML_PUBLIC_FAILURE,
+        state,
+        action
+    );
+}
+
+function removePrivateSamlCertificate(state = initialRequestState(), action) {
+    return handleRequest(
+        AdminTypes.DELETE_SAML_PRIVATE_REQUEST,
+        AdminTypes.DELETE_SAML_PRIVATE_SUCCESS,
+        AdminTypes.DELETE_SAML_PRIVATE_FAILURE,
+        state,
+        action
+    );
+}
+
+function removeIdpSamlCertificate(state = initialRequestState(), action) {
+    return handleRequest(
+        AdminTypes.DELETE_SAML_IDP_REQUEST,
+        AdminTypes.DELETE_SAML_IDP_SUCCESS,
+        AdminTypes.DELETE_SAML_IDP_FAILURE,
+        state,
+        action
+    );
+}
+
 export default combineReducers({
     getLogs,
     getAudits,
@@ -204,6 +234,9 @@ export default combineReducers({
     getSamlCertificateStatus,
     uploadPublicSamlCertificate,
     uploadPrivateSamlCertificate,
-    uploadIdpSamlCertificate
+    uploadIdpSamlCertificate,
+    removePublicSamlCertificate,
+    removePrivateSamlCertificate,
+    removeIdpSamlCertificate
 });
 
