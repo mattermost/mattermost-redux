@@ -4,6 +4,7 @@
 import assert from 'assert';
 
 import * as Actions from 'actions/integrations';
+import * as TeamsActions from 'actions/teams';
 import {Client, Client4} from 'client';
 
 import {RequestStatus} from 'constants';
@@ -205,5 +206,104 @@ describe('Actions.Integrations', () => {
         const hooks = state.entities.integrations.outgoingHooks;
         assert.ok(hooks[created.id]);
         assert.ok(hooks[created.id].display_name === updated.display_name);
+    });
+
+    it('addCommand', async () => {
+        const team = await TeamsActions.createTeam(
+          TestHelper.fakeTeam()
+        )(store.dispatch, store.getState);
+
+        const created = await Actions.addCommand(team.id,
+          TestHelper.testCommand()
+        )(store.dispatch, store.getState);
+
+        const request = store.getState().requests.integrations.addCommand;
+        if (request.status === RequestStatus.FAILURE) {
+            throw new Error(JSON.stringify(request.error));
+        }
+
+        const {commands} = store.getState().entities.integrations;
+        assert.ok(commands[created.id]);
+        const actual = commands[created.id];
+        const expected = TestHelper.testCommand();
+
+        assert.ok(actual.token);
+        assert.equal(actual.create_at, actual.update_at);
+        assert.equal(actual.delete_at, 0);
+        assert.ok(actual.creator_id);
+        assert.equal(actual.team_id, team.id);
+        assert.equal(actual.trigger, expected.trigger);
+        assert.equal(actual.method, expected.method);
+        assert.equal(actual.username, expected.username);
+        assert.equal(actual.icon_url, expected.icon_url);
+        assert.equal(actual.auto_complete, expected.auto_complete);
+        assert.equal(actual.auto_complete_desc, expected.auto_complete_desc);
+        assert.equal(actual.auto_complete_hint, expected.auto_complete_hint);
+        assert.equal(actual.display_name, expected.display_name);
+        assert.equal(actual.description, expected.description);
+        assert.equal(actual.url, expected.url);
+    });
+
+    it('regenCommandToken', async () => {
+        const team = await TeamsActions.createTeam(
+          TestHelper.fakeTeam()
+        )(store.dispatch, store.getState);
+
+        const created = await Actions.addCommand(team.id,
+          TestHelper.testCommand()
+        )(store.dispatch, store.getState);
+
+        await Actions.regenCommandToken(
+          created.id
+        )(store.dispatch, store.getState);
+
+        const request = store.getState().requests.integrations.regenCommandToken;
+        if (request.status === RequestStatus.FAILURE) {
+            throw new Error(JSON.stringify(request.error));
+        }
+
+        const {commands} = store.getState().entities.integrations;
+        assert.ok(commands[created.id]);
+        const updated = commands[created.id];
+
+        assert.equal(updated.id, created.id);
+        assert.notEqual(updated.token, created.token);
+        assert.equal(updated.create_at, created.create_at);
+        assert.equal(updated.update_at, created.update_at);
+        assert.equal(updated.delete_at, created.delete_at);
+        assert.equal(updated.creator_id, created.creator_id);
+        assert.equal(updated.team_id, created.team_id);
+        assert.equal(updated.trigger, created.trigger);
+        assert.equal(updated.method, created.method);
+        assert.equal(updated.username, created.username);
+        assert.equal(updated.icon_url, created.icon_url);
+        assert.equal(updated.auto_complete, created.auto_complete);
+        assert.equal(updated.auto_complete_desc, created.auto_complete_desc);
+        assert.equal(updated.auto_complete_hint, created.auto_complete_hint);
+        assert.equal(updated.display_name, created.display_name);
+        assert.equal(updated.description, created.description);
+        assert.equal(updated.url, created.url);
+    });
+
+    it('deleteCommand', async () => {
+        const team = await TeamsActions.createTeam(
+          TestHelper.fakeTeam()
+        )(store.dispatch, store.getState);
+
+        const created = await Actions.addCommand(team.id,
+          TestHelper.testCommand()
+        )(store.dispatch, store.getState);
+
+        await Actions.deleteCommand(
+          created.id
+        )(store.dispatch, store.getState);
+
+        const request = store.getState().requests.integrations.deleteCommand;
+        if (request.status === RequestStatus.FAILURE) {
+            throw new Error(JSON.stringify(request.error));
+        }
+
+        const {commands} = store.getState().entities.integrations;
+        assert.ok(!commands[created.id]);
     });
 });

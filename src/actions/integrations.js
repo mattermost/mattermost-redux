@@ -134,3 +134,78 @@ export function updateOutgoingHook(hook) {
         hook
     );
 }
+
+export function addCommand(teamId, command) {
+    return bindClientFunc(
+        Client4.addCommand,
+        IntegrationTypes.ADD_COMMAND_REQUEST,
+        [IntegrationTypes.RECEIVED_COMMAND, IntegrationTypes.ADD_COMMAND_SUCCESS],
+        IntegrationTypes.ADD_COMMAND_FAILURE,
+        teamId,
+        command
+    );
+}
+
+export function regenCommandToken(id) {
+    return async (dispatch, getState) => {
+        dispatch({type: IntegrationTypes.REGEN_COMMAND_TOKEN_REQUEST}, getState);
+
+        let res;
+        try {
+            res = await Client4.regenCommandToken(id);
+        } catch (error) {
+            forceLogoutIfNecessary(error, dispatch);
+
+            dispatch(batchActions([
+                {type: IntegrationTypes.REGEN_COMMAND_TOKEN_FAILURE, error},
+                getLogErrorAction(error)
+            ]), getState);
+            return null;
+        }
+
+        dispatch(batchActions([
+            {
+                type: IntegrationTypes.RECEIVED_COMMAND_TOKEN,
+                data: {
+                    id,
+                    token: res.token
+                }
+            },
+            {
+                type: IntegrationTypes.REGEN_COMMAND_TOKEN_SUCCESS
+            }
+        ]), getState);
+
+        return true;
+    };
+}
+
+export function deleteCommand(id) {
+    return async (dispatch, getState) => {
+        dispatch({type: IntegrationTypes.DELETE_COMMAND_REQUEST}, getState);
+
+        try {
+            await Client4.deleteCommand(id);
+        } catch (error) {
+            forceLogoutIfNecessary(error, dispatch);
+
+            dispatch(batchActions([
+                {type: IntegrationTypes.DELETE_COMMAND_FAILURE, error},
+                getLogErrorAction(error)
+            ]), getState);
+            return null;
+        }
+
+        dispatch(batchActions([
+            {
+                type: IntegrationTypes.DELETED_COMMAND,
+                data: {id}
+            },
+            {
+                type: IntegrationTypes.DELETE_COMMAND_SUCCESS
+            }
+        ]), getState);
+
+        return true;
+    };
+}

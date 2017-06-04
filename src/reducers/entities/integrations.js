@@ -56,12 +56,45 @@ function outgoingHooks(state = {}, action) {
     }
 }
 
+function commands(state = {}, action) {
+    const nextState = {...state};
+    switch (action.type) {
+    case IntegrationTypes.RECEIVED_COMMAND:
+        return {
+            ...state,
+            [action.data.id]: action.data
+        };
+    case IntegrationTypes.RECEIVED_COMMAND_TOKEN: {
+        const {id, token} = action.data;
+        return {
+            ...state,
+            [id]: {
+                ...state[id],
+                token
+            }
+        };
+    }
+    case IntegrationTypes.DELETED_COMMAND: {
+        Reflect.deleteProperty(nextState, action.data.id);
+        return nextState;
+    }
+    case UserTypes.LOGOUT_SUCCESS:
+        return {};
+
+    default:
+        return state;
+    }
+}
+
 export default combineReducers({
 
     // object where every key is the hook id and has an object with the incoming hook details
     incomingHooks,
 
     // object where every key is the hook id and has an object with the outgoing hook details
-    outgoingHooks
+    outgoingHooks,
+
+    // object to represent installed slash commands for a current team
+    commands
 
 });

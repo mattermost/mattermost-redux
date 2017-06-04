@@ -86,6 +86,36 @@ function updateOutgoingHook(state = initialRequestState(), action) {
     );
 }
 
+function addCommand(state = initialRequestState(), action) {
+    return handleRequest(
+        IntegrationTypes.ADD_COMMAND_REQUEST,
+        IntegrationTypes.ADD_COMMAND_SUCCESS,
+        IntegrationTypes.ADD_COMMAND_FAILURE,
+        state,
+        action
+    );
+}
+
+function regenCommandToken(state = initialRequestState(), action) {
+    return handleRequest(
+        IntegrationTypes.REGEN_COMMAND_TOKEN_REQUEST,
+        IntegrationTypes.REGEN_COMMAND_TOKEN_SUCCESS,
+        IntegrationTypes.REGEN_COMMAND_TOKEN_FAILURE,
+        state,
+        action
+    );
+}
+
+function deleteCommand(state = initialRequestState(), action) {
+    return handleRequest(
+        IntegrationTypes.DELETE_COMMAND_REQUEST,
+        IntegrationTypes.DELETE_COMMAND_SUCCESS,
+        IntegrationTypes.DELETE_COMMAND_FAILURE,
+        state,
+        action
+    );
+}
+
 export default combineReducers({
     createIncomingHook,
     getIncomingHooks,
@@ -94,5 +124,8 @@ export default combineReducers({
     createOutgoingHook,
     getOutgoingHooks,
     deleteOutgoingHook,
-    updateOutgoingHook
+    updateOutgoingHook,
+    addCommand,
+    regenCommandToken,
+    deleteCommand
 });

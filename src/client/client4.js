@@ -120,6 +120,10 @@ export default class Client4 {
         return `${this.getBaseRoute()}/reactions`;
     }
 
+    getCommandsRoute() {
+        return `${this.getBaseRoute()}/commands`;
+    }
+
     getFilesRoute() {
         return `${this.getBaseRoute()}/files`;
     }
@@ -1021,6 +1025,28 @@ export default class Client4 {
         return this.doFetch(
             `${this.getOutgoingHookRoute(hook.id)}`,
             {method: 'put', body: JSON.stringify(hook)}
+        );
+    };
+
+    addCommand = async (teamId, command) => {
+        command.team_id = teamId;
+        return this.doFetch(
+            `${this.getCommandsRoute()}`,
+            {method: 'post', body: JSON.stringify(command)}
+        );
+    };
+
+    regenCommandToken = async (id) => {
+        return this.doFetch(
+            `${this.getCommandsRoute()}/${id}/regen_token`,
+            {method: 'put'}
+        );
+    };
+
+    deleteCommand = async (id) => {
+        return this.doFetch(
+            `${this.getCommandsRoute()}/${id}`,
+            {method: 'delete'}
         );
     };
 
