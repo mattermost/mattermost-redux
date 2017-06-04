@@ -17,3 +17,6 @@ export function getComplianceReports(state) {
     return state.entities.admin.complianceReports;
 }
 
+export function getClusterInfo(state) {
+    return state.entities.admin.clusterInfo;
+}

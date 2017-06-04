@@ -70,6 +70,19 @@ function complianceReports(state = {}, action) {
     }
 }
 
+function clusterInfo(state = [], action) {
+    switch (action.type) {
+    case AdminTypes.RECEIVED_CLUSTER_STATUS: {
+        return action.data;
+    }
+    case UserTypes.LOGOUT_SUCCESS:
+        return [];
+
+    default:
+        return state;
+    }
+}
+
 export default combineReducers({
 
     // array of strings each representing a log entry
@@ -82,7 +95,10 @@ export default combineReducers({
     config,
 
     // object where every key is a report id and has an object with report details
-    complianceReports
+    complianceReports,
+
+    // array of cluster status data
+    clusterInfo
 
 });
 

@@ -126,3 +126,12 @@ export function uploadBrandImage(imageData) {
         imageData
     );
 }
+
+export function getClusterStatus() {
+    return bindClientFunc(
+        Client4.getClusterStatus,
+        AdminTypes.GET_CLUSTER_STATUS_REQUEST,
+        [AdminTypes.RECEIVED_CLUSTER_STATUS, AdminTypes.GET_CLUSTER_STATUS_SUCCESS],
+        AdminTypes.GET_CLUSTER_STATUS_FAILURE
+    );
+}
