@@ -116,6 +116,16 @@ function uploadBrandImage(state = initialRequestState(), action) {
     );
 }
 
+function getClusterStatus(state = initialRequestState(), action) {
+    return handleRequest(
+        AdminTypes.GET_CLUSTER_STATUS_REQUEST,
+        AdminTypes.GET_CLUSTER_STATUS_SUCCESS,
+        AdminTypes.GET_CLUSTER_STATUS_FAILURE,
+        state,
+        action
+    );
+}
+
 export default combineReducers({
     getLogs,
     getAudits,
@@ -127,6 +137,7 @@ export default combineReducers({
     recycleDatabase,
     createCompliance,
     getCompliance,
-    uploadBrandImage
+    uploadBrandImage,
+    getClusterStatus
 });
 

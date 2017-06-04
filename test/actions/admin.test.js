@@ -305,4 +305,28 @@ describe('Actions.Admin', () => {
             throw new Error('uploadBrandImage request failed');
         }
     });
+
+    it('getClusterStatus', async () => {
+        nock(Client4.getBaseRoute()).
+            get('/cluster/status').
+            reply(200, [
+                {
+                    id: 'someid',
+                    version: 'someversion'
+                }
+            ]);
+
+        await Actions.getClusterStatus()(store.dispatch, store.getState);
+
+        const state = store.getState();
+        const request = state.requests.admin.getClusterStatus;
+        if (request.status === RequestStatus.FAILURE) {
+            throw new Error('getClusterStatus request failed');
+        }
+
+        const clusterInfo = state.entities.admin.clusterInfo;
+        assert.ok(clusterInfo);
+        assert.ok(clusterInfo.length === 1);
+        assert.ok(clusterInfo[0].id === 'someid');
+    });
 });

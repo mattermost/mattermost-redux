@@ -1142,6 +1142,13 @@ export default class Client4 {
         );
     };
 
+    getClusterStatus = async () => {
+        return this.doFetch(
+            `${this.getBaseRoute()}/cluster/status`,
+            {method: 'get'}
+        );
+    };
+
     // Client Helpers
 
     doFetch = async (url, options) => {
