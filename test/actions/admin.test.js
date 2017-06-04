@@ -150,7 +150,7 @@ describe('Actions.Admin', () => {
             post('/email/test').
             reply(200, OK_RESPONSE);
 
-        await Actions.testEmail()(store.dispatch, store.getState);
+        await Actions.testEmail({})(store.dispatch, store.getState);
 
         const state = store.getState();
         const request = state.requests.admin.testEmail;
