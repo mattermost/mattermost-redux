@@ -121,7 +121,7 @@ export function uploadBrandImage(imageData) {
     return bindClientFunc(
         Client4.uploadBrandImage,
         AdminTypes.UPLOAD_BRAND_IMAGE_REQUEST,
-        [AdminTypes.UPLOAD_BRAND_IMAGE_SUCCESS],
+        AdminTypes.UPLOAD_BRAND_IMAGE_SUCCESS,
         AdminTypes.UPLOAD_BRAND_IMAGE_FAILURE,
         imageData
     );
@@ -133,5 +133,89 @@ export function getClusterStatus() {
         AdminTypes.GET_CLUSTER_STATUS_REQUEST,
         [AdminTypes.RECEIVED_CLUSTER_STATUS, AdminTypes.GET_CLUSTER_STATUS_SUCCESS],
         AdminTypes.GET_CLUSTER_STATUS_FAILURE
+    );
+}
+
+export function testLdap() {
+    return bindClientFunc(
+        Client4.testLdap,
+        AdminTypes.TEST_LDAP_REQUEST,
+        AdminTypes.TEST_LDAP_SUCCESS,
+        AdminTypes.TEST_LDAP_FAILURE
+    );
+}
+
+export function syncLdap() {
+    return bindClientFunc(
+        Client4.syncLdap,
+        AdminTypes.SYNC_LDAP_REQUEST,
+        AdminTypes.SYNC_LDAP_SUCCESS,
+        AdminTypes.SYNC_LDAP_FAILURE
+    );
+}
+
+export function getSamlCertificateStatus() {
+    return bindClientFunc(
+        Client4.getSamlCertificateStatus,
+        AdminTypes.SAML_CERT_STATUS_REQUEST,
+        [AdminTypes.RECEIVED_SAML_CERT_STATUS, AdminTypes.SAML_CERT_STATUS_SUCCESS],
+        AdminTypes.SAML_CERT_STATUS_FAILURE
+    );
+}
+
+export function uploadPublicSamlCertificate(fileData) {
+    return bindClientFunc(
+        Client4.uploadPublicSamlCertificate,
+        AdminTypes.UPLOAD_SAML_PUBLIC_REQUEST,
+        AdminTypes.UPLOAD_SAML_PUBLIC_SUCCESS,
+        AdminTypes.UPLOAD_SAML_PUBLIC_FAILURE,
+        fileData
+    );
+}
+
+export function uploadPrivateSamlCertificate(fileData) {
+    return bindClientFunc(
+        Client4.uploadPrivateSamlCertificate,
+        AdminTypes.UPLOAD_SAML_PRIVATE_REQUEST,
+        AdminTypes.UPLOAD_SAML_PRIVATE_SUCCESS,
+        AdminTypes.UPLOAD_SAML_PRIVATE_FAILURE,
+        fileData
+    );
+}
+
+export function uploadIdpSamlCertificate(fileData) {
+    return bindClientFunc(
+        Client4.uploadIdpSamlCertificate,
+        AdminTypes.UPLOAD_SAML_IDP_REQUEST,
+        AdminTypes.UPLOAD_SAML_IDP_SUCCESS,
+        AdminTypes.UPLOAD_SAML_IDP_FAILURE,
+        fileData
+    );
+}
+
+export function removePublicSamlCertificate() {
+    return bindClientFunc(
+        Client4.deletePublicSamlCertificate,
+        AdminTypes.DELETE_SAML_PUBLIC_REQUEST,
+        AdminTypes.DELETE_SAML_PUBLIC_SUCCESS,
+        AdminTypes.DELETE_SAML_PUBLIC_FAILURE
+    );
+}
+
+export function removePrivateSamlCertificate() {
+    return bindClientFunc(
+        Client4.deletePrivateSamlCertificate,
+        AdminTypes.DELETE_SAML_PRIVATE_REQUEST,
+        AdminTypes.DELETE_SAML_PRIVATE_SUCCESS,
+        AdminTypes.DELETE_SAML_PRIVATE_FAILURE
+    );
+}
+
+export function removeIdpSamlCertificate() {
+    return bindClientFunc(
+        Client4.deleteIdpSamlCertificate,
+        AdminTypes.DELETE_SAML_IDP_REQUEST,
+        AdminTypes.DELETE_SAML_IDP_SUCCESS,
+        AdminTypes.DELETE_SAML_IDP_FAILURE
     );
 }

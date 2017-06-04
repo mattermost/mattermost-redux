@@ -83,6 +83,19 @@ function clusterInfo(state = [], action) {
     }
 }
 
+function samlCertStatus(state = {}, action) {
+    switch (action.type) {
+    case AdminTypes.RECEIVED_SAML_CERT_STATUS: {
+        return action.data;
+    }
+    case UserTypes.LOGOUT_SUCCESS:
+        return {};
+
+    default:
+        return state;
+    }
+}
+
 export default combineReducers({
 
     // array of strings each representing a log entry
@@ -98,7 +111,10 @@ export default combineReducers({
     complianceReports,
 
     // array of cluster status data
-    clusterInfo
+    clusterInfo,
+
+    // object with certificate type as keys and boolean statuses as values
+    samlCertStatus
 
 });
 

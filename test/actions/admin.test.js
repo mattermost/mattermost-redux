@@ -329,4 +329,146 @@ describe('Actions.Admin', () => {
         assert.ok(clusterInfo.length === 1);
         assert.ok(clusterInfo[0].id === 'someid');
     });
+
+    it('testLdap', async () => {
+        nock(Client4.getBaseRoute()).
+            post('/ldap/test').
+            reply(200, OK_RESPONSE);
+
+        await Actions.testLdap()(store.dispatch, store.getState);
+
+        const state = store.getState();
+        const request = state.requests.admin.testLdap;
+        if (request.status === RequestStatus.FAILURE) {
+            throw new Error('testLdap request failed err=' + request.error);
+        }
+    });
+
+    it('syncLdap', async () => {
+        nock(Client4.getBaseRoute()).
+            post('/ldap/sync').
+            reply(200, OK_RESPONSE);
+
+        await Actions.syncLdap()(store.dispatch, store.getState);
+
+        const state = store.getState();
+        const request = state.requests.admin.syncLdap;
+        if (request.status === RequestStatus.FAILURE) {
+            throw new Error('syncLdap request failed err=' + request.error);
+        }
+    });
+
+    it('getSamlCertificateStatus', async () => {
+        nock(Client4.getBaseRoute()).
+            get('/saml/certificate/status').
+            reply(200, {
+                public_certificate_file: true,
+                private_key_file: true,
+                idp_certificate_file: true
+            });
+
+        await Actions.getSamlCertificateStatus()(store.dispatch, store.getState);
+
+        const state = store.getState();
+        const request = state.requests.admin.getSamlCertificateStatus;
+        if (request.status === RequestStatus.FAILURE) {
+            throw new Error('getSamlCertificateStatus request failed err=' + request.error);
+        }
+
+        const certStatus = state.entities.admin.samlCertStatus;
+        assert.ok(certStatus);
+        assert.ok(certStatus.idp_certificate_file);
+        assert.ok(certStatus.private_key_file);
+        assert.ok(certStatus.public_certificate_file);
+    });
+
+    it('uploadPublicSamlCertificate', async () => {
+        const testFileData = fs.createReadStream('test/assets/images/test.png');
+
+        nock(Client4.getBaseRoute()).
+            post('/saml/certificate/public').
+            reply(200, OK_RESPONSE);
+
+        await Actions.uploadPublicSamlCertificate(testFileData)(store.dispatch, store.getState);
+
+        const state = store.getState();
+        const request = state.requests.admin.uploadPublicSamlCertificate;
+        if (request.status === RequestStatus.FAILURE) {
+            throw new Error('uploadPublicSamlCertificate request failed err=' + request.error);
+        }
+    });
+
+    it('uploadPrivateSamlCertificate', async () => {
+        const testFileData = fs.createReadStream('test/assets/images/test.png');
+
+        nock(Client4.getBaseRoute()).
+            post('/saml/certificate/private').
+            reply(200, OK_RESPONSE);
+
+        await Actions.uploadPrivateSamlCertificate(testFileData)(store.dispatch, store.getState);
+
+        const state = store.getState();
+        const request = state.requests.admin.uploadPrivateSamlCertificate;
+        if (request.status === RequestStatus.FAILURE) {
+            throw new Error('uploadPrivateSamlCertificate request failed err=' + request.error);
+        }
+    });
+
+    it('uploadIdpSamlCertificate', async () => {
+        const testFileData = fs.createReadStream('test/assets/images/test.png');
+
+        nock(Client4.getBaseRoute()).
+            post('/saml/certificate/idp').
+            reply(200, OK_RESPONSE);
+
+        await Actions.uploadIdpSamlCertificate(testFileData)(store.dispatch, store.getState);
+
+        const state = store.getState();
+        const request = state.requests.admin.uploadIdpSamlCertificate;
+        if (request.status === RequestStatus.FAILURE) {
+            throw new Error('uploadIdpSamlCertificate request failed err=' + request.error);
+        }
+    });
+
+    it('removePublicSamlCertificate', async () => {
+        nock(Client4.getBaseRoute()).
+            delete('/saml/certificate/public').
+            reply(200, OK_RESPONSE);
+
+        await Actions.removePublicSamlCertificate()(store.dispatch, store.getState);
+
+        const state = store.getState();
+        const request = state.requests.admin.removePublicSamlCertificate;
+        if (request.status === RequestStatus.FAILURE) {
+            throw new Error('removePublicSamlCertificate request failed err=' + request.error);
+        }
+    });
+
+    it('removePrivateSamlCertificate', async () => {
+        nock(Client4.getBaseRoute()).
+            delete('/saml/certificate/private').
+            reply(200, OK_RESPONSE);
+
+        await Actions.removePrivateSamlCertificate()(store.dispatch, store.getState);
+
+        const state = store.getState();
+        const request = state.requests.admin.removePrivateSamlCertificate;
+        if (request.status === RequestStatus.FAILURE) {
+            throw new Error('removePrivateSamlCertificate request failed err=' + request.error);
+        }
+    });
+
+    it('removeIdpSamlCertificate', async () => {
+        nock(Client4.getBaseRoute()).
+            delete('/saml/certificate/idp').
+            reply(200, OK_RESPONSE);
+
+        await Actions.removeIdpSamlCertificate()(store.dispatch, store.getState);
+
+        const state = store.getState();
+        const request = state.requests.admin.removeIdpSamlCertificate;
+        if (request.status === RequestStatus.FAILURE) {
+            throw new Error('removeIdpSamlCertificate request failed err=' + request.error);
+        }
+    });
 });
