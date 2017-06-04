@@ -58,12 +58,13 @@ export function reloadConfig() {
     );
 }
 
-export function testEmail() {
+export function testEmail(config) {
     return bindClientFunc(
         Client4.testEmail,
         AdminTypes.TEST_EMAIL_REQUEST,
         AdminTypes.TEST_EMAIL_SUCCESS,
-        AdminTypes.TEST_EMAIL_FAILURE
+        AdminTypes.TEST_EMAIL_FAILURE,
+        config
     );
 }
 

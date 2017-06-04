@@ -1087,10 +1087,10 @@ export default class Client4 {
         );
     };
 
-    testEmail = async () => {
+    testEmail = async (config) => {
         return this.doFetch(
             `${this.getBaseRoute()}/email/test`,
-            {method: 'post'}
+            {method: 'post', body: JSON.stringify(config)}
         );
     };
 
