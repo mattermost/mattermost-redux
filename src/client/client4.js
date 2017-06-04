@@ -1149,6 +1149,87 @@ export default class Client4 {
         );
     };
 
+    testLdap = async () => {
+        return this.doFetch(
+            `${this.getBaseRoute()}/ldap/test`,
+            {method: 'post'}
+        );
+    };
+
+    syncLdap = async () => {
+        return this.doFetch(
+            `${this.getBaseRoute()}/ldap/sync`,
+            {method: 'post'}
+        );
+    };
+
+    getSamlCertificateStatus = async () => {
+        return this.doFetch(
+            `${this.getBaseRoute()}/saml/certificate/status`,
+            {method: 'get'}
+        );
+    };
+
+    uploadPublicSamlCertificate = async (fileData) => {
+        const formData = new FormData();
+        formData.append('certificate', fileData);
+
+        return this.doFetch(
+            `${this.getBaseRoute()}/saml/certificate/public`,
+            {
+                method: 'post',
+                body: formData
+            }
+        );
+    };
+
+    uploadPrivateSamlCertificate = async (fileData) => {
+        const formData = new FormData();
+        formData.append('certificate', fileData);
+
+        return this.doFetch(
+            `${this.getBaseRoute()}/saml/certificate/private`,
+            {
+                method: 'post',
+                body: formData
+            }
+        );
+    };
+
+    uploadIdpSamlCertificate = async (fileData) => {
+        const formData = new FormData();
+        formData.append('certificate', fileData);
+
+        return this.doFetch(
+            `${this.getBaseRoute()}/saml/certificate/idp`,
+            {
+                method: 'post',
+                body: formData
+            }
+        );
+    };
+
+    deletePublicSamlCertificate = async () => {
+        return this.doFetch(
+            `${this.getBaseRoute()}/saml/certificate/public`,
+            {method: 'delete'}
+        );
+    };
+
+    deletePrivateSamlCertificate = async () => {
+        return this.doFetch(
+            `${this.getBaseRoute()}/saml/certificate/private`,
+            {method: 'delete'}
+        );
+    };
+
+    deleteIdpSamlCertificate = async () => {
+        return this.doFetch(
+            `${this.getBaseRoute()}/saml/certificate/idp`,
+            {method: 'delete'}
+        );
+    };
+
     // Client Helpers
 
     doFetch = async (url, options) => {

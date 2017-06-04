@@ -126,6 +126,66 @@ function getClusterStatus(state = initialRequestState(), action) {
     );
 }
 
+function testLdap(state = initialRequestState(), action) {
+    return handleRequest(
+        AdminTypes.TEST_LDAP_REQUEST,
+        AdminTypes.TEST_LDAP_SUCCESS,
+        AdminTypes.TEST_LDAP_FAILURE,
+        state,
+        action
+    );
+}
+
+function syncLdap(state = initialRequestState(), action) {
+    return handleRequest(
+        AdminTypes.SYNC_LDAP_REQUEST,
+        AdminTypes.SYNC_LDAP_SUCCESS,
+        AdminTypes.SYNC_LDAP_FAILURE,
+        state,
+        action
+    );
+}
+
+function getSamlCertificateStatus(state = initialRequestState(), action) {
+    return handleRequest(
+        AdminTypes.SAML_CERT_STATUS_REQUEST,
+        AdminTypes.SAML_CERT_STATUS_SUCCESS,
+        AdminTypes.SAML_CERT_STATUS_FAILURE,
+        state,
+        action
+    );
+}
+
+function uploadPublicSamlCertificate(state = initialRequestState(), action) {
+    return handleRequest(
+        AdminTypes.UPLOAD_SAML_PUBLIC_REQUEST,
+        AdminTypes.UPLOAD_SAML_PUBLIC_SUCCESS,
+        AdminTypes.UPLOAD_SAML_PUBLIC_FAILURE,
+        state,
+        action
+    );
+}
+
+function uploadPrivateSamlCertificate(state = initialRequestState(), action) {
+    return handleRequest(
+        AdminTypes.UPLOAD_SAML_PRIVATE_REQUEST,
+        AdminTypes.UPLOAD_SAML_PRIVATE_SUCCESS,
+        AdminTypes.UPLOAD_SAML_PRIVATE_FAILURE,
+        state,
+        action
+    );
+}
+
+function uploadIdpSamlCertificate(state = initialRequestState(), action) {
+    return handleRequest(
+        AdminTypes.UPLOAD_SAML_IDP_REQUEST,
+        AdminTypes.UPLOAD_SAML_IDP_SUCCESS,
+        AdminTypes.UPLOAD_SAML_IDP_FAILURE,
+        state,
+        action
+    );
+}
+
 export default combineReducers({
     getLogs,
     getAudits,
@@ -138,6 +198,12 @@ export default combineReducers({
     createCompliance,
     getCompliance,
     uploadBrandImage,
-    getClusterStatus
+    getClusterStatus,
+    testLdap,
+    syncLdap,
+    getSamlCertificateStatus,
+    uploadPublicSamlCertificate,
+    uploadPrivateSamlCertificate,
+    uploadIdpSamlCertificate
 });
 
