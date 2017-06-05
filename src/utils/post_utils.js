@@ -58,7 +58,7 @@ export function isFromWebhook(post) {
 }
 
 export function isPostEphemeral(post) {
-    return post.type === Posts.POST_TYPES.EPHEMERAL || post.state === General.POST_DELETED;
+    return post.type === Posts.POST_TYPES.EPHEMERAL || post.state === Posts.POST_DELETED;
 }
 
 export function shouldIgnorePost(post) {
