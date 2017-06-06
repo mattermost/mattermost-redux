@@ -13,7 +13,8 @@ import {
     updateChannelHeader,
     updateChannelPurpose,
     markChannelAsUnread,
-    markChannelAsRead
+    markChannelAsRead,
+    selectChannel
 } from './channels';
 import {
     getPosts,
@@ -346,17 +347,28 @@ function handleUserAddedEvent(msg, dispatch, getState) {
 
 function handleUserRemovedEvent(msg, dispatch, getState) {
     const state = getState();
-    const {currentChannelId} = state.entities.channels;
+    const {channels, currentChannelId} = state.entities.channels;
     const {currentTeamId} = state.entities.teams;
     const {currentUserId} = state.entities.users;
 
     if (msg.broadcast.user_id === currentUserId && currentTeamId) {
         fetchMyChannelsAndMembers(currentTeamId)(dispatch, getState);
+        const channel = channels[currentChannelId] || {};
         dispatch({
             type: ChannelTypes.LEAVE_CHANNEL,
-            data: msg.data.channel_id
+            data: {
+                id: msg.data.channel_id,
+                user_id: currentUserId,
+                team_id: channel.team_id,
+                type: channel.type
+            }
         }, getState);
-    } else if (msg.broadcast.channel_id === currentChannelId) {
+
+        if (msg.data.channel_id === currentChannelId) {
+            const defaultChannel = Object.values(channels).find((c) => c.team_id === currentTeamId && c.name === General.DEFAULT_CHANNEL);
+            selectChannel(defaultChannel.id)(dispatch, getState);
+        }
+    } else if (msg.data.channel_id === currentChannelId) {
         getChannelStats(currentTeamId, currentChannelId)(dispatch, getState);
     }
 }
