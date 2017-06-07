@@ -112,3 +112,14 @@ export function getLastUpdateAt(postsArray) {
 
     return 0;
 }
+
+export function shouldFilterPost(post, options = {}) {
+    // Add as much filters as needed here, if you want to filter the post return true
+    const postTypes = Posts.POST_TYPES;
+
+    if (options.filterJoinLeave && (post.type === postTypes.JOIN_LEAVE || post.type === postTypes.JOIN_CHANNEL || post.type === postTypes.LEAVE_CHANNEL)) {
+        return true;
+    }
+
+    return false;
+}
