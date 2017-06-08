@@ -92,6 +92,10 @@ export default keyMirror({
     UPDATE_USER_SUCCESS: null,
     UPDATE_USER_FAILURE: null,
 
+    MFA_SECRET_REQUEST: null,
+    MFA_SECRET_SUCCESS: null,
+    MFA_SECRET_FAILURE: null,
+
     RECEIVED_ME: null,
     RECEIVED_PROFILE: null,
     RECEIVED_PROFILES: null,
