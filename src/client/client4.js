@@ -4,6 +4,8 @@
 import EventEmitter from 'utils/event_emitter';
 import {General} from 'constants';
 
+const FormData = require('form-data');
+
 import fetch from './fetch_etag';
 
 const HEADER_TOKEN = 'Token';
@@ -250,10 +252,90 @@ export default class Client4 {
         );
     }
 
-    login = async (loginId, password, token = '', deviceId = '') => {
+    resetUserPassword = async (token, newPassword) => {
+        return this.doFetch(
+            `${this.getUsersRoute()}/password/reset`,
+            {method: 'post', body: JSON.stringify({token, new_password: newPassword})}
+        );
+    }
+
+    sendPasswordResetEmail = async (email) => {
+        return this.doFetch(
+            `${this.getUsersRoute()}/password/reset/send`,
+            {method: 'post', body: JSON.stringify({email})}
+        );
+    }
+
+    updateUserActive = async (userId, active) => {
+        return this.doFetch(
+            `${this.getUserRoute(userId)}/active`,
+            {method: 'put', body: JSON.stringify({active})}
+        );
+    }
+
+    uploadProfileImage = async (userId, imageData) => {
+        const formData = new FormData();
+        formData.append('image', imageData);
+
+        const request = {
+            method: 'post',
+            body: formData
+        };
+
+        if (formData.getBoundary) {
+            request.headers = {
+                'Content-Type': `multipart/form-data; boundary=${formData.getBoundary()}`
+            };
+        }
+
+        return this.doFetch(
+            `${this.getUserRoute(userId)}/image`,
+            request
+        );
+    };
+
+    verifyUserEmail = async (token) => {
+        return this.doFetch(
+            `${this.getUsersRoute()}/email/verify`,
+            {method: 'post', body: JSON.stringify({token})}
+        );
+    }
+
+    sendVerificationEmail = async (email) => {
+        return this.doFetch(
+            `${this.getUsersRoute()}/email/verify/send`,
+            {method: 'post', body: JSON.stringify({email})}
+        );
+    }
+
+    login = async (loginId, password, token = '', deviceId = '', ldapOnly = false) => {
         const body = {
             device_id: deviceId,
             login_id: loginId,
+            password,
+            token
+        };
+
+        if (ldapOnly) {
+            body.ldap_only = 'true';
+        }
+
+        const {headers, data} = await this.doFetchWithResponse(
+            `${this.getUsersRoute()}/login`,
+            {method: 'post', body: JSON.stringify(body)}
+        );
+
+        if (headers.has(HEADER_TOKEN)) {
+            this.token = headers.get(HEADER_TOKEN);
+        }
+
+        return data;
+    };
+
+    loginById = async (id, password, token = '', deviceId = '') => {
+        const body = {
+            device_id: deviceId,
+            id,
             password,
             token
         };
@@ -1140,12 +1222,20 @@ export default class Client4 {
         const formData = new FormData();
         formData.append('image', imageData);
 
+        const request = {
+            method: 'post',
+            body: formData
+        };
+
+        if (formData.getBoundary) {
+            request.headers = {
+                'Content-Type': `multipart/form-data; boundary=${formData.getBoundary()}`
+            };
+        }
+
         return this.doFetch(
             `${this.getBrandRoute()}/image`,
-            {
-                method: 'post',
-                body: formData
-            }
+            request
         );
     };
 

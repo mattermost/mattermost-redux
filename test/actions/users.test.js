@@ -3,6 +3,7 @@
 
 import assert from 'assert';
 import nock from 'nock';
+import fs from 'fs';
 
 import * as Actions from 'actions/users';
 import {Client, Client4} from 'client';
@@ -47,6 +48,32 @@ describe('Actions.Users', () => {
         const user = TestHelper.basicUser;
         await TestHelper.basicClient4.logout();
         await Actions.login(user.email, 'password1')(store.dispatch, store.getState);
+
+        const state = store.getState();
+        const loginRequest = state.requests.users.login;
+        const {currentUserId, profiles} = state.entities.users;
+        const preferences = state.entities.preferences.myPreferences;
+        const teamMembers = state.entities.teams.myMembers;
+
+        if (loginRequest.status === RequestStatus.FAILURE) {
+            throw new Error(JSON.stringify(loginRequest.error));
+        }
+
+        assert.ok(currentUserId);
+        assert.ok(profiles);
+        assert.ok(profiles[currentUserId]);
+        assert.ok(Object.keys(preferences).length);
+
+        Object.keys(teamMembers).forEach((id) => {
+            assert.ok(teamMembers[id].team_id);
+            assert.equal(teamMembers[id].user_id, currentUserId);
+        });
+    });
+
+    it('loginById', async () => {
+        const user = TestHelper.basicUser;
+        await TestHelper.basicClient4.logout();
+        await Actions.loginById(user.id, 'password1')(store.dispatch, store.getState);
 
         const state = store.getState();
         const loginRequest = state.requests.users.login;
@@ -628,5 +655,120 @@ describe('Actions.Users', () => {
         if (request.status === RequestStatus.FAILURE) {
             throw new Error(JSON.stringify(request.error));
         }
+    });
+
+    it('updateUserActive', async () => {
+        const user = await TestHelper.basicClient4.createUser(
+            TestHelper.fakeUser(),
+            null,
+            null,
+            TestHelper.basicTeam.invite_id
+        );
+
+        await Actions.login(user.email, 'password1')(store.dispatch, store.getState);
+
+        const beforeTime = new Date().getTime();
+        const currentUserId = store.getState().entities.users.currentUserId;
+
+        await Actions.updateUserActive(currentUserId, false)(store.dispatch, store.getState);
+
+        const updateRequest = store.getState().requests.users.updateUser;
+        const {profiles} = store.getState().entities.users;
+        const currentUser = profiles[currentUserId];
+
+        if (updateRequest.status === RequestStatus.FAILURE) {
+            throw new Error(JSON.stringify(updateRequest.error));
+        }
+
+        assert.ok(currentUser);
+        assert.ok(currentUser.delete_at > beforeTime);
+
+        await Actions.login(TestHelper.basicUser.email, 'password1')(store.dispatch, store.getState);
+    });
+
+    it('verifyUserEmail', async () => {
+        TestHelper.activateMocking();
+        nock(Client4.getBaseRoute()).
+            post('/users/email/verify').
+            reply(200, OK_RESPONSE);
+
+        await Actions.verifyUserEmail('sometoken')(store.dispatch, store.getState);
+        nock.restore();
+
+        const request = store.getState().requests.users.verifyEmail;
+
+        if (request.status === RequestStatus.FAILURE) {
+            throw new Error(JSON.stringify(request.error));
+        }
+    });
+
+    it('sendVerificationEmail', async () => {
+        TestHelper.activateMocking();
+        nock(Client4.getBaseRoute()).
+            post('/users/email/verify/send').
+            reply(200, OK_RESPONSE);
+
+        await Actions.sendVerificationEmail(TestHelper.basicUser.email)(store.dispatch, store.getState);
+        nock.restore();
+
+        const request = store.getState().requests.users.verifyEmail;
+
+        if (request.status === RequestStatus.FAILURE) {
+            throw new Error(JSON.stringify(request.error));
+        }
+    });
+
+    it('resetUserPassword', async () => {
+        TestHelper.activateMocking();
+        nock(Client4.getBaseRoute()).
+            post('/users/password/reset').
+            reply(200, OK_RESPONSE);
+
+        await Actions.resetUserPassword('sometoken', 'newpassword')(store.dispatch, store.getState);
+        nock.restore();
+
+        const request = store.getState().requests.users.passwordReset;
+
+        if (request.status === RequestStatus.FAILURE) {
+            throw new Error(JSON.stringify(request.error));
+        }
+    });
+
+    it('sendPasswordResetEmail', async () => {
+        TestHelper.activateMocking();
+        nock(Client4.getBaseRoute()).
+            post('/users/password/reset/send').
+            reply(200, OK_RESPONSE);
+
+        await Actions.sendPasswordResetEmail(TestHelper.basicUser.email)(store.dispatch, store.getState);
+        nock.restore();
+
+        const request = store.getState().requests.users.passwordReset;
+
+        if (request.status === RequestStatus.FAILURE) {
+            throw new Error(JSON.stringify(request.error));
+        }
+    });
+
+    it('uploadProfileImage', async () => {
+        await Actions.login(TestHelper.basicUser.email, 'password1')(store.dispatch, store.getState);
+
+        const testImageData = fs.createReadStream('test/assets/images/test.png');
+
+        const beforeTime = new Date().getTime();
+        const currentUserId = store.getState().entities.users.currentUserId;
+
+        await Actions.uploadProfileImage(currentUserId, testImageData)(store.dispatch, store.getState);
+
+        const updateRequest = store.getState().requests.users.updateUser;
+        const {profiles} = store.getState().entities.users;
+        const currentUser = profiles[currentUserId];
+
+        if (updateRequest.status === RequestStatus.FAILURE) {
+            throw new Error(JSON.stringify(updateRequest.error));
+        }
+
+        assert.ok(currentUser);
+        assert.ok(currentUser.last_picture_update > beforeTime);
     });
 });

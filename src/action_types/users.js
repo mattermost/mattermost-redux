@@ -96,6 +96,14 @@ export default keyMirror({
     MFA_SECRET_SUCCESS: null,
     MFA_SECRET_FAILURE: null,
 
+    VERIFY_EMAIL_REQUEST: null,
+    VERIFY_EMAIL_SUCCESS: null,
+    VERIFY_EMAIL_FAILURE: null,
+
+    PASSWORD_RESET_REQUEST: null,
+    PASSWORD_RESET_SUCCESS: null,
+    PASSWORD_RESET_FAILURE: null,
+
     RECEIVED_ME: null,
     RECEIVED_PROFILE: null,
     RECEIVED_PROFILES: null,

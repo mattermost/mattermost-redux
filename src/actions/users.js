@@ -79,7 +79,7 @@ export function createUser(user, data, hash, inviteId) {
     };
 }
 
-export function login(loginId, password, mfaToken = '') {
+export function login(loginId, password, mfaToken = '', ldapOnly = false) {
     return async (dispatch, getState) => {
         dispatch({type: UserTypes.LOGIN_REQUEST}, getState);
 
@@ -87,7 +87,7 @@ export function login(loginId, password, mfaToken = '') {
 
         let data;
         try {
-            data = await Client4.login(loginId, password, mfaToken, deviceId);
+            data = await Client4.login(loginId, password, mfaToken, deviceId, ldapOnly);
         } catch (error) {
             dispatch(batchActions([
                 {
@@ -99,6 +99,36 @@ export function login(loginId, password, mfaToken = '') {
             return null;
         }
 
+        return await completeLogin(data)(dispatch, getState);
+    };
+}
+
+export function loginById(id, password, mfaToken = '') {
+    return async (dispatch, getState) => {
+        dispatch({type: UserTypes.LOGIN_REQUEST}, getState);
+
+        const deviceId = getState().entities.general.deviceToken;
+
+        let data;
+        try {
+            data = await Client4.loginById(id, password, mfaToken, deviceId);
+        } catch (error) {
+            dispatch(batchActions([
+                {
+                    type: UserTypes.LOGIN_FAILURE,
+                    error
+                },
+                getLogErrorAction(error)
+            ]), getState);
+            return null;
+        }
+
+        return await completeLogin(data)(dispatch, getState);
+    };
+}
+
+function completeLogin(data) {
+    return async (dispatch, getState) => {
         let teamMembers;
         try {
             teamMembers = await Client4.getMyTeamMembers();
@@ -865,6 +895,99 @@ export function updateUserPassword(userId, currentPassword, newPassword) {
     };
 }
 
+export function updateUserActive(userId, active) {
+    return async (dispatch, getState) => {
+        dispatch({type: UserTypes.UPDATE_USER_REQUEST}, getState);
+
+        try {
+            await Client4.updateUserActive(userId, active);
+        } catch (error) {
+            dispatch({type: UserTypes.UPDATE_USER_FAILURE, error}, getState);
+            return null;
+        }
+
+        const actions = [
+            {type: UserTypes.UPDATE_USER_SUCCESS}
+        ];
+
+        const profile = getState().entities.users.profiles[userId];
+        if (profile) {
+            actions.push({type: UserTypes.RECEIVED_PROFILE, data: {...profile, delete_at: new Date().getTime()}});
+        }
+
+        dispatch(batchActions(actions), getState);
+
+        return true;
+    };
+}
+
+export function verifyUserEmail(token) {
+    return bindClientFunc(
+        Client4.verifyUserEmail,
+        UserTypes.VERIFY_EMAIL_REQUEST,
+        UserTypes.VERIFY_EMAIL_SUCCESS,
+        UserTypes.VERIFY_EMAIL_FAILURE,
+        token
+    );
+}
+
+export function sendVerificationEmail(email) {
+    return bindClientFunc(
+        Client4.sendVerificationEmail,
+        UserTypes.VERIFY_EMAIL_REQUEST,
+        UserTypes.VERIFY_EMAIL_SUCCESS,
+        UserTypes.VERIFY_EMAIL_FAILURE,
+        email
+    );
+}
+
+export function resetUserPassword(token, newPassword) {
+    return bindClientFunc(
+        Client4.resetUserPassword,
+        UserTypes.PASSWORD_RESET_REQUEST,
+        UserTypes.PASSWORD_RESET_SUCCESS,
+        UserTypes.PASSWORD_RESET_FAILURE,
+        token,
+        newPassword
+    );
+}
+
+export function sendPasswordResetEmail(email) {
+    return bindClientFunc(
+        Client4.sendPasswordResetEmail,
+        UserTypes.PASSWORD_RESET_REQUEST,
+        UserTypes.PASSWORD_RESET_SUCCESS,
+        UserTypes.PASSWORD_RESET_FAILURE,
+        email
+    );
+}
+
+export function uploadProfileImage(userId, imageData) {
+    return async (dispatch, getState) => {
+        dispatch({type: UserTypes.UPDATE_USER_REQUEST}, getState);
+
+        try {
+            await Client4.uploadProfileImage(userId, imageData);
+        } catch (error) {
+            dispatch({type: UserTypes.UPDATE_USER_FAILURE, error}, getState);
+            return null;
+        }
+
+        const actions = [
+            {type: UserTypes.UPDATE_USER_SUCCESS}
+        ];
+
+        const profile = getState().entities.users.profiles[userId];
+        if (profile) {
+            actions.push({type: UserTypes.RECEIVED_PROFILE, data: {...profile, last_picture_update: new Date().getTime()}});
+        }
+
+        dispatch(batchActions(actions), getState);
+
+        return true;
+    };
+}
+
 export default {
     checkMfa,
     generateMfaSecret,
@@ -890,5 +1013,11 @@ export default {
     updateMe,
     updateUserRoles,
     updateUserMfa,
-    updateUserPassword
+    updateUserPassword,
+    updateUserActive,
+    verifyUserEmail,
+    sendVerificationEmail,
+    resetUserPassword,
+    sendPasswordResetEmail,
+    uploadProfileImage
 };
