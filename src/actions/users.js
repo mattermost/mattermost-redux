@@ -42,6 +42,16 @@ export function checkMfa(loginId) {
     };
 }
 
+export function generateMfaSecret(userId) {
+    return bindClientFunc(
+        Client4.generateMfaSecret,
+        UserTypes.MFA_SECRET_REQUEST,
+        UserTypes.MFA_SECRET_SUCCESS,
+        UserTypes.MFA_SECRET_FAILURE,
+        userId
+    );
+}
+
 export function createUser(user, data, hash, inviteId) {
     return async (dispatch, getState) => {
         dispatch({type: UserTypes.CREATE_USER_REQUEST}, getState);
@@ -857,6 +867,7 @@ export function updateUserPassword(userId, currentPassword, newPassword) {
 
 export default {
     checkMfa,
+    generateMfaSecret,
     login,
     logout,
     getProfiles,

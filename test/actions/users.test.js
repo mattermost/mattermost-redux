@@ -613,4 +613,20 @@ describe('Actions.Users', () => {
 
         assert.ok(!mfaRequired);
     });
+
+    it('generateMfaSecret', async () => {
+        TestHelper.activateMocking();
+        nock(Client4.getBaseRoute()).
+            post('/users/me/mfa/generate').
+            reply(200, {secret: 'somesecret', qr_code: 'someqrcode'});
+
+        await Actions.generateMfaSecret('me')(store.dispatch, store.getState);
+        nock.restore();
+
+        const request = store.getState().requests.users.generateMfaSecret;
+
+        if (request.status === RequestStatus.FAILURE) {
+            throw new Error(JSON.stringify(request.error));
+        }
+    });
 });

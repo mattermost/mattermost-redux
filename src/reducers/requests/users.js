@@ -45,6 +45,16 @@ function login(state = initialRequestState(), action) {
     }
 }
 
+function generateMfaSecret(state = initialRequestState(), action) {
+    return handleRequest(
+        UserTypes.MFA_SECRET_REQUEST,
+        UserTypes.MFA_SECRET_SUCCESS,
+        UserTypes.MFA_SECRET_FAILURE,
+        state,
+        action
+    );
+}
+
 function logout(state = initialRequestState(), action) {
     switch (action.type) {
     case UserTypes.LOGOUT_REQUEST:
@@ -256,6 +266,7 @@ function create(state = initialRequestState(), action) {
 
 export default combineReducers({
     checkMfa,
+    generateMfaSecret,
     login,
     logout,
     create,
