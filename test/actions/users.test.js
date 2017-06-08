@@ -70,6 +70,32 @@ describe('Actions.Users', () => {
         });
     });
 
+    it('loginById', async () => {
+        const user = TestHelper.basicUser;
+        await TestHelper.basicClient4.logout();
+        await Actions.loginById(user.id, 'password1')(store.dispatch, store.getState);
+
+        const state = store.getState();
+        const loginRequest = state.requests.users.login;
+        const {currentUserId, profiles} = state.entities.users;
+        const preferences = state.entities.preferences.myPreferences;
+        const teamMembers = state.entities.teams.myMembers;
+
+        if (loginRequest.status === RequestStatus.FAILURE) {
+            throw new Error(JSON.stringify(loginRequest.error));
+        }
+
+        assert.ok(currentUserId);
+        assert.ok(profiles);
+        assert.ok(profiles[currentUserId]);
+        assert.ok(Object.keys(preferences).length);
+
+        Object.keys(teamMembers).forEach((id) => {
+            assert.ok(teamMembers[id].team_id);
+            assert.equal(teamMembers[id].user_id, currentUserId);
+        });
+    });
+
     it('logout', async () => {
         await Actions.logout()(store.dispatch, store.getState);
 
