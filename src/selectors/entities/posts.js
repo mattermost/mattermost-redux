@@ -3,10 +3,12 @@
 
 import {createSelector} from 'reselect';
 
+import {getMyPreferences} from 'selectors/entities/preferences';
 import {getCurrentUser} from 'selectors/entities/users';
 
-import {Posts} from 'constants';
-import {isSystemMessage} from 'utils/post_utils';
+import {Posts, Preferences} from 'constants';
+import {isSystemMessage, shouldFilterPost} from 'utils/post_utils';
+import {getPreferenceKey} from 'utils/preference_utils';
 
 export function getAllPosts(state) {
     return state.entities.posts.posts;
@@ -136,17 +138,23 @@ export function makeGetPostsInChannel() {
         getAllPosts,
         (state, channelId) => state.entities.posts.postsInChannel[channelId],
         getCurrentUser,
-        (allPosts, postIds, currentUser) => {
+        getMyPreferences,
+        (allPosts, postIds, currentUser, myPreferences) => {
             if (postIds == null) {
                 return null;
             }
 
             const posts = [];
 
+            const joinLeavePref = myPreferences[getPreferenceKey(Preferences.CATEGORY_ADVANCED_SETTINGS, 'join_leave')];
+            const filterJoinLeave = joinLeavePref ? joinLeavePref.value === 'false' : false;
+
             for (let i = 0; i < postIds.length; i++) {
                 const post = allPosts[postIds[i]];
-                const previousPost = allPosts[postIds[i + 1]] || {create_at: 0};
-                posts.push(formatPostInChannel(post, previousPost, i, allPosts, postIds, currentUser));
+                if (!shouldFilterPost(post, {filterJoinLeave})) {
+                    const previousPost = allPosts[postIds[i + 1]] || {create_at: 0};
+                    posts.push(formatPostInChannel(post, previousPost, i, allPosts, postIds, currentUser));
+                }
             }
 
             return posts;
@@ -160,7 +168,8 @@ export function makeGetPostsAroundPost() {
         (state, postId, channelId) => state.entities.posts.postsInChannel[channelId],
         (state, postId) => postId,
         getCurrentUser,
-        (allPosts, postIds, focusedPostId, currentUser) => {
+        getMyPreferences,
+        (allPosts, postIds, focusedPostId, currentUser, myPreferences) => {
             if (postIds == null) {
                 return null;
             }
@@ -176,17 +185,21 @@ export function makeGetPostsAroundPost() {
             const slicedPostIds = postIds.slice(minPostIndex);
 
             const posts = [];
+            const joinLeavePref = myPreferences[getPreferenceKey(Preferences.CATEGORY_ADVANCED_SETTINGS, 'join_leave')];
+            const filterJoinLeave = joinLeavePref ? joinLeavePref.value === 'false' : false;
 
             for (let i = 0; i < slicedPostIds.length; i++) {
                 const post = allPosts[slicedPostIds[i]];
-                const previousPost = allPosts[slicedPostIds[i + 1]] || {create_at: 0};
-                const formattedPost = formatPostInChannel(post, previousPost, i, allPosts, slicedPostIds, currentUser);
+                if (!shouldFilterPost(post, {filterJoinLeave})) {
+                    const previousPost = allPosts[slicedPostIds[i + 1]] || {create_at: 0};
+                    const formattedPost = formatPostInChannel(post, previousPost, i, allPosts, slicedPostIds, currentUser);
 
-                if (post.id === focusedPostId) {
-                    formattedPost.highlight = true;
+                    if (post.id === focusedPostId) {
+                        formattedPost.highlight = true;
+                    }
+
+                    posts.push(formattedPost);
                 }
-
-                posts.push(formattedPost);
             }
 
             return posts;

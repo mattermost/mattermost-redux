@@ -41,6 +41,9 @@ describe('Selectors.Posts', () => {
                     2: ['f']
                 },
                 reactions
+            },
+            preferences: {
+                myPreferences: {}
             }
         }
     });
