@@ -404,6 +404,13 @@ export default class Client4 {
         );
     };
 
+    generateMfaSecret = async (userId) => {
+        return this.doFetch(
+            `${this.getUserRoute(userId)}/mfa/generate`,
+            {method: 'post'}
+        );
+    };
+
     attachDevice = async (deviceId) => {
         return this.doFetch(
             `${this.getUsersRoute()}/sessions/device`,
