@@ -264,6 +264,26 @@ function create(state = initialRequestState(), action) {
     );
 }
 
+function verifyEmail(state = initialRequestState(), action) {
+    return handleRequest(
+        UserTypes.VERIFY_EMAIL_REQUEST,
+        UserTypes.VERIFY_EMAIL_SUCCESS,
+        UserTypes.VERIFY_EMAIL_FAILURE,
+        state,
+        action
+    );
+}
+
+function passwordReset(state = initialRequestState(), action) {
+    return handleRequest(
+        UserTypes.PASSWORD_RESET_REQUEST,
+        UserTypes.PASSWORD_RESET_SUCCESS,
+        UserTypes.PASSWORD_RESET_FAILURE,
+        state,
+        action
+    );
+}
+
 export default combineReducers({
     checkMfa,
     generateMfaSecret,
@@ -287,5 +307,7 @@ export default combineReducers({
     autocompleteUsers,
     searchProfiles,
     updateMe,
-    updateUser
+    updateUser,
+    verifyEmail,
+    passwordReset
 });
