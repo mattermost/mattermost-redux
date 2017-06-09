@@ -41,7 +41,7 @@ export function getMyPreferences() {
     return bindClientFunc(
         Client4.getMyPreferences,
         PreferenceTypes.MY_PREFERENCES_REQUEST,
-        [PreferenceTypes.RECEIVED_PREFERENCES, PreferenceTypes.MY_PREFERENCES_SUCCESS],
+        [PreferenceTypes.RECEIVED_ALL_PREFERENCES, PreferenceTypes.MY_PREFERENCES_SUCCESS],
         PreferenceTypes.MY_PREFERENCES_FAILURE
     );
 }

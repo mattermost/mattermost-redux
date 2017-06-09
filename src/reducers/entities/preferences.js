@@ -10,6 +10,18 @@ function getKey(preference) {
 
 function myPreferences(state = {}, action) {
     switch (action.type) {
+    case PreferenceTypes.RECEIVED_ALL_PREFERENCES: {
+        const nextState = {};
+
+        if (action.data) {
+            for (const preference of action.data) {
+                nextState[getKey(preference)] = preference;
+            }
+        }
+
+        return nextState;
+    }
+
     case PreferenceTypes.RECEIVED_PREFERENCES: {
         const nextState = {...state};
 
