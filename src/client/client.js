@@ -827,6 +827,14 @@ export default class Client {
         );
     };
 
+    getSystemEmojiImageUrl = (filename) => {
+        return `${this.url}/static/emoji/${filename}.png`;
+    };
+
+    getCustomEmojiImageUrl = (id) => {
+        return `${this.getEmojiRoute()}/${id}`;
+    };
+
     // Client helpers
     doFetch = async (url, options) => {
         const {data} = await this.doFetchWithResponse(url, options);
