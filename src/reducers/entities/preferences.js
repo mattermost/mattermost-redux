@@ -10,8 +10,7 @@ function getKey(preference) {
 
 function myPreferences(state = {}, action) {
     switch (action.type) {
-    case PreferenceTypes.RECEIVED_ALL_PREFERENCES:
-    {
+    case PreferenceTypes.RECEIVED_ALL_PREFERENCES: {
         const nextState = {};
 
         if (action.data) {
