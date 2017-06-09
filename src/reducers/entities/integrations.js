@@ -59,6 +59,12 @@ function outgoingHooks(state = {}, action) {
 function commands(state = {}, action) {
     const nextState = {...state};
     switch (action.type) {
+    case IntegrationTypes.RECEIVED_CUSTOM_TEAM_COMMANDS: {
+        for (const command of action.data) {
+            nextState[command.id] = command;
+        }
+        return nextState;
+    }
     case IntegrationTypes.RECEIVED_COMMAND:
         return {
             ...state,

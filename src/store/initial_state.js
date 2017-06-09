@@ -407,11 +407,19 @@ const state = {
                 status: 'not_started',
                 error: null
             },
+            getCustomTeamCommands: {
+                status: 'not_started',
+                error: null
+            },
             addCommand: {
                 status: 'not_started',
                 error: null
             },
             regenCommandToken: {
+                status: 'not_started',
+                error: null
+            },
+            editCommand: {
                 status: 'not_started',
                 error: null
             },

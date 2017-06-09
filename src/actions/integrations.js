@@ -135,6 +135,16 @@ export function updateOutgoingHook(hook) {
     );
 }
 
+export function getCustomTeamCommands(teamId) {
+    return bindClientFunc(
+        Client4.getCustomTeamCommands,
+        IntegrationTypes.GET_CUSTOM_TEAM_COMMANDS_REQUEST,
+        [IntegrationTypes.RECEIVED_CUSTOM_TEAM_COMMANDS, IntegrationTypes.GET_CUSTOM_TEAM_COMMANDS_SUCCESS],
+        IntegrationTypes.GET_CUSTOM_TEAM_COMMANDS_FAILURE,
+        teamId
+    );
+}
+
 export function addCommand(teamId, command) {
     return bindClientFunc(
         Client4.addCommand,
@@ -142,6 +152,16 @@ export function addCommand(teamId, command) {
         [IntegrationTypes.RECEIVED_COMMAND, IntegrationTypes.ADD_COMMAND_SUCCESS],
         IntegrationTypes.ADD_COMMAND_FAILURE,
         teamId,
+        command
+    );
+}
+
+export function editCommand(command) {
+    return bindClientFunc(
+        Client4.editCommand,
+        IntegrationTypes.EDIT_COMMAND_REQUEST,
+        [IntegrationTypes.RECEIVED_COMMAND, IntegrationTypes.EDIT_COMMAND_SUCCESS],
+        IntegrationTypes.EDIT_COMMAND_FAILURE,
         command
     );
 }
