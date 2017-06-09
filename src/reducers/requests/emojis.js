@@ -26,6 +26,16 @@ function getCustomEmojis(state = initialRequestState(), action) {
     );
 }
 
+function getAllCustomEmojis(state = initialRequestState(), action) {
+    return handleRequest(
+        EmojiTypes.GET_ALL_CUSTOM_EMOJIS_REQUEST,
+        EmojiTypes.GET_ALL_CUSTOM_EMOJIS_SUCCESS,
+        EmojiTypes.GET_ALL_CUSTOM_EMOJIS_FAILURE,
+        state,
+        action
+    );
+}
+
 function deleteCustomEmoji(state = initialRequestState(), action) {
     return handleRequest(
         EmojiTypes.DELETE_CUSTOM_EMOJI_REQUEST,
@@ -39,6 +49,7 @@ function deleteCustomEmoji(state = initialRequestState(), action) {
 export default combineReducers({
     createCustomEmoji,
     getCustomEmojis,
+    getAllCustomEmojis,
     deleteCustomEmoji
 });
 

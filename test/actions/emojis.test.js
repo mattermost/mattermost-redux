@@ -57,7 +57,7 @@ describe('Actions.Emojis', () => {
             testImageData
         )(store.dispatch, store.getState);
 
-        await Actions.getCustomEmojis(TestHelper.basicChannel.id)(store.dispatch, store.getState);
+        await Actions.getCustomEmojis()(store.dispatch, store.getState);
 
         const state = store.getState();
         const request = state.requests.emojis.getCustomEmojis;
@@ -68,6 +68,56 @@ describe('Actions.Emojis', () => {
         const emojis = state.entities.emojis.customEmoji;
         assert.ok(emojis);
         assert.ok(emojis[created.id]);
+    });
+
+    it('getAllCustomEmojis', async () => {
+        const created1 = await Actions.createCustomEmoji(
+            {
+                name: TestHelper.generateId(),
+                creator_id: TestHelper.basicUser.id
+            },
+            fs.createReadStream('test/assets/images/test.png')
+        )(store.dispatch, store.getState);
+        const created2 = await Actions.createCustomEmoji(
+            {
+                name: TestHelper.generateId(),
+                creator_id: TestHelper.basicUser.id
+            },
+            fs.createReadStream('test/assets/images/test.png')
+        )(store.dispatch, store.getState);
+
+        // Should have all custom emojis
+        await Actions.getAllCustomEmojis(1)(store.dispatch, store.getState);
+
+        let state = store.getState();
+        let request = state.requests.emojis.getAllCustomEmojis;
+        if (request.status === RequestStatus.FAILURE) {
+            throw new Error('getAllCustomEmojis request failed');
+        }
+
+        let emojis = state.entities.emojis.customEmoji;
+        assert.ok(emojis);
+        assert.ok(emojis[created1.id]);
+        assert.ok(emojis[created2.id]);
+
+        // Should have all emojis minus the deleted one
+        await Client.deleteCustomEmoji(created2.id);
+
+        await Actions.getAllCustomEmojis(1)(store.dispatch, store.getState);
+
+        state = store.getState();
+        request = state.requests.emojis.getAllCustomEmojis;
+        if (request.status === RequestStatus.FAILURE) {
+            throw new Error('getAllCustomEmojis request failed');
+        }
+
+        emojis = state.entities.emojis.customEmoji;
+        assert.ok(emojis);
+        assert.ok(emojis[created1.id]);
+        assert.ok(!emojis[created2.id]);
+
+        // Cleanup
+        Client.deleteCustomEmoji(created1.id);
     });
 
     it('deleteCustomEmoji', async () => {
