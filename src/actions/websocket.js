@@ -366,6 +366,9 @@ function handleUserRemovedEvent(msg, dispatch, getState) {
 
         if (msg.data.channel_id === currentChannelId) {
             const defaultChannel = Object.values(channels).find((c) => c.team_id === currentTeamId && c.name === General.DEFAULT_CHANNEL);
+
+            // emit the event so the client can change his own state
+            EventEmitter.emit(General.DEFAULT_CHANNEL, defaultChannel.display_name);
             selectChannel(defaultChannel.id)(dispatch, getState);
         }
     } else if (msg.data.channel_id === currentChannelId) {
