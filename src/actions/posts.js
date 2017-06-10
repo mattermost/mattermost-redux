@@ -361,7 +361,7 @@ export function getPosts(channelId, page = 0, perPage = Posts.POST_CHUNK_SIZE) {
         }
 
         const actions = [];
-        if (Object.keys(posts.posts).length === Posts.POST_CHUNK_SIZE) {
+        if (page === 0 && Object.keys(posts.posts).length === Posts.POST_CHUNK_SIZE) {
             actions.push({
                 type: InternalTypes.CHANNEL_LAST_FETCH_TIME,
                 data: {
