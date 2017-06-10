@@ -11,6 +11,17 @@ import {Client4} from 'client';
 import {logError, getLogErrorAction} from './errors';
 import {bindClientFunc, forceLogoutIfNecessary} from './helpers';
 
+function getChannelsIdForTeam(state, teamId) {
+    const {channels} = state.entities.channels;
+
+    return Object.values(channels).reduce((res, channel) => {
+        if (channel.team_id === teamId) {
+            res.push(channel.id);
+        }
+        return res;
+    }, []);
+}
+
 export function selectChannel(channelId) {
     return async (dispatch, getState) => {
         try {
@@ -353,7 +364,8 @@ export function fetchMyChannelsAndMembers(teamId) {
             },
             {
                 type: ChannelTypes.RECEIVED_MY_CHANNEL_MEMBERS,
-                data: channelMembers
+                data: channelMembers,
+                remove: getChannelsIdForTeam(getState(), teamId)
             },
             {
                 type: ChannelTypes.CHANNEL_MEMBERS_SUCCESS
@@ -385,7 +397,8 @@ export function getMyChannelMembers(teamId) {
         dispatch(batchActions([
             {
                 type: ChannelTypes.RECEIVED_MY_CHANNEL_MEMBERS,
-                data: channelMembers
+                data: channelMembers,
+                remove: getChannelsIdForTeam(getState(), teamId)
             },
             {
                 type: ChannelTypes.CHANNEL_MY_MEMBERS_SUCCESS

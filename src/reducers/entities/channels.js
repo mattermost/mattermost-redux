@@ -146,6 +146,13 @@ function myMembers(state = {}, action) {
         };
     }
     case ChannelTypes.RECEIVED_MY_CHANNEL_MEMBERS: {
+        const remove = action.remove;
+        if (remove) {
+            remove.forEach((id) => {
+                Reflect.deleteProperty(nextState, id);
+            });
+        }
+
         for (const cm of action.data) {
             nextState[cm.channel_id] = cm;
         }
@@ -207,6 +214,13 @@ function membersInChannel(state = {}, action) {
     case ChannelTypes.RECEIVED_MY_CHANNEL_MEMBERS:
     case ChannelTypes.RECEIVED_CHANNEL_MEMBERS: {
         const nextState = {...state};
+        const remove = action.remove;
+        if (remove) {
+            remove.forEach((id) => {
+                Reflect.deleteProperty(nextState, id);
+            });
+        }
+
         for (const cm of action.data) {
             if (nextState[cm.channel_id]) {
                 nextState[cm.channel_id] = {...nextState[cm.channel_id]};

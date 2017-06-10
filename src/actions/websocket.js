@@ -116,22 +116,46 @@ async function handleReconnect(dispatch, getState) {
     const entities = getState().entities;
     const {currentTeamId} = entities.teams;
     const {currentChannelId} = entities.channels;
+    const {currentUserId} = entities.users;
 
     await getMyPreferences()(dispatch, getState);
 
     if (currentTeamId) {
         await getMyTeams()(dispatch, getState);
-        await fetchMyChannelsAndMembers(currentTeamId)(dispatch, getState);
         await getMyTeamMembers()(dispatch, getState);
         getMyTeamUnreads()(dispatch, getState);
         loadProfilesForDirect()(dispatch, getState);
+        getTeams()(dispatch, getState);
+
+        const {myMembers: myTeamMembers} = getState().entities.teams;
+        if (!myTeamMembers[currentTeamId]) {
+            // If the user is no longer a member of this team when reconnecting
+            const newMsg = {
+                data: {
+                    user_id: currentUserId,
+                    team_id: currentTeamId
+                }
+            };
+            return handleLeaveTeamEvent(newMsg, dispatch, getState);
+        }
+
+        await fetchMyChannelsAndMembers(currentTeamId)(dispatch, getState);
+        const {channels, myMembers} = getState().entities.channels;
+        if (!myMembers[currentChannelId]) {
+            // in case the user is not a member of the channel when reconnecting
+            const defaultChannel = Object.values(channels).find((c) => c.team_id === currentTeamId && c.name === General.DEFAULT_CHANNEL);
+
+            // emit the event so the client can change his own state
+            EventEmitter.emit(General.DEFAULT_CHANNEL, defaultChannel.display_name);
+            return selectChannel(defaultChannel.id)(dispatch, getState);
+        }
+
         if (currentChannelId) {
             loadPostsHelper(currentChannelId, dispatch, getState);
         }
-        getTeams()(dispatch, getState);
     }
 
-    dispatch({type: GeneralTypes.WEBSOCKET_SUCCESS}, getState);
+    return dispatch({type: GeneralTypes.WEBSOCKET_SUCCESS}, getState);
 }
 
 function handleClose(connectFailCount, dispatch, getState) {
