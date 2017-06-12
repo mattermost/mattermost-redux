@@ -89,6 +89,11 @@ export function login(loginId, password, mfaToken = '') {
             return null;
         }
 
+        dispatch({
+            type: UserTypes.RECEIVED_ME,
+            data
+        });
+
         let teamMembers;
         try {
             teamMembers = await Client4.getMyTeamMembers();
@@ -130,10 +135,6 @@ export function login(loginId, password, mfaToken = '') {
         }
 
         dispatch(batchActions([
-            {
-                type: UserTypes.RECEIVED_ME,
-                data
-            },
             {
                 type: TeamTypes.RECEIVED_MY_TEAM_MEMBERS,
                 data: await teamMembers
