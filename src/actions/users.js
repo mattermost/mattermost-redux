@@ -134,11 +134,14 @@ function completeLogin(data) {
         try {
             teamMembers = await Client4.getMyTeamMembers();
             const teamUnreads = await Client4.getMyTeamUnreads();
-            for (const u of teamUnreads) {
-                const index = teamMembers.findIndex((m) => m.team_id === u.team_id);
-                const member = teamMembers[index];
-                member.mention_count = u.mention_count;
-                member.msg_count = u.msg_count;
+
+            if (teamUnreads) {
+                for (const u of teamUnreads) {
+                    const index = teamMembers.findIndex((m) => m.team_id === u.team_id);
+                    const member = teamMembers[index];
+                    member.mention_count = u.mention_count;
+                    member.msg_count = u.msg_count;
+                }
             }
         } catch (error) {
             dispatch(batchActions([
@@ -187,14 +190,13 @@ export function loadMe() {
             Client4.attachDevice(deviceId);
         }
 
-        getMyTeamUnreads()(dispatch, getState);
-        getAllCustomEmojis()(dispatch, getState);
-
         await Promise.all([
             getMe()(dispatch, getState),
             getMyPreferences()(dispatch, getState),
             getMyTeams()(dispatch, getState),
-            getMyTeamMembers()(dispatch, getState)
+            getMyTeamMembers()(dispatch, getState),
+            getMyTeamUnreads()(dispatch, getState),
+            getAllCustomEmojis()(dispatch, getState)
         ]);
     };
 }
