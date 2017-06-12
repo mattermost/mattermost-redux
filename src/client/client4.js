@@ -1153,6 +1153,15 @@ export default class Client4 {
         );
     };
 
+    // Emoji Routes
+    getSystemEmojiImageUrl = (filename) => {
+        return `${this.url}/static/emoji/${filename}.png`;
+    };
+
+    getCustomEmojiImageUrl = (id) => {
+        return `${this.getEmojiRoute()}/${id}`;
+    };
+
     // Admin Routes
 
     getLogs = async (page = 0, perPage = PER_PAGE_DEFAULT) => {

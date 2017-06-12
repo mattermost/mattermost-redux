@@ -5,6 +5,7 @@ import {batchActions} from 'redux-batched-actions';
 import {Client4} from 'client';
 import {General} from 'constants';
 import {UserTypes, TeamTypes} from 'action_types';
+import {getAllCustomEmojis} from './emojis';
 import {getMyTeams, getMyTeamMembers, getMyTeamUnreads} from './teams';
 
 import {
@@ -96,7 +97,7 @@ export function login(loginId, password, mfaToken = '', ldapOnly = false) {
                 },
                 getLogErrorAction(error)
             ]), getState);
-            return null;
+            return false;
         }
 
         return await completeLogin(data)(dispatch, getState);
@@ -144,29 +145,21 @@ function completeLogin(data) {
                 {type: UserTypes.LOGIN_FAILURE, error},
                 getLogErrorAction(error)
             ]), getState);
-            return null;
+            return false;
         }
 
         try {
-            await getMyPreferences()(dispatch, getState);
+            await Promise.all([
+                getMyPreferences()(dispatch, getState),
+                getMyTeams()(dispatch, getState),
+                getAllCustomEmojis()(dispatch, getState)
+            ]);
         } catch (error) {
-            forceLogoutIfNecessary(error, dispatch);
             dispatch(batchActions([
                 {type: UserTypes.LOGIN_FAILURE, error},
                 getLogErrorAction(error)
             ]), getState);
-            return null;
-        }
-
-        try {
-            await getMyTeams()(dispatch, getState);
-        } catch (error) {
-            forceLogoutIfNecessary(error, dispatch);
-            dispatch(batchActions([
-                {type: UserTypes.LOGIN_FAILURE, error},
-                getLogErrorAction(error)
-            ]), getState);
-            return null;
+            return false;
         }
 
         dispatch(batchActions([
@@ -194,17 +187,15 @@ export function loadMe() {
             Client4.attachDevice(deviceId);
         }
 
-        const me = getMe()(dispatch, getState);
-        const prefs = getMyPreferences()(dispatch, getState);
-        const teams = getMyTeams()(dispatch, getState);
-        const members = getMyTeamMembers()(dispatch, getState);
-
-        await me;
-        await prefs;
-        await teams;
-        await members;
-
         getMyTeamUnreads()(dispatch, getState);
+        getAllCustomEmojis()(dispatch, getState);
+
+        await Promise.all([
+            getMe()(dispatch, getState),
+            getMyPreferences()(dispatch, getState),
+            getMyTeams()(dispatch, getState),
+            getMyTeamMembers()(dispatch, getState)
+        ]);
     };
 }
 

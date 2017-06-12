@@ -33,6 +33,45 @@ export function getCustomEmojis(page = 0, perPage = General.PAGE_SIZE_DEFAULT) {
     );
 }
 
+export function getAllCustomEmojis(perPage = General.PAGE_SIZE_DEFAULT) {
+    return async (dispatch, getState) => {
+        dispatch(batchActions([
+            {type: EmojiTypes.GET_ALL_CUSTOM_EMOJIS_REQUEST},
+            {type: EmojiTypes.CLEAR_CUSTOM_EMOJIS}
+        ]), getState);
+
+        // hasMore should be set to true once we switch to v4
+        let hasMore = false;
+        let page = 0;
+
+        do {
+            try {
+                const emojis = await Client.getCustomEmojis(page, perPage);
+
+                dispatch({
+                    type: EmojiTypes.RECEIVED_CUSTOM_EMOJIS,
+                    data: emojis
+                });
+
+                if (emojis.length < perPage) {
+                    hasMore = false;
+                } else {
+                    page += 1;
+                }
+            } catch (error) {
+                forceLogoutIfNecessary(error, dispatch);
+
+                return dispatch(batchActions([
+                    {type: EmojiTypes.GET_ALL_CUSTOM_EMOJIS_FAILURE, error},
+                    getLogErrorAction(error)
+                ]), getState);
+            }
+        } while (hasMore);
+
+        return dispatch({type: EmojiTypes.GET_ALL_CUSTOM_EMOJIS_SUCCESS}, getState);
+    };
+}
+
 export function deleteCustomEmoji(emojiId) {
     return async (dispatch, getState) => {
         dispatch({type: EmojiTypes.DELETE_CUSTOM_EMOJI_REQUEST}, getState);

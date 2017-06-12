@@ -17,3 +17,16 @@ export const getCustomEmojisAsMap = createSelector(
         return map;
     }
 );
+
+export const getCustomEmojisByName = createSelector(
+    getCustomEmojis,
+    (emojis) => {
+        const map = new Map();
+
+        Object.values(emojis).forEach((emoji) => {
+            map.set(emoji.name, emoji);
+        });
+
+        return map;
+    }
+);

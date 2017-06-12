@@ -13,8 +13,8 @@ function customEmoji(state = {}, action) {
         return nextState;
     }
     case EmojiTypes.RECEIVED_CUSTOM_EMOJIS: {
-        for (const hook of action.data) {
-            nextState[hook.id] = hook;
+        for (const emoji of action.data) {
+            nextState[emoji.id] = emoji;
         }
         return nextState;
     }
@@ -22,6 +22,7 @@ function customEmoji(state = {}, action) {
         Reflect.deleteProperty(nextState, action.data.id);
         return nextState;
     }
+    case EmojiTypes.CLEAR_CUSTOM_EMOJIS:
     case UserTypes.LOGOUT_SUCCESS:
         return {};
 
