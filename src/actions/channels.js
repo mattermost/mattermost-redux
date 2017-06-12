@@ -1,12 +1,13 @@
 // Copyright (c) 2016-present Mattermost, Inc. All Rights Reserved.
 // See License.txt for license information.
 
-import {General, Preferences} from 'constants';
-import {ChannelTypes, PreferenceTypes, TeamTypes, UserTypes} from 'action_types';
-import {savePreferences} from 'actions/preferences';
 import {batchActions} from 'redux-batched-actions';
 
 import {Client4} from 'client';
+import {General, Preferences} from 'constants';
+import {ChannelTypes, PreferenceTypes, TeamTypes, UserTypes} from 'action_types';
+import {savePreferences} from 'actions/preferences';
+import {getChannelsIdForTeam} from 'utils/channel_utils';
 
 import {logError, getLogErrorAction} from './errors';
 import {bindClientFunc, forceLogoutIfNecessary} from './helpers';
@@ -353,7 +354,8 @@ export function fetchMyChannelsAndMembers(teamId) {
             },
             {
                 type: ChannelTypes.RECEIVED_MY_CHANNEL_MEMBERS,
-                data: channelMembers
+                data: channelMembers,
+                remove: getChannelsIdForTeam(getState(), teamId)
             },
             {
                 type: ChannelTypes.CHANNEL_MEMBERS_SUCCESS
@@ -385,7 +387,8 @@ export function getMyChannelMembers(teamId) {
         dispatch(batchActions([
             {
                 type: ChannelTypes.RECEIVED_MY_CHANNEL_MEMBERS,
-                data: channelMembers
+                data: channelMembers,
+                remove: getChannelsIdForTeam(getState(), teamId)
             },
             {
                 type: ChannelTypes.CHANNEL_MY_MEMBERS_SUCCESS

@@ -219,6 +219,17 @@ export function showDeleteOption(config, license, channel, isAdmin, isSystemAdmi
     return true;
 }
 
+export function getChannelsIdForTeam(state, teamId) {
+    const {channels} = state.entities.channels;
+
+    return Object.values(channels).reduce((res, channel) => {
+        if (channel.team_id === teamId) {
+            res.push(channel.id);
+        }
+        return res;
+    }, []);
+}
+
 //====================================================
 
 function createFakeChannel(userId, otherUserId) {
