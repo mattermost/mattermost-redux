@@ -1,26 +1,16 @@
 // Copyright (c) 2016-present Mattermost, Inc. All Rights Reserved.
 // See License.txt for license information.
 
-import {General, Preferences} from 'constants';
-import {ChannelTypes, PreferenceTypes, TeamTypes, UserTypes} from 'action_types';
-import {savePreferences} from 'actions/preferences';
 import {batchActions} from 'redux-batched-actions';
 
 import {Client4} from 'client';
+import {General, Preferences} from 'constants';
+import {ChannelTypes, PreferenceTypes, TeamTypes, UserTypes} from 'action_types';
+import {savePreferences} from 'actions/preferences';
+import {getChannelsIdForTeam} from 'utils/channel_utils';
 
 import {logError, getLogErrorAction} from './errors';
 import {bindClientFunc, forceLogoutIfNecessary} from './helpers';
-
-function getChannelsIdForTeam(state, teamId) {
-    const {channels} = state.entities.channels;
-
-    return Object.values(channels).reduce((res, channel) => {
-        if (channel.team_id === teamId) {
-            res.push(channel.id);
-        }
-        return res;
-    }, []);
-}
 
 export function selectChannel(channelId) {
     return async (dispatch, getState) => {
