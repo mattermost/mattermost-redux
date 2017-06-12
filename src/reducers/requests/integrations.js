@@ -86,11 +86,31 @@ function updateOutgoingHook(state = initialRequestState(), action) {
     );
 }
 
+function getCustomTeamCommands(state = initialRequestState(), action) {
+    return handleRequest(
+        IntegrationTypes.GET_CUSTOM_TEAM_COMMANDS_REQUEST,
+        IntegrationTypes.GET_CUSTOM_TEAM_COMMANDS_SUCCESS,
+        IntegrationTypes.GET_CUSTOM_TEAM_COMMANDS_FAILURE,
+        state,
+        action
+    );
+}
+
 function addCommand(state = initialRequestState(), action) {
     return handleRequest(
         IntegrationTypes.ADD_COMMAND_REQUEST,
         IntegrationTypes.ADD_COMMAND_SUCCESS,
         IntegrationTypes.ADD_COMMAND_FAILURE,
+        state,
+        action
+    );
+}
+
+function editCommand(state = initialRequestState(), action) {
+    return handleRequest(
+        IntegrationTypes.EDIT_COMMAND_REQUEST,
+        IntegrationTypes.EDIT_COMMAND_SUCCESS,
+        IntegrationTypes.EDIT_COMMAND_FAILURE,
         state,
         action
     );
@@ -125,7 +145,9 @@ export default combineReducers({
     getOutgoingHooks,
     deleteOutgoingHook,
     updateOutgoingHook,
+    getCustomTeamCommands,
     addCommand,
+    editCommand,
     regenCommandToken,
     deleteCommand
 });

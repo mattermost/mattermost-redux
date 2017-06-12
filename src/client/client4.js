@@ -1117,11 +1117,25 @@ export default class Client4 {
         );
     };
 
+    getCustomTeamCommands = async (teamId) => {
+        return this.doFetch(
+            `${this.getCommandsRoute()}?team_id=${teamId}&custom_only=true`,
+            {method: 'get'}
+        );
+    };
+
     addCommand = async (teamId, command) => {
         command.team_id = teamId;
         return this.doFetch(
             `${this.getCommandsRoute()}`,
             {method: 'post', body: JSON.stringify(command)}
+        );
+    };
+
+    editCommand = async (command) => {
+        return this.doFetch(
+            `${this.getCommandsRoute()}/${command.id}`,
+            {method: 'put', body: JSON.stringify(command)}
         );
     };
 
