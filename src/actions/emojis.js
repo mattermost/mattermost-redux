@@ -66,7 +66,7 @@ export function getAllCustomEmojis(perPage = General.PAGE_SIZE_DEFAULT) {
                     getLogErrorAction(error)
                 ]), getState);
             }
-        } while(hasMore);
+        } while (hasMore);
 
         return dispatch({type: EmojiTypes.GET_ALL_CUSTOM_EMOJIS_SUCCESS}, getState);
     };
