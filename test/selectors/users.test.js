@@ -167,5 +167,10 @@ describe('Selectors.Users', () => {
     it('getUsersInVisibleDMs', () => {
         assert.deepEqual(Selectors.getUsersInVisibleDMs(testState), [user2]);
     });
+
+    it('getUserByEmail', () => {
+        assert.deepEqual(Selectors.getUserByEmail(testState, user1.email), user1);
+        assert.deepEqual(Selectors.getUserByEmail(testState, user2.email), user2);
+    });
 });
 
