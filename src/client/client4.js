@@ -162,6 +162,10 @@ export default class Client4 {
         return `${this.getBaseRoute()}/brand`;
     }
 
+    getBrandImageUrl(timestamp) {
+        return `${this.getBrandRoute()}/image?t=${timestamp}`;
+    }
+
     getOptions(options) {
         const newOptions = Object.assign({}, options);
 
