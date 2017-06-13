@@ -905,7 +905,8 @@ export function updateUserActive(userId, active) {
 
         const profile = getState().entities.users.profiles[userId];
         if (profile) {
-            actions.push({type: UserTypes.RECEIVED_PROFILE, data: {...profile, delete_at: new Date().getTime()}});
+            const deleteAt = active ? 0 : new Date().getTime();
+            actions.push({type: UserTypes.RECEIVED_PROFILE, data: {...profile, delete_at: deleteAt}});
         }
 
         dispatch(batchActions(actions), getState);
