@@ -532,6 +532,34 @@ export default class Client4 {
         );
     };
 
+    switchEmailToOAuth = async (service, email, password, mfaCode = '') => {
+        return this.doFetch(
+            `${this.getUsersRoute()}/login/switch`,
+            {method: 'post', body: JSON.stringify({current_service: 'email', new_service: service, email, password, mfa_code: mfaCode})}
+        );
+    };
+
+    switchOAuthToEmail = async (currentService, email, password) => {
+        return this.doFetch(
+            `${this.getUsersRoute()}/login/switch`,
+            {method: 'post', body: JSON.stringify({current_service: currentService, new_service: 'email', email, new_password: password})}
+        );
+    };
+
+    switchEmailToLdap = async (email, emailPassword, ldapId, ldapPassword, mfaCode = '') => {
+        return this.doFetch(
+            `${this.getUsersRoute()}/login/switch`,
+            {method: 'post', body: JSON.stringify({current_service: 'email', new_service: 'ldap', email, password: emailPassword, ldap_id: ldapId, new_password: ldapPassword, mfa_code: mfaCode})}
+        );
+    };
+
+    switchLdapToEmail = async (ldapId, ldapPassword, email, emailPassword, mfaCode = '') => {
+        return this.doFetch(
+            `${this.getUsersRoute()}/login/switch`,
+            {method: 'post', body: JSON.stringify({current_service: 'ldap', new_service: 'email', email, password: ldapPassword, ldap_id: ldapId, new_password: emailPassword, mfa_code: mfaCode})}
+        );
+    };
+
     // Team Routes
 
     createTeam = async (team) => {

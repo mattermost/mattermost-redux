@@ -284,6 +284,16 @@ function passwordReset(state = initialRequestState(), action) {
     );
 }
 
+function switchLogin(state = initialRequestState(), action) {
+    return handleRequest(
+        UserTypes.SWITCH_LOGIN_REQUEST,
+        UserTypes.SWITCH_LOGIN_SUCCESS,
+        UserTypes.SWITCH_LOGIN_FAILURE,
+        state,
+        action
+    );
+}
+
 export default combineReducers({
     checkMfa,
     generateMfaSecret,
@@ -309,5 +319,6 @@ export default combineReducers({
     updateMe,
     updateUser,
     verifyEmail,
-    passwordReset
+    passwordReset,
+    switchLogin
 });

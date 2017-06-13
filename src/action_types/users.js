@@ -104,6 +104,10 @@ export default keyMirror({
     PASSWORD_RESET_SUCCESS: null,
     PASSWORD_RESET_FAILURE: null,
 
+    SWITCH_LOGIN_REQUEST: null,
+    SWITCH_LOGIN_SUCCESS: null,
+    SWITCH_LOGIN_FAILURE: null,
+
     RECEIVED_ME: null,
     RECEIVED_PROFILE: null,
     RECEIVED_PROFILES: null,
