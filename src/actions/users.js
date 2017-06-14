@@ -1021,13 +1021,12 @@ export function switchEmailToLdap(email, emailPassword, ldapId, ldapPassword, mf
     );
 }
 
-export function switchLdapToEmail(ldapId, ldapPassword, email, emailPassword, mfaCode = '') {
+export function switchLdapToEmail(ldapPassword, email, emailPassword, mfaCode = '') {
     return bindClientFunc(
         Client4.switchLdapToEmail,
         UserTypes.SWITCH_LOGIN_REQUEST,
         UserTypes.SWITCH_LOGIN_SUCCESS,
         UserTypes.SWITCH_LOGIN_FAILURE,
-        ldapId,
         ldapPassword,
         email,
         emailPassword,

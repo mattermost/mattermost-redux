@@ -553,10 +553,10 @@ export default class Client4 {
         );
     };
 
-    switchLdapToEmail = async (ldapId, ldapPassword, email, emailPassword, mfaCode = '') => {
+    switchLdapToEmail = async (ldapPassword, email, emailPassword, mfaCode = '') => {
         return this.doFetch(
             `${this.getUsersRoute()}/login/switch`,
-            {method: 'post', body: JSON.stringify({current_service: 'ldap', new_service: 'email', email, password: ldapPassword, ldap_id: ldapId, new_password: emailPassword, mfa_code: mfaCode})}
+            {method: 'post', body: JSON.stringify({current_service: 'ldap', new_service: 'email', email, password: ldapPassword, new_password: emailPassword, mfa_code: mfaCode})}
         );
     };
 
