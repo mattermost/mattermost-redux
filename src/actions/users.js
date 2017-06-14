@@ -982,6 +982,59 @@ export function uploadProfileImage(userId, imageData) {
     };
 }
 
+export function switchEmailToOAuth(service, email, password, mfaCode = '') {
+    return bindClientFunc(
+        Client4.switchEmailToOAuth,
+        UserTypes.SWITCH_LOGIN_REQUEST,
+        UserTypes.SWITCH_LOGIN_SUCCESS,
+        UserTypes.SWITCH_LOGIN_FAILURE,
+        service,
+        email,
+        password,
+        mfaCode
+    );
+}
+
+export function switchOAuthToEmail(currentService, email, password) {
+    return bindClientFunc(
+        Client4.switchOAuthToEmail,
+        UserTypes.SWITCH_LOGIN_REQUEST,
+        UserTypes.SWITCH_LOGIN_SUCCESS,
+        UserTypes.SWITCH_LOGIN_FAILURE,
+        currentService,
+        email,
+        password
+    );
+}
+
+export function switchEmailToLdap(email, emailPassword, ldapId, ldapPassword, mfaCode = '') {
+    return bindClientFunc(
+        Client4.switchEmailToLdap,
+        UserTypes.SWITCH_LOGIN_REQUEST,
+        UserTypes.SWITCH_LOGIN_SUCCESS,
+        UserTypes.SWITCH_LOGIN_FAILURE,
+        email,
+        emailPassword,
+        ldapId,
+        ldapPassword,
+        mfaCode
+    );
+}
+
+export function switchLdapToEmail(ldapId, ldapPassword, email, emailPassword, mfaCode = '') {
+    return bindClientFunc(
+        Client4.switchLdapToEmail,
+        UserTypes.SWITCH_LOGIN_REQUEST,
+        UserTypes.SWITCH_LOGIN_SUCCESS,
+        UserTypes.SWITCH_LOGIN_FAILURE,
+        ldapId,
+        ldapPassword,
+        email,
+        emailPassword,
+        mfaCode
+    );
+}
+
 export default {
     checkMfa,
     generateMfaSecret,
@@ -1013,5 +1066,9 @@ export default {
     sendVerificationEmail,
     resetUserPassword,
     sendPasswordResetEmail,
-    uploadProfileImage
+    uploadProfileImage,
+    switchEmailToOAuth,
+    switchOAuthToEmail,
+    switchEmailToLdap,
+    switchLdapToEmail
 };

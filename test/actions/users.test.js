@@ -771,4 +771,68 @@ describe('Actions.Users', () => {
         assert.ok(currentUser);
         assert.ok(currentUser.last_picture_update > beforeTime);
     });
+
+    it('switchEmailToOAuth', async () => {
+        TestHelper.activateMocking();
+        nock(Client4.getBaseRoute()).
+            post('/users/login/switch').
+            reply(200, {follow_link: '/login'});
+
+        await Actions.switchEmailToOAuth('gitlab', TestHelper.basicUser.email, TestHelper.basicUser.password)(store.dispatch, store.getState);
+        nock.restore();
+
+        const request = store.getState().requests.users.switchLogin;
+
+        if (request.status === RequestStatus.FAILURE) {
+            throw new Error(JSON.stringify(request.error));
+        }
+    });
+
+    it('switchOAuthToEmail', async () => {
+        TestHelper.activateMocking();
+        nock(Client4.getBaseRoute()).
+            post('/users/login/switch').
+            reply(200, {follow_link: '/login'});
+
+        await Actions.switchOAuthToEmail('gitlab', TestHelper.basicUser.email, TestHelper.basicUser.password)(store.dispatch, store.getState);
+        nock.restore();
+
+        const request = store.getState().requests.users.switchLogin;
+
+        if (request.status === RequestStatus.FAILURE) {
+            throw new Error(JSON.stringify(request.error));
+        }
+    });
+
+    it('switchEmailToLdap', async () => {
+        TestHelper.activateMocking();
+        nock(Client4.getBaseRoute()).
+            post('/users/login/switch').
+            reply(200, {follow_link: '/login'});
+
+        await Actions.switchEmailToLdap(TestHelper.basicUser.email, TestHelper.basicUser.password, 'someid', 'somepassword')(store.dispatch, store.getState);
+        nock.restore();
+
+        const request = store.getState().requests.users.switchLogin;
+
+        if (request.status === RequestStatus.FAILURE) {
+            throw new Error(JSON.stringify(request.error));
+        }
+    });
+
+    it('switchLdapToEmail', async () => {
+        TestHelper.activateMocking();
+        nock(Client4.getBaseRoute()).
+            post('/users/login/switch').
+            reply(200, {follow_link: '/login'});
+
+        await Actions.switchLdapToEmail('someid', 'somepassword', TestHelper.basicUser.email, TestHelper.basicUser.password)(store.dispatch, store.getState);
+        nock.restore();
+
+        const request = store.getState().requests.users.switchLogin;
+
+        if (request.status === RequestStatus.FAILURE) {
+            throw new Error(JSON.stringify(request.error));
+        }
+    });
 });
