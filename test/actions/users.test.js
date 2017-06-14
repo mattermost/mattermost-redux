@@ -826,7 +826,7 @@ describe('Actions.Users', () => {
             post('/users/login/switch').
             reply(200, {follow_link: '/login'});
 
-        await Actions.switchLdapToEmail('someid', 'somepassword', TestHelper.basicUser.email, TestHelper.basicUser.password)(store.dispatch, store.getState);
+        await Actions.switchLdapToEmail('somepassword', TestHelper.basicUser.email, TestHelper.basicUser.password)(store.dispatch, store.getState);
         nock.restore();
 
         const request = store.getState().requests.users.switchLogin;
