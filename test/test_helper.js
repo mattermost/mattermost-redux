@@ -117,7 +117,7 @@ class TestHelper {
 
     testCommand = () => {
         return {
-            trigger: 'test',
+            trigger: this.generateId(),
             method: 'P',
             username: 'test',
             icon_url: 'http://localhost/notarealendpoint',
