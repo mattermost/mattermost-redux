@@ -701,7 +701,8 @@ export function addChannelMember(channelId, userId) {
                 data: member
             },
             {
-                type: ChannelTypes.ADD_CHANNEL_MEMBER_SUCCESS
+                type: ChannelTypes.ADD_CHANNEL_MEMBER_SUCCESS,
+                id: channelId
             }
         ], 'ADD_CHANNEL_MEMBER.BATCH'), getState);
 
