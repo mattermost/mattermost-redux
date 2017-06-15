@@ -15,11 +15,21 @@ import {General} from 'constants';
 import serviceReducer from 'reducers';
 import deepFreezeAndThrowOnMutation from 'utils/deep_freeze';
 
-import {offlineConfig} from './helpers';
+import {defaultOptions, offlineConfig} from './helpers';
 
-export default function configureServiceStore(preloadedState, appReducer, userOfflineConfig, getAppReducer, enableBuffer = true) {
+export default function configureServiceStore(preloadedState, appReducer, userOfflineConfig, getAppReducer, clientOptions = {}) {
     const baseOfflineConfig = Object.assign({}, defaultOfflineConfig, offlineConfig, userOfflineConfig);
-    const middleware = [thunk];
+    const options = Object.assign({}, defaultOptions, clientOptions);
+
+    const {additionalMiddleware, enableBuffer} = options;
+
+    let clientSideMiddleware = additionalMiddleware;
+
+    if (typeof clientSideMiddleware === 'function') {
+        clientSideMiddleware = [clientSideMiddleware];
+    }
+
+    const middleware = [thunk, ...clientSideMiddleware];
     if (enableBuffer) {
         middleware.push(createActionBuffer(REHYDRATE));
     }
