@@ -1,6 +1,11 @@
 // Copyright (c) 2017 Mattermost, Inc. All Rights Reserved.
 // See License.txt for license information.
 
+export const defaultOptions = {
+    additionalMiddleware: [],
+    enableBuffer: true
+};
+
 export const offlineConfig = {
     effect: (effect, action) => {
         if (typeof effect !== 'function') {
