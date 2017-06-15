@@ -328,11 +328,19 @@ export function fetchMyChannelsAndMembers(teamId) {
         let channels;
         let channelMembers;
         try {
-            const channelsRequest = Client4.getMyChannels(teamId);
-            const channelMembersRequest = Client4.getMyChannelMembers(teamId);
+            channels = await Client4.getMyChannels(teamId);
+        } catch (error) {
+            forceLogoutIfNecessary(error, dispatch);
+            dispatch(batchActions([
+                {type: ChannelTypes.CHANNELS_FAILURE, error},
+                {type: ChannelTypes.CHANNEL_MEMBERS_FAILURE, error},
+                getLogErrorAction(error)
+            ]), getState);
+            return null;
+        }
 
-            channels = await channelsRequest;
-            channelMembers = await channelMembersRequest;
+        try {
+            channelMembers = await Client4.getMyChannelMembers(teamId);
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch);
             dispatch(batchActions([
