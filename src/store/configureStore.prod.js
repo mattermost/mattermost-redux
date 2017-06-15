@@ -15,6 +15,12 @@ import serviceReducer from 'reducers';
 import initialState from './initial_state';
 import {defaultOptions, offlineConfig} from './helpers';
 
+/***
+clientOptions object - This param allows users to configure the store from the client side.
+It has two properties currently:
+enableBuffer - bool - default = true - If true the store will buffer all actions until offline state rehydration occurs.
+additionalMiddleware - func | array - Allows for single or multiple additional middleware functions to be passed in from the client side.
+***/
 export default function configureOfflineServiceStore(preloadedState, appReducer, userOfflineConfig, getAppReducer, clientOptions = {}) {
     const baseReducer = combineReducers(Object.assign({}, serviceReducer, appReducer));
     const baseState = Object.assign({}, initialState, preloadedState);
