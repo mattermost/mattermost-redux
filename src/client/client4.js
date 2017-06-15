@@ -1406,7 +1406,9 @@ export default class Client4 {
             };
         }
 
-        if (headers.has(HEADER_X_VERSION_ID)) {
+        // Need to only accept version in the header from requests that are not cached
+        // to avoid getting an old version from a cached response
+        if (headers.has(HEADER_X_VERSION_ID) && !headers.get('Cache-Control')) {
             const serverVersion = headers.get(HEADER_X_VERSION_ID);
             if (serverVersion && this.serverVersion !== serverVersion) {
                 this.serverVersion = serverVersion;
