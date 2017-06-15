@@ -26,6 +26,8 @@ import {
     makeGroupMessageVisibleIfNecessary
 } from './preferences';
 
+import {getConfig} from 'selectors/entities/general';
+
 export function checkMfa(loginId) {
     return async (dispatch, getState) => {
         dispatch({type: UserTypes.CHECK_MFA_REQUEST}, getState);
@@ -156,12 +158,18 @@ function completeLogin(data) {
             return false;
         }
 
+        const promises = [
+            getMyPreferences()(dispatch, getState),
+            getMyTeams()(dispatch, getState)
+        ];
+
+        const state = getState();
+        if (getConfig(state).EnableCustomEmoji === 'true') {
+            promises.push(getAllCustomEmojis()(dispatch, getState));
+        }
+
         try {
-            await Promise.all([
-                getMyPreferences()(dispatch, getState),
-                getMyTeams()(dispatch, getState),
-                getAllCustomEmojis()(dispatch, getState)
-            ]);
+            await Promise.all(promises);
         } catch (error) {
             dispatch(batchActions([
                 {type: UserTypes.LOGIN_FAILURE, error},
@@ -186,19 +194,26 @@ function completeLogin(data) {
 
 export function loadMe() {
     return async (dispatch, getState) => {
-        const deviceId = getState().entities.general.deviceToken;
+        const state = getState();
+
+        const deviceId = state.entities.general.deviceToken;
         if (deviceId) {
             Client4.attachDevice(deviceId);
         }
 
-        await Promise.all([
+        const promises = [
             getMe()(dispatch, getState),
             getMyPreferences()(dispatch, getState),
             getMyTeams()(dispatch, getState),
             getMyTeamMembers()(dispatch, getState),
-            getMyTeamUnreads()(dispatch, getState),
-            getAllCustomEmojis()(dispatch, getState)
-        ]);
+            getMyTeamUnreads()(dispatch, getState)
+        ];
+
+        if (state.EnableCustomEmoji === 'true') {
+            promises.push(getAllCustomEmojis()(dispatch, getState));
+        }
+
+        await Promise.all(promises);
     };
 }
 
