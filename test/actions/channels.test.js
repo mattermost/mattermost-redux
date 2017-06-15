@@ -433,6 +433,8 @@ describe('Actions.Channels', () => {
     });
 
     it('addChannelMember', async () => {
+        const channelId = TestHelper.basicChannel.id;
+
         const user = await TestHelper.basicClient4.createUser(
             TestHelper.fakeUser(),
             null,
@@ -441,31 +443,52 @@ describe('Actions.Channels', () => {
         );
 
         await Actions.joinChannel(
-                TestHelper.basicUser.id,
-                TestHelper.basicTeam.id,
-                TestHelper.basicChannel.id
-            )(store.dispatch, store.getState);
+            TestHelper.basicUser.id,
+            TestHelper.basicTeam.id,
+            channelId
+        )(store.dispatch, store.getState);
+
+        await Actions.getChannelStats(
+            channelId
+        )(store.dispatch, store.getState);
+
+        let state = store.getState();
+        let {stats} = state.entities.channels;
+        assert.ok(stats, 'stats');
+        assert.ok(stats[channelId], 'stats for channel');
+        assert.ok(stats[channelId].member_count, 'member count for channel');
+        assert.equal(stats[channelId].member_count, 1, 'incorrect member count for channel');
 
         await Actions.addChannelMember(
-            TestHelper.basicChannel.id,
+            channelId,
             user.id
         )(store.dispatch, store.getState);
 
-        const addRequest = store.getState().requests.channels.addChannelMember;
+        state = store.getState();
+
+        const addRequest = state.requests.channels.addChannelMember;
         if (addRequest.status === RequestStatus.FAILURE) {
             throw new Error(JSON.stringify(addRequest.error));
         }
 
-        const {profilesInChannel, profilesNotInChannel} = store.getState().entities.users;
-        const channel = profilesInChannel[TestHelper.basicChannel.id];
-        const notChannel = profilesNotInChannel[TestHelper.basicChannel.id];
+        const {profilesInChannel, profilesNotInChannel} = state.entities.users;
+        const channel = profilesInChannel[channelId];
+        const notChannel = profilesNotInChannel[channelId];
         assert.ok(channel);
         assert.ok(notChannel);
         assert.ok(channel.has(user.id));
         assert.ifError(notChannel.has(user.id));
+
+        stats = state.entities.channels.stats;
+        assert.ok(stats, 'stats');
+        assert.ok(stats[channelId], 'stats for channel');
+        assert.ok(stats[channelId].member_count, 'member count for channel');
+        assert.equal(stats[channelId].member_count, 2, 'incorrect member count for channel');
     });
 
     it('removeChannelMember', async () => {
+        const channelId = TestHelper.basicChannel.id;
+
         const user = await TestHelper.basicClient4.createUser(
             TestHelper.fakeUser(),
             null,
@@ -476,31 +499,50 @@ describe('Actions.Channels', () => {
         await Actions.joinChannel(
                 TestHelper.basicUser.id,
                 TestHelper.basicTeam.id,
-                TestHelper.basicChannel.id
+                channelId
             )(store.dispatch, store.getState);
 
+        await Actions.getChannelStats(
+            channelId
+        )(store.dispatch, store.getState);
+
         await Actions.addChannelMember(
-            TestHelper.basicChannel.id,
+            channelId,
             user.id
         )(store.dispatch, store.getState);
+
+        let state = store.getState();
+        let {stats} = state.entities.channels;
+        assert.ok(stats, 'stats');
+        assert.ok(stats[channelId], 'stats for channel');
+        assert.ok(stats[channelId].member_count, 'member count for channel');
+        assert.equal(stats[channelId].member_count, 3, 'incorrect member count for channel');
 
         await Actions.removeChannelMember(
-            TestHelper.basicChannel.id,
+            channelId,
             user.id
         )(store.dispatch, store.getState);
 
-        const removeRequest = store.getState().requests.channels.removeChannelMember;
+        state = store.getState();
+
+        const removeRequest = state.requests.channels.removeChannelMember;
         if (removeRequest.status === RequestStatus.FAILURE) {
             throw new Error(JSON.stringify(removeRequest.error));
         }
 
-        const {profilesInChannel, profilesNotInChannel} = store.getState().entities.users;
-        const channel = profilesInChannel[TestHelper.basicChannel.id];
-        const notChannel = profilesNotInChannel[TestHelper.basicChannel.id];
+        const {profilesInChannel, profilesNotInChannel} = state.entities.users;
+        const channel = profilesInChannel[channelId];
+        const notChannel = profilesNotInChannel[channelId];
         assert.ok(channel);
         assert.ok(notChannel);
         assert.ok(notChannel.has(user.id));
         assert.ifError(channel.has(user.id));
+
+        stats = state.entities.channels.stats;
+        assert.ok(stats, 'stats');
+        assert.ok(stats[channelId], 'stats for channel');
+        assert.ok(stats[channelId].member_count, 'member count for channel');
+        assert.equal(stats[channelId].member_count, 2, 'incorrect member count for channel');
     });
 
     it('updateChannelMemberRoles', async () => {

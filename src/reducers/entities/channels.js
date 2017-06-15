@@ -263,8 +263,8 @@ function stats(state = {}, action) {
 
         return nextState;
     }
-    case ChannelTypes.RECEIVED_CHANNEL_MEMBER: {
-        const id = action.channel_id;
+    case ChannelTypes.ADD_CHANNEL_MEMBER_SUCCESS: {
+        const id = action.id;
         const nextStat = nextState[id];
         if (nextStat) {
             const count = nextStat.member_count + 1;
