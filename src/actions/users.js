@@ -130,6 +130,11 @@ export function loginById(id, password, mfaToken = '') {
 
 function completeLogin(data) {
     return async (dispatch, getState) => {
+        dispatch({
+            type: UserTypes.RECEIVED_ME,
+            data
+        });
+
         let teamMembers;
         try {
             teamMembers = await Client4.getMyTeamMembers();
@@ -166,10 +171,6 @@ function completeLogin(data) {
         }
 
         dispatch(batchActions([
-            {
-                type: UserTypes.RECEIVED_ME,
-                data
-            },
             {
                 type: TeamTypes.RECEIVED_MY_TEAM_MEMBERS,
                 data: await teamMembers
