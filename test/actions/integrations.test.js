@@ -247,9 +247,9 @@ describe('Actions.Integrations', () => {
           TestHelper.fakeTeam()
         )(store.dispatch, store.getState);
 
-        const created = await Actions.addCommand(team.id,
-          TestHelper.testCommand()
-        )(store.dispatch, store.getState);
+        const expected = TestHelper.testCommand();
+
+        const created = await Actions.addCommand(team.id, expected)(store.dispatch, store.getState);
 
         const request = store.getState().requests.integrations.addCommand;
         if (request.status === RequestStatus.FAILURE) {
@@ -259,7 +259,6 @@ describe('Actions.Integrations', () => {
         const {commands} = store.getState().entities.integrations;
         assert.ok(commands[created.id]);
         const actual = commands[created.id];
-        const expected = TestHelper.testCommand();
 
         assert.ok(actual.token);
         assert.equal(actual.create_at, actual.update_at);
