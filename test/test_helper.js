@@ -176,6 +176,17 @@ class TestHelper {
         return files;
     }
 
+    fakeOAuthApp = () => {
+        return {
+            name: this.generateId(),
+            callback_urls: ['http://localhost/notrealurl'],
+            homepage: 'http://localhost/notrealurl',
+            description: 'fake app',
+            is_trusted: false,
+            icon_url: 'http://localhost/notrealurl'
+        };
+    }
+
     initBasic = async (client = this.createClient(), client4 = this.createClient4()) => {
         client.setUrl(DEFAULT_SERVER);
         client4.setUrl(DEFAULT_SERVER);

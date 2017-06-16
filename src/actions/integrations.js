@@ -135,6 +135,16 @@ export function updateOutgoingHook(hook) {
     );
 }
 
+export function regenOutgoingHookToken(hookId) {
+    return bindClientFunc(
+        Client4.regenOutgoingHookToken,
+        IntegrationTypes.UPDATE_OUTGOING_HOOK_REQUEST,
+        [IntegrationTypes.RECEIVED_OUTGOING_HOOK, IntegrationTypes.UPDATE_OUTGOING_HOOK_SUCCESS],
+        IntegrationTypes.UPDATE_OUTGOING_HOOK_FAILURE,
+        hookId
+    );
+}
+
 export function getCustomTeamCommands(teamId) {
     return bindClientFunc(
         Client4.getCustomTeamCommands,
@@ -228,4 +238,75 @@ export function deleteCommand(id) {
 
         return true;
     };
+}
+
+export function addOAuthApp(app) {
+    return bindClientFunc(
+        Client4.createOAuthApp,
+        IntegrationTypes.ADD_OAUTH_APP_REQUEST,
+        [IntegrationTypes.RECEIVED_OAUTH_APP, IntegrationTypes.ADD_OAUTH_APP_SUCCESS],
+        IntegrationTypes.ADD_OAUTH_APP_FAILURE,
+        app
+    );
+}
+
+export function getOAuthApps(page = 0, perPage = General.PAGE_SIZE_DEFAULT) {
+    return bindClientFunc(
+        Client4.getOAuthApps,
+        IntegrationTypes.GET_OAUTH_APPS_REQUEST,
+        [IntegrationTypes.RECEIVED_OAUTH_APPS, IntegrationTypes.GET_OAUTH_APPS_SUCCESS],
+        IntegrationTypes.GET_OAUTH_APPS_FAILURE,
+        page,
+        perPage
+    );
+}
+
+export function getOAuthApp(appId) {
+    return bindClientFunc(
+        Client4.getOAuthApp,
+        IntegrationTypes.GET_OAUTH_APP_REQUEST,
+        [IntegrationTypes.RECEIVED_OAUTH_APP, IntegrationTypes.GET_OAUTH_APP_SUCCESS],
+        IntegrationTypes.GET_OAUTH_APP_FAILURE,
+        appId
+    );
+}
+
+export function deleteOAuthApp(id) {
+    return async (dispatch, getState) => {
+        dispatch({type: IntegrationTypes.DELETE_OAUTH_APP_REQUEST}, getState);
+
+        try {
+            await Client4.deleteOAuthApp(id);
+        } catch (error) {
+            forceLogoutIfNecessary(error, dispatch);
+
+            dispatch(batchActions([
+                {type: IntegrationTypes.DELETE_OAUTH_APP_FAILURE, error},
+                getLogErrorAction(error)
+            ]), getState);
+            return null;
+        }
+
+        dispatch(batchActions([
+            {
+                type: IntegrationTypes.DELETED_OAUTH_APP,
+                data: {id}
+            },
+            {
+                type: IntegrationTypes.DELETE_OAUTH_APP_SUCCESS
+            }
+        ]), getState);
+
+        return true;
+    };
+}
+
+export function regenOAuthAppSecret(appId) {
+    return bindClientFunc(
+        Client4.regenOAuthAppSecret,
+        IntegrationTypes.UPDATE_OAUTH_APP_REQUEST,
+        [IntegrationTypes.RECEIVED_OAUTH_APP, IntegrationTypes.UPDATE_OAUTH_APP_SUCCESS],
+        IntegrationTypes.UPDATE_OAUTH_APP_FAILURE,
+        appId
+    );
 }
