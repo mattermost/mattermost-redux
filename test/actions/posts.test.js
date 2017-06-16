@@ -211,6 +211,29 @@ describe('Actions.Posts', () => {
         );
     });
 
+    it('deletePostWithReaction', async () => {
+        await login(TestHelper.basicUser.email, 'password1')(store.dispatch, store.getState);
+
+        const post1 = await Client4.createPost(
+            TestHelper.fakePost(TestHelper.basicChannel.id)
+        );
+
+        const emojiName = '+1';
+
+        await Actions.addReaction(post1.id, emojiName)(store.dispatch, store.getState);
+
+        let reactions = store.getState().entities.posts.reactions;
+        assert.ok(reactions);
+        assert.ok(reactions[post1.id]);
+        assert.ok(reactions[post1.id][TestHelper.basicUser.id + '-' + emojiName]);
+
+        await Actions.deletePost(post1)(store.dispatch, store.getState);
+
+        reactions = store.getState().entities.posts.reactions;
+        assert.ok(reactions);
+        assert.ok(!reactions[post1.id]);
+    });
+
     it('removePost', async () => {
         const channelId = TestHelper.basicChannel.id;
         const postId = TestHelper.basicPost.id;
@@ -239,6 +262,29 @@ describe('Actions.Posts', () => {
         assert.equal(postsInChannel[channelId].length, postsCount - 2);
         assert.ok(!posts[postId]);
         assert.ok(!posts[post1a.id]);
+    });
+
+    it('removePostWithReaction', async () => {
+        await login(TestHelper.basicUser.email, 'password1')(store.dispatch, store.getState);
+
+        const post1 = await Client4.createPost(
+            TestHelper.fakePost(TestHelper.basicChannel.id)
+        );
+
+        const emojiName = '+1';
+
+        await Actions.addReaction(post1.id, emojiName)(store.dispatch, store.getState);
+
+        let reactions = store.getState().entities.posts.reactions;
+        assert.ok(reactions);
+        assert.ok(reactions[post1.id]);
+        assert.ok(reactions[post1.id][TestHelper.basicUser.id + '-' + emojiName]);
+
+        await Actions.removePost(post1)(store.dispatch, store.getState);
+
+        reactions = store.getState().entities.posts.reactions;
+        assert.ok(reactions);
+        assert.ok(!reactions[post1.id]);
     });
 
     it('getPostThread', async () => {
