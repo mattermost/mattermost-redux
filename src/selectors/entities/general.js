@@ -5,6 +5,10 @@ export function getConfig(state) {
     return state.entities.general.config;
 }
 
+export function getLicense(state) {
+    return state.entities.general.license;
+}
+
 export function getCurrentUrl(state) {
     return state.entities.general.credentials.url;
 }

@@ -77,9 +77,9 @@ export function canDeletePost(config, license, userId, post, isAdmin, isSystemAd
     const isOwner = isPostOwner(userId, post);
 
     if (license.IsLicensed === 'true') {
-        return (config.RestrictPostDelete === General.PERMISSIONS_DELETE_POST_ALL && (isOwner || isAdmin)) ||
-            (config.RestrictPostDelete === General.PERMISSIONS_DELETE_POST_TEAM_ADMIN && isAdmin) ||
-            (config.RestrictPostDelete === General.PERMISSIONS_DELETE_POST_SYSTEM_ADMIN && isSystemAdmin);
+        return (config.RestrictPostDelete === General.PERMISSIONS_ALL && (isOwner || isAdmin)) ||
+            (config.RestrictPostDelete === General.PERMISSIONS_TEAM_ADMIN && isAdmin) ||
+            (config.RestrictPostDelete === General.PERMISSIONS_SYSTEM_ADMIN && isSystemAdmin);
     }
     return isOwner || isAdmin;
 }

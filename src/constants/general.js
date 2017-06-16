@@ -19,9 +19,9 @@ export default {
     ONLINE: 'online',
 
     PERMISSIONS_ALL: 'all',
-    PERMISSIONS_DELETE_POST_ALL: 'all',
-    PERMISSIONS_DELETE_POST_TEAM_ADMIN: 'team_admin',
-    PERMISSIONS_DELETE_POST_SYSTEM_ADMIN: 'system_admin',
+    PERMISSIONS_CHANNEL_ADMIN: 'channel_admin',
+    PERMISSIONS_TEAM_ADMIN: 'team_admin',
+    PERMISSIONS_SYSTEM_ADMIN: 'system_admin',
 
     TEAM_USER_ROLE: 'team_user',
     TEAM_ADMIN_ROLE: 'team_admin',
