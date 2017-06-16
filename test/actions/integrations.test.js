@@ -208,6 +208,30 @@ describe('Actions.Integrations', () => {
         assert.ok(hooks[created.id].display_name === updated.display_name);
     });
 
+    it('regenOutgoingHookToken', async () => {
+        const created = await Actions.createOutgoingHook(
+            {
+                channel_id: TestHelper.basicChannel.id,
+                team_id: TestHelper.basicTeam.id,
+                display_name: 'test',
+                trigger_words: [TestHelper.generateId()],
+                callback_urls: ['http://localhost/notarealendpoint']
+            }
+        )(store.dispatch, store.getState);
+
+        await Actions.regenOutgoingHookToken(created.id)(store.dispatch, store.getState);
+
+        const state = store.getState();
+        const request = state.requests.integrations.updateOutgoingHook;
+        if (request.status === RequestStatus.FAILURE) {
+            throw new Error('regenOutgoingHookToken request failed');
+        }
+
+        const hooks = state.entities.integrations.outgoingHooks;
+        assert.ok(hooks[created.id]);
+        assert.ok(hooks[created.id].token !== created.token);
+    });
+
     it('getCustomTeamCommands', async () => {
         const team = await TeamsActions.createTeam(
             TestHelper.fakeTeam()
