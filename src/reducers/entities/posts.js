@@ -255,6 +255,20 @@ function reactions(state = {}, action) {
             [reaction.post_id]: nextReactions
         };
     }
+    case PostTypes.POST_DELETED:
+    case PostTypes.REMOVE_POST: {
+        const post = action.data;
+
+        if (post && state[post.id]) {
+            const nextState = {...state};
+            Reflect.deleteProperty(nextState, post.id);
+
+            return nextState;
+        }
+
+        return state;
+    }
+
     case UserTypes.LOGOUT_SUCCESS:
         return {};
     default:
