@@ -92,6 +92,32 @@ function commands(state = {}, action) {
     }
 }
 
+function oauthApps(state = {}, action) {
+    const nextState = {...state};
+    switch (action.type) {
+    case IntegrationTypes.RECEIVED_OAUTH_APPS: {
+        for (const app of action.data) {
+            nextState[app.id] = app;
+        }
+        return nextState;
+    }
+    case IntegrationTypes.RECEIVED_OAUTH_APP:
+        return {
+            ...state,
+            [action.data.id]: action.data
+        };
+    case IntegrationTypes.DELETED_OAUTH_APP: {
+        Reflect.deleteProperty(nextState, action.data.id);
+        return nextState;
+    }
+    case UserTypes.LOGOUT_SUCCESS:
+        return {};
+
+    default:
+        return state;
+    }
+}
+
 export default combineReducers({
 
     // object where every key is the hook id and has an object with the incoming hook details
@@ -101,6 +127,9 @@ export default combineReducers({
     outgoingHooks,
 
     // object to represent installed slash commands for a current team
-    commands
+    commands,
+
+    // object to represent registered oauth apps with app id as the key
+    oauthApps
 
 });

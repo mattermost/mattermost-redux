@@ -373,4 +373,72 @@ describe('Actions.Integrations', () => {
         const {commands} = store.getState().entities.integrations;
         assert.ok(!commands[created.id]);
     });
+
+    it('addOAuthApp', async () => {
+        const created = await Actions.addOAuthApp(TestHelper.fakeOAuthApp())(store.dispatch, store.getState);
+
+        const request = store.getState().requests.integrations.addOAuthApp;
+        if (request.status === RequestStatus.FAILURE) {
+            throw new Error(JSON.stringify(request.error));
+        }
+
+        const {oauthApps} = store.getState().entities.integrations;
+        assert.ok(oauthApps[created.id]);
+    });
+
+    it('getOAuthApp', async () => {
+        const created = await Actions.addOAuthApp(TestHelper.fakeOAuthApp())(store.dispatch, store.getState);
+
+        await Actions.getOAuthApp(created.id)(store.dispatch, store.getState);
+
+        const request = store.getState().requests.integrations.getOAuthApp;
+        if (request.status === RequestStatus.FAILURE) {
+            throw new Error(JSON.stringify(request.error));
+        }
+
+        const {oauthApps} = store.getState().entities.integrations;
+        assert.ok(oauthApps[created.id]);
+    });
+
+    it('getOAuthApps', async () => {
+        await Actions.addOAuthApp(TestHelper.fakeOAuthApp())(store.dispatch, store.getState);
+
+        await Actions.getOAuthApps()(store.dispatch, store.getState);
+
+        const request = store.getState().requests.integrations.getOAuthApps;
+        if (request.status === RequestStatus.FAILURE) {
+            throw new Error(JSON.stringify(request.error));
+        }
+
+        const {oauthApps} = store.getState().entities.integrations;
+        assert.ok(oauthApps);
+    });
+
+    it('deleteOAuthApp', async () => {
+        const created = await Actions.addOAuthApp(TestHelper.fakeOAuthApp())(store.dispatch, store.getState);
+
+        await Actions.deleteOAuthApp(created.id)(store.dispatch, store.getState);
+
+        const request = store.getState().requests.integrations.deleteOAuthApp;
+        if (request.status === RequestStatus.FAILURE) {
+            throw new Error(JSON.stringify(request.error));
+        }
+
+        const {oauthApps} = store.getState().entities.integrations;
+        assert.ok(!oauthApps[created.id]);
+    });
+
+    it('regenOAuthAppSecret', async () => {
+        const created = await Actions.addOAuthApp(TestHelper.fakeOAuthApp())(store.dispatch, store.getState);
+
+        await Actions.regenOAuthAppSecret(created.id)(store.dispatch, store.getState);
+
+        const request = store.getState().requests.integrations.updateOAuthApp;
+        if (request.status === RequestStatus.FAILURE) {
+            throw new Error(JSON.stringify(request.error));
+        }
+
+        const {oauthApps} = store.getState().entities.integrations;
+        assert.ok(oauthApps[created.id].client_secret !== created.client_secret);
+    });
 });

@@ -136,6 +136,56 @@ function deleteCommand(state = initialRequestState(), action) {
     );
 }
 
+function addOAuthApp(state = initialRequestState(), action) {
+    return handleRequest(
+        IntegrationTypes.ADD_OAUTH_APP_REQUEST,
+        IntegrationTypes.ADD_OAUTH_APP_SUCCESS,
+        IntegrationTypes.ADD_OAUTH_APP_FAILURE,
+        state,
+        action
+    );
+}
+
+function getOAuthApps(state = initialRequestState(), action) {
+    return handleRequest(
+        IntegrationTypes.GET_OAUTH_APPS_REQUEST,
+        IntegrationTypes.GET_OAUTH_APPS_SUCCESS,
+        IntegrationTypes.GET_OAUTH_APPS_FAILURE,
+        state,
+        action
+    );
+}
+
+function getOAuthApp(state = initialRequestState(), action) {
+    return handleRequest(
+        IntegrationTypes.GET_OAUTH_APP_REQUEST,
+        IntegrationTypes.GET_OAUTH_APP_SUCCESS,
+        IntegrationTypes.GET_OAUTH_APP_FAILURE,
+        state,
+        action
+    );
+}
+
+function deleteOAuthApp(state = initialRequestState(), action) {
+    return handleRequest(
+        IntegrationTypes.DELETE_OAUTH_APP_REQUEST,
+        IntegrationTypes.DELETE_OAUTH_APP_SUCCESS,
+        IntegrationTypes.DELETE_OAUTH_APP_FAILURE,
+        state,
+        action
+    );
+}
+
+function updateOAuthApp(state = initialRequestState(), action) {
+    return handleRequest(
+        IntegrationTypes.UPDATE_OAUTH_APP_REQUEST,
+        IntegrationTypes.UPDATE_OAUTH_APP_SUCCESS,
+        IntegrationTypes.UPDATE_OAUTH_APP_FAILURE,
+        state,
+        action
+    );
+}
+
 export default combineReducers({
     createIncomingHook,
     getIncomingHooks,
@@ -149,5 +199,10 @@ export default combineReducers({
     addCommand,
     editCommand,
     regenCommandToken,
-    deleteCommand
+    deleteCommand,
+    addOAuthApp,
+    getOAuthApps,
+    getOAuthApp,
+    deleteOAuthApp,
+    updateOAuthApp
 });

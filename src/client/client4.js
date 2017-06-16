@@ -154,6 +154,14 @@ export default class Client4 {
         return `${this.getBaseRoute()}/hooks/outgoing/${hookId}`;
     }
 
+    getOAuthAppsRoute() {
+        return `${this.getBaseRoute()}/oauth/apps`;
+    }
+
+    getOAuthAppRoute(appId) {
+        return `${this.getOAuthAppsRoute()}/${appId}`;
+    }
+
     getEmojiRoute(emojiId) {
         return `${this.getBaseRoute()}/emoji/${emojiId}`;
     }
@@ -559,6 +567,27 @@ export default class Client4 {
             {method: 'post', body: JSON.stringify({current_service: 'ldap', new_service: 'email', email, password: ldapPassword, new_password: emailPassword, mfa_code: mfaCode})}
         );
     };
+
+    getAuthorizedOAuthApps = async (userId) => {
+        return this.doFetch(
+            `${this.getUserRoute(userId)}/oauth/apps/authorized`,
+            {method: 'get'}
+        );
+    }
+
+    authorizeOAuthApp = async (responseType, clientId, redirectUri, state, scope) => {
+        return this.doFetch(
+            `${this.url}/oauth/authorize`,
+            {method: 'post', body: JSON.stringify({client_id: clientId, response_type: responseType, redirect_uri: redirectUri, state, scope})}
+        );
+    }
+
+    deauthorizeOAuthApp = async (clientId) => {
+        return this.doFetch(
+            `${this.url}/oauth/deauthorize`,
+            {method: 'post', body: JSON.stringify({client_id: clientId})}
+        );
+    }
 
     // Team Routes
 
@@ -1149,6 +1178,13 @@ export default class Client4 {
         );
     };
 
+    regenOutgoingHookToken = async (id) => {
+        return this.doFetch(
+            `${this.getOutgoingHookRoute(id)}/regen_token`,
+            {method: 'post'}
+        );
+    };
+
     getCustomTeamCommands = async (teamId) => {
         return this.doFetch(
             `${this.getCommandsRoute()}?team_id=${teamId}&custom_only=true`,
@@ -1182,6 +1218,48 @@ export default class Client4 {
         return this.doFetch(
             `${this.getCommandsRoute()}/${id}`,
             {method: 'delete'}
+        );
+    };
+
+    createOAuthApp = async (app) => {
+        return this.doFetch(
+            `${this.getOAuthAppsRoute()}`,
+            {method: 'post', body: JSON.stringify(app)}
+        );
+    };
+
+    getOAuthApps = async (page = 0, perPage = PER_PAGE_DEFAULT) => {
+        return this.doFetch(
+            `${this.getOAuthAppsRoute()}${buildQueryString({page, per_page: perPage})}`,
+            {method: 'get'}
+        );
+    };
+
+    getOAuthApp = async (appId) => {
+        return this.doFetch(
+            `${this.getOAuthAppRoute(appId)}`,
+            {method: 'get'}
+        );
+    };
+
+    getOAuthAppInfo = async (appId) => {
+        return this.doFetch(
+            `${this.getOAuthAppRoute(appId)}/info`,
+            {method: 'get'}
+        );
+    };
+
+    deleteOAuthApp = async (appId) => {
+        return this.doFetch(
+            `${this.getOAuthAppRoute(appId)}`,
+            {method: 'delete'}
+        );
+    };
+
+    regenOAuthAppSecret = async (appId) => {
+        return this.doFetch(
+            `${this.getOAuthAppRoute(appId)}/regen_secret`,
+            {method: 'post'}
         );
     };
 

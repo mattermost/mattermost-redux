@@ -18,6 +18,6 @@ Feel free to drop by [the Redux channel](https://pre-release.mattermost.com/core
 
 ### Running the Tests
 
-To run the tests you need to have a Mattermost server running locally on port 8065 with "EnableOpenServer", "EnableCustomEmoji" and "EnableLinkPreviews" set to `true` in your config.json.
+To run the tests you need to have a Mattermost server running locally on port 8065 with "EnableOpenServer", "EnableCustomEmoji", "EnableLinkPreviews" and "EnableOAuthServiceProvider" set to `true` and with "EnableOnlyAdminIntegrations" set to `false` in your config.json.
 
 With that set up, you can run the tests with `make test`.
