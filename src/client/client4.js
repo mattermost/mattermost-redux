@@ -1192,8 +1192,7 @@ export default class Client4 {
         );
     };
 
-    addCommand = async (teamId, command) => {
-        command.team_id = teamId;
+    addCommand = async (command) => {
         return this.doFetch(
             `${this.getCommandsRoute()}`,
             {method: 'post', body: JSON.stringify(command)}

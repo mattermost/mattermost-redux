@@ -244,9 +244,11 @@ describe('Actions.Integrations', () => {
         const noCommands = store.getState().entities.integrations.commands;
         assert.equal(Object.keys(noCommands).length, 0);
 
+        const command = TestHelper.testCommand();
+        command.team_id = team.id;
+
         const created = await Actions.addCommand(
-            team.id,
-            TestHelper.testCommand()
+            command
         )(store.dispatch, store.getState);
 
         await Actions.getCustomTeamCommands(
@@ -272,8 +274,9 @@ describe('Actions.Integrations', () => {
         )(store.dispatch, store.getState);
 
         const expected = TestHelper.testCommand();
+        expected.team_id = team.id;
 
-        const created = await Actions.addCommand(team.id, expected)(store.dispatch, store.getState);
+        const created = await Actions.addCommand(expected)(store.dispatch, store.getState);
 
         const request = store.getState().requests.integrations.addCommand;
         if (request.status === RequestStatus.FAILURE) {
@@ -306,8 +309,11 @@ describe('Actions.Integrations', () => {
           TestHelper.fakeTeam()
         )(store.dispatch, store.getState);
 
-        const created = await Actions.addCommand(team.id,
-          TestHelper.testCommand()
+        const command = TestHelper.testCommand();
+        command.team_id = team.id;
+
+        const created = await Actions.addCommand(
+          command
         )(store.dispatch, store.getState);
 
         await Actions.regenCommandToken(
@@ -347,9 +353,11 @@ describe('Actions.Integrations', () => {
             TestHelper.fakeTeam()
         )(store.dispatch, store.getState);
 
+        const command = TestHelper.testCommand();
+        command.team_id = team.id;
+
         const created = await Actions.addCommand(
-            team.id,
-            TestHelper.testCommand()
+            command
         )(store.dispatch, store.getState);
 
         const expected = Object.assign({}, created);
@@ -381,8 +389,11 @@ describe('Actions.Integrations', () => {
           TestHelper.fakeTeam()
         )(store.dispatch, store.getState);
 
-        const created = await Actions.addCommand(team.id,
-          TestHelper.testCommand()
+        const command = TestHelper.testCommand();
+        command.team_id = team.id;
+
+        const created = await Actions.addCommand(
+            command
         )(store.dispatch, store.getState);
 
         await Actions.deleteCommand(
