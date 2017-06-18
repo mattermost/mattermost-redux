@@ -219,6 +219,37 @@ export function showDeleteOption(config, license, channel, isAdmin, isSystemAdmi
     return true;
 }
 
+export function canManageMembers(channel, user, teamMember, channelMember, config, license) {
+    if (channel.type === General.DM_CHANNEL ||
+        channel.type === General.GM_CHANNEL ||
+        channel.name === General.DEFAULT_CHANNEL) {
+        return false;
+    }
+
+    if (license.IsLicensed !== 'true') {
+        return true;
+    }
+
+    if (channel.type === General.PRIVATE_CHANNEL) {
+        const isSystemAdmin = user.roles.includes(General.SYSTEM_ADMIN_ROLE);
+        if (config.RestrictPrivateChannelManageMembers === General.PERMISSIONS_SYSTEM_ADMIN && !isSystemAdmin) {
+            return false;
+        }
+
+        const isTeamAdmin = teamMember.roles.includes(General.TEAM_ADMIN_ROLE);
+        if (config.RestrictPrivateChannelManageMembers === General.PERMISSIONS_TEAM_ADMIN && !isTeamAdmin && !isSystemAdmin) {
+            return false;
+        }
+
+        const isChannelAdmin = channelMember.roles.includes(General.CHANNEL_ADMIN_ROLE);
+        if (config.RestrictPrivateChannelManageMembers === General.PERMISSIONS_CHANNEL_ADMIN && !isChannelAdmin && !isTeamAdmin && !isSystemAdmin) {
+            return false;
+        }
+    }
+
+    return true;
+}
+
 export function getChannelsIdForTeam(state, teamId) {
     const {channels} = state.entities.channels;
 

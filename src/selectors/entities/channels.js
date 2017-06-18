@@ -2,12 +2,15 @@
 // See License.txt for license information.
 
 import {createSelector} from 'reselect';
+
+import {getConfig, getLicense} from 'selectors/entities/general';
 import {getMyPreferences} from 'selectors/entities/preferences';
 import {getCurrentTeamId, getCurrentTeamMembership} from 'selectors/entities/teams';
-import {getCurrentUser, getCurrentUserId, getUsers} from 'selectors/entities/users';
+import {getCurrentUser} from 'selectors/entities/users';
 import {
     buildDisplayableChannelList,
     buildDisplayableChannelListWithUnreadSection,
+    canManageMembers,
     completeDirectChannelInfo,
     sortChannelsByDisplayName
 } from 'utils/channel_utils';
@@ -289,21 +292,10 @@ export const getUnreadsInCurrentTeam = createSelector(
 
 export const canManageChannelMembers = createSelector(
     getCurrentChannel,
-    getMyCurrentChannelMembership,
+    getCurrentUser,
     getCurrentTeamMembership,
-    getUsers,
-    getCurrentUserId,
-    (channel, channelMembership, teamMembership, allUsers, currentUserId) => {
-        const user = allUsers[currentUserId];
-        const roles = `${channelMembership.roles} ${teamMembership.roles} ${user.roles}`;
-        if (channel.type === General.DM_CHANNEL ||
-            channel.type === General.GM_CHANNEL ||
-            channel.name === General.DEFAULT_CHANNEL) {
-            return false;
-        }
-        if (channel.type === General.OPEN_CHANNEL) {
-            return true;
-        }
-        return roles.includes('_admin');
-    }
+    getMyCurrentChannelMembership,
+    getConfig,
+    getLicense,
+    canManageMembers
 );
