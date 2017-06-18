@@ -155,13 +155,12 @@ export function getCustomTeamCommands(teamId) {
     );
 }
 
-export function addCommand(teamId, command) {
+export function addCommand(command) {
     return bindClientFunc(
         Client4.addCommand,
         IntegrationTypes.ADD_COMMAND_REQUEST,
         [IntegrationTypes.RECEIVED_COMMAND, IntegrationTypes.ADD_COMMAND_SUCCESS],
         IntegrationTypes.ADD_COMMAND_FAILURE,
-        teamId,
         command
     );
 }
