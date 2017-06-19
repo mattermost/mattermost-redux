@@ -220,11 +220,31 @@ export function removeIdpSamlCertificate() {
     );
 }
 
+<<<<<<< db39ca51bb9c441f4ada667508d37587277f8edf
 export function testElasticsearch() {
     return bindClientFunc(
         Client4.testElasticsearch,
         AdminTypes.TEST_ELASTICSEARCH_REQUEST,
         AdminTypes.TEST_ELASTICSEARCH_SUCCESS,
         AdminTypes.TEST_ELASTICSEARCH_FAILURE
+    );
+}
+
+export function uploadLicense(fileData) {
+    return bindClientFunc(
+        Client4.uploadLicense,
+        AdminTypes.UPLOAD_LICENSE_REQUEST,
+        AdminTypes.UPLOAD_LICENSE_SUCCESS,
+        AdminTypes.UPLOAD_LICENSE_FAILURE,
+        fileData
+    );
+}
+
+export function removeLicense() {
+    return bindClientFunc(
+        Client4.removeLicense,
+        AdminTypes.REMOVE_LICENSE_REQUEST,
+        AdminTypes.REMOVE_LICENSE_SUCCESS,
+        AdminTypes.REMOVE_LICENSE_FAILURE
     );
 }
