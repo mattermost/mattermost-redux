@@ -3,12 +3,10 @@
 
 import entities from './entities';
 import errors from './errors';
-import internal from './internal';
 import requests from './requests';
 
 export default {
     entities,
     errors,
-    internal,
     requests
 };

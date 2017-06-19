@@ -5,7 +5,7 @@ import {batchActions} from 'redux-batched-actions';
 
 import {Client, Client4} from 'client';
 import {Preferences, Posts} from 'constants';
-import {InternalTypes, PostTypes, FileTypes} from 'action_types';
+import {PostTypes, FileTypes} from 'action_types';
 
 import * as Selectors from 'selectors/entities/posts';
 
@@ -360,18 +360,7 @@ export function getPosts(channelId, page = 0, perPage = Posts.POST_CHUNK_SIZE) {
             return null;
         }
 
-        const actions = [];
-        if (page === 0) {
-            actions.push({
-                type: InternalTypes.CHANNEL_LAST_FETCH_TIME,
-                data: {
-                    id: channelId,
-                    timestamp: Date.now()
-                }
-            });
-        }
-
-        actions.push(
+        dispatch(batchActions([
             {
                 type: PostTypes.RECEIVED_POSTS,
                 data: posts,
@@ -380,9 +369,7 @@ export function getPosts(channelId, page = 0, perPage = Posts.POST_CHUNK_SIZE) {
             {
                 type: PostTypes.GET_POSTS_SUCCESS
             }
-        );
-
-        dispatch(batchActions(actions, 'GET_POSTS_BATCH'), getState);
+        ]), getState);
 
         return posts;
     };
@@ -410,13 +397,6 @@ export function getPostsSince(channelId, since) {
                 type: PostTypes.RECEIVED_POSTS,
                 data: posts,
                 channelId
-            },
-            {
-                type: InternalTypes.CHANNEL_LAST_FETCH_TIME,
-                data: {
-                    id: channelId,
-                    timestamp: Date.now()
-                }
             },
             {
                 type: PostTypes.GET_POSTS_SINCE_SUCCESS
