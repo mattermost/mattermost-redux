@@ -1572,6 +1572,13 @@ export default class Client4 {
         );
     };
 
+    getAnalytics = async (name = 'standard', teamId = '') => {
+        return this.doFetch(
+            `${this.getBaseRoute()}/analytics/old${buildQueryString({name, team_id: teamId})}`,
+            {method: 'get'}
+        );
+    };
+
     // Client Helpers
 
     doFetch = async (url, options) => {
