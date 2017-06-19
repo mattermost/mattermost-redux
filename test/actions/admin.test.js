@@ -485,4 +485,34 @@ describe('Actions.Admin', () => {
             throw new Error('testElasticsearch request failed err=' + request.error);
         }
     });
+
+    it('uploadLicense', async () => {
+        const testFileData = fs.createReadStream('test/assets/images/test.png');
+
+        nock(Client4.getBaseRoute()).
+            post('/license').
+            reply(200, OK_RESPONSE);
+
+        await Actions.uploadLicense(testFileData)(store.dispatch, store.getState);
+
+        const state = store.getState();
+        const request = state.requests.admin.uploadLicense;
+        if (request.status === RequestStatus.FAILURE) {
+            throw new Error('uploadLicense request failed err=' + request.error);
+        }
+    });
+
+    it('removeLicense', async () => {
+        nock(Client4.getBaseRoute()).
+            delete('/license').
+            reply(200, OK_RESPONSE);
+
+        await Actions.removeLicense()(store.dispatch, store.getState);
+
+        const state = store.getState();
+        const request = state.requests.admin.removeLicense;
+        if (request.status === RequestStatus.FAILURE) {
+            throw new Error('removeLicense request failed err=' + request.error);
+        }
+    });
 });

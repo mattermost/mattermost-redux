@@ -1544,6 +1544,34 @@ export default class Client4 {
         );
     };
 
+    uploadLicense = async (fileData) => {
+        const formData = new FormData();
+        formData.append('license', fileData);
+
+        const request = {
+            method: 'post',
+            body: formData
+        };
+
+        if (formData.getBoundary) {
+            request.headers = {
+                'Content-Type': `multipart/form-data; boundary=${formData.getBoundary()}`
+            };
+        }
+
+        return this.doFetch(
+            `${this.getBaseRoute()}/license`,
+            request
+        );
+    };
+
+    removeLicense = async () => {
+        return this.doFetch(
+            `${this.getBaseRoute()}/license`,
+            {method: 'delete'}
+        );
+    };
+
     // Client Helpers
 
     doFetch = async (url, options) => {

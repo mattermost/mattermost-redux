@@ -229,3 +229,22 @@ export function testElasticsearch(config) {
         config
     );
 }
+
+export function uploadLicense(fileData) {
+    return bindClientFunc(
+        Client4.uploadLicense,
+        AdminTypes.UPLOAD_LICENSE_REQUEST,
+        AdminTypes.UPLOAD_LICENSE_SUCCESS,
+        AdminTypes.UPLOAD_LICENSE_FAILURE,
+        fileData
+    );
+}
+
+export function removeLicense() {
+    return bindClientFunc(
+        Client4.removeLicense,
+        AdminTypes.REMOVE_LICENSE_REQUEST,
+        AdminTypes.REMOVE_LICENSE_SUCCESS,
+        AdminTypes.REMOVE_LICENSE_FAILURE
+    );
+}
