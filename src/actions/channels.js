@@ -110,7 +110,7 @@ export function createDirectChannel(userId, otherUserId) {
         const member = {
             channel_id: created.id,
             user_id: userId,
-            roles: `${General.CHANNEL_USER_ROLE} ${General.CHANNEL_ADMIN_ROLE}`,
+            roles: `${General.CHANNEL_USER_ROLE}`,
             last_viewed_at: 0,
             msg_count: 0,
             mention_count: 0,
@@ -141,6 +141,61 @@ export function createDirectChannel(userId, otherUserId) {
         ]), getState);
 
         return {data: created};
+    };
+}
+
+export function createGroupChannel(userIds) {
+    return async (dispatch, getState) => {
+        dispatch({type: ChannelTypes.CREATE_CHANNEL_REQUEST}, getState);
+
+        const {currentUserId} = getState().entities.users;
+
+        let created;
+        try {
+            created = await Client4.createGroupChannel(userIds);
+        } catch (error) {
+            forceLogoutIfNecessary(error, dispatch);
+            dispatch(batchActions([
+                {type: ChannelTypes.CREATE_CHANNEL_FAILURE, error},
+                getLogErrorAction(error)
+            ]), getState);
+            return null;
+        }
+
+        const member = {
+            channel_id: created.id,
+            user_id: currentUserId,
+            roles: `${General.CHANNEL_USER_ROLE}`,
+            last_viewed_at: 0,
+            msg_count: 0,
+            mention_count: 0,
+            notify_props: {desktop: 'default', mark_unread: 'all'},
+            last_update_at: created.create_at
+        };
+
+        const preferences = [{user_id: currentUserId, category: Preferences.CATEGORY_GROUP_CHANNEL_SHOW, name: created.id, value: 'true'}];
+
+        savePreferences(currentUserId, preferences)(dispatch, getState);
+
+        dispatch(batchActions([
+            {
+                type: ChannelTypes.RECEIVED_CHANNEL,
+                data: created
+            },
+            {
+                type: ChannelTypes.RECEIVED_MY_CHANNEL_MEMBER,
+                data: member
+            },
+            {
+                type: PreferenceTypes.RECEIVED_PREFERENCES,
+                data: preferences
+            },
+            {
+                type: ChannelTypes.CREATE_CHANNEL_SUCCESS
+            }
+        ]), getState);
+
+        return created;
     };
 }
 

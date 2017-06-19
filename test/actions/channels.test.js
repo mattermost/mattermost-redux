@@ -104,6 +104,43 @@ describe('Actions.Channels', () => {
         assert.equal(membersCount, 1);
     });
 
+    it('createGroupChannel', async () => {
+        const user = await TestHelper.basicClient4.createUser(
+            TestHelper.fakeUser(),
+            null,
+            null,
+            TestHelper.basicTeam.invite_id
+        );
+
+        const user2 = await TestHelper.basicClient4.createUser(
+            TestHelper.fakeUser(),
+            null,
+            null,
+            TestHelper.basicTeam.invite_id
+        );
+
+        await login(TestHelper.basicUser.email, 'password1')(store.dispatch, store.getState);
+
+        await getProfilesByIds([user.id, user2.id])(store.dispatch, store.getState);
+        const created = await Actions.createGroupChannel([TestHelper.basicUser.id, user.id, user2.id])(store.dispatch, store.getState);
+
+        const createRequest = store.getState().requests.channels.createChannel;
+        if (createRequest.status === RequestStatus.FAILURE) {
+            throw new Error(createRequest.error);
+        }
+
+        const state = store.getState();
+        const {channels, myMembers} = state.entities.channels;
+        const preferences = state.entities.preferences.myPreferences;
+
+        assert.ok(channels, 'channels is empty');
+        assert.ok(channels[created.id]);
+        assert.ok(channels[created.id]);
+        assert.ok(myMembers, 'members is empty');
+        assert.ok(myMembers[created.id]);
+        assert.ok(Object.keys(preferences).length, 'preferences is empty');
+    });
+
     it('updateChannel', async () => {
         const channel = {
             ...TestHelper.basicChannel,
