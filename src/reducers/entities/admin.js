@@ -96,6 +96,38 @@ function samlCertStatus(state = {}, action) {
     }
 }
 
+function analytics(state = {}, action) {
+    switch (action.type) {
+    case AdminTypes.RECEIVED_SYSTEM_ANALYTICS: {
+        const nextState = {...state};
+        nextState[action.name] = action.data;
+        return nextState;
+    }
+    case UserTypes.LOGOUT_SUCCESS:
+        return {};
+
+    default:
+        return state;
+    }
+}
+
+function teamAnalytics(state = {}, action) {
+    switch (action.type) {
+    case AdminTypes.RECEIVED_TEAM_ANALYTICS: {
+        const nextState = {...state};
+        const analyticsForTeam = {...(nextState[action.teamId] || {})};
+        analyticsForTeam[action.name] = action.data;
+        nextState[action.teamId] = analyticsForTeam;
+        return nextState;
+    }
+    case UserTypes.LOGOUT_SUCCESS:
+        return {};
+
+    default:
+        return state;
+    }
+}
+
 export default combineReducers({
 
     // array of strings each representing a log entry
@@ -114,7 +146,13 @@ export default combineReducers({
     clusterInfo,
 
     // object with certificate type as keys and boolean statuses as values
-    samlCertStatus
+    samlCertStatus,
+
+    // object with analytic categories as types and numbers as values
+    analytics,
+
+    // object with team ids as keys and analytics objects as values
+    teamAnalytics
 
 });
 
