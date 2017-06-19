@@ -704,6 +704,14 @@ export default class Client4 {
         );
     };
 
+    addToTeamFromInvite = async (teamId, hash = '', data = '', inviteId = '') => {
+        const query = buildQueryString({hash, data, invite_id: inviteId});
+        return this.doFetch(
+            `${this.getTeamMembersRoute(teamId)}${query}`,
+            {method: 'post', body: JSON.stringify({team_id: teamId})}
+        );
+    };
+
     addUsersToTeam = async (teamId, userIds) => {
         const members = [];
         userIds.forEach((id) => members.push({team_id: teamId, user_id: id}));
@@ -731,6 +739,13 @@ export default class Client4 {
     getTeamStats = async (teamId) => {
         return this.doFetch(
             `${this.getTeamRoute(teamId)}/stats`,
+            {method: 'get'}
+        );
+    };
+
+    getTeamInviteInfo = async (inviteId) => {
+        return this.doFetch(
+            `${this.getTeamsRoute()}/invite/${inviteId}`,
             {method: 'get'}
         );
     };
@@ -1138,6 +1153,24 @@ export default class Client4 {
         );
     };
 
+    getTranslations = async (url) => {
+        return this.doFetch(
+            url,
+            {method: 'get'}
+        );
+    };
+
+    getWebSocketUrl = () => {
+        return `${this.getBaseRoute()}/websocket`;
+    }
+
+    webrtcToken = async () => {
+        return this.doFetch(
+            `${this.getBaseRoute()}/webrtc/token`,
+            {method: 'get'}
+        );
+    };
+
     // Integration Routes
 
     createIncomingWebhook = async (hook) => {
@@ -1230,6 +1263,13 @@ export default class Client4 {
         return this.doFetch(
             `${this.getOutgoingHookRoute(id)}/regen_token`,
             {method: 'post'}
+        );
+    };
+
+    getCommandsList = async (teamId) => {
+        return this.doFetch(
+            `${this.getCommandsRoute()}?team_id=${teamId}`,
+            {method: 'get'}
         );
     };
 
