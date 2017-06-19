@@ -1000,6 +1000,13 @@ export default class Client4 {
         );
     };
 
+    searchPosts = async (teamId, terms, isOrSearch) => {
+        return this.doFetch(
+            `${this.getTeamRoute(teamId)}/posts/search`,
+            {method: 'post', body: JSON.stringify({terms, is_or_search: isOrSearch})}
+        );
+    };
+
     // Files Routes
     getFileUrl(fileId, timestamp) {
         let url = `${this.getFileRoute(fileId)}`;
