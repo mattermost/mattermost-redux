@@ -765,6 +765,13 @@ export default class Client4 {
         );
     };
 
+    createGroupChannel = async (userIds) => {
+        return this.doFetch(
+            `${this.getChannelsRoute()}/group`,
+            {method: 'post', body: JSON.stringify(userIds)}
+        );
+    };
+
     deleteChannel = async (channelId) => {
         return this.doFetch(
             `${this.getChannelRoute(channelId)}`,
@@ -1230,6 +1237,13 @@ export default class Client4 {
         return this.doFetch(
             `${this.getCommandsRoute()}?team_id=${teamId}&custom_only=true`,
             {method: 'get'}
+        );
+    };
+
+    executeCommand = async (command, commandArgs = {}) => {
+        return this.doFetch(
+            `${this.getCommandsRoute()}`,
+            {method: 'post', body: JSON.stringify({command, ...commandArgs})}
         );
     };
 
