@@ -41,7 +41,7 @@ import {General, WebsocketEvents, Preferences, Posts} from 'constants';
 
 import {getCurrentChannelStats} from 'selectors/entities/channels';
 import {getUserIdFromChannelName} from 'utils/channel_utils';
-import {isFromWebhook, isSystemMessage, getLastUpdateAt, shouldIgnorePost} from 'utils/post_utils';
+import {isFromWebhook, isSystemMessage, getLastCreateAt, shouldIgnorePost} from 'utils/post_utils';
 import EventEmitter from 'utils/event_emitter';
 
 export function init(platform, siteUrl, token, optionalWebSocket) {
@@ -577,7 +577,7 @@ function loadPostsHelper(channelId, dispatch, getState) {
     let latestPostTime = 0;
     if (postsIds && postsIds.length) {
         const postsForChannel = postsIds.map((id) => posts[id]);
-        latestPostTime = getLastUpdateAt(postsForChannel);
+        latestPostTime = getLastCreateAt(postsForChannel);
     }
 
     if (latestPostTime === 0) {
