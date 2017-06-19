@@ -168,8 +168,12 @@ export default class Client4 {
         return `${this.getOAuthAppsRoute()}/${appId}`;
     }
 
+    getEmojisRoute() {
+        return `${this.getBaseRoute()}/emoji`;
+    }
+
     getEmojiRoute(emojiId) {
-        return `${this.getBaseRoute()}/emoji/${emojiId}`;
+        return `${this.getEmojisRoute()}/${emojiId}`;
     }
 
     getBrandRoute() {
@@ -1300,12 +1304,49 @@ export default class Client4 {
     };
 
     // Emoji Routes
+
+    createCustomEmoji = async (emoji, imageData) => {
+        const formData = new FormData();
+        formData.append('image', imageData);
+        formData.append('emoji', JSON.stringify(emoji));
+
+        const request = {
+            method: 'post',
+            body: formData
+        };
+
+        if (formData.getBoundary) {
+            request.headers = {
+                'Content-Type': `multipart/form-data; boundary=${formData.getBoundary()}`
+            };
+        }
+
+        return this.doFetch(
+            `${this.getEmojisRoute()}`,
+            request
+        );
+    };
+
+    getCustomEmojis = async (page = 0, perPage = PER_PAGE_DEFAULT) => {
+        return this.doFetch(
+            `${this.getEmojisRoute()}${buildQueryString({page, per_page: perPage})}`,
+            {method: 'get'}
+        );
+    };
+
+    deleteCustomEmoji = async (emojiId) => {
+        return this.doFetch(
+            `${this.getEmojiRoute(emojiId)}`,
+            {method: 'delete'}
+        );
+    };
+
     getSystemEmojiImageUrl = (filename) => {
         return `${this.url}/static/emoji/${filename}.png`;
     };
 
     getCustomEmojiImageUrl = (id) => {
-        return `${this.getEmojiRoute()}/${id}`;
+        return `${this.getEmojiRoute(id)}/image`;
     };
 
     // Admin Routes
