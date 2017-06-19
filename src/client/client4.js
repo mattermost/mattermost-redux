@@ -951,6 +951,20 @@ export default class Client4 {
         );
     };
 
+    getFlaggedPosts = async (userId, channelId = '', teamId = '', page = 0, perPage = PER_PAGE_DEFAULT) => {
+        return this.doFetch(
+            `${this.getUserRoute(userId)}/posts/flagged${buildQueryString({channel_id: channelId, team_id: teamId, page, per_page: perPage})}`,
+            {method: 'get'}
+        );
+    };
+
+    getPinnedPosts = async (channelId) => {
+        return this.doFetch(
+            `${this.getChannelRoute(channelId)}/pinned`,
+            {method: 'get'}
+        );
+    };
+
     pinPost = async (postId) => {
         return this.doFetch(
             `${this.getPostRoute(postId)}/pin`,
