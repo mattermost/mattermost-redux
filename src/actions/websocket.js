@@ -41,7 +41,7 @@ import {General, WebsocketEvents, Preferences, Posts} from 'constants';
 
 import {getCurrentChannelStats} from 'selectors/entities/channels';
 import {getUserIdFromChannelName} from 'utils/channel_utils';
-import {isFromWebhook, isSystemMessage, shouldIgnorePost} from 'utils/post_utils';
+import {isFromWebhook, isSystemMessage, getLastCreateAt, shouldIgnorePost} from 'utils/post_utils';
 import EventEmitter from 'utils/event_emitter';
 
 export function init(platform, siteUrl, token, optionalWebSocket) {
@@ -571,13 +571,19 @@ function handleUserTypingEvent(msg, dispatch, getState) {
 // Helpers
 
 function loadPostsHelper(channelId, dispatch, getState) {
-    const {channelsLastFetch} = getState().internal;
-    const lastFetchTime = channelsLastFetch[channelId] || 0;
+    const {posts, postsInChannel} = getState().entities.posts;
+    const postsIds = postsInChannel[channelId];
 
-    if (lastFetchTime === 0) {
+    let latestPostTime = 0;
+    if (postsIds && postsIds.length) {
+        const postsForChannel = postsIds.map((id) => posts[id]);
+        latestPostTime = getLastCreateAt(postsForChannel);
+    }
+
+    if (latestPostTime === 0) {
         getPosts(channelId)(dispatch, getState);
     } else {
-        getPostsSince(channelId, lastFetchTime)(dispatch, getState);
+        getPostsSince(channelId, latestPostTime)(dispatch, getState);
     }
 }
 

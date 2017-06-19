@@ -103,11 +103,11 @@ export function canEditPost(config, license, userId, post, editDisableAction) {
     return canEdit;
 }
 
-export function getLastUpdateAt(postsArray) {
-    const updateAt = postsArray.map((p) => p.update_at);
+export function getLastCreateAt(postsArray) {
+    const createAt = postsArray.map((p) => p.update_at);
 
-    if (updateAt.length) {
-        return Reflect.apply(Math.max, null, updateAt);
+    if (createAt.length) {
+        return Reflect.apply(Math.max, null, createAt);
     }
 
     return 0;
