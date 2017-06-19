@@ -123,3 +123,7 @@ export function shouldFilterPost(post, options = {}) {
 
     return false;
 }
+
+export function isPostPendingOrFailed(post) {
+    return post.failed || post.id === post.pending_post_id;
+}
