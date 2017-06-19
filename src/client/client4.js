@@ -1282,7 +1282,7 @@ export default class Client4 {
 
     executeCommand = async (command, commandArgs = {}) => {
         return this.doFetch(
-            `${this.getCommandsRoute()}`,
+            `${this.getCommandsRoute()}/execute`,
             {method: 'post', body: JSON.stringify({command, ...commandArgs})}
         );
     };
