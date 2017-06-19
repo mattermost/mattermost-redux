@@ -88,6 +88,14 @@ export default keyMirror({
     DELETE_SAML_IDP_SUCCESS: null,
     DELETE_SAML_IDP_FAILURE: null,
 
+    UPLOAD_LICENSE_REQUEST: null,
+    UPLOAD_LICENSE_SUCCESS: null,
+    UPLOAD_LICENSE_FAILURE: null,
+
+    REMOVE_LICENSE_REQUEST: null,
+    REMOVE_LICENSE_SUCCESS: null,
+    REMOVE_LICENSE_FAILURE: null,
+
     RECEIVED_LOGS: null,
     RECEIVED_AUDITS: null,
     RECEIVED_CONFIG: null,
