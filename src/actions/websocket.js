@@ -106,9 +106,7 @@ function handleFirstConnect(dispatch, getState) {
     if (reconnect) {
         reconnect = false;
 
-        handleReconnect(dispatch, getState).catch(() => {
-            //just do nothing
-        });
+        handleReconnect(dispatch, getState).catch(() => {}); //eslint-disable-line no-empty-function
     }
 }
 
