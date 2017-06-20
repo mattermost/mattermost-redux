@@ -704,11 +704,11 @@ export default class Client4 {
         );
     };
 
-    addToTeamFromInvite = async (teamId, hash = '', data = '', inviteId = '') => {
+    addToTeamFromInvite = async (hash = '', data = '', inviteId = '') => {
         const query = buildQueryString({hash, data, invite_id: inviteId});
         return this.doFetch(
-            `${this.getTeamMembersRoute(teamId)}${query}`,
-            {method: 'post', body: JSON.stringify({team_id: teamId})}
+            `${this.getTeamsRoute()}/members/invite${query}`,
+            {method: 'post'}
         );
     };
 
