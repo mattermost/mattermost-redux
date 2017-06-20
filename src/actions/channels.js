@@ -351,6 +351,8 @@ export function fetchMyChannelsAndMembers(teamId) {
             return null;
         }
 
+        const {currentUserId} = getState().entities.users;
+
         dispatch(batchActions([
             {
                 type: ChannelTypes.RECEIVED_CHANNELS,
@@ -363,7 +365,8 @@ export function fetchMyChannelsAndMembers(teamId) {
             {
                 type: ChannelTypes.RECEIVED_MY_CHANNEL_MEMBERS,
                 data: channelMembers,
-                remove: getChannelsIdForTeam(getState(), teamId)
+                remove: getChannelsIdForTeam(getState(), teamId),
+                currentUserId
             },
             {
                 type: ChannelTypes.CHANNEL_MEMBERS_SUCCESS
@@ -392,11 +395,14 @@ export function getMyChannelMembers(teamId) {
             return null;
         }
 
+        const {currentUserId} = getState().entities.users;
+
         dispatch(batchActions([
             {
                 type: ChannelTypes.RECEIVED_MY_CHANNEL_MEMBERS,
                 data: channelMembers,
-                remove: getChannelsIdForTeam(getState(), teamId)
+                remove: getChannelsIdForTeam(getState(), teamId),
+                currentUserId
             },
             {
                 type: ChannelTypes.CHANNEL_MY_MEMBERS_SUCCESS

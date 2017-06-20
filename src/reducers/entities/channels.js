@@ -215,9 +215,12 @@ function membersInChannel(state = {}, action) {
     case ChannelTypes.RECEIVED_CHANNEL_MEMBERS: {
         const nextState = {...state};
         const remove = action.remove;
-        if (remove) {
+        const currentUserId = action.currentUserId;
+        if (remove && currentUserId) {
             remove.forEach((id) => {
-                Reflect.deleteProperty(nextState, id);
+                if (nextState[id]) {
+                    Reflect.deleteProperty(nextState[id], currentUserId);
+                }
             });
         }
 
