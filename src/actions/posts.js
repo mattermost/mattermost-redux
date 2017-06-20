@@ -59,7 +59,11 @@ export function createPost(post, files = []) {
                 offline: {
                     effect: () => Client4.createPost(newPost),
                     commit: (success, payload) => {
-                        const actions = [];
+                        const actions = [{
+                            type: PostTypes.RECEIVED_POST,
+                            data: payload
+                        }];
+
                         if (files) {
                             actions.push({
                                 type: FileTypes.RECEIVED_FILES_FOR_POST,
