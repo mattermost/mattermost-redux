@@ -59,9 +59,16 @@ export function createPost(post, files = []) {
                 offline: {
                     effect: () => Client4.createPost(newPost),
                     commit: (success, payload) => {
+                        // Use RECEIVED_POSTS to clear pending posts
                         const actions = [{
-                            type: PostTypes.RECEIVED_POST,
-                            data: payload
+                            type: PostTypes.RECEIVED_POSTS,
+                            data: {
+                                order: [],
+                                posts: {
+                                    [payload.id]: payload
+                                }
+                            },
+                            channelId: payload.channel_id
                         }];
 
                         if (files) {
