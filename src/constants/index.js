@@ -9,6 +9,7 @@ import Posts from './posts';
 import Files from './files';
 import Alerts from './alerts';
 import Teams from './teams';
+import Stats from './stats';
 
 export {
     General,
@@ -18,6 +19,7 @@ export {
     RequestStatus,
     WebsocketEvents,
     Alerts,
-    Teams
+    Teams,
+    Stats
 };
 
