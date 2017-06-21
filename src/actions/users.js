@@ -507,6 +507,16 @@ export function getUserByUsername(username) {
     );
 }
 
+export function getUserByEmail(email) {
+    return bindClientFunc(
+        Client4.getUserByEmail,
+        UserTypes.USER_REQUEST,
+        [UserTypes.RECEIVED_PROFILE, UserTypes.USER_SUCCESS],
+        UserTypes.USER_FAILURE,
+        email
+    );
+}
+
 // We create an array to hold the id's that we want to get a status for. We build our
 // debounced function that will get called after a set period of idle time in which
 // the array of id's will be passed to the getStatusesByIds with a cb that clears out
