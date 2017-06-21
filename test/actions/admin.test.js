@@ -8,7 +8,7 @@ import nock from 'nock';
 import * as Actions from 'actions/admin';
 import {Client, Client4} from 'client';
 
-import {RequestStatus} from 'constants';
+import {RequestStatus, Stats} from 'constants';
 import TestHelper from 'test/test_helper';
 import configureStore from 'test/test_store';
 
@@ -534,12 +534,12 @@ describe('Actions.Admin', () => {
 
         const analytics = state.entities.admin.analytics;
         assert.ok(analytics);
-        assert.ok(analytics.standard[0].value === 495);
+        assert.ok(analytics[Stats.TOTAL_PUBLIC_CHANNELS] === 495);
 
         const teamAnalytics = state.entities.admin.teamAnalytics;
         assert.ok(teamAnalytics);
         assert.ok(teamAnalytics[TestHelper.basicTeam.id]);
-        assert.ok(teamAnalytics[TestHelper.basicTeam.id].standard[0].value === 495);
+        assert.ok(teamAnalytics[TestHelper.basicTeam.id][Stats.TOTAL_PUBLIC_CHANNELS] === 495);
     });
 
     it('getAdvancedAnalytics', async () => {
@@ -560,12 +560,12 @@ describe('Actions.Admin', () => {
 
         const analytics = state.entities.admin.analytics;
         assert.ok(analytics);
-        assert.ok(analytics.extra_counts[0].value === 24);
+        assert.ok(analytics[Stats.TOTAL_FILE_POSTS] === 24);
 
         const teamAnalytics = state.entities.admin.teamAnalytics;
         assert.ok(teamAnalytics);
         assert.ok(teamAnalytics[TestHelper.basicTeam.id]);
-        assert.ok(teamAnalytics[TestHelper.basicTeam.id].extra_counts[0].value === 24);
+        assert.ok(teamAnalytics[TestHelper.basicTeam.id][Stats.TOTAL_FILE_POSTS] === 24);
     });
 
     it('getPostsPerDayAnalytics', async () => {
@@ -586,12 +586,12 @@ describe('Actions.Admin', () => {
 
         const analytics = state.entities.admin.analytics;
         assert.ok(analytics);
-        assert.ok(analytics.post_counts_day[0].value === 16);
+        assert.ok(analytics[Stats.POST_PER_DAY][0].value === 146);
 
         const teamAnalytics = state.entities.admin.teamAnalytics;
         assert.ok(teamAnalytics);
         assert.ok(teamAnalytics[TestHelper.basicTeam.id]);
-        assert.ok(teamAnalytics[TestHelper.basicTeam.id].post_counts_day[0].value === 16);
+        assert.ok(teamAnalytics[TestHelper.basicTeam.id][Stats.POST_PER_DAY][0].value === 146);
     });
 
     it('getUsersPerDayAnalytics', async () => {
@@ -599,7 +599,7 @@ describe('Actions.Admin', () => {
             get('/analytics/old').
             query(true).
             times(2).
-            reply(200, [{name: '2017-06-18', value: 2}, {name: '2017-06-16', value: 47}, {name: '2017-06-12', value: 4}, {name: '2017-06-08', value: 55}, {name: '2017-06-07', value: 2}, {name: '2017-06-06', value: 1}, {name: '2017-06-05', value: 2}, {name: '2017-06-04', value: 13}, {name: '2017-06-02', value: 1}, {name: '2017-05-31', value: 3}, {name: '2017-05-30', value: 4}, {name: '2017-05-29', value: 3}, {name: '2017-05-26', value: 40}, {name: '2017-05-25', value: 26}, {name: '2017-05-24', value: 43}, {name: '2017-05-23', value: 2}]);
+            reply(200, [{name: '2017-06-18', value: 2}, {name: '2017-06-16', value: 47}, {name: '2017-06-12', value: 4}, {name: '2017-06-08', value: 55}, {name: '2017-06-07', value: 2}, {name: '2017-06-06', value: 1}, {name: '2017-06-05', value: 2}, {name: '2017-06-04', value: 13}, {name: '2017-06-02', value: 1}, {name: '2017-05-31', value: 3}, {name: '2017-05-30', value: 4}, {name: '2017-05-29', value: 3}, {name: '2017-05-26', value: 40}, {name: '2017-05-25', value: 26}, {name: '2017-05-24', value: 43}, {name: '2017-05-23', value: 3}]);
 
         await Actions.getUsersPerDayAnalytics()(store.dispatch, store.getState);
         await Actions.getUsersPerDayAnalytics(TestHelper.basicTeam.id)(store.dispatch, store.getState);
@@ -612,11 +612,11 @@ describe('Actions.Admin', () => {
 
         const analytics = state.entities.admin.analytics;
         assert.ok(analytics);
-        assert.ok(analytics.user_counts_with_posts_day[0].value === 2);
+        assert.ok(analytics[Stats.USERS_WITH_POSTS_PER_DAY][0].value === 3);
 
         const teamAnalytics = state.entities.admin.teamAnalytics;
         assert.ok(teamAnalytics);
         assert.ok(teamAnalytics[TestHelper.basicTeam.id]);
-        assert.ok(teamAnalytics[TestHelper.basicTeam.id].user_counts_with_posts_day[0].value === 2);
+        assert.ok(teamAnalytics[TestHelper.basicTeam.id][Stats.USERS_WITH_POSTS_PER_DAY][0].value === 3);
     });
 });
