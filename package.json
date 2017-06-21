@@ -6,6 +6,7 @@
     "deep-equal": "1.0.1",
     "harmony-reflect": "1.5.1",
     "isomorphic-fetch": "2.2.1",
+    "key-mirror": "1.0.1",
     "mime-db": "1.27.0",
     "redux": "3.6.0",
     "redux-action-buffer": "1.0.1",
