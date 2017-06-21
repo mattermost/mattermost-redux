@@ -14,17 +14,3 @@ export function getOutgoingHooks(state) {
 export function getCommands(state) {
     return state.entities.integrations.commands;
 }
-
-export const getCommandsAsArray = createSelector(
-        getCommands,
-        (commandsState) => {
-            const commands = [];
-            for (const id in commandsState) {
-                if (commandsState.hasOwnProperty(id)) {
-                    const command = commandsState[id];
-                    commands.push(command);
-                }
-            }
-            return commands;
-        }
-);
