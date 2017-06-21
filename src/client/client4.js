@@ -470,6 +470,13 @@ export default class Client4 {
         );
     };
 
+    getUserByEmail = async (email) => {
+        return this.doFetch(
+            `${this.getUsersRoute()}/email/${email}`,
+            {method: 'get'}
+        );
+    };
+
     getProfilePictureUrl = (userId, lastPictureUpdate) => {
         const params = {};
         if (lastPictureUpdate) {
