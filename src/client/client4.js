@@ -771,6 +771,29 @@ export default class Client4 {
         );
     };
 
+    importTeam = async (teamId, file, importFrom) => {
+        const formData = new FormData();
+        formData.append('file', file, file.name);
+        formData.append('filesize', file.size);
+        formData.append('importFrom', importFrom);
+
+        const request = {
+            method: 'post',
+            body: formData
+        };
+
+        if (formData.getBoundary) {
+            request.headers = {
+                'Content-Type': `multipart/form-data; boundary=${formData.getBoundary()}`
+            };
+        }
+
+        return this.doFetch(
+            `${this.getTeamRoute(teamId)}/import`,
+            request
+        );
+    };
+
     // Channel Routes
 
     createChannel = async (channel) => {
