@@ -637,7 +637,26 @@ export function viewChannel(channelId, prevChannelId = '') {
             return null;
         }
 
-        dispatch({type: ChannelTypes.UPDATE_LAST_VIEWED_SUCCESS}, getState);
+        const actions = [{type: ChannelTypes.UPDATE_LAST_VIEWED_SUCCESS}];
+
+        const {myMembers} = getState().entities.channels;
+        const member = myMembers[channelId];
+        if (member) {
+            actions.push({
+                type: ChannelTypes.RECEIVED_MY_CHANNEL_MEMBER,
+                data: {...member, last_viewed_at: new Date().getTime()}
+            });
+        }
+
+        const prevMember = myMembers[prevChannelId];
+        if (prevMember) {
+            actions.push({
+                type: ChannelTypes.RECEIVED_MY_CHANNEL_MEMBER,
+                data: {...prevMember, last_viewed_at: new Date().getTime()}
+            });
+        }
+
+        dispatch(batchActions(actions), getState);
 
         return true;
     };
