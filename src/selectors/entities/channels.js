@@ -100,7 +100,7 @@ export const getChannelSetInCurrentTeam = createSelector(
     getCurrentTeamId,
     getChannelsInTeam,
     (currentTeamId, channelsInTeam) => {
-        return channelsInTeam[currentTeamId];
+        return channelsInTeam[currentTeamId] || [];
     }
 );
 
