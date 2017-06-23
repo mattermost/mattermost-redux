@@ -4,37 +4,56 @@
 import {WebsocketEvents} from 'constants';
 
 export default function typing(state = {}, action) {
-    const {data, type} = action;
+    const {
+        data,
+        type
+    } = action;
+
     switch (type) {
     case WebsocketEvents.TYPING: {
-        const {id, userId} = data;
+        const {
+            id,
+            userId,
+            now
+        } = data;
 
         if (id && userId) {
             return {
                 ...state,
                 [id]: {
-                    ...state[id] || {},
-                    [userId]: true
+                    ...(state[id] || {}),
+                    [userId]: now
                 }
             };
         }
+
         return state;
     }
     case WebsocketEvents.STOP_TYPING: {
-        const nextState = {...state};
-        const {id, userId} = data;
-        const users = {...nextState[id] || {}};
-        if (users) {
-            Reflect.deleteProperty(users, userId);
+        const {
+            id,
+            userId,
+            now
+        } = data;
+
+        if (state[id] && state[id][userId] <= now) {
+            const nextState = {
+                ...state,
+                [id]: {...state[id]}
+            };
+
+            Reflect.deleteProperty(nextState[id], userId);
+
+            if (Object.keys(nextState[id]).length === 0) {
+                Reflect.deleteProperty(nextState, id);
+            }
+
+            return nextState;
         }
 
-        nextState[id] = users;
-        if (!Object.keys(users).length) {
-            Reflect.deleteProperty(nextState, id);
-        }
-
-        return nextState;
+        return state;
     }
+
     default:
         return state;
     }
