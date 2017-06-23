@@ -522,41 +522,29 @@ function handleHelloEvent(msg) {
     }
 }
 
-const typingUsers = {};
 function handleUserTypingEvent(msg, dispatch, getState) {
     const state = getState();
     const {currentUserId, profiles, statuses} = state.entities.users;
     const {config} = state.entities.general;
     const userId = msg.data.user_id;
-    const id = msg.broadcast.channel_id + msg.data.parent_id;
-    const data = {id, userId};
 
-    // Create entry
-    if (!typingUsers[id]) {
-        typingUsers[id] = {};
-    }
-
-    // If we already have this user, clear it's timeout to be deleted
-    if (typingUsers[id][userId]) {
-        clearTimeout(typingUsers[id][userId].timeout);
-    }
-
-    // Set the user and a timeout to remove it
-    typingUsers[id][userId] = setTimeout(() => {
-        Reflect.deleteProperty(typingUsers[id], userId);
-        if (typingUsers[id] === {}) {
-            Reflect.deleteProperty(typingUsers, id);
-        }
-        dispatch({
-            type: WebsocketEvents.STOP_TYPING,
-            data
-        }, getState);
-    }, parseInt(config.TimeBetweenUserTypingUpdatesMilliseconds, 10));
+    const data = {
+        id: msg.broadcast.channel_id + msg.data.parent_id,
+        userId,
+        now: Date.now()
+    };
 
     dispatch({
         type: WebsocketEvents.TYPING,
         data
     }, getState);
+
+    setTimeout(() => {
+        dispatch({
+            type: WebsocketEvents.STOP_TYPING,
+            data
+        }, getState);
+    }, parseInt(config.TimeBetweenUserTypingUpdatesMilliseconds, 10));
 
     if (!profiles[userId] && userId !== currentUserId) {
         getProfilesByIds([userId])(dispatch, getState);
