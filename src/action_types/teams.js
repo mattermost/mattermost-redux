@@ -60,6 +60,10 @@ export default keyMirror({
     TEAM_EMAIL_INVITE_SUCCESS: null,
     TEAM_EMAIL_INVITE_FAILURE: null,
 
+    JOIN_TEAM_REQUEST: null,
+    JOIN_TEAM_SUCCESS: null,
+    JOIN_TEAM_FAILURE: null,
+
     CREATED_TEAM: null,
     SELECT_TEAM: null,
     UPDATED_TEAM: null,
