@@ -209,7 +209,7 @@ export function loadMe() {
             getMyTeamUnreads()(dispatch, getState)
         ];
 
-        if (state.EnableCustomEmoji === 'true') {
+        if (getConfig(state).EnableCustomEmoji === 'true') {
             promises.push(getAllCustomEmojis()(dispatch, getState));
         }
 
