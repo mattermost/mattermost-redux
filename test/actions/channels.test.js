@@ -194,7 +194,7 @@ describe('Actions.Channels', () => {
         assert.ok(myMembers);
         assert.ok(channels[Object.keys(myMembers)[0]]);
         assert.ok(myMembers[Object.keys(channels)[0]]);
-        assert.ok(channelsInTeam[''].has(directChannel.id));
+        assert.ok(channelsInTeam[''].has(directChannel.data.id));
         assert.equal(Object.keys(channels).length, Object.keys(myMembers).length);
     });
 
