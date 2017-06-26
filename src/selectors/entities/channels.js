@@ -48,7 +48,7 @@ export const getChannel = createSelector(
     getAllChannels,
     (state, id) => id,
     (state) => state.entities.users,
-    (state) => state.entities.preferences.myPreferences,
+    getMyPreferences,
     (allChannels, channelId, users, myPreferences) => {
         const channel = allChannels[channelId];
         if (channel) {
@@ -62,7 +62,7 @@ export const getCurrentChannel = createSelector(
     getAllChannels,
     getCurrentChannelId,
     (state) => state.entities.users,
-    (state) => state.entities.preferences.myPreferences,
+    getMyPreferences,
     (allChannels, currentChannelId, users, myPreferences) => {
         const channel = allChannels[currentChannelId];
         if (channel) {
@@ -147,10 +147,12 @@ export const getChannelsNameMapInCurrentTeam = createSelector(
 export const getDirectChannels = createSelector(
     getAllChannels,
     getDirectChannelsSet,
-    (channels, channelSet) => {
+    (state) => state.entities.users,
+    getMyPreferences,
+    (channels, channelSet, users, myPreferences) => {
         const dmChannels = [];
         channelSet.forEach((c) => {
-            dmChannels.push(channels[c]);
+            dmChannels.push(completeDirectChannelInfo(users, myPreferences, channels[c]));
         });
         return dmChannels;
     }
@@ -160,12 +162,14 @@ export const getDirectChannels = createSelector(
 export const getGroupChannels = createSelector(
     getAllChannels,
     getDirectChannelsSet,
-    (channels, channelSet) => {
+    (state) => state.entities.users,
+    getMyPreferences,
+    (channels, channelSet, users, myPreferences) => {
         const gmChannels = [];
         channelSet.forEach((id) => {
             const channel = channels[id];
             if (channel.type === General.GM_CHANNEL) {
-                gmChannels.push(channel);
+                gmChannels.push(completeDirectChannelInfo(users, myPreferences, channel));
             }
         });
         return gmChannels;
@@ -177,7 +181,7 @@ export const getMyChannels = createSelector(
     getDirectChannels,
     getMyChannelMemberships,
     (channels, directChannels, myMembers) => {
-        return [...channels, ...directChannels].filter((c) => myMembers.hasOwnProperty(c.id));
+        return [...channels, ...directChannels].filter((c) => myMembers[c.id]);
     }
 );
 
@@ -185,7 +189,7 @@ export const getOtherChannels = createSelector(
     getChannelsInCurrentTeam,
     getMyChannelMemberships,
     (channels, myMembers) => {
-        return channels.filter((c) => !myMembers.hasOwnProperty(c.id) && c.type === General.OPEN_CHANNEL);
+        return channels.filter((c) => !myMembers[c.id] && c.type === General.OPEN_CHANNEL);
     }
 );
 
