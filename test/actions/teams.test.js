@@ -158,7 +158,16 @@ describe('Actions.Teams', () => {
         const team = await client.createTeam({...TestHelper.fakeTeam(), allow_open_invite: true});
 
         await Actions.joinTeam(team.invite_id, team.id)(store.dispatch, store.getState);
-        const {teams, myMembers} = store.getState().entities.teams;
+
+        const state = store.getState();
+
+        const request = state.requests.teams.joinTeam;
+
+        if (request.status !== RequestStatus.SUCCESS) {
+            throw new Error(JSON.stringify(request.error));
+        }
+
+        const {teams, myMembers} = state.entities.teams;
         assert.ok(teams[team.id]);
         assert.ok(myMembers[team.id]);
     });

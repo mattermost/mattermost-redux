@@ -440,14 +440,14 @@ export function checkIfTeamExists(teamName) {
 
 export function joinTeam(inviteId, teamId) {
     return async (dispatch, getState) => {
-        dispatch({type: TeamTypes.ADD_TEAM_MEMBER_REQUEST}, getState);
+        dispatch({type: TeamTypes.JOIN_TEAM_REQUEST}, getState);
 
         try {
             await Client.joinTeamFromInvite(inviteId);
         } catch (err) {
             forceLogoutIfNecessary(err, dispatch);
             dispatch(batchActions([
-                {type: TeamTypes.ADD_TEAM_MEMBER_FAILURE, error: err},
+                {type: TeamTypes.JOIN_TEAM_FAILURE, error: err},
                 getLogErrorAction(err)
             ]), getState);
             return null;
@@ -457,7 +457,7 @@ export function joinTeam(inviteId, teamId) {
         await getMyTeamMembers()(dispatch, getState);
         getMyTeamUnreads()(dispatch, getState);
 
-        dispatch({type: TeamTypes.ADD_TEAM_MEMBER_SUCCESS}, getState);
+        dispatch({type: TeamTypes.JOIN_TEAM_SUCCESS}, getState);
         return true;
     };
 }

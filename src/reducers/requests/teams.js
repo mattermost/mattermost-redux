@@ -136,6 +136,16 @@ function emailInvite(state = initialRequestState(), action) {
     );
 }
 
+function joinTeam(state = initialRequestState(), action) {
+    return handleRequest(
+        TeamTypes.JOIN_TEAM_REQUEST,
+        TeamTypes.JOIN_TEAM_SUCCESS,
+        TeamTypes.JOIN_TEAM_FAILURE,
+        state,
+        action
+    );
+}
+
 export default combineReducers({
     getMyTeams,
     getTeams,
@@ -149,5 +159,6 @@ export default combineReducers({
     addUserToTeam,
     removeUserFromTeam,
     updateTeamMember,
-    emailInvite
+    emailInvite,
+    joinTeam
 });
