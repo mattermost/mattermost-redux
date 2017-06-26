@@ -104,7 +104,7 @@ export function createDirectChannel(userId, otherUserId) {
                 {type: ChannelTypes.CREATE_CHANNEL_FAILURE, error},
                 getLogErrorAction(error)
             ]), getState);
-            return null;
+            return {error};
         }
 
         const member = {
@@ -140,7 +140,7 @@ export function createDirectChannel(userId, otherUserId) {
             }
         ]), getState);
 
-        return created;
+        return {data: created};
     };
 }
 
@@ -503,7 +503,7 @@ export function joinChannel(userId, teamId, channelId, channelName) {
                 {type: ChannelTypes.JOIN_CHANNEL_FAILURE, error},
                 getLogErrorAction(error)
             ]), getState);
-            return null;
+            return {error};
         }
 
         dispatch(batchActions([
@@ -520,7 +520,7 @@ export function joinChannel(userId, teamId, channelId, channelName) {
             }
         ]), getState);
 
-        return {channel, member};
+        return {data: {channel, member}};
     };
 }
 

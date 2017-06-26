@@ -181,7 +181,7 @@ export const getMyChannels = createSelector(
     getDirectChannels,
     getMyChannelMemberships,
     (channels, directChannels, myMembers) => {
-        return [...channels, ...directChannels].filter((c) => myMembers[c.id]);
+        return [...channels, ...directChannels].filter((c) => myMembers.hasOwnProperty(c.id));
     }
 );
 
@@ -189,7 +189,7 @@ export const getOtherChannels = createSelector(
     getChannelsInCurrentTeam,
     getMyChannelMemberships,
     (channels, myMembers) => {
-        return channels.filter((c) => !myMembers[c.id] && c.type === General.OPEN_CHANNEL);
+        return channels.filter((c) => !myMembers.hasOwnProperty(c.id) && c.type === General.OPEN_CHANNEL);
     }
 );
 
