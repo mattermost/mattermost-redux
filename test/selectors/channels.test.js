@@ -21,6 +21,7 @@ describe('Selectors.Channels', () => {
     channel5.type = General.PRIVATE_CHANNEL;
     const channel6 = TestHelper.fakeChannelWithId(team1.id);
     const channel7 = TestHelper.fakeChannelWithId('');
+    channel7.display_name = '';
     channel7.type = General.GM_CHANNEL;
 
     const channels = {};
