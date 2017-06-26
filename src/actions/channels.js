@@ -536,7 +536,7 @@ export function deleteChannel(channelId) {
                 {type: ChannelTypes.DELETE_CHANNEL_FAILURE, error},
                 getLogErrorAction(error)
             ]), getState);
-            return null;
+            return {error};
         }
 
         const entities = getState().entities;
@@ -563,7 +563,7 @@ export function deleteChannel(channelId) {
             }
         ]), getState);
 
-        return true;
+        return {data: true};
     };
 }
 
