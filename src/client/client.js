@@ -474,6 +474,13 @@ export default class Client {
         );
     };
 
+    joinTeamFromInvite = async (inviteId) => {
+        return this.doFetch(
+            `${this.getTeamsRoute()}/add_user_to_team_from_invite`,
+            {method: 'post', body: JSON.stringify({invite_id: inviteId})}
+        );
+    };
+
     removeUserFromTeam = async (teamId, userId) => {
         return this.doFetch(
             `${this.getTeamNeededRoute(teamId)}/remove_user_from_team`,

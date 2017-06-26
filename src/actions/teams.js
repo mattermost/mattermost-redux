@@ -2,7 +2,7 @@
 // See License.txt for license information.
 
 import {batchActions} from 'redux-batched-actions';
-import {Client4} from 'client';
+import {Client, Client4} from 'client';
 import {General} from 'constants';
 import {ChannelTypes, TeamTypes, UserTypes} from 'action_types';
 import {getLogErrorAction} from './errors';
@@ -443,7 +443,7 @@ export function joinTeam(inviteId, teamId) {
         dispatch({type: TeamTypes.ADD_TEAM_MEMBER_REQUEST}, getState);
 
         try {
-            await Client4.joinTeam(inviteId, teamId);
+            await Client.joinTeamFromInvite(inviteId);
         } catch (err) {
             forceLogoutIfNecessary(err, dispatch);
             dispatch(batchActions([
