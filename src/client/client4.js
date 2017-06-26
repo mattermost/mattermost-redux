@@ -692,12 +692,11 @@ export default class Client4 {
         );
     };
 
-    joinTeam = async (inviteId, teamId) => {
-        const member = {team_id: teamId};
+    joinTeam = async (inviteId) => {
         const query = buildQueryString({invite_id: inviteId});
         return this.doFetch(
-            `${this.getTeamMembersRoute(teamId)}${query}`,
-            {method: 'post', body: JSON.stringify(member)}
+            `${this.getTeamsRoute()}/members/invite${query}`,
+            {method: 'post'}
         );
     };
 
