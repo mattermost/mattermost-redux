@@ -18,7 +18,7 @@ import {
 
 import {removeUserFromList} from 'utils/user_utils';
 
-import {getLogErrorAction} from './errors';
+import {logError} from './errors';
 import {bindClientFunc, forceLogoutIfNecessary, debounce} from './helpers';
 import {
     getMyPreferences,
@@ -38,7 +38,7 @@ export function checkMfa(loginId) {
         } catch (error) {
             dispatch(batchActions([
                 {type: UserTypes.CHECK_MFA_FAILURE, error},
-                getLogErrorAction(error)
+                logError(error)(dispatch)
             ]), getState);
             return null;
         }
@@ -69,7 +69,7 @@ export function createUser(user, data, hash, inviteId) {
                     type: UserTypes.CREATE_USER_FAILURE,
                     error
                 },
-                getLogErrorAction(error)
+                logError(error)(dispatch)
             ]), getState);
             return null;
         }
@@ -97,7 +97,7 @@ export function login(loginId, password, mfaToken = '', ldapOnly = false) {
                     type: UserTypes.LOGIN_FAILURE,
                     error
                 },
-                getLogErrorAction(error)
+                logError(error)(dispatch)
             ]), getState);
             return false;
         }
@@ -121,7 +121,7 @@ export function loginById(id, password, mfaToken = '') {
                     type: UserTypes.LOGIN_FAILURE,
                     error
                 },
-                getLogErrorAction(error)
+                logError(error)(dispatch)
             ]), getState);
             return null;
         }
@@ -153,7 +153,7 @@ function completeLogin(data) {
         } catch (error) {
             dispatch(batchActions([
                 {type: UserTypes.LOGIN_FAILURE, error},
-                getLogErrorAction(error)
+                logError(error)(dispatch)
             ]), getState);
             return false;
         }
@@ -173,7 +173,7 @@ function completeLogin(data) {
         } catch (error) {
             dispatch(batchActions([
                 {type: UserTypes.LOGIN_FAILURE, error},
-                getLogErrorAction(error)
+                logError(error)(dispatch)
             ]), getState);
             return false;
         }
@@ -240,7 +240,7 @@ export function getProfiles(page = 0, perPage = General.PROFILE_CHUNK_SIZE) {
             forceLogoutIfNecessary(error, dispatch);
             dispatch(batchActions([
                 {type: UserTypes.PROFILES_FAILURE, error},
-                getLogErrorAction(error)
+                logError(error)(dispatch)
             ]), getState);
             return null;
         }
@@ -301,7 +301,7 @@ export function getProfilesInTeam(teamId, page, perPage = General.PROFILE_CHUNK_
             forceLogoutIfNecessary(error, dispatch);
             dispatch(batchActions([
                 {type: UserTypes.PROFILES_IN_TEAM_FAILURE, error},
-                getLogErrorAction(error)
+                logError(error)(dispatch)
             ]), getState);
             return null;
         }
@@ -336,7 +336,7 @@ export function getProfilesNotInTeam(teamId, page, perPage = General.PROFILE_CHU
             forceLogoutIfNecessary(error, dispatch);
             dispatch(batchActions([
                 {type: UserTypes.PROFILES_NOT_IN_TEAM_FAILURE, error},
-                getLogErrorAction(error)
+                logError(error)(dispatch)
             ]), getState);
             return null;
         }
@@ -371,7 +371,7 @@ export function getProfilesWithoutTeam(page, perPage = General.PROFILE_CHUNK_SIZ
             forceLogoutIfNecessary(error, dispatch);
             dispatch(batchActions([
                 {type: UserTypes.PROFILES_WITHOUT_TEAM_FAILURE, error},
-                getLogErrorAction(error)
+                logError(error)(dispatch)
             ]), getState);
             return null;
         }
@@ -407,7 +407,7 @@ export function getProfilesInChannel(channelId, page, perPage = General.PROFILE_
             forceLogoutIfNecessary(error, dispatch);
             dispatch(batchActions([
                 {type: UserTypes.PROFILES_IN_CHANNEL_FAILURE, error},
-                getLogErrorAction(error)
+                logError(error)(dispatch)
             ]), getState);
             return null;
         }
@@ -444,7 +444,7 @@ export function getProfilesNotInChannel(teamId, channelId, page, perPage = Gener
             forceLogoutIfNecessary(error, dispatch);
             dispatch(batchActions([
                 {type: UserTypes.PROFILES_NOT_IN_CHANNEL_FAILURE, error},
-                getLogErrorAction(error)
+                logError(error)(dispatch)
             ]), getState);
             return null;
         }
@@ -544,7 +544,7 @@ export function setStatus(status) {
             forceLogoutIfNecessary(error, dispatch);
             dispatch(batchActions([
                 {type: UserTypes.SET_STATUS_FAILURE, error},
-                getLogErrorAction(error)
+                logError(error)(dispatch)
             ]), getState);
             return null;
         }
@@ -583,7 +583,7 @@ export function revokeSession(userId, sessionId) {
             forceLogoutIfNecessary(error, dispatch);
             dispatch(batchActions([
                 {type: UserTypes.REVOKE_SESSION_FAILURE, error},
-                getLogErrorAction(error)
+                logError(error)(dispatch)
             ]), getState);
             return false;
         }
@@ -655,7 +655,7 @@ export function autocompleteUsers(term, teamId = '', channelId = '') {
             forceLogoutIfNecessary(error, dispatch);
             dispatch(batchActions([
                 {type: UserTypes.AUTOCOMPLETE_USERS_FAILURE, error},
-                getLogErrorAction(error)
+                logError(error)(dispatch)
             ]), getState);
             return null;
         }
@@ -722,7 +722,7 @@ export function searchProfiles(term, options = {}) {
             forceLogoutIfNecessary(error, dispatch);
             dispatch(batchActions([
                 {type: UserTypes.SEARCH_PROFILES_FAILURE, error},
-                getLogErrorAction(error)
+                logError(error)(dispatch)
             ]), getState);
             return null;
         }

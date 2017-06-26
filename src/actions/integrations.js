@@ -7,7 +7,7 @@ import {batchActions} from 'redux-batched-actions';
 
 import {Client4} from 'client';
 
-import {getLogErrorAction} from './errors';
+import {logError} from './errors';
 import {bindClientFunc, forceLogoutIfNecessary} from './helpers';
 
 export function createIncomingHook(hook) {
@@ -43,7 +43,7 @@ export function removeIncomingHook(hookId) {
 
             dispatch(batchActions([
                 {type: IntegrationTypes.DELETE_INCOMING_HOOK_FAILURE, error},
-                getLogErrorAction(error)
+                logError(error)(dispatch)
             ]), getState);
             return null;
         }
@@ -106,7 +106,7 @@ export function removeOutgoingHook(hookId) {
 
             dispatch(batchActions([
                 {type: IntegrationTypes.DELETE_OUTGOING_HOOK_FAILURE, error},
-                getLogErrorAction(error)
+                logError(error)(dispatch)
             ]), getState);
             return null;
         }
@@ -187,7 +187,7 @@ export function regenCommandToken(id) {
 
             dispatch(batchActions([
                 {type: IntegrationTypes.REGEN_COMMAND_TOKEN_FAILURE, error},
-                getLogErrorAction(error)
+                logError(error)(dispatch)
             ]), getState);
             return null;
         }
@@ -220,7 +220,7 @@ export function deleteCommand(id) {
 
             dispatch(batchActions([
                 {type: IntegrationTypes.DELETE_COMMAND_FAILURE, error},
-                getLogErrorAction(error)
+                logError(error)(dispatch)
             ]), getState);
             return null;
         }
@@ -281,7 +281,7 @@ export function deleteOAuthApp(id) {
 
             dispatch(batchActions([
                 {type: IntegrationTypes.DELETE_OAUTH_APP_FAILURE, error},
-                getLogErrorAction(error)
+                logError(error)(dispatch)
             ]), getState);
             return null;
         }

@@ -9,7 +9,7 @@ import {ChannelTypes, PreferenceTypes, TeamTypes, UserTypes} from 'action_types'
 import {savePreferences} from 'actions/preferences';
 import {getChannelsIdForTeam} from 'utils/channel_utils';
 
-import {logError, getLogErrorAction} from './errors';
+import {logError} from './errors';
 import {bindClientFunc, forceLogoutIfNecessary} from './helpers';
 
 export function selectChannel(channelId) {
@@ -50,7 +50,7 @@ export function createChannel(channel, userId) {
                     type: ChannelTypes.CHANNEL_MEMBERS_FAILURE,
                     error
                 },
-                getLogErrorAction(error)
+                logError(error)(dispatch)
             ]), getState);
             return null;
         }
@@ -102,7 +102,7 @@ export function createDirectChannel(userId, otherUserId) {
             forceLogoutIfNecessary(error, dispatch);
             dispatch(batchActions([
                 {type: ChannelTypes.CREATE_CHANNEL_FAILURE, error},
-                getLogErrorAction(error)
+                logError(error)(dispatch)
             ]), getState);
             return {error};
         }
@@ -156,7 +156,7 @@ export function patchChannel(channelId, patch) {
 
             dispatch(batchActions([
                 {type: ChannelTypes.UPDATE_CHANNEL_FAILURE, error},
-                getLogErrorAction(error)
+                logError(error)(dispatch)
             ]), getState);
             return null;
         }
@@ -187,7 +187,7 @@ export function updateChannel(channel) {
 
             dispatch(batchActions([
                 {type: ChannelTypes.UPDATE_CHANNEL_FAILURE, error},
-                getLogErrorAction(error)
+                logError(error)(dispatch)
             ]), getState);
             return null;
         }
@@ -223,7 +223,7 @@ export function updateChannelNotifyProps(userId, channelId, props) {
 
             dispatch(batchActions([
                 {type: ChannelTypes.NOTIFY_PROPS_FAILURE, error},
-                getLogErrorAction(error)
+                logError(error)(dispatch)
             ]), getState);
             return null;
         }
@@ -259,7 +259,7 @@ export function getChannel(channelId) {
             forceLogoutIfNecessary(error, dispatch);
             dispatch(batchActions([
                 {type: ChannelTypes.CHANNELS_FAILURE, error},
-                getLogErrorAction(error)
+                logError(error)(dispatch)
             ]), getState);
             return null;
         }
@@ -291,7 +291,7 @@ export function getChannelAndMyMember(channelId) {
             forceLogoutIfNecessary(error, dispatch);
             dispatch(batchActions([
                 {type: ChannelTypes.CHANNELS_FAILURE, error},
-                getLogErrorAction(error)
+                logError(error)(dispatch)
             ]), getState);
             return null;
         }
@@ -334,7 +334,7 @@ export function fetchMyChannelsAndMembers(teamId) {
             dispatch(batchActions([
                 {type: ChannelTypes.CHANNELS_FAILURE, error},
                 {type: ChannelTypes.CHANNEL_MEMBERS_FAILURE, error},
-                getLogErrorAction(error)
+                logError(error)(dispatch)
             ]), getState);
             return null;
         }
@@ -346,7 +346,7 @@ export function fetchMyChannelsAndMembers(teamId) {
             dispatch(batchActions([
                 {type: ChannelTypes.CHANNELS_FAILURE, error},
                 {type: ChannelTypes.CHANNEL_MEMBERS_FAILURE, error},
-                getLogErrorAction(error)
+                logError(error)(dispatch)
             ]), getState);
             return null;
         }
@@ -390,7 +390,7 @@ export function getMyChannelMembers(teamId) {
             forceLogoutIfNecessary(error, dispatch);
             dispatch(batchActions([
                 {type: ChannelTypes.CHANNEL_MY_MEMBERS_FAILURE, error},
-                getLogErrorAction(error)
+                logError(error)(dispatch)
             ]), getState);
             return null;
         }
@@ -426,7 +426,7 @@ export function getChannelMembers(channelId, page = 0, perPage = General.CHANNEL
             forceLogoutIfNecessary(error, dispatch);
             dispatch(batchActions([
                 {type: ChannelTypes.CHANNEL_MEMBERS_FAILURE, error},
-                getLogErrorAction(error)
+                logError(error)(dispatch)
             ]), getState);
             return null;
         }
@@ -501,7 +501,7 @@ export function joinChannel(userId, teamId, channelId, channelName) {
             forceLogoutIfNecessary(error, dispatch);
             dispatch(batchActions([
                 {type: ChannelTypes.JOIN_CHANNEL_FAILURE, error},
-                getLogErrorAction(error)
+                logError(error)(dispatch)
             ]), getState);
             return {error};
         }
@@ -534,7 +534,7 @@ export function deleteChannel(channelId) {
             forceLogoutIfNecessary(error, dispatch);
             dispatch(batchActions([
                 {type: ChannelTypes.DELETE_CHANNEL_FAILURE, error},
-                getLogErrorAction(error)
+                logError(error)(dispatch)
             ]), getState);
             return {error};
         }
@@ -577,7 +577,7 @@ export function viewChannel(channelId, prevChannelId = '') {
             forceLogoutIfNecessary(error, dispatch);
             dispatch(batchActions([
                 {type: ChannelTypes.UPDATE_LAST_VIEWED_FAILURE, error},
-                getLogErrorAction(error)
+                logError(error)(dispatch)
             ]), getState);
             return null;
         }
@@ -599,7 +599,7 @@ export function getChannels(teamId, page = 0, perPage = General.CHANNELS_CHUNK_S
             forceLogoutIfNecessary(error, dispatch);
             dispatch(batchActions([
                 {type: ChannelTypes.GET_CHANNELS_FAILURE, error},
-                getLogErrorAction(error)
+                logError(error)(dispatch)
             ]), getState);
             return null;
         }
@@ -630,7 +630,7 @@ export function searchChannels(teamId, term) {
             forceLogoutIfNecessary(error, dispatch);
             dispatch(batchActions([
                 {type: ChannelTypes.GET_CHANNELS_FAILURE, error},
-                getLogErrorAction(error)
+                logError(error)(dispatch)
             ]), getState);
             return null;
         }
@@ -661,7 +661,7 @@ export function getChannelStats(channelId) {
             forceLogoutIfNecessary(error, dispatch);
             dispatch(batchActions([
                 {type: ChannelTypes.CHANNEL_STATS_FAILURE, error},
-                getLogErrorAction(error)
+                logError(error)(dispatch)
             ]), getState);
             return null;
         }
@@ -691,7 +691,7 @@ export function addChannelMember(channelId, userId) {
             forceLogoutIfNecessary(error, dispatch);
             dispatch(batchActions([
                 {type: ChannelTypes.ADD_CHANNEL_MEMBER_FAILURE, error},
-                getLogErrorAction(error)
+                logError(error)(dispatch)
             ]), getState);
             return null;
         }
@@ -726,7 +726,7 @@ export function removeChannelMember(channelId, userId) {
             forceLogoutIfNecessary(error, dispatch);
             dispatch(batchActions([
                 {type: ChannelTypes.REMOVE_CHANNEL_MEMBER_FAILURE, error},
-                getLogErrorAction(error)
+                logError(error)(dispatch)
             ]), getState);
             return null;
         }
@@ -757,7 +757,7 @@ export function updateChannelMemberRoles(channelId, userId, roles) {
             forceLogoutIfNecessary(error, dispatch);
             dispatch(batchActions([
                 {type: ChannelTypes.UPDATE_CHANNEL_MEMBER_FAILURE, error},
-                getLogErrorAction(error)
+                logError(error)(dispatch)
             ]), getState);
             return null;
         }

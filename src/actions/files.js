@@ -5,7 +5,7 @@ import {batchActions} from 'redux-batched-actions';
 
 import {Client4} from 'client';
 import {FileTypes} from 'action_types';
-import {getLogErrorAction} from './errors';
+import {logError} from './errors';
 import {forceLogoutIfNecessary} from './helpers';
 
 export function getFilesForPost(postId) {
@@ -19,7 +19,7 @@ export function getFilesForPost(postId) {
             forceLogoutIfNecessary(error, dispatch);
             dispatch(batchActions([
                 {type: FileTypes.FETCH_FILES_FOR_POST_FAILURE, error},
-                getLogErrorAction(error)
+                logError(error)(dispatch)
             ]), getState);
             return;
         }
@@ -68,7 +68,7 @@ export function uploadFile(channelId, rootId, clientIds, fileFormData, formBound
                 error
             };
 
-            dispatch(batchActions([failure, getLogErrorAction(error)]), getState);
+            dispatch(batchActions([failure, logError(error)(dispatch)]), getState);
             return null;
         }
 

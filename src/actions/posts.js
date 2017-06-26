@@ -10,7 +10,7 @@ import {PostTypes, FileTypes} from 'action_types';
 import * as Selectors from 'selectors/entities/posts';
 
 import {bindClientFunc, forceLogoutIfNecessary} from './helpers';
-import {getLogErrorAction} from './errors';
+import {logError} from './errors';
 import {deletePreferences, savePreferences} from './preferences';
 import {getProfilesByIds, getStatusesByIds} from './users';
 
@@ -147,7 +147,7 @@ export function pinPost(postId) {
             forceLogoutIfNecessary(error, dispatch);
             dispatch(batchActions([
                 {type: PostTypes.EDIT_POST_FAILURE, error},
-                getLogErrorAction(error)
+                logError(error)(dispatch)
             ]), getState);
             return null;
         }
@@ -185,7 +185,7 @@ export function unpinPost(postId) {
             forceLogoutIfNecessary(error, dispatch);
             dispatch(batchActions([
                 {type: PostTypes.EDIT_POST_FAILURE, error},
-                getLogErrorAction(error)
+                logError(error)(dispatch)
             ]), getState);
             return null;
         }
@@ -225,7 +225,7 @@ export function addReaction(postId, emojiName) {
             forceLogoutIfNecessary(error, dispatch);
             dispatch(batchActions([
                 {type: PostTypes.REACTION_FAILURE, error},
-                getLogErrorAction(error)
+                logError(error)(dispatch)
             ]), getState);
             return null;
         }
@@ -256,7 +256,7 @@ export function removeReaction(postId, emojiName) {
             forceLogoutIfNecessary(error, dispatch);
             dispatch(batchActions([
                 {type: PostTypes.REACTION_FAILURE, error},
-                getLogErrorAction(error)
+                logError(error)(dispatch)
             ]), getState);
             return null;
         }
@@ -286,7 +286,7 @@ export function getReactionsForPost(postId) {
             forceLogoutIfNecessary(error, dispatch);
             dispatch(batchActions([
                 {type: PostTypes.REACTION_FAILURE, error},
-                getLogErrorAction(error)
+                logError(error)(dispatch)
             ]), getState);
             return null;
         }
@@ -332,7 +332,7 @@ export function getPostThread(postId) {
             forceLogoutIfNecessary(error, dispatch);
             dispatch(batchActions([
                 {type: PostTypes.GET_POST_THREAD_FAILURE, error},
-                getLogErrorAction(error)
+                logError(error)(dispatch)
             ]), getState);
             return null;
         }
@@ -366,7 +366,7 @@ export function getPosts(channelId, page = 0, perPage = Posts.POST_CHUNK_SIZE) {
             forceLogoutIfNecessary(error, dispatch);
             dispatch(batchActions([
                 {type: PostTypes.GET_POSTS_FAILURE, error},
-                getLogErrorAction(error)
+                logError(error)(dispatch)
             ]), getState);
             return null;
         }
@@ -398,7 +398,7 @@ export function getPostsSince(channelId, since) {
             forceLogoutIfNecessary(error, dispatch);
             dispatch(batchActions([
                 {type: PostTypes.GET_POSTS_SINCE_FAILURE, error},
-                getLogErrorAction(error)
+                logError(error)(dispatch)
             ]), getState);
             return null;
         }
@@ -430,7 +430,7 @@ export function getPostsBefore(channelId, postId, page = 0, perPage = Posts.POST
             forceLogoutIfNecessary(error, dispatch);
             dispatch(batchActions([
                 {type: PostTypes.GET_POSTS_BEFORE_FAILURE, error},
-                getLogErrorAction(error)
+                logError(error)(dispatch)
             ]), getState);
             return null;
         }
@@ -462,7 +462,7 @@ export function getPostsAfter(channelId, postId, page = 0, perPage = Posts.POST_
             forceLogoutIfNecessary(error, dispatch);
             dispatch(batchActions([
                 {type: PostTypes.GET_POSTS_AFTER_FAILURE, error},
-                getLogErrorAction(error)
+                logError(error)(dispatch)
             ]), getState);
             return null;
         }
@@ -552,7 +552,7 @@ export function getOpenGraphMetadata(url) {
             forceLogoutIfNecessary(error, dispatch);
             dispatch(batchActions([
                 {type: PostTypes.OPEN_GRAPH_FAILURE, error},
-                getLogErrorAction(error)
+                logError(error)(dispatch)
             ]), getState);
             return null;
         }
