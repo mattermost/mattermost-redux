@@ -14,6 +14,7 @@ const HEADER_REQUESTED_WITH = 'X-Requested-With';
 const HEADER_TOKEN = 'Token';
 const HEADER_X_VERSION_ID = 'X-Version-Id';
 const HEADER_USER_AGENT = 'User-Agent';
+const HEADER_ACCEPT_LANGUAGE = 'Accept-Language';
 
 export default class Client {
     constructor() {
@@ -23,6 +24,7 @@ export default class Client {
         this.url = '';
         this.urlVersion = '/api/v3';
         this.userAgent = null;
+        this.acceptLanguage = null;
 
         this.translations = {
             connectionError: 'There appears to be a problem with your internet connection.',
@@ -40,6 +42,10 @@ export default class Client {
 
     setUserAgent(userAgent) {
         this.userAgent = userAgent;
+    }
+
+    setLocale(locale) {
+        this.acceptLanguage = locale;
     }
 
     getToken() {
@@ -149,6 +155,10 @@ export default class Client {
 
         if (this.userAgent) {
             headers[HEADER_USER_AGENT] = this.userAgent;
+        }
+
+        if (this.acceptLanguage) {
+            headers[HEADER_ACCEPT_LANGUAGE] = this.acceptLanguage;
         }
 
         if (options.headers) {
