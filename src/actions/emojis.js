@@ -7,7 +7,7 @@ import {batchActions} from 'redux-batched-actions';
 
 import {Client} from 'client';
 
-import {getLogErrorAction} from './errors';
+import {logError} from './errors';
 import {bindClientFunc, forceLogoutIfNecessary} from './helpers';
 
 export function createCustomEmoji(emoji, image) {
@@ -63,7 +63,7 @@ export function getAllCustomEmojis(perPage = General.PAGE_SIZE_DEFAULT) {
 
                 return dispatch(batchActions([
                     {type: EmojiTypes.GET_ALL_CUSTOM_EMOJIS_FAILURE, error},
-                    getLogErrorAction(error)
+                    logError(error)(dispatch)
                 ]), getState);
             }
         } while (hasMore);
@@ -83,7 +83,7 @@ export function deleteCustomEmoji(emojiId) {
 
             dispatch(batchActions([
                 {type: EmojiTypes.DELETE_CUSTOM_EMOJI_FAILURE, error},
-                getLogErrorAction(error)
+                logError(error)(dispatch)
             ]), getState);
             return null;
         }

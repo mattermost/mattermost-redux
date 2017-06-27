@@ -4,6 +4,7 @@
 import {ErrorTypes} from 'action_types';
 import serializeError from 'serialize-error';
 import Client from 'client';
+import EventEmitter from 'utils/event_emitter';
 
 export function dismissErrorObject(index) {
     return {
@@ -18,7 +19,7 @@ export function dismissError(index) {
     };
 }
 
-export function getLogErrorAction(error, displayable = true) {
+export function getLogErrorAction(error, displayable = false) {
     return {
         type: ErrorTypes.LOG_ERROR,
         displayable,
@@ -26,16 +27,20 @@ export function getLogErrorAction(error, displayable = true) {
     };
 }
 
-export function logError(error) {
-    return async () => {
+export function logError(error, displayable = false) {
+    return async (dispatch) => {
+        const serializedError = serializeError(error);
+
         try {
-            const serializedError = serializeError(error);
             const stringifiedSerializedError = JSON.stringify(serializedError).toString();
             await Client.logClientError(stringifiedSerializedError);
         } catch (err) {
           // avoid crashing the app if an error sending
           // the error occurs.
         }
+
+        EventEmitter.emit(ErrorTypes.LOG_ERROR, error);
+        dispatch(getLogErrorAction(serializedError, displayable));
     };
 }
 

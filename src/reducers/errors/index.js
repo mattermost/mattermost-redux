@@ -14,10 +14,16 @@ export default (state = [], action) => {
     case ErrorTypes.LOG_ERROR: {
         const nextState = [...state];
         const {displayable, error} = action;
-        nextState.push({displayable, error});
+        nextState.push({
+            displayable,
+            error,
+            date: new Date(Date.now()).toUTCString()
+        });
 
         return nextState;
     }
+    case ErrorTypes.RESTORE_ERRORS:
+        return action.data;
     case ErrorTypes.CLEAR_ERRORS: {
         return [];
     }

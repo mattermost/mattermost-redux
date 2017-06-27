@@ -5,7 +5,7 @@ import {batchActions} from 'redux-batched-actions';
 import {Client, Client4} from 'client';
 import {General} from 'constants';
 import {ChannelTypes, TeamTypes, UserTypes} from 'action_types';
-import {getLogErrorAction} from './errors';
+import {logError} from './errors';
 import {bindClientFunc, forceLogoutIfNecessary} from './helpers';
 import {getProfilesByIds, getStatusesByIds} from './users';
 
@@ -90,7 +90,7 @@ export function createTeam(team) {
             forceLogoutIfNecessary(err, dispatch);
             dispatch(batchActions([
                 {type: TeamTypes.CREATE_TEAM_FAILURE, error: err},
-                getLogErrorAction(err)
+                logError(err)(dispatch)
             ]), getState);
             return null;
         }
@@ -157,7 +157,7 @@ export function getTeamMember(teamId, userId) {
             forceLogoutIfNecessary(error, dispatch);
             dispatch(batchActions([
                 {type: TeamTypes.TEAM_MEMBERS_FAILURE, error},
-                getLogErrorAction(error)
+                logError(error)(dispatch)
             ]), getState);
             return null;
         }
@@ -188,7 +188,7 @@ export function getTeamMembersByIds(teamId, userIds) {
             forceLogoutIfNecessary(error, dispatch);
             dispatch(batchActions([
                 {type: TeamTypes.TEAM_MEMBERS_FAILURE, error},
-                getLogErrorAction(error)
+                logError(error)(dispatch)
             ]), getState);
             return null;
         }
@@ -248,7 +248,7 @@ export function addUserToTeam(teamId, userId) {
             forceLogoutIfNecessary(error, dispatch);
             dispatch(batchActions([
                 {type: TeamTypes.ADD_TEAM_MEMBER_FAILURE, error},
-                getLogErrorAction(error)
+                logError(error)(dispatch)
             ]), getState);
             return null;
         }
@@ -283,7 +283,7 @@ export function addUsersToTeam(teamId, userIds) {
             forceLogoutIfNecessary(error, dispatch);
             dispatch(batchActions([
                 {type: TeamTypes.ADD_TEAM_MEMBER_FAILURE, error},
-                getLogErrorAction(error)
+                logError(error)(dispatch)
             ]), getState);
             return null;
         }
@@ -320,7 +320,7 @@ export function removeUserFromTeam(teamId, userId) {
             forceLogoutIfNecessary(error, dispatch);
             dispatch(batchActions([
                 {type: TeamTypes.REMOVE_TEAM_MEMBER_FAILURE, error},
-                getLogErrorAction(error)
+                logError(error)(dispatch)
             ]), getState);
             return null;
         }
@@ -378,7 +378,7 @@ export function updateTeamMemberRoles(teamId, userId, roles) {
             forceLogoutIfNecessary(error, dispatch);
             dispatch(batchActions([
                 {type: TeamTypes.UPDATE_TEAM_MEMBER_FAILURE, error},
-                getLogErrorAction(error)
+                logError(error)(dispatch)
             ]), getState);
             return null;
         }
@@ -427,7 +427,7 @@ export function checkIfTeamExists(teamName) {
             forceLogoutIfNecessary(error, dispatch);
             dispatch(batchActions([
                 {type: TeamTypes.GET_TEAM_FAILURE, error},
-                getLogErrorAction(error)
+                logError(error)(dispatch)
             ]));
             return null;
         }
@@ -448,7 +448,7 @@ export function joinTeam(inviteId, teamId) {
             forceLogoutIfNecessary(err, dispatch);
             dispatch(batchActions([
                 {type: TeamTypes.JOIN_TEAM_FAILURE, error: err},
-                getLogErrorAction(err)
+                logError(err)(dispatch)
             ]), getState);
             return null;
         }
