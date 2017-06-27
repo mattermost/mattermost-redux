@@ -4,6 +4,7 @@
 import {ErrorTypes} from 'action_types';
 import serializeError from 'serialize-error';
 import Client from 'client';
+import EventEmitter from 'utils/event_emitter';
 
 export function dismissErrorObject(index) {
     return {
@@ -38,6 +39,7 @@ export function logError(error, displayable = false) {
           // the error occurs.
         }
 
+        EventEmitter.emit(ErrorTypes.LOG_ERROR, error);
         dispatch(getLogErrorAction(serializedError, displayable));
     };
 }
