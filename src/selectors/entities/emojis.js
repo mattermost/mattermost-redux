@@ -23,8 +23,8 @@ export const getCustomEmojisByName = createSelector(
     (emojis) => {
         const map = new Map();
 
-        Object.values(emojis).forEach((emoji) => {
-            map.set(emoji.name, emoji);
+        Object.keys(emojis).forEach((key) => {
+            map.set(emojis[key].name, emojis[key]);
         });
 
         return map;
