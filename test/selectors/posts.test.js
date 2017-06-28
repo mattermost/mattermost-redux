@@ -222,4 +222,319 @@ describe('Selectors.Posts', () => {
         const getPostsAroundPost = makeGetPostsAroundPost();
         assert.deepEqual(getPostsAroundPost(testState, post3.id, '1'), [post5, post4, post3, post2, post1]);
     });
+
+    it('get posts in channel with notify comments as any', () => {
+        const userAny = TestHelper.fakeUserWithId();
+        userAny.notify_props = {comments: 'any'};
+        const profilesAny = {};
+        profilesAny[userAny.id] = userAny;
+
+        const postsAny = {
+            a: {id: 'a', channel_id: '1', create_at: 1, user_id: userAny.id},
+            b: {id: 'b', channel_id: '1', create_at: 2, user_id: 'b'},
+            c: {id: 'c', root_id: 'a', channel_id: '1', create_at: 3, user_id: 'b'},
+            d: {id: 'd', root_id: 'b', channel_id: '1', create_at: 4, user_id: userAny.id},
+            e: {id: 'e', root_id: 'a', channel_id: '1', create_at: 5, user_id: 'b'},
+            f: {id: 'f', root_id: 'b', channel_id: '1', create_at: 6, user_id: 'b'},
+            g: {id: 'g', channel_id: '2', create_at: 7, user_id: 'b'}
+        };
+
+        const testStateAny = deepFreezeAndThrowOnMutation({
+            entities: {
+                users: {
+                    currentUserId: userAny.id,
+                    profiles: profilesAny
+                },
+                posts: {
+                    posts: postsAny,
+                    postsInChannel: {
+                        1: ['f', 'e', 'd', 'c', 'b', 'a'],
+                        2: ['g']
+                    }
+                },
+                preferences: {
+                    myPreferences: {}
+                }
+            }
+        });
+
+        const post1 = {
+            ...postsAny.a,
+            isFirstReply: false,
+            isLastReply: false,
+            previousPostIsComment: false,
+            commentedOnPost: undefined,
+            consecutivePostByUser: false,
+            replyCount: 2,
+            isCommentMention: false
+        };
+
+        const post2 = {
+            ...postsAny.b,
+            isFirstReply: false,
+            isLastReply: false,
+            previousPostIsComment: false,
+            commentedOnPost: undefined,
+            consecutivePostByUser: false,
+            replyCount: 2,
+            isCommentMention: true
+        };
+
+        const post3 = {
+            ...postsAny.c,
+            isFirstReply: true,
+            isLastReply: true,
+            previousPostIsComment: false,
+            commentedOnPost: postsAny.a,
+            consecutivePostByUser: true,
+            replyCount: 2,
+            isCommentMention: true
+        };
+
+        const post4 = {
+            ...postsAny.d,
+            isFirstReply: true,
+            isLastReply: true,
+            previousPostIsComment: true,
+            commentedOnPost: postsAny.b,
+            consecutivePostByUser: false,
+            replyCount: 2,
+            isCommentMention: false
+        };
+
+        const post5 = {
+            ...postsAny.e,
+            isFirstReply: true,
+            isLastReply: true,
+            previousPostIsComment: true,
+            commentedOnPost: postsAny.a,
+            consecutivePostByUser: false,
+            replyCount: 2,
+            isCommentMention: true
+        };
+
+        const post6 = {
+            ...postsAny.f,
+            isFirstReply: true,
+            isLastReply: true,
+            previousPostIsComment: true,
+            commentedOnPost: postsAny.b,
+            consecutivePostByUser: true,
+            replyCount: 2,
+            isCommentMention: true
+        };
+
+        const getPostsInChannel = makeGetPostsInChannel();
+        assert.deepEqual(getPostsInChannel(testStateAny, '1'), [post6, post5, post4, post3, post2, post1]);
+    });
+
+    it('get posts in channel with notify comments as root', () => {
+        const userRoot = TestHelper.fakeUserWithId();
+        userRoot.notify_props = {comments: 'root'};
+        const profilesRoot = {};
+        profilesRoot[userRoot.id] = userRoot;
+
+        const postsRoot = {
+            a: {id: 'a', channel_id: '1', create_at: 1, user_id: userRoot.id},
+            b: {id: 'b', channel_id: '1', create_at: 2, user_id: 'b'},
+            c: {id: 'c', root_id: 'a', channel_id: '1', create_at: 3, user_id: 'b'},
+            d: {id: 'd', root_id: 'b', channel_id: '1', create_at: 4, user_id: userRoot.id},
+            e: {id: 'e', root_id: 'a', channel_id: '1', create_at: 5, user_id: 'b'},
+            f: {id: 'f', root_id: 'b', channel_id: '1', create_at: 6, user_id: 'b'},
+            g: {id: 'g', channel_id: '2', create_at: 7, user_id: 'b'}
+        };
+
+        const testStateRoot = deepFreezeAndThrowOnMutation({
+            entities: {
+                users: {
+                    currentUserId: userRoot.id,
+                    profiles: profilesRoot
+                },
+                posts: {
+                    posts: postsRoot,
+                    postsInChannel: {
+                        1: ['f', 'e', 'd', 'c', 'b', 'a'],
+                        2: ['g']
+                    }
+                },
+                preferences: {
+                    myPreferences: {}
+                }
+            }
+        });
+
+        const post1 = {
+            ...postsRoot.a,
+            isFirstReply: false,
+            isLastReply: false,
+            previousPostIsComment: false,
+            commentedOnPost: undefined,
+            consecutivePostByUser: false,
+            replyCount: 2,
+            isCommentMention: false
+        };
+
+        const post2 = {
+            ...postsRoot.b,
+            isFirstReply: false,
+            isLastReply: false,
+            previousPostIsComment: false,
+            commentedOnPost: undefined,
+            consecutivePostByUser: false,
+            replyCount: 2,
+            isCommentMention: false
+        };
+
+        const post3 = {
+            ...postsRoot.c,
+            isFirstReply: true,
+            isLastReply: true,
+            previousPostIsComment: false,
+            commentedOnPost: postsRoot.a,
+            consecutivePostByUser: true,
+            replyCount: 2,
+            isCommentMention: true
+        };
+
+        const post4 = {
+            ...postsRoot.d,
+            isFirstReply: true,
+            isLastReply: true,
+            previousPostIsComment: true,
+            commentedOnPost: postsRoot.b,
+            consecutivePostByUser: false,
+            replyCount: 2,
+            isCommentMention: false
+        };
+
+        const post5 = {
+            ...postsRoot.e,
+            isFirstReply: true,
+            isLastReply: true,
+            previousPostIsComment: true,
+            commentedOnPost: postsRoot.a,
+            consecutivePostByUser: false,
+            replyCount: 2,
+            isCommentMention: true
+        };
+
+        const post6 = {
+            ...postsRoot.f,
+            isFirstReply: true,
+            isLastReply: true,
+            previousPostIsComment: true,
+            commentedOnPost: postsRoot.b,
+            consecutivePostByUser: true,
+            replyCount: 2,
+            isCommentMention: false
+        };
+
+        const getPostsInChannel = makeGetPostsInChannel();
+        assert.deepEqual(getPostsInChannel(testStateRoot, '1'), [post6, post5, post4, post3, post2, post1]);
+    });
+
+    it('get posts in channel with notify comments as never', () => {
+        const userNever = TestHelper.fakeUserWithId();
+        userNever.notify_props = {comments: 'never'};
+        const profilesNever = {};
+        profilesNever[userNever.id] = userNever;
+
+        const postsNever = {
+            a: {id: 'a', channel_id: '1', create_at: 1, user_id: userNever.id},
+            b: {id: 'b', channel_id: '1', create_at: 2, user_id: 'b'},
+            c: {id: 'c', root_id: 'a', channel_id: '1', create_at: 3, user_id: 'b'},
+            d: {id: 'd', root_id: 'b', channel_id: '1', create_at: 4, user_id: userNever.id},
+            e: {id: 'e', root_id: 'a', channel_id: '1', create_at: 5, user_id: 'b'},
+            f: {id: 'f', root_id: 'b', channel_id: '1', create_at: 6, user_id: 'b'},
+            g: {id: 'g', channel_id: '2', create_at: 7, user_id: 'b'}
+        };
+
+        const testStateNever = deepFreezeAndThrowOnMutation({
+            entities: {
+                users: {
+                    currentUserId: userNever.id,
+                    profiles: profilesNever
+                },
+                posts: {
+                    posts: postsNever,
+                    postsInChannel: {
+                        1: ['f', 'e', 'd', 'c', 'b', 'a'],
+                        2: ['g']
+                    }
+                },
+                preferences: {
+                    myPreferences: {}
+                }
+            }
+        });
+
+        const post1 = {
+            ...postsNever.a,
+            isFirstReply: false,
+            isLastReply: false,
+            previousPostIsComment: false,
+            commentedOnPost: undefined,
+            consecutivePostByUser: false,
+            replyCount: 2,
+            isCommentMention: false
+        };
+
+        const post2 = {
+            ...postsNever.b,
+            isFirstReply: false,
+            isLastReply: false,
+            previousPostIsComment: false,
+            commentedOnPost: undefined,
+            consecutivePostByUser: false,
+            replyCount: 2,
+            isCommentMention: false
+        };
+
+        const post3 = {
+            ...postsNever.c,
+            isFirstReply: true,
+            isLastReply: true,
+            previousPostIsComment: false,
+            commentedOnPost: postsNever.a,
+            consecutivePostByUser: true,
+            replyCount: 2,
+            isCommentMention: false
+        };
+
+        const post4 = {
+            ...postsNever.d,
+            isFirstReply: true,
+            isLastReply: true,
+            previousPostIsComment: true,
+            commentedOnPost: postsNever.b,
+            consecutivePostByUser: false,
+            replyCount: 2,
+            isCommentMention: false
+        };
+
+        const post5 = {
+            ...postsNever.e,
+            isFirstReply: true,
+            isLastReply: true,
+            previousPostIsComment: true,
+            commentedOnPost: postsNever.a,
+            consecutivePostByUser: false,
+            replyCount: 2,
+            isCommentMention: false
+        };
+
+        const post6 = {
+            ...postsNever.f,
+            isFirstReply: true,
+            isLastReply: true,
+            previousPostIsComment: true,
+            commentedOnPost: postsNever.b,
+            consecutivePostByUser: true,
+            replyCount: 2,
+            isCommentMention: false
+        };
+
+        const getPostsInChannel = makeGetPostsInChannel();
+        assert.deepEqual(getPostsInChannel(testStateNever, '1'), [post6, post5, post4, post3, post2, post1]);
+    });
 });

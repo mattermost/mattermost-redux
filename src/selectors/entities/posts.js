@@ -109,15 +109,13 @@ function formatPostInChannel(post, previousPost, index, allPosts, postIds, curre
     });
 
     let isCommentMention = false;
-    if (post.commentedOnPost && rootId) {
-        const commentsNotifyLevel = currentUser.notify_props.comments || 'never';
-        const notCurrentUser = post.user_id !== currentUser.id || (post.props && post.props.from_webhook);
-        if (notCurrentUser) {
-            if (commentsNotifyLevel === 'any' && (threadCreatedByCurrentUser || threadRepliedToByCurrentUser)) {
-                isCommentMention = true;
-            } else if (commentsNotifyLevel === 'root' && threadCreatedByCurrentUser) {
-                isCommentMention = true;
-            }
+    const commentsNotifyLevel = currentUser.notify_props.comments || 'never';
+    const notCurrentUser = post.user_id !== currentUser.id || (post.props && post.props.from_webhook);
+    if (notCurrentUser) {
+        if (commentsNotifyLevel === 'any' && (threadCreatedByCurrentUser || threadRepliedToByCurrentUser)) {
+            isCommentMention = true;
+        } else if (commentsNotifyLevel === 'root' && threadCreatedByCurrentUser) {
+            isCommentMention = true;
         }
     }
 
