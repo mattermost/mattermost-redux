@@ -216,6 +216,16 @@ function removeIdpSamlCertificate(state = initialRequestState(), action) {
     );
 }
 
+function testElasticsearch(state = initialRequestState(), action) {
+    return handleRequest(
+        AdminTypes.TEST_ELASTICSEARCH_REQUEST,
+        AdminTypes.TEST_ELASTICSEARCH_SUCCESS,
+        AdminTypes.TEST_ELASTICSEARCH_FAILURE,
+        state,
+        action
+    );
+}
+
 export default combineReducers({
     getLogs,
     getAudits,
@@ -237,6 +247,7 @@ export default combineReducers({
     uploadIdpSamlCertificate,
     removePublicSamlCertificate,
     removePrivateSamlCertificate,
-    removeIdpSamlCertificate
+    removeIdpSamlCertificate,
+    testElasticsearch
 });
 
