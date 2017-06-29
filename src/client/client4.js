@@ -1489,6 +1489,13 @@ export default class Client4 {
         );
     };
 
+    testElasticsearch = async () => {
+        return this.doFetch(
+            `${this.getBaseRoute()}/elasticsearch/test`,
+            {method: 'post'}
+        );
+    };
+
     // Client Helpers
 
     doFetch = async (url, options) => {

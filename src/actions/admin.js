@@ -219,3 +219,12 @@ export function removeIdpSamlCertificate() {
         AdminTypes.DELETE_SAML_IDP_FAILURE
     );
 }
+
+export function testElasticsearch() {
+    return bindClientFunc(
+        Client4.testElasticsearch,
+        AdminTypes.TEST_ELASTICSEARCH_REQUEST,
+        AdminTypes.TEST_ELASTICSEARCH_SUCCESS,
+        AdminTypes.TEST_ELASTICSEARCH_FAILURE
+    );
+}

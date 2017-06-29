@@ -471,4 +471,18 @@ describe('Actions.Admin', () => {
             throw new Error('removeIdpSamlCertificate request failed err=' + request.error);
         }
     });
+
+    it('testElasticsearch', async () => {
+        nock(Client4.getBaseRoute()).
+        post('/elasticsearch/test').
+        reply(200, OK_RESPONSE);
+
+        await Actions.testElasticsearch()(store.dispatch, store.getState);
+
+        const state = store.getState();
+        const request = state.requests.admin.testElasticsearch;
+        if (request.status === RequestStatus.FAILURE) {
+            throw new Error('testElasticsearch request failed err=' + request.error);
+        }
+    });
 });
