@@ -280,23 +280,69 @@ export function getMissingProfilesByIds(userIds) {
 }
 
 export function getProfilesByIds(userIds) {
-    return bindClientFunc(
-        Client4.getProfilesByIds,
-        UserTypes.PROFILES_REQUEST,
-        [UserTypes.RECEIVED_PROFILES_LIST, UserTypes.PROFILES_SUCCESS],
-        UserTypes.PROFILES_FAILURE,
-        userIds
-    );
+    return async (dispatch, getState) => {
+        dispatch({type: UserTypes.PROFILES_REQUEST}, getState);
+
+        const {currentUserId} = getState().entities.users;
+
+        let profiles;
+        try {
+            profiles = await Client4.getProfilesByIds(userIds);
+            removeUserFromList(currentUserId, profiles);
+        } catch (error) {
+            forceLogoutIfNecessary(error, dispatch);
+            dispatch(batchActions([
+                {type: UserTypes.PROFILES_FAILURE, error},
+                logError(error)(dispatch)
+            ]), getState);
+            return null;
+        }
+
+        dispatch(batchActions([
+            {
+                type: UserTypes.RECEIVED_PROFILES_LIST,
+                data: profiles
+            },
+            {
+                type: UserTypes.PROFILES_SUCCESS
+            }
+        ]), getState);
+
+        return profiles;
+    };
 }
 
 export function getProfilesByUsernames(usernames) {
-    return bindClientFunc(
-        Client4.getProfilesByUsernames,
-        UserTypes.PROFILES_REQUEST,
-        [UserTypes.RECEIVED_PROFILES_LIST, UserTypes.PROFILES_SUCCESS],
-        UserTypes.PROFILES_FAILURE,
-        usernames
-    );
+    return async (dispatch, getState) => {
+        dispatch({type: UserTypes.PROFILES_REQUEST}, getState);
+
+        const {currentUserId} = getState().entities.users;
+
+        let profiles;
+        try {
+            profiles = await Client4.getProfilesByUsernames(usernames);
+            removeUserFromList(currentUserId, profiles);
+        } catch (error) {
+            forceLogoutIfNecessary(error, dispatch);
+            dispatch(batchActions([
+                {type: UserTypes.PROFILES_FAILURE, error},
+                logError(error)(dispatch)
+            ]), getState);
+            return null;
+        }
+
+        dispatch(batchActions([
+            {
+                type: UserTypes.RECEIVED_PROFILES_LIST,
+                data: profiles
+            },
+            {
+                type: UserTypes.PROFILES_SUCCESS
+            }
+        ]), getState);
+
+        return profiles;
+    };
 }
 
 export function getProfilesInTeam(teamId, page, perPage = General.PROFILE_CHUNK_SIZE) {
