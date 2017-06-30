@@ -222,7 +222,6 @@ export function removeIdpSamlCertificate() {
     );
 }
 
-<<<<<<< db39ca51bb9c441f4ada667508d37587277f8edf
 export function testElasticsearch() {
     return bindClientFunc(
         Client4.testElasticsearch,
