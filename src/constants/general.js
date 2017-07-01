@@ -37,6 +37,9 @@ export default {
     ALLOW_EDIT_POST_TIME_LIMIT: 'time_limit',
     DEFAULT_POST_EDIT_TIME_LIMIT: 300,
 
+    RESTRICT_DIRECT_MESSAGE_ANY: 'any',
+    RESTRICT_DIRECT_MESSAGE_TEAM: 'team',
+
     DEFAULT_CHANNEL: 'town-square',
     DM_CHANNEL: 'D',
     OPEN_CHANNEL: 'O',
