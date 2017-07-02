@@ -20,6 +20,16 @@ export function createIncomingHook(hook) {
     );
 }
 
+export function getIncomingHook(hookId) {
+    return bindClientFunc(
+        Client4.getIncomingWebhook,
+        IntegrationTypes.GET_INCOMING_HOOKS_REQUEST,
+        [IntegrationTypes.RECEIVED_INCOMING_HOOK, IntegrationTypes.GET_INCOMING_HOOKS_SUCCESS],
+        IntegrationTypes.GET_INCOMING_HOOKS_FAILURE,
+        hookId
+    );
+}
+
 export function getIncomingHooks(teamId = '', page = 0, perPage = General.PAGE_SIZE_DEFAULT) {
     return bindClientFunc(
         Client4.getIncomingWebhooks,
@@ -79,6 +89,16 @@ export function createOutgoingHook(hook) {
         [IntegrationTypes.RECEIVED_OUTGOING_HOOK, IntegrationTypes.CREATE_OUTGOING_HOOK_SUCCESS],
         IntegrationTypes.CREATE_OUTGOING_HOOK_FAILURE,
         hook
+    );
+}
+
+export function getOutgoingHook(hookId) {
+    return bindClientFunc(
+        Client4.getOutgoingWebhook,
+        IntegrationTypes.GET_OUTGOING_HOOKS_REQUEST,
+        [IntegrationTypes.RECEIVED_OUTGOING_HOOK, IntegrationTypes.GET_OUTGOING_HOOKS_SUCCESS],
+        IntegrationTypes.GET_OUTGOING_HOOKS_FAILURE,
+        hookId
     );
 }
 

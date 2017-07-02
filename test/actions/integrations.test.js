@@ -46,6 +46,28 @@ describe('Actions.Integrations', () => {
         assert.ok(hooks[created.id]);
     });
 
+    it('getIncomingWebhook', async () => {
+        const created = await Actions.createIncomingHook(
+            {
+                channel_id: TestHelper.basicChannel.id,
+                display_name: 'test',
+                description: 'test'
+            }
+        )(store.dispatch, store.getState);
+
+        await Actions.getIncomingHook(created.id)(store.dispatch, store.getState);
+
+        const state = store.getState();
+        const request = state.requests.integrations.getIncomingHooks;
+        if (request.status === RequestStatus.FAILURE) {
+            throw new Error('getIncomingHooks request failed');
+        }
+
+        const hooks = state.entities.integrations.incomingHooks;
+        assert.ok(hooks);
+        assert.ok(hooks[created.id]);
+    });
+
     it('getIncomingWebhooks', async () => {
         const created = await Actions.createIncomingHook(
             {
@@ -128,6 +150,30 @@ describe('Actions.Integrations', () => {
         const request = state.requests.integrations.createOutgoingHook;
         if (request.status === RequestStatus.FAILURE) {
             throw new Error('createOutgoingHook request failed');
+        }
+
+        const hooks = state.entities.integrations.outgoingHooks;
+        assert.ok(hooks);
+        assert.ok(hooks[created.id]);
+    });
+
+    it('getOutgoingWebhook', async () => {
+        const created = await Actions.createOutgoingHook(
+            {
+                channel_id: TestHelper.basicChannel.id,
+                team_id: TestHelper.basicTeam.id,
+                display_name: 'test',
+                trigger_words: [TestHelper.generateId()],
+                callback_urls: ['http://localhost/notarealendpoint']
+            }
+        )(store.dispatch, store.getState);
+
+        await Actions.getOutgoingHook(created.id)(store.dispatch, store.getState);
+
+        const state = store.getState();
+        const request = state.requests.integrations.getOutgoingHooks;
+        if (request.status === RequestStatus.FAILURE) {
+            throw new Error('getOutgoingHooks request failed');
         }
 
         const hooks = state.entities.integrations.outgoingHooks;
