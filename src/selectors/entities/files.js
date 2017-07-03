@@ -8,7 +8,11 @@ function getAllFiles(state) {
 }
 
 function getFilesIdsForPost(state, post) {
-    return state.entities.files.fileIdsByPostId[post.id] || [];
+    if (post.hasOwnProperty('id')) {
+        return state.entities.files.fileIdsByPostId[post.id] || [];
+    }
+
+    return [];
 }
 
 export function makeGetFilesForPost() {

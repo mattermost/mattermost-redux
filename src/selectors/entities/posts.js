@@ -109,7 +109,11 @@ function formatPostInChannel(post, previousPost, index, allPosts, postIds, curre
     });
 
     let isCommentMention = false;
-    const commentsNotifyLevel = currentUser.notify_props.comments || 'never';
+    let commentsNotifyLevel = 'never';
+    if (currentUser && currentUser.notify_props && currentUser.notify_props.comments) {
+        commentsNotifyLevel = currentUser.notify_props.comments;
+    }
+
     const notCurrentUser = post.user_id !== currentUser.id || (post.props && post.props.from_webhook);
     if (notCurrentUser) {
         if (commentsNotifyLevel === 'any' && (threadCreatedByCurrentUser || threadRepliedToByCurrentUser)) {
