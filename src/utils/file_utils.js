@@ -24,6 +24,10 @@ export function getFormattedFileSize(file) {
 }
 
 export function getFileType(file) {
+    if (!file || !file.extension) {
+        return 'other';
+    }
+
     const fileExt = file.extension.toLowerCase();
     const fileTypes = [
         'image',
