@@ -860,6 +860,8 @@ export function updateChannelMemberRoles(channelId, userId, roles) {
 
 export function updateChannelHeader(channelId, header) {
     return async (dispatch, getState) => {
+        Client4.trackEvent('action', 'action_channels_update_header', {channel_id: channelId});
+
         dispatch({
             type: ChannelTypes.UPDATE_CHANNEL_HEADER,
             data: {
@@ -872,6 +874,8 @@ export function updateChannelHeader(channelId, header) {
 
 export function updateChannelPurpose(channelId, purpose) {
     return async (dispatch, getState) => {
+        Client4.trackEvent('action', 'action_channels_update_purpose', {channel_id: channelId});
+
         dispatch({
             type: ChannelTypes.UPDATE_CHANNEL_PURPOSE,
             data: {
