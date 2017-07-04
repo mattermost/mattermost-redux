@@ -104,7 +104,7 @@ export function canEditPost(config, license, userId, post, editDisableAction) {
 }
 
 export function getLastCreateAt(postsArray) {
-    const createAt = postsArray.map((p) => p.update_at);
+    const createAt = postsArray.map((p) => p.create_at);
 
     if (createAt.length) {
         return Reflect.apply(Math.max, null, createAt);
