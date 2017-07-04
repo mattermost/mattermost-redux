@@ -29,7 +29,6 @@ export default class Client4 {
         this.userAgent = null;
         this.enableLogging = false;
         this.defaultHeaders = {};
-        this.analytics = null;
         this.userId = '';
 
         this.translations = {
@@ -64,10 +63,6 @@ export default class Client4 {
 
     setEnableLogging(enable) {
         this.enableLogging = enable;
-    }
-
-    setAnalytics(analytics) {
-        this.analytics = analytics;
     }
 
     setUserId(userId) {
@@ -1907,7 +1902,7 @@ export default class Client4 {
     }
 
     trackEvent(category, event, props) {
-        if (this.analytics) {
+        if (global && global.window && global.window.analytics) {
             const properties = Object.assign({category, type: event, user_actual_id: this.userId}, props);
             const options = {
                 context: {
@@ -1922,7 +1917,7 @@ export default class Client4 {
                 },
                 anonymousId: '00000000000000000000000000'
             };
-            this.analytics.track('event', properties, options);
+            global.window.analytics.track('event', properties, options);
         }
     }
 }
