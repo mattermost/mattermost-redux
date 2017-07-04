@@ -18,13 +18,13 @@ const typeToPrefixMap = {[General.OPEN_CHANNEL]: 'A', [General.PRIVATE_CHANNEL]:
  *  favoriteChannels: [...]
  * }
  */
-export function buildDisplayableChannelList(usersState, allChannels, myPreferences) {
+export function buildDisplayableChannelList(usersState, allChannels, myPreferences, teammateNameDisplay) {
     const missingDirectChannels = createMissingDirectChannels(usersState.currentUserId, allChannels, myPreferences);
 
     const {currentUserId, profiles} = usersState;
     const locale = profiles && profiles[currentUserId] ? profiles[currentUserId].locale : 'en';
 
-    const channels = buildChannels(usersState, allChannels, missingDirectChannels, myPreferences, locale);
+    const channels = buildChannels(usersState, allChannels, missingDirectChannels, teammateNameDisplay, locale);
     const favoriteChannels = buildFavoriteChannels(channels, myPreferences, locale);
     const notFavoriteChannels = buildNotFavoriteChannels(channels, myPreferences);
     const directAndGroupChannels = buildDirectAndGroupChannels(notFavoriteChannels, myPreferences, currentUserId);
@@ -37,12 +37,12 @@ export function buildDisplayableChannelList(usersState, allChannels, myPreferenc
     };
 }
 
-export function buildDisplayableChannelListWithUnreadSection(usersState, myChannels, myMembers, myPreferences) {
+export function buildDisplayableChannelListWithUnreadSection(usersState, myChannels, myMembers, myPreferences, teammateNameDisplay) {
     const {currentUserId, profiles} = usersState;
     const locale = profiles && profiles[currentUserId] ? profiles[currentUserId].locale : 'en';
 
     const missingDirectChannels = createMissingDirectChannels(currentUserId, myChannels, myPreferences);
-    const channels = buildChannels(usersState, myChannels, missingDirectChannels, myPreferences, locale);
+    const channels = buildChannels(usersState, myChannels, missingDirectChannels, teammateNameDisplay, locale);
     const unreadChannels = [...buildChannelsWithMentions(channels, myMembers, locale), ...buildUnreadChannels(channels, myMembers, locale)];
     const notUnreadChannels = channels.filter(not(isUnreadChannel.bind(null, myMembers)));
     const favoriteChannels = buildFavoriteChannels(notUnreadChannels, myPreferences, locale);
@@ -58,18 +58,18 @@ export function buildDisplayableChannelListWithUnreadSection(usersState, myChann
     };
 }
 
-export function completeDirectChannelInfo(usersState, myPreferences, channel) {
+export function completeDirectChannelInfo(usersState, teammateNameDisplay, channel) {
     if (isDirectChannel(channel)) {
         const dmChannelClone = {...channel};
         const teammateId = getUserIdFromChannelName(usersState.currentUserId, channel.name);
 
         return Object.assign(dmChannelClone, {
-            display_name: displayUsername(usersState.profiles[teammateId], myPreferences),
+            display_name: displayUsername(usersState.profiles[teammateId], teammateNameDisplay),
             teammate_id: teammateId,
             status: usersState.statuses[teammateId] || 'offline'
         });
     } else if (isGroupChannel(channel)) {
-        return completeDirectGroupInfo(usersState, myPreferences, channel);
+        return completeDirectGroupInfo(usersState, teammateNameDisplay, channel);
     }
 
     return channel;
@@ -288,7 +288,7 @@ function createMissingDirectChannels(currentUserId, allChannels, myPreferences) 
     map(createFakeChannelCurried(currentUserId));
 }
 
-function completeDirectGroupInfo(usersState, myPreferences, channel) {
+function completeDirectGroupInfo(usersState, teammateNameDisplay, channel) {
     const {currentUserId, profiles, profilesInChannel} = usersState;
     const profilesIds = profilesInChannel[channel.id];
     if (profilesIds) {
@@ -300,7 +300,7 @@ function completeDirectGroupInfo(usersState, myPreferences, channel) {
         const displayName = [];
         profilesIds.forEach((teammateId) => {
             if (teammateId !== currentUserId) {
-                displayName.push(displayUsername(usersState.profiles[teammateId], myPreferences));
+                displayName.push(displayUsername(usersState.profiles[teammateId], teammateNameDisplay));
             }
         });
 
@@ -396,10 +396,10 @@ function orX(...fns) {
     return (...args) => fns.some((f) => f(...args));
 }
 
-function buildChannels(usersState, channels, missingDirectChannels, myPreferences, locale) {
+function buildChannels(usersState, channels, missingDirectChannels, teammateNameDisplay, locale) {
     return channels.
     concat(missingDirectChannels).
-    map(completeDirectChannelInfo.bind(null, usersState, myPreferences)).
+    map(completeDirectChannelInfo.bind(null, usersState, teammateNameDisplay)).
     filter(isNotDeletedChannel).
     sort(sortChannelsByDisplayName.bind(null, locale));
 }

@@ -2,8 +2,12 @@
 // See License.txt for license information.
 
 import {createSelector} from 'reselect';
-import {getPreferenceKey} from 'utils/preference_utils';
+
 import {Preferences} from 'constants';
+
+import {getConfig} from 'selectors/entities/general';
+
+import {getPreferenceKey} from 'utils/preference_utils';
 
 export function getMyPreferences(state) {
     return state.entities.preferences.myPreferences;
@@ -56,3 +60,11 @@ const getGroupShowCategory = makeGetCategory();
 export function getGroupShowPreferences(state) {
     return getGroupShowCategory(state, Preferences.CATEGORY_GROUP_CHANNEL_SHOW);
 }
+
+export const getTeammateNameDisplaySetting = createSelector(
+    getConfig,
+    getMyPreferences,
+    (config, myPreferences) => {
+        return config.TeammateNameDisplay || myPreferences[getPreferenceKey(Preferences.CATEGORY_DISPLAY_SETTINGS, Preferences.NAME_NAME_FORMAT)];
+    }
+);

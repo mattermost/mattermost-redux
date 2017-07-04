@@ -11,6 +11,7 @@ export default {
     CATEGORY_ADVANCED_SETTINGS: 'advanced_settings',
     CATEGORY_AUTO_RESET_MANUAL_STATUS: 'auto_reset_manual_status',
     CATEGORY_THEME: 'theme',
+    NAME_NAME_FORMAT: 'name_format',
     DISPLAY_PREFER_NICKNAME: 'nickname_full_name',
     DISPLAY_PREFER_FULL_NAME: 'full_name',
     EMAIL_INTERVAL: 'email_interval',

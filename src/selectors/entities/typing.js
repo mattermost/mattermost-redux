@@ -3,17 +3,17 @@
 
 import {createSelector} from 'reselect';
 import {getCurrentChannelId} from './channels';
-import {getMyPreferences} from './preferences';
+import {getTeammateNameDisplaySetting} from './preferences';
 import {getUsers} from './users';
 import {displayUsername} from 'utils/user_utils';
 
 export const getUsersTyping = createSelector(
     getUsers,
-    getMyPreferences,
+    getTeammateNameDisplaySetting,
     getCurrentChannelId,
     (state) => state.entities.posts.selectedPostId,
     (state) => state.entities.typing,
-    (profiles, preferences, channelId, parentPostId, typing) => {
+    (profiles, teammateNameDisplay, channelId, parentPostId, typing) => {
         const id = channelId + parentPostId;
 
         if (typing[id]) {
@@ -21,7 +21,7 @@ export const getUsersTyping = createSelector(
 
             if (users.length) {
                 return users.map((userId) => {
-                    return displayUsername(profiles[userId], preferences);
+                    return displayUsername(profiles[userId], teammateNameDisplay);
                 });
             }
         }
