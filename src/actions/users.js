@@ -344,7 +344,7 @@ export function getProfilesByUsernames(usernames) {
     };
 }
 
-export function getProfilesInTeam(teamId, page, perPage = General.PROFILE_CHUNK_SIZE) {
+export function getProfilesInTeam(teamId, page, perPage = General.PROFILE_CHUNK_SIZE, sort = '') {
     return async (dispatch, getState) => {
         dispatch({type: UserTypes.PROFILES_IN_TEAM_REQUEST}, getState);
 
@@ -352,7 +352,7 @@ export function getProfilesInTeam(teamId, page, perPage = General.PROFILE_CHUNK_
 
         let profiles;
         try {
-            profiles = await Client4.getProfilesInTeam(teamId, page, perPage);
+            profiles = await Client4.getProfilesInTeam(teamId, page, perPage, sort);
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch);
             dispatch(batchActions([

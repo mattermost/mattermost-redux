@@ -27,6 +27,7 @@ export default class Client4 {
         this.url = '';
         this.urlVersion = '/api/v4';
         this.userAgent = null;
+        this.enableLogging = false;
         this.defaultHeaders = {};
 
         this.translations = {
@@ -57,6 +58,10 @@ export default class Client4 {
 
     setAcceptLanguage(locale) {
         this.defaultHeaders['Accept-Language'] = locale;
+    }
+
+    setEnableLogging(enable) {
+        this.enableLogging = enable;
     }
 
     getServerVersion() {
@@ -414,9 +419,9 @@ export default class Client4 {
         );
     };
 
-    getProfilesInTeam = async (teamId, page = 0, perPage = PER_PAGE_DEFAULT) => {
+    getProfilesInTeam = async (teamId, page = 0, perPage = PER_PAGE_DEFAULT, sort = '') => {
         return this.doFetch(
-            `${this.getUsersRoute()}${buildQueryString({in_team: teamId, page, per_page: perPage})}`,
+            `${this.getUsersRoute()}${buildQueryString({in_team: teamId, page, per_page: perPage, sort})}`,
             {method: 'get'}
         );
     };
@@ -1079,6 +1084,13 @@ export default class Client4 {
         );
     };
 
+    getOpenGraphMetadata = async (url) => {
+        return this.doFetch(
+            `${this.getBaseRoute()}/opengraph`,
+            {method: 'post', body: JSON.stringify({url})}
+        );
+    };
+
     // Files Routes
 
     getFileUrl(fileId, timestamp) {
@@ -1166,14 +1178,15 @@ export default class Client4 {
     };
 
     logClientError = async (message, level = 'ERROR') => {
-        const body = {
-            message,
-            level
-        };
+        if (!this.enableLogging) {
+            throw {
+                message: 'Logging disabled.'
+            };
+        }
 
         return this.doFetch(
-            `${this.url}/api/v3/general/log_client`,
-            {method: 'post', body: JSON.stringify(body)}
+            `${this.getBaseRoute}/logs`,
+            {method: 'post', body: JSON.stringify({message, level})}
         );
     };
 

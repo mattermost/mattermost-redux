@@ -2,11 +2,13 @@
 // See License.txt for license information.
 
 import {Client, Client4} from 'client';
-import {bindClientFunc, FormattedError} from './helpers.js';
+import {bindClientFunc, forceLogoutIfNecessary, FormattedError} from './helpers.js';
 import {GeneralTypes} from 'action_types';
 import {General} from 'constants';
 import {loadMe} from './users';
+import {logError} from './errors';
 import EventEmitter from 'utils/event_emitter';
+import {batchActions} from 'redux-batched-actions';
 
 export function getPing() {
     return async (dispatch, getState) => {
@@ -40,12 +42,33 @@ export function resetPing() {
 }
 
 export function getClientConfig() {
-    return bindClientFunc(
-        Client4.getClientConfigOld,
-        GeneralTypes.CLIENT_CONFIG_REQUEST,
-        [GeneralTypes.CLIENT_CONFIG_RECEIVED, GeneralTypes.CLIENT_CONFIG_SUCCESS],
-        GeneralTypes.CLIENT_CONFIG_FAILURE
-    );
+    return async (dispatch, getState) => {
+        dispatch({type: GeneralTypes.CLIENT_CONFIG_REQUEST}, getState);
+
+        let data;
+        try {
+            data = await Client4.getClientConfigOld();
+        } catch (error) {
+            forceLogoutIfNecessary(error, dispatch);
+            dispatch(batchActions([
+                {
+                    type: GeneralTypes.CLIENT_CONFIG_FAILURE,
+                    error
+                },
+                logError(error)(dispatch)
+            ]), getState);
+            return null;
+        }
+
+        Client4.setEnableLogging(data.EnableDeveloper === 'true');
+
+        dispatch(batchActions([
+            {type: GeneralTypes.CLIENT_CONFIG_RECEIVED, data},
+            {type: GeneralTypes.CLIENT_CONFIG_SUCCESS}
+        ]));
+
+        return data;
+    };
 }
 
 export function getLicenseConfig() {

@@ -157,7 +157,7 @@ export function createGroupChannel(userIds) {
             forceLogoutIfNecessary(error, dispatch);
             dispatch(batchActions([
                 {type: ChannelTypes.CREATE_CHANNEL_FAILURE, error},
-                getLogErrorAction(error)
+                logError(error)(dispatch)
             ]), getState);
             return null;
         }

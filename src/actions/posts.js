@@ -3,7 +3,7 @@
 
 import {batchActions} from 'redux-batched-actions';
 
-import {Client, Client4} from 'client';
+import {Client4} from 'client';
 import {Preferences, Posts} from 'constants';
 import {PostTypes, FileTypes} from 'action_types';
 import {getUsersByUsername} from 'selectors/entities/users';
@@ -597,7 +597,7 @@ export function getOpenGraphMetadata(url) {
 
         let data;
         try {
-            data = await Client.getOpenGraphMetadata(url);
+            data = await Client4.getOpenGraphMetadata(url);
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch);
             dispatch(batchActions([
