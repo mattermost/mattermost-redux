@@ -317,6 +317,8 @@ export function flagPost(postId) {
             value: 'true'
         };
 
+        Client4.trackEvent('action', 'action_posts_flag');
+
         savePreferences(currentUserId, [preference])(dispatch, getState);
     };
 }
@@ -586,6 +588,8 @@ export function unflagPost(postId) {
             category: Preferences.CATEGORY_FLAGGED_POST,
             name: postId
         };
+
+        Client4.trackEvent('action', 'action_posts_unflag');
 
         deletePreferences(currentUserId, [preference])(dispatch, getState);
     };

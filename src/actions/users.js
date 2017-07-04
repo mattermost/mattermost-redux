@@ -137,6 +137,8 @@ function completeLogin(data) {
             data
         });
 
+        Client4.setUserId(data.id);
+
         let teamMembers;
         try {
             teamMembers = await Client4.getMyTeamMembers();
@@ -214,6 +216,9 @@ export function loadMe() {
         }
 
         await Promise.all(promises);
+
+        const {currentUserId} = getState().entities.users;
+        Client4.setUserId(currentUserId);
     };
 }
 
