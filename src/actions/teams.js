@@ -442,8 +442,14 @@ export function joinTeam(inviteId, teamId) {
     return async (dispatch, getState) => {
         dispatch({type: TeamTypes.JOIN_TEAM_REQUEST}, getState);
 
+        const serverVersion = getState().entities.general.serverVersion;
+
         try {
-            await Client.joinTeamFromInvite(inviteId);
+            if (serverVersion.charAt(0) === '3') {
+                await Client.joinTeamFromInvite(inviteId);
+            } else {
+                await Client4.joinTeam(inviteId);
+            }
         } catch (err) {
             forceLogoutIfNecessary(err, dispatch);
             dispatch(batchActions([

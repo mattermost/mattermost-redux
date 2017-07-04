@@ -8,6 +8,7 @@ import * as Actions from 'actions/emojis';
 import {Client, Client4} from 'client';
 
 import {RequestStatus} from 'constants';
+import {GeneralTypes} from 'action_types';
 import TestHelper from 'test/test_helper';
 import configureStore from 'test/test_store';
 
@@ -86,7 +87,12 @@ describe('Actions.Emojis', () => {
             fs.createReadStream('test/assets/images/test.png')
         )(store.dispatch, store.getState);
 
-        // Should have all custom emojis
+        store.dispatch({type: GeneralTypes.RECEIVED_SERVER_VERSION, data: '3.10.0'});
+
+        await Actions.getAllCustomEmojis(1)(store.dispatch, store.getState);
+
+        store.dispatch({type: GeneralTypes.RECEIVED_SERVER_VERSION, data: '4.0.0'});
+
         await Actions.getAllCustomEmojis(1)(store.dispatch, store.getState);
 
         let state = store.getState();

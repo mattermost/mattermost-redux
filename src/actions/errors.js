@@ -3,7 +3,7 @@
 
 import {ErrorTypes} from 'action_types';
 import serializeError from 'serialize-error';
-import Client from 'client';
+import {Client4} from 'client';
 import EventEmitter from 'utils/event_emitter';
 
 export function dismissErrorObject(index) {
@@ -33,7 +33,7 @@ export function logError(error, displayable = false) {
 
         try {
             const stringifiedSerializedError = JSON.stringify(serializedError).toString();
-            await Client.logClientError(stringifiedSerializedError);
+            await Client4.logClientError(stringifiedSerializedError);
         } catch (err) {
           // avoid crashing the app if an error sending
           // the error occurs.
