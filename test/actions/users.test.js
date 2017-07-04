@@ -351,6 +351,26 @@ describe('Actions.Users', () => {
         assert.equal(profiles[user.id].username, user.username);
     });
 
+    it('getUsersStats', async () => {
+        TestHelper.activateMocking();
+        nock(Client4.getBaseRoute()).
+            get('/users/stats').
+            query(true).
+            reply(200, {total_user_count: 656});
+
+        await Actions.getUsersStats()(store.dispatch, store.getState);
+        nock.restore();
+
+        const {stats} = store.getState().entities.users;
+        const statsRequest = store.getState().requests.users.getUsersStats;
+
+        if (statsRequest.status === RequestStatus.FAILURE) {
+            throw new Error(JSON.stringify(statsRequest.error));
+        }
+
+        assert.equal(stats.total_user_count, 656);
+    });
+
     it('searchProfiles', async () => {
         const user = TestHelper.basicUser;
 

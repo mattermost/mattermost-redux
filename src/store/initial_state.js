@@ -265,6 +265,10 @@ const state = {
                 status: 'not_started',
                 error: null
             },
+            getUsersStats: {
+                status: 'not_started',
+                error: null
+            },
             getStatusesByIds: {
                 status: 'not_started',
                 error: null

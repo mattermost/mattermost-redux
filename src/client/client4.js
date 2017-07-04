@@ -459,6 +459,13 @@ export default class Client4 {
         );
     };
 
+    getUsersStats = async () => {
+        return this.doFetch(
+            `${this.getUsersRoute()}/stats`,
+            {method: 'get'}
+        );
+    };
+
     getProfilePictureUrl = (userId, lastPictureUpdate) => {
         const params = {};
         if (lastPictureUpdate) {

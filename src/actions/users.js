@@ -488,6 +488,15 @@ export function getUser(id) {
     );
 }
 
+export function getUsersStats() {
+    return bindClientFunc(
+        Client4.getUsersStats,
+        UserTypes.USER_STATS_REQUEST,
+        [UserTypes.RECEIVED_USER_STATS, UserTypes.USER_STATS_SUCCESS],
+        UserTypes.USER_STATS_FAILURE,
+    );
+}
+
 export function getUserByUsername(username) {
     return bindClientFunc(
         Client4.getUserByUsername,
@@ -1064,6 +1073,7 @@ export default {
     getUser,
     getMe,
     getUserByUsername,
+    getUsersStats,
     getStatus,
     getStatusesByIds,
     getSessions,

@@ -45,6 +45,10 @@ export function getUsers(state) {
     return state.entities.users.profiles;
 }
 
+export function getUsersStats(state) {
+    return state.entities.users.stats;
+}
+
 export const getUsersByUsername = createSelector(
     getUsers,
     (users) => {
@@ -63,23 +67,6 @@ export const getUsersByUsername = createSelector(
 
 export function getUserByUsername(state, username) {
     return getUsersByUsername(state)[username];
-}
-
-export const getUsersByEmail = createSelector(
-    getUsers,
-    (users) => {
-        const usersByEmail = {};
-
-        for (const user of Object.values(users)) {
-            usersByEmail[user.email] = user;
-        }
-
-        return usersByEmail;
-    }
-);
-
-export function getUserByEmail(state, email) {
-    return getUsersByEmail(state)[email];
 }
 
 export function getCurrentUser(state) {

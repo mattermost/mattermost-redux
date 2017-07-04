@@ -154,6 +154,16 @@ function getUserByUsername(state = initialRequestState(), action) {
     );
 }
 
+function getUsersStats(state = initialRequestState(), action) {
+    return handleRequest(
+        UserTypes.USER_STATS_REQUEST,
+        UserTypes.USER_STATS_SUCCESS,
+        UserTypes.USER_STATS_FAILURE,
+        state,
+        action
+    );
+}
+
 function getStatusesByIds(state = initialRequestState(), action) {
     return handleRequest(
         UserTypes.PROFILES_STATUSES_REQUEST,
@@ -308,6 +318,7 @@ export default combineReducers({
     getProfilesNotInChannel,
     getUser,
     getUserByUsername,
+    getUsersStats,
     getStatusesByIds,
     getStatus,
     setStatus,

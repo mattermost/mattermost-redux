@@ -293,6 +293,22 @@ function statuses(state = {}, action) {
     }
 }
 
+function stats(state = {}, action) {
+    switch (action.type) {
+    case UserTypes.RECEIVED_USER_STATS: {
+        const stat = action.data;
+        return {
+            ...state,
+            ...stat
+        };
+    }
+    case UserTypes.LOGOUT_SUCCESS:
+        return {};
+    default:
+        return state;
+    }
+}
+
 export default combineReducers({
 
     // the current selected user
@@ -323,5 +339,8 @@ export default combineReducers({
     profilesNotInChannel,
 
     // object where every key is the user id and has a value with the current status of each user
-    statuses
+    statuses,
+
+    // object with the users stats
+    stats
 });
