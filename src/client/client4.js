@@ -503,7 +503,7 @@ export default class Client4 {
 
     getMe = async () => {
         return this.doFetch(
-            `${this.getUserRoute('me')}?text=stuff`,
+            `${this.getUserRoute('me')}`,
             {method: 'get'}
         );
     };
