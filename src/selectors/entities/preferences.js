@@ -3,7 +3,7 @@
 
 import {createSelector} from 'reselect';
 
-import {Preferences} from 'constants';
+import {General, Preferences} from 'constants';
 
 import {getConfig} from 'selectors/entities/general';
 
@@ -64,7 +64,16 @@ export function getGroupShowPreferences(state) {
 export const getTeammateNameDisplaySetting = createSelector(
     getConfig,
     getMyPreferences,
-    (config, myPreferences) => {
-        return config.TeammateNameDisplay || myPreferences[getPreferenceKey(Preferences.CATEGORY_DISPLAY_SETTINGS, Preferences.NAME_NAME_FORMAT)];
+    (config, preferences) => {
+        if (config.TeammateNameDisplay) {
+            return config.TeammateNameDisplay;
+        }
+
+        const key = getPreferenceKey(Preferences.CATEGORY_DISPLAY_SETTINGS, Preferences.NAME_NAME_FORMAT);
+        if (preferences[key]) {
+            return preferences[key].value;
+        }
+
+        return General.TEAMMATE_NAME_DISPLAY.SHOW_USERNAME;
     }
 );
