@@ -15,26 +15,22 @@ export function getFullName(user) {
     return '';
 }
 
-export function displayUsername(user, myPreferences) {
-    let nameFormat = 'false';
-    const pref = myPreferences[`${Preferences.CATEGORY_DISPLAY_SETTINGS}--name_format`];
-    if (pref && pref.value) {
-        nameFormat = pref.value;
-    }
-    let username = '';
+export function displayUsername(user, teammateNameDisplay) {
+    let name = '';
 
     if (user) {
-        if (nameFormat === Preferences.DISPLAY_PREFER_NICKNAME) {
-            username = user.nickname || getFullName(user);
-        } else if (nameFormat === Preferences.DISPLAY_PREFER_FULL_NAME) {
-            username = getFullName(user);
+        if (teammateNameDisplay === Preferences.DISPLAY_PREFER_NICKNAME) {
+            name = user.nickname || getFullName(user);
+        } else if (teammateNameDisplay === Preferences.DISPLAY_PREFER_FULL_NAME) {
+            name = getFullName(user);
         }
 
-        if (!username.trim().length) {
-            username = user.username;
+        if (!name.trim().length) {
+            name = user.username;
         }
     }
-    return username;
+
+    return name;
 }
 
 export function isAdmin(roles) {

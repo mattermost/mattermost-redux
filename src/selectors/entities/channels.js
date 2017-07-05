@@ -4,7 +4,7 @@
 import {createSelector} from 'reselect';
 
 import {getConfig, getLicense} from 'selectors/entities/general';
-import {getMyPreferences} from 'selectors/entities/preferences';
+import {getMyPreferences, getTeammateNameDisplaySetting} from 'selectors/entities/preferences';
 import {getCurrentTeamId, getCurrentTeamMembership} from 'selectors/entities/teams';
 import {getCurrentUser} from 'selectors/entities/users';
 import {
@@ -48,11 +48,11 @@ export const getChannel = createSelector(
     getAllChannels,
     (state, id) => id,
     (state) => state.entities.users,
-    getMyPreferences,
-    (allChannels, channelId, users, myPreferences) => {
+    getTeammateNameDisplaySetting,
+    (allChannels, channelId, users, teammateNameDisplay) => {
         const channel = allChannels[channelId];
         if (channel) {
-            return completeDirectChannelInfo(users, myPreferences, channel);
+            return completeDirectChannelInfo(users, teammateNameDisplay, channel);
         }
         return channel;
     }
@@ -62,11 +62,11 @@ export const getCurrentChannel = createSelector(
     getAllChannels,
     getCurrentChannelId,
     (state) => state.entities.users,
-    getMyPreferences,
-    (allChannels, currentChannelId, users, myPreferences) => {
+    getTeammateNameDisplaySetting,
+    (allChannels, currentChannelId, users, teammateNameDisplay) => {
         const channel = allChannels[currentChannelId];
         if (channel) {
-            return completeDirectChannelInfo(users, myPreferences, channel);
+            return completeDirectChannelInfo(users, teammateNameDisplay, channel);
         }
         return channel;
     }
@@ -148,11 +148,11 @@ export const getDirectChannels = createSelector(
     getAllChannels,
     getDirectChannelsSet,
     (state) => state.entities.users,
-    getMyPreferences,
-    (channels, channelSet, users, myPreferences) => {
+    getTeammateNameDisplaySetting,
+    (channels, channelSet, users, teammateNameDisplay) => {
         const dmChannels = [];
         channelSet.forEach((c) => {
-            dmChannels.push(completeDirectChannelInfo(users, myPreferences, channels[c]));
+            dmChannels.push(completeDirectChannelInfo(users, teammateNameDisplay, channels[c]));
         });
         return dmChannels;
     }
@@ -163,13 +163,13 @@ export const getGroupChannels = createSelector(
     getAllChannels,
     getDirectChannelsSet,
     (state) => state.entities.users,
-    getMyPreferences,
-    (channels, channelSet, users, myPreferences) => {
+    getTeammateNameDisplaySetting,
+    (channels, channelSet, users, teammateNameDisplay) => {
         const gmChannels = [];
         channelSet.forEach((id) => {
             const channel = channels[id];
             if (channel.type === General.GM_CHANNEL) {
-                gmChannels.push(completeDirectChannelInfo(users, myPreferences, channel));
+                gmChannels.push(completeDirectChannelInfo(users, teammateNameDisplay, channel));
             }
         });
         return gmChannels;

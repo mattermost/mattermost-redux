@@ -88,6 +88,9 @@ describe('Selectors.Channels', () => {
             },
             preferences: {
                 myPreferences
+            },
+            general: {
+                config: {}
             }
         }
     });
