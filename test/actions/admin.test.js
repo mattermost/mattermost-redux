@@ -477,7 +477,7 @@ describe('Actions.Admin', () => {
         post('/elasticsearch/test').
         reply(200, OK_RESPONSE);
 
-        await Actions.testElasticsearch()(store.dispatch, store.getState);
+        await Actions.testElasticsearch({})(store.dispatch, store.getState);
 
         const state = store.getState();
         const request = state.requests.admin.testElasticsearch;

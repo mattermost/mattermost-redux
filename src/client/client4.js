@@ -1489,10 +1489,10 @@ export default class Client4 {
         );
     };
 
-    testElasticsearch = async () => {
+    testElasticsearch = async (config) => {
         return this.doFetch(
             `${this.getBaseRoute()}/elasticsearch/test`,
-            {method: 'post'}
+            {method: 'post', body: JSON.stringify(config)}
         );
     };
 
