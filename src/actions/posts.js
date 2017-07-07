@@ -4,7 +4,7 @@
 import {batchActions} from 'redux-batched-actions';
 
 import {Client4} from 'client';
-import {Preferences, Posts} from 'constants';
+import {General, Preferences, Posts} from 'constants';
 import {PostTypes, FileTypes} from 'action_types';
 import {getUsersByUsername} from 'selectors/entities/users';
 
@@ -548,6 +548,10 @@ export function getNeededAtMentionedUsernames(state, posts) {
         while ((match = pattern.exec(post.message)) !== null) {
             // match[1] is the matched mention including trailing punctuation
             // match[2] is the matched mention without trailing punctuation
+            if (General.SPECIAL_MENTIONS.indexOf(match[2]) !== -1) {
+                continue;
+            }
+
             if (usersByUsername[match[1]] || usersByUsername[match[2]]) {
                 // We have the user, go to the next match
                 continue;
