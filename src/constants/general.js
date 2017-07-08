@@ -54,5 +54,11 @@ export default {
 
     STORE_REHYDRATION_COMPLETE: 'store_hydation_complete',
     OFFLINE_STORE_RESET: 'offline_store_reset',
-    OFFLINE_STORE_PURGE: 'offline_store_purge'
+    OFFLINE_STORE_PURGE: 'offline_store_purge',
+
+    SPECIAL_MENTIONS: [
+        'all',
+        'channel',
+        'here'
+    ]
 };
