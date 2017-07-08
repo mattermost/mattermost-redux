@@ -220,11 +220,12 @@ export function removeIdpSamlCertificate() {
     );
 }
 
-export function testElasticsearch() {
+export function testElasticsearch(config) {
     return bindClientFunc(
         Client4.testElasticsearch,
         AdminTypes.TEST_ELASTICSEARCH_REQUEST,
         AdminTypes.TEST_ELASTICSEARCH_SUCCESS,
-        AdminTypes.TEST_ELASTICSEARCH_FAILURE
+        AdminTypes.TEST_ELASTICSEARCH_FAILURE,
+        config
     );
 }
