@@ -54,7 +54,10 @@ describe('Selectors.Users', () => {
                 profilesNotInTeam,
                 profilesWithoutTeam,
                 profilesInChannel,
-                profilesNotInChannel
+                profilesNotInChannel,
+                stats: {
+                    total_user_count: 1
+                }
             },
             teams: {
                 currentTeamId: team1.id
@@ -168,9 +171,7 @@ describe('Selectors.Users', () => {
         assert.deepEqual(Selectors.getUsersInVisibleDMs(testState), [user2]);
     });
 
-    it('getUserByEmail', () => {
-        assert.deepEqual(Selectors.getUserByEmail(testState, user1.email), user1);
-        assert.deepEqual(Selectors.getUserByEmail(testState, user2.email), user2);
+    it('getUsersStats', () => {
+        assert.deepEqual(Selectors.getUsersStats(testState), {total_user_count: 1});
     });
 });
-
