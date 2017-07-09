@@ -58,7 +58,7 @@ export function createPost(post, files = []) {
             },
             meta: {
                 offline: {
-                    effect: () => Client4.createPost(newPost),
+                    effect: () => Client4.createPost({...newPost, create_at: 0}),
                     commit: (success, payload) => {
                         // Use RECEIVED_POSTS to clear pending posts
                         const actions = [{
