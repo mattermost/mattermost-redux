@@ -262,7 +262,7 @@ export function getAnalytics(name, teamId = '') {
             forceLogoutIfNecessary(error, dispatch);
             dispatch(batchActions([
                 {type: AdminTypes.GET_ANALYTICS_FAILURE, error},
-                logError(error)
+                logError(error)(dispatch)
             ]), getState);
             return null;
         }
