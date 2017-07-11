@@ -138,6 +138,8 @@ function completeLogin(data) {
             data
         });
 
+        Client4.setUserId(data.id);
+
         let teamMembers;
         try {
             teamMembers = await Client4.getMyTeamMembers();
@@ -215,6 +217,9 @@ export function loadMe() {
         }
 
         await Promise.all(promises);
+
+        const {currentUserId} = getState().entities.users;
+        Client4.setUserId(currentUserId);
     };
 }
 
@@ -280,16 +285,72 @@ export function getMissingProfilesByIds(userIds) {
 }
 
 export function getProfilesByIds(userIds) {
-    return bindClientFunc(
-        Client4.getProfilesByIds,
-        UserTypes.PROFILES_REQUEST,
-        [UserTypes.RECEIVED_PROFILES_LIST, UserTypes.PROFILES_SUCCESS],
-        UserTypes.PROFILES_FAILURE,
-        userIds
-    );
+    return async (dispatch, getState) => {
+        dispatch({type: UserTypes.PROFILES_REQUEST}, getState);
+
+        const {currentUserId} = getState().entities.users;
+
+        let profiles;
+        try {
+            profiles = await Client4.getProfilesByIds(userIds);
+            removeUserFromList(currentUserId, profiles);
+        } catch (error) {
+            forceLogoutIfNecessary(error, dispatch);
+            dispatch(batchActions([
+                {type: UserTypes.PROFILES_FAILURE, error},
+                logError(error)(dispatch)
+            ]), getState);
+            return null;
+        }
+
+        dispatch(batchActions([
+            {
+                type: UserTypes.RECEIVED_PROFILES_LIST,
+                data: profiles
+            },
+            {
+                type: UserTypes.PROFILES_SUCCESS
+            }
+        ]), getState);
+
+        return profiles;
+    };
 }
 
-export function getProfilesInTeam(teamId, page, perPage = General.PROFILE_CHUNK_SIZE) {
+export function getProfilesByUsernames(usernames) {
+    return async (dispatch, getState) => {
+        dispatch({type: UserTypes.PROFILES_REQUEST}, getState);
+
+        const {currentUserId} = getState().entities.users;
+
+        let profiles;
+        try {
+            profiles = await Client4.getProfilesByUsernames(usernames);
+            removeUserFromList(currentUserId, profiles);
+        } catch (error) {
+            forceLogoutIfNecessary(error, dispatch);
+            dispatch(batchActions([
+                {type: UserTypes.PROFILES_FAILURE, error},
+                logError(error)(dispatch)
+            ]), getState);
+            return null;
+        }
+
+        dispatch(batchActions([
+            {
+                type: UserTypes.RECEIVED_PROFILES_LIST,
+                data: profiles
+            },
+            {
+                type: UserTypes.PROFILES_SUCCESS
+            }
+        ]), getState);
+
+        return profiles;
+    };
+}
+
+export function getProfilesInTeam(teamId, page, perPage = General.PROFILE_CHUNK_SIZE, sort = '') {
     return async (dispatch, getState) => {
         dispatch({type: UserTypes.PROFILES_IN_TEAM_REQUEST}, getState);
 
@@ -297,7 +358,7 @@ export function getProfilesInTeam(teamId, page, perPage = General.PROFILE_CHUNK_
 
         let profiles;
         try {
-            profiles = await Client4.getProfilesInTeam(teamId, page, perPage);
+            profiles = await Client4.getProfilesInTeam(teamId, page, perPage, sort);
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch);
             dispatch(batchActions([
@@ -495,6 +556,16 @@ export function getUserByUsername(username) {
         [UserTypes.RECEIVED_PROFILE, UserTypes.USER_BY_USERNAME_SUCCESS],
         UserTypes.USER_BY_USERNAME_FAILURE,
         username
+    );
+}
+
+export function getUserByEmail(email) {
+    return bindClientFunc(
+        Client4.getUserByEmail,
+        UserTypes.USER_REQUEST,
+        [UserTypes.RECEIVED_PROFILE, UserTypes.USER_SUCCESS],
+        UserTypes.USER_FAILURE,
+        email
     );
 }
 

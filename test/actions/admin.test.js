@@ -8,7 +8,7 @@ import nock from 'nock';
 import * as Actions from 'actions/admin';
 import {Client, Client4} from 'client';
 
-import {RequestStatus} from 'constants';
+import {RequestStatus, Stats} from 'constants';
 import TestHelper from 'test/test_helper';
 import configureStore from 'test/test_store';
 
@@ -484,5 +484,139 @@ describe('Actions.Admin', () => {
         if (request.status === RequestStatus.FAILURE) {
             throw new Error('testElasticsearch request failed err=' + request.error);
         }
+    });
+
+    it('uploadLicense', async () => {
+        const testFileData = fs.createReadStream('test/assets/images/test.png');
+
+        nock(Client4.getBaseRoute()).
+            post('/license').
+            reply(200, OK_RESPONSE);
+
+        await Actions.uploadLicense(testFileData)(store.dispatch, store.getState);
+
+        const state = store.getState();
+        const request = state.requests.admin.uploadLicense;
+        if (request.status === RequestStatus.FAILURE) {
+            throw new Error('uploadLicense request failed err=' + request.error);
+        }
+    });
+
+    it('removeLicense', async () => {
+        nock(Client4.getBaseRoute()).
+            delete('/license').
+            reply(200, OK_RESPONSE);
+
+        await Actions.removeLicense()(store.dispatch, store.getState);
+
+        const state = store.getState();
+        const request = state.requests.admin.removeLicense;
+        if (request.status === RequestStatus.FAILURE) {
+            throw new Error('removeLicense request failed err=' + request.error);
+        }
+    });
+
+    it('getStandardAnalytics', async () => {
+        nock(Client4.getBaseRoute()).
+            get('/analytics/old').
+            query(true).
+            times(2).
+            reply(200, [{name: 'channel_open_count', value: 495}, {name: 'channel_private_count', value: 19}, {name: 'post_count', value: 2763}, {name: 'unique_user_count', value: 316}, {name: 'team_count', value: 159}, {name: 'total_websocket_connections', value: 1}, {name: 'total_master_db_connections', value: 8}, {name: 'total_read_db_connections', value: 0}, {name: 'daily_active_users', value: 22}, {name: 'monthly_active_users', value: 114}]);
+
+        await Actions.getStandardAnalytics()(store.dispatch, store.getState);
+        await Actions.getStandardAnalytics(TestHelper.basicTeam.id)(store.dispatch, store.getState);
+
+        const state = store.getState();
+        const request = state.requests.admin.getAnalytics;
+        if (request.status === RequestStatus.FAILURE) {
+            throw new Error('getAnalytics request failed');
+        }
+
+        const analytics = state.entities.admin.analytics;
+        assert.ok(analytics);
+        assert.ok(analytics[Stats.TOTAL_PUBLIC_CHANNELS] === 495);
+
+        const teamAnalytics = state.entities.admin.teamAnalytics;
+        assert.ok(teamAnalytics);
+        assert.ok(teamAnalytics[TestHelper.basicTeam.id]);
+        assert.ok(teamAnalytics[TestHelper.basicTeam.id][Stats.TOTAL_PUBLIC_CHANNELS] === 495);
+    });
+
+    it('getAdvancedAnalytics', async () => {
+        nock(Client4.getBaseRoute()).
+            get('/analytics/old').
+            query(true).
+            times(2).
+            reply(200, [{name: 'file_post_count', value: 24}, {name: 'hashtag_post_count', value: 876}, {name: 'incoming_webhook_count', value: 16}, {name: 'outgoing_webhook_count', value: 18}, {name: 'command_count', value: 14}, {name: 'session_count', value: 149}]);
+
+        await Actions.getAdvancedAnalytics()(store.dispatch, store.getState);
+        await Actions.getAdvancedAnalytics(TestHelper.basicTeam.id)(store.dispatch, store.getState);
+
+        const state = store.getState();
+        const request = state.requests.admin.getAnalytics;
+        if (request.status === RequestStatus.FAILURE) {
+            throw new Error('getAnalytics request failed');
+        }
+
+        const analytics = state.entities.admin.analytics;
+        assert.ok(analytics);
+        assert.ok(analytics[Stats.TOTAL_FILE_POSTS] === 24);
+
+        const teamAnalytics = state.entities.admin.teamAnalytics;
+        assert.ok(teamAnalytics);
+        assert.ok(teamAnalytics[TestHelper.basicTeam.id]);
+        assert.ok(teamAnalytics[TestHelper.basicTeam.id][Stats.TOTAL_FILE_POSTS] === 24);
+    });
+
+    it('getPostsPerDayAnalytics', async () => {
+        nock(Client4.getBaseRoute()).
+            get('/analytics/old').
+            query(true).
+            times(2).
+            reply(200, [{name: '2017-06-18', value: 16}, {name: '2017-06-16', value: 209}, {name: '2017-06-12', value: 35}, {name: '2017-06-08', value: 227}, {name: '2017-06-07', value: 27}, {name: '2017-06-06', value: 136}, {name: '2017-06-05', value: 127}, {name: '2017-06-04', value: 39}, {name: '2017-06-02', value: 3}, {name: '2017-05-31', value: 52}, {name: '2017-05-30', value: 52}, {name: '2017-05-29', value: 9}, {name: '2017-05-26', value: 198}, {name: '2017-05-25', value: 144}, {name: '2017-05-24', value: 1130}, {name: '2017-05-23', value: 146}]);
+
+        await Actions.getPostsPerDayAnalytics()(store.dispatch, store.getState);
+        await Actions.getPostsPerDayAnalytics(TestHelper.basicTeam.id)(store.dispatch, store.getState);
+
+        const state = store.getState();
+        const request = state.requests.admin.getAnalytics;
+        if (request.status === RequestStatus.FAILURE) {
+            throw new Error('getAnalytics request failed');
+        }
+
+        const analytics = state.entities.admin.analytics;
+        assert.ok(analytics);
+        assert.ok(analytics[Stats.POST_PER_DAY][0].value === 146);
+
+        const teamAnalytics = state.entities.admin.teamAnalytics;
+        assert.ok(teamAnalytics);
+        assert.ok(teamAnalytics[TestHelper.basicTeam.id]);
+        assert.ok(teamAnalytics[TestHelper.basicTeam.id][Stats.POST_PER_DAY][0].value === 146);
+    });
+
+    it('getUsersPerDayAnalytics', async () => {
+        nock(Client4.getBaseRoute()).
+            get('/analytics/old').
+            query(true).
+            times(2).
+            reply(200, [{name: '2017-06-18', value: 2}, {name: '2017-06-16', value: 47}, {name: '2017-06-12', value: 4}, {name: '2017-06-08', value: 55}, {name: '2017-06-07', value: 2}, {name: '2017-06-06', value: 1}, {name: '2017-06-05', value: 2}, {name: '2017-06-04', value: 13}, {name: '2017-06-02', value: 1}, {name: '2017-05-31', value: 3}, {name: '2017-05-30', value: 4}, {name: '2017-05-29', value: 3}, {name: '2017-05-26', value: 40}, {name: '2017-05-25', value: 26}, {name: '2017-05-24', value: 43}, {name: '2017-05-23', value: 3}]);
+
+        await Actions.getUsersPerDayAnalytics()(store.dispatch, store.getState);
+        await Actions.getUsersPerDayAnalytics(TestHelper.basicTeam.id)(store.dispatch, store.getState);
+
+        const state = store.getState();
+        const request = state.requests.admin.getAnalytics;
+        if (request.status === RequestStatus.FAILURE) {
+            throw new Error('getAnalytics request failed');
+        }
+
+        const analytics = state.entities.admin.analytics;
+        assert.ok(analytics);
+        assert.ok(analytics[Stats.USERS_WITH_POSTS_PER_DAY][0].value === 3);
+
+        const teamAnalytics = state.entities.admin.teamAnalytics;
+        assert.ok(teamAnalytics);
+        assert.ok(teamAnalytics[TestHelper.basicTeam.id]);
+        assert.ok(teamAnalytics[TestHelper.basicTeam.id][Stats.USERS_WITH_POSTS_PER_DAY][0].value === 3);
     });
 });

@@ -110,7 +110,7 @@ export function createDirectChannel(userId, otherUserId) {
         const member = {
             channel_id: created.id,
             user_id: userId,
-            roles: `${General.CHANNEL_USER_ROLE} ${General.CHANNEL_ADMIN_ROLE}`,
+            roles: `${General.CHANNEL_USER_ROLE}`,
             last_viewed_at: 0,
             msg_count: 0,
             mention_count: 0,
@@ -141,6 +141,61 @@ export function createDirectChannel(userId, otherUserId) {
         ]), getState);
 
         return {data: created};
+    };
+}
+
+export function createGroupChannel(userIds) {
+    return async (dispatch, getState) => {
+        dispatch({type: ChannelTypes.CREATE_CHANNEL_REQUEST}, getState);
+
+        const {currentUserId} = getState().entities.users;
+
+        let created;
+        try {
+            created = await Client4.createGroupChannel(userIds);
+        } catch (error) {
+            forceLogoutIfNecessary(error, dispatch);
+            dispatch(batchActions([
+                {type: ChannelTypes.CREATE_CHANNEL_FAILURE, error},
+                logError(error)(dispatch)
+            ]), getState);
+            return null;
+        }
+
+        const member = {
+            channel_id: created.id,
+            user_id: currentUserId,
+            roles: `${General.CHANNEL_USER_ROLE}`,
+            last_viewed_at: 0,
+            msg_count: 0,
+            mention_count: 0,
+            notify_props: {desktop: 'default', mark_unread: 'all'},
+            last_update_at: created.create_at
+        };
+
+        const preferences = [{user_id: currentUserId, category: Preferences.CATEGORY_GROUP_CHANNEL_SHOW, name: created.id, value: 'true'}];
+
+        savePreferences(currentUserId, preferences)(dispatch, getState);
+
+        dispatch(batchActions([
+            {
+                type: ChannelTypes.RECEIVED_CHANNEL,
+                data: created
+            },
+            {
+                type: ChannelTypes.RECEIVED_MY_CHANNEL_MEMBER,
+                data: member
+            },
+            {
+                type: PreferenceTypes.RECEIVED_PREFERENCES,
+                data: preferences
+            },
+            {
+                type: ChannelTypes.CREATE_CHANNEL_SUCCESS
+            }
+        ]), getState);
+
+        return created;
     };
 }
 
@@ -582,7 +637,26 @@ export function viewChannel(channelId, prevChannelId = '') {
             return null;
         }
 
-        dispatch({type: ChannelTypes.UPDATE_LAST_VIEWED_SUCCESS}, getState);
+        const actions = [{type: ChannelTypes.UPDATE_LAST_VIEWED_SUCCESS}];
+
+        const {myMembers} = getState().entities.channels;
+        const member = myMembers[channelId];
+        if (member) {
+            actions.push({
+                type: ChannelTypes.RECEIVED_MY_CHANNEL_MEMBER,
+                data: {...member, last_viewed_at: new Date().getTime()}
+            });
+        }
+
+        const prevMember = myMembers[prevChannelId];
+        if (prevMember) {
+            actions.push({
+                type: ChannelTypes.RECEIVED_MY_CHANNEL_MEMBER,
+                data: {...prevMember, last_viewed_at: new Date().getTime()}
+            });
+        }
+
+        dispatch(batchActions(actions), getState);
 
         return true;
     };
@@ -786,6 +860,8 @@ export function updateChannelMemberRoles(channelId, userId, roles) {
 
 export function updateChannelHeader(channelId, header) {
     return async (dispatch, getState) => {
+        Client4.trackEvent('action', 'action_channels_update_header', {channel_id: channelId});
+
         dispatch({
             type: ChannelTypes.UPDATE_CHANNEL_HEADER,
             data: {
@@ -798,6 +874,8 @@ export function updateChannelHeader(channelId, header) {
 
 export function updateChannelPurpose(channelId, purpose) {
     return async (dispatch, getState) => {
+        Client4.trackEvent('action', 'action_channels_update_purpose', {channel_id: channelId});
+
         dispatch({
             type: ChannelTypes.UPDATE_CHANNEL_PURPOSE,
             data: {

@@ -6,7 +6,9 @@ import {General} from 'constants';
 
 import {Client4} from 'client';
 
-import {bindClientFunc} from './helpers';
+import {logError} from './errors';
+import {bindClientFunc, forceLogoutIfNecessary} from './helpers';
+import {batchActions} from 'redux-batched-actions';
 
 export function getLogs(page = 0, perPage = General.PAGE_SIZE_DEFAULT) {
     return bindClientFunc(
@@ -228,4 +230,68 @@ export function testElasticsearch(config) {
         AdminTypes.TEST_ELASTICSEARCH_FAILURE,
         config
     );
+}
+
+export function uploadLicense(fileData) {
+    return bindClientFunc(
+        Client4.uploadLicense,
+        AdminTypes.UPLOAD_LICENSE_REQUEST,
+        AdminTypes.UPLOAD_LICENSE_SUCCESS,
+        AdminTypes.UPLOAD_LICENSE_FAILURE,
+        fileData
+    );
+}
+
+export function removeLicense() {
+    return bindClientFunc(
+        Client4.removeLicense,
+        AdminTypes.REMOVE_LICENSE_REQUEST,
+        AdminTypes.REMOVE_LICENSE_SUCCESS,
+        AdminTypes.REMOVE_LICENSE_FAILURE
+    );
+}
+
+export function getAnalytics(name, teamId = '') {
+    return async (dispatch, getState) => {
+        dispatch({type: AdminTypes.GET_ANALYTICS_REQUEST}, getState);
+
+        let data;
+        try {
+            data = await Client4.getAnalytics(name, teamId);
+        } catch (error) {
+            forceLogoutIfNecessary(error, dispatch);
+            dispatch(batchActions([
+                {type: AdminTypes.GET_ANALYTICS_FAILURE, error},
+                logError(error)(dispatch)
+            ]), getState);
+            return null;
+        }
+
+        const actions = [{type: AdminTypes.GET_ANALYTICS_SUCCESS}];
+        if (teamId === '') {
+            actions.push({type: AdminTypes.RECEIVED_SYSTEM_ANALYTICS, data, name});
+        } else {
+            actions.push({type: AdminTypes.RECEIVED_TEAM_ANALYTICS, data, name, teamId});
+        }
+
+        dispatch(batchActions(actions), getState);
+
+        return data;
+    };
+}
+
+export function getStandardAnalytics(teamId = '') {
+    return getAnalytics('standard', teamId);
+}
+
+export function getAdvancedAnalytics(teamId = '') {
+    return getAnalytics('extra_counts', teamId);
+}
+
+export function getPostsPerDayAnalytics(teamId = '') {
+    return getAnalytics('post_counts_day', teamId);
+}
+
+export function getUsersPerDayAnalytics(teamId = '') {
+    return getAnalytics('user_counts_with_posts_day', teamId);
 }

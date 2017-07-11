@@ -3,6 +3,7 @@
 
 import {combineReducers} from 'redux';
 import {AdminTypes, UserTypes} from 'action_types';
+import {Stats} from 'constants';
 
 function logs(state = [], action) {
     switch (action.type) {
@@ -96,6 +97,113 @@ function samlCertStatus(state = {}, action) {
     }
 }
 
+function convertAnalyticsRowsToStats(data, name) {
+    const stats = {};
+
+    if (name === 'post_counts_day') {
+        data.reverse();
+        stats[Stats.POST_PER_DAY] = data;
+        return stats;
+    }
+
+    if (name === 'user_counts_with_posts_day') {
+        data.reverse();
+        stats[Stats.USERS_WITH_POSTS_PER_DAY] = data;
+        return stats;
+    }
+
+    data.forEach((row) => {
+        let key;
+        switch (row.name) {
+        case 'channel_open_count':
+            key = Stats.TOTAL_PUBLIC_CHANNELS;
+            break;
+        case 'channel_private_count':
+            key = Stats.TOTAL_PRIVATE_GROUPS;
+            break;
+        case 'post_count':
+            key = Stats.TOTAL_POSTS;
+            break;
+        case 'unique_user_count':
+            key = Stats.TOTAL_USERS;
+            break;
+        case 'team_count':
+            key = Stats.TOTAL_TEAMS;
+            break;
+        case 'total_websocket_connections':
+            key = Stats.TOTAL_WEBSOCKET_CONNECTIONS;
+            break;
+        case 'total_master_db_connections':
+            key = Stats.TOTAL_MASTER_DB_CONNECTIONS;
+            break;
+        case 'total_read_db_connections':
+            key = Stats.TOTAL_READ_DB_CONNECTIONS;
+            break;
+        case 'daily_active_users':
+            key = Stats.DAILY_ACTIVE_USERS;
+            break;
+        case 'monthly_active_users':
+            key = Stats.MONTHLY_ACTIVE_USERS;
+            break;
+        case 'file_post_count':
+            key = Stats.TOTAL_FILE_POSTS;
+            break;
+        case 'hashtag_post_count':
+            key = Stats.TOTAL_HASHTAG_POSTS;
+            break;
+        case 'incoming_webhook_count':
+            key = Stats.TOTAL_IHOOKS;
+            break;
+        case 'outgoing_webhook_count':
+            key = Stats.TOTAL_OHOOKS;
+            break;
+        case 'command_count':
+            key = Stats.TOTAL_COMMANDS;
+            break;
+        case 'session_count':
+            key = Stats.TOTAL_SESSIONS;
+            break;
+        }
+
+        if (key) {
+            stats[key] = row.value;
+        }
+    });
+
+    return stats;
+}
+
+function analytics(state = {}, action) {
+    switch (action.type) {
+    case AdminTypes.RECEIVED_SYSTEM_ANALYTICS: {
+        const stats = convertAnalyticsRowsToStats(action.data, action.name);
+        return {...state, ...stats};
+    }
+    case UserTypes.LOGOUT_SUCCESS:
+        return {};
+
+    default:
+        return state;
+    }
+}
+
+function teamAnalytics(state = {}, action) {
+    switch (action.type) {
+    case AdminTypes.RECEIVED_TEAM_ANALYTICS: {
+        const nextState = {...state};
+        const stats = convertAnalyticsRowsToStats(action.data, action.name);
+        const analyticsForTeam = {...(nextState[action.teamId] || {}), ...stats};
+        nextState[action.teamId] = analyticsForTeam;
+        return nextState;
+    }
+    case UserTypes.LOGOUT_SUCCESS:
+        return {};
+
+    default:
+        return state;
+    }
+}
+
 export default combineReducers({
 
     // array of strings each representing a log entry
@@ -114,7 +222,13 @@ export default combineReducers({
     clusterInfo,
 
     // object with certificate type as keys and boolean statuses as values
-    samlCertStatus
+    samlCertStatus,
+
+    // object with analytic categories as types and numbers as values
+    analytics,
+
+    // object with team ids as keys and analytics objects as values
+    teamAnalytics
 
 });
 

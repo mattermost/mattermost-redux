@@ -7,6 +7,7 @@ import * as Actions from 'actions/teams';
 import {login} from 'actions/users';
 import {Client, Client4} from 'client';
 import {General, RequestStatus} from 'constants';
+import {GeneralTypes} from 'action_types';
 import TestHelper from 'test/test_helper';
 import configureStore from 'test/test_store';
 
@@ -156,8 +157,13 @@ describe('Actions.Teams', () => {
         );
         await client.login(user.email, 'password1');
         const team = await client.createTeam({...TestHelper.fakeTeam(), allow_open_invite: true});
+        const team2 = await client.createTeam({...TestHelper.fakeTeam(), allow_open_invite: true});
 
+        store.dispatch({type: GeneralTypes.RECEIVED_SERVER_VERSION, data: '3.10.0'});
         await Actions.joinTeam(team.invite_id, team.id)(store.dispatch, store.getState);
+
+        store.dispatch({type: GeneralTypes.RECEIVED_SERVER_VERSION, data: '4.0.0'});
+        await Actions.joinTeam(team2.invite_id, team2.id)(store.dispatch, store.getState);
 
         const state = store.getState();
 
@@ -169,7 +175,9 @@ describe('Actions.Teams', () => {
 
         const {teams, myMembers} = state.entities.teams;
         assert.ok(teams[team.id]);
+        assert.ok(teams[team2.id]);
         assert.ok(myMembers[team.id]);
+        assert.ok(myMembers[team2.id]);
     });
 
     it('getMyTeamMembers and getMyTeamUnreads', async () => {
