@@ -6,7 +6,7 @@ import {General} from 'constants';
 
 import {Client4} from 'client';
 
-import {getLogErrorAction} from './errors';
+import {logError} from './errors';
 import {bindClientFunc, forceLogoutIfNecessary} from './helpers';
 import {batchActions} from 'redux-batched-actions';
 
@@ -262,7 +262,7 @@ export function getAnalytics(name, teamId = '') {
             forceLogoutIfNecessary(error, dispatch);
             dispatch(batchActions([
                 {type: AdminTypes.GET_ANALYTICS_FAILURE, error},
-                getLogErrorAction(error)
+                logError(error)
             ]), getState);
             return null;
         }

@@ -1,7 +1,7 @@
 // Copyright (c) 2017-present Mattermost, Inc. All Rights Reserved.
 // See License.txt for license information.
 
-import keyMirror from 'key-mirror';
+import keyMirror from 'utils/key_mirror';
 
 export default keyMirror({
     TOTAL_USERS: null,
