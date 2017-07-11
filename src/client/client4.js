@@ -1847,7 +1847,14 @@ export default class Client4 {
     };
 
     doFetchWithResponse = async (url, options) => {
-        const response = await fetch(url, this.getOptions(options));
+        let response;
+        try {
+            response = await fetch(url, this.getOptions(options));
+        } catch (err) {
+            console.log(err);
+            return;
+        }
+
         const headers = parseAndMergeNestedHeaders(response.headers);
 
         let data;
