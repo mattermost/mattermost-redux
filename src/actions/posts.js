@@ -487,6 +487,11 @@ export function getPostsAfter(channelId, postId, page = 0, perPage = Posts.POST_
 
 // Note that getProfilesAndStatusesForPosts can take either an array of posts or a map of ids to posts
 export async function getProfilesAndStatusesForPosts(posts, dispatch, getState) {
+    if (!posts) {
+        // Some API methods return null for no results
+        return Promise.resolve();
+    }
+
     const state = getState();
     const {currentUserId, profiles, statuses} = state.entities.users;
 
