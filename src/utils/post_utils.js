@@ -50,7 +50,7 @@ export function isPostFlagged(postId, myPreferences) {
 }
 
 export function isSystemMessage(post) {
-    return post.type && post.type.startsWith(Posts.SYSTEM_MESSAGE_PREFIX);
+    return post.type !== '' && post.type && post.type.startsWith(Posts.SYSTEM_MESSAGE_PREFIX);
 }
 
 export function isFromWebhook(post) {
