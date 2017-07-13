@@ -7,9 +7,9 @@ function getAllFiles(state) {
     return state.entities.files.files;
 }
 
-function getFilesIdsForPost(state, post) {
-    if (post.hasOwnProperty('id')) {
-        return state.entities.files.fileIdsByPostId[post.id] || [];
+function getFilesIdsForPost(state, postId) {
+    if (postId) {
+        return state.entities.files.fileIdsByPostId[postId] || [];
     }
 
     return [];
