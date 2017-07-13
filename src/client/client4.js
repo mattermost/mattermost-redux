@@ -1309,7 +1309,7 @@ export default class Client4 {
         }
 
         return this.doFetch(
-            `${this.getBaseRoute}/logs`,
+            `${this.getBaseRoute()}/logs`,
             {method: 'post', body: JSON.stringify({message, level})}
         );
     };
