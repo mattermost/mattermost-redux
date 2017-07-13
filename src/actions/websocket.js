@@ -218,6 +218,12 @@ function handleEvent(msg, dispatch, getState) {
     case WebsocketEvents.HELLO:
         handleHelloEvent(msg);
         break;
+    case WebsocketEvents.REACTION_ADDED:
+        handleReactionAddedEvent(msg, dispatch, getState);
+        break;
+    case WebsocketEvents.REACTION_REMOVED:
+        handleReactionRemovedEvent(msg, dispatch, getState);
+        break;
     }
 }
 
@@ -554,6 +560,26 @@ function handleUserTypingEvent(msg, dispatch, getState) {
     if (status !== General.ONLINE) {
         getStatusesByIds([userId])(dispatch, getState);
     }
+}
+
+function handleReactionAddedEvent(msg, dispatch, getState) {
+    const {data} = msg;
+    const reaction = JSON.parse(data.reaction);
+
+    dispatch({
+        type: PostTypes.RECEIVED_REACTION,
+        data: reaction
+    }, getState);
+}
+
+function handleReactionRemovedEvent(msg, dispatch, getState) {
+    const {data} = msg;
+    const reaction = JSON.parse(data.reaction);
+
+    dispatch({
+        type: PostTypes.REACTION_DELETED,
+        data: reaction
+    }, getState);
 }
 
 // Helpers
