@@ -109,6 +109,92 @@ describe('Actions.Websocket', () => {
         });
     });
 
+    it('Websocket Handle Reaction Added to Post', (done) => {
+        async function test() {
+            const client = TestHelper.createClient4();
+            const user = await client.createUser(
+                TestHelper.fakeUser(),
+                null,
+                null,
+                TestHelper.basicTeam.invite_id
+            );
+            await client.login(user.email, 'password1');
+
+            await Client4.addToChannel(user.id, TestHelper.basicChannel.id);
+
+            const post = await client.createPost({...TestHelper.fakePost(), channel_id: TestHelper.basicChannel.id});
+            const emoji = '+1';
+
+            await Client4.addReaction(TestHelper.basicUser.id, post.id, emoji);
+
+            setTimeout(() => {
+                const nextEntities = store.getState().entities;
+                const {reactions} = nextEntities.posts;
+                const reactionsForPost = reactions[post.id];
+
+                assert.ok(reactionsForPost.hasOwnProperty(`${TestHelper.basicUser.id}-${emoji}`));
+                done();
+            }, 500);
+        }
+
+        test();
+    });
+
+    it('Websocket Handle Reaction Removed from Post', (done) => {
+        async function test() {
+            const client = TestHelper.createClient4();
+            const user = await client.createUser(
+                TestHelper.fakeUser(),
+                null,
+                null,
+                TestHelper.basicTeam.invite_id
+            );
+
+            await client.login(user.email, 'password1');
+
+            await Client4.addToChannel(user.id, TestHelper.basicChannel.id);
+
+            const newPost = {...TestHelper.fakePost(), channel_id: TestHelper.basicChannel.id};
+            const post = await client.createPost(newPost);
+            const emoji = '+1';
+
+            await Client4.addReaction(TestHelper.basicUser.id, post.id, emoji);
+
+            function checkForAdd() {
+                return new Promise((resolve) => {
+                    setTimeout(() => {
+                        const nextEntities = store.getState().entities;
+                        const {reactions} = nextEntities.posts;
+                        const reactionsForPost = reactions[post.id];
+
+                        assert.ok(reactionsForPost.hasOwnProperty(`${TestHelper.basicUser.id}-${emoji}`));
+                        resolve();
+                    }, 500);
+                });
+            }
+
+            function checkForRemove() {
+                return new Promise((resolve) => {
+                    setTimeout(() => {
+                        const nextEntities = store.getState().entities;
+                        const {reactions} = nextEntities.posts;
+                        const reactionsForPost = reactions[post.id];
+
+                        assert.ok(!reactionsForPost.hasOwnProperty(`${TestHelper.basicUser.id}-${emoji}`));
+                        resolve();
+                        done();
+                    }, 500);
+                });
+            }
+
+            await checkForAdd();
+            await Client4.removeReaction(TestHelper.basicUser.id, post.id, emoji);
+            await checkForRemove();
+        }
+
+        test();
+    });
+
     // If we move this test lower it will fail cause of a permissions issue
     it('Websocket handle team updated', (done) => {
         async function test() {
