@@ -221,7 +221,7 @@ function reactions(state = {}, action) {
     switch (action.type) {
     case PostTypes.RECEIVED_REACTIONS: {
         const reactionsList = action.data;
-        const nextReactions = {...(state[action.postId] || {})};
+        const nextReactions = {};
         reactionsList.forEach((reaction) => {
             nextReactions[reaction.user_id + '-' + reaction.emoji_name] = reaction;
         });
