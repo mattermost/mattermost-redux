@@ -15,6 +15,7 @@ import integrations from './integrations';
 import emojis from './emojis';
 import admin from './admin';
 import alerts from './alerts';
+import jobs from './jobs';
 
 export default combineReducers({
     general,
@@ -28,5 +29,6 @@ export default combineReducers({
     integrations,
     emojis,
     admin,
-    alerts
+    alerts,
+    jobs
 });

@@ -13,6 +13,7 @@ import IntegrationTypes from './integrations';
 import EmojiTypes from './emojis';
 import AdminTypes from './admin';
 import AlertTypes from './alerts';
+import JobTypes from './jobs';
 
 export {
     ErrorTypes,
@@ -26,5 +27,6 @@ export {
     IntegrationTypes,
     EmojiTypes,
     AdminTypes,
-    AlertTypes
+    AlertTypes,
+    JobTypes
 };
