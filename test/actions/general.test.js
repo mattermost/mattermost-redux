@@ -27,11 +27,12 @@ describe('Actions.General', () => {
 
     it('getPing - Invalid URL', async () => {
         const serverUrl = Client4.getUrl();
-        Client4.setUrl('notarealurl');
+        Client.setUrl('notarealurl');
         await Actions.getPing()(store.dispatch, store.getState);
 
         const {server} = store.getState().requests.general;
         assert.ok(server.status === RequestStatus.FAILURE && server.error);
+        Client.setUrl(serverUrl);
         Client4.setUrl(serverUrl);
     });
 

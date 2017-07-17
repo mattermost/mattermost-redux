@@ -20,8 +20,8 @@ export function getPing() {
             'Cannot connect to the server. Please check your server URL and internet connection.'
         );
         try {
-            data = await Client4.ping();
-            if (!data.status) {
+            data = await Client.getPing();
+            if (!data.version) {
                 // successful ping but not the right return data
                 dispatch({type: GeneralTypes.PING_FAILURE, error: pingError}, getState);
                 return;
