@@ -1924,7 +1924,7 @@ export default class Client4 {
 }
 
 function isNonVersionUrl(url) {
-    for (let i = 0; i < NON_VERSION_URLS; i++) {
+    for (let i = 0; i < NON_VERSION_URLS.length; i++) {
         if (url.indexOf(NON_VERSION_URLS[i]) > 0) {
             return true;
         }
