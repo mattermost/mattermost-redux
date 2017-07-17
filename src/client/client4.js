@@ -17,7 +17,7 @@ const HEADER_X_VERSION_ID = 'X-Version-Id';
 const HEADER_X_CLUSTER_ID = 'X-Cluster-Id';
 
 const PER_PAGE_DEFAULT = 60;
-const NON_VERSION_URLS = ['/api/v4/saml/', '/api/v4/config/'];
+const NON_VERSION_URLS = ['/api/v4/saml', '/api/v4/config', '/api/v4/logs'];
 
 export default class Client4 {
     constructor() {
