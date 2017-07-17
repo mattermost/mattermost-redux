@@ -1864,7 +1864,7 @@ export default class Client4 {
 
         // Need to only accept version in the header from requests that are not cached
         // to avoid getting an old version from a cached response
-        if (headers.has(HEADER_X_VERSION_ID) && !headers.get('Cache-Control')) {
+        if (url.indexOf('/api/v4/saml/') === -1 && headers.has(HEADER_X_VERSION_ID) && !headers.get('Cache-Control')) {
             const serverVersion = headers.get(HEADER_X_VERSION_ID);
             if (serverVersion && this.serverVersion !== serverVersion) {
                 this.serverVersion = serverVersion;
