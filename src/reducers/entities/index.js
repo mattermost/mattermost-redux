@@ -16,6 +16,7 @@ import emojis from './emojis';
 import admin from './admin';
 import alerts from './alerts';
 import jobs from './jobs';
+import search from './search';
 
 export default combineReducers({
     general,
@@ -30,5 +31,6 @@ export default combineReducers({
     emojis,
     admin,
     alerts,
-    jobs
+    jobs,
+    search
 });

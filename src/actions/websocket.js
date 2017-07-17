@@ -19,7 +19,8 @@ import {
 import {
     getPosts,
     getPostsSince,
-    getProfilesAndStatusesForPosts
+    getProfilesAndStatusesForPosts,
+    getPostThread
 } from './posts';
 
 import {
@@ -262,23 +263,7 @@ async function handleNewPostEvent(msg, dispatch, getState) {
     }
 
     if (post.root_id && !posts[post.root_id]) {
-        await Client4.getPostThread(post.root_id).then((data) => {
-            const rootUserId = data.posts[post.root_id].user_id;
-            const rootStatus = users.statuses[rootUserId];
-            if (!users.profiles[rootUserId] && rootUserId !== users.currentUserId) {
-                getProfilesByIds([rootUserId])(dispatch, getState);
-            }
-
-            if (rootStatus !== General.ONLINE) {
-                getStatusesByIds([rootUserId])(dispatch, getState);
-            }
-
-            dispatch({
-                type: PostTypes.RECEIVED_POSTS,
-                data,
-                channelId: post.channel_id
-            }, getState);
-        });
+        getPostThread(post.root_id);
     }
 
     dispatch(batchActions([

@@ -1,7 +1,7 @@
 // Copyright (c) 2016-present Mattermost, Inc. All Rights Reserved.
 // See License.txt for license information.
 
-import {PostTypes, UserTypes} from 'action_types';
+import {PostTypes, SearchTypes, UserTypes} from 'action_types';
 import {Posts} from 'constants';
 
 function handleReceivedPost(posts = {}, postsInChannel = {}, action) {
@@ -88,6 +88,35 @@ function handleReceivedPosts(posts = {}, postsInChannel = {}, action) {
     nextPostsForChannel[channelId] = postsForChannel;
 
     return {posts: nextPosts, postsInChannel: nextPostsForChannel};
+}
+
+function handlePostsFromSearch(posts = {}, postsInChannel = {}, action) {
+    const newPosts = action.data.posts;
+    let info = {posts, postsInChannel};
+    const postsForChannel = new Map();
+
+    for (const id in newPosts) {
+        if (newPosts.hasOwnProperty(id)) {
+            const nextPost = newPosts[id];
+            if (nextPost) {
+                const channelId = nextPost.channel_id;
+                if (postsForChannel.has(channelId)) {
+                    postsForChannel.set(channelId,
+                        {...postsForChannel.get(channelId), [id]: nextPost}
+                    );
+                } else {
+                    postsForChannel.set(channelId, {[id]: nextPost});
+                }
+            }
+        }
+    }
+
+    postsForChannel.forEach((postList, channelId) => {
+        const result = handleReceivedPosts(info.posts, postsInChannel, {channelId, data: {posts: postList}});
+        info = {...info, ...result};
+    });
+
+    return info;
 }
 
 function handlePostDeleted(posts = {}, postsInChannel = {}, action) {
@@ -183,6 +212,9 @@ function handlePosts(posts = {}, postsInChannel = {}, action) {
         return {posts, postsInChannel};
     case PostTypes.REMOVE_POST:
         return handleRemovePost(posts, postsInChannel, action);
+
+    case SearchTypes.RECEIVED_SEARCH_POSTS:
+        return handlePostsFromSearch(posts, postsInChannel, action);
 
     case UserTypes.LOGOUT_SUCCESS:
         return {
