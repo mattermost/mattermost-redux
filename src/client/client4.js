@@ -197,6 +197,10 @@ export default class Client4 {
         return `${this.getBrandRoute()}/image?t=${timestamp}`;
     }
 
+    getJobsRoute() {
+        return `${this.getBaseRoute()}/jobs`;
+    }
+
     getOptions(options) {
         const newOptions = Object.assign({}, options);
 
@@ -1604,6 +1608,42 @@ export default class Client4 {
 
     getCustomEmojiImageUrl = (id) => {
         return `${this.getEmojiRoute(id)}/image`;
+    };
+
+    // Jobs Routes
+    getJob = async (id) => {
+        return this.doFetch(
+            `${this.getJobsRoute()}/${id}`,
+            {method: 'get'}
+        );
+    };
+
+    getJobs = async (page = 0, perPage = PER_PAGE_DEFAULT) => {
+        return this.doFetch(
+            `${this.getJobsRoute()}${buildQueryString({page, per_page: perPage})}`,
+            {method: 'get'}
+        );
+    };
+
+    getJobsByType = async (type, page = 0, perPage = PER_PAGE_DEFAULT) => {
+        return this.doFetch(
+            `${this.getJobsRoute()}/type/${type}${buildQueryString({page, per_page: perPage})}`,
+            {method: 'get'}
+        );
+    };
+
+    createJob = async (job) => {
+        return this.doFetch(
+            `${this.getJobsRoute()}`,
+            {method: 'post', body: JSON.stringify(job)}
+        );
+    };
+
+    cancelJob = async (id) => {
+        return this.doFetch(
+            `${this.getJobsRoute()}/${id}/cancel`,
+            {method: 'post'}
+        );
     };
 
     // Admin Routes
