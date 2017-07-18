@@ -232,6 +232,15 @@ export function testElasticsearch(config) {
     );
 }
 
+export function purgeElasticsearchIndexes() {
+    return bindClientFunc(
+        Client4.purgeElasticsearchIndexes,
+        AdminTypes.PURGE_ELASTICSEARCH_INDEXES_REQUEST,
+        AdminTypes.PURGE_ELASTICSEARCH_INDEXES_SUCCESS,
+        AdminTypes.PURGE_ELASTICSEARCH_INDEXES_FAILURE,
+    );
+}
+
 export function uploadLicense(fileData) {
     return bindClientFunc(
         Client4.uploadLicense,

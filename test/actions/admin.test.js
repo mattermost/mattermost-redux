@@ -486,6 +486,20 @@ describe('Actions.Admin', () => {
         }
     });
 
+    it('purgeElasticsearchIndexes', async () => {
+        nock(Client4.getBaseRoute()).
+            post('/elasticsearch/purge_indexes').
+            reply(200, OK_RESPONSE);
+
+        await Actions.purgeElasticsearchIndexes()(store.dispatch, store.getState);
+
+        const state = store.getState();
+        const request = state.requests.admin.purgeElasticsearchIndexes;
+        if (request.status === RequestStatus.FAILURE) {
+            throw new Error('purgeElasticsearchIndexes request failed err=' + request.error);
+        }
+    });
+
     it('uploadLicense', async () => {
         const testFileData = fs.createReadStream('test/assets/images/test.png');
 

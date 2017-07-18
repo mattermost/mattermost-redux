@@ -226,6 +226,16 @@ function testElasticsearch(state = initialRequestState(), action) {
     );
 }
 
+function purgeElasticsearchIndexes(state = initialRequestState(), action) {
+    return handleRequest(
+        AdminTypes.PURGE_ELASTICSEARCH_INDEXES_REQUEST,
+        AdminTypes.PURGE_ELASTICSEARCH_INDEXES_SUCCESS,
+        AdminTypes.PURGE_ELASTICSEARCH_INDEXES_FAILURE,
+        state,
+        action
+    );
+}
+
 function uploadLicense(state = initialRequestState(), action) {
     return handleRequest(
         AdminTypes.UPLOAD_LICENSE_REQUEST,
@@ -279,6 +289,7 @@ export default combineReducers({
     removePrivateSamlCertificate,
     removeIdpSamlCertificate,
     testElasticsearch,
+    purgeElasticsearchIndexes,
     uploadLicense,
     removeLicense,
     getAnalytics

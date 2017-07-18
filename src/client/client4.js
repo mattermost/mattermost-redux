@@ -1841,6 +1841,13 @@ export default class Client4 {
         );
     };
 
+    purgeElasticsearchIndexes = async () => {
+        return this.doFetch(
+            `${this.getBaseRoute()}/elasticsearch/purge_indexes`,
+            {method: 'post'}
+        );
+    };
+
     uploadLicense = async (fileData) => {
         this.trackEvent('api', 'api_license_upload');
 
