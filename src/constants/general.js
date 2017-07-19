@@ -61,5 +61,11 @@ export default {
         SHOW_USERNAME: 'username',
         SHOW_NICKNAME_FULLNAME: 'nickname_full_name',
         SHOW_FULLNAME: 'full_name'
-    }
+    },
+
+    SPECIAL_MENTIONS: [
+        'all',
+        'channel',
+        'here'
+    ]
 };

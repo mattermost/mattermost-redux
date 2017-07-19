@@ -4,7 +4,7 @@
 import {batchActions} from 'redux-batched-actions';
 
 import {Client4} from 'client';
-import {Preferences, Posts} from 'constants';
+import {General, Preferences, Posts} from 'constants';
 import {PostTypes, FileTypes} from 'action_types';
 import {getUsersByUsername} from 'selectors/entities/users';
 
@@ -58,7 +58,7 @@ export function createPost(post, files = []) {
             },
             meta: {
                 offline: {
-                    effect: () => Client4.createPost(newPost),
+                    effect: () => Client4.createPost({...newPost, create_at: 0}),
                     commit: (success, payload) => {
                         // Use RECEIVED_POSTS to clear pending posts
                         const actions = [{
@@ -330,7 +330,7 @@ export function getPostThread(postId) {
         let posts;
         try {
             posts = await Client4.getPostThread(postId);
-            getProfilesAndStatusesForPosts(posts, dispatch, getState);
+            getProfilesAndStatusesForPosts(posts.posts, dispatch, getState);
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch);
             dispatch(batchActions([
@@ -364,7 +364,7 @@ export function getPosts(channelId, page = 0, perPage = Posts.POST_CHUNK_SIZE) {
 
         try {
             posts = await Client4.getPosts(channelId, page, perPage);
-            getProfilesAndStatusesForPosts(posts, dispatch, getState);
+            getProfilesAndStatusesForPosts(posts.posts, dispatch, getState);
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch);
             dispatch(batchActions([
@@ -396,7 +396,7 @@ export function getPostsSince(channelId, since) {
         let posts;
         try {
             posts = await Client4.getPostsSince(channelId, since);
-            getProfilesAndStatusesForPosts(posts, dispatch, getState);
+            getProfilesAndStatusesForPosts(posts.posts, dispatch, getState);
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch);
             dispatch(batchActions([
@@ -428,7 +428,7 @@ export function getPostsBefore(channelId, postId, page = 0, perPage = Posts.POST
         let posts;
         try {
             posts = await Client4.getPostsBefore(channelId, postId, page, perPage);
-            getProfilesAndStatusesForPosts(posts, dispatch, getState);
+            getProfilesAndStatusesForPosts(posts.posts, dispatch, getState);
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch);
             dispatch(batchActions([
@@ -460,7 +460,7 @@ export function getPostsAfter(channelId, postId, page = 0, perPage = Posts.POST_
         let posts;
         try {
             posts = await Client4.getPostsAfter(channelId, postId, page, perPage);
-            getProfilesAndStatusesForPosts(posts, dispatch, getState);
+            getProfilesAndStatusesForPosts(posts.posts, dispatch, getState);
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch);
             dispatch(batchActions([
@@ -485,10 +485,15 @@ export function getPostsAfter(channelId, postId, page = 0, perPage = Posts.POST_
     };
 }
 
-export async function getProfilesAndStatusesForPosts(list, dispatch, getState) {
+// Note that getProfilesAndStatusesForPosts can take either an array of posts or a map of ids to posts
+export async function getProfilesAndStatusesForPosts(posts, dispatch, getState) {
+    if (!posts) {
+        // Some API methods return null for no results
+        return Promise.resolve();
+    }
+
     const state = getState();
     const {currentUserId, profiles, statuses} = state.entities.users;
-    const posts = list.posts;
 
     const userIdsToLoad = new Set();
     const statusesToLoad = new Set();
@@ -548,6 +553,10 @@ export function getNeededAtMentionedUsernames(state, posts) {
         while ((match = pattern.exec(post.message)) !== null) {
             // match[1] is the matched mention including trailing punctuation
             // match[2] is the matched mention without trailing punctuation
+            if (General.SPECIAL_MENTIONS.indexOf(match[2]) !== -1) {
+                continue;
+            }
+
             if (usersByUsername[match[1]] || usersByUsername[match[2]]) {
                 // We have the user, go to the next match
                 continue;
