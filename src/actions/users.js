@@ -1122,6 +1122,79 @@ export function switchLdapToEmail(ldapPassword, email, emailPassword, mfaCode = 
     );
 }
 
+export function createUserAccessToken(userId, description) {
+    return async (dispatch) => {
+        dispatch({type: UserTypes.CREATE_USER_ACCESS_TOKEN_REQUEST});
+
+        let data;
+        try {
+            data = await Client4.createUserAccessToken(userId, description);
+        } catch (error) {
+            dispatch({type: UserTypes.CREATE_USER_ACCESS_TOKEN_FAILURE, error});
+            return {error};
+        }
+
+        dispatch(batchActions([
+            {
+                type: UserTypes.CREATE_USER_ACCESS_TOKEN_SUCCESS
+            },
+            {
+                type: UserTypes.RECEIVED_USER_ACCESS_TOKEN,
+                data: {...data, token: ''}
+            }
+        ]));
+
+        return {data};
+    };
+}
+
+export function getUserAccessToken(tokenId) {
+    return bindClientFunc(
+        Client4.getUserAccessToken,
+        UserTypes.GET_USER_ACCESS_TOKEN_REQUEST,
+        [UserTypes.GET_USER_ACCESS_TOKEN_SUCCESS, UserTypes.RECEIVED_USER_ACCESS_TOKEN],
+        UserTypes.GET_USER_ACCESS_TOKEN_FAILURE,
+        tokenId
+    );
+}
+
+export function getUserAccessTokensForUser(userId, page = 0, perPage = General.PROFILE_CHUNK_SIZE) {
+    return bindClientFunc(
+        Client4.getUserAccessTokensForUser,
+        UserTypes.GET_USER_ACCESS_TOKEN_REQUEST,
+        [UserTypes.GET_USER_ACCESS_TOKEN_SUCCESS, UserTypes.RECEIVED_USER_ACCESS_TOKENS],
+        UserTypes.GET_USER_ACCESS_TOKEN_FAILURE,
+        userId,
+        page,
+        perPage
+    );
+}
+
+export function revokeUserAccessToken(tokenId) {
+    return async (dispatch) => {
+        dispatch({type: UserTypes.REVOKE_USER_ACCESS_TOKEN_REQUEST});
+
+        try {
+            await Client4.revokeUserAccessToken(tokenId);
+        } catch (error) {
+            dispatch({type: UserTypes.REVOKE_USER_ACCESS_TOKEN_FAILURE, error});
+            return {error};
+        }
+
+        dispatch(batchActions([
+            {
+                type: UserTypes.REVOKE_USER_ACCESS_TOKEN_SUCCESS
+            },
+            {
+                type: UserTypes.REVOKED_USER_ACCESS_TOKEN,
+                data: tokenId
+            }
+        ]));
+
+        return {data: true};
+    };
+}
+
 export default {
     checkMfa,
     generateMfaSecret,
@@ -1157,5 +1230,9 @@ export default {
     switchEmailToOAuth,
     switchOAuthToEmail,
     switchEmailToLdap,
-    switchLdapToEmail
+    switchLdapToEmail,
+    createUserAccessToken,
+    getUserAccessToken,
+    getUserAccessTokensForUser,
+    revokeUserAccessToken
 };

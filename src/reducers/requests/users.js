@@ -294,6 +294,36 @@ function switchLogin(state = initialRequestState(), action) {
     );
 }
 
+function createUserAccessToken(state = initialRequestState(), action) {
+    return handleRequest(
+        UserTypes.CREATE_USER_ACCESS_TOKEN_REQUEST,
+        UserTypes.CREATE_USER_ACCESS_TOKEN_SUCCESS,
+        UserTypes.CREATE_USER_ACCESS_TOKEN_FAILURE,
+        state,
+        action
+    );
+}
+
+function getUserAccessToken(state = initialRequestState(), action) {
+    return handleRequest(
+        UserTypes.GET_USER_ACCESS_TOKEN_REQUEST,
+        UserTypes.GET_USER_ACCESS_TOKEN_SUCCESS,
+        UserTypes.GET_USER_ACCESS_TOKEN_FAILURE,
+        state,
+        action
+    );
+}
+
+function revokeUserAccessToken(state = initialRequestState(), action) {
+    return handleRequest(
+        UserTypes.REVOKE_USER_ACCESS_TOKEN_REQUEST,
+        UserTypes.REVOKE_USER_ACCESS_TOKEN_SUCCESS,
+        UserTypes.REVOKE_USER_ACCESS_TOKEN_FAILURE,
+        state,
+        action
+    );
+}
+
 export default combineReducers({
     checkMfa,
     generateMfaSecret,
@@ -320,5 +350,8 @@ export default combineReducers({
     updateUser,
     verifyEmail,
     passwordReset,
-    switchLogin
+    switchLogin,
+    createUserAccessToken,
+    getUserAccessToken,
+    revokeUserAccessToken
 });
