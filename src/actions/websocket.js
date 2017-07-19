@@ -18,7 +18,8 @@ import {
 } from './channels';
 import {
     getPosts,
-    getPostsSince
+    getPostsSince,
+    getProfilesAndStatusesForPosts
 } from './posts';
 
 import {
@@ -236,11 +237,11 @@ async function handleNewPostEvent(msg, dispatch, getState) {
     const userId = post.user_id;
     const status = users.statuses[userId];
 
-    if (!users.profiles[userId] && userId !== users.currentUserId) {
-        getProfilesByIds([userId])(dispatch, getState);
-    }
+    getProfilesAndStatusesForPosts([post], dispatch, getState);
 
-    if (status !== General.ONLINE) {
+    // getProfilesAndStatusesForPosts only gets the status if it doesn't exist, but we also want it if
+    // the user does not appear to be online
+    if (status && status !== General.ONLINE) {
         getStatusesByIds([userId])(dispatch, getState);
     }
 

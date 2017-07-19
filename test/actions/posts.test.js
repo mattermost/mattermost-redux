@@ -429,6 +429,19 @@ describe('Actions.Posts', () => {
             }),
             new Set(['bbb', 'ccc'])
         );
+
+        assert.deepEqual(
+            Actions.getNeededAtMentionedUsernames(state, {
+                abcd: {message: '@all'},
+                abcd1: {message: '@here'},
+                abcd2: {message: '@channel'},
+                abcd3: {message: '@all.'},
+                abcd4: {message: '@here.'},
+                abcd5: {message: '@channel.'}
+            }),
+            new Set(),
+            'should never try to request usernames matching special mentions'
+        );
     });
 
     it('getPostsSince', async () => {
