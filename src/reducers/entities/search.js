@@ -4,28 +4,10 @@
 import {combineReducers} from 'redux';
 import {SearchTypes, UserTypes} from 'action_types';
 
-function handleReceivedSearch(data) {
-    const newPosts = data.posts;
-    const postsForSearch = Object.values(newPosts);
-
-    // Sort to ensure that the most recent posts are first
-    postsForSearch.sort((a, b) => {
-        if (a.create_at > b.create_at) {
-            return -1;
-        } else if (a.create_at < b.create_at) {
-            return 1;
-        }
-
-        return 0;
-    });
-
-    return postsForSearch.map((post) => post.id);
-}
-
 function results(state = [], action) {
     switch (action.type) {
     case SearchTypes.RECEIVED_SEARCH_POSTS: {
-        return handleReceivedSearch(action.data);
+        return action.data.order;
     }
     case SearchTypes.REMOVE_SEARCH_POSTS:
     case UserTypes.LOGOUT_SUCCESS:
@@ -42,7 +24,7 @@ function recent(state = {}, action) {
     switch (type) {
     case SearchTypes.RECEIVED_SEARCH_TERM: {
         const team = {
-            ...nextState[data.teamId] || {},
+            ...(nextState[data.teamId] || {}),
             [data.terms]: data.isOrSearch
         };
 
@@ -52,7 +34,7 @@ function recent(state = {}, action) {
         };
     }
     case SearchTypes.REMOVE_SEARCH_TERM: {
-        const team = {...nextState[data.teamId]} || {};
+        const team = {...(nextState[data.teamId] || {})};
         const key = data.terms;
 
         if (team.hasOwnProperty(key)) {

@@ -95,25 +95,23 @@ function handlePostsFromSearch(posts = {}, postsInChannel = {}, action) {
     let info = {posts, postsInChannel};
     const postsForChannel = new Map();
 
-    for (const id in newPosts) {
-        if (newPosts.hasOwnProperty(id)) {
-            const nextPost = newPosts[id];
-            if (nextPost) {
-                const channelId = nextPost.channel_id;
-                if (postsForChannel.has(channelId)) {
-                    postsForChannel.set(channelId,
-                        {...postsForChannel.get(channelId), [id]: nextPost}
-                    );
-                } else {
-                    postsForChannel.set(channelId, {[id]: nextPost});
-                }
+    const postIds = Object.keys(newPosts);
+    for (const id of postIds) {
+        const nextPost = newPosts[id];
+        if (nextPost) {
+            const channelId = nextPost.channel_id;
+            if (postsForChannel.has(channelId)) {
+                postsForChannel.set(channelId,
+                    postsForChannel.get(channelId)[id] = nextPost
+                );
+            } else {
+                postsForChannel.set(channelId, {[id]: nextPost});
             }
         }
     }
 
     postsForChannel.forEach((postList, channelId) => {
-        const result = handleReceivedPosts(info.posts, postsInChannel, {channelId, data: {posts: postList}});
-        info = {...info, ...result};
+        info = handleReceivedPosts(info.posts, postsInChannel, {channelId, data: {posts: postList}});
     });
 
     return info;
