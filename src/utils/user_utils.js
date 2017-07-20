@@ -49,6 +49,18 @@ export function isChannelAdmin(roles) {
     return roles.includes(General.CHANNEL_ADMIN_ROLE);
 }
 
+export function hasUserAccessTokenRole(roles) {
+    return roles.includes(General.SYSTEM_USER_ACCESS_TOKEN_ROLE);
+}
+
+export function hasPostAllRole(roles) {
+    return roles.includes(General.SYSTEM_POST_ALL_ROLE);
+}
+
+export function hasPostAllPublicRole(roles) {
+    return roles.includes(General.SYSTEM_POST_ALL_PUBLIC_ROLE);
+}
+
 export function profileListToMap(profileList) {
     const profiles = {};
     for (let i = 0; i < profileList.length; i++) {
