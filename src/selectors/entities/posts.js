@@ -142,7 +142,7 @@ export function makeGetPostsInChannel() {
         getCurrentUser,
         getMyPreferences,
         (allPosts, postIds, currentUser, myPreferences) => {
-            if (postIds == null) {
+            if (!postIds) {
                 return null;
             }
 
@@ -172,7 +172,7 @@ export function makeGetPostsAroundPost() {
         getCurrentUser,
         getMyPreferences,
         (allPosts, postIds, focusedPostId, currentUser, myPreferences) => {
-            if (postIds == null) {
+            if (!postIds) {
                 return null;
             }
 
@@ -253,3 +253,11 @@ export function makeGetCommentCountForPost() {
       }
     );
 }
+
+export const getSearchResults = createSelector(
+    getAllPosts,
+    (state) => state.entities.search.results,
+    (posts, postIds) => {
+        return postIds.map((id) => posts[id]);
+    }
+);

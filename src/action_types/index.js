@@ -14,6 +14,7 @@ import EmojiTypes from './emojis';
 import AdminTypes from './admin';
 import AlertTypes from './alerts';
 import JobTypes from './jobs';
+import SearchTypes from './search';
 
 export {
     ErrorTypes,
@@ -28,5 +29,6 @@ export {
     EmojiTypes,
     AdminTypes,
     AlertTypes,
-    JobTypes
+    JobTypes,
+    SearchTypes
 };
