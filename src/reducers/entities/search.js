@@ -21,30 +21,37 @@ function results(state = [], action) {
 function recent(state = {}, action) {
     const nextState = {...state};
     const {data, type} = action;
+
     switch (type) {
     case SearchTypes.RECEIVED_SEARCH_TERM: {
-        const team = {
-            ...(nextState[data.teamId] || {}),
-            [data.terms]: data.isOrSearch
-        };
-
+        const {teamId, terms, isOrSearch} = data;
+        const team = [...(nextState[teamId] || [])];
+        const index = team.findIndex((r) => r.terms === terms);
+        if (index === -1) {
+            team.push({terms, isOrSearch});
+        } else {
+            team[index] = {terms, isOrSearch};
+        }
         return {
             ...nextState,
-            [data.teamId]: team
+            [teamId]: team
         };
     }
     case SearchTypes.REMOVE_SEARCH_TERM: {
-        const team = {...(nextState[data.teamId] || {})};
-        const key = data.terms;
+        const {teamId, terms} = data;
+        const team = [...(nextState[teamId] || [])];
+        const index = team.findIndex((r) => r.terms === terms);
 
-        if (team.hasOwnProperty(key)) {
-            Reflect.deleteProperty(team, key);
+        if (index !== -1) {
+            team.splice(index, 1);
+
+            return {
+                ...nextState,
+                [teamId]: team
+            };
         }
 
-        return {
-            ...nextState,
-            [data.teamId]: team
-        };
+        return nextState;
     }
     case UserTypes.LOGOUT_SUCCESS:
         return {};

@@ -98,15 +98,11 @@ function handlePostsFromSearch(posts = {}, postsInChannel = {}, action) {
     const postIds = Object.keys(newPosts);
     for (const id of postIds) {
         const nextPost = newPosts[id];
-        if (nextPost) {
-            const channelId = nextPost.channel_id;
-            if (postsForChannel.has(channelId)) {
-                postsForChannel.set(channelId,
-                    postsForChannel.get(channelId)[id] = nextPost
-                );
-            } else {
-                postsForChannel.set(channelId, {[id]: nextPost});
-            }
+        const channelId = nextPost.channel_id;
+        if (postsForChannel.has(channelId)) {
+            postsForChannel.get(channelId)[id] = nextPost;
+        } else {
+            postsForChannel.set(channelId, {[id]: nextPost});
         }
     }
 

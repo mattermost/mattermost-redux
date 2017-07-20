@@ -10,7 +10,7 @@ import {forceLogoutIfNecessary} from './helpers';
 import {logError} from './errors';
 import {getProfilesAndStatusesForPosts} from './posts';
 
-export function searchPosts(teamId, terms, isOrSearch = 'false') {
+export function searchPosts(teamId, terms, isOrSearch = false) {
     return async (dispatch, getState) => {
         dispatch({type: SearchTypes.SEARCH_POSTS_REQUEST}, getState);
 
