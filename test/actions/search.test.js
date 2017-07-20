@@ -44,7 +44,8 @@ describe('Actions.Search', () => {
         let {recent, results} = state.entities.search;
         const {posts} = state.entities.posts;
         assert.ok(recent[TestHelper.basicTeam.id]);
-        assert.ok(recent[TestHelper.basicTeam.id][search1]);
+        let searchIsPresent = recent[TestHelper.basicTeam.id].findIndex((r) => r.terms === search1);
+        assert.ok(searchIsPresent !== -1);
         assert.equal(Object.keys(recent[TestHelper.basicTeam.id]).length, 1);
         assert.equal(results.length, 1);
         assert.ok(posts[results[0]]);
@@ -59,7 +60,8 @@ describe('Actions.Search', () => {
         state = getState();
         recent = state.entities.search.recent;
         results = state.entities.search.results;
-        assert.ok(recent[TestHelper.basicTeam.id][search2]);
+        searchIsPresent = recent[TestHelper.basicTeam.id].findIndex((r) => r.terms === search1);
+        assert.ok(searchIsPresent !== -1);
         assert.equal(Object.keys(recent[TestHelper.basicTeam.id]).length, 2);
         assert.equal(results.length, 3);
 
@@ -68,7 +70,8 @@ describe('Actions.Search', () => {
         state = getState();
         recent = state.entities.search.recent;
         results = state.entities.search.results;
-        assert.ok(recent[TestHelper.basicTeam.id][search2]);
+        searchIsPresent = recent[TestHelper.basicTeam.id].findIndex((r) => r.terms === search1);
+        assert.ok(searchIsPresent !== -1);
         assert.equal(Object.keys(recent[TestHelper.basicTeam.id]).length, 2);
         assert.equal(results.length, 0);
 
@@ -77,8 +80,10 @@ describe('Actions.Search', () => {
         state = getState();
         recent = state.entities.search.recent;
         results = state.entities.search.results;
-        assert.ok(recent[TestHelper.basicTeam.id][search1]);
-        assert.ifError(recent[TestHelper.basicTeam.id][search2]);
+        searchIsPresent = recent[TestHelper.basicTeam.id].findIndex((r) => r.terms === search1);
+        assert.ok(searchIsPresent !== -1);
+        searchIsPresent = recent[TestHelper.basicTeam.id].findIndex((r) => r.terms === search2);
+        assert.ok(searchIsPresent === -1);
         assert.equal(Object.keys(recent[TestHelper.basicTeam.id]).length, 1);
         assert.equal(results.length, 0);
     });
