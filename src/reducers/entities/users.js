@@ -295,13 +295,13 @@ function statuses(state = {}, action) {
 
 function myUserAccessTokens(state = {}, action) {
     switch (action.type) {
-    case UserTypes.RECEIVED_USER_ACCESS_TOKEN: {
+    case UserTypes.RECEIVED_MY_USER_ACCESS_TOKEN: {
         const nextState = {...state};
         nextState[action.data.id] = action.data;
 
         return nextState;
     }
-    case UserTypes.RECEIVED_USER_ACCESS_TOKENS: {
+    case UserTypes.RECEIVED_MY_USER_ACCESS_TOKENS: {
         const nextState = {...state};
 
         for (const uat of action.data) {
