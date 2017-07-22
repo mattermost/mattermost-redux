@@ -21,6 +21,6 @@ export const offlineConfig = {
             return retries === action.meta.offline.maxRetry;
         }
 
-        return retries < 10;
+        return retries > 10;
     }
 };
