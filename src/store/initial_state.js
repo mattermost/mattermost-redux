@@ -59,6 +59,7 @@ const state = {
         integrations: {
             incomingHooks: {},
             outgoingHooks: {},
+            oauthApps: {},
             commands: {}
         },
         files: {
