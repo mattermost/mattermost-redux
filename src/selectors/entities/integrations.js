@@ -12,3 +12,7 @@ export function getOutgoingHooks(state) {
 export function getCommands(state) {
     return state.entities.integrations.commands;
 }
+
+export function getOAuthApps(state) {
+    return state.entities.integrations.oauthApps;
+}
