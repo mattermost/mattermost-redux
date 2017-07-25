@@ -122,7 +122,11 @@ describe('Actions.Channels', () => {
         await login(TestHelper.basicUser.email, 'password1')(store.dispatch, store.getState);
 
         await getProfilesByIds([user.id, user2.id])(store.dispatch, store.getState);
-        const created = await Actions.createGroupChannel([TestHelper.basicUser.id, user.id, user2.id])(store.dispatch, store.getState);
+        const result = await Actions.createGroupChannel([TestHelper.basicUser.id, user.id, user2.id])(store.dispatch, store.getState);
+        const created = result.data;
+
+        assert.ok(!result.error, 'error was returned');
+        assert.ok(created, 'channel was not returned');
 
         const createRequest = store.getState().requests.channels.createChannel;
         if (createRequest.status === RequestStatus.FAILURE) {
@@ -134,10 +138,9 @@ describe('Actions.Channels', () => {
         const preferences = state.entities.preferences.myPreferences;
 
         assert.ok(channels, 'channels is empty');
-        assert.ok(channels[created.id]);
-        assert.ok(channels[created.id]);
+        assert.ok(channels[created.id], 'channel does not exist');
         assert.ok(myMembers, 'members is empty');
-        assert.ok(myMembers[created.id]);
+        assert.ok(myMembers[created.id], 'member does not exist');
         assert.ok(Object.keys(preferences).length, 'preferences is empty');
     });
 
