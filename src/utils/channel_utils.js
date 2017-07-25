@@ -261,6 +261,22 @@ export function getChannelsIdForTeam(state, teamId) {
     }, []);
 }
 
+export function getGroupDisplayNameFromUserIds(userIds, profiles, currentUserId, teammateNameDisplay) {
+    const names = [];
+    userIds.forEach((id) => {
+        if (id !== currentUserId) {
+            names.push(displayUsername(profiles[id], teammateNameDisplay));
+        }
+    });
+
+    function sortUsernames(a, b) {
+        const locale = profiles[currentUserId].locale;
+        return a.localeCompare(b, locale, {numeric: true});
+    }
+
+    return names.sort(sortUsernames).join(', ');
+}
+
 //====================================================
 
 function createFakeChannel(userId, otherUserId) {
@@ -281,32 +297,20 @@ function createMissingDirectChannels(currentUserId, allChannels, myPreferences) 
     const directChannelsDisplayPreferences = getPreferencesByCategory(myPreferences, Preferences.CATEGORY_DIRECT_CHANNEL_SHOW);
 
     return Array.
-    from(directChannelsDisplayPreferences).
-    filter((entry) => entry[1] === 'true').
-    map((entry) => entry[0]).
-    filter((teammateId) => !allChannels.some(isDirectChannelForUser.bind(null, currentUserId, teammateId))).
-    map(createFakeChannelCurried(currentUserId));
+        from(directChannelsDisplayPreferences).
+        filter((entry) => entry[1] === 'true').
+        map((entry) => entry[0]).
+        filter((teammateId) => !allChannels.some(isDirectChannelForUser.bind(null, currentUserId, teammateId))).
+        map(createFakeChannelCurried(currentUserId));
 }
 
 function completeDirectGroupInfo(usersState, teammateNameDisplay, channel) {
     const {currentUserId, profiles, profilesInChannel} = usersState;
     const profilesIds = profilesInChannel[channel.id];
     if (profilesIds) {
-        function sortUsernames(a, b) {
-            const locale = profiles[currentUserId].locale;
-            return a.localeCompare(b, locale, {numeric: true});
-        }
-
-        const displayName = [];
-        profilesIds.forEach((teammateId) => {
-            if (teammateId !== currentUserId) {
-                displayName.push(displayUsername(usersState.profiles[teammateId], teammateNameDisplay));
-            }
-        });
-
         const gm = {...channel};
         return Object.assign(gm, {
-            display_name: displayName.sort(sortUsernames).join(', ')
+            display_name: getGroupDisplayNameFromUserIds(profilesIds, profiles, currentUserId, teammateNameDisplay)
         });
     }
     return channel;

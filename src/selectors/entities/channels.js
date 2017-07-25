@@ -44,6 +44,22 @@ export function getChannelMembersInChannels(state) {
     return state.entities.channels.membersInChannel;
 }
 
+export function makeGetChannel() {
+    return createSelector(
+        getAllChannels,
+        (state, props) => props.id,
+        (state) => state.entities.users,
+        getTeammateNameDisplaySetting,
+        (allChannels, channelId, users, teammateNameDisplay) => {
+            const channel = allChannels[channelId];
+            if (channel) {
+                return completeDirectChannelInfo(users, teammateNameDisplay, channel);
+            }
+            return channel;
+        }
+    );
+}
+
 export const getChannel = createSelector(
     getAllChannels,
     (state, id) => id,
