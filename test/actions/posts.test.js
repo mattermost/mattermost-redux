@@ -320,6 +320,46 @@ describe('Actions.Posts', () => {
         assert.ok(found, 'failed to find post in postsInChannel');
     });
 
+    it('getPostThreadWithRetry', async () => {
+        const channelId = TestHelper.basicChannel.id;
+
+        const post = await Client4.createPost(
+            TestHelper.fakePost(channelId)
+        );
+
+        TestHelper.activateMocking();
+        nock(Client4.getBaseRoute()).post('/posts').reply(400);
+
+        await Actions.getPostThreadWithRetry(post.id)(store.dispatch, store.getState);
+
+        nock.restore();
+
+        await TestHelper.wait(300);
+
+        const state = store.getState();
+        const getRequest = state.requests.posts.getPostThread;
+        const {posts, postsInChannel} = state.entities.posts;
+
+        if (getRequest.status === RequestStatus.FAILURE) {
+            throw new Error(JSON.stringify(getRequest.error));
+        }
+
+        assert.ok(posts);
+        assert.ok(postsInChannel);
+        assert.ok(postsInChannel[channelId]);
+
+        assert.ok(posts[post.id]);
+
+        let found = false;
+        for (const postIdInChannel of postsInChannel[channelId]) {
+            if (postIdInChannel === post.id) {
+                found = true;
+                break;
+            }
+        }
+        assert.ok(found, 'failed to find post in postsInChannel');
+    });
+
     it('getPosts', async () => {
         const channelId = TestHelper.basicChannel.id;
 
@@ -342,6 +382,60 @@ describe('Actions.Posts', () => {
         await Actions.getPosts(
             channelId
         )(store.dispatch, store.getState);
+
+        const state = store.getState();
+        const getRequest = state.requests.posts.getPosts;
+        const {posts, postsInChannel} = state.entities.posts;
+
+        if (getRequest.status === RequestStatus.FAILURE) {
+            throw new Error(JSON.stringify(getRequest.error));
+        }
+
+        assert.ok(posts);
+        assert.ok(postsInChannel);
+
+        const postsForChannel = postsInChannel[channelId];
+        assert.ok(postsForChannel);
+        assert.equal(postsForChannel[0], post3a.id, 'wrong order for post3a');
+        assert.equal(postsForChannel[1], post3.id, 'wrong order for post3');
+        assert.equal(postsForChannel[3], post1a.id, 'wrong order for post1a');
+
+        assert.ok(posts[post1.id]);
+        assert.ok(posts[post1a.id]);
+        assert.ok(posts[post2.id]);
+        assert.ok(posts[post3.id]);
+        assert.ok(posts[post3a.id]);
+    });
+
+    it('getPostsWithRetry', async () => {
+        const channelId = TestHelper.basicChannel.id;
+
+        const post1 = await Client4.createPost(
+            TestHelper.fakePost(channelId)
+        );
+        const post1a = await Client4.createPost(
+            {...TestHelper.fakePost(channelId), root_id: post1.id}
+        );
+        const post2 = await Client4.createPost(
+            TestHelper.fakePost(channelId)
+        );
+        const post3 = await Client4.createPost(
+            TestHelper.fakePost(channelId)
+        );
+        const post3a = await Client4.createPost(
+            {...TestHelper.fakePost(channelId), root_id: post3.id}
+        );
+
+        TestHelper.activateMocking();
+        nock(Client4.getBaseRoute()).post('/posts').reply(400);
+
+        Actions.getPostsWithRetry(
+            channelId
+        )(store.dispatch, store.getState);
+
+        nock.restore();
+
+        await TestHelper.wait(300); // wait for retry action to complete after 200ms
 
         const state = store.getState();
         const getRequest = state.requests.posts.getPosts;
@@ -486,6 +580,55 @@ describe('Actions.Posts', () => {
         assert.equal(postsForChannel.length, 2, 'wrong size');
     });
 
+    it('getPostsSinceWithRetry', async () => {
+        const channelId = TestHelper.basicChannel.id;
+
+        const post1 = await Client4.createPost(
+            TestHelper.fakePost(channelId)
+        );
+        await Client4.createPost(
+            {...TestHelper.fakePost(channelId), root_id: post1.id}
+        );
+        const post2 = await Client4.createPost(
+            TestHelper.fakePost(channelId)
+        );
+        const post3 = await Client4.createPost(
+            TestHelper.fakePost(channelId)
+        );
+        const post3a = await Client4.createPost(
+            {...TestHelper.fakePost(channelId), root_id: post3.id}
+        );
+
+        TestHelper.activateMocking();
+        nock(Client4.getBaseRoute()).post('/posts').reply(400);
+
+        Actions.getPostsSinceWithRetry(
+            channelId,
+            post2.create_at
+        )(store.dispatch, store.getState);
+
+        nock.restore();
+
+        await TestHelper.wait(300);
+
+        const state = store.getState();
+        const getRequest = state.requests.posts.getPostsSince;
+        const {posts, postsInChannel} = state.entities.posts;
+
+        if (getRequest.status === RequestStatus.FAILURE) {
+            throw new Error(JSON.stringify(getRequest.error));
+        }
+
+        assert.ok(posts);
+        assert.ok(postsInChannel);
+
+        const postsForChannel = postsInChannel[channelId];
+        assert.ok(postsForChannel);
+        assert.equal(postsForChannel[0], post3a.id, 'wrong order for post3a');
+        assert.equal(postsForChannel[1], post3.id, 'wrong order for post3');
+        assert.equal(postsForChannel.length, 2, 'wrong size');
+    });
+
     it('getPostsBefore', async () => {
         const channelId = TestHelper.basicChannel.id;
 
@@ -530,6 +673,57 @@ describe('Actions.Posts', () => {
         assert.equal(postsForChannel.length, 10, 'wrong size');
     });
 
+    it('getPostsBeforeWithRetry', async () => {
+        const channelId = TestHelper.basicChannel.id;
+
+        const post1 = await Client4.createPost(
+            TestHelper.fakePost(channelId)
+        );
+        const post1a = await Client4.createPost(
+            {...TestHelper.fakePost(channelId), root_id: post1.id}
+        );
+        const post2 = await Client4.createPost(
+            TestHelper.fakePost(channelId)
+        );
+        const post3 = await Client4.createPost(
+            TestHelper.fakePost(channelId)
+        );
+        await Client4.createPost(
+            {...TestHelper.fakePost(channelId), root_id: post3.id}
+        );
+
+        TestHelper.activateMocking();
+        nock(Client4.getBaseRoute()).post('/posts').reply(400);
+
+        Actions.getPostsBeforeWithRetry(
+            channelId,
+            post2.id,
+            0,
+            10
+        )(store.dispatch, store.getState);
+
+        nock.restore();
+
+        await TestHelper.wait(300);
+
+        const state = store.getState();
+        const getRequest = state.requests.posts.getPostsBefore;
+        const {posts, postsInChannel} = state.entities.posts;
+
+        if (getRequest.status === RequestStatus.FAILURE) {
+            throw new Error(JSON.stringify(getRequest.error));
+        }
+
+        assert.ok(posts);
+        assert.ok(postsInChannel);
+
+        const postsForChannel = postsInChannel[channelId];
+        assert.ok(postsForChannel);
+        assert.equal(postsForChannel[0], post1a.id, 'wrong order for post1a');
+        assert.equal(postsForChannel[1], post1.id, 'wrong order for post1');
+        assert.equal(postsForChannel.length, 10, 'wrong size');
+    });
+
     it('getPostsAfter', async () => {
         const channelId = TestHelper.basicChannel.id;
 
@@ -555,6 +749,57 @@ describe('Actions.Posts', () => {
             0,
             10
         )(store.dispatch, store.getState);
+
+        const state = store.getState();
+        const getRequest = state.requests.posts.getPostsAfter;
+        const {posts, postsInChannel} = state.entities.posts;
+
+        if (getRequest.status === RequestStatus.FAILURE) {
+            throw new Error(JSON.stringify(getRequest.error));
+        }
+
+        assert.ok(posts);
+        assert.ok(postsInChannel);
+
+        const postsForChannel = postsInChannel[channelId];
+        assert.ok(postsForChannel);
+        assert.equal(postsForChannel[0], post3a.id, 'wrong order for post3a');
+        assert.equal(postsForChannel[1], post3.id, 'wrong order for post3');
+        assert.equal(postsForChannel.length, 2, 'wrong size');
+    });
+
+    it('getPostsAfterWithRetry', async () => {
+        const channelId = TestHelper.basicChannel.id;
+
+        const post1 = await Client4.createPost(
+            TestHelper.fakePost(channelId)
+        );
+        await Client4.createPost(
+            {...TestHelper.fakePost(channelId), root_id: post1.id}
+        );
+        const post2 = await Client4.createPost(
+            TestHelper.fakePost(channelId)
+        );
+        const post3 = await Client4.createPost(
+            TestHelper.fakePost(channelId)
+        );
+        const post3a = await Client4.createPost(
+            {...TestHelper.fakePost(channelId), root_id: post3.id}
+        );
+
+        TestHelper.activateMocking();
+        nock(Client4.getBaseRoute()).post('/posts').reply(400);
+
+        Actions.getPostsAfterWithRetry(
+            channelId,
+            post2.id,
+            0,
+            10
+        )(store.dispatch, store.getState);
+
+        nock.restore();
+
+        await TestHelper.wait(300);
 
         const state = store.getState();
         const getRequest = state.requests.posts.getPostsAfter;
