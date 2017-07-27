@@ -159,7 +159,7 @@ export function createGroupChannel(userIds) {
                 {type: ChannelTypes.CREATE_CHANNEL_FAILURE, error},
                 logError(error)(dispatch)
             ]), getState);
-            return null;
+            return {error};
         }
 
         const member = {
@@ -195,7 +195,7 @@ export function createGroupChannel(userIds) {
             }
         ]), getState);
 
-        return created;
+        return {data: created};
     };
 }
 

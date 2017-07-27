@@ -67,5 +67,8 @@ export default {
         'all',
         'channel',
         'here'
-    ]
+    ],
+
+    MAX_USERS_IN_GM: 8,
+    MIN_USERS_IN_GM: 3
 };
