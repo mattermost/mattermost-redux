@@ -220,11 +220,13 @@ export function makeGetPostsForThread() {
         (posts, postIds, {rootId}) => {
             const thread = [];
 
-            for (const id of postIds) {
-                const post = posts[id];
+            if (postIds) {
+                for (const id of postIds) {
+                    const post = posts[id];
 
-                if (id === rootId || post.root_id === rootId) {
-                    thread.push(post);
+                    if (id === rootId || post.root_id === rootId) {
+                        thread.push(post);
+                    }
                 }
             }
 
