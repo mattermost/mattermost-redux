@@ -50,6 +50,7 @@ function getPostThreadWithRetryAttempt(state = 0, action) {
     switch (action.type) {
     case PostTypes.GET_POST_THREAD_WITH_RETRY_ATTEMPT:
         return state + 1;
+    case PostTypes.GET_POST_THREAD_REQUEST:
     case PostTypes.GET_POST_THREAD_SUCCESS:
         return 0;
     default:
@@ -94,6 +95,7 @@ function getPostsSinceWithRetryAttempt(state = 0, action) {
     case PostTypes.GET_POSTS_SINCE_WITH_RETRY_ATTEMPT:
         return state + 1;
     case PostTypes.GET_POSTS_REQUEST:
+    case PostTypes.GET_POSTS_SINCE_REQUEST:
     case PostTypes.GET_POSTS_SINCE_SUCCESS:
         return 0;
     default:
@@ -116,6 +118,7 @@ function getPostsBeforeWithRetryAttempt(state = 0, action) {
     case PostTypes.GET_POSTS_BEFORE_WITH_RETRY_ATTEMPT:
         return state + 1;
     case PostTypes.GET_POSTS_REQUEST:
+    case PostTypes.GET_POSTS_BEFORE_REQUEST:
     case PostTypes.GET_POSTS_BEFORE_SUCCESS:
         return 0;
     default:
@@ -138,6 +141,7 @@ function getPostsAfterWithRetryAttempt(state = 0, action) {
     case PostTypes.GET_POSTS_AFTER_WITH_RETRY_ATTEMPT:
         return state + 1;
     case PostTypes.GET_POSTS_REQUEST:
+    case PostTypes.GET_POSTS_AFTER_REQUEST:
     case PostTypes.GET_POSTS_AFTER_SUCCESS:
         return 0;
     default:
