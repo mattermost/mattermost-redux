@@ -261,16 +261,16 @@ export function getChannelsIdForTeam(state, teamId) {
     }, []);
 }
 
-export function getGroupDisplayNameFromUserIds(userIds, profiles, currentUserId, teammateNameDisplay) {
+export function getGroupDisplayNameFromUserIds(userIds, profiles, currentUser, teammateNameDisplay) {
     const names = [];
     userIds.forEach((id) => {
-        if (id !== currentUserId) {
+        if (id !== currentUser.id) {
             names.push(displayUsername(profiles[id], teammateNameDisplay));
         }
     });
 
     function sortUsernames(a, b) {
-        const locale = profiles[currentUserId].locale;
+        const locale = currentUser.locale;
         return a.localeCompare(b, locale, {numeric: true});
     }
 
@@ -310,7 +310,7 @@ function completeDirectGroupInfo(usersState, teammateNameDisplay, channel) {
     if (profilesIds) {
         const gm = {...channel};
         return Object.assign(gm, {
-            display_name: getGroupDisplayNameFromUserIds(profilesIds, profiles, currentUserId, teammateNameDisplay)
+            display_name: getGroupDisplayNameFromUserIds(profilesIds, profiles, profiles[currentUserId], teammateNameDisplay)
         });
     }
     return channel;
