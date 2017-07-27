@@ -22,7 +22,7 @@ export function buildDisplayableChannelList(usersState, allChannels, myPreferenc
     const missingDirectChannels = createMissingDirectChannels(usersState.currentUserId, allChannels, myPreferences);
 
     const {currentUserId, profiles} = usersState;
-    const locale = profiles && profiles[currentUserId] ? profiles[currentUserId].locale : 'en';
+    const locale = profiles && profiles[currentUserId] && profiles[currentUserId].locale ? profiles[currentUserId].locale : 'en';
 
     const channels = buildChannels(usersState, allChannels, missingDirectChannels, myPreferences, locale);
     const favoriteChannels = buildFavoriteChannels(channels, myPreferences, locale);
@@ -39,7 +39,7 @@ export function buildDisplayableChannelList(usersState, allChannels, myPreferenc
 
 export function buildDisplayableChannelListWithUnreadSection(usersState, myChannels, myMembers, myPreferences) {
     const {currentUserId, profiles} = usersState;
-    const locale = profiles && profiles[currentUserId] ? profiles[currentUserId].locale : 'en';
+    const locale = profiles && profiles[currentUserId] && profiles[currentUserId].locale ? profiles[currentUserId].locale : 'en';
 
     const missingDirectChannels = createMissingDirectChannels(currentUserId, myChannels, myPreferences);
     const channels = buildChannels(usersState, myChannels, missingDirectChannels, myPreferences, locale);
@@ -293,7 +293,11 @@ function completeDirectGroupInfo(usersState, myPreferences, channel) {
     const profilesIds = profilesInChannel[channel.id];
     if (profilesIds) {
         function sortUsernames(a, b) {
-            const locale = profiles[currentUserId].locale;
+            let locale = 'en';
+            if (profiles[currentUserId] && profiles[currentUserId].locale) {
+                locale = profiles[currentUserId].locale;
+            }
+
             return a.localeCompare(b, locale, {numeric: true});
         }
 
