@@ -357,6 +357,54 @@ export function getPostThread(postId) {
     };
 }
 
+export function getPostThreadWithRetry(postId) {
+    return async (dispatch, getState) => {
+        dispatch({
+            type: PostTypes.GET_POST_THREAD_REQUEST
+        });
+
+        dispatch({
+            type: PostTypes.GET_POST_THREAD_WITH_RETRY_ATTEMPT,
+            data: {},
+            meta: {
+                offline: {
+                    effect: () => Client4.getPostThread(postId),
+                    commit: (success, payload) => {
+                        const {posts} = payload;
+                        const post = posts[postId];
+                        getProfilesAndStatusesForPosts(posts, dispatch, getState);
+
+                        dispatch(batchActions([
+                            {
+                                type: PostTypes.RECEIVED_POSTS,
+                                data: payload,
+                                channelId: post.channel_id
+                            },
+                            {
+                                type: PostTypes.GET_POST_THREAD_SUCCESS
+                            }
+                        ]), getState);
+                    },
+                    maxRetry: 2,
+                    cancel: true,
+                    onRetryScheduled: () => {
+                        dispatch({
+                            type: PostTypes.GET_POST_THREAD_WITH_RETRY_ATTEMPT
+                        });
+                    },
+                    rollback: (success, error) => {
+                        forceLogoutIfNecessary(error, dispatch);
+                        dispatch(batchActions([
+                            {type: PostTypes.GET_POST_THREAD_FAILURE, error},
+                            logError(error)(dispatch)
+                        ]), getState);
+                    }
+                }
+            }
+        });
+    };
+}
+
 export function getPosts(channelId, page = 0, perPage = Posts.POST_CHUNK_SIZE) {
     return async (dispatch, getState) => {
         dispatch({type: PostTypes.GET_POSTS_REQUEST}, getState);
@@ -386,6 +434,53 @@ export function getPosts(channelId, page = 0, perPage = Posts.POST_CHUNK_SIZE) {
         ]), getState);
 
         return posts;
+    };
+}
+
+export function getPostsWithRetry(channelId, page = 0, perPage = Posts.POST_CHUNK_SIZE) {
+    return async (dispatch, getState) => {
+        dispatch({
+            type: PostTypes.GET_POSTS_REQUEST
+        });
+
+        dispatch({
+            type: PostTypes.GET_POSTS_WITH_RETRY_ATTEMPT,
+            data: {},
+            meta: {
+                offline: {
+                    effect: () => Client4.getPosts(channelId, page, perPage),
+                    commit: (success, payload) => {
+                        const {posts} = payload;
+                        getProfilesAndStatusesForPosts(posts, dispatch, getState);
+
+                        dispatch(batchActions([
+                            {
+                                type: PostTypes.RECEIVED_POSTS,
+                                data: payload,
+                                channelId
+                            },
+                            {
+                                type: PostTypes.GET_POSTS_SUCCESS
+                            }
+                        ]), getState);
+                    },
+                    maxRetry: 2,
+                    cancel: true,
+                    onRetryScheduled: () => {
+                        dispatch({
+                            type: PostTypes.GET_POSTS_WITH_RETRY_ATTEMPT
+                        });
+                    },
+                    rollback: (success, error) => {
+                        forceLogoutIfNecessary(error, dispatch);
+                        dispatch(batchActions([
+                            {type: PostTypes.GET_POSTS_FAILURE, error},
+                            logError(error)(dispatch)
+                        ]), getState);
+                    }
+                }
+            }
+        });
     };
 }
 
@@ -421,6 +516,51 @@ export function getPostsSince(channelId, since) {
     };
 }
 
+export function getPostsSinceWithRetry(channelId, since) {
+    return async (dispatch, getState) => {
+        dispatch({type: PostTypes.GET_POSTS_SINCE_REQUEST}, getState);
+
+        dispatch({
+            type: PostTypes.GET_POSTS_SINCE_WITH_RETRY_ATTEMPT,
+            data: {},
+            meta: {
+                offline: {
+                    effect: () => Client4.getPostsSince(channelId, since),
+                    commit: (success, payload) => {
+                        const {posts} = payload;
+                        getProfilesAndStatusesForPosts(posts, dispatch, getState);
+
+                        dispatch(batchActions([
+                            {
+                                type: PostTypes.RECEIVED_POSTS,
+                                data: payload,
+                                channelId
+                            },
+                            {
+                                type: PostTypes.GET_POSTS_SINCE_SUCCESS
+                            }
+                        ]), getState);
+                    },
+                    maxRetry: 2,
+                    cancel: true,
+                    onRetryScheduled: () => {
+                        dispatch({
+                            type: PostTypes.GET_POSTS_SINCE_WITH_RETRY_ATTEMPT
+                        });
+                    },
+                    rollback: (success, error) => {
+                        forceLogoutIfNecessary(error, dispatch);
+                        dispatch(batchActions([
+                            {type: PostTypes.GET_POSTS_SINCE_FAILURE, error},
+                            logError(error)(dispatch)
+                        ]), getState);
+                    }
+                }
+            }
+        });
+    };
+}
+
 export function getPostsBefore(channelId, postId, page = 0, perPage = Posts.POST_CHUNK_SIZE) {
     return async (dispatch, getState) => {
         dispatch({type: PostTypes.GET_POSTS_BEFORE_REQUEST}, getState);
@@ -453,6 +593,53 @@ export function getPostsBefore(channelId, postId, page = 0, perPage = Posts.POST
     };
 }
 
+export function getPostsBeforeWithRetry(channelId, postId, page = 0, perPage = Posts.POST_CHUNK_SIZE) {
+    return async (dispatch, getState) => {
+        dispatch({
+            type: PostTypes.GET_POSTS_BEFORE_REQUEST
+        });
+
+        dispatch({
+            type: PostTypes.GET_POSTS_BEFORE_WITH_RETRY_ATTEMPT,
+            data: {},
+            meta: {
+                offline: {
+                    effect: () => Client4.getPostsBefore(channelId, postId, page, perPage),
+                    commit: (success, payload) => {
+                        const {posts} = payload;
+                        getProfilesAndStatusesForPosts(posts, dispatch, getState);
+
+                        dispatch(batchActions([
+                            {
+                                type: PostTypes.RECEIVED_POSTS,
+                                data: payload,
+                                channelId
+                            },
+                            {
+                                type: PostTypes.GET_POSTS_BEFORE_SUCCESS
+                            }
+                        ]), getState);
+                    },
+                    maxRetry: 2,
+                    cancel: true,
+                    onRetryScheduled: () => {
+                        dispatch({
+                            type: PostTypes.GET_POSTS_BEFORE_WITH_RETRY_ATTEMPT
+                        });
+                    },
+                    rollback: (success, error) => {
+                        forceLogoutIfNecessary(error, dispatch);
+                        dispatch(batchActions([
+                            {type: PostTypes.GET_POSTS_BEFORE_FAILURE, error},
+                            logError(error)(dispatch)
+                        ]), getState);
+                    }
+                }
+            }
+        });
+    };
+}
+
 export function getPostsAfter(channelId, postId, page = 0, perPage = Posts.POST_CHUNK_SIZE) {
     return async (dispatch, getState) => {
         dispatch({type: PostTypes.GET_POSTS_AFTER_REQUEST}, getState);
@@ -482,6 +669,53 @@ export function getPostsAfter(channelId, postId, page = 0, perPage = Posts.POST_
         ]), getState);
 
         return posts;
+    };
+}
+
+export function getPostsAfterWithRetry(channelId, postId, page = 0, perPage = Posts.POST_CHUNK_SIZE) {
+    return async (dispatch, getState) => {
+        dispatch({
+            type: PostTypes.GET_POSTS_AFTER_REQUEST
+        });
+
+        dispatch({
+            type: PostTypes.GET_POSTS_AFTER_WITH_RETRY_ATTEMPT,
+            data: {},
+            meta: {
+                offline: {
+                    effect: () => Client4.getPostsAfter(channelId, postId, page, perPage),
+                    commit: (success, payload) => {
+                        const {posts} = payload;
+                        getProfilesAndStatusesForPosts(posts, dispatch, getState);
+
+                        dispatch(batchActions([
+                            {
+                                type: PostTypes.RECEIVED_POSTS,
+                                data: payload,
+                                channelId
+                            },
+                            {
+                                type: PostTypes.GET_POSTS_AFTER_SUCCESS
+                            }
+                        ]), getState);
+                    },
+                    maxRetry: 2,
+                    cancel: true,
+                    onRetryScheduled: () => {
+                        dispatch({
+                            type: PostTypes.GET_POSTS_AFTER_WITH_RETRY_ATTEMPT
+                        });
+                    },
+                    rollback: (success, error) => {
+                        forceLogoutIfNecessary(error, dispatch);
+                        dispatch(batchActions([
+                            {type: PostTypes.GET_POSTS_AFTER_FAILURE, error},
+                            logError(error)(dispatch)
+                        ]), getState);
+                    }
+                }
+            }
+        });
     };
 }
 
@@ -641,9 +875,14 @@ export default {
     deletePost,
     removePost,
     getPostThread,
+    getPostThreadWithRetry,
     getPosts,
+    getPostsWithRetry,
     getPostsSince,
+    getPostsSinceWithRetry,
     getPostsBefore,
+    getPostsBeforeWithRetry,
     getPostsAfter,
+    getPostsAfterWithRetry,
     selectPost
 };

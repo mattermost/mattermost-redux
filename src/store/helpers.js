@@ -18,9 +18,9 @@ export const offlineConfig = {
     },
     discard: (error, action, retries) => {
         if (action.meta && action.meta.offline.hasOwnProperty('maxRetry')) {
-            return retries === action.meta.offline.maxRetry;
+            return retries >= action.meta.offline.maxRetry;
         }
 
-        return retries < 10;
+        return retries > 10;
     }
 };

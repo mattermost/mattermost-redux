@@ -652,29 +652,28 @@ describe('Actions.Channels', () => {
                 TestHelper.basicChannel.id
             )(store.dispatch, store.getState);
 
+            const {channels, myMembers} = store.getState().entities.channels;
+            assert.ok(channels[TestHelper.basicChannel.id]);
+            assert.ok(myMembers[TestHelper.basicChannel.id]);
+
             TestHelper.activateMocking();
             nock(Client4.getBaseRoute()).
             delete(`/channels/${TestHelper.basicChannel.id}/members/${TestHelper.basicUser.id}`).
             reply(400);
 
+            // This action will retry after 1000ms
             await Actions.leaveChannel(
                 TestHelper.basicChannel.id
             )(store.dispatch, store.getState);
             nock.restore();
 
-            setTimeout(test2, 100);
+            setTimeout(test2, 1200);
         }
 
         async function test2() {
-            let {channels, myMembers} = store.getState().entities.channels;
-            assert.ok(channels[TestHelper.basicChannel.id]);
-            assert.ok(myMembers[TestHelper.basicChannel.id]);
+            // retry will have completed and should have left the channel successfully
+            const {channels, myMembers} = store.getState().entities.channels;
 
-            await Actions.leaveChannel(
-                TestHelper.basicChannel.id
-            )(store.dispatch, store.getState);
-            channels = store.getState().entities.channels.channels;
-            myMembers = store.getState().entities.channels.myMembers;
             assert.ok(channels[TestHelper.basicChannel.id]);
             assert.ifError(myMembers[TestHelper.basicChannel.id]);
             done();

@@ -46,6 +46,18 @@ function getPostThread(state = initialRequestState(), action) {
     );
 }
 
+function getPostThreadWithRetryAttempt(state = 0, action) {
+    switch (action.type) {
+    case PostTypes.GET_POST_THREAD_WITH_RETRY_ATTEMPT:
+        return state + 1;
+    case PostTypes.GET_POST_THREAD_REQUEST:
+    case PostTypes.GET_POST_THREAD_SUCCESS:
+        return 0;
+    default:
+        return state;
+    }
+}
+
 function getPosts(state = initialRequestState(), action) {
     return handleRequest(
         PostTypes.GET_POSTS_REQUEST,
@@ -54,6 +66,18 @@ function getPosts(state = initialRequestState(), action) {
         state,
         action
     );
+}
+
+function getPostsWithRetryAttempt(state = 0, action) {
+    switch (action.type) {
+    case PostTypes.GET_POSTS_WITH_RETRY_ATTEMPT:
+        return state + 1;
+    case PostTypes.GET_POSTS_REQUEST:
+    case PostTypes.GET_POSTS_SUCCESS:
+        return 0;
+    default:
+        return state;
+    }
 }
 
 function getPostsSince(state = initialRequestState(), action) {
@@ -66,6 +90,19 @@ function getPostsSince(state = initialRequestState(), action) {
     );
 }
 
+function getPostsSinceWithRetryAttempt(state = 0, action) {
+    switch (action.type) {
+    case PostTypes.GET_POSTS_SINCE_WITH_RETRY_ATTEMPT:
+        return state + 1;
+    case PostTypes.GET_POSTS_REQUEST:
+    case PostTypes.GET_POSTS_SINCE_REQUEST:
+    case PostTypes.GET_POSTS_SINCE_SUCCESS:
+        return 0;
+    default:
+        return state;
+    }
+}
+
 function getPostsBefore(state = initialRequestState(), action) {
     return handleRequest(
         PostTypes.GET_POSTS_BEFORE_REQUEST,
@@ -76,6 +113,19 @@ function getPostsBefore(state = initialRequestState(), action) {
     );
 }
 
+function getPostsBeforeWithRetryAttempt(state = 0, action) {
+    switch (action.type) {
+    case PostTypes.GET_POSTS_BEFORE_WITH_RETRY_ATTEMPT:
+        return state + 1;
+    case PostTypes.GET_POSTS_REQUEST:
+    case PostTypes.GET_POSTS_BEFORE_REQUEST:
+    case PostTypes.GET_POSTS_BEFORE_SUCCESS:
+        return 0;
+    default:
+        return state;
+    }
+}
+
 function getPostsAfter(state = initialRequestState(), action) {
     return handleRequest(
         PostTypes.GET_POSTS_AFTER_REQUEST,
@@ -84,6 +134,19 @@ function getPostsAfter(state = initialRequestState(), action) {
         state,
         action
     );
+}
+
+function getPostsAfterWithRetryAttempt(state = 0, action) {
+    switch (action.type) {
+    case PostTypes.GET_POSTS_AFTER_WITH_RETRY_ATTEMPT:
+        return state + 1;
+    case PostTypes.GET_POSTS_REQUEST:
+    case PostTypes.GET_POSTS_AFTER_REQUEST:
+    case PostTypes.GET_POSTS_AFTER_SUCCESS:
+        return 0;
+    default:
+        return state;
+    }
 }
 
 function reaction(state = initialRequestState(), action) {
@@ -111,10 +174,15 @@ export default combineReducers({
     editPost,
     deletePost,
     getPostThread,
+    getPostThreadRetryAttempts: getPostThreadWithRetryAttempt,
     getPosts,
+    getPostsRetryAttempts: getPostsWithRetryAttempt,
     getPostsSince,
+    getPostsSinceRetryAttempts: getPostsSinceWithRetryAttempt,
     getPostsBefore,
+    getPostsBeforeRetryAttempts: getPostsBeforeWithRetryAttempt,
     getPostsAfter,
+    getPostsAfterRetryAttempts: getPostsAfterWithRetryAttempt,
     reaction,
     openGraph
 });

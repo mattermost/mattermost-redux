@@ -21,7 +21,8 @@ export default async function testConfigureStore() {
             transforms: [
                 storageTransform
             ]
-        }
+        },
+        retry: (action, retries) => 200 * (retries + 1)
     };
 
     const store = configureStore(undefined, {}, offlineConfig, () => ({}), {enableBuffer: false});

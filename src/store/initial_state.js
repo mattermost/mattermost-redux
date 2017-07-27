@@ -170,22 +170,27 @@ const state = {
                 status: 'not_started',
                 error: null
             },
+            getPostThreadRetryAttempts: 0,
             getPosts: {
                 status: 'not_started',
                 error: null
             },
+            getPostsRetryAttempts: 0,
             getPostsSince: {
                 status: 'not_started',
                 error: null
             },
+            getPostsSinceRetryAttempts: 0,
             getPostsBefore: {
                 status: 'not_started',
                 error: null
             },
+            getPostsBeforeRetryAttempts: 0,
             getPostsAfter: {
                 status: 'not_started',
                 error: null
-            }
+            },
+            getPostsAfterRetryAttempts: 0
         },
         teams: {
             getMyTeams: {
