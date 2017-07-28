@@ -33,6 +33,7 @@ import {getTeam, getTeams, getMyTeams, getMyTeamMembers, getMyTeamUnreads} from 
 import {
     ChannelTypes,
     GeneralTypes,
+    EmojiTypes,
     PostTypes,
     PreferenceTypes,
     TeamTypes,
@@ -224,6 +225,9 @@ function handleEvent(msg, dispatch, getState) {
         break;
     case WebsocketEvents.REACTION_REMOVED:
         handleReactionRemovedEvent(msg, dispatch, getState);
+        break;
+    case WebsocketEvents.EMOJI_ADDED:
+        handleAddEmoji(msg, dispatch, getState);
         break;
     }
 }
@@ -581,6 +585,15 @@ function handleReactionRemovedEvent(msg, dispatch, getState) {
         type: PostTypes.REACTION_DELETED,
         data: reaction
     }, getState);
+}
+
+function handleAddEmoji(msg, dispatch) {
+    const data = JSON.parse(msg.data.emoji);
+
+    dispatch({
+        type: EmojiTypes.RECEIVED_CUSTOM_EMOJI,
+        data
+    });
 }
 
 // Helpers
