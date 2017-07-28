@@ -3,6 +3,7 @@
 
 import EventEmitter from 'utils/event_emitter';
 import {General} from 'constants';
+import * as UserUtils from 'utils/user_utils';
 
 const FormData = require('form-data');
 
@@ -685,6 +686,8 @@ export default class Client4 {
     }
 
     createUserAccessToken = async (userId, description) => {
+        this.trackEvent('api', 'api_users_create_access_token');
+
         return this.doFetch(
             `${this.getUserRoute(userId)}/tokens`,
             {method: 'post', body: JSON.stringify({description})}
@@ -706,6 +709,8 @@ export default class Client4 {
     }
 
     revokeUserAccessToken = async (tokenId) => {
+        this.trackEvent('api', 'api_users_revoke_access_token');
+
         return this.doFetch(
             `${this.getUsersRoute()}/tokens/revoke`,
             {method: 'post', body: JSON.stringify({token_id: tokenId})}
