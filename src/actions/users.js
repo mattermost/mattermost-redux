@@ -277,6 +277,7 @@ export function getMissingProfilesByIds(userIds) {
         });
 
         if (missingIds.length > 0) {
+            getStatusesByIds(missingIds)(dispatch, getState);
             return await getProfilesByIds(missingIds)(dispatch, getState);
         }
 

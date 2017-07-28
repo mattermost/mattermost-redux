@@ -307,12 +307,29 @@ function createMissingDirectChannels(currentUserId, allChannels, myPreferences) 
 function completeDirectGroupInfo(usersState, teammateNameDisplay, channel) {
     const {currentUserId, profiles, profilesInChannel} = usersState;
     const profilesIds = profilesInChannel[channel.id];
+    const gm = {...channel};
+
     if (profilesIds) {
-        const gm = {...channel};
         return Object.assign(gm, {
             display_name: getGroupDisplayNameFromUserIds(profilesIds, profiles, currentUserId, teammateNameDisplay)
         });
     }
+
+    const usernames = gm.display_name.split(', ');
+    const users = Object.values(profiles);
+    const userIds = [];
+    usernames.forEach((username) => {
+        const u = users.find((p) => p.username === username);
+        if (u) {
+            userIds.push(u.id);
+        }
+    });
+    if (usernames.length === userIds.length) {
+        return Object.assign(gm, {
+            display_name: getGroupDisplayNameFromUserIds(userIds, profiles, currentUserId, teammateNameDisplay)
+        });
+    }
+
     return channel;
 }
 
