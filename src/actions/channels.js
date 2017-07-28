@@ -11,6 +11,7 @@ import {getChannelsIdForTeam} from 'utils/channel_utils';
 
 import {logError} from './errors';
 import {bindClientFunc, forceLogoutIfNecessary} from './helpers';
+import {getMissingProfilesByIds} from './users';
 
 export function selectChannel(channelId) {
     return async (dispatch, getState) => {
@@ -485,6 +486,9 @@ export function getChannelMembers(channelId, page = 0, perPage = General.CHANNEL
             ]), getState);
             return null;
         }
+
+        const userIds = channelMembers.map((cm) => cm.user_id);
+        getMissingProfilesByIds(userIds)(dispatch, getState);
 
         dispatch(batchActions([
             {

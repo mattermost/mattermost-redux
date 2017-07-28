@@ -6,9 +6,30 @@ import {batchActions} from 'redux-batched-actions';
 import {Client4} from 'client';
 import {SearchTypes} from 'action_types';
 
+import {getChannelAndMyMember, getChannelMembers} from './channels';
 import {forceLogoutIfNecessary} from './helpers';
 import {logError} from './errors';
 import {getProfilesAndStatusesForPosts} from './posts';
+
+function getMissingChannelsFromPosts(posts) {
+    return async (dispatch, getState) => {
+        const {channels, membersInChannel, myMembers} = getState().entities.channels;
+        const promises = [];
+
+        Object.values(posts).forEach((post) => {
+            const id = post.channel_id;
+            if (!channels[id] || !myMembers[id]) {
+                promises.push(getChannelAndMyMember(id)(dispatch, getState));
+            }
+
+            if (!membersInChannel[id]) {
+                promises.push(getChannelMembers(id)(dispatch, getState));
+            }
+        });
+
+        return Promise.all(promises);
+    };
+}
 
 export function searchPosts(teamId, terms, isOrSearch = false) {
     return async (dispatch, getState) => {
@@ -17,7 +38,8 @@ export function searchPosts(teamId, terms, isOrSearch = false) {
         let posts;
         try {
             posts = await Client4.searchPosts(teamId, terms, isOrSearch);
-            getProfilesAndStatusesForPosts(posts.posts, dispatch, getState);
+            await getProfilesAndStatusesForPosts(posts.posts, dispatch, getState);
+            await getMissingChannelsFromPosts(posts.posts)(dispatch, getState);
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch);
             dispatch(batchActions([
