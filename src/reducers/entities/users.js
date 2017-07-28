@@ -316,6 +316,8 @@ function myUserAccessTokens(state = {}, action) {
 
         return nextState;
     }
+
+    case UserTypes.CLEAR_MY_USER_ACCESS_TOKENS:
     case UserTypes.LOGOUT_SUCCESS:
         return {};
 

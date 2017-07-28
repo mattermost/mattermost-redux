@@ -146,5 +146,6 @@ export default keyMirror({
     RESET_LOGOUT_STATE: null,
     RECEIVED_MY_USER_ACCESS_TOKEN: null,
     RECEIVED_MY_USER_ACCESS_TOKENS: null,
+    CLEAR_MY_USER_ACCESS_TOKENS: null,
     REVOKED_USER_ACCESS_TOKEN: null
 });

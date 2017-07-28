@@ -1015,4 +1015,24 @@ describe('Actions.Users', () => {
         assert.ok(userAccessTokens[currentUserId]);
         assert.ok(!userAccessTokens[currentUserId][testId]);
     });
+
+    it('clearUserAccessTokens', async () => {
+        await Actions.login(TestHelper.basicUser.email, 'password1')(store.dispatch, store.getState);
+
+        const currentUserId = store.getState().entities.users.currentUserId;
+
+        TestHelper.activateMocking();
+        nock(Client4.getBaseRoute()).
+            post(`/users/${currentUserId}/tokens`).
+            reply(201, {id: 'someid', token: 'sometoken', description: 'test token', user_id: currentUserId});
+
+        await Actions.createUserAccessToken(currentUserId, 'test token')(store.dispatch, store.getState);
+        nock.restore();
+
+        await Actions.clearUserAccessTokens()(store.dispatch, store.getState);
+
+        const {myUserAccessTokens} = store.getState().entities.users;
+
+        assert.ok(Object.values(myUserAccessTokens).length === 0);
+    });
 });

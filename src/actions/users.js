@@ -1262,6 +1262,13 @@ export function revokeUserAccessToken(tokenId) {
     };
 }
 
+export function clearUserAccessTokens() {
+    return async (dispatch) => {
+        dispatch({type: UserTypes.CLEAR_MY_USER_ACCESS_TOKENS});
+        return {data: true};
+    };
+}
+
 export default {
     checkMfa,
     generateMfaSecret,
