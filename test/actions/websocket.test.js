@@ -1,6 +1,7 @@
 // Copyright (c) 2016 Mattermost, Inc. All Rights Reserved.
 // See License.txt for license information.
 
+import fs from 'fs';
 import assert from 'assert';
 import * as Actions from 'actions/websocket';
 import * as ChannelActions from 'actions/channels';
@@ -399,6 +400,36 @@ describe('Actions.Websocket', () => {
                 assert.ok(member.hasOwnProperty('mention_count'));
                 done();
             }, 500);
+        }
+
+        test();
+    });
+
+    it('Websocket handle emoji added', (done) => {
+        async function test() {
+            const client = TestHelper.createClient4();
+            const user = await client.createUser(
+                TestHelper.fakeUser(),
+                null,
+                null,
+                TestHelper.basicTeam.invite_id
+            );
+            await client.login(user.email, 'password1');
+
+            const testImageData = fs.createReadStream('test/assets/images/test.png');
+            const created = await Client4.createCustomEmoji({
+                name: TestHelper.generateId(),
+                creator_id: TestHelper.basicUser.id
+            }, testImageData);
+
+            await TestHelper.wait(200);
+
+            const state = store.getState();
+
+            const emojis = state.entities.emojis.customEmoji;
+            assert.ok(emojis);
+            assert.ok(emojis[created.id]);
+            done();
         }
 
         test();
