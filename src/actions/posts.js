@@ -88,12 +88,17 @@ export function createPost(post, files = []) {
                     },
                     maxRetry: 0,
                     offlineRollback: true,
-                    rollback: () => {
+                    rollback: (success, error) => {
                         const data = {
                             ...newPost,
                             id: pendingPostId,
                             failed: true
                         };
+
+                        // If the failure was because the root post was deleted, remove the post
+                        if (error.server_error_id === 'api.post.create_post.root_id.app_error') {
+                            removePost(data)(dispatch, getState);
+                        }
 
                         dispatch({
                             type: PostTypes.RECEIVED_POST,
