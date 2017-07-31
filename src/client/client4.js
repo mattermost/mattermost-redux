@@ -3,7 +3,6 @@
 
 import EventEmitter from 'utils/event_emitter';
 import {General} from 'constants';
-import * as UserUtils from 'utils/user_utils';
 
 const FormData = require('form-data');
 
