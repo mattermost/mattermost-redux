@@ -3,6 +3,7 @@
 
 import {PostTypes, SearchTypes, UserTypes} from 'action_types';
 import {Posts} from 'constants';
+import {isPostPendingOrFailed} from 'utils/post_utils';
 
 function handleReceivedPost(posts = {}, postsInChannel = {}, action) {
     const post = action.data;
@@ -74,8 +75,17 @@ function handleReceivedPosts(posts = {}, postsInChannel = {}, action) {
         }
     }
 
-    // Sort to ensure that the most recent posts are first
+    // Sort to ensure that the most recent posts are first, with pending
+    // and failed posts first
     postsForChannel.sort((a, b) => {
+        const aIsPendingOrFailed = isPostPendingOrFailed(nextPosts[a]);
+        const bIsPendingOrFailed = isPostPendingOrFailed(nextPosts[b]);
+        if (aIsPendingOrFailed && !bIsPendingOrFailed) {
+            return -1;
+        } else if (!aIsPendingOrFailed && bIsPendingOrFailed) {
+            return 1;
+        }
+
         if (nextPosts[a].create_at > nextPosts[b].create_at) {
             return -1;
         } else if (nextPosts[a].create_at < nextPosts[b].create_at) {
