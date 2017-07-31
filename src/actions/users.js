@@ -1130,7 +1130,11 @@ export function createUserAccessToken(userId, description) {
         try {
             data = await Client4.createUserAccessToken(userId, description);
         } catch (error) {
-            dispatch({type: UserTypes.CREATE_USER_ACCESS_TOKEN_FAILURE, error});
+            forceLogoutIfNecessary(error, dispatch);
+            dispatch(batchActions([
+                {type: UserTypes.CREATE_USER_ACCESS_TOKEN_FAILURE, error},
+                logError(error)(dispatch)
+            ]), getState);
             return {error};
         }
 
@@ -1168,7 +1172,11 @@ export function getUserAccessToken(tokenId) {
         try {
             data = await Client4.getUserAccessToken(tokenId);
         } catch (error) {
-            dispatch({type: UserTypes.GET_USER_ACCESS_TOKEN_FAILURE, error});
+            forceLogoutIfNecessary(error, dispatch);
+            dispatch(batchActions([
+                {type: UserTypes.GET_USER_ACCESS_TOKEN_FAILURE, error},
+                logError(error)(dispatch)
+            ]), getState);
             return {error};
         }
 
@@ -1206,7 +1214,11 @@ export function getUserAccessTokensForUser(userId, page = 0, perPage = General.P
         try {
             data = await Client4.getUserAccessTokensForUser(userId, page, perPage);
         } catch (error) {
-            dispatch({type: UserTypes.GET_USER_ACCESS_TOKEN_FAILURE, error});
+            forceLogoutIfNecessary(error, dispatch);
+            dispatch(batchActions([
+                {type: UserTypes.GET_USER_ACCESS_TOKEN_FAILURE, error},
+                logError(error)(dispatch)
+            ]), getState);
             return {error};
         }
 
@@ -1238,13 +1250,17 @@ export function getUserAccessTokensForUser(userId, page = 0, perPage = General.P
 }
 
 export function revokeUserAccessToken(tokenId) {
-    return async (dispatch) => {
+    return async (dispatch, getState) => {
         dispatch({type: UserTypes.REVOKE_USER_ACCESS_TOKEN_REQUEST});
 
         try {
             await Client4.revokeUserAccessToken(tokenId);
         } catch (error) {
-            dispatch({type: UserTypes.REVOKE_USER_ACCESS_TOKEN_FAILURE, error});
+            forceLogoutIfNecessary(error, dispatch);
+            dispatch(batchActions([
+                {type: UserTypes.REVOKE_USER_ACCESS_TOKEN_FAILURE, error},
+                logError(error)(dispatch)
+            ]), getState);
             return {error};
         }
 

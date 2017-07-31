@@ -35,7 +35,7 @@ export function displayUsername(user, teammateNameDisplay) {
 
 export function rolesIncludePermission(roles, permission) {
     const rolesArray = roles.split(' ');
-    return rolesArray.indexOf(permission) !== -1;
+    return rolesArray.includes(permission);
 }
 
 export function isAdmin(roles) {
