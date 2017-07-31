@@ -684,6 +684,38 @@ export default class Client4 {
         );
     }
 
+    createUserAccessToken = async (userId, description) => {
+        this.trackEvent('api', 'api_users_create_access_token');
+
+        return this.doFetch(
+            `${this.getUserRoute(userId)}/tokens`,
+            {method: 'post', body: JSON.stringify({description})}
+        );
+    }
+
+    getUserAccessToken = async (tokenId) => {
+        return this.doFetch(
+            `${this.getUsersRoute()}/tokens/${tokenId}`,
+            {method: 'get'}
+        );
+    }
+
+    getUserAccessTokensForUser = async (userId, page = 0, perPage = PER_PAGE_DEFAULT) => {
+        return this.doFetch(
+            `${this.getUserRoute(userId)}/tokens${buildQueryString({page, per_page: perPage})}`,
+            {method: 'get'}
+        );
+    }
+
+    revokeUserAccessToken = async (tokenId) => {
+        this.trackEvent('api', 'api_users_revoke_access_token');
+
+        return this.doFetch(
+            `${this.getUsersRoute()}/tokens/revoke`,
+            {method: 'post', body: JSON.stringify({token_id: tokenId})}
+        );
+    }
+
     // Team Routes
 
     createTeam = async (team) => {

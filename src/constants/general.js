@@ -33,6 +33,9 @@ export default {
 
     SYSTEM_USER_ROLE: 'system_user',
     SYSTEM_ADMIN_ROLE: 'system_admin',
+    SYSTEM_USER_ACCESS_TOKEN_ROLE: 'system_user_access_token',
+    SYSTEM_POST_ALL_ROLE: 'system_post_all',
+    SYSTEM_POST_ALL_PUBLIC_ROLE: 'system_post_all_public',
 
     ALLOW_EDIT_POST_ALWAYS: 'always',
     ALLOW_EDIT_POST_NEVER: 'never',

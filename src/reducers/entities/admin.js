@@ -204,6 +204,44 @@ function teamAnalytics(state = {}, action) {
     }
 }
 
+function userAccessTokens(state = {}, action) {
+    switch (action.type) {
+    case AdminTypes.RECEIVED_USER_ACCESS_TOKEN: {
+        const nextUserState = {...(state[action.data.user_id] || {})};
+        nextUserState[action.data.id] = action.data;
+
+        return {...state, [action.data.user_id]: nextUserState};
+    }
+    case AdminTypes.RECEIVED_USER_ACCESS_TOKENS: {
+        const nextUserState = {...(state[action.userId] || {})};
+
+        for (const uat of action.data) {
+            nextUserState[uat.id] = uat;
+        }
+
+        return {...state, [action.userId]: nextUserState};
+    }
+    case UserTypes.REVOKED_USER_ACCESS_TOKEN: {
+        const userIds = Object.keys(state);
+        for (let i = 0; i < userIds.length; i++) {
+            const userId = userIds[i];
+            if (state[userId] && state[userId][action.data]) {
+                const nextUserState = {...state[userId]};
+                Reflect.deleteProperty(nextUserState, action.data);
+                return {...state, [userId]: nextUserState};
+            }
+        }
+
+        return state;
+    }
+    case UserTypes.LOGOUT_SUCCESS:
+        return {};
+
+    default:
+        return state;
+    }
+}
+
 export default combineReducers({
 
     // array of strings each representing a log entry
@@ -228,7 +266,9 @@ export default combineReducers({
     analytics,
 
     // object with team ids as keys and analytics objects as values
-    teamAnalytics
+    teamAnalytics,
 
+    // object with user ids as keys and objects, with token ids as keys, as values
+    userAccessTokens
 });
 

@@ -33,20 +33,37 @@ export function displayUsername(user, teammateNameDisplay) {
     return name;
 }
 
+export function rolesIncludePermission(roles, permission) {
+    const rolesArray = roles.split(' ');
+    return rolesArray.includes(permission);
+}
+
 export function isAdmin(roles) {
     return isSystemAdmin(roles) || isTeamAdmin(roles);
 }
 
 export function isTeamAdmin(roles) {
-    return roles.includes(General.TEAM_ADMIN_ROLE);
+    return rolesIncludePermission(roles, General.TEAM_ADMIN_ROLE);
 }
 
 export function isSystemAdmin(roles) {
-    return roles.includes(General.SYSTEM_ADMIN_ROLE);
+    return rolesIncludePermission(roles, General.SYSTEM_ADMIN_ROLE);
 }
 
 export function isChannelAdmin(roles) {
-    return roles.includes(General.CHANNEL_ADMIN_ROLE);
+    return rolesIncludePermission(roles, General.CHANNEL_ADMIN_ROLE);
+}
+
+export function hasUserAccessTokenRole(roles) {
+    return rolesIncludePermission(roles, General.SYSTEM_USER_ACCESS_TOKEN_ROLE);
+}
+
+export function hasPostAllRole(roles) {
+    return rolesIncludePermission(roles, General.SYSTEM_POST_ALL_ROLE);
+}
+
+export function hasPostAllPublicRole(roles) {
+    return rolesIncludePermission(roles, General.SYSTEM_POST_ALL_PUBLIC_ROLE);
 }
 
 export function profileListToMap(profileList) {

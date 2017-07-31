@@ -293,6 +293,39 @@ function statuses(state = {}, action) {
     }
 }
 
+function myUserAccessTokens(state = {}, action) {
+    switch (action.type) {
+    case UserTypes.RECEIVED_MY_USER_ACCESS_TOKEN: {
+        const nextState = {...state};
+        nextState[action.data.id] = action.data;
+
+        return nextState;
+    }
+    case UserTypes.RECEIVED_MY_USER_ACCESS_TOKENS: {
+        const nextState = {...state};
+
+        for (const uat of action.data) {
+            nextState[uat.id] = uat;
+        }
+
+        return nextState;
+    }
+    case UserTypes.REVOKED_USER_ACCESS_TOKEN: {
+        const nextState = {...state};
+        Reflect.deleteProperty(nextState, action.data);
+
+        return nextState;
+    }
+
+    case UserTypes.CLEAR_MY_USER_ACCESS_TOKENS:
+    case UserTypes.LOGOUT_SUCCESS:
+        return {};
+
+    default:
+        return state;
+    }
+}
+
 export default combineReducers({
 
     // the current selected user
@@ -303,6 +336,9 @@ export default combineReducers({
 
     // array with the user's audits
     myAudits,
+
+    // object where every key is the token id and has a user access token as a value
+    myUserAccessTokens,
 
     // object where every key is a user id and has an object with the users details
     profiles,

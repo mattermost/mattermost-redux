@@ -4,7 +4,7 @@
 import {batchActions} from 'redux-batched-actions';
 import {Client, Client4} from 'client';
 import {General} from 'constants';
-import {UserTypes, TeamTypes} from 'action_types';
+import {UserTypes, TeamTypes, AdminTypes} from 'action_types';
 import {getAllCustomEmojis} from './emojis';
 import {getMyTeams, getMyTeamMembers, getMyTeamUnreads} from './teams';
 
@@ -1123,6 +1123,169 @@ export function switchLdapToEmail(ldapPassword, email, emailPassword, mfaCode = 
     );
 }
 
+export function createUserAccessToken(userId, description) {
+    return async (dispatch, getState) => {
+        dispatch({type: UserTypes.CREATE_USER_ACCESS_TOKEN_REQUEST});
+
+        let data;
+        try {
+            data = await Client4.createUserAccessToken(userId, description);
+        } catch (error) {
+            forceLogoutIfNecessary(error, dispatch);
+            dispatch(batchActions([
+                {type: UserTypes.CREATE_USER_ACCESS_TOKEN_FAILURE, error},
+                logError(error)(dispatch)
+            ]), getState);
+            return {error};
+        }
+
+        const actions = [
+            {
+                type: UserTypes.CREATE_USER_ACCESS_TOKEN_SUCCESS
+            },
+            {
+                type: AdminTypes.RECEIVED_USER_ACCESS_TOKEN,
+                data: {...data, token: ''}
+            }
+        ];
+
+        const {currentUserId} = getState().entities.users;
+        if (userId === currentUserId) {
+            actions.push(
+                {
+                    type: UserTypes.RECEIVED_MY_USER_ACCESS_TOKEN,
+                    data: {...data, token: ''}
+                }
+            );
+        }
+
+        dispatch(batchActions(actions));
+
+        return {data};
+    };
+}
+
+export function getUserAccessToken(tokenId) {
+    return async (dispatch, getState) => {
+        dispatch({type: UserTypes.GET_USER_ACCESS_TOKEN_REQUEST});
+
+        let data;
+        try {
+            data = await Client4.getUserAccessToken(tokenId);
+        } catch (error) {
+            forceLogoutIfNecessary(error, dispatch);
+            dispatch(batchActions([
+                {type: UserTypes.GET_USER_ACCESS_TOKEN_FAILURE, error},
+                logError(error)(dispatch)
+            ]), getState);
+            return {error};
+        }
+
+        const actions = [
+            {
+                type: UserTypes.GET_USER_ACCESS_TOKEN_SUCCESS
+            },
+            {
+                type: AdminTypes.RECEIVED_USER_ACCESS_TOKEN,
+                data
+            }
+        ];
+
+        const {currentUserId} = getState().entities.users;
+        if (data.user_id === currentUserId) {
+            actions.push(
+                {
+                    type: UserTypes.RECEIVED_MY_USER_ACCESS_TOKEN,
+                    data
+                }
+            );
+        }
+
+        dispatch(batchActions(actions));
+
+        return {data};
+    };
+}
+
+export function getUserAccessTokensForUser(userId, page = 0, perPage = General.PROFILE_CHUNK_SIZE) {
+    return async (dispatch, getState) => {
+        dispatch({type: UserTypes.GET_USER_ACCESS_TOKEN_REQUEST});
+
+        let data;
+        try {
+            data = await Client4.getUserAccessTokensForUser(userId, page, perPage);
+        } catch (error) {
+            forceLogoutIfNecessary(error, dispatch);
+            dispatch(batchActions([
+                {type: UserTypes.GET_USER_ACCESS_TOKEN_FAILURE, error},
+                logError(error)(dispatch)
+            ]), getState);
+            return {error};
+        }
+
+        const actions = [
+            {
+                type: UserTypes.GET_USER_ACCESS_TOKEN_SUCCESS
+            },
+            {
+                type: AdminTypes.RECEIVED_USER_ACCESS_TOKENS,
+                data,
+                userId
+            }
+        ];
+
+        const {currentUserId} = getState().entities.users;
+        if (userId === currentUserId) {
+            actions.push(
+                {
+                    type: UserTypes.RECEIVED_MY_USER_ACCESS_TOKENS,
+                    data
+                }
+            );
+        }
+
+        dispatch(batchActions(actions));
+
+        return {data};
+    };
+}
+
+export function revokeUserAccessToken(tokenId) {
+    return async (dispatch, getState) => {
+        dispatch({type: UserTypes.REVOKE_USER_ACCESS_TOKEN_REQUEST});
+
+        try {
+            await Client4.revokeUserAccessToken(tokenId);
+        } catch (error) {
+            forceLogoutIfNecessary(error, dispatch);
+            dispatch(batchActions([
+                {type: UserTypes.REVOKE_USER_ACCESS_TOKEN_FAILURE, error},
+                logError(error)(dispatch)
+            ]), getState);
+            return {error};
+        }
+
+        dispatch(batchActions([
+            {
+                type: UserTypes.REVOKE_USER_ACCESS_TOKEN_SUCCESS
+            },
+            {
+                type: UserTypes.REVOKED_USER_ACCESS_TOKEN,
+                data: tokenId
+            }
+        ]));
+
+        return {data: true};
+    };
+}
+
+export function clearUserAccessTokens() {
+    return async (dispatch) => {
+        dispatch({type: UserTypes.CLEAR_MY_USER_ACCESS_TOKENS});
+        return {data: true};
+    };
+}
+
 export default {
     checkMfa,
     generateMfaSecret,
@@ -1158,5 +1321,9 @@ export default {
     switchEmailToOAuth,
     switchOAuthToEmail,
     switchEmailToLdap,
-    switchLdapToEmail
+    switchLdapToEmail,
+    createUserAccessToken,
+    getUserAccessToken,
+    getUserAccessTokensForUser,
+    revokeUserAccessToken
 };
