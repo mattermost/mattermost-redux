@@ -95,15 +95,21 @@ export function createPost(post, files = []) {
                             failed: true
                         };
 
+                        const actions = [
+                            {type: PostTypes.CREATE_POST_FAILURE, error}
+                        ];
+
                         // If the failure was because the root post was deleted, remove the post
                         if (error.server_error_id === 'api.post.create_post.root_id.app_error') {
                             removePost(data)(dispatch, getState);
+                        } else {
+                            actions.push({
+                                type: PostTypes.RECEIVED_POST,
+                                data
+                            });
                         }
 
-                        dispatch({
-                            type: PostTypes.RECEIVED_POST,
-                            data
-                        });
+                        dispatch(batchActions(actions));
                     }
                 }
             }
