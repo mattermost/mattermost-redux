@@ -1979,25 +1979,30 @@ export default class Client4 {
             status_code: data.status_code,
             url
         };
-    }
+    };
 
     trackEvent(category, event, props) {
-        if (global && global.window && global.window.analytics) {
-            const properties = Object.assign({category, type: event, user_actual_id: this.userId}, props);
-            const options = {
-                context: {
-                    ip: '0.0.0.0'
-                },
-                page: {
-                    path: '',
-                    referrer: '',
-                    search: '',
-                    title: '',
-                    url: ''
-                },
-                anonymousId: '00000000000000000000000000'
-            };
+        const properties = Object.assign({category, type: event, user_actual_id: this.userId}, props);
+        const options = {
+            context: {
+                ip: '0.0.0.0'
+            },
+            page: {
+                path: '',
+                referrer: '',
+                search: '',
+                title: '',
+                url: ''
+            },
+            anonymousId: '00000000000000000000000000'
+        };
+
+        if (global && global.window && global.window.analytics && global.window.analytics.initialized) {
             global.window.analytics.track('event', properties, options);
+        } else if (global && global.analytics) {
+            global.analytics.track(Object.assign({
+                event: 'event'
+            }, {properties}, options));
         }
     }
 }
