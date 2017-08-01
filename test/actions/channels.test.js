@@ -7,6 +7,7 @@ import nock from 'nock';
 import * as Actions from 'actions/channels';
 import {addUserToTeam, getMyTeams, getMyTeamMembers, getMyTeamUnreads} from 'actions/teams';
 import {getMe, getProfilesByIds, login} from 'actions/users';
+import {createIncomingHook, createOutgoingHook} from 'actions/integrations';
 import {Client, Client4} from 'client';
 import {General, RequestStatus} from 'constants';
 import TestHelper from 'test/test_helper';
@@ -283,6 +284,9 @@ describe('Actions.Channels', () => {
 
         await Actions.fetchMyChannelsAndMembers(TestHelper.basicTeam.id)(store.dispatch, store.getState);
 
+        const incomingHook = await createIncomingHook({channel_id: secondChannel.id, display_name: 'test', description: 'test'})(store.dispatch, store.getState);
+        const outgoingHook = await createOutgoingHook({channel_id: secondChannel.id, team_id: TestHelper.basicTeam.id, display_name: 'test', trigger_words: [TestHelper.generateId()], callback_urls: ['http://localhost/notarealendpoint']})(store.dispatch, store.getState);
+
         await Actions.deleteChannel(
             secondChannel.id
         )(store.dispatch, store.getState);
@@ -293,8 +297,11 @@ describe('Actions.Channels', () => {
         }
 
         const {channels, myMembers} = store.getState().entities.channels;
+        const {incomingHooks, outgoingHooks} = store.getState().entities.integrations;
         assert.ifError(channels[secondChannel.id]);
         assert.ifError(myMembers[secondChannel.id]);
+        assert.ifError(incomingHooks[incomingHook.id]);
+        assert.ifError(outgoingHooks[outgoingHook.id]);
     });
 
     it('viewChannel', async () => {

@@ -2,7 +2,7 @@
 // See License.txt for license information.
 
 import {combineReducers} from 'redux';
-import {IntegrationTypes, UserTypes} from 'action_types';
+import {IntegrationTypes, UserTypes, ChannelTypes} from 'action_types';
 
 function incomingHooks(state = {}, action) {
     const nextState = {...state};
@@ -21,6 +21,21 @@ function incomingHooks(state = {}, action) {
     case IntegrationTypes.DELETED_INCOMING_HOOK: {
         Reflect.deleteProperty(nextState, action.data.id);
         return nextState;
+    }
+    case ChannelTypes.RECEIVED_CHANNEL_DELETED: {
+        let deleted = false;
+        Object.keys(nextState).forEach((id) => {
+            if (nextState[id].channel_id === action.data.id) {
+                deleted = true;
+                Reflect.deleteProperty(nextState, id);
+            }
+        });
+
+        if (deleted) {
+            return nextState;
+        }
+
+        return state;
     }
     case UserTypes.LOGOUT_SUCCESS:
         return {};
@@ -47,6 +62,21 @@ function outgoingHooks(state = {}, action) {
     case IntegrationTypes.DELETED_OUTGOING_HOOK: {
         Reflect.deleteProperty(nextState, action.data.id);
         return nextState;
+    }
+    case ChannelTypes.RECEIVED_CHANNEL_DELETED: {
+        let deleted = false;
+        Object.keys(nextState).forEach((id) => {
+            if (nextState[id].channel_id === action.data.id) {
+                deleted = true;
+                Reflect.deleteProperty(nextState, id);
+            }
+        });
+
+        if (deleted) {
+            return nextState;
+        }
+
+        return state;
     }
     case UserTypes.LOGOUT_SUCCESS:
         return {};
