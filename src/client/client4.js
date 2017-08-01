@@ -17,7 +17,6 @@ const HEADER_X_VERSION_ID = 'X-Version-Id';
 const HEADER_X_CLUSTER_ID = 'X-Cluster-Id';
 
 const PER_PAGE_DEFAULT = 60;
-const NON_VERSION_URLS = ['/api/v4/saml', '/api/v4/config', '/api/v4/logs'];
 
 export default class Client4 {
     constructor() {
@@ -1945,7 +1944,7 @@ export default class Client4 {
 
         // Need to only accept version in the header from requests that are not cached
         // to avoid getting an old version from a cached response
-        if (!isNonVersionUrl(url) && headers.has(HEADER_X_VERSION_ID) && !headers.get('Cache-Control')) {
+        if (headers.has(HEADER_X_VERSION_ID) && !headers.get('Cache-Control')) {
             const serverVersion = headers.get(HEADER_X_VERSION_ID);
             if (serverVersion && this.serverVersion !== serverVersion) {
                 this.serverVersion = serverVersion;
@@ -2001,16 +2000,6 @@ export default class Client4 {
             global.window.analytics.track('event', properties, options);
         }
     }
-}
-
-function isNonVersionUrl(url) {
-    for (let i = 0; i < NON_VERSION_URLS.length; i++) {
-        if (url.indexOf(NON_VERSION_URLS[i]) > 0) {
-            return true;
-        }
-    }
-
-    return false;
 }
 
 function buildQueryString(parameters) {
