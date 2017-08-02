@@ -22,7 +22,7 @@ export function buildDisplayableChannelList(usersState, allChannels, myPreferenc
     const missingDirectChannels = createMissingDirectChannels(usersState.currentUserId, allChannels, myPreferences);
 
     const {currentUserId, profiles} = usersState;
-    const locale = profiles && profiles[currentUserId] ? profiles[currentUserId].locale : 'en';
+    const locale = getUserLocale(currentUserId, profiles);
 
     const channels = buildChannels(usersState, allChannels, missingDirectChannels, teammateNameDisplay, locale);
     const favoriteChannels = buildFavoriteChannels(channels, myPreferences, locale);
@@ -39,7 +39,7 @@ export function buildDisplayableChannelList(usersState, allChannels, myPreferenc
 
 export function buildDisplayableChannelListWithUnreadSection(usersState, myChannels, myMembers, myPreferences, teammateNameDisplay) {
     const {currentUserId, profiles} = usersState;
-    const locale = profiles && profiles[currentUserId] ? profiles[currentUserId].locale : 'en';
+    const locale = getUserLocale(currentUserId, profiles);
 
     const missingDirectChannels = createMissingDirectChannels(currentUserId, myChannels, myPreferences);
     const channels = buildChannels(usersState, myChannels, missingDirectChannels, teammateNameDisplay, locale);
@@ -451,4 +451,13 @@ function buildChannelsWithMentions(channels, members, locale) {
 function buildUnreadChannels(channels, members, locale) {
     return channels.filter(channelHasUnreadMessages.bind(null, members)).
         sort(sortFavorites.bind(null, locale));
+}
+
+function getUserLocale(userId, profiles) {
+    let locale = 'en';
+    if (profiles && profiles[userId] && profiles[userId].locale) {
+        locale = profiles[userId].locale;
+    }
+
+    return locale;
 }
