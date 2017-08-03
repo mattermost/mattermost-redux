@@ -17,16 +17,19 @@ export function getCurrentUrl(state) {
 
 export const canUploadFilesOnMobile = createSelector(
     getConfig,
-    (config) => {
+    getLicense,
+    (config, license) => {
         // Defaults to true if either setting doesn't exist
-        return config.EnableMobileFileUpload !== 'false' && config.EnableFileAttachments !== 'false';
+        return config.EnableFileAttachments !== 'false' &&
+           (license.IsLicensed === 'false' || license.Compliance === 'false' || config.EnableMobileFileUpload !== 'false');
     }
 );
 
 export const canDownloadFilesOnMobile = createSelector(
     getConfig,
-    (config) => {
-        // Defaults to true if either setting doesn't exist
-        return config.EnableMobileFileDownload !== 'false' && config.EnableFileAttachments !== 'false';
+    getLicense,
+    (config, license) => {
+        // Defaults to true if the setting doesn't exist
+        return license.IsLicensed === 'false' || license.Compliance === 'false' || config.EnableMobileFileDownload !== 'false';
     }
 );
