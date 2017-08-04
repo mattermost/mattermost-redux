@@ -99,8 +99,11 @@ export function createPost(post, files = []) {
                             {type: PostTypes.CREATE_POST_FAILURE, error}
                         ];
 
-                        // If the failure was because the root post was deleted, remove the post
-                        if (error.server_error_id === 'api.post.create_post.root_id.app_error') {
+                        // If the failure was because: the root post was deleted or
+                        // TownSquareIsReadOnly=true then remove the post
+                        if (error.server_error_id === 'api.post.create_post.root_id.app_error' ||
+                            error.server_error_id === 'api.post.create_post.town_square_read_only'
+                        ) {
                             removePost(data)(dispatch, getState);
                         } else {
                             actions.push({
