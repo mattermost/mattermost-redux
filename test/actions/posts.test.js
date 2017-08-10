@@ -305,9 +305,6 @@ describe('Actions.Posts', () => {
         }
 
         assert.ok(posts);
-        assert.ok(postsInChannel);
-        assert.ok(postsInChannel[channelId]);
-
         assert.ok(posts[post.id]);
 
         let found = false;
@@ -317,7 +314,7 @@ describe('Actions.Posts', () => {
                 break;
             }
         }
-        assert.ok(found, 'failed to find post in postsInChannel');
+        assert.ok(!found, 'found post in postsInChannel');
     });
 
     it('getPostThreadWithRetry', async () => {
@@ -345,9 +342,6 @@ describe('Actions.Posts', () => {
         }
 
         assert.ok(posts);
-        assert.ok(postsInChannel);
-        assert.ok(postsInChannel[channelId]);
-
         assert.ok(posts[post.id]);
 
         let found = false;
@@ -357,7 +351,7 @@ describe('Actions.Posts', () => {
                 break;
             }
         }
-        assert.ok(found, 'failed to find post in postsInChannel');
+        assert.ok(!found, 'found post in postsInChannel');
     });
 
     it('getPosts', async () => {

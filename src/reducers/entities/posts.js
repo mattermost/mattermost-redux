@@ -34,6 +34,7 @@ function handleReceivedPost(posts = {}, postsInChannel = {}, action) {
 function handleReceivedPosts(posts = {}, postsInChannel = {}, action) {
     const newPosts = action.data.posts;
     const channelId = action.channelId;
+    const skipAddToChannel = action.skipAddToChannel;
 
     const nextPosts = {...posts};
     const nextPostsForChannel = {...postsInChannel};
@@ -59,7 +60,7 @@ function handleReceivedPosts(posts = {}, postsInChannel = {}, action) {
             nextPosts[newPost.id] = newPost;
         }
 
-        if (postsForChannel.indexOf(newPost.id) === -1) {
+        if (!skipAddToChannel && postsForChannel.indexOf(newPost.id) === -1) {
             // Just add the post id to the end of the order and we'll sort it out later
             postsForChannel.push(newPost.id);
         }
