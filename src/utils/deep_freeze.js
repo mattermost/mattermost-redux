@@ -26,6 +26,11 @@
  * only be used in DEV.
  */
 export default function deepFreezeAndThrowOnMutation(object) {
+    // Some objects in IE11 don't have a hasOwnProperty method so don't even bother trying to freeze them
+    if (window.navigator.userAgent.indexOf('Trident') !== -1) {
+        return object;
+    }
+
     if (typeof object !== 'object' || object === null || Object.isFrozen(object) || Object.isSealed(object)) {
         return object;
     }
