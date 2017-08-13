@@ -115,6 +115,19 @@ class TestHelper {
         };
     };
 
+    fakeOutgoingHook = (teamId) => {
+        return {
+            teamId
+        };
+    };
+
+    fakeOutgoingHookWithId = (teamId) => {
+        return {
+            ...this.fakeOutgoingHook(teamId),
+            id: this.generateId()
+        };
+    };
+
     testCommand = () => {
         return {
             trigger: this.generateId(),
