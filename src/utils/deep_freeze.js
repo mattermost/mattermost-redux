@@ -8,7 +8,7 @@
  *
  */
 
- const disableOnIe11 =
+const disableOnIe11 =
     window && window.navigator && window.navigator.userAgent &&
     window.navigator.userAgent.indexOf('Trident') !== -1;
 
