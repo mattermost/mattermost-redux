@@ -1,12 +1,68 @@
-# Mattermost Redux (unreleased)
+# Mattermost Redux (beta)
 
-**Supported Server Versions:** Master (no released versions are currently supported) 
+**Supported Server Versions:** Latest
 
-This is an unreleased project for replacing the current implementation of the store with Redux. The project is not yet stable, and the instructions are for internal use currently (i.e. probably out-of-date until we stablize).
+The project is in beta, with the purpose of consolidating the storage, web utilities and logic of the webapp and React Native mobile clients into a single driver. We encourgae you to use mattermost-redux to power your own Mattermost clients or integrations.
 
-We'll post updates to our [Forums](http://forum.mattermost.org/) and [Twitter](https://twitter.com/mattermosthq) when we're ready to bring in more community contributors.
+[Redux](http://redux.js.org/docs/introduction/) is the backbone for this project and many of the design decisions and patterns stem from it.
 
-Mattermost is an open source Slack-alternative used by thousands of companies around the world in 11 languages. Learn more at https://mattermost.com.
+Mattermost is an open source Slack-alternative used by thousands of companies around the world in more than 12 languages. Learn more at https://mattermost.com.
+
+# Usage
+
+### Basic Usage
+
+To hook up your application to the mattermost-redux store:
+
+```
+import configureServiceStore from 'mattermost-redux/store';
+
+configureServiceStore(yourInitialState, yourAppReducers, yourOfflineOptions);
+
+const store = configureStore();
+
+// use store
+```
+
+* `yourInitialState` - any initial state for any extra reducers you may have (set to `{}` if none)
+* `yourAppReducers` - any reducers from your app (set to `{}` if none)
+* `yourOfflineOptions` - any offline options, specified using [this redux-offline configuration object](https://github.com/jevakallio/redux-offline#configuration-object)
+
+### Web Client Usage
+
+If you're only looking to use the v4 JavaScript web client for the Mattermost server:
+
+```
+import {Client4} from 'mattermost-redux/client';
+
+Client4.setUrl('https://your-mattermost-url.com');
+
+async function loginAndGetUser(username, password) {
+    await Client4.login(username, password);
+    return await Client4.getMe();
+}
+
+```
+
+If you already have a [personal access token](https://docs.mattermost.com/guides/developer/personal-access-tokens.html) or session token, you can set the token manually instead of logging in:
+
+```
+import {Client4} from 'mattermost-redux/client';
+
+Client4.setUrl('https://your-mattermost-url.com');
+Client4.setToken(yourToken);
+```
+
+# Features for Stable Release
+
+* Improved return pattern for actions, always return both data and error
+* Error reporting for optimistic actions
+* Better documentation
+
+### Future Features
+
+* Full server mocking for unit tests (including WebSocket mocking)
+* Offline support with automatic update polling (needs server work)
 
 # How to Contribute
 
