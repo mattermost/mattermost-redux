@@ -270,7 +270,7 @@ export function getGroupDisplayNameFromUserIds(userIds, profiles, currentUserId,
     });
 
     function sortUsernames(a, b) {
-        const locale = profiles[currentUserId].locale;
+        const locale = getUserLocale(currentUserId, profiles);
         return a.localeCompare(b, locale, {numeric: true});
     }
 
