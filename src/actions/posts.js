@@ -360,7 +360,8 @@ export function getPostThread(postId) {
             {
                 type: PostTypes.RECEIVED_POSTS,
                 data: posts,
-                channelId: post.channel_id
+                channelId: post.channel_id,
+                skipAddToChannel: true
             },
             {
                 type: PostTypes.GET_POST_THREAD_SUCCESS
@@ -392,7 +393,8 @@ export function getPostThreadWithRetry(postId) {
                             {
                                 type: PostTypes.RECEIVED_POSTS,
                                 data: payload,
-                                channelId: post.channel_id
+                                channelId: post.channel_id,
+                                skipAddToChannel: true
                             },
                             {
                                 type: PostTypes.GET_POST_THREAD_SUCCESS
