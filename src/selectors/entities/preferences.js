@@ -101,13 +101,8 @@ export const getTheme = createSelector(
         }
 
         if (typeof theme === 'string') {
-            try {
-                // A custom theme will be a JSON-serialized object stored in a preference
-                theme = JSON.parse(theme);
-            } catch (e) {
-                // But if it's not a JSON object, it must be the name of a default theme
-                theme = Preferences.THEMES[theme];
-            }
+            // A custom theme will be a JSON-serialized object stored in a preference
+            theme = JSON.parse(theme);
         }
 
         // At this point, the theme should be a plain object
