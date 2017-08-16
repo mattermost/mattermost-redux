@@ -21,13 +21,25 @@ describe('Selectors.Preferences', () => {
     const name3 = 'testname3';
     const pref3 = {category: category3, name: name3, value: 'true'};
 
+    const currentUserId = 'currentuserid';
+    const currentTeamId = 'currentteamid';
+    const testTheme = {themeColor: '#ffffff'};
+    const themePref = {category: Preferences.CATEGORY_THEME, name: '', value: JSON.stringify(testTheme)};
+
     const myPreferences = {};
     myPreferences[`${category1}--${name1}`] = pref1;
     myPreferences[`${category2}--${name2}`] = pref2;
     myPreferences[`${category3}--${name3}`] = pref3;
+    myPreferences[`${themePref.category}--${themePref.name}`] = themePref;
 
     const testState = deepFreezeAndThrowOnMutation({
         entities: {
+            users: {
+                currentUserId
+            },
+            teams: {
+                currentTeamId
+            },
             preferences: {
                 myPreferences
             }
@@ -111,6 +123,32 @@ describe('Selectors.Preferences', () => {
                 General.TEAMMATE_NAME_DISPLAY.SHOW_NICKNAME_FULLNAME
             );
         });
+    });
+
+    it('get theme', () => {
+        assert.deepEqual(Selectors.getTheme(testState), testTheme);
+    });
+
+    it('get theme from style', () => {
+        function testStyleFunction(theme) {
+            return {
+                container: {
+                    backgroundColor: theme.themeColor,
+                    height: 100
+                }
+            };
+        }
+
+        const expected = {
+            container: {
+                backgroundColor: testTheme.themeColor,
+                height: 100
+            }
+        };
+
+        const getStyleFromTheme = Selectors.makeGetStyleFromTheme();
+
+        assert.deepEqual(getStyleFromTheme(testState, testStyleFunction), expected);
     });
 });
 
