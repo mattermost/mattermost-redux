@@ -117,8 +117,11 @@ export function shouldFilterPost(post, options = {}) {
     // Add as much filters as needed here, if you want to filter the post return true
     const postTypes = Posts.POST_TYPES;
 
-    if (options.filterJoinLeave && (post.type === postTypes.JOIN_LEAVE || post.type === postTypes.JOIN_CHANNEL || post.type === postTypes.LEAVE_CHANNEL)) {
-        return true;
+    if (options.filterJoinLeave) {
+        const joinLeaveTypes = [postTypes.JOIN_LEAVE, postTypes.JOIN_CHANNEL, postTypes.LEAVE_CHANNEL, postTypes.ADD_REMOVE, postTypes.ADD_TO_CHANNEL, postTypes.REMOVE_FROM_CHANNEL];
+        if (joinLeaveTypes.includes(post.type)) {
+            return true;
+        }
     }
 
     return false;
