@@ -17,5 +17,32 @@ export default {
     EMAIL_INTERVAL: 'email_interval',
     INTERVAL_FIFTEEN_MINUTES: 15 * 60,
     INTERVAL_HOUR: 60 * 60,
-    INTERVAL_IMMEDIATE: 30 // "immediate" is a 30 second interval
+    INTERVAL_IMMEDIATE: 30, // "immediate" is a 30 second interval
+    THEMES: {
+        default: {
+            type: 'Mattermost',
+            sidebarBg: '#145dbf',
+            sidebarText: '#ffffff',
+            sidebarUnreadText: '#ffffff',
+            sidebarTextHoverBg: '#4578bf',
+            sidebarTextActiveBorder: '#579eff',
+            sidebarTextActiveColor: '#ffffff',
+            sidebarHeaderBg: '#1153ab',
+            sidebarHeaderTextColor: '#ffffff',
+            onlineIndicator: '#06d6a0',
+            awayIndicator: '#ffbc42',
+            mentionBj: '#ffffff',
+            mentionColor: '#145dbf',
+            centerChannelBg: '#ffffff',
+            centerChannelColor: '#3d3c40',
+            newMessageSeparator: '#ff8800',
+            linkColor: '#2389d7',
+            buttonBg: '#166de0',
+            buttonColor: '#ffffff',
+            errorTextColor: '#fd5960',
+            mentionHighlightBg: '#ffe577',
+            mentionHighlightLink: '#166de0',
+            codeTheme: 'github'
+        }
+    }
 };

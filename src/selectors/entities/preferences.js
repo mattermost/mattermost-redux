@@ -6,6 +6,7 @@ import {createSelector} from 'reselect';
 import {General, Preferences} from 'constants';
 
 import {getConfig} from 'selectors/entities/general';
+import {getCurrentTeamId} from 'selectors/entities/teams';
 
 import {getPreferenceKey} from 'utils/preference_utils';
 
@@ -77,3 +78,50 @@ export const getTeammateNameDisplaySetting = createSelector(
         return General.TEAMMATE_NAME_DISPLAY.SHOW_USERNAME;
     }
 );
+
+export const getTheme = createSelector(
+    getMyPreferences,
+    getCurrentTeamId,
+    (myPreferences, currentTeamId) => {
+        // Prefer the user's current team-specific theme over the user's current global theme over the default theme
+        let themePreference;
+        if (currentTeamId) {
+            themePreference = myPreferences[getPreferenceKey(Preferences.CATEGORY_THEME, currentTeamId)];
+        }
+
+        if (!themePreference) {
+            themePreference = myPreferences[getPreferenceKey(Preferences.CATEGORY_THEME, '')];
+        }
+
+        let theme;
+        if (themePreference) {
+            theme = themePreference.value;
+        } else {
+            theme = Preferences.THEMES.default;
+        }
+
+        if (typeof theme === 'string') {
+            // A custom theme will be a JSON-serialized object stored in a preference
+            theme = JSON.parse(theme);
+        }
+
+        // At this point, the theme should be a plain object
+
+        // Fix a case where upper case theme colours are rendered as black
+        for (const key of Object.keys(theme)) {
+            theme[key] = theme[key].toLowerCase();
+        }
+
+        return theme;
+    }
+);
+
+export function makeGetStyleFromTheme() {
+    return createSelector(
+        getTheme,
+        (state, getStyleFromTheme) => getStyleFromTheme,
+        (theme, getStyleFromTheme) => {
+            return getStyleFromTheme(theme);
+        }
+    );
+}
