@@ -119,7 +119,7 @@ export function shouldFilterPost(post, options = {}) {
 
     if (options.filterJoinLeave) {
         const joinLeaveTypes = [postTypes.JOIN_LEAVE, postTypes.JOIN_CHANNEL, postTypes.LEAVE_CHANNEL, postTypes.ADD_REMOVE, postTypes.ADD_TO_CHANNEL, postTypes.REMOVE_FROM_CHANNEL];
-        if (joinLeaveTypes.indexOf(post.type) >= 0) {
+        if (joinLeaveTypes.includes(post.type)) {
             return true;
         }
     }
