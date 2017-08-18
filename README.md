@@ -55,16 +55,17 @@ Client4.setToken(yourToken);
 
 ### node.js Usage
 
-Running the client from node.js requires making the `fetch` and `WebSocket` packages globally available:
+Running the client from node.js requires making the `fetch` and `WebSocket` packages globally available, and the use of `babel-polyfill`:
 
 ```
+require('babel-polyfill');
 require('isomorphic-fetch');
 if (!global.WebSocket) {
     global.WebSocket = require('ws');
 }
-const MatterMost = require('./client/index.js');
-const client = MatterMost.Client4;
-const wsClient = MatterMost.WebSocketClient;
+const Client4 = require('./client/client4.js').default;
+const client = new Client4;
+const wsClient = require('./client/websocket_client.js').default;
 var token;
 
 wsClient.setEventCallback(function(event){
