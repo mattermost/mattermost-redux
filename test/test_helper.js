@@ -7,7 +7,7 @@ import nock from 'nock';
 import Client from 'client/client';
 import Client4 from 'client/client4';
 
-const DEFAULT_SERVER = 'http://localhost:8065';
+const DEFAULT_SERVER = `${process.env.MATTERMOST_SERVER_URL || 'http://localhost:8065'}`; //eslint-disable-line no-process-env
 const PASSWORD = 'password1';
 
 class TestHelper {
