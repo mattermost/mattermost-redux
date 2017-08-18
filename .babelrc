@@ -6,6 +6,7 @@
   "plugins": [
     ["module-resolver", {
       "root": ["./src", "."]
-    }]
+    }],
+    "transform-runtime"
   ]
 }
