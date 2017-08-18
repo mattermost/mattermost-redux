@@ -2,7 +2,7 @@
 
 **Supported Server Versions:** Latest
 
-The project is in beta, with the purpose of consolidating the storage, web utilities and logic of the webapp and React Native mobile clients into a single driver. We encourgae you to use mattermost-redux to power your own Mattermost clients or integrations.
+The project is in beta, with the purpose of consolidating the storage, web utilities and logic of the webapp and React Native mobile clients into a single driver. We encourage you to use mattermost-redux to power your own Mattermost clients or integrations.
 
 [Redux](http://redux.js.org/docs/introduction/) is the backbone for this project and many of the design decisions and patterns stem from it.
 
