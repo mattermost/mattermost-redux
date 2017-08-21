@@ -211,9 +211,9 @@ export default class Client4 {
 
         if (this.token) {
             headers[HEADER_AUTH] = `${HEADER_BEARER} ${this.token}`;
+        } else {
+            newOptions.credentials = 'include';
         }
-
-        newOptions.credentials = 'include';
 
         if (this.userAgent) {
             headers[HEADER_USER_AGENT] = this.userAgent;
