@@ -83,7 +83,7 @@ class WebSocketClient {
                 }
             }
 
-            this.conn = new Socket(connectionUrl, null, {origin});
+            this.conn = new Socket(connectionUrl, [], {origin});
             this.connectionUrl = connectionUrl;
             this.token = token;
             this.dispatch = dispatch;
