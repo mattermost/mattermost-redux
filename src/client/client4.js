@@ -30,6 +30,7 @@ export default class Client4 {
         this.enableLogging = false;
         this.defaultHeaders = {};
         this.userId = '';
+        this.includeCookies = true;
 
         this.translations = {
             connectionError: 'There appears to be a problem with your internet connection.',
@@ -63,6 +64,10 @@ export default class Client4 {
 
     setEnableLogging(enable) {
         this.enableLogging = enable;
+    }
+
+    setIncludeCookies(include) {
+        this.includeCookies = include;
     }
 
     setUserId(userId) {
@@ -213,7 +218,9 @@ export default class Client4 {
             headers[HEADER_AUTH] = `${HEADER_BEARER} ${this.token}`;
         }
 
-        newOptions.credentials = 'include';
+        if (this.includeCookies) {
+            newOptions.credentials = 'include';
+        }
 
         if (this.userAgent) {
             headers[HEADER_USER_AGENT] = this.userAgent;
