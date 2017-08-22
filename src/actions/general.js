@@ -10,7 +10,7 @@ import {logError} from './errors';
 import EventEmitter from 'utils/event_emitter';
 import {batchActions} from 'redux-batched-actions';
 
-export function getPing() {
+export function getPing(useV3 = false) {
     return async (dispatch, getState) => {
         dispatch({type: GeneralTypes.PING_REQUEST}, getState);
 
@@ -20,18 +20,26 @@ export function getPing() {
             'Cannot connect to the server. Please check your server URL and internet connection.'
         );
         try {
-            data = await Client.getPing();
-            if (!data.version) {
+            if (useV3) {
+                data = await Client.getPing();
+            } else {
+                data = await Client4.ping();
+            }
+            if ((useV3 && !data.version) || (!useV3 && data.status !== 'OK')) {
                 // successful ping but not the right return data
                 dispatch({type: GeneralTypes.PING_FAILURE, error: pingError}, getState);
-                return;
+                return {error: pingError};
             }
         } catch (error) {
+            if (!useV3 && error.status_code === 404) {
+                return getPing(true)(dispatch, getState);
+            }
             dispatch({type: GeneralTypes.PING_FAILURE, error: pingError}, getState);
-            return;
+            return {error: pingError};
         }
 
         dispatch({type: GeneralTypes.PING_SUCCESS, data}, getState);
+        return {data};
     };
 }
 
