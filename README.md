@@ -53,6 +53,42 @@ Client4.setUrl('https://your-mattermost-url.com');
 Client4.setToken(yourToken);
 ```
 
+### Browser Usage
+
+To build a browser-compatible client via `webpack`:
+
+```
+$ git clone <this repo>
+$ cd mattermost-redux
+$ npm install && npm run build && npm run webpack
+```
+
+`lib/mattermost-redux.bundle.js` exposes the v4 client and the websocket client as `window.MatterMostClient` and `window.MatterMostWebSocketClient`, respectively.
+
+
+```
+<script src="/path/to/mattermost-redux.bundle.js"></script>
+<script type="text/javascript">
+    const client = window.MatterMostClient;
+    const wsClient = window.MatterMostWebSocketClient;
+    var token;
+    client.setUrl('https://your-mattermost-url.com');
+    client.setToken('yourToken');
+    client.setIncludeCookies(false);
+    client.login(username, password)
+    .then(function(user){
+        console.log(`Logged in as ${user.email}`);
+        token = client.getToken();
+    })
+    .then(function(){
+        wsClient.initialize(token, {}, {}, {connectionUrl: 'wss://your-mattermost-url.com/api/v4/websocket'});
+    })
+    .catch(function(err){
+        console.error(err);
+    });
+</script>
+```
+
 ### node.js Usage
 
 Running the client from node.js requires making the `fetch` and `WebSocket` packages globally available, and the use of `babel-polyfill`:

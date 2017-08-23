@@ -38,10 +38,13 @@
     "redux-persist-node-storage": "1.0.2",
     "remote-redux-devtools": "0.5.7",
     "remote-redux-devtools-on-debugger": "0.7.0",
+    "uglifyjs-webpack-plugin": "0.4.6",
+    "webpack": "3.5.5",
     "ws": "2.2.3"
   },
   "scripts": {
     "build": "babel src --out-dir .",
+    "webpack": "node_modules/.bin/webpack",
     "check": "node_modules/.bin/eslint --ext \".js\" --ignore-pattern node_modules --quiet .",
     "test": "NODE_ENV=test mocha --opts test/mocha.opts",
     "postinstall": "npm run build"

@@ -33,3 +33,6 @@ mattermost-redux-*.tgz
 /selectors
 /store
 /utils
+
+# browser bundle
+/lib

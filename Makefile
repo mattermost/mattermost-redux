@@ -37,6 +37,7 @@ pre-run:
 	@rm -rf selectors
 	@rm -rf store
 	@rm -rf utils
+	@rm -rf lib
 
 test: check-style
 	npm test
