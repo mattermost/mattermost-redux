@@ -63,14 +63,14 @@ $ cd mattermost-redux
 $ npm install && npm run build && npm run webpack
 ```
 
-`lib/mattermost-redux.bundle.js` exposes the v4 client and the websocket client as `window.MatterMostClient` and `window.MatterMostWebSocketClient`, respectively.
+`lib/mattermost-redux.bundle.js` exposes the v4 client and the websocket client as `window.MattermostClient` and `window.MattermostWebSocketClient`, respectively.
 
 
 ```
 <script src="/path/to/mattermost-redux.bundle.js"></script>
 <script type="text/javascript">
-    const client = window.MatterMostClient;
-    const wsClient = window.MatterMostWebSocketClient;
+    const client = window.MattermostClient;
+    const wsClient = window.MattermostWebSocketClient;
     var token;
     client.setUrl('https://your-mattermost-url.com');
     client.setToken('yourToken');
