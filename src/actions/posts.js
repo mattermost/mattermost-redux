@@ -337,7 +337,7 @@ export function flagPost(postId) {
     };
 }
 
-export function getPostThread(postId) {
+export function getPostThread(postId, skipAddToChannel = true) {
     return async (dispatch, getState) => {
         dispatch({type: PostTypes.GET_POST_THREAD_REQUEST}, getState);
 
@@ -361,7 +361,7 @@ export function getPostThread(postId) {
                 type: PostTypes.RECEIVED_POSTS,
                 data: posts,
                 channelId: post.channel_id,
-                skipAddToChannel: true
+                skipAddToChannel
             },
             {
                 type: PostTypes.GET_POST_THREAD_SUCCESS
