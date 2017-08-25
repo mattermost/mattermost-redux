@@ -390,11 +390,18 @@ export function sortChannelsByDisplayName(locale, a, b) {
         return (typeToPrefixMap[a.type] || defaultPrefix).localeCompare((typeToPrefixMap[b.type] || defaultPrefix), locale);
     }
 
-    if (a.display_name !== b.display_name) {
-        return a.display_name.toLowerCase().localeCompare(b.display_name.toLowerCase(), locale, {numeric: true});
+    const aDisplayName = filterName(a.display_name);
+    const bDisplayName = filterName(b.display_name);
+
+    if (aDisplayName !== bDisplayName) {
+        return aDisplayName.toLowerCase().localeCompare(bDisplayName.toLowerCase(), locale, {numeric: true});
     }
 
     return a.name.toLowerCase().localeCompare(b.name.toLowerCase(), locale, {numeric: true});
+}
+
+function filterName(name) {
+    return name.replace(/[.,'"\/#!$%\^&\*;:{}=\-_`~()]/g, ''); // eslint-disable-line no-useless-escape
 }
 
 function sortFavorites(locale, a, b) {
