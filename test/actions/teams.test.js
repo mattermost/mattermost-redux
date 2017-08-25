@@ -239,6 +239,27 @@ describe('Actions.Teams', () => {
         assert.ok(members[TestHelper.basicTeam.id][user.id]);
     });
 
+    it('getTeamMembers', async () => {
+        const user1 = await TestHelper.basicClient4.createUser(TestHelper.fakeUser());
+        const user2 = await TestHelper.basicClient4.createUser(TestHelper.fakeUser());
+
+        await Actions.addUserToTeam(TestHelper.basicTeam.id, user1.id)(store.dispatch, store.getState);
+        await Actions.addUserToTeam(TestHelper.basicTeam.id, user2.id)(store.dispatch, store.getState);
+        await Actions.getTeamMembers(TestHelper.basicTeam.id)(store.dispatch, store.getState);
+
+        const membersRequest = store.getState().requests.teams.getTeamMembers;
+        const membersInTeam = store.getState().entities.teams.membersInTeam;
+
+        if (membersRequest.status === RequestStatus.FAILURE) {
+            throw new Error(JSON.stringify(membersRequest.error));
+        }
+
+        assert.ok(membersInTeam[TestHelper.basicTeam.id]);
+        assert.ok(membersInTeam[TestHelper.basicTeam.id][TestHelper.basicUser.id]);
+        assert.ok(membersInTeam[TestHelper.basicTeam.id][user1.id]);
+        assert.ok(membersInTeam[TestHelper.basicTeam.id][user2.id]);
+    });
+
     it('getTeamMembersByIds', async () => {
         const user1 = await TestHelper.basicClient4.createUser(
             TestHelper.fakeUser(),
@@ -285,8 +306,8 @@ describe('Actions.Teams', () => {
         assert.ok(stat);
 
         // we need to take into account the members of the tests above
-        assert.equal(stat.total_member_count, 5);
-        assert.equal(stat.active_member_count, 5);
+        assert.equal(stat.total_member_count, 7);
+        assert.equal(stat.active_member_count, 7);
     });
 
     it('addUserToTeam', async () => {

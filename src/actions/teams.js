@@ -145,6 +145,16 @@ export function getMyTeamMembers() {
     );
 }
 
+export function getTeamMembers(teamId) {
+    return bindClientFunc(
+        Client4.getTeamMembers,
+        TeamTypes.GET_TEAM_MEMBERS_REQUEST,
+        [TeamTypes.RECEIVED_MEMBERS_IN_TEAM, TeamTypes.GET_TEAM_MEMBERS_SUCCESS],
+        TeamTypes.GET_TEAM_MEMBERS_FAILURE,
+        teamId
+    );
+}
+
 export function getTeamMember(teamId, userId) {
     return async (dispatch, getState) => {
         dispatch({type: TeamTypes.TEAM_MEMBERS_REQUEST}, getState);
