@@ -60,7 +60,7 @@ To build a browser-compatible client via `webpack`:
 ```
 $ git clone <this repo>
 $ cd mattermost-redux
-$ npm install && npm run build && npm run webpack
+$ make bundle
 ```
 
 `lib/mattermost-redux.bundle.js` exposes the v4 client and the websocket client as `window.MattermostClient` and `window.MattermostWebSocketClient`, respectively.
