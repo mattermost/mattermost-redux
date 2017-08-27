@@ -44,8 +44,8 @@
   },
   "scripts": {
     "build": "babel src --out-dir .",
-    "webpack": "node_modules/.bin/webpack",
-    "check": "node_modules/.bin/eslint --ext \".js\" --ignore-pattern node_modules --quiet .",
+    "webpack": "webpack",
+    "check": "eslint --ext \".js\" --ignore-pattern node_modules --quiet .",
     "test": "NODE_ENV=test mocha --opts test/mocha.opts",
     "postinstall": "npm run build"
   }
