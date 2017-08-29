@@ -896,7 +896,6 @@ export function doPostAction(postId, actionId) {
     );
 }
 
-
 export default {
     createPost,
     editPost,
