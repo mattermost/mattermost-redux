@@ -24,6 +24,7 @@ describe('Actions.Posts', () => {
     });
 
     after(async () => {
+        nock.restore();
         await TestHelper.basicClient.logout();
         await TestHelper.basicClient4.logout();
     });
@@ -997,5 +998,21 @@ describe('Actions.Posts', () => {
         const metadata = state.entities.posts.openGraph;
         assert.ok(metadata);
         assert.ok(metadata[url]);
+    });
+
+    it('doPostAction', async () => {
+        TestHelper.activateMocking();
+
+        nock(Client4.getBaseRoute()).
+            post('/posts/posth67ja7ntdkek6g13dp3wka/actions/action7ja7ntdkek6g13dp3wka').
+            reply(200, {});
+
+        await Actions.doPostAction('posth67ja7ntdkek6g13dp3wka', 'action7ja7ntdkek6g13dp3wka')(store.dispatch, store.getState);
+
+        const state = store.getState();
+        const request = state.requests.posts.doPostAction;
+        if (request.status === RequestStatus.FAILURE) {
+            throw new Error('doPostAction request failed');
+        }
     });
 });

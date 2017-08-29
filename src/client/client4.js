@@ -1263,6 +1263,13 @@ export default class Client4 {
         );
     };
 
+    doPostAction = async (postId, actionId) => {
+        return this.doFetch(
+            `${this.getPostRoute(postId)}/actions/${actionId}`,
+            {method: 'post'}
+        );
+    };
+
     // Files Routes
 
     getFileUrl(fileId, timestamp) {
