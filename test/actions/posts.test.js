@@ -1000,7 +1000,7 @@ describe('Actions.Posts', () => {
         assert.ok(metadata[url]);
     });
 
-    it.only('doPostAction', async () => {
+    it('doPostAction', async () => {
         TestHelper.activateMocking();
 
         nock(Client4.getBaseRoute()).
