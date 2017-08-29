@@ -791,6 +791,13 @@ export default class Client4 {
         );
     };
 
+    getTeamMembers = async (teamId, page = 0, perPage = PER_PAGE_DEFAULT) => {
+        return this.doFetch(
+            `${this.getTeamMembersRoute(teamId)}${buildQueryString({page, per_page: perPage})}`,
+            {method: 'get'}
+        );
+    };
+
     getTeamMembersForUser = async (userId) => {
         return this.doFetch(
             `${this.getUserRoute(userId)}/teams/members`,
