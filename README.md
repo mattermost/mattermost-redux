@@ -38,8 +38,22 @@ import {Client4} from 'mattermost-redux/client';
 Client4.setUrl('https://your-mattermost-url.com');
 
 async function loginAndGetUser(username, password) {
-    await Client4.login(username, password);
-    return await Client4.getMe();
+    try {
+        await Client4.login(username, password);
+    } catch (error) {
+        console.error(error);
+        return null;
+    }
+
+    let user;
+    try {
+        user = await Client4.getMe();
+    } catch (error) {
+        console.error(error);
+        return null;
+    }
+
+    return user;
 }
 
 ```
