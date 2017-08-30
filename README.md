@@ -32,6 +32,7 @@ const store = configureStore();
 
 If you're only looking to use the v4 JavaScript web client for the Mattermost server:
 
+With async/await:
 ```
 import {Client4} from 'mattermost-redux/client';
 
@@ -56,6 +57,33 @@ async function loginAndGetUser(username, password) {
     return user;
 }
 
+```
+
+With promises:
+```
+import {Client4} from 'mattermost-redux/client';
+
+Client4.setUrl('https://your-mattermost-url.com');
+
+function loginAndGetUser(username, password, callback) {
+    Client4.login(username, password).then(
+        () => {
+            Client4.getMe().then(
+                (data) => {
+                    callback(data);
+                }
+            ).catch(
+                (error) => {
+                    console.error(error);
+                }
+            );
+        }
+    ).catch(
+        (error) => {
+            console.error(error);
+        }
+    );
+}
 ```
 
 If you already have a [personal access token](https://docs.mattermost.com/guides/developer/personal-access-tokens.html) or session token, you can set the token manually instead of logging in:
