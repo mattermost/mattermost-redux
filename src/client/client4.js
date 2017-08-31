@@ -206,6 +206,14 @@ export default class Client4 {
         return `${this.getBaseRoute()}/jobs`;
     }
 
+    getPluginsRoute() {
+        return `${this.getBaseRoute()}/plugins`;
+    }
+
+    getPluginRoute(pluginId) {
+        return `${this.getPluginsRoute()}/${pluginId}`;
+    }
+
     getOptions(options) {
         const newOptions = Object.assign({}, options);
 
@@ -1936,6 +1944,45 @@ export default class Client4 {
         return this.doFetch(
             `${this.getBaseRoute()}/analytics/old${buildQueryString({name, team_id: teamId})}`,
             {method: 'get'}
+        );
+    };
+
+    // Plugin Routes - EXPERIMENTAL - SUBJECT TO CHANGE
+
+    uploadPlugin = async (fileData) => {
+        this.trackEvent('api', 'api_plugin_upload');
+
+        const formData = new FormData();
+        formData.append('plugin', fileData);
+
+        const request = {
+            method: 'post',
+            body: formData
+        };
+
+        if (formData.getBoundary) {
+            request.headers = {
+                'Content-Type': `multipart/form-data; boundary=${formData.getBoundary()}`
+            };
+        }
+
+        return this.doFetch(
+            this.getPluginsRoute(),
+            request
+        );
+    };
+
+    getPlugins = async () => {
+        return this.doFetch(
+            this.getPluginsRoute(),
+            {method: 'get'}
+        );
+    };
+
+    removePlugin = async (pluginId) => {
+        return this.doFetch(
+            this.getPluginRoute(pluginId),
+            {method: 'delete'}
         );
     };
 

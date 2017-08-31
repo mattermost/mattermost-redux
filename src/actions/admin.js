@@ -304,3 +304,80 @@ export function getPostsPerDayAnalytics(teamId = '') {
 export function getUsersPerDayAnalytics(teamId = '') {
     return getAnalytics('user_counts_with_posts_day', teamId);
 }
+
+// EXPERIMENTAL - SUBJECT TO CHANGE
+export function uploadPlugin(fileData) {
+    return async (dispatch) => {
+        dispatch({type: AdminTypes.UPLOAD_PLUGIN_REQUEST});
+
+        let data;
+        try {
+            data = await Client4.uploadPlugin(fileData);
+        } catch (error) {
+            forceLogoutIfNecessary(error, dispatch);
+            dispatch(batchActions([
+                {type: AdminTypes.UPLOAD_PLUGIN_FAILURE, error},
+                logError(error)(dispatch)
+            ]));
+            return {error};
+        }
+
+        dispatch(batchActions([
+            {type: AdminTypes.UPLOAD_PLUGIN_SUCCESS},
+            {type: AdminTypes.RECEIVED_PLUGIN, data}
+        ]));
+
+        return {data};
+    };
+}
+
+// EXPERIMENTAL - SUBJECT TO CHANGE
+export function getPlugins() {
+    return async (dispatch) => {
+        dispatch({type: AdminTypes.GET_PLUGIN_REQUEST});
+
+        let data;
+        try {
+            data = await Client4.getPlugins();
+        } catch (error) {
+            forceLogoutIfNecessary(error, dispatch);
+            dispatch(batchActions([
+                {type: AdminTypes.GET_PLUGIN_FAILURE, error},
+                logError(error)(dispatch)
+            ]));
+            return {error};
+        }
+
+        dispatch(batchActions([
+            {type: AdminTypes.GET_PLUGIN_SUCCESS},
+            {type: AdminTypes.RECEIVED_PLUGINS, data}
+        ]));
+
+        return {data};
+    };
+}
+
+// EXPERIMENTAL - SUBJECT TO CHANGE
+export function removePlugin(pluginId) {
+    return async (dispatch) => {
+        dispatch({type: AdminTypes.REMOVE_PLUGIN_REQUEST});
+
+        try {
+            await Client4.removePlugin(pluginId);
+        } catch (error) {
+            forceLogoutIfNecessary(error, dispatch);
+            dispatch(batchActions([
+                {type: AdminTypes.REMOVE_PLUGIN_FAILURE, error},
+                logError(error)(dispatch)
+            ]));
+            return {error};
+        }
+
+        dispatch(batchActions([
+            {type: AdminTypes.REMOVE_PLUGIN_SUCCESS},
+            {type: AdminTypes.REMOVED_PLUGIN, data: pluginId}
+        ]));
+
+        return {data: true};
+    };
+}
