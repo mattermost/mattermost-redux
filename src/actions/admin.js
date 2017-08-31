@@ -307,23 +307,54 @@ export function getUsersPerDayAnalytics(teamId = '') {
 
 // EXPERIMENTAL - SUBJECT TO CHANGE
 export function uploadPlugin(fileData) {
-    return bindClientFunc(
-        Client4.uploadPlugin,
-        AdminTypes.UPLOAD_PLUGIN_REQUEST,
-        [AdminTypes.UPLOAD_PLUGIN_SUCCESS, AdminTypes.RECEIVED_PLUGIN],
-        AdminTypes.UPLOAD_PLUGIN_FAILURE,
-        fileData
-    );
+    return async (dispatch) => {
+        dispatch({type: AdminTypes.UPLOAD_PLUGIN_REQUEST});
+
+        let data;
+        try {
+            data = await Client4.uploadPlugin(fileData);
+        } catch (error) {
+            forceLogoutIfNecessary(error, dispatch);
+            dispatch(batchActions([
+                {type: AdminTypes.UPLOAD_PLUGIN_FAILURE, error},
+                logError(error)(dispatch)
+            ]));
+            return {error};
+        }
+
+        dispatch(batchActions([
+            {type: AdminTypes.UPLOAD_PLUGIN_SUCCESS},
+            {type: AdminTypes.RECEIVED_PLUGIN, data}
+        ]));
+
+        return {data};
+    };
 }
 
 // EXPERIMENTAL - SUBJECT TO CHANGE
 export function getPlugins() {
-    return bindClientFunc(
-        Client4.getPlugins,
-        AdminTypes.GET_PLUGIN_REQUEST,
-        [AdminTypes.GET_PLUGIN_SUCCESS, AdminTypes.RECEIVED_PLUGINS],
-        AdminTypes.GET_PLUGIN_FAILURE,
-    );
+    return async (dispatch) => {
+        dispatch({type: AdminTypes.GET_PLUGIN_REQUEST});
+
+        let data;
+        try {
+            data = await Client4.getPlugins();
+        } catch (error) {
+            forceLogoutIfNecessary(error, dispatch);
+            dispatch(batchActions([
+                {type: AdminTypes.GET_PLUGIN_FAILURE, error},
+                logError(error)(dispatch)
+            ]));
+            return {error};
+        }
+
+        dispatch(batchActions([
+            {type: AdminTypes.GET_PLUGIN_SUCCESS},
+            {type: AdminTypes.RECEIVED_PLUGINS, data}
+        ]));
+
+        return {data};
+    };
 }
 
 // EXPERIMENTAL - SUBJECT TO CHANGE
