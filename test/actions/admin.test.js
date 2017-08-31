@@ -633,4 +633,76 @@ describe('Actions.Admin', () => {
         assert.ok(teamAnalytics[TestHelper.basicTeam.id]);
         assert.ok(teamAnalytics[TestHelper.basicTeam.id][Stats.USERS_WITH_POSTS_PER_DAY][0].value === 3);
     });
+
+    it('uploadPlugin', async () => {
+        const testFileData = fs.createReadStream('test/assets/images/test.png');
+        const testPlugin = {id: 'testplugin', webapp: {bundle_path: '/static/somebundle.js'}};
+
+        nock(Client4.getBaseRoute()).
+            post('/plugins').
+            reply(200, testPlugin);
+
+        await Actions.uploadPlugin(testFileData)(store.dispatch, store.getState);
+
+        const state = store.getState();
+        const request = state.requests.admin.uploadPlugin;
+        if (request.status === RequestStatus.FAILURE) {
+            throw new Error('uploadPlugin request failed err=' + request.error);
+        }
+
+        const plugins = state.entities.admin.plugins;
+        assert.ok(plugins);
+        assert.ok(plugins[testPlugin.id]);
+    });
+
+    it('getPlugins', async () => {
+        const testPlugin = {id: 'testplugin2', webapp: {bundle_path: '/static/somebundle.js'}};
+
+        nock(Client4.getBaseRoute()).
+            get('/plugins').
+            reply(200, [testPlugin]);
+
+        await Actions.getPlugins()(store.dispatch, store.getState);
+
+        const state = store.getState();
+        const request = state.requests.admin.getPlugins;
+        if (request.status === RequestStatus.FAILURE) {
+            throw new Error('getPlugins request failed err=' + request.error);
+        }
+
+        const plugins = state.entities.admin.plugins;
+        assert.ok(plugins);
+        assert.ok(plugins[testPlugin.id]);
+    });
+
+    it('removePlugin', async () => {
+        const testPlugin = {id: 'testplugin3', webapp: {bundle_path: '/static/somebundle.js'}};
+
+        nock(Client4.getBaseRoute()).
+            get('/plugins').
+            reply(200, [testPlugin]);
+
+        await Actions.getPlugins()(store.dispatch, store.getState);
+
+        let state = store.getState();
+        let plugins = state.entities.admin.plugins;
+        assert.ok(plugins);
+        assert.ok(plugins[testPlugin.id]);
+
+        nock(Client4.getBaseRoute()).
+            delete(`/plugins/${testPlugin.id}`).
+            reply(200, OK_RESPONSE);
+
+        await Actions.removePlugin(testPlugin.id)(store.dispatch, store.getState);
+
+        const request = state.requests.admin.removePlugin;
+        if (request.status === RequestStatus.FAILURE) {
+            throw new Error('removePlugin request failed err=' + request.error);
+        }
+
+        state = store.getState();
+        plugins = state.entities.admin.plugins;
+        assert.ok(plugins);
+        assert.ok(!plugins[testPlugin.id]);
+    });
 });

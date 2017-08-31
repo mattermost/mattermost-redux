@@ -304,3 +304,49 @@ export function getPostsPerDayAnalytics(teamId = '') {
 export function getUsersPerDayAnalytics(teamId = '') {
     return getAnalytics('user_counts_with_posts_day', teamId);
 }
+
+// EXPERIMENTAL - SUBJECT TO CHANGE
+export function uploadPlugin(fileData) {
+    return bindClientFunc(
+        Client4.uploadPlugin,
+        AdminTypes.UPLOAD_PLUGIN_REQUEST,
+        [AdminTypes.UPLOAD_PLUGIN_SUCCESS, AdminTypes.RECEIVED_PLUGIN],
+        AdminTypes.UPLOAD_PLUGIN_FAILURE,
+        fileData
+    );
+}
+
+// EXPERIMENTAL - SUBJECT TO CHANGE
+export function getPlugins() {
+    return bindClientFunc(
+        Client4.getPlugins,
+        AdminTypes.GET_PLUGIN_REQUEST,
+        [AdminTypes.GET_PLUGIN_SUCCESS, AdminTypes.RECEIVED_PLUGINS],
+        AdminTypes.GET_PLUGIN_FAILURE,
+    );
+}
+
+// EXPERIMENTAL - SUBJECT TO CHANGE
+export function removePlugin(pluginId) {
+    return async (dispatch) => {
+        dispatch({type: AdminTypes.REMOVE_PLUGIN_REQUEST});
+
+        try {
+            await Client4.removePlugin(pluginId);
+        } catch (error) {
+            forceLogoutIfNecessary(error, dispatch);
+            dispatch(batchActions([
+                {type: AdminTypes.REMOVE_PLUGIN_FAILURE, error},
+                logError(error)(dispatch)
+            ]));
+            return {error};
+        }
+
+        dispatch(batchActions([
+            {type: AdminTypes.REMOVE_PLUGIN_SUCCESS},
+            {type: AdminTypes.REMOVED_PLUGIN, data: pluginId}
+        ]));
+
+        return {data: true};
+    };
+}

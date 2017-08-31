@@ -242,6 +242,32 @@ function userAccessTokens(state = {}, action) {
     }
 }
 
+function plugins(state = {}, action) {
+    const nextState = {...state};
+
+    switch (action.type) {
+    case AdminTypes.RECEIVED_PLUGIN: {
+        nextState[action.data.id] = action.data;
+        return nextState;
+    }
+    case AdminTypes.RECEIVED_PLUGINS: {
+        for (const plugin of action.data) {
+            nextState[plugin.id] = plugin;
+        }
+        return nextState;
+    }
+    case AdminTypes.REMOVED_PLUGIN: {
+        Reflect.deleteProperty(nextState, action.data);
+        return nextState;
+    }
+    case UserTypes.LOGOUT_SUCCESS:
+        return {};
+
+    default:
+        return state;
+    }
+}
+
 export default combineReducers({
 
     // array of strings each representing a log entry
@@ -269,6 +295,9 @@ export default combineReducers({
     teamAnalytics,
 
     // object with user ids as keys and objects, with token ids as keys, as values
-    userAccessTokens
+    userAccessTokens,
+
+    // object with plugin ids as keys and objects representing plugin manifests as values
+    plugins
 });
 
