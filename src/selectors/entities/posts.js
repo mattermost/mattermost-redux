@@ -93,8 +93,7 @@ function formatPostInChannel(post, previousPost, index, allPosts, postIds, curre
     let threadRepliedToByCurrentUser = false;
     let threadCreatedByCurrentUser = false;
     const rootId = post.root_id || post.id;
-    postIds.forEach((pid) => {
-        const p = allPosts[pid];
+    Object.values(allPosts).forEach((p) => {
         if (p.root_id === rootId) {
             replyCount += 1;
 
