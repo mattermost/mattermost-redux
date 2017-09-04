@@ -481,6 +481,34 @@ describe('Actions.Integrations', () => {
         assert.ok(oauthApps[created.id]);
     });
 
+    it('editOAuthApp', async () => {
+        const created = await Actions.addOAuthApp(TestHelper.fakeOAuthApp())(store.dispatch, store.getState);
+
+        const expected = Object.assign({}, created);
+        expected.name = 'modified';
+        expected.description = 'modified';
+        expected.homepage = 'https://modified.com';
+        expected.icon_url = 'https://modified.com/icon';
+        expected.callback_urls = ['https://modified.com/callback1', 'https://modified.com/callback2'];
+        expected.is_trusted = true;
+
+        await Actions.editOAuthApp(expected)(store.dispatch, store.getState);
+
+        const request = store.getState().requests.integrations.updateOAuthApp;
+        if (request.status === RequestStatus.FAILURE) {
+            throw new Error(JSON.stringify(request.error));
+        }
+
+        const {oauthApps} = store.getState().entities.integrations;
+        assert.ok(oauthApps[created.id]);
+
+        const actual = oauthApps[created.id];
+
+        assert.notEqual(actual.update_at, expected.update_at);
+        expected.update_at = actual.update_at;
+        assert.equal(JSON.stringify(actual), JSON.stringify(expected));
+    });
+
     it('getOAuthApps', async () => {
         await Actions.addOAuthApp(TestHelper.fakeOAuthApp())(store.dispatch, store.getState);
 

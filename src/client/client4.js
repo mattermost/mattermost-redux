@@ -1584,6 +1584,13 @@ export default class Client4 {
         );
     };
 
+    editOAuthApp = async (app) => {
+        return this.doFetch(
+            `${this.getOAuthAppsRoute()}/${app.id}`,
+            {method: 'put', body: JSON.stringify(app)}
+        );
+    };
+
     getOAuthApps = async (page = 0, perPage = PER_PAGE_DEFAULT) => {
         return this.doFetch(
             `${this.getOAuthAppsRoute()}${buildQueryString({page, per_page: perPage})}`,
