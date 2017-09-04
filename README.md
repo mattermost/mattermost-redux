@@ -63,18 +63,21 @@ $ cd mattermost-redux
 $ make bundle
 ```
 
-`lib/mattermost-redux.bundle.js` exposes the v4 client and the websocket client as `window.MattermostClient` and `window.MattermostWebSocketClient`, respectively.
-
+This will generate `lib/mattermost.client.js`, `lib/mattermost.client4.js`, and `lib/mattermost.websocket.js` which can be loaded in a browser. Also note that `babel-polyfill` is required.
 
 ```
-<script src="/path/to/mattermost-redux.bundle.js"></script>
+<script src="/path/to/babel/polyfill.js"></script>
+<script src="/path/to/mattermost.client4.js"></script>
+<script src="/path/to/mattermost.websocket.js"></script>
 <script type="text/javascript">
-    const client = window.MattermostClient;
-    const wsClient = window.MattermostWebSocketClient;
+    const client = Mattermost.client4.default();
+    const wsClient = Mattermost.websocket.default;
     var token;
     client.setUrl('https://your-mattermost-url.com');
+    /* use an existing personal access token */
     client.setToken('yourToken');
     client.setIncludeCookies(false);
+    /* login and obtain a token */
     client.login(username, password)
     .then(function(user){
         console.log(`Logged in as ${user.email}`);

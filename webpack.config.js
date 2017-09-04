@@ -2,11 +2,15 @@ const path = require('path');
 const UglifyPlugin = require('uglifyjs-webpack-plugin');
 
 module.exports = {
-    entry: './main.browser.js',
+    entry: {
+        client: './src/client/client.js',
+        client4: './src/client/client4.js',
+        websocket: './src/client/websocket_client.js'
+    },
     output: {
         path: path.resolve(__dirname, 'lib'),
-        library: 'Mattermost',
-        filename: 'mattermost-redux.bundle.js'
+        library: ['Mattermost', '[name]'],
+        filename: 'mattermost.[name].js'
     },
     module: {
         rules: [
@@ -16,7 +20,7 @@ module.exports = {
                 use: {
                     loader: 'babel-loader',
                     options: {
-                        presets: ['env']
+                        presets: ['env', 'stage-0']
                     }
                 }
             }
