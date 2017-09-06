@@ -7,7 +7,7 @@ import {getMyPreferences} from 'selectors/entities/preferences';
 import {getCurrentUser} from 'selectors/entities/users';
 
 import {Posts, Preferences} from 'constants';
-import {isSystemMessage, shouldFilterPost} from 'utils/post_utils';
+import {isSystemMessage, shouldFilterPost, comparePosts} from 'utils/post_utils';
 import {getPreferenceKey} from 'utils/preference_utils';
 
 export function getAllPosts(state) {
@@ -93,8 +93,7 @@ function formatPostInChannel(post, previousPost, index, allPosts, postIds, curre
     let threadRepliedToByCurrentUser = false;
     let threadCreatedByCurrentUser = false;
     const rootId = post.root_id || post.id;
-    postIds.forEach((pid) => {
-        const p = allPosts[pid];
+    Object.values(allPosts).forEach((p) => {
         if (p.root_id === rootId) {
             replyCount += 1;
 
@@ -210,18 +209,17 @@ export function makeGetPostsAroundPost() {
 }
 
 // Returns a function that creates a creates a selector that will get the posts for a given thread.
-// That selector will take a props object (containing a channelId field and a rootId field) as its
+// That selector will take a props object (containing a rootId field) as its
 // only argument and will be memoized based on that argument.
 export function makeGetPostsForThread() {
     return createSelector(
         getAllPosts,
-        (state, props) => state.entities.posts.postsInChannel[props.channelId],
         (state, props) => props,
-        (posts, postIds, {rootId}) => {
+        (posts, {rootId}) => {
             const thread = [];
 
-            if (postIds) {
-                for (const id of postIds) {
+            for (const id in posts) {
+                if (posts.hasOwnProperty(id)) {
                     const post = posts[id];
 
                     if (id === rootId || post.root_id === rootId) {
@@ -229,6 +227,8 @@ export function makeGetPostsForThread() {
                     }
                 }
             }
+
+            thread.sort(comparePosts);
 
             return thread;
         }

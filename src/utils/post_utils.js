@@ -130,3 +130,21 @@ export function shouldFilterPost(post, options = {}) {
 export function isPostPendingOrFailed(post) {
     return post.failed || post.id === post.pending_post_id;
 }
+
+export function comparePosts(a, b) {
+    const aIsPendingOrFailed = isPostPendingOrFailed(a);
+    const bIsPendingOrFailed = isPostPendingOrFailed(b);
+    if (aIsPendingOrFailed && !bIsPendingOrFailed) {
+        return -1;
+    } else if (!aIsPendingOrFailed && bIsPendingOrFailed) {
+        return 1;
+    }
+
+    if (a.create_at > b.create_at) {
+        return -1;
+    } else if (a.create_at < b.create_at) {
+        return 1;
+    }
+
+    return 0;
+}
