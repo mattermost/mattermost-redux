@@ -3,7 +3,7 @@
 
 import {PostTypes, SearchTypes, UserTypes} from 'action_types';
 import {Posts} from 'constants';
-import {isPostPendingOrFailed, comparePosts} from 'utils/post_utils';
+import {comparePosts} from 'utils/post_utils';
 
 function handleReceivedPost(posts = {}, postsInChannel = {}, action) {
     const post = action.data;
