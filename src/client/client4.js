@@ -551,7 +551,7 @@ export default class Client4 {
     getProfilePictureUrl = (userId, lastPictureUpdate) => {
         const params = {};
         if (lastPictureUpdate) {
-            params.time = lastPictureUpdate;
+            params._ = lastPictureUpdate;
         }
 
         return `${this.getUserRoute(userId)}/image${buildQueryString(params)}`;
