@@ -985,8 +985,10 @@ describe('Actions.Posts', () => {
         const {dispatch, getState} = store;
 
         const url = 'https://about.mattermost.com';
+        const docs = 'https://docs.mattermost.com/';
 
         await Actions.getOpenGraphMetadata(url)(dispatch, getState);
+        await Actions.getOpenGraphMetadata(docs)(dispatch, getState);
 
         const openGraphRequest = getState().requests.posts.openGraph;
 
@@ -998,6 +1000,7 @@ describe('Actions.Posts', () => {
         const metadata = state.entities.posts.openGraph;
         assert.ok(metadata);
         assert.ok(metadata[url]);
+        assert.ifError(metadata[docs]);
     });
 
     it('doPostAction', async () => {
