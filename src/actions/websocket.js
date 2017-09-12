@@ -118,11 +118,12 @@ async function handleReconnect(dispatch, getState) {
     const {currentChannelId} = entities.channels;
     const {currentUserId} = entities.users;
 
-    await getMyPreferences()(dispatch, getState);
+    getMyPreferences()(dispatch, getState);
 
     if (currentTeamId) {
-        await getMyTeams()(dispatch, getState);
-        await getMyTeamMembers()(dispatch, getState);
+        fetchMyChannelsAndMembers(currentTeamId)(dispatch, getState);
+        getMyTeams()(dispatch, getState);
+        getMyTeamMembers()(dispatch, getState);
         getMyTeamUnreads()(dispatch, getState);
         loadProfilesForDirect()(dispatch, getState);
         getTeams()(dispatch, getState);
@@ -139,7 +140,6 @@ async function handleReconnect(dispatch, getState) {
             return handleLeaveTeamEvent(newMsg, dispatch, getState);
         }
 
-        await fetchMyChannelsAndMembers(currentTeamId)(dispatch, getState);
         const {channels, myMembers} = getState().entities.channels;
         if (!myMembers[currentChannelId]) {
             // in case the user is not a member of the channel when reconnecting
