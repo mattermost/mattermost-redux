@@ -870,16 +870,19 @@ export function getOpenGraphMetadata(url) {
             return null;
         }
 
-        dispatch(batchActions([
-            {
+        const actions = [{
+            type: PostTypes.OPEN_GRAPH_SUCCESS
+        }];
+
+        if (data.description) {
+            actions.push({
                 type: PostTypes.RECEIVED_OPEN_GRAPH_METADATA,
                 data,
                 url
-            },
-            {
-                type: PostTypes.OPEN_GRAPH_SUCCESS
-            }
-        ]), getState);
+            });
+        }
+
+        dispatch(batchActions(actions), getState);
 
         return data;
     };
