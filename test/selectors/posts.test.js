@@ -3,7 +3,7 @@
 
 import assert from 'assert';
 
-import {makeGetPostsForThread, makeGetReactionsForPost, makeGetPostsInChannel, makeGetPostsAroundPost} from 'selectors/entities/posts';
+import {makeGetPostsForThread, makeGetReactionsForPost, makeGetPostsInChannel, makeGetPostsAroundPost, makeGetMessageInHistoryItem} from 'selectors/entities/posts';
 import {makeGetProfilesForReactions} from 'selectors/entities/users';
 import deepFreezeAndThrowOnMutation from 'utils/deep_freeze';
 import TestHelper from 'test/test_helper';
@@ -676,5 +676,58 @@ describe('Selectors.Posts', () => {
 
         const getPostsInChannel = makeGetPostsInChannel();
         assert.deepEqual(getPostsInChannel(testStateAny, '1'), [post3, post2, post1]);
+    });
+
+    it('get current history item', () => {
+        const testState1 = deepFreezeAndThrowOnMutation({
+            entities: {
+                posts: {
+                    messagesHistory: {
+                        messages: ['test1', 'test2', 'test3'],
+                        index: {
+                            post: 1,
+                            comment: 2
+                        }
+                    }
+                }
+            }
+        });
+
+        const testState2 = deepFreezeAndThrowOnMutation({
+            entities: {
+                posts: {
+                    messagesHistory: {
+                        messages: ['test1', 'test2', 'test3'],
+                        index: {
+                            post: 0,
+                            comment: 0
+                        }
+                    }
+                }
+            }
+        });
+
+        const testState3 = deepFreezeAndThrowOnMutation({
+            entities: {
+                posts: {
+                    messagesHistory: {
+                        messages: [],
+                        index: {
+                            post: -1,
+                            comment: -1
+                        }
+                    }
+                }
+            }
+        });
+
+        const getHistoryMessagePost = makeGetMessageInHistoryItem(Posts.MESSAGE_TYPES.POST);
+        const getHistoryMessageComment = makeGetMessageInHistoryItem(Posts.MESSAGE_TYPES.COMMENT);
+        assert.equal(getHistoryMessagePost(testState1), 'test2');
+        assert.equal(getHistoryMessageComment(testState1), 'test3');
+        assert.equal(getHistoryMessagePost(testState2), 'test1');
+        assert.equal(getHistoryMessageComment(testState2), 'test1');
+        assert.equal(getHistoryMessagePost(testState3), '');
+        assert.equal(getHistoryMessageComment(testState3), '');
     });
 });

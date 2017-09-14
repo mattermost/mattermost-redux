@@ -1018,4 +1018,163 @@ describe('Actions.Posts', () => {
             throw new Error('doPostAction request failed');
         }
     });
+
+    it('addMessageIntoHistory', async () => {
+        const {dispatch, getState} = store;
+
+        await Actions.addMessageIntoHistory('test1')(dispatch, getState);
+
+        let history = getState().entities.posts.messagesHistory.messages;
+        assert.ok(history.length === 1);
+        assert.ok(history[0] === 'test1');
+
+        await Actions.addMessageIntoHistory('test2')(dispatch, getState);
+
+        history = getState().entities.posts.messagesHistory.messages;
+        assert.ok(history.length === 2);
+        assert.ok(history[1] === 'test2');
+
+        await Actions.addMessageIntoHistory('test3')(dispatch, getState);
+
+        history = getState().entities.posts.messagesHistory.messages;
+        assert.ok(history.length === 3);
+        assert.ok(history[2] === 'test3');
+    });
+
+    it('resetHistoryIndex', async () => {
+        const {dispatch, getState} = store;
+
+        await Actions.addMessageIntoHistory('test1')(dispatch, getState);
+        await Actions.addMessageIntoHistory('test2')(dispatch, getState);
+        await Actions.addMessageIntoHistory('test3')(dispatch, getState);
+
+        let index = getState().entities.posts.messagesHistory.index[Posts.MESSAGE_TYPES.POST];
+        assert.ok(index === 3);
+        index = getState().entities.posts.messagesHistory.index[Posts.MESSAGE_TYPES.COMMENT];
+        assert.ok(index === 3);
+
+        await Actions.moveHistoryIndexBack(Posts.MESSAGE_TYPES.POST)(dispatch, getState);
+        await Actions.moveHistoryIndexBack(Posts.MESSAGE_TYPES.POST)(dispatch, getState);
+        await Actions.moveHistoryIndexBack(Posts.MESSAGE_TYPES.COMMENT)(dispatch, getState);
+
+        index = getState().entities.posts.messagesHistory.index[Posts.MESSAGE_TYPES.POST];
+        assert.ok(index === 1);
+        index = getState().entities.posts.messagesHistory.index[Posts.MESSAGE_TYPES.COMMENT];
+        assert.ok(index === 2);
+
+        await Actions.resetHistoryIndex(Posts.MESSAGE_TYPES.POST)(dispatch, getState);
+
+        index = getState().entities.posts.messagesHistory.index[Posts.MESSAGE_TYPES.POST];
+        assert.ok(index === 3);
+        index = getState().entities.posts.messagesHistory.index[Posts.MESSAGE_TYPES.COMMENT];
+        assert.ok(index === 2);
+
+        await Actions.resetHistoryIndex(Posts.MESSAGE_TYPES.COMMENT)(dispatch, getState);
+
+        index = getState().entities.posts.messagesHistory.index[Posts.MESSAGE_TYPES.POST];
+        assert.ok(index === 3);
+        index = getState().entities.posts.messagesHistory.index[Posts.MESSAGE_TYPES.COMMENT];
+        assert.ok(index === 3);
+    });
+
+    it('moveHistoryIndexBack', async () => {
+        const {dispatch, getState} = store;
+
+        await Actions.moveHistoryIndexBack(Posts.MESSAGE_TYPES.POST)(dispatch, getState);
+
+        let index = getState().entities.posts.messagesHistory.index[Posts.MESSAGE_TYPES.POST];
+        assert.ok(index === -1);
+
+        await Actions.moveHistoryIndexBack(Posts.MESSAGE_TYPES.POST)(dispatch, getState);
+
+        index = getState().entities.posts.messagesHistory.index[Posts.MESSAGE_TYPES.POST];
+        assert.ok(index === -1);
+
+        await Actions.addMessageIntoHistory('test1')(dispatch, getState);
+        await Actions.addMessageIntoHistory('test2')(dispatch, getState);
+        await Actions.addMessageIntoHistory('test3')(dispatch, getState);
+
+        index = getState().entities.posts.messagesHistory.index[Posts.MESSAGE_TYPES.POST];
+        assert.ok(index === 3);
+        index = getState().entities.posts.messagesHistory.index[Posts.MESSAGE_TYPES.COMMENT];
+        assert.ok(index === 3);
+
+        await Actions.moveHistoryIndexBack(Posts.MESSAGE_TYPES.POST)(dispatch, getState);
+        await Actions.moveHistoryIndexBack(Posts.MESSAGE_TYPES.POST)(dispatch, getState);
+
+        index = getState().entities.posts.messagesHistory.index[Posts.MESSAGE_TYPES.POST];
+        assert.ok(index === 1);
+        index = getState().entities.posts.messagesHistory.index[Posts.MESSAGE_TYPES.COMMENT];
+        assert.ok(index === 3);
+
+        await Actions.moveHistoryIndexBack(Posts.MESSAGE_TYPES.POST)(dispatch, getState);
+        await Actions.moveHistoryIndexBack(Posts.MESSAGE_TYPES.POST)(dispatch, getState);
+
+        index = getState().entities.posts.messagesHistory.index[Posts.MESSAGE_TYPES.POST];
+        assert.ok(index === 0);
+        index = getState().entities.posts.messagesHistory.index[Posts.MESSAGE_TYPES.COMMENT];
+        assert.ok(index === 3);
+
+        await Actions.moveHistoryIndexBack(Posts.MESSAGE_TYPES.COMMENT)(dispatch, getState);
+
+        index = getState().entities.posts.messagesHistory.index[Posts.MESSAGE_TYPES.POST];
+        assert.ok(index === 0);
+        index = getState().entities.posts.messagesHistory.index[Posts.MESSAGE_TYPES.COMMENT];
+        assert.ok(index === 2);
+    });
+
+    it('moveHistoryIndexForward', async () => {
+        const {dispatch, getState} = store;
+
+        await Actions.moveHistoryIndexForward(Posts.MESSAGE_TYPES.POST)(dispatch, getState);
+
+        let index = getState().entities.posts.messagesHistory.index[Posts.MESSAGE_TYPES.POST];
+        assert.ok(index === 0);
+
+        await Actions.moveHistoryIndexForward(Posts.MESSAGE_TYPES.POST)(dispatch, getState);
+
+        index = getState().entities.posts.messagesHistory.index[Posts.MESSAGE_TYPES.POST];
+        assert.ok(index === 0);
+
+        await Actions.addMessageIntoHistory('test1')(dispatch, getState);
+        await Actions.addMessageIntoHistory('test2')(dispatch, getState);
+        await Actions.addMessageIntoHistory('test3')(dispatch, getState);
+
+        index = getState().entities.posts.messagesHistory.index[Posts.MESSAGE_TYPES.POST];
+        assert.ok(index === 3);
+        index = getState().entities.posts.messagesHistory.index[Posts.MESSAGE_TYPES.COMMENT];
+        assert.ok(index === 3);
+
+        await Actions.moveHistoryIndexForward(Posts.MESSAGE_TYPES.POST)(dispatch, getState);
+        await Actions.moveHistoryIndexForward(Posts.MESSAGE_TYPES.POST)(dispatch, getState);
+
+        index = getState().entities.posts.messagesHistory.index[Posts.MESSAGE_TYPES.POST];
+        assert.ok(index === 3);
+        index = getState().entities.posts.messagesHistory.index[Posts.MESSAGE_TYPES.COMMENT];
+        assert.ok(index === 3);
+
+        await Actions.moveHistoryIndexBack(Posts.MESSAGE_TYPES.POST)(dispatch, getState);
+        await Actions.moveHistoryIndexBack(Posts.MESSAGE_TYPES.POST)(dispatch, getState);
+        await Actions.moveHistoryIndexBack(Posts.MESSAGE_TYPES.COMMENT)(dispatch, getState);
+        await Actions.moveHistoryIndexBack(Posts.MESSAGE_TYPES.COMMENT)(dispatch, getState);
+
+        index = getState().entities.posts.messagesHistory.index[Posts.MESSAGE_TYPES.POST];
+        assert.ok(index === 1);
+        index = getState().entities.posts.messagesHistory.index[Posts.MESSAGE_TYPES.COMMENT];
+        assert.ok(index === 1);
+
+        await Actions.moveHistoryIndexForward(Posts.MESSAGE_TYPES.POST)(dispatch, getState);
+
+        index = getState().entities.posts.messagesHistory.index[Posts.MESSAGE_TYPES.POST];
+        assert.ok(index === 2);
+        index = getState().entities.posts.messagesHistory.index[Posts.MESSAGE_TYPES.COMMENT];
+        assert.ok(index === 1);
+
+        await Actions.moveHistoryIndexForward(Posts.MESSAGE_TYPES.COMMENT)(dispatch, getState);
+
+        index = getState().entities.posts.messagesHistory.index[Posts.MESSAGE_TYPES.POST];
+        assert.ok(index === 2);
+        index = getState().entities.posts.messagesHistory.index[Posts.MESSAGE_TYPES.COMMENT];
+        assert.ok(index === 2);
+    });
 });

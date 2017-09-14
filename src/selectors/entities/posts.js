@@ -263,3 +263,17 @@ export const getSearchResults = createSelector(
         return postIds.map((id) => posts[id]);
     }
 );
+
+export function makeGetMessageInHistoryItem(type) {
+    return createSelector(
+      (state) => state.entities.posts.messagesHistory,
+      (messagesHistory) => {
+          const idx = messagesHistory.index[type];
+          const messages = messagesHistory.messages;
+          if (idx >= 0 && messages && messages.length > idx) {
+              return messages[idx];
+          }
+          return '';
+      }
+    );
+}

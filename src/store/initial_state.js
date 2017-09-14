@@ -42,7 +42,11 @@ const state = {
             posts: {},
             postsByChannel: {},
             selectedPostId: '',
-            currentFocusedPostId: ''
+            currentFocusedPostId: '',
+            messagesHistory: {
+                messages: [],
+                index: {}
+            }
         },
         preferences: {
             myPreferences: {}
