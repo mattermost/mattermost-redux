@@ -1986,6 +1986,13 @@ export default class Client4 {
         );
     };
 
+    getWebappPlugins = async () => {
+        return this.doFetch(
+            `${this.getPluginsRoute()}/webapp`,
+            {method: 'get'}
+        );
+    };
+
     // Client Helpers
 
     doFetch = async (url, options) => {
