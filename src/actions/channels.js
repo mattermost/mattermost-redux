@@ -6,7 +6,7 @@ import {batchActions} from 'redux-batched-actions';
 import {Client4} from 'client';
 import {General, Preferences} from 'constants';
 import {ChannelTypes, PreferenceTypes, TeamTypes, UserTypes} from 'action_types';
-import {savePreferences} from 'actions/preferences';
+import {savePreferences, deletePreferences} from 'actions/preferences';
 import {getChannelsIdForTeam} from 'utils/channel_utils';
 
 import {logError} from './errors';
@@ -1060,6 +1060,37 @@ export function getMyChannelMember(channelId) {
     );
 }
 
+export function favoriteChannel(channelId) {
+    return async (dispatch, getState) => {
+        const {currentUserId} = getState().entities.users;
+        const preference = {
+            user_id: currentUserId,
+            category: Preferences.CATEGORY_FAVORITE_CHANNEL,
+            name: channelId,
+            value: 'true'
+        };
+
+        Client4.trackEvent('action', 'action_channels_favorite');
+
+        savePreferences(currentUserId, [preference])(dispatch, getState);
+    };
+}
+
+export function unfavoriteChannel(channelId) {
+    return async (dispatch, getState) => {
+        const {currentUserId} = getState().entities.users;
+        const preference = {
+            user_id: currentUserId,
+            category: Preferences.CATEGORY_FAVORITE_CHANNEL,
+            name: channelId
+        };
+
+        Client4.trackEvent('action', 'action_channels_unfavorite');
+
+        deletePreferences(currentUserId, [preference])(dispatch, getState);
+    };
+}
+
 export default {
     selectChannel,
     createChannel,
@@ -1083,5 +1114,7 @@ export default {
     updateChannelHeader,
     updateChannelPurpose,
     markChannelAsRead,
-    markChannelAsUnread
+    markChannelAsUnread,
+    favoriteChannel,
+    unfavoriteChannel
 };

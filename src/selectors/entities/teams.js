@@ -85,6 +85,14 @@ export const getMyTeams = createSelector(
     }
 );
 
+export const getMyTeamMember = createSelector(
+    getTeamMemberships,
+    (state, teamId) => teamId,
+    (teamMemberships, teamId) => {
+        return teamMemberships[teamId] || {};
+    }
+);
+
 export const getMembersInCurrentTeam = createSelector(
     getCurrentTeamId,
     getMembersInTeams,
