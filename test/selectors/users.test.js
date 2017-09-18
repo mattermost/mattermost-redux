@@ -13,6 +13,7 @@ describe('Selectors.Users', () => {
     const team1 = TestHelper.fakeTeamWithId();
 
     const channel1 = TestHelper.fakeChannelWithId(team1.id);
+    const channel2 = TestHelper.fakeChannelWithId(team1.id);
 
     const user1 = TestHelper.fakeUserWithId();
     user1.notify_props = {mention_keys: 'testkey1,testkey2'};
@@ -37,6 +38,7 @@ describe('Selectors.Users', () => {
 
     const profilesInChannel = {};
     profilesInChannel[channel1.id] = new Set([user1.id]);
+    profilesInChannel[channel2.id] = new Set([user1.id, user2.id]);
 
     const profilesNotInChannel = {};
     profilesNotInChannel[channel1.id] = new Set([user2.id]);
@@ -171,6 +173,16 @@ describe('Selectors.Users', () => {
     it('getUserByEmail', () => {
         assert.deepEqual(Selectors.getUserByEmail(testState, user1.email), user1);
         assert.deepEqual(Selectors.getUserByEmail(testState, user2.email), user2);
+    });
+
+    it('makeGetProfilesInChannel', () => {
+        const getProfilesInChannel = Selectors.makeGetProfilesInChannel();
+        assert.deepEqual(getProfilesInChannel(testState, channel1.id), [user1]);
+
+        const users = [user1, user2].sort(sortByUsername);
+        assert.deepEqual(getProfilesInChannel(testState, channel2.id), users);
+
+        assert.deepEqual(getProfilesInChannel(testState, 'nonexistentid'), []);
     });
 });
 

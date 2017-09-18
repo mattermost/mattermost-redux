@@ -344,3 +344,21 @@ export function makeGetProfilesForReactions() {
         }
     );
 }
+
+export function makeGetProfilesInChannel() {
+    return createSelector(
+        getUsers,
+        getUserIdsInChannels,
+        (state, channelId) => channelId,
+        (users, userIds, channelId) => {
+            const userIdsInChannel = userIds[channelId];
+
+            if (!userIdsInChannel) {
+                return [];
+            }
+
+            return sortAndInjectProfiles(users, userIdsInChannel);
+        }
+    );
+}
+
