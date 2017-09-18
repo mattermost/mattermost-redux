@@ -76,4 +76,8 @@ describe('Selectors.Teams', () => {
     it('isCurrentUserCurrentTeamAdmin', () => {
         assert.deepEqual(Selectors.isCurrentUserCurrentTeamAdmin(testState), false);
     });
+
+    it('getMyTeamMember', () => {
+        assert.deepEqual(Selectors.getMyTeamMember(testState, team1.id), myMembers[team1.id]);
+    });
 });

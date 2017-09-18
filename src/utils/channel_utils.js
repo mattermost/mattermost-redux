@@ -277,6 +277,16 @@ export function getGroupDisplayNameFromUserIds(userIds, profiles, currentUserId,
     return names.sort(sortUsernames).join(', ');
 }
 
+export function isFavoriteChannel(myPreferences, channel) {
+    const fav = myPreferences[`${Preferences.CATEGORY_FAVORITE_CHANNEL}--${channel.id}`];
+    channel.isFavorite = fav && fav.value === 'true';
+    return channel.isFavorite;
+}
+
+export function isDefault(channel) {
+    return channel.name === General.DEFAULT_CHANNEL;
+}
+
 //====================================================
 
 function createFakeChannel(userId, otherUserId) {
@@ -335,12 +345,6 @@ function completeDirectGroupInfo(usersState, teammateNameDisplay, channel) {
 
 function isDirectChannelForUser(userId, otherUserId, channel) {
     return channel.type === General.DM_CHANNEL && getUserIdFromChannelName(userId, channel.name) === otherUserId;
-}
-
-function isFavoriteChannel(myPreferences, channel) {
-    const fav = myPreferences[`${Preferences.CATEGORY_FAVORITE_CHANNEL}--${channel.id}`];
-    channel.isFavorite = fav && fav.value === 'true';
-    return channel.isFavorite;
 }
 
 function channelHasMentions(members, channel) {

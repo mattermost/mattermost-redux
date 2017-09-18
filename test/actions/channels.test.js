@@ -9,7 +9,8 @@ import {addUserToTeam, getMyTeams, getMyTeamMembers, getMyTeamUnreads} from 'act
 import {getMe, getProfilesByIds, login} from 'actions/users';
 import {createIncomingHook, createOutgoingHook} from 'actions/integrations';
 import {Client, Client4} from 'client';
-import {General, RequestStatus} from 'constants';
+import {General, RequestStatus, Preferences} from 'constants';
+import {getPreferenceKey} from 'utils/preference_utils';
 import TestHelper from 'test/test_helper';
 import configureStore from 'test/test_store';
 
@@ -757,5 +758,32 @@ describe('Actions.Channels', () => {
         const {channels, myMembers} = store.getState().entities.channels;
         assert.ok(channels[secondChannel.id]);
         assert.ok(myMembers[secondChannel.id]);
+    });
+
+    it('favoriteChannel', async () => {
+        Actions.favoriteChannel(TestHelper.basicChannel.id)(store.dispatch, store.getState);
+
+        const state = store.getState();
+        const prefKey = getPreferenceKey(Preferences.CATEGORY_FAVORITE_CHANNEL, TestHelper.basicChannel.id);
+        const preference = state.entities.preferences.myPreferences[prefKey];
+        assert.ok(preference);
+        assert.ok(preference.value === 'true');
+    });
+
+    it('unfavoriteChannel', async () => {
+        Actions.favoriteChannel(TestHelper.basicChannel.id)(store.dispatch, store.getState);
+
+        let state = store.getState();
+        let prefKey = getPreferenceKey(Preferences.CATEGORY_FAVORITE_CHANNEL, TestHelper.basicChannel.id);
+        let preference = state.entities.preferences.myPreferences[prefKey];
+        assert.ok(preference);
+        assert.ok(preference.value === 'true');
+
+        Actions.unfavoriteChannel(TestHelper.basicChannel.id)(store.dispatch, store.getState);
+
+        state = store.getState();
+        prefKey = getPreferenceKey(Preferences.CATEGORY_FAVORITE_CHANNEL, TestHelper.basicChannel.id);
+        preference = state.entities.preferences.myPreferences[prefKey];
+        assert.ok(!preference);
     });
 });
