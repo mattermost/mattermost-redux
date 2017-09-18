@@ -18,6 +18,7 @@ describe('Selectors.Users', () => {
     const user1 = TestHelper.fakeUserWithId();
     user1.notify_props = {mention_keys: 'testkey1,testkey2'};
     const user2 = TestHelper.fakeUserWithId();
+    user2.delete_at = 1;
     const user3 = TestHelper.fakeUserWithId();
     const user4 = TestHelper.fakeUserWithId();
     const user5 = TestHelper.fakeUserWithId();
@@ -181,6 +182,7 @@ describe('Selectors.Users', () => {
 
         const users = [user1, user2].sort(sortByUsername);
         assert.deepEqual(getProfilesInChannel(testState, channel2.id), users);
+        assert.deepEqual(getProfilesInChannel(testState, channel2.id, true), [user1]);
 
         assert.deepEqual(getProfilesInChannel(testState, 'nonexistentid'), []);
     });
