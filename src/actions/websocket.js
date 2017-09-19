@@ -199,6 +199,9 @@ function handleEvent(msg, dispatch, getState) {
     case WebsocketEvents.CHANNEL_DELETED:
         handleChannelDeletedEvent(msg, dispatch, getState);
         break;
+    case WebsocketEvents.CHANNEL_UPDATED:
+        handleChannelUpdatedEvent(msg, dispatch, getState);
+        break;
     case WebsocketEvents.DIRECT_ADDED:
         handleDirectAddedEvent(msg, dispatch, getState);
         break;
@@ -454,6 +457,28 @@ function handleChannelDeletedEvent(msg, dispatch, getState) {
         dispatch({type: ChannelTypes.RECEIVED_CHANNEL_DELETED, data: msg.data.channel_id}, getState);
 
         fetchMyChannelsAndMembers(currentTeamId)(dispatch, getState);
+    }
+}
+
+function handleChannelUpdatedEvent(msg, dispatch, getState) {
+    try {
+        const channel = msg.data ? JSON.parse(msg.data.channel) : null;
+        const entities = getState().entities;
+        const {currentChannelId} = entities.channels;
+        if (channel) {
+            dispatch({
+                type: ChannelTypes.RECEIVED_CHANNEL,
+                data: channel
+            });
+
+            if (currentChannelId === channel.id) {
+                // Emit an event with the channel received as we need to handle
+                // the changes without listening to the store
+                EventEmitter.emit(WebsocketEvents.CHANNEL_UPDATED, channel);
+            }
+        }
+    } catch (err) {
+        // do nothing
     }
 }
 

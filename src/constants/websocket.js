@@ -7,6 +7,7 @@ const WebsocketEvents = {
     POST_DELETED: 'post_deleted',
     CHANNEL_CREATED: 'channel_created',
     CHANNEL_DELETED: 'channel_deleted',
+    CHANNEL_UPDATED: 'channel_updated',
     DIRECT_ADDED: 'direct_added',
     ADDED_TO_TEAM: 'added_to_team',
     LEAVE_TEAM: 'leave_team',
