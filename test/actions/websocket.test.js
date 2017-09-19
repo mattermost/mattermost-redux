@@ -328,6 +328,22 @@ describe('Actions.Websocket', () => {
         test();
     });
 
+    it('Websocket Handle Channel Updated', async () => {
+        const client = TestHelper.createClient4();
+        const channelName = 'Test name';
+        const channelId = TestHelper.basicChannel.id;
+        await client.login(TestHelper.basicUser.email, 'password1');
+        await client.updateChannel({...TestHelper.basicChannel, display_name: channelName});
+
+        store.subscribe(() => {
+            const state = store.getState();
+            const entities = state.entities;
+            const {channels} = entities.channels;
+
+            assert.strictEqual(channels[channelId].display_name, channelName);
+        });
+    });
+
     it('Websocket Handle Channel Deleted', (done) => {
         async function test() {
             await TeamActions.selectTeam(TestHelper.basicTeam)(store.dispatch, store.getState);
