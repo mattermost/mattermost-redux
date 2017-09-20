@@ -2,6 +2,7 @@
 // See License.txt for license information.
 
 import assert from 'assert';
+import nock from 'nock';
 
 import * as Actions from 'actions/integrations';
 import * as TeamsActions from 'actions/teams';
@@ -492,7 +493,14 @@ describe('Actions.Integrations', () => {
         expected.callback_urls = ['https://modified.com/callback1', 'https://modified.com/callback2'];
         expected.is_trusted = true;
 
+        TestHelper.activateMocking();
+        const nockReply = Object.assign({}, expected);
+        nockReply.update_at += 1;
+        nock(Client4.getBaseRoute()).
+            put(`/oauth/apps/${created.id}`).reply(200, nockReply);
+
         await Actions.editOAuthApp(expected)(store.dispatch, store.getState);
+        nock.restore();
 
         const request = store.getState().requests.integrations.updateOAuthApp;
         if (request.status === RequestStatus.FAILURE) {
