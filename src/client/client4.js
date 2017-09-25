@@ -1061,8 +1061,6 @@ export default class Client4 {
     };
 
     addToChannel = async (userId, channelId) => {
-        this.trackEvent('api', 'api_channels_add_member', {channel_id: channelId});
-
         const member = {user_id: userId, channel_id: channelId};
         return this.doFetch(
             `${this.getChannelMembersRoute(channelId)}`,
@@ -1071,8 +1069,6 @@ export default class Client4 {
     };
 
     removeFromChannel = async (userId, channelId) => {
-        this.trackEvent('api', 'api_channels_remove_member', {channel_id: channelId});
-
         return this.doFetch(
             `${this.getChannelMemberRoute(channelId, userId)}`,
             {method: 'delete'}
