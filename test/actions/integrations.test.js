@@ -2,6 +2,7 @@
 // See License.txt for license information.
 
 import assert from 'assert';
+import nock from 'nock';
 
 import * as Actions from 'actions/integrations';
 import * as TeamsActions from 'actions/teams';
@@ -479,6 +480,41 @@ describe('Actions.Integrations', () => {
 
         const {oauthApps} = store.getState().entities.integrations;
         assert.ok(oauthApps[created.id]);
+    });
+
+    it('editOAuthApp', async () => {
+        const created = await Actions.addOAuthApp(TestHelper.fakeOAuthApp())(store.dispatch, store.getState);
+
+        const expected = Object.assign({}, created);
+        expected.name = 'modified';
+        expected.description = 'modified';
+        expected.homepage = 'https://modified.com';
+        expected.icon_url = 'https://modified.com/icon';
+        expected.callback_urls = ['https://modified.com/callback1', 'https://modified.com/callback2'];
+        expected.is_trusted = true;
+
+        TestHelper.activateMocking();
+        const nockReply = Object.assign({}, expected);
+        nockReply.update_at += 1;
+        nock(Client4.getBaseRoute()).
+            put(`/oauth/apps/${created.id}`).reply(200, nockReply);
+
+        await Actions.editOAuthApp(expected)(store.dispatch, store.getState);
+        nock.restore();
+
+        const request = store.getState().requests.integrations.updateOAuthApp;
+        if (request.status === RequestStatus.FAILURE) {
+            throw new Error(JSON.stringify(request.error));
+        }
+
+        const {oauthApps} = store.getState().entities.integrations;
+        assert.ok(oauthApps[created.id]);
+
+        const actual = oauthApps[created.id];
+
+        assert.notEqual(actual.update_at, expected.update_at);
+        expected.update_at = actual.update_at;
+        assert.equal(JSON.stringify(actual), JSON.stringify(expected));
     });
 
     it('getOAuthApps', async () => {

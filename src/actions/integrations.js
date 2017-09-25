@@ -269,6 +269,16 @@ export function addOAuthApp(app) {
     );
 }
 
+export function editOAuthApp(app) {
+    return bindClientFunc(
+        Client4.editOAuthApp,
+        IntegrationTypes.UPDATE_OAUTH_APP_REQUEST,
+        [IntegrationTypes.RECEIVED_OAUTH_APP, IntegrationTypes.UPDATE_OAUTH_APP_SUCCESS],
+        IntegrationTypes.UPDATE_OAUTH_APP_FAILURE,
+        app
+    );
+}
+
 export function getOAuthApps(page = 0, perPage = General.PAGE_SIZE_DEFAULT) {
     return bindClientFunc(
         Client4.getOAuthApps,
