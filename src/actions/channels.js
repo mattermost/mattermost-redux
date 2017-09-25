@@ -512,7 +512,7 @@ export function leaveChannel(channelId) {
         const channel = channels[channelId];
         const member = myMembers[channelId];
 
-        Client4.trackEvent('api', 'api_channels_leave', {channel_id: channelId});
+        Client4.trackEvent('action', 'action_channels_leave', {channel_id: channelId});
 
         dispatch({
             type: ChannelTypes.LEAVE_CHANNEL,
@@ -567,7 +567,7 @@ export function joinChannel(userId, teamId, channelId, channelName) {
             return {error};
         }
 
-        Client4.trackEvent('api', 'api_channels_join', {channel_id: channelId});
+        Client4.trackEvent('action', 'action_channels_join', {channel_id: channelId});
 
         dispatch(batchActions([
             {
@@ -778,7 +778,7 @@ export function addChannelMember(channelId, userId) {
             return null;
         }
 
-        Client4.trackEvent('api', 'api_channels_add_member', {channel_id: channelId});
+        Client4.trackEvent('action', 'action_channels_add_member', {channel_id: channelId});
 
         dispatch(batchActions([
             {
@@ -815,7 +815,7 @@ export function removeChannelMember(channelId, userId) {
             return null;
         }
 
-        Client4.trackEvent('api', 'api_channels_remove_member', {channel_id: channelId});
+        Client4.trackEvent('action', 'action_channels_remove_member', {channel_id: channelId});
 
         dispatch(batchActions([
             {
