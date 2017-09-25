@@ -138,6 +138,11 @@ export function createDirectChannel(userId, otherUserId) {
             },
             {
                 type: ChannelTypes.CREATE_CHANNEL_SUCCESS
+            },
+            {
+                type: UserTypes.RECEIVED_PROFILES_LIST_IN_CHANNEL,
+                id: created.id,
+                data: [{id: userId}, {id: otherUserId}]
             }
         ]), getState);
 
@@ -178,6 +183,11 @@ export function createGroupChannel(userIds) {
 
         savePreferences(currentUserId, preferences)(dispatch, getState);
 
+        const profilesInChannel = userIds.map((id) => {
+            return {id};
+        });
+        profilesInChannel.push({id: currentUserId}); // currentUserId is optionally in userIds, but the reducer will get rid of a duplicate
+
         dispatch(batchActions([
             {
                 type: ChannelTypes.RECEIVED_CHANNEL,
@@ -193,6 +203,11 @@ export function createGroupChannel(userIds) {
             },
             {
                 type: ChannelTypes.CREATE_CHANNEL_SUCCESS
+            },
+            {
+                type: UserTypes.RECEIVED_PROFILES_LIST_IN_CHANNEL,
+                id: created.id,
+                data: profilesInChannel
             }
         ]), getState);
 
