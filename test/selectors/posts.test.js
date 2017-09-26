@@ -7,6 +7,7 @@ import {makeGetPostsForThread, makeGetReactionsForPost, makeGetPostsInChannel, m
 import {makeGetProfilesForReactions} from 'selectors/entities/users';
 import deepFreezeAndThrowOnMutation from 'utils/deep_freeze';
 import TestHelper from 'test/test_helper';
+import {Posts} from 'constants';
 
 describe('Selectors.Posts', () => {
     const user1 = TestHelper.fakeUserWithId();
@@ -536,5 +537,144 @@ describe('Selectors.Posts', () => {
 
         const getPostsInChannel = makeGetPostsInChannel();
         assert.deepEqual(getPostsInChannel(testStateNever, '1'), [post6, post5, post4, post3, post2, post1]);
+    });
+
+    it('gets posts around post in channel not adding ephemeral post to replyCount', () => {
+        const userAny = TestHelper.fakeUserWithId();
+        userAny.notify_props = {comments: 'any'};
+        const profilesAny = {};
+        profilesAny[userAny.id] = userAny;
+
+        const postsAny = {
+            a: {id: 'a', channel_id: '1', create_at: 1, user_id: userAny.id},
+            b: {id: 'b', root_id: 'a', channel_id: '1', create_at: 2, user_id: 'b'},
+            c: {id: 'c', root_id: 'a', channel_id: '1', create_at: 3, user_id: 'b', type: Posts.POST_TYPES.EPHEMERAL},
+            d: {id: 'd', channel_id: '2', create_at: 4, user_id: 'b'}
+        };
+
+        const testStateAny = deepFreezeAndThrowOnMutation({
+            entities: {
+                users: {
+                    currentUserId: userAny.id,
+                    profiles: profilesAny
+                },
+                posts: {
+                    posts: postsAny,
+                    postsInChannel: {
+                        1: ['c', 'b', 'a'],
+                        2: ['d']
+                    }
+                },
+                preferences: {
+                    myPreferences: {}
+                }
+            }
+        });
+
+        const post1 = {
+            ...postsAny.a,
+            isFirstReply: false,
+            isLastReply: false,
+            previousPostIsComment: false,
+            commentedOnPost: undefined,
+            consecutivePostByUser: false,
+            replyCount: 1,
+            isCommentMention: false,
+            highlight: true
+        };
+
+        const post2 = {
+            ...postsAny.b,
+            isFirstReply: true,
+            isLastReply: false,
+            previousPostIsComment: false,
+            commentedOnPost: undefined,
+            consecutivePostByUser: false,
+            replyCount: 1,
+            isCommentMention: true
+        };
+
+        const post3 = {
+            ...postsAny.c,
+            isFirstReply: false,
+            isLastReply: true,
+            previousPostIsComment: true,
+            commentedOnPost: undefined,
+            consecutivePostByUser: false,
+            replyCount: 1,
+            isCommentMention: true
+        };
+
+        const getPostsAroundPost = makeGetPostsAroundPost();
+        assert.deepEqual(getPostsAroundPost(testStateAny, post1.id, '1'), [post3, post2, post1]);
+    });
+
+    it('gets posts in channel not adding ephemeral post to replyCount', () => {
+        const userAny = TestHelper.fakeUserWithId();
+        userAny.notify_props = {comments: 'any'};
+        const profilesAny = {};
+        profilesAny[userAny.id] = userAny;
+
+        const postsAny = {
+            a: {id: 'a', channel_id: '1', create_at: 1, user_id: userAny.id},
+            b: {id: 'b', root_id: 'a', channel_id: '1', create_at: 2, user_id: 'b', type: Posts.POST_TYPES.EPHEMERAL},
+            c: {id: 'c', root_id: 'a', channel_id: '1', create_at: 3, user_id: 'b', state: Posts.POST_DELETED},
+            d: {id: 'd', channel_id: '2', create_at: 4, user_id: 'b'}
+        };
+
+        const testStateAny = deepFreezeAndThrowOnMutation({
+            entities: {
+                users: {
+                    currentUserId: userAny.id,
+                    profiles: profilesAny
+                },
+                posts: {
+                    posts: postsAny,
+                    postsInChannel: {
+                        1: ['c', 'b', 'a'],
+                        2: ['d']
+                    }
+                },
+                preferences: {
+                    myPreferences: {}
+                }
+            }
+        });
+
+        const post1 = {
+            ...postsAny.a,
+            isFirstReply: false,
+            isLastReply: false,
+            previousPostIsComment: false,
+            commentedOnPost: undefined,
+            consecutivePostByUser: false,
+            replyCount: 0,
+            isCommentMention: false
+        };
+
+        const post2 = {
+            ...postsAny.b,
+            isFirstReply: true,
+            isLastReply: false,
+            previousPostIsComment: false,
+            commentedOnPost: undefined,
+            consecutivePostByUser: false,
+            replyCount: 0,
+            isCommentMention: true
+        };
+
+        const post3 = {
+            ...postsAny.c,
+            isFirstReply: false,
+            isLastReply: true,
+            previousPostIsComment: true,
+            commentedOnPost: undefined,
+            consecutivePostByUser: false,
+            replyCount: 0,
+            isCommentMention: true
+        };
+
+        const getPostsInChannel = makeGetPostsInChannel();
+        assert.deepEqual(getPostsInChannel(testStateAny, '1'), [post3, post2, post1]);
     });
 });
