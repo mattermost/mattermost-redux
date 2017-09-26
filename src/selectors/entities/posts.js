@@ -7,7 +7,7 @@ import {getMyPreferences} from 'selectors/entities/preferences';
 import {getCurrentUser} from 'selectors/entities/users';
 
 import {Posts, Preferences} from 'constants';
-import {isSystemMessage, shouldFilterPost, comparePosts} from 'utils/post_utils';
+import {isPostEphemeral, isSystemMessage, shouldFilterPost, comparePosts} from 'utils/post_utils';
 import {getPreferenceKey} from 'utils/preference_utils';
 
 export function getAllPosts(state) {
@@ -94,7 +94,7 @@ function formatPostInChannel(post, previousPost, index, allPosts, postIds, curre
     let threadCreatedByCurrentUser = false;
     const rootId = post.root_id || post.id;
     Object.values(allPosts).forEach((p) => {
-        if (p.root_id === rootId) {
+        if (p.root_id === rootId && !isPostEphemeral(p)) {
             replyCount += 1;
 
             if (p.user_id === currentUser.id) {
