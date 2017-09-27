@@ -314,6 +314,81 @@ function openGraph(state = {}, action) {
     }
 }
 
+function messagesHistory(state = {}, action) {
+    switch (action.type) {
+    case PostTypes.ADD_MESSAGE_INTO_HISTORY: {
+        const nextIndex = {};
+        let nextMessages = state.messages ? [...state.messages] : [];
+        nextMessages.push(action.data);
+        nextIndex[Posts.MESSAGE_TYPES.POST] = nextMessages.length;
+        nextIndex[Posts.MESSAGE_TYPES.COMMENT] = nextMessages.length;
+
+        if (nextMessages.length > Posts.MAX_PREV_MSGS) {
+            nextMessages = nextMessages.slice(1, Posts.MAX_PREV_MSGS + 1);
+        }
+
+        return {
+            messages: nextMessages,
+            index: nextIndex
+        };
+    }
+    case PostTypes.RESET_HISTORY_INDEX: {
+        const index = {};
+        index[Posts.MESSAGE_TYPES.POST] = -1;
+        index[Posts.MESSAGE_TYPES.COMMENT] = -1;
+
+        const messages = state.messages || [];
+        const nextIndex = state.index ? {...state.index} : index;
+        nextIndex[action.data] = messages.length;
+        return {
+            messages: state.messages,
+            index: nextIndex
+        };
+    }
+    case PostTypes.MOVE_HISTORY_INDEX_BACK: {
+        const index = {};
+        index[Posts.MESSAGE_TYPES.POST] = -1;
+        index[Posts.MESSAGE_TYPES.COMMENT] = -1;
+
+        const nextIndex = state.index ? {...state.index} : index;
+        if (nextIndex[action.data] > 0) {
+            nextIndex[action.data]--;
+        }
+        return {
+            messages: state.messages,
+            index: nextIndex
+        };
+    }
+    case PostTypes.MOVE_HISTORY_INDEX_FORWARD: {
+        const index = {};
+        index[Posts.MESSAGE_TYPES.POST] = -1;
+        index[Posts.MESSAGE_TYPES.COMMENT] = -1;
+
+        const messages = state.messages || [];
+        const nextIndex = state.index ? {...state.index} : index;
+        if (nextIndex[action.data] < messages.length) {
+            nextIndex[action.data]++;
+        }
+        return {
+            messages: state.messages,
+            index: nextIndex
+        };
+    }
+    case UserTypes.LOGOUT_SUCCESS: {
+        const index = {};
+        index[Posts.MESSAGE_TYPES.POST] = -1;
+        index[Posts.MESSAGE_TYPES.COMMENT] = -1;
+
+        return {
+            messages: [],
+            index
+        };
+    }
+    default:
+        return state;
+    }
+}
+
 export default function(state = {}, action) {
     const {posts, postsInChannel} = handlePosts(state.posts, state.postsInChannel, action);
 
@@ -335,14 +410,18 @@ export default function(state = {}, action) {
         reactions: reactions(state.reactions, action),
 
         // Object mapping URLs to their relevant opengraph metadata for link previews
-        openGraph: openGraph(state.openGraph, action)
+        openGraph: openGraph(state.openGraph, action),
+
+        // History of posts and comments
+        messagesHistory: messagesHistory(state.messagesHistory, action)
     };
 
     if (state.posts === nextState.posts && state.postsInChannel === nextState.postsInChannel &&
         state.selectedPostId === nextState.selectedPostId &&
         state.currentFocusedPostId === nextState.currentFocusedPostId &&
         state.reactions === nextState.reactions &&
-        state.openGraph === nextState.openGraph) {
+        state.openGraph === nextState.openGraph &&
+        state.messagesHistory === nextState.messagesHistory) {
         // None of the children have changed so don't even let the parent object change
         return state;
     }

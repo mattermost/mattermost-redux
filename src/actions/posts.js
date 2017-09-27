@@ -899,6 +899,42 @@ export function doPostAction(postId, actionId) {
     );
 }
 
+export function addMessageIntoHistory(message) {
+    return async (dispatch, getState) => {
+        dispatch({
+            type: PostTypes.ADD_MESSAGE_INTO_HISTORY,
+            data: message
+        }, getState);
+    };
+}
+
+export function resetHistoryIndex(index) {
+    return async (dispatch, getState) => {
+        dispatch({
+            type: PostTypes.RESET_HISTORY_INDEX,
+            data: index
+        }, getState);
+    };
+}
+
+export function moveHistoryIndexBack(index) {
+    return async (dispatch, getState) => {
+        dispatch({
+            type: PostTypes.MOVE_HISTORY_INDEX_BACK,
+            data: index
+        }, getState);
+    };
+}
+
+export function moveHistoryIndexForward(index) {
+    return async (dispatch, getState) => {
+        dispatch({
+            type: PostTypes.MOVE_HISTORY_INDEX_FORWARD,
+            data: index
+        }, getState);
+    };
+}
+
 export default {
     createPost,
     editPost,
@@ -914,5 +950,9 @@ export default {
     getPostsBeforeWithRetry,
     getPostsAfter,
     getPostsAfterWithRetry,
-    selectPost
+    selectPost,
+    addMessageIntoHistory,
+    resetHistoryIndex,
+    moveHistoryIndexBack,
+    moveHistoryIndexForward
 };
