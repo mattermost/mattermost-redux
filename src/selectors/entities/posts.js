@@ -7,7 +7,7 @@ import {getMyPreferences} from 'selectors/entities/preferences';
 import {getCurrentUser} from 'selectors/entities/users';
 
 import {Posts, Preferences} from 'constants';
-import {isPostEphemeral, isPostUserActivity, isSystemMessage, shouldFilterPost, comparePosts} from 'utils/post_utils';
+import {isPostEphemeral, isSystemMessage, shouldFilterPost, comparePosts} from 'utils/post_utils';
 import {getPreferenceKey} from 'utils/preference_utils';
 
 export function getAllPosts(state) {

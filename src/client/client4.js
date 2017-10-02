@@ -122,6 +122,10 @@ export default class Client4 {
         return `${this.getChannelsRoute()}/${channelId}`;
     }
 
+    getChannelPostsRoute(channelId) {
+        return `${this.getChannelRoute()}/${channelId}/posts`;
+    }
+
     getChannelMembersRoute(channelId) {
         return `${this.getChannelRoute(channelId)}/members`;
     }
@@ -1149,6 +1153,15 @@ export default class Client4 {
         );
     };
 
+    deletePostsForChannel = async (channelId, postIds) => {
+        this.trackEvent('api', 'api_posts_delete_for_channel');
+
+        return this.doFetch(
+            `${this.getChannelPostsRoute(channelId)}/delete`,
+            {method: 'post', body: JSON.stringify(postIds)}
+        );
+    };
+
     getPostThread = async (postId) => {
         return this.doFetch(
             `${this.getPostRoute(postId)}/thread`,
@@ -1158,14 +1171,14 @@ export default class Client4 {
 
     getPosts = async (channelId, page = 0, perPage = PER_PAGE_DEFAULT) => {
         return this.doFetch(
-            `${this.getChannelRoute(channelId)}/posts${buildQueryString({page, per_page: perPage})}`,
+            `${this.getChannelPostsRoute(channelId)}${buildQueryString({page, per_page: perPage})}`,
             {method: 'get'}
         );
     };
 
     getPostsSince = async (channelId, since) => {
         return this.doFetch(
-            `${this.getChannelRoute(channelId)}/posts${buildQueryString({since})}`,
+            `${this.getChannelPostsRoute(channelId)}${buildQueryString({since})}`,
             {method: 'get'}
         );
     };
@@ -1174,7 +1187,7 @@ export default class Client4 {
         this.trackEvent('api', 'api_posts_get_before', {channel_id: channelId});
 
         return this.doFetch(
-            `${this.getChannelRoute(channelId)}/posts${buildQueryString({before: postId, page, per_page: perPage})}`,
+            `${this.getChannelPostsRoute(channelId)}${buildQueryString({before: postId, page, per_page: perPage})}`,
             {method: 'get'}
         );
     };
@@ -1183,7 +1196,7 @@ export default class Client4 {
         this.trackEvent('api', 'api_posts_get_after', {channel_id: channelId});
 
         return this.doFetch(
-            `${this.getChannelRoute(channelId)}/posts${buildQueryString({after: postId, page, per_page: perPage})}`,
+            `${this.getChannelPostsRoute(channelId)}${buildQueryString({after: postId, page, per_page: perPage})}`,
             {method: 'get'}
         );
     };
