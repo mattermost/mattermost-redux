@@ -3,7 +3,7 @@
 
 import {PostTypes, SearchTypes, UserTypes} from 'action_types';
 import {Posts} from 'constants';
-import {comparePosts} from 'utils/post_utils';
+import {comparePosts, consolidateUserActivitySystemMessages} from 'utils/post_utils';
 
 function handleReceivedPost(posts = {}, postsInChannel = {}, action) {
     const post = action.data;
@@ -82,15 +82,19 @@ function handleReceivedPosts(posts = {}, postsInChannel = {}, action) {
         }
     }
 
+    // Remove missing post most likely due to consolidated system messages
     // Sort to ensure that the most recent posts are first, with pending
     // and failed posts first
-    postsForChannel.sort((a, b) => {
+    let updatedPostsForChannel = postsForChannel.filter((postId) => {
+        return nextPosts[postId] !== undefined;
+    }).sort((a, b) => {
         return comparePosts(nextPosts[a], nextPosts[b]);
     });
 
-    nextPostsForChannel[channelId] = postsForChannel;
-
-    return {posts: nextPosts, postsInChannel: nextPostsForChannel};
+    const consolidatedPosts = consolidateUserActivitySystemMessages(nextPosts, updatedPostsForChannel)
+    
+    nextPostsForChannel[channelId] = consolidatedPosts.newOrder;
+    return {posts: consolidatedPosts.newPosts, postsInChannel: nextPostsForChannel};
 }
 
 function handlePostsFromSearch(posts = {}, postsInChannel = {}, action) {
