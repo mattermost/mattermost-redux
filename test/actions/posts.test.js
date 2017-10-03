@@ -212,6 +212,47 @@ describe('Actions.Posts', () => {
         );
     });
 
+    it('deletePosts', async () => {
+        const channelId = TestHelper.basicChannel.id;
+
+        await Actions.createPost(TestHelper.fakePost(channelId))(store.dispatch, store.getState);
+
+        const initialPosts = store.getState().entities.posts;
+        const createdPost1 = initialPosts.posts[initialPosts.postsInChannel[channelId][0]];
+        const createdPost2 = initialPosts.posts[initialPosts.postsInChannel[channelId][1]];
+        const createdPost3 = initialPosts.posts[initialPosts.postsInChannel[channelId][2]];
+
+        await Actions.deletePosts([createdPost1.id, createdPost2.id, createdPost3.id])(store.dispatch, store.getState);
+
+        const state = store.getState();
+        const deleteRequest = state.requests.posts.deletePosts;
+        const {posts} = state.entities.posts;
+
+        if (deleteRequest.status === RequestStatus.FAILURE) {
+            throw new Error(JSON.stringify(deleteRequest.error));
+        }
+
+        assert.ok(posts);
+        assert.ok(posts[createdPost1.id]);
+        assert.ok(posts[createdPost2.id]);
+        assert.ok(posts[createdPost3.id]);
+
+        assert.strictEqual(
+            posts[createdPost1.id].state,
+            Posts.POST_DELETED
+        );
+
+        assert.strictEqual(
+            posts[createdPost2.id].state,
+            Posts.POST_DELETED
+        );
+
+        assert.strictEqual(
+            posts[createdPost3.id].state,
+            Posts.POST_DELETED
+        );
+    });
+
     it('deletePostWithReaction', async () => {
         await login(TestHelper.basicUser.email, 'password1')(store.dispatch, store.getState);
 

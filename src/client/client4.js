@@ -1153,7 +1153,7 @@ export default class Client4 {
         );
     };
 
-    deletePostsForChannel = async (channelId, postIds) => {
+    deletePosts = async (channelId, postIds) => {
         this.trackEvent('api', 'api_posts_delete_for_channel');
 
         return this.doFetch(

@@ -128,11 +128,32 @@ export function deletePost(post) {
             data: delPost,
             meta: {
                 offline: {
-                    effect: () => () => Client4.deletePost(post.id),
+                    effect: () => Client4.deletePost(post.id),
                     commit: {type: PostTypes.POST_DELETED},
                     rollback: {
                         type: PostTypes.RECEIVED_POST,
                         data: delPost
+                    }
+                }
+            }
+        });
+    };
+}
+
+export function deletePosts(postIds) {
+    return async (dispatch) => {
+        const delPosts = [...postIds];
+
+        dispatch({
+            type: PostTypes.POSTS_DELETED,
+            data: delPosts,
+            meta: {
+                offline: {
+                    effect: () => () => Client4.deletePosts(delPosts),
+                    commit: {type: PostTypes.POSTS_DELETED},
+                    rollback: {
+                        type: PostTypes.RECEIVED_POSTS,
+                        data: delPosts
                     }
                 }
             }
@@ -938,6 +959,7 @@ export default {
     createPost,
     editPost,
     deletePost,
+    deletePosts,
     removePost,
     getPostThread,
     getPostThreadWithRetry,

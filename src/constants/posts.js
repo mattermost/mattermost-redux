@@ -18,6 +18,7 @@ const PostTypes = {
 export default {
     POST_CHUNK_SIZE: 60,
     POST_DELETED: 'DELETED',
+    POSTS_DELETED: 'POSTS_DELETED',
     SYSTEM_MESSAGE_PREFIX: 'system_',
     POST_TYPES: PostTypes,
     MESSAGE_TYPES: {
