@@ -50,7 +50,7 @@ function combineUserActivitySystemMessage(newPost, firstPost) {
 
     let userActivities = props.user_activities;
     userActivities = [...userActivities, {...newPost.props, type: newPost.type}];
-    const newProps = {...props, userActivities};
+    const newProps = {...props, user_activities: userActivities};
 
     return {
         ...firstPost,
@@ -111,30 +111,26 @@ function handleReceivedPosts(posts = {}, postsInChannel = {}, action) {
         }
     }
 
-    // Remove missing post most likely due to consolidated system messages
+    // Remove missing post most likely due to consolidated system messages and then
     // Sort to ensure that the most recent posts are first, with pending
     // and failed posts first
-    // const updatedPostsForChannel = postsForChannel.filter((postId) => {
-    //     return typeof nextPosts[postId] !== 'undefined';
-    // }).sort((a, b) => {
-    //     return comparePosts(nextPosts[a], nextPosts[b]);
-    // });
-
-    postsForChannel.sort((a, b) => {
+    const updatedPostsForChannel = postsForChannel.filter((postId) => {
+        return typeof nextPosts[postId] !== 'undefined';
+    }).sort((a, b) => {
         return comparePosts(nextPosts[a], nextPosts[b]);
     });
 
-    const consolidatedPosts = combineUserActivitySystemMessages(nextPosts, postsForChannel);
+    const withCombinedPosts = combineUserActivitySystemMessages(nextPosts, updatedPostsForChannel);
 
-    nextPostsForChannel[channelId] = consolidatedPosts.nextPostsForChannel;
-    return {posts: consolidatedPosts.nextPosts, postsInChannel: nextPostsForChannel};
+    nextPostsForChannel[channelId] = withCombinedPosts.nextPostsForChannel;
+    return {posts: withCombinedPosts.nextPosts, postsInChannel: nextPostsForChannel};
 }
 
 function combineUserActivitySystemMessages(posts = {}, order = []) {
     let combinedPosts;
     const {POST_PROPS_USER_ACTIVITIES, POST_PROPS_USER_ACTIVITIES_MAX} = Posts;
 
-    let testPosts = order.reduce((acc, postId, index, arr) => {
+    return order.reduce((acc, postId, index, arr) => {
         const post = posts[postId];
         const {nextPosts, nextPostsForChannel} = acc;
         const nextPost = {};
@@ -181,9 +177,6 @@ function combineUserActivitySystemMessages(posts = {}, order = []) {
             nextPostsForChannel
         };
     }, {nextPosts: {}, nextPostsForChannel: []});
-    console.log("FINAL testPosts:", testPosts);
-
-    return testPosts;
 }
 
 function handlePostsFromSearch(posts = {}, postsInChannel = {}, action) {
