@@ -7,7 +7,6 @@ import {Client4} from 'client';
 import {General, Preferences, Posts} from 'constants';
 import {PostTypes, FileTypes} from 'action_types';
 import {getUsersByUsername} from 'selectors/entities/users';
-
 import * as Selectors from 'selectors/entities/posts';
 
 import {bindClientFunc, forceLogoutIfNecessary} from './helpers';
@@ -124,17 +123,12 @@ export function deletePost(post) {
     return async (dispatch) => {
         const delPost = {...post};
 
-        let deleteFn = () => Client4.deletePost(post.id);
-        if (isPostUserActivity(post.type) && post.system_ids) {
-            deleteFn = () => Client4.deletePostsForChannel(post.channel_id, post.system_ids);
-        }
-
         dispatch({
             type: PostTypes.POST_DELETED,
             data: delPost,
             meta: {
                 offline: {
-                    effect: () => deleteFn,
+                    effect: () => () => Client4.deletePost(post.id),
                     commit: {type: PostTypes.POST_DELETED},
                     rollback: {
                         type: PostTypes.RECEIVED_POST,

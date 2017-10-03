@@ -123,7 +123,7 @@ export default class Client4 {
     }
 
     getChannelPostsRoute(channelId) {
-        return `${this.getChannelRoute()}/${channelId}/posts`;
+        return `${this.getChannelRoute(channelId)}/posts`;
     }
 
     getChannelMembersRoute(channelId) {
