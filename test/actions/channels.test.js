@@ -348,13 +348,15 @@ describe('Actions.Channels', () => {
         await getMyTeamMembers()(store.dispatch, store.getState);
         await getMyTeamUnreads()(store.dispatch, store.getState);
 
-        const channelId = await Actions.createChannel(
+        const userChannel = await Client4.createChannel(
             TestHelper.fakeChannel(TestHelper.basicTeam.id)
-        ).id;
+        );
+        await Actions.fetchMyChannelsAndMembers(TestHelper.basicTeam.id)(store.dispatch, store.getState);
 
         const {channels} = store.getState().entities.channels;
         assert.ok(channels);
 
+        const channelId = userChannel.id;
         await Actions.markChannelAsUnread(
             TestHelper.basicTeam.id,
             channelId,
