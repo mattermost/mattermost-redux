@@ -129,7 +129,7 @@ describe('Actions.Files', () => {
         assert.ok(fileIdsByPostId[postForFile.id]);
         assert.equal(fileIdsByPostId[postForFile.id][0], fileId);
 
-        const files = await Actions.getMissingFilesForPost(postForFile.id)(store.dispatch, store.getState);
+        const {data: files} = await Actions.getMissingFilesForPost(postForFile.id)(store.dispatch, store.getState);
         assert.ok(files.length === 0);
     });
 });

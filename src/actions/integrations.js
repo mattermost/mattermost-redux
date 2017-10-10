@@ -55,7 +55,7 @@ export function removeIncomingHook(hookId) {
                 {type: IntegrationTypes.DELETE_INCOMING_HOOK_FAILURE, error},
                 logError(error)(dispatch)
             ]), getState);
-            return null;
+            return {error};
         }
 
         dispatch(batchActions([
@@ -68,7 +68,7 @@ export function removeIncomingHook(hookId) {
             }
         ]), getState);
 
-        return true;
+        return {data: true};
     };
 }
 
@@ -128,7 +128,7 @@ export function removeOutgoingHook(hookId) {
                 {type: IntegrationTypes.DELETE_OUTGOING_HOOK_FAILURE, error},
                 logError(error)(dispatch)
             ]), getState);
-            return null;
+            return {error};
         }
 
         dispatch(batchActions([
@@ -141,7 +141,7 @@ export function removeOutgoingHook(hookId) {
             }
         ]), getState);
 
-        return true;
+        return {data: true};
     };
 }
 
@@ -209,7 +209,7 @@ export function regenCommandToken(id) {
                 {type: IntegrationTypes.REGEN_COMMAND_TOKEN_FAILURE, error},
                 logError(error)(dispatch)
             ]), getState);
-            return null;
+            return {error};
         }
 
         dispatch(batchActions([
@@ -225,7 +225,7 @@ export function regenCommandToken(id) {
             }
         ]), getState);
 
-        return true;
+        return {data: true};
     };
 }
 
@@ -242,7 +242,7 @@ export function deleteCommand(id) {
                 {type: IntegrationTypes.DELETE_COMMAND_FAILURE, error},
                 logError(error)(dispatch)
             ]), getState);
-            return null;
+            return {error};
         }
 
         dispatch(batchActions([
@@ -255,7 +255,7 @@ export function deleteCommand(id) {
             }
         ]), getState);
 
-        return true;
+        return {data: true};
     };
 }
 
@@ -313,7 +313,7 @@ export function deleteOAuthApp(id) {
                 {type: IntegrationTypes.DELETE_OAUTH_APP_FAILURE, error},
                 logError(error)(dispatch)
             ]), getState);
-            return null;
+            return {error};
         }
 
         dispatch(batchActions([
@@ -326,7 +326,7 @@ export function deleteOAuthApp(id) {
             }
         ]), getState);
 
-        return true;
+        return {data: true};
     };
 }
 

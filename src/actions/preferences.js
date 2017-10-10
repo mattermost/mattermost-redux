@@ -34,6 +34,8 @@ export function deletePreferences(userId, preferences) {
                 }
             }
         });
+
+        return {data: true};
     };
 }
 
@@ -64,6 +66,8 @@ export function makeDirectChannelVisibleIfNecessary(otherUserId) {
             getProfilesByIds([otherUserId])(dispatch, getState);
             savePreferences(currentUserId, [preference])(dispatch, getState);
         }
+
+        return {data: true};
     };
 }
 
@@ -93,6 +97,8 @@ export function makeGroupMessageVisibleIfNecessary(channelId) {
             getProfilesInChannel(channelId, 0)(dispatch, getState);
             savePreferences(currentUserId, [preference])(dispatch, getState);
         }
+
+        return {data: true};
     };
 }
 
@@ -114,5 +120,7 @@ export function savePreferences(userId, preferences) {
                 }
             }
         });
+
+        return {data: true};
     };
 }

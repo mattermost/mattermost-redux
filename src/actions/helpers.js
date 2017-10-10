@@ -54,13 +54,13 @@ export function bindClientFunc(clientFunc, request, success, failure, ...args) {
         let data = null;
         try {
             data = await clientFunc(...args);
-        } catch (err) {
-            forceLogoutIfNecessary(err, dispatch);
+        } catch (error) {
+            forceLogoutIfNecessary(error, dispatch);
             dispatch(batchActions([
-                requestFailure(failure, err),
-                logError(err)(dispatch)
+                requestFailure(failure, error),
+                logError(error)(dispatch)
             ]), getState);
-            return null;
+            return {data: null, error};
         }
 
         if (Array.isArray(success)) {
@@ -71,7 +71,7 @@ export function bindClientFunc(clientFunc, request, success, failure, ...args) {
             dispatcher(success, data, dispatch, getState);
         }
 
-        return data;
+        return {data, error: null};
     };
 }
 

@@ -16,6 +16,8 @@ export function dismissErrorObject(index) {
 export function dismissError(index) {
     return async (dispatch) => {
         dispatch(dismissErrorObject(index));
+
+        return {data: true};
     };
 }
 
@@ -48,11 +50,15 @@ export function logError(error, displayable = false) {
 
         EventEmitter.emit(ErrorTypes.LOG_ERROR, error);
         dispatch(getLogErrorAction(serializedError, displayable));
+
+        return {data: true};
     };
 }
 
 export function clearErrors() {
     return async (dispatch) => {
         dispatch({type: ErrorTypes.CLEAR_ERRORS});
+
+        return {data: true};
     };
 }

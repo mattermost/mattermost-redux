@@ -656,5 +656,7 @@ export function userTyping(channelId, parentPostId) {
             websocketClient.userTyping(channelId, parentPostId);
             lastTimeTypingSent = t;
         }
+
+        return {data: true};
     };
 }

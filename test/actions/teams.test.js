@@ -415,7 +415,7 @@ describe('Actions.Teams', () => {
     });
 
     it('checkIfTeamExists', async () => {
-        let exists = await Actions.checkIfTeamExists(TestHelper.basicTeam.name)(store.dispatch, store.getState);
+        let {data: exists} = await Actions.checkIfTeamExists(TestHelper.basicTeam.name)(store.dispatch, store.getState);
 
         let teamRequest = store.getState().requests.teams.getTeam;
 
@@ -425,7 +425,8 @@ describe('Actions.Teams', () => {
 
         assert.ok(exists === true);
 
-        exists = await Actions.checkIfTeamExists('junk')(store.dispatch, store.getState);
+        const {data} = await Actions.checkIfTeamExists('junk')(store.dispatch, store.getState);
+        exists = data;
 
         teamRequest = store.getState().requests.teams.getTeam;
 

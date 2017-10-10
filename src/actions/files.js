@@ -21,7 +21,7 @@ export function getFilesForPost(postId) {
                 {type: FileTypes.FETCH_FILES_FOR_POST_FAILURE, error},
                 logError(error)(dispatch)
             ]), getState);
-            return;
+            return {error};
         }
 
         dispatch(batchActions([
@@ -34,6 +34,8 @@ export function getFilesForPost(postId) {
                 type: FileTypes.FETCH_FILES_FOR_POST_SUCCESS
             }
         ]), getState);
+
+        return {data: true};
     };
 }
 
@@ -46,7 +48,7 @@ export function getMissingFilesForPost(postId) {
             posts = await getFilesForPost(postId)(dispatch, getState);
         }
 
-        return posts;
+        return {data: posts};
     };
 }
 
@@ -69,7 +71,7 @@ export function uploadFile(channelId, rootId, clientIds, fileFormData, formBound
             };
 
             dispatch(batchActions([failure, logError(error)(dispatch)]), getState);
-            return null;
+            return {error};
         }
 
         const data = files.file_infos.map((file, index) => {
@@ -91,6 +93,6 @@ export function uploadFile(channelId, rootId, clientIds, fileFormData, formBound
             }
         ]), getState);
 
-        return files;
+        return {data: files};
     };
 }
