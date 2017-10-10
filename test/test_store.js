@@ -27,8 +27,8 @@ export default async function testConfigureStore(preloadedState) {
 
     const store = configureStore(preloadedState, {}, offlineConfig, () => ({}), {enableBuffer: false});
 
-    // const wait = () => new Promise((resolve) => setTimeout(resolve), 300); //eslint-disable-line
-    // await wait();
+    const wait = () => new Promise((resolve) => setTimeout(resolve), 300); //eslint-disable-line
+    await wait();
 
     return store;
 }
