@@ -970,7 +970,6 @@ export function markChannelAsRead(channelId, prevChannelId) {
             teamUnreads.push(teamUnread);
         }
 
-        let prevTeamUnread;
         if (prevChannel && prevChannel.team_id && channel.team_id !== prevChannel.team_id) {
             const prevTeamMember = teamState.myMembers[prevChannel.team_id];
 

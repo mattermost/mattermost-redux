@@ -361,12 +361,12 @@ describe('Actions.Channels', () => {
             JSON.stringify([TestHelper.basicUser.id])
         )(store.dispatch, store.getState);
 
-        let state = store.getState();
-        let {channels: myChannels, myMembers: channelMembers} = state.entities.channels;
-        let {myMembers: teamMembers} = state.entities.teams;
-        let channel = myChannels[channelId];
-        let channelMember = channelMembers[channelId];
-        let teamMember = teamMembers[TestHelper.basicTeam.id];
+        const state = store.getState();
+        const {channels: myChannels, myMembers: channelMembers} = state.entities.channels;
+        const {myMembers: teamMembers} = state.entities.teams;
+        const channel = myChannels[channelId];
+        const channelMember = channelMembers[channelId];
+        const teamMember = teamMembers[TestHelper.basicTeam.id];
 
         assert.equal((channel.total_msg_count - channelMember.msg_count), 1);
         assert.equal(channelMember.mention_count, 1);

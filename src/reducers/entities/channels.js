@@ -160,8 +160,8 @@ function myMembers(state = {}, action) {
 
         member = {
             ...member,
-            msg_count: action.data.msg_count != null ? action.data.msg_count : member.msg_count,
-            mention_count: action.data.mention_count != null ? action.data.mention_count : member.mention_count,
+            msg_count: action.data.msg_count == null ? member.msg_count : action.data.msg_count,
+            mention_count: action.data.mention_count == null ? member.mention_count : action.data.mention_count
         };
 
         return {
