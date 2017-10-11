@@ -23,23 +23,16 @@ describe('Selectors.Preferences', () => {
     const pref3 = {category: category3, name: name3, value: 'true'};
 
     const currentUserId = 'currentuserid';
-    const currentTeamId = 'currentteamid';
-    const testTheme = {themeColor: '#ffffff'};
-    const themePref = {category: Preferences.CATEGORY_THEME, name: '', value: JSON.stringify(testTheme)};
 
     const myPreferences = {};
     myPreferences[`${category1}--${name1}`] = pref1;
     myPreferences[`${category2}--${name2}`] = pref2;
     myPreferences[`${category3}--${name3}`] = pref3;
-    myPreferences[`${themePref.category}--${themePref.name}`] = themePref;
 
     const testState = deepFreezeAndThrowOnMutation({
         entities: {
             users: {
                 currentUserId
-            },
-            teams: {
-                currentTeamId
             },
             preferences: {
                 myPreferences
@@ -128,6 +121,8 @@ describe('Selectors.Preferences', () => {
 
     describe('get theme', () => {
         it('default theme', () => {
+            const currentTeamId = '1234';
+
             assert.equal(Selectors.getTheme({
                 entities: {
                     teams: {
@@ -257,6 +252,24 @@ describe('Selectors.Preferences', () => {
     });
 
     it('get theme from style', () => {
+        const theme = {themeColor: '#ffffff'};
+        const currentTeamId = '1234';
+
+        const state = {
+            entities: {
+                teams: {
+                    currentTeamId
+                },
+                preferences: {
+                    myPreferences: {
+                        [getPreferenceKey(Preferences.CATEGORY_THEME, '')]: {
+                            category: Preferences.CATEGORY_THEME, name: '', value: JSON.stringify(theme)
+                        }
+                    }
+                }
+            }
+        };
+
         function testStyleFunction(theme) {
             return {
                 container: {
@@ -268,14 +281,14 @@ describe('Selectors.Preferences', () => {
 
         const expected = {
             container: {
-                backgroundColor: testTheme.themeColor,
+                backgroundColor: theme.themeColor,
                 height: 100
             }
         };
 
         const getStyleFromTheme = Selectors.makeGetStyleFromTheme();
 
-        assert.deepEqual(getStyleFromTheme(testState, testStyleFunction), expected);
+        assert.deepEqual(getStyleFromTheme(state, testStyleFunction), expected);
     });
 });
 
