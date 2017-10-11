@@ -1108,7 +1108,7 @@ export function favoriteChannel(channelId) {
 
         Client4.trackEvent('action', 'action_channels_favorite');
 
-        return savePreferences(currentUserId, [preference])(dispatch, getState);
+        return await savePreferences(currentUserId, [preference])(dispatch, getState);
     };
 }
 
@@ -1123,7 +1123,7 @@ export function unfavoriteChannel(channelId) {
 
         Client4.trackEvent('action', 'action_channels_unfavorite');
 
-        return deletePreferences(currentUserId, [preference])(dispatch, getState);
+        return await deletePreferences(currentUserId, [preference])(dispatch, getState);
     };
 }
 

@@ -337,7 +337,7 @@ export function flagPost(postId) {
 
         Client4.trackEvent('action', 'action_posts_flag');
 
-        return savePreferences(currentUserId, [preference])(dispatch, getState);
+        return await savePreferences(currentUserId, [preference])(dispatch, getState);
     };
 }
 
@@ -868,7 +868,7 @@ export function unflagPost(postId) {
 
         Client4.trackEvent('action', 'action_posts_unflag');
 
-        return deletePreferences(currentUserId, [preference])(dispatch, getState);
+        return await deletePreferences(currentUserId, [preference])(dispatch, getState);
     };
 }
 
