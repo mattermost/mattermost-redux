@@ -270,10 +270,10 @@ describe('Selectors.Preferences', () => {
             }
         };
 
-        function testStyleFunction(theme) {
+        function testStyleFunction(myTheme) {
             return {
                 container: {
-                    backgroundColor: theme.themeColor,
+                    backgroundColor: myTheme.themeColor,
                     height: 100
                 }
             };
