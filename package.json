@@ -34,6 +34,7 @@
     "jsdom": "9.12.0",
     "jsdom-global": "2.1.1",
     "mocha": "3.5.3",
+    "mock-socket": "7.0.0",
     "nock": "9.0.14",
     "react": "15.6.1",
     "redux-persist-node-storage": "1.0.2",
@@ -45,6 +46,7 @@
     "build": "babel src --out-dir .",
     "check": "node_modules/.bin/eslint --ext \".js\" --ignore-pattern node_modules --quiet .",
     "test": "NODE_ENV=test mocha --opts test/mocha.opts",
+    "test-no-mock": "TEST_SERVER=1 NOCK_OFF=true NODE_ENV=test mocha --opts test/mocha.opts",
     "postinstall": "npm run build"
   }
 }

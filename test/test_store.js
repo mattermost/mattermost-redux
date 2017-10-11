@@ -20,7 +20,8 @@ export default async function testConfigureStore(preloadedState) {
             debounce: 1000,
             transforms: [
                 storageTransform
-            ]
+            ],
+            whitelist: []
         },
         retry: (action, retries) => 200 * (retries + 1)
     };

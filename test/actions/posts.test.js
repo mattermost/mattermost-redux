@@ -6,17 +6,19 @@ import nock from 'nock';
 
 import * as Actions from 'actions/posts';
 import {login} from 'actions/users';
-import {Client, Client4} from 'client';
+import {Client4} from 'client';
 import {Preferences, Posts, RequestStatus} from 'constants';
 import {PostTypes} from 'action_types';
 import TestHelper from 'test/test_helper';
 import configureStore from 'test/test_store';
 import {getPreferenceKey} from 'utils/preference_utils';
 
+const OK_RESPONSE = {status: 'OK'};
+
 describe('Actions.Posts', () => {
     let store;
     before(async () => {
-        await TestHelper.initBasic(Client, Client4);
+        await TestHelper.initBasic(Client4);
     });
 
     beforeEach(async () => {
@@ -24,14 +26,16 @@ describe('Actions.Posts', () => {
     });
 
     after(async () => {
-        nock.restore();
-        await TestHelper.basicClient.logout();
-        await TestHelper.basicClient4.logout();
+        await TestHelper.tearDown();
     });
 
     it('createPost', async () => {
         const channelId = TestHelper.basicChannel.id;
         const post = TestHelper.fakePost(channelId);
+
+        nock(Client4.getPostsRoute()).
+            post('').
+            reply(201, {...post, id: TestHelper.generateId()});
 
         await Actions.createPost(post)(store.dispatch, store.getState);
 
@@ -70,6 +74,10 @@ describe('Actions.Posts', () => {
         const post = TestHelper.fakePost(channelId);
         const files = TestHelper.fakeFiles(3);
 
+        nock(Client4.getPostsRoute()).
+            post('').
+            reply(201, {...post, id: TestHelper.generateId(), file_ids: [files[0].id, files[1].id, files[2].id]});
+
         await Actions.createPost(
             post,
             files
@@ -106,17 +114,25 @@ describe('Actions.Posts', () => {
     });
 
     it('retry failed post', async () => {
+        if (TestHelper.isLiveServer()) {
+            console.log('Skipping mock-only test');
+            return;
+        }
+
         const channelId = TestHelper.basicChannel.id;
         const post = TestHelper.fakePost(channelId);
 
-        TestHelper.activateMocking();
         nock(Client4.getBaseRoute()).
-        post('/posts').
-        reply(400);
+            post('/posts').
+            reply(400, {});
+
+        nock(Client4.getPostsRoute()).
+            post('').
+            reply(201, {...post, id: TestHelper.generateId()});
+
         await Actions.createPost(post)(store.dispatch, store.getState);
 
         await TestHelper.wait(200);
-        nock.restore();
 
         let state = store.getState();
 
@@ -137,7 +153,7 @@ describe('Actions.Posts', () => {
         const {id, failed, ...retryPost} = failedPost; // eslint-disable-line
         await Actions.createPost(retryPost)(store.dispatch, store.getState);
 
-        await TestHelper.wait(200);
+        await TestHelper.wait(500);
 
         state = store.getState();
         const {posts: nextPosts} = state.entities.posts;
@@ -158,12 +174,21 @@ describe('Actions.Posts', () => {
     it('editPost', async () => {
         const channelId = TestHelper.basicChannel.id;
 
+        nock(Client4.getPostsRoute()).
+            post('').
+            reply(201, TestHelper.fakePostWithId(channelId));
+
         const post = await Client4.createPost(
             TestHelper.fakePost(channelId)
         );
         const message = post.message;
 
         post.message = `${message} (edited)`;
+
+        nock(Client4.getPostsRoute()).
+            put(`/${post.id}/patch`).
+            reply(200, post);
+
         await Actions.editPost(
             post
         )(store.dispatch, store.getState);
@@ -188,6 +213,9 @@ describe('Actions.Posts', () => {
     it('deletePost', async () => {
         const channelId = TestHelper.basicChannel.id;
 
+        nock(Client4.getPostsRoute()).
+            post('').
+            reply(201, TestHelper.fakePostWithId(channelId));
         await Actions.createPost(TestHelper.fakePost(channelId))(store.dispatch, store.getState);
 
         const initialPosts = store.getState().entities.posts;
@@ -196,12 +224,7 @@ describe('Actions.Posts', () => {
         await Actions.deletePost(created)(store.dispatch, store.getState);
 
         const state = store.getState();
-        const deleteRequest = state.requests.posts.deletePost;
         const {posts} = state.entities.posts;
-
-        if (deleteRequest.status === RequestStatus.FAILURE) {
-            throw new Error(JSON.stringify(deleteRequest.error));
-        }
 
         assert.ok(posts);
         assert.ok(posts[created.id]);
@@ -213,7 +236,12 @@ describe('Actions.Posts', () => {
     });
 
     it('deletePostWithReaction', async () => {
+        TestHelper.mockLogin();
         await login(TestHelper.basicUser.email, 'password1')(store.dispatch, store.getState);
+
+        nock(Client4.getPostsRoute()).
+            post('').
+            reply(201, TestHelper.fakePostWithId(TestHelper.basicChannel.id));
 
         const post1 = await Client4.createPost(
             TestHelper.fakePost(TestHelper.basicChannel.id)
@@ -221,6 +249,9 @@ describe('Actions.Posts', () => {
 
         const emojiName = '+1';
 
+        nock(Client4.getReactionsRoute()).
+            post('').
+            reply(201, {user_id: TestHelper.basicUser.id, post_id: post1.id, emoji_name: emojiName, create_at: 1508168444721});
         await Actions.addReaction(post1.id, emojiName)(store.dispatch, store.getState);
 
         let reactions = store.getState().entities.posts.reactions;
@@ -239,10 +270,21 @@ describe('Actions.Posts', () => {
         const channelId = TestHelper.basicChannel.id;
         const postId = TestHelper.basicPost.id;
 
+        nock(Client4.getPostsRoute()).
+            post('').
+            reply(201, {...TestHelper.fakePostWithId(channelId), root_id: postId});
         const post1a = await Client4.createPost(
             {...TestHelper.fakePost(channelId), root_id: postId}
         );
 
+        const postList = {order: [postId, post1a.id], posts: {}};
+        postList.posts[postId] = TestHelper.basicPost;
+        postList.posts[post1a.id] = post1a;
+
+        nock(Client4.getChannelsRoute()).
+            get(`/${channelId}/posts`).
+            query(true).
+            reply(200, postList);
         await Actions.getPosts(
             channelId
         )(store.dispatch, store.getState);
@@ -266,14 +308,21 @@ describe('Actions.Posts', () => {
     });
 
     it('removePostWithReaction', async () => {
+        TestHelper.mockLogin();
         await login(TestHelper.basicUser.email, 'password1')(store.dispatch, store.getState);
 
+        nock(Client4.getPostsRoute()).
+            post('').
+            reply(201, TestHelper.fakePostWithId(TestHelper.basicChannel.id));
         const post1 = await Client4.createPost(
             TestHelper.fakePost(TestHelper.basicChannel.id)
         );
 
         const emojiName = '+1';
 
+        nock(Client4.getReactionsRoute()).
+            post('').
+            reply(201, {user_id: TestHelper.basicUser.id, post_id: post1.id, emoji_name: emojiName, create_at: 1508168444721});
         await Actions.addReaction(post1.id, emojiName)(store.dispatch, store.getState);
 
         let reactions = store.getState().entities.posts.reactions;
@@ -291,10 +340,19 @@ describe('Actions.Posts', () => {
     it('getPostThread', async () => {
         const channelId = TestHelper.basicChannel.id;
 
+        nock(Client4.getPostsRoute()).
+            post('').
+            reply(201, TestHelper.fakePostWithId(channelId));
         const post = await Client4.createPost(
             TestHelper.fakePost(channelId)
         );
 
+        const postList = {order: [post.id], posts: {}};
+        postList.posts[post.id] = post;
+
+        nock(Client4.getPostsRoute()).
+            get(`/${post.id}/thread`).
+            reply(200, postList);
         await Actions.getPostThread(post.id)(store.dispatch, store.getState);
 
         const state = store.getState();
@@ -319,20 +377,32 @@ describe('Actions.Posts', () => {
     });
 
     it('getPostThreadWithRetry', async () => {
+        if (TestHelper.isLiveServer()) {
+            console.log('Skipping mock-only test');
+            return;
+        }
+
         const channelId = TestHelper.basicChannel.id;
 
+        nock(Client4.getPostsRoute()).
+            post('').
+            reply(201, TestHelper.fakePostWithId(channelId));
         const post = await Client4.createPost(
             TestHelper.fakePost(channelId)
         );
 
-        TestHelper.activateMocking();
-        nock(Client4.getBaseRoute()).post('/posts').reply(400);
+        nock(Client4.getPostsRoute()).get(`/${post.id}/thread`).reply(400, {});
+
+        const postList = {order: [post.id], posts: {}};
+        postList.posts[post.id] = post;
+
+        nock(Client4.getPostsRoute()).
+            get(`/${post.id}/thread`).
+            reply(200, postList);
 
         await Actions.getPostThreadWithRetry(post.id)(store.dispatch, store.getState);
 
-        nock.restore();
-
-        await TestHelper.wait(300);
+        await TestHelper.wait(500);
 
         const state = store.getState();
         const getRequest = state.requests.posts.getPostThread;
@@ -357,23 +427,51 @@ describe('Actions.Posts', () => {
 
     it('getPosts', async () => {
         const channelId = TestHelper.basicChannel.id;
+        const post = TestHelper.basicPost;
 
+        nock(Client4.getPostsRoute()).
+            post('').
+            reply(201, {...TestHelper.fakePostWithId(TestHelper.basicChannel.id), create_at: post.create_at + 1});
         const post1 = await Client4.createPost(
             TestHelper.fakePost(channelId)
         );
+        nock(Client4.getPostsRoute()).
+            post('').
+            reply(201, {...TestHelper.fakePostWithId(TestHelper.basicChannel.id), root_id: post1.id, create_at: post.create_at + 2});
         const post1a = await Client4.createPost(
             {...TestHelper.fakePost(channelId), root_id: post1.id}
         );
+        nock(Client4.getPostsRoute()).
+            post('').
+            reply(201, {...TestHelper.fakePostWithId(TestHelper.basicChannel.id), create_at: post.create_at + 3});
         const post2 = await Client4.createPost(
             TestHelper.fakePost(channelId)
         );
+        nock(Client4.getPostsRoute()).
+            post('').
+            reply(201, {...TestHelper.fakePostWithId(TestHelper.basicChannel.id), create_at: post.create_at + 4});
         const post3 = await Client4.createPost(
             TestHelper.fakePost(channelId)
         );
+        nock(Client4.getPostsRoute()).
+            post('').
+            reply(201, {...TestHelper.fakePostWithId(TestHelper.basicChannel.id), root_id: post3.id, create_at: post.create_at + 5});
         const post3a = await Client4.createPost(
             {...TestHelper.fakePost(channelId), root_id: post3.id}
         );
 
+        const postList = {order: [post3a.id, post3.id, post2.id, post1a.id, post1.id, post.id], posts: {}};
+        postList.posts[post.id] = TestHelper.basicPost;
+        postList.posts[post1.id] = post1;
+        postList.posts[post1a.id] = post1a;
+        postList.posts[post2.id] = post2;
+        postList.posts[post3.id] = post3;
+        postList.posts[post3a.id] = post3a;
+
+        nock(Client4.getChannelsRoute()).
+            get(`/${channelId}/posts`).
+            query(true).
+            reply(200, postList);
         await Actions.getPosts(
             channelId
         )(store.dispatch, store.getState);
@@ -403,34 +501,65 @@ describe('Actions.Posts', () => {
     });
 
     it('getPostsWithRetry', async () => {
-        const channelId = TestHelper.basicChannel.id;
+        if (TestHelper.isLiveServer()) {
+            console.log('Skipping mock-only test');
+            return;
+        }
 
+        const channelId = TestHelper.basicChannel.id;
+        const post = TestHelper.basicPost;
+
+        nock(Client4.getPostsRoute()).
+            post('').
+            reply(201, {...TestHelper.fakePostWithId(TestHelper.basicChannel.id), create_at: post.create_at + 1});
         const post1 = await Client4.createPost(
             TestHelper.fakePost(channelId)
         );
+        nock(Client4.getPostsRoute()).
+            post('').
+            reply(201, {...TestHelper.fakePostWithId(TestHelper.basicChannel.id), root_id: post1.id, create_at: post.create_at + 2});
         const post1a = await Client4.createPost(
             {...TestHelper.fakePost(channelId), root_id: post1.id}
         );
+        nock(Client4.getPostsRoute()).
+            post('').
+            reply(201, {...TestHelper.fakePostWithId(TestHelper.basicChannel.id), create_at: post.create_at + 3});
         const post2 = await Client4.createPost(
             TestHelper.fakePost(channelId)
         );
+        nock(Client4.getPostsRoute()).
+            post('').
+            reply(201, {...TestHelper.fakePostWithId(TestHelper.basicChannel.id), create_at: post.create_at + 4});
         const post3 = await Client4.createPost(
             TestHelper.fakePost(channelId)
         );
+        nock(Client4.getPostsRoute()).
+            post('').
+            reply(201, {...TestHelper.fakePostWithId(TestHelper.basicChannel.id), root_id: post3.id, create_at: post.create_at + 5});
         const post3a = await Client4.createPost(
             {...TestHelper.fakePost(channelId), root_id: post3.id}
         );
 
-        TestHelper.activateMocking();
-        nock(Client4.getBaseRoute()).post('/posts').reply(400);
+        nock(Client4.getChannelsRoute()).get(`/${channelId}/posts`).query(true).reply(400, {});
+
+        const postList = {order: [post3a.id, post3.id, post2.id, post1a.id, post1.id, post.id], posts: {}};
+        postList.posts[post.id] = TestHelper.basicPost;
+        postList.posts[post1.id] = post1;
+        postList.posts[post1a.id] = post1a;
+        postList.posts[post2.id] = post2;
+        postList.posts[post3.id] = post3;
+        postList.posts[post3a.id] = post3a;
+
+        nock(Client4.getChannelsRoute()).
+            get(`/${channelId}/posts`).
+            query(true).
+            reply(200, postList);
 
         Actions.getPostsWithRetry(
             channelId
         )(store.dispatch, store.getState);
 
-        nock.restore();
-
-        await TestHelper.wait(300); // wait for retry action to complete after 200ms
+        await TestHelper.wait(500); // wait for retry action to complete after 200ms
 
         const state = store.getState();
         const getRequest = state.requests.posts.getPosts;
@@ -535,23 +664,47 @@ describe('Actions.Posts', () => {
 
     it('getPostsSince', async () => {
         const channelId = TestHelper.basicChannel.id;
+        const post = TestHelper.basicPost;
 
+        nock(Client4.getPostsRoute()).
+            post('').
+            reply(201, {...TestHelper.fakePostWithId(TestHelper.basicChannel.id), create_at: post.create_at + 1});
         const post1 = await Client4.createPost(
             TestHelper.fakePost(channelId)
         );
+        nock(Client4.getPostsRoute()).
+            post('').
+            reply(201, {...TestHelper.fakePostWithId(TestHelper.basicChannel.id), create_at: post.create_at + 2, root_id: post1.id});
         await Client4.createPost(
             {...TestHelper.fakePost(channelId), root_id: post1.id}
         );
+        nock(Client4.getPostsRoute()).
+            post('').
+            reply(201, {...TestHelper.fakePostWithId(TestHelper.basicChannel.id), create_at: post.create_at + 3});
         const post2 = await Client4.createPost(
             TestHelper.fakePost(channelId)
         );
+        nock(Client4.getPostsRoute()).
+            post('').
+            reply(201, {...TestHelper.fakePostWithId(TestHelper.basicChannel.id), create_at: post.create_at + 4});
         const post3 = await Client4.createPost(
             TestHelper.fakePost(channelId)
         );
+        nock(Client4.getPostsRoute()).
+            post('').
+            reply(201, {...TestHelper.fakePostWithId(TestHelper.basicChannel.id), create_at: post.create_at + 5});
         const post3a = await Client4.createPost(
             {...TestHelper.fakePost(channelId), root_id: post3.id}
         );
 
+        const postList = {order: [post3a.id, post3.id], posts: {}};
+        postList.posts[post3.id] = post3;
+        postList.posts[post3a.id] = post3a;
+
+        nock(Client4.getChannelsRoute()).
+            get(`/${channelId}/posts`).
+            query(true).
+            reply(200, postList);
         await Actions.getPostsSince(
             channelId,
             post2.create_at
@@ -576,33 +729,60 @@ describe('Actions.Posts', () => {
     });
 
     it('getPostsSinceWithRetry', async () => {
-        const channelId = TestHelper.basicChannel.id;
+        if (TestHelper.isLiveServer()) {
+            console.log('Skipping mock-only test');
+            return;
+        }
 
+        const channelId = TestHelper.basicChannel.id;
+        const post = TestHelper.basicPost;
+
+        nock(Client4.getPostsRoute()).
+            post('').
+            reply(201, {...TestHelper.fakePostWithId(TestHelper.basicChannel.id), create_at: post.create_at + 1});
         const post1 = await Client4.createPost(
             TestHelper.fakePost(channelId)
         );
+        nock(Client4.getPostsRoute()).
+            post('').
+            reply(201, {...TestHelper.fakePostWithId(TestHelper.basicChannel.id), create_at: post.create_at + 2, root_id: post1.id});
         await Client4.createPost(
             {...TestHelper.fakePost(channelId), root_id: post1.id}
         );
+        nock(Client4.getPostsRoute()).
+            post('').
+            reply(201, {...TestHelper.fakePostWithId(TestHelper.basicChannel.id), create_at: post.create_at + 3});
         const post2 = await Client4.createPost(
             TestHelper.fakePost(channelId)
         );
+        nock(Client4.getPostsRoute()).
+            post('').
+            reply(201, {...TestHelper.fakePostWithId(TestHelper.basicChannel.id), create_at: post.create_at + 4});
         const post3 = await Client4.createPost(
             TestHelper.fakePost(channelId)
         );
+        nock(Client4.getPostsRoute()).
+            post('').
+            reply(201, {...TestHelper.fakePostWithId(TestHelper.basicChannel.id), create_at: post.create_at + 5});
         const post3a = await Client4.createPost(
             {...TestHelper.fakePost(channelId), root_id: post3.id}
         );
 
-        TestHelper.activateMocking();
-        nock(Client4.getBaseRoute()).post('/posts').reply(400);
+        nock(Client4.getChannelsRoute()).get(`/${channelId}/posts`).query(true).reply(400, {});
+
+        const postList = {order: [post3a.id, post3.id], posts: {}};
+        postList.posts[post3.id] = post3;
+        postList.posts[post3a.id] = post3a;
+
+        nock(Client4.getChannelsRoute()).
+            get(`/${channelId}/posts`).
+            query(true).
+            reply(200, postList);
 
         Actions.getPostsSinceWithRetry(
             channelId,
             post2.create_at
         )(store.dispatch, store.getState);
-
-        nock.restore();
 
         await TestHelper.wait(300);
 
@@ -626,23 +806,47 @@ describe('Actions.Posts', () => {
 
     it('getPostsBefore', async () => {
         const channelId = TestHelper.basicChannel.id;
+        const post = TestHelper.basicPost;
 
+        nock(Client4.getPostsRoute()).
+            post('').
+            reply(201, {...TestHelper.fakePostWithId(TestHelper.basicChannel.id), create_at: post.create_at + 1});
         const post1 = await Client4.createPost(
             TestHelper.fakePost(channelId)
         );
+        nock(Client4.getPostsRoute()).
+            post('').
+            reply(201, {...TestHelper.fakePostWithId(TestHelper.basicChannel.id), create_at: post.create_at + 2, root_id: post1.id});
         const post1a = await Client4.createPost(
             {...TestHelper.fakePost(channelId), root_id: post1.id}
         );
+        nock(Client4.getPostsRoute()).
+            post('').
+            reply(201, {...TestHelper.fakePostWithId(TestHelper.basicChannel.id), create_at: post.create_at + 3});
         const post2 = await Client4.createPost(
             TestHelper.fakePost(channelId)
         );
+        nock(Client4.getPostsRoute()).
+            post('').
+            reply(201, {...TestHelper.fakePostWithId(TestHelper.basicChannel.id), create_at: post.create_at + 4});
         const post3 = await Client4.createPost(
             TestHelper.fakePost(channelId)
         );
+        nock(Client4.getPostsRoute()).
+            post('').
+            reply(201, {...TestHelper.fakePostWithId(TestHelper.basicChannel.id), create_at: post.create_at + 5, root_id: post3.id});
         await Client4.createPost(
             {...TestHelper.fakePost(channelId), root_id: post3.id}
         );
 
+        const postList = {order: [post1a.id, post1.id], posts: {}};
+        postList.posts[post1a.id] = post1a;
+        postList.posts[post1.id] = post1;
+
+        nock(Client4.getChannelsRoute()).
+            get(`/${channelId}/posts`).
+            query(true).
+            reply(200, postList);
         await Actions.getPostsBefore(
             channelId,
             post2.id,
@@ -665,30 +869,59 @@ describe('Actions.Posts', () => {
         assert.ok(postsForChannel);
         assert.equal(postsForChannel[0], post1a.id, 'wrong order for post1a');
         assert.equal(postsForChannel[1], post1.id, 'wrong order for post1');
-        assert.equal(postsForChannel.length, 10, 'wrong size');
+        assert.ok(postsForChannel.length <= 10, 'wrong size');
     });
 
     it('getPostsBeforeWithRetry', async () => {
-        const channelId = TestHelper.basicChannel.id;
+        if (TestHelper.isLiveServer()) {
+            console.log('Skipping mock-only test');
+            return;
+        }
 
+        const channelId = TestHelper.basicChannel.id;
+        const post = TestHelper.basicPost;
+
+        nock(Client4.getPostsRoute()).
+            post('').
+            reply(201, {...TestHelper.fakePostWithId(TestHelper.basicChannel.id), create_at: post.create_at + 1});
         const post1 = await Client4.createPost(
             TestHelper.fakePost(channelId)
         );
+        nock(Client4.getPostsRoute()).
+            post('').
+            reply(201, {...TestHelper.fakePostWithId(TestHelper.basicChannel.id), create_at: post.create_at + 2, root_id: post1.id});
         const post1a = await Client4.createPost(
             {...TestHelper.fakePost(channelId), root_id: post1.id}
         );
+        nock(Client4.getPostsRoute()).
+            post('').
+            reply(201, {...TestHelper.fakePostWithId(TestHelper.basicChannel.id), create_at: post.create_at + 3});
         const post2 = await Client4.createPost(
             TestHelper.fakePost(channelId)
         );
+        nock(Client4.getPostsRoute()).
+            post('').
+            reply(201, {...TestHelper.fakePostWithId(TestHelper.basicChannel.id), create_at: post.create_at + 4});
         const post3 = await Client4.createPost(
             TestHelper.fakePost(channelId)
         );
+        nock(Client4.getPostsRoute()).
+            post('').
+            reply(201, {...TestHelper.fakePostWithId(TestHelper.basicChannel.id), create_at: post.create_at + 5, root_id: post3.id});
         await Client4.createPost(
             {...TestHelper.fakePost(channelId), root_id: post3.id}
         );
 
-        TestHelper.activateMocking();
-        nock(Client4.getBaseRoute()).post('/posts').reply(400);
+        nock(Client4.getChannelsRoute()).get(`/${channelId}/posts`).query(true).reply(400, {});
+
+        const postList = {order: [post1a.id, post1.id], posts: {}};
+        postList.posts[post1a.id] = post1a;
+        postList.posts[post1.id] = post1;
+
+        nock(Client4.getChannelsRoute()).
+            get(`/${channelId}/posts`).
+            query(true).
+            reply(200, postList);
 
         Actions.getPostsBeforeWithRetry(
             channelId,
@@ -696,8 +929,6 @@ describe('Actions.Posts', () => {
             0,
             10
         )(store.dispatch, store.getState);
-
-        nock.restore();
 
         await TestHelper.wait(300);
 
@@ -716,27 +947,52 @@ describe('Actions.Posts', () => {
         assert.ok(postsForChannel);
         assert.equal(postsForChannel[0], post1a.id, 'wrong order for post1a');
         assert.equal(postsForChannel[1], post1.id, 'wrong order for post1');
-        assert.equal(postsForChannel.length, 10, 'wrong size');
+        assert.ok(postsForChannel.length <= 10, 'wrong size');
     });
 
     it('getPostsAfter', async () => {
         const channelId = TestHelper.basicChannel.id;
+        const post = TestHelper.basicPost;
 
+        nock(Client4.getPostsRoute()).
+            post('').
+            reply(201, {...TestHelper.fakePostWithId(TestHelper.basicChannel.id), create_at: post.create_at + 1});
         const post1 = await Client4.createPost(
             TestHelper.fakePost(channelId)
         );
+        nock(Client4.getPostsRoute()).
+            post('').
+            reply(201, {...TestHelper.fakePostWithId(TestHelper.basicChannel.id), create_at: post.create_at + 2, root_id: post1.id});
         await Client4.createPost(
             {...TestHelper.fakePost(channelId), root_id: post1.id}
         );
+        nock(Client4.getPostsRoute()).
+            post('').
+            reply(201, {...TestHelper.fakePostWithId(TestHelper.basicChannel.id), create_at: post.create_at + 3});
         const post2 = await Client4.createPost(
             TestHelper.fakePost(channelId)
         );
+        nock(Client4.getPostsRoute()).
+            post('').
+            reply(201, {...TestHelper.fakePostWithId(TestHelper.basicChannel.id), create_at: post.create_at + 4});
         const post3 = await Client4.createPost(
             TestHelper.fakePost(channelId)
         );
+        nock(Client4.getPostsRoute()).
+            post('').
+            reply(201, {...TestHelper.fakePostWithId(TestHelper.basicChannel.id), create_at: post.create_at + 5, root_id: post3.id});
         const post3a = await Client4.createPost(
             {...TestHelper.fakePost(channelId), root_id: post3.id}
         );
+
+        const postList = {order: [post3a.id, post3.id], posts: {}};
+        postList.posts[post3a.id] = post3a;
+        postList.posts[post3.id] = post3;
+
+        nock(Client4.getChannelsRoute()).
+            get(`/${channelId}/posts`).
+            query(true).
+            reply(200, postList);
 
         await Actions.getPostsAfter(
             channelId,
@@ -764,26 +1020,55 @@ describe('Actions.Posts', () => {
     });
 
     it('getPostsAfterWithRetry', async () => {
-        const channelId = TestHelper.basicChannel.id;
+        if (TestHelper.isLiveServer()) {
+            console.log('Skipping mock-only test');
+            return;
+        }
 
+        const channelId = TestHelper.basicChannel.id;
+        const post = TestHelper.basicPost;
+
+        nock(Client4.getPostsRoute()).
+            post('').
+            reply(201, {...TestHelper.fakePostWithId(TestHelper.basicChannel.id), create_at: post.create_at + 1});
         const post1 = await Client4.createPost(
             TestHelper.fakePost(channelId)
         );
+        nock(Client4.getPostsRoute()).
+            post('').
+            reply(201, {...TestHelper.fakePostWithId(TestHelper.basicChannel.id), create_at: post.create_at + 2, root_id: post1.id});
         await Client4.createPost(
             {...TestHelper.fakePost(channelId), root_id: post1.id}
         );
+        nock(Client4.getPostsRoute()).
+            post('').
+            reply(201, {...TestHelper.fakePostWithId(TestHelper.basicChannel.id), create_at: post.create_at + 3});
         const post2 = await Client4.createPost(
             TestHelper.fakePost(channelId)
         );
+        nock(Client4.getPostsRoute()).
+            post('').
+            reply(201, {...TestHelper.fakePostWithId(TestHelper.basicChannel.id), create_at: post.create_at + 4});
         const post3 = await Client4.createPost(
             TestHelper.fakePost(channelId)
         );
+        nock(Client4.getPostsRoute()).
+            post('').
+            reply(201, {...TestHelper.fakePostWithId(TestHelper.basicChannel.id), create_at: post.create_at + 5, root_id: post3.id});
         const post3a = await Client4.createPost(
             {...TestHelper.fakePost(channelId), root_id: post3.id}
         );
 
-        TestHelper.activateMocking();
-        nock(Client4.getBaseRoute()).post('/posts').reply(400);
+        nock(Client4.getChannelsRoute()).get(`/${channelId}/posts`).query(true).reply(400, {});
+
+        const postList = {order: [post3a.id, post3.id], posts: {}};
+        postList.posts[post3a.id] = post3a;
+        postList.posts[post3.id] = post3;
+
+        nock(Client4.getChannelsRoute()).
+            get(`/${channelId}/posts`).
+            query(true).
+            reply(200, postList);
 
         Actions.getPostsAfterWithRetry(
             channelId,
@@ -791,8 +1076,6 @@ describe('Actions.Posts', () => {
             0,
             10
         )(store.dispatch, store.getState);
-
-        nock.restore();
 
         await TestHelper.wait(300);
 
@@ -817,12 +1100,26 @@ describe('Actions.Posts', () => {
     it('flagPost', async () => {
         const {dispatch, getState} = store;
         const channelId = TestHelper.basicChannel.id;
+
+        nock(Client4.getUsersRoute()).
+            post('/logout').
+            reply(200, OK_RESPONSE);
         await TestHelper.basicClient4.logout();
+
+        TestHelper.mockLogin();
         await login(TestHelper.basicUser.email, 'password1')(store.dispatch, store.getState);
+
+        nock(Client4.getPostsRoute()).
+            post('').
+            reply(201, TestHelper.fakePostWithId(TestHelper.basicChannel.id));
 
         const post1 = await Client4.createPost(
             TestHelper.fakePost(channelId)
         );
+
+        nock(Client4.getUsersRoute()).
+            put(`/${TestHelper.basicUser.id}/preferences`).
+            reply(200, OK_RESPONSE);
 
         Actions.flagPost(post1.id)(dispatch, getState);
         const state = getState();
@@ -834,19 +1131,33 @@ describe('Actions.Posts', () => {
     it('unflagPost', async () => {
         const {dispatch, getState} = store;
         const channelId = TestHelper.basicChannel.id;
+        nock(Client4.getUsersRoute()).
+            post('/logout').
+            reply(200, OK_RESPONSE);
         await TestHelper.basicClient4.logout();
+
+        TestHelper.mockLogin();
         await login(TestHelper.basicUser.email, 'password1')(store.dispatch, store.getState);
 
+        nock(Client4.getPostsRoute()).
+            post('').
+            reply(201, TestHelper.fakePostWithId(TestHelper.basicChannel.id));
         const post1 = await Client4.createPost(
             TestHelper.fakePost(channelId)
         );
 
+        nock(Client4.getUsersRoute()).
+            put(`/${TestHelper.basicUser.id}/preferences`).
+            reply(200, OK_RESPONSE);
         Actions.flagPost(post1.id)(dispatch, getState);
         let state = getState();
         const prefKey = getPreferenceKey(Preferences.CATEGORY_FLAGGED_POST, post1.id);
         const preference = state.entities.preferences.myPreferences[prefKey];
         assert.ok(preference);
 
+        nock(Client4.getUsersRoute()).
+            delete(`/${TestHelper.basicUser.id}/preferences`).
+            reply(200, OK_RESPONSE);
         Actions.unflagPost(post1.id)(dispatch, getState);
         state = getState();
         const unflagged = state.entities.preferences.myPreferences[prefKey];
@@ -856,11 +1167,24 @@ describe('Actions.Posts', () => {
     it('pinPost', async () => {
         const {dispatch, getState} = store;
 
+        nock(Client4.getPostsRoute()).
+            post('').
+            reply(201, TestHelper.fakePostWithId(TestHelper.basicChannel.id));
         const post1 = await Client4.createPost(
             TestHelper.fakePost(TestHelper.basicChannel.id)
         );
 
+        const postList = {order: [post1.id], posts: {}};
+        postList.posts[post1.id] = post1;
+
+        nock(Client4.getPostsRoute()).
+            get(`/${post1.id}/thread`).
+            reply(200, postList);
         await Actions.getPostThread(post1.id)(dispatch, getState);
+
+        nock(Client4.getPostsRoute()).
+            post(`/${post1.id}/pin`).
+            reply(200, OK_RESPONSE);
         await Actions.pinPost(post1.id)(dispatch, getState);
 
         const editRequest = getState().requests.posts.editPost;
@@ -878,12 +1202,29 @@ describe('Actions.Posts', () => {
     it('unpinPost', async () => {
         const {dispatch, getState} = store;
 
+        nock(Client4.getPostsRoute()).
+            post('').
+            reply(201, TestHelper.fakePostWithId(TestHelper.basicChannel.id));
         const post1 = await Client4.createPost(
             TestHelper.fakePost(TestHelper.basicChannel.id)
         );
 
+        const postList = {order: [post1.id], posts: {}};
+        postList.posts[post1.id] = post1;
+
+        nock(Client4.getPostsRoute()).
+            get(`/${post1.id}/thread`).
+            reply(200, postList);
         await Actions.getPostThread(post1.id)(dispatch, getState);
+
+        nock(Client4.getPostsRoute()).
+            post(`/${post1.id}/pin`).
+            reply(200, OK_RESPONSE);
         await Actions.pinPost(post1.id)(dispatch, getState);
+
+        nock(Client4.getPostsRoute()).
+            post(`/${post1.id}/unpin`).
+            reply(200, OK_RESPONSE);
         await Actions.unpinPost(post1.id)(dispatch, getState);
 
         const editRequest = getState().requests.posts.editPost;
@@ -901,14 +1242,21 @@ describe('Actions.Posts', () => {
     it('addReaction', async () => {
         const {dispatch, getState} = store;
 
+        TestHelper.mockLogin();
         await login(TestHelper.basicUser.email, 'password1')(dispatch, getState);
 
+        nock(Client4.getPostsRoute()).
+            post('').
+            reply(201, TestHelper.fakePostWithId(TestHelper.basicChannel.id));
         const post1 = await Client4.createPost(
             TestHelper.fakePost(TestHelper.basicChannel.id)
         );
 
         const emojiName = '+1';
 
+        nock(Client4.getReactionsRoute()).
+            post('').
+            reply(201, {user_id: TestHelper.basicUser.id, post_id: post1.id, emoji_name: emojiName, create_at: 1508168444721});
         await Actions.addReaction(post1.id, emojiName)(dispatch, getState);
 
         const reactionRequest = getState().requests.posts.reaction;
@@ -926,15 +1274,26 @@ describe('Actions.Posts', () => {
     it('removeReaction', async () => {
         const {dispatch, getState} = store;
 
+        TestHelper.mockLogin();
         await login(TestHelper.basicUser.email, 'password1')(dispatch, getState);
 
+        nock(Client4.getPostsRoute()).
+            post('').
+            reply(201, TestHelper.fakePostWithId(TestHelper.basicChannel.id));
         const post1 = await Client4.createPost(
             TestHelper.fakePost(TestHelper.basicChannel.id)
         );
 
         const emojiName = '+1';
 
+        nock(Client4.getReactionsRoute()).
+            post('').
+            reply(201, {user_id: TestHelper.basicUser.id, post_id: post1.id, emoji_name: emojiName, create_at: 1508168444721});
         await Actions.addReaction(post1.id, emojiName)(dispatch, getState);
+
+        nock(Client4.getUsersRoute()).
+            delete(`/${TestHelper.basicUser.id}/posts/${post1.id}/reactions/${emojiName}`).
+            reply(200, OK_RESPONSE);
         await Actions.removeReaction(post1.id, emojiName)(dispatch, getState);
 
         const reactionRequest = getState().requests.posts.reaction;
@@ -952,14 +1311,21 @@ describe('Actions.Posts', () => {
     it('getReactionsForPost', async () => {
         const {dispatch, getState} = store;
 
+        TestHelper.mockLogin();
         await login(TestHelper.basicUser.email, 'password1')(dispatch, getState);
 
+        nock(Client4.getPostsRoute()).
+            post('').
+            reply(201, TestHelper.fakePostWithId(TestHelper.basicChannel.id));
         const post1 = await Client4.createPost(
             TestHelper.fakePost(TestHelper.basicChannel.id)
         );
 
         const emojiName = '+1';
 
+        nock(Client4.getReactionsRoute()).
+            post('').
+            reply(201, {user_id: TestHelper.basicUser.id, post_id: post1.id, emoji_name: emojiName, create_at: 1508168444721});
         await Actions.addReaction(post1.id, emojiName)(dispatch, getState);
 
         dispatch({
@@ -967,6 +1333,9 @@ describe('Actions.Posts', () => {
             data: {user_id: TestHelper.basicUser.id, post_id: post1.id, emoji_name: emojiName}
         });
 
+        nock(Client4.getPostsRoute()).
+            get(`/${post1.id}/reactions`).
+            reply(200, [{user_id: TestHelper.basicUser.id, post_id: post1.id, emoji_name: emojiName, create_at: 1508168444721}]);
         await Actions.getReactionsForPost(post1.id)(dispatch, getState);
 
         const reactionRequest = getState().requests.posts.reaction;
@@ -987,7 +1356,14 @@ describe('Actions.Posts', () => {
         const url = 'https://about.mattermost.com';
         const docs = 'https://docs.mattermost.com/';
 
+        nock(Client4.getBaseRoute()).
+            post('/opengraph').
+            reply(200, {type: 'article', url: 'https://about.mattermost.com/', title: 'Mattermost private cloud messaging', description: 'Open source,  private cloud\nSlack-alternative, \nWorkplace messaging for web, PCs and phones.'});
         await Actions.getOpenGraphMetadata(url)(dispatch, getState);
+
+        nock(Client4.getBaseRoute()).
+            post('/opengraph').
+            reply(200, {type: '', url: '', title: '', description: ''});
         await Actions.getOpenGraphMetadata(docs)(dispatch, getState);
 
         const openGraphRequest = getState().requests.posts.openGraph;
@@ -1004,7 +1380,10 @@ describe('Actions.Posts', () => {
     });
 
     it('doPostAction', async () => {
-        TestHelper.activateMocking();
+        if (TestHelper.isLiveServer()) {
+            console.log('Skipping mock-only test');
+            return;
+        }
 
         nock(Client4.getBaseRoute()).
             post('/posts/posth67ja7ntdkek6g13dp3wka/actions/action7ja7ntdkek6g13dp3wka').

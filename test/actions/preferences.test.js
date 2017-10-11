@@ -2,19 +2,22 @@
 // See License.txt for license information.
 
 import assert from 'assert';
+import nock from 'nock';
 
 import * as Actions from 'actions/preferences';
 import {login} from 'actions/users';
-import {Client, Client4} from 'client';
+import {Client4} from 'client';
 import {Preferences, RequestStatus} from 'constants';
 
 import TestHelper from 'test/test_helper';
 import configureStore from 'test/test_store';
 
+const OK_RESPONSE = {status: 'OK'};
+
 describe('Actions.Preferences', () => {
     let store;
     before(async () => {
-        await TestHelper.initBasic(Client, Client4);
+        await TestHelper.initBasic(Client4);
     });
 
     beforeEach(async () => {
@@ -22,8 +25,7 @@ describe('Actions.Preferences', () => {
     });
 
     after(async () => {
-        await TestHelper.basicClient.logout();
-        await TestHelper.basicClient4.logout();
+        await TestHelper.tearDown();
     });
 
     it('getMyPreferences', async () => {
@@ -43,8 +45,15 @@ describe('Actions.Preferences', () => {
             }
         ];
 
+        nock(Client4.getUsersRoute()).
+            put(`/${TestHelper.basicUser.id}/preferences`).
+            reply(200, OK_RESPONSE);
         await Client4.savePreferences(user.id, existingPreferences);
-        await Actions.getMyPreferences('1234')(store.dispatch, store.getState);
+
+        nock(Client4.getUsersRoute()).
+            get('/me/preferences').
+            reply(200, existingPreferences);
+        await Actions.getMyPreferences()(store.dispatch, store.getState);
 
         const state = store.getState();
         const request = state.requests.preferences.getMyPreferences;
@@ -71,7 +80,14 @@ describe('Actions.Preferences', () => {
             }
         ];
 
+        nock(Client4.getUsersRoute()).
+            put(`/${TestHelper.basicUser.id}/preferences`).
+            reply(200, OK_RESPONSE);
         await Client4.savePreferences(user.id, existingPreferences);
+
+        nock(Client4.getUsersRoute()).
+            get('/me/preferences').
+            reply(200, existingPreferences);
         await Actions.getMyPreferences()(store.dispatch, store.getState);
 
         const preferences = [
@@ -89,6 +105,9 @@ describe('Actions.Preferences', () => {
             }
         ];
 
+        nock(Client4.getUsersRoute()).
+            put(`/${TestHelper.basicUser.id}/preferences`).
+            reply(200, OK_RESPONSE);
         await Actions.savePreferences(user.id, preferences)(store.dispatch, store.getState);
 
         const state = store.getState();
@@ -130,8 +149,19 @@ describe('Actions.Preferences', () => {
             }
         ];
 
+        nock(Client4.getUsersRoute()).
+            put(`/${TestHelper.basicUser.id}/preferences`).
+            reply(200, OK_RESPONSE);
         await Client4.savePreferences(user.id, existingPreferences);
+
+        nock(Client4.getUsersRoute()).
+            get('/me/preferences').
+            reply(200, existingPreferences);
         await Actions.getMyPreferences()(store.dispatch, store.getState);
+
+        nock(Client4.getUsersRoute()).
+            delete(`/${TestHelper.basicUser.id}/preferences`).
+            reply(200, OK_RESPONSE);
         await Actions.deletePreferences(user.id, [
             existingPreferences[0],
             existingPreferences[2]
@@ -153,11 +183,19 @@ describe('Actions.Preferences', () => {
 
     it('makeDirectChannelVisibleIfNecessary', async () => {
         const user = TestHelper.basicUser;
+
+        nock(Client4.getUsersRoute()).
+            post('').
+            reply(201, TestHelper.fakeUserWithId());
         const user2 = await TestHelper.createClient4().createUser(TestHelper.fakeUser());
 
+        TestHelper.mockLogin();
         await login(user.email, 'password1')(store.dispatch, store.getState);
 
-        // Test that a new preference is created if non exists
+        // Test that a new preference is created if none exists
+        nock(Client4.getUsersRoute()).
+            put(`/${TestHelper.basicUser.id}/preferences`).
+            reply(200, OK_RESPONSE);
         await Actions.makeDirectChannelVisibleIfNecessary(user2.id)(store.dispatch, store.getState);
 
         let state = store.getState();
@@ -167,17 +205,26 @@ describe('Actions.Preferences', () => {
         assert.equal(preference.value, 'true', 'preference for showing direct channel is not true');
 
         // Test that nothing changes if the preference already exists and is true
+        nock(Client4.getUsersRoute()).
+            put(`/${TestHelper.basicUser.id}/preferences`).
+            reply(200, OK_RESPONSE);
         await Actions.makeDirectChannelVisibleIfNecessary(user2.id)(store.dispatch, store.getState);
 
         const state2 = store.getState();
         assert.equal(state, state2, 'store should not change since direct channel is already visible');
 
         // Test that the preference is updated if it already exists and is false
+        nock(Client4.getUsersRoute()).
+            put(`/${TestHelper.basicUser.id}/preferences`).
+            reply(200, OK_RESPONSE);
         Actions.savePreferences(user.id, [{
             ...preference,
             value: 'false'
         }])(store.dispatch, store.getState);
 
+        nock(Client4.getUsersRoute()).
+            put(`/${TestHelper.basicUser.id}/preferences`).
+            reply(200, OK_RESPONSE);
         await Actions.makeDirectChannelVisibleIfNecessary(user2.id)(store.dispatch, store.getState);
 
         state = store.getState();

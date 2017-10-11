@@ -284,7 +284,7 @@ export function addUserToTeam(teamId, userId) {
             }
         ]), getState);
 
-        return {data: true};
+        return {data: member};
     };
 }
 

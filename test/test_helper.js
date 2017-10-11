@@ -4,11 +4,11 @@
 import assert from 'assert';
 import nock from 'nock';
 
-import Client from 'client/client';
 import Client4 from 'client/client4';
 
 const DEFAULT_SERVER = `${process.env.MATTERMOST_SERVER_URL || 'http://localhost:8065'}`; //eslint-disable-line no-process-env
-const PASSWORD = 'password1';
+const EMAIL = `${process.env.MATTERMOST_REDUX_EMAIL || 'redux-admin@simulator.amazonses.com'}`; //eslint-disable-line no-process-env
+const PASSWORD = `${process.env.MATTERMOST_REDUX_PASSWORD || 'password1'}`; //eslint-disable-line no-process-env
 
 class TestHelper {
     constructor() {
@@ -17,7 +17,9 @@ class TestHelper {
 
         this.basicUser = null;
         this.basicTeam = null;
+        this.basicTeamMember = null;
         this.basicChannel = null;
+        this.basicChannelMember = null;
         this.basicPost = null;
     }
 
@@ -50,14 +52,6 @@ class TestHelper {
         });
 
         return 'uid' + id;
-    };
-
-    createClient = () => {
-        const client = new Client();
-
-        client.setUrl(DEFAULT_SERVER);
-
-        return client;
     };
 
     createClient4 = () => {
@@ -115,6 +109,15 @@ class TestHelper {
         };
     };
 
+    fakeTeamMember = (userId, teamId) => {
+        return {
+            user_id: userId,
+            team_id: teamId,
+            roles: 'team_user',
+            delete_at: 0
+        };
+    };
+
     fakeOutgoingHook = (teamId) => {
         return {
             teamId
@@ -128,10 +131,48 @@ class TestHelper {
         };
     };
 
-    testCommand = () => {
+    testIncomingHook = () => {
+        return {
+            id: this.generateId(),
+            create_at: 1507840900004,
+            update_at: 1507840900004,
+            delete_at: 0,
+            user_id: this.basicUser.id,
+            channel_id: this.basicChannel.id,
+            team_id: this.basicTeam.id,
+            display_name: 'test',
+            description: 'test'
+        };
+    };
+
+    testOutgoingHook = () => {
+        return {
+            id: this.generateId(),
+            token: this.generateId(),
+            create_at: 1507841118796,
+            update_at: 1507841118796,
+            delete_at: 0,
+            creator_id: this.basicUser.id,
+            channel_id: this.basicChannel.id,
+            team_id: this.basicTeam.id,
+            trigger_words: ['testword'],
+            trigger_when: 0,
+            callback_urls: ['http://localhost/notarealendpoint'],
+            display_name: 'test',
+            description: '',
+            content_type: 'application/x-www-form-urlencoded'
+        };
+    }
+
+    testCommand = (teamId) => {
         return {
             trigger: this.generateId(),
             method: 'P',
+            create_at: 1507841118796,
+            update_at: 1507841118796,
+            delete_at: 0,
+            creator_id: this.basicUser.id,
+            team_id: teamId,
             username: 'test',
             icon_url: 'http://localhost/notarealendpoint',
             auto_complete: true,
@@ -151,7 +192,8 @@ class TestHelper {
             team_id: teamId,
             display_name: `Unit Test ${name}`,
             type: 'O',
-            delete_at: 0
+            delete_at: 0,
+            total_msg_count: 0
         };
     };
 
@@ -167,7 +209,9 @@ class TestHelper {
             user_id: userId,
             channel_id: channelId,
             notify_props: {},
-            roles: 'system_user'
+            roles: 'system_user',
+            msg_count: 0,
+            mention_count: 0
         };
     };
 
@@ -175,6 +219,13 @@ class TestHelper {
         return {
             channel_id: channelId,
             message: `Unit Test ${this.generateId()}`
+        };
+    };
+
+    fakePostWithId = (channelId) => {
+        return {
+            ...this.fakePost(channelId),
+            id: this.generateId()
         };
     };
 
@@ -187,7 +238,7 @@ class TestHelper {
         }
 
         return files;
-    }
+    };
 
     fakeOAuthApp = () => {
         return {
@@ -196,27 +247,79 @@ class TestHelper {
             homepage: 'http://localhost/notrealurl',
             description: 'fake app',
             is_trusted: false,
-            icon_url: 'http://localhost/notrealurl'
+            icon_url: 'http://localhost/notrealurl',
+            update_at: 1507841118796
         };
+    };
+
+    fakeOAuthAppWithId = () => {
+        return {
+            ...this.fakeOAuthApp(),
+            id: this.generateId()
+        };
+    };
+
+    mockLogin = () => {
+        nock(this.basicClient4.getUsersRoute()).
+            post('/login').
+            reply(200, this.basicUser);
+
+        nock(this.basicClient4.getUserRoute('me')).
+            get('/teams/members').
+            reply(200, [this.basicTeamMember]);
+
+        nock(this.basicClient4.getUserRoute('me')).
+            get('/teams/unread').
+            reply(200, [{team_id: this.basicTeam.id, msg_count: 0, mention_count: 0}]);
+
+        nock(this.basicClient4.getUserRoute('me')).
+            get('/teams').
+            reply(200, [this.basicTeam]);
+
+        nock(this.basicClient4.getPreferencesRoute('me')).
+            get('').
+            reply(200, [{user_id: this.basicUser.id, category: 'tutorial_step', name: this.basicUser.id, value: '999'}]);
     }
 
-    initBasic = async (client = this.createClient(), client4 = this.createClient4()) => {
-        client.setUrl(DEFAULT_SERVER);
+    initRealEntities = async () => {
+        try {
+            this.basicUser = await this.basicClient4.login(EMAIL, PASSWORD);
+            this.basicUser.password = PASSWORD;
+            this.basicTeam = await this.basicClient4.createTeam(this.fakeTeam());
+            this.basicChannel = await this.basicClient4.createChannel(this.fakeChannel(this.basicTeam.id));
+            this.basicPost = await this.basicClient4.createPost(this.fakePost(this.basicChannel.id));
+        } catch (error) {
+            console.error('Unable to initialize against server: ' + error); //eslint-disable-line no-console
+            throw error;
+        }
+    }
+
+    isLiveServer = () => {
+        return process.env.TEST_SERVER; //eslint-disable-line no-process-env
+    }
+
+    initMockEntities = () => {
+        this.basicUser = this.fakeUserWithId();
+        this.basicUser.roles = 'system_user system_admin';
+        this.basicTeam = this.fakeTeamWithId();
+        this.basicTeamMember = this.fakeTeamMember(this.basicUser.id, this.basicTeam.id);
+        this.basicChannel = this.fakeChannelWithId();
+        this.basicChannelMember = this.fakeChannelMember(this.basicUser.id, this.basicChannel.id);
+        this.basicPost = {...this.fakePostWithId(this.basicChannel.id), create_at: 1507841118796};
+    }
+
+    initBasic = async (client4 = this.createClient4()) => {
         client4.setUrl(DEFAULT_SERVER);
-        this.basicClient = client;
         this.basicClient4 = client4;
 
-        this.basicUser = await client.createUser(this.fakeUser());
-        await client.login(this.basicUser.email, PASSWORD);
-        await client4.login(this.basicUser.email, PASSWORD);
-
-        this.basicTeam = await client4.createTeam(this.fakeTeam());
-
-        this.basicChannel = await client4.createChannel(this.fakeChannel(this.basicTeam.id));
-        this.basicPost = await client4.createPost(this.fakePost(this.basicChannel.id));
+        if (process.env.TEST_SERVER) { //eslint-disable-line no-process-env
+            await this.initRealEntities();
+        } else {
+            this.initMockEntities();
+            this.activateMocking();
+        }
 
         return {
-            client: this.basicClient,
             client4: this.basicClient4,
             user: this.basicUser,
             team: this.basicTeam,
@@ -224,6 +327,22 @@ class TestHelper {
             post: this.basicPost
         };
     };
+
+    tearDown = async () => {
+        if (process.env.TEST_SERVER) { //eslint-disable-line no-process-env
+            await this.basicClient4.logout();
+        } else {
+            nock.restore();
+        }
+
+        this.basicClient4 = null;
+        this.basicUser = null;
+        this.basicTeam = null;
+        this.basicTeamMember = null;
+        this.basicChannel = null;
+        this.basicChannelMember = null;
+        this.basicPost = null;
+    }
 
     wait = (time) => new Promise((resolve) => setTimeout(resolve, time))
 }
