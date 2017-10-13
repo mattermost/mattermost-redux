@@ -675,6 +675,31 @@ export function revokeSession(userId, sessionId) {
     };
 }
 
+export function revokeAllSessionsForUser(userId) {
+    return async (dispatch, getState) => {
+        dispatch({type: UserTypes.REVOKE_ALL_USER_SESSIONS_REQUEST}, getState);
+
+        try {
+            await Client4.revokeAllSessionsForUser(userId);
+        } catch (error) {
+            forceLogoutIfNecessary(error, dispatch);
+            dispatch(batchActions([
+                {type: UserTypes.REVOKE_ALL_USER_SESSIONS_FAILURE, error},
+                logError(error)(dispatch)
+            ]), getState);
+            return false;
+        }
+
+        dispatch(batchActions([
+            {
+                type: UserTypes.REVOKE_ALL_USER_SESSIONS_SUCCESS
+            }
+        ]), getState);
+
+        return true;
+    };
+}
+
 export function loadProfilesForDirect() {
     return async (dispatch, getState) => {
         const state = getState();
@@ -1304,6 +1329,7 @@ export default {
     getSessions,
     loadProfilesForDirect,
     revokeSession,
+    revokeAllSessionsForUser,
     getUserAudits,
     searchProfiles,
     startPeriodicStatusUpdates,
