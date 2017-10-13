@@ -79,7 +79,8 @@ describe('Actions.Channels', () => {
         );
 
         await getProfilesByIds([user.id])(store.dispatch, store.getState);
-        await Actions.createDirectChannel(TestHelper.basicUser.id, user.id)(store.dispatch, store.getState);
+        const result = await Actions.createDirectChannel(TestHelper.basicUser.id, user.id)(store.dispatch, store.getState);
+        const created = result.data;
 
         const createRequest = store.getState().requests.channels.createChannel;
         if (createRequest.status === RequestStatus.FAILURE) {
@@ -88,7 +89,7 @@ describe('Actions.Channels', () => {
 
         const state = store.getState();
         const {channels, myMembers} = state.entities.channels;
-        const profiles = state.entities.users.profiles;
+        const {profiles, profilesInChannel} = state.entities.users;
         const preferences = state.entities.preferences.myPreferences;
         const channelsCount = Object.keys(channels).length;
         const membersCount = Object.keys(myMembers).length;
@@ -104,6 +105,13 @@ describe('Actions.Channels', () => {
         assert.equal(channels[Object.keys(channels)[0]].type, 'D');
         assert.equal(channelsCount, 1);
         assert.equal(membersCount, 1);
+
+        assert.ok(profilesInChannel, 'profiles in channel is empty');
+        assert.ok(profilesInChannel[created.id], 'profiles in channel is empty for channel');
+        assert.equal(profilesInChannel[created.id].size, 2, 'incorrect number of profiles in channel');
+        console.log(profilesInChannel[created.id]);
+        assert.ok(profilesInChannel[created.id].has(TestHelper.basicUser.id), 'creator is not in channel');
+        assert.ok(profilesInChannel[created.id].has(user.id), 'user is not in channel');
     });
 
     it('createGroupChannel', async () => {
@@ -138,12 +146,21 @@ describe('Actions.Channels', () => {
         const state = store.getState();
         const {channels, myMembers} = state.entities.channels;
         const preferences = state.entities.preferences.myPreferences;
+        const {profilesInChannel} = state.entities.users;
 
         assert.ok(channels, 'channels is empty');
         assert.ok(channels[created.id], 'channel does not exist');
         assert.ok(myMembers, 'members is empty');
         assert.ok(myMembers[created.id], 'member does not exist');
         assert.ok(Object.keys(preferences).length, 'preferences is empty');
+
+        assert.ok(profilesInChannel, 'profiles in channel is empty');
+        assert.ok(profilesInChannel[created.id], 'profiles in channel is empty for channel');
+        console.log(profilesInChannel[created.id]);
+        assert.equal(profilesInChannel[created.id].size, 3, 'incorrect number of profiles in channel');
+        assert.ok(profilesInChannel[created.id].has(TestHelper.basicUser.id), 'creator is not in channel');
+        assert.ok(profilesInChannel[created.id].has(user.id), 'user is not in channel');
+        assert.ok(profilesInChannel[created.id].has(user2.id), 'user2 is not in channel');
     });
 
     it('updateChannel', async () => {

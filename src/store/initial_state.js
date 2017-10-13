@@ -42,7 +42,11 @@ const state = {
             posts: {},
             postsByChannel: {},
             selectedPostId: '',
-            currentFocusedPostId: ''
+            currentFocusedPostId: '',
+            messagesHistory: {
+                messages: [],
+                index: {}
+            }
         },
         preferences: {
             myPreferences: {}
@@ -430,6 +434,26 @@ const state = {
                 error: null
             },
             deleteCommand: {
+                status: 'not_started',
+                error: null
+            },
+            addOAuthApp: {
+                status: 'not_started',
+                error: null
+            },
+            updateOAuthApp: {
+                status: 'not_started',
+                error: null
+            },
+            getOAuthApp: {
+                status: 'not_started',
+                error: null
+            },
+            getOAuthApps: {
+                status: 'not_started',
+                error: null
+            },
+            deleteOAuthApp: {
                 status: 'not_started',
                 error: null
             }

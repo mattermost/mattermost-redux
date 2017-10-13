@@ -137,7 +137,8 @@ async function handleReconnect(dispatch, getState) {
                     team_id: currentTeamId
                 }
             };
-            return handleLeaveTeamEvent(newMsg, dispatch, getState);
+            handleLeaveTeamEvent(newMsg, dispatch, getState);
+            return dispatch({type: GeneralTypes.WEBSOCKET_SUCCESS}, getState);
         }
 
         const {channels, myMembers} = getState().entities.channels;
@@ -146,8 +147,11 @@ async function handleReconnect(dispatch, getState) {
             const defaultChannel = Object.values(channels).find((c) => c.team_id === currentTeamId && c.name === General.DEFAULT_CHANNEL);
 
             // emit the event so the client can change his own state
-            EventEmitter.emit(General.DEFAULT_CHANNEL, defaultChannel.display_name);
-            return selectChannel(defaultChannel.id)(dispatch, getState);
+            if (defaultChannel) {
+                EventEmitter.emit(General.DEFAULT_CHANNEL, defaultChannel.display_name);
+                selectChannel(defaultChannel.id)(dispatch, getState);
+            }
+            return dispatch({type: GeneralTypes.WEBSOCKET_SUCCESS}, getState);
         }
 
         if (currentChannelId) {

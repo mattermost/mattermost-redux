@@ -79,12 +79,13 @@ export const getTeammateNameDisplaySetting = createSelector(
     }
 );
 
-export const getTheme = createSelector(
+const getThemePreference = createSelector(
     getMyPreferences,
     getCurrentTeamId,
     (myPreferences, currentTeamId) => {
-        // Prefer the user's current team-specific theme over the user's current global theme over the default theme
+        // Prefer the user's current team-specific theme over the user's current global theme
         let themePreference;
+
         if (currentTeamId) {
             themePreference = myPreferences[getPreferenceKey(Preferences.CATEGORY_THEME, currentTeamId)];
         }
@@ -93,6 +94,13 @@ export const getTheme = createSelector(
             themePreference = myPreferences[getPreferenceKey(Preferences.CATEGORY_THEME, '')];
         }
 
+        return themePreference;
+    }
+);
+
+export const getTheme = createSelector(
+    getThemePreference,
+    (themePreference) => {
         let theme;
         if (themePreference) {
             theme = themePreference.value;

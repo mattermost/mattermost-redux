@@ -1280,7 +1280,7 @@ export default class Client4 {
 
     doPostAction = async (postId, actionId) => {
         return this.doFetch(
-            `${this.getPostRoute(postId)}/actions/${actionId}`,
+            `${this.getPostRoute(postId)}/actions/${encodeURIComponent(actionId)}`,
             {method: 'post'}
         );
     };
@@ -1588,6 +1588,13 @@ export default class Client4 {
         return this.doFetch(
             `${this.getOAuthAppsRoute()}`,
             {method: 'post', body: JSON.stringify(app)}
+        );
+    };
+
+    editOAuthApp = async (app) => {
+        return this.doFetch(
+            `${this.getOAuthAppsRoute()}/${app.id}`,
+            {method: 'put', body: JSON.stringify(app)}
         );
     };
 

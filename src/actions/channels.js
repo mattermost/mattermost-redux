@@ -138,6 +138,11 @@ export function createDirectChannel(userId, otherUserId) {
             },
             {
                 type: ChannelTypes.CREATE_CHANNEL_SUCCESS
+            },
+            {
+                type: UserTypes.RECEIVED_PROFILES_LIST_IN_CHANNEL,
+                id: created.id,
+                data: [{id: userId}, {id: otherUserId}]
             }
         ]), getState);
 
@@ -178,6 +183,11 @@ export function createGroupChannel(userIds) {
 
         savePreferences(currentUserId, preferences)(dispatch, getState);
 
+        const profilesInChannel = userIds.map((id) => {
+            return {id};
+        });
+        profilesInChannel.push({id: currentUserId}); // currentUserId is optionally in userIds, but the reducer will get rid of a duplicate
+
         dispatch(batchActions([
             {
                 type: ChannelTypes.RECEIVED_CHANNEL,
@@ -193,6 +203,11 @@ export function createGroupChannel(userIds) {
             },
             {
                 type: ChannelTypes.CREATE_CHANNEL_SUCCESS
+            },
+            {
+                type: UserTypes.RECEIVED_PROFILES_LIST_IN_CHANNEL,
+                id: created.id,
+                data: profilesInChannel
             }
         ]), getState);
 
@@ -512,6 +527,8 @@ export function leaveChannel(channelId) {
         const channel = channels[channelId];
         const member = myMembers[channelId];
 
+        Client4.trackEvent('action', 'action_channels_leave', {channel_id: channelId});
+
         dispatch({
             type: ChannelTypes.LEAVE_CHANNEL,
             data: {
@@ -564,6 +581,8 @@ export function joinChannel(userId, teamId, channelId, channelName) {
             ]), getState);
             return {error};
         }
+
+        Client4.trackEvent('action', 'action_channels_join', {channel_id: channelId});
 
         dispatch(batchActions([
             {
@@ -774,6 +793,8 @@ export function addChannelMember(channelId, userId) {
             return null;
         }
 
+        Client4.trackEvent('action', 'action_channels_add_member', {channel_id: channelId});
+
         dispatch(batchActions([
             {
                 type: UserTypes.RECEIVED_PROFILE_IN_CHANNEL,
@@ -808,6 +829,8 @@ export function removeChannelMember(channelId, userId) {
             ]), getState);
             return null;
         }
+
+        Client4.trackEvent('action', 'action_channels_remove_member', {channel_id: channelId});
 
         dispatch(batchActions([
             {
