@@ -5,8 +5,9 @@ import {batchActions} from 'redux-batched-actions';
 
 import {Client4} from 'client';
 import {General, Preferences, Posts} from 'constants';
-import {PostTypes, FileTypes} from 'action_types';
+import {PostTypes, FileTypes, SearchTypes} from 'action_types';
 import {getUsersByUsername} from 'selectors/entities/users';
+import {getCurrentChannelId} from '../selectors/entities/channels';
 
 import * as Selectors from 'selectors/entities/posts';
 
@@ -885,6 +886,48 @@ export function getOpenGraphMetadata(url) {
         dispatch(batchActions(actions), getState);
 
         return data;
+    };
+}
+
+export function getPinnedPosts(channelId) {
+    return async (dispatch, getState) => {
+        const state = getState();
+        const requestedChannelId = channelId || getCurrentChannelId(state);
+
+        dispatch({type: SearchTypes.SEARCH_POSTS_REQUEST});
+        try {
+            const data = await Client4.getPinnedPosts(requestedChannelId);
+            dispatch(batchActions([
+                {type: SearchTypes.SEARCH_POSTS_SUCCESS},
+                {
+                    type: SearchTypes.RECEIVED_SEARCH_TERM,
+                    data: {
+                        term: null,
+                        do_search: false,
+                        is_mention_search: false
+                    }
+                },
+                {
+                    type: SearchTypes.RECEIVED_SEARCH,
+                    data: {
+                        results: data,
+                        is_flagged_posts: false,
+                        is_pinned_posts: true,
+                        channelId: requestedChannelId,
+                    }
+                }
+            ]));
+
+            getProfilesAndStatusesForPosts(data.posts, dispatch, getState);
+            return data;
+        } catch (error) {
+            forceLogoutIfNecessary(error, dispatch);
+            dispatch(batchActions([
+                {type: SearchTypes.SEARCH_POSTS_FAILURE},
+                logError(error)(dispatch)
+            ]), getState);
+            return null;
+        }
     };
 }
 
