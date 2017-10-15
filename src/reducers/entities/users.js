@@ -108,6 +108,13 @@ function mySessions(state = [], action) {
 
         return state;
     }
+
+    case UserTypes.REVOKE_ALL_USER_SESSIONS_SUCCESS:
+        if (action.data.isCurrentUser === true) {
+            return [];
+        }
+        return state;
+
     case UserTypes.LOGOUT_SUCCESS:
         return [];
 

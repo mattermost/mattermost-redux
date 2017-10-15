@@ -586,7 +586,7 @@ export default class Client4 {
     revokeAllSessionsForUser = async (userId) => {
         return this.doFetch(
             `${this.getUserRoute(userId)}/sessions/revoke/all`,
-            {method: 'post', body: JSON.stringify({user_id: userId})}
+            {method: 'post'}
         );
     };
 
