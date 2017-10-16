@@ -14,7 +14,8 @@
     "redux-persist": "4.9.1",
     "redux-thunk": "2.2.0",
     "reselect": "3.0.1",
-    "serialize-error": "2.1.0"
+    "serialize-error": "2.1.0",
+    "shallow-equals": "1.0.0"
   },
   "devDependencies": {
     "babel-cli": "6.26.0",

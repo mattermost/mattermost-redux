@@ -12,22 +12,39 @@ import {getPreferenceKey} from 'utils/preference_utils';
 
 describe('Selectors.Preferences', () => {
     const category1 = 'testcategory1';
+    const directCategory = Preferences.CATEGORY_DIRECT_CHANNEL_SHOW;
+    const groupCategory = Preferences.CATEGORY_GROUP_CHANNEL_SHOW;
+    const favCategory = Preferences.CATEGORY_FAVORITE_CHANNEL;
+
     const name1 = 'testname1';
     const value1 = 'true';
     const pref1 = {category: category1, name: name1, value: value1};
-    const category2 = Preferences.CATEGORY_DIRECT_CHANNEL_SHOW;
-    const name2 = 'testname2';
-    const pref2 = {category: category2, name: name2, value: 'true'};
-    const category3 = Preferences.CATEGORY_GROUP_CHANNEL_SHOW;
-    const name3 = 'testname3';
-    const pref3 = {category: category3, name: name3, value: 'true'};
+
+    const dm1 = 'teammate1';
+    const dmPref1 = {category: directCategory, name: dm1, value: 'true'};
+    const dm2 = 'teammate2';
+    const dmPref2 = {category: directCategory, name: dm2, value: 'false'};
+
+    const gp1 = 'group1';
+    const prefGp1 = {category: groupCategory, name: gp1, value: 'true'};
+    const gp2 = 'group2';
+    const prefGp2 = {category: groupCategory, name: gp2, value: 'false'};
+
+    const fav1 = 'favorite1';
+    const favPref1 = {category1: favCategory, name: fav1, value: 'true'};
+    const fav2 = 'favorite2';
+    const favPref2 = {category1: favCategory, name: fav2, value: 'false'};
 
     const currentUserId = 'currentuserid';
 
     const myPreferences = {};
     myPreferences[`${category1}--${name1}`] = pref1;
-    myPreferences[`${category2}--${name2}`] = pref2;
-    myPreferences[`${category3}--${name3}`] = pref3;
+    myPreferences[`${directCategory}--${dm1}`] = dmPref1;
+    myPreferences[`${directCategory}--${dm2}`] = dmPref2;
+    myPreferences[`${groupCategory}--${gp1}`] = prefGp1;
+    myPreferences[`${groupCategory}--${gp2}`] = prefGp2;
+    myPreferences[`${favCategory}--${fav1}`] = favPref1;
+    myPreferences[`${favCategory}--${fav2}`] = favPref2;
 
     const testState = deepFreezeAndThrowOnMutation({
         entities: {
@@ -54,11 +71,11 @@ describe('Selectors.Preferences', () => {
     });
 
     it('get direct channel show preferences', () => {
-        assert.deepEqual(Selectors.getDirectShowPreferences(testState), [pref2]);
+        assert.deepEqual(Selectors.getDirectShowPreferences(testState), [dmPref1, dmPref2]);
     });
 
     it('get group channel show preferences', () => {
-        assert.deepEqual(Selectors.getGroupShowPreferences(testState), [pref3]);
+        assert.deepEqual(Selectors.getGroupShowPreferences(testState), [prefGp1, prefGp2]);
     });
 
     it('getTeammateNameDisplaySetting', () => {
@@ -289,6 +306,18 @@ describe('Selectors.Preferences', () => {
         const getStyleFromTheme = Selectors.makeGetStyleFromTheme();
 
         assert.deepEqual(getStyleFromTheme(state, testStyleFunction), expected);
+    });
+
+    it('get favorites names', () => {
+        assert.deepEqual(Selectors.getFavoritesPreferences(testState), [fav1]);
+    });
+
+    it('get visible teammates', () => {
+        assert.deepEqual(Selectors.getVisibleTeammate(testState), [dm1]);
+    });
+
+    it('get visible groups', () => {
+        assert.deepEqual(Selectors.getVisibleGroupIds(testState), [gp1]);
     });
 });
 

@@ -5,6 +5,7 @@ import {createSelector} from 'reselect';
 
 import {getCurrentUrl} from './general';
 
+import {createIdsSelector} from 'utils/helpers';
 import {isTeamAdmin} from 'utils/user_utils';
 
 export function getCurrentTeamId(state) {
@@ -39,6 +40,14 @@ export const getCurrentTeam = createSelector(
     getCurrentTeamId,
     (teams, currentTeamId) => {
         return teams[currentTeamId];
+    }
+);
+
+export const getTeam = createSelector(
+    getTeams,
+    (state, id) => id,
+    (teams, id) => {
+        return teams[id];
     }
 );
 
@@ -122,5 +131,86 @@ export const getJoinableTeams = createSelector(
         });
 
         return openTeams;
+    }
+);
+
+export const getJoinableTeamIds = createIdsSelector(
+    getTeams,
+    getTeamMemberships,
+    (teams, myMembers) => {
+        return Object.keys(teams).filter((id) => {
+            const team = teams[id];
+            const member = myMembers[id];
+            return team.allow_open_invite && !member;
+        });
+    }
+);
+
+export const getMySortedTeamIds = createIdsSelector(
+    getTeams,
+    getTeamMemberships,
+    (state, locale) => locale,
+    (teams, myMembers, locale) => {
+        return Object.values(teams).filter((t) => myMembers[t.id]).sort((a, b) => {
+            if (a.display_name !== b.display_name) {
+                return a.display_name.toLowerCase().localeCompare(b.display_name.toLowerCase(), locale, {numeric: true});
+            }
+
+            return a.name.toLowerCase().localeCompare(b.name.toLowerCase(), locale, {numeric: true});
+        }).map((t) => t.id);
+    }
+);
+
+export const getMyTeamsCount = createSelector(
+    getTeamMemberships,
+    (teams) => {
+        return Object.keys(teams).length;
+    }
+);
+
+// Returns the number of mentions or -1 if it has unreads
+// for every team except the current one
+export const getTeamsMentions = createSelector(
+    getCurrentTeamId,
+    getTeamMemberships,
+    (currentTeamId, teamMembers) => {
+        let mentionCount = 0;
+        let messageCount = 0;
+        Object.values(teamMembers).forEach((m) => {
+            if (m.team_id !== currentTeamId) {
+                mentionCount = mentionCount + (m.mention_count || 0);
+                messageCount = messageCount + (m.msg_count || 0);
+            }
+        });
+
+        let badgeCount = 0;
+        if (mentionCount) {
+            badgeCount = mentionCount;
+        } else if (messageCount) {
+            badgeCount = -1;
+        }
+
+        return badgeCount;
+    }
+);
+
+// Returns the number of mentions or -1 if it has unreads
+// for every team except the current one
+export const getTeamMentions = createSelector(
+    getTeamMemberships,
+    (state, id) => id,
+    (members, teamId) => {
+        const member = members[teamId];
+        let badgeCount = 0;
+
+        if (member) {
+            if (member.mention_count) {
+                badgeCount = member.mention_count;
+            } else if (member.msg_count) {
+                badgeCount = -1;
+            }
+        }
+
+        return badgeCount;
     }
 );

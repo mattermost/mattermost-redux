@@ -75,6 +75,32 @@ export function completeDirectChannelInfo(usersState, teammateNameDisplay, chann
     return channel;
 }
 
+export function completeDirectChannelDisplayName(currentUserId, profiles, teammateNameDisplay, channel) {
+    if (isDirectChannel(channel)) {
+        const dmChannelClone = {...channel};
+        const teammateId = getUserIdFromChannelName(currentUserId, channel.name);
+
+        return Object.assign(dmChannelClone, {display_name: displayUsername(profiles[teammateId], teammateNameDisplay)});
+    } else if (isGroupChannel(channel)) {
+        const usernames = channel.display_name.split(', ');
+        const users = Object.values(profiles);
+        const userIds = [];
+        usernames.forEach((username) => {
+            const u = users.find((p) => p.username === username);
+            if (u) {
+                userIds.push(u.id);
+            }
+        });
+        if (usernames.length === userIds.length) {
+            return Object.assign({}, channel, {
+                display_name: getGroupDisplayNameFromUserIds(userIds, profiles, currentUserId, teammateNameDisplay)
+            });
+        }
+    }
+
+    return channel;
+}
+
 export function cleanUpUrlable(input) {
     let cleaned = input.trim().replace(/-/g, ' ').replace(/[^\w\s]/gi, '').toLowerCase().replace(/\s/g, '-');
     cleaned = cleaned.replace(/-{2,}/, '-');
@@ -389,7 +415,7 @@ function isPrivateChannel(channel) {
     return channel.type === General.PRIVATE_CHANNEL;
 }
 
-export function sortChannelsByDisplayName(locale, a, b) {
+export function sortChannelsByTypeAndDisplayName(locale, a, b) {
     if (a.type !== b.type && typeToPrefixMap[a.type] !== typeToPrefixMap[b.type]) {
         return (typeToPrefixMap[a.type] || defaultPrefix).localeCompare((typeToPrefixMap[b.type] || defaultPrefix), locale);
     }
@@ -408,7 +434,7 @@ function filterName(name) {
     return name.replace(/[.,'"\/#!$%\^&\*;:{}=\-_`~()]/g, ''); // eslint-disable-line no-useless-escape
 }
 
-function sortFavorites(locale, a, b) {
+export function sortChannelsByDisplayName(locale, a, b) {
     if (a.display_name !== b.display_name) {
         return a.display_name.toLowerCase().localeCompare(b.display_name.toLowerCase(), locale, {numeric: true});
     }
@@ -433,11 +459,11 @@ function buildChannels(usersState, channels, missingDirectChannels, teammateName
     concat(missingDirectChannels).
     map(completeDirectChannelInfo.bind(null, usersState, teammateNameDisplay)).
     filter(isNotDeletedChannel).
-    sort(sortChannelsByDisplayName.bind(null, locale));
+    sort(sortChannelsByTypeAndDisplayName.bind(null, locale));
 }
 
 function buildFavoriteChannels(channels, myPreferences, locale) {
-    return channels.filter(isFavoriteChannel.bind(null, myPreferences)).sort(sortFavorites.bind(null, locale));
+    return channels.filter(isFavoriteChannel.bind(null, myPreferences)).sort(sortChannelsByDisplayName.bind(null, locale));
 }
 
 function buildNotFavoriteChannels(channels, myPreferences) {
@@ -456,12 +482,12 @@ function buildDirectAndGroupChannels(channels, myPreferences, currentUserId) {
 
 function buildChannelsWithMentions(channels, members, locale) {
     return channels.filter(channelHasMentions.bind(null, members)).
-    sort(sortFavorites.bind(null, locale));
+    sort(sortChannelsByDisplayName.bind(null, locale));
 }
 
 function buildUnreadChannels(channels, members, locale) {
     return channels.filter(channelHasUnreadMessages.bind(null, members)).
-        sort(sortFavorites.bind(null, locale));
+        sort(sortChannelsByDisplayName.bind(null, locale));
 }
 
 function getUserLocale(userId, profiles) {
