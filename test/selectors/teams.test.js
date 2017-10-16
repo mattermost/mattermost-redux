@@ -222,20 +222,24 @@ describe('Selectors.Teams', () => {
         assert.ok(fromUpdateState === 3);
     });
 
-    it('getTeamsMentions', () => {
-        const mentions = Selectors.getTeamsMentions(testState);
+    it('getChannelDrawerBadgeCount', () => {
+        const mentions = Selectors.getChannelDrawerBadgeCount(testState);
         assert.ok(mentions === 3);
     });
 
     it('getTeamMentions', () => {
-        const mentions1 = Selectors.getTeamMentions(testState, team1.id);
+        const factory1 = Selectors.makeGetBadgeCountForTeamId();
+        const factory2 = Selectors.makeGetBadgeCountForTeamId();
+        const factory3 = Selectors.makeGetBadgeCountForTeamId();
+
+        const mentions1 = factory1(testState, team1.id);
         assert.ok(mentions1 === 1);
 
-        const mentions2 = Selectors.getTeamMentions(testState, team2.id);
+        const mentions2 = factory2(testState, team2.id);
         assert.ok(mentions2 === 3);
 
         // Not a member of the team
-        const mentions3 = Selectors.getTeamMentions(testState, team3.id);
+        const mentions3 = factory3(testState, team3.id);
         assert.ok(mentions3 === 0);
     });
 });

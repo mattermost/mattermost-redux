@@ -43,13 +43,10 @@ export const getCurrentTeam = createSelector(
     }
 );
 
-export const getTeam = createSelector(
-    getTeams,
-    (state, id) => id,
-    (teams, id) => {
-        return teams[id];
-    }
-);
+export function getTeam(state, id) {
+    const teams = getTeams(state);
+    return teams[id];
+}
 
 export const getCurrentTeamMembership = createSelector(
     getCurrentTeamId,
@@ -170,7 +167,7 @@ export const getMyTeamsCount = createSelector(
 
 // Returns the number of mentions or -1 if it has unreads
 // for every team except the current one
-export const getTeamsMentions = createSelector(
+export const getChannelDrawerBadgeCount = createSelector(
     getCurrentTeamId,
     getTeamMemberships,
     (currentTeamId, teamMembers) => {
@@ -196,21 +193,23 @@ export const getTeamsMentions = createSelector(
 
 // Returns the number of mentions or -1 if it has unreads
 // for every team except the current one
-export const getTeamMentions = createSelector(
-    getTeamMemberships,
-    (state, id) => id,
-    (members, teamId) => {
-        const member = members[teamId];
-        let badgeCount = 0;
+export function makeGetBadgeCountForTeamId() {
+    return createSelector(
+        getTeamMemberships,
+        (state, id) => id,
+        (members, teamId) => {
+            const member = members[teamId];
+            let badgeCount = 0;
 
-        if (member) {
-            if (member.mention_count) {
-                badgeCount = member.mention_count;
-            } else if (member.msg_count) {
-                badgeCount = -1;
+            if (member) {
+                if (member.mention_count) {
+                    badgeCount = member.mention_count;
+                } else if (member.msg_count) {
+                    badgeCount = -1;
+                }
             }
-        }
 
-        return badgeCount;
-    }
-);
+            return badgeCount;
+        }
+    );
+}

@@ -3,7 +3,6 @@
 
 import {createSelectorCreator, defaultMemoize} from 'reselect';
 import shallowEqual from 'shallow-equals';
-import deepEqual from 'deep-equal';
 
 export function memoizeResult(func) {
     let lastArgs = null;
@@ -30,6 +29,3 @@ export const createIdsSelector = createSelectorCreator(memoizeResult);
 
 // Use this selector when you want a shallow comparison of the arguments and you don't need to memoize the result
 export const createShallowSelector = createSelectorCreator(defaultMemoize, shallowEqual);
-
-// Use this selector when you want a deep comparison of the arguments and you don't need to memoize the result
-export const createDeepSelector = createSelectorCreator(defaultMemoize, deepEqual);
