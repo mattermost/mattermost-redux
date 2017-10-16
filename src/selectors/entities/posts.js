@@ -5,6 +5,7 @@ import {createSelector} from 'reselect';
 
 import {getMyPreferences} from 'selectors/entities/preferences';
 import {getCurrentUser} from 'selectors/entities/users';
+import {createIdsSelector} from 'utils/helpers';
 
 import {Posts, Preferences} from 'constants';
 import {isPostEphemeral, isSystemMessage, shouldFilterPost, comparePosts} from 'utils/post_utils';
@@ -40,15 +41,10 @@ export function getOpenGraphMetadataForUrl(state, url) {
     return state.entities.posts.openGraph[url];
 }
 
-function getPostIdsInCurrentChannel(state) {
-    return state.entities.posts.postsInChannel[state.entities.channels.currentChannelId] || [];
-}
-
-export const getPostsInCurrentChannel = createSelector(
-    getAllPosts,
-    getPostIdsInCurrentChannel,
-    (posts, postIds) => {
-        return postIds.map((id) => posts[id]);
+export const getPostIdsInCurrentChannel = createIdsSelector(
+    (state) => state.entities.posts.postsInChannel[state.entities.channels.currentChannelId],
+    (postIdsInCurrentChannel) => {
+        return postIdsInCurrentChannel || [];
     }
 );
 
