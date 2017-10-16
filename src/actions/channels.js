@@ -916,79 +916,79 @@ export function updateChannelPurpose(channelId, purpose) {
 export function markChannelAsRead(channelId, prevChannelId) {
     return async (dispatch, getState) => {
         const state = getState();
-        const {myMembers: teamMembers} = state.entities.teams;
-        const {channels, myMembers} = state.entities.channels;
-        const channel = channels[channelId];
-        const channelMember = myMembers[channelId];
+        const channelState = state.entities.channels;
+        const teamState = state.entities.teams;
+
         const actions = [];
 
-        let totalMsgCount = 0;
-        let teamMember;
-        if (channel && channelMember) {
-            totalMsgCount = channel.total_msg_count;
+        // Update channel member objects to set all mentions and posts as viewed
+        const channel = channelState.channels[channelId];
+        const prevChannel = channelState.channels[prevChannelId]; // May be null since prevChannelId is optional
 
-            if (channel.team_id) {
-                teamMember = {...teamMembers[channel.team_id]};
-                teamMember.mention_count = teamMember.mention_count - channelMember.mention_count;
-
-                let teamMsgCount = 0;
-                if (totalMsgCount) {
-                    teamMsgCount = totalMsgCount - channelMember.msg_count;
-                }
-                teamMember.msg_count = teamMember.msg_count - teamMsgCount;
+        actions.push({
+            type: ChannelTypes.RECEIVED_MSG_AND_MENTION_COUNT,
+            data: {
+                channel_id: channelId,
+                msg_count: channel.total_msg_count,
+                mention_count: 0
             }
+        });
 
+        if (prevChannel && channelId !== prevChannelId) {
             actions.push({
-                type: ChannelTypes.RECEIVED_LAST_VIEWED,
+                type: ChannelTypes.RECEIVED_MSG_AND_MENTION_COUNT,
                 data: {
-                    channel_id: channelId,
-                    last_viewed_at: channelMember.last_viewed_at,
-                    total_msg_count: totalMsgCount
+                    channel_id: prevChannelId,
+                    msg_count: prevChannel.total_msg_count,
+                    mention_count: 0
                 }
             });
         }
 
-        if (prevChannelId && channelId !== prevChannelId) {
-            const prevChannel = channels[prevChannelId];
-            const prevChannelMember = myMembers[prevChannelId];
-            let prevTotalMsgCount = 0;
-            if (prevChannel && prevChannelMember) {
-                prevTotalMsgCount = prevChannel.total_msg_count;
+        // Update team member objects to set mentions and posts in channel as viewed
+        const channelMember = channelState.myMembers[channelId];
+        const prevChannelMember = channelState.myMembers[prevChannelId]; // May also be null
 
-                if (prevChannel.team_id) {
-                    // if the channel is a GM or DM we don't have the teamMember
-                    if (!teamMember) {
-                        teamMember = {...teamMembers[prevChannel.team_id]};
-                    }
-                    teamMember.mention_count = teamMember.mention_count - prevChannelMember.mention_count;
+        const teamUnreads = [];
 
-                    let teamMsgCount = 0;
-                    if (prevTotalMsgCount) {
-                        teamMsgCount = prevTotalMsgCount - prevChannelMember.msg_count;
-                    }
-                    teamMember.msg_count = teamMember.msg_count - teamMsgCount;
-                }
+        if (channel.team_id) {
+            const teamMember = teamState.myMembers[channel.team_id];
 
-                actions.push({
-                    type: ChannelTypes.RECEIVED_LAST_VIEWED,
-                    data: {
-                        channel_id: prevChannelId,
-                        last_viewed_at: new Date().getTime(),
-                        total_msg_count: prevTotalMsgCount
-                    }
-                });
+            // Decrement mention_count and msg_count by the number that was read in the channel.
+            // Note that this works because the values in channelMember are what was unread before this.
+            const teamUnread = {
+                team_id: channel.team_id,
+                mention_count: teamMember.mention_count - channelMember.mention_count,
+                msg_count: teamMember.msg_count - (channel.total_msg_count - channelMember.msg_count)
+            };
+
+            if (prevChannel && channel.team_id === prevChannel.team_id) {
+                teamUnread.mention_count -= prevChannelMember.mention_count;
+                teamUnread.msg_count -= (prevChannel.total_msg_count - prevChannelMember.msg_count);
             }
+
+            teamUnreads.push(teamUnread);
         }
 
-        if (teamMember) {
+        if (prevChannel && prevChannel.team_id && channel.team_id !== prevChannel.team_id) {
+            const prevTeamMember = teamState.myMembers[prevChannel.team_id];
+
+            teamUnreads.push({
+                team_id: prevChannel.team_id,
+                mention_count: prevTeamMember.mention_count - prevChannelMember.mention_count,
+                msg_count: prevTeamMember.msg_count - (prevChannel.total_msg_count - prevChannelMember.msg_count)
+            });
+        }
+
+        if (teamUnreads.length > 0) {
             actions.push({
                 type: TeamTypes.RECEIVED_MY_TEAM_UNREADS,
-                data: [teamMember]
+                data: teamUnreads
             });
         }
 
-        if (actions.length) {
-            dispatch(batchActions([...actions]), getState);
+        if (actions.length > 0) {
+            dispatch(batchActions(actions), getState);
         }
     };
 }

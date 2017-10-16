@@ -109,7 +109,6 @@ describe('Actions.Channels', () => {
         assert.ok(profilesInChannel, 'profiles in channel is empty');
         assert.ok(profilesInChannel[created.id], 'profiles in channel is empty for channel');
         assert.equal(profilesInChannel[created.id].size, 2, 'incorrect number of profiles in channel');
-        console.log(profilesInChannel[created.id]);
         assert.ok(profilesInChannel[created.id].has(TestHelper.basicUser.id), 'creator is not in channel');
         assert.ok(profilesInChannel[created.id].has(user.id), 'user is not in channel');
     });
@@ -156,7 +155,6 @@ describe('Actions.Channels', () => {
 
         assert.ok(profilesInChannel, 'profiles in channel is empty');
         assert.ok(profilesInChannel[created.id], 'profiles in channel is empty for channel');
-        console.log(profilesInChannel[created.id]);
         assert.equal(profilesInChannel[created.id].size, 3, 'incorrect number of profiles in channel');
         assert.ok(profilesInChannel[created.id].has(TestHelper.basicUser.id), 'creator is not in channel');
         assert.ok(profilesInChannel[created.id].has(user.id), 'user is not in channel');
@@ -344,7 +342,7 @@ describe('Actions.Channels', () => {
         }
     });
 
-    it('markChannelAsUnread and markChannelAsRead', async () => {
+    it('markChannelAsUnread', async () => {
         await getMe()(store.dispatch, store.getState);
         await getMyTeams()(store.dispatch, store.getState);
         await getMyTeamMembers()(store.dispatch, store.getState);
@@ -365,30 +363,526 @@ describe('Actions.Channels', () => {
             JSON.stringify([TestHelper.basicUser.id])
         )(store.dispatch, store.getState);
 
-        let state = store.getState();
-        let {channels: myChannels, myMembers: channelMembers} = state.entities.channels;
-        let {myMembers: teamMembers} = state.entities.teams;
-        let channel = myChannels[channelId];
-        let channelMember = channelMembers[channelId];
-        let teamMember = teamMembers[TestHelper.basicTeam.id];
+        const state = store.getState();
+        const {channels: myChannels, myMembers: channelMembers} = state.entities.channels;
+        const {myMembers: teamMembers} = state.entities.teams;
+        const channel = myChannels[channelId];
+        const channelMember = channelMembers[channelId];
+        const teamMember = teamMembers[TestHelper.basicTeam.id];
 
         assert.equal((channel.total_msg_count - channelMember.msg_count), 1);
         assert.equal(channelMember.mention_count, 1);
         assert.equal(teamMember.msg_count, 1);
         assert.equal(teamMember.mention_count, 1);
+    });
 
-        await Actions.markChannelAsRead(channelId)(store.dispatch, store.getState);
-        state = store.getState();
-        myChannels = state.entities.channels.channels;
-        channelMembers = state.entities.channels.myMembers;
-        teamMembers = state.entities.teams.myMembers;
-        channel = myChannels[channelId];
-        channelMember = channelMembers[channelId];
-        teamMember = teamMembers[TestHelper.basicTeam.id];
-        assert.equal((channel.total_msg_count - channelMember.msg_count), 0);
-        assert.equal(channelMember.mention_count, 0);
-        assert.equal(teamMember.msg_count, 0);
-        assert.equal(teamMember.mention_count, 0);
+    describe('markChannelAsRead', async () => {
+        it('one read channel', async () => {
+            const channelId = TestHelper.generateId();
+            const teamId = TestHelper.generateId();
+
+            store = await configureStore({
+                entities: {
+                    channels: {
+                        channels: {
+                            [channelId]: {
+                                id: channelId,
+                                team_id: teamId,
+                                total_msg_count: 10
+                            }
+                        },
+                        myMembers: {
+                            [channelId]: {
+                                channel_id: channelId,
+                                mention_count: 0,
+                                msg_count: 10
+                            }
+                        }
+                    },
+                    teams: {
+                        myMembers: {
+                            [teamId]: {
+                                id: teamId,
+                                mention_count: 0,
+                                msg_count: 0
+                            }
+                        }
+                    }
+                }
+            });
+
+            await Actions.markChannelAsRead(channelId)(store.dispatch, store.getState);
+
+            const state = store.getState();
+
+            assert.equal(state.entities.channels.myMembers[channelId].mention_count, 0);
+            assert.equal(state.entities.channels.myMembers[channelId].msg_count, state.entities.channels.channels[channelId].total_msg_count);
+
+            assert.equal(state.entities.teams.myMembers[teamId].mention_count, 0);
+            assert.equal(state.entities.teams.myMembers[teamId].msg_count, 0);
+        });
+
+        it('one unread channel', async () => {
+            const channelId = TestHelper.generateId();
+            const teamId = TestHelper.generateId();
+
+            store = await configureStore({
+                entities: {
+                    channels: {
+                        channels: {
+                            [channelId]: {
+                                id: channelId,
+                                team_id: teamId,
+                                total_msg_count: 10
+                            }
+                        },
+                        myMembers: {
+                            [channelId]: {
+                                channel_id: channelId,
+                                mention_count: 2,
+                                msg_count: 5
+                            }
+                        }
+                    },
+                    teams: {
+                        myMembers: {
+                            [teamId]: {
+                                id: teamId,
+                                mention_count: 2,
+                                msg_count: 5
+                            }
+                        }
+                    }
+                }
+            });
+
+            await Actions.markChannelAsRead(channelId)(store.dispatch, store.getState);
+
+            const state = store.getState();
+
+            assert.equal(state.entities.channels.myMembers[channelId].mention_count, 0);
+            assert.equal(state.entities.channels.myMembers[channelId].msg_count, state.entities.channels.channels[channelId].total_msg_count);
+
+            assert.equal(state.entities.teams.myMembers[teamId].mention_count, 0);
+            assert.equal(state.entities.teams.myMembers[teamId].msg_count, 0);
+        });
+
+        it('one unread DM channel', async () => {
+            const channelId = TestHelper.generateId();
+
+            store = await configureStore({
+                entities: {
+                    channels: {
+                        channels: {
+                            [channelId]: {
+                                id: channelId,
+                                team_id: '',
+                                total_msg_count: 10
+                            }
+                        },
+                        myMembers: {
+                            [channelId]: {
+                                channel_id: channelId,
+                                mention_count: 2,
+                                msg_count: 5
+                            }
+                        }
+                    },
+                    teams: {
+                        myMembers: {
+                        }
+                    }
+                }
+            });
+
+            await Actions.markChannelAsRead(channelId)(store.dispatch, store.getState);
+
+            const state = store.getState();
+
+            assert.equal(state.entities.channels.myMembers[channelId].mention_count, 0);
+            assert.equal(state.entities.channels.myMembers[channelId].msg_count, state.entities.channels.channels[channelId].total_msg_count);
+        });
+
+        it('two unread channels, same team, reading one', async () => {
+            const channelId1 = TestHelper.generateId();
+            const channelId2 = TestHelper.generateId();
+            const teamId = TestHelper.generateId();
+
+            store = await configureStore({
+                entities: {
+                    channels: {
+                        channels: {
+                            [channelId1]: {
+                                id: channelId1,
+                                team_id: teamId,
+                                total_msg_count: 10
+                            },
+                            [channelId2]: {
+                                id: channelId2,
+                                team_id: teamId,
+                                total_msg_count: 12
+                            }
+                        },
+                        myMembers: {
+                            [channelId1]: {
+                                channel_id: channelId1,
+                                mention_count: 2,
+                                msg_count: 5
+                            },
+                            [channelId2]: {
+                                channel_id: channelId2,
+                                mention_count: 4,
+                                msg_count: 9
+                            }
+                        }
+                    },
+                    teams: {
+                        myMembers: {
+                            [teamId]: {
+                                id: teamId,
+                                mention_count: 6,
+                                msg_count: 8
+                            }
+                        }
+                    }
+                }
+            });
+
+            await Actions.markChannelAsRead(channelId1)(store.dispatch, store.getState);
+
+            const state = store.getState();
+
+            assert.equal(state.entities.channels.myMembers[channelId1].mention_count, 0);
+            assert.equal(state.entities.channels.myMembers[channelId1].msg_count, state.entities.channels.channels[channelId1].total_msg_count);
+
+            assert.equal(state.entities.channels.myMembers[channelId2].mention_count, 4);
+            assert.equal(state.entities.channels.myMembers[channelId2].msg_count, 9);
+
+            assert.equal(state.entities.teams.myMembers[teamId].mention_count, 4);
+            assert.equal(state.entities.teams.myMembers[teamId].msg_count, 3);
+        });
+
+        it('two unread channels, same team, reading both', async () => {
+            const channelId1 = TestHelper.generateId();
+            const channelId2 = TestHelper.generateId();
+            const teamId = TestHelper.generateId();
+
+            store = await configureStore({
+                entities: {
+                    channels: {
+                        channels: {
+                            [channelId1]: {
+                                id: channelId1,
+                                team_id: teamId,
+                                total_msg_count: 10
+                            },
+                            [channelId2]: {
+                                id: channelId2,
+                                team_id: teamId,
+                                total_msg_count: 12
+                            }
+                        },
+                        myMembers: {
+                            [channelId1]: {
+                                channel_id: channelId1,
+                                mention_count: 2,
+                                msg_count: 5
+                            },
+                            [channelId2]: {
+                                channel_id: channelId2,
+                                mention_count: 4,
+                                msg_count: 9
+                            }
+                        }
+                    },
+                    teams: {
+                        myMembers: {
+                            [teamId]: {
+                                id: teamId,
+                                mention_count: 6,
+                                msg_count: 8
+                            }
+                        }
+                    }
+                }
+            });
+
+            await Actions.markChannelAsRead(channelId1, channelId2)(store.dispatch, store.getState);
+
+            const state = store.getState();
+
+            assert.equal(state.entities.channels.myMembers[channelId1].mention_count, 0);
+            assert.equal(state.entities.channels.myMembers[channelId1].msg_count, state.entities.channels.channels[channelId1].total_msg_count);
+
+            assert.equal(state.entities.channels.myMembers[channelId2].mention_count, 0);
+            assert.equal(state.entities.channels.myMembers[channelId2].msg_count, state.entities.channels.channels[channelId2].total_msg_count);
+
+            assert.equal(state.entities.teams.myMembers[teamId].mention_count, 0);
+            assert.equal(state.entities.teams.myMembers[teamId].msg_count, 0);
+        });
+
+        it('two unread channels, same team, reading both (opposite order)', async () => {
+            const channelId1 = TestHelper.generateId();
+            const channelId2 = TestHelper.generateId();
+            const teamId = TestHelper.generateId();
+
+            store = await configureStore({
+                entities: {
+                    channels: {
+                        channels: {
+                            [channelId1]: {
+                                id: channelId1,
+                                team_id: teamId,
+                                total_msg_count: 10
+                            },
+                            [channelId2]: {
+                                id: channelId2,
+                                team_id: teamId,
+                                total_msg_count: 12
+                            }
+                        },
+                        myMembers: {
+                            [channelId1]: {
+                                channel_id: channelId1,
+                                mention_count: 2,
+                                msg_count: 5
+                            },
+                            [channelId2]: {
+                                channel_id: channelId2,
+                                mention_count: 4,
+                                msg_count: 9
+                            }
+                        }
+                    },
+                    teams: {
+                        myMembers: {
+                            [teamId]: {
+                                id: teamId,
+                                mention_count: 6,
+                                msg_count: 8
+                            }
+                        }
+                    }
+                }
+            });
+
+            await Actions.markChannelAsRead(channelId2, channelId1)(store.dispatch, store.getState);
+
+            const state = store.getState();
+
+            assert.equal(state.entities.channels.myMembers[channelId1].mention_count, 0);
+            assert.equal(state.entities.channels.myMembers[channelId1].msg_count, state.entities.channels.channels[channelId1].total_msg_count);
+
+            assert.equal(state.entities.channels.myMembers[channelId2].mention_count, 0);
+            assert.equal(state.entities.channels.myMembers[channelId2].msg_count, state.entities.channels.channels[channelId2].total_msg_count);
+
+            assert.equal(state.entities.teams.myMembers[teamId].mention_count, 0);
+            assert.equal(state.entities.teams.myMembers[teamId].msg_count, 0);
+        });
+
+        it('two unread channels, different teams, reading one', async () => {
+            const channelId1 = TestHelper.generateId();
+            const channelId2 = TestHelper.generateId();
+            const teamId1 = TestHelper.generateId();
+            const teamId2 = TestHelper.generateId();
+
+            store = await configureStore({
+                entities: {
+                    channels: {
+                        channels: {
+                            [channelId1]: {
+                                id: channelId1,
+                                team_id: teamId1,
+                                total_msg_count: 10
+                            },
+                            [channelId2]: {
+                                id: channelId2,
+                                team_id: teamId2,
+                                total_msg_count: 12
+                            }
+                        },
+                        myMembers: {
+                            [channelId1]: {
+                                channel_id: channelId1,
+                                mention_count: 2,
+                                msg_count: 5
+                            },
+                            [channelId2]: {
+                                channel_id: channelId2,
+                                mention_count: 4,
+                                msg_count: 9
+                            }
+                        }
+                    },
+                    teams: {
+                        myMembers: {
+                            [teamId1]: {
+                                id: teamId1,
+                                mention_count: 2,
+                                msg_count: 5
+                            },
+                            [teamId2]: {
+                                id: teamId2,
+                                mention_count: 4,
+                                msg_count: 3
+                            }
+                        }
+                    }
+                }
+            });
+
+            await Actions.markChannelAsRead(channelId1)(store.dispatch, store.getState);
+
+            const state = store.getState();
+
+            assert.equal(state.entities.channels.myMembers[channelId1].mention_count, 0);
+            assert.equal(state.entities.channels.myMembers[channelId1].msg_count, state.entities.channels.channels[channelId1].total_msg_count);
+
+            assert.equal(state.entities.channels.myMembers[channelId2].mention_count, 4);
+            assert.equal(state.entities.channels.myMembers[channelId2].msg_count, 9);
+
+            assert.equal(state.entities.teams.myMembers[teamId1].mention_count, 0);
+            assert.equal(state.entities.teams.myMembers[teamId1].msg_count, 0);
+
+            assert.equal(state.entities.teams.myMembers[teamId2].mention_count, 4);
+            assert.equal(state.entities.teams.myMembers[teamId2].msg_count, 3);
+        });
+
+        it('two unread channels, different teams, reading both', async () => {
+            const channelId1 = TestHelper.generateId();
+            const channelId2 = TestHelper.generateId();
+            const teamId1 = TestHelper.generateId();
+            const teamId2 = TestHelper.generateId();
+
+            store = await configureStore({
+                entities: {
+                    channels: {
+                        channels: {
+                            [channelId1]: {
+                                id: channelId1,
+                                team_id: teamId1,
+                                total_msg_count: 10
+                            },
+                            [channelId2]: {
+                                id: channelId2,
+                                team_id: teamId2,
+                                total_msg_count: 12
+                            }
+                        },
+                        myMembers: {
+                            [channelId1]: {
+                                channel_id: channelId1,
+                                mention_count: 2,
+                                msg_count: 5
+                            },
+                            [channelId2]: {
+                                channel_id: channelId2,
+                                mention_count: 4,
+                                msg_count: 9
+                            }
+                        }
+                    },
+                    teams: {
+                        myMembers: {
+                            [teamId1]: {
+                                id: teamId1,
+                                mention_count: 2,
+                                msg_count: 5
+                            },
+                            [teamId2]: {
+                                id: teamId2,
+                                mention_count: 4,
+                                msg_count: 3
+                            }
+                        }
+                    }
+                }
+            });
+
+            await Actions.markChannelAsRead(channelId1, channelId2)(store.dispatch, store.getState);
+
+            const state = store.getState();
+
+            assert.equal(state.entities.channels.myMembers[channelId1].mention_count, 0);
+            assert.equal(state.entities.channels.myMembers[channelId1].msg_count, state.entities.channels.channels[channelId1].total_msg_count);
+
+            assert.equal(state.entities.channels.myMembers[channelId2].mention_count, 0);
+            assert.equal(state.entities.channels.myMembers[channelId2].msg_count, state.entities.channels.channels[channelId2].total_msg_count);
+
+            assert.equal(state.entities.teams.myMembers[teamId1].mention_count, 0);
+            assert.equal(state.entities.teams.myMembers[teamId1].msg_count, 0);
+
+            assert.equal(state.entities.teams.myMembers[teamId2].mention_count, 0);
+            assert.equal(state.entities.teams.myMembers[teamId2].msg_count, 0);
+        });
+
+        it('two unread channels, different teams, reading both (opposite order)', async () => {
+            const channelId1 = TestHelper.generateId();
+            const channelId2 = TestHelper.generateId();
+            const teamId1 = TestHelper.generateId();
+            const teamId2 = TestHelper.generateId();
+
+            store = await configureStore({
+                entities: {
+                    channels: {
+                        channels: {
+                            [channelId1]: {
+                                id: channelId1,
+                                team_id: teamId1,
+                                total_msg_count: 10
+                            },
+                            [channelId2]: {
+                                id: channelId2,
+                                team_id: teamId2,
+                                total_msg_count: 12
+                            }
+                        },
+                        myMembers: {
+                            [channelId1]: {
+                                channel_id: channelId1,
+                                mention_count: 2,
+                                msg_count: 5
+                            },
+                            [channelId2]: {
+                                channel_id: channelId2,
+                                mention_count: 4,
+                                msg_count: 9
+                            }
+                        }
+                    },
+                    teams: {
+                        myMembers: {
+                            [teamId1]: {
+                                id: teamId1,
+                                mention_count: 2,
+                                msg_count: 5
+                            },
+                            [teamId2]: {
+                                id: teamId2,
+                                mention_count: 4,
+                                msg_count: 3
+                            }
+                        }
+                    }
+                }
+            });
+
+            await Actions.markChannelAsRead(channelId1, channelId2)(store.dispatch, store.getState);
+
+            const state = store.getState();
+
+            assert.equal(state.entities.channels.myMembers[channelId1].mention_count, 0);
+            assert.equal(state.entities.channels.myMembers[channelId1].msg_count, state.entities.channels.channels[channelId1].total_msg_count);
+
+            assert.equal(state.entities.channels.myMembers[channelId2].mention_count, 0);
+            assert.equal(state.entities.channels.myMembers[channelId2].msg_count, state.entities.channels.channels[channelId2].total_msg_count);
+
+            assert.equal(state.entities.teams.myMembers[teamId1].mention_count, 0);
+            assert.equal(state.entities.teams.myMembers[teamId1].msg_count, 0);
+
+            assert.equal(state.entities.teams.myMembers[teamId2].mention_count, 0);
+            assert.equal(state.entities.teams.myMembers[teamId2].msg_count, 0);
+        });
     });
 
     it('getChannels', async () => {

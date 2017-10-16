@@ -56,21 +56,6 @@ function channels(state = {}, action) {
     case ChannelTypes.RECEIVED_CHANNEL_DELETED:
         Reflect.deleteProperty(nextState, action.data.id);
         return nextState;
-    case ChannelTypes.RECEIVED_LAST_VIEWED: {
-        const channelId = action.data.channel_id;
-        const lastUpdatedAt = action.data.last_viewed_at;
-        const channel = state[channelId];
-        if (!channel) {
-            return state;
-        }
-        return {
-            ...state,
-            [channelId]: {
-                ...channel,
-                extra_update_at: lastUpdatedAt
-            }
-        };
-    }
     case ChannelTypes.UPDATE_CHANNEL_HEADER: {
         const {channelId, header} = action.data;
         return {
@@ -167,15 +152,16 @@ function myMembers(state = {}, action) {
             [action.data.channel_id]: member
         };
     }
-    case ChannelTypes.RECEIVED_LAST_VIEWED: {
+    case ChannelTypes.RECEIVED_MSG_AND_MENTION_COUNT: {
         let member = state[action.data.channel_id];
         if (!member) {
             return state;
         }
-        member = {...member,
-            last_viewed_at: action.data.last_viewed_at,
-            msg_count: action.data.total_msg_count,
-            mention_count: 0
+
+        member = {
+            ...member,
+            msg_count: action.data.msg_count == null ? member.msg_count : action.data.msg_count,
+            mention_count: action.data.mention_count == null ? member.mention_count : action.data.mention_count
         };
 
         return {
