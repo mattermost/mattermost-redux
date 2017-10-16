@@ -165,8 +165,10 @@ export const getMyTeamsCount = createSelector(
     }
 );
 
-// Returns the number of mentions or -1 if it has unreads
-// for every team except the current one
+// returns the badge number to show (excluding the current team)
+// > 0 means is returning the mention count
+// 0 means that there are no unread messages
+// -1 means that there are unread messages but no mentions
 export const getChannelDrawerBadgeCount = createSelector(
     getCurrentTeamId,
     getTeamMemberships,
@@ -191,8 +193,10 @@ export const getChannelDrawerBadgeCount = createSelector(
     }
 );
 
-// Returns the number of mentions or -1 if it has unreads
-// for every team except the current one
+// returns the badge for a team
+// > 0 means is returning the mention count
+// 0 means that there are no unread messages
+// -1 means that there are unread messages but no mentions
 export function makeGetBadgeCountForTeamId() {
     return createSelector(
         getTeamMemberships,
