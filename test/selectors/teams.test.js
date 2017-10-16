@@ -12,12 +12,17 @@ describe('Selectors.Teams', () => {
     const team1 = TestHelper.fakeTeamWithId();
     const team2 = TestHelper.fakeTeamWithId();
     const team3 = TestHelper.fakeTeamWithId();
+    const team4 = TestHelper.fakeTeamWithId();
 
     const teams = {};
     teams[team1.id] = team1;
     teams[team2.id] = team2;
     teams[team3.id] = team3;
+    teams[team4.id] = team4;
+    team1.display_name = 'Marketeam';
+    team2.display_name = 'Core Team';
     team3.allow_open_invite = true;
+    team4.allow_open_invite = true;
 
     const user = TestHelper.fakeUserWithId();
     const user2 = TestHelper.fakeUserWithId();
@@ -28,8 +33,8 @@ describe('Selectors.Teams', () => {
     profiles[user3.id] = user3;
 
     const myMembers = {};
-    myMembers[team1.id] = {team_id: team1.id, user_id: user.id, roles: General.TEAM_USER_ROLE};
-    myMembers[team2.id] = {team_id: team2.id, user_id: user.id, roles: General.TEAM_USER_ROLE};
+    myMembers[team1.id] = {team_id: team1.id, user_id: user.id, roles: General.TEAM_USER_ROLE, mention_count: 1};
+    myMembers[team2.id] = {team_id: team2.id, user_id: user.id, roles: General.TEAM_USER_ROLE, mention_count: 3};
 
     const membersInTeam = {};
     membersInTeam[team1.id] = {};
@@ -52,7 +57,7 @@ describe('Selectors.Teams', () => {
     });
 
     it('getTeamsList', () => {
-        assert.deepEqual(Selectors.getTeamsList(testState), [team1, team2, team3]);
+        assert.deepEqual(Selectors.getTeamsList(testState), [team1, team2, team3, team4]);
     });
 
     it('getMyTeams', () => {
@@ -70,6 +75,7 @@ describe('Selectors.Teams', () => {
     it('getJoinableTeams', () => {
         const openTeams = {};
         openTeams[team3.id] = team3;
+        openTeams[team4.id] = team4;
         assert.deepEqual(Selectors.getJoinableTeams(testState), openTeams);
     });
 
@@ -79,5 +85,161 @@ describe('Selectors.Teams', () => {
 
     it('getMyTeamMember', () => {
         assert.deepEqual(Selectors.getMyTeamMember(testState, team1.id), myMembers[team1.id]);
+    });
+
+    it('getTeam', () => {
+        const modifiedState = {
+            ...testState,
+            entities: {
+                ...testState.entities,
+                teams: {
+                    ...testState.entities.teams,
+                    teams: {
+                        ...testState.entities.teams.teams,
+                        [team3.id]: {
+                            ...team3,
+                            allow_open_invite: false
+                        }
+                    }
+                }
+            }
+        };
+
+        const fromOriginalState = Selectors.getTeam(testState, team1.id);
+        const fromModifiedState = Selectors.getTeam(modifiedState, team1.id);
+        assert.ok(fromOriginalState === fromModifiedState);
+    });
+
+    it('getJoinableTeamIds', () => {
+        const modifiedState = {
+            ...testState,
+            entities: {
+                ...testState.entities,
+                teams: {
+                    ...testState.entities.teams,
+                    teams: {
+                        ...testState.entities.teams.teams,
+                        [team3.id]: {
+                            ...team3,
+                            display_name: 'Welcome'
+                        }
+                    }
+                }
+            }
+        };
+
+        const fromOriginalState = Selectors.getJoinableTeamIds(testState);
+        const fromModifiedState = Selectors.getJoinableTeamIds(modifiedState);
+        assert.ok(fromOriginalState === fromModifiedState);
+    });
+
+    it('getMySortedTeamIds', () => {
+        const modifiedState = {
+            ...testState,
+            entities: {
+                ...testState.entities,
+                teams: {
+                    ...testState.entities.teams,
+                    teams: {
+                        ...testState.entities.teams.teams,
+                        [team3.id]: {
+                            ...team3,
+                            display_name: 'Welcome'
+                        }
+                    }
+                }
+            }
+        };
+
+        const updateState = {
+            ...testState,
+            entities: {
+                ...testState.entities,
+                teams: {
+                    ...testState.entities.teams,
+                    teams: {
+                        ...testState.entities.teams.teams,
+                        [team2.id]: {
+                            ...team2,
+                            display_name: 'Yankz'
+                        }
+                    }
+                }
+            }
+        };
+
+        const fromOriginalState = Selectors.getMySortedTeamIds(testState);
+        const fromModifiedState = Selectors.getMySortedTeamIds(modifiedState);
+        const fromUpdateState = Selectors.getMySortedTeamIds(updateState);
+
+        assert.ok(fromOriginalState === fromModifiedState);
+        assert.ok(fromModifiedState[0] === team2.id);
+
+        assert.ok(fromModifiedState !== fromUpdateState);
+        assert.ok(fromUpdateState[0] === team1.id);
+    });
+
+    it('getMyTeamsCount', () => {
+        const modifiedState = {
+            ...testState,
+            entities: {
+                ...testState.entities,
+                teams: {
+                    ...testState.entities.teams,
+                    teams: {
+                        ...testState.entities.teams.teams,
+                        [team3.id]: {
+                            ...team3,
+                            display_name: 'Welcome'
+                        }
+                    }
+                }
+            }
+        };
+
+        const updateState = {
+            ...testState,
+            entities: {
+                ...testState.entities,
+                teams: {
+                    ...testState.entities.teams,
+                    myMembers: {
+                        ...testState.entities.teams.myMembers,
+                        [team3.id]: {team_id: team3.id, user_id: user.id, roles: General.TEAM_USER_ROLE}
+                    }
+                }
+            }
+        };
+
+        const fromOriginalState = Selectors.getMyTeamsCount(testState);
+        const fromModifiedState = Selectors.getMyTeamsCount(modifiedState);
+        const fromUpdateState = Selectors.getMyTeamsCount(updateState);
+
+        assert.ok(fromOriginalState === fromModifiedState);
+        assert.ok(fromModifiedState === 2);
+
+        assert.ok(fromModifiedState !== fromUpdateState);
+        assert.ok(fromUpdateState === 3);
+    });
+
+    it('getChannelDrawerBadgeCount', () => {
+        const mentions = Selectors.getChannelDrawerBadgeCount(testState);
+        assert.ok(mentions === 3);
+    });
+
+    it('getTeamMentions', () => {
+        const factory1 = Selectors.makeGetBadgeCountForTeamId();
+        const factory2 = Selectors.makeGetBadgeCountForTeamId();
+        const factory3 = Selectors.makeGetBadgeCountForTeamId();
+
+        const mentions1 = factory1(testState, team1.id);
+        assert.ok(mentions1 === 1);
+
+        const mentions2 = factory2(testState, team2.id);
+        assert.ok(mentions2 === 3);
+
+        // Not a member of the team
+        const mentions3 = factory3(testState, team3.id);
+        assert.ok(mentions3 === 0);
     });
 });

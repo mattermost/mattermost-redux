@@ -4,16 +4,26 @@
 import {createSelector} from 'reselect';
 
 import {getConfig, getLicense} from 'selectors/entities/general';
-import {getMyPreferences, getTeammateNameDisplaySetting} from 'selectors/entities/preferences';
+import {
+    getFavoritesPreferences,
+    getMyPreferences,
+    getTeammateNameDisplaySetting,
+    getVisibleTeammate,
+    getVisibleGroupIds
+} from 'selectors/entities/preferences';
 import {getCurrentTeamId, getCurrentTeamMembership} from 'selectors/entities/teams';
-import {getCurrentUser} from 'selectors/entities/users';
+import {getCurrentUser, getUsers} from 'selectors/entities/users';
 import {
     buildDisplayableChannelList,
     buildDisplayableChannelListWithUnreadSection,
     canManageMembers,
     completeDirectChannelInfo,
-    sortChannelsByDisplayName
+    completeDirectChannelDisplayName,
+    sortChannelsByDisplayName,
+    getDirectChannelName
 } from 'utils/channel_utils';
+import {createIdsSelector} from 'utils/helpers';
+
 import {General} from 'constants';
 
 export function getAllChannels(state) {
@@ -320,4 +330,186 @@ export const canManageChannelMembers = createSelector(
     getConfig,
     getLicense,
     canManageMembers
+);
+
+export const getDirectChannelIds = createIdsSelector(
+    getDirectChannelsSet,
+    (directIds) => {
+        return Array.from(directIds);
+    }
+);
+
+export const getChannelIdsInCurrentTeam = createIdsSelector(
+    getCurrentTeamId,
+    getChannelsInTeam,
+    (currentTeamId, channelsInTeam) => {
+        return Array.from(channelsInTeam[currentTeamId] || []);
+    }
+);
+
+export const getChannelIdsForCurrentTeam = createIdsSelector(
+    getChannelIdsInCurrentTeam,
+    getDirectChannelIds,
+    (channels, direct) => {
+        return [...channels, ...direct];
+    }
+);
+
+export const getUnreadChannelIds = createIdsSelector(
+    getAllChannels,
+    getMyChannelMemberships,
+    getChannelIdsForCurrentTeam,
+    (channels, members, teamChannelIds) => {
+        return teamChannelIds.filter((id) => {
+            const c = channels[id];
+            const m = members[id];
+
+            if (c && m) {
+                if (m.notify_props && m.notify_props.mark_unread !== 'mention' && c.total_msg_count - m.msg_count > 0) {
+                    return true;
+                }
+            }
+            return false;
+        });
+    }
+);
+
+export const getSortedUnreadChannelIds = createIdsSelector(
+    getCurrentUser,
+    getUsers,
+    getAllChannels,
+    getMyChannelMemberships,
+    getUnreadChannelIds,
+    getTeammateNameDisplaySetting,
+    (currentUser, profiles, channels, members, unreadIds, settings) => {
+        // If we receive an unread for a channel and then a mention the channel
+        // won't be sorted correctly until we receive a message in another channel
+        const locale = currentUser.locale || 'en';
+        const allUnreadChannels = unreadIds.map((id) => {
+            const c = channels[id];
+            if (c.type === General.DM_CHANNEL || c.type === General.GM_CHANNEL) {
+                return completeDirectChannelDisplayName(currentUser.id, profiles, settings, c);
+            }
+
+            return c;
+        }).sort((a, b) => {
+            const aMember = members[a.id];
+            const bMember = members[b.id];
+
+            const aIsMention = a.type === General.DM_CHANNEL || (aMember && aMember.mention_count > 0);
+            const bIsMention = b.type === General.DM_CHANNEL || (bMember && bMember.mention_count > 0);
+
+            if (aIsMention === bIsMention) {
+                return sortChannelsByDisplayName(locale, a, b);
+            } else if (aIsMention) {
+                return -1;
+            }
+
+            return 1;
+        });
+
+        return allUnreadChannels.map((c) => c.id);
+    }
+);
+
+export const getSortedFavoriteChannelIds = createIdsSelector(
+    getCurrentUser,
+    getUsers,
+    getAllChannels,
+    getMyChannelMemberships,
+    getFavoritesPreferences,
+    getChannelIdsForCurrentTeam,
+    getUnreadChannelIds,
+    getTeammateNameDisplaySetting,
+    (currentUser, profiles, channels, myMembers, favoriteIds, teamChannelIds, unreadIds, settings) => {
+        const locale = currentUser.locale || 'en';
+        const favoriteChannel = favoriteIds.filter((id) => {
+            if (!myMembers[id]) {
+                return false;
+            }
+
+            return !unreadIds.includes(id) && teamChannelIds.includes(id);
+        }).map((id) => {
+            const c = channels[id];
+            if (c.type === General.DM_CHANNEL || c.type === General.GM_CHANNEL) {
+                return completeDirectChannelDisplayName(currentUser.id, profiles, settings, c);
+            }
+
+            return c;
+        }).sort(sortChannelsByDisplayName.bind(null, locale));
+        return favoriteChannel.map((f) => f.id);
+    }
+);
+
+export const getSortedPublicChannelIds = createIdsSelector(
+    getCurrentUser,
+    getAllChannels,
+    getMyChannelMemberships,
+    getChannelIdsForCurrentTeam,
+    getUnreadChannelIds,
+    getSortedFavoriteChannelIds,
+    (currentUser, channels, myMembers, teamChannelIds, unreadIds, favoriteIds) => {
+        const locale = currentUser.locale || 'en';
+        const publicChannels = teamChannelIds.filter((id) => {
+            if (!myMembers[id]) {
+                return false;
+            }
+            const channel = channels[id];
+            return !unreadIds.includes(id) && !favoriteIds.includes(id) &&
+                teamChannelIds.includes(id) && channel.type === General.OPEN_CHANNEL;
+        }).map((id) => channels[id]).sort(sortChannelsByDisplayName.bind(null, locale));
+        return publicChannels.map((c) => c.id);
+    }
+);
+
+export const getSortedPrivateChannelIds = createIdsSelector(
+    getCurrentUser,
+    getAllChannels,
+    getMyChannelMemberships,
+    getChannelIdsForCurrentTeam,
+    getUnreadChannelIds,
+    getSortedFavoriteChannelIds,
+    (currentUser, channels, myMembers, teamChannelIds, unreadIds, favoriteIds) => {
+        const locale = currentUser.locale || 'en';
+        const publicChannels = teamChannelIds.filter((id) => {
+            if (!myMembers[id]) {
+                return false;
+            }
+            const channel = channels[id];
+            return !unreadIds.includes(id) && !favoriteIds.includes(id) &&
+                teamChannelIds.includes(id) && channel.type === General.PRIVATE_CHANNEL;
+        }).map((id) => channels[id]).sort(sortChannelsByDisplayName.bind(null, locale));
+        return publicChannels.map((c) => c.id);
+    }
+);
+
+export const getSortedDirectChannelIds = createIdsSelector(
+    getCurrentUser,
+    getUsers,
+    getAllChannels,
+    getVisibleTeammate,
+    getVisibleGroupIds,
+    getUnreadChannelIds,
+    getSortedFavoriteChannelIds,
+    getTeammateNameDisplaySetting,
+    (currentUser, profiles, channels, teammates, groupIds, unreadIds, favoriteIds, settings) => {
+        const locale = currentUser.locale || 'en';
+        const channelValues = Object.values(channels);
+        const directChannelsIds = [];
+        teammates.reduce((result, teammateId) => {
+            const name = getDirectChannelName(currentUser.id, teammateId);
+            const channel = channelValues.find((c) => c.name === name); //eslint-disable-line max-nested-callbacks
+            if (channel && !unreadIds.includes(channel.id) && !favoriteIds.includes(channel.id)) {
+                result.push(channel.id);
+            }
+            return result;
+        }, directChannelsIds);
+        const directChannels = groupIds.filter((id) => {
+            return !unreadIds.includes(id) && !favoriteIds.includes(id);
+        }).concat(directChannelsIds).map((id) => {
+            const channel = channels[id];
+            return completeDirectChannelDisplayName(currentUser.id, profiles, settings, channel);
+        }).sort(sortChannelsByDisplayName.bind(null, locale));
+        return directChannels.map((c) => c.id);
+    }
 );

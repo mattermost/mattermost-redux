@@ -108,7 +108,9 @@ export const getCurrentUserRoles = createSelector(
             roles += `${currentChannelMembership.roles} `;
         }
 
-        roles += currentUser.roles;
+        if (currentUser) {
+            roles += currentUser.roles;
+        }
         return roles.trim();
     }
 );

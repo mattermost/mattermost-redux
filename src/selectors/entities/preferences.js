@@ -8,6 +8,7 @@ import {General, Preferences} from 'constants';
 import {getConfig} from 'selectors/entities/general';
 import {getCurrentTeamId} from 'selectors/entities/teams';
 
+import {createShallowSelector} from 'utils/helpers';
 import {getPreferenceKey} from 'utils/preference_utils';
 
 export function getMyPreferences(state) {
@@ -62,6 +63,27 @@ export function getGroupShowPreferences(state) {
     return getGroupShowCategory(state, Preferences.CATEGORY_GROUP_CHANNEL_SHOW);
 }
 
+const getFavoritesCategory = makeGetCategory();
+
+export function getFavoritesPreferences(state) {
+    const favorites = getFavoritesCategory(state, Preferences.CATEGORY_FAVORITE_CHANNEL);
+    return favorites.filter((f) => f.value === 'true').map((f) => f.name);
+}
+
+export const getVisibleTeammate = createSelector(
+    getDirectShowPreferences,
+    (direct) => {
+        return direct.filter((dm) => dm.value === 'true' && dm.name).map((dm) => dm.name);
+    }
+);
+
+export const getVisibleGroupIds = createSelector(
+    getGroupShowPreferences,
+    (groups) => {
+        return groups.filter((dm) => dm.value === 'true' && dm.name).map((dm) => dm.name);
+    }
+);
+
 export const getTeammateNameDisplaySetting = createSelector(
     getConfig,
     getMyPreferences,
@@ -98,7 +120,7 @@ const getThemePreference = createSelector(
     }
 );
 
-export const getTheme = createSelector(
+export const getTheme = createShallowSelector(
     getThemePreference,
     (themePreference) => {
         let theme;
