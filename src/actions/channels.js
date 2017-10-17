@@ -925,14 +925,16 @@ export function markChannelAsRead(channelId, prevChannelId) {
         const channel = channelState.channels[channelId];
         const prevChannel = channelState.channels[prevChannelId]; // May be null since prevChannelId is optional
 
-        actions.push({
-            type: ChannelTypes.RECEIVED_MSG_AND_MENTION_COUNT,
-            data: {
-                channel_id: channelId,
-                msg_count: channel.total_msg_count,
-                mention_count: 0
-            }
-        });
+        if (channel) {
+            actions.push({
+                type: ChannelTypes.RECEIVED_MSG_AND_MENTION_COUNT,
+                data: {
+                    channel_id: channelId,
+                    msg_count: channel.total_msg_count,
+                    mention_count: 0
+                }
+            });
+        }
 
         if (prevChannel && channelId !== prevChannelId) {
             actions.push({
@@ -951,7 +953,7 @@ export function markChannelAsRead(channelId, prevChannelId) {
 
         const teamUnreads = [];
 
-        if (channel.team_id) {
+        if (channel && channel.team_id) {
             const teamMember = teamState.myMembers[channel.team_id];
 
             // Decrement mention_count and msg_count by the number that was read in the channel.
@@ -970,7 +972,7 @@ export function markChannelAsRead(channelId, prevChannelId) {
             teamUnreads.push(teamUnread);
         }
 
-        if (prevChannel && prevChannel.team_id && channel.team_id !== prevChannel.team_id) {
+        if (channel && prevChannel && prevChannel.team_id && channel.team_id !== prevChannel.team_id) {
             const prevTeamMember = teamState.myMembers[prevChannel.team_id];
 
             teamUnreads.push({
