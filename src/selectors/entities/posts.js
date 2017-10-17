@@ -48,6 +48,30 @@ export const getPostIdsInCurrentChannel = createIdsSelector(
     }
 );
 
+export function makeGetPostIdsForThread() {
+    return createIdsSelector(
+        getAllPosts,
+        (state, rootId) => rootId,
+        (posts, rootId) => {
+            const thread = [];
+
+            for (const id in posts) {
+                if (posts.hasOwnProperty(id)) {
+                    const post = posts[id];
+
+                    if (id === rootId || post.root_id === rootId) {
+                        thread.push(post);
+                    }
+                }
+            }
+
+            thread.sort(comparePosts);
+
+            return thread.map((post) => post.id);
+        }
+    );
+}
+
 function formatPostInChannel(post, previousPost, index, allPosts, postIds, currentUser) {
     let isFirstReply = false;
     let isLastReply = false;
