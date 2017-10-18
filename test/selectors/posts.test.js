@@ -1085,7 +1085,7 @@ describe('Selectors.Posts', () => {
             previous1 = now1;
             now1 = getPostIdsForThread1(state, '1001');
             assert.equal(now1, previous1);
-        })
+        });
     });
 
     describe('makeGetPostIdsAroundPost', () => {
