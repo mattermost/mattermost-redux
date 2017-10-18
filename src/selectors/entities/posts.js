@@ -72,6 +72,31 @@ export function makeGetPostIdsForThread() {
     );
 }
 
+export function makeGetPostIdsAroundPost() {
+    return createIdsSelector(
+        (state, focusedPostId, channelId) => state.entities.posts.postsInChannel[channelId],
+        (state, focusedPostId) => focusedPostId,
+        (state, focusedPostId, channelId, options) => options && options.postsBeforeCount,
+        (state, focusedPostId, channelId, options) => options && options.postsAfterCount,
+        (postIds, focusedPostId, postsBeforeCount = Posts.POST_CHUNK_SIZE / 2, postsAfterCount = Posts.POST_CHUNK_SIZE / 2) => {
+            if (!postIds) {
+                return null;
+            }
+
+            const focusedPostIndex = postIds.indexOf(focusedPostId);
+            if (focusedPostIndex === -1) {
+                return null;
+            }
+
+            const desiredPostIndexBefore = focusedPostIndex - postsBeforeCount;
+            const minPostIndex = desiredPostIndexBefore < 0 ? 0 : desiredPostIndexBefore;
+            const maxPostIndex = focusedPostIndex + postsAfterCount + 1; // Needs the extra 1 to include the focused post
+
+            return postIds.slice(minPostIndex, maxPostIndex);
+        }
+    );
+}
+
 function formatPostInChannel(post, previousPost, index, allPosts, postIds, currentUser) {
     let isFirstReply = false;
     let isLastReply = false;
