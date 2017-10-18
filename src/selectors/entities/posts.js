@@ -48,6 +48,14 @@ export const getPostIdsInCurrentChannel = createIdsSelector(
     }
 );
 
+export const getPostsInCurrentChannel = createSelector(
+    getAllPosts,
+    getPostIdsInCurrentChannel,
+    (posts, postIds) => {
+        return postIds.map((id) => posts[id]);
+    }
+);
+
 export function makeGetPostIdsForThread() {
     return createIdsSelector(
         getAllPosts,
