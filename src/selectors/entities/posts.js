@@ -330,3 +330,13 @@ export function makeGetMessageInHistoryItem(type) {
       }
     );
 }
+
+export function makeGetPostsForIds() {
+    return createIdsSelector(
+        getAllPosts,
+        (state, postIds) => postIds,
+        (allPosts, postIds) => {
+            return postIds.map((id) => allPosts[id]);
+        }
+    );
+}
