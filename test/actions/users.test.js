@@ -530,6 +530,7 @@ describe('Actions.Users', () => {
         assert.strictEqual(sessions.length, 0);
 
         await Actions.loginById(user.id, 'password1')(store.dispatch, store.getState);
+        await TestHelper.basicClient4.login(TestHelper.basicUser.email, 'password1');
 
         await Actions.getSessions(user.id)(store.dispatch, store.getState);
 
@@ -540,8 +541,7 @@ describe('Actions.Users', () => {
         }
 
         sessions = store.getState().entities.users.mySessions;
-
-        assert.ok(sessions.length > 0);
+        assert.ok(sessions.length > 1);
 
         await Actions.revokeAllSessionsForUser(user.id)(store.dispatch, store.getState);
 
