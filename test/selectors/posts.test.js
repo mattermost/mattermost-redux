@@ -3,11 +3,14 @@
 
 import assert from 'assert';
 
-import {makeGetPostsForThread, makeGetReactionsForPost, makeGetPostsInChannel, makeGetPostsAroundPost, makeGetMessageInHistoryItem} from 'selectors/entities/posts';
-import {makeGetProfilesForReactions} from 'selectors/entities/users';
-import deepFreezeAndThrowOnMutation from 'utils/deep_freeze';
-import TestHelper from 'test/test_helper';
 import {Posts} from 'constants';
+
+import * as Selectors from 'selectors/entities/posts';
+import {makeGetProfilesForReactions} from 'selectors/entities/users';
+
+import TestHelper from 'test/test_helper';
+
+import deepFreezeAndThrowOnMutation from 'utils/deep_freeze';
 
 describe('Selectors.Posts', () => {
     const user1 = TestHelper.fakeUserWithId();
@@ -50,19 +53,19 @@ describe('Selectors.Posts', () => {
     });
 
     it('should return single post with no children', () => {
-        const getPostsForThread = makeGetPostsForThread();
+        const getPostsForThread = Selectors.makeGetPostsForThread();
 
         assert.deepEqual(getPostsForThread(testState, {channelId: '2', rootId: 'f'}), [posts.f]);
     });
 
     it('should return post with children', () => {
-        const getPostsForThread = makeGetPostsForThread();
+        const getPostsForThread = Selectors.makeGetPostsForThread();
 
         assert.deepEqual(getPostsForThread(testState, {channelId: '1', rootId: 'a'}), [posts.e, posts.c, posts.a]);
     });
 
     it('should return memoized result for identical props', () => {
-        const getPostsForThread = makeGetPostsForThread();
+        const getPostsForThread = Selectors.makeGetPostsForThread();
 
         const props = {channelId: '1', rootId: 'a'};
         const result = getPostsForThread(testState, props);
@@ -71,7 +74,7 @@ describe('Selectors.Posts', () => {
     });
 
     it('should return different result for different props', () => {
-        const getPostsForThread = makeGetPostsForThread();
+        const getPostsForThread = Selectors.makeGetPostsForThread();
 
         const result = getPostsForThread(testState, {channelId: '1', rootId: 'a'});
 
@@ -80,8 +83,8 @@ describe('Selectors.Posts', () => {
     });
 
     it('should return memoized result for multiple selectors with different props', () => {
-        const getPostsForThread1 = makeGetPostsForThread();
-        const getPostsForThread2 = makeGetPostsForThread();
+        const getPostsForThread1 = Selectors.makeGetPostsForThread();
+        const getPostsForThread2 = Selectors.makeGetPostsForThread();
 
         const props1 = {channelId: '1', rootId: 'a'};
         const result1 = getPostsForThread1(testState, props1);
@@ -94,7 +97,7 @@ describe('Selectors.Posts', () => {
     });
 
     it('should return reactions for post', () => {
-        const getReactionsForPost = makeGetReactionsForPost();
+        const getReactionsForPost = Selectors.makeGetReactionsForPost();
         assert.deepEqual(getReactionsForPost(testState, posts.a.id), [reaction1]);
     });
 
@@ -159,7 +162,7 @@ describe('Selectors.Posts', () => {
             isCommentMention: false
         };
 
-        const getPostsInChannel = makeGetPostsInChannel();
+        const getPostsInChannel = Selectors.makeGetPostsInChannel();
         assert.deepEqual(getPostsInChannel(testState, '1'), [post5, post4, post3, post2, post1]);
     });
 
@@ -220,7 +223,7 @@ describe('Selectors.Posts', () => {
             isCommentMention: false
         };
 
-        const getPostsAroundPost = makeGetPostsAroundPost();
+        const getPostsAroundPost = Selectors.makeGetPostsAroundPost();
         assert.deepEqual(getPostsAroundPost(testState, post3.id, '1'), [post5, post4, post3, post2, post1]);
     });
 
@@ -325,7 +328,7 @@ describe('Selectors.Posts', () => {
             isCommentMention: true
         };
 
-        const getPostsInChannel = makeGetPostsInChannel();
+        const getPostsInChannel = Selectors.makeGetPostsInChannel();
         assert.deepEqual(getPostsInChannel(testStateAny, '1'), [post6, post5, post4, post3, post2, post1]);
     });
 
@@ -430,7 +433,7 @@ describe('Selectors.Posts', () => {
             isCommentMention: false
         };
 
-        const getPostsInChannel = makeGetPostsInChannel();
+        const getPostsInChannel = Selectors.makeGetPostsInChannel();
         assert.deepEqual(getPostsInChannel(testStateRoot, '1'), [post6, post5, post4, post3, post2, post1]);
     });
 
@@ -535,7 +538,7 @@ describe('Selectors.Posts', () => {
             isCommentMention: false
         };
 
-        const getPostsInChannel = makeGetPostsInChannel();
+        const getPostsInChannel = Selectors.makeGetPostsInChannel();
         assert.deepEqual(getPostsInChannel(testStateNever, '1'), [post6, post5, post4, post3, post2, post1]);
     });
 
@@ -605,7 +608,7 @@ describe('Selectors.Posts', () => {
             isCommentMention: true
         };
 
-        const getPostsAroundPost = makeGetPostsAroundPost();
+        const getPostsAroundPost = Selectors.makeGetPostsAroundPost();
         assert.deepEqual(getPostsAroundPost(testStateAny, post1.id, '1'), [post3, post2, post1]);
     });
 
@@ -674,7 +677,7 @@ describe('Selectors.Posts', () => {
             isCommentMention: true
         };
 
-        const getPostsInChannel = makeGetPostsInChannel();
+        const getPostsInChannel = Selectors.makeGetPostsInChannel();
         assert.deepEqual(getPostsInChannel(testStateAny, '1'), [post3, post2, post1]);
     });
 
@@ -721,13 +724,630 @@ describe('Selectors.Posts', () => {
             }
         });
 
-        const getHistoryMessagePost = makeGetMessageInHistoryItem(Posts.MESSAGE_TYPES.POST);
-        const getHistoryMessageComment = makeGetMessageInHistoryItem(Posts.MESSAGE_TYPES.COMMENT);
+        const getHistoryMessagePost = Selectors.makeGetMessageInHistoryItem(Posts.MESSAGE_TYPES.POST);
+        const getHistoryMessageComment = Selectors.makeGetMessageInHistoryItem(Posts.MESSAGE_TYPES.COMMENT);
         assert.equal(getHistoryMessagePost(testState1), 'test2');
         assert.equal(getHistoryMessageComment(testState1), 'test3');
         assert.equal(getHistoryMessagePost(testState2), 'test1');
         assert.equal(getHistoryMessageComment(testState2), 'test1');
         assert.equal(getHistoryMessagePost(testState3), '');
         assert.equal(getHistoryMessageComment(testState3), '');
+    });
+
+    describe('getPostIdsInCurrentChannel', () => {
+        it('no posts', () => {
+            const currentChannelId = '1234';
+
+            const state = {
+                entities: {
+                    channels: {
+                        currentChannelId
+                    },
+                    posts: {
+                        postsInChannel: {}
+                    }
+                }
+            };
+            const expected = [];
+
+            assert.deepEqual(Selectors.getPostIdsInCurrentChannel(state), expected);
+        });
+
+        it('posts in channel', () => {
+            const currentChannelId = '1234';
+
+            const state = {
+                entities: {
+                    channels: {
+                        currentChannelId
+                    },
+                    posts: {
+                        postsInChannel: {
+                            [currentChannelId]: ['a', 'b', 'c', 'd'],
+                            abcd: ['e', 'f', 'g']
+                        }
+                    }
+                }
+            };
+            const expected = state.entities.posts.postsInChannel[currentChannelId];
+
+            assert.equal(Selectors.getPostIdsInCurrentChannel(state), expected);
+        });
+
+        it('memoization', () => {
+            const currentChannelId = '1234';
+
+            let state = {
+                entities: {
+                    channels: {
+                        currentChannelId
+                    },
+                    posts: {
+                        postsInChannel: {}
+                    }
+                }
+            };
+
+            // No posts, no changes
+            let previous = Selectors.getPostIdsInCurrentChannel(state);
+            let now = Selectors.getPostIdsInCurrentChannel(state);
+            assert.deepEqual(now, []);
+            assert.equal(now, previous);
+
+            // No posts in current channel
+            state = {
+                ...state,
+                entities: {
+                    ...state.entities,
+                    posts: {
+                        ...state.entities.posts,
+                        postsInChannel: {
+                            ...state.entities.posts.postsInChannel,
+                            abcd: ['e', 'f', 'g']
+                        }
+                    }
+                }
+            };
+
+            previous = now;
+            now = Selectors.getPostIdsInCurrentChannel(state);
+            assert.deepEqual(now, []);
+            assert.equal(now, previous);
+
+            // Posts in channel
+            state = {
+                ...state,
+                entities: {
+                    ...state.entities,
+                    posts: {
+                        ...state.entities.posts,
+                        postsInChannel: {
+                            ...state.entities.posts.postsInChannel,
+                            [currentChannelId]: ['a', 'b', 'c', 'd']
+                        }
+                    }
+                }
+            };
+
+            previous = now;
+            now = Selectors.getPostIdsInCurrentChannel(state);
+            assert.deepEqual(now, ['a', 'b', 'c', 'd']);
+            assert.notEqual(now, previous);
+
+            previous = now;
+            now = Selectors.getPostIdsInCurrentChannel(state);
+            assert.deepEqual(now, ['a', 'b', 'c', 'd']);
+            assert.equal(now, previous);
+
+            // Posts in channel, changes with same ids
+            state = {
+                ...state,
+                entities: {
+                    ...state.entities,
+                    posts: {
+                        ...state.entities.posts,
+                        postsInChannel: {
+                            ...state.entities.posts.postsInChannel,
+                            [currentChannelId]: ['a', 'b', 'c', 'd']
+                        }
+                    }
+                }
+            };
+
+            previous = now;
+            now = Selectors.getPostIdsInCurrentChannel(state);
+            assert.deepEqual(now, ['a', 'b', 'c', 'd']);
+            assert.equal(now, previous);
+
+            // New posts in channel
+            state = {
+                ...state,
+                entities: {
+                    ...state.entities,
+                    posts: {
+                        ...state.entities.posts,
+                        postsInChannel: {
+                            ...state.entities.posts.postsInChannel,
+                            [currentChannelId]: ['a', 'b', 'c', 'd', 'h']
+                        }
+                    }
+                }
+            };
+
+            previous = now;
+            now = Selectors.getPostIdsInCurrentChannel(state);
+            assert.deepEqual(now, ['a', 'b', 'c', 'd', 'h']);
+            assert.notEqual(now, previous);
+
+            previous = now;
+            now = Selectors.getPostIdsInCurrentChannel(state);
+            assert.deepEqual(now, ['a', 'b', 'c', 'd', 'h']);
+            assert.equal(now, previous);
+
+            // Change of channel
+            state = {
+                ...state,
+                entities: {
+                    ...state.entities,
+                    channels: {
+                        ...state.entities.channels,
+                        currentChannelId: 'abcd'
+                    }
+                }
+            };
+
+            previous = now;
+            now = Selectors.getPostIdsInCurrentChannel(state);
+            assert.deepEqual(now, ['e', 'f', 'g']);
+            assert.notEqual(now, previous);
+
+            previous = now;
+            now = Selectors.getPostIdsInCurrentChannel(state);
+            assert.deepEqual(now, ['e', 'f', 'g']);
+            assert.equal(now, previous);
+        });
+    });
+
+    describe('makeGetPostIdsForThread', () => {
+        it('single post', () => {
+            const getPostIdsForThread = Selectors.makeGetPostIdsForThread();
+
+            const state = {
+                entities: {
+                    posts: {
+                        posts: {
+                            1001: {id: '1001', create_at: 1001},
+                            1002: {id: '1002', create_at: 1002, root_id: '1001'},
+                            1003: {id: '1003', create_at: 1003},
+                            1004: {id: '1004', create_at: 1004, root_id: '1001'},
+                            1005: {id: '1005', create_at: 1005}
+                        }
+                    }
+                }
+            };
+            const expected = ['1005'];
+
+            assert.deepEqual(getPostIdsForThread(state, '1005'), expected);
+        });
+
+        it('thread', () => {
+            const getPostIdsForThread = Selectors.makeGetPostIdsForThread();
+
+            const state = {
+                entities: {
+                    posts: {
+                        posts: {
+                            1001: {id: '1001', create_at: 1001},
+                            1002: {id: '1002', create_at: 1002, root_id: '1001'},
+                            1003: {id: '1003', create_at: 1003},
+                            1004: {id: '1004', create_at: 1004, root_id: '1001'},
+                            1005: {id: '1005', create_at: 1005}
+                        }
+                    }
+                }
+            };
+            const expected = ['1004', '1002', '1001'];
+
+            assert.deepEqual(getPostIdsForThread(state, '1001'), expected);
+        });
+
+        it('memoization', () => {
+            const getPostIdsForThread = Selectors.makeGetPostIdsForThread();
+
+            let state = {
+                entities: {
+                    posts: {
+                        posts: {
+                            1001: {id: '1001', create_at: 1001},
+                            1002: {id: '1002', create_at: 1002, root_id: '1001'},
+                            1003: {id: '1003', create_at: 1003},
+                            1004: {id: '1004', create_at: 1004, root_id: '1001'},
+                            1005: {id: '1005', create_at: 1005}
+                        }
+                    }
+                }
+            };
+
+            // One post, no changes
+            let previous = getPostIdsForThread(state, '1005');
+            let now = getPostIdsForThread(state, '1005');
+            assert.deepEqual(now, ['1005']);
+            assert.equal(now, previous);
+
+            // One post, unrelated changes
+            state = {
+                ...state,
+                entities: {
+                    ...state.entities,
+                    posts: {
+                        ...state.entities.posts,
+                        posts: {
+                            ...state.entities.posts.posts,
+                            1006: {id: '1006', create_at: 1006, root_id: '1003'}
+                        }
+                    }
+                }
+            };
+
+            previous = now;
+            now = getPostIdsForThread(state, '1005');
+            assert.deepEqual(now, ['1005']);
+            assert.equal(now, previous);
+
+            // One post, changes to post
+            state = {
+                ...state,
+                entities: {
+                    ...state.entities,
+                    posts: {
+                        ...state.entities.posts,
+                        posts: {
+                            ...state.entities.posts.posts,
+                            1005: {id: '1005', create_at: 1005, update_at: 1006}
+                        }
+                    }
+                }
+            };
+
+            previous = now;
+            now = getPostIdsForThread(state, '1005');
+            assert.deepEqual(now, ['1005']);
+            assert.equal(now, previous);
+
+            // Change of thread
+            previous = now;
+            now = getPostIdsForThread(state, '1001');
+            assert.deepEqual(now, ['1004', '1002', '1001']);
+            assert.notEqual(now, previous);
+
+            previous = now;
+            now = getPostIdsForThread(state, '1001');
+            assert.equal(now, previous);
+
+            // New post in thread
+            state = {
+                ...state,
+                entities: {
+                    ...state.entities,
+                    posts: {
+                        ...state.entities.posts,
+                        posts: {
+                            ...state.entities.posts.posts,
+                            1007: {id: '1007', create_at: 1007, root_id: '1001'}
+                        }
+                    }
+                }
+            };
+
+            previous = now;
+            now = getPostIdsForThread(state, '1001');
+            assert.deepEqual(now, ['1007', '1004', '1002', '1001']);
+            assert.notEqual(now, previous);
+
+            previous = now;
+            now = getPostIdsForThread(state, '1001');
+            assert.deepEqual(now, ['1007', '1004', '1002', '1001']);
+            assert.equal(now, previous);
+        });
+
+        it('memoization with multiple selectors', () => {
+            const getPostIdsForThread1 = Selectors.makeGetPostIdsForThread();
+            const getPostIdsForThread2 = Selectors.makeGetPostIdsForThread();
+
+            const state = {
+                entities: {
+                    posts: {
+                        posts: {
+                            1001: {id: '1001', create_at: 1001},
+                            1002: {id: '1002', create_at: 1002, root_id: '1001'},
+                            1003: {id: '1003', create_at: 1003},
+                            1004: {id: '1004', create_at: 1004, root_id: '1001'},
+                            1005: {id: '1005', create_at: 1005}
+                        }
+                    }
+                }
+            };
+
+            let now1 = getPostIdsForThread1(state, '1001');
+            let now2 = getPostIdsForThread2(state, '1001');
+            assert.notEqual(now1, now2);
+            assert.deepEqual(now1, now2);
+
+            let previous1 = now1;
+            now1 = getPostIdsForThread1(state, '1001');
+            assert.equal(now1, previous1);
+
+            const previous2 = now2;
+            now2 = getPostIdsForThread2(state, '1003');
+            assert.notEqual(now2, previous2);
+            assert.notDeepEqual(now1, now2);
+
+            previous1 = now1;
+            now1 = getPostIdsForThread1(state, '1001');
+            assert.equal(now1, previous1);
+        });
+    });
+
+    describe('makeGetPostIdsAroundPost', () => {
+        it('no posts around', () => {
+            const getPostIdsAroundPost = Selectors.makeGetPostIdsAroundPost();
+
+            const state = {
+                entities: {
+                    posts: {
+                        postsInChannel: {
+                            1234: ['a']
+                        }
+                    }
+                }
+            };
+
+            assert.deepEqual(getPostIdsAroundPost(state, 'a', '1234'), ['a']);
+        });
+
+        it('posts around', () => {
+            const getPostIdsAroundPost = Selectors.makeGetPostIdsAroundPost();
+
+            const state = {
+                entities: {
+                    posts: {
+                        postsInChannel: {
+                            1234: ['a', 'b', 'c', 'd', 'e']
+                        }
+                    }
+                }
+            };
+
+            assert.deepEqual(getPostIdsAroundPost(state, 'c', '1234'), ['a', 'b', 'c', 'd', 'e']);
+        });
+
+        it('posts before limit', () => {
+            const getPostIdsAroundPost = Selectors.makeGetPostIdsAroundPost();
+
+            const state = {
+                entities: {
+                    posts: {
+                        postsInChannel: {
+                            1234: ['a', 'b', 'c', 'd', 'e']
+                        }
+                    }
+                }
+            };
+
+            assert.deepEqual(getPostIdsAroundPost(state, 'e', '1234', {postsBeforeCount: 3}), ['b', 'c', 'd', 'e']);
+        });
+
+        it('posts after limit', () => {
+            const getPostIdsAroundPost = Selectors.makeGetPostIdsAroundPost();
+
+            const state = {
+                entities: {
+                    posts: {
+                        postsInChannel: {
+                            1234: ['a', 'b', 'c', 'd', 'e']
+                        }
+                    }
+                }
+            };
+
+            assert.deepEqual(getPostIdsAroundPost(state, 'a', '1234', {postsAfterCount: 2}), ['a', 'b', 'c']);
+        });
+
+        it('posts before/after limit', () => {
+            const getPostIdsAroundPost = Selectors.makeGetPostIdsAroundPost();
+
+            const state = {
+                entities: {
+                    posts: {
+                        postsInChannel: {
+                            1234: ['a', 'b', 'c', 'd', 'e', 'f']
+                        }
+                    }
+                }
+            };
+
+            assert.deepEqual(getPostIdsAroundPost(state, 'c', '1234', {postsBeforeCount: 1, postsAfterCount: 2}), ['b', 'c', 'd', 'e']);
+        });
+
+        it('memoization', () => {
+            const getPostIdsAroundPost = Selectors.makeGetPostIdsAroundPost();
+
+            let state = {
+                entities: {
+                    posts: {
+                        postsInChannel: {
+                            1234: ['a', 'b', 'c', 'd', 'e']
+                        }
+                    }
+                }
+            };
+
+            // No limit, no changes
+            let previous = getPostIdsAroundPost(state, 'c', '1234');
+            let now = getPostIdsAroundPost(state, 'c', '1234');
+            assert.deepEqual(now, ['a', 'b', 'c', 'd', 'e']);
+            assert.equal(now, previous);
+
+            // Changes to posts in another channel
+            state = {
+                ...state,
+                entities: {
+                    ...state.entities,
+                    posts: {
+                        ...state.entities.posts,
+                        postsInChannel: {
+                            ...state.entities.posts.postsInChannel,
+                            abcd: ['g', 'h', 'i', 'j', 'k', 'l']
+                        }
+                    }
+                }
+            };
+
+            previous = now;
+            now = getPostIdsAroundPost(state, 'c', '1234');
+            assert.deepEqual(now, ['a', 'b', 'c', 'd', 'e']);
+            assert.equal(now, previous);
+
+            // Changes to posts in this channel
+            state = {
+                ...state,
+                entities: {
+                    ...state.entities,
+                    posts: {
+                        ...state.entities.posts,
+                        postsInChannel: {
+                            ...state.entities.posts.postsInChannel,
+                            1234: [...state.entities.posts.postsInChannel['1234'], 'f']
+                        }
+                    }
+                }
+            };
+
+            previous = now;
+            now = getPostIdsAroundPost(state, 'c', '1234');
+            assert.deepEqual(now, ['a', 'b', 'c', 'd', 'e', 'f']);
+            assert.notEqual(now, previous);
+
+            previous = now;
+            now = getPostIdsAroundPost(state, 'c', '1234');
+            assert.deepEqual(now, ['a', 'b', 'c', 'd', 'e', 'f']);
+            assert.equal(now, previous);
+
+            // Change of channel
+            previous = now;
+            now = getPostIdsAroundPost(state, 'i', 'abcd');
+            assert.deepEqual(now, ['g', 'h', 'i', 'j', 'k', 'l']);
+            assert.notEqual(now, previous);
+
+            previous = now;
+            now = getPostIdsAroundPost(state, 'i', 'abcd');
+            assert.deepEqual(now, ['g', 'h', 'i', 'j', 'k', 'l']);
+            assert.equal(now, previous);
+
+            // With limits
+            previous = now;
+            now = getPostIdsAroundPost(state, 'i', 'abcd', {postsBeforeCount: 1, postsAfterCount: 2});
+            assert.deepEqual(now, ['h', 'i', 'j', 'k']);
+            assert.notEqual(now, previous);
+
+            previous = now;
+            now = getPostIdsAroundPost(state, 'i', 'abcd', {postsBeforeCount: 1, postsAfterCount: 2}); // Note that the options object is a new object each time
+            assert.deepEqual(now, ['h', 'i', 'j', 'k']);
+            assert.equal(now, previous);
+
+            // Change of limits
+            previous = now;
+            now = getPostIdsAroundPost(state, 'i', 'abcd', {postsBeforeCount: 2, postsAfterCount: 1});
+            assert.deepEqual(now, ['g', 'h', 'i', 'j']);
+            assert.notEqual(now, previous);
+
+            previous = now;
+            now = getPostIdsAroundPost(state, 'i', 'abcd', {postsBeforeCount: 2, postsAfterCount: 1});
+            assert.deepEqual(now, ['g', 'h', 'i', 'j']);
+            assert.equal(now, previous);
+
+            // Change of post
+            previous = now;
+            now = getPostIdsAroundPost(state, 'j', 'abcd', {postsBeforeCount: 2, postsAfterCount: 1});
+            assert.deepEqual(now, ['h', 'i', 'j', 'k']);
+            assert.notEqual(now, previous);
+
+            previous = now;
+            now = getPostIdsAroundPost(state, 'j', 'abcd', {postsBeforeCount: 2, postsAfterCount: 1});
+            assert.deepEqual(now, ['h', 'i', 'j', 'k']);
+            assert.equal(now, previous);
+
+            // Change of posts past limit
+            state = {
+                ...state,
+                entities: {
+                    ...state.entities,
+                    posts: {
+                        ...state.entities.posts,
+                        postsInChannel: {
+                            ...state.entities.posts.postsInChannel,
+                            abcd: ['y', ...state.entities.posts.postsInChannel.abcd, 'z']
+                        }
+                    }
+                }
+            };
+            previous = now;
+            now = getPostIdsAroundPost(state, 'j', 'abcd', {postsBeforeCount: 2, postsAfterCount: 1});
+            assert.deepEqual(now, ['h', 'i', 'j', 'k']);
+            assert.equal(now, previous);
+
+            // Change of post order
+            state = {
+                ...state,
+                entities: {
+                    ...state.entities,
+                    posts: {
+                        ...state.entities.posts,
+                        postsInChannel: {
+                            ...state.entities.posts.postsInChannel,
+                            abcd: ['y', 'g', 'i', 'h', 'j', 'l', 'k', 'z']
+                        }
+                    }
+                }
+            };
+
+            previous = now;
+            now = getPostIdsAroundPost(state, 'j', 'abcd', {postsBeforeCount: 2, postsAfterCount: 1});
+            assert.deepEqual(now, ['i', 'h', 'j', 'l']);
+            assert.notEqual(now, previous);
+
+            previous = now;
+            now = getPostIdsAroundPost(state, 'j', 'abcd', {postsBeforeCount: 2, postsAfterCount: 1});
+            assert.deepEqual(now, ['i', 'h', 'j', 'l']);
+            assert.equal(now, previous);
+        });
+
+        it('memoization with multiple selectors', () => {
+            const getPostIdsAroundPost1 = Selectors.makeGetPostIdsAroundPost();
+            const getPostIdsAroundPost2 = Selectors.makeGetPostIdsAroundPost();
+
+            const state = {
+                entities: {
+                    posts: {
+                        postsInChannel: {
+                            1234: ['a', 'b', 'c', 'd', 'e', 'f'],
+                            abcd: ['g', 'h', 'i']
+                        }
+                    }
+                }
+            };
+
+            const previous1 = getPostIdsAroundPost1(state, 'c', '1234');
+            const previous2 = getPostIdsAroundPost2(state, 'h', 'abcd', {postsBeforeCount: 0, postsAfterCount: 1});
+
+            assert.notEqual(previous1, previous2);
+
+            const now1 = getPostIdsAroundPost1(state, 'c', '1234');
+            const now2 = getPostIdsAroundPost2(state, 'i', 'abcd', {postsBeforeCount: 0, postsAfterCount: 1});
+
+            assert.equal(now1, previous1);
+            assert.notEqual(now2, previous2);
+            assert.notEqual(now1, now2);
+        });
     });
 });

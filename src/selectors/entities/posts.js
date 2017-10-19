@@ -5,6 +5,7 @@ import {createSelector} from 'reselect';
 
 import {getMyPreferences} from 'selectors/entities/preferences';
 import {getCurrentUser} from 'selectors/entities/users';
+import {createIdsSelector} from 'utils/helpers';
 
 import {Posts, Preferences} from 'constants';
 import {isPostEphemeral, isSystemMessage, shouldFilterPost, comparePosts} from 'utils/post_utils';
@@ -40,9 +41,12 @@ export function getOpenGraphMetadataForUrl(state, url) {
     return state.entities.posts.openGraph[url];
 }
 
-function getPostIdsInCurrentChannel(state) {
-    return state.entities.posts.postsInChannel[state.entities.channels.currentChannelId] || [];
-}
+export const getPostIdsInCurrentChannel = createIdsSelector(
+    (state) => state.entities.posts.postsInChannel[state.entities.channels.currentChannelId],
+    (postIdsInCurrentChannel) => {
+        return postIdsInCurrentChannel || [];
+    }
+);
 
 export const getPostsInCurrentChannel = createSelector(
     getAllPosts,
@@ -51,6 +55,55 @@ export const getPostsInCurrentChannel = createSelector(
         return postIds.map((id) => posts[id]);
     }
 );
+
+export function makeGetPostIdsForThread() {
+    return createIdsSelector(
+        getAllPosts,
+        (state, rootId) => rootId,
+        (posts, rootId) => {
+            const thread = [];
+
+            for (const id in posts) {
+                if (posts.hasOwnProperty(id)) {
+                    const post = posts[id];
+
+                    if (id === rootId || post.root_id === rootId) {
+                        thread.push(post);
+                    }
+                }
+            }
+
+            thread.sort(comparePosts);
+
+            return thread.map((post) => post.id);
+        }
+    );
+}
+
+export function makeGetPostIdsAroundPost() {
+    return createIdsSelector(
+        (state, focusedPostId, channelId) => state.entities.posts.postsInChannel[channelId],
+        (state, focusedPostId) => focusedPostId,
+        (state, focusedPostId, channelId, options) => options && options.postsBeforeCount,
+        (state, focusedPostId, channelId, options) => options && options.postsAfterCount,
+        (postIds, focusedPostId, postsBeforeCount = Posts.POST_CHUNK_SIZE / 2, postsAfterCount = Posts.POST_CHUNK_SIZE / 2) => {
+            if (!postIds) {
+                return null;
+            }
+
+            const focusedPostIndex = postIds.indexOf(focusedPostId);
+            if (focusedPostIndex === -1) {
+                return null;
+            }
+
+            const desiredPostIndexBefore = focusedPostIndex - postsBeforeCount;
+            const minPostIndex = desiredPostIndexBefore < 0 ? 0 : desiredPostIndexBefore;
+            const maxPostIndex = focusedPostIndex + postsAfterCount + 1; // Needs the extra 1 to include the focused post
+
+            return postIds.slice(minPostIndex, maxPostIndex);
+        }
+    );
+}
 
 function formatPostInChannel(post, previousPost, index, allPosts, postIds, currentUser) {
     let isFirstReply = false;
