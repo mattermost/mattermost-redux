@@ -730,6 +730,20 @@ export default class Client4 {
         );
     }
 
+    disableUserAccessToken = async (tokenId) => {
+        return this.doFetch(
+            `${this.getUsersRoute()}/tokens/disable`,
+            {method: 'post', body: JSON.stringify({token_id: tokenId})}
+        );
+    }
+
+    enableUserAccessToken = async (tokenId) => {
+        return this.doFetch(
+            `${this.getUsersRoute()}/tokens/enable`,
+            {method: 'post', body: JSON.stringify({token_id: tokenId})}
+        );
+    }
+
     // Team Routes
 
     createTeam = async (team) => {

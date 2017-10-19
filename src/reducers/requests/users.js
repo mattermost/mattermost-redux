@@ -324,6 +324,26 @@ function revokeUserAccessToken(state = initialRequestState(), action) {
     );
 }
 
+function disableUserAccessToken(state = initialRequestState(), action) {
+    return handleRequest(
+        UserTypes.DISABLE_USER_ACCESS_TOKEN_REQUEST,
+        UserTypes.DISABLE_USER_ACCESS_TOKEN_SUCCESS,
+        UserTypes.DISABLE_USER_ACCESS_TOKEN_FAILURE,
+        state,
+        action
+    );
+}
+
+function enableUserAccessToken(state = initialRequestState(), action) {
+    return handleRequest(
+        UserTypes.ENABLE_USER_ACCESS_TOKEN_REQUEST,
+        UserTypes.ENABLE_USER_ACCESS_TOKEN_SUCCESS,
+        UserTypes.ENABLE_USER_ACCESS_TOKEN_FAILURE,
+        state,
+        action
+    );
+}
+
 export default combineReducers({
     checkMfa,
     generateMfaSecret,
@@ -353,5 +373,7 @@ export default combineReducers({
     switchLogin,
     createUserAccessToken,
     getUserAccessToken,
-    revokeUserAccessToken
+    revokeUserAccessToken,
+    disableUserAccessToken,
+    enableUserAccessToken
 });

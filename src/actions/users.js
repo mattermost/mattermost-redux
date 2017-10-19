@@ -1279,6 +1279,64 @@ export function revokeUserAccessToken(tokenId) {
     };
 }
 
+export function disableUserAccessToken(tokenId) {
+    return async (dispatch, getState) => {
+        dispatch({type: UserTypes.DISABLE_USER_ACCESS_TOKEN_REQUEST});
+
+        try {
+            await Client4.disableUserAccessToken(tokenId);
+        } catch (error) {
+            forceLogoutIfNecessary(error, dispatch);
+            dispatch(batchActions([
+                {type: UserTypes.DISABLE_USER_ACCESS_TOKEN_FAILURE, error},
+                logError(error)(dispatch)
+            ]), getState);
+            return {error};
+        }
+
+        dispatch(batchActions([
+            {
+                type: UserTypes.DISABLE_USER_ACCESS_TOKEN_SUCCESS
+            },
+            {
+                type: UserTypes.DISABLED_USER_ACCESS_TOKEN,
+                data: tokenId
+            }
+        ]));
+
+        return {data: true};
+    };
+}
+
+export function enableUserAccessToken(tokenId) {
+    return async (dispatch, getState) => {
+        dispatch({type: UserTypes.ENABLE_USER_ACCESS_TOKEN_REQUEST});
+
+        try {
+            await Client4.revokeUserAccessToken(tokenId);
+        } catch (error) {
+            forceLogoutIfNecessary(error, dispatch);
+            dispatch(batchActions([
+                {type: UserTypes.ENABLE_USER_ACCESS_TOKEN_FAILURE, error},
+                logError(error)(dispatch)
+            ]), getState);
+            return {error};
+        }
+
+        dispatch(batchActions([
+            {
+                type: UserTypes.ENABLE_USER_ACCESS_TOKEN_SUCCESS
+            },
+            {
+                type: UserTypes.ENABLED_USER_ACCESS_TOKEN,
+                data: tokenId
+            }
+        ]));
+
+        return {data: true};
+    };
+}
+
 export function clearUserAccessTokens() {
     return async (dispatch) => {
         dispatch({type: UserTypes.CLEAR_MY_USER_ACCESS_TOKENS});
@@ -1325,5 +1383,7 @@ export default {
     createUserAccessToken,
     getUserAccessToken,
     getUserAccessTokensForUser,
-    revokeUserAccessToken
+    revokeUserAccessToken,
+    disableUserAccessToken,
+    enableUserAccessToken
 };
