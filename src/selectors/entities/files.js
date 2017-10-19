@@ -19,7 +19,7 @@ export function makeGetFilesForPost() {
     return createSelector(
         [getAllFiles, getFilesIdsForPost],
         (allFiles, fileIdsForPost) => {
-            return fileIdsForPost.map((id) => allFiles[id]);
+            return fileIdsForPost.map((id) => allFiles[id]).filter((id) => Boolean(id));
         }
     );
 }
