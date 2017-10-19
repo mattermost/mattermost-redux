@@ -958,28 +958,33 @@ export function markChannelAsRead(channelId, prevChannelId) {
 
             // Decrement mention_count and msg_count by the number that was read in the channel.
             // Note that this works because the values in channelMember are what was unread before this.
-            const teamUnread = {
-                team_id: channel.team_id,
-                mention_count: teamMember.mention_count - channelMember.mention_count,
-                msg_count: teamMember.msg_count - (channel.total_msg_count - channelMember.msg_count)
-            };
+            if (teamMember && channelMember) {
+                const teamUnread = {
+                    team_id: channel.team_id,
+                    mention_count: teamMember.mention_count - channelMember.mention_count,
+                    msg_count: teamMember.msg_count - (channel.total_msg_count - channelMember.msg_count)
+                };
 
-            if (prevChannel && channel.team_id === prevChannel.team_id) {
-                teamUnread.mention_count -= prevChannelMember.mention_count;
-                teamUnread.msg_count -= (prevChannel.total_msg_count - prevChannelMember.msg_count);
+                if (prevChannel && prevChannelMember && channel.team_id === prevChannel.team_id) {
+                    teamUnread.mention_count -= prevChannelMember.mention_count;
+                    teamUnread.msg_count -= (prevChannel.total_msg_count - prevChannelMember.msg_count);
+                }
+
+                teamUnreads.push(teamUnread);
             }
-
-            teamUnreads.push(teamUnread);
         }
 
         if (channel && prevChannel && prevChannel.team_id && channel.team_id !== prevChannel.team_id) {
             const prevTeamMember = teamState.myMembers[prevChannel.team_id];
 
-            teamUnreads.push({
-                team_id: prevChannel.team_id,
-                mention_count: prevTeamMember.mention_count - prevChannelMember.mention_count,
-                msg_count: prevTeamMember.msg_count - (prevChannel.total_msg_count - prevChannelMember.msg_count)
-            });
+            // We need to make sure that the user hasn't left the team
+            if (prevTeamMember) {
+                teamUnreads.push({
+                    team_id: prevChannel.team_id,
+                    mention_count: prevTeamMember.mention_count - prevChannelMember.mention_count,
+                    msg_count: prevTeamMember.msg_count - (prevChannel.total_msg_count - prevChannelMember.msg_count)
+                });
+            }
         }
 
         if (teamUnreads.length > 0) {
