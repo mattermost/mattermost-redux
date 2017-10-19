@@ -150,12 +150,12 @@ function formatPostInChannel(post, previousPost, index, allPosts, postIds, curre
         if (p.root_id === rootId && !isPostEphemeral(p)) {
             replyCount += 1;
 
-            if (p.user_id === currentUser.id) {
+            if (currentUser && p.user_id === currentUser.id) {
                 threadRepliedToByCurrentUser = true;
             }
         }
 
-        if (p.id === rootId && p.user_id === currentUser.id) {
+        if (currentUser && p.id === rootId && p.user_id === currentUser.id) {
             threadCreatedByCurrentUser = true;
         }
     });
@@ -166,7 +166,7 @@ function formatPostInChannel(post, previousPost, index, allPosts, postIds, curre
         commentsNotifyLevel = currentUser.notify_props.comments;
     }
 
-    const notCurrentUser = post.user_id !== currentUser.id || (post.props && post.props.from_webhook);
+    const notCurrentUser = (currentUser && post.user_id !== currentUser.id) || (post.props && post.props.from_webhook);
     if (notCurrentUser) {
         if (commentsNotifyLevel === 'any' && (threadCreatedByCurrentUser || threadRepliedToByCurrentUser)) {
             isCommentMention = true;
