@@ -522,6 +522,46 @@ describe('Actions.Users', () => {
         }
     });
 
+    it('revokeAllSessionsForCurrentUser', async () => {
+        const user = TestHelper.basicUser;
+        await TestHelper.basicClient4.logout();
+        let sessions = store.getState().entities.users.mySessions;
+
+        assert.strictEqual(sessions.length, 0);
+
+        await Actions.loginById(user.id, 'password1')(store.dispatch, store.getState);
+        await TestHelper.basicClient4.login(TestHelper.basicUser.email, 'password1');
+
+        await Actions.getSessions(user.id)(store.dispatch, store.getState);
+
+        const sessionsRequest = store.getState().requests.users.getSessions;
+
+        if (sessionsRequest.status === RequestStatus.FAILURE) {
+            throw new Error(JSON.stringify(sessionsRequest.error));
+        }
+
+        sessions = store.getState().entities.users.mySessions;
+        assert.ok(sessions.length > 1);
+
+        await Actions.revokeAllSessionsForUser(user.id)(store.dispatch, store.getState);
+
+        const revokeRequest = store.getState().requests.users.revokeAllSessionsForUser;
+        if (revokeRequest.status === RequestStatus.FAILURE) {
+            throw new Error(JSON.stringify(revokeRequest.error));
+        }
+
+        await Actions.getProfiles(0)(store.dispatch, store.getState);
+
+        const logoutRequest = store.getState().requests.users.logout;
+        if (logoutRequest.status === RequestStatus.FAILURE) {
+            throw new Error(JSON.stringify(logoutRequest.error));
+        }
+
+        sessions = store.getState().entities.users.mySessions;
+
+        assert.strictEqual(sessions.length, 0);
+    });
+
     it('getUserAudits', async () => {
         await TestHelper.basicClient4.login(TestHelper.basicUser.email, 'password1');
         await Actions.getUserAudits(TestHelper.basicUser.id)(store.dispatch, store.getState);

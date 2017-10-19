@@ -204,6 +204,16 @@ function revokeSession(state = initialRequestState(), action) {
     );
 }
 
+function revokeAllSessionsForUser(state = initialRequestState(), action) {
+    return handleRequest(
+        UserTypes.REVOKE_ALL_USER_SESSIONS_REQUEST,
+        UserTypes.REVOKE_ALL_USER_SESSIONS_SUCCESS,
+        UserTypes.REVOKE_ALL_USER_SESSIONS_FAILURE,
+        state,
+        action
+    );
+}
+
 function getAudits(state = initialRequestState(), action) {
     return handleRequest(
         UserTypes.AUDITS_REQUEST,
@@ -363,6 +373,7 @@ export default combineReducers({
     setStatus,
     getSessions,
     revokeSession,
+    revokeAllSessionsForUser,
     getAudits,
     autocompleteUsers,
     searchProfiles,

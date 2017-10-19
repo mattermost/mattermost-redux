@@ -583,6 +583,13 @@ export default class Client4 {
         );
     };
 
+    revokeAllSessionsForUser = async (userId) => {
+        return this.doFetch(
+            `${this.getUserRoute(userId)}/sessions/revoke/all`,
+            {method: 'post'}
+        );
+    };
+
     getUserAudits = async (userId, page = 0, perPage = PER_PAGE_DEFAULT) => {
         return this.doFetch(
             `${this.getUserRoute(userId)}/audits${buildQueryString({page, per_page: perPage})}`,

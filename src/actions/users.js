@@ -27,6 +27,7 @@ import {
 } from './preferences';
 
 import {getConfig} from 'selectors/entities/general';
+import {getCurrentUserId} from 'selectors/entities/users';
 
 export function checkMfa(loginId) {
     return async (dispatch, getState) => {
@@ -672,6 +673,32 @@ export function revokeSession(userId, sessionId) {
         ]), getState);
 
         return true;
+    };
+}
+
+export function revokeAllSessionsForUser(userId) {
+    return async (dispatch, getState) => {
+        dispatch({type: UserTypes.REVOKE_ALL_USER_SESSIONS_REQUEST}, getState);
+
+        try {
+            await Client4.revokeAllSessionsForUser(userId);
+        } catch (error) {
+            forceLogoutIfNecessary(error, dispatch);
+            dispatch(batchActions([
+                {type: UserTypes.REVOKE_ALL_USER_SESSIONS_FAILURE, error},
+                logError(error)(dispatch)
+            ]), getState);
+            return {error};
+        }
+        const data = {isCurrentUser: userId === getCurrentUserId(getState())};
+        dispatch(batchActions([
+            {
+                type: UserTypes.REVOKE_ALL_USER_SESSIONS_SUCCESS,
+                data
+            }
+        ]), getState);
+
+        return {data: true};
     };
 }
 
@@ -1362,6 +1389,7 @@ export default {
     getSessions,
     loadProfilesForDirect,
     revokeSession,
+    revokeAllSessionsForUser,
     getUserAudits,
     searchProfiles,
     startPeriodicStatusUpdates,
