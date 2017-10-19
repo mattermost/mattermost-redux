@@ -384,6 +384,10 @@ export const getSortedUnreadChannelIds = createIdsSelector(
     (currentUser, profiles, channels, members, unreadIds, settings) => {
         // If we receive an unread for a channel and then a mention the channel
         // won't be sorted correctly until we receive a message in another channel
+        if (!currentUser) {
+            return null;
+        }
+
         const locale = currentUser.locale || 'en';
         const allUnreadChannels = unreadIds.map((id) => {
             const c = channels[id];
@@ -422,6 +426,10 @@ export const getSortedFavoriteChannelIds = createIdsSelector(
     getUnreadChannelIds,
     getTeammateNameDisplaySetting,
     (currentUser, profiles, channels, myMembers, favoriteIds, teamChannelIds, unreadIds, settings) => {
+        if (!currentUser) {
+            return null;
+        }
+
         const locale = currentUser.locale || 'en';
         const favoriteChannel = favoriteIds.filter((id) => {
             if (!myMembers[id]) {
@@ -449,6 +457,10 @@ export const getSortedPublicChannelIds = createIdsSelector(
     getUnreadChannelIds,
     getSortedFavoriteChannelIds,
     (currentUser, channels, myMembers, teamChannelIds, unreadIds, favoriteIds) => {
+        if (!currentUser) {
+            return null;
+        }
+
         const locale = currentUser.locale || 'en';
         const publicChannels = teamChannelIds.filter((id) => {
             if (!myMembers[id]) {
@@ -470,6 +482,10 @@ export const getSortedPrivateChannelIds = createIdsSelector(
     getUnreadChannelIds,
     getSortedFavoriteChannelIds,
     (currentUser, channels, myMembers, teamChannelIds, unreadIds, favoriteIds) => {
+        if (!currentUser) {
+            return null;
+        }
+
         const locale = currentUser.locale || 'en';
         const publicChannels = teamChannelIds.filter((id) => {
             if (!myMembers[id]) {
@@ -493,6 +509,10 @@ export const getSortedDirectChannelIds = createIdsSelector(
     getSortedFavoriteChannelIds,
     getTeammateNameDisplaySetting,
     (currentUser, profiles, channels, teammates, groupIds, unreadIds, favoriteIds, settings) => {
+        if (!currentUser) {
+            return null;
+        }
+
         const locale = currentUser.locale || 'en';
         const channelValues = Object.values(channels);
         const directChannelsIds = [];
