@@ -908,7 +908,7 @@ describe('Selectors.Posts', () => {
         });
     });
 
-    describe('makeGetPostIdsForThread', () => {
+    describe('getPostIdsForThread', () => {
         it('single post', () => {
             const getPostIdsForThread = Selectors.makeGetPostIdsForThread();
 
@@ -1088,7 +1088,7 @@ describe('Selectors.Posts', () => {
         });
     });
 
-    describe('makeGetPostIdsAroundPost', () => {
+    describe('getPostIdsAroundPost', () => {
         it('no posts around', () => {
             const getPostIdsAroundPost = Selectors.makeGetPostIdsAroundPost();
 
@@ -1348,6 +1348,132 @@ describe('Selectors.Posts', () => {
             assert.equal(now1, previous1);
             assert.notEqual(now2, previous2);
             assert.notEqual(now1, now2);
+        });
+    });
+
+    describe('getPostsForIds', () => {
+        it('selector', () => {
+            const getPostsForIds = Selectors.makeGetPostsForIds();
+
+            const testPosts = {
+                1000: {id: '1000'},
+                1001: {id: '1001'},
+                1002: {id: '1002'},
+                1003: {id: '1003'},
+                1004: {id: '1004'}
+            };
+            const state = {
+                entities: {
+                    posts: {
+                        posts: testPosts
+                    }
+                }
+            };
+
+            const postIds = ['1000', '1002', '1003'];
+
+            const actual = getPostsForIds(state, postIds);
+            assert.equal(actual.length, 3);
+            assert.equal(actual[0], testPosts[postIds[0]]);
+            assert.equal(actual[1], testPosts[postIds[1]]);
+            assert.equal(actual[2], testPosts[postIds[2]]);
+        });
+
+        it('memoization', () => {
+            const getPostsForIds = Selectors.makeGetPostsForIds();
+
+            const testPosts = {
+                1000: {id: '1000'},
+                1001: {id: '1001'},
+                1002: {id: '1002'},
+                1003: {id: '1003'},
+                1004: {id: '1004'}
+            };
+            let state = {
+                entities: {
+                    posts: {
+                        posts: {
+                            ...testPosts
+                        }
+                    }
+                }
+            };
+            let postIds = ['1000', '1002', '1003'];
+
+            let now = getPostsForIds(state, postIds);
+            assert.deepEqual(now, [testPosts['1000'], testPosts['1002'], testPosts['1003']]);
+
+            // No changes
+            let previous = now;
+            now = getPostsForIds(state, postIds);
+            assert.deepEqual(now, [testPosts['1000'], testPosts['1002'], testPosts['1003']]);
+            assert.equal(now, previous);
+
+            // New, identical ids
+            postIds = ['1000', '1002', '1003'];
+
+            previous = now;
+            now = getPostsForIds(state, postIds);
+            assert.deepEqual(now, [testPosts['1000'], testPosts['1002'], testPosts['1003']]);
+            assert.equal(now, previous);
+
+            // New posts, no changes to ones in ids
+            state = {
+                ...state,
+                entities: {
+                    ...state.entities,
+                    posts: {
+                        ...state.entities.posts,
+                        posts: {
+                            ...state.entities.posts.posts
+                        }
+                    }
+                }
+            };
+
+            previous = now;
+            now = getPostsForIds(state, postIds);
+            assert.deepEqual(now, [testPosts['1000'], testPosts['1002'], testPosts['1003']]);
+            assert.equal(now, previous);
+
+            // New ids
+            postIds = ['1001', '1002', '1004'];
+
+            previous = now;
+            now = getPostsForIds(state, postIds);
+            assert.deepEqual(now, [testPosts['1001'], testPosts['1002'], testPosts['1004']]);
+            assert.notEqual(now, previous);
+
+            previous = now;
+            now = getPostsForIds(state, postIds);
+            assert.deepEqual(now, [testPosts['1001'], testPosts['1002'], testPosts['1004']]);
+            assert.equal(now, previous);
+
+            // New posts, changes to ones in ids
+            const newPost = {id: '1002', message: 'abcd'};
+            state = {
+                ...state,
+                entities: {
+                    ...state.entities,
+                    posts: {
+                        ...state.entities.posts,
+                        posts: {
+                            ...state.entities.posts.posts,
+                            [newPost.id]: newPost
+                        }
+                    }
+                }
+            };
+
+            previous = now;
+            now = getPostsForIds(state, postIds);
+            assert.deepEqual(now, [testPosts['1001'], newPost, testPosts['1004']]);
+            assert.notEqual(now, previous);
+
+            previous = now;
+            now = getPostsForIds(state, postIds);
+            assert.deepEqual(now, [testPosts['1001'], newPost, testPosts['1004']]);
+            assert.equal(now, previous);
         });
     });
 });

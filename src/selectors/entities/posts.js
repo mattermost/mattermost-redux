@@ -201,11 +201,11 @@ export function makeGetPostsInChannel() {
             const posts = [];
 
             const joinLeavePref = myPreferences[getPreferenceKey(Preferences.CATEGORY_ADVANCED_SETTINGS, 'join_leave')];
-            const filterJoinLeave = joinLeavePref ? joinLeavePref.value === 'false' : false;
+            const showJoinLeave = joinLeavePref ? joinLeavePref.value !== 'false' : true;
 
             for (let i = 0; i < postIds.length; i++) {
                 const post = allPosts[postIds[i]];
-                if (!shouldFilterPost(post, {filterJoinLeave})) {
+                if (!shouldFilterPost(post, {showJoinLeave})) {
                     const previousPost = allPosts[postIds[i + 1]] || {create_at: 0};
                     posts.push(formatPostInChannel(post, previousPost, i, allPosts, postIds, currentUser));
                 }
@@ -240,11 +240,11 @@ export function makeGetPostsAroundPost() {
 
             const posts = [];
             const joinLeavePref = myPreferences[getPreferenceKey(Preferences.CATEGORY_ADVANCED_SETTINGS, 'join_leave')];
-            const filterJoinLeave = joinLeavePref ? joinLeavePref.value === 'false' : false;
+            const showJoinLeave = joinLeavePref ? joinLeavePref.value !== 'false' : true;
 
             for (let i = 0; i < slicedPostIds.length; i++) {
                 const post = allPosts[slicedPostIds[i]];
-                if (!shouldFilterPost(post, {filterJoinLeave})) {
+                if (!shouldFilterPost(post, {showJoinLeave})) {
                     const previousPost = allPosts[slicedPostIds[i + 1]] || {create_at: 0};
                     const formattedPost = formatPostInChannel(post, previousPost, i, allPosts, slicedPostIds, currentUser);
 
@@ -328,5 +328,15 @@ export function makeGetMessageInHistoryItem(type) {
           }
           return '';
       }
+    );
+}
+
+export function makeGetPostsForIds() {
+    return createIdsSelector(
+        getAllPosts,
+        (state, postIds) => postIds,
+        (allPosts, postIds) => {
+            return postIds.map((id) => allPosts[id]);
+        }
     );
 }
