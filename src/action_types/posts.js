@@ -55,6 +55,7 @@ export default keyMirror({
     GET_POSTS_AFTER_WITH_RETRY_ATTEMPT: null,
 
     RECEIVED_POST: null,
+    RECEIVED_NEW_POST: null,
     RECEIVED_POSTS: null,
     RECEIVED_FOCUSED_POST: null,
     RECEIVED_POST_SELECTED: null,

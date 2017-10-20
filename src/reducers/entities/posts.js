@@ -198,7 +198,15 @@ function handleRemovePost(posts = {}, postsInChannel = {}, action) {
 
 function handlePosts(posts = {}, postsInChannel = {}, action) {
     switch (action.type) {
-    case PostTypes.RECEIVED_POST:
+    case PostTypes.RECEIVED_POST: {
+        const nextPosts = {...posts};
+        nextPosts[action.data.id] = action.data;
+        return {
+            posts: nextPosts,
+            postsInChannel
+        };
+    }
+    case PostTypes.RECEIVED_NEW_POST:
         return handleReceivedPost(posts, postsInChannel, action);
     case PostTypes.RECEIVED_POSTS:
         return handleReceivedPosts(posts, postsInChannel, action);
