@@ -12,6 +12,8 @@ export default keyMirror({
      * The same action as `Constants.ActionTypes.RECEIVE_SEARCH`
      */
     RECEIVED_SEARCH: null,
+    RECEIVED_PINNED_POSTS: null,
+    RECEIVED_FLAGGED_POSTS: null,
     RECEIVED_SEARCH_POSTS: null,
     RECEIVED_SEARCH_TERM: null,
     REMOVE_SEARCH_POSTS: null,

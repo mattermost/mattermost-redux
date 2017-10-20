@@ -61,106 +61,15 @@ function recent(state = {}, action) {
     }
 }
 
-/*
- * Search reducer for mattermost-webapp will replace `SearchStore`
- * Structure is:
- * {
- *     term: string on null - searching terms,
- *     searchResults: array or null - list of searched posts
- *     isMentionSearch: boolean - is searched be mentions
- *     isFlaggedPosts: boolean - is searched flagged posts
- *     isPinnedPosts: boolean - is searched boolean posts
- * }
- */
-function search(
-    state = {
-        term: '',
-        searchResults: false,
-        isMentionSearch: false,
-        isFlaggedPosts: false,
-        isPinnedPosts: false
-    },
-    action
-) {
+function pinnedPosts(state = {}, action) {
     const {type, data} = action;
 
     switch (type) {
-    case SearchTypes.RECEIVED_SEARCH: {
-        const {
-            results: searchResults,
-            is_mention_search: isMentionSearch,
-            is_flagged_posts: isFlaggedPosts,
-            is_pinned_posts: isPinnedPosts
-        } = data;
+    case SearchTypes.RECEIVED_PINNED_POSTS: {
+        const {channelId, order} = data;
         return {
             ...state,
-            searchResults,
-            isMentionSearch,
-            isFlaggedPosts,
-            isPinnedPosts
-        };
-    }
-    case SearchTypes.RECEIVED_SEARCH_TERM: {
-        let updatedState = state;
-        const {do_search: doSearch, term} = data;
-        if (doSearch) {
-            updatedState = {
-                ...state,
-                searchResults: null,
-                isMentionSearch: false,
-                isFlaggedPosts: false,
-                isPinnedPosts: false,
-            };
-        }
-        updatedState = {...updatedState, term};
-        return updatedState;
-    }
-    case PostTypes.POST_DELETED:
-    case PostTypes.REMOVE_POST: {
-        const {searchResults} = state;
-
-        if (!searchResults) {
-            return state;
-        }
-
-        const {posts, order} = searchResults;
-
-        if (posts[data.id]) {
-            const updatedPosts = {...posts};
-            Reflect.deleteProperty(updatedPosts, data.id);
-            const updatedOrder = order.filter((item) => item.id !== data.id);
-            return {
-                ...state,
-                searchResults: {
-                    posts: updatedPosts,
-                    order: updatedOrder,
-                }
-            };
-        }
-        return state;
-    }
-    case PostTypes.RECEIVED_POST: {
-        const {searchResults} = state;
-
-        if (!searchResults) {
-            return state;
-        }
-
-        const {posts} = searchResults;
-        if (!posts[data.id]) {
-            return state;
-        }
-
-        const updatedPosts = {
-            ...posts,
-            [data.id]: data
-        };
-        return {
-            ...state,
-            searchResults: {
-                ...searchResults,
-                posts: updatedPosts
-            }
+            [channelId]: order
         };
     }
     default:
@@ -177,6 +86,6 @@ export default combineReducers({
     // an object where the key is the term and the value indicates is "or" search
     recent,
 
-    //Reducer that will store information like StoreSearch in mattermost-webapp
-    search
+    // reducer to store pinnedPosts posts
+    pinnedPosts,
 });

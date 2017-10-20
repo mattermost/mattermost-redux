@@ -910,7 +910,7 @@ export function getFlaggedPosts() {
                     }
                 },
                 {
-                    type: SearchTypes.RECEIVED_SEARCH,
+                    type: SearchTypes.RECEIVED_FLAGGED_POSTS,
                     data: {
                         results: data,
                         is_flagged_posts: true,
@@ -951,11 +951,14 @@ export function getPinnedPosts(channelId) {
                     }
                 },
                 {
-                    type: SearchTypes.RECEIVED_SEARCH,
+                    data,
+                    channelId: requestedChannelId,
+                    type: PostTypes.RECEIVED_POSTS
+                },
+                {
+                    type: SearchTypes.RECEIVED_PINNED_POSTS,
                     data: {
-                        results: data,
-                        is_flagged_posts: false,
-                        is_pinned_posts: true,
+                        ...data,
                         channelId: requestedChannelId,
                     }
                 }
