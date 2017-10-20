@@ -662,14 +662,25 @@ describe('Actions.Users', () => {
 
     it('revokeAllSessionsForCurrentUser', async () => {
         const user = TestHelper.basicUser;
+        nock(Client4.getUsersRoute()).
+            post('/logout').
+            reply(200, OK_RESPONSE);
         await TestHelper.basicClient4.logout();
         let sessions = store.getState().entities.users.mySessions;
 
         assert.strictEqual(sessions.length, 0);
 
+        TestHelper.mockLogin();
         await Actions.loginById(user.id, 'password1')(store.dispatch, store.getState);
+
+        nock(Client4.getUsersRoute()).
+            post('/login').
+            reply(200, TestHelper.basicUser);
         await TestHelper.basicClient4.login(TestHelper.basicUser.email, 'password1');
 
+        nock(Client4.getBaseRoute()).
+            get(`/users/${user.id}/sessions`).
+            reply(200, [{id: TestHelper.generateId(), create_at: 1507756921338, expires_at: 1510348921338, last_activity_at: 1507821125630, user_id: TestHelper.basicUser.id, device_id: '', roles: 'system_admin system_user'}, {id: TestHelper.generateId(), create_at: 1507756921338, expires_at: 1510348921338, last_activity_at: 1507821125630, user_id: TestHelper.basicUser.id, device_id: '', roles: 'system_admin system_user'}]);
         await Actions.getSessions(user.id)(store.dispatch, store.getState);
 
         const sessionsRequest = store.getState().requests.users.getSessions;
@@ -681,6 +692,9 @@ describe('Actions.Users', () => {
         sessions = store.getState().entities.users.mySessions;
         assert.ok(sessions.length > 1);
 
+        nock(Client4.getBaseRoute()).
+            post(`/users/${user.id}/sessions/revoke/all`).
+            reply(200, OK_RESPONSE);
         await Actions.revokeAllSessionsForUser(user.id)(store.dispatch, store.getState);
 
         const revokeRequest = store.getState().requests.users.revokeAllSessionsForUser;
@@ -688,6 +702,10 @@ describe('Actions.Users', () => {
             throw new Error(JSON.stringify(revokeRequest.error));
         }
 
+        nock(Client4.getUsersRoute()).
+            get('').
+            query(true).
+            reply(401, {});
         await Actions.getProfiles(0)(store.dispatch, store.getState);
 
         const logoutRequest = store.getState().requests.users.logout;
