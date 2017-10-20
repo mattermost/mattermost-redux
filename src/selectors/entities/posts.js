@@ -205,7 +205,7 @@ export function makeGetPostsInChannel() {
 
             for (let i = 0; i < postIds.length; i++) {
                 const post = allPosts[postIds[i]];
-                if (!shouldFilterPost(post, {filterJoinLeave})) {
+                if (post && !shouldFilterPost(post, {filterJoinLeave})) {
                     const previousPost = allPosts[postIds[i + 1]] || {create_at: 0};
                     posts.push(formatPostInChannel(post, previousPost, i, allPosts, postIds, currentUser));
                 }
@@ -244,7 +244,7 @@ export function makeGetPostsAroundPost() {
 
             for (let i = 0; i < slicedPostIds.length; i++) {
                 const post = allPosts[slicedPostIds[i]];
-                if (!shouldFilterPost(post, {filterJoinLeave})) {
+                if (post && !shouldFilterPost(post, {filterJoinLeave})) {
                     const previousPost = allPosts[slicedPostIds[i + 1]] || {create_at: 0};
                     const formattedPost = formatPostInChannel(post, previousPost, i, allPosts, slicedPostIds, currentUser);
 

@@ -36,6 +36,16 @@ function deletePost(state = initialRequestState(), action) {
     );
 }
 
+function deletePosts(state = initialRequestState(), action) {
+    return handleRequest(
+        PostTypes.DELETE_POSTS_REQUEST,
+        PostTypes.DELETE_POSTS_SUCCESS,
+        PostTypes.DELETE_POSTS_FAILURE,
+        state,
+        action
+    );
+}
+
 function getPostThread(state = initialRequestState(), action) {
     return handleRequest(
         PostTypes.GET_POST_THREAD_REQUEST,
@@ -183,6 +193,7 @@ export default combineReducers({
     createPost,
     editPost,
     deletePost,
+    deletePosts,
     getPostThread,
     getPostThreadRetryAttempts: getPostThreadWithRetryAttempt,
     getPosts,

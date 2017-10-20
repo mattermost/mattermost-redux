@@ -3,16 +3,26 @@
 
 import {PostTypes, SearchTypes, UserTypes} from 'action_types';
 import {Posts} from 'constants';
-import {comparePosts} from 'utils/post_utils';
+import {comparePosts, isPostUserActivity} from 'utils/post_utils';
 
 function handleReceivedPost(posts = {}, postsInChannel = {}, action) {
     const post = action.data;
     const channelId = post.channel_id;
+    const firstPost = posts[postsInChannel[channelId][0]];
+    let nextPosts = {};
 
-    const nextPosts = {
-        ...posts,
-        [post.id]: post
-    };
+    if (firstPost &&
+        isPostUserActivity(firstPost.type) &&
+        firstPost.system_ids.length < PostTypes.POST_PROPS_USER_ACTIVITIES_MAX &&
+        isPostUserActivity(post.type)
+    ) {
+        combineUserActivitySystemMessage(post, firstPost);
+    } else {
+        nextPosts = {
+            ...posts,
+            [post.id]: post
+        };
+    }
 
     let nextPostsForChannel = postsInChannel;
 
@@ -29,6 +39,25 @@ function handleReceivedPost(posts = {}, postsInChannel = {}, action) {
     }
 
     return {posts: nextPosts, postsInChannel: nextPostsForChannel};
+}
+
+function combineUserActivitySystemMessage(newPost, firstPost) {
+    const props = firstPost.props;
+    let message = firstPost.message;
+    let systemIds = firstPost.system_ids;
+    message += ` ${newPost.message}`;
+    systemIds = [...systemIds, newPost.id];
+
+    let userActivities = props.user_activities;
+    userActivities = [...userActivities, {...newPost.props, type: newPost.type}];
+    const newProps = {...props, user_activities: userActivities};
+
+    return {
+        ...firstPost,
+        message,
+        system_ids: systemIds,
+        props: newProps
+    };
 }
 
 function handleReceivedPosts(posts = {}, postsInChannel = {}, action) {
@@ -82,15 +111,72 @@ function handleReceivedPosts(posts = {}, postsInChannel = {}, action) {
         }
     }
 
+    // Remove missing post most likely due to consolidated system messages and then
     // Sort to ensure that the most recent posts are first, with pending
     // and failed posts first
-    postsForChannel.sort((a, b) => {
+    const updatedPostsForChannel = postsForChannel.filter((postId) => {
+        return typeof nextPosts[postId] !== 'undefined';
+    }).sort((a, b) => {
         return comparePosts(nextPosts[a], nextPosts[b]);
     });
 
-    nextPostsForChannel[channelId] = postsForChannel;
+    const withCombinedPosts = combineUserActivitySystemMessages(nextPosts, updatedPostsForChannel);
 
-    return {posts: nextPosts, postsInChannel: nextPostsForChannel};
+    nextPostsForChannel[channelId] = withCombinedPosts.nextPostsForChannel;
+    return {posts: withCombinedPosts.nextPosts, postsInChannel: nextPostsForChannel};
+}
+
+function combineUserActivitySystemMessages(posts = {}, order = []) {
+    let combinedPosts;
+    const {POST_PROPS_USER_ACTIVITIES, POST_PROPS_USER_ACTIVITIES_MAX} = Posts;
+
+    return order.reduce((acc, postId, index, arr) => {
+        const post = posts[postId];
+        const {nextPosts, nextPostsForChannel} = acc;
+        const nextPost = {};
+
+        function pushCombinedPosts(p) {
+            nextPost[p.id] = p;
+            nextPostsForChannel.push(p.id);
+
+            return null;
+        }
+
+        if (isPostUserActivity(post.type)) {
+            if (combinedPosts) {
+                combinedPosts = combineUserActivitySystemMessage(post, combinedPosts);
+            } else {
+                const props = {};
+                if (post.props.user_activities) {
+                    nextPost[post.id] = post;
+                    nextPostsForChannel.push(post.id);
+                } else {
+                    props[POST_PROPS_USER_ACTIVITIES] = [{...post.props, type: post.type}];
+                    combinedPosts = {
+                        ...post,
+                        system_ids: [post.id],
+                        props
+                    };
+                }
+            }
+        } else {
+            if (combinedPosts) {
+                combinedPosts = pushCombinedPosts(combinedPosts);
+            }
+
+            nextPost[post.id] = post;
+            nextPostsForChannel.push(post.id);
+        }
+
+        if (combinedPosts && (arr.length === index + 1 || combinedPosts.system_ids.length === POST_PROPS_USER_ACTIVITIES_MAX)) {
+            combinedPosts = pushCombinedPosts(combinedPosts);
+        }
+
+        return {
+            nextPosts: {...nextPosts, ...nextPost},
+            nextPostsForChannel
+        };
+    }, {nextPosts: {}, nextPostsForChannel: []});
 }
 
 function handlePostsFromSearch(posts = {}, postsInChannel = {}, action) {

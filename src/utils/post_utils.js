@@ -109,3 +109,7 @@ export function comparePosts(a, b) {
 
     return 0;
 }
+
+export function isPostUserActivity(postType) {
+    return Posts.USER_ACTIVITY_POST_TYPES.includes(postType);
+}

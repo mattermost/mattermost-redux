@@ -60,6 +60,7 @@ export default keyMirror({
     RECEIVED_POST_SELECTED: null,
     RECEIVED_EDIT_POST: null,
     POST_DELETED: null,
+    POSTS_DELETED: null,
     REMOVE_POST: null,
     RECEIVED_REACTION: null,
     RECEIVED_REACTIONS: null,

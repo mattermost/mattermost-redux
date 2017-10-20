@@ -170,6 +170,10 @@ const state = {
                 status: 'not_started',
                 error: null
             },
+            deletePosts: {
+                status: 'not_started',
+                error: null
+            },
             getPostThread: {
                 status: 'not_started',
                 error: null

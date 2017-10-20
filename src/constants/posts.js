@@ -18,6 +18,7 @@ const PostTypes = {
 export default {
     POST_CHUNK_SIZE: 60,
     POST_DELETED: 'DELETED',
+    POSTS_DELETED: 'POSTS_DELETED',
     SYSTEM_MESSAGE_PREFIX: 'system_',
     POST_TYPES: PostTypes,
     MESSAGE_TYPES: {
@@ -34,5 +35,15 @@ export default {
         PostTypes.JOIN_CHANNEL,
         PostTypes.LEAVE_CHANNEL,
         PostTypes.REMOVE_FROM_CHANNEL
-    ]
+    ],
+    USER_ACTIVITY_POST_TYPES: [
+        PostTypes.ADD_REMOVE,
+        PostTypes.ADD_TO_CHANNEL,
+        PostTypes.REMOVE_FROM_CHANNEL,
+        PostTypes.JOIN_LEAVE,
+        PostTypes.JOIN_CHANNEL,
+        PostTypes.LEAVE_CHANNEL
+    ],
+    POST_PROPS_USER_ACTIVITIES: 'user_activities',
+    POST_PROPS_USER_ACTIVITIES_MAX: 30
 };

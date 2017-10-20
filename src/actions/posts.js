@@ -7,7 +7,6 @@ import {Client4} from 'client';
 import {General, Preferences, Posts} from 'constants';
 import {PostTypes, FileTypes} from 'action_types';
 import {getUsersByUsername} from 'selectors/entities/users';
-
 import * as Selectors from 'selectors/entities/posts';
 
 import {bindClientFunc, forceLogoutIfNecessary} from './helpers';
@@ -134,6 +133,27 @@ export function deletePost(post) {
                     rollback: {
                         type: PostTypes.RECEIVED_POST,
                         data: delPost
+                    }
+                }
+            }
+        });
+    };
+}
+
+export function deletePosts(postIds) {
+    return async (dispatch) => {
+        const delPosts = [...postIds];
+
+        dispatch({
+            type: PostTypes.POSTS_DELETED,
+            data: delPosts,
+            meta: {
+                offline: {
+                    effect: () => () => Client4.deletePosts(delPosts),
+                    commit: {type: PostTypes.POSTS_DELETED},
+                    rollback: {
+                        type: PostTypes.RECEIVED_POSTS,
+                        data: delPosts
                     }
                 }
             }
@@ -939,6 +959,7 @@ export default {
     createPost,
     editPost,
     deletePost,
+    deletePosts,
     removePost,
     getPostThread,
     getPostThreadWithRetry,
