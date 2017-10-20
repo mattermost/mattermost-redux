@@ -910,12 +910,12 @@ export function getFlaggedPosts() {
                     }
                 },
                 {
-                    type: SearchTypes.RECEIVED_FLAGGED_POSTS,
-                    data: {
-                        results: data,
-                        is_flagged_posts: true,
-                        is_mention_search: false,
-                    }
+                    data,
+                    type: SearchTypes.RECEIVED_FLAGGED_POSTS
+                },
+                {
+                    data,
+                    type: SearchTypes.RECEIVED_SEARCH_POSTS
                 }
             ]));
 
@@ -929,7 +929,7 @@ export function getFlaggedPosts() {
             ]), getState);
             return null;
         }
-    }
+    };
 }
 
 export function getPinnedPosts(channelId) {
@@ -959,7 +959,7 @@ export function getPinnedPosts(channelId) {
                     type: SearchTypes.RECEIVED_PINNED_POSTS,
                     data: {
                         ...data,
-                        channelId: requestedChannelId,
+                        channelId: requestedChannelId
                     }
                 }
             ]));

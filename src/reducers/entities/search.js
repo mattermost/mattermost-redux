@@ -2,7 +2,7 @@
 // See License.txt for license information.
 
 import {combineReducers} from 'redux';
-import {SearchTypes, UserTypes, PostTypes} from 'action_types';
+import {SearchTypes, UserTypes} from 'action_types';
 
 function results(state = [], action) {
     switch (action.type) {
@@ -77,6 +77,19 @@ function pinnedPosts(state = {}, action) {
     }
 }
 
+function flaggedPosts(state = [], action) {
+    const {type, data} = action;
+
+    switch (type) {
+    case SearchTypes.RECEIVED_FLAGGED_POSTS: {
+        const {order} = data;
+        return order;
+    }
+    default:
+        return state;
+    }
+}
+
 export default combineReducers({
 
     // An ordered array with posts ids from the search results
@@ -88,4 +101,5 @@ export default combineReducers({
 
     // reducer to store pinnedPosts posts
     pinnedPosts,
+    flaggedPosts
 });
