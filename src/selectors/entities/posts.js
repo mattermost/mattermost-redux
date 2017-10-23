@@ -313,6 +313,10 @@ export const getSearchResults = createSelector(
     getAllPosts,
     (state) => state.entities.search.results,
     (posts, postIds) => {
+        if (!postIds) {
+            return [];
+        }
+
         return postIds.map((id) => posts[id]);
     }
 );
@@ -336,6 +340,10 @@ export function makeGetPostsForIds() {
         getAllPosts,
         (state, postIds) => postIds,
         (allPosts, postIds) => {
+            if (!postIds) {
+                return [];
+            }
+
             return postIds.map((id) => allPosts[id]);
         }
     );
