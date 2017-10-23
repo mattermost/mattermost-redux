@@ -235,7 +235,7 @@ export function logout() {
     );
 }
 
-export function getProfiles(page = 0, perPage = General.PROFILE_CHUNK_SIZE) {
+export function getProfiles(page = 0, perPage = General.PROFILE_CHUNK_SIZE, skipCurrent = true) {
     return async (dispatch, getState) => {
         dispatch({type: UserTypes.PROFILES_REQUEST}, getState);
 
@@ -244,7 +244,9 @@ export function getProfiles(page = 0, perPage = General.PROFILE_CHUNK_SIZE) {
         let profiles;
         try {
             profiles = await Client4.getProfiles(page, perPage);
-            removeUserFromList(currentUserId, profiles);
+            if (skipCurrent) {
+                removeUserFromList(currentUserId, profiles);
+            }
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch);
             dispatch(batchActions([
