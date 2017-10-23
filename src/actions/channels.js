@@ -22,7 +22,10 @@ export function selectChannel(channelId) {
             }, getState);
         } catch (error) {
             logError(error)(dispatch);
+            return {error};
         }
+
+        return {data: true};
     };
 }
 
@@ -53,7 +56,7 @@ export function createChannel(channel, userId) {
                 },
                 logError(error)(dispatch)
             ]), getState);
-            return null;
+            return {error};
         }
 
         const member = {
@@ -88,7 +91,7 @@ export function createChannel(channel, userId) {
             }
         ]), getState);
 
-        return created;
+        return {data: created};
     };
 }
 
@@ -229,7 +232,7 @@ export function patchChannel(channelId, patch) {
                 {type: ChannelTypes.UPDATE_CHANNEL_FAILURE, error},
                 logError(error)(dispatch)
             ]), getState);
-            return null;
+            return {error};
         }
 
         dispatch(batchActions([
@@ -242,7 +245,7 @@ export function patchChannel(channelId, patch) {
             }
         ]), getState);
 
-        return updated;
+        return {data: updated};
     };
 }
 
@@ -260,7 +263,7 @@ export function updateChannel(channel) {
                 {type: ChannelTypes.UPDATE_CHANNEL_FAILURE, error},
                 logError(error)(dispatch)
             ]), getState);
-            return null;
+            return {error};
         }
 
         dispatch(batchActions([
@@ -273,7 +276,7 @@ export function updateChannel(channel) {
             }
         ]), getState);
 
-        return updated;
+        return {data: updated};
     };
 }
 
@@ -296,7 +299,7 @@ export function updateChannelNotifyProps(userId, channelId, props) {
                 {type: ChannelTypes.NOTIFY_PROPS_FAILURE, error},
                 logError(error)(dispatch)
             ]), getState);
-            return null;
+            return {error};
         }
 
         const member = getState().entities.channels.myMembers[channelId] || {};
@@ -315,7 +318,7 @@ export function updateChannelNotifyProps(userId, channelId, props) {
             }
         ]), getState);
 
-        return true;
+        return {data: true};
     };
 }
 
@@ -332,7 +335,7 @@ export function getChannel(channelId) {
                 {type: ChannelTypes.CHANNELS_FAILURE, error},
                 logError(error)(dispatch)
             ]), getState);
-            return null;
+            return {error};
         }
 
         dispatch(batchActions([
@@ -345,7 +348,7 @@ export function getChannel(channelId) {
             }
         ]), getState);
 
-        return data;
+        return {data};
     };
 }
 
@@ -364,7 +367,7 @@ export function getChannelAndMyMember(channelId) {
                 {type: ChannelTypes.CHANNELS_FAILURE, error},
                 logError(error)(dispatch)
             ]), getState);
-            return null;
+            return {error};
         }
 
         dispatch(batchActions([
@@ -381,7 +384,7 @@ export function getChannelAndMyMember(channelId) {
             }
         ]), getState);
 
-        return {channel, member};
+        return {data: {channel, member}};
     };
 }
 
@@ -407,7 +410,7 @@ export function fetchMyChannelsAndMembers(teamId) {
                 {type: ChannelTypes.CHANNEL_MEMBERS_FAILURE, error},
                 logError(error)(dispatch)
             ]), getState);
-            return null;
+            return {error};
         }
 
         try {
@@ -419,7 +422,7 @@ export function fetchMyChannelsAndMembers(teamId) {
                 {type: ChannelTypes.CHANNEL_MEMBERS_FAILURE, error},
                 logError(error)(dispatch)
             ]), getState);
-            return null;
+            return {error};
         }
 
         const {currentUserId} = getState().entities.users;
@@ -444,7 +447,7 @@ export function fetchMyChannelsAndMembers(teamId) {
             }
         ]), getState);
 
-        return {channels, members: channelMembers};
+        return {data: {channels, members: channelMembers}};
     };
 }
 
@@ -463,7 +466,7 @@ export function getMyChannelMembers(teamId) {
                 {type: ChannelTypes.CHANNEL_MY_MEMBERS_FAILURE, error},
                 logError(error)(dispatch)
             ]), getState);
-            return null;
+            return {error};
         }
 
         const {currentUserId} = getState().entities.users;
@@ -480,7 +483,7 @@ export function getMyChannelMembers(teamId) {
             }
         ]), getState);
 
-        return channelMembers;
+        return {data: channelMembers};
     };
 }
 
@@ -499,7 +502,7 @@ export function getChannelMembers(channelId, page = 0, perPage = General.CHANNEL
                 {type: ChannelTypes.CHANNEL_MEMBERS_FAILURE, error},
                 logError(error)(dispatch)
             ]), getState);
-            return null;
+            return {error};
         }
 
         const userIds = channelMembers.map((cm) => cm.user_id);
@@ -515,7 +518,7 @@ export function getChannelMembers(channelId, page = 0, perPage = General.CHANNEL
             }
         ]), getState);
 
-        return channelMembers;
+        return {data: channelMembers};
     };
 }
 
@@ -556,6 +559,8 @@ export function leaveChannel(channelId) {
                 }
             }
         });
+
+        return {data: true};
     };
 }
 
@@ -657,7 +662,7 @@ export function viewChannel(channelId, prevChannelId = '') {
                 {type: ChannelTypes.UPDATE_LAST_VIEWED_FAILURE, error},
                 logError(error)(dispatch)
             ]), getState);
-            return null;
+            return {error};
         }
 
         const actions = [{type: ChannelTypes.UPDATE_LAST_VIEWED_SUCCESS}];
@@ -681,7 +686,7 @@ export function viewChannel(channelId, prevChannelId = '') {
 
         dispatch(batchActions(actions), getState);
 
-        return true;
+        return {data: true};
     };
 }
 
@@ -698,7 +703,7 @@ export function getChannels(teamId, page = 0, perPage = General.CHANNELS_CHUNK_S
                 {type: ChannelTypes.GET_CHANNELS_FAILURE, error},
                 logError(error)(dispatch)
             ]), getState);
-            return null;
+            return {error};
         }
 
         dispatch(batchActions([
@@ -712,7 +717,7 @@ export function getChannels(teamId, page = 0, perPage = General.CHANNELS_CHUNK_S
             }
         ]), getState);
 
-        return channels;
+        return {data: channels};
     };
 }
 
@@ -729,7 +734,7 @@ export function searchChannels(teamId, term) {
                 {type: ChannelTypes.GET_CHANNELS_FAILURE, error},
                 logError(error)(dispatch)
             ]), getState);
-            return null;
+            return {error};
         }
 
         dispatch(batchActions([
@@ -743,7 +748,7 @@ export function searchChannels(teamId, term) {
             }
         ]), getState);
 
-        return channels;
+        return {data: channels};
     };
 }
 
@@ -760,7 +765,7 @@ export function getChannelStats(channelId) {
                 {type: ChannelTypes.CHANNEL_STATS_FAILURE, error},
                 logError(error)(dispatch)
             ]), getState);
-            return null;
+            return {error};
         }
 
         dispatch(batchActions([
@@ -773,7 +778,7 @@ export function getChannelStats(channelId) {
             }
         ]), getState);
 
-        return stat;
+        return {data: stat};
     };
 }
 
@@ -790,7 +795,7 @@ export function addChannelMember(channelId, userId) {
                 {type: ChannelTypes.ADD_CHANNEL_MEMBER_FAILURE, error},
                 logError(error)(dispatch)
             ]), getState);
-            return null;
+            return {error};
         }
 
         Client4.trackEvent('action', 'action_channels_add_member', {channel_id: channelId});
@@ -811,7 +816,7 @@ export function addChannelMember(channelId, userId) {
             }
         ], 'ADD_CHANNEL_MEMBER.BATCH'), getState);
 
-        return member;
+        return {data: member};
     };
 }
 
@@ -827,7 +832,7 @@ export function removeChannelMember(channelId, userId) {
                 {type: ChannelTypes.REMOVE_CHANNEL_MEMBER_FAILURE, error},
                 logError(error)(dispatch)
             ]), getState);
-            return null;
+            return {error};
         }
 
         Client4.trackEvent('action', 'action_channels_remove_member', {channel_id: channelId});
@@ -844,7 +849,7 @@ export function removeChannelMember(channelId, userId) {
             }
         ], 'REMOVE_CHANNEL_MEMBER.BATCH'), getState);
 
-        return true;
+        return {data: true};
     };
 }
 
@@ -860,7 +865,7 @@ export function updateChannelMemberRoles(channelId, userId, roles) {
                 {type: ChannelTypes.UPDATE_CHANNEL_MEMBER_FAILURE, error},
                 logError(error)(dispatch)
             ]), getState);
-            return null;
+            return {error};
         }
 
         const actions = [
@@ -881,7 +886,7 @@ export function updateChannelMemberRoles(channelId, userId, roles) {
 
         dispatch(batchActions(actions), getState);
 
-        return true;
+        return {data: true};
     };
 }
 
@@ -896,6 +901,8 @@ export function updateChannelHeader(channelId, header) {
                 header
             }
         }, getState);
+
+        return {data: true};
     };
 }
 
@@ -910,6 +917,8 @@ export function updateChannelPurpose(channelId, purpose) {
                 purpose
             }
         }, getState);
+
+        return {data: true};
     };
 }
 
@@ -997,6 +1006,8 @@ export function markChannelAsRead(channelId, prevChannelId) {
         if (actions.length > 0) {
             dispatch(batchActions(actions), getState);
         }
+
+        return {data: true};
     };
 }
 
@@ -1055,6 +1066,8 @@ export function markChannelAsUnread(teamId, channelId, mentionsArray) {
         if (actions.length) {
             dispatch(batchActions(actions), getState);
         }
+
+        return {data: true};
     };
 }
 
@@ -1102,7 +1115,7 @@ export function favoriteChannel(channelId) {
 
         Client4.trackEvent('action', 'action_channels_favorite');
 
-        savePreferences(currentUserId, [preference])(dispatch, getState);
+        return await savePreferences(currentUserId, [preference])(dispatch, getState);
     };
 }
 
@@ -1117,7 +1130,7 @@ export function unfavoriteChannel(channelId) {
 
         Client4.trackEvent('action', 'action_channels_unfavorite');
 
-        deletePreferences(currentUserId, [preference])(dispatch, getState);
+        return await deletePreferences(currentUserId, [preference])(dispatch, getState);
     };
 }
 

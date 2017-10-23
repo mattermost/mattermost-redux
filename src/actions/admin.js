@@ -273,7 +273,7 @@ export function getAnalytics(name, teamId = '') {
                 {type: AdminTypes.GET_ANALYTICS_FAILURE, error},
                 logError(error)(dispatch)
             ]), getState);
-            return null;
+            return {error};
         }
 
         const actions = [{type: AdminTypes.GET_ANALYTICS_SUCCESS}];
@@ -285,7 +285,7 @@ export function getAnalytics(name, teamId = '') {
 
         dispatch(batchActions(actions), getState);
 
-        return data;
+        return {data};
     };
 }
 

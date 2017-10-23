@@ -29,8 +29,7 @@ describe('Actions.Users', () => {
     });
 
     it('createUser', async () => {
-        let user = TestHelper.fakeUser();
-        user = await Actions.createUser(user)(store.dispatch, store.getState);
+        const {data: user} = await Actions.createUser(TestHelper.fakeUser())(store.dispatch, store.getState);
 
         const state = store.getState();
         const createRequest = state.requests.users.create;
@@ -708,7 +707,7 @@ describe('Actions.Users', () => {
 
     it('checkMfa', async () => {
         const user = TestHelper.basicUser;
-        const mfaRequired = await Actions.checkMfa(user.email)(store.dispatch, store.getState);
+        const {data: mfaRequired} = await Actions.checkMfa(user.email)(store.dispatch, store.getState);
 
         const state = store.getState();
         const mfaRequest = state.requests.users.checkMfa;

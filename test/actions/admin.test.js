@@ -212,7 +212,7 @@ describe('Actions.Admin', () => {
                 emails: 'joram@example.com'
             });
 
-        const created = await Actions.createComplianceReport(job)(store.dispatch, store.getState);
+        const {data: created} = await Actions.createComplianceReport(job)(store.dispatch, store.getState);
 
         const state = store.getState();
         const request = state.requests.admin.createCompliance;

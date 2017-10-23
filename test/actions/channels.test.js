@@ -79,8 +79,7 @@ describe('Actions.Channels', () => {
         );
 
         await getProfilesByIds([user.id])(store.dispatch, store.getState);
-        const result = await Actions.createDirectChannel(TestHelper.basicUser.id, user.id)(store.dispatch, store.getState);
-        const created = result.data;
+        const {data: created} = await Actions.createDirectChannel(TestHelper.basicUser.id, user.id)(store.dispatch, store.getState);
 
         const createRequest = store.getState().requests.channels.createChannel;
         if (createRequest.status === RequestStatus.FAILURE) {
@@ -234,7 +233,7 @@ describe('Actions.Channels', () => {
             TestHelper.basicTeam.invite_id
         );
 
-        const directChannel = await Actions.createDirectChannel(TestHelper.basicUser.id, user.id)(store.dispatch, store.getState);
+        const {data: directChannel} = await Actions.createDirectChannel(TestHelper.basicUser.id, user.id)(store.dispatch, store.getState);
 
         await Actions.fetchMyChannelsAndMembers(TestHelper.basicTeam.id)(store.dispatch, store.getState);
 
@@ -251,7 +250,7 @@ describe('Actions.Channels', () => {
         assert.ok(myMembers);
         assert.ok(channels[Object.keys(myMembers)[0]]);
         assert.ok(myMembers[Object.keys(channels)[0]]);
-        assert.ok(channelsInTeam[''].has(directChannel.data.id));
+        assert.ok(channelsInTeam[''].has(directChannel.id));
         assert.equal(Object.keys(channels).length, Object.keys(myMembers).length);
     });
 
@@ -1202,7 +1201,7 @@ describe('Actions.Channels', () => {
     });
 
     it('leave private channel', async() => {
-        let channel = {
+        const newChannel = {
             team_id: TestHelper.basicTeam.id,
             name: 'redux-test-private',
             display_name: 'Redux Test',
@@ -1211,7 +1210,7 @@ describe('Actions.Channels', () => {
             type: 'P'
         };
 
-        channel = await Actions.createChannel(channel, TestHelper.basicUser.id)(store.dispatch, store.getState);
+        const {data: channel} = await Actions.createChannel(newChannel, TestHelper.basicUser.id)(store.dispatch, store.getState);
         let channels = store.getState().entities.channels.channels;
         assert.ok(channels[channel.id]);
 

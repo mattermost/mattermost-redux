@@ -28,7 +28,7 @@ describe('Actions.Integrations', () => {
     });
 
     it('createIncomingHook', async () => {
-        const created = await Actions.createIncomingHook(
+        const {data: created} = await Actions.createIncomingHook(
             {
                 channel_id: TestHelper.basicChannel.id,
                 display_name: 'test',
@@ -48,7 +48,7 @@ describe('Actions.Integrations', () => {
     });
 
     it('getIncomingWebhook', async () => {
-        const created = await Actions.createIncomingHook(
+        const {data: created} = await Actions.createIncomingHook(
             {
                 channel_id: TestHelper.basicChannel.id,
                 display_name: 'test',
@@ -70,7 +70,7 @@ describe('Actions.Integrations', () => {
     });
 
     it('getIncomingWebhooks', async () => {
-        const created = await Actions.createIncomingHook(
+        const {data: created} = await Actions.createIncomingHook(
             {
                 channel_id: TestHelper.basicChannel.id,
                 display_name: 'test',
@@ -92,7 +92,7 @@ describe('Actions.Integrations', () => {
     });
 
     it('removeIncomingHook', async () => {
-        const created = await Actions.createIncomingHook(
+        const {data: created} = await Actions.createIncomingHook(
             {
                 channel_id: TestHelper.basicChannel.id,
                 display_name: 'test',
@@ -113,7 +113,7 @@ describe('Actions.Integrations', () => {
     });
 
     it('updateIncomingHook', async () => {
-        const created = await Actions.createIncomingHook(
+        const {data: created} = await Actions.createIncomingHook(
             {
                 channel_id: TestHelper.basicChannel.id,
                 display_name: 'test',
@@ -137,7 +137,7 @@ describe('Actions.Integrations', () => {
     });
 
     it('createOutgoingHook', async () => {
-        const created = await Actions.createOutgoingHook(
+        const {data: created} = await Actions.createOutgoingHook(
             {
                 channel_id: TestHelper.basicChannel.id,
                 team_id: TestHelper.basicTeam.id,
@@ -159,7 +159,7 @@ describe('Actions.Integrations', () => {
     });
 
     it('getOutgoingWebhook', async () => {
-        const created = await Actions.createOutgoingHook(
+        const {data: created} = await Actions.createOutgoingHook(
             {
                 channel_id: TestHelper.basicChannel.id,
                 team_id: TestHelper.basicTeam.id,
@@ -183,7 +183,7 @@ describe('Actions.Integrations', () => {
     });
 
     it('getOutgoingWebhooks', async () => {
-        const created = await Actions.createOutgoingHook(
+        const {data: created} = await Actions.createOutgoingHook(
             {
                 channel_id: TestHelper.basicChannel.id,
                 team_id: TestHelper.basicTeam.id,
@@ -207,7 +207,7 @@ describe('Actions.Integrations', () => {
     });
 
     it('removeOutgoingHook', async () => {
-        const created = await Actions.createOutgoingHook(
+        const {data: created} = await Actions.createOutgoingHook(
             {
                 channel_id: TestHelper.basicChannel.id,
                 team_id: TestHelper.basicTeam.id,
@@ -230,7 +230,7 @@ describe('Actions.Integrations', () => {
     });
 
     it('updateOutgoingHook', async () => {
-        const created = await Actions.createOutgoingHook(
+        const {data: created} = await Actions.createOutgoingHook(
             {
                 channel_id: TestHelper.basicChannel.id,
                 team_id: TestHelper.basicTeam.id,
@@ -256,7 +256,7 @@ describe('Actions.Integrations', () => {
     });
 
     it('regenOutgoingHookToken', async () => {
-        const created = await Actions.createOutgoingHook(
+        const {data: created} = await Actions.createOutgoingHook(
             {
                 channel_id: TestHelper.basicChannel.id,
                 team_id: TestHelper.basicTeam.id,
@@ -280,7 +280,7 @@ describe('Actions.Integrations', () => {
     });
 
     it('getCustomTeamCommands', async () => {
-        const team = await TeamsActions.createTeam(
+        const {data: team} = await TeamsActions.createTeam(
             TestHelper.fakeTeam()
         )(store.dispatch, store.getState);
 
@@ -294,7 +294,7 @@ describe('Actions.Integrations', () => {
         const command = TestHelper.testCommand();
         command.team_id = team.id;
 
-        const created = await Actions.addCommand(
+        const {data: created} = await Actions.addCommand(
             command
         )(store.dispatch, store.getState);
 
@@ -316,14 +316,14 @@ describe('Actions.Integrations', () => {
     });
 
     it('addCommand', async () => {
-        const team = await TeamsActions.createTeam(
+        const {data: team} = await TeamsActions.createTeam(
           TestHelper.fakeTeam()
         )(store.dispatch, store.getState);
 
         const expected = TestHelper.testCommand();
         expected.team_id = team.id;
 
-        const created = await Actions.addCommand(expected)(store.dispatch, store.getState);
+        const {data: created} = await Actions.addCommand(expected)(store.dispatch, store.getState);
 
         const request = store.getState().requests.integrations.addCommand;
         if (request.status === RequestStatus.FAILURE) {
@@ -352,14 +352,14 @@ describe('Actions.Integrations', () => {
     });
 
     it('regenCommandToken', async () => {
-        const team = await TeamsActions.createTeam(
+        const {data: team} = await TeamsActions.createTeam(
           TestHelper.fakeTeam()
         )(store.dispatch, store.getState);
 
         const command = TestHelper.testCommand();
         command.team_id = team.id;
 
-        const created = await Actions.addCommand(
+        const {data: created} = await Actions.addCommand(
           command
         )(store.dispatch, store.getState);
 
@@ -396,14 +396,14 @@ describe('Actions.Integrations', () => {
     });
 
     it('editCommand', async () => {
-        const team = await TeamsActions.createTeam(
+        const {data: team} = await TeamsActions.createTeam(
             TestHelper.fakeTeam()
         )(store.dispatch, store.getState);
 
         const command = TestHelper.testCommand();
         command.team_id = team.id;
 
-        const created = await Actions.addCommand(
+        const {data: created} = await Actions.addCommand(
             command
         )(store.dispatch, store.getState);
 
@@ -432,14 +432,14 @@ describe('Actions.Integrations', () => {
     });
 
     it('deleteCommand', async () => {
-        const team = await TeamsActions.createTeam(
+        const {data: team} = await TeamsActions.createTeam(
           TestHelper.fakeTeam()
         )(store.dispatch, store.getState);
 
         const command = TestHelper.testCommand();
         command.team_id = team.id;
 
-        const created = await Actions.addCommand(
+        const {data: created} = await Actions.addCommand(
             command
         )(store.dispatch, store.getState);
 
@@ -457,7 +457,7 @@ describe('Actions.Integrations', () => {
     });
 
     it('addOAuthApp', async () => {
-        const created = await Actions.addOAuthApp(TestHelper.fakeOAuthApp())(store.dispatch, store.getState);
+        const {data: created} = await Actions.addOAuthApp(TestHelper.fakeOAuthApp())(store.dispatch, store.getState);
 
         const request = store.getState().requests.integrations.addOAuthApp;
         if (request.status === RequestStatus.FAILURE) {
@@ -469,7 +469,7 @@ describe('Actions.Integrations', () => {
     });
 
     it('getOAuthApp', async () => {
-        const created = await Actions.addOAuthApp(TestHelper.fakeOAuthApp())(store.dispatch, store.getState);
+        const {data: created} = await Actions.addOAuthApp(TestHelper.fakeOAuthApp())(store.dispatch, store.getState);
 
         await Actions.getOAuthApp(created.id)(store.dispatch, store.getState);
 
@@ -483,7 +483,7 @@ describe('Actions.Integrations', () => {
     });
 
     it('editOAuthApp', async () => {
-        const created = await Actions.addOAuthApp(TestHelper.fakeOAuthApp())(store.dispatch, store.getState);
+        const {data: created} = await Actions.addOAuthApp(TestHelper.fakeOAuthApp())(store.dispatch, store.getState);
 
         const expected = Object.assign({}, created);
         expected.name = 'modified';
@@ -532,7 +532,7 @@ describe('Actions.Integrations', () => {
     });
 
     it('deleteOAuthApp', async () => {
-        const created = await Actions.addOAuthApp(TestHelper.fakeOAuthApp())(store.dispatch, store.getState);
+        const {data: created} = await Actions.addOAuthApp(TestHelper.fakeOAuthApp())(store.dispatch, store.getState);
 
         await Actions.deleteOAuthApp(created.id)(store.dispatch, store.getState);
 
@@ -546,7 +546,7 @@ describe('Actions.Integrations', () => {
     });
 
     it('regenOAuthAppSecret', async () => {
-        const created = await Actions.addOAuthApp(TestHelper.fakeOAuthApp())(store.dispatch, store.getState);
+        const {data: created} = await Actions.addOAuthApp(TestHelper.fakeOAuthApp())(store.dispatch, store.getState);
 
         await Actions.regenOAuthAppSecret(created.id)(store.dispatch, store.getState);
 
