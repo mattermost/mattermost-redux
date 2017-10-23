@@ -314,7 +314,7 @@ export const getSearchResults = createSelector(
     (state) => state.entities.search.results,
     (posts, postIds) => {
         if (!postIds) {
-            return null;
+            return [];
         }
 
         return postIds.map((id) => posts[id]);
@@ -341,7 +341,7 @@ export function makeGetPostsForIds() {
         (state, postIds) => postIds,
         (allPosts, postIds) => {
             if (!postIds) {
-                return null;
+                return [];
             }
 
             return postIds.map((id) => allPosts[id]);
