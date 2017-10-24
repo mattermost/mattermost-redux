@@ -51,7 +51,7 @@ export function createPost(post, files = []) {
         }
 
         dispatch({
-            type: PostTypes.RECEIVED_POST,
+            type: PostTypes.RECEIVED_NEW_POST,
             data: {
                 id: pendingPostId,
                 ...newPost
