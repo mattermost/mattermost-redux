@@ -1348,7 +1348,7 @@ export function enableUserAccessToken(tokenId) {
         dispatch({type: UserTypes.ENABLE_USER_ACCESS_TOKEN_REQUEST});
 
         try {
-            await Client4.revokeUserAccessToken(tokenId);
+            await Client4.enableUserAccessToken(tokenId);
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch);
             dispatch(batchActions([
