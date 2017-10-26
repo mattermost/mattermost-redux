@@ -251,14 +251,36 @@ function plugins(state = {}, action) {
         return nextState;
     }
     case AdminTypes.RECEIVED_PLUGINS: {
-        for (const plugin of action.data) {
-            nextState[plugin.id] = plugin;
+        const activePlugins = action.data.active;
+        for (const plugin of activePlugins) {
+            nextState[plugin.id] = {...plugin, active: true};
+        }
+
+        const inactivePlugins = action.data.inactive;
+        for (const plugin of inactivePlugins) {
+            nextState[plugin.id] = {...plugin, active: false};
         }
         return nextState;
     }
     case AdminTypes.REMOVED_PLUGIN: {
         Reflect.deleteProperty(nextState, action.data);
         return nextState;
+    }
+    case AdminTypes.ACTIVATED_PLUGIN: {
+        const plugin = nextState[action.data];
+        if (plugin && !plugin.active) {
+            nextState[action.data] = {...plugin, active: true};
+            return nextState;
+        }
+        return state;
+    }
+    case AdminTypes.DEACTIVATED_PLUGIN: {
+        const plugin = nextState[action.data];
+        if (plugin && plugin.active) {
+            nextState[action.data] = {...plugin, active: false};
+            return nextState;
+        }
+        return state;
     }
     case UserTypes.LOGOUT_SUCCESS:
         return {};

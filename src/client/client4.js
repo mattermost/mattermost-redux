@@ -2021,6 +2021,20 @@ export default class Client4 {
         );
     };
 
+    activatePlugin = async (pluginId) => {
+        return this.doFetch(
+            `${this.getPluginRoute(pluginId)}/activate`,
+            {method: 'post'}
+        );
+    };
+
+    deactivatePlugin = async (pluginId) => {
+        return this.doFetch(
+            `${this.getPluginRoute(pluginId)}/deactivate`,
+            {method: 'post'}
+        );
+    };
+
     // Client Helpers
 
     doFetch = async (url, options) => {

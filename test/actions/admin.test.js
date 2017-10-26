@@ -656,11 +656,12 @@ describe('Actions.Admin', () => {
     });
 
     it('getPlugins', async () => {
-        const testPlugin = {id: 'testplugin2', webapp: {bundle_path: '/static/somebundle.js'}};
+        const testPlugin = {id: 'testplugin', webapp: {bundle_path: '/static/somebundle.js'}};
+        const testPlugin2 = {id: 'testplugin2', webapp: {bundle_path: '/static/somebundle.js'}};
 
         nock(Client4.getBaseRoute()).
             get('/plugins').
-            reply(200, [testPlugin]);
+            reply(200, {active: [testPlugin], inactive: [testPlugin2]});
 
         await Actions.getPlugins()(store.dispatch, store.getState);
 
@@ -673,6 +674,9 @@ describe('Actions.Admin', () => {
         const plugins = state.entities.admin.plugins;
         assert.ok(plugins);
         assert.ok(plugins[testPlugin.id]);
+        assert.ok(plugins[testPlugin.id].active);
+        assert.ok(plugins[testPlugin2.id]);
+        assert.ok(!plugins[testPlugin2.id].active);
     });
 
     it('removePlugin', async () => {
@@ -680,7 +684,7 @@ describe('Actions.Admin', () => {
 
         nock(Client4.getBaseRoute()).
             get('/plugins').
-            reply(200, [testPlugin]);
+            reply(200, {active: [], inactive: [testPlugin]});
 
         await Actions.getPlugins()(store.dispatch, store.getState);
 
@@ -704,5 +708,71 @@ describe('Actions.Admin', () => {
         plugins = state.entities.admin.plugins;
         assert.ok(plugins);
         assert.ok(!plugins[testPlugin.id]);
+    });
+
+    it('activatePlugin', async () => {
+        const testPlugin = {id: TestHelper.generateId(), webapp: {bundle_path: '/static/somebundle.js'}};
+
+        nock(Client4.getBaseRoute()).
+            get('/plugins').
+            reply(200, {active: [], inactive: [testPlugin]});
+
+        await Actions.getPlugins()(store.dispatch, store.getState);
+
+        let state = store.getState();
+        let plugins = state.entities.admin.plugins;
+        assert.ok(plugins);
+        assert.ok(plugins[testPlugin.id]);
+        assert.ok(!plugins[testPlugin.id].active);
+
+        nock(Client4.getBaseRoute()).
+            post(`/plugins/${testPlugin.id}/activate`).
+            reply(200, OK_RESPONSE);
+
+        await Actions.activatePlugin(testPlugin.id)(store.dispatch, store.getState);
+
+        const request = state.requests.admin.activatePlugin;
+        if (request.status === RequestStatus.FAILURE) {
+            throw new Error(request.error);
+        }
+
+        state = store.getState();
+        plugins = state.entities.admin.plugins;
+        assert.ok(plugins);
+        assert.ok(plugins[testPlugin.id]);
+        assert.ok(plugins[testPlugin.id].active);
+    });
+
+    it('deactivatePlugin', async () => {
+        const testPlugin = {id: TestHelper.generateId(), webapp: {bundle_path: '/static/somebundle.js'}};
+
+        nock(Client4.getBaseRoute()).
+            get('/plugins').
+            reply(200, {active: [testPlugin], inactive: []});
+
+        await Actions.getPlugins()(store.dispatch, store.getState);
+
+        let state = store.getState();
+        let plugins = state.entities.admin.plugins;
+        assert.ok(plugins);
+        assert.ok(plugins[testPlugin.id]);
+        assert.ok(plugins[testPlugin.id].active);
+
+        nock(Client4.getBaseRoute()).
+            post(`/plugins/${testPlugin.id}/deactivate`).
+            reply(200, OK_RESPONSE);
+
+        await Actions.deactivatePlugin(testPlugin.id)(store.dispatch, store.getState);
+
+        const request = state.requests.admin.deactivatePlugin;
+        if (request.status === RequestStatus.FAILURE) {
+            throw new Error(request.error);
+        }
+
+        state = store.getState();
+        plugins = state.entities.admin.plugins;
+        assert.ok(plugins);
+        assert.ok(plugins[testPlugin.id]);
+        assert.ok(!plugins[testPlugin.id].active);
     });
 });
