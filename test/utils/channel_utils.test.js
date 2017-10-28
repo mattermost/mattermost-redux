@@ -105,24 +105,24 @@ describe('ChannelUtils', () => {
         assert.ok(isAutoClosed(autoCloseEnabled, {}, inactiveChannel));
 
         assert.ok(isAutoClosed(autoCloseEnabled, {
-            'sidebar_settings--close_unused_direct_messages': {value: 'after_seven_days'},
+            'sidebar_settings--close_unused_direct_messages': {value: 'after_seven_days'}
         }, inactiveChannel));
 
         assert.ok(!isAutoClosed(autoCloseEnabled, {
-            'sidebar_settings--close_unused_direct_messages': {value: 'after_seven_days'},
+            'sidebar_settings--close_unused_direct_messages': {value: 'after_seven_days'}
         }, activeChannel));
 
         assert.ok(!isAutoClosed(autoCloseDisabled, {
-            'sidebar_settings--close_unused_direct_messages': {value: 'after_seven_days'},
+            'sidebar_settings--close_unused_direct_messages': {value: 'after_seven_days'}
         }, inactiveChannel));
 
         assert.ok(!isAutoClosed(autoCloseEnabled, {
             'sidebar_settings--close_unused_direct_messages': {value: 'after_seven_days'},
-            'channel_open_time--channelid': {value: new Date().getTime().toString()},
+            'channel_open_time--channelid': {value: new Date().getTime().toString()}
         }, inactiveChannel));
 
         assert.ok(!isAutoClosed(autoCloseEnabled, {
-            'sidebar_settings--close_unused_direct_messages': {value: 'never'},
+            'sidebar_settings--close_unused_direct_messages': {value: 'never'}
         }, inactiveChannel));
     });
 });
