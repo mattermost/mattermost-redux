@@ -2,6 +2,7 @@
 // See License.txt for license information.
 
 export default {
+    CATEGORY_CHANNEL_OPEN_TIME: 'channel_open_time',
     CATEGORY_DIRECT_CHANNEL_SHOW: 'direct_channel_show',
     CATEGORY_GROUP_CHANNEL_SHOW: 'group_channel_show',
     CATEGORY_FLAGGED_POST: 'flagged_post',
@@ -18,6 +19,8 @@ export default {
     NAME_NAME_FORMAT: 'name_format',
     DISPLAY_PREFER_NICKNAME: 'nickname_full_name',
     DISPLAY_PREFER_FULL_NAME: 'full_name',
+
+    CATEGORY_SIDEBAR_SETTINGS: 'sidebar_settings',
 
     CATEGORY_ADVANCED_SETTINGS: 'advanced_settings',
     ADVANCED_FILTER_JOIN_LEAVE: 'join_leave',

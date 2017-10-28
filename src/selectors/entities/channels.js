@@ -222,17 +222,18 @@ export const getOtherChannels = createSelector(
 export const getChannelsByCategory = createSelector(
     getCurrentChannelId,
     getMyChannels,
+    getConfig,
     getMyPreferences,
     getTeammateNameDisplaySetting,
     (state) => state.entities.users,
-    (currentChannelId, channels, myPreferences, teammateNameDisplay, usersState) => {
+    (currentChannelId, channels, config, myPreferences, teammateNameDisplay, usersState) => {
         const allChannels = channels.map((c) => {
             const channel = {...c};
             channel.isCurrent = c.id === currentChannelId;
             return channel;
         });
 
-        return buildDisplayableChannelList(usersState, allChannels, myPreferences, teammateNameDisplay);
+        return buildDisplayableChannelList(usersState, allChannels, config, myPreferences, teammateNameDisplay);
     }
 );
 
@@ -240,17 +241,18 @@ export const getChannelsWithUnreadSection = createSelector(
     getCurrentChannelId,
     getMyChannels,
     getMyChannelMemberships,
+    getConfig,
     getMyPreferences,
     getTeammateNameDisplaySetting,
     (state) => state.entities.users,
-    (currentChannelId, channels, myMembers, myPreferences, teammateNameDisplay, usersState) => {
+    (currentChannelId, channels, myMembers, config, myPreferences, teammateNameDisplay, usersState) => {
         const allChannels = channels.map((c) => {
             const channel = {...c};
             channel.isCurrent = c.id === currentChannelId;
             return channel;
         });
 
-        return buildDisplayableChannelListWithUnreadSection(usersState, allChannels, myMembers, myPreferences, teammateNameDisplay);
+        return buildDisplayableChannelListWithUnreadSection(usersState, allChannels, myMembers, config, myPreferences, teammateNameDisplay);
     }
 );
 
