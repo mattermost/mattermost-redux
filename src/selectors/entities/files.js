@@ -15,6 +15,10 @@ function getFilesIdsForPost(state, postId) {
     return [];
 }
 
+export function getFilePublicLink(state) {
+    return state.entities.files.filePublicLink;
+}
+
 export function makeGetFilesForPost() {
     return createSelector(
         [getAllFiles, getFilesIdsForPost],
