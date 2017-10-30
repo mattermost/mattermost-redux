@@ -296,6 +296,26 @@ function removePlugin(state = initialRequestState(), action) {
     );
 }
 
+function activatePlugin(state = initialRequestState(), action) {
+    return handleRequest(
+        AdminTypes.ACTIVATE_PLUGIN_REQUEST,
+        AdminTypes.ACTIVATE_PLUGIN_SUCCESS,
+        AdminTypes.ACTIVATE_PLUGIN_FAILURE,
+        state,
+        action
+    );
+}
+
+function deactivatePlugin(state = initialRequestState(), action) {
+    return handleRequest(
+        AdminTypes.DEACTIVATE_PLUGIN_REQUEST,
+        AdminTypes.DEACTIVATE_PLUGIN_SUCCESS,
+        AdminTypes.DEACTIVATE_PLUGIN_FAILURE,
+        state,
+        action
+    );
+}
+
 export default combineReducers({
     getLogs,
     getAudits,
@@ -325,6 +345,8 @@ export default combineReducers({
     getAnalytics,
     uploadPlugin,
     getPlugins,
-    removePlugin
+    removePlugin,
+    activatePlugin,
+    deactivatePlugin
 });
 

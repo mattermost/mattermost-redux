@@ -324,7 +324,7 @@ export function uploadPlugin(fileData) {
 
         dispatch(batchActions([
             {type: AdminTypes.UPLOAD_PLUGIN_SUCCESS},
-            {type: AdminTypes.RECEIVED_PLUGIN, data}
+            {type: AdminTypes.RECEIVED_PLUGIN, data: {...data, active: false}}
         ]));
 
         return {data};
@@ -381,3 +381,54 @@ export function removePlugin(pluginId) {
         return {data: true};
     };
 }
+
+// EXPERIMENTAL - SUBJECT TO CHANGE
+export function activatePlugin(pluginId) {
+    return async (dispatch) => {
+        dispatch({type: AdminTypes.ACTIVATE_PLUGIN_REQUEST});
+
+        try {
+            await Client4.activatePlugin(pluginId);
+        } catch (error) {
+            forceLogoutIfNecessary(error, dispatch);
+            dispatch(batchActions([
+                {type: AdminTypes.ACTIVATE_PLUGIN_FAILURE, error},
+                logError(error)(dispatch)
+            ]));
+            return {error};
+        }
+
+        dispatch(batchActions([
+            {type: AdminTypes.ACTIVATE_PLUGIN_SUCCESS},
+            {type: AdminTypes.ACTIVATED_PLUGIN, data: pluginId}
+        ]));
+
+        return {data: true};
+    };
+}
+
+// EXPERIMENTAL - SUBJECT TO CHANGE
+export function deactivatePlugin(pluginId) {
+    return async (dispatch) => {
+        dispatch({type: AdminTypes.DEACTIVATE_PLUGIN_REQUEST});
+
+        try {
+            await Client4.deactivatePlugin(pluginId);
+        } catch (error) {
+            forceLogoutIfNecessary(error, dispatch);
+            dispatch(batchActions([
+                {type: AdminTypes.DEACTIVATE_PLUGIN_FAILURE, error},
+                logError(error)(dispatch)
+            ]));
+            return {error};
+        }
+
+        dispatch(batchActions([
+            {type: AdminTypes.DEACTIVATE_PLUGIN_SUCCESS},
+            {type: AdminTypes.DEACTIVATED_PLUGIN, data: pluginId}
+        ]));
+
+        return {data: true};
+    };
+}
+

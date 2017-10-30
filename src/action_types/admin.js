@@ -120,6 +120,14 @@ export default keyMirror({
     REMOVE_PLUGIN_SUCCESS: null,
     REMOVE_PLUGIN_FAILURE: null,
 
+    ACTIVATE_PLUGIN_REQUEST: null,
+    ACTIVATE_PLUGIN_SUCCESS: null,
+    ACTIVATE_PLUGIN_FAILURE: null,
+
+    DEACTIVATE_PLUGIN_REQUEST: null,
+    DEACTIVATE_PLUGIN_SUCCESS: null,
+    DEACTIVATE_PLUGIN_FAILURE: null,
+
     RECEIVED_LOGS: null,
     RECEIVED_AUDITS: null,
     RECEIVED_CONFIG: null,
@@ -133,6 +141,8 @@ export default keyMirror({
     RECEIVED_USER_ACCESS_TOKENS: null,
     RECEIVED_PLUGIN: null,
     RECEIVED_PLUGINS: null,
-    REMOVED_PLUGIN: null
+    REMOVED_PLUGIN: null,
+    ACTIVATED_PLUGIN: null,
+    DEACTIVATED_PLUGIN: null
 });
 
