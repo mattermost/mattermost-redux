@@ -130,6 +130,9 @@ describe('Selectors.Channels', () => {
                 membersInChannel,
                 myMembers
             },
+            posts: {
+                posts: {}
+            },
             preferences: {
                 myPreferences
             },
