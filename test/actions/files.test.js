@@ -136,6 +136,7 @@ describe('Actions.Files', () => {
     });
 
     it('getFilePublicLink', async () => {
+        TestHelper.activateMocking();
         const fileId = 't1izsr9uspgi3ynggqu6xxjn9y';
         nock(Client4.getBaseRoute()).
             get(`/files/${fileId}/link`).
@@ -154,6 +155,7 @@ describe('Actions.Files', () => {
         }
 
         const filePublicLink = state.entities.files.filePublicLink.link;
+        assert.equal('https://mattermost.com/files/ndans23ry2rtjd1z73g6i5f3fc/public?h=rE1-b2N1VVVMsAQssjwlfNawbVOwUy1TRDuTeGC_tys', filePublicLink);
         assert.ok(filePublicLink);
         assert.ok(filePublicLink.length > 0);
     });
