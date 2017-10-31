@@ -348,3 +348,19 @@ export function makeGetPostsForIds() {
         }
     );
 }
+
+export const getLastPostPerChannel = createSelector(
+    getAllPosts,
+    (allPosts) => {
+        const posts = {};
+        for (const id in allPosts) {
+            if (allPosts.hasOwnProperty(id)) {
+                const post = allPosts[id];
+                if (post.channel_id && (!posts.hasOwnProperty(post.channel_id) || posts[post.channel_id].create_at < post.create_at)) {
+                    posts[post.channel_id] = post;
+                }
+            }
+        }
+        return posts;
+    }
+);
