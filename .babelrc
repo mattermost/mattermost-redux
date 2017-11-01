@@ -7,8 +7,7 @@
         "firefox": 52,
         "edge": 40,
         "ios": 9,
-        "android": 5,
-        "node": "current"
+        "android": 5
       }
     }],
     "stage-0"
