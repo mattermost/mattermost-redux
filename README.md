@@ -128,6 +128,15 @@ client.login(username, password)
 
 # How to Contribute
 
+### How to Build mattermost-redux
+
+You only need to build mattermost-redux if you are developing it. If your
+mattermost-webapp and mattermost-redux are in the same directory, you only need
+to run `npm run dev` or `npm run dev:watch`. If you have mattermost-webapp in
+other directory or you are developing your own application, you can define the
+environment variable `WEBAPP_DIR` to change the destination app
+(e. g. `WEBAPP_DIR=/tmp/mattermost-webapp npm run dev`).
+
 ### Contribute Code
 
 If you're contributing to help [migrate the webapp to Redux](https://docs.mattermost.com/developer/webapp-to-redux.html) go ahead and submit your PR. If you're just fixing a small bug or adding a small improvement then feel free to submit a PR for it. For everything else, please either work on an issue labeled `[Help Wanted]` or open an issue if there's something else that you'd like to work on.
