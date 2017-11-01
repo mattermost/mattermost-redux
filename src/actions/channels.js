@@ -788,13 +788,13 @@ export function getChannelStats(channelId) {
     };
 }
 
-export function addChannelMember(channelId, userId) {
+export function addChannelMember(channelId, userId, postRootId = '') {
     return async (dispatch, getState) => {
         dispatch({type: ChannelTypes.ADD_CHANNEL_MEMBER_REQUEST}, getState);
 
         let member;
         try {
-            member = await Client4.addToChannel(userId, channelId);
+            member = await Client4.addToChannel(userId, channelId, postRootId);
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch);
             dispatch(batchActions([
