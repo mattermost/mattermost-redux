@@ -319,8 +319,9 @@ describe('Actions.Users', () => {
         }
 
         assert.ok(profilesWithoutTeam);
-        assert.ok(profilesWithoutTeam.has(user.id));
-        assert.ok(profiles[user.id]);
+        assert.ok(profilesWithoutTeam.size > 0);
+        assert.ok(profiles);
+        assert.ok(Object.keys(profiles).length > 0);
     });
 
     it('getProfilesInChannel', async () => {
@@ -716,6 +717,11 @@ describe('Actions.Users', () => {
         sessions = store.getState().entities.users.mySessions;
 
         assert.strictEqual(sessions.length, 0);
+
+        nock(Client4.getUsersRoute()).
+            post('/login').
+            reply(200, TestHelper.basicUser);
+        await TestHelper.basicClient4.login(TestHelper.basicUser.email, 'password1');
     });
 
     it('getUserAudits', async () => {
@@ -847,6 +853,11 @@ describe('Actions.Users', () => {
     });
 
     it('updateUserMfa', async () => {
+        if (TestHelper.isLiveServer()) {
+            console.log('Skipping mock-only test');
+            return;
+        }
+
         TestHelper.mockLogin();
         await Actions.login(TestHelper.basicUser.email, 'password1')(store.dispatch, store.getState);
 
@@ -914,6 +925,11 @@ describe('Actions.Users', () => {
     });
 
     it('generateMfaSecret', async () => {
+        if (TestHelper.isLiveServer()) {
+            console.log('Skipping mock-only test');
+            return;
+        }
+
         nock(Client4.getBaseRoute()).
             post('/users/me/mfa/generate').
             reply(200, {secret: 'somesecret', qr_code: 'someqrcode'});
@@ -987,7 +1003,7 @@ describe('Actions.Users', () => {
 
     it('resetUserPassword', async () => {
         if (TestHelper.isLiveServer()) {
-            console.log('Skipping mock-only test');
+
             return;
         }
 
@@ -1106,6 +1122,7 @@ describe('Actions.Users', () => {
         async function test() {
             if (TestHelper.isLiveServer()) {
                 console.log('Skipping mock-only test');
+                done();
                 return;
             }
 
@@ -1280,15 +1297,13 @@ describe('Actions.Users', () => {
         await Actions.login(TestHelper.basicUser.email, 'password1')(store.dispatch, store.getState);
 
         const currentUserId = store.getState().entities.users.currentUserId;
-        const testId = 'xgeikjf383ftmx8jzrhdocmfne';
 
-        TestHelper.activateMocking();
         nock(Client4.getBaseRoute()).
-            get(`/users/tokens/${testId}`).
-            reply(200, {id: testId, description: 'test token', user_id: currentUserId});
+                post(`/users/${currentUserId}/tokens`).
+                reply(201, {id: 'someid', token: 'sometoken', description: 'test token', user_id: currentUserId});
 
-        await Actions.getUserAccessToken(testId)(store.dispatch, store.getState);
-        nock.restore();
+        const {data} = await Actions.createUserAccessToken(currentUserId, 'test token')(store.dispatch, store.getState);
+        const testId = data.id;
 
         let {myUserAccessTokens} = store.getState().entities.users;
         let {userAccessTokens} = store.getState().entities.admin;
@@ -1301,13 +1316,11 @@ describe('Actions.Users', () => {
         assert.ok(userAccessTokens[currentUserId][testId]);
         assert.ok(!userAccessTokens[currentUserId][testId].token);
 
-        TestHelper.activateMocking();
         nock(Client4.getBaseRoute()).
             post('/users/tokens/disable').
             reply(200, OK_RESPONSE);
 
         await Actions.disableUserAccessToken(testId)(store.dispatch, store.getState);
-        nock.restore();
 
         const request = store.getState().requests.users.revokeUserAccessToken;
         myUserAccessTokens = store.getState().entities.users.myUserAccessTokens;
@@ -1330,15 +1343,13 @@ describe('Actions.Users', () => {
         await Actions.login(TestHelper.basicUser.email, 'password1')(store.dispatch, store.getState);
 
         const currentUserId = store.getState().entities.users.currentUserId;
-        const testId = 'xgeikjf383ftmx8jzrhdocmfne';
 
-        TestHelper.activateMocking();
         nock(Client4.getBaseRoute()).
-            get(`/users/tokens/${testId}`).
-            reply(200, {id: testId, description: 'test token', user_id: currentUserId});
+                post(`/users/${currentUserId}/tokens`).
+                reply(201, {id: 'someid', token: 'sometoken', description: 'test token', user_id: currentUserId});
 
-        await Actions.getUserAccessToken(testId)(store.dispatch, store.getState);
-        nock.restore();
+        const {data} = await Actions.createUserAccessToken(currentUserId, 'test token')(store.dispatch, store.getState);
+        const testId = data.id;
 
         let {myUserAccessTokens} = store.getState().entities.users;
         let {userAccessTokens} = store.getState().entities.admin;
@@ -1351,13 +1362,11 @@ describe('Actions.Users', () => {
         assert.ok(userAccessTokens[currentUserId][testId]);
         assert.ok(!userAccessTokens[currentUserId][testId].token);
 
-        TestHelper.activateMocking();
         nock(Client4.getBaseRoute()).
             post('/users/tokens/enable').
             reply(200, OK_RESPONSE);
 
         await Actions.enableUserAccessToken(testId)(store.dispatch, store.getState);
-        nock.restore();
 
         const request = store.getState().requests.users.revokeUserAccessToken;
         myUserAccessTokens = store.getState().entities.users.myUserAccessTokens;

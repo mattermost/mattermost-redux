@@ -213,6 +213,11 @@ describe('Actions.Admin', () => {
     });
 
     it('createComplianceReport', async () => {
+        if (TestHelper.isLiveServer()) {
+            console.log('Skipping mock-only test');
+            return;
+        }
+
         const job = {
             desc: 'testjob',
             emails: 'joram@example.com',
@@ -251,6 +256,11 @@ describe('Actions.Admin', () => {
     });
 
     it('getComplianceReport', async () => {
+        if (TestHelper.isLiveServer()) {
+            console.log('Skipping mock-only test');
+            return;
+        }
+
         const job = {
             desc: 'testjob',
             emails: 'joram@example.com',
@@ -295,6 +305,11 @@ describe('Actions.Admin', () => {
     });
 
     it('getComplianceReports', async () => {
+        if (TestHelper.isLiveServer()) {
+            console.log('Skipping mock-only test');
+            return;
+        }
+
         const job = {
             desc: 'testjob',
             emails: 'joram@example.com',
@@ -340,6 +355,11 @@ describe('Actions.Admin', () => {
     });
 
     it('uploadBrandImage', async () => {
+        if (TestHelper.isLiveServer()) {
+            console.log('Skipping mock-only test');
+            return;
+        }
+
         const testImageData = fs.createReadStream('test/assets/images/test.png');
 
         nock(Client4.getBaseRoute()).

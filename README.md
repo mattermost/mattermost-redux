@@ -151,7 +151,7 @@ Feel free to drop by [the Redux channel](https://pre-release.mattermost.com/core
 
 `make test` will run the tests against a mocked server.
 
-To run the tests against a live server, you must have a system admin user with the email `` and password `password1`. If you're using a developer copy of the Mattermost server, you can create this user by running:
+To run the tests against a live server, you must have a system admin user with the email `redux-admin@simulator.amazonses.com` and password `password1`. If you're using a developer copy of the Mattermost server, you can create this user by running:
 
 ```
 go build ./cmd/platform
@@ -165,6 +165,6 @@ If you're using a release binary for the server, just run:
 
 The server needs to be available at `http://localhost:8065`. This can be overridden by setting an environment variable named `MATTERMOST_SERVER_URL`.
 
-Finally, set "EnableOpenServer", "EnableCustomEmoji", "EnableLinkPreviews" and "EnableOAuthServiceProvider" to `true` and "EnableOnlyAdminIntegrations" to `false` in your config.json. If you don't have a config.json yet, create it by copying default.json.
+Finally, set "EnableOpenServer", "EnableCustomEmoji", "EnableLinkPreviews", "EnableUserAccessTokens" and "EnableOAuthServiceProvider" to `true` and "EnableOnlyAdminIntegrations" to `false` in your config.json. If you don't have a config.json yet, create it by copying default.json.
 
 With that set up, you can run the tests against your server with `npm run test-no-mock`.

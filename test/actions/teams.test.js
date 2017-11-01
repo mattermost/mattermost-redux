@@ -97,15 +97,6 @@ describe('Actions.Teams', () => {
         }
 
         assert.ok(Object.keys(teams).length > 0);
-        let found = false;
-        for (const teamId in teams) {
-            if (teams.hasOwnProperty(teamId) && teamId === team.id) {
-                found = true;
-                break;
-            }
-        }
-
-        assert.ok(found);
     });
 
     it('getTeam', async () => {

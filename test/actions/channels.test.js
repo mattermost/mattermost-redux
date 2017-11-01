@@ -1467,16 +1467,20 @@ describe('Actions.Channels', () => {
             assert.ok(channels[TestHelper.basicChannel.id]);
             assert.ok(myMembers[TestHelper.basicChannel.id]);
 
-            nock(Client4.getBaseRoute()).
-                delete(`/channels/${TestHelper.basicChannel.id}/members/${TestHelper.basicUser.id}`).
-                reply(400);
+            nock(Client4.getChannelMemberRoute(TestHelper.basicChannel.id, TestHelper.basicUser.id)).
+                delete('').
+                reply(400, {});
+
+            nock(Client4.getChannelMemberRoute(TestHelper.basicChannel.id, TestHelper.basicUser.id)).
+                delete('').
+                reply(200, OK_RESPONSE);
 
             // This action will retry after 1000ms
             await Actions.leaveChannel(
                 TestHelper.basicChannel.id
             )(store.dispatch, store.getState);
 
-            setTimeout(test2, 1200);
+            setTimeout(test2, 300);
         }
 
         async function test2() {

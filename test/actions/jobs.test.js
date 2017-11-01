@@ -24,7 +24,7 @@ describe('Actions.Jobs', () => {
     });
 
     after(async () => {
-        TestHelper.tearDown();
+        await TestHelper.tearDown();
     });
 
     it('createJob', async () => {
