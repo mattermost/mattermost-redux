@@ -5,15 +5,13 @@ import {createSelector} from 'reselect';
 
 import {getConfig, getLicense} from 'selectors/entities/general';
 import {
-    getLastPostPerChannel
-} from 'selectors/entities/posts';
-import {
     getFavoritesPreferences,
     getMyPreferences,
     getTeammateNameDisplaySetting,
     getVisibleTeammate,
     getVisibleGroupIds
 } from 'selectors/entities/preferences';
+import {getLastPostPerChannel} from 'selectors/entities/posts';
 import {getCurrentTeamId, getCurrentTeamMembership} from 'selectors/entities/teams';
 import {getCurrentUser, getUsers} from 'selectors/entities/users';
 import {
