@@ -1,8 +1,6 @@
-# Mattermost Redux (beta)
+# Mattermost Redux
 
-**Supported Server Versions:** Latest
-
-The project is in beta, with the purpose of consolidating the storage, web utilities and logic of the webapp and React Native mobile clients into a single driver. We encourage you to use mattermost-redux to power your own Mattermost clients or integrations.
+The project purpose is consolidating the storage, web utilities and logic of the webapp and React Native mobile clients into a single driver. We encourage you to use mattermost-redux to power your own Mattermost clients or integrations.
 
 [Redux](http://redux.js.org/docs/introduction/) is the backbone for this project and many of the design decisions and patterns stem from it.
 
@@ -128,17 +126,6 @@ client.login(username, password)
 });
 ```
 
-# Features for Stable Release
-
-* Improved return pattern for actions, always return both data and error
-* Error reporting for optimistic actions
-* Better documentation
-
-### Future Features
-
-* Full server mocking for unit tests (including WebSocket mocking)
-* Offline support with automatic update polling (needs server work)
-
 # How to Contribute
 
 ### Contribute Code
@@ -149,6 +136,22 @@ Feel free to drop by [the Redux channel](https://pre-release.mattermost.com/core
 
 ### Running the Tests
 
-To run the tests you need to have a Mattermost server running locally on port 8065 with "EnableOpenServer", "EnableCustomEmoji", "EnableLinkPreviews" and "EnableOAuthServiceProvider" set to `true` and with "EnableOnlyAdminIntegrations" set to `false` in your config/config.json (copy default.json to config.json first if none exists).
+`make test` will run the tests against a mocked server.
 
-With that set up, you can run the tests with `make test`.
+To run the tests against a live server, you must have a system admin user with the email `redux-admin@simulator.amazonses.com` and password `password1`. If you're using a developer copy of the Mattermost server, you can create this user by running:
+
+```
+go build ./cmd/platform
+./platform user create --email "redux-admin@simulator.amazonses.com" --password "password1" --username "redux-admin" --system_admin
+```
+
+If you're using a release binary for the server, just run:
+```
+./bin/platform user create --email "redux-admin@simulator.amazonses.com" --password "password1" --username "redux-admin" --system_admin
+```
+
+The server needs to be available at `http://localhost:8065`. This can be overridden by setting an environment variable named `MATTERMOST_SERVER_URL`.
+
+Finally, set "EnableOpenServer", "EnableCustomEmoji", "EnableLinkPreviews", "EnableUserAccessTokens" and "EnableOAuthServiceProvider" to `true` and "EnableOnlyAdminIntegrations" to `false` in your config.json. If you don't have a config.json yet, create it by copying default.json.
+
+With that set up, you can run the tests against your server with `npm run test-no-mock`.

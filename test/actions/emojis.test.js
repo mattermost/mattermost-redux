@@ -3,19 +3,22 @@
 
 import fs from 'fs';
 import assert from 'assert';
+import nock from 'nock';
 
 import * as Actions from 'actions/emojis';
-import {Client, Client4} from 'client';
+import {Client4} from 'client';
 
-import {RequestStatus} from 'constants';
 import {GeneralTypes} from 'action_types';
+import {RequestStatus} from 'constants';
 import TestHelper from 'test/test_helper';
 import configureStore from 'test/test_store';
+
+const OK_RESPONSE = {status: 'OK'};
 
 describe('Actions.Emojis', () => {
     let store;
     before(async () => {
-        await TestHelper.initBasic(Client, Client4);
+        await TestHelper.initBasic(Client4);
     });
 
     beforeEach(async () => {
@@ -23,12 +26,16 @@ describe('Actions.Emojis', () => {
     });
 
     after(async () => {
-        await TestHelper.basicClient.logout();
-        await TestHelper.basicClient4.logout();
+        await TestHelper.tearDown();
     });
 
     it('createCustomEmoji', async () => {
         const testImageData = fs.createReadStream('test/assets/images/test.png');
+
+        nock(Client4.getEmojisRoute()).
+            post('').
+            reply(201, {id: TestHelper.generateId(), create_at: 1507918415696, update_at: 1507918415696, delete_at: 0, creator_id: TestHelper.basicUser.id, name: TestHelper.generateId()});
+
         const {data: created} = await Actions.createCustomEmoji(
             {
                 name: TestHelper.generateId(),
@@ -50,6 +57,11 @@ describe('Actions.Emojis', () => {
 
     it('getCustomEmojis', async () => {
         const testImageData = fs.createReadStream('test/assets/images/test.png');
+
+        nock(Client4.getEmojisRoute()).
+            post('').
+            reply(201, {id: TestHelper.generateId(), create_at: 1507918415696, update_at: 1507918415696, delete_at: 0, creator_id: TestHelper.basicUser.id, name: TestHelper.generateId()});
+
         const {data: created} = await Actions.createCustomEmoji(
             {
                 name: TestHelper.generateId(),
@@ -58,12 +70,17 @@ describe('Actions.Emojis', () => {
             testImageData
         )(store.dispatch, store.getState);
 
+        nock(Client4.getEmojisRoute()).
+            get('').
+            query(true).
+            reply(200, [created]);
+
         await Actions.getCustomEmojis()(store.dispatch, store.getState);
 
         const state = store.getState();
         const request = state.requests.emojis.getCustomEmojis;
         if (request.status === RequestStatus.FAILURE) {
-            throw new Error('getCustomEmojis request failed');
+            throw new Error(request.error);
         }
 
         const emojis = state.entities.emojis.customEmoji;
@@ -72,6 +89,11 @@ describe('Actions.Emojis', () => {
     });
 
     it('getAllCustomEmojis', async () => {
+        store.dispatch({type: GeneralTypes.RECEIVED_SERVER_VERSION, data: '4.0.0'});
+
+        nock(Client4.getEmojisRoute()).
+            post('').
+            reply(201, {id: TestHelper.generateId(), create_at: 1507918415696, update_at: 1507918415696, delete_at: 0, creator_id: TestHelper.basicUser.id, name: TestHelper.generateId()});
         const {data: created1} = await Actions.createCustomEmoji(
             {
                 name: TestHelper.generateId(),
@@ -79,6 +101,10 @@ describe('Actions.Emojis', () => {
             },
             fs.createReadStream('test/assets/images/test.png')
         )(store.dispatch, store.getState);
+
+        nock(Client4.getEmojisRoute()).
+            post('').
+            reply(201, {id: TestHelper.generateId(), create_at: 1507918415696, update_at: 1507918415696, delete_at: 0, creator_id: TestHelper.basicUser.id, name: TestHelper.generateId()});
         const {data: created2} = await Actions.createCustomEmoji(
             {
                 name: TestHelper.generateId(),
@@ -87,18 +113,26 @@ describe('Actions.Emojis', () => {
             fs.createReadStream('test/assets/images/test.png')
         )(store.dispatch, store.getState);
 
-        store.dispatch({type: GeneralTypes.RECEIVED_SERVER_VERSION, data: '3.10.0'});
+        nock(Client4.getEmojisRoute()).
+            get('').
+            query(true).
+            reply(200, [created1]);
 
-        await Actions.getAllCustomEmojis(1)(store.dispatch, store.getState);
+        nock(Client4.getEmojisRoute()).
+            get('').
+            query(true).
+            reply(200, [created2]);
 
-        store.dispatch({type: GeneralTypes.RECEIVED_SERVER_VERSION, data: '4.0.0'});
-
+        nock(Client4.getEmojisRoute()).
+            get('').
+            query(true).
+            reply(200, []);
         await Actions.getAllCustomEmojis(1)(store.dispatch, store.getState);
 
         let state = store.getState();
         let request = state.requests.emojis.getAllCustomEmojis;
         if (request.status === RequestStatus.FAILURE) {
-            throw new Error('getAllCustomEmojis request failed');
+            throw new Error(request.error);
         }
 
         let emojis = state.entities.emojis.customEmoji;
@@ -106,9 +140,22 @@ describe('Actions.Emojis', () => {
         assert.ok(emojis[created1.id]);
         assert.ok(emojis[created2.id]);
 
-        // Should have all emojis minus the deleted one
-        await Client.deleteCustomEmoji(created2.id);
+        nock(Client4.getEmojisRoute()).
+            delete(`/${created2.id}`).
+            reply(200, OK_RESPONSE);
 
+        // Should have all emojis minus the deleted one
+        await Client4.deleteCustomEmoji(created2.id);
+
+        nock(Client4.getEmojisRoute()).
+            get('').
+            query(true).
+            reply(200, [created1]);
+
+        nock(Client4.getEmojisRoute()).
+            get('').
+            query(true).
+            reply(200, []);
         await Actions.getAllCustomEmojis(1)(store.dispatch, store.getState);
 
         state = store.getState();
@@ -122,12 +169,20 @@ describe('Actions.Emojis', () => {
         assert.ok(emojis[created1.id]);
         assert.ok(!emojis[created2.id]);
 
+        nock(Client4.getEmojisRoute()).
+            delete(`/${created1.id}`).
+            reply(200, OK_RESPONSE);
+
         // Cleanup
-        Client.deleteCustomEmoji(created1.id);
+        Client4.deleteCustomEmoji(created1.id);
     });
 
     it('deleteCustomEmoji', async () => {
         const testImageData = fs.createReadStream('test/assets/images/test.png');
+
+        nock(Client4.getEmojisRoute()).
+            post('').
+            reply(201, {id: TestHelper.generateId(), create_at: 1507918415696, update_at: 1507918415696, delete_at: 0, creator_id: TestHelper.basicUser.id, name: TestHelper.generateId()});
         const {data: created} = await Actions.createCustomEmoji(
             {
                 name: TestHelper.generateId(),
@@ -135,6 +190,10 @@ describe('Actions.Emojis', () => {
             },
             testImageData
         )(store.dispatch, store.getState);
+
+        nock(Client4.getEmojisRoute()).
+            delete(`/${created.id}`).
+            reply(200, OK_RESPONSE);
 
         await Actions.deleteCustomEmoji(created.id)(store.dispatch, store.getState);
 

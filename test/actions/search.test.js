@@ -2,9 +2,10 @@
 // See License.txt for license information.
 
 import assert from 'assert';
+import nock from 'nock';
 
 import * as Actions from 'actions/search';
-import {Client, Client4} from 'client';
+import {Client4} from 'client';
 
 import TestHelper from 'test/test_helper';
 import configureStore from 'test/test_store';
@@ -12,7 +13,7 @@ import configureStore from 'test/test_store';
 describe('Actions.Search', () => {
     let store;
     before(async () => {
-        await TestHelper.initBasic(Client, Client4);
+        await TestHelper.initBasic(Client4);
     });
 
     beforeEach(async () => {
@@ -20,24 +21,37 @@ describe('Actions.Search', () => {
     });
 
     after(async () => {
-        await TestHelper.basicClient.logout();
-        await TestHelper.basicClient4.logout();
+        await TestHelper.tearDown();
     });
 
     it('Perform Search', async () => {
         const {dispatch, getState} = store;
 
-        await Client4.createPost({
+        let post1 = {
             ...TestHelper.fakePost(TestHelper.basicChannel.id),
             message: 'try searching for this using the first and last word'
-        });
-        await Client4.createPost({
+        };
+
+        let post2 = {
             ...TestHelper.fakePost(TestHelper.basicChannel.id),
             message: 'return this message in second attempt'
-        });
+        };
+
+        nock(Client4.getPostsRoute()).
+            post('').
+            reply(201, {...post1, id: TestHelper.generateId()});
+        post1 = await Client4.createPost(post1);
+
+        nock(Client4.getPostsRoute()).
+            post('').
+            reply(201, {...post2, id: TestHelper.generateId()});
+        post2 = await Client4.createPost(post2);
 
         // Test for a couple of words
         const search1 = 'try word';
+        nock(Client4.getTeamsRoute()).
+            post(`/${TestHelper.basicTeam.id}/posts/search`).
+            reply(200, {order: [post1.id], posts: {[post1.id]: post1}});
         await Actions.searchPosts(TestHelper.basicTeam.id, search1)(dispatch, getState);
 
         let state = getState();
@@ -52,6 +66,9 @@ describe('Actions.Search', () => {
 
         // Test for posts from a user in a channel
         const search2 = `from: ${TestHelper.basicUser.username} in: ${TestHelper.basicChannel.name}`;
+        nock(Client4.getTeamsRoute()).
+            post(`/${TestHelper.basicTeam.id}/posts/search`).
+            reply(200, {order: [post1.id, post2.id, TestHelper.basicPost.id], posts: {[post1.id]: post1, [TestHelper.basicPost.id]: TestHelper.basicPost, [post2.id]: post2}});
         await Actions.searchPosts(
             TestHelper.basicTeam.id,
             search2

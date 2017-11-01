@@ -382,6 +382,10 @@ const state = {
             uploadFiles: {
                 status: 'not_started',
                 error: null
+            },
+            getFilePublicLink: {
+                status: 'not_started',
+                error: null
             }
         },
         integrations: {

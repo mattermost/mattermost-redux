@@ -5,7 +5,7 @@ import assert from 'assert';
 
 import General from 'constants/general';
 
-import {canManageMembers} from 'utils/channel_utils';
+import {canManageMembers, isAutoClosed} from 'utils/channel_utils';
 
 describe('ChannelUtils', () => {
     it('canManageMembers', () => {
@@ -94,5 +94,39 @@ describe('ChannelUtils', () => {
         assert.ok(!canManageMembers(privateChannel, systemUser, teamUser, channelUser, channelAdminsCanManageMembers, licensed));
         assert.ok(!canManageMembers(privateChannel, systemUser, teamUser, channelUser, teamAdminsCanManageMembers, licensed));
         assert.ok(!canManageMembers(privateChannel, systemUser, teamUser, channelUser, systemAdminsCanManageMembers, licensed));
+    });
+
+    it('isAutoClosed', () => {
+        const autoCloseEnabled = {CloseUnusedDirectMessages: 'true'};
+        const autoCloseDisabled = {CloseUnusedDirectMessages: 'false'};
+        const activeChannel = {id: 'channelid', last_post_at: new Date().getTime()};
+        const inactiveChannel = {id: 'channelid', last_post_at: 1};
+
+        assert.ok(isAutoClosed(autoCloseEnabled, {}, inactiveChannel));
+
+        assert.ok(isAutoClosed(autoCloseEnabled, {
+            'sidebar_settings--close_unused_direct_messages': {value: 'after_seven_days'}
+        }, inactiveChannel));
+
+        assert.ok(!isAutoClosed(autoCloseEnabled, {
+            'sidebar_settings--close_unused_direct_messages': {value: 'after_seven_days'}
+        }, inactiveChannel, new Date().getTime()));
+
+        assert.ok(!isAutoClosed(autoCloseEnabled, {
+            'sidebar_settings--close_unused_direct_messages': {value: 'after_seven_days'}
+        }, activeChannel));
+
+        assert.ok(!isAutoClosed(autoCloseDisabled, {
+            'sidebar_settings--close_unused_direct_messages': {value: 'after_seven_days'}
+        }, inactiveChannel));
+
+        assert.ok(!isAutoClosed(autoCloseEnabled, {
+            'sidebar_settings--close_unused_direct_messages': {value: 'after_seven_days'},
+            'channel_open_time--channelid': {value: new Date().getTime().toString()}
+        }, inactiveChannel));
+
+        assert.ok(!isAutoClosed(autoCloseEnabled, {
+            'sidebar_settings--close_unused_direct_messages': {value: 'never'}
+        }, inactiveChannel));
     });
 });

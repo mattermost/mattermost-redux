@@ -54,6 +54,16 @@ export function handleUploadFilesRequest(REQUEST, SUCCESS, FAILURE, CANCEL, stat
     }
 }
 
+function getFilePublicLink(state = initialRequestState(), action) {
+    return handleRequest(
+        FileTypes.GET_FILE_PUBLIC_LINK_REQUEST,
+        FileTypes.GET_FILE_PUBLIC_LINK_SUCCESS,
+        FileTypes.GET_FILE_PUBLIC_LINK_FAILURE,
+        state,
+        action
+    );
+}
+
 function uploadFiles(state = initialRequestState(), action) {
     return handleUploadFilesRequest(
         FileTypes.UPLOAD_FILES_REQUEST,
@@ -67,5 +77,6 @@ function uploadFiles(state = initialRequestState(), action) {
 
 export default combineReducers({
     getFilesForPost,
+    getFilePublicLink,
     uploadFiles
 });

@@ -3,9 +3,10 @@
 
 import fs from 'fs';
 import assert from 'assert';
+import nock from 'nock';
 
 import * as Actions from 'actions/files';
-import {Client, Client4} from 'client';
+import {Client4} from 'client';
 import {RequestStatus} from 'constants';
 import TestHelper from 'test/test_helper';
 import configureStore from 'test/test_store';
@@ -15,7 +16,7 @@ const FormData = require('form-data');
 describe('Actions.Files', () => {
     let store;
     before(async () => {
-        await TestHelper.initBasic(Client, Client4);
+        await TestHelper.initBasic(Client4);
     });
 
     beforeEach(async () => {
@@ -23,8 +24,7 @@ describe('Actions.Files', () => {
     });
 
     after(async () => {
-        await TestHelper.basicClient.logout();
-        await TestHelper.basicClient4.logout();
+        await TestHelper.tearDown();
     });
 
     it('uploadFile', async () => {
@@ -38,6 +38,10 @@ describe('Actions.Files', () => {
         imageFormData.append('channel_id', basicChannel.id);
         imageFormData.append('client_ids', clientId);
         const formBoundary = imageFormData.getBoundary();
+
+        nock(Client4.getFilesRoute()).
+            post('').
+            reply(201, {file_infos: [{id: TestHelper.generateId(), user_id: TestHelper.basicUser.id, create_at: 1507921547541, update_at: 1507921547541, delete_at: 0, name: 'test.png', extension: 'png', size: 258428, mime_type: 'image/png', width: 600, height: 600, has_preview_image: true}], client_ids: [TestHelper.generateId()]});
 
         await Actions.uploadFile(basicChannel.id, null, [clientId], imageFormData, formBoundary)(store.dispatch, store.getState);
 
@@ -64,13 +68,25 @@ describe('Actions.Files', () => {
         imageFormData.append('client_ids', clientId);
         const formBoundary = imageFormData.getBoundary();
 
+        nock(Client4.getFilesRoute()).
+            post('').
+            reply(201, {file_infos: [{id: TestHelper.generateId(), user_id: TestHelper.basicUser.id, create_at: 1507921547541, update_at: 1507921547541, delete_at: 0, name: 'test.png', extension: 'png', size: 258428, mime_type: 'image/png', width: 600, height: 600, has_preview_image: true}], client_ids: [TestHelper.generateId()]});
+
         const fileUploadResp = await basicClient4.
             uploadFile(imageFormData, formBoundary);
         const fileId = fileUploadResp.file_infos[0].id;
 
         const fakePostForFile = TestHelper.fakePost(basicChannel.id);
         fakePostForFile.file_ids = [fileId];
+
+        nock(Client4.getPostsRoute()).
+            post('').
+            reply(201, {...TestHelper.fakePostWithId(), ...fakePostForFile});
         const postForFile = await basicClient4.createPost(fakePostForFile);
+
+        nock(Client4.getPostsRoute()).
+            get(`/${postForFile.id}/files/info`).
+            reply(200, [{id: fileId, user_id: TestHelper.basicUser.id, create_at: 1507921547541, update_at: 1507921547541, delete_at: 0, name: 'test.png', extension: 'png', size: 258428, mime_type: 'image/png', width: 600, height: 600, has_preview_image: true}]);
 
         await Actions.getFilesForPost(postForFile.id)(store.dispatch, store.getState);
 
@@ -103,13 +119,25 @@ describe('Actions.Files', () => {
         imageFormData.append('client_ids', clientId);
         const formBoundary = imageFormData.getBoundary();
 
+        nock(Client4.getFilesRoute()).
+            post('').
+            reply(201, {file_infos: [{id: TestHelper.generateId(), user_id: TestHelper.basicUser.id, create_at: 1507921547541, update_at: 1507921547541, delete_at: 0, name: 'test.png', extension: 'png', size: 258428, mime_type: 'image/png', width: 600, height: 600, has_preview_image: true}], client_ids: [TestHelper.generateId()]});
+
         const fileUploadResp = await basicClient4.
             uploadFile(imageFormData, formBoundary);
         const fileId = fileUploadResp.file_infos[0].id;
 
         const fakePostForFile = TestHelper.fakePost(basicChannel.id);
         fakePostForFile.file_ids = [fileId];
+
+        nock(Client4.getPostsRoute()).
+            post('').
+            reply(201, {...TestHelper.fakePostWithId(), ...fakePostForFile});
         const postForFile = await basicClient4.createPost(fakePostForFile);
+
+        nock(Client4.getPostsRoute()).
+            get(`/${postForFile.id}/files/info`).
+            reply(200, [{id: fileId, user_id: TestHelper.basicUser.id, create_at: 1507921547541, update_at: 1507921547541, delete_at: 0, name: 'test.png', extension: 'png', size: 258428, mime_type: 'image/png', width: 600, height: 600, has_preview_image: true}]);
 
         await Actions.getMissingFilesForPost(postForFile.id)(store.dispatch, store.getState);
 
@@ -131,5 +159,34 @@ describe('Actions.Files', () => {
 
         const {data: files} = await Actions.getMissingFilesForPost(postForFile.id)(store.dispatch, store.getState);
         assert.ok(files.length === 0);
+    });
+
+    it('getFilePublicLink', async () => {
+        if (TestHelper.isLiveServer()) {
+            console.log('Skipping mock-only test');
+            return;
+        }
+
+        const fileId = 't1izsr9uspgi3ynggqu6xxjn9y';
+        nock(Client4.getBaseRoute()).
+            get(`/files/${fileId}/link`).
+            query(true).
+            reply(200, {
+                link: 'https://mattermost.com/files/ndans23ry2rtjd1z73g6i5f3fc/public?h=rE1-b2N1VVVMsAQssjwlfNawbVOwUy1TRDuTeGC_tys'
+            });
+
+        await Actions.getFilePublicLink(fileId)(store.dispatch, store.getState);
+
+        const state = store.getState();
+        const request = state.requests.files.getFilePublicLink;
+        if (request.status === RequestStatus.FAILURE) {
+            console.log(JSON.stringify(request));
+            throw new Error('getFilePublicLink request failed');
+        }
+
+        const filePublicLink = state.entities.files.filePublicLink.link;
+        assert.equal('https://mattermost.com/files/ndans23ry2rtjd1z73g6i5f3fc/public?h=rE1-b2N1VVVMsAQssjwlfNawbVOwUy1TRDuTeGC_tys', filePublicLink);
+        assert.ok(filePublicLink);
+        assert.ok(filePublicLink.length > 0);
     });
 });
