@@ -5,6 +5,9 @@ import {createSelector} from 'reselect';
 
 import {getConfig, getLicense} from 'selectors/entities/general';
 import {
+    getLastPostPerChannel
+} from 'selectors/entities/posts';
+import {
     getFavoritesPreferences,
     getMyPreferences,
     getTeammateNameDisplaySetting,
@@ -20,7 +23,8 @@ import {
     completeDirectChannelInfo,
     completeDirectChannelDisplayName,
     sortChannelsByDisplayName,
-    getDirectChannelName
+    getDirectChannelName,
+    isAutoClosed
 } from 'utils/channel_utils';
 import {createIdsSelector} from 'utils/helpers';
 
@@ -222,17 +226,19 @@ export const getOtherChannels = createSelector(
 export const getChannelsByCategory = createSelector(
     getCurrentChannelId,
     getMyChannels,
+    getConfig,
     getMyPreferences,
     getTeammateNameDisplaySetting,
     (state) => state.entities.users,
-    (currentChannelId, channels, myPreferences, teammateNameDisplay, usersState) => {
+    getLastPostPerChannel,
+    (currentChannelId, channels, config, myPreferences, teammateNameDisplay, usersState, lastPosts) => {
         const allChannels = channels.map((c) => {
             const channel = {...c};
             channel.isCurrent = c.id === currentChannelId;
             return channel;
         });
 
-        return buildDisplayableChannelList(usersState, allChannels, myPreferences, teammateNameDisplay);
+        return buildDisplayableChannelList(usersState, allChannels, config, myPreferences, teammateNameDisplay, lastPosts);
     }
 );
 
@@ -240,17 +246,19 @@ export const getChannelsWithUnreadSection = createSelector(
     getCurrentChannelId,
     getMyChannels,
     getMyChannelMemberships,
+    getConfig,
     getMyPreferences,
     getTeammateNameDisplaySetting,
     (state) => state.entities.users,
-    (currentChannelId, channels, myMembers, myPreferences, teammateNameDisplay, usersState) => {
+    getLastPostPerChannel,
+    (currentChannelId, channels, myMembers, config, myPreferences, teammateNameDisplay, usersState, lastPosts) => {
         const allChannels = channels.map((c) => {
             const channel = {...c};
             channel.isCurrent = c.id === currentChannelId;
             return channel;
         });
 
-        return buildDisplayableChannelListWithUnreadSection(usersState, allChannels, myMembers, myPreferences, teammateNameDisplay);
+        return buildDisplayableChannelListWithUnreadSection(usersState, allChannels, myMembers, config, myPreferences, teammateNameDisplay, lastPosts);
     }
 );
 
@@ -508,7 +516,10 @@ export const getSortedDirectChannelIds = createIdsSelector(
     getUnreadChannelIds,
     getSortedFavoriteChannelIds,
     getTeammateNameDisplaySetting,
-    (currentUser, profiles, channels, teammates, groupIds, unreadIds, favoriteIds, settings) => {
+    getConfig,
+    getMyPreferences,
+    getLastPostPerChannel,
+    (currentUser, profiles, channels, teammates, groupIds, unreadIds, favoriteIds, settings, config, preferences, lastPosts) => {
         if (!currentUser) {
             return null;
         }
@@ -519,13 +530,18 @@ export const getSortedDirectChannelIds = createIdsSelector(
         teammates.reduce((result, teammateId) => {
             const name = getDirectChannelName(currentUser.id, teammateId);
             const channel = channelValues.find((c) => c.name === name); //eslint-disable-line max-nested-callbacks
-            if (channel && !unreadIds.includes(channel.id) && !favoriteIds.includes(channel.id)) {
-                result.push(channel.id);
+            if (channel) {
+                const lastPost = lastPosts[channel.id];
+                if (!unreadIds.includes(channel.id) && !favoriteIds.includes(channel.id) && !isAutoClosed(config, preferences, channel, lastPost ? lastPost.create_at : 0)) {
+                    result.push(channel.id);
+                }
             }
             return result;
         }, directChannelsIds);
         const directChannels = groupIds.filter((id) => {
-            return !unreadIds.includes(id) && !favoriteIds.includes(id);
+            const channel = channels[id];
+            const lastPost = lastPosts[channel.id];
+            return !unreadIds.includes(id) && !favoriteIds.includes(id) && !isAutoClosed(config, preferences, channels[id], lastPost ? lastPost.create_at : 0);
         }).concat(directChannelsIds).map((id) => {
             const channel = channels[id];
             return completeDirectChannelDisplayName(currentUser.id, profiles, settings, channel);

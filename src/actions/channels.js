@@ -122,7 +122,10 @@ export function createDirectChannel(userId, otherUserId) {
             last_update_at: created.create_at
         };
 
-        const preferences = [{user_id: userId, category: Preferences.CATEGORY_DIRECT_CHANNEL_SHOW, name: otherUserId, value: 'true'}];
+        const preferences = [
+            {user_id: userId, category: Preferences.CATEGORY_DIRECT_CHANNEL_SHOW, name: otherUserId, value: 'true'},
+            {user_id: userId, category: Preferences.CATEGORY_CHANNEL_OPEN_TIME, name: created.id, value: new Date().getTime().toString()}
+        ];
 
         savePreferences(userId, preferences)(dispatch, getState);
 
@@ -182,7 +185,10 @@ export function createGroupChannel(userIds) {
             last_update_at: created.create_at
         };
 
-        const preferences = [{user_id: currentUserId, category: Preferences.CATEGORY_GROUP_CHANNEL_SHOW, name: created.id, value: 'true'}];
+        const preferences = [
+            {user_id: currentUserId, category: Preferences.CATEGORY_GROUP_CHANNEL_SHOW, name: created.id, value: 'true'},
+            {user_id: currentUserId, category: Preferences.CATEGORY_CHANNEL_OPEN_TIME, name: created.id, value: new Date().getTime().toString()}
+        ];
 
         savePreferences(currentUserId, preferences)(dispatch, getState);
 
