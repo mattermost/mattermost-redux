@@ -1003,7 +1003,7 @@ describe('Actions.Users', () => {
 
     it('resetUserPassword', async () => {
         if (TestHelper.isLiveServer()) {
-
+            console.log('Skipping mock-only test');
             return;
         }
 
