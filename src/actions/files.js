@@ -6,7 +6,7 @@ import {batchActions} from 'redux-batched-actions';
 import {Client4} from 'client';
 import {FileTypes} from 'action_types';
 import {logError} from './errors';
-import {forceLogoutIfNecessary} from './helpers';
+import {bindClientFunc, forceLogoutIfNecessary} from './helpers';
 
 export function getFilesForPost(postId) {
     return async (dispatch, getState) => {
@@ -95,4 +95,14 @@ export function uploadFile(channelId, rootId, clientIds, fileFormData, formBound
 
         return {data: files};
     };
+}
+
+export function getFilePublicLink(fileId) {
+    return bindClientFunc(
+        Client4.getFilePublicLink,
+        FileTypes.GET_FILE_PUBLIC_LINK_REQUEST,
+        [FileTypes.RECEIVED_FILE_PUBLIC_LINK, FileTypes.GET_FILE_PUBLIC_LINK_SUCCESS],
+        FileTypes.GET_FILE_PUBLIC_LINK_FAILURE,
+        fileId
+    );
 }

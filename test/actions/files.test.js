@@ -3,6 +3,7 @@
 
 import fs from 'fs';
 import assert from 'assert';
+import nock from 'nock';
 
 import * as Actions from 'actions/files';
 import {Client, Client4} from 'client';
@@ -23,6 +24,7 @@ describe('Actions.Files', () => {
     });
 
     after(async () => {
+        nock.restore();
         await TestHelper.basicClient.logout();
         await TestHelper.basicClient4.logout();
     });
@@ -131,5 +133,30 @@ describe('Actions.Files', () => {
 
         const {data: files} = await Actions.getMissingFilesForPost(postForFile.id)(store.dispatch, store.getState);
         assert.ok(files.length === 0);
+    });
+
+    it('getFilePublicLink', async () => {
+        TestHelper.activateMocking();
+        const fileId = 't1izsr9uspgi3ynggqu6xxjn9y';
+        nock(Client4.getBaseRoute()).
+            get(`/files/${fileId}/link`).
+            query(true).
+            reply(200, {
+                link: 'https://mattermost.com/files/ndans23ry2rtjd1z73g6i5f3fc/public?h=rE1-b2N1VVVMsAQssjwlfNawbVOwUy1TRDuTeGC_tys'
+            });
+
+        await Actions.getFilePublicLink(fileId)(store.dispatch, store.getState);
+
+        const state = store.getState();
+        const request = state.requests.files.getFilePublicLink;
+        if (request.status === RequestStatus.FAILURE) {
+            console.log(JSON.stringify(request));
+            throw new Error('getFilePublicLink request failed');
+        }
+
+        const filePublicLink = state.entities.files.filePublicLink.link;
+        assert.equal('https://mattermost.com/files/ndans23ry2rtjd1z73g6i5f3fc/public?h=rE1-b2N1VVVMsAQssjwlfNawbVOwUy1TRDuTeGC_tys', filePublicLink);
+        assert.ok(filePublicLink);
+        assert.ok(filePublicLink.length > 0);
     });
 });
