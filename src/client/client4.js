@@ -1081,7 +1081,7 @@ export default class Client4 {
         );
     };
 
-    addToChannel = async (userId, channelId, postRootId) => {
+    addToChannel = async (userId, channelId, postRootId = '') => {
         this.trackEvent('api', 'api_channels_add_member', {channel_id: channelId});
 
         const member = {user_id: userId, channel_id: channelId, post_root_id: postRootId};
