@@ -11,6 +11,14 @@ import {createOfflineReducer, networkStatusChangedAction, offlineCompose} from '
 import defaultOfflineConfig from 'redux-offline/lib/defaults';
 import createActionBuffer from 'redux-action-buffer';
 
+const devToolsEnhancer = (
+    typeof window !== 'undefined' && window.__REDUX_DEVTOOLS_EXTENSION__ ?  // eslint-disable-line no-underscore-dangle
+    window.__REDUX_DEVTOOLS_EXTENSION__ :  // eslint-disable-line no-underscore-dangle
+    () => {
+        return (noop) => noop;
+    }
+);
+
 import {General} from 'constants';
 import serviceReducer from 'reducers';
 import deepFreezeAndThrowOnMutation from 'utils/deep_freeze';
@@ -46,11 +54,14 @@ export default function configureServiceStore(preloadedState, appReducer, userOf
         // eslint-disable-line - offlineCompose(config)(middleware, other funcs)
         offlineCompose(baseOfflineConfig)(
             middleware,
-            [devTools({
-                name: 'Mattermost',
-                hostname: 'localhost',
-                port: 5678
-            })]
+            [
+                devTools({
+                    name: 'Mattermost',
+                    hostname: 'localhost',
+                    port: 5678
+                }),
+                devToolsEnhancer()
+            ]
         )
     );
 
