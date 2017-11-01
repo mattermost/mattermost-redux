@@ -1,8 +1,6 @@
-# Mattermost Redux (beta)
+# Mattermost Redux
 
-**Supported Server Versions:** Latest
-
-The project is in beta, with the purpose of consolidating the storage, web utilities and logic of the webapp and React Native mobile clients into a single driver. We encourage you to use mattermost-redux to power your own Mattermost clients or integrations.
+The project purpose is consolidating the storage, web utilities and logic of the webapp and React Native mobile clients into a single driver. We encourage you to use mattermost-redux to power your own Mattermost clients or integrations.
 
 [Redux](http://redux.js.org/docs/introduction/) is the backbone for this project and many of the design decisions and patterns stem from it.
 
@@ -127,17 +125,6 @@ client.login(username, password)
     console.error(err);
 });
 ```
-
-# Features for Stable Release
-
-* Improved return pattern for actions, always return both data and error
-* Error reporting for optimistic actions
-* Better documentation
-
-### Future Features
-
-* Full server mocking for unit tests (including WebSocket mocking)
-* Offline support with automatic update polling (needs server work)
 
 # How to Contribute
 

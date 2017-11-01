@@ -1,7 +1,6 @@
 {
   "name": "mattermost-redux",
-  "version": "0.0.1",
-  "private": true,
+  "version": "1.0.0",
   "dependencies": {
     "deep-equal": "1.0.1",
     "harmony-reflect": "1.5.1",
@@ -46,7 +45,6 @@
     "build": "babel src --out-dir .",
     "check": "node_modules/.bin/eslint --ext \".js\" --ignore-pattern node_modules --quiet .",
     "test": "NODE_ENV=test mocha --opts test/mocha.opts",
-    "test-no-mock": "TEST_SERVER=1 NOCK_OFF=true NODE_ENV=test mocha --opts test/mocha.opts",
-    "postinstall": "npm run build"
+    "test-no-mock": "TEST_SERVER=1 NOCK_OFF=true NODE_ENV=test mocha --opts test/mocha.opts"
   }
 }
