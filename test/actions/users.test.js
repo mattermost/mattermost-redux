@@ -6,7 +6,7 @@ import nock from 'nock';
 import fs from 'fs';
 
 import * as Actions from 'actions/users';
-import {Client, Client4} from 'client';
+import {Client4} from 'client';
 import {RequestStatus} from 'constants';
 import TestHelper from 'test/test_helper';
 import configureStore from 'test/test_store';
@@ -16,7 +16,7 @@ const OK_RESPONSE = {status: 'OK'};
 describe('Actions.Users', () => {
     let store;
     before(async () => {
-        await TestHelper.initBasic(Client, Client4);
+        await TestHelper.initBasic(Client4);
     });
 
     beforeEach(async () => {
@@ -24,12 +24,16 @@ describe('Actions.Users', () => {
     });
 
     after(async () => {
-        await TestHelper.basicClient.logout();
-        await TestHelper.basicClient4.logout();
+        await TestHelper.tearDown();
     });
 
     it('createUser', async () => {
-        const {data: user} = await Actions.createUser(TestHelper.fakeUser())(store.dispatch, store.getState);
+        const userToCreate = TestHelper.fakeUser();
+        nock(Client4.getUsersRoute()).
+            post('').
+            reply(201, {...userToCreate, id: TestHelper.generateId()});
+
+        const {data: user} = await Actions.createUser(userToCreate)(store.dispatch, store.getState);
 
         const state = store.getState();
         const createRequest = state.requests.users.create;
@@ -45,8 +49,16 @@ describe('Actions.Users', () => {
 
     it('login', async () => {
         const user = TestHelper.basicUser;
+
+        nock(Client4.getUsersRoute()).
+            post('/logout').
+            reply(200, OK_RESPONSE);
+
         await TestHelper.basicClient4.logout();
-        await Actions.login(user.email, 'password1')(store.dispatch, store.getState);
+
+        TestHelper.mockLogin();
+
+        await Actions.login(user.email, user.password)(store.dispatch, store.getState);
 
         const state = store.getState();
         const loginRequest = state.requests.users.login;
@@ -71,7 +83,15 @@ describe('Actions.Users', () => {
 
     it('loginById', async () => {
         const user = TestHelper.basicUser;
+
+        nock(Client4.getUsersRoute()).
+            post('/logout').
+            reply(200, OK_RESPONSE);
+
         await TestHelper.basicClient4.logout();
+
+        TestHelper.mockLogin();
+
         await Actions.loginById(user.id, 'password1')(store.dispatch, store.getState);
 
         const state = store.getState();
@@ -96,6 +116,10 @@ describe('Actions.Users', () => {
     });
 
     it('logout', async () => {
+        nock(Client4.getUsersRoute()).
+            post('/logout').
+            reply(200, OK_RESPONSE);
+
         await Actions.logout()(store.dispatch, store.getState);
 
         const state = store.getState();
@@ -136,11 +160,19 @@ describe('Actions.Users', () => {
         assert.deepStrictEqual(posts.posts, {}, 'posts is not empty');
         assert.deepStrictEqual(posts.postsInChannel, {}, 'posts by channel is not empty');
         assert.deepStrictEqual(preferences.myPreferences, {}, 'user preferences not empty');
+
+        nock(Client4.getUsersRoute()).
+            post('/login').
+            reply(200, TestHelper.basicUser);
+        await TestHelper.basicClient4.login(TestHelper.basicUser.email, 'password1');
     });
 
     it('getProfiles', async () => {
-        await TestHelper.basicClient4.login(TestHelper.basicUser.email, 'password1');
-        await TestHelper.basicClient4.createUser(TestHelper.fakeUser());
+        nock(Client4.getUsersRoute()).
+            get('').
+            query(true).
+            reply(200, [TestHelper.basicUser]);
+
         await Actions.getProfiles(0)(store.dispatch, store.getState);
 
         const profilesRequest = store.getState().requests.users.getProfiles;
@@ -154,8 +186,16 @@ describe('Actions.Users', () => {
     });
 
     it('getProfilesByIds', async () => {
-        await TestHelper.basicClient4.login(TestHelper.basicUser.email, 'password1');
+        nock(Client4.getUsersRoute()).
+            post('').
+            reply(200, TestHelper.fakeUserWithId());
+
         const user = await TestHelper.basicClient4.createUser(TestHelper.fakeUser());
+
+        nock(Client4.getUsersRoute()).
+            post('/ids').
+            reply(200, [user]);
+
         await Actions.getProfilesByIds([user.id])(store.dispatch, store.getState);
 
         const profilesRequest = store.getState().requests.users.getProfiles;
@@ -169,8 +209,16 @@ describe('Actions.Users', () => {
     });
 
     it('getMissingProfilesByIds', async () => {
-        await TestHelper.basicClient4.login(TestHelper.basicUser.email, 'password1');
+        nock(Client4.getUsersRoute()).
+            post('').
+            reply(200, TestHelper.fakeUserWithId());
+
         const user = await TestHelper.basicClient4.createUser(TestHelper.fakeUser());
+
+        nock(Client4.getUsersRoute()).
+            post('/ids').
+            reply(200, [user]);
+
         await Actions.getMissingProfilesByIds([user.id])(store.dispatch, store.getState);
 
         const {profiles} = store.getState().entities.users;
@@ -178,8 +226,16 @@ describe('Actions.Users', () => {
     });
 
     it('getProfilesByUsernames', async () => {
-        await TestHelper.basicClient4.login(TestHelper.basicUser.email, 'password1');
+        nock(Client4.getUsersRoute()).
+            post('').
+            reply(200, TestHelper.fakeUserWithId());
+
         const user = await TestHelper.basicClient4.createUser(TestHelper.fakeUser());
+
+        nock(Client4.getUsersRoute()).
+            post('/usernames').
+            reply(200, [user]);
+
         await Actions.getProfilesByUsernames([user.username])(store.dispatch, store.getState);
 
         const profilesRequest = store.getState().requests.users.getProfiles;
@@ -193,6 +249,11 @@ describe('Actions.Users', () => {
     });
 
     it('getProfilesInTeam', async () => {
+        nock(Client4.getUsersRoute()).
+            get('').
+            query(true).
+            reply(200, [TestHelper.basicUser]);
+
         await Actions.getProfilesInTeam(TestHelper.basicTeam.id, 0)(store.dispatch, store.getState);
 
         const profilesRequest = store.getState().requests.users.getProfilesInTeam;
@@ -209,14 +270,18 @@ describe('Actions.Users', () => {
     });
 
     it('getProfilesNotInTeam', async () => {
-        await TestHelper.basicClient4.createUser(
-            TestHelper.fakeUser(),
-            null,
-            null,
-            TestHelper.basicTeam.invite_id
-        );
+        const team = TestHelper.basicTeam;
 
-        const team = await Client4.createTeam({...TestHelper.fakeTeam(), allow_open_invite: true});
+        nock(Client4.getUsersRoute()).
+            post('').
+            reply(200, TestHelper.fakeUserWithId());
+
+        const user = await TestHelper.basicClient4.createUser(TestHelper.fakeUser());
+
+        nock(Client4.getUsersRoute()).
+            get('').
+            query(true).
+            reply(200, [user]);
 
         await Actions.getProfilesNotInTeam(team.id, 0)(store.dispatch, store.getState);
 
@@ -233,18 +298,18 @@ describe('Actions.Users', () => {
     });
 
     it('getProfilesWithoutTeam', async () => {
-        const user = await TestHelper.basicClient4.createUser(
-            TestHelper.fakeUser(),
-        );
+        nock(Client4.getUsersRoute()).
+            post('').
+            reply(200, TestHelper.fakeUserWithId());
 
-        TestHelper.activateMocking();
+        const user = await TestHelper.basicClient4.createUser(TestHelper.fakeUser());
+
         nock(Client4.getBaseRoute()).
             get('/users').
             query(true).
             reply(200, [user]);
 
         await Actions.getProfilesWithoutTeam(0)(store.dispatch, store.getState);
-        nock.restore();
 
         const profilesRequest = store.getState().requests.users.getProfilesWithoutTeam;
         const {profilesWithoutTeam, profiles} = store.getState().entities.users;
@@ -254,11 +319,17 @@ describe('Actions.Users', () => {
         }
 
         assert.ok(profilesWithoutTeam);
-        assert.ok(profilesWithoutTeam.has(user.id));
-        assert.ok(profiles[user.id]);
+        assert.ok(profilesWithoutTeam.size > 0);
+        assert.ok(profiles);
+        assert.ok(Object.keys(profiles).length > 0);
     });
 
     it('getProfilesInChannel', async () => {
+        nock(Client4.getBaseRoute()).
+            get('/users').
+            query(true).
+            reply(200, [TestHelper.basicUser]);
+
         await Actions.getProfilesInChannel(
             TestHelper.basicChannel.id,
             0
@@ -277,12 +348,22 @@ describe('Actions.Users', () => {
     });
 
     it('getProfilesNotInChannel', async () => {
+        nock(Client4.getUsersRoute()).
+            post('').
+            query(true).
+            reply(200, TestHelper.fakeUserWithId());
+
         const user = await TestHelper.basicClient4.createUser(
             TestHelper.fakeUser(),
             null,
             null,
             TestHelper.basicTeam.invite_id
         );
+
+        nock(Client4.getBaseRoute()).
+            get('/users').
+            query(true).
+            reply(200, [user]);
 
         await Actions.getProfilesNotInChannel(
             TestHelper.basicTeam.id,
@@ -303,12 +384,15 @@ describe('Actions.Users', () => {
     });
 
     it('getUser', async () => {
-        const user = await TestHelper.basicClient4.createUser(
-            TestHelper.fakeUser(),
-            null,
-            null,
-            TestHelper.basicTeam.invite_id
-        );
+        nock(Client4.getUsersRoute()).
+            post('').
+            reply(200, TestHelper.fakeUserWithId());
+
+        const user = await TestHelper.basicClient4.createUser(TestHelper.fakeUser());
+
+        nock(Client4.getBaseRoute()).
+            get(`/users/${user.id}`).
+            reply(200, user);
 
         await Actions.getUser(
             user.id
@@ -327,6 +411,10 @@ describe('Actions.Users', () => {
     });
 
     it('getMe', async () => {
+        nock(Client4.getBaseRoute()).
+            get('/users/me').
+            reply(200, TestHelper.basicUser);
+
         await Actions.getMe()(store.dispatch, store.getState);
 
         const state = store.getState();
@@ -342,12 +430,15 @@ describe('Actions.Users', () => {
     });
 
     it('getUserByUsername', async () => {
-        const user = await TestHelper.basicClient4.createUser(
-            TestHelper.fakeUser(),
-            null,
-            null,
-            TestHelper.basicTeam.invite_id
-        );
+        nock(Client4.getUsersRoute()).
+            post('').
+            reply(200, TestHelper.fakeUserWithId());
+
+        const user = await TestHelper.basicClient4.createUser(TestHelper.fakeUser());
+
+        nock(Client4.getBaseRoute()).
+            get(`/users/username/${user.username}`).
+            reply(200, user);
 
         await Actions.getUserByUsername(
             user.username
@@ -366,12 +457,15 @@ describe('Actions.Users', () => {
     });
 
     it('getUserByEmail', async () => {
-        const user = await TestHelper.basicClient4.createUser(
-            TestHelper.fakeUser(),
-            null,
-            null,
-            TestHelper.basicTeam.invite_id
-        );
+        nock(Client4.getUsersRoute()).
+            post('').
+            reply(200, TestHelper.fakeUserWithId());
+
+        const user = await TestHelper.basicClient4.createUser(TestHelper.fakeUser());
+
+        nock(Client4.getBaseRoute()).
+            get(`/users/email/${user.email}`).
+            reply(200, user);
 
         await Actions.getUserByEmail(
             user.email
@@ -392,6 +486,10 @@ describe('Actions.Users', () => {
     it('searchProfiles', async () => {
         const user = TestHelper.basicUser;
 
+        nock(Client4.getBaseRoute()).
+            post('/users/search').
+            reply(200, [user]);
+
         await Actions.searchProfiles(
             user.username
         )(store.dispatch, store.getState);
@@ -409,10 +507,12 @@ describe('Actions.Users', () => {
     });
 
     it('getStatusesByIds', async () => {
-        const user = await TestHelper.basicClient4.createUser(TestHelper.fakeUser());
+        nock(Client4.getBaseRoute()).
+            post('/users/status/ids').
+            reply(200, [{user_id: TestHelper.basicUser.id, status: 'online', manual: false, last_activity_at: 1507662212199}]);
 
         await Actions.getStatusesByIds(
-            [TestHelper.basicUser.id, user.id]
+            [TestHelper.basicUser.id]
         )(store.dispatch, store.getState);
 
         const statusesRequest = store.getState().requests.users.getStatusesByIds;
@@ -423,12 +523,15 @@ describe('Actions.Users', () => {
         }
 
         assert.ok(statuses[TestHelper.basicUser.id]);
-        assert.ok(statuses[user.id]);
-        assert.equal(Object.keys(statuses).length, 2);
+        assert.equal(Object.keys(statuses).length, 1);
     });
 
     it('getStatus', async () => {
-        const user = await TestHelper.basicClient4.createUser(TestHelper.fakeUser());
+        const user = TestHelper.basicUser;
+
+        nock(Client4.getBaseRoute()).
+            get(`/users/${user.id}/status`).
+            reply(200, {user_id: user.id, status: 'online', manual: false, last_activity_at: 1507662212199});
 
         await Actions.getStatus(
             user.id
@@ -445,6 +548,10 @@ describe('Actions.Users', () => {
     });
 
     it('setStatus', async () => {
+        nock(Client4.getBaseRoute()).
+            put(`/users/${TestHelper.basicUser.id}/status`).
+            reply(200, OK_RESPONSE);
+
         await Actions.setStatus(
             {user_id: TestHelper.basicUser.id, status: 'away'}
         )(store.dispatch, store.getState);
@@ -460,6 +567,10 @@ describe('Actions.Users', () => {
     });
 
     it('getSessions', async () => {
+        nock(Client4.getBaseRoute()).
+            get(`/users/${TestHelper.basicUser.id}/sessions`).
+            reply(200, [{id: TestHelper.generateId(), create_at: 1507756921338, expires_at: 1510348921338, last_activity_at: 1507821125630, user_id: TestHelper.basicUser.id, device_id: '', roles: 'system_admin system_user'}]);
+
         await Actions.getSessions(TestHelper.basicUser.id)(store.dispatch, store.getState);
 
         const sessionsRequest = store.getState().requests.users.getSessions;
@@ -474,6 +585,10 @@ describe('Actions.Users', () => {
     });
 
     it('revokeSession', async () => {
+        nock(Client4.getBaseRoute()).
+            get(`/users/${TestHelper.basicUser.id}/sessions`).
+            reply(200, [{id: TestHelper.generateId(), create_at: 1507756921338, expires_at: 1510348921338, last_activity_at: 1507821125630, user_id: TestHelper.basicUser.id, device_id: '', roles: 'system_admin system_user'}]);
+
         await Actions.getSessions(TestHelper.basicUser.id)(store.dispatch, store.getState);
 
         const sessionsRequest = store.getState().requests.users.getSessions;
@@ -484,6 +599,9 @@ describe('Actions.Users', () => {
 
         const sessionsLength = sessions.length;
 
+        nock(Client4.getBaseRoute()).
+            post(`/users/${TestHelper.basicUser.id}/sessions/revoke`).
+            reply(200, OK_RESPONSE);
         await Actions.revokeSession(TestHelper.basicUser.id, sessions[0].id)(store.dispatch, store.getState);
 
         const revokeRequest = store.getState().requests.users.revokeSession;
@@ -493,10 +611,19 @@ describe('Actions.Users', () => {
 
         sessions = store.getState().entities.users.mySessions;
         assert.ok(sessions.length === sessionsLength - 1);
+
+        TestHelper.basicClient4.token = '';
+        nock(Client4.getUsersRoute()).
+            post('/login').
+            reply(200, TestHelper.basicUser);
+        await TestHelper.basicClient4.login(TestHelper.basicUser.email, 'password1');
     });
 
     it('revokeSession and logout', async () => {
-        await TestHelper.basicClient4.login(TestHelper.basicUser.email, 'password1');
+        nock(Client4.getBaseRoute()).
+            get(`/users/${TestHelper.basicUser.id}/sessions`).
+            reply(200, [{id: TestHelper.generateId(), create_at: 1507756921338, expires_at: 1510348921338, last_activity_at: 1507821125630, user_id: TestHelper.basicUser.id, device_id: '', roles: 'system_admin system_user'}]);
+
         await Actions.getSessions(TestHelper.basicUser.id)(store.dispatch, store.getState);
 
         const sessionsRequest = store.getState().requests.users.getSessions;
@@ -506,6 +633,10 @@ describe('Actions.Users', () => {
             throw new Error(JSON.stringify(sessionsRequest.error));
         }
 
+        nock(Client4.getBaseRoute()).
+            post(`/users/${TestHelper.basicUser.id}/sessions/revoke`).
+            reply(200, OK_RESPONSE);
+
         await Actions.revokeSession(TestHelper.basicUser.id, sessions[0].id)(store.dispatch, store.getState);
 
         const revokeRequest = store.getState().requests.users.revokeSession;
@@ -513,24 +644,44 @@ describe('Actions.Users', () => {
             throw new Error(JSON.stringify(revokeRequest.error));
         }
 
+        nock(Client4.getUsersRoute()).
+            get('').
+            reply(401, {});
+
         await Actions.getProfiles(0)(store.dispatch, store.getState);
 
         const logoutRequest = store.getState().requests.users.logout;
         if (logoutRequest.status === RequestStatus.FAILURE) {
             throw new Error(JSON.stringify(logoutRequest.error));
         }
+
+        nock(Client4.getUsersRoute()).
+            post('/login').
+            reply(200, TestHelper.basicUser);
+        await TestHelper.basicClient4.login(TestHelper.basicUser.email, 'password1');
     });
 
     it('revokeAllSessionsForCurrentUser', async () => {
         const user = TestHelper.basicUser;
+        nock(Client4.getUsersRoute()).
+            post('/logout').
+            reply(200, OK_RESPONSE);
         await TestHelper.basicClient4.logout();
         let sessions = store.getState().entities.users.mySessions;
 
         assert.strictEqual(sessions.length, 0);
 
+        TestHelper.mockLogin();
         await Actions.loginById(user.id, 'password1')(store.dispatch, store.getState);
+
+        nock(Client4.getUsersRoute()).
+            post('/login').
+            reply(200, TestHelper.basicUser);
         await TestHelper.basicClient4.login(TestHelper.basicUser.email, 'password1');
 
+        nock(Client4.getBaseRoute()).
+            get(`/users/${user.id}/sessions`).
+            reply(200, [{id: TestHelper.generateId(), create_at: 1507756921338, expires_at: 1510348921338, last_activity_at: 1507821125630, user_id: TestHelper.basicUser.id, device_id: '', roles: 'system_admin system_user'}, {id: TestHelper.generateId(), create_at: 1507756921338, expires_at: 1510348921338, last_activity_at: 1507821125630, user_id: TestHelper.basicUser.id, device_id: '', roles: 'system_admin system_user'}]);
         await Actions.getSessions(user.id)(store.dispatch, store.getState);
 
         const sessionsRequest = store.getState().requests.users.getSessions;
@@ -542,6 +693,9 @@ describe('Actions.Users', () => {
         sessions = store.getState().entities.users.mySessions;
         assert.ok(sessions.length > 1);
 
+        nock(Client4.getBaseRoute()).
+            post(`/users/${user.id}/sessions/revoke/all`).
+            reply(200, OK_RESPONSE);
         await Actions.revokeAllSessionsForUser(user.id)(store.dispatch, store.getState);
 
         const revokeRequest = store.getState().requests.users.revokeAllSessionsForUser;
@@ -549,6 +703,10 @@ describe('Actions.Users', () => {
             throw new Error(JSON.stringify(revokeRequest.error));
         }
 
+        nock(Client4.getUsersRoute()).
+            get('').
+            query(true).
+            reply(401, {});
         await Actions.getProfiles(0)(store.dispatch, store.getState);
 
         const logoutRequest = store.getState().requests.users.logout;
@@ -559,10 +717,19 @@ describe('Actions.Users', () => {
         sessions = store.getState().entities.users.mySessions;
 
         assert.strictEqual(sessions.length, 0);
+
+        nock(Client4.getUsersRoute()).
+            post('/login').
+            reply(200, TestHelper.basicUser);
+        await TestHelper.basicClient4.login(TestHelper.basicUser.email, 'password1');
     });
 
     it('getUserAudits', async () => {
-        await TestHelper.basicClient4.login(TestHelper.basicUser.email, 'password1');
+        nock(Client4.getUsersRoute()).
+            get(`/${TestHelper.basicUser.id}/audits`).
+            query(true).
+            reply(200, [{id: TestHelper.generateId(), create_at: 1497285546645, user_id: TestHelper.basicUser.id, action: '/api/v4/users/login', extra_info: 'success', ip_address: '::1', session_id: ''}]);
+
         await Actions.getUserAudits(TestHelper.basicUser.id)(store.dispatch, store.getState);
 
         const auditsRequest = store.getState().requests.users.getAudits;
@@ -577,6 +744,11 @@ describe('Actions.Users', () => {
     });
 
     it('autocompleteUsers', async () => {
+        nock(Client4.getUsersRoute()).
+            post('').
+            query(true).
+            reply(200, TestHelper.fakeUserWithId());
+
         const user = await TestHelper.basicClient4.createUser(
             TestHelper.fakeUser(),
             null,
@@ -584,7 +756,11 @@ describe('Actions.Users', () => {
             TestHelper.basicTeam.invite_id
         );
 
-        await TestHelper.basicClient4.login(TestHelper.basicUser.email, 'password1');
+        nock(Client4.getUsersRoute()).
+            get('/autocomplete').
+            query(true).
+            reply(200, {users: [TestHelper.basicUser], out_of_channel: [user]});
+
         await Actions.autocompleteUsers(
             '',
             TestHelper.basicTeam.id,
@@ -606,11 +782,27 @@ describe('Actions.Users', () => {
     });
 
     it('updateMe', async () => {
-        await Actions.login(TestHelper.basicUser.email, 'password1')(store.dispatch, store.getState);
+        TestHelper.mockLogin();
+        await Actions.login(TestHelper.basicUser.email, TestHelper.basicUser.password)(store.dispatch, store.getState);
 
         const state = store.getState();
         const currentUser = state.entities.users.profiles[state.entities.users.currentUserId];
         const notifyProps = currentUser.notify_props;
+
+        nock(Client4.getUsersRoute()).
+            put('/me/patch').
+            query(true).
+            reply(200, {
+                ...currentUser,
+                notify_props: {
+                    ...notifyProps,
+                    comments: 'any',
+                    email: 'false',
+                    first_name: 'false',
+                    mention_keys: '',
+                    user_id: currentUser.id
+                }
+            });
 
         await Actions.updateMe({
             notify_props: {
@@ -638,17 +830,16 @@ describe('Actions.Users', () => {
     });
 
     it('updateUserRoles', async () => {
+        TestHelper.mockLogin();
         await Actions.login(TestHelper.basicUser.email, 'password1')(store.dispatch, store.getState);
 
         const currentUserId = store.getState().entities.users.currentUserId;
 
-        TestHelper.activateMocking();
         nock(Client4.getBaseRoute()).
             put(`/users/${currentUserId}/roles`).
             reply(200, OK_RESPONSE);
 
         await Actions.updateUserRoles(currentUserId, 'system_user system_admin')(store.dispatch, store.getState);
-        nock.restore();
 
         const updateRequest = store.getState().requests.users.updateUser;
         const {profiles} = store.getState().entities.users;
@@ -662,17 +853,21 @@ describe('Actions.Users', () => {
     });
 
     it('updateUserMfa', async () => {
+        if (TestHelper.isLiveServer()) {
+            console.log('Skipping mock-only test');
+            return;
+        }
+
+        TestHelper.mockLogin();
         await Actions.login(TestHelper.basicUser.email, 'password1')(store.dispatch, store.getState);
 
         const currentUserId = store.getState().entities.users.currentUserId;
 
-        TestHelper.activateMocking();
         nock(Client4.getBaseRoute()).
             put(`/users/${currentUserId}/mfa`).
             reply(200, OK_RESPONSE);
 
-        await Actions.updateUserMfa(currentUserId, true, '123456')(store.dispatch, store.getState);
-        nock.restore();
+        await Actions.updateUserMfa(currentUserId, false, '')(store.dispatch, store.getState);
 
         const updateRequest = store.getState().requests.users.updateUser;
         const {profiles} = store.getState().entities.users;
@@ -682,14 +877,19 @@ describe('Actions.Users', () => {
             throw new Error(JSON.stringify(updateRequest.error));
         }
 
-        assert.equal(currentUserMfa, true);
+        assert.equal(currentUserMfa, false);
     });
 
     it('updateUserPassword', async () => {
+        TestHelper.mockLogin();
         await Actions.login(TestHelper.basicUser.email, 'password1')(store.dispatch, store.getState);
 
         const beforeTime = new Date().getTime();
         const currentUserId = store.getState().entities.users.currentUserId;
+
+        nock(Client4.getUsersRoute()).
+            put(`/${currentUserId}/password`).
+            reply(200, OK_RESPONSE);
 
         await Actions.updateUserPassword(currentUserId, 'password1', 'password1')(store.dispatch, store.getState);
 
@@ -707,6 +907,11 @@ describe('Actions.Users', () => {
 
     it('checkMfa', async () => {
         const user = TestHelper.basicUser;
+
+        nock(Client4.getUsersRoute()).
+            post('/mfa').
+            reply(200, {mfa_required: false});
+
         const {data: mfaRequired} = await Actions.checkMfa(user.email)(store.dispatch, store.getState);
 
         const state = store.getState();
@@ -720,13 +925,16 @@ describe('Actions.Users', () => {
     });
 
     it('generateMfaSecret', async () => {
-        TestHelper.activateMocking();
+        if (TestHelper.isLiveServer()) {
+            console.log('Skipping mock-only test');
+            return;
+        }
+
         nock(Client4.getBaseRoute()).
             post('/users/me/mfa/generate').
             reply(200, {secret: 'somesecret', qr_code: 'someqrcode'});
 
         await Actions.generateMfaSecret('me')(store.dispatch, store.getState);
-        nock.restore();
 
         const request = store.getState().requests.users.generateMfaSecret;
 
@@ -736,42 +944,41 @@ describe('Actions.Users', () => {
     });
 
     it('updateUserActive', async () => {
-        const user = await TestHelper.basicClient4.createUser(
-            TestHelper.fakeUser(),
-            null,
-            null,
-            TestHelper.basicTeam.invite_id
-        );
+        nock(Client4.getUsersRoute()).
+            post('').
+            reply(200, TestHelper.fakeUserWithId());
 
-        await Actions.login(user.email, 'password1')(store.dispatch, store.getState);
+        const {data: user} = await Actions.createUser(TestHelper.fakeUser())(store.dispatch, store.getState);
 
         const beforeTime = new Date().getTime();
-        const currentUserId = store.getState().entities.users.currentUserId;
 
-        await Actions.updateUserActive(currentUserId, false)(store.dispatch, store.getState);
+        nock(Client4.getUsersRoute()).
+            put(`/${user.id}/active`).
+            reply(200, OK_RESPONSE);
+        await Actions.updateUserActive(user.id, false)(store.dispatch, store.getState);
 
         const updateRequest = store.getState().requests.users.updateUser;
         const {profiles} = store.getState().entities.users;
-        const currentUser = profiles[currentUserId];
 
         if (updateRequest.status === RequestStatus.FAILURE) {
             throw new Error(JSON.stringify(updateRequest.error));
         }
 
-        assert.ok(currentUser);
-        assert.ok(currentUser.delete_at > beforeTime);
-
-        await Actions.login(TestHelper.basicUser.email, 'password1')(store.dispatch, store.getState);
+        assert.ok(profiles[user.id]);
+        assert.ok(profiles[user.id].delete_at > beforeTime);
     });
 
     it('verifyUserEmail', async () => {
-        TestHelper.activateMocking();
+        if (TestHelper.isLiveServer()) {
+            console.log('Skipping mock-only test');
+            return;
+        }
+
         nock(Client4.getBaseRoute()).
             post('/users/email/verify').
             reply(200, OK_RESPONSE);
 
         await Actions.verifyUserEmail('sometoken')(store.dispatch, store.getState);
-        nock.restore();
 
         const request = store.getState().requests.users.verifyEmail;
 
@@ -781,13 +988,11 @@ describe('Actions.Users', () => {
     });
 
     it('sendVerificationEmail', async () => {
-        TestHelper.activateMocking();
         nock(Client4.getBaseRoute()).
             post('/users/email/verify/send').
             reply(200, OK_RESPONSE);
 
         await Actions.sendVerificationEmail(TestHelper.basicUser.email)(store.dispatch, store.getState);
-        nock.restore();
 
         const request = store.getState().requests.users.verifyEmail;
 
@@ -797,13 +1002,16 @@ describe('Actions.Users', () => {
     });
 
     it('resetUserPassword', async () => {
-        TestHelper.activateMocking();
+        if (TestHelper.isLiveServer()) {
+            console.log('Skipping mock-only test');
+            return;
+        }
+
         nock(Client4.getBaseRoute()).
             post('/users/password/reset').
             reply(200, OK_RESPONSE);
 
         await Actions.resetUserPassword('sometoken', 'newpassword')(store.dispatch, store.getState);
-        nock.restore();
 
         const request = store.getState().requests.users.passwordReset;
 
@@ -813,13 +1021,11 @@ describe('Actions.Users', () => {
     });
 
     it('sendPasswordResetEmail', async () => {
-        TestHelper.activateMocking();
         nock(Client4.getBaseRoute()).
             post('/users/password/reset/send').
             reply(200, OK_RESPONSE);
 
         await Actions.sendPasswordResetEmail(TestHelper.basicUser.email)(store.dispatch, store.getState);
-        nock.restore();
 
         const request = store.getState().requests.users.passwordReset;
 
@@ -829,12 +1035,17 @@ describe('Actions.Users', () => {
     });
 
     it('uploadProfileImage', async () => {
+        TestHelper.mockLogin();
         await Actions.login(TestHelper.basicUser.email, 'password1')(store.dispatch, store.getState);
 
         const testImageData = fs.createReadStream('test/assets/images/test.png');
 
         const beforeTime = new Date().getTime();
         const currentUserId = store.getState().entities.users.currentUserId;
+
+        nock(Client4.getUsersRoute()).
+            post(`/${TestHelper.basicUser.id}/image`).
+            reply(200, OK_RESPONSE);
 
         await Actions.uploadProfileImage(currentUserId, testImageData)(store.dispatch, store.getState);
 
@@ -851,13 +1062,16 @@ describe('Actions.Users', () => {
     });
 
     it('switchEmailToOAuth', async () => {
-        TestHelper.activateMocking();
+        if (TestHelper.isLiveServer()) {
+            console.log('Skipping mock-only test');
+            return;
+        }
+
         nock(Client4.getBaseRoute()).
             post('/users/login/switch').
             reply(200, {follow_link: '/login'});
 
         await Actions.switchEmailToOAuth('gitlab', TestHelper.basicUser.email, TestHelper.basicUser.password)(store.dispatch, store.getState);
-        nock.restore();
 
         const request = store.getState().requests.users.switchLogin;
 
@@ -867,13 +1081,16 @@ describe('Actions.Users', () => {
     });
 
     it('switchOAuthToEmail', async () => {
-        TestHelper.activateMocking();
+        if (TestHelper.isLiveServer()) {
+            console.log('Skipping mock-only test');
+            return;
+        }
+
         nock(Client4.getBaseRoute()).
             post('/users/login/switch').
             reply(200, {follow_link: '/login'});
 
         await Actions.switchOAuthToEmail('gitlab', TestHelper.basicUser.email, TestHelper.basicUser.password)(store.dispatch, store.getState);
-        nock.restore();
 
         const request = store.getState().requests.users.switchLogin;
 
@@ -883,13 +1100,16 @@ describe('Actions.Users', () => {
     });
 
     it('switchEmailToLdap', async () => {
-        TestHelper.activateMocking();
+        if (TestHelper.isLiveServer()) {
+            console.log('Skipping mock-only test');
+            return;
+        }
+
         nock(Client4.getBaseRoute()).
             post('/users/login/switch').
             reply(200, {follow_link: '/login'});
 
         await Actions.switchEmailToLdap(TestHelper.basicUser.email, TestHelper.basicUser.password, 'someid', 'somepassword')(store.dispatch, store.getState);
-        nock.restore();
 
         const request = store.getState().requests.users.switchLogin;
 
@@ -898,36 +1118,85 @@ describe('Actions.Users', () => {
         }
     });
 
-    it('switchLdapToEmail', async () => {
-        TestHelper.activateMocking();
-        nock(Client4.getBaseRoute()).
-            post('/users/login/switch').
-            reply(200, {follow_link: '/login'});
+    it('switchLdapToEmail', (done) => {
+        async function test() {
+            if (TestHelper.isLiveServer()) {
+                console.log('Skipping mock-only test');
+                done();
+                return;
+            }
 
-        await Actions.switchLdapToEmail('somepassword', TestHelper.basicUser.email, TestHelper.basicUser.password)(store.dispatch, store.getState);
-        nock.restore();
+            nock(Client4.getBaseRoute()).
+                post('/users/login/switch').
+                reply(200, {follow_link: '/login'});
 
-        const request = store.getState().requests.users.switchLogin;
+            await Actions.switchLdapToEmail('somepassword', TestHelper.basicUser.email, TestHelper.basicUser.password)(store.dispatch, store.getState);
 
-        if (request.status === RequestStatus.FAILURE) {
-            throw new Error(JSON.stringify(request.error));
+            const request = store.getState().requests.users.switchLogin;
+
+            if (request.status === RequestStatus.FAILURE) {
+                throw new Error(JSON.stringify(request.error));
+            }
+
+            done();
         }
+
+        test();
     });
 
-    it('createUserAccessToken', async () => {
+    it('createUserAccessToken', (done) => {
+        async function test() {
+            TestHelper.mockLogin();
+            await Actions.login(TestHelper.basicUser.email, 'password1')(store.dispatch, store.getState);
+
+            const currentUserId = store.getState().entities.users.currentUserId;
+
+            nock(Client4.getBaseRoute()).
+                post(`/users/${currentUserId}/tokens`).
+                reply(201, {id: 'someid', token: 'sometoken', description: 'test token', user_id: currentUserId});
+
+            const {data} = await Actions.createUserAccessToken(currentUserId, 'test token')(store.dispatch, store.getState);
+
+            const request = store.getState().requests.users.createUserAccessToken;
+            const {myUserAccessTokens} = store.getState().entities.users;
+            const {userAccessTokens} = store.getState().entities.admin;
+
+            if (request.status === RequestStatus.FAILURE) {
+                throw new Error(JSON.stringify(request.error));
+            }
+
+            assert.ok(myUserAccessTokens);
+            assert.ok(myUserAccessTokens[data.id]);
+            assert.ok(!myUserAccessTokens[data.id].token);
+            assert.ok(userAccessTokens);
+            assert.ok(userAccessTokens[currentUserId]);
+            assert.ok(userAccessTokens[currentUserId][data.id]);
+            assert.ok(!userAccessTokens[currentUserId][data.id].token);
+            done();
+        }
+
+        test();
+    });
+
+    it('getUserAccessToken', async () => {
+        TestHelper.mockLogin();
         await Actions.login(TestHelper.basicUser.email, 'password1')(store.dispatch, store.getState);
 
         const currentUserId = store.getState().entities.users.currentUserId;
 
-        TestHelper.activateMocking();
         nock(Client4.getBaseRoute()).
             post(`/users/${currentUserId}/tokens`).
             reply(201, {id: 'someid', token: 'sometoken', description: 'test token', user_id: currentUserId});
 
         const {data} = await Actions.createUserAccessToken(currentUserId, 'test token')(store.dispatch, store.getState);
-        nock.restore();
 
-        const request = store.getState().requests.users.createUserAccessToken;
+        nock(Client4.getBaseRoute()).
+            get(`/users/tokens/${data.id}`).
+            reply(200, {id: data.id, description: 'test token', user_id: currentUserId});
+
+        await Actions.getUserAccessToken(data.id)(store.dispatch, store.getState);
+
+        const request = store.getState().requests.users.getUserAccessToken;
         const {myUserAccessTokens} = store.getState().entities.users;
         const {userAccessTokens} = store.getState().entities.admin;
 
@@ -944,51 +1213,24 @@ describe('Actions.Users', () => {
         assert.ok(!userAccessTokens[currentUserId][data.id].token);
     });
 
-    it('getUserAccessToken', async () => {
-        await Actions.login(TestHelper.basicUser.email, 'password1')(store.dispatch, store.getState);
-
-        const currentUserId = store.getState().entities.users.currentUserId;
-        const testId = 'xgeikjf383ftmx8jzrhdocmfne';
-
-        TestHelper.activateMocking();
-        nock(Client4.getBaseRoute()).
-            get(`/users/tokens/${testId}`).
-            reply(200, {id: testId, description: 'test token', user_id: currentUserId});
-
-        await Actions.getUserAccessToken(testId)(store.dispatch, store.getState);
-        nock.restore();
-
-        const request = store.getState().requests.users.getUserAccessToken;
-        const {myUserAccessTokens} = store.getState().entities.users;
-        const {userAccessTokens} = store.getState().entities.admin;
-
-        if (request.status === RequestStatus.FAILURE) {
-            throw new Error(JSON.stringify(request.error));
-        }
-
-        assert.ok(myUserAccessTokens);
-        assert.ok(myUserAccessTokens[testId]);
-        assert.ok(!myUserAccessTokens[testId].token);
-        assert.ok(userAccessTokens);
-        assert.ok(userAccessTokens[currentUserId]);
-        assert.ok(userAccessTokens[currentUserId][testId]);
-        assert.ok(!userAccessTokens[currentUserId][testId].token);
-    });
-
     it('getUserAccessTokensForUser', async () => {
+        TestHelper.mockLogin();
         await Actions.login(TestHelper.basicUser.email, 'password1')(store.dispatch, store.getState);
 
         const currentUserId = store.getState().entities.users.currentUserId;
-        const testId = 'xgeikjf383ftmx8jzrhdocmfne';
 
-        TestHelper.activateMocking();
+        nock(Client4.getBaseRoute()).
+            post(`/users/${currentUserId}/tokens`).
+            reply(201, {id: 'someid', token: 'sometoken', description: 'test token', user_id: currentUserId});
+
+        const {data} = await Actions.createUserAccessToken(currentUserId, 'test token')(store.dispatch, store.getState);
+
         nock(Client4.getBaseRoute()).
             get(`/users/${currentUserId}/tokens`).
             query(true).
-            reply(200, [{id: testId, description: 'test token', user_id: currentUserId}]);
+            reply(200, [{id: data.id, description: 'test token', user_id: currentUserId}]);
 
         await Actions.getUserAccessTokensForUser(currentUserId)(store.dispatch, store.getState);
-        nock.restore();
 
         const request = store.getState().requests.users.getUserAccessToken;
         const {myUserAccessTokens} = store.getState().entities.users;
@@ -999,46 +1241,42 @@ describe('Actions.Users', () => {
         }
 
         assert.ok(myUserAccessTokens);
-        assert.ok(myUserAccessTokens[testId]);
-        assert.ok(!myUserAccessTokens[testId].token);
+        assert.ok(myUserAccessTokens[data.id]);
+        assert.ok(!myUserAccessTokens[data.id].token);
         assert.ok(userAccessTokens);
         assert.ok(userAccessTokens[currentUserId]);
-        assert.ok(userAccessTokens[currentUserId][testId]);
-        assert.ok(!userAccessTokens[currentUserId][testId].token);
+        assert.ok(userAccessTokens[currentUserId][data.id]);
+        assert.ok(!userAccessTokens[currentUserId][data.id].token);
     });
 
     it('revokeUserAccessToken', async () => {
+        TestHelper.mockLogin();
         await Actions.login(TestHelper.basicUser.email, 'password1')(store.dispatch, store.getState);
 
         const currentUserId = store.getState().entities.users.currentUserId;
-        const testId = 'xgeikjf383ftmx8jzrhdocmfne';
 
-        TestHelper.activateMocking();
         nock(Client4.getBaseRoute()).
-            get(`/users/tokens/${testId}`).
-            reply(200, {id: testId, description: 'test token', user_id: currentUserId});
+            post(`/users/${currentUserId}/tokens`).
+            reply(201, {id: 'someid', token: 'sometoken', description: 'test token', user_id: currentUserId});
 
-        await Actions.getUserAccessToken(testId)(store.dispatch, store.getState);
-        nock.restore();
+        const {data} = await Actions.createUserAccessToken(currentUserId, 'test token')(store.dispatch, store.getState);
 
         let {myUserAccessTokens} = store.getState().entities.users;
         let {userAccessTokens} = store.getState().entities.admin;
 
         assert.ok(myUserAccessTokens);
-        assert.ok(myUserAccessTokens[testId]);
-        assert.ok(!myUserAccessTokens[testId].token);
+        assert.ok(myUserAccessTokens[data.id]);
+        assert.ok(!myUserAccessTokens[data.id].token);
         assert.ok(userAccessTokens);
         assert.ok(userAccessTokens[currentUserId]);
-        assert.ok(userAccessTokens[currentUserId][testId]);
-        assert.ok(!userAccessTokens[currentUserId][testId].token);
+        assert.ok(userAccessTokens[currentUserId][data.id]);
+        assert.ok(!userAccessTokens[currentUserId][data.id].token);
 
-        TestHelper.activateMocking();
         nock(Client4.getBaseRoute()).
             post('/users/tokens/revoke').
             reply(200, OK_RESPONSE);
 
-        await Actions.revokeUserAccessToken(testId)(store.dispatch, store.getState);
-        nock.restore();
+        await Actions.revokeUserAccessToken(data.id)(store.dispatch, store.getState);
 
         const request = store.getState().requests.users.revokeUserAccessToken;
         myUserAccessTokens = store.getState().entities.users.myUserAccessTokens;
@@ -1049,25 +1287,23 @@ describe('Actions.Users', () => {
         }
 
         assert.ok(myUserAccessTokens);
-        assert.ok(!myUserAccessTokens[testId]);
+        assert.ok(!myUserAccessTokens[data.id]);
         assert.ok(userAccessTokens);
         assert.ok(userAccessTokens[currentUserId]);
-        assert.ok(!userAccessTokens[currentUserId][testId]);
+        assert.ok(!userAccessTokens[currentUserId][data.id]);
     });
 
     it('disableUserAccessToken', async () => {
         await Actions.login(TestHelper.basicUser.email, 'password1')(store.dispatch, store.getState);
 
         const currentUserId = store.getState().entities.users.currentUserId;
-        const testId = 'xgeikjf383ftmx8jzrhdocmfne';
 
-        TestHelper.activateMocking();
         nock(Client4.getBaseRoute()).
-            get(`/users/tokens/${testId}`).
-            reply(200, {id: testId, description: 'test token', user_id: currentUserId});
+                post(`/users/${currentUserId}/tokens`).
+                reply(201, {id: 'someid', token: 'sometoken', description: 'test token', user_id: currentUserId});
 
-        await Actions.getUserAccessToken(testId)(store.dispatch, store.getState);
-        nock.restore();
+        const {data} = await Actions.createUserAccessToken(currentUserId, 'test token')(store.dispatch, store.getState);
+        const testId = data.id;
 
         let {myUserAccessTokens} = store.getState().entities.users;
         let {userAccessTokens} = store.getState().entities.admin;
@@ -1080,13 +1316,11 @@ describe('Actions.Users', () => {
         assert.ok(userAccessTokens[currentUserId][testId]);
         assert.ok(!userAccessTokens[currentUserId][testId].token);
 
-        TestHelper.activateMocking();
         nock(Client4.getBaseRoute()).
             post('/users/tokens/disable').
             reply(200, OK_RESPONSE);
 
         await Actions.disableUserAccessToken(testId)(store.dispatch, store.getState);
-        nock.restore();
 
         const request = store.getState().requests.users.revokeUserAccessToken;
         myUserAccessTokens = store.getState().entities.users.myUserAccessTokens;
@@ -1109,15 +1343,13 @@ describe('Actions.Users', () => {
         await Actions.login(TestHelper.basicUser.email, 'password1')(store.dispatch, store.getState);
 
         const currentUserId = store.getState().entities.users.currentUserId;
-        const testId = 'xgeikjf383ftmx8jzrhdocmfne';
 
-        TestHelper.activateMocking();
         nock(Client4.getBaseRoute()).
-            get(`/users/tokens/${testId}`).
-            reply(200, {id: testId, description: 'test token', user_id: currentUserId});
+                post(`/users/${currentUserId}/tokens`).
+                reply(201, {id: 'someid', token: 'sometoken', description: 'test token', user_id: currentUserId});
 
-        await Actions.getUserAccessToken(testId)(store.dispatch, store.getState);
-        nock.restore();
+        const {data} = await Actions.createUserAccessToken(currentUserId, 'test token')(store.dispatch, store.getState);
+        const testId = data.id;
 
         let {myUserAccessTokens} = store.getState().entities.users;
         let {userAccessTokens} = store.getState().entities.admin;
@@ -1130,13 +1362,11 @@ describe('Actions.Users', () => {
         assert.ok(userAccessTokens[currentUserId][testId]);
         assert.ok(!userAccessTokens[currentUserId][testId].token);
 
-        TestHelper.activateMocking();
         nock(Client4.getBaseRoute()).
             post('/users/tokens/enable').
             reply(200, OK_RESPONSE);
 
         await Actions.enableUserAccessToken(testId)(store.dispatch, store.getState);
-        nock.restore();
 
         const request = store.getState().requests.users.revokeUserAccessToken;
         myUserAccessTokens = store.getState().entities.users.myUserAccessTokens;
@@ -1160,13 +1390,11 @@ describe('Actions.Users', () => {
 
         const currentUserId = store.getState().entities.users.currentUserId;
 
-        TestHelper.activateMocking();
         nock(Client4.getBaseRoute()).
             post(`/users/${currentUserId}/tokens`).
             reply(201, {id: 'someid', token: 'sometoken', description: 'test token', user_id: currentUserId});
 
         await Actions.createUserAccessToken(currentUserId, 'test token')(store.dispatch, store.getState);
-        nock.restore();
 
         await Actions.clearUserAccessTokens()(store.dispatch, store.getState);
 

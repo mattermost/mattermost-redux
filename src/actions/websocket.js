@@ -365,7 +365,6 @@ function handleUpdateTeamEvent(msg, dispatch, getState) {
 
 async function handleTeamAddedEvent(msg, dispatch, getState) {
     await getTeam(msg.data.team_id)(dispatch, getState);
-    await getMyTeamMembers()(dispatch, getState);
     await getMyTeamUnreads()(dispatch, getState);
 }
 

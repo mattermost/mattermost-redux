@@ -6,7 +6,7 @@ import assert from 'assert';
 import nock from 'nock';
 
 import * as Actions from 'actions/admin';
-import {Client, Client4} from 'client';
+import {Client4} from 'client';
 
 import {RequestStatus, Stats} from 'constants';
 import TestHelper from 'test/test_helper';
@@ -17,7 +17,7 @@ const OK_RESPONSE = {status: 'OK'};
 describe('Actions.Admin', () => {
     let store;
     before(async () => {
-        await TestHelper.initBasic(Client, Client4);
+        await TestHelper.initBasic(Client4);
     });
 
     beforeEach(async () => {
@@ -25,9 +25,7 @@ describe('Actions.Admin', () => {
     });
 
     after(async () => {
-        nock.restore();
-        await TestHelper.basicClient.logout();
-        await TestHelper.basicClient4.logout();
+        await TestHelper.tearDown();
     });
 
     it('getLogs', async () => {
@@ -87,8 +85,8 @@ describe('Actions.Admin', () => {
         nock(Client4.getBaseRoute()).
             get('/config').
             reply(200, {
-                ServiceSettings: {
-                    SiteURL: 'http://localhost:8065'
+                TeamSettings: {
+                    SiteName: 'Mattermost'
                 }
             });
 
@@ -102,16 +100,24 @@ describe('Actions.Admin', () => {
 
         const config = state.entities.admin.config;
         assert.ok(config);
-        assert.ok(config.ServiceSettings);
-        assert.ok(config.ServiceSettings.SiteURL === 'http://localhost:8065');
+        assert.ok(config.TeamSettings);
+        assert.ok(config.TeamSettings.SiteName === 'Mattermost');
     });
 
     it('updateConfig', async () => {
-        const updated = {
-            ServiceSettings: {
-                SiteURL: 'http://localhost:8066'
-            }
-        };
+        nock(Client4.getBaseRoute()).
+            get('/config').
+            reply(200, {
+                TeamSettings: {
+                    SiteName: 'Mattermost'
+                }
+            });
+
+        const {data} = await Actions.getConfig()(store.dispatch, store.getState);
+        const updated = JSON.parse(JSON.stringify(data));
+        const oldSiteName = updated.TeamSettings.SiteName;
+        const testSiteName = 'MattermostReduxTest';
+        updated.TeamSettings.SiteName = testSiteName;
 
         nock(Client4.getBaseRoute()).
             put('/config').
@@ -127,8 +133,16 @@ describe('Actions.Admin', () => {
 
         const config = state.entities.admin.config;
         assert.ok(config);
-        assert.ok(config.ServiceSettings);
-        assert.ok(config.ServiceSettings.SiteURL === updated.ServiceSettings.SiteURL);
+        assert.ok(config.TeamSettings);
+        assert.ok(config.TeamSettings.SiteName === testSiteName);
+
+        updated.TeamSettings.SiteName = oldSiteName;
+
+        nock(Client4.getBaseRoute()).
+            put('/config').
+            reply(200, updated);
+
+        await Actions.updateConfig(updated)(store.dispatch, store.getState);
     });
 
     it('reloadConfig', async () => {
@@ -147,10 +161,16 @@ describe('Actions.Admin', () => {
 
     it('testEmail', async () => {
         nock(Client4.getBaseRoute()).
+            get('/config').
+            reply(200, {});
+
+        const {data: config} = await Actions.getConfig()(store.dispatch, store.getState);
+
+        nock(Client4.getBaseRoute()).
             post('/email/test').
             reply(200, OK_RESPONSE);
 
-        await Actions.testEmail({})(store.dispatch, store.getState);
+        await Actions.testEmail(config)(store.dispatch, store.getState);
 
         const state = store.getState();
         const request = state.requests.admin.testEmail;
@@ -174,6 +194,11 @@ describe('Actions.Admin', () => {
     });
 
     it('recycleDatabase', async () => {
+        if (TestHelper.isLiveServer()) {
+            console.log('Skipping mock-only test');
+            return;
+        }
+
         nock(Client4.getBaseRoute()).
             post('/database/recycle').
             reply(200, OK_RESPONSE);
@@ -188,6 +213,11 @@ describe('Actions.Admin', () => {
     });
 
     it('createComplianceReport', async () => {
+        if (TestHelper.isLiveServer()) {
+            console.log('Skipping mock-only test');
+            return;
+        }
+
         const job = {
             desc: 'testjob',
             emails: 'joram@example.com',
@@ -226,19 +256,36 @@ describe('Actions.Admin', () => {
     });
 
     it('getComplianceReport', async () => {
-        const report = {
-            id: 'lix4h67ja7ntdkek6g13dp3wka',
-            create_at: 1491399241953,
-            user_id: 'ua7yqgjiq3dabc46ianp3yfgty',
-            status: 'running',
-            count: 0,
+        if (TestHelper.isLiveServer()) {
+            console.log('Skipping mock-only test');
+            return;
+        }
+
+        const job = {
             desc: 'testjob',
-            type: 'adhoc',
-            start_at: 1457654400000,
-            end_at: 1458000000000,
+            emails: 'joram@example.com',
             keywords: 'testkeyword',
-            emails: 'joram@example.com'
+            start_at: 1457654400000,
+            end_at: 1458000000000
         };
+
+        nock(Client4.getBaseRoute()).
+            post('/compliance/reports').
+            reply(201, {
+                id: 'six4h67ja7ntdkek6g13dp3wka',
+                create_at: 1491399241953,
+                user_id: 'ua7yqgjiq3dabc46ianp3yfgty',
+                status: 'running',
+                count: 0,
+                desc: 'testjob',
+                type: 'adhoc',
+                start_at: 1457654400000,
+                end_at: 1458000000000,
+                keywords: 'testkeyword',
+                emails: 'joram@example.com'
+            });
+
+        const {data: report} = await Actions.createComplianceReport(job)(store.dispatch, store.getState);
 
         nock(Client4.getBaseRoute()).
             get(`/compliance/reports/${report.id}`).
@@ -258,19 +305,36 @@ describe('Actions.Admin', () => {
     });
 
     it('getComplianceReports', async () => {
-        const report = {
-            id: 'aix4h67ja7ntdkek6g13dp3wka',
-            create_at: 1491399241953,
-            user_id: 'ua7yqgjiq3dabc46ianp3yfgty',
-            status: 'running',
-            count: 0,
+        if (TestHelper.isLiveServer()) {
+            console.log('Skipping mock-only test');
+            return;
+        }
+
+        const job = {
             desc: 'testjob',
-            type: 'adhoc',
-            start_at: 1457654400000,
-            end_at: 1458000000000,
+            emails: 'joram@example.com',
             keywords: 'testkeyword',
-            emails: 'joram@example.com'
+            start_at: 1457654400000,
+            end_at: 1458000000000
         };
+
+        nock(Client4.getBaseRoute()).
+            post('/compliance/reports').
+            reply(201, {
+                id: 'six4h67ja7ntdkek6g13dp3wka',
+                create_at: 1491399241953,
+                user_id: 'ua7yqgjiq3dabc46ianp3yfgty',
+                status: 'running',
+                count: 0,
+                desc: 'testjob',
+                type: 'adhoc',
+                start_at: 1457654400000,
+                end_at: 1458000000000,
+                keywords: 'testkeyword',
+                emails: 'joram@example.com'
+            });
+
+        const {data: report} = await Actions.createComplianceReport(job)(store.dispatch, store.getState);
 
         nock(Client4.getBaseRoute()).
             get('/compliance/reports').
@@ -291,6 +355,11 @@ describe('Actions.Admin', () => {
     });
 
     it('uploadBrandImage', async () => {
+        if (TestHelper.isLiveServer()) {
+            console.log('Skipping mock-only test');
+            return;
+        }
+
         const testImageData = fs.createReadStream('test/assets/images/test.png');
 
         nock(Client4.getBaseRoute()).
@@ -307,6 +376,11 @@ describe('Actions.Admin', () => {
     });
 
     it('getClusterStatus', async () => {
+        if (TestHelper.isLiveServer()) {
+            console.log('Skipping mock-only test');
+            return;
+        }
+
         nock(Client4.getBaseRoute()).
             get('/cluster/status').
             reply(200, [
@@ -331,6 +405,11 @@ describe('Actions.Admin', () => {
     });
 
     it('testLdap', async () => {
+        if (TestHelper.isLiveServer()) {
+            console.log('Skipping mock-only test');
+            return;
+        }
+
         nock(Client4.getBaseRoute()).
             post('/ldap/test').
             reply(200, OK_RESPONSE);
@@ -345,6 +424,11 @@ describe('Actions.Admin', () => {
     });
 
     it('syncLdap', async () => {
+        if (TestHelper.isLiveServer()) {
+            console.log('Skipping mock-only test');
+            return;
+        }
+
         nock(Client4.getBaseRoute()).
             post('/ldap/sync').
             reply(200, OK_RESPONSE);
@@ -359,6 +443,11 @@ describe('Actions.Admin', () => {
     });
 
     it('getSamlCertificateStatus', async () => {
+        if (TestHelper.isLiveServer()) {
+            console.log('Skipping mock-only test');
+            return;
+        }
+
         nock(Client4.getBaseRoute()).
             get('/saml/certificate/status').
             reply(200, {
@@ -383,6 +472,11 @@ describe('Actions.Admin', () => {
     });
 
     it('uploadPublicSamlCertificate', async () => {
+        if (TestHelper.isLiveServer()) {
+            console.log('Skipping mock-only test');
+            return;
+        }
+
         const testFileData = fs.createReadStream('test/assets/images/test.png');
 
         nock(Client4.getBaseRoute()).
@@ -399,6 +493,11 @@ describe('Actions.Admin', () => {
     });
 
     it('uploadPrivateSamlCertificate', async () => {
+        if (TestHelper.isLiveServer()) {
+            console.log('Skipping mock-only test');
+            return;
+        }
+
         const testFileData = fs.createReadStream('test/assets/images/test.png');
 
         nock(Client4.getBaseRoute()).
@@ -415,6 +514,11 @@ describe('Actions.Admin', () => {
     });
 
     it('uploadIdpSamlCertificate', async () => {
+        if (TestHelper.isLiveServer()) {
+            console.log('Skipping mock-only test');
+            return;
+        }
+
         const testFileData = fs.createReadStream('test/assets/images/test.png');
 
         nock(Client4.getBaseRoute()).
@@ -431,6 +535,11 @@ describe('Actions.Admin', () => {
     });
 
     it('removePublicSamlCertificate', async () => {
+        if (TestHelper.isLiveServer()) {
+            console.log('Skipping mock-only test');
+            return;
+        }
+
         nock(Client4.getBaseRoute()).
             delete('/saml/certificate/public').
             reply(200, OK_RESPONSE);
@@ -445,6 +554,11 @@ describe('Actions.Admin', () => {
     });
 
     it('removePrivateSamlCertificate', async () => {
+        if (TestHelper.isLiveServer()) {
+            console.log('Skipping mock-only test');
+            return;
+        }
+
         nock(Client4.getBaseRoute()).
             delete('/saml/certificate/private').
             reply(200, OK_RESPONSE);
@@ -459,6 +573,11 @@ describe('Actions.Admin', () => {
     });
 
     it('removeIdpSamlCertificate', async () => {
+        if (TestHelper.isLiveServer()) {
+            console.log('Skipping mock-only test');
+            return;
+        }
+
         nock(Client4.getBaseRoute()).
             delete('/saml/certificate/idp').
             reply(200, OK_RESPONSE);
@@ -473,9 +592,14 @@ describe('Actions.Admin', () => {
     });
 
     it('testElasticsearch', async () => {
+        if (TestHelper.isLiveServer()) {
+            console.log('Skipping mock-only test');
+            return;
+        }
+
         nock(Client4.getBaseRoute()).
-        post('/elasticsearch/test').
-        reply(200, OK_RESPONSE);
+            post('/elasticsearch/test').
+            reply(200, OK_RESPONSE);
 
         await Actions.testElasticsearch({})(store.dispatch, store.getState);
 
@@ -487,6 +611,11 @@ describe('Actions.Admin', () => {
     });
 
     it('purgeElasticsearchIndexes', async () => {
+        if (TestHelper.isLiveServer()) {
+            console.log('Skipping mock-only test');
+            return;
+        }
+
         nock(Client4.getBaseRoute()).
             post('/elasticsearch/purge_indexes').
             reply(200, OK_RESPONSE);
@@ -501,6 +630,11 @@ describe('Actions.Admin', () => {
     });
 
     it('uploadLicense', async () => {
+        if (TestHelper.isLiveServer()) {
+            console.log('Skipping mock-only test');
+            return;
+        }
+
         const testFileData = fs.createReadStream('test/assets/images/test.png');
 
         nock(Client4.getBaseRoute()).
@@ -517,6 +651,11 @@ describe('Actions.Admin', () => {
     });
 
     it('removeLicense', async () => {
+        if (TestHelper.isLiveServer()) {
+            console.log('Skipping mock-only test');
+            return;
+        }
+
         nock(Client4.getBaseRoute()).
             delete('/license').
             reply(200, OK_RESPONSE);
@@ -548,12 +687,12 @@ describe('Actions.Admin', () => {
 
         const analytics = state.entities.admin.analytics;
         assert.ok(analytics);
-        assert.ok(analytics[Stats.TOTAL_PUBLIC_CHANNELS] === 495);
+        assert.ok(analytics[Stats.TOTAL_PUBLIC_CHANNELS] > 0);
 
         const teamAnalytics = state.entities.admin.teamAnalytics;
         assert.ok(teamAnalytics);
         assert.ok(teamAnalytics[TestHelper.basicTeam.id]);
-        assert.ok(teamAnalytics[TestHelper.basicTeam.id][Stats.TOTAL_PUBLIC_CHANNELS] === 495);
+        assert.ok(teamAnalytics[TestHelper.basicTeam.id][Stats.TOTAL_PUBLIC_CHANNELS] > 0);
     });
 
     it('getAdvancedAnalytics', async () => {
@@ -574,12 +713,12 @@ describe('Actions.Admin', () => {
 
         const analytics = state.entities.admin.analytics;
         assert.ok(analytics);
-        assert.ok(analytics[Stats.TOTAL_FILE_POSTS] === 24);
+        assert.ok(analytics[Stats.TOTAL_SESSIONS] > 0);
 
         const teamAnalytics = state.entities.admin.teamAnalytics;
         assert.ok(teamAnalytics);
         assert.ok(teamAnalytics[TestHelper.basicTeam.id]);
-        assert.ok(teamAnalytics[TestHelper.basicTeam.id][Stats.TOTAL_FILE_POSTS] === 24);
+        assert.ok(teamAnalytics[TestHelper.basicTeam.id][Stats.TOTAL_SESSIONS] > 0);
     });
 
     it('getPostsPerDayAnalytics', async () => {
@@ -600,12 +739,12 @@ describe('Actions.Admin', () => {
 
         const analytics = state.entities.admin.analytics;
         assert.ok(analytics);
-        assert.ok(analytics[Stats.POST_PER_DAY][0].value === 146);
+        assert.ok(analytics[Stats.POST_PER_DAY]);
 
         const teamAnalytics = state.entities.admin.teamAnalytics;
         assert.ok(teamAnalytics);
         assert.ok(teamAnalytics[TestHelper.basicTeam.id]);
-        assert.ok(teamAnalytics[TestHelper.basicTeam.id][Stats.POST_PER_DAY][0].value === 146);
+        assert.ok(teamAnalytics[TestHelper.basicTeam.id][Stats.POST_PER_DAY]);
     });
 
     it('getUsersPerDayAnalytics', async () => {
@@ -626,15 +765,20 @@ describe('Actions.Admin', () => {
 
         const analytics = state.entities.admin.analytics;
         assert.ok(analytics);
-        assert.ok(analytics[Stats.USERS_WITH_POSTS_PER_DAY][0].value === 3);
+        assert.ok(analytics[Stats.USERS_WITH_POSTS_PER_DAY]);
 
         const teamAnalytics = state.entities.admin.teamAnalytics;
         assert.ok(teamAnalytics);
         assert.ok(teamAnalytics[TestHelper.basicTeam.id]);
-        assert.ok(teamAnalytics[TestHelper.basicTeam.id][Stats.USERS_WITH_POSTS_PER_DAY][0].value === 3);
+        assert.ok(teamAnalytics[TestHelper.basicTeam.id][Stats.USERS_WITH_POSTS_PER_DAY]);
     });
 
     it('uploadPlugin', async () => {
+        if (TestHelper.isLiveServer()) {
+            console.log('Skipping mock-only test');
+            return;
+        }
+
         const testFileData = fs.createReadStream('test/assets/images/test.png');
         const testPlugin = {id: 'testplugin', webapp: {bundle_path: '/static/somebundle.js'}};
 
@@ -656,6 +800,11 @@ describe('Actions.Admin', () => {
     });
 
     it('getPlugins', async () => {
+        if (TestHelper.isLiveServer()) {
+            console.log('Skipping mock-only test');
+            return;
+        }
+
         const testPlugin = {id: 'testplugin', webapp: {bundle_path: '/static/somebundle.js'}};
         const testPlugin2 = {id: 'testplugin2', webapp: {bundle_path: '/static/somebundle.js'}};
 
@@ -680,6 +829,11 @@ describe('Actions.Admin', () => {
     });
 
     it('removePlugin', async () => {
+        if (TestHelper.isLiveServer()) {
+            console.log('Skipping mock-only test');
+            return;
+        }
+
         const testPlugin = {id: 'testplugin3', webapp: {bundle_path: '/static/somebundle.js'}};
 
         nock(Client4.getBaseRoute()).
@@ -711,6 +865,11 @@ describe('Actions.Admin', () => {
     });
 
     it('activatePlugin', async () => {
+        if (TestHelper.isLiveServer()) {
+            console.log('Skipping mock-only test');
+            return;
+        }
+
         const testPlugin = {id: TestHelper.generateId(), webapp: {bundle_path: '/static/somebundle.js'}};
 
         nock(Client4.getBaseRoute()).
@@ -744,6 +903,11 @@ describe('Actions.Admin', () => {
     });
 
     it('deactivatePlugin', async () => {
+        if (TestHelper.isLiveServer()) {
+            console.log('Skipping mock-only test');
+            return;
+        }
+
         const testPlugin = {id: TestHelper.generateId(), webapp: {bundle_path: '/static/somebundle.js'}};
 
         nock(Client4.getBaseRoute()).

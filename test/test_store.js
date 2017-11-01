@@ -20,9 +20,17 @@ export default async function testConfigureStore(preloadedState) {
             debounce: 1000,
             transforms: [
                 storageTransform
-            ]
+            ],
+            whitelist: []
         },
-        retry: (action, retries) => 200 * (retries + 1)
+        retry: (action, retries) => 200 * (retries + 1),
+        discard: (error, action, retries) => {
+            if (action.meta && action.meta.offline.hasOwnProperty('maxRetry')) {
+                return retries >= action.meta.offline.maxRetry;
+            }
+
+            return retries >= 1;
+        }
     };
 
     const store = configureStore(preloadedState, {}, offlineConfig, () => ({}), {enableBuffer: false});
