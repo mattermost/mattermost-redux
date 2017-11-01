@@ -1,6 +1,15 @@
 {
   "presets": [
-    "es2015",
+    ["env", {
+      "targets": {
+        "ie": 11,
+        "chrome": 43,
+        "firefox": 52,
+        "edge": 40,
+        "ios": 9,
+        "android": 5
+      }
+    }],
     "stage-0"
   ],
   "plugins": [
