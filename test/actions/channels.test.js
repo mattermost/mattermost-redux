@@ -5,11 +5,12 @@ import assert from 'assert';
 import nock from 'nock';
 
 import * as Actions from 'actions/channels';
+import * as PostActions from 'actions/posts';
 import {addUserToTeam, getMyTeams, getMyTeamMembers, getMyTeamUnreads} from 'actions/teams';
 import {getMe, getProfilesByIds, login} from 'actions/users';
 import {createIncomingHook, createOutgoingHook} from 'actions/integrations';
 import {Client, Client4} from 'client';
-import {General, RequestStatus, Preferences} from 'constants';
+import {General, RequestStatus, Posts, Preferences} from 'constants';
 import {getPreferenceKey} from 'utils/preference_utils';
 import TestHelper from 'test/test_helper';
 import configureStore from 'test/test_store';
@@ -1042,6 +1043,51 @@ describe('Actions.Channels', () => {
         assert.ok(stats[channelId], 'stats for channel');
         assert.ok(stats[channelId].member_count, 'member count for channel');
         assert.equal(stats[channelId].member_count, 2, 'incorrect member count for channel');
+
+        // add channel member with post.root_id (when added via system post)
+        await Actions.removeChannelMember(
+            channelId,
+            user.id
+        )(store.dispatch, store.getState);
+
+        state = store.getState();
+        const removeRequest = state.requests.channels.removeChannelMember;
+        if (removeRequest.status === RequestStatus.FAILURE) {
+            throw new Error(JSON.stringify(removeRequest.error));
+        }
+
+        const rootPostId = TestHelper.basicPost.id;
+        await Actions.addChannelMember(
+            channelId,
+            user.id,
+            rootPostId
+        )(store.dispatch, store.getState);
+
+        await PostActions.getPostThread(rootPostId)(store.dispatch, store.getState);
+
+        state = store.getState();
+        const getRequest = state.requests.posts.getPostThread;
+        const {posts, postsInChannel} = state.entities.posts;
+
+        if (getRequest.status === RequestStatus.FAILURE) {
+            throw new Error(JSON.stringify(getRequest.error));
+        }
+
+        assert.ok(posts);
+        assert.ok(postsInChannel);
+        assert.ok(postsInChannel[channelId]);
+
+        let found = false;
+        for (const storedPost of Object.values(posts)) {
+            if (storedPost.root_id === rootPostId &&
+                storedPost.type === Posts.POST_TYPES.ADD_TO_CHANNEL &&
+                storedPost.channel_id === channelId
+            ) {
+                found = true;
+                break;
+            }
+        }
+        assert.ok(found, 'failed to find new system_add_to_channel post in posts');
     });
 
     it('removeChannelMember', async () => {
