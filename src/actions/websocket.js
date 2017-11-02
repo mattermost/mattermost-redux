@@ -443,19 +443,21 @@ function handleChannelCreatedEvent(msg, dispatch, getState) {
 
 function handleChannelDeletedEvent(msg, dispatch, getState) {
     const entities = getState().entities;
-    const {channels, currentChannelId} = entities.channels;
+    const {channels, currentChannelId, channelsInTeam} = entities.channels;
     const {currentTeamId} = entities.teams;
 
     if (msg.broadcast.team_id === currentTeamId) {
         if (msg.data.channel_id === currentChannelId) {
             let channelId = '';
-            const channel = Object.keys(channels).filter((key) => channels[key].name === General.DEFAULT_CHANNEL);
+            const teamChannels = Array.from(channelsInTeam[currentTeamId]);
+            const channel = teamChannels.filter((key) => channels[key].name === General.DEFAULT_CHANNEL);
 
             if (channel.length) {
                 channelId = channel[0];
             }
 
             dispatch({type: ChannelTypes.SELECT_CHANNEL, data: channelId}, getState);
+            EventEmitter.emit(General.DEFAULT_CHANNEL, '');
         }
         dispatch({type: ChannelTypes.RECEIVED_CHANNEL_DELETED, data: msg.data.channel_id}, getState);
 
