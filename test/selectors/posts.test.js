@@ -3,7 +3,7 @@
 
 import assert from 'assert';
 
-import {Posts} from 'constants';
+import {Posts, Preferences} from 'constants';
 
 import * as Selectors from 'selectors/entities/posts';
 import {makeGetProfilesForReactions} from 'selectors/entities/users';
@@ -1480,6 +1480,64 @@ describe('Selectors.Posts', () => {
             now = getPostsForIds(state, postIds);
             assert.deepEqual(now, [testPosts['1001'], newPost, testPosts['1004']]);
             assert.equal(now, previous);
+        });
+    });
+
+    describe('getMostRecentPostIdInChannel', () => {
+        it('system messages visible', () => {
+            const testPosts = {
+                1000: {id: '1000', type: 'system_join_channel'},
+                1001: {id: '1001', type: 'system_join_channel'},
+                1002: {id: '1002'},
+                1003: {id: '1003'}
+            };
+            const testPostsInChannel = {
+                channelId: ['1000', '1001', '1002', '1003']
+            };
+            const state = {
+                entities: {
+                    posts: {
+                        posts: testPosts,
+                        postsInChannel: testPostsInChannel
+                    },
+                    preferences: {
+                        myPreferences: {
+                            [`${Preferences.CATEGORY_ADVANCED_SETTINGS}--${Preferences.ADVANCED_FILTER_JOIN_LEAVE}`]: {value: 'true'}
+                        }
+                    }
+                }
+            };
+
+            const postId = Selectors.getMostRecentPostIdInChannel(state, 'channelId');
+            assert.equal(postId, '1000');
+        });
+
+        it('system messages hidden', () => {
+            const testPosts = {
+                1000: {id: '1000', type: 'system_join_channel'},
+                1001: {id: '1001', type: 'system_join_channel'},
+                1002: {id: '1002'},
+                1003: {id: '1003'}
+            };
+            const testPostsInChannel = {
+                channelId: ['1000', '1001', '1002', '1003']
+            };
+            const state = {
+                entities: {
+                    posts: {
+                        posts: testPosts,
+                        postsInChannel: testPostsInChannel
+                    },
+                    preferences: {
+                        myPreferences: {
+                            [`${Preferences.CATEGORY_ADVANCED_SETTINGS}--${Preferences.ADVANCED_FILTER_JOIN_LEAVE}`]: {value: 'false'}
+                        }
+                    }
+                }
+            };
+
+            const postId = Selectors.getMostRecentPostIdInChannel(state, 'channelId');
+            assert.equal(postId, '1002');
         });
     });
 });
