@@ -31,7 +31,7 @@ function getMissingChannelsFromPosts(posts) {
     };
 }
 
-export function searchPosts(teamId, terms, isOrSearch = false) {
+export function searchPosts(teamId, terms, isOrSearch = false, successCallback, errorCallback) {
     return async (dispatch, getState) => {
         dispatch({type: SearchTypes.SEARCH_POSTS_REQUEST}, getState);
 
@@ -46,6 +46,10 @@ export function searchPosts(teamId, terms, isOrSearch = false) {
                 {type: SearchTypes.SEARCH_POSTS_FAILURE, error},
                 logError(error)(dispatch)
             ]), getState);
+
+            if (errorCallback) {
+                errorCallback(error);
+            }
             return {error};
         }
 
@@ -66,6 +70,10 @@ export function searchPosts(teamId, terms, isOrSearch = false) {
                 type: SearchTypes.SEARCH_POSTS_SUCCESS
             }
         ], 'SEARCH_POST_BATCH'), getState);
+
+        if (successCallback) {
+            successCallback(posts);
+        }
 
         return {data: posts};
     };
