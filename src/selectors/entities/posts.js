@@ -365,3 +365,29 @@ export function getLastPostPerChannel(state) {
     }
     return ret;
 }
+
+export const getMostRecentPostIdInChannel = createSelector(
+    getAllPosts,
+    (state, channelId) => state.entities.posts.postsInChannel[channelId],
+    getMyPreferences,
+    (posts, postIdsInChannel, preferences) => {
+        const key = getPreferenceKey(Preferences.CATEGORY_ADVANCED_SETTINGS, 'join_leave');
+        const allowSystemMessages = preferences[key] ? preferences[key].value === 'true' : true;
+
+        if (!allowSystemMessages) {
+            // return the most recent non-system message in the channel
+            let postId;
+            for (let i = 0; i < postIdsInChannel.length; i++) {
+                const p = posts[postIdsInChannel[i]];
+                if (!p.type || !p.type.startsWith(Posts.SYSTEM_MESSAGE_PREFIX)) {
+                    postId = p.id;
+                    break;
+                }
+            }
+            return postId;
+        }
+
+        // return the most recent message in the channel
+        return postIdsInChannel[0];
+    }
+);
