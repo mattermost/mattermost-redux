@@ -35,7 +35,7 @@ const state = {
             channels: {},
             channelsInTeam: {},
             myMembers: {},
-            members: {},
+            membersInChannel: {},
             stats: {}
         },
         posts: {
@@ -110,10 +110,6 @@ const state = {
                 status: 'not_started',
                 error: null
             },
-            leaveChannel: {
-                status: 'not_started',
-                error: null
-            },
             joinChannel: {
                 status: 'not_started',
                 error: null
@@ -135,6 +131,10 @@ const state = {
                 error: null
             },
             removeChannelMember: {
+                status: 'not_started',
+                error: null
+            },
+            updateChannelMember: {
                 status: 'not_started',
                 error: null
             }
