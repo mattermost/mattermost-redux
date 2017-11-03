@@ -350,15 +350,18 @@ export function makeGetPostsForIds() {
 }
 
 export function getLastPostPerChannel(state) {
-    const allPosts = getAllPosts(state);
-    const posts = {};
-    for (const id in allPosts) {
-        if (allPosts.hasOwnProperty(id)) {
-            const post = allPosts[id];
-            if (post.channel_id && (!posts.hasOwnProperty(post.channel_id) || posts[post.channel_id].create_at < post.create_at)) {
-                posts[post.channel_id] = post;
+    const {posts: allPosts, postsInChannel: allChannels} = state.entities.posts;
+    const ret = {};
+    for (const channelId in allChannels) {
+        if (allChannels.hasOwnProperty(channelId)) {
+            const channelPosts = allChannels[channelId];
+            if (channelPosts.length > 0) {
+                const postId = channelPosts[0];
+                if (allPosts.hasOwnProperty(postId)) {
+                    ret[channelId] = allPosts[postId];
+                }
             }
         }
     }
-    return posts;
+    return ret;
 }
