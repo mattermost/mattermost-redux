@@ -2,7 +2,7 @@
 
 
 .npminstall: package.json
-	@if ! [ $(shell command -v npm) ]; then \
+	@if ! [ $(shell which npm) ]; then \
 		echo "npm is not installed"; \
 		exit 1; \
 	fi
