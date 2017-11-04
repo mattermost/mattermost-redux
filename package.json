@@ -44,7 +44,7 @@
   "scripts": {
     "build": "babel src --out-dir .",
     "dev": "babel src --out-dir ${WEBAPP_DIR:-../mattermost-webapp}/node_modules/mattermost-redux",
-    "dev:watch": "babel --watch src --out-dir ${WEBAPP_DIR:-../mattermost-webapp/node_modules/mattermost-redux}",
+    "dev:watch": "babel --watch src --out-dir ${WEBAPP_DIR:-../mattermost-webapp}/node_modules/mattermost-redux",
     "check": "node_modules/.bin/eslint --ext \".js\" --ignore-pattern node_modules --quiet .",
     "test": "NODE_ENV=test mocha --opts test/mocha.opts",
     "test-no-mock": "TEST_SERVER=1 NOCK_OFF=true NODE_ENV=test mocha --opts test/mocha.opts",
