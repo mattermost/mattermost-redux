@@ -245,6 +245,17 @@ function selectedPostId(state = '', action) {
     }
 }
 
+function editingPost(state = '', action) {
+    switch (action.type) {
+    case PostTypes.RECEIVED_EDIT_POST:
+        return action.data;
+    case UserTypes.LOGOUT_SUCCESS:
+        return '';
+    default:
+        return state;
+    }
+}
+
 function currentFocusedPostId(state = '', action) {
     switch (action.type) {
     case UserTypes.LOGOUT_SUCCESS:
@@ -417,6 +428,9 @@ export default function(state = {}, action) {
         // The current selected post
         selectedPostId: selectedPostId(state.selectedPostId, action),
 
+        // The current editing post
+        editingPost: editingPost(state.editingPost, action),
+
         // The current selected focused post (permalink view)
         currentFocusedPostId: currentFocusedPostId(state.currentFocusedPostId, action),
 
@@ -432,6 +446,7 @@ export default function(state = {}, action) {
 
     if (state.posts === nextState.posts && state.postsInChannel === nextState.postsInChannel &&
         state.selectedPostId === nextState.selectedPostId &&
+        state.editingPost === nextState.editingPost &&
         state.currentFocusedPostId === nextState.currentFocusedPostId &&
         state.reactions === nextState.reactions &&
         state.openGraph === nextState.openGraph &&
