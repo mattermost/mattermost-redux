@@ -42,6 +42,7 @@ const state = {
             posts: {},
             postsByChannel: {},
             selectedPostId: '',
+            editingPost: {},
             currentFocusedPostId: '',
             messagesHistory: {
                 messages: [],

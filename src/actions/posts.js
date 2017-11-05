@@ -857,6 +857,17 @@ export function selectPost(postId) {
     };
 }
 
+export function setEditingPost(postId, commentsCount, refocusId, title) {
+    return async (dispatch, getState) => {
+        dispatch({
+            type: PostTypes.RECEIVED_EDIT_POST,
+            data: {postId, commentsCount, refocusId, title}
+        }, getState);
+
+        return {data: true};
+    };
+}
+
 export function unflagPost(postId) {
     return async (dispatch, getState) => {
         const {currentUserId} = getState().entities.users;

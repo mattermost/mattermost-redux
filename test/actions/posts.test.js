@@ -1556,4 +1556,27 @@ describe('Actions.Posts', () => {
         index = getState().entities.posts.messagesHistory.index[Posts.MESSAGE_TYPES.COMMENT];
         assert.ok(index === 2);
     });
+
+    it('setEditingPost', async () => {
+        await Actions.setEditingPost('123', 0, '#test', 'title')(store.dispatch, store.getState);
+        assert.deepEqual(
+            store.getState().entities.posts.editingPost,
+            {
+                postId: '123',
+                commentsCount: 0,
+                refocusId: '#test',
+                title: 'title'
+            }
+        );
+        await Actions.setEditingPost('456', 3, '#test2', 'title2')(store.dispatch, store.getState);
+        assert.deepEqual(
+            store.getState().entities.posts.editingPost,
+            {
+                postId: '456',
+                commentsCount: 3,
+                refocusId: '#test2',
+                title: 'title2'
+            }
+        );
+    });
 });

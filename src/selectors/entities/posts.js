@@ -19,6 +19,17 @@ export function getPost(state, postId) {
     return getAllPosts(state)[postId];
 }
 
+export const getEditingPost = createIdsSelector(
+    (state) => state,
+    (state) => state.entities.posts.editingPost,
+    (state, editingPost) => {
+        return {
+            ...editingPost,
+            post: getPost(state, editingPost.postId)
+        };
+    }
+);
+
 export function getReactionsForPosts(state) {
     return state.entities.posts.reactions;
 }
