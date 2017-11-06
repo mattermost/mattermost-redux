@@ -4,9 +4,11 @@
 import entities from './entities';
 import errors from './errors';
 import requests from './requests';
+import storage from './storage';
 
 export default {
     entities,
     errors,
-    requests
+    requests,
+    storage
 };

@@ -2,6 +2,7 @@
 // See License.txt for license information.
 import {AsyncNodeStorage} from 'redux-persist-node-storage';
 import {createTransform, persistStore} from 'redux-persist';
+import {LocalStorage} from 'node-localstorage';
 
 import configureStore from 'store';
 
@@ -11,10 +12,13 @@ export default async function testConfigureStore(preloadedState) {
       () => ({})
     );
 
+    LocalStorage('./.tmp').clear();
+    const storage = new AsyncNodeStorage('./.tmp');
+
     const offlineConfig = {
         detectNetwork: (callback) => callback(true),
         persist: (store, options) => {
-            return persistStore(store, {storage: new AsyncNodeStorage('./.tmp'), ...options});
+            return persistStore(store, {storage, ...options});
         },
         persistOptions: {
             debounce: 1000,
@@ -33,7 +37,7 @@ export default async function testConfigureStore(preloadedState) {
         }
     };
 
-    const store = configureStore(preloadedState, {}, offlineConfig, () => ({}), {enableBuffer: false});
+    const store = configureStore(preloadedState, {}, offlineConfig, () => ({}), {enableBuffer: false}, {storage});
 
     const wait = () => new Promise((resolve) => setTimeout(resolve), 300); //eslint-disable-line
     await wait();
