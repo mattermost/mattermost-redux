@@ -234,6 +234,34 @@ function userAccessTokens(state = {}, action) {
 
         return state;
     }
+    case UserTypes.ENABLED_USER_ACCESS_TOKEN: {
+        const userIds = Object.keys(state);
+        for (let i = 0; i < userIds.length; i++) {
+            const userId = userIds[i];
+            if (state[userId] && state[userId][action.data]) {
+                const nextUserState = {...state[userId]};
+                const token = {...nextUserState[action.data], is_active: true};
+                nextUserState[token.id] = token;
+                return {...state, [userId]: nextUserState};
+            }
+        }
+
+        return state;
+    }
+    case UserTypes.DISABLED_USER_ACCESS_TOKEN: {
+        const userIds = Object.keys(state);
+        for (let i = 0; i < userIds.length; i++) {
+            const userId = userIds[i];
+            if (state[userId] && state[userId][action.data]) {
+                const nextUserState = {...state[userId]};
+                const token = {...nextUserState[action.data], is_active: false};
+                nextUserState[token.id] = token;
+                return {...state, [userId]: nextUserState};
+            }
+        }
+
+        return state;
+    }
     case UserTypes.LOGOUT_SUCCESS:
         return {};
 
