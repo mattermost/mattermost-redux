@@ -45,7 +45,10 @@ const state = {
             currentFocusedPostId: '',
             messagesHistory: {
                 messages: [],
-                index: {}
+                index: {
+                    post: -1,
+                    comment: -1
+                }
             }
         },
         preferences: {
