@@ -1293,7 +1293,7 @@ describe('Actions.Users', () => {
         assert.ok(!userAccessTokens[currentUserId][data.id]);
     });
 
-    it.only('disableUserAccessToken', async () => {
+    it('disableUserAccessToken', async () => {
         TestHelper.mockLogin();
         await Actions.login(TestHelper.basicUser.email, 'password1')(store.dispatch, store.getState);
 
@@ -1342,7 +1342,7 @@ describe('Actions.Users', () => {
         assert.ok(!userAccessTokens[currentUserId][testId].token);
     });
 
-    it.only('enableUserAccessToken', async () => {
+    it('enableUserAccessToken', async () => {
         TestHelper.mockLogin();
         await Actions.login(TestHelper.basicUser.email, 'password1')(store.dispatch, store.getState);
 
