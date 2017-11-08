@@ -6,10 +6,10 @@ import {displayUsername} from './user_utils';
 import {getPreferencesByCategory} from './preference_utils';
 
 const channelTypeOrder = {
-    [Constants.OPEN_CHANNEL]: 0,
-    [Constants.PRIVATE_CHANNEL]: 1,
-    [Constants.DM_CHANNEL]: 2,
-    [Constants.GM_CHANNEL]: 2
+    [General.OPEN_CHANNEL]: 0,
+    [General.PRIVATE_CHANNEL]: 1,
+    [General.DM_CHANNEL]: 2,
+    [General.GM_CHANNEL]: 2
 };
 
 /**
@@ -443,9 +443,9 @@ export function sortChannelsByTypeAndDisplayName(locale, a, b) {
     if (a.type !== b.type) {
         if (channelTypeOrder[a.type] < channelTypeOrder[b.type]) {
             return -1;
-        } else {
-            return 1;
         }
+
+        return 1;
     }
 
     const aDisplayName = filterName(a.display_name);
