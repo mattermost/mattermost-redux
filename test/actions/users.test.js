@@ -1294,6 +1294,7 @@ describe('Actions.Users', () => {
     });
 
     it('disableUserAccessToken', async () => {
+        TestHelper.mockLogin();
         await Actions.login(TestHelper.basicUser.email, 'password1')(store.dispatch, store.getState);
 
         const currentUserId = store.getState().entities.users.currentUserId;
@@ -1332,14 +1333,17 @@ describe('Actions.Users', () => {
 
         assert.ok(myUserAccessTokens);
         assert.ok(myUserAccessTokens[testId]);
+        assert.ok(!myUserAccessTokens[testId].is_active);
         assert.ok(!myUserAccessTokens[testId].token);
         assert.ok(userAccessTokens);
         assert.ok(userAccessTokens[currentUserId]);
         assert.ok(userAccessTokens[currentUserId][testId]);
+        assert.ok(!userAccessTokens[currentUserId][testId].is_active);
         assert.ok(!userAccessTokens[currentUserId][testId].token);
     });
 
     it('enableUserAccessToken', async () => {
+        TestHelper.mockLogin();
         await Actions.login(TestHelper.basicUser.email, 'password1')(store.dispatch, store.getState);
 
         const currentUserId = store.getState().entities.users.currentUserId;
@@ -1378,10 +1382,12 @@ describe('Actions.Users', () => {
 
         assert.ok(myUserAccessTokens);
         assert.ok(myUserAccessTokens[testId]);
+        assert.ok(myUserAccessTokens[testId].is_active);
         assert.ok(!myUserAccessTokens[testId].token);
         assert.ok(userAccessTokens);
         assert.ok(userAccessTokens[currentUserId]);
         assert.ok(userAccessTokens[currentUserId][testId]);
+        assert.ok(userAccessTokens[currentUserId][testId].is_active);
         assert.ok(!userAccessTokens[currentUserId][testId].token);
     });
 

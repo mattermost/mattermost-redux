@@ -324,6 +324,24 @@ function myUserAccessTokens(state = {}, action) {
         return nextState;
     }
 
+    case UserTypes.ENABLED_USER_ACCESS_TOKEN: {
+        if (state[action.data]) {
+            const nextState = {...state};
+            nextState[action.data] = {...nextState[action.data], is_active: true};
+            return nextState;
+        }
+        return state;
+    }
+
+    case UserTypes.DISABLED_USER_ACCESS_TOKEN: {
+        if (state[action.data]) {
+            const nextState = {...state};
+            nextState[action.data] = {...nextState[action.data], is_active: false};
+            return nextState;
+        }
+        return state;
+    }
+
     case UserTypes.CLEAR_MY_USER_ACCESS_TOKENS:
     case UserTypes.LOGOUT_SUCCESS:
         return {};
