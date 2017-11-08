@@ -5,8 +5,12 @@ import {General, Preferences} from 'constants';
 import {displayUsername} from './user_utils';
 import {getPreferencesByCategory} from './preference_utils';
 
-const defaultPrefix = 'D'; // fallback for future types
-const typeToPrefixMap = {[General.OPEN_CHANNEL]: 'A', [General.PRIVATE_CHANNEL]: 'B', [General.DM_CHANNEL]: 'C', [General.GM_CHANNEL]: 'C'};
+const channelTypeOrder = {
+    [Constants.OPEN_CHANNEL]: 0,
+    [Constants.PRIVATE_CHANNEL]: 1,
+    [Constants.DM_CHANNEL]: 2,
+    [Constants.GM_CHANNEL]: 2
+};
 
 /**
  * Returns list of sorted channels grouped by type. Favorites here is considered as separated type.
@@ -436,8 +440,12 @@ function isPrivateChannel(channel) {
 }
 
 export function sortChannelsByTypeAndDisplayName(locale, a, b) {
-    if (a.type !== b.type && typeToPrefixMap[a.type] !== typeToPrefixMap[b.type]) {
-        return (typeToPrefixMap[a.type] || defaultPrefix).localeCompare((typeToPrefixMap[b.type] || defaultPrefix), locale);
+    if (a.type !== b.type) {
+        if (channelTypeOrder[a.type] < channelTypeOrder[b.type]) {
+            return -1;
+        } else {
+            return 1;
+        }
     }
 
     const aDisplayName = filterName(a.display_name);
