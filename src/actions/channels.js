@@ -928,7 +928,7 @@ export function updateChannelPurpose(channelId, purpose) {
     };
 }
 
-export function markChannelAsRead(channelId, prevChannelId) {
+export function markChannelAsRead(channelId, prevChannelId, updateLastViewedAt = false) {
     return async (dispatch, getState) => {
         const state = getState();
         const channelState = state.entities.channels;
@@ -940,31 +940,35 @@ export function markChannelAsRead(channelId, prevChannelId) {
         const channel = channelState.channels[channelId];
         const prevChannel = channelState.channels[prevChannelId]; // May be null since prevChannelId is optional
 
-        if (channel) {
+        // Update team member objects to set mentions and posts in channel as viewed
+        const channelMember = channelState.myMembers[channelId];
+        const prevChannelMember = channelState.myMembers[prevChannelId]; // May also be null
+
+        if (channel && channelMember) {
+            const lastViewedAt = updateLastViewedAt ? Date.now() : channelMember.last_viewed_at;
+
             actions.push({
                 type: ChannelTypes.RECEIVED_MSG_AND_MENTION_COUNT,
                 data: {
                     channel_id: channelId,
+                    last_viewed_at: lastViewedAt,
                     msg_count: channel.total_msg_count,
                     mention_count: 0
                 }
             });
         }
 
-        if (prevChannel && channelId !== prevChannelId) {
+        if (prevChannel && prevChannelMember && channelId !== prevChannelId) {
             actions.push({
                 type: ChannelTypes.RECEIVED_MSG_AND_MENTION_COUNT,
                 data: {
                     channel_id: prevChannelId,
+                    last_viewed_at: prevChannelMember.last_viewed_at,
                     msg_count: prevChannel.total_msg_count,
                     mention_count: 0
                 }
             });
         }
-
-        // Update team member objects to set mentions and posts in channel as viewed
-        const channelMember = channelState.myMembers[channelId];
-        const prevChannelMember = channelState.myMembers[prevChannelId]; // May also be null
 
         const teamUnreads = [];
 

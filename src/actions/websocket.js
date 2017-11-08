@@ -246,14 +246,19 @@ async function handleNewPostEvent(msg, dispatch, getState) {
     const {posts} = state.entities.posts;
     const post = JSON.parse(msg.data.post);
     const userId = post.user_id;
+    const currentUserId = users.currentUserId;
     const status = users.statuses[userId];
 
-    getProfilesAndStatusesForPosts([post], dispatch, getState);
+    // Only fetch the profile and status if the post was made by someone else
+    // as well as making the DM channel visible
+    if (userId !== currentUserId) {
+        getProfilesAndStatusesForPosts([post], dispatch, getState);
 
-    // getProfilesAndStatusesForPosts only gets the status if it doesn't exist, but we also want it if
-    // the user does not appear to be online
-    if (status && status !== General.ONLINE) {
-        getStatusesByIds([userId])(dispatch, getState);
+        // getProfilesAndStatusesForPosts only gets the status if it doesn't exist, but we also want it if
+        // the user does not appear to be online
+        if (status && status !== General.ONLINE) {
+            getStatusesByIds([userId])(dispatch, getState);
+        }
     }
 
     switch (post.type) {
@@ -265,18 +270,11 @@ async function handleNewPostEvent(msg, dispatch, getState) {
         break;
     }
 
-    if (msg.data.channel_type === General.DM_CHANNEL) {
-        const otherUserId = getUserIdFromChannelName(users.currentUserId, msg.data.channel_name);
-        makeDirectChannelVisibleIfNecessary(otherUserId)(dispatch, getState);
-    } else if (msg.data.channel_type === General.GM_CHANNEL) {
-        makeGroupMessageVisibleIfNecessary(post.channel_id)(dispatch, getState);
-    }
-
     if (post.root_id && !posts[post.root_id]) {
         await Client4.getPostThread(post.root_id).then((data) => {
             const rootUserId = data.posts[post.root_id].user_id;
             const rootStatus = users.statuses[rootUserId];
-            if (!users.profiles[rootUserId] && rootUserId !== users.currentUserId) {
+            if (!users.profiles[rootUserId] && rootUserId !== currentUserId) {
                 getProfilesByIds([rootUserId])(dispatch, getState);
             }
 
@@ -292,8 +290,23 @@ async function handleNewPostEvent(msg, dispatch, getState) {
         });
     }
 
-    dispatch(batchActions([
-        {
+    const actions = [{
+        type: WebsocketEvents.STOP_TYPING,
+        data: {
+            id: post.channel_id + post.root_id,
+            userId: post.user_id
+        }
+    }];
+
+    if (!posts[post.id]) {
+        if (msg.data.channel_type === General.DM_CHANNEL) {
+            const otherUserId = getUserIdFromChannelName(currentUserId, msg.data.channel_name);
+            makeDirectChannelVisibleIfNecessary(otherUserId)(dispatch, getState);
+        } else if (msg.data.channel_type === General.GM_CHANNEL) {
+            makeGroupMessageVisibleIfNecessary(post.channel_id)(dispatch, getState);
+        }
+
+        actions.push({
             type: PostTypes.RECEIVED_POSTS,
             data: {
                 order: [],
@@ -302,15 +315,10 @@ async function handleNewPostEvent(msg, dispatch, getState) {
                 }
             },
             channelId: post.channel_id
-        },
-        {
-            type: WebsocketEvents.STOP_TYPING,
-            data: {
-                id: post.channel_id + post.root_id,
-                userId: post.user_id
-            }
-        }
-    ]), getState);
+        });
+    }
+
+    dispatch(batchActions(actions), getState);
 
     if (shouldIgnorePost(post)) {
         // if the post type is in the ignore list we'll do nothing with the read state
@@ -318,7 +326,7 @@ async function handleNewPostEvent(msg, dispatch, getState) {
     }
 
     let markAsRead = false;
-    if (userId === users.currentUserId && !isSystemMessage(post) && !isFromWebhook(post)) {
+    if (userId === currentUserId && !isSystemMessage(post) && !isFromWebhook(post)) {
         // In case the current user posted the message and that message wasn't triggered by a system message
         markAsRead = true;
     } else if (post.channel_id === currentChannelId) {
@@ -327,7 +335,7 @@ async function handleNewPostEvent(msg, dispatch, getState) {
     }
 
     if (markAsRead) {
-        markChannelAsRead(post.channel_id)(dispatch, getState);
+        markChannelAsRead(post.channel_id, null, true)(dispatch, getState);
     } else {
         markChannelAsUnread(msg.data.team_id, post.channel_id, msg.data.mentions)(dispatch, getState);
     }
