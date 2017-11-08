@@ -158,9 +158,22 @@ function myMembers(state = {}, action) {
 
         member = {
             ...member,
-            last_viewed_at: data.last_viewed_at,
             msg_count: data.msg_count == null ? member.msg_count : data.msg_count,
             mention_count: data.mention_count == null ? member.mention_count : data.mention_count
+        };
+
+        return {
+            ...state,
+            [data.channel_id]: member
+        };
+    }
+    case ChannelTypes.RECEIVED_LAST_VIEWED_AT: {
+        const {data} = action;
+        let member = state[data.channel_id];
+
+        member = {
+            ...member,
+            last_viewed_at: data.last_viewed_at
         };
 
         return {

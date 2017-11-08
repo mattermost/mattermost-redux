@@ -945,13 +945,20 @@ export function markChannelAsRead(channelId, prevChannelId, updateLastViewedAt =
         const prevChannelMember = channelState.myMembers[prevChannelId]; // May also be null
 
         if (channel && channelMember) {
-            const lastViewedAt = updateLastViewedAt ? Date.now() : channelMember.last_viewed_at;
+            if (updateLastViewedAt) {
+                actions.push({
+                    type: ChannelTypes.RECEIVED_LAST_VIEWED_AT,
+                    data: {
+                        channel_id: channelId,
+                        last_viewed_at: Date.now()
+                    }
+                });
+            }
 
             actions.push({
                 type: ChannelTypes.RECEIVED_MSG_AND_MENTION_COUNT,
                 data: {
                     channel_id: channelId,
-                    last_viewed_at: lastViewedAt,
                     msg_count: channel.total_msg_count,
                     mention_count: 0
                 }
@@ -963,7 +970,6 @@ export function markChannelAsRead(channelId, prevChannelId, updateLastViewedAt =
                 type: ChannelTypes.RECEIVED_MSG_AND_MENTION_COUNT,
                 data: {
                     channel_id: prevChannelId,
-                    last_viewed_at: prevChannelMember.last_viewed_at,
                     msg_count: prevChannel.total_msg_count,
                     mention_count: 0
                 }
