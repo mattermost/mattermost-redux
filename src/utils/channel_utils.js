@@ -431,11 +431,11 @@ function isNotDeletedChannel(channel) {
     return channel.delete_at === 0;
 }
 
-function isOpenChannel(channel) {
+export function isOpenChannel(channel) {
     return channel.type === General.OPEN_CHANNEL;
 }
 
-function isPrivateChannel(channel) {
+export function isPrivateChannel(channel) {
     return channel.type === General.PRIVATE_CHANNEL;
 }
 
