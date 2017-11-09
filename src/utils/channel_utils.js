@@ -153,7 +153,7 @@ export function isDirectChannel(channel) {
 }
 
 export function isAutoClosed(config, myPreferences, channel, channelActivity) {
-    if (config.CloseUnusedDirectMessages !== 'true' || isFavoriteChannel(myPreferences, channel)) {
+    if (config.CloseUnusedDirectMessages !== 'true' || isFavoriteChannel(myPreferences, channel.id)) {
         return false;
     }
     const autoClose = myPreferences[`${Preferences.CATEGORY_SIDEBAR_SETTINGS}--close_unused_direct_messages`];
@@ -327,10 +327,9 @@ export function getGroupDisplayNameFromUserIds(userIds, profiles, currentUserId,
     return names.sort(sortUsernames).join(', ');
 }
 
-export function isFavoriteChannel(myPreferences, channel) {
-    const fav = myPreferences[`${Preferences.CATEGORY_FAVORITE_CHANNEL}--${channel.id}`];
-    channel.isFavorite = fav && fav.value === 'true';
-    return channel.isFavorite;
+export function isFavoriteChannel(myPreferences, id) {
+    const fav = myPreferences[`${Preferences.CATEGORY_FAVORITE_CHANNEL}--${id}`];
+    return fav && fav.value === 'true';
 }
 
 export function isDefault(channel) {
@@ -483,11 +482,11 @@ function buildChannels(usersState, channels, missingDirectChannels, teammateName
 }
 
 function buildFavoriteChannels(channels, myPreferences, locale) {
-    return channels.filter(isFavoriteChannel.bind(null, myPreferences)).sort(sortChannelsByDisplayName.bind(null, locale));
+    return channels.filter((channel) => isFavoriteChannel(myPreferences, channel.id)).sort(sortChannelsByDisplayName.bind(null, locale));
 }
 
 function buildNotFavoriteChannels(channels, myPreferences) {
-    return channels.filter(not(isFavoriteChannel.bind(null, myPreferences)));
+    return channels.filter((channel) => !isFavoriteChannel(myPreferences, channel.id));
 }
 
 function buildDirectAndGroupChannels(channels, config, myPreferences, currentUserId, lastPosts) {
