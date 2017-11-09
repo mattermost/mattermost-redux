@@ -98,4 +98,23 @@ describe('Actions.General', () => {
         const {serverVersion} = store.getState().entities.general;
         assert.deepEqual(serverVersion, version);
     });
+
+    it('getDataRetentionPolicy', async () => {
+        const responseData = {
+            message_deletion_enabled: true,
+            file_deletion_enabled: false,
+            message_retention_cutoff: Date.now(),
+            file_retention_cutoff: 0
+        };
+
+        nock(Client4.getBaseRoute()).
+        get('/data_retention/policy').
+        query(true).
+        reply(200, responseData);
+
+        await Actions.getDataRetentionPolicy()(store.dispatch, store.getState);
+        await TestHelper.wait(100);
+        const {dataRetentionPolicy} = store.getState().entities.general;
+        assert.deepEqual(dataRetentionPolicy, responseData);
+    });
 });

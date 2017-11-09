@@ -202,6 +202,10 @@ export default class Client4 {
         return `${this.getBrandRoute()}/image?t=${timestamp}`;
     }
 
+    getDataRetentionRoute() {
+        return `${this.getBaseRoute()}/data_retention`;
+    }
+
     getJobsRoute() {
         return `${this.getBaseRoute()}/jobs`;
     }
@@ -1697,6 +1701,14 @@ export default class Client4 {
 
     getCustomEmojiImageUrl = (id) => {
         return `${this.getEmojiRoute(id)}/image`;
+    };
+
+    // Data Retention
+    getDataRetentionPolicy = () => {
+        return this.doFetch(
+            `${this.getDataRetentionRoute()}/policy`,
+            {method: 'get'}
+        );
     };
 
     // Jobs Routes

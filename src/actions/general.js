@@ -81,6 +81,34 @@ export function getClientConfig() {
     };
 }
 
+export function getDataRetentionPolicy() {
+    return async (dispatch, getState) => {
+        dispatch({type: GeneralTypes.DATA_RETENTION_POLICY_REQUEST}, getState);
+
+        let data;
+        try {
+            data = await Client4.getDataRetentionPolicy();
+        } catch (error) {
+            forceLogoutIfNecessary(error, dispatch);
+            dispatch(batchActions([
+                {
+                    type: GeneralTypes.DATA_RETENTION_POLICY_FAILURE,
+                    error
+                },
+                logError(error)(dispatch)
+            ]), getState);
+            return {error};
+        }
+
+        dispatch(batchActions([
+            {type: GeneralTypes.RECEIVED_DATA_RETENTION_POLICY, data},
+            {type: GeneralTypes.DATA_RETENTION_POLICY_SUCCESS}
+        ]));
+
+        return {data};
+    };
+}
+
 export function getLicenseConfig() {
     return bindClientFunc(
         Client4.getClientLicenseOld,
@@ -147,6 +175,7 @@ export function setUrl(url) {
 export default {
     getPing,
     getClientConfig,
+    getDataRetentionPolicy,
     getLicenseConfig,
     logClientError,
     setAppState,
