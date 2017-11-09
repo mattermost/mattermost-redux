@@ -157,7 +157,7 @@ describe('Selectors.Preferences', () => {
             const currentTeamId = '1234';
             const theme = {sidebarBg: '#ff0000'};
 
-            assert.deepEqual(Selectors.getTheme({
+            assert.equal(Selectors.getTheme({
                 entities: {
                     teams: {
                         currentTeamId
@@ -170,7 +170,7 @@ describe('Selectors.Preferences', () => {
                         }
                     }
                 }
-            }), theme);
+            }).sidebarBg, theme.sidebarBg);
         });
 
         it('team-specific theme', () => {
@@ -197,7 +197,7 @@ describe('Selectors.Preferences', () => {
                         }
                     }
                 }
-            }), theme);
+            }).sidebarBg, theme.sidebarBg);
         });
 
         it('memoization', () => {
@@ -265,6 +265,46 @@ describe('Selectors.Preferences', () => {
 
             assert.notEqual(before, Selectors.getTheme(state));
             assert.notDeepEqual(before, Selectors.getTheme(state));
+        });
+
+        it('custom theme with upper case colours', () => {
+            const currentTeamId = '1234';
+            const theme = {sidebarBg: '#FF0000'};
+
+            assert.deepEqual(Selectors.getTheme({
+                entities: {
+                    teams: {
+                        currentTeamId
+                    },
+                    preferences: {
+                        myPreferences: {
+                            [getPreferenceKey(Preferences.CATEGORY_THEME, '')]: {
+                                category: Preferences.CATEGORY_THEME, name: '', value: JSON.stringify(theme)
+                            }
+                        }
+                    }
+                }
+            }).sidebarBg, theme.sidebarBg.toLowerCase());
+        });
+
+        it('custom theme with missing colours', () => {
+            const currentTeamId = '1234';
+            const theme = {sidebarBg: '#ff0000'};
+
+            assert.equal(Selectors.getTheme({
+                entities: {
+                    teams: {
+                        currentTeamId
+                    },
+                    preferences: {
+                        myPreferences: {
+                            [getPreferenceKey(Preferences.CATEGORY_THEME, '')]: {
+                                category: Preferences.CATEGORY_THEME, name: '', value: JSON.stringify(theme)
+                            }
+                        }
+                    }
+                }
+            }).sidebarText, Preferences.THEMES.default.sidebarText);
         });
     });
 
