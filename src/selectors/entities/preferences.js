@@ -137,9 +137,14 @@ export const getTheme = createShallowSelector(
 
         // At this point, the theme should be a plain object
 
-        // Fix a case where upper case theme colours are rendered as black
-        for (const key of Object.keys(theme)) {
-            theme[key] = theme[key].toLowerCase();
+        for (const key of Object.keys(Preferences.THEMES.default)) {
+            if (theme[key]) {
+                // Fix a case where upper case theme colours are rendered as black
+                theme[key] = theme[key].toLowerCase();
+            } else {
+                // This theme is missing some colours, so fall back to the default theme when necessary
+                theme[key] = Preferences.THEMES.default[key];
+            }
         }
 
         return theme;
