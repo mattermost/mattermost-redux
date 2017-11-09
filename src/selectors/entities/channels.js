@@ -391,7 +391,7 @@ export const getSortedUnreadChannelIds = createIdsSelector(
         // If we receive an unread for a channel and then a mention the channel
         // won't be sorted correctly until we receive a message in another channel
         if (!currentUser) {
-            return null;
+            return [];
         }
 
         const locale = currentUser.locale || 'en';
@@ -433,7 +433,7 @@ export const getSortedFavoriteChannelIds = createIdsSelector(
     getTeammateNameDisplaySetting,
     (currentUser, profiles, channels, myMembers, favoriteIds, teamChannelIds, unreadIds, settings) => {
         if (!currentUser) {
-            return null;
+            return [];
         }
 
         const locale = currentUser.locale || 'en';
@@ -464,7 +464,7 @@ export const getSortedPublicChannelIds = createIdsSelector(
     getSortedFavoriteChannelIds,
     (currentUser, channels, myMembers, teamChannelIds, unreadIds, favoriteIds) => {
         if (!currentUser) {
-            return null;
+            return [];
         }
 
         const locale = currentUser.locale || 'en';
@@ -489,7 +489,7 @@ export const getSortedPrivateChannelIds = createIdsSelector(
     getSortedFavoriteChannelIds,
     (currentUser, channels, myMembers, teamChannelIds, unreadIds, favoriteIds) => {
         if (!currentUser) {
-            return null;
+            return [];
         }
 
         const locale = currentUser.locale || 'en';
@@ -519,7 +519,7 @@ export const getSortedDirectChannelIds = createIdsSelector(
     getLastPostPerChannel,
     (currentUser, profiles, channels, teammates, groupIds, unreadIds, favoriteIds, settings, config, preferences, lastPosts) => {
         if (!currentUser) {
-            return null;
+            return [];
         }
 
         const locale = currentUser.locale || 'en';
