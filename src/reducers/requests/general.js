@@ -30,6 +30,16 @@ function config(state = initialRequestState(), action) {
     );
 }
 
+function dataRetentionPolicy(state = initialRequestState(), action) {
+    return handleRequest(
+        GeneralTypes.DATA_RETENTION_POLICY_REQUEST,
+        GeneralTypes.DATA_RETENTION_POLICY_SUCCESS,
+        GeneralTypes.DATA_RETENTION_POLICY_FAILURE,
+        state,
+        action
+    );
+}
+
 function license(state = initialRequestState(), action) {
     return handleRequest(
         GeneralTypes.CLIENT_LICENSE_REQUEST,
@@ -57,6 +67,7 @@ function websocket(state = initialRequestState(), action) {
 export default combineReducers({
     server,
     config,
+    dataRetentionPolicy,
     license,
     websocket
 });

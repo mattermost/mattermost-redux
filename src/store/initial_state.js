@@ -7,6 +7,7 @@ const state = {
             appState: false,
             credentials: {},
             config: {},
+            dataRetentionPolicy: {},
             deviceToken: '',
             license: {},
             serverVersion: ''
@@ -145,6 +146,10 @@ const state = {
                 error: null
             },
             config: {
+                status: 'not_started',
+                error: null
+            },
+            dataRetentionPolicy: {
                 status: 'not_started',
                 error: null
             },

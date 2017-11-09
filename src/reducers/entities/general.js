@@ -37,6 +37,17 @@ function credentials(state = {}, action) {
     }
 }
 
+function dataRetentionPolicy(state = {}, action) {
+    switch (action.type) {
+    case GeneralTypes.RECEIVED_DATA_RETENTION_POLICY:
+        return action.data;
+    case UserTypes.LOGOUT_SUCCESS:
+        return {};
+    default:
+        return state;
+    }
+}
+
 function deviceToken(state = '', action) {
     switch (action.type) {
     case GeneralTypes.RECEIVED_APP_DEVICE_TOKEN:
@@ -72,6 +83,7 @@ export default combineReducers({
     appState,
     credentials,
     config,
+    dataRetentionPolicy,
     deviceToken,
     license,
     serverVersion
