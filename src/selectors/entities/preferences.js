@@ -137,13 +137,24 @@ export const getTheme = createShallowSelector(
 
         // At this point, the theme should be a plain object
 
-        for (const key of Object.keys(Preferences.THEMES.default)) {
+        // If this is a system theme, find it in case the user's theme is missing any fields
+        let baseTheme = Preferences.THEMES.default;
+        if (theme.type) {
+            for (const key of Object.keys(Preferences.THEMES)) {
+                if (Preferences.THEMES[key].type === theme.type) {
+                    baseTheme = Preferences.THEMES[key];
+                    break;
+                }
+            }
+        }
+
+        for (const key of Object.keys(baseTheme)) {
             if (theme[key]) {
                 // Fix a case where upper case theme colours are rendered as black
                 theme[key] = theme[key].toLowerCase();
             } else {
                 // This theme is missing some colours, so fall back to the default theme when necessary
-                theme[key] = Preferences.THEMES.default[key];
+                theme[key] = baseTheme[key];
             }
         }
 
