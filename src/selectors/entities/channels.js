@@ -538,8 +538,12 @@ export const getSortedDirectChannelIds = createIdsSelector(
         }, directChannelsIds);
         const directChannels = groupIds.filter((id) => {
             const channel = channels[id];
-            const lastPost = lastPosts[channel.id];
-            return !unreadIds.includes(id) && !favoriteIds.includes(id) && !isAutoClosed(config, preferences, channels[id], lastPost ? lastPost.create_at : 0);
+            if (channel) {
+                const lastPost = lastPosts[channel.id];
+                return !unreadIds.includes(id) && !favoriteIds.includes(id) && !isAutoClosed(config, preferences, channels[id], lastPost ? lastPost.create_at : 0);
+            }
+
+            return false;
         }).concat(directChannelsIds).map((id) => {
             const channel = channels[id];
             return completeDirectChannelDisplayName(currentUser.id, profiles, settings, channel);
