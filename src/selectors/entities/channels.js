@@ -27,7 +27,7 @@ import {
 import {createIdsSelector} from 'utils/helpers';
 
 import {General} from 'constants';
-import { isDirectChannelVisible } from '../../utils/channel_utils';
+import {isDirectChannelVisible} from '../../utils/channel_utils';
 
 export function getAllChannels(state) {
     return state.entities.channels.channels;
