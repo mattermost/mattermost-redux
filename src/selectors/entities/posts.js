@@ -298,7 +298,7 @@ export function makeGetCommentCountForPost() {
               if (posts.hasOwnProperty(id)) {
                   const post = posts[id];
 
-                  if (post.root_id === currentPost.id && post.state !== Posts.POST_DELETED) {
+                  if (post.root_id === currentPost.id && post.state !== Posts.POST_DELETED && !isPostEphemeral(post)) {
                       count += 1;
                   }
               }
