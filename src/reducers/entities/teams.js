@@ -55,7 +55,11 @@ function myMembers(state = {}, action) {
         const members = action.data;
         for (const m of members) {
             if (m.delete_at == null || m.delete_at === 0) {
-                nextState[m.team_id] = m;
+                const prevMember = state[m.team_id] || {mention_count: 0, msg_count: 0};
+                nextState[m.team_id] = {
+                    ...prevMember,
+                    ...m
+                };
             }
         }
         return nextState;
