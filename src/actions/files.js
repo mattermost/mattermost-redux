@@ -6,7 +6,7 @@ import {batchActions} from 'redux-batched-actions';
 import {Client4} from 'client';
 import {FileTypes} from 'action_types';
 import {logError} from './errors';
-import {forceLogoutIfNecessary} from './helpers';
+import {bindClientFunc, forceLogoutIfNecessary} from './helpers';
 
 export function getFilesForPost(postId) {
     return async (dispatch, getState) => {
@@ -21,7 +21,7 @@ export function getFilesForPost(postId) {
                 {type: FileTypes.FETCH_FILES_FOR_POST_FAILURE, error},
                 logError(error)(dispatch)
             ]), getState);
-            return;
+            return {error};
         }
 
         dispatch(batchActions([
@@ -34,6 +34,8 @@ export function getFilesForPost(postId) {
                 type: FileTypes.FETCH_FILES_FOR_POST_SUCCESS
             }
         ]), getState);
+
+        return {data: true};
     };
 }
 
@@ -46,7 +48,7 @@ export function getMissingFilesForPost(postId) {
             posts = await getFilesForPost(postId)(dispatch, getState);
         }
 
-        return posts;
+        return {data: posts};
     };
 }
 
@@ -69,7 +71,7 @@ export function uploadFile(channelId, rootId, clientIds, fileFormData, formBound
             };
 
             dispatch(batchActions([failure, logError(error)(dispatch)]), getState);
-            return null;
+            return {error};
         }
 
         const data = files.file_infos.map((file, index) => {
@@ -91,6 +93,16 @@ export function uploadFile(channelId, rootId, clientIds, fileFormData, formBound
             }
         ]), getState);
 
-        return files;
+        return {data: files};
     };
+}
+
+export function getFilePublicLink(fileId) {
+    return bindClientFunc(
+        Client4.getFilePublicLink,
+        FileTypes.GET_FILE_PUBLIC_LINK_REQUEST,
+        [FileTypes.RECEIVED_FILE_PUBLIC_LINK, FileTypes.GET_FILE_PUBLIC_LINK_SUCCESS],
+        FileTypes.GET_FILE_PUBLIC_LINK_FAILURE,
+        fileId
+    );
 }

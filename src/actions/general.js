@@ -26,7 +26,7 @@ export function getPing(useV3 = false) {
                 data = await Client4.ping();
             }
             if ((useV3 && !data.version) || (!useV3 && data.status !== 'OK')) {
-                // successful ping but not the right return data
+                // successful ping but not the right return {data}
                 dispatch({type: GeneralTypes.PING_FAILURE, error: pingError}, getState);
                 return {error: pingError};
             }
@@ -46,6 +46,8 @@ export function getPing(useV3 = false) {
 export function resetPing() {
     return async (dispatch, getState) => {
         dispatch({type: GeneralTypes.PING_RESET}, getState);
+
+        return {data: true};
     };
 }
 
@@ -65,7 +67,7 @@ export function getClientConfig() {
                 },
                 logError(error)(dispatch)
             ]), getState);
-            return null;
+            return {error};
         }
 
         Client4.setEnableLogging(data.EnableDeveloper === 'true');
@@ -75,7 +77,35 @@ export function getClientConfig() {
             {type: GeneralTypes.CLIENT_CONFIG_SUCCESS}
         ]));
 
-        return data;
+        return {data};
+    };
+}
+
+export function getDataRetentionPolicy() {
+    return async (dispatch, getState) => {
+        dispatch({type: GeneralTypes.DATA_RETENTION_POLICY_REQUEST}, getState);
+
+        let data;
+        try {
+            data = await Client4.getDataRetentionPolicy();
+        } catch (error) {
+            forceLogoutIfNecessary(error, dispatch);
+            dispatch(batchActions([
+                {
+                    type: GeneralTypes.DATA_RETENTION_POLICY_FAILURE,
+                    error
+                },
+                logError(error)(dispatch)
+            ]), getState);
+            return {error};
+        }
+
+        dispatch(batchActions([
+            {type: GeneralTypes.RECEIVED_DATA_RETENTION_POLICY, data},
+            {type: GeneralTypes.DATA_RETENTION_POLICY_SUCCESS}
+        ]));
+
+        return {data};
     };
 }
 
@@ -102,12 +132,16 @@ export function logClientError(message, level = 'ERROR') {
 export function setAppState(state) {
     return async (dispatch, getState) => {
         dispatch({type: GeneralTypes.RECEIVED_APP_STATE, data: state}, getState);
+
+        return {data: true};
     };
 }
 
 export function setDeviceToken(token) {
     return async (dispatch, getState) => {
         dispatch({type: GeneralTypes.RECEIVED_APP_DEVICE_TOKEN, data: token}, getState);
+
+        return {data: true};
     };
 }
 
@@ -116,6 +150,8 @@ EventEmitter.on(General.CONFIG_CHANGED, setServerVersion);
 export function setServerVersion(serverVersion) {
     return async (dispatch, getState) => {
         dispatch({type: GeneralTypes.RECEIVED_SERVER_VERSION, data: serverVersion}, getState);
+
+        return {data: true};
     };
 }
 
@@ -139,6 +175,7 @@ export function setUrl(url) {
 export default {
     getPing,
     getClientConfig,
+    getDataRetentionPolicy,
     getLicenseConfig,
     logClientError,
     setAppState,

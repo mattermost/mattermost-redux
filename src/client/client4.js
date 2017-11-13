@@ -202,8 +202,20 @@ export default class Client4 {
         return `${this.getBrandRoute()}/image?t=${timestamp}`;
     }
 
+    getDataRetentionRoute() {
+        return `${this.getBaseRoute()}/data_retention`;
+    }
+
     getJobsRoute() {
         return `${this.getBaseRoute()}/jobs`;
+    }
+
+    getPluginsRoute() {
+        return `${this.getBaseRoute()}/plugins`;
+    }
+
+    getPluginRoute(pluginId) {
+        return `${this.getPluginsRoute()}/${pluginId}`;
     }
 
     getOptions(options) {
@@ -543,7 +555,7 @@ export default class Client4 {
     getProfilePictureUrl = (userId, lastPictureUpdate) => {
         const params = {};
         if (lastPictureUpdate) {
-            params.time = lastPictureUpdate;
+            params._ = lastPictureUpdate;
         }
 
         return `${this.getUserRoute(userId)}/image${buildQueryString(params)}`;
@@ -572,6 +584,13 @@ export default class Client4 {
         return this.doFetch(
             `${this.getUserRoute(userId)}/sessions/revoke`,
             {method: 'post', body: JSON.stringify({session_id: sessionId})}
+        );
+    };
+
+    revokeAllSessionsForUser = async (userId) => {
+        return this.doFetch(
+            `${this.getUserRoute(userId)}/sessions/revoke/all`,
+            {method: 'post'}
         );
     };
 
@@ -722,6 +741,20 @@ export default class Client4 {
         );
     }
 
+    disableUserAccessToken = async (tokenId) => {
+        return this.doFetch(
+            `${this.getUsersRoute()}/tokens/disable`,
+            {method: 'post', body: JSON.stringify({token_id: tokenId})}
+        );
+    }
+
+    enableUserAccessToken = async (tokenId) => {
+        return this.doFetch(
+            `${this.getUsersRoute()}/tokens/enable`,
+            {method: 'post', body: JSON.stringify({token_id: tokenId})}
+        );
+    }
+
     // Team Routes
 
     createTeam = async (team) => {
@@ -787,6 +820,13 @@ export default class Client4 {
     getMyTeamUnreads = async () => {
         return this.doFetch(
             `${this.getUserRoute('me')}/teams/unread`,
+            {method: 'get'}
+        );
+    };
+
+    getTeamMembers = async (teamId, page = 0, perPage = PER_PAGE_DEFAULT) => {
+        return this.doFetch(
+            `${this.getTeamMembersRoute(teamId)}${buildQueryString({page, per_page: perPage})}`,
             {method: 'get'}
         );
     };
@@ -1045,10 +1085,10 @@ export default class Client4 {
         );
     };
 
-    addToChannel = async (userId, channelId) => {
+    addToChannel = async (userId, channelId, postRootId = '') => {
         this.trackEvent('api', 'api_channels_add_member', {channel_id: channelId});
 
-        const member = {user_id: userId, channel_id: channelId};
+        const member = {user_id: userId, channel_id: channelId, post_root_id: postRootId};
         return this.doFetch(
             `${this.getChannelMembersRoute(channelId)}`,
             {method: 'post', body: JSON.stringify(member)}
@@ -1253,6 +1293,13 @@ export default class Client4 {
         return this.doFetch(
             `${this.getBaseRoute()}/opengraph`,
             {method: 'post', body: JSON.stringify({url})}
+        );
+    };
+
+    doPostAction = async (postId, actionId) => {
+        return this.doFetch(
+            `${this.getPostRoute(postId)}/actions/${encodeURIComponent(actionId)}`,
+            {method: 'post'}
         );
     };
 
@@ -1562,6 +1609,13 @@ export default class Client4 {
         );
     };
 
+    editOAuthApp = async (app) => {
+        return this.doFetch(
+            `${this.getOAuthAppsRoute()}/${app.id}`,
+            {method: 'put', body: JSON.stringify(app)}
+        );
+    };
+
     getOAuthApps = async (page = 0, perPage = PER_PAGE_DEFAULT) => {
         return this.doFetch(
             `${this.getOAuthAppsRoute()}${buildQueryString({page, per_page: perPage})}`,
@@ -1647,6 +1701,14 @@ export default class Client4 {
 
     getCustomEmojiImageUrl = (id) => {
         return `${this.getEmojiRoute(id)}/image`;
+    };
+
+    // Data Retention
+    getDataRetentionPolicy = () => {
+        return this.doFetch(
+            `${this.getDataRetentionRoute()}/policy`,
+            {method: 'get'}
+        );
     };
 
     // Jobs Routes
@@ -1922,6 +1984,66 @@ export default class Client4 {
         return this.doFetch(
             `${this.getBaseRoute()}/analytics/old${buildQueryString({name, team_id: teamId})}`,
             {method: 'get'}
+        );
+    };
+
+    // Plugin Routes - EXPERIMENTAL - SUBJECT TO CHANGE
+
+    uploadPlugin = async (fileData) => {
+        this.trackEvent('api', 'api_plugin_upload');
+
+        const formData = new FormData();
+        formData.append('plugin', fileData);
+
+        const request = {
+            method: 'post',
+            body: formData
+        };
+
+        if (formData.getBoundary) {
+            request.headers = {
+                'Content-Type': `multipart/form-data; boundary=${formData.getBoundary()}`
+            };
+        }
+
+        return this.doFetch(
+            this.getPluginsRoute(),
+            request
+        );
+    };
+
+    getPlugins = async () => {
+        return this.doFetch(
+            this.getPluginsRoute(),
+            {method: 'get'}
+        );
+    };
+
+    removePlugin = async (pluginId) => {
+        return this.doFetch(
+            this.getPluginRoute(pluginId),
+            {method: 'delete'}
+        );
+    };
+
+    getWebappPlugins = async () => {
+        return this.doFetch(
+            `${this.getPluginsRoute()}/webapp`,
+            {method: 'get'}
+        );
+    };
+
+    activatePlugin = async (pluginId) => {
+        return this.doFetch(
+            `${this.getPluginRoute(pluginId)}/activate`,
+            {method: 'post'}
+        );
+    };
+
+    deactivatePlugin = async (pluginId) => {
+        return this.doFetch(
+            `${this.getPluginRoute(pluginId)}/deactivate`,
+            {method: 'post'}
         );
     };
 

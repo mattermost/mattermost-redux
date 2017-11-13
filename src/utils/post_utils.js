@@ -5,45 +5,6 @@ import {General, Posts, Preferences} from 'constants';
 
 import {getPreferenceKey} from './preference_utils';
 
-export function addDatesToPostList(posts, options = {}) {
-    const {indicateNewMessages, currentUserId, lastViewedAt} = options;
-
-    const out = [];
-
-    let lastDate = null;
-    let subsequentPostIsUnread = false;
-    let subsequentPostUserId;
-    let postIsUnread;
-    for (const post of posts) {
-        if (post.state === Posts.POST_DELETED && post.user_id === currentUserId) {
-            continue;
-        }
-        postIsUnread = post.create_at > lastViewedAt;
-        if (indicateNewMessages && subsequentPostIsUnread && !postIsUnread && subsequentPostUserId !== currentUserId) {
-            out.push(General.START_OF_NEW_MESSAGES);
-        }
-        subsequentPostIsUnread = postIsUnread;
-        subsequentPostUserId = post.user_id;
-
-        const postDate = new Date(post.create_at);
-
-        // Push on a date header if the last post was on a different day than the current one
-        if (lastDate && lastDate.toDateString() !== postDate.toDateString()) {
-            out.push(lastDate);
-        }
-
-        lastDate = postDate;
-        out.push(post);
-    }
-
-    // Push on the date header for the oldest post
-    if (lastDate) {
-        out.push(lastDate);
-    }
-
-    return out;
-}
-
 export function isPostFlagged(postId, myPreferences) {
     const key = getPreferenceKey(Preferences.CATEGORY_FLAGGED_POST, postId);
     return myPreferences.hasOwnProperty(key);
@@ -117,7 +78,7 @@ export function shouldFilterPost(post, options = {}) {
     // Add as much filters as needed here, if you want to filter the post return true
     const postTypes = Posts.POST_TYPES;
 
-    if (options.filterJoinLeave) {
+    if ('showJoinLeave' in options && !options.showJoinLeave) {
         const joinLeaveTypes = [postTypes.JOIN_LEAVE, postTypes.JOIN_CHANNEL, postTypes.LEAVE_CHANNEL, postTypes.ADD_REMOVE, postTypes.ADD_TO_CHANNEL, postTypes.REMOVE_FROM_CHANNEL];
         if (joinLeaveTypes.includes(post.type)) {
             return true;
@@ -129,4 +90,22 @@ export function shouldFilterPost(post, options = {}) {
 
 export function isPostPendingOrFailed(post) {
     return post.failed || post.id === post.pending_post_id;
+}
+
+export function comparePosts(a, b) {
+    const aIsPendingOrFailed = isPostPendingOrFailed(a);
+    const bIsPendingOrFailed = isPostPendingOrFailed(b);
+    if (aIsPendingOrFailed && !bIsPendingOrFailed) {
+        return -1;
+    } else if (!aIsPendingOrFailed && bIsPendingOrFailed) {
+        return 1;
+    }
+
+    if (a.create_at > b.create_at) {
+        return -1;
+    } else if (a.create_at < b.create_at) {
+        return 1;
+    }
+
+    return 0;
 }

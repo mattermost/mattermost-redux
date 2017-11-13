@@ -2,6 +2,7 @@
 // See License.txt for license information.
 
 import assert from 'assert';
+import nock from 'nock';
 
 import * as Actions from 'actions/general';
 import {Client, Client4} from 'client';
@@ -13,7 +14,7 @@ import configureStore from 'test/test_store';
 describe('Actions.General', () => {
     let store;
     before(async () => {
-        await TestHelper.initBasic(Client, Client4);
+        await TestHelper.initBasic(Client4);
     });
 
     beforeEach(async () => {
@@ -21,8 +22,7 @@ describe('Actions.General', () => {
     });
 
     after(async () => {
-        await TestHelper.basicClient.logout();
-        await TestHelper.basicClient4.logout();
+        await TestHelper.tearDown();
     });
 
     it('getPing - Invalid URL', async () => {
@@ -37,6 +37,11 @@ describe('Actions.General', () => {
     });
 
     it('getPing', async () => {
+        nock(Client4.getBaseRoute()).
+            get('/system/ping').
+            query(true).
+            reply(200, {status: 'OK', version: '4.0.0'});
+
         await Actions.getPing()(store.dispatch, store.getState);
 
         const {server} = store.getState().requests.general;
@@ -46,6 +51,11 @@ describe('Actions.General', () => {
     });
 
     it('getClientConfig', async () => {
+        nock(Client4.getBaseRoute()).
+            get('/config/client').
+            query(true).
+            reply(200, {Version: '4.0.0', BuildNumber: '3', BuildDate: 'Yesterday', BuildHash: '1234'});
+
         await Actions.getClientConfig()(store.dispatch, store.getState);
 
         const configRequest = store.getState().requests.general.config;
@@ -63,6 +73,11 @@ describe('Actions.General', () => {
     });
 
     it('getLicenseConfig', async () => {
+        nock(Client4.getBaseRoute()).
+            get('/license/client').
+            query(true).
+            reply(200, {IsLicensed: 'false'});
+
         await Actions.getLicenseConfig()(store.dispatch, store.getState);
 
         const licenseRequest = store.getState().requests.general.license;
@@ -82,5 +97,24 @@ describe('Actions.General', () => {
         await TestHelper.wait(100);
         const {serverVersion} = store.getState().entities.general;
         assert.deepEqual(serverVersion, version);
+    });
+
+    it('getDataRetentionPolicy', async () => {
+        const responseData = {
+            message_deletion_enabled: true,
+            file_deletion_enabled: false,
+            message_retention_cutoff: Date.now(),
+            file_retention_cutoff: 0
+        };
+
+        nock(Client4.getBaseRoute()).
+        get('/data_retention/policy').
+        query(true).
+        reply(200, responseData);
+
+        await Actions.getDataRetentionPolicy()(store.dispatch, store.getState);
+        await TestHelper.wait(100);
+        const {dataRetentionPolicy} = store.getState().entities.general;
+        assert.deepEqual(dataRetentionPolicy, responseData);
     });
 });

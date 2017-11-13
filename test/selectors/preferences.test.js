@@ -8,37 +8,48 @@ import {General, Preferences} from 'constants';
 import * as Selectors from 'selectors/entities/preferences';
 
 import deepFreezeAndThrowOnMutation from 'utils/deep_freeze';
+import {getPreferenceKey} from 'utils/preference_utils';
 
 describe('Selectors.Preferences', () => {
     const category1 = 'testcategory1';
+    const directCategory = Preferences.CATEGORY_DIRECT_CHANNEL_SHOW;
+    const groupCategory = Preferences.CATEGORY_GROUP_CHANNEL_SHOW;
+    const favCategory = Preferences.CATEGORY_FAVORITE_CHANNEL;
+
     const name1 = 'testname1';
     const value1 = 'true';
     const pref1 = {category: category1, name: name1, value: value1};
-    const category2 = Preferences.CATEGORY_DIRECT_CHANNEL_SHOW;
-    const name2 = 'testname2';
-    const pref2 = {category: category2, name: name2, value: 'true'};
-    const category3 = Preferences.CATEGORY_GROUP_CHANNEL_SHOW;
-    const name3 = 'testname3';
-    const pref3 = {category: category3, name: name3, value: 'true'};
+
+    const dm1 = 'teammate1';
+    const dmPref1 = {category: directCategory, name: dm1, value: 'true'};
+    const dm2 = 'teammate2';
+    const dmPref2 = {category: directCategory, name: dm2, value: 'false'};
+
+    const gp1 = 'group1';
+    const prefGp1 = {category: groupCategory, name: gp1, value: 'true'};
+    const gp2 = 'group2';
+    const prefGp2 = {category: groupCategory, name: gp2, value: 'false'};
+
+    const fav1 = 'favorite1';
+    const favPref1 = {category1: favCategory, name: fav1, value: 'true'};
+    const fav2 = 'favorite2';
+    const favPref2 = {category1: favCategory, name: fav2, value: 'false'};
 
     const currentUserId = 'currentuserid';
-    const currentTeamId = 'currentteamid';
-    const testTheme = {themeColor: '#ffffff'};
-    const themePref = {category: Preferences.CATEGORY_THEME, name: '', value: JSON.stringify(testTheme)};
 
     const myPreferences = {};
     myPreferences[`${category1}--${name1}`] = pref1;
-    myPreferences[`${category2}--${name2}`] = pref2;
-    myPreferences[`${category3}--${name3}`] = pref3;
-    myPreferences[`${themePref.category}--${themePref.name}`] = themePref;
+    myPreferences[`${directCategory}--${dm1}`] = dmPref1;
+    myPreferences[`${directCategory}--${dm2}`] = dmPref2;
+    myPreferences[`${groupCategory}--${gp1}`] = prefGp1;
+    myPreferences[`${groupCategory}--${gp2}`] = prefGp2;
+    myPreferences[`${favCategory}--${fav1}`] = favPref1;
+    myPreferences[`${favCategory}--${fav2}`] = favPref2;
 
     const testState = deepFreezeAndThrowOnMutation({
         entities: {
             users: {
                 currentUserId
-            },
-            teams: {
-                currentTeamId
             },
             preferences: {
                 myPreferences
@@ -60,11 +71,11 @@ describe('Selectors.Preferences', () => {
     });
 
     it('get direct channel show preferences', () => {
-        assert.deepEqual(Selectors.getDirectShowPreferences(testState), [pref2]);
+        assert.deepEqual(Selectors.getDirectShowPreferences(testState), [dmPref1, dmPref2]);
     });
 
     it('get group channel show preferences', () => {
-        assert.deepEqual(Selectors.getGroupShowPreferences(testState), [pref3]);
+        assert.deepEqual(Selectors.getGroupShowPreferences(testState), [prefGp1, prefGp2]);
     });
 
     it('getTeammateNameDisplaySetting', () => {
@@ -76,7 +87,7 @@ describe('Selectors.Preferences', () => {
                             config: {}
                         },
                         preferences: {
-                            preferences: {
+                            myPreferences: {
                                 [`${Preferences.CATEGORY_DISPLAY_SETTINGS}--${Preferences.NAME_NAME_FORMAT}`]: General.TEAMMATE_NAME_DISPLAY.SHOW_FULLNAME
                             }
                         }
@@ -96,7 +107,7 @@ describe('Selectors.Preferences', () => {
                             }
                         },
                         preferences: {
-                            preferences: {
+                            myPreferences: {
                                 [`${Preferences.CATEGORY_DISPLAY_SETTINGS}--${Preferences.NAME_NAME_FORMAT}`]: General.TEAMMATE_NAME_DISPLAY.SHOW_FULLNAME
                             }
                         }
@@ -116,7 +127,7 @@ describe('Selectors.Preferences', () => {
                             }
                         },
                         preferences: {
-                            preferences: {}
+                            myPreferences: {}
                         }
                     }
                 }),
@@ -125,15 +136,224 @@ describe('Selectors.Preferences', () => {
         });
     });
 
-    it('get theme', () => {
-        assert.deepEqual(Selectors.getTheme(testState), testTheme);
+    describe('get theme', () => {
+        it('default theme', () => {
+            const currentTeamId = '1234';
+
+            assert.equal(Selectors.getTheme({
+                entities: {
+                    teams: {
+                        currentTeamId
+                    },
+                    preferences: {
+                        myPreferences: {
+                        }
+                    }
+                }
+            }), Preferences.THEMES.default);
+        });
+
+        it('custom theme', () => {
+            const currentTeamId = '1234';
+            const theme = {sidebarBg: '#ff0000'};
+
+            assert.equal(Selectors.getTheme({
+                entities: {
+                    teams: {
+                        currentTeamId
+                    },
+                    preferences: {
+                        myPreferences: {
+                            [getPreferenceKey(Preferences.CATEGORY_THEME, '')]: {
+                                category: Preferences.CATEGORY_THEME, name: '', value: JSON.stringify(theme)
+                            }
+                        }
+                    }
+                }
+            }).sidebarBg, theme.sidebarBg);
+        });
+
+        it('team-specific theme', () => {
+            const currentTeamId = '1234';
+            const otherTeamId = 'abcd';
+            const theme = {sidebarBg: '#ff0000'};
+
+            assert.deepEqual(Selectors.getTheme({
+                entities: {
+                    teams: {
+                        currentTeamId
+                    },
+                    preferences: {
+                        myPreferences: {
+                            [getPreferenceKey(Preferences.CATEGORY_THEME, '')]: {
+                                category: Preferences.CATEGORY_THEME, name: '', value: JSON.stringify({})
+                            },
+                            [getPreferenceKey(Preferences.CATEGORY_THEME, currentTeamId)]: {
+                                category: Preferences.CATEGORY_THEME, name: currentTeamId, value: JSON.stringify(theme)
+                            },
+                            [getPreferenceKey(Preferences.CATEGORY_THEME, otherTeamId)]: {
+                                category: Preferences.CATEGORY_THEME, name: otherTeamId, value: JSON.stringify({})
+                            }
+                        }
+                    }
+                }
+            }).sidebarBg, theme.sidebarBg);
+        });
+
+        it('memoization', () => {
+            const currentTeamId = '1234';
+            const otherTeamId = 'abcd';
+
+            let state = {
+                entities: {
+                    teams: {
+                        currentTeamId
+                    },
+                    preferences: {
+                        myPreferences: {
+                            [getPreferenceKey(Preferences.CATEGORY_THEME, '')]: {
+                                category: Preferences.CATEGORY_THEME, name: '', value: JSON.stringify({})
+                            },
+                            [getPreferenceKey(Preferences.CATEGORY_THEME, currentTeamId)]: {
+                                category: Preferences.CATEGORY_THEME, name: currentTeamId, value: JSON.stringify({sidebarBg: '#ff0000'})
+                            },
+                            [getPreferenceKey(Preferences.CATEGORY_THEME, otherTeamId)]: {
+                                category: Preferences.CATEGORY_THEME, name: otherTeamId, value: JSON.stringify({})
+                            }
+                        }
+                    }
+                }
+            };
+
+            const before = Selectors.getTheme(state);
+
+            assert.equal(before, Selectors.getTheme(state));
+
+            state = {
+                ...state,
+                entities: {
+                    ...state.entities,
+                    preferences: {
+                        ...state.entities.preferences,
+                        myPreferences: {
+                            ...state.entities.preferences.myPreferences,
+                            somethingUnrelated: {
+                                category: 'somethingUnrelated', name: '', value: JSON.stringify({})
+                            }
+                        }
+                    }
+                }
+            };
+
+            assert.equal(before, Selectors.getTheme(state));
+
+            state = {
+                ...state,
+                entities: {
+                    ...state.entities,
+                    preferences: {
+                        ...state.entities.preferences,
+                        myPreferences: {
+                            ...state.entities.preferences.myPreferences,
+                            [getPreferenceKey(Preferences.CATEGORY_THEME, currentTeamId)]: {
+                                category: Preferences.CATEGORY_THEME, name: currentTeamId, value: JSON.stringify({sidebarBg: '#0000ff'})
+                            }
+                        }
+                    }
+                }
+            };
+
+            assert.notEqual(before, Selectors.getTheme(state));
+            assert.notDeepEqual(before, Selectors.getTheme(state));
+        });
+
+        it('custom theme with upper case colours', () => {
+            const currentTeamId = '1234';
+            const theme = {sidebarBg: '#FF0000'};
+
+            assert.deepEqual(Selectors.getTheme({
+                entities: {
+                    teams: {
+                        currentTeamId
+                    },
+                    preferences: {
+                        myPreferences: {
+                            [getPreferenceKey(Preferences.CATEGORY_THEME, '')]: {
+                                category: Preferences.CATEGORY_THEME, name: '', value: JSON.stringify(theme)
+                            }
+                        }
+                    }
+                }
+            }).sidebarBg, theme.sidebarBg.toLowerCase());
+        });
+
+        it('custom theme with missing colours', () => {
+            const currentTeamId = '1234';
+            const theme = {sidebarBg: '#ff0000'};
+
+            assert.equal(Selectors.getTheme({
+                entities: {
+                    teams: {
+                        currentTeamId
+                    },
+                    preferences: {
+                        myPreferences: {
+                            [getPreferenceKey(Preferences.CATEGORY_THEME, '')]: {
+                                category: Preferences.CATEGORY_THEME, name: '', value: JSON.stringify(theme)
+                            }
+                        }
+                    }
+                }
+            }).sidebarText, Preferences.THEMES.default.sidebarText);
+        });
+
+        it('system theme with missing colours', () => {
+            const currentTeamId = '1234';
+            const theme = {
+                type: Preferences.THEMES.mattermostDark.type,
+                sidebarBg: '#ff0000'
+            };
+
+            assert.equal(Selectors.getTheme({
+                entities: {
+                    teams: {
+                        currentTeamId
+                    },
+                    preferences: {
+                        myPreferences: {
+                            [getPreferenceKey(Preferences.CATEGORY_THEME, '')]: {
+                                category: Preferences.CATEGORY_THEME, name: '', value: JSON.stringify(theme)
+                            }
+                        }
+                    }
+                }
+            }).sidebarText, Preferences.THEMES.mattermostDark.sidebarText);
+        });
     });
 
     it('get theme from style', () => {
-        function testStyleFunction(theme) {
+        const theme = {themeColor: '#ffffff'};
+        const currentTeamId = '1234';
+
+        const state = {
+            entities: {
+                teams: {
+                    currentTeamId
+                },
+                preferences: {
+                    myPreferences: {
+                        [getPreferenceKey(Preferences.CATEGORY_THEME, '')]: {
+                            category: Preferences.CATEGORY_THEME, name: '', value: JSON.stringify(theme)
+                        }
+                    }
+                }
+            }
+        };
+
+        function testStyleFunction(myTheme) {
             return {
                 container: {
-                    backgroundColor: theme.themeColor,
+                    backgroundColor: myTheme.themeColor,
                     height: 100
                 }
             };
@@ -141,14 +361,26 @@ describe('Selectors.Preferences', () => {
 
         const expected = {
             container: {
-                backgroundColor: testTheme.themeColor,
+                backgroundColor: theme.themeColor,
                 height: 100
             }
         };
 
         const getStyleFromTheme = Selectors.makeGetStyleFromTheme();
 
-        assert.deepEqual(getStyleFromTheme(testState, testStyleFunction), expected);
+        assert.deepEqual(getStyleFromTheme(state, testStyleFunction), expected);
+    });
+
+    it('get favorites names', () => {
+        assert.deepEqual(Selectors.getFavoritesPreferences(testState), [fav1]);
+    });
+
+    it('get visible teammates', () => {
+        assert.deepEqual(Selectors.getVisibleTeammate(testState), [dm1]);
+    });
+
+    it('get visible groups', () => {
+        assert.deepEqual(Selectors.getVisibleGroupIds(testState), [gp1]);
     });
 });
 

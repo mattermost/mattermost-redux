@@ -3,7 +3,7 @@
 
 import {PostTypes, SearchTypes, UserTypes} from 'action_types';
 import {Posts} from 'constants';
-import {isPostPendingOrFailed} from 'utils/post_utils';
+import {comparePosts} from 'utils/post_utils';
 
 function handleReceivedPost(posts = {}, postsInChannel = {}, action) {
     const post = action.data;
@@ -35,6 +35,12 @@ function handleReceivedPosts(posts = {}, postsInChannel = {}, action) {
     const newPosts = action.data.posts;
     const channelId = action.channelId;
     const skipAddToChannel = action.skipAddToChannel;
+
+    // Change the state only if we have new posts,
+    // otherwise there's no need to create a new object for the same state.
+    if (!Object.keys(newPosts).length) {
+        return {posts, postsInChannel};
+    }
 
     const nextPosts = {...posts};
     const nextPostsForChannel = {...postsInChannel};
@@ -79,21 +85,7 @@ function handleReceivedPosts(posts = {}, postsInChannel = {}, action) {
     // Sort to ensure that the most recent posts are first, with pending
     // and failed posts first
     postsForChannel.sort((a, b) => {
-        const aIsPendingOrFailed = isPostPendingOrFailed(nextPosts[a]);
-        const bIsPendingOrFailed = isPostPendingOrFailed(nextPosts[b]);
-        if (aIsPendingOrFailed && !bIsPendingOrFailed) {
-            return -1;
-        } else if (!aIsPendingOrFailed && bIsPendingOrFailed) {
-            return 1;
-        }
-
-        if (nextPosts[a].create_at > nextPosts[b].create_at) {
-            return -1;
-        } else if (nextPosts[a].create_at < nextPosts[b].create_at) {
-            return 1;
-        }
-
-        return 0;
+        return comparePosts(nextPosts[a], nextPosts[b]);
     });
 
     nextPostsForChannel[channelId] = postsForChannel;
@@ -206,7 +198,15 @@ function handleRemovePost(posts = {}, postsInChannel = {}, action) {
 
 function handlePosts(posts = {}, postsInChannel = {}, action) {
     switch (action.type) {
-    case PostTypes.RECEIVED_POST:
+    case PostTypes.RECEIVED_POST: {
+        const nextPosts = {...posts};
+        nextPosts[action.data.id] = action.data;
+        return {
+            posts: nextPosts,
+            postsInChannel
+        };
+    }
+    case PostTypes.RECEIVED_NEW_POST:
         return handleReceivedPost(posts, postsInChannel, action);
     case PostTypes.RECEIVED_POSTS:
         return handleReceivedPosts(posts, postsInChannel, action);
@@ -328,6 +328,81 @@ function openGraph(state = {}, action) {
     }
 }
 
+function messagesHistory(state = {}, action) {
+    switch (action.type) {
+    case PostTypes.ADD_MESSAGE_INTO_HISTORY: {
+        const nextIndex = {};
+        let nextMessages = state.messages ? [...state.messages] : [];
+        nextMessages.push(action.data);
+        nextIndex[Posts.MESSAGE_TYPES.POST] = nextMessages.length;
+        nextIndex[Posts.MESSAGE_TYPES.COMMENT] = nextMessages.length;
+
+        if (nextMessages.length > Posts.MAX_PREV_MSGS) {
+            nextMessages = nextMessages.slice(1, Posts.MAX_PREV_MSGS + 1);
+        }
+
+        return {
+            messages: nextMessages,
+            index: nextIndex
+        };
+    }
+    case PostTypes.RESET_HISTORY_INDEX: {
+        const index = {};
+        index[Posts.MESSAGE_TYPES.POST] = -1;
+        index[Posts.MESSAGE_TYPES.COMMENT] = -1;
+
+        const messages = state.messages || [];
+        const nextIndex = state.index ? {...state.index} : index;
+        nextIndex[action.data] = messages.length;
+        return {
+            messages: state.messages,
+            index: nextIndex
+        };
+    }
+    case PostTypes.MOVE_HISTORY_INDEX_BACK: {
+        const index = {};
+        index[Posts.MESSAGE_TYPES.POST] = -1;
+        index[Posts.MESSAGE_TYPES.COMMENT] = -1;
+
+        const nextIndex = state.index ? {...state.index} : index;
+        if (nextIndex[action.data] > 0) {
+            nextIndex[action.data]--;
+        }
+        return {
+            messages: state.messages,
+            index: nextIndex
+        };
+    }
+    case PostTypes.MOVE_HISTORY_INDEX_FORWARD: {
+        const index = {};
+        index[Posts.MESSAGE_TYPES.POST] = -1;
+        index[Posts.MESSAGE_TYPES.COMMENT] = -1;
+
+        const messages = state.messages || [];
+        const nextIndex = state.index ? {...state.index} : index;
+        if (nextIndex[action.data] < messages.length) {
+            nextIndex[action.data]++;
+        }
+        return {
+            messages: state.messages,
+            index: nextIndex
+        };
+    }
+    case UserTypes.LOGOUT_SUCCESS: {
+        const index = {};
+        index[Posts.MESSAGE_TYPES.POST] = -1;
+        index[Posts.MESSAGE_TYPES.COMMENT] = -1;
+
+        return {
+            messages: [],
+            index
+        };
+    }
+    default:
+        return state;
+    }
+}
+
 export default function(state = {}, action) {
     const {posts, postsInChannel} = handlePosts(state.posts, state.postsInChannel, action);
 
@@ -349,14 +424,18 @@ export default function(state = {}, action) {
         reactions: reactions(state.reactions, action),
 
         // Object mapping URLs to their relevant opengraph metadata for link previews
-        openGraph: openGraph(state.openGraph, action)
+        openGraph: openGraph(state.openGraph, action),
+
+        // History of posts and comments
+        messagesHistory: messagesHistory(state.messagesHistory, action)
     };
 
     if (state.posts === nextState.posts && state.postsInChannel === nextState.postsInChannel &&
         state.selectedPostId === nextState.selectedPostId &&
         state.currentFocusedPostId === nextState.currentFocusedPostId &&
         state.reactions === nextState.reactions &&
-        state.openGraph === nextState.openGraph) {
+        state.openGraph === nextState.openGraph &&
+        state.messagesHistory === nextState.messagesHistory) {
         // None of the children have changed so don't even let the parent object change
         return state;
     }

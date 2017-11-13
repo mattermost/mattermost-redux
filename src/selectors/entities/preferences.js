@@ -8,6 +8,7 @@ import {General, Preferences} from 'constants';
 import {getConfig} from 'selectors/entities/general';
 import {getCurrentTeamId} from 'selectors/entities/teams';
 
+import {createShallowSelector} from 'utils/helpers';
 import {getPreferenceKey} from 'utils/preference_utils';
 
 export function getMyPreferences(state) {
@@ -62,6 +63,27 @@ export function getGroupShowPreferences(state) {
     return getGroupShowCategory(state, Preferences.CATEGORY_GROUP_CHANNEL_SHOW);
 }
 
+const getFavoritesCategory = makeGetCategory();
+
+export function getFavoritesPreferences(state) {
+    const favorites = getFavoritesCategory(state, Preferences.CATEGORY_FAVORITE_CHANNEL);
+    return favorites.filter((f) => f.value === 'true').map((f) => f.name);
+}
+
+export const getVisibleTeammate = createSelector(
+    getDirectShowPreferences,
+    (direct) => {
+        return direct.filter((dm) => dm.value === 'true' && dm.name).map((dm) => dm.name);
+    }
+);
+
+export const getVisibleGroupIds = createSelector(
+    getGroupShowPreferences,
+    (groups) => {
+        return groups.filter((dm) => dm.value === 'true' && dm.name).map((dm) => dm.name);
+    }
+);
+
 export const getTeammateNameDisplaySetting = createSelector(
     getConfig,
     getMyPreferences,
@@ -79,12 +101,13 @@ export const getTeammateNameDisplaySetting = createSelector(
     }
 );
 
-export const getTheme = createSelector(
+const getThemePreference = createSelector(
     getMyPreferences,
     getCurrentTeamId,
     (myPreferences, currentTeamId) => {
-        // Prefer the user's current team-specific theme over the user's current global theme over the default theme
+        // Prefer the user's current team-specific theme over the user's current global theme
         let themePreference;
+
         if (currentTeamId) {
             themePreference = myPreferences[getPreferenceKey(Preferences.CATEGORY_THEME, currentTeamId)];
         }
@@ -93,6 +116,13 @@ export const getTheme = createSelector(
             themePreference = myPreferences[getPreferenceKey(Preferences.CATEGORY_THEME, '')];
         }
 
+        return themePreference;
+    }
+);
+
+export const getTheme = createShallowSelector(
+    getThemePreference,
+    (themePreference) => {
         let theme;
         if (themePreference) {
             theme = themePreference.value;
@@ -107,9 +137,25 @@ export const getTheme = createSelector(
 
         // At this point, the theme should be a plain object
 
-        // Fix a case where upper case theme colours are rendered as black
-        for (const key of Object.keys(theme)) {
-            theme[key] = theme[key].toLowerCase();
+        // If this is a system theme, find it in case the user's theme is missing any fields
+        let baseTheme = Preferences.THEMES.default;
+        if (theme.type) {
+            for (const key of Object.keys(Preferences.THEMES)) {
+                if (Preferences.THEMES[key].type === theme.type) {
+                    baseTheme = Preferences.THEMES[key];
+                    break;
+                }
+            }
+        }
+
+        for (const key of Object.keys(baseTheme)) {
+            if (theme[key]) {
+                // Fix a case where upper case theme colours are rendered as black
+                theme[key] = theme[key].toLowerCase();
+            } else {
+                // This theme is missing some colours, so fall back to the default theme when necessary
+                theme[key] = baseTheme[key];
+            }
         }
 
         return theme;

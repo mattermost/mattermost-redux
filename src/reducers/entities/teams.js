@@ -55,7 +55,11 @@ function myMembers(state = {}, action) {
         const members = action.data;
         for (const m of members) {
             if (m.delete_at == null || m.delete_at === 0) {
-                nextState[m.team_id] = m;
+                const prevMember = state[m.team_id] || {mention_count: 0, msg_count: 0};
+                nextState[m.team_id] = {
+                    ...prevMember,
+                    ...m
+                };
             }
         }
         return nextState;
@@ -65,10 +69,12 @@ function myMembers(state = {}, action) {
         const nextState = {...state};
         const unreads = action.data;
         for (const u of unreads) {
+            const msgCount = u.msg_count < 0 ? 0 : u.msg_count;
+            const mentionCount = u.mention_count < 0 ? 0 : u.mention_count;
             const m = {
                 ...state[u.team_id],
-                mention_count: u.mention_count,
-                msg_count: u.msg_count
+                mention_count: mentionCount,
+                msg_count: msgCount
             };
             nextState[u.team_id] = m;
         }

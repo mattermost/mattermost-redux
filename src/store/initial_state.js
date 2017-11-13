@@ -7,6 +7,7 @@ const state = {
             appState: false,
             credentials: {},
             config: {},
+            dataRetentionPolicy: {},
             deviceToken: '',
             license: {},
             serverVersion: ''
@@ -35,14 +36,21 @@ const state = {
             channels: {},
             channelsInTeam: {},
             myMembers: {},
-            members: {},
+            membersInChannel: {},
             stats: {}
         },
         posts: {
             posts: {},
-            postsByChannel: {},
+            postsInChannel: {},
             selectedPostId: '',
-            currentFocusedPostId: ''
+            currentFocusedPostId: '',
+            messagesHistory: {
+                messages: [],
+                index: {
+                    post: -1,
+                    comment: -1
+                }
+            }
         },
         preferences: {
             myPreferences: {}
@@ -106,10 +114,6 @@ const state = {
                 status: 'not_started',
                 error: null
             },
-            leaveChannel: {
-                status: 'not_started',
-                error: null
-            },
             joinChannel: {
                 status: 'not_started',
                 error: null
@@ -133,6 +137,10 @@ const state = {
             removeChannelMember: {
                 status: 'not_started',
                 error: null
+            },
+            updateChannelMember: {
+                status: 'not_started',
+                error: null
             }
         },
         general: {
@@ -141,6 +149,10 @@ const state = {
                 error: null
             },
             config: {
+                status: 'not_started',
+                error: null
+            },
+            dataRetentionPolicy: {
                 status: 'not_started',
                 error: null
             },
@@ -378,6 +390,10 @@ const state = {
             uploadFiles: {
                 status: 'not_started',
                 error: null
+            },
+            getFilePublicLink: {
+                status: 'not_started',
+                error: null
             }
         },
         integrations: {
@@ -430,6 +446,26 @@ const state = {
                 error: null
             },
             deleteCommand: {
+                status: 'not_started',
+                error: null
+            },
+            addOAuthApp: {
+                status: 'not_started',
+                error: null
+            },
+            updateOAuthApp: {
+                status: 'not_started',
+                error: null
+            },
+            getOAuthApp: {
+                status: 'not_started',
+                error: null
+            },
+            getOAuthApps: {
+                status: 'not_started',
+                error: null
+            },
+            deleteOAuthApp: {
                 status: 'not_started',
                 error: null
             }

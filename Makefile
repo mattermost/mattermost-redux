@@ -2,14 +2,14 @@
 
 
 .npminstall: package.json
-	@if ! [ $(shell command -v npm) ]; then \
+	@if ! [ $(shell which npm) ]; then \
 		echo "npm is not installed"; \
 		exit 1; \
 	fi
 
 	@echo Getting dependencies using npm
 
-	npm install --ignore-scripts
+	npm install --ignore-scripts --no-package-lock
 
 	touch $@
 
@@ -22,7 +22,7 @@ check-style: | pre-run .npminstall
 clean:
 	@echo Cleaning app
 
-	npm cache clean
+	npm cache clean --force
 	rm -rf node_modules
 	rm -f .npminstall
 

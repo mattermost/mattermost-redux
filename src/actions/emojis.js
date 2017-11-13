@@ -74,7 +74,9 @@ export function getAllCustomEmojis(perPage = General.PAGE_SIZE_MAXIMUM) {
             }
         } while (hasMore);
 
-        return dispatch({type: EmojiTypes.GET_ALL_CUSTOM_EMOJIS_SUCCESS}, getState);
+        dispatch({type: EmojiTypes.GET_ALL_CUSTOM_EMOJIS_SUCCESS}, getState);
+
+        return {data: true};
     };
 }
 
@@ -91,7 +93,7 @@ export function deleteCustomEmoji(emojiId) {
                 {type: EmojiTypes.DELETE_CUSTOM_EMOJI_FAILURE, error},
                 logError(error)(dispatch)
             ]), getState);
-            return null;
+            return {error};
         }
 
         dispatch(batchActions([
@@ -104,6 +106,6 @@ export function deleteCustomEmoji(emojiId) {
             }
         ]), getState);
 
-        return true;
+        return {data: true};
     };
 }

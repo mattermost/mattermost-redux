@@ -12,6 +12,8 @@ export function pushNotificationAlert(message) {
         };
 
         dispatch({type: AlertTypes.PUSH_ALERT, data: notificationAlert}, getState);
+
+        return {data: true};
     };
 }
 
@@ -23,6 +25,8 @@ export function pushDeveloperAlert(message) {
         };
 
         dispatch({type: AlertTypes.PUSH_ALERT, data: developerAlert}, getState);
+
+        return {data: true};
     };
 }
 
@@ -34,12 +38,16 @@ export function pushErrorAlert(message) {
         };
 
         dispatch({type: AlertTypes.PUSH_ALERT, data: errorAlert}, getState);
+
+        return {data: true};
     };
 }
 
 export function clearLatestAlert() {
     return async (dispatch, getState) => {
         dispatch({type: AlertTypes.CLEAR_ALERT}, getState);
+
+        return {data: true};
     };
 }
 

@@ -5,9 +5,10 @@ import {createSelector} from 'reselect';
 
 import {getMyPreferences} from 'selectors/entities/preferences';
 import {getCurrentUser} from 'selectors/entities/users';
+import {createIdsSelector} from 'utils/helpers';
 
 import {Posts, Preferences} from 'constants';
-import {isSystemMessage, shouldFilterPost} from 'utils/post_utils';
+import {isPostEphemeral, isSystemMessage, shouldFilterPost, comparePosts} from 'utils/post_utils';
 import {getPreferenceKey} from 'utils/preference_utils';
 
 export function getAllPosts(state) {
@@ -40,9 +41,12 @@ export function getOpenGraphMetadataForUrl(state, url) {
     return state.entities.posts.openGraph[url];
 }
 
-function getPostIdsInCurrentChannel(state) {
-    return state.entities.posts.postsInChannel[state.entities.channels.currentChannelId] || [];
-}
+export const getPostIdsInCurrentChannel = createIdsSelector(
+    (state) => state.entities.posts.postsInChannel[state.entities.channels.currentChannelId],
+    (postIdsInCurrentChannel) => {
+        return postIdsInCurrentChannel || [];
+    }
+);
 
 export const getPostsInCurrentChannel = createSelector(
     getAllPosts,
@@ -51,6 +55,55 @@ export const getPostsInCurrentChannel = createSelector(
         return postIds.map((id) => posts[id]);
     }
 );
+
+export function makeGetPostIdsForThread() {
+    return createIdsSelector(
+        getAllPosts,
+        (state, rootId) => rootId,
+        (posts, rootId) => {
+            const thread = [];
+
+            for (const id in posts) {
+                if (posts.hasOwnProperty(id)) {
+                    const post = posts[id];
+
+                    if (id === rootId || post.root_id === rootId) {
+                        thread.push(post);
+                    }
+                }
+            }
+
+            thread.sort(comparePosts);
+
+            return thread.map((post) => post.id);
+        }
+    );
+}
+
+export function makeGetPostIdsAroundPost() {
+    return createIdsSelector(
+        (state, focusedPostId, channelId) => state.entities.posts.postsInChannel[channelId],
+        (state, focusedPostId) => focusedPostId,
+        (state, focusedPostId, channelId, options) => options && options.postsBeforeCount,
+        (state, focusedPostId, channelId, options) => options && options.postsAfterCount,
+        (postIds, focusedPostId, postsBeforeCount = Posts.POST_CHUNK_SIZE / 2, postsAfterCount = Posts.POST_CHUNK_SIZE / 2) => {
+            if (!postIds) {
+                return null;
+            }
+
+            const focusedPostIndex = postIds.indexOf(focusedPostId);
+            if (focusedPostIndex === -1) {
+                return null;
+            }
+
+            const desiredPostIndexBefore = focusedPostIndex - postsBeforeCount;
+            const minPostIndex = desiredPostIndexBefore < 0 ? 0 : desiredPostIndexBefore;
+            const maxPostIndex = focusedPostIndex + postsAfterCount + 1; // Needs the extra 1 to include the focused post
+
+            return postIds.slice(minPostIndex, maxPostIndex);
+        }
+    );
+}
 
 function formatPostInChannel(post, previousPost, index, allPosts, postIds, currentUser) {
     let isFirstReply = false;
@@ -93,17 +146,16 @@ function formatPostInChannel(post, previousPost, index, allPosts, postIds, curre
     let threadRepliedToByCurrentUser = false;
     let threadCreatedByCurrentUser = false;
     const rootId = post.root_id || post.id;
-    postIds.forEach((pid) => {
-        const p = allPosts[pid];
-        if (p.root_id === rootId) {
+    Object.values(allPosts).forEach((p) => {
+        if (p.root_id === rootId && !isPostEphemeral(p)) {
             replyCount += 1;
 
-            if (p.user_id === currentUser.id) {
+            if (currentUser && p.user_id === currentUser.id) {
                 threadRepliedToByCurrentUser = true;
             }
         }
 
-        if (p.id === rootId && p.user_id === currentUser.id) {
+        if (currentUser && p.id === rootId && p.user_id === currentUser.id) {
             threadCreatedByCurrentUser = true;
         }
     });
@@ -114,7 +166,7 @@ function formatPostInChannel(post, previousPost, index, allPosts, postIds, curre
         commentsNotifyLevel = currentUser.notify_props.comments;
     }
 
-    const notCurrentUser = post.user_id !== currentUser.id || (post.props && post.props.from_webhook);
+    const notCurrentUser = (currentUser && post.user_id !== currentUser.id) || (post.props && post.props.from_webhook);
     if (notCurrentUser) {
         if (commentsNotifyLevel === 'any' && (threadCreatedByCurrentUser || threadRepliedToByCurrentUser)) {
             isCommentMention = true;
@@ -149,11 +201,11 @@ export function makeGetPostsInChannel() {
             const posts = [];
 
             const joinLeavePref = myPreferences[getPreferenceKey(Preferences.CATEGORY_ADVANCED_SETTINGS, 'join_leave')];
-            const filterJoinLeave = joinLeavePref ? joinLeavePref.value === 'false' : false;
+            const showJoinLeave = joinLeavePref ? joinLeavePref.value !== 'false' : true;
 
             for (let i = 0; i < postIds.length; i++) {
                 const post = allPosts[postIds[i]];
-                if (!shouldFilterPost(post, {filterJoinLeave})) {
+                if (!shouldFilterPost(post, {showJoinLeave})) {
                     const previousPost = allPosts[postIds[i + 1]] || {create_at: 0};
                     posts.push(formatPostInChannel(post, previousPost, i, allPosts, postIds, currentUser));
                 }
@@ -188,11 +240,11 @@ export function makeGetPostsAroundPost() {
 
             const posts = [];
             const joinLeavePref = myPreferences[getPreferenceKey(Preferences.CATEGORY_ADVANCED_SETTINGS, 'join_leave')];
-            const filterJoinLeave = joinLeavePref ? joinLeavePref.value === 'false' : false;
+            const showJoinLeave = joinLeavePref ? joinLeavePref.value !== 'false' : true;
 
             for (let i = 0; i < slicedPostIds.length; i++) {
                 const post = allPosts[slicedPostIds[i]];
-                if (!shouldFilterPost(post, {filterJoinLeave})) {
+                if (!shouldFilterPost(post, {showJoinLeave})) {
                     const previousPost = allPosts[slicedPostIds[i + 1]] || {create_at: 0};
                     const formattedPost = formatPostInChannel(post, previousPost, i, allPosts, slicedPostIds, currentUser);
 
@@ -210,18 +262,17 @@ export function makeGetPostsAroundPost() {
 }
 
 // Returns a function that creates a creates a selector that will get the posts for a given thread.
-// That selector will take a props object (containing a channelId field and a rootId field) as its
+// That selector will take a props object (containing a rootId field) as its
 // only argument and will be memoized based on that argument.
 export function makeGetPostsForThread() {
     return createSelector(
         getAllPosts,
-        (state, props) => state.entities.posts.postsInChannel[props.channelId],
         (state, props) => props,
-        (posts, postIds, {rootId}) => {
+        (posts, {rootId}) => {
             const thread = [];
 
-            if (postIds) {
-                for (const id of postIds) {
+            for (const id in posts) {
+                if (posts.hasOwnProperty(id)) {
                     const post = posts[id];
 
                     if (id === rootId || post.root_id === rootId) {
@@ -229,6 +280,8 @@ export function makeGetPostsForThread() {
                     }
                 }
             }
+
+            thread.sort(comparePosts);
 
             return thread;
         }
@@ -245,7 +298,7 @@ export function makeGetCommentCountForPost() {
               if (posts.hasOwnProperty(id)) {
                   const post = posts[id];
 
-                  if (post.root_id === currentPost.id && post.state !== Posts.POST_DELETED) {
+                  if (post.root_id === currentPost.id && post.state !== Posts.POST_DELETED && !isPostEphemeral(post)) {
                       count += 1;
                   }
               }
@@ -260,6 +313,81 @@ export const getSearchResults = createSelector(
     getAllPosts,
     (state) => state.entities.search.results,
     (posts, postIds) => {
+        if (!postIds) {
+            return [];
+        }
+
         return postIds.map((id) => posts[id]);
+    }
+);
+
+export function makeGetMessageInHistoryItem(type) {
+    return createSelector(
+      (state) => state.entities.posts.messagesHistory,
+      (messagesHistory) => {
+          const idx = messagesHistory.index[type];
+          const messages = messagesHistory.messages;
+          if (idx >= 0 && messages && messages.length > idx) {
+              return messages[idx];
+          }
+          return '';
+      }
+    );
+}
+
+export function makeGetPostsForIds() {
+    return createIdsSelector(
+        getAllPosts,
+        (state, postIds) => postIds,
+        (allPosts, postIds) => {
+            if (!postIds) {
+                return [];
+            }
+
+            return postIds.map((id) => allPosts[id]);
+        }
+    );
+}
+
+export function getLastPostPerChannel(state) {
+    const {posts: allPosts, postsInChannel: allChannels} = state.entities.posts;
+    const ret = {};
+    for (const channelId in allChannels) {
+        if (allChannels.hasOwnProperty(channelId)) {
+            const channelPosts = allChannels[channelId];
+            if (channelPosts.length > 0) {
+                const postId = channelPosts[0];
+                if (allPosts.hasOwnProperty(postId)) {
+                    ret[channelId] = allPosts[postId];
+                }
+            }
+        }
+    }
+    return ret;
+}
+
+export const getMostRecentPostIdInChannel = createSelector(
+    getAllPosts,
+    (state, channelId) => state.entities.posts.postsInChannel[channelId],
+    getMyPreferences,
+    (posts, postIdsInChannel, preferences) => {
+        const key = getPreferenceKey(Preferences.CATEGORY_ADVANCED_SETTINGS, 'join_leave');
+        const allowSystemMessages = preferences[key] ? preferences[key].value === 'true' : true;
+
+        if (!allowSystemMessages) {
+            // return the most recent non-system message in the channel
+            let postId;
+            for (let i = 0; i < postIdsInChannel.length; i++) {
+                const p = posts[postIdsInChannel[i]];
+                if (!p.type || !p.type.startsWith(Posts.SYSTEM_MESSAGE_PREFIX)) {
+                    postId = p.id;
+                    break;
+                }
+            }
+            return postId;
+        }
+
+        // return the most recent message in the channel
+        return postIdsInChannel[0];
     }
 );

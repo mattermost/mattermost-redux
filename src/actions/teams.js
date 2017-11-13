@@ -34,10 +34,14 @@ async function getProfilesAndStatusesForMembers(userIds, dispatch, getState) {
 }
 
 export function selectTeam(team) {
-    return async (dispatch, getState) => dispatch({
-        type: TeamTypes.SELECT_TEAM,
-        data: team.id
-    }, getState);
+    return async (dispatch, getState) => {
+        dispatch({
+            type: TeamTypes.SELECT_TEAM,
+            data: team.id
+        }, getState);
+
+        return {data: true};
+    };
 }
 
 export function getMyTeams() {
@@ -86,13 +90,13 @@ export function createTeam(team) {
         let created;
         try {
             created = await Client4.createTeam(team);
-        } catch (err) {
-            forceLogoutIfNecessary(err, dispatch);
+        } catch (error) {
+            forceLogoutIfNecessary(error, dispatch);
             dispatch(batchActions([
-                {type: TeamTypes.CREATE_TEAM_FAILURE, error: err},
-                logError(err)(dispatch)
+                {type: TeamTypes.CREATE_TEAM_FAILURE, error},
+                logError(error)(dispatch)
             ]), getState);
-            return null;
+            return {error};
         }
 
         const member = {
@@ -122,7 +126,7 @@ export function createTeam(team) {
             }
         ]), getState);
 
-        return created;
+        return {data: created};
     };
 }
 
@@ -145,6 +149,18 @@ export function getMyTeamMembers() {
     );
 }
 
+export function getTeamMembers(teamId, page = 0, perPage = General.TEAMS_CHUNK_SIZE) {
+    return bindClientFunc(
+        Client4.getTeamMembers,
+        TeamTypes.GET_TEAM_MEMBERS_REQUEST,
+        [TeamTypes.RECEIVED_MEMBERS_IN_TEAM, TeamTypes.GET_TEAM_MEMBERS_SUCCESS],
+        TeamTypes.GET_TEAM_MEMBERS_FAILURE,
+        teamId,
+        page,
+        perPage
+    );
+}
+
 export function getTeamMember(teamId, userId) {
     return async (dispatch, getState) => {
         dispatch({type: TeamTypes.TEAM_MEMBERS_REQUEST}, getState);
@@ -159,7 +175,7 @@ export function getTeamMember(teamId, userId) {
                 {type: TeamTypes.TEAM_MEMBERS_FAILURE, error},
                 logError(error)(dispatch)
             ]), getState);
-            return null;
+            return {error};
         }
 
         dispatch(batchActions([
@@ -172,7 +188,7 @@ export function getTeamMember(teamId, userId) {
             }
         ]), getState);
 
-        return member;
+        return {data: member};
     };
 }
 
@@ -190,7 +206,7 @@ export function getTeamMembersByIds(teamId, userIds) {
                 {type: TeamTypes.TEAM_MEMBERS_FAILURE, error},
                 logError(error)(dispatch)
             ]), getState);
-            return null;
+            return {error};
         }
 
         dispatch(batchActions([
@@ -203,7 +219,7 @@ export function getTeamMembersByIds(teamId, userIds) {
             }
         ]), getState);
 
-        return members;
+        return {data: members};
     };
 }
 
@@ -250,7 +266,7 @@ export function addUserToTeam(teamId, userId) {
                 {type: TeamTypes.ADD_TEAM_MEMBER_FAILURE, error},
                 logError(error)(dispatch)
             ]), getState);
-            return null;
+            return {error};
         }
 
         dispatch(batchActions([
@@ -268,7 +284,7 @@ export function addUserToTeam(teamId, userId) {
             }
         ]), getState);
 
-        return true;
+        return {data: member};
     };
 }
 
@@ -285,7 +301,7 @@ export function addUsersToTeam(teamId, userIds) {
                 {type: TeamTypes.ADD_TEAM_MEMBER_FAILURE, error},
                 logError(error)(dispatch)
             ]), getState);
-            return null;
+            return {error};
         }
 
         const profiles = [];
@@ -306,7 +322,7 @@ export function addUsersToTeam(teamId, userIds) {
             }
         ]), getState);
 
-        return members;
+        return {data: members};
     };
 }
 
@@ -322,7 +338,7 @@ export function removeUserFromTeam(teamId, userId) {
                 {type: TeamTypes.REMOVE_TEAM_MEMBER_FAILURE, error},
                 logError(error)(dispatch)
             ]), getState);
-            return null;
+            return {error};
         }
 
         const member = {
@@ -364,7 +380,7 @@ export function removeUserFromTeam(teamId, userId) {
 
         dispatch(batchActions(actions), getState);
 
-        return true;
+        return {data: true};
     };
 }
 
@@ -380,7 +396,7 @@ export function updateTeamMemberRoles(teamId, userId, roles) {
                 {type: TeamTypes.UPDATE_TEAM_MEMBER_FAILURE, error},
                 logError(error)(dispatch)
             ]), getState);
-            return null;
+            return {error};
         }
 
         const actions = [
@@ -401,7 +417,7 @@ export function updateTeamMemberRoles(teamId, userId, roles) {
 
         dispatch(batchActions(actions), getState);
 
-        return true;
+        return {data: true};
     };
 }
 
@@ -429,12 +445,12 @@ export function checkIfTeamExists(teamName) {
                 {type: TeamTypes.GET_TEAM_FAILURE, error},
                 logError(error)(dispatch)
             ]));
-            return null;
+            return {error};
         }
 
         dispatch({type: TeamTypes.GET_TEAM_SUCCESS});
 
-        return data.exists;
+        return {data: data.exists};
     };
 }
 
@@ -450,13 +466,13 @@ export function joinTeam(inviteId, teamId) {
             } else {
                 await Client4.joinTeam(inviteId);
             }
-        } catch (err) {
-            forceLogoutIfNecessary(err, dispatch);
+        } catch (error) {
+            forceLogoutIfNecessary(error, dispatch);
             dispatch(batchActions([
-                {type: TeamTypes.JOIN_TEAM_FAILURE, error: err},
-                logError(err)(dispatch)
+                {type: TeamTypes.JOIN_TEAM_FAILURE, error},
+                logError(error)(dispatch)
             ]), getState);
-            return null;
+            return {error};
         }
 
         await getTeam(teamId)(dispatch, getState);
@@ -464,6 +480,6 @@ export function joinTeam(inviteId, teamId) {
         getMyTeamUnreads()(dispatch, getState);
 
         dispatch({type: TeamTypes.JOIN_TEAM_SUCCESS}, getState);
-        return true;
+        return {data: true};
     };
 }

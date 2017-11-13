@@ -44,6 +44,10 @@ export default keyMirror({
     OPEN_GRAPH_SUCCESS: null,
     OPEN_GRAPH_FAILURE: null,
 
+    DO_POST_ACTION_REQUEST: null,
+    DO_POST_ACTION_SUCCESS: null,
+    DO_POST_ACTION_FAILURE: null,
+
     GET_POST_THREAD_WITH_RETRY_ATTEMPT: null,
     GET_POSTS_WITH_RETRY_ATTEMPT: null,
     GET_POSTS_SINCE_WITH_RETRY_ATTEMPT: null,
@@ -51,6 +55,7 @@ export default keyMirror({
     GET_POSTS_AFTER_WITH_RETRY_ATTEMPT: null,
 
     RECEIVED_POST: null,
+    RECEIVED_NEW_POST: null,
     RECEIVED_POSTS: null,
     RECEIVED_FOCUSED_POST: null,
     RECEIVED_POST_SELECTED: null,
@@ -60,5 +65,10 @@ export default keyMirror({
     RECEIVED_REACTION: null,
     RECEIVED_REACTIONS: null,
     REACTION_DELETED: null,
-    RECEIVED_OPEN_GRAPH_METADATA: null
+    RECEIVED_OPEN_GRAPH_METADATA: null,
+
+    ADD_MESSAGE_INTO_HISTORY: null,
+    RESET_HISTORY_INDEX: null,
+    MOVE_HISTORY_INDEX_BACK: null,
+    MOVE_HISTORY_INDEX_FORWARD: null
 });

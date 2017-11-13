@@ -74,6 +74,8 @@ export function searchPosts(teamId, terms, isOrSearch = false) {
 export function clearSearch() {
     return async (dispatch, getState) => {
         dispatch({type: SearchTypes.REMOVE_SEARCH_POSTS}, getState);
+
+        return {data: true};
     };
 }
 
@@ -86,6 +88,8 @@ export function removeSearchTerms(teamId, terms) {
                 terms
             }
         }, getState);
+
+        return {data: true};
     };
 }
 

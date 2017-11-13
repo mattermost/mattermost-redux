@@ -234,6 +234,82 @@ function userAccessTokens(state = {}, action) {
 
         return state;
     }
+    case UserTypes.ENABLED_USER_ACCESS_TOKEN: {
+        const userIds = Object.keys(state);
+        for (let i = 0; i < userIds.length; i++) {
+            const userId = userIds[i];
+            if (state[userId] && state[userId][action.data]) {
+                const nextUserState = {...state[userId]};
+                const token = {...nextUserState[action.data], is_active: true};
+                nextUserState[token.id] = token;
+                return {...state, [userId]: nextUserState};
+            }
+        }
+
+        return state;
+    }
+    case UserTypes.DISABLED_USER_ACCESS_TOKEN: {
+        const userIds = Object.keys(state);
+        for (let i = 0; i < userIds.length; i++) {
+            const userId = userIds[i];
+            if (state[userId] && state[userId][action.data]) {
+                const nextUserState = {...state[userId]};
+                const token = {...nextUserState[action.data], is_active: false};
+                nextUserState[token.id] = token;
+                return {...state, [userId]: nextUserState};
+            }
+        }
+
+        return state;
+    }
+    case UserTypes.LOGOUT_SUCCESS:
+        return {};
+
+    default:
+        return state;
+    }
+}
+
+function plugins(state = {}, action) {
+    const nextState = {...state};
+
+    switch (action.type) {
+    case AdminTypes.RECEIVED_PLUGIN: {
+        nextState[action.data.id] = action.data;
+        return nextState;
+    }
+    case AdminTypes.RECEIVED_PLUGINS: {
+        const activePlugins = action.data.active;
+        for (const plugin of activePlugins) {
+            nextState[plugin.id] = {...plugin, active: true};
+        }
+
+        const inactivePlugins = action.data.inactive;
+        for (const plugin of inactivePlugins) {
+            nextState[plugin.id] = {...plugin, active: false};
+        }
+        return nextState;
+    }
+    case AdminTypes.REMOVED_PLUGIN: {
+        Reflect.deleteProperty(nextState, action.data);
+        return nextState;
+    }
+    case AdminTypes.ACTIVATED_PLUGIN: {
+        const plugin = nextState[action.data];
+        if (plugin && !plugin.active) {
+            nextState[action.data] = {...plugin, active: true};
+            return nextState;
+        }
+        return state;
+    }
+    case AdminTypes.DEACTIVATED_PLUGIN: {
+        const plugin = nextState[action.data];
+        if (plugin && plugin.active) {
+            nextState[action.data] = {...plugin, active: false};
+            return nextState;
+        }
+        return state;
+    }
     case UserTypes.LOGOUT_SUCCESS:
         return {};
 
@@ -269,6 +345,9 @@ export default combineReducers({
     teamAnalytics,
 
     // object with user ids as keys and objects, with token ids as keys, as values
-    userAccessTokens
+    userAccessTokens,
+
+    // object with plugin ids as keys and objects representing plugin manifests as values
+    plugins
 });
 

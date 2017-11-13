@@ -108,7 +108,9 @@ export const getCurrentUserRoles = createSelector(
             roles += `${currentChannelMembership.roles} `;
         }
 
-        roles += currentUser.roles;
+        if (currentUser) {
+            roles += currentUser.roles;
+        }
         return roles.trim();
     }
 );
@@ -177,14 +179,18 @@ export const getProfileSetNotInCurrentTeam = createSelector(
     }
 );
 
-function sortAndInjectProfiles(profiles, profileSet) {
+function sortAndInjectProfiles(profiles, profileSet, skipInactive = false) {
     const currentProfiles = [];
     if (typeof profileSet === 'undefined') {
         return currentProfiles;
     }
 
     profileSet.forEach((p) => {
-        currentProfiles.push(profiles[p]);
+        const profile = profiles[p];
+        if (skipInactive && profile.delete_at && profile.delete_at !== 0) {
+            return;
+        }
+        currentProfiles.push(profile);
     });
 
     const sortedCurrentProfiles = currentProfiles.sort(sortByUsername);
@@ -344,3 +350,22 @@ export function makeGetProfilesForReactions() {
         }
     );
 }
+
+export function makeGetProfilesInChannel() {
+    return createSelector(
+        getUsers,
+        getUserIdsInChannels,
+        (state, channelId) => channelId,
+        (state, channelId, skipInactive) => skipInactive,
+        (users, userIds, channelId, skipInactive = false) => {
+            const userIdsInChannel = userIds[channelId];
+
+            if (!userIdsInChannel) {
+                return [];
+            }
+
+            return sortAndInjectProfiles(users, userIdsInChannel, skipInactive);
+        }
+    );
+}
+

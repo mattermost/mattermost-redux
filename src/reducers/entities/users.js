@@ -108,6 +108,13 @@ function mySessions(state = [], action) {
 
         return state;
     }
+
+    case UserTypes.REVOKE_ALL_USER_SESSIONS_SUCCESS:
+        if (action.data.isCurrentUser === true) {
+            return [];
+        }
+        return state;
+
     case UserTypes.LOGOUT_SUCCESS:
         return [];
 
@@ -315,6 +322,24 @@ function myUserAccessTokens(state = {}, action) {
         Reflect.deleteProperty(nextState, action.data);
 
         return nextState;
+    }
+
+    case UserTypes.ENABLED_USER_ACCESS_TOKEN: {
+        if (state[action.data]) {
+            const nextState = {...state};
+            nextState[action.data] = {...nextState[action.data], is_active: true};
+            return nextState;
+        }
+        return state;
+    }
+
+    case UserTypes.DISABLED_USER_ACCESS_TOKEN: {
+        if (state[action.data]) {
+            const nextState = {...state};
+            nextState[action.data] = {...nextState[action.data], is_active: false};
+            return nextState;
+        }
+        return state;
     }
 
     case UserTypes.CLEAR_MY_USER_ACCESS_TOKENS:

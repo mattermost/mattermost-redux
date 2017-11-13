@@ -11,10 +11,19 @@ import {createOfflineReducer, networkStatusChangedAction, offlineCompose} from '
 import defaultOfflineConfig from 'redux-offline/lib/defaults';
 import createActionBuffer from 'redux-action-buffer';
 
+const devToolsEnhancer = (
+    typeof window !== 'undefined' && window.__REDUX_DEVTOOLS_EXTENSION__ ?  // eslint-disable-line no-underscore-dangle
+    window.__REDUX_DEVTOOLS_EXTENSION__ :  // eslint-disable-line no-underscore-dangle
+    () => {
+        return (noop) => noop;
+    }
+);
+
 import {General} from 'constants';
 import serviceReducer from 'reducers';
 import deepFreezeAndThrowOnMutation from 'utils/deep_freeze';
 
+import initialState from './initial_state';
 import {defaultOptions, offlineConfig} from './helpers';
 
 /***
@@ -26,6 +35,7 @@ additionalMiddleware - func | array - Allows for single or multiple additional m
 export default function configureServiceStore(preloadedState, appReducer, userOfflineConfig, getAppReducer, clientOptions = {}) {
     const baseOfflineConfig = Object.assign({}, defaultOfflineConfig, offlineConfig, userOfflineConfig);
     const options = Object.assign({}, defaultOptions, clientOptions);
+    const baseState = Object.assign({}, initialState, preloadedState);
 
     const {additionalMiddleware, enableBuffer} = options;
 
@@ -41,16 +51,20 @@ export default function configureServiceStore(preloadedState, appReducer, userOf
     }
 
     const store = createStore(
-        createOfflineReducer(createReducer(serviceReducer, appReducer)),
-        undefined,
+        createOfflineReducer(createReducer(baseState, serviceReducer, appReducer)),
+        baseState,
         // eslint-disable-line - offlineCompose(config)(middleware, other funcs)
         offlineCompose(baseOfflineConfig)(
             middleware,
-            [devTools({
-                name: 'Mattermost',
-                hostname: 'localhost',
-                port: 5678
-            })]
+            [
+                devTools({
+                    name: 'Mattermost',
+                    hostname: 'localhost',
+                    port: 5678,
+                    realtime: true
+                }),
+                devToolsEnhancer()
+            ]
         )
     );
 
@@ -73,14 +87,14 @@ export default function configureServiceStore(preloadedState, appReducer, userOf
             if (getAppReducer) {
                 nextAppReducer = getAppReducer(); // eslint-disable-line global-require
             }
-            store.replaceReducer(createReducer(nextServiceReducer, nextAppReducer));
+            store.replaceReducer(createReducer(baseState, nextServiceReducer, nextAppReducer));
         });
     }
 
     return store;
 }
 
-function createReducer(...reducers) {
+function createReducer(baseState, ...reducers) {
     const baseReducer = combineReducers(Object.assign({}, ...reducers));
 
     // Root reducer wrapper that listens for reset events.
@@ -88,7 +102,7 @@ function createReducer(...reducers) {
     // as the new state.
     function offlineReducer(state = {}, action) {
         if (action.type === General.OFFLINE_STORE_RESET) {
-            return baseReducer(undefined, action);
+            return baseReducer(baseState, action);
         }
 
         return baseReducer(state, action);

@@ -266,6 +266,56 @@ function getAnalytics(state = initialRequestState(), action) {
     );
 }
 
+function uploadPlugin(state = initialRequestState(), action) {
+    return handleRequest(
+        AdminTypes.UPLOAD_PLUGIN_REQUEST,
+        AdminTypes.UPLOAD_PLUGIN_SUCCESS,
+        AdminTypes.UPLOAD_PLUGIN_FAILURE,
+        state,
+        action
+    );
+}
+
+function getPlugins(state = initialRequestState(), action) {
+    return handleRequest(
+        AdminTypes.GET_PLUGIN_REQUEST,
+        AdminTypes.GET_PLUGIN_SUCCESS,
+        AdminTypes.GET_PLUGIN_FAILURE,
+        state,
+        action
+    );
+}
+
+function removePlugin(state = initialRequestState(), action) {
+    return handleRequest(
+        AdminTypes.REMOVE_PLUGIN_REQUEST,
+        AdminTypes.REMOVE_PLUGIN_SUCCESS,
+        AdminTypes.REMOVE_PLUGIN_FAILURE,
+        state,
+        action
+    );
+}
+
+function activatePlugin(state = initialRequestState(), action) {
+    return handleRequest(
+        AdminTypes.ACTIVATE_PLUGIN_REQUEST,
+        AdminTypes.ACTIVATE_PLUGIN_SUCCESS,
+        AdminTypes.ACTIVATE_PLUGIN_FAILURE,
+        state,
+        action
+    );
+}
+
+function deactivatePlugin(state = initialRequestState(), action) {
+    return handleRequest(
+        AdminTypes.DEACTIVATE_PLUGIN_REQUEST,
+        AdminTypes.DEACTIVATE_PLUGIN_SUCCESS,
+        AdminTypes.DEACTIVATE_PLUGIN_FAILURE,
+        state,
+        action
+    );
+}
+
 export default combineReducers({
     getLogs,
     getAudits,
@@ -292,6 +342,11 @@ export default combineReducers({
     purgeElasticsearchIndexes,
     uploadLicense,
     removeLicense,
-    getAnalytics
+    getAnalytics,
+    uploadPlugin,
+    getPlugins,
+    removePlugin,
+    activatePlugin,
+    deactivatePlugin
 });
 

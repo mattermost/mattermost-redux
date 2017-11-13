@@ -66,7 +66,21 @@ function fileIdsByPostId(state = {}, action) {
     }
 }
 
+function filePublicLink(state = {}, action) {
+    switch (action.type) {
+    case FileTypes.RECEIVED_FILE_PUBLIC_LINK: {
+        return action.data;
+    }
+    case UserTypes.LOGOUT_SUCCESS:
+        return '';
+
+    default:
+        return state;
+    }
+}
+
 export default combineReducers({
     files,
-    fileIdsByPostId
+    fileIdsByPostId,
+    filePublicLink
 });

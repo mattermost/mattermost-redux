@@ -51,7 +51,7 @@ export function createPost(post, files = []) {
         }
 
         dispatch({
-            type: PostTypes.RECEIVED_POST,
+            type: PostTypes.RECEIVED_NEW_POST,
             data: {
                 id: pendingPostId,
                 ...newPost
@@ -117,6 +117,8 @@ export function createPost(post, files = []) {
                 }
             }
         });
+
+        return {data: true};
     };
 }
 
@@ -138,6 +140,8 @@ export function deletePost(post) {
                 }
             }
         });
+
+        return {data: true};
     };
 }
 
@@ -164,7 +168,7 @@ export function pinPost(postId) {
                 {type: PostTypes.EDIT_POST_FAILURE, error},
                 logError(error)(dispatch)
             ]), getState);
-            return null;
+            return {error};
         }
 
         const actions = [
@@ -185,7 +189,7 @@ export function pinPost(postId) {
 
         dispatch(batchActions(actions), getState);
 
-        return posts;
+        return {data: posts};
     };
 }
 
@@ -202,7 +206,7 @@ export function unpinPost(postId) {
                 {type: PostTypes.EDIT_POST_FAILURE, error},
                 logError(error)(dispatch)
             ]), getState);
-            return null;
+            return {error};
         }
 
         const actions = [
@@ -223,7 +227,7 @@ export function unpinPost(postId) {
 
         dispatch(batchActions(actions), getState);
 
-        return posts;
+        return {data: posts};
     };
 }
 
@@ -242,7 +246,7 @@ export function addReaction(postId, emojiName) {
                 {type: PostTypes.REACTION_FAILURE, error},
                 logError(error)(dispatch)
             ]), getState);
-            return null;
+            return {error};
         }
 
         dispatch(batchActions([
@@ -255,7 +259,7 @@ export function addReaction(postId, emojiName) {
             }
         ]));
 
-        return true;
+        return {data: true};
     };
 }
 
@@ -273,7 +277,7 @@ export function removeReaction(postId, emojiName) {
                 {type: PostTypes.REACTION_FAILURE, error},
                 logError(error)(dispatch)
             ]), getState);
-            return null;
+            return {error};
         }
 
         dispatch(batchActions([
@@ -286,7 +290,7 @@ export function removeReaction(postId, emojiName) {
             }
         ]));
 
-        return true;
+        return {data: true};
     };
 }
 
@@ -303,7 +307,7 @@ export function getReactionsForPost(postId) {
                 {type: PostTypes.REACTION_FAILURE, error},
                 logError(error)(dispatch)
             ]), getState);
-            return null;
+            return {error};
         }
 
         dispatch(batchActions([
@@ -333,11 +337,11 @@ export function flagPost(postId) {
 
         Client4.trackEvent('action', 'action_posts_flag');
 
-        savePreferences(currentUserId, [preference])(dispatch, getState);
+        return await savePreferences(currentUserId, [preference])(dispatch, getState);
     };
 }
 
-export function getPostThread(postId) {
+export function getPostThread(postId, skipAddToChannel = true) {
     return async (dispatch, getState) => {
         dispatch({type: PostTypes.GET_POST_THREAD_REQUEST}, getState);
 
@@ -351,7 +355,7 @@ export function getPostThread(postId) {
                 {type: PostTypes.GET_POST_THREAD_FAILURE, error},
                 logError(error)(dispatch)
             ]), getState);
-            return null;
+            return {error};
         }
 
         const post = posts.posts[postId];
@@ -361,14 +365,14 @@ export function getPostThread(postId) {
                 type: PostTypes.RECEIVED_POSTS,
                 data: posts,
                 channelId: post.channel_id,
-                skipAddToChannel: true
+                skipAddToChannel
             },
             {
                 type: PostTypes.GET_POST_THREAD_SUCCESS
             }
         ]), getState);
 
-        return posts;
+        return {data: posts};
     };
 }
 
@@ -418,6 +422,8 @@ export function getPostThreadWithRetry(postId) {
                 }
             }
         });
+
+        return {data: true};
     };
 }
 
@@ -435,7 +441,7 @@ export function getPosts(channelId, page = 0, perPage = Posts.POST_CHUNK_SIZE) {
                 {type: PostTypes.GET_POSTS_FAILURE, error},
                 logError(error)(dispatch)
             ]), getState);
-            return null;
+            return {error};
         }
 
         dispatch(batchActions([
@@ -449,7 +455,7 @@ export function getPosts(channelId, page = 0, perPage = Posts.POST_CHUNK_SIZE) {
             }
         ]), getState);
 
-        return posts;
+        return {data: posts};
     };
 }
 
@@ -497,6 +503,8 @@ export function getPostsWithRetry(channelId, page = 0, perPage = Posts.POST_CHUN
                 }
             }
         });
+
+        return {data: true};
     };
 }
 
@@ -514,7 +522,7 @@ export function getPostsSince(channelId, since) {
                 {type: PostTypes.GET_POSTS_SINCE_FAILURE, error},
                 logError(error)(dispatch)
             ]), getState);
-            return null;
+            return {error};
         }
 
         dispatch(batchActions([
@@ -528,7 +536,7 @@ export function getPostsSince(channelId, since) {
             }
         ]), getState);
 
-        return posts;
+        return {data: posts};
     };
 }
 
@@ -574,6 +582,8 @@ export function getPostsSinceWithRetry(channelId, since) {
                 }
             }
         });
+
+        return {data: true};
     };
 }
 
@@ -591,7 +601,7 @@ export function getPostsBefore(channelId, postId, page = 0, perPage = Posts.POST
                 {type: PostTypes.GET_POSTS_BEFORE_FAILURE, error},
                 logError(error)(dispatch)
             ]), getState);
-            return null;
+            return {error};
         }
 
         dispatch(batchActions([
@@ -605,7 +615,7 @@ export function getPostsBefore(channelId, postId, page = 0, perPage = Posts.POST
             }
         ]), getState);
 
-        return posts;
+        return {data: posts};
     };
 }
 
@@ -653,6 +663,8 @@ export function getPostsBeforeWithRetry(channelId, postId, page = 0, perPage = P
                 }
             }
         });
+
+        return {data: true};
     };
 }
 
@@ -670,7 +682,7 @@ export function getPostsAfter(channelId, postId, page = 0, perPage = Posts.POST_
                 {type: PostTypes.GET_POSTS_AFTER_FAILURE, error},
                 logError(error)(dispatch)
             ]), getState);
-            return null;
+            return {error};
         }
 
         dispatch(batchActions([
@@ -684,7 +696,7 @@ export function getPostsAfter(channelId, postId, page = 0, perPage = Posts.POST_
             }
         ]), getState);
 
-        return posts;
+        return {data: posts};
     };
 }
 
@@ -732,13 +744,15 @@ export function getPostsAfterWithRetry(channelId, postId, page = 0, perPage = Po
                 }
             }
         });
+
+        return {data: true};
     };
 }
 
 // Note that getProfilesAndStatusesForPosts can take either an array of posts or a map of ids to posts
 export async function getProfilesAndStatusesForPosts(posts, dispatch, getState) {
     if (!posts) {
-        // Some API methods return null for no results
+        // Some API methods return {error} for no results
         return Promise.resolve();
     }
 
@@ -827,6 +841,8 @@ export function removePost(post) {
             type: PostTypes.REMOVE_POST,
             data: {...post}
         }, getState);
+
+        return {data: true};
     };
 }
 
@@ -836,6 +852,8 @@ export function selectPost(postId) {
             type: PostTypes.RECEIVED_POST_SELECTED,
             data: postId
         }, getState);
+
+        return {data: true};
     };
 }
 
@@ -850,7 +868,7 @@ export function unflagPost(postId) {
 
         Client4.trackEvent('action', 'action_posts_unflag');
 
-        deletePreferences(currentUserId, [preference])(dispatch, getState);
+        return await deletePreferences(currentUserId, [preference])(dispatch, getState);
     };
 }
 
@@ -867,21 +885,79 @@ export function getOpenGraphMetadata(url) {
                 {type: PostTypes.OPEN_GRAPH_FAILURE, error},
                 logError(error)(dispatch)
             ]), getState);
-            return null;
+            return {error};
         }
 
-        dispatch(batchActions([
-            {
+        const actions = [{
+            type: PostTypes.OPEN_GRAPH_SUCCESS
+        }];
+
+        if (data.description) {
+            actions.push({
                 type: PostTypes.RECEIVED_OPEN_GRAPH_METADATA,
                 data,
                 url
-            },
-            {
-                type: PostTypes.OPEN_GRAPH_SUCCESS
-            }
-        ]), getState);
+            });
+        }
 
-        return data;
+        dispatch(batchActions(actions), getState);
+
+        return {data};
+    };
+}
+
+export function doPostAction(postId, actionId) {
+    return bindClientFunc(
+        Client4.doPostAction,
+        PostTypes.DO_POST_ACTION_REQUEST,
+        [PostTypes.DO_POST_ACTION_SUCCESS],
+        PostTypes.DO_POST_ACTION_FAILURE,
+        postId,
+        actionId
+    );
+}
+
+export function addMessageIntoHistory(message) {
+    return async (dispatch, getState) => {
+        dispatch({
+            type: PostTypes.ADD_MESSAGE_INTO_HISTORY,
+            data: message
+        }, getState);
+
+        return {data: true};
+    };
+}
+
+export function resetHistoryIndex(index) {
+    return async (dispatch, getState) => {
+        dispatch({
+            type: PostTypes.RESET_HISTORY_INDEX,
+            data: index
+        }, getState);
+
+        return {data: true};
+    };
+}
+
+export function moveHistoryIndexBack(index) {
+    return async (dispatch, getState) => {
+        dispatch({
+            type: PostTypes.MOVE_HISTORY_INDEX_BACK,
+            data: index
+        }, getState);
+
+        return {data: true};
+    };
+}
+
+export function moveHistoryIndexForward(index) {
+    return async (dispatch, getState) => {
+        dispatch({
+            type: PostTypes.MOVE_HISTORY_INDEX_FORWARD,
+            data: index
+        }, getState);
+
+        return {data: true};
     };
 }
 
@@ -900,5 +976,9 @@ export default {
     getPostsBeforeWithRetry,
     getPostsAfter,
     getPostsAfterWithRetry,
-    selectPost
+    selectPost,
+    addMessageIntoHistory,
+    resetHistoryIndex,
+    moveHistoryIndexBack,
+    moveHistoryIndexForward
 };

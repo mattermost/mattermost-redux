@@ -27,6 +27,7 @@ import {
 } from './preferences';
 
 import {getConfig} from 'selectors/entities/general';
+import {getCurrentUserId} from 'selectors/entities/users';
 
 export function checkMfa(loginId) {
     return async (dispatch, getState) => {
@@ -34,13 +35,13 @@ export function checkMfa(loginId) {
         try {
             const data = await Client4.checkUserMfa(loginId);
             dispatch({type: UserTypes.CHECK_MFA_SUCCESS}, getState);
-            return data.mfa_required;
+            return {data: data.mfa_required};
         } catch (error) {
             dispatch(batchActions([
                 {type: UserTypes.CHECK_MFA_FAILURE, error},
                 logError(error)(dispatch)
             ]), getState);
-            return null;
+            return {error};
         }
     };
 }
@@ -71,14 +72,14 @@ export function createUser(user, data, hash, inviteId) {
                 },
                 logError(error)(dispatch)
             ]), getState);
-            return null;
+            return {error};
         }
 
         const profiles = {};
         profiles[created.id] = created;
         dispatch({type: UserTypes.RECEIVED_PROFILES, data: profiles});
 
-        return created;
+        return {data: created};
     };
 }
 
@@ -100,7 +101,7 @@ export function login(loginId, password, mfaToken = '', ldapOnly = false) {
                 },
                 logError(error)(dispatch)
             ]), getState);
-            return false;
+            return {error};
         }
 
         return await completeLogin(data)(dispatch, getState);
@@ -124,7 +125,7 @@ export function loginById(id, password, mfaToken = '') {
                 },
                 logError(error)(dispatch)
             ]), getState);
-            return null;
+            return {error};
         }
 
         return await completeLogin(data)(dispatch, getState);
@@ -158,7 +159,7 @@ function completeLogin(data) {
                 {type: UserTypes.LOGIN_FAILURE, error},
                 logError(error)(dispatch)
             ]), getState);
-            return false;
+            return {error};
         }
 
         const promises = [
@@ -178,7 +179,7 @@ function completeLogin(data) {
                 {type: UserTypes.LOGIN_FAILURE, error},
                 logError(error)(dispatch)
             ]), getState);
-            return false;
+            return {error};
         }
 
         dispatch(batchActions([
@@ -191,7 +192,7 @@ function completeLogin(data) {
             }
         ]), getState);
 
-        return true;
+        return {data: true};
     };
 }
 
@@ -220,6 +221,8 @@ export function loadMe() {
 
         const {currentUserId} = getState().entities.users;
         Client4.setUserId(currentUserId);
+
+        return {data: true};
     };
 }
 
@@ -248,7 +251,7 @@ export function getProfiles(page = 0, perPage = General.PROFILE_CHUNK_SIZE) {
                 {type: UserTypes.PROFILES_FAILURE, error},
                 logError(error)(dispatch)
             ]), getState);
-            return null;
+            return {error};
         }
 
         dispatch(batchActions([
@@ -261,7 +264,7 @@ export function getProfiles(page = 0, perPage = General.PROFILE_CHUNK_SIZE) {
             }
         ]), getState);
 
-        return profiles;
+        return {data: profiles};
     };
 }
 
@@ -281,7 +284,7 @@ export function getMissingProfilesByIds(userIds) {
             return await getProfilesByIds(missingIds)(dispatch, getState);
         }
 
-        return [];
+        return {data: []};
     };
 }
 
@@ -301,7 +304,7 @@ export function getProfilesByIds(userIds) {
                 {type: UserTypes.PROFILES_FAILURE, error},
                 logError(error)(dispatch)
             ]), getState);
-            return null;
+            return {error};
         }
 
         dispatch(batchActions([
@@ -314,7 +317,7 @@ export function getProfilesByIds(userIds) {
             }
         ]), getState);
 
-        return profiles;
+        return {data: profiles};
     };
 }
 
@@ -334,7 +337,7 @@ export function getProfilesByUsernames(usernames) {
                 {type: UserTypes.PROFILES_FAILURE, error},
                 logError(error)(dispatch)
             ]), getState);
-            return null;
+            return {error};
         }
 
         dispatch(batchActions([
@@ -347,7 +350,7 @@ export function getProfilesByUsernames(usernames) {
             }
         ]), getState);
 
-        return profiles;
+        return {data: profiles};
     };
 }
 
@@ -366,7 +369,7 @@ export function getProfilesInTeam(teamId, page, perPage = General.PROFILE_CHUNK_
                 {type: UserTypes.PROFILES_IN_TEAM_FAILURE, error},
                 logError(error)(dispatch)
             ]), getState);
-            return null;
+            return {error};
         }
 
         dispatch(batchActions([
@@ -384,7 +387,7 @@ export function getProfilesInTeam(teamId, page, perPage = General.PROFILE_CHUNK_
             }
         ]), getState);
 
-        return profiles;
+        return {data: profiles};
     };
 }
 
@@ -401,7 +404,7 @@ export function getProfilesNotInTeam(teamId, page, perPage = General.PROFILE_CHU
                 {type: UserTypes.PROFILES_NOT_IN_TEAM_FAILURE, error},
                 logError(error)(dispatch)
             ]), getState);
-            return null;
+            return {error};
         }
 
         dispatch(batchActions([
@@ -419,7 +422,7 @@ export function getProfilesNotInTeam(teamId, page, perPage = General.PROFILE_CHU
             }
         ]), getState);
 
-        return profiles;
+        return {data: profiles};
     };
 }
 
@@ -436,7 +439,7 @@ export function getProfilesWithoutTeam(page, perPage = General.PROFILE_CHUNK_SIZ
                 {type: UserTypes.PROFILES_WITHOUT_TEAM_FAILURE, error},
                 logError(error)(dispatch)
             ]), getState);
-            return null;
+            return {error};
         }
 
         dispatch(batchActions([
@@ -453,7 +456,7 @@ export function getProfilesWithoutTeam(page, perPage = General.PROFILE_CHUNK_SIZ
             }
         ]), getState);
 
-        return profiles;
+        return {data: profiles};
     };
 }
 
@@ -472,7 +475,7 @@ export function getProfilesInChannel(channelId, page, perPage = General.PROFILE_
                 {type: UserTypes.PROFILES_IN_CHANNEL_FAILURE, error},
                 logError(error)(dispatch)
             ]), getState);
-            return null;
+            return {error};
         }
 
         dispatch(batchActions([
@@ -490,7 +493,7 @@ export function getProfilesInChannel(channelId, page, perPage = General.PROFILE_
             }
         ]), getState);
 
-        return profiles;
+        return {data: profiles};
     };
 }
 
@@ -509,7 +512,7 @@ export function getProfilesNotInChannel(teamId, channelId, page, perPage = Gener
                 {type: UserTypes.PROFILES_NOT_IN_CHANNEL_FAILURE, error},
                 logError(error)(dispatch)
             ]), getState);
-            return null;
+            return {error};
         }
 
         dispatch(batchActions([
@@ -527,7 +530,7 @@ export function getProfilesNotInChannel(teamId, channelId, page, perPage = Gener
             }
         ]), getState);
 
-        return profiles;
+        return {data: profiles};
     };
 }
 
@@ -619,7 +622,7 @@ export function setStatus(status) {
                 {type: UserTypes.SET_STATUS_FAILURE, error},
                 logError(error)(dispatch)
             ]), getState);
-            return null;
+            return {error};
         }
 
         dispatch(batchActions([
@@ -632,7 +635,7 @@ export function setStatus(status) {
             }
         ]), getState);
 
-        return status;
+        return {data: status};
     };
 }
 
@@ -658,7 +661,7 @@ export function revokeSession(userId, sessionId) {
                 {type: UserTypes.REVOKE_SESSION_FAILURE, error},
                 logError(error)(dispatch)
             ]), getState);
-            return false;
+            return {error};
         }
 
         dispatch(batchActions([
@@ -671,13 +674,40 @@ export function revokeSession(userId, sessionId) {
             }
         ]), getState);
 
-        return true;
+        return {data: true};
+    };
+}
+
+export function revokeAllSessionsForUser(userId) {
+    return async (dispatch, getState) => {
+        dispatch({type: UserTypes.REVOKE_ALL_USER_SESSIONS_REQUEST}, getState);
+
+        try {
+            await Client4.revokeAllSessionsForUser(userId);
+        } catch (error) {
+            forceLogoutIfNecessary(error, dispatch);
+            dispatch(batchActions([
+                {type: UserTypes.REVOKE_ALL_USER_SESSIONS_FAILURE, error},
+                logError(error)(dispatch)
+            ]), getState);
+            return {error};
+        }
+        const data = {isCurrentUser: userId === getCurrentUserId(getState())};
+        dispatch(batchActions([
+            {
+                type: UserTypes.REVOKE_ALL_USER_SESSIONS_SUCCESS,
+                data
+            }
+        ]), getState);
+
+        return {data: true};
     };
 }
 
 export function loadProfilesForDirect() {
     return async (dispatch, getState) => {
         const state = getState();
+        const config = state.entities.general.config;
         const {channels, myMembers} = state.entities.channels;
         const {myPreferences} = state.entities.preferences;
         const {currentUserId} = state.entities.users;
@@ -691,15 +721,17 @@ export function loadProfilesForDirect() {
             }
 
             if (member) {
-                if (member.mention_count > 0 && isDirectChannel(channel) && !isDirectChannelVisible(currentUserId, myPreferences, channel)) {
+                if (member.mention_count > 0 && isDirectChannel(channel) && !isDirectChannelVisible(currentUserId, config, myPreferences, channel)) {
                     const otherUserId = getUserIdFromChannelName(currentUserId, channel.name);
                     makeDirectChannelVisibleIfNecessary(otherUserId)(dispatch, getState);
                 } else if ((member.mention_count > 0 || member.msg_count < channel.total_msg_count) &&
-                    isGroupChannel(channel) && !isGroupChannelVisible(myPreferences, channel)) {
+                    isGroupChannel(channel) && !isGroupChannelVisible(config, myPreferences, channel)) {
                     makeGroupMessageVisibleIfNecessary(channel.id)(dispatch, getState);
                 }
             }
         }
+
+        return {data: true};
     };
 }
 
@@ -730,7 +762,7 @@ export function autocompleteUsers(term, teamId = '', channelId = '') {
                 {type: UserTypes.AUTOCOMPLETE_USERS_FAILURE, error},
                 logError(error)(dispatch)
             ]), getState);
-            return null;
+            return {error};
         }
 
         let users = [...data.users];
@@ -778,7 +810,7 @@ export function autocompleteUsers(term, teamId = '', channelId = '') {
 
         dispatch(batchActions(actions), getState);
 
-        return data;
+        return {data};
     };
 }
 
@@ -797,7 +829,7 @@ export function searchProfiles(term, options = {}) {
                 {type: UserTypes.SEARCH_PROFILES_FAILURE, error},
                 logError(error)(dispatch)
             ]), getState);
-            return null;
+            return {error};
         }
 
         const actions = [{type: UserTypes.RECEIVED_PROFILES_LIST, data: removeUserFromList(currentUserId, [...profiles])}];
@@ -841,7 +873,7 @@ export function searchProfiles(term, options = {}) {
             }
         ]), getState);
 
-        return profiles;
+        return {data: profiles};
     };
 }
 
@@ -867,6 +899,8 @@ export function startPeriodicStatusUpdates() {
             },
             General.STATUS_INTERVAL
         );
+
+        return {data: true};
     };
 }
 
@@ -875,6 +909,8 @@ export function stopPeriodicStatusUpdates() {
         if (statusIntervalId) {
             clearInterval(statusIntervalId);
         }
+
+        return {data: true};
     };
 }
 
@@ -887,7 +923,7 @@ export function updateMe(user) {
             data = await Client4.patchMe(user);
         } catch (error) {
             dispatch({type: UserTypes.UPDATE_ME_FAILURE, error}, getState);
-            return null;
+            return {error};
         }
 
         dispatch(batchActions([
@@ -895,7 +931,7 @@ export function updateMe(user) {
             {type: UserTypes.UPDATE_ME_SUCCESS}
         ]), getState);
 
-        return data;
+        return {data};
     };
 }
 
@@ -907,7 +943,7 @@ export function updateUserRoles(userId, roles) {
             await Client4.updateUserRoles(userId, roles);
         } catch (error) {
             dispatch({type: UserTypes.UPDATE_USER_FAILURE, error}, getState);
-            return null;
+            return {error};
         }
 
         const actions = [
@@ -921,7 +957,7 @@ export function updateUserRoles(userId, roles) {
 
         dispatch(batchActions(actions), getState);
 
-        return true;
+        return {data: true};
     };
 }
 
@@ -933,7 +969,7 @@ export function updateUserMfa(userId, activate, code = '') {
             await Client4.updateUserMfa(userId, activate, code);
         } catch (error) {
             dispatch({type: UserTypes.UPDATE_USER_FAILURE, error}, getState);
-            return null;
+            return {error};
         }
 
         const actions = [
@@ -947,7 +983,7 @@ export function updateUserMfa(userId, activate, code = '') {
 
         dispatch(batchActions(actions), getState);
 
-        return true;
+        return {data: true};
     };
 }
 
@@ -959,7 +995,7 @@ export function updateUserPassword(userId, currentPassword, newPassword) {
             await Client4.updateUserPassword(userId, currentPassword, newPassword);
         } catch (error) {
             dispatch({type: UserTypes.UPDATE_USER_FAILURE, error}, getState);
-            return null;
+            return {error};
         }
 
         const actions = [
@@ -973,7 +1009,7 @@ export function updateUserPassword(userId, currentPassword, newPassword) {
 
         dispatch(batchActions(actions), getState);
 
-        return true;
+        return {data: true};
     };
 }
 
@@ -985,7 +1021,7 @@ export function updateUserActive(userId, active) {
             await Client4.updateUserActive(userId, active);
         } catch (error) {
             dispatch({type: UserTypes.UPDATE_USER_FAILURE, error}, getState);
-            return null;
+            return {error};
         }
 
         const actions = [
@@ -1000,7 +1036,7 @@ export function updateUserActive(userId, active) {
 
         dispatch(batchActions(actions), getState);
 
-        return true;
+        return {data: true};
     };
 }
 
@@ -1053,7 +1089,7 @@ export function uploadProfileImage(userId, imageData) {
             await Client4.uploadProfileImage(userId, imageData);
         } catch (error) {
             dispatch({type: UserTypes.UPDATE_USER_FAILURE, error}, getState);
-            return null;
+            return {error};
         }
 
         const actions = [
@@ -1067,7 +1103,7 @@ export function uploadProfileImage(userId, imageData) {
 
         dispatch(batchActions(actions), getState);
 
-        return true;
+        return {data: true};
     };
 }
 
@@ -1279,6 +1315,64 @@ export function revokeUserAccessToken(tokenId) {
     };
 }
 
+export function disableUserAccessToken(tokenId) {
+    return async (dispatch, getState) => {
+        dispatch({type: UserTypes.DISABLE_USER_ACCESS_TOKEN_REQUEST});
+
+        try {
+            await Client4.disableUserAccessToken(tokenId);
+        } catch (error) {
+            forceLogoutIfNecessary(error, dispatch);
+            dispatch(batchActions([
+                {type: UserTypes.DISABLE_USER_ACCESS_TOKEN_FAILURE, error},
+                logError(error)(dispatch)
+            ]), getState);
+            return {error};
+        }
+
+        dispatch(batchActions([
+            {
+                type: UserTypes.DISABLE_USER_ACCESS_TOKEN_SUCCESS
+            },
+            {
+                type: UserTypes.DISABLED_USER_ACCESS_TOKEN,
+                data: tokenId
+            }
+        ]));
+
+        return {data: true};
+    };
+}
+
+export function enableUserAccessToken(tokenId) {
+    return async (dispatch, getState) => {
+        dispatch({type: UserTypes.ENABLE_USER_ACCESS_TOKEN_REQUEST});
+
+        try {
+            await Client4.enableUserAccessToken(tokenId);
+        } catch (error) {
+            forceLogoutIfNecessary(error, dispatch);
+            dispatch(batchActions([
+                {type: UserTypes.ENABLE_USER_ACCESS_TOKEN_FAILURE, error},
+                logError(error)(dispatch)
+            ]), getState);
+            return {error};
+        }
+
+        dispatch(batchActions([
+            {
+                type: UserTypes.ENABLE_USER_ACCESS_TOKEN_SUCCESS
+            },
+            {
+                type: UserTypes.ENABLED_USER_ACCESS_TOKEN,
+                data: tokenId
+            }
+        ]));
+
+        return {data: true};
+    };
+}
+
 export function clearUserAccessTokens() {
     return async (dispatch) => {
         dispatch({type: UserTypes.CLEAR_MY_USER_ACCESS_TOKENS});
@@ -1304,6 +1398,7 @@ export default {
     getSessions,
     loadProfilesForDirect,
     revokeSession,
+    revokeAllSessionsForUser,
     getUserAudits,
     searchProfiles,
     startPeriodicStatusUpdates,
@@ -1325,5 +1420,7 @@ export default {
     createUserAccessToken,
     getUserAccessToken,
     getUserAccessTokensForUser,
-    revokeUserAccessToken
+    revokeUserAccessToken,
+    disableUserAccessToken,
+    enableUserAccessToken
 };

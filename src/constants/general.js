@@ -19,6 +19,7 @@ export default {
     OFFLINE: 'offline',
     AWAY: 'away',
     ONLINE: 'online',
+    DND: 'dnd',
 
     PERMISSIONS_ALL: 'all',
     PERMISSIONS_CHANNEL_ADMIN: 'channel_admin',
@@ -50,8 +51,6 @@ export default {
     OPEN_CHANNEL: 'O',
     PRIVATE_CHANNEL: 'P',
     GM_CHANNEL: 'G',
-
-    START_OF_NEW_MESSAGES: 'start-of-new-messages',
 
     PUSH_NOTIFY_APPLE_REACT_NATIVE: 'apple_rn',
     PUSH_NOTIFY_ANDROID_REACT_NATIVE: 'android_rn',

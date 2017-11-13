@@ -204,6 +204,16 @@ function revokeSession(state = initialRequestState(), action) {
     );
 }
 
+function revokeAllSessionsForUser(state = initialRequestState(), action) {
+    return handleRequest(
+        UserTypes.REVOKE_ALL_USER_SESSIONS_REQUEST,
+        UserTypes.REVOKE_ALL_USER_SESSIONS_SUCCESS,
+        UserTypes.REVOKE_ALL_USER_SESSIONS_FAILURE,
+        state,
+        action
+    );
+}
+
 function getAudits(state = initialRequestState(), action) {
     return handleRequest(
         UserTypes.AUDITS_REQUEST,
@@ -324,6 +334,26 @@ function revokeUserAccessToken(state = initialRequestState(), action) {
     );
 }
 
+function disableUserAccessToken(state = initialRequestState(), action) {
+    return handleRequest(
+        UserTypes.DISABLE_USER_ACCESS_TOKEN_REQUEST,
+        UserTypes.DISABLE_USER_ACCESS_TOKEN_SUCCESS,
+        UserTypes.DISABLE_USER_ACCESS_TOKEN_FAILURE,
+        state,
+        action
+    );
+}
+
+function enableUserAccessToken(state = initialRequestState(), action) {
+    return handleRequest(
+        UserTypes.ENABLE_USER_ACCESS_TOKEN_REQUEST,
+        UserTypes.ENABLE_USER_ACCESS_TOKEN_SUCCESS,
+        UserTypes.ENABLE_USER_ACCESS_TOKEN_FAILURE,
+        state,
+        action
+    );
+}
+
 export default combineReducers({
     checkMfa,
     generateMfaSecret,
@@ -343,6 +373,7 @@ export default combineReducers({
     setStatus,
     getSessions,
     revokeSession,
+    revokeAllSessionsForUser,
     getAudits,
     autocompleteUsers,
     searchProfiles,
@@ -353,5 +384,7 @@ export default combineReducers({
     switchLogin,
     createUserAccessToken,
     getUserAccessToken,
-    revokeUserAccessToken
+    revokeUserAccessToken,
+    disableUserAccessToken,
+    enableUserAccessToken
 });

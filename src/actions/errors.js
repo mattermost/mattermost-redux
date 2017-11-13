@@ -16,6 +16,8 @@ export function dismissErrorObject(index) {
 export function dismissError(index) {
     return async (dispatch) => {
         dispatch(dismissErrorObject(index));
+
+        return {data: true};
     };
 }
 
@@ -31,21 +33,32 @@ export function logError(error, displayable = false) {
     return async (dispatch) => {
         const serializedError = serializeError(error);
 
-        try {
-            const stringifiedSerializedError = JSON.stringify(serializedError).toString();
-            await Client4.logClientError(stringifiedSerializedError);
-        } catch (err) {
-          // avoid crashing the app if an error sending
-          // the error occurs.
+        let sendToServer = true;
+        if (error.stack && error.stack.includes('TypeError: Failed to fetch')) {
+            sendToServer = false;
+        }
+
+        if (sendToServer) {
+            try {
+                const stringifiedSerializedError = JSON.stringify(serializedError).toString();
+                await Client4.logClientError(stringifiedSerializedError);
+            } catch (err) {
+              // avoid crashing the app if an error sending
+              // the error occurs.
+            }
         }
 
         EventEmitter.emit(ErrorTypes.LOG_ERROR, error);
         dispatch(getLogErrorAction(serializedError, displayable));
+
+        return {data: true};
     };
 }
 
 export function clearErrors() {
     return async (dispatch) => {
         dispatch({type: ErrorTypes.CLEAR_ERRORS});
+
+        return {data: true};
     };
 }

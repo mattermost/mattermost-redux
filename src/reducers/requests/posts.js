@@ -169,6 +169,16 @@ function openGraph(state = initialRequestState(), action) {
     );
 }
 
+function doPostAction(state = initialRequestState(), action) {
+    return handleRequest(
+        PostTypes.DO_POST_ACTION_REQUEST,
+        PostTypes.DO_POST_ACTION_SUCCESS,
+        PostTypes.DO_POST_ACTION_FAILURE,
+        state,
+        action
+    );
+}
+
 export default combineReducers({
     createPost,
     editPost,
@@ -184,5 +194,6 @@ export default combineReducers({
     getPostsAfter,
     getPostsAfterRetryAttempts: getPostsAfterWithRetryAttempt,
     reaction,
-    openGraph
+    openGraph,
+    doPostAction
 });
