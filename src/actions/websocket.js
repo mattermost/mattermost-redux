@@ -121,10 +121,14 @@ async function handleReconnect(dispatch, getState) {
     getMyPreferences()(dispatch, getState);
 
     if (currentTeamId) {
-        fetchMyChannelsAndMembers(currentTeamId)(dispatch, getState);
         getMyTeams()(dispatch, getState);
         getMyTeamMembers()(dispatch, getState);
-        getMyTeamUnreads()(dispatch, getState);
+        getMyTeamUnreads()(dispatch, getState).then(async () => {
+            await fetchMyChannelsAndMembers(currentTeamId)(dispatch, getState);
+            if (currentChannelId) {
+                markChannelAsRead(currentChannelId)(dispatch, getState);
+            }
+        });
         loadProfilesForDirect()(dispatch, getState);
         getTeams()(dispatch, getState);
 
