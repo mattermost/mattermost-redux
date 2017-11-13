@@ -22,12 +22,13 @@ import {
     completeDirectChannelDisplayName,
     sortChannelsByDisplayName,
     getDirectChannelName,
-    isAutoClosed
+    isAutoClosed,
+    isDirectChannelVisible,
+    isGroupChannelVisible
 } from 'utils/channel_utils';
 import {createIdsSelector} from 'utils/helpers';
 
 import {General} from 'constants';
-import {isDirectChannelVisible} from '../../utils/channel_utils';
 
 export function getAllChannels(state) {
     return state.entities.channels.channels;
@@ -447,6 +448,8 @@ export const getSortedFavoriteChannelIds = createIdsSelector(
 
             const channel = channels[id];
             if (channel.type === General.DM_CHANNEL && !isDirectChannelVisible(currentUser.id, config, prefs, channel)) {
+                return false;
+            } else if (channel.type === General.GM_CHANNEL && !isGroupChannelVisible(config, prefs, channel)) {
                 return false;
             }
 
