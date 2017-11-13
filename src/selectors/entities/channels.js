@@ -22,7 +22,9 @@ import {
     completeDirectChannelDisplayName,
     sortChannelsByDisplayName,
     getDirectChannelName,
-    isAutoClosed
+    isAutoClosed,
+    isDirectChannelVisible,
+    isGroupChannelVisible
 } from 'utils/channel_utils';
 import {createIdsSelector} from 'utils/helpers';
 
@@ -431,7 +433,9 @@ export const getSortedFavoriteChannelIds = createIdsSelector(
     getChannelIdsForCurrentTeam,
     getUnreadChannelIds,
     getTeammateNameDisplaySetting,
-    (currentUser, profiles, channels, myMembers, favoriteIds, teamChannelIds, unreadIds, settings) => {
+    getConfig,
+    getMyPreferences,
+    (currentUser, profiles, channels, myMembers, favoriteIds, teamChannelIds, unreadIds, settings, config, prefs) => {
         if (!currentUser) {
             return [];
         }
@@ -439,6 +443,13 @@ export const getSortedFavoriteChannelIds = createIdsSelector(
         const locale = currentUser.locale || 'en';
         const favoriteChannel = favoriteIds.filter((id) => {
             if (!myMembers[id]) {
+                return false;
+            }
+
+            const channel = channels[id];
+            if (channel.type === General.DM_CHANNEL && !isDirectChannelVisible(currentUser.id, config, prefs, channel)) {
+                return false;
+            } else if (channel.type === General.GM_CHANNEL && !isGroupChannelVisible(config, prefs, channel)) {
                 return false;
             }
 
