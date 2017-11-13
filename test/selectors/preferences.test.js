@@ -306,6 +306,29 @@ describe('Selectors.Preferences', () => {
                 }
             }).sidebarText, Preferences.THEMES.default.sidebarText);
         });
+
+        it('system theme with missing colours', () => {
+            const currentTeamId = '1234';
+            const theme = {
+                type: Preferences.THEMES.mattermostDark.type,
+                sidebarBg: '#ff0000'
+            };
+
+            assert.equal(Selectors.getTheme({
+                entities: {
+                    teams: {
+                        currentTeamId
+                    },
+                    preferences: {
+                        myPreferences: {
+                            [getPreferenceKey(Preferences.CATEGORY_THEME, '')]: {
+                                category: Preferences.CATEGORY_THEME, name: '', value: JSON.stringify(theme)
+                            }
+                        }
+                    }
+                }
+            }).sidebarText, Preferences.THEMES.mattermostDark.sidebarText);
+        });
     });
 
     it('get theme from style', () => {
