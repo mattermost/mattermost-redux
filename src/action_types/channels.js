@@ -77,6 +77,7 @@ export default keyMirror({
     RECEIVED_CHANNEL_PROPS: null,
     RECEIVED_CHANNEL_DELETED: null,
     RECEIVED_MSG_AND_MENTION_COUNT: null,
+    RECEIVED_LAST_VIEWED_AT: null,
     UPDATE_CHANNEL_HEADER: null,
     UPDATE_CHANNEL_PURPOSE: null
 });

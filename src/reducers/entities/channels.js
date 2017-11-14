@@ -153,15 +153,27 @@ function myMembers(state = {}, action) {
         };
     }
     case ChannelTypes.RECEIVED_MSG_AND_MENTION_COUNT: {
-        let member = state[action.data.channel_id];
-        if (!member) {
-            return state;
-        }
+        const {data} = action;
+        let member = state[data.channel_id];
 
         member = {
             ...member,
-            msg_count: action.data.msg_count == null ? member.msg_count : action.data.msg_count,
-            mention_count: action.data.mention_count == null ? member.mention_count : action.data.mention_count
+            msg_count: data.msg_count == null ? member.msg_count : data.msg_count,
+            mention_count: data.mention_count == null ? member.mention_count : data.mention_count
+        };
+
+        return {
+            ...state,
+            [data.channel_id]: member
+        };
+    }
+    case ChannelTypes.RECEIVED_LAST_VIEWED_AT: {
+        const {data} = action;
+        let member = state[data.channel_id];
+
+        member = {
+            ...member,
+            last_viewed_at: data.last_viewed_at
         };
 
         return {

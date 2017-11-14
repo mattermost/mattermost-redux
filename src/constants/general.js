@@ -19,6 +19,7 @@ export default {
     OFFLINE: 'offline',
     AWAY: 'away',
     ONLINE: 'online',
+    DND: 'dnd',
 
     PERMISSIONS_ALL: 'all',
     PERMISSIONS_CHANNEL_ADMIN: 'channel_admin',

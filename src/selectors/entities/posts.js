@@ -298,7 +298,7 @@ export function makeGetCommentCountForPost() {
               if (posts.hasOwnProperty(id)) {
                   const post = posts[id];
 
-                  if (post.root_id === currentPost.id && post.state !== Posts.POST_DELETED) {
+                  if (post.root_id === currentPost.id && post.state !== Posts.POST_DELETED && !isPostEphemeral(post)) {
                       count += 1;
                   }
               }
@@ -350,15 +350,44 @@ export function makeGetPostsForIds() {
 }
 
 export function getLastPostPerChannel(state) {
-    const allPosts = getAllPosts(state);
-    const posts = {};
-    for (const id in allPosts) {
-        if (allPosts.hasOwnProperty(id)) {
-            const post = allPosts[id];
-            if (post.channel_id && (!posts.hasOwnProperty(post.channel_id) || posts[post.channel_id].create_at < post.create_at)) {
-                posts[post.channel_id] = post;
+    const {posts: allPosts, postsInChannel: allChannels} = state.entities.posts;
+    const ret = {};
+    for (const channelId in allChannels) {
+        if (allChannels.hasOwnProperty(channelId)) {
+            const channelPosts = allChannels[channelId];
+            if (channelPosts.length > 0) {
+                const postId = channelPosts[0];
+                if (allPosts.hasOwnProperty(postId)) {
+                    ret[channelId] = allPosts[postId];
+                }
             }
         }
     }
-    return posts;
+    return ret;
 }
+
+export const getMostRecentPostIdInChannel = createSelector(
+    getAllPosts,
+    (state, channelId) => state.entities.posts.postsInChannel[channelId],
+    getMyPreferences,
+    (posts, postIdsInChannel, preferences) => {
+        const key = getPreferenceKey(Preferences.CATEGORY_ADVANCED_SETTINGS, 'join_leave');
+        const allowSystemMessages = preferences[key] ? preferences[key].value === 'true' : true;
+
+        if (!allowSystemMessages) {
+            // return the most recent non-system message in the channel
+            let postId;
+            for (let i = 0; i < postIdsInChannel.length; i++) {
+                const p = posts[postIdsInChannel[i]];
+                if (!p.type || !p.type.startsWith(Posts.SYSTEM_MESSAGE_PREFIX)) {
+                    postId = p.id;
+                    break;
+                }
+            }
+            return postId;
+        }
+
+        // return the most recent message in the channel
+        return postIdsInChannel[0];
+    }
+);

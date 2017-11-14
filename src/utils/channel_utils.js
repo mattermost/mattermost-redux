@@ -5,8 +5,12 @@ import {General, Preferences} from 'constants';
 import {displayUsername} from './user_utils';
 import {getPreferencesByCategory} from './preference_utils';
 
-const defaultPrefix = 'D'; // fallback for future types
-const typeToPrefixMap = {[General.OPEN_CHANNEL]: 'A', [General.PRIVATE_CHANNEL]: 'B', [General.DM_CHANNEL]: 'C', [General.GM_CHANNEL]: 'C'};
+const channelTypeOrder = {
+    [General.OPEN_CHANNEL]: 0,
+    [General.PRIVATE_CHANNEL]: 1,
+    [General.DM_CHANNEL]: 2,
+    [General.GM_CHANNEL]: 2
+};
 
 /**
  * Returns list of sorted channels grouped by type. Favorites here is considered as separated type.
@@ -149,7 +153,7 @@ export function isDirectChannel(channel) {
 }
 
 export function isAutoClosed(config, myPreferences, channel, channelActivity) {
-    if (config.CloseUnusedDirectMessages !== 'true' || isFavoriteChannel(myPreferences, channel)) {
+    if (config.CloseUnusedDirectMessages !== 'true' || isFavoriteChannel(myPreferences, channel.id)) {
         return false;
     }
     const autoClose = myPreferences[`${Preferences.CATEGORY_SIDEBAR_SETTINGS}--close_unused_direct_messages`];
@@ -323,10 +327,9 @@ export function getGroupDisplayNameFromUserIds(userIds, profiles, currentUserId,
     return names.sort(sortUsernames).join(', ');
 }
 
-export function isFavoriteChannel(myPreferences, channel) {
-    const fav = myPreferences[`${Preferences.CATEGORY_FAVORITE_CHANNEL}--${channel.id}`];
-    channel.isFavorite = fav && fav.value === 'true';
-    return channel.isFavorite;
+export function isFavoriteChannel(myPreferences, id) {
+    const fav = myPreferences[`${Preferences.CATEGORY_FAVORITE_CHANNEL}--${id}`];
+    return fav && fav.value === 'true';
 }
 
 export function isDefault(channel) {
@@ -427,17 +430,21 @@ function isNotDeletedChannel(channel) {
     return channel.delete_at === 0;
 }
 
-function isOpenChannel(channel) {
+export function isOpenChannel(channel) {
     return channel.type === General.OPEN_CHANNEL;
 }
 
-function isPrivateChannel(channel) {
+export function isPrivateChannel(channel) {
     return channel.type === General.PRIVATE_CHANNEL;
 }
 
 export function sortChannelsByTypeAndDisplayName(locale, a, b) {
-    if (a.type !== b.type && typeToPrefixMap[a.type] !== typeToPrefixMap[b.type]) {
-        return (typeToPrefixMap[a.type] || defaultPrefix).localeCompare((typeToPrefixMap[b.type] || defaultPrefix), locale);
+    if (a.type !== b.type) {
+        if (channelTypeOrder[a.type] < channelTypeOrder[b.type]) {
+            return -1;
+        }
+
+        return 1;
     }
 
     const aDisplayName = filterName(a.display_name);
@@ -475,11 +482,11 @@ function buildChannels(usersState, channels, missingDirectChannels, teammateName
 }
 
 function buildFavoriteChannels(channels, myPreferences, locale) {
-    return channels.filter(isFavoriteChannel.bind(null, myPreferences)).sort(sortChannelsByDisplayName.bind(null, locale));
+    return channels.filter((channel) => isFavoriteChannel(myPreferences, channel.id)).sort(sortChannelsByDisplayName.bind(null, locale));
 }
 
 function buildNotFavoriteChannels(channels, myPreferences) {
-    return channels.filter(not(isFavoriteChannel.bind(null, myPreferences)));
+    return channels.filter((channel) => !isFavoriteChannel(myPreferences, channel.id));
 }
 
 function buildDirectAndGroupChannels(channels, config, myPreferences, currentUserId, lastPosts) {

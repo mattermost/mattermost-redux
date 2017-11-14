@@ -22,7 +22,9 @@ import {
     completeDirectChannelDisplayName,
     sortChannelsByDisplayName,
     getDirectChannelName,
-    isAutoClosed
+    isAutoClosed,
+    isDirectChannelVisible,
+    isGroupChannelVisible
 } from 'utils/channel_utils';
 import {createIdsSelector} from 'utils/helpers';
 
@@ -391,7 +393,7 @@ export const getSortedUnreadChannelIds = createIdsSelector(
         // If we receive an unread for a channel and then a mention the channel
         // won't be sorted correctly until we receive a message in another channel
         if (!currentUser) {
-            return null;
+            return [];
         }
 
         const locale = currentUser.locale || 'en';
@@ -431,14 +433,23 @@ export const getSortedFavoriteChannelIds = createIdsSelector(
     getChannelIdsForCurrentTeam,
     getUnreadChannelIds,
     getTeammateNameDisplaySetting,
-    (currentUser, profiles, channels, myMembers, favoriteIds, teamChannelIds, unreadIds, settings) => {
+    getConfig,
+    getMyPreferences,
+    (currentUser, profiles, channels, myMembers, favoriteIds, teamChannelIds, unreadIds, settings, config, prefs) => {
         if (!currentUser) {
-            return null;
+            return [];
         }
 
         const locale = currentUser.locale || 'en';
         const favoriteChannel = favoriteIds.filter((id) => {
             if (!myMembers[id]) {
+                return false;
+            }
+
+            const channel = channels[id];
+            if (channel.type === General.DM_CHANNEL && !isDirectChannelVisible(currentUser.id, config, prefs, channel)) {
+                return false;
+            } else if (channel.type === General.GM_CHANNEL && !isGroupChannelVisible(config, prefs, channel)) {
                 return false;
             }
 
@@ -464,7 +475,7 @@ export const getSortedPublicChannelIds = createIdsSelector(
     getSortedFavoriteChannelIds,
     (currentUser, channels, myMembers, teamChannelIds, unreadIds, favoriteIds) => {
         if (!currentUser) {
-            return null;
+            return [];
         }
 
         const locale = currentUser.locale || 'en';
@@ -489,7 +500,7 @@ export const getSortedPrivateChannelIds = createIdsSelector(
     getSortedFavoriteChannelIds,
     (currentUser, channels, myMembers, teamChannelIds, unreadIds, favoriteIds) => {
         if (!currentUser) {
-            return null;
+            return [];
         }
 
         const locale = currentUser.locale || 'en';
@@ -519,7 +530,7 @@ export const getSortedDirectChannelIds = createIdsSelector(
     getLastPostPerChannel,
     (currentUser, profiles, channels, teammates, groupIds, unreadIds, favoriteIds, settings, config, preferences, lastPosts) => {
         if (!currentUser) {
-            return null;
+            return [];
         }
 
         const locale = currentUser.locale || 'en';
@@ -538,8 +549,12 @@ export const getSortedDirectChannelIds = createIdsSelector(
         }, directChannelsIds);
         const directChannels = groupIds.filter((id) => {
             const channel = channels[id];
-            const lastPost = lastPosts[channel.id];
-            return !unreadIds.includes(id) && !favoriteIds.includes(id) && !isAutoClosed(config, preferences, channels[id], lastPost ? lastPost.create_at : 0);
+            if (channel) {
+                const lastPost = lastPosts[channel.id];
+                return !unreadIds.includes(id) && !favoriteIds.includes(id) && !isAutoClosed(config, preferences, channels[id], lastPost ? lastPost.create_at : 0);
+            }
+
+            return false;
         }).concat(directChannelsIds).map((id) => {
             const channel = channels[id];
             return completeDirectChannelDisplayName(currentUser.id, profiles, settings, channel);
