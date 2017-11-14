@@ -93,6 +93,45 @@ Client4.setUrl('https://your-mattermost-url.com');
 Client4.setToken(yourToken);
 ```
 
+### Browser Usage
+
+To build a browser-compatible client via `webpack`:
+
+```
+$ git clone <this repo>
+$ cd mattermost-redux
+$ make bundle
+```
+
+This will generate `lib/mattermost.client.js`, `lib/mattermost.client4.js`, and `lib/mattermost.websocket.js` which can be loaded in a browser. Also note that `babel-polyfill` is required.
+
+```
+<script src="/path/to/babel/polyfill.js"></script>
+<script src="/path/to/mattermost.client4.js"></script>
+<script src="/path/to/mattermost.websocket.js"></script>
+<script type="text/javascript">
+    const client = Mattermost.client4.default();
+    const wsClient = Mattermost.websocket.default;
+    var token;
+    client.setUrl('https://your-mattermost-url.com');
+    /* use an existing personal access token */
+    client.setToken('yourToken');
+    client.setIncludeCookies(false);
+    /* login and obtain a token */
+    client.login(username, password)
+    .then(function(user){
+        console.log(`Logged in as ${user.email}`);
+        token = client.getToken();
+    })
+    .then(function(){
+        wsClient.initialize(token, {}, {}, {connectionUrl: 'wss://your-mattermost-url.com/api/v4/websocket'});
+    })
+    .catch(function(err){
+        console.error(err);
+    });
+</script>
+```
+
 ### node.js Usage
 
 Running the client from node.js requires making the `fetch` and `WebSocket` packages globally available, and the use of `babel-polyfill`:
