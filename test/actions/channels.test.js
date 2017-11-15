@@ -462,7 +462,7 @@ describe('Actions.Channels', () => {
         assert.ifError(outgoingHooks[outgoingHook.id]);
     });
 
-    it('viewChannel', async () => {
+    it('markChannelAsViewed', async () => {
         nock(Client4.getChannelsRoute()).
             post('').
             reply(201, TestHelper.fakeChannelWithId(TestHelper.basicTeam.id));
@@ -481,25 +481,20 @@ describe('Actions.Channels', () => {
 
         await Actions.fetchMyChannelsAndMembers(TestHelper.basicTeam.id)(store.dispatch, store.getState);
 
-        const members = store.getState().entities.channels.myMembers;
-        const member = members[TestHelper.basicChannel.id];
+        const timestamp = Date.now();
+        let members = store.getState().entities.channels.myMembers;
+        let member = members[TestHelper.basicChannel.id];
         const otherMember = members[userChannel.id];
         assert.ok(member);
         assert.ok(otherMember);
 
-        nock(Client4.getChannelsRoute()).
-            post('/members/me/view').
-            reply(200, OK_RESPONSE);
-
-        await Actions.viewChannel(
-            TestHelper.basicChannel.id,
-            userChannel.id
+        await Actions.markChannelAsViewed(
+            TestHelper.basicChannel.id
         )(store.dispatch, store.getState);
 
-        const updateRequest = store.getState().requests.channels.updateLastViewedAt;
-        if (updateRequest.status === RequestStatus.FAILURE) {
-            throw new Error(JSON.stringify(updateRequest.error));
-        }
+        members = store.getState().entities.channels.myMembers;
+        member = members[TestHelper.basicChannel.id];
+        assert.ok(member.last_viewed_at > timestamp);
     });
 
     it('markChannelAsUnread', async () => {

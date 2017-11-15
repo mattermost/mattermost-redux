@@ -656,7 +656,7 @@ export function deleteChannel(channelId) {
     };
 }
 
-export function viewChannel(channelId, prevChannelId = '') {
+export function markChannelAsViewed(channelId, prevChannelId = '') {
     return async (dispatch, getState) => {
         const actions = [];
 
@@ -665,7 +665,7 @@ export function viewChannel(channelId, prevChannelId = '') {
         if (member) {
             actions.push({
                 type: ChannelTypes.RECEIVED_MY_CHANNEL_MEMBER,
-                data: {...member, last_viewed_at: new Date().getTime()}
+                data: {...member, last_viewed_at: Date.now()}
             });
         }
 
@@ -673,7 +673,7 @@ export function viewChannel(channelId, prevChannelId = '') {
         if (prevMember) {
             actions.push({
                 type: ChannelTypes.RECEIVED_MY_CHANNEL_MEMBER,
-                data: {...prevMember, last_viewed_at: new Date().getTime()}
+                data: {...prevMember, last_viewed_at: Date.now()}
             });
         }
 
@@ -1161,7 +1161,7 @@ export default {
     leaveChannel,
     joinChannel,
     deleteChannel,
-    viewChannel,
+    markChannelAsViewed,
     getChannels,
     searchChannels,
     getChannelStats,

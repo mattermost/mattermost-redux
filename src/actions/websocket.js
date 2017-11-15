@@ -15,7 +15,7 @@ import {
     markChannelAsUnread,
     markChannelAsRead,
     selectChannel,
-    viewChannel
+    markChannelAsViewed
 } from './channels';
 import {
     getPosts,
@@ -344,7 +344,7 @@ async function handleNewPostEvent(msg, dispatch, getState) {
 
     if (markAsRead) {
         markChannelAsRead(post.channel_id, null, false)(dispatch, getState);
-        viewChannel(post.channel_id)(dispatch, getState);
+        markChannelAsViewed(post.channel_id)(dispatch, getState);
     } else {
         markChannelAsUnread(msg.data.team_id, post.channel_id, msg.data.mentions)(dispatch, getState);
     }
@@ -512,7 +512,7 @@ function handleChannelViewedEvent(msg, dispatch, getState) {
 
     if (channelId !== currentChannelId) {
         markChannelAsRead(channelId, null, false)(dispatch, getState);
-        viewChannel(channelId)(dispatch, getState);
+        markChannelAsViewed(channelId)(dispatch, getState);
     }
 }
 
