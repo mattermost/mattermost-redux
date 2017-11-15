@@ -462,6 +462,46 @@ describe('Actions.Channels', () => {
         assert.ifError(outgoingHooks[outgoingHook.id]);
     });
 
+    it('viewChannel', async () => {
+        nock(Client4.getChannelsRoute()).
+            post('').
+            reply(201, TestHelper.fakeChannelWithId(TestHelper.basicTeam.id));
+
+        const userChannel = await Client4.createChannel(
+            TestHelper.fakeChannel(TestHelper.basicTeam.id)
+        );
+
+        nock(Client4.getUsersRoute()).
+            get(`/me/teams/${TestHelper.basicTeam.id}/channels`).
+            reply(200, [userChannel, TestHelper.basicChannel]);
+
+        nock(Client4.getUsersRoute()).
+            get(`/me/teams/${TestHelper.basicTeam.id}/channels/members`).
+            reply(200, [{user_id: TestHelper.basicUser.id, channel_id: userChannel.id}, TestHelper.basicChannelMember]);
+
+        await Actions.fetchMyChannelsAndMembers(TestHelper.basicTeam.id)(store.dispatch, store.getState);
+
+        const members = store.getState().entities.channels.myMembers;
+        const member = members[TestHelper.basicChannel.id];
+        const otherMember = members[userChannel.id];
+        assert.ok(member);
+        assert.ok(otherMember);
+
+        nock(Client4.getChannelsRoute()).
+            post('/members/me/view').
+            reply(200, OK_RESPONSE);
+
+        await Actions.viewChannel(
+            TestHelper.basicChannel.id,
+            userChannel.id
+        )(store.dispatch, store.getState);
+
+        const updateRequest = store.getState().requests.channels.updateLastViewedAt;
+        if (updateRequest.status === RequestStatus.FAILURE) {
+            throw new Error(JSON.stringify(updateRequest.error));
+        }
+    });
+
     it('markChannelAsViewed', async () => {
         nock(Client4.getChannelsRoute()).
             post('').

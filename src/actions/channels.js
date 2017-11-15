@@ -656,6 +656,46 @@ export function deleteChannel(channelId) {
     };
 }
 
+export function viewChannel(channelId, prevChannelId = '') {
+    return async (dispatch, getState) => {
+        dispatch({type: ChannelTypes.UPDATE_LAST_VIEWED_REQUEST}, getState);
+
+        try {
+            await Client4.viewMyChannel(channelId, prevChannelId);
+        } catch (error) {
+            forceLogoutIfNecessary(error, dispatch);
+            dispatch(batchActions([
+                {type: ChannelTypes.UPDATE_LAST_VIEWED_FAILURE, error},
+                logError(error)(dispatch)
+            ]), getState);
+            return {error};
+        }
+
+        const actions = [{type: ChannelTypes.UPDATE_LAST_VIEWED_SUCCESS}];
+
+        const {myMembers} = getState().entities.channels;
+        const member = myMembers[channelId];
+        if (member) {
+            actions.push({
+                type: ChannelTypes.RECEIVED_MY_CHANNEL_MEMBER,
+                data: {...member, last_viewed_at: new Date().getTime()}
+            });
+        }
+
+        const prevMember = myMembers[prevChannelId];
+        if (prevMember) {
+            actions.push({
+                type: ChannelTypes.RECEIVED_MY_CHANNEL_MEMBER,
+                data: {...prevMember, last_viewed_at: new Date().getTime()}
+            });
+        }
+
+        dispatch(batchActions(actions), getState);
+
+        return {data: true};
+    };
+}
+
 export function markChannelAsViewed(channelId, prevChannelId = '') {
     return async (dispatch, getState) => {
         const actions = [];
@@ -937,16 +977,14 @@ export function markChannelAsRead(channelId, prevChannelId, updateLastViewedAt =
         if (updateLastViewedAt) {
             dispatch({type: ChannelTypes.UPDATE_LAST_VIEWED_REQUEST}, getState);
 
-            try {
-                Client4.viewMyChannel(channelId, prevChannelId);
-            } catch (error) {
+            Client4.viewMyChannel(channelId, prevChannelId).catch((error) => {
                 forceLogoutIfNecessary(error, dispatch);
                 dispatch(batchActions([
                     {type: ChannelTypes.UPDATE_LAST_VIEWED_FAILURE, error},
                     logError(error)(dispatch)
                 ]), getState);
                 return {error};
-            }
+            });
 
             actions.push({type: ChannelTypes.UPDATE_LAST_VIEWED_SUCCESS});
         }
@@ -1161,6 +1199,7 @@ export default {
     leaveChannel,
     joinChannel,
     deleteChannel,
+    viewChannel,
     markChannelAsViewed,
     getChannels,
     searchChannels,
