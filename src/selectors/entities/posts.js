@@ -290,22 +290,21 @@ export function makeGetPostsForThread() {
 
 export function makeGetCommentCountForPost() {
     return createSelector(
-      getAllPosts,
-      (state, props) => props,
-      (posts, {post: currentPost}) => {
-          let count = 0;
-          for (const id in posts) {
-              if (posts.hasOwnProperty(id)) {
-                  const post = posts[id];
+        getAllPosts,
+        (state, props) => props,
+        (posts, {post: currentPost}) => {
+            let count = 0;
+            for (const id in posts) {
+                if (posts.hasOwnProperty(id)) {
+                    const post = posts[id];
 
-                  if (post.root_id === currentPost.id && post.state !== Posts.POST_DELETED && !isPostEphemeral(post)) {
-                      count += 1;
-                  }
-              }
-          }
-
-          return count;
-      }
+                    if (post.root_id === currentPost.id && post.state !== Posts.POST_DELETED && !isPostEphemeral(post)) {
+                        count += 1;
+                    }
+                }
+            }
+            return count;
+        }
     );
 }
 
@@ -323,15 +322,15 @@ export const getSearchResults = createSelector(
 
 export function makeGetMessageInHistoryItem(type) {
     return createSelector(
-      (state) => state.entities.posts.messagesHistory,
-      (messagesHistory) => {
-          const idx = messagesHistory.index[type];
-          const messages = messagesHistory.messages;
-          if (idx >= 0 && messages && messages.length > idx) {
-              return messages[idx];
-          }
-          return '';
-      }
+        (state) => state.entities.posts.messagesHistory,
+        (messagesHistory) => {
+            const idx = messagesHistory.index[type];
+            const messages = messagesHistory.messages;
+            if (idx >= 0 && messages && messages.length > idx) {
+                return messages[idx];
+            }
+            return '';
+        }
     );
 }
 

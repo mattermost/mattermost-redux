@@ -58,7 +58,7 @@
         "global-require": 2,
         "guard-for-in": 2,
         "id-blacklist": 0,
-        "indent": [2, 4, {"SwitchCase": 0}],
+        "indent": [2, 4, {"SwitchCase": 0, "CallExpression": {"arguments": 1}}],
         "jsx-quotes": [2, "prefer-single"],
         "key-spacing": [2, {"beforeColon": false, "afterColon": true, "mode": "strict"}],
         "keyword-spacing": [2, {"before": true, "after": true, "overrides": {}}],
