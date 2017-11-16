@@ -419,7 +419,7 @@ describe('Actions.Integrations', () => {
             reply(201, TestHelper.fakeTeamWithId());
 
         const {data: team} = await TeamsActions.createTeam(
-          TestHelper.fakeTeam()
+            TestHelper.fakeTeam()
         )(store.dispatch, store.getState);
 
         const expected = TestHelper.testCommand(team.id);
@@ -462,7 +462,7 @@ describe('Actions.Integrations', () => {
             reply(201, TestHelper.fakeTeamWithId());
 
         const {data: team} = await TeamsActions.createTeam(
-          TestHelper.fakeTeam()
+            TestHelper.fakeTeam()
         )(store.dispatch, store.getState);
 
         const command = TestHelper.testCommand(team.id);
@@ -472,7 +472,7 @@ describe('Actions.Integrations', () => {
             reply(201, {...command, token: TestHelper.generateId(), id: TestHelper.generateId()});
 
         const {data: created} = await Actions.addCommand(
-          command
+            command
         )(store.dispatch, store.getState);
 
         nock(Client4.getCommandsRoute()).
@@ -480,7 +480,7 @@ describe('Actions.Integrations', () => {
             reply(200, {...created, token: TestHelper.generateId()});
 
         await Actions.regenCommandToken(
-          created.id
+            created.id
         )(store.dispatch, store.getState);
 
         const request = store.getState().requests.integrations.regenCommandToken;
@@ -564,7 +564,7 @@ describe('Actions.Integrations', () => {
             reply(201, TestHelper.fakeTeamWithId());
 
         const {data: team} = await TeamsActions.createTeam(
-          TestHelper.fakeTeam()
+            TestHelper.fakeTeam()
         )(store.dispatch, store.getState);
 
         const command = TestHelper.testCommand(team.id);
@@ -582,7 +582,7 @@ describe('Actions.Integrations', () => {
             reply(200, OK_RESPONSE);
 
         await Actions.deleteCommand(
-          created.id
+            created.id
         )(store.dispatch, store.getState);
 
         const request = store.getState().requests.integrations.deleteCommand;

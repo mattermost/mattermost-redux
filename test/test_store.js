@@ -7,8 +7,8 @@ import configureStore from 'store';
 
 export default async function testConfigureStore(preloadedState) {
     const storageTransform = createTransform(
-      () => ({}),
-      () => ({})
+        () => ({}),
+        () => ({})
     );
 
     const offlineConfig = {

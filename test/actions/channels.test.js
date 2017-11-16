@@ -1294,9 +1294,9 @@ describe('Actions.Channels', () => {
             reply(201, {channel_id: TestHelper.basicChannel.id, user_id: TestHelper.basicUser.id});
 
         await Actions.joinChannel(
-                TestHelper.basicUser.id,
-                TestHelper.basicTeam.id,
-                channelId
+            TestHelper.basicUser.id,
+            TestHelper.basicTeam.id,
+            channelId
             )(store.dispatch, store.getState);
 
         nock(Client4.getChannelsRoute()).
