@@ -15,7 +15,12 @@ const devToolsEnhancer = (
     typeof window !== 'undefined' && window.__REDUX_DEVTOOLS_EXTENSION__ ?  // eslint-disable-line no-underscore-dangle
     window.__REDUX_DEVTOOLS_EXTENSION__ :  // eslint-disable-line no-underscore-dangle
     () => {
-        return (noop) => noop;
+        return devTools({
+            name: 'Mattermost',
+            hostname: 'localhost',
+            port: 5678,
+            realtime: true
+        });
     }
 );
 
@@ -57,12 +62,6 @@ export default function configureServiceStore(preloadedState, appReducer, userOf
         offlineCompose(baseOfflineConfig)(
             middleware,
             [
-                devTools({
-                    name: 'Mattermost',
-                    hostname: 'localhost',
-                    port: 5678,
-                    realtime: true
-                }),
                 devToolsEnhancer()
             ]
         )
