@@ -14,7 +14,8 @@ import {
     updateChannelPurpose,
     markChannelAsUnread,
     markChannelAsRead,
-    selectChannel
+    selectChannel,
+    markChannelAsViewed
 } from './channels';
 import {
     getPosts,
@@ -210,6 +211,9 @@ function handleEvent(msg, dispatch, getState) {
     case WebsocketEvents.CHANNEL_UPDATED:
         handleChannelUpdatedEvent(msg, dispatch, getState);
         break;
+    case WebsocketEvents.CHANNEL_VIEWED:
+        handleChannelViewedEvent(msg, dispatch, getState);
+        break;
     case WebsocketEvents.DIRECT_ADDED:
         handleDirectAddedEvent(msg, dispatch, getState);
         break;
@@ -339,7 +343,8 @@ async function handleNewPostEvent(msg, dispatch, getState) {
     }
 
     if (markAsRead) {
-        markChannelAsRead(post.channel_id, null, true)(dispatch, getState);
+        markChannelAsRead(post.channel_id, null, false)(dispatch, getState);
+        markChannelAsViewed(post.channel_id)(dispatch, getState);
     } else {
         markChannelAsUnread(msg.data.team_id, post.channel_id, msg.data.mentions)(dispatch, getState);
     }
@@ -498,6 +503,16 @@ function handleChannelUpdatedEvent(msg, dispatch, getState) {
             // the changes without listening to the store
             EventEmitter.emit(WebsocketEvents.CHANNEL_UPDATED, channel);
         }
+    }
+}
+
+function handleChannelViewedEvent(msg, dispatch, getState) {
+    const {currentChannelId} = getState().entities.channels;
+    const {channel_id: channelId} = msg.data;
+
+    if (channelId !== currentChannelId) {
+        markChannelAsRead(channelId, null, false)(dispatch, getState);
+        markChannelAsViewed(channelId)(dispatch, getState);
     }
 }
 

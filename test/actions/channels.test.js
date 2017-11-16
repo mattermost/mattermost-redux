@@ -502,6 +502,41 @@ describe('Actions.Channels', () => {
         }
     });
 
+    it('markChannelAsViewed', async () => {
+        nock(Client4.getChannelsRoute()).
+            post('').
+            reply(201, TestHelper.fakeChannelWithId(TestHelper.basicTeam.id));
+
+        const userChannel = await Client4.createChannel(
+            TestHelper.fakeChannel(TestHelper.basicTeam.id)
+        );
+
+        nock(Client4.getUsersRoute()).
+            get(`/me/teams/${TestHelper.basicTeam.id}/channels`).
+            reply(200, [userChannel, TestHelper.basicChannel]);
+
+        nock(Client4.getUsersRoute()).
+            get(`/me/teams/${TestHelper.basicTeam.id}/channels/members`).
+            reply(200, [{user_id: TestHelper.basicUser.id, channel_id: userChannel.id}, TestHelper.basicChannelMember]);
+
+        await Actions.fetchMyChannelsAndMembers(TestHelper.basicTeam.id)(store.dispatch, store.getState);
+
+        const timestamp = Date.now();
+        let members = store.getState().entities.channels.myMembers;
+        let member = members[TestHelper.basicChannel.id];
+        const otherMember = members[userChannel.id];
+        assert.ok(member);
+        assert.ok(otherMember);
+
+        await Actions.markChannelAsViewed(
+            TestHelper.basicChannel.id
+        )(store.dispatch, store.getState);
+
+        members = store.getState().entities.channels.myMembers;
+        member = members[TestHelper.basicChannel.id];
+        assert.ok(member.last_viewed_at > timestamp);
+    });
+
     it('markChannelAsUnread', async () => {
         TestHelper.mockLogin();
         await login(TestHelper.basicUser.email, TestHelper.basicUser.password)(store.dispatch, store.getState);

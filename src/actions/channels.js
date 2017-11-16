@@ -696,6 +696,35 @@ export function viewChannel(channelId, prevChannelId = '') {
     };
 }
 
+export function markChannelAsViewed(channelId, prevChannelId = '') {
+    return async (dispatch, getState) => {
+        const actions = [];
+
+        const {myMembers} = getState().entities.channels;
+        const member = myMembers[channelId];
+        if (member) {
+            actions.push({
+                type: ChannelTypes.RECEIVED_MY_CHANNEL_MEMBER,
+                data: {...member, last_viewed_at: Date.now()}
+            });
+        }
+
+        const prevMember = myMembers[prevChannelId];
+        if (prevMember) {
+            actions.push({
+                type: ChannelTypes.RECEIVED_MY_CHANNEL_MEMBER,
+                data: {...prevMember, last_viewed_at: Date.now()}
+            });
+        }
+
+        if (actions.length) {
+            dispatch(batchActions(actions), getState);
+        }
+
+        return {data: true};
+    };
+}
+
 export function getChannels(teamId, page = 0, perPage = General.CHANNELS_CHUNK_SIZE) {
     return async (dispatch, getState) => {
         dispatch({type: ChannelTypes.GET_CHANNELS_REQUEST}, getState);
@@ -928,7 +957,7 @@ export function updateChannelPurpose(channelId, purpose) {
     };
 }
 
-export function markChannelAsRead(channelId, prevChannelId, updateLastViewedAt = false) {
+export function markChannelAsRead(channelId, prevChannelId, updateLastViewedAt = true) {
     return async (dispatch, getState) => {
         const state = getState();
         const channelState = state.entities.channels;
@@ -944,17 +973,23 @@ export function markChannelAsRead(channelId, prevChannelId, updateLastViewedAt =
         const channelMember = channelState.myMembers[channelId];
         const prevChannelMember = channelState.myMembers[prevChannelId]; // May also be null
 
-        if (channel && channelMember) {
-            if (updateLastViewedAt) {
-                actions.push({
-                    type: ChannelTypes.RECEIVED_LAST_VIEWED_AT,
-                    data: {
-                        channel_id: channelId,
-                        last_viewed_at: Date.now()
-                    }
-                });
-            }
+        // Send channel last viewed at to the server
+        if (updateLastViewedAt) {
+            dispatch({type: ChannelTypes.UPDATE_LAST_VIEWED_REQUEST}, getState);
 
+            Client4.viewMyChannel(channelId, prevChannelId).catch((error) => {
+                forceLogoutIfNecessary(error, dispatch);
+                dispatch(batchActions([
+                    {type: ChannelTypes.UPDATE_LAST_VIEWED_FAILURE, error},
+                    logError(error)(dispatch)
+                ]), getState);
+                return {error};
+            });
+
+            actions.push({type: ChannelTypes.UPDATE_LAST_VIEWED_SUCCESS});
+        }
+
+        if (channel && channelMember) {
             actions.push({
                 type: ChannelTypes.RECEIVED_MSG_AND_MENTION_COUNT,
                 data: {
@@ -1165,6 +1200,7 @@ export default {
     joinChannel,
     deleteChannel,
     viewChannel,
+    markChannelAsViewed,
     getChannels,
     searchChannels,
     getChannelStats,
