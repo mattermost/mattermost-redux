@@ -1540,4 +1540,50 @@ describe('Selectors.Posts', () => {
             assert.equal(postId, '1002');
         });
     });
+
+    describe('getLatestReplyablePostId', () => {
+        it('no posts', () => {
+            const noPosts = {};
+            const state = {
+                entities: {
+                    posts: {
+                        posts: noPosts,
+                        postsInChannel: []
+                    },
+                    channels: {
+                        currentChannelId: 'abcd'
+                    }
+                }
+            };
+            const actual = Selectors.getLatestReplyablePostId(state);
+
+            assert.equal(actual, null);
+        });
+
+        it('return first post which dosent have POST_DELETED state', () => {
+            const postsAny = {
+                a: {id: 'a', channel_id: 'a', create_at: 1, user_id: 'a'},
+                b: {id: 'b', root_id: 'a', channel_id: 'abcd', create_at: 3, user_id: 'b', state: Posts.POST_DELETED},
+                c: {id: 'c', root_id: 'a', channel_id: 'abcd', create_at: 3, user_id: 'b', type: 'system_join_channel'},
+                d: {id: 'd', root_id: 'a', channel_id: 'abcd', create_at: 3, user_id: 'b', type: Posts.POST_TYPES.EPHEMERAL},
+                e: {id: 'e', channel_id: 'abcd', create_at: 4, user_id: 'b'}
+            };
+            const state = {
+                entities: {
+                    posts: {
+                        posts: postsAny,
+                        postsInChannel: {
+                            abcd: ['b', 'c', 'd', 'e']
+                        }
+                    },
+                    channels: {
+                        currentChannelId: 'abcd'
+                    }
+                }
+            };
+            const actual = Selectors.getLatestReplyablePostId(state);
+
+            assert.equal(actual, postsAny.e.id);
+        });
+    });
 });

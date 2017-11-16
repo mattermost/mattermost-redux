@@ -391,3 +391,15 @@ export const getMostRecentPostIdInChannel = createSelector(
         return postIdsInChannel[0];
     }
 );
+
+export const getLatestReplyablePostId = createSelector(
+    getPostsInCurrentChannel,
+    (posts) => {
+        for (const post of posts) {
+            if (post.state !== Posts.POST_DELETED && !isSystemMessage(post) && !isPostEphemeral(post)) {
+                return post.id;
+            }
+        }
+        return null;
+    }
+);
