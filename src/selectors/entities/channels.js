@@ -373,7 +373,9 @@ export const getUnreadChannelIds = createIdsSelector(
             const m = members[id];
 
             if (c && m) {
-                if (m.notify_props && m.notify_props.mark_unread !== 'mention' && c.total_msg_count - m.msg_count > 0) {
+                const chHasUnread = (c.total_msg_count - m.msg_count) > 0;
+                const chHasMention = m.mention_count > 0;
+                if ((m.notify_props && m.notify_props.mark_unread !== 'mention' && chHasUnread) || chHasMention) {
                     return true;
                 }
             }
