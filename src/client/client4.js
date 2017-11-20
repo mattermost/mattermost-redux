@@ -2129,6 +2129,9 @@ export default class Client4 {
         if (global && global.window && global.window.analytics && global.window.analytics.initialized) {
             global.window.analytics.track('event', properties, options);
         } else if (global && global.analytics) {
+            if (global.analytics_context) {
+                options.context = global.analytics_context;
+            }
             global.analytics.track(Object.assign({
                 event: 'event'
             }, {properties}, options));
