@@ -304,7 +304,7 @@ describe('Selectors.Preferences', () => {
                         }
                     }
                 }
-            }).mentionHighlightLink, Preferences.THEMES.organization.mentionHighlightLink);
+            }).mentionHighlightLink, Preferences.THEMES.default.mentionHighlightLink);
         });
 
         it('system theme with missing colours', () => {

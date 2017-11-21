@@ -152,7 +152,7 @@ export const getTheme = createShallowSelector(
             }
         }
 
-        return Object.assign({}, Preferences.THEMES.organization, theme);
+        return Object.assign({}, Preferences.THEMES.default, theme);
     }
 );
 
