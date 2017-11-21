@@ -304,7 +304,7 @@ describe('Selectors.Preferences', () => {
                         }
                     }
                 }
-            }).sidebarText, Preferences.THEMES.default.sidebarText);
+            }).mentionHighlightLink, Preferences.THEMES.default.mentionHighlightLink);
         });
 
         it('system theme with missing colours', () => {
@@ -328,6 +328,28 @@ describe('Selectors.Preferences', () => {
                     }
                 }
             }).sidebarText, Preferences.THEMES.mattermostDark.sidebarText);
+        });
+
+        it('non-default system theme', () => {
+            const currentTeamId = '1234';
+            const theme = {
+                type: Preferences.THEMES.windows10.type
+            };
+
+            assert.equal(Selectors.getTheme({
+                entities: {
+                    teams: {
+                        currentTeamId
+                    },
+                    preferences: {
+                        myPreferences: {
+                            [getPreferenceKey(Preferences.CATEGORY_THEME, '')]: {
+                                category: Preferences.CATEGORY_THEME, name: '', value: JSON.stringify(theme)
+                            }
+                        }
+                    }
+                }
+            }).codeTheme, Preferences.THEMES.windows10.codeTheme);
         });
     });
 
