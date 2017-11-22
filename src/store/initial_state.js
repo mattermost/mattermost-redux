@@ -68,7 +68,7 @@ const state = {
             incomingHooks: {},
             outgoingHooks: {},
             oauthApps: {},
-            internalCommands: {},
+            systemCommands: {},
             commands: {}
         },
         files: {

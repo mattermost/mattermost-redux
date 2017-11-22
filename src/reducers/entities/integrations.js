@@ -91,20 +91,24 @@ function commands(state = {}, action) {
     switch (action.type) {
     case IntegrationTypes.RECEIVED_COMMANDS:
     case IntegrationTypes.RECEIVED_CUSTOM_TEAM_COMMANDS: {
-        const nextCommands = {};
         for (const command of action.data) {
             if (command.id) {
                 const id = command.id;
-                nextCommands[id] = command;
+                nextState[id] = command;
             }
         }
-        return nextCommands;
+
+        return nextState;
     }
     case IntegrationTypes.RECEIVED_COMMAND:
-        return {
-            ...state,
-            [action.data.id]: action.data
-        };
+        if (action.data.id) {
+            return {
+                ...state,
+                [action.data.id]: action.data
+            };
+        }
+
+        return state;
     case IntegrationTypes.RECEIVED_COMMAND_TOKEN: {
         const {id, token} = action.data;
         return {
@@ -127,7 +131,7 @@ function commands(state = {}, action) {
     }
 }
 
-function executableCommands(state = {}, action) {
+function systemCommands(state = {}, action) {
     switch (action.type) {
     case IntegrationTypes.RECEIVED_COMMANDS: {
         const nextCommands = {};
@@ -196,5 +200,5 @@ export default combineReducers({
     oauthApps,
 
     // object to represent built-in slash commands
-    executableCommands
+    systemCommands
 });

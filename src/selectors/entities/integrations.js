@@ -20,8 +20,8 @@ export function getOAuthApps(state) {
     return state.entities.integrations.oauthApps;
 }
 
-export function getExecutableCommands(state) {
-    return state.entities.integrations.executableCommands;
+export function getSystemCommands(state) {
+    return state.entities.integrations.systemCommands;
 }
 
 /**
@@ -37,11 +37,11 @@ export const getOutgoingHooksInCurrentTeam = createSelector(
 
 export const getAllCommands = createSelector(
     getCommands,
-    getExecutableCommands,
-    (commands, executableCommands) => {
+    getSystemCommands,
+    (commands, systemCommands) => {
         return {
             ...commands,
-            ...executableCommands
+            ...systemCommands
         };
     }
 );

@@ -528,6 +528,8 @@ describe('Actions.Channels', () => {
         assert.ok(member);
         assert.ok(otherMember);
 
+        await TestHelper.wait(50);
+
         await Actions.markChannelAsViewed(
             TestHelper.basicChannel.id
         )(store.dispatch, store.getState);
