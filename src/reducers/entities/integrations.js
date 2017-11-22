@@ -89,17 +89,26 @@ function outgoingHooks(state = {}, action) {
 function commands(state = {}, action) {
     const nextState = {...state};
     switch (action.type) {
+    case IntegrationTypes.RECEIVED_COMMANDS:
     case IntegrationTypes.RECEIVED_CUSTOM_TEAM_COMMANDS: {
         for (const command of action.data) {
-            nextState[command.id] = command;
+            if (command.id) {
+                const id = command.id;
+                nextState[id] = command;
+            }
         }
+
         return nextState;
     }
     case IntegrationTypes.RECEIVED_COMMAND:
-        return {
-            ...state,
-            [action.data.id]: action.data
-        };
+        if (action.data.id) {
+            return {
+                ...state,
+                [action.data.id]: action.data
+            };
+        }
+
+        return state;
     case IntegrationTypes.RECEIVED_COMMAND_TOKEN: {
         const {id, token} = action.data;
         return {
@@ -114,6 +123,34 @@ function commands(state = {}, action) {
         Reflect.deleteProperty(nextState, action.data.id);
         return nextState;
     }
+    case UserTypes.LOGOUT_SUCCESS:
+        return {};
+
+    default:
+        return state;
+    }
+}
+
+function systemCommands(state = {}, action) {
+    switch (action.type) {
+    case IntegrationTypes.RECEIVED_COMMANDS: {
+        const nextCommands = {};
+        for (const command of action.data) {
+            if (!command.id) {
+                nextCommands[command.trigger] = command;
+            }
+        }
+        return nextCommands;
+    }
+    case IntegrationTypes.RECEIVED_COMMAND:
+        if (!action.data.id) {
+            return {
+                ...state,
+                [action.data.trigger]: action.data
+            };
+        }
+
+        return state;
     case UserTypes.LOGOUT_SUCCESS:
         return {};
 
@@ -160,6 +197,8 @@ export default combineReducers({
     commands,
 
     // object to represent registered oauth apps with app id as the key
-    oauthApps
+    oauthApps,
 
+    // object to represent built-in slash commands
+    systemCommands
 });

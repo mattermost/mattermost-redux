@@ -68,6 +68,7 @@ const state = {
             incomingHooks: {},
             outgoingHooks: {},
             oauthApps: {},
+            systemCommands: {},
             commands: {}
         },
         files: {
@@ -426,6 +427,14 @@ const state = {
                 error: null
             },
             updateOutgoingHook: {
+                status: 'not_started',
+                error: null
+            },
+            getCommands: {
+                status: 'not_started',
+                error: null
+            },
+            getAutocompleteCommands: {
                 status: 'not_started',
                 error: null
             },

@@ -86,6 +86,26 @@ function updateOutgoingHook(state = initialRequestState(), action) {
     );
 }
 
+function getCommands(state = initialRequestState(), action) {
+    return handleRequest(
+        IntegrationTypes.GET_COMMANDS_REQUEST,
+        IntegrationTypes.GET_COMMANDS_SUCCESS,
+        IntegrationTypes.GET_COMMANDS_FAILURE,
+        state,
+        action
+    );
+}
+
+function getAutocompleteCommands(state = initialRequestState(), action) {
+    return handleRequest(
+        IntegrationTypes.GET_AUTOCOMPLETE_COMMANDS_REQUEST,
+        IntegrationTypes.GET_AUTOCOMPLETE_COMMANDS_SUCCESS,
+        IntegrationTypes.GET_AUTOCOMPLETE_COMMANDS_FAILURE,
+        state,
+        action
+    );
+}
+
 function getCustomTeamCommands(state = initialRequestState(), action) {
     return handleRequest(
         IntegrationTypes.GET_CUSTOM_TEAM_COMMANDS_REQUEST,
@@ -186,6 +206,16 @@ function updateOAuthApp(state = initialRequestState(), action) {
     );
 }
 
+function executeCommand(state = initialRequestState(), action) {
+    return handleRequest(
+        IntegrationTypes.EXECUTE_COMMAND_REQUEST,
+        IntegrationTypes.EXECUTE_COMMAND_SUCCESS,
+        IntegrationTypes.EXECUTE_COMMAND_FAILURE,
+        state,
+        action
+    );
+}
+
 export default combineReducers({
     createIncomingHook,
     getIncomingHooks,
@@ -195,6 +225,7 @@ export default combineReducers({
     getOutgoingHooks,
     deleteOutgoingHook,
     updateOutgoingHook,
+    getCommands,
     getCustomTeamCommands,
     addCommand,
     editCommand,
@@ -204,5 +235,7 @@ export default combineReducers({
     getOAuthApps,
     getOAuthApp,
     deleteOAuthApp,
-    updateOAuthApp
+    updateOAuthApp,
+    executeCommand,
+    getAutocompleteCommands
 });

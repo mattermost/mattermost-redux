@@ -165,6 +165,28 @@ export function regenOutgoingHookToken(hookId) {
     );
 }
 
+export function getCommands(teamId) {
+    return bindClientFunc(
+        Client4.getCommandsList,
+        IntegrationTypes.GET_COMMANDS_REQUEST,
+        [IntegrationTypes.RECEIVED_COMMANDS, IntegrationTypes.GET_COMMANDS_SUCCESS],
+        IntegrationTypes.GET_COMMANDS_FAILURE,
+        teamId
+    );
+}
+
+export function getAutocompleteCommands(teamId, page = 0, perPage = General.PAGE_SIZE_DEFAULT) {
+    return bindClientFunc(
+        Client4.getAutocompleteCommandsList,
+        IntegrationTypes.GET_AUTOCOMPLETE_COMMANDS_REQUEST,
+        [IntegrationTypes.RECEIVED_COMMANDS, IntegrationTypes.GET_AUTOCOMPLETE_COMMANDS_SUCCESS],
+        IntegrationTypes.GET_AUTOCOMPLETE_COMMANDS_FAILURE,
+        teamId,
+        page,
+        perPage
+    );
+}
+
 export function getCustomTeamCommands(teamId) {
     return bindClientFunc(
         Client4.getCustomTeamCommands,
@@ -192,6 +214,17 @@ export function editCommand(command) {
         [IntegrationTypes.RECEIVED_COMMAND, IntegrationTypes.EDIT_COMMAND_SUCCESS],
         IntegrationTypes.EDIT_COMMAND_FAILURE,
         command
+    );
+}
+
+export function executeCommand(command, args) {
+    return bindClientFunc(
+        Client4.executeCommand,
+        IntegrationTypes.EXECUTE_COMMAND_REQUEST,
+        IntegrationTypes.EXECUTE_COMMAND_SUCCESS,
+        IntegrationTypes.EXECUTE_COMMAND_FAILURE,
+        command,
+        args
     );
 }
 

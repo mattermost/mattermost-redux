@@ -1550,6 +1550,13 @@ export default class Client4 {
         );
     };
 
+    getAutocompleteCommandsList = async (teamId, page = 0, perPage = PER_PAGE_DEFAULT) => {
+        return this.doFetch(
+            `${this.getTeamRoute(teamId)}/commands/autocomplete${buildQueryString({page, per_page: perPage})}`,
+            {method: 'get'}
+        );
+    };
+
     getCustomTeamCommands = async (teamId) => {
         return this.doFetch(
             `${this.getCommandsRoute()}?team_id=${teamId}&custom_only=true`,
