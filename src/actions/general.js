@@ -71,6 +71,7 @@ export function getClientConfig() {
         }
 
         Client4.setEnableLogging(data.EnableDeveloper === 'true');
+        Client4.setDiagnosticId(data.DiagnosticId);
 
         dispatch(batchActions([
             {type: GeneralTypes.CLIENT_CONFIG_RECEIVED, data},
