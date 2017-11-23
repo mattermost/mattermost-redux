@@ -1587,3 +1587,93 @@ describe('Selectors.Posts', () => {
         });
     });
 });
+
+describe('getCurrentUsersLatestPost', () => {
+    const user1 = TestHelper.fakeUserWithId();
+    user1.notify_props = {};
+    const profiles = {};
+    profiles[user1.id] = user1;
+    it('no posts', () => {
+        const noPosts = {};
+        const state = {
+            entities: {
+                users: {
+                    currentUserId: user1.id,
+                    profiles
+                },
+                posts: {
+                    posts: noPosts,
+                    postsInChannel: []
+                },
+                channels: {
+                    currentChannelId: 'abcd'
+                }
+            }
+        };
+        const actual = Selectors.getCurrentUsersLatestPost(state);
+
+        assert.equal(actual, null);
+    });
+
+    it('return first post which user can edit', () => {
+        const postsAny = {
+            a: {id: 'a', channel_id: 'a', create_at: 1, user_id: 'a'},
+            b: {id: 'b', root_id: 'a', channel_id: 'abcd', create_at: 3, user_id: 'b', state: Posts.POST_DELETED},
+            c: {id: 'c', root_id: 'a', channel_id: 'abcd', create_at: 3, user_id: 'b', type: 'system_join_channel'},
+            d: {id: 'd', root_id: 'a', channel_id: 'abcd', create_at: 3, user_id: 'b', type: Posts.POST_TYPES.EPHEMERAL},
+            e: {id: 'e', channel_id: 'abcd', create_at: 4, user_id: 'c'},
+            f: {id: 'f', channel_id: 'abcd', create_at: 4, user_id: user1.id}
+        };
+        const state = {
+            entities: {
+                users: {
+                    currentUserId: user1.id,
+                    profiles
+                },
+                posts: {
+                    posts: postsAny,
+                    postsInChannel: {
+                        abcd: ['b', 'c', 'd', 'e', 'f']
+                    }
+                },
+                channels: {
+                    currentChannelId: 'abcd'
+                }
+            }
+        };
+        const actual = Selectors.getCurrentUsersLatestPost(state);
+
+        assert.equal(actual, postsAny.f);
+    });
+
+    it('return first post which has rootId match', () => {
+        const postsAny = {
+            a: {id: 'a', channel_id: 'a', create_at: 1, user_id: 'a'},
+            b: {id: 'b', root_id: 'a', channel_id: 'abcd', create_at: 3, user_id: 'b', state: Posts.POST_DELETED},
+            c: {id: 'c', root_id: 'a', channel_id: 'abcd', create_at: 3, user_id: 'b', type: 'system_join_channel'},
+            d: {id: 'd', root_id: 'a', channel_id: 'abcd', create_at: 3, user_id: 'b', type: Posts.POST_TYPES.EPHEMERAL},
+            e: {id: 'e', channel_id: 'abcd', create_at: 4, user_id: 'c'},
+            f: {id: 'f', root_id: 'e', channel_id: 'abcd', create_at: 4, user_id: user1.id}
+        };
+        const state = {
+            entities: {
+                users: {
+                    currentUserId: user1.id,
+                    profiles
+                },
+                posts: {
+                    posts: postsAny,
+                    postsInChannel: {
+                        abcd: ['b', 'c', 'd', 'e', 'f']
+                    }
+                },
+                channels: {
+                    currentChannelId: 'abcd'
+                }
+            }
+        };
+        const actual = Selectors.getCurrentUsersLatestPost(state, 'e');
+
+        assert.equal(actual, postsAny.f);
+    });
+});
