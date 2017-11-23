@@ -402,3 +402,32 @@ export const getLatestReplyablePostId = createSelector(
         return null;
     }
 );
+
+export const getCurrentUsersLatestPost = createSelector(
+    getPostsInCurrentChannel,
+    getCurrentUser,
+    (_, rootId) => rootId,
+    (posts, currentUser, rootId) => {
+        let lastPost = null;
+        for (const post of posts) {
+            // don't edit webhook posts, deleted posts, or system messages
+            if (post.user_id !== currentUser.id ||
+               (post.props && post.props.from_webhook) ||
+               post.state === Posts.POST_DELETED ||
+               (isSystemMessage(post) && isPostEphemeral(post))) {
+                continue;
+            }
+
+            if (rootId) {
+                if (post.root_id === rootId || post.id === rootId) {
+                    lastPost = post;
+                    break;
+                }
+            } else {
+                lastPost = post;
+                break;
+            }
+        }
+        return lastPost;
+    }
+);
