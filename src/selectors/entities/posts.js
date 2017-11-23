@@ -294,12 +294,14 @@ export function makeGetCommentCountForPost() {
         (state, props) => props,
         (posts, {post: currentPost}) => {
             let count = 0;
-            for (const id in posts) {
-                if (posts.hasOwnProperty(id)) {
-                    const post = posts[id];
+            if (currentPost) {
+                for (const id in posts) {
+                    if (posts.hasOwnProperty(id)) {
+                        const post = posts[id];
 
-                    if (post.root_id === currentPost.id && post.state !== Posts.POST_DELETED && !isPostEphemeral(post)) {
-                        count += 1;
+                        if (post.root_id === currentPost.id && post.state !== Posts.POST_DELETED && !isPostEphemeral(post)) {
+                            count += 1;
+                        }
                     }
                 }
             }
@@ -370,6 +372,9 @@ export const getMostRecentPostIdInChannel = createSelector(
     (state, channelId) => state.entities.posts.postsInChannel[channelId],
     getMyPreferences,
     (posts, postIdsInChannel, preferences) => {
+        if (!postIdsInChannel) {
+            return '';
+        }
         const key = getPreferenceKey(Preferences.CATEGORY_ADVANCED_SETTINGS, 'join_leave');
         const allowSystemMessages = preferences[key] ? preferences[key].value === 'true' : true;
 
