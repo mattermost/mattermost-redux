@@ -30,6 +30,7 @@ export default class Client4 {
         this.enableLogging = false;
         this.defaultHeaders = {};
         this.userId = '';
+        this.diagnosticId = '';
         this.includeCookies = true;
 
         this.translations = {
@@ -72,6 +73,10 @@ export default class Client4 {
 
     setUserId(userId) {
         this.userId = userId;
+    }
+
+    setDiagnosticId(diagnosticId) {
+        this.diagnosticId = diagnosticId;
     }
 
     getServerVersion() {
@@ -2140,7 +2145,8 @@ export default class Client4 {
                 options.context = global.analytics_context;
             }
             global.analytics.track(Object.assign({
-                event: 'event'
+                event: 'event',
+                userId: this.diagnosticId
             }, {properties}, options));
         }
     }
