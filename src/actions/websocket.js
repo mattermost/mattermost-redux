@@ -43,6 +43,7 @@ import {
 import {General, WebsocketEvents, Preferences, Posts} from 'constants';
 
 import {getCurrentChannelStats} from 'selectors/entities/channels';
+import {getCurrentUser} from 'selectors/entities/users';
 import {getUserIdFromChannelName} from 'utils/channel_utils';
 import {isFromWebhook, isSystemMessage, getLastCreateAt, shouldIgnorePost} from 'utils/post_utils';
 import EventEmitter from 'utils/event_emitter';
@@ -433,11 +434,18 @@ function handleUserRemovedEvent(msg, dispatch, getState) {
 }
 
 function handleUserUpdatedEvent(msg, dispatch, getState) {
-    const entities = getState().entities;
-    const {currentUserId} = entities.users;
+    const currentUser = getCurrentUser(getState());
     const user = msg.data.user;
 
-    if (user.id !== currentUserId) {
+    if (user.id === currentUser.id) {
+        dispatch({
+            type: UserTypes.RECEIVED_ME,
+            data: {
+                ...currentUser,
+                last_picture_update: user.last_picture_update
+            }
+        });
+    } else {
         dispatch({
             type: UserTypes.RECEIVED_PROFILES,
             data: {
