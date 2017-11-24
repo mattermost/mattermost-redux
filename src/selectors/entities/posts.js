@@ -431,3 +431,10 @@ export const getCurrentUsersLatestPost = createSelector(
         return lastPost;
     }
 );
+
+export const getPostIdsInChannel = createIdsSelector(
+    (state, channelId) => state.entities.posts.postsInChannel[channelId],
+    (postIdsInChannel) => {
+        return postIdsInChannel || [];
+    }
+);
