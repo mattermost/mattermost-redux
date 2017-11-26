@@ -582,7 +582,11 @@ export function joinChannel(userId, teamId, channelId, channelName) {
                 channel = await Client4.getChannel(channelId);
             } else if (channelName) {
                 channel = await Client4.getChannelByName(teamId, channelName);
-                member = await Client4.addToChannel(userId, channel.id);
+                if ((channel.type === General.GM_CHANNEL) || (channel.type === General.DM_CHANNEL)) {
+                    member = await Client4.getChannelMember(channel.id, userId);
+                } else {
+                    member = await Client4.addToChannel(userId, channel.id);
+                }
             }
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch);
