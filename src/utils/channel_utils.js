@@ -31,7 +31,7 @@ export function buildDisplayableChannelList(usersState, allChannels, config, myP
     const channels = buildChannels(usersState, allChannels, missingDirectChannels, teammateNameDisplay, locale);
     const favoriteChannels = buildFavoriteChannels(channels, myPreferences, locale);
     const notFavoriteChannels = buildNotFavoriteChannels(channels, myPreferences);
-    const directAndGroupChannels = buildDirectAndGroupChannels(notFavoriteChannels, config, myPreferences, currentUserId, lastPosts);
+    const directAndGroupChannels = buildDirectAndGroupChannels(notFavoriteChannels, config, myPreferences, currentUserId, profiles, lastPosts);
 
     return {
         favoriteChannels,
@@ -51,7 +51,7 @@ export function buildDisplayableChannelListWithUnreadSection(usersState, myChann
     const notUnreadChannels = channels.filter(not(isUnreadChannel.bind(null, myMembers)));
     const favoriteChannels = buildFavoriteChannels(notUnreadChannels, myPreferences, locale);
     const notFavoriteChannels = buildNotFavoriteChannels(notUnreadChannels, myPreferences);
-    const directAndGroupChannels = buildDirectAndGroupChannels(notFavoriteChannels, config, myPreferences, currentUserId, lastPosts);
+    const directAndGroupChannels = buildDirectAndGroupChannels(notFavoriteChannels, config, myPreferences, currentUserId, profiles, lastPosts);
 
     return {
         unreadChannels,
@@ -152,7 +152,12 @@ export function isDirectChannel(channel) {
     return channel.type === General.DM_CHANNEL;
 }
 
-export function isAutoClosed(config, myPreferences, channel, channelActivity) {
+export function isAutoClosed(config, myPreferences, channel, channelActivity, channelArchiveTime) {
+    const openTimePref = myPreferences[`${Preferences.CATEGORY_CHANNEL_OPEN_TIME}--${channel.id}`];
+    const openTime = openTimePref ? parseInt(openTimePref.value, 10) : 0;
+    if (channelArchiveTime && channelArchiveTime > openTime) {
+        return true;
+    }
     if (config.CloseUnusedDirectMessages !== 'true' || isFavoriteChannel(myPreferences, channel.id)) {
         return false;
     }
@@ -162,8 +167,7 @@ export function isAutoClosed(config, myPreferences, channel, channelActivity) {
         if (channelActivity && channelActivity > cutoff) {
             return false;
         }
-        const openTime = myPreferences[`${Preferences.CATEGORY_CHANNEL_OPEN_TIME}--${channel.id}`];
-        if (openTime && parseInt(openTime.value, 10) > cutoff) {
+        if (openTime > cutoff) {
             return false;
         }
         const lastActivity = channel.last_post_at;
@@ -172,10 +176,11 @@ export function isAutoClosed(config, myPreferences, channel, channelActivity) {
     return false;
 }
 
-export function isDirectChannelVisible(userId, config, myPreferences, channel, lastPost) {
-    const channelId = getUserIdFromChannelName(userId, channel.name);
-    const dm = myPreferences[`${Preferences.CATEGORY_DIRECT_CHANNEL_SHOW}--${channelId}`];
-    return !isAutoClosed(config, myPreferences, channel, lastPost ? lastPost.create_at : 0) && dm && dm.value === 'true';
+export function isDirectChannelVisible(otherUserOrOtherUserId, config, myPreferences, channel, lastPost) {
+    const otherUser = typeof otherUserOrOtherUserId === 'object' ? otherUserOrOtherUserId : null;
+    const otherUserId = typeof otherUserOrOtherUserId === 'object' ? otherUserOrOtherUserId.id : otherUserOrOtherUserId;
+    const dm = myPreferences[`${Preferences.CATEGORY_DIRECT_CHANNEL_SHOW}--${otherUserId}`];
+    return !isAutoClosed(config, myPreferences, channel, lastPost ? lastPost.create_at : 0, otherUser ? otherUser.delete_at : 0) && dm && dm.value === 'true';
 }
 
 export function isGroupChannel(channel) {
@@ -489,13 +494,17 @@ function buildNotFavoriteChannels(channels, myPreferences) {
     return channels.filter((channel) => !isFavoriteChannel(myPreferences, channel.id));
 }
 
-function buildDirectAndGroupChannels(channels, config, myPreferences, currentUserId, lastPosts) {
+function buildDirectAndGroupChannels(channels, config, myPreferences, currentUserId, users, lastPosts) {
     return channels.filter((channel) => {
         const lastPost = lastPosts[channel.id];
         if (isGroupChannel(channel) && isGroupChannelVisible(config, myPreferences, channel, lastPost)) {
             return true;
         }
-        return isDirectChannel(channel) && isDirectChannelVisible(currentUserId, config, myPreferences, channel, lastPost);
+        if (!isDirectChannel(channel)) {
+            return false;
+        }
+        const otherUserId = getUserIdFromChannelName(currentUserId, channel.name);
+        return isDirectChannelVisible(users[otherUserId] || otherUserId, config, myPreferences, channel, lastPost);
     });
 }
 

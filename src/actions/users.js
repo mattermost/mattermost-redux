@@ -710,7 +710,7 @@ export function loadProfilesForDirect() {
         const config = state.entities.general.config;
         const {channels, myMembers} = state.entities.channels;
         const {myPreferences} = state.entities.preferences;
-        const {currentUserId} = state.entities.users;
+        const {currentUserId, profiles} = state.entities.users;
 
         const values = Object.values(channels);
         for (let i = 0; i < values.length; i++) {
@@ -721,9 +721,11 @@ export function loadProfilesForDirect() {
             }
 
             if (member) {
-                if (member.mention_count > 0 && isDirectChannel(channel) && !isDirectChannelVisible(currentUserId, config, myPreferences, channel)) {
+                if (member.mention_count > 0 && isDirectChannel(channel)) {
                     const otherUserId = getUserIdFromChannelName(currentUserId, channel.name);
-                    makeDirectChannelVisibleIfNecessary(otherUserId)(dispatch, getState);
+                    if (!isDirectChannelVisible(profiles[otherUserId] || otherUserId, config, myPreferences, channel)) {
+                        makeDirectChannelVisibleIfNecessary(otherUserId)(dispatch, getState);
+                    }
                 } else if ((member.mention_count > 0 || member.msg_count < channel.total_msg_count) &&
                     isGroupChannel(channel) && !isGroupChannelVisible(config, myPreferences, channel)) {
                     makeGroupMessageVisibleIfNecessary(channel.id)(dispatch, getState);
