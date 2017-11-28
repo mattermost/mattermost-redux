@@ -545,7 +545,8 @@ export const getSortedDirectChannelIds = createIdsSelector(
             const channel = channelValues.find((c) => c.name === name); //eslint-disable-line max-nested-callbacks
             if (channel) {
                 const lastPost = lastPosts[channel.id];
-                if (!unreadIds.includes(channel.id) && !favoriteIds.includes(channel.id) && !isAutoClosed(config, preferences, channel, lastPost ? lastPost.create_at : 0)) {
+                const otherUser = profiles[getUserIdFromChannelName(currentUser.id, channel.name)];
+                if (!unreadIds.includes(channel.id) && !favoriteIds.includes(channel.id) && !isAutoClosed(config, preferences, channel, lastPost ? lastPost.create_at : 0, otherUser ? otherUser.delete_at : 0)) {
                     result.push(channel.id);
                 }
             }
