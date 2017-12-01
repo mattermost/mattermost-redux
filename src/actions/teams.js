@@ -24,13 +24,17 @@ async function getProfilesAndStatusesForMembers(userIds, dispatch, getState) {
         }
     });
 
+    const requests = [];
+
     if (profilesToLoad.length) {
-        await getProfilesByIds(profilesToLoad)(dispatch, getState);
+        requests.push(getProfilesByIds(profilesToLoad)(dispatch, getState));
     }
 
     if (statusesToLoad.length) {
-        await getStatusesByIds(statusesToLoad)(dispatch, getState);
+        requests.push(getStatusesByIds(statusesToLoad)(dispatch, getState));
     }
+
+    await Promise.all(requests);
 }
 
 export function selectTeam(team) {
@@ -167,8 +171,11 @@ export function getTeamMember(teamId, userId) {
 
         let member;
         try {
-            member = await Client4.getTeamMember(teamId, userId);
+            const memberRequest = Client4.getTeamMember(teamId, userId);
+
             getProfilesAndStatusesForMembers([userId], dispatch, getState);
+
+            member = await memberRequest;
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch);
             dispatch(batchActions([
@@ -198,8 +205,11 @@ export function getTeamMembersByIds(teamId, userIds) {
 
         let members;
         try {
-            members = await Client4.getTeamMembersByIds(teamId, userIds);
+            const membersRequest = Client4.getTeamMembersByIds(teamId, userIds);
+
             getProfilesAndStatusesForMembers(userIds, dispatch, getState);
+
+            members = await membersRequest;
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch);
             dispatch(batchActions([
@@ -475,9 +485,12 @@ export function joinTeam(inviteId, teamId) {
             return {error};
         }
 
-        await getTeam(teamId)(dispatch, getState);
-        await getMyTeamMembers()(dispatch, getState);
         getMyTeamUnreads()(dispatch, getState);
+
+        await Promise.all([
+            getTeam(teamId)(dispatch, getState),
+            getMyTeamMembers()(dispatch, getState)
+        ]);
 
         dispatch({type: TeamTypes.JOIN_TEAM_SUCCESS}, getState);
         return {data: true};
