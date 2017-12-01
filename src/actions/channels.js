@@ -405,10 +405,12 @@ export function fetchMyChannelsAndMembers(teamId) {
             }
         ]), getState);
 
+        const channelsRequest = Client4.getMyChannels(teamId)
+        const channelMembersRequest = Client4.getMyChannelMembers(teamId);
+
         let channels;
-        let channelMembers;
         try {
-            channels = await Client4.getMyChannels(teamId);
+            channels = await channelsRequest;
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch);
             dispatch(batchActions([
@@ -419,8 +421,9 @@ export function fetchMyChannelsAndMembers(teamId) {
             return {error};
         }
 
+        let channelMembers;
         try {
-            channelMembers = await Client4.getMyChannelMembers(teamId);
+            channelMembers = await channelMembersRequest;
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch);
             dispatch(batchActions([
