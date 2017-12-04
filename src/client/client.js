@@ -213,7 +213,7 @@ export default class Client {
 
     // TODO: add deep linking to emails so we can create accounts from within
     // the mobile app
-    createUserWithInvite = async(user, data, emailHash, inviteId) => {
+    createUserWithInvite = async (user, data, emailHash, inviteId) => {
         let url = `${this.getUsersRoute()}/create`;
 
         url += '?d=' + encodeURIComponent(data);
