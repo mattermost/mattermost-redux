@@ -408,7 +408,7 @@ export function fetchMyChannelsAndMembers(teamId) {
             }
         ]), getState);
 
-        const channelsRequest = Client4.getMyChannels(teamId)
+        const channelsRequest = Client4.getMyChannels(teamId);
         const channelMembersRequest = Client4.getMyChannelMembers(teamId);
 
         let channels;
