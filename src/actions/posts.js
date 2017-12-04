@@ -122,12 +122,8 @@ export function createPost(post, files = []) {
     };
 }
 
-export function resetCreatePost() {
-    return async (dispatch, getState) => {
-        dispatch({type: PostTypes.CREATE_POST_RESET}, getState);
-
-        return {data: true};
-    };
+export function resetCreatePostRequest() {
+    return {type: PostTypes.CREATE_POST_RESET_REQUEST};
 }
 
 export function deletePost(post) {
@@ -971,7 +967,7 @@ export function moveHistoryIndexForward(index) {
 
 export default {
     createPost,
-    resetCreatePost,
+    resetCreatePostRequest,
     editPost,
     deletePost,
     removePost,

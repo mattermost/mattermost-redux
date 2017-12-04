@@ -69,7 +69,7 @@ describe('Actions.Posts', () => {
         assert.ok(found, 'failed to find new post in postsInChannel');
     });
 
-    it('resetCreatePost', async() => {
+    it('resetCreatePostRequest', async() => {
         const channelId = TestHelper.basicChannel.id;
         const post = TestHelper.fakePost(channelId);
         const createPostError = {
@@ -84,7 +84,7 @@ describe('Actions.Posts', () => {
             reply(400, createPostError);
 
         await Actions.createPost(post)(store.dispatch, store.getState);
-        await TestHelper.wait(300);
+        await TestHelper.wait(50);
 
         let state = store.getState();
         let createRequest = state.requests.posts.createPost;
@@ -96,8 +96,8 @@ describe('Actions.Posts', () => {
         assert.equal(createRequest.error.message, createPostError.message);
         assert.equal(createRequest.error.status_code, createPostError.status_code);
 
-        await Actions.resetCreatePost()(store.dispatch, store.getState);
-        await TestHelper.wait(300);
+        store.dispatch(Actions.resetCreatePostRequest());
+        await TestHelper.wait(50);
 
         state = store.getState();
         createRequest = state.requests.posts.createPost;
