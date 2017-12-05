@@ -58,6 +58,8 @@ export function createPost(post, files = []) {
             },
             meta: {
                 offline: {
+                    canTimeout: true,
+                    timeout: 10000,
                     effect: () => Client4.createPost({...newPost, create_at: 0}),
                     commit: (success, payload) => {
                         // Use RECEIVED_POSTS to clear pending posts
