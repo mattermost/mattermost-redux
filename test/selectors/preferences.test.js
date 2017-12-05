@@ -200,6 +200,42 @@ describe('Selectors.Preferences', () => {
             }).sidebarBg, theme.sidebarBg);
         });
 
+        it('mentionBj backwards compatability theme', () => {
+            const currentTeamId = '1234';
+            const theme = {mentionBj: '#ff0000'};
+
+            assert.equal(Selectors.getTheme({
+                entities: {
+                    teams: {
+                        currentTeamId
+                    },
+                    preferences: {
+                        myPreferences: {
+                            [getPreferenceKey(Preferences.CATEGORY_THEME, '')]: {
+                                category: Preferences.CATEGORY_THEME, name: '', value: JSON.stringify(theme)
+                            }
+                        }
+                    }
+                }
+            }).mentionBg, theme.mentionBj);
+
+            theme.mentionBg = '#ff0001';
+            assert.equal(Selectors.getTheme({
+                entities: {
+                    teams: {
+                        currentTeamId
+                    },
+                    preferences: {
+                        myPreferences: {
+                            [getPreferenceKey(Preferences.CATEGORY_THEME, '')]: {
+                                category: Preferences.CATEGORY_THEME, name: '', value: JSON.stringify(theme)
+                            }
+                        }
+                    }
+                }
+            }).mentionBg, theme.mentionBg);
+        });
+
         it('memoization', () => {
             const currentTeamId = '1234';
             const otherTeamId = 'abcd';

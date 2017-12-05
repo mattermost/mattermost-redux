@@ -152,6 +152,11 @@ export const getTheme = createShallowSelector(
             }
         }
 
+        // Backwards compatability with old name
+        if (!theme.mentionBg) {
+            theme.mentionBg = theme.mentionBj;
+        }
+
         return Object.assign({}, Preferences.THEMES.default, theme);
     }
 );
