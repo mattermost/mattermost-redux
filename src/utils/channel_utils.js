@@ -444,7 +444,7 @@ export function isPrivateChannel(channel) {
 }
 
 export function sortChannelsByTypeAndDisplayName(locale, a, b) {
-    if (a.type !== b.type) {
+    if (channelTypeOrder[a.type] !== channelTypeOrder[b.type]) {
         if (channelTypeOrder[a.type] < channelTypeOrder[b.type]) {
             return -1;
         }
