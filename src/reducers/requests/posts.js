@@ -7,6 +7,10 @@ import {PostTypes} from 'action_types';
 import {handleRequest, initialRequestState} from './helpers';
 
 function createPost(state = initialRequestState(), action) {
+    if (action.type === PostTypes.CREATE_POST_RESET_REQUEST) {
+        return initialRequestState();
+    }
+
     return handleRequest(
         PostTypes.CREATE_POST_REQUEST,
         PostTypes.CREATE_POST_SUCCESS,

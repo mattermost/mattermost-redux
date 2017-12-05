@@ -7,6 +7,7 @@ export default keyMirror({
     CREATE_POST_REQUEST: null,
     CREATE_POST_SUCCESS: null,
     CREATE_POST_FAILURE: null,
+    CREATE_POST_RESET_REQUEST: null,
 
     EDIT_POST_REQUEST: null,
     EDIT_POST_SUCCESS: null,

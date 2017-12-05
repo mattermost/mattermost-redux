@@ -124,6 +124,10 @@ export function createPost(post, files = []) {
     };
 }
 
+export function resetCreatePostRequest() {
+    return {type: PostTypes.CREATE_POST_RESET_REQUEST};
+}
+
 export function deletePost(post) {
     return async (dispatch) => {
         const delPost = {...post};
@@ -965,6 +969,7 @@ export function moveHistoryIndexForward(index) {
 
 export default {
     createPost,
+    resetCreatePostRequest,
     editPost,
     deletePost,
     removePost,

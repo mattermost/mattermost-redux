@@ -69,6 +69,46 @@ describe('Actions.Posts', () => {
         assert.ok(found, 'failed to find new post in postsInChannel');
     });
 
+    it('resetCreatePostRequest', async() => {
+        const channelId = TestHelper.basicChannel.id;
+        const post = TestHelper.fakePost(channelId);
+        const createPostError = {
+            message: 'Invalid RootId parameter',
+            server_error_id: 'api.post.create_post.root_id.app_error',
+            status_code: 400,
+            url: 'http://localhost:8065/api/v4/posts'
+        };
+
+        nock(Client4.getPostsRoute()).
+            post('').
+            reply(400, createPostError);
+
+        await Actions.createPost(post)(store.dispatch, store.getState);
+        await TestHelper.wait(50);
+
+        let state = store.getState();
+        let createRequest = state.requests.posts.createPost;
+        if (createRequest.status !== RequestStatus.FAILURE) {
+            throw new Error(JSON.stringify(createRequest.error));
+        }
+
+        assert.equal(createRequest.status, RequestStatus.FAILURE);
+        assert.equal(createRequest.error.message, createPostError.message);
+        assert.equal(createRequest.error.status_code, createPostError.status_code);
+
+        store.dispatch(Actions.resetCreatePostRequest());
+        await TestHelper.wait(50);
+
+        state = store.getState();
+        createRequest = state.requests.posts.createPost;
+        if (createRequest.status === RequestStatus.FAILURE) {
+            throw new Error(JSON.stringify(createRequest.error));
+        }
+
+        assert.equal(createRequest.status, RequestStatus.NOT_STARTED);
+        assert.equal(createRequest.error, null);
+    });
+
     it('createPost with file attachments', async () => {
         const channelId = TestHelper.basicChannel.id;
         const post = TestHelper.fakePost(channelId);
