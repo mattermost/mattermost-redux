@@ -24,12 +24,11 @@ describe('Actions.Websocket', () => {
         store = await configureStore();
         await TestHelper.initBasic(Client4);
 
-        const connUrl = (Client4.getUrl() + '/api/v4/websocket');
-
+        const connUrl = (Client4.getUrl() + '/api/v4/websocket').replace(/^http:/, 'ws:');
         mockServer = new Server(connUrl);
         const webSocketConnector = TestHelper.isLiveServer() ? require('ws') : MockWebSocket;
         return await Actions.init(
-            'ios',
+            'web',
             null,
             null,
             webSocketConnector
