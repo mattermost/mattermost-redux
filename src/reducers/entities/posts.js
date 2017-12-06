@@ -33,13 +33,17 @@ function handleReceivedPost(posts = {}, postsInChannel = {}, action) {
 
 function handleReceivedPosts(posts = {}, postsInChannel = {}, action) {
     const newPosts = action.data.posts;
-    const channelId = action.channelId;
     const skipAddToChannel = action.skipAddToChannel;
 
     // Change the state only if we have new posts,
     // otherwise there's no need to create a new object for the same state.
     if (!Object.keys(newPosts).length) {
         return {posts, postsInChannel};
+    }
+
+    let channelId = action.channelId;
+    if (!channelId) {
+        channelId = Object.values(newPosts)[0].channel_id;
     }
 
     const nextPosts = {...posts};
