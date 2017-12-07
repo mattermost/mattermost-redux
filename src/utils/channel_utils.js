@@ -149,23 +149,25 @@ export function getUserIdFromChannelName(userId, channelName) {
 }
 
 export function isAutoClosed(config, myPreferences, channel, channelActivity, channelArchiveTime) {
+    const cutoff = new Date().getTime() - (7 * 24 * 60 * 60 * 1000);
+
+    const viewTimePref = myPreferences[`${Preferences.CATEGORY_CHANNEL_APPROXIMATE_VIEW_TIME}--${channel.id}`];
+    const viewTime = viewTimePref ? parseInt(viewTimePref.value, 10) : 0;
+    if (viewTime > cutoff) {
+        return false;
+    }
+
     const openTimePref = myPreferences[`${Preferences.CATEGORY_CHANNEL_OPEN_TIME}--${channel.id}`];
     const openTime = openTimePref ? parseInt(openTimePref.value, 10) : 0;
     if (channelArchiveTime && channelArchiveTime > openTime) {
         return true;
     }
+
     if (config.CloseUnusedDirectMessages !== 'true' || isFavoriteChannel(myPreferences, channel.id)) {
         return false;
     }
     const autoClose = myPreferences[`${Preferences.CATEGORY_SIDEBAR_SETTINGS}--close_unused_direct_messages`];
     if (!autoClose || autoClose.value === 'after_seven_days') {
-        const cutoff = new Date().getTime() - (7 * 24 * 60 * 60 * 1000);
-
-        const viewTimePref = myPreferences[`${Preferences.CATEGORY_CHANNEL_APPROXIMATE_VIEW_TIME}--${channel.id}`];
-        const viewTime = viewTimePref ? parseInt(viewTimePref.value, 10) : 0;
-        if (viewTime > cutoff) {
-            return false;
-        }
         if (channelActivity && channelActivity > cutoff) {
             return false;
         }
