@@ -2,7 +2,8 @@
 // See License.txt for license information.
 
 import {createSelector} from 'reselect';
-import {getCurrentTeamId} from './teams';
+
+import {getCurrentTeamId} from 'selectors/entities/teams';
 
 export function getIncomingHooks(state) {
     return state.entities.integrations.incomingHooks;

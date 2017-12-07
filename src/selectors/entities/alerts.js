@@ -2,6 +2,7 @@
 // See License.txt for license information.
 
 import {createSelector} from 'reselect';
+
 import {Alerts} from 'constants';
 
 export function getAlerts(state) {

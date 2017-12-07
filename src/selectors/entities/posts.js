@@ -3,8 +3,8 @@
 
 import {createSelector} from 'reselect';
 
+import {getCurrentUser} from 'selectors/entities/common';
 import {getMyPreferences} from 'selectors/entities/preferences';
-import {getCurrentUser} from 'selectors/entities/users';
 import {createIdsSelector} from 'utils/helpers';
 
 import {Posts, Preferences} from 'constants';
@@ -350,22 +350,27 @@ export function makeGetPostsForIds() {
     );
 }
 
-export function getLastPostPerChannel(state) {
-    const {posts: allPosts, postsInChannel: allChannels} = state.entities.posts;
-    const ret = {};
-    for (const channelId in allChannels) {
-        if (allChannels.hasOwnProperty(channelId)) {
-            const channelPosts = allChannels[channelId];
-            if (channelPosts.length > 0) {
-                const postId = channelPosts[0];
-                if (allPosts.hasOwnProperty(postId)) {
-                    ret[channelId] = allPosts[postId];
+export const getLastPostPerChannel = createSelector(
+    getAllPosts,
+    (state) => state.entities.posts.postsInChannel,
+    (allPosts, allChannels) => {
+        const ret = {};
+
+        for (const channelId in allChannels) {
+            if (allChannels.hasOwnProperty(channelId)) {
+                const channelPosts = allChannels[channelId];
+                if (channelPosts.length > 0) {
+                    const postId = channelPosts[0];
+                    if (allPosts.hasOwnProperty(postId)) {
+                        ret[channelId] = allPosts[postId];
+                    }
                 }
             }
         }
+
+        return ret;
     }
-    return ret;
-}
+);
 
 export const getMostRecentPostIdInChannel = createSelector(
     getAllPosts,
