@@ -3,15 +3,22 @@
 
 import {createSelector} from 'reselect';
 
-import {getCurrentChannelId, getMyCurrentChannelMembership} from './channels';
-import {getCurrentTeamId, getCurrentTeamMembership} from './teams';
-import {getDirectShowPreferences} from './preferences';
+import {
+    getCurrentChannelId,
+    getCurrentUser,
+    getCurrentUserId,
+    getUsers
+} from 'selectors/entities/common';
+import {getMyCurrentChannelMembership} from 'selectors/entities/channels';
+import {getDirectShowPreferences} from 'selectors/entities/preferences';
 
 import {filterProfilesMatchingTerm, sortByUsername, isSystemAdmin} from 'utils/user_utils';
 
-export function getCurrentUserId(state) {
-    return state.entities.users.currentUserId;
-}
+export {
+    getCurrentUserId,
+    getCurrentUser,
+    getUsers
+};
 
 export function getUserIdsInChannels(state) {
     return state.entities.users.profilesInChannel;
@@ -39,10 +46,6 @@ export function getUserStatuses(state) {
 
 export function getUser(state, id) {
     return state.entities.users.profiles[id];
-}
-
-export function getUsers(state) {
-    return state.entities.users.profiles;
 }
 
 export const getUsersByUsername = createSelector(
@@ -82,10 +85,6 @@ export function getUserByEmail(state, email) {
     return getUsersByEmail(state)[email];
 }
 
-export function getCurrentUser(state) {
-    return state.entities.users.profiles[getCurrentUserId(state)];
-}
-
 export const isCurrentUserSystemAdmin = createSelector(
     getCurrentUser,
     (user) => {
@@ -96,7 +95,7 @@ export const isCurrentUserSystemAdmin = createSelector(
 
 export const getCurrentUserRoles = createSelector(
     getMyCurrentChannelMembership,
-    getCurrentTeamMembership,
+    (state) => state.entities.teams.myMembers[state.entities.teams.currentTeamId],
     getCurrentUser,
     (currentChannelMembership, currentTeamMembership, currentUser) => {
         let roles = '';
@@ -164,7 +163,7 @@ export const getProfileSetNotInCurrentChannel = createSelector(
 );
 
 export const getProfileSetInCurrentTeam = createSelector(
-    getCurrentTeamId,
+    (state) => state.entities.teams.currentTeamId,
     getUserIdsInTeams,
     (currentTeam, teamProfiles) => {
         return teamProfiles[currentTeam];
@@ -172,7 +171,7 @@ export const getProfileSetInCurrentTeam = createSelector(
 );
 
 export const getProfileSetNotInCurrentTeam = createSelector(
-    getCurrentTeamId,
+    (state) => state.entities.teams.currentTeamId,
     getUserIdsNotInTeams,
     (currentTeam, teamProfiles) => {
         return teamProfiles[currentTeam];

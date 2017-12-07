@@ -3,6 +3,13 @@
 
 import {createSelector} from 'reselect';
 
+import {General} from 'constants';
+
+import {
+    getCurrentChannelId,
+    getCurrentUser,
+    getUsers
+} from 'selectors/entities/common';
 import {getConfig, getLicense} from 'selectors/entities/general';
 import {
     getFavoritesPreferences,
@@ -13,7 +20,7 @@ import {
 } from 'selectors/entities/preferences';
 import {getLastPostPerChannel} from 'selectors/entities/posts';
 import {getCurrentTeamId, getCurrentTeamMembership} from 'selectors/entities/teams';
-import {getCurrentUser, getUsers} from 'selectors/entities/users';
+
 import {
     buildDisplayableChannelList,
     buildDisplayableChannelListWithUnreadSection,
@@ -29,7 +36,9 @@ import {
 } from 'utils/channel_utils';
 import {createIdsSelector} from 'utils/helpers';
 
-import {General} from 'constants';
+export {
+    getCurrentChannelId
+};
 
 export function getAllChannels(state) {
     return state.entities.channels.channels;
@@ -43,13 +52,12 @@ export function getChannelsInTeam(state) {
     return state.entities.channels.channelsInTeam;
 }
 
-export function getDirectChannelsSet(state) {
-    return state.entities.channels.channelsInTeam[''] || new Set();
-}
-
-export function getCurrentChannelId(state) {
-    return state.entities.channels.currentChannelId;
-}
+export const getDirectChannelsSet = createSelector(
+    getChannelsInTeam,
+    (channelsInTeam) => {
+        return channelsInTeam[''] || new Set();
+    }
+);
 
 export function getMyChannelMemberships(state) {
     return state.entities.channels.myMembers;

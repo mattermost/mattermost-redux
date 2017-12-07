@@ -3,8 +3,8 @@
 
 import {createSelector} from 'reselect';
 
+import {getCurrentUser} from 'selectors/entities/common';
 import {getMyPreferences} from 'selectors/entities/preferences';
-import {getCurrentUser} from 'selectors/entities/users';
 import {createIdsSelector} from 'utils/helpers';
 
 import {Posts, Preferences} from 'constants';

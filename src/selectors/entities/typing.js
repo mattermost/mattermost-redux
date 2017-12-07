@@ -2,9 +2,13 @@
 // See License.txt for license information.
 
 import {createSelector} from 'reselect';
-import {getCurrentChannelId} from './channels';
-import {getTeammateNameDisplaySetting} from './preferences';
-import {getUsers} from './users';
+
+import {
+    getCurrentChannelId,
+    getUsers
+} from 'selectors/entities/common';
+import {getTeammateNameDisplaySetting} from 'selectors/entities/preferences';
+
 import {displayUsername} from 'utils/user_utils';
 
 export const getUsersTyping = createSelector(
