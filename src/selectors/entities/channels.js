@@ -604,15 +604,14 @@ export const getSortedDirectChannelIds = createIdsSelector(
     filterUnreadChannels
 );
 
-export const getGroupOrDirectChannelVisibility = createSelector(
-    getChannel,
-    getMyChannelMemberships,
-    getConfig,
-    getMyPreferences,
-    getCurrentUser,
-    getUsers,
-    getLastPostPerChannel,
-    (channel, memberships, config, myPreferences, currentUser, users, lastPosts) => {
-        return isGroupOrDirectChannelVisible(channel, memberships, config, myPreferences, currentUser.id, users, lastPosts);
-    }
-);
+export function getGroupOrDirectChannelVisibility(state, channelId) {
+    return isGroupOrDirectChannelVisible(
+        getChannel(state, channelId),
+        getMyChannelMemberships(state),
+        getConfig(state),
+        getMyPreferences(state),
+        getCurrentUser(state).id,
+        getUsers(state),
+        getLastPostPerChannel(state)
+    );
+}
