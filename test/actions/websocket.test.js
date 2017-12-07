@@ -457,6 +457,11 @@ describe('Actions.Websocket', () => {
             } else {
                 store.dispatch({type: ChannelTypes.RECEIVED_CHANNEL, data: {id: TestHelper.generateId(), name: General.DEFAULT_CHANNEL, team_id: TestHelper.basicTeam.id}});
                 store.dispatch({type: ChannelTypes.RECEIVED_CHANNEL, data: TestHelper.basicChannel});
+
+                nock(Client4.getUserRoute('me')).
+                    get(`/teams/${TestHelper.basicTeam.id}/channels/members`).
+                    reply(201, [{user_id: TestHelper.basicUser.id, channel_id: TestHelper.basicChannel.id}]);
+
                 mockServer.send(JSON.stringify({event: WebsocketEvents.CHANNEL_DELETED, data: {channel_id: TestHelper.basicChannel.id}, broadcast: {omit_users: null, user_id: '', channel_id: '', team_id: TestHelper.basicTeam.id}, seq: 68}));
             }
 
@@ -489,6 +494,10 @@ describe('Actions.Websocket', () => {
                 await client.createDirectChannel([user.id, TestHelper.basicUser.id]);
             } else {
                 const channel = {id: TestHelper.generateId(), name: TestHelper.basicUser.id + '__' + TestHelper.generateId(), type: 'D'};
+
+                nock(Client4.getChannelsRoute()).
+                    get(`/${channel.id}/members/me`).
+                    reply(201, {user_id: TestHelper.basicUser.id, channel_id: channel.id});
 
                 mockServer.send(JSON.stringify({event: WebsocketEvents.DIRECT_ADDED, data: {teammate_id: 'btaxe5msnpnqurayosn5p8twuw'}, broadcast: {omit_users: null, user_id: '', channel_id: channel.id, team_id: ''}, seq: 2}));
                 store.dispatch({type: ChannelTypes.RECEIVED_CHANNEL, data: channel});
