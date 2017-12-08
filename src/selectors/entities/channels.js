@@ -393,6 +393,12 @@ export const getUnreadChannelIds = createIdsSelector(
     }
 );
 
+function filterUnreadChannels(unreadIds, channelIds) {
+    return channelIds.filter((id) => {
+        return !unreadIds.includes(id);
+    });
+}
+
 export const getSortedUnreadChannelIds = createIdsSelector(
     getCurrentUser,
     getUsers,
@@ -435,18 +441,17 @@ export const getSortedUnreadChannelIds = createIdsSelector(
     }
 );
 
-export const getSortedFavoriteChannelIds = createIdsSelector(
+export const getSortedFavoriteChannelWithUnreadsIds = createIdsSelector(
     getCurrentUser,
     getUsers,
     getAllChannels,
     getMyChannelMemberships,
     getFavoritesPreferences,
     getChannelIdsForCurrentTeam,
-    getUnreadChannelIds,
     getTeammateNameDisplaySetting,
     getConfig,
     getMyPreferences,
-    (currentUser, profiles, channels, myMembers, favoriteIds, teamChannelIds, unreadIds, settings, config, prefs) => {
+    (currentUser, profiles, channels, myMembers, favoriteIds, teamChannelIds, settings, config, prefs) => {
         if (!currentUser) {
             return [];
         }
@@ -465,7 +470,7 @@ export const getSortedFavoriteChannelIds = createIdsSelector(
                 return false;
             }
 
-            return !unreadIds.includes(id) && teamChannelIds.includes(id);
+            return teamChannelIds.includes(id);
         }).map((id) => {
             const c = channels[id];
             if (c.type === General.DM_CHANNEL || c.type === General.GM_CHANNEL) {
@@ -478,14 +483,19 @@ export const getSortedFavoriteChannelIds = createIdsSelector(
     }
 );
 
-export const getSortedPublicChannelIds = createIdsSelector(
+export const getSortedFavoriteChannelIds = createIdsSelector(
+    getUnreadChannelIds,
+    getSortedFavoriteChannelWithUnreadsIds,
+    filterUnreadChannels
+);
+
+export const getSortedPublicChannelWithUnreadsIds = createIdsSelector(
     getCurrentUser,
     getAllChannels,
     getMyChannelMemberships,
     getChannelIdsForCurrentTeam,
-    getUnreadChannelIds,
     getSortedFavoriteChannelIds,
-    (currentUser, channels, myMembers, teamChannelIds, unreadIds, favoriteIds) => {
+    (currentUser, channels, myMembers, teamChannelIds, favoriteIds) => {
         if (!currentUser) {
             return [];
         }
@@ -496,21 +506,26 @@ export const getSortedPublicChannelIds = createIdsSelector(
                 return false;
             }
             const channel = channels[id];
-            return !unreadIds.includes(id) && !favoriteIds.includes(id) &&
+            return !favoriteIds.includes(id) &&
                 teamChannelIds.includes(id) && channel.type === General.OPEN_CHANNEL;
         }).map((id) => channels[id]).sort(sortChannelsByDisplayName.bind(null, locale));
         return publicChannels.map((c) => c.id);
     }
 );
 
-export const getSortedPrivateChannelIds = createIdsSelector(
+export const getSortedPublicChannelIds = createIdsSelector(
+    getUnreadChannelIds,
+    getSortedPublicChannelWithUnreadsIds,
+    filterUnreadChannels
+);
+
+export const getSortedPrivateChannelWithUnreadsIds = createIdsSelector(
     getCurrentUser,
     getAllChannels,
     getMyChannelMemberships,
     getChannelIdsForCurrentTeam,
-    getUnreadChannelIds,
     getSortedFavoriteChannelIds,
-    (currentUser, channels, myMembers, teamChannelIds, unreadIds, favoriteIds) => {
+    (currentUser, channels, myMembers, teamChannelIds, favoriteIds) => {
         if (!currentUser) {
             return [];
         }
@@ -521,26 +536,31 @@ export const getSortedPrivateChannelIds = createIdsSelector(
                 return false;
             }
             const channel = channels[id];
-            return !unreadIds.includes(id) && !favoriteIds.includes(id) &&
-                teamChannelIds.includes(id) && channel.type === General.PRIVATE_CHANNEL;
+            return !favoriteIds.includes(id) && teamChannelIds.includes(id) &&
+                channel.type === General.PRIVATE_CHANNEL;
         }).map((id) => channels[id]).sort(sortChannelsByDisplayName.bind(null, locale));
         return publicChannels.map((c) => c.id);
     }
 );
 
-export const getSortedDirectChannelIds = createIdsSelector(
+export const getSortedPrivateChannelIds = createIdsSelector(
+    getUnreadChannelIds,
+    getSortedPrivateChannelWithUnreadsIds,
+    filterUnreadChannels
+);
+
+export const getSortedDirectChannelWithUnreadsIds = createIdsSelector(
     getCurrentUser,
     getUsers,
     getAllChannels,
     getVisibleTeammate,
     getVisibleGroupIds,
-    getUnreadChannelIds,
     getSortedFavoriteChannelIds,
     getTeammateNameDisplaySetting,
     getConfig,
     getMyPreferences,
     getLastPostPerChannel,
-    (currentUser, profiles, channels, teammates, groupIds, unreadIds, favoriteIds, settings, config, preferences, lastPosts) => {
+    (currentUser, profiles, channels, teammates, groupIds, favoriteIds, settings, config, preferences, lastPosts) => {
         if (!currentUser) {
             return [];
         }
@@ -554,7 +574,7 @@ export const getSortedDirectChannelIds = createIdsSelector(
             if (channel) {
                 const lastPost = lastPosts[channel.id];
                 const otherUser = profiles[getUserIdFromChannelName(currentUser.id, channel.name)];
-                if (!unreadIds.includes(channel.id) && !favoriteIds.includes(channel.id) && !isAutoClosed(config, preferences, channel, lastPost ? lastPost.create_at : 0, otherUser ? otherUser.delete_at : 0)) {
+                if (!favoriteIds.includes(channel.id) && !isAutoClosed(config, preferences, channel, lastPost ? lastPost.create_at : 0, otherUser ? otherUser.delete_at : 0)) {
                     result.push(channel.id);
                 }
             }
@@ -564,7 +584,7 @@ export const getSortedDirectChannelIds = createIdsSelector(
             const channel = channels[id];
             if (channel) {
                 const lastPost = lastPosts[channel.id];
-                return !unreadIds.includes(id) && !favoriteIds.includes(id) && !isAutoClosed(config, preferences, channels[id], lastPost ? lastPost.create_at : 0);
+                return !favoriteIds.includes(id) && !isAutoClosed(config, preferences, channels[id], lastPost ? lastPost.create_at : 0);
             }
 
             return false;
@@ -574,4 +594,10 @@ export const getSortedDirectChannelIds = createIdsSelector(
         }).sort(sortChannelsByDisplayName.bind(null, locale));
         return directChannels.map((c) => c.id);
     }
+);
+
+export const getSortedDirectChannelIds = createIdsSelector(
+    getUnreadChannelIds,
+    getSortedDirectChannelWithUnreadsIds,
+    filterUnreadChannels
 );
