@@ -28,7 +28,7 @@ describe('Actions.Websocket', () => {
         mockServer = new Server(connUrl);
         const webSocketConnector = TestHelper.isLiveServer() ? require('ws') : MockWebSocket;
         return await Actions.init(
-            'ios',
+            'web',
             null,
             null,
             webSocketConnector

@@ -55,18 +55,20 @@ export function init(platform, siteUrl, token, optionalWebSocket) {
         const authToken = token || Client4.getToken();
 
         // replace the protocol with a websocket one
-        if (connUrl.startsWith('https:')) {
-            connUrl = connUrl.replace(/^https:/, 'wss:');
-        } else {
-            connUrl = connUrl.replace(/^http:/, 'ws:');
-        }
-
-        // append a port number if one isn't already specified
-        if (!(/:\d+$/).test(connUrl)) {
-            if (connUrl.startsWith('wss:')) {
-                connUrl += ':' + (config.WebsocketSecurePort || 443);
+        if (platform !== 'ios' && platform !== 'android') {
+            if (connUrl.startsWith('https:')) {
+                connUrl = connUrl.replace(/^https:/, 'wss:');
             } else {
-                connUrl += ':' + (config.WebsocketPort || 80);
+                connUrl = connUrl.replace(/^http:/, 'ws:');
+            }
+
+            // append a port number if one isn't already specified
+            if (!(/:\d+$/).test(connUrl)) {
+                if (connUrl.startsWith('wss:')) {
+                    connUrl += ':' + (config.WebsocketSecurePort || 443);
+                } else {
+                    connUrl += ':' + (config.WebsocketPort || 80);
+                }
             }
         }
 
