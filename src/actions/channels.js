@@ -662,6 +662,18 @@ export function deleteChannel(channelId) {
 
 export function viewChannel(channelId, prevChannelId = '') {
     return async (dispatch, getState) => {
+        const {currentUserId} = getState().entities.users;
+
+        const {myPreferences} = getState().entities.preferences;
+        const viewTimePref = myPreferences[`${Preferences.CATEGORY_CHANNEL_APPROXIMATE_VIEW_TIME}--${channelId}`];
+        const viewTime = viewTimePref ? parseInt(viewTimePref.value, 10) : 0;
+        if (viewTime < new Date().getTime() - (3 * 60 * 60 * 1000)) {
+            const preferences = [
+                {user_id: currentUserId, category: Preferences.CATEGORY_CHANNEL_APPROXIMATE_VIEW_TIME, name: channelId, value: new Date().getTime().toString()}
+            ];
+            savePreferences(currentUserId, preferences)(dispatch, getState);
+        }
+
         dispatch({type: ChannelTypes.UPDATE_LAST_VIEWED_REQUEST}, getState);
 
         try {

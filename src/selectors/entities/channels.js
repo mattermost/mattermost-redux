@@ -32,7 +32,8 @@ import {
     getDirectChannelName,
     isAutoClosed,
     isDirectChannelVisible,
-    isGroupChannelVisible
+    isGroupChannelVisible,
+    isGroupOrDirectChannelVisible
 } from 'utils/channel_utils';
 import {createIdsSelector} from 'utils/helpers';
 
@@ -235,19 +236,20 @@ export const getOtherChannels = createSelector(
 export const getChannelsByCategory = createSelector(
     getCurrentChannelId,
     getMyChannels,
+    getMyChannelMemberships,
     getConfig,
     getMyPreferences,
     getTeammateNameDisplaySetting,
     (state) => state.entities.users,
     getLastPostPerChannel,
-    (currentChannelId, channels, config, myPreferences, teammateNameDisplay, usersState, lastPosts) => {
+    (currentChannelId, channels, myMembers, config, myPreferences, teammateNameDisplay, usersState, lastPosts) => {
         const allChannels = channels.map((c) => {
             const channel = {...c};
             channel.isCurrent = c.id === currentChannelId;
             return channel;
         });
 
-        return buildDisplayableChannelList(usersState, allChannels, config, myPreferences, teammateNameDisplay, lastPosts);
+        return buildDisplayableChannelList(usersState, allChannels, myMembers, config, myPreferences, teammateNameDisplay, lastPosts);
     }
 );
 
@@ -601,3 +603,15 @@ export const getSortedDirectChannelIds = createIdsSelector(
     getSortedDirectChannelWithUnreadsIds,
     filterUnreadChannels
 );
+
+export function getGroupOrDirectChannelVisibility(state, channelId) {
+    return isGroupOrDirectChannelVisible(
+        getChannel(state, channelId),
+        getMyChannelMemberships(state),
+        getConfig(state),
+        getMyPreferences(state),
+        getCurrentUser(state).id,
+        getUsers(state),
+        getLastPostPerChannel(state)
+    );
+}
