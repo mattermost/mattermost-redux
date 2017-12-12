@@ -365,8 +365,11 @@ export function getChannelAndMyMember(channelId) {
         let channel;
         let member;
         try {
-            channel = await Client4.getChannel(channelId);
-            member = await Client4.getMyChannelMember(channelId);
+            const channelRequest = Client4.getChannel(channelId);
+            const memberRequest = Client4.getMyChannelMember(channelId);
+
+            channel = await channelRequest;
+            member = await memberRequest;
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch);
             dispatch(batchActions([
@@ -405,10 +408,12 @@ export function fetchMyChannelsAndMembers(teamId) {
             }
         ]), getState);
 
+        const channelsRequest = Client4.getMyChannels(teamId);
+        const channelMembersRequest = Client4.getMyChannelMembers(teamId);
+
         let channels;
-        let channelMembers;
         try {
-            channels = await Client4.getMyChannels(teamId);
+            channels = await channelsRequest;
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch);
             dispatch(batchActions([
@@ -419,8 +424,9 @@ export function fetchMyChannelsAndMembers(teamId) {
             return {error};
         }
 
+        let channelMembers;
         try {
-            channelMembers = await Client4.getMyChannelMembers(teamId);
+            channelMembers = await channelMembersRequest;
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch);
             dispatch(batchActions([
@@ -761,7 +767,7 @@ export function getChannels(teamId, page = 0, perPage = General.CHANNELS_CHUNK_S
             {
                 type: ChannelTypes.RECEIVED_CHANNELS,
                 teamId,
-                data: await channels
+                data: channels
             },
             {
                 type: ChannelTypes.GET_CHANNELS_SUCCESS
@@ -792,7 +798,7 @@ export function searchChannels(teamId, term) {
             {
                 type: ChannelTypes.RECEIVED_CHANNELS,
                 teamId,
-                data: await channels
+                data: channels
             },
             {
                 type: ChannelTypes.GET_CHANNELS_SUCCESS
@@ -1182,7 +1188,7 @@ export function favoriteChannel(channelId) {
 
         Client4.trackEvent('action', 'action_channels_favorite');
 
-        return await savePreferences(currentUserId, [preference])(dispatch, getState);
+        return savePreferences(currentUserId, [preference])(dispatch, getState);
     };
 }
 
@@ -1197,7 +1203,7 @@ export function unfavoriteChannel(channelId) {
 
         Client4.trackEvent('action', 'action_channels_unfavorite');
 
-        return await deletePreferences(currentUserId, [preference])(dispatch, getState);
+        return deletePreferences(currentUserId, [preference])(dispatch, getState);
     };
 }
 

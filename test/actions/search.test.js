@@ -49,9 +49,14 @@ describe('Actions.Search', () => {
 
         // Test for a couple of words
         const search1 = 'try word';
+
         nock(Client4.getTeamsRoute()).
             post(`/${TestHelper.basicTeam.id}/posts/search`).
             reply(200, {order: [post1.id], posts: {[post1.id]: post1}});
+        nock(Client4.getChannelsRoute()).
+            get(`/${TestHelper.basicChannel.id}/members/me`).
+            reply(201, {user_id: TestHelper.basicUser.id, channel_id: TestHelper.basicChannel.id});
+
         await Actions.searchPosts(TestHelper.basicTeam.id, search1)(dispatch, getState);
 
         let state = getState();
@@ -66,9 +71,14 @@ describe('Actions.Search', () => {
 
         // Test for posts from a user in a channel
         const search2 = `from: ${TestHelper.basicUser.username} in: ${TestHelper.basicChannel.name}`;
-        nock(Client4.getTeamsRoute()).
+
+        nock(Client4.getTeamsRoute(), `/${TestHelper.basicTeam.id}/posts/search`).
             post(`/${TestHelper.basicTeam.id}/posts/search`).
             reply(200, {order: [post1.id, post2.id, TestHelper.basicPost.id], posts: {[post1.id]: post1, [TestHelper.basicPost.id]: TestHelper.basicPost, [post2.id]: post2}});
+        nock(Client4.getChannelsRoute()).
+            get(`/${TestHelper.basicChannel.id}/members/me`).
+            reply(201, {user_id: TestHelper.basicUser.id, channel_id: TestHelper.basicChannel.id});
+
         await Actions.searchPosts(
             TestHelper.basicTeam.id,
             search2

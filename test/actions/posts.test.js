@@ -69,7 +69,7 @@ describe('Actions.Posts', () => {
         assert.ok(found, 'failed to find new post in postsInChannel');
     });
 
-    it('resetCreatePostRequest', async() => {
+    it('resetCreatePostRequest', async () => {
         const channelId = TestHelper.basicChannel.id;
         const post = TestHelper.fakePost(channelId);
         const createPostError = {

@@ -384,8 +384,10 @@ function handleUpdateTeamEvent(msg, dispatch, getState) {
 }
 
 async function handleTeamAddedEvent(msg, dispatch, getState) {
-    await getTeam(msg.data.team_id)(dispatch, getState);
-    await getMyTeamUnreads()(dispatch, getState);
+    await Promise.all([
+        getTeam(msg.data.team_id)(dispatch, getState),
+        getMyTeamUnreads()(dispatch, getState)
+    ]);
 }
 
 function handleUserAddedEvent(msg, dispatch, getState) {

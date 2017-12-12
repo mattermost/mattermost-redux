@@ -143,8 +143,11 @@ function completeLogin(data) {
 
         let teamMembers;
         try {
-            teamMembers = await Client4.getMyTeamMembers();
-            const teamUnreads = await Client4.getMyTeamUnreads();
+            const membersRequest = Client4.getMyTeamMembers();
+            const unreadsRequest = Client4.getMyTeamUnreads();
+
+            teamMembers = await membersRequest;
+            const teamUnreads = await unreadsRequest;
 
             if (teamUnreads) {
                 for (const u of teamUnreads) {
@@ -185,7 +188,7 @@ function completeLogin(data) {
         dispatch(batchActions([
             {
                 type: TeamTypes.RECEIVED_MY_TEAM_MEMBERS,
-                data: await teamMembers
+                data: teamMembers
             },
             {
                 type: UserTypes.LOGIN_SUCCESS

@@ -1334,7 +1334,7 @@ describe('Actions.Channels', () => {
             TestHelper.basicUser.id,
             TestHelper.basicTeam.id,
             channelId
-            )(store.dispatch, store.getState);
+        )(store.dispatch, store.getState);
 
         nock(Client4.getChannelsRoute()).
             get(`/${TestHelper.basicChannel.id}/stats`).
@@ -1532,7 +1532,7 @@ describe('Actions.Channels', () => {
         test();
     });
 
-    it('leave private channel', async() => {
+    it('leave private channel', async () => {
         const newChannel = {
             team_id: TestHelper.basicTeam.id,
             name: 'redux-test-private',

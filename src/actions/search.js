@@ -38,8 +38,11 @@ export function searchPosts(teamId, terms, isOrSearch = false) {
         let posts;
         try {
             posts = await Client4.searchPosts(teamId, terms, isOrSearch);
-            await getProfilesAndStatusesForPosts(posts.posts, dispatch, getState);
-            await getMissingChannelsFromPosts(posts.posts)(dispatch, getState);
+
+            await Promise.all([
+                getProfilesAndStatusesForPosts(posts.posts, dispatch, getState),
+                getMissingChannelsFromPosts(posts.posts)(dispatch, getState)
+            ]);
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch);
             dispatch(batchActions([
