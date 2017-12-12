@@ -72,6 +72,16 @@ export function getTeam(teamId) {
     );
 }
 
+export function getTeamByName(teamName) {
+    return bindClientFunc(
+        Client4.getTeamByName,
+        TeamTypes.GET_TEAM_REQUEST,
+        [TeamTypes.RECEIVED_TEAM, TeamTypes.GET_TEAM_SUCCESS],
+        TeamTypes.GET_TEAM_FAILURE,
+        teamName
+    );
+}
+
 export function getTeams(page = 0, perPage = General.TEAMS_CHUNK_SIZE) {
     return bindClientFunc(
         Client4.getTeams,
