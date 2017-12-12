@@ -286,6 +286,8 @@ export default class Client4 {
     }
 
     patchUser = async (userId, user) => {
+        this.trackEvent('api', 'api_users_patch');
+
         return this.doFetch(
             `${this.getUserRoute(userId)}/patch`,
             {method: 'put', body: JSON.stringify(user)}
@@ -809,6 +811,8 @@ export default class Client4 {
     };
 
     getTeamByName = async (teamName) => {
+        this.trackEvent('api', 'api_teams_get_team_by_name');
+
         return this.doFetch(
             this.getTeamNameRoute(teamName),
             {method: 'get'}
