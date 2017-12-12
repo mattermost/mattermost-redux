@@ -122,6 +122,29 @@ describe('Actions.Teams', () => {
         assert.ok(teams[team.id]);
     });
 
+    it('getTeamByName', async () => {
+        nock(Client4.getTeamsRoute()).
+            post('').
+            reply(201, TestHelper.fakeTeamWithId());
+        const team = await Client4.createTeam(TestHelper.fakeTeam());
+
+        nock(Client4.getTeamsRoute()).
+            get(`/name/${team.name}`).
+            reply(200, team);
+        await Actions.getTeamByName(team.name)(store.dispatch, store.getState);
+
+        const state = store.getState();
+        const {getTeam: teamRequest} = state.requests.teams;
+        const {teams} = state.entities.teams;
+
+        if (teamRequest.status === RequestStatus.FAILURE) {
+            throw new Error(JSON.stringify(teamRequest.error));
+        }
+
+        assert.ok(teams);
+        assert.ok(teams[team.id]);
+    });
+
     it('createTeam', async () => {
         nock(Client4.getTeamsRoute()).
             post('').
