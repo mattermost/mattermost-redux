@@ -801,6 +801,13 @@ export default class Client4 {
         );
     };
 
+    getTeamByName = async (teamName) => {
+        return this.doFetch(
+            this.getTeamNameRoute(teamName),
+            {method: 'get'}
+        );
+    };
+
     getMyTeams = async () => {
         return this.doFetch(
             `${this.getUserRoute('me')}/teams`,
