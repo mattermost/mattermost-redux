@@ -285,6 +285,13 @@ export default class Client4 {
         );
     }
 
+    patchUser = async (userId, user) => {
+        return this.doFetch(
+            `${this.getUserRoute(userId)}/patch`,
+            {method: 'put', body: JSON.stringify(user)}
+        );
+    }
+
     updateUser = async (user) => {
         this.trackEvent('api', 'api_users_update');
 
