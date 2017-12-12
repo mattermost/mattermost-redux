@@ -955,19 +955,6 @@ export function patchUser(userId, user) {
         ]), getState);
 
         return {data};
-
-        // const actions = [
-        //     {type: UserTypes.UPDATE_USER_SUCCESS}
-        // ];
-
-        // const profile = getState().entities.users.profiles[userId];
-        // if (profile) {
-        //     actions.push({type: UserTypes.RECEIVED_PROFILE, data: {...profile}});
-        // }
-
-        // dispatch(batchActions(actions), getState);
-
-        // return {data};
     };
 }
 
