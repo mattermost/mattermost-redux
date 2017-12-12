@@ -937,6 +937,40 @@ export function updateMe(user) {
     };
 }
 
+export function patchUser(userId, user) {
+    return async (dispatch, getState) => {
+        dispatch({type: UserTypes.UPDATE_USER_REQUEST}, getState);
+
+        let data;
+        try {
+            data = await Client4.patchUser(userId, user);
+        } catch (error) {
+            dispatch({type: UserTypes.UPDATE_USER_FAILURE, error}, getState);
+            return {error};
+        }
+
+        dispatch(batchActions([
+            {type: UserTypes.RECEIVED_PROFILE, data},
+            {type: UserTypes.UPDATE_USER_SUCCESS}
+        ]), getState);
+
+        return {data};
+
+        // const actions = [
+        //     {type: UserTypes.UPDATE_USER_SUCCESS}
+        // ];
+
+        // const profile = getState().entities.users.profiles[userId];
+        // if (profile) {
+        //     actions.push({type: UserTypes.RECEIVED_PROFILE, data: {...profile}});
+        // }
+
+        // dispatch(batchActions(actions), getState);
+
+        // return {data};
+    };
+}
+
 export function updateUserRoles(userId, roles) {
     return async (dispatch, getState) => {
         dispatch({type: UserTypes.UPDATE_USER_REQUEST}, getState);
