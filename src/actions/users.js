@@ -937,13 +937,13 @@ export function updateMe(user) {
     };
 }
 
-export function patchUser(userId, user) {
+export function patchUser(user) {
     return async (dispatch, getState) => {
         dispatch({type: UserTypes.UPDATE_USER_REQUEST}, getState);
 
         let data;
         try {
-            data = await Client4.patchUser(userId, user);
+            data = await Client4.patchUser(user);
         } catch (error) {
             dispatch({type: UserTypes.UPDATE_USER_FAILURE, error}, getState);
             return {error};

@@ -853,7 +853,8 @@ describe('Actions.Users', () => {
                 }
             });
 
-        await Actions.patchUser(currentUserId, {
+        await Actions.patchUser({
+            id: currentUserId,
             notify_props: {
                 ...notifyProps,
                 comments: 'any',
