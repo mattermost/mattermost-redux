@@ -1059,6 +1059,13 @@ export default class Client4 {
         );
     };
 
+    getChannelByNameAndTeamName = async (teamName, channelName) => {
+        return this.doFetch(
+            `${this.getTeamNameRoute(teamName)}/channels/name/${channelName}`,
+            {method: 'get'}
+        );
+    };
+
     getChannels = async (teamId, page = 0, perPage = PER_PAGE_DEFAULT) => {
         return this.doFetch(
             `${this.getTeamRoute(teamId)}/channels${buildQueryString({page, per_page: perPage})}`,
