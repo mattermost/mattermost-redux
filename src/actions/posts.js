@@ -124,6 +124,85 @@ export function createPost(post, files = []) {
     };
 }
 
+export function createPostImmediately(post, files = []) {
+    return async (dispatch, getState) => {
+        const state = getState();
+        const currentUserId = state.entities.users.currentUserId;
+
+        const timestamp = Date.now();
+        const pendingPostId = `${currentUserId}:${timestamp}`;
+
+        let newPost = {
+            ...post,
+            pending_post_id: pendingPostId,
+            create_at: timestamp,
+            update_at: timestamp
+        };
+
+        if (files.length) {
+            const fileIds = files.map((file) => file.id);
+
+            newPost = {
+                ...newPost,
+                file_ids: fileIds
+            };
+
+            dispatch({
+                type: FileTypes.RECEIVED_FILES_FOR_POST,
+                postId: pendingPostId,
+                data: files
+            });
+        }
+
+        dispatch({
+            type: PostTypes.RECEIVED_NEW_POST,
+            data: {
+                id: pendingPostId,
+                ...newPost
+            }
+        });
+
+        try {
+            const created = await Client4.createPost({...newPost, create_at: 0});
+            newPost.id = created.id;
+        } catch (error) {
+            forceLogoutIfNecessary(error, dispatch);
+            dispatch(batchActions([
+                {type: PostTypes.CREATE_POST_FAILURE, error},
+                logError(error)(dispatch)
+            ]), getState);
+            return {error};
+        }
+
+        const actions = [{
+            type: PostTypes.RECEIVED_POSTS,
+            data: {
+                order: [],
+                posts: {
+                    [newPost.id]: newPost
+                }
+            },
+            channelId: newPost.channel_id
+        }];
+
+        if (files) {
+            actions.push({
+                type: FileTypes.RECEIVED_FILES_FOR_POST,
+                postId: newPost.id,
+                data: files
+            });
+        }
+
+        actions.push({
+            type: PostTypes.CREATE_POST_SUCCESS
+        });
+
+        dispatch(batchActions(actions), getState);
+
+        return {data: newPost};
+    };
+}
+
 export function resetCreatePostRequest() {
     return {type: PostTypes.CREATE_POST_RESET_REQUEST};
 }
@@ -969,6 +1048,7 @@ export function moveHistoryIndexForward(index) {
 
 export default {
     createPost,
+    createPostImmediately,
     resetCreatePostRequest,
     editPost,
     deletePost,
