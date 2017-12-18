@@ -784,8 +784,8 @@ export default class Client4 {
         this.trackEvent('api', 'api_teams_delete');
 
         return this.doFetch(
-            `${this.getTeamsRoute()}`,
-            {method: 'delete', body: JSON.stringify(teamId)}
+            `${this.getTeamRoute(teamId)}`,
+            {method: 'delete'}
         );
     };
 
