@@ -256,6 +256,22 @@ describe('Actions.Channels', () => {
         assert.ok(channels[TestHelper.basicChannel.id]);
     });
 
+    it('getChannelByNameAndTeamName', async () => {
+        nock(Client4.getTeamsRoute()).
+            get(`/name/${TestHelper.basicTeam.name}/channels/name/${TestHelper.basicChannel.name}`).
+            reply(200, TestHelper.basicChannel);
+
+        await Actions.getChannelByNameAndTeamName(TestHelper.basicTeam.name, TestHelper.basicChannel.name)(store.dispatch, store.getState);
+
+        const channelRequest = store.getState().requests.channels.getChannel;
+        if (channelRequest.status === RequestStatus.FAILURE) {
+            throw new Error(JSON.stringify(channelRequest.error));
+        }
+
+        const {channels} = store.getState().entities.channels;
+        assert.ok(channels[TestHelper.basicChannel.id]);
+    });
+
     it('getChannelAndMyMember', async () => {
         nock(Client4.getChannelsRoute()).
             get(`/${TestHelper.basicChannel.id}`).
