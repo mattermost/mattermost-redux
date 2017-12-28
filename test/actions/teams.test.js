@@ -166,6 +166,55 @@ describe('Actions.Teams', () => {
         assert.ok(myMembers[teamId]);
     });
 
+    it('deleteTeam', async () => {
+        const secondClient = TestHelper.createClient4();
+
+        nock(Client4.getUsersRoute()).
+            post('').
+            query(true).
+            reply(201, TestHelper.fakeUserWithId());
+
+        const user = await TestHelper.basicClient4.createUser(
+            TestHelper.fakeUser(),
+            null,
+            null,
+            TestHelper.basicTeam.invite_id
+        );
+
+        nock(Client4.getUsersRoute()).
+            post('/login').
+            reply(200, user);
+        await secondClient.login(user.email, 'password1');
+
+        nock(Client4.getTeamsRoute()).
+            post('').
+            reply(201, TestHelper.fakeTeamWithId());
+        const secondTeam = await secondClient.createTeam(
+            TestHelper.fakeTeam());
+
+        nock(Client4.getTeamsRoute()).
+            delete(`/${secondTeam.id}`).
+            reply(200, OK_RESPONSE);
+
+        await Actions.deleteTeam(
+            secondTeam.id
+        )(store.dispatch, store.getState);
+
+        const deleteRequest = store.getState().requests.teams.deleteTeam;
+
+        if (deleteRequest === undefined) {
+            throw new Error(JSON.stringify(store.getState().requests.teams));
+        }
+
+        if (deleteRequest.status === RequestStatus.FAILURE) {
+            throw new Error(JSON.stringify(deleteRequest.error));
+        }
+
+        const {teams, myMembers} = store.getState().entities.teams;
+        assert.ifError(teams[secondTeam.id]);
+        assert.ifError(myMembers[secondTeam.id]);
+    });
+
     it('updateTeam', async () => {
         const displayName = 'The Updated Team';
         const description = 'This is a team created by unit tests';
