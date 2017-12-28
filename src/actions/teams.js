@@ -140,6 +140,47 @@ export function createTeam(team) {
     };
 }
 
+export function deleteTeam(teamId) {
+    return async (dispatch, getState) => {
+        dispatch({type: TeamTypes.DELETE_TEAM_REQUEST}, getState);
+
+        try {
+            await Client4.deleteTeam(teamId);
+        } catch (error) {
+            forceLogoutIfNecessary(error, dispatch);
+            dispatch(batchActions([
+                {type: TeamTypes.DELETE_TEAM_FAILURE, error},
+                logError(error)(dispatch)
+            ]), getState);
+            return {error};
+        }
+
+        const entities = getState().entities;
+        const {teams, currentTeamId} = entities.teams;
+        if (teamId === currentTeamId) {
+            const team = Object.keys(teams).filter((key) => teams[key].name === General.DEFAULT_TEAM);
+            let defaultTeamId = '';
+            if (team.length) {
+                defaultTeamId = team[0];
+            }
+
+            dispatch({type: TeamTypes.SELECT_TEAM, data: defaultTeamId}, getState);
+        }
+
+        dispatch(batchActions([
+            {
+                type: TeamTypes.RECEIVED_TEAM_DELETED,
+                data: {id: teamId}
+            },
+            {
+                type: TeamTypes.DELETE_TEAM_SUCCESS
+            }
+        ]), getState);
+
+        return {data: true};
+    };
+}
+
 export function updateTeam(team) {
     return bindClientFunc(
         Client4.updateTeam,
