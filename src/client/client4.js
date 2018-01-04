@@ -17,6 +17,7 @@ const HEADER_X_VERSION_ID = 'X-Version-Id';
 const HEADER_X_CLUSTER_ID = 'X-Cluster-Id';
 
 const PER_PAGE_DEFAULT = 60;
+const LOGS_PER_PAGE_DEFAULT = 10000;
 
 export default class Client4 {
     constructor() {
@@ -1762,9 +1763,9 @@ export default class Client4 {
 
     // Admin Routes
 
-    getLogs = async (page = 0, perPage = PER_PAGE_DEFAULT) => {
+    getLogs = async (page = 0, perPage = LOGS_PER_PAGE_DEFAULT) => {
         return this.doFetch(
-            `${this.getBaseRoute()}/logs${buildQueryString({page, per_page: perPage})}`,
+            `${this.getBaseRoute()}/logs${buildQueryString({page, logs_per_page: perPage})}`,
             {method: 'get'}
         );
     };

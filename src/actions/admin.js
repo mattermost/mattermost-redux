@@ -10,7 +10,7 @@ import {logError} from './errors';
 import {bindClientFunc, forceLogoutIfNecessary} from './helpers';
 import {batchActions} from 'redux-batched-actions';
 
-export function getLogs(page = 0, perPage = General.PAGE_SIZE_DEFAULT) {
+export function getLogs(page = 0, perPage = General.LOGS_PAGE_SIZE_DEFAULT) {
     return bindClientFunc(
         Client4.getLogs,
         AdminTypes.GET_LOGS_REQUEST,
