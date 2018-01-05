@@ -174,7 +174,7 @@ mattermost-webapp and mattermost-redux are in the same directory, you only need
 to run `npm run dev` or `npm run dev:watch`. If you have mattermost-webapp in
 other directory or you are developing your own application, you can define the
 environment variable `WEBAPP_DIR` to change the destination app
-(e. g. `WEBAPP_DIR=/tmp/mattermost-webapp npm run dev`).
+(e. g. `WEBAPP_DIR=/tmp/mattermost-webapp`).
 
 ### Contribute Code
 
