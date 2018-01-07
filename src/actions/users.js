@@ -1269,7 +1269,7 @@ export function getUserAccessTokensForUser(userId, page = 0, perPage = General.P
                 type: UserTypes.GET_USER_ACCESS_TOKEN_SUCCESS
             },
             {
-                type: AdminTypes.RECEIVED_USER_ACCESS_TOKENS,
+                type: AdminTypes.RECEIVED_USER_ACCESS_TOKENS_FOR_USER,
                 data,
                 userId
             }

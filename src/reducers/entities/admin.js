@@ -204,7 +204,7 @@ function teamAnalytics(state = {}, action) {
     }
 }
 
-function userAccessTokens(state = {}, action) {
+function userAccessTokensForUser(state = {}, action) {
     switch (action.type) {
     case AdminTypes.RECEIVED_USER_ACCESS_TOKEN: {
         const nextUserState = {...(state[action.data.user_id] || {})};
@@ -212,7 +212,7 @@ function userAccessTokens(state = {}, action) {
 
         return {...state, [action.data.user_id]: nextUserState};
     }
-    case AdminTypes.RECEIVED_USER_ACCESS_TOKENS: {
+    case AdminTypes.RECEIVED_USER_ACCESS_TOKENS_FOR_USER: {
         const nextUserState = {...(state[action.userId] || {})};
 
         for (const uat of action.data) {
@@ -345,9 +345,8 @@ export default combineReducers({
     teamAnalytics,
 
     // object with user ids as keys and objects, with token ids as keys, as values
-    userAccessTokens,
+    userAccessTokensByUser: userAccessTokensForUser,
 
     // object with plugin ids as keys and objects representing plugin manifests as values
     plugins
 });
-
