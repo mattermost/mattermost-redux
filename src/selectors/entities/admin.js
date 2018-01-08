@@ -20,3 +20,7 @@ export function getComplianceReports(state) {
 export function getClusterInfo(state) {
     return state.entities.admin.clusterInfo;
 }
+
+export function getUserAccessTokens(state) {
+    return state.entities.admin.userAccessTokens;
+}

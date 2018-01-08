@@ -738,6 +738,13 @@ export default class Client4 {
         );
     }
 
+    getUserAccessTokens = async (page = 0, perPage = PER_PAGE_DEFAULT) => {
+        return this.doFetch(
+            `${this.getUsersRoute()}/tokens${buildQueryString({page, per_page: perPage})}`,
+            {method: 'get'}
+        );
+    }
+
     revokeUserAccessToken = async (tokenId) => {
         this.trackEvent('api', 'api_users_revoke_access_token');
 
