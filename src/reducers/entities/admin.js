@@ -268,7 +268,7 @@ function userAccessTokensForUser(state = {}, action) {
         const nextUserState = {};
 
         for (const uat of action.data) {
-            nextUserState[uat.user_id] = {...nextUserState[uat.user_id] || {}};
+            nextUserState[uat.user_id] = nextUserState[uat.user_id] || {};
             nextUserState[uat.user_id][uat.id] = uat;
         }
 
