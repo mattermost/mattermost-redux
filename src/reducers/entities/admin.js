@@ -207,12 +207,55 @@ function teamAnalytics(state = {}, action) {
 function userAccessTokens(state = {}, action) {
     switch (action.type) {
     case AdminTypes.RECEIVED_USER_ACCESS_TOKEN: {
+        return {...state, [action.data.id]: action.data};
+    }
+    case AdminTypes.RECEIVED_USER_ACCESS_TOKENS_FOR_USER: {
+        const nextState = {};
+
+        for (const uat of action.data) {
+            nextState[uat.id] = uat;
+        }
+
+        return {...state, ...nextState};
+    }
+    case AdminTypes.RECEIVED_USER_ACCESS_TOKENS: {
+        const nextState = {};
+
+        for (const uat of action.data) {
+            nextState[uat.id] = uat;
+        }
+
+        return {...state, ...nextState};
+    }
+    case UserTypes.REVOKED_USER_ACCESS_TOKEN: {
+        const nextState = {...state};
+        Reflect.deleteProperty(nextState, action.data);
+        return {...nextState};
+    }
+    case UserTypes.ENABLED_USER_ACCESS_TOKEN: {
+        const token = {...state[action.data], is_active: true};
+        return {...state, [action.data]: token};
+    }
+    case UserTypes.DISABLED_USER_ACCESS_TOKEN: {
+        const token = {...state[action.data], is_active: false};
+        return {...state, [action.data]: token};
+    }
+    case UserTypes.LOGOUT_SUCCESS:
+        return {};
+    default:
+        return state;
+    }
+}
+
+function userAccessTokensForUser(state = {}, action) {
+    switch (action.type) {
+    case AdminTypes.RECEIVED_USER_ACCESS_TOKEN: {
         const nextUserState = {...(state[action.data.user_id] || {})};
         nextUserState[action.data.id] = action.data;
 
         return {...state, [action.data.user_id]: nextUserState};
     }
-    case AdminTypes.RECEIVED_USER_ACCESS_TOKENS: {
+    case AdminTypes.RECEIVED_USER_ACCESS_TOKENS_FOR_USER: {
         const nextUserState = {...(state[action.userId] || {})};
 
         for (const uat of action.data) {
@@ -220,6 +263,16 @@ function userAccessTokens(state = {}, action) {
         }
 
         return {...state, [action.userId]: nextUserState};
+    }
+    case AdminTypes.RECEIVED_USER_ACCESS_TOKENS: {
+        const nextUserState = {};
+
+        for (const uat of action.data) {
+            nextUserState[uat.user_id] = nextUserState[uat.user_id] || {};
+            nextUserState[uat.user_id][uat.id] = uat;
+        }
+
+        return {...state, ...nextUserState};
     }
     case UserTypes.REVOKED_USER_ACCESS_TOKEN: {
         const userIds = Object.keys(state);
@@ -344,10 +397,13 @@ export default combineReducers({
     // object with team ids as keys and analytics objects as values
     teamAnalytics,
 
-    // object with user ids as keys and objects, with token ids as keys, as values
+    // object with user ids as keys and objects, with token ids as keys, and
+    // user access tokens as values without actual token
+    userAccessTokensByUser: userAccessTokensForUser,
+
+    // object with token ids as keys, and user access tokens as values without actual token
     userAccessTokens,
 
     // object with plugin ids as keys and objects representing plugin manifests as values
     plugins
 });
-

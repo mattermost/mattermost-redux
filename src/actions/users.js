@@ -1248,6 +1248,37 @@ export function getUserAccessToken(tokenId) {
     };
 }
 
+export function getUserAccessTokens(page = 0, perPage = General.PROFILE_CHUNK_SIZE) {
+    return async (dispatch, getState) => {
+        dispatch({type: UserTypes.GET_USER_ACCESS_TOKEN_REQUEST});
+        let data;
+        try {
+            data = await Client4.getUserAccessTokens(page, perPage);
+        } catch (error) {
+            forceLogoutIfNecessary(error, dispatch);
+            dispatch(batchActions([
+                {type: UserTypes.GET_USER_ACCESS_TOKEN_FAILURE, error},
+                logError(error)(dispatch)
+            ]), getState);
+            return {error};
+        }
+
+        const actions = [
+            {
+                type: UserTypes.GET_USER_ACCESS_TOKEN_SUCCESS
+            },
+            {
+                type: AdminTypes.RECEIVED_USER_ACCESS_TOKENS,
+                data
+            }
+        ];
+
+        dispatch(batchActions(actions));
+
+        return {data};
+    };
+}
+
 export function getUserAccessTokensForUser(userId, page = 0, perPage = General.PROFILE_CHUNK_SIZE) {
     return async (dispatch, getState) => {
         dispatch({type: UserTypes.GET_USER_ACCESS_TOKEN_REQUEST});
@@ -1269,7 +1300,7 @@ export function getUserAccessTokensForUser(userId, page = 0, perPage = General.P
                 type: UserTypes.GET_USER_ACCESS_TOKEN_SUCCESS
             },
             {
-                type: AdminTypes.RECEIVED_USER_ACCESS_TOKENS,
+                type: AdminTypes.RECEIVED_USER_ACCESS_TOKENS_FOR_USER,
                 data,
                 userId
             }
