@@ -10,6 +10,7 @@ import Files from './files';
 import Alerts from './alerts';
 import Teams from './teams';
 import Stats from './stats';
+import Permissions from './permissions';
 
 export {
     General,
@@ -20,6 +21,7 @@ export {
     WebsocketEvents,
     Alerts,
     Teams,
-    Stats
+    Stats,
+    Permissions
 };
 
