@@ -1,3 +1,6 @@
+// Copyright (c) 2018-present Mattermost, Inc. All Rights Reserved.
+// See License.txt for license information.
+
 export default {
     INVITE_USER: 'invite_user',
     ADD_USER_TO_TEAM: 'add_user_to_team',
