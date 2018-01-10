@@ -279,7 +279,7 @@ describe('Actions.Teams', () => {
 
         nock(Client4.getUserRoute('me')).
             get('/teams/members').
-            reply(200, [{user_id: TestHelper.basicUser.id, team_id: team.id}]);
+            reply(200, [{user_id: TestHelper.basicUser.id, roles: 'team_user', team_id: team.id}]);
 
         nock(Client4.getUserRoute('me')).
             get('/teams/unread').
@@ -303,7 +303,7 @@ describe('Actions.Teams', () => {
     it('getMyTeamMembers and getMyTeamUnreads', async () => {
         nock(Client4.getUserRoute('me')).
             get('/teams/members').
-            reply(200, [{user_id: TestHelper.basicUser.id, team_id: TestHelper.basicTeam.id}]);
+            reply(200, [{user_id: TestHelper.basicUser.id, roles: 'team_user', team_id: TestHelper.basicTeam.id}]);
         await Actions.getMyTeamMembers()(store.dispatch, store.getState);
 
         nock(Client4.getUserRoute('me')).

@@ -10,6 +10,7 @@ import EventEmitter from 'utils/event_emitter';
 import {logError} from './errors';
 import {bindClientFunc, forceLogoutIfNecessary} from './helpers';
 import {getProfilesByIds, getStatusesByIds} from './users';
+import {loadRolesIfNeeded} from './roles';
 
 async function getProfilesAndStatusesForMembers(userIds, dispatch, getState) {
     const {currentUserId, profiles, statuses} = getState().entities.users;
@@ -141,6 +142,7 @@ export function createTeam(team) {
                 type: TeamTypes.CREATE_TEAM_SUCCESS
             }
         ]), getState);
+        loadRolesIfNeeded(new Set(member.roles.split(' ')))(dispatch, getState);
 
         return {data: created};
     };
@@ -196,12 +198,28 @@ export function updateTeam(team) {
 }
 
 export function getMyTeamMembers() {
-    return bindClientFunc(
-        Client4.getMyTeamMembers,
-        TeamTypes.MY_TEAM_MEMBERS_REQUEST,
-        [TeamTypes.RECEIVED_MY_TEAM_MEMBERS, TeamTypes.MY_TEAM_MEMBERS_SUCCESS],
-        TeamTypes.MY_TEAM_MEMBERS_FAILURE
-    );
+    return async (dispatch, getState) => {
+        const getMyTeamMembersFunc = bindClientFunc(
+            Client4.getMyTeamMembers,
+            TeamTypes.MY_TEAM_MEMBERS_REQUEST,
+            [TeamTypes.RECEIVED_MY_TEAM_MEMBERS, TeamTypes.MY_TEAM_MEMBERS_SUCCESS],
+            TeamTypes.MY_TEAM_MEMBERS_FAILURE
+        );
+        const teamMembers = await getMyTeamMembersFunc(dispatch, getState);
+        if (teamMembers.error) {
+            return teamMembers;
+        }
+        const roles = new Set();
+        for (const teamMember of teamMembers.data) {
+            for (const role of teamMember.roles.split(' ')) {
+                roles.add(role);
+            }
+        }
+        if (roles.size > 0) {
+            loadRolesIfNeeded(roles)(dispatch, getState);
+        }
+        return teamMembers;
+    };
 }
 
 export function getTeamMembers(teamId, page = 0, perPage = General.TEAMS_CHUNK_SIZE) {

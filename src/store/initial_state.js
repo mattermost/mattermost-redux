@@ -78,7 +78,10 @@ const state = {
         emojis: {
             customEmoji: {}
         },
-        typing: {}
+        typing: {},
+        roles: {
+            roles: []
+        }
     },
     errors: [],
     requests: {
