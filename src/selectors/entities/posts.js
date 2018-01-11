@@ -424,7 +424,7 @@ export const getCurrentUsersLatestPost = createSelector(
             if (post.user_id !== currentUser.id ||
                (post.props && post.props.from_webhook) ||
                post.state === Posts.POST_DELETED ||
-               (isSystemMessage(post) && isPostEphemeral(post))) {
+               (isSystemMessage(post) || isPostEphemeral(post))) {
                 continue;
             }
 
