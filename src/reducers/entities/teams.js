@@ -74,6 +74,28 @@ function myMembers(state = {}, action) {
         }
         return nextState;
     }
+    case TeamTypes.RECEIVED_TEAMS_LIST: {
+        const nextState = {...state};
+        const teamsList = teamListToMap(action.data);
+        Object.keys(nextState).forEach((myMemberTeamId) => {
+            if (teamsList[myMemberTeamId] && teamsList[myMemberTeamId].delete_at) {
+                Reflect.deleteProperty(nextState, myMemberTeamId);
+            }
+        });
+
+        return nextState;
+    }
+    case TeamTypes.RECEIVED_TEAMS: {
+        const nextState = {...state};
+        const team = action.data;
+        Object.keys(team).forEach((teamId) => {
+            if (nextState[teamId] && nextState[teamId].delete_at) {
+                Reflect.deleteProperty(nextState, teamId);
+            }
+        });
+
+        return nextState;
+    }
     case TeamTypes.RECEIVED_MY_TEAM_UNREADS: {
         const nextState = {...state};
         const unreads = action.data;
