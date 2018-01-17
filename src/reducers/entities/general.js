@@ -8,6 +8,7 @@ function config(state = {}, action) {
     switch (action.type) {
     case GeneralTypes.CLIENT_CONFIG_RECEIVED:
         return Object.assign({}, state, action.data);
+    case GeneralTypes.CLIENT_CONFIG_RESET:
     case UserTypes.LOGOUT_SUCCESS:
         return {};
     default:
@@ -61,6 +62,7 @@ function license(state = {}, action) {
     switch (action.type) {
     case GeneralTypes.CLIENT_LICENSE_RECEIVED:
         return Object.assign({}, state, action.data);
+    case GeneralTypes.CLIENT_LICENSE_RESET:
     case UserTypes.LOGOUT_SUCCESS:
         return {};
     default:
