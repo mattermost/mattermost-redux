@@ -8,19 +8,11 @@ import {logError} from './errors';
 const HTTP_UNAUTHORIZED = 401;
 
 export function forceLogoutIfNecessary(err, dispatch, getState) {
-    // Wrap around a setTimeout so it gets executed once the store updates
-    setTimeout(() => {
-        const {currentUserId} = getState().entities.users;
-        if (err.status_code === HTTP_UNAUTHORIZED && err.url.indexOf('/login') === -1 && currentUserId) {
-            dispatch({type: UserTypes.LOGOUT_REQUEST});
-            try {
-                Client4.logout();
-            } catch (error) {
-                logError(error)(dispatch);
-            }
-            dispatch({type: UserTypes.LOGOUT_SUCCESS});
-        }
-    }, 0);
+    const {currentUserId} = getState().entities.users;
+    if (err.status_code === HTTP_UNAUTHORIZED && err.url.indexOf('/login') === -1 && currentUserId) {
+        Client4.setToken('');
+        dispatch({type: UserTypes.LOGOUT_SUCCESS});
+    }
 }
 
 function dispatcher(type, data, dispatch, getState) {
