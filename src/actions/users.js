@@ -64,7 +64,7 @@ export function createUser(user, data, hash, inviteId) {
         try {
             created = await Client4.createUser(user, data, hash, inviteId);
         } catch (error) {
-            forceLogoutIfNecessary(error, dispatch);
+            forceLogoutIfNecessary(error, dispatch, getState);
             dispatch(batchActions([
                 {
                     type: UserTypes.CREATE_USER_FAILURE,
@@ -249,7 +249,7 @@ export function getProfiles(page = 0, perPage = General.PROFILE_CHUNK_SIZE) {
             profiles = await Client4.getProfiles(page, perPage);
             removeUserFromList(currentUserId, profiles);
         } catch (error) {
-            forceLogoutIfNecessary(error, dispatch);
+            forceLogoutIfNecessary(error, dispatch, getState);
             dispatch(batchActions([
                 {type: UserTypes.PROFILES_FAILURE, error},
                 logError(error)(dispatch)
@@ -302,7 +302,7 @@ export function getProfilesByIds(userIds) {
             profiles = await Client4.getProfilesByIds(userIds);
             removeUserFromList(currentUserId, profiles);
         } catch (error) {
-            forceLogoutIfNecessary(error, dispatch);
+            forceLogoutIfNecessary(error, dispatch, getState);
             dispatch(batchActions([
                 {type: UserTypes.PROFILES_FAILURE, error},
                 logError(error)(dispatch)
@@ -335,7 +335,7 @@ export function getProfilesByUsernames(usernames) {
             profiles = await Client4.getProfilesByUsernames(usernames);
             removeUserFromList(currentUserId, profiles);
         } catch (error) {
-            forceLogoutIfNecessary(error, dispatch);
+            forceLogoutIfNecessary(error, dispatch, getState);
             dispatch(batchActions([
                 {type: UserTypes.PROFILES_FAILURE, error},
                 logError(error)(dispatch)
@@ -367,7 +367,7 @@ export function getProfilesInTeam(teamId, page, perPage = General.PROFILE_CHUNK_
         try {
             profiles = await Client4.getProfilesInTeam(teamId, page, perPage, sort);
         } catch (error) {
-            forceLogoutIfNecessary(error, dispatch);
+            forceLogoutIfNecessary(error, dispatch, getState);
             dispatch(batchActions([
                 {type: UserTypes.PROFILES_IN_TEAM_FAILURE, error},
                 logError(error)(dispatch)
@@ -402,7 +402,7 @@ export function getProfilesNotInTeam(teamId, page, perPage = General.PROFILE_CHU
         try {
             profiles = await Client4.getProfilesNotInTeam(teamId, page, perPage);
         } catch (error) {
-            forceLogoutIfNecessary(error, dispatch);
+            forceLogoutIfNecessary(error, dispatch, getState);
             dispatch(batchActions([
                 {type: UserTypes.PROFILES_NOT_IN_TEAM_FAILURE, error},
                 logError(error)(dispatch)
@@ -437,7 +437,7 @@ export function getProfilesWithoutTeam(page, perPage = General.PROFILE_CHUNK_SIZ
         try {
             profiles = await Client4.getProfilesWithoutTeam(page, perPage);
         } catch (error) {
-            forceLogoutIfNecessary(error, dispatch);
+            forceLogoutIfNecessary(error, dispatch, getState);
             dispatch(batchActions([
                 {type: UserTypes.PROFILES_WITHOUT_TEAM_FAILURE, error},
                 logError(error)(dispatch)
@@ -473,7 +473,7 @@ export function getProfilesInChannel(channelId, page, perPage = General.PROFILE_
         try {
             profiles = await Client4.getProfilesInChannel(channelId, page, perPage);
         } catch (error) {
-            forceLogoutIfNecessary(error, dispatch);
+            forceLogoutIfNecessary(error, dispatch, getState);
             dispatch(batchActions([
                 {type: UserTypes.PROFILES_IN_CHANNEL_FAILURE, error},
                 logError(error)(dispatch)
@@ -510,7 +510,7 @@ export function getProfilesNotInChannel(teamId, channelId, page, perPage = Gener
         try {
             profiles = await Client4.getProfilesNotInChannel(teamId, channelId, page, perPage);
         } catch (error) {
-            forceLogoutIfNecessary(error, dispatch);
+            forceLogoutIfNecessary(error, dispatch, getState);
             dispatch(batchActions([
                 {type: UserTypes.PROFILES_NOT_IN_CHANNEL_FAILURE, error},
                 logError(error)(dispatch)
@@ -620,7 +620,7 @@ export function setStatus(status) {
         try {
             await Client4.updateStatus(status);
         } catch (error) {
-            forceLogoutIfNecessary(error, dispatch);
+            forceLogoutIfNecessary(error, dispatch, getState);
             dispatch(batchActions([
                 {type: UserTypes.SET_STATUS_FAILURE, error},
                 logError(error)(dispatch)
@@ -659,7 +659,7 @@ export function revokeSession(userId, sessionId) {
         try {
             await Client4.revokeSession(userId, sessionId);
         } catch (error) {
-            forceLogoutIfNecessary(error, dispatch);
+            forceLogoutIfNecessary(error, dispatch, getState);
             dispatch(batchActions([
                 {type: UserTypes.REVOKE_SESSION_FAILURE, error},
                 logError(error)(dispatch)
@@ -688,7 +688,7 @@ export function revokeAllSessionsForUser(userId) {
         try {
             await Client4.revokeAllSessionsForUser(userId);
         } catch (error) {
-            forceLogoutIfNecessary(error, dispatch);
+            forceLogoutIfNecessary(error, dispatch, getState);
             dispatch(batchActions([
                 {type: UserTypes.REVOKE_ALL_USER_SESSIONS_FAILURE, error},
                 logError(error)(dispatch)
@@ -762,7 +762,7 @@ export function autocompleteUsers(term, teamId = '', channelId = '') {
         try {
             data = await Client4.autocompleteUsers(term, teamId, channelId);
         } catch (error) {
-            forceLogoutIfNecessary(error, dispatch);
+            forceLogoutIfNecessary(error, dispatch, getState);
             dispatch(batchActions([
                 {type: UserTypes.AUTOCOMPLETE_USERS_FAILURE, error},
                 logError(error)(dispatch)
@@ -829,7 +829,7 @@ export function searchProfiles(term, options = {}) {
         try {
             profiles = await Client4.searchUsers(term, options);
         } catch (error) {
-            forceLogoutIfNecessary(error, dispatch);
+            forceLogoutIfNecessary(error, dispatch, getState);
             dispatch(batchActions([
                 {type: UserTypes.SEARCH_PROFILES_FAILURE, error},
                 logError(error)(dispatch)
@@ -1172,7 +1172,7 @@ export function createUserAccessToken(userId, description) {
         try {
             data = await Client4.createUserAccessToken(userId, description);
         } catch (error) {
-            forceLogoutIfNecessary(error, dispatch);
+            forceLogoutIfNecessary(error, dispatch, getState);
             dispatch(batchActions([
                 {type: UserTypes.CREATE_USER_ACCESS_TOKEN_FAILURE, error},
                 logError(error)(dispatch)
@@ -1214,7 +1214,7 @@ export function getUserAccessToken(tokenId) {
         try {
             data = await Client4.getUserAccessToken(tokenId);
         } catch (error) {
-            forceLogoutIfNecessary(error, dispatch);
+            forceLogoutIfNecessary(error, dispatch, getState);
             dispatch(batchActions([
                 {type: UserTypes.GET_USER_ACCESS_TOKEN_FAILURE, error},
                 logError(error)(dispatch)
@@ -1287,7 +1287,7 @@ export function getUserAccessTokensForUser(userId, page = 0, perPage = General.P
         try {
             data = await Client4.getUserAccessTokensForUser(userId, page, perPage);
         } catch (error) {
-            forceLogoutIfNecessary(error, dispatch);
+            forceLogoutIfNecessary(error, dispatch, getState);
             dispatch(batchActions([
                 {type: UserTypes.GET_USER_ACCESS_TOKEN_FAILURE, error},
                 logError(error)(dispatch)
@@ -1329,7 +1329,7 @@ export function revokeUserAccessToken(tokenId) {
         try {
             await Client4.revokeUserAccessToken(tokenId);
         } catch (error) {
-            forceLogoutIfNecessary(error, dispatch);
+            forceLogoutIfNecessary(error, dispatch, getState);
             dispatch(batchActions([
                 {type: UserTypes.REVOKE_USER_ACCESS_TOKEN_FAILURE, error},
                 logError(error)(dispatch)
@@ -1358,7 +1358,7 @@ export function disableUserAccessToken(tokenId) {
         try {
             await Client4.disableUserAccessToken(tokenId);
         } catch (error) {
-            forceLogoutIfNecessary(error, dispatch);
+            forceLogoutIfNecessary(error, dispatch, getState);
             dispatch(batchActions([
                 {type: UserTypes.DISABLE_USER_ACCESS_TOKEN_FAILURE, error},
                 logError(error)(dispatch)
@@ -1387,7 +1387,7 @@ export function enableUserAccessToken(tokenId) {
         try {
             await Client4.enableUserAccessToken(tokenId);
         } catch (error) {
-            forceLogoutIfNecessary(error, dispatch);
+            forceLogoutIfNecessary(error, dispatch, getState);
             dispatch(batchActions([
                 {type: UserTypes.ENABLE_USER_ACCESS_TOKEN_FAILURE, error},
                 logError(error)(dispatch)

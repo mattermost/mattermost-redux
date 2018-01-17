@@ -44,7 +44,7 @@ export function searchPosts(teamId, terms, isOrSearch = false) {
                 getMissingChannelsFromPosts(posts.posts)(dispatch, getState)
             ]);
         } catch (error) {
-            forceLogoutIfNecessary(error, dispatch);
+            forceLogoutIfNecessary(error, dispatch, getState);
             dispatch(batchActions([
                 {type: SearchTypes.SEARCH_POSTS_FAILURE, error},
                 logError(error)(dispatch)

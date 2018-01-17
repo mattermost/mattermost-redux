@@ -7,14 +7,10 @@ import {UserTypes} from 'action_types';
 import {logError} from './errors';
 const HTTP_UNAUTHORIZED = 401;
 
-export async function forceLogoutIfNecessary(err, dispatch) {
-    if (err.status_code === HTTP_UNAUTHORIZED && err.url.indexOf('/login') === -1) {
-        dispatch({type: UserTypes.LOGOUT_REQUEST});
-        try {
-            await Client4.logout();
-        } catch (error) {
-            logError(error)(dispatch);
-        }
+export function forceLogoutIfNecessary(err, dispatch, getState) {
+    const {currentUserId} = getState().entities.users;
+    if (err.status_code === HTTP_UNAUTHORIZED && err.url.indexOf('/login') === -1 && currentUserId) {
+        Client4.setToken('');
         dispatch({type: UserTypes.LOGOUT_SUCCESS});
     }
 }
@@ -55,7 +51,7 @@ export function bindClientFunc(clientFunc, request, success, failure, ...args) {
         try {
             data = await clientFunc(...args);
         } catch (error) {
-            forceLogoutIfNecessary(error, dispatch);
+            forceLogoutIfNecessary(error, dispatch, getState);
             dispatch(batchActions([
                 requestFailure(failure, error),
                 logError(error)(dispatch)

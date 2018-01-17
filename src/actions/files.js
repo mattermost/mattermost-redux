@@ -16,7 +16,7 @@ export function getFilesForPost(postId) {
         try {
             files = await Client4.getFileInfosForPost(postId);
         } catch (error) {
-            forceLogoutIfNecessary(error, dispatch);
+            forceLogoutIfNecessary(error, dispatch, getState);
             dispatch(batchActions([
                 {type: FileTypes.FETCH_FILES_FOR_POST_FAILURE, error},
                 logError(error)(dispatch)
@@ -60,7 +60,7 @@ export function uploadFile(channelId, rootId, clientIds, fileFormData, formBound
         try {
             files = await Client4.uploadFile(fileFormData, formBoundary);
         } catch (error) {
-            forceLogoutIfNecessary(error, dispatch);
+            forceLogoutIfNecessary(error, dispatch, getState);
 
             const failure = {
                 type: FileTypes.UPLOAD_FILES_FAILURE,
