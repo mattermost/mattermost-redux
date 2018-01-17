@@ -234,12 +234,12 @@ export function logout() {
         dispatch({type: UserTypes.LOGOUT_REQUEST}, getState);
 
         try {
-            Client4.logout();
-            Client.setToken('');
+            await Client4.logout();
         } catch (error) {
-            Client.setToken('');
+            // nothing to do here
         }
 
+        Client.setToken('');
         dispatch({type: UserTypes.LOGOUT_SUCCESS}, getState);
     };
 }
