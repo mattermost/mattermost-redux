@@ -230,12 +230,18 @@ export function loadMe() {
 }
 
 export function logout() {
-    return bindClientFunc(
-        Client4.logout,
-        UserTypes.LOGOUT_REQUEST,
-        UserTypes.LOGOUT_SUCCESS,
-        UserTypes.LOGOUT_FAILURE,
-    );
+    return async (dispatch, getState) => {
+        dispatch({type: UserTypes.LOGOUT_REQUEST}, getState);
+
+        try {
+            await Client4.logout();
+        } catch (error) {
+            // nothing to do here
+        }
+
+        Client.setToken('');
+        dispatch({type: UserTypes.LOGOUT_SUCCESS}, getState);
+    };
 }
 
 export function getProfiles(page = 0, perPage = General.PROFILE_CHUNK_SIZE) {
