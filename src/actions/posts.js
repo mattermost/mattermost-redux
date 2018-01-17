@@ -166,7 +166,7 @@ export function createPostImmediately(post, files = []) {
             const created = await Client4.createPost({...newPost, create_at: 0});
             newPost.id = created.id;
         } catch (error) {
-            forceLogoutIfNecessary(error, dispatch);
+            forceLogoutIfNecessary(error, dispatch, getState);
             dispatch(batchActions([
                 {type: PostTypes.CREATE_POST_FAILURE, error},
                 logError(error)(dispatch)
@@ -248,7 +248,7 @@ export function pinPost(postId) {
         try {
             posts = await Client4.pinPost(postId);
         } catch (error) {
-            forceLogoutIfNecessary(error, dispatch);
+            forceLogoutIfNecessary(error, dispatch, getState);
             dispatch(batchActions([
                 {type: PostTypes.EDIT_POST_FAILURE, error},
                 logError(error)(dispatch)
@@ -286,7 +286,7 @@ export function unpinPost(postId) {
         try {
             posts = await Client4.unpinPost(postId);
         } catch (error) {
-            forceLogoutIfNecessary(error, dispatch);
+            forceLogoutIfNecessary(error, dispatch, getState);
             dispatch(batchActions([
                 {type: PostTypes.EDIT_POST_FAILURE, error},
                 logError(error)(dispatch)
@@ -326,7 +326,7 @@ export function addReaction(postId, emojiName) {
         try {
             reaction = await Client4.addReaction(currentUserId, postId, emojiName);
         } catch (error) {
-            forceLogoutIfNecessary(error, dispatch);
+            forceLogoutIfNecessary(error, dispatch, getState);
             dispatch(batchActions([
                 {type: PostTypes.REACTION_FAILURE, error},
                 logError(error)(dispatch)
@@ -357,7 +357,7 @@ export function removeReaction(postId, emojiName) {
         try {
             await Client4.removeReaction(currentUserId, postId, emojiName);
         } catch (error) {
-            forceLogoutIfNecessary(error, dispatch);
+            forceLogoutIfNecessary(error, dispatch, getState);
             dispatch(batchActions([
                 {type: PostTypes.REACTION_FAILURE, error},
                 logError(error)(dispatch)
@@ -387,7 +387,7 @@ export function getReactionsForPost(postId) {
         try {
             reactions = await Client4.getReactionsForPost(postId);
         } catch (error) {
-            forceLogoutIfNecessary(error, dispatch);
+            forceLogoutIfNecessary(error, dispatch, getState);
             dispatch(batchActions([
                 {type: PostTypes.REACTION_FAILURE, error},
                 logError(error)(dispatch)
@@ -435,7 +435,7 @@ export function getPostThread(postId, skipAddToChannel = true) {
             posts = await Client4.getPostThread(postId);
             getProfilesAndStatusesForPosts(posts.posts, dispatch, getState);
         } catch (error) {
-            forceLogoutIfNecessary(error, dispatch);
+            forceLogoutIfNecessary(error, dispatch, getState);
             dispatch(batchActions([
                 {type: PostTypes.GET_POST_THREAD_FAILURE, error},
                 logError(error)(dispatch)
@@ -498,7 +498,7 @@ export function getPostThreadWithRetry(postId) {
                         });
                     },
                     rollback: (success, error) => {
-                        forceLogoutIfNecessary(error, dispatch);
+                        forceLogoutIfNecessary(error, dispatch, getState);
                         dispatch(batchActions([
                             {type: PostTypes.GET_POST_THREAD_FAILURE, error},
                             logError(error)(dispatch)
@@ -521,7 +521,7 @@ export function getPosts(channelId, page = 0, perPage = Posts.POST_CHUNK_SIZE) {
             posts = await Client4.getPosts(channelId, page, perPage);
             getProfilesAndStatusesForPosts(posts.posts, dispatch, getState);
         } catch (error) {
-            forceLogoutIfNecessary(error, dispatch);
+            forceLogoutIfNecessary(error, dispatch, getState);
             dispatch(batchActions([
                 {type: PostTypes.GET_POSTS_FAILURE, error},
                 logError(error)(dispatch)
@@ -579,7 +579,7 @@ export function getPostsWithRetry(channelId, page = 0, perPage = Posts.POST_CHUN
                         });
                     },
                     rollback: (success, error) => {
-                        forceLogoutIfNecessary(error, dispatch);
+                        forceLogoutIfNecessary(error, dispatch, getState);
                         dispatch(batchActions([
                             {type: PostTypes.GET_POSTS_FAILURE, error},
                             logError(error)(dispatch)
@@ -602,7 +602,7 @@ export function getPostsSince(channelId, since) {
             posts = await Client4.getPostsSince(channelId, since);
             getProfilesAndStatusesForPosts(posts.posts, dispatch, getState);
         } catch (error) {
-            forceLogoutIfNecessary(error, dispatch);
+            forceLogoutIfNecessary(error, dispatch, getState);
             dispatch(batchActions([
                 {type: PostTypes.GET_POSTS_SINCE_FAILURE, error},
                 logError(error)(dispatch)
@@ -658,7 +658,7 @@ export function getPostsSinceWithRetry(channelId, since) {
                         });
                     },
                     rollback: (success, error) => {
-                        forceLogoutIfNecessary(error, dispatch);
+                        forceLogoutIfNecessary(error, dispatch, getState);
                         dispatch(batchActions([
                             {type: PostTypes.GET_POSTS_SINCE_FAILURE, error},
                             logError(error)(dispatch)
@@ -681,7 +681,7 @@ export function getPostsBefore(channelId, postId, page = 0, perPage = Posts.POST
             posts = await Client4.getPostsBefore(channelId, postId, page, perPage);
             getProfilesAndStatusesForPosts(posts.posts, dispatch, getState);
         } catch (error) {
-            forceLogoutIfNecessary(error, dispatch);
+            forceLogoutIfNecessary(error, dispatch, getState);
             dispatch(batchActions([
                 {type: PostTypes.GET_POSTS_BEFORE_FAILURE, error},
                 logError(error)(dispatch)
@@ -739,7 +739,7 @@ export function getPostsBeforeWithRetry(channelId, postId, page = 0, perPage = P
                         });
                     },
                     rollback: (success, error) => {
-                        forceLogoutIfNecessary(error, dispatch);
+                        forceLogoutIfNecessary(error, dispatch, getState);
                         dispatch(batchActions([
                             {type: PostTypes.GET_POSTS_BEFORE_FAILURE, error},
                             logError(error)(dispatch)
@@ -762,7 +762,7 @@ export function getPostsAfter(channelId, postId, page = 0, perPage = Posts.POST_
             posts = await Client4.getPostsAfter(channelId, postId, page, perPage);
             getProfilesAndStatusesForPosts(posts.posts, dispatch, getState);
         } catch (error) {
-            forceLogoutIfNecessary(error, dispatch);
+            forceLogoutIfNecessary(error, dispatch, getState);
             dispatch(batchActions([
                 {type: PostTypes.GET_POSTS_AFTER_FAILURE, error},
                 logError(error)(dispatch)
@@ -820,7 +820,7 @@ export function getPostsAfterWithRetry(channelId, postId, page = 0, perPage = Po
                         });
                     },
                     rollback: (success, error) => {
-                        forceLogoutIfNecessary(error, dispatch);
+                        forceLogoutIfNecessary(error, dispatch, getState);
                         dispatch(batchActions([
                             {type: PostTypes.GET_POSTS_AFTER_FAILURE, error},
                             logError(error)(dispatch)
@@ -965,7 +965,7 @@ export function getOpenGraphMetadata(url) {
         try {
             data = await Client4.getOpenGraphMetadata(url);
         } catch (error) {
-            forceLogoutIfNecessary(error, dispatch);
+            forceLogoutIfNecessary(error, dispatch, getState);
             dispatch(batchActions([
                 {type: PostTypes.OPEN_GRAPH_FAILURE, error},
                 logError(error)(dispatch)

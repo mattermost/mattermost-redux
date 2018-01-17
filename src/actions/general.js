@@ -59,7 +59,7 @@ export function getClientConfig() {
         try {
             data = await Client4.getClientConfigOld();
         } catch (error) {
-            forceLogoutIfNecessary(error, dispatch);
+            forceLogoutIfNecessary(error, dispatch, getState);
             dispatch(batchActions([
                 {
                     type: GeneralTypes.CLIENT_CONFIG_FAILURE,
@@ -90,7 +90,7 @@ export function getDataRetentionPolicy() {
         try {
             data = await Client4.getDataRetentionPolicy();
         } catch (error) {
-            forceLogoutIfNecessary(error, dispatch);
+            forceLogoutIfNecessary(error, dispatch, getState);
             dispatch(batchActions([
                 {
                     type: GeneralTypes.DATA_RETENTION_POLICY_FAILURE,

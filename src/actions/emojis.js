@@ -65,7 +65,7 @@ export function getAllCustomEmojis(perPage = General.PAGE_SIZE_MAXIMUM) {
                     data: emojis
                 });
             } catch (error) {
-                forceLogoutIfNecessary(error, dispatch);
+                forceLogoutIfNecessary(error, dispatch, getState);
 
                 return dispatch(batchActions([
                     {type: EmojiTypes.GET_ALL_CUSTOM_EMOJIS_FAILURE, error},
@@ -87,7 +87,7 @@ export function deleteCustomEmoji(emojiId) {
         try {
             await Client4.deleteCustomEmoji(emojiId);
         } catch (error) {
-            forceLogoutIfNecessary(error, dispatch);
+            forceLogoutIfNecessary(error, dispatch, getState);
 
             dispatch(batchActions([
                 {type: EmojiTypes.DELETE_CUSTOM_EMOJI_FAILURE, error},

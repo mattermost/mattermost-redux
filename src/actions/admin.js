@@ -268,7 +268,7 @@ export function getAnalytics(name, teamId = '') {
         try {
             data = await Client4.getAnalytics(name, teamId);
         } catch (error) {
-            forceLogoutIfNecessary(error, dispatch);
+            forceLogoutIfNecessary(error, dispatch, getState);
             dispatch(batchActions([
                 {type: AdminTypes.GET_ANALYTICS_FAILURE, error},
                 logError(error)(dispatch)
@@ -307,14 +307,14 @@ export function getUsersPerDayAnalytics(teamId = '') {
 
 // EXPERIMENTAL - SUBJECT TO CHANGE
 export function uploadPlugin(fileData) {
-    return async (dispatch) => {
+    return async (dispatch, getState) => {
         dispatch({type: AdminTypes.UPLOAD_PLUGIN_REQUEST});
 
         let data;
         try {
             data = await Client4.uploadPlugin(fileData);
         } catch (error) {
-            forceLogoutIfNecessary(error, dispatch);
+            forceLogoutIfNecessary(error, dispatch, getState);
             dispatch(batchActions([
                 {type: AdminTypes.UPLOAD_PLUGIN_FAILURE, error},
                 logError(error)(dispatch)
@@ -333,14 +333,14 @@ export function uploadPlugin(fileData) {
 
 // EXPERIMENTAL - SUBJECT TO CHANGE
 export function getPlugins() {
-    return async (dispatch) => {
+    return async (dispatch, getState) => {
         dispatch({type: AdminTypes.GET_PLUGIN_REQUEST});
 
         let data;
         try {
             data = await Client4.getPlugins();
         } catch (error) {
-            forceLogoutIfNecessary(error, dispatch);
+            forceLogoutIfNecessary(error, dispatch, getState);
             dispatch(batchActions([
                 {type: AdminTypes.GET_PLUGIN_FAILURE, error},
                 logError(error)(dispatch)
@@ -359,13 +359,13 @@ export function getPlugins() {
 
 // EXPERIMENTAL - SUBJECT TO CHANGE
 export function removePlugin(pluginId) {
-    return async (dispatch) => {
+    return async (dispatch, getState) => {
         dispatch({type: AdminTypes.REMOVE_PLUGIN_REQUEST});
 
         try {
             await Client4.removePlugin(pluginId);
         } catch (error) {
-            forceLogoutIfNecessary(error, dispatch);
+            forceLogoutIfNecessary(error, dispatch, getState);
             dispatch(batchActions([
                 {type: AdminTypes.REMOVE_PLUGIN_FAILURE, error},
                 logError(error)(dispatch)
@@ -384,13 +384,13 @@ export function removePlugin(pluginId) {
 
 // EXPERIMENTAL - SUBJECT TO CHANGE
 export function activatePlugin(pluginId) {
-    return async (dispatch) => {
+    return async (dispatch, getState) => {
         dispatch({type: AdminTypes.ACTIVATE_PLUGIN_REQUEST});
 
         try {
             await Client4.activatePlugin(pluginId);
         } catch (error) {
-            forceLogoutIfNecessary(error, dispatch);
+            forceLogoutIfNecessary(error, dispatch, getState);
             dispatch(batchActions([
                 {type: AdminTypes.ACTIVATE_PLUGIN_FAILURE, error},
                 logError(error)(dispatch)
@@ -409,13 +409,13 @@ export function activatePlugin(pluginId) {
 
 // EXPERIMENTAL - SUBJECT TO CHANGE
 export function deactivatePlugin(pluginId) {
-    return async (dispatch) => {
+    return async (dispatch, getState) => {
         dispatch({type: AdminTypes.DEACTIVATE_PLUGIN_REQUEST});
 
         try {
             await Client4.deactivatePlugin(pluginId);
         } catch (error) {
-            forceLogoutIfNecessary(error, dispatch);
+            forceLogoutIfNecessary(error, dispatch, getState);
             dispatch(batchActions([
                 {type: AdminTypes.DEACTIVATE_PLUGIN_FAILURE, error},
                 logError(error)(dispatch)

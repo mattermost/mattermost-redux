@@ -44,7 +44,7 @@ export function createChannel(channel, userId) {
         try {
             created = await Client4.createChannel(channel);
         } catch (error) {
-            forceLogoutIfNecessary(error, dispatch);
+            forceLogoutIfNecessary(error, dispatch, getState);
             dispatch(batchActions([
                 {
                     type: ChannelTypes.CREATE_CHANNEL_FAILURE,
@@ -103,7 +103,7 @@ export function createDirectChannel(userId, otherUserId) {
         try {
             created = await Client4.createDirectChannel([userId, otherUserId]);
         } catch (error) {
-            forceLogoutIfNecessary(error, dispatch);
+            forceLogoutIfNecessary(error, dispatch, getState);
             dispatch(batchActions([
                 {type: ChannelTypes.CREATE_CHANNEL_FAILURE, error},
                 logError(error)(dispatch)
@@ -166,7 +166,7 @@ export function createGroupChannel(userIds) {
         try {
             created = await Client4.createGroupChannel(userIds);
         } catch (error) {
-            forceLogoutIfNecessary(error, dispatch);
+            forceLogoutIfNecessary(error, dispatch, getState);
             dispatch(batchActions([
                 {type: ChannelTypes.CREATE_CHANNEL_FAILURE, error},
                 logError(error)(dispatch)
@@ -232,7 +232,7 @@ export function patchChannel(channelId, patch) {
         try {
             updated = await Client4.patchChannel(channelId, patch);
         } catch (error) {
-            forceLogoutIfNecessary(error, dispatch);
+            forceLogoutIfNecessary(error, dispatch, getState);
 
             dispatch(batchActions([
                 {type: ChannelTypes.UPDATE_CHANNEL_FAILURE, error},
@@ -263,7 +263,7 @@ export function updateChannel(channel) {
         try {
             updated = await Client4.updateChannel(channel);
         } catch (error) {
-            forceLogoutIfNecessary(error, dispatch);
+            forceLogoutIfNecessary(error, dispatch, getState);
 
             dispatch(batchActions([
                 {type: ChannelTypes.UPDATE_CHANNEL_FAILURE, error},
@@ -299,7 +299,7 @@ export function updateChannelNotifyProps(userId, channelId, props) {
         try {
             await Client4.updateChannelNotifyProps(notifyProps);
         } catch (error) {
-            forceLogoutIfNecessary(error, dispatch);
+            forceLogoutIfNecessary(error, dispatch, getState);
 
             dispatch(batchActions([
                 {type: ChannelTypes.NOTIFY_PROPS_FAILURE, error},
@@ -336,7 +336,7 @@ export function getChannel(channelId) {
         try {
             data = await Client4.getChannel(channelId);
         } catch (error) {
-            forceLogoutIfNecessary(error, dispatch);
+            forceLogoutIfNecessary(error, dispatch, getState);
             dispatch(batchActions([
                 {type: ChannelTypes.CHANNELS_FAILURE, error},
                 logError(error)(dispatch)
@@ -371,7 +371,7 @@ export function getChannelAndMyMember(channelId) {
             channel = await channelRequest;
             member = await memberRequest;
         } catch (error) {
-            forceLogoutIfNecessary(error, dispatch);
+            forceLogoutIfNecessary(error, dispatch, getState);
             dispatch(batchActions([
                 {type: ChannelTypes.CHANNELS_FAILURE, error},
                 logError(error)(dispatch)
@@ -415,7 +415,7 @@ export function fetchMyChannelsAndMembers(teamId) {
         try {
             channels = await channelsRequest;
         } catch (error) {
-            forceLogoutIfNecessary(error, dispatch);
+            forceLogoutIfNecessary(error, dispatch, getState);
             dispatch(batchActions([
                 {type: ChannelTypes.CHANNELS_FAILURE, error},
                 {type: ChannelTypes.CHANNEL_MEMBERS_FAILURE, error},
@@ -428,7 +428,7 @@ export function fetchMyChannelsAndMembers(teamId) {
         try {
             channelMembers = await channelMembersRequest;
         } catch (error) {
-            forceLogoutIfNecessary(error, dispatch);
+            forceLogoutIfNecessary(error, dispatch, getState);
             dispatch(batchActions([
                 {type: ChannelTypes.CHANNELS_FAILURE, error},
                 {type: ChannelTypes.CHANNEL_MEMBERS_FAILURE, error},
@@ -473,7 +473,7 @@ export function getMyChannelMembers(teamId) {
 
             channelMembers = await channelMembersRequest;
         } catch (error) {
-            forceLogoutIfNecessary(error, dispatch);
+            forceLogoutIfNecessary(error, dispatch, getState);
             dispatch(batchActions([
                 {type: ChannelTypes.CHANNEL_MY_MEMBERS_FAILURE, error},
                 logError(error)(dispatch)
@@ -509,7 +509,7 @@ export function getChannelMembers(channelId, page = 0, perPage = General.CHANNEL
 
             channelMembers = await channelMembersRequest;
         } catch (error) {
-            forceLogoutIfNecessary(error, dispatch);
+            forceLogoutIfNecessary(error, dispatch, getState);
             dispatch(batchActions([
                 {type: ChannelTypes.CHANNEL_MEMBERS_FAILURE, error},
                 logError(error)(dispatch)
@@ -595,7 +595,7 @@ export function joinChannel(userId, teamId, channelId, channelName) {
                 }
             }
         } catch (error) {
-            forceLogoutIfNecessary(error, dispatch);
+            forceLogoutIfNecessary(error, dispatch, getState);
             dispatch(batchActions([
                 {type: ChannelTypes.JOIN_CHANNEL_FAILURE, error},
                 logError(error)(dispatch)
@@ -630,7 +630,7 @@ export function deleteChannel(channelId) {
         try {
             await Client4.deleteChannel(channelId);
         } catch (error) {
-            forceLogoutIfNecessary(error, dispatch);
+            forceLogoutIfNecessary(error, dispatch, getState);
             dispatch(batchActions([
                 {type: ChannelTypes.DELETE_CHANNEL_FAILURE, error},
                 logError(error)(dispatch)
@@ -685,7 +685,7 @@ export function viewChannel(channelId, prevChannelId = '') {
         try {
             await Client4.viewMyChannel(channelId, prevChannelId);
         } catch (error) {
-            forceLogoutIfNecessary(error, dispatch);
+            forceLogoutIfNecessary(error, dispatch, getState);
             dispatch(batchActions([
                 {type: ChannelTypes.UPDATE_LAST_VIEWED_FAILURE, error},
                 logError(error)(dispatch)
@@ -755,7 +755,7 @@ export function getChannels(teamId, page = 0, perPage = General.CHANNELS_CHUNK_S
         try {
             channels = await Client4.getChannels(teamId, page, perPage);
         } catch (error) {
-            forceLogoutIfNecessary(error, dispatch);
+            forceLogoutIfNecessary(error, dispatch, getState);
             dispatch(batchActions([
                 {type: ChannelTypes.GET_CHANNELS_FAILURE, error},
                 logError(error)(dispatch)
@@ -786,7 +786,7 @@ export function searchChannels(teamId, term) {
         try {
             channels = await Client4.searchChannels(teamId, term);
         } catch (error) {
-            forceLogoutIfNecessary(error, dispatch);
+            forceLogoutIfNecessary(error, dispatch, getState);
             dispatch(batchActions([
                 {type: ChannelTypes.GET_CHANNELS_FAILURE, error},
                 logError(error)(dispatch)
@@ -817,7 +817,7 @@ export function getChannelStats(channelId) {
         try {
             stat = await Client4.getChannelStats(channelId);
         } catch (error) {
-            forceLogoutIfNecessary(error, dispatch);
+            forceLogoutIfNecessary(error, dispatch, getState);
             dispatch(batchActions([
                 {type: ChannelTypes.CHANNEL_STATS_FAILURE, error},
                 logError(error)(dispatch)
@@ -847,7 +847,7 @@ export function addChannelMember(channelId, userId, postRootId = '') {
         try {
             member = await Client4.addToChannel(userId, channelId, postRootId);
         } catch (error) {
-            forceLogoutIfNecessary(error, dispatch);
+            forceLogoutIfNecessary(error, dispatch, getState);
             dispatch(batchActions([
                 {type: ChannelTypes.ADD_CHANNEL_MEMBER_FAILURE, error},
                 logError(error)(dispatch)
@@ -884,7 +884,7 @@ export function removeChannelMember(channelId, userId) {
         try {
             await Client4.removeFromChannel(userId, channelId);
         } catch (error) {
-            forceLogoutIfNecessary(error, dispatch);
+            forceLogoutIfNecessary(error, dispatch, getState);
             dispatch(batchActions([
                 {type: ChannelTypes.REMOVE_CHANNEL_MEMBER_FAILURE, error},
                 logError(error)(dispatch)
@@ -917,7 +917,7 @@ export function updateChannelMemberRoles(channelId, userId, roles) {
         try {
             await Client4.updateChannelMemberRoles(channelId, userId, roles);
         } catch (error) {
-            forceLogoutIfNecessary(error, dispatch);
+            forceLogoutIfNecessary(error, dispatch, getState);
             dispatch(batchActions([
                 {type: ChannelTypes.UPDATE_CHANNEL_MEMBER_FAILURE, error},
                 logError(error)(dispatch)
@@ -1000,7 +1000,7 @@ export function markChannelAsRead(channelId, prevChannelId, updateLastViewedAt =
             dispatch({type: ChannelTypes.UPDATE_LAST_VIEWED_REQUEST}, getState);
 
             Client4.viewMyChannel(channelId, prevChannelId).catch((error) => {
-                forceLogoutIfNecessary(error, dispatch);
+                forceLogoutIfNecessary(error, dispatch, getState);
                 dispatch(batchActions([
                     {type: ChannelTypes.UPDATE_LAST_VIEWED_FAILURE, error},
                     logError(error)(dispatch)

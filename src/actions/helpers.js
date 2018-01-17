@@ -7,16 +7,20 @@ import {UserTypes} from 'action_types';
 import {logError} from './errors';
 const HTTP_UNAUTHORIZED = 401;
 
-export async function forceLogoutIfNecessary(err, dispatch) {
-    if (err.status_code === HTTP_UNAUTHORIZED && err.url.indexOf('/login') === -1) {
-        dispatch({type: UserTypes.LOGOUT_REQUEST});
-        try {
-            await Client4.logout();
-        } catch (error) {
-            logError(error)(dispatch);
+export function forceLogoutIfNecessary(err, dispatch, getState) {
+    // Wrap around a setTimeout so it gets executed once the store updates
+    setTimeout(() => {
+        const {currentUserId} = getState().entities.users;
+        if (err.status_code === HTTP_UNAUTHORIZED && err.url.indexOf('/login') === -1 && currentUserId) {
+            dispatch({type: UserTypes.LOGOUT_REQUEST});
+            try {
+                Client4.logout();
+            } catch (error) {
+                logError(error)(dispatch);
+            }
+            dispatch({type: UserTypes.LOGOUT_SUCCESS});
         }
-        dispatch({type: UserTypes.LOGOUT_SUCCESS});
-    }
+    }, 0);
 }
 
 function dispatcher(type, data, dispatch, getState) {
@@ -55,7 +59,7 @@ export function bindClientFunc(clientFunc, request, success, failure, ...args) {
         try {
             data = await clientFunc(...args);
         } catch (error) {
-            forceLogoutIfNecessary(error, dispatch);
+            forceLogoutIfNecessary(error, dispatch, getState);
             dispatch(batchActions([
                 requestFailure(failure, error),
                 logError(error)(dispatch)

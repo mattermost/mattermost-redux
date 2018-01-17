@@ -49,7 +49,7 @@ export function removeIncomingHook(hookId) {
         try {
             await Client4.removeIncomingWebhook(hookId);
         } catch (error) {
-            forceLogoutIfNecessary(error, dispatch);
+            forceLogoutIfNecessary(error, dispatch, getState);
 
             dispatch(batchActions([
                 {type: IntegrationTypes.DELETE_INCOMING_HOOK_FAILURE, error},
@@ -122,7 +122,7 @@ export function removeOutgoingHook(hookId) {
         try {
             await Client4.removeOutgoingWebhook(hookId);
         } catch (error) {
-            forceLogoutIfNecessary(error, dispatch);
+            forceLogoutIfNecessary(error, dispatch, getState);
 
             dispatch(batchActions([
                 {type: IntegrationTypes.DELETE_OUTGOING_HOOK_FAILURE, error},
@@ -236,7 +236,7 @@ export function regenCommandToken(id) {
         try {
             res = await Client4.regenCommandToken(id);
         } catch (error) {
-            forceLogoutIfNecessary(error, dispatch);
+            forceLogoutIfNecessary(error, dispatch, getState);
 
             dispatch(batchActions([
                 {type: IntegrationTypes.REGEN_COMMAND_TOKEN_FAILURE, error},
@@ -269,7 +269,7 @@ export function deleteCommand(id) {
         try {
             await Client4.deleteCommand(id);
         } catch (error) {
-            forceLogoutIfNecessary(error, dispatch);
+            forceLogoutIfNecessary(error, dispatch, getState);
 
             dispatch(batchActions([
                 {type: IntegrationTypes.DELETE_COMMAND_FAILURE, error},
@@ -340,7 +340,7 @@ export function deleteOAuthApp(id) {
         try {
             await Client4.deleteOAuthApp(id);
         } catch (error) {
-            forceLogoutIfNecessary(error, dispatch);
+            forceLogoutIfNecessary(error, dispatch, getState);
 
             dispatch(batchActions([
                 {type: IntegrationTypes.DELETE_OAUTH_APP_FAILURE, error},

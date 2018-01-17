@@ -95,7 +95,7 @@ export function createTeam(team) {
         try {
             created = await Client4.createTeam(team);
         } catch (error) {
-            forceLogoutIfNecessary(error, dispatch);
+            forceLogoutIfNecessary(error, dispatch, getState);
             dispatch(batchActions([
                 {type: TeamTypes.CREATE_TEAM_FAILURE, error},
                 logError(error)(dispatch)
@@ -177,7 +177,7 @@ export function getTeamMember(teamId, userId) {
 
             member = await memberRequest;
         } catch (error) {
-            forceLogoutIfNecessary(error, dispatch);
+            forceLogoutIfNecessary(error, dispatch, getState);
             dispatch(batchActions([
                 {type: TeamTypes.TEAM_MEMBERS_FAILURE, error},
                 logError(error)(dispatch)
@@ -211,7 +211,7 @@ export function getTeamMembersByIds(teamId, userIds) {
 
             members = await membersRequest;
         } catch (error) {
-            forceLogoutIfNecessary(error, dispatch);
+            forceLogoutIfNecessary(error, dispatch, getState);
             dispatch(batchActions([
                 {type: TeamTypes.TEAM_MEMBERS_FAILURE, error},
                 logError(error)(dispatch)
@@ -271,7 +271,7 @@ export function addUserToTeam(teamId, userId) {
         try {
             member = await Client4.addToTeam(teamId, userId);
         } catch (error) {
-            forceLogoutIfNecessary(error, dispatch);
+            forceLogoutIfNecessary(error, dispatch, getState);
             dispatch(batchActions([
                 {type: TeamTypes.ADD_TEAM_MEMBER_FAILURE, error},
                 logError(error)(dispatch)
@@ -306,7 +306,7 @@ export function addUsersToTeam(teamId, userIds) {
         try {
             members = await Client4.addUsersToTeam(teamId, userIds);
         } catch (error) {
-            forceLogoutIfNecessary(error, dispatch);
+            forceLogoutIfNecessary(error, dispatch, getState);
             dispatch(batchActions([
                 {type: TeamTypes.ADD_TEAM_MEMBER_FAILURE, error},
                 logError(error)(dispatch)
@@ -343,7 +343,7 @@ export function removeUserFromTeam(teamId, userId) {
         try {
             await Client4.removeFromTeam(teamId, userId);
         } catch (error) {
-            forceLogoutIfNecessary(error, dispatch);
+            forceLogoutIfNecessary(error, dispatch, getState);
             dispatch(batchActions([
                 {type: TeamTypes.REMOVE_TEAM_MEMBER_FAILURE, error},
                 logError(error)(dispatch)
@@ -401,7 +401,7 @@ export function updateTeamMemberRoles(teamId, userId, roles) {
         try {
             await Client4.updateTeamMemberRoles(teamId, userId, roles);
         } catch (error) {
-            forceLogoutIfNecessary(error, dispatch);
+            forceLogoutIfNecessary(error, dispatch, getState);
             dispatch(batchActions([
                 {type: TeamTypes.UPDATE_TEAM_MEMBER_FAILURE, error},
                 logError(error)(dispatch)
@@ -450,7 +450,7 @@ export function checkIfTeamExists(teamName) {
         try {
             data = await Client4.checkIfTeamExists(teamName);
         } catch (error) {
-            forceLogoutIfNecessary(error, dispatch);
+            forceLogoutIfNecessary(error, dispatch, getState);
             dispatch(batchActions([
                 {type: TeamTypes.GET_TEAM_FAILURE, error},
                 logError(error)(dispatch)
@@ -477,7 +477,7 @@ export function joinTeam(inviteId, teamId) {
                 await Client4.joinTeam(inviteId);
             }
         } catch (error) {
-            forceLogoutIfNecessary(error, dispatch);
+            forceLogoutIfNecessary(error, dispatch, getState);
             dispatch(batchActions([
                 {type: TeamTypes.JOIN_TEAM_FAILURE, error},
                 logError(error)(dispatch)
