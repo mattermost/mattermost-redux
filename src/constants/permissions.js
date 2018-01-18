@@ -18,7 +18,7 @@ export default {
     MANAGE_SYSTEM: 'manage_system',
     CREATE_DIRECT_CHANNEL: 'create_direct_channel',
     CREATE_GROUP_CHANNEL: 'create_group_channel',
-    MANAGE__PUBLICCHANNEL_PROPERTIES: 'manage__publicchannel_properties',
+    MANAGE_PUBLIC_CHANNEL_PROPERTIES: 'manage_public_channel_properties',
     MANAGE_PRIVATE_CHANNEL_PROPERTIES: 'manage_private_channel_properties',
     LIST_TEAM_CHANNELS: 'list_team_channels',
     JOIN_PUBLIC_CHANNELS: 'join_public_channels',
