@@ -496,7 +496,7 @@ export const getSortedPublicChannelWithUnreadsIds = createIdsSelector(
     getAllChannels,
     getMyChannelMemberships,
     getChannelIdsForCurrentTeam,
-    getSortedFavoriteChannelIds,
+    getSortedFavoriteChannelWithUnreadsIds,
     (currentUser, channels, myMembers, teamChannelIds, favoriteIds) => {
         if (!currentUser) {
             return [];
@@ -526,7 +526,7 @@ export const getSortedPrivateChannelWithUnreadsIds = createIdsSelector(
     getAllChannels,
     getMyChannelMemberships,
     getChannelIdsForCurrentTeam,
-    getSortedFavoriteChannelIds,
+    getSortedFavoriteChannelWithUnreadsIds,
     (currentUser, channels, myMembers, teamChannelIds, favoriteIds) => {
         if (!currentUser) {
             return [];
@@ -557,7 +557,7 @@ export const getSortedDirectChannelWithUnreadsIds = createIdsSelector(
     getAllChannels,
     getVisibleTeammate,
     getVisibleGroupIds,
-    getSortedFavoriteChannelIds,
+    getSortedFavoriteChannelWithUnreadsIds,
     getTeammateNameDisplaySetting,
     getConfig,
     getMyPreferences,
