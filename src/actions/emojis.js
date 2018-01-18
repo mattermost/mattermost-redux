@@ -42,6 +42,7 @@ export function getAllCustomEmojis(perPage = General.PAGE_SIZE_MAXIMUM) {
 
         let hasMore = true;
         let page = 0;
+        const allEmojis = [];
 
         const serverVersion = getState().entities.general.serverVersion;
 
@@ -58,12 +59,8 @@ export function getAllCustomEmojis(perPage = General.PAGE_SIZE_MAXIMUM) {
                     } else {
                         page += 1;
                     }
+                    allEmojis.push(...emojis);
                 }
-
-                dispatch({
-                    type: EmojiTypes.RECEIVED_CUSTOM_EMOJIS,
-                    data: emojis
-                });
             } catch (error) {
                 forceLogoutIfNecessary(error, dispatch, getState);
 
@@ -74,7 +71,13 @@ export function getAllCustomEmojis(perPage = General.PAGE_SIZE_MAXIMUM) {
             }
         } while (hasMore);
 
-        dispatch({type: EmojiTypes.GET_ALL_CUSTOM_EMOJIS_SUCCESS}, getState);
+        dispatch(batchActions([
+            {type: EmojiTypes.GET_ALL_CUSTOM_EMOJIS_SUCCESS},
+            {
+                type: EmojiTypes.RECEIVED_CUSTOM_EMOJIS,
+                data: allEmojis
+            }
+        ]), getState);
 
         return {data: true};
     };
