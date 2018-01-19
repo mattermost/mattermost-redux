@@ -1723,6 +1723,20 @@ export default class Client4 {
         return `${this.getEmojiRoute(id)}/image`;
     };
 
+    searchCustomEmoji = async (term, options = {}) => {
+        return this.doFetch(
+            `${this.getEmojisRoute()}/search`,
+            {method: 'post', body: JSON.stringify({term, ...options})}
+        );
+    };
+
+    autocompleteCustomEmoji = async (name) => {
+        return this.doFetch(
+            `${this.getEmojisRoute()}/autocomplete${buildQueryString({name})}`,
+            {method: 'get'}
+        );
+    };
+
     // Data Retention
 
     getDataRetentionPolicy = () => {

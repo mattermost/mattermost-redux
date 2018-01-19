@@ -206,4 +206,69 @@ describe('Actions.Emojis', () => {
         const emojis = state.entities.emojis.customEmoji;
         assert.ok(!emojis[created.id]);
     });
+
+    it('searchCustomEmojis', async () => {
+        const testImageData = fs.createReadStream('test/assets/images/test.png');
+
+        nock(Client4.getEmojisRoute()).
+            post('').
+            reply(201, {id: TestHelper.generateId(), create_at: 1507918415696, update_at: 1507918415696, delete_at: 0, creator_id: TestHelper.basicUser.id, name: TestHelper.generateId()});
+
+        const {data: created} = await Actions.createCustomEmoji(
+            {
+                name: TestHelper.generateId(),
+                creator_id: TestHelper.basicUser.id
+            },
+            testImageData
+        )(store.dispatch, store.getState);
+
+        nock(Client4.getEmojisRoute()).
+            post('/search').
+            reply(200, [created]);
+
+        await Actions.searchCustomEmojis(created.name, {prefix_only: true})(store.dispatch, store.getState);
+
+        const state = store.getState();
+        const request = state.requests.emojis.getCustomEmojis;
+        if (request.status === RequestStatus.FAILURE) {
+            throw new Error(request.error);
+        }
+
+        const emojis = state.entities.emojis.customEmoji;
+        assert.ok(emojis);
+        assert.ok(emojis[created.id]);
+    });
+
+    it('autocompleteCustomEmojis', async () => {
+        const testImageData = fs.createReadStream('test/assets/images/test.png');
+
+        nock(Client4.getEmojisRoute()).
+            post('').
+            reply(201, {id: TestHelper.generateId(), create_at: 1507918415696, update_at: 1507918415696, delete_at: 0, creator_id: TestHelper.basicUser.id, name: TestHelper.generateId()});
+
+        const {data: created} = await Actions.createCustomEmoji(
+            {
+                name: TestHelper.generateId(),
+                creator_id: TestHelper.basicUser.id
+            },
+            testImageData
+        )(store.dispatch, store.getState);
+
+        nock(Client4.getEmojisRoute()).
+            get('/autocomplete').
+            query(true).
+            reply(200, [created]);
+
+        await Actions.autocompleteCustomEmojis(created.name)(store.dispatch, store.getState);
+
+        const state = store.getState();
+        const request = state.requests.emojis.getCustomEmojis;
+        if (request.status === RequestStatus.FAILURE) {
+            throw new Error(request.error);
+        }
+
+        const emojis = state.entities.emojis.customEmoji;
+        assert.ok(emojis);
+        assert.ok(emojis[created.id]);
+    });
 });

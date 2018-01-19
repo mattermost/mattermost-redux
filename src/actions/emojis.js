@@ -113,3 +113,24 @@ export function deleteCustomEmoji(emojiId) {
         return {data: true};
     };
 }
+
+export function searchCustomEmojis(term, options = {}) {
+    return bindClientFunc(
+        Client4.searchCustomEmoji,
+        EmojiTypes.GET_CUSTOM_EMOJIS_REQUEST,
+        [EmojiTypes.RECEIVED_CUSTOM_EMOJIS, EmojiTypes.GET_CUSTOM_EMOJIS_SUCCESS],
+        EmojiTypes.GET_CUSTOM_EMOJIS_FAILURE,
+        term,
+        options
+    );
+}
+
+export function autocompleteCustomEmojis(name) {
+    return bindClientFunc(
+        Client4.autocompleteCustomEmoji,
+        EmojiTypes.GET_CUSTOM_EMOJIS_REQUEST,
+        [EmojiTypes.RECEIVED_CUSTOM_EMOJIS, EmojiTypes.GET_CUSTOM_EMOJIS_SUCCESS],
+        EmojiTypes.GET_CUSTOM_EMOJIS_FAILURE,
+        name
+    );
+}
