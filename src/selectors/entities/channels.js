@@ -460,7 +460,7 @@ export const getSortedFavoriteChannelWithUnreadsIds = createIdsSelector(
 
         const locale = currentUser.locale || 'en';
         const favoriteChannel = favoriteIds.filter((id) => {
-            if (!myMembers[id]) {
+            if (!myMembers[id] || !channels[id]) {
                 return false;
             }
 
