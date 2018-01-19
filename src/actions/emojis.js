@@ -29,7 +29,8 @@ export function getCustomEmojis(page = 0, perPage = General.PAGE_SIZE_DEFAULT) {
         [EmojiTypes.RECEIVED_CUSTOM_EMOJIS, EmojiTypes.GET_CUSTOM_EMOJIS_SUCCESS],
         EmojiTypes.GET_CUSTOM_EMOJIS_FAILURE,
         page,
-        perPage
+        perPage,
+        'name'
     );
 }
 
@@ -53,7 +54,7 @@ export function getAllCustomEmojis(perPage = General.PAGE_SIZE_MAXIMUM) {
                     emojis = await Client.getCustomEmojis();
                     hasMore = false;
                 } else {
-                    emojis = await Client4.getCustomEmojis(page, perPage);
+                    emojis = await Client4.getCustomEmojis(page, perPage, 'name');
                     if (emojis.length < perPage) {
                         hasMore = false;
                     } else {
