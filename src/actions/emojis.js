@@ -2,7 +2,7 @@
 // See License.txt for license information.
 
 import {EmojiTypes} from 'action_types';
-import {General} from 'constants';
+import {General, Emoji} from 'constants';
 import {batchActions} from 'redux-batched-actions';
 
 import {Client, Client4} from 'client';
@@ -30,7 +30,7 @@ export function getCustomEmojis(page = 0, perPage = General.PAGE_SIZE_DEFAULT) {
         EmojiTypes.GET_CUSTOM_EMOJIS_FAILURE,
         page,
         perPage,
-        'name'
+        Emoji.SORT_BY_NAME
     );
 }
 
@@ -54,7 +54,7 @@ export function getAllCustomEmojis(perPage = General.PAGE_SIZE_MAXIMUM) {
                     emojis = await Client.getCustomEmojis();
                     hasMore = false;
                 } else {
-                    emojis = await Client4.getCustomEmojis(page, perPage, 'name');
+                    emojis = await Client4.getCustomEmojis(page, perPage, Emoji.SORT_BY_NAME);
                     if (emojis.length < perPage) {
                         hasMore = false;
                     } else {
