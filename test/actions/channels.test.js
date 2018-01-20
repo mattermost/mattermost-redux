@@ -539,49 +539,150 @@ describe('Actions.Channels', () => {
         assert.ok(member.last_viewed_at > timestamp);
     });
 
-    it('markChannelAsUnread', async () => {
-        TestHelper.mockLogin();
-        await login(TestHelper.basicUser.email, TestHelper.basicUser.password)(store.dispatch, store.getState);
+    describe('markChannelAsUnread', async () => {
+        it('plain message', async () => {
+            const teamId = TestHelper.generateId();
+            const channelId = TestHelper.generateId();
+            const userId = TestHelper.generateId();
 
-        nock(Client4.getChannelsRoute()).
-            post('').
-            reply(201, TestHelper.fakeChannelWithId(TestHelper.basicTeam.id));
+            store = await configureStore({
+                entities: {
+                    channels: {
+                        channels: {
+                            [channelId]: {team_id: teamId, total_msg_count: 10}
+                        },
+                        myMembers: {
+                            [channelId]: {msg_count: 10, mention_count: 0}
+                        }
+                    },
+                    teams: {
+                        myMembers: {
+                            [teamId]: {msg_count: 0, mention_count: 0}
+                        }
+                    },
+                    users: {
+                        currentUserId: userId
+                    }
+                }
+            });
 
-        const userChannel = await Client4.createChannel(
-            TestHelper.fakeChannel(TestHelper.basicTeam.id)
-        );
+            store.dispatch(Actions.markChannelAsUnread(teamId, channelId, [TestHelper.generateId()]), store.getState);
 
-        nock(Client4.getUsersRoute()).
-            get(`/me/teams/${TestHelper.basicTeam.id}/channels`).
-            reply(200, [userChannel, TestHelper.basicChannel]);
+            const state = store.getState();
+            assert.equal(state.entities.channels.channels[channelId].total_msg_count, 11);
+            assert.equal(state.entities.channels.myMembers[channelId].msg_count, 10);
+            assert.equal(state.entities.channels.myMembers[channelId].mention_count, 0);
+            assert.equal(state.entities.teams.myMembers[teamId].msg_count, 1);
+            assert.equal(state.entities.teams.myMembers[teamId].mention_count, 0);
+        });
 
-        nock(Client4.getUsersRoute()).
-            get(`/me/teams/${TestHelper.basicTeam.id}/channels/members`).
-            reply(200, [{user_id: TestHelper.basicUser.id, channel_id: userChannel.id, mention_count: 0, msg_count: 0}, TestHelper.basicChannelMember]);
+        it('message mentioning current user', async () => {
+            const teamId = TestHelper.generateId();
+            const channelId = TestHelper.generateId();
+            const userId = TestHelper.generateId();
 
-        await Actions.fetchMyChannelsAndMembers(TestHelper.basicTeam.id)(store.dispatch, store.getState);
+            store = await configureStore({
+                entities: {
+                    channels: {
+                        channels: {
+                            [channelId]: {team_id: teamId, total_msg_count: 10}
+                        },
+                        myMembers: {
+                            [channelId]: {msg_count: 10, mention_count: 0}
+                        }
+                    },
+                    teams: {
+                        myMembers: {
+                            [teamId]: {msg_count: 0, mention_count: 0}
+                        }
+                    },
+                    users: {
+                        currentUserId: userId
+                    }
+                }
+            });
 
-        const {channels} = store.getState().entities.channels;
-        assert.ok(channels);
+            store.dispatch(Actions.markChannelAsUnread(teamId, channelId, [userId]), store.getState);
 
-        const channelId = userChannel.id;
-        await Actions.markChannelAsUnread(
-            TestHelper.basicTeam.id,
-            channelId,
-            JSON.stringify([TestHelper.basicUser.id])
-        )(store.dispatch, store.getState);
+            const state = store.getState();
+            assert.equal(state.entities.channels.channels[channelId].total_msg_count, 11);
+            assert.equal(state.entities.channels.myMembers[channelId].msg_count, 10);
+            assert.equal(state.entities.channels.myMembers[channelId].mention_count, 1);
+            assert.equal(state.entities.teams.myMembers[teamId].msg_count, 1);
+            assert.equal(state.entities.teams.myMembers[teamId].mention_count, 1);
+        });
 
-        const state = store.getState();
-        const {channels: myChannels, myMembers: channelMembers} = state.entities.channels;
-        const {myMembers: teamMembers} = state.entities.teams;
-        const channel = myChannels[channelId];
-        const channelMember = channelMembers[channelId];
-        const teamMember = teamMembers[TestHelper.basicTeam.id];
+        it('plain message with mark_unread="mention"', async () => {
+            const teamId = TestHelper.generateId();
+            const channelId = TestHelper.generateId();
+            const userId = TestHelper.generateId();
 
-        assert.equal((channel.total_msg_count - channelMember.msg_count), 1);
-        assert.equal(channelMember.mention_count, 1);
-        assert.equal(teamMember.msg_count, 1);
-        assert.equal(teamMember.mention_count, 1);
+            store = await configureStore({
+                entities: {
+                    channels: {
+                        channels: {
+                            [channelId]: {team_id: teamId, total_msg_count: 10}
+                        },
+                        myMembers: {
+                            [channelId]: {msg_count: 10, mention_count: 0, notify_props: {mark_unread: General.MENTION}}
+                        }
+                    },
+                    teams: {
+                        myMembers: {
+                            [teamId]: {msg_count: 0, mention_count: 0}
+                        }
+                    },
+                    users: {
+                        currentUserId: userId
+                    }
+                }
+            });
+
+            store.dispatch(Actions.markChannelAsUnread(teamId, channelId, [TestHelper.generateId()]), store.getState);
+
+            const state = store.getState();
+            assert.equal(state.entities.channels.channels[channelId].total_msg_count, 11);
+            assert.equal(state.entities.channels.myMembers[channelId].msg_count, 11);
+            assert.equal(state.entities.channels.myMembers[channelId].mention_count, 0);
+            assert.equal(state.entities.teams.myMembers[teamId].msg_count, 0);
+            assert.equal(state.entities.teams.myMembers[teamId].mention_count, 0);
+        });
+
+        it('message mentioning current user with mark_unread="mention"', async () => {
+            const teamId = TestHelper.generateId();
+            const channelId = TestHelper.generateId();
+            const userId = TestHelper.generateId();
+
+            store = await configureStore({
+                entities: {
+                    channels: {
+                        channels: {
+                            [channelId]: {team_id: teamId, total_msg_count: 10}
+                        },
+                        myMembers: {
+                            [channelId]: {msg_count: 10, mention_count: 0, notify_props: {mark_unread: General.MENTION}}
+                        }
+                    },
+                    teams: {
+                        myMembers: {
+                            [teamId]: {msg_count: 0, mention_count: 0}
+                        }
+                    },
+                    users: {
+                        currentUserId: userId
+                    }
+                }
+            });
+
+            store.dispatch(Actions.markChannelAsUnread(teamId, channelId, [userId]), store.getState);
+
+            const state = store.getState();
+            assert.equal(state.entities.channels.channels[channelId].total_msg_count, 11);
+            assert.equal(state.entities.channels.myMembers[channelId].msg_count, 11);
+            assert.equal(state.entities.channels.myMembers[channelId].mention_count, 1);
+            assert.equal(state.entities.teams.myMembers[teamId].msg_count, 0);
+            assert.equal(state.entities.teams.myMembers[teamId].mention_count, 1);
+        });
     });
 
     describe('markChannelAsRead', async () => {

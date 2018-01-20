@@ -83,9 +83,25 @@ function channels(state = {}, action) {
         }
         return state;
     }
+    case ChannelTypes.INCREMENT_TOTAL_MSG_COUNT: {
+        const {channelId, amount} = action.data;
+        const channel = state[channelId];
+
+        if (!channel) {
+            return state;
+        }
+
+        return {
+            ...state,
+            [channelId]: {
+                ...channel,
+                total_msg_count: channel.total_msg_count + amount
+            }
+        };
+    }
+
     case UserTypes.LOGOUT_SUCCESS:
         return {};
-
     default:
         return state;
     }
@@ -152,19 +168,78 @@ function myMembers(state = {}, action) {
             [action.data.channel_id]: member
         };
     }
-    case ChannelTypes.RECEIVED_MSG_AND_MENTION_COUNT: {
-        const {data} = action;
-        let member = state[data.channel_id];
+    case ChannelTypes.INCREMENT_UNREAD_MSG_COUNT: {
+        const {channelId, amount, onlyMentions} = action.data;
+        const member = state[channelId];
 
-        member = {
-            ...member,
-            msg_count: data.msg_count == null ? member.msg_count : data.msg_count,
-            mention_count: data.mention_count == null ? member.mention_count : data.mention_count
-        };
+        if (!member) {
+            // Don't keep track of unread posts until we've loaded the actual channel member
+            return state;
+        }
+
+        if (!onlyMentions) {
+            // Incrementing the msg_count marks the channel as read, so don't do that if these posts should be unread
+            return state;
+        }
 
         return {
             ...state,
-            [data.channel_id]: member
+            [channelId]: {
+                ...member,
+                msg_count: member.msg_count + amount
+            }
+        };
+    }
+    case ChannelTypes.DECREMENT_UNREAD_MSG_COUNT: {
+        const {channelId, amount} = action.data;
+
+        const member = state[channelId];
+
+        if (!member) {
+            // Don't keep track of unread posts until we've loaded the actual channel member
+            return state;
+        }
+
+        return {
+            ...state,
+            [channelId]: {
+                ...member,
+                msg_count: member.msg_count + amount
+            }
+        };
+    }
+    case ChannelTypes.INCREMENT_UNREAD_MENTION_COUNT: {
+        const {channelId, amount} = action.data;
+        const member = state[channelId];
+
+        if (!member) {
+            // Don't keep track of unread posts until we've loaded the actual channel member
+            return state;
+        }
+
+        return {
+            ...state,
+            [channelId]: {
+                ...member,
+                mention_count: member.mention_count + amount
+            }
+        };
+    }
+    case ChannelTypes.DECREMENT_UNREAD_MENTION_COUNT: {
+        const {channelId, amount} = action.data;
+        const member = state[channelId];
+
+        if (!member) {
+            // Don't keep track of unread posts until we've loaded the actual channel member
+            return state;
+        }
+
+        return {
+            ...state,
+            [channelId]: {
+                ...member,
+                mention_count: Math.max(member.mention_count - amount, 0)
+            }
         };
     }
     case ChannelTypes.RECEIVED_LAST_VIEWED_AT: {

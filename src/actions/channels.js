@@ -5,7 +5,7 @@ import {batchActions} from 'redux-batched-actions';
 
 import {Client4} from 'client';
 import {General, Preferences} from 'constants';
-import {ChannelTypes, PreferenceTypes, TeamTypes, UserTypes} from 'action_types';
+import {ChannelTypes, PreferenceTypes, UserTypes} from 'action_types';
 import {savePreferences, deletePreferences} from 'actions/preferences';
 import {getChannelsIdForTeam} from 'utils/channel_utils';
 
@@ -980,26 +980,14 @@ export function updateChannelPurpose(channelId, purpose) {
 }
 
 export function markChannelAsRead(channelId, prevChannelId, updateLastViewedAt = true) {
-    return async (dispatch, getState) => {
-        const state = getState();
-        const channelState = state.entities.channels;
-        const teamState = state.entities.teams;
-
-        const actions = [];
-
-        // Update channel member objects to set all mentions and posts as viewed
-        const channel = channelState.channels[channelId];
-        const prevChannel = channelState.channels[prevChannelId]; // May be null since prevChannelId is optional
-
-        // Update team member objects to set mentions and posts in channel as viewed
-        const channelMember = channelState.myMembers[channelId];
-        const prevChannelMember = channelState.myMembers[prevChannelId]; // May also be null
-
+    return (dispatch, getState) => {
         // Send channel last viewed at to the server
         if (updateLastViewedAt) {
             dispatch({type: ChannelTypes.UPDATE_LAST_VIEWED_REQUEST}, getState);
 
-            Client4.viewMyChannel(channelId, prevChannelId).catch((error) => {
+            Client4.viewMyChannel(channelId, prevChannelId).then(() => {
+                dispatch({type: ChannelTypes.UPDATE_LAST_VIEWED_SUCCESS}, getState);
+            }).catch((error) => {
                 forceLogoutIfNecessary(error, dispatch, getState);
                 dispatch(batchActions([
                     {type: ChannelTypes.UPDATE_LAST_VIEWED_FAILURE, error},
@@ -1007,72 +995,58 @@ export function markChannelAsRead(channelId, prevChannelId, updateLastViewedAt =
                 ]), getState);
                 return {error};
             });
-
-            actions.push({type: ChannelTypes.UPDATE_LAST_VIEWED_SUCCESS});
         }
+
+        const state = getState();
+        const {channels, myMembers} = state.entities.channels;
+
+        // Update channel member objects to set all mentions and posts as viewed
+        const channel = channels[channelId];
+        const prevChannel = channels[prevChannelId]; // May be null since prevChannelId is optional
+
+        // Update team member objects to set mentions and posts in channel as viewed
+        const channelMember = myMembers[channelId];
+        const prevChannelMember = myMembers[prevChannelId]; // May also be null
+
+        const actions = [];
 
         if (channel && channelMember) {
             actions.push({
-                type: ChannelTypes.RECEIVED_MSG_AND_MENTION_COUNT,
+                type: ChannelTypes.DECREMENT_UNREAD_MSG_COUNT,
                 data: {
-                    channel_id: channelId,
-                    msg_count: channel.total_msg_count,
-                    mention_count: 0
+                    teamId: channel.team_id,
+                    channelId,
+                    amount: channel.total_msg_count - channelMember.msg_count
+                }
+            });
+
+            actions.push({
+                type: ChannelTypes.DECREMENT_UNREAD_MENTION_COUNT,
+                data: {
+                    teamId: channel.team_id,
+                    channelId,
+                    amount: channelMember.mention_count
                 }
             });
         }
 
-        if (prevChannel && prevChannelMember && channelId !== prevChannelId) {
+        if (prevChannel && prevChannelMember) {
             actions.push({
-                type: ChannelTypes.RECEIVED_MSG_AND_MENTION_COUNT,
+                type: ChannelTypes.DECREMENT_UNREAD_MSG_COUNT,
                 data: {
-                    channel_id: prevChannelId,
-                    msg_count: prevChannel.total_msg_count,
-                    mention_count: 0
+                    teamId: prevChannel.team_id,
+                    channelId: prevChannelId,
+                    amount: prevChannel.total_msg_count - prevChannelMember.msg_count
                 }
             });
-        }
 
-        const teamUnreads = [];
-
-        if (channel && channel.team_id) {
-            const teamMember = teamState.myMembers[channel.team_id];
-
-            // Decrement mention_count and msg_count by the number that was read in the channel.
-            // Note that this works because the values in channelMember are what was unread before this.
-            if (teamMember && channelMember) {
-                const teamUnread = {
-                    team_id: channel.team_id,
-                    mention_count: teamMember.mention_count - channelMember.mention_count,
-                    msg_count: teamMember.msg_count - (channel.total_msg_count - channelMember.msg_count)
-                };
-
-                if (prevChannel && prevChannelMember && channel.team_id === prevChannel.team_id) {
-                    teamUnread.mention_count -= prevChannelMember.mention_count;
-                    teamUnread.msg_count -= (prevChannel.total_msg_count - prevChannelMember.msg_count);
-                }
-
-                teamUnreads.push(teamUnread);
-            }
-        }
-
-        if (channel && prevChannel && prevChannel.team_id && channel.team_id !== prevChannel.team_id) {
-            const prevTeamMember = teamState.myMembers[prevChannel.team_id];
-
-            // We need to make sure that the user hasn't left the team
-            if (prevTeamMember) {
-                teamUnreads.push({
-                    team_id: prevChannel.team_id,
-                    mention_count: prevTeamMember.mention_count - prevChannelMember.mention_count,
-                    msg_count: prevTeamMember.msg_count - (prevChannel.total_msg_count - prevChannelMember.msg_count)
-                });
-            }
-        }
-
-        if (teamUnreads.length > 0) {
             actions.push({
-                type: TeamTypes.RECEIVED_MY_TEAM_UNREADS,
-                data: teamUnreads
+                type: ChannelTypes.DECREMENT_UNREAD_MENTION_COUNT,
+                data: {
+                    teamId: prevChannel.team_id,
+                    channelId: prevChannelId,
+                    amount: prevChannelMember.mention_count
+                }
             });
         }
 
@@ -1084,61 +1058,42 @@ export function markChannelAsRead(channelId, prevChannelId, updateLastViewedAt =
     };
 }
 
-export function markChannelAsUnread(teamId, channelId, mentionsArray) {
-    return async (dispatch, getState) => {
+// Increments the number of posts in the channel by 1 and marks it as unread if necessary
+export function markChannelAsUnread(teamId, channelId, mentions) {
+    return (dispatch, getState) => {
         const state = getState();
-        const {channels, myMembers} = state.entities.channels;
-        const {myMembers: teamMembers} = state.entities.teams;
+        const {myMembers} = state.entities.channels;
         const {currentUserId} = state.entities.users;
-        const actions = [];
 
-        let wasMentioned = false;
-        if (mentionsArray) {
-            const mentions = JSON.parse(mentionsArray);
-            if (mentions.indexOf(currentUserId) !== -1) {
-                wasMentioned = true;
+        const actions = [{
+            type: ChannelTypes.INCREMENT_TOTAL_MSG_COUNT,
+            data: {
+                channelId,
+                amount: 1
             }
-        }
-
-        // if we have the channel and the channel member in the store
-        if (channels[channelId] && myMembers[channelId]) {
-            const channel = {...channels[channelId]};
-            const member = {...myMembers[channelId]};
-
-            channel.total_msg_count++;
-            if (member.notify_props && member.notify_props.mark_unread === General.MENTION) {
-                member.msg_count++;
+        }, {
+            type: ChannelTypes.INCREMENT_UNREAD_MSG_COUNT,
+            data: {
+                teamId,
+                channelId,
+                amount: 1,
+                onlyMentions: myMembers[channelId] && myMembers[channelId].notify_props &&
+                    myMembers[channelId].notify_props.mark_unread === General.MENTION
             }
+        }];
 
-            if (wasMentioned) {
-                member.mention_count++;
-            }
-
+        if (mentions.indexOf(currentUserId) !== -1) {
             actions.push({
-                type: ChannelTypes.RECEIVED_MY_CHANNEL_MEMBER,
-                data: member
-            }, {
-                type: ChannelTypes.RECEIVED_CHANNEL,
-                data: channel
+                type: ChannelTypes.INCREMENT_UNREAD_MENTION_COUNT,
+                data: {
+                    teamId,
+                    channelId,
+                    amount: 1
+                }
             });
         }
 
-        if (teamId) {
-            const teamMember = {...teamMembers[teamId]};
-            teamMember.msg_count++;
-            if (wasMentioned) {
-                teamMember.mention_count++;
-            }
-
-            actions.push({
-                type: TeamTypes.RECEIVED_MY_TEAM_UNREADS,
-                data: [teamMember]
-            });
-        }
-
-        if (actions.length) {
-            dispatch(batchActions(actions), getState);
-        }
+        dispatch(batchActions(actions), getState);
 
         return {data: true};
     };
