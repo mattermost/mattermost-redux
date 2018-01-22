@@ -64,6 +64,22 @@ function myMembers(state = {}, action) {
         }
         return nextState;
     }
+    case TeamTypes.RECEIVED_MY_TEAM_UNREADS: {
+        const nextState = {...state};
+        const unreads = action.data;
+        for (const u of unreads) {
+            const msgCount = u.msg_count < 0 ? 0 : u.msg_count;
+            const mentionCount = u.mention_count < 0 ? 0 : u.mention_count;
+            const m = {
+                ...state[u.team_id],
+                mention_count: mentionCount,
+                msg_count: msgCount
+            };
+            nextState[u.team_id] = m;
+        }
+
+        return nextState;
+    }
     case ChannelTypes.INCREMENT_UNREAD_MSG_COUNT: {
         const {teamId, amount, onlyMentions} = action.data;
         const member = state[teamId];
