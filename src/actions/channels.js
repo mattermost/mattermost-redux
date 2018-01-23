@@ -1082,7 +1082,7 @@ export function markChannelAsUnread(teamId, channelId, mentions) {
             }
         }];
 
-        if (mentions.indexOf(currentUserId) !== -1) {
+        if (mentions && mentions.indexOf(currentUserId) !== -1) {
             actions.push({
                 type: ChannelTypes.INCREMENT_UNREAD_MENTION_COUNT,
                 data: {
