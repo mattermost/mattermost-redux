@@ -7,6 +7,8 @@ import {batchActions} from 'redux-batched-actions';
 
 import {Client, Client4} from 'client';
 
+import {getProfilesByIds} from 'actions/users';
+
 import {logError} from './errors';
 import {bindClientFunc, forceLogoutIfNecessary} from './helpers';
 
@@ -21,17 +23,50 @@ export function createCustomEmoji(emoji, image) {
     );
 }
 
-// page and perPage to be used when converting to v4
-export function getCustomEmojis(page = 0, perPage = General.PAGE_SIZE_DEFAULT) {
-    return bindClientFunc(
-        Client4.getCustomEmojis,
-        EmojiTypes.GET_CUSTOM_EMOJIS_REQUEST,
-        [EmojiTypes.RECEIVED_CUSTOM_EMOJIS, EmojiTypes.GET_CUSTOM_EMOJIS_SUCCESS],
-        EmojiTypes.GET_CUSTOM_EMOJIS_FAILURE,
-        page,
-        perPage,
-        Emoji.SORT_BY_NAME
-    );
+export function getCustomEmojis(page = 0, perPage = General.PAGE_SIZE_DEFAULT, sort = Emoji.SORT_BY_NAME, loadUsers = false) {
+    return async (dispatch, getState) => {
+        dispatch({type: EmojiTypes.GET_CUSTOM_EMOJIS_REQUEST}, getState);
+
+        let data;
+        try {
+            data = await Client4.getCustomEmojis(page, perPage, sort);
+        } catch (error) {
+            forceLogoutIfNecessary(error, dispatch, getState);
+
+            dispatch(batchActions([
+                {type: EmojiTypes.GET_CUSTOM_EMOJIS_FAILURE, error},
+                logError(error)(dispatch)
+            ]), getState);
+            return {error};
+        }
+
+        if (loadUsers) {
+            const usersToLoad = {};
+            Object.values(data).forEach((emoji) => {
+                if (!getState().entities.users.profiles[emoji.creator_id]) {
+                    usersToLoad[emoji.creator_id] = true;
+                }
+            });
+
+            const userIds = Object.keys(usersToLoad);
+
+            if (userIds.length > 0) {
+                getProfilesByIds(userIds)(dispatch, getState);
+            }
+        }
+
+        dispatch(batchActions([
+            {
+                type: EmojiTypes.RECEIVED_CUSTOM_EMOJIS,
+                data
+            },
+            {
+                type: EmojiTypes.GET_CUSTOM_EMOJIS_SUCCESS
+            }
+        ]));
+
+        return {data};
+    };
 }
 
 export function getAllCustomEmojis(perPage = General.PAGE_SIZE_MAXIMUM) {
