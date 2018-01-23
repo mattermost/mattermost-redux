@@ -1699,9 +1699,9 @@ export default class Client4 {
         );
     };
 
-    getCustomEmojis = async (page = 0, perPage = PER_PAGE_DEFAULT) => {
+    getCustomEmojis = async (page = 0, perPage = PER_PAGE_DEFAULT, sort = '') => {
         return this.doFetch(
-            `${this.getEmojisRoute()}${buildQueryString({page, per_page: perPage})}`,
+            `${this.getEmojisRoute()}${buildQueryString({page, per_page: perPage, sort})}`,
             {method: 'get'}
         );
     };
@@ -1723,7 +1723,22 @@ export default class Client4 {
         return `${this.getEmojiRoute(id)}/image`;
     };
 
+    searchCustomEmoji = async (term, options = {}) => {
+        return this.doFetch(
+            `${this.getEmojisRoute()}/search`,
+            {method: 'post', body: JSON.stringify({term, ...options})}
+        );
+    };
+
+    autocompleteCustomEmoji = async (name) => {
+        return this.doFetch(
+            `${this.getEmojisRoute()}/autocomplete${buildQueryString({name})}`,
+            {method: 'get'}
+        );
+    };
+
     // Data Retention
+
     getDataRetentionPolicy = () => {
         return this.doFetch(
             `${this.getDataRetentionRoute()}/policy`,

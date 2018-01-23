@@ -2,7 +2,7 @@
 // See License.txt for license information.
 
 import {EmojiTypes} from 'action_types';
-import {General} from 'constants';
+import {General, Emoji} from 'constants';
 import {batchActions} from 'redux-batched-actions';
 
 import {Client, Client4} from 'client';
@@ -29,7 +29,8 @@ export function getCustomEmojis(page = 0, perPage = General.PAGE_SIZE_DEFAULT) {
         [EmojiTypes.RECEIVED_CUSTOM_EMOJIS, EmojiTypes.GET_CUSTOM_EMOJIS_SUCCESS],
         EmojiTypes.GET_CUSTOM_EMOJIS_FAILURE,
         page,
-        perPage
+        perPage,
+        Emoji.SORT_BY_NAME
     );
 }
 
@@ -53,7 +54,7 @@ export function getAllCustomEmojis(perPage = General.PAGE_SIZE_MAXIMUM) {
                     emojis = await Client.getCustomEmojis();
                     hasMore = false;
                 } else {
-                    emojis = await Client4.getCustomEmojis(page, perPage);
+                    emojis = await Client4.getCustomEmojis(page, perPage, Emoji.SORT_BY_NAME);
                     if (emojis.length < perPage) {
                         hasMore = false;
                     } else {
@@ -111,4 +112,25 @@ export function deleteCustomEmoji(emojiId) {
 
         return {data: true};
     };
+}
+
+export function searchCustomEmojis(term, options = {}) {
+    return bindClientFunc(
+        Client4.searchCustomEmoji,
+        EmojiTypes.GET_CUSTOM_EMOJIS_REQUEST,
+        [EmojiTypes.RECEIVED_CUSTOM_EMOJIS, EmojiTypes.GET_CUSTOM_EMOJIS_SUCCESS],
+        EmojiTypes.GET_CUSTOM_EMOJIS_FAILURE,
+        term,
+        options
+    );
+}
+
+export function autocompleteCustomEmojis(name) {
+    return bindClientFunc(
+        Client4.autocompleteCustomEmoji,
+        EmojiTypes.GET_CUSTOM_EMOJIS_REQUEST,
+        [EmojiTypes.RECEIVED_CUSTOM_EMOJIS, EmojiTypes.GET_CUSTOM_EMOJIS_SUCCESS],
+        EmojiTypes.GET_CUSTOM_EMOJIS_FAILURE,
+        name
+    );
 }

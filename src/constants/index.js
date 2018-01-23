@@ -11,6 +11,7 @@ import Alerts from './alerts';
 import Teams from './teams';
 import Stats from './stats';
 import Permissions from './permissions';
+import Emoji from './emoji';
 
 export {
     General,
@@ -22,6 +23,7 @@ export {
     Alerts,
     Teams,
     Stats,
-    Permissions
+    Permissions,
+    Emoji
 };
 
