@@ -2,7 +2,7 @@
 // See License.txt for license information.
 
 import {combineReducers} from 'redux';
-import {TeamTypes, UserTypes} from 'action_types';
+import {ChannelTypes, TeamTypes, UserTypes} from 'action_types';
 import {teamListToMap} from 'utils/team_utils';
 
 function currentTeamId(state = '', action) {
@@ -64,7 +64,6 @@ function myMembers(state = {}, action) {
         }
         return nextState;
     }
-
     case TeamTypes.RECEIVED_MY_TEAM_UNREADS: {
         const nextState = {...state};
         const unreads = action.data;
@@ -81,16 +80,88 @@ function myMembers(state = {}, action) {
 
         return nextState;
     }
+    case ChannelTypes.INCREMENT_UNREAD_MSG_COUNT: {
+        const {teamId, amount, onlyMentions} = action.data;
+        const member = state[teamId];
 
+        if (!member) {
+            // Don't keep track of unread posts until we've loaded the actual team member
+            return state;
+        }
+
+        if (onlyMentions) {
+            // Incrementing the msg_count marks the team as unread, so don't do that if these posts shouldn't be unread
+            return state;
+        }
+
+        return {
+            ...state,
+            [teamId]: {
+                ...member,
+                msg_count: member.msg_count + amount
+            }
+        };
+    }
+    case ChannelTypes.DECREMENT_UNREAD_MSG_COUNT: {
+        const {teamId, amount} = action.data;
+        const member = state[teamId];
+
+        if (!member) {
+            // Don't keep track of unread posts until we've loaded the actual team member
+            return state;
+        }
+
+        return {
+            ...state,
+            [teamId]: {
+                ...member,
+                msg_count: Math.max(member.msg_count - amount, 0)
+            }
+        };
+    }
+    case ChannelTypes.INCREMENT_UNREAD_MENTION_COUNT: {
+        const {teamId, amount} = action.data;
+        const member = state[teamId];
+
+        if (!member) {
+            // Don't keep track of unread posts until we've loaded the actual team member
+            return state;
+        }
+
+        return {
+            ...state,
+            [teamId]: {
+                ...member,
+                mention_count: member.mention_count + amount
+            }
+        };
+    }
+    case ChannelTypes.DECREMENT_UNREAD_MENTION_COUNT: {
+        const {teamId, amount} = action.data;
+        const member = state[teamId];
+
+        if (!member) {
+            // Don't keep track of unread posts until we've loaded the actual team member
+            return state;
+        }
+
+        return {
+            ...state,
+            [teamId]: {
+                ...member,
+                mention_count: Math.max(member.mention_count - amount, 0)
+            }
+        };
+    }
     case TeamTypes.LEAVE_TEAM: {
         const nextState = {...state};
         const data = action.data;
         Reflect.deleteProperty(nextState, data.id);
         return nextState;
     }
+
     case UserTypes.LOGOUT_SUCCESS:
         return {};
-
     default:
         return state;
     }
