@@ -32,6 +32,16 @@ function teams(state = {}, action) {
             [action.data.id]: action.data
         };
 
+    case TeamTypes.RECEIVED_TEAM_DELETED: {
+        const nextState = {...state};
+        const teamId = action.data.id;
+        if (nextState.hasOwnProperty(teamId)) {
+            Reflect.deleteProperty(nextState, teamId);
+            return nextState;
+        }
+
+        return state;
+    }
     case UserTypes.LOGOUT_SUCCESS:
         return {};
 
@@ -153,7 +163,8 @@ function myMembers(state = {}, action) {
             }
         };
     }
-    case TeamTypes.LEAVE_TEAM: {
+    case TeamTypes.LEAVE_TEAM:
+    case TeamTypes.RECEIVED_TEAM_DELETED: {
         const nextState = {...state};
         const data = action.data;
         Reflect.deleteProperty(nextState, data.id);
@@ -227,6 +238,16 @@ function membersInTeam(state = {}, action) {
 
         return state;
     }
+    case TeamTypes.RECEIVED_TEAM_DELETED: {
+        const nextState = {...state};
+        const teamId = action.data.id;
+        if (nextState.hasOwnProperty(teamId)) {
+            Reflect.deleteProperty(nextState, teamId);
+            return nextState;
+        }
+
+        return state;
+    }
     case UserTypes.LOGOUT_SUCCESS:
         return {};
     default:
@@ -242,6 +263,16 @@ function stats(state = {}, action) {
             ...state,
             [stat.team_id]: stat
         };
+    }
+    case TeamTypes.RECEIVED_TEAM_DELETED: {
+        const nextState = {...state};
+        const teamId = action.data.id;
+        if (nextState.hasOwnProperty(teamId)) {
+            Reflect.deleteProperty(nextState, teamId);
+            return nextState;
+        }
+
+        return state;
     }
     case UserTypes.LOGOUT_SUCCESS:
         return {};
