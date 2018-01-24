@@ -293,15 +293,27 @@ describe('Actions.Emojis', () => {
 
         await Actions.getCustomEmoji(created.id)(store.dispatch, store.getState);
 
-        const state = store.getState();
-        const request = state.requests.emojis.getCustomEmoji;
+        let state = store.getState();
+        let request = state.requests.emojis.getCustomEmoji;
         if (request.status === RequestStatus.FAILURE) {
             throw new Error(request.error);
         }
 
+        assert.ok(request.status === RequestStatus.SUCCESS);
+
         const emojis = state.entities.emojis.customEmoji;
         assert.ok(emojis);
         assert.ok(emojis[created.id]);
+
+        nock(Client4.getEmojisRoute()).
+            get(`/${created.id}`).
+            reply(500, {});
+
+        await Actions.getCustomEmoji(created.id)(store.dispatch, store.getState);
+
+        state = store.getState();
+        request = state.requests.emojis.getCustomEmoji;
+        assert.ok(request.status === RequestStatus.FAILURE);
     });
 
     it('getCustomEmojiByName', async () => {
@@ -325,14 +337,26 @@ describe('Actions.Emojis', () => {
 
         await Actions.getCustomEmojiByName(created.name)(store.dispatch, store.getState);
 
-        const state = store.getState();
-        const request = state.requests.emojis.getCustomEmoji;
+        let state = store.getState();
+        let request = state.requests.emojis.getCustomEmoji;
         if (request.status === RequestStatus.FAILURE) {
             throw new Error(request.error);
         }
 
+        assert.ok(request.status === RequestStatus.SUCCESS);
+
         const emojis = state.entities.emojis.customEmoji;
         assert.ok(emojis);
         assert.ok(emojis[created.id]);
+
+        nock(Client4.getEmojisRoute()).
+            get(`/name/${created.name}`).
+            reply(500, {});
+
+        await Actions.getCustomEmojiByName(created.name)(store.dispatch, store.getState);
+
+        state = store.getState();
+        request = state.requests.emojis.getCustomEmoji;
+        assert.ok(request.status === RequestStatus.FAILURE);
     });
 });
