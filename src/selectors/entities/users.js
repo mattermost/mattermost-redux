@@ -124,22 +124,24 @@ export const getCurrentUserMentionKeys = createSelector(
         }
 
         if (user.notify_props.mention_keys) {
-            keys = keys.concat(user.notify_props.mention_keys.split(','));
+            keys = keys.concat(user.notify_props.mention_keys.split(',').map((key) => {
+                return {key};
+            }));
         }
 
         if (user.notify_props.first_name === 'true' && user.first_name) {
-            keys.push(user.first_name);
+            keys.push({key: user.first_name, caseSensitive: true});
         }
 
         if (user.notify_props.channel === 'true') {
-            keys.push('@channel');
-            keys.push('@all');
-            keys.push('@here');
+            keys.push({key: '@channel'});
+            keys.push({key: '@all'});
+            keys.push({key: '@here'});
         }
 
         const usernameKey = '@' + user.username;
-        if (keys.indexOf(usernameKey) === -1) {
-            keys.push(usernameKey);
+        if (keys.findIndex((key) => key.key === usernameKey) === -1) {
+            keys.push({key: usernameKey});
         }
 
         return keys;

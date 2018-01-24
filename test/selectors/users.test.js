@@ -3,11 +3,11 @@
 
 import assert from 'assert';
 
+import {Preferences} from 'constants';
 import deepFreezeAndThrowOnMutation from 'utils/deep_freeze';
 import {sortByUsername} from 'utils/user_utils';
 import TestHelper from 'test/test_helper';
 import * as Selectors from 'selectors/entities/users';
-import {Preferences} from 'constants';
 
 describe('Selectors.Users', () => {
     const team1 = TestHelper.fakeTeamWithId();
@@ -99,8 +99,80 @@ describe('Selectors.Users', () => {
         assert.deepEqual(Selectors.getUsers(testState), profiles);
     });
 
-    it('getCurrentUserMentionKeys', () => {
-        assert.deepEqual(Selectors.getCurrentUserMentionKeys(testState), ['testkey1', 'testkey2', '@' + user1.username]);
+    describe('getCurrentUserMentionKeys', () => {
+        it('at mention', () => {
+            const userId = '1234';
+            const notifyProps = {};
+            const state = {
+                entities: {
+                    users: {
+                        currentUserId: userId,
+                        profiles: {
+                            [userId]: {id: userId, username: 'user', first_name: 'First', last_name: 'Last', notify_props: notifyProps}
+                        }
+                    }
+                }
+            };
+
+            assert.deepEqual(Selectors.getCurrentUserMentionKeys(state), [{key: '@user'}]);
+        });
+
+        it('channel', () => {
+            const userId = '1234';
+            const notifyProps = {
+                channel: 'true'
+            };
+            const state = {
+                entities: {
+                    users: {
+                        currentUserId: userId,
+                        profiles: {
+                            [userId]: {id: userId, username: 'user', first_name: 'First', last_name: 'Last', notify_props: notifyProps}
+                        }
+                    }
+                }
+            };
+
+            assert.deepEqual(Selectors.getCurrentUserMentionKeys(state), [{key: '@channel'}, {key: '@all'}, {key: '@here'}, {key: '@user'}]);
+        });
+
+        it('first name', () => {
+            const userId = '1234';
+            const notifyProps = {
+                first_name: 'true'
+            };
+            const state = {
+                entities: {
+                    users: {
+                        currentUserId: userId,
+                        profiles: {
+                            [userId]: {id: userId, username: 'user', first_name: 'First', last_name: 'Last', notify_props: notifyProps}
+                        }
+                    }
+                }
+            };
+
+            assert.deepEqual(Selectors.getCurrentUserMentionKeys(state), [{key: 'First', caseSensitive: true}, {key: '@user'}]);
+        });
+
+        it('custom keys', () => {
+            const userId = '1234';
+            const notifyProps = {
+                mention_keys: 'test,foo,@user,user'
+            };
+            const state = {
+                entities: {
+                    users: {
+                        currentUserId: userId,
+                        profiles: {
+                            [userId]: {id: userId, username: 'user', first_name: 'First', last_name: 'Last', notify_props: notifyProps}
+                        }
+                    }
+                }
+            };
+
+            assert.deepEqual(Selectors.getCurrentUserMentionKeys(state), [{key: 'test'}, {key: 'foo'}, {key: '@user'}, {key: 'user'}]);
+        });
     });
 
     it('getProfilesInCurrentTeam', () => {
