@@ -829,6 +829,56 @@ describe('Actions.Users', () => {
         assert.equal(updateNotifyProps.mention_keys, '');
     });
 
+    it('patchUser', async () => {
+        TestHelper.mockLogin();
+        await Actions.login(TestHelper.basicUser.email, TestHelper.basicUser.password)(store.dispatch, store.getState);
+
+        const state = store.getState();
+        const currentUserId = state.entities.users.currentUserId;
+        const currentUser = state.entities.users.profiles[currentUserId];
+        const notifyProps = currentUser.notify_props;
+
+        nock(Client4.getUsersRoute()).
+            put(`/${currentUserId}/patch`).
+            query(true).
+            reply(200, {
+                ...currentUser,
+                notify_props: {
+                    ...notifyProps,
+                    comments: 'any',
+                    email: 'false',
+                    first_name: 'false',
+                    mention_keys: '',
+                    user_id: currentUser.id
+                }
+            });
+
+        await Actions.patchUser({
+            id: currentUserId,
+            notify_props: {
+                ...notifyProps,
+                comments: 'any',
+                email: 'false',
+                first_name: 'false',
+                mention_keys: '',
+                user_id: currentUser.id
+            }
+        })(store.dispatch, store.getState);
+
+        const updateRequest = store.getState().requests.users.updateUser;
+        const {profiles} = store.getState().entities.users;
+        const updateNotifyProps = profiles[currentUserId].notify_props;
+
+        if (updateRequest.status === RequestStatus.FAILURE) {
+            throw new Error(JSON.stringify(updateRequest.error));
+        }
+
+        assert.equal(updateNotifyProps.comments, 'any');
+        assert.equal(updateNotifyProps.email, 'false');
+        assert.equal(updateNotifyProps.first_name, 'false');
+        assert.equal(updateNotifyProps.mention_keys, '');
+    });
+
     it('updateUserRoles', async () => {
         TestHelper.mockLogin();
         await Actions.login(TestHelper.basicUser.email, 'password1')(store.dispatch, store.getState);

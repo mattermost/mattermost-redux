@@ -46,6 +46,16 @@ function createTeam(state = initialRequestState(), action) {
     );
 }
 
+function deleteTeam(state = initialRequestState(), action) {
+    return handleRequest(
+        TeamTypes.DELETE_CHANNEL_REQUEST,
+        TeamTypes.DELETE_CHANNEL_SUCCESS,
+        TeamTypes.DELETE_CHANNEL_FAILURE,
+        state,
+        action
+    );
+}
+
 function updateTeam(state = initialRequestState(), action) {
     return handleRequest(
         TeamTypes.UPDATE_TEAM_REQUEST,
@@ -151,6 +161,7 @@ export default combineReducers({
     getTeams,
     getTeam,
     createTeam,
+    deleteTeam,
     updateTeam,
     getMyTeamMembers,
     getMyTeamUnreads,

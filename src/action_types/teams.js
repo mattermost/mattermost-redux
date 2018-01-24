@@ -64,11 +64,16 @@ export default keyMirror({
     JOIN_TEAM_SUCCESS: null,
     JOIN_TEAM_FAILURE: null,
 
+    DELETE_TEAM_REQUEST: null,
+    DELETE_TEAM_SUCCESS: null,
+    DELETE_TEAM_FAILURE: null,
+
     CREATED_TEAM: null,
     SELECT_TEAM: null,
     UPDATED_TEAM: null,
     RECEIVED_TEAM: null,
     RECEIVED_TEAMS: null,
+    RECEIVED_TEAM_DELETED: null,
     RECEIVED_TEAMS_LIST: null,
     RECEIVED_MY_TEAM_MEMBERS: null,
     RECEIVED_MY_TEAM_MEMBER: null,

@@ -122,6 +122,29 @@ describe('Actions.Teams', () => {
         assert.ok(teams[team.id]);
     });
 
+    it('getTeamByName', async () => {
+        nock(Client4.getTeamsRoute()).
+            post('').
+            reply(201, TestHelper.fakeTeamWithId());
+        const team = await Client4.createTeam(TestHelper.fakeTeam());
+
+        nock(Client4.getTeamsRoute()).
+            get(`/name/${team.name}`).
+            reply(200, team);
+        await Actions.getTeamByName(team.name)(store.dispatch, store.getState);
+
+        const state = store.getState();
+        const {getTeam: teamRequest} = state.requests.teams;
+        const {teams} = state.entities.teams;
+
+        if (teamRequest.status === RequestStatus.FAILURE) {
+            throw new Error(JSON.stringify(teamRequest.error));
+        }
+
+        assert.ok(teams);
+        assert.ok(teams[team.id]);
+    });
+
     it('createTeam', async () => {
         nock(Client4.getTeamsRoute()).
             post('').
@@ -141,6 +164,55 @@ describe('Actions.Teams', () => {
         assert.strictEqual(Object.keys(teams).length, 1);
         assert.strictEqual(currentTeamId, teamId);
         assert.ok(myMembers[teamId]);
+    });
+
+    it('deleteTeam', async () => {
+        const secondClient = TestHelper.createClient4();
+
+        nock(Client4.getUsersRoute()).
+            post('').
+            query(true).
+            reply(201, TestHelper.fakeUserWithId());
+
+        const user = await TestHelper.basicClient4.createUser(
+            TestHelper.fakeUser(),
+            null,
+            null,
+            TestHelper.basicTeam.invite_id
+        );
+
+        nock(Client4.getUsersRoute()).
+            post('/login').
+            reply(200, user);
+        await secondClient.login(user.email, 'password1');
+
+        nock(Client4.getTeamsRoute()).
+            post('').
+            reply(201, TestHelper.fakeTeamWithId());
+        const secondTeam = await secondClient.createTeam(
+            TestHelper.fakeTeam());
+
+        nock(Client4.getTeamsRoute()).
+            delete(`/${secondTeam.id}`).
+            reply(200, OK_RESPONSE);
+
+        await Actions.deleteTeam(
+            secondTeam.id
+        )(store.dispatch, store.getState);
+
+        const deleteRequest = store.getState().requests.teams.deleteTeam;
+
+        if (deleteRequest === undefined) {
+            throw new Error(JSON.stringify(store.getState().requests.teams));
+        }
+
+        if (deleteRequest.status === RequestStatus.FAILURE) {
+            throw new Error(JSON.stringify(deleteRequest.error));
+        }
+
+        const {teams, myMembers} = store.getState().entities.teams;
+        assert.ifError(teams[secondTeam.id]);
+        assert.ifError(myMembers[secondTeam.id]);
     });
 
     it('updateTeam', async () => {

@@ -76,6 +76,16 @@ export function getTeam(teamId) {
     );
 }
 
+export function getTeamByName(teamName) {
+    return bindClientFunc(
+        Client4.getTeamByName,
+        TeamTypes.GET_TEAM_REQUEST,
+        [TeamTypes.RECEIVED_TEAM, TeamTypes.GET_TEAM_SUCCESS],
+        TeamTypes.GET_TEAM_FAILURE,
+        teamName
+    );
+}
+
 export function getTeams(page = 0, perPage = General.TEAMS_CHUNK_SIZE) {
     return bindClientFunc(
         Client4.getTeams,
@@ -131,6 +141,47 @@ export function createTeam(team) {
         ]), getState);
 
         return {data: created};
+    };
+}
+
+export function deleteTeam(teamId) {
+    return async (dispatch, getState) => {
+        dispatch({type: TeamTypes.DELETE_TEAM_REQUEST}, getState);
+
+        try {
+            await Client4.deleteTeam(teamId);
+        } catch (error) {
+            forceLogoutIfNecessary(error, dispatch);
+            dispatch(batchActions([
+                {type: TeamTypes.DELETE_TEAM_FAILURE, error},
+                logError(error)(dispatch)
+            ]), getState);
+            return {error};
+        }
+
+        const entities = getState().entities;
+        const {teams, currentTeamId} = entities.teams;
+        if (teamId === currentTeamId) {
+            const team = Object.keys(teams).filter((key) => teams[key].name === General.DEFAULT_TEAM);
+            let defaultTeamId = '';
+            if (team.length) {
+                defaultTeamId = team[0];
+            }
+
+            dispatch({type: TeamTypes.SELECT_TEAM, data: defaultTeamId}, getState);
+        }
+
+        dispatch(batchActions([
+            {
+                type: TeamTypes.RECEIVED_TEAM_DELETED,
+                data: {id: teamId}
+            },
+            {
+                type: TeamTypes.DELETE_TEAM_SUCCESS
+            }
+        ]), getState);
+
+        return {data: true};
     };
 }
 

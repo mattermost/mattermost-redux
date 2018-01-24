@@ -328,6 +328,36 @@ export function updateChannelNotifyProps(userId, channelId, props) {
     };
 }
 
+export function getChannelByNameAndTeamName(teamName, channelName) {
+    return async (dispatch, getState) => {
+        dispatch({type: ChannelTypes.CHANNEL_REQUEST}, getState);
+
+        let data;
+        try {
+            data = await Client4.getChannelByNameAndTeamName(teamName, channelName);
+        } catch (error) {
+            forceLogoutIfNecessary(error, dispatch);
+            dispatch(batchActions([
+                {type: ChannelTypes.CHANNELS_FAILURE, error},
+                logError(error)(dispatch)
+            ]), getState);
+            return {error};
+        }
+
+        dispatch(batchActions([
+            {
+                type: ChannelTypes.RECEIVED_CHANNEL,
+                data
+            },
+            {
+                type: ChannelTypes.CHANNEL_SUCCESS
+            }
+        ]), getState);
+
+        return {data};
+    };
+}
+
 export function getChannel(channelId) {
     return async (dispatch, getState) => {
         dispatch({type: ChannelTypes.CHANNEL_REQUEST}, getState);

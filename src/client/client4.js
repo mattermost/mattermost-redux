@@ -286,6 +286,15 @@ export default class Client4 {
         );
     }
 
+    patchUser = async (user) => {
+        this.trackEvent('api', 'api_users_patch');
+
+        return this.doFetch(
+            `${this.getUserRoute(user.id)}/patch`,
+            {method: 'put', body: JSON.stringify(user)}
+        );
+    }
+
     updateUser = async (user) => {
         this.trackEvent('api', 'api_users_update');
 
@@ -779,6 +788,15 @@ export default class Client4 {
         );
     };
 
+    deleteTeam = async (teamId) => {
+        this.trackEvent('api', 'api_teams_delete');
+
+        return this.doFetch(
+            `${this.getTeamRoute(teamId)}`,
+            {method: 'delete'}
+        );
+    };
+
     updateTeam = async (team) => {
         this.trackEvent('api', 'api_teams_update_name', {team_id: team.id});
 
@@ -805,6 +823,15 @@ export default class Client4 {
     getTeam = async (teamId) => {
         return this.doFetch(
             this.getTeamRoute(teamId),
+            {method: 'get'}
+        );
+    };
+
+    getTeamByName = async (teamName) => {
+        this.trackEvent('api', 'api_teams_get_team_by_name');
+
+        return this.doFetch(
+            this.getTeamNameRoute(teamName),
             {method: 'get'}
         );
     };
@@ -1045,6 +1072,15 @@ export default class Client4 {
     getChannelByName = async (teamId, channelName) => {
         return this.doFetch(
             `${this.getTeamRoute(teamId)}/channels/name/${channelName}`,
+            {method: 'get'}
+        );
+    };
+
+    getChannelByNameAndTeamName = async (teamName, channelName) => {
+        this.trackEvent('api', 'api_channel_get_by_name_and_teamName', {channel_name: channelName, team_name: teamName});
+
+        return this.doFetch(
+            `${this.getTeamNameRoute(teamName)}/channels/name/${channelName}`,
             {method: 'get'}
         );
     };
