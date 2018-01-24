@@ -5,6 +5,8 @@ import {batchActions} from 'redux-batched-actions';
 import {Client, Client4} from 'client';
 import {General} from 'constants';
 import {ChannelTypes, TeamTypes, UserTypes} from 'action_types';
+import EventEmitter from 'utils/event_emitter';
+
 import {logError} from './errors';
 import {bindClientFunc, forceLogoutIfNecessary} from './helpers';
 import {getProfilesByIds, getStatusesByIds} from './users';
@@ -160,18 +162,14 @@ export function deleteTeam(teamId) {
         }
 
         const entities = getState().entities;
-        const {teams, currentTeamId} = entities.teams;
+        const {currentTeamId} = entities.teams;
+        const actions = [];
         if (teamId === currentTeamId) {
-            const team = Object.keys(teams).filter((key) => teams[key].name === General.DEFAULT_TEAM);
-            let defaultTeamId = '';
-            if (team.length) {
-                defaultTeamId = team[0];
-            }
-
-            dispatch({type: TeamTypes.SELECT_TEAM, data: defaultTeamId}, getState);
+            EventEmitter.emit('leave_team');
+            actions.push({type: ChannelTypes.SELECT_CHANNEL, data: ''});
         }
 
-        dispatch(batchActions([
+        actions.push(
             {
                 type: TeamTypes.RECEIVED_TEAM_DELETED,
                 data: {id: teamId}
@@ -179,7 +177,9 @@ export function deleteTeam(teamId) {
             {
                 type: TeamTypes.DELETE_TEAM_SUCCESS
             }
-        ]), getState);
+        );
+
+        dispatch(batchActions(actions), getState);
 
         return {data: true};
     };
