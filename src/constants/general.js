@@ -73,5 +73,6 @@ export default {
     ],
 
     MAX_USERS_IN_GM: 8,
-    MIN_USERS_IN_GM: 3
+    MIN_USERS_IN_GM: 3,
+    LAST_OLD_PERMISSIONS_VERSION: '4.6.0'
 };
