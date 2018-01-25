@@ -23,6 +23,26 @@ export function createCustomEmoji(emoji, image) {
     );
 }
 
+export function getCustomEmoji(emojiId) {
+    return bindClientFunc(
+        Client4.getCustomEmoji,
+        EmojiTypes.GET_CUSTOM_EMOJI_REQUEST,
+        [EmojiTypes.RECEIVED_CUSTOM_EMOJI, EmojiTypes.GET_CUSTOM_EMOJI_SUCCESS],
+        EmojiTypes.GET_CUSTOM_EMOJI_FAILURE,
+        emojiId
+    );
+}
+
+export function getCustomEmojiByName(name) {
+    return bindClientFunc(
+        Client4.getCustomEmojiByName,
+        EmojiTypes.GET_CUSTOM_EMOJI_REQUEST,
+        [EmojiTypes.RECEIVED_CUSTOM_EMOJI, EmojiTypes.GET_CUSTOM_EMOJI_SUCCESS],
+        EmojiTypes.GET_CUSTOM_EMOJI_FAILURE,
+        name
+    );
+}
+
 export function getCustomEmojis(page = 0, perPage = General.PAGE_SIZE_DEFAULT, sort = Emoji.SORT_BY_NAME, loadUsers = false) {
     return async (dispatch, getState) => {
         dispatch({type: EmojiTypes.GET_CUSTOM_EMOJIS_REQUEST}, getState);

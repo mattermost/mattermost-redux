@@ -1735,6 +1735,20 @@ export default class Client4 {
         );
     };
 
+    getCustomEmoji = async (id) => {
+        return this.doFetch(
+            `${this.getEmojisRoute()}/${id}`,
+            {method: 'get'}
+        );
+    };
+
+    getCustomEmojiByName = async (name) => {
+        return this.doFetch(
+            `${this.getEmojisRoute()}/name/${name}`,
+            {method: 'get'}
+        );
+    };
+
     getCustomEmojis = async (page = 0, perPage = PER_PAGE_DEFAULT, sort = '') => {
         return this.doFetch(
             `${this.getEmojisRoute()}${buildQueryString({page, per_page: perPage, sort})}`,

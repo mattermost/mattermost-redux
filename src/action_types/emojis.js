@@ -4,6 +4,10 @@
 import keyMirror from 'utils/key_mirror';
 
 export default keyMirror({
+    GET_CUSTOM_EMOJI_REQUEST: null,
+    GET_CUSTOM_EMOJI_SUCCESS: null,
+    GET_CUSTOM_EMOJI_FAILURE: null,
+
     GET_CUSTOM_EMOJIS_REQUEST: null,
     GET_CUSTOM_EMOJIS_SUCCESS: null,
     GET_CUSTOM_EMOJIS_FAILURE: null,
