@@ -1,30 +1,30 @@
 .PHONY: check-style clean pre-run test install
 
 
-.npminstall: package.json
-	@if ! [ $(shell which npm) ]; then \
-		echo "npm is not installed"; \
+.yarninstall: package.json
+	@if ! [ $(shell which yarn) ]; then \
+		echo "yarn is not installed"; \
 		exit 1; \
 	fi
 
-	@echo Getting dependencies using npm
+	@echo Getting dependencies using yarn
 
-	npm install --ignore-scripts --no-package-lock
+	yarn install --ignore-scripts --pure-lockfile
 
 	touch $@
 
-check-style: | pre-run .npminstall
+check-style: | pre-run .yarninstall
 	@echo Checking for style guide compliance
 
-	npm run check
+	yarn run check
 
 
 clean:
 	@echo Cleaning app
 
-	npm cache clean --force
+	yarn cache clean --force
 	rm -rf node_modules
-	rm -f .npminstall
+	rm -f .yarninstall
 
 pre-run:
 	@echo Make sure no previous build are in the folder
@@ -40,10 +40,10 @@ pre-run:
 	@rm -rf lib
 
 test: check-style
-	npm test
+	yarn test
 
-install: .npminstall
+install: .yarninstall
 
 bundle:
-	npm run build
-	npm run webpack
+	yarn run build
+	yarn run webpack
