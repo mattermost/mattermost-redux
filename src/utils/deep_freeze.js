@@ -1,3 +1,4 @@
+// @flow
 /**
  * Copyright (c) 2015-present, Facebook, Inc.
  * All rights reserved.
@@ -29,7 +30,7 @@ const disableOnIe11 =
  * Freezing the object and adding the throw mechanism is expensive and will
  * only be used in DEV.
  */
-export default function deepFreezeAndThrowOnMutation(object) {
+export default function deepFreezeAndThrowOnMutation(object: Object): Object {
     // Some objects in IE11 don't have a hasOwnProperty method so don't even bother trying to freeze them
     if (disableOnIe11) {
         return object;
@@ -58,7 +59,7 @@ export default function deepFreezeAndThrowOnMutation(object) {
     return object;
 }
 
-function throwOnImmutableMutation(key, value) {
+function throwOnImmutableMutation(key: string, value: any) {
     throw Error(
         'You attempted to set the key `' + key + '` with the value `' +
         JSON.stringify(value) + '` on an object that is meant to be immutable ' +
@@ -66,6 +67,6 @@ function throwOnImmutableMutation(key, value) {
     );
 }
 
-function identity(value) {
+function identity(value: any): any {
     return value;
 }

@@ -1,5 +1,6 @@
 // Copyright (c) 2016-present Mattermost, Inc. All Rights Reserved.
 // See License.txt for license information.
+// @flow
 
 import {combineReducers} from 'redux';
 import {RequestStatus} from 'constants';
@@ -7,7 +8,10 @@ import {UserTypes} from 'action_types';
 
 import {handleRequest, initialRequestState} from './helpers';
 
-function checkMfa(state = initialRequestState(), action) {
+import type {GenericAction} from '../../types/actions';
+import type {RequestStatusType} from '../../types/requests';
+
+function checkMfa(state: RequestStatusType = initialRequestState(), action: GenericAction): RequestStatusType {
     switch (action.type) {
     case UserTypes.CHECK_MFA_REQUEST:
         return {...state, status: RequestStatus.STARTED};
@@ -26,7 +30,7 @@ function checkMfa(state = initialRequestState(), action) {
     }
 }
 
-function login(state = initialRequestState(), action) {
+function login(state: RequestStatusType = initialRequestState(), action: GenericAction): RequestStatusType {
     switch (action.type) {
     case UserTypes.LOGIN_REQUEST:
         return {...state, status: RequestStatus.STARTED};
@@ -45,7 +49,7 @@ function login(state = initialRequestState(), action) {
     }
 }
 
-function generateMfaSecret(state = initialRequestState(), action) {
+function generateMfaSecret(state: RequestStatusType = initialRequestState(), action: GenericAction): RequestStatusType {
     return handleRequest(
         UserTypes.MFA_SECRET_REQUEST,
         UserTypes.MFA_SECRET_SUCCESS,
@@ -55,7 +59,7 @@ function generateMfaSecret(state = initialRequestState(), action) {
     );
 }
 
-function logout(state = initialRequestState(), action) {
+function logout(state: RequestStatusType = initialRequestState(), action: GenericAction): RequestStatusType {
     switch (action.type) {
     case UserTypes.LOGOUT_REQUEST:
         return {...state, status: RequestStatus.STARTED};
@@ -74,7 +78,7 @@ function logout(state = initialRequestState(), action) {
     }
 }
 
-function getProfiles(state = initialRequestState(), action) {
+function getProfiles(state: RequestStatusType = initialRequestState(), action: GenericAction): RequestStatusType {
     return handleRequest(
         UserTypes.PROFILES_REQUEST,
         UserTypes.PROFILES_SUCCESS,
@@ -84,7 +88,7 @@ function getProfiles(state = initialRequestState(), action) {
     );
 }
 
-function getProfilesInTeam(state = initialRequestState(), action) {
+function getProfilesInTeam(state: RequestStatusType = initialRequestState(), action: GenericAction): RequestStatusType {
     return handleRequest(
         UserTypes.PROFILES_IN_TEAM_REQUEST,
         UserTypes.PROFILES_IN_TEAM_SUCCESS,
@@ -94,7 +98,7 @@ function getProfilesInTeam(state = initialRequestState(), action) {
     );
 }
 
-function getProfilesNotInTeam(state = initialRequestState(), action) {
+function getProfilesNotInTeam(state: RequestStatusType = initialRequestState(), action: GenericAction): RequestStatusType {
     return handleRequest(
         UserTypes.PROFILES_NOT_IN_TEAM_REQUEST,
         UserTypes.PROFILES_NOT_IN_TEAM_SUCCESS,
@@ -104,7 +108,7 @@ function getProfilesNotInTeam(state = initialRequestState(), action) {
     );
 }
 
-function getProfilesWithoutTeam(state = initialRequestState(), action) {
+function getProfilesWithoutTeam(state: RequestStatusType = initialRequestState(), action: GenericAction): RequestStatusType {
     return handleRequest(
         UserTypes.PROFILES_WITHOUT_TEAM_REQUEST,
         UserTypes.PROFILES_WITHOUT_TEAM_SUCCESS,
@@ -114,7 +118,7 @@ function getProfilesWithoutTeam(state = initialRequestState(), action) {
     );
 }
 
-function getProfilesInChannel(state = initialRequestState(), action) {
+function getProfilesInChannel(state: RequestStatusType = initialRequestState(), action: GenericAction): RequestStatusType {
     return handleRequest(
         UserTypes.PROFILES_IN_CHANNEL_REQUEST,
         UserTypes.PROFILES_IN_CHANNEL_SUCCESS,
@@ -124,7 +128,7 @@ function getProfilesInChannel(state = initialRequestState(), action) {
     );
 }
 
-function getProfilesNotInChannel(state = initialRequestState(), action) {
+function getProfilesNotInChannel(state: RequestStatusType = initialRequestState(), action: GenericAction): RequestStatusType {
     return handleRequest(
         UserTypes.PROFILES_NOT_IN_CHANNEL_REQUEST,
         UserTypes.PROFILES_NOT_IN_CHANNEL_SUCCESS,
@@ -134,7 +138,7 @@ function getProfilesNotInChannel(state = initialRequestState(), action) {
     );
 }
 
-function getUser(state = initialRequestState(), action) {
+function getUser(state: RequestStatusType = initialRequestState(), action: GenericAction): RequestStatusType {
     return handleRequest(
         UserTypes.USER_REQUEST,
         UserTypes.USER_SUCCESS,
@@ -144,7 +148,7 @@ function getUser(state = initialRequestState(), action) {
     );
 }
 
-function getUserByUsername(state = initialRequestState(), action) {
+function getUserByUsername(state: RequestStatusType = initialRequestState(), action: GenericAction): RequestStatusType {
     return handleRequest(
         UserTypes.USER_BY_USERNAME_REQUEST,
         UserTypes.USER_BY_USERNAME_SUCCESS,
@@ -154,7 +158,7 @@ function getUserByUsername(state = initialRequestState(), action) {
     );
 }
 
-function getStatusesByIds(state = initialRequestState(), action) {
+function getStatusesByIds(state: RequestStatusType = initialRequestState(), action: GenericAction): RequestStatusType {
     return handleRequest(
         UserTypes.PROFILES_STATUSES_REQUEST,
         UserTypes.PROFILES_STATUSES_SUCCESS,
@@ -164,7 +168,7 @@ function getStatusesByIds(state = initialRequestState(), action) {
     );
 }
 
-function getStatus(state = initialRequestState(), action) {
+function getStatus(state: RequestStatusType = initialRequestState(), action: GenericAction): RequestStatusType {
     return handleRequest(
         UserTypes.PROFILE_STATUS_REQUEST,
         UserTypes.PROFILE_STATUS_SUCCESS,
@@ -174,7 +178,7 @@ function getStatus(state = initialRequestState(), action) {
     );
 }
 
-function setStatus(state = initialRequestState(), action) {
+function setStatus(state: RequestStatusType = initialRequestState(), action: GenericAction): RequestStatusType {
     return handleRequest(
         UserTypes.SET_STATUS_REQUEST,
         UserTypes.SET_STATUS_SUCCESS,
@@ -184,7 +188,7 @@ function setStatus(state = initialRequestState(), action) {
     );
 }
 
-function getSessions(state = initialRequestState(), action) {
+function getSessions(state: RequestStatusType = initialRequestState(), action: GenericAction): RequestStatusType {
     return handleRequest(
         UserTypes.SESSIONS_REQUEST,
         UserTypes.SESSIONS_SUCCESS,
@@ -194,7 +198,7 @@ function getSessions(state = initialRequestState(), action) {
     );
 }
 
-function revokeSession(state = initialRequestState(), action) {
+function revokeSession(state: RequestStatusType = initialRequestState(), action: GenericAction): RequestStatusType {
     return handleRequest(
         UserTypes.REVOKE_SESSION_REQUEST,
         UserTypes.REVOKE_SESSION_SUCCESS,
@@ -204,7 +208,7 @@ function revokeSession(state = initialRequestState(), action) {
     );
 }
 
-function revokeAllSessionsForUser(state = initialRequestState(), action) {
+function revokeAllSessionsForUser(state: RequestStatusType = initialRequestState(), action: GenericAction): RequestStatusType {
     return handleRequest(
         UserTypes.REVOKE_ALL_USER_SESSIONS_REQUEST,
         UserTypes.REVOKE_ALL_USER_SESSIONS_SUCCESS,
@@ -214,7 +218,7 @@ function revokeAllSessionsForUser(state = initialRequestState(), action) {
     );
 }
 
-function getAudits(state = initialRequestState(), action) {
+function getAudits(state: RequestStatusType = initialRequestState(), action: GenericAction): RequestStatusType {
     return handleRequest(
         UserTypes.AUDITS_REQUEST,
         UserTypes.AUDITS_SUCCESS,
@@ -224,7 +228,7 @@ function getAudits(state = initialRequestState(), action) {
     );
 }
 
-function autocompleteUsers(state = initialRequestState(), action) {
+function autocompleteUsers(state: RequestStatusType = initialRequestState(), action: GenericAction): RequestStatusType {
     return handleRequest(
         UserTypes.AUTOCOMPLETE_USERS_REQUEST,
         UserTypes.AUTOCOMPLETE_USERS_SUCCESS,
@@ -234,7 +238,7 @@ function autocompleteUsers(state = initialRequestState(), action) {
     );
 }
 
-function searchProfiles(state = initialRequestState(), action) {
+function searchProfiles(state: RequestStatusType = initialRequestState(), action: GenericAction): RequestStatusType {
     return handleRequest(
         UserTypes.SEARCH_PROFILES_REQUEST,
         UserTypes.SEARCH_PROFILES_SUCCESS,
@@ -244,7 +248,7 @@ function searchProfiles(state = initialRequestState(), action) {
     );
 }
 
-function updateMe(state = initialRequestState(), action) {
+function updateMe(state: RequestStatusType = initialRequestState(), action: GenericAction): RequestStatusType {
     return handleRequest(
         UserTypes.UPDATE_ME_REQUEST,
         UserTypes.UPDATE_ME_SUCCESS,
@@ -254,7 +258,7 @@ function updateMe(state = initialRequestState(), action) {
     );
 }
 
-function updateUser(state = initialRequestState(), action) {
+function updateUser(state: RequestStatusType = initialRequestState(), action: GenericAction): RequestStatusType {
     return handleRequest(
         UserTypes.UPDATE_USER_REQUEST,
         UserTypes.UPDATE_USER_SUCCESS,
@@ -264,7 +268,7 @@ function updateUser(state = initialRequestState(), action) {
     );
 }
 
-function create(state = initialRequestState(), action) {
+function create(state: RequestStatusType = initialRequestState(), action: GenericAction): RequestStatusType {
     return handleRequest(
         UserTypes.CREATE_USER_REQUEST,
         UserTypes.CREATE_USER_SUCCESS,
@@ -274,7 +278,7 @@ function create(state = initialRequestState(), action) {
     );
 }
 
-function verifyEmail(state = initialRequestState(), action) {
+function verifyEmail(state: RequestStatusType = initialRequestState(), action: GenericAction): RequestStatusType {
     return handleRequest(
         UserTypes.VERIFY_EMAIL_REQUEST,
         UserTypes.VERIFY_EMAIL_SUCCESS,
@@ -284,7 +288,7 @@ function verifyEmail(state = initialRequestState(), action) {
     );
 }
 
-function passwordReset(state = initialRequestState(), action) {
+function passwordReset(state: RequestStatusType = initialRequestState(), action: GenericAction): RequestStatusType {
     return handleRequest(
         UserTypes.PASSWORD_RESET_REQUEST,
         UserTypes.PASSWORD_RESET_SUCCESS,
@@ -294,7 +298,7 @@ function passwordReset(state = initialRequestState(), action) {
     );
 }
 
-function switchLogin(state = initialRequestState(), action) {
+function switchLogin(state: RequestStatusType = initialRequestState(), action: GenericAction): RequestStatusType {
     return handleRequest(
         UserTypes.SWITCH_LOGIN_REQUEST,
         UserTypes.SWITCH_LOGIN_SUCCESS,
@@ -304,7 +308,7 @@ function switchLogin(state = initialRequestState(), action) {
     );
 }
 
-function createUserAccessToken(state = initialRequestState(), action) {
+function createUserAccessToken(state: RequestStatusType = initialRequestState(), action: GenericAction): RequestStatusType {
     return handleRequest(
         UserTypes.CREATE_USER_ACCESS_TOKEN_REQUEST,
         UserTypes.CREATE_USER_ACCESS_TOKEN_SUCCESS,
@@ -314,7 +318,7 @@ function createUserAccessToken(state = initialRequestState(), action) {
     );
 }
 
-function getUserAccessToken(state = initialRequestState(), action) {
+function getUserAccessToken(state: RequestStatusType = initialRequestState(), action: GenericAction): RequestStatusType {
     return handleRequest(
         UserTypes.GET_USER_ACCESS_TOKEN_REQUEST,
         UserTypes.GET_USER_ACCESS_TOKEN_SUCCESS,
@@ -324,7 +328,7 @@ function getUserAccessToken(state = initialRequestState(), action) {
     );
 }
 
-function revokeUserAccessToken(state = initialRequestState(), action) {
+function revokeUserAccessToken(state: RequestStatusType = initialRequestState(), action: GenericAction): RequestStatusType {
     return handleRequest(
         UserTypes.REVOKE_USER_ACCESS_TOKEN_REQUEST,
         UserTypes.REVOKE_USER_ACCESS_TOKEN_SUCCESS,
@@ -334,7 +338,7 @@ function revokeUserAccessToken(state = initialRequestState(), action) {
     );
 }
 
-function disableUserAccessToken(state = initialRequestState(), action) {
+function disableUserAccessToken(state: RequestStatusType = initialRequestState(), action: GenericAction): RequestStatusType {
     return handleRequest(
         UserTypes.DISABLE_USER_ACCESS_TOKEN_REQUEST,
         UserTypes.DISABLE_USER_ACCESS_TOKEN_SUCCESS,
@@ -344,7 +348,7 @@ function disableUserAccessToken(state = initialRequestState(), action) {
     );
 }
 
-function enableUserAccessToken(state = initialRequestState(), action) {
+function enableUserAccessToken(state: RequestStatusType = initialRequestState(), action: GenericAction): RequestStatusType {
     return handleRequest(
         UserTypes.ENABLE_USER_ACCESS_TOKEN_REQUEST,
         UserTypes.ENABLE_USER_ACCESS_TOKEN_SUCCESS,

@@ -33,6 +33,11 @@ mattermost-redux-*.tgz
 /selectors
 /store
 /utils
+/types
 
 # browser bundle
 /lib
+
+# flow
+/flow-typed
+/.flowinstall

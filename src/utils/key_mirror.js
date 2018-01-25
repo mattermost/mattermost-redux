@@ -1,3 +1,4 @@
+// @flow
 /**
  * Copyright (c) 2013-present, Facebook, Inc.
  * All rights reserved.
@@ -26,7 +27,7 @@
  * @param {object} obj
  * @return {object}
  */
-export default function keyMirror(obj) {
+export default function keyMirror(obj: {[string]: null}): {[string]: string} {
     if (!(obj instanceof Object && !Array.isArray(obj))) {
         throw new Error('keyMirror(...): Argument must be an object.');
     }

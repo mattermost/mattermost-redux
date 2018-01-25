@@ -1,31 +1,34 @@
 // Copyright (c) 2017-present Mattermost, Inc. All Rights Reserved.
 // See License.txt for license information.
+// @flow
 
 export default class DelayedAction {
-    constructor(action) {
+    action: Function
+    timer: TimeoutID | null
+
+    constructor(action: Function) {
         this.action = action;
 
-        this.timer = -1;
-
-        // bind fire since it doesn't get passed the correct this value with setTimeout
-        this.fire = this.fire.bind(this);
+        this.timer = null;
     }
 
-    fire() {
+    fire = (): void => {
         this.action();
 
-        this.timer = -1;
+        this.timer = null;
     }
 
-    fireAfter(timeout) {
-        if (this.timer >= 0) {
+    fireAfter = (timeout: number): void => {
+        if (this.timer !== null) {
             clearTimeout(this.timer);
         }
 
         this.timer = setTimeout(this.fire, timeout);
     }
 
-    cancel() {
-        clearTimeout(this.timer);
+    cancel = (): void => {
+        if (this.timer !== null) {
+            clearTimeout(this.timer);
+        }
     }
 }

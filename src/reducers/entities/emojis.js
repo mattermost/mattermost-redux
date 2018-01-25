@@ -1,10 +1,14 @@
 // Copyright (c) 2017-present Mattermost, Inc. All Rights Reserved.
 // See License.txt for license information.
+// @flow
 
 import {combineReducers} from 'redux';
 import {EmojiTypes, UserTypes} from 'action_types';
 
-function customEmoji(state = {}, action) {
+import type {CustomEmoji} from '../../types/emojis';
+import type {GenericAction} from '../../types/actions';
+
+function customEmoji(state: {[string]: CustomEmoji} = {}, action: GenericAction): {[string]: CustomEmoji} {
     switch (action.type) {
     case EmojiTypes.RECEIVED_CUSTOM_EMOJI: {
         const nextState = {...state};

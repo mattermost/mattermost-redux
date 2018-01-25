@@ -1,7 +1,10 @@
 // Copyright (c) 2017 Mattermost, Inc. All Rights Reserved.
 // See License.txt for license information.
+// @flow
 
-const state = {
+import type {GlobalState} from 'types/store';
+
+const state: GlobalState = {
     entities: {
         general: {
             appState: false,
@@ -78,6 +81,11 @@ const state = {
         },
         emojis: {
             customEmoji: {},
+            nonExistentEmoji: new Set(),
+        },
+        search: {
+            results: [],
+            recent: {},
         },
         typing: {},
     },

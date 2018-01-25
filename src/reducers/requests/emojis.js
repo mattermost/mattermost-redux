@@ -1,12 +1,16 @@
 // Copyright (c) 2017-present Mattermost, Inc. All Rights Reserved.
 // See License.txt for license information.
+// @flow
 
 import {combineReducers} from 'redux';
 import {EmojiTypes} from 'action_types';
 
 import {handleRequest, initialRequestState} from './helpers';
 
-function createCustomEmoji(state = initialRequestState(), action) {
+import type {GenericAction} from '../../types/actions';
+import type {RequestStatusType} from '../../types/requests';
+
+function createCustomEmoji(state: RequestStatusType = initialRequestState(), action: GenericAction): RequestStatusType {
     return handleRequest(
         EmojiTypes.CREATE_CUSTOM_EMOJI_REQUEST,
         EmojiTypes.CREATE_CUSTOM_EMOJI_SUCCESS,
@@ -16,7 +20,7 @@ function createCustomEmoji(state = initialRequestState(), action) {
     );
 }
 
-function getCustomEmoji(state = initialRequestState(), action) {
+function getCustomEmoji(state: RequestStatusType = initialRequestState(), action: GenericAction): RequestStatusType {
     return handleRequest(
         EmojiTypes.GET_CUSTOM_EMOJI_REQUEST,
         EmojiTypes.GET_CUSTOM_EMOJI_SUCCESS,
@@ -26,7 +30,7 @@ function getCustomEmoji(state = initialRequestState(), action) {
     );
 }
 
-function getCustomEmojis(state = initialRequestState(), action) {
+function getCustomEmojis(state: RequestStatusType = initialRequestState(), action: GenericAction): RequestStatusType {
     return handleRequest(
         EmojiTypes.GET_CUSTOM_EMOJIS_REQUEST,
         EmojiTypes.GET_CUSTOM_EMOJIS_SUCCESS,
@@ -36,7 +40,7 @@ function getCustomEmojis(state = initialRequestState(), action) {
     );
 }
 
-function getAllCustomEmojis(state = initialRequestState(), action) {
+function getAllCustomEmojis(state: RequestStatusType = initialRequestState(), action: GenericAction): RequestStatusType {
     return handleRequest(
         EmojiTypes.GET_ALL_CUSTOM_EMOJIS_REQUEST,
         EmojiTypes.GET_ALL_CUSTOM_EMOJIS_SUCCESS,
@@ -46,7 +50,7 @@ function getAllCustomEmojis(state = initialRequestState(), action) {
     );
 }
 
-function deleteCustomEmoji(state = initialRequestState(), action) {
+function deleteCustomEmoji(state: RequestStatusType = initialRequestState(), action: GenericAction): RequestStatusType {
     return handleRequest(
         EmojiTypes.DELETE_CUSTOM_EMOJI_REQUEST,
         EmojiTypes.DELETE_CUSTOM_EMOJI_SUCCESS,
@@ -63,4 +67,3 @@ export default combineReducers({
     getAllCustomEmojis,
     deleteCustomEmoji,
 });
-
