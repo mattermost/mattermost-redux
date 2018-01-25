@@ -5,6 +5,7 @@ import {Client4} from 'client';
 import {RoleTypes} from 'action_types';
 
 import {getRoles} from 'selectors/entities/roles';
+import {hasNewPermissions} from 'selectors/entities/general';
 
 import {bindClientFunc} from './helpers';
 
@@ -49,16 +50,28 @@ export function editRole(role) {
     );
 }
 
+let pendingRoles = new Set();
+
 export function loadRolesIfNeeded(roles) {
     return async (dispatch, getState) => {
         const state = getState();
+        for (const role of roles) {
+            pendingRoles.add(role);
+        }
+        if (!state.entities.general.serverVersion) {
+            return {data: []}
+        }
+        if (!hasNewPermissions(state)) {
+            return {data: []}
+        }
         const loadedRoles = getRoles(state);
         const newRoles = new Set();
-        for (const role of roles) {
+        for (const role of pendingRoles) {
             if (!loadedRoles[role]) {
                 newRoles.add(role);
             }
         }
+        pendingRoles = new Set();
         if (newRoles.size > 0) {
             return await getRolesByNames(newRoles)(dispatch, getState);
         }

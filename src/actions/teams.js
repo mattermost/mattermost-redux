@@ -142,9 +142,7 @@ export function createTeam(team) {
                 type: TeamTypes.CREATE_TEAM_SUCCESS
             }
         ]), getState);
-        if (getState().entities.general.serverVersion > General.LAST_OLD_PERMISSIONS_VERSION) {
-            loadRolesIfNeeded(new Set(member.roles.split(' ')))(dispatch, getState);
-        }
+        loadRolesIfNeeded(new Set(member.roles.split(' ')))(dispatch, getState);
 
         return {data: created};
     };
@@ -217,7 +215,7 @@ export function getMyTeamMembers() {
                 roles.add(role);
             }
         }
-        if (roles.size > 0 && getState().entities.general.serverVersion > General.LAST_OLD_PERMISSIONS_VERSION) {
+        if (roles.size > 0) {
             loadRolesIfNeeded(roles)(dispatch, getState);
         }
         return teamMembers;

@@ -466,7 +466,7 @@ function handleUserUpdatedEvent(msg, dispatch, getState) {
 }
 
 function handleRoleAddedEvent(msg, dispatch) {
-    const role = msg.data.role;
+    const role = JSON.parse(msg.data.role);
 
     dispatch({
         type: RoleTypes.RECEIVED_ROLE,
@@ -475,7 +475,7 @@ function handleRoleAddedEvent(msg, dispatch) {
 }
 
 function handleRoleRemovedEvent(msg, dispatch) {
-    const role = msg.data.role;
+    const role = JSON.parse(msg.data.role);
 
     dispatch({
         type: RoleTypes.ROLE_DELETED,
@@ -484,7 +484,7 @@ function handleRoleRemovedEvent(msg, dispatch) {
 }
 
 function handleRoleUpdatedEvent(msg, dispatch) {
-    const role = msg.data.role;
+    const role = JSON.parse(msg.data.role);
 
     dispatch({
         type: RoleTypes.RECEIVED_ROLE,

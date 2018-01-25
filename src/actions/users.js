@@ -207,7 +207,7 @@ function completeLogin(data) {
                 roles.add(role);
             }
         }
-        if (roles.size > 0 && state.entities.general.serverVersion > General.LAST_OLD_PERMISSIONS_VERSION) {
+        if (roles.size > 0) {
             loadRolesIfNeeded(roles)(dispatch, getState);
         }
 
@@ -573,9 +573,7 @@ export function getMe() {
         if (me.error) {
             return me;
         }
-        if (getState().entities.general.serverVersion > General.LAST_OLD_PERMISSIONS_VERSION) {
-            loadRolesIfNeeded(new Set(me.data.roles.split(' ')))(dispatch, getState);
-        }
+        loadRolesIfNeeded(new Set(me.data.roles.split(' ')))(dispatch, getState);
         return me;
     };
 }
@@ -969,9 +967,7 @@ export function updateMe(user) {
             {type: UserTypes.RECEIVED_ME, data},
             {type: UserTypes.UPDATE_ME_SUCCESS}
         ]), getState);
-        if (getState().entities.general.serverVersion > General.LAST_OLD_PERMISSIONS_VERSION) {
-            loadRolesIfNeeded(new Set(data.roles.split(' ')))(dispatch, getState);
-        }
+        loadRolesIfNeeded(new Set(data.roles.split(' ')))(dispatch, getState);
 
         return {data};
     };
