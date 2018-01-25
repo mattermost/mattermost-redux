@@ -70,16 +70,6 @@ export function lookupMimeType(filename) {
     return extToMime[ext] || 'application/octet-stream';
 }
 
-export function parseClientIdsFromFormData(formdata) {
-    const parts = formdata._parts; // eslint-disable-line
-    const index = parts.findIndex((p) => p[0] === 'client_ids');
-
-    const clientIds = [...parts[index]];
-    clientIds.shift();
-
-    return clientIds;
-}
-
 export function getFileUrl(fileId) {
     return Client4.getFileRoute(fileId);
 }
