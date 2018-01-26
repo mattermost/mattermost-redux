@@ -6,6 +6,7 @@ import nock from 'nock';
 
 import * as Actions from 'actions/posts';
 import {login} from 'actions/users';
+import {setSystemEmojis} from 'actions/emojis';
 import {Client4} from 'client';
 import {Preferences, Posts, RequestStatus} from 'constants';
 import {PostTypes} from 'action_types';
@@ -699,6 +700,81 @@ describe('Actions.Posts', () => {
             }),
             new Set(),
             'should never try to request usernames matching special mentions'
+        );
+    });
+
+    it('getNeededCustomEmojis', async () => {
+        const state = {
+            entities: {
+                emojis: {
+                    customEmoji: {
+                        1: {
+                            id: '1',
+                            creator_id: '1',
+                            name: 'name1'
+                        }
+                    },
+                    nonExistentEmoji: new Set(['name2'])
+                }
+            }
+        };
+
+        setSystemEmojis(new Map([['systemEmoji1', {}]]));
+
+        assert.deepEqual(
+            Actions.getNeededCustomEmojis(state, {
+                abcd: {message: 'aaa'}
+            }),
+            new Set()
+        );
+
+        assert.deepEqual(
+            Actions.getNeededCustomEmojis(state, {
+                abcd: {message: ':name1:'}
+            }),
+            new Set()
+        );
+
+        assert.deepEqual(
+            Actions.getNeededCustomEmojis(state, {
+                abcd: {message: ':systemEmoji1:'}
+            }),
+            new Set()
+        );
+
+        assert.deepEqual(
+            Actions.getNeededCustomEmojis(state, {
+                abcd: {message: ':systemEmoji1: :name1: :name2: :name3:'}
+            }),
+            new Set(['name3'])
+        );
+
+        assert.deepEqual(
+            Actions.getNeededCustomEmojis(state, {
+                abcd: {message: 'aaa :name3: :name4:'}
+            }),
+            new Set(['name3', 'name4'])
+        );
+
+        assert.deepEqual(
+            Actions.getNeededCustomEmojis(state, {
+                abcd: {message: ':name3:!'}
+            }),
+            new Set(['name3'])
+        );
+
+        assert.deepEqual(
+            Actions.getNeededCustomEmojis(state, {
+                abcd: {message: ':name-3:'}
+            }),
+            new Set(['name-3'])
+        );
+
+        assert.deepEqual(
+            Actions.getNeededCustomEmojis(state, {
+                abcd: {message: ':name_3:'}
+            }),
+            new Set(['name_3'])
         );
     });
 
