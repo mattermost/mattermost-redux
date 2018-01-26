@@ -191,7 +191,7 @@ destination app
 
 #### Resetting apps to use package redux
 If you want to go back to using the package specified redux in your web or mobile
-app you can stop the server and run `rm -rf node_modules/mattermost-redux` to force
+app you can stop the server and run `rm -rf .yarninstall` to force
 your project to reset to the specified package version on next server start.  
 
 
