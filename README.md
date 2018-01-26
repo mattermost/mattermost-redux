@@ -169,12 +169,31 @@ client.login(username, password)
 
 ### How to Build mattermost-redux
 
-You only need to build mattermost-redux if you are developing it. If your
-mattermost-webapp and mattermost-redux are in the same directory, you only need
-to run `npm run dev` or `npm run dev:watch`. If you have mattermost-webapp in
-other directory or you are developing your own application, you can define the
-environment variable `WEBAPP_DIR` to change the destination app
+You only need to build mattermost-redux if you are developing it. 
+
+#### Webapp Development
+If your mattermost-webapp and mattermost-redux are in the same directory, you only 
+need to run `npm run dev` or `npm run dev:watch`.
+ 
+If you have mattermost-webapp in other directory or you are developing your own 
+application, you can define the environment variable `WEBAPP_DIR` to change the 
+destination app
 (e. g. `WEBAPP_DIR=/tmp/mattermost-webapp`).
+
+#### React Native (Mobile) Development
+If your mattermost-mobile and mattermost-redux are in the same directory, you only 
+need to run `npm run dev-mobile` or `npm run dev-mobile:watch`.
+ 
+If you have mattermost-mobile in other directory or you are developing your own 
+application, you can define the environment variable `MOBILE_DIR` to change the 
+destination app
+(e. g. `MOBILE_DIR=/tmp/mattermost-mobile`).
+
+#### Resetting apps to use package redux
+If you want to go back to using the package specified redux in your web or mobile
+app you can stop the server and run `rm -rf .yarninstall` to force
+your project to reset to the specified package version on next server start.  
+
 
 ### Contribute Code
 
