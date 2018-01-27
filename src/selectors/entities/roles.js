@@ -3,9 +3,8 @@
 
 import {createSelector} from 'reselect';
 
-import {getCurrentUser} from 'selectors/entities/common';
+import {getCurrentUser, getCurrentChannelId} from 'selectors/entities/common';
 import {getTeamMemberships, getCurrentTeamId} from 'selectors/entities/teams';
-import {getMyChannelMemberships, getCurrentChannelId} from 'selectors/entities/channels';
 
 export const getMySystemRoles = createSelector(
     getCurrentUser,
@@ -33,7 +32,7 @@ export const getMyTeamRoles = createSelector(
 );
 
 export const getMyChannelRoles = createSelector(
-    getMyChannelMemberships,
+    (state) => state.entities.channels.myMembers,
     (channelsMemberships) => {
         const roles = {};
         if (channelsMemberships) {
