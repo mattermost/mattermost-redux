@@ -4,8 +4,8 @@
 import {createSelector} from 'reselect';
 
 import {getCurrentUser} from 'selectors/entities/common';
-import {getTeamMemberships} from 'selectors/entities/teams';
-import {getMyChannelMemberships} from 'selectors/entities/channels';
+import {getTeamMemberships, getCurrentTeamId} from 'selectors/entities/teams';
+import {getMyChannelMemberships, getCurrentChannelId} from 'selectors/entities/channels';
 
 export const getMySystemRoles = createSelector(
     getCurrentUser,
@@ -80,6 +80,52 @@ export const getMySystemPerms = createSelector(
     }
 );
 
+export const getMyCurrentTeamPerms = createSelector(
+    getMyTeamRoles,
+    getRoles,
+    getMySystemPerms,
+    getCurrentTeamId,
+    (myTeamRoles, roles, systemPerms, teamId) => {
+        const perms = new Set();
+        if (myTeamRoles[teamId]) {
+            for (const roleName of myTeamRoles[teamId]) {
+                if (roles[roleName]) {
+                    for (const perm of roles[roleName].permissions) {
+                        perms.add(perm);
+                    }
+                }
+            }
+        }
+        for (const perm of systemPerms) {
+            perms.add(perm);
+        }
+        return perms;
+    }
+);
+
+export const getMyCurrentChannelPerms = createSelector(
+    getMyChannelRoles,
+    getRoles,
+    getMyCurrentTeamPerms,
+    getCurrentChannelId,
+    (myChannelRoles, roles, teamPerms, channelId) => {
+        const perms = new Set();
+        if (myChannelRoles[channelId]) {
+            for (const roleName of myChannelRoles[channelId]) {
+                if (roles[roleName]) {
+                    for (const perm of roles[roleName].permissions) {
+                        perms.add(perm);
+                    }
+                }
+            }
+        }
+        for (const perm of teamPerms) {
+            perms.add(perm);
+        }
+        return perms;
+    }
+);
+
 export const getMyTeamPerms = createSelector(
     getMyTeamRoles,
     getRoles,
@@ -107,9 +153,8 @@ export const getMyChannelPerms = createSelector(
     getMyChannelRoles,
     getRoles,
     getMyTeamPerms,
-    (state, options) => options.team,
     (state, options) => options.channel,
-    (myChannelRoles, roles, teamPerms, teamId, channelId) => {
+    (myChannelRoles, roles, teamPerms, channelId) => {
         const perms = new Set();
         if (myChannelRoles[channelId]) {
             for (const roleName of myChannelRoles[channelId]) {
@@ -145,6 +190,22 @@ export const haveITeamPerm = createSelector(
 
 export const haveIChannelPerm = createSelector(
     getMyChannelPerms,
+    (state, options) => options.perm,
+    (perms, perm) => {
+        return perms.has(perm);
+    }
+);
+
+export const haveICurrentTeamPerm = createSelector(
+    getMyCurrentTeamPerms,
+    (state, options) => options.perm,
+    (perms, perm) => {
+        return perms.has(perm);
+    }
+);
+
+export const haveICurrentChannelPerm = createSelector(
+    getMyCurrentChannelPerms,
     (state, options) => options.perm,
     (perms, perm) => {
         return perms.has(perm);

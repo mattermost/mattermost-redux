@@ -3,14 +3,14 @@
 
 import {createSelector} from 'reselect';
 
-import {General} from 'constants';
+import {General, Permissions} from 'constants';
 
 import {
     getCurrentChannelId,
     getCurrentUser,
     getUsers
 } from 'selectors/entities/common';
-import {getConfig, getLicense} from 'selectors/entities/general';
+import {getConfig, getLicense, hasNewPermissions} from 'selectors/entities/general';
 import {
     getFavoritesPreferences,
     getMyPreferences,
@@ -20,6 +20,7 @@ import {
 } from 'selectors/entities/preferences';
 import {getLastPostPerChannel} from 'selectors/entities/posts';
 import {getCurrentTeamId, getCurrentTeamMembership} from 'selectors/entities/teams';
+import {haveICurrentChannelPerm} from 'selectors/entities/roles';
 
 import {
     buildDisplayableChannelList,
@@ -348,7 +349,20 @@ export const canManageChannelMembers = createSelector(
     getMyCurrentChannelMembership,
     getConfig,
     getLicense,
-    canManageMembers
+    hasNewPermissions,
+    (state) => haveICurrentChannelPerm(state, {perm: Permissions.MANAGE_PRIVATE_CHANNEL_MEMBERS}),
+    (state) => haveICurrentChannelPerm(state, {perm: Permissions.MANAGE_PUBLIC_CHANNEL_MEMBERS}),
+    (channel, user, teamMembership, channelMembership, config, license, newPermissions, managePrivateMembers, managePublicMembers) => {
+        if (newPermissions) {
+            if (channel.type === General.OPEN_CHANNEL) {
+                return managePublicMembers;
+            } else if (channel.type === General.PRIVATE_CHANNEL) {
+                return managePrivateMembers;
+            }
+            return true;
+        }
+        return canManageMembers(channel, user, teamMembership, channelMembership, config, license);
+    }
 );
 
 export const getDirectChannelIds = createIdsSelector(

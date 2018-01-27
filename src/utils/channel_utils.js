@@ -1,9 +1,11 @@
 // Copyright (c) 2016-present Mattermost, Inc. All Rights Reserved.
 // See License.txt for license information.
 
-import {General, Preferences} from 'constants';
+import {General, Preferences, Permissions} from 'constants';
 import {displayUsername} from './user_utils';
 import {getPreferencesByCategory} from './preference_utils';
+import {hasNewPermissions} from 'selectors/entities/general';
+import {haveITeamPerm} from 'selectors/entities/roles';
 
 const channelTypeOrder = {
     [General.OPEN_CHANNEL]: 0,
@@ -218,7 +220,16 @@ export function isGroupOrDirectChannelVisible(channel, memberships, config, myPr
     return isDirectChannelVisible(users[otherUserId] || otherUserId, config, myPreferences, channel, lastPost, isUnreadChannel(memberships, channel));
 }
 
-export function showCreateOption(config, license, channelType, isAdmin, isSystemAdmin) {
+export function showCreateOption(state, config, license, teamId, channelType, isAdmin, isSystemAdmin) {
+    if (hasNewPermissions(state)) {
+        if (channelType === General.OPEN_CHANNEL) {
+            return haveITeamPerm(state, {team: teamId, perm: Permissions.CREATE_PUBLIC_CHANNEL});
+        } else if (channelType === General.PRIVATE_CHANNEL) {
+            return haveITeamPerm(state, {team: teamId, perm: Permissions.CREATE_PRIVATE_CHANNEL});
+        }
+        return true;
+    }
+
     if (license.IsLicensed !== 'true') {
         return true;
     }
@@ -240,7 +251,16 @@ export function showCreateOption(config, license, channelType, isAdmin, isSystem
     return true;
 }
 
-export function showManagementOptions(config, license, channel, isAdmin, isSystemAdmin, isChannelAdmin) {
+export function showManagementOptions(state, config, license, channel, isAdmin, isSystemAdmin, isChannelAdmin) {
+    if (hasNewPermissions(state)) {
+        if (channel.type === General.OPEN_CHANNEL) {
+            return haveITeamPerm(state, {team: channel.team_idteamId, perm: Permissions.MANAGE_PUBLIC_CHANNEL_PROPERTIES});
+        } else if (channel.type === General.PRIVATE_CHANNEL) {
+            return haveITeamPerm(state, {team: channel.team_id, perm: Permissions.MANAGE_PRIVATE_CHANNEL_PROPERTIES});
+        }
+        return true;
+    }
+
     if (license.IsLicensed !== 'true') {
         return true;
     }
@@ -270,7 +290,16 @@ export function showManagementOptions(config, license, channel, isAdmin, isSyste
     return true;
 }
 
-export function showDeleteOption(config, license, channel, isAdmin, isSystemAdmin, isChannelAdmin) {
+export function showDeleteOption(state, config, license, channel, isAdmin, isSystemAdmin, isChannelAdmin) {
+    if (hasNewPermissions(state)) {
+        if (channel.type === General.OPEN_CHANNEL) {
+            return haveITeamPerm(state, {team: channel.team_idteamId, perm: Permissions.DELETE_PUBLIC_CHANNEL});
+        } else if (channel.type === General.PRIVATE_CHANNEL) {
+            return haveITeamPerm(state, {team: channel.team_id, perm: Permissions.DELETE_PRIVATE_CHANNEL});
+        }
+        return true;
+    }
+
     if (license.IsLicensed !== 'true') {
         return true;
     }

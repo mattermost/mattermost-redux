@@ -50,19 +50,29 @@ export function editRole(role) {
     );
 }
 
-let pendingRoles = new Set();
+export function setPendingRoles(roles) {
+    return async (dispatch, getState) => {
+        dispatch({type: RoleTypes.SET_PENDING_ROLES, data: roles}, getState);
+        return {data: roles};
+    };
+}
 
 export function loadRolesIfNeeded(roles) {
     return async (dispatch, getState) => {
         const state = getState();
+        const pendingRoles = new Set(state.entities.roles.pending);
         for (const role of roles) {
             pendingRoles.add(role);
         }
         if (!state.entities.general.serverVersion) {
-            return {data: []}
+            setPendingRoles(pendingRoles);
+            return {data: []};
         }
         if (!hasNewPermissions(state)) {
-            return {data: []}
+            if (state.entities.roles.pending) {
+                await setPendingRoles(new Set());
+            }
+            return {data: []};
         }
         const loadedRoles = getRoles(state);
         const newRoles = new Set();
@@ -71,7 +81,10 @@ export function loadRolesIfNeeded(roles) {
                 newRoles.add(role);
             }
         }
-        pendingRoles = new Set();
+
+        if (state.entities.roles.pending) {
+            await setPendingRoles(new Set());
+        }
         if (newRoles.size > 0) {
             return await getRolesByNames(newRoles)(dispatch, getState);
         }

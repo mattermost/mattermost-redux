@@ -80,7 +80,8 @@ const state = {
         },
         typing: {},
         roles: {
-            roles: []
+            roles: [],
+            pending: new Set()
         }
     },
     errors: [],

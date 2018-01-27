@@ -4,6 +4,17 @@
 import {combineReducers} from 'redux';
 import {RoleTypes, UserTypes} from 'action_types';
 
+function pending(state = new Set(), action) {
+    switch (action.type) {
+    case RoleTypes.SET_PENDING_ROLES:
+        return action.data;
+    case UserTypes.LOGOUT_SUCCESS:
+        return new Set();
+    default:
+        return state;
+    }
+}
+
 function roles(state = {}, action) {
     switch (action.type) {
     case RoleTypes.RECEIVED_ROLES: {
@@ -46,5 +57,6 @@ function roles(state = {}, action) {
 export default combineReducers({
 
     // object where the key is the category-name and has the corresponding value
-    roles
+    roles,
+    pending
 });
