@@ -947,7 +947,7 @@ export function getNeededCustomEmojis(state, posts) {
             customEmojisByName = selectCustomEmojisByName(state);
         }
 
-        const pattern = /\B:([A-Za-z0-9_-]+):/gi;
+        const pattern = /\B:([A-Za-z0-9_-]+):\B/gi;
 
         let match;
         while ((match = pattern.exec(post.message)) !== null) {
