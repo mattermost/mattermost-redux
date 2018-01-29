@@ -378,8 +378,9 @@ export const getUnreadChannelIds = createIdsSelector(
     getAllChannels,
     getMyChannelMemberships,
     getChannelIdsForCurrentTeam,
-    (channels, members, teamChannelIds) => {
-        return teamChannelIds.filter((id) => {
+    (state, channelId = '') => channelId,
+    (channels, members, teamChannelIds, keepChannelIdAsUnread) => {
+        const unreadIds = teamChannelIds.filter((id) => {
             const c = channels[id];
             const m = members[id];
 
@@ -392,6 +393,12 @@ export const getUnreadChannelIds = createIdsSelector(
             }
             return false;
         });
+
+        if (keepChannelIdAsUnread && !unreadIds.includes(keepChannelIdAsUnread)) {
+            unreadIds.push(keepChannelIdAsUnread);
+        }
+
+        return unreadIds;
     }
 );
 

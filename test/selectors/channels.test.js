@@ -332,6 +332,31 @@ describe('Selectors.Channels', () => {
         assert.ok(fromOriginalState === fromModifiedState);
     });
 
+    it('get unread channel ids in current team and keep specified channel as unread', () => {
+        const chan2 = {...testState.entities.channels.channels[channel2.id]};
+        chan2.total_msg_count = 10;
+
+        const modifiedState = {
+            ...testState,
+            entities: {
+                ...testState.entities,
+                channels: {
+                    ...testState.entities.channels,
+                    channels: {
+                        ...testState.entities.channels.channels,
+                        [channel2.id]: chan2
+                    }
+                }
+            }
+        };
+
+        const fromOriginalState = Selectors.getUnreadChannelIds(testState);
+        const fromModifiedState = Selectors.getUnreadChannelIds(modifiedState, channel1.id);
+
+        assert.ok(fromOriginalState !== fromModifiedState);
+        assert.ok(fromModifiedState.includes(channel1.id));
+    });
+
     it('get sorted unread channel ids in current team strict equal', () => {
         const chan2 = {...testState.entities.channels.channels[channel2.id]};
         chan2.total_msg_count = 10;
