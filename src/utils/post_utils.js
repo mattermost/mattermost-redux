@@ -37,6 +37,10 @@ export function isEdited(post) {
 }
 
 export function canDeletePost(state, config, license, teamId, channelId, userId, post, isAdmin, isSystemAdmin) {
+    if (!post) {
+        return false;
+    }
+
     const isOwner = isPostOwner(userId, post);
 
     if (hasNewPermissions(state)) {
@@ -56,6 +60,10 @@ export function canDeletePost(state, config, license, teamId, channelId, userId,
 }
 
 export function canEditPost(state, config, license, teamId, channelId, userId, post) {
+    if (!post) {
+        return false;
+    }
+
     const isOwner = isPostOwner(userId, post);
 
     let canEdit;
