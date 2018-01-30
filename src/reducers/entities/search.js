@@ -61,6 +61,35 @@ function recent(state = {}, action) {
     }
 }
 
+function pinnedPosts(state = {}, action) {
+    const {type, data} = action;
+
+    switch (type) {
+    case SearchTypes.RECEIVED_PINNED_POSTS: {
+        const {channelId, order} = data;
+        return {
+            ...state,
+            [channelId]: order
+        };
+    }
+    default:
+        return state;
+    }
+}
+
+function flaggedPosts(state = [], action) {
+    const {type, data} = action;
+
+    switch (type) {
+    case SearchTypes.RECEIVED_FLAGGED_POSTS: {
+        const {order} = data;
+        return order;
+    }
+    default:
+        return state;
+    }
+}
+
 export default combineReducers({
 
     // An ordered array with posts ids from the search results
@@ -68,5 +97,9 @@ export default combineReducers({
 
     // Object where every key is a team composed with
     // an object where the key is the term and the value indicates is "or" search
-    recent
+    recent,
+
+    // reducer to store pinnedPosts posts
+    pinnedPosts,
+    flaggedPosts
 });
