@@ -378,8 +378,8 @@ export const getUnreadChannelIds = createIdsSelector(
     getAllChannels,
     getMyChannelMemberships,
     getChannelIdsForCurrentTeam,
-    (state, channelId = '') => channelId,
-    (channels, members, teamChannelIds, keepChannelIdAsUnread) => {
+    (state, lastUnreadChannel = null) => lastUnreadChannel,
+    (channels, members, teamChannelIds, lastUnreadChannel) => {
         const unreadIds = teamChannelIds.filter((id) => {
             const c = channels[id];
             const m = members[id];
@@ -394,8 +394,8 @@ export const getUnreadChannelIds = createIdsSelector(
             return false;
         });
 
-        if (keepChannelIdAsUnread && !unreadIds.includes(keepChannelIdAsUnread)) {
-            unreadIds.push(keepChannelIdAsUnread);
+        if (lastUnreadChannel && !unreadIds.includes(lastUnreadChannel.id)) {
+            unreadIds.push(lastUnreadChannel.id);
         }
 
         return unreadIds;
@@ -415,7 +415,8 @@ export const getSortedUnreadChannelIds = createIdsSelector(
     getMyChannelMemberships,
     getUnreadChannelIds,
     getTeammateNameDisplaySetting,
-    (currentUser, profiles, channels, members, unreadIds, settings) => {
+    (state, lastUnreadChannel = null) => lastUnreadChannel,
+    (currentUser, profiles, channels, members, unreadIds, settings, lastUnreadChannel) => {
         // If we receive an unread for a channel and then a mention the channel
         // won't be sorted correctly until we receive a message in another channel
         if (!currentUser) {
@@ -425,6 +426,7 @@ export const getSortedUnreadChannelIds = createIdsSelector(
         const locale = currentUser.locale || 'en';
         const allUnreadChannels = unreadIds.map((id) => {
             const c = channels[id];
+
             if (c.type === General.DM_CHANNEL || c.type === General.GM_CHANNEL) {
                 return completeDirectChannelDisplayName(currentUser.id, profiles, settings, c);
             }
@@ -433,9 +435,12 @@ export const getSortedUnreadChannelIds = createIdsSelector(
         }).sort((a, b) => {
             const aMember = members[a.id];
             const bMember = members[b.id];
-
             const aIsMention = a.type === General.DM_CHANNEL || (aMember && aMember.mention_count > 0);
-            const bIsMention = b.type === General.DM_CHANNEL || (bMember && bMember.mention_count > 0);
+            let bIsMention = b.type === General.DM_CHANNEL || (bMember && bMember.mention_count > 0);
+
+            if (lastUnreadChannel && b.id === lastUnreadChannel.id && lastUnreadChannel.hadMentions) {
+                bIsMention = true;
+            }
 
             if (aIsMention === bIsMention) {
                 return sortChannelsByDisplayName(locale, a, b);
