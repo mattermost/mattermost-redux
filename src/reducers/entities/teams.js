@@ -51,6 +51,14 @@ function teams(state = {}, action) {
 }
 
 function myMembers(state = {}, action) {
+    function updateState(receivedTeams = {}, currenState = {}) {
+        return Object.keys(receivedTeams).forEach((teamId) => {
+            if (receivedTeams[teamId].delete_at > 0 && currenState[teamId]) {
+                Reflect.deleteProperty(currenState, teamId);
+            }
+        });
+    }
+
     switch (action.type) {
     case TeamTypes.RECEIVED_MY_TEAM_MEMBER: {
         const nextState = {...state};
@@ -76,25 +84,15 @@ function myMembers(state = {}, action) {
     }
     case TeamTypes.RECEIVED_TEAMS_LIST: {
         const nextState = {...state};
-        const teamsList = teamListToMap(action.data);
-        Object.keys(nextState).forEach((myMemberTeamId) => {
-            if (teamsList[myMemberTeamId] && teamsList[myMemberTeamId].delete_at) {
-                Reflect.deleteProperty(nextState, myMemberTeamId);
-            }
-        });
+        const receivedTeams = teamListToMap(action.data);
 
-        return nextState;
+        return updateState(receivedTeams, nextState) || nextState;
     }
     case TeamTypes.RECEIVED_TEAMS: {
         const nextState = {...state};
-        const team = action.data;
-        Object.keys(team).forEach((teamId) => {
-            if (nextState[teamId] && nextState[teamId].delete_at) {
-                Reflect.deleteProperty(nextState, teamId);
-            }
-        });
+        const receivedTeams = action.data;
 
-        return nextState;
+        return updateState(receivedTeams, nextState) || nextState;
     }
     case TeamTypes.RECEIVED_MY_TEAM_UNREADS: {
         const nextState = {...state};
