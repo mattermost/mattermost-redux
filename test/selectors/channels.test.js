@@ -351,7 +351,7 @@ describe('Selectors.Channels', () => {
         };
 
         const fromOriginalState = Selectors.getUnreadChannelIds(testState);
-        const fromModifiedState = Selectors.getUnreadChannelIds(modifiedState, channel1.id);
+        const fromModifiedState = Selectors.getUnreadChannelIds(modifiedState, {id: channel1.id});
 
         assert.ok(fromOriginalState !== fromModifiedState);
         assert.ok(fromModifiedState.includes(channel1.id));
