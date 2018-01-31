@@ -8,6 +8,9 @@ import {batchActions} from 'redux-batched-actions';
 import {Client, Client4} from 'client';
 
 import {getProfilesByIds} from 'actions/users';
+import {getCustomEmojisByName as selectCustomEmojisByName} from 'selectors/entities/emojis';
+
+import {parseNeededCustomEmojisFromText} from 'utils/emoji_utils';
 
 import {logError} from './errors';
 import {bindClientFunc, forceLogoutIfNecessary} from './helpers';
@@ -86,6 +89,22 @@ export function getCustomEmojisByName(names) {
         names.forEach((name) => promises.push(getCustomEmojiByName(name)(dispatch, getState)));
 
         return Promise.all(promises);
+    };
+}
+
+export function getCustomEmojisInText(text) {
+    return async (dispatch, getState) => {
+        if (!text) {
+            return {data: true};
+        }
+
+        const state = getState();
+        const nonExistentEmoji = state.entities.emojis.nonExistentEmoji;
+        const customEmojisByName = selectCustomEmojisByName(state);
+
+        const emojisToLoad = parseNeededCustomEmojisFromText(text, systemEmojis, customEmojisByName, nonExistentEmoji);
+
+        return await getCustomEmojisByName(Array.from(emojisToLoad))(dispatch, getState);
     };
 }
 
