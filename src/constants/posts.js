@@ -1,7 +1,7 @@
 // Copyright (c) 2017-present Mattermost, Inc. All Rights Reserved.
 // See License.txt for license information.
 
-const PostTypes = {
+export const PostTypes = {
     CHANNEL_DELETED: 'system_channel_deleted',
     DISPLAYNAME_CHANGE: 'system_displayname_change',
     EPHEMERAL: 'system_ephemeral',
