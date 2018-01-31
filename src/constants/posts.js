@@ -1,18 +1,24 @@
 // Copyright (c) 2017-present Mattermost, Inc. All Rights Reserved.
 // See License.txt for license information.
 
-const PostTypes = {
-    ADD_REMOVE: 'system_add_remove',
-    ADD_TO_CHANNEL: 'system_add_to_channel',
+export const PostTypes = {
     CHANNEL_DELETED: 'system_channel_deleted',
     DISPLAYNAME_CHANGE: 'system_displayname_change',
     EPHEMERAL: 'system_ephemeral',
     HEADER_CHANGE: 'system_header_change',
-    JOIN_CHANNEL: 'system_join_channel',
-    JOIN_LEAVE: 'system_join_leave',
-    LEAVE_CHANNEL: 'system_leave_channel',
     PURPOSE_CHANGE: 'system_purpose_change',
-    REMOVE_FROM_CHANNEL: 'system_remove_from_channel'
+
+    JOIN_LEAVE: 'system_join_leave',
+    JOIN_CHANNEL: 'system_join_channel',
+    LEAVE_CHANNEL: 'system_leave_channel',
+    ADD_REMOVE: 'system_add_remove',
+    ADD_TO_CHANNEL: 'system_add_to_channel',
+    REMOVE_FROM_CHANNEL: 'system_remove_from_channel',
+
+    JOIN_TEAM: 'system_join_team',
+    LEAVE_TEAM: 'system_leave_team',
+    ADD_TO_TEAM: 'system_add_to_team',
+    REMOVE_FROM_TEAM: 'system_remove_from_team'
 };
 
 export default {

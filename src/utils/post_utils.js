@@ -74,12 +74,25 @@ export function getLastCreateAt(postsArray) {
     return 0;
 }
 
+// Returns true if a post should be hidden based off the Show Join/Leave Messages setting
 export function shouldFilterPost(post, options = {}) {
     // Add as much filters as needed here, if you want to filter the post return true
     const postTypes = Posts.POST_TYPES;
 
     if ('showJoinLeave' in options && !options.showJoinLeave) {
-        const joinLeaveTypes = [postTypes.JOIN_LEAVE, postTypes.JOIN_CHANNEL, postTypes.LEAVE_CHANNEL, postTypes.ADD_REMOVE, postTypes.ADD_TO_CHANNEL, postTypes.REMOVE_FROM_CHANNEL];
+        const joinLeaveTypes = [
+            postTypes.JOIN_LEAVE,
+            postTypes.JOIN_CHANNEL,
+            postTypes.LEAVE_CHANNEL,
+            postTypes.ADD_REMOVE,
+            postTypes.ADD_TO_CHANNEL,
+            postTypes.REMOVE_FROM_CHANNEL,
+            postTypes.JOIN_TEAM,
+            postTypes.LEAVE_TEAM,
+            postTypes.ADD_TO_TEAM,
+            postTypes.REMOVE_FROM_TEAM
+        ];
+
         if (joinLeaveTypes.includes(post.type)) {
             return true;
         }
