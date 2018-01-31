@@ -12,6 +12,12 @@ import {getProfilesByIds} from 'actions/users';
 import {logError} from './errors';
 import {bindClientFunc, forceLogoutIfNecessary} from './helpers';
 
+export let systemEmojis = new Map();
+
+export function setSystemEmojis(emojis) {
+    systemEmojis = emojis;
+}
+
 export function createCustomEmoji(emoji, image) {
     return bindClientFunc(
         Client4.createCustomEmoji,
@@ -34,13 +40,53 @@ export function getCustomEmoji(emojiId) {
 }
 
 export function getCustomEmojiByName(name) {
-    return bindClientFunc(
-        Client4.getCustomEmojiByName,
-        EmojiTypes.GET_CUSTOM_EMOJI_REQUEST,
-        [EmojiTypes.RECEIVED_CUSTOM_EMOJI, EmojiTypes.GET_CUSTOM_EMOJI_SUCCESS],
-        EmojiTypes.GET_CUSTOM_EMOJI_FAILURE,
-        name
-    );
+    return async (dispatch, getState) => {
+        dispatch({type: EmojiTypes.GET_CUSTOM_EMOJI_REQUEST}, getState);
+
+        let data;
+        try {
+            data = await Client4.getCustomEmojiByName(name);
+        } catch (error) {
+            forceLogoutIfNecessary(error, dispatch, getState);
+
+            const actions = [
+                {type: EmojiTypes.GET_CUSTOM_EMOJI_FAILURE, error},
+                logError(error)(dispatch)
+            ];
+
+            if (error.status_code === 404) {
+                actions.push({type: EmojiTypes.CUSTOM_EMOJI_DOES_NOT_EXIST, data: name});
+            }
+
+            dispatch(batchActions(actions), getState);
+            return {error};
+        }
+
+        dispatch(batchActions([
+            {
+                type: EmojiTypes.RECEIVED_CUSTOM_EMOJI,
+                data
+            },
+            {
+                type: EmojiTypes.GET_CUSTOM_EMOJI_SUCCESS
+            }
+        ]));
+
+        return {data};
+    };
+}
+
+export function getCustomEmojisByName(names) {
+    return async (dispatch, getState) => {
+        if (!names || names.length === 0) {
+            return {data: true};
+        }
+
+        const promises = [];
+        names.forEach((name) => promises.push(getCustomEmojiByName(name)(dispatch, getState)));
+
+        return Promise.all(promises);
+    };
 }
 
 export function getCustomEmojis(page = 0, perPage = General.PAGE_SIZE_DEFAULT, sort = Emoji.SORT_BY_NAME, loadUsers = false) {

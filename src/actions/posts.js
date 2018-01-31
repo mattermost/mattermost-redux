@@ -7,13 +7,16 @@ import {Client4} from 'client';
 import {General, Preferences, Posts} from 'constants';
 import {PostTypes, FileTypes} from 'action_types';
 import {getUsersByUsername} from 'selectors/entities/users';
+import {getCustomEmojisByName as selectCustomEmojisByName} from 'selectors/entities/emojis';
 
 import * as Selectors from 'selectors/entities/posts';
+import {getConfig} from 'selectors/entities/general';
 
 import {bindClientFunc, forceLogoutIfNecessary} from './helpers';
 import {logError} from './errors';
 import {deletePreferences, savePreferences} from './preferences';
 import {getProfilesByIds, getProfilesByUsernames, getStatusesByIds} from './users';
+import {systemEmojis, getCustomEmojisByName} from './emojis';
 
 export function createPost(post, files = []) {
     return async (dispatch, getState) => {
@@ -875,8 +878,17 @@ export async function getProfilesAndStatusesForPosts(posts, dispatch, getState) 
     // Do this after firing the other requests as it's more expensive
     const usernamesToLoad = getNeededAtMentionedUsernames(state, posts);
 
+    let emojisToLoad;
+    if (getConfig(state).EnableCustomEmoji === 'true') {
+        emojisToLoad = getNeededCustomEmojis(state, posts);
+    }
+
     if (usernamesToLoad.size > 0) {
         promises.push(getProfilesByUsernames(Array.from(usernamesToLoad))(dispatch, getState));
+    }
+
+    if (emojisToLoad && emojisToLoad.size > 0) {
+        promises.push(getCustomEmojisByName(Array.from(emojisToLoad))(dispatch, getState));
     }
 
     return Promise.all(promises);
@@ -918,6 +930,47 @@ export function getNeededAtMentionedUsernames(state, posts) {
     });
 
     return usernamesToLoad;
+}
+
+export function getNeededCustomEmojis(state, posts) {
+    let customEmojisByName; // Populate this lazily since it's relatively expensive
+    const nonExistentEmoji = state.entities.emojis.nonExistentEmoji;
+
+    const customEmojisToLoad = new Set();
+
+    Object.values(posts).forEach((post) => {
+        if (!post.message.includes(':')) {
+            return;
+        }
+
+        if (!customEmojisByName) {
+            customEmojisByName = selectCustomEmojisByName(state);
+        }
+
+        const pattern = /\B:([A-Za-z0-9_-]+):\B/gi;
+
+        let match;
+        while ((match = pattern.exec(post.message)) !== null) {
+            if (systemEmojis.has(match[1])) {
+                // It's a system emoji, go the next match
+                continue;
+            }
+
+            if (nonExistentEmoji.has(match[1])) {
+                // We've previously confirmed this is not a custom emoji
+                continue;
+            }
+
+            if (customEmojisByName.has(match[1])) {
+                // We have the emoji, go to the next match
+                continue;
+            }
+
+            customEmojisToLoad.add(match[1]);
+        }
+    });
+
+    return customEmojisToLoad;
 }
 
 export function removePost(post) {
