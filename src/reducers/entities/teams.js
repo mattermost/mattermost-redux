@@ -51,6 +51,14 @@ function teams(state = {}, action) {
 }
 
 function myMembers(state = {}, action) {
+    function updateState(receivedTeams = {}, currentState = {}) {
+        return Object.keys(receivedTeams).forEach((teamId) => {
+            if (receivedTeams[teamId].delete_at > 0 && currentState[teamId]) {
+                Reflect.deleteProperty(currentState, teamId);
+            }
+        });
+    }
+
     switch (action.type) {
     case TeamTypes.RECEIVED_MY_TEAM_MEMBER: {
         const nextState = {...state};
@@ -73,6 +81,18 @@ function myMembers(state = {}, action) {
             }
         }
         return nextState;
+    }
+    case TeamTypes.RECEIVED_TEAMS_LIST: {
+        const nextState = {...state};
+        const receivedTeams = teamListToMap(action.data);
+
+        return updateState(receivedTeams, nextState) || nextState;
+    }
+    case TeamTypes.RECEIVED_TEAMS: {
+        const nextState = {...state};
+        const receivedTeams = action.data;
+
+        return updateState(receivedTeams, nextState) || nextState;
     }
     case TeamTypes.RECEIVED_MY_TEAM_UNREADS: {
         const nextState = {...state};
