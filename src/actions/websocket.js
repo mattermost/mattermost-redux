@@ -260,16 +260,12 @@ async function handleNewPostEvent(msg, dispatch, getState) {
     const currentUserId = users.currentUserId;
     const status = users.statuses[userId];
 
-    // Only fetch the profile and status if the post was made by someone else
-    // as well as making the DM channel visible
-    if (userId !== currentUserId) {
-        getProfilesAndStatusesForPosts([post], dispatch, getState);
+    getProfilesAndStatusesForPosts([post], dispatch, getState);
 
-        // getProfilesAndStatusesForPosts only gets the status if it doesn't exist, but we also want it if
-        // the user does not appear to be online
-        if (status && status !== General.ONLINE) {
-            getStatusesByIds([userId])(dispatch, getState);
-        }
+    // getProfilesAndStatusesForPosts only gets the status if it doesn't exist, but we
+    // also want it if the user does not appear to be online
+    if (userId !== currentUserId && status && status !== General.ONLINE) {
+        getStatusesByIds([userId])(dispatch, getState);
     }
 
     switch (post.type) {
