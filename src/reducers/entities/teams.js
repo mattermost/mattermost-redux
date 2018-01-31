@@ -51,10 +51,10 @@ function teams(state = {}, action) {
 }
 
 function myMembers(state = {}, action) {
-    function updateState(receivedTeams = {}, currenState = {}) {
+    function updateState(receivedTeams = {}, currentState = {}) {
         return Object.keys(receivedTeams).forEach((teamId) => {
-            if (receivedTeams[teamId].delete_at > 0 && currenState[teamId]) {
-                Reflect.deleteProperty(currenState, teamId);
+            if (receivedTeams[teamId].delete_at > 0 && currentState[teamId]) {
+                Reflect.deleteProperty(currentState, teamId);
             }
         });
     }
