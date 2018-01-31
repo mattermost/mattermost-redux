@@ -808,6 +808,37 @@ export function getChannels(teamId, page = 0, perPage = General.CHANNELS_CHUNK_S
     };
 }
 
+export function autocompleteChannels(teamId, term) {
+    return async (dispatch, getState) => {
+        dispatch({type: ChannelTypes.GET_CHANNELS_REQUEST}, getState);
+
+        let channels;
+        try {
+            channels = await Client4.autocompleteChannels(teamId, term);
+        } catch (error) {
+            forceLogoutIfNecessary(error, dispatch, getState);
+            dispatch(batchActions([
+                {type: ChannelTypes.GET_CHANNELS_FAILURE, error},
+                logError(error)(dispatch)
+            ]), getState);
+            return {error};
+        }
+
+        dispatch(batchActions([
+            {
+                type: ChannelTypes.RECEIVED_CHANNELS,
+                teamId,
+                data: channels
+            },
+            {
+                type: ChannelTypes.GET_CHANNELS_SUCCESS
+            }
+        ]), getState);
+
+        return {data: channels};
+    };
+}
+
 export function searchChannels(teamId, term) {
     return async (dispatch, getState) => {
         dispatch({type: ChannelTypes.GET_CHANNELS_REQUEST}, getState);
@@ -1209,6 +1240,7 @@ export default {
     viewChannel,
     markChannelAsViewed,
     getChannels,
+    autocompleteChannels,
     searchChannels,
     getChannelStats,
     addChannelMember,

@@ -1795,4 +1795,20 @@ describe('Actions.Channels', () => {
         preference = state.entities.preferences.myPreferences[prefKey];
         assert.ok(!preference);
     });
+
+    it('autocompleteChannels', async () => {
+        const prefix = TestHelper.basicChannel.name.slice(0, 5);
+
+        nock(Client4.getTeamRoute(TestHelper.basicChannel.team_id)).
+            get('/channels/autocomplete').
+            query({name: prefix}).
+            reply(200, [TestHelper.basicChannel]);
+
+        const result = await Actions.autocompleteChannels(
+            TestHelper.basicChannel.team_id,
+            prefix
+        )(store.dispatch, store.getState);
+
+        assert.deepEqual(result, {data: [TestHelper.basicChannel]});
+    });
 });

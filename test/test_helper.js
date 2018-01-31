@@ -303,7 +303,7 @@ class TestHelper {
         this.basicUser.roles = 'system_user system_admin';
         this.basicTeam = this.fakeTeamWithId();
         this.basicTeamMember = this.fakeTeamMember(this.basicUser.id, this.basicTeam.id);
-        this.basicChannel = this.fakeChannelWithId();
+        this.basicChannel = this.fakeChannelWithId(this.basicTeam.id);
         this.basicChannelMember = this.fakeChannelMember(this.basicUser.id, this.basicChannel.id);
         this.basicPost = {...this.fakePostWithId(this.basicChannel.id), create_at: 1507841118796};
     }
