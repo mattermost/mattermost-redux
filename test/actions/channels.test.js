@@ -1800,7 +1800,7 @@ describe('Actions.Channels', () => {
         const prefix = TestHelper.basicChannel.name.slice(0, 5);
 
         nock(Client4.getTeamRoute(TestHelper.basicChannel.team_id)).
-            get(`/channels/autocomplete`).
+            get('/channels/autocomplete').
             query({name: prefix}).
             reply(200, [TestHelper.basicChannel]);
 
