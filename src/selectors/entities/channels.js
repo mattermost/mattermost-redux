@@ -353,6 +353,16 @@ export const canManageChannelMembers = createSelector(
     (state) => haveICurrentChannelPerm(state, {perm: Permissions.MANAGE_PRIVATE_CHANNEL_MEMBERS}),
     (state) => haveICurrentChannelPerm(state, {perm: Permissions.MANAGE_PUBLIC_CHANNEL_MEMBERS}),
     (channel, user, teamMembership, channelMembership, config, license, newPermissions, managePrivateMembers, managePublicMembers) => {
+        if (channel.type === General.DM_CHANNEL ||
+            channel.type === General.GM_CHANNEL ||
+            channel.name === General.DEFAULT_CHANNEL) {
+            return false;
+        }
+
+        if (license.IsLicensed !== 'true') {
+            return true;
+        }
+
         if (newPermissions) {
             if (channel.type === General.OPEN_CHANNEL) {
                 return managePublicMembers;
