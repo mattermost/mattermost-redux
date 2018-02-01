@@ -60,32 +60,37 @@ export function canDeletePost(state, config, license, teamId, channelId, userId,
 }
 
 export function canEditPost(state, config, license, teamId, channelId, userId, post) {
-    if (!post) {
+    if (!post || isSystemMessage(post)) {
         return false;
     }
 
     const isOwner = isPostOwner(userId, post);
 
-    let canEdit;
-    if (hasNewPermissions(state)) {
-        canEdit = haveIChannelPerm(state, {team: teamId, channel: channelId, perm: Permissions.EDIT_POST});
-        canEdit = canEdit && !isSystemMessage(post);
-        if (!isOwner) {
-            canEdit = canEdit && haveIChannelPerm(state, {team: teamId, channel: channelId, perm: Permissions.EDIT_OTHERS_POSTS});
-        }
-    } else {
-        canEdit = isOwner && !isSystemMessage(post);
-    }
+    let canEdit = true;
 
     if (canEdit && license.IsLicensed === 'true') {
-        if (config.AllowEditPost === General.ALLOW_EDIT_POST_NEVER) {
-            canEdit = false;
-        } else if (config.AllowEditPost === General.ALLOW_EDIT_POST_TIME_LIMIT) {
-            const timeLeft = (post.create_at + (config.PostEditTimeLimit * 1000)) - Date.now();
-            if (timeLeft <= 0) {
-                canEdit = false;
+        if (hasNewPermissions(state)) {
+            canEdit = canEdit && haveIChannelPerm(state, {team: teamId, channel: channelId, perm: Permissions.EDIT_POST});
+            if (!isOwner) {
+                canEdit = canEdit && haveIChannelPerm(state, {team: teamId, channel: channelId, perm: Permissions.EDIT_OTHERS_POSTS});
+            }
+            if (config.PostEditTimeLimit !== -1) {
+                const timeLeft = (post.create_at + (config.PostEditTimeLimit * 1000)) - Date.now();
+                if (timeLeft <= 0) {
+                    canEdit = false;
+                }
+            }
+        } else {
+            canEdit = isOwner && config.AllowEditPost !== 'never';
+            if (config.AllowEditPost === General.ALLOW_EDIT_POST_TIME_LIMIT) {
+                const timeLeft = (post.create_at + (config.PostEditTimeLimit * 1000)) - Date.now();
+                if (timeLeft <= 0) {
+                    canEdit = false;
+                }
             }
         }
+    } else {
+        canEdit = canEdit && isOwner;
     }
     return canEdit;
 }
@@ -94,7 +99,7 @@ export function editDisable(state, config, license, teamId, channelId, userId, p
     const canEdit = canEditPost(state, config, license, teamId, channelId, userId, post);
 
     if (canEdit && license.IsLicensed === 'true') {
-        if (config.AllowEditPost === General.ALLOW_EDIT_POST_TIME_LIMIT) {
+        if (config.AllowEditPost === General.ALLOW_EDIT_POST_TIME_LIMIT || config.PostEditTimeLimit !== -1) {
             const timeLeft = (post.create_at + (config.PostEditTimeLimit * 1000)) - Date.now();
             if (timeLeft > 0) {
                 editDisableAction.fireAfter(timeLeft + 1000);
