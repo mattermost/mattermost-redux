@@ -400,6 +400,35 @@ export function getReactionsForPost(postId) {
             return {error};
         }
 
+        if (reactions && reactions.length > 0) {
+            const nonExistentEmoji = getState().entities.emojis.nonExistentEmoji;
+            const customEmojisByName = selectCustomEmojisByName(getState());
+            const emojisToLoad = new Set();
+
+            reactions.forEach((r) => {
+                const name = r.emoji_name;
+
+                if (systemEmojis.has(name)) {
+                    // It's a system emoji, go the next match
+                    return;
+                }
+
+                if (nonExistentEmoji.has(name)) {
+                    // We've previously confirmed this is not a custom emoji
+                    return;
+                }
+
+                if (customEmojisByName.has(name)) {
+                    // We have the emoji, go to the next match
+                    return;
+                }
+
+                emojisToLoad.add(name);
+            });
+
+            dispatch(getCustomEmojisByName(Array.from(emojisToLoad)));
+        }
+
         dispatch(batchActions([
             {
                 type: PostTypes.REACTION_SUCCESS
