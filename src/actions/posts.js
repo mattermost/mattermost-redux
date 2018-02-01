@@ -12,6 +12,8 @@ import {getCustomEmojisByName as selectCustomEmojisByName} from 'selectors/entit
 import * as Selectors from 'selectors/entities/posts';
 import {getConfig} from 'selectors/entities/general';
 
+import {parseNeededCustomEmojisFromText} from 'utils/emoji_utils';
+
 import {bindClientFunc, forceLogoutIfNecessary} from './helpers';
 import {logError} from './errors';
 import {deletePreferences, savePreferences} from './preferences';
@@ -396,6 +398,35 @@ export function getReactionsForPost(postId) {
                 logError(error)(dispatch)
             ]), getState);
             return {error};
+        }
+
+        if (reactions && reactions.length > 0) {
+            const nonExistentEmoji = getState().entities.emojis.nonExistentEmoji;
+            const customEmojisByName = selectCustomEmojisByName(getState());
+            const emojisToLoad = new Set();
+
+            reactions.forEach((r) => {
+                const name = r.emoji_name;
+
+                if (systemEmojis.has(name)) {
+                    // It's a system emoji, go the next match
+                    return;
+                }
+
+                if (nonExistentEmoji.has(name)) {
+                    // We've previously confirmed this is not a custom emoji
+                    return;
+                }
+
+                if (customEmojisByName.has(name)) {
+                    // We have the emoji, go to the next match
+                    return;
+                }
+
+                emojisToLoad.add(name);
+            });
+
+            dispatch(getCustomEmojisByName(Array.from(emojisToLoad)));
         }
 
         dispatch(batchActions([
@@ -936,7 +967,7 @@ export function getNeededCustomEmojis(state, posts) {
     let customEmojisByName; // Populate this lazily since it's relatively expensive
     const nonExistentEmoji = state.entities.emojis.nonExistentEmoji;
 
-    const customEmojisToLoad = new Set();
+    let customEmojisToLoad = new Set();
 
     Object.values(posts).forEach((post) => {
         if (!post.message.includes(':')) {
@@ -947,26 +978,10 @@ export function getNeededCustomEmojis(state, posts) {
             customEmojisByName = selectCustomEmojisByName(state);
         }
 
-        const pattern = /\B:([A-Za-z0-9_-]+):\B/gi;
+        const emojisFromPost = parseNeededCustomEmojisFromText(post.message, systemEmojis, customEmojisByName, nonExistentEmoji);
 
-        let match;
-        while ((match = pattern.exec(post.message)) !== null) {
-            if (systemEmojis.has(match[1])) {
-                // It's a system emoji, go the next match
-                continue;
-            }
-
-            if (nonExistentEmoji.has(match[1])) {
-                // We've previously confirmed this is not a custom emoji
-                continue;
-            }
-
-            if (customEmojisByName.has(match[1])) {
-                // We have the emoji, go to the next match
-                continue;
-            }
-
-            customEmojisToLoad.add(match[1]);
+        if (emojisFromPost.size > 0) {
+            customEmojisToLoad = new Set([...customEmojisToLoad, ...emojisFromPost]);
         }
     });
 
