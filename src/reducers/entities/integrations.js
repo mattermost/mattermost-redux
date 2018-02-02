@@ -5,24 +5,26 @@ import {combineReducers} from 'redux';
 import {IntegrationTypes, UserTypes, ChannelTypes} from 'action_types';
 
 function incomingHooks(state = {}, action) {
-    const nextState = {...state};
-
     switch (action.type) {
     case IntegrationTypes.RECEIVED_INCOMING_HOOK: {
+        const nextState = {...state};
         nextState[action.data.id] = action.data;
         return nextState;
     }
     case IntegrationTypes.RECEIVED_INCOMING_HOOKS: {
+        const nextState = {...state};
         for (const hook of action.data) {
             nextState[hook.id] = hook;
         }
         return nextState;
     }
     case IntegrationTypes.DELETED_INCOMING_HOOK: {
+        const nextState = {...state};
         Reflect.deleteProperty(nextState, action.data.id);
         return nextState;
     }
     case ChannelTypes.RECEIVED_CHANNEL_DELETED: {
+        const nextState = {...state};
         let deleted = false;
         Object.keys(nextState).forEach((id) => {
             if (nextState[id].channel_id === action.data.id) {
@@ -46,24 +48,26 @@ function incomingHooks(state = {}, action) {
 }
 
 function outgoingHooks(state = {}, action) {
-    const nextState = {...state};
-
     switch (action.type) {
     case IntegrationTypes.RECEIVED_OUTGOING_HOOK: {
+        const nextState = {...state};
         nextState[action.data.id] = action.data;
         return nextState;
     }
     case IntegrationTypes.RECEIVED_OUTGOING_HOOKS: {
+        const nextState = {...state};
         for (const hook of action.data) {
             nextState[hook.id] = hook;
         }
         return nextState;
     }
     case IntegrationTypes.DELETED_OUTGOING_HOOK: {
+        const nextState = {...state};
         Reflect.deleteProperty(nextState, action.data.id);
         return nextState;
     }
     case ChannelTypes.RECEIVED_CHANNEL_DELETED: {
+        const nextState = {...state};
         let deleted = false;
         Object.keys(nextState).forEach((id) => {
             if (nextState[id].channel_id === action.data.id) {
@@ -87,10 +91,10 @@ function outgoingHooks(state = {}, action) {
 }
 
 function commands(state = {}, action) {
-    const nextState = {...state};
     switch (action.type) {
     case IntegrationTypes.RECEIVED_COMMANDS:
     case IntegrationTypes.RECEIVED_CUSTOM_TEAM_COMMANDS: {
+        const nextState = {...state};
         for (const command of action.data) {
             if (command.id) {
                 const id = command.id;
@@ -120,6 +124,7 @@ function commands(state = {}, action) {
         };
     }
     case IntegrationTypes.DELETED_COMMAND: {
+        const nextState = {...state};
         Reflect.deleteProperty(nextState, action.data.id);
         return nextState;
     }
@@ -160,9 +165,9 @@ function systemCommands(state = {}, action) {
 }
 
 function oauthApps(state = {}, action) {
-    const nextState = {...state};
     switch (action.type) {
     case IntegrationTypes.RECEIVED_OAUTH_APPS: {
+        const nextState = {...state};
         for (const app of action.data) {
             nextState[app.id] = app;
         }
@@ -174,6 +179,7 @@ function oauthApps(state = {}, action) {
             [action.data.id]: action.data
         };
     case IntegrationTypes.DELETED_OAUTH_APP: {
+        const nextState = {...state};
         Reflect.deleteProperty(nextState, action.data.id);
         return nextState;
     }

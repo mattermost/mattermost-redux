@@ -19,10 +19,9 @@ function logs(state = [], action) {
 }
 
 function audits(state = {}, action) {
-    const nextState = {...state};
-
     switch (action.type) {
     case AdminTypes.RECEIVED_AUDITS: {
+        const nextState = {...state};
         for (const audit of action.data) {
             nextState[audit.id] = audit;
         }
@@ -50,14 +49,14 @@ function config(state = {}, action) {
 }
 
 function complianceReports(state = {}, action) {
-    const nextState = {...state};
-
     switch (action.type) {
     case AdminTypes.RECEIVED_COMPLIANCE_REPORT: {
+        const nextState = {...state};
         nextState[action.data.id] = action.data;
         return nextState;
     }
     case AdminTypes.RECEIVED_COMPLIANCE_REPORTS: {
+        const nextState = {...state};
         for (const report of action.data) {
             nextState[report.id] = report;
         }
@@ -324,14 +323,14 @@ function userAccessTokensForUser(state = {}, action) {
 }
 
 function plugins(state = {}, action) {
-    const nextState = {...state};
-
     switch (action.type) {
     case AdminTypes.RECEIVED_PLUGIN: {
+        const nextState = {...state};
         nextState[action.data.id] = action.data;
         return nextState;
     }
     case AdminTypes.RECEIVED_PLUGINS: {
+        const nextState = {...state};
         const activePlugins = action.data.active;
         for (const plugin of activePlugins) {
             nextState[plugin.id] = {...plugin, active: true};
@@ -344,10 +343,12 @@ function plugins(state = {}, action) {
         return nextState;
     }
     case AdminTypes.REMOVED_PLUGIN: {
+        const nextState = {...state};
         Reflect.deleteProperty(nextState, action.data);
         return nextState;
     }
     case AdminTypes.ACTIVATED_PLUGIN: {
+        const nextState = {...state};
         const plugin = nextState[action.data];
         if (plugin && !plugin.active) {
             nextState[action.data] = {...plugin, active: true};
@@ -356,6 +357,7 @@ function plugins(state = {}, action) {
         return state;
     }
     case AdminTypes.DEACTIVATED_PLUGIN: {
+        const nextState = {...state};
         const plugin = nextState[action.data];
         if (plugin && plugin.active) {
             nextState[action.data] = {...plugin, active: false};
