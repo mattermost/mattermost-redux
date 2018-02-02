@@ -52,10 +52,11 @@ function channels(state = {}, action) {
         }
         return nextState;
     }
-    case ChannelTypes.RECEIVED_CHANNEL_DELETED:
+    case ChannelTypes.RECEIVED_CHANNEL_DELETED: {
         const nextState = {...state};
         Reflect.deleteProperty(nextState, action.data.id);
         return nextState;
+    }
     case ChannelTypes.UPDATE_CHANNEL_HEADER: {
         const {channelId, header} = action.data;
         return {
@@ -78,7 +79,7 @@ function channels(state = {}, action) {
     }
     case ChannelTypes.LEAVE_CHANNEL: {
         if (action.data && action.data.type === General.PRIVATE_CHANNEL) {
-            nextState = {...state};
+            const nextState = {...state};
             Reflect.deleteProperty(nextState, action.data.id);
             return nextState;
         }
@@ -257,14 +258,15 @@ function myMembers(state = {}, action) {
         };
     }
     case ChannelTypes.LEAVE_CHANNEL:
-    case ChannelTypes.RECEIVED_CHANNEL_DELETED:
+    case ChannelTypes.RECEIVED_CHANNEL_DELETED: {
+        const nextState = {...state};
         if (action.data) {
             Reflect.deleteProperty(nextState, action.data.id);
             return nextState;
         }
 
         return state;
-
+    }
     case UserTypes.LOGOUT_SUCCESS:
         return {};
     default:
