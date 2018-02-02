@@ -38,8 +38,6 @@ function currentChannelId(state = '', action) {
 }
 
 function channels(state = {}, action) {
-    const nextState = {...state};
-
     switch (action.type) {
     case ChannelTypes.RECEIVED_CHANNEL:
         return {
@@ -48,12 +46,14 @@ function channels(state = {}, action) {
         };
 
     case ChannelTypes.RECEIVED_CHANNELS: {
+        const nextState = {...state};
         for (const channel of action.data) {
             nextState[channel.id] = channel;
         }
         return nextState;
     }
     case ChannelTypes.RECEIVED_CHANNEL_DELETED:
+        const nextState = {...state};
         Reflect.deleteProperty(nextState, action.data.id);
         return nextState;
     case ChannelTypes.UPDATE_CHANNEL_HEADER: {
@@ -78,6 +78,7 @@ function channels(state = {}, action) {
     }
     case ChannelTypes.LEAVE_CHANNEL: {
         if (action.data && action.data.type === General.PRIVATE_CHANNEL) {
+            nextState = {...state};
             Reflect.deleteProperty(nextState, action.data.id);
             return nextState;
         }
@@ -136,8 +137,6 @@ function channelsInTeam(state = {}, action) {
 }
 
 function myMembers(state = {}, action) {
-    const nextState = {...state};
-
     switch (action.type) {
     case ChannelTypes.RECEIVED_MY_CHANNEL_MEMBER: {
         const channelMember = action.data;
@@ -147,6 +146,7 @@ function myMembers(state = {}, action) {
         };
     }
     case ChannelTypes.RECEIVED_MY_CHANNEL_MEMBERS: {
+        const nextState = {...state};
         const remove = action.remove;
         if (remove) {
             remove.forEach((id) => {
@@ -331,15 +331,16 @@ function membersInChannel(state = {}, action) {
 }
 
 function stats(state = {}, action) {
-    const nextState = {...state};
     switch (action.type) {
     case ChannelTypes.RECEIVED_CHANNEL_STATS: {
+        const nextState = {...state};
         const stat = action.data;
         nextState[stat.channel_id] = stat;
 
         return nextState;
     }
     case ChannelTypes.ADD_CHANNEL_MEMBER_SUCCESS: {
+        const nextState = {...state};
         const id = action.id;
         const nextStat = nextState[id];
         if (nextStat) {
@@ -356,6 +357,7 @@ function stats(state = {}, action) {
         return state;
     }
     case ChannelTypes.REMOVE_CHANNEL_MEMBER_SUCCESS: {
+        const nextState = {...state};
         const id = action.id;
         const nextStat = nextState[id];
         if (nextStat) {

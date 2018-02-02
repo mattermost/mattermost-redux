@@ -19,11 +19,11 @@ function results(state = [], action) {
 }
 
 function recent(state = {}, action) {
-    const nextState = {...state};
     const {data, type} = action;
 
     switch (type) {
     case SearchTypes.RECEIVED_SEARCH_TERM: {
+        const nextState = {...state};
         const {teamId, terms, isOrSearch} = data;
         const team = [...(nextState[teamId] || [])];
         const index = team.findIndex((r) => r.terms === terms);
@@ -38,6 +38,7 @@ function recent(state = {}, action) {
         };
     }
     case SearchTypes.REMOVE_SEARCH_TERM: {
+        const nextState = {...state};
         const {teamId, terms} = data;
         const team = [...(nextState[teamId] || [])];
         const index = team.findIndex((r) => r.terms === terms);
