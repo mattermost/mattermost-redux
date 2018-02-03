@@ -523,9 +523,8 @@ export default class Client4 {
 
     getProfilesInChannel = async (channelId, page = 0, perPage = PER_PAGE_DEFAULT) => {
         this.trackEvent('api', 'api_profiles_get_in_channel', {channel_id: channelId});
-
         return this.doFetch(
-            `${this.getUsersRoute()}${buildQueryString({in_channel: channelId, page, per_page: perPage})}`,
+            `${this.getUsersRoute()}${buildQueryString({in_channel: channelId, page, per_page: perPage, sort: 'status'})}`,
             {method: 'get'}
         );
     };
