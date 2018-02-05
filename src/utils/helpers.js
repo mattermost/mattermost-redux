@@ -40,24 +40,11 @@ export function isMinimumServerVersion(currentVersion, minMajorVersion = 0, minM
         return false;
     }
 
-    let firstDotIndex = currentVersion.indexOf('.');
-    if (firstDotIndex < 0) {
-        firstDotIndex = currentVersion.length;
-    }
+    const split = currentVersion.split('.');
 
-    let secondDotIndex = currentVersion.indexOf('.', firstDotIndex + 1);
-    if (secondDotIndex < 0) {
-        secondDotIndex = currentVersion.length;
-    }
-
-    let thirdDotIndex = currentVersion.indexOf('.', secondDotIndex + 1) || currentVersion.length;
-    if (thirdDotIndex < 0) {
-        thirdDotIndex = currentVersion.length;
-    }
-
-    const major = parseInt(currentVersion.slice(0, firstDotIndex), 10);
-    const minor = parseInt(currentVersion.slice(firstDotIndex + 1, secondDotIndex) || '0', 10);
-    const dot = parseInt(currentVersion.slice(secondDotIndex + 1, thirdDotIndex) || '0', 10);
+    const major = parseInt(split[0], 10);
+    const minor = parseInt(split[1] || '0', 10);
+    const dot = parseInt(split[2] || '0', 10);
 
     if (major > minMajorVersion) {
         return true;
