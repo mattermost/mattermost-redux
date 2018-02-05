@@ -11,6 +11,7 @@ import {getProfilesByIds} from 'actions/users';
 import {getCustomEmojisByName as selectCustomEmojisByName} from 'selectors/entities/emojis';
 
 import {parseNeededCustomEmojisFromText} from 'utils/emoji_utils';
+import {isMinimumServerVersion} from 'utils/helpers';
 
 import {logError} from './errors';
 import {bindClientFunc, forceLogoutIfNecessary} from './helpers';
@@ -44,6 +45,11 @@ export function getCustomEmoji(emojiId) {
 
 export function getCustomEmojiByName(name) {
     return async (dispatch, getState) => {
+        const serverVersion = Client4.getServerVersion();
+        if (!isMinimumServerVersion(serverVersion, 4, 7)) {
+            return {data: {}};
+        }
+
         dispatch({type: EmojiTypes.GET_CUSTOM_EMOJI_REQUEST}, getState);
 
         let data;
@@ -235,22 +241,73 @@ export function deleteCustomEmoji(emojiId) {
 }
 
 export function searchCustomEmojis(term, options = {}) {
-    return bindClientFunc(
-        Client4.searchCustomEmoji,
-        EmojiTypes.GET_CUSTOM_EMOJIS_REQUEST,
-        [EmojiTypes.RECEIVED_CUSTOM_EMOJIS, EmojiTypes.GET_CUSTOM_EMOJIS_SUCCESS],
-        EmojiTypes.GET_CUSTOM_EMOJIS_FAILURE,
-        term,
-        options
-    );
+    return async (dispatch, getState) => {
+        const serverVersion = Client4.getServerVersion();
+        if (!isMinimumServerVersion(serverVersion, 4, 7)) {
+            return {data: []};
+        }
+
+        dispatch({type: EmojiTypes.GET_CUSTOM_EMOJIS_REQUEST}, getState);
+
+        let data;
+        try {
+            data = await Client4.searchCustomEmoji(term, options);
+        } catch (error) {
+            forceLogoutIfNecessary(error, dispatch, getState);
+
+            dispatch(batchActions([
+                {type: EmojiTypes.GET_CUSTOM_EMOJIS_FAILURE, error},
+                logError(error)(dispatch)
+            ]), getState);
+            return {error};
+        }
+
+        dispatch(batchActions([
+            {
+                type: EmojiTypes.RECEIVED_CUSTOM_EMOJIS,
+                data
+            },
+            {
+                type: EmojiTypes.GET_CUSTOM_EMOJIS_SUCCESS
+            }
+        ]), getState);
+
+        return {data};
+    };
 }
 
 export function autocompleteCustomEmojis(name) {
-    return bindClientFunc(
-        Client4.autocompleteCustomEmoji,
-        EmojiTypes.GET_CUSTOM_EMOJIS_REQUEST,
-        [EmojiTypes.RECEIVED_CUSTOM_EMOJIS, EmojiTypes.GET_CUSTOM_EMOJIS_SUCCESS],
-        EmojiTypes.GET_CUSTOM_EMOJIS_FAILURE,
-        name
-    );
+    return async (dispatch, getState) => {
+        const serverVersion = Client4.getServerVersion();
+        if (!isMinimumServerVersion(serverVersion, 4, 7)) {
+            return {data: []};
+        }
+
+        dispatch({type: EmojiTypes.GET_CUSTOM_EMOJIS_REQUEST}, getState);
+
+        let data;
+        try {
+            data = await Client4.autocompleteCustomEmoji(name);
+        } catch (error) {
+            forceLogoutIfNecessary(error, dispatch, getState);
+
+            dispatch(batchActions([
+                {type: EmojiTypes.GET_CUSTOM_EMOJIS_FAILURE, error},
+                logError(error)(dispatch)
+            ]), getState);
+            return {error};
+        }
+
+        dispatch(batchActions([
+            {
+                type: EmojiTypes.RECEIVED_CUSTOM_EMOJIS,
+                data
+            },
+            {
+                type: EmojiTypes.GET_CUSTOM_EMOJIS_SUCCESS
+            }
+        ]), getState);
+
+        return {data};
+    };
 }
