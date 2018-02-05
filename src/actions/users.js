@@ -218,7 +218,8 @@ export function loadMe() {
             getMyTeamUnreads()(dispatch, getState)
         ];
 
-        const serverVersion = Client4.getServerVersion();
+        // Sometimes the server version is set in one or the other
+        const serverVersion = Client4.getServerVersion() || getState().entities.general.serverVersion;
         if (!isMinimumServerVersion(serverVersion, 4, 7) && getConfig(state).EnableCustomEmoji === 'true') {
             dispatch(getAllCustomEmojis());
         }
