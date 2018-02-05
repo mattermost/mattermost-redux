@@ -3,7 +3,6 @@
 
 import {createSelectorCreator, defaultMemoize} from 'reselect';
 import shallowEqual from 'shallow-equals';
-import {Client4} from 'client';
 
 export function memoizeResult(func) {
     let lastArgs = null;
