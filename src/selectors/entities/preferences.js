@@ -120,14 +120,18 @@ const getThemePreference = createSelector(
     }
 );
 
+const getDefaultThemeName = createSelector(getConfig, (config) => config.DefaultTheme || 'default');
+
 export const getTheme = createShallowSelector(
     getThemePreference,
-    (themePreference) => {
+    getDefaultThemeName,
+    (themePreference, defaultThemeName) => {
         let theme;
+        const defaultTheme = Preferences.THEMES[defaultThemeName];
         if (themePreference) {
             theme = themePreference.value;
         } else {
-            theme = Preferences.THEMES.default;
+            theme = defaultTheme;
         }
 
         if (typeof theme === 'string') {
@@ -139,13 +143,13 @@ export const getTheme = createShallowSelector(
 
         // If this is a system theme, find it in case the user's theme is missing any fields
         if (theme.type && theme.type !== 'custom') {
-            const match = Object.entries(Preferences.THEMES).find(([, v]) => v.type === theme.type);
+            const match = Object.values(Preferences.THEMES).find((v) => v.type === theme.type);
             if (match) {
-                return match[1];
+                return match;
             }
         }
 
-        for (const key of Object.keys(Preferences.THEMES.default)) {
+        for (const key of Object.keys(defaultTheme)) {
             if (theme[key]) {
                 // Fix a case where upper case theme colours are rendered as black
                 theme[key] = theme[key].toLowerCase();
@@ -157,7 +161,7 @@ export const getTheme = createShallowSelector(
             theme.mentionBg = theme.mentionBj;
         }
 
-        return Object.assign({}, Preferences.THEMES.default, theme);
+        return Object.assign({}, defaultTheme, theme);
     }
 );
 
