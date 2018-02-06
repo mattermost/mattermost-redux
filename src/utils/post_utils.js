@@ -74,31 +74,40 @@ export function getLastCreateAt(postsArray) {
     return 0;
 }
 
-// Returns true if a post should be hidden based off the Show Join/Leave Messages setting
-export function shouldFilterPost(post, options = {}) {
-    // Add as much filters as needed here, if you want to filter the post return true
-    const postTypes = Posts.POST_TYPES;
+const joinLeavePostTypes = [
+    Posts.POST_TYPES.JOIN_LEAVE,
+    Posts.POST_TYPES.JOIN_CHANNEL,
+    Posts.POST_TYPES.LEAVE_CHANNEL,
+    Posts.POST_TYPES.ADD_REMOVE,
+    Posts.POST_TYPES.ADD_TO_CHANNEL,
+    Posts.POST_TYPES.REMOVE_FROM_CHANNEL,
+    Posts.POST_TYPES.JOIN_TEAM,
+    Posts.POST_TYPES.LEAVE_TEAM,
+    Posts.POST_TYPES.ADD_TO_TEAM,
+    Posts.POST_TYPES.REMOVE_FROM_TEAM
+];
 
-    if ('showJoinLeave' in options && !options.showJoinLeave) {
-        const joinLeaveTypes = [
-            postTypes.JOIN_LEAVE,
-            postTypes.JOIN_CHANNEL,
-            postTypes.LEAVE_CHANNEL,
-            postTypes.ADD_REMOVE,
-            postTypes.ADD_TO_CHANNEL,
-            postTypes.REMOVE_FROM_CHANNEL,
-            postTypes.JOIN_TEAM,
-            postTypes.LEAVE_TEAM,
-            postTypes.ADD_TO_TEAM,
-            postTypes.REMOVE_FROM_TEAM
-        ];
+// Returns true if a post should be hidden when the user has Show Join/Leave Messages disabled
+export function shouldFilterJoinLeavePost(post, showJoinLeave, currentUsername) {
+    if (showJoinLeave) {
+        return false;
+    }
 
-        if (joinLeaveTypes.includes(post.type)) {
-            return true;
+    // Don't filter out non-join/leave messages
+    if (joinLeavePostTypes.indexOf(post.type) === -1) {
+        return false;
+    }
+
+    // Don't filter out join/leave messages about the current user
+    if (post.props) {
+        if (post.props.username === currentUsername ||
+            post.props.addedUsername === currentUsername ||
+            post.props.removedUsername === currentUsername) {
+            return false;
         }
     }
 
-    return false;
+    return true;
 }
 
 export function isPostPendingOrFailed(post) {
