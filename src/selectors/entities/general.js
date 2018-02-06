@@ -15,6 +15,20 @@ export function getCurrentUrl(state) {
     return state.entities.general.credentials.url;
 }
 
+export function hasNewPermissions(state) {
+    const version = state.entities.general.serverVersion;
+    if (version.split('.')[0] > '4') {
+        return true;
+    }
+    if (version.split('.')[0] < '4') {
+        return false;
+    }
+    if (version.split('.')[1] < '6') {
+        return false;
+    }
+    return true;
+}
+
 export const canUploadFilesOnMobile = createSelector(
     getConfig,
     getLicense,

@@ -38,7 +38,8 @@ import {
     PostTypes,
     PreferenceTypes,
     TeamTypes,
-    UserTypes
+    UserTypes,
+    RoleTypes
 } from 'action_types';
 import {General, WebsocketEvents, Preferences, Posts} from 'constants';
 
@@ -204,6 +205,15 @@ function handleEvent(msg, dispatch, getState) {
         break;
     case WebsocketEvents.USER_UPDATED:
         handleUserUpdatedEvent(msg, dispatch, getState);
+        break;
+    case WebsocketEvents.ROLE_ADDED:
+        handleRoleAddedEvent(msg, dispatch, getState);
+        break;
+    case WebsocketEvents.ROLE_REMOVED:
+        handleRoleRemovedEvent(msg, dispatch, getState);
+        break;
+    case WebsocketEvents.ROLE_UPDATED:
+        handleRoleUpdatedEvent(msg, dispatch, getState);
         break;
     case WebsocketEvents.CHANNEL_CREATED:
         handleChannelCreatedEvent(msg, dispatch, getState);
@@ -453,6 +463,33 @@ function handleUserUpdatedEvent(msg, dispatch, getState) {
             }
         }, getState);
     }
+}
+
+function handleRoleAddedEvent(msg, dispatch) {
+    const role = JSON.parse(msg.data.role);
+
+    dispatch({
+        type: RoleTypes.RECEIVED_ROLE,
+        data: role
+    });
+}
+
+function handleRoleRemovedEvent(msg, dispatch) {
+    const role = JSON.parse(msg.data.role);
+
+    dispatch({
+        type: RoleTypes.ROLE_DELETED,
+        data: role
+    });
+}
+
+function handleRoleUpdatedEvent(msg, dispatch) {
+    const role = JSON.parse(msg.data.role);
+
+    dispatch({
+        type: RoleTypes.RECEIVED_ROLE,
+        data: role
+    });
 }
 
 function handleChannelCreatedEvent(msg, dispatch, getState) {

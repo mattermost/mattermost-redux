@@ -6,6 +6,7 @@ import {bindClientFunc, forceLogoutIfNecessary, FormattedError} from './helpers.
 import {GeneralTypes} from 'action_types';
 import {General} from 'constants';
 import {loadMe} from './users';
+import {loadRolesIfNeeded} from './roles';
 import {logError} from './errors';
 import EventEmitter from 'utils/event_emitter';
 import {batchActions} from 'redux-batched-actions';
@@ -151,6 +152,7 @@ EventEmitter.on(General.CONFIG_CHANGED, setServerVersion);
 export function setServerVersion(serverVersion) {
     return async (dispatch, getState) => {
         dispatch({type: GeneralTypes.RECEIVED_SERVER_VERSION, data: serverVersion}, getState);
+        loadRolesIfNeeded([])(dispatch, getState);
 
         return {data: true};
     };

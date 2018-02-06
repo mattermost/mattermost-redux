@@ -12,6 +12,7 @@ import {getChannelsIdForTeam} from 'utils/channel_utils';
 import {logError} from './errors';
 import {bindClientFunc, forceLogoutIfNecessary} from './helpers';
 import {getMissingProfilesByIds} from './users';
+import {loadRolesIfNeeded} from './roles';
 
 export function selectChannel(channelId) {
     return async (dispatch, getState) => {
@@ -79,6 +80,7 @@ export function createChannel(channel, userId) {
 
         if (!myMembers[created.id]) {
             actions.push({type: ChannelTypes.RECEIVED_MY_CHANNEL_MEMBER, data: member});
+            loadRolesIfNeeded(new Set(member.roles.split(' ')))(dispatch, getState);
         }
 
         dispatch(batchActions([
@@ -151,6 +153,7 @@ export function createDirectChannel(userId, otherUserId) {
                 data: [{id: userId}, {id: otherUserId}]
             }
         ]), getState);
+        loadRolesIfNeeded(new Set(member.roles.split(' ')))(dispatch, getState);
 
         return {data: created};
     };
@@ -219,6 +222,7 @@ export function createGroupChannel(userIds) {
                 data: profilesInChannel
             }
         ]), getState);
+        loadRolesIfNeeded(new Set(member.roles.split(' ')))(dispatch, getState);
 
         return {data: created};
     };
@@ -422,6 +426,7 @@ export function getChannelAndMyMember(channelId) {
                 data: member
             }
         ]), getState);
+        loadRolesIfNeeded(new Set(member.roles.split(' ')))(dispatch, getState);
 
         return {data: {channel, member}};
     };
@@ -488,6 +493,15 @@ export function fetchMyChannelsAndMembers(teamId) {
                 type: ChannelTypes.CHANNEL_MEMBERS_SUCCESS
             }
         ]), getState);
+        const roles = new Set();
+        for (const member of channelMembers) {
+            for (const role of member.roles.split(' ')) {
+                roles.add(role);
+            }
+        }
+        if (roles.size > 0) {
+            loadRolesIfNeeded(roles)(dispatch, getState);
+        }
 
         return {data: {channels, members: channelMembers}};
     };
@@ -524,6 +538,16 @@ export function getMyChannelMembers(teamId) {
                 type: ChannelTypes.CHANNEL_MY_MEMBERS_SUCCESS
             }
         ]), getState);
+
+        const roles = new Set();
+        for (const member of channelMembers) {
+            for (const role of member.roles.split(' ')) {
+                roles.add(role);
+            }
+        }
+        if (roles.size > 0) {
+            loadRolesIfNeeded(roles)(dispatch, getState);
+        }
 
         return {data: channelMembers};
     };
@@ -648,6 +672,7 @@ export function joinChannel(userId, teamId, channelId, channelName) {
                 type: ChannelTypes.JOIN_CHANNEL_SUCCESS
             }
         ]), getState);
+        loadRolesIfNeeded(new Set(member.roles.split(' ')))(dispatch, getState);
 
         return {data: {channel, member}};
     };
@@ -732,6 +757,7 @@ export function viewChannel(channelId, prevChannelId = '') {
                 type: ChannelTypes.RECEIVED_MY_CHANNEL_MEMBER,
                 data: {...member, last_viewed_at: new Date().getTime()}
             });
+            loadRolesIfNeeded(new Set(member.roles.split(' ')))(dispatch, getState);
         }
 
         const prevMember = myMembers[prevChannelId];
@@ -740,6 +766,7 @@ export function viewChannel(channelId, prevChannelId = '') {
                 type: ChannelTypes.RECEIVED_MY_CHANNEL_MEMBER,
                 data: {...prevMember, last_viewed_at: new Date().getTime()}
             });
+            loadRolesIfNeeded(new Set(prevMember.roles.split(' ')))(dispatch, getState);
         }
 
         dispatch(batchActions(actions), getState);
@@ -759,6 +786,7 @@ export function markChannelAsViewed(channelId, prevChannelId = '') {
                 type: ChannelTypes.RECEIVED_MY_CHANNEL_MEMBER,
                 data: {...member, last_viewed_at: Date.now()}
             });
+            loadRolesIfNeeded(new Set(member.roles.split(' ')))(dispatch, getState);
         }
 
         const prevMember = myMembers[prevChannelId];
@@ -767,6 +795,7 @@ export function markChannelAsViewed(channelId, prevChannelId = '') {
                 type: ChannelTypes.RECEIVED_MY_CHANNEL_MEMBER,
                 data: {...prevMember, last_viewed_at: Date.now()}
             });
+            loadRolesIfNeeded(new Set(prevMember.roles.split(' ')))(dispatch, getState);
         }
 
         if (actions.length) {
