@@ -25,7 +25,7 @@ import {haveICurrentChannelPerm} from 'selectors/entities/roles';
 import {
     buildDisplayableChannelList,
     buildDisplayableChannelListWithUnreadSection,
-    canManageMembers,
+    canManageMembersOldPermissions,
     completeDirectChannelInfo,
     completeDirectChannelDisplayName,
     getUserIdFromChannelName,
@@ -359,10 +359,6 @@ export const canManageChannelMembers = createSelector(
             return false;
         }
 
-        if (license.IsLicensed !== 'true') {
-            return true;
-        }
-
         if (newPermissions) {
             if (channel.type === General.OPEN_CHANNEL) {
                 return managePublicMembers;
@@ -371,7 +367,7 @@ export const canManageChannelMembers = createSelector(
             }
             return true;
         }
-        return canManageMembers(channel, user, teamMembership, channelMembership, config, license);
+        return canManageMembersOldPermissions(channel, user, teamMembership, channelMembership, config, license);
     }
 );
 
