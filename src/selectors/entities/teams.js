@@ -12,6 +12,10 @@ export function getCurrentTeamId(state) {
     return state.entities.teams.currentTeamId;
 }
 
+export function getTeamByName(state, name) {
+    return Object.values(getTeams(state)).find((team) => team.name === name);
+}
+
 export function getTeams(state) {
     return state.entities.teams.teams;
 }
