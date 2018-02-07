@@ -18,6 +18,13 @@ export function parseNeededCustomEmojisFromText(text, systemEmojis, customEmojis
         return new Set();
     }
 
+    // sometimes nonExistentEmoji is of type object instead of a Set for the mobile app
+    // causing a crash, this will in case is not a Set convert it to one
+    let nonExistentEmojiSet = nonExistentEmoji;
+    if (!nonExistentEmojiSet.has) {
+        nonExistentEmojiSet = new Set(nonExistentEmoji);
+    }
+
     const pattern = /\B:([A-Za-z0-9_-]+):\B/gi;
 
     const customEmojis = new Set();
@@ -29,7 +36,7 @@ export function parseNeededCustomEmojisFromText(text, systemEmojis, customEmojis
             continue;
         }
 
-        if (nonExistentEmoji.has(match[1])) {
+        if (nonExistentEmojiSet.has(match[1])) {
             // We've previously confirmed this is not a custom emoji
             continue;
         }

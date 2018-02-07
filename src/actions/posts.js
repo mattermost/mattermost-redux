@@ -401,7 +401,14 @@ export function getReactionsForPost(postId) {
         }
 
         if (reactions && reactions.length > 0) {
-            const nonExistentEmoji = getState().entities.emojis.nonExistentEmoji;
+            let nonExistentEmoji = getState().entities.emojis.nonExistentEmoji;
+
+            // sometimes nonExistentEmoji is of type object instead of a Set for the mobile app
+            // causing a crash, this will in case is not a Set convert it to one
+            if (!nonExistentEmoji.has) {
+                nonExistentEmoji = new Set(nonExistentEmoji);
+            }
+
             const customEmojisByName = selectCustomEmojisByName(getState());
             const emojisToLoad = new Set();
 
