@@ -2,6 +2,7 @@
 // See License.txt for license information.
 
 import {createSelector} from 'reselect';
+import {isMinimumServerVersion} from 'utils/helpers';
 
 export function getConfig(state) {
     return state.entities.general.config;
@@ -17,16 +18,7 @@ export function getCurrentUrl(state) {
 
 export function hasNewPermissions(state) {
     const version = state.entities.general.serverVersion;
-    if (version.split('.')[0] > '4') {
-        return true;
-    }
-    if (version.split('.')[0] < '4') {
-        return false;
-    }
-    if (version.split('.')[1] < '6') {
-        return false;
-    }
-    return true;
+    return isMinimumServerVersion(version, 4, 8, 0);
 }
 
 export const canUploadFilesOnMobile = createSelector(
