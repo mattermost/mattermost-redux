@@ -476,6 +476,26 @@ describe('Selectors.Preferences', () => {
                 }
             }).codeTheme, Preferences.THEMES.mattermostDark.codeTheme);
         });
+
+        it('returns the "default" theme if the server-configured value is not present', () => {
+            assert.equal(Selectors.getTheme({
+                entities: {
+                    general: {
+                        config: {
+                            DefaultTheme: 'fakedoesnotexist'
+                        }
+                    },
+                    teams: {
+                        currentTeamId: null
+                    },
+                    preferences: {
+                        myPreferences: {
+                            [getPreferenceKey(Preferences.CATEGORY_THEME, '')]: null
+                        }
+                    }
+                }
+            }).codeTheme, Preferences.THEMES.default.codeTheme);
+        });
     });
 
     it('get theme from style', () => {

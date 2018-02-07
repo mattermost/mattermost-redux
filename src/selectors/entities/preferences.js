@@ -120,14 +120,23 @@ const getThemePreference = createSelector(
     }
 );
 
-const getDefaultThemeName = createSelector(getConfig, (config) => config.DefaultTheme || 'default');
+const getDefaultTheme = createSelector(getConfig, (config) => {
+    if (config.DefaultTheme) {
+        const theme = Preferences.THEMES[config.DefaultTheme];
+        if (theme) {
+            return theme;
+        }
+    }
+
+    // If no config.DefaultTheme or value doesn't refer to a valid theme name...
+    return Preferences.THEMES.default;
+});
 
 export const getTheme = createShallowSelector(
     getThemePreference,
-    getDefaultThemeName,
-    (themePreference, defaultThemeName) => {
+    getDefaultTheme,
+    (themePreference, defaultTheme) => {
         let theme;
-        const defaultTheme = Preferences.THEMES[defaultThemeName];
         if (themePreference) {
             theme = themePreference.value;
         } else {
