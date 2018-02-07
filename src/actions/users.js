@@ -17,6 +17,7 @@ import {
 } from 'utils/channel_utils';
 
 import {removeUserFromList} from 'utils/user_utils';
+import {isMinimumServerVersion} from 'utils/helpers';
 
 import {logError} from './errors';
 import {bindClientFunc, forceLogoutIfNecessary, debounce} from './helpers';
@@ -171,8 +172,9 @@ function completeLogin(data) {
         ];
 
         const state = getState();
-        if (getConfig(state).EnableCustomEmoji === 'true') {
-            promises.push(getAllCustomEmojis()(dispatch, getState));
+        const serverVersion = Client4.getServerVersion();
+        if (!isMinimumServerVersion(serverVersion, 4, 7) && getConfig(state).EnableCustomEmoji === 'true') {
+            dispatch(getAllCustomEmojis());
         }
 
         try {
@@ -216,8 +218,10 @@ export function loadMe() {
             getMyTeamUnreads()(dispatch, getState)
         ];
 
-        if (getConfig(state).EnableCustomEmoji === 'true') {
-            promises.push(getAllCustomEmojis()(dispatch, getState));
+        // Sometimes the server version is set in one or the other
+        const serverVersion = Client4.getServerVersion() || getState().entities.general.serverVersion;
+        if (!isMinimumServerVersion(serverVersion, 4, 7) && getConfig(state).EnableCustomEmoji === 'true') {
+            dispatch(getAllCustomEmojis());
         }
 
         await Promise.all(promises);
