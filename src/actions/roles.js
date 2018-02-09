@@ -65,12 +65,12 @@ export function loadRolesIfNeeded(roles) {
             pendingRoles.add(role);
         }
         if (!state.entities.general.serverVersion) {
-            setPendingRoles(pendingRoles);
+            setPendingRoles(pendingRoles)(dispatch, getState);
             return {data: []};
         }
         if (!hasNewPermissions(state)) {
             if (state.entities.roles.pending) {
-                await setPendingRoles(new Set());
+                await setPendingRoles(new Set())(dispatch, getState);
             }
             return {data: []};
         }
@@ -83,7 +83,7 @@ export function loadRolesIfNeeded(roles) {
         }
 
         if (state.entities.roles.pending) {
-            await setPendingRoles(new Set());
+            await setPendingRoles(new Set())(dispatch, getState);
         }
         if (newRoles.size > 0) {
             return await getRolesByNames(newRoles)(dispatch, getState);
