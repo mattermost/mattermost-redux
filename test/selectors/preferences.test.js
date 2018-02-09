@@ -142,6 +142,11 @@ describe('Selectors.Preferences', () => {
 
             assert.equal(Selectors.getTheme({
                 entities: {
+                    general: {
+                        config: {
+                            DefaultTheme: 'default'
+                        }
+                    },
                     teams: {
                         currentTeamId
                     },
@@ -159,6 +164,11 @@ describe('Selectors.Preferences', () => {
 
             assert.equal(Selectors.getTheme({
                 entities: {
+                    general: {
+                        config: {
+                            DefaultTheme: 'default'
+                        }
+                    },
                     teams: {
                         currentTeamId
                     },
@@ -180,6 +190,11 @@ describe('Selectors.Preferences', () => {
 
             assert.deepEqual(Selectors.getTheme({
                 entities: {
+                    general: {
+                        config: {
+                            DefaultTheme: 'default'
+                        }
+                    },
                     teams: {
                         currentTeamId
                     },
@@ -206,6 +221,11 @@ describe('Selectors.Preferences', () => {
 
             assert.equal(Selectors.getTheme({
                 entities: {
+                    general: {
+                        config: {
+                            DefaultTheme: 'default'
+                        }
+                    },
                     teams: {
                         currentTeamId
                     },
@@ -222,6 +242,11 @@ describe('Selectors.Preferences', () => {
             theme.mentionBg = '#ff0001';
             assert.equal(Selectors.getTheme({
                 entities: {
+                    general: {
+                        config: {
+                            DefaultTheme: 'default'
+                        }
+                    },
                     teams: {
                         currentTeamId
                     },
@@ -242,6 +267,11 @@ describe('Selectors.Preferences', () => {
 
             let state = {
                 entities: {
+                    general: {
+                        config: {
+                            DefaultTheme: 'default'
+                        }
+                    },
                     teams: {
                         currentTeamId
                     },
@@ -309,6 +339,11 @@ describe('Selectors.Preferences', () => {
 
             assert.deepEqual(Selectors.getTheme({
                 entities: {
+                    general: {
+                        config: {
+                            DefaultTheme: 'default'
+                        }
+                    },
                     teams: {
                         currentTeamId
                     },
@@ -329,6 +364,11 @@ describe('Selectors.Preferences', () => {
 
             assert.equal(Selectors.getTheme({
                 entities: {
+                    general: {
+                        config: {
+                            DefaultTheme: 'default'
+                        }
+                    },
                     teams: {
                         currentTeamId
                     },
@@ -352,6 +392,11 @@ describe('Selectors.Preferences', () => {
 
             assert.equal(Selectors.getTheme({
                 entities: {
+                    general: {
+                        config: {
+                            DefaultTheme: 'default'
+                        }
+                    },
                     teams: {
                         currentTeamId
                     },
@@ -374,6 +419,11 @@ describe('Selectors.Preferences', () => {
 
             assert.equal(Selectors.getTheme({
                 entities: {
+                    general: {
+                        config: {
+                            DefaultTheme: 'default'
+                        }
+                    },
                     teams: {
                         currentTeamId
                     },
@@ -387,6 +437,65 @@ describe('Selectors.Preferences', () => {
                 }
             }).codeTheme, Preferences.THEMES.windows10.codeTheme);
         });
+
+        it('should return the server-configured theme by default', () => {
+            assert.equal(Selectors.getTheme({
+                entities: {
+                    general: {
+                        config: {
+                            DefaultTheme: 'mattermostDark'
+                        }
+                    },
+                    teams: {
+                        currentTeamId: null
+                    },
+                    preferences: {
+                        myPreferences: {
+                            [getPreferenceKey(Preferences.CATEGORY_THEME, '')]: null
+                        }
+                    }
+                }
+            }).codeTheme, Preferences.THEMES.mattermostDark.codeTheme);
+
+            // Opposite case
+            assert.notEqual(Selectors.getTheme({
+                entities: {
+                    general: {
+                        config: {
+                            DefaultTheme: 'windows10'
+                        }
+                    },
+                    teams: {
+                        currentTeamId: null
+                    },
+                    preferences: {
+                        myPreferences: {
+                            [getPreferenceKey(Preferences.CATEGORY_THEME, '')]: null
+                        }
+                    }
+                }
+            }).codeTheme, Preferences.THEMES.mattermostDark.codeTheme);
+        });
+
+        it('returns the "default" theme if the server-configured value is not present', () => {
+            assert.equal(Selectors.getTheme({
+                entities: {
+                    general: {
+                        config: {
+                            DefaultTheme: 'fakedoesnotexist'
+                        }
+                    },
+                    teams: {
+                        currentTeamId: null
+                    },
+                    preferences: {
+                        myPreferences: {
+                            [getPreferenceKey(Preferences.CATEGORY_THEME, '')]: null
+                        }
+                    }
+                }
+            }).codeTheme, Preferences.THEMES.default.codeTheme);
+        });
     });
 
     it('get theme from style', () => {
@@ -395,6 +504,11 @@ describe('Selectors.Preferences', () => {
 
         const state = {
             entities: {
+                general: {
+                    config: {
+                        DefaultTheme: 'default'
+                    }
+                },
                 teams: {
                     currentTeamId
                 },
