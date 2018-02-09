@@ -12,6 +12,14 @@ export function getCurrentTeamId(state) {
     return state.entities.teams.currentTeamId;
 }
 
+export const getTeamByName = createSelector(
+    getTeams,
+    (state, name) => name,
+    (teams, name) => {
+        return Object.values(teams).find((team) => team.name === name);
+    }
+);
+
 export function getTeams(state) {
     return state.entities.teams.teams;
 }
