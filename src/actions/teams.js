@@ -551,7 +551,7 @@ export function joinTeam(inviteId, teamId) {
 export function setTeamIcon(teamId, imageData) {
     return async (dispatch, getState) => {
         dispatch({type: TeamTypes.UPDATE_TEAM_REQUEST}, getState);
-        
+
         try {
             await Client4.setTeamIcon(teamId, imageData);
         } catch (error) {

@@ -1006,7 +1006,7 @@ export default class Client4 {
 
     setTeamIcon = async (teamId, imageData) => {
         this.trackEvent('api', 'api_team_set_team_icon');
-            
+
         const formData = new FormData();
         formData.append('image', imageData);
 
