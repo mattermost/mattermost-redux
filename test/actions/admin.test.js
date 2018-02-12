@@ -179,6 +179,26 @@ describe('Actions.Admin', () => {
         }
     });
 
+    it('testS3Connection', async () => {
+        nock(Client4.getBaseRoute()).
+            get('/config').
+            reply(200, {});
+
+        const {data: config} = await Actions.getConfig()(store.dispatch, store.getState);
+
+        nock(Client4.getBaseRoute()).
+            post('/file/s3_test').
+            reply(200, OK_RESPONSE);
+
+        await Actions.testS3Connection(config)(store.dispatch, store.getState);
+
+        const state = store.getState();
+        const request = state.requests.admin.testS3Connection;
+        if (request.status === RequestStatus.FAILURE) {
+            throw new Error('testS3Connection request failed');
+        }
+    });
+
     it('invalidateCaches', async () => {
         nock(Client4.getBaseRoute()).
             post('/caches/invalidate').

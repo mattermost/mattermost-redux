@@ -66,6 +66,16 @@ function testEmail(state = initialRequestState(), action) {
     );
 }
 
+function testS3Connection(state = initialRequestState(), action) {
+    return handleRequest(
+        AdminTypes.TEST_S3_REQUEST,
+        AdminTypes.TEST_S3_SUCCESS,
+        AdminTypes.TEST_S3_FAILURE,
+        state,
+        action
+    );
+}
+
 function invalidateCaches(state = initialRequestState(), action) {
     return handleRequest(
         AdminTypes.INVALIDATE_CACHES_REQUEST,
@@ -323,6 +333,7 @@ export default combineReducers({
     updateConfig,
     reloadConfig,
     testEmail,
+    testS3Connection,
     invalidateCaches,
     recycleDatabase,
     createCompliance,

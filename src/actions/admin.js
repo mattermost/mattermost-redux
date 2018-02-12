@@ -70,6 +70,16 @@ export function testEmail(config) {
     );
 }
 
+export function testS3Connection(config) {
+    return bindClientFunc(
+        Client4.testS3Connection,
+        AdminTypes.TEST_S3_REQUEST,
+        AdminTypes.TEST_S3_SUCCESS,
+        AdminTypes.TEST_S3_FAILURE,
+        config
+    );
+}
+
 export function invalidateCaches() {
     return bindClientFunc(
         Client4.invalidateCaches,
