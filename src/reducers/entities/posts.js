@@ -443,6 +443,7 @@ export default function(state = {}, action) {
         // Object mapping post ids to post objects
         posts,
 
+        // Array that contains the pending post ids for those messages that are in transition to being created
         pendingPostIds: handlePendingPosts(state.pendingPostIds, action),
 
         // Object mapping channel ids to an array of posts ids in that channel with the most recent post first
