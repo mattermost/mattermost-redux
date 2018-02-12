@@ -547,3 +547,20 @@ export function joinTeam(inviteId, teamId) {
         return {data: true};
     };
 }
+
+export function setTeamIcon(teamId, imageData) {
+    return async (dispatch, getState) => {
+        dispatch({type: TeamTypes.UPDATE_TEAM_REQUEST}, getState);
+        
+        try {
+            await Client4.setTeamIcon(teamId, imageData);
+        } catch (error) {
+            dispatch({type: TeamTypes.UPDATE_TEAM_FAILURE, error}, getState);
+            return {error};
+        }
+
+        dispatch({type: TeamTypes.UPDATE_TEAM_SUCCESS}, getState);
+
+        return {data: true};
+    };
+}
