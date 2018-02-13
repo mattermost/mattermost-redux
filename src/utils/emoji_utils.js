@@ -18,7 +18,7 @@ export function parseNeededCustomEmojisFromText(text, systemEmojis, customEmojis
         return new Set();
     }
 
-    const pattern = /\B:([A-Za-z0-9_-]+):\B/gi;
+    const pattern = /:([A-Za-z0-9_-]+):/gi;
 
     const customEmojis = new Set();
 
