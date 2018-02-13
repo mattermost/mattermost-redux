@@ -20,7 +20,8 @@ import {
 import {
     getPosts,
     getPostsSince,
-    getProfilesAndStatusesForPosts
+    getProfilesAndStatusesForPosts,
+    getCustomEmojiForReaction
 } from './posts';
 
 import {
@@ -352,6 +353,8 @@ async function handleNewPostEvent(msg, dispatch, getState) {
 function handlePostEdited(msg, dispatch, getState) {
     const data = JSON.parse(msg.data.post);
 
+    getProfilesAndStatusesForPosts([data], dispatch, getState);
+
     dispatch({type: PostTypes.RECEIVED_POST, data}, getState);
 }
 
@@ -637,6 +640,8 @@ function handleUserTypingEvent(msg, dispatch, getState) {
 function handleReactionAddedEvent(msg, dispatch, getState) {
     const {data} = msg;
     const reaction = JSON.parse(data.reaction);
+
+    dispatch(getCustomEmojiForReaction(reaction.emoji_name));
 
     dispatch({
         type: PostTypes.RECEIVED_REACTION,
