@@ -1,12 +1,13 @@
 // Copyright (c) 2016 Mattermost, Inc. All Rights Reserved.
 // See License.txt for license information.
 
+import fs from 'fs';
 import assert from 'assert';
 import nock from 'nock';
 
 import * as Actions from 'actions/posts';
 import {login} from 'actions/users';
-import {setSystemEmojis} from 'actions/emojis';
+import {setSystemEmojis, createCustomEmoji} from 'actions/emojis';
 import {Client4} from 'client';
 import {Preferences, Posts, RequestStatus} from 'constants';
 import {PostTypes} from 'action_types';
@@ -1464,6 +1465,46 @@ describe('Actions.Posts', () => {
         const reactions = state.entities.posts.reactions[post1.id];
         assert.ok(reactions);
         assert.ok(reactions[TestHelper.basicUser.id + '-' + emojiName]);
+    });
+
+    it('getCustomEmojiForReaction', async () => {
+        const oldVersion = Client4.getServerVersion();
+        Client4.serverVersion = '4.7.0';
+
+        const testImageData = fs.createReadStream('test/assets/images/test.png');
+        const {dispatch, getState} = store;
+
+        nock(Client4.getEmojisRoute()).
+            post('').
+            reply(201, {id: TestHelper.generateId(), create_at: 1507918415696, update_at: 1507918415696, delete_at: 0, creator_id: TestHelper.basicUser.id, name: TestHelper.generateId()});
+
+        const {data: created} = await createCustomEmoji(
+            {
+                name: TestHelper.generateId(),
+                creator_id: TestHelper.basicUser.id
+            },
+            testImageData
+        )(store.dispatch, store.getState);
+
+        nock(Client4.getEmojisRoute()).
+            get(`/name/${created.name}`).
+            reply(200, created);
+
+        const missingEmojiName = ':notrealemoji:';
+
+        nock(Client4.getEmojisRoute()).
+            get(`/name/${missingEmojiName}`).
+            reply(404, {message: 'Not found', status_code: 404});
+
+        await Actions.getCustomEmojiForReaction(missingEmojiName)(dispatch, getState);
+
+        const state = getState();
+        const emojis = state.entities.emojis.customEmoji;
+        assert.ok(emojis);
+        assert.ok(emojis[created.id]);
+        assert.ok(state.entities.emojis.nonExistentEmoji.has(missingEmojiName));
+
+        Client4.serverVersion = oldVersion;
     });
 
     it('getOpenGraphMetadata', async () => {
