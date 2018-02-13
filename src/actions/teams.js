@@ -550,16 +550,30 @@ export function joinTeam(inviteId, teamId) {
 
 export function setTeamIcon(teamId, imageData) {
     return async (dispatch, getState) => {
-        dispatch({type: TeamTypes.UPDATE_TEAM_REQUEST}, getState);
+        dispatch({type: TeamTypes.SET_TEAM_ICON_REQUEST}, getState);
 
         try {
             await Client4.setTeamIcon(teamId, imageData);
         } catch (error) {
-            dispatch({type: TeamTypes.UPDATE_TEAM_FAILURE, error}, getState);
+            dispatch({type: TeamTypes.SET_TEAM_ICON_FAILURE, error}, getState);
             return {error};
         }
 
-        dispatch({type: TeamTypes.UPDATE_TEAM_SUCCESS}, getState);
+        const actions = [
+            {type: TeamTypes.SET_TEAM_ICON_SUCCESS}
+        ];
+
+        const {teams} = getState().entities.teams;
+        const team = teams[teamId];
+
+        if (team) {
+            actions.push({
+                type: TeamTypes.UPDATED_TEAM,
+                data: {...team, last_team_icon_update: new Date().getTime()}
+            });
+        }
+
+        dispatch(batchActions(actions), getState);
 
         return {data: true};
     };
