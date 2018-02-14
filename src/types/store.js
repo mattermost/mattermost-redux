@@ -19,7 +19,7 @@ import type {ChannelsRequestsStatuses,
              AdminRequestsStatuses,
              EmojisRequestsStatuses,
              FilesRequestsStatuses,
-             IntegrationsRequestsStatuses
+             IntegrationsRequestsStatuses,
 } from './requests';
 
 export type GlobalState = {

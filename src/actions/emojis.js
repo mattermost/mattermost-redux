@@ -163,7 +163,7 @@ export function getCustomEmojis(
             },
             {
                 type: EmojiTypes.GET_CUSTOM_EMOJIS_SUCCESS,
-                data: {}
+                data: {},
             },
         ]));
 
