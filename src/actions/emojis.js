@@ -18,7 +18,6 @@ import {logError} from './errors';
 import {bindClientFunc, forceLogoutIfNecessary} from './helpers';
 
 import type {GetStateFunc, DispatchFunc, ActionFunc} from '../types/actions';
-import type {GlobalState} from '../types/store';
 
 export let systemEmojis: Map<string, Object> = new Map();
 
@@ -109,7 +108,7 @@ export function getCustomEmojisInText(text: string): ActionFunc {
             return {data: true};
         }
 
-        const state: GlobalState = getState();
+        const state = getState();
         const nonExistentEmoji = state.entities.emojis.nonExistentEmoji;
         const customEmojisByName = selectCustomEmojisByName(state);
 
