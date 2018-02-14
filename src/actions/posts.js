@@ -18,7 +18,7 @@ import {bindClientFunc, forceLogoutIfNecessary} from './helpers';
 import {logError} from './errors';
 import {deletePreferences, savePreferences} from './preferences';
 import {getProfilesByIds, getProfilesByUsernames, getStatusesByIds} from './users';
-import {systemEmojis, getCustomEmojisByName} from './emojis';
+import {systemEmojis, getCustomEmojiByName, getCustomEmojisByName} from './emojis';
 
 export function createPost(post, files = []) {
     return async (dispatch, getState) => {
@@ -63,8 +63,6 @@ export function createPost(post, files = []) {
             },
             meta: {
                 offline: {
-                    canTimeout: true,
-                    timeout: 10000,
                     effect: () => Client4.createPost({...newPost, create_at: 0}),
                     commit: (success, payload) => {
                         // Use RECEIVED_POSTS to clear pending posts
@@ -91,7 +89,7 @@ export function createPost(post, files = []) {
                             type: PostTypes.CREATE_POST_SUCCESS
                         });
 
-                        dispatch(batchActions(actions), getState);
+                        dispatch(batchActions(actions));
                     },
                     maxRetry: 0,
                     offlineRollback: true,
@@ -111,7 +109,7 @@ export function createPost(post, files = []) {
                         if (error.server_error_id === 'api.post.create_post.root_id.app_error' ||
                             error.server_error_id === 'api.post.create_post.town_square_read_only'
                         ) {
-                            removePost(data)(dispatch, getState);
+                            dispatch(removePost(data));
                         } else {
                             actions.push({
                                 type: PostTypes.RECEIVED_POST,
@@ -381,6 +379,27 @@ export function removeReaction(postId, emojiName) {
         ]));
 
         return {data: true};
+    };
+}
+
+export function getCustomEmojiForReaction(name) {
+    return async (dispatch, getState) => {
+        const nonExistentEmoji = getState().entities.emojis.nonExistentEmoji;
+        const customEmojisByName = selectCustomEmojisByName(getState());
+
+        if (systemEmojis.has(name)) {
+            return {data: true};
+        }
+
+        if (nonExistentEmoji.has(name)) {
+            return {data: true};
+        }
+
+        if (customEmojisByName.has(name)) {
+            return {data: true};
+        }
+
+        return await dispatch(getCustomEmojiByName(name));
     };
 }
 
