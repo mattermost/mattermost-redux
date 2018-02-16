@@ -52,7 +52,7 @@ import EventEmitter from 'utils/event_emitter';
 export function init(platform, siteUrl, token, optionalWebSocket) {
     return async (dispatch, getState) => {
         const config = getState().entities.general.config;
-        let connUrl = siteUrl || Client4.getUrl();
+        let connUrl = siteUrl || config.WebsocketURL || Client4.getUrl();
         const authToken = token || Client4.getToken();
 
         // replace the protocol with a websocket one
