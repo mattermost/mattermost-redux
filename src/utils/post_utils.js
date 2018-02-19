@@ -5,7 +5,7 @@ import {General, Posts, Preferences, Permissions} from 'constants';
 
 import {getPreferenceKey} from './preference_utils';
 import {hasNewPermissions} from 'selectors/entities/general';
-import {haveIChannelPerm} from 'selectors/entities/roles';
+import {haveIChannelPermission} from 'selectors/entities/roles';
 
 export function isPostFlagged(postId, myPreferences) {
     const key = getPreferenceKey(Preferences.CATEGORY_FLAGGED_POST, postId);
@@ -44,9 +44,9 @@ export function canDeletePost(state, config, license, teamId, channelId, userId,
     const isOwner = isPostOwner(userId, post);
 
     if (hasNewPermissions(state)) {
-        const canDelete = haveIChannelPerm(state, {team: teamId, channel: channelId, perm: Permissions.DELETE_POST});
+        const canDelete = haveIChannelPermission(state, {team: teamId, channel: channelId, permission: Permissions.DELETE_POST});
         if (!isOwner) {
-            return canDelete && haveIChannelPerm(state, {team: teamId, channel: channelId, perm: Permissions.DELETE_OTHERS_POSTS});
+            return canDelete && haveIChannelPermission(state, {team: teamId, channel: channelId, permission: Permissions.DELETE_OTHERS_POSTS});
         }
         return canDelete;
     }
@@ -70,9 +70,9 @@ export function canEditPost(state, config, license, teamId, channelId, userId, p
 
     if (canEdit && license.IsLicensed === 'true') {
         if (hasNewPermissions(state)) {
-            canEdit = canEdit && haveIChannelPerm(state, {team: teamId, channel: channelId, perm: Permissions.EDIT_POST});
+            canEdit = canEdit && haveIChannelPermission(state, {team: teamId, channel: channelId, permission: Permissions.EDIT_POST});
             if (!isOwner) {
-                canEdit = canEdit && haveIChannelPerm(state, {team: teamId, channel: channelId, perm: Permissions.EDIT_OTHERS_POSTS});
+                canEdit = canEdit && haveIChannelPermission(state, {team: teamId, channel: channelId, permission: Permissions.EDIT_OTHERS_POSTS});
             }
             if (config.PostEditTimeLimit !== -1) {
                 const timeLeft = (post.create_at + (config.PostEditTimeLimit * 1000)) - Date.now();

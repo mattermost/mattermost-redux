@@ -314,7 +314,7 @@ class TestHelper {
                 display_name: 'authentication.roles.global_admin.name',
                 description: 'authentication.roles.global_admin.description',
                 permissions: [
-                    'system_admin_perm'
+                    'system_admin_permission'
                 ],
                 scheme_managed: true
             },
@@ -324,7 +324,7 @@ class TestHelper {
                 display_name: 'authentication.roles.global_user.name',
                 description: 'authentication.roles.global_user.description',
                 permissions: [
-                    'system_user_perm'
+                    'system_user_permission'
                 ],
                 scheme_managed: true
             },
@@ -334,7 +334,7 @@ class TestHelper {
                 display_name: 'authentication.roles.team_admin.name',
                 description: 'authentication.roles.team_admin.description',
                 permissions: [
-                    'team_admin_perm'
+                    'team_admin_permission'
                 ],
                 scheme_managed: true
             },
@@ -344,7 +344,7 @@ class TestHelper {
                 display_name: 'authentication.roles.team_user.name',
                 description: 'authentication.roles.team_user.description',
                 permissions: [
-                    'team_user_perm'
+                    'team_user_permission'
                 ],
                 scheme_managed: true
             },
@@ -354,7 +354,7 @@ class TestHelper {
                 display_name: 'authentication.roles.channel_admin.name',
                 description: 'authentication.roles.channel_admin.description',
                 permissions: [
-                    'channel_admin_perm'
+                    'channel_admin_permission'
                 ],
                 scheme_managed: true
             },
@@ -364,7 +364,7 @@ class TestHelper {
                 display_name: 'authentication.roles.channel_user.name',
                 description: 'authentication.roles.channel_user.description',
                 permissions: [
-                    'channel_user_perm'
+                    'channel_user_permission'
                 ],
                 scheme_managed: true
             }

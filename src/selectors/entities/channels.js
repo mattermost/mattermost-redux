@@ -20,7 +20,7 @@ import {
 } from 'selectors/entities/preferences';
 import {getLastPostPerChannel} from 'selectors/entities/posts';
 import {getCurrentTeamId, getCurrentTeamMembership} from 'selectors/entities/teams';
-import {haveICurrentChannelPerm} from 'selectors/entities/roles';
+import {haveICurrentChannelPermission} from 'selectors/entities/roles';
 
 import {
     buildDisplayableChannelList,
@@ -350,8 +350,8 @@ export const canManageChannelMembers = createSelector(
     getConfig,
     getLicense,
     hasNewPermissions,
-    (state) => haveICurrentChannelPerm(state, {perm: Permissions.MANAGE_PRIVATE_CHANNEL_MEMBERS}),
-    (state) => haveICurrentChannelPerm(state, {perm: Permissions.MANAGE_PUBLIC_CHANNEL_MEMBERS}),
+    (state) => haveICurrentChannelPermission(state, {permission: Permissions.MANAGE_PRIVATE_CHANNEL_MEMBERS}),
+    (state) => haveICurrentChannelPermission(state, {permission: Permissions.MANAGE_PUBLIC_CHANNEL_MEMBERS}),
     (channel, user, teamMembership, channelMembership, config, license, newPermissions, managePrivateMembers, managePublicMembers) => {
         if (channel.type === General.DM_CHANNEL ||
             channel.type === General.GM_CHANNEL ||
