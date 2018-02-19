@@ -508,7 +508,7 @@ export function getPostThread(postId, skipAddToChannel = true) {
             {
                 type: PostTypes.GET_POST_THREAD_SUCCESS
             }
-        ]), getState);
+        ], 'BATCH_GET_POST_THREAD'), getState);
 
         return {data: posts};
     };
@@ -1029,6 +1029,13 @@ export function selectPost(postId) {
     };
 }
 
+export function selectFocusedPostId(postId) {
+    return {
+        type: PostTypes.RECEIVED_FOCUSED_POST,
+        data: postId
+    };
+}
+
 export function unflagPost(postId) {
     return async (dispatch, getState) => {
         const {currentUserId} = getState().entities.users;
@@ -1151,6 +1158,7 @@ export default {
     getPostsAfter,
     getPostsAfterWithRetry,
     selectPost,
+    selectFocusedPostId,
     addMessageIntoHistory,
     resetHistoryIndex,
     moveHistoryIndexBack,
