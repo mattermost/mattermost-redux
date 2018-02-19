@@ -63,150 +63,150 @@ export function getRoles(state) {
     return state.entities.roles.roles;
 }
 
-export const getMySystemPerms = createSelector(
+export const getMySystemPermissions = createSelector(
     getMySystemRoles,
     getRoles,
     (mySystemRoles, roles) => {
-        const perms = new Set();
+        const permissions = new Set();
         for (const roleName of mySystemRoles) {
             if (roles[roleName]) {
-                for (const perm of roles[roleName].permissions) {
-                    perms.add(perm);
+                for (const permission of roles[roleName].permissions) {
+                    permissions.add(permission);
                 }
             }
         }
-        return perms;
+        return permissions;
     }
 );
 
-export const getMyCurrentTeamPerms = createSelector(
+export const getMyCurrentTeamPermissions = createSelector(
     getMyTeamRoles,
     getRoles,
-    getMySystemPerms,
+    getMySystemPermissions,
     getCurrentTeamId,
-    (myTeamRoles, roles, systemPerms, teamId) => {
-        const perms = new Set();
+    (myTeamRoles, roles, systemPermissions, teamId) => {
+        const permissions = new Set();
         if (myTeamRoles[teamId]) {
             for (const roleName of myTeamRoles[teamId]) {
                 if (roles[roleName]) {
-                    for (const perm of roles[roleName].permissions) {
-                        perms.add(perm);
+                    for (const permission of roles[roleName].permissions) {
+                        permissions.add(permission);
                     }
                 }
             }
         }
-        for (const perm of systemPerms) {
-            perms.add(perm);
+        for (const permission of systemPermissions) {
+            permissions.add(permission);
         }
-        return perms;
+        return permissions;
     }
 );
 
-export const getMyCurrentChannelPerms = createSelector(
+export const getMyCurrentChannelPermissions = createSelector(
     getMyChannelRoles,
     getRoles,
-    getMyCurrentTeamPerms,
+    getMyCurrentTeamPermissions,
     getCurrentChannelId,
-    (myChannelRoles, roles, teamPerms, channelId) => {
-        const perms = new Set();
+    (myChannelRoles, roles, teamPermissions, channelId) => {
+        const permissions = new Set();
         if (myChannelRoles[channelId]) {
             for (const roleName of myChannelRoles[channelId]) {
                 if (roles[roleName]) {
-                    for (const perm of roles[roleName].permissions) {
-                        perms.add(perm);
+                    for (const permission of roles[roleName].permissions) {
+                        permissions.add(permission);
                     }
                 }
             }
         }
-        for (const perm of teamPerms) {
-            perms.add(perm);
+        for (const permission of teamPermissions) {
+            permissions.add(permission);
         }
-        return perms;
+        return permissions;
     }
 );
 
-export const getMyTeamPerms = createSelector(
+export const getMyTeamPermissions = createSelector(
     getMyTeamRoles,
     getRoles,
-    getMySystemPerms,
+    getMySystemPermissions,
     (state, options) => options.team,
-    (myTeamRoles, roles, systemPerms, teamId) => {
-        const perms = new Set();
+    (myTeamRoles, roles, systemPermissions, teamId) => {
+        const permissions = new Set();
         if (myTeamRoles[teamId]) {
             for (const roleName of myTeamRoles[teamId]) {
                 if (roles[roleName]) {
-                    for (const perm of roles[roleName].permissions) {
-                        perms.add(perm);
+                    for (const permission of roles[roleName].permissions) {
+                        permissions.add(permission);
                     }
                 }
             }
         }
-        for (const perm of systemPerms) {
-            perms.add(perm);
+        for (const permission of systemPermissions) {
+            permissions.add(permission);
         }
-        return perms;
+        return permissions;
     }
 );
 
-export const getMyChannelPerms = createSelector(
+export const getMyChannelPermissions = createSelector(
     getMyChannelRoles,
     getRoles,
-    getMyTeamPerms,
+    getMyTeamPermissions,
     (state, options) => options.channel,
-    (myChannelRoles, roles, teamPerms, channelId) => {
-        const perms = new Set();
+    (myChannelRoles, roles, teamPermissions, channelId) => {
+        const permissions = new Set();
         if (myChannelRoles[channelId]) {
             for (const roleName of myChannelRoles[channelId]) {
                 if (roles[roleName]) {
-                    for (const perm of roles[roleName].permissions) {
-                        perms.add(perm);
+                    for (const permission of roles[roleName].permissions) {
+                        permissions.add(permission);
                     }
                 }
             }
         }
-        for (const perm of teamPerms) {
-            perms.add(perm);
+        for (const permission of teamPermissions) {
+            permissions.add(permission);
         }
-        return perms;
+        return permissions;
     }
 );
 
-export const haveISystemPerm = createSelector(
-    getMySystemPerms,
-    (state, options) => options.perm,
-    (perms, perm) => {
-        return perms.has(perm);
+export const haveISystemPermission = createSelector(
+    getMySystemPermissions,
+    (state, options) => options.permission,
+    (permissions, permission) => {
+        return permissions.has(permission);
     }
 );
 
-export const haveITeamPerm = createSelector(
-    getMyTeamPerms,
-    (state, options) => options.perm,
-    (perms, perm) => {
-        return perms.has(perm);
+export const haveITeamPermission = createSelector(
+    getMyTeamPermissions,
+    (state, options) => options.permission,
+    (permissions, permission) => {
+        return permissions.has(permission);
     }
 );
 
-export const haveIChannelPerm = createSelector(
-    getMyChannelPerms,
-    (state, options) => options.perm,
-    (perms, perm) => {
-        return perms.has(perm);
+export const haveIChannelPermission = createSelector(
+    getMyChannelPermissions,
+    (state, options) => options.permission,
+    (permissions, permission) => {
+        return permissions.has(permission);
     }
 );
 
-export const haveICurrentTeamPerm = createSelector(
-    getMyCurrentTeamPerms,
-    (state, options) => options.perm,
-    (perms, perm) => {
-        return perms.has(perm);
+export const haveICurrentTeamPermission = createSelector(
+    getMyCurrentTeamPermissions,
+    (state, options) => options.permission,
+    (permissions, permission) => {
+        return permissions.has(permission);
     }
 );
 
-export const haveICurrentChannelPerm = createSelector(
-    getMyCurrentChannelPerms,
-    (state, options) => options.perm,
-    (perms, perm) => {
-        return perms.has(perm);
+export const haveICurrentChannelPermission = createSelector(
+    getMyCurrentChannelPermissions,
+    (state, options) => options.permission,
+    (permissions, permission) => {
+        return permissions.has(permission);
     }
 );

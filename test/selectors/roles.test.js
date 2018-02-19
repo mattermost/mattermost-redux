@@ -155,68 +155,68 @@ describe('Selectors.Roles', () => {
         assert.deepEqual(Selectors.getRoles(testState), loadedRoles);
     });
 
-    it('should return my system permission on getMySystemPerms', () => {
-        assert.deepEqual(Selectors.getMySystemPerms(testState), new Set([
+    it('should return my system permission on getMySystemPermissions', () => {
+        assert.deepEqual(Selectors.getMySystemPermissions(testState), new Set([
             'user_role2'
         ]));
     });
 
-    it('should return if i have a system permission on haveISystemPerm', () => {
-        assert.equal(Selectors.haveISystemPerm(testState, {perm: 'user_role2'}), true);
-        assert.equal(Selectors.haveISystemPerm(testState, {perm: 'invalid_perm'}), false);
+    it('should return if i have a system permission on haveISystemPermission', () => {
+        assert.equal(Selectors.haveISystemPermission(testState, {permission: 'user_role2'}), true);
+        assert.equal(Selectors.haveISystemPermission(testState, {permission: 'invalid_permission'}), false);
     });
 
-    it('should return my team permission on getMyTeamPerms', () => {
-        assert.deepEqual(Selectors.getMyTeamPerms(testState, {team: team1.id}), new Set([
+    it('should return my team permission on getMyTeamPermissions', () => {
+        assert.deepEqual(Selectors.getMyTeamPermissions(testState, {team: team1.id}), new Set([
             'user_role2', 'team1_role1'
         ]));
     });
 
-    it('should return if i have a team permission on haveITeamPerm', () => {
-        assert.equal(Selectors.haveITeamPerm(testState, {team: team1.id, perm: 'user_role2'}), true);
-        assert.equal(Selectors.haveITeamPerm(testState, {team: team1.id, perm: 'team1_role1'}), true);
-        assert.equal(Selectors.haveITeamPerm(testState, {team: team1.id, perm: 'team2_role2'}), false);
-        assert.equal(Selectors.haveITeamPerm(testState, {team: team1.id, perm: 'invalid_perm'}), false);
+    it('should return if i have a team permission on haveITeamPermission', () => {
+        assert.equal(Selectors.haveITeamPermission(testState, {team: team1.id, permission: 'user_role2'}), true);
+        assert.equal(Selectors.haveITeamPermission(testState, {team: team1.id, permission: 'team1_role1'}), true);
+        assert.equal(Selectors.haveITeamPermission(testState, {team: team1.id, permission: 'team2_role2'}), false);
+        assert.equal(Selectors.haveITeamPermission(testState, {team: team1.id, permission: 'invalid_permission'}), false);
     });
 
-    it('should return my team permission on getMyCurrentTeamPerms', () => {
-        assert.deepEqual(Selectors.getMyCurrentTeamPerms(testState), new Set([
+    it('should return my team permission on getMyCurrentTeamPermissions', () => {
+        assert.deepEqual(Selectors.getMyCurrentTeamPermissions(testState), new Set([
             'user_role2', 'team1_role1'
         ]));
     });
 
-    it('should return if i have a team permission on haveICurrentTeamPerm', () => {
-        assert.equal(Selectors.haveICurrentTeamPerm(testState, {perm: 'user_role2'}), true);
-        assert.equal(Selectors.haveICurrentTeamPerm(testState, {perm: 'team1_role1'}), true);
-        assert.equal(Selectors.haveICurrentTeamPerm(testState, {perm: 'team2_role2'}), false);
-        assert.equal(Selectors.haveICurrentTeamPerm(testState, {perm: 'invalid_perm'}), false);
+    it('should return if i have a team permission on haveICurrentTeamPermission', () => {
+        assert.equal(Selectors.haveICurrentTeamPermission(testState, {permission: 'user_role2'}), true);
+        assert.equal(Selectors.haveICurrentTeamPermission(testState, {permission: 'team1_role1'}), true);
+        assert.equal(Selectors.haveICurrentTeamPermission(testState, {permission: 'team2_role2'}), false);
+        assert.equal(Selectors.haveICurrentTeamPermission(testState, {permission: 'invalid_permission'}), false);
     });
 
-    it('should return my channel permission on getMyChannelPerms', () => {
-        assert.deepEqual(Selectors.getMyChannelPerms(testState, {team: team1.id, channel: channel1.id}), new Set([
+    it('should return my channel permission on getMyChannelPermissions', () => {
+        assert.deepEqual(Selectors.getMyChannelPermissions(testState, {team: team1.id, channel: channel1.id}), new Set([
             'user_role2', 'team1_role1', 'channel_a_role1', 'channel_a_role2'
         ]));
     });
 
-    it('should return if i have a channel permission on haveIChannelPerm', () => {
-        assert.equal(Selectors.haveIChannelPerm(testState, {team: team1.id, channel: channel1.id, perm: 'user_role2'}), true);
-        assert.equal(Selectors.haveIChannelPerm(testState, {team: team1.id, channel: channel1.id, perm: 'team1_role1'}), true);
-        assert.equal(Selectors.haveIChannelPerm(testState, {team: team1.id, channel: channel1.id, perm: 'team2_role2'}), false);
-        assert.equal(Selectors.haveIChannelPerm(testState, {team: team1.id, channel: channel1.id, perm: 'channel_a_role1'}), true);
-        assert.equal(Selectors.haveIChannelPerm(testState, {team: team1.id, channel: channel1.id, perm: 'channel_b_role1'}), false);
+    it('should return if i have a channel permission on haveIChannelPermission', () => {
+        assert.equal(Selectors.haveIChannelPermission(testState, {team: team1.id, channel: channel1.id, permission: 'user_role2'}), true);
+        assert.equal(Selectors.haveIChannelPermission(testState, {team: team1.id, channel: channel1.id, permission: 'team1_role1'}), true);
+        assert.equal(Selectors.haveIChannelPermission(testState, {team: team1.id, channel: channel1.id, permission: 'team2_role2'}), false);
+        assert.equal(Selectors.haveIChannelPermission(testState, {team: team1.id, channel: channel1.id, permission: 'channel_a_role1'}), true);
+        assert.equal(Selectors.haveIChannelPermission(testState, {team: team1.id, channel: channel1.id, permission: 'channel_b_role1'}), false);
     });
 
-    it('should return my current channel permission on getMyCurrentChannelPerms', () => {
-        assert.deepEqual(Selectors.getMyCurrentChannelPerms(testState), new Set([
+    it('should return my current channel permission on getMyCurrentChannelPermissions', () => {
+        assert.deepEqual(Selectors.getMyCurrentChannelPermissions(testState), new Set([
             'user_role2', 'team1_role1', 'channel_a_role1', 'channel_a_role2'
         ]));
     });
 
-    it('should return if i have a channel permission on haveICurrentChannelPerm', () => {
-        assert.equal(Selectors.haveICurrentChannelPerm(testState, {perm: 'user_role2'}), true);
-        assert.equal(Selectors.haveICurrentChannelPerm(testState, {perm: 'team1_role1'}), true);
-        assert.equal(Selectors.haveICurrentChannelPerm(testState, {perm: 'team2_role2'}), false);
-        assert.equal(Selectors.haveICurrentChannelPerm(testState, {perm: 'channel_a_role1'}), true);
-        assert.equal(Selectors.haveICurrentChannelPerm(testState, {perm: 'channel_b_role1'}), false);
+    it('should return if i have a channel permission on haveICurrentChannelPermission', () => {
+        assert.equal(Selectors.haveICurrentChannelPermission(testState, {permission: 'user_role2'}), true);
+        assert.equal(Selectors.haveICurrentChannelPermission(testState, {permission: 'team1_role1'}), true);
+        assert.equal(Selectors.haveICurrentChannelPermission(testState, {permission: 'team2_role2'}), false);
+        assert.equal(Selectors.haveICurrentChannelPermission(testState, {permission: 'channel_a_role1'}), true);
+        assert.equal(Selectors.haveICurrentChannelPermission(testState, {permission: 'channel_b_role1'}), false);
     });
 });
