@@ -104,6 +104,8 @@ class WebSocketClient {
                 } else if (this.firstConnectCallback) {
                     this.firstConnectCallback(this.dispatch, this.getState);
                     resolve();
+                } else {
+                    resolve();
                 }
 
                 this.connectFailCount = 0;
