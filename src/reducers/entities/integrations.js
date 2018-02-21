@@ -108,7 +108,7 @@ function commands(state = {}, action) {
         if (action.data.id) {
             return {
                 ...state,
-                [action.data.id]: action.data
+                [action.data.id]: action.data,
             };
         }
 
@@ -119,8 +119,8 @@ function commands(state = {}, action) {
             ...state,
             [id]: {
                 ...state[id],
-                token
-            }
+                token,
+            },
         };
     }
     case IntegrationTypes.DELETED_COMMAND: {
@@ -151,7 +151,7 @@ function systemCommands(state = {}, action) {
         if (!action.data.id) {
             return {
                 ...state,
-                [action.data.trigger]: action.data
+                [action.data.trigger]: action.data,
             };
         }
 
@@ -176,7 +176,7 @@ function oauthApps(state = {}, action) {
     case IntegrationTypes.RECEIVED_OAUTH_APP:
         return {
             ...state,
-            [action.data.id]: action.data
+            [action.data.id]: action.data,
         };
     case IntegrationTypes.DELETED_OAUTH_APP: {
         const nextState = {...state};
@@ -206,5 +206,5 @@ export default combineReducers({
     oauthApps,
 
     // object to represent built-in slash commands
-    systemCommands
+    systemCommands,
 });

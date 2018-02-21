@@ -8,7 +8,7 @@ export function pushNotificationAlert(message) {
     return async (dispatch, getState) => {
         const notificationAlert = {
             type: Alerts.ALERT_NOTIFICATION,
-            message
+            message,
         };
 
         dispatch({type: AlertTypes.PUSH_ALERT, data: notificationAlert}, getState);
@@ -21,7 +21,7 @@ export function pushDeveloperAlert(message) {
     return async (dispatch, getState) => {
         const developerAlert = {
             type: Alerts.ALERT_DEVELOPER,
-            message
+            message,
         };
 
         dispatch({type: AlertTypes.PUSH_ALERT, data: developerAlert}, getState);
@@ -34,7 +34,7 @@ export function pushErrorAlert(message) {
     return async (dispatch, getState) => {
         const errorAlert = {
             type: Alerts.ALERT_ERROR,
-            message
+            message,
         };
 
         dispatch({type: AlertTypes.PUSH_ALERT, data: errorAlert}, getState);

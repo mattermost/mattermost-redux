@@ -88,5 +88,5 @@ export default combineReducers({
     dataRetentionPolicy,
     deviceToken,
     license,
-    serverVersion
+    serverVersion,
 });

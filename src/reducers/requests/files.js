@@ -22,13 +22,13 @@ export function handleUploadFilesRequest(REQUEST, SUCCESS, FAILURE, CANCEL, stat
     case REQUEST:
         return {
             ...state,
-            status: RequestStatus.STARTED
+            status: RequestStatus.STARTED,
         };
     case SUCCESS:
         return {
             ...state,
             status: RequestStatus.SUCCESS,
-            error: null
+            error: null,
         };
     case FAILURE: {
         let error = action.error;
@@ -40,14 +40,14 @@ export function handleUploadFilesRequest(REQUEST, SUCCESS, FAILURE, CANCEL, stat
         return {
             ...state,
             status: RequestStatus.FAILURE,
-            error
+            error,
         };
     }
     case CANCEL:
         return {
             ...state,
             status: RequestStatus.CANCELLED,
-            error: null
+            error: null,
         };
     default:
         return state;
@@ -78,5 +78,5 @@ function uploadFiles(state = initialRequestState(), action) {
 export default combineReducers({
     getFilesForPost,
     getFilePublicLink,
-    uploadFiles
+    uploadFiles,
 });

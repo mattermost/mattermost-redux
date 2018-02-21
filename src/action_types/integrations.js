@@ -101,5 +101,5 @@ export default keyMirror({
     DELETED_COMMAND: null,
     RECEIVED_OAUTH_APP: null,
     RECEIVED_OAUTH_APPS: null,
-    DELETED_OAUTH_APP: null
+    DELETED_OAUTH_APP: null,
 });

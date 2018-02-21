@@ -83,5 +83,5 @@ export default keyMirror({
     REMOVE_MEMBER_FROM_TEAM: null,
     RECEIVED_TEAM_STATS: null,
     RECEIVED_MY_TEAM_UNREADS: null,
-    LEAVE_TEAM: null
+    LEAVE_TEAM: null,
 });

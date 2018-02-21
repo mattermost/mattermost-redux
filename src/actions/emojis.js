@@ -60,7 +60,7 @@ export function getCustomEmojiByName(name) {
 
             const actions = [
                 {type: EmojiTypes.GET_CUSTOM_EMOJI_FAILURE, error},
-                logError(error)(dispatch)
+                logError(error)(dispatch),
             ];
 
             if (error.status_code === 404) {
@@ -74,11 +74,11 @@ export function getCustomEmojiByName(name) {
         dispatch(batchActions([
             {
                 type: EmojiTypes.RECEIVED_CUSTOM_EMOJI,
-                data
+                data,
             },
             {
-                type: EmojiTypes.GET_CUSTOM_EMOJI_SUCCESS
-            }
+                type: EmojiTypes.GET_CUSTOM_EMOJI_SUCCESS,
+            },
         ]));
 
         return {data};
@@ -126,7 +126,7 @@ export function getCustomEmojis(page = 0, perPage = General.PAGE_SIZE_DEFAULT, s
 
             dispatch(batchActions([
                 {type: EmojiTypes.GET_CUSTOM_EMOJIS_FAILURE, error},
-                logError(error)(dispatch)
+                logError(error)(dispatch),
             ]), getState);
             return {error};
         }
@@ -149,11 +149,11 @@ export function getCustomEmojis(page = 0, perPage = General.PAGE_SIZE_DEFAULT, s
         dispatch(batchActions([
             {
                 type: EmojiTypes.RECEIVED_CUSTOM_EMOJIS,
-                data
+                data,
             },
             {
-                type: EmojiTypes.GET_CUSTOM_EMOJIS_SUCCESS
-            }
+                type: EmojiTypes.GET_CUSTOM_EMOJIS_SUCCESS,
+            },
         ]));
 
         return {data};
@@ -164,7 +164,7 @@ export function getAllCustomEmojis(perPage = General.PAGE_SIZE_MAXIMUM) {
     return async (dispatch, getState) => {
         dispatch(batchActions([
             {type: EmojiTypes.GET_ALL_CUSTOM_EMOJIS_REQUEST},
-            {type: EmojiTypes.CLEAR_CUSTOM_EMOJIS}
+            {type: EmojiTypes.CLEAR_CUSTOM_EMOJIS},
         ]), getState);
 
         let hasMore = true;
@@ -193,7 +193,7 @@ export function getAllCustomEmojis(perPage = General.PAGE_SIZE_MAXIMUM) {
 
                 return dispatch(batchActions([
                     {type: EmojiTypes.GET_ALL_CUSTOM_EMOJIS_FAILURE, error},
-                    logError(error)(dispatch)
+                    logError(error)(dispatch),
                 ]), getState);
             }
         } while (hasMore);
@@ -202,8 +202,8 @@ export function getAllCustomEmojis(perPage = General.PAGE_SIZE_MAXIMUM) {
             {type: EmojiTypes.GET_ALL_CUSTOM_EMOJIS_SUCCESS},
             {
                 type: EmojiTypes.RECEIVED_CUSTOM_EMOJIS,
-                data: allEmojis
-            }
+                data: allEmojis,
+            },
         ]), getState);
 
         return {data: true};
@@ -221,7 +221,7 @@ export function deleteCustomEmoji(emojiId) {
 
             dispatch(batchActions([
                 {type: EmojiTypes.DELETE_CUSTOM_EMOJI_FAILURE, error},
-                logError(error)(dispatch)
+                logError(error)(dispatch),
             ]), getState);
             return {error};
         }
@@ -229,11 +229,11 @@ export function deleteCustomEmoji(emojiId) {
         dispatch(batchActions([
             {
                 type: EmojiTypes.DELETED_CUSTOM_EMOJI,
-                data: {id: emojiId}
+                data: {id: emojiId},
             },
             {
-                type: EmojiTypes.DELETE_CUSTOM_EMOJI_SUCCESS
-            }
+                type: EmojiTypes.DELETE_CUSTOM_EMOJI_SUCCESS,
+            },
         ]), getState);
 
         return {data: true};
@@ -257,7 +257,7 @@ export function searchCustomEmojis(term, options = {}) {
 
             dispatch(batchActions([
                 {type: EmojiTypes.GET_CUSTOM_EMOJIS_FAILURE, error},
-                logError(error)(dispatch)
+                logError(error)(dispatch),
             ]), getState);
             return {error};
         }
@@ -265,11 +265,11 @@ export function searchCustomEmojis(term, options = {}) {
         dispatch(batchActions([
             {
                 type: EmojiTypes.RECEIVED_CUSTOM_EMOJIS,
-                data
+                data,
             },
             {
-                type: EmojiTypes.GET_CUSTOM_EMOJIS_SUCCESS
-            }
+                type: EmojiTypes.GET_CUSTOM_EMOJIS_SUCCESS,
+            },
         ]), getState);
 
         return {data};
@@ -293,7 +293,7 @@ export function autocompleteCustomEmojis(name) {
 
             dispatch(batchActions([
                 {type: EmojiTypes.GET_CUSTOM_EMOJIS_FAILURE, error},
-                logError(error)(dispatch)
+                logError(error)(dispatch),
             ]), getState);
             return {error};
         }
@@ -301,11 +301,11 @@ export function autocompleteCustomEmojis(name) {
         dispatch(batchActions([
             {
                 type: EmojiTypes.RECEIVED_CUSTOM_EMOJIS,
-                data
+                data,
             },
             {
-                type: EmojiTypes.GET_CUSTOM_EMOJIS_SUCCESS
-            }
+                type: EmojiTypes.GET_CUSTOM_EMOJIS_SUCCESS,
+            },
         ]), getState);
 
         return {data};

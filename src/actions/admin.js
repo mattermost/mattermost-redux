@@ -271,7 +271,7 @@ export function getAnalytics(name, teamId = '') {
             forceLogoutIfNecessary(error, dispatch, getState);
             dispatch(batchActions([
                 {type: AdminTypes.GET_ANALYTICS_FAILURE, error},
-                logError(error)(dispatch)
+                logError(error)(dispatch),
             ]), getState);
             return {error};
         }
@@ -317,14 +317,14 @@ export function uploadPlugin(fileData) {
             forceLogoutIfNecessary(error, dispatch, getState);
             dispatch(batchActions([
                 {type: AdminTypes.UPLOAD_PLUGIN_FAILURE, error},
-                logError(error)(dispatch)
+                logError(error)(dispatch),
             ]));
             return {error};
         }
 
         dispatch(batchActions([
             {type: AdminTypes.UPLOAD_PLUGIN_SUCCESS},
-            {type: AdminTypes.RECEIVED_PLUGIN, data: {...data, active: false}}
+            {type: AdminTypes.RECEIVED_PLUGIN, data: {...data, active: false}},
         ]));
 
         return {data};
@@ -343,14 +343,14 @@ export function getPlugins() {
             forceLogoutIfNecessary(error, dispatch, getState);
             dispatch(batchActions([
                 {type: AdminTypes.GET_PLUGIN_FAILURE, error},
-                logError(error)(dispatch)
+                logError(error)(dispatch),
             ]));
             return {error};
         }
 
         dispatch(batchActions([
             {type: AdminTypes.GET_PLUGIN_SUCCESS},
-            {type: AdminTypes.RECEIVED_PLUGINS, data}
+            {type: AdminTypes.RECEIVED_PLUGINS, data},
         ]));
 
         return {data};
@@ -368,14 +368,14 @@ export function removePlugin(pluginId) {
             forceLogoutIfNecessary(error, dispatch, getState);
             dispatch(batchActions([
                 {type: AdminTypes.REMOVE_PLUGIN_FAILURE, error},
-                logError(error)(dispatch)
+                logError(error)(dispatch),
             ]));
             return {error};
         }
 
         dispatch(batchActions([
             {type: AdminTypes.REMOVE_PLUGIN_SUCCESS},
-            {type: AdminTypes.REMOVED_PLUGIN, data: pluginId}
+            {type: AdminTypes.REMOVED_PLUGIN, data: pluginId},
         ]));
 
         return {data: true};
@@ -393,14 +393,14 @@ export function activatePlugin(pluginId) {
             forceLogoutIfNecessary(error, dispatch, getState);
             dispatch(batchActions([
                 {type: AdminTypes.ACTIVATE_PLUGIN_FAILURE, error},
-                logError(error)(dispatch)
+                logError(error)(dispatch),
             ]));
             return {error};
         }
 
         dispatch(batchActions([
             {type: AdminTypes.ACTIVATE_PLUGIN_SUCCESS},
-            {type: AdminTypes.ACTIVATED_PLUGIN, data: pluginId}
+            {type: AdminTypes.ACTIVATED_PLUGIN, data: pluginId},
         ]));
 
         return {data: true};
@@ -418,14 +418,14 @@ export function deactivatePlugin(pluginId) {
             forceLogoutIfNecessary(error, dispatch, getState);
             dispatch(batchActions([
                 {type: AdminTypes.DEACTIVATE_PLUGIN_FAILURE, error},
-                logError(error)(dispatch)
+                logError(error)(dispatch),
             ]));
             return {error};
         }
 
         dispatch(batchActions([
             {type: AdminTypes.DEACTIVATE_PLUGIN_SUCCESS},
-            {type: AdminTypes.DEACTIVATED_PLUGIN, data: pluginId}
+            {type: AdminTypes.DEACTIVATED_PLUGIN, data: pluginId},
         ]));
 
         return {data: true};

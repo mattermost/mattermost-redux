@@ -10,5 +10,5 @@ export default {
     PRESENTATION_TYPES: ['ppt', 'pptx'],
     SPREADSHEET_TYPES: ['xlsx', 'csv'],
     VIDEO_TYPES: ['mp4', 'avi', 'webm', 'mkv', 'wmv', 'mpg', 'mov', 'flv'],
-    WORD_TYPES: ['doc', 'docx']
+    WORD_TYPES: ['doc', 'docx'],
 };

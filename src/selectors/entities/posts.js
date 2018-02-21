@@ -183,7 +183,7 @@ function formatPostInChannel(post, previousPost, index, allPosts, postIds, curre
         commentedOnPost,
         consecutivePostByUser,
         replyCount,
-        isCommentMention
+        isCommentMention,
     };
 }
 

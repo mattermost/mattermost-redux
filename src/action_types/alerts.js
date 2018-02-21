@@ -5,6 +5,6 @@ import keyMirror from 'utils/key_mirror';
 
 export default keyMirror({
     PUSH_ALERT: null,
-    CLEAR_ALERT: null
+    CLEAR_ALERT: null,
 });
 

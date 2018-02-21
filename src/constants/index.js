@@ -24,6 +24,6 @@ export {
     Teams,
     Stats,
     Permissions,
-    Emoji
+    Emoji,
 };
 

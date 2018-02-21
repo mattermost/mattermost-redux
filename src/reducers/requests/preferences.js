@@ -39,5 +39,5 @@ function deletePreferences(state = initialRequestState(), action) {
 export default combineReducers({
     getMyPreferences,
     savePreferences,
-    deletePreferences
+    deletePreferences,
 });

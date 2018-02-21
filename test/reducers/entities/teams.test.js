@@ -23,7 +23,7 @@ describe('Reducers.teams.myMembers', () => {
         const testAction = {
             type: TeamTypes.RECEIVED_MY_TEAM_MEMBER,
             data: myMember2,
-            result: {team_id_1: myMember1, team_id_2: myMember2}
+            result: {team_id_1: myMember1, team_id_2: myMember2},
         };
 
         state = teamsReducer(state, testAction);
@@ -42,7 +42,7 @@ describe('Reducers.teams.myMembers', () => {
         const testAction = {
             type: TeamTypes.RECEIVED_MY_TEAM_MEMBERS,
             data: [myMember1, myMember2, myMember3],
-            result: {team_id_1: myMember1, team_id_2: myMember2}
+            result: {team_id_1: myMember1, team_id_2: myMember2},
         };
 
         state = teamsReducer(state, testAction);
@@ -60,8 +60,8 @@ describe('Reducers.teams.myMembers', () => {
         let state = {
             myMembers: {
                 team_id_1: {...team1, msg_count: 0, mention_count: 0},
-                team_id_2: {...team2, msg_count: 0, mention_count: 0}
-            }
+                team_id_2: {...team2, msg_count: 0, mention_count: 0},
+            },
         };
 
         const testAction = {
@@ -69,8 +69,8 @@ describe('Reducers.teams.myMembers', () => {
             data: [team3],
             result: {
                 team_id_1: {...team1, msg_count: 0, mention_count: 0},
-                team_id_2: {...team2, msg_count: 0, mention_count: 0}
-            }
+                team_id_2: {...team2, msg_count: 0, mention_count: 0},
+            },
         };
 
         // do not add a team when it's not on the teams.myMembers list
@@ -94,7 +94,7 @@ describe('Reducers.teams.myMembers', () => {
         const testAction = {
             type: TeamTypes.RECEIVED_TEAMS,
             data: {team_id_3: myMember3},
-            result: {team_id_1: myMember1, team_id_2: myMember2}
+            result: {team_id_1: myMember1, team_id_2: myMember2},
         };
 
         // do not add a team when it's not on the teams.myMembers list

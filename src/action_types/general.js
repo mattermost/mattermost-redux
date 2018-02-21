@@ -40,5 +40,5 @@ export default keyMirror({
     WEBSOCKET_REQUEST: null,
     WEBSOCKET_SUCCESS: null,
     WEBSOCKET_FAILURE: null,
-    WEBSOCKET_CLOSED: null
+    WEBSOCKET_CLOSED: null,
 });

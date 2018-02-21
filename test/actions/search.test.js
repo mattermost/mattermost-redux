@@ -29,12 +29,12 @@ describe('Actions.Search', () => {
 
         let post1 = {
             ...TestHelper.fakePost(TestHelper.basicChannel.id),
-            message: 'try searching for this using the first and last word'
+            message: 'try searching for this using the first and last word',
         };
 
         let post2 = {
             ...TestHelper.fakePost(TestHelper.basicChannel.id),
-            message: 'return this message in second attempt'
+            message: 'return this message in second attempt',
         };
 
         nock(Client4.getPostsRoute()).

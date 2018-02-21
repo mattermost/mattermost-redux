@@ -21,5 +21,5 @@ function searchPosts(state = initialRequestState(), action) {
 }
 
 export default combineReducers({
-    searchPosts
+    searchPosts,
 });

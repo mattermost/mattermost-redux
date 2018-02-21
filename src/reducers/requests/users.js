@@ -386,5 +386,5 @@ export default combineReducers({
     getUserAccessToken,
     revokeUserAccessToken,
     disableUserAccessToken,
-    enableUserAccessToken
+    enableUserAccessToken,
 });

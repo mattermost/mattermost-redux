@@ -25,14 +25,14 @@ export function deletePreferences(userId, preferences) {
                 offline: {
                     effect: () => Client4.deletePreferences(userId, preferences),
                     commit: {
-                        type: PreferenceTypes.DELETED_PREFERENCES
+                        type: PreferenceTypes.DELETED_PREFERENCES,
                     },
                     rollback: {
                         type: PreferenceTypes.RECEIVED_PREFERENCES,
-                        data: currentPreferences
-                    }
-                }
-            }
+                        data: currentPreferences,
+                    },
+                },
+            },
         });
 
         return {data: true};
@@ -61,7 +61,7 @@ export function makeDirectChannelVisibleIfNecessary(otherUserId) {
                 user_id: currentUserId,
                 category: Preferences.CATEGORY_DIRECT_CHANNEL_SHOW,
                 name: otherUserId,
-                value: 'true'
+                value: 'true',
             };
             getProfilesByIds([otherUserId])(dispatch, getState);
             savePreferences(currentUserId, [preference])(dispatch, getState);
@@ -85,7 +85,7 @@ export function makeGroupMessageVisibleIfNecessary(channelId) {
                 user_id: currentUserId,
                 category: Preferences.CATEGORY_GROUP_CHANNEL_SHOW,
                 name: channelId,
-                value: 'true'
+                value: 'true',
             };
 
             if (channels[channelId]) {
@@ -111,14 +111,14 @@ export function savePreferences(userId, preferences) {
                 offline: {
                     effect: () => Client4.savePreferences(userId, preferences),
                     commit: {
-                        type: PreferenceTypes.RECEIVED_PREFERENCES
+                        type: PreferenceTypes.RECEIVED_PREFERENCES,
                     },
                     rollback: {
                         type: PreferenceTypes.DELETED_PREFERENCES,
-                        data: preferences
-                    }
-                }
-            }
+                        data: preferences,
+                    },
+                },
+            },
         });
 
         return {data: true};

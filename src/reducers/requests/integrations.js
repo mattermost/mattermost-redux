@@ -237,5 +237,5 @@ export default combineReducers({
     deleteOAuthApp,
     updateOAuthApp,
     executeCommand,
-    getAutocompleteCommands
+    getAutocompleteCommands,
 });

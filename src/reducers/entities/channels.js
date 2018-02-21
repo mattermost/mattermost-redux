@@ -22,7 +22,7 @@ function removeChannelFromSet(state, action) {
     nextSet.delete(action.data.id);
     return {
         ...state,
-        [id]: nextSet
+        [id]: nextSet,
     };
 }
 
@@ -42,7 +42,7 @@ function channels(state = {}, action) {
     case ChannelTypes.RECEIVED_CHANNEL:
         return {
             ...state,
-            [action.data.id]: action.data
+            [action.data.id]: action.data,
         };
 
     case ChannelTypes.RECEIVED_CHANNELS: {
@@ -63,8 +63,8 @@ function channels(state = {}, action) {
             ...state,
             [channelId]: {
                 ...state[channelId],
-                header
-            }
+                header,
+            },
         };
     }
     case ChannelTypes.UPDATE_CHANNEL_PURPOSE: {
@@ -73,8 +73,8 @@ function channels(state = {}, action) {
             ...state,
             [channelId]: {
                 ...state[channelId],
-                purpose
-            }
+                purpose,
+            },
         };
     }
     case ChannelTypes.LEAVE_CHANNEL: {
@@ -97,8 +97,8 @@ function channels(state = {}, action) {
             ...state,
             [channelId]: {
                 ...channel,
-                total_msg_count: channel.total_msg_count + amount
-            }
+                total_msg_count: channel.total_msg_count + amount,
+            },
         };
     }
 
@@ -116,7 +116,7 @@ function channelsInTeam(state = {}, action) {
         nextSet.add(action.data.id);
         return {
             ...state,
-            [action.data.team_id]: nextSet
+            [action.data.team_id]: nextSet,
         };
     }
     case ChannelTypes.RECEIVED_CHANNELS: {
@@ -143,7 +143,7 @@ function myMembers(state = {}, action) {
         const channelMember = action.data;
         return {
             ...state,
-            [channelMember.channel_id]: channelMember
+            [channelMember.channel_id]: channelMember,
         };
     }
     case ChannelTypes.RECEIVED_MY_CHANNEL_MEMBERS: {
@@ -166,7 +166,7 @@ function myMembers(state = {}, action) {
 
         return {
             ...state,
-            [action.data.channel_id]: member
+            [action.data.channel_id]: member,
         };
     }
     case ChannelTypes.INCREMENT_UNREAD_MSG_COUNT: {
@@ -187,8 +187,8 @@ function myMembers(state = {}, action) {
             ...state,
             [channelId]: {
                 ...member,
-                msg_count: member.msg_count + amount
-            }
+                msg_count: member.msg_count + amount,
+            },
         };
     }
     case ChannelTypes.DECREMENT_UNREAD_MSG_COUNT: {
@@ -205,8 +205,8 @@ function myMembers(state = {}, action) {
             ...state,
             [channelId]: {
                 ...member,
-                msg_count: member.msg_count + amount
-            }
+                msg_count: member.msg_count + amount,
+            },
         };
     }
     case ChannelTypes.INCREMENT_UNREAD_MENTION_COUNT: {
@@ -222,8 +222,8 @@ function myMembers(state = {}, action) {
             ...state,
             [channelId]: {
                 ...member,
-                mention_count: member.mention_count + amount
-            }
+                mention_count: member.mention_count + amount,
+            },
         };
     }
     case ChannelTypes.DECREMENT_UNREAD_MENTION_COUNT: {
@@ -239,8 +239,8 @@ function myMembers(state = {}, action) {
             ...state,
             [channelId]: {
                 ...member,
-                mention_count: Math.max(member.mention_count - amount, 0)
-            }
+                mention_count: Math.max(member.mention_count - amount, 0),
+            },
         };
     }
     case ChannelTypes.RECEIVED_LAST_VIEWED_AT: {
@@ -249,12 +249,12 @@ function myMembers(state = {}, action) {
 
         member = {
             ...member,
-            last_viewed_at: data.last_viewed_at
+            last_viewed_at: data.last_viewed_at,
         };
 
         return {
             ...state,
-            [action.data.channel_id]: member
+            [action.data.channel_id]: member,
         };
     }
     case ChannelTypes.LEAVE_CHANNEL:
@@ -283,7 +283,7 @@ function membersInChannel(state = {}, action) {
         members[member.user_id] = member;
         return {
             ...state,
-            [member.channel_id]: members
+            [member.channel_id]: members,
         };
     }
     case ChannelTypes.RECEIVED_MY_CHANNEL_MEMBERS:
@@ -318,7 +318,7 @@ function membersInChannel(state = {}, action) {
                 Reflect.deleteProperty(members, data.user_id);
                 return {
                     ...state,
-                    [data.id]: members
+                    [data.id]: members,
                 };
             }
         }
@@ -351,8 +351,8 @@ function stats(state = {}, action) {
                 ...nextState,
                 [id]: {
                     ...nextStat,
-                    member_count: count
-                }
+                    member_count: count,
+                },
             };
         }
 
@@ -368,8 +368,8 @@ function stats(state = {}, action) {
                 ...nextState,
                 [id]: {
                     ...nextStat,
-                    member_count: count || 1
-                }
+                    member_count: count || 1,
+                },
             };
         }
 
@@ -400,5 +400,5 @@ export default combineReducers({
     membersInChannel,
 
     // object where every key is the channel id and has an object with the channel stats
-    stats
+    stats,
 });

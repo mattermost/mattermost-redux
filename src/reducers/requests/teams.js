@@ -171,5 +171,5 @@ export default combineReducers({
     removeUserFromTeam,
     updateTeamMember,
     emailInvite,
-    joinTeam
+    joinTeam,
 });

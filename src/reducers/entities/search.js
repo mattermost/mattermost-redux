@@ -44,7 +44,7 @@ function recent(state = {}, action) {
         }
         return {
             ...nextState,
-            [teamId]: team
+            [teamId]: team,
         };
     }
     case SearchTypes.REMOVE_SEARCH_TERM: {
@@ -58,7 +58,7 @@ function recent(state = {}, action) {
 
             return {
                 ...nextState,
-                [teamId]: team
+                [teamId]: team,
             };
         }
 
@@ -79,5 +79,5 @@ export default combineReducers({
 
     // Object where every key is a team composed with
     // an object where the key is the term and the value indicates is "or" search
-    recent
+    recent,
 });

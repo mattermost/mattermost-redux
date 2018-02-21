@@ -11,7 +11,7 @@ export function getFormattedFileSize(file) {
         ['TB', 1024 * 1024 * 1024 * 1024],
         ['GB', 1024 * 1024 * 1024],
         ['MB', 1024 * 1024],
-        ['KB', 1024]
+        ['KB', 1024],
     ];
     const size = fileSizes.find((unitAndMinBytes) => {
         const minBytes = unitAndMinBytes[1];
@@ -38,7 +38,7 @@ export function getFileType(file) {
         'spreadsheet',
         'word',
         'presentation',
-        'patch'
+        'patch',
     ];
     return fileTypes.find((fileType) => {
         const constForFileTypeExtList = `${fileType}_types`.toUpperCase();

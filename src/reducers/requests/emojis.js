@@ -61,6 +61,6 @@ export default combineReducers({
     getCustomEmoji,
     getCustomEmojis,
     getAllCustomEmojis,
-    deleteCustomEmoji
+    deleteCustomEmoji,
 });
 

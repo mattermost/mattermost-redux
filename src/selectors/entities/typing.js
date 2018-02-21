@@ -5,7 +5,7 @@ import {createSelector} from 'reselect';
 
 import {
     getCurrentChannelId,
-    getUsers
+    getUsers,
 } from 'selectors/entities/common';
 import {getTeammateNameDisplaySetting} from 'selectors/entities/preferences';
 
