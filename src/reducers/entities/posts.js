@@ -279,6 +279,8 @@ function selectedPostId(state = '', action) {
 
 function currentFocusedPostId(state = '', action) {
     switch (action.type) {
+    case PostTypes.RECEIVED_FOCUSED_POST:
+        return action.data;
     case UserTypes.LOGOUT_SUCCESS:
         return '';
     default:
