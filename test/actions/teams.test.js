@@ -660,7 +660,6 @@ describe('Actions.Teams', () => {
 
         const team = TestHelper.basicTeam;
         const imageData = fs.createReadStream('test/assets/images/test.png');
-        const beforeTime = new Date().getTime();
 
         nock(Client4.getTeamRoute(team.id)).
             post('/image').
@@ -673,11 +672,5 @@ describe('Actions.Teams', () => {
         if (setTeamIconRequest.status === RequestStatus.FAILURE) {
             throw new Error(JSON.stringify(setTeamIconRequest.error));
         }
-
-        const {teams} = store.getState().entities.teams;
-        const updatedTeam = teams[TestHelper.basicTeam.id];
-
-        assert.ok(updatedTeam);
-        assert.ok(updatedTeam.last_team_icon_update > beforeTime);
     });
 });
