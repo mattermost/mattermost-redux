@@ -13,16 +13,20 @@ describe('Selectors.Teams', () => {
     const team2 = TestHelper.fakeTeamWithId();
     const team3 = TestHelper.fakeTeamWithId();
     const team4 = TestHelper.fakeTeamWithId();
+    const team5 = TestHelper.fakeTeamWithId();
 
     const teams = {};
     teams[team1.id] = team1;
     teams[team2.id] = team2;
     teams[team3.id] = team3;
     teams[team4.id] = team4;
+    teams[team5.id] = team5;
     team1.display_name = 'Marketeam';
     team2.display_name = 'Core Team';
     team3.allow_open_invite = true;
     team4.allow_open_invite = true;
+    team5.delete_at = 10;
+    team5.allow_open_invite = true;
 
     const user = TestHelper.fakeUserWithId();
     const user2 = TestHelper.fakeUserWithId();
@@ -57,7 +61,7 @@ describe('Selectors.Teams', () => {
     });
 
     it('getTeamsList', () => {
-        assert.deepEqual(Selectors.getTeamsList(testState), [team1, team2, team3, team4]);
+        assert.deepEqual(Selectors.getTeamsList(testState), [team1, team2, team3, team4, team5]);
     });
 
     it('getMyTeams', () => {
