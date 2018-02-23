@@ -334,16 +334,19 @@ async function handleNewPostEvent(msg, dispatch, getState) {
     }
 
     let markAsRead = false;
+    let markAsReadOnServer = false;
     if (userId === currentUserId && !isSystemMessage(post) && !isFromWebhook(post)) {
         // In case the current user posted the message and that message wasn't triggered by a system message
         markAsRead = true;
+        markAsReadOnServer = false;
     } else if (post.channel_id === currentChannelId) {
         // if the post is for the channel that the user is currently viewing we'll mark the channel as read
         markAsRead = true;
+        markAsReadOnServer = true;
     }
 
     if (markAsRead) {
-        markChannelAsRead(post.channel_id, null, false)(dispatch, getState);
+        markChannelAsRead(post.channel_id, null, markAsReadOnServer)(dispatch, getState);
         markChannelAsViewed(post.channel_id)(dispatch, getState);
     } else {
         markChannelAsUnread(msg.data.team_id, post.channel_id, msg.data.mentions)(dispatch, getState);
