@@ -84,7 +84,7 @@ const joinLeavePostTypes = [
     Posts.POST_TYPES.JOIN_TEAM,
     Posts.POST_TYPES.LEAVE_TEAM,
     Posts.POST_TYPES.ADD_TO_TEAM,
-    Posts.POST_TYPES.REMOVE_FROM_TEAM
+    Posts.POST_TYPES.REMOVE_FROM_TEAM,
 ];
 
 // Returns true if a post should be hidden when the user has Show Join/Leave Messages disabled

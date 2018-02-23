@@ -199,5 +199,5 @@ export default combineReducers({
     getPostsAfterRetryAttempts: getPostsAfterWithRetryAttempt,
     reaction,
     openGraph,
-    doPostAction
+    doPostAction,
 });

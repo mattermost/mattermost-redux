@@ -6,7 +6,7 @@ import {RequestStatus} from 'constants';
 export function initialRequestState() {
     return {
         status: RequestStatus.NOT_STARTED,
-        error: null
+        error: null,
     };
 }
 
@@ -15,13 +15,13 @@ export function handleRequest(REQUEST, SUCCESS, FAILURE, state, action) {
     case REQUEST:
         return {
             ...state,
-            status: RequestStatus.STARTED
+            status: RequestStatus.STARTED,
         };
     case SUCCESS:
         return {
             ...state,
             status: RequestStatus.SUCCESS,
-            error: null
+            error: null,
         };
     case FAILURE: {
         let error = action.error;
@@ -32,7 +32,7 @@ export function handleRequest(REQUEST, SUCCESS, FAILURE, state, action) {
         return {
             ...state,
             status: RequestStatus.FAILURE,
-            error
+            error,
         };
     }
     default:

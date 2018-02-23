@@ -69,5 +69,5 @@ export default combineReducers({
     config,
     dataRetentionPolicy,
     license,
-    websocket
+    websocket,
 });

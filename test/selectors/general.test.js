@@ -14,96 +14,10 @@ describe('Selectors.General', () => {
                     },
                     license: {
                         IsLicensed: 'true',
-                        Compliance: 'true'
-                    }
-                }
-            }
-        }), true);
-
-        assert.equal(Selectors.canUploadFilesOnMobile({
-            entities: {
-                general: {
-                    config: {
-                        EnableFileAttachments: 'false'
+                        Compliance: 'true',
                     },
-                    license: {
-                        IsLicensed: 'true',
-                        Compliance: 'true'
-                    }
-                }
-            }
-        }), false);
-
-        assert.equal(Selectors.canUploadFilesOnMobile({
-            entities: {
-                general: {
-                    config: {
-                        EnableFileAttachments: 'true'
-                    },
-                    license: {
-                        IsLicensed: 'true',
-                        Compliance: 'true'
-                    }
-                }
-            }
-        }), true);
-
-        assert.equal(Selectors.canUploadFilesOnMobile({
-            entities: {
-                general: {
-                    config: {
-                        EnableMobileFileUpload: 'false'
-                    },
-                    license: {
-                        IsLicensed: 'true',
-                        Compliance: 'true'
-                    }
-                }
-            }
-        }), false);
-
-        assert.equal(Selectors.canUploadFilesOnMobile({
-            entities: {
-                general: {
-                    config: {
-                        EnableFileAttachments: 'false',
-                        EnableMobileFileUpload: 'false'
-                    },
-                    license: {
-                        IsLicensed: 'true',
-                        Compliance: 'true'
-                    }
-                }
-            }
-        }), false);
-
-        assert.equal(Selectors.canUploadFilesOnMobile({
-            entities: {
-                general: {
-                    config: {
-                        EnableFileAttachments: 'true',
-                        EnableMobileFileUpload: 'false'
-                    },
-                    license: {
-                        IsLicensed: 'true',
-                        Compliance: 'true'
-                    }
-                }
-            }
-        }), false);
-
-        assert.equal(Selectors.canUploadFilesOnMobile({
-            entities: {
-                general: {
-                    config: {
-                        EnableMobileFileUpload: 'true'
-                    },
-                    license: {
-                        IsLicensed: 'true',
-                        Compliance: 'true'
-                    }
-                }
-            }
+                },
+            },
         }), true);
 
         assert.equal(Selectors.canUploadFilesOnMobile({
@@ -111,14 +25,13 @@ describe('Selectors.General', () => {
                 general: {
                     config: {
                         EnableFileAttachments: 'false',
-                        EnableMobileFileUpload: 'true'
                     },
                     license: {
                         IsLicensed: 'true',
-                        Compliance: 'true'
-                    }
-                }
-            }
+                        Compliance: 'true',
+                    },
+                },
+            },
         }), false);
 
         assert.equal(Selectors.canUploadFilesOnMobile({
@@ -126,28 +39,42 @@ describe('Selectors.General', () => {
                 general: {
                     config: {
                         EnableFileAttachments: 'true',
-                        EnableMobileFileUpload: 'true'
                     },
                     license: {
                         IsLicensed: 'true',
-                        Compliance: 'true'
-                    }
-                }
-            }
+                        Compliance: 'true',
+                    },
+                },
+            },
         }), true);
 
         assert.equal(Selectors.canUploadFilesOnMobile({
             entities: {
                 general: {
                     config: {
-                        EnableFileAttachments: 'false'
+                        EnableMobileFileUpload: 'false',
                     },
                     license: {
-                        IsLicensed: 'false',
-                        Compliance: 'false'
-                    }
-                }
-            }
+                        IsLicensed: 'true',
+                        Compliance: 'true',
+                    },
+                },
+            },
+        }), false);
+
+        assert.equal(Selectors.canUploadFilesOnMobile({
+            entities: {
+                general: {
+                    config: {
+                        EnableFileAttachments: 'false',
+                        EnableMobileFileUpload: 'false',
+                    },
+                    license: {
+                        IsLicensed: 'true',
+                        Compliance: 'true',
+                    },
+                },
+            },
         }), false);
 
         assert.equal(Selectors.canUploadFilesOnMobile({
@@ -155,14 +82,87 @@ describe('Selectors.General', () => {
                 general: {
                     config: {
                         EnableFileAttachments: 'true',
-                        EnableMobileFileUpload: 'false'
+                        EnableMobileFileUpload: 'false',
+                    },
+                    license: {
+                        IsLicensed: 'true',
+                        Compliance: 'true',
+                    },
+                },
+            },
+        }), false);
+
+        assert.equal(Selectors.canUploadFilesOnMobile({
+            entities: {
+                general: {
+                    config: {
+                        EnableMobileFileUpload: 'true',
+                    },
+                    license: {
+                        IsLicensed: 'true',
+                        Compliance: 'true',
+                    },
+                },
+            },
+        }), true);
+
+        assert.equal(Selectors.canUploadFilesOnMobile({
+            entities: {
+                general: {
+                    config: {
+                        EnableFileAttachments: 'false',
+                        EnableMobileFileUpload: 'true',
+                    },
+                    license: {
+                        IsLicensed: 'true',
+                        Compliance: 'true',
+                    },
+                },
+            },
+        }), false);
+
+        assert.equal(Selectors.canUploadFilesOnMobile({
+            entities: {
+                general: {
+                    config: {
+                        EnableFileAttachments: 'true',
+                        EnableMobileFileUpload: 'true',
+                    },
+                    license: {
+                        IsLicensed: 'true',
+                        Compliance: 'true',
+                    },
+                },
+            },
+        }), true);
+
+        assert.equal(Selectors.canUploadFilesOnMobile({
+            entities: {
+                general: {
+                    config: {
+                        EnableFileAttachments: 'false',
                     },
                     license: {
                         IsLicensed: 'false',
-                        Compliance: 'false'
-                    }
-                }
-            }
+                        Compliance: 'false',
+                    },
+                },
+            },
+        }), false);
+
+        assert.equal(Selectors.canUploadFilesOnMobile({
+            entities: {
+                general: {
+                    config: {
+                        EnableFileAttachments: 'true',
+                        EnableMobileFileUpload: 'false',
+                    },
+                    license: {
+                        IsLicensed: 'false',
+                        Compliance: 'false',
+                    },
+                },
+            },
         }), true);
 
         assert.equal(Selectors.canUploadFilesOnMobile({
@@ -170,14 +170,14 @@ describe('Selectors.General', () => {
                 general: {
                     config: {
                         EnableFileAttachments: 'true',
-                        EnableMobileFileUpload: 'false'
+                        EnableMobileFileUpload: 'false',
                     },
                     license: {
                         IsLicensed: 'true',
-                        Compliance: 'false'
-                    }
-                }
-            }
+                        Compliance: 'false',
+                    },
+                },
+            },
         }), true);
     });
 
@@ -189,66 +189,66 @@ describe('Selectors.General', () => {
                     },
                     license: {
                         IsLicensed: 'true',
-                        Compliance: 'true'
-                    }
-                }
-            }
+                        Compliance: 'true',
+                    },
+                },
+            },
         }), true);
 
         assert.equal(Selectors.canDownloadFilesOnMobile({
             entities: {
                 general: {
                     config: {
-                        EnableMobileFileDownload: 'false'
+                        EnableMobileFileDownload: 'false',
                     },
                     license: {
                         IsLicensed: 'true',
-                        Compliance: 'true,'
-                    }
-                }
-            }
+                        Compliance: 'true,',
+                    },
+                },
+            },
         }), false);
 
         assert.equal(Selectors.canDownloadFilesOnMobile({
             entities: {
                 general: {
                     config: {
-                        EnableMobileFileDownload: 'true'
+                        EnableMobileFileDownload: 'true',
                     },
                     license: {
                         IsLicensed: 'true',
-                        Compliance: 'true'
-                    }
-                }
-            }
+                        Compliance: 'true',
+                    },
+                },
+            },
         }), true);
 
         assert.equal(Selectors.canDownloadFilesOnMobile({
             entities: {
                 general: {
                     config: {
-                        EnableMobileFileDownload: 'false'
+                        EnableMobileFileDownload: 'false',
                     },
                     license: {
                         IsLicensed: 'false',
-                        Compliance: 'false'
-                    }
-                }
-            }
+                        Compliance: 'false',
+                    },
+                },
+            },
         }), true);
 
         assert.equal(Selectors.canDownloadFilesOnMobile({
             entities: {
                 general: {
                     config: {
-                        EnableMobileFileDownload: 'false'
+                        EnableMobileFileDownload: 'false',
                     },
                     license: {
                         IsLicensed: 'true',
-                        Compliance: 'false'
-                    }
-                }
-            }
+                        Compliance: 'false',
+                    },
+                },
+            },
         }), true);
     });
 });

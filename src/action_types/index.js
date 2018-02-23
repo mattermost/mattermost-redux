@@ -30,5 +30,5 @@ export {
     AdminTypes,
     AlertTypes,
     JobTypes,
-    SearchTypes
+    SearchTypes,
 };

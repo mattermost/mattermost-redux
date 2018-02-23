@@ -43,6 +43,6 @@ export default combineReducers({
     jobs,
 
     // object where every key is a job type and contains a list of jobs.
-    jobsByTypeList
+    jobsByTypeList,
 
 });

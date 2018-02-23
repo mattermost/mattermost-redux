@@ -17,7 +17,7 @@ export default (state = [], action) => {
         nextState.push({
             displayable,
             error,
-            date: new Date(Date.now()).toUTCString()
+            date: new Date(Date.now()).toUTCString(),
         });
 
         return nextState;

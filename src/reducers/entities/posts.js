@@ -11,7 +11,7 @@ function handleReceivedPost(posts = {}, postsInChannel = {}, action) {
 
     const nextPosts = {
         ...posts,
-        [post.id]: post
+        [post.id]: post,
     };
 
     let nextPostsForChannel = postsInChannel;
@@ -24,7 +24,7 @@ function handleReceivedPost(posts = {}, postsInChannel = {}, action) {
         nextPostsForChannel = {...postsInChannel};
         nextPostsForChannel[channelId] = [
             post.id,
-            ...postsForChannel
+            ...postsForChannel,
         ];
     }
 
@@ -54,7 +54,7 @@ function handleReceivedPosts(posts = {}, postsInChannel = {}, action) {
                     ...newPost,
                     state: Posts.POST_DELETED,
                     file_ids: [],
-                    has_reactions: false
+                    has_reactions: false,
                 };
             } else {
                 continue;
@@ -162,7 +162,7 @@ function handlePostDeleted(posts = {}, postsInChannel = {}, action) {
             ...posts[post.id],
             state: Posts.POST_DELETED,
             file_ids: [],
-            has_reactions: false
+            has_reactions: false,
         };
 
         // Remove any of its comments
@@ -235,7 +235,7 @@ function handlePosts(posts = {}, postsInChannel = {}, action) {
         nextPosts[action.data.id] = action.data;
         return {
             posts: nextPosts,
-            postsInChannel
+            postsInChannel,
         };
     }
     case PostTypes.RECEIVED_NEW_POST:
@@ -256,12 +256,12 @@ function handlePosts(posts = {}, postsInChannel = {}, action) {
     case UserTypes.LOGOUT_SUCCESS:
         return {
             posts: {},
-            postsInChannel: {}
+            postsInChannel: {},
         };
     default:
         return {
             posts,
-            postsInChannel
+            postsInChannel,
         };
     }
 }
@@ -299,7 +299,7 @@ function reactions(state = {}, action) {
 
         return {
             ...state,
-            [action.postId]: nextReactions
+            [action.postId]: nextReactions,
         };
     }
     case PostTypes.RECEIVED_REACTION: {
@@ -309,7 +309,7 @@ function reactions(state = {}, action) {
 
         return {
             ...state,
-            [reaction.post_id]: nextReactions
+            [reaction.post_id]: nextReactions,
         };
     }
     case PostTypes.REACTION_DELETED: {
@@ -323,7 +323,7 @@ function reactions(state = {}, action) {
 
         return {
             ...state,
-            [reaction.post_id]: nextReactions
+            [reaction.post_id]: nextReactions,
         };
     }
     case PostTypes.POST_DELETED:
@@ -377,7 +377,7 @@ function messagesHistory(state = {}, action) {
 
         return {
             messages: nextMessages,
-            index: nextIndex
+            index: nextIndex,
         };
     }
     case PostTypes.RESET_HISTORY_INDEX: {
@@ -390,7 +390,7 @@ function messagesHistory(state = {}, action) {
         nextIndex[action.data] = messages.length;
         return {
             messages: state.messages,
-            index: nextIndex
+            index: nextIndex,
         };
     }
     case PostTypes.MOVE_HISTORY_INDEX_BACK: {
@@ -404,7 +404,7 @@ function messagesHistory(state = {}, action) {
         }
         return {
             messages: state.messages,
-            index: nextIndex
+            index: nextIndex,
         };
     }
     case PostTypes.MOVE_HISTORY_INDEX_FORWARD: {
@@ -419,7 +419,7 @@ function messagesHistory(state = {}, action) {
         }
         return {
             messages: state.messages,
-            index: nextIndex
+            index: nextIndex,
         };
     }
     case UserTypes.LOGOUT_SUCCESS: {
@@ -429,7 +429,7 @@ function messagesHistory(state = {}, action) {
 
         return {
             messages: [],
-            index
+            index,
         };
     }
     default:
@@ -464,7 +464,7 @@ export default function(state = {}, action) {
         openGraph: openGraph(state.openGraph, action),
 
         // History of posts and comments
-        messagesHistory: messagesHistory(state.messagesHistory, action)
+        messagesHistory: messagesHistory(state.messagesHistory, action),
     };
 
     if (state.posts === nextState.posts && state.postsInChannel === nextState.postsInChannel &&

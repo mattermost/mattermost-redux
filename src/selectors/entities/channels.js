@@ -8,7 +8,7 @@ import {General} from 'constants';
 import {
     getCurrentChannelId,
     getCurrentUser,
-    getUsers
+    getUsers,
 } from 'selectors/entities/common';
 import {getConfig, getLicense} from 'selectors/entities/general';
 import {
@@ -16,7 +16,7 @@ import {
     getMyPreferences,
     getTeammateNameDisplaySetting,
     getVisibleTeammate,
-    getVisibleGroupIds
+    getVisibleGroupIds,
 } from 'selectors/entities/preferences';
 import {getLastPostPerChannel} from 'selectors/entities/posts';
 import {getCurrentTeamId, getCurrentTeamMembership} from 'selectors/entities/teams';
@@ -33,12 +33,12 @@ import {
     isAutoClosed,
     isDirectChannelVisible,
     isGroupChannelVisible,
-    isGroupOrDirectChannelVisible
+    isGroupOrDirectChannelVisible,
 } from 'utils/channel_utils';
 import {createIdsSelector} from 'utils/helpers';
 
 export {
-    getCurrentChannelId
+    getCurrentChannelId,
 };
 
 export function getAllChannels(state) {

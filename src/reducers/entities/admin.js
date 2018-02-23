@@ -407,5 +407,5 @@ export default combineReducers({
     userAccessTokens,
 
     // object with plugin ids as keys and objects representing plugin manifests as values
-    plugins
+    plugins,
 });

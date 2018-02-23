@@ -39,7 +39,7 @@ describe('Actions.Emojis', () => {
         const {data: created} = await Actions.createCustomEmoji(
             {
                 name: TestHelper.generateId(),
-                creator_id: TestHelper.basicUser.id
+                creator_id: TestHelper.basicUser.id,
             },
             testImageData
         )(store.dispatch, store.getState);
@@ -65,7 +65,7 @@ describe('Actions.Emojis', () => {
         const {data: created} = await Actions.createCustomEmoji(
             {
                 name: TestHelper.generateId(),
-                creator_id: TestHelper.basicUser.id
+                creator_id: TestHelper.basicUser.id,
             },
             testImageData
         )(store.dispatch, store.getState);
@@ -97,7 +97,7 @@ describe('Actions.Emojis', () => {
         const {data: created1} = await Actions.createCustomEmoji(
             {
                 name: TestHelper.generateId(),
-                creator_id: TestHelper.basicUser.id
+                creator_id: TestHelper.basicUser.id,
             },
             fs.createReadStream('test/assets/images/test.png')
         )(store.dispatch, store.getState);
@@ -108,7 +108,7 @@ describe('Actions.Emojis', () => {
         const {data: created2} = await Actions.createCustomEmoji(
             {
                 name: TestHelper.generateId(),
-                creator_id: TestHelper.basicUser.id
+                creator_id: TestHelper.basicUser.id,
             },
             fs.createReadStream('test/assets/images/test.png')
         )(store.dispatch, store.getState);
@@ -186,7 +186,7 @@ describe('Actions.Emojis', () => {
         const {data: created} = await Actions.createCustomEmoji(
             {
                 name: TestHelper.generateId(),
-                creator_id: TestHelper.basicUser.id
+                creator_id: TestHelper.basicUser.id,
             },
             testImageData
         )(store.dispatch, store.getState);
@@ -220,7 +220,7 @@ describe('Actions.Emojis', () => {
         const {data: created} = await Actions.createCustomEmoji(
             {
                 name: TestHelper.generateId(),
-                creator_id: TestHelper.basicUser.id
+                creator_id: TestHelper.basicUser.id,
             },
             testImageData
         )(store.dispatch, store.getState);
@@ -261,7 +261,7 @@ describe('Actions.Emojis', () => {
         const {data: created} = await Actions.createCustomEmoji(
             {
                 name: TestHelper.generateId(),
-                creator_id: TestHelper.basicUser.id
+                creator_id: TestHelper.basicUser.id,
             },
             testImageData
         )(store.dispatch, store.getState);
@@ -300,7 +300,7 @@ describe('Actions.Emojis', () => {
         const {data: created} = await Actions.createCustomEmoji(
             {
                 name: TestHelper.generateId(),
-                creator_id: TestHelper.basicUser.id
+                creator_id: TestHelper.basicUser.id,
             },
             testImageData
         )(store.dispatch, store.getState);
@@ -347,7 +347,7 @@ describe('Actions.Emojis', () => {
         const {data: created} = await Actions.createCustomEmoji(
             {
                 name: TestHelper.generateId(),
-                creator_id: TestHelper.basicUser.id
+                creator_id: TestHelper.basicUser.id,
             },
             testImageData
         )(store.dispatch, store.getState);
@@ -403,7 +403,7 @@ describe('Actions.Emojis', () => {
         const {data: created} = await Actions.createCustomEmoji(
             {
                 name: TestHelper.generateId(),
-                creator_id: TestHelper.basicUser.id
+                creator_id: TestHelper.basicUser.id,
             },
             testImageData
         )(store.dispatch, store.getState);
@@ -440,7 +440,7 @@ describe('Actions.Emojis', () => {
         const {data: created} = await Actions.createCustomEmoji(
             {
                 name: TestHelper.generateId(),
-                creator_id: TestHelper.basicUser.id
+                creator_id: TestHelper.basicUser.id,
             },
             testImageData
         )(store.dispatch, store.getState);

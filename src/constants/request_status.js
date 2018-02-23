@@ -6,5 +6,5 @@ export default {
     STARTED: 'started',
     SUCCESS: 'success',
     FAILURE: 'failure',
-    CANCELLED: 'cancelled'
+    CANCELLED: 'cancelled',
 };

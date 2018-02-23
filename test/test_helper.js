@@ -74,14 +74,14 @@ class TestHelper {
             locale: 'en',
             username: this.generateId(),
             first_name: this.generateId(),
-            last_name: this.generateId()
+            last_name: this.generateId(),
         };
     };
 
     fakeUserWithId = () => {
         return {
             ...this.fakeUser(),
-            id: this.generateId()
+            id: this.generateId(),
         };
     };
 
@@ -98,14 +98,14 @@ class TestHelper {
             type: 'O',
             email: this.fakeEmail(),
             allowed_domains: '',
-            invite_id: inviteId
+            invite_id: inviteId,
         };
     };
 
     fakeTeamWithId = () => {
         return {
             ...this.fakeTeam(),
-            id: this.generateId()
+            id: this.generateId(),
         };
     };
 
@@ -114,20 +114,20 @@ class TestHelper {
             user_id: userId,
             team_id: teamId,
             roles: 'team_user',
-            delete_at: 0
+            delete_at: 0,
         };
     };
 
     fakeOutgoingHook = (teamId) => {
         return {
-            teamId
+            teamId,
         };
     };
 
     fakeOutgoingHookWithId = (teamId) => {
         return {
             ...this.fakeOutgoingHook(teamId),
-            id: this.generateId()
+            id: this.generateId(),
         };
     };
 
@@ -141,7 +141,7 @@ class TestHelper {
             channel_id: this.basicChannel.id,
             team_id: this.basicTeam.id,
             display_name: 'test',
-            description: 'test'
+            description: 'test',
         };
     };
 
@@ -160,7 +160,7 @@ class TestHelper {
             callback_urls: ['http://localhost/notarealendpoint'],
             display_name: 'test',
             description: '',
-            content_type: 'application/x-www-form-urlencoded'
+            content_type: 'application/x-www-form-urlencoded',
         };
     }
 
@@ -180,7 +180,7 @@ class TestHelper {
             auto_complete_hint: 'test',
             display_name: 'test',
             description: 'test',
-            url: 'http://localhost/notarealendpoint'
+            url: 'http://localhost/notarealendpoint',
         };
     };
 
@@ -193,14 +193,14 @@ class TestHelper {
             display_name: `Unit Test ${name}`,
             type: 'O',
             delete_at: 0,
-            total_msg_count: 0
+            total_msg_count: 0,
         };
     };
 
     fakeChannelWithId = (teamId) => {
         return {
             ...this.fakeChannel(teamId),
-            id: this.generateId()
+            id: this.generateId(),
         };
     };
 
@@ -211,21 +211,21 @@ class TestHelper {
             notify_props: {},
             roles: 'system_user',
             msg_count: 0,
-            mention_count: 0
+            mention_count: 0,
         };
     };
 
     fakePost = (channelId) => {
         return {
             channel_id: channelId,
-            message: `Unit Test ${this.generateId()}`
+            message: `Unit Test ${this.generateId()}`,
         };
     };
 
     fakePostWithId = (channelId) => {
         return {
             ...this.fakePost(channelId),
-            id: this.generateId()
+            id: this.generateId(),
         };
     };
 
@@ -233,7 +233,7 @@ class TestHelper {
         const files = [];
         while (files.length < count) {
             files.push({
-                id: this.generateId()
+                id: this.generateId(),
             });
         }
 
@@ -248,14 +248,14 @@ class TestHelper {
             description: 'fake app',
             is_trusted: false,
             icon_url: 'http://localhost/notrealurl',
-            update_at: 1507841118796
+            update_at: 1507841118796,
         };
     };
 
     fakeOAuthAppWithId = () => {
         return {
             ...this.fakeOAuthApp(),
-            id: this.generateId()
+            id: this.generateId(),
         };
     };
 
@@ -324,7 +324,7 @@ class TestHelper {
             user: this.basicUser,
             team: this.basicTeam,
             channel: this.basicChannel,
-            post: this.basicPost
+            post: this.basicPost,
         };
     };
 

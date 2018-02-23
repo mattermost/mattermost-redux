@@ -4,5 +4,5 @@
 export default {
     ALERT_NOTIFICATION: 'notification',
     ALERT_DEVELOPER: 'developer',
-    ALERT_ERROR: 'error'
+    ALERT_ERROR: 'error',
 };

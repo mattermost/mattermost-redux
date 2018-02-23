@@ -221,7 +221,7 @@ describe('Actions.Teams', () => {
         const team = {
             ...TestHelper.basicTeam,
             display_name: displayName,
-            description
+            description,
         };
 
         nock(Client4.getTeamsRoute()).
@@ -313,7 +313,7 @@ describe('Actions.Teams', () => {
 
         const {
             getMyTeamMembers: membersRequest,
-            getMyTeamUnreads: unreadRequest
+            getMyTeamUnreads: unreadRequest,
         } = store.getState().requests.teams;
         const members = store.getState().entities.teams.myMembers;
 

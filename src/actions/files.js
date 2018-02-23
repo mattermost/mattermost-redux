@@ -19,7 +19,7 @@ export function getFilesForPost(postId) {
             forceLogoutIfNecessary(error, dispatch, getState);
             dispatch(batchActions([
                 {type: FileTypes.FETCH_FILES_FOR_POST_FAILURE, error},
-                logError(error)(dispatch)
+                logError(error)(dispatch),
             ]), getState);
             return {error};
         }
@@ -28,11 +28,11 @@ export function getFilesForPost(postId) {
             {
                 type: FileTypes.RECEIVED_FILES_FOR_POST,
                 data: files,
-                postId
+                postId,
             },
             {
-                type: FileTypes.FETCH_FILES_FOR_POST_SUCCESS
-            }
+                type: FileTypes.FETCH_FILES_FOR_POST_SUCCESS,
+            },
         ]), getState);
 
         return {data: true};
@@ -67,7 +67,7 @@ export function uploadFile(channelId, rootId, clientIds, fileFormData, formBound
                 clientIds,
                 channelId,
                 rootId,
-                error
+                error,
             };
 
             dispatch(batchActions([failure, logError(error)(dispatch)]), getState);
@@ -77,7 +77,7 @@ export function uploadFile(channelId, rootId, clientIds, fileFormData, formBound
         const data = files.file_infos.map((file, index) => {
             return {
                 ...file,
-                clientId: files.client_ids[index]
+                clientId: files.client_ids[index],
             };
         });
 
@@ -86,11 +86,11 @@ export function uploadFile(channelId, rootId, clientIds, fileFormData, formBound
                 type: FileTypes.RECEIVED_UPLOAD_FILES,
                 data,
                 channelId,
-                rootId
+                rootId,
             },
             {
-                type: FileTypes.UPLOAD_FILES_SUCCESS
-            }
+                type: FileTypes.UPLOAD_FILES_SUCCESS,
+            },
         ]), getState);
 
         return {data: files};

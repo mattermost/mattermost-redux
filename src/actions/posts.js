@@ -32,7 +32,7 @@ export function createPost(post, files = []) {
             ...post,
             pending_post_id: pendingPostId,
             create_at: timestamp,
-            update_at: timestamp
+            update_at: timestamp,
         };
 
         // We are retrying a pending post that had files
@@ -45,13 +45,13 @@ export function createPost(post, files = []) {
 
             newPost = {
                 ...newPost,
-                file_ids: fileIds
+                file_ids: fileIds,
             };
 
             dispatch({
                 type: FileTypes.RECEIVED_FILES_FOR_POST,
                 postId: pendingPostId,
-                data: files
+                data: files,
             });
         }
 
@@ -59,7 +59,7 @@ export function createPost(post, files = []) {
             type: PostTypes.RECEIVED_NEW_POST,
             data: {
                 id: pendingPostId,
-                ...newPost
+                ...newPost,
             },
             meta: {
                 offline: {
@@ -71,22 +71,22 @@ export function createPost(post, files = []) {
                             data: {
                                 order: [],
                                 posts: {
-                                    [payload.id]: payload
-                                }
+                                    [payload.id]: payload,
+                                },
                             },
-                            channelId: payload.channel_id
+                            channelId: payload.channel_id,
                         }];
 
                         if (files) {
                             actions.push({
                                 type: FileTypes.RECEIVED_FILES_FOR_POST,
                                 postId: payload.id,
-                                data: files
+                                data: files,
                             });
                         }
 
                         actions.push({
-                            type: PostTypes.CREATE_POST_SUCCESS
+                            type: PostTypes.CREATE_POST_SUCCESS,
                         });
 
                         dispatch(batchActions(actions));
@@ -97,11 +97,11 @@ export function createPost(post, files = []) {
                         const data = {
                             ...newPost,
                             id: pendingPostId,
-                            failed: true
+                            failed: true,
                         };
 
                         const actions = [
-                            {type: PostTypes.CREATE_POST_FAILURE, error}
+                            {type: PostTypes.CREATE_POST_FAILURE, error},
                         ];
 
                         // If the failure was because: the root post was deleted or
@@ -113,14 +113,14 @@ export function createPost(post, files = []) {
                         } else {
                             actions.push({
                                 type: PostTypes.RECEIVED_POST,
-                                data
+                                data,
                             });
                         }
 
                         dispatch(batchActions(actions));
-                    }
-                }
-            }
+                    },
+                },
+            },
         });
 
         return {data: true};
@@ -139,7 +139,7 @@ export function createPostImmediately(post, files = []) {
             ...post,
             pending_post_id: pendingPostId,
             create_at: timestamp,
-            update_at: timestamp
+            update_at: timestamp,
         };
 
         if (files.length) {
@@ -147,13 +147,13 @@ export function createPostImmediately(post, files = []) {
 
             newPost = {
                 ...newPost,
-                file_ids: fileIds
+                file_ids: fileIds,
             };
 
             dispatch({
                 type: FileTypes.RECEIVED_FILES_FOR_POST,
                 postId: pendingPostId,
-                data: files
+                data: files,
             });
         }
 
@@ -161,8 +161,8 @@ export function createPostImmediately(post, files = []) {
             type: PostTypes.RECEIVED_NEW_POST,
             data: {
                 id: pendingPostId,
-                ...newPost
-            }
+                ...newPost,
+            },
         });
 
         try {
@@ -172,7 +172,7 @@ export function createPostImmediately(post, files = []) {
             forceLogoutIfNecessary(error, dispatch, getState);
             dispatch(batchActions([
                 {type: PostTypes.CREATE_POST_FAILURE, error},
-                logError(error)(dispatch)
+                logError(error)(dispatch),
             ]), getState);
             return {error};
         }
@@ -182,22 +182,22 @@ export function createPostImmediately(post, files = []) {
             data: {
                 order: [],
                 posts: {
-                    [newPost.id]: newPost
-                }
+                    [newPost.id]: newPost,
+                },
             },
-            channelId: newPost.channel_id
+            channelId: newPost.channel_id,
         }];
 
         if (files) {
             actions.push({
                 type: FileTypes.RECEIVED_FILES_FOR_POST,
                 postId: newPost.id,
-                data: files
+                data: files,
             });
         }
 
         actions.push({
-            type: PostTypes.CREATE_POST_SUCCESS
+            type: PostTypes.CREATE_POST_SUCCESS,
         });
 
         dispatch(batchActions(actions), getState);
@@ -223,10 +223,10 @@ export function deletePost(post) {
                     commit: {type: PostTypes.POST_DELETED},
                     rollback: {
                         type: PostTypes.RECEIVED_POST,
-                        data: delPost
-                    }
-                }
-            }
+                        data: delPost,
+                    },
+                },
+            },
         });
 
         return {data: true};
@@ -254,15 +254,15 @@ export function pinPost(postId) {
             forceLogoutIfNecessary(error, dispatch, getState);
             dispatch(batchActions([
                 {type: PostTypes.EDIT_POST_FAILURE, error},
-                logError(error)(dispatch)
+                logError(error)(dispatch),
             ]), getState);
             return {error};
         }
 
         const actions = [
             {
-                type: PostTypes.EDIT_POST_SUCCESS
-            }
+                type: PostTypes.EDIT_POST_SUCCESS,
+            },
         ];
 
         const post = Selectors.getPost(getState(), postId);
@@ -270,7 +270,7 @@ export function pinPost(postId) {
             actions.push(
                 {
                     type: PostTypes.RECEIVED_POST,
-                    data: {...post, is_pinned: true}
+                    data: {...post, is_pinned: true},
                 }
             );
         }
@@ -292,15 +292,15 @@ export function unpinPost(postId) {
             forceLogoutIfNecessary(error, dispatch, getState);
             dispatch(batchActions([
                 {type: PostTypes.EDIT_POST_FAILURE, error},
-                logError(error)(dispatch)
+                logError(error)(dispatch),
             ]), getState);
             return {error};
         }
 
         const actions = [
             {
-                type: PostTypes.EDIT_POST_SUCCESS
-            }
+                type: PostTypes.EDIT_POST_SUCCESS,
+            },
         ];
 
         const post = Selectors.getPost(getState(), postId);
@@ -308,7 +308,7 @@ export function unpinPost(postId) {
             actions.push(
                 {
                     type: PostTypes.RECEIVED_POST,
-                    data: {...post, is_pinned: false}
+                    data: {...post, is_pinned: false},
                 }
             );
         }
@@ -332,19 +332,19 @@ export function addReaction(postId, emojiName) {
             forceLogoutIfNecessary(error, dispatch, getState);
             dispatch(batchActions([
                 {type: PostTypes.REACTION_FAILURE, error},
-                logError(error)(dispatch)
+                logError(error)(dispatch),
             ]), getState);
             return {error};
         }
 
         dispatch(batchActions([
             {
-                type: PostTypes.REACTION_SUCCESS
+                type: PostTypes.REACTION_SUCCESS,
             },
             {
                 type: PostTypes.RECEIVED_REACTION,
-                data: reaction
-            }
+                data: reaction,
+            },
         ]));
 
         return {data: true};
@@ -363,19 +363,19 @@ export function removeReaction(postId, emojiName) {
             forceLogoutIfNecessary(error, dispatch, getState);
             dispatch(batchActions([
                 {type: PostTypes.REACTION_FAILURE, error},
-                logError(error)(dispatch)
+                logError(error)(dispatch),
             ]), getState);
             return {error};
         }
 
         dispatch(batchActions([
             {
-                type: PostTypes.REACTION_SUCCESS
+                type: PostTypes.REACTION_SUCCESS,
             },
             {
                 type: PostTypes.REACTION_DELETED,
-                data: {user_id: currentUserId, post_id: postId, emoji_name: emojiName}
-            }
+                data: {user_id: currentUserId, post_id: postId, emoji_name: emojiName},
+            },
         ]));
 
         return {data: true};
@@ -414,7 +414,7 @@ export function getReactionsForPost(postId) {
             forceLogoutIfNecessary(error, dispatch, getState);
             dispatch(batchActions([
                 {type: PostTypes.REACTION_FAILURE, error},
-                logError(error)(dispatch)
+                logError(error)(dispatch),
             ]), getState);
             return {error};
         }
@@ -450,13 +450,13 @@ export function getReactionsForPost(postId) {
 
         dispatch(batchActions([
             {
-                type: PostTypes.REACTION_SUCCESS
+                type: PostTypes.REACTION_SUCCESS,
             },
             {
                 type: PostTypes.RECEIVED_REACTIONS,
                 data: reactions,
-                postId
-            }
+                postId,
+            },
         ]));
 
         return reactions;
@@ -470,7 +470,7 @@ export function flagPost(postId) {
             user_id: currentUserId,
             category: Preferences.CATEGORY_FLAGGED_POST,
             name: postId,
-            value: 'true'
+            value: 'true',
         };
 
         Client4.trackEvent('action', 'action_posts_flag');
@@ -491,7 +491,7 @@ export function getPostThread(postId, skipAddToChannel = true) {
             forceLogoutIfNecessary(error, dispatch, getState);
             dispatch(batchActions([
                 {type: PostTypes.GET_POST_THREAD_FAILURE, error},
-                logError(error)(dispatch)
+                logError(error)(dispatch),
             ]), getState);
             return {error};
         }
@@ -503,11 +503,11 @@ export function getPostThread(postId, skipAddToChannel = true) {
                 type: PostTypes.RECEIVED_POSTS,
                 data: posts,
                 channelId: post.channel_id,
-                skipAddToChannel
+                skipAddToChannel,
             },
             {
-                type: PostTypes.GET_POST_THREAD_SUCCESS
-            }
+                type: PostTypes.GET_POST_THREAD_SUCCESS,
+            },
         ], 'BATCH_GET_POST_THREAD'), getState);
 
         return {data: posts};
@@ -517,7 +517,7 @@ export function getPostThread(postId, skipAddToChannel = true) {
 export function getPostThreadWithRetry(postId) {
     return async (dispatch, getState) => {
         dispatch({
-            type: PostTypes.GET_POST_THREAD_REQUEST
+            type: PostTypes.GET_POST_THREAD_REQUEST,
         });
 
         dispatch({
@@ -536,29 +536,29 @@ export function getPostThreadWithRetry(postId) {
                                 type: PostTypes.RECEIVED_POSTS,
                                 data: payload,
                                 channelId: post.channel_id,
-                                skipAddToChannel: true
+                                skipAddToChannel: true,
                             },
                             {
-                                type: PostTypes.GET_POST_THREAD_SUCCESS
-                            }
+                                type: PostTypes.GET_POST_THREAD_SUCCESS,
+                            },
                         ]), getState);
                     },
                     maxRetry: 2,
                     cancel: true,
                     onRetryScheduled: () => {
                         dispatch({
-                            type: PostTypes.GET_POST_THREAD_WITH_RETRY_ATTEMPT
+                            type: PostTypes.GET_POST_THREAD_WITH_RETRY_ATTEMPT,
                         });
                     },
                     rollback: (success, error) => {
                         forceLogoutIfNecessary(error, dispatch, getState);
                         dispatch(batchActions([
                             {type: PostTypes.GET_POST_THREAD_FAILURE, error},
-                            logError(error)(dispatch)
+                            logError(error)(dispatch),
                         ]), getState);
-                    }
-                }
-            }
+                    },
+                },
+            },
         });
 
         return {data: true};
@@ -577,7 +577,7 @@ export function getPosts(channelId, page = 0, perPage = Posts.POST_CHUNK_SIZE) {
             forceLogoutIfNecessary(error, dispatch, getState);
             dispatch(batchActions([
                 {type: PostTypes.GET_POSTS_FAILURE, error},
-                logError(error)(dispatch)
+                logError(error)(dispatch),
             ]), getState);
             return {error};
         }
@@ -586,11 +586,11 @@ export function getPosts(channelId, page = 0, perPage = Posts.POST_CHUNK_SIZE) {
             {
                 type: PostTypes.RECEIVED_POSTS,
                 data: posts,
-                channelId
+                channelId,
             },
             {
-                type: PostTypes.GET_POSTS_SUCCESS
-            }
+                type: PostTypes.GET_POSTS_SUCCESS,
+            },
         ]), getState);
 
         return {data: posts};
@@ -600,7 +600,7 @@ export function getPosts(channelId, page = 0, perPage = Posts.POST_CHUNK_SIZE) {
 export function getPostsWithRetry(channelId, page = 0, perPage = Posts.POST_CHUNK_SIZE) {
     return async (dispatch, getState) => {
         dispatch({
-            type: PostTypes.GET_POSTS_REQUEST
+            type: PostTypes.GET_POSTS_REQUEST,
         });
 
         dispatch({
@@ -617,29 +617,29 @@ export function getPostsWithRetry(channelId, page = 0, perPage = Posts.POST_CHUN
                             {
                                 type: PostTypes.RECEIVED_POSTS,
                                 data: payload,
-                                channelId
+                                channelId,
                             },
                             {
-                                type: PostTypes.GET_POSTS_SUCCESS
-                            }
+                                type: PostTypes.GET_POSTS_SUCCESS,
+                            },
                         ]), getState);
                     },
                     maxRetry: 2,
                     cancel: true,
                     onRetryScheduled: () => {
                         dispatch({
-                            type: PostTypes.GET_POSTS_WITH_RETRY_ATTEMPT
+                            type: PostTypes.GET_POSTS_WITH_RETRY_ATTEMPT,
                         });
                     },
                     rollback: (success, error) => {
                         forceLogoutIfNecessary(error, dispatch, getState);
                         dispatch(batchActions([
                             {type: PostTypes.GET_POSTS_FAILURE, error},
-                            logError(error)(dispatch)
+                            logError(error)(dispatch),
                         ]), getState);
-                    }
-                }
-            }
+                    },
+                },
+            },
         });
 
         return {data: true};
@@ -658,7 +658,7 @@ export function getPostsSince(channelId, since) {
             forceLogoutIfNecessary(error, dispatch, getState);
             dispatch(batchActions([
                 {type: PostTypes.GET_POSTS_SINCE_FAILURE, error},
-                logError(error)(dispatch)
+                logError(error)(dispatch),
             ]), getState);
             return {error};
         }
@@ -667,11 +667,11 @@ export function getPostsSince(channelId, since) {
             {
                 type: PostTypes.RECEIVED_POSTS,
                 data: posts,
-                channelId
+                channelId,
             },
             {
-                type: PostTypes.GET_POSTS_SINCE_SUCCESS
-            }
+                type: PostTypes.GET_POSTS_SINCE_SUCCESS,
+            },
         ]), getState);
 
         return {data: posts};
@@ -696,29 +696,29 @@ export function getPostsSinceWithRetry(channelId, since) {
                             {
                                 type: PostTypes.RECEIVED_POSTS,
                                 data: payload,
-                                channelId
+                                channelId,
                             },
                             {
-                                type: PostTypes.GET_POSTS_SINCE_SUCCESS
-                            }
+                                type: PostTypes.GET_POSTS_SINCE_SUCCESS,
+                            },
                         ]), getState);
                     },
                     maxRetry: 2,
                     cancel: true,
                     onRetryScheduled: () => {
                         dispatch({
-                            type: PostTypes.GET_POSTS_SINCE_WITH_RETRY_ATTEMPT
+                            type: PostTypes.GET_POSTS_SINCE_WITH_RETRY_ATTEMPT,
                         });
                     },
                     rollback: (success, error) => {
                         forceLogoutIfNecessary(error, dispatch, getState);
                         dispatch(batchActions([
                             {type: PostTypes.GET_POSTS_SINCE_FAILURE, error},
-                            logError(error)(dispatch)
+                            logError(error)(dispatch),
                         ]), getState);
-                    }
-                }
-            }
+                    },
+                },
+            },
         });
 
         return {data: true};
@@ -737,7 +737,7 @@ export function getPostsBefore(channelId, postId, page = 0, perPage = Posts.POST
             forceLogoutIfNecessary(error, dispatch, getState);
             dispatch(batchActions([
                 {type: PostTypes.GET_POSTS_BEFORE_FAILURE, error},
-                logError(error)(dispatch)
+                logError(error)(dispatch),
             ]), getState);
             return {error};
         }
@@ -746,11 +746,11 @@ export function getPostsBefore(channelId, postId, page = 0, perPage = Posts.POST
             {
                 type: PostTypes.RECEIVED_POSTS,
                 data: posts,
-                channelId
+                channelId,
             },
             {
-                type: PostTypes.GET_POSTS_BEFORE_SUCCESS
-            }
+                type: PostTypes.GET_POSTS_BEFORE_SUCCESS,
+            },
         ]), getState);
 
         return {data: posts};
@@ -760,7 +760,7 @@ export function getPostsBefore(channelId, postId, page = 0, perPage = Posts.POST
 export function getPostsBeforeWithRetry(channelId, postId, page = 0, perPage = Posts.POST_CHUNK_SIZE) {
     return async (dispatch, getState) => {
         dispatch({
-            type: PostTypes.GET_POSTS_BEFORE_REQUEST
+            type: PostTypes.GET_POSTS_BEFORE_REQUEST,
         });
 
         dispatch({
@@ -777,29 +777,29 @@ export function getPostsBeforeWithRetry(channelId, postId, page = 0, perPage = P
                             {
                                 type: PostTypes.RECEIVED_POSTS,
                                 data: payload,
-                                channelId
+                                channelId,
                             },
                             {
-                                type: PostTypes.GET_POSTS_BEFORE_SUCCESS
-                            }
+                                type: PostTypes.GET_POSTS_BEFORE_SUCCESS,
+                            },
                         ]), getState);
                     },
                     maxRetry: 2,
                     cancel: true,
                     onRetryScheduled: () => {
                         dispatch({
-                            type: PostTypes.GET_POSTS_BEFORE_WITH_RETRY_ATTEMPT
+                            type: PostTypes.GET_POSTS_BEFORE_WITH_RETRY_ATTEMPT,
                         });
                     },
                     rollback: (success, error) => {
                         forceLogoutIfNecessary(error, dispatch, getState);
                         dispatch(batchActions([
                             {type: PostTypes.GET_POSTS_BEFORE_FAILURE, error},
-                            logError(error)(dispatch)
+                            logError(error)(dispatch),
                         ]), getState);
-                    }
-                }
-            }
+                    },
+                },
+            },
         });
 
         return {data: true};
@@ -818,7 +818,7 @@ export function getPostsAfter(channelId, postId, page = 0, perPage = Posts.POST_
             forceLogoutIfNecessary(error, dispatch, getState);
             dispatch(batchActions([
                 {type: PostTypes.GET_POSTS_AFTER_FAILURE, error},
-                logError(error)(dispatch)
+                logError(error)(dispatch),
             ]), getState);
             return {error};
         }
@@ -827,11 +827,11 @@ export function getPostsAfter(channelId, postId, page = 0, perPage = Posts.POST_
             {
                 type: PostTypes.RECEIVED_POSTS,
                 data: posts,
-                channelId
+                channelId,
             },
             {
-                type: PostTypes.GET_POSTS_AFTER_SUCCESS
-            }
+                type: PostTypes.GET_POSTS_AFTER_SUCCESS,
+            },
         ]), getState);
 
         return {data: posts};
@@ -841,7 +841,7 @@ export function getPostsAfter(channelId, postId, page = 0, perPage = Posts.POST_
 export function getPostsAfterWithRetry(channelId, postId, page = 0, perPage = Posts.POST_CHUNK_SIZE) {
     return async (dispatch, getState) => {
         dispatch({
-            type: PostTypes.GET_POSTS_AFTER_REQUEST
+            type: PostTypes.GET_POSTS_AFTER_REQUEST,
         });
 
         dispatch({
@@ -858,29 +858,29 @@ export function getPostsAfterWithRetry(channelId, postId, page = 0, perPage = Po
                             {
                                 type: PostTypes.RECEIVED_POSTS,
                                 data: payload,
-                                channelId
+                                channelId,
                             },
                             {
-                                type: PostTypes.GET_POSTS_AFTER_SUCCESS
-                            }
+                                type: PostTypes.GET_POSTS_AFTER_SUCCESS,
+                            },
                         ]), getState);
                     },
                     maxRetry: 2,
                     cancel: true,
                     onRetryScheduled: () => {
                         dispatch({
-                            type: PostTypes.GET_POSTS_AFTER_WITH_RETRY_ATTEMPT
+                            type: PostTypes.GET_POSTS_AFTER_WITH_RETRY_ATTEMPT,
                         });
                     },
                     rollback: (success, error) => {
                         forceLogoutIfNecessary(error, dispatch, getState);
                         dispatch(batchActions([
                             {type: PostTypes.GET_POSTS_AFTER_FAILURE, error},
-                            logError(error)(dispatch)
+                            logError(error)(dispatch),
                         ]), getState);
-                    }
-                }
-            }
+                    },
+                },
+            },
         });
 
         return {data: true};
@@ -1011,7 +1011,7 @@ export function removePost(post) {
     return async (dispatch, getState) => {
         dispatch({
             type: PostTypes.REMOVE_POST,
-            data: {...post}
+            data: {...post},
         }, getState);
 
         return {data: true};
@@ -1022,7 +1022,7 @@ export function selectPost(postId) {
     return async (dispatch, getState) => {
         dispatch({
             type: PostTypes.RECEIVED_POST_SELECTED,
-            data: postId
+            data: postId,
         }, getState);
 
         return {data: true};
@@ -1032,7 +1032,7 @@ export function selectPost(postId) {
 export function selectFocusedPostId(postId) {
     return {
         type: PostTypes.RECEIVED_FOCUSED_POST,
-        data: postId
+        data: postId,
     };
 }
 
@@ -1042,7 +1042,7 @@ export function unflagPost(postId) {
         const preference = {
             user_id: currentUserId,
             category: Preferences.CATEGORY_FLAGGED_POST,
-            name: postId
+            name: postId,
         };
 
         Client4.trackEvent('action', 'action_posts_unflag');
@@ -1062,20 +1062,20 @@ export function getOpenGraphMetadata(url) {
             forceLogoutIfNecessary(error, dispatch, getState);
             dispatch(batchActions([
                 {type: PostTypes.OPEN_GRAPH_FAILURE, error},
-                logError(error)(dispatch)
+                logError(error)(dispatch),
             ]), getState);
             return {error};
         }
 
         const actions = [{
-            type: PostTypes.OPEN_GRAPH_SUCCESS
+            type: PostTypes.OPEN_GRAPH_SUCCESS,
         }];
 
         if (data.description) {
             actions.push({
                 type: PostTypes.RECEIVED_OPEN_GRAPH_METADATA,
                 data,
-                url
+                url,
             });
         }
 
@@ -1100,7 +1100,7 @@ export function addMessageIntoHistory(message) {
     return async (dispatch, getState) => {
         dispatch({
             type: PostTypes.ADD_MESSAGE_INTO_HISTORY,
-            data: message
+            data: message,
         }, getState);
 
         return {data: true};
@@ -1111,7 +1111,7 @@ export function resetHistoryIndex(index) {
     return async (dispatch, getState) => {
         dispatch({
             type: PostTypes.RESET_HISTORY_INDEX,
-            data: index
+            data: index,
         }, getState);
 
         return {data: true};
@@ -1122,7 +1122,7 @@ export function moveHistoryIndexBack(index) {
     return async (dispatch, getState) => {
         dispatch({
             type: PostTypes.MOVE_HISTORY_INDEX_BACK,
-            data: index
+            data: index,
         }, getState);
 
         return {data: true};
@@ -1133,7 +1133,7 @@ export function moveHistoryIndexForward(index) {
     return async (dispatch, getState) => {
         dispatch({
             type: PostTypes.MOVE_HISTORY_INDEX_FORWARD,
-            data: index
+            data: index,
         }, getState);
 
         return {data: true};
@@ -1162,5 +1162,5 @@ export default {
     addMessageIntoHistory,
     resetHistoryIndex,
     moveHistoryIndexBack,
-    moveHistoryIndexForward
+    moveHistoryIndexForward,
 };

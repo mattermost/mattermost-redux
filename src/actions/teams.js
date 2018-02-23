@@ -43,7 +43,7 @@ export function selectTeam(team) {
     return async (dispatch, getState) => {
         dispatch({
             type: TeamTypes.SELECT_TEAM,
-            data: team.id
+            data: team.id,
         }, getState);
 
         return {data: true};
@@ -110,7 +110,7 @@ export function createTeam(team) {
             forceLogoutIfNecessary(error, dispatch, getState);
             dispatch(batchActions([
                 {type: TeamTypes.CREATE_TEAM_FAILURE, error},
-                logError(error)(dispatch)
+                logError(error)(dispatch),
             ]), getState);
             return {error};
         }
@@ -121,25 +121,25 @@ export function createTeam(team) {
             roles: `${General.TEAM_ADMIN_ROLE} ${General.TEAM_USER_ROLE}`,
             delete_at: 0,
             msg_count: 0,
-            mention_count: 0
+            mention_count: 0,
         };
 
         dispatch(batchActions([
             {
                 type: TeamTypes.CREATED_TEAM,
-                data: created
+                data: created,
             },
             {
                 type: TeamTypes.RECEIVED_MY_TEAM_MEMBER,
-                data: member
+                data: member,
             },
             {
                 type: TeamTypes.SELECT_TEAM,
-                data: created.id
+                data: created.id,
             },
             {
-                type: TeamTypes.CREATE_TEAM_SUCCESS
-            }
+                type: TeamTypes.CREATE_TEAM_SUCCESS,
+            },
         ]), getState);
 
         return {data: created};
@@ -156,7 +156,7 @@ export function deleteTeam(teamId) {
             forceLogoutIfNecessary(error, dispatch);
             dispatch(batchActions([
                 {type: TeamTypes.DELETE_TEAM_FAILURE, error},
-                logError(error)(dispatch)
+                logError(error)(dispatch),
             ]), getState);
             return {error};
         }
@@ -172,10 +172,10 @@ export function deleteTeam(teamId) {
         actions.push(
             {
                 type: TeamTypes.RECEIVED_TEAM_DELETED,
-                data: {id: teamId}
+                data: {id: teamId},
             },
             {
-                type: TeamTypes.DELETE_TEAM_SUCCESS
+                type: TeamTypes.DELETE_TEAM_SUCCESS,
             }
         );
 
@@ -231,7 +231,7 @@ export function getTeamMember(teamId, userId) {
             forceLogoutIfNecessary(error, dispatch, getState);
             dispatch(batchActions([
                 {type: TeamTypes.TEAM_MEMBERS_FAILURE, error},
-                logError(error)(dispatch)
+                logError(error)(dispatch),
             ]), getState);
             return {error};
         }
@@ -239,11 +239,11 @@ export function getTeamMember(teamId, userId) {
         dispatch(batchActions([
             {
                 type: TeamTypes.RECEIVED_MEMBERS_IN_TEAM,
-                data: [member]
+                data: [member],
             },
             {
-                type: TeamTypes.TEAM_MEMBERS_SUCCESS
-            }
+                type: TeamTypes.TEAM_MEMBERS_SUCCESS,
+            },
         ]), getState);
 
         return {data: member};
@@ -265,7 +265,7 @@ export function getTeamMembersByIds(teamId, userIds) {
             forceLogoutIfNecessary(error, dispatch, getState);
             dispatch(batchActions([
                 {type: TeamTypes.TEAM_MEMBERS_FAILURE, error},
-                logError(error)(dispatch)
+                logError(error)(dispatch),
             ]), getState);
             return {error};
         }
@@ -273,11 +273,11 @@ export function getTeamMembersByIds(teamId, userIds) {
         dispatch(batchActions([
             {
                 type: TeamTypes.RECEIVED_MEMBERS_IN_TEAM,
-                data: members
+                data: members,
             },
             {
-                type: TeamTypes.TEAM_MEMBERS_SUCCESS
-            }
+                type: TeamTypes.TEAM_MEMBERS_SUCCESS,
+            },
         ]), getState);
 
         return {data: members};
@@ -325,7 +325,7 @@ export function addUserToTeam(teamId, userId) {
             forceLogoutIfNecessary(error, dispatch, getState);
             dispatch(batchActions([
                 {type: TeamTypes.ADD_TEAM_MEMBER_FAILURE, error},
-                logError(error)(dispatch)
+                logError(error)(dispatch),
             ]), getState);
             return {error};
         }
@@ -334,15 +334,15 @@ export function addUserToTeam(teamId, userId) {
             {
                 type: UserTypes.RECEIVED_PROFILE_IN_TEAM,
                 data: {user_id: userId},
-                id: teamId
+                id: teamId,
             },
             {
                 type: TeamTypes.RECEIVED_MEMBER_IN_TEAM,
-                data: member
+                data: member,
             },
             {
-                type: TeamTypes.ADD_TEAM_MEMBER_SUCCESS
-            }
+                type: TeamTypes.ADD_TEAM_MEMBER_SUCCESS,
+            },
         ]), getState);
 
         return {data: member};
@@ -360,7 +360,7 @@ export function addUsersToTeam(teamId, userIds) {
             forceLogoutIfNecessary(error, dispatch, getState);
             dispatch(batchActions([
                 {type: TeamTypes.ADD_TEAM_MEMBER_FAILURE, error},
-                logError(error)(dispatch)
+                logError(error)(dispatch),
             ]), getState);
             return {error};
         }
@@ -372,15 +372,15 @@ export function addUsersToTeam(teamId, userIds) {
             {
                 type: UserTypes.RECEIVED_PROFILES_LIST_IN_TEAM,
                 data: profiles,
-                id: teamId
+                id: teamId,
             },
             {
                 type: TeamTypes.RECEIVED_MEMBERS_IN_TEAM,
-                data: members
+                data: members,
             },
             {
-                type: TeamTypes.ADD_TEAM_MEMBER_SUCCESS
-            }
+                type: TeamTypes.ADD_TEAM_MEMBER_SUCCESS,
+            },
         ]), getState);
 
         return {data: members};
@@ -397,29 +397,29 @@ export function removeUserFromTeam(teamId, userId) {
             forceLogoutIfNecessary(error, dispatch, getState);
             dispatch(batchActions([
                 {type: TeamTypes.REMOVE_TEAM_MEMBER_FAILURE, error},
-                logError(error)(dispatch)
+                logError(error)(dispatch),
             ]), getState);
             return {error};
         }
 
         const member = {
             team_id: teamId,
-            user_id: userId
+            user_id: userId,
         };
 
         const actions = [
             {
                 type: UserTypes.RECEIVED_PROFILE_NOT_IN_TEAM,
                 data: {user_id: userId},
-                id: teamId
+                id: teamId,
             },
             {
                 type: TeamTypes.REMOVE_MEMBER_FROM_TEAM,
-                data: member
+                data: member,
             },
             {
-                type: TeamTypes.REMOVE_TEAM_MEMBER_SUCCESS
-            }
+                type: TeamTypes.REMOVE_TEAM_MEMBER_SUCCESS,
+            },
         ];
 
         const state = getState();
@@ -433,7 +433,7 @@ export function removeUserFromTeam(teamId, userId) {
                 if (channel && channel.team_id === teamId) {
                     actions.push({
                         type: ChannelTypes.LEAVE_CHANNEL,
-                        data: channel
+                        data: channel,
                     });
                 }
             }
@@ -455,15 +455,15 @@ export function updateTeamMemberRoles(teamId, userId, roles) {
             forceLogoutIfNecessary(error, dispatch, getState);
             dispatch(batchActions([
                 {type: TeamTypes.UPDATE_TEAM_MEMBER_FAILURE, error},
-                logError(error)(dispatch)
+                logError(error)(dispatch),
             ]), getState);
             return {error};
         }
 
         const actions = [
             {
-                type: TeamTypes.UPDATE_TEAM_MEMBER_SUCCESS
-            }
+                type: TeamTypes.UPDATE_TEAM_MEMBER_SUCCESS,
+            },
         ];
 
         const membersInTeam = getState().entities.teams.membersInTeam[teamId];
@@ -471,7 +471,7 @@ export function updateTeamMemberRoles(teamId, userId, roles) {
             actions.push(
                 {
                     type: TeamTypes.RECEIVED_MEMBER_IN_TEAM,
-                    data: {...membersInTeam[userId], roles}
+                    data: {...membersInTeam[userId], roles},
                 }
             );
         }
@@ -504,7 +504,7 @@ export function checkIfTeamExists(teamName) {
             forceLogoutIfNecessary(error, dispatch, getState);
             dispatch(batchActions([
                 {type: TeamTypes.GET_TEAM_FAILURE, error},
-                logError(error)(dispatch)
+                logError(error)(dispatch),
             ]));
             return {error};
         }
@@ -531,7 +531,7 @@ export function joinTeam(inviteId, teamId) {
             forceLogoutIfNecessary(error, dispatch, getState);
             dispatch(batchActions([
                 {type: TeamTypes.JOIN_TEAM_FAILURE, error},
-                logError(error)(dispatch)
+                logError(error)(dispatch),
             ]), getState);
             return {error};
         }
@@ -540,7 +540,7 @@ export function joinTeam(inviteId, teamId) {
 
         await Promise.all([
             getTeam(teamId)(dispatch, getState),
-            getMyTeamMembers()(dispatch, getState)
+            getMyTeamMembers()(dispatch, getState),
         ]);
 
         dispatch({type: TeamTypes.JOIN_TEAM_SUCCESS}, getState);

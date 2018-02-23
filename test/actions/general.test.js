@@ -104,7 +104,7 @@ describe('Actions.General', () => {
             message_deletion_enabled: true,
             file_deletion_enabled: false,
             message_retention_cutoff: Date.now(),
-            file_retention_cutoff: 0
+            file_retention_cutoff: 0,
         };
 
         nock(Client4.getBaseRoute()).

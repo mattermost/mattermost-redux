@@ -28,5 +28,5 @@ export default combineReducers({
     emojis,
     admin,
     jobs,
-    search
+    search,
 });

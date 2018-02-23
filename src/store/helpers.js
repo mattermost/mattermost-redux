@@ -3,7 +3,7 @@
 
 export const defaultOptions = {
     additionalMiddleware: [],
-    enableBuffer: true
+    enableBuffer: true,
 };
 
 export const offlineConfig = {
@@ -22,5 +22,5 @@ export const offlineConfig = {
         }
 
         return retries > 10;
-    }
+    },
 };

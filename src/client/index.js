@@ -9,5 +9,5 @@ const Client4 = new ClientClass4();
 
 export {
     Client,
-    Client4
+    Client4,
 };

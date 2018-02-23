@@ -15,19 +15,19 @@ import {
     markChannelAsUnread,
     markChannelAsRead,
     selectChannel,
-    markChannelAsViewed
+    markChannelAsViewed,
 } from './channels';
 import {
     getPosts,
     getPostsSince,
     getProfilesAndStatusesForPosts,
-    getCustomEmojiForReaction
+    getCustomEmojiForReaction,
 } from './posts';
 
 import {
     getMyPreferences,
     makeDirectChannelVisibleIfNecessary,
-    makeGroupMessageVisibleIfNecessary
+    makeGroupMessageVisibleIfNecessary,
 } from './preferences';
 
 import {getTeam, getTeams, getMyTeams, getMyTeamMembers, getMyTeamUnreads} from './teams';
@@ -39,7 +39,7 @@ import {
     PostTypes,
     PreferenceTypes,
     TeamTypes,
-    UserTypes
+    UserTypes,
 } from 'action_types';
 import {General, WebsocketEvents, Preferences, Posts} from 'constants';
 
@@ -82,7 +82,7 @@ export function init(platform, siteUrl, token, optionalWebSocket) {
 
         const websocketOpts = {
             connectionUrl: connUrl,
-            platform
+            platform,
         };
 
         if (optionalWebSocket) {
@@ -143,8 +143,8 @@ async function handleReconnect(dispatch, getState) {
             const newMsg = {
                 data: {
                     user_id: currentUserId,
-                    team_id: currentTeamId
-                }
+                    team_id: currentTeamId,
+                },
             };
             handleLeaveTeamEvent(newMsg, dispatch, getState);
             return dispatch({type: GeneralTypes.WEBSOCKET_SUCCESS}, getState);
@@ -293,7 +293,7 @@ async function handleNewPostEvent(msg, dispatch, getState) {
             dispatch({
                 type: PostTypes.RECEIVED_POSTS,
                 data,
-                channelId: post.channel_id
+                channelId: post.channel_id,
             }, getState);
         });
     }
@@ -302,8 +302,8 @@ async function handleNewPostEvent(msg, dispatch, getState) {
         type: WebsocketEvents.STOP_TYPING,
         data: {
             id: post.channel_id + post.root_id,
-            userId: post.user_id
-        }
+            userId: post.user_id,
+        },
     }];
 
     if (!posts[post.id]) {
@@ -319,10 +319,10 @@ async function handleNewPostEvent(msg, dispatch, getState) {
             data: {
                 order: [],
                 posts: {
-                    [post.id]: post
-                }
+                    [post.id]: post,
+                },
             },
-            channelId: post.channel_id
+            channelId: post.channel_id,
         });
     }
 
@@ -388,7 +388,7 @@ function handleUpdateTeamEvent(msg, dispatch, getState) {
 async function handleTeamAddedEvent(msg, dispatch, getState) {
     await Promise.all([
         getTeam(msg.data.team_id)(dispatch, getState),
-        getMyTeamUnreads()(dispatch, getState)
+        getMyTeamUnreads()(dispatch, getState),
     ]);
 }
 
@@ -423,8 +423,8 @@ function handleUserRemovedEvent(msg, dispatch, getState) {
                 id: msg.data.channel_id,
                 user_id: currentUserId,
                 team_id: channel.team_id,
-                type: channel.type
-            }
+                type: channel.type,
+            },
         }, getState);
 
         if (msg.data.channel_id === currentChannelId) {
@@ -448,15 +448,15 @@ function handleUserUpdatedEvent(msg, dispatch, getState) {
             type: UserTypes.RECEIVED_ME,
             data: {
                 ...currentUser,
-                last_picture_update: user.last_picture_update
-            }
+                last_picture_update: user.last_picture_update,
+            },
         });
     } else {
         dispatch({
             type: UserTypes.RECEIVED_PROFILES,
             data: {
-                [user.id]: user
-            }
+                [user.id]: user,
+            },
         }, getState);
     }
 }
@@ -509,7 +509,7 @@ function handleChannelUpdatedEvent(msg, dispatch, getState) {
     if (channel) {
         dispatch({
             type: ChannelTypes.RECEIVED_CHANNEL,
-            data: channel
+            data: channel,
         });
 
         if (currentChannelId === channel.id) {
@@ -594,7 +594,7 @@ function handlePreferencesDeletedEvent(msg, dispatch, getState) {
 function handleStatusChangedEvent(msg, dispatch, getState) {
     dispatch({
         type: UserTypes.RECEIVED_STATUSES,
-        data: [{user_id: msg.data.user_id, status: msg.data.status}]
+        data: [{user_id: msg.data.user_id, status: msg.data.status}],
     }, getState);
 }
 
@@ -615,18 +615,18 @@ function handleUserTypingEvent(msg, dispatch, getState) {
     const data = {
         id: msg.broadcast.channel_id + msg.data.parent_id,
         userId,
-        now: Date.now()
+        now: Date.now(),
     };
 
     dispatch({
         type: WebsocketEvents.TYPING,
-        data
+        data,
     }, getState);
 
     setTimeout(() => {
         dispatch({
             type: WebsocketEvents.STOP_TYPING,
-            data
+            data,
         }, getState);
     }, parseInt(config.TimeBetweenUserTypingUpdatesMilliseconds, 10));
 
@@ -648,7 +648,7 @@ function handleReactionAddedEvent(msg, dispatch, getState) {
 
     dispatch({
         type: PostTypes.RECEIVED_REACTION,
-        data: reaction
+        data: reaction,
     }, getState);
 }
 
@@ -658,7 +658,7 @@ function handleReactionRemovedEvent(msg, dispatch, getState) {
 
     dispatch({
         type: PostTypes.REACTION_DELETED,
-        data: reaction
+        data: reaction,
     }, getState);
 }
 
@@ -667,7 +667,7 @@ function handleAddEmoji(msg, dispatch) {
 
     dispatch({
         type: EmojiTypes.RECEIVED_CUSTOM_EMOJI,
-        data
+        data,
     });
 }
 

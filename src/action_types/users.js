@@ -161,5 +161,5 @@ export default keyMirror({
     CLEAR_MY_USER_ACCESS_TOKENS: null,
     REVOKED_USER_ACCESS_TOKEN: null,
     DISABLED_USER_ACCESS_TOKEN: null,
-    ENABLED_USER_ACCESS_TOKEN: null
+    ENABLED_USER_ACCESS_TOKEN: null,
 });

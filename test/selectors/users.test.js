@@ -57,18 +57,18 @@ describe('Selectors.Users', () => {
                 profilesNotInTeam,
                 profilesWithoutTeam,
                 profilesInChannel,
-                profilesNotInChannel
+                profilesNotInChannel,
             },
             teams: {
-                currentTeamId: team1.id
+                currentTeamId: team1.id,
             },
             channels: {
-                currentChannelId: channel1.id
+                currentChannelId: channel1.id,
             },
             preferences: {
-                myPreferences
-            }
-        }
+                myPreferences,
+            },
+        },
     });
 
     it('getUserIdsInChannels', () => {
@@ -108,10 +108,10 @@ describe('Selectors.Users', () => {
                     users: {
                         currentUserId: userId,
                         profiles: {
-                            [userId]: {id: userId, username: 'user', first_name: 'First', last_name: 'Last', notify_props: notifyProps}
-                        }
-                    }
-                }
+                            [userId]: {id: userId, username: 'user', first_name: 'First', last_name: 'Last', notify_props: notifyProps},
+                        },
+                    },
+                },
             };
 
             assert.deepEqual(Selectors.getCurrentUserMentionKeys(state), [{key: '@user'}]);
@@ -120,17 +120,17 @@ describe('Selectors.Users', () => {
         it('channel', () => {
             const userId = '1234';
             const notifyProps = {
-                channel: 'true'
+                channel: 'true',
             };
             const state = {
                 entities: {
                     users: {
                         currentUserId: userId,
                         profiles: {
-                            [userId]: {id: userId, username: 'user', first_name: 'First', last_name: 'Last', notify_props: notifyProps}
-                        }
-                    }
-                }
+                            [userId]: {id: userId, username: 'user', first_name: 'First', last_name: 'Last', notify_props: notifyProps},
+                        },
+                    },
+                },
             };
 
             assert.deepEqual(Selectors.getCurrentUserMentionKeys(state), [{key: '@channel'}, {key: '@all'}, {key: '@here'}, {key: '@user'}]);
@@ -139,17 +139,17 @@ describe('Selectors.Users', () => {
         it('first name', () => {
             const userId = '1234';
             const notifyProps = {
-                first_name: 'true'
+                first_name: 'true',
             };
             const state = {
                 entities: {
                     users: {
                         currentUserId: userId,
                         profiles: {
-                            [userId]: {id: userId, username: 'user', first_name: 'First', last_name: 'Last', notify_props: notifyProps}
-                        }
-                    }
-                }
+                            [userId]: {id: userId, username: 'user', first_name: 'First', last_name: 'Last', notify_props: notifyProps},
+                        },
+                    },
+                },
             };
 
             assert.deepEqual(Selectors.getCurrentUserMentionKeys(state), [{key: 'First', caseSensitive: true}, {key: '@user'}]);
@@ -158,17 +158,17 @@ describe('Selectors.Users', () => {
         it('custom keys', () => {
             const userId = '1234';
             const notifyProps = {
-                mention_keys: 'test,foo,@user,user'
+                mention_keys: 'test,foo,@user,user',
             };
             const state = {
                 entities: {
                     users: {
                         currentUserId: userId,
                         profiles: {
-                            [userId]: {id: userId, username: 'user', first_name: 'First', last_name: 'Last', notify_props: notifyProps}
-                        }
-                    }
-                }
+                            [userId]: {id: userId, username: 'user', first_name: 'First', last_name: 'Last', notify_props: notifyProps},
+                        },
+                    },
+                },
             };
 
             assert.deepEqual(Selectors.getCurrentUserMentionKeys(state), [{key: 'test'}, {key: 'foo'}, {key: '@user'}, {key: 'user'}]);

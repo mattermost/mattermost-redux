@@ -7,7 +7,7 @@ import {
     getCurrentChannelId,
     getCurrentUser,
     getCurrentUserId,
-    getUsers
+    getUsers,
 } from 'selectors/entities/common';
 import {getMyCurrentChannelMembership} from 'selectors/entities/channels';
 import {getDirectShowPreferences} from 'selectors/entities/preferences';
@@ -17,7 +17,7 @@ import {filterProfilesMatchingTerm, sortByUsername, isSystemAdmin} from 'utils/u
 export {
     getCurrentUserId,
     getCurrentUser,
-    getUsers
+    getUsers,
 };
 
 export function getUserIdsInChannels(state) {

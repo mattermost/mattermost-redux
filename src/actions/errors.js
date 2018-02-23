@@ -9,7 +9,7 @@ import EventEmitter from 'utils/event_emitter';
 export function dismissErrorObject(index) {
     return {
         type: ErrorTypes.DISMISS_ERROR,
-        index
+        index,
     };
 }
 
@@ -25,7 +25,7 @@ export function getLogErrorAction(error, displayable = false) {
     return {
         type: ErrorTypes.LOG_ERROR,
         displayable,
-        error
+        error,
     };
 }
 

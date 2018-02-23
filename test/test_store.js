@@ -19,9 +19,9 @@ export default async function testConfigureStore(preloadedState) {
         persistOptions: {
             debounce: 1000,
             transforms: [
-                storageTransform
+                storageTransform,
             ],
-            whitelist: []
+            whitelist: [],
         },
         retry: (action, retries) => 200 * (retries + 1),
         discard: (error, action, retries) => {
@@ -30,7 +30,7 @@ export default async function testConfigureStore(preloadedState) {
             }
 
             return retries >= 1;
-        }
+        },
     };
 
     const store = configureStore(preloadedState, {}, offlineConfig, () => ({}), {enableBuffer: false});
