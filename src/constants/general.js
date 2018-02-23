@@ -3,6 +3,7 @@
 
 export default {
     CONFIG_CHANGED: 'config_changed',
+    SERVER_VERSION_CHANGED: 'server_version_changed',
 
     PAGE_SIZE_DEFAULT: 60,
     PAGE_SIZE_MAXIMUM: 200,
