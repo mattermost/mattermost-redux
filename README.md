@@ -12,7 +12,7 @@ Mattermost is an open source Slack-alternative used by thousands of companies ar
 
 To hook up your application to the mattermost-redux store:
 
-```
+```javascript
 import configureServiceStore from 'mattermost-redux/store';
 
 configureServiceStore(yourInitialState, yourAppReducers, yourOfflineOptions);
@@ -31,7 +31,7 @@ const store = configureStore();
 If you're only looking to use the v4 JavaScript web client for the Mattermost server:
 
 With async/await:
-```
+```javascript
 import {Client4} from 'mattermost-redux/client';
 
 Client4.setUrl('https://your-mattermost-url.com');
@@ -58,7 +58,7 @@ async function loginAndGetUser(username, password) {
 ```
 
 With promises:
-```
+```javascript
 import {Client4} from 'mattermost-redux/client';
 
 Client4.setUrl('https://your-mattermost-url.com');
@@ -86,7 +86,7 @@ function loginAndGetUser(username, password, callback) {
 
 If you already have a [personal access token](https://docs.mattermost.com/guides/developer/personal-access-tokens.html) or session token, you can set the token manually instead of logging in:
 
-```
+```javascript
 import {Client4} from 'mattermost-redux/client';
 
 Client4.setUrl('https://your-mattermost-url.com');
@@ -105,7 +105,7 @@ $ make bundle
 
 This will generate `lib/mattermost.client.js`, `lib/mattermost.client4.js`, and `lib/mattermost.websocket.js` which can be loaded in a browser. Also note that `babel-polyfill` is required.
 
-```
+```html
 <script src="/path/to/babel/polyfill.js"></script>
 <script src="/path/to/mattermost.client4.js"></script>
 <script src="/path/to/mattermost.websocket.js"></script>
@@ -136,7 +136,7 @@ This will generate `lib/mattermost.client.js`, `lib/mattermost.client4.js`, and 
 
 Running the client from node.js requires making the `fetch` and `WebSocket` packages globally available, and the use of `babel-polyfill`:
 
-```
+```node.js
 require('babel-polyfill');
 require('isomorphic-fetch');
 if (!global.WebSocket) {
