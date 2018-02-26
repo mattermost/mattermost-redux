@@ -4,10 +4,8 @@
 import {Client, Client4} from 'client';
 import {bindClientFunc, forceLogoutIfNecessary, FormattedError} from './helpers.js';
 import {GeneralTypes} from 'action_types';
-import {General} from 'constants';
 import {loadMe} from './users';
 import {logError} from './errors';
-import EventEmitter from 'utils/event_emitter';
 import {batchActions} from 'redux-batched-actions';
 
 export function getPing(useV3 = false) {
@@ -145,8 +143,6 @@ export function setDeviceToken(token) {
         return {data: true};
     };
 }
-
-EventEmitter.on(General.CONFIG_CHANGED, setServerVersion);
 
 export function setServerVersion(serverVersion) {
     return async (dispatch, getState) => {
