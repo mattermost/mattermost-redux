@@ -27,7 +27,7 @@ function alertStack(state = [], action) {
 export default combineReducers({
 
     // array acting as a stack where every object is an alert
-    alertStack
+    alertStack,
 
 });
 

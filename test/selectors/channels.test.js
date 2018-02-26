@@ -104,13 +104,13 @@ describe('Selectors.Channels', () => {
         [`${Preferences.CATEGORY_FAVORITE_CHANNEL}--${channel1.id}`]: {
             name: channel1.id,
             category: Preferences.CATEGORY_FAVORITE_CHANNEL,
-            value: 'true'
+            value: 'true',
         },
         [`${Preferences.CATEGORY_FAVORITE_CHANNEL}--${channel9.id}`]: {
             name: channel9.id,
             category: Preferences.CATEGORY_FAVORITE_CHANNEL,
-            value: 'true'
-        }
+            value: 'true',
+        },
     };
 
     const testState = deepFreezeAndThrowOnMutation({
@@ -118,28 +118,28 @@ describe('Selectors.Channels', () => {
             users: {
                 currentUserId: user.id,
                 profiles,
-                profilesInChannel: {[channel7.id]: [user.id]}
+                profilesInChannel: {[channel7.id]: [user.id]},
             },
             teams: {
-                currentTeamId: team1.id
+                currentTeamId: team1.id,
             },
             channels: {
                 currentChannelId: channel1.id,
                 channels,
                 channelsInTeam,
                 membersInChannel,
-                myMembers
+                myMembers,
             },
             posts: {
-                posts: {}
+                posts: {},
             },
             preferences: {
-                myPreferences
+                myPreferences,
             },
             general: {
-                config: {}
-            }
-        }
+                config: {},
+            },
+        },
     });
 
     it('should return channels in current team', () => {
@@ -176,7 +176,7 @@ describe('Selectors.Channels', () => {
             [channel6.name]: channel6,
             [channel8.name]: channel8,
             [channel10.name]: channel10,
-            [channel11.name]: channel11
+            [channel11.name]: channel11,
         };
         assert.deepEqual(Selectors.getChannelsNameMapInCurrentTeam(testState), channelMap);
     });
@@ -187,7 +187,7 @@ describe('Selectors.Channels', () => {
             favoriteChannels,
             publicChannels,
             privateChannels,
-            directAndGroupChannels
+            directAndGroupChannels,
         } = categories;
 
         assert.equal(favoriteChannels.length, 2);
@@ -203,7 +203,7 @@ describe('Selectors.Channels', () => {
             favoriteChannels,
             publicChannels,
             privateChannels,
-            directAndGroupChannels
+            directAndGroupChannels,
         } = categories;
 
         assert.equal(unreadChannels.length, 1);
@@ -229,10 +229,10 @@ describe('Selectors.Channels', () => {
                     ...testState.entities.channels,
                     channels: {
                         ...testState.entities.channels.channels,
-                        [channel1.id]: chan1
-                    }
-                }
-            }
+                        [channel1.id]: chan1,
+                    },
+                },
+            },
         };
 
         const fromOriginalState = Selectors.getDirectChannelIds(testState);
@@ -254,17 +254,17 @@ describe('Selectors.Channels', () => {
                     ...testState.entities.channels,
                     channels: {
                         ...testState.entities.channels.channels,
-                        [newChannel.id]: newChannel
+                        [newChannel.id]: newChannel,
                     },
                     channelsInTeam: {
                         ...testState.entities.channels.channelsInTeam,
                         [team2.id]: [
                             ...testState.entities.channels.channelsInTeam[team2.id],
-                            newChannel.id
-                        ]
-                    }
-                }
-            }
+                            newChannel.id,
+                        ],
+                    },
+                },
+            },
         };
 
         const fromOriginalState = Selectors.getChannelIdsInCurrentTeam(testState);
@@ -286,17 +286,17 @@ describe('Selectors.Channels', () => {
                     ...testState.entities.channels,
                     channels: {
                         ...testState.entities.channels.channels,
-                        [anotherChannel.id]: anotherChannel
+                        [anotherChannel.id]: anotherChannel,
                     },
                     channelsInTeam: {
                         ...testState.entities.channels.channelsInTeam,
                         [team2.id]: [
                             ...testState.entities.channels.channelsInTeam[team2.id],
-                            anotherChannel.id
-                        ]
-                    }
-                }
-            }
+                            anotherChannel.id,
+                        ],
+                    },
+                },
+            },
         };
 
         const fromOriginalState = Selectors.getChannelIdsForCurrentTeam(testState);
@@ -320,10 +320,10 @@ describe('Selectors.Channels', () => {
                     ...testState.entities.channels,
                     channels: {
                         ...testState.entities.channels.channels,
-                        [channel2.id]: chan2
-                    }
-                }
-            }
+                        [channel2.id]: chan2,
+                    },
+                },
+            },
         };
 
         const fromOriginalState = Selectors.getUnreadChannelIds(testState);
@@ -344,10 +344,10 @@ describe('Selectors.Channels', () => {
                     ...testState.entities.channels,
                     channels: {
                         ...testState.entities.channels.channels,
-                        [channel2.id]: chan2
-                    }
-                }
-            }
+                        [channel2.id]: chan2,
+                    },
+                },
+            },
         };
 
         const fromOriginalState = Selectors.getUnreadChannelIds(testState);
@@ -369,10 +369,10 @@ describe('Selectors.Channels', () => {
                     ...testState.entities.channels,
                     channels: {
                         ...testState.entities.channels.channels,
-                        [channel2.id]: chan2
-                    }
-                }
-            }
+                        [channel2.id]: chan2,
+                    },
+                },
+            },
         };
 
         // When adding a mention to channel8 with display_name 'ABC' states are !== and channel8 is above all others
@@ -386,11 +386,11 @@ describe('Selectors.Channels', () => {
                         ...modifiedState.entities.channels.myMembers,
                         [channel8.id]: {
                             ...modifiedState.entities.channels.myMembers[channel8.id],
-                            mention_count: 1
-                        }
-                    }
-                }
-            }
+                            mention_count: 1,
+                        },
+                    },
+                },
+            },
         };
 
         const fromOriginalState = Selectors.getSortedUnreadChannelIds(testState);
@@ -419,10 +419,10 @@ describe('Selectors.Channels', () => {
                     ...testState.entities.channels,
                     channels: {
                         ...testState.entities.channels.channels,
-                        [channel1.id]: chan1
-                    }
-                }
-            }
+                        [channel1.id]: chan1,
+                    },
+                },
+            },
         };
 
         const fromOriginalState = Selectors.getSortedFavoriteChannelIds(testState);
@@ -442,10 +442,10 @@ describe('Selectors.Channels', () => {
                     ...modifiedState.entities.channels,
                     channels: {
                         ...modifiedState.entities.channels.channels,
-                        [channel9.id]: chan9
-                    }
-                }
-            }
+                        [channel9.id]: chan9,
+                    },
+                },
+            },
         };
 
         const fromUpdateState = Selectors.getSortedFavoriteChannelIds(updateState);
@@ -465,10 +465,10 @@ describe('Selectors.Channels', () => {
                     ...testState.entities.channels,
                     channels: {
                         ...testState.entities.channels.channels,
-                        [channel10.id]: chan10
-                    }
-                }
-            }
+                        [channel10.id]: chan10,
+                    },
+                },
+            },
         };
 
         const fromOriginalState = Selectors.getSortedPublicChannelIds(testState);
@@ -486,10 +486,10 @@ describe('Selectors.Channels', () => {
                     ...modifiedState.entities.channels,
                     channels: {
                         ...modifiedState.entities.channels.channels,
-                        [channel10.id]: chan10
-                    }
-                }
-            }
+                        [channel10.id]: chan10,
+                    },
+                },
+            },
         };
 
         const fromUpdateState = Selectors.getSortedPublicChannelIds(updateState);
@@ -509,10 +509,10 @@ describe('Selectors.Channels', () => {
                     ...testState.entities.channels,
                     channels: {
                         ...testState.entities.channels.channels,
-                        [channel11.id]: chan11
-                    }
-                }
-            }
+                        [channel11.id]: chan11,
+                    },
+                },
+            },
         };
 
         const fromOriginalState = Selectors.getSortedPrivateChannelIds(testState);
@@ -530,10 +530,10 @@ describe('Selectors.Channels', () => {
                     ...modifiedState.entities.channels,
                     channels: {
                         ...modifiedState.entities.channels.channels,
-                        [channel11.id]: chan11
-                    }
-                }
-            }
+                        [channel11.id]: chan11,
+                    },
+                },
+            },
         };
 
         const fromUpdateState = Selectors.getSortedPrivateChannelIds(updateState);

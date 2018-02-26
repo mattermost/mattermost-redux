@@ -27,7 +27,7 @@ const WebsocketEvents = {
     WEBRTC: 'webrtc',
     REACTION_ADDED: 'reaction_added',
     REACTION_REMOVED: 'reaction_removed',
-    EMOJI_ADDED: 'emoji_added'
+    EMOJI_ADDED: 'emoji_added',
 };
 
 export default WebsocketEvents;

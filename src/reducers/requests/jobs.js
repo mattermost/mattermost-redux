@@ -50,6 +50,6 @@ export default combineReducers({
     createJob,
     getJob,
     getJobs,
-    cancelJob
+    cancelJob,
 });
 

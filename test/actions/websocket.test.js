@@ -290,7 +290,7 @@ describe('Actions.Websocket', () => {
 
             await GeneralActions.setStoreFromLocalData({
                 url: Client4.getUrl(),
-                token: Client4.getToken()
+                token: Client4.getToken(),
             })(store.dispatch, store.getState);
             await TeamActions.selectTeam(team)(store.dispatch, store.getState);
             await ChannelActions.selectChannel(channel.id)(store.dispatch, store.getState);
@@ -576,7 +576,7 @@ describe('Actions.Websocket', () => {
                 const testImageData = fs.createReadStream('test/assets/images/test.png');
                 created = await Client4.createCustomEmoji({
                     name: TestHelper.generateId(),
-                    creator_id: TestHelper.basicUser.id
+                    creator_id: TestHelper.basicUser.id,
                 }, testImageData);
             } else {
                 created = {id: '1mmgakhhupfgfm8oug6pooc5no'};

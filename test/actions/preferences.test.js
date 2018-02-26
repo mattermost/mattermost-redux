@@ -35,14 +35,14 @@ describe('Actions.Preferences', () => {
                 user_id: user.id,
                 category: 'test',
                 name: 'test1',
-                value: 'test'
+                value: 'test',
             },
             {
                 user_id: user.id,
                 category: 'test',
                 name: 'test2',
-                value: 'test'
-            }
+                value: 'test',
+            },
         ];
 
         nock(Client4.getUsersRoute()).
@@ -76,8 +76,8 @@ describe('Actions.Preferences', () => {
                 user_id: user.id,
                 category: 'test',
                 name: 'test1',
-                value: 'test'
-            }
+                value: 'test',
+            },
         ];
 
         nock(Client4.getUsersRoute()).
@@ -95,14 +95,14 @@ describe('Actions.Preferences', () => {
                 user_id: user.id,
                 category: 'test',
                 name: 'test2',
-                value: 'test'
+                value: 'test',
             },
             {
                 user_id: user.id,
                 category: 'test',
                 name: 'test3',
-                value: 'test'
-            }
+                value: 'test',
+            },
         ];
 
         nock(Client4.getUsersRoute()).
@@ -133,20 +133,20 @@ describe('Actions.Preferences', () => {
                 user_id: user.id,
                 category: 'test',
                 name: 'test1',
-                value: 'test'
+                value: 'test',
             },
             {
                 user_id: user.id,
                 category: 'test',
                 name: 'test2',
-                value: 'test'
+                value: 'test',
             },
             {
                 user_id: user.id,
                 category: 'test',
                 name: 'test3',
-                value: 'test'
-            }
+                value: 'test',
+            },
         ];
 
         nock(Client4.getUsersRoute()).
@@ -164,7 +164,7 @@ describe('Actions.Preferences', () => {
             reply(200, OK_RESPONSE);
         await Actions.deletePreferences(user.id, [
             existingPreferences[0],
-            existingPreferences[2]
+            existingPreferences[2],
         ])(store.dispatch, store.getState);
 
         const state = store.getState();
@@ -219,7 +219,7 @@ describe('Actions.Preferences', () => {
             reply(200, OK_RESPONSE);
         Actions.savePreferences(user.id, [{
             ...preference,
-            value: 'false'
+            value: 'false',
         }])(store.dispatch, store.getState);
 
         nock(Client4.getUsersRoute()).

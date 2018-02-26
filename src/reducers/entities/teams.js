@@ -29,7 +29,7 @@ function teams(state = {}, action) {
     case TeamTypes.RECEIVED_TEAM:
         return {
             ...state,
-            [action.data.id]: action.data
+            [action.data.id]: action.data,
         };
 
     case TeamTypes.RECEIVED_TEAM_DELETED: {
@@ -76,7 +76,7 @@ function myMembers(state = {}, action) {
                 const prevMember = state[m.team_id] || {mention_count: 0, msg_count: 0};
                 nextState[m.team_id] = {
                     ...prevMember,
-                    ...m
+                    ...m,
                 };
             }
         }
@@ -103,7 +103,7 @@ function myMembers(state = {}, action) {
             const m = {
                 ...state[u.team_id],
                 mention_count: mentionCount,
-                msg_count: msgCount
+                msg_count: msgCount,
             };
             nextState[u.team_id] = m;
         }
@@ -128,8 +128,8 @@ function myMembers(state = {}, action) {
             ...state,
             [teamId]: {
                 ...member,
-                msg_count: member.msg_count + amount
-            }
+                msg_count: member.msg_count + amount,
+            },
         };
     }
     case ChannelTypes.DECREMENT_UNREAD_MSG_COUNT: {
@@ -145,8 +145,8 @@ function myMembers(state = {}, action) {
             ...state,
             [teamId]: {
                 ...member,
-                msg_count: Math.max(member.msg_count - amount, 0)
-            }
+                msg_count: Math.max(member.msg_count - amount, 0),
+            },
         };
     }
     case ChannelTypes.INCREMENT_UNREAD_MENTION_COUNT: {
@@ -162,8 +162,8 @@ function myMembers(state = {}, action) {
             ...state,
             [teamId]: {
                 ...member,
-                mention_count: member.mention_count + amount
-            }
+                mention_count: member.mention_count + amount,
+            },
         };
     }
     case ChannelTypes.DECREMENT_UNREAD_MENTION_COUNT: {
@@ -179,8 +179,8 @@ function myMembers(state = {}, action) {
             ...state,
             [teamId]: {
                 ...member,
-                mention_count: Math.max(member.mention_count - amount, 0)
-            }
+                mention_count: Math.max(member.mention_count - amount, 0),
+            },
         };
     }
     case TeamTypes.LEAVE_TEAM:
@@ -206,7 +206,7 @@ function membersInTeam(state = {}, action) {
         members[data.user_id] = data;
         return {
             ...state,
-            [data.team_id]: members
+            [data.team_id]: members,
         };
     }
     case TeamTypes.RECEIVED_TEAM_MEMBERS: {
@@ -238,7 +238,7 @@ function membersInTeam(state = {}, action) {
 
             return {
                 ...state,
-                [teamId]: members
+                [teamId]: members,
             };
         }
 
@@ -252,7 +252,7 @@ function membersInTeam(state = {}, action) {
             Reflect.deleteProperty(nextState, data.user_id);
             return {
                 ...state,
-                [data.team_id]: nextState
+                [data.team_id]: nextState,
             };
         }
 
@@ -281,7 +281,7 @@ function stats(state = {}, action) {
         const stat = action.data;
         return {
             ...state,
-            [stat.team_id]: stat
+            [stat.team_id]: stat,
         };
     }
     case TeamTypes.RECEIVED_TEAM_DELETED: {
@@ -316,5 +316,5 @@ export default combineReducers({
     membersInTeam,
 
     // object where every key is the team id and has an object with the team stats
-    stats
+    stats,
 });

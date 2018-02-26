@@ -20,10 +20,10 @@ describe('Selectors.Integrations', () => {
                 customEmoji: {
                     [emoji1.id]: emoji1,
                     [emoji2.id]: emoji2,
-                    [emoji3.id]: emoji3
-                }
-            }
-        }
+                    [emoji3.id]: emoji3,
+                },
+            },
+        },
     });
 
     it('should get sorted emoji ids', () => {

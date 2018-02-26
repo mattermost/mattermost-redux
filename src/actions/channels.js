@@ -18,7 +18,7 @@ export function selectChannel(channelId) {
         try {
             dispatch({
                 type: ChannelTypes.SELECT_CHANNEL,
-                data: channelId
+                data: channelId,
             }, getState);
         } catch (error) {
             logError(error)(dispatch);
@@ -33,11 +33,11 @@ export function createChannel(channel, userId) {
     return async (dispatch, getState) => {
         dispatch(batchActions([
             {
-                type: ChannelTypes.CREATE_CHANNEL_REQUEST
+                type: ChannelTypes.CREATE_CHANNEL_REQUEST,
             },
             {
-                type: ChannelTypes.CHANNEL_MEMBERS_REQUEST
-            }
+                type: ChannelTypes.CHANNEL_MEMBERS_REQUEST,
+            },
         ]), getState);
 
         let created;
@@ -48,13 +48,13 @@ export function createChannel(channel, userId) {
             dispatch(batchActions([
                 {
                     type: ChannelTypes.CREATE_CHANNEL_FAILURE,
-                    error
+                    error,
                 },
                 {
                     type: ChannelTypes.CHANNEL_MEMBERS_FAILURE,
-                    error
+                    error,
                 },
-                logError(error)(dispatch)
+                logError(error)(dispatch),
             ]), getState);
             return {error};
         }
@@ -67,7 +67,7 @@ export function createChannel(channel, userId) {
             msg_count: 0,
             mention_count: 0,
             notify_props: {desktop: 'default', mark_unread: 'all'},
-            last_update_at: created.create_at
+            last_update_at: created.create_at,
         };
 
         const actions = [];
@@ -84,11 +84,11 @@ export function createChannel(channel, userId) {
         dispatch(batchActions([
             ...actions,
             {
-                type: ChannelTypes.CREATE_CHANNEL_SUCCESS
+                type: ChannelTypes.CREATE_CHANNEL_SUCCESS,
             },
             {
-                type: ChannelTypes.CHANNEL_MEMBERS_SUCCESS
-            }
+                type: ChannelTypes.CHANNEL_MEMBERS_SUCCESS,
+            },
         ]), getState);
 
         return {data: created};
@@ -106,7 +106,7 @@ export function createDirectChannel(userId, otherUserId) {
             forceLogoutIfNecessary(error, dispatch, getState);
             dispatch(batchActions([
                 {type: ChannelTypes.CREATE_CHANNEL_FAILURE, error},
-                logError(error)(dispatch)
+                logError(error)(dispatch),
             ]), getState);
             return {error};
         }
@@ -119,12 +119,12 @@ export function createDirectChannel(userId, otherUserId) {
             msg_count: 0,
             mention_count: 0,
             notify_props: {desktop: 'default', mark_unread: 'all'},
-            last_update_at: created.create_at
+            last_update_at: created.create_at,
         };
 
         const preferences = [
             {user_id: userId, category: Preferences.CATEGORY_DIRECT_CHANNEL_SHOW, name: otherUserId, value: 'true'},
-            {user_id: userId, category: Preferences.CATEGORY_CHANNEL_OPEN_TIME, name: created.id, value: new Date().getTime().toString()}
+            {user_id: userId, category: Preferences.CATEGORY_CHANNEL_OPEN_TIME, name: created.id, value: new Date().getTime().toString()},
         ];
 
         savePreferences(userId, preferences)(dispatch, getState);
@@ -132,24 +132,24 @@ export function createDirectChannel(userId, otherUserId) {
         dispatch(batchActions([
             {
                 type: ChannelTypes.RECEIVED_CHANNEL,
-                data: created
+                data: created,
             },
             {
                 type: ChannelTypes.RECEIVED_MY_CHANNEL_MEMBER,
-                data: member
+                data: member,
             },
             {
                 type: PreferenceTypes.RECEIVED_PREFERENCES,
-                data: preferences
+                data: preferences,
             },
             {
-                type: ChannelTypes.CREATE_CHANNEL_SUCCESS
+                type: ChannelTypes.CREATE_CHANNEL_SUCCESS,
             },
             {
                 type: UserTypes.RECEIVED_PROFILES_LIST_IN_CHANNEL,
                 id: created.id,
-                data: [{id: userId}, {id: otherUserId}]
-            }
+                data: [{id: userId}, {id: otherUserId}],
+            },
         ]), getState);
 
         return {data: created};
@@ -169,7 +169,7 @@ export function createGroupChannel(userIds) {
             forceLogoutIfNecessary(error, dispatch, getState);
             dispatch(batchActions([
                 {type: ChannelTypes.CREATE_CHANNEL_FAILURE, error},
-                logError(error)(dispatch)
+                logError(error)(dispatch),
             ]), getState);
             return {error};
         }
@@ -182,12 +182,12 @@ export function createGroupChannel(userIds) {
             msg_count: 0,
             mention_count: 0,
             notify_props: {desktop: 'default', mark_unread: 'all'},
-            last_update_at: created.create_at
+            last_update_at: created.create_at,
         };
 
         const preferences = [
             {user_id: currentUserId, category: Preferences.CATEGORY_GROUP_CHANNEL_SHOW, name: created.id, value: 'true'},
-            {user_id: currentUserId, category: Preferences.CATEGORY_CHANNEL_OPEN_TIME, name: created.id, value: new Date().getTime().toString()}
+            {user_id: currentUserId, category: Preferences.CATEGORY_CHANNEL_OPEN_TIME, name: created.id, value: new Date().getTime().toString()},
         ];
 
         savePreferences(currentUserId, preferences)(dispatch, getState);
@@ -200,24 +200,24 @@ export function createGroupChannel(userIds) {
         dispatch(batchActions([
             {
                 type: ChannelTypes.RECEIVED_CHANNEL,
-                data: created
+                data: created,
             },
             {
                 type: ChannelTypes.RECEIVED_MY_CHANNEL_MEMBER,
-                data: member
+                data: member,
             },
             {
                 type: PreferenceTypes.RECEIVED_PREFERENCES,
-                data: preferences
+                data: preferences,
             },
             {
-                type: ChannelTypes.CREATE_CHANNEL_SUCCESS
+                type: ChannelTypes.CREATE_CHANNEL_SUCCESS,
             },
             {
                 type: UserTypes.RECEIVED_PROFILES_LIST_IN_CHANNEL,
                 id: created.id,
-                data: profilesInChannel
-            }
+                data: profilesInChannel,
+            },
         ]), getState);
 
         return {data: created};
@@ -236,7 +236,7 @@ export function patchChannel(channelId, patch) {
 
             dispatch(batchActions([
                 {type: ChannelTypes.UPDATE_CHANNEL_FAILURE, error},
-                logError(error)(dispatch)
+                logError(error)(dispatch),
             ]), getState);
             return {error};
         }
@@ -244,11 +244,11 @@ export function patchChannel(channelId, patch) {
         dispatch(batchActions([
             {
                 type: ChannelTypes.RECEIVED_CHANNEL,
-                data: updated
+                data: updated,
             },
             {
-                type: ChannelTypes.UPDATE_CHANNEL_SUCCESS
-            }
+                type: ChannelTypes.UPDATE_CHANNEL_SUCCESS,
+            },
         ]), getState);
 
         return {data: updated};
@@ -267,7 +267,7 @@ export function updateChannel(channel) {
 
             dispatch(batchActions([
                 {type: ChannelTypes.UPDATE_CHANNEL_FAILURE, error},
-                logError(error)(dispatch)
+                logError(error)(dispatch),
             ]), getState);
             return {error};
         }
@@ -275,11 +275,11 @@ export function updateChannel(channel) {
         dispatch(batchActions([
             {
                 type: ChannelTypes.RECEIVED_CHANNEL,
-                data: updated
+                data: updated,
             },
             {
-                type: ChannelTypes.UPDATE_CHANNEL_SUCCESS
-            }
+                type: ChannelTypes.UPDATE_CHANNEL_SUCCESS,
+            },
         ]), getState);
 
         return {data: updated};
@@ -293,7 +293,7 @@ export function updateChannelNotifyProps(userId, channelId, props) {
         const notifyProps = {
             user_id: userId,
             channel_id: channelId,
-            ...props
+            ...props,
         };
 
         try {
@@ -303,7 +303,7 @@ export function updateChannelNotifyProps(userId, channelId, props) {
 
             dispatch(batchActions([
                 {type: ChannelTypes.NOTIFY_PROPS_FAILURE, error},
-                logError(error)(dispatch)
+                logError(error)(dispatch),
             ]), getState);
             return {error};
         }
@@ -316,12 +316,12 @@ export function updateChannelNotifyProps(userId, channelId, props) {
                 type: ChannelTypes.RECEIVED_CHANNEL_PROPS,
                 data: {
                     channel_id: channelId,
-                    notifyProps: {...currentNotifyProps, ...notifyProps}
-                }
+                    notifyProps: {...currentNotifyProps, ...notifyProps},
+                },
             },
             {
-                type: ChannelTypes.NOTIFY_PROPS_SUCCESS
-            }
+                type: ChannelTypes.NOTIFY_PROPS_SUCCESS,
+            },
         ]), getState);
 
         return {data: true};
@@ -339,7 +339,7 @@ export function getChannelByNameAndTeamName(teamName, channelName) {
             forceLogoutIfNecessary(error, dispatch);
             dispatch(batchActions([
                 {type: ChannelTypes.CHANNELS_FAILURE, error},
-                logError(error)(dispatch)
+                logError(error)(dispatch),
             ]), getState);
             return {error};
         }
@@ -347,11 +347,11 @@ export function getChannelByNameAndTeamName(teamName, channelName) {
         dispatch(batchActions([
             {
                 type: ChannelTypes.RECEIVED_CHANNEL,
-                data
+                data,
             },
             {
-                type: ChannelTypes.CHANNEL_SUCCESS
-            }
+                type: ChannelTypes.CHANNEL_SUCCESS,
+            },
         ]), getState);
 
         return {data};
@@ -369,7 +369,7 @@ export function getChannel(channelId) {
             forceLogoutIfNecessary(error, dispatch, getState);
             dispatch(batchActions([
                 {type: ChannelTypes.CHANNELS_FAILURE, error},
-                logError(error)(dispatch)
+                logError(error)(dispatch),
             ]), getState);
             return {error};
         }
@@ -377,11 +377,11 @@ export function getChannel(channelId) {
         dispatch(batchActions([
             {
                 type: ChannelTypes.RECEIVED_CHANNEL,
-                data
+                data,
             },
             {
-                type: ChannelTypes.CHANNEL_SUCCESS
-            }
+                type: ChannelTypes.CHANNEL_SUCCESS,
+            },
         ]), getState);
 
         return {data};
@@ -404,7 +404,7 @@ export function getChannelAndMyMember(channelId) {
             forceLogoutIfNecessary(error, dispatch, getState);
             dispatch(batchActions([
                 {type: ChannelTypes.CHANNELS_FAILURE, error},
-                logError(error)(dispatch)
+                logError(error)(dispatch),
             ]), getState);
             return {error};
         }
@@ -412,15 +412,15 @@ export function getChannelAndMyMember(channelId) {
         dispatch(batchActions([
             {
                 type: ChannelTypes.RECEIVED_CHANNEL,
-                data: channel
+                data: channel,
             },
             {
-                type: ChannelTypes.CHANNEL_SUCCESS
+                type: ChannelTypes.CHANNEL_SUCCESS,
             },
             {
                 type: ChannelTypes.RECEIVED_MY_CHANNEL_MEMBER,
-                data: member
-            }
+                data: member,
+            },
         ]), getState);
 
         return {data: {channel, member}};
@@ -431,11 +431,11 @@ export function fetchMyChannelsAndMembers(teamId) {
     return async (dispatch, getState) => {
         dispatch(batchActions([
             {
-                type: ChannelTypes.CHANNELS_REQUEST
+                type: ChannelTypes.CHANNELS_REQUEST,
             },
             {
-                type: ChannelTypes.CHANNEL_MEMBERS_REQUEST
-            }
+                type: ChannelTypes.CHANNEL_MEMBERS_REQUEST,
+            },
         ]), getState);
 
         const channelsRequest = Client4.getMyChannels(teamId);
@@ -449,7 +449,7 @@ export function fetchMyChannelsAndMembers(teamId) {
             dispatch(batchActions([
                 {type: ChannelTypes.CHANNELS_FAILURE, error},
                 {type: ChannelTypes.CHANNEL_MEMBERS_FAILURE, error},
-                logError(error)(dispatch)
+                logError(error)(dispatch),
             ]), getState);
             return {error};
         }
@@ -462,7 +462,7 @@ export function fetchMyChannelsAndMembers(teamId) {
             dispatch(batchActions([
                 {type: ChannelTypes.CHANNELS_FAILURE, error},
                 {type: ChannelTypes.CHANNEL_MEMBERS_FAILURE, error},
-                logError(error)(dispatch)
+                logError(error)(dispatch),
             ]), getState);
             return {error};
         }
@@ -473,20 +473,20 @@ export function fetchMyChannelsAndMembers(teamId) {
             {
                 type: ChannelTypes.RECEIVED_CHANNELS,
                 teamId,
-                data: channels
+                data: channels,
             },
             {
-                type: ChannelTypes.CHANNELS_SUCCESS
+                type: ChannelTypes.CHANNELS_SUCCESS,
             },
             {
                 type: ChannelTypes.RECEIVED_MY_CHANNEL_MEMBERS,
                 data: channelMembers,
                 remove: getChannelsIdForTeam(getState(), teamId),
-                currentUserId
+                currentUserId,
             },
             {
-                type: ChannelTypes.CHANNEL_MEMBERS_SUCCESS
-            }
+                type: ChannelTypes.CHANNEL_MEMBERS_SUCCESS,
+            },
         ]), getState);
 
         return {data: {channels, members: channelMembers}};
@@ -506,7 +506,7 @@ export function getMyChannelMembers(teamId) {
             forceLogoutIfNecessary(error, dispatch, getState);
             dispatch(batchActions([
                 {type: ChannelTypes.CHANNEL_MY_MEMBERS_FAILURE, error},
-                logError(error)(dispatch)
+                logError(error)(dispatch),
             ]), getState);
             return {error};
         }
@@ -518,11 +518,11 @@ export function getMyChannelMembers(teamId) {
                 type: ChannelTypes.RECEIVED_MY_CHANNEL_MEMBERS,
                 data: channelMembers,
                 remove: getChannelsIdForTeam(getState(), teamId),
-                currentUserId
+                currentUserId,
             },
             {
-                type: ChannelTypes.CHANNEL_MY_MEMBERS_SUCCESS
-            }
+                type: ChannelTypes.CHANNEL_MY_MEMBERS_SUCCESS,
+            },
         ]), getState);
 
         return {data: channelMembers};
@@ -542,7 +542,7 @@ export function getChannelMembers(channelId, page = 0, perPage = General.CHANNEL
             forceLogoutIfNecessary(error, dispatch, getState);
             dispatch(batchActions([
                 {type: ChannelTypes.CHANNEL_MEMBERS_FAILURE, error},
-                logError(error)(dispatch)
+                logError(error)(dispatch),
             ]), getState);
             return {error};
         }
@@ -553,11 +553,11 @@ export function getChannelMembers(channelId, page = 0, perPage = General.CHANNEL
         dispatch(batchActions([
             {
                 type: ChannelTypes.RECEIVED_CHANNEL_MEMBERS,
-                data: channelMembers
+                data: channelMembers,
             },
             {
-                type: ChannelTypes.CHANNEL_MEMBERS_SUCCESS
-            }
+                type: ChannelTypes.CHANNEL_MEMBERS_SUCCESS,
+            },
         ]), getState);
 
         return {data: channelMembers};
@@ -580,7 +580,7 @@ export function leaveChannel(channelId) {
                 id: channelId,
                 user_id: currentUserId,
                 team_id: channel.team_id,
-                type: channel.type
+                type: channel.type,
             },
             meta: {
                 offline: {
@@ -590,16 +590,16 @@ export function leaveChannel(channelId) {
                         dispatch(batchActions([
                             {
                                 type: ChannelTypes.RECEIVED_CHANNEL,
-                                data: channel
+                                data: channel,
                             },
                             {
                                 type: ChannelTypes.RECEIVED_MY_CHANNEL_MEMBER,
-                                data: member
-                            }
+                                data: member,
+                            },
                         ]));
-                    }
-                }
-            }
+                    },
+                },
+            },
         });
 
         return {data: true};
@@ -628,7 +628,7 @@ export function joinChannel(userId, teamId, channelId, channelName) {
             forceLogoutIfNecessary(error, dispatch, getState);
             dispatch(batchActions([
                 {type: ChannelTypes.JOIN_CHANNEL_FAILURE, error},
-                logError(error)(dispatch)
+                logError(error)(dispatch),
             ]), getState);
             return {error};
         }
@@ -638,15 +638,15 @@ export function joinChannel(userId, teamId, channelId, channelName) {
         dispatch(batchActions([
             {
                 type: ChannelTypes.RECEIVED_CHANNEL,
-                data: channel
+                data: channel,
             },
             {
                 type: ChannelTypes.RECEIVED_MY_CHANNEL_MEMBER,
-                data: member
+                data: member,
             },
             {
-                type: ChannelTypes.JOIN_CHANNEL_SUCCESS
-            }
+                type: ChannelTypes.JOIN_CHANNEL_SUCCESS,
+            },
         ]), getState);
 
         return {data: {channel, member}};
@@ -663,7 +663,7 @@ export function deleteChannel(channelId) {
             forceLogoutIfNecessary(error, dispatch, getState);
             dispatch(batchActions([
                 {type: ChannelTypes.DELETE_CHANNEL_FAILURE, error},
-                logError(error)(dispatch)
+                logError(error)(dispatch),
             ]), getState);
             return {error};
         }
@@ -685,11 +685,11 @@ export function deleteChannel(channelId) {
         dispatch(batchActions([
             {
                 type: ChannelTypes.RECEIVED_CHANNEL_DELETED,
-                data: {id: channelId, team_id: teamId}
+                data: {id: channelId, team_id: teamId},
             },
             {
-                type: ChannelTypes.DELETE_CHANNEL_SUCCESS
-            }
+                type: ChannelTypes.DELETE_CHANNEL_SUCCESS,
+            },
         ]), getState);
 
         return {data: true};
@@ -705,7 +705,7 @@ export function viewChannel(channelId, prevChannelId = '') {
         const viewTime = viewTimePref ? parseInt(viewTimePref.value, 10) : 0;
         if (viewTime < new Date().getTime() - (3 * 60 * 60 * 1000)) {
             const preferences = [
-                {user_id: currentUserId, category: Preferences.CATEGORY_CHANNEL_APPROXIMATE_VIEW_TIME, name: channelId, value: new Date().getTime().toString()}
+                {user_id: currentUserId, category: Preferences.CATEGORY_CHANNEL_APPROXIMATE_VIEW_TIME, name: channelId, value: new Date().getTime().toString()},
             ];
             savePreferences(currentUserId, preferences)(dispatch, getState);
         }
@@ -718,7 +718,7 @@ export function viewChannel(channelId, prevChannelId = '') {
             forceLogoutIfNecessary(error, dispatch, getState);
             dispatch(batchActions([
                 {type: ChannelTypes.UPDATE_LAST_VIEWED_FAILURE, error},
-                logError(error)(dispatch)
+                logError(error)(dispatch),
             ]), getState);
             return {error};
         }
@@ -730,7 +730,7 @@ export function viewChannel(channelId, prevChannelId = '') {
         if (member) {
             actions.push({
                 type: ChannelTypes.RECEIVED_MY_CHANNEL_MEMBER,
-                data: {...member, last_viewed_at: new Date().getTime()}
+                data: {...member, last_viewed_at: new Date().getTime()},
             });
         }
 
@@ -738,7 +738,7 @@ export function viewChannel(channelId, prevChannelId = '') {
         if (prevMember) {
             actions.push({
                 type: ChannelTypes.RECEIVED_MY_CHANNEL_MEMBER,
-                data: {...prevMember, last_viewed_at: new Date().getTime()}
+                data: {...prevMember, last_viewed_at: new Date().getTime()},
             });
         }
 
@@ -757,7 +757,7 @@ export function markChannelAsViewed(channelId, prevChannelId = '') {
         if (member) {
             actions.push({
                 type: ChannelTypes.RECEIVED_MY_CHANNEL_MEMBER,
-                data: {...member, last_viewed_at: Date.now()}
+                data: {...member, last_viewed_at: Date.now()},
             });
         }
 
@@ -765,7 +765,7 @@ export function markChannelAsViewed(channelId, prevChannelId = '') {
         if (prevMember) {
             actions.push({
                 type: ChannelTypes.RECEIVED_MY_CHANNEL_MEMBER,
-                data: {...prevMember, last_viewed_at: Date.now()}
+                data: {...prevMember, last_viewed_at: Date.now()},
             });
         }
 
@@ -788,7 +788,7 @@ export function getChannels(teamId, page = 0, perPage = General.CHANNELS_CHUNK_S
             forceLogoutIfNecessary(error, dispatch, getState);
             dispatch(batchActions([
                 {type: ChannelTypes.GET_CHANNELS_FAILURE, error},
-                logError(error)(dispatch)
+                logError(error)(dispatch),
             ]), getState);
             return {error};
         }
@@ -797,11 +797,11 @@ export function getChannels(teamId, page = 0, perPage = General.CHANNELS_CHUNK_S
             {
                 type: ChannelTypes.RECEIVED_CHANNELS,
                 teamId,
-                data: channels
+                data: channels,
             },
             {
-                type: ChannelTypes.GET_CHANNELS_SUCCESS
-            }
+                type: ChannelTypes.GET_CHANNELS_SUCCESS,
+            },
         ]), getState);
 
         return {data: channels};
@@ -819,7 +819,7 @@ export function autocompleteChannels(teamId, term) {
             forceLogoutIfNecessary(error, dispatch, getState);
             dispatch(batchActions([
                 {type: ChannelTypes.GET_CHANNELS_FAILURE, error},
-                logError(error)(dispatch)
+                logError(error)(dispatch),
             ]), getState);
             return {error};
         }
@@ -828,11 +828,11 @@ export function autocompleteChannels(teamId, term) {
             {
                 type: ChannelTypes.RECEIVED_CHANNELS,
                 teamId,
-                data: channels
+                data: channels,
             },
             {
-                type: ChannelTypes.GET_CHANNELS_SUCCESS
-            }
+                type: ChannelTypes.GET_CHANNELS_SUCCESS,
+            },
         ]), getState);
 
         return {data: channels};
@@ -850,7 +850,7 @@ export function searchChannels(teamId, term) {
             forceLogoutIfNecessary(error, dispatch, getState);
             dispatch(batchActions([
                 {type: ChannelTypes.GET_CHANNELS_FAILURE, error},
-                logError(error)(dispatch)
+                logError(error)(dispatch),
             ]), getState);
             return {error};
         }
@@ -859,11 +859,11 @@ export function searchChannels(teamId, term) {
             {
                 type: ChannelTypes.RECEIVED_CHANNELS,
                 teamId,
-                data: channels
+                data: channels,
             },
             {
-                type: ChannelTypes.GET_CHANNELS_SUCCESS
-            }
+                type: ChannelTypes.GET_CHANNELS_SUCCESS,
+            },
         ]), getState);
 
         return {data: channels};
@@ -881,7 +881,7 @@ export function getChannelStats(channelId) {
             forceLogoutIfNecessary(error, dispatch, getState);
             dispatch(batchActions([
                 {type: ChannelTypes.CHANNEL_STATS_FAILURE, error},
-                logError(error)(dispatch)
+                logError(error)(dispatch),
             ]), getState);
             return {error};
         }
@@ -889,11 +889,11 @@ export function getChannelStats(channelId) {
         dispatch(batchActions([
             {
                 type: ChannelTypes.RECEIVED_CHANNEL_STATS,
-                data: stat
+                data: stat,
             },
             {
-                type: ChannelTypes.CHANNEL_STATS_SUCCESS
-            }
+                type: ChannelTypes.CHANNEL_STATS_SUCCESS,
+            },
         ]), getState);
 
         return {data: stat};
@@ -911,7 +911,7 @@ export function addChannelMember(channelId, userId, postRootId = '') {
             forceLogoutIfNecessary(error, dispatch, getState);
             dispatch(batchActions([
                 {type: ChannelTypes.ADD_CHANNEL_MEMBER_FAILURE, error},
-                logError(error)(dispatch)
+                logError(error)(dispatch),
             ]), getState);
             return {error};
         }
@@ -922,16 +922,16 @@ export function addChannelMember(channelId, userId, postRootId = '') {
             {
                 type: UserTypes.RECEIVED_PROFILE_IN_CHANNEL,
                 data: {user_id: userId},
-                id: channelId
+                id: channelId,
             },
             {
                 type: ChannelTypes.RECEIVED_CHANNEL_MEMBER,
-                data: member
+                data: member,
             },
             {
                 type: ChannelTypes.ADD_CHANNEL_MEMBER_SUCCESS,
-                id: channelId
-            }
+                id: channelId,
+            },
         ], 'ADD_CHANNEL_MEMBER.BATCH'), getState);
 
         return {data: member};
@@ -948,7 +948,7 @@ export function removeChannelMember(channelId, userId) {
             forceLogoutIfNecessary(error, dispatch, getState);
             dispatch(batchActions([
                 {type: ChannelTypes.REMOVE_CHANNEL_MEMBER_FAILURE, error},
-                logError(error)(dispatch)
+                logError(error)(dispatch),
             ]), getState);
             return {error};
         }
@@ -959,12 +959,12 @@ export function removeChannelMember(channelId, userId) {
             {
                 type: UserTypes.RECEIVED_PROFILE_NOT_IN_CHANNEL,
                 data: {user_id: userId},
-                id: channelId
+                id: channelId,
             },
             {
                 type: ChannelTypes.REMOVE_CHANNEL_MEMBER_SUCCESS,
-                id: channelId
-            }
+                id: channelId,
+            },
         ], 'REMOVE_CHANNEL_MEMBER.BATCH'), getState);
 
         return {data: true};
@@ -981,15 +981,15 @@ export function updateChannelMemberRoles(channelId, userId, roles) {
             forceLogoutIfNecessary(error, dispatch, getState);
             dispatch(batchActions([
                 {type: ChannelTypes.UPDATE_CHANNEL_MEMBER_FAILURE, error},
-                logError(error)(dispatch)
+                logError(error)(dispatch),
             ]), getState);
             return {error};
         }
 
         const actions = [
             {
-                type: ChannelTypes.UPDATE_CHANNEL_MEMBER_SUCCESS
-            }
+                type: ChannelTypes.UPDATE_CHANNEL_MEMBER_SUCCESS,
+            },
         ];
 
         const membersInChannel = getState().entities.channels.membersInChannel[channelId];
@@ -997,7 +997,7 @@ export function updateChannelMemberRoles(channelId, userId, roles) {
             actions.push(
                 {
                     type: ChannelTypes.RECEIVED_CHANNEL_MEMBER,
-                    data: {...membersInChannel[userId], roles}
+                    data: {...membersInChannel[userId], roles},
                 }
             );
         }
@@ -1016,8 +1016,8 @@ export function updateChannelHeader(channelId, header) {
             type: ChannelTypes.UPDATE_CHANNEL_HEADER,
             data: {
                 channelId,
-                header
-            }
+                header,
+            },
         }, getState);
 
         return {data: true};
@@ -1032,8 +1032,8 @@ export function updateChannelPurpose(channelId, purpose) {
             type: ChannelTypes.UPDATE_CHANNEL_PURPOSE,
             data: {
                 channelId,
-                purpose
-            }
+                purpose,
+            },
         }, getState);
 
         return {data: true};
@@ -1052,7 +1052,7 @@ export function markChannelAsRead(channelId, prevChannelId, updateLastViewedAt =
                 forceLogoutIfNecessary(error, dispatch, getState);
                 dispatch(batchActions([
                     {type: ChannelTypes.UPDATE_LAST_VIEWED_FAILURE, error},
-                    logError(error)(dispatch)
+                    logError(error)(dispatch),
                 ]), getState);
                 return {error};
             });
@@ -1077,8 +1077,8 @@ export function markChannelAsRead(channelId, prevChannelId, updateLastViewedAt =
                 data: {
                     teamId: channel.team_id,
                     channelId,
-                    amount: channel.total_msg_count - channelMember.msg_count
-                }
+                    amount: channel.total_msg_count - channelMember.msg_count,
+                },
             });
 
             actions.push({
@@ -1086,8 +1086,8 @@ export function markChannelAsRead(channelId, prevChannelId, updateLastViewedAt =
                 data: {
                     teamId: channel.team_id,
                     channelId,
-                    amount: channelMember.mention_count
-                }
+                    amount: channelMember.mention_count,
+                },
             });
         }
 
@@ -1097,8 +1097,8 @@ export function markChannelAsRead(channelId, prevChannelId, updateLastViewedAt =
                 data: {
                     teamId: prevChannel.team_id,
                     channelId: prevChannelId,
-                    amount: prevChannel.total_msg_count - prevChannelMember.msg_count
-                }
+                    amount: prevChannel.total_msg_count - prevChannelMember.msg_count,
+                },
             });
 
             actions.push({
@@ -1106,8 +1106,8 @@ export function markChannelAsRead(channelId, prevChannelId, updateLastViewedAt =
                 data: {
                     teamId: prevChannel.team_id,
                     channelId: prevChannelId,
-                    amount: prevChannelMember.mention_count
-                }
+                    amount: prevChannelMember.mention_count,
+                },
             });
         }
 
@@ -1130,8 +1130,8 @@ export function markChannelAsUnread(teamId, channelId, mentions) {
             type: ChannelTypes.INCREMENT_TOTAL_MSG_COUNT,
             data: {
                 channelId,
-                amount: 1
-            }
+                amount: 1,
+            },
         }, {
             type: ChannelTypes.INCREMENT_UNREAD_MSG_COUNT,
             data: {
@@ -1139,8 +1139,8 @@ export function markChannelAsUnread(teamId, channelId, mentions) {
                 channelId,
                 amount: 1,
                 onlyMentions: myMembers[channelId] && myMembers[channelId].notify_props &&
-                    myMembers[channelId].notify_props.mark_unread === General.MENTION
-            }
+                    myMembers[channelId].notify_props.mark_unread === General.MENTION,
+            },
         }];
 
         if (mentions && mentions.indexOf(currentUserId) !== -1) {
@@ -1149,8 +1149,8 @@ export function markChannelAsUnread(teamId, channelId, mentions) {
                 data: {
                     teamId,
                     channelId,
-                    amount: 1
-                }
+                    amount: 1,
+                },
             });
         }
 
@@ -1199,7 +1199,7 @@ export function favoriteChannel(channelId) {
             user_id: currentUserId,
             category: Preferences.CATEGORY_FAVORITE_CHANNEL,
             name: channelId,
-            value: 'true'
+            value: 'true',
         };
 
         Client4.trackEvent('action', 'action_channels_favorite');
@@ -1214,7 +1214,7 @@ export function unfavoriteChannel(channelId) {
         const preference = {
             user_id: currentUserId,
             category: Preferences.CATEGORY_FAVORITE_CHANNEL,
-            name: channelId
+            name: channelId,
         };
 
         Client4.trackEvent('action', 'action_channels_unfavorite');
@@ -1250,5 +1250,5 @@ export default {
     markChannelAsRead,
     markChannelAsUnread,
     favoriteChannel,
-    unfavoriteChannel
+    unfavoriteChannel,
 };

@@ -144,5 +144,5 @@ export default keyMirror({
     RECEIVED_PLUGINS: null,
     REMOVED_PLUGIN: null,
     ACTIVATED_PLUGIN: null,
-    DEACTIVATED_PLUGIN: null
+    DEACTIVATED_PLUGIN: null,
 });

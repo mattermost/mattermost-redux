@@ -63,9 +63,9 @@ export function getClientConfig() {
             dispatch(batchActions([
                 {
                     type: GeneralTypes.CLIENT_CONFIG_FAILURE,
-                    error
+                    error,
                 },
-                logError(error)(dispatch)
+                logError(error)(dispatch),
             ]), getState);
             return {error};
         }
@@ -75,7 +75,7 @@ export function getClientConfig() {
 
         dispatch(batchActions([
             {type: GeneralTypes.CLIENT_CONFIG_RECEIVED, data},
-            {type: GeneralTypes.CLIENT_CONFIG_SUCCESS}
+            {type: GeneralTypes.CLIENT_CONFIG_SUCCESS},
         ]));
 
         return {data};
@@ -94,16 +94,16 @@ export function getDataRetentionPolicy() {
             dispatch(batchActions([
                 {
                     type: GeneralTypes.DATA_RETENTION_POLICY_FAILURE,
-                    error
+                    error,
                 },
-                logError(error)(dispatch)
+                logError(error)(dispatch),
             ]), getState);
             return {error};
         }
 
         dispatch(batchActions([
             {type: GeneralTypes.RECEIVED_DATA_RETENTION_POLICY, data},
-            {type: GeneralTypes.DATA_RETENTION_POLICY_SUCCESS}
+            {type: GeneralTypes.DATA_RETENTION_POLICY_SUCCESS},
         ]));
 
         return {data};
@@ -183,5 +183,5 @@ export default {
     setDeviceToken,
     setServerVersion,
     setStoreFromLocalData,
-    setUrl
+    setUrl,
 };

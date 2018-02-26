@@ -347,6 +347,6 @@ export default combineReducers({
     getPlugins,
     removePlugin,
     activatePlugin,
-    deactivatePlugin
+    deactivatePlugin,
 });
 

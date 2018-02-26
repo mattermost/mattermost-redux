@@ -63,15 +63,15 @@ export default {
     TEAMMATE_NAME_DISPLAY: {
         SHOW_USERNAME: 'username',
         SHOW_NICKNAME_FULLNAME: 'nickname_full_name',
-        SHOW_FULLNAME: 'full_name'
+        SHOW_FULLNAME: 'full_name',
     },
 
     SPECIAL_MENTIONS: [
         'all',
         'channel',
-        'here'
+        'here',
     ],
 
     MAX_USERS_IN_GM: 8,
-    MIN_USERS_IN_GM: 3
+    MIN_USERS_IN_GM: 3,
 };

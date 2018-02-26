@@ -32,5 +32,5 @@ export default combineReducers({
     admin,
     alerts,
     jobs,
-    search
+    search,
 });

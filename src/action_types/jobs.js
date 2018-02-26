@@ -22,5 +22,5 @@ export default keyMirror({
 
     RECEIVED_JOB: null,
     RECEIVED_JOBS: null,
-    RECEIVED_JOBS_BY_TYPE: null
+    RECEIVED_JOBS_BY_TYPE: null,
 });

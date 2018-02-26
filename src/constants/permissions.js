@@ -49,5 +49,5 @@ export default {
     CREATE_USER_ACCESS_TOKEN: 'create_user_access_token',
     READ_USER_ACCESS_TOKEN: 'read_user_access_token',
     REVOKE_USER_ACCESS_TOKEN: 'revoke_user_access_token',
-    MANAGE_JOBS: 'manage_jobs'
+    MANAGE_JOBS: 'manage_jobs',
 };

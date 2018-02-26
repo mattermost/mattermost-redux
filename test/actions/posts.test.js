@@ -78,7 +78,7 @@ describe('Actions.Posts', () => {
             message: 'Invalid RootId parameter',
             server_error_id: 'api.post.create_post.root_id.app_error',
             status_code: 400,
-            url: 'http://localhost:8065/api/v4/posts'
+            url: 'http://localhost:8065/api/v4/posts',
         };
 
         nock(Client4.getPostsRoute()).
@@ -634,58 +634,58 @@ describe('Actions.Posts', () => {
                     profiles: {
                         1: {
                             id: '1',
-                            username: 'aaa'
-                        }
-                    }
-                }
-            }
+                            username: 'aaa',
+                        },
+                    },
+                },
+            },
         };
 
         assert.deepEqual(
             Actions.getNeededAtMentionedUsernames(state, {
-                abcd: {message: 'aaa'}
+                abcd: {message: 'aaa'},
             }),
             new Set()
         );
 
         assert.deepEqual(
             Actions.getNeededAtMentionedUsernames(state, {
-                abcd: {message: '@aaa'}
+                abcd: {message: '@aaa'},
             }),
             new Set()
         );
 
         assert.deepEqual(
             Actions.getNeededAtMentionedUsernames(state, {
-                abcd: {message: '@aaa @bbb @ccc'}
+                abcd: {message: '@aaa @bbb @ccc'},
             }),
             new Set(['bbb', 'ccc'])
         );
 
         assert.deepEqual(
             Actions.getNeededAtMentionedUsernames(state, {
-                abcd: {message: '@bbb. @ccc.ddd'}
+                abcd: {message: '@bbb. @ccc.ddd'},
             }),
             new Set(['bbb.', 'bbb', 'ccc.ddd'])
         );
 
         assert.deepEqual(
             Actions.getNeededAtMentionedUsernames(state, {
-                abcd: {message: '@bbb- @ccc-ddd'}
+                abcd: {message: '@bbb- @ccc-ddd'},
             }),
             new Set(['bbb-', 'bbb', 'ccc-ddd'])
         );
 
         assert.deepEqual(
             Actions.getNeededAtMentionedUsernames(state, {
-                abcd: {message: '@bbb_ @ccc_ddd'}
+                abcd: {message: '@bbb_ @ccc_ddd'},
             }),
             new Set(['bbb_', 'ccc_ddd'])
         );
 
         assert.deepEqual(
             Actions.getNeededAtMentionedUsernames(state, {
-                abcd: {message: '(@bbb/@ccc) ddd@eee'}
+                abcd: {message: '(@bbb/@ccc) ddd@eee'},
             }),
             new Set(['bbb', 'ccc'])
         );
@@ -697,7 +697,7 @@ describe('Actions.Posts', () => {
                 abcd2: {message: '@channel'},
                 abcd3: {message: '@all.'},
                 abcd4: {message: '@here.'},
-                abcd5: {message: '@channel.'}
+                abcd5: {message: '@channel.'},
             }),
             new Set(),
             'should never try to request usernames matching special mentions'
@@ -712,68 +712,68 @@ describe('Actions.Posts', () => {
                         1: {
                             id: '1',
                             creator_id: '1',
-                            name: 'name1'
-                        }
+                            name: 'name1',
+                        },
                     },
-                    nonExistentEmoji: new Set(['name2'])
-                }
-            }
+                    nonExistentEmoji: new Set(['name2']),
+                },
+            },
         };
 
         setSystemEmojis(new Map([['systemEmoji1', {}]]));
 
         assert.deepEqual(
             Actions.getNeededCustomEmojis(state, {
-                abcd: {message: 'aaa'}
+                abcd: {message: 'aaa'},
             }),
             new Set()
         );
 
         assert.deepEqual(
             Actions.getNeededCustomEmojis(state, {
-                abcd: {message: ':name1:'}
+                abcd: {message: ':name1:'},
             }),
             new Set()
         );
 
         assert.deepEqual(
             Actions.getNeededCustomEmojis(state, {
-                abcd: {message: ':systemEmoji1:'}
+                abcd: {message: ':systemEmoji1:'},
             }),
             new Set()
         );
 
         assert.deepEqual(
             Actions.getNeededCustomEmojis(state, {
-                abcd: {message: ':systemEmoji1: :name1: :name2: :name3:'}
+                abcd: {message: ':systemEmoji1: :name1: :name2: :name3:'},
             }),
             new Set(['name3'])
         );
 
         assert.deepEqual(
             Actions.getNeededCustomEmojis(state, {
-                abcd: {message: 'aaa :name3: :name4:'}
+                abcd: {message: 'aaa :name3: :name4:'},
             }),
             new Set(['name3', 'name4'])
         );
 
         assert.deepEqual(
             Actions.getNeededCustomEmojis(state, {
-                abcd: {message: ':name3:!'}
+                abcd: {message: ':name3:!'},
             }),
             new Set(['name3'])
         );
 
         assert.deepEqual(
             Actions.getNeededCustomEmojis(state, {
-                abcd: {message: ':name-3:'}
+                abcd: {message: ':name-3:'},
             }),
             new Set(['name-3'])
         );
 
         assert.deepEqual(
             Actions.getNeededCustomEmojis(state, {
-                abcd: {message: ':name_3:'}
+                abcd: {message: ':name_3:'},
             }),
             new Set(['name_3'])
         );
@@ -1447,7 +1447,7 @@ describe('Actions.Posts', () => {
 
         dispatch({
             type: PostTypes.REACTION_DELETED,
-            data: {user_id: TestHelper.basicUser.id, post_id: post1.id, emoji_name: emojiName}
+            data: {user_id: TestHelper.basicUser.id, post_id: post1.id, emoji_name: emojiName},
         });
 
         nock(Client4.getPostsRoute()).
@@ -1481,7 +1481,7 @@ describe('Actions.Posts', () => {
         const {data: created} = await createCustomEmoji(
             {
                 name: TestHelper.generateId(),
-                creator_id: TestHelper.basicUser.id
+                creator_id: TestHelper.basicUser.id,
             },
             testImageData
         )(store.dispatch, store.getState);
