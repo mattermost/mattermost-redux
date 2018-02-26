@@ -75,6 +75,8 @@ class TestHelper {
             username: this.generateId(),
             first_name: this.generateId(),
             last_name: this.generateId(),
+            create_at: Date.now(),
+            delete_at: 0,
         };
     };
 
@@ -82,6 +84,9 @@ class TestHelper {
         return {
             ...this.fakeUser(),
             id: this.generateId(),
+            create_at: 1507840900004,
+            update_at: 1507840900004,
+            delete_at: 0,
         };
     };
 
@@ -106,6 +111,9 @@ class TestHelper {
         return {
             ...this.fakeTeam(),
             id: this.generateId(),
+            create_at: 1507840900004,
+            update_at: 1507840900004,
+            delete_at: 0,
         };
     };
 
@@ -201,6 +209,9 @@ class TestHelper {
         return {
             ...this.fakeChannel(teamId),
             id: this.generateId(),
+            create_at: 1507840900004,
+            update_at: 1507840900004,
+            delete_at: 0,
         };
     };
 
@@ -226,6 +237,9 @@ class TestHelper {
         return {
             ...this.fakePost(channelId),
             id: this.generateId(),
+            create_at: 1507840900004,
+            update_at: 1507840900004,
+            delete_at: 0,
         };
     };
 
