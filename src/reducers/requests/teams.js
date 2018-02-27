@@ -182,5 +182,5 @@ export default combineReducers({
     updateTeamMember,
     emailInvite,
     joinTeam,
-    setTeamIcon
+    setTeamIcon,
 });

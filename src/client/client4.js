@@ -1012,12 +1012,12 @@ export default class Client4 {
 
         const request = {
             method: 'post',
-            body: formData
+            body: formData,
         };
 
         if (formData.getBoundary) {
             request.headers = {
-                'Content-Type': `multipart/form-data; boundary=${formData.getBoundary()}`
+                'Content-Type': `multipart/form-data; boundary=${formData.getBoundary()}`,
             };
         }
 
