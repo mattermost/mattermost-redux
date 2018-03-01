@@ -547,3 +547,14 @@ export function joinTeam(inviteId, teamId) {
         return {data: true};
     };
 }
+
+export function setTeamIcon(teamId, imageData) {
+    return bindClientFunc(
+        Client4.setTeamIcon,
+        TeamTypes.SET_TEAM_ICON_REQUEST,
+        TeamTypes.SET_TEAM_ICON_SUCCESS,
+        TeamTypes.SET_TEAM_ICON_FAILURE,
+        teamId,
+        imageData
+    );
+}

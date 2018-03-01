@@ -995,6 +995,38 @@ export default class Client4 {
         );
     };
 
+    getTeamIconUrl = (teamId, lastTeamIconUpdate) => {
+        const params = {};
+        if (lastTeamIconUpdate) {
+            params._ = lastTeamIconUpdate;
+        }
+
+        return `${this.getTeamRoute(teamId)}/image${buildQueryString(params)}`;
+    };
+
+    setTeamIcon = async (teamId, imageData) => {
+        this.trackEvent('api', 'api_team_set_team_icon');
+
+        const formData = new FormData();
+        formData.append('image', imageData);
+
+        const request = {
+            method: 'post',
+            body: formData,
+        };
+
+        if (formData.getBoundary) {
+            request.headers = {
+                'Content-Type': `multipart/form-data; boundary=${formData.getBoundary()}`,
+            };
+        }
+
+        return this.doFetch(
+            `${this.getTeamRoute(teamId)}/image`,
+            request
+        );
+    };
+
     // Channel Routes
 
     createChannel = async (channel) => {
