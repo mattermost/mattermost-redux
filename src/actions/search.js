@@ -41,13 +41,13 @@ export function searchPosts(teamId, terms, isOrSearch = false) {
 
             await Promise.all([
                 getProfilesAndStatusesForPosts(posts.posts, dispatch, getState),
-                getMissingChannelsFromPosts(posts.posts)(dispatch, getState)
+                getMissingChannelsFromPosts(posts.posts)(dispatch, getState),
             ]);
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch, getState);
             dispatch(batchActions([
                 {type: SearchTypes.SEARCH_POSTS_FAILURE, error},
-                logError(error)(dispatch)
+                logError(error)(dispatch),
             ]), getState);
             return {error};
         }
@@ -55,19 +55,19 @@ export function searchPosts(teamId, terms, isOrSearch = false) {
         dispatch(batchActions([
             {
                 type: SearchTypes.RECEIVED_SEARCH_POSTS,
-                data: posts
+                data: posts,
             },
             {
                 type: SearchTypes.RECEIVED_SEARCH_TERM,
                 data: {
                     teamId,
                     terms,
-                    isOrSearch
-                }
+                    isOrSearch,
+                },
             },
             {
-                type: SearchTypes.SEARCH_POSTS_SUCCESS
-            }
+                type: SearchTypes.SEARCH_POSTS_SUCCESS,
+            },
         ], 'SEARCH_POST_BATCH'), getState);
 
         return {data: posts};
@@ -88,8 +88,8 @@ export function removeSearchTerms(teamId, terms) {
             type: SearchTypes.REMOVE_SEARCH_TERM,
             data: {
                 teamId,
-                terms
-            }
+                terms,
+            },
         }, getState);
 
         return {data: true};
@@ -99,5 +99,5 @@ export function removeSearchTerms(teamId, terms) {
 export default {
     clearSearch,
     removeSearchTerms,
-    searchPosts
+    searchPosts,
 };

@@ -34,7 +34,7 @@ describe('Actions.Jobs', () => {
         }
 
         const job = {
-            type: 'data_retention'
+            type: 'data_retention',
         };
 
         nock(Client4.getBaseRoute()).
@@ -44,7 +44,7 @@ describe('Actions.Jobs', () => {
                 create_at: 1491399241953,
                 type: 'data_retention',
                 status: 'pending',
-                data: {}
+                data: {},
             });
 
         await Actions.createJob(job)(store.dispatch, store.getState);
@@ -72,7 +72,7 @@ describe('Actions.Jobs', () => {
                 create_at: 1491399241953,
                 type: 'data_retention',
                 status: 'pending',
-                data: {}
+                data: {},
             });
 
         await Actions.getJob('six4h67ja7ntdkek6g13dp3wka')(store.dispatch, store.getState);
@@ -120,7 +120,7 @@ describe('Actions.Jobs', () => {
                 create_at: 1491399241953,
                 type: 'data_retention',
                 status: 'pending',
-                data: {}
+                data: {},
             }]);
 
         await Actions.getJobs()(store.dispatch, store.getState);
@@ -149,7 +149,7 @@ describe('Actions.Jobs', () => {
                 create_at: 1491399241953,
                 type: 'data_retention',
                 status: 'pending',
-                data: {}
+                data: {},
             }]);
 
         await Actions.getJobsByType('data_retention')(store.dispatch, store.getState);

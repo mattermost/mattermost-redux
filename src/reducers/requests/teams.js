@@ -156,6 +156,16 @@ function joinTeam(state = initialRequestState(), action) {
     );
 }
 
+function setTeamIcon(state = initialRequestState(), action) {
+    return handleRequest(
+        TeamTypes.SET_TEAM_ICON_REQUEST,
+        TeamTypes.SET_TEAM_ICON_SUCCESS,
+        TeamTypes.SET_TEAM_ICON_FAILURE,
+        state,
+        action
+    );
+}
+
 export default combineReducers({
     getMyTeams,
     getTeams,
@@ -171,5 +181,6 @@ export default combineReducers({
     removeUserFromTeam,
     updateTeamMember,
     emailInvite,
-    joinTeam
+    joinTeam,
+    setTeamIcon,
 });

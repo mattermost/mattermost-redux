@@ -52,7 +52,7 @@ export default {
             errorTextColor: '#fd5960',
             mentionHighlightBg: '#ffe577',
             mentionHighlightLink: '#166de0',
-            codeTheme: 'github'
+            codeTheme: 'github',
         },
         organization: {
             type: 'Organization',
@@ -78,7 +78,7 @@ export default {
             errorTextColor: '#a94442',
             mentionHighlightBg: '#f3e197',
             mentionHighlightLink: '#2f81b7',
-            codeTheme: 'github'
+            codeTheme: 'github',
         },
         mattermostDark: {
             type: 'Mattermost Dark',
@@ -104,7 +104,7 @@ export default {
             errorTextColor: '#ff6461',
             mentionHighlightBg: '#984063',
             mentionHighlightLink: '#a4ffeb',
-            codeTheme: 'solarized-dark'
+            codeTheme: 'solarized-dark',
         },
         windows10: {
             type: 'Windows Dark',
@@ -130,7 +130,7 @@ export default {
             errorTextColor: '#ff6461',
             mentionHighlightBg: '#784098',
             mentionHighlightLink: '#a4ffeb',
-            codeTheme: 'monokai'
-        }
-    }
+            codeTheme: 'monokai',
+        },
+    },
 };

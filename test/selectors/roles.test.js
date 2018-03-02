@@ -90,28 +90,28 @@ describe('Selectors.Roles', () => {
         test_channel_b_role2: {permissions: ['channel_b_role2']},
         test_channel_c_role1: {permissions: ['channel_c_role1']},
         test_channel_c_role2: {permissions: ['channel_c_role2']},
-        test_user_role2: {permissions: ['user_role2']}
+        test_user_role2: {permissions: ['user_role2']},
     };
 
     const testState = deepFreezeAndThrowOnMutation({
         entities: {
             users: {
                 currentUserId: user.id,
-                profiles
+                profiles,
             },
             teams: {
                 currentTeamId: team1.id,
-                myMembers: myTeamMembers
+                myMembers: myTeamMembers,
             },
             channels: {
                 currentChannelId: channel1.id,
                 channels,
-                myMembers: myChannelMembers
+                myMembers: myChannelMembers,
             },
             roles: {
-                roles
-            }
-        }
+                roles,
+            },
+        },
     });
 
     it('should return my roles by scope on getMyRoles/getMySystemRoles/getMyTeamRoles/getMyChannelRoles', () => {
@@ -132,7 +132,7 @@ describe('Selectors.Roles', () => {
         const myRoles = {
             system: new Set(['test_user_role', 'test_user_role2']),
             team: teamsRoles,
-            channel: channelsRoles
+            channel: channelsRoles,
         };
         assert.deepEqual(Selectors.getMyRoles(testState), myRoles);
         assert.deepEqual(Selectors.getMySystemRoles(testState), myRoles.system);
@@ -150,14 +150,14 @@ describe('Selectors.Roles', () => {
             test_channel_b_role2: {permissions: ['channel_b_role2']},
             test_channel_c_role1: {permissions: ['channel_c_role1']},
             test_channel_c_role2: {permissions: ['channel_c_role2']},
-            test_user_role2: {permissions: ['user_role2']}
+            test_user_role2: {permissions: ['user_role2']},
         };
         assert.deepEqual(Selectors.getRoles(testState), loadedRoles);
     });
 
     it('should return my system permission on getMySystemPermissions', () => {
         assert.deepEqual(Selectors.getMySystemPermissions(testState), new Set([
-            'user_role2'
+            'user_role2',
         ]));
     });
 
@@ -168,7 +168,7 @@ describe('Selectors.Roles', () => {
 
     it('should return my team permission on getMyTeamPermissions', () => {
         assert.deepEqual(Selectors.getMyTeamPermissions(testState, {team: team1.id}), new Set([
-            'user_role2', 'team1_role1'
+            'user_role2', 'team1_role1',
         ]));
     });
 
@@ -181,7 +181,7 @@ describe('Selectors.Roles', () => {
 
     it('should return my team permission on getMyCurrentTeamPermissions', () => {
         assert.deepEqual(Selectors.getMyCurrentTeamPermissions(testState), new Set([
-            'user_role2', 'team1_role1'
+            'user_role2', 'team1_role1',
         ]));
     });
 
@@ -194,7 +194,7 @@ describe('Selectors.Roles', () => {
 
     it('should return my channel permission on getMyChannelPermissions', () => {
         assert.deepEqual(Selectors.getMyChannelPermissions(testState, {team: team1.id, channel: channel1.id}), new Set([
-            'user_role2', 'team1_role1', 'channel_a_role1', 'channel_a_role2'
+            'user_role2', 'team1_role1', 'channel_a_role1', 'channel_a_role2',
         ]));
     });
 
@@ -208,7 +208,7 @@ describe('Selectors.Roles', () => {
 
     it('should return my current channel permission on getMyCurrentChannelPermissions', () => {
         assert.deepEqual(Selectors.getMyCurrentChannelPermissions(testState), new Set([
-            'user_role2', 'team1_role1', 'channel_a_role1', 'channel_a_role2'
+            'user_role2', 'team1_role1', 'channel_a_role1', 'channel_a_role2',
         ]));
     });
 

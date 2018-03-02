@@ -50,5 +50,5 @@ export default combineReducers({
     getRolesByNames,
     getRoleByName,
     getRole,
-    editRole
+    editRole,
 });

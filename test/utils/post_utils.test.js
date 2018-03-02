@@ -103,9 +103,9 @@ describe('PostUtils', () => {
             const oldVersionState = {
                 entities: {
                     general: {
-                        serverVersion: '4.3.0'
-                    }
-                }
+                        serverVersion: '4.3.0',
+                    },
+                },
             };
 
             // With old permissions
@@ -123,40 +123,40 @@ describe('PostUtils', () => {
             const newVersionState = {
                 entities: {
                     general: {
-                        serverVersion: '4.8.0'
+                        serverVersion: '4.8.0',
                     },
                     users: {
                         currentUserId: userId,
                         profiles: {
-                            'user-id': {roles: 'system_role'}
-                        }
+                            'user-id': {roles: 'system_role'},
+                        },
                     },
                     teams: {
                         currentTeamId: teamId,
                         myMembers: {
-                            'team-id': {roles: 'team_role'}
-                        }
+                            'team-id': {roles: 'team_role'},
+                        },
                     },
                     channels: {
                         currentChannelId: channelId,
                         myMembers: {
-                            'channel-id': {roles: 'channel_role'}
-                        }
+                            'channel-id': {roles: 'channel_role'},
+                        },
                     },
                     roles: {
                         roles: {
                             system_role: {
-                                permissions: []
+                                permissions: [],
                             },
                             team_role: {
-                                permissions: []
+                                permissions: [],
                             },
                             channel_role: {
-                                permissions: []
-                            }
-                        }
-                    }
-                }
+                                permissions: [],
+                            },
+                        },
+                    },
+                },
             };
 
             // With new permissions
@@ -171,8 +171,8 @@ describe('PostUtils', () => {
                 roles: {
                     system_role: {permissions: [Permissions.EDIT_POST]},
                     team_role: {permissions: []},
-                    channel_role: {permissions: []}
-                }
+                    channel_role: {permissions: []},
+                },
             };
             assert.ok(canEditPost(newVersionState, {PostEditTimeLimit: -1}, licensed, teamId, channelId, userId, {user_id: userId}));
             assert.ok(canEditPost(newVersionState, {PostEditTimeLimit: 300}, licensed, teamId, channelId, userId, {user_id: userId, create_at: Date.now() - 100}));
@@ -185,8 +185,8 @@ describe('PostUtils', () => {
                 roles: {
                     system_role: {permissions: []},
                     team_role: {permissions: [Permissions.EDIT_POST]},
-                    channel_role: {permissions: []}
-                }
+                    channel_role: {permissions: []},
+                },
             };
             assert.ok(canEditPost(newVersionState, {PostEditTimeLimit: -1}, licensed, teamId, channelId, userId, {user_id: userId}));
             assert.ok(canEditPost(newVersionState, {PostEditTimeLimit: 300}, licensed, teamId, channelId, userId, {user_id: userId, create_at: Date.now() - 100}));
@@ -199,8 +199,8 @@ describe('PostUtils', () => {
                 roles: {
                     system_role: {permissions: []},
                     team_role: {permissions: []},
-                    channel_role: {permissions: [Permissions.EDIT_POST]}
-                }
+                    channel_role: {permissions: [Permissions.EDIT_POST]},
+                },
             };
             assert.ok(canEditPost(newVersionState, {PostEditTimeLimit: -1}, licensed, teamId, channelId, userId, {user_id: userId}));
             assert.ok(canEditPost(newVersionState, {PostEditTimeLimit: 300}, licensed, teamId, channelId, userId, {user_id: userId, create_at: Date.now() - 100}));
@@ -213,8 +213,8 @@ describe('PostUtils', () => {
                 roles: {
                     system_role: {permissions: [Permissions.EDIT_OTHERS_POSTS]},
                     team_role: {permissions: []},
-                    channel_role: {permissions: []}
-                }
+                    channel_role: {permissions: []},
+                },
             };
             assert.ok(!canEditPost(newVersionState, {PostEditTimeLimit: -1}, licensed, teamId, channelId, userId, {user_id: userId}));
             assert.ok(!canEditPost(newVersionState, {PostEditTimeLimit: 300}, licensed, teamId, channelId, userId, {user_id: userId, create_at: Date.now() - 100}));
@@ -227,8 +227,8 @@ describe('PostUtils', () => {
                 roles: {
                     system_role: {permissions: []},
                     team_role: {permissions: [Permissions.EDIT_OTHERS_POSTS]},
-                    channel_role: {permissions: []}
-                }
+                    channel_role: {permissions: []},
+                },
             };
             assert.ok(!canEditPost(newVersionState, {PostEditTimeLimit: -1}, licensed, teamId, channelId, userId, {user_id: userId}));
             assert.ok(!canEditPost(newVersionState, {PostEditTimeLimit: 300}, licensed, teamId, channelId, userId, {user_id: userId, create_at: Date.now() - 100}));
@@ -241,8 +241,8 @@ describe('PostUtils', () => {
                 roles: {
                     system_role: {permissions: []},
                     team_role: {permissions: []},
-                    channel_role: {permissions: [Permissions.EDIT_OTHERS_POSTS]}
-                }
+                    channel_role: {permissions: [Permissions.EDIT_OTHERS_POSTS]},
+                },
             };
             assert.ok(!canEditPost(newVersionState, {PostEditTimeLimit: -1}, licensed, teamId, channelId, userId, {user_id: userId}));
             assert.ok(!canEditPost(newVersionState, {PostEditTimeLimit: 300}, licensed, teamId, channelId, userId, {user_id: userId, create_at: Date.now() - 100}));
@@ -255,8 +255,8 @@ describe('PostUtils', () => {
                 roles: {
                     system_role: {permissions: [Permissions.EDIT_OTHERS_POSTS, Permissions.EDIT_POST]},
                     team_role: {permissions: []},
-                    channel_role: {permissions: []}
-                }
+                    channel_role: {permissions: []},
+                },
             };
             assert.ok(canEditPost(newVersionState, {PostEditTimeLimit: -1}, licensed, teamId, channelId, userId, {user_id: userId}));
             assert.ok(canEditPost(newVersionState, {PostEditTimeLimit: 300}, licensed, teamId, channelId, userId, {user_id: userId, create_at: Date.now() - 100}));
@@ -269,8 +269,8 @@ describe('PostUtils', () => {
                 roles: {
                     system_role: {permissions: []},
                     team_role: {permissions: [Permissions.EDIT_OTHERS_POSTS, Permissions.EDIT_POST]},
-                    channel_role: {permissions: []}
-                }
+                    channel_role: {permissions: []},
+                },
             };
             assert.ok(canEditPost(newVersionState, {PostEditTimeLimit: -1}, licensed, teamId, channelId, userId, {user_id: userId}));
             assert.ok(canEditPost(newVersionState, {PostEditTimeLimit: 300}, licensed, teamId, channelId, userId, {user_id: userId, create_at: Date.now() - 100}));
@@ -283,8 +283,8 @@ describe('PostUtils', () => {
                 roles: {
                     system_role: {permissions: []},
                     team_role: {permissions: []},
-                    channel_role: {permissions: [Permissions.EDIT_OTHERS_POSTS, Permissions.EDIT_POST]}
-                }
+                    channel_role: {permissions: [Permissions.EDIT_OTHERS_POSTS, Permissions.EDIT_POST]},
+                },
             };
             assert.ok(canEditPost(newVersionState, {PostEditTimeLimit: -1}, licensed, teamId, channelId, userId, {user_id: userId}));
             assert.ok(canEditPost(newVersionState, {PostEditTimeLimit: 300}, licensed, teamId, channelId, userId, {user_id: userId, create_at: Date.now() - 100}));

@@ -71,5 +71,5 @@ export default keyMirror({
     ADD_MESSAGE_INTO_HISTORY: null,
     RESET_HISTORY_INDEX: null,
     MOVE_HISTORY_INDEX_BACK: null,
-    MOVE_HISTORY_INDEX_FORWARD: null
+    MOVE_HISTORY_INDEX_FORWARD: null,
 });

@@ -58,5 +58,5 @@ export default combineReducers({
 
     // object where the key is the category-name and has the corresponding value
     roles,
-    pending
+    pending,
 });

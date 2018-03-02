@@ -11,7 +11,7 @@ const channelTypeOrder = {
     [General.OPEN_CHANNEL]: 0,
     [General.PRIVATE_CHANNEL]: 1,
     [General.DM_CHANNEL]: 2,
-    [General.GM_CHANNEL]: 2
+    [General.GM_CHANNEL]: 2,
 };
 
 /**
@@ -39,7 +39,7 @@ export function buildDisplayableChannelList(usersState, allChannels, myMembers, 
         favoriteChannels,
         publicChannels: notFavoriteChannels.filter(isOpenChannel),
         privateChannels: notFavoriteChannels.filter(isPrivateChannel),
-        directAndGroupChannels
+        directAndGroupChannels,
     };
 }
 
@@ -60,7 +60,7 @@ export function buildDisplayableChannelListWithUnreadSection(usersState, myChann
         favoriteChannels,
         publicChannels: notFavoriteChannels.filter(isOpenChannel),
         privateChannels: notFavoriteChannels.filter(isPrivateChannel),
-        directAndGroupChannels
+        directAndGroupChannels,
     };
 }
 
@@ -72,7 +72,7 @@ export function completeDirectChannelInfo(usersState, teammateNameDisplay, chann
         return Object.assign(dmChannelClone, {
             display_name: displayUsername(usersState.profiles[teammateId], teammateNameDisplay),
             teammate_id: teammateId,
-            status: usersState.statuses[teammateId] || 'offline'
+            status: usersState.statuses[teammateId] || 'offline',
         });
     } else if (isGroupChannel(channel)) {
         return completeDirectGroupInfo(usersState, teammateNameDisplay, channel);
@@ -99,7 +99,7 @@ export function completeDirectChannelDisplayName(currentUserId, profiles, teamma
         });
         if (usernames.length === userIds.length) {
             return Object.assign({}, channel, {
-                display_name: getGroupDisplayNameFromUserIds(userIds, profiles, currentUserId, teammateNameDisplay)
+                display_name: getGroupDisplayNameFromUserIds(userIds, profiles, currentUserId, teammateNameDisplay),
             });
         }
     }
@@ -404,7 +404,7 @@ function createFakeChannel(userId, otherUserId) {
         last_post_at: 0,
         total_msg_count: 0,
         type: General.DM_CHANNEL,
-        fake: true
+        fake: true,
     };
 }
 
@@ -430,7 +430,7 @@ function completeDirectGroupInfo(usersState, teammateNameDisplay, channel) {
 
     if (profilesIds) {
         return Object.assign(gm, {
-            display_name: getGroupDisplayNameFromUserIds(profilesIds, profiles, currentUserId, teammateNameDisplay)
+            display_name: getGroupDisplayNameFromUserIds(profilesIds, profiles, currentUserId, teammateNameDisplay),
         });
     }
 
@@ -445,7 +445,7 @@ function completeDirectGroupInfo(usersState, teammateNameDisplay, channel) {
     });
     if (usernames.length === userIds.length) {
         return Object.assign(gm, {
-            display_name: getGroupDisplayNameFromUserIds(userIds, profiles, currentUserId, teammateNameDisplay)
+            display_name: getGroupDisplayNameFromUserIds(userIds, profiles, currentUserId, teammateNameDisplay),
         });
     }
 

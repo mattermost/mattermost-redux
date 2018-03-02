@@ -3,6 +3,7 @@
 
 import assert from 'assert';
 import nock from 'nock';
+import fs from 'fs';
 
 import * as Actions from 'actions/teams';
 import {login} from 'actions/users';
@@ -221,7 +222,7 @@ describe('Actions.Teams', () => {
         const team = {
             ...TestHelper.basicTeam,
             display_name: displayName,
-            description
+            description,
         };
 
         nock(Client4.getTeamsRoute()).
@@ -313,7 +314,7 @@ describe('Actions.Teams', () => {
 
         const {
             getMyTeamMembers: membersRequest,
-            getMyTeamUnreads: unreadRequest
+            getMyTeamUnreads: unreadRequest,
         } = store.getState().requests.teams;
         const members = store.getState().entities.teams.myMembers;
 
@@ -651,5 +652,25 @@ describe('Actions.Teams', () => {
         }
 
         assert.ok(exists === false);
+    });
+
+    it('setTeamIcon', async () => {
+        TestHelper.mockLogin();
+        await login(TestHelper.basicUser.email, 'password1')(store.dispatch, store.getState);
+
+        const team = TestHelper.basicTeam;
+        const imageData = fs.createReadStream('test/assets/images/test.png');
+
+        nock(Client4.getTeamRoute(team.id)).
+            post('/image').
+            reply(200, OK_RESPONSE);
+
+        await Actions.setTeamIcon(team.id, imageData)(store.dispatch, store.getState);
+
+        const setTeamIconRequest = store.getState().requests.teams.setTeamIcon;
+
+        if (setTeamIconRequest.status === RequestStatus.FAILURE) {
+            throw new Error(JSON.stringify(setTeamIconRequest.error));
+        }
     });
 });

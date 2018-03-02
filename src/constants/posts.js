@@ -18,7 +18,7 @@ export const PostTypes = {
     JOIN_TEAM: 'system_join_team',
     LEAVE_TEAM: 'system_leave_team',
     ADD_TO_TEAM: 'system_add_to_team',
-    REMOVE_FROM_TEAM: 'system_remove_from_team'
+    REMOVE_FROM_TEAM: 'system_remove_from_team',
 };
 
 export default {
@@ -28,7 +28,7 @@ export default {
     POST_TYPES: PostTypes,
     MESSAGE_TYPES: {
         POST: 'post',
-        COMMENT: 'comment'
+        COMMENT: 'comment',
     },
     MAX_PREV_MSGS: 100,
     POST_COLLAPSE_TIMEOUT: 1000 * 60 * 5, // five minutes
@@ -43,6 +43,6 @@ export default {
         PostTypes.JOIN_TEAM,
         PostTypes.LEAVE_TEAM,
         PostTypes.ADD_TO_TEAM,
-        PostTypes.REMOVE_FROM_TEAM
-    ]
+        PostTypes.REMOVE_FROM_TEAM,
+    ],
 };

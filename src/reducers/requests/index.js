@@ -30,5 +30,5 @@ export default combineReducers({
     admin,
     jobs,
     search,
-    roles
+    roles,
 });

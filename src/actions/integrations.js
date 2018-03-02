@@ -53,7 +53,7 @@ export function removeIncomingHook(hookId) {
 
             dispatch(batchActions([
                 {type: IntegrationTypes.DELETE_INCOMING_HOOK_FAILURE, error},
-                logError(error)(dispatch)
+                logError(error)(dispatch),
             ]), getState);
             return {error};
         }
@@ -61,11 +61,11 @@ export function removeIncomingHook(hookId) {
         dispatch(batchActions([
             {
                 type: IntegrationTypes.DELETED_INCOMING_HOOK,
-                data: {id: hookId}
+                data: {id: hookId},
             },
             {
-                type: IntegrationTypes.DELETE_INCOMING_HOOK_SUCCESS
-            }
+                type: IntegrationTypes.DELETE_INCOMING_HOOK_SUCCESS,
+            },
         ]), getState);
 
         return {data: true};
@@ -126,7 +126,7 @@ export function removeOutgoingHook(hookId) {
 
             dispatch(batchActions([
                 {type: IntegrationTypes.DELETE_OUTGOING_HOOK_FAILURE, error},
-                logError(error)(dispatch)
+                logError(error)(dispatch),
             ]), getState);
             return {error};
         }
@@ -134,11 +134,11 @@ export function removeOutgoingHook(hookId) {
         dispatch(batchActions([
             {
                 type: IntegrationTypes.DELETED_OUTGOING_HOOK,
-                data: {id: hookId}
+                data: {id: hookId},
             },
             {
-                type: IntegrationTypes.DELETE_OUTGOING_HOOK_SUCCESS
-            }
+                type: IntegrationTypes.DELETE_OUTGOING_HOOK_SUCCESS,
+            },
         ]), getState);
 
         return {data: true};
@@ -240,7 +240,7 @@ export function regenCommandToken(id) {
 
             dispatch(batchActions([
                 {type: IntegrationTypes.REGEN_COMMAND_TOKEN_FAILURE, error},
-                logError(error)(dispatch)
+                logError(error)(dispatch),
             ]), getState);
             return {error};
         }
@@ -250,12 +250,12 @@ export function regenCommandToken(id) {
                 type: IntegrationTypes.RECEIVED_COMMAND_TOKEN,
                 data: {
                     id,
-                    token: res.token
-                }
+                    token: res.token,
+                },
             },
             {
-                type: IntegrationTypes.REGEN_COMMAND_TOKEN_SUCCESS
-            }
+                type: IntegrationTypes.REGEN_COMMAND_TOKEN_SUCCESS,
+            },
         ]), getState);
 
         return {data: true};
@@ -273,7 +273,7 @@ export function deleteCommand(id) {
 
             dispatch(batchActions([
                 {type: IntegrationTypes.DELETE_COMMAND_FAILURE, error},
-                logError(error)(dispatch)
+                logError(error)(dispatch),
             ]), getState);
             return {error};
         }
@@ -281,11 +281,11 @@ export function deleteCommand(id) {
         dispatch(batchActions([
             {
                 type: IntegrationTypes.DELETED_COMMAND,
-                data: {id}
+                data: {id},
             },
             {
-                type: IntegrationTypes.DELETE_COMMAND_SUCCESS
-            }
+                type: IntegrationTypes.DELETE_COMMAND_SUCCESS,
+            },
         ]), getState);
 
         return {data: true};
@@ -344,7 +344,7 @@ export function deleteOAuthApp(id) {
 
             dispatch(batchActions([
                 {type: IntegrationTypes.DELETE_OAUTH_APP_FAILURE, error},
-                logError(error)(dispatch)
+                logError(error)(dispatch),
             ]), getState);
             return {error};
         }
@@ -352,11 +352,11 @@ export function deleteOAuthApp(id) {
         dispatch(batchActions([
             {
                 type: IntegrationTypes.DELETED_OAUTH_APP,
-                data: {id}
+                data: {id},
             },
             {
-                type: IntegrationTypes.DELETE_OAUTH_APP_SUCCESS
-            }
+                type: IntegrationTypes.DELETE_OAUTH_APP_SUCCESS,
+            },
         ]), getState);
 
         return {data: true};

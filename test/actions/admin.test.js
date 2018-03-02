@@ -36,7 +36,7 @@ describe('Actions.Admin', () => {
                 '[2017/04/04 14:56:19 EDT] [INFO] Starting Server...',
                 '[2017/04/04 14:56:19 EDT] [INFO] Server is listening on :8065',
                 '[2017/04/04 15:01:48 EDT] [INFO] Stopping Server...',
-                '[2017/04/04 15:01:48 EDT] [INFO] Closing SqlStore'
+                '[2017/04/04 15:01:48 EDT] [INFO] Closing SqlStore',
             ]);
 
         await Actions.getLogs()(store.dispatch, store.getState);
@@ -64,8 +64,8 @@ describe('Actions.Admin', () => {
                     action: '/api/v4/teams/o5pjxhkq8br8fj6xnidt7hm3ja',
                     extra_info: '',
                     ip_address: '127.0.0.1',
-                    session_id: 'u3yb6bqe6fg15bu4stzyto8rgh'
-                }
+                    session_id: 'u3yb6bqe6fg15bu4stzyto8rgh',
+                },
             ]);
 
         await Actions.getAudits()(store.dispatch, store.getState);
@@ -86,8 +86,8 @@ describe('Actions.Admin', () => {
             get('/config').
             reply(200, {
                 TeamSettings: {
-                    SiteName: 'Mattermost'
-                }
+                    SiteName: 'Mattermost',
+                },
             });
 
         await Actions.getConfig()(store.dispatch, store.getState);
@@ -109,8 +109,8 @@ describe('Actions.Admin', () => {
             get('/config').
             reply(200, {
                 TeamSettings: {
-                    SiteName: 'Mattermost'
-                }
+                    SiteName: 'Mattermost',
+                },
             });
 
         const {data} = await Actions.getConfig()(store.dispatch, store.getState);
@@ -223,7 +223,7 @@ describe('Actions.Admin', () => {
             emails: 'joram@example.com',
             keywords: 'testkeyword',
             start_at: 1457654400000,
-            end_at: 1458000000000
+            end_at: 1458000000000,
         };
 
         nock(Client4.getBaseRoute()).
@@ -239,7 +239,7 @@ describe('Actions.Admin', () => {
                 start_at: 1457654400000,
                 end_at: 1458000000000,
                 keywords: 'testkeyword',
-                emails: 'joram@example.com'
+                emails: 'joram@example.com',
             });
 
         const {data: created} = await Actions.createComplianceReport(job)(store.dispatch, store.getState);
@@ -266,7 +266,7 @@ describe('Actions.Admin', () => {
             emails: 'joram@example.com',
             keywords: 'testkeyword',
             start_at: 1457654400000,
-            end_at: 1458000000000
+            end_at: 1458000000000,
         };
 
         nock(Client4.getBaseRoute()).
@@ -282,7 +282,7 @@ describe('Actions.Admin', () => {
                 start_at: 1457654400000,
                 end_at: 1458000000000,
                 keywords: 'testkeyword',
-                emails: 'joram@example.com'
+                emails: 'joram@example.com',
             });
 
         const {data: report} = await Actions.createComplianceReport(job)(store.dispatch, store.getState);
@@ -315,7 +315,7 @@ describe('Actions.Admin', () => {
             emails: 'joram@example.com',
             keywords: 'testkeyword',
             start_at: 1457654400000,
-            end_at: 1458000000000
+            end_at: 1458000000000,
         };
 
         nock(Client4.getBaseRoute()).
@@ -331,7 +331,7 @@ describe('Actions.Admin', () => {
                 start_at: 1457654400000,
                 end_at: 1458000000000,
                 keywords: 'testkeyword',
-                emails: 'joram@example.com'
+                emails: 'joram@example.com',
             });
 
         const {data: report} = await Actions.createComplianceReport(job)(store.dispatch, store.getState);
@@ -386,8 +386,8 @@ describe('Actions.Admin', () => {
             reply(200, [
                 {
                     id: 'someid',
-                    version: 'someversion'
-                }
+                    version: 'someversion',
+                },
             ]);
 
         await Actions.getClusterStatus()(store.dispatch, store.getState);
@@ -453,7 +453,7 @@ describe('Actions.Admin', () => {
             reply(200, {
                 public_certificate_file: true,
                 private_key_file: true,
-                idp_certificate_file: true
+                idp_certificate_file: true,
             });
 
         await Actions.getSamlCertificateStatus()(store.dispatch, store.getState);

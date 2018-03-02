@@ -196,7 +196,7 @@ describe('Actions.Channels', () => {
         const channel = {
             ...TestHelper.basicChannel,
             purpose: 'This is to test redux',
-            header: 'MM with Redux'
+            header: 'MM with Redux',
         };
 
         nock(Client4.getChannelsRoute()).
@@ -219,7 +219,7 @@ describe('Actions.Channels', () => {
 
     it('patchChannel', async () => {
         const channel = {
-            header: 'MM with Redux2'
+            header: 'MM with Redux2',
         };
 
         nock(Client4.getChannelsRoute()).
@@ -342,7 +342,7 @@ describe('Actions.Channels', () => {
     it('updateChannelNotifyProps', async () => {
         const notifyProps = {
             mark_unread: 'mention',
-            desktop: 'none'
+            desktop: 'none',
         };
 
         nock(Client4.getUsersRoute()).
@@ -433,7 +433,7 @@ describe('Actions.Channels', () => {
                 channel_id: secondChannel.id,
                 team_id: TestHelper.basicTeam.id,
                 display_name: 'TestIncomingHook',
-                description: 'Some description.'
+                description: 'Some description.',
             });
         const incomingHook = await createIncomingHook({channel_id: secondChannel.id, display_name: 'test', description: 'test'})(store.dispatch, store.getState);
 
@@ -453,7 +453,7 @@ describe('Actions.Channels', () => {
                 callback_urls: ['http://notarealurl'],
                 display_name: 'TestOutgoingHook',
                 description: '',
-                content_type: 'application/x-www-form-urlencoded'
+                content_type: 'application/x-www-form-urlencoded',
             });
         const outgoingHook = await createOutgoingHook({channel_id: secondChannel.id, team_id: TestHelper.basicTeam.id, display_name: 'TestOutgoingHook', trigger_words: [TestHelper.generateId()], callback_urls: ['http://notarealurl']})(store.dispatch, store.getState);
 
@@ -565,21 +565,21 @@ describe('Actions.Channels', () => {
                 entities: {
                     channels: {
                         channels: {
-                            [channelId]: {team_id: teamId, total_msg_count: 10}
+                            [channelId]: {team_id: teamId, total_msg_count: 10},
                         },
                         myMembers: {
-                            [channelId]: {msg_count: 10, mention_count: 0}
-                        }
+                            [channelId]: {msg_count: 10, mention_count: 0},
+                        },
                     },
                     teams: {
                         myMembers: {
-                            [teamId]: {msg_count: 0, mention_count: 0}
-                        }
+                            [teamId]: {msg_count: 0, mention_count: 0},
+                        },
                     },
                     users: {
-                        currentUserId: userId
-                    }
-                }
+                        currentUserId: userId,
+                    },
+                },
             });
 
             store.dispatch(Actions.markChannelAsUnread(teamId, channelId, [TestHelper.generateId()]), store.getState);
@@ -601,21 +601,21 @@ describe('Actions.Channels', () => {
                 entities: {
                     channels: {
                         channels: {
-                            [channelId]: {team_id: teamId, total_msg_count: 10}
+                            [channelId]: {team_id: teamId, total_msg_count: 10},
                         },
                         myMembers: {
-                            [channelId]: {msg_count: 10, mention_count: 0}
-                        }
+                            [channelId]: {msg_count: 10, mention_count: 0},
+                        },
                     },
                     teams: {
                         myMembers: {
-                            [teamId]: {msg_count: 0, mention_count: 0}
-                        }
+                            [teamId]: {msg_count: 0, mention_count: 0},
+                        },
                     },
                     users: {
-                        currentUserId: userId
-                    }
-                }
+                        currentUserId: userId,
+                    },
+                },
             });
 
             store.dispatch(Actions.markChannelAsUnread(teamId, channelId, [userId]), store.getState);
@@ -637,21 +637,21 @@ describe('Actions.Channels', () => {
                 entities: {
                     channels: {
                         channels: {
-                            [channelId]: {team_id: teamId, total_msg_count: 10}
+                            [channelId]: {team_id: teamId, total_msg_count: 10},
                         },
                         myMembers: {
-                            [channelId]: {msg_count: 10, mention_count: 0, notify_props: {mark_unread: General.MENTION}}
-                        }
+                            [channelId]: {msg_count: 10, mention_count: 0, notify_props: {mark_unread: General.MENTION}},
+                        },
                     },
                     teams: {
                         myMembers: {
-                            [teamId]: {msg_count: 0, mention_count: 0}
-                        }
+                            [teamId]: {msg_count: 0, mention_count: 0},
+                        },
                     },
                     users: {
-                        currentUserId: userId
-                    }
-                }
+                        currentUserId: userId,
+                    },
+                },
             });
 
             store.dispatch(Actions.markChannelAsUnread(teamId, channelId, [TestHelper.generateId()]), store.getState);
@@ -673,21 +673,21 @@ describe('Actions.Channels', () => {
                 entities: {
                     channels: {
                         channels: {
-                            [channelId]: {team_id: teamId, total_msg_count: 10}
+                            [channelId]: {team_id: teamId, total_msg_count: 10},
                         },
                         myMembers: {
-                            [channelId]: {msg_count: 10, mention_count: 0, notify_props: {mark_unread: General.MENTION}}
-                        }
+                            [channelId]: {msg_count: 10, mention_count: 0, notify_props: {mark_unread: General.MENTION}},
+                        },
                     },
                     teams: {
                         myMembers: {
-                            [teamId]: {msg_count: 0, mention_count: 0}
-                        }
+                            [teamId]: {msg_count: 0, mention_count: 0},
+                        },
                     },
                     users: {
-                        currentUserId: userId
-                    }
-                }
+                        currentUserId: userId,
+                    },
+                },
             });
 
             store.dispatch(Actions.markChannelAsUnread(teamId, channelId, [userId]), store.getState);
@@ -713,27 +713,27 @@ describe('Actions.Channels', () => {
                             [channelId]: {
                                 id: channelId,
                                 team_id: teamId,
-                                total_msg_count: 10
-                            }
+                                total_msg_count: 10,
+                            },
                         },
                         myMembers: {
                             [channelId]: {
                                 channel_id: channelId,
                                 mention_count: 0,
-                                msg_count: 10
-                            }
-                        }
+                                msg_count: 10,
+                            },
+                        },
                     },
                     teams: {
                         myMembers: {
                             [teamId]: {
                                 id: teamId,
                                 mention_count: 0,
-                                msg_count: 0
-                            }
-                        }
-                    }
-                }
+                                msg_count: 0,
+                            },
+                        },
+                    },
+                },
             });
 
             await Actions.markChannelAsRead(channelId)(store.dispatch, store.getState);
@@ -758,27 +758,27 @@ describe('Actions.Channels', () => {
                             [channelId]: {
                                 id: channelId,
                                 team_id: teamId,
-                                total_msg_count: 10
-                            }
+                                total_msg_count: 10,
+                            },
                         },
                         myMembers: {
                             [channelId]: {
                                 channel_id: channelId,
                                 mention_count: 2,
-                                msg_count: 5
-                            }
-                        }
+                                msg_count: 5,
+                            },
+                        },
                     },
                     teams: {
                         myMembers: {
                             [teamId]: {
                                 id: teamId,
                                 mention_count: 2,
-                                msg_count: 5
-                            }
-                        }
-                    }
-                }
+                                msg_count: 5,
+                            },
+                        },
+                    },
+                },
             });
 
             await Actions.markChannelAsRead(channelId)(store.dispatch, store.getState);
@@ -802,22 +802,22 @@ describe('Actions.Channels', () => {
                             [channelId]: {
                                 id: channelId,
                                 team_id: '',
-                                total_msg_count: 10
-                            }
+                                total_msg_count: 10,
+                            },
                         },
                         myMembers: {
                             [channelId]: {
                                 channel_id: channelId,
                                 mention_count: 2,
-                                msg_count: 5
-                            }
-                        }
+                                msg_count: 5,
+                            },
+                        },
                     },
                     teams: {
                         myMembers: {
-                        }
-                    }
-                }
+                        },
+                    },
+                },
             });
 
             await Actions.markChannelAsRead(channelId)(store.dispatch, store.getState);
@@ -840,37 +840,37 @@ describe('Actions.Channels', () => {
                             [channelId1]: {
                                 id: channelId1,
                                 team_id: teamId,
-                                total_msg_count: 10
+                                total_msg_count: 10,
                             },
                             [channelId2]: {
                                 id: channelId2,
                                 team_id: teamId,
-                                total_msg_count: 12
-                            }
+                                total_msg_count: 12,
+                            },
                         },
                         myMembers: {
                             [channelId1]: {
                                 channel_id: channelId1,
                                 mention_count: 2,
-                                msg_count: 5
+                                msg_count: 5,
                             },
                             [channelId2]: {
                                 channel_id: channelId2,
                                 mention_count: 4,
-                                msg_count: 9
-                            }
-                        }
+                                msg_count: 9,
+                            },
+                        },
                     },
                     teams: {
                         myMembers: {
                             [teamId]: {
                                 id: teamId,
                                 mention_count: 6,
-                                msg_count: 8
-                            }
-                        }
-                    }
-                }
+                                msg_count: 8,
+                            },
+                        },
+                    },
+                },
             });
 
             await Actions.markChannelAsRead(channelId1)(store.dispatch, store.getState);
@@ -899,37 +899,37 @@ describe('Actions.Channels', () => {
                             [channelId1]: {
                                 id: channelId1,
                                 team_id: teamId,
-                                total_msg_count: 10
+                                total_msg_count: 10,
                             },
                             [channelId2]: {
                                 id: channelId2,
                                 team_id: teamId,
-                                total_msg_count: 12
-                            }
+                                total_msg_count: 12,
+                            },
                         },
                         myMembers: {
                             [channelId1]: {
                                 channel_id: channelId1,
                                 mention_count: 2,
-                                msg_count: 5
+                                msg_count: 5,
                             },
                             [channelId2]: {
                                 channel_id: channelId2,
                                 mention_count: 4,
-                                msg_count: 9
-                            }
-                        }
+                                msg_count: 9,
+                            },
+                        },
                     },
                     teams: {
                         myMembers: {
                             [teamId]: {
                                 id: teamId,
                                 mention_count: 6,
-                                msg_count: 8
-                            }
-                        }
-                    }
-                }
+                                msg_count: 8,
+                            },
+                        },
+                    },
+                },
             });
 
             await Actions.markChannelAsRead(channelId1, channelId2)(store.dispatch, store.getState);
@@ -958,37 +958,37 @@ describe('Actions.Channels', () => {
                             [channelId1]: {
                                 id: channelId1,
                                 team_id: teamId,
-                                total_msg_count: 10
+                                total_msg_count: 10,
                             },
                             [channelId2]: {
                                 id: channelId2,
                                 team_id: teamId,
-                                total_msg_count: 12
-                            }
+                                total_msg_count: 12,
+                            },
                         },
                         myMembers: {
                             [channelId1]: {
                                 channel_id: channelId1,
                                 mention_count: 2,
-                                msg_count: 5
+                                msg_count: 5,
                             },
                             [channelId2]: {
                                 channel_id: channelId2,
                                 mention_count: 4,
-                                msg_count: 9
-                            }
-                        }
+                                msg_count: 9,
+                            },
+                        },
                     },
                     teams: {
                         myMembers: {
                             [teamId]: {
                                 id: teamId,
                                 mention_count: 6,
-                                msg_count: 8
-                            }
-                        }
-                    }
-                }
+                                msg_count: 8,
+                            },
+                        },
+                    },
+                },
             });
 
             await Actions.markChannelAsRead(channelId2, channelId1)(store.dispatch, store.getState);
@@ -1018,42 +1018,42 @@ describe('Actions.Channels', () => {
                             [channelId1]: {
                                 id: channelId1,
                                 team_id: teamId1,
-                                total_msg_count: 10
+                                total_msg_count: 10,
                             },
                             [channelId2]: {
                                 id: channelId2,
                                 team_id: teamId2,
-                                total_msg_count: 12
-                            }
+                                total_msg_count: 12,
+                            },
                         },
                         myMembers: {
                             [channelId1]: {
                                 channel_id: channelId1,
                                 mention_count: 2,
-                                msg_count: 5
+                                msg_count: 5,
                             },
                             [channelId2]: {
                                 channel_id: channelId2,
                                 mention_count: 4,
-                                msg_count: 9
-                            }
-                        }
+                                msg_count: 9,
+                            },
+                        },
                     },
                     teams: {
                         myMembers: {
                             [teamId1]: {
                                 id: teamId1,
                                 mention_count: 2,
-                                msg_count: 5
+                                msg_count: 5,
                             },
                             [teamId2]: {
                                 id: teamId2,
                                 mention_count: 4,
-                                msg_count: 3
-                            }
-                        }
-                    }
-                }
+                                msg_count: 3,
+                            },
+                        },
+                    },
+                },
             });
 
             await Actions.markChannelAsRead(channelId1)(store.dispatch, store.getState);
@@ -1086,42 +1086,42 @@ describe('Actions.Channels', () => {
                             [channelId1]: {
                                 id: channelId1,
                                 team_id: teamId1,
-                                total_msg_count: 10
+                                total_msg_count: 10,
                             },
                             [channelId2]: {
                                 id: channelId2,
                                 team_id: teamId2,
-                                total_msg_count: 12
-                            }
+                                total_msg_count: 12,
+                            },
                         },
                         myMembers: {
                             [channelId1]: {
                                 channel_id: channelId1,
                                 mention_count: 2,
-                                msg_count: 5
+                                msg_count: 5,
                             },
                             [channelId2]: {
                                 channel_id: channelId2,
                                 mention_count: 4,
-                                msg_count: 9
-                            }
-                        }
+                                msg_count: 9,
+                            },
+                        },
                     },
                     teams: {
                         myMembers: {
                             [teamId1]: {
                                 id: teamId1,
                                 mention_count: 2,
-                                msg_count: 5
+                                msg_count: 5,
                             },
                             [teamId2]: {
                                 id: teamId2,
                                 mention_count: 4,
-                                msg_count: 3
-                            }
-                        }
-                    }
-                }
+                                msg_count: 3,
+                            },
+                        },
+                    },
+                },
             });
 
             await Actions.markChannelAsRead(channelId1, channelId2)(store.dispatch, store.getState);
@@ -1154,42 +1154,42 @@ describe('Actions.Channels', () => {
                             [channelId1]: {
                                 id: channelId1,
                                 team_id: teamId1,
-                                total_msg_count: 10
+                                total_msg_count: 10,
                             },
                             [channelId2]: {
                                 id: channelId2,
                                 team_id: teamId2,
-                                total_msg_count: 12
-                            }
+                                total_msg_count: 12,
+                            },
                         },
                         myMembers: {
                             [channelId1]: {
                                 channel_id: channelId1,
                                 mention_count: 2,
-                                msg_count: 5
+                                msg_count: 5,
                             },
                             [channelId2]: {
                                 channel_id: channelId2,
                                 mention_count: 4,
-                                msg_count: 9
-                            }
-                        }
+                                msg_count: 9,
+                            },
+                        },
                     },
                     teams: {
                         myMembers: {
                             [teamId1]: {
                                 id: teamId1,
                                 mention_count: 2,
-                                msg_count: 5
+                                msg_count: 5,
                             },
                             [teamId2]: {
                                 id: teamId2,
                                 mention_count: 4,
-                                msg_count: 3
-                            }
-                        }
-                    }
-                }
+                                msg_count: 3,
+                            },
+                        },
+                    },
+                },
             });
 
             await Actions.markChannelAsRead(channelId1, channelId2)(store.dispatch, store.getState);
@@ -1656,7 +1656,7 @@ describe('Actions.Channels', () => {
             display_name: 'Redux Test',
             purpose: 'This is to test redux',
             header: 'MM with Redux',
-            type: 'P'
+            type: 'P',
         };
 
         nock(Client4.getChannelsRoute()).

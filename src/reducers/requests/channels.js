@@ -171,5 +171,5 @@ export default combineReducers({
     getChannelStats,
     addChannelMember,
     removeChannelMember,
-    updateChannelMember
+    updateChannelMember,
 });

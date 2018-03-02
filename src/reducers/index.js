@@ -8,5 +8,5 @@ import requests from './requests';
 export default {
     entities,
     errors,
-    requests
+    requests,
 };

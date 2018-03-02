@@ -78,6 +78,6 @@ export default combineReducers({
     customEmoji,
 
     // set containing custom emoji names that do not exist
-    nonExistentEmoji
+    nonExistentEmoji,
 
 });

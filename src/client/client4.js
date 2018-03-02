@@ -36,7 +36,7 @@ export default class Client4 {
 
         this.translations = {
             connectionError: 'There appears to be a problem with your internet connection.',
-            unknownError: 'We received an unexpected status code from the server.'
+            unknownError: 'We received an unexpected status code from the server.',
         };
     }
 
@@ -233,7 +233,7 @@ export default class Client4 {
 
         const headers = {
             [HEADER_REQUESTED_WITH]: 'XMLHttpRequest',
-            ...this.defaultHeaders
+            ...this.defaultHeaders,
         };
 
         if (this.token) {
@@ -254,7 +254,7 @@ export default class Client4 {
 
         return {
             ...newOptions,
-            headers
+            headers,
         };
     }
 
@@ -373,12 +373,12 @@ export default class Client4 {
 
         const request = {
             method: 'post',
-            body: formData
+            body: formData,
         };
 
         if (formData.getBoundary) {
             request.headers = {
-                'Content-Type': `multipart/form-data; boundary=${formData.getBoundary()}`
+                'Content-Type': `multipart/form-data; boundary=${formData.getBoundary()}`,
             };
         }
 
@@ -413,7 +413,7 @@ export default class Client4 {
             device_id: deviceId,
             login_id: loginId,
             password,
-            token
+            token,
         };
 
         if (ldapOnly) {
@@ -439,7 +439,7 @@ export default class Client4 {
             device_id: deviceId,
             id,
             password,
-            token
+            token,
         };
 
         const {headers, data} = await this.doFetchWithResponse(
@@ -984,17 +984,49 @@ export default class Client4 {
 
         const request = {
             method: 'post',
-            body: formData
+            body: formData,
         };
 
         if (formData.getBoundary) {
             request.headers = {
-                'Content-Type': `multipart/form-data; boundary=${formData.getBoundary()}`
+                'Content-Type': `multipart/form-data; boundary=${formData.getBoundary()}`,
             };
         }
 
         return this.doFetch(
             `${this.getTeamRoute(teamId)}/import`,
+            request
+        );
+    };
+
+    getTeamIconUrl = (teamId, lastTeamIconUpdate) => {
+        const params = {};
+        if (lastTeamIconUpdate) {
+            params._ = lastTeamIconUpdate;
+        }
+
+        return `${this.getTeamRoute(teamId)}/image${buildQueryString(params)}`;
+    };
+
+    setTeamIcon = async (teamId, imageData) => {
+        this.trackEvent('api', 'api_team_set_team_icon');
+
+        const formData = new FormData();
+        formData.append('image', imageData);
+
+        const request = {
+            method: 'post',
+            body: formData,
+        };
+
+        if (formData.getBoundary) {
+            request.headers = {
+                'Content-Type': `multipart/form-data; boundary=${formData.getBoundary()}`,
+            };
+        }
+
+        return this.doFetch(
+            `${this.getTeamRoute(teamId)}/image`,
             request
         );
     };
@@ -1397,12 +1429,12 @@ export default class Client4 {
 
         const request = {
             method: 'post',
-            body: fileFormData
+            body: fileFormData,
         };
 
         if (formBoundary) {
             request.headers = {
-                'Content-Type': `multipart/form-data; boundary=${formBoundary}`
+                'Content-Type': `multipart/form-data; boundary=${formBoundary}`,
             };
         }
 
@@ -1454,7 +1486,7 @@ export default class Client4 {
     logClientError = async (message, level = 'ERROR') => {
         if (!this.enableLogging) {
             throw {
-                message: 'Logging disabled.'
+                message: 'Logging disabled.',
             };
         }
 
@@ -1731,12 +1763,12 @@ export default class Client4 {
 
         const request = {
             method: 'post',
-            body: formData
+            body: formData,
         };
 
         if (formData.getBoundary) {
             request.headers = {
-                'Content-Type': `multipart/form-data; boundary=${formData.getBoundary()}`
+                'Content-Type': `multipart/form-data; boundary=${formData.getBoundary()}`,
             };
         }
 
@@ -1929,12 +1961,12 @@ export default class Client4 {
 
         const request = {
             method: 'post',
-            body: formData
+            body: formData,
         };
 
         if (formData.getBoundary) {
             request.headers = {
-                'Content-Type': `multipart/form-data; boundary=${formData.getBoundary()}`
+                'Content-Type': `multipart/form-data; boundary=${formData.getBoundary()}`,
             };
         }
 
@@ -1980,7 +2012,7 @@ export default class Client4 {
             `${this.getBaseRoute()}/saml/certificate/public`,
             {
                 method: 'post',
-                body: formData
+                body: formData,
             }
         );
     };
@@ -1993,7 +2025,7 @@ export default class Client4 {
             `${this.getBaseRoute()}/saml/certificate/private`,
             {
                 method: 'post',
-                body: formData
+                body: formData,
             }
         );
     };
@@ -2006,7 +2038,7 @@ export default class Client4 {
             `${this.getBaseRoute()}/saml/certificate/idp`,
             {
                 method: 'post',
-                body: formData
+                body: formData,
             }
         );
     };
@@ -2054,12 +2086,12 @@ export default class Client4 {
 
         const request = {
             method: 'post',
-            body: formData
+            body: formData,
         };
 
         if (formData.getBoundary) {
             request.headers = {
-                'Content-Type': `multipart/form-data; boundary=${formData.getBoundary()}`
+                'Content-Type': `multipart/form-data; boundary=${formData.getBoundary()}`,
             };
         }
 
@@ -2122,12 +2154,12 @@ export default class Client4 {
 
         const request = {
             method: 'post',
-            body: formData
+            body: formData,
         };
 
         if (formData.getBoundary) {
             request.headers = {
-                'Content-Type': `multipart/form-data; boundary=${formData.getBoundary()}`
+                'Content-Type': `multipart/form-data; boundary=${formData.getBoundary()}`,
             };
         }
 
@@ -2191,8 +2223,8 @@ export default class Client4 {
             throw {
                 intl: {
                     id: 'mobile.request.invalid_response',
-                    defaultMessage: 'Received invalid response from the server.'
-                }
+                    defaultMessage: 'Received invalid response from the server.',
+                },
             };
         }
 
@@ -2217,7 +2249,7 @@ export default class Client4 {
             return {
                 response,
                 headers,
-                data
+                data,
             };
         }
 
@@ -2231,7 +2263,7 @@ export default class Client4 {
             message: msg,
             server_error_id: data.id,
             status_code: data.status_code,
-            url
+            url,
         };
     };
 
@@ -2239,16 +2271,16 @@ export default class Client4 {
         const properties = Object.assign({category, type: event, user_actual_id: this.userId}, props);
         const options = {
             context: {
-                ip: '0.0.0.0'
+                ip: '0.0.0.0',
             },
             page: {
                 path: '',
                 referrer: '',
                 search: '',
                 title: '',
-                url: ''
+                url: '',
             },
-            anonymousId: '00000000000000000000000000'
+            anonymousId: '00000000000000000000000000',
         };
 
         if (global && global.window && global.window.analytics && global.window.analytics.initialized) {
@@ -2259,7 +2291,7 @@ export default class Client4 {
             }
             global.analytics.track(Object.assign({
                 event: 'event',
-                userId: this.diagnosticId
+                userId: this.diagnosticId,
             }, {properties}, options));
         }
     }

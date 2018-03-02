@@ -14,7 +14,7 @@ function profilesToSet(state, action) {
 
     return {
         ...state,
-        [id]: nextSet
+        [id]: nextSet,
     };
 }
 
@@ -28,7 +28,7 @@ function profileListToSet(state, action) {
 
         return {
             ...state,
-            [id]: nextSet
+            [id]: nextSet,
         };
     }
 
@@ -45,7 +45,7 @@ function removeProfileListFromSet(state, action) {
 
         return {
             ...state,
-            [id]: nextSet
+            [id]: nextSet,
         };
     }
 
@@ -58,7 +58,7 @@ function addProfileToSet(state, action) {
     nextSet.add(action.data.user_id);
     return {
         ...state,
-        [id]: nextSet
+        [id]: nextSet,
     };
 }
 
@@ -68,7 +68,7 @@ function removeProfileFromSet(state, action) {
     nextSet.delete(action.data.user_id);
     return {
         ...state,
-        [id]: nextSet
+        [id]: nextSet,
     };
 }
 
@@ -143,7 +143,7 @@ function profiles(state = {}, action) {
         const data = action.data || action.payload;
         return {
             ...state,
-            [data.id]: {...data}
+            [data.id]: {...data},
         };
     }
     case UserTypes.RECEIVED_PROFILES_LIST:
@@ -384,5 +384,5 @@ export default combineReducers({
     profilesNotInChannel,
 
     // object where every key is the user id and has a value with the current status of each user
-    statuses
+    statuses,
 });

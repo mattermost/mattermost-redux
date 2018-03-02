@@ -25,21 +25,21 @@ function dispatcher(type, data, dispatch, getState) {
 
 export function requestData(type) {
     return {
-        type
+        type,
     };
 }
 
 export function requestSuccess(type, data) {
     return {
         type,
-        data
+        data,
     };
 }
 
 export function requestFailure(type, error) {
     return {
         type,
-        error
+        error,
     };
 }
 
@@ -54,7 +54,7 @@ export function bindClientFunc(clientFunc, request, success, failure, ...args) {
             forceLogoutIfNecessary(error, dispatch, getState);
             dispatch(batchActions([
                 requestFailure(failure, error),
-                logError(error)(dispatch)
+                logError(error)(dispatch),
             ]), getState);
             return {data: null, error};
         }
@@ -102,7 +102,7 @@ export class FormattedError extends Error {
         this.intl = {
             id,
             defaultMessage,
-            values
+            values,
         };
     }
 }

@@ -42,7 +42,7 @@ export const getAllCommands = createSelector(
     (commands, systemCommands) => {
         return {
             ...commands,
-            ...systemCommands
+            ...systemCommands,
         };
     }
 );

@@ -14,7 +14,7 @@ import {
     isDirectChannel,
     isDirectChannelVisible,
     isGroupChannel,
-    isGroupChannelVisible
+    isGroupChannelVisible,
 } from 'utils/channel_utils';
 
 import {removeUserFromList} from 'utils/user_utils';
@@ -25,7 +25,7 @@ import {bindClientFunc, forceLogoutIfNecessary, debounce} from './helpers';
 import {
     getMyPreferences,
     makeDirectChannelVisibleIfNecessary,
-    makeGroupMessageVisibleIfNecessary
+    makeGroupMessageVisibleIfNecessary,
 } from './preferences';
 
 import {getConfig} from 'selectors/entities/general';
@@ -41,7 +41,7 @@ export function checkMfa(loginId) {
         } catch (error) {
             dispatch(batchActions([
                 {type: UserTypes.CHECK_MFA_FAILURE, error},
-                logError(error)(dispatch)
+                logError(error)(dispatch),
             ]), getState);
             return {error};
         }
@@ -70,9 +70,9 @@ export function createUser(user, data, hash, inviteId) {
             dispatch(batchActions([
                 {
                     type: UserTypes.CREATE_USER_FAILURE,
-                    error
+                    error,
                 },
-                logError(error)(dispatch)
+                logError(error)(dispatch),
             ]), getState);
             return {error};
         }
@@ -99,9 +99,9 @@ export function login(loginId, password, mfaToken = '', ldapOnly = false) {
             dispatch(batchActions([
                 {
                     type: UserTypes.LOGIN_FAILURE,
-                    error
+                    error,
                 },
-                logError(error)(dispatch)
+                logError(error)(dispatch),
             ]), getState);
             return {error};
         }
@@ -123,9 +123,9 @@ export function loginById(id, password, mfaToken = '') {
             dispatch(batchActions([
                 {
                     type: UserTypes.LOGIN_FAILURE,
-                    error
+                    error,
                 },
-                logError(error)(dispatch)
+                logError(error)(dispatch),
             ]), getState);
             return {error};
         }
@@ -138,7 +138,7 @@ function completeLogin(data) {
     return async (dispatch, getState) => {
         dispatch({
             type: UserTypes.RECEIVED_ME,
-            data
+            data,
         });
 
         Client4.setUserId(data.id);
@@ -162,14 +162,14 @@ function completeLogin(data) {
         } catch (error) {
             dispatch(batchActions([
                 {type: UserTypes.LOGIN_FAILURE, error},
-                logError(error)(dispatch)
+                logError(error)(dispatch),
             ]), getState);
             return {error};
         }
 
         const promises = [
             getMyPreferences()(dispatch, getState),
-            getMyTeams()(dispatch, getState)
+            getMyTeams()(dispatch, getState),
         ];
 
         const state = getState();
@@ -183,7 +183,7 @@ function completeLogin(data) {
         } catch (error) {
             dispatch(batchActions([
                 {type: UserTypes.LOGIN_FAILURE, error},
-                logError(error)(dispatch)
+                logError(error)(dispatch),
             ]), getState);
             return {error};
         }
@@ -191,11 +191,11 @@ function completeLogin(data) {
         dispatch(batchActions([
             {
                 type: TeamTypes.RECEIVED_MY_TEAM_MEMBERS,
-                data: teamMembers
+                data: teamMembers,
             },
             {
-                type: UserTypes.LOGIN_SUCCESS
-            }
+                type: UserTypes.LOGIN_SUCCESS,
+            },
         ]), getState);
 
         const roles = new Set();
@@ -229,7 +229,7 @@ export function loadMe() {
             getMyPreferences()(dispatch, getState),
             getMyTeams()(dispatch, getState),
             getMyTeamMembers()(dispatch, getState),
-            getMyTeamUnreads()(dispatch, getState)
+            getMyTeamUnreads()(dispatch, getState),
         ];
 
         // Sometimes the server version is set in one or the other
@@ -276,7 +276,7 @@ export function getProfiles(page = 0, perPage = General.PROFILE_CHUNK_SIZE) {
             forceLogoutIfNecessary(error, dispatch, getState);
             dispatch(batchActions([
                 {type: UserTypes.PROFILES_FAILURE, error},
-                logError(error)(dispatch)
+                logError(error)(dispatch),
             ]), getState);
             return {error};
         }
@@ -284,11 +284,11 @@ export function getProfiles(page = 0, perPage = General.PROFILE_CHUNK_SIZE) {
         dispatch(batchActions([
             {
                 type: UserTypes.RECEIVED_PROFILES_LIST,
-                data: profiles
+                data: profiles,
             },
             {
-                type: UserTypes.PROFILES_SUCCESS
-            }
+                type: UserTypes.PROFILES_SUCCESS,
+            },
         ]), getState);
 
         return {data: profiles};
@@ -329,7 +329,7 @@ export function getProfilesByIds(userIds) {
             forceLogoutIfNecessary(error, dispatch, getState);
             dispatch(batchActions([
                 {type: UserTypes.PROFILES_FAILURE, error},
-                logError(error)(dispatch)
+                logError(error)(dispatch),
             ]), getState);
             return {error};
         }
@@ -337,11 +337,11 @@ export function getProfilesByIds(userIds) {
         dispatch(batchActions([
             {
                 type: UserTypes.RECEIVED_PROFILES_LIST,
-                data: profiles
+                data: profiles,
             },
             {
-                type: UserTypes.PROFILES_SUCCESS
-            }
+                type: UserTypes.PROFILES_SUCCESS,
+            },
         ]), getState);
 
         return {data: profiles};
@@ -362,7 +362,7 @@ export function getProfilesByUsernames(usernames) {
             forceLogoutIfNecessary(error, dispatch, getState);
             dispatch(batchActions([
                 {type: UserTypes.PROFILES_FAILURE, error},
-                logError(error)(dispatch)
+                logError(error)(dispatch),
             ]), getState);
             return {error};
         }
@@ -370,11 +370,11 @@ export function getProfilesByUsernames(usernames) {
         dispatch(batchActions([
             {
                 type: UserTypes.RECEIVED_PROFILES_LIST,
-                data: profiles
+                data: profiles,
             },
             {
-                type: UserTypes.PROFILES_SUCCESS
-            }
+                type: UserTypes.PROFILES_SUCCESS,
+            },
         ]), getState);
 
         return {data: profiles};
@@ -394,7 +394,7 @@ export function getProfilesInTeam(teamId, page, perPage = General.PROFILE_CHUNK_
             forceLogoutIfNecessary(error, dispatch, getState);
             dispatch(batchActions([
                 {type: UserTypes.PROFILES_IN_TEAM_FAILURE, error},
-                logError(error)(dispatch)
+                logError(error)(dispatch),
             ]), getState);
             return {error};
         }
@@ -403,15 +403,15 @@ export function getProfilesInTeam(teamId, page, perPage = General.PROFILE_CHUNK_
             {
                 type: UserTypes.RECEIVED_PROFILES_LIST_IN_TEAM,
                 data: profiles,
-                id: teamId
+                id: teamId,
             },
             {
                 type: UserTypes.RECEIVED_PROFILES_LIST,
-                data: removeUserFromList(currentUserId, [...profiles])
+                data: removeUserFromList(currentUserId, [...profiles]),
             },
             {
-                type: UserTypes.PROFILES_IN_TEAM_SUCCESS
-            }
+                type: UserTypes.PROFILES_IN_TEAM_SUCCESS,
+            },
         ]), getState);
 
         return {data: profiles};
@@ -429,7 +429,7 @@ export function getProfilesNotInTeam(teamId, page, perPage = General.PROFILE_CHU
             forceLogoutIfNecessary(error, dispatch, getState);
             dispatch(batchActions([
                 {type: UserTypes.PROFILES_NOT_IN_TEAM_FAILURE, error},
-                logError(error)(dispatch)
+                logError(error)(dispatch),
             ]), getState);
             return {error};
         }
@@ -438,15 +438,15 @@ export function getProfilesNotInTeam(teamId, page, perPage = General.PROFILE_CHU
             {
                 type: UserTypes.RECEIVED_PROFILES_LIST_NOT_IN_TEAM,
                 data: profiles,
-                id: teamId
+                id: teamId,
             },
             {
                 type: UserTypes.RECEIVED_PROFILES_LIST,
-                data: profiles
+                data: profiles,
             },
             {
-                type: UserTypes.PROFILES_NOT_IN_TEAM_SUCCESS
-            }
+                type: UserTypes.PROFILES_NOT_IN_TEAM_SUCCESS,
+            },
         ]), getState);
 
         return {data: profiles};
@@ -464,7 +464,7 @@ export function getProfilesWithoutTeam(page, perPage = General.PROFILE_CHUNK_SIZ
             forceLogoutIfNecessary(error, dispatch, getState);
             dispatch(batchActions([
                 {type: UserTypes.PROFILES_WITHOUT_TEAM_FAILURE, error},
-                logError(error)(dispatch)
+                logError(error)(dispatch),
             ]), getState);
             return {error};
         }
@@ -472,15 +472,15 @@ export function getProfilesWithoutTeam(page, perPage = General.PROFILE_CHUNK_SIZ
         dispatch(batchActions([
             {
                 type: UserTypes.RECEIVED_PROFILES_LIST_WITHOUT_TEAM,
-                data: profiles
+                data: profiles,
             },
             {
                 type: UserTypes.RECEIVED_PROFILES_LIST,
-                data: profiles
+                data: profiles,
             },
             {
-                type: UserTypes.PROFILES_WITHOUT_TEAM_SUCCESS
-            }
+                type: UserTypes.PROFILES_WITHOUT_TEAM_SUCCESS,
+            },
         ]), getState);
 
         return {data: profiles};
@@ -500,7 +500,7 @@ export function getProfilesInChannel(channelId, page, perPage = General.PROFILE_
             forceLogoutIfNecessary(error, dispatch, getState);
             dispatch(batchActions([
                 {type: UserTypes.PROFILES_IN_CHANNEL_FAILURE, error},
-                logError(error)(dispatch)
+                logError(error)(dispatch),
             ]), getState);
             return {error};
         }
@@ -509,15 +509,15 @@ export function getProfilesInChannel(channelId, page, perPage = General.PROFILE_
             {
                 type: UserTypes.RECEIVED_PROFILES_LIST_IN_CHANNEL,
                 data: profiles,
-                id: channelId
+                id: channelId,
             },
             {
                 type: UserTypes.RECEIVED_PROFILES_LIST,
-                data: removeUserFromList(currentUserId, [...profiles])
+                data: removeUserFromList(currentUserId, [...profiles]),
             },
             {
-                type: UserTypes.PROFILES_IN_CHANNEL_SUCCESS
-            }
+                type: UserTypes.PROFILES_IN_CHANNEL_SUCCESS,
+            },
         ]), getState);
 
         return {data: profiles};
@@ -537,7 +537,7 @@ export function getProfilesNotInChannel(teamId, channelId, page, perPage = Gener
             forceLogoutIfNecessary(error, dispatch, getState);
             dispatch(batchActions([
                 {type: UserTypes.PROFILES_NOT_IN_CHANNEL_FAILURE, error},
-                logError(error)(dispatch)
+                logError(error)(dispatch),
             ]), getState);
             return {error};
         }
@@ -546,15 +546,15 @@ export function getProfilesNotInChannel(teamId, channelId, page, perPage = Gener
             {
                 type: UserTypes.RECEIVED_PROFILES_LIST_NOT_IN_CHANNEL,
                 data: profiles,
-                id: channelId
+                id: channelId,
             },
             {
                 type: UserTypes.RECEIVED_PROFILES_LIST,
-                data: removeUserFromList(currentUserId, [...profiles])
+                data: removeUserFromList(currentUserId, [...profiles]),
             },
             {
-                type: UserTypes.PROFILES_NOT_IN_CHANNEL_SUCCESS
-            }
+                type: UserTypes.PROFILES_NOT_IN_CHANNEL_SUCCESS,
+            },
         ]), getState);
 
         return {data: profiles};
@@ -655,7 +655,7 @@ export function setStatus(status) {
             forceLogoutIfNecessary(error, dispatch, getState);
             dispatch(batchActions([
                 {type: UserTypes.SET_STATUS_FAILURE, error},
-                logError(error)(dispatch)
+                logError(error)(dispatch),
             ]), getState);
             return {error};
         }
@@ -663,11 +663,11 @@ export function setStatus(status) {
         dispatch(batchActions([
             {
                 type: UserTypes.RECEIVED_STATUS,
-                data: status
+                data: status,
             },
             {
-                type: UserTypes.SET_STATUS_SUCCESS
-            }
+                type: UserTypes.SET_STATUS_SUCCESS,
+            },
         ]), getState);
 
         return {data: status};
@@ -694,7 +694,7 @@ export function revokeSession(userId, sessionId) {
             forceLogoutIfNecessary(error, dispatch, getState);
             dispatch(batchActions([
                 {type: UserTypes.REVOKE_SESSION_FAILURE, error},
-                logError(error)(dispatch)
+                logError(error)(dispatch),
             ]), getState);
             return {error};
         }
@@ -702,11 +702,11 @@ export function revokeSession(userId, sessionId) {
         dispatch(batchActions([
             {
                 type: UserTypes.RECEIVED_REVOKED_SESSION,
-                sessionId
+                sessionId,
             },
             {
-                type: UserTypes.REVOKE_SESSION_SUCCESS
-            }
+                type: UserTypes.REVOKE_SESSION_SUCCESS,
+            },
         ]), getState);
 
         return {data: true};
@@ -723,7 +723,7 @@ export function revokeAllSessionsForUser(userId) {
             forceLogoutIfNecessary(error, dispatch, getState);
             dispatch(batchActions([
                 {type: UserTypes.REVOKE_ALL_USER_SESSIONS_FAILURE, error},
-                logError(error)(dispatch)
+                logError(error)(dispatch),
             ]), getState);
             return {error};
         }
@@ -731,8 +731,8 @@ export function revokeAllSessionsForUser(userId) {
         dispatch(batchActions([
             {
                 type: UserTypes.REVOKE_ALL_USER_SESSIONS_SUCCESS,
-                data
-            }
+                data,
+            },
         ]), getState);
 
         return {data: true};
@@ -797,7 +797,7 @@ export function autocompleteUsers(term, teamId = '', channelId = '') {
             forceLogoutIfNecessary(error, dispatch, getState);
             dispatch(batchActions([
                 {type: UserTypes.AUTOCOMPLETE_USERS_FAILURE, error},
-                logError(error)(dispatch)
+                logError(error)(dispatch),
             ]), getState);
             return {error};
         }
@@ -811,11 +811,11 @@ export function autocompleteUsers(term, teamId = '', channelId = '') {
         const actions = [
             {
                 type: UserTypes.RECEIVED_PROFILES_LIST,
-                data: users
+                data: users,
             },
             {
-                type: UserTypes.AUTOCOMPLETE_USERS_SUCCESS
-            }
+                type: UserTypes.AUTOCOMPLETE_USERS_SUCCESS,
+            },
         ];
 
         if (channelId) {
@@ -823,14 +823,14 @@ export function autocompleteUsers(term, teamId = '', channelId = '') {
                 {
                     type: UserTypes.RECEIVED_PROFILES_LIST_IN_CHANNEL,
                     data: data.users,
-                    id: channelId
+                    id: channelId,
                 }
             );
             actions.push(
                 {
                     type: UserTypes.RECEIVED_PROFILES_LIST_NOT_IN_CHANNEL,
                     data: data.out_of_channel,
-                    id: channelId
+                    id: channelId,
                 }
             );
         }
@@ -840,7 +840,7 @@ export function autocompleteUsers(term, teamId = '', channelId = '') {
                 {
                     type: UserTypes.RECEIVED_PROFILES_LIST_IN_TEAM,
                     data: users,
-                    id: teamId
+                    id: teamId,
                 }
             );
         }
@@ -864,7 +864,7 @@ export function searchProfiles(term, options = {}) {
             forceLogoutIfNecessary(error, dispatch, getState);
             dispatch(batchActions([
                 {type: UserTypes.SEARCH_PROFILES_FAILURE, error},
-                logError(error)(dispatch)
+                logError(error)(dispatch),
             ]), getState);
             return {error};
         }
@@ -875,7 +875,7 @@ export function searchProfiles(term, options = {}) {
             actions.push({
                 type: UserTypes.RECEIVED_PROFILES_LIST_IN_CHANNEL,
                 data: profiles,
-                id: options.in_channel_id
+                id: options.in_channel_id,
             });
         }
 
@@ -883,7 +883,7 @@ export function searchProfiles(term, options = {}) {
             actions.push({
                 type: UserTypes.RECEIVED_PROFILES_LIST_NOT_IN_CHANNEL,
                 data: profiles,
-                id: options.not_in_channel_id
+                id: options.not_in_channel_id,
             });
         }
 
@@ -891,7 +891,7 @@ export function searchProfiles(term, options = {}) {
             actions.push({
                 type: UserTypes.RECEIVED_PROFILES_LIST_IN_TEAM,
                 data: profiles,
-                id: options.team_id
+                id: options.team_id,
             });
         }
 
@@ -899,15 +899,15 @@ export function searchProfiles(term, options = {}) {
             actions.push({
                 type: UserTypes.RECEIVED_PROFILES_LIST_NOT_IN_TEAM,
                 data: profiles,
-                id: options.not_in_team_id
+                id: options.not_in_team_id,
             });
         }
 
         dispatch(batchActions([
             ...actions,
             {
-                type: UserTypes.SEARCH_PROFILES_SUCCESS
-            }
+                type: UserTypes.SEARCH_PROFILES_SUCCESS,
+            },
         ]), getState);
 
         return {data: profiles};
@@ -965,7 +965,7 @@ export function updateMe(user) {
 
         dispatch(batchActions([
             {type: UserTypes.RECEIVED_ME, data},
-            {type: UserTypes.UPDATE_ME_SUCCESS}
+            {type: UserTypes.UPDATE_ME_SUCCESS},
         ]), getState);
         loadRolesIfNeeded(new Set(data.roles.split(' ')))(dispatch, getState);
 
@@ -987,7 +987,7 @@ export function patchUser(user) {
 
         dispatch(batchActions([
             {type: UserTypes.RECEIVED_PROFILE, data},
-            {type: UserTypes.UPDATE_USER_SUCCESS}
+            {type: UserTypes.UPDATE_USER_SUCCESS},
         ]), getState);
 
         return {data};
@@ -1006,7 +1006,7 @@ export function updateUserRoles(userId, roles) {
         }
 
         const actions = [
-            {type: UserTypes.UPDATE_USER_SUCCESS}
+            {type: UserTypes.UPDATE_USER_SUCCESS},
         ];
 
         const profile = getState().entities.users.profiles[userId];
@@ -1032,7 +1032,7 @@ export function updateUserMfa(userId, activate, code = '') {
         }
 
         const actions = [
-            {type: UserTypes.UPDATE_USER_SUCCESS}
+            {type: UserTypes.UPDATE_USER_SUCCESS},
         ];
 
         const profile = getState().entities.users.profiles[userId];
@@ -1058,7 +1058,7 @@ export function updateUserPassword(userId, currentPassword, newPassword) {
         }
 
         const actions = [
-            {type: UserTypes.UPDATE_USER_SUCCESS}
+            {type: UserTypes.UPDATE_USER_SUCCESS},
         ];
 
         const profile = getState().entities.users.profiles[userId];
@@ -1084,7 +1084,7 @@ export function updateUserActive(userId, active) {
         }
 
         const actions = [
-            {type: UserTypes.UPDATE_USER_SUCCESS}
+            {type: UserTypes.UPDATE_USER_SUCCESS},
         ];
 
         const profile = getState().entities.users.profiles[userId];
@@ -1152,7 +1152,7 @@ export function uploadProfileImage(userId, imageData) {
         }
 
         const actions = [
-            {type: UserTypes.UPDATE_USER_SUCCESS}
+            {type: UserTypes.UPDATE_USER_SUCCESS},
         ];
 
         const profile = getState().entities.users.profiles[userId];
@@ -1229,19 +1229,19 @@ export function createUserAccessToken(userId, description) {
             forceLogoutIfNecessary(error, dispatch, getState);
             dispatch(batchActions([
                 {type: UserTypes.CREATE_USER_ACCESS_TOKEN_FAILURE, error},
-                logError(error)(dispatch)
+                logError(error)(dispatch),
             ]), getState);
             return {error};
         }
 
         const actions = [
             {
-                type: UserTypes.CREATE_USER_ACCESS_TOKEN_SUCCESS
+                type: UserTypes.CREATE_USER_ACCESS_TOKEN_SUCCESS,
             },
             {
                 type: AdminTypes.RECEIVED_USER_ACCESS_TOKEN,
-                data: {...data, token: ''}
-            }
+                data: {...data, token: ''},
+            },
         ];
 
         const {currentUserId} = getState().entities.users;
@@ -1249,7 +1249,7 @@ export function createUserAccessToken(userId, description) {
             actions.push(
                 {
                     type: UserTypes.RECEIVED_MY_USER_ACCESS_TOKEN,
-                    data: {...data, token: ''}
+                    data: {...data, token: ''},
                 }
             );
         }
@@ -1271,19 +1271,19 @@ export function getUserAccessToken(tokenId) {
             forceLogoutIfNecessary(error, dispatch, getState);
             dispatch(batchActions([
                 {type: UserTypes.GET_USER_ACCESS_TOKEN_FAILURE, error},
-                logError(error)(dispatch)
+                logError(error)(dispatch),
             ]), getState);
             return {error};
         }
 
         const actions = [
             {
-                type: UserTypes.GET_USER_ACCESS_TOKEN_SUCCESS
+                type: UserTypes.GET_USER_ACCESS_TOKEN_SUCCESS,
             },
             {
                 type: AdminTypes.RECEIVED_USER_ACCESS_TOKEN,
-                data
-            }
+                data,
+            },
         ];
 
         const {currentUserId} = getState().entities.users;
@@ -1291,7 +1291,7 @@ export function getUserAccessToken(tokenId) {
             actions.push(
                 {
                     type: UserTypes.RECEIVED_MY_USER_ACCESS_TOKEN,
-                    data
+                    data,
                 }
             );
         }
@@ -1312,19 +1312,19 @@ export function getUserAccessTokens(page = 0, perPage = General.PROFILE_CHUNK_SI
             forceLogoutIfNecessary(error, dispatch);
             dispatch(batchActions([
                 {type: UserTypes.GET_USER_ACCESS_TOKEN_FAILURE, error},
-                logError(error)(dispatch)
+                logError(error)(dispatch),
             ]), getState);
             return {error};
         }
 
         const actions = [
             {
-                type: UserTypes.GET_USER_ACCESS_TOKEN_SUCCESS
+                type: UserTypes.GET_USER_ACCESS_TOKEN_SUCCESS,
             },
             {
                 type: AdminTypes.RECEIVED_USER_ACCESS_TOKENS,
-                data
-            }
+                data,
+            },
         ];
 
         dispatch(batchActions(actions));
@@ -1344,20 +1344,20 @@ export function getUserAccessTokensForUser(userId, page = 0, perPage = General.P
             forceLogoutIfNecessary(error, dispatch, getState);
             dispatch(batchActions([
                 {type: UserTypes.GET_USER_ACCESS_TOKEN_FAILURE, error},
-                logError(error)(dispatch)
+                logError(error)(dispatch),
             ]), getState);
             return {error};
         }
 
         const actions = [
             {
-                type: UserTypes.GET_USER_ACCESS_TOKEN_SUCCESS
+                type: UserTypes.GET_USER_ACCESS_TOKEN_SUCCESS,
             },
             {
                 type: AdminTypes.RECEIVED_USER_ACCESS_TOKENS_FOR_USER,
                 data,
-                userId
-            }
+                userId,
+            },
         ];
 
         const {currentUserId} = getState().entities.users;
@@ -1365,7 +1365,7 @@ export function getUserAccessTokensForUser(userId, page = 0, perPage = General.P
             actions.push(
                 {
                     type: UserTypes.RECEIVED_MY_USER_ACCESS_TOKENS,
-                    data
+                    data,
                 }
             );
         }
@@ -1386,19 +1386,19 @@ export function revokeUserAccessToken(tokenId) {
             forceLogoutIfNecessary(error, dispatch, getState);
             dispatch(batchActions([
                 {type: UserTypes.REVOKE_USER_ACCESS_TOKEN_FAILURE, error},
-                logError(error)(dispatch)
+                logError(error)(dispatch),
             ]), getState);
             return {error};
         }
 
         dispatch(batchActions([
             {
-                type: UserTypes.REVOKE_USER_ACCESS_TOKEN_SUCCESS
+                type: UserTypes.REVOKE_USER_ACCESS_TOKEN_SUCCESS,
             },
             {
                 type: UserTypes.REVOKED_USER_ACCESS_TOKEN,
-                data: tokenId
-            }
+                data: tokenId,
+            },
         ]));
 
         return {data: true};
@@ -1415,19 +1415,19 @@ export function disableUserAccessToken(tokenId) {
             forceLogoutIfNecessary(error, dispatch, getState);
             dispatch(batchActions([
                 {type: UserTypes.DISABLE_USER_ACCESS_TOKEN_FAILURE, error},
-                logError(error)(dispatch)
+                logError(error)(dispatch),
             ]), getState);
             return {error};
         }
 
         dispatch(batchActions([
             {
-                type: UserTypes.DISABLE_USER_ACCESS_TOKEN_SUCCESS
+                type: UserTypes.DISABLE_USER_ACCESS_TOKEN_SUCCESS,
             },
             {
                 type: UserTypes.DISABLED_USER_ACCESS_TOKEN,
-                data: tokenId
-            }
+                data: tokenId,
+            },
         ]));
 
         return {data: true};
@@ -1444,19 +1444,19 @@ export function enableUserAccessToken(tokenId) {
             forceLogoutIfNecessary(error, dispatch, getState);
             dispatch(batchActions([
                 {type: UserTypes.ENABLE_USER_ACCESS_TOKEN_FAILURE, error},
-                logError(error)(dispatch)
+                logError(error)(dispatch),
             ]), getState);
             return {error};
         }
 
         dispatch(batchActions([
             {
-                type: UserTypes.ENABLE_USER_ACCESS_TOKEN_SUCCESS
+                type: UserTypes.ENABLE_USER_ACCESS_TOKEN_SUCCESS,
             },
             {
                 type: UserTypes.ENABLED_USER_ACCESS_TOKEN,
-                data: tokenId
-            }
+                data: tokenId,
+            },
         ]));
 
         return {data: true};
@@ -1512,5 +1512,5 @@ export default {
     getUserAccessTokensForUser,
     revokeUserAccessToken,
     disableUserAccessToken,
-    enableUserAccessToken
+    enableUserAccessToken,
 };

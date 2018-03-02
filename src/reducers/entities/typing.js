@@ -6,7 +6,7 @@ import {WebsocketEvents} from 'constants';
 export default function typing(state = {}, action) {
     const {
         data,
-        type
+        type,
     } = action;
 
     switch (type) {
@@ -14,7 +14,7 @@ export default function typing(state = {}, action) {
         const {
             id,
             userId,
-            now
+            now,
         } = data;
 
         if (id && userId) {
@@ -22,8 +22,8 @@ export default function typing(state = {}, action) {
                 ...state,
                 [id]: {
                     ...(state[id] || {}),
-                    [userId]: now
-                }
+                    [userId]: now,
+                },
             };
         }
 
@@ -33,13 +33,13 @@ export default function typing(state = {}, action) {
         const {
             id,
             userId,
-            now
+            now,
         } = data;
 
         if (state[id] && state[id][userId] <= now) {
             const nextState = {
                 ...state,
-                [id]: {...state[id]}
+                [id]: {...state[id]},
             };
 
             Reflect.deleteProperty(nextState[id], userId);

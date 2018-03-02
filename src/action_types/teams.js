@@ -24,6 +24,10 @@ export default keyMirror({
     UPDATE_TEAM_SUCCESS: null,
     UPDATE_TEAM_FAILURE: null,
 
+    SET_TEAM_ICON_REQUEST: null,
+    SET_TEAM_ICON_SUCCESS: null,
+    SET_TEAM_ICON_FAILURE: null,
+
     MY_TEAM_MEMBERS_REQUEST: null,
     MY_TEAM_MEMBERS_SUCCESS: null,
     MY_TEAM_MEMBERS_FAILURE: null,
@@ -83,5 +87,5 @@ export default keyMirror({
     REMOVE_MEMBER_FROM_TEAM: null,
     RECEIVED_TEAM_STATS: null,
     RECEIVED_MY_TEAM_UNREADS: null,
-    LEAVE_TEAM: null
+    LEAVE_TEAM: null,
 });

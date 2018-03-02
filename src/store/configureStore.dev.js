@@ -19,7 +19,7 @@ const devToolsEnhancer = (
             name: 'Mattermost',
             hostname: 'localhost',
             port: 5678,
-            realtime: true
+            realtime: true,
         });
     }
 );
@@ -62,7 +62,7 @@ export default function configureServiceStore(preloadedState, appReducer, userOf
         offlineCompose(baseOfflineConfig)(
             middleware,
             [
-                devToolsEnhancer()
+                devToolsEnhancer(),
             ]
         )
     );

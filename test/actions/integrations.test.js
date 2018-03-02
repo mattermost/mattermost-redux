@@ -37,7 +37,7 @@ describe('Actions.Integrations', () => {
             {
                 channel_id: TestHelper.basicChannel.id,
                 display_name: 'test',
-                description: 'test'
+                description: 'test',
             }
         )(store.dispatch, store.getState);
 
@@ -61,7 +61,7 @@ describe('Actions.Integrations', () => {
             {
                 channel_id: TestHelper.basicChannel.id,
                 display_name: 'test',
-                description: 'test'
+                description: 'test',
             }
         )(store.dispatch, store.getState);
 
@@ -91,7 +91,7 @@ describe('Actions.Integrations', () => {
             {
                 channel_id: TestHelper.basicChannel.id,
                 display_name: 'test',
-                description: 'test'
+                description: 'test',
             }
         )(store.dispatch, store.getState);
 
@@ -122,7 +122,7 @@ describe('Actions.Integrations', () => {
             {
                 channel_id: TestHelper.basicChannel.id,
                 display_name: 'test',
-                description: 'test'
+                description: 'test',
             }
         )(store.dispatch, store.getState);
 
@@ -151,7 +151,7 @@ describe('Actions.Integrations', () => {
             {
                 channel_id: TestHelper.basicChannel.id,
                 display_name: 'test',
-                description: 'test'
+                description: 'test',
             }
         )(store.dispatch, store.getState);
 
@@ -185,7 +185,7 @@ describe('Actions.Integrations', () => {
                 team_id: TestHelper.basicTeam.id,
                 display_name: 'test',
                 trigger_words: [TestHelper.generateId()],
-                callback_urls: ['http://localhost/notarealendpoint']
+                callback_urls: ['http://localhost/notarealendpoint'],
             }
         )(store.dispatch, store.getState);
 
@@ -211,7 +211,7 @@ describe('Actions.Integrations', () => {
                 team_id: TestHelper.basicTeam.id,
                 display_name: 'test',
                 trigger_words: [TestHelper.generateId()],
-                callback_urls: ['http://localhost/notarealendpoint']
+                callback_urls: ['http://localhost/notarealendpoint'],
             }
         )(store.dispatch, store.getState);
 
@@ -243,7 +243,7 @@ describe('Actions.Integrations', () => {
                 team_id: TestHelper.basicTeam.id,
                 display_name: 'test',
                 trigger_words: [TestHelper.generateId()],
-                callback_urls: ['http://localhost/notarealendpoint']
+                callback_urls: ['http://localhost/notarealendpoint'],
             }
         )(store.dispatch, store.getState);
 
@@ -276,7 +276,7 @@ describe('Actions.Integrations', () => {
                 team_id: TestHelper.basicTeam.id,
                 display_name: 'test',
                 trigger_words: [TestHelper.generateId()],
-                callback_urls: ['http://localhost/notarealendpoint']
+                callback_urls: ['http://localhost/notarealendpoint'],
             }
         )(store.dispatch, store.getState);
 
@@ -307,7 +307,7 @@ describe('Actions.Integrations', () => {
                 team_id: TestHelper.basicTeam.id,
                 display_name: 'test',
                 trigger_words: [TestHelper.generateId()],
-                callback_urls: ['http://localhost/notarealendpoint']
+                callback_urls: ['http://localhost/notarealendpoint'],
             }
         )(store.dispatch, store.getState);
 
@@ -340,7 +340,7 @@ describe('Actions.Integrations', () => {
                 team_id: TestHelper.basicTeam.id,
                 display_name: 'test',
                 trigger_words: [TestHelper.generateId()],
-                callback_urls: ['http://localhost/notarealendpoint']
+                callback_urls: ['http://localhost/notarealendpoint'],
             }
         )(store.dispatch, store.getState);
 
@@ -387,7 +387,7 @@ describe('Actions.Integrations', () => {
             get('').
             query(true).
             reply(200, [created, {
-                trigger: 'system-command'
+                trigger: 'system-command',
             }]);
 
         await Actions.getCommands(
@@ -431,7 +431,7 @@ describe('Actions.Integrations', () => {
             get('').
             query(true).
             reply(200, [createdWithAutocomplete, {
-                trigger: 'system-command'
+                trigger: 'system-command',
             }]);
 
         await Actions.getAutocompleteCommands(
@@ -512,7 +512,7 @@ describe('Actions.Integrations', () => {
 
         const args = {
             channel_id: TestHelper.basicChannel.id,
-            team_id: team.id
+            team_id: team.id,
         };
 
         nock(`${Client4.getCommandsRoute()}/execute`).

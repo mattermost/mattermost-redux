@@ -54,7 +54,7 @@ export const getMyRoles = createSelector(
         return {
             system: systemRoles,
             team: teamRoles,
-            channel: channelRoles
+            channel: channelRoles,
         };
     }
 );

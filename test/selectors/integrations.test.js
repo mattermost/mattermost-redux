@@ -30,14 +30,14 @@ describe('Selectors.Integrations', () => {
     const testState = deepFreezeAndThrowOnMutation({
         entities: {
             teams: {
-                currentTeamId: team1.id
+                currentTeamId: team1.id,
             },
             integrations: {
                 outgoingHooks: hooks,
                 commands,
-                systemCommands
-            }
-        }
+                systemCommands,
+            },
+        },
     });
 
     it('should return outgoing hooks in current team', () => {

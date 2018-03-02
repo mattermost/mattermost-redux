@@ -800,8 +800,8 @@ describe('Actions.Users', () => {
                     email: 'false',
                     first_name: 'false',
                     mention_keys: '',
-                    user_id: currentUser.id
-                }
+                    user_id: currentUser.id,
+                },
             });
 
         await Actions.updateMe({
@@ -811,8 +811,8 @@ describe('Actions.Users', () => {
                 email: 'false',
                 first_name: 'false',
                 mention_keys: '',
-                user_id: currentUser.id
-            }
+                user_id: currentUser.id,
+            },
         })(store.dispatch, store.getState);
 
         const updateRequest = store.getState().requests.users.updateMe;
@@ -849,8 +849,8 @@ describe('Actions.Users', () => {
                     email: 'false',
                     first_name: 'false',
                     mention_keys: '',
-                    user_id: currentUser.id
-                }
+                    user_id: currentUser.id,
+                },
             });
 
         await Actions.patchUser({
@@ -861,8 +861,8 @@ describe('Actions.Users', () => {
                 email: 'false',
                 first_name: 'false',
                 mention_keys: '',
-                user_id: currentUser.id
-            }
+                user_id: currentUser.id,
+            },
         })(store.dispatch, store.getState);
 
         const updateRequest = store.getState().requests.users.updateUser;

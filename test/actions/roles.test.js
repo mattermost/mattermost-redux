@@ -91,14 +91,14 @@ describe('Actions.Roles', () => {
         const fakeState = {
             entities: {
                 general: {
-                    serverVersion: '4.3'
+                    serverVersion: '4.3',
                 },
                 roles: {
                     roles: {
-                        test: {}
-                    }
-                }
-            }
+                        test: {},
+                    },
+                },
+            },
         };
         await Actions.loadRolesIfNeeded(['test'])(store.dispatch, () => fakeState);
         assert(!mock1.isDone());

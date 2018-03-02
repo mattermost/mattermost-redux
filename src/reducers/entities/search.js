@@ -2,12 +2,22 @@
 // See License.txt for license information.
 
 import {combineReducers} from 'redux';
-import {SearchTypes, UserTypes} from 'action_types';
+import {PostTypes, SearchTypes, UserTypes} from 'action_types';
 
 function results(state = [], action) {
     switch (action.type) {
     case SearchTypes.RECEIVED_SEARCH_POSTS: {
         return action.data.order;
+    }
+    case PostTypes.REMOVE_POST: {
+        const postId = action.data ? action.data.id : null;
+        const index = state.indexOf(postId);
+        if (index !== -1) {
+            const newState = [...state];
+            newState.splice(index, 1);
+            return newState;
+        }
+        return state;
     }
     case SearchTypes.REMOVE_SEARCH_POSTS:
     case UserTypes.LOGOUT_SUCCESS:
@@ -34,7 +44,7 @@ function recent(state = {}, action) {
         }
         return {
             ...nextState,
-            [teamId]: team
+            [teamId]: team,
         };
     }
     case SearchTypes.REMOVE_SEARCH_TERM: {
@@ -48,7 +58,7 @@ function recent(state = {}, action) {
 
             return {
                 ...nextState,
-                [teamId]: team
+                [teamId]: team,
             };
         }
 
@@ -69,5 +79,5 @@ export default combineReducers({
 
     // Object where every key is a team composed with
     // an object where the key is the term and the value indicates is "or" search
-    recent
+    recent,
 });
