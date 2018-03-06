@@ -28,6 +28,8 @@ const WebsocketEvents = {
     REACTION_ADDED: 'reaction_added',
     REACTION_REMOVED: 'reaction_removed',
     EMOJI_ADDED: 'emoji_added',
+    LICENSE_CHANGED: 'license_changed',
+    CONFIG_CHANGED: 'config_changed',
 };
 
 export default WebsocketEvents;

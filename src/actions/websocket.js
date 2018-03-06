@@ -23,12 +23,15 @@ import {
     getProfilesAndStatusesForPosts,
     getCustomEmojiForReaction,
 } from './posts';
-
 import {
     getMyPreferences,
     makeDirectChannelVisibleIfNecessary,
     makeGroupMessageVisibleIfNecessary,
 } from './preferences';
+import {
+    getLicenseConfig,
+    getClientConfig,
+} from './general';
 
 import {getTeam, getTeams, getMyTeams, getMyTeamMembers, getMyTeamUnreads} from './teams';
 
@@ -123,6 +126,8 @@ async function handleReconnect(dispatch, getState) {
     const {currentChannelId} = entities.channels;
     const {currentUserId} = entities.users;
 
+    getLicenseConfig()(dispatch, getState);
+    getClientConfig()(dispatch, getState);
     getMyPreferences()(dispatch, getState);
 
     if (currentTeamId) {
@@ -247,6 +252,12 @@ function handleEvent(msg, dispatch, getState) {
         break;
     case WebsocketEvents.EMOJI_ADDED:
         handleAddEmoji(msg, dispatch, getState);
+        break;
+    case WebsocketEvents.LICENSE_CHANGED:
+        handleLicenseChangedEvent(msg, dispatch, getState);
+        break;
+    case WebsocketEvents.CONFIG_CHANGED:
+        handleConfigChangedEvent(msg, dispatch, getState);
         break;
     }
 }
@@ -602,7 +613,7 @@ function handleHelloEvent(msg) {
     const serverVersion = msg.data.server_version;
     if (serverVersion && Client4.serverVersion !== serverVersion) {
         Client4.serverVersion = serverVersion;
-        EventEmitter.emit(General.CONFIG_CHANGED, serverVersion);
+        EventEmitter.emit(General.SERVER_VERSION_CHANGED, serverVersion);
     }
 }
 
@@ -669,6 +680,25 @@ function handleAddEmoji(msg, dispatch) {
         type: EmojiTypes.RECEIVED_CUSTOM_EMOJI,
         data,
     });
+}
+
+function handleLicenseChangedEvent(msg, dispatch) {
+    const data = msg.data.license;
+
+    dispatch({
+        type: GeneralTypes.CLIENT_LICENSE_RECEIVED,
+        data,
+    });
+}
+
+function handleConfigChangedEvent(msg, dispatch) {
+    const data = msg.data.config;
+
+    dispatch({
+        type: GeneralTypes.CLIENT_CONFIG_RECEIVED,
+        data,
+    });
+    EventEmitter.emit(General.CONFIG_CHANGED, data);
 }
 
 // Helpers
