@@ -28,6 +28,10 @@ export default keyMirror({
     TEST_EMAIL_SUCCESS: null,
     TEST_EMAIL_FAILURE: null,
 
+    TEST_S3_REQUEST: null,
+    TEST_S3_SUCCESS: null,
+    TEST_S3_FAILURE: null,
+
     INVALIDATE_CACHES_REQUEST: null,
     INVALIDATE_CACHES_SUCCESS: null,
     INVALIDATE_CACHES_FAILURE: null,

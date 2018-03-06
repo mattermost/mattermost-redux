@@ -352,6 +352,10 @@ const state = {
                 status: 'not_started',
                 error: null,
             },
+            testS3Connection: {
+                status: 'not_started',
+                error: null
+            },
             invalidateCaches: {
                 status: 'not_started',
                 error: null,

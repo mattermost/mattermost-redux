@@ -1916,6 +1916,13 @@ export default class Client4 {
         );
     };
 
+    testS3Connection = async (config) => {
+        return this.doFetch(
+            `${this.getBaseRoute()}/file/s3_test`,
+            {method: 'post', body: JSON.stringify(config)}
+        );
+    };
+
     invalidateCaches = async () => {
         return this.doFetch(
             `${this.getBaseRoute()}/caches/invalidate`,
