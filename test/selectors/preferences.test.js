@@ -12,6 +12,7 @@ import {getPreferenceKey} from 'utils/preference_utils';
 
 describe('Selectors.Preferences', () => {
     const category1 = 'testcategory1';
+    const category2 = 'testcategory2';
     const directCategory = Preferences.CATEGORY_DIRECT_CHANNEL_SHOW;
     const groupCategory = Preferences.CATEGORY_GROUP_CHANNEL_SHOW;
     const favCategory = Preferences.CATEGORY_FAVORITE_CHANNEL;
@@ -19,6 +20,10 @@ describe('Selectors.Preferences', () => {
     const name1 = 'testname1';
     const value1 = 'true';
     const pref1 = {category: category1, name: name1, value: value1};
+
+    const name2 = 'testname2';
+    const value2 = '42';
+    const pref2 = {category: category2, name: name2, value: value2};
 
     const dm1 = 'teammate1';
     const dmPref1 = {category: directCategory, name: dm1, value: 'true'};
@@ -39,6 +44,7 @@ describe('Selectors.Preferences', () => {
 
     const myPreferences = {};
     myPreferences[`${category1}--${name1}`] = pref1;
+    myPreferences[`${category2}--${name2}`] = pref2;
     myPreferences[`${directCategory}--${dm1}`] = dmPref1;
     myPreferences[`${directCategory}--${dm2}`] = dmPref2;
     myPreferences[`${groupCategory}--${gp1}`] = prefGp1;
@@ -57,12 +63,82 @@ describe('Selectors.Preferences', () => {
         },
     });
 
-    it('get preference', () => {
-        assert.deepEqual(Selectors.get(testState, category1, name1), value1);
+    describe('get preference', () => {
+        it('should return the requested value', () => {
+            assert.deepEqual(Selectors.get(testState, category1, name1), 'true');
+        });
+
+        describe('should fallback to the default', () => {
+            it('if name unknown', () => {
+                assert.deepEqual(Selectors.get(testState, category1, 'unknown name'), '');
+            });
+
+            it('if category unknown', () => {
+                assert.deepEqual(Selectors.get(testState, 'unknown category', name1), '');
+            });
+        });
+
+        describe('should fallback to the overridden default', () => {
+            it('if name unknown', () => {
+                assert.deepEqual(Selectors.get(testState, category1, 'unknown name', 'fallback'), 'fallback');
+            });
+
+            it('if category unknown', () => {
+                assert.deepEqual(Selectors.get(testState, 'unknown category', name1, 'fallback'), 'fallback');
+            });
+        });
     });
 
-    it('get bool preference', () => {
-        assert.deepEqual(Selectors.getBool(testState, category1, name1), value1 === 'true');
+    describe('get bool preference', () => {
+        it('should return the requested value', () => {
+            assert.deepEqual(Selectors.getBool(testState, category1, name1), value1 === 'true');
+        });
+
+        describe('should fallback to the default', () => {
+            it('if name unknown', () => {
+                assert.deepEqual(Selectors.getBool(testState, category1, 'unknown name'), false);
+            });
+
+            it('if category unknown', () => {
+                assert.deepEqual(Selectors.getBool(testState, 'unknown category', name1), false);
+            });
+        });
+
+        describe('should fallback to the overridden default', () => {
+            it('if name unknown', () => {
+                assert.deepEqual(Selectors.getBool(testState, category1, 'unknown name', true), true);
+            });
+
+            it('if category unknown', () => {
+                assert.deepEqual(Selectors.getBool(testState, 'unknown category', name1, true), true);
+            });
+        });
+    });
+
+    describe('get int preference', () => {
+        it('should return the requested value', () => {
+            assert.deepEqual(Selectors.getInt(testState, category2, name2), value2);
+        });
+
+        describe('should fallback to the default', () => {
+            it('if name unknown', () => {
+                assert.deepEqual(Selectors.getInt(testState, category2, 'unknown name'), 0);
+            });
+
+            it('if category unknown', () => {
+                assert.deepEqual(Selectors.getInt(testState, 'unknown category', name2), 0);
+            });
+        });
+
+        describe('should fallback to the overridden default', () => {
+            it('if name unknown', () => {
+                assert.deepEqual(Selectors.getInt(testState, category2, 'unknown name', 100), 100);
+            });
+
+            it('if category unknown', () => {
+                assert.deepEqual(Selectors.getInt(testState, 'unknown category', name2, 100), 100);
+            });
+        });
     });
 
     it('get preferences by category', () => {
