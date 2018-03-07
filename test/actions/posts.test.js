@@ -777,6 +777,55 @@ describe('Actions.Posts', () => {
             }),
             new Set(['name_3'])
         );
+
+        assert.deepEqual(
+            Actions.getNeededCustomEmojis(state, {
+                abcd: {message: '', props: {attachments: [{text: ':name3:'}]}}
+            }),
+            new Set(['name3'])
+        );
+
+        assert.deepEqual(
+            Actions.getNeededCustomEmojis(state, {
+                abcd: {message: '', props: {attachments: [{pretext: ':name3:'}]}}
+            }),
+            new Set(['name3'])
+        );
+
+        assert.deepEqual(
+            Actions.getNeededCustomEmojis(state, {
+                abcd: {message: '', props: {attachments: [{fields: [{value: ':name3:'}]}]}}
+            }),
+            new Set(['name3'])
+        );
+
+        assert.deepEqual(
+            Actions.getNeededCustomEmojis(state, {
+                abcd: {message: '', props: {attachments: [{text: ':name4: :name1:', pretext: ':name3: :systemEmoji1:', fields: [{value: ':name3:'}]}]}}
+            }),
+            new Set(['name3', 'name4'])
+        );
+
+        assert.deepEqual(
+            Actions.getNeededCustomEmojis(state, {
+                abcd: {message: '', props: {attachments: [{fields: [{}]}]}}
+            }),
+            new Set([])
+        );
+
+        assert.deepEqual(
+            Actions.getNeededCustomEmojis(state, {
+                abcd: {message: '', props: {attachments: [{text: null, pretext: null, fields: null}]}}
+            }),
+            new Set([])
+        );
+
+        assert.deepEqual(
+            Actions.getNeededCustomEmojis(state, {
+                abcd: {message: '', props: {attachments: null}}
+            }),
+            new Set([])
+        );
     });
 
     it('getPostsSince', async () => {
