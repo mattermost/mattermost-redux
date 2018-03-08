@@ -30,6 +30,9 @@ export function getPing(useV3 = false) {
             }
         } catch (error) {
             if (!useV3 && error.status_code === 404) {
+                if (!Client.getUrl()) {
+                    Client.setUrl(Client4.getUrl());
+                }
                 return getPing(true)(dispatch, getState);
             }
             dispatch({type: GeneralTypes.PING_FAILURE, error: pingError}, getState);
