@@ -11,6 +11,10 @@ export function getLicense(state) {
     return state.entities.general.license;
 }
 
+export function getSupportedTimezones(state) {
+    return state.entities.general.timezones;
+}
+
 export function getCurrentUrl(state) {
     return state.entities.general.credentials.url;
 }
