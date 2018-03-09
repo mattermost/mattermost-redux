@@ -473,7 +473,7 @@ export function getProfilesWithoutTeam(page, perPage = General.PROFILE_CHUNK_SIZ
     };
 }
 
-export function getProfilesInChannel(channelId, page, perPage = General.PROFILE_CHUNK_SIZE) {
+export function getProfilesInChannel(channelId, page, perPage = General.PROFILE_CHUNK_SIZE, sort = '') {
     return async (dispatch, getState) => {
         dispatch({type: UserTypes.PROFILES_IN_CHANNEL_REQUEST}, getState);
 
@@ -481,7 +481,7 @@ export function getProfilesInChannel(channelId, page, perPage = General.PROFILE_
 
         let profiles;
         try {
-            profiles = await Client4.getProfilesInChannel(channelId, page, perPage);
+            profiles = await Client4.getProfilesInChannel(channelId, page, perPage, sort);
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch, getState);
             dispatch(batchActions([

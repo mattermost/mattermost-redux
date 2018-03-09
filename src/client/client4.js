@@ -7,6 +7,7 @@ import {General} from 'constants';
 const FormData = require('form-data');
 
 import fetch from './fetch_etag';
+import {isMinimumServerVersion} from 'src/utils/helpers';
 
 const HEADER_TOKEN = 'Token';
 const HEADER_AUTH = 'Authorization';
@@ -521,11 +522,18 @@ export default class Client4 {
         );
     };
 
-    getProfilesInChannel = async (channelId, page = 0, perPage = PER_PAGE_DEFAULT) => {
+    getProfilesInChannel = async (channelId, page = 0, perPage = PER_PAGE_DEFAULT, sort = '') => {
         this.trackEvent('api', 'api_profiles_get_in_channel', {channel_id: channelId});
 
+        const serverVersion = this.getServerVersion();
+        let queryStringObj;
+        if (isMinimumServerVersion(serverVersion, 4, 7)) {
+            queryStringObj = {in_channel: channelId, page, per_page: perPage, sort};
+        } else {
+            queryStringObj = {in_channel: channelId, page, per_page: perPage};
+        }
         return this.doFetch(
-            `${this.getUsersRoute()}${buildQueryString({in_channel: channelId, page, per_page: perPage})}`,
+            `${this.getUsersRoute()}${buildQueryString(queryStringObj)}`,
             {method: 'get'}
         );
     };
