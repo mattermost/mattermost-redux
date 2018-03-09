@@ -11,6 +11,7 @@ const state = {
             deviceToken: '',
             license: {},
             serverVersion: '',
+            timezones: [],
         },
         users: {
             currentUserId: '',

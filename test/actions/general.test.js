@@ -117,4 +117,17 @@ describe('Actions.General', () => {
         const {dataRetentionPolicy} = store.getState().entities.general;
         assert.deepEqual(dataRetentionPolicy, responseData);
     });
+
+    it('getTimezones', async () => {
+        nock(Client4.getBaseRoute()).
+        get('/timezone').
+        query(true).
+        reply(200, ['America/New_York', 'America/Los_Angeles']);
+
+        await Actions.getSupportedTimezones()(store.dispatch, store.getState);
+
+        await TestHelper.wait(100);
+        const {timezones} = store.getState().entities.general;
+        assert.equal(timezones.length > 0, true);
+    });
 });

@@ -100,5 +100,5 @@ export default combineReducers({
     deviceToken,
     license,
     serverVersion,
-    timezones
+    timezones,
 });

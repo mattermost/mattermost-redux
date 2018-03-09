@@ -185,6 +185,7 @@ export default {
     getPing,
     getClientConfig,
     getDataRetentionPolicy,
+    getSupportedTimezones,
     getLicenseConfig,
     logClientError,
     setAppState,
