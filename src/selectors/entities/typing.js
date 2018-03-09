@@ -27,14 +27,16 @@ const getUsersTypingImpl = (profiles, teammateNameDisplay, channelId, parentPost
     return [];
 };
 
-export const getUsersTypingByChannelAndPost = createSelector(
-    getUsers,
-    getTeammateNameDisplaySetting,
-    (state, options) => options.channelId,
-    (state, options) => options.postId,
-    (state) => state.entities.typing,
-    getUsersTypingImpl,
-);
+export const makeGetUsersTypingByChannelAndPost = () => {
+    return createSelector(
+        getUsers,
+        getTeammateNameDisplaySetting,
+        (state, options) => options.channelId,
+        (state, options) => options.postId,
+        (state) => state.entities.typing,
+        getUsersTypingImpl,
+    );
+};
 
 export const getUsersTyping = createSelector(
     getUsers,
