@@ -120,7 +120,7 @@ describe('Actions.General', () => {
 
     it('getTimezones', async () => {
         nock(Client4.getBaseRoute()).
-        get('/timezone').
+        get('/system/timezones').
         query(true).
         reply(200, ['America/New_York', 'America/Los_Angeles']);
 
