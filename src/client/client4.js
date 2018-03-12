@@ -226,7 +226,7 @@ export default class Client4 {
     }
 
     getTimezonesRoute() {
-        return `${this.getBaseRoute()}/timezone`;
+        return `${this.getBaseRoute()}/timezones`;
     }
 
     getOptions(options) {
