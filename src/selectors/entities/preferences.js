@@ -32,6 +32,12 @@ export function getBool(state, category, name, defaultValue = false) {
     return value !== 'false';
 }
 
+export function getInt(state, category, name, defaultValue = 0) {
+    const value = get(state, category, name, defaultValue);
+
+    return parseInt(value, 10);
+}
+
 export function makeGetCategory() {
     return createSelector(
         getMyPreferences,

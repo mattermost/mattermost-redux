@@ -4,11 +4,9 @@
 import {Client, Client4} from 'client';
 import {bindClientFunc, forceLogoutIfNecessary, FormattedError} from './helpers.js';
 import {GeneralTypes} from 'action_types';
-import {General} from 'constants';
 import {loadMe} from './users';
 import {loadRolesIfNeeded} from './roles';
 import {logError} from './errors';
-import EventEmitter from 'utils/event_emitter';
 import {batchActions} from 'redux-batched-actions';
 
 export function getPing(useV3 = false) {
@@ -33,6 +31,9 @@ export function getPing(useV3 = false) {
             }
         } catch (error) {
             if (!useV3 && error.status_code === 404) {
+                if (!Client.getUrl()) {
+                    Client.setUrl(Client4.getUrl());
+                }
                 return getPing(true)(dispatch, getState);
             }
             dispatch({type: GeneralTypes.PING_FAILURE, error: pingError}, getState);
@@ -146,8 +147,6 @@ export function setDeviceToken(token) {
         return {data: true};
     };
 }
-
-EventEmitter.on(General.CONFIG_CHANGED, setServerVersion);
 
 export function setServerVersion(serverVersion) {
     return async (dispatch, getState) => {

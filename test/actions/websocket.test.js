@@ -595,4 +595,49 @@ describe('Actions.Websocket', () => {
 
         test();
     });
+
+    it('handle license changed', (done) => {
+        async function test() {
+            if (TestHelper.isLiveServer()) {
+                // No live server version implemented for this test case.
+                this.skip();
+            } else {
+                mockServer.send(JSON.stringify({event: WebsocketEvents.LICENSE_CHANGED, data: {license: {IsLicensed: 'true'}}}));
+            }
+
+            await TestHelper.wait(200);
+
+            const state = store.getState();
+
+            const license = state.entities.general.license;
+            assert.ok(license);
+            assert.ok(license.IsLicensed);
+            done();
+        }
+
+        test();
+    });
+
+    it('handle config changed', (done) => {
+        async function test() {
+            if (TestHelper.isLiveServer()) {
+                // No live server version implemented for this test case.
+                this.skip();
+            } else {
+                mockServer.send(JSON.stringify({event: WebsocketEvents.CONFIG_CHANGED, data: {config: {EnableCustomEmoji: 'true', EnableLinkPreviews: 'false'}}}));
+            }
+
+            await TestHelper.wait(200);
+
+            const state = store.getState();
+
+            const config = state.entities.general.config;
+            assert.ok(config);
+            assert.ok(config.EnableCustomEmoji === 'true');
+            assert.ok(config.EnableLinkPreviews === 'false');
+            done();
+        }
+
+        test();
+    });
 });

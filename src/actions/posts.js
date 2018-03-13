@@ -982,6 +982,28 @@ export function getNeededAtMentionedUsernames(state, posts) {
     return usernamesToLoad;
 }
 
+function buildPostAttachmentText(attachments) {
+    let attachmentText = '';
+
+    attachments.forEach((a) => {
+        if (a.fields && a.fields.length) {
+            a.fields.forEach((f) => {
+                attachmentText += ' ' + (f.value || '');
+            });
+        }
+
+        if (a.pretext) {
+            attachmentText += ' ' + a.pretext;
+        }
+
+        if (a.text) {
+            attachmentText += ' ' + a.text;
+        }
+    });
+
+    return attachmentText;
+}
+
 export function getNeededCustomEmojis(state, posts) {
     let customEmojisByName; // Populate this lazily since it's relatively expensive
     const nonExistentEmoji = state.entities.emojis.nonExistentEmoji;
@@ -989,18 +1011,33 @@ export function getNeededCustomEmojis(state, posts) {
     let customEmojisToLoad = new Set();
 
     Object.values(posts).forEach((post) => {
-        if (!post.message.includes(':')) {
-            return;
+        if (post.message.includes(':')) {
+            if (!customEmojisByName) {
+                customEmojisByName = selectCustomEmojisByName(state);
+            }
+
+            const emojisFromPost = parseNeededCustomEmojisFromText(post.message, systemEmojis, customEmojisByName, nonExistentEmoji);
+
+            if (emojisFromPost.size > 0) {
+                customEmojisToLoad = new Set([...customEmojisToLoad, ...emojisFromPost]);
+            }
         }
 
-        if (!customEmojisByName) {
-            customEmojisByName = selectCustomEmojisByName(state);
-        }
+        const props = post.props;
+        if (props && props.attachments && props.attachments.length) {
+            if (!customEmojisByName) {
+                customEmojisByName = selectCustomEmojisByName(state);
+            }
 
-        const emojisFromPost = parseNeededCustomEmojisFromText(post.message, systemEmojis, customEmojisByName, nonExistentEmoji);
+            const attachmentText = buildPostAttachmentText(props.attachments);
 
-        if (emojisFromPost.size > 0) {
-            customEmojisToLoad = new Set([...customEmojisToLoad, ...emojisFromPost]);
+            if (attachmentText) {
+                const emojisFromAttachment = parseNeededCustomEmojisFromText(attachmentText, systemEmojis, customEmojisByName, nonExistentEmoji);
+
+                if (emojisFromAttachment.size > 0) {
+                    customEmojisToLoad = new Set([...customEmojisToLoad, ...emojisFromAttachment]);
+                }
+            }
         }
     });
 
