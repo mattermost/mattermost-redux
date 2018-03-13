@@ -31,6 +31,35 @@ function handleReceivedPost(posts = {}, postsInChannel = {}, action) {
     return {posts: nextPosts, postsInChannel: nextPostsForChannel};
 }
 
+function handleRemovePendingPost(posts = {}, postsInChannel = {}, action) {
+    const postId = action.data.id;
+    const channelId = action.data.channel_id;
+
+    const nextPosts = {
+        ...posts,
+    };
+
+    Reflect.deleteProperty(nextPosts, postId);
+
+    let nextPostsForChannel = postsInChannel;
+
+    // Only change postsInChannel if the order of the posts needs to change
+    if (!postsInChannel[channelId] || postsInChannel[channelId].indexOf(postId) !== -1) {
+        // If we don't already have the post, assume it's the most recent one
+        const postsForChannel = postsInChannel[channelId] || [];
+
+        nextPostsForChannel = {...postsInChannel};
+        nextPostsForChannel[channelId] = [];
+        for (const post of postsForChannel) {
+            if (post !== postId) {
+                nextPostsForChannel[channelId].push(post);
+            }
+        }
+    }
+
+    return {posts: nextPosts, postsInChannel: nextPostsForChannel};
+}
+
 function handleReceivedPosts(posts = {}, postsInChannel = {}, action) {
     const newPosts = action.data.posts;
     const channelId = action.channelId;
@@ -100,6 +129,16 @@ function handlePendingPosts(pendingPostIds = [], action) {
         const nextPendingPostIds = [...pendingPostIds];
         if (post.pending_post_id && !nextPendingPostIds.includes(post.pending_post_id)) {
             nextPendingPostIds.push(post.pending_post_id);
+        }
+        return nextPendingPostIds;
+    }
+    case PostTypes.REMOVE_PENDING_POST: {
+        const postId = action.data.id;
+        const nextPendingPostIds = [];
+        for (const post of pendingPostIds) {
+            if (post !== postId) {
+                nextPendingPostIds.push(post);
+            }
         }
         return nextPendingPostIds;
     }
@@ -240,6 +279,9 @@ function handlePosts(posts = {}, postsInChannel = {}, action) {
     }
     case PostTypes.RECEIVED_NEW_POST:
         return handleReceivedPost(posts, postsInChannel, action);
+    case PostTypes.REMOVE_PENDING_POST: {
+        return handleRemovePendingPost(posts, postsInChannel, action);
+    }
     case PostTypes.RECEIVED_POSTS:
         return handleReceivedPosts(posts, postsInChannel, action);
     case PostTypes.POST_DELETED:
