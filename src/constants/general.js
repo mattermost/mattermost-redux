@@ -18,6 +18,7 @@ export default {
 
     MENTION: 'mention',
 
+    OUT_OF_OFFICE: 'ooo',
     OFFLINE: 'offline',
     AWAY: 'away',
     ONLINE: 'online',
