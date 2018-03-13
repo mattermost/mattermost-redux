@@ -32,24 +32,24 @@ function handleReceivedPost(posts = {}, postsInChannel = {}, action) {
 }
 
 function handleRemovePendingPost(posts = {}, postsInChannel = {}, action) {
-    const postId = action.data.id;
+    const pendingPostId = action.data.id;
     const channelId = action.data.channel_id;
 
     const nextPosts = {
         ...posts,
     };
 
-    Reflect.deleteProperty(nextPosts, postId);
+    Reflect.deleteProperty(nextPosts, pendingPostId);
 
     let nextPostsForChannel = postsInChannel;
 
     // Only change postsInChannel if the order of the posts needs to change
-    if (!postsInChannel[channelId] || postsInChannel[channelId].includes(postId)) {
+    if (!postsInChannel[channelId] || postsInChannel[channelId].includes(pendingPostId)) {
         // If we don't already have the post, assume it's the most recent one
         const postsForChannel = postsInChannel[channelId] || [];
 
         nextPostsForChannel = {...postsInChannel};
-        nextPostsForChannel[channelId] = postsForChannel.filter((post) => post !== postId);
+        nextPostsForChannel[channelId] = postsForChannel.filter((post) => post !== pendingPostId);
     }
 
     return {posts: nextPosts, postsInChannel: nextPostsForChannel};
@@ -128,8 +128,8 @@ function handlePendingPosts(pendingPostIds = [], action) {
         return nextPendingPostIds;
     }
     case PostTypes.REMOVE_PENDING_POST: {
-        const postId = action.data.id;
-        const nextPendingPostIds = pendingPostIds.filter((post) => post !== postId);
+        const pendingPostId = action.data.id;
+        const nextPendingPostIds = pendingPostIds.filter((post) => post !== pendingPostId);
         return nextPendingPostIds;
     }
     case PostTypes.RECEIVED_POSTS: {
