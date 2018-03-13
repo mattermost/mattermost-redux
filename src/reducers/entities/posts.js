@@ -17,7 +17,7 @@ function handleReceivedPost(posts = {}, postsInChannel = {}, action) {
     let nextPostsForChannel = postsInChannel;
 
     // Only change postsInChannel if the order of the posts needs to change
-    if (!postsInChannel[channelId] || postsInChannel[channelId].indexOf(post.id) === -1) {
+    if (!postsInChannel[channelId] || !postsInChannel[channelId].includes(post.id)) {
         // If we don't already have the post, assume it's the most recent one
         const postsForChannel = postsInChannel[channelId] || [];
 
@@ -44,17 +44,12 @@ function handleRemovePendingPost(posts = {}, postsInChannel = {}, action) {
     let nextPostsForChannel = postsInChannel;
 
     // Only change postsInChannel if the order of the posts needs to change
-    if (!postsInChannel[channelId] || postsInChannel[channelId].indexOf(postId) !== -1) {
+    if (!postsInChannel[channelId] || postsInChannel[channelId].includes(postId)) {
         // If we don't already have the post, assume it's the most recent one
         const postsForChannel = postsInChannel[channelId] || [];
 
         nextPostsForChannel = {...postsInChannel};
-        nextPostsForChannel[channelId] = [];
-        for (const post of postsForChannel) {
-            if (post !== postId) {
-                nextPostsForChannel[channelId].push(post);
-            }
-        }
+        nextPostsForChannel[channelId] = postsForChannel.filter((post) => post !== postId);
     }
 
     return {posts: nextPosts, postsInChannel: nextPostsForChannel};
@@ -95,7 +90,7 @@ function handleReceivedPosts(posts = {}, postsInChannel = {}, action) {
             nextPosts[newPost.id] = newPost;
         }
 
-        if (!skipAddToChannel && postsForChannel.indexOf(newPost.id) === -1) {
+        if (!skipAddToChannel && !postsForChannel.includes(newPost.id)) {
             // Just add the post id to the end of the order and we'll sort it out later
             postsForChannel.push(newPost.id);
         }
@@ -134,12 +129,7 @@ function handlePendingPosts(pendingPostIds = [], action) {
     }
     case PostTypes.REMOVE_PENDING_POST: {
         const postId = action.data.id;
-        const nextPendingPostIds = [];
-        for (const post of pendingPostIds) {
-            if (post !== postId) {
-                nextPendingPostIds.push(post);
-            }
-        }
+        const nextPendingPostIds = pendingPostIds.filter((post) => post !== postId);
         return nextPendingPostIds;
     }
     case PostTypes.RECEIVED_POSTS: {
