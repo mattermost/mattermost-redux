@@ -49,7 +49,7 @@ function handleRemovePendingPost(posts = {}, postsInChannel = {}, action) {
         const postsForChannel = postsInChannel[channelId] || [];
 
         nextPostsForChannel = {...postsInChannel};
-        nextPostsForChannel[channelId] = postsForChannel.filter((post) => post !== pendingPostId);
+        nextPostsForChannel[channelId] = postsForChannel.filter((postId) => postId !== pendingPostId);
     }
 
     return {posts: nextPosts, postsInChannel: nextPostsForChannel};
@@ -129,7 +129,7 @@ function handlePendingPosts(pendingPostIds = [], action) {
     }
     case PostTypes.REMOVE_PENDING_POST: {
         const pendingPostId = action.data.id;
-        const nextPendingPostIds = pendingPostIds.filter((post) => post !== pendingPostId);
+        const nextPendingPostIds = pendingPostIds.filter((postId) => postId !== pendingPostId);
         return nextPendingPostIds;
     }
     case PostTypes.RECEIVED_POSTS: {
