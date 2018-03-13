@@ -9,6 +9,8 @@ export default keyMirror({
     CREATE_POST_FAILURE: null,
     CREATE_POST_RESET_REQUEST: null,
 
+    REMOVE_PENDING_POST: null,
+
     EDIT_POST_REQUEST: null,
     EDIT_POST_SUCCESS: null,
     EDIT_POST_FAILURE: null,
