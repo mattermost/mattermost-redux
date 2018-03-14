@@ -166,6 +166,15 @@ export function setStoreFromLocalData(data) {
     };
 }
 
+export function getSupportedTimezones() {
+    return bindClientFunc(
+        Client4.getTimezones,
+        GeneralTypes.SUPPORTED_TIMEZONES_REQUEST,
+        [GeneralTypes.SUPPORTED_TIMEZONES_RECEIVED, GeneralTypes.SUPPORTED_TIMEZONES_SUCCESS],
+        GeneralTypes.SUPPORTED_TIMEZONES_FAILURE,
+    );
+}
+
 export function setUrl(url) {
     Client.setUrl(url);
     Client4.setUrl(url);
@@ -176,6 +185,7 @@ export default {
     getPing,
     getClientConfig,
     getDataRetentionPolicy,
+    getSupportedTimezones,
     getLicenseConfig,
     logClientError,
     setAppState,

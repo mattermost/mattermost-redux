@@ -70,6 +70,17 @@ function license(state = {}, action) {
     }
 }
 
+function timezones(state = [], action) {
+    switch (action.type) {
+    case GeneralTypes.SUPPORTED_TIMEZONES_RECEIVED:
+        return action.data;
+    case UserTypes.LOGOUT_SUCCESS:
+        return [];
+    default:
+        return state;
+    }
+}
+
 function serverVersion(state = '', action) {
     switch (action.type) {
     case GeneralTypes.RECEIVED_SERVER_VERSION:
@@ -89,4 +100,5 @@ export default combineReducers({
     deviceToken,
     license,
     serverVersion,
+    timezones,
 });
