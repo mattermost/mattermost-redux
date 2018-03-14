@@ -129,5 +129,6 @@ describe('Actions.General', () => {
         await TestHelper.wait(100);
         const {timezones} = store.getState().entities.general;
         assert.equal(timezones.length > 0, true);
+        assert.equal(timezones.length === 0, false);
     });
 });

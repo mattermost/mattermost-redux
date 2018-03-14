@@ -26,11 +26,7 @@ export function getTimezoneRegion(timezone) {
     if (timezone) {
         const split = timezone.split('/');
         if (split.length > 1) {
-            const region = split.pop();
-            if (region.indexOf('_') >= 0) {
-                return region.replace('_', ' ');
-            }
-            return region;
+            return split.pop().replace(/_/g, ' ');
         }
     }
 
