@@ -17,7 +17,7 @@ function handleReceivedPost(posts = {}, postsInChannel = {}, action) {
     let nextPostsForChannel = postsInChannel;
 
     // Only change postsInChannel if the order of the posts needs to change
-    if (!postsInChannel[channelId] || postsInChannel[channelId].indexOf(post.id) === -1) {
+    if (!postsInChannel[channelId] || !postsInChannel[channelId].includes(post.id)) {
         // If we don't already have the post, assume it's the most recent one
         const postsForChannel = postsInChannel[channelId] || [];
 
@@ -26,6 +26,30 @@ function handleReceivedPost(posts = {}, postsInChannel = {}, action) {
             post.id,
             ...postsForChannel,
         ];
+    }
+
+    return {posts: nextPosts, postsInChannel: nextPostsForChannel};
+}
+
+function handleRemovePendingPost(posts = {}, postsInChannel = {}, action) {
+    const pendingPostId = action.data.id;
+    const channelId = action.data.channel_id;
+
+    const nextPosts = {
+        ...posts,
+    };
+
+    Reflect.deleteProperty(nextPosts, pendingPostId);
+
+    let nextPostsForChannel = postsInChannel;
+
+    // Only change postsInChannel if the order of the posts needs to change
+    if (!postsInChannel[channelId] || postsInChannel[channelId].includes(pendingPostId)) {
+        // If we don't already have the post, assume it's the most recent one
+        const postsForChannel = postsInChannel[channelId] || [];
+
+        nextPostsForChannel = {...postsInChannel};
+        nextPostsForChannel[channelId] = postsForChannel.filter((postId) => postId !== pendingPostId);
     }
 
     return {posts: nextPosts, postsInChannel: nextPostsForChannel};
@@ -66,7 +90,7 @@ function handleReceivedPosts(posts = {}, postsInChannel = {}, action) {
             nextPosts[newPost.id] = newPost;
         }
 
-        if (!skipAddToChannel && postsForChannel.indexOf(newPost.id) === -1) {
+        if (!skipAddToChannel && !postsForChannel.includes(newPost.id)) {
             // Just add the post id to the end of the order and we'll sort it out later
             postsForChannel.push(newPost.id);
         }
@@ -101,6 +125,11 @@ function handlePendingPosts(pendingPostIds = [], action) {
         if (post.pending_post_id && !nextPendingPostIds.includes(post.pending_post_id)) {
             nextPendingPostIds.push(post.pending_post_id);
         }
+        return nextPendingPostIds;
+    }
+    case PostTypes.REMOVE_PENDING_POST: {
+        const pendingPostId = action.data.id;
+        const nextPendingPostIds = pendingPostIds.filter((postId) => postId !== pendingPostId);
         return nextPendingPostIds;
     }
     case PostTypes.RECEIVED_POSTS: {
@@ -240,6 +269,9 @@ function handlePosts(posts = {}, postsInChannel = {}, action) {
     }
     case PostTypes.RECEIVED_NEW_POST:
         return handleReceivedPost(posts, postsInChannel, action);
+    case PostTypes.REMOVE_PENDING_POST: {
+        return handleRemovePendingPost(posts, postsInChannel, action);
+    }
     case PostTypes.RECEIVED_POSTS:
         return handleReceivedPosts(posts, postsInChannel, action);
     case PostTypes.POST_DELETED:
