@@ -63,19 +63,21 @@ export const getPostsInCurrentChannel = createSelector(
 export function makeGetPostIdsForThread() {
     return createIdsSelector(
         getAllPosts,
-        (state, rootId) => rootId,
-        (posts, rootId) => {
+        (state, rootId) => state.entities.posts.postsInThread[rootId] || [],
+        (state, rootId) => state.entities.posts.posts[rootId],
+        (posts, postsInThread, rootPost) => {
             const thread = [];
 
-            for (const id in posts) {
-                if (posts.hasOwnProperty(id)) {
-                    const post = posts[id];
-
-                    if (id === rootId || post.root_id === rootId) {
-                        thread.push(post);
-                    }
-                }
+            if (rootPost) {
+                thread.push(rootPost);
             }
+
+            postsInThread.forEach((id) => {
+                const post = posts[id];
+                if (post) {
+                    thread.push(post);
+                }
+            });
 
             thread.sort(comparePosts);
 
@@ -157,13 +159,18 @@ function formatPostInChannel(post, previousPost, index, allPosts, postsInThread,
 
         for (const pid of threadIds) {
             const p = allPosts[pid];
-            if (p && p.user_id === currentUser.id) {
+            if (!p) {
+                continue;
+            }
+
+            if (p.user_id === currentUser.id) {
                 threadRepliedToByCurrentUser = true;
-                break;
+            }
+
+            if (!isPostEphemeral(p)) {
+                replyCount += 1;
             }
         }
-
-        replyCount = threadIds.length;
 
         const rootPost = allPosts[rootId];
         if (rootPost.user_id === currentUser.id) {
@@ -204,7 +211,8 @@ export function makeGetPostsInChannel() {
         (state, channelId) => state.entities.posts.postsInChannel[channelId],
         getCurrentUser,
         getMyPreferences,
-        (allPosts, postsInThread, postIds, currentUser, myPreferences) => {
+        (state, channelId, numPosts) => numPosts,
+        (allPosts, postsInThread, postIds, currentUser, myPreferences, numPosts) => {
             if (!postIds || !currentUser) {
                 return null;
             }
@@ -214,7 +222,7 @@ export function makeGetPostsInChannel() {
             const joinLeavePref = myPreferences[getPreferenceKey(Preferences.CATEGORY_ADVANCED_SETTINGS, 'join_leave')];
             const showJoinLeave = joinLeavePref ? joinLeavePref.value !== 'false' : true;
 
-            for (let i = 0; i < postIds.length; i++) {
+            for (let i = 0; i < postIds.length && i < numPosts; i++) {
                 const post = allPosts[postIds[i]];
 
                 if (shouldFilterJoinLeavePost(post, showJoinLeave, currentUser.username)) {
@@ -284,19 +292,21 @@ export function makeGetPostsAroundPost() {
 export function makeGetPostsForThread() {
     return createSelector(
         getAllPosts,
-        (state, props) => props,
-        (posts, {rootId}) => {
+        (state, {rootId}) => state.entities.posts.postsInThread[rootId] || [],
+        (state, {rootId}) => state.entities.posts.posts[rootId],
+        (posts, postsInThread, rootPost) => {
             const thread = [];
 
-            for (const id in posts) {
-                if (posts.hasOwnProperty(id)) {
-                    const post = posts[id];
-
-                    if (id === rootId || post.root_id === rootId) {
-                        thread.push(post);
-                    }
-                }
+            if (rootPost) {
+                thread.push(rootPost);
             }
+
+            postsInThread.forEach((id) => {
+                const post = posts[id];
+                if (post) {
+                    thread.push(post);
+                }
+            });
 
             thread.sort(comparePosts);
 
@@ -308,20 +318,20 @@ export function makeGetPostsForThread() {
 export function makeGetCommentCountForPost() {
     return createSelector(
         getAllPosts,
+        (state, {post}) => state.entities.posts.postsInThread[post ? post.id : ''] || [],
         (state, props) => props,
-        (posts, {post: currentPost}) => {
-            let count = 0;
-            if (currentPost) {
-                for (const id in posts) {
-                    if (posts.hasOwnProperty(id)) {
-                        const post = posts[id];
-
-                        if (post.root_id === currentPost.id && post.state !== Posts.POST_DELETED && !isPostEphemeral(post)) {
-                            count += 1;
-                        }
-                    }
-                }
+        (posts, postsInThread, {post: currentPost}) => {
+            if (!currentPost) {
+                return 0;
             }
+
+            let count = 0;
+            postsInThread.forEach((id) => {
+                const post = posts[id];
+                if (post && post.state !== Posts.POST_DELETED && !isPostEphemeral(post)) {
+                    count += 1;
+                }
+            });
             return count;
         }
     );
