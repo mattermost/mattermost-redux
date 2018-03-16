@@ -19,7 +19,7 @@ export function isFromWebhook(post) {
 }
 
 export function isPostEphemeral(post) {
-    return post.type === Posts.POST_TYPES.EPHEMERAL || post.state === Posts.POST_DELETED;
+    return post.type === Posts.POST_TYPES.EPHEMERAL || post.type === Posts.POST_TYPES.EPHEMERAL_ADD_TO_CHANNEL || post.state === Posts.POST_DELETED;
 }
 
 export function shouldIgnorePost(post) {
