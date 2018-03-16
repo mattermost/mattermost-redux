@@ -19,6 +19,10 @@ export function getPost(state, postId) {
     return getAllPosts(state)[postId];
 }
 
+export function getPostsInThread(state) {
+    return state.entities.posts.postsInThread;
+}
+
 export function getReactionsForPosts(state) {
     return state.entities.posts.reactions;
 }
@@ -105,7 +109,7 @@ export function makeGetPostIdsAroundPost() {
     );
 }
 
-function formatPostInChannel(post, previousPost, index, allPosts, postIds, currentUser) {
+function formatPostInChannel(post, previousPost, index, allPosts, postsInThread, postIds, currentUser) {
     let isFirstReply = false;
     let isLastReply = false;
     let commentedOnPost;
@@ -142,36 +146,42 @@ function formatPostInChannel(post, previousPost, index, allPosts, postIds, curre
         consecutivePostByUser = true;
     }
 
-    let replyCount = 0;
     let threadRepliedToByCurrentUser = false;
     let threadCreatedByCurrentUser = false;
-    const rootId = post.root_id || post.id;
-    Object.values(allPosts).forEach((p) => {
-        if (p.root_id === rootId && !isPostEphemeral(p)) {
-            replyCount += 1;
+    let replyCount = 0;
+    let isCommentMention = false;
 
-            if (currentUser && p.user_id === currentUser.id) {
+    if (currentUser) {
+        const rootId = post.root_id || post.id;
+        const threadIds = postsInThread[rootId] || [];
+
+        for (const pid of threadIds) {
+            const p = allPosts[pid];
+            if (p && p.user_id === currentUser.id) {
                 threadRepliedToByCurrentUser = true;
+                break;
             }
         }
 
-        if (currentUser && p.id === rootId && p.user_id === currentUser.id) {
+        replyCount = threadIds.length;
+
+        const rootPost = allPosts[rootId];
+        if (rootPost.user_id === currentUser.id) {
             threadCreatedByCurrentUser = true;
         }
-    });
 
-    let isCommentMention = false;
-    let commentsNotifyLevel = 'never';
-    if (currentUser && currentUser.notify_props && currentUser.notify_props.comments) {
-        commentsNotifyLevel = currentUser.notify_props.comments;
-    }
+        let commentsNotifyLevel = 'never';
+        if (currentUser.notify_props && currentUser.notify_props.comments) {
+            commentsNotifyLevel = currentUser.notify_props.comments;
+        }
 
-    const notCurrentUser = (currentUser && post.user_id !== currentUser.id) || (post.props && post.props.from_webhook);
-    if (notCurrentUser) {
-        if (commentsNotifyLevel === 'any' && (threadCreatedByCurrentUser || threadRepliedToByCurrentUser)) {
-            isCommentMention = true;
-        } else if (commentsNotifyLevel === 'root' && threadCreatedByCurrentUser) {
-            isCommentMention = true;
+        const notCurrentUser = post.user_id !== currentUser.id || (post.props && post.props.from_webhook);
+        if (notCurrentUser) {
+            if (commentsNotifyLevel === 'any' && (threadCreatedByCurrentUser || threadRepliedToByCurrentUser)) {
+                isCommentMention = true;
+            } else if (commentsNotifyLevel === 'root' && threadCreatedByCurrentUser) {
+                isCommentMention = true;
+            }
         }
     }
 
@@ -190,10 +200,11 @@ function formatPostInChannel(post, previousPost, index, allPosts, postIds, curre
 export function makeGetPostsInChannel() {
     return createSelector(
         getAllPosts,
+        getPostsInThread,
         (state, channelId) => state.entities.posts.postsInChannel[channelId],
         getCurrentUser,
         getMyPreferences,
-        (allPosts, postIds, currentUser, myPreferences) => {
+        (allPosts, postsInThread, postIds, currentUser, myPreferences) => {
             if (!postIds || !currentUser) {
                 return null;
             }
@@ -211,7 +222,7 @@ export function makeGetPostsInChannel() {
                 }
 
                 const previousPost = allPosts[postIds[i + 1]] || {create_at: 0};
-                posts.push(formatPostInChannel(post, previousPost, i, allPosts, postIds, currentUser));
+                posts.push(formatPostInChannel(post, previousPost, i, allPosts, postsInThread, postIds, currentUser));
             }
 
             return posts;
