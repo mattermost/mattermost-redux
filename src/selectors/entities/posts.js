@@ -211,7 +211,7 @@ export function makeGetPostsInChannel() {
         (state, channelId) => state.entities.posts.postsInChannel[channelId],
         getCurrentUser,
         getMyPreferences,
-        (state, channelId, numPosts) => numPosts,
+        (state, channelId, numPosts) => numPosts || Posts.POST_CHUNK_SIZE,
         (allPosts, postsInThread, postIds, currentUser, myPreferences, numPosts) => {
             if (!postIds || !currentUser) {
                 return null;
@@ -241,11 +241,12 @@ export function makeGetPostsInChannel() {
 export function makeGetPostsAroundPost() {
     return createSelector(
         getAllPosts,
+        getPostsInThread,
         (state, postId, channelId) => state.entities.posts.postsInChannel[channelId],
         (state, postId) => postId,
         getCurrentUser,
         getMyPreferences,
-        (allPosts, postIds, focusedPostId, currentUser, myPreferences) => {
+        (allPosts, postsInThread, postIds, focusedPostId, currentUser, myPreferences) => {
             if (!postIds || !currentUser) {
                 return null;
             }
@@ -272,7 +273,7 @@ export function makeGetPostsAroundPost() {
                 }
 
                 const previousPost = allPosts[slicedPostIds[i + 1]] || {create_at: 0};
-                const formattedPost = formatPostInChannel(post, previousPost, i, allPosts, slicedPostIds, currentUser);
+                const formattedPost = formatPostInChannel(post, previousPost, i, allPosts, postsInThread, slicedPostIds, currentUser);
 
                 if (post.id === focusedPostId) {
                     formattedPost.highlight = true;
