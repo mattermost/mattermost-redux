@@ -43,6 +43,7 @@ const state = {
         posts: {
             posts: {},
             postsInChannel: {},
+            postsInThread: {},
             selectedPostId: '',
             currentFocusedPostId: '',
             messagesHistory: {
