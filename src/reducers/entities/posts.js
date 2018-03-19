@@ -14,32 +14,32 @@ function handleReceivedPost(posts = {}, postsInChannel = {}, postsInThread = {},
         [post.id]: post,
     };
 
-    let nextPostsForChannel = postsInChannel;
+    let nextPostsInChannel = postsInChannel;
 
     // Only change postsInChannel if the order of the posts needs to change
     if (!postsInChannel[channelId] || !postsInChannel[channelId].includes(post.id)) {
         // If we don't already have the post, assume it's the most recent one
         const postsForChannel = postsInChannel[channelId] || [];
 
-        nextPostsForChannel = {...postsInChannel};
-        nextPostsForChannel[channelId] = [
+        nextPostsInChannel = {...postsInChannel};
+        nextPostsInChannel[channelId] = [
             post.id,
             ...postsForChannel,
         ];
     }
 
-    let nextPostsForThread = postsInThread;
+    let nextPostsInThread = postsInThread;
     if (post.root_id && (!postsInThread[post.root_id] || !postsInThread[post.root_id].includes(post.id))) {
         const postsForThread = postsInThread[post.root_id] || [];
 
-        nextPostsForThread = {...postsInThread};
-        nextPostsForThread[post.root_id] = [
+        nextPostsInThread = {...postsInThread};
+        nextPostsInThread[post.root_id] = [
             post.id,
             ...postsForThread,
         ];
     }
 
-    return {posts: nextPosts, postsInChannel: nextPostsForChannel, postsInThread: nextPostsForThread};
+    return {posts: nextPosts, postsInChannel: nextPostsInChannel, postsInThread: nextPostsInThread};
 }
 
 function handleRemovePendingPost(posts = {}, postsInChannel = {}, postsInThread = {}, action) {
@@ -53,26 +53,26 @@ function handleRemovePendingPost(posts = {}, postsInChannel = {}, postsInThread 
 
     Reflect.deleteProperty(nextPosts, pendingPostId);
 
-    let nextPostsForChannel = postsInChannel;
+    let nextPostsInChannel = postsInChannel;
 
     // Only change postsInChannel if the order of the posts needs to change
     if (!postsInChannel[channelId] || postsInChannel[channelId].includes(pendingPostId)) {
         // If we don't already have the post, assume it's the most recent one
         const postsForChannel = postsInChannel[channelId] || [];
 
-        nextPostsForChannel = {...postsInChannel};
-        nextPostsForChannel[channelId] = postsForChannel.filter((postId) => postId !== pendingPostId);
+        nextPostsInChannel = {...postsInChannel};
+        nextPostsInChannel[channelId] = postsForChannel.filter((postId) => postId !== pendingPostId);
     }
 
-    let nextPostsForThread = postsInThread;
+    let nextPostsInThread = postsInThread;
     if (pendingPost.root_id && (!postsInThread[pendingPost.root_id] || postsInThread[pendingPost.root_id].includes(pendingPostId))) {
         const postsForThread = postsInThread[pendingPost.root_id] || [];
 
-        nextPostsForThread = {...postsInThread};
-        nextPostsForThread[pendingPost.root_id] = postsForThread.filter((postId) => postId !== pendingPostId);
+        nextPostsInThread = {...postsInThread};
+        nextPostsInThread[pendingPost.root_id] = postsForThread.filter((postId) => postId !== pendingPostId);
     }
 
-    return {posts: nextPosts, postsInChannel: nextPostsForChannel, postsInThread: nextPostsForThread};
+    return {posts: nextPosts, postsInChannel: nextPostsInChannel, postsInThread: nextPostsInThread};
 }
 
 function handleReceivedPosts(posts = {}, postsInChannel = {}, postsInThread = {}, action) {
@@ -87,7 +87,7 @@ function handleReceivedPosts(posts = {}, postsInChannel = {}, postsInThread = {}
     }
 
     const nextPosts = {...posts};
-    const nextPostsForChannel = {...postsInChannel};
+    const nextPostsInChannel = {...postsInChannel};
     const nextPostsInThread = {...postsInThread};
     const postsForChannel = postsInChannel[channelId] ? [...postsInChannel[channelId]] : [];
 
@@ -149,9 +149,9 @@ function handleReceivedPosts(posts = {}, postsInChannel = {}, postsInThread = {}
         return comparePosts(nextPosts[a], nextPosts[b]);
     });
 
-    nextPostsForChannel[channelId] = postsForChannel;
+    nextPostsInChannel[channelId] = postsForChannel;
 
-    return {posts: nextPosts, postsInChannel: nextPostsForChannel, postsInThread: nextPostsInThread};
+    return {posts: nextPosts, postsInChannel: nextPostsInChannel, postsInThread: nextPostsInThread};
 }
 
 function handlePendingPosts(pendingPostIds = [], action) {

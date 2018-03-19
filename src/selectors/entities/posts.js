@@ -65,14 +65,14 @@ export function makeGetPostIdsForThread() {
         getAllPosts,
         (state, rootId) => state.entities.posts.postsInThread[rootId] || [],
         (state, rootId) => state.entities.posts.posts[rootId],
-        (posts, postsInThread, rootPost) => {
+        (posts, postsForThread, rootPost) => {
             const thread = [];
 
             if (rootPost) {
                 thread.push(rootPost);
             }
 
-            postsInThread.forEach((id) => {
+            postsForThread.forEach((id) => {
                 const post = posts[id];
                 if (post) {
                     thread.push(post);
@@ -295,14 +295,14 @@ export function makeGetPostsForThread() {
         getAllPosts,
         (state, {rootId}) => state.entities.posts.postsInThread[rootId] || [],
         (state, {rootId}) => state.entities.posts.posts[rootId],
-        (posts, postsInThread, rootPost) => {
+        (posts, postsForThread, rootPost) => {
             const thread = [];
 
             if (rootPost) {
                 thread.push(rootPost);
             }
 
-            postsInThread.forEach((id) => {
+            postsForThread.forEach((id) => {
                 const post = posts[id];
                 if (post) {
                     thread.push(post);
@@ -321,13 +321,13 @@ export function makeGetCommentCountForPost() {
         getAllPosts,
         (state, {post}) => state.entities.posts.postsInThread[post ? post.id : ''] || [],
         (state, props) => props,
-        (posts, postsInThread, {post: currentPost}) => {
+        (posts, postsForThread, {post: currentPost}) => {
             if (!currentPost) {
                 return 0;
             }
 
             let count = 0;
-            postsInThread.forEach((id) => {
+            postsForThread.forEach((id) => {
                 const post = posts[id];
                 if (post && post.state !== Posts.POST_DELETED && !isPostEphemeral(post)) {
                     count += 1;
