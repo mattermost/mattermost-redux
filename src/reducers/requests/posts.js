@@ -1,12 +1,16 @@
 // Copyright (c) 2016-present Mattermost, Inc. All Rights Reserved.
 // See License.txt for license information.
+// @flow
 
 import {combineReducers} from 'redux';
 import {PostTypes} from 'action_types';
 
 import {handleRequest, initialRequestState} from './helpers';
 
-function createPost(state = initialRequestState(), action) {
+import type {GenericAction} from '../../types/actions';
+import type {RequestStatusType} from '../../types/requests';
+
+function createPost(state: RequestStatusType = initialRequestState(), action: GenericAction): RequestStatusType {
     if (action.type === PostTypes.CREATE_POST_RESET_REQUEST) {
         return initialRequestState();
     }
@@ -20,7 +24,7 @@ function createPost(state = initialRequestState(), action) {
     );
 }
 
-function editPost(state = initialRequestState(), action) {
+function editPost(state: RequestStatusType = initialRequestState(), action: GenericAction): RequestStatusType {
     return handleRequest(
         PostTypes.EDIT_POST_REQUEST,
         PostTypes.EDIT_POST_SUCCESS,
@@ -30,7 +34,7 @@ function editPost(state = initialRequestState(), action) {
     );
 }
 
-function deletePost(state = initialRequestState(), action) {
+function deletePost(state: RequestStatusType = initialRequestState(), action: GenericAction): RequestStatusType {
     return handleRequest(
         PostTypes.DELETE_POST_REQUEST,
         PostTypes.DELETE_POST_SUCCESS,
@@ -40,7 +44,7 @@ function deletePost(state = initialRequestState(), action) {
     );
 }
 
-function getPostThread(state = initialRequestState(), action) {
+function getPostThread(state: RequestStatusType = initialRequestState(), action: GenericAction): RequestStatusType {
     return handleRequest(
         PostTypes.GET_POST_THREAD_REQUEST,
         PostTypes.GET_POST_THREAD_SUCCESS,
@@ -50,7 +54,7 @@ function getPostThread(state = initialRequestState(), action) {
     );
 }
 
-function getPostThreadWithRetryAttempt(state = 0, action) {
+function getPostThreadWithRetryAttempt(state: number = 0, action: GenericAction): number {
     switch (action.type) {
     case PostTypes.GET_POST_THREAD_WITH_RETRY_ATTEMPT:
         return state + 1;
@@ -62,7 +66,7 @@ function getPostThreadWithRetryAttempt(state = 0, action) {
     }
 }
 
-function getPosts(state = initialRequestState(), action) {
+function getPosts(state: RequestStatusType = initialRequestState(), action: GenericAction): RequestStatusType {
     return handleRequest(
         PostTypes.GET_POSTS_REQUEST,
         PostTypes.GET_POSTS_SUCCESS,
@@ -72,7 +76,7 @@ function getPosts(state = initialRequestState(), action) {
     );
 }
 
-function getPostsWithRetryAttempt(state = 0, action) {
+function getPostsWithRetryAttempt(state: number = 0, action: GenericAction): number {
     switch (action.type) {
     case PostTypes.GET_POSTS_WITH_RETRY_ATTEMPT:
         return state + 1;
@@ -84,7 +88,7 @@ function getPostsWithRetryAttempt(state = 0, action) {
     }
 }
 
-function getPostsSince(state = initialRequestState(), action) {
+function getPostsSince(state: RequestStatusType = initialRequestState(), action: GenericAction): RequestStatusType {
     return handleRequest(
         PostTypes.GET_POSTS_SINCE_REQUEST,
         PostTypes.GET_POSTS_SINCE_SUCCESS,
@@ -94,7 +98,7 @@ function getPostsSince(state = initialRequestState(), action) {
     );
 }
 
-function getPostsSinceWithRetryAttempt(state = 0, action) {
+function getPostsSinceWithRetryAttempt(state: number = 0, action: GenericAction): number {
     switch (action.type) {
     case PostTypes.GET_POSTS_SINCE_WITH_RETRY_ATTEMPT:
         return state + 1;
@@ -107,7 +111,7 @@ function getPostsSinceWithRetryAttempt(state = 0, action) {
     }
 }
 
-function getPostsBefore(state = initialRequestState(), action) {
+function getPostsBefore(state: RequestStatusType = initialRequestState(), action: GenericAction): RequestStatusType {
     return handleRequest(
         PostTypes.GET_POSTS_BEFORE_REQUEST,
         PostTypes.GET_POSTS_BEFORE_SUCCESS,
@@ -117,7 +121,7 @@ function getPostsBefore(state = initialRequestState(), action) {
     );
 }
 
-function getPostsBeforeWithRetryAttempt(state = 0, action) {
+function getPostsBeforeWithRetryAttempt(state: number = 0, action: GenericAction): number {
     switch (action.type) {
     case PostTypes.GET_POSTS_BEFORE_WITH_RETRY_ATTEMPT:
         return state + 1;
@@ -130,7 +134,7 @@ function getPostsBeforeWithRetryAttempt(state = 0, action) {
     }
 }
 
-function getPostsAfter(state = initialRequestState(), action) {
+function getPostsAfter(state: RequestStatusType = initialRequestState(), action: GenericAction): RequestStatusType {
     return handleRequest(
         PostTypes.GET_POSTS_AFTER_REQUEST,
         PostTypes.GET_POSTS_AFTER_SUCCESS,
@@ -140,7 +144,7 @@ function getPostsAfter(state = initialRequestState(), action) {
     );
 }
 
-function getPostsAfterWithRetryAttempt(state = 0, action) {
+function getPostsAfterWithRetryAttempt(state: number = 0, action: GenericAction): number {
     switch (action.type) {
     case PostTypes.GET_POSTS_AFTER_WITH_RETRY_ATTEMPT:
         return state + 1;
@@ -153,7 +157,7 @@ function getPostsAfterWithRetryAttempt(state = 0, action) {
     }
 }
 
-function reaction(state = initialRequestState(), action) {
+function reaction(state: RequestStatusType = initialRequestState(), action: GenericAction): RequestStatusType {
     return handleRequest(
         PostTypes.REACTION_REQUEST,
         PostTypes.REACTION_SUCCESS,
@@ -163,7 +167,7 @@ function reaction(state = initialRequestState(), action) {
     );
 }
 
-function openGraph(state = initialRequestState(), action) {
+function openGraph(state: RequestStatusType = initialRequestState(), action: GenericAction): RequestStatusType {
     return handleRequest(
         PostTypes.OPEN_GRAPH_REQUEST,
         PostTypes.OPEN_GRAPH_SUCCESS,
@@ -173,7 +177,7 @@ function openGraph(state = initialRequestState(), action) {
     );
 }
 
-function doPostAction(state = initialRequestState(), action) {
+function doPostAction(state: RequestStatusType = initialRequestState(), action: GenericAction): RequestStatusType {
     return handleRequest(
         PostTypes.DO_POST_ACTION_REQUEST,
         PostTypes.DO_POST_ACTION_SUCCESS,

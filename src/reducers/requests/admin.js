@@ -1,12 +1,16 @@
 // Copyright (c) 2017-present Mattermost, Inc. All Rights Reserved.
 // See License.txt for license information.
+// @flow
 
 import {combineReducers} from 'redux';
 import {AdminTypes} from 'action_types';
 
 import {handleRequest, initialRequestState} from './helpers';
 
-function getLogs(state = initialRequestState(), action) {
+import type {GenericAction} from '../../types/actions';
+import type {RequestStatusType} from '../../types/requests';
+
+function getLogs(state: RequestStatusType = initialRequestState(), action: GenericAction): RequestStatusType {
     return handleRequest(
         AdminTypes.GET_LOGS_REQUEST,
         AdminTypes.GET_LOGS_SUCCESS,
@@ -16,7 +20,7 @@ function getLogs(state = initialRequestState(), action) {
     );
 }
 
-function getAudits(state = initialRequestState(), action) {
+function getAudits(state: RequestStatusType = initialRequestState(), action: GenericAction): RequestStatusType {
     return handleRequest(
         AdminTypes.GET_AUDITS_REQUEST,
         AdminTypes.GET_AUDITS_SUCCESS,
@@ -26,7 +30,7 @@ function getAudits(state = initialRequestState(), action) {
     );
 }
 
-function getConfig(state = initialRequestState(), action) {
+function getConfig(state: RequestStatusType = initialRequestState(), action: GenericAction): RequestStatusType {
     return handleRequest(
         AdminTypes.GET_CONFIG_REQUEST,
         AdminTypes.GET_CONFIG_SUCCESS,
@@ -36,7 +40,7 @@ function getConfig(state = initialRequestState(), action) {
     );
 }
 
-function updateConfig(state = initialRequestState(), action) {
+function updateConfig(state: RequestStatusType = initialRequestState(), action: GenericAction): RequestStatusType {
     return handleRequest(
         AdminTypes.UPDATE_CONFIG_REQUEST,
         AdminTypes.UPDATE_CONFIG_SUCCESS,
@@ -46,7 +50,7 @@ function updateConfig(state = initialRequestState(), action) {
     );
 }
 
-function reloadConfig(state = initialRequestState(), action) {
+function reloadConfig(state: RequestStatusType = initialRequestState(), action: GenericAction): RequestStatusType {
     return handleRequest(
         AdminTypes.RELOAD_CONFIG_REQUEST,
         AdminTypes.RELOAD_CONFIG_SUCCESS,
@@ -56,7 +60,7 @@ function reloadConfig(state = initialRequestState(), action) {
     );
 }
 
-function testEmail(state = initialRequestState(), action) {
+function testEmail(state: RequestStatusType = initialRequestState(), action: GenericAction): RequestStatusType {
     return handleRequest(
         AdminTypes.TEST_EMAIL_REQUEST,
         AdminTypes.TEST_EMAIL_SUCCESS,
@@ -66,7 +70,7 @@ function testEmail(state = initialRequestState(), action) {
     );
 }
 
-function testS3Connection(state = initialRequestState(), action) {
+function testS3Connection(state: RequestStatusType = initialRequestState(), action: GenericAction): RequestStatusType {
     return handleRequest(
         AdminTypes.TEST_S3_REQUEST,
         AdminTypes.TEST_S3_SUCCESS,
@@ -76,7 +80,7 @@ function testS3Connection(state = initialRequestState(), action) {
     );
 }
 
-function invalidateCaches(state = initialRequestState(), action) {
+function invalidateCaches(state: RequestStatusType = initialRequestState(), action: GenericAction): RequestStatusType {
     return handleRequest(
         AdminTypes.INVALIDATE_CACHES_REQUEST,
         AdminTypes.INVALIDATE_CACHES_SUCCESS,
@@ -86,7 +90,7 @@ function invalidateCaches(state = initialRequestState(), action) {
     );
 }
 
-function recycleDatabase(state = initialRequestState(), action) {
+function recycleDatabase(state: RequestStatusType = initialRequestState(), action: GenericAction): RequestStatusType {
     return handleRequest(
         AdminTypes.RECYCLE_DATABASE_REQUEST,
         AdminTypes.RECYCLE_DATABASE_SUCCESS,
@@ -96,7 +100,7 @@ function recycleDatabase(state = initialRequestState(), action) {
     );
 }
 
-function createCompliance(state = initialRequestState(), action) {
+function createCompliance(state: RequestStatusType = initialRequestState(), action: GenericAction): RequestStatusType {
     return handleRequest(
         AdminTypes.CREATE_COMPLIANCE_REQUEST,
         AdminTypes.CREATE_COMPLIANCE_SUCCESS,
@@ -106,7 +110,7 @@ function createCompliance(state = initialRequestState(), action) {
     );
 }
 
-function getCompliance(state = initialRequestState(), action) {
+function getCompliance(state: RequestStatusType = initialRequestState(), action: GenericAction): RequestStatusType {
     return handleRequest(
         AdminTypes.GET_COMPLIANCE_REQUEST,
         AdminTypes.GET_COMPLIANCE_SUCCESS,
@@ -116,7 +120,7 @@ function getCompliance(state = initialRequestState(), action) {
     );
 }
 
-function uploadBrandImage(state = initialRequestState(), action) {
+function uploadBrandImage(state: RequestStatusType = initialRequestState(), action: GenericAction): RequestStatusType {
     return handleRequest(
         AdminTypes.UPLOAD_BRAND_IMAGE_REQUEST,
         AdminTypes.UPLOAD_BRAND_IMAGE_SUCCESS,
@@ -126,7 +130,7 @@ function uploadBrandImage(state = initialRequestState(), action) {
     );
 }
 
-function getClusterStatus(state = initialRequestState(), action) {
+function getClusterStatus(state: RequestStatusType = initialRequestState(), action: GenericAction): RequestStatusType {
     return handleRequest(
         AdminTypes.GET_CLUSTER_STATUS_REQUEST,
         AdminTypes.GET_CLUSTER_STATUS_SUCCESS,
@@ -136,7 +140,7 @@ function getClusterStatus(state = initialRequestState(), action) {
     );
 }
 
-function testLdap(state = initialRequestState(), action) {
+function testLdap(state: RequestStatusType = initialRequestState(), action: GenericAction): RequestStatusType {
     return handleRequest(
         AdminTypes.TEST_LDAP_REQUEST,
         AdminTypes.TEST_LDAP_SUCCESS,
@@ -146,7 +150,7 @@ function testLdap(state = initialRequestState(), action) {
     );
 }
 
-function syncLdap(state = initialRequestState(), action) {
+function syncLdap(state: RequestStatusType = initialRequestState(), action: GenericAction): RequestStatusType {
     return handleRequest(
         AdminTypes.SYNC_LDAP_REQUEST,
         AdminTypes.SYNC_LDAP_SUCCESS,
@@ -156,7 +160,7 @@ function syncLdap(state = initialRequestState(), action) {
     );
 }
 
-function getSamlCertificateStatus(state = initialRequestState(), action) {
+function getSamlCertificateStatus(state: RequestStatusType = initialRequestState(), action: GenericAction): RequestStatusType {
     return handleRequest(
         AdminTypes.SAML_CERT_STATUS_REQUEST,
         AdminTypes.SAML_CERT_STATUS_SUCCESS,
@@ -166,7 +170,7 @@ function getSamlCertificateStatus(state = initialRequestState(), action) {
     );
 }
 
-function uploadPublicSamlCertificate(state = initialRequestState(), action) {
+function uploadPublicSamlCertificate(state: RequestStatusType = initialRequestState(), action: GenericAction): RequestStatusType {
     return handleRequest(
         AdminTypes.UPLOAD_SAML_PUBLIC_REQUEST,
         AdminTypes.UPLOAD_SAML_PUBLIC_SUCCESS,
@@ -176,7 +180,7 @@ function uploadPublicSamlCertificate(state = initialRequestState(), action) {
     );
 }
 
-function uploadPrivateSamlCertificate(state = initialRequestState(), action) {
+function uploadPrivateSamlCertificate(state: RequestStatusType = initialRequestState(), action: GenericAction): RequestStatusType {
     return handleRequest(
         AdminTypes.UPLOAD_SAML_PRIVATE_REQUEST,
         AdminTypes.UPLOAD_SAML_PRIVATE_SUCCESS,
@@ -186,7 +190,7 @@ function uploadPrivateSamlCertificate(state = initialRequestState(), action) {
     );
 }
 
-function uploadIdpSamlCertificate(state = initialRequestState(), action) {
+function uploadIdpSamlCertificate(state: RequestStatusType = initialRequestState(), action: GenericAction): RequestStatusType {
     return handleRequest(
         AdminTypes.UPLOAD_SAML_IDP_REQUEST,
         AdminTypes.UPLOAD_SAML_IDP_SUCCESS,
@@ -196,7 +200,7 @@ function uploadIdpSamlCertificate(state = initialRequestState(), action) {
     );
 }
 
-function removePublicSamlCertificate(state = initialRequestState(), action) {
+function removePublicSamlCertificate(state: RequestStatusType = initialRequestState(), action: GenericAction): RequestStatusType {
     return handleRequest(
         AdminTypes.DELETE_SAML_PUBLIC_REQUEST,
         AdminTypes.DELETE_SAML_PUBLIC_SUCCESS,
@@ -206,7 +210,7 @@ function removePublicSamlCertificate(state = initialRequestState(), action) {
     );
 }
 
-function removePrivateSamlCertificate(state = initialRequestState(), action) {
+function removePrivateSamlCertificate(state: RequestStatusType = initialRequestState(), action: GenericAction): RequestStatusType {
     return handleRequest(
         AdminTypes.DELETE_SAML_PRIVATE_REQUEST,
         AdminTypes.DELETE_SAML_PRIVATE_SUCCESS,
@@ -216,7 +220,7 @@ function removePrivateSamlCertificate(state = initialRequestState(), action) {
     );
 }
 
-function removeIdpSamlCertificate(state = initialRequestState(), action) {
+function removeIdpSamlCertificate(state: RequestStatusType = initialRequestState(), action: GenericAction): RequestStatusType {
     return handleRequest(
         AdminTypes.DELETE_SAML_IDP_REQUEST,
         AdminTypes.DELETE_SAML_IDP_SUCCESS,
@@ -226,7 +230,7 @@ function removeIdpSamlCertificate(state = initialRequestState(), action) {
     );
 }
 
-function testElasticsearch(state = initialRequestState(), action) {
+function testElasticsearch(state: RequestStatusType = initialRequestState(), action: GenericAction): RequestStatusType {
     return handleRequest(
         AdminTypes.TEST_ELASTICSEARCH_REQUEST,
         AdminTypes.TEST_ELASTICSEARCH_SUCCESS,
@@ -236,7 +240,7 @@ function testElasticsearch(state = initialRequestState(), action) {
     );
 }
 
-function purgeElasticsearchIndexes(state = initialRequestState(), action) {
+function purgeElasticsearchIndexes(state: RequestStatusType = initialRequestState(), action: GenericAction): RequestStatusType {
     return handleRequest(
         AdminTypes.PURGE_ELASTICSEARCH_INDEXES_REQUEST,
         AdminTypes.PURGE_ELASTICSEARCH_INDEXES_SUCCESS,
@@ -246,7 +250,7 @@ function purgeElasticsearchIndexes(state = initialRequestState(), action) {
     );
 }
 
-function uploadLicense(state = initialRequestState(), action) {
+function uploadLicense(state: RequestStatusType = initialRequestState(), action: GenericAction): RequestStatusType {
     return handleRequest(
         AdminTypes.UPLOAD_LICENSE_REQUEST,
         AdminTypes.UPLOAD_LICENSE_SUCCESS,
@@ -256,7 +260,7 @@ function uploadLicense(state = initialRequestState(), action) {
     );
 }
 
-function removeLicense(state = initialRequestState(), action) {
+function removeLicense(state: RequestStatusType = initialRequestState(), action: GenericAction): RequestStatusType {
     return handleRequest(
         AdminTypes.REMOVE_LICENSE_REQUEST,
         AdminTypes.REMOVE_LICENSE_SUCCESS,
@@ -266,7 +270,7 @@ function removeLicense(state = initialRequestState(), action) {
     );
 }
 
-function getAnalytics(state = initialRequestState(), action) {
+function getAnalytics(state: RequestStatusType = initialRequestState(), action: GenericAction): RequestStatusType {
     return handleRequest(
         AdminTypes.GET_ANALYTICS_REQUEST,
         AdminTypes.GET_ANALYTICS_SUCCESS,
@@ -276,7 +280,7 @@ function getAnalytics(state = initialRequestState(), action) {
     );
 }
 
-function uploadPlugin(state = initialRequestState(), action) {
+function uploadPlugin(state: RequestStatusType = initialRequestState(), action: GenericAction): RequestStatusType {
     return handleRequest(
         AdminTypes.UPLOAD_PLUGIN_REQUEST,
         AdminTypes.UPLOAD_PLUGIN_SUCCESS,
@@ -286,7 +290,7 @@ function uploadPlugin(state = initialRequestState(), action) {
     );
 }
 
-function getPlugins(state = initialRequestState(), action) {
+function getPlugins(state: RequestStatusType = initialRequestState(), action: GenericAction): RequestStatusType {
     return handleRequest(
         AdminTypes.GET_PLUGIN_REQUEST,
         AdminTypes.GET_PLUGIN_SUCCESS,
@@ -296,7 +300,7 @@ function getPlugins(state = initialRequestState(), action) {
     );
 }
 
-function removePlugin(state = initialRequestState(), action) {
+function removePlugin(state: RequestStatusType = initialRequestState(), action: GenericAction): RequestStatusType {
     return handleRequest(
         AdminTypes.REMOVE_PLUGIN_REQUEST,
         AdminTypes.REMOVE_PLUGIN_SUCCESS,
@@ -306,7 +310,7 @@ function removePlugin(state = initialRequestState(), action) {
     );
 }
 
-function activatePlugin(state = initialRequestState(), action) {
+function activatePlugin(state: RequestStatusType = initialRequestState(), action: GenericAction): RequestStatusType {
     return handleRequest(
         AdminTypes.ACTIVATE_PLUGIN_REQUEST,
         AdminTypes.ACTIVATE_PLUGIN_SUCCESS,
@@ -316,7 +320,7 @@ function activatePlugin(state = initialRequestState(), action) {
     );
 }
 
-function deactivatePlugin(state = initialRequestState(), action) {
+function deactivatePlugin(state: RequestStatusType = initialRequestState(), action: GenericAction): RequestStatusType {
     return handleRequest(
         AdminTypes.DEACTIVATE_PLUGIN_REQUEST,
         AdminTypes.DEACTIVATE_PLUGIN_SUCCESS,

@@ -1,11 +1,12 @@
 // Copyright (c) 2016-present Mattermost, Inc. All Rights Reserved.
 // See License.txt for license information.
+// @flow
 
-export function getPreferenceKey(category, name) {
+export function getPreferenceKey(category: string, name: string): string {
     return `${category}--${name}`;
 }
 
-export function getPreferencesByCategory(myPreferences, category) {
+export function getPreferencesByCategory(myPreferences: Object, category: string): Map<string, any> {
     const prefix = `${category}--`;
     const preferences = new Map();
     Object.keys(myPreferences).forEach((key) => {

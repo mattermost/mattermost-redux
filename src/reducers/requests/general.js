@@ -1,12 +1,16 @@
 // Copyright (c) 2016-present Mattermost, Inc. All Rights Reserved.
 // See License.txt for license information.
+// @flow
 
 import {combineReducers} from 'redux';
 import {GeneralTypes} from 'action_types';
 
 import {handleRequest, initialRequestState} from './helpers';
 
-function server(state = initialRequestState(), action) {
+import type {GenericAction} from '../../types/actions';
+import type {RequestStatusType} from '../../types/requests';
+
+function server(state: RequestStatusType = initialRequestState(), action: GenericAction): RequestStatusType {
     if (action.type === GeneralTypes.PING_RESET) {
         return initialRequestState();
     }
@@ -20,7 +24,7 @@ function server(state = initialRequestState(), action) {
     );
 }
 
-function config(state = initialRequestState(), action) {
+function config(state: RequestStatusType = initialRequestState(), action: GenericAction): RequestStatusType {
     return handleRequest(
         GeneralTypes.CLIENT_CONFIG_REQUEST,
         GeneralTypes.CLIENT_CONFIG_SUCCESS,
@@ -30,7 +34,7 @@ function config(state = initialRequestState(), action) {
     );
 }
 
-function dataRetentionPolicy(state = initialRequestState(), action) {
+function dataRetentionPolicy(state: RequestStatusType = initialRequestState(), action: GenericAction): RequestStatusType {
     return handleRequest(
         GeneralTypes.DATA_RETENTION_POLICY_REQUEST,
         GeneralTypes.DATA_RETENTION_POLICY_SUCCESS,
@@ -40,7 +44,7 @@ function dataRetentionPolicy(state = initialRequestState(), action) {
     );
 }
 
-function license(state = initialRequestState(), action) {
+function license(state: RequestStatusType = initialRequestState(), action: GenericAction): RequestStatusType {
     return handleRequest(
         GeneralTypes.CLIENT_LICENSE_REQUEST,
         GeneralTypes.CLIENT_LICENSE_SUCCESS,
@@ -50,7 +54,7 @@ function license(state = initialRequestState(), action) {
     );
 }
 
-function websocket(state = initialRequestState(), action) {
+function websocket(state: RequestStatusType = initialRequestState(), action: GenericAction): RequestStatusType {
     if (action.type === GeneralTypes.WEBSOCKET_CLOSED) {
         return initialRequestState();
     }

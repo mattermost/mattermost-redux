@@ -1,12 +1,16 @@
 // Copyright (c) 2017-present Mattermost, Inc. All Rights Reserved.
 // See License.txt for license information.
+// @flow
 
 import {combineReducers} from 'redux';
 import {IntegrationTypes} from 'action_types';
 
 import {handleRequest, initialRequestState} from './helpers';
 
-function createIncomingHook(state = initialRequestState(), action) {
+import type {GenericAction} from '../../types/actions';
+import type {RequestStatusType} from '../../types/requests';
+
+function createIncomingHook(state: RequestStatusType = initialRequestState(), action: GenericAction): RequestStatusType {
     return handleRequest(
         IntegrationTypes.CREATE_INCOMING_HOOK_REQUEST,
         IntegrationTypes.CREATE_INCOMING_HOOK_SUCCESS,
@@ -16,7 +20,7 @@ function createIncomingHook(state = initialRequestState(), action) {
     );
 }
 
-function getIncomingHooks(state = initialRequestState(), action) {
+function getIncomingHooks(state: RequestStatusType = initialRequestState(), action: GenericAction): RequestStatusType {
     return handleRequest(
         IntegrationTypes.GET_INCOMING_HOOKS_REQUEST,
         IntegrationTypes.GET_INCOMING_HOOKS_SUCCESS,
@@ -26,7 +30,7 @@ function getIncomingHooks(state = initialRequestState(), action) {
     );
 }
 
-function deleteIncomingHook(state = initialRequestState(), action) {
+function deleteIncomingHook(state: RequestStatusType = initialRequestState(), action: GenericAction): RequestStatusType {
     return handleRequest(
         IntegrationTypes.DELETE_INCOMING_HOOK_REQUEST,
         IntegrationTypes.DELETE_INCOMING_HOOK_SUCCESS,
@@ -36,7 +40,7 @@ function deleteIncomingHook(state = initialRequestState(), action) {
     );
 }
 
-function updateIncomingHook(state = initialRequestState(), action) {
+function updateIncomingHook(state: RequestStatusType = initialRequestState(), action: GenericAction): RequestStatusType {
     return handleRequest(
         IntegrationTypes.UPDATE_INCOMING_HOOK_REQUEST,
         IntegrationTypes.UPDATE_INCOMING_HOOK_SUCCESS,
@@ -46,7 +50,7 @@ function updateIncomingHook(state = initialRequestState(), action) {
     );
 }
 
-function createOutgoingHook(state = initialRequestState(), action) {
+function createOutgoingHook(state: RequestStatusType = initialRequestState(), action: GenericAction): RequestStatusType {
     return handleRequest(
         IntegrationTypes.CREATE_OUTGOING_HOOK_REQUEST,
         IntegrationTypes.CREATE_OUTGOING_HOOK_SUCCESS,
@@ -56,7 +60,7 @@ function createOutgoingHook(state = initialRequestState(), action) {
     );
 }
 
-function getOutgoingHooks(state = initialRequestState(), action) {
+function getOutgoingHooks(state: RequestStatusType = initialRequestState(), action: GenericAction): RequestStatusType {
     return handleRequest(
         IntegrationTypes.GET_OUTGOING_HOOKS_REQUEST,
         IntegrationTypes.GET_OUTGOING_HOOKS_SUCCESS,
@@ -66,7 +70,7 @@ function getOutgoingHooks(state = initialRequestState(), action) {
     );
 }
 
-function deleteOutgoingHook(state = initialRequestState(), action) {
+function deleteOutgoingHook(state: RequestStatusType = initialRequestState(), action: GenericAction): RequestStatusType {
     return handleRequest(
         IntegrationTypes.DELETE_OUTGOING_HOOK_REQUEST,
         IntegrationTypes.DELETE_OUTGOING_HOOK_SUCCESS,
@@ -76,7 +80,7 @@ function deleteOutgoingHook(state = initialRequestState(), action) {
     );
 }
 
-function updateOutgoingHook(state = initialRequestState(), action) {
+function updateOutgoingHook(state: RequestStatusType = initialRequestState(), action: GenericAction): RequestStatusType {
     return handleRequest(
         IntegrationTypes.UPDATE_OUTGOING_HOOK_REQUEST,
         IntegrationTypes.UPDATE_OUTGOING_HOOK_SUCCESS,
@@ -86,7 +90,7 @@ function updateOutgoingHook(state = initialRequestState(), action) {
     );
 }
 
-function getCommands(state = initialRequestState(), action) {
+function getCommands(state: RequestStatusType = initialRequestState(), action: GenericAction): RequestStatusType {
     return handleRequest(
         IntegrationTypes.GET_COMMANDS_REQUEST,
         IntegrationTypes.GET_COMMANDS_SUCCESS,
@@ -96,7 +100,7 @@ function getCommands(state = initialRequestState(), action) {
     );
 }
 
-function getAutocompleteCommands(state = initialRequestState(), action) {
+function getAutocompleteCommands(state: RequestStatusType = initialRequestState(), action: GenericAction): RequestStatusType {
     return handleRequest(
         IntegrationTypes.GET_AUTOCOMPLETE_COMMANDS_REQUEST,
         IntegrationTypes.GET_AUTOCOMPLETE_COMMANDS_SUCCESS,
@@ -106,7 +110,7 @@ function getAutocompleteCommands(state = initialRequestState(), action) {
     );
 }
 
-function getCustomTeamCommands(state = initialRequestState(), action) {
+function getCustomTeamCommands(state: RequestStatusType = initialRequestState(), action: GenericAction): RequestStatusType {
     return handleRequest(
         IntegrationTypes.GET_CUSTOM_TEAM_COMMANDS_REQUEST,
         IntegrationTypes.GET_CUSTOM_TEAM_COMMANDS_SUCCESS,
@@ -116,7 +120,7 @@ function getCustomTeamCommands(state = initialRequestState(), action) {
     );
 }
 
-function addCommand(state = initialRequestState(), action) {
+function addCommand(state: RequestStatusType = initialRequestState(), action: GenericAction): RequestStatusType {
     return handleRequest(
         IntegrationTypes.ADD_COMMAND_REQUEST,
         IntegrationTypes.ADD_COMMAND_SUCCESS,
@@ -126,7 +130,7 @@ function addCommand(state = initialRequestState(), action) {
     );
 }
 
-function editCommand(state = initialRequestState(), action) {
+function editCommand(state: RequestStatusType = initialRequestState(), action: GenericAction): RequestStatusType {
     return handleRequest(
         IntegrationTypes.EDIT_COMMAND_REQUEST,
         IntegrationTypes.EDIT_COMMAND_SUCCESS,
@@ -136,7 +140,7 @@ function editCommand(state = initialRequestState(), action) {
     );
 }
 
-function regenCommandToken(state = initialRequestState(), action) {
+function regenCommandToken(state: RequestStatusType = initialRequestState(), action: GenericAction): RequestStatusType {
     return handleRequest(
         IntegrationTypes.REGEN_COMMAND_TOKEN_REQUEST,
         IntegrationTypes.REGEN_COMMAND_TOKEN_SUCCESS,
@@ -146,7 +150,7 @@ function regenCommandToken(state = initialRequestState(), action) {
     );
 }
 
-function deleteCommand(state = initialRequestState(), action) {
+function deleteCommand(state: RequestStatusType = initialRequestState(), action: GenericAction): RequestStatusType {
     return handleRequest(
         IntegrationTypes.DELETE_COMMAND_REQUEST,
         IntegrationTypes.DELETE_COMMAND_SUCCESS,
@@ -156,7 +160,7 @@ function deleteCommand(state = initialRequestState(), action) {
     );
 }
 
-function addOAuthApp(state = initialRequestState(), action) {
+function addOAuthApp(state: RequestStatusType = initialRequestState(), action: GenericAction): RequestStatusType {
     return handleRequest(
         IntegrationTypes.ADD_OAUTH_APP_REQUEST,
         IntegrationTypes.ADD_OAUTH_APP_SUCCESS,
@@ -166,7 +170,7 @@ function addOAuthApp(state = initialRequestState(), action) {
     );
 }
 
-function getOAuthApps(state = initialRequestState(), action) {
+function getOAuthApps(state: RequestStatusType = initialRequestState(), action: GenericAction): RequestStatusType {
     return handleRequest(
         IntegrationTypes.GET_OAUTH_APPS_REQUEST,
         IntegrationTypes.GET_OAUTH_APPS_SUCCESS,
@@ -176,7 +180,7 @@ function getOAuthApps(state = initialRequestState(), action) {
     );
 }
 
-function getOAuthApp(state = initialRequestState(), action) {
+function getOAuthApp(state: RequestStatusType = initialRequestState(), action: GenericAction): RequestStatusType {
     return handleRequest(
         IntegrationTypes.GET_OAUTH_APP_REQUEST,
         IntegrationTypes.GET_OAUTH_APP_SUCCESS,
@@ -186,7 +190,7 @@ function getOAuthApp(state = initialRequestState(), action) {
     );
 }
 
-function deleteOAuthApp(state = initialRequestState(), action) {
+function deleteOAuthApp(state: RequestStatusType = initialRequestState(), action: GenericAction): RequestStatusType {
     return handleRequest(
         IntegrationTypes.DELETE_OAUTH_APP_REQUEST,
         IntegrationTypes.DELETE_OAUTH_APP_SUCCESS,
@@ -196,7 +200,7 @@ function deleteOAuthApp(state = initialRequestState(), action) {
     );
 }
 
-function updateOAuthApp(state = initialRequestState(), action) {
+function updateOAuthApp(state: RequestStatusType = initialRequestState(), action: GenericAction): RequestStatusType {
     return handleRequest(
         IntegrationTypes.UPDATE_OAUTH_APP_REQUEST,
         IntegrationTypes.UPDATE_OAUTH_APP_SUCCESS,
@@ -206,7 +210,7 @@ function updateOAuthApp(state = initialRequestState(), action) {
     );
 }
 
-function executeCommand(state = initialRequestState(), action) {
+function executeCommand(state: RequestStatusType = initialRequestState(), action: GenericAction): RequestStatusType {
     return handleRequest(
         IntegrationTypes.EXECUTE_COMMAND_REQUEST,
         IntegrationTypes.EXECUTE_COMMAND_SUCCESS,
