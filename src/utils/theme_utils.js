@@ -18,7 +18,7 @@ export function makeStyleFromTheme(getStyleFromTheme: (Object) => Object): (Obje
 
 const rgbPattern = /^rgba?\(([\d.]+),([\d.]+),([\d.]+)(?:,([\d.]+))?\)$/;
 
-function getComponents(inColor: string): {red: number, green: number, blue: number, alpha: ?number} {
+export function getComponents(inColor: string): {red: number, green: number, blue: number, alpha: number} {
     let color = inColor;
 
     // RGB color
@@ -28,7 +28,7 @@ function getComponents(inColor: string): {red: number, green: number, blue: numb
             red: parseInt(match[1], 10),
             green: parseInt(match[2], 10),
             blue: parseInt(match[3], 10),
-            alpha: match[4] ? parseInt(match[4], 10) : 1,
+            alpha: match[4] ? parseFloat(match[4]) : 1,
         };
     }
 
@@ -66,28 +66,28 @@ export function changeOpacity(oldColor: string, opacity: number): string {
 }
 
 function blendComponent(background: number, foreground: number, opacity: number): number {
-    return Math.floor(((1 - opacity) * background) + (opacity * foreground));
+    return ((1 - opacity) * background) + (opacity * foreground);
 }
 
 export function blendColors(background: string, foreground: string, opacity: number): string {
     const backgroundComponents = getComponents(background);
     const foregroundComponents = getComponents(foreground);
 
-    const red = blendComponent(
+    const red = Math.floor(blendComponent(
         backgroundComponents.red,
         foregroundComponents.red,
         opacity
-    );
-    const green = blendComponent(
+    ));
+    const green = Math.floor(blendComponent(
         backgroundComponents.green,
         foregroundComponents.green,
         opacity
-    );
-    const blue = blendComponent(
+    ));
+    const blue = Math.floor(blendComponent(
         backgroundComponents.blue,
         foregroundComponents.blue,
         opacity
-    );
+    ));
     const alpha = blendComponent(
         backgroundComponents.alpha,
         foregroundComponents.alpha,
