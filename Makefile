@@ -1,5 +1,4 @@
-.PHONY: check-style clean pre-run test install
-
+.PHONY: check-style clean pre-run test install flow
 
 .yarninstall: package.json
 	@if ! [ $(shell which yarn) ]; then \
@@ -41,6 +40,18 @@ pre-run:
 
 test: check-style
 	yarn test
+
+flow: .flowinstall
+	@echo Checking types
+
+	yarn run flow
+
+.flowinstall: .yarninstall
+	@echo Getting flow-typed packages
+
+	yarn run flow-typed install
+
+	touch $@
 
 install: .yarninstall
 

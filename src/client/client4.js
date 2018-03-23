@@ -228,6 +228,10 @@ export default class Client4 {
     getRolesRoute() {
         return `${this.getBaseRoute()}/roles`;
     }
+    
+    getTimezonesRoute() {
+        return `${this.getBaseRoute()}/system/timezones`;
+    }
 
     getOptions(options) {
         const newOptions = Object.assign({}, options);
@@ -1834,6 +1838,14 @@ export default class Client4 {
     autocompleteCustomEmoji = async (name) => {
         return this.doFetch(
             `${this.getEmojisRoute()}/autocomplete${buildQueryString({name})}`,
+            {method: 'get'}
+        );
+    };
+
+    // Timezone Routes
+    getTimezones = async () => {
+        return this.doFetch(
+            `${this.getTimezonesRoute()}`,
             {method: 'get'}
         );
     };

@@ -1,12 +1,16 @@
 // Copyright (c) 2016-present Mattermost, Inc. All Rights Reserved.
 // See License.txt for license information.
+// @flow
 
 import {combineReducers} from 'redux';
 import {ChannelTypes} from 'action_types';
 
 import {handleRequest, initialRequestState} from './helpers';
 
-function getChannel(state = initialRequestState(), action) {
+import type {GenericAction} from '../../types/actions';
+import type {RequestStatusType} from '../../types/requests';
+
+function getChannel(state: RequestStatusType = initialRequestState(), action: GenericAction): RequestStatusType {
     return handleRequest(
         ChannelTypes.CHANNEL_REQUEST,
         ChannelTypes.CHANNEL_SUCCESS,
@@ -16,7 +20,7 @@ function getChannel(state = initialRequestState(), action) {
     );
 }
 
-function myChannels(state = initialRequestState(), action) {
+function myChannels(state: RequestStatusType = initialRequestState(), action: GenericAction): RequestStatusType {
     return handleRequest(
         ChannelTypes.CHANNELS_REQUEST,
         ChannelTypes.CHANNELS_SUCCESS,
@@ -26,7 +30,7 @@ function myChannels(state = initialRequestState(), action) {
     );
 }
 
-function myMembers(state = initialRequestState(), action) {
+function myMembers(state: RequestStatusType = initialRequestState(), action: GenericAction): RequestStatusType {
     return handleRequest(
         ChannelTypes.CHANNEL_MY_MEMBERS_REQUEST,
         ChannelTypes.CHANNEL_MY_MEMBERS_SUCCESS,
@@ -36,7 +40,7 @@ function myMembers(state = initialRequestState(), action) {
     );
 }
 
-function members(state = initialRequestState(), action) {
+function members(state: RequestStatusType = initialRequestState(), action: GenericAction): RequestStatusType {
     return handleRequest(
         ChannelTypes.CHANNEL_MEMBERS_REQUEST,
         ChannelTypes.CHANNEL_MEMBERS_SUCCESS,
@@ -46,7 +50,7 @@ function members(state = initialRequestState(), action) {
     );
 }
 
-function createChannel(state = initialRequestState(), action) {
+function createChannel(state: RequestStatusType = initialRequestState(), action: GenericAction): RequestStatusType {
     return handleRequest(
         ChannelTypes.CREATE_CHANNEL_REQUEST,
         ChannelTypes.CREATE_CHANNEL_SUCCESS,
@@ -56,7 +60,7 @@ function createChannel(state = initialRequestState(), action) {
     );
 }
 
-function updateChannel(state = initialRequestState(), action) {
+function updateChannel(state: RequestStatusType = initialRequestState(), action: GenericAction): RequestStatusType {
     return handleRequest(
         ChannelTypes.UPDATE_CHANNEL_REQUEST,
         ChannelTypes.UPDATE_CHANNEL_SUCCESS,
@@ -66,7 +70,7 @@ function updateChannel(state = initialRequestState(), action) {
     );
 }
 
-function updateChannelNotifyProps(state = initialRequestState(), action) {
+function updateChannelNotifyProps(state: RequestStatusType = initialRequestState(), action: GenericAction): RequestStatusType {
     return handleRequest(
         ChannelTypes.NOTIFY_PROPS_REQUEST,
         ChannelTypes.NOTIFY_PROPS_SUCCESS,
@@ -76,7 +80,7 @@ function updateChannelNotifyProps(state = initialRequestState(), action) {
     );
 }
 
-function joinChannel(state = initialRequestState(), action) {
+function joinChannel(state: RequestStatusType = initialRequestState(), action: GenericAction): RequestStatusType {
     return handleRequest(
         ChannelTypes.JOIN_CHANNEL_REQUEST,
         ChannelTypes.JOIN_CHANNEL_SUCCESS,
@@ -86,7 +90,7 @@ function joinChannel(state = initialRequestState(), action) {
     );
 }
 
-function deleteChannel(state = initialRequestState(), action) {
+function deleteChannel(state: RequestStatusType = initialRequestState(), action: GenericAction): RequestStatusType {
     return handleRequest(
         ChannelTypes.DELETE_CHANNEL_REQUEST,
         ChannelTypes.DELETE_CHANNEL_SUCCESS,
@@ -96,7 +100,7 @@ function deleteChannel(state = initialRequestState(), action) {
     );
 }
 
-function updateLastViewedAt(state = initialRequestState(), action) {
+function updateLastViewedAt(state: RequestStatusType = initialRequestState(), action: GenericAction): RequestStatusType {
     return handleRequest(
         ChannelTypes.UPDATE_LAST_VIEWED_REQUEST,
         ChannelTypes.UPDATE_LAST_VIEWED_SUCCESS,
@@ -106,7 +110,7 @@ function updateLastViewedAt(state = initialRequestState(), action) {
     );
 }
 
-function getChannels(state = initialRequestState(), action) {
+function getChannels(state: RequestStatusType = initialRequestState(), action: GenericAction): RequestStatusType {
     return handleRequest(
         ChannelTypes.GET_CHANNELS_REQUEST,
         ChannelTypes.GET_CHANNELS_SUCCESS,
@@ -116,7 +120,7 @@ function getChannels(state = initialRequestState(), action) {
     );
 }
 
-function getChannelStats(state = initialRequestState(), action) {
+function getChannelStats(state: RequestStatusType = initialRequestState(), action: GenericAction): RequestStatusType {
     return handleRequest(
         ChannelTypes.CHANNEL_STATS_REQUEST,
         ChannelTypes.CHANNEL_STATS_SUCCESS,
@@ -126,7 +130,7 @@ function getChannelStats(state = initialRequestState(), action) {
     );
 }
 
-function addChannelMember(state = initialRequestState(), action) {
+function addChannelMember(state: RequestStatusType = initialRequestState(), action: GenericAction): RequestStatusType {
     return handleRequest(
         ChannelTypes.ADD_CHANNEL_MEMBER_REQUEST,
         ChannelTypes.ADD_CHANNEL_MEMBER_SUCCESS,
@@ -136,7 +140,7 @@ function addChannelMember(state = initialRequestState(), action) {
     );
 }
 
-function removeChannelMember(state = initialRequestState(), action) {
+function removeChannelMember(state: RequestStatusType = initialRequestState(), action: GenericAction): RequestStatusType {
     return handleRequest(
         ChannelTypes.REMOVE_CHANNEL_MEMBER_REQUEST,
         ChannelTypes.REMOVE_CHANNEL_MEMBER_SUCCESS,
@@ -146,7 +150,7 @@ function removeChannelMember(state = initialRequestState(), action) {
     );
 }
 
-function updateChannelMember(state = initialRequestState(), action) {
+function updateChannelMember(state: RequestStatusType = initialRequestState(), action: GenericAction): RequestStatusType {
     return handleRequest(
         ChannelTypes.UPDATE_CHANNEL_MEMBER_REQUEST,
         ChannelTypes.UPDATE_CHANNEL_MEMBER_SUCCESS,

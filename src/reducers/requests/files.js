@@ -1,5 +1,6 @@
 // Copyright (c) 2017-present Mattermost, Inc. All Rights Reserved.
 // See License.txt for license information.
+// @flow
 
 import {combineReducers} from 'redux';
 import {FileTypes} from 'action_types';
@@ -7,7 +8,10 @@ import {RequestStatus} from 'constants';
 
 import {handleRequest, initialRequestState} from './helpers';
 
-function getFilesForPost(state = initialRequestState(), action) {
+import type {GenericAction} from '../../types/actions';
+import type {RequestStatusType} from '../../types/requests';
+
+function getFilesForPost(state: RequestStatusType = initialRequestState(), action: GenericAction): RequestStatus {
     return handleRequest(
         FileTypes.FETCH_FILES_FOR_POST_REQUEST,
         FileTypes.FETCH_FILES_FOR_POST_SUCCESS,
@@ -17,7 +21,14 @@ function getFilesForPost(state = initialRequestState(), action) {
     );
 }
 
-export function handleUploadFilesRequest(REQUEST, SUCCESS, FAILURE, CANCEL, state, action) {
+export function handleUploadFilesRequest(
+    REQUEST: string,
+    SUCCESS: string,
+    FAILURE: string,
+    CANCEL: string,
+    state: RequestStatusType,
+    action: GenericAction
+): RequestStatusType {
     switch (action.type) {
     case REQUEST:
         return {
@@ -54,7 +65,7 @@ export function handleUploadFilesRequest(REQUEST, SUCCESS, FAILURE, CANCEL, stat
     }
 }
 
-function getFilePublicLink(state = initialRequestState(), action) {
+function getFilePublicLink(state: RequestStatusType = initialRequestState(), action: GenericAction): RequestStatus {
     return handleRequest(
         FileTypes.GET_FILE_PUBLIC_LINK_REQUEST,
         FileTypes.GET_FILE_PUBLIC_LINK_SUCCESS,
@@ -64,7 +75,7 @@ function getFilePublicLink(state = initialRequestState(), action) {
     );
 }
 
-function uploadFiles(state = initialRequestState(), action) {
+function uploadFiles(state: RequestStatusType = initialRequestState(), action: GenericAction): RequestStatus {
     return handleUploadFilesRequest(
         FileTypes.UPLOAD_FILES_REQUEST,
         FileTypes.UPLOAD_FILES_SUCCESS,

@@ -1,16 +1,26 @@
 // Copyright (c) 2016-present Mattermost, Inc. All Rights Reserved.
 // See License.txt for license information.
+// @flow
 
 import {RequestStatus} from 'constants';
 
-export function initialRequestState() {
+import type {GenericAction} from '../../types/actions';
+import type {RequestStatusType} from '../../types/requests';
+
+export function initialRequestState(): RequestStatusType {
     return {
         status: RequestStatus.NOT_STARTED,
         error: null,
     };
 }
 
-export function handleRequest(REQUEST, SUCCESS, FAILURE, state, action) {
+export function handleRequest(
+    REQUEST: string,
+    SUCCESS: string,
+    FAILURE: string,
+    state: RequestStatusType,
+    action: GenericAction
+): RequestStatusType {
     switch (action.type) {
     case REQUEST:
         return {
