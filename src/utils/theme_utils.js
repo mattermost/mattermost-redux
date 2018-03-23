@@ -16,7 +16,7 @@ export function makeStyleFromTheme(getStyleFromTheme: (Object) => Object): (Obje
     };
 }
 
-const rgbPattern = /^rgba?\(([\d.]+),([\d.]+),([\d.]+)(?:,([\d.]+))?\)$/;
+const rgbPattern = /^rgba?\((\d+),(\d+),(\d+)(?:,([\d.]+))?\)$/;
 
 export function getComponents(inColor: string): {red: number, green: number, blue: number, alpha: number} {
     let color = inColor;
