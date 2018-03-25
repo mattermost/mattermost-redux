@@ -11,7 +11,7 @@ import {handleRequest, initialRequestState} from './helpers';
 import type {GenericAction} from '../../types/actions';
 import type {RequestStatusType} from '../../types/requests';
 
-function getFilesForPost(state: RequestStatusType = initialRequestState(), action: GenericAction): RequestStatus {
+function getFilesForPost(state: RequestStatusType = initialRequestState(), action: GenericAction): RequestStatusType {
     return handleRequest(
         FileTypes.FETCH_FILES_FOR_POST_REQUEST,
         FileTypes.FETCH_FILES_FOR_POST_SUCCESS,
@@ -65,7 +65,7 @@ export function handleUploadFilesRequest(
     }
 }
 
-function getFilePublicLink(state: RequestStatusType = initialRequestState(), action: GenericAction): RequestStatus {
+function getFilePublicLink(state: RequestStatusType = initialRequestState(), action: GenericAction): RequestStatusType {
     return handleRequest(
         FileTypes.GET_FILE_PUBLIC_LINK_REQUEST,
         FileTypes.GET_FILE_PUBLIC_LINK_SUCCESS,
@@ -75,7 +75,7 @@ function getFilePublicLink(state: RequestStatusType = initialRequestState(), act
     );
 }
 
-function uploadFiles(state: RequestStatusType = initialRequestState(), action: GenericAction): RequestStatus {
+function uploadFiles(state: RequestStatusType = initialRequestState(), action: GenericAction): RequestStatusType {
     return handleUploadFilesRequest(
         FileTypes.UPLOAD_FILES_REQUEST,
         FileTypes.UPLOAD_FILES_SUCCESS,

@@ -19,7 +19,7 @@ export function getFullName(user: UserProfile): string {
 
 export function displayUsername(
     user: UserProfile,
-    teammateNameDisplay: Preferences.DISPLAY_PREFER_NICKNAME | Preferences.DISPLAY_PREFER_FULL_NAME
+    teammateNameDisplay: string
 ): string {
     let name = '';
 
