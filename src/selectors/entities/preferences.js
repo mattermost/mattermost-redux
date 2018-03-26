@@ -94,15 +94,12 @@ export const getTeammateNameDisplaySetting = createSelector(
     getConfig,
     getMyPreferences,
     (config, preferences) => {
-        if (config.TeammateNameDisplay) {
-            return config.TeammateNameDisplay;
-        }
-
         const key = getPreferenceKey(Preferences.CATEGORY_DISPLAY_SETTINGS, Preferences.NAME_NAME_FORMAT);
         if (preferences[key]) {
             return preferences[key].value;
+        } else if (config.TeammateNameDisplay) {
+            return config.TeammateNameDisplay;
         }
-
         return General.TEAMMATE_NAME_DISPLAY.SHOW_USERNAME;
     }
 );
