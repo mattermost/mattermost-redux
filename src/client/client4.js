@@ -228,7 +228,7 @@ export default class Client4 {
     getRolesRoute() {
         return `${this.getBaseRoute()}/roles`;
     }
-    
+
     getTimezonesRoute() {
         return `${this.getBaseRoute()}/system/timezones`;
     }
