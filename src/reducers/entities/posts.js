@@ -5,7 +5,7 @@ import {PostTypes, SearchTypes, UserTypes} from 'action_types';
 import {Posts} from 'constants';
 import {comparePosts} from 'utils/post_utils';
 
-function handleReceivedPost(posts = {}, postsInChannel = {}, action) {
+function handleReceivedPost(posts = {}, postsInChannel = {}, postsInThread = {}, action) {
     const post = action.data;
     const channelId = post.channel_id;
 
@@ -14,26 +14,38 @@ function handleReceivedPost(posts = {}, postsInChannel = {}, action) {
         [post.id]: post,
     };
 
-    let nextPostsForChannel = postsInChannel;
+    let nextPostsInChannel = postsInChannel;
 
     // Only change postsInChannel if the order of the posts needs to change
     if (!postsInChannel[channelId] || !postsInChannel[channelId].includes(post.id)) {
         // If we don't already have the post, assume it's the most recent one
         const postsForChannel = postsInChannel[channelId] || [];
 
-        nextPostsForChannel = {...postsInChannel};
-        nextPostsForChannel[channelId] = [
+        nextPostsInChannel = {...postsInChannel};
+        nextPostsInChannel[channelId] = [
             post.id,
             ...postsForChannel,
         ];
     }
 
-    return {posts: nextPosts, postsInChannel: nextPostsForChannel};
+    let nextPostsInThread = postsInThread;
+    if (post.root_id && (!postsInThread[post.root_id] || !postsInThread[post.root_id].includes(post.id))) {
+        const postsForThread = postsInThread[post.root_id] || [];
+
+        nextPostsInThread = {...postsInThread};
+        nextPostsInThread[post.root_id] = [
+            post.id,
+            ...postsForThread,
+        ];
+    }
+
+    return {posts: nextPosts, postsInChannel: nextPostsInChannel, postsInThread: nextPostsInThread};
 }
 
-function handleRemovePendingPost(posts = {}, postsInChannel = {}, action) {
+function handleRemovePendingPost(posts = {}, postsInChannel = {}, postsInThread = {}, action) {
     const pendingPostId = action.data.id;
     const channelId = action.data.channel_id;
+    const pendingPost = posts[pendingPostId];
 
     const nextPosts = {
         ...posts,
@@ -41,21 +53,29 @@ function handleRemovePendingPost(posts = {}, postsInChannel = {}, action) {
 
     Reflect.deleteProperty(nextPosts, pendingPostId);
 
-    let nextPostsForChannel = postsInChannel;
+    let nextPostsInChannel = postsInChannel;
 
     // Only change postsInChannel if the order of the posts needs to change
     if (!postsInChannel[channelId] || postsInChannel[channelId].includes(pendingPostId)) {
         // If we don't already have the post, assume it's the most recent one
         const postsForChannel = postsInChannel[channelId] || [];
 
-        nextPostsForChannel = {...postsInChannel};
-        nextPostsForChannel[channelId] = postsForChannel.filter((postId) => postId !== pendingPostId);
+        nextPostsInChannel = {...postsInChannel};
+        nextPostsInChannel[channelId] = postsForChannel.filter((postId) => postId !== pendingPostId);
     }
 
-    return {posts: nextPosts, postsInChannel: nextPostsForChannel};
+    let nextPostsInThread = postsInThread;
+    if (pendingPost.root_id && (!postsInThread[pendingPost.root_id] || postsInThread[pendingPost.root_id].includes(pendingPostId))) {
+        const postsForThread = postsInThread[pendingPost.root_id] || [];
+
+        nextPostsInThread = {...postsInThread};
+        nextPostsInThread[pendingPost.root_id] = postsForThread.filter((postId) => postId !== pendingPostId);
+    }
+
+    return {posts: nextPosts, postsInChannel: nextPostsInChannel, postsInThread: nextPostsInThread};
 }
 
-function handleReceivedPosts(posts = {}, postsInChannel = {}, action) {
+function handleReceivedPosts(posts = {}, postsInChannel = {}, postsInThread = {}, action) {
     const newPosts = action.data.posts;
     const channelId = action.channelId;
     const skipAddToChannel = action.skipAddToChannel;
@@ -67,7 +87,8 @@ function handleReceivedPosts(posts = {}, postsInChannel = {}, action) {
     }
 
     const nextPosts = {...posts};
-    const nextPostsForChannel = {...postsInChannel};
+    const nextPostsInChannel = {...postsInChannel};
+    const nextPostsInThread = {...postsInThread};
     const postsForChannel = postsInChannel[channelId] ? [...postsInChannel[channelId]] : [];
 
     for (const newPost of Object.values(newPosts)) {
@@ -104,6 +125,22 @@ function handleReceivedPosts(posts = {}, postsInChannel = {}, action) {
                 postsForChannel.splice(index, 1);
             }
         }
+
+        if (!newPost.root_id) {
+            continue;
+        }
+
+        const postsForThread = nextPostsInThread[newPost.root_id] ? [...nextPostsInThread[newPost.root_id]] : [];
+        if (!postsForThread.includes(newPost.id)) {
+            postsForThread.push(newPost.id);
+        }
+
+        const index = postsForThread.indexOf(newPost.pending_post_id);
+        if (index !== -1) {
+            postsForThread.splice(index, 1);
+        }
+
+        nextPostsInThread[newPost.root_id] = postsForThread;
     }
 
     // Sort to ensure that the most recent posts are first, with pending
@@ -112,9 +149,9 @@ function handleReceivedPosts(posts = {}, postsInChannel = {}, action) {
         return comparePosts(nextPosts[a], nextPosts[b]);
     });
 
-    nextPostsForChannel[channelId] = postsForChannel;
+    nextPostsInChannel[channelId] = postsForChannel;
 
-    return {posts: nextPosts, postsInChannel: nextPostsForChannel};
+    return {posts: nextPosts, postsInChannel: nextPostsInChannel, postsInThread: nextPostsInThread};
 }
 
 function handlePendingPosts(pendingPostIds = [], action) {
@@ -154,9 +191,9 @@ function handlePendingPosts(pendingPostIds = [], action) {
     }
 }
 
-function handlePostsFromSearch(posts = {}, postsInChannel = {}, action) {
+function handlePostsFromSearch(posts = {}, postsInChannel = {}, postsInThread = {}, action) {
     const newPosts = action.data.posts;
-    let info = {posts, postsInChannel};
+    let info = {posts, postsInChannel, postsInThread};
     const postsForChannel = new Map();
 
     const postIds = Object.keys(newPosts);
@@ -171,21 +208,25 @@ function handlePostsFromSearch(posts = {}, postsInChannel = {}, action) {
     }
 
     postsForChannel.forEach((postList, channelId) => {
-        info = handleReceivedPosts(info.posts, postsInChannel, {channelId, data: {posts: postList}});
+        info = handleReceivedPosts(info.posts, postsInChannel, postsInThread, {channelId, data: {posts: postList}});
     });
 
     return info;
 }
 
-function handlePostDeleted(posts = {}, postsInChannel = {}, action) {
+function handlePostDeleted(posts = {}, postsInChannel = {}, postsInThread = {}, action) {
     const post = action.data;
     const channelId = post.channel_id;
 
-    const nextPosts = {...posts};
-    const nextPostsForChannel = {...postsInChannel};
+    let nextPosts = posts;
+    let nextPostsForChannel = postsInChannel;
+    let nextPostsForThread = postsInThread;
 
     // We only need to do something if already have the post
     if (posts[post.id]) {
+        nextPosts = {...posts};
+        nextPostsForChannel = {...postsInChannel};
+
         // Mark the post as deleted
         nextPosts[post.id] = {
             ...posts[post.id],
@@ -209,17 +250,23 @@ function handlePostDeleted(posts = {}, postsInChannel = {}, action) {
         }
 
         nextPostsForChannel[channelId] = postsForChannel;
+
+        if (postsInThread[post.id]) {
+            nextPostsForThread = {...postsInThread};
+            Reflect.deleteProperty(nextPostsForThread, post.id);
+        }
     }
 
-    return {posts: nextPosts, postsInChannel: nextPostsForChannel};
+    return {posts: nextPosts, postsInChannel: nextPostsForChannel, postsInThread: nextPostsForThread};
 }
 
-function handleRemovePost(posts = {}, postsInChannel = {}, action) {
+function handleRemovePost(posts = {}, postsInChannel = {}, postsInThread = {}, action) {
     const post = action.data;
     const channelId = post.channel_id;
 
     let nextPosts = posts;
     let nextPostsForChannel = postsInChannel;
+    let nextPostsForThread;
 
     // We only need to do something if already have the post
     if (nextPosts[post.id]) {
@@ -252,12 +299,27 @@ function handleRemovePost(posts = {}, postsInChannel = {}, action) {
         }
 
         nextPostsForChannel[channelId] = postsForChannel;
+
+        if (postsInThread[post.id]) {
+            nextPostsForThread = nextPostsForThread || {...postsInThread};
+            Reflect.deleteProperty(nextPostsForThread, post.id);
+        }
+
+        if (postsInThread[post.root_id]) {
+            nextPostsForThread = nextPostsForThread || {...postsInThread};
+            const threadPosts = [...postsInThread[post.root_id]];
+            const threadIndex = threadPosts.indexOf(post.id);
+            if (threadIndex !== -1) {
+                threadPosts.splice(threadIndex, 1);
+            }
+            nextPostsForThread[post.root_id] = threadPosts;
+        }
     }
 
-    return {posts: nextPosts, postsInChannel: nextPostsForChannel};
+    return {posts: nextPosts, postsInChannel: nextPostsForChannel, postsInThread: nextPostsForThread || postsInThread};
 }
 
-function handlePosts(posts = {}, postsInChannel = {}, action) {
+function handlePosts(posts = {}, postsInChannel = {}, postsInThread = {}, action) {
     switch (action.type) {
     case PostTypes.RECEIVED_POST: {
         const nextPosts = {...posts};
@@ -265,35 +327,38 @@ function handlePosts(posts = {}, postsInChannel = {}, action) {
         return {
             posts: nextPosts,
             postsInChannel,
+            postsInThread,
         };
     }
     case PostTypes.RECEIVED_NEW_POST:
-        return handleReceivedPost(posts, postsInChannel, action);
+        return handleReceivedPost(posts, postsInChannel, postsInThread, action);
     case PostTypes.REMOVE_PENDING_POST: {
-        return handleRemovePendingPost(posts, postsInChannel, action);
+        return handleRemovePendingPost(posts, postsInChannel, postsInThread, action);
     }
     case PostTypes.RECEIVED_POSTS:
-        return handleReceivedPosts(posts, postsInChannel, action);
+        return handleReceivedPosts(posts, postsInChannel, postsInThread, action);
     case PostTypes.POST_DELETED:
         if (action.data) {
-            return handlePostDeleted(posts, postsInChannel, action);
+            return handlePostDeleted(posts, postsInChannel, postsInThread, action);
         }
-        return {posts, postsInChannel};
+        return {posts, postsInChannel, postsInThread};
     case PostTypes.REMOVE_POST:
-        return handleRemovePost(posts, postsInChannel, action);
+        return handleRemovePost(posts, postsInChannel, postsInThread, action);
 
     case SearchTypes.RECEIVED_SEARCH_POSTS:
-        return handlePostsFromSearch(posts, postsInChannel, action);
+        return handlePostsFromSearch(posts, postsInChannel, postsInThread, action);
 
     case UserTypes.LOGOUT_SUCCESS:
         return {
             posts: {},
             postsInChannel: {},
+            postsInThread: {},
         };
     default:
         return {
             posts,
             postsInChannel,
+            postsInThread,
         };
     }
 }
@@ -470,7 +535,7 @@ function messagesHistory(state = {}, action) {
 }
 
 export default function(state = {}, action) {
-    const {posts, postsInChannel} = handlePosts(state.posts, state.postsInChannel, action);
+    const {posts, postsInChannel, postsInThread} = handlePosts(state.posts, state.postsInChannel, state.postsInThread, action);
 
     const nextState = {
 
@@ -482,6 +547,9 @@ export default function(state = {}, action) {
 
         // Object mapping channel ids to an array of posts ids in that channel with the most recent post first
         postsInChannel,
+
+        // Object mapping post root ids to an array of posts ids in that thread with no guaranteed order
+        postsInThread,
 
         // The current selected post
         selectedPostId: selectedPostId(state.selectedPostId, action),
@@ -500,6 +568,7 @@ export default function(state = {}, action) {
     };
 
     if (state.posts === nextState.posts && state.postsInChannel === nextState.postsInChannel &&
+        state.postsInThread === nextState.postsInThread &&
         state.pendingPostIds === nextState.pendingPostIds &&
         state.selectedPostId === nextState.selectedPostId &&
         state.currentFocusedPostId === nextState.currentFocusedPostId &&
