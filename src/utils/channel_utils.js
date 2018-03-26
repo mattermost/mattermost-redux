@@ -500,12 +500,12 @@ export function sortChannelsByDisplayName(locale, a, b) {
     return a.name.toLowerCase().localeCompare(b.name.toLowerCase(), locale, {numeric: true});
 }
 
-export function sortMutedChannels(members, a, b) {
+export function sortChannelsByDisplayNameAndMuted(locale, members, a, b) {
     const aMember = members[a.id];
     const bMember = members[b.id];
 
     if (isChannelMuted(bMember) === isChannelMuted(aMember)) {
-        return 0;
+        return sortChannelsByDisplayName(locale, a, b);
     }
 
     if (!isChannelMuted(bMember) && isChannelMuted(aMember)) {

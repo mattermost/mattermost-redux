@@ -28,13 +28,14 @@ import {
     completeDirectChannelInfo,
     completeDirectChannelDisplayName,
     getUserIdFromChannelName,
-    sortChannelsByDisplayName,
+    isChannelMuted,
     getDirectChannelName,
     isAutoClosed,
     isDirectChannelVisible,
     isGroupChannelVisible,
     isGroupOrDirectChannelVisible,
-    sortMutedChannels,
+    sortChannelsByDisplayName,
+    sortChannelsByDisplayNameAndMuted,
 } from 'utils/channel_utils';
 import {createIdsSelector} from 'utils/helpers';
 
@@ -442,16 +443,16 @@ export const getSortedUnreadChannelIds = createIdsSelector(
                 bIsMention = true;
             }
 
-            if (aIsMention === bIsMention) {
+            if (aIsMention === bIsMention && isChannelMuted(bMember) === isChannelMuted(aMember)) {
                 return sortChannelsByDisplayName(locale, a, b);
-            } else if (aIsMention) {
+            } else if (aIsMention || (isChannelMuted(bMember) && !isChannelMuted(aMember))) {
                 return -1;
             }
 
             return 1;
         });
 
-        return allUnreadChannels.sort(sortMutedChannels.bind(null, myMembers)).map((c) => c.id);
+        return allUnreadChannels.map((c) => c.id);
     }
 );
 
@@ -492,8 +493,8 @@ export const getSortedFavoriteChannelWithUnreadsIds = createIdsSelector(
             }
 
             return c;
-        }).sort(sortChannelsByDisplayName.bind(null, locale));
-        return favoriteChannel.sort(sortMutedChannels.bind(null, myMembers)).map((f) => f.id);
+        }).sort(sortChannelsByDisplayNameAndMuted.bind(null, locale, myMembers));
+        return favoriteChannel.map((f) => f.id);
     }
 );
 
@@ -523,8 +524,8 @@ export const getSortedPublicChannelWithUnreadsIds = createIdsSelector(
             return !favoriteIds.includes(id) &&
                 teamChannelIds.includes(id) && channel.type === General.OPEN_CHANNEL;
         }).map((id) => channels[id]).
-        sort(sortChannelsByDisplayName.bind(null, locale)).
-        sort(sortMutedChannels.bind(null, myMembers));
+        sort(sortChannelsByDisplayNameAndMuted.bind(null, locale, myMembers));
+
         return publicChannels.map((c) => c.id);
     }
 );
@@ -554,8 +555,9 @@ export const getSortedPrivateChannelWithUnreadsIds = createIdsSelector(
             const channel = channels[id];
             return !favoriteIds.includes(id) && teamChannelIds.includes(id) &&
                 channel.type === General.PRIVATE_CHANNEL;
-        }).map((id) => channels[id]).sort(sortChannelsByDisplayName.bind(null, locale));
-        return privateChannels.sort(sortMutedChannels.bind(null, myMembers)).map((c) => c.id);
+        }).map((id) => channels[id]).
+        sort(sortChannelsByDisplayNameAndMuted.bind(null, locale, myMembers));
+        return privateChannels.map((c) => c.id);
     }
 );
 
@@ -608,8 +610,9 @@ export const getSortedDirectChannelWithUnreadsIds = createIdsSelector(
         }).concat(directChannelsIds).map((id) => {
             const channel = channels[id];
             return completeDirectChannelDisplayName(currentUser.id, profiles, settings, channel);
-        }).sort(sortChannelsByDisplayName.bind(null, locale));
-        return directChannels.sort(sortMutedChannels.bind(null, myMembers)).map((c) => c.id);
+        }).
+        sort(sortChannelsByDisplayNameAndMuted.bind(null, locale, myMembers));
+        return directChannels.map((c) => c.id);
     }
 );
 
