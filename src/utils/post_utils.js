@@ -74,7 +74,7 @@ export function canEditPost(state, config, license, teamId, channelId, userId, p
             if (!isOwner) {
                 canEdit = canEdit && haveIChannelPermission(state, {team: teamId, channel: channelId, permission: Permissions.EDIT_OTHERS_POSTS});
             }
-            if (config.PostEditTimeLimit !== -1) {
+            if (config.PostEditTimeLimit !== '-1' && config.PostEditTimeLimit !== -1) {
                 const timeLeft = (post.create_at + (config.PostEditTimeLimit * 1000)) - Date.now();
                 if (timeLeft <= 0) {
                     canEdit = false;
@@ -99,7 +99,7 @@ export function editDisable(state, config, license, teamId, channelId, userId, p
     const canEdit = canEditPost(state, config, license, teamId, channelId, userId, post);
 
     if (canEdit && license.IsLicensed === 'true') {
-        if (config.AllowEditPost === General.ALLOW_EDIT_POST_TIME_LIMIT || config.PostEditTimeLimit !== -1) {
+        if (config.AllowEditPost === General.ALLOW_EDIT_POST_TIME_LIMIT || (config.PostEditTimeLimit !== -1 && config.PostEditTimeLimit !== '-1')) {
             const timeLeft = (post.create_at + (config.PostEditTimeLimit * 1000)) - Date.now();
             if (timeLeft > 0) {
                 editDisableAction.fireAfter(timeLeft + 1000);
