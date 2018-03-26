@@ -503,6 +503,11 @@ export function sortChannelsByDisplayName(locale, a, b) {
 export function sortMutedChannels(members, a, b) {
     const aMember = members[a.id];
     const bMember = members[b.id];
+
+    if (isChannelMuted(bMember) === isChannelMuted(aMember)) {
+        return 0;
+    }
+
     if (!isChannelMuted(bMember) && isChannelMuted(aMember)) {
         return 1;
     }
