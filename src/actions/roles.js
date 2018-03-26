@@ -77,7 +77,7 @@ export function loadRolesIfNeeded(roles) {
         const loadedRoles = getRoles(state);
         const newRoles = new Set();
         for (const role of pendingRoles) {
-            if (!loadedRoles[role]) {
+            if (!loadedRoles[role] && role.trim() !== '') {
                 newRoles.add(role);
             }
         }
