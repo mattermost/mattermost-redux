@@ -223,6 +223,9 @@ function handleEvent(msg, dispatch, getState) {
     case WebsocketEvents.CHANNEL_VIEWED:
         handleChannelViewedEvent(msg, dispatch, getState);
         break;
+    case WebsocketEvents.CHANNEL_MEMBER_UPDATED:
+        handleChannelMemberUpdatedEvent(msg, dispatch);
+        break;
     case WebsocketEvents.DIRECT_ADDED:
         handleDirectAddedEvent(msg, dispatch, getState);
         break;
@@ -539,6 +542,11 @@ function handleChannelViewedEvent(msg, dispatch, getState) {
         markChannelAsRead(channelId, null, false)(dispatch, getState);
         markChannelAsViewed(channelId)(dispatch, getState);
     }
+}
+
+function handleChannelMemberUpdatedEvent(msg, dispatch) {
+    const channelMember = JSON.parse(msg.data.channelMember);
+    dispatch({type: ChannelTypes.RECEIVED_MY_CHANNEL_MEMBER, data: channelMember});
 }
 
 function handleDirectAddedEvent(msg, dispatch, getState) {

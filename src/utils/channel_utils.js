@@ -500,6 +500,25 @@ export function sortChannelsByDisplayName(locale, a, b) {
     return a.name.toLowerCase().localeCompare(b.name.toLowerCase(), locale, {numeric: true});
 }
 
+export function sortChannelsByDisplayNameAndMuted(locale, members, a, b) {
+    const aMember = members[a.id];
+    const bMember = members[b.id];
+
+    if (isChannelMuted(bMember) === isChannelMuted(aMember)) {
+        return sortChannelsByDisplayName(locale, a, b);
+    }
+
+    if (!isChannelMuted(bMember) && isChannelMuted(aMember)) {
+        return 1;
+    }
+
+    return -1;
+}
+
+export function isChannelMuted(member) {
+    return member && member.notify_props ? (member.notify_props.mark_unread === 'mention') : false;
+}
+
 function not(f) {
     return (...args) => !f(...args);
 }
