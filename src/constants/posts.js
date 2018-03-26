@@ -4,6 +4,7 @@
 export const PostTypes = {
     CHANNEL_DELETED: 'system_channel_deleted',
     DISPLAYNAME_CHANGE: 'system_displayname_change',
+    CONVERT_CHANNEL: 'system_convert_channel',
     EPHEMERAL: 'system_ephemeral',
     EPHEMERAL_ADD_TO_CHANNEL: 'system_ephemeral_add_to_channel',
     HEADER_CHANGE: 'system_header_change',

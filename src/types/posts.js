@@ -4,6 +4,7 @@ export type PostType = 'system_add_remove' |
                        'system_add_to_channel' |
                        'system_channel_deleted' |
                        'system_displayname_change' |
+                       'system_convert_channel' |
                        'system_ephemeral' |
                        'system_header_change' |
                        'system_join_channel' |
