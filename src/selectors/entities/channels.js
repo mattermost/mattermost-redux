@@ -20,6 +20,7 @@ import {
 } from 'selectors/entities/preferences';
 import {getLastPostPerChannel} from 'selectors/entities/posts';
 import {getCurrentTeamId, getCurrentTeamMembership} from 'selectors/entities/teams';
+import {isCurrentUserSystemAdmin} from 'selectors/entities/users';
 
 import {
     buildDisplayableChannelList,
@@ -137,6 +138,19 @@ export const getCurrentChannelStats = createSelector(
         return allChannelStats[currentChannelId];
     }
 );
+
+export function isCurrentChannelReadOnly(state) {
+    return isChannelReadOnly(state, getCurrentChannel(state));
+}
+
+export function isChannelReadOnlyById(state, channelId) {
+    return isChannelReadOnly(state, getChannel(state, channelId));
+}
+
+export function isChannelReadOnly(state, channel) {
+    return channel && channel.name === General.DEFAULT_CHANNEL &&
+        !isCurrentUserSystemAdmin(state) && getConfig(state).ExperimentalTownSquareIsReadOnly === 'true';
+}
 
 export const getChannelSetInCurrentTeam = createSelector(
     getCurrentTeamId,
