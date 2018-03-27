@@ -9,6 +9,8 @@ import {
     getCurrentChannelId,
     getCurrentUser,
     getUsers,
+    getMyChannelMemberships,
+    getMyCurrentChannelMembership,
 } from 'selectors/entities/common';
 import {getConfig, getLicense, hasNewPermissions} from 'selectors/entities/general';
 import {
@@ -64,10 +66,6 @@ export const getDirectChannelsSet = createSelector(
     }
 );
 
-export function getMyChannelMemberships(state) {
-    return state.entities.channels.myMembers;
-}
-
 export function getChannelMembersInChannels(state) {
     return state.entities.channels.membersInChannel;
 }
@@ -121,14 +119,6 @@ export const getMyChannelMember = createSelector(
     (state, channelId) => channelId,
     (channelMemberships, channelId) => {
         return channelMemberships[channelId] || {};
-    }
-);
-
-export const getMyCurrentChannelMembership = createSelector(
-    getCurrentChannelId,
-    getMyChannelMemberships,
-    (currentChannelId, channelMemberships) => {
-        return channelMemberships[currentChannelId] || {};
     }
 );
 
