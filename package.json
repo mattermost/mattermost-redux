@@ -3,7 +3,6 @@
   "version": "1.2.0",
   "dependencies": {
     "deep-equal": "1.0.1",
-    "flow-copy-source": "^1.2.2",
     "form-data": "2.3.1",
     "harmony-reflect": "1.5.1",
     "isomorphic-fetch": "2.2.1",
@@ -37,6 +36,7 @@
     "eslint-plugin-mocha": "4.11.0",
     "fetch-mock": "5.12.2",
     "flow-bin": "0.64.0",
+    "flow-copy-source": "1.2.2",
     "flow-typed": "2.2.3",
     "jsdom": "9.12.0",
     "jsdom-global": "2.1.1",
@@ -52,7 +52,7 @@
     "ws": "2.3.1"
   },
   "scripts": {
-    "build": "babel src --out-dir . && flow-copy-source src .",
+    "build": "babel src --out-dir .",
     "webpack": "webpack",
     "dev": "babel src --out-dir ${WEBAPP_DIR:-../mattermost-webapp}/node_modules/mattermost-redux --source-maps && yarn dev:flow-copy",
     "dev:flow-copy": "flow-copy-source src ${WEBAPP_DIR:-../mattermost-webapp}/node_modules/mattermost-redux",
