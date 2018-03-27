@@ -36,7 +36,7 @@ export default {
     MANAGE_WEBHOOKS: 'manage_webhooks',
     MANAGE_OTHERS_WEBHOOKS: 'manage_others_webhooks',
     MANAGE_OAUTH: 'manage_oauth',
-    MANAGE_SYTEM_WIDE_OAUTH: 'manage_sytem_wide_oauth',
+    MANAGE_SYSTEM_WIDE_OAUTH: 'manage_system_wide_oauth',
     CREATE_POST: 'create_post',
     CREATE_POST_PUBLIC: 'create_post_public',
     EDIT_POST: 'edit_post',
