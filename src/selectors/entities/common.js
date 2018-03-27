@@ -5,11 +5,25 @@
 import type {GlobalState} from '../../types/store';
 import type {UserProfile} from '../../types/users';
 
+import {createSelector} from 'reselect';
+
 // Channels
 
 export function getCurrentChannelId(state: GlobalState): string {
     return state.entities.channels.currentChannelId;
 }
+
+export function getMyChannelMemberships(state: GlobalState): string {
+    return state.entities.channels.myMembers;
+}
+
+export const getMyCurrentChannelMembership = createSelector(
+    getCurrentChannelId,
+    getMyChannelMemberships,
+    (currentChannelId, channelMemberships) => {
+        return channelMemberships[currentChannelId] || {};
+    }
+);
 
 // Users
 
