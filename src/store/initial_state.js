@@ -89,10 +89,6 @@ const state: GlobalState = {
             recent: {},
         },
         typing: {},
-        roles: {
-            roles: [],
-            pending: new Set(),
-        },
     },
     errors: [],
     requests: {

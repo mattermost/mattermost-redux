@@ -15,7 +15,6 @@ import AdminTypes from './admin';
 import AlertTypes from './alerts';
 import JobTypes from './jobs';
 import SearchTypes from './search';
-import RoleTypes from './roles';
 
 export {
     ErrorTypes,
@@ -32,5 +31,4 @@ export {
     AlertTypes,
     JobTypes,
     SearchTypes,
-    RoleTypes,
 };

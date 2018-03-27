@@ -5,7 +5,6 @@ import {Client, Client4} from 'client';
 import {bindClientFunc, forceLogoutIfNecessary, FormattedError} from './helpers.js';
 import {GeneralTypes} from 'action_types';
 import {loadMe} from './users';
-import {loadRolesIfNeeded} from './roles';
 import {logError} from './errors';
 import {batchActions} from 'redux-batched-actions';
 
@@ -151,7 +150,6 @@ export function setDeviceToken(token) {
 export function setServerVersion(serverVersion) {
     return async (dispatch, getState) => {
         dispatch({type: GeneralTypes.RECEIVED_SERVER_VERSION, data: serverVersion}, getState);
-        loadRolesIfNeeded([])(dispatch, getState);
 
         return {data: true};
     };

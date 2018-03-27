@@ -3,7 +3,6 @@
 // @flow
 
 import {createSelector} from 'reselect';
-import {isMinimumServerVersion} from 'utils/helpers';
 
 import type {GlobalState} from '../../types/store';
 
@@ -21,13 +20,6 @@ export function getSupportedTimezones(state: GlobalState): Array<string> {
 
 export function getCurrentUrl(state: GlobalState): string {
     return state.entities.general.credentials.url;
-}
-
-export function hasNewPermissions(state) {
-    const version = state.entities.general.serverVersion;
-
-    // FIXME This must be changed to 4, 8, 0 before we merge this branch into master
-    return isMinimumServerVersion(version, 4, 6, 0);
 }
 
 export const canUploadFilesOnMobile = createSelector(

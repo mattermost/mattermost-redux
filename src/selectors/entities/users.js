@@ -8,9 +8,8 @@ import {
     getCurrentUser,
     getCurrentUserId,
     getUsers,
-    getMyCurrentChannelMembership,
 } from 'selectors/entities/common';
-
+import {getMyCurrentChannelMembership} from 'selectors/entities/channels';
 import {getDirectShowPreferences} from 'selectors/entities/preferences';
 
 import {filterProfilesMatchingTerm, sortByUsername, isSystemAdmin} from 'utils/user_utils';
