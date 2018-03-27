@@ -16,9 +16,24 @@ export function makeStyleFromTheme(getStyleFromTheme: (Object) => Object): (Obje
     };
 }
 
-function normalizeColor(oldColor: string): string {
-    let color = oldColor;
-    if (color.length && color[0] === '#') {
+const rgbPattern = /^rgba?\((\d+),(\d+),(\d+)(?:,([\d.]+))?\)$/;
+
+export function getComponents(inColor: string): {red: number, green: number, blue: number, alpha: number} {
+    let color = inColor;
+
+    // RGB color
+    const match = rgbPattern.exec(color);
+    if (match) {
+        return {
+            red: parseInt(match[1], 10),
+            green: parseInt(match[2], 10),
+            blue: parseInt(match[3], 10),
+            alpha: match[4] ? parseFloat(match[4]) : 1,
+        };
+    }
+
+    // Hex color
+    if (color[0] === '#') {
         color = color.slice(1);
     }
 
@@ -31,17 +46,23 @@ function normalizeColor(oldColor: string): string {
         color += tempColor[2] + tempColor[2];
     }
 
-    return color;
+    return {
+        red: parseInt(color.substring(0, 2), 16),
+        green: parseInt(color.substring(2, 4), 16),
+        blue: parseInt(color.substring(4, 6), 16),
+        alpha: 1,
+    };
 }
 
 export function changeOpacity(oldColor: string, opacity: number): string {
-    const color = normalizeColor(oldColor);
+    const {
+        red,
+        green,
+        blue,
+        alpha,
+    } = getComponents(oldColor);
 
-    const r = parseInt(color.substring(0, 2), 16);
-    const g = parseInt(color.substring(2, 4), 16);
-    const b = parseInt(color.substring(4, 6), 16);
-
-    return `rgba(${r},${g},${b},${opacity})`;
+    return `rgba(${red},${green},${blue},${alpha * opacity})`;
 }
 
 function blendComponent(background: number, foreground: number, opacity: number): number {
@@ -49,24 +70,29 @@ function blendComponent(background: number, foreground: number, opacity: number)
 }
 
 export function blendColors(background: string, foreground: string, opacity: number): string {
-    const backgroundNormalized = normalizeColor(background);
-    const foregroundNormalized = normalizeColor(foreground);
+    const backgroundComponents = getComponents(background);
+    const foregroundComponents = getComponents(foreground);
 
-    const r = blendComponent(
-        parseInt(backgroundNormalized.substring(0, 2), 16),
-        parseInt(foregroundNormalized.substring(0, 2), 16),
+    const red = Math.floor(blendComponent(
+        backgroundComponents.red,
+        foregroundComponents.red,
         opacity
-    );
-    const g = blendComponent(
-        parseInt(backgroundNormalized.substring(2, 4), 16),
-        parseInt(foregroundNormalized.substring(2, 4), 16),
+    ));
+    const green = Math.floor(blendComponent(
+        backgroundComponents.green,
+        foregroundComponents.green,
         opacity
-    );
-    const b = blendComponent(
-        parseInt(backgroundNormalized.substring(4, 6), 16),
-        parseInt(foregroundNormalized.substring(4, 6), 16),
+    ));
+    const blue = Math.floor(blendComponent(
+        backgroundComponents.blue,
+        foregroundComponents.blue,
+        opacity
+    ));
+    const alpha = blendComponent(
+        backgroundComponents.alpha,
+        foregroundComponents.alpha,
         opacity
     );
 
-    return `rgb(${r},${g},${b})`;
+    return `rgba(${red},${green},${blue},${alpha})`;
 }

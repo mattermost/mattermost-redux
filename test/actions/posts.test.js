@@ -337,7 +337,7 @@ describe('Actions.Posts', () => {
             TestHelper.basicPost
         )(store.dispatch, store.getState);
 
-        const {posts, postsInChannel} = store.getState().entities.posts;
+        const {posts, postsInChannel, postsInThread} = store.getState().entities.posts;
 
         assert.ok(posts);
         assert.ok(postsInChannel);
@@ -347,6 +347,7 @@ describe('Actions.Posts', () => {
         assert.equal(postsInChannel[channelId].length, postsCount - 2);
         assert.ok(!posts[postId]);
         assert.ok(!posts[post1a.id]);
+        assert.ok(!postsInThread[postId]);
     });
 
     it('removePostWithReaction', async () => {
@@ -520,7 +521,7 @@ describe('Actions.Posts', () => {
 
         const state = store.getState();
         const getRequest = state.requests.posts.getPosts;
-        const {posts, postsInChannel} = state.entities.posts;
+        const {posts, postsInChannel, postsInThread} = state.entities.posts;
 
         if (getRequest.status === RequestStatus.FAILURE) {
             throw new Error(JSON.stringify(getRequest.error));
@@ -540,6 +541,14 @@ describe('Actions.Posts', () => {
         assert.ok(posts[post2.id]);
         assert.ok(posts[post3.id]);
         assert.ok(posts[post3a.id]);
+
+        let postsForThread = postsInThread[post1.id];
+        assert.ok(postsForThread);
+        assert.ok(postsForThread.includes(post1a.id));
+
+        postsForThread = postsInThread[post3.id];
+        assert.ok(postsForThread);
+        assert.ok(postsForThread.includes(post3a.id));
     });
 
     it('getPostsWithRetry', async () => {
@@ -605,7 +614,7 @@ describe('Actions.Posts', () => {
 
         const state = store.getState();
         const getRequest = state.requests.posts.getPosts;
-        const {posts, postsInChannel} = state.entities.posts;
+        const {posts, postsInChannel, postsInThread} = state.entities.posts;
 
         if (getRequest.status === RequestStatus.FAILURE) {
             throw new Error(JSON.stringify(getRequest.error));
@@ -625,6 +634,14 @@ describe('Actions.Posts', () => {
         assert.ok(posts[post2.id]);
         assert.ok(posts[post3.id]);
         assert.ok(posts[post3a.id]);
+
+        let postsForThread = postsInThread[post1.id];
+        assert.ok(postsForThread);
+        assert.ok(postsForThread.includes(post1a.id));
+
+        postsForThread = postsInThread[post3.id];
+        assert.ok(postsForThread);
+        assert.ok(postsForThread.includes(post3a.id));
     });
 
     it('getNeededAtMentionedUsernames', async () => {
@@ -1022,7 +1039,7 @@ describe('Actions.Posts', () => {
 
         const state = store.getState();
         const getRequest = state.requests.posts.getPostsBefore;
-        const {posts, postsInChannel} = state.entities.posts;
+        const {posts, postsInChannel, postsInThread} = state.entities.posts;
 
         if (getRequest.status === RequestStatus.FAILURE) {
             throw new Error(JSON.stringify(getRequest.error));
@@ -1036,6 +1053,10 @@ describe('Actions.Posts', () => {
         assert.equal(postsForChannel[0], post1a.id, 'wrong order for post1a');
         assert.equal(postsForChannel[1], post1.id, 'wrong order for post1');
         assert.ok(postsForChannel.length <= 10, 'wrong size');
+
+        const postsForThread = postsInThread[post1.id];
+        assert.ok(postsForThread);
+        assert.ok(postsForThread.includes(post1a.id));
     });
 
     it('getPostsBeforeWithRetry', async () => {
@@ -1169,7 +1190,7 @@ describe('Actions.Posts', () => {
 
         const state = store.getState();
         const getRequest = state.requests.posts.getPostsAfter;
-        const {posts, postsInChannel} = state.entities.posts;
+        const {posts, postsInChannel, postsInThread} = state.entities.posts;
 
         if (getRequest.status === RequestStatus.FAILURE) {
             throw new Error(JSON.stringify(getRequest.error));
@@ -1183,6 +1204,10 @@ describe('Actions.Posts', () => {
         assert.equal(postsForChannel[0], post3a.id, 'wrong order for post3a');
         assert.equal(postsForChannel[1], post3.id, 'wrong order for post3');
         assert.equal(postsForChannel.length, 2, 'wrong size');
+
+        const postsForThread = postsInThread[post3.id];
+        assert.ok(postsForThread);
+        assert.ok(postsForThread.includes(post3a.id));
     });
 
     it('getPostsAfterWithRetry', async () => {

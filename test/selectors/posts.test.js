@@ -44,6 +44,10 @@ describe('Selectors.Posts', () => {
                     1: ['e', 'd', 'c', 'b', 'a'],
                     2: ['f'],
                 },
+                postsInThread: {
+                    a: ['c', 'e'],
+                    b: ['d'],
+                },
                 reactions,
             },
             preferences: {
@@ -77,15 +81,6 @@ describe('Selectors.Posts', () => {
         const result = getPostsForThread(testState, props);
 
         assert.equal(result, getPostsForThread(testState, props));
-    });
-
-    it('should return different result for different props', () => {
-        const getPostsForThread = Selectors.makeGetPostsForThread();
-
-        const result = getPostsForThread(testState, {channelId: '1', rootId: 'a'});
-
-        assert.notEqual(result, getPostsForThread(testState, {channelId: '1', rootId: 'a'}));
-        assert.deepEqual(result, getPostsForThread(testState, {channelId: '1', rootId: 'a'}));
     });
 
     it('should return memoized result for multiple selectors with different props', () => {
@@ -169,7 +164,7 @@ describe('Selectors.Posts', () => {
         };
 
         const getPostsInChannel = Selectors.makeGetPostsInChannel();
-        assert.deepEqual(getPostsInChannel(testState, '1'), [post5, post4, post3, post2, post1]);
+        assert.deepEqual(getPostsInChannel(testState, '1', 30), [post5, post4, post3, post2, post1]);
     });
 
     it('get posts around post in channel', () => {
@@ -260,6 +255,10 @@ describe('Selectors.Posts', () => {
                     postsInChannel: {
                         1: ['f', 'e', 'd', 'c', 'b', 'a'],
                         2: ['g'],
+                    },
+                    postsInThread: {
+                        a: ['c', 'e'],
+                        b: ['d', 'f'],
                     },
                 },
                 preferences: {
@@ -366,6 +365,10 @@ describe('Selectors.Posts', () => {
                         1: ['f', 'e', 'd', 'c', 'b', 'a'],
                         2: ['g'],
                     },
+                    postsInThread: {
+                        a: ['c', 'e'],
+                        b: ['d', 'f'],
+                    },
                 },
                 preferences: {
                     myPreferences: {},
@@ -471,6 +474,10 @@ describe('Selectors.Posts', () => {
                         1: ['f', 'e', 'd', 'c', 'b', 'a'],
                         2: ['g'],
                     },
+                    postsInThread: {
+                        a: ['c', 'e'],
+                        b: ['d', 'f'],
+                    },
                 },
                 preferences: {
                     myPreferences: {},
@@ -573,6 +580,9 @@ describe('Selectors.Posts', () => {
                         1: ['c', 'b', 'a'],
                         2: ['d'],
                     },
+                    postsInThread: {
+                        a: ['b', 'c'],
+                    },
                 },
                 preferences: {
                     myPreferences: {},
@@ -642,6 +652,9 @@ describe('Selectors.Posts', () => {
                     postsInChannel: {
                         1: ['c', 'b', 'a'],
                         2: ['d'],
+                    },
+                    postsInThread: {
+                        a: ['b', 'c'],
                     },
                 },
                 preferences: {
@@ -928,6 +941,9 @@ describe('Selectors.Posts', () => {
                             1004: {id: '1004', create_at: 1004, root_id: '1001'},
                             1005: {id: '1005', create_at: 1005},
                         },
+                        postsInThread: {
+                            1001: ['1002', '1004'],
+                        },
                     },
                 },
             };
@@ -948,6 +964,9 @@ describe('Selectors.Posts', () => {
                             1003: {id: '1003', create_at: 1003},
                             1004: {id: '1004', create_at: 1004, root_id: '1001'},
                             1005: {id: '1005', create_at: 1005},
+                        },
+                        postsInThread: {
+                            1001: ['1002', '1004'],
                         },
                     },
                 },
@@ -970,6 +989,9 @@ describe('Selectors.Posts', () => {
                             1004: {id: '1004', create_at: 1004, root_id: '1001'},
                             1005: {id: '1005', create_at: 1005},
                         },
+                        postsInThread: {
+                            1001: ['1002', '1004'],
+                        },
                     },
                 },
             };
@@ -991,6 +1013,10 @@ describe('Selectors.Posts', () => {
                             ...state.entities.posts.posts,
                             1006: {id: '1006', create_at: 1006, root_id: '1003'},
                         },
+                        postsInThread: {
+                            ...state.entities.posts.postsInThread,
+                            1003: ['1006'],
+                        },
                     },
                 },
             };
@@ -1011,6 +1037,7 @@ describe('Selectors.Posts', () => {
                             ...state.entities.posts.posts,
                             1005: {id: '1005', create_at: 1005, update_at: 1006},
                         },
+                        postsInThread: state.entities.posts.postsInThread,
                     },
                 },
             };
@@ -1041,6 +1068,10 @@ describe('Selectors.Posts', () => {
                             ...state.entities.posts.posts,
                             1007: {id: '1007', create_at: 1007, root_id: '1001'},
                         },
+                        postsInThread: {
+                            ...state.entities.posts.postsInThread,
+                            1001: [...state.entities.posts.postsInThread['1001'], '1007'],
+                        },
                     },
                 },
             };
@@ -1069,6 +1100,9 @@ describe('Selectors.Posts', () => {
                             1003: {id: '1003', create_at: 1003},
                             1004: {id: '1004', create_at: 1004, root_id: '1001'},
                             1005: {id: '1005', create_at: 1005},
+                        },
+                        postsInThread: {
+                            1001: ['1002', '1004'],
                         },
                     },
                 },

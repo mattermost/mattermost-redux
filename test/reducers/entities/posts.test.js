@@ -35,6 +35,7 @@ describe('Reducers.posts', () => {
                     channel_id: ['other_post_id'],
                     other_channel_id: ['post_id', 'other_post_id'],
                 },
+                postsInThread: {},
                 pendingPostIds: ['other_post_id'],
             },
         };
