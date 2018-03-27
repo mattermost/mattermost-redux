@@ -26,8 +26,8 @@ export function getCurrentUrl(state: GlobalState): string {
 export function hasNewPermissions(state) {
     const version = state.entities.general.serverVersion;
 
-    // FIXME This must be changed to 4, 8, 0 before we merge this branch into master
-    return isMinimumServerVersion(version, 4, 6, 0);
+    // FIXME This must be changed to 4, 9, 0 before we generate the 4.9.0 release
+    return isMinimumServerVersion(version, 4, 9, 0) || (version.indexOf('dev') !== -1 && isMinimumServerVersion(version, 4, 8, 0));
 }
 
 export const canUploadFilesOnMobile = createSelector(

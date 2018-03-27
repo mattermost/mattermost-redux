@@ -251,5 +251,24 @@ describe('Selectors.General', () => {
             },
         }), true);
     });
+
+    it('hasNewPermissions', () => {
+        const state = {
+            entities: {
+                general: {
+                    serverVersion: '4.8.0',
+                },
+            },
+        };
+        assert.equal(Selectors.hasNewPermissions(state), false);
+        state.entities.general.serverVersion = '4.8.0.dev.123123';
+        assert.equal(Selectors.hasNewPermissions(state), true);
+        state.entities.general.serverVersion = '4.9.0';
+        assert.equal(Selectors.hasNewPermissions(state), true);
+        state.entities.general.serverVersion = '4.10.0';
+        assert.equal(Selectors.hasNewPermissions(state), true);
+        state.entities.general.serverVersion = '5.10.0.dev';
+        assert.equal(Selectors.hasNewPermissions(state), true);
+    });
 });
 
