@@ -21,6 +21,7 @@ class TestHelper {
         this.basicChannel = null;
         this.basicChannelMember = null;
         this.basicPost = null;
+        this.basicRoles = null;
     }
 
     activateMocking() {
@@ -320,6 +321,68 @@ class TestHelper {
         this.basicChannel = this.fakeChannelWithId(this.basicTeam.id);
         this.basicChannelMember = this.fakeChannelMember(this.basicUser.id, this.basicChannel.id);
         this.basicPost = {...this.fakePostWithId(this.basicChannel.id), create_at: 1507841118796};
+        this.basicRoles = {
+            system_admin: {
+                id: this.generateId(),
+                name: 'system_admin',
+                display_name: 'authentication.roles.global_admin.name',
+                description: 'authentication.roles.global_admin.description',
+                permissions: [
+                    'system_admin_permission',
+                ],
+                scheme_managed: true,
+            },
+            system_user: {
+                id: this.generateId(),
+                name: 'system_user',
+                display_name: 'authentication.roles.global_user.name',
+                description: 'authentication.roles.global_user.description',
+                permissions: [
+                    'system_user_permission',
+                ],
+                scheme_managed: true,
+            },
+            team_admin: {
+                id: this.generateId(),
+                name: 'team_admin',
+                display_name: 'authentication.roles.team_admin.name',
+                description: 'authentication.roles.team_admin.description',
+                permissions: [
+                    'team_admin_permission',
+                ],
+                scheme_managed: true,
+            },
+            team_user: {
+                id: this.generateId(),
+                name: 'team_user',
+                display_name: 'authentication.roles.team_user.name',
+                description: 'authentication.roles.team_user.description',
+                permissions: [
+                    'team_user_permission',
+                ],
+                scheme_managed: true,
+            },
+            channel_admin: {
+                id: this.generateId(),
+                name: 'channel_admin',
+                display_name: 'authentication.roles.channel_admin.name',
+                description: 'authentication.roles.channel_admin.description',
+                permissions: [
+                    'channel_admin_permission',
+                ],
+                scheme_managed: true,
+            },
+            channel_user: {
+                id: this.generateId(),
+                name: 'channel_user',
+                display_name: 'authentication.roles.channel_user.name',
+                description: 'authentication.roles.channel_user.description',
+                permissions: [
+                    'channel_user_permission',
+                ],
+                scheme_managed: true,
+            },
+        };
     }
 
     initBasic = async (client4 = this.createClient4()) => {

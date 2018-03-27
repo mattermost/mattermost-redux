@@ -17,6 +17,7 @@ import admin from './admin';
 import alerts from './alerts';
 import jobs from './jobs';
 import search from './search';
+import roles from './roles';
 
 export default combineReducers({
     general,
@@ -33,4 +34,5 @@ export default combineReducers({
     alerts,
     jobs,
     search,
+    roles,
 });

@@ -225,6 +225,10 @@ export default class Client4 {
         return `${this.getPluginsRoute()}/${pluginId}`;
     }
 
+    getRolesRoute() {
+        return `${this.getBaseRoute()}/roles`;
+    }
+
     getTimezonesRoute() {
         return `${this.getBaseRoute()}/system/timezones`;
     }
@@ -2135,6 +2139,35 @@ export default class Client4 {
         return this.doFetch(
             `${this.getBaseRoute()}/analytics/old${buildQueryString({name, team_id: teamId})}`,
             {method: 'get'}
+        );
+    };
+
+    // Role Routes
+    getRole = async (roleId) => {
+        return this.doFetch(
+            `${this.getRolesRoute()}/${roleId}`,
+            {method: 'get'}
+        );
+    };
+
+    getRoleByName = async (roleName) => {
+        return this.doFetch(
+            `${this.getRolesRoute()}/name/${roleName}`,
+            {method: 'get'}
+        );
+    };
+
+    getRolesByNames = async (rolesNames) => {
+        return this.doFetch(
+            `${this.getRolesRoute()}/names`,
+            {method: 'post', body: JSON.stringify(rolesNames)}
+        );
+    };
+
+    patchRole = async (roleId, role) => {
+        return this.doFetch(
+            `${this.getRolesRoute()}/${roleId}/patch`,
+            {method: 'put', body: JSON.stringify(role)}
         );
     };
 

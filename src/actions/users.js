@@ -7,6 +7,7 @@ import {General} from 'constants';
 import {UserTypes, TeamTypes, AdminTypes} from 'action_types';
 import {getAllCustomEmojis} from './emojis';
 import {getMyTeams, getMyTeamMembers, getMyTeamUnreads} from './teams';
+import {loadRolesIfNeeded} from './roles';
 
 import {
     getUserIdFromChannelName,
@@ -196,6 +197,19 @@ function completeLogin(data) {
                 type: UserTypes.LOGIN_SUCCESS,
             },
         ]), getState);
+
+        const roles = new Set();
+        for (const teamMember of teamMembers) {
+            for (const role of teamMember.roles.split(' ')) {
+                roles.add(role);
+            }
+            for (const role of data.roles.split(' ')) {
+                roles.add(role);
+            }
+        }
+        if (roles.size > 0) {
+            loadRolesIfNeeded(roles)(dispatch, getState);
+        }
 
         return {data: true};
     };
@@ -548,12 +562,20 @@ export function getProfilesNotInChannel(teamId, channelId, page, perPage = Gener
 }
 
 export function getMe() {
-    return bindClientFunc(
-        Client4.getMe,
-        UserTypes.USER_REQUEST,
-        [UserTypes.RECEIVED_ME, UserTypes.USER_SUCCESS],
-        UserTypes.USER_FAILURE
-    );
+    return async (dispatch, getState) => {
+        const getMeFunc = bindClientFunc(
+            Client4.getMe,
+            UserTypes.USER_REQUEST,
+            [UserTypes.RECEIVED_ME, UserTypes.USER_SUCCESS],
+            UserTypes.USER_FAILURE
+        );
+        const me = await getMeFunc(dispatch, getState);
+        if (me.error) {
+            return me;
+        }
+        loadRolesIfNeeded(new Set(me.data.roles.split(' ')))(dispatch, getState);
+        return me;
+    };
 }
 
 export function getUser(id) {
@@ -945,6 +967,7 @@ export function updateMe(user) {
             {type: UserTypes.RECEIVED_ME, data},
             {type: UserTypes.UPDATE_ME_SUCCESS},
         ]), getState);
+        loadRolesIfNeeded(new Set(data.roles.split(' ')))(dispatch, getState);
 
         return {data};
     };
