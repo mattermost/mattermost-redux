@@ -90,7 +90,7 @@ const state: GlobalState = {
         },
         typing: {},
         roles: {
-            roles: [],
+            roles: {},
             pending: new Set(),
         },
     },
