@@ -74,6 +74,10 @@ export function getFileUrl(fileId) {
     return Client4.getFileRoute(fileId);
 }
 
+export function getFileDownloadUrl(fileId) {
+    return `${Client4.getFileRoute(fileId)}?download=1`;
+}
+
 export function getFileThumbnailUrl(fileId) {
     return `${Client4.getFileRoute(fileId)}/thumbnail`;
 }
