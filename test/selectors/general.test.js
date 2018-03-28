@@ -263,6 +263,10 @@ describe('Selectors.General', () => {
         assert.equal(Selectors.hasNewPermissions(state), false);
         state.entities.general.serverVersion = '4.8.0.dev.123123';
         assert.equal(Selectors.hasNewPermissions(state), true);
+        state.entities.general.serverVersion = '4.8.0.4.8.1.ffffff';
+        assert.equal(Selectors.hasNewPermissions(state), false);
+        state.entities.general.serverVersion = '4.8.0.3607.2f31498e967dc08ed38d7a2d7a306825.true';
+        assert.equal(Selectors.hasNewPermissions(state), true);
         state.entities.general.serverVersion = '4.9.0';
         assert.equal(Selectors.hasNewPermissions(state), true);
         state.entities.general.serverVersion = '4.10.0';
