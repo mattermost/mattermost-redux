@@ -151,7 +151,7 @@ export function setDeviceToken(token) {
 export function setServerVersion(serverVersion) {
     return async (dispatch, getState) => {
         dispatch({type: GeneralTypes.RECEIVED_SERVER_VERSION, data: serverVersion}, getState);
-        loadRolesIfNeeded([])(dispatch, getState);
+        dispatch(loadRolesIfNeeded([]));
 
         return {data: true};
     };

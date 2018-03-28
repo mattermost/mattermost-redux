@@ -208,7 +208,7 @@ function completeLogin(data) {
             }
         }
         if (roles.size > 0) {
-            loadRolesIfNeeded(roles)(dispatch, getState);
+            dispatch(loadRolesIfNeeded(roles));
         }
 
         return {data: true};
@@ -573,7 +573,7 @@ export function getMe() {
         if (me.error) {
             return me;
         }
-        loadRolesIfNeeded(new Set(me.data.roles.split(' ')))(dispatch, getState);
+        dispatch(loadRolesIfNeeded(new Set(me.data.roles.split(' '))));
         return me;
     };
 }
@@ -967,7 +967,7 @@ export function updateMe(user) {
             {type: UserTypes.RECEIVED_ME, data},
             {type: UserTypes.UPDATE_ME_SUCCESS},
         ]), getState);
-        loadRolesIfNeeded(new Set(data.roles.split(' ')))(dispatch, getState);
+        dispatch(loadRolesIfNeeded(new Set(data.roles.split(' '))));
 
         return {data};
     };
