@@ -173,7 +173,7 @@ function formatPostInChannel(post, previousPost, index, allPosts, postsInThread,
         }
 
         const rootPost = allPosts[rootId];
-        if (rootPost.user_id === currentUser.id) {
+        if (rootPost && rootPost.user_id === currentUser.id) {
             threadCreatedByCurrentUser = true;
         }
 
