@@ -142,7 +142,7 @@ export function createTeam(team) {
                 type: TeamTypes.CREATE_TEAM_SUCCESS,
             },
         ]), getState);
-        dispatch(loadRolesIfNeeded(new Set(member.roles.split(' '))));
+        dispatch(loadRolesIfNeeded(member.roles.split(' ')));
 
         return {data: created};
     };

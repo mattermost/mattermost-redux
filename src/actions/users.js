@@ -573,7 +573,7 @@ export function getMe() {
         if (me.error) {
             return me;
         }
-        dispatch(loadRolesIfNeeded(new Set(me.data.roles.split(' '))));
+        dispatch(loadRolesIfNeeded(me.data.roles.split(' ')));
         return me;
     };
 }
@@ -967,7 +967,7 @@ export function updateMe(user) {
             {type: UserTypes.RECEIVED_ME, data},
             {type: UserTypes.UPDATE_ME_SUCCESS},
         ]), getState);
-        dispatch(loadRolesIfNeeded(new Set(data.roles.split(' '))));
+        dispatch(loadRolesIfNeeded(data.roles.split(' ')));
 
         return {data};
     };

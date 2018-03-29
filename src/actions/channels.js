@@ -80,7 +80,7 @@ export function createChannel(channel, userId) {
 
         if (!myMembers[created.id]) {
             actions.push({type: ChannelTypes.RECEIVED_MY_CHANNEL_MEMBER, data: member});
-            dispatch(loadRolesIfNeeded(new Set(member.roles.split(' '))));
+            dispatch(loadRolesIfNeeded(member.roles.split(' ')));
         }
 
         dispatch(batchActions([
@@ -153,7 +153,7 @@ export function createDirectChannel(userId, otherUserId) {
                 data: [{id: userId}, {id: otherUserId}],
             },
         ]), getState);
-        dispatch(loadRolesIfNeeded(new Set(member.roles.split(' '))));
+        dispatch(loadRolesIfNeeded(member.roles.split(' ')));
 
         return {data: created};
     };
@@ -222,7 +222,7 @@ export function createGroupChannel(userIds) {
                 data: profilesInChannel,
             },
         ]), getState);
-        dispatch(loadRolesIfNeeded(new Set(member.roles.split(' '))));
+        dispatch(loadRolesIfNeeded(member.roles.split(' ')));
 
         return {data: created};
     };
@@ -426,7 +426,7 @@ export function getChannelAndMyMember(channelId) {
                 data: member,
             },
         ]), getState);
-        dispatch(loadRolesIfNeeded(new Set(member.roles.split(' '))));
+        dispatch(loadRolesIfNeeded(member.roles.split(' ')));
 
         return {data: {channel, member}};
     };
@@ -672,7 +672,7 @@ export function joinChannel(userId, teamId, channelId, channelName) {
                 type: ChannelTypes.JOIN_CHANNEL_SUCCESS,
             },
         ]), getState);
-        dispatch(loadRolesIfNeeded(new Set(member.roles.split(' '))));
+        dispatch(loadRolesIfNeeded(member.roles.split(' ')));
 
         return {data: {channel, member}};
     };
@@ -757,7 +757,7 @@ export function viewChannel(channelId, prevChannelId = '') {
                 type: ChannelTypes.RECEIVED_MY_CHANNEL_MEMBER,
                 data: {...member, last_viewed_at: new Date().getTime()},
             });
-            dispatch(loadRolesIfNeeded(new Set(member.roles.split(' '))));
+            dispatch(loadRolesIfNeeded(member.roles.split(' ')));
         }
 
         const prevMember = myMembers[prevChannelId];
@@ -766,7 +766,7 @@ export function viewChannel(channelId, prevChannelId = '') {
                 type: ChannelTypes.RECEIVED_MY_CHANNEL_MEMBER,
                 data: {...prevMember, last_viewed_at: new Date().getTime()},
             });
-            dispatch(loadRolesIfNeeded(new Set(prevMember.roles.split(' '))));
+            dispatch(loadRolesIfNeeded(prevMember.roles.split(' ')));
         }
 
         dispatch(batchActions(actions), getState);
@@ -786,7 +786,7 @@ export function markChannelAsViewed(channelId, prevChannelId = '') {
                 type: ChannelTypes.RECEIVED_MY_CHANNEL_MEMBER,
                 data: {...member, last_viewed_at: Date.now()},
             });
-            dispatch(loadRolesIfNeeded(new Set(member.roles.split(' '))));
+            dispatch(loadRolesIfNeeded(member.roles.split(' ')));
         }
 
         const prevMember = myMembers[prevChannelId];
@@ -795,7 +795,7 @@ export function markChannelAsViewed(channelId, prevChannelId = '') {
                 type: ChannelTypes.RECEIVED_MY_CHANNEL_MEMBER,
                 data: {...prevMember, last_viewed_at: Date.now()},
             });
-            dispatch(loadRolesIfNeeded(new Set(prevMember.roles.split(' '))));
+            dispatch(loadRolesIfNeeded(prevMember.roles.split(' ')));
         }
 
         if (actions.length) {
