@@ -150,7 +150,7 @@ export function getUserIdFromChannelName(userId, channelName) {
     return otherUserId;
 }
 
-export function isAutoClosed(config, myPreferences, channel, channelActivity, channelArchiveTime) {
+export function isAutoClosed(config, myPreferences, channel, channelActivity, channelArchiveTime, currentChannelId = '') {
     const cutoff = new Date().getTime() - (7 * 24 * 60 * 60 * 1000);
 
     const viewTimePref = myPreferences[`${Preferences.CATEGORY_CHANNEL_APPROXIMATE_VIEW_TIME}--${channel.id}`];
@@ -161,7 +161,9 @@ export function isAutoClosed(config, myPreferences, channel, channelActivity, ch
 
     const openTimePref = myPreferences[`${Preferences.CATEGORY_CHANNEL_OPEN_TIME}--${channel.id}`];
     const openTime = openTimePref ? parseInt(openTimePref.value, 10) : 0;
-    if (channelArchiveTime && channelArchiveTime > openTime) {
+
+    // Only close archived channels when not being viewed
+    if (channel.id !== currentChannelId && channelArchiveTime && channelArchiveTime > openTime) {
         return true;
     }
 
@@ -186,14 +188,14 @@ export function isDirectChannel(channel) {
     return channel.type === General.DM_CHANNEL;
 }
 
-export function isDirectChannelVisible(otherUserOrOtherUserId, config, myPreferences, channel, lastPost, isUnread) {
+export function isDirectChannelVisible(otherUserOrOtherUserId, config, myPreferences, channel, lastPost, isUnread, currentChannelId) {
     const otherUser = typeof otherUserOrOtherUserId === 'object' ? otherUserOrOtherUserId : null;
     const otherUserId = typeof otherUserOrOtherUserId === 'object' ? otherUserOrOtherUserId.id : otherUserOrOtherUserId;
     const dm = myPreferences[`${Preferences.CATEGORY_DIRECT_CHANNEL_SHOW}--${otherUserId}`];
     if (!dm || dm.value !== 'true') {
         return false;
     }
-    return isUnread || !isAutoClosed(config, myPreferences, channel, lastPost ? lastPost.create_at : 0, otherUser ? otherUser.delete_at : 0);
+    return isUnread || !isAutoClosed(config, myPreferences, channel, lastPost ? lastPost.create_at : 0, otherUser ? otherUser.delete_at : 0, currentChannelId);
 }
 
 export function isGroupChannel(channel) {
