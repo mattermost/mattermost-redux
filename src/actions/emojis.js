@@ -63,11 +63,12 @@ export function getCustomEmojiByName(name: string): ActionFunc {
 
             const actions = [
                 {type: EmojiTypes.GET_CUSTOM_EMOJI_FAILURE, error},
-                logError(error)(dispatch),
             ];
 
             if (error.status_code === 404) {
                 actions.push({type: EmojiTypes.CUSTOM_EMOJI_DOES_NOT_EXIST, data: name});
+            } else {
+                dispatch(logError(error));
             }
 
             dispatch(batchActions(actions), getState);
