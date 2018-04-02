@@ -181,24 +181,30 @@ export const getProfileSetNotInCurrentTeam = createSelector(
     }
 );
 
+const PROFILE_SET_ALL = 'all';
 function sortAndInjectProfiles(profiles, profileSet, skipInactive = false) {
-    const currentProfiles = [];
+    let currentProfiles = [];
     if (typeof profileSet === 'undefined') {
         return currentProfiles;
+    } else if (profileSet === PROFILE_SET_ALL) {
+        currentProfiles = Object.values(profiles);
+    } else {
+        currentProfiles = Array.from(profileSet).map((p) => profiles[p]);
     }
 
-    profileSet.forEach((p) => {
-        const profile = profiles[p];
-        if (skipInactive && profile.delete_at && profile.delete_at !== 0) {
-            return;
-        }
-        currentProfiles.push(profile);
-    });
+    if (skipInactive) {
+        currentProfiles = currentProfiles.filter((profile) => !(profile.delete_at && profile.delete_at !== 0));
+    }
 
-    const sortedCurrentProfiles = currentProfiles.sort(sortByUsername);
-
-    return sortedCurrentProfiles;
+    return currentProfiles.sort(sortByUsername);
 }
+
+export const getProfiles = createSelector(
+    getUsers,
+    (profiles) => {
+        return sortAndInjectProfiles(profiles, PROFILE_SET_ALL);
+    }
+);
 
 export const getProfilesInCurrentChannel = createSelector(
     getUsers,

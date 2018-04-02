@@ -175,6 +175,11 @@ describe('Selectors.Users', () => {
         });
     });
 
+    it('getProfiles', () => {
+        const users = [user1, user2, user3, user4, user5].sort(sortByUsername);
+        assert.deepEqual(Selectors.getProfiles(testState), users);
+    });
+
     it('getProfilesInCurrentTeam', () => {
         const users = [user1, user2].sort(sortByUsername);
         assert.deepEqual(Selectors.getProfilesInCurrentTeam(testState), users);
