@@ -504,7 +504,7 @@ export const getSortedFavoriteChannelWithUnreadsIds = createIdsSelector(
 
             const channel = channels[id];
             const otherUserId = getUserIdFromChannelName(currentUser.id, channel.name);
-            if (channel.type === General.DM_CHANNEL && !isDirectChannelVisible(profiles[otherUserId] || otherUserId, config, prefs, channel, currentChannelId)) {
+            if (channel.type === General.DM_CHANNEL && !isDirectChannelVisible(profiles[otherUserId] || otherUserId, config, prefs, channel, null, null, currentChannelId)) {
                 return false;
             } else if (channel.type === General.GM_CHANNEL && !isGroupChannelVisible(config, prefs, channel)) {
                 return false;
