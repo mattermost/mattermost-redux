@@ -45,6 +45,8 @@ import {createIdsSelector} from 'utils/helpers';
 
 export {
     getCurrentChannelId,
+    getMyChannelMemberships,
+    getMyCurrentChannelMembership,
 };
 
 export function getAllChannels(state) {
