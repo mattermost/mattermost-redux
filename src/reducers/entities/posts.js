@@ -83,7 +83,7 @@ function handleReceivedPosts(posts = {}, postsInChannel = {}, postsInThread = {}
     // Change the state only if we have new posts,
     // otherwise there's no need to create a new object for the same state.
     if (!Object.keys(newPosts).length) {
-        return {posts, postsInChannel};
+        return {posts, postsInChannel, postsInThread};
     }
 
     const nextPosts = {...posts};
