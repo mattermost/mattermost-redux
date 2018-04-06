@@ -6,6 +6,7 @@ import type {TeamsState} from './teams';
 import type {ChannelsState} from './channels';
 import type {PostsState} from './posts';
 import type {AdminState} from './admin';
+import type {JobsState} from './jobs';
 import type {SearchState} from './search';
 import type {IntegrationsState} from './integrations';
 import type {FilesState} from './files';
@@ -33,6 +34,7 @@ export type GlobalState = {
             myPreferences: Object
         },
         admin: AdminState,
+        jobs: JobsState,
         alerts: {
             alertStack: Array<Object>
         },

@@ -1,5 +1,6 @@
 // Copyright (c) 2017-present Mattermost, Inc. All Rights Reserved.
 // See License.txt for license information.
+// @flow
 
 export default {
     CATEGORY_CHANNEL_OPEN_TIME: 'channel_open_time',

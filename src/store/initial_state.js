@@ -66,6 +66,10 @@ const state: GlobalState = {
             config: {},
             complianceReports: {},
         },
+        jobs: {
+            jobs: {},
+            jobsByTypeList: {},
+        },
         alerts: {
             alertStack: [],
         },

@@ -1,5 +1,6 @@
 // Copyright (c) 2017-present Mattermost, Inc. All Rights Reserved.
 // See License.txt for license information.
+// @flow
 
 import ChannelTypes from './channels';
 import ErrorTypes from './errors';

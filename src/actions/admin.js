@@ -1,5 +1,6 @@
 // Copyright (c) 2017-present Mattermost, Inc. All Rights Reserved.
 // See License.txt for license information.
+// @flow
 
 import {AdminTypes} from 'action_types';
 import {General} from 'constants';
@@ -10,7 +11,10 @@ import {logError} from './errors';
 import {bindClientFunc, forceLogoutIfNecessary} from './helpers';
 import {batchActions} from 'redux-batched-actions';
 
-export function getLogs(page = 0, perPage = General.LOGS_PAGE_SIZE_DEFAULT) {
+import type {ActionFunc} from '../types/actions';
+import type {Job} from '../types/jobs';
+
+export function getLogs(page: number = 0, perPage: number = General.LOGS_PAGE_SIZE_DEFAULT): ActionFunc {
     return bindClientFunc(
         Client4.getLogs,
         AdminTypes.GET_LOGS_REQUEST,
@@ -21,7 +25,7 @@ export function getLogs(page = 0, perPage = General.LOGS_PAGE_SIZE_DEFAULT) {
     );
 }
 
-export function getAudits(page = 0, perPage = General.PAGE_SIZE_DEFAULT) {
+export function getAudits(page: number = 0, perPage: number = General.PAGE_SIZE_DEFAULT): ActionFunc {
     return bindClientFunc(
         Client4.getAudits,
         AdminTypes.GET_AUDITS_REQUEST,
@@ -32,7 +36,7 @@ export function getAudits(page = 0, perPage = General.PAGE_SIZE_DEFAULT) {
     );
 }
 
-export function getConfig() {
+export function getConfig(): ActionFunc {
     return bindClientFunc(
         Client4.getConfig,
         AdminTypes.GET_CONFIG_REQUEST,
@@ -41,7 +45,7 @@ export function getConfig() {
     );
 }
 
-export function updateConfig(config) {
+export function updateConfig(config: Object): ActionFunc {
     return bindClientFunc(
         Client4.updateConfig,
         AdminTypes.UPDATE_CONFIG_REQUEST,
@@ -51,7 +55,7 @@ export function updateConfig(config) {
     );
 }
 
-export function reloadConfig() {
+export function reloadConfig(): ActionFunc {
     return bindClientFunc(
         Client4.reloadConfig,
         AdminTypes.RELOAD_CONFIG_REQUEST,
@@ -60,7 +64,7 @@ export function reloadConfig() {
     );
 }
 
-export function testEmail(config) {
+export function testEmail(config: Object): ActionFunc {
     return bindClientFunc(
         Client4.testEmail,
         AdminTypes.TEST_EMAIL_REQUEST,
@@ -70,7 +74,7 @@ export function testEmail(config) {
     );
 }
 
-export function testS3Connection(config) {
+export function testS3Connection(config: Object): ActionFunc {
     return bindClientFunc(
         Client4.testS3Connection,
         AdminTypes.TEST_S3_REQUEST,
@@ -80,7 +84,7 @@ export function testS3Connection(config) {
     );
 }
 
-export function invalidateCaches() {
+export function invalidateCaches(): ActionFunc {
     return bindClientFunc(
         Client4.invalidateCaches,
         AdminTypes.INVALIDATE_CACHES_REQUEST,
@@ -89,7 +93,7 @@ export function invalidateCaches() {
     );
 }
 
-export function recycleDatabase() {
+export function recycleDatabase(): ActionFunc {
     return bindClientFunc(
         Client4.recycleDatabase,
         AdminTypes.RECYCLE_DATABASE_REQUEST,
@@ -98,7 +102,7 @@ export function recycleDatabase() {
     );
 }
 
-export function createComplianceReport(job) {
+export function createComplianceReport(job: Job): ActionFunc {
     return bindClientFunc(
         Client4.createComplianceReport,
         AdminTypes.CREATE_COMPLIANCE_REQUEST,
@@ -108,7 +112,7 @@ export function createComplianceReport(job) {
     );
 }
 
-export function getComplianceReport(reportId) {
+export function getComplianceReport(reportId: string): ActionFunc {
     return bindClientFunc(
         Client4.getComplianceReport,
         AdminTypes.GET_COMPLIANCE_REQUEST,
@@ -118,7 +122,7 @@ export function getComplianceReport(reportId) {
     );
 }
 
-export function getComplianceReports(page = 0, perPage = General.PER_PAGE_DEFAULT) {
+export function getComplianceReports(page: number = 0, perPage: number = General.PAGE_SIZE_DEFAULT): ActionFunc {
     return bindClientFunc(
         Client4.getComplianceReports,
         AdminTypes.GET_COMPLIANCE_REQUEST,
@@ -129,7 +133,7 @@ export function getComplianceReports(page = 0, perPage = General.PER_PAGE_DEFAUL
     );
 }
 
-export function uploadBrandImage(imageData) {
+export function uploadBrandImage(imageData: File): ActionFunc {
     return bindClientFunc(
         Client4.uploadBrandImage,
         AdminTypes.UPLOAD_BRAND_IMAGE_REQUEST,
@@ -139,7 +143,7 @@ export function uploadBrandImage(imageData) {
     );
 }
 
-export function getClusterStatus() {
+export function getClusterStatus(): ActionFunc {
     return bindClientFunc(
         Client4.getClusterStatus,
         AdminTypes.GET_CLUSTER_STATUS_REQUEST,
@@ -148,7 +152,7 @@ export function getClusterStatus() {
     );
 }
 
-export function testLdap() {
+export function testLdap(): ActionFunc {
     return bindClientFunc(
         Client4.testLdap,
         AdminTypes.TEST_LDAP_REQUEST,
@@ -157,7 +161,7 @@ export function testLdap() {
     );
 }
 
-export function syncLdap() {
+export function syncLdap(): ActionFunc {
     return bindClientFunc(
         Client4.syncLdap,
         AdminTypes.SYNC_LDAP_REQUEST,
@@ -166,7 +170,7 @@ export function syncLdap() {
     );
 }
 
-export function getSamlCertificateStatus() {
+export function getSamlCertificateStatus(): ActionFunc {
     return bindClientFunc(
         Client4.getSamlCertificateStatus,
         AdminTypes.SAML_CERT_STATUS_REQUEST,
@@ -175,7 +179,7 @@ export function getSamlCertificateStatus() {
     );
 }
 
-export function uploadPublicSamlCertificate(fileData) {
+export function uploadPublicSamlCertificate(fileData: File): ActionFunc {
     return bindClientFunc(
         Client4.uploadPublicSamlCertificate,
         AdminTypes.UPLOAD_SAML_PUBLIC_REQUEST,
@@ -185,7 +189,7 @@ export function uploadPublicSamlCertificate(fileData) {
     );
 }
 
-export function uploadPrivateSamlCertificate(fileData) {
+export function uploadPrivateSamlCertificate(fileData: File): ActionFunc {
     return bindClientFunc(
         Client4.uploadPrivateSamlCertificate,
         AdminTypes.UPLOAD_SAML_PRIVATE_REQUEST,
@@ -195,7 +199,7 @@ export function uploadPrivateSamlCertificate(fileData) {
     );
 }
 
-export function uploadIdpSamlCertificate(fileData) {
+export function uploadIdpSamlCertificate(fileData: File): ActionFunc {
     return bindClientFunc(
         Client4.uploadIdpSamlCertificate,
         AdminTypes.UPLOAD_SAML_IDP_REQUEST,
@@ -205,7 +209,7 @@ export function uploadIdpSamlCertificate(fileData) {
     );
 }
 
-export function removePublicSamlCertificate() {
+export function removePublicSamlCertificate(): ActionFunc {
     return bindClientFunc(
         Client4.deletePublicSamlCertificate,
         AdminTypes.DELETE_SAML_PUBLIC_REQUEST,
@@ -214,7 +218,7 @@ export function removePublicSamlCertificate() {
     );
 }
 
-export function removePrivateSamlCertificate() {
+export function removePrivateSamlCertificate(): ActionFunc {
     return bindClientFunc(
         Client4.deletePrivateSamlCertificate,
         AdminTypes.DELETE_SAML_PRIVATE_REQUEST,
@@ -223,7 +227,7 @@ export function removePrivateSamlCertificate() {
     );
 }
 
-export function removeIdpSamlCertificate() {
+export function removeIdpSamlCertificate(): ActionFunc {
     return bindClientFunc(
         Client4.deleteIdpSamlCertificate,
         AdminTypes.DELETE_SAML_IDP_REQUEST,
@@ -232,7 +236,7 @@ export function removeIdpSamlCertificate() {
     );
 }
 
-export function testElasticsearch(config) {
+export function testElasticsearch(config: Object): ActionFunc {
     return bindClientFunc(
         Client4.testElasticsearch,
         AdminTypes.TEST_ELASTICSEARCH_REQUEST,
@@ -242,7 +246,7 @@ export function testElasticsearch(config) {
     );
 }
 
-export function purgeElasticsearchIndexes() {
+export function purgeElasticsearchIndexes(): ActionFunc {
     return bindClientFunc(
         Client4.purgeElasticsearchIndexes,
         AdminTypes.PURGE_ELASTICSEARCH_INDEXES_REQUEST,
@@ -251,7 +255,7 @@ export function purgeElasticsearchIndexes() {
     );
 }
 
-export function uploadLicense(fileData) {
+export function uploadLicense(fileData: File): ActionFunc {
     return bindClientFunc(
         Client4.uploadLicense,
         AdminTypes.UPLOAD_LICENSE_REQUEST,
@@ -261,7 +265,7 @@ export function uploadLicense(fileData) {
     );
 }
 
-export function removeLicense() {
+export function removeLicense(): ActionFunc {
     return bindClientFunc(
         Client4.removeLicense,
         AdminTypes.REMOVE_LICENSE_REQUEST,
@@ -270,9 +274,9 @@ export function removeLicense() {
     );
 }
 
-export function getAnalytics(name, teamId = '') {
+export function getAnalytics(name: string, teamId: string = ''): ActionFunc {
     return async (dispatch, getState) => {
-        dispatch({type: AdminTypes.GET_ANALYTICS_REQUEST}, getState);
+        dispatch({type: AdminTypes.GET_ANALYTICS_REQUEST, data: null}, getState);
 
         let data;
         try {
@@ -286,7 +290,7 @@ export function getAnalytics(name, teamId = '') {
             return {error};
         }
 
-        const actions = [{type: AdminTypes.GET_ANALYTICS_SUCCESS}];
+        const actions = [{type: AdminTypes.GET_ANALYTICS_SUCCESS, data: null}];
         if (teamId === '') {
             actions.push({type: AdminTypes.RECEIVED_SYSTEM_ANALYTICS, data, name});
         } else {
@@ -299,26 +303,26 @@ export function getAnalytics(name, teamId = '') {
     };
 }
 
-export function getStandardAnalytics(teamId = '') {
+export function getStandardAnalytics(teamId: string = ''): ActionFunc {
     return getAnalytics('standard', teamId);
 }
 
-export function getAdvancedAnalytics(teamId = '') {
+export function getAdvancedAnalytics(teamId: string = ''): ActionFunc {
     return getAnalytics('extra_counts', teamId);
 }
 
-export function getPostsPerDayAnalytics(teamId = '') {
+export function getPostsPerDayAnalytics(teamId: string = ''): ActionFunc {
     return getAnalytics('post_counts_day', teamId);
 }
 
-export function getUsersPerDayAnalytics(teamId = '') {
+export function getUsersPerDayAnalytics(teamId: string = ''): ActionFunc {
     return getAnalytics('user_counts_with_posts_day', teamId);
 }
 
 // EXPERIMENTAL - SUBJECT TO CHANGE
-export function uploadPlugin(fileData) {
+export function uploadPlugin(fileData: File): ActionFunc {
     return async (dispatch, getState) => {
-        dispatch({type: AdminTypes.UPLOAD_PLUGIN_REQUEST});
+        dispatch({type: AdminTypes.UPLOAD_PLUGIN_REQUEST, data: null});
 
         let data;
         try {
@@ -333,7 +337,7 @@ export function uploadPlugin(fileData) {
         }
 
         dispatch(batchActions([
-            {type: AdminTypes.UPLOAD_PLUGIN_SUCCESS},
+            {type: AdminTypes.UPLOAD_PLUGIN_SUCCESS, data: null},
             {type: AdminTypes.RECEIVED_PLUGIN, data: {...data, active: false}},
         ]));
 
@@ -342,9 +346,9 @@ export function uploadPlugin(fileData) {
 }
 
 // EXPERIMENTAL - SUBJECT TO CHANGE
-export function getPlugins() {
+export function getPlugins(): ActionFunc {
     return async (dispatch, getState) => {
-        dispatch({type: AdminTypes.GET_PLUGIN_REQUEST});
+        dispatch({type: AdminTypes.GET_PLUGIN_REQUEST, data: null});
 
         let data;
         try {
@@ -359,7 +363,7 @@ export function getPlugins() {
         }
 
         dispatch(batchActions([
-            {type: AdminTypes.GET_PLUGIN_SUCCESS},
+            {type: AdminTypes.GET_PLUGIN_SUCCESS, data: null},
             {type: AdminTypes.RECEIVED_PLUGINS, data},
         ]));
 
@@ -368,9 +372,9 @@ export function getPlugins() {
 }
 
 // EXPERIMENTAL - SUBJECT TO CHANGE
-export function removePlugin(pluginId) {
+export function removePlugin(pluginId: string): ActionFunc {
     return async (dispatch, getState) => {
-        dispatch({type: AdminTypes.REMOVE_PLUGIN_REQUEST});
+        dispatch({type: AdminTypes.REMOVE_PLUGIN_REQUEST, data: null});
 
         try {
             await Client4.removePlugin(pluginId);
@@ -384,7 +388,7 @@ export function removePlugin(pluginId) {
         }
 
         dispatch(batchActions([
-            {type: AdminTypes.REMOVE_PLUGIN_SUCCESS},
+            {type: AdminTypes.REMOVE_PLUGIN_SUCCESS, data: null},
             {type: AdminTypes.REMOVED_PLUGIN, data: pluginId},
         ]));
 
@@ -393,9 +397,9 @@ export function removePlugin(pluginId) {
 }
 
 // EXPERIMENTAL - SUBJECT TO CHANGE
-export function activatePlugin(pluginId) {
+export function activatePlugin(pluginId: string): ActionFunc {
     return async (dispatch, getState) => {
-        dispatch({type: AdminTypes.ACTIVATE_PLUGIN_REQUEST});
+        dispatch({type: AdminTypes.ACTIVATE_PLUGIN_REQUEST, data: null});
 
         try {
             await Client4.activatePlugin(pluginId);
@@ -409,7 +413,7 @@ export function activatePlugin(pluginId) {
         }
 
         dispatch(batchActions([
-            {type: AdminTypes.ACTIVATE_PLUGIN_SUCCESS},
+            {type: AdminTypes.ACTIVATE_PLUGIN_SUCCESS, data: null},
             {type: AdminTypes.ACTIVATED_PLUGIN, data: pluginId},
         ]));
 
@@ -418,9 +422,9 @@ export function activatePlugin(pluginId) {
 }
 
 // EXPERIMENTAL - SUBJECT TO CHANGE
-export function deactivatePlugin(pluginId) {
+export function deactivatePlugin(pluginId: string): ActionFunc {
     return async (dispatch, getState) => {
-        dispatch({type: AdminTypes.DEACTIVATE_PLUGIN_REQUEST});
+        dispatch({type: AdminTypes.DEACTIVATE_PLUGIN_REQUEST, data: null});
 
         try {
             await Client4.deactivatePlugin(pluginId);
@@ -434,11 +438,10 @@ export function deactivatePlugin(pluginId) {
         }
 
         dispatch(batchActions([
-            {type: AdminTypes.DEACTIVATE_PLUGIN_SUCCESS},
+            {type: AdminTypes.DEACTIVATE_PLUGIN_SUCCESS, data: null},
             {type: AdminTypes.DEACTIVATED_PLUGIN, data: pluginId},
         ]));
 
         return {data: true};
     };
 }
-
