@@ -1309,7 +1309,7 @@ export function getUserAccessTokens(page = 0, perPage = General.PROFILE_CHUNK_SI
         try {
             data = await Client4.getUserAccessTokens(page, perPage);
         } catch (error) {
-            forceLogoutIfNecessary(error, dispatch);
+            forceLogoutIfNecessary(error, dispatch, getState);
             dispatch(batchActions([
                 {type: UserTypes.GET_USER_ACCESS_TOKEN_FAILURE, error},
                 logError(error)(dispatch),

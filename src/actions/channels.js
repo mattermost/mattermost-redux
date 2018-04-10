@@ -340,7 +340,7 @@ export function getChannelByNameAndTeamName(teamName, channelName) {
         try {
             data = await Client4.getChannelByNameAndTeamName(teamName, channelName);
         } catch (error) {
-            forceLogoutIfNecessary(error, dispatch);
+            forceLogoutIfNecessary(error, dispatch, getState);
             dispatch(batchActions([
                 {type: ChannelTypes.CHANNELS_FAILURE, error},
                 logError(error)(dispatch),
