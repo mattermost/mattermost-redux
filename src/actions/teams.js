@@ -155,7 +155,7 @@ export function deleteTeam(teamId) {
         try {
             await Client4.deleteTeam(teamId);
         } catch (error) {
-            forceLogoutIfNecessary(error, dispatch);
+            forceLogoutIfNecessary(error, dispatch, getState);
             dispatch(batchActions([
                 {type: TeamTypes.DELETE_TEAM_FAILURE, error},
                 logError(error)(dispatch),
