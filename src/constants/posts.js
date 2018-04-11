@@ -22,6 +22,8 @@ export const PostTypes = {
     LEAVE_TEAM: 'system_leave_team',
     ADD_TO_TEAM: 'system_add_to_team',
     REMOVE_FROM_TEAM: 'system_remove_from_team',
+
+    COMBINED_USER_ACTIVITY: 'system_combined_user_activity',
 };
 
 export default {
@@ -47,6 +49,16 @@ export default {
         PostTypes.JOIN_TEAM,
         PostTypes.LEAVE_TEAM,
         PostTypes.ADD_TO_TEAM,
+        PostTypes.REMOVE_FROM_TEAM,
+    ],
+    USER_ACTIVITY_POST_TYPES: [
+        PostTypes.ADD_TO_CHANNEL,
+        PostTypes.JOIN_CHANNEL,
+        PostTypes.LEAVE_CHANNEL,
+        PostTypes.REMOVE_FROM_CHANNEL,
+        PostTypes.ADD_TO_TEAM,
+        PostTypes.JOIN_TEAM,
+        PostTypes.LEAVE_TEAM,
         PostTypes.REMOVE_FROM_TEAM,
     ],
 };

@@ -3,7 +3,7 @@
 
 import {PostTypes, SearchTypes, UserTypes} from 'action_types';
 import {Posts} from 'constants';
-import {comparePosts} from 'utils/post_utils';
+import {comparePosts, combineSystemPost} from 'utils/post_utils';
 
 function handleReceivedPost(posts = {}, postsInChannel = {}, postsInThread = {}, action) {
     const post = action.data;
@@ -39,7 +39,10 @@ function handleReceivedPost(posts = {}, postsInChannel = {}, postsInThread = {},
         ];
     }
 
-    return {posts: nextPosts, postsInChannel: nextPostsInChannel, postsInThread: nextPostsInThread};
+    const combineSystemPosts = combineSystemPost(nextPostsInChannel[channelId], nextPosts);
+    nextPostsInChannel[channelId] = combineSystemPosts.postsForChannel;
+
+    return {posts: combineSystemPosts.nextPosts, postsInChannel: nextPostsInChannel, postsInThread: nextPostsInThread};
 }
 
 function handleRemovePendingPost(posts = {}, postsInChannel = {}, postsInThread = {}, action) {
@@ -145,13 +148,14 @@ function handleReceivedPosts(posts = {}, postsInChannel = {}, postsInThread = {}
 
     // Sort to ensure that the most recent posts are first, with pending
     // and failed posts first
-    postsForChannel.sort((a, b) => {
+    const filteredPostsForChannel = postsForChannel.filter((id) => nextPosts[id]).sort((a, b) => {
         return comparePosts(nextPosts[a], nextPosts[b]);
     });
 
-    nextPostsInChannel[channelId] = postsForChannel;
+    const combineSystemPosts = combineSystemPost(filteredPostsForChannel, nextPosts);
+    nextPostsInChannel[channelId] = combineSystemPosts.postsForChannel;
 
-    return {posts: nextPosts, postsInChannel: nextPostsInChannel, postsInThread: nextPostsInThread};
+    return {posts: combineSystemPosts.nextPosts, postsInChannel: nextPostsInChannel, postsInThread: nextPostsInThread};
 }
 
 function handlePendingPosts(pendingPostIds = [], action) {
@@ -275,7 +279,7 @@ function handlePostDeleted(posts = {}, postsInChannel = {}, postsInThread = {}, 
         const channelPosts = postsInChannel[channelId] ? [...postsInChannel[channelId]] : [];
         const postsForChannel = [...channelPosts]; // make sure we don't modify the array we loop over
         for (const id of channelPosts) {
-            if (nextPosts[id].root_id === post.id) {
+            if (nextPosts[id] && nextPosts[id].root_id === post.id) {
                 Reflect.deleteProperty(nextPosts, id);
 
                 const commentIndex = postsForChannel.indexOf(id);

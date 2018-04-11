@@ -3,9 +3,13 @@
 
 import {General, Posts, Preferences, Permissions} from 'constants';
 
-import {getPreferenceKey} from './preference_utils';
 import {hasNewPermissions} from 'selectors/entities/general';
 import {haveIChannelPermission} from 'selectors/entities/roles';
+
+import {generateId} from './helpers';
+import {getPreferenceKey} from './preference_utils';
+
+const MAX_COMBINED_SYSTEM_POSTS = 100;
 
 export function isPostFlagged(postId, myPreferences) {
     const key = getPreferenceKey(Preferences.CATEGORY_FLAGGED_POST, postId);
@@ -26,6 +30,10 @@ export function isPostEphemeral(post) {
 
 export function shouldIgnorePost(post) {
     return Posts.IGNORE_POST_TYPES.includes(post.type);
+}
+
+export function isUserActivityPost(postType) {
+    return Posts.USER_ACTIVITY_POST_TYPES.includes(postType);
 }
 
 export function isPostOwner(userId, post) {
@@ -174,4 +182,99 @@ export function comparePosts(a, b) {
     }
 
     return 0;
+}
+
+export function combineSystemPost(postsIds = [], posts = {}) {
+    if (postsIds.length === 0) {
+        return {postsForChannel: postsIds, nextPosts: posts};
+    }
+
+    const postsForChannel = [];
+    const nextPosts = {...posts};
+
+    let userActivitySystemPosts = [];
+    let systemPostIds = [];
+    let createAt;
+    let combinedPostId;
+
+    postsIds.forEach((p, i) => {
+        const channelPost = posts[p];
+        if (
+            channelPost.delete_at === 0 &&
+            (isUserActivityPost(channelPost.type) || channelPost.type === Posts.POST_TYPES.COMBINED_USER_ACTIVITY)
+        ) {
+            if (!createAt || createAt > channelPost.create_at) {
+                createAt = channelPost.create_at;
+            }
+
+            if (isUserActivityPost(channelPost.type)) {
+                userActivitySystemPosts = [...userActivitySystemPosts, channelPost];
+                systemPostIds.push(channelPost.id);
+
+                if (nextPosts[channelPost.id]) {
+                    nextPosts[channelPost.id] = {...channelPost, state: Posts.POST_DELETED, delete_at: 1};
+                }
+            } else if (channelPost.type === Posts.POST_TYPES.COMBINED_USER_ACTIVITY) {
+                userActivitySystemPosts = [...userActivitySystemPosts, ...channelPost.user_activity_posts];
+                systemPostIds = [...systemPostIds, ...channelPost.system_post_ids];
+
+                combinedPostId = channelPost.id;
+            }
+        }
+
+        if (channelPost.type === '') {
+            if (userActivitySystemPosts.length > 0) {
+                const combinedPost = {
+                    id: combinedPostId || generateId(),
+                    root_id: '',
+                    type: Posts.POST_TYPES.COMBINED_USER_ACTIVITY,
+                    message: '',
+                    create_at: createAt,
+                    delete_at: 0,
+                    user_activity_posts: userActivitySystemPosts,
+                    system_post_ids: systemPostIds,
+                    state: '',
+                };
+
+                nextPosts[combinedPost.id] = combinedPost;
+                postsForChannel.push(combinedPost.id);
+            }
+
+            userActivitySystemPosts = [];
+            systemPostIds = [];
+            createAt = null;
+            combinedPostId = null;
+
+            postsForChannel.push(channelPost.id);
+        } else if (
+                userActivitySystemPosts.length === MAX_COMBINED_SYSTEM_POSTS ||
+                (userActivitySystemPosts.length > 0 && i === postsIds.length - 1)
+            ) {
+            const combinedPost = {
+                id: combinedPostId || generateId(),
+                root_id: '',
+                type: Posts.POST_TYPES.COMBINED_USER_ACTIVITY,
+                message: '',
+                create_at: createAt,
+                delete_at: 0,
+                user_activity_posts: userActivitySystemPosts,
+                system_post_ids: systemPostIds,
+                state: '',
+            };
+
+            nextPosts[combinedPost.id] = combinedPost;
+            postsForChannel.push(combinedPost.id);
+
+            userActivitySystemPosts = [];
+            systemPostIds = [];
+            createAt = null;
+            combinedPostId = null;
+        }
+    });
+
+    postsForChannel.sort((a, b) => {
+        return comparePosts(nextPosts[a], nextPosts[b]);
+    });
+
+    return {postsForChannel, nextPosts};
 }

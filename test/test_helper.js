@@ -233,6 +233,7 @@ class TestHelper {
         return {
             channel_id: channelId,
             message: `Unit Test ${this.generateId()}`,
+            type: '',
         };
     };
 

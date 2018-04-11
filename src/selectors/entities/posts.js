@@ -56,7 +56,7 @@ export const getPostsInCurrentChannel = createSelector(
     getAllPosts,
     getPostIdsInCurrentChannel,
     (posts, postIds) => {
-        return postIds.map((id) => posts[id]);
+        return postIds.filter((id) => posts[id]).map((id) => posts[id]);
     }
 );
 
@@ -217,20 +217,24 @@ export function makeGetPostsInChannel() {
                 return null;
             }
 
+            const filteredPostIds = postIds.filter((id) => allPosts[id]);
+
             const posts = [];
 
             const joinLeavePref = myPreferences[getPreferenceKey(Preferences.CATEGORY_ADVANCED_SETTINGS, 'join_leave')];
             const showJoinLeave = joinLeavePref ? joinLeavePref.value !== 'false' : true;
 
-            for (let i = 0; i < postIds.length && i < numPosts; i++) {
-                const post = allPosts[postIds[i]];
+            for (let i = 0; i < filteredPostIds.length && i < numPosts; i++) {
+                const post = allPosts[filteredPostIds[i]];
 
                 if (shouldFilterJoinLeavePost(post, showJoinLeave, currentUser.username)) {
                     continue;
                 }
 
-                const previousPost = allPosts[postIds[i + 1]] || {create_at: 0};
-                posts.push(formatPostInChannel(post, previousPost, i, allPosts, postsInThread, postIds, currentUser));
+                const previousPost = allPosts[filteredPostIds[i + 1]] || {create_at: 0};
+                if (post) {
+                    posts.push(formatPostInChannel(post, previousPost, i, allPosts, postsInThread, filteredPostIds, currentUser));
+                }
             }
 
             return posts;
@@ -433,7 +437,7 @@ export const getLatestReplyablePostId = createSelector(
     getPostsInCurrentChannel,
     (posts) => {
         for (const post of posts) {
-            if (post.state !== Posts.POST_DELETED && !isSystemMessage(post) && !isPostEphemeral(post)) {
+            if (post && post.state !== Posts.POST_DELETED && !isSystemMessage(post) && !isPostEphemeral(post)) {
                 return post.id;
             }
         }
