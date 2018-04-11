@@ -11,16 +11,18 @@ import type {SearchState} from './search';
 import type {IntegrationsState} from './integrations';
 import type {FilesState} from './files';
 import type {EmojisState} from './emojis';
-import type {ChannelsRequestsStatuses,
-             GeneralRequestsStatuses,
-             PostsRequestsStatuses,
-             TeamsRequestsStatuses,
-             UsersRequestsStatuses,
-             PreferencesRequestsStatuses,
-             AdminRequestsStatuses,
-             EmojisRequestsStatuses,
-             FilesRequestsStatuses,
-             IntegrationsRequestsStatuses,
+import type {SchemesState} from './schemes';
+import type {
+    ChannelsRequestsStatuses,
+        GeneralRequestsStatuses,
+        PostsRequestsStatuses,
+        TeamsRequestsStatuses,
+        UsersRequestsStatuses,
+        PreferencesRequestsStatuses,
+        AdminRequestsStatuses,
+        EmojisRequestsStatuses,
+        FilesRequestsStatuses,
+        IntegrationsRequestsStatuses,
 } from './requests';
 
 export type GlobalState = {
@@ -42,7 +44,8 @@ export type GlobalState = {
         integrations: IntegrationsState,
         files: FilesState,
         emojis: EmojisState,
-        typing: Object
+        typing: Object,
+        schemes: SchemesState,
     },
     errors: Array<Object>,
     requests: {
