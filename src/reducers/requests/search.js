@@ -38,7 +38,22 @@ function flaggedPosts(state: RequestStatusType = initialRequestState(), action: 
     );
 }
 
+function recentMentions(state: RequestStatusType = initialRequestState(), action: GenericAction): RequestStatusType {
+    if (action.type === SearchTypes.REMOVE_SEARCH_POSTS) {
+        return initialRequestState();
+    }
+
+    return handleRequest(
+        SearchTypes.SEARCH_RECENT_MENTIONS_REQUEST,
+        SearchTypes.SEARCH_RECENT_MENTIONS_SUCCESS,
+        SearchTypes.SEARCH_RECENT_MENTIONS_FAILURE,
+        state,
+        action
+    );
+}
+
 export default combineReducers({
     flaggedPosts,
+    recentMentions,
     searchPosts,
 });

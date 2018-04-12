@@ -7,7 +7,7 @@ import {Client4} from 'client';
 import {SearchTypes} from 'action_types';
 
 import {getCurrentTeamId} from 'selectors/entities/teams';
-import {getCurrentUserId} from 'selectors/entities/users';
+import {getCurrentUserId, getCurrentUserMentionKeys} from 'selectors/entities/users';
 
 import {getChannelAndMyMember, getChannelMembers} from './channels';
 import {forceLogoutIfNecessary} from './helpers';
@@ -118,6 +118,51 @@ export function getFlaggedPosts() {
                 type: SearchTypes.SEARCH_FLAGGED_POSTS_SUCCESS,
             },
         ], 'SEARCH_FLAGGED_POSTS_BATCH'), getState);
+
+        return {data: posts};
+    };
+}
+
+export function getRecentMentions() {
+    return async (dispatch, getState) => {
+        const state = getState();
+        const teamId = getCurrentTeamId(state);
+
+        dispatch({type: SearchTypes.SEARCH_RECENT_MENTIONS_REQUEST}, getState);
+
+        let posts;
+        try {
+            const termKeys = getCurrentUserMentionKeys(getState()).filter(({key}) => {
+                return key !== '@channel' && key !== '@all' && key !== '@here';
+            });
+
+            const terms = termKeys.map(({key}) => key).join(' ').trim() + ' ';
+
+            Client4.trackEvent('api', 'api_posts_search_mention');
+            posts = await Client4.searchPosts(teamId, terms, true);
+
+            await Promise.all([
+                getProfilesAndStatusesForPosts(posts.posts, dispatch, getState),
+                getMissingChannelsFromPosts(posts.posts)(dispatch, getState),
+            ]);
+        } catch (error) {
+            forceLogoutIfNecessary(error, dispatch, getState);
+            dispatch(batchActions([
+                {type: SearchTypes.SEARCH_RECENT_MENTIONS_FAILURE, error},
+                logError(error)(dispatch),
+            ]), getState);
+            return {error};
+        }
+
+        dispatch(batchActions([
+            {
+                type: SearchTypes.RECEIVED_SEARCH_POSTS,
+                data: posts,
+            },
+            {
+                type: SearchTypes.SEARCH_RECENT_MENTIONS_SUCCESS,
+            },
+        ], 'SEARCH_RECENT_MENTIONS_BATCH'), getState);
 
         return {data: posts};
     };
