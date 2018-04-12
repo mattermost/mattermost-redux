@@ -72,7 +72,9 @@ export function canEditPost(state, config, license, teamId, channelId, userId, p
         if (hasNewPermissions(state)) {
             canEdit = canEdit && haveIChannelPermission(state, {team: teamId, channel: channelId, permission: Permissions.EDIT_POST});
             if (!isOwner) {
-                canEdit = canEdit && haveIChannelPermission(state, {team: teamId, channel: channelId, permission: Permissions.EDIT_OTHERS_POSTS});
+                // I only can edit my posts, at least until phase-2
+                //canEdit = canEdit && haveIChannelPermission(state, {team: teamId, channel: channelId, permission: Permissions.EDIT_OTHERS_POSTS});
+                canEdit = false;
             }
             if (config.PostEditTimeLimit !== '-1' && config.PostEditTimeLimit !== -1) {
                 const timeLeft = (post.create_at + (config.PostEditTimeLimit * 1000)) - Date.now();
