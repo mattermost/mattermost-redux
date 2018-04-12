@@ -6,6 +6,9 @@ import {batchActions} from 'redux-batched-actions';
 import {Client4} from 'client';
 import {SearchTypes} from 'action_types';
 
+import {getCurrentTeamId} from 'selectors/entities/teams';
+import {getCurrentUserId} from 'selectors/entities/users';
+
 import {getChannelAndMyMember, getChannelMembers} from './channels';
 import {forceLogoutIfNecessary} from './helpers';
 import {logError} from './errors';
@@ -79,6 +82,44 @@ export function clearSearch() {
         dispatch({type: SearchTypes.REMOVE_SEARCH_POSTS}, getState);
 
         return {data: true};
+    };
+}
+
+export function getFlaggedPosts() {
+    return async (dispatch, getState) => {
+        const state = getState();
+        const userId = getCurrentUserId(state);
+        const teamId = getCurrentTeamId(state);
+
+        dispatch({type: SearchTypes.SEARCH_FLAGGED_POSTS_REQUEST}, getState);
+
+        let posts;
+        try {
+            posts = await Client4.getFlaggedPosts(userId, '', teamId);
+            await Promise.all([
+                getProfilesAndStatusesForPosts(posts.posts, dispatch, getState),
+                getMissingChannelsFromPosts(posts.posts)(dispatch, getState),
+            ]);
+        } catch (error) {
+            forceLogoutIfNecessary(error, dispatch, getState);
+            dispatch(batchActions([
+                {type: SearchTypes.SEARCH_FLAGGED_POSTS_FAILURE, error},
+                logError(error)(dispatch),
+            ]), getState);
+            return {error};
+        }
+
+        dispatch(batchActions([
+            {
+                type: SearchTypes.RECEIVED_SEARCH_FLAGGED_POSTS,
+                data: posts,
+            },
+            {
+                type: SearchTypes.SEARCH_FLAGGED_POSTS_SUCCESS,
+            },
+        ], 'SEARCH_FLAGGED_POSTS_BATCH'), getState);
+
+        return {data: posts};
     };
 }
 

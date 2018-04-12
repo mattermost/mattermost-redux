@@ -2,7 +2,8 @@
 // See License.txt for license information.
 
 import {combineReducers} from 'redux';
-import {PostTypes, SearchTypes, UserTypes} from 'action_types';
+import {PostTypes, PreferenceTypes, SearchTypes, UserTypes} from 'action_types';
+import {Preferences} from 'constants';
 
 function results(state = [], action) {
     switch (action.type) {
@@ -17,6 +18,65 @@ function results(state = [], action) {
             newState.splice(index, 1);
             return newState;
         }
+        return state;
+    }
+    case SearchTypes.REMOVE_SEARCH_POSTS:
+    case UserTypes.LOGOUT_SUCCESS:
+        return [];
+
+    default:
+        return state;
+    }
+}
+
+function flagged(state = [], action) {
+    switch (action.type) {
+    case SearchTypes.RECEIVED_SEARCH_FLAGGED_POSTS: {
+        return action.data.order;
+    }
+    case PostTypes.REMOVE_POST: {
+        const postId = action.data ? action.data.id : null;
+        const index = state.indexOf(postId);
+        if (index !== -1) {
+            const newState = [...state];
+            newState.splice(index, 1);
+            return newState;
+        }
+        return state;
+    }
+    case PreferenceTypes.RECEIVED_PREFERENCES: {
+        if (action.data) {
+            const nextState = [...state];
+            let hasNewFlaggedPosts = false;
+            action.data.forEach((pref) => {
+                if (pref.category === Preferences.CATEGORY_FLAGGED_POST) {
+                    hasNewFlaggedPosts = true;
+                    nextState.unshift(pref.name);
+                }
+            });
+
+            return hasNewFlaggedPosts ? nextState : state;
+        }
+
+        return state;
+    }
+    case PreferenceTypes.DELETED_PREFERENCES: {
+        if (action.data) {
+            const nextState = [...state];
+            let flaggedPostsRemoved = false;
+            action.data.forEach((pref) => {
+                if (pref.category === Preferences.CATEGORY_FLAGGED_POST) {
+                    const index = state.indexOf(pref.name);
+                    if (index !== -1) {
+                        flaggedPostsRemoved = true;
+                        nextState.splice(index, 1);
+                    }
+                }
+            });
+
+            return flaggedPostsRemoved ? nextState : state;
+        }
+
         return state;
     }
     case SearchTypes.REMOVE_SEARCH_POSTS:
@@ -73,6 +133,9 @@ function recent(state = {}, action) {
 }
 
 export default combineReducers({
+
+    // An ordered array with posts ids of flagged posts
+    flagged,
 
     // An ordered array with posts ids from the search results
     results,

@@ -1260,6 +1260,13 @@ export default class Client4 {
         );
     };
 
+    getPost = async (postId) => {
+        return this.doFetch(
+            `${this.getPostRoute(postId)}`,
+            {method: 'get'}
+        );
+    };
+
     patchPost = async (post) => {
         this.trackEvent('api', 'api_posts_patch', {channel_id: post.channel_id});
 

@@ -346,6 +346,7 @@ function handlePosts(posts = {}, postsInChannel = {}, postsInThread = {}, action
         return handleRemovePost(posts, postsInChannel, postsInThread, action);
 
     case SearchTypes.RECEIVED_SEARCH_POSTS:
+    case SearchTypes.RECEIVED_SEARCH_FLAGGED_POSTS:
         return handlePostsFromSearch(posts, postsInChannel, postsInThread, action);
 
     case UserTypes.LOGOUT_SUCCESS:

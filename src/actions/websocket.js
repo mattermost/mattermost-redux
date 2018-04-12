@@ -18,6 +18,7 @@ import {
     markChannelAsViewed,
 } from './channels';
 import {
+    getPost,
     getPosts,
     getPostsSince,
     getProfilesAndStatusesForPosts,
@@ -599,9 +600,20 @@ function handlePreferenceChangedEvent(msg, dispatch, getState) {
 
 function handlePreferencesChangedEvent(msg, dispatch, getState) {
     const preferences = JSON.parse(msg.data.preferences);
-    dispatch({type: PreferenceTypes.RECEIVED_PREFERENCES, data: preferences}, getState);
 
+    getAddedPostsIfNecessary(preferences, dispatch, getState);
     getAddedDmUsersIfNecessary(preferences, dispatch, getState);
+    dispatch({type: PreferenceTypes.RECEIVED_PREFERENCES, data: preferences});
+}
+
+function getAddedPostsIfNecessary(preferences, dispatch, getState) {
+    const state = getState();
+    const {posts} = state.entities.posts;
+    preferences.forEach((pref) => {
+        if (pref.category === Preferences.CATEGORY_FLAGGED_POST && !posts[pref.name]) {
+            dispatch(getPost(pref.name));
+        }
+    });
 }
 
 function getAddedDmUsersIfNecessary(preferences, dispatch, getState) {
