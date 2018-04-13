@@ -20,6 +20,37 @@ import {deletePreferences, savePreferences} from './preferences';
 import {getProfilesByIds, getProfilesByUsernames, getStatusesByIds} from './users';
 import {systemEmojis, getCustomEmojiByName, getCustomEmojisByName} from './emojis';
 
+export function getPost(postId) {
+    return async (dispatch, getState) => {
+        dispatch({type: PostTypes.GET_POSTS_REQUEST}, getState);
+        let post;
+
+        try {
+            post = await Client4.getPost(postId);
+            getProfilesAndStatusesForPosts([post], dispatch, getState);
+        } catch (error) {
+            forceLogoutIfNecessary(error, dispatch, getState);
+            dispatch(batchActions([
+                {type: PostTypes.GET_POSTS_FAILURE, error},
+                logError(error)(dispatch),
+            ]), getState);
+            return {error};
+        }
+
+        dispatch(batchActions([
+            {
+                type: PostTypes.RECEIVED_POST,
+                data: post,
+            },
+            {
+                type: PostTypes.GET_POSTS_SUCCESS,
+            },
+        ]), getState);
+
+        return {data: post};
+    };
+}
+
 export function createPost(post, files = []) {
     return async (dispatch, getState) => {
         const state = getState();
