@@ -54,9 +54,9 @@
   "scripts": {
     "build": "babel src --out-dir .",
     "webpack": "webpack",
-    "dev": "babel src --out-dir ${WEBAPP_DIR:-../mattermost-webapp}/node_modules/mattermost-redux --source-maps && yarn dev:flow-copy",
+    "dev": "babel src --out-dir ${WEBAPP_DIR:-../mattermost-webapp}/node_modules/mattermost-redux --source-maps && npm dev:flow-copy",
     "dev:flow-copy": "flow-copy-source src ${WEBAPP_DIR:-../mattermost-webapp}/node_modules/mattermost-redux",
-    "dev-mobile": "babel src --out-dir ${MOBILE_DIR:-../mattermost-mobile}/node_modules/mattermost-redux --source-maps && yarn dev-mobile:flow-copy",
+    "dev-mobile": "babel src --out-dir ${MOBILE_DIR:-../mattermost-mobile}/node_modules/mattermost-redux --source-maps && npm dev-mobile:flow-copy",
     "dev-mobile:flow-copy": "flow-copy-source src ${MOBILE_DIR:-../mattermost-webapp}/node_modules/mattermost-redux",
     "dev:watch": "babel --watch src --out-dir ${WEBAPP_DIR:-../mattermost-webapp}/node_modules/mattermost-redux --source-maps",
     "dev-mobile:watch": "babel --watch src --out-dir ${MOBILE_DIR:-../mattermost-mobile}/node_modules/mattermost-redux --source-maps",
