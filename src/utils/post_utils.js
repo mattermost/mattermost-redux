@@ -184,7 +184,7 @@ export function comparePosts(a, b) {
     return 0;
 }
 
-export function combineSystemPost(postsIds = [], posts = {}) {
+export function combineSystemPosts(postsIds = [], posts = {}, channelId) {
     if (postsIds.length === 0) {
         return {postsForChannel: postsIds, nextPosts: posts};
     }
@@ -222,37 +222,15 @@ export function combineSystemPost(postsIds = [], posts = {}) {
             }
         }
 
-        if (channelPost.type === '') {
-            if (userActivitySystemPosts.length > 0) {
-                const combinedPost = {
-                    id: combinedPostId || generateId(),
-                    root_id: '',
-                    type: Posts.POST_TYPES.COMBINED_USER_ACTIVITY,
-                    message: '',
-                    create_at: createAt,
-                    delete_at: 0,
-                    user_activity_posts: userActivitySystemPosts,
-                    system_post_ids: systemPostIds,
-                    state: '',
-                };
-
-                nextPosts[combinedPost.id] = combinedPost;
-                postsForChannel.push(combinedPost.id);
-            }
-
-            userActivitySystemPosts = [];
-            systemPostIds = [];
-            createAt = null;
-            combinedPostId = null;
-
-            postsForChannel.push(channelPost.id);
-        } else if (
-                userActivitySystemPosts.length === MAX_COMBINED_SYSTEM_POSTS ||
-                (userActivitySystemPosts.length > 0 && i === postsIds.length - 1)
-            ) {
+        if (
+            (channelPost.type === '' && userActivitySystemPosts.length > 0) ||
+            userActivitySystemPosts.length === MAX_COMBINED_SYSTEM_POSTS ||
+            (userActivitySystemPosts.length > 0 && i === postsIds.length - 1)
+        ) {
             const combinedPost = {
                 id: combinedPostId || generateId(),
                 root_id: '',
+                channel_id: channelId,
                 type: Posts.POST_TYPES.COMBINED_USER_ACTIVITY,
                 message: '',
                 create_at: createAt,
@@ -269,6 +247,12 @@ export function combineSystemPost(postsIds = [], posts = {}) {
             systemPostIds = [];
             createAt = null;
             combinedPostId = null;
+
+            if (channelPost.type === '') {
+                postsForChannel.push(channelPost.id);
+            }
+        } else if (channelPost.type === '') {
+            postsForChannel.push(channelPost.id);
         }
     });
 

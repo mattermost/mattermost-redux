@@ -8,7 +8,7 @@ import {Permissions} from 'constants';
 
 import {
     canEditPost,
-    combineSystemPost,
+    combineSystemPosts,
     isSystemMessage,
     isUserActivityPost,
     shouldFilterJoinLeavePost,
@@ -380,7 +380,7 @@ describe('PostUtils', () => {
         });
     });
 
-    describe('combineSystemPost', () => {
+    describe('combineSystemPosts', () => {
         const postIdUA1 = '11';
         const postIdUA2 = '12';
         const postIdUA5 = '15';
@@ -407,7 +407,7 @@ describe('PostUtils', () => {
         const post22 = {id: '22', type: '', state: '', create_at: 22, props: {}, delete_at: 0};
 
         it('should combine consecutive user activity posts', () => {  // eslint-disable-line
-            const out = combineSystemPost([postIdUA2, postIdUA1], {[postIdUA1]: postUA1, [postIdUA2]: postUA2});
+            const out = combineSystemPosts([postIdUA2, postIdUA1], {[postIdUA1]: postUA1, [postIdUA2]: postUA2});
 
             assert.equal(out.postsForChannel.length, 1);
             assert.equal(Object.keys(out.nextPosts).length, 3);
@@ -422,7 +422,7 @@ describe('PostUtils', () => {
         });
 
         it('should combine consecutive user activity posts between posts', () => {  // eslint-disable-line
-            const out = combineSystemPost(
+            const out = combineSystemPosts(
                 [postId18, postId17, postIdUA6, postIdUA5, postId14, postId13, postIdUA2, postIdUA1, postId2, postId1],
                 {
                     [postId1]: post1,
@@ -469,7 +469,7 @@ describe('PostUtils', () => {
                 user_activity_posts: [{id: '10'}, {id: '9'}],
                 system_post_ids: ['10', '9'],
             };
-            const out = combineSystemPost(
+            const out = combineSystemPosts(
                 [postIdUA2, postIdUA1, combinedPost.id],
                 {[combinedPost.id]: combinedPost, [postIdUA1]: postUA1, [postIdUA2]: postUA2}
             );
@@ -495,7 +495,7 @@ describe('PostUtils', () => {
                 user_activity_posts: [{id: '14'}, {id: '13'}],
                 system_post_ids: ['14', '13'],
             };
-            const out = combineSystemPost(
+            const out = combineSystemPosts(
                 [combinedPost.id, postIdUA2, postIdUA1],
                 {[combinedPost.id]: combinedPost, [postIdUA1]: postUA1, [postIdUA2]: postUA2}
             );
@@ -511,7 +511,7 @@ describe('PostUtils', () => {
         });
 
         it('should combine consecutive combined and user activity posts between regular posts', () => {  // eslint-disable-line
-            const out = combineSystemPost(
+            const out = combineSystemPosts(
                 [postId22, postIdUA2, postIdUA1, postId2, postId1],
                 {[postIdUA1]: postUA1, [postIdUA2]: postUA2, [postId1]: post1, [postId2]: post2, [postId22]: post22}
             );
@@ -539,7 +539,7 @@ describe('PostUtils', () => {
                 system_post_ids: ['10', '9'],
             };
 
-            const out = combineSystemPost(
+            const out = combineSystemPosts(
                 [postId22, postIdUA2, postIdUA1, combinedPost.id, postId2, postId1],
                 {[postId1]: post1, [postId2]: post2, [combinedPost.id]: combinedPost, [postIdUA1]: postUA1, [postIdUA2]: postUA2, [postId22]: post22}
             );
