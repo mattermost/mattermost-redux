@@ -58,13 +58,13 @@ export function generateMfaSecret(userId) {
     );
 }
 
-export function createUser(user, data, hash, inviteId) {
+export function createUser(user, token, inviteId) {
     return async (dispatch, getState) => {
         dispatch({type: UserTypes.CREATE_USER_REQUEST}, getState);
 
         let created;
         try {
-            created = await Client4.createUser(user, data, hash, inviteId);
+            created = await Client4.createUser(user, token, inviteId);
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch, getState);
             dispatch(batchActions([
