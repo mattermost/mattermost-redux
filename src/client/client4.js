@@ -265,14 +265,10 @@ export default class Client4 {
 
     // User Routes
 
-    createUser = async (user, data, token, inviteId) => {
+    createUser = async (user, token, inviteId) => {
         this.trackEvent('api', 'api_users_create');
 
         const queryParams = {};
-
-        if (data) {
-            queryParams.d = data;
-        }
 
         if (token) {
             queryParams.t = token;
@@ -918,10 +914,10 @@ export default class Client4 {
         );
     };
 
-    addToTeamFromInvite = async (token = '', data = '', inviteId = '') => {
+    addToTeamFromInvite = async (token = '', inviteId = '') => {
         this.trackEvent('api', 'api_teams_invite_members');
 
-        const query = buildQueryString({token, data, invite_id: inviteId});
+        const query = buildQueryString({token, invite_id: inviteId});
         return this.doFetch(
             `${this.getTeamsRoute()}/members/invite${query}`,
             {method: 'post'}
