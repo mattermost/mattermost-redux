@@ -1710,4 +1710,29 @@ describe('getCurrentUsersLatestPost', () => {
 
         assert.equal(actual, postsAny.f);
     });
+
+    it('determine the sending posts', () => {
+        const state = {
+            entities: {
+                users: {
+                    currentUserId: user1.id,
+                    profiles,
+                },
+                posts: {
+                    posts: {},
+                    postsInChannel: {},
+                    sendingPostIds: ['1', '2', '3'],
+                },
+                channels: {
+                    currentChannelId: 'abcd',
+                },
+            },
+        };
+
+        assert.equal(Selectors.isPostIdSending(state, '1'), true);
+        assert.equal(Selectors.isPostIdSending(state, '2'), true);
+        assert.equal(Selectors.isPostIdSending(state, '3'), true);
+        assert.equal(Selectors.isPostIdSending(state, '4'), false);
+        assert.equal(Selectors.isPostIdSending(state), false);
+    });
 });

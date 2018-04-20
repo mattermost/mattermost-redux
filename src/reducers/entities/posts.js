@@ -191,6 +191,42 @@ function handlePendingPosts(pendingPostIds = [], action) {
     }
 }
 
+function handleSendingPosts(sendingPostIds = [], action) {
+    switch (action.type) {
+    case PostTypes.RECEIVED_NEW_POST: {
+        const sendingPostId = action.data.id;
+        if (sendingPostIds.includes(sendingPostId)) {
+            return sendingPostIds;
+        }
+
+        return [
+            ...sendingPostIds,
+            sendingPostId,
+        ];
+    }
+    case PostTypes.RECEIVED_POST: {
+        const sendingPostId = action.data.id;
+        if (!sendingPostIds.includes(sendingPostId)) {
+            return sendingPostIds;
+        }
+
+        return sendingPostIds.filter((postId) => postId !== sendingPostId);
+    }
+    case PostTypes.RECEIVED_POSTS: {
+        const postIds = Object.values(action.data.posts).map((post) => post.pending_post_id);
+
+        const nextSendingPostIds = sendingPostIds.filter((sendingPostId) => !postIds.includes(sendingPostId));
+        if (nextSendingPostIds.length === sendingPostIds.length) {
+            return sendingPostIds;
+        }
+
+        return nextSendingPostIds;
+    }
+    default:
+        return sendingPostIds;
+    }
+}
+
 function handlePostsFromSearch(posts = {}, postsInChannel = {}, postsInThread = {}, action) {
     const newPosts = action.data.posts;
     let info = {posts, postsInChannel, postsInThread};
@@ -546,6 +582,9 @@ export default function(state = {}, action) {
         // Array that contains the pending post ids for those messages that are in transition to being created
         pendingPostIds: handlePendingPosts(state.pendingPostIds, action),
 
+        // Array that contains the sending post ids for those messages being sent to the server.
+        sendingPostIds: handleSendingPosts(state.sendingPostIds, action),
+
         // Object mapping channel ids to an array of posts ids in that channel with the most recent post first
         postsInChannel,
 
@@ -571,6 +610,7 @@ export default function(state = {}, action) {
     if (state.posts === nextState.posts && state.postsInChannel === nextState.postsInChannel &&
         state.postsInThread === nextState.postsInThread &&
         state.pendingPostIds === nextState.pendingPostIds &&
+        state.sendingPostIds === nextState.sendingPostIds &&
         state.selectedPostId === nextState.selectedPostId &&
         state.currentFocusedPostId === nextState.currentFocusedPostId &&
         state.reactions === nextState.reactions &&
