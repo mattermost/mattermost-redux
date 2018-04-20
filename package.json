@@ -10,7 +10,7 @@
     "redux": "3.7.2",
     "redux-action-buffer": "1.1.0",
     "redux-batched-actions": "0.2.0",
-    "redux-offline": "git+https://github.com/enahum/redux-offline.git",
+    "redux-offline": "git+https://github.com/enahum/redux-offline.git#4bd85e7e3b279a2b11fb4d587808d583d2b5e7b5",
     "redux-persist": "4.9.1",
     "redux-thunk": "2.2.0",
     "reselect": "3.0.1",
