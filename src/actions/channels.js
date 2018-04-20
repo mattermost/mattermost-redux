@@ -290,6 +290,37 @@ export function updateChannel(channel) {
     };
 }
 
+export function convertChannelToPrivate(channelId) {
+    return async (dispatch, getState) => {
+        dispatch({type: ChannelTypes.UPDATE_CHANNEL_REQUEST}, getState);
+
+        let convertedChannel;
+        try {
+            convertedChannel = await Client4.convertChannelToPrivate(channelId);
+        } catch (error) {
+            forceLogoutIfNecessary(error, dispatch, getState);
+
+            dispatch(batchActions([
+                {type: ChannelTypes.UPDATE_CHANNEL_FAILURE, error},
+                logError(error)(dispatch),
+            ]), getState);
+            return {error};
+        }
+
+        dispatch(batchActions([
+            {
+                type: ChannelTypes.RECEIVED_CHANNEL,
+                data: convertedChannel,
+            },
+            {
+                type: ChannelTypes.UPDATE_CHANNEL_SUCCESS,
+            },
+        ]), getState);
+
+        return {data: convertedChannel};
+    };
+}
+
 export function updateChannelNotifyProps(userId, channelId, props) {
     return async (dispatch, getState) => {
         dispatch({type: ChannelTypes.NOTIFY_PROPS_REQUEST}, getState);
