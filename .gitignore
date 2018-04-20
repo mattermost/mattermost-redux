@@ -10,6 +10,7 @@
 #
 node_modules/
 npm-debug.log
+.npminstall
 .yarninstall
 
 # Vim
