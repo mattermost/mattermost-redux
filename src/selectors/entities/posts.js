@@ -476,3 +476,6 @@ export const getPostIdsInChannel = createIdsSelector(
         return postIdsInChannel || [];
     }
 );
+
+export const isPostIdSending = (state, postId) =>
+    state.entities.posts.sendingPostIds.some((sendingPostId) => sendingPostId === postId);

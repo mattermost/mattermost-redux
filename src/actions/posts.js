@@ -59,6 +59,10 @@ export function createPost(post, files = []) {
         const timestamp = Date.now();
         const pendingPostId = post.pending_post_id || `${currentUserId}:${timestamp}`;
 
+        if (Selectors.isPostIdSending(state, pendingPostId)) {
+            return {data: true};
+        }
+
         let newPost = {
             ...post,
             pending_post_id: pendingPostId,
@@ -96,7 +100,7 @@ export function createPost(post, files = []) {
                 offline: {
                     effect: () => Client4.createPost({...newPost, create_at: 0}),
                     commit: (success, payload) => {
-                        // Use RECEIVED_POSTS to clear pending posts
+                        // Use RECEIVED_POSTS to clear pending and sending posts
                         const actions = [{
                             type: PostTypes.RECEIVED_POSTS,
                             data: {

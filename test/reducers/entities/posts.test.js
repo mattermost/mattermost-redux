@@ -37,10 +37,130 @@ describe('Reducers.posts', () => {
                 },
                 postsInThread: {},
                 pendingPostIds: ['other_post_id'],
+                sendingPostIds: [],
             },
         };
 
         state = postsReducer(state, testAction);
         assert.deepEqual(state, testAction.result);
+    });
+
+    describe('sendingPostIds', () => {
+        it('should remain unchanged for an UNKNOWN action', () => {
+            const state = ['other_post'];
+            const action = {
+                type: 'UNKNOWN',
+            };
+            const expectedState = state;
+
+            const actualState = postsReducer({sendingPostIds: state}, action);
+            assert.strictEqual(actualState.sendingPostIds, expectedState);
+        });
+
+        it('should add a new post id on RECEIVED_NEW_POST', () => {
+            const state = ['other_post'];
+            const action = {
+                type: PostTypes.RECEIVED_NEW_POST,
+                data: {
+                    id: 'post_id',
+                    channel_id: 'channel_id',
+                    pending_post_id: 'post_id',
+                },
+            };
+            const expectedState = ['other_post', 'post_id'];
+
+            const actualState = postsReducer({sendingPostIds: state}, action);
+            assert.deepEqual(expectedState, actualState.sendingPostIds);
+        });
+
+        it('should remain unchanged if given an existing post id on RECEIVED_NEW_POST', () => {
+            const state = ['other_post', 'post_id'];
+            const action = {
+                type: PostTypes.RECEIVED_NEW_POST,
+                data: {
+                    id: 'post_id',
+                    channel_id: 'channel_id',
+                    pending_post_id: 'post_id',
+                },
+            };
+            const expectedState = state;
+
+            const actualState = postsReducer({sendingPostIds: state}, action);
+            assert.strictEqual(actualState.sendingPostIds, expectedState);
+        });
+
+        it('should remain remove a post on RECEIVED_POST', () => {
+            const state = ['other_post', 'post_id'];
+            const action = {
+                type: PostTypes.RECEIVED_POST,
+                data: {
+                    id: 'post_id',
+                },
+            };
+            const expectedState = ['other_post'];
+
+            const actualState = postsReducer({sendingPostIds: state}, action);
+            assert.deepEqual(actualState.sendingPostIds, expectedState);
+        });
+
+        it('should remain unchanged if given a non-existing post on RECEIVED_POST', () => {
+            const state = ['other_post'];
+            const action = {
+                type: PostTypes.RECEIVED_POST,
+                data: {
+                    id: 'post_id',
+                },
+            };
+            const expectedState = state;
+
+            const actualState = postsReducer({sendingPostIds: state}, action);
+            assert.strictEqual(actualState.sendingPostIds, expectedState);
+        });
+
+        it('should remain remove a post on RECEIVED_POSTS', () => {
+            const state = ['other_post', 'post_id'];
+            const action = {
+                type: PostTypes.RECEIVED_POSTS,
+                data: {
+                    posts: {
+                        actual_post_id: {
+                            id: 'actual_post_id',
+                            pending_post_id: 'post_id',
+                        },
+                        different_actual_post_id: {
+                            id: 'different_actual_post_id',
+                            pending_post_id: 'different_post_id',
+                        },
+                    },
+                },
+            };
+            const expectedState = ['other_post'];
+
+            const actualState = postsReducer({sendingPostIds: state}, action);
+            assert.deepEqual(actualState.sendingPostIds, expectedState);
+        });
+
+        it('should remain unchanged if given a non-existing post on RECEIVED_POSTS', () => {
+            const state = ['other_post'];
+            const action = {
+                type: PostTypes.RECEIVED_POSTS,
+                data: {
+                    posts: {
+                        actual_post_id: {
+                            id: 'actual_post_id',
+                            pending_post_id: 'post_id',
+                        },
+                        different_actual_post_id: {
+                            id: 'different_actual_post_id',
+                            pending_post_id: 'different_post_id',
+                        },
+                    },
+                },
+            };
+            const expectedState = state;
+
+            const actualState = postsReducer({sendingPostIds: state}, action);
+            assert.strictEqual(actualState.sendingPostIds, expectedState);
+        });
     });
 });
