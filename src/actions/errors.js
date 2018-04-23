@@ -37,6 +37,9 @@ export function logError(error, displayable = false) {
         if (error.stack && error.stack.includes('TypeError: Failed to fetch')) {
             sendToServer = false;
         }
+        if (error.server_error_id) {
+            sendToServer = false;
+        }
 
         if (sendToServer) {
             try {
