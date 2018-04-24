@@ -132,7 +132,7 @@ async function handleReconnect(dispatch, getState) {
     getClientConfig()(dispatch, getState);
     getMyPreferences()(dispatch, getState);
     getMe()(dispatch, getState);
-    
+
     if (currentTeamId) {
         getMyTeams()(dispatch, getState);
         getMyTeamMembers()(dispatch, getState);
