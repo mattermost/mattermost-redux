@@ -5,7 +5,7 @@ import {batchActions} from 'redux-batched-actions';
 
 import {Client4} from 'client';
 import websocketClient from 'client/websocket_client';
-import {getProfilesByIds, getStatusesByIds, loadProfilesForDirect} from './users';
+import {getProfilesByIds, getStatusesByIds, loadProfilesForDirect, getMe} from './users';
 import {
     fetchMyChannelsAndMembers,
     getChannelAndMyMember,
@@ -131,7 +131,8 @@ async function handleReconnect(dispatch, getState) {
     getLicenseConfig()(dispatch, getState);
     getClientConfig()(dispatch, getState);
     getMyPreferences()(dispatch, getState);
-
+    getMe()(dispatch, getState);
+    
     if (currentTeamId) {
         getMyTeams()(dispatch, getState);
         getMyTeamMembers()(dispatch, getState);
