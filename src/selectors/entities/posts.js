@@ -251,29 +251,19 @@ export function makeGetPostsAroundPost() {
                 return null;
             }
 
-            const focusedPostIndex = postIds.indexOf(focusedPostId);
-            if (focusedPostIndex === -1) {
-                return null;
-            }
-
-            const desiredPostIndexBefore = focusedPostIndex - (Posts.POST_CHUNK_SIZE / 2);
-            const minPostIndex = desiredPostIndexBefore < 0 ? 0 : desiredPostIndexBefore;
-
-            const slicedPostIds = postIds.slice(minPostIndex);
-
             const posts = [];
             const joinLeavePref = myPreferences[getPreferenceKey(Preferences.CATEGORY_ADVANCED_SETTINGS, 'join_leave')];
             const showJoinLeave = joinLeavePref ? joinLeavePref.value !== 'false' : true;
 
-            for (let i = 0; i < slicedPostIds.length; i++) {
-                const post = allPosts[slicedPostIds[i]];
+            for (let i = 0; i < postIds.length; i++) {
+                const post = allPosts[postIds[i]];
 
                 if (shouldFilterJoinLeavePost(post, showJoinLeave, currentUser.username)) {
                     continue;
                 }
 
-                const previousPost = allPosts[slicedPostIds[i + 1]] || {create_at: 0};
-                const formattedPost = formatPostInChannel(post, previousPost, i, allPosts, postsInThread, slicedPostIds, currentUser);
+                const previousPost = allPosts[postIds[i + 1]] || {create_at: 0};
+                const formattedPost = formatPostInChannel(post, previousPost, i, allPosts, postsInThread, postIds, currentUser);
 
                 if (post.id === focusedPostId) {
                     formattedPost.highlight = true;
