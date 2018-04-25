@@ -5,7 +5,7 @@ import {General, Preferences, Permissions} from 'constants';
 import {displayUsername} from './user_utils';
 import {getPreferencesByCategory} from './preference_utils';
 import {hasNewPermissions} from 'selectors/entities/general';
-import {haveITeamPermission} from 'selectors/entities/roles';
+import {haveITeamPermission, haveIChannelPermission} from 'selectors/entities/roles';
 
 const channelTypeOrder = {
     [General.OPEN_CHANNEL]: 0,
@@ -256,9 +256,9 @@ export function showCreateOption(state, config, license, teamId, channelType, is
 export function showManagementOptions(state, config, license, channel, isAdmin, isSystemAdmin, isChannelAdmin) {
     if (hasNewPermissions(state)) {
         if (channel.type === General.OPEN_CHANNEL) {
-            return haveITeamPermission(state, {team: channel.team_idteamId, permission: Permissions.MANAGE_PUBLIC_CHANNEL_PROPERTIES});
+            return haveIChannelPermission(state, {channel: channel.id, team: channel.team_id, permission: Permissions.MANAGE_PUBLIC_CHANNEL_PROPERTIES});
         } else if (channel.type === General.PRIVATE_CHANNEL) {
-            return haveITeamPermission(state, {team: channel.team_id, permission: Permissions.MANAGE_PRIVATE_CHANNEL_PROPERTIES});
+            return haveIChannelPermission(state, {channel: channel.id, team: channel.team_id, permission: Permissions.MANAGE_PRIVATE_CHANNEL_PROPERTIES});
         }
         return true;
     }
@@ -295,9 +295,9 @@ export function showManagementOptions(state, config, license, channel, isAdmin, 
 export function showDeleteOption(state, config, license, channel, isAdmin, isSystemAdmin, isChannelAdmin) {
     if (hasNewPermissions(state)) {
         if (channel.type === General.OPEN_CHANNEL) {
-            return haveITeamPermission(state, {team: channel.team_idteamId, permission: Permissions.DELETE_PUBLIC_CHANNEL});
+            return haveIChannelPermission(state, {channel: channel.id, team: channel.team_id, permission: Permissions.DELETE_PUBLIC_CHANNEL});
         } else if (channel.type === General.PRIVATE_CHANNEL) {
-            return haveITeamPermission(state, {team: channel.team_id, permission: Permissions.DELETE_PRIVATE_CHANNEL});
+            return haveIChannelPermission(state, {channel: channel.id, team: channel.team_id, permission: Permissions.DELETE_PRIVATE_CHANNEL});
         }
         return true;
     }
