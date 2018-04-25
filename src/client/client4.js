@@ -1086,6 +1086,15 @@ export default class Client4 {
         );
     };
 
+    convertChannelToPrivate = async (channelId) => {
+        this.trackEvent('api', 'api_channels_convert_to_private', {channel_id: channelId});
+
+        return this.doFetch(
+            `${this.getChannelRoute(channelId)}/convert`,
+            {method: 'post'}
+        );
+    };
+
     patchChannel = async (channelId, patch) => {
         this.trackEvent('api', 'api_channels_patch', {channel_id: channelId});
 
