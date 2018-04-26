@@ -4,7 +4,6 @@
 import {createSelector} from 'reselect';
 
 import {getCurrentUrl} from 'selectors/entities/general';
-import {getCurrentUser} from 'selectors/entities/users';
 
 import {createIdsSelector} from 'utils/helpers';
 import {isTeamAdmin} from 'utils/user_utils';
@@ -154,8 +153,8 @@ export const getJoinableTeams = createSelector(
 export const getSortedJoinableTeams = createSelector(
     getTeams,
     getJoinableTeamIds,
-    getCurrentUser,
-    (teams, joinableTeamIds, currentUser) => {
+    (state, locale) => locale,
+    (teams, joinableTeamIds, locale) => {
         const openTeams = {};
 
         for (const id of joinableTeamIds) {
@@ -163,11 +162,11 @@ export const getSortedJoinableTeams = createSelector(
         }
 
         function sortTeams(a, b) {
-            const options = {
-                numeric: true,
-                sensitivity: 'base',
-            };
-            return a.display_name.localeCompare(b.display_name, currentUser.locale || 'en', options);
+            if (a.display_name !== b.display_name) {
+                return a.display_name.toLowerCase().localeCompare(b.display_name.toLowerCase(), locale || 'en', {numeric: true});
+            }
+
+            return a.name.toLowerCase().localeCompare(b.name.toLowerCase(), locale || 'en', {numeric: true});
         }
 
         return Object.values(openTeams).sort(sortTeams);
