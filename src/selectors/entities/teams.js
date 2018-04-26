@@ -140,6 +140,20 @@ export const getJoinableTeamIds = createIdsSelector(
 export const getJoinableTeams = createSelector(
     getTeams,
     getJoinableTeamIds,
+    (teams, joinableTeamIds) => {
+        const openTeams = {};
+
+        for (const id of joinableTeamIds) {
+            openTeams[id] = teams[id];
+        }
+
+        return openTeams;
+    }
+);
+
+export const getSortedJoinableTeams = createSelector(
+    getTeams,
+    getJoinableTeamIds,
     getCurrentUser,
     (teams, joinableTeamIds, currentUser) => {
         const openTeams = {};
