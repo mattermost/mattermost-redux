@@ -4,6 +4,7 @@
 import {createSelector} from 'reselect';
 
 import {getCurrentUrl} from 'selectors/entities/general';
+import {getCurrentUser} from 'selectors/entities/users';
 
 import {createIdsSelector} from 'utils/helpers';
 import {isTeamAdmin} from 'utils/user_utils';
@@ -139,14 +140,23 @@ export const getJoinableTeamIds = createIdsSelector(
 export const getJoinableTeams = createSelector(
     getTeams,
     getJoinableTeamIds,
-    (teams, joinableTeamIds) => {
+    getCurrentUser,
+    (teams, joinableTeamIds, currentUser) => {
         const openTeams = {};
 
         for (const id of joinableTeamIds) {
             openTeams[id] = teams[id];
         }
 
-        return openTeams;
+        function sortTeams(a, b) {
+            const options = {
+                numeric: true,
+                sensitivity: 'base',
+            };
+            return a.display_name.localeCompare(b.display_name, currentUser.locale || 'en', options);
+        }
+
+        return Object.values(openTeams).sort(sortTeams);
     }
 );
 
