@@ -150,6 +150,29 @@ export const getJoinableTeams = createSelector(
     }
 );
 
+export const getSortedJoinableTeams = createSelector(
+    getTeams,
+    getJoinableTeamIds,
+    (state, locale) => locale,
+    (teams, joinableTeamIds, locale) => {
+        const openTeams = {};
+
+        for (const id of joinableTeamIds) {
+            openTeams[id] = teams[id];
+        }
+
+        function sortTeams(a, b) {
+            if (a.display_name !== b.display_name) {
+                return a.display_name.toLowerCase().localeCompare(b.display_name.toLowerCase(), locale || 'en', {numeric: true});
+            }
+
+            return a.name.toLowerCase().localeCompare(b.name.toLowerCase(), locale || 'en', {numeric: true});
+        }
+
+        return Object.values(openTeams).sort(sortTeams);
+    }
+);
+
 export const getMySortedTeamIds = createIdsSelector(
     getTeams,
     getTeamMemberships,

@@ -25,6 +25,8 @@ describe('Selectors.Teams', () => {
     team2.display_name = 'Core Team';
     team3.allow_open_invite = true;
     team4.allow_open_invite = true;
+    team3.display_name = 'Team AA';
+    team4.display_name = 'aa-team';
     team5.delete_at = 10;
     team5.allow_open_invite = true;
 
@@ -81,6 +83,13 @@ describe('Selectors.Teams', () => {
         openTeams[team3.id] = team3;
         openTeams[team4.id] = team4;
         assert.deepEqual(Selectors.getJoinableTeams(testState), openTeams);
+    });
+
+    it('getSortedJoinableTeams', () => {
+        const openTeams = [team4, team3];
+        const joinableTeams = Selectors.getSortedJoinableTeams(testState);
+        assert.strictEqual(joinableTeams[0], openTeams[0]);
+        assert.strictEqual(joinableTeams[1], openTeams[1]);
     });
 
     it('isCurrentUserCurrentTeamAdmin', () => {
