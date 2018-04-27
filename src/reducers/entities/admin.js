@@ -48,6 +48,19 @@ function config(state = {}, action) {
     }
 }
 
+function environmentConfig(state = {}, action) {
+    switch (action.type) {
+    case AdminTypes.RECEIVED_ENVIRONMENT_CONFIG: {
+        return action.data;
+    }
+    case UserTypes.LOGOUT_SUCCESS:
+        return {};
+
+    default:
+        return state;
+    }
+}
+
 function complianceReports(state = {}, action) {
     switch (action.type) {
     case AdminTypes.RECEIVED_COMPLIANCE_REPORT: {
@@ -383,6 +396,9 @@ export default combineReducers({
 
     // object representing the server configuration
     config,
+
+    // object representing which fields of the server configuration were set through the environment config
+    environmentConfig,
 
     // object where every key is a report id and has an object with report details
     complianceReports,

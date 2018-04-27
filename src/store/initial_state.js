@@ -64,6 +64,7 @@ const state: GlobalState = {
             logs: [],
             audits: {},
             config: {},
+            environmentConfig: {},
             complianceReports: {},
         },
         jobs: {

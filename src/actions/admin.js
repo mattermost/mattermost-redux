@@ -64,6 +64,15 @@ export function reloadConfig(): ActionFunc {
     );
 }
 
+export function getEnvironmentConfig(): ActionFunc {
+    return bindClientFunc(
+        Client4.getEnvironmentConfig,
+        AdminTypes.GET_ENVIRONMENT_CONFIG_REQUEST,
+        [AdminTypes.RECEIVED_ENVIRONMENT_CONFIG, AdminTypes.GET_ENVIRONMENT_CONFIG_SUCCESS],
+        AdminTypes.GET_ENVIRONMENT_CONFIG_FAILURE
+    );
+}
+
 export function testEmail(config: Object): ActionFunc {
     return bindClientFunc(
         Client4.testEmail,

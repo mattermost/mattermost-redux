@@ -13,6 +13,10 @@ export function getConfig(state) {
     return state.entities.admin.config;
 }
 
+export function getEnvironmentConfig(state) {
+    return state.entities.admin.environmentConfig;
+}
+
 export function getComplianceReports(state) {
     return state.entities.admin.complianceReports;
 }

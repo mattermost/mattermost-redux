@@ -60,6 +60,16 @@ function reloadConfig(state: RequestStatusType = initialRequestState(), action: 
     );
 }
 
+function getEnvironmentConfig(state: RequestStatusType = initialRequestState(), action: GenericAction): RequestStatusType {
+    return handleRequest(
+        AdminTypes.GET_ENVIRONMENT_CONFIG_REQUEST,
+        AdminTypes.GET_ENVIRONMENT_CONFIG_SUCCESS,
+        AdminTypes.GET_ENVIRONMENT_CONFIG_FAILURE,
+        state,
+        action
+    );
+}
+
 function testEmail(state: RequestStatusType = initialRequestState(), action: GenericAction): RequestStatusType {
     return handleRequest(
         AdminTypes.TEST_EMAIL_REQUEST,
@@ -336,6 +346,7 @@ export default combineReducers({
     getConfig,
     updateConfig,
     reloadConfig,
+    getEnvironmentConfig,
     testEmail,
     testS3Connection,
     invalidateCaches,
