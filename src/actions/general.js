@@ -14,7 +14,7 @@ export function getPing(useV3 = false) {
         dispatch({type: GeneralTypes.PING_REQUEST}, getState);
 
         let data;
-        const pingError = new FormattedError(
+        let pingError = new FormattedError(
             'mobile.server_ping_failed',
             'Cannot connect to the server. Please check your server URL and internet connection.'
         );
@@ -35,6 +35,9 @@ export function getPing(useV3 = false) {
                     Client.setUrl(Client4.getUrl());
                 }
                 return getPing(true)(dispatch, getState);
+            } else if (error.status_code === 401) {
+                // When the server requires a client certificate to connect.
+                pingError = error;
             }
             dispatch({type: GeneralTypes.PING_FAILURE, error: pingError}, getState);
             return {error: pingError};

@@ -33,7 +33,7 @@ class WebSocketClient {
             webSocketConnector: WebSocket,
         };
 
-        const {connectionUrl, forceConnection, webSocketConnector, platform} = Object.assign({}, defaults, opts);
+        const {connectionUrl, forceConnection, webSocketConnector, platform, ...additionalOptions} = Object.assign({}, defaults, opts);
 
         if (platform) {
             this.platform = platform;
@@ -83,7 +83,7 @@ class WebSocketClient {
                 }
             }
 
-            this.conn = new Socket(connectionUrl, [], {headers: {origin}});
+            this.conn = new Socket(connectionUrl, [], {headers: {origin}, ...(additionalOptions || {})});
             this.connectionUrl = connectionUrl;
             this.token = token;
             this.dispatch = dispatch;
