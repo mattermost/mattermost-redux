@@ -22,6 +22,7 @@ function teams(state = {}, action) {
     case TeamTypes.RECEIVED_TEAMS_LIST:
         return Object.assign({}, state, teamListToMap(action.data));
     case TeamTypes.RECEIVED_TEAMS:
+    case SchemeTypes.RECEIVED_SCHEME_TEAMS:
         return Object.assign({}, state, action.data);
 
     case TeamTypes.CREATED_TEAM:
@@ -41,14 +42,6 @@ function teams(state = {}, action) {
         }
 
         return state;
-    }
-
-    case SchemeTypes.RECEIVED_SCHEME_TEAMS: {
-        const nextState = {...state};
-        for (const team of action.data) {
-            nextState[team.id] = team;
-        }
-        return nextState;
     }
 
     case UserTypes.LOGOUT_SUCCESS:

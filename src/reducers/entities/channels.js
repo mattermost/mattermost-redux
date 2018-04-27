@@ -45,7 +45,8 @@ function channels(state = {}, action) {
             [action.data.id]: action.data,
         };
 
-    case ChannelTypes.RECEIVED_CHANNELS: {
+    case ChannelTypes.RECEIVED_CHANNELS:
+    case SchemeTypes.RECEIVED_SCHEME_CHANNELS: {
         const nextState = {...state};
         for (const channel of action.data) {
             nextState[channel.id] = channel;
@@ -100,14 +101,6 @@ function channels(state = {}, action) {
                 total_msg_count: channel.total_msg_count + amount,
             },
         };
-    }
-
-    case SchemeTypes.RECEIVED_SCHEME_CHANNELS: {
-        const nextState = {...state};
-        for (const channel of action.data) {
-            nextState[channel.id] = channel;
-        }
-        return nextState;
     }
 
     case UserTypes.LOGOUT_SUCCESS:
