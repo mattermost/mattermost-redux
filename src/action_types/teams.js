@@ -29,6 +29,10 @@ export default keyMirror({
     SET_TEAM_ICON_SUCCESS: null,
     SET_TEAM_ICON_FAILURE: null,
 
+    REMOVE_TEAM_ICON_REQUEST: null,
+    REMOVE_TEAM_ICON_SUCCESS: null,
+    REMOVE_TEAM_ICON_FAILURE: null,
+
     MY_TEAM_MEMBERS_REQUEST: null,
     MY_TEAM_MEMBERS_SUCCESS: null,
     MY_TEAM_MEMBERS_FAILURE: null,

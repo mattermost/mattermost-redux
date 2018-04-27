@@ -170,6 +170,16 @@ function setTeamIcon(state = initialRequestState(), action) {
     );
 }
 
+function removeTeamIcon(state = initialRequestState(), action) {
+    return handleRequest(
+        TeamTypes.REMOVE_TEAM_ICON_REQUEST,
+        TeamTypes.REMOVE_TEAM_ICON_SUCCESS,
+        TeamTypes.REMOVE_TEAM_ICON_FAILURE,
+        state,
+        action
+    );
+}
+
 export default combineReducers({
     getMyTeams,
     getTeams,
@@ -187,4 +197,5 @@ export default combineReducers({
     emailInvite,
     joinTeam,
     setTeamIcon,
+    removeTeamIcon,
 });

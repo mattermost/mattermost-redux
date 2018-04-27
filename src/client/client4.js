@@ -1039,6 +1039,15 @@ export default class Client4 {
         );
     };
 
+    removeTeamIcon = async (teamId) => {
+        this.trackEvent('api', 'api_team_remove_team_icon');
+
+        return this.doFetch(
+            `${this.getTeamRoute(teamId)}/image`,
+            {method: 'delete'}
+        );
+    };
+
     // Channel Routes
 
     createChannel = async (channel) => {
