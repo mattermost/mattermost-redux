@@ -20,9 +20,9 @@ function currentTeamId(state = '', action) {
 function teams(state = {}, action) {
     switch (action.type) {
     case TeamTypes.RECEIVED_TEAMS_LIST:
+    case SchemeTypes.RECEIVED_SCHEME_TEAMS:
         return Object.assign({}, state, teamListToMap(action.data));
     case TeamTypes.RECEIVED_TEAMS:
-    case SchemeTypes.RECEIVED_SCHEME_TEAMS:
         return Object.assign({}, state, action.data);
 
     case TeamTypes.CREATED_TEAM:
