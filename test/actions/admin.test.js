@@ -159,6 +159,34 @@ describe('Actions.Admin', () => {
         }
     });
 
+    it('getEnvironmentConfig', async () => {
+        nock(Client4.getBaseRoute()).
+            get('/config/environment').
+            reply(200, {
+                ServiceSettings: {
+                    SiteURL: true,
+                },
+                TeamSettings: {
+                    SiteName: true,
+                },
+            });
+
+        await store.dispatch(Actions.getEnvironmentConfig());
+
+        const state = store.getState();
+        const request = state.requests.admin.getEnvironmentConfig;
+        if (request.status === RequestStatus.FAILURE) {
+            throw new Error('getEnvironmentConfig request failed');
+        }
+
+        const config = state.entities.admin.environmentConfig;
+        assert.ok(config);
+        assert.ok(config.ServiceSettings);
+        assert.ok(config.ServiceSettings.SiteURL);
+        assert.ok(config.TeamSettings);
+        assert.ok(config.TeamSettings.SiteName);
+    });
+
     it('testEmail', async () => {
         nock(Client4.getBaseRoute()).
             get('/config').

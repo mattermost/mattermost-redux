@@ -1945,6 +1945,13 @@ export default class Client4 {
         );
     };
 
+    getEnvironmentConfig = async () => {
+        return this.doFetch(
+            `${this.getBaseRoute()}/config/environment`,
+            {method: 'get'}
+        );
+    };
+
     testEmail = async (config) => {
         return this.doFetch(
             `${this.getBaseRoute()}/email/test`,
