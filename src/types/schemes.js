@@ -10,10 +10,10 @@ export type Scheme = {
     update_at: number,
     delete_at: number,
     scope: SchemeScope,
-    defaultteamadminrole: string,
-    defaultteamuserrole: string,
-    defaultchanneladminrole: string,
-    defaultchanneluserrole: string,
+    default_team_admin_role: string,
+    default_team_user_role: string,
+    default_channel_admin_role: string,
+    default_channel_user_role: string,
 };
 
 export type SchemesState = {
