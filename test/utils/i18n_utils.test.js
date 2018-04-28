@@ -1,0 +1,21 @@
+// Copyright (c) 2018-present Mattermost, Inc. All Rights Reserved.
+// See License.txt for license information.
+
+import assert from 'assert';
+
+import {setLocalizeFunction, localizeMessage} from 'utils/i18n_utils';
+
+describe('i18n utils', () => {
+    it('should return default message', () => {
+        assert.equal(localizeMessage('someting.string', 'defaultString'), 'defaultString');
+    });
+
+    it('should return previously set Localized function return value', () => {
+        function mockFunc() {
+            return 'test';
+        }
+
+        setLocalizeFunction(mockFunc);
+        assert.equal(localizeMessage('someting.string', 'defaultString'), 'test');
+    });
+});
