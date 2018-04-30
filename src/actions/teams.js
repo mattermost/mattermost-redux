@@ -576,3 +576,13 @@ export function setTeamIcon(teamId, imageData) {
         imageData
     );
 }
+
+export function removeTeamIcon(teamId) {
+    return bindClientFunc(
+        Client4.removeTeamIcon,
+        TeamTypes.REMOVE_TEAM_ICON_REQUEST,
+        TeamTypes.REMOVE_TEAM_ICON_SUCCESS,
+        TeamTypes.REMOVE_TEAM_ICON_FAILURE,
+        teamId,
+    );
+}

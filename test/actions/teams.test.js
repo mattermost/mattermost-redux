@@ -673,4 +673,23 @@ describe('Actions.Teams', () => {
             throw new Error(JSON.stringify(setTeamIconRequest.error));
         }
     });
+
+    it('removeTeamIcon', async () => {
+        TestHelper.mockLogin();
+        await login(TestHelper.basicUser.email, 'password1')(store.dispatch, store.getState);
+
+        const team = TestHelper.basicTeam;
+
+        nock(Client4.getTeamRoute(team.id)).
+            delete('/image').
+            reply(200, OK_RESPONSE);
+
+        await Actions.removeTeamIcon(team.id)(store.dispatch, store.getState);
+
+        const removeTeamIconRequest = store.getState().requests.teams.removeTeamIcon;
+
+        if (removeTeamIconRequest.status === RequestStatus.FAILURE) {
+            throw new Error(JSON.stringify(removeTeamIconRequest.error));
+        }
+    });
 });
