@@ -230,9 +230,7 @@ export function makeGetPostsInChannel() {
                 }
 
                 const previousPost = allPosts[postIds[i + 1]] || {create_at: 0};
-                if (post) {
-                    posts.push(formatPostInChannel(post, previousPost, i, allPosts, postsInThread, postIds, currentUser));
-                }
+                posts.push(formatPostInChannel(post, previousPost, i, allPosts, postsInThread, postIds, currentUser));
             }
 
             return posts;

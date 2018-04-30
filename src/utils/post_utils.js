@@ -184,6 +184,93 @@ export function comparePosts(a, b) {
     return 0;
 }
 
+function extractUserActivityData(userActivities) {
+    const postTypePriority = {
+        [Posts.POST_TYPES.JOIN_TEAM]: 0,
+        [Posts.POST_TYPES.ADD_TO_TEAM]: 1,
+        [Posts.POST_TYPES.REMOVE_FROM_TEAM]: 2,
+        [Posts.POST_TYPES.LEAVE_TEAM]: 3,
+        [Posts.POST_TYPES.JOIN_CHANNEL]: 4,
+        [Posts.POST_TYPES.ADD_TO_CHANNEL]: 5,
+        [Posts.POST_TYPES.REMOVE_FROM_CHANNEL]: 6,
+        [Posts.POST_TYPES.LEAVE_CHANNEL]: 7,
+    };
+
+    const messageData = [];
+    const allUserIds = [];
+
+    Object.entries(userActivities).forEach(([postType, values]) => {
+        if (
+            postType === Posts.POST_TYPES.ADD_TO_TEAM ||
+            postType === Posts.POST_TYPES.ADD_TO_CHANNEL
+        ) {
+            Object.entries(values).forEach(([actorId, userIds]) => {
+                messageData.push({postType, userIds, actorId});
+                allUserIds.push(...userIds, actorId);
+            });
+        } else {
+            messageData.push({postType, userIds: values});
+            allUserIds.push(...values);
+        }
+    });
+
+    messageData.sort((a, b) => postTypePriority[a.postType] > postTypePriority[b.postType]);
+
+    return {
+        allUserIds: allUserIds.reduce((acc, curr) => {
+            if (!acc.includes(curr)) {
+                acc.push(curr);
+            }
+            return acc;
+        }, []),
+        messageData,
+    };
+}
+
+export function combineUserActivitySystemPost(systemPosts = []) {
+    if (systemPosts.length === 0) {
+        return null;
+    }
+
+    const userActivities = systemPosts.reduce((acc, post) => {
+        const postType = post.type;
+        let userActivityProps = acc;
+        const combinedPostType = userActivityProps[postType];
+
+        if (
+            postType === Posts.POST_TYPES.ADD_TO_TEAM ||
+            postType === Posts.POST_TYPES.ADD_TO_CHANNEL
+        ) {
+            if (combinedPostType) {
+                const addedUserIds = combinedPostType[post.user_id] || [];
+                if (!addedUserIds.includes(post.props.addedUserId)) {
+                    addedUserIds.push(post.props.addedUserId);
+                    combinedPostType[post.user_id] = addedUserIds;
+                }
+            } else {
+                userActivityProps[postType] = {[post.user_id]: [post.props.addedUserId]};
+            }
+        } else {
+            let propsUserId = post.user_id;
+            if (postType === Posts.POST_TYPES.REMOVE_FROM_CHANNEL) {
+                propsUserId = post.props.removedUserId;
+            }
+
+            if (combinedPostType) {
+                if (!combinedPostType.includes(propsUserId)) {
+                    userActivityProps[postType] = [...combinedPostType, propsUserId];
+                }
+            } else {
+                userActivityProps = {...userActivityProps, [postType]: [propsUserId]};
+            }
+        }
+
+        return userActivityProps;
+    }, {});
+
+    return extractUserActivityData(userActivities);
+}
+
 export function combineSystemPosts(postsIds = [], posts = {}, channelId) {
     if (postsIds.length === 0) {
         return {postsForChannel: postsIds, nextPosts: posts};
@@ -194,6 +281,7 @@ export function combineSystemPosts(postsIds = [], posts = {}, channelId) {
 
     let userActivitySystemPosts = [];
     let systemPostIds = [];
+    let messages = [];
     let createAt;
     let combinedPostId;
 
@@ -208,15 +296,17 @@ export function combineSystemPosts(postsIds = [], posts = {}, channelId) {
             }
 
             if (isUserActivityPost(channelPost.type)) {
-                userActivitySystemPosts = [...userActivitySystemPosts, channelPost];
+                userActivitySystemPosts.push(channelPost);
                 systemPostIds.push(channelPost.id);
+                messages.push(channelPost.message);
 
                 if (nextPosts[channelPost.id]) {
                     nextPosts[channelPost.id] = {...channelPost, state: Posts.POST_DELETED, delete_at: 1};
                 }
             } else if (channelPost.type === Posts.POST_TYPES.COMBINED_USER_ACTIVITY) {
-                userActivitySystemPosts = [...userActivitySystemPosts, ...channelPost.user_activity_posts];
-                systemPostIds = [...systemPostIds, ...channelPost.system_post_ids];
+                userActivitySystemPosts.push(...channelPost.user_activity_posts);
+                systemPostIds.push(...channelPost.system_post_ids);
+                messages.push(...channelPost.props.messages);
 
                 combinedPostId = channelPost.id;
             }
@@ -232,10 +322,14 @@ export function combineSystemPosts(postsIds = [], posts = {}, channelId) {
                 root_id: '',
                 channel_id: channelId,
                 type: Posts.POST_TYPES.COMBINED_USER_ACTIVITY,
-                message: '',
+                message: messages.join('\n'),
                 create_at: createAt,
                 delete_at: 0,
                 user_activity_posts: userActivitySystemPosts,
+                props: {
+                    user_activity: combineUserActivitySystemPost(userActivitySystemPosts),
+                    messages,
+                },
                 system_post_ids: systemPostIds,
                 state: '',
             };
@@ -245,6 +339,7 @@ export function combineSystemPosts(postsIds = [], posts = {}, channelId) {
 
             userActivitySystemPosts = [];
             systemPostIds = [];
+            messages = [];
             createAt = null;
             combinedPostId = null;
 
