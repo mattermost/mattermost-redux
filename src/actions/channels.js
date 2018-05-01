@@ -1283,6 +1283,32 @@ export function unfavoriteChannel(channelId) {
     };
 }
 
+export function updateChannelScheme(channelId, schemeId) {
+    return async (dispatch, getState) => {
+        dispatch({type: ChannelTypes.UPDATE_CHANNEL_SCHEME_REQUEST}, getState);
+
+        try {
+            await Client4.updateChannelScheme(channelId, schemeId);
+        } catch (error) {
+            forceLogoutIfNecessary(error, dispatch, getState);
+            dispatch(batchActions([
+                {type: ChannelTypes.UPDATE_CHANNEL_SCHEME_FAILURE, error},
+                logError(error)(dispatch),
+            ]), getState);
+            return {error};
+        }
+
+        dispatch(batchActions([
+            {
+                type: ChannelTypes.UPDATE_CHANNEL_SCHEME_SUCCESS,
+                data: {channelId, schemeId},
+            },
+        ]), getState);
+
+        return {data: true};
+    };
+}
+
 export default {
     selectChannel,
     createChannel,

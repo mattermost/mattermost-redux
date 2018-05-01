@@ -586,3 +586,29 @@ export function removeTeamIcon(teamId) {
         teamId,
     );
 }
+
+export function updateTeamScheme(teamId, schemeId) {
+    return async (dispatch, getState) => {
+        dispatch({type: TeamTypes.UPDATE_TEAM_SCHEME_REQUEST}, getState);
+
+        try {
+            await Client4.updateTeamScheme(teamId, schemeId);
+        } catch (error) {
+            forceLogoutIfNecessary(error, dispatch, getState);
+            dispatch(batchActions([
+                {type: TeamTypes.UPDATE_TEAM_SCHEME_FAILURE, error},
+                logError(error)(dispatch),
+            ]), getState);
+            return {error};
+        }
+
+        dispatch(batchActions([
+            {
+                type: TeamTypes.UPDATE_TEAM_SCHEME_SUCCESS,
+                data: {teamId, schemeId},
+            },
+        ]), getState);
+
+        return {data: true};
+    };
+}

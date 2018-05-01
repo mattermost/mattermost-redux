@@ -1833,4 +1833,30 @@ describe('Actions.Channels', () => {
 
         assert.deepEqual(result, {data: [TestHelper.basicChannel]});
     });
+
+    it('updateChannelScheme', async () => {
+        TestHelper.mockLogin();
+        await login(TestHelper.basicUser.email, 'password1')(store.dispatch, store.getState);
+
+        const schemeId = 'xxxxxxxxxxxxxxxxxxxxxxxxxx';
+        const {id} = TestHelper.basicChannel;
+
+        nock(Client4.getChannelsRoute()).
+            put('/' + id + '/scheme').
+            reply(200, OK_RESPONSE);
+
+        await Actions.updateChannelScheme(id, schemeId)(store.dispatch, store.getState);
+
+        const state = store.getState();
+        const request = state.requests.channels.updateChannelScheme;
+        const {channels} = state.entities.channels;
+
+        if (request.status === RequestStatus.FAILURE) {
+            throw new Error(JSON.stringify(request.error));
+        }
+
+        const updated = channels[id];
+        assert.ok(updated);
+        assert.equal(updated.scheme_id, schemeId);
+    });
 });
