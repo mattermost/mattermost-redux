@@ -1152,8 +1152,8 @@ export default class Client4 {
 
         return this.doFetch(
             `${this.getChannelSchemeRoute(channelId)}`,
-                    {method: 'put', body: JSON.stringify(patch)}
-                );
+            {method: 'put', body: JSON.stringify(patch)}
+        );
     };
 
     getChannel = async (channelId) => {
