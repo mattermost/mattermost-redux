@@ -90,4 +90,6 @@ export default keyMirror({
     DECREMENT_UNREAD_MSG_COUNT: null,
     INCREMENT_UNREAD_MENTION_COUNT: null,
     DECREMENT_UNREAD_MENTION_COUNT: null,
+
+    UPDATED_CHANNEL_SCHEME: null,
 });

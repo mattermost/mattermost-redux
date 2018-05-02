@@ -97,4 +97,5 @@ export default keyMirror({
     RECEIVED_TEAM_STATS: null,
     RECEIVED_MY_TEAM_UNREADS: null,
     LEAVE_TEAM: null,
+    UPDATED_TEAM_SCHEME: null,
 });

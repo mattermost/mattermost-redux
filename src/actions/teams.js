@@ -588,27 +588,13 @@ export function removeTeamIcon(teamId) {
 }
 
 export function updateTeamScheme(teamId, schemeId) {
-    return async (dispatch, getState) => {
-        dispatch({type: TeamTypes.UPDATE_TEAM_SCHEME_REQUEST}, getState);
-
-        try {
+    return bindClientFunc(
+        async () => {
             await Client4.updateTeamScheme(teamId, schemeId);
-        } catch (error) {
-            forceLogoutIfNecessary(error, dispatch, getState);
-            dispatch(batchActions([
-                {type: TeamTypes.UPDATE_TEAM_SCHEME_FAILURE, error},
-                logError(error)(dispatch),
-            ]), getState);
-            return {error};
-        }
-
-        dispatch(batchActions([
-            {
-                type: TeamTypes.UPDATE_TEAM_SCHEME_SUCCESS,
-                data: {teamId, schemeId},
-            },
-        ]), getState);
-
-        return {data: true};
-    };
+            return {teamId, schemeId};
+        },
+        TeamTypes.UPDATE_TEAM_SCHEME_REQUEST,
+        [TeamTypes.UPDATE_TEAM_SCHEME_SUCCESS, TeamTypes.UPDATED_TEAM_SCHEME],
+        TeamTypes.UPDATE_TEAM_SCHEME_FAILURE,
+    );
 }

@@ -1284,29 +1284,15 @@ export function unfavoriteChannel(channelId) {
 }
 
 export function updateChannelScheme(channelId, schemeId) {
-    return async (dispatch, getState) => {
-        dispatch({type: ChannelTypes.UPDATE_CHANNEL_SCHEME_REQUEST}, getState);
-
-        try {
+    return bindClientFunc(
+        async () => {
             await Client4.updateChannelScheme(channelId, schemeId);
-        } catch (error) {
-            forceLogoutIfNecessary(error, dispatch, getState);
-            dispatch(batchActions([
-                {type: ChannelTypes.UPDATE_CHANNEL_SCHEME_FAILURE, error},
-                logError(error)(dispatch),
-            ]), getState);
-            return {error};
-        }
-
-        dispatch(batchActions([
-            {
-                type: ChannelTypes.UPDATE_CHANNEL_SCHEME_SUCCESS,
-                data: {channelId, schemeId},
-            },
-        ]), getState);
-
-        return {data: true};
-    };
+            return {channelId, schemeId};
+        },
+        ChannelTypes.UPDATE_CHANNEL_SCHEME_REQUEST,
+        [ChannelTypes.UPDATE_CHANNEL_SCHEME_SUCCESS, ChannelTypes.UPDATED_CHANNEL_SCHEME],
+        ChannelTypes.UPDATE_CHANNEL_SCHEME_FAILURE,
+    );
 }
 
 export default {
