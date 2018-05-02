@@ -1836,10 +1836,23 @@ describe('Actions.Channels', () => {
 
     it('updateChannelScheme', async () => {
         TestHelper.mockLogin();
-        await login(TestHelper.basicUser.email, 'password1')(store.dispatch, store.getState);
+        await login(TestHelper.basicChannelMember.email, 'password1')(store.dispatch, store.getState);
 
+        nock(Client4.getChannelsRoute()).
+            post('').
+            reply(201, TestHelper.fakeChannelWithId(TestHelper.basicTeam.id));
+
+        await Actions.createChannel(TestHelper.fakeChannel(TestHelper.basicTeam.id), TestHelper.basicUser.id)(store.dispatch, store.getState);
+
+        const createRequest = store.getState().requests.channels.createChannel;
+
+        if (createRequest.status === RequestStatus.FAILURE) {
+            throw new Error(JSON.stringify(createRequest.error));
+        }
+
+        const {channels} = store.getState().entities.channels;
         const schemeId = 'xxxxxxxxxxxxxxxxxxxxxxxxxx';
-        const {id} = TestHelper.basicChannel;
+        const {id} = channels[Object.keys(channels)[0]];
 
         nock(Client4.getChannelsRoute()).
             put('/' + id + '/scheme').
@@ -1847,15 +1860,13 @@ describe('Actions.Channels', () => {
 
         await Actions.updateChannelScheme(id, schemeId)(store.dispatch, store.getState);
 
-        const state = store.getState();
-        const request = state.requests.channels.updateChannelScheme;
-        const {channels} = state.entities.channels;
+        const request = store.getState().requests.channels.updateChannelScheme;
 
         if (request.status === RequestStatus.FAILURE) {
             throw new Error(JSON.stringify(request.error));
         }
 
-        const updated = channels[id];
+        const updated = store.getState().entities.channels.channels[id];
         assert.ok(updated);
         assert.equal(updated.scheme_id, schemeId);
     });
