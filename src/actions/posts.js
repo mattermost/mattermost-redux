@@ -1144,7 +1144,7 @@ export function getOpenGraphMetadata(url) {
             type: PostTypes.OPEN_GRAPH_SUCCESS,
         }];
 
-        if (data.description) {
+        if (data.description != null) {
             actions.push({
                 type: PostTypes.RECEIVED_OPEN_GRAPH_METADATA,
                 data,
