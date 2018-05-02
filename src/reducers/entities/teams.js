@@ -2,7 +2,7 @@
 // See License.txt for license information.
 
 import {combineReducers} from 'redux';
-import {ChannelTypes, TeamTypes, UserTypes} from 'action_types';
+import {ChannelTypes, TeamTypes, UserTypes, SchemeTypes} from 'action_types';
 import {teamListToMap} from 'utils/team_utils';
 
 function currentTeamId(state = '', action) {
@@ -20,6 +20,7 @@ function currentTeamId(state = '', action) {
 function teams(state = {}, action) {
     switch (action.type) {
     case TeamTypes.RECEIVED_TEAMS_LIST:
+    case SchemeTypes.RECEIVED_SCHEME_TEAMS:
         return Object.assign({}, state, teamListToMap(action.data));
     case TeamTypes.RECEIVED_TEAMS:
         return Object.assign({}, state, action.data);
@@ -42,6 +43,7 @@ function teams(state = {}, action) {
 
         return state;
     }
+
     case UserTypes.LOGOUT_SUCCESS:
         return {};
 

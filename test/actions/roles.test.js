@@ -70,7 +70,7 @@ describe('Actions.Roles', () => {
         await Actions.getRole(TestHelper.basicRoles.system_admin.id)(store.dispatch, store.getState);
 
         const state = store.getState();
-        const request = state.requests.roles.getRolesByNames;
+        const request = state.requests.roles.getRole;
         const {roles} = state.entities.roles;
 
         if (request.status === RequestStatus.FAILURE) {
