@@ -139,6 +139,9 @@ function convertAnalyticsRowsToStats(data, name) {
         case 'unique_user_count':
             key = Stats.TOTAL_USERS;
             break;
+        case 'inactive_user_count':
+            key = Stats.TOTAL_INACTIVE_USERS;
+            break;
         case 'team_count':
             key = Stats.TOTAL_TEAMS;
             break;
