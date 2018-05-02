@@ -103,8 +103,7 @@ function channels(state = {}, action) {
         };
     }
     case ChannelTypes.UPDATED_CHANNEL_SCHEME: {
-        const {channelId} = action.data;
-        const {schemeId} = action.data;
+        const {channelId, schemeId} = action.data;
         const channel = state[channelId];
 
         if (!channel) {

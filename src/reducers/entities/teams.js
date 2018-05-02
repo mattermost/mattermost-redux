@@ -45,8 +45,7 @@ function teams(state = {}, action) {
     }
 
     case TeamTypes.UPDATED_TEAM_SCHEME: {
-        const {teamId} = action.data;
-        const {schemeId} = action.data;
+        const {teamId, schemeId} = action.data;
         const team = state[teamId];
 
         if (!team) {
