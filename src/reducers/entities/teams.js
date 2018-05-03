@@ -44,6 +44,17 @@ function teams(state = {}, action) {
         return state;
     }
 
+    case TeamTypes.UPDATED_TEAM_SCHEME: {
+        const {teamId, schemeId} = action.data;
+        const team = state[teamId];
+
+        if (!team) {
+            return state;
+        }
+
+        return {...state, [teamId]: {...team, scheme_id: schemeId}};
+    }
+
     case UserTypes.LOGOUT_SUCCESS:
         return {};
 
