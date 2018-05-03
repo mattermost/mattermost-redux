@@ -1607,7 +1607,7 @@ describe('Actions.Posts', () => {
         const metadata = state.entities.posts.openGraph;
         assert.ok(metadata);
         assert.ok(metadata[url]);
-        assert.ifError(metadata[docs]);
+        assert.ok(metadata[docs]);
     });
 
     it('doPostAction', async () => {
