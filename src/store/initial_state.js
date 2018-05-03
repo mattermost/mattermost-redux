@@ -96,7 +96,7 @@ const state: GlobalState = {
         typing: {},
         roles: {
             roles: {},
-            pending: new Set(),
+            pending: [],
         },
     },
     errors: [],
