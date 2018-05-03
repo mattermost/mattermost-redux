@@ -381,6 +381,32 @@ export function getPlugins(): ActionFunc {
 }
 
 // EXPERIMENTAL - SUBJECT TO CHANGE
+export function getPluginStatuses(): ActionFunc {
+    return async (dispatch, getState) => {
+        dispatch({type: AdminTypes.GET_PLUGIN_STATUSES_REQUEST, data: null});
+
+        let data;
+        try {
+            data = await Client4.getPluginStatuses();
+        } catch (error) {
+            forceLogoutIfNecessary(error, dispatch, getState);
+            dispatch(batchActions([
+                {type: AdminTypes.GET_PLUGIN_STATUSES_FAILURE, error},
+                logError(error)(dispatch),
+            ]));
+            return {error};
+        }
+
+        dispatch(batchActions([
+            {type: AdminTypes.GET_PLUGIN_STATUSES_SUCCESS, data: null},
+            {type: AdminTypes.RECEIVED_PLUGIN_STATUSES, data},
+        ]));
+
+        return {data};
+    };
+}
+
+// EXPERIMENTAL - SUBJECT TO CHANGE
 export function removePlugin(pluginId: string): ActionFunc {
     return async (dispatch, getState) => {
         dispatch({type: AdminTypes.REMOVE_PLUGIN_REQUEST, data: pluginId});
