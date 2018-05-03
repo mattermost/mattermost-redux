@@ -171,7 +171,7 @@ export const getChannelsInCurrentTeam = createSelector(
     getChannelSetInCurrentTeam,
     getCurrentUser,
     (channels, currentTeamChannelSet, currentUser) => {
-        let locale = 'en';
+        let locale = General.DEFAULT_LOCALE;
         if (currentUser && currentUser.locale) {
             locale = currentUser.locale;
         }
@@ -450,7 +450,7 @@ export const getSortedUnreadChannelIds = createIdsSelector(
             return [];
         }
 
-        const locale = currentUser.locale || 'en';
+        const locale = currentUser.locale || General.DEFAULT_LOCALE;
         const allUnreadChannels = unreadIds.map((id) => {
             const c = channels[id];
 
@@ -498,7 +498,7 @@ export const getSortedFavoriteChannelWithUnreadsIds = createIdsSelector(
             return [];
         }
 
-        const locale = currentUser.locale || 'en';
+        const locale = currentUser.locale || General.DEFAULT_LOCALE;
         const favoriteChannel = favoriteIds.filter((id) => {
             if (!myMembers[id] || !channels[id]) {
                 return false;
@@ -542,7 +542,7 @@ export const getSortedPublicChannelWithUnreadsIds = createIdsSelector(
             return [];
         }
 
-        const locale = currentUser.locale || 'en';
+        const locale = currentUser.locale || General.DEFAULT_LOCALE;
         const publicChannels = teamChannelIds.filter((id) => {
             if (!myMembers[id]) {
                 return false;
@@ -574,7 +574,7 @@ export const getSortedPrivateChannelWithUnreadsIds = createIdsSelector(
             return [];
         }
 
-        const locale = currentUser.locale || 'en';
+        const locale = currentUser.locale || General.DEFAULT_LOCALE;
         const privateChannels = teamChannelIds.filter((id) => {
             if (!myMembers[id]) {
                 return false;
@@ -612,7 +612,7 @@ export const getSortedDirectChannelWithUnreadsIds = createIdsSelector(
             return [];
         }
 
-        const locale = currentUser.locale || 'en';
+        const locale = currentUser.locale || General.DEFAULT_LOCALE;
         const channelValues = Object.values(channels);
         const directChannelsIds = [];
         teammates.reduce((result, teammateId) => {

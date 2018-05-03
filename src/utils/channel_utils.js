@@ -587,7 +587,7 @@ function buildUnreadChannels(channels, members, locale) {
 }
 
 function getUserLocale(userId, profiles) {
-    let locale = 'en';
+    let locale = General.DEFAULT_LOCALE;
     if (profiles && profiles[userId] && profiles[userId].locale) {
         locale = profiles[userId].locale;
     }
