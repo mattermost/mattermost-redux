@@ -4,7 +4,6 @@
 import assert from 'assert';
 
 import {Preferences} from 'constants';
-import {setLocalizeFunction} from 'utils/i18n_utils';
 import {displayUsername} from 'utils/user_utils';
 
 describe('user utils', () => {
@@ -29,7 +28,6 @@ describe('user utils', () => {
 
     it('should return default username string', () => {
         let noUserObj;
-        setLocalizeFunction(null);
         assert.equal(displayUsername(noUserObj, 'UNKNOWN_PREFERENCE'), 'Someone');
     });
 });

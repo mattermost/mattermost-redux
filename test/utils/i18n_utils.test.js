@@ -6,6 +6,10 @@ import assert from 'assert';
 import {setLocalizeFunction, localizeMessage} from 'utils/i18n_utils';
 
 describe('i18n utils', () => {
+    afterEach(() => {
+        setLocalizeFunction(null);
+    });
+
     it('should return default message', () => {
         assert.equal(localizeMessage('someting.string', 'defaultString'), 'defaultString');
     });
