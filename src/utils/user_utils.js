@@ -4,6 +4,7 @@
 
 import {General, Preferences} from 'constants';
 import type {UserProfile} from 'types/users';
+import {localizeMessage} from 'src/utils/i18n_utils';
 
 export function getFullName(user: UserProfile): string {
     if (user.first_name && user.last_name) {
@@ -21,16 +22,14 @@ export function displayUsername(
     user: UserProfile,
     teammateNameDisplay: string
 ): string {
-    let name = '';
+    let name = localizeMessage('channel_loader.someone', 'Someone');
 
     if (user) {
         if (teammateNameDisplay === Preferences.DISPLAY_PREFER_NICKNAME) {
             name = user.nickname || getFullName(user);
         } else if (teammateNameDisplay === Preferences.DISPLAY_PREFER_FULL_NAME) {
             name = getFullName(user);
-        }
-
-        if (!name.trim().length) {
+        } else {
             name = user.username;
         }
     }
