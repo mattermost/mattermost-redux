@@ -6,6 +6,7 @@ import keyMirror from 'utils/key_mirror';
 
 export default keyMirror({
     TOTAL_USERS: null,
+    TOTAL_INACTIVE_USERS: null,
     TOTAL_PUBLIC_CHANNELS: null,
     TOTAL_PRIVATE_GROUPS: null,
     TOTAL_POSTS: null,
