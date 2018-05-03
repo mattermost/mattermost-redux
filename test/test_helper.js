@@ -6,6 +6,8 @@ import nock from 'nock';
 
 import Client4 from 'client/client4';
 
+import {DEFAULT_LOCALE} from 'constants/general';
+
 const DEFAULT_SERVER = `${process.env.MATTERMOST_SERVER_URL || 'http://localhost:8065'}`; //eslint-disable-line no-process-env
 const EMAIL = `${process.env.MATTERMOST_REDUX_EMAIL || 'redux-admin@simulator.amazonses.com'}`; //eslint-disable-line no-process-env
 const PASSWORD = `${process.env.MATTERMOST_REDUX_PASSWORD || 'password1'}`; //eslint-disable-line no-process-env
@@ -72,7 +74,7 @@ class TestHelper {
             email: this.fakeEmail(),
             allow_marketing: true,
             password: PASSWORD,
-            locale: 'en',
+            locale: DEFAULT_LOCALE,
             username: this.generateId(),
             first_name: this.generateId(),
             last_name: this.generateId(),
