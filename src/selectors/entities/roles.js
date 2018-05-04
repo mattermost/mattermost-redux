@@ -22,7 +22,7 @@ export const getMyTeamRoles = createSelector(
         const roles = {};
         if (teamsMemberships) {
             for (const key in teamsMemberships) {
-                if (teamsMemberships.hasOwnProperty(key)) {
+                if (teamsMemberships.hasOwnProperty(key) && teamsMemberships[key].roles) {
                     roles[key] = new Set(teamsMemberships[key].roles.split(' '));
                 }
             }
@@ -37,7 +37,7 @@ export const getMyChannelRoles = createSelector(
         const roles = {};
         if (channelsMemberships) {
             for (const key in channelsMemberships) {
-                if (channelsMemberships.hasOwnProperty(key)) {
+                if (channelsMemberships.hasOwnProperty(key) && channelsMemberships[key].roles) {
                     roles[key] = new Set(channelsMemberships[key].roles.split(' '));
                 }
             }
