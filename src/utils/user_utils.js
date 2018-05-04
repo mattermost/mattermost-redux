@@ -32,6 +32,10 @@ export function displayUsername(
         } else {
             name = user.username;
         }
+
+        if (!name.trim().length) {
+            name = user.username;
+        }
     }
 
     return name;

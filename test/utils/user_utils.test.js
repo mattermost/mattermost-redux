@@ -22,8 +22,20 @@ describe('user utils', () => {
         assert.equal(displayUsername(userObj, Preferences.DISPLAY_PREFER_NICKNAME), 'nick');
     });
 
+    it('should return fullname when no nick name', () => {
+        assert.equal(displayUsername({...userObj, nickname: ''}, Preferences.DISPLAY_PREFER_NICKNAME), 'test user');
+    });
+
+    it('should return username when no nick name and no full name', () => {
+        assert.equal(displayUsername({...userObj, nickname: '', first_name: '', last_name: ''}, Preferences.DISPLAY_PREFER_NICKNAME), 'testUser');
+    });
+
     it('should return fullname', () => {
         assert.equal(displayUsername(userObj, Preferences.DISPLAY_PREFER_FULL_NAME), 'test user');
+    });
+
+    it('should return username when no full name', () => {
+        assert.equal(displayUsername({...userObj, first_name: '', last_name: ''}, Preferences.DISPLAY_PREFER_FULL_NAME), 'testUser');
     });
 
     it('should return default username string', () => {
