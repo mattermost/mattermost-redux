@@ -4,6 +4,7 @@
 
 import type {GlobalState} from '../../types/store';
 import type {UserProfile} from '../../types/users';
+import type {ChannelMembership} from '../../types/channels';
 
 import {createSelector} from 'reselect';
 
@@ -13,7 +14,7 @@ export function getCurrentChannelId(state: GlobalState): string {
     return state.entities.channels.currentChannelId;
 }
 
-export function getMyChannelMemberships(state: GlobalState): string {
+export function getMyChannelMemberships(state: GlobalState): {[string]: ChannelMembership} {
     return state.entities.channels.myMembers;
 }
 

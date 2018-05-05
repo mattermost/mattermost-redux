@@ -4,7 +4,7 @@
 
 import {General, Preferences} from 'constants';
 import type {UserProfile} from 'types/users';
-import {localizeMessage} from 'src/utils/i18n_utils';
+import {localizeMessage} from 'utils/i18n_utils';
 
 export function getFullName(user: UserProfile): string {
     if (user.first_name && user.last_name) {
