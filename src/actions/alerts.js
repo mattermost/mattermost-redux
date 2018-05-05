@@ -1,12 +1,16 @@
 // Copyright (c) 2017-present Mattermost, Inc. All Rights Reserved.
 // See License.txt for license information.
+// @flow
 
 import {AlertTypes} from 'action_types';
 import {Alerts} from 'constants';
 
-export function pushNotificationAlert(message) {
+import type {ActionFunc} from '../types/actions';
+import type {AlertType} from '../types/alerts';
+
+export function pushNotificationAlert(message: string): ActionFunc {
     return async (dispatch, getState) => {
-        const notificationAlert = {
+        const notificationAlert: AlertType = {
             type: Alerts.ALERT_NOTIFICATION,
             message,
         };
@@ -17,9 +21,9 @@ export function pushNotificationAlert(message) {
     };
 }
 
-export function pushDeveloperAlert(message) {
+export function pushDeveloperAlert(message: string): ActionFunc {
     return async (dispatch, getState) => {
-        const developerAlert = {
+        const developerAlert: AlertType = {
             type: Alerts.ALERT_DEVELOPER,
             message,
         };
@@ -30,9 +34,9 @@ export function pushDeveloperAlert(message) {
     };
 }
 
-export function pushErrorAlert(message) {
+export function pushErrorAlert(message: string): ActionFunc {
     return async (dispatch, getState) => {
-        const errorAlert = {
+        const errorAlert: AlertType = {
             type: Alerts.ALERT_ERROR,
             message,
         };
@@ -43,9 +47,9 @@ export function pushErrorAlert(message) {
     };
 }
 
-export function clearLatestAlert() {
+export function clearLatestAlert(): ActionFunc {
     return async (dispatch, getState) => {
-        dispatch({type: AlertTypes.CLEAR_ALERT}, getState);
+        dispatch({type: AlertTypes.CLEAR_ALERT, data: null}, getState);
 
         return {data: true};
     };
