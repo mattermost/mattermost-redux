@@ -23,7 +23,7 @@ export function getCurrentUrl(state: GlobalState): string {
     return state.entities.general.credentials.url;
 }
 
-export function hasNewPermissions(state) {
+export function hasNewPermissions(state: GlobalState): boolean {
     const version = state.entities.general.serverVersion;
 
     // FIXME This must be changed to 4, 9, 0 before we generate the 4.9.0 release

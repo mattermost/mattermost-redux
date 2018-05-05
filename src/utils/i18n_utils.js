@@ -4,7 +4,7 @@
 
 let localizeFunction = null;
 
-export function setLocalizeFunction(func: func) {
+export function setLocalizeFunction(func: Function) {
     localizeFunction = func;
 }
 
