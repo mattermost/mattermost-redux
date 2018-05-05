@@ -1,5 +1,6 @@
 // @flow
 
+import type {AlertType} from './alerts';
 import type {GeneralState} from './general';
 import type {UsersState} from './users';
 import type {TeamsState} from './teams';
@@ -36,7 +37,7 @@ export type GlobalState = {
         admin: AdminState,
         jobs: JobsState,
         alerts: {
-            alertStack: Array<Object>
+            alertStack: Array<AlertType>
         },
         search: SearchState,
         integrations: IntegrationsState,

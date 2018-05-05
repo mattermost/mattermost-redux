@@ -1,10 +1,14 @@
 // Copyright (c) 2017-present Mattermost, Inc. All Rights Reserved.
 // See License.txt for license information.
+// @flow
 
 import {combineReducers} from 'redux';
 import {AlertTypes, UserTypes} from 'action_types';
 
-function alertStack(state = [], action) {
+import type {AlertType} from '../../types/alerts';
+import type {GenericAction} from '../../types/actions';
+
+function alertStack(state: Array<AlertType> = [], action: GenericAction) {
     const nextState = [...state];
 
     switch (action.type) {
