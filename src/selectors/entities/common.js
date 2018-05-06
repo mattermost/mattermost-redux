@@ -2,9 +2,9 @@
 // See License.txt for license information.
 // @flow
 
-import type {GlobalState} from '../../types/store';
-import type {UserProfile} from '../../types/users';
-import type {ChannelMembership} from '../../types/channels';
+import type {GlobalState} from 'mattermost-redux/types/store';
+import type {UserProfile} from 'mattermost-redux/types/users';
+import type {ChannelMembership} from 'mattermost-redux/types/channels';
 
 import {createSelector} from 'reselect';
 
