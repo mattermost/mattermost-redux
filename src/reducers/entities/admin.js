@@ -1,7 +1,6 @@
 // Copyright (c) 2017-present Mattermost, Inc. All Rights Reserved.
 // See License.txt for license information.
 
-/*eslint no-unused-vars: ["error", { "ignoreRestSiblings": true }]*/
 import {combineReducers} from 'redux';
 import {AdminTypes, UserTypes} from 'action_types';
 import {Stats} from 'constants';
@@ -483,7 +482,8 @@ function pluginStatuses(state = {}, action) {
             return state;
         }
 
-        const {[pluginId]: plugin, ...nextState} = state;
+        const nextState = {...state};
+        Reflect.deleteProperty(nextState, pluginId);
 
         return nextState;
     }
