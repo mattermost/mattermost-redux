@@ -356,54 +356,22 @@ export function uploadPlugin(fileData: File): ActionFunc {
 
 // EXPERIMENTAL - SUBJECT TO CHANGE
 export function getPlugins(): ActionFunc {
-    return async (dispatch, getState) => {
-        dispatch({type: AdminTypes.GET_PLUGIN_REQUEST, data: null});
-
-        let data;
-        try {
-            data = await Client4.getPlugins();
-        } catch (error) {
-            forceLogoutIfNecessary(error, dispatch, getState);
-            dispatch(batchActions([
-                {type: AdminTypes.GET_PLUGIN_FAILURE, error},
-                logError(error)(dispatch),
-            ]));
-            return {error};
-        }
-
-        dispatch(batchActions([
-            {type: AdminTypes.GET_PLUGIN_SUCCESS, data: null},
-            {type: AdminTypes.RECEIVED_PLUGINS, data},
-        ]));
-
-        return {data};
-    };
+    return bindClientFunc(
+        Client4.getPlugins,
+        AdminTypes.GET_PLUGIN_REQUEST,
+        [AdminTypes.GET_PLUGIN_SUCCESS, AdminTypes.RECEIVED_PLUGINS],
+        AdminTypes.GET_PLUGIN_FAILURE,
+    );
 }
 
 // EXPERIMENTAL - SUBJECT TO CHANGE
 export function getPluginStatuses(): ActionFunc {
-    return async (dispatch, getState) => {
-        dispatch({type: AdminTypes.GET_PLUGIN_STATUSES_REQUEST, data: null});
-
-        let data;
-        try {
-            data = await Client4.getPluginStatuses();
-        } catch (error) {
-            forceLogoutIfNecessary(error, dispatch, getState);
-            dispatch(batchActions([
-                {type: AdminTypes.GET_PLUGIN_STATUSES_FAILURE, error},
-                logError(error)(dispatch),
-            ]));
-            return {error};
-        }
-
-        dispatch(batchActions([
-            {type: AdminTypes.GET_PLUGIN_STATUSES_SUCCESS, data: null},
-            {type: AdminTypes.RECEIVED_PLUGIN_STATUSES, data},
-        ]));
-
-        return {data};
-    };
+    return bindClientFunc(
+        Client4.getPluginStatuses,
+        AdminTypes.GET_PLUGIN_STATUSES_REQUEST,
+        [AdminTypes.GET_PLUGIN_STATUSES_SUCCESS, AdminTypes.RECEIVED_PLUGIN_STATUSES],
+        AdminTypes.GET_PLUGIN_STATUSES_FAILURE,
+    );
 }
 
 // EXPERIMENTAL - SUBJECT TO CHANGE
