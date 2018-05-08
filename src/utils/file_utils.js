@@ -8,10 +8,10 @@ import mimeDB from 'mime-db';
 export function getFormattedFileSize(file) {
     const bytes = file.size;
     const fileSizes = [
-        ['TB', 1024 * 1024 * 1024 * 1024],
-        ['GB', 1024 * 1024 * 1024],
-        ['MB', 1024 * 1024],
-        ['KB', 1024],
+        ['TiB', 1024 * 1024 * 1024 * 1024],
+        ['GiB', 1024 * 1024 * 1024],
+        ['MiB', 1024 * 1024],
+        ['KiB', 1024],
     ];
     const size = fileSizes.find((unitAndMinBytes) => {
         const minBytes = unitAndMinBytes[1];
