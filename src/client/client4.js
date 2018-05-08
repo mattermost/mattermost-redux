@@ -2231,6 +2231,13 @@ export default class Client4 {
         );
     };
 
+    getPluginStatuses = async () => {
+        return this.doFetch(
+            `${this.getPluginsRoute()}/statuses`,
+            {method: 'get'}
+        );
+    };
+
     removePlugin = async (pluginId) => {
         return this.doFetch(
             this.getPluginRoute(pluginId),

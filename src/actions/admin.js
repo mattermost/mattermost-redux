@@ -356,41 +356,35 @@ export function uploadPlugin(fileData: File): ActionFunc {
 
 // EXPERIMENTAL - SUBJECT TO CHANGE
 export function getPlugins(): ActionFunc {
-    return async (dispatch, getState) => {
-        dispatch({type: AdminTypes.GET_PLUGIN_REQUEST, data: null});
+    return bindClientFunc(
+        Client4.getPlugins,
+        AdminTypes.GET_PLUGIN_REQUEST,
+        [AdminTypes.GET_PLUGIN_SUCCESS, AdminTypes.RECEIVED_PLUGINS],
+        AdminTypes.GET_PLUGIN_FAILURE,
+    );
+}
 
-        let data;
-        try {
-            data = await Client4.getPlugins();
-        } catch (error) {
-            forceLogoutIfNecessary(error, dispatch, getState);
-            dispatch(batchActions([
-                {type: AdminTypes.GET_PLUGIN_FAILURE, error},
-                logError(error)(dispatch),
-            ]));
-            return {error};
-        }
-
-        dispatch(batchActions([
-            {type: AdminTypes.GET_PLUGIN_SUCCESS, data: null},
-            {type: AdminTypes.RECEIVED_PLUGINS, data},
-        ]));
-
-        return {data};
-    };
+// EXPERIMENTAL - SUBJECT TO CHANGE
+export function getPluginStatuses(): ActionFunc {
+    return bindClientFunc(
+        Client4.getPluginStatuses,
+        AdminTypes.GET_PLUGIN_STATUSES_REQUEST,
+        [AdminTypes.GET_PLUGIN_STATUSES_SUCCESS, AdminTypes.RECEIVED_PLUGIN_STATUSES],
+        AdminTypes.GET_PLUGIN_STATUSES_FAILURE,
+    );
 }
 
 // EXPERIMENTAL - SUBJECT TO CHANGE
 export function removePlugin(pluginId: string): ActionFunc {
     return async (dispatch, getState) => {
-        dispatch({type: AdminTypes.REMOVE_PLUGIN_REQUEST, data: null});
+        dispatch({type: AdminTypes.REMOVE_PLUGIN_REQUEST, data: pluginId});
 
         try {
             await Client4.removePlugin(pluginId);
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch, getState);
             dispatch(batchActions([
-                {type: AdminTypes.REMOVE_PLUGIN_FAILURE, error},
+                {type: AdminTypes.REMOVE_PLUGIN_FAILURE, error, data: pluginId},
                 logError(error)(dispatch),
             ]));
             return {error};
@@ -408,14 +402,14 @@ export function removePlugin(pluginId: string): ActionFunc {
 // EXPERIMENTAL - SUBJECT TO CHANGE
 export function activatePlugin(pluginId: string): ActionFunc {
     return async (dispatch, getState) => {
-        dispatch({type: AdminTypes.ACTIVATE_PLUGIN_REQUEST, data: null});
+        dispatch({type: AdminTypes.ACTIVATE_PLUGIN_REQUEST, data: pluginId});
 
         try {
             await Client4.activatePlugin(pluginId);
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch, getState);
             dispatch(batchActions([
-                {type: AdminTypes.ACTIVATE_PLUGIN_FAILURE, error},
+                {type: AdminTypes.ACTIVATE_PLUGIN_FAILURE, error, data: pluginId},
                 logError(error)(dispatch),
             ]));
             return {error};
@@ -433,14 +427,14 @@ export function activatePlugin(pluginId: string): ActionFunc {
 // EXPERIMENTAL - SUBJECT TO CHANGE
 export function deactivatePlugin(pluginId: string): ActionFunc {
     return async (dispatch, getState) => {
-        dispatch({type: AdminTypes.DEACTIVATE_PLUGIN_REQUEST, data: null});
+        dispatch({type: AdminTypes.DEACTIVATE_PLUGIN_REQUEST, data: pluginId});
 
         try {
             await Client4.deactivatePlugin(pluginId);
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch, getState);
             dispatch(batchActions([
-                {type: AdminTypes.DEACTIVATE_PLUGIN_FAILURE, error},
+                {type: AdminTypes.DEACTIVATE_PLUGIN_FAILURE, error, data: pluginId},
                 logError(error)(dispatch),
             ]));
             return {error};

@@ -35,6 +35,7 @@ const WebsocketEvents = {
     EMOJI_ADDED: 'emoji_added',
     LICENSE_CHANGED: 'license_changed',
     CONFIG_CHANGED: 'config_changed',
+    PLUGIN_STATUSES_CHANGED: 'plugin_statuses_changed',
 };
 
 export default WebsocketEvents;

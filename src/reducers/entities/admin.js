@@ -4,6 +4,7 @@
 import {combineReducers} from 'redux';
 import {AdminTypes, UserTypes} from 'action_types';
 import {Stats} from 'constants';
+import PluginState from 'constants/plugins';
 
 function logs(state = [], action) {
     switch (action.type) {
@@ -389,6 +390,112 @@ function plugins(state = {}, action) {
     }
 }
 
+function pluginStatuses(state = {}, action) {
+    switch (action.type) {
+
+    case AdminTypes.RECEIVED_PLUGIN_STATUSES: {
+        const nextState = {};
+
+        for (const plugin of (action.data || [])) {
+            const id = plugin.plugin_id;
+
+            // The plugin may be in different states across the cluster. Pick the highest one to
+            // surface an error.
+            const pluginState = Math.max((nextState[id] && nextState[id].state) || 0, plugin.state);
+
+            const instances = [
+                ...((nextState[id] && nextState[id].instances) || []),
+                {
+                    cluster_discovery_id: plugin.cluster_discovery_id,
+                    version: plugin.version,
+                    state: plugin.state,
+                },
+            ];
+
+            nextState[id] = {
+                id,
+                name: (nextState[id] && nextState[id].name) || plugin.name,
+                description: (nextState[id] && nextState[id].description) || plugin.description,
+                version: (nextState[id] && nextState[id].version) || plugin.version,
+                is_prepackaged: (nextState[id] && nextState[id].is_prepackaged) || plugin.is_prepackaged,
+                active: pluginState > 0,
+                state: pluginState,
+                instances,
+            };
+        }
+
+        return nextState;
+    }
+
+    case AdminTypes.RECEIVED_PLUGIN: {
+        const plugin = action.data;
+        const existingPlugin = state[plugin.id] || {instances: []};
+
+        return {
+            ...state,
+            [plugin.id]: {
+                ...existingPlugin,
+                id: plugin.id,
+                name: plugin.name,
+                description: plugin.description,
+                version: plugin.version,
+                is_prepackaged: false,
+                active: plugin.active,
+                state: PluginState.PLUGIN_STATE_NOT_RUNNING,
+            },
+        };
+    }
+
+    case AdminTypes.ACTIVATE_PLUGIN_REQUEST: {
+        const pluginId = action.data;
+        if (!state[pluginId]) {
+            return state;
+        }
+
+        return {
+            ...state,
+            [pluginId]: {
+                ...state[pluginId],
+                state: PluginState.PLUGIN_STATE_STARTING,
+            },
+        };
+    }
+
+    case AdminTypes.DEACTIVATE_PLUGIN_REQUEST: {
+        const pluginId = action.data;
+        if (!state[pluginId]) {
+            return state;
+        }
+
+        return {
+            ...state,
+            [pluginId]: {
+                ...state[pluginId],
+                state: PluginState.PLUGIN_STATE_STOPPING,
+            },
+        };
+    }
+
+    case AdminTypes.REMOVED_PLUGIN: {
+        const pluginId = action.data;
+        if (!state[pluginId]) {
+            return state;
+        }
+
+        const nextState = {...state};
+        Reflect.deleteProperty(nextState, pluginId);
+
+        return nextState;
+    }
+
+    case UserTypes.LOGOUT_SUCCESS:
+        return {};
+
+    default:
+        return state;
+    }
+}
+
 export default combineReducers({
 
     // array of strings each representing a log entry
@@ -427,4 +534,7 @@ export default combineReducers({
 
     // object with plugin ids as keys and objects representing plugin manifests as values
     plugins,
+
+    // object with plugin ids as keys and objects representing plugin statuses across the cluster
+    pluginStatuses,
 });
