@@ -12,6 +12,14 @@ export default {
     CATEGORY_AUTO_RESET_MANUAL_STATUS: 'auto_reset_manual_status',
 
     CATEGORY_NOTIFICATIONS: 'notifications',
+
+    COMMENTS: 'comments',
+    COMMENTS_ANY: 'any',
+    COMMENTS_ROOT: 'root',
+    COMMENTS_NEVER: 'never',
+
+    EMAIL: 'email',
+
     EMAIL_INTERVAL: 'email_interval',
     INTERVAL_FIFTEEN_MINUTES: 15 * 60,
     INTERVAL_HOUR: 60 * 60,
@@ -22,6 +30,10 @@ export default {
     NAME_NAME_FORMAT: 'name_format',
     DISPLAY_PREFER_NICKNAME: 'nickname_full_name',
     DISPLAY_PREFER_FULL_NAME: 'full_name',
+
+    MENTION_KEYS: 'mention_keys',
+
+    USE_MILITARY_TIME: 'use_military_time',
 
     CATEGORY_SIDEBAR_SETTINGS: 'sidebar_settings',
 
