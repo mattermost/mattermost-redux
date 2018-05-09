@@ -109,6 +109,10 @@ export default class Client4 {
         return `${this.getTeamsRoute()}/${teamId}`;
     }
 
+    getTeamSchemeRoute(teamId) {
+        return `${this.getTeamRoute(teamId)}/scheme`;
+    }
+
     getTeamNameRoute(teamName) {
         return `${this.getTeamsRoute()}/name/${teamName}`;
     }
@@ -135,6 +139,10 @@ export default class Client4 {
 
     getChannelMemberRoute(channelId, userId) {
         return `${this.getChannelMembersRoute(channelId)}/${userId}`;
+    }
+
+    getChannelSchemeRoute(channelId) {
+        return `${this.getChannelRoute(channelId)}/scheme`;
     }
 
     getPostsRoute() {
@@ -822,6 +830,17 @@ export default class Client4 {
         );
     };
 
+    updateTeamScheme = async (teamId, schemeId) => {
+        const patch = {scheme_id: schemeId};
+
+        this.trackEvent('api', 'api_teams_update_scheme', {team_id: teamId, ...patch});
+
+        return this.doFetch(
+            `${this.getTeamSchemeRoute(teamId)}`,
+            {method: 'put', body: JSON.stringify(patch)}
+        );
+    };
+
     checkIfTeamExists = async (teamName) => {
         return this.doFetch(
             `${this.getTeamNameRoute(teamName)}/exists`,
@@ -1123,6 +1142,17 @@ export default class Client4 {
         return this.doFetch(
             `${this.getChannelMemberRoute(props.channel_id, props.user_id)}/notify_props`,
             {method: 'put', body: JSON.stringify(props)}
+        );
+    };
+
+    updateChannelScheme = async (channelId, schemeId) => {
+        const patch = {scheme_id: schemeId};
+
+        this.trackEvent('api', 'api_channels_update_scheme', {channel_id: channelId, ...patch});
+
+        return this.doFetch(
+            `${this.getChannelSchemeRoute(channelId)}`,
+            {method: 'put', body: JSON.stringify(patch)}
         );
     };
 

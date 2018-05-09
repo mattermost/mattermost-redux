@@ -163,6 +163,10 @@ const state: GlobalState = {
                 status: 'not_started',
                 error: null,
             },
+            updateChannelScheme: {
+                status: 'not_started',
+                error: null,
+            },
         },
         general: {
             server: {
@@ -259,6 +263,10 @@ const state: GlobalState = {
                 error: null,
             },
             removeUserFromTeam: {
+                status: 'not_started',
+                error: null,
+            },
+            updateTeamScheme: {
                 status: 'not_started',
                 error: null,
             },

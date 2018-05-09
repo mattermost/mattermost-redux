@@ -21,7 +21,8 @@ export type ChannelsRequestsStatuses = {
     getChannelStats: RequestStatusType,
     addChannelMember: RequestStatusType,
     removeChannelMember: RequestStatusType,
-    updateChannelMember: RequestStatusType
+    updateChannelMember: RequestStatusType,
+    updateChannelScheme: RequestStatusType
 };
 
 export type GeneralRequestsStatuses = {
@@ -57,7 +58,8 @@ export type TeamsRequestsStatuses = {
     getTeamMembers: RequestStatusType,
     getTeamStats: RequestStatusType,
     addUserToTeam: RequestStatusType,
-    removeUserFromTeam: RequestStatusType
+    removeUserFromTeam: RequestStatusType,
+    updateTeamScheme: RequestStatusType,
 };
 
 export type UsersRequestsStatuses = {

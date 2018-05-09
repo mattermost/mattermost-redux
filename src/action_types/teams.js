@@ -77,6 +77,10 @@ export default keyMirror({
     DELETE_TEAM_SUCCESS: null,
     DELETE_TEAM_FAILURE: null,
 
+    UPDATE_TEAM_SCHEME_REQUEST: null,
+    UPDATE_TEAM_SCHEME_SUCCESS: null,
+    UPDATE_TEAM_SCHEME_FAILURE: null,
+
     CREATED_TEAM: null,
     SELECT_TEAM: null,
     UPDATED_TEAM: null,
@@ -93,4 +97,5 @@ export default keyMirror({
     RECEIVED_TEAM_STATS: null,
     RECEIVED_MY_TEAM_UNREADS: null,
     LEAVE_TEAM: null,
+    UPDATED_TEAM_SCHEME: null,
 });

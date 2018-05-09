@@ -102,6 +102,16 @@ function channels(state = {}, action) {
             },
         };
     }
+    case ChannelTypes.UPDATED_CHANNEL_SCHEME: {
+        const {channelId, schemeId} = action.data;
+        const channel = state[channelId];
+
+        if (!channel) {
+            return state;
+        }
+
+        return {...state, [channelId]: {...channel, scheme_id: schemeId}};
+    }
 
     case UserTypes.LOGOUT_SUCCESS:
         return {};

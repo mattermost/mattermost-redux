@@ -586,3 +586,15 @@ export function removeTeamIcon(teamId) {
         teamId,
     );
 }
+
+export function updateTeamScheme(teamId, schemeId) {
+    return bindClientFunc(
+        async () => {
+            await Client4.updateTeamScheme(teamId, schemeId);
+            return {teamId, schemeId};
+        },
+        TeamTypes.UPDATE_TEAM_SCHEME_REQUEST,
+        [TeamTypes.UPDATE_TEAM_SCHEME_SUCCESS, TeamTypes.UPDATED_TEAM_SCHEME],
+        TeamTypes.UPDATE_TEAM_SCHEME_FAILURE,
+    );
+}
