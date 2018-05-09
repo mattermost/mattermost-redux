@@ -11,9 +11,11 @@ import {General} from 'constants';
 describe('Selectors.Roles', () => {
     const team1 = TestHelper.fakeTeamWithId();
     const team2 = TestHelper.fakeTeamWithId();
+    const team3 = TestHelper.fakeTeamWithId();
     const myTeamMembers = {};
     myTeamMembers[team1.id] = {roles: 'test_team1_role1 test_team1_role2'};
     myTeamMembers[team2.id] = {roles: 'test_team2_role1 test_team2_role2'};
+    myTeamMembers[team3.id] = {};
 
     const channel1 = TestHelper.fakeChannelWithId(team1.id);
     channel1.display_name = 'Channel Name';
@@ -46,6 +48,7 @@ describe('Selectors.Roles', () => {
     const channel10 = TestHelper.fakeChannelWithId(team1.id);
     const channel11 = TestHelper.fakeChannelWithId(team1.id);
     channel11.type = General.PRIVATE_CHANNEL;
+    const channel12 = TestHelper.fakeChannelWithId(team1.id);
 
     const channels = {};
     channels[channel1.id] = channel1;
@@ -59,6 +62,7 @@ describe('Selectors.Roles', () => {
     channels[channel9.id] = channel9;
     channels[channel10.id] = channel10;
     channels[channel11.id] = channel11;
+    channels[channel12.id] = channel12;
 
     const channelsInTeam = {};
     channelsInTeam[team1.id] = [channel1.id, channel2.id, channel5.id, channel6.id, channel8.id, channel10.id, channel11.id];
@@ -81,6 +85,7 @@ describe('Selectors.Roles', () => {
     myChannelMembers[channel9.id] = {roles: 'test_channel_b_role1 test_channel_b_role2'};
     myChannelMembers[channel10.id] = {roles: 'test_channel_c_role1 test_channel_c_role2'};
     myChannelMembers[channel11.id] = {roles: 'test_channel_c_role1 test_channel_c_role2'};
+    myChannelMembers[channel12.id] = {};
     const roles = {
         test_team1_role1: {permissions: ['team1_role1']},
         test_team2_role1: {permissions: ['team2_role1']},

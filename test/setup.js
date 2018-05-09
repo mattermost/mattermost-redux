@@ -11,4 +11,6 @@ const rcPath = path.join(__dirname, '..', '.babelrc');
 const source = fs.readFileSync(rcPath).toString();
 const config = JSON.parse(source);
 
+global.window = {};
+
 register(config);

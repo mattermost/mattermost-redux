@@ -310,6 +310,16 @@ function getPlugins(state: RequestStatusType = initialRequestState(), action: Ge
     );
 }
 
+function getPluginStatuses(state: RequestStatusType = initialRequestState(), action: GenericAction): RequestStatusType {
+    return handleRequest(
+        AdminTypes.GET_PLUGIN_STATUSES_REQUEST,
+        AdminTypes.GET_PLUGIN_STATUSES_SUCCESS,
+        AdminTypes.GET_PLUGIN_STATUSES_FAILURE,
+        state,
+        action
+    );
+}
+
 function removePlugin(state: RequestStatusType = initialRequestState(), action: GenericAction): RequestStatusType {
     return handleRequest(
         AdminTypes.REMOVE_PLUGIN_REQUEST,
@@ -371,6 +381,7 @@ export default combineReducers({
     getAnalytics,
     uploadPlugin,
     getPlugins,
+    getPluginStatuses,
     removePlugin,
     activatePlugin,
     deactivatePlugin,

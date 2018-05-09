@@ -45,6 +45,7 @@ import {
     TeamTypes,
     UserTypes,
     RoleTypes,
+    AdminTypes,
 } from 'action_types';
 import {General, WebsocketEvents, Preferences, Posts} from 'constants';
 
@@ -272,6 +273,9 @@ function handleEvent(msg, dispatch, getState) {
         break;
     case WebsocketEvents.CONFIG_CHANGED:
         handleConfigChangedEvent(msg, dispatch, getState);
+        break;
+    case WebsocketEvents.PLUGIN_STATUSES_CHANGED:
+        handlePluginStatusesChangedEvent(msg, dispatch, getState);
         break;
     }
 }
@@ -756,6 +760,15 @@ function handleConfigChangedEvent(msg, dispatch) {
         data,
     });
     EventEmitter.emit(General.CONFIG_CHANGED, data);
+}
+
+function handlePluginStatusesChangedEvent(msg, dispatch) {
+    const data = msg.data;
+
+    dispatch({
+        type: AdminTypes.RECEIVED_PLUGIN_STATUSES,
+        data: data.plugin_statuses,
+    });
 }
 
 // Helpers

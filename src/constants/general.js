@@ -77,4 +77,6 @@ export default {
 
     MAX_USERS_IN_GM: 8,
     MIN_USERS_IN_GM: 3,
+
+    DEFAULT_LOCALE: 'en',
 };
