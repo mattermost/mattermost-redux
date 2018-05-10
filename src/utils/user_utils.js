@@ -22,9 +22,10 @@ export function displayUsername(
     user: UserProfile,
     teammateNameDisplay: string
 ): string {
-    let name = localizeMessage('channel_loader.someone', 'Someone');
+    let name = '';
 
     if (user) {
+        name = localizeMessage('channel_loader.someone', 'Someone');
         if (teammateNameDisplay === Preferences.DISPLAY_PREFER_NICKNAME) {
             name = user.nickname || getFullName(user);
         } else if (teammateNameDisplay === Preferences.DISPLAY_PREFER_FULL_NAME) {
