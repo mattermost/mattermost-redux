@@ -50,8 +50,11 @@ function flagged(state = [], action) {
             let hasNewFlaggedPosts = false;
             action.data.forEach((pref) => {
                 if (pref.category === Preferences.CATEGORY_FLAGGED_POST) {
-                    hasNewFlaggedPosts = true;
-                    nextState.unshift(pref.name);
+                    const exists = nextState.find((p) => p === pref.name);
+                    if (!exists) {
+                        hasNewFlaggedPosts = true;
+                        nextState.unshift(pref.name);
+                    }
                 }
             });
 
