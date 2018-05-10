@@ -1281,6 +1281,28 @@ export function unfavoriteChannel(channelId) {
     };
 }
 
+export function addHiddenDefaultChannel(teamId, channelId) {
+    return (dispatch) => {
+        if (teamId && channelId) {
+            dispatch({
+                type: ChannelTypes.ADD_HIDDEN_DEFAULT_CHANNEL,
+                data: {teamId, channelId},
+            });
+        }
+    };
+}
+
+export function removeHiddenDefaultChannel(teamId, channelId) {
+    return (dispatch) => {
+        if (teamId && channelId) {
+            dispatch({
+                type: ChannelTypes.REMOVE_HIDDEN_DEFAULT_CHANNEL,
+                data: {teamId, channelId},
+            });
+        }
+    };
+}
+
 export default {
     selectChannel,
     createChannel,
@@ -1309,4 +1331,6 @@ export default {
     markChannelAsUnread,
     favoriteChannel,
     unfavoriteChannel,
+    addHiddenDefaultChannel,
+    removeHiddenDefaultChannel,
 };

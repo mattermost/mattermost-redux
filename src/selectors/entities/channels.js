@@ -150,6 +150,14 @@ export function isChannelHidden(state, channel) {
         !isCurrentUserSystemAdmin(state) && getConfig(state).ExperimentalHideTownSquareinLHS === 'true';
 }
 
+export const getHiddenChannelIdInCurrentTeam = createSelector(
+    getCurrentTeamId,
+    (state) => state.entities.channels.hiddenDefaultChannelId,
+    (currentTeamId, hiddenChannel) => {
+        return hiddenChannel[currentTeamId] || '';
+    }
+);
+
 export const getChannelSetInCurrentTeam = createSelector(
     getCurrentTeamId,
     getChannelsInTeam,
