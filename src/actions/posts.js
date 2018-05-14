@@ -248,10 +248,11 @@ export function resetCreatePostRequest() {
 
 export function deletePost(post) {
     return async (dispatch, getState) => {
+        const state = getState();
         const delPost = {...post};
         if (delPost.type === Posts.POST_TYPES.COMBINED_USER_ACTIVITY) {
             delPost.system_post_ids.forEach((systemPostId) => {
-                const systemPost = Selectors.getPost(getState(), systemPostId);
+                const systemPost = Selectors.getPost(state, systemPostId);
                 if (systemPost) {
                     dispatch(deletePost(systemPost));
                 }
