@@ -7,6 +7,7 @@ import nock from 'nock';
 import Client4 from 'client/client4';
 
 import {DEFAULT_LOCALE} from 'constants/general';
+import {generateId} from 'utils/helpers';
 
 const DEFAULT_SERVER = `${process.env.MATTERMOST_SERVER_URL || 'http://localhost:8065'}`; //eslint-disable-line no-process-env
 const EMAIL = `${process.env.MATTERMOST_REDUX_EMAIL || 'redux-admin@simulator.amazonses.com'}`; //eslint-disable-line no-process-env
@@ -38,23 +39,7 @@ class TestHelper {
     };
 
     generateId = () => {
-        // Implementation taken from http://stackoverflow.com/a/2117523
-        let id = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx';
-
-        id = id.replace(/[xy]/g, (c) => {
-            const r = Math.floor(Math.random() * 16);
-
-            let v;
-            if (c === 'x') {
-                v = r;
-            } else {
-                v = (r & 0x3) | 0x8;
-            }
-
-            return v.toString(16);
-        });
-
-        return 'uid' + id;
+        return generateId();
     };
 
     createClient4 = () => {
@@ -233,6 +218,7 @@ class TestHelper {
         return {
             channel_id: channelId,
             message: `Unit Test ${this.generateId()}`,
+            type: '',
         };
     };
 
