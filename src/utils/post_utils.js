@@ -321,17 +321,18 @@ export function combineSystemPosts(postsIds = [], posts = {}, channelId) {
                 id: combinedPostId || generateId(),
                 root_id: '',
                 channel_id: channelId,
-                type: Posts.POST_TYPES.COMBINED_USER_ACTIVITY,
-                message: messages.join('\n'),
                 create_at: createAt,
                 delete_at: 0,
-                user_activity_posts: userActivitySystemPosts,
+                message: messages.join('\n'),
                 props: {
-                    user_activity: combineUserActivitySystemPost(userActivitySystemPosts),
                     messages,
+                    user_activity: combineUserActivitySystemPost(userActivitySystemPosts),
                 },
-                system_post_ids: systemPostIds,
                 state: '',
+                system_post_ids: systemPostIds,
+                type: Posts.POST_TYPES.COMBINED_USER_ACTIVITY,
+                user_activity_posts: userActivitySystemPosts,
+                user_id: '',
             };
 
             nextPosts[combinedPost.id] = combinedPost;

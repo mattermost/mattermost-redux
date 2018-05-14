@@ -31,10 +31,10 @@ export function displayUsername(
         } else if (teammateNameDisplay === Preferences.DISPLAY_PREFER_FULL_NAME) {
             name = getFullName(user);
         } else {
-            name = user.username;
+            name = usernameWithPrefix ? `@${user.username}` : user.username;
         }
 
-        if (!name.trim().length) {
+        if (!name || name.trim().length === 0) {
             name = usernameWithPrefix ? `@${user.username}` : user.username;
         }
     }
