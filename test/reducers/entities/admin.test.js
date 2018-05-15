@@ -25,7 +25,7 @@ describe('reducers.entities.admin', () => {
                 data: [
                     {
                         plugin_id: 'plugin_0',
-                        cluster_discovery_id: 'cluster_discovery_id_1',
+                        cluster_id: 'cluster_id_1',
                         version: '0.1.0',
                         state: PluginState.PLUGIN_STATE_NOT_RUNNING,
                         name: 'Plugin 0',
@@ -34,7 +34,7 @@ describe('reducers.entities.admin', () => {
                     },
                     {
                         plugin_id: 'plugin_1',
-                        cluster_discovery_id: 'cluster_discovery_id_1',
+                        cluster_id: 'cluster_id_1',
                         version: '0.0.1',
                         state: PluginState.PLUGIN_STATE_NOT_RUNNING,
                         name: 'Plugin 1',
@@ -43,7 +43,7 @@ describe('reducers.entities.admin', () => {
                     },
                     {
                         plugin_id: 'plugin_1',
-                        cluster_discovery_id: 'cluster_discovery_id_2',
+                        cluster_id: 'cluster_id_2',
                         version: '0.0.2',
                         state: PluginState.PLUGIN_STATE_RUNNING,
                         name: 'Plugin 1',
@@ -63,7 +63,7 @@ describe('reducers.entities.admin', () => {
                     active: false,
                     instances: [
                         {
-                            cluster_discovery_id: 'cluster_discovery_id_1',
+                            cluster_id: 'cluster_id_1',
                             state: PluginState.PLUGIN_STATE_NOT_RUNNING,
                             version: '0.1.0',
                         },
@@ -79,12 +79,12 @@ describe('reducers.entities.admin', () => {
                     active: true,
                     instances: [
                         {
-                            cluster_discovery_id: 'cluster_discovery_id_1',
+                            cluster_id: 'cluster_id_1',
                             state: PluginState.PLUGIN_STATE_NOT_RUNNING,
                             version: '0.0.1',
                         },
                         {
-                            cluster_discovery_id: 'cluster_discovery_id_2',
+                            cluster_id: 'cluster_id_2',
                             state: PluginState.PLUGIN_STATE_RUNNING,
                             version: '0.0.2',
                         },
@@ -108,7 +108,7 @@ describe('reducers.entities.admin', () => {
                     active: false,
                     instances: [
                         {
-                            cluster_discovery_id: 'cluster_discovery_id_1',
+                            cluster_id: 'cluster_id_1',
                             state: PluginState.PLUGIN_STATE_NOT_RUNNING,
                             version: '0.1.0',
                         },
@@ -124,7 +124,7 @@ describe('reducers.entities.admin', () => {
                     active: false,
                     instances: [
                         {
-                            cluster_discovery_id: 'cluster_discovery_id_1',
+                            cluster_id: 'cluster_id_1',
                             state: PluginState.PLUGIN_STATE_NOT_RUNNING,
                             version: '0.0.1',
                         },
@@ -136,7 +136,7 @@ describe('reducers.entities.admin', () => {
                 data: [
                     {
                         plugin_id: 'plugin_0',
-                        cluster_discovery_id: 'cluster_discovery_id_1',
+                        cluster_id: 'cluster_id_1',
                         version: '0.1.0',
                         state: PluginState.PLUGIN_STATE_NOT_RUNNING,
                         name: 'Plugin 0',
@@ -145,7 +145,7 @@ describe('reducers.entities.admin', () => {
                     },
                     {
                         plugin_id: 'plugin_1',
-                        cluster_discovery_id: 'cluster_discovery_id_1',
+                        cluster_id: 'cluster_id_1',
                         version: '0.0.1',
                         state: PluginState.PLUGIN_STATE_NOT_RUNNING,
                         name: 'Plugin 1',
@@ -154,7 +154,7 @@ describe('reducers.entities.admin', () => {
                     },
                     {
                         plugin_id: 'plugin_1',
-                        cluster_discovery_id: 'cluster_discovery_id_2',
+                        cluster_id: 'cluster_id_2',
                         version: '0.0.2',
                         state: PluginState.PLUGIN_STATE_RUNNING,
                         name: 'Plugin 1',
@@ -174,7 +174,7 @@ describe('reducers.entities.admin', () => {
                     active: false,
                     instances: [
                         {
-                            cluster_discovery_id: 'cluster_discovery_id_1',
+                            cluster_id: 'cluster_id_1',
                             state: PluginState.PLUGIN_STATE_NOT_RUNNING,
                             version: '0.1.0',
                         },
@@ -190,12 +190,12 @@ describe('reducers.entities.admin', () => {
                     active: true,
                     instances: [
                         {
-                            cluster_discovery_id: 'cluster_discovery_id_1',
+                            cluster_id: 'cluster_id_1',
                             state: PluginState.PLUGIN_STATE_NOT_RUNNING,
                             version: '0.0.1',
                         },
                         {
-                            cluster_discovery_id: 'cluster_discovery_id_2',
+                            cluster_id: 'cluster_id_2',
                             state: PluginState.PLUGIN_STATE_RUNNING,
                             version: '0.0.2',
                         },
@@ -219,7 +219,7 @@ describe('reducers.entities.admin', () => {
                     active: false,
                     instances: [
                         {
-                            cluster_discovery_id: 'cluster_discovery_id_1',
+                            cluster_id: 'cluster_id_1',
                             state: PluginState.PLUGIN_STATE_NOT_RUNNING,
                             version: '0.1.0',
                         },
@@ -235,7 +235,7 @@ describe('reducers.entities.admin', () => {
                     active: false,
                     instances: [
                         {
-                            cluster_discovery_id: 'cluster_discovery_id_1',
+                            cluster_id: 'cluster_id_1',
                             state: PluginState.PLUGIN_STATE_NOT_RUNNING,
                             version: '0.0.1',
                         },
@@ -263,7 +263,7 @@ describe('reducers.entities.admin', () => {
                     active: false,
                     instances: [
                         {
-                            cluster_discovery_id: 'cluster_discovery_id_1',
+                            cluster_id: 'cluster_id_1',
                             state: PluginState.PLUGIN_STATE_NOT_RUNNING,
                             version: '0.1.0',
                         },
@@ -279,7 +279,7 @@ describe('reducers.entities.admin', () => {
                     active: false,
                     instances: [
                         {
-                            cluster_discovery_id: 'cluster_discovery_id_1',
+                            cluster_id: 'cluster_id_1',
                             state: PluginState.PLUGIN_STATE_NOT_RUNNING,
                             version: '0.0.1',
                         },
@@ -313,7 +313,7 @@ describe('reducers.entities.admin', () => {
                     active: false,
                     instances: [
                         {
-                            cluster_discovery_id: 'cluster_discovery_id_1',
+                            cluster_id: 'cluster_id_1',
                             state: PluginState.PLUGIN_STATE_NOT_RUNNING,
                             version: '0.1.0',
                         },
@@ -329,7 +329,7 @@ describe('reducers.entities.admin', () => {
                     active: false,
                     instances: [
                         {
-                            cluster_discovery_id: 'cluster_discovery_id_1',
+                            cluster_id: 'cluster_id_1',
                             state: PluginState.PLUGIN_STATE_NOT_RUNNING,
                             version: '0.0.1',
                         },
@@ -357,7 +357,7 @@ describe('reducers.entities.admin', () => {
                     active: false,
                     instances: [
                         {
-                            cluster_discovery_id: 'cluster_discovery_id_1',
+                            cluster_id: 'cluster_id_1',
                             state: PluginState.PLUGIN_STATE_NOT_RUNNING,
                             version: '0.1.0',
                         },
@@ -373,7 +373,7 @@ describe('reducers.entities.admin', () => {
                     active: false,
                     instances: [
                         {
-                            cluster_discovery_id: 'cluster_discovery_id_1',
+                            cluster_id: 'cluster_id_1',
                             state: PluginState.PLUGIN_STATE_NOT_RUNNING,
                             version: '0.0.1',
                         },
@@ -397,7 +397,7 @@ describe('reducers.entities.admin', () => {
                     active: false,
                     instances: [
                         {
-                            cluster_discovery_id: 'cluster_discovery_id_1',
+                            cluster_id: 'cluster_id_1',
                             state: PluginState.PLUGIN_STATE_NOT_RUNNING,
                             version: '0.1.0',
                         },
@@ -413,12 +413,12 @@ describe('reducers.entities.admin', () => {
                     active: true,
                     instances: [
                         {
-                            cluster_discovery_id: 'cluster_discovery_id_1',
+                            cluster_id: 'cluster_id_1',
                             state: PluginState.PLUGIN_STATE_NOT_RUNNING,
                             version: '0.0.1',
                         },
                         {
-                            cluster_discovery_id: 'cluster_discovery_id_2',
+                            cluster_id: 'cluster_id_2',
                             state: PluginState.PLUGIN_STATE_RUNNING,
                             version: '0.0.2',
                         },
@@ -440,7 +440,7 @@ describe('reducers.entities.admin', () => {
                     active: false,
                     instances: [
                         {
-                            cluster_discovery_id: 'cluster_discovery_id_1',
+                            cluster_id: 'cluster_id_1',
                             state: PluginState.PLUGIN_STATE_NOT_RUNNING,
                             version: '0.1.0',
                         },
@@ -456,12 +456,12 @@ describe('reducers.entities.admin', () => {
                     active: true,
                     instances: [
                         {
-                            cluster_discovery_id: 'cluster_discovery_id_1',
+                            cluster_id: 'cluster_id_1',
                             state: PluginState.PLUGIN_STATE_NOT_RUNNING,
                             version: '0.0.1',
                         },
                         {
-                            cluster_discovery_id: 'cluster_discovery_id_2',
+                            cluster_id: 'cluster_id_2',
                             state: PluginState.PLUGIN_STATE_RUNNING,
                             version: '0.0.2',
                         },
@@ -485,7 +485,7 @@ describe('reducers.entities.admin', () => {
                     active: false,
                     instances: [
                         {
-                            cluster_discovery_id: 'cluster_discovery_id_1',
+                            cluster_id: 'cluster_id_1',
                             state: PluginState.PLUGIN_STATE_NOT_RUNNING,
                             version: '0.1.0',
                         },
@@ -501,12 +501,12 @@ describe('reducers.entities.admin', () => {
                     active: true,
                     instances: [
                         {
-                            cluster_discovery_id: 'cluster_discovery_id_1',
+                            cluster_id: 'cluster_id_1',
                             state: PluginState.PLUGIN_STATE_NOT_RUNNING,
                             version: '0.0.1',
                         },
                         {
-                            cluster_discovery_id: 'cluster_discovery_id_2',
+                            cluster_id: 'cluster_id_2',
                             state: PluginState.PLUGIN_STATE_RUNNING,
                             version: '0.0.2',
                         },
@@ -528,7 +528,7 @@ describe('reducers.entities.admin', () => {
                     active: false,
                     instances: [
                         {
-                            cluster_discovery_id: 'cluster_discovery_id_1',
+                            cluster_id: 'cluster_id_1',
                             state: PluginState.PLUGIN_STATE_NOT_RUNNING,
                             version: '0.1.0',
                         },
@@ -544,12 +544,12 @@ describe('reducers.entities.admin', () => {
                     active: true,
                     instances: [
                         {
-                            cluster_discovery_id: 'cluster_discovery_id_1',
+                            cluster_id: 'cluster_id_1',
                             state: PluginState.PLUGIN_STATE_NOT_RUNNING,
                             version: '0.0.1',
                         },
                         {
-                            cluster_discovery_id: 'cluster_discovery_id_2',
+                            cluster_id: 'cluster_id_2',
                             state: PluginState.PLUGIN_STATE_RUNNING,
                             version: '0.0.2',
                         },
@@ -573,7 +573,7 @@ describe('reducers.entities.admin', () => {
                     active: false,
                     instances: [
                         {
-                            cluster_discovery_id: 'cluster_discovery_id_1',
+                            cluster_id: 'cluster_id_1',
                             state: PluginState.PLUGIN_STATE_NOT_RUNNING,
                             version: '0.1.0',
                         },
@@ -589,12 +589,12 @@ describe('reducers.entities.admin', () => {
                     active: true,
                     instances: [
                         {
-                            cluster_discovery_id: 'cluster_discovery_id_1',
+                            cluster_id: 'cluster_id_1',
                             state: PluginState.PLUGIN_STATE_NOT_RUNNING,
                             version: '0.0.1',
                         },
                         {
-                            cluster_discovery_id: 'cluster_discovery_id_2',
+                            cluster_id: 'cluster_id_2',
                             state: PluginState.PLUGIN_STATE_RUNNING,
                             version: '0.0.2',
                         },
@@ -616,7 +616,7 @@ describe('reducers.entities.admin', () => {
                     active: false,
                     instances: [
                         {
-                            cluster_discovery_id: 'cluster_discovery_id_1',
+                            cluster_id: 'cluster_id_1',
                             state: PluginState.PLUGIN_STATE_NOT_RUNNING,
                             version: '0.1.0',
                         },
@@ -632,12 +632,12 @@ describe('reducers.entities.admin', () => {
                     active: true,
                     instances: [
                         {
-                            cluster_discovery_id: 'cluster_discovery_id_1',
+                            cluster_id: 'cluster_id_1',
                             state: PluginState.PLUGIN_STATE_NOT_RUNNING,
                             version: '0.0.1',
                         },
                         {
-                            cluster_discovery_id: 'cluster_discovery_id_2',
+                            cluster_id: 'cluster_id_2',
                             state: PluginState.PLUGIN_STATE_RUNNING,
                             version: '0.0.2',
                         },
@@ -661,7 +661,7 @@ describe('reducers.entities.admin', () => {
                     active: false,
                     instances: [
                         {
-                            cluster_discovery_id: 'cluster_discovery_id_1',
+                            cluster_id: 'cluster_id_1',
                             state: PluginState.PLUGIN_STATE_NOT_RUNNING,
                             version: '0.1.0',
                         },
@@ -677,7 +677,7 @@ describe('reducers.entities.admin', () => {
                     active: false,
                     instances: [
                         {
-                            cluster_discovery_id: 'cluster_discovery_id_1',
+                            cluster_id: 'cluster_id_1',
                             state: PluginState.PLUGIN_STATE_NOT_RUNNING,
                             version: '0.0.1',
                         },
@@ -699,7 +699,7 @@ describe('reducers.entities.admin', () => {
                     active: false,
                     instances: [
                         {
-                            cluster_discovery_id: 'cluster_discovery_id_1',
+                            cluster_id: 'cluster_id_1',
                             state: PluginState.PLUGIN_STATE_NOT_RUNNING,
                             version: '0.0.1',
                         },
@@ -723,7 +723,7 @@ describe('reducers.entities.admin', () => {
                     active: false,
                     instances: [
                         {
-                            cluster_discovery_id: 'cluster_discovery_id_1',
+                            cluster_id: 'cluster_id_1',
                             state: PluginState.PLUGIN_STATE_NOT_RUNNING,
                             version: '0.0.1',
                         },
@@ -752,7 +752,7 @@ describe('reducers.entities.admin', () => {
                     active: false,
                     instances: [
                         {
-                            cluster_discovery_id: 'cluster_discovery_id_1',
+                            cluster_id: 'cluster_id_1',
                             state: PluginState.PLUGIN_STATE_NOT_RUNNING,
                             version: '0.1.0',
                         },
@@ -768,7 +768,7 @@ describe('reducers.entities.admin', () => {
                     active: false,
                     instances: [
                         {
-                            cluster_discovery_id: 'cluster_discovery_id_1',
+                            cluster_id: 'cluster_id_1',
                             state: PluginState.PLUGIN_STATE_NOT_RUNNING,
                             version: '0.0.1',
                         },
