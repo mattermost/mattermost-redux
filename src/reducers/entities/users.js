@@ -53,9 +53,9 @@ function removeProfileListFromSet(state, action) {
 }
 
 function addProfileToSet(state, action) {
-    const id = action.id;
+    const {id, user_id: userId} = action.data;
     const nextSet = new Set(state[id]);
-    nextSet.add(action.data.user_id);
+    nextSet.add(userId);
     return {
         ...state,
         [id]: nextSet,
@@ -63,9 +63,9 @@ function addProfileToSet(state, action) {
 }
 
 function removeProfileFromSet(state, action) {
-    const id = action.id;
+    const {id, user_id: userId} = action.data;
     const nextSet = new Set(state[id]);
-    nextSet.delete(action.data.user_id);
+    nextSet.delete(userId);
     return {
         ...state,
         [id]: nextSet,
@@ -220,7 +220,7 @@ function profilesWithoutTeam(state = new Set(), action) {
     }
     case UserTypes.RECEIVED_PROFILE_IN_TEAM: {
         const nextSet = new Set(state);
-        nextSet.delete(action.id);
+        nextSet.delete(action.data.id);
         return nextSet;
     }
     case UserTypes.LOGOUT_SUCCESS:

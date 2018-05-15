@@ -326,7 +326,7 @@ describe('Actions.Websocket', () => {
             )(store.dispatch, store.getState);
         } else {
             user = {...TestHelper.fakeUser(), id: TestHelper.generateId()};
-            store.dispatch({type: UserTypes.RECEIVED_PROFILE_IN_CHANNEL, id: TestHelper.basicChannel.id, data: {user_id: user.id}});
+            store.dispatch({type: UserTypes.RECEIVED_PROFILE_IN_CHANNEL, data: {id: TestHelper.basicChannel.id, user_id: user.id}});
             mockServer.send(JSON.stringify({event: WebsocketEvents.USER_ADDED, data: {team_id: TestHelper.basicTeam.id, user_id: user.id}, broadcast: {omit_users: null, user_id: '', channel_id: TestHelper.basicChannel.id, team_id: ''}, seq: 42}));
         }
 
@@ -358,7 +358,7 @@ describe('Actions.Websocket', () => {
             )(store.dispatch, store.getState);
         } else {
             user = {...TestHelper.fakeUser(), id: TestHelper.generateId()};
-            store.dispatch({type: UserTypes.RECEIVED_PROFILE_NOT_IN_CHANNEL, id: TestHelper.basicChannel.id, data: {user_id: user.id}});
+            store.dispatch({type: UserTypes.RECEIVED_PROFILE_NOT_IN_CHANNEL, data: {id: TestHelper.basicChannel.id, user_id: user.id}});
             mockServer.send(JSON.stringify({event: WebsocketEvents.USER_REMOVED, data: {remover_id: TestHelper.basicUser.id, user_id: user.id}, broadcast: {omit_users: null, user_id: '', channel_id: TestHelper.basicChannel.id, team_id: ''}, seq: 42}));
         }
 
