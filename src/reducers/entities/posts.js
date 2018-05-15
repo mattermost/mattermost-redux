@@ -3,7 +3,7 @@
 
 import {PostTypes, SearchTypes, UserTypes} from 'action_types';
 import {Posts} from 'constants';
-import {comparePosts} from 'utils/post_utils';
+import {comparePosts, combineSystemPosts} from 'utils/post_utils';
 
 function handleReceivedPost(posts = {}, postsInChannel = {}, postsInThread = {}, action) {
     const post = action.data;
@@ -39,7 +39,10 @@ function handleReceivedPost(posts = {}, postsInChannel = {}, postsInThread = {},
         ];
     }
 
-    return {posts: nextPosts, postsInChannel: nextPostsInChannel, postsInThread: nextPostsInThread};
+    const withCombineSystemPosts = combineSystemPosts(nextPostsInChannel[channelId], nextPosts);
+    nextPostsInChannel[channelId] = withCombineSystemPosts.postsForChannel;
+
+    return {posts: withCombineSystemPosts.nextPosts, postsInChannel: nextPostsInChannel, postsInThread: nextPostsInThread};
 }
 
 function handleRemovePendingPost(posts = {}, postsInChannel = {}, postsInThread = {}, action) {
@@ -149,9 +152,10 @@ function handleReceivedPosts(posts = {}, postsInChannel = {}, postsInThread = {}
         return comparePosts(nextPosts[a], nextPosts[b]);
     });
 
-    nextPostsInChannel[channelId] = postsForChannel;
+    const withCombineSystemPosts = combineSystemPosts(postsForChannel, nextPosts, channelId);
+    nextPostsInChannel[channelId] = withCombineSystemPosts.postsForChannel;
 
-    return {posts: nextPosts, postsInChannel: nextPostsInChannel, postsInThread: nextPostsInThread};
+    return {posts: withCombineSystemPosts.nextPosts, postsInChannel: nextPostsInChannel, postsInThread: nextPostsInThread};
 }
 
 function handlePendingPosts(pendingPostIds = [], action) {

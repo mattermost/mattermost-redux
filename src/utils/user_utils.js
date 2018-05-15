@@ -20,7 +20,8 @@ export function getFullName(user: UserProfile): string {
 
 export function displayUsername(
     user: UserProfile,
-    teammateNameDisplay: string
+    teammateNameDisplay: string,
+    usernameWithPrefix: boolean,
 ): string {
     let name = localizeMessage('channel_loader.someone', 'Someone');
 
@@ -30,11 +31,11 @@ export function displayUsername(
         } else if (teammateNameDisplay === Preferences.DISPLAY_PREFER_FULL_NAME) {
             name = getFullName(user);
         } else {
-            name = user.username;
+            name = usernameWithPrefix ? `@${user.username}` : user.username;
         }
 
-        if (!name.trim().length) {
-            name = user.username;
+        if (!name || name.trim().length === 0) {
+            name = usernameWithPrefix ? `@${user.username}` : user.username;
         }
     }
 
