@@ -5,10 +5,14 @@
 import {Client4} from 'client';
 import {SchemeTypes} from 'action_types';
 import {General} from 'constants';
-import {bindClientFunc} from './helpers';
-import type {Scheme, SchemeScope, SchemePatch} from '../types/schemes';
+import {batchActions} from 'redux-batched-actions';
 
-export function getScheme(schemeId: string) {
+import {bindClientFunc, forceLogoutIfNecessary} from './helpers';
+import {logError} from './errors';
+import type {Scheme, SchemeScope, SchemePatch} from '../types/schemes';
+import type {ActionFunc} from '../types/actions';
+
+export function getScheme(schemeId: string): ActionFunc {
     return bindClientFunc(
         Client4.getScheme,
         SchemeTypes.GET_SCHEME_REQUEST,
@@ -18,7 +22,7 @@ export function getScheme(schemeId: string) {
     );
 }
 
-export function getSchemes(scope: SchemeScope, page: number = 0, perPage: number = General.PAGE_SIZE_DEFAULT) {
+export function getSchemes(scope: SchemeScope, page: number = 0, perPage: number = General.PAGE_SIZE_DEFAULT): ActionFunc {
     return bindClientFunc(
         Client4.getSchemes,
         SchemeTypes.GET_SCHEMES_REQUEST,
@@ -30,7 +34,7 @@ export function getSchemes(scope: SchemeScope, page: number = 0, perPage: number
     );
 }
 
-export function createScheme(scheme: Scheme) {
+export function createScheme(scheme: Scheme): ActionFunc {
     return bindClientFunc(
         Client4.createScheme,
         SchemeTypes.CREATE_SCHEME_REQUEST,
@@ -40,17 +44,30 @@ export function createScheme(scheme: Scheme) {
     );
 }
 
-export function deleteScheme(schemeId: string) {
-    return bindClientFunc(
-        Client4.deleteScheme,
-        SchemeTypes.DELETE_SCHEME_REQUEST,
-        [SchemeTypes.DELETED_SCHEME, SchemeTypes.DELETE_SCHEME_SUCCESS],
-        SchemeTypes.DELETE_SCHEME_FAILURE,
-        schemeId
-    );
+export function deleteScheme(schemeId: string): ActionFunc {
+    return async (dispatch, getState) => {
+        dispatch({type: SchemeTypes.DELETE_SCHEME_REQUEST, data: null}, getState);
+
+        let data = null;
+        try {
+            data = await Client4.deleteScheme(schemeId);
+        } catch (error) {
+            forceLogoutIfNecessary(error, dispatch, getState);
+            dispatch(batchActions([
+                {type: SchemeTypes.DELETE_SCHEME_FAILURE, error},
+                logError(error)(dispatch),
+            ]), getState);
+            return {data: null, error};
+        }
+
+        dispatch({type: SchemeTypes.DELETED_SCHEME, data: {schemeId}}, getState);
+        dispatch({type: SchemeTypes.DELETE_SCHEME_SUCCESS, data: null}, getState);
+
+        return {data, error: null};
+    };
 }
 
-export function patchScheme(scheme: SchemePatch) {
+export function patchScheme(scheme: SchemePatch): ActionFunc {
     return bindClientFunc(
         Client4.patchScheme,
         SchemeTypes.PATCH_SCHEME_REQUEST,
@@ -60,7 +77,7 @@ export function patchScheme(scheme: SchemePatch) {
     );
 }
 
-export function getSchemeTeams(schemeId: string, page: number = 0, perPage: number = General.PAGE_SIZE_DEFAULT) {
+export function getSchemeTeams(schemeId: string, page: number = 0, perPage: number = General.PAGE_SIZE_DEFAULT): ActionFunc {
     return bindClientFunc(
         Client4.getSchemeTeams,
         SchemeTypes.GET_SCHEME_TEAMS_REQUEST,
@@ -72,7 +89,7 @@ export function getSchemeTeams(schemeId: string, page: number = 0, perPage: numb
     );
 }
 
-export function getSchemeChannels(schemeId: string, page: number = 0, perPage: number = General.PAGE_SIZE_DEFAULT) {
+export function getSchemeChannels(schemeId: string, page: number = 0, perPage: number = General.PAGE_SIZE_DEFAULT): ActionFunc {
     return bindClientFunc(
         Client4.getSchemeChannels,
         SchemeTypes.GET_SCHEME_CHANNELS_REQUEST,

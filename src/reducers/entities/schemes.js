@@ -28,7 +28,7 @@ function schemes(state: { [string]: Scheme } = {}, action: GenericAction): { [st
 
     case SchemeTypes.DELETED_SCHEME: {
         const nextState = {...state};
-        Reflect.deleteProperty(nextState, action.data.id);
+        Reflect.deleteProperty(nextState, action.data.schemeId);
         return nextState;
     }
 
