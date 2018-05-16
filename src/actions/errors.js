@@ -46,8 +46,8 @@ export function logError(error, displayable = false) {
                 const stringifiedSerializedError = JSON.stringify(serializedError).toString();
                 await Client4.logClientError(stringifiedSerializedError);
             } catch (err) {
-              // avoid crashing the app if an error sending
-              // the error occurs.
+                // avoid crashing the app if an error sending
+                // the error occurs.
             }
         }
 

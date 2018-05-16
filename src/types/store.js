@@ -15,15 +15,15 @@ import type {IntegrationsState} from './integrations';
 import type {FilesState} from './files';
 import type {EmojisState} from './emojis';
 import type {ChannelsRequestsStatuses,
-             GeneralRequestsStatuses,
-             PostsRequestsStatuses,
-             TeamsRequestsStatuses,
-             UsersRequestsStatuses,
-             PreferencesRequestsStatuses,
-             AdminRequestsStatuses,
-             EmojisRequestsStatuses,
-             FilesRequestsStatuses,
-             IntegrationsRequestsStatuses,
+    GeneralRequestsStatuses,
+    PostsRequestsStatuses,
+    TeamsRequestsStatuses,
+    UsersRequestsStatuses,
+    PreferencesRequestsStatuses,
+    AdminRequestsStatuses,
+    EmojisRequestsStatuses,
+    FilesRequestsStatuses,
+    IntegrationsRequestsStatuses,
 } from './requests';
 
 export type GlobalState = {

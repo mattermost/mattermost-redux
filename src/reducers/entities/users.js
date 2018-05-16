@@ -82,7 +82,6 @@ function currentUserId(state = '', action) {
 
     case UserTypes.LOGOUT_SUCCESS:
         return '';
-
     }
 
     return state;
