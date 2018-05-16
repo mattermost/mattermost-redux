@@ -425,14 +425,24 @@ describe('Actions.Websocket', () => {
 
     it('Websocket Handle Channel Updated', async () => {
         const channelName = 'Test name';
+        const channelType = 'P';
         const channelId = TestHelper.basicChannel.id;
 
         if (TestHelper.isLiveServer()) {
             const client = TestHelper.createClient4();
             await client.login(TestHelper.basicUser.email, 'password1');
-            await client.updateChannel({...TestHelper.basicChannel, display_name: channelName});
+            await client.updateChannel({...TestHelper.basicChannel, display_name: channelName, type: channelType});
         } else {
-            mockServer.send(JSON.stringify({event: WebsocketEvents.CHANNEL_UPDATED, data: {channel: `{"id":"${channelId}","create_at":1508253647983,"update_at":1508254198797,"delete_at":0,"team_id":"55pfercbm7bsmd11p5cjpgsbwr","type":"O","display_name":"${channelName}","name":"${TestHelper.basicChannel.name}","header":"header","purpose":"","last_post_at":1508253648004,"total_msg_count":0,"extra_update_at":1508253648001,"creator_id":"${TestHelper.basicUser.id}"}`}, broadcast: {omit_users: null, user_id: '', channel_id: channelId, team_id: ''}, seq: 62}));
+            nock(Client4.getChannelsRoute()).
+                get(`/${TestHelper.basicChannel.id}`).
+                reply(200, {...TestHelper.basicChannel, display_name: channelName, type: channelType});
+
+            mockServer.send(JSON.stringify({
+                event: WebsocketEvents.CHANNEL_UPDATED,
+                data: {channel_id: channelId},
+                broadcast: {omit_users: null, user_id: '', channel_id: channelId, team_id: ''},
+                seq: 62},
+            ));
         }
 
         await TestHelper.wait(300);
@@ -442,6 +452,7 @@ describe('Actions.Websocket', () => {
         const {channels} = entities.channels;
 
         assert.strictEqual(channels[channelId].display_name, channelName);
+        assert.strictEqual(channels[channelId].type, channelType);
     });
 
     it('Websocket Handle Channel Deleted', (done) => {
