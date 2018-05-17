@@ -8,6 +8,7 @@
  * of patent rights can be found in the PATENTS file in the same directory.
  *
  */
+/* eslint-disable header/header */
 
 const disableOnIe11 =
     window && window.navigator && window.navigator.userAgent &&

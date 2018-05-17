@@ -1,5 +1,5 @@
-// Copyright (c) 2017-present Mattermost, Inc. All Rights Reserved.
-// See License.txt for license information.
+// Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
+// See LICENSE.txt for license information.
 
 import {combineReducers} from 'redux';
 import {AdminTypes, UserTypes} from 'action_types';
@@ -406,7 +406,7 @@ function pluginStatuses(state = {}, action) {
             const instances = [
                 ...((nextState[id] && nextState[id].instances) || []),
                 {
-                    cluster_discovery_id: plugin.cluster_discovery_id,
+                    cluster_id: plugin.cluster_id,
                     version: plugin.version,
                     state: plugin.state,
                 },

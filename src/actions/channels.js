@@ -1,5 +1,5 @@
-// Copyright (c) 2016-present Mattermost, Inc. All Rights Reserved.
-// See License.txt for license information.
+// Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
+// See LICENSE.txt for license information.
 
 import {batchActions} from 'redux-batched-actions';
 
@@ -981,8 +981,7 @@ export function addChannelMember(channelId, userId, postRootId = '') {
         dispatch(batchActions([
             {
                 type: UserTypes.RECEIVED_PROFILE_IN_CHANNEL,
-                data: {user_id: userId},
-                id: channelId,
+                data: {id: channelId, user_id: userId},
             },
             {
                 type: ChannelTypes.RECEIVED_CHANNEL_MEMBER,
@@ -1018,8 +1017,7 @@ export function removeChannelMember(channelId, userId) {
         dispatch(batchActions([
             {
                 type: UserTypes.RECEIVED_PROFILE_NOT_IN_CHANNEL,
-                data: {user_id: userId},
-                id: channelId,
+                data: {id: channelId, user_id: userId},
             },
             {
                 type: ChannelTypes.REMOVE_CHANNEL_MEMBER_SUCCESS,

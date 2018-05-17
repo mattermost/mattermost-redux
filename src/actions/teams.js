@@ -1,5 +1,5 @@
-// Copyright (c) 2016-present Mattermost, Inc. All Rights Reserved.
-// See License.txt for license information.
+// Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
+// See LICENSE.txt for license information.
 
 import {batchActions} from 'redux-batched-actions';
 import {Client, Client4} from 'client';
@@ -351,8 +351,7 @@ export function addUserToTeam(teamId, userId) {
         dispatch(batchActions([
             {
                 type: UserTypes.RECEIVED_PROFILE_IN_TEAM,
-                data: {user_id: userId},
-                id: teamId,
+                data: {id: teamId, user_id: userId},
             },
             {
                 type: TeamTypes.RECEIVED_MEMBER_IN_TEAM,
@@ -428,8 +427,7 @@ export function removeUserFromTeam(teamId, userId) {
         const actions = [
             {
                 type: UserTypes.RECEIVED_PROFILE_NOT_IN_TEAM,
-                data: {user_id: userId},
-                id: teamId,
+                data: {id: teamId, user_id: userId},
             },
             {
                 type: TeamTypes.REMOVE_MEMBER_FROM_TEAM,
