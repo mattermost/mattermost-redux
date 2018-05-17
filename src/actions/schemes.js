@@ -67,12 +67,13 @@ export function deleteScheme(schemeId: string): ActionFunc {
     };
 }
 
-export function patchScheme(scheme: SchemePatch): ActionFunc {
+export function patchScheme(schemeId: string, scheme: SchemePatch): ActionFunc {
     return bindClientFunc(
         Client4.patchScheme,
         SchemeTypes.PATCH_SCHEME_REQUEST,
         [SchemeTypes.PATCHED_SCHEME, SchemeTypes.PATCH_SCHEME_SUCCESS],
         SchemeTypes.PATCH_SCHEME_FAILURE,
+        schemeId,
         scheme
     );
 }
