@@ -261,6 +261,15 @@ export function logout() {
     };
 }
 
+export function getTotalUsersStats() {
+    return bindClientFunc(
+        Client4.getTotalUsersStats,
+        UserTypes.USER_STATS_REQUEST,
+        [UserTypes.RECEIVED_USER_STATS, UserTypes.USER_STATS_SUCCESS],
+        UserTypes.USER_STATS_FAILURE,
+    );
+}
+
 export function getProfiles(page = 0, perPage = General.PROFILE_CHUNK_SIZE) {
     return async (dispatch, getState) => {
         dispatch({type: UserTypes.PROFILES_REQUEST}, getState);
@@ -1509,6 +1518,7 @@ export default {
     getStatus,
     getStatusesByIds,
     getSessions,
+    getTotalUsersStats,
     loadProfilesForDirect,
     revokeSession,
     revokeAllSessionsForUser,

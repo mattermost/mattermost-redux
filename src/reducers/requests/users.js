@@ -178,6 +178,16 @@ function getStatus(state: RequestStatusType = initialRequestState(), action: Gen
     );
 }
 
+function getTotalUsersStats(state: RequestStatusType = initialRequestState(), action: GenericAction): RequestStatusType {
+    return handleRequest(
+        UserTypes.USER_STATS_REQUEST,
+        UserTypes.USER_STATS_SUCCESS,
+        UserTypes.USER_STATS_FAILURE,
+        state,
+        action
+    );
+}
+
 function setStatus(state: RequestStatusType = initialRequestState(), action: GenericAction): RequestStatusType {
     return handleRequest(
         UserTypes.SET_STATUS_REQUEST,
@@ -376,6 +386,7 @@ export default combineReducers({
     getStatus,
     setStatus,
     getSessions,
+    getTotalUsersStats,
     revokeSession,
     revokeAllSessionsForUser,
     getAudits,

@@ -996,6 +996,13 @@ export default class Client4 {
         );
     };
 
+    getTotalUsersStats = async () => {
+        return this.doFetch(
+            `${this.getUsersRoute()}/stats`,
+            {method: 'get'}
+        );
+    };
+
     getTeamInviteInfo = async (inviteId) => {
         return this.doFetch(
             `${this.getTeamsRoute()}/invite/${inviteId}`,
