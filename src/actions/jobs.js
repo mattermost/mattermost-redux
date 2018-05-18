@@ -1,5 +1,6 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
+// @flow
 
 import {JobTypes} from 'action_types';
 
@@ -8,7 +9,10 @@ import {General} from 'constants';
 
 import {bindClientFunc} from './helpers';
 
-export function createJob(job) {
+import type {ActionFunc} from '../types/actions';
+import type {JobType, Job} from '../types/jobs';
+
+export function createJob(job: Job): ActionFunc {
     return bindClientFunc(
         Client4.createJob,
         JobTypes.CREATE_JOB_REQUEST,
@@ -18,7 +22,7 @@ export function createJob(job) {
     );
 }
 
-export function getJob(id) {
+export function getJob(id: string): ActionFunc {
     return bindClientFunc(
         Client4.getJob,
         JobTypes.GET_JOB_REQUEST,
@@ -28,7 +32,7 @@ export function getJob(id) {
     );
 }
 
-export function getJobs(page = 0, perPage = General.JOBS_CHUNK_SIZE) {
+export function getJobs(page: number = 0, perPage: number = General.JOBS_CHUNK_SIZE): ActionFunc {
     return bindClientFunc(
         Client4.getJobs,
         JobTypes.GET_JOBS_REQUEST,
@@ -39,7 +43,7 @@ export function getJobs(page = 0, perPage = General.JOBS_CHUNK_SIZE) {
     );
 }
 
-export function getJobsByType(type, page = 0, perPage = General.JOBS_CHUNK_SIZE) {
+export function getJobsByType(type: JobType, page: number = 0, perPage: number = General.JOBS_CHUNK_SIZE): ActionFunc {
     return bindClientFunc(
         Client4.getJobsByType,
         JobTypes.GET_JOBS_REQUEST,
@@ -51,7 +55,7 @@ export function getJobsByType(type, page = 0, perPage = General.JOBS_CHUNK_SIZE)
     );
 }
 
-export function cancelJob(job) {
+export function cancelJob(job: string): ActionFunc {
     return bindClientFunc(
         Client4.cancelJob,
         JobTypes.CANCEL_JOB_REQUEST,
