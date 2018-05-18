@@ -1076,6 +1076,15 @@ describe('PostUtils', () => {
             };
 
             assert.equal(out.postsForChannel.length, 4);
+
+            // check that regular posts are present
+            assert.deepEqual(out.nextPosts[out.postsForChannel[0]], post22);
+            assert.deepEqual(out.nextPosts[out.postsForChannel[2]], post2);
+            assert.deepEqual(out.nextPosts[out.postsForChannel[3]], post1);
+
+            // verify that the combined posts is at correct order
+            assert.deepEqual(out.nextPosts[out.postsForChannel[1]].type, PostTypes.COMBINED_USER_ACTIVITY);
+
             assert.equal(Object.keys(out.nextPosts).length, 6);
             assert.equal(out.nextPosts[combinedPost.id].type, PostTypes.COMBINED_USER_ACTIVITY);
             assert.equal(out.nextPosts[combinedPost.id].create_at, 9);
@@ -1101,9 +1110,16 @@ describe('PostUtils', () => {
             };
 
             const combinedPostId = out.postsForChannel[1];
-            console.log('out.nextPosts[combinedPostId]:', out.nextPosts[combinedPostId]);
-            console.log('out.postsForChannel:', out.postsForChannel);
             assert.equal(out.postsForChannel.length, 4);
+
+            // check that regular and custom posts are present
+            assert.deepEqual(out.nextPosts[out.postsForChannel[0]], post22);
+            assert.deepEqual(out.nextPosts[out.postsForChannel[2]], postCustom2);
+            assert.deepEqual(out.nextPosts[out.postsForChannel[3]], post1);
+
+            // verify that the combined posts is at correct order
+            assert.deepEqual(out.nextPosts[out.postsForChannel[1]].type, PostTypes.COMBINED_USER_ACTIVITY);
+
             assert.equal(Object.keys(out.nextPosts).length, 6);
             assert.equal(out.nextPosts[combinedPostId].type, PostTypes.COMBINED_USER_ACTIVITY);
             assert.equal(out.nextPosts[combinedPostId].create_at, 11);
