@@ -819,6 +819,9 @@ describe('PostUtils', () => {
 
         const postId1 = '1';
         const postId2 = '2';
+
+        const postCustomId2 = '2';
+
         const postId13 = '13';
         const postId14 = '14';
         const postId17 = '17';
@@ -827,6 +830,9 @@ describe('PostUtils', () => {
 
         const post1 = {id: '1', type: '', state: '', create_at: 1, props: {}, delete_at: 0};
         const post2 = {id: '2', type: '', state: '', create_at: 2, props: {}, delete_at: 0};
+
+        const postCustom2 = {id: '2', type: 'custom_post', state: '', create_at: 2, props: {}, delete_at: 0};
+
         const post13 = {id: '13', type: '', state: '', create_at: 13, props: {}, delete_at: 0};
         const post14 = {id: '14', type: '', state: '', create_at: 14, props: {}, delete_at: 0};
         const post17 = {id: '17', type: '', state: '', create_at: 17, props: {}, delete_at: 0};
@@ -834,7 +840,7 @@ describe('PostUtils', () => {
         const post22 = {id: '22', type: '', state: '', create_at: 22, props: {}, delete_at: 0};
 
         it('should combine consecutive user activity posts', () => {
-            const out = combineSystemPosts([postIdUA12, postIdUA11], {[postIdUA11]: postUA11, [postIdUA12]: postUA12});
+            const out = combineSystemPosts([postIdUA12, postIdUA11], {[postIdUA11]: postUA11, [postIdUA12]: postUA12}, 'channel_id');
             const expectedUserActivityPosts = {
                 allUserIds: ['user_id_2', 'added_user_id_1', 'user_id_1'],
                 messageData: [
@@ -1070,6 +1076,15 @@ describe('PostUtils', () => {
             };
 
             assert.equal(out.postsForChannel.length, 4);
+
+            // check that regular posts are present
+            assert.deepEqual(out.nextPosts[out.postsForChannel[0]], post22);
+            assert.deepEqual(out.nextPosts[out.postsForChannel[2]], post2);
+            assert.deepEqual(out.nextPosts[out.postsForChannel[3]], post1);
+
+            // verify that the combined posts is at correct order
+            assert.deepEqual(out.nextPosts[out.postsForChannel[1]].type, PostTypes.COMBINED_USER_ACTIVITY);
+
             assert.equal(Object.keys(out.nextPosts).length, 6);
             assert.equal(out.nextPosts[combinedPost.id].type, PostTypes.COMBINED_USER_ACTIVITY);
             assert.equal(out.nextPosts[combinedPost.id].create_at, 9);
@@ -1078,6 +1093,41 @@ describe('PostUtils', () => {
             assert.equal(out.nextPosts[combinedPost.id].system_post_ids[2], '10');
             assert.equal(out.nextPosts[combinedPost.id].system_post_ids[3], '9');
             assert.deepEqual(out.nextPosts[combinedPost.id].props.user_activity, expectedUserActivityPosts);
+        });
+
+        it('should combine consecutive combined and user activity posts between regular and custom posts', () => {
+            const out = combineSystemPosts(
+                [postId22, postIdUA12, postIdUA11, postCustomId2, postId1],
+                {[postIdUA11]: postUA11, [postIdUA12]: postUA12, [postId1]: post1, [postCustomId2]: postCustom2, [postId22]: post22},
+                'channel_id',
+            );
+            const expectedUserActivityPosts = {
+                allUserIds: ['user_id_2', 'added_user_id_1', 'user_id_1'],
+                messageData: [
+                    {postType: 'system_join_channel', userIds: ['user_id_2']},
+                    {postType: 'system_add_to_channel', userIds: ['added_user_id_1'], actorId: 'user_id_1'},
+                ],
+            };
+
+            const combinedPostId = out.postsForChannel[1];
+            assert.equal(out.postsForChannel.length, 4);
+
+            // check that regular and custom posts are present
+            assert.deepEqual(out.nextPosts[out.postsForChannel[0]], post22);
+            assert.deepEqual(out.nextPosts[out.postsForChannel[2]], postCustom2);
+            assert.deepEqual(out.nextPosts[out.postsForChannel[3]], post1);
+
+            // verify that the combined posts is at correct order
+            assert.deepEqual(out.nextPosts[out.postsForChannel[1]].type, PostTypes.COMBINED_USER_ACTIVITY);
+
+            assert.equal(Object.keys(out.nextPosts).length, 6);
+            assert.equal(out.nextPosts[combinedPostId].type, PostTypes.COMBINED_USER_ACTIVITY);
+            assert.equal(out.nextPosts[combinedPostId].create_at, 11);
+            assert.equal(out.nextPosts[combinedPostId].system_post_ids[0], '12');
+            assert.equal(out.nextPosts[combinedPostId].system_post_ids[1], '11');
+            assert.equal(out.nextPosts[combinedPostId].user_activity_posts[0], postUA12);
+            assert.equal(out.nextPosts[combinedPostId].user_activity_posts[1], postUA11);
+            assert.deepEqual(out.nextPosts[combinedPostId].props.user_activity, expectedUserActivityPosts);
         });
     });
 });
