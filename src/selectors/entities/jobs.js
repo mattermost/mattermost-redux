@@ -1,21 +1,25 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
+// @flow
 
 import {createSelector} from 'reselect';
 
-export function getAllJobs(state) {
+import type {GlobalState} from 'types/store';
+import type {JobType, Job} from 'types/jobs';
+
+export function getAllJobs(state: GlobalState): {[string]: Job} {
     return state.entities.jobs.jobs;
 }
 
-export function getJobsByType(state) {
+export function getJobsByType(state: GlobalState): {[JobType]: Array<Job>} {
     return state.entities.jobs.jobsByTypeList;
 }
 
-export function makeGetJobsByType(type) {
+export function makeGetJobsByType(type: JobType): (state: GlobalState) => Array<Job> {
     return createSelector(
         getJobsByType,
         (jobsByType) => {
-            return Object.values(jobsByType[type] || []);
+            return jobsByType[type] || [];
         }
     );
 }

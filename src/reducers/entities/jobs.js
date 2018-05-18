@@ -1,10 +1,14 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
+// @flow
 
 import {combineReducers} from 'redux';
 import {JobTypes} from 'action_types';
 
-function jobs(state = {}, action) {
+import type {JobType, Job} from '../../types/jobs';
+import type {GenericAction} from '../../types/actions';
+
+function jobs(state: {[string]: Job} = {}, action: GenericAction): {[string]: Job} {
     switch (action.type) {
     case JobTypes.RECEIVED_JOB: {
         const nextState = {...state};
@@ -23,7 +27,7 @@ function jobs(state = {}, action) {
     }
 }
 
-function jobsByTypeList(state = {}, action) {
+function jobsByTypeList(state: {[JobType]: Array<Job>} = {}, action: GenericAction): {[JobType]: Array<Job>} {
     switch (action.type) {
     case JobTypes.RECEIVED_JOBS_BY_TYPE: {
         const nextState = {...state};
