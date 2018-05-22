@@ -392,7 +392,6 @@ function plugins(state = {}, action) {
 
 function pluginStatuses(state = {}, action) {
     switch (action.type) {
-
     case AdminTypes.RECEIVED_PLUGIN_STATUSES: {
         const nextState = {};
 

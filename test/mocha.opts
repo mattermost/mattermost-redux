@@ -3,3 +3,4 @@
 --require babel-polyfill
 --require isomorphic-fetch
 --recursive
+--exit

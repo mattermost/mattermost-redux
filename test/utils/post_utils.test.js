@@ -317,8 +317,8 @@ describe('PostUtils', () => {
                 {input: {type: PostTypes.HEADER_CHANGE}, output: true},
                 {input: {type: PostTypes.PURPOSE_CHANGE}, output: true},
 
-                {input: {type: PostTypes.JOIN_LEAVE}, output: true},  // deprecated system type
-                {input: {type: PostTypes.ADD_REMOVE}, output: true},  // deprecated system type
+                {input: {type: PostTypes.JOIN_LEAVE}, output: true}, // deprecated system type
+                {input: {type: PostTypes.ADD_REMOVE}, output: true}, // deprecated system type
 
                 {input: {type: PostTypes.COMBINED_USER_ACTIVITY}, output: true},
 
@@ -356,8 +356,8 @@ describe('PostUtils', () => {
                 {input: PostTypes.HEADER_CHANGE, output: false},
                 {input: PostTypes.PURPOSE_CHANGE, output: false},
 
-                {input: PostTypes.JOIN_LEAVE, output: false},  // deprecated system type
-                {input: PostTypes.ADD_REMOVE, output: false},  // deprecated system type
+                {input: PostTypes.JOIN_LEAVE, output: false}, // deprecated system type
+                {input: PostTypes.ADD_REMOVE, output: false}, // deprecated system type
 
                 {input: PostTypes.COMBINED_USER_ACTIVITY, output: false},
 

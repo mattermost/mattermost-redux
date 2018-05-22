@@ -556,10 +556,10 @@ function not(f) {
 
 function buildChannels(usersState, channels, missingDirectChannels, teammateNameDisplay, locale) {
     return channels.
-    concat(missingDirectChannels).
-    map(completeDirectChannelInfo.bind(null, usersState, teammateNameDisplay)).
-    filter(isNotDeletedChannel).
-    sort(sortChannelsByTypeAndDisplayName.bind(null, locale));
+        concat(missingDirectChannels).
+        map(completeDirectChannelInfo.bind(null, usersState, teammateNameDisplay)).
+        filter(isNotDeletedChannel).
+        sort(sortChannelsByTypeAndDisplayName.bind(null, locale));
 }
 
 function buildFavoriteChannels(channels, myPreferences, locale) {
@@ -578,7 +578,7 @@ function buildDirectAndGroupChannels(channels, memberships, config, myPreference
 
 function buildChannelsWithMentions(channels, members, locale) {
     return channels.filter(channelHasMentions.bind(null, members)).
-    sort(sortChannelsByDisplayName.bind(null, locale));
+        sort(sortChannelsByDisplayName.bind(null, locale));
 }
 
 function buildUnreadChannels(channels, members, locale) {

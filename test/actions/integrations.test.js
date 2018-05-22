@@ -366,8 +366,8 @@ describe('Actions.Integrations', () => {
         assert.equal(Object.keys({...noTeamCommands, ...noSystemCommands}).length, 0);
 
         nock(Client4.getTeamsRoute()).
-        post('').
-        reply(201, TestHelper.fakeTeamWithId());
+            post('').
+            reply(201, TestHelper.fakeTeamWithId());
 
         const {data: team} = await TeamsActions.createTeam(
             TestHelper.fakeTeam()
@@ -410,8 +410,8 @@ describe('Actions.Integrations', () => {
         assert.equal(Object.keys({...noTeamCommands, ...noSystemCommands}).length, 0);
 
         nock(Client4.getTeamsRoute()).
-        post('').
-        reply(201, TestHelper.fakeTeamWithId());
+            post('').
+            reply(201, TestHelper.fakeTeamWithId());
 
         const {data: team} = await TeamsActions.createTeam(
             TestHelper.fakeTeam()
@@ -516,8 +516,8 @@ describe('Actions.Integrations', () => {
         };
 
         nock(`${Client4.getCommandsRoute()}/execute`).
-        post('').
-        reply(200, []);
+            post('').
+            reply(200, []);
 
         await Actions.executeCommand('/echo message 5', args);
 
