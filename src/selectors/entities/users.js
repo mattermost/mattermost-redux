@@ -192,6 +192,8 @@ function sortAndInjectProfiles(profiles, profileSet, skipInactive = false) {
         currentProfiles = Array.from(profileSet).map((p) => profiles[p]);
     }
 
+    currentProfiles = currentProfiles.filter((profile) => Boolean(profile));
+
     if (skipInactive) {
         currentProfiles = currentProfiles.filter((profile) => !(profile.delete_at && profile.delete_at !== 0));
     }
