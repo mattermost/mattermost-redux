@@ -145,18 +145,10 @@ export function isChannelReadOnly(state, channel) {
         !isCurrentUserSystemAdmin(state) && getConfig(state).ExperimentalTownSquareIsReadOnly === 'true';
 }
 
-export function isChannelHidden(state, channel) {
+export function shouldHideDefaultChannel(state, channel) {
     return channel && channel.name === General.DEFAULT_CHANNEL &&
         !isCurrentUserSystemAdmin(state) && getConfig(state).ExperimentalHideTownSquareinLHS === 'true';
 }
-
-export const getHiddenChannelIdInCurrentTeam = createSelector(
-    getCurrentTeamId,
-    (state) => state.entities.channels.hiddenDefaultChannelId,
-    (currentTeamId, hiddenChannel) => {
-        return hiddenChannel[currentTeamId] || '';
-    }
-);
 
 export const getChannelSetInCurrentTeam = createSelector(
     getCurrentTeamId,

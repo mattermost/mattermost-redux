@@ -1833,21 +1833,4 @@ describe('Actions.Channels', () => {
 
         assert.deepEqual(result, {data: [TestHelper.basicChannel]});
     });
-
-    it('addHiddenDefaultChannel and removeHiddenDefaultChannel', () => {
-        const channelId = TestHelper.basicChannel.id;
-        const teamId = TestHelper.basicChannel.team_id;
-
-        Actions.addHiddenDefaultChannel(teamId, channelId)(store.dispatch, store.getState);
-        let state = store.getState();
-        let hiddenChannel = state.entities.channels.hiddenDefaultChannelId;
-        assert.ok(hiddenChannel);
-        assert.ok(hiddenChannel[teamId] === channelId);
-
-        Actions.removeHiddenDefaultChannel(teamId, channelId)(store.dispatch, store.getState);
-        state = store.getState();
-        hiddenChannel = state.entities.channels.hiddenDefaultChannelId;
-        assert.ok(hiddenChannel);
-        assert.ok(!hiddenChannel[teamId]);
-    });
 });

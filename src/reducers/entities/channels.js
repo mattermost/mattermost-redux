@@ -382,27 +382,6 @@ function stats(state = {}, action) {
     }
 }
 
-function hiddenDefaultChannelId(state = {}, action) {
-    switch (action.type) {
-    case ChannelTypes.ADD_HIDDEN_DEFAULT_CHANNEL: {
-        const nextState = {...state};
-        nextState[action.data.teamId] = action.data.channelId;
-        return nextState;
-    }
-    case ChannelTypes.REMOVE_HIDDEN_DEFAULT_CHANNEL: {
-        if (state[action.data.teamId] === action.data.channelId) {
-            const nextState = {...state};
-            Reflect.deleteProperty(nextState, action.data.teamId);
-            return nextState;
-        }
-
-        return state;
-    }
-    default:
-        return state;
-    }
-}
-
 export default combineReducers({
 
     // the current selected channel
@@ -422,7 +401,4 @@ export default combineReducers({
 
     // object where every key is the channel id and has an object with the channel stats
     stats,
-
-    // object where every key is the team id and has a value of channel id
-    hiddenDefaultChannelId,
 });
