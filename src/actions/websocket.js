@@ -8,7 +8,6 @@ import websocketClient from 'client/websocket_client';
 import {getProfilesByIds, getStatusesByIds, loadProfilesForDirect} from './users';
 import {
     fetchMyChannelsAndMembers,
-    getChannel,
     getChannelAndMyMember,
     getChannelStats,
     updateChannelHeader,
@@ -233,6 +232,9 @@ function handleEvent(msg, dispatch, getState) {
         break;
     case WebsocketEvents.CHANNEL_UPDATED:
         handleChannelUpdatedEvent(msg, dispatch, getState);
+        break;
+    case WebsocketEvents.CHANNEL_CONVERTED:
+        handleChannelConvertedEvent(msg, dispatch);
         break;
     case WebsocketEvents.CHANNEL_VIEWED:
         handleChannelViewedEvent(msg, dispatch, getState);
@@ -554,15 +556,41 @@ function handleChannelDeletedEvent(msg, dispatch, getState) {
     }
 }
 
-async function handleChannelUpdatedEvent(msg, dispatch, getState) {
-    const channelId = msg.data.channel_id;
-    const {data: channel} = await dispatch(getChannel(channelId));
+function handleChannelUpdatedEvent(msg, dispatch, getState) {
+    let channel;
+    try {
+        channel = msg.data ? JSON.parse(msg.data.channel) : null;
+    } catch (err) {
+        return;
+    }
 
-    const {currentChannelId} = getState().entities.channels;
-    if (currentChannelId === channelId) {
-        // Emit an event with the channel received as we need to handle
-        // the changes without listening to the store
-        EventEmitter.emit(WebsocketEvents.CHANNEL_UPDATED, channel);
+    const entities = getState().entities;
+    const {currentChannelId} = entities.channels;
+    if (channel) {
+        dispatch({
+            type: ChannelTypes.RECEIVED_CHANNEL,
+            data: channel,
+        });
+
+        if (currentChannelId === channel.id) {
+            // Emit an event with the channel received as we need to handle
+            // the changes without listening to the store
+            EventEmitter.emit(WebsocketEvents.CHANNEL_UPDATED, channel);
+        }
+    }
+}
+
+function handleChannelConvertedEvent(msg, dispatch) {
+    let channel;
+    try {
+        channel = msg.data ? JSON.parse(msg.data.channel) : null;
+
+        dispatch({
+            type: ChannelTypes.RECEIVED_CHANNEL,
+            data: channel,
+        });
+    } catch (err) {
+        return;
     }
 }
 
