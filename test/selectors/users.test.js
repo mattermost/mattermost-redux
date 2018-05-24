@@ -262,6 +262,27 @@ describe('Selectors.Users', () => {
         assert.deepEqual(getProfilesInChannel(testState, channel2.id, true), [user1]);
 
         assert.deepEqual(getProfilesInChannel(testState, 'nonexistentid'), []);
+        assert.deepEqual(getProfilesInChannel(testState, 'nonexistentid'), []);
+    });
+
+    it('makeGetProfilesInChannel, unknown user id in channel', () => {
+        const state = {
+            ...testState,
+            entities: {
+                ...testState.entities,
+                users: {
+                    ...testState.entities.users,
+                    profilesInChannel: {
+                        ...testState.entities.users.profilesInChannel,
+                        [channel1.id]: new Set([...testState.entities.users.profilesInChannel[channel1.id], 'unknown']),
+                    },
+                },
+            },
+        };
+
+        const getProfilesInChannel = Selectors.makeGetProfilesInChannel();
+        assert.deepEqual(getProfilesInChannel(state, channel1.id), [user1]);
+        assert.deepEqual(getProfilesInChannel(state, channel1.id, true), [user1]);
     });
 });
 
