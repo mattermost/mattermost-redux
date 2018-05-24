@@ -25,6 +25,7 @@ export default {
     JOIN_PUBLIC_CHANNELS: 'join_public_channels',
     DELETE_PUBLIC_CHANNEL: 'delete_public_channel',
     DELETE_PRIVATE_CHANNEL: 'delete_private_channel',
+    CONVERT_PUBLIC_CHANNEL: 'convert_public_channel',
     EDIT_OTHER_USERS: 'edit_other_users',
     READ_CHANNEL: 'read_channel',
     READ_PUBLIC_CHANNEL: 'read_public_channel',
