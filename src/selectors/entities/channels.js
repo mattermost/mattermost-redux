@@ -145,6 +145,11 @@ export function isChannelReadOnly(state, channel) {
         !isCurrentUserSystemAdmin(state) && getConfig(state).ExperimentalTownSquareIsReadOnly === 'true';
 }
 
+export function shouldHideDefaultChannel(state, channel) {
+    return channel && channel.name === General.DEFAULT_CHANNEL &&
+        !isCurrentUserSystemAdmin(state) && getConfig(state).ExperimentalHideTownSquareinLHS === 'true';
+}
+
 export const getChannelSetInCurrentTeam = createSelector(
     getCurrentTeamId,
     getChannelsInTeam,
