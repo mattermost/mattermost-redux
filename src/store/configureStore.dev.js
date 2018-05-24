@@ -12,16 +12,16 @@ import defaultOfflineConfig from 'redux-offline/lib/defaults';
 import createActionBuffer from 'redux-action-buffer';
 
 const devToolsEnhancer = (
-    typeof window !== 'undefined' && window.__REDUX_DEVTOOLS_EXTENSION__ ?  // eslint-disable-line no-underscore-dangle
-    window.__REDUX_DEVTOOLS_EXTENSION__ :  // eslint-disable-line no-underscore-dangle
-    () => {
-        return devTools({
-            name: 'Mattermost',
-            hostname: 'localhost',
-            port: 5678,
-            realtime: true,
-        });
-    }
+    typeof window !== 'undefined' && window.__REDUX_DEVTOOLS_EXTENSION__ ? // eslint-disable-line no-underscore-dangle
+        window.__REDUX_DEVTOOLS_EXTENSION__ : // eslint-disable-line no-underscore-dangle
+        () => {
+            return devTools({
+                name: 'Mattermost',
+                hostname: 'localhost',
+                port: 5678,
+                realtime: true,
+            });
+        }
 );
 
 import {General} from 'constants';

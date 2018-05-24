@@ -15,22 +15,22 @@ export default (url = null, options = {headers: {}}) => {
         }
 
         return fetch(url, options).
-        then((response) => {
-            if (response.status === 304) {
-                return cachedResponse.clone();
-            }
-
-            if (response.status === 200) {
-                const responseEtag = response.headers.get('Etag');
-
-                if (responseEtag) {
-                    data[`${url}${responseEtag}`] = response.clone();
-                    etags[url] = responseEtag;
+            then((response) => {
+                if (response.status === 304) {
+                    return cachedResponse.clone();
                 }
-            }
 
-            return response;
-        });
+                if (response.status === 200) {
+                    const responseEtag = response.headers.get('Etag');
+
+                    if (responseEtag) {
+                        data[`${url}${responseEtag}`] = response.clone();
+                        etags[url] = responseEtag;
+                    }
+                }
+
+                return response;
+            });
     }
 
     // all other requests go straight to fetch

@@ -108,9 +108,9 @@ describe('Actions.General', () => {
         };
 
         nock(Client4.getBaseRoute()).
-        get('/data_retention/policy').
-        query(true).
-        reply(200, responseData);
+            get('/data_retention/policy').
+            query(true).
+            reply(200, responseData);
 
         await Actions.getDataRetentionPolicy()(store.dispatch, store.getState);
         await TestHelper.wait(100);
@@ -120,9 +120,9 @@ describe('Actions.General', () => {
 
     it('getTimezones', async () => {
         nock(Client4.getBaseRoute()).
-        get('/system/timezones').
-        query(true).
-        reply(200, ['America/New_York', 'America/Los_Angeles']);
+            get('/system/timezones').
+            query(true).
+            reply(200, ['America/New_York', 'America/Los_Angeles']);
 
         await Actions.getSupportedTimezones()(store.dispatch, store.getState);
 

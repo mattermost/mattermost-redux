@@ -287,10 +287,8 @@ export function combineSystemPosts(postsIds = [], posts = {}, channelId) {
 
     postsIds.forEach((p, i) => {
         const channelPost = posts[p];
-        if (
-            channelPost.delete_at === 0 &&
-            (isUserActivityPost(channelPost.type) || channelPost.type === Posts.POST_TYPES.COMBINED_USER_ACTIVITY)
-        ) {
+        const combinedOrUserActivityPost = isUserActivityPost(channelPost.type) || channelPost.type === Posts.POST_TYPES.COMBINED_USER_ACTIVITY;
+        if (channelPost.delete_at === 0 && combinedOrUserActivityPost) {
             if (!createAt || createAt > channelPost.create_at) {
                 createAt = channelPost.create_at;
             }
@@ -311,9 +309,8 @@ export function combineSystemPosts(postsIds = [], posts = {}, channelId) {
                 combinedPostId = channelPost.id;
             }
         }
-
         if (
-            (channelPost.type === '' && userActivitySystemPosts.length > 0) ||
+            (!combinedOrUserActivityPost && userActivitySystemPosts.length > 0) ||
             userActivitySystemPosts.length === MAX_COMBINED_SYSTEM_POSTS ||
             (userActivitySystemPosts.length > 0 && i === postsIds.length - 1)
         ) {
@@ -344,10 +341,10 @@ export function combineSystemPosts(postsIds = [], posts = {}, channelId) {
             createAt = null;
             combinedPostId = null;
 
-            if (channelPost.type === '') {
+            if (!combinedOrUserActivityPost) {
                 postsForChannel.push(channelPost.id);
             }
-        } else if (channelPost.type === '') {
+        } else if (!combinedOrUserActivityPost) {
             postsForChannel.push(channelPost.id);
         }
     });

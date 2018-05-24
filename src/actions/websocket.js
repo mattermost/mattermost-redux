@@ -55,7 +55,7 @@ import {getUserIdFromChannelName} from 'utils/channel_utils';
 import {isFromWebhook, isSystemMessage, getLastCreateAt, shouldIgnorePost} from 'utils/post_utils';
 import EventEmitter from 'utils/event_emitter';
 
-export function init(platform, siteUrl, token, optionalWebSocket) {
+export function init(platform, siteUrl, token, optionalWebSocket, additionalOptions = {}) {
     return async (dispatch, getState) => {
         const config = getState().entities.general.config;
         let connUrl = siteUrl || config.WebsocketURL || Client4.getUrl();
@@ -89,6 +89,7 @@ export function init(platform, siteUrl, token, optionalWebSocket) {
         const websocketOpts = {
             connectionUrl: connUrl,
             platform,
+            ...additionalOptions,
         };
 
         if (optionalWebSocket) {

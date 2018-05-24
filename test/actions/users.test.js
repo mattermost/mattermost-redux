@@ -1401,8 +1401,8 @@ describe('Actions.Users', () => {
         const currentUserId = store.getState().entities.users.currentUserId;
 
         nock(Client4.getBaseRoute()).
-                post(`/users/${currentUserId}/tokens`).
-                reply(201, {id: 'someid', token: 'sometoken', description: 'test token', user_id: currentUserId});
+            post(`/users/${currentUserId}/tokens`).
+            reply(201, {id: 'someid', token: 'sometoken', description: 'test token', user_id: currentUserId});
 
         const {data} = await Actions.createUserAccessToken(currentUserId, 'test token')(store.dispatch, store.getState);
         const testId = data.id;
@@ -1458,8 +1458,8 @@ describe('Actions.Users', () => {
         const currentUserId = store.getState().entities.users.currentUserId;
 
         nock(Client4.getBaseRoute()).
-                post(`/users/${currentUserId}/tokens`).
-                reply(201, {id: 'someid', token: 'sometoken', description: 'test token', user_id: currentUserId});
+            post(`/users/${currentUserId}/tokens`).
+            reply(201, {id: 'someid', token: 'sometoken', description: 'test token', user_id: currentUserId});
 
         const {data} = await Actions.createUserAccessToken(currentUserId, 'test token')(store.dispatch, store.getState);
         const testId = data.id;
