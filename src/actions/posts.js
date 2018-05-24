@@ -6,7 +6,8 @@ import {batchActions} from 'redux-batched-actions';
 import {Client4} from 'client';
 import {General, Preferences, Posts} from 'constants';
 import {PostTypes, FileTypes} from 'action_types';
-import {getUsersByUsername} from 'selectors/entities/users';
+import {getUsersByUsername, getCurrentUserId} from 'selectors/entities/users';
+import {getCurrentTeamId} from 'selectors/entities/teams';
 import {getCustomEmojisByName as selectCustomEmojisByName} from 'selectors/entities/emojis';
 
 import * as Selectors from 'selectors/entities/posts';
@@ -366,6 +367,39 @@ export function unpinPost(postId) {
         dispatch(batchActions(actions), getState);
 
         return {data: posts};
+    };
+}
+
+export function getFlaggedPosts() {
+    return async (dispatch, getState) => {
+        dispatch({type: PostTypes.GET_POSTS_FLAGGED_REQUEST}, getState);
+        let flaggedPosts;
+        const userId = getCurrentUserId(state);
+        const teamId = getCurrentTeamId(state);
+
+        try {
+            flaggedPosts = await Client4.getFlaggedPosts(userId, '', teamId);
+
+        } catch (error) {
+            forceLogoutIfNecessary(error, dispatch, getState);
+            dispatch(batchActions([
+                {type: PostTypes.GET_POSTS_FLAGGED_FAILURE, error},
+                logError(error)(dispatch),
+            ]), getState);
+            return {error}; 
+        }
+
+        dispatch(batchActions([
+            {
+                type: PostTypes.RECEIVED_FLAGGED_POSTS,
+                data: flaggedPosts,
+            },
+            {
+                type: PostTypes.GET_POSTS_FLAGGED_SUCCESS,  
+            },
+        ]), getState);
+
+        return {data: flaggedPosts};
     };
 }
 
@@ -1250,4 +1284,5 @@ export default {
     resetHistoryIndex,
     moveHistoryIndexBack,
     moveHistoryIndexForward,
+    getFlaggedPosts,
 };

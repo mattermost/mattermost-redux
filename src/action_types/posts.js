@@ -40,6 +40,10 @@ export default keyMirror({
     GET_POSTS_AFTER_SUCCESS: null,
     GET_POSTS_AFTER_FAILURE: null,
 
+    GET_POSTS_FLAGGED_REQUEST: null,
+    GET_POSTS_FLAGGED_SUCCESS: null,
+    GET_POSTS_FLAGGED_FAILURE: null,
+
     REACTION_REQUEST: null,
     REACTION_SUCCESS: null,
     REACTION_FAILURE: null,
@@ -70,6 +74,7 @@ export default keyMirror({
     RECEIVED_REACTIONS: null,
     REACTION_DELETED: null,
     RECEIVED_OPEN_GRAPH_METADATA: null,
+    RECEIVED_FLAGGED_POSTS: null,
 
     ADD_MESSAGE_INTO_HISTORY: null,
     RESET_HISTORY_INDEX: null,
