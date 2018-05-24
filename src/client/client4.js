@@ -855,6 +855,15 @@ export default class Client4 {
         );
     };
 
+    searchTeams = (term) => {
+        this.trackEvent('api', 'api_search_teams');
+
+        return this.doFetch(
+            `${this.getTeamsRoute()}/search`,
+            {method: 'post', body: JSON.stringify({term})}
+        );
+    };
+
     getTeam = async (teamId) => {
         return this.doFetch(
             this.getTeamRoute(teamId),

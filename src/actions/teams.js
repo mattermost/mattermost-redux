@@ -100,6 +100,16 @@ export function getTeams(page = 0, perPage = General.TEAMS_CHUNK_SIZE) {
     );
 }
 
+export function searchTeams(term) {
+    return bindClientFunc(
+        Client4.searchTeams,
+        TeamTypes.GET_TEAMS_REQUEST,
+        [TeamTypes.RECEIVED_TEAMS_LIST, TeamTypes.GET_TEAMS_SUCCESS],
+        TeamTypes.GET_TEAMS_FAILURE,
+        term,
+    );
+}
+
 export function createTeam(team) {
     return async (dispatch, getState) => {
         dispatch({type: TeamTypes.CREATE_TEAM_REQUEST}, getState);
