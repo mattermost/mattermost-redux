@@ -13,6 +13,7 @@ import preferences from './preferences';
 import typing from './typing';
 import integrations from './integrations';
 import emojis from './emojis';
+import gifs from './gifs';
 import admin from './admin';
 import alerts from './alerts';
 import jobs from './jobs';
@@ -30,6 +31,7 @@ export default combineReducers({
     typing,
     integrations,
     emojis,
+    gifs,
     admin,
     alerts,
     jobs,
