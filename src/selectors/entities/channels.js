@@ -145,6 +145,11 @@ export function isChannelReadOnly(state, channel) {
         !isCurrentUserSystemAdmin(state) && getConfig(state).ExperimentalTownSquareIsReadOnly === 'true';
 }
 
+export function shouldHideDefaultChannel(state, channel) {
+    return channel && channel.name === General.DEFAULT_CHANNEL &&
+        !isCurrentUserSystemAdmin(state) && getConfig(state).ExperimentalHideTownSquareinLHS === 'true';
+}
+
 export const getChannelSetInCurrentTeam = createSelector(
     getCurrentTeamId,
     getChannelsInTeam,
@@ -360,6 +365,10 @@ export const canManageChannelMembers = createSelector(
     (state) => haveICurrentChannelPermission(state, {permission: Permissions.MANAGE_PRIVATE_CHANNEL_MEMBERS}),
     (state) => haveICurrentChannelPermission(state, {permission: Permissions.MANAGE_PUBLIC_CHANNEL_MEMBERS}),
     (channel, user, teamMembership, channelMembership, config, license, newPermissions, managePrivateMembers, managePublicMembers) => {
+        if (!channel) {
+            return false;
+        }
+
         if (channel.type === General.DM_CHANNEL ||
             channel.type === General.GM_CHANNEL ||
             channel.name === General.DEFAULT_CHANNEL) {
