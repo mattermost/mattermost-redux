@@ -399,6 +399,6 @@ export default combineReducers({
     // object where every key is the user id and has a value with the current status of each user
     statuses,
 
-    // object where every key is the user id and has an object with the user stats
+    // Total user stats
     stats,
 });

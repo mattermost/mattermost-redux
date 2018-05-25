@@ -526,22 +526,21 @@ describe('Actions.Users', () => {
         assert.equal(Object.keys(statuses).length, 1);
     });
 
-    // it('getUsersStats', async () => {
-    //     nock(Client4.getUsersRoute(TestHelper.basicUser.id)).
-    //         get('/stats').
-    //         reply(200, {total_user_count: 2605});
-    //     await Actions.getUserStats(TestHelper.basicUser.id)(store.dispatch, store.getState);
+    it('getTotalUsersStats', async () => {
+        nock(Client4.getBaseRoute(TestHelper.basicUser.id)).
+            get('/users/stats').
+            reply(200, {total_users_count: 2605});
+        await Actions.getTotalUsersStats()(store.dispatch, store.getState);
 
-    //     const {stats} = store.getState().entities.user;
-    //     const statsRequest = store.getState().requests.user.getUsersStats;
+        const {stats} = store.getState().entities.users;
+        const statsRequest = store.getState().requests.users.getTotalUsersStats;
 
-    //     if (statsRequest.status === RequestStatus.FAILURE) {
-    //         throw new Error(JSON.stringify(statsRequest.error));
-    //     }
+        if (statsRequest.status === RequestStatus.FAILURE) {
+            throw new Error(JSON.stringify(statsRequest.error));
+        }
 
-    //     const stat = stats[TestHelper.basicUser.id];
-    //     assert.ok(stat);
-    // });
+        assert.equal(stats.total_users_count, 2605);
+    });
 
     it('getStatus', async () => {
         const user = TestHelper.basicUser;

@@ -52,7 +52,6 @@ export default keyMirror({
     USER_STATS_REQUEST: null,
     USER_STATS_SUCCESS: null,
     USER_STATS_FAILURE: null,
-    RECEIVED_USER_STATS: null,
 
     PROFILES_STATUSES_REQUEST: null,
     PROFILES_STATUSES_SUCCESS: null,
@@ -168,4 +167,5 @@ export default keyMirror({
     REVOKED_USER_ACCESS_TOKEN: null,
     DISABLED_USER_ACCESS_TOKEN: null,
     ENABLED_USER_ACCESS_TOKEN: null,
+    RECEIVED_USER_STATS: null,
 });
