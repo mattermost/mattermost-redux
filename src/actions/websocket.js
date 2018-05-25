@@ -49,6 +49,8 @@ import {
 } from 'action_types';
 import {General, WebsocketEvents, Preferences, Posts} from 'constants';
 
+import {getChannel} from 'actions/channels';
+
 import {getCurrentChannelStats} from 'selectors/entities/channels';
 import {getCurrentUser} from 'selectors/entities/users';
 import {getUserIdFromChannelName} from 'utils/channel_utils';
@@ -581,14 +583,9 @@ function handleChannelUpdatedEvent(msg, dispatch, getState) {
 }
 
 function handleChannelConvertedEvent(msg, dispatch) {
-    let channel;
     try {
-        channel = msg.data ? JSON.parse(msg.data.channel) : null;
-
-        dispatch({
-            type: ChannelTypes.RECEIVED_CHANNEL,
-            data: channel,
-        });
+        const channelId = msg.data ? JSON.parse(msg.data.channel_id) : null;
+        dispatch(getChannel(channelId));
     } catch (err) {
         return;
     }
