@@ -17,15 +17,15 @@ import type {EmojisState} from './emojis';
 import type {SchemesState} from './schemes';
 import type {
     ChannelsRequestsStatuses,
-        GeneralRequestsStatuses,
-        PostsRequestsStatuses,
-        TeamsRequestsStatuses,
-        UsersRequestsStatuses,
-        PreferencesRequestsStatuses,
-        AdminRequestsStatuses,
-        EmojisRequestsStatuses,
-        FilesRequestsStatuses,
-        IntegrationsRequestsStatuses,
+    GeneralRequestsStatuses,
+    PostsRequestsStatuses,
+    TeamsRequestsStatuses,
+    UsersRequestsStatuses,
+    PreferencesRequestsStatuses,
+    AdminRequestsStatuses,
+    EmojisRequestsStatuses,
+    FilesRequestsStatuses,
+    IntegrationsRequestsStatuses,
 } from './requests';
 
 export type GlobalState = {
