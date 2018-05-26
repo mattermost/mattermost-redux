@@ -644,6 +644,35 @@ describe('Actions.Posts', () => {
         assert.ok(postsForThread.includes(post3a.id));
     });
 
+    // it('getFlaggedPosts', async () => {
+    //     const channelId = TestHelper.basicChannel.id;
+
+    //     nock(Client4.getPostsRoute()).
+    //         post('').
+    //         reply(201, TestHelper.fakePostWithId(channelId));
+    //     const post = await Client4.createPost(
+    //         TestHelper.fakePost(channelId)
+    //     );
+
+    //     const postList = {order: [post.id], posts: {}};
+    //     postList.posts[post.id] = post;
+
+    //     nock(Client4.getPostsRoute()).
+    //         get(`/${post.id}/flagged`).
+    //         reply(200, postList);
+    //     await Actions.getFlaggedPosts()(store.dispatch, store.getState);
+
+    //     const state = store.getState();
+    //     const getRequest = state.requests.posts.getFlaggedPosts;
+    //     const {posts, postsInChannel} = state.entities.posts;
+
+    //     if (getRequest.status === RequestStatus.FAILURE) {
+    //         throw new Error(JSON.stringify(getRequest.error));
+    //     }
+
+    //     assert.ok(posts);
+    // });
+
     it('getNeededAtMentionedUsernames', async () => {
         const state = {
             entities: {

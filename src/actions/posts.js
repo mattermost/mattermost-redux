@@ -374,19 +374,18 @@ export function getFlaggedPosts() {
     return async (dispatch, getState) => {
         dispatch({type: PostTypes.GET_POSTS_FLAGGED_REQUEST}, getState);
         let flaggedPosts;
-        const userId = getCurrentUserId(state);
-        const teamId = getCurrentTeamId(state);
+        const userId = getCurrentUserId(getState());
+        const teamId = getCurrentTeamId(getState());
 
         try {
             flaggedPosts = await Client4.getFlaggedPosts(userId, '', teamId);
-
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch, getState);
             dispatch(batchActions([
                 {type: PostTypes.GET_POSTS_FLAGGED_FAILURE, error},
                 logError(error)(dispatch),
             ]), getState);
-            return {error}; 
+            return {error};
         }
 
         dispatch(batchActions([
@@ -395,7 +394,7 @@ export function getFlaggedPosts() {
                 data: flaggedPosts,
             },
             {
-                type: PostTypes.GET_POSTS_FLAGGED_SUCCESS,  
+                type: PostTypes.GET_POSTS_FLAGGED_SUCCESS,
             },
         ]), getState);
 
