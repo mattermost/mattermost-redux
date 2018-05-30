@@ -276,5 +276,66 @@ describe('Selectors.General', () => {
         state.entities.general.serverVersion = '5.10.0.dev';
         assert.equal(Selectors.hasNewPermissions(state), true);
     });
+
+    describe('getCustomUrlSchemes', () => {
+        it('setting doesn\'t exist', () => {
+            const state = {
+                entities: {
+                    general: {
+                        config: {
+                        },
+                    },
+                },
+            };
+
+            assert.deepEqual(Selectors.getCustomUrlSchemes(state), []);
+            assert.equal(Selectors.getCustomUrlSchemes(state), Selectors.getCustomUrlSchemes(state));
+        });
+
+        it('no custom url schemes', () => {
+            const state = {
+                entities: {
+                    general: {
+                        config: {
+                            CustomUrlSchemes: '',
+                        },
+                    },
+                },
+            };
+
+            assert.deepEqual(Selectors.getCustomUrlSchemes(state), []);
+            assert.equal(Selectors.getCustomUrlSchemes(state), Selectors.getCustomUrlSchemes(state));
+        });
+
+        it('one custom url scheme', () => {
+            const state = {
+                entities: {
+                    general: {
+                        config: {
+                            CustomUrlSchemes: 'dns',
+                        },
+                    },
+                },
+            };
+
+            assert.deepEqual(Selectors.getCustomUrlSchemes(state), ['dns']);
+            assert.equal(Selectors.getCustomUrlSchemes(state), Selectors.getCustomUrlSchemes(state));
+        });
+
+        it('multiple custom url schemes', () => {
+            const state = {
+                entities: {
+                    general: {
+                        config: {
+                            CustomUrlSchemes: 'dns,steam,shttp',
+                        },
+                    },
+                },
+            };
+
+            assert.deepEqual(Selectors.getCustomUrlSchemes(state), ['dns', 'steam', 'shttp']);
+            assert.equal(Selectors.getCustomUrlSchemes(state), Selectors.getCustomUrlSchemes(state));
+        });
+    });
 });
 

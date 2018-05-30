@@ -50,3 +50,14 @@ export const canDownloadFilesOnMobile = createSelector(
         return license.IsLicensed === 'false' || license.Compliance === 'false' || config.EnableMobileFileDownload !== 'false';
     }
 );
+
+export const getCustomUrlSchemes = createSelector(
+    getConfig,
+    (config: Object): string[] => {
+        if (!config.CustomUrlSchemes) {
+            return [];
+        }
+
+        return config.CustomUrlSchemes.split(',');
+    }
+);
