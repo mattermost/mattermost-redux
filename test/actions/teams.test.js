@@ -692,4 +692,30 @@ describe('Actions.Teams', () => {
             throw new Error(JSON.stringify(removeTeamIconRequest.error));
         }
     });
+
+    it('updateTeamScheme', async () => {
+        TestHelper.mockLogin();
+        await login(TestHelper.basicUser.email, 'password1')(store.dispatch, store.getState);
+
+        const schemeId = 'xxxxxxxxxxxxxxxxxxxxxxxxxx';
+        const {id} = TestHelper.basicTeam;
+
+        nock(Client4.getTeamsRoute()).
+            put('/' + id + '/scheme').
+            reply(200, OK_RESPONSE);
+
+        await Actions.updateTeamScheme(id, schemeId)(store.dispatch, store.getState);
+
+        const state = store.getState();
+        const request = state.requests.teams.updateTeamScheme;
+        const {teams} = state.entities.teams;
+
+        if (request.status === RequestStatus.FAILURE) {
+            throw new Error(JSON.stringify(request.error));
+        }
+
+        const updated = teams[id];
+        assert.ok(updated);
+        assert.equal(updated.scheme_id, schemeId);
+    });
 });

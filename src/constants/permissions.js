@@ -54,4 +54,6 @@ export default {
     READ_USER_ACCESS_TOKEN: 'read_user_access_token',
     REVOKE_USER_ACCESS_TOKEN: 'revoke_user_access_token',
     MANAGE_JOBS: 'manage_jobs',
+    MANAGE_EMOJIS: 'manage_emojis',
+    MANAGE_OTHERS_EMOJIS: 'manage_others_emojis',
 };

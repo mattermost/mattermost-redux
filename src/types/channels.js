@@ -30,7 +30,8 @@ export type Channel = {
     last_post_at: number,
     total_msg_count: number,
     extra_update_at: number,
-    creator_id: string
+    creator_id: string,
+    scheme_id: string
 };
 
 export type ChannelMembership = {
@@ -41,14 +42,16 @@ export type ChannelMembership = {
     msg_count: number,
     mention_count: number,
     notify_props: NotifyProps,
-    last_update_at: number
+    last_update_at: number,
+    scheme_user: boolean,
+    scheme_admin: boolean
 }
 
 export type ChannelsState = {
     currentChannelId: string,
-    channels: {[string]: Channel},
-    channelsInTeam: {[string]: Array<string>},
-    myMembers: {[string]: ChannelMembership},
-    membersInChannel: {[string]: {[string]: ChannelMembership}},
-    stats: {[string]: ChannelStats}
+    channels: { [string]: Channel },
+    channelsInTeam: { [string]: Array<string> },
+    myMembers: { [string]: ChannelMembership },
+    membersInChannel: { [string]: { [string]: ChannelMembership } },
+    stats: { [string]: ChannelStats }
 };

@@ -160,6 +160,16 @@ function updateChannelMember(state: RequestStatusType = initialRequestState(), a
     );
 }
 
+function updateChannelScheme(state: RequestStatusType = initialRequestState(), action: GenericAction): RequestStatusType {
+    return handleRequest(
+        ChannelTypes.UPDATE_CHANNEL_SCHEME_REQUEST,
+        ChannelTypes.UPDATE_CHANNEL_SCHEME_SUCCESS,
+        ChannelTypes.UPDATE_CHANNEL_SCHEME_FAILURE,
+        state,
+        action
+    );
+}
+
 export default combineReducers({
     getChannel,
     getChannels,
@@ -176,4 +186,5 @@ export default combineReducers({
     addChannelMember,
     removeChannelMember,
     updateChannelMember,
+    updateChannelScheme,
 });

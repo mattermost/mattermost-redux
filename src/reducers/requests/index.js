@@ -16,6 +16,7 @@ import admin from './admin';
 import jobs from './jobs';
 import search from './search';
 import roles from './roles';
+import schemes from './schemes';
 
 export default combineReducers({
     channels,
@@ -31,4 +32,5 @@ export default combineReducers({
     jobs,
     search,
     roles,
+    schemes,
 });

@@ -1281,6 +1281,18 @@ export function unfavoriteChannel(channelId) {
     };
 }
 
+export function updateChannelScheme(channelId, schemeId) {
+    return bindClientFunc(
+        async () => {
+            await Client4.updateChannelScheme(channelId, schemeId);
+            return {channelId, schemeId};
+        },
+        ChannelTypes.UPDATE_CHANNEL_SCHEME_REQUEST,
+        [ChannelTypes.UPDATE_CHANNEL_SCHEME_SUCCESS, ChannelTypes.UPDATED_CHANNEL_SCHEME],
+        ChannelTypes.UPDATE_CHANNEL_SCHEME_FAILURE,
+    );
+}
+
 export default {
     selectChannel,
     createChannel,

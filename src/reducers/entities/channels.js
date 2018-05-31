@@ -2,7 +2,7 @@
 // See LICENSE.txt for license information.
 
 import {combineReducers} from 'redux';
-import {ChannelTypes, UserTypes} from 'action_types';
+import {ChannelTypes, UserTypes, SchemeTypes} from 'action_types';
 import {General} from 'constants';
 
 function channelListToSet(state, action) {
@@ -45,7 +45,8 @@ function channels(state = {}, action) {
             [action.data.id]: action.data,
         };
 
-    case ChannelTypes.RECEIVED_CHANNELS: {
+    case ChannelTypes.RECEIVED_CHANNELS:
+    case SchemeTypes.RECEIVED_SCHEME_CHANNELS: {
         const nextState = {...state};
         for (const channel of action.data) {
             nextState[channel.id] = channel;
@@ -100,6 +101,16 @@ function channels(state = {}, action) {
                 total_msg_count: channel.total_msg_count + amount,
             },
         };
+    }
+    case ChannelTypes.UPDATED_CHANNEL_SCHEME: {
+        const {channelId, schemeId} = action.data;
+        const channel = state[channelId];
+
+        if (!channel) {
+            return state;
+        }
+
+        return {...state, [channelId]: {...channel, scheme_id: schemeId}};
     }
 
     case UserTypes.LOGOUT_SUCCESS:
