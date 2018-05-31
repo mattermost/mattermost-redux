@@ -57,13 +57,13 @@ export function deleteScheme(schemeId: string): ActionFunc {
                 {type: SchemeTypes.DELETE_SCHEME_FAILURE, error},
                 logError(error)(dispatch),
             ]), getState);
-            return {data: null, error};
+            return {error};
         }
 
         dispatch({type: SchemeTypes.DELETED_SCHEME, data: {schemeId}}, getState);
         dispatch({type: SchemeTypes.DELETE_SCHEME_SUCCESS, data: null}, getState);
 
-        return {data, error: null};
+        return {data};
     };
 }
 

@@ -2,7 +2,7 @@
 // See LICENSE.txt for license information.
 // @flow
 
-export type FileInfo = {
+export type FileInfo = {|
 	id: string,
 	user_id: string,
 	create_at: number,
@@ -16,9 +16,9 @@ export type FileInfo = {
 	height: number,
 	has_preview_image: boolean,
 	clientId: string
-}
+|}
 
-export type FilesState = {
+export type FilesState = {|
     files: {[string]: FileInfo},
     fileIdsByPostId: {[string]: Array<string>}
-};
+|};

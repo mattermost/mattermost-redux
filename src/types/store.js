@@ -26,32 +26,35 @@ import type {
     EmojisRequestsStatuses,
     FilesRequestsStatuses,
     IntegrationsRequestsStatuses,
+    RolesRequestsStatuses,
+    SchemesRequestsStatuses,
 } from './requests';
 
-export type GlobalState = {
-    entities: {
+export type GlobalState = {|
+    entities: {|
         general: GeneralState,
         users: UsersState,
         teams: TeamsState,
         channels: ChannelsState,
         posts: PostsState,
-        preferences: {
+        preferences: {|
             myPreferences: Object
-        },
+        |},
         admin: AdminState,
         jobs: JobsState,
-        alerts: {
+        alerts: {|
             alertStack: Array<AlertType>
-        },
+        |},
         search: SearchState,
         integrations: IntegrationsState,
         files: FilesState,
         emojis: EmojisState,
         typing: Object,
+        roles: Object,
         schemes: SchemesState,
-    },
+    |},
     errors: Array<Object>,
-    requests: {
+    requests: {|
         channels: ChannelsRequestsStatuses,
         general: GeneralRequestsStatuses,
         posts: PostsRequestsStatuses,
@@ -61,6 +64,8 @@ export type GlobalState = {
         admin: AdminRequestsStatuses,
         emojis: EmojisRequestsStatuses,
         files: FilesRequestsStatuses,
-        integrations: IntegrationsRequestsStatuses
-    }
-};
+        integrations: IntegrationsRequestsStatuses,
+        roles: RolesRequestsStatuses,
+        schemes: SchemesRequestsStatuses
+    |}
+|};

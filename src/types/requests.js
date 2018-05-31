@@ -3,12 +3,12 @@
 // @flow
 
 export type RequestStatusOption = 'not_started' | 'started' | 'success' | 'failure' | 'cancelled';
-export type RequestStatusType = {
+export type RequestStatusType = {|
     status: RequestStatusOption,
     error: null | Object
-};
+|};
 
-export type ChannelsRequestsStatuses = {
+export type ChannelsRequestsStatuses = {|
     getChannel: RequestStatusType,
     getChannels: RequestStatusType,
     myMembers: RequestStatusType,
@@ -25,17 +25,17 @@ export type ChannelsRequestsStatuses = {
     removeChannelMember: RequestStatusType,
     updateChannelMember: RequestStatusType,
     updateChannelScheme: RequestStatusType
-};
+|};
 
-export type GeneralRequestsStatuses = {
+export type GeneralRequestsStatuses = {|
     server: RequestStatusType,
     config: RequestStatusType,
     dataRetentionPolicy: RequestStatusType,
     license: RequestStatusType,
     websocket: RequestStatusType
-};
+|};
 
-export type PostsRequestsStatuses = {
+export type PostsRequestsStatuses = {|
     createPost: RequestStatusType,
     editPost: RequestStatusType,
     deletePost: RequestStatusType,
@@ -49,9 +49,9 @@ export type PostsRequestsStatuses = {
     getPostsBeforeRetryAttempts: number,
     getPostsAfter: RequestStatusType,
     getPostsAfterRetryAttempts: number
-};
+|};
 
-export type TeamsRequestsStatuses = {
+export type TeamsRequestsStatuses = {|
     getMyTeams: RequestStatusType,
     getTeams: RequestStatusType,
     createTeam: RequestStatusType,
@@ -62,9 +62,9 @@ export type TeamsRequestsStatuses = {
     addUserToTeam: RequestStatusType,
     removeUserFromTeam: RequestStatusType,
     updateTeamScheme: RequestStatusType,
-};
+|};
 
-export type UsersRequestsStatuses = {
+export type UsersRequestsStatuses = {|
     checkMfa: RequestStatusType,
     login: RequestStatusType,
     logout: RequestStatusType,
@@ -82,15 +82,15 @@ export type UsersRequestsStatuses = {
     autocompleteUsers: RequestStatusType,
     searchProfiles: RequestStatusType,
     updateMe: RequestStatusType
-};
+|};
 
-export type PreferencesRequestsStatuses = {
+export type PreferencesRequestsStatuses = {|
     getMyPreferences: RequestStatusType,
     savePreferences: RequestStatusType,
     deletePreferences: RequestStatusType
-};
+|};
 
-export type AdminRequestsStatuses = {
+export type AdminRequestsStatuses = {|
     getLogs: RequestStatusType,
     getAudits: RequestStatusType,
     getConfig: RequestStatusType,
@@ -100,22 +100,23 @@ export type AdminRequestsStatuses = {
     invalidateCaches: RequestStatusType,
     recycleDatabase: RequestStatusType,
     createCompliance: RequestStatusType,
-    getCompliance: RequestStatusType
-};
+    getCompliance: RequestStatusType,
+    testS3Connection: RequestStatusType
+|};
 
-export type EmojisRequestsStatuses = {
+export type EmojisRequestsStatuses = {|
     createCustomEmoji: RequestStatusType,
     getCustomEmojis: RequestStatusType,
     deleteCustomEmoji: RequestStatusType
-};
+|};
 
-export type FilesRequestsStatuses = {
+export type FilesRequestsStatuses = {|
     getFilesForPost: RequestStatusType,
     uploadFiles: RequestStatusType,
     getFilePublicLink: RequestStatusType
-};
+|};
 
-export type IntegrationsRequestsStatuses = {
+export type IntegrationsRequestsStatuses = {|
     createIncomingHook: RequestStatusType,
     getIncomingHooks: RequestStatusType,
     deleteIncomingHook: RequestStatusType,
@@ -136,4 +137,21 @@ export type IntegrationsRequestsStatuses = {
     getOAuthApp: RequestStatusType,
     getOAuthApps: RequestStatusType,
     deleteOAuthApp: RequestStatusType
-};
+|};
+
+export type RolesRequestsStatuses = {|
+    getRolesByNames: RequestStatusType,
+    getRoleByName: RequestStatusType,
+    getRole: RequestStatusType,
+    editRole: RequestStatusType
+|};
+
+export type SchemesRequestsStatuses = {|
+    getSchemes: RequestStatusType,
+    getScheme: RequestStatusType,
+    createScheme: RequestStatusType,
+    deleteScheme: RequestStatusType,
+    patchScheme: RequestStatusType,
+    getSchemeTeams: RequestStatusType,
+    getSchemeChannels: RequestStatusType
+|};

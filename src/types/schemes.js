@@ -4,7 +4,7 @@
 
 export type SchemeScope = 'team' | 'channel';
 
-export type Scheme = {
+export type Scheme = {|
     id: string,
     name: string,
     description: string,
@@ -16,13 +16,13 @@ export type Scheme = {
     default_team_user_role: string,
     default_channel_admin_role: string,
     default_channel_user_role: string,
-};
+|};
 
-export type SchemesState = {
+export type SchemesState = {|
     schemes: { [string]: Scheme },
-};
+|};
 
-export type SchemePatch = {
+export type SchemePatch = {|
   name?: string,
   description?: string
-};
+|};

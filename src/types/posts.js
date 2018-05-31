@@ -15,7 +15,7 @@ export type PostType = 'system_add_remove' |
                        'system_purpose_change' |
                        'system_remove_from_channel';
 
-export type Post = {
+export type Post = {|
     id: string,
     create_at: number,
     update_at: number,
@@ -32,18 +32,19 @@ export type Post = {
     props: Object,
     hashtags: string,
     pending_post_id: string
-}
+|}
 
-export type PostsState = {
+export type PostsState = {|
     posts: {[string]: Post},
     postsInChannel: {[string]: Array<string>},
+    postsInThread: {[string]: Array<string>},
     selectedPostId: string,
     currentFocusedPostId: string,
-    messagesHistory: {
+    messagesHistory: {|
         messages: Array<string>,
-        index: {
+        index: {|
             post: number,
             comment: number
-        }
-    }
-};
+        |}
+    |}
+|};
