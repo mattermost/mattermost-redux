@@ -2,7 +2,7 @@
 // See LICENSE.txt for license information.
 
 import {batchActions} from 'redux-batched-actions';
-import {Client, Client4} from 'client';
+import {Client4} from 'client';
 import {General} from 'constants';
 import {ChannelTypes, TeamTypes, UserTypes} from 'action_types';
 import EventEmitter from 'utils/event_emitter';
@@ -545,14 +545,8 @@ export function joinTeam(inviteId, teamId) {
     return async (dispatch, getState) => {
         dispatch({type: TeamTypes.JOIN_TEAM_REQUEST}, getState);
 
-        const serverVersion = getState().entities.general.serverVersion;
-
         try {
-            if (serverVersion.charAt(0) === '3') {
-                await Client.joinTeamFromInvite(inviteId);
-            } else {
-                await Client4.joinTeam(inviteId);
-            }
+            await Client4.joinTeam(inviteId);
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch, getState);
             dispatch(batchActions([

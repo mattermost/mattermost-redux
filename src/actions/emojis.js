@@ -4,7 +4,7 @@
 
 import {batchActions} from 'redux-batched-actions';
 
-import {Client, Client4} from 'client';
+import {Client4} from 'client';
 import {EmojiTypes} from 'action_types';
 import {General, Emoji} from 'constants';
 
@@ -183,23 +183,16 @@ export function getAllCustomEmojis(perPage: number = General.PAGE_SIZE_MAXIMUM):
         let page = 0;
         const allEmojis = [];
 
-        const serverVersion = getState().entities.general.serverVersion;
-
         do {
             try {
                 let emojis = [];
-                if (serverVersion.charAt(0) === '3') {
-                    emojis = await Client.getCustomEmojis();
+                emojis = await Client4.getCustomEmojis(page, perPage, Emoji.SORT_BY_NAME);
+                if (emojis.length < perPage) {
                     hasMore = false;
                 } else {
-                    emojis = await Client4.getCustomEmojis(page, perPage, Emoji.SORT_BY_NAME);
-                    if (emojis.length < perPage) {
-                        hasMore = false;
-                    } else {
-                        page += 1;
-                    }
-                    allEmojis.push(...emojis);
+                    page += 1;
                 }
+                allEmojis.push(...emojis);
             } catch (error) {
                 forceLogoutIfNecessary(error, dispatch, getState);
 

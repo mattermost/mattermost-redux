@@ -5,7 +5,7 @@ import assert from 'assert';
 import nock from 'nock';
 
 import * as Actions from 'actions/general';
-import {Client, Client4} from 'client';
+import {Client4} from 'client';
 import {RequestStatus} from 'constants';
 
 import TestHelper from 'test/test_helper';
@@ -27,12 +27,11 @@ describe('Actions.General', () => {
 
     it('getPing - Invalid URL', async () => {
         const serverUrl = Client4.getUrl();
-        Client.setUrl('notarealurl');
+        Client4.setUrl('notarealurl');
         await Actions.getPing(true)(store.dispatch, store.getState);
 
         const {server} = store.getState().requests.general;
         assert.ok(server.status === RequestStatus.FAILURE && server.error);
-        Client.setUrl(serverUrl);
         Client4.setUrl(serverUrl);
     });
 
