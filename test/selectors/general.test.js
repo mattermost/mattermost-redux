@@ -3,6 +3,8 @@
 
 import assert from 'assert';
 
+import {General} from 'constants';
+
 import * as Selectors from 'selectors/entities/general';
 
 describe('Selectors.General', () => {
@@ -277,7 +279,7 @@ describe('Selectors.General', () => {
         assert.equal(Selectors.hasNewPermissions(state), true);
     });
 
-    describe('getCustomUrlSchemes', () => {
+    describe('getAutolinkedUrlSchemes', () => {
         it('setting doesn\'t exist', () => {
             const state = {
                 entities: {
@@ -288,8 +290,8 @@ describe('Selectors.General', () => {
                 },
             };
 
-            assert.deepEqual(Selectors.getCustomUrlSchemes(state), []);
-            assert.equal(Selectors.getCustomUrlSchemes(state), Selectors.getCustomUrlSchemes(state));
+            assert.deepEqual(Selectors.getAutolinkedUrlSchemes(state), General.DEFAULT_AUTOLINKED_URL_SCHEMES);
+            assert.equal(Selectors.getAutolinkedUrlSchemes(state), Selectors.getAutolinkedUrlSchemes(state));
         });
 
         it('no custom url schemes', () => {
@@ -303,8 +305,8 @@ describe('Selectors.General', () => {
                 },
             };
 
-            assert.deepEqual(Selectors.getCustomUrlSchemes(state), []);
-            assert.equal(Selectors.getCustomUrlSchemes(state), Selectors.getCustomUrlSchemes(state));
+            assert.deepEqual(Selectors.getAutolinkedUrlSchemes(state), General.DEFAULT_AUTOLINKED_URL_SCHEMES);
+            assert.equal(Selectors.getAutolinkedUrlSchemes(state), Selectors.getAutolinkedUrlSchemes(state));
         });
 
         it('one custom url scheme', () => {
@@ -318,8 +320,8 @@ describe('Selectors.General', () => {
                 },
             };
 
-            assert.deepEqual(Selectors.getCustomUrlSchemes(state), ['dns']);
-            assert.equal(Selectors.getCustomUrlSchemes(state), Selectors.getCustomUrlSchemes(state));
+            assert.deepEqual(Selectors.getAutolinkedUrlSchemes(state), [...General.DEFAULT_AUTOLINKED_URL_SCHEMES, 'dns']);
+            assert.equal(Selectors.getAutolinkedUrlSchemes(state), Selectors.getAutolinkedUrlSchemes(state));
         });
 
         it('multiple custom url schemes', () => {
@@ -333,8 +335,8 @@ describe('Selectors.General', () => {
                 },
             };
 
-            assert.deepEqual(Selectors.getCustomUrlSchemes(state), ['dns', 'steam', 'shttp']);
-            assert.equal(Selectors.getCustomUrlSchemes(state), Selectors.getCustomUrlSchemes(state));
+            assert.deepEqual(Selectors.getAutolinkedUrlSchemes(state), [...General.DEFAULT_AUTOLINKED_URL_SCHEMES, 'dns', 'steam', 'shttp']);
+            assert.equal(Selectors.getAutolinkedUrlSchemes(state), Selectors.getAutolinkedUrlSchemes(state));
         });
     });
 });

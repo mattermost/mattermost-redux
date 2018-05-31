@@ -79,4 +79,6 @@ export default {
     MIN_USERS_IN_GM: 3,
 
     DEFAULT_LOCALE: 'en',
+
+    DEFAULT_AUTOLINKED_URL_SCHEMES: ['http', 'https', 'ftp', 'mailto', 'tel'],
 };
