@@ -394,30 +394,60 @@ describe('PostUtils', () => {
         it('should match return for ADD_TO_CHANNEL', () => {
             const out1 = {
                 allUserIds: ['added_user_id_1', 'user_id_1'],
+                allUsernames: [],
                 messageData: [{actorId: 'user_id_1', postType: PostTypes.ADD_TO_CHANNEL, userIds: ['added_user_id_1']}],
             };
             assert.deepEqual(combineUserActivitySystemPost([postAddToChannel1]), out1);
 
             const out2 = {
                 allUserIds: ['added_user_id_1', 'added_user_id_2', 'user_id_1'],
+                allUsernames: [],
                 messageData: [{actorId: 'user_id_1', postType: PostTypes.ADD_TO_CHANNEL, userIds: ['added_user_id_1', 'added_user_id_2']}],
             };
             assert.deepEqual(combineUserActivitySystemPost([postAddToChannel1, postAddToChannel2]), out2);
 
             const out3 = {
                 allUserIds: ['added_user_id_1', 'added_user_id_2', 'added_user_id_3', 'user_id_1'],
+                allUsernames: [],
                 messageData: [{actorId: 'user_id_1', postType: PostTypes.ADD_TO_CHANNEL, userIds: ['added_user_id_1', 'added_user_id_2', 'added_user_id_3']}],
             };
             assert.deepEqual(combineUserActivitySystemPost([postAddToChannel1, postAddToChannel2, postAddToChannel3]), out3);
 
             const out4 = {
                 allUserIds: ['added_user_id_1', 'added_user_id_2', 'added_user_id_3', 'user_id_1', 'added_user_id_4', 'user_id_2'],
+                allUsernames: [],
                 messageData: [
                     {actorId: 'user_id_1', postType: PostTypes.ADD_TO_CHANNEL, userIds: ['added_user_id_1', 'added_user_id_2', 'added_user_id_3']},
                     {actorId: 'user_id_2', postType: PostTypes.ADD_TO_CHANNEL, userIds: ['added_user_id_4']},
                 ],
             };
             assert.deepEqual(combineUserActivitySystemPost([postAddToChannel1, postAddToChannel2, postAddToChannel3, postAddToChannel4]), out4);
+        });
+
+        it('should match return for ADD_TO_CHANNEL, backward compatibility with addedUsername', () => {
+            const out1 = {
+                allUserIds: ['user_id_1'],
+                allUsernames: ['added_user_name_1'],
+                messageData: [{actorId: 'user_id_1', postType: PostTypes.ADD_TO_CHANNEL, userIds: ['added_user_name_1']}],
+            };
+            assert.deepEqual(combineUserActivitySystemPost([{...postAddToChannel1, props: {addedUsername: 'added_user_name_1'}}]), out1);
+
+            const out2 = {
+                allUserIds: ['added_user_id_2', 'user_id_1'],
+                allUsernames: ['added_user_name_1'],
+                messageData: [{actorId: 'user_id_1', postType: PostTypes.ADD_TO_CHANNEL, userIds: ['added_user_name_1', 'added_user_id_2']}],
+            };
+            assert.deepEqual(combineUserActivitySystemPost([{...postAddToChannel1, props: {addedUsername: 'added_user_name_1'}}, postAddToChannel2]), out2);
+
+            const out3 = {
+                allUserIds: ['added_user_id_1', 'added_user_id_2', 'added_user_id_3', 'user_id_1', 'user_id_2'],
+                allUsernames: ['added_user_name_4'],
+                messageData: [
+                    {actorId: 'user_id_1', postType: PostTypes.ADD_TO_CHANNEL, userIds: ['added_user_id_1', 'added_user_id_2', 'added_user_id_3']},
+                    {actorId: 'user_id_2', postType: PostTypes.ADD_TO_CHANNEL, userIds: ['added_user_name_4']},
+                ],
+            };
+            assert.deepEqual(combineUserActivitySystemPost([postAddToChannel1, postAddToChannel2, postAddToChannel3, {...postAddToChannel4, props: {addedUsername: 'added_user_name_4'}}]), out3);
         });
 
         const postAddToTeam1 = {type: PostTypes.ADD_TO_TEAM, user_id: 'user_id_1', props: {addedUserId: 'added_user_id_1'}};
@@ -427,30 +457,60 @@ describe('PostUtils', () => {
         it('should match return for ADD_TO_TEAM', () => {
             const out1 = {
                 allUserIds: ['added_user_id_1', 'user_id_1'],
+                allUsernames: [],
                 messageData: [{actorId: 'user_id_1', postType: PostTypes.ADD_TO_TEAM, userIds: ['added_user_id_1']}],
             };
             assert.deepEqual(combineUserActivitySystemPost([postAddToTeam1]), out1);
 
             const out2 = {
                 allUserIds: ['added_user_id_1', 'added_user_id_2', 'user_id_1'],
+                allUsernames: [],
                 messageData: [{actorId: 'user_id_1', postType: PostTypes.ADD_TO_TEAM, userIds: ['added_user_id_1', 'added_user_id_2']}],
             };
             assert.deepEqual(combineUserActivitySystemPost([postAddToTeam1, postAddToTeam2]), out2);
 
             const out3 = {
                 allUserIds: ['added_user_id_1', 'added_user_id_2', 'added_user_id_3', 'user_id_1'],
+                allUsernames: [],
                 messageData: [{actorId: 'user_id_1', postType: PostTypes.ADD_TO_TEAM, userIds: ['added_user_id_1', 'added_user_id_2', 'added_user_id_3']}],
             };
             assert.deepEqual(combineUserActivitySystemPost([postAddToTeam1, postAddToTeam2, postAddToTeam3]), out3);
 
             const out4 = {
                 allUserIds: ['added_user_id_1', 'added_user_id_2', 'added_user_id_3', 'user_id_1', 'added_user_id_4', 'user_id_2'],
+                allUsernames: [],
                 messageData: [
                     {actorId: 'user_id_1', postType: PostTypes.ADD_TO_TEAM, userIds: ['added_user_id_1', 'added_user_id_2', 'added_user_id_3']},
                     {actorId: 'user_id_2', postType: PostTypes.ADD_TO_TEAM, userIds: ['added_user_id_4']},
                 ],
             };
             assert.deepEqual(combineUserActivitySystemPost([postAddToTeam1, postAddToTeam2, postAddToTeam3, postAddToTeam4]), out4);
+        });
+
+        it('should match return for ADD_TO_TEAM, backward compatibility with addedUsername', () => {
+            const out1 = {
+                allUserIds: ['user_id_1'],
+                allUsernames: ['added_user_name_1'],
+                messageData: [{actorId: 'user_id_1', postType: PostTypes.ADD_TO_TEAM, userIds: ['added_user_name_1']}],
+            };
+            assert.deepEqual(combineUserActivitySystemPost([{...postAddToTeam1, props: {addedUsername: 'added_user_name_1'}}]), out1);
+
+            const out2 = {
+                allUserIds: ['added_user_id_2', 'user_id_1'],
+                allUsernames: ['added_user_name_1'],
+                messageData: [{actorId: 'user_id_1', postType: PostTypes.ADD_TO_TEAM, userIds: ['added_user_name_1', 'added_user_id_2']}],
+            };
+            assert.deepEqual(combineUserActivitySystemPost([{...postAddToTeam1, props: {addedUsername: 'added_user_name_1'}}, postAddToTeam2]), out2);
+
+            const out3 = {
+                allUserIds: ['added_user_id_1', 'added_user_id_2', 'added_user_id_3', 'user_id_1', 'user_id_2'],
+                allUsernames: ['added_user_name_4'],
+                messageData: [
+                    {actorId: 'user_id_1', postType: PostTypes.ADD_TO_TEAM, userIds: ['added_user_id_1', 'added_user_id_2', 'added_user_id_3']},
+                    {actorId: 'user_id_2', postType: PostTypes.ADD_TO_TEAM, userIds: ['added_user_name_4']},
+                ],
+            };
+            assert.deepEqual(combineUserActivitySystemPost([postAddToTeam1, postAddToTeam2, postAddToTeam3, {...postAddToTeam4, props: {addedUsername: 'added_user_name_4'}}]), out3);
         });
 
         const postJoinChannel1 = {type: PostTypes.JOIN_CHANNEL, user_id: 'user_id_1'};
@@ -460,24 +520,28 @@ describe('PostUtils', () => {
         it('should match return for JOIN_CHANNEL', () => {
             const out1 = {
                 allUserIds: ['user_id_1'],
+                allUsernames: [],
                 messageData: [{postType: PostTypes.JOIN_CHANNEL, userIds: ['user_id_1']}],
             };
             assert.deepEqual(combineUserActivitySystemPost([postJoinChannel1]), out1);
 
             const out2 = {
                 allUserIds: ['user_id_1', 'user_id_2'],
+                allUsernames: [],
                 messageData: [{postType: PostTypes.JOIN_CHANNEL, userIds: ['user_id_1', 'user_id_2']}],
             };
             assert.deepEqual(combineUserActivitySystemPost([postJoinChannel1, postJoinChannel2]), out2);
 
             const out3 = {
                 allUserIds: ['user_id_1', 'user_id_2', 'user_id_3'],
+                allUsernames: [],
                 messageData: [{postType: PostTypes.JOIN_CHANNEL, userIds: ['user_id_1', 'user_id_2', 'user_id_3']}],
             };
             assert.deepEqual(combineUserActivitySystemPost([postJoinChannel1, postJoinChannel2, postJoinChannel3]), out3);
 
             const out4 = {
                 allUserIds: ['user_id_1', 'user_id_2', 'user_id_3', 'user_id_4'],
+                allUsernames: [],
                 messageData: [{postType: PostTypes.JOIN_CHANNEL, userIds: ['user_id_1', 'user_id_2', 'user_id_3', 'user_id_4']}],
             };
             assert.deepEqual(combineUserActivitySystemPost([postJoinChannel1, postJoinChannel2, postJoinChannel3, postJoinChannel4]), out4);
@@ -490,24 +554,28 @@ describe('PostUtils', () => {
         it('should match return for JOIN_TEAM', () => {
             const out1 = {
                 allUserIds: ['user_id_1'],
+                allUsernames: [],
                 messageData: [{postType: PostTypes.JOIN_TEAM, userIds: ['user_id_1']}],
             };
             assert.deepEqual(combineUserActivitySystemPost([postJoinTeam1]), out1);
 
             const out2 = {
                 allUserIds: ['user_id_1', 'user_id_2'],
+                allUsernames: [],
                 messageData: [{postType: PostTypes.JOIN_TEAM, userIds: ['user_id_1', 'user_id_2']}],
             };
             assert.deepEqual(combineUserActivitySystemPost([postJoinTeam1, postJoinTeam2]), out2);
 
             const out3 = {
                 allUserIds: ['user_id_1', 'user_id_2', 'user_id_3'],
+                allUsernames: [],
                 messageData: [{postType: PostTypes.JOIN_TEAM, userIds: ['user_id_1', 'user_id_2', 'user_id_3']}],
             };
             assert.deepEqual(combineUserActivitySystemPost([postJoinTeam1, postJoinTeam2, postJoinTeam3]), out3);
 
             const out4 = {
                 allUserIds: ['user_id_1', 'user_id_2', 'user_id_3', 'user_id_4'],
+                allUsernames: [],
                 messageData: [{postType: PostTypes.JOIN_TEAM, userIds: ['user_id_1', 'user_id_2', 'user_id_3', 'user_id_4']}],
             };
             assert.deepEqual(combineUserActivitySystemPost([postJoinTeam1, postJoinTeam2, postJoinTeam3, postJoinTeam4]), out4);
@@ -520,24 +588,28 @@ describe('PostUtils', () => {
         it('should match return for LEAVE_CHANNEL', () => {
             const out1 = {
                 allUserIds: ['user_id_1'],
+                allUsernames: [],
                 messageData: [{postType: PostTypes.LEAVE_CHANNEL, userIds: ['user_id_1']}],
             };
             assert.deepEqual(combineUserActivitySystemPost([postLeaveChannel1]), out1);
 
             const out2 = {
                 allUserIds: ['user_id_1', 'user_id_2'],
+                allUsernames: [],
                 messageData: [{postType: PostTypes.LEAVE_CHANNEL, userIds: ['user_id_1', 'user_id_2']}],
             };
             assert.deepEqual(combineUserActivitySystemPost([postLeaveChannel1, postLeaveChannel2]), out2);
 
             const out3 = {
                 allUserIds: ['user_id_1', 'user_id_2', 'user_id_3'],
+                allUsernames: [],
                 messageData: [{postType: PostTypes.LEAVE_CHANNEL, userIds: ['user_id_1', 'user_id_2', 'user_id_3']}],
             };
             assert.deepEqual(combineUserActivitySystemPost([postLeaveChannel1, postLeaveChannel2, postLeaveChannel3]), out3);
 
             const out4 = {
                 allUserIds: ['user_id_1', 'user_id_2', 'user_id_3', 'user_id_4'],
+                allUsernames: [],
                 messageData: [{postType: PostTypes.LEAVE_CHANNEL, userIds: ['user_id_1', 'user_id_2', 'user_id_3', 'user_id_4']}],
             };
             assert.deepEqual(combineUserActivitySystemPost([postLeaveChannel1, postLeaveChannel2, postLeaveChannel3, postLeaveChannel4]), out4);
@@ -550,24 +622,28 @@ describe('PostUtils', () => {
         it('should match return for LEAVE_TEAM', () => {
             const out1 = {
                 allUserIds: ['user_id_1'],
+                allUsernames: [],
                 messageData: [{postType: PostTypes.LEAVE_TEAM, userIds: ['user_id_1']}],
             };
             assert.deepEqual(combineUserActivitySystemPost([postLeaveTeam1]), out1);
 
             const out2 = {
                 allUserIds: ['user_id_1', 'user_id_2'],
+                allUsernames: [],
                 messageData: [{postType: PostTypes.LEAVE_TEAM, userIds: ['user_id_1', 'user_id_2']}],
             };
             assert.deepEqual(combineUserActivitySystemPost([postLeaveTeam1, postLeaveTeam2]), out2);
 
             const out3 = {
                 allUserIds: ['user_id_1', 'user_id_2', 'user_id_3'],
+                allUsernames: [],
                 messageData: [{postType: PostTypes.LEAVE_TEAM, userIds: ['user_id_1', 'user_id_2', 'user_id_3']}],
             };
             assert.deepEqual(combineUserActivitySystemPost([postLeaveTeam1, postLeaveTeam2, postLeaveTeam3]), out3);
 
             const out4 = {
                 allUserIds: ['user_id_1', 'user_id_2', 'user_id_3', 'user_id_4'],
+                allUsernames: [],
                 messageData: [{postType: PostTypes.LEAVE_TEAM, userIds: ['user_id_1', 'user_id_2', 'user_id_3', 'user_id_4']}],
             };
             assert.deepEqual(combineUserActivitySystemPost([postLeaveTeam1, postLeaveTeam2, postLeaveTeam3, postLeaveTeam4]), out4);
@@ -580,24 +656,28 @@ describe('PostUtils', () => {
         it('should match return for REMOVE_FROM_CHANNEL', () => {
             const out1 = {
                 allUserIds: ['user_id_1'],
+                allUsernames: [],
                 messageData: [{postType: PostTypes.REMOVE_FROM_CHANNEL, userIds: ['user_id_1']}],
             };
             assert.deepEqual(combineUserActivitySystemPost([postRemoveFromChannel1]), out1);
 
             const out2 = {
                 allUserIds: ['user_id_1', 'user_id_2'],
+                allUsernames: [],
                 messageData: [{postType: PostTypes.REMOVE_FROM_CHANNEL, userIds: ['user_id_1', 'user_id_2']}],
             };
             assert.deepEqual(combineUserActivitySystemPost([postRemoveFromChannel1, postRemoveFromChannel2]), out2);
 
             const out3 = {
                 allUserIds: ['user_id_1', 'user_id_2', 'user_id_3'],
+                allUsernames: [],
                 messageData: [{postType: PostTypes.REMOVE_FROM_CHANNEL, userIds: ['user_id_1', 'user_id_2', 'user_id_3']}],
             };
             assert.deepEqual(combineUserActivitySystemPost([postRemoveFromChannel1, postRemoveFromChannel2, postRemoveFromChannel3]), out3);
 
             const out4 = {
                 allUserIds: ['user_id_1', 'user_id_2', 'user_id_3', 'user_id_4'],
+                allUsernames: [],
                 messageData: [{postType: PostTypes.REMOVE_FROM_CHANNEL, userIds: ['user_id_1', 'user_id_2', 'user_id_3', 'user_id_4']}],
             };
             assert.deepEqual(combineUserActivitySystemPost([postRemoveFromChannel1, postRemoveFromChannel2, postRemoveFromChannel3, postRemoveFromChannel4]), out4);
@@ -610,24 +690,28 @@ describe('PostUtils', () => {
         it('should match return for REMOVE_FROM_TEAM', () => {
             const out1 = {
                 allUserIds: ['user_id_1'],
+                allUsernames: [],
                 messageData: [{postType: PostTypes.REMOVE_FROM_TEAM, userIds: ['user_id_1']}],
             };
             assert.deepEqual(combineUserActivitySystemPost([postRemoveFromTeam1]), out1);
 
             const out2 = {
                 allUserIds: ['user_id_1', 'user_id_2'],
+                allUsernames: [],
                 messageData: [{postType: PostTypes.REMOVE_FROM_TEAM, userIds: ['user_id_1', 'user_id_2']}],
             };
             assert.deepEqual(combineUserActivitySystemPost([postRemoveFromTeam1, postRemoveFromTeam2]), out2);
 
             const out3 = {
                 allUserIds: ['user_id_1', 'user_id_2', 'user_id_3'],
+                allUsernames: [],
                 messageData: [{postType: PostTypes.REMOVE_FROM_TEAM, userIds: ['user_id_1', 'user_id_2', 'user_id_3']}],
             };
             assert.deepEqual(combineUserActivitySystemPost([postRemoveFromTeam1, postRemoveFromTeam2, postRemoveFromTeam3]), out3);
 
             const out4 = {
                 allUserIds: ['user_id_1', 'user_id_2', 'user_id_3', 'user_id_4'],
+                allUsernames: [],
                 messageData: [{postType: PostTypes.REMOVE_FROM_TEAM, userIds: ['user_id_1', 'user_id_2', 'user_id_3', 'user_id_4']}],
             };
             assert.deepEqual(combineUserActivitySystemPost([postRemoveFromTeam1, postRemoveFromTeam2, postRemoveFromTeam3, postRemoveFromTeam4]), out4);
@@ -636,6 +720,7 @@ describe('PostUtils', () => {
         it('should match return on combination', () => {
             const out1 = {
                 allUserIds: ['added_user_id_1', 'added_user_id_2', 'user_id_1'],
+                allUsernames: [],
                 messageData: [
                     {actorId: 'user_id_1', postType: PostTypes.ADD_TO_TEAM, userIds: ['added_user_id_1', 'added_user_id_2']},
                     {actorId: 'user_id_1', postType: PostTypes.ADD_TO_CHANNEL, userIds: ['added_user_id_1', 'added_user_id_2']},
@@ -645,6 +730,7 @@ describe('PostUtils', () => {
 
             const out2 = {
                 allUserIds: ['user_id_1', 'user_id_2'],
+                allUsernames: [],
                 messageData: [
                     {postType: PostTypes.JOIN_TEAM, userIds: ['user_id_1', 'user_id_2']},
                     {postType: PostTypes.JOIN_CHANNEL, userIds: ['user_id_1', 'user_id_2']},
@@ -654,6 +740,7 @@ describe('PostUtils', () => {
 
             const out3 = {
                 allUserIds: ['user_id_1', 'user_id_2'],
+                allUsernames: [],
                 messageData: [
                     {postType: PostTypes.LEAVE_TEAM, userIds: ['user_id_1', 'user_id_2']},
                     {postType: PostTypes.LEAVE_CHANNEL, userIds: ['user_id_1', 'user_id_2']},
@@ -663,6 +750,7 @@ describe('PostUtils', () => {
 
             const out4 = {
                 allUserIds: ['user_id_1', 'user_id_2'],
+                allUsernames: [],
                 messageData: [
                     {postType: PostTypes.REMOVE_FROM_TEAM, userIds: ['user_id_1', 'user_id_2']},
                     {postType: PostTypes.REMOVE_FROM_CHANNEL, userIds: ['user_id_1', 'user_id_2']},
@@ -672,6 +760,7 @@ describe('PostUtils', () => {
 
             const out5 = {
                 allUserIds: ['added_user_id_1', 'added_user_id_2', 'user_id_1', 'user_id_2'],
+                allUsernames: [],
                 messageData: [
                     {postType: PostTypes.JOIN_CHANNEL, userIds: ['user_id_1', 'user_id_2']},
                     {actorId: 'user_id_1', postType: PostTypes.ADD_TO_CHANNEL, userIds: ['added_user_id_1', 'added_user_id_2']},
@@ -692,6 +781,7 @@ describe('PostUtils', () => {
 
             const out6 = {
                 allUserIds: ['added_user_id_3', 'user_id_1', 'added_user_id_4', 'user_id_2', 'user_id_3', 'user_id_4'],
+                allUsernames: [],
                 messageData: [
                     {postType: PostTypes.JOIN_TEAM, userIds: ['user_id_3', 'user_id_4']},
                     {actorId: 'user_id_1', postType: PostTypes.ADD_TO_TEAM, userIds: ['added_user_id_3']},
@@ -713,6 +803,7 @@ describe('PostUtils', () => {
 
             const out7 = {
                 allUserIds: ['added_user_id_3', 'added_user_id_1', 'added_user_id_2', 'user_id_1', 'added_user_id_4', 'user_id_2', 'user_id_3', 'user_id_4'],
+                allUsernames: [],
                 messageData: [
                     {postType: PostTypes.JOIN_TEAM, userIds: ['user_id_3', 'user_id_4', 'user_id_1', 'user_id_2']},
                     {actorId: 'user_id_1', postType: PostTypes.ADD_TO_TEAM, userIds: ['added_user_id_3', 'added_user_id_1', 'added_user_id_2']},
@@ -766,6 +857,7 @@ describe('PostUtils', () => {
 
             const out8 = {
                 allUserIds: ['added_user_id_3', 'user_id_1', 'user_id_3', 'added_user_id_1'],
+                allUsernames: [],
                 messageData: [
                     {postType: PostTypes.JOIN_TEAM, userIds: ['user_id_3']},
                     {actorId: 'user_id_1', postType: PostTypes.ADD_TO_TEAM, userIds: ['added_user_id_3']},
@@ -843,6 +935,7 @@ describe('PostUtils', () => {
             const out = combineSystemPosts([postIdUA12, postIdUA11], {[postIdUA11]: postUA11, [postIdUA12]: postUA12}, 'channel_id');
             const expectedUserActivityPosts = {
                 allUserIds: ['user_id_2', 'added_user_id_1', 'user_id_1'],
+                allUsernames: [],
                 messageData: [
                     {postType: 'system_join_channel', userIds: ['user_id_2']},
                     {postType: 'system_add_to_channel', userIds: ['added_user_id_1'], actorId: 'user_id_1'},
@@ -886,6 +979,7 @@ describe('PostUtils', () => {
 
             const expectedUserActivityPosts1 = {
                 allUserIds: ['user_id_2', 'added_user_id_1', 'user_id_1'],
+                allUsernames: [],
                 messageData: [
                     {postType: 'system_join_channel', userIds: ['user_id_2']},
                     {postType: 'system_add_to_channel', userIds: ['added_user_id_1'], actorId: 'user_id_1'},
@@ -904,6 +998,7 @@ describe('PostUtils', () => {
 
             const expectedUserActivityPosts2 = {
                 allUserIds: ['user_id_4', 'user_id_3'],
+                allUsernames: [],
                 messageData: [
                     {postType: 'system_remove_from_channel', userIds: ['user_id_4']},
                     {postType: 'system_leave_channel', userIds: ['user_id_3']},
@@ -948,6 +1043,7 @@ describe('PostUtils', () => {
             );
             const expectedUserActivityPosts = {
                 allUserIds: ['user_id_2', 'user_id_11', 'added_user_id_1', 'user_id_1', 'added_user_id_10', 'user_id_9'],
+                allUsernames: [],
                 messageData: [
                     {postType: 'system_join_channel', userIds: ['user_id_2', 'user_id_11']},
                     {postType: 'system_add_to_channel', userIds: ['added_user_id_1'], actorId: 'user_id_1'},
@@ -994,6 +1090,7 @@ describe('PostUtils', () => {
             );
             const expectedUserActivityPosts = {
                 allUserIds: ['user_id_14', 'user_id_13', 'user_id_2', 'added_user_id_1', 'user_id_1'],
+                allUsernames: [],
                 messageData: [
                     {postType: 'system_join_channel', userIds: ['user_id_2']},
                     {postType: 'system_add_to_channel', userIds: ['added_user_id_1'], actorId: 'user_id_1'},
@@ -1022,6 +1119,7 @@ describe('PostUtils', () => {
             );
             const expectedUserActivityPosts = {
                 allUserIds: ['user_id_2', 'added_user_id_1', 'user_id_1'],
+                allUsernames: [],
                 messageData: [
                     {postType: 'system_join_channel', userIds: ['user_id_2']},
                     {postType: 'system_add_to_channel', userIds: ['added_user_id_1'], actorId: 'user_id_1'},
@@ -1068,6 +1166,7 @@ describe('PostUtils', () => {
             );
             const expectedUserActivityPosts = {
                 allUserIds: ['user_id_2', 'user_id_11', 'added_user_id_1', 'user_id_1', 'added_user_id_10', 'user_id_9'],
+                allUsernames: [],
                 messageData: [
                     {postType: 'system_join_channel', userIds: ['user_id_2', 'user_id_11']},
                     {postType: 'system_add_to_channel', userIds: ['added_user_id_1'], actorId: 'user_id_1'},
@@ -1103,6 +1202,7 @@ describe('PostUtils', () => {
             );
             const expectedUserActivityPosts = {
                 allUserIds: ['user_id_2', 'added_user_id_1', 'user_id_1'],
+                allUsernames: [],
                 messageData: [
                     {postType: 'system_join_channel', userIds: ['user_id_2']},
                     {postType: 'system_add_to_channel', userIds: ['added_user_id_1'], actorId: 'user_id_1'},

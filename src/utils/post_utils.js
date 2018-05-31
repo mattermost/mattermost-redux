@@ -198,15 +198,24 @@ function extractUserActivityData(userActivities) {
 
     const messageData = [];
     const allUserIds = [];
+    const allUsernames = [];
 
     Object.entries(userActivities).forEach(([postType, values]) => {
         if (
             postType === Posts.POST_TYPES.ADD_TO_TEAM ||
             postType === Posts.POST_TYPES.ADD_TO_CHANNEL
         ) {
-            Object.entries(values).forEach(([actorId, userIds]) => {
-                messageData.push({postType, userIds, actorId});
-                allUserIds.push(...userIds, actorId);
+            Object.entries(values).forEach(([actorId, addedUsers]) => {
+                const {ids, usernames} = addedUsers;
+                messageData.push({postType, userIds: [...usernames, ...ids], actorId});
+                if (ids.length > 0) {
+                    allUserIds.push(...ids);
+                }
+
+                if (usernames.length > 0) {
+                    allUsernames.push(...usernames);
+                }
+                allUserIds.push(actorId);
             });
         } else {
             messageData.push({postType, userIds: values});
@@ -216,13 +225,16 @@ function extractUserActivityData(userActivities) {
 
     messageData.sort((a, b) => postTypePriority[a.postType] > postTypePriority[b.postType]);
 
+    function reduceUsers(acc, curr) {
+        if (!acc.includes(curr)) {
+            acc.push(curr);
+        }
+        return acc;
+    }
+
     return {
-        allUserIds: allUserIds.reduce((acc, curr) => {
-            if (!acc.includes(curr)) {
-                acc.push(curr);
-            }
-            return acc;
-        }, []),
+        allUserIds: allUserIds.reduce(reduceUsers, []),
+        allUsernames: allUsernames.reduce(reduceUsers, []),
         messageData,
     };
 }
@@ -241,14 +253,26 @@ export function combineUserActivitySystemPost(systemPosts = []) {
             postType === Posts.POST_TYPES.ADD_TO_TEAM ||
             postType === Posts.POST_TYPES.ADD_TO_CHANNEL
         ) {
+            const addedUserId = post.props.addedUserId;
+            const addedUsername = post.props.addedUsername;
             if (combinedPostType) {
-                const addedUserIds = combinedPostType[post.user_id] || [];
-                if (!addedUserIds.includes(post.props.addedUserId)) {
-                    addedUserIds.push(post.props.addedUserId);
-                    combinedPostType[post.user_id] = addedUserIds;
+                const addedUsers = combinedPostType[post.user_id] || {ids: [], usernames: []};
+                if (addedUserId && !addedUsers.ids.includes(addedUserId)) {
+                    addedUsers.ids.push(addedUserId);
+                } else if (addedUsername && !addedUsers.usernames.includes(addedUsername)) {
+                    addedUsers.usernames.push(addedUsername);
                 }
+                combinedPostType[post.user_id] = addedUsers;
             } else {
-                userActivityProps[postType] = {[post.user_id]: [post.props.addedUserId]};
+                const addedUsers = {ids: [], usernames: []};
+                if (addedUserId) {
+                    addedUsers.ids.push(addedUserId);
+                } else if (addedUsername) {
+                    addedUsers.usernames.push(addedUsername);
+                }
+                userActivityProps[postType] = {
+                    [post.user_id]: addedUsers,
+                };
             }
         } else {
             let propsUserId = post.user_id;
