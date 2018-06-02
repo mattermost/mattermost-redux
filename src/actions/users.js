@@ -2,7 +2,7 @@
 // See LICENSE.txt for license information.
 
 import {batchActions} from 'redux-batched-actions';
-import {Client, Client4} from 'client';
+import {Client4} from 'client';
 import {General} from 'constants';
 import {UserTypes, TeamTypes, AdminTypes} from 'action_types';
 import {getAllCustomEmojis} from './emojis';
@@ -94,7 +94,6 @@ export function login(loginId, password, mfaToken = '', ldapOnly = false) {
         let data;
         try {
             data = await Client4.login(loginId, password, mfaToken, deviceId, ldapOnly);
-            Client.setToken(Client4.getToken());
         } catch (error) {
             dispatch(batchActions([
                 {
@@ -257,7 +256,6 @@ export function logout() {
             // nothing to do here
         }
 
-        Client.setToken('');
         dispatch({type: UserTypes.LOGOUT_SUCCESS}, getState);
     };
 }
