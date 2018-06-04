@@ -444,6 +444,38 @@ describe('Actions.Websocket', () => {
         assert.strictEqual(channels[channelId].display_name, channelName);
     });
 
+    it('Websocket Handle Channel Converted', async () => {
+        const channelType = 'P';
+        const channelId = TestHelper.basicChannel.id;
+
+        if (TestHelper.isLiveServer()) {
+            const client = TestHelper.createClient4();
+            await client.login(TestHelper.basicUser.email, 'password1');
+            await client.convertChannelToPrivate({channel_id: channelId});
+        } else {
+            nock(Client4.getChannelsRoute()).
+                get(`/${TestHelper.basicChannel.id}`).
+                reply(200, {...TestHelper.basicChannel, type: channelType});
+
+            mockServer.send(JSON.stringify({
+                event: WebsocketEvents.CHANNEL_CONVERTED,
+                data: {channel_id: channelId},
+                broadcast: {omit_users: null, user_id: '', channel_id: '', team_id: TestHelper.basicTeam.id},
+                seq: 65},
+            ));
+
+            store.dispatch({type: ChannelTypes.RECEIVED_CHANNEL, data: {...TestHelper.basicChannel, type: channelType}});
+        }
+
+        await TestHelper.wait(300);
+
+        const state = store.getState();
+        const entities = state.entities;
+        const {channels} = entities.channels;
+
+        assert.strictEqual(channels[channelId].type, channelType);
+    });
+
     it('Websocket Handle Channel Deleted', (done) => {
         async function test() {
             await TeamActions.selectTeam(TestHelper.basicTeam)(store.dispatch, store.getState);

@@ -49,6 +49,8 @@ import {
 } from 'action_types';
 import {General, WebsocketEvents, Preferences, Posts} from 'constants';
 
+import {getChannel} from 'actions/channels';
+
 import {getCurrentChannelStats} from 'selectors/entities/channels';
 import {getCurrentUser} from 'selectors/entities/users';
 import {getUserIdFromChannelName} from 'utils/channel_utils';
@@ -232,6 +234,9 @@ function handleEvent(msg, dispatch, getState) {
         break;
     case WebsocketEvents.CHANNEL_UPDATED:
         handleChannelUpdatedEvent(msg, dispatch, getState);
+        break;
+    case WebsocketEvents.CHANNEL_CONVERTED:
+        handleChannelConvertedEvent(msg, dispatch);
         break;
     case WebsocketEvents.CHANNEL_VIEWED:
         handleChannelViewedEvent(msg, dispatch, getState);
@@ -574,6 +579,15 @@ function handleChannelUpdatedEvent(msg, dispatch, getState) {
             // the changes without listening to the store
             EventEmitter.emit(WebsocketEvents.CHANNEL_UPDATED, channel);
         }
+    }
+}
+
+function handleChannelConvertedEvent(msg, dispatch) {
+    try {
+        const channelId = msg.data ? JSON.parse(msg.data.channel_id) : null;
+        dispatch(getChannel(channelId));
+    } catch (err) {
+        return;
     }
 }
 
