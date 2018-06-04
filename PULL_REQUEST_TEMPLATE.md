@@ -10,6 +10,9 @@ When filling in a section please remove the help text and the above text.
 
 #### Checklist
 [Place an '[x]' (no spaces) in all applicable fields. Please remove unrelated fields.]
+- [ ] Ran `make check-style` to check for style errors (required for all pull requests)
+- [ ] Ran `make test` to ensure unit tests passed
+- [ ] Ran `make flow` to ensure type cheking passed
 - [ ] Added or updated unit tests (required for all new features)
 - [ ] All new/modified APIs include changes to the drivers
 

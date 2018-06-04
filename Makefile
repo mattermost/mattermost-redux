@@ -36,7 +36,7 @@ pre-run:
 	@rm -rf utils
 	@rm -rf lib
 
-test: check-style
+test: check-style flow
 	npm test
 
 flow: .flowinstall

@@ -2,12 +2,12 @@
 // See LICENSE.txt for license information.
 // @flow
 
-export type Search = {
+export type Search = {|
     terms: string,
     isOrSearch: boolean
-}
+|}
 
-export type SearchState = {
+export type SearchState = {|
     results: Array<string>,
     recent: {[string]: Array<Search>}
-};
+|};

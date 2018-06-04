@@ -4,19 +4,19 @@
 
 export type ChannelType = 'O' | 'P' | 'D' | 'G';
 
-export type ChannelStats = {
+export type ChannelStats = {|
     channel_id: string,
     member_count: number
-};
+|};
 
-export type NotifyProps = {
+export type NotifyProps = {|
     desktop: 'default' | 'all' | 'mention' | 'none',
     email: 'default' | 'all' | 'mention' | 'none',
     mark_unread: 'all' | 'mention',
     push: 'default' | 'all' | 'mention' | 'none'
-};
+|};
 
-export type Channel = {
+export type Channel = {|
     id: string,
     create_at: number,
     update_at: number,
@@ -32,9 +32,9 @@ export type Channel = {
     extra_update_at: number,
     creator_id: string,
     scheme_id: string
-};
+|};
 
-export type ChannelMembership = {
+export type ChannelMembership = {|
     channel_id: string,
     user_id: string,
     roles: string,
@@ -45,13 +45,13 @@ export type ChannelMembership = {
     last_update_at: number,
     scheme_user: boolean,
     scheme_admin: boolean
-}
+|}
 
-export type ChannelsState = {
+export type ChannelsState = {|
     currentChannelId: string,
     channels: { [string]: Channel },
     channelsInTeam: { [string]: Array<string> },
     myMembers: { [string]: ChannelMembership },
     membersInChannel: { [string]: { [string]: ChannelMembership } },
     stats: { [string]: ChannelStats }
-};
+|};
