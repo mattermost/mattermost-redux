@@ -313,6 +313,30 @@ export function getMissingProfilesByIds(userIds) {
     };
 }
 
+export function getMissingProfilesByUsernames(usernames) {
+    return async (dispatch, getState) => {
+        const {profiles} = getState().entities.users;
+
+        const usernameProfiles = Object.values(profiles).reduce((acc, profile) => {
+            acc[profile.username] = profile;
+            return acc;
+        }, {});
+
+        const missingUsernames = [];
+        usernames.forEach((username) => {
+            if (!usernameProfiles[username]) {
+                missingUsernames.push(username);
+            }
+        });
+
+        if (missingUsernames.length > 0) {
+            return await getProfilesByUsernames(missingUsernames)(dispatch, getState);
+        }
+
+        return {data: []};
+    };
+}
+
 export function getProfilesByIds(userIds) {
     return async (dispatch, getState) => {
         dispatch({type: UserTypes.PROFILES_REQUEST}, getState);
