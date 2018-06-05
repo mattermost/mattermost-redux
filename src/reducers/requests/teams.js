@@ -190,6 +190,16 @@ function removeTeamIcon(state = initialRequestState(), action) {
     );
 }
 
+function updateTeamMemberSchemeRoles(state: RequestStatusType = initialRequestState(), action: GenericAction) {
+    return handleRequest(
+        TeamTypes.UPDATE_TEAM_MEMBER_SCHEME_ROLES_REQUEST,
+        TeamTypes.UPDATE_TEAM_MEMBER_SCHEME_ROLES_SUCCESS,
+        TeamTypes.UPDATE_TEAM_MEMBER_SCHEME_ROLES_FAILURE,
+        state,
+        action
+    );
+}
+
 export default combineReducers({
     getMyTeams,
     getTeams,
@@ -209,4 +219,5 @@ export default combineReducers({
     joinTeam,
     setTeamIcon,
     removeTeamIcon,
+    updateTeamMemberSchemeRoles,
 });
