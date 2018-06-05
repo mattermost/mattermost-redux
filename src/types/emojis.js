@@ -8,7 +8,9 @@ export type CustomEmoji = {|
     update_at: number,
     delete_at: number,
     creator_id: string,
-    name: string
+    name: string,
+    filename: string,
+    aliases: Array<string>,
 |}
 
 export type EmojisState = {|

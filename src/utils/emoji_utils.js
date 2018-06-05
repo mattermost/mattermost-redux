@@ -1,9 +1,12 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
+// @flow
 
 import {Client4} from 'client';
 
-export function getEmojiImageUrl(emoji) {
+import type {CustomEmoji} from '../types/emojis';
+
+export function getEmojiImageUrl(emoji: CustomEmoji): string {
     if (emoji.id) {
         return Client4.getEmojiRoute(emoji.id) + '/image';
     }
@@ -13,7 +16,7 @@ export function getEmojiImageUrl(emoji) {
     return '/static/emoji/' + filename + '.png';
 }
 
-export function parseNeededCustomEmojisFromText(text, systemEmojis, customEmojisByName, nonExistentEmoji) {
+export function parseNeededCustomEmojisFromText(text: string, systemEmojis: Map<string, CustomEmoji>, customEmojisByName: Map<string, CustomEmoji>, nonExistentEmoji: Set<string>): Set<string> {
     if (!text.includes(':')) {
         return new Set();
     }
