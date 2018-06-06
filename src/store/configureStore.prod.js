@@ -8,6 +8,7 @@ import {REHYDRATE} from 'redux-persist/constants';
 import {createOfflineReducer, networkStatusChangedAction, offlineCompose} from 'redux-offline';
 import defaultOfflineConfig from 'redux-offline/lib/defaults';
 import createActionBuffer from 'redux-action-buffer';
+import {Client4} from 'client';
 
 import {General} from 'constants';
 import serviceReducer from 'reducers';
@@ -68,6 +69,7 @@ export default function configureOfflineServiceStore(preloadedState, appReducer,
 
     if (baseOfflineConfig.detectNetwork) {
         baseOfflineConfig.detectNetwork((online) => {
+            Client4.setOnline(online);
             store.dispatch(networkStatusChangedAction(online));
         });
     }
