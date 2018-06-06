@@ -1080,6 +1080,14 @@ export default class Client4 {
         );
     };
 
+    updateTeamMemberSchemeRoles = async (teamId, userId, isSchemeUser, isSchemeAdmin) => {
+        const body = {scheme_user: isSchemeUser, scheme_admin: isSchemeAdmin};
+        return this.doFetch(
+            `${this.getTeamRoute(teamId)}/members/${userId}/schemeRoles`,
+            {method: 'put', body: JSON.stringify(body)}
+        );
+    };
+
     // Channel Routes
 
     createChannel = async (channel) => {
@@ -1291,6 +1299,14 @@ export default class Client4 {
         return this.doFetch(
             `${this.getTeamRoute(teamId)}/channels/search`,
             {method: 'post', body: JSON.stringify({term})}
+        );
+    };
+
+    updateChannelMemberSchemeRoles = async (channelId, userId, isSchemeUser, isSchemeAdmin) => {
+        const body = {scheme_user: isSchemeUser, scheme_admin: isSchemeAdmin};
+        return this.doFetch(
+            `${this.getChannelRoute(channelId)}/members/${userId}/schemeRoles`,
+            {method: 'put', body: JSON.stringify(body)}
         );
     };
 

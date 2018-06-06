@@ -1293,6 +1293,18 @@ export function updateChannelScheme(channelId, schemeId) {
     );
 }
 
+export function updateChannelMemberSchemeRoles(channelId, userId, isSchemeUser, isSchemeAdmin) {
+    return bindClientFunc(
+        async () => {
+            await Client4.updateChannelMemberSchemeRoles(channelId, userId, isSchemeUser, isSchemeAdmin);
+            return {channelId, userId, isSchemeUser, isSchemeAdmin};
+        },
+        ChannelTypes.UPDATE_CHANNEL_MEMBER_SCHEME_ROLES_REQUEST,
+        [ChannelTypes.UPDATE_CHANNEL_MEMBER_SCHEME_ROLES_SUCCESS, ChannelTypes.UPDATED_CHANNEL_MEMBER_SCHEME_ROLES],
+        ChannelTypes.UPDATE_CHANNEL_MEMBER_SCHEME_ROLES_FAILURE,
+    );
+}
+
 export default {
     selectChannel,
     createChannel,

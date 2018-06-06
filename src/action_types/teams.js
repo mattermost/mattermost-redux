@@ -81,6 +81,10 @@ export default keyMirror({
     UPDATE_TEAM_SCHEME_SUCCESS: null,
     UPDATE_TEAM_SCHEME_FAILURE: null,
 
+    UPDATE_TEAM_MEMBER_SCHEME_ROLES_REQUEST: null,
+    UPDATE_TEAM_MEMBER_SCHEME_ROLES_SUCCESS: null,
+    UPDATE_TEAM_MEMBER_SCHEME_ROLES_RAILURE: null,
+
     CREATED_TEAM: null,
     SELECT_TEAM: null,
     UPDATED_TEAM: null,
@@ -98,4 +102,5 @@ export default keyMirror({
     RECEIVED_MY_TEAM_UNREADS: null,
     LEAVE_TEAM: null,
     UPDATED_TEAM_SCHEME: null,
+    UPDATED_TEAM_MEMBER_SCHEME_ROLES: null,
 });

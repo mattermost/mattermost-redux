@@ -24,7 +24,8 @@ export type ChannelsRequestsStatuses = {|
     addChannelMember: RequestStatusType,
     removeChannelMember: RequestStatusType,
     updateChannelMember: RequestStatusType,
-    updateChannelScheme: RequestStatusType
+    updateChannelScheme: RequestStatusType,
+    updateChannelMemberSchemeRoles: RequestStatusType,
 |};
 
 export type GeneralRequestsStatuses = {|
