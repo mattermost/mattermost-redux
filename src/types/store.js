@@ -15,6 +15,7 @@ import type {IntegrationsState} from './integrations';
 import type {FilesState} from './files';
 import type {EmojisState} from './emojis';
 import type {SchemesState} from './schemes';
+import type {Typing} from './typing';
 import type {
     ChannelsRequestsStatuses,
     GeneralRequestsStatuses,
@@ -49,7 +50,7 @@ export type GlobalState = {|
         integrations: IntegrationsState,
         files: FilesState,
         emojis: EmojisState,
-        typing: Object,
+        typing: Typing,
         roles: Object,
         schemes: SchemesState,
     |},

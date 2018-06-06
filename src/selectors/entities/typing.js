@@ -1,5 +1,6 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
+// @flow
 
 import {createSelector} from 'reselect';
 
@@ -11,7 +12,10 @@ import {getTeammateNameDisplaySetting} from 'selectors/entities/preferences';
 
 import {displayUsername} from 'utils/user_utils';
 
-const getUsersTypingImpl = (profiles, teammateNameDisplay, channelId, parentPostId, typing) => {
+import type {Typing} from '../../types/typing';
+import type {UserProfile} from '../../types/users';
+
+const getUsersTypingImpl = (profiles: {[string]: UserProfile}, teammateNameDisplay: string, channelId: string, parentPostId: string, typing: Typing): Array<string> => {
     const id = channelId + parentPostId;
 
     if (typing[id]) {
@@ -19,7 +23,7 @@ const getUsersTypingImpl = (profiles, teammateNameDisplay, channelId, parentPost
 
         if (users.length) {
             return users.map((userId) => {
-                return displayUsername(profiles[userId], teammateNameDisplay);
+                return displayUsername(profiles[userId], teammateNameDisplay, false);
             });
         }
     }
