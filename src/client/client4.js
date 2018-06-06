@@ -2377,6 +2377,12 @@ export default class Client4 {
     // Client Helpers
 
     doFetch = async (url, options) => {
+        const {data} = await this.doFetchWithResponse(url, options);
+
+        return data;
+    };
+
+    doFetchWithResponse = async (url, options) => {
         if (!this.online) {
             throw {
                 message: 'no internet connection',
@@ -2384,12 +2390,6 @@ export default class Client4 {
             };
         }
 
-        const {data} = await this.doFetchWithResponse(url, options);
-
-        return data;
-    };
-
-    doFetchWithResponse = async (url, options) => {
         const response = await fetch(url, this.getOptions(options));
         const headers = parseAndMergeNestedHeaders(response.headers);
 
