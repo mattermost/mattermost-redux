@@ -1,9 +1,13 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
+// @flow
 
 import {WebsocketEvents} from 'constants';
 
-export default function typing(state = {}, action) {
+import type {Typing} from '../../types/typing';
+import type {GenericAction} from '../../types/actions';
+
+export default function typing(state: Typing = {}, action: GenericAction): Typing {
     const {
         data,
         type,
