@@ -49,9 +49,7 @@ import {
 } from 'action_types';
 import {General, WebsocketEvents, Preferences, Posts} from 'constants';
 
-import {getChannel} from 'actions/channels';
-
-import {getCurrentChannelStats} from 'selectors/entities/channels';
+import {getChannel, getCurrentChannelStats} from 'selectors/entities/channels';
 import {getCurrentUser} from 'selectors/entities/users';
 import {getUserIdFromChannelName} from 'utils/channel_utils';
 import {isFromWebhook, isSystemMessage, getLastCreateAt, shouldIgnorePost} from 'utils/post_utils';
@@ -236,7 +234,7 @@ function handleEvent(msg, dispatch, getState) {
         handleChannelUpdatedEvent(msg, dispatch, getState);
         break;
     case WebsocketEvents.CHANNEL_CONVERTED:
-        handleChannelConvertedEvent(msg, dispatch);
+        handleChannelConvertedEvent(msg, dispatch, getState);
         break;
     case WebsocketEvents.CHANNEL_VIEWED:
         handleChannelViewedEvent(msg, dispatch, getState);
@@ -582,12 +580,17 @@ function handleChannelUpdatedEvent(msg, dispatch, getState) {
     }
 }
 
-function handleChannelConvertedEvent(msg, dispatch) {
-    try {
-        const channelId = msg.data ? JSON.parse(msg.data.channel_id) : null;
-        dispatch(getChannel(channelId));
-    } catch (err) {
-        return;
+// handleChannelConvertedEvent handles updating of channel which is converted from public to private
+function handleChannelConvertedEvent(msg, dispatch, getState) {
+    const channelId = msg.data.channel_id;
+    if (channelId) {
+        const channel = getChannel(getState(), channelId);
+        if (channel) {
+            dispatch({
+                type: ChannelTypes.RECEIVED_CHANNEL,
+                data: {...channel, type: General.PRIVATE_CHANNEL},
+            });
+        }
     }
 }
 
