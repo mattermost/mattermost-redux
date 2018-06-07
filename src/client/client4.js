@@ -34,6 +34,7 @@ export default class Client4 {
         this.userId = '';
         this.diagnosticId = '';
         this.includeCookies = true;
+        this.online = true;
 
         this.translations = {
             connectionError: 'There appears to be a problem with your internet connection.',
@@ -47,6 +48,10 @@ export default class Client4 {
 
     setUrl(url) {
         this.url = url;
+    }
+
+    setOnline(online) {
+        this.online = online;
     }
 
     setUserAgent(userAgent) {
@@ -2394,6 +2399,13 @@ export default class Client4 {
     };
 
     doFetchWithResponse = async (url, options) => {
+        if (!this.online) {
+            throw {
+                message: 'no internet connection',
+                url,
+            };
+        }
+
         const response = await fetch(url, this.getOptions(options));
         const headers = parseAndMergeNestedHeaders(response.headers);
 
