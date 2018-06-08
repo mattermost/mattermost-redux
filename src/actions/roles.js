@@ -60,7 +60,12 @@ export function setPendingRoles(roles) {
 export function loadRolesIfNeeded(roles) {
     return async (dispatch, getState) => {
         const state = getState();
-        const pendingRoles = new Set(state.entities.roles.pending);
+        let pendingRoles = new Set();
+        try {
+            pendingRoles = new Set(state.entities.roles.pending);
+        } catch (e) {
+            // eslint-disable-line
+        }
         for (const role of roles) {
             pendingRoles.add(role);
         }
