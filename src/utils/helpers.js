@@ -74,9 +74,16 @@ export const isMinimumServerVersion = (currentVersion, minMajorVersion = 0, minM
     // Dot version is equal
     return true;
 };
+
+let sentMessageToRemoveBackwardsCompatibility = false;
 export const sendMessageToRemoveBackwardsCompatibility = (currentVersion, minVersion) => {
     if (process.env.NODE_ENV !== 'production' && currentVersion > minVersion) { //eslint-disable-line no-process-env
+        if (sentMessageToRemoveBackwardsCompatibility) {
+            return;
+        }
+
         console.warn('You can now remove backwards-compatibility code from the project, as referenced in the stacktrace below.'); //eslint-disable-line no-console
+        sentMessageToRemoveBackwardsCompatibility = true;
     }
 };
 
