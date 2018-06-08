@@ -278,6 +278,9 @@ function myMembers(state = {}, action) {
 
         return state;
     }
+    case ChannelTypes.UPDATED_CHANNEL_MEMBER_SCHEME_ROLES: {
+        return updateChannelMemberSchemeRoles(state, action);
+    }
     case UserTypes.LOGOUT_SUCCESS:
         return {};
     default:
@@ -336,6 +339,9 @@ function membersInChannel(state = {}, action) {
 
         return state;
     }
+    case ChannelTypes.UPDATED_CHANNEL_MEMBER_SCHEME_ROLES: {
+        return updateChannelMemberSchemeRoles(state, action);
+    }
     case UserTypes.LOGOUT_SUCCESS:
         return {};
     default:
@@ -391,6 +397,28 @@ function stats(state = {}, action) {
     default:
         return state;
     }
+}
+
+function updateChannelMemberSchemeRoles(state, action) {
+    const {channelId, userId, isSchemeUser, isSchemeAdmin} = action.data;
+    const channel = state[channelId];
+    if (channel) {
+        const member = channel[userId];
+        if (member) {
+            return {
+                ...state,
+                [channelId]: {
+                    ...state[channelId],
+                    [userId]: {
+                        ...state[channelId][userId],
+                        scheme_user: isSchemeUser,
+                        scheme_admin: isSchemeAdmin,
+                    },
+                },
+            };
+        }
+    }
+    return state;
 }
 
 export default combineReducers({

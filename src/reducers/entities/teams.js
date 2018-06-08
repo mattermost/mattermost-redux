@@ -203,7 +203,9 @@ function myMembers(state = {}, action) {
         Reflect.deleteProperty(nextState, data.id);
         return nextState;
     }
-
+    case TeamTypes.UPDATED_TEAM_MEMBER_SCHEME_ROLES: {
+        return updateTeamMemberSchemeRoles(state, action);
+    }
     case UserTypes.LOGOUT_SUCCESS:
         return {};
     default:
@@ -281,6 +283,9 @@ function membersInTeam(state = {}, action) {
 
         return state;
     }
+    case TeamTypes.UPDATED_TEAM_MEMBER_SCHEME_ROLES: {
+        return updateTeamMemberSchemeRoles(state, action);
+    }
     case UserTypes.LOGOUT_SUCCESS:
         return {};
     default:
@@ -312,6 +317,28 @@ function stats(state = {}, action) {
     default:
         return state;
     }
+}
+
+function updateTeamMemberSchemeRoles(state, action) {
+    const {teamId, userId, isSchemeUser, isSchemeAdmin} = action.data;
+    const team = state[teamId];
+    if (team) {
+        const member = team[userId];
+        if (member) {
+            return {
+                ...state,
+                [teamId]: {
+                    ...state[teamId],
+                    [userId]: {
+                        ...state[teamId][userId],
+                        scheme_user: isSchemeUser,
+                        scheme_admin: isSchemeAdmin,
+                    },
+                },
+            };
+        }
+    }
+    return state;
 }
 
 export default combineReducers({
