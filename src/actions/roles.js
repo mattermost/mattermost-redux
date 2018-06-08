@@ -64,7 +64,7 @@ export function loadRolesIfNeeded(roles) {
         try {
             pendingRoles = new Set(state.entities.roles.pending);
         } catch (e) {
-            // eslint-disable-line
+            console.warn('failed to convert pendingRoles into a Set', e); // eslint-disable-line
         }
         for (const role of roles) {
             pendingRoles.add(role);
