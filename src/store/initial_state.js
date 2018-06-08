@@ -167,6 +167,10 @@ const state: GlobalState = {
                 status: 'not_started',
                 error: null,
             },
+            updateChannelMemberSchemeRoles: {
+                status: 'not_started',
+                error: null,
+            },
         },
         general: {
             server: {

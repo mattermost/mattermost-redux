@@ -600,3 +600,15 @@ export function updateTeamScheme(teamId, schemeId) {
         TeamTypes.UPDATE_TEAM_SCHEME_FAILURE,
     );
 }
+
+export function updateTeamMemberSchemeRoles(teamId, userId, isSchemeUser, isSchemeAdmin) {
+    return bindClientFunc(
+        async () => {
+            await Client4.updateTeamMemberSchemeRoles(teamId, userId, isSchemeUser, isSchemeAdmin);
+            return {teamId, userId, isSchemeUser, isSchemeAdmin};
+        },
+        TeamTypes.UPDATE_TEAM_MEMBER_SCHEME_ROLES_REQUEST,
+        [TeamTypes.UPDATE_TEAM_MEMBER_SCHEME_ROLES_SUCCESS, TeamTypes.UPDATED_TEAM_MEMBER_SCHEME_ROLES],
+        TeamTypes.UPDATE_TEAM_MEMBER_SCHEME_ROLES_FAILURE,
+    );
+}
