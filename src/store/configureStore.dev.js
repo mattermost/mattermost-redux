@@ -56,15 +56,15 @@ export default function configureServiceStore(preloadedState, appReducer, userOf
         middleware.push(createActionBuffer(REHYDRATE));
     }
 
+    const loadReduxDevtools = process.env.NODE_ENV !== 'test'; //eslint-disable-line no-process-env
+
     const store = createStore(
         createOfflineReducer(createReducer(baseState, serviceReducer, appReducer)),
         baseState,
         // eslint-disable-line - offlineCompose(config)(middleware, other funcs)
         offlineCompose(baseOfflineConfig)(
             middleware,
-            [
-                devToolsEnhancer(),
-            ]
+            loadReduxDevtools ? [devToolsEnhancer()] : []
         )
     );
 
