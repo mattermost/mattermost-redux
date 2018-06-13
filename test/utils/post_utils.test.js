@@ -90,6 +90,167 @@ describe('PostUtils', () => {
             assert.equal(shouldFilterJoinLeavePost({type: PostTypes.REMOVE_FROM_TEAM, props: {removedUsername: username}}, showJoinLeave, username), false);
             assert.equal(shouldFilterJoinLeavePost({type: PostTypes.REMOVE_FROM_TEAM, props: {removedUsername: otherUsername}}, showJoinLeave, username), true);
         });
+
+        describe('combined join/leave messages', () => {
+            it('not about current user', () => {
+                const postIds = ['abcd', 'efgh'];
+                const posts = {
+                    abcd: {
+                        create_at: 1000,
+                        delete_at: 0,
+                        message: 'User1 joined the channel',
+                        props: {
+                            username: 'user1',
+                        },
+                        type: PostTypes.JOIN_CHANNEL,
+                        user_id: 'user1',
+                    },
+                    efgh: {
+                        create_at: 1001,
+                        delete_at: 0,
+                        message: 'User1 added User2 to the channel',
+                        props: {
+                            username: 'user1',
+                            addedUsername: 'user2',
+                        },
+                        type: PostTypes.ADD_TO_CHANNEL,
+                        user_id: 'user1',
+                    },
+                };
+                const combinedPosts = combineSystemPosts(postIds, posts, 'channel_id');
+                const combinedPost = combinedPosts.nextPosts[combinedPosts.postsForChannel[0]];
+
+                assert.equal(shouldFilterJoinLeavePost(combinedPost, false, 'currentUser'), true);
+                assert.equal(shouldFilterJoinLeavePost(combinedPost, true, 'currentUser'), false);
+            });
+
+            it('current user joining channel', () => {
+                const postIds = ['abcd', 'efgh'];
+                const posts = {
+                    abcd: {
+                        create_at: 1000,
+                        delete_at: 0,
+                        message: 'CurrentUser joined the channel',
+                        props: {
+                            username: 'currentUser',
+                        },
+                        type: PostTypes.JOIN_CHANNEL,
+                        user_id: 'currentUser',
+                    },
+                    efgh: {
+                        create_at: 1001,
+                        delete_at: 0,
+                        message: 'User1 added User2 to the channel',
+                        props: {
+                            username: 'user1',
+                            addedUsername: 'user2',
+                        },
+                        type: PostTypes.ADD_TO_CHANNEL,
+                        user_id: 'user1',
+                    },
+                };
+                const combinedPosts = combineSystemPosts(postIds, posts, 'channel_id');
+                const combinedPost = combinedPosts.nextPosts[combinedPosts.postsForChannel[0]];
+
+                assert.equal(shouldFilterJoinLeavePost(combinedPost, false, 'currentUser'), false);
+                assert.equal(shouldFilterJoinLeavePost(combinedPost, true, 'currentUser'), false);
+            });
+
+            it('current user added to channel', () => {
+                const postIds = ['abcd', 'efgh'];
+                const posts = {
+                    abcd: {
+                        create_at: 1000,
+                        delete_at: 0,
+                        message: 'User1 joined the channel',
+                        props: {
+                            username: 'user1',
+                        },
+                        type: PostTypes.JOIN_CHANNEL,
+                        user_id: 'user1',
+                    },
+                    efgh: {
+                        create_at: 1001,
+                        delete_at: 0,
+                        message: 'User1 added CurrentUser to the channel',
+                        props: {
+                            username: 'user1',
+                            addedUsername: 'currentUser',
+                        },
+                        type: PostTypes.ADD_TO_CHANNEL,
+                        user_id: 'user1',
+                    },
+                };
+                const combinedPosts = combineSystemPosts(postIds, posts, 'channel_id');
+                const combinedPost = combinedPosts.nextPosts[combinedPosts.postsForChannel[0]];
+
+                assert.equal(shouldFilterJoinLeavePost(combinedPost, false, 'currentUser'), false);
+                assert.equal(shouldFilterJoinLeavePost(combinedPost, true, 'currentUser'), false);
+            });
+
+            it('current user adding another user to channel', () => {
+                const postIds = ['abcd', 'efgh'];
+                const posts = {
+                    abcd: {
+                        create_at: 1000,
+                        delete_at: 0,
+                        message: 'User1 joined the channel',
+                        props: {
+                            username: 'user1',
+                        },
+                        type: PostTypes.JOIN_CHANNEL,
+                        user_id: 'user1',
+                    },
+                    efgh: {
+                        create_at: 1001,
+                        delete_at: 0,
+                        message: 'CurrentUser added User2 to the channel',
+                        props: {
+                            username: 'currentUser',
+                            addedUsername: 'user2',
+                        },
+                        type: PostTypes.ADD_TO_CHANNEL,
+                        user_id: 'user1',
+                    },
+                };
+                const combinedPosts = combineSystemPosts(postIds, posts, 'channel_id');
+                const combinedPost = combinedPosts.nextPosts[combinedPosts.postsForChannel[0]];
+
+                assert.equal(shouldFilterJoinLeavePost(combinedPost, false, 'currentUser'), false);
+                assert.equal(shouldFilterJoinLeavePost(combinedPost, true, 'currentUser'), false);
+            });
+
+            it('current user removed from channel', () => {
+                const postIds = ['abcd', 'efgh'];
+                const posts = {
+                    abcd: {
+                        create_at: 1000,
+                        delete_at: 0,
+                        message: 'User1 joined the channel',
+                        props: {
+                            username: 'user1',
+                        },
+                        type: PostTypes.JOIN_CHANNEL,
+                        user_id: 'user1',
+                    },
+                    efgh: {
+                        create_at: 1001,
+                        delete_at: 0,
+                        message: 'CurrentUser removed from the channel',
+                        props: {
+                            removedUsername: 'currentUser',
+                        },
+                        type: PostTypes.ADD_TO_CHANNEL,
+                        user_id: 'user1',
+                    },
+                };
+                const combinedPosts = combineSystemPosts(postIds, posts, 'channel_id');
+                const combinedPost = combinedPosts.nextPosts[combinedPosts.postsForChannel[0]];
+
+                assert.equal(shouldFilterJoinLeavePost(combinedPost, false, 'currentUser'), false);
+                assert.equal(shouldFilterJoinLeavePost(combinedPost, true, 'currentUser'), false);
+            });
+        });
     });
 
     describe('canEditPost', () => {
