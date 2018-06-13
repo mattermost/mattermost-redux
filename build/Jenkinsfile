@@ -5,18 +5,33 @@ node {
         checkout scm
     }
 
+    stage('Setup Redux') {
+        sh """
+        npm install --ignore-scripts || exit 1
+        touch .npminstall
+        """
+    }
+
+    stage('Check style') {
+        sh "npm run check || exit 1"
+    }
+
+    stage('Run tests with mock server') {
+        dir('mattermost-redux') {
+            sh "npm run test || exit 1"
+        }
+    }
+
     stage('Setup') {
         environment {
-            MM_SQLSETTINGS_DATASOURCE="mmuser:mostest@tcp(dockerhost:3306)/mattermost_test?charset=utf8mb4,utf8|root:passwd@tcp(localhost:3306)/'${BUILD_TAG}'?charset=utf8mb4,utf8"
+            MM_SQLSETTINGS_DATASOURCE="mmuser:mostest@tcp(localhost:3306)/mattermost_test?charset=utf8mb4,utf8|root:passwd@tcp(localhost:3306)/"+ ${BUILD_TAG} + "?charset=utf8mb4,utf8"
             MM_TEAMSETTINGS_ENABLEOPENSERVER=true
             MM_SERVICESETTINGS_ENABLECUSTOMEMOJI=true
             MM_SERVICESETTINGS_ENABLELINKPREVIEWS=true
             MM_SERVICESETTINGS_ENABLEOAUTHSERVICEPROVIDER=true
             MM_SERVICESETTINGS_ENABLEONLYADMININTEGRATIONS=true
         }
-        sh """
-        docker exec mattermost-mysql-57 mysql --user=root --password=passwd -e 'create database `'$BUILD_TAG'`;'
-        """
+        sh "docker exec mattermost-mysql-57 mysql --user=root --password=passwd -e 'create database `'$BUILD_TAG'`;'"
         echo 'Created database for mysql'
 
         sh """
@@ -34,33 +49,8 @@ node {
         echo 'Started Mattermost server'
     }
 
-    stage('Setup Redux') {
-        dir('mattermost-redux') {
-            sh """
-            npm install --ignore-scripts || exit 1
-            touch .npminstall
-            """
-        }
-    }
-
-    stage('Check style') {
-        dir('mattermost-redux') {
-            sh "npm run check || exit 1"
-        }
-    }
-
-    stage('Run tests') {
-        dir('mattermost-redux') {
-            sh "npm run test || exit 1"
-        }
-    }
-
-    post {
-        always {
-            sh """
-            docker exec mattermost-mysql-57 mysql --user=root --password=passwd -e 'drop database `'${BUILD_TAG}'`;'
-            """
-            cleanWS()
-        }
+    stage('Run tests with real server') {
+        sh "npm run test-no-mock || exit 1"
+        sh "docker exec mattermost-mysql-57 mysql --user=root --password=passwd -e 'drop database `'${BUILD_TAG}'`;'"
     }
 }
