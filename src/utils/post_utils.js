@@ -137,6 +137,7 @@ const joinLeavePostTypes = [
     Posts.POST_TYPES.LEAVE_TEAM,
     Posts.POST_TYPES.ADD_TO_TEAM,
     Posts.POST_TYPES.REMOVE_FROM_TEAM,
+    Posts.POST_TYPES.COMBINED_USER_ACTIVITY,
 ];
 
 // Returns true if a post should be hidden when the user has Show Join/Leave Messages disabled
@@ -151,15 +152,27 @@ export function shouldFilterJoinLeavePost(post, showJoinLeave, currentUsername) 
     }
 
     // Don't filter out join/leave messages about the current user
-    if (post.props) {
-        if (post.props.username === currentUsername ||
-            post.props.addedUsername === currentUsername ||
-            post.props.removedUsername === currentUsername) {
-            return false;
+    return !isJoinLeavePostForUsername(post, currentUsername);
+}
+
+function isJoinLeavePostForUsername(post, currentUsername) {
+    if (!post.props) {
+        return false;
+    }
+
+    if (post.user_activity_posts) {
+        for (const childPost of post.user_activity_posts) {
+            if (isJoinLeavePostForUsername(childPost, currentUsername)) {
+                // If any of the contained posts are for this user, the client will
+                // need to figure out how to render the post
+                return true;
+            }
         }
     }
 
-    return true;
+    return post.props.username === currentUsername ||
+        post.props.addedUsername === currentUsername ||
+        post.props.removedUsername === currentUsername;
 }
 
 export function isPostPendingOrFailed(post) {
