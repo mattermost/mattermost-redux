@@ -219,7 +219,7 @@ export function makeGetPostsInChannel() {
 
             const posts = [];
 
-            const joinLeavePref = myPreferences[getPreferenceKey(Preferences.CATEGORY_ADVANCED_SETTINGS, 'join_leave')];
+            const joinLeavePref = myPreferences[getPreferenceKey(Preferences.CATEGORY_ADVANCED_SETTINGS, Preferences.ADVANCED_FILTER_JOIN_LEAVE)];
             const showJoinLeave = joinLeavePref ? joinLeavePref.value !== 'false' : true;
 
             for (let i = 0; i < postIds.length && i < numPosts; i++) {
@@ -262,7 +262,7 @@ export function makeGetPostsAroundPost() {
             const slicedPostIds = postIds.slice(minPostIndex);
 
             const posts = [];
-            const joinLeavePref = myPreferences[getPreferenceKey(Preferences.CATEGORY_ADVANCED_SETTINGS, 'join_leave')];
+            const joinLeavePref = myPreferences[getPreferenceKey(Preferences.CATEGORY_ADVANCED_SETTINGS, Preferences.ADVANCED_FILTER_JOIN_LEAVE)];
             const showJoinLeave = joinLeavePref ? joinLeavePref.value !== 'false' : true;
 
             for (let i = 0; i < slicedPostIds.length; i++) {
@@ -408,7 +408,7 @@ export const getMostRecentPostIdInChannel = createSelector(
         if (!postIdsInChannel) {
             return '';
         }
-        const key = getPreferenceKey(Preferences.CATEGORY_ADVANCED_SETTINGS, 'join_leave');
+        const key = getPreferenceKey(Preferences.CATEGORY_ADVANCED_SETTINGS, Preferences.ADVANCED_FILTER_JOIN_LEAVE);
         const allowSystemMessages = preferences[key] ? preferences[key].value === 'true' : true;
 
         if (!allowSystemMessages) {
