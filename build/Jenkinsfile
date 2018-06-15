@@ -23,6 +23,9 @@ node {
     }
 
     stage('Setup') {
+        when {
+            branch 'master'
+        }
         environment {
             MM_SQLSETTINGS_DATASOURCE="mmuser:mostest@tcp(localhost:3306)/mattermost_test?charset=utf8mb4,utf8|root:passwd@tcp(localhost:3306)/"+ ${BUILD_TAG} + "?charset=utf8mb4,utf8"
             MM_TEAMSETTINGS_ENABLEOPENSERVER=true
@@ -50,6 +53,10 @@ node {
     }
 
     stage('Run tests with real server') {
+        when {
+            branch 'master'
+        }
+
         sh "npm run test-no-mock || exit 1"
         sh "docker exec mattermost-mysql-57 mysql --user=root --password=passwd -e 'drop database `'${BUILD_TAG}'`;'"
     }
