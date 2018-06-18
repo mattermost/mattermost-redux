@@ -1,63 +1,78 @@
 #!/usr/bin/env groovy
 
-node {
-    stage('Checkout') {
-        checkout scm
-    }
+pipeline {
+    agent any
 
-    stage('Setup Redux') {
-        sh """
-        npm install --ignore-scripts || exit 1
-        touch .npminstall
-        """
-    }
+    stages {
 
-    stage('Check style') {
-        sh "npm run check || exit 1"
-    }
-
-    stage('Run tests with mock server') {
-        dir('mattermost-redux') {
-            sh "npm run test || exit 1"
+        stage('Checkout') {
+            steps {
+                cleanWs()
+                checkout scm
+            }
         }
-    }
-
-    stage('Setup') {
-        when {
-            branch 'master'
-        }
-        environment {
-            MM_SQLSETTINGS_DATASOURCE="mmuser:mostest@tcp(localhost:3306)/mattermost_test?charset=utf8mb4,utf8|root:passwd@tcp(localhost:3306)/"+ ${BUILD_TAG} + "?charset=utf8mb4,utf8"
-            MM_TEAMSETTINGS_ENABLEOPENSERVER=true
-            MM_SERVICESETTINGS_ENABLECUSTOMEMOJI=true
-            MM_SERVICESETTINGS_ENABLELINKPREVIEWS=true
-            MM_SERVICESETTINGS_ENABLEOAUTHSERVICEPROVIDER=true
-            MM_SERVICESETTINGS_ENABLEONLYADMININTEGRATIONS=true
-        }
-        sh "docker exec mattermost-mysql-57 mysql --user=root --password=passwd -e 'create database `'$BUILD_TAG'`;'"
-        echo 'Created database for mysql'
-
-        sh """
-        # Download and configure Mattermost
-        wget https://releases.mattermost.com/mattermost-platform/master/mattermost-enterprise-linux-amd64.tar.gz
-        tar -zxf mattermost-enterprise-linux-amd64.tar.gz
-
-        cd mattermost
-        echo mattermost version
-        bin/mattermost version
-
-        # Run Mattermost
-        bin/mattermost &
-        """
-        echo 'Started Mattermost server'
-    }
-
-    stage('Run tests with real server') {
-        when {
-            branch 'master'
+        stage('Setup Redux') {
+            steps {
+                sh """
+                npm install --ignore-scripts || exit 1
+                touch .npminstall
+                """
+            }
         }
 
-        sh "npm run test-no-mock || exit 1"
-        sh "docker exec mattermost-mysql-57 mysql --user=root --password=passwd -e 'drop database `'${BUILD_TAG}'`;'"
+        stage('Check style') {
+            steps {
+                sh "npm run check || exit 1"
+            }
+        }
+
+        stage('Run tests without mock server') {
+            steps {
+                sh "npm run test || exit 1"
+            }
+        }
+
+        stage('Setup') {
+            when {
+                branch 'master'
+            }
+            environment {
+                MM_SQLSETTINGS_DATASOURCE="root:passwd@tcp(localhost:3306)/${BUILD_TAG}?charset=utf8mb4,utf8"
+                MM_TEAMSETTINGS_ENABLEOPENSERVER=true
+                MM_SERVICESETTINGS_ENABLECUSTOMEMOJI=true
+                MM_SERVICESETTINGS_ENABLELINKPREVIEWS=true
+                MM_SERVICESETTINGS_ENABLEOAUTHSERVICEPROVIDER=true
+                MM_SERVICESETTINGS_ENABLEONLYADMININTEGRATIONS=true
+            }
+            steps {
+                sh 'echo $MM_SQLSETTINGS_DATASOURCE'
+                sh "docker exec mattermost-mysql-57 mysql --user=root --password=passwd -e 'create database `'$BUILD_TAG'`;'"
+                echo 'Created database for mysql'
+
+                sh """
+                # Download and configure Mattermost
+                wget https://releases.mattermost.com/mattermost-platform/master/mattermost-enterprise-linux-amd64.tar.gz
+                tar -zxf mattermost-enterprise-linux-amd64.tar.gz
+
+                cd mattermost
+                echo mattermost version
+                bin/mattermost version
+
+                # Run Mattermost
+                bin/mattermost &
+                """
+                echo 'Started Mattermost server'
+            }
+        }
+
+        stage('Run tests with mock server') {
+            when {
+                branch 'master'
+            }
+            steps {
+                sh "npm run test-no-mock || exit 1"
+                sh "docker exec mattermost-mysql-57 mysql --user=root --password=passwd -e 'drop database `'${BUILD_TAG}'`;'"
+            }
+        }
     }
 }
