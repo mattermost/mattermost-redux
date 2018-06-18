@@ -4,19 +4,21 @@
 
 import {Client4} from 'client';
 
-import type {CustomEmoji} from '../types/emojis';
+import type {Emoji, SystemEmoji, CustomEmoji} from '../types/emojis';
 
-export function getEmojiImageUrl(emoji: CustomEmoji): string {
+export function getEmojiImageUrl(emoji: Emoji): string {
     if (emoji.id) {
         return Client4.getEmojiRoute(emoji.id) + '/image';
     }
 
-    const filename = emoji.filename || emoji.aliases[0];
+    const systemEmoji = ((emoji: any): SystemEmoji);
+
+    const filename = systemEmoji.filename || systemEmoji.aliases[0];
 
     return '/static/emoji/' + filename + '.png';
 }
 
-export function parseNeededCustomEmojisFromText(text: string, systemEmojis: Map<string, CustomEmoji>, customEmojisByName: Map<string, CustomEmoji>, nonExistentEmoji: Set<string>): Set<string> {
+export function parseNeededCustomEmojisFromText(text: string, systemEmojis: Map<string, SystemEmoji>, customEmojisByName: Map<string, CustomEmoji>, nonExistentEmoji: Set<string>): Set<string> {
     if (!text.includes(':')) {
         return new Set();
     }
