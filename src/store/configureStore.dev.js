@@ -2,14 +2,14 @@
 // See LICENSE.txt for license information.
 /* eslint-disable no-undefined */
 
-import {createStore, combineReducers} from 'redux';
-import {enableBatching} from 'redux-batched-actions';
+import {createStore} from 'redux';
 import devTools from 'remote-redux-devtools';
 import thunk from 'redux-thunk';
 import {REHYDRATE} from 'redux-persist/constants';
 import {createOfflineReducer, networkStatusChangedAction, offlineCompose} from 'redux-offline';
 import defaultOfflineConfig from 'redux-offline/lib/defaults';
 import createActionBuffer from 'redux-action-buffer';
+import reducerRegistry from 'store/reducer_registry';
 import {Client4} from 'client';
 
 const devToolsEnhancer = (
@@ -25,12 +25,10 @@ const devToolsEnhancer = (
         }
 );
 
-import {General} from 'constants';
 import serviceReducer from 'reducers';
 import deepFreezeAndThrowOnMutation from 'utils/deep_freeze';
-
 import initialState from './initial_state';
-import {defaultOptions, offlineConfig} from './helpers';
+import {defaultOptions, offlineConfig, createReducer} from './helpers';
 
 /***
 clientOptions object - This param allows users to configure the store from the client side.
@@ -59,7 +57,7 @@ export default function configureServiceStore(preloadedState, appReducer, userOf
     const loadReduxDevtools = process.env.NODE_ENV !== 'test'; //eslint-disable-line no-process-env
 
     const store = createStore(
-        createOfflineReducer(createReducer(baseState, serviceReducer, appReducer)),
+        createOfflineReducer(createDevReducer(baseState, serviceReducer, appReducer)),
         baseState,
         // eslint-disable-line - offlineCompose(config)(middleware, other funcs)
         offlineCompose(baseOfflineConfig)(
@@ -67,6 +65,10 @@ export default function configureServiceStore(preloadedState, appReducer, userOf
             loadReduxDevtools ? [devToolsEnhancer()] : []
         )
     );
+
+    reducerRegistry.setChangeListener((reducers) => {
+        store.replaceReducer(createOfflineReducer(createDevReducer(baseState, reducers)));
+    });
 
     // launch store persistor
     if (baseOfflineConfig.persist) {
@@ -88,28 +90,15 @@ export default function configureServiceStore(preloadedState, appReducer, userOf
             if (getAppReducer) {
                 nextAppReducer = getAppReducer(); // eslint-disable-line global-require
             }
-            store.replaceReducer(createReducer(baseState, nextServiceReducer, nextAppReducer));
+            store.replaceReducer(createDevReducer(baseState, reducerRegistry.getReducers(), nextServiceReducer, nextAppReducer));
         });
     }
 
     return store;
 }
 
-function createReducer(baseState, ...reducers) {
-    const baseReducer = combineReducers(Object.assign({}, ...reducers));
-
-    // Root reducer wrapper that listens for reset events.
-    // Returns whatever is passed for the data property
-    // as the new state.
-    function offlineReducer(state = {}, action) {
-        if (action.type === General.OFFLINE_STORE_RESET) {
-            return baseReducer(baseState, action);
-        }
-
-        return baseReducer(state, action);
-    }
-
-    return enableFreezing(enableBatching(offlineReducer));
+function createDevReducer(baseState, ...reducers) {
+    return enableFreezing(createReducer(baseState, ...reducers));
 }
 
 function enableFreezing(reducer) {
