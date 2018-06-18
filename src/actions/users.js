@@ -167,16 +167,14 @@ function completeLogin(data) {
             return {error};
         }
 
-        const serverVersion = Client4.getServerVersion();
-
         const promises = [
             dispatch(getMyPreferences()),
             dispatch(getMyTeams()),
+            dispatch(getClientConfig()),
         ];
 
-        if (isMinimumServerVersion(serverVersion, 5, 0)) {
-            promises.push(dispatch(getClientConfig()));
-        } else if (!isMinimumServerVersion(serverVersion, 4, 7) && getConfig(getState()).EnableCustomEmoji === 'true') {
+        const serverVersion = Client4.getServerVersion();
+        if (!isMinimumServerVersion(serverVersion, 4, 7) && getConfig(getState()).EnableCustomEmoji === 'true') {
             dispatch(getAllCustomEmojis());
         }
 
