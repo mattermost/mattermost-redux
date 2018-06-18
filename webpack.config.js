@@ -5,7 +5,6 @@ const UglifyPlugin = require('uglifyjs-webpack-plugin');
 
 module.exports = {
     entry: {
-        client: './src/client/client.js',
         client4: './src/client/client4.js',
         websocket: './src/client/websocket_client.js',
     },
