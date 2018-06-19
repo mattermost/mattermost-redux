@@ -548,10 +548,11 @@ describe('PostUtils', () => {
             assert.equal(Boolean(combineUserActivitySystemPost([])), false);
         });
 
-        const postAddToChannel1 = {type: PostTypes.ADD_TO_CHANNEL, user_id: 'user_id_1', props: {addedUserId: 'added_user_id_1'}};
-        const postAddToChannel2 = {type: PostTypes.ADD_TO_CHANNEL, user_id: 'user_id_1', props: {addedUserId: 'added_user_id_2'}};
-        const postAddToChannel3 = {type: PostTypes.ADD_TO_CHANNEL, user_id: 'user_id_1', props: {addedUserId: 'added_user_id_3'}};
-        const postAddToChannel4 = {type: PostTypes.ADD_TO_CHANNEL, user_id: 'user_id_2', props: {addedUserId: 'added_user_id_4'}};
+        const postAddToChannel1 = {type: PostTypes.ADD_TO_CHANNEL, user_id: 'user_id_1', props: {addedUserId: 'added_user_id_1', addedUsername: 'added_username_1'}};
+        const postAddToChannel2 = {type: PostTypes.ADD_TO_CHANNEL, user_id: 'user_id_1', props: {addedUserId: 'added_user_id_2', addedUsername: 'added_username_2'}};
+        const postAddToChannel3 = {type: PostTypes.ADD_TO_CHANNEL, user_id: 'user_id_1', props: {addedUserId: 'added_user_id_3', addedUsername: 'added_username_3'}};
+        const postAddToChannel4 = {type: PostTypes.ADD_TO_CHANNEL, user_id: 'user_id_2', props: {addedUserId: 'added_user_id_4', addedUsername: 'added_username_4'}};
+        const postAddToChannel5 = {type: PostTypes.ADD_TO_CHANNEL, user_id: 'user_id_1', props: {addedUsername: 'added_username_1'}};
         it('should match return for ADD_TO_CHANNEL', () => {
             const out1 = {
                 allUserIds: ['added_user_id_1', 'user_id_1'],
@@ -583,6 +584,23 @@ describe('PostUtils', () => {
                 ],
             };
             assert.deepEqual(combineUserActivitySystemPost([postAddToChannel1, postAddToChannel2, postAddToChannel3, postAddToChannel4]), out4);
+
+            const out5 = {
+                allUserIds: ['user_id_1'],
+                allUsernames: ['added_username_1'],
+                messageData: [{actorId: 'user_id_1', postType: PostTypes.ADD_TO_CHANNEL, userIds: ['added_username_1']}],
+            };
+            assert.deepEqual(combineUserActivitySystemPost([postAddToChannel5]), out5);
+
+            const out6 = {
+                allUserIds: ['added_user_id_1', 'added_user_id_2', 'added_user_id_3', 'user_id_1', 'added_user_id_4', 'user_id_2'],
+                allUsernames: ['added_username_1'],
+                messageData: [
+                    {actorId: 'user_id_1', postType: PostTypes.ADD_TO_CHANNEL, userIds: ['added_username_1', 'added_user_id_1', 'added_user_id_2', 'added_user_id_3']},
+                    {actorId: 'user_id_2', postType: PostTypes.ADD_TO_CHANNEL, userIds: ['added_user_id_4']},
+                ],
+            };
+            assert.deepEqual(combineUserActivitySystemPost([postAddToChannel1, postAddToChannel2, postAddToChannel3, postAddToChannel4, postAddToChannel5]), out6);
         });
 
         it('should match return for ADD_TO_CHANNEL, backward compatibility with addedUsername', () => {
