@@ -34,7 +34,7 @@ function matches(state = {}, action) {
     case SearchTypes.RECEIVED_SEARCH_POSTS:
         return action.data.matches || {};
     case PostTypes.REMOVE_POST: {
-        if (!action.data.matches[action.data.id]) {
+        if (!state[action.data.id]) {
             return state;
         }
 
