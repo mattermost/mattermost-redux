@@ -5,9 +5,10 @@ import {batchActions} from 'redux-batched-actions';
 import {Client4} from 'client';
 import {General} from 'constants';
 import {UserTypes, TeamTypes, AdminTypes} from 'action_types';
-import {getAllCustomEmojis} from './emojis';
-import {getMyTeams, getMyTeamMembers, getMyTeamUnreads} from './teams';
-import {loadRolesIfNeeded} from './roles';
+import {getAllCustomEmojis} from 'actions/emojis';
+import {getClientConfig} from 'actions/general';
+import {getMyTeams, getMyTeamMembers, getMyTeamUnreads} from 'actions/teams';
+import {loadRolesIfNeeded} from 'actions/roles';
 
 import {
     getUserIdFromChannelName,
@@ -167,13 +168,13 @@ function completeLogin(data) {
         }
 
         const promises = [
-            getMyPreferences()(dispatch, getState),
-            getMyTeams()(dispatch, getState),
+            dispatch(getMyPreferences()),
+            dispatch(getMyTeams()),
+            dispatch(getClientConfig()),
         ];
 
-        const state = getState();
         const serverVersion = Client4.getServerVersion();
-        if (!isMinimumServerVersion(serverVersion, 4, 7) && getConfig(state).EnableCustomEmoji === 'true') {
+        if (!isMinimumServerVersion(serverVersion, 4, 7) && getConfig(getState()).EnableCustomEmoji === 'true') {
             dispatch(getAllCustomEmojis());
         }
 
@@ -183,7 +184,7 @@ function completeLogin(data) {
             dispatch(batchActions([
                 {type: UserTypes.LOGIN_FAILURE, error},
                 logError(error)(dispatch),
-            ]), getState);
+            ]));
             return {error};
         }
 
@@ -195,7 +196,7 @@ function completeLogin(data) {
             {
                 type: UserTypes.LOGIN_SUCCESS,
             },
-        ]), getState);
+        ]));
 
         const roles = new Set();
         for (const teamMember of teamMembers) {
