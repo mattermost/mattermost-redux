@@ -270,8 +270,10 @@ export function combineUserActivitySystemPost(systemPosts = []) {
             const addedUsername = post.props.addedUsername;
             if (combinedPostType) {
                 const addedUsers = combinedPostType[post.user_id] || {ids: [], usernames: []};
-                if (addedUserId && !addedUsers.ids.includes(addedUserId)) {
-                    addedUsers.ids.push(addedUserId);
+                if (addedUserId) {
+                    if (!addedUsers.ids.includes(addedUserId)) {
+                        addedUsers.ids.push(addedUserId);
+                    }
                 } else if (addedUsername && !addedUsers.usernames.includes(addedUsername)) {
                     addedUsers.usernames.push(addedUsername);
                 }
