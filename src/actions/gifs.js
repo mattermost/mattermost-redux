@@ -1,3 +1,6 @@
+// Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
+// See LICENSE.txt for license information.
+
 import {GifTypes} from 'action_types';
 import gfycatSdk from 'utils/gfycatSdk';
 import {generateUUID, readCookie, setCookie} from 'utils/gif_utils';
