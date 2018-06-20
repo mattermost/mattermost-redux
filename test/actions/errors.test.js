@@ -46,12 +46,18 @@ describe('Actions.Errors', () => {
                 return '{}';
             });
 
-        await logError({message: 'error'})(store.dispatch, store.getState);
-        await logError({message: 'error', server_error_id: 'error_id'})(store.dispatch, store.getState);
-        await logError({message: 'error'})(store.dispatch, store.getState);
+        await store.dispatch(logError({message: 'error'}));
+        await store.dispatch(logError({message: 'error', server_error_id: 'error_id'}));
+        await store.dispatch(logError({message: 'error'}));
 
         if (count > 2) {
             assert.fail(`should not hit /logs endpoint, called ${count} times`);
+        }
+
+        await store.dispatch(logError({message: 'error', server_error_id: 'api.context.session_expired.app_error'}));
+
+        if (count > 2) {
+            assert.fail('should not add session expired errors to the reducer');
         }
     });
 });
