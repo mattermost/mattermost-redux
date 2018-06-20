@@ -2,7 +2,7 @@
 // See LICENSE.txt for license information.
 
 import {combineReducers} from 'redux';
-import {ChannelTypes, TeamTypes, UserTypes} from 'action_types';
+import {ChannelTypes, TeamTypes, UserTypes, SchemeTypes} from 'action_types';
 import {teamListToMap} from 'utils/team_utils';
 
 function currentTeamId(state = '', action) {
@@ -20,6 +20,7 @@ function currentTeamId(state = '', action) {
 function teams(state = {}, action) {
     switch (action.type) {
     case TeamTypes.RECEIVED_TEAMS_LIST:
+    case SchemeTypes.RECEIVED_SCHEME_TEAMS:
         return Object.assign({}, state, teamListToMap(action.data));
     case TeamTypes.RECEIVED_TEAMS:
         return Object.assign({}, state, action.data);
@@ -42,6 +43,18 @@ function teams(state = {}, action) {
 
         return state;
     }
+
+    case TeamTypes.UPDATED_TEAM_SCHEME: {
+        const {teamId, schemeId} = action.data;
+        const team = state[teamId];
+
+        if (!team) {
+            return state;
+        }
+
+        return {...state, [teamId]: {...team, scheme_id: schemeId}};
+    }
+
     case UserTypes.LOGOUT_SUCCESS:
         return {};
 
@@ -190,7 +203,9 @@ function myMembers(state = {}, action) {
         Reflect.deleteProperty(nextState, data.id);
         return nextState;
     }
-
+    case TeamTypes.UPDATED_TEAM_MEMBER_SCHEME_ROLES: {
+        return updateTeamMemberSchemeRoles(state, action);
+    }
     case UserTypes.LOGOUT_SUCCESS:
         return {};
     default:
@@ -268,6 +283,9 @@ function membersInTeam(state = {}, action) {
 
         return state;
     }
+    case TeamTypes.UPDATED_TEAM_MEMBER_SCHEME_ROLES: {
+        return updateTeamMemberSchemeRoles(state, action);
+    }
     case UserTypes.LOGOUT_SUCCESS:
         return {};
     default:
@@ -299,6 +317,28 @@ function stats(state = {}, action) {
     default:
         return state;
     }
+}
+
+function updateTeamMemberSchemeRoles(state, action) {
+    const {teamId, userId, isSchemeUser, isSchemeAdmin} = action.data;
+    const team = state[teamId];
+    if (team) {
+        const member = team[userId];
+        if (member) {
+            return {
+                ...state,
+                [teamId]: {
+                    ...state[teamId],
+                    [userId]: {
+                        ...state[teamId][userId],
+                        scheme_user: isSchemeUser,
+                        scheme_admin: isSchemeAdmin,
+                    },
+                },
+            };
+        }
+    }
+    return state;
 }
 
 export default combineReducers({

@@ -31,6 +31,10 @@ export function getLogErrorAction(error, displayable = false) {
 
 export function logError(error, displayable = false) {
     return async (dispatch) => {
+        if (error.server_error_id === 'api.context.session_expired.app_error') {
+            return {data: true};
+        }
+
         const serializedError = serializeError(error);
 
         let sendToServer = true;

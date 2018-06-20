@@ -192,6 +192,8 @@ function sortAndInjectProfiles(profiles, profileSet, skipInactive = false) {
         currentProfiles = Array.from(profileSet).map((p) => profiles[p]);
     }
 
+    currentProfiles = currentProfiles.filter((profile) => Boolean(profile));
+
     if (skipInactive) {
         currentProfiles = currentProfiles.filter((profile) => !(profile.delete_at && profile.delete_at !== 0));
     }
@@ -377,3 +379,36 @@ export function makeGetProfilesInChannel() {
     );
 }
 
+export function makeGetProfilesByIdsAndUsernames() {
+    return createSelector(
+        getUsers,
+        getUsersByUsername,
+        (state, props) => props.allUserIds,
+        (state, props) => props.allUsernames,
+        (allProfilesById, allProfilesByUsername, allUserIds, allUsernames) => {
+            const userProfiles = [];
+
+            if (allUserIds && allUserIds.length > 0) {
+                const profilesById = allUserIds.
+                    filter((userId) => allProfilesById[userId]).
+                    map((userId) => allProfilesById[userId]);
+
+                if (profilesById && profilesById.length > 0) {
+                    userProfiles.push(...profilesById);
+                }
+            }
+
+            if (allUsernames && allUsernames.length > 0) {
+                const profilesByUsername = allUsernames.
+                    filter((username) => allProfilesByUsername[username]).
+                    map((username) => allProfilesByUsername[username]);
+
+                if (profilesByUsername && profilesByUsername.length > 0) {
+                    userProfiles.push(...profilesByUsername);
+                }
+            }
+
+            return userProfiles;
+        }
+    );
+}

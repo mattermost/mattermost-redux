@@ -70,6 +70,16 @@ function updateTeam(state: RequestStatusType = initialRequestState(), action: Ge
     );
 }
 
+function updateTeamScheme(state: RequestStatusType = initialRequestState(), action: GenericAction): RequestStatusType {
+    return handleRequest(
+        TeamTypes.UPDATE_TEAM_SCHEME_REQUEST,
+        TeamTypes.UPDATE_TEAM_SCHEME_SUCCESS,
+        TeamTypes.UPDATE_TEAM_SCHEME_FAILURE,
+        state,
+        action
+    );
+}
+
 function getMyTeamMembers(state: RequestStatusType = initialRequestState(), action: GenericAction): RequestStatusType {
     return handleRequest(
         TeamTypes.MY_TEAM_MEMBERS_REQUEST,
@@ -180,6 +190,16 @@ function removeTeamIcon(state = initialRequestState(), action) {
     );
 }
 
+function updateTeamMemberSchemeRoles(state: RequestStatusType = initialRequestState(), action: GenericAction) {
+    return handleRequest(
+        TeamTypes.UPDATE_TEAM_MEMBER_SCHEME_ROLES_REQUEST,
+        TeamTypes.UPDATE_TEAM_MEMBER_SCHEME_ROLES_SUCCESS,
+        TeamTypes.UPDATE_TEAM_MEMBER_SCHEME_ROLES_FAILURE,
+        state,
+        action
+    );
+}
+
 export default combineReducers({
     getMyTeams,
     getTeams,
@@ -187,6 +207,7 @@ export default combineReducers({
     createTeam,
     deleteTeam,
     updateTeam,
+    updateTeamScheme,
     getMyTeamMembers,
     getMyTeamUnreads,
     getTeamMembers,
@@ -198,4 +219,5 @@ export default combineReducers({
     joinTeam,
     setTeamIcon,
     removeTeamIcon,
+    updateTeamMemberSchemeRoles,
 });

@@ -2,12 +2,13 @@
 // See LICENSE.txt for license information.
 
 import {batchActions} from 'redux-batched-actions';
-import {Client, Client4} from 'client';
+import {Client4} from 'client';
 import {General} from 'constants';
 import {UserTypes, TeamTypes, AdminTypes} from 'action_types';
-import {getAllCustomEmojis} from './emojis';
-import {getMyTeams, getMyTeamMembers, getMyTeamUnreads} from './teams';
-import {loadRolesIfNeeded} from './roles';
+import {getAllCustomEmojis} from 'actions/emojis';
+import {getClientConfig} from 'actions/general';
+import {getMyTeams, getMyTeamMembers, getMyTeamUnreads} from 'actions/teams';
+import {loadRolesIfNeeded} from 'actions/roles';
 
 import {
     getUserIdFromChannelName,
@@ -94,7 +95,6 @@ export function login(loginId, password, mfaToken = '', ldapOnly = false) {
         let data;
         try {
             data = await Client4.login(loginId, password, mfaToken, deviceId, ldapOnly);
-            Client.setToken(Client4.getToken());
         } catch (error) {
             dispatch(batchActions([
                 {
@@ -168,13 +168,13 @@ function completeLogin(data) {
         }
 
         const promises = [
-            getMyPreferences()(dispatch, getState),
-            getMyTeams()(dispatch, getState),
+            dispatch(getMyPreferences()),
+            dispatch(getMyTeams()),
+            dispatch(getClientConfig()),
         ];
 
-        const state = getState();
         const serverVersion = Client4.getServerVersion();
-        if (!isMinimumServerVersion(serverVersion, 4, 7) && getConfig(state).EnableCustomEmoji === 'true') {
+        if (!isMinimumServerVersion(serverVersion, 4, 7) && getConfig(getState()).EnableCustomEmoji === 'true') {
             dispatch(getAllCustomEmojis());
         }
 
@@ -184,7 +184,7 @@ function completeLogin(data) {
             dispatch(batchActions([
                 {type: UserTypes.LOGIN_FAILURE, error},
                 logError(error)(dispatch),
-            ]), getState);
+            ]));
             return {error};
         }
 
@@ -196,7 +196,7 @@ function completeLogin(data) {
             {
                 type: UserTypes.LOGIN_SUCCESS,
             },
-        ]), getState);
+        ]));
 
         const roles = new Set();
         for (const teamMember of teamMembers) {
@@ -257,7 +257,6 @@ export function logout() {
             // nothing to do here
         }
 
-        Client.setToken('');
         dispatch({type: UserTypes.LOGOUT_SUCCESS}, getState);
     };
 }
@@ -309,6 +308,30 @@ export function getMissingProfilesByIds(userIds) {
         if (missingIds.length > 0) {
             getStatusesByIds(missingIds)(dispatch, getState);
             return await getProfilesByIds(missingIds)(dispatch, getState);
+        }
+
+        return {data: []};
+    };
+}
+
+export function getMissingProfilesByUsernames(usernames) {
+    return async (dispatch, getState) => {
+        const {profiles} = getState().entities.users;
+
+        const usernameProfiles = Object.values(profiles).reduce((acc, profile) => {
+            acc[profile.username] = profile;
+            return acc;
+        }, {});
+
+        const missingUsernames = [];
+        usernames.forEach((username) => {
+            if (!usernameProfiles[username]) {
+                missingUsernames.push(username);
+            }
+        });
+
+        if (missingUsernames.length > 0) {
+            return await getProfilesByUsernames(missingUsernames)(dispatch, getState);
         }
 
         return {data: []};

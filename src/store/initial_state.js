@@ -96,7 +96,7 @@ const state: GlobalState = {
         typing: {},
         roles: {
             roles: {},
-            pending: [],
+            pending: new Set(),
         },
         gifs: {
             analytics: {},
@@ -116,6 +116,7 @@ const state: GlobalState = {
                 priorLocation: null,
             },
         },
+        schemes: {schemes: {}},
     },
     errors: [],
     requests: {
@@ -177,6 +178,14 @@ const state: GlobalState = {
                 error: null,
             },
             updateChannelMember: {
+                status: 'not_started',
+                error: null,
+            },
+            updateChannelScheme: {
+                status: 'not_started',
+                error: null,
+            },
+            updateChannelMemberSchemeRoles: {
                 status: 'not_started',
                 error: null,
             },
@@ -276,6 +285,10 @@ const state: GlobalState = {
                 error: null,
             },
             removeUserFromTeam: {
+                status: 'not_started',
+                error: null,
+            },
+            updateTeamScheme: {
                 status: 'not_started',
                 error: null,
             },
@@ -534,6 +547,36 @@ const state: GlobalState = {
                 error: null,
             },
             editRole: {
+                status: 'not_started',
+                error: null,
+            },
+        },
+        schemes: {
+            getSchemes: {
+                status: 'not_started',
+                error: null,
+            },
+            getScheme: {
+                status: 'not_started',
+                error: null,
+            },
+            createScheme: {
+                status: 'not_started',
+                error: null,
+            },
+            deleteScheme: {
+                status: 'not_started',
+                error: null,
+            },
+            patchScheme: {
+                status: 'not_started',
+                error: null,
+            },
+            getSchemeTeams: {
+                status: 'not_started',
+                error: null,
+            },
+            getSchemeChannels: {
                 status: 'not_started',
                 error: null,
             },

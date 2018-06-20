@@ -2,7 +2,7 @@
 // See LICENSE.txt for license information.
 // @flow
 
-export type UserProfile = {
+export type UserProfile = {|
     id: string,
     create_at: number,
     update_at: number,
@@ -17,9 +17,9 @@ export type UserProfile = {
     last_name: string,
     position: string,
     roles: string,
-};
+|};
 
-export type UsersState = {
+export type UsersState = {|
     currentUserId: string,
     mySessions: Array<Object>,
     myAudits: Array<Object>,
@@ -30,4 +30,4 @@ export type UsersState = {
     profilesInChannel: {[string]: Array<string>},
     profilesNotInChannel: {[string]: Array<string>},
     statuses: {[string]: string}
-};
+|};

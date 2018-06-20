@@ -2,9 +2,10 @@
 // See LICENSE.txt for license information.
 // @flow
 
-export type AdminState = {
+export type AdminState = {|
     logs: Array<Object>,
     audits: Object,
     config: Object,
+    environmentConfig: Object,
     complianceReports: Object
-};
+|};

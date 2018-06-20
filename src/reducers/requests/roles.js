@@ -1,12 +1,16 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
+// @flow
 
 import {combineReducers} from 'redux';
 import {RoleTypes} from 'action_types';
 
 import {handleRequest, initialRequestState} from './helpers';
 
-function getRolesByNames(state = initialRequestState(), action) {
+import type {GenericAction} from '../../types/actions';
+import type {RequestStatusType} from '../../types/requests';
+
+function getRolesByNames(state: RequestStatusType = initialRequestState(), action: GenericAction): RequestStatusType {
     return handleRequest(
         RoleTypes.ROLES_BY_NAMES_REQUEST,
         RoleTypes.ROLES_BY_NAMES_SUCCESS,
@@ -16,7 +20,7 @@ function getRolesByNames(state = initialRequestState(), action) {
     );
 }
 
-function getRoleByName(state = initialRequestState(), action) {
+function getRoleByName(state: RequestStatusType = initialRequestState(), action: GenericAction): RequestStatusType {
     return handleRequest(
         RoleTypes.ROLE_BY_NAME_REQUEST,
         RoleTypes.ROLE_BY_NAME_SUCCESS,
@@ -26,7 +30,7 @@ function getRoleByName(state = initialRequestState(), action) {
     );
 }
 
-function getRole(state = initialRequestState(), action) {
+function getRole(state: RequestStatusType = initialRequestState(), action: GenericAction): RequestStatusType {
     return handleRequest(
         RoleTypes.ROLE_BY_ID_REQUEST,
         RoleTypes.ROLE_BY_ID_SUCCESS,
@@ -36,7 +40,7 @@ function getRole(state = initialRequestState(), action) {
     );
 }
 
-function editRole(state = initialRequestState(), action) {
+function editRole(state: RequestStatusType = initialRequestState(), action: GenericAction): RequestStatusType {
     return handleRequest(
         RoleTypes.EDIT_ROLE_REQUEST,
         RoleTypes.EDIT_ROLE_SUCCESS,

@@ -25,6 +25,7 @@ class TestHelper {
         this.basicChannelMember = null;
         this.basicPost = null;
         this.basicRoles = null;
+        this.basicScheme = null;
     }
 
     activateMocking() {
@@ -92,6 +93,7 @@ class TestHelper {
             email: this.fakeEmail(),
             allowed_domains: '',
             invite_id: inviteId,
+            scheme_id: this.generateId(),
         };
     };
 
@@ -111,6 +113,8 @@ class TestHelper {
             team_id: teamId,
             roles: 'team_user',
             delete_at: 0,
+            scheme_user: false,
+            scheme_admin: false,
         };
     };
 
@@ -124,6 +128,26 @@ class TestHelper {
         return {
             ...this.fakeOutgoingHook(teamId),
             id: this.generateId(),
+        };
+    };
+
+    mockScheme = () => {
+        return {
+            name: this.generateId(),
+            description: this.generateId(),
+            scope: 'channel',
+            defaultchanneladminrole: false,
+            defaultchanneluserrole: false,
+        };
+    };
+
+    mockSchemeWithId = () => {
+        return {
+            ...this.mockScheme(),
+            id: this.generateId(),
+            create_at: 1507840900004,
+            update_at: 1507840900004,
+            delete_at: 0,
         };
     };
 
@@ -190,6 +214,7 @@ class TestHelper {
             type: 'O',
             delete_at: 0,
             total_msg_count: 0,
+            scheme_id: this.generateId(),
         };
     };
 
@@ -211,6 +236,8 @@ class TestHelper {
             roles: 'system_user',
             msg_count: 0,
             mention_count: 0,
+            scheme_user: false,
+            scheme_admin: false,
         };
     };
 
@@ -319,6 +346,7 @@ class TestHelper {
                     'system_admin_permission',
                 ],
                 scheme_managed: true,
+                built_in: true,
             },
             system_user: {
                 id: this.generateId(),
@@ -329,6 +357,7 @@ class TestHelper {
                     'system_user_permission',
                 ],
                 scheme_managed: true,
+                built_in: true,
             },
             team_admin: {
                 id: this.generateId(),
@@ -339,6 +368,7 @@ class TestHelper {
                     'team_admin_permission',
                 ],
                 scheme_managed: true,
+                built_in: true,
             },
             team_user: {
                 id: this.generateId(),
@@ -349,6 +379,7 @@ class TestHelper {
                     'team_user_permission',
                 ],
                 scheme_managed: true,
+                built_in: true,
             },
             channel_admin: {
                 id: this.generateId(),
@@ -359,6 +390,7 @@ class TestHelper {
                     'channel_admin_permission',
                 ],
                 scheme_managed: true,
+                built_in: true,
             },
             channel_user: {
                 id: this.generateId(),
@@ -369,8 +401,10 @@ class TestHelper {
                     'channel_user_permission',
                 ],
                 scheme_managed: true,
+                built_in: true,
             },
         };
+        this.basicScheme = this.mockSchemeWithId();
     }
 
     initBasic = async (client4 = this.createClient4()) => {

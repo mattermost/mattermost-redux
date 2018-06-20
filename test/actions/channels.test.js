@@ -1833,4 +1833,93 @@ describe('Actions.Channels', () => {
 
         assert.deepEqual(result, {data: [TestHelper.basicChannel]});
     });
+
+    it('updateChannelScheme', async () => {
+        TestHelper.mockLogin();
+        await login(TestHelper.basicChannelMember.email, 'password1')(store.dispatch, store.getState);
+
+        nock(Client4.getChannelsRoute()).
+            post('').
+            reply(201, TestHelper.fakeChannelWithId(TestHelper.basicTeam.id));
+
+        await Actions.createChannel(TestHelper.fakeChannel(TestHelper.basicTeam.id), TestHelper.basicUser.id)(store.dispatch, store.getState);
+
+        const createRequest = store.getState().requests.channels.createChannel;
+
+        if (createRequest.status === RequestStatus.FAILURE) {
+            throw new Error(JSON.stringify(createRequest.error));
+        }
+
+        const {channels} = store.getState().entities.channels;
+        const schemeId = 'xxxxxxxxxxxxxxxxxxxxxxxxxx';
+        const {id} = channels[Object.keys(channels)[0]];
+
+        nock(Client4.getChannelsRoute()).
+            put('/' + id + '/scheme').
+            reply(200, OK_RESPONSE);
+
+        await Actions.updateChannelScheme(id, schemeId)(store.dispatch, store.getState);
+
+        const request = store.getState().requests.channels.updateChannelScheme;
+
+        if (request.status === RequestStatus.FAILURE) {
+            throw new Error(JSON.stringify(request.error));
+        }
+
+        const updated = store.getState().entities.channels.channels[id];
+        assert.ok(updated);
+        assert.equal(updated.scheme_id, schemeId);
+    });
+
+    it('updateChannelMemberSchemeRoles', async () => {
+        TestHelper.mockLogin();
+        await login(TestHelper.basicChannelMember.email, 'password1')(store.dispatch, store.getState);
+
+        nock(Client4.getChannelsRoute()).
+            post('').
+            reply(201, TestHelper.fakeChannelWithId(TestHelper.basicTeam.id));
+
+        const userId = TestHelper.basicChannelMember.id;
+
+        await Actions.createChannel(TestHelper.fakeChannel(TestHelper.basicTeam.id), userId)(store.dispatch, store.getState);
+
+        const createRequest = store.getState().requests.channels.createChannel;
+
+        if (createRequest.status === RequestStatus.FAILURE) {
+            throw new Error(JSON.stringify(createRequest.error));
+        }
+
+        const {channels} = store.getState().entities.channels;
+        const channelId = channels[Object.keys(channels)[0]].id;
+
+        nock(Client4.getChannelsRoute()).
+            put(`/${channelId}/members/${userId}/schemeRoles`).
+            reply(200, OK_RESPONSE);
+
+        await Actions.updateChannelMemberSchemeRoles(channelId, userId, true, true)(store.dispatch, store.getState);
+        const request = store.getState().requests.channels.updateChannelMemberSchemeRoles;
+        if (request.status === RequestStatus.FAILURE) {
+            throw new Error(JSON.stringify(request.error));
+        }
+
+        const update1 = store.getState().entities.channels.membersInChannel[channelId][userId];
+        assert.ok(update1);
+        assert.equal(update1.scheme_admin, true);
+        assert.equal(update1.scheme_user, true);
+
+        nock(Client4.getChannelsRoute()).
+            put(`/${channelId}/members/${userId}/schemeRoles`).
+            reply(200, OK_RESPONSE);
+
+        await Actions.updateChannelMemberSchemeRoles(channelId, userId, false, false)(store.dispatch, store.getState);
+        const request2 = store.getState().requests.channels.updateChannelMemberSchemeRoles;
+        if (request2.status === RequestStatus.FAILURE) {
+            throw new Error(JSON.stringify(request2.error));
+        }
+
+        const update2 = store.getState().entities.channels.membersInChannel[channelId][userId];
+        assert.ok(update2);
+        assert.equal(update2.scheme_admin, false);
+        assert.equal(update2.scheme_user, false);
+    });
 });

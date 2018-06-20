@@ -160,6 +160,26 @@ function updateChannelMember(state: RequestStatusType = initialRequestState(), a
     );
 }
 
+function updateChannelScheme(state: RequestStatusType = initialRequestState(), action: GenericAction): RequestStatusType {
+    return handleRequest(
+        ChannelTypes.UPDATE_CHANNEL_SCHEME_REQUEST,
+        ChannelTypes.UPDATE_CHANNEL_SCHEME_SUCCESS,
+        ChannelTypes.UPDATE_CHANNEL_SCHEME_FAILURE,
+        state,
+        action
+    );
+}
+
+function updateChannelMemberSchemeRoles(state: RequestStatusType = initialRequestState(), action: GenericAction) {
+    return handleRequest(
+        ChannelTypes.UPDATE_CHANNEL_MEMBER_SCHEME_ROLES_REQUEST,
+        ChannelTypes.UPDATE_CHANNEL_MEMBER_SCHEME_ROLES_SUCCESS,
+        ChannelTypes.UPDATE_CHANNEL_MEMBER_SCHEME_ROLES_FAILURE,
+        state,
+        action
+    );
+}
+
 export default combineReducers({
     getChannel,
     getChannels,
@@ -176,4 +196,6 @@ export default combineReducers({
     addChannelMember,
     removeChannelMember,
     updateChannelMember,
+    updateChannelScheme,
+    updateChannelMemberSchemeRoles,
 });

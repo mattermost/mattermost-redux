@@ -49,13 +49,13 @@ import {
 } from 'action_types';
 import {General, WebsocketEvents, Preferences, Posts} from 'constants';
 
-import {getCurrentChannelStats} from 'selectors/entities/channels';
+import {getChannel, getCurrentChannelStats} from 'selectors/entities/channels';
 import {getCurrentUser} from 'selectors/entities/users';
 import {getUserIdFromChannelName} from 'utils/channel_utils';
 import {isFromWebhook, isSystemMessage, getLastCreateAt, shouldIgnorePost} from 'utils/post_utils';
 import EventEmitter from 'utils/event_emitter';
 
-export function init(platform, siteUrl, token, optionalWebSocket) {
+export function init(platform, siteUrl, token, optionalWebSocket, additionalOptions = {}) {
     return async (dispatch, getState) => {
         const config = getState().entities.general.config;
         let connUrl = siteUrl || config.WebsocketURL || Client4.getUrl();
@@ -89,6 +89,7 @@ export function init(platform, siteUrl, token, optionalWebSocket) {
         const websocketOpts = {
             connectionUrl: connUrl,
             platform,
+            ...additionalOptions,
         };
 
         if (optionalWebSocket) {
@@ -231,6 +232,9 @@ function handleEvent(msg, dispatch, getState) {
         break;
     case WebsocketEvents.CHANNEL_UPDATED:
         handleChannelUpdatedEvent(msg, dispatch, getState);
+        break;
+    case WebsocketEvents.CHANNEL_CONVERTED:
+        handleChannelConvertedEvent(msg, dispatch, getState);
         break;
     case WebsocketEvents.CHANNEL_VIEWED:
         handleChannelViewedEvent(msg, dispatch, getState);
@@ -572,6 +576,20 @@ function handleChannelUpdatedEvent(msg, dispatch, getState) {
             // Emit an event with the channel received as we need to handle
             // the changes without listening to the store
             EventEmitter.emit(WebsocketEvents.CHANNEL_UPDATED, channel);
+        }
+    }
+}
+
+// handleChannelConvertedEvent handles updating of channel which is converted from public to private
+function handleChannelConvertedEvent(msg, dispatch, getState) {
+    const channelId = msg.data.channel_id;
+    if (channelId) {
+        const channel = getChannel(getState(), channelId);
+        if (channel) {
+            dispatch({
+                type: ChannelTypes.RECEIVED_CHANNEL,
+                data: {...channel, type: General.PRIVATE_CHANNEL},
+            });
         }
     }
 }

@@ -5,6 +5,8 @@
 import {createSelector} from 'reselect';
 import {isMinimumServerVersion} from 'utils/helpers';
 
+import {General} from 'constants';
+
 import type {GlobalState} from '../../types/store';
 
 export function getConfig(state: GlobalState): Object {
@@ -48,5 +50,19 @@ export const canDownloadFilesOnMobile = createSelector(
     (config: Object, license: Object): boolean => {
         // Defaults to true if the setting doesn't exist
         return license.IsLicensed === 'false' || license.Compliance === 'false' || config.EnableMobileFileDownload !== 'false';
+    }
+);
+
+export const getAutolinkedUrlSchemes = createSelector(
+    getConfig,
+    (config: Object): string[] => {
+        if (!config.CustomUrlSchemes) {
+            return General.DEFAULT_AUTOLINKED_URL_SCHEMES;
+        }
+
+        return [
+            ...General.DEFAULT_AUTOLINKED_URL_SCHEMES,
+            ...config.CustomUrlSchemes.split(','),
+        ];
     }
 );

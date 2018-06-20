@@ -103,7 +103,7 @@ $ cd mattermost-redux
 $ make bundle
 ```
 
-This will generate `lib/mattermost.client.js`, `lib/mattermost.client4.js`, and `lib/mattermost.websocket.js` which can be loaded in a browser. Also note that `babel-polyfill` is required.
+This will generate `lib/mattermost.client4.js`, and `lib/mattermost.websocket.js` which can be loaded in a browser. Also note that `babel-polyfill` is required.
 
 ```
 <script src="/path/to/babel/polyfill.js"></script>

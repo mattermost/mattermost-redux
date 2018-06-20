@@ -1,7 +1,7 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
 
-import {Client, Client4} from 'client';
+import {Client4} from 'client';
 import {bindClientFunc, forceLogoutIfNecessary, FormattedError} from './helpers.js';
 import {GeneralTypes} from 'action_types';
 import {loadMe} from './users';
@@ -9,32 +9,26 @@ import {loadRolesIfNeeded} from './roles';
 import {logError} from './errors';
 import {batchActions} from 'redux-batched-actions';
 
-export function getPing(useV3 = false) {
+export function getPing() {
     return async (dispatch, getState) => {
         dispatch({type: GeneralTypes.PING_REQUEST}, getState);
 
         let data;
-        const pingError = new FormattedError(
+        let pingError = new FormattedError(
             'mobile.server_ping_failed',
             'Cannot connect to the server. Please check your server URL and internet connection.'
         );
         try {
-            if (useV3) {
-                data = await Client.getPing();
-            } else {
-                data = await Client4.ping();
-            }
-            if ((useV3 && !data.version) || (!useV3 && data.status !== 'OK')) {
+            data = await Client4.ping();
+            if (data.status !== 'OK') {
                 // successful ping but not the right return {data}
                 dispatch({type: GeneralTypes.PING_FAILURE, error: pingError}, getState);
                 return {error: pingError};
             }
         } catch (error) {
-            if (!useV3 && error.status_code === 404) {
-                if (!Client.getUrl()) {
-                    Client.setUrl(Client4.getUrl());
-                }
-                return getPing(true)(dispatch, getState);
+            if (error.status_code === 401) {
+                // When the server requires a client certificate to connect.
+                pingError = error;
             }
             dispatch({type: GeneralTypes.PING_FAILURE, error: pingError}, getState);
             return {error: pingError};
@@ -159,8 +153,6 @@ export function setServerVersion(serverVersion) {
 
 export function setStoreFromLocalData(data) {
     return async (dispatch, getState) => {
-        Client.setToken(data.token);
-        Client.setUrl(data.url);
         Client4.setToken(data.token);
         Client4.setUrl(data.url);
 
@@ -178,7 +170,6 @@ export function getSupportedTimezones() {
 }
 
 export function setUrl(url) {
-    Client.setUrl(url);
     Client4.setUrl(url);
     return true;
 }

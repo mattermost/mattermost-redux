@@ -3,6 +3,8 @@
 
 import assert from 'assert';
 
+import {General} from 'constants';
+
 import * as Selectors from 'selectors/entities/general';
 
 describe('Selectors.General', () => {
@@ -275,6 +277,67 @@ describe('Selectors.General', () => {
         assert.equal(Selectors.hasNewPermissions(state), true);
         state.entities.general.serverVersion = '5.10.0.dev';
         assert.equal(Selectors.hasNewPermissions(state), true);
+    });
+
+    describe('getAutolinkedUrlSchemes', () => {
+        it('setting doesn\'t exist', () => {
+            const state = {
+                entities: {
+                    general: {
+                        config: {
+                        },
+                    },
+                },
+            };
+
+            assert.deepEqual(Selectors.getAutolinkedUrlSchemes(state), General.DEFAULT_AUTOLINKED_URL_SCHEMES);
+            assert.equal(Selectors.getAutolinkedUrlSchemes(state), Selectors.getAutolinkedUrlSchemes(state));
+        });
+
+        it('no custom url schemes', () => {
+            const state = {
+                entities: {
+                    general: {
+                        config: {
+                            CustomUrlSchemes: '',
+                        },
+                    },
+                },
+            };
+
+            assert.deepEqual(Selectors.getAutolinkedUrlSchemes(state), General.DEFAULT_AUTOLINKED_URL_SCHEMES);
+            assert.equal(Selectors.getAutolinkedUrlSchemes(state), Selectors.getAutolinkedUrlSchemes(state));
+        });
+
+        it('one custom url scheme', () => {
+            const state = {
+                entities: {
+                    general: {
+                        config: {
+                            CustomUrlSchemes: 'dns',
+                        },
+                    },
+                },
+            };
+
+            assert.deepEqual(Selectors.getAutolinkedUrlSchemes(state), [...General.DEFAULT_AUTOLINKED_URL_SCHEMES, 'dns']);
+            assert.equal(Selectors.getAutolinkedUrlSchemes(state), Selectors.getAutolinkedUrlSchemes(state));
+        });
+
+        it('multiple custom url schemes', () => {
+            const state = {
+                entities: {
+                    general: {
+                        config: {
+                            CustomUrlSchemes: 'dns,steam,shttp',
+                        },
+                    },
+                },
+            };
+
+            assert.deepEqual(Selectors.getAutolinkedUrlSchemes(state), [...General.DEFAULT_AUTOLINKED_URL_SCHEMES, 'dns', 'steam', 'shttp']);
+            assert.equal(Selectors.getAutolinkedUrlSchemes(state), Selectors.getAutolinkedUrlSchemes(state));
+        });
     });
 });
 

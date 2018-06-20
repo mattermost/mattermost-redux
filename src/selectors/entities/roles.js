@@ -63,6 +63,17 @@ export function getRoles(state) {
     return state.entities.roles.roles;
 }
 
+export const getRolesById = createSelector(
+    getRoles,
+    (rolesByName) => {
+        const rolesById = {};
+        for (const role of Object.values(rolesByName)) {
+            rolesById[role.id] = role;
+        }
+        return rolesById;
+    }
+);
+
 export const getMySystemPermissions = createSelector(
     getMySystemRoles,
     getRoles,

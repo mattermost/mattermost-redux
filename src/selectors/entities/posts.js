@@ -219,7 +219,7 @@ export function makeGetPostsInChannel() {
 
             const posts = [];
 
-            const joinLeavePref = myPreferences[getPreferenceKey(Preferences.CATEGORY_ADVANCED_SETTINGS, 'join_leave')];
+            const joinLeavePref = myPreferences[getPreferenceKey(Preferences.CATEGORY_ADVANCED_SETTINGS, Preferences.ADVANCED_FILTER_JOIN_LEAVE)];
             const showJoinLeave = joinLeavePref ? joinLeavePref.value !== 'false' : true;
 
             for (let i = 0; i < postIds.length && i < numPosts; i++) {
@@ -262,7 +262,7 @@ export function makeGetPostsAroundPost() {
             const slicedPostIds = postIds.slice(minPostIndex);
 
             const posts = [];
-            const joinLeavePref = myPreferences[getPreferenceKey(Preferences.CATEGORY_ADVANCED_SETTINGS, 'join_leave')];
+            const joinLeavePref = myPreferences[getPreferenceKey(Preferences.CATEGORY_ADVANCED_SETTINGS, Preferences.ADVANCED_FILTER_JOIN_LEAVE)];
             const showJoinLeave = joinLeavePref ? joinLeavePref.value !== 'false' : true;
 
             for (let i = 0; i < slicedPostIds.length; i++) {
@@ -350,6 +350,13 @@ export const getSearchResults = createSelector(
     }
 );
 
+// Returns the matched text from the search results, if the server has provided them.
+// These matches will only be present if the server is running Mattermost 5.1 or higher
+// with Elasticsearch enabled to search posts. Otherwise, null will be returned.
+export function getSearchMatches(state) {
+    return state.entities.search.matches;
+}
+
 export function makeGetMessageInHistoryItem(type) {
     return createSelector(
         (state) => state.entities.posts.messagesHistory,
@@ -408,7 +415,7 @@ export const getMostRecentPostIdInChannel = createSelector(
         if (!postIdsInChannel) {
             return '';
         }
-        const key = getPreferenceKey(Preferences.CATEGORY_ADVANCED_SETTINGS, 'join_leave');
+        const key = getPreferenceKey(Preferences.CATEGORY_ADVANCED_SETTINGS, Preferences.ADVANCED_FILTER_JOIN_LEAVE);
         const allowSystemMessages = preferences[key] ? preferences[key].value === 'true' : true;
 
         if (!allowSystemMessages) {

@@ -2,7 +2,7 @@
 // See LICENSE.txt for license information.
 // @flow
 
-export type GeneralState = {
+export type GeneralState = {|
     appState: boolean,
     credentials: Object,
     config: Object,
@@ -11,4 +11,4 @@ export type GeneralState = {
     license: Object,
     serverVersion: string,
     timezones: Array<string>
-};
+|};

@@ -18,6 +18,7 @@ import AlertTypes from './alerts';
 import JobTypes from './jobs';
 import SearchTypes from './search';
 import RoleTypes from './roles';
+import SchemeTypes from './schemes';
 
 export {
     ErrorTypes,
@@ -36,4 +37,5 @@ export {
     JobTypes,
     SearchTypes,
     RoleTypes,
+    SchemeTypes,
 };

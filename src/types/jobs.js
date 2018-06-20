@@ -5,7 +5,7 @@
 export type JobType = 'data_retention' | 'elasticsearch_post_indexing' | 'ldap_sync' | 'message_export';
 export type JobStatus = 'pending' | 'in_progress' | 'success' | 'error' | 'cancel_requested' | 'canceled';
 
-export type Job = {
+export type Job = {|
     id: string,
     type: JobType,
     priority: number,
@@ -15,9 +15,9 @@ export type Job = {
     status: JobStatus,
     progress: number,
     data: Object
-}
+|}
 
-export type JobsState = {
+export type JobsState = {|
     jobs: {[string]: Job},
     jobsByTypeList: {[JobType]: Array<Job>}
-};
+|};
