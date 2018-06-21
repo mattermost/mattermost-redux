@@ -312,7 +312,16 @@ async function handleNewPostEvent(msg, dispatch, getState) {
     }
 
     if (post.root_id && !posts[post.root_id]) {
-        await Client4.getPostThread(post.root_id).then((data) => {
+        let response;
+        try {
+            response = await Client4.getPostThread(post.root_id);
+        } catch (e) {
+            console.warn('failed to get thread for new post event', e); // eslint-disable-line no-console
+        }
+
+        if (response && response.data) {
+            const data = response.data;
+
             const rootUserId = data.posts[post.root_id].user_id;
             const rootStatus = users.statuses[rootUserId];
             if (!users.profiles[rootUserId] && rootUserId !== currentUserId) {
@@ -328,7 +337,7 @@ async function handleNewPostEvent(msg, dispatch, getState) {
                 data,
                 channelId: post.channel_id,
             }, getState);
-        });
+        }
     }
 
     const actions = [{
