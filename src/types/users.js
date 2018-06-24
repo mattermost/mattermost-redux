@@ -31,4 +31,4 @@ export type UsersState = {|
     profilesNotInChannel: {[string]: Array<string>},
     statuses: {[string]: string},
     stats: Object,
-};
+|};
