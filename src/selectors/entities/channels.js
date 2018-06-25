@@ -43,6 +43,7 @@ import {
     sortChannelsByDisplayNameAndMuted,
     isFavoriteChannel,
     isDefault,
+    sortChannelsByRecency,
 } from 'utils/channel_utils';
 import {createIdsSelector} from 'utils/helpers';
 import {getUserIdsInChannels} from './users';
@@ -81,17 +82,39 @@ export const mapAndSortChannelIds = (channels, currentUser, myMembers, lastPosts
 
     if (sorting === 'recent') {
         channels.sort((a, b) => {
-            const aLastPostAt = (lastPosts[a.id] && lastPosts[a.id].update_at) || a.last_post_at;
-            const bLastPostAt = (lastPosts[b.id] && lastPosts[b.id].update_at) || b.last_post_at;
-
-            const aDate = new Date(aLastPostAt);
-            const bDate = new Date(bLastPostAt);
-
-            return bDate.getTime() - aDate.getTime();
+            return sortChannelsByRecency(lastPosts, a, b);
         });
     } else {
         channels.sort(sortChannelsByDisplayNameAndMuted.bind(null, locale, myMembers));
     }
+
+    return channels.map((c) => c.id);
+};
+
+export const mapAndSortUnreadChannelIds = (channels, currentUser, myMembers, lastPosts, lastUnreadChannel, sorting) => {
+    const locale = currentUser.locale || General.DEFAULT_LOCALE;
+
+    channels.sort((a, b) => {
+        const aMember = myMembers[a.id];
+        const bMember = myMembers[b.id];
+        const aIsMention = a.type === General.DM_CHANNEL || (aMember && aMember.mention_count > 0);
+        let bIsMention = b.type === General.DM_CHANNEL || (bMember && bMember.mention_count > 0);
+
+        if (lastUnreadChannel && b.id === lastUnreadChannel.id && lastUnreadChannel.hadMentions) {
+            bIsMention = true;
+        }
+
+        if (aIsMention === bIsMention && isChannelMuted(bMember) === isChannelMuted(aMember)) {
+            if (sorting === 'recent') {
+                return sortChannelsByRecency(lastPosts, a, b);
+            }
+            return sortChannelsByDisplayName(locale, a, b);
+        } else if (aIsMention || (isChannelMuted(bMember) && !isChannelMuted(aMember))) {
+            return -1;
+        }
+
+        return 1;
+    });
 
     return channels.map((c) => c.id);
 };
@@ -582,8 +605,9 @@ export const getMapAndSortedUnreadChannelIds = createIdsSelector(
     getCurrentUser,
     getMyChannelMemberships,
     getLastPostPerChannel,
+    (state, lastUnreadChannel = null) => lastUnreadChannel,
     (state, lastUnreadChannel, unreadsAtTop, favoritesAtTop, sorting = 'alpha') => sorting,
-    mapAndSortChannelIds,
+    mapAndSortUnreadChannelIds,
 );
 
 export const getSortedUnreadChannelIds = createIdsSelector(
