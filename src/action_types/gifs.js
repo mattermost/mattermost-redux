@@ -46,11 +46,4 @@ export default keyMirror({
 
     CACHE_GIFS: null,
     CACHE_REQUEST: null,
-
-    // Analytics.
-
-    SEND_VIEW_COUNT: null,
-    SEND_EVENT: null,
-    SET_USER_COOKIE: null,
-    SET_SESSION_COOKIE: null,
 });

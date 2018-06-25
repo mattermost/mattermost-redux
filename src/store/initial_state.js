@@ -99,7 +99,6 @@ const state: GlobalState = {
             pending: new Set(),
         },
         gifs: {
-            analytics: {},
             categories: {
                 tagsList: [],
                 tagsDict: {},

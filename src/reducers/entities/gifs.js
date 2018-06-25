@@ -4,17 +4,6 @@
 import {combineReducers} from 'redux';
 import {GifTypes} from 'action_types';
 
-const ANALYTICS_SELECTORS = {
-    [GifTypes.SET_USER_COOKIE]: (state, action) => ({
-        ...state,
-        ...action.payload,
-    }),
-    [GifTypes.SET_SESSION_COOKIE]: (state, action) => ({
-        ...state,
-        ...action.payload,
-    }),
-};
-
 const SEARCH_SELECTORS = {
     [GifTypes.SELECT_SEARCH_TEXT]: (state, action) => ({
         ...state,
@@ -84,10 +73,7 @@ const CATEGORIES_SELECTORS = {
         const {tagsList: oldTagsList = []} = state;
         const tagsDict = {};
         const newTagsList = tags.filter((item) => {
-            if (item && item.gfycats[0] && item.gfycats[0].width) {
-                return true;
-            }
-            return false;
+            return Boolean(item && item.gfycats[0] && item.gfycats[0].width);
         }).map((item) => {
             tagsDict[item.tag] = true;
             return {
@@ -229,11 +215,6 @@ const CACHE_GIF_SELECTOR = {
     }),
 };
 
-function analyticsReducer(state = {utc: 0, stc: 0}, action) {
-    const selector = ANALYTICS_SELECTORS[action.type];
-    return selector ? selector(state, action) : state;
-}
-
 function appReducer(state = {}, action) {
     const nextState = {...state};
     switch (action.type) {
@@ -260,7 +241,6 @@ function cacheReducer(state = {}, action) {
 }
 
 export default combineReducers({
-    analytics: analyticsReducer,
     app: appReducer,
     categories: categoriesReducer,
     search: searchReducer,
