@@ -70,17 +70,25 @@ class WebSocketClient {
                 this.connectingCallback(dispatch, getState);
             }
 
-            const regex = /^(?:https?|wss?):\/\/[^/]*/;
+            const regex = /^(?:https?|wss?):(?:\/\/)?[^/]*/;
             const captured = (regex).exec(connectionUrl);
-            let origin = captured[0];
-            if (platform === 'android') {
-                // this is done cause for android having the port 80 or 443 will fail the connection
-                // the websocket will append them
-                const split = origin.split(':');
-                const port = split[2];
-                if (port === '80' || port === '443') {
-                    origin = `${split[0]}:${split[1]}`;
+
+            let origin;
+            if (captured) {
+                origin = captured[0];
+
+                if (platform === 'android') {
+                    // this is done cause for android having the port 80 or 443 will fail the connection
+                    // the websocket will append them
+                    const split = origin.split(':');
+                    const port = split[2];
+                    if (port === '80' || port === '443') {
+                        origin = `${split[0]}:${split[1]}`;
+                    }
                 }
+            } else {
+                // If we're unable to set the origin header, the websocket won't connect, but the URL is likely malformed anyway
+                console.warn('websocket failed to parse origin from ' + connectionUrl); // eslint-disable-line no-console
             }
 
             this.conn = new Socket(connectionUrl, [], {headers: {origin}, ...(additionalOptions || {})});
