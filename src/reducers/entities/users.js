@@ -350,6 +350,20 @@ function myUserAccessTokens(state = {}, action) {
     }
 }
 
+function stats(state = {}, action) {
+    switch (action.type) {
+    case UserTypes.RECEIVED_USER_STATS: {
+        const stat = action.data;
+        return {
+            ...state,
+            ...stat,
+        };
+    }
+    default:
+        return state;
+    }
+}
+
 export default combineReducers({
 
     // the current selected user
@@ -384,4 +398,7 @@ export default combineReducers({
 
     // object where every key is the user id and has a value with the current status of each user
     statuses,
+
+    // Total user stats
+    stats,
 });

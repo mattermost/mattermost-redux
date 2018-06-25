@@ -29,5 +29,6 @@ export type UsersState = {|
     profilesWithoutTeam: Set<Object>,
     profilesInChannel: {[string]: Array<string>},
     profilesNotInChannel: {[string]: Array<string>},
-    statuses: {[string]: string}
+    statuses: {[string]: string},
+    stats: Object,
 |};

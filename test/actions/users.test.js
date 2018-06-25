@@ -526,6 +526,22 @@ describe('Actions.Users', () => {
         assert.equal(Object.keys(statuses).length, 1);
     });
 
+    it('getTotalUsersStats', async () => {
+        nock(Client4.getBaseRoute(TestHelper.basicUser.id)).
+            get('/users/stats').
+            reply(200, {total_users_count: 2605});
+        await Actions.getTotalUsersStats()(store.dispatch, store.getState);
+
+        const {stats} = store.getState().entities.users;
+        const statsRequest = store.getState().requests.users.getTotalUsersStats;
+
+        if (statsRequest.status === RequestStatus.FAILURE) {
+            throw new Error(JSON.stringify(statsRequest.error));
+        }
+
+        assert.equal(stats.total_users_count, 2605);
+    });
+
     it('getStatus', async () => {
         const user = TestHelper.basicUser;
 

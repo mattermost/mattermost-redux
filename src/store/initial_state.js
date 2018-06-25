@@ -27,6 +27,7 @@ const state: GlobalState = {
             profilesInChannel: {},
             profilesNotInChannel: {},
             statuses: {},
+            stats: {},
         },
         teams: {
             currentTeamId: '',
@@ -341,6 +342,10 @@ const state: GlobalState = {
                 error: null,
             },
             updateMe: {
+                status: 'not_started',
+                error: null,
+            },
+            getTotalUsersStats: {
                 status: 'not_started',
                 error: null,
             },

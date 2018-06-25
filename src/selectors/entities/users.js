@@ -261,6 +261,10 @@ export function getStatusForUserId(state, userId) {
     return getUserStatuses(state)[userId];
 }
 
+export function getTotalUsersStats(state) {
+    return state.entities.users.stats;
+}
+
 export function searchProfiles(state, term, skipCurrent = false) {
     const profiles = filterProfilesMatchingTerm(Object.values(getUsers(state)), term);
     if (skipCurrent) {
