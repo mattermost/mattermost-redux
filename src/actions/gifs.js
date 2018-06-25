@@ -2,6 +2,7 @@
 // See LICENSE.txt for license information.
 
 import {GifTypes} from 'action_types';
+import {Client4} from 'client';
 import gfycatSdk from 'utils/gfycatSdk';
 
 // APP PROPS
@@ -163,15 +164,11 @@ export function searchGfycat({searchText, count = 30, startIndex = 0}) {
                 const context = getState().entities.gifs.categories.tagsDict[searchText] ?
                     'category' :
                     'search';
-
-                dispatch(sendViewCountBatch({
-                    gfycats: json.gfycats,
-                    params: {
-                        context,
-                        keyword: searchText,
-                        app_id: getState().entities.gifs.app.appId,
-                    },
-                }));
+                Client4.trackEvent(
+                    'gfycat',
+                    'views',
+                    {context: context, count: json.gfycats.length, keyword: searchText}
+                );
             }
         }).catch(
             (err) => dispatch(errorSearching(err, searchText))
@@ -200,14 +197,11 @@ export function searchCategory({tagName = '', gfyCount = 30, cursorPos}) {
                     dispatch(cacheGifsRequest(json.gfycats));
                     dispatch(receiveCategorySearch({tagName, json}));
 
-                    dispatch(sendViewCountBatch({
-                        gfycats: json.gfycats,
-                        params: {
-                            context: 'category',
-                            keyword: tagName,
-                            app_id: getState().entities.gifs.app.appId,
-                        },
-                    }));
+                    Client4.trackEvent(
+                        'gfycat',
+                        'views',
+                        {context: 'category', count: json.gfycats.length, keyword: tagName}
+                    );
 
                     // preload categories list
                     if (tagName === 'trending') {
