@@ -5,7 +5,7 @@ import Gfycat from './gfycat-sdk.umd.bundle.min';
 
 let instance = null;
 
-export default function (key, secret) {
+export default function(key, secret) {
     if (!instance) {
         instance = new Gfycat({client_id: key, client_secret: secret});
     }

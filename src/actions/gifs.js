@@ -152,9 +152,7 @@ export function searchGfycat({searchText, count = 30, startIndex = 0}) {
         }
         dispatch(requestSearch(searchText, count, start));
         gfycatSdk(GfycatApiKey, GfycatApiSecret).authenticate();
-        return gfycatSdk(GfycatApiKey, GfycatApiSecret)
-            .search({search_text: searchText, count, start})
-            .then((json) => {
+        return gfycatSdk(GfycatApiKey, GfycatApiSecret).search({search_text: searchText, count, start}).then((json) => {
             if (json.errorMessage) {
                 // There was no results before
                 if (resultsByTerm[searchText].items) {
@@ -173,7 +171,7 @@ export function searchGfycat({searchText, count = 30, startIndex = 0}) {
                 Client4.trackEvent(
                     'gfycat',
                     'views',
-                    {context: context, count: json.gfycats.length, keyword: searchText}
+                    {context, count: json.gfycats.length, keyword: searchText}
                 );
             }
         }).catch(
@@ -191,9 +189,7 @@ export function searchCategory({tagName = '', gfyCount = 30, cursorPos}) {
             cursor = resultsByTerm[tagName].cursor;
         }
         dispatch(requestSearch(tagName));
-        return gfycatSdk(GfycatApiKey, GfycatApiSecret)
-            .getTrendingCategories({tagName, gfyCount, cursor})
-            .then(
+        return gfycatSdk(GfycatApiKey, GfycatApiSecret).getTrendingCategories({tagName, gfyCount, cursor}).then(
             (json) => {
                 if (json.errorMessage) {
                     if (resultsByTerm[tagName].gfycats) {
