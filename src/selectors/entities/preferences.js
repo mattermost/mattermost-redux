@@ -157,6 +157,10 @@ export const getTheme = createShallowSelector(
         if (theme.type && theme.type !== 'custom') {
             const match = Object.values(Preferences.THEMES).find((v) => v.type === theme.type);
             if (match) {
+                if (!match.mentionBg) {
+                    match.mentionBg = match.mentionBj;
+                }
+
                 return match;
             }
         }
