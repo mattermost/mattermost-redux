@@ -15,6 +15,7 @@ export function saveAppPropsRequest(props) {
 }
 
 export function saveAppProps(appProps) {
+    gfycatSdk.authenticate();
     return (dispatch) => {
         dispatch(saveAppPropsRequest(appProps));
     };
