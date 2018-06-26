@@ -15,8 +15,9 @@ export function saveAppPropsRequest(props) {
 }
 
 export function saveAppProps(appProps) {
-    gfycatSdk.authenticate();
-    return (dispatch) => {
+    return (dispatch, getState) => {
+        const {GfycatApiKey, GfycatApiSecret} = getState().entities.general.config;
+        gfycatSdk(GfycatApiKey, GfycatApiSecret).authenticate();
         dispatch(saveAppPropsRequest(appProps));
     };
 }
@@ -144,12 +145,16 @@ export function searchPriorLocation(priorLocation) {
 export function searchGfycat({searchText, count = 30, startIndex = 0}) {
     var start = startIndex;
     return (dispatch, getState) => {
+        const {GfycatApiKey, GfycatApiSecret} = getState().entities.general.config;
         const {resultsByTerm} = getState().entities.gifs.search;
         if (resultsByTerm[searchText]) {
             start = resultsByTerm[searchText].start + count;
         }
         dispatch(requestSearch(searchText, count, start));
-        return gfycatSdk.search({search_text: searchText, count, start}).then((json) => {
+        gfycatSdk(GfycatApiKey, GfycatApiSecret).authenticate();
+        return gfycatSdk(GfycatApiKey, GfycatApiSecret)
+            .search({search_text: searchText, count, start})
+            .then((json) => {
             if (json.errorMessage) {
                 // There was no results before
                 if (resultsByTerm[searchText].items) {
@@ -180,12 +185,15 @@ export function searchGfycat({searchText, count = 30, startIndex = 0}) {
 export function searchCategory({tagName = '', gfyCount = 30, cursorPos}) {
     var cursor = cursorPos;
     return (dispatch, getState) => {
+        const {GfycatApiKey, GfycatApiSecret} = getState().entities.general.config;
         const {resultsByTerm} = getState().entities.gifs.search;
         if (resultsByTerm[tagName]) {
             cursor = resultsByTerm[tagName].cursor;
         }
         dispatch(requestSearch(tagName));
-        return gfycatSdk.getTrendingCategories({tagName, gfyCount, cursor}).then(
+        return gfycatSdk(GfycatApiKey, GfycatApiSecret)
+            .getTrendingCategories({tagName, gfyCount, cursor})
+            .then(
             (json) => {
                 if (json.errorMessage) {
                     if (resultsByTerm[tagName].gfycats) {
@@ -262,9 +270,10 @@ export function shouldSearchInitial(state, searchText) {
 }
 
 export function searchById(gfyId) {
-    return (dispatch) => {
+    return (dispatch, getState) => {
+        const {GfycatApiKey, GfycatApiSecret} = getState().entities.general.config;
         dispatch(requestSearchById(gfyId));
-        return gfycatSdk.searchById({id: gfyId}).then(
+        return gfycatSdk(GfycatApiKey, GfycatApiSecret).searchById({id: gfyId}).then(
             (response) => {
                 dispatch(receiveSearchById(gfyId, response.gfyItem));
                 dispatch(cacheGifsRequest([response.gfyItem]));
@@ -334,6 +343,7 @@ export function categoriesListFailure(err) {
 
 export function requestCategoriesList({count = 60} = {}) {
     return (dispatch, getState) => {
+        const {GfycatApiKey, GfycatApiSecret} = getState().entities.general.config;
         const state = getState().entities.gifs.categories;
         if (!shouldRequestCategoriesList(state)) {
             return Promise.resolve();
@@ -344,7 +354,7 @@ export function requestCategoriesList({count = 60} = {}) {
             ...(count && {count}),
             ...(cursor && {cursor}),
         };
-        return gfycatSdk.getCategories(options).then((json) => {
+        return gfycatSdk(GfycatApiKey, GfycatApiSecret).getCategories(options).then((json) => {
             const newGfycats = json.tags.reduce((gfycats, tag) => {
                 if (tag.gfycats[0] && tag.gfycats[0].width) {
                     return [...gfycats, ...tag.gfycats];
