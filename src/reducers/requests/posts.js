@@ -76,6 +76,16 @@ function getPosts(state: RequestStatusType = initialRequestState(), action: Gene
     );
 }
 
+function getFlaggedPosts(state: RequestStatusType = initialRequestState(), action: GenericAction): RequestStatusType {
+    return handleRequest(
+        PostTypes.GET_POSTS_FLAGGED_REQUEST,
+        PostTypes.GET_POSTS_FLAGGED_SUCCESS,
+        PostTypes.GET_POSTS_FLAGGED_FAILURE,
+        state,
+        action
+    );
+}
+
 function getPostsWithRetryAttempt(state: number = 0, action: GenericAction): number {
     switch (action.type) {
     case PostTypes.GET_POSTS_WITH_RETRY_ATTEMPT:
@@ -204,4 +214,5 @@ export default combineReducers({
     reaction,
     openGraph,
     doPostAction,
+    getFlaggedPosts,
 });

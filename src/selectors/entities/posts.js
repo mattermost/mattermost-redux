@@ -19,6 +19,10 @@ export function getPost(state, postId) {
     return getAllPosts(state)[postId];
 }
 
+export function getFlaggedPosts(state) {
+    return state.entities.posts.flaggedPosts;
+}
+
 export function getPostsInThread(state) {
     return state.entities.posts.postsInThread;
 }

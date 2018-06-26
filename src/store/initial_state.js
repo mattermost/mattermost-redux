@@ -48,6 +48,7 @@ const state: GlobalState = {
             posts: {},
             postsInChannel: {},
             postsInThread: {},
+            flaggedPosts: {},
             selectedPostId: '',
             currentFocusedPostId: '',
             messagesHistory: {
@@ -214,6 +215,10 @@ const state: GlobalState = {
             },
             getPostThreadRetryAttempts: 0,
             getPosts: {
+                status: 'not_started',
+                error: null,
+            },
+            getFlaggedPosts: {
                 status: 'not_started',
                 error: null,
             },
