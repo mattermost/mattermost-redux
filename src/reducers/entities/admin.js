@@ -364,7 +364,7 @@ function plugins(state = {}, action) {
         Reflect.deleteProperty(nextState, action.data);
         return nextState;
     }
-    case AdminTypes.ACTIVATED_PLUGIN: {
+    case AdminTypes.ENABLED_PLUGIN: {
         const nextState = {...state};
         const plugin = nextState[action.data];
         if (plugin && !plugin.active) {
@@ -373,7 +373,7 @@ function plugins(state = {}, action) {
         }
         return state;
     }
-    case AdminTypes.DEACTIVATED_PLUGIN: {
+    case AdminTypes.DISABLED_PLUGIN: {
         const nextState = {...state};
         const plugin = nextState[action.data];
         if (plugin && plugin.active) {
@@ -445,7 +445,7 @@ function pluginStatuses(state = {}, action) {
         };
     }
 
-    case AdminTypes.ACTIVATE_PLUGIN_REQUEST: {
+    case AdminTypes.ENABLE_PLUGIN_REQUEST: {
         const pluginId = action.data;
         if (!state[pluginId]) {
             return state;
@@ -460,7 +460,7 @@ function pluginStatuses(state = {}, action) {
         };
     }
 
-    case AdminTypes.DEACTIVATE_PLUGIN_REQUEST: {
+    case AdminTypes.DISABLE_PLUGIN_REQUEST: {
         const pluginId = action.data;
         if (!state[pluginId]) {
             return state;
