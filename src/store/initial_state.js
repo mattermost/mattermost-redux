@@ -99,6 +99,23 @@ const state: GlobalState = {
             roles: {},
             pending: new Set(),
         },
+        gifs: {
+            categories: {
+                tagsList: [],
+                tagsDict: {},
+            },
+            cache: {
+                gifs: {},
+                updating: false,
+            },
+            search: {
+                searchText: '',
+                searchBarText: '',
+                resultsByTerm: {},
+                scrollPosition: 0,
+                priorLocation: null,
+            },
+        },
         schemes: {schemes: {}},
     },
     errors: [],
