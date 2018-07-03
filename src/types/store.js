@@ -53,6 +53,7 @@ export type GlobalState = {|
         typing: Typing,
         roles: Object,
         schemes: SchemesState,
+        gifs: Object,
     |},
     errors: Array<Object>,
     requests: {|

@@ -82,7 +82,8 @@ export type UsersRequestsStatuses = {|
     getAudits: RequestStatusType,
     autocompleteUsers: RequestStatusType,
     searchProfiles: RequestStatusType,
-    updateMe: RequestStatusType
+    updateMe: RequestStatusType,
+    getTotalUsersStats: RequestStatusType
 |};
 
 export type PreferencesRequestsStatuses = {|
