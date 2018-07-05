@@ -86,7 +86,7 @@ describe('Utils.isEmail', function() {
                 valid: false,
             },
             {
-                email: '<Jonathan Fritz> jonathan.fritz@mattermost.com',
+                email: '<testing> test.email@example.com',
                 valid: false,
             },
             {
