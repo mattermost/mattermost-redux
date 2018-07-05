@@ -89,6 +89,7 @@ class WebSocketClient {
             } else {
                 // If we're unable to set the origin header, the websocket won't connect, but the URL is likely malformed anyway
                 console.warn('websocket failed to parse origin from ' + connectionUrl); // eslint-disable-line no-console
+                return;
             }
 
             this.conn = new Socket(connectionUrl, [], {headers: {origin}, ...(additionalOptions || {})});
