@@ -385,7 +385,7 @@ describe('reducers.entities.admin', () => {
             assert.deepEqual(actualState.pluginStatuses, expectedState);
         });
 
-        it('ACTIVATE_PLUGIN_REQUEST, plugin_0', () => {
+        it('ENABLE_PLUGIN_REQUEST, plugin_0', () => {
             const state = {
                 plugin_0: {
                     id: 'plugin_0',
@@ -426,7 +426,7 @@ describe('reducers.entities.admin', () => {
                 },
             };
             const action = {
-                type: AdminTypes.ACTIVATE_PLUGIN_REQUEST,
+                type: AdminTypes.ENABLE_PLUGIN_REQUEST,
                 data: 'plugin_0',
             };
             const expectedState = {
@@ -473,7 +473,7 @@ describe('reducers.entities.admin', () => {
             assert.deepEqual(actualState.pluginStatuses, expectedState);
         });
 
-        it('DEACTIVATE_PLUGIN_REQUEST, plugin_0', () => {
+        it('DISABLE_PLUGIN_REQUEST, plugin_0', () => {
             const state = {
                 plugin_0: {
                     id: 'plugin_0',
@@ -514,7 +514,7 @@ describe('reducers.entities.admin', () => {
                 },
             };
             const action = {
-                type: AdminTypes.DEACTIVATE_PLUGIN_REQUEST,
+                type: AdminTypes.DISABLE_PLUGIN_REQUEST,
                 data: 'plugin_0',
             };
             const expectedState = {
@@ -561,7 +561,7 @@ describe('reducers.entities.admin', () => {
             assert.deepEqual(actualState.pluginStatuses, expectedState);
         });
 
-        it('DEACTIVATE_PLUGIN_REQUEST, plugin_1', () => {
+        it('DISABLE_PLUGIN_REQUEST, plugin_1', () => {
             const state = {
                 plugin_0: {
                     id: 'plugin_0',
@@ -602,7 +602,7 @@ describe('reducers.entities.admin', () => {
                 },
             };
             const action = {
-                type: AdminTypes.DEACTIVATE_PLUGIN_REQUEST,
+                type: AdminTypes.DISABLE_PLUGIN_REQUEST,
                 data: 'plugin_1',
             };
             const expectedState = {

@@ -947,7 +947,7 @@ describe('Actions.Admin', () => {
         assert.ok(!plugins[testPlugin.id]);
     });
 
-    it('activatePlugin', async () => {
+    it('enablePlugin', async () => {
         if (TestHelper.isLiveServer()) {
             console.log('Skipping mock-only test');
             return;
@@ -968,12 +968,12 @@ describe('Actions.Admin', () => {
         assert.ok(!plugins[testPlugin.id].active);
 
         nock(Client4.getBaseRoute()).
-            post(`/plugins/${testPlugin.id}/activate`).
+            post(`/plugins/${testPlugin.id}/enable`).
             reply(200, OK_RESPONSE);
 
-        await Actions.activatePlugin(testPlugin.id)(store.dispatch, store.getState);
+        await Actions.enablePlugin(testPlugin.id)(store.dispatch, store.getState);
 
-        const request = state.requests.admin.activatePlugin;
+        const request = state.requests.admin.enablePlugin;
         if (request.status === RequestStatus.FAILURE) {
             throw new Error(request.error);
         }
@@ -985,7 +985,7 @@ describe('Actions.Admin', () => {
         assert.ok(plugins[testPlugin.id].active);
     });
 
-    it('deactivatePlugin', async () => {
+    it('disablePlugin', async () => {
         if (TestHelper.isLiveServer()) {
             console.log('Skipping mock-only test');
             return;
@@ -1006,12 +1006,12 @@ describe('Actions.Admin', () => {
         assert.ok(plugins[testPlugin.id].active);
 
         nock(Client4.getBaseRoute()).
-            post(`/plugins/${testPlugin.id}/deactivate`).
+            post(`/plugins/${testPlugin.id}/disable`).
             reply(200, OK_RESPONSE);
 
-        await Actions.deactivatePlugin(testPlugin.id)(store.dispatch, store.getState);
+        await Actions.disablePlugin(testPlugin.id)(store.dispatch, store.getState);
 
-        const request = state.requests.admin.deactivatePlugin;
+        const request = state.requests.admin.disablePlugin;
         if (request.status === RequestStatus.FAILURE) {
             throw new Error(request.error);
         }

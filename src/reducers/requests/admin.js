@@ -330,21 +330,21 @@ function removePlugin(state: RequestStatusType = initialRequestState(), action: 
     );
 }
 
-function activatePlugin(state: RequestStatusType = initialRequestState(), action: GenericAction): RequestStatusType {
+function enablePlugin(state: RequestStatusType = initialRequestState(), action: GenericAction): RequestStatusType {
     return handleRequest(
-        AdminTypes.ACTIVATE_PLUGIN_REQUEST,
-        AdminTypes.ACTIVATE_PLUGIN_SUCCESS,
-        AdminTypes.ACTIVATE_PLUGIN_FAILURE,
+        AdminTypes.ENABLE_PLUGIN_REQUEST,
+        AdminTypes.ENABLE_PLUGIN_SUCCESS,
+        AdminTypes.ENABLE_PLUGIN_FAILURE,
         state,
         action
     );
 }
 
-function deactivatePlugin(state: RequestStatusType = initialRequestState(), action: GenericAction): RequestStatusType {
+function disablePlugin(state: RequestStatusType = initialRequestState(), action: GenericAction): RequestStatusType {
     return handleRequest(
-        AdminTypes.DEACTIVATE_PLUGIN_REQUEST,
-        AdminTypes.DEACTIVATE_PLUGIN_SUCCESS,
-        AdminTypes.DEACTIVATE_PLUGIN_FAILURE,
+        AdminTypes.DISABLE_PLUGIN_REQUEST,
+        AdminTypes.DISABLE_PLUGIN_SUCCESS,
+        AdminTypes.DISABLE_PLUGIN_FAILURE,
         state,
         action
     );
@@ -383,7 +383,7 @@ export default combineReducers({
     getPlugins,
     getPluginStatuses,
     removePlugin,
-    activatePlugin,
-    deactivatePlugin,
+    enablePlugin,
+    disablePlugin,
 });
 
