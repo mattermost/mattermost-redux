@@ -1,6 +1,6 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
-
+// @flow
 import {Client4} from 'client';
 import {RoleTypes} from 'action_types';
 
@@ -8,8 +8,10 @@ import {getRoles} from 'selectors/entities/roles';
 import {hasNewPermissions} from 'selectors/entities/general';
 
 import {bindClientFunc} from './helpers';
+import type {DispatchFunc, GetStateFunc} from '../types/actions';
+import type {Role} from '../types/roles';
 
-export function getRolesByNames(rolesNames) {
+export function getRolesByNames(rolesNames: Array<string>) {
     return bindClientFunc(
         Client4.getRolesByNames,
         RoleTypes.ROLES_BY_NAMES_REQUEST,
@@ -19,7 +21,7 @@ export function getRolesByNames(rolesNames) {
     );
 }
 
-export function getRoleByName(roleName) {
+export function getRoleByName(roleName: string) {
     return bindClientFunc(
         Client4.getRoleByName,
         RoleTypes.ROLE_BY_NAME_REQUEST,
@@ -29,7 +31,7 @@ export function getRoleByName(roleName) {
     );
 }
 
-export function getRole(roleId) {
+export function getRole(roleId: string) {
     return bindClientFunc(
         Client4.getRole,
         RoleTypes.ROLE_BY_ID_REQUEST,
@@ -39,7 +41,7 @@ export function getRole(roleId) {
     );
 }
 
-export function editRole(role) {
+export function editRole(role: Role) {
     return bindClientFunc(
         Client4.patchRole,
         RoleTypes.EDIT_ROLE_REQUEST,
@@ -50,15 +52,15 @@ export function editRole(role) {
     );
 }
 
-export function setPendingRoles(roles) {
-    return async (dispatch, getState) => {
+export function setPendingRoles(roles: Array<string>) {
+    return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         dispatch({type: RoleTypes.SET_PENDING_ROLES, data: roles}, getState);
         return {data: roles};
     };
 }
 
-export function loadRolesIfNeeded(roles) {
-    return async (dispatch, getState) => {
+export function loadRolesIfNeeded(roles: Array<string>) {
+    return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         const state = getState();
         let pendingRoles = new Set();
         try {
