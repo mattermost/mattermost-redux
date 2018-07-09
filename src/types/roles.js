@@ -2,7 +2,7 @@
 // See LICENSE.txt for license information.
 // @flow
 
-export type Role = {
+export type Role = {|
     id: string,
     name: string,
     display_name: string,
@@ -13,4 +13,4 @@ export type Role = {
     permissions: Array<string>,
     scheme_managed: boolean,
     built_in: boolean,
-}
+|}
