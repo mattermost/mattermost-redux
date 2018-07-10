@@ -2383,16 +2383,16 @@ export default class Client4 {
         );
     };
 
-    activatePlugin = async (pluginId) => {
+    enablePlugin = async (pluginId) => {
         return this.doFetch(
-            `${this.getPluginRoute(pluginId)}/activate`,
+            `${this.getPluginRoute(pluginId)}/enable`,
             {method: 'post'}
         );
     };
 
-    deactivatePlugin = async (pluginId) => {
+    disablePlugin = async (pluginId) => {
         return this.doFetch(
-            `${this.getPluginRoute(pluginId)}/deactivate`,
+            `${this.getPluginRoute(pluginId)}/disable`,
             {method: 'post'}
         );
     };

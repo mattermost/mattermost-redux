@@ -328,7 +328,6 @@ export function getUsersPerDayAnalytics(teamId: string = ''): ActionFunc {
     return getAnalytics('user_counts_with_posts_day', teamId);
 }
 
-// EXPERIMENTAL - SUBJECT TO CHANGE
 export function uploadPlugin(fileData: File): ActionFunc {
     return async (dispatch, getState) => {
         dispatch({type: AdminTypes.UPLOAD_PLUGIN_REQUEST, data: null});
@@ -354,7 +353,6 @@ export function uploadPlugin(fileData: File): ActionFunc {
     };
 }
 
-// EXPERIMENTAL - SUBJECT TO CHANGE
 export function getPlugins(): ActionFunc {
     return bindClientFunc(
         Client4.getPlugins,
@@ -364,7 +362,6 @@ export function getPlugins(): ActionFunc {
     );
 }
 
-// EXPERIMENTAL - SUBJECT TO CHANGE
 export function getPluginStatuses(): ActionFunc {
     return bindClientFunc(
         Client4.getPluginStatuses,
@@ -374,7 +371,6 @@ export function getPluginStatuses(): ActionFunc {
     );
 }
 
-// EXPERIMENTAL - SUBJECT TO CHANGE
 export function removePlugin(pluginId: string): ActionFunc {
     return async (dispatch, getState) => {
         dispatch({type: AdminTypes.REMOVE_PLUGIN_REQUEST, data: pluginId});
@@ -398,51 +394,48 @@ export function removePlugin(pluginId: string): ActionFunc {
         return {data: true};
     };
 }
-
-// EXPERIMENTAL - SUBJECT TO CHANGE
-export function activatePlugin(pluginId: string): ActionFunc {
+export function enablePlugin(pluginId: string): ActionFunc {
     return async (dispatch, getState) => {
-        dispatch({type: AdminTypes.ACTIVATE_PLUGIN_REQUEST, data: pluginId});
+        dispatch({type: AdminTypes.ENABLE_PLUGIN_REQUEST, data: pluginId});
 
         try {
-            await Client4.activatePlugin(pluginId);
+            await Client4.enablePlugin(pluginId);
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch, getState);
             dispatch(batchActions([
-                {type: AdminTypes.ACTIVATE_PLUGIN_FAILURE, error, data: pluginId},
+                {type: AdminTypes.ENABLE_PLUGIN_FAILURE, error, data: pluginId},
                 logError(error)(dispatch),
             ]));
             return {error};
         }
 
         dispatch(batchActions([
-            {type: AdminTypes.ACTIVATE_PLUGIN_SUCCESS, data: null},
-            {type: AdminTypes.ACTIVATED_PLUGIN, data: pluginId},
+            {type: AdminTypes.ENABLE_PLUGIN_SUCCESS, data: null},
+            {type: AdminTypes.ENABLED_PLUGIN, data: pluginId},
         ]));
 
         return {data: true};
     };
 }
 
-// EXPERIMENTAL - SUBJECT TO CHANGE
-export function deactivatePlugin(pluginId: string): ActionFunc {
+export function disablePlugin(pluginId: string): ActionFunc {
     return async (dispatch, getState) => {
-        dispatch({type: AdminTypes.DEACTIVATE_PLUGIN_REQUEST, data: pluginId});
+        dispatch({type: AdminTypes.DISABLE_PLUGIN_REQUEST, data: pluginId});
 
         try {
-            await Client4.deactivatePlugin(pluginId);
+            await Client4.disablePlugin(pluginId);
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch, getState);
             dispatch(batchActions([
-                {type: AdminTypes.DEACTIVATE_PLUGIN_FAILURE, error, data: pluginId},
+                {type: AdminTypes.DISABLE_PLUGIN_FAILURE, error, data: pluginId},
                 logError(error)(dispatch),
             ]));
             return {error};
         }
 
         dispatch(batchActions([
-            {type: AdminTypes.DEACTIVATE_PLUGIN_SUCCESS, data: null},
-            {type: AdminTypes.DEACTIVATED_PLUGIN, data: pluginId},
+            {type: AdminTypes.DISABLE_PLUGIN_SUCCESS, data: null},
+            {type: AdminTypes.DISABLED_PLUGIN, data: pluginId},
         ]));
 
         return {data: true};
