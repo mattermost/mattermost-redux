@@ -30,6 +30,7 @@ import type {
     RolesRequestsStatuses,
     SchemesRequestsStatuses,
 } from './requests';
+import type {Role} from './roles';
 
 export type GlobalState = {|
     entities: {|
@@ -51,7 +52,11 @@ export type GlobalState = {|
         files: FilesState,
         emojis: EmojisState,
         typing: Typing,
-        roles: Object,
+        roles: {
+            roles: { [string]: Role },
+            pending: Set<string>
+
+        },
         schemes: SchemesState,
         gifs: Object,
     |},
