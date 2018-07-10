@@ -1,5 +1,6 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
+// @flow
 
 import {batchActions} from 'redux-batched-actions';
 
@@ -7,10 +8,11 @@ import {Client4} from 'client';
 import {FileTypes} from 'action_types';
 import {logError} from './errors';
 import {bindClientFunc, forceLogoutIfNecessary} from './helpers';
+import type {DispatchFunc, GetStateFunc} from '../types/actions';
 
-export function getFilesForPost(postId) {
-    return async (dispatch, getState) => {
-        dispatch({type: FileTypes.FETCH_FILES_FOR_POST_REQUEST}, getState);
+export function getFilesForPost(postId: string) {
+    return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
+        dispatch({type: FileTypes.FETCH_FILES_FOR_POST_REQUEST, data: {}}, getState);
         let files;
 
         try {
@@ -39,8 +41,8 @@ export function getFilesForPost(postId) {
     };
 }
 
-export function getMissingFilesForPost(postId) {
-    return async (dispatch, getState) => {
+export function getMissingFilesForPost(postId: string) {
+    return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         const {fileIdsByPostId} = getState().entities.files;
 
         let posts = [];
@@ -52,9 +54,10 @@ export function getMissingFilesForPost(postId) {
     };
 }
 
-export function uploadFile(channelId, rootId, clientIds, fileFormData, formBoundary) {
-    return async (dispatch, getState) => {
-        dispatch({type: FileTypes.UPLOAD_FILES_REQUEST}, getState);
+export function uploadFile(channelId: string, rootId: string, clientIds: Array<String>,
+    fileFormData: File, formBoundary: string) {
+    return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
+        dispatch({type: FileTypes.UPLOAD_FILES_REQUEST, data: {}}, getState);
 
         let files;
         try {
@@ -97,7 +100,7 @@ export function uploadFile(channelId, rootId, clientIds, fileFormData, formBound
     };
 }
 
-export function getFilePublicLink(fileId) {
+export function getFilePublicLink(fileId: string) {
     return bindClientFunc(
         Client4.getFilePublicLink,
         FileTypes.GET_FILE_PUBLIC_LINK_REQUEST,
