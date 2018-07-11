@@ -553,8 +553,8 @@ export function sortChannelsByDisplayNameAndMuted(locale, members, a, b) {
 }
 
 export function sortChannelsByRecency(lastPosts, a, b) {
-    const aLastPostAt = (lastPosts[a.id] && lastPosts[a.id].update_at) || a.last_post_at;
-    const bLastPostAt = (lastPosts[b.id] && lastPosts[b.id].update_at) || b.last_post_at;
+    const aLastPostAt = lastPosts[a.id] ? lastPosts[a.id].update_at : a.last_post_at;
+    const bLastPostAt = lastPosts[b.id] ? lastPosts[b.id].update_at : b.last_post_at;
 
     const aDate = new Date(aLastPostAt);
     const bDate = new Date(bLastPostAt);

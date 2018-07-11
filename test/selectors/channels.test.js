@@ -24,49 +24,49 @@ describe('Selectors.Channels', () => {
     const channel1 = TestHelper.fakeChannelWithId(team1.id);
     channel1.display_name = 'Channel Name';
     channel1.name = 'Name';
-    channel1.last_post_at = (new Date()).getTime();
+    channel1.last_post_at = Date.now();
 
     const channel2 = TestHelper.fakeChannelWithId(team1.id);
     channel2.total_msg_count = 2;
     channel2.display_name = 'DEF';
-    channel2.last_post_at = (new Date()).getTime();
+    channel2.last_post_at = Date.now();
 
     const channel3 = TestHelper.fakeChannelWithId(team2.id);
     channel3.total_msg_count = 2;
-    channel3.last_post_at = (new Date()).getTime();
+    channel3.last_post_at = Date.now();
 
     const channel4 = TestHelper.fakeChannelWithId('');
     channel4.display_name = 'Channel 4';
-    channel4.last_post_at = (new Date()).getTime();
+    channel4.last_post_at = Date.now();
 
     const channel5 = TestHelper.fakeChannelWithId(team1.id);
     channel5.type = General.PRIVATE_CHANNEL;
     channel5.display_name = 'Channel 5';
-    channel5.last_post_at = (new Date()).getTime();
+    channel5.last_post_at = Date.now();
 
     const channel6 = TestHelper.fakeChannelWithId(team1.id);
-    channel6.last_post_at = (new Date()).getTime();
+    channel6.last_post_at = Date.now();
 
     const channel7 = TestHelper.fakeChannelWithId('');
     channel7.display_name = [user.username, user2.username, user3.username].join(', ');
     channel7.type = General.GM_CHANNEL;
     channel7.total_msg_count = 1;
-    channel7.last_post_at = (new Date()).getTime();
+    channel7.last_post_at = Date.now();
 
     const channel8 = TestHelper.fakeChannelWithId(team1.id);
     channel8.display_name = 'ABC';
     channel8.total_msg_count = 1;
-    channel8.last_post_at = (new Date()).getTime();
+    channel8.last_post_at = Date.now();
 
     const channel9 = TestHelper.fakeChannelWithId(team1.id);
-    channel9.last_post_at = (new Date()).getTime();
+    channel9.last_post_at = Date.now();
 
     const channel10 = TestHelper.fakeChannelWithId(team1.id);
-    channel10.last_post_at = (new Date()).getTime();
+    channel10.last_post_at = Date.now();
 
     const channel11 = TestHelper.fakeChannelWithId(team1.id);
     channel11.type = General.PRIVATE_CHANNEL;
-    channel11.last_post_at = (new Date()).getTime();
+    channel11.last_post_at = Date.now();
 
     const channel12 = TestHelper.fakeChannelWithId(team1.id);
     channel12.type = General.DM_CHANNEL;
