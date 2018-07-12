@@ -3,7 +3,7 @@
 
 import {GifTypes} from 'action_types';
 import {Client4} from 'client';
-import gfycatSdk from 'utils/gfycatSdk';
+import gfycatSdk from 'utils/gfycat_sdk';
 
 // APP PROPS
 
