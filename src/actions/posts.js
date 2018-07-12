@@ -293,6 +293,17 @@ export function editPost(post) {
     );
 }
 
+export function rethreadPost(post) {
+    return bindClientFunc(
+        Client4.rethreadPost,
+        PostTypes.RETHREAD_POST_REQUEST,
+        [PostTypes.RECEIVED_POST, PostTypes.RETHREAD_POST_SUCCESS],
+        PostTypes.RETHREAD_POST_FAILURE,
+        post
+    );
+}
+
+
 export function pinPost(postId) {
     return async (dispatch, getState) => {
         dispatch({type: PostTypes.EDIT_POST_REQUEST}, getState);
