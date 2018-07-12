@@ -1401,6 +1401,15 @@ export default class Client4 {
         );
     };
 
+    updatePost = async (post) => {
+        this.trackEvent('api', 'api_posts_rethread', {channel_id: post.channel_id});
+
+        return this.doFetch(
+            `${this.getPostRoute(post.id)}/rethread`,
+            {method: 'put', body: JSON.stringify(post)}
+        );
+    };
+
     deletePost = async (postId) => {
         this.trackEvent('api', 'api_posts_delete');
 
