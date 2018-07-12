@@ -1362,7 +1362,7 @@ export default class Client4 {
         );
     };
 
-    updatePost = async (post) => {
+    rethreadPost = async (post) => {
         this.trackEvent('api', 'api_posts_rethread', {channel_id: post.channel_id});
 
         return this.doFetch(
