@@ -553,13 +553,17 @@ export function sortChannelsByDisplayNameAndMuted(locale, members, a, b) {
 }
 
 export function sortChannelsByRecency(lastPosts, a, b) {
-    const aLastPostAt = lastPosts[a.id] ? lastPosts[a.id].update_at : a.last_post_at;
-    const bLastPostAt = lastPosts[b.id] ? lastPosts[b.id].update_at : b.last_post_at;
+    let aLastPostAt = a.last_post_at;
+    if (lastPosts[a.id] && lastPosts[a.id].update_at > a.last_post_at) {
+        aLastPostAt = lastPosts[a.id].update_at;
+    }
 
-    const aDate = new Date(aLastPostAt);
-    const bDate = new Date(bLastPostAt);
+    let bLastPostAt = b.last_post_at;
+    if (lastPosts[b.id] && lastPosts[b.id].update_at > b.last_post_at) {
+        bLastPostAt = lastPosts[b.id].update_at;
+    }
 
-    return bDate.getTime() - aDate.getTime();
+    return bLastPostAt - aLastPostAt;
 }
 
 export function isChannelMuted(member) {
