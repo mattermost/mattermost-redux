@@ -15,7 +15,7 @@ export default keyMirror({
     EDIT_POST_REQUEST: null,
     EDIT_POST_SUCCESS: null,
     EDIT_POST_FAILURE: null,
-    
+
     RETHREAD_POST_REQUEST: null,
     RETHREAD_POST_SUCCESS: null,
     RETHREAD_POST_FAILURE: null,
