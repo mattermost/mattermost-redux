@@ -1,21 +1,27 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
+// @flow
 
 import {batchActions} from 'redux-batched-actions';
 import {Client4} from 'client';
 import {UserTypes} from 'action_types';
 import {logError} from './errors';
+
+import type {Client4Error} from '../types/errors';
+import type {GenericAction, ActionResult, DispatchFunc, GetStateFunc} from '../types/actions';
+type ActionType = string;
+
 const HTTP_UNAUTHORIZED = 401;
 
-export function forceLogoutIfNecessary(err, dispatch, getState) {
+export function forceLogoutIfNecessary(err: Client4Error, dispatch: DispatchFunc, getState: GetStateFunc) {
     const {currentUserId} = getState().entities.users;
-    if (err.status_code === HTTP_UNAUTHORIZED && err.url.indexOf('/login') === -1 && currentUserId) {
+    if (err.status_code === HTTP_UNAUTHORIZED && err.url && err.url.indexOf('/login') === -1 && currentUserId) {
         Client4.setToken('');
-        dispatch({type: UserTypes.LOGOUT_SUCCESS});
+        dispatch({type: UserTypes.LOGOUT_SUCCESS, data: {}});
     }
 }
 
-function dispatcher(type, data, dispatch, getState) {
+function dispatcher(type: ActionType, data: any, dispatch: DispatchFunc, getState: GetStateFunc) {
     if (type.indexOf('SUCCESS') === -1) { // we don't want to pass the data for the request types
         dispatch(requestSuccess(type, data), getState);
     } else {
@@ -23,28 +29,30 @@ function dispatcher(type, data, dispatch, getState) {
     }
 }
 
-export function requestData(type) {
+export function requestData(type: ActionType): GenericAction {
     return {
         type,
+        data: null,
     };
 }
 
-export function requestSuccess(type, data) {
+export function requestSuccess(type: ActionType, data: any) {
     return {
         type,
         data,
     };
 }
 
-export function requestFailure(type, error) {
+export function requestFailure(type: ActionType, error: Client4Error) {
     return {
         type,
         error,
     };
 }
 
-export function bindClientFunc(clientFunc, request, success, failure, ...args) {
-    return async (dispatch, getState) => {
+export function bindClientFunc(clientFunc: () => Promise<mixed>, request: ActionType,
+    success: ActionType | Array<ActionType>, failure: ActionType, ...args: Array<any>) {
+    return async (dispatch: DispatchFunc, getState: GetStateFunc): Promise<ActionResult> => {
         dispatch(requestData(request), getState);
 
         let data = null;
@@ -56,7 +64,7 @@ export function bindClientFunc(clientFunc, request, success, failure, ...args) {
                 requestFailure(failure, error),
                 logError(error)(dispatch),
             ]), getState);
-            return {data: null, error};
+            return {error};
         }
 
         if (Array.isArray(success)) {
@@ -67,14 +75,14 @@ export function bindClientFunc(clientFunc, request, success, failure, ...args) {
             dispatcher(success, data, dispatch, getState);
         }
 
-        return {data, error: null};
+        return {data};
     };
 }
 
 // Debounce function based on underscores modified to use es6 and a cb
-export function debounce(func, wait, immediate, cb) {
+export function debounce(func: () => mixed, wait: number, immediate: boolean, cb: () => mixed) {
     let timeout;
-    return function fx(...args) {
+    return function fx(...args: Array<any>) {
         const runLater = () => {
             timeout = null;
             if (!immediate) {
@@ -85,7 +93,9 @@ export function debounce(func, wait, immediate, cb) {
             }
         };
         const callNow = immediate && !timeout;
-        clearTimeout(timeout);
+        if (timeout) {
+            clearTimeout(timeout);
+        }
         timeout = setTimeout(runLater, wait);
         if (callNow) {
             Reflect.apply(func, this, args);
@@ -97,7 +107,13 @@ export function debounce(func, wait, immediate, cb) {
 }
 
 export class FormattedError extends Error {
-    constructor(id, defaultMessage, values = {}) {
+    intl: {
+      id: string,
+      defaultMessage: string,
+      values: Object
+    }
+
+    constructor(id: string, defaultMessage: string, values: Object = {}) {
         super(defaultMessage);
         this.intl = {
             id,
