@@ -303,7 +303,6 @@ export function rethreadPost(post) {
     );
 }
 
-
 export function pinPost(postId) {
     return async (dispatch, getState) => {
         dispatch({type: PostTypes.EDIT_POST_REQUEST}, getState);
