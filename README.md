@@ -221,4 +221,4 @@ The server needs to be available at `http://localhost:8065`. This can be overrid
 
 Finally, set "EnableOpenServer", "EnableCustomEmoji", "EnableLinkPreviews", "EnableUserAccessTokens" and "EnableOAuthServiceProvider" to `true` and "EnableOnlyAdminIntegrations" to `false` in your config.json. If you don't have a config.json yet, create it by copying default.json.
 
-With that set up, you can run the tests against your server with `npm run test-no-mock`.
+With that set up, you can run the tests against your server with `npm run test-no-mock`..
