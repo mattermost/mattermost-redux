@@ -1038,3 +1038,43 @@ export const getOrderedChannelIds = (state, lastUnreadChannel, grouping, sorting
         items: getAllChannelIds(state, lastUnreadChannel, sorting),
     }];
 };
+
+// Added for backwards compatibility
+// Can be removed once webapp includes new sidebar preferences
+
+export const getSortedPublicChannelWithUnreadsIds = createIdsSelector(
+    getUnreadChannelIds,
+    getFavoritesPreferences,
+    getPublicChannelIds,
+    () => false, // keepUnreadIds
+    (state, lastUnreadChannel, unreadsAtTop, favoritesAtTop = true) => favoritesAtTop,
+    filterChannels,
+);
+
+export const getSortedPrivateChannelWithUnreadsIds = createIdsSelector(
+    getUnreadChannelIds,
+    getFavoritesPreferences,
+    getPrivateChannelIds,
+    () => false, // keepUnreadIds
+    (state, lastUnreadChannel, unreadsAtTop, favoritesAtTop = true) => favoritesAtTop,
+    filterChannels,
+);
+
+export const getSortedFavoriteChannelWithUnreadsIds = createIdsSelector(
+    getUnreadChannelIds,
+    getFavoritesPreferences,
+    getFavoriteChannelIds,
+    () => false, // keepUnreadIds
+    () => false,
+    filterChannels,
+);
+
+export const getSortedDirectChannelWithUnreadsIds = createIdsSelector(
+    getUnreadChannelIds,
+    getFavoritesPreferences,
+    getDirectChannelIds,
+    () => false, // keepUnreadIds
+    (state, lastUnreadChannel, unreadsAtTop, favoritesAtTop = true) => favoritesAtTop,
+    filterChannels,
+);
+
