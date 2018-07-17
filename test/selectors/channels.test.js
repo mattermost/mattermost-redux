@@ -15,35 +15,49 @@ describe('Selectors.Channels', () => {
 
     const channel1 = TestHelper.fakeChannelWithId(team1.id);
     channel1.display_name = 'Channel Name';
+    channel1.last_post_at = Date.now();
 
     const channel2 = TestHelper.fakeChannelWithId(team1.id);
     channel2.total_msg_count = 2;
     channel2.display_name = 'DEF';
+    channel2.last_post_at = Date.now();
 
     const channel3 = TestHelper.fakeChannelWithId(team2.id);
     channel3.total_msg_count = 2;
+    channel3.last_post_at = Date.now();
 
     const channel4 = TestHelper.fakeChannelWithId('');
     channel4.display_name = 'Channel 4';
+    channel4.last_post_at = Date.now();
 
     const channel5 = TestHelper.fakeChannelWithId(team1.id);
     channel5.type = General.PRIVATE_CHANNEL;
     channel5.display_name = 'Channel 5';
+    channel5.last_post_at = Date.now();
 
     const channel6 = TestHelper.fakeChannelWithId(team1.id);
+    channel6.last_post_at = Date.now();
+
     const channel7 = TestHelper.fakeChannelWithId('');
     channel7.display_name = '';
     channel7.type = General.GM_CHANNEL;
     channel7.total_msg_count = 1;
+    channel7.last_post_at = Date.now();
 
     const channel8 = TestHelper.fakeChannelWithId(team1.id);
     channel8.display_name = 'ABC';
     channel8.total_msg_count = 1;
+    channel8.last_post_at = Date.now();
 
     const channel9 = TestHelper.fakeChannelWithId(team1.id);
+    channel9.last_post_at = Date.now();
+
     const channel10 = TestHelper.fakeChannelWithId(team1.id);
+    channel10.last_post_at = Date.now();
+
     const channel11 = TestHelper.fakeChannelWithId(team1.id);
     channel11.type = General.PRIVATE_CHANNEL;
+    channel11.last_post_at = Date.now();
 
     const channels = {};
     channels[channel1.id] = channel1;
@@ -539,5 +553,204 @@ describe('Selectors.Channels', () => {
         const fromUpdateState = Selectors.getSortedPrivateChannelIds(updateState);
         assert.ok(fromModifiedState !== fromUpdateState);
         assert.ok(fromUpdateState[0] === channel11.id);
+    });
+
+    it('get ordered channel ids by_type in current team strict equal', () => {
+        const chan11 = {...testState.entities.channels.channels[channel11.id]};
+        chan11.header = 'This should not change the results';
+
+        const sidebarPrefs = {
+            grouping: 'by_type',
+            sorting: 'alpha',
+            unreads_at_top: 'true',
+            favorite_at_top: 'true',
+        };
+
+        const modifiedState = {
+            ...testState,
+            entities: {
+                ...testState.entities,
+                channels: {
+                    ...testState.entities.channels,
+                    channels: {
+                        ...testState.entities.channels.channels,
+                        [channel11.id]: chan11,
+                    },
+                },
+            },
+        };
+
+        const fromOriginalState = Selectors.getOrderedChannelIds(
+            testState,
+            null,
+            sidebarPrefs.grouping,
+            sidebarPrefs.sorting,
+            sidebarPrefs.unreads_at_top === 'true',
+            sidebarPrefs.favorite_at_top === 'true',
+        );
+
+        const fromModifiedState = Selectors.getOrderedChannelIds(
+            modifiedState,
+            null,
+            sidebarPrefs.grouping,
+            sidebarPrefs.sorting,
+            sidebarPrefs.unreads_at_top === 'true',
+            sidebarPrefs.favorite_at_top === 'true',
+        );
+
+        assert.deepEqual(fromOriginalState, fromModifiedState);
+
+        chan11.total_msg_count = 10;
+
+        const unreadChannelState = {
+            ...modifiedState,
+            entities: {
+                ...modifiedState.entities,
+                channels: {
+                    ...modifiedState.entities.channels,
+                    channels: {
+                        ...modifiedState.entities.channels.channels,
+                        [channel11.id]: chan11,
+                    },
+                    myMembers: {
+                        ...modifiedState.entities.channels.myMembers,
+                        [channel11.id]: {
+                            ...modifiedState.entities.channels.myMembers[channel11.id],
+                            mention_count: 1,
+                        },
+                    },
+                },
+            },
+        };
+
+        const fromUnreadState = Selectors.getOrderedChannelIds(
+            unreadChannelState,
+            null,
+            sidebarPrefs.grouping,
+            sidebarPrefs.sorting,
+            sidebarPrefs.unreads_at_top === 'true',
+            sidebarPrefs.favorite_at_top === 'true',
+        );
+
+        assert.notDeepEqual(fromModifiedState, fromUnreadState);
+
+        const favoriteChannelState = {
+            ...modifiedState,
+            entities: {
+                ...modifiedState.entities,
+                preferences: {
+                    ...modifiedState.entities.preferences,
+                    [`${Preferences.CATEGORY_FAVORITE_CHANNEL}--${channel10.id}`]: {
+                        name: channel10.id,
+                        category: Preferences.CATEGORY_FAVORITE_CHANNEL,
+                        value: 'true',
+                    },
+                },
+            },
+        };
+
+        const fromFavoriteState = Selectors.getOrderedChannelIds(
+            favoriteChannelState,
+            null,
+            sidebarPrefs.grouping,
+            sidebarPrefs.sorting,
+            sidebarPrefs.unreads_at_top === 'true',
+            sidebarPrefs.favorite_at_top === 'true',
+        );
+
+        assert.notDeepEqual(fromUnreadState, fromFavoriteState);
+    });
+
+    it('get ordered channel ids by recency order in current team strict equal', () => {
+        const chan5 = {...testState.entities.channels.channels[channel5.id]};
+        chan5.header = 'This should not change the results';
+
+        const sidebarPrefs = {
+            grouping: 'never',
+            sorting: 'recent',
+            unreads_at_top: 'true',
+            favorite_at_top: 'true',
+        };
+
+        const modifiedState = {
+            ...testState,
+            entities: {
+                ...testState.entities,
+                channels: {
+                    ...testState.entities.channels,
+                    channels: {
+                        ...testState.entities.channels.channels,
+                        [channel5.id]: chan5,
+                    },
+                },
+            },
+        };
+
+        const fromOriginalState = Selectors.getOrderedChannelIds(
+            testState,
+            null,
+            sidebarPrefs.grouping,
+            sidebarPrefs.sorting,
+        );
+
+        const fromModifiedState = Selectors.getOrderedChannelIds(
+            modifiedState,
+            null,
+            sidebarPrefs.grouping,
+            sidebarPrefs.sorting,
+        );
+
+        assert.deepEqual(fromOriginalState, fromModifiedState);
+
+        chan5.last_post_at = (new Date()).getTime() + 500;
+        const recencyInChan5State = {
+            ...modifiedState,
+            entities: {
+                ...modifiedState.entities,
+                channels: {
+                    ...modifiedState.entities.channels,
+                    channels: {
+                        ...modifiedState.entities.channels.channels,
+                        [channel5.id]: chan5,
+                    },
+                },
+            },
+        };
+
+        const fromRecencyInChan5State = Selectors.getOrderedChannelIds(
+            recencyInChan5State,
+            null,
+            sidebarPrefs.grouping,
+            sidebarPrefs.sorting,
+        );
+
+        assert.notDeepEqual(fromModifiedState, fromRecencyInChan5State);
+        assert.ok(fromRecencyInChan5State[0].items[0] === chan5.id);
+
+        const chan6 = {...testState.entities.channels.channels[channel6.id]};
+        chan6.last_post_at = (new Date()).getTime() + 500;
+        const recencyInChan6State = {
+            ...modifiedState,
+            entities: {
+                ...modifiedState.entities,
+                channels: {
+                    ...modifiedState.entities.channels,
+                    channels: {
+                        ...modifiedState.entities.channels.channels,
+                        [channel4.id]: chan6,
+                    },
+                },
+            },
+        };
+
+        const fromRecencyInChan6State = Selectors.getOrderedChannelIds(
+            recencyInChan6State,
+            null,
+            sidebarPrefs.grouping,
+            sidebarPrefs.sorting,
+        );
+
+        assert.notDeepEqual(fromRecencyInChan5State, fromRecencyInChan6State);
+        assert.ok(fromRecencyInChan6State[0].items[0] === chan6.id);
     });
 });
