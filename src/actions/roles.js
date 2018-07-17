@@ -8,7 +8,7 @@ import {getRoles} from 'selectors/entities/roles';
 import {hasNewPermissions} from 'selectors/entities/general';
 
 import {bindClientFunc} from './helpers';
-import type {DispatchFunc, GetStateFunc} from '../types/actions';
+import type {DispatchFunc, GetStateFunc, ActionFunc} from '../types/actions';
 import type {Role} from '../types/roles';
 
 export function getRolesByNames(rolesNames: Array<string>) {
@@ -59,7 +59,7 @@ export function setPendingRoles(roles: Array<string>) {
     };
 }
 
-export function loadRolesIfNeeded(roles: Array<string>) {
+export function loadRolesIfNeeded(roles: Array<string>): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         const state = getState();
         let pendingRoles = new Set();

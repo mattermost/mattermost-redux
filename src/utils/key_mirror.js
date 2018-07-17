@@ -28,12 +28,14 @@
  * @param {object} obj
  * @return {object}
  */
-export default function keyMirror(obj: {[string]: null}): {[string]: string} {
+
+export default function keyMirror(obj: {[string]: null}) {
     if (!(obj instanceof Object && !Array.isArray(obj))) {
         throw new Error('keyMirror(...): Argument must be an object.');
     }
 
-    const ret = {};
+    type Out = {[string]: $Keys<typeof obj>;}
+    const ret:Out = {};
     for (const key in obj) {
         if (!obj.hasOwnProperty(key)) {
             continue;
@@ -41,6 +43,5 @@ export default function keyMirror(obj: {[string]: null}): {[string]: string} {
 
         ret[key] = key;
     }
-
     return ret;
 }
