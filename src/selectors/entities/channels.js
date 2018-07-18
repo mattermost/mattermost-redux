@@ -934,7 +934,7 @@ export const filterPostIds = (condition) => {
         getAllPosts,
         (state, postIds) => postIds,
         (channels, posts, postIds) => {
-            return postIds.filter((postId) => {
+            return postIds.filter((postId) => { // eslint-disable-line
                 const post = posts[postId];
                 if (post) {
                     const channel = channels[post.channel_id];
