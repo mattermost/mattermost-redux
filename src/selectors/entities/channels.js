@@ -934,17 +934,15 @@ export const filterPostIds = (condition) => {
         getAllPosts,
         (state, postIds) => postIds,
         (channels, posts, postIds) => {
-            const ids = [];
-            postIds.forEach((postId) => {
+            return postIds.filter((postId) => {
                 const post = posts[postId];
                 if (post) {
                     const channel = channels[post.channel_id];
                     if (condition(channel, post)) {
-                        ids.push(postId);
+                        return postId;
                     }
                 }
             });
-            return ids;
         }
     );
 };
