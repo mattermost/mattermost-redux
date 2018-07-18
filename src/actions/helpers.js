@@ -7,8 +7,8 @@ import {Client4} from 'client';
 import {UserTypes} from 'action_types';
 import {logError} from './errors';
 
-import type {Client4Error} from '../types/errors';
-import type {GenericAction, ActionResult, DispatchFunc, GetStateFunc} from '../types/actions';
+import type {Client4Error} from '../types/client4';
+import type {ActionFunc, GenericAction, DispatchFunc, GetStateFunc} from '../types/actions';
 type ActionType = string;
 
 const HTTP_UNAUTHORIZED = 401;
@@ -50,9 +50,21 @@ export function requestFailure(type: ActionType, error: Client4Error) {
     };
 }
 
+/**
+ * Returns an ActionFunc which calls a specfied (client) function and
+ * dispatches the specifed actions on request, success or failure.
+ *
+ * @export
+ * @param {() => Promise<mixed>} clientFunc          clientFunc to execute
+ * @param {ActionType} request                       ActionType to dispatch on request
+ * @param {(ActionType | Array<ActionType>)} success ActionType to dispatch on success
+ * @param {ActionType} failure                       ActionType to dispatch on failure
+ * @param {...Array<any>} args
+ * @returns {ActionFunc} ActionFunc
+ */
 export function bindClientFunc(clientFunc: () => Promise<mixed>, request: ActionType,
-    success: ActionType | Array<ActionType>, failure: ActionType, ...args: Array<any>) {
-    return async (dispatch: DispatchFunc, getState: GetStateFunc): Promise<ActionResult> => {
+    success: ActionType | Array<ActionType>, failure: ActionType, ...args: Array<any>): ActionFunc {
+    return async (dispatch, getState) => {
         dispatch(requestData(request), getState);
 
         let data = null;

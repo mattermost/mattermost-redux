@@ -11,17 +11,14 @@ import {logError} from './errors';
 import {batchActions} from 'redux-batched-actions';
 
 import type {GeneralState} from '../types/general';
+import type {GenericClientResponse, logLevel} from '../types/client4';
 import type {GetStateFunc, DispatchFunc, ActionFunc} from '../types/actions';
-type response = {
-    response: Object,
-    headers: Map<string, string>,
-    data: Object,
-}
+
 export function getPing(): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         dispatch({type: GeneralTypes.PING_REQUEST, data: {}}, getState);
 
-        let data: response;
+        let data: GenericClientResponse;
         let pingError = new FormattedError(
             'mobile.server_ping_failed',
             'Cannot connect to the server. Please check your server URL and internet connection.'
@@ -33,7 +30,7 @@ export function getPing(): ActionFunc {
                 dispatch({type: GeneralTypes.PING_FAILURE, data: {}, error: pingError}, getState);
                 return {error: pingError};
             }
-        } catch (error) {
+        } catch (error) { // Client4Error
             if (error.status_code === 401) {
                 // When the server requires a client certificate to connect.
                 pingError = error;
@@ -56,7 +53,7 @@ export function resetPing(): ActionFunc {
 }
 
 export function getClientConfig(): ActionFunc {
-    return async (dispatch: DispatchFunc, getState) => {
+    return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         dispatch({type: GeneralTypes.CLIENT_CONFIG_REQUEST, data: {}}, getState);
 
         let data;
@@ -87,7 +84,7 @@ export function getClientConfig(): ActionFunc {
 }
 
 export function getDataRetentionPolicy(): ActionFunc {
-    return async (dispatch: DispatchFunc, getState) => {
+    return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         dispatch({type: GeneralTypes.DATA_RETENTION_POLICY_REQUEST, data: {}}, getState);
 
         let data;
@@ -123,7 +120,6 @@ export function getLicenseConfig(): ActionFunc {
     );
 }
 
-type logLevel = 'ERROR' | 'WARNING' | 'INFO' // I guess?
 export function logClientError(message: string, level: logLevel = 'ERROR') {
     return bindClientFunc(
         Client4.logClientError,
