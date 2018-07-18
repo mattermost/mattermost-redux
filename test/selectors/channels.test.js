@@ -767,11 +767,21 @@ describe('Selectors.Channels', () => {
         const filterPostIDsByArchived = Selectors.filterPostIds((channel) => channel.delete_at !== 0);
         const filterPostIDsByUserB = Selectors.filterPostIds((channel, post) => post.user_id === 'b');
 
+        const filterPostIDsInvalid = Selectors.filterPostIds((channel, post) => foo === 'b'); // eslint-disable-line
+        let filterErrorMessage;
+        try {
+            const result = ['bar'].filter((item) => foo === 'b'); // eslint-disable-line
+        } catch (e) {
+            filterErrorMessage = e.message;
+        }
+
         const postIDs = Object.keys(posts);
 
         assert.deepEqual(filterPostIDsByArchived(testStateC, postIDs), ['b']);
         assert.deepEqual(filterPostIDsByUserB(testStateC, postIDs), ['c']);
 
         assert.throws(() => Selectors.filterPostIds(), TypeError);
+
+        assert.throws(() => filterPostIDsInvalid(testStateC, postIDs), ReferenceError, filterErrorMessage);
     });
 });
