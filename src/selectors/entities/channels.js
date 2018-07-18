@@ -926,6 +926,9 @@ export const getSortedDirectChannelWithUnreadsIds = createIdsSelector(
 // Filters post IDs by the given condition.
 // The condition function receives as parameters the associated channel object and the post object.
 export const filterPostIds = (condition) => {
+    if (typeof condition !== 'function') {
+        throw new TypeError(`${condition} is not a function`);
+    }
     return createSelector(
         getAllChannels,
         getAllPosts,

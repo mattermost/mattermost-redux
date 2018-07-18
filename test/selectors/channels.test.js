@@ -771,5 +771,7 @@ describe('Selectors.Channels', () => {
 
         assert.deepEqual(filterPostIDsByArchived(testStateC, postIDs), ['b']);
         assert.deepEqual(filterPostIDsByUserB(testStateC, postIDs), ['c']);
+
+        assert.throws(() => Selectors.filterPostIds(), TypeError);
     });
 });
