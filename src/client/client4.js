@@ -2481,14 +2481,17 @@ export default class Client4 {
                 url: '',
             },
             anonymousId: '00000000000000000000000000',
+            anotherNameForTheField: this.diagnosticId,
         };
 
         if (global && global.window && global.window.analytics && global.window.analytics.initialized) {
             global.window.analytics.track('event', properties, options);
+            console.log("analytics: window");
         } else if (global && global.analytics) {
             if (global.analytics_context) {
                 options.context = global.analytics_context;
             }
+            console.log("analytics: global");
             global.analytics.track(Object.assign({
                 event: 'event',
                 userId: this.diagnosticId,
