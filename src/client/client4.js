@@ -2484,15 +2484,21 @@ export default class Client4 {
             anotherNameForTheField: this.diagnosticId,
         };
 
+        let analytics = null;
+
         if (global && global.window && global.window.analytics && global.window.analytics.initialized) {
-            global.window.analytics.track('event', properties, options);
+            analytics = global.window.analytics;
             console.log("analytics: window");
         } else if (global && global.analytics) {
             if (global.analytics_context) {
                 options.context = global.analytics_context;
             }
+            analytics = global.analytics;
             console.log("analytics: global");
-            global.analytics.track(Object.assign({
+        }
+
+        if (analytics !== null) {
+            analytics.track(Object.assign({
                 event: 'event',
                 userId: this.diagnosticId,
             }, {properties}, options));
