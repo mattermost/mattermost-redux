@@ -20,7 +20,7 @@ import {
     getVisibleTeammate,
     getVisibleGroupIds,
 } from 'selectors/entities/preferences';
-import {getLastPostPerChannel} from 'selectors/entities/posts';
+import {getLastPostPerChannel, getAllPosts} from 'selectors/entities/posts';
 import {getCurrentTeamId, getCurrentTeamMembership} from 'selectors/entities/teams';
 import {haveICurrentChannelPermission} from 'selectors/entities/roles';
 import {isCurrentUserSystemAdmin} from 'selectors/entities/users';
@@ -923,3 +923,25 @@ export const getSortedDirectChannelWithUnreadsIds = createIdsSelector(
     filterChannels,
 );
 
+// Filters post IDs by the given condition.
+// The condition function receives as parameters the associated channel object and the post object.
+export const filterPostIds = (condition) => {
+    if (typeof condition !== 'function') {
+        throw new TypeError(`${condition} is not a function`);
+    }
+    return createSelector(
+        getAllChannels,
+        getAllPosts,
+        (state, postIds) => postIds,
+        (channels, posts, postIds) => {
+            return postIds.filter((postId) => {
+                const post = posts[postId];
+                let channel;
+                if (post) {
+                    channel = channels[post.channel_id];
+                }
+                return post && channel && condition(channel, post);
+            });
+        }
+    );
+};

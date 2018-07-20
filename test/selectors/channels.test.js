@@ -753,4 +753,35 @@ describe('Selectors.Channels', () => {
         assert.notDeepEqual(fromRecencyInChan5State, fromRecencyInChan6State);
         assert.ok(fromRecencyInChan6State[0].items[0] === chan6.id);
     });
+
+    it('filters post IDs by the given condition', () => {
+        const posts = {
+            a: {id: 'a', channel_id: channel1.id, create_at: 1, user_id: user.id},
+            b: {id: 'b', channel_id: channel2.id, create_at: 2, user_id: user.id},
+            c: {id: 'c', root_id: 'a', channel_id: channel1.id, create_at: 3, user_id: 'b'},
+        };
+        const testStateC = JSON.parse(JSON.stringify(testState));
+        testStateC.entities.posts.posts = posts;
+        testStateC.entities.channels.channels[channel2.id].delete_at = 1;
+
+        const filterPostIDsByArchived = Selectors.filterPostIds((channel) => channel.delete_at !== 0);
+        const filterPostIDsByUserB = Selectors.filterPostIds((channel, post) => post.user_id === 'b');
+
+        const filterPostIDsInvalid = Selectors.filterPostIds((channel, post) => foo === 'b'); // eslint-disable-line
+        let filterErrorMessage;
+        try {
+            const result = ['bar'].filter((item) => foo === 'b'); // eslint-disable-line
+        } catch (e) {
+            filterErrorMessage = e.message;
+        }
+
+        const postIDs = Object.keys(posts);
+
+        assert.deepEqual(filterPostIDsByArchived(testStateC, postIDs), ['b']);
+        assert.deepEqual(filterPostIDsByUserB(testStateC, postIDs), ['c']);
+
+        assert.throws(() => Selectors.filterPostIds(), TypeError);
+
+        assert.throws(() => filterPostIDsInvalid(testStateC, postIDs), ReferenceError, filterErrorMessage);
+    });
 });
