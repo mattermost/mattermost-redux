@@ -2,6 +2,15 @@
 // See LICENSE.txt for license information.
 // @flow
 
+// I assume these are the loglevels
+export type logLevel = 'ERROR' | 'WARNING' | 'INFO'
+
+export type GenericClientResponse = {
+    response: Object,
+    headers: Map<string, string>,
+    data: Object,
+}
+
 type ErrorOffline = {|
   message: string,
   url: string
