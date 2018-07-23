@@ -52,9 +52,9 @@ function createTeam(state: RequestStatusType = initialRequestState(), action: Ge
 
 function deleteTeam(state: RequestStatusType = initialRequestState(), action: GenericAction): RequestStatusType {
     return handleRequest(
-        TeamTypes.DELETE_CHANNEL_REQUEST,
-        TeamTypes.DELETE_CHANNEL_SUCCESS,
-        TeamTypes.DELETE_CHANNEL_FAILURE,
+        TeamTypes.DELETE_TEAM_REQUEST,
+        TeamTypes.DELETE_TEAM_SUCCESS,
+        TeamTypes.DELETE_TEAM_FAILURE,
         state,
         action
     );
