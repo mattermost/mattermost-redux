@@ -44,6 +44,7 @@ export type PostsRequestsStatuses = {|
     getPostThreadRetryAttempts: number,
     getPosts: RequestStatusType,
     getPostsRetryAttempts: number,
+    getPostsUnread: RequestStatusType,
     getPostsSince: RequestStatusType,
     getPostsSinceRetryAttempts: number,
     getPostsBefore: RequestStatusType,

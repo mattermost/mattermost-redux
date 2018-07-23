@@ -1787,4 +1787,32 @@ describe('Actions.Posts', () => {
         index = getState().entities.posts.messagesHistory.index[Posts.MESSAGE_TYPES.COMMENT];
         assert.ok(index === 2);
     });
+
+    it('getPostsUnread', async () => {
+        const {dispatch, getState} = store;
+        const channelId = TestHelper.basicChannel.id;
+        const post = TestHelper.fakePostWithId(channelId);
+        const response = {
+            posts: {
+                [post.id]: post,
+            },
+            order: [post.id],
+        };
+
+        nock(Client4.getChannelRoute(channelId)).
+            get('/posts/unread').
+            reply(200, response);
+
+        await Actions.getPostsUnread(channelId)(dispatch, getState);
+
+        const {getPostsUnread} = getState().requests.posts;
+
+        if (getPostsUnread.status === RequestStatus.FAILURE) {
+            throw new Error(JSON.stringify(getPostsUnread.error));
+        }
+
+        const {posts} = getState().entities.posts;
+        assert(getPostsUnread.status === RequestStatus.SUCCESS);
+        assert.ok(posts[post.id]);
+    });
 });
