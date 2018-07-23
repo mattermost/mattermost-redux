@@ -663,6 +663,28 @@ export function getPostsWithRetry(channelId, page = 0, perPage = Posts.POST_CHUN
     };
 }
 
+export function getPostsUnread(channelId) {
+    return async (dispatch, getState) => {
+        let posts;
+        try {
+            posts = await Client4.getPostsUnread(channelId);
+            getProfilesAndStatusesForPosts(posts.posts, dispatch, getState);
+        } catch (error) {
+            forceLogoutIfNecessary(error, dispatch, getState);
+            dispatch(logError(error));
+            return {error};
+        }
+
+        dispatch({
+            type: PostTypes.RECEIVED_POSTS,
+            data: posts,
+            channelId,
+        });
+
+        return {data: posts};
+    };
+}
+
 export function getPostsSince(channelId, since) {
     return async (dispatch, getState) => {
         let posts;
@@ -1257,6 +1279,7 @@ export default {
     getPostThread,
     getPostThreadWithRetry,
     getPosts,
+    getPostsUnread,
     getPostsWithRetry,
     getPostsSince,
     getPostsSinceWithRetry,

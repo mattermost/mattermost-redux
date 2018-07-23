@@ -1808,4 +1808,27 @@ describe('Actions.Posts', () => {
             });
         });
     });
+
+    it('getPostsUnread', async () => {
+        const {dispatch, getState} = store;
+        const channelId = TestHelper.basicChannel.id;
+        const post = TestHelper.fakePostWithId(channelId);
+        const postList = {
+            posts: {
+                [post.id]: post,
+            },
+            order: [post.id],
+        };
+
+        nock(Client4.getChannelRoute(channelId)).
+            get('/posts/unread').
+            reply(200, postList);
+
+        const response = await Actions.getPostsUnread(channelId)(dispatch, getState);
+
+        assert.deepEqual(response, {data: postList});
+
+        const {posts} = getState().entities.posts;
+        assert.deepEqual(posts[post.id], post);
+    });
 });
