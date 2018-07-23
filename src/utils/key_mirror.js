@@ -28,8 +28,7 @@
  * @param {object} obj
  * @return {object}
  */
-
-export default function keyMirror(obj: {[string]: null}) {
+export default function keyMirror<T: {}>(obj: T): $ObjMapi<T, <K>(K) => K> {
     if (!(obj instanceof Object && !Array.isArray(obj))) {
         throw new Error('keyMirror(...): Argument must be an object.');
     }
