@@ -28,6 +28,10 @@ export default keyMirror({
     GET_POSTS_SUCCESS: null,
     GET_POSTS_FAILURE: null,
 
+    GET_POSTS_UNREAD_REQUEST: null,
+    GET_POSTS_UNREAD_SUCCESS: null,
+    GET_POSTS_UNREAD_FAILURE: null,
+
     GET_POSTS_SINCE_REQUEST: null,
     GET_POSTS_SINCE_SUCCESS: null,
     GET_POSTS_SINCE_FAILURE: null,
