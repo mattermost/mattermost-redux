@@ -243,6 +243,10 @@ const state: GlobalState = {
                 error: null,
             },
             getPostsRetryAttempts: 0,
+            getPostsUnread: {
+                status: 'not_started',
+                error: null,
+            },
             getPostsSince: {
                 status: 'not_started',
                 error: null,

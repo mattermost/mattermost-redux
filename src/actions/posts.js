@@ -696,6 +696,38 @@ export function getPostsWithRetry(channelId, page = 0, perPage = Posts.POST_CHUN
     };
 }
 
+export function getPostsUnread(channelId) {
+    return async (dispatch, getState) => {
+        dispatch({type: PostTypes.GET_POSTS_UNREAD_REQUEST}, getState);
+
+        let posts;
+        try {
+            posts = await Client4.getPostsUnread(channelId);
+            getProfilesAndStatusesForPosts(posts.posts, dispatch, getState);
+        } catch (error) {
+            forceLogoutIfNecessary(error, dispatch, getState);
+            dispatch(batchActions([
+                {type: PostTypes.GET_POSTS_UNREAD_FAILURE, error},
+                logError(error)(dispatch),
+            ]), getState);
+            return {error};
+        }
+
+        dispatch(batchActions([
+            {
+                type: PostTypes.RECEIVED_POSTS,
+                data: posts,
+                channelId,
+            },
+            {
+                type: PostTypes.GET_POSTS_UNREAD_SUCCESS,
+            },
+        ]), getState);
+
+        return {data: posts};
+    };
+}
+
 export function getPostsSince(channelId, since) {
     return async (dispatch, getState) => {
         dispatch({type: PostTypes.GET_POSTS_SINCE_REQUEST}, getState);
@@ -1238,6 +1270,7 @@ export default {
     getPostThread,
     getPostThreadWithRetry,
     getPosts,
+    getPostsUnread,
     getPostsWithRetry,
     getPostsSince,
     getPostsSinceWithRetry,
