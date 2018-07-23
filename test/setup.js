@@ -5,7 +5,7 @@
 
 import fs from 'fs';
 import path from 'path';
-import register from 'babel-core/register';
+import register from '@babel/register';
 
 const rcPath = path.join(__dirname, '..', '.babelrc');
 const source = fs.readFileSync(rcPath).toString();
