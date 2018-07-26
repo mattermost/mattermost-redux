@@ -359,29 +359,21 @@ function handleRemovePost(posts = {}, postsInChannel = {}, postsInThread = {}, a
     return {posts: nextPosts, postsInChannel: nextPostsForChannel, postsInThread: nextPostsForThread || postsInThread};
 }
 
-function clearChannelPosts(posts, postsInChannel, postsInThread, action) {
+function clearChannelPosts(postsInChannel, action) {
     const nextPostsInChannel = {
         ...postsInChannel,
     };
 
     Reflect.deleteProperty(nextPostsInChannel, action.data.channelId);
-    return {
-        posts,
-        postsInChannel: nextPostsInChannel,
-        postsInThread,
-    };
+    return nextPostsInChannel;
 }
 
-function addPostIdsToChannel(posts, postsInChannel, postsInThread, action) {
+function addPostIdsToChannel(postsInChannel, action) {
     const nextPostsInChannel = {
         ...postsInChannel,
         [action.data.channelId]: action.data.postIds,
     };
-    return {
-        posts,
-        postsInChannel: nextPostsInChannel,
-        postsInThread,
-    };
+    return nextPostsInChannel;
 }
 
 function handlePosts(posts = {}, postsInChannel = {}, postsInThread = {}, action) {
@@ -414,11 +406,23 @@ function handlePosts(posts = {}, postsInChannel = {}, postsInThread = {}, action
     case SearchTypes.RECEIVED_SEARCH_FLAGGED_POSTS:
         return handlePostsFromSearch(posts, postsInChannel, postsInThread, action);
 
-    case PostTypes.CLEAR_CHANNEL_POSTS:
-        return clearChannelPosts(posts, postsInChannel, postsInThread, action);
+    case PostTypes.CLEAR_CHANNEL_POSTS: {
+        const nextPostsInChannel = clearChannelPosts(postsInChannel, action);
+        return {
+            posts,
+            postsInThread,
+            postsInChannel: nextPostsInChannel,
+        };
+    }
 
-    case PostTypes.ADD_CHANNEL_POSTIDS:
-        return addPostIdsToChannel(posts, postsInChannel, postsInThread, action);
+    case PostTypes.ADD_CHANNEL_POSTIDS: {
+        const nextPostsInChannel = addPostIdsToChannel(postsInChannel, action);
+        return {
+            posts,
+            postsInThread,
+            postsInChannel: nextPostsInChannel,
+        };
+    }
 
     case UserTypes.LOGOUT_SUCCESS:
         return {
