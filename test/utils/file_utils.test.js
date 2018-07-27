@@ -35,4 +35,19 @@ describe('FileUtils', () => {
         assert.deepEqual(FileUtils.getFilePreviewUrl('id1'), 'localhost/api/v4/files/id1/preview');
         assert.deepEqual(FileUtils.getFilePreviewUrl('id2'), 'localhost/api/v4/files/id2/preview');
     });
+
+    it('sortFileInfos', () => {
+        const testCases = [
+            {inputFileInfos: [{name: 'aaa', create_at: 100}, {name: 'bbb', create_at: 200}], outputFileInfos: [{name: 'aaa', create_at: 100}, {name: 'bbb', create_at: 200}]},
+            {inputFileInfos: [{name: 'bbb', create_at: 200}, {name: 'aaa', create_at: 100}], outputFileInfos: [{name: 'aaa', create_at: 100}, {name: 'bbb', create_at: 200}]},
+            {inputFileInfos: [{name: 'aaa', create_at: 100}, {name: 'bbb', create_at: 200}, {name: 'ccc', create_at: 300}], outputFileInfos: [{name: 'aaa', create_at: 100}, {name: 'bbb', create_at: 200}, {name: 'ccc', create_at: 300}]},
+            {inputFileInfos: [{name: 'ccc', create_at: 300}, {name: 'bbb', create_at: 200}, {name: 'aaa', create_at: 100}], outputFileInfos: [{name: 'aaa', create_at: 100}, {name: 'bbb', create_at: 200}, {name: 'ccc', create_at: 300}]},
+            {inputFileInfos: [{id: '1', name: 'aaa', create_at: 100}, {id: '2', name: 'aaa', create_at: 200}], outputFileInfos: [{id: '1', name: 'aaa', create_at: 100}, {id: '2', name: 'aaa', create_at: 200}]},
+            {inputFileInfos: [{id: '2', name: 'aaa', create_at: 200}, {id: '1', name: 'aaa', create_at: 100}], outputFileInfos: [{id: '1', name: 'aaa', create_at: 100}, {id: '2', name: 'aaa', create_at: 200}]},
+        ];
+
+        testCases.forEach((testCase) => {
+            assert.deepEqual(FileUtils.sortFileInfos(testCase.inputFileInfos), testCase.outputFileInfos);
+        });
+    });
 });
