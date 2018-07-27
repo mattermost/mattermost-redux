@@ -3,6 +3,10 @@
 
 import {createSelector} from 'reselect';
 
+import {getCurrentUserLocale} from 'selectors/entities/i18n';
+
+import {sortFileInfos} from 'utils/file_utils';
+
 function getAllFiles(state) {
     return state.entities.files.files;
 }
@@ -21,9 +25,11 @@ export function getFilePublicLink(state) {
 
 export function makeGetFilesForPost() {
     return createSelector(
-        [getAllFiles, getFilesIdsForPost],
-        (allFiles, fileIdsForPost) => {
-            return fileIdsForPost.map((id) => allFiles[id]).filter((id) => Boolean(id));
+        [getAllFiles, getFilesIdsForPost, getCurrentUserLocale],
+        (allFiles, fileIdsForPost, locale) => {
+            const fileInfos = fileIdsForPost.map((id) => allFiles[id]).filter((id) => Boolean(id));
+
+            return sortFileInfos(fileInfos, locale);
         }
     );
 }

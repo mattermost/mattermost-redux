@@ -5,6 +5,8 @@ import {Files} from 'constants';
 import {Client4} from 'client';
 import mimeDB from 'mime-db';
 
+import {DEFAULT_LOCALE} from 'constants/general';
+
 export function getFormattedFileSize(file) {
     const bytes = file.size;
     const fileSizes = [
@@ -84,4 +86,14 @@ export function getFileThumbnailUrl(fileId) {
 
 export function getFilePreviewUrl(fileId) {
     return `${Client4.getFileRoute(fileId)}/preview`;
+}
+
+export function sortFileInfos(fileInfos = [], locale = DEFAULT_LOCALE) {
+    return fileInfos.sort((a, b) => {
+        if (a.create_at !== b.create_at) {
+            return a.create_at - b.create_at;
+        }
+
+        return a.name.localeCompare(b.name, locale, {numeric: true});
+    });
 }
