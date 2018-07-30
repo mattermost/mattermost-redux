@@ -363,13 +363,13 @@ export function updateChannelNotifyProps(userId, channelId, props) {
     };
 }
 
-export function getChannelByNameAndTeamName(teamName, channelName) {
+export function getChannelByNameAndTeamName(teamName, channelName, includeDeleted = false) {
     return async (dispatch, getState) => {
         dispatch({type: ChannelTypes.CHANNEL_REQUEST}, getState);
 
         let data;
         try {
-            data = await Client4.getChannelByNameAndTeamName(teamName, channelName);
+            data = await Client4.getChannelByNameAndTeamName(teamName, channelName, includeDeleted);
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch, getState);
             dispatch(batchActions([

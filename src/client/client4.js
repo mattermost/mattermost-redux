@@ -1194,18 +1194,18 @@ export default class Client4 {
         );
     };
 
-    getChannelByName = async (teamId, channelName) => {
+    getChannelByName = async (teamId, channelName, includeDeleted = false) => {
         return this.doFetch(
-            `${this.getTeamRoute(teamId)}/channels/name/${channelName}`,
+            `${this.getTeamRoute(teamId)}/channels/name/${channelName}?include_deleted=${includeDeleted}`,
             {method: 'get'}
         );
     };
 
-    getChannelByNameAndTeamName = async (teamName, channelName) => {
-        this.trackEvent('api', 'api_channel_get_by_name_and_teamName', {channel_name: channelName, team_name: teamName});
+    getChannelByNameAndTeamName = async (teamName, channelName, includeDeleted = false) => {
+        this.trackEvent('api', 'api_channel_get_by_name_and_teamName', {channel_name: channelName, team_name: teamName, include_deleted: includeDeleted});
 
         return this.doFetch(
-            `${this.getTeamNameRoute(teamName)}/channels/name/${channelName}`,
+            `${this.getTeamNameRoute(teamName)}/channels/name/${channelName}?include_deleted=${includeDeleted}`,
             {method: 'get'}
         );
     };
@@ -1477,11 +1477,11 @@ export default class Client4 {
         );
     };
 
-    searchPosts = async (teamId, terms, isOrSearch) => {
+    searchPosts = async (teamId, terms, isOrSearch, includeDeletedChannels = false) => {
         this.trackEvent('api', 'api_posts_search', {team_id: teamId});
 
         return this.doFetch(
-            `${this.getTeamRoute(teamId)}/posts/search`,
+            `${this.getTeamRoute(teamId)}/posts/search?include_deleted_channels=${includeDeletedChannels}`,
             {method: 'post', body: JSON.stringify({terms, is_or_search: isOrSearch})}
         );
     };

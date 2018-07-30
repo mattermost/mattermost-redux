@@ -34,13 +34,13 @@ function getMissingChannelsFromPosts(posts) {
     };
 }
 
-export function searchPosts(teamId, terms, isOrSearch = false) {
+export function searchPosts(teamId, terms, isOrSearch = false, includeDeletedChannels = false) {
     return async (dispatch, getState) => {
         dispatch({type: SearchTypes.SEARCH_POSTS_REQUEST}, getState);
 
         let posts;
         try {
-            posts = await Client4.searchPosts(teamId, terms, isOrSearch);
+            posts = await Client4.searchPosts(teamId, terms, isOrSearch, includeDeletedChannels);
 
             await Promise.all([
                 getProfilesAndStatusesForPosts(posts.posts, dispatch, getState),
@@ -139,7 +139,7 @@ export function getRecentMentions() {
             const terms = termKeys.map(({key}) => key).join(' ').trim() + ' ';
 
             Client4.trackEvent('api', 'api_posts_search_mention');
-            posts = await Client4.searchPosts(teamId, terms, true);
+            posts = await Client4.searchPosts(teamId, terms, true, false);
 
             await Promise.all([
                 getProfilesAndStatusesForPosts(posts.posts, dispatch, getState),
