@@ -216,10 +216,11 @@ function extractUserActivityData(userActivities) {
     Object.entries(userActivities).forEach(([postType, values]) => {
         if (
             postType === Posts.POST_TYPES.ADD_TO_TEAM ||
-            postType === Posts.POST_TYPES.ADD_TO_CHANNEL
+            postType === Posts.POST_TYPES.ADD_TO_CHANNEL ||
+            postType === Posts.POST_TYPES.REMOVE_FROM_CHANNEL
         ) {
-            Object.entries(values).forEach(([actorId, addedUsers]) => {
-                const {ids, usernames} = addedUsers;
+            Object.entries(values).forEach(([actorId, users]) => {
+                const {ids, usernames} = users;
                 messageData.push({postType, userIds: [...usernames, ...ids], actorId});
                 if (ids.length > 0) {
                     allUserIds.push(...ids);
@@ -264,36 +265,34 @@ export function combineUserActivitySystemPost(systemPosts = []) {
 
         if (
             postType === Posts.POST_TYPES.ADD_TO_TEAM ||
-            postType === Posts.POST_TYPES.ADD_TO_CHANNEL
+            postType === Posts.POST_TYPES.ADD_TO_CHANNEL ||
+            postType === Posts.POST_TYPES.REMOVE_FROM_CHANNEL
         ) {
-            const addedUserId = post.props.addedUserId;
-            const addedUsername = post.props.addedUsername;
+            const userId = post.props.addedUserId || post.props.removedUserId;
+            const username = post.props.addedUsername || post.props.removedUsername;
             if (combinedPostType) {
-                const addedUsers = combinedPostType[post.user_id] || {ids: [], usernames: []};
-                if (addedUserId) {
-                    if (!addedUsers.ids.includes(addedUserId)) {
-                        addedUsers.ids.push(addedUserId);
+                const users = combinedPostType[post.user_id] || {ids: [], usernames: []};
+                if (userId) {
+                    if (!users.ids.includes(userId)) {
+                        users.ids.push(userId);
                     }
-                } else if (addedUsername && !addedUsers.usernames.includes(addedUsername)) {
-                    addedUsers.usernames.push(addedUsername);
+                } else if (username && !users.usernames.includes(username)) {
+                    users.usernames.push(username);
                 }
-                combinedPostType[post.user_id] = addedUsers;
+                combinedPostType[post.user_id] = users;
             } else {
-                const addedUsers = {ids: [], usernames: []};
-                if (addedUserId) {
-                    addedUsers.ids.push(addedUserId);
-                } else if (addedUsername) {
-                    addedUsers.usernames.push(addedUsername);
+                const users = {ids: [], usernames: []};
+                if (userId) {
+                    users.ids.push(userId);
+                } else if (username) {
+                    users.usernames.push(username);
                 }
                 userActivityProps[postType] = {
-                    [post.user_id]: addedUsers,
+                    [post.user_id]: users,
                 };
             }
         } else {
-            let propsUserId = post.user_id;
-            if (postType === Posts.POST_TYPES.REMOVE_FROM_CHANNEL) {
-                propsUserId = post.props.removedUserId;
-            }
+            const propsUserId = post.user_id;
 
             if (combinedPostType) {
                 if (!combinedPostType.includes(propsUserId)) {
