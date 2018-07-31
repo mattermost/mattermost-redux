@@ -492,9 +492,8 @@ describe('Actions.Channels', () => {
             throw new Error(JSON.stringify(deleteRequest.error));
         }
 
-        const {channels, myMembers} = store.getState().entities.channels;
+        const {myMembers} = store.getState().entities.channels;
         const {incomingHooks, outgoingHooks} = store.getState().entities.integrations;
-        assert.ifError(channels[secondChannel.id]);
         assert.ifError(myMembers[secondChannel.id]);
         assert.ifError(incomingHooks[incomingHook.id]);
         assert.ifError(outgoingHooks[outgoingHook.id]);

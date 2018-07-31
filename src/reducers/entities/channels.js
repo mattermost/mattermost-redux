@@ -53,11 +53,6 @@ function channels(state = {}, action) {
         }
         return nextState;
     }
-    case ChannelTypes.RECEIVED_CHANNEL_DELETED: {
-        const nextState = {...state};
-        Reflect.deleteProperty(nextState, action.data.id);
-        return nextState;
-    }
     case ChannelTypes.UPDATE_CHANNEL_HEADER: {
         const {channelId, header} = action.data;
         return {
