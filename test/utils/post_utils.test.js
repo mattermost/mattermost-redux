@@ -466,7 +466,7 @@ describe('PostUtils', () => {
     });
 
     describe('isSystemMessage', () => {
-        it('should identify if post is system message', () => {  // eslint-disable-line
+        it('should identify if post is system message', () => {
             const testCases = [
                 {input: {type: ''}, output: false},
 
@@ -504,7 +504,7 @@ describe('PostUtils', () => {
     });
 
     describe('isUserActivityPost', () => {
-        it('should identify if post is user activity - add/remove/join/leave channel/team', () => {  // eslint-disable-line
+        it('should identify if post is user activity - add/remove/join/leave channel/team', () => {
             const testCases = [
                 {input: '', output: false},
                 {input: null, output: false},
@@ -828,36 +828,36 @@ describe('PostUtils', () => {
             assert.deepEqual(combineUserActivitySystemPost([postLeaveTeam1, postLeaveTeam2, postLeaveTeam3, postLeaveTeam4]), out4);
         });
 
-        const postRemoveFromChannel1 = {type: PostTypes.REMOVE_FROM_CHANNEL, props: {removedUserId: 'user_id_1'}};
-        const postRemoveFromChannel2 = {type: PostTypes.REMOVE_FROM_CHANNEL, props: {removedUserId: 'user_id_2'}};
-        const postRemoveFromChannel3 = {type: PostTypes.REMOVE_FROM_CHANNEL, props: {removedUserId: 'user_id_3'}};
-        const postRemoveFromChannel4 = {type: PostTypes.REMOVE_FROM_CHANNEL, props: {removedUserId: 'user_id_4'}};
+        const postRemoveFromChannel1 = {type: PostTypes.REMOVE_FROM_CHANNEL, user_id: 'user_id_1', props: {removedUserId: 'removed_user_id_1'}};
+        const postRemoveFromChannel2 = {type: PostTypes.REMOVE_FROM_CHANNEL, user_id: 'user_id_1', props: {removedUserId: 'removed_user_id_2'}};
+        const postRemoveFromChannel3 = {type: PostTypes.REMOVE_FROM_CHANNEL, user_id: 'user_id_1', props: {removedUserId: 'removed_user_id_3'}};
+        const postRemoveFromChannel4 = {type: PostTypes.REMOVE_FROM_CHANNEL, user_id: 'user_id_1', props: {removedUserId: 'removed_user_id_4'}};
         it('should match return for REMOVE_FROM_CHANNEL', () => {
             const out1 = {
-                allUserIds: ['user_id_1'],
+                allUserIds: ['removed_user_id_1', 'user_id_1'],
                 allUsernames: [],
-                messageData: [{postType: PostTypes.REMOVE_FROM_CHANNEL, userIds: ['user_id_1']}],
+                messageData: [{actorId: 'user_id_1', postType: PostTypes.REMOVE_FROM_CHANNEL, userIds: ['removed_user_id_1']}],
             };
             assert.deepEqual(combineUserActivitySystemPost([postRemoveFromChannel1]), out1);
 
             const out2 = {
-                allUserIds: ['user_id_1', 'user_id_2'],
+                allUserIds: ['removed_user_id_1', 'removed_user_id_2', 'user_id_1'],
                 allUsernames: [],
-                messageData: [{postType: PostTypes.REMOVE_FROM_CHANNEL, userIds: ['user_id_1', 'user_id_2']}],
+                messageData: [{actorId: 'user_id_1', postType: PostTypes.REMOVE_FROM_CHANNEL, userIds: ['removed_user_id_1', 'removed_user_id_2']}],
             };
             assert.deepEqual(combineUserActivitySystemPost([postRemoveFromChannel1, postRemoveFromChannel2]), out2);
 
             const out3 = {
-                allUserIds: ['user_id_1', 'user_id_2', 'user_id_3'],
+                allUserIds: ['removed_user_id_1', 'removed_user_id_2', 'removed_user_id_3', 'user_id_1'],
                 allUsernames: [],
-                messageData: [{postType: PostTypes.REMOVE_FROM_CHANNEL, userIds: ['user_id_1', 'user_id_2', 'user_id_3']}],
+                messageData: [{actorId: 'user_id_1', postType: PostTypes.REMOVE_FROM_CHANNEL, userIds: ['removed_user_id_1', 'removed_user_id_2', 'removed_user_id_3']}],
             };
             assert.deepEqual(combineUserActivitySystemPost([postRemoveFromChannel1, postRemoveFromChannel2, postRemoveFromChannel3]), out3);
 
             const out4 = {
-                allUserIds: ['user_id_1', 'user_id_2', 'user_id_3', 'user_id_4'],
+                allUserIds: ['removed_user_id_1', 'removed_user_id_2', 'removed_user_id_3', 'removed_user_id_4', 'user_id_1'],
                 allUsernames: [],
-                messageData: [{postType: PostTypes.REMOVE_FROM_CHANNEL, userIds: ['user_id_1', 'user_id_2', 'user_id_3', 'user_id_4']}],
+                messageData: [{actorId: 'user_id_1', postType: PostTypes.REMOVE_FROM_CHANNEL, userIds: ['removed_user_id_1', 'removed_user_id_2', 'removed_user_id_3', 'removed_user_id_4']}],
             };
             assert.deepEqual(combineUserActivitySystemPost([postRemoveFromChannel1, postRemoveFromChannel2, postRemoveFromChannel3, postRemoveFromChannel4]), out4);
         });
@@ -928,22 +928,22 @@ describe('PostUtils', () => {
             assert.deepEqual(combineUserActivitySystemPost([postLeaveChannel1, postLeaveChannel2, postLeaveTeam1, postLeaveTeam2]), out3);
 
             const out4 = {
-                allUserIds: ['user_id_1', 'user_id_2'],
+                allUserIds: ['removed_user_id_1', 'removed_user_id_2', 'user_id_1', 'user_id_2'],
                 allUsernames: [],
                 messageData: [
                     {postType: PostTypes.REMOVE_FROM_TEAM, userIds: ['user_id_1', 'user_id_2']},
-                    {postType: PostTypes.REMOVE_FROM_CHANNEL, userIds: ['user_id_1', 'user_id_2']},
+                    {actorId: 'user_id_1', postType: PostTypes.REMOVE_FROM_CHANNEL, userIds: ['removed_user_id_1', 'removed_user_id_2']},
                 ],
             };
             assert.deepEqual(combineUserActivitySystemPost([postRemoveFromChannel1, postRemoveFromChannel2, postRemoveFromTeam1, postRemoveFromTeam2]), out4);
 
             const out5 = {
-                allUserIds: ['added_user_id_1', 'added_user_id_2', 'user_id_1', 'user_id_2'],
+                allUserIds: ['added_user_id_1', 'added_user_id_2', 'user_id_1', 'user_id_2', 'removed_user_id_1', 'removed_user_id_2'],
                 allUsernames: [],
                 messageData: [
                     {postType: PostTypes.JOIN_CHANNEL, userIds: ['user_id_1', 'user_id_2']},
                     {actorId: 'user_id_1', postType: PostTypes.ADD_TO_CHANNEL, userIds: ['added_user_id_1', 'added_user_id_2']},
-                    {postType: PostTypes.REMOVE_FROM_CHANNEL, userIds: ['user_id_1', 'user_id_2']},
+                    {actorId: 'user_id_1', postType: PostTypes.REMOVE_FROM_CHANNEL, userIds: ['removed_user_id_1', 'removed_user_id_2']},
                     {postType: PostTypes.LEAVE_CHANNEL, userIds: ['user_id_1', 'user_id_2']},
                 ],
             };
@@ -981,7 +981,7 @@ describe('PostUtils', () => {
             ]), out6);
 
             const out7 = {
-                allUserIds: ['added_user_id_3', 'added_user_id_1', 'added_user_id_2', 'user_id_1', 'added_user_id_4', 'user_id_2', 'user_id_3', 'user_id_4'],
+                allUserIds: ['added_user_id_3', 'added_user_id_1', 'added_user_id_2', 'user_id_1', 'added_user_id_4', 'user_id_2', 'user_id_3', 'user_id_4', 'removed_user_id_1', 'removed_user_id_2', 'removed_user_id_3', 'removed_user_id_4'],
                 allUsernames: [],
                 messageData: [
                     {postType: PostTypes.JOIN_TEAM, userIds: ['user_id_3', 'user_id_4', 'user_id_1', 'user_id_2']},
@@ -992,7 +992,7 @@ describe('PostUtils', () => {
                     {postType: PostTypes.JOIN_CHANNEL, userIds: ['user_id_1', 'user_id_2', 'user_id_3', 'user_id_4']},
                     {actorId: 'user_id_1', postType: PostTypes.ADD_TO_CHANNEL, userIds: ['added_user_id_1', 'added_user_id_2', 'added_user_id_3']},
                     {actorId: 'user_id_2', postType: PostTypes.ADD_TO_CHANNEL, userIds: ['added_user_id_4']},
-                    {postType: PostTypes.REMOVE_FROM_CHANNEL, userIds: ['user_id_1', 'user_id_2', 'user_id_3', 'user_id_4']},
+                    {actorId: 'user_id_1', postType: PostTypes.REMOVE_FROM_CHANNEL, userIds: ['removed_user_id_1', 'removed_user_id_2', 'removed_user_id_3', 'removed_user_id_4']},
                     {postType: PostTypes.LEAVE_CHANNEL, userIds: ['user_id_1', 'user_id_2', 'user_id_3', 'user_id_4']},
                 ],
             };
@@ -1035,7 +1035,7 @@ describe('PostUtils', () => {
             ]), out7);
 
             const out8 = {
-                allUserIds: ['added_user_id_3', 'user_id_1', 'user_id_3', 'added_user_id_1'],
+                allUserIds: ['added_user_id_3', 'user_id_1', 'user_id_3', 'added_user_id_1', 'removed_user_id_1'],
                 allUsernames: [],
                 messageData: [
                     {postType: PostTypes.JOIN_TEAM, userIds: ['user_id_3']},
@@ -1044,7 +1044,7 @@ describe('PostUtils', () => {
                     {postType: PostTypes.LEAVE_TEAM, userIds: ['user_id_3']},
                     {postType: PostTypes.JOIN_CHANNEL, userIds: ['user_id_1']},
                     {actorId: 'user_id_1', postType: PostTypes.ADD_TO_CHANNEL, userIds: ['added_user_id_1']},
-                    {postType: PostTypes.REMOVE_FROM_CHANNEL, userIds: ['user_id_1']},
+                    {actorId: 'user_id_1', postType: PostTypes.REMOVE_FROM_CHANNEL, userIds: ['removed_user_id_1']},
                     {postType: PostTypes.LEAVE_CHANNEL, userIds: ['user_id_1']},
                 ],
             };
@@ -1083,10 +1083,10 @@ describe('PostUtils', () => {
         const postUA10 = {id: '10', message: 'user_id_11 joined the channel', type: PostTypes.JOIN_CHANNEL, user_id: 'user_id_11', state: '', create_at: 10, props: {}, delete_at: 0};
         const postUA11 = {id: '11', message: 'added_user_id_1 added to channel by user_id_1', type: PostTypes.ADD_TO_CHANNEL, user_id: 'user_id_1', props: {addedUserId: 'added_user_id_1'}, state: '', create_at: 11, delete_at: 0};
         const postUA12 = {id: '12', message: 'user_id_2 joined the channel', type: PostTypes.JOIN_CHANNEL, user_id: 'user_id_2', state: '', create_at: 12, props: {}, delete_at: 0};
-        const postUA13 = {id: '13', message: 'user_id_13 removed from the channel', type: PostTypes.REMOVE_FROM_CHANNEL, state: '', create_at: 13, props: {removedUserId: 'user_id_13'}, delete_at: 0};
+        const postUA13 = {id: '13', message: 'user_id_13 removed from the channel', type: PostTypes.REMOVE_FROM_CHANNEL, user_id: 'user_id_1', state: '', create_at: 13, props: {removedUserId: 'user_id_13'}, delete_at: 0};
         const postUA14 = {id: '14', message: 'user_id_14 left the channel', type: PostTypes.LEAVE_CHANNEL, user_id: 'user_id_14', state: '', create_at: 14, props: {}, delete_at: 0};
         const postUA15 = {id: '15', message: 'user_id_3 left the channel', type: PostTypes.LEAVE_CHANNEL, user_id: 'user_id_3', state: '', create_at: 15, props: {}, delete_at: 0};
-        const postUA16 = {id: '16', message: 'user_id_4 removed from the channel', type: PostTypes.REMOVE_FROM_CHANNEL, state: '', create_at: 16, props: {removedUserId: 'user_id_4'}, delete_at: 0};
+        const postUA16 = {id: '16', message: 'user_id_4 removed from the channel', type: PostTypes.REMOVE_FROM_CHANNEL, user_id: 'user_id_1', state: '', create_at: 16, props: {removedUserId: 'user_id_4'}, delete_at: 0};
 
         const postId1 = '1';
         const postId2 = '2';
@@ -1176,10 +1176,10 @@ describe('PostUtils', () => {
             assert.equal(out.nextPosts[combinedPostId1].message, [postUA12.message, postUA11.message].join('\n'));
 
             const expectedUserActivityPosts2 = {
-                allUserIds: ['user_id_4', 'user_id_3'],
+                allUserIds: ['user_id_4', 'user_id_1', 'user_id_3'],
                 allUsernames: [],
                 messageData: [
-                    {postType: 'system_remove_from_channel', userIds: ['user_id_4']},
+                    {actorId: 'user_id_1', postType: 'system_remove_from_channel', userIds: ['user_id_4']},
                     {postType: 'system_leave_channel', userIds: ['user_id_3']},
                 ],
             };
@@ -1268,12 +1268,12 @@ describe('PostUtils', () => {
                 {[combinedPost.id]: combinedPost, [postIdUA11]: postUA11, [postIdUA12]: postUA12}
             );
             const expectedUserActivityPosts = {
-                allUserIds: ['user_id_14', 'user_id_13', 'user_id_2', 'added_user_id_1', 'user_id_1'],
+                allUserIds: ['user_id_14', 'user_id_13', 'user_id_1', 'user_id_2', 'added_user_id_1'],
                 allUsernames: [],
                 messageData: [
                     {postType: 'system_join_channel', userIds: ['user_id_2']},
                     {postType: 'system_add_to_channel', userIds: ['added_user_id_1'], actorId: 'user_id_1'},
-                    {postType: 'system_remove_from_channel', userIds: ['user_id_13']},
+                    {actorId: 'user_id_1', postType: 'system_remove_from_channel', userIds: ['user_id_13']},
                     {postType: 'system_leave_channel', userIds: ['user_id_14']},
                 ],
             };
