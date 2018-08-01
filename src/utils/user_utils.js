@@ -21,9 +21,9 @@ export function getFullName(user: UserProfile): string {
 export function displayUsername(
     user: UserProfile,
     teammateNameDisplay: string,
-    usernameWithPrefix: boolean,
+    useFallbackUsername: boolean = true,
 ): string {
-    let name = localizeMessage('channel_loader.someone', 'Someone');
+    let name = useFallbackUsername ? localizeMessage('channel_loader.someone', 'Someone') : '';
 
     if (user) {
         if (teammateNameDisplay === Preferences.DISPLAY_PREFER_NICKNAME) {
@@ -31,11 +31,11 @@ export function displayUsername(
         } else if (teammateNameDisplay === Preferences.DISPLAY_PREFER_FULL_NAME) {
             name = getFullName(user);
         } else {
-            name = usernameWithPrefix ? `@${user.username}` : user.username;
+            name = user.username;
         }
 
         if (!name || name.trim().length === 0) {
-            name = usernameWithPrefix ? `@${user.username}` : user.username;
+            name = user.username;
         }
     }
 
