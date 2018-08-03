@@ -125,7 +125,7 @@ function handleFirstConnect(dispatch, getState) {
     if (reconnect) {
         reconnect = false;
 
-        handleReconnect(dispatch, getState).catch(() => {}); //eslint-disable-line no-empty-function
+        handleReconnect(dispatch, getState).catch(() => { }); //eslint-disable-line no-empty-function
     }
 }
 
@@ -560,7 +560,8 @@ function handleChannelDeletedEvent(msg, dispatch, getState) {
             dispatch({type: ChannelTypes.SELECT_CHANNEL, data: channelId}, getState);
             EventEmitter.emit(General.DEFAULT_CHANNEL, '');
         }
-        dispatch({type: ChannelTypes.RECEIVED_CHANNEL_DELETED, data: msg.data.channel_id}, getState);
+
+        dispatch({type: ChannelTypes.RECEIVED_CHANNEL_DELETED, data: {id: msg.data.channel_id, team_id: msg.data.team_id, deleteAt: msg.data.delete_at}}, getState);
 
         fetchMyChannelsAndMembers(currentTeamId)(dispatch, getState);
     }
