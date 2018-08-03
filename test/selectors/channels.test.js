@@ -171,8 +171,8 @@ describe('Selectors.Channels', () => {
     it('get my channels in current team and DMs', () => {
         const channelsInCurrentTeam = [channel1, channel2, channel5, channel8, channel10, channel11].sort(sortChannelsByDisplayName.bind(null, []));
         assert.deepEqual(Selectors.getMyChannels(testState), [
-            ...channelsInCurrentTeam, 
-            channel4, 
+            ...channelsInCurrentTeam,
+            channel4,
             {...channel7, display_name: [user2.username, user3.username].sort().join(', ')},
             channel9,
         ]);
