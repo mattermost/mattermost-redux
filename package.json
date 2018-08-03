@@ -65,7 +65,6 @@
     "flow": "flow",
     "flow-typed": "flow-typed",
     "test": "NODE_ENV=test mocha --opts test/mocha.opts",
-    "test-no-mock": "TEST_SERVER=1 NOCK_OFF=true NODE_ENV=test mocha --opts test/mocha.opts",
     "prepublishOnly": "npm run build"
   }
 }
