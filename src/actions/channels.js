@@ -736,17 +736,7 @@ export function deleteChannel(channelId) {
             dispatch({type: ChannelTypes.SELECT_CHANNEL, data: defaultChannelId}, getState);
         }
 
-        const teamId = channels[channelId] ? channels[channelId].team_id : '';
-
-        dispatch(batchActions([
-            {
-                type: ChannelTypes.RECEIVED_CHANNEL_DELETED,
-                data: {id: channelId, team_id: teamId},
-            },
-            {
-                type: ChannelTypes.DELETE_CHANNEL_SUCCESS,
-            },
-        ]), getState);
+        dispatch({type: ChannelTypes.DELETE_CHANNEL_SUCCESS}, getState);
 
         return {data: true};
     };
