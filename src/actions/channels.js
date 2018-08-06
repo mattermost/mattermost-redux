@@ -7,6 +7,7 @@ import {Client4} from 'client';
 import {General, Preferences} from 'constants';
 import {ChannelTypes, PreferenceTypes, UserTypes} from 'action_types';
 import {savePreferences, deletePreferences} from 'actions/preferences';
+import {makeGetChannel} from 'selectors/entities/channels';
 import {getChannelsIdForTeam} from 'utils/channel_utils';
 
 import {logError} from './errors';
@@ -1268,6 +1269,18 @@ export function unfavoriteChannel(channelId) {
         Client4.trackEvent('action', 'action_channels_unfavorite');
 
         return deletePreferences(currentUserId, [preference])(dispatch, getState);
+    };
+}
+
+export function removeCurrentUserFromList() {
+    return async (dispatch, getState) => {
+        const getCurrentChannel = makeGetChannel();
+        const state = getState();
+        const category = Preferences.CATEGORY_DIRECT_CHANNEL_SHOW;
+        const channel = getCurrentChannel(state, {id: state.entities.channels.currentChannelId});
+        Client4.trackEvent('ui', 'ui_direct_channel_x_button_clicked');
+
+        return dispatch(savePreferences(state.entities.users.currentUserId, [{user_id: state.entities.users.currentUserId, category, name: channel.teammate_id, value: 'false'}]));
     };
 }
 
