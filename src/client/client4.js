@@ -2416,6 +2416,7 @@ export default class Client4 {
             data = await response.json();
         } catch (err) {
             throw {
+                message: 'Received invalid response from the server.',
                 intl: {
                     id: 'mobile.request.invalid_response',
                     defaultMessage: 'Received invalid response from the server.',
