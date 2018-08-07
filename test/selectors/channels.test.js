@@ -634,5 +634,29 @@ describe('Selectors.Channels', () => {
                 {...channel12, display_name: user2.username},
             ]);
         });
+
+        it('will not error out on undefined channels', () => {
+            const state = {
+                ...testState,
+                entities: {
+                    ...testState.entities,
+                    users: {
+                        ...testState.entities.users,
+                    },
+                    channels: {
+                        ...testState.entities.channels,
+                        channels: {
+                            ...testState.entities.channels.channels,
+                            ['undefined']: undefined, //eslint-disable-line no-useless-computed-key
+                        },
+                    },
+                },
+            };
+
+            assert.deepEqual(getDirectAndGroupChannels(state), [
+                {...channel7, display_name: [user2.username, user3.username].sort(sortUsernames).join(', ')},
+                {...channel12, display_name: user2.username},
+            ]);
+        });
     });
 });

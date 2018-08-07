@@ -671,6 +671,8 @@ export const getDirectAndGroupChannels = createSelector(
         }
 
         return Object.values(channels).filter((channel) =>
+            Boolean(channel)
+        ).filter((channel) =>
             channel.type === General.DM_CHANNEL || channel.type === General.GM_CHANNEL
         ).map((channel) =>
             completeDirectChannelDisplayName(currentUser.id, profiles, settings, channel)
