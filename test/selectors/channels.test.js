@@ -163,6 +163,8 @@ describe('Selectors.Channels', () => {
         },
     });
 
+    const sortUsernames = (a, b) => a.localeCompare(b, General.DEFAULT_LOCALE, {numeric: true});
+
     it('should return channels in current team', () => {
         const channelsInCurrentTeam = [channel1, channel2, channel5, channel6, channel8, channel10, channel11].sort(sortChannelsByDisplayName.bind(null, []));
         assert.deepEqual(Selectors.getChannelsInCurrentTeam(testState), channelsInCurrentTeam);
@@ -173,7 +175,7 @@ describe('Selectors.Channels', () => {
         assert.deepEqual(Selectors.getMyChannels(testState), [
             ...channelsInCurrentTeam,
             channel4,
-            {...channel7, display_name: [user2.username, user3.username].sort().join(', ')},
+            {...channel7, display_name: [user2.username, user3.username].sort(sortUsernames).join(', ')},
             channel9,
         ]);
     });
@@ -241,7 +243,7 @@ describe('Selectors.Channels', () => {
 
     it('get group channels', () => {
         assert.deepEqual(Selectors.getGroupChannels(testState), [
-            {...channel7, display_name: [user2.username, user3.username].sort().join(', ')},
+            {...channel7, display_name: [user2.username, user3.username].sort(sortUsernames).join(', ')},
         ]);
     });
 
@@ -630,7 +632,7 @@ describe('Selectors.Channels', () => {
             };
 
             assert.deepEqual(getDirectAndGroupChannels(state), [
-                {...channel7, display_name: [user2.username, user3.username].sort().join(', ')},
+                {...channel7, display_name: [user2.username, user3.username].sort(sortUsernames).join(', ')},
                 {...channel12, display_name: user2.username},
             ]);
         });
