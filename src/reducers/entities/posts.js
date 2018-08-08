@@ -375,7 +375,9 @@ function handleRethreadPost(posts = {}, postsInChannel = {}, postsInThread = {},
             console.log("post is in a thread...")
             nextPostsForThread = nextPostsForThread || {...postsInThread};
             const threadPosts = [...postsInThread[post.root_id]];
+            console.log(threadPosts)
             const threadIndex = threadPosts.indexOf(post.id);
+            console.log(threadIndex)
             if (threadIndex !== -1) {
                 console.log("found post")
                 threadPosts.splice(threadIndex, 1);
