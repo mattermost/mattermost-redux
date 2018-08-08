@@ -5,7 +5,12 @@ import {batchActions} from 'redux-batched-actions';
 
 import {Client4} from 'client';
 import websocketClient from 'client/websocket_client';
-import {getProfilesByIds, getStatusesByIds, loadProfilesForDirect} from './users';
+import {
+    getMe,
+    getProfilesByIds,
+    getStatusesByIds,
+    loadProfilesForDirect,
+} from './users';
 import {
     fetchMyChannelsAndMembers,
     getChannelAndMyMember,
@@ -120,7 +125,7 @@ function handleFirstConnect(dispatch, getState) {
     if (reconnect) {
         reconnect = false;
 
-        handleReconnect(dispatch, getState).catch(() => {}); //eslint-disable-line no-empty-function
+        handleReconnect(dispatch, getState).catch(() => { }); //eslint-disable-line no-empty-function
     }
 }
 
@@ -484,13 +489,11 @@ function handleUserUpdatedEvent(msg, dispatch, getState) {
     const user = msg.data.user;
 
     if (user.id === currentUser.id) {
-        dispatch({
-            type: UserTypes.RECEIVED_ME,
-            data: {
-                ...currentUser,
-                last_picture_update: user.last_picture_update,
-            },
-        });
+        if (user.update_at > currentUser.update_at) {
+            // Need to request me to make sure we don't override with sanitized fields from the
+            // websocket event
+            dispatch(getMe());
+        }
     } else {
         dispatch({
             type: UserTypes.RECEIVED_PROFILES,
@@ -557,7 +560,8 @@ function handleChannelDeletedEvent(msg, dispatch, getState) {
             dispatch({type: ChannelTypes.SELECT_CHANNEL, data: channelId}, getState);
             EventEmitter.emit(General.DEFAULT_CHANNEL, '');
         }
-        dispatch({type: ChannelTypes.RECEIVED_CHANNEL_DELETED, data: msg.data.channel_id}, getState);
+
+        dispatch({type: ChannelTypes.RECEIVED_CHANNEL_DELETED, data: {id: msg.data.channel_id, team_id: msg.data.team_id, deleteAt: msg.data.delete_at}}, getState);
 
         fetchMyChannelsAndMembers(currentTeamId)(dispatch, getState);
     }

@@ -54,9 +54,15 @@ function channels(state = {}, action) {
         return nextState;
     }
     case ChannelTypes.RECEIVED_CHANNEL_DELETED: {
-        const nextState = {...state};
-        Reflect.deleteProperty(nextState, action.data.id);
-        return nextState;
+        const {id, deleteAt} = action.data;
+        const newState = {
+            ...state,
+            [id]: {
+                ...state[id],
+                delete_at: deleteAt,
+            },
+        };
+        return newState;
     }
     case ChannelTypes.UPDATE_CHANNEL_HEADER: {
         const {channelId, header} = action.data;
@@ -133,8 +139,6 @@ function channelsInTeam(state = {}, action) {
     case ChannelTypes.RECEIVED_CHANNELS: {
         return channelListToSet(state, action);
     }
-    case ChannelTypes.RECEIVED_CHANNEL_DELETED:
-        return removeChannelFromSet(state, action);
     case ChannelTypes.LEAVE_CHANNEL: {
         if (action.data && action.data.type === General.PRIVATE_CHANNEL) {
             return removeChannelFromSet(state, action);
@@ -268,8 +272,7 @@ function myMembers(state = {}, action) {
             [action.data.channel_id]: member,
         };
     }
-    case ChannelTypes.LEAVE_CHANNEL:
-    case ChannelTypes.RECEIVED_CHANNEL_DELETED: {
+    case ChannelTypes.LEAVE_CHANNEL: {
         const nextState = {...state};
         if (action.data) {
             Reflect.deleteProperty(nextState, action.data.id);

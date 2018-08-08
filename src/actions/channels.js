@@ -363,13 +363,13 @@ export function updateChannelNotifyProps(userId, channelId, props) {
     };
 }
 
-export function getChannelByNameAndTeamName(teamName, channelName) {
+export function getChannelByNameAndTeamName(teamName, channelName, includeDeleted = false) {
     return async (dispatch, getState) => {
         dispatch({type: ChannelTypes.CHANNEL_REQUEST}, getState);
 
         let data;
         try {
-            data = await Client4.getChannelByNameAndTeamName(teamName, channelName);
+            data = await Client4.getChannelByNameAndTeamName(teamName, channelName, includeDeleted);
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch, getState);
             dispatch(batchActions([
@@ -736,17 +736,7 @@ export function deleteChannel(channelId) {
             dispatch({type: ChannelTypes.SELECT_CHANNEL, data: defaultChannelId}, getState);
         }
 
-        const teamId = channels[channelId] ? channels[channelId].team_id : '';
-
-        dispatch(batchActions([
-            {
-                type: ChannelTypes.RECEIVED_CHANNEL_DELETED,
-                data: {id: channelId, team_id: teamId},
-            },
-            {
-                type: ChannelTypes.DELETE_CHANNEL_SUCCESS,
-            },
-        ]), getState);
+        dispatch({type: ChannelTypes.DELETE_CHANNEL_SUCCESS}, getState);
 
         return {data: true};
     };

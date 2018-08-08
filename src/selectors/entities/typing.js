@@ -23,7 +23,7 @@ const getUsersTypingImpl = (profiles: {[string]: UserProfile}, teammateNameDispl
 
         if (users.length) {
             return users.map((userId) => {
-                return displayUsername(profiles[userId], teammateNameDisplay, false);
+                return displayUsername(profiles[userId], teammateNameDisplay);
             });
         }
     }

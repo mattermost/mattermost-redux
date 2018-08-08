@@ -1,35 +1,34 @@
 #!/usr/bin/env groovy
 
 pipeline {
-    agent any
+    agent {
+        docker {
+            image 'node:8'
+        }
+    }
 
     stages {
-
-        stage('Checkout') {
+        stage('Install') {
             steps {
-                cleanWs()
-                checkout scm
-            }
-        }
-        stage('Setup Redux') {
-            steps {
-                sh """
-                npm install --ignore-scripts || exit 1
-                touch .npminstall
-                """
+                sh "npm install --ignore-scripts"
             }
         }
 
         stage('Check style') {
             steps {
-                sh "npm run check || exit 1"
+                sh "npm run check"
             }
         }
 
-        stage('Run tests without mock server') {
+        stage('Test') {
             steps {
-                sh "npm run test || exit 1"
+                sh "npm run test"
             }
+        }
+    }
+    post {
+        always {
+            junit 'build/test-results.xml'
         }
     }
 }

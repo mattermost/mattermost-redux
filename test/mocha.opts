@@ -3,4 +3,6 @@
 --require babel-polyfill
 --require isomorphic-fetch
 --recursive
+--reporter mocha-multi-reporters 
+--reporter-options configFile=test/mocha-multi-reporters-config.json
 --exit

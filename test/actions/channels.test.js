@@ -280,7 +280,7 @@ describe('Actions.Channels', () => {
 
     it('getChannelByNameAndTeamName', async () => {
         nock(Client4.getTeamsRoute()).
-            get(`/name/${TestHelper.basicTeam.name}/channels/name/${TestHelper.basicChannel.name}`).
+            get(`/name/${TestHelper.basicTeam.name}/channels/name/${TestHelper.basicChannel.name}?include_deleted=false`).
             reply(200, TestHelper.basicChannel);
 
         await Actions.getChannelByNameAndTeamName(TestHelper.basicTeam.name, TestHelper.basicChannel.name)(store.dispatch, store.getState);
@@ -492,10 +492,8 @@ describe('Actions.Channels', () => {
             throw new Error(JSON.stringify(deleteRequest.error));
         }
 
-        const {channels, myMembers} = store.getState().entities.channels;
         const {incomingHooks, outgoingHooks} = store.getState().entities.integrations;
-        assert.ifError(channels[secondChannel.id]);
-        assert.ifError(myMembers[secondChannel.id]);
+
         assert.ifError(incomingHooks[incomingHook.id]);
         assert.ifError(outgoingHooks[outgoingHook.id]);
     });
@@ -1756,7 +1754,7 @@ describe('Actions.Channels', () => {
             TestHelper.fakeChannel(TestHelper.basicTeam.id));
 
         nock(Client4.getTeamsRoute()).
-            get(`/${TestHelper.basicTeam.id}/channels/name/${secondChannel.name}`).
+            get(`/${TestHelper.basicTeam.id}/channels/name/${secondChannel.name}?include_deleted=false`).
             reply(200, secondChannel);
 
         nock(Client4.getChannelsRoute()).

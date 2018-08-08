@@ -47,7 +47,6 @@ export const isMinimumServerVersion = (currentVersion, minMajorVersion = 0, minM
     const dot = parseInt(split[2] || '0', 10);
 
     if (major > minMajorVersion) {
-        sendMessageToRemoveBackwardsCompatibility(major, minMajorVersion);
         return true;
     }
     if (major < minMajorVersion) {
@@ -56,7 +55,6 @@ export const isMinimumServerVersion = (currentVersion, minMajorVersion = 0, minM
 
     // Major version is equal, check minor
     if (minor > minMinorVersion) {
-        sendMessageToRemoveBackwardsCompatibility(minor, minMinorVersion + 3);
         return true;
     }
     if (minor < minMinorVersion) {
@@ -73,18 +71,6 @@ export const isMinimumServerVersion = (currentVersion, minMajorVersion = 0, minM
 
     // Dot version is equal
     return true;
-};
-
-let sentMessageToRemoveBackwardsCompatibility = false;
-export const sendMessageToRemoveBackwardsCompatibility = (currentVersion, minVersion) => {
-    if (process.env.NODE_ENV !== 'production' && currentVersion > minVersion) { //eslint-disable-line no-process-env
-        if (sentMessageToRemoveBackwardsCompatibility) {
-            return;
-        }
-
-        console.warn('You can now remove backwards-compatibility code from the project, as referenced in the stacktrace below.'); //eslint-disable-line no-console
-        sentMessageToRemoveBackwardsCompatibility = true;
-    }
 };
 
 // Generates a RFC-4122 version 4 compliant globally unique identifier.
