@@ -360,6 +360,7 @@ function handleRemovePost(posts = {}, postsInChannel = {}, postsInThread = {}, a
 }
 
 function handleRethreadPost(posts = {}, postsInChannel = {}, postsInThread = {}, action) {
+    console.log(action)
     console.log(posts)
     console.log(postsInChannel)
     console.log(postsInThread)
