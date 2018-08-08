@@ -360,7 +360,6 @@ function handleRemovePost(posts = {}, postsInChannel = {}, postsInThread = {}, a
 }
 
 function handleRethreadPost(posts = {}, postsInChannel = {}, postsInThread = {}, action) {
-    console.log(action)
     console.log(posts)
     console.log(postsInChannel)
     console.log(postsInThread)
@@ -368,27 +367,17 @@ function handleRethreadPost(posts = {}, postsInChannel = {}, postsInThread = {},
     const channelId = post.channel_id;
 
     let nextPosts = posts;
-    let nextPostsForChannel = postsInChannel;
     let nextPostsForThread;
 
-    // We only need to do something if already have the post
     if (nextPosts[post.id]) {
-        nextPosts = {...posts};
-        nextPostsForChannel = {...postsInChannel};
-        const channelPosts = postsInChannel[channelId] ? [...postsInChannel[channelId]] : [];
-
-        nextPostsForChannel[channelId] = postsInChannel;
-
-        if (postsInThread[post.id]) {
-            nextPostsForThread = nextPostsForThread || {...postsInThread};
-            Reflect.deleteProperty(nextPostsForThread, post.id);
-        }
 
         if (postsInThread[post.root_id]) {
+            console.log("post is in a thread...")
             nextPostsForThread = nextPostsForThread || {...postsInThread};
             const threadPosts = [...postsInThread[post.root_id]];
             const threadIndex = threadPosts.indexOf(post.id);
             if (threadIndex !== -1) {
+                console.log("found post")
                 threadPosts.splice(threadIndex, 1);
             }
             nextPostsForThread[post.root_id] = threadPosts;
