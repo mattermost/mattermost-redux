@@ -423,7 +423,7 @@ function handlePosts(posts = {}, postsInChannel = {}, postsInThread = {}, action
         return {posts, postsInChannel, postsInThread};
     case PostTypes.REMOVE_POST:
         return handleRemovePost(posts, postsInChannel, postsInThread, action);
-    case PostTypes.RETHREAD_POST_SUCCESS:
+    case PostTypes.RETHREAD_POST_UPDATE:
         return handleRethreadPost(posts, postsInChannel, postsInThread, action);
 
     case SearchTypes.RECEIVED_SEARCH_POSTS:
