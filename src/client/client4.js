@@ -619,11 +619,6 @@ export default class Client4 {
         );
     };
 
-    getCurrentSession = async (userId, token) => {
-        const sessions = await this.getSessions(userId);
-        return sessions.find((s) => s.token === token);
-    };
-
     revokeSession = async (userId, sessionId) => {
         return this.doFetch(
             `${this.getUserRoute(userId)}/sessions/revoke`,
@@ -2421,6 +2416,7 @@ export default class Client4 {
             data = await response.json();
         } catch (err) {
             throw {
+                message: 'Received invalid response from the server.',
                 intl: {
                     id: 'mobile.request.invalid_response',
                     defaultMessage: 'Received invalid response from the server.',
