@@ -359,26 +359,31 @@ function handleRemovePost(posts = {}, postsInChannel = {}, postsInThread = {}, a
     return {posts: nextPosts, postsInChannel: nextPostsForChannel, postsInThread: nextPostsForThread || postsInThread};
 }
 
-function handleRethreadPost(posts = {}, postsInChannel = {}, postsInThread = {}, action) {
-    const post = action.data;
-    const channelId = post.channel_id;
+function handleRethreadPost(postsMap, action) {
+    const posts = postsMap.posts ? postsMap.posts : {};
+    const postsInChannel = postsMap.postsInThread ? postsMap.postsInChannel : {};
+    const postsInThread = postsMap.postsInThread ? postsMap.postsInThread : {};
+    var post = action.data.post;
+    const nextPosts = posts;
+    nextPosts[post.id] = post;
+    const rootId = action.data.original_root_id;
 
+    const nextPostsForChannel = postsInChannel;
     let nextPostsForThread;
 
-    if (posts[post.id]) {
-
-        if (postsInThread[post.root_id]) {
+    if (nextPosts[post.id]) {
+        if (postsInThread[rootId]) {
             nextPostsForThread = nextPostsForThread || {...postsInThread};
-            const threadPosts = [...postsInThread[post.root_id]];
-            const threadIndex = threadPosts.indexOf(post.id);
+            const threadPosts = [...postsInThread[post.rootId]];
+            var threadIndex = threadPosts.indexOf(post.id);
             if (threadIndex !== -1) {
                 threadPosts.splice(threadIndex, 1);
             }
-            nextPostsForThread[post.root_id] = threadPosts;
+            nextPostsForThread[rootId] = threadPosts;
         }
     }
 
-    return {posts: posts, postsInChannel: postsInChannel, postsInThread: nextPostsForThread || postsInThread};
+    return {posts: nextPosts, postsInChannel: nextPostsForChannel, postsInThread: nextPostsForThread || postsInThread};
 }
 
 function handlePosts(posts = {}, postsInChannel = {}, postsInThread = {}, action) {
@@ -407,7 +412,7 @@ function handlePosts(posts = {}, postsInChannel = {}, postsInThread = {}, action
     case PostTypes.REMOVE_POST:
         return handleRemovePost(posts, postsInChannel, postsInThread, action);
     case PostTypes.RETHREAD_POST_UPDATE:
-        return handleRethreadPost(posts, postsInChannel, postsInThread, action);
+        return handleRethreadPost(handleReceivedPosts(posts, postsInChannel, postsInThread, action), action);
 
     case SearchTypes.RECEIVED_SEARCH_POSTS:
     case SearchTypes.RECEIVED_SEARCH_FLAGGED_POSTS:
