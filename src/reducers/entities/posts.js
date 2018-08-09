@@ -369,7 +369,7 @@ function handleRethreadPost(postsMap, action) {
     const rootId = action.data.original_root_id;
 
     const nextPostsForChannel = postsInChannel;
-    let nextPostsForThread;
+    let nextPostsForThread = postsInThread;
 
     if (nextPosts[post.id]) {
         if (postsInThread[rootId]) {
