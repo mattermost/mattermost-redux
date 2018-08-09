@@ -374,7 +374,7 @@ function handleRethreadPost(postsMap, action) {
     if (nextPosts[post.id]) {
         if (postsInThread[rootId]) {
             nextPostsForThread = nextPostsForThread || {...postsInThread};
-            const threadPosts = [...postsInThread[post.rootId]];
+            const threadPosts = [...postsInThread[rootId]];
             var threadIndex = threadPosts.indexOf(post.id);
             if (threadIndex !== -1) {
                 threadPosts.splice(threadIndex, 1);
