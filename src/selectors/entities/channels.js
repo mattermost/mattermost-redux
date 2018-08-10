@@ -291,7 +291,7 @@ export const getDefaultChannel = createSelector(
     getAllChannels,
     getCurrentTeamId,
     (channels, teamId) => {
-        return Object.values(channels).find((c) => c.team_id === teamId && c.name === General.DEFAULT_CHANNEL);
+        return Object.values(channels).find((c) => c && c.team_id === teamId && c.name === General.DEFAULT_CHANNEL);
     }
 );
 
