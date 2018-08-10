@@ -1754,7 +1754,7 @@ describe('Actions.Channels', () => {
             TestHelper.fakeChannel(TestHelper.basicTeam.id));
 
         nock(Client4.getTeamsRoute()).
-            get(`/${TestHelper.basicTeam.id}/channels/name/${secondChannel.name}?include_deleted=false`).
+            get(`/${TestHelper.basicTeam.id}/channels/name/${secondChannel.name}?include_deleted=true`).
             reply(200, secondChannel);
 
         nock(Client4.getChannelsRoute()).
