@@ -5,13 +5,21 @@ import assert from 'assert';
 
 import deepFreezeAndThrowOnMutation from 'utils/deep_freeze';
 import TestHelper from 'test/test_helper';
-import {sortChannelsByDisplayName} from 'utils/channel_utils';
+import {sortChannelsByDisplayName, getDirectChannelName} from 'utils/channel_utils';
 import * as Selectors from 'selectors/entities/channels';
 import {General, Preferences} from 'constants';
 
 describe('Selectors.Channels', () => {
     const team1 = TestHelper.fakeTeamWithId();
     const team2 = TestHelper.fakeTeamWithId();
+
+    const user = TestHelper.fakeUserWithId();
+    const user2 = TestHelper.fakeUserWithId();
+    const user3 = TestHelper.fakeUserWithId();
+    const profiles = {};
+    profiles[user.id] = user;
+    profiles[user2.id] = user2;
+    profiles[user3.id] = user3;
 
     const channel1 = TestHelper.fakeChannelWithId(team1.id);
     channel1.display_name = 'Channel Name';
@@ -32,7 +40,7 @@ describe('Selectors.Channels', () => {
 
     const channel6 = TestHelper.fakeChannelWithId(team1.id);
     const channel7 = TestHelper.fakeChannelWithId('');
-    channel7.display_name = '';
+    channel7.display_name = [user.username, user2.username, user3.username].join(', ');
     channel7.type = General.GM_CHANNEL;
     channel7.total_msg_count = 1;
 
@@ -44,6 +52,11 @@ describe('Selectors.Channels', () => {
     const channel10 = TestHelper.fakeChannelWithId(team1.id);
     const channel11 = TestHelper.fakeChannelWithId(team1.id);
     channel11.type = General.PRIVATE_CHANNEL;
+
+    const channel12 = TestHelper.fakeChannelWithId(team1.id);
+    channel12.type = General.DM_CHANNEL;
+    channel12.last_post_at = Date.now();
+    channel12.name = getDirectChannelName(user.id, user2.id);
 
     const channels = {};
     channels[channel1.id] = channel1;
@@ -57,15 +70,12 @@ describe('Selectors.Channels', () => {
     channels[channel9.id] = channel9;
     channels[channel10.id] = channel10;
     channels[channel11.id] = channel11;
+    channels[channel12.id] = channel12;
 
     const channelsInTeam = {};
     channelsInTeam[team1.id] = [channel1.id, channel2.id, channel5.id, channel6.id, channel8.id, channel10.id, channel11.id];
     channelsInTeam[team2.id] = [channel3.id];
     channelsInTeam[''] = [channel4.id, channel7.id, channel9.id];
-
-    const user = TestHelper.fakeUserWithId();
-    const profiles = {};
-    profiles[user.id] = user;
 
     const membersInChannel = {};
     membersInChannel[channel1.id] = {};
@@ -79,6 +89,10 @@ describe('Selectors.Channels', () => {
     membersInChannel[channel5.id] = {};
     membersInChannel[channel5.id][user.id] = {channel_id: channel5.id, user_id: user.id};
     membersInChannel[channel6.id] = {};
+    membersInChannel[channel7.id] = {};
+    membersInChannel[channel7.id][user.id] = {channel_id: channel7.id, user_id: user.id};
+    membersInChannel[channel7.id][user2.id] = {channel_id: channel7.id, user_id: user2.id};
+    membersInChannel[channel7.id][user3.id] = {channel_id: channel7.id, user_id: user3.id};
     membersInChannel[channel8.id] = {};
     membersInChannel[channel8.id][user.id] = {channel_id: channel8.id, user_id: user.id};
     membersInChannel[channel9.id] = {};
@@ -87,6 +101,9 @@ describe('Selectors.Channels', () => {
     membersInChannel[channel10.id][user.id] = {channel_id: channel10.id, user_id: user.id};
     membersInChannel[channel11.id] = {};
     membersInChannel[channel11.id][user.id] = {channel_id: channel11.id, user_id: user.id};
+    membersInChannel[channel12.id] = {};
+    membersInChannel[channel12.id][user.id] = {channel_id: channel12.id, user_id: user.id};
+    membersInChannel[channel12.id][user2.id] = {channel_id: channel12.id, user_id: user2.id};
 
     const myMembers = {};
     myMembers[channel1.id] = {channel_id: channel1.id, user_id: user.id};
@@ -99,6 +116,7 @@ describe('Selectors.Channels', () => {
     myMembers[channel9.id] = {channel_id: channel9.id, user_id: user.id};
     myMembers[channel10.id] = {channel_id: channel10.id, user_id: user.id};
     myMembers[channel11.id] = {channel_id: channel11.id, user_id: user.id};
+    myMembers[channel12.id] = {channel_id: channel12.id, user_id: user.id};
 
     const myPreferences = {
         [`${Preferences.CATEGORY_FAVORITE_CHANNEL}--${channel1.id}`]: {
@@ -118,7 +136,10 @@ describe('Selectors.Channels', () => {
             users: {
                 currentUserId: user.id,
                 profiles,
-                profilesInChannel: {[channel7.id]: [user.id]},
+                profilesInChannel: {
+                    [channel7.id]: [user.id, user2.id, user3.id],
+                    [channel12.id]: [user.id, user2.id],
+                },
             },
             teams: {
                 currentTeamId: team1.id,
@@ -142,6 +163,8 @@ describe('Selectors.Channels', () => {
         },
     });
 
+    const sortUsernames = (a, b) => a.localeCompare(b, General.DEFAULT_LOCALE, {numeric: true});
+
     it('should return channels in current team', () => {
         const channelsInCurrentTeam = [channel1, channel2, channel5, channel6, channel8, channel10, channel11].sort(sortChannelsByDisplayName.bind(null, []));
         assert.deepEqual(Selectors.getChannelsInCurrentTeam(testState), channelsInCurrentTeam);
@@ -149,7 +172,12 @@ describe('Selectors.Channels', () => {
 
     it('get my channels in current team and DMs', () => {
         const channelsInCurrentTeam = [channel1, channel2, channel5, channel8, channel10, channel11].sort(sortChannelsByDisplayName.bind(null, []));
-        assert.deepEqual(Selectors.getMyChannels(testState), [...channelsInCurrentTeam, channel4, channel7, channel9]);
+        assert.deepEqual(Selectors.getMyChannels(testState), [
+            ...channelsInCurrentTeam,
+            channel4,
+            {...channel7, display_name: [user2.username, user3.username].sort(sortUsernames).join(', ')},
+            channel9,
+        ]);
     });
 
     it('should return members in current channel', () => {
@@ -214,7 +242,9 @@ describe('Selectors.Channels', () => {
     });
 
     it('get group channels', () => {
-        assert.deepEqual(Selectors.getGroupChannels(testState), [channel7]);
+        assert.deepEqual(Selectors.getGroupChannels(testState), [
+            {...channel7, display_name: [user2.username, user3.username].sort(sortUsernames).join(', ')},
+        ]);
     });
 
     it('get direct channel ids strict equal', () => {
@@ -570,5 +600,65 @@ describe('Selectors.Channels', () => {
         assert.throws(() => Selectors.filterPostIds(), TypeError);
 
         assert.throws(() => filterPostIDsInvalid(testStateC, postIDs), ReferenceError, filterErrorMessage);
+    });
+
+    describe('getDirectAndGroupChannels', () => {
+        const getDirectAndGroupChannels = Selectors.getDirectAndGroupChannels;
+
+        it('will return no channels if there is no active user', () => {
+            const state = {
+                ...testState,
+                entities: {
+                    ...testState.entities,
+                    users: {
+                        ...testState.entities.users,
+                        currentUserId: null,
+                    },
+                },
+            };
+
+            assert.deepEqual(getDirectAndGroupChannels(state), []);
+        });
+
+        it('will return only direct and group message channels', () => {
+            const state = {
+                ...testState,
+                entities: {
+                    ...testState.entities,
+                    users: {
+                        ...testState.entities.users,
+                    },
+                },
+            };
+
+            assert.deepEqual(getDirectAndGroupChannels(state), [
+                {...channel7, display_name: [user2.username, user3.username].sort(sortUsernames).join(', ')},
+                {...channel12, display_name: user2.username},
+            ]);
+        });
+
+        it('will not error out on undefined channels', () => {
+            const state = {
+                ...testState,
+                entities: {
+                    ...testState.entities,
+                    users: {
+                        ...testState.entities.users,
+                    },
+                    channels: {
+                        ...testState.entities.channels,
+                        channels: {
+                            ...testState.entities.channels.channels,
+                            ['undefined']: undefined, //eslint-disable-line no-useless-computed-key
+                        },
+                    },
+                },
+            };
+
+            assert.deepEqual(getDirectAndGroupChannels(state), [
+                {...channel7, display_name: [user2.username, user3.username].sort(sortUsernames).join(', ')},
+                {...channel12, display_name: user2.username},
+            ]);
+        });
     });
 });

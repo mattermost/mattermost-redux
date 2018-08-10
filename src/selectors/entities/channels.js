@@ -653,6 +653,33 @@ export const getSortedDirectChannelWithUnreadsIds = createIdsSelector(
     }
 );
 
+// getDirectAndGroupChannels returns all direct and group channels, even if they have been manually
+// or automatically closed.
+//
+// This is similar to the getDirectChannels above (which actually also returns group channels,
+// but suppresses manually closed group channels but not manually closed direct channels.) This
+// method does away with all the suppression, since the webapp client downstream uses this for
+// the channel switcher and puts such suppressed channels in a separate category.
+export const getDirectAndGroupChannels = createSelector(
+    getCurrentUser,
+    getUsers,
+    getAllChannels,
+    getTeammateNameDisplaySetting,
+    (currentUser, profiles, channels, settings) => {
+        if (!currentUser) {
+            return [];
+        }
+
+        return Object.values(channels).filter((channel) =>
+            Boolean(channel)
+        ).filter((channel) =>
+            channel.type === General.DM_CHANNEL || channel.type === General.GM_CHANNEL
+        ).map((channel) =>
+            completeDirectChannelDisplayName(currentUser.id, profiles, settings, channel)
+        );
+    }
+);
+
 export const getSortedDirectChannelIds = createIdsSelector(
     getUnreadChannelIds,
     getSortedDirectChannelWithUnreadsIds,

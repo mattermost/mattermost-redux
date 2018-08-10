@@ -672,7 +672,7 @@ export function joinChannel(userId, teamId, channelId, channelName) {
                 member = await Client4.addToChannel(userId, channelId);
                 channel = await Client4.getChannel(channelId);
             } else if (channelName) {
-                channel = await Client4.getChannelByName(teamId, channelName);
+                channel = await Client4.getChannelByName(teamId, channelName, true);
                 if ((channel.type === General.GM_CHANNEL) || (channel.type === General.DM_CHANNEL)) {
                     member = await Client4.getChannelMember(channel.id, userId);
                 } else {
