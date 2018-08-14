@@ -319,18 +319,18 @@ export const getUnreads = createSelector(
                 let otherUserId;
                 if (channel.type === 'D') {
                     otherUserId = getUserIdFromChannelName(currentUserId, channel.name);
-                    if (users[otherUserId]) {
+                    if (users[otherUserId] && users[otherUserId].delete_at === 0) {
                         mentionCount += channel.total_msg_count - m.msg_count;
                     }
-                } else if (m.mention_count > 0) {
+                } else if (m.mention_count > 0 && channel.delete_at === 0) {
                     mentionCount += m.mention_count;
                 }
                 if (m.notify_props && m.notify_props.mark_unread !== 'mention' && channel.total_msg_count - m.msg_count > 0) {
                     if (channel.type === 'D') {
-                        if (users[otherUserId]) {
+                        if (users[otherUserId] && users[otherUserId].delete_at === 0) {
                             messageCount += 1;
                         }
-                    } else {
+                    } else if (channel.delete_at === 0) {
                         messageCount += 1;
                     }
                 }
@@ -357,18 +357,18 @@ export const getUnreadsInCurrentTeam = createSelector(
                 let otherUserId;
                 if (channel.type === 'D') {
                     otherUserId = getUserIdFromChannelName(currentUserId, channel.name);
-                    if (users[otherUserId]) {
+                    if (users[otherUserId] && users[otherUserId].delete_at === 0) {
                         mentionCount += channel.total_msg_count - m.msg_count;
                     }
-                } else if (m.mention_count > 0) {
+                } else if (m.mention_count > 0 && channel.delete_at === 0) {
                     mentionCount += m.mention_count;
                 }
                 if (m.notify_props && m.notify_props.mark_unread !== 'mention' && channel.total_msg_count - m.msg_count > 0) {
                     if (channel.type === 'D') {
-                        if (users[otherUserId]) {
+                        if (users[otherUserId] && users[otherUserId].delete_at === 0) {
                             messageCount += 1;
                         }
-                    } else {
+                    } else if (channel.delete_at === 0) {
                         messageCount += 1;
                     }
                 }

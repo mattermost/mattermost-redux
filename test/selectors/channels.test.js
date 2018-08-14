@@ -182,7 +182,11 @@ describe('Selectors.Channels', () => {
         assert.equal(Selectors.getUnreadsInCurrentTeam(testState).mentionCount, 3);
     });
 
-    it('get unreads for current team with a missing profile entity', () => {
+    it('get unreads', () => {
+        assert.deepEqual(Selectors.getUnreads(testState), {messageCount: 4, mentionCount: 4});
+    });
+
+    it('get unreads with a missing profile entity', () => {
         const newProfiles = {
             ...testState.entities.users.profiles,
         };
@@ -197,18 +201,20 @@ describe('Selectors.Channels', () => {
                 },
             },
         };
-        assert.equal(Selectors.getUnreadsInCurrentTeam(newState).mentionCount, 1);
+
+        assert.deepEqual(Selectors.getUnreads(newState), {messageCount: 4, mentionCount: 2});
+        assert.deepEqual(Selectors.getUnreadsInCurrentTeam(newState), {messageCount: 3, mentionCount: 1});
     });
 
-    it('get unreads', () => {
-        assert.deepEqual(Selectors.getUnreads(testState), {messageCount: 4, mentionCount: 4});
-    });
-
-    it('get unreads with user with a missing profile entity', () => {
+    it('get unreads with a deactivated user', () => {
         const newProfiles = {
             ...testState.entities.users.profiles,
+            fakeUserId: {
+                ...testState.entities.users.profiles.fakeUserId,
+                delete_at: 100,
+            },
         };
-        Reflect.deleteProperty(newProfiles, 'fakeUserId');
+
         const newState = {
             ...testState,
             entities: {
@@ -220,6 +226,31 @@ describe('Selectors.Channels', () => {
             },
         };
         assert.deepEqual(Selectors.getUnreads(newState), {messageCount: 4, mentionCount: 2});
+        assert.deepEqual(Selectors.getUnreadsInCurrentTeam(newState), {messageCount: 3, mentionCount: 1});
+    });
+
+    it('get unreads with a deactivated channel', () => {
+        const newChannels = {
+            ...testState.entities.channels.channels,
+            [channel2.id]: {
+                ...testState.entities.channels.channels[channel2.id],
+                delete_at: 100,
+            },
+        };
+
+        const newState = {
+            ...testState,
+            entities: {
+                ...testState.entities,
+                channels: {
+                    ...testState.entities.channels,
+                    channels: newChannels,
+                },
+            },
+        };
+
+        assert.deepEqual(Selectors.getUnreads(newState), {messageCount: 3, mentionCount: 3});
+        assert.deepEqual(Selectors.getUnreadsInCurrentTeam(newState), {messageCount: 2, mentionCount: 2});
     });
 
     it('get channel map for current team', () => {
