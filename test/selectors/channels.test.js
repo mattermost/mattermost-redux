@@ -80,7 +80,7 @@ describe('Selectors.Channels', () => {
     const channelsInTeam = {};
     channelsInTeam[team1.id] = [channel1.id, channel2.id, channel5.id, channel6.id, channel8.id, channel10.id, channel11.id];
     channelsInTeam[team2.id] = [channel3.id];
-    channelsInTeam[''] = [channel4.id, channel7.id, channel9.id, channel12.id];
+    channelsInTeam[''] = [channel4.id, channel7.id, channel9.id, channel13.id];
 
     const membersInChannel = {};
     membersInChannel[channel1.id] = {};
@@ -182,17 +182,12 @@ describe('Selectors.Channels', () => {
 
     it('get my channels in current team and DMs', () => {
         const channelsInCurrentTeam = [channel1, channel2, channel5, channel8, channel10, channel11].sort(sortChannelsByDisplayName.bind(null, []));
-        const dmDisplayName = profiles.fakeUserId.username;
-        const dmChannel = {
-            ...channel13,
-            display_name: dmDisplayName,
-        };
         assert.deepEqual(Selectors.getMyChannels(testState), [
             ...channelsInCurrentTeam,
             channel4,
             {...channel7, display_name: [user2.username, user3.username].sort(sortUsernames).join(', ')},
             channel9,
-            dmChannel,
+            {...channel13, display_name: profiles.fakeUserId.username},
         ]);
     });
 
@@ -212,7 +207,11 @@ describe('Selectors.Channels', () => {
         assert.equal(Selectors.getUnreadsInCurrentTeam(testState).mentionCount, 3);
     });
 
-    it('get unreads for current team with a missing profile entity', () => {
+    it('get unreads', () => {
+        assert.deepEqual(Selectors.getUnreads(testState), {messageCount: 4, mentionCount: 4});
+    });
+
+    it('get unreads with a missing profile entity', () => {
         const newProfiles = {
             ...testState.entities.users.profiles,
         };
@@ -227,18 +226,20 @@ describe('Selectors.Channels', () => {
                 },
             },
         };
-        assert.equal(Selectors.getUnreadsInCurrentTeam(newState).mentionCount, 1);
+
+        assert.deepEqual(Selectors.getUnreads(newState), {messageCount: 4, mentionCount: 2});
+        assert.deepEqual(Selectors.getUnreadsInCurrentTeam(newState), {messageCount: 3, mentionCount: 1});
     });
 
-    it('get unreads', () => {
-        assert.deepEqual(Selectors.getUnreads(testState), {messageCount: 4, mentionCount: 4});
-    });
-
-    it('get unreads with user with a missing profile entity', () => {
+    it('get unreads with a deactivated user', () => {
         const newProfiles = {
             ...testState.entities.users.profiles,
+            fakeUserId: {
+                ...testState.entities.users.profiles.fakeUserId,
+                delete_at: 100,
+            },
         };
-        Reflect.deleteProperty(newProfiles, 'fakeUserId');
+
         const newState = {
             ...testState,
             entities: {
@@ -250,6 +251,31 @@ describe('Selectors.Channels', () => {
             },
         };
         assert.deepEqual(Selectors.getUnreads(newState), {messageCount: 4, mentionCount: 2});
+        assert.deepEqual(Selectors.getUnreadsInCurrentTeam(newState), {messageCount: 3, mentionCount: 1});
+    });
+
+    it('get unreads with a deactivated channel', () => {
+        const newChannels = {
+            ...testState.entities.channels.channels,
+            [channel2.id]: {
+                ...testState.entities.channels.channels[channel2.id],
+                delete_at: 100,
+            },
+        };
+
+        const newState = {
+            ...testState,
+            entities: {
+                ...testState.entities,
+                channels: {
+                    ...testState.entities.channels,
+                    channels: newChannels,
+                },
+            },
+        };
+
+        assert.deepEqual(Selectors.getUnreads(newState), {messageCount: 3, mentionCount: 3});
+        assert.deepEqual(Selectors.getUnreadsInCurrentTeam(newState), {messageCount: 2, mentionCount: 2});
     });
 
     it('get channel map for current team', () => {
@@ -690,6 +716,7 @@ describe('Selectors.Channels', () => {
             assert.deepEqual(getDirectAndGroupChannels(state), [
                 {...channel7, display_name: [user2.username, user3.username].sort(sortUsernames).join(', ')},
                 {...channel12, display_name: user2.username},
+                {...channel13, display_name: profiles.fakeUserId.username},
             ]);
         });
 
@@ -714,6 +741,7 @@ describe('Selectors.Channels', () => {
             assert.deepEqual(getDirectAndGroupChannels(state), [
                 {...channel7, display_name: [user2.username, user3.username].sort(sortUsernames).join(', ')},
                 {...channel12, display_name: user2.username},
+                {...channel13, display_name: profiles.fakeUserId.username},
             ]);
         });
     });
