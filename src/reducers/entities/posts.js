@@ -368,7 +368,7 @@ function clearChannelPosts(postsInChannel, action) {
     return nextPostsInChannel;
 }
 
-function addPostIdsToChannel(postsInChannel, action) {
+function restoreBackedUpPostIds(postsInChannel, action) {
     const nextPostsInChannel = {
         ...postsInChannel,
         [action.data.channelId]: action.data.postIds,
@@ -416,7 +416,7 @@ function handlePosts(posts = {}, postsInChannel = {}, postsInThread = {}, action
     }
 
     case PostTypes.ADD_CHANNEL_POSTIDS: {
-        const nextPostsInChannel = addPostIdsToChannel(postsInChannel, action);
+        const nextPostsInChannel = restoreBackedUpPostIds(postsInChannel, action);
         return {
             posts,
             postsInThread,

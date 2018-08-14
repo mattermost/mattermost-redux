@@ -1270,7 +1270,7 @@ export function clearPostsFromChannel(channelId) {
     };
 }
 
-export function addPostIdsToChannel(channelId, postIds) {
+export function restoreBackedUpPostIds(channelId, postIds) {
     return async (dispatch, getState) => {
         dispatch({
             type: PostTypes.ADD_CHANNEL_POSTIDS,
@@ -1317,6 +1317,6 @@ export default {
     moveHistoryIndexBack,
     moveHistoryIndexForward,
     clearPostsFromChannel,
-    addPostIdsToChannel,
+    restoreBackedUpPostIds,
     backUpPostsInChannel,
 };

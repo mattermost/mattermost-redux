@@ -1816,11 +1816,11 @@ describe('Actions.Posts', () => {
         assert.ok(posts[post.id]);
     });
 
-    it('addPostIdsToChannel', async () => {
+    it('restoreBackedUpPostIds', async () => {
         const {dispatch, getState} = store;
         const channelId = TestHelper.basicChannel.id;
         const postIds = ['testId'];
-        await Actions.addPostIdsToChannel(channelId, postIds)(dispatch, getState);
+        await Actions.restoreBackedUpPostIds(channelId, postIds)(dispatch, getState);
 
         const {postsInChannel} = getState().entities.posts;
         assert.ok(postsInChannel[channelId] === postIds);
@@ -1831,7 +1831,7 @@ describe('Actions.Posts', () => {
         const {dispatch, getState} = store;
         const channelId = TestHelper.basicChannel.id;
         const postIds = ['testId'];
-        await Actions.addPostIdsToChannel(channelId, postIds)(dispatch, getState);
+        await Actions.restoreBackedUpPostIds(channelId, postIds)(dispatch, getState);
 
         ({postsInChannel} = getState().entities.posts);
         assert.ok(postsInChannel[channelId] === postIds);
