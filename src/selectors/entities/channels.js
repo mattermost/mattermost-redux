@@ -515,6 +515,11 @@ export const getSortedFavoriteChannelWithUnreadsIds = createIdsSelector(
 
             const channel = channels[id];
             const otherUserId = getUserIdFromChannelName(currentUser.id, channel.name);
+
+            if (channel.delete_at !== 0 && channel.id !== currentChannelId) {
+                return false;
+            }
+
             if (channel.type === General.DM_CHANNEL && !isDirectChannelVisible(profiles[otherUserId] || otherUserId, config, prefs, channel, null, null, currentChannelId)) {
                 return false;
             } else if (channel.type === General.GM_CHANNEL && !isGroupChannelVisible(config, prefs, channel)) {
