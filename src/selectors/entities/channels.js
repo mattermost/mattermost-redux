@@ -463,12 +463,16 @@ export const getSortedUnreadChannelIds = createIdsSelector(
         const allUnreadChannels = unreadIds.map((id) => {
             const c = channels[id];
 
+            if (c.delete_at !== 0) {
+                return false;
+            }
+
             if (c.type === General.DM_CHANNEL || c.type === General.GM_CHANNEL) {
                 return completeDirectChannelDisplayName(currentUser.id, profiles, settings, c);
             }
 
             return c;
-        }).sort((a, b) => {
+        }).filter((c) => c).sort((a, b) => {
             const aMember = myMembers[a.id];
             const bMember = myMembers[b.id];
             const aIsMention = a.type === General.DM_CHANNEL || (aMember && aMember.mention_count > 0);
