@@ -228,6 +228,18 @@ class TestHelper {
         };
     };
 
+    fakeDmChannel = (userId, otherUserId) => {
+        return {
+            name: `${userId}__${otherUserId}`,
+            team_id: '',
+            display_name: `${otherUserId}`,
+            type: 'D',
+            status: 'offline',
+            teammate_id: `${otherUserId}`,
+            id: this.generateId(),
+        };
+    }
+
     fakeChannelMember = (userId, channelId) => {
         return {
             user_id: userId,
