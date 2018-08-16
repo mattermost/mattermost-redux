@@ -12,7 +12,6 @@ import {General, Preferences} from 'constants';
 describe('Selectors.Channels', () => {
     const team1 = TestHelper.fakeTeamWithId();
     const team2 = TestHelper.fakeTeamWithId();
-
     const user = TestHelper.fakeUserWithId();
     const user2 = TestHelper.fakeUserWithId();
     const user3 = TestHelper.fakeUserWithId();
@@ -20,6 +19,7 @@ describe('Selectors.Channels', () => {
     profiles[user.id] = user;
     profiles[user2.id] = user2;
     profiles[user3.id] = user3;
+    profiles.fakeUserId = TestHelper.fakeUserWithId('fakeUserId');
 
     const channel1 = TestHelper.fakeChannelWithId(team1.id);
     channel1.display_name = 'Channel Name';
@@ -58,6 +58,10 @@ describe('Selectors.Channels', () => {
     channel12.last_post_at = Date.now();
     channel12.name = getDirectChannelName(user.id, user2.id);
 
+    const channel13 = TestHelper.fakeDmChannel(user.id, 'fakeUserId');
+    channel13.total_msg_count = 3;
+    channel13.display_name = '';
+
     const channels = {};
     channels[channel1.id] = channel1;
     channels[channel2.id] = channel2;
@@ -71,11 +75,12 @@ describe('Selectors.Channels', () => {
     channels[channel10.id] = channel10;
     channels[channel11.id] = channel11;
     channels[channel12.id] = channel12;
+    channels[channel13.id] = channel13;
 
     const channelsInTeam = {};
     channelsInTeam[team1.id] = [channel1.id, channel2.id, channel5.id, channel6.id, channel8.id, channel10.id, channel11.id];
     channelsInTeam[team2.id] = [channel3.id];
-    channelsInTeam[''] = [channel4.id, channel7.id, channel9.id];
+    channelsInTeam[''] = [channel4.id, channel7.id, channel9.id, channel13.id];
 
     const membersInChannel = {};
     membersInChannel[channel1.id] = {};
@@ -104,6 +109,9 @@ describe('Selectors.Channels', () => {
     membersInChannel[channel12.id] = {};
     membersInChannel[channel12.id][user.id] = {channel_id: channel12.id, user_id: user.id};
     membersInChannel[channel12.id][user2.id] = {channel_id: channel12.id, user_id: user2.id};
+    membersInChannel[channel13.id] = {};
+    membersInChannel[channel13.id][user.id] = {channel_id: channel13.id, user_id: user.id};
+    membersInChannel[channel13.id][user2.id] = {channel_id: channel13.id, user_id: user2.id};
 
     const myMembers = {};
     myMembers[channel1.id] = {channel_id: channel1.id, user_id: user.id};
@@ -112,11 +120,12 @@ describe('Selectors.Channels', () => {
     myMembers[channel4.id] = {channel_id: channel4.id, user_id: user.id};
     myMembers[channel5.id] = {channel_id: channel5.id, user_id: user.id};
     myMembers[channel7.id] = {channel_id: channel7.id, user_id: user.id, msg_count: 0, notify_props: {}};
-    myMembers[channel8.id] = {channel_id: channel7.id, user_id: user.id, msg_count: 0, notify_props: {}};
+    myMembers[channel8.id] = {channel_id: channel8.id, user_id: user.id, msg_count: 0, notify_props: {}};
     myMembers[channel9.id] = {channel_id: channel9.id, user_id: user.id};
     myMembers[channel10.id] = {channel_id: channel10.id, user_id: user.id};
     myMembers[channel11.id] = {channel_id: channel11.id, user_id: user.id};
-    myMembers[channel12.id] = {channel_id: channel12.id, user_id: user.id};
+    myMembers[channel12.id] = {channel_id: channel12.id, user_id: user.id, msg_count: 0, notifyProps: {}};
+    myMembers[channel13.id] = {channel_id: channel13.id, user_id: user.id, msg_count: 1, notifyProps: {}};
 
     const myPreferences = {
         [`${Preferences.CATEGORY_FAVORITE_CHANNEL}--${channel1.id}`]: {
@@ -140,6 +149,7 @@ describe('Selectors.Channels', () => {
                     [channel7.id]: [user.id, user2.id, user3.id],
                     [channel12.id]: [user.id, user2.id],
                 },
+                statuses: {},
             },
             teams: {
                 currentTeamId: team1.id,
@@ -177,6 +187,7 @@ describe('Selectors.Channels', () => {
             channel4,
             {...channel7, display_name: [user2.username, user3.username].sort(sortUsernames).join(', ')},
             channel9,
+            {...channel13, display_name: profiles.fakeUserId.username},
         ]);
     });
 
@@ -193,7 +204,78 @@ describe('Selectors.Channels', () => {
     });
 
     it('get unreads for current team', () => {
-        assert.equal(Selectors.getUnreadsInCurrentTeam(testState).mentionCount, 1);
+        assert.equal(Selectors.getUnreadsInCurrentTeam(testState).mentionCount, 3);
+    });
+
+    it('get unreads', () => {
+        assert.deepEqual(Selectors.getUnreads(testState), {messageCount: 4, mentionCount: 4});
+    });
+
+    it('get unreads with a missing profile entity', () => {
+        const newProfiles = {
+            ...testState.entities.users.profiles,
+        };
+        Reflect.deleteProperty(newProfiles, 'fakeUserId');
+        const newState = {
+            ...testState,
+            entities: {
+                ...testState.entities,
+                users: {
+                    ...testState.entities.users,
+                    profiles: newProfiles,
+                },
+            },
+        };
+
+        assert.deepEqual(Selectors.getUnreads(newState), {messageCount: 4, mentionCount: 2});
+        assert.deepEqual(Selectors.getUnreadsInCurrentTeam(newState), {messageCount: 3, mentionCount: 1});
+    });
+
+    it('get unreads with a deactivated user', () => {
+        const newProfiles = {
+            ...testState.entities.users.profiles,
+            fakeUserId: {
+                ...testState.entities.users.profiles.fakeUserId,
+                delete_at: 100,
+            },
+        };
+
+        const newState = {
+            ...testState,
+            entities: {
+                ...testState.entities,
+                users: {
+                    ...testState.entities.users,
+                    profiles: newProfiles,
+                },
+            },
+        };
+        assert.deepEqual(Selectors.getUnreads(newState), {messageCount: 4, mentionCount: 2});
+        assert.deepEqual(Selectors.getUnreadsInCurrentTeam(newState), {messageCount: 3, mentionCount: 1});
+    });
+
+    it('get unreads with a deactivated channel', () => {
+        const newChannels = {
+            ...testState.entities.channels.channels,
+            [channel2.id]: {
+                ...testState.entities.channels.channels[channel2.id],
+                delete_at: 100,
+            },
+        };
+
+        const newState = {
+            ...testState,
+            entities: {
+                ...testState.entities,
+                channels: {
+                    ...testState.entities.channels,
+                    channels: newChannels,
+                },
+            },
+        };
+
+        assert.deepEqual(Selectors.getUnreads(newState), {messageCount: 3, mentionCount: 3});
+        assert.deepEqual(Selectors.getUnreadsInCurrentTeam(newState), {messageCount: 2, mentionCount: 2});
     });
 
     it('get channel map for current team', () => {
@@ -634,6 +716,7 @@ describe('Selectors.Channels', () => {
             assert.deepEqual(getDirectAndGroupChannels(state), [
                 {...channel7, display_name: [user2.username, user3.username].sort(sortUsernames).join(', ')},
                 {...channel12, display_name: user2.username},
+                {...channel13, display_name: profiles.fakeUserId.username},
             ]);
         });
 
@@ -658,6 +741,7 @@ describe('Selectors.Channels', () => {
             assert.deepEqual(getDirectAndGroupChannels(state), [
                 {...channel7, display_name: [user2.username, user3.username].sort(sortUsernames).join(', ')},
                 {...channel12, display_name: user2.username},
+                {...channel13, display_name: profiles.fakeUserId.username},
             ]);
         });
     });
