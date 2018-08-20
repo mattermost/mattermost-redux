@@ -484,5 +484,12 @@ export const getPostIdsInChannel = createIdsSelector(
     }
 );
 
+export const getbackUpPostIdsInChannel = createSelector(
+    (state, channelId) => state.entities.posts.postsInChannelBackup[channelId],
+    (postIdsInChannel) => {
+        return postIdsInChannel || [];
+    }
+);
+
 export const isPostIdSending = (state, postId) =>
     state.entities.posts.sendingPostIds.some((sendingPostId) => sendingPostId === postId);

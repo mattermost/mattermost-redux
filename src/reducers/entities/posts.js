@@ -359,6 +359,23 @@ function handleRemovePost(posts = {}, postsInChannel = {}, postsInThread = {}, a
     return {posts: nextPosts, postsInChannel: nextPostsForChannel, postsInThread: nextPostsForThread || postsInThread};
 }
 
+function clearChannelPosts(postsInChannel, action) {
+    const nextPostsInChannel = {
+        ...postsInChannel,
+    };
+
+    Reflect.deleteProperty(nextPostsInChannel, action.data.channelId);
+    return nextPostsInChannel;
+}
+
+function restoreBackedUpPostIds(postsInChannel, action) {
+    const nextPostsInChannel = {
+        ...postsInChannel,
+        [action.data.channelId]: action.data.postIds,
+    };
+    return nextPostsInChannel;
+}
+
 function handlePosts(posts = {}, postsInChannel = {}, postsInThread = {}, action) {
     switch (action.type) {
     case PostTypes.RECEIVED_POST: {
@@ -388,6 +405,24 @@ function handlePosts(posts = {}, postsInChannel = {}, postsInThread = {}, action
     case SearchTypes.RECEIVED_SEARCH_POSTS:
     case SearchTypes.RECEIVED_SEARCH_FLAGGED_POSTS:
         return handlePostsFromSearch(posts, postsInChannel, postsInThread, action);
+
+    case PostTypes.CLEAR_CHANNEL_POSTS: {
+        const nextPostsInChannel = clearChannelPosts(postsInChannel, action);
+        return {
+            posts,
+            postsInThread,
+            postsInChannel: nextPostsInChannel,
+        };
+    }
+
+    case PostTypes.ADD_CHANNEL_POSTIDS: {
+        const nextPostsInChannel = restoreBackedUpPostIds(postsInChannel, action);
+        return {
+            posts,
+            postsInThread,
+            postsInChannel: nextPostsInChannel,
+        };
+    }
 
     case UserTypes.LOGOUT_SUCCESS:
         return {
@@ -575,6 +610,18 @@ function messagesHistory(state = {}, action) {
     }
 }
 
+function postsInChannelBackup(state = {}, action) {
+    switch (action.type) {
+    case PostTypes.BACKUP_CHANNEL_POSTIDS:
+        return {
+            ...state,
+            [action.data.channelId]: action.data.postIds,
+        };
+    default:
+        return state;
+    }
+}
+
 export default function(state = {}, action) {
     const {posts, postsInChannel, postsInThread} = handlePosts(state.posts, state.postsInChannel, state.postsInThread, action);
 
@@ -609,6 +656,8 @@ export default function(state = {}, action) {
 
         // History of posts and comments
         messagesHistory: messagesHistory(state.messagesHistory, action),
+
+        postsInChannelBackup: postsInChannelBackup(state.postsInChannelBackup, action),
     };
 
     if (state.posts === nextState.posts && state.postsInChannel === nextState.postsInChannel &&
@@ -619,7 +668,8 @@ export default function(state = {}, action) {
         state.currentFocusedPostId === nextState.currentFocusedPostId &&
         state.reactions === nextState.reactions &&
         state.openGraph === nextState.openGraph &&
-        state.messagesHistory === nextState.messagesHistory) {
+        state.messagesHistory === nextState.messagesHistory &&
+        state.postsInChannelBackup === nextState.postsInChannelBackup) {
         // None of the children have changed so don't even let the parent object change
         return state;
     }
