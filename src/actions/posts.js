@@ -1259,6 +1259,39 @@ export function moveHistoryIndexForward(index) {
     };
 }
 
+export function clearPostsFromChannel(channelId) {
+    return async (dispatch, getState) => {
+        dispatch({
+            type: PostTypes.CLEAR_CHANNEL_POSTS,
+            data: {channelId},
+        }, getState);
+
+        return {data: true};
+    };
+}
+
+export function restoreBackedUpPostIds(channelId, postIds) {
+    return async (dispatch, getState) => {
+        dispatch({
+            type: PostTypes.ADD_CHANNEL_POSTIDS,
+            data: {channelId, postIds},
+        }, getState);
+
+        return {data: true};
+    };
+}
+
+export function backUpPostsInChannel(channelId, postIds) {
+    return async (dispatch, getState) => {
+        dispatch({
+            type: PostTypes.BACKUP_CHANNEL_POSTIDS,
+            data: {channelId, postIds},
+        }, getState);
+
+        return {data: true};
+    };
+}
+
 export default {
     createPost,
     createPostImmediately,
@@ -1283,4 +1316,7 @@ export default {
     resetHistoryIndex,
     moveHistoryIndexBack,
     moveHistoryIndexForward,
+    clearPostsFromChannel,
+    restoreBackedUpPostIds,
+    backUpPostsInChannel,
 };

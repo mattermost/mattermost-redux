@@ -393,3 +393,21 @@ export function combineSystemPosts(postsIds = [], posts = {}, channelId) {
 
     return {postsForChannel, nextPosts};
 }
+
+export function getOldestPostIdFromPosts(posts) {
+    const oldestPost = posts[posts.length - 1];
+    let oldestPostId = oldestPost.id;
+    if (oldestPost.type === Posts.POST_TYPES.COMBINED_USER_ACTIVITY) {
+        oldestPostId = oldestPost.system_post_ids[0];
+    }
+    return oldestPostId;
+}
+
+export function getNewestPostIdFromPosts(posts) {
+    const newestPost = posts[0];
+    let newestPostId = newestPost.id;
+    if (newestPost.type === Posts.POST_TYPES.COMBINED_USER_ACTIVITY) {
+        newestPostId = newestPost.system_post_ids[0];
+    }
+    return newestPostId;
+}

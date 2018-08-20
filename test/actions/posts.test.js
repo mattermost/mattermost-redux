@@ -1815,4 +1815,40 @@ describe('Actions.Posts', () => {
         assert(getPostsUnread.status === RequestStatus.SUCCESS);
         assert.ok(posts[post.id]);
     });
+
+    it('restoreBackedUpPostIds', async () => {
+        const {dispatch, getState} = store;
+        const channelId = TestHelper.basicChannel.id;
+        const postIds = ['testId'];
+        await Actions.restoreBackedUpPostIds(channelId, postIds)(dispatch, getState);
+
+        const {postsInChannel} = getState().entities.posts;
+        assert.ok(postsInChannel[channelId] === postIds);
+    });
+
+    it('clearPostsFromChannel', async () => {
+        let postsInChannel;
+        const {dispatch, getState} = store;
+        const channelId = TestHelper.basicChannel.id;
+        const postIds = ['testId'];
+        await Actions.restoreBackedUpPostIds(channelId, postIds)(dispatch, getState);
+
+        ({postsInChannel} = getState().entities.posts);
+        assert.ok(postsInChannel[channelId] === postIds);
+
+        await Actions.clearPostsFromChannel(channelId)(dispatch, getState);
+
+        ({postsInChannel} = getState().entities.posts);
+        assert.ok(!postsInChannel[channelId]);
+    });
+
+    it('backUpPostsInChannel', async () => {
+        const {dispatch, getState} = store;
+        const channelId = TestHelper.basicChannel.id;
+        const postIds = ['testId'];
+        await Actions.backUpPostsInChannel(channelId, postIds)(dispatch, getState);
+
+        const {postsInChannelBackup} = getState().entities.posts;
+        assert.ok(postsInChannelBackup[channelId] === postIds);
+    });
 });

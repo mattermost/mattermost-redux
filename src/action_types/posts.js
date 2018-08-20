@@ -79,4 +79,8 @@ export default keyMirror({
     RESET_HISTORY_INDEX: null,
     MOVE_HISTORY_INDEX_BACK: null,
     MOVE_HISTORY_INDEX_FORWARD: null,
+
+    CLEAR_CHANNEL_POSTS: null,
+    ADD_CHANNEL_POSTIDS: null,
+    BACKUP_CHANNEL_POSTIDS: null,
 });
