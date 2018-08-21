@@ -665,9 +665,11 @@ export function getPostsWithRetry(channelId, page = 0, perPage = Posts.POST_CHUN
 
 export function getPostsUnread(channelId) {
     return async (dispatch, getState) => {
+        const userId = getCurrentUserId(getState());
+
         let posts;
         try {
-            posts = await Client4.getPostsUnread(channelId);
+            posts = await Client4.getPostsUnread(channelId, userId);
             getProfilesAndStatusesForPosts(posts.posts, dispatch, getState);
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch, getState);

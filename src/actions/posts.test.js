@@ -1819,9 +1819,10 @@ describe('Actions.Posts', () => {
             },
             order: [post.id],
         };
+        const userId = getState().entities.users.currentUserId;
 
-        nock(Client4.getChannelRoute(channelId)).
-            get('/posts/unread').
+        nock(Client4.getUsersRoute()).
+            get(`/${userId}/channels/${channelId}/posts/unread`).
             reply(200, postList);
 
         const response = await Actions.getPostsUnread(channelId)(dispatch, getState);

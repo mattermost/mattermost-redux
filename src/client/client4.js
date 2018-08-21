@@ -1472,9 +1472,9 @@ export default class Client4 {
         );
     };
 
-    getPostsUnread = async (channelId) => {
+    getPostsUnread = async (channelId, userId) => {
         return this.doFetch(
-            `${this.getChannelRoute(channelId)}/posts/unread`,
+            `${this.getUserRoute(userId)}/channels/${channelId}/posts/unread`,
             {method: 'get'}
         );
     };
