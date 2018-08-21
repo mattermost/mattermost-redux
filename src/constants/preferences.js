@@ -69,6 +69,7 @@ export default {
             mentionHighlightBg: '#ffe577',
             mentionHighlightLink: '#166de0',
             codeTheme: 'github',
+            postRethreadHighlight: '#cfebfd',
         },
         organization: {
             type: 'Organization',
@@ -95,6 +96,7 @@ export default {
             mentionHighlightBg: '#f3e197',
             mentionHighlightLink: '#2f81b7',
             codeTheme: 'github',
+            postRethreadHighlight: '#cfebfd',
         },
         mattermostDark: {
             type: 'Mattermost Dark',
@@ -121,6 +123,7 @@ export default {
             mentionHighlightBg: '#984063',
             mentionHighlightLink: '#a4ffeb',
             codeTheme: 'solarized-dark',
+            postRethreadHighlight: '#808080',
         },
         windows10: {
             type: 'Windows Dark',
@@ -147,6 +150,7 @@ export default {
             mentionHighlightBg: '#784098',
             mentionHighlightLink: '#a4ffeb',
             codeTheme: 'monokai',
+            postRethreadHighlight: '#2F4F4F',
         },
     },
 };
