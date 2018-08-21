@@ -1797,6 +1797,7 @@ describe('Actions.Posts', () => {
         const {dispatch, getState} = store;
         const channelId = TestHelper.basicChannel.id;
         const post = TestHelper.fakePostWithId(channelId);
+        const userId = getState().entities.users.currentUserId;
         const response = {
             posts: {
                 [post.id]: post,
@@ -1804,8 +1805,8 @@ describe('Actions.Posts', () => {
             order: [post.id],
         };
 
-        nock(Client4.getChannelRoute(channelId)).
-            get('/posts/unread').
+        nock(Client4.getUsersRoute()).
+            get(`/${userId}/channels/${channelId}/posts/unread`).
             reply(200, response);
 
         await Actions.getPostsUnread(channelId)(dispatch, getState);
