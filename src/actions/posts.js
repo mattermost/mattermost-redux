@@ -6,7 +6,7 @@ import {batchActions} from 'redux-batched-actions';
 import {Client4} from 'client';
 import {General, Preferences, Posts} from 'constants';
 import {PostTypes, FileTypes} from 'action_types';
-import {getUsersByUsername} from 'selectors/entities/users';
+import {getUsersByUsername, getCurrentUserId} from 'selectors/entities/users';
 import {getCustomEmojisByName as selectCustomEmojisByName} from 'selectors/entities/emojis';
 
 import * as Selectors from 'selectors/entities/posts';
@@ -699,10 +699,10 @@ export function getPostsWithRetry(channelId, page = 0, perPage = Posts.POST_CHUN
 export function getPostsUnread(channelId) {
     return async (dispatch, getState) => {
         dispatch({type: PostTypes.GET_POSTS_UNREAD_REQUEST}, getState);
-
+        const userId = getCurrentUserId(getState());
         let posts;
         try {
-            posts = await Client4.getPostsUnread(channelId);
+            posts = await Client4.getPostsUnread(channelId, userId);
             getProfilesAndStatusesForPosts(posts.posts, dispatch, getState);
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch, getState);
