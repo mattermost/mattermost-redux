@@ -467,6 +467,35 @@ export function getChannelAndMyMember(channelId) {
     };
 }
 
+export function getChannelTimezones(channelId) {
+    return async (dispatch, getState) => {
+        dispatch({type: ChannelTypes.GET_CHANNELS_TIMEZONE_REQUEST}, getState);
+
+        let channelTimezones;
+        try {
+            const channelTimezonesRequest = Client4.getChannelTimezones(channelId);
+
+            channelTimezones = await channelTimezonesRequest;
+        } catch (error) {
+            forceLogoutIfNecessary(error, dispatch, getState);
+            dispatch(batchActions([
+                {type: ChannelTypes.GET_CHANNELS_TIMEZONE_FAILURE, error},
+                logError(error)(dispatch),
+            ]), getState);
+            return {error};
+        }
+
+        dispatch(batchActions([
+            {
+                type: ChannelTypes.GET_CHANNELS_TIMEZONE_SUCCESS,
+                data: channelTimezones,
+            },
+        ]), getState);
+
+        return {data: channelTimezones};
+    };
+}
+
 export function fetchMyChannelsAndMembers(teamId) {
     return async (dispatch, getState) => {
         dispatch(batchActions([
@@ -1343,6 +1372,7 @@ export default {
     getChannel,
     fetchMyChannelsAndMembers,
     getMyChannelMembers,
+    getChannelTimezones,
     getChannelMembersByIds,
     leaveChannel,
     joinChannel,

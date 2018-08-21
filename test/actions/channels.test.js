@@ -1916,4 +1916,28 @@ describe('Actions.Channels', () => {
         assert.ok(preference);
         assert.ok(parseInt(preference.value, 10) >= now);
     });
+
+    it('getChannelTimezones', async () => {
+        const {dispatch, getState} = store;
+        const channelId = TestHelper.basicChannel.id;
+        const response = {
+            useAutomaticTimezone: 'true',
+            manualTimezone: '',
+            automaticTimezone: 'xoxoxo/blablabla',
+        };
+
+        nock(Client4.getChannelsRoute()).
+            get(`/${TestHelper.basicChannel.id}/timezones`).
+            query(true).
+            reply(200, [response]);
+
+        await Actions.getChannelTimezones(channelId)(dispatch, getState);
+
+        const getChannelTimezones = getState().requests.channels.getChannelTimezones;
+        if (getChannelTimezones.status === RequestStatus.FAILURE) {
+            throw new Error(JSON.stringify(getChannelTimezones.error));
+        }
+
+        assert(getChannelTimezones.status === RequestStatus.SUCCESS);
+    });
 });
