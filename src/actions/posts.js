@@ -1172,14 +1172,15 @@ export function getOpenGraphMetadata(url) {
     };
 }
 
-export function doPostAction(postId, actionId) {
+export function doPostAction(postId, actionId, selectedOption = '') {
     return bindClientFunc(
         Client4.doPostAction,
         PostTypes.DO_POST_ACTION_REQUEST,
         [PostTypes.DO_POST_ACTION_SUCCESS],
         PostTypes.DO_POST_ACTION_FAILURE,
         postId,
-        actionId
+        actionId,
+        selectedOption
     );
 }
 
