@@ -45,6 +45,10 @@ export function getUserStatuses(state) {
     return state.entities.users.statuses;
 }
 
+export function getUserSessions(state) {
+    return state.entities.users.mySessions;
+}
+
 export function getUser(state, id) {
     return state.entities.users.profiles[id];
 }

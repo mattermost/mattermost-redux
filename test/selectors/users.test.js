@@ -44,6 +44,14 @@ describe('Selectors.Users', () => {
     const profilesNotInChannel = {};
     profilesNotInChannel[channel1.id] = new Set([user2.id]);
 
+    const userSessions = [{
+        create_at: 1,
+        expires_at: 2,
+        props: {},
+        user_id: user1.id,
+        roles: '',
+    }];
+
     const myPreferences = {};
     myPreferences[`${Preferences.CATEGORY_DIRECT_CHANNEL_SHOW}--${user2.id}`] = {category: Preferences.CATEGORY_DIRECT_CHANNEL_SHOW, name: user2.id, value: 'true'};
     myPreferences[`${Preferences.CATEGORY_DIRECT_CHANNEL_SHOW}--${user3.id}`] = {category: Preferences.CATEGORY_DIRECT_CHANNEL_SHOW, name: user3.id, value: 'false'};
@@ -58,6 +66,7 @@ describe('Selectors.Users', () => {
                 profilesWithoutTeam,
                 profilesInChannel,
                 profilesNotInChannel,
+                mySessions: userSessions,
             },
             teams: {
                 currentTeamId: team1.id,
@@ -89,6 +98,10 @@ describe('Selectors.Users', () => {
 
     it('getUserIdsWithoutTeam', () => {
         assert.deepEqual(Selectors.getUserIdsWithoutTeam(testState), profilesWithoutTeam);
+    });
+
+    it('getUserSessions', () => {
+        assert.deepEqual(Selectors.getUserSessions(testState), userSessions);
     });
 
     it('getUser', () => {
