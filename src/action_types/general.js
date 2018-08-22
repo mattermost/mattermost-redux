@@ -47,4 +47,8 @@ export default keyMirror({
     WEBSOCKET_SUCCESS: null,
     WEBSOCKET_FAILURE: null,
     WEBSOCKET_CLOSED: null,
+
+    REDIRECT_LOCATION_REQUEST: null,
+    REDIRECT_LOCATION_SUCCESS: null,
+    REDIRECT_LOCATION_FAILURE: null,
 });

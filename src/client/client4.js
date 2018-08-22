@@ -250,6 +250,10 @@ export default class Client4 {
         return `${this.getBaseRoute()}/schemes`;
     }
 
+    getRedirectLocationRoute() {
+        return `${this.getBaseRoute()}/redirect_location`;
+    }
+
     getOptions(options) {
         const newOptions = Object.assign({}, options);
 
@@ -2390,6 +2394,16 @@ export default class Client4 {
             `${this.getPluginRoute(pluginId)}/disable`,
             {method: 'post'}
         );
+    };
+
+    // Redirect Location
+
+    getRedirectLocation = async (urlParam) => {
+        if (!urlParam.length) {
+            return Promise.resolve();
+        }
+        const url = `${this.getRedirectLocationRoute()}${buildQueryString({url: urlParam})}`;
+        return this.doFetch(url, {method: 'get'});
     };
 
     // Client Helpers
