@@ -542,14 +542,12 @@ describe('Selectors.Channels', () => {
         const fromModifiedState = Selectors.getSortedUnreadChannelIds(modifiedState);
         const fromMentionState = Selectors.getSortedUnreadChannelIds(mentionState);
 
+        // mentions should not be prioritized to the top
         assert.ok(fromOriginalState === fromModifiedState);
-        assert.ok(fromMentionState !== fromModifiedState);
-
-        // Channel 2 with display_name 'DEF' is above all others
-        assert.ok(fromModifiedState[0] === channel2.id);
+        assert.ok(fromMentionState === fromModifiedState);
 
         // Channel 8 with display_name 'ABC' is above all others
-        assert.ok(fromMentionState[0] === channel8.id);
+        assert.ok(fromMentionState[0] !== channel8.id);
     });
 
     it('get sorted unread channels with muted and last read states', () => {
