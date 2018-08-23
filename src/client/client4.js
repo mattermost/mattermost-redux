@@ -1488,10 +1488,10 @@ export default class Client4 {
         );
     };
 
-    doPostAction = async (postId, actionId) => {
+    doPostAction = async (postId, actionId, selectedOption = '') => {
         return this.doFetch(
             `${this.getPostRoute(postId)}/actions/${encodeURIComponent(actionId)}`,
-            {method: 'post'}
+            {method: 'post', body: JSON.stringify({selected_option: selectedOption})}
         );
     };
 

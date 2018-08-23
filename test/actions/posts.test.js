@@ -1620,7 +1620,7 @@ describe('Actions.Posts', () => {
             post('/posts/posth67ja7ntdkek6g13dp3wka/actions/action7ja7ntdkek6g13dp3wka').
             reply(200, {});
 
-        await Actions.doPostAction('posth67ja7ntdkek6g13dp3wka', 'action7ja7ntdkek6g13dp3wka')(store.dispatch, store.getState);
+        await Actions.doPostAction('posth67ja7ntdkek6g13dp3wka', 'action7ja7ntdkek6g13dp3wka', 'option')(store.dispatch, store.getState);
 
         const state = store.getState();
         const request = state.requests.posts.doPostAction;
