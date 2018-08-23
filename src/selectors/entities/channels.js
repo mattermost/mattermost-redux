@@ -949,14 +949,23 @@ export const getAllChannelIds = createIdsSelector(
     getCurrentUser,
     getMyChannelMemberships,
     getLastPostPerChannel,
-    (state, lastUnreadChannel, sorting = 'alpha') => sorting,
+    (state, lastUnreadChannel, unreadsAtTop, favoritesAtTop, sorting = 'alpha') => sorting,
     mapAndSortChannelIds,
 );
 
-export const getOrderedChannelIds = (state, lastUnreadChannel, grouping, sorting, unreadsAtTop, favoritesAtTop) => {
-    if (grouping === 'by_type') {
-        const channels = [];
+export const getAllSortedChannelIds = createIdsSelector(
+    getUnreadChannelIds,
+    getFavoritesPreferences,
+    getAllChannelIds,
+    (state, lastUnreadChannel, unreadsAtTop = true) => unreadsAtTop,
+    (state, lastUnreadChannel, unreadsAtTop, favoritesAtTop = true) => favoritesAtTop,
+    filterChannels,
+);
 
+export const getOrderedChannelIds = (state, lastUnreadChannel, grouping, sorting, unreadsAtTop, favoritesAtTop) => {
+    const channels = [];
+
+    if (grouping === 'by_type') {
         channels.push({
             type: 'public',
             name: 'PUBLIC CHANNELS',
@@ -992,51 +1001,57 @@ export const getOrderedChannelIds = (state, lastUnreadChannel, grouping, sorting
                 sorting,
             ),
         });
-
-        if (favoritesAtTop) {
-            channels.unshift({
-                type: 'favorite',
-                name: 'FAVORITE CHANNELS',
-                items: getSortedFavoriteChannelIds(
-                    state,
-                    lastUnreadChannel,
-                    unreadsAtTop,
-                    favoritesAtTop,
-                    sorting,
-                ),
-            });
+    } else {
+        // Combine all channel types
+        let type = 'alpha';
+        let name = 'CHANNELS';
+        if (sorting === 'recent') {
+            type = 'recent';
+            name = 'RECENT ACTIVITY';
         }
 
-        if (unreadsAtTop) {
-            channels.unshift({
-                type: 'unreads',
-                name: 'UNREADS',
-                items: getSortedUnreadChannelIds(
-                    state,
-                    lastUnreadChannel,
-                    unreadsAtTop,
-                    favoritesAtTop,
-                    sorting,
-                ),
-            });
-        }
-
-        return channels;
+        channels.push({
+            type,
+            name,
+            items: getAllSortedChannelIds(
+                state,
+                lastUnreadChannel,
+                unreadsAtTop,
+                favoritesAtTop,
+                sorting,
+            ),
+        });
     }
 
-    // Combine all channel types
-    let type = 'alpha';
-    let name = 'CHANNELS';
-    if (sorting === 'recent') {
-        type = 'recent';
-        name = 'RECENT ACTIVITY';
+    if (favoritesAtTop) {
+        channels.unshift({
+            type: 'favorite',
+            name: 'FAVORITE CHANNELS',
+            items: getSortedFavoriteChannelIds(
+                state,
+                lastUnreadChannel,
+                unreadsAtTop,
+                favoritesAtTop,
+                sorting,
+            ),
+        });
     }
 
-    return [{
-        type,
-        name,
-        items: getAllChannelIds(state, lastUnreadChannel, sorting),
-    }];
+    if (unreadsAtTop) {
+        channels.unshift({
+            type: 'unreads',
+            name: 'UNREADS',
+            items: getSortedUnreadChannelIds(
+                state,
+                lastUnreadChannel,
+                unreadsAtTop,
+                favoritesAtTop,
+                sorting,
+            ),
+        });
+    }
+
+    return channels;
 };
 
 // Added for backwards compatibility
