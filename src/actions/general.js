@@ -156,7 +156,7 @@ export function setServerVersion(serverVersion: string): ActionFunc {
     };
 }
 
-export function setStoreFromLocalData(data: {token: string, url: string}): ActionFunc {
+export function setStoreFromLocalData(data: { token: string, url: string }): ActionFunc {
     return async (dispatch: DispatchFunc, getState) => {
         Client4.setToken(data.token);
         Client4.setUrl(data.url);
@@ -179,6 +179,24 @@ export function setUrl(url: string) {
     return true;
 }
 
+export function getRedirectLocation(url: string): ActionFunc {
+    return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
+        dispatch({type: GeneralTypes.REDIRECT_LOCATION_REQUEST, data: {}}, getState);
+
+        let data: GenericClientResponse;
+        try {
+            data = await Client4.getRedirectLocation(url);
+        } catch (error) {
+            forceLogoutIfNecessary(error, dispatch, getState);
+            dispatch({type: GeneralTypes.REDIRECT_LOCATION_FAILURE, data: error}, getState);
+            return {error};
+        }
+
+        dispatch({type: GeneralTypes.REDIRECT_LOCATION_SUCCESS, data}, getState);
+        return {data};
+    };
+}
+
 export default {
     getPing,
     getClientConfig,
@@ -191,4 +209,5 @@ export default {
     setServerVersion,
     setStoreFromLocalData,
     setUrl,
+    getRedirectLocation,
 };
