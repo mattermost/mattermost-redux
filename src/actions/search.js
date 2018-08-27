@@ -77,7 +77,7 @@ export function searchPostsWithParams(teamId, params, includeDeletedChannels = f
 }
 
 export function searchPosts(teamId, terms, isOrSearch, includeDeletedChannels) {
-    return searchPostsWithparams(teamId, {terms, is_or_search: isOrSearch}, includeDeletedChannels);
+    return searchPostsWithParams(teamId, {terms, is_or_search: isOrSearch}, includeDeletedChannels);
 }
 
 export function clearSearch() {
