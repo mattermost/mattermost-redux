@@ -34,13 +34,13 @@ function getMissingChannelsFromPosts(posts) {
     };
 }
 
-export function searchPosts(teamId, terms, isOrSearch = false, includeDeletedChannels = false) {
+export function searchPostsWithParams(teamId, params, includeDeletedChannels = false) {
     return async (dispatch, getState) => {
         dispatch({type: SearchTypes.SEARCH_POSTS_REQUEST}, getState);
 
         let posts;
         try {
-            posts = await Client4.searchPosts(teamId, terms, isOrSearch, includeDeletedChannels);
+            posts = await Client4.searchPostsWithParams(teamId, params, includeDeletedChannels);
 
             await Promise.all([
                 getProfilesAndStatusesForPosts(posts.posts, dispatch, getState),
@@ -64,8 +64,8 @@ export function searchPosts(teamId, terms, isOrSearch = false, includeDeletedCha
                 type: SearchTypes.RECEIVED_SEARCH_TERM,
                 data: {
                     teamId,
-                    terms,
-                    isOrSearch,
+                    terms: params.terms,
+                    isOrSearch: params.is_or_search,
                 },
             },
             {
@@ -75,6 +75,10 @@ export function searchPosts(teamId, terms, isOrSearch = false, includeDeletedCha
 
         return {data: posts};
     };
+}
+
+export function searchPosts(teamId, terms, isOrSearch, includeDeletedChannels) {
+    return searchPostsWithParams(teamId, {terms, is_or_search: isOrSearch}, includeDeletedChannels);
 }
 
 export function clearSearch() {
