@@ -1486,7 +1486,7 @@ export default class Client4 {
     };
 
     searchPosts = async (teamId, terms, isOrSearch, includeDeletedChannels = false) => {
-        this.searchPostsWithParams(teamId, {terms, is_or_search: isOrSearch}, includeDeletedChannels);
+        return this.searchPostsWithParams(teamId, {terms, is_or_search: isOrSearch}, includeDeletedChannels);
     };
 
     getOpenGraphMetadata = async (url) => {

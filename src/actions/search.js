@@ -64,7 +64,8 @@ export function searchPostsWithParams(teamId, params, includeDeletedChannels = f
                 type: SearchTypes.RECEIVED_SEARCH_TERM,
                 data: {
                     teamId,
-                    params,
+                    terms: params.terms,
+                    isOrSearch: params.is_or_search,
                 },
             },
             {
