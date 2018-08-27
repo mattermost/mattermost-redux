@@ -49,6 +49,10 @@ export function getUserSessions(state) {
     return state.entities.users.mySessions;
 }
 
+export function getUserAudits(state) {
+    return state.entities.users.myAudits;
+}
+
 export function getUser(state, id) {
     return state.entities.users.profiles[id];
 }
