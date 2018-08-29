@@ -1920,4 +1920,26 @@ describe('Actions.Channels', () => {
         assert.equal(update2.scheme_admin, false);
         assert.equal(update2.scheme_user, false);
     });
+
+    it('markGroupChannelOpen', async () => {
+        const channelId = TestHelper.generateId();
+        const now = new Date().getTime();
+
+        nock(Client4.getUsersRoute()).
+            put(`/${TestHelper.basicUser.id}/preferences`).
+            reply(200, OK_RESPONSE);
+
+        await Actions.markGroupChannelOpen(channelId)(store.dispatch, store.getState);
+
+        const state = store.getState();
+        let prefKey = getPreferenceKey(Preferences.CATEGORY_GROUP_CHANNEL_SHOW, channelId);
+        let preference = state.entities.preferences.myPreferences[prefKey];
+        assert.ok(preference);
+        assert.ok(preference.value === 'true');
+
+        prefKey = getPreferenceKey(Preferences.CATEGORY_CHANNEL_OPEN_TIME, channelId);
+        preference = state.entities.preferences.myPreferences[prefKey];
+        assert.ok(preference);
+        assert.ok(parseInt(preference.value, 10) >= now);
+    });
 });
