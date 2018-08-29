@@ -237,6 +237,7 @@ class TestHelper {
             status: 'offline',
             teammate_id: `${otherUserId}`,
             id: this.generateId(),
+            delete_at: 0,
         };
     }
 

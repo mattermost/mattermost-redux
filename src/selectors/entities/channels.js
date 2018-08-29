@@ -549,6 +549,11 @@ export const getSortedFavoriteChannelWithUnreadsIds = createIdsSelector(
                 return false;
             }
 
+            // Deleted users from CLI will not have a profiles entry
+            if (channel.type === General.DM_CHANNEL && !profiles[otherUserId]) {
+                return false;
+            }
+
             if (channel.type === General.DM_CHANNEL && !isDirectChannelVisible(profiles[otherUserId] || otherUserId, config, prefs, channel, null, null, currentChannelId)) {
                 return false;
             } else if (channel.type === General.GM_CHANNEL && !isGroupChannelVisible(config, prefs, channel)) {
