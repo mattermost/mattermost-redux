@@ -136,7 +136,7 @@ export function getCustomEmojis(
 
             dispatch(batchActions([
                 {type: EmojiTypes.GET_CUSTOM_EMOJIS_FAILURE, error},
-                logError(error)(dispatch),
+                logError(error),
             ]), getState);
             return {error};
         }
@@ -198,7 +198,7 @@ export function getAllCustomEmojis(perPage: number = General.PAGE_SIZE_MAXIMUM):
 
                 dispatch(batchActions([
                     {type: EmojiTypes.GET_ALL_CUSTOM_EMOJIS_FAILURE, error},
-                    logError(error)(dispatch),
+                    logError(error),
                 ]), getState);
                 return {error: true};
             }
@@ -227,7 +227,7 @@ export function deleteCustomEmoji(emojiId: string): ActionFunc {
 
             dispatch(batchActions([
                 {type: EmojiTypes.DELETE_CUSTOM_EMOJI_FAILURE, error},
-                logError(error)(dispatch),
+                logError(error),
             ]), getState);
             return {error};
         }
@@ -263,7 +263,7 @@ export function searchCustomEmojis(term: string, options: Object = {}): ActionFu
 
             dispatch(batchActions([
                 {type: EmojiTypes.GET_CUSTOM_EMOJIS_FAILURE, error},
-                logError(error)(dispatch),
+                logError(error),
             ]), getState);
             return {error};
         }
@@ -299,7 +299,7 @@ export function autocompleteCustomEmojis(name: string): ActionFunc {
 
             dispatch(batchActions([
                 {type: EmojiTypes.GET_CUSTOM_EMOJIS_FAILURE, error},
-                logError(error)(dispatch),
+                logError(error),
             ]), getState);
             return {error};
         }
