@@ -121,7 +121,7 @@ export function createTeam(team) {
             forceLogoutIfNecessary(error, dispatch, getState);
             dispatch(batchActions([
                 {type: TeamTypes.CREATE_TEAM_FAILURE, error},
-                logError(error)(dispatch),
+                logError(error),
             ]), getState);
             return {error};
         }
@@ -168,7 +168,7 @@ export function deleteTeam(teamId) {
             forceLogoutIfNecessary(error, dispatch, getState);
             dispatch(batchActions([
                 {type: TeamTypes.DELETE_TEAM_FAILURE, error},
-                logError(error)(dispatch),
+                logError(error),
             ]), getState);
             return {error};
         }
@@ -259,7 +259,7 @@ export function getTeamMember(teamId, userId) {
             forceLogoutIfNecessary(error, dispatch, getState);
             dispatch(batchActions([
                 {type: TeamTypes.TEAM_MEMBERS_FAILURE, error},
-                logError(error)(dispatch),
+                logError(error),
             ]), getState);
             return {error};
         }
@@ -293,7 +293,7 @@ export function getTeamMembersByIds(teamId, userIds) {
             forceLogoutIfNecessary(error, dispatch, getState);
             dispatch(batchActions([
                 {type: TeamTypes.TEAM_MEMBERS_FAILURE, error},
-                logError(error)(dispatch),
+                logError(error),
             ]), getState);
             return {error};
         }
@@ -353,7 +353,7 @@ export function addUserToTeam(teamId, userId) {
             forceLogoutIfNecessary(error, dispatch, getState);
             dispatch(batchActions([
                 {type: TeamTypes.ADD_TEAM_MEMBER_FAILURE, error},
-                logError(error)(dispatch),
+                logError(error),
             ]), getState);
             return {error};
         }
@@ -387,7 +387,7 @@ export function addUsersToTeam(teamId, userIds) {
             forceLogoutIfNecessary(error, dispatch, getState);
             dispatch(batchActions([
                 {type: TeamTypes.ADD_TEAM_MEMBER_FAILURE, error},
-                logError(error)(dispatch),
+                logError(error),
             ]), getState);
             return {error};
         }
@@ -424,7 +424,7 @@ export function removeUserFromTeam(teamId, userId) {
             forceLogoutIfNecessary(error, dispatch, getState);
             dispatch(batchActions([
                 {type: TeamTypes.REMOVE_TEAM_MEMBER_FAILURE, error},
-                logError(error)(dispatch),
+                logError(error),
             ]), getState);
             return {error};
         }
@@ -481,7 +481,7 @@ export function updateTeamMemberRoles(teamId, userId, roles) {
             forceLogoutIfNecessary(error, dispatch, getState);
             dispatch(batchActions([
                 {type: TeamTypes.UPDATE_TEAM_MEMBER_FAILURE, error},
-                logError(error)(dispatch),
+                logError(error),
             ]), getState);
             return {error};
         }
@@ -530,7 +530,7 @@ export function checkIfTeamExists(teamName) {
             forceLogoutIfNecessary(error, dispatch, getState);
             dispatch(batchActions([
                 {type: TeamTypes.GET_TEAM_FAILURE, error},
-                logError(error)(dispatch),
+                logError(error),
             ]));
             return {error};
         }
@@ -551,7 +551,7 @@ export function joinTeam(inviteId, teamId) {
             forceLogoutIfNecessary(error, dispatch, getState);
             dispatch(batchActions([
                 {type: TeamTypes.JOIN_TEAM_FAILURE, error},
-                logError(error)(dispatch),
+                logError(error),
             ]), getState);
             return {error};
         }

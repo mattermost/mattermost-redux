@@ -55,7 +55,7 @@ export function deleteScheme(schemeId: string): ActionFunc {
             forceLogoutIfNecessary(error, dispatch, getState);
             dispatch(batchActions([
                 {type: SchemeTypes.DELETE_SCHEME_FAILURE, error},
-                logError(error)(dispatch),
+                logError(error),
             ]), getState);
             return {error};
         }

@@ -42,7 +42,7 @@ export function checkMfa(loginId) {
         } catch (error) {
             dispatch(batchActions([
                 {type: UserTypes.CHECK_MFA_FAILURE, error},
-                logError(error)(dispatch),
+                logError(error),
             ]), getState);
             return {error};
         }
@@ -73,7 +73,7 @@ export function createUser(user, token, inviteId) {
                     type: UserTypes.CREATE_USER_FAILURE,
                     error,
                 },
-                logError(error)(dispatch),
+                logError(error),
             ]), getState);
             return {error};
         }
@@ -101,7 +101,7 @@ export function login(loginId, password, mfaToken = '', ldapOnly = false) {
                     type: UserTypes.LOGIN_FAILURE,
                     error,
                 },
-                logError(error)(dispatch),
+                logError(error),
             ]), getState);
             return {error};
         }
@@ -125,7 +125,7 @@ export function loginById(id, password, mfaToken = '') {
                     type: UserTypes.LOGIN_FAILURE,
                     error,
                 },
-                logError(error)(dispatch),
+                logError(error),
             ]), getState);
             return {error};
         }
@@ -162,7 +162,7 @@ function completeLogin(data) {
         } catch (error) {
             dispatch(batchActions([
                 {type: UserTypes.LOGIN_FAILURE, error},
-                logError(error)(dispatch),
+                logError(error),
             ]), getState);
             return {error};
         }
@@ -183,7 +183,7 @@ function completeLogin(data) {
         } catch (error) {
             dispatch(batchActions([
                 {type: UserTypes.LOGIN_FAILURE, error},
-                logError(error)(dispatch),
+                logError(error),
             ]));
             return {error};
         }
@@ -284,7 +284,7 @@ export function getProfiles(page = 0, perPage = General.PROFILE_CHUNK_SIZE) {
             forceLogoutIfNecessary(error, dispatch, getState);
             dispatch(batchActions([
                 {type: UserTypes.PROFILES_FAILURE, error},
-                logError(error)(dispatch),
+                logError(error),
             ]), getState);
             return {error};
         }
@@ -361,7 +361,7 @@ export function getProfilesByIds(userIds) {
             forceLogoutIfNecessary(error, dispatch, getState);
             dispatch(batchActions([
                 {type: UserTypes.PROFILES_FAILURE, error},
-                logError(error)(dispatch),
+                logError(error),
             ]), getState);
             return {error};
         }
@@ -394,7 +394,7 @@ export function getProfilesByUsernames(usernames) {
             forceLogoutIfNecessary(error, dispatch, getState);
             dispatch(batchActions([
                 {type: UserTypes.PROFILES_FAILURE, error},
-                logError(error)(dispatch),
+                logError(error),
             ]), getState);
             return {error};
         }
@@ -426,7 +426,7 @@ export function getProfilesInTeam(teamId, page, perPage = General.PROFILE_CHUNK_
             forceLogoutIfNecessary(error, dispatch, getState);
             dispatch(batchActions([
                 {type: UserTypes.PROFILES_IN_TEAM_FAILURE, error},
-                logError(error)(dispatch),
+                logError(error),
             ]), getState);
             return {error};
         }
@@ -461,7 +461,7 @@ export function getProfilesNotInTeam(teamId, page, perPage = General.PROFILE_CHU
             forceLogoutIfNecessary(error, dispatch, getState);
             dispatch(batchActions([
                 {type: UserTypes.PROFILES_NOT_IN_TEAM_FAILURE, error},
-                logError(error)(dispatch),
+                logError(error),
             ]), getState);
             return {error};
         }
@@ -496,7 +496,7 @@ export function getProfilesWithoutTeam(page, perPage = General.PROFILE_CHUNK_SIZ
             forceLogoutIfNecessary(error, dispatch, getState);
             dispatch(batchActions([
                 {type: UserTypes.PROFILES_WITHOUT_TEAM_FAILURE, error},
-                logError(error)(dispatch),
+                logError(error),
             ]), getState);
             return {error};
         }
@@ -532,7 +532,7 @@ export function getProfilesInChannel(channelId, page, perPage = General.PROFILE_
             forceLogoutIfNecessary(error, dispatch, getState);
             dispatch(batchActions([
                 {type: UserTypes.PROFILES_IN_CHANNEL_FAILURE, error},
-                logError(error)(dispatch),
+                logError(error),
             ]), getState);
             return {error};
         }
@@ -569,7 +569,7 @@ export function getProfilesNotInChannel(teamId, channelId, page, perPage = Gener
             forceLogoutIfNecessary(error, dispatch, getState);
             dispatch(batchActions([
                 {type: UserTypes.PROFILES_NOT_IN_CHANNEL_FAILURE, error},
-                logError(error)(dispatch),
+                logError(error),
             ]), getState);
             return {error};
         }
@@ -687,7 +687,7 @@ export function setStatus(status) {
             forceLogoutIfNecessary(error, dispatch, getState);
             dispatch(batchActions([
                 {type: UserTypes.SET_STATUS_FAILURE, error},
-                logError(error)(dispatch),
+                logError(error),
             ]), getState);
             return {error};
         }
@@ -726,7 +726,7 @@ export function revokeSession(userId, sessionId) {
             forceLogoutIfNecessary(error, dispatch, getState);
             dispatch(batchActions([
                 {type: UserTypes.REVOKE_SESSION_FAILURE, error},
-                logError(error)(dispatch),
+                logError(error),
             ]), getState);
             return {error};
         }
@@ -755,7 +755,7 @@ export function revokeAllSessionsForUser(userId) {
             forceLogoutIfNecessary(error, dispatch, getState);
             dispatch(batchActions([
                 {type: UserTypes.REVOKE_ALL_USER_SESSIONS_FAILURE, error},
-                logError(error)(dispatch),
+                logError(error),
             ]), getState);
             return {error};
         }
@@ -829,7 +829,7 @@ export function autocompleteUsers(term, teamId = '', channelId = '') {
             forceLogoutIfNecessary(error, dispatch, getState);
             dispatch(batchActions([
                 {type: UserTypes.AUTOCOMPLETE_USERS_FAILURE, error},
-                logError(error)(dispatch),
+                logError(error),
             ]), getState);
             return {error};
         }
@@ -896,7 +896,7 @@ export function searchProfiles(term, options = {}) {
             forceLogoutIfNecessary(error, dispatch, getState);
             dispatch(batchActions([
                 {type: UserTypes.SEARCH_PROFILES_FAILURE, error},
-                logError(error)(dispatch),
+                logError(error),
             ]), getState);
             return {error};
         }
@@ -1261,7 +1261,7 @@ export function createUserAccessToken(userId, description) {
             forceLogoutIfNecessary(error, dispatch, getState);
             dispatch(batchActions([
                 {type: UserTypes.CREATE_USER_ACCESS_TOKEN_FAILURE, error},
-                logError(error)(dispatch),
+                logError(error),
             ]), getState);
             return {error};
         }
@@ -1303,7 +1303,7 @@ export function getUserAccessToken(tokenId) {
             forceLogoutIfNecessary(error, dispatch, getState);
             dispatch(batchActions([
                 {type: UserTypes.GET_USER_ACCESS_TOKEN_FAILURE, error},
-                logError(error)(dispatch),
+                logError(error),
             ]), getState);
             return {error};
         }
@@ -1344,7 +1344,7 @@ export function getUserAccessTokens(page = 0, perPage = General.PROFILE_CHUNK_SI
             forceLogoutIfNecessary(error, dispatch, getState);
             dispatch(batchActions([
                 {type: UserTypes.GET_USER_ACCESS_TOKEN_FAILURE, error},
-                logError(error)(dispatch),
+                logError(error),
             ]), getState);
             return {error};
         }
@@ -1376,7 +1376,7 @@ export function getUserAccessTokensForUser(userId, page = 0, perPage = General.P
             forceLogoutIfNecessary(error, dispatch, getState);
             dispatch(batchActions([
                 {type: UserTypes.GET_USER_ACCESS_TOKEN_FAILURE, error},
-                logError(error)(dispatch),
+                logError(error),
             ]), getState);
             return {error};
         }
@@ -1418,7 +1418,7 @@ export function revokeUserAccessToken(tokenId) {
             forceLogoutIfNecessary(error, dispatch, getState);
             dispatch(batchActions([
                 {type: UserTypes.REVOKE_USER_ACCESS_TOKEN_FAILURE, error},
-                logError(error)(dispatch),
+                logError(error),
             ]), getState);
             return {error};
         }
@@ -1447,7 +1447,7 @@ export function disableUserAccessToken(tokenId) {
             forceLogoutIfNecessary(error, dispatch, getState);
             dispatch(batchActions([
                 {type: UserTypes.DISABLE_USER_ACCESS_TOKEN_FAILURE, error},
-                logError(error)(dispatch),
+                logError(error),
             ]), getState);
             return {error};
         }
@@ -1476,7 +1476,7 @@ export function enableUserAccessToken(tokenId) {
             forceLogoutIfNecessary(error, dispatch, getState);
             dispatch(batchActions([
                 {type: UserTypes.ENABLE_USER_ACCESS_TOKEN_FAILURE, error},
-                logError(error)(dispatch),
+                logError(error),
             ]), getState);
             return {error};
         }

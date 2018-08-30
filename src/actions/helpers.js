@@ -74,7 +74,7 @@ export function bindClientFunc(clientFunc: () => Promise<mixed>, request: Action
             forceLogoutIfNecessary(error, dispatch, getState);
             dispatch(batchActions([
                 requestFailure(failure, error),
-                logError(error)(dispatch),
+                logError(error),
             ]), getState);
             return {error};
         }

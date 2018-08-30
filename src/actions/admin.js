@@ -294,7 +294,7 @@ export function getAnalytics(name: string, teamId: string = ''): ActionFunc {
             forceLogoutIfNecessary(error, dispatch, getState);
             dispatch(batchActions([
                 {type: AdminTypes.GET_ANALYTICS_FAILURE, error},
-                logError(error)(dispatch),
+                logError(error),
             ]), getState);
             return {error};
         }
@@ -339,7 +339,7 @@ export function uploadPlugin(fileData: File): ActionFunc {
             forceLogoutIfNecessary(error, dispatch, getState);
             dispatch(batchActions([
                 {type: AdminTypes.UPLOAD_PLUGIN_FAILURE, error},
-                logError(error)(dispatch),
+                logError(error),
             ]));
             return {error};
         }
@@ -381,7 +381,7 @@ export function removePlugin(pluginId: string): ActionFunc {
             forceLogoutIfNecessary(error, dispatch, getState);
             dispatch(batchActions([
                 {type: AdminTypes.REMOVE_PLUGIN_FAILURE, error, data: pluginId},
-                logError(error)(dispatch),
+                logError(error),
             ]));
             return {error};
         }
@@ -404,7 +404,7 @@ export function enablePlugin(pluginId: string): ActionFunc {
             forceLogoutIfNecessary(error, dispatch, getState);
             dispatch(batchActions([
                 {type: AdminTypes.ENABLE_PLUGIN_FAILURE, error, data: pluginId},
-                logError(error)(dispatch),
+                logError(error),
             ]));
             return {error};
         }
@@ -428,7 +428,7 @@ export function disablePlugin(pluginId: string): ActionFunc {
             forceLogoutIfNecessary(error, dispatch, getState);
             dispatch(batchActions([
                 {type: AdminTypes.DISABLE_PLUGIN_FAILURE, error, data: pluginId},
-                logError(error)(dispatch),
+                logError(error),
             ]));
             return {error};
         }

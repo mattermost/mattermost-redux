@@ -53,7 +53,7 @@ export function removeIncomingHook(hookId) {
 
             dispatch(batchActions([
                 {type: IntegrationTypes.DELETE_INCOMING_HOOK_FAILURE, error},
-                logError(error)(dispatch),
+                logError(error),
             ]), getState);
             return {error};
         }
@@ -126,7 +126,7 @@ export function removeOutgoingHook(hookId) {
 
             dispatch(batchActions([
                 {type: IntegrationTypes.DELETE_OUTGOING_HOOK_FAILURE, error},
-                logError(error)(dispatch),
+                logError(error),
             ]), getState);
             return {error};
         }
@@ -240,7 +240,7 @@ export function regenCommandToken(id) {
 
             dispatch(batchActions([
                 {type: IntegrationTypes.REGEN_COMMAND_TOKEN_FAILURE, error},
-                logError(error)(dispatch),
+                logError(error),
             ]), getState);
             return {error};
         }
@@ -273,7 +273,7 @@ export function deleteCommand(id) {
 
             dispatch(batchActions([
                 {type: IntegrationTypes.DELETE_COMMAND_FAILURE, error},
-                logError(error)(dispatch),
+                logError(error),
             ]), getState);
             return {error};
         }
@@ -344,7 +344,7 @@ export function deleteOAuthApp(id) {
 
             dispatch(batchActions([
                 {type: IntegrationTypes.DELETE_OAUTH_APP_FAILURE, error},
-                logError(error)(dispatch),
+                logError(error),
             ]), getState);
             return {error};
         }

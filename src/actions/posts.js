@@ -32,7 +32,7 @@ export function getPost(postId) {
             forceLogoutIfNecessary(error, dispatch, getState);
             dispatch(batchActions([
                 {type: PostTypes.GET_POSTS_FAILURE, error},
-                logError(error)(dispatch),
+                logError(error),
             ]), getState);
             return {error};
         }
@@ -208,7 +208,7 @@ export function createPostImmediately(post, files = []) {
             dispatch(batchActions([
                 {type: PostTypes.CREATE_POST_FAILURE, error},
                 {type: PostTypes.REMOVE_PENDING_POST, data: {id: pendingPostId, channel_id: newPost.channel_id}},
-                logError(error)(dispatch),
+                logError(error),
             ]), getState);
             return {error};
         }
@@ -304,7 +304,7 @@ export function pinPost(postId) {
             forceLogoutIfNecessary(error, dispatch, getState);
             dispatch(batchActions([
                 {type: PostTypes.EDIT_POST_FAILURE, error},
-                logError(error)(dispatch),
+                logError(error),
             ]), getState);
             return {error};
         }
@@ -342,7 +342,7 @@ export function unpinPost(postId) {
             forceLogoutIfNecessary(error, dispatch, getState);
             dispatch(batchActions([
                 {type: PostTypes.EDIT_POST_FAILURE, error},
-                logError(error)(dispatch),
+                logError(error),
             ]), getState);
             return {error};
         }
@@ -382,7 +382,7 @@ export function addReaction(postId, emojiName) {
             forceLogoutIfNecessary(error, dispatch, getState);
             dispatch(batchActions([
                 {type: PostTypes.REACTION_FAILURE, error},
-                logError(error)(dispatch),
+                logError(error),
             ]), getState);
             return {error};
         }
@@ -413,7 +413,7 @@ export function removeReaction(postId, emojiName) {
             forceLogoutIfNecessary(error, dispatch, getState);
             dispatch(batchActions([
                 {type: PostTypes.REACTION_FAILURE, error},
-                logError(error)(dispatch),
+                logError(error),
             ]), getState);
             return {error};
         }
@@ -464,7 +464,7 @@ export function getReactionsForPost(postId) {
             forceLogoutIfNecessary(error, dispatch, getState);
             dispatch(batchActions([
                 {type: PostTypes.REACTION_FAILURE, error},
-                logError(error)(dispatch),
+                logError(error),
             ]), getState);
             return {error};
         }
@@ -541,7 +541,7 @@ export function getPostThread(postId, skipAddToChannel = true) {
             forceLogoutIfNecessary(error, dispatch, getState);
             dispatch(batchActions([
                 {type: PostTypes.GET_POST_THREAD_FAILURE, error},
-                logError(error)(dispatch),
+                logError(error),
             ]), getState);
             return {error};
         }
@@ -604,7 +604,7 @@ export function getPostThreadWithRetry(postId) {
                         forceLogoutIfNecessary(error, dispatch, getState);
                         dispatch(batchActions([
                             {type: PostTypes.GET_POST_THREAD_FAILURE, error},
-                            logError(error)(dispatch),
+                            logError(error),
                         ]), getState);
                     },
                 },
@@ -627,7 +627,7 @@ export function getPosts(channelId, page = 0, perPage = Posts.POST_CHUNK_SIZE) {
             forceLogoutIfNecessary(error, dispatch, getState);
             dispatch(batchActions([
                 {type: PostTypes.GET_POSTS_FAILURE, error},
-                logError(error)(dispatch),
+                logError(error),
             ]), getState);
             return {error};
         }
@@ -685,7 +685,7 @@ export function getPostsWithRetry(channelId, page = 0, perPage = Posts.POST_CHUN
                         forceLogoutIfNecessary(error, dispatch, getState);
                         dispatch(batchActions([
                             {type: PostTypes.GET_POSTS_FAILURE, error},
-                            logError(error)(dispatch),
+                            logError(error),
                         ]), getState);
                     },
                 },
@@ -708,7 +708,7 @@ export function getPostsSince(channelId, since) {
             forceLogoutIfNecessary(error, dispatch, getState);
             dispatch(batchActions([
                 {type: PostTypes.GET_POSTS_SINCE_FAILURE, error},
-                logError(error)(dispatch),
+                logError(error),
             ]), getState);
             return {error};
         }
@@ -764,7 +764,7 @@ export function getPostsSinceWithRetry(channelId, since) {
                         forceLogoutIfNecessary(error, dispatch, getState);
                         dispatch(batchActions([
                             {type: PostTypes.GET_POSTS_SINCE_FAILURE, error},
-                            logError(error)(dispatch),
+                            logError(error),
                         ]), getState);
                     },
                 },
@@ -787,7 +787,7 @@ export function getPostsBefore(channelId, postId, page = 0, perPage = Posts.POST
             forceLogoutIfNecessary(error, dispatch, getState);
             dispatch(batchActions([
                 {type: PostTypes.GET_POSTS_BEFORE_FAILURE, error},
-                logError(error)(dispatch),
+                logError(error),
             ]), getState);
             return {error};
         }
@@ -845,7 +845,7 @@ export function getPostsBeforeWithRetry(channelId, postId, page = 0, perPage = P
                         forceLogoutIfNecessary(error, dispatch, getState);
                         dispatch(batchActions([
                             {type: PostTypes.GET_POSTS_BEFORE_FAILURE, error},
-                            logError(error)(dispatch),
+                            logError(error),
                         ]), getState);
                     },
                 },
@@ -868,7 +868,7 @@ export function getPostsAfter(channelId, postId, page = 0, perPage = Posts.POST_
             forceLogoutIfNecessary(error, dispatch, getState);
             dispatch(batchActions([
                 {type: PostTypes.GET_POSTS_AFTER_FAILURE, error},
-                logError(error)(dispatch),
+                logError(error),
             ]), getState);
             return {error};
         }
@@ -926,7 +926,7 @@ export function getPostsAfterWithRetry(channelId, postId, page = 0, perPage = Po
                         forceLogoutIfNecessary(error, dispatch, getState);
                         dispatch(batchActions([
                             {type: PostTypes.GET_POSTS_AFTER_FAILURE, error},
-                            logError(error)(dispatch),
+                            logError(error),
                         ]), getState);
                     },
                 },
@@ -1149,7 +1149,7 @@ export function getOpenGraphMetadata(url) {
             forceLogoutIfNecessary(error, dispatch, getState);
             dispatch(batchActions([
                 {type: PostTypes.OPEN_GRAPH_FAILURE, error},
-                logError(error)(dispatch),
+                logError(error),
             ]), getState);
             return {error};
         }

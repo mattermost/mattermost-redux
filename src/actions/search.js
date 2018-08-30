@@ -50,7 +50,7 @@ export function searchPostsWithParams(teamId, params, includeDeletedChannels = f
             forceLogoutIfNecessary(error, dispatch, getState);
             dispatch(batchActions([
                 {type: SearchTypes.SEARCH_POSTS_FAILURE, error},
-                logError(error)(dispatch),
+                logError(error),
             ]), getState);
             return {error};
         }
@@ -108,7 +108,7 @@ export function getFlaggedPosts() {
             forceLogoutIfNecessary(error, dispatch, getState);
             dispatch(batchActions([
                 {type: SearchTypes.SEARCH_FLAGGED_POSTS_FAILURE, error},
-                logError(error)(dispatch),
+                logError(error),
             ]), getState);
             return {error};
         }
@@ -153,7 +153,7 @@ export function getRecentMentions() {
             forceLogoutIfNecessary(error, dispatch, getState);
             dispatch(batchActions([
                 {type: SearchTypes.SEARCH_RECENT_MENTIONS_FAILURE, error},
-                logError(error)(dispatch),
+                logError(error),
             ]), getState);
             return {error};
         }
