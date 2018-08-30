@@ -130,4 +130,18 @@ describe('Actions.General', () => {
         assert.equal(timezones.length > 0, true);
         assert.equal(timezones.length === 0, false);
     });
+
+    it('getRedirectLocation', async () => {
+        nock(Client4.getBaseRoute()).
+            get('/redirect_location').
+            query(true).
+            reply(200);
+
+        await Actions.getRedirectLocation()(store.dispatch, store.getState);
+
+        const {server} = store.getState().requests.general;
+        if (server.status === RequestStatus.FAILURE) {
+            throw new Error(JSON.stringify(server.error));
+        }
+    });
 });

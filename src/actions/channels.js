@@ -159,6 +159,19 @@ export function createDirectChannel(userId, otherUserId) {
     };
 }
 
+export function markGroupChannelOpen(channelId) {
+    return async (dispatch, getState) => {
+        const {currentUserId} = getState().entities.users;
+
+        const preferences = [
+            {user_id: currentUserId, category: Preferences.CATEGORY_GROUP_CHANNEL_SHOW, name: channelId, value: 'true'},
+            {user_id: currentUserId, category: Preferences.CATEGORY_CHANNEL_OPEN_TIME, name: channelId, value: new Date().getTime().toString()},
+        ];
+
+        dispatch(savePreferences(currentUserId, preferences));
+    };
+}
+
 export function createGroupChannel(userIds) {
     return async (dispatch, getState) => {
         dispatch({type: ChannelTypes.CREATE_CHANNEL_REQUEST}, getState);
@@ -188,12 +201,7 @@ export function createGroupChannel(userIds) {
             last_update_at: created.create_at,
         };
 
-        const preferences = [
-            {user_id: currentUserId, category: Preferences.CATEGORY_GROUP_CHANNEL_SHOW, name: created.id, value: 'true'},
-            {user_id: currentUserId, category: Preferences.CATEGORY_CHANNEL_OPEN_TIME, name: created.id, value: new Date().getTime().toString()},
-        ];
-
-        savePreferences(currentUserId, preferences)(dispatch, getState);
+        dispatch(markGroupChannelOpen(created.id));
 
         const profilesInChannel = userIds.map((id) => {
             return {id};
@@ -208,10 +216,6 @@ export function createGroupChannel(userIds) {
             {
                 type: ChannelTypes.RECEIVED_MY_CHANNEL_MEMBER,
                 data: member,
-            },
-            {
-                type: PreferenceTypes.RECEIVED_PREFERENCES,
-                data: preferences,
             },
             {
                 type: ChannelTypes.CREATE_CHANNEL_SUCCESS,

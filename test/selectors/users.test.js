@@ -52,6 +52,16 @@ describe('Selectors.Users', () => {
         roles: '',
     }];
 
+    const userAudits = [{
+        action: 'test_user_action',
+        create_at: 1535007018934,
+        extra_info: 'success',
+        id: 'test_id',
+        ip_address: '::1',
+        session_id: '',
+        user_id: 'test_user_id',
+    }];
+
     const myPreferences = {};
     myPreferences[`${Preferences.CATEGORY_DIRECT_CHANNEL_SHOW}--${user2.id}`] = {category: Preferences.CATEGORY_DIRECT_CHANNEL_SHOW, name: user2.id, value: 'true'};
     myPreferences[`${Preferences.CATEGORY_DIRECT_CHANNEL_SHOW}--${user3.id}`] = {category: Preferences.CATEGORY_DIRECT_CHANNEL_SHOW, name: user3.id, value: 'false'};
@@ -67,6 +77,7 @@ describe('Selectors.Users', () => {
                 profilesInChannel,
                 profilesNotInChannel,
                 mySessions: userSessions,
+                myAudits: userAudits,
             },
             teams: {
                 currentTeamId: team1.id,
@@ -102,6 +113,10 @@ describe('Selectors.Users', () => {
 
     it('getUserSessions', () => {
         assert.deepEqual(Selectors.getUserSessions(testState), userSessions);
+    });
+
+    it('getUserAudits', () => {
+        assert.deepEqual(Selectors.getUserAudits(testState), userAudits);
     });
 
     it('getUser', () => {
