@@ -1832,6 +1832,22 @@ describe('Actions.Channels', () => {
         assert.deepEqual(result, {data: [TestHelper.basicChannel]});
     });
 
+    it('autocompleteChannelsForSearch', async () => {
+        const prefix = TestHelper.basicChannel.name.slice(0, 5);
+
+        nock(Client4.getTeamRoute(TestHelper.basicChannel.team_id)).
+            get('/channels/search_autocomplete').
+            query({name: prefix}).
+            reply(200, [TestHelper.basicChannel]);
+
+        const result = await Actions.autocompleteChannelsForSearch(
+            TestHelper.basicChannel.team_id,
+            prefix
+        )(store.dispatch, store.getState);
+
+        assert.deepEqual(result, {data: [TestHelper.basicChannel]});
+    });
+
     it('updateChannelScheme', async () => {
         TestHelper.mockLogin();
         await login(TestHelper.basicChannelMember.email, 'password1')(store.dispatch, store.getState);

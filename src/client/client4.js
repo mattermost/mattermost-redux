@@ -1306,6 +1306,13 @@ export default class Client4 {
         );
     };
 
+    autocompleteChannelsForSearch = async (teamId, name) => {
+        return this.doFetch(
+            `${this.getTeamRoute(teamId)}/channels/search_autocomplete${buildQueryString({name})}`,
+            {method: 'get'}
+        );
+    };
+
     searchChannels = async (teamId, term) => {
         return this.doFetch(
             `${this.getTeamRoute(teamId)}/channels/search`,
