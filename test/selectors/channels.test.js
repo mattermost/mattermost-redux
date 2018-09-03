@@ -744,5 +744,57 @@ describe('Selectors.Channels', () => {
                 {...channel13, display_name: profiles.fakeUserId.username},
             ]);
         });
+
+        it('Should not include deleted users in favorites', () => {
+            const newDmChannel = TestHelper.fakeDmChannel(user.id, 'newfakeId');
+            newDmChannel.total_msg_count = 1;
+            newDmChannel.display_name = '';
+            newDmChannel.name = getDirectChannelName(user.id, 'newfakeId');
+
+            const newState = {
+                ...testState,
+                entities: {
+                    ...testState.entities,
+                    channels: {
+                        ...testState.entities.channels,
+                        channels: {
+                            ...testState.entities.channels.channels,
+                            [newDmChannel.id]: newDmChannel,
+                        },
+                        channelsInTeam: {
+                            ...testState.entities.channels.channelsInTeam,
+                            '': [
+                                ...testState.entities.channels.channelsInTeam[''],
+                                newDmChannel.id,
+                            ],
+                        },
+                        myMembers: {
+                            ...testState.entities.channels.myMembers,
+                            [newDmChannel.id]: {channel_id: newDmChannel.id, user_id: user.id, msg_count: 1, mention_count: 0, notifyProps: {}},
+                        },
+                    },
+                    preferences: {
+                        myPreferences: {
+                            ...testState.entities.preferences.myPreferences,
+                            [`${Preferences.CATEGORY_FAVORITE_CHANNEL}--${newDmChannel.id}`]: {
+                                name: newDmChannel.id,
+                                category: Preferences.CATEGORY_FAVORITE_CHANNEL,
+                                value: 'true',
+                            },
+                            [`${Preferences.CATEGORY_DIRECT_CHANNEL_SHOW}--newfakeId`]: {
+                                category: Preferences.CATEGORY_DIRECT_CHANNEL_SHOW,
+                                name: 'newfakeId',
+                                value: 'true',
+                            },
+                        },
+                    },
+                },
+
+            };
+            const fromOriginalState = Selectors.getSortedFavoriteChannelWithUnreadsIds(testState);
+            const fromModifiedState = Selectors.getSortedFavoriteChannelWithUnreadsIds(newState);
+            assert.ok(fromOriginalState.length === 2);
+            assert.ok(fromModifiedState.length === 2);
+        });
     });
 });
