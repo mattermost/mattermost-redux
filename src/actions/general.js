@@ -66,7 +66,7 @@ export function getClientConfig(): ActionFunc {
                     type: GeneralTypes.CLIENT_CONFIG_FAILURE,
                     error,
                 },
-                logError(error)(dispatch),
+                logError(error),
             ]), getState);
             return {error};
         }
@@ -97,7 +97,7 @@ export function getDataRetentionPolicy(): ActionFunc {
                     type: GeneralTypes.DATA_RETENTION_POLICY_FAILURE,
                     error,
                 },
-                logError(error)(dispatch),
+                logError(error),
             ]), getState);
             return {error};
         }

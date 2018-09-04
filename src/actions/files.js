@@ -21,7 +21,7 @@ export function getFilesForPost(postId: string) {
             forceLogoutIfNecessary(error, dispatch, getState);
             dispatch(batchActions([
                 {type: FileTypes.FETCH_FILES_FOR_POST_FAILURE, error},
-                logError(error)(dispatch),
+                logError(error),
             ]), getState);
             return {error};
         }
@@ -73,7 +73,7 @@ export function uploadFile(channelId: string, rootId: string, clientIds: Array<S
                 error,
             };
 
-            dispatch(batchActions([failure, logError(error)(dispatch)]), getState);
+            dispatch(batchActions([failure, logError(error)]), getState);
             return {error};
         }
 
