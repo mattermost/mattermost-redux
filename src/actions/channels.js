@@ -904,7 +904,7 @@ export function autocompleteChannelsForSearch(teamId, term) {
             forceLogoutIfNecessary(error, dispatch, getState);
             dispatch(batchActions([
                 {type: ChannelTypes.GET_CHANNELS_FAILURE, error},
-                logError(error)(dispatch),
+                logError(error),
             ]), getState);
             return {error};
         }
