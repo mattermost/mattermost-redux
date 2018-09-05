@@ -1680,6 +1680,37 @@ describe('getCurrentUsersLatestPost', () => {
         assert.equal(actual, postsAny.f);
     });
 
+    it('return first post which user can edit ignore pending and failed', () => {
+        const postsAny = {
+            a: {id: 'a', channel_id: 'a', create_at: 1, user_id: 'a'},
+            b: {id: 'b', channel_id: 'abcd', create_at: 4, user_id: user1.id, pending_post_id: 'b'},
+            c: {id: 'c', channel_id: 'abcd', create_at: 4, user_id: user1.id, failed: true},
+            d: {id: 'd', root_id: 'a', channel_id: 'abcd', create_at: 3, user_id: 'b', type: Posts.POST_TYPES.EPHEMERAL},
+            e: {id: 'e', channel_id: 'abcd', create_at: 4, user_id: 'c'},
+            f: {id: 'f', channel_id: 'abcd', create_at: 4, user_id: user1.id},
+        };
+        const state = {
+            entities: {
+                users: {
+                    currentUserId: user1.id,
+                    profiles,
+                },
+                posts: {
+                    posts: postsAny,
+                    postsInChannel: {
+                        abcd: ['b', 'c', 'd', 'e', 'f'],
+                    },
+                },
+                channels: {
+                    currentChannelId: 'abcd',
+                },
+            },
+        };
+        const actual = Selectors.getCurrentUsersLatestPost(state);
+
+        assert.equal(actual, postsAny.f);
+    });
+
     it('return first post which has rootId match', () => {
         const postsAny = {
             a: {id: 'a', channel_id: 'a', create_at: 1, user_id: 'a'},
