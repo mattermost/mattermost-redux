@@ -207,6 +207,41 @@ describe('Actions.Emojis', () => {
         assert.ok(!emojis[created.id]);
     });
 
+    it('loadProfilesForCustomEmojis', async () => {
+        const fakeUser = TestHelper.fakeUser();
+        fakeUser.id = TestHelper.generateId();
+        const junkUserId = TestHelper.generateId();
+
+        const testEmojis = [{
+            name: TestHelper.generateId(),
+            creator_id: TestHelper.basicUser.id,
+        },
+        {
+            name: TestHelper.generateId(),
+            creator_id: TestHelper.basicUser.id,
+        },
+        {
+            name: TestHelper.generateId(),
+            creator_id: fakeUser.id,
+        },
+        {
+            name: TestHelper.generateId(),
+            creator_id: junkUserId,
+        }];
+
+        nock(Client4.getUsersRoute()).
+            post('/ids').
+            reply(200, [TestHelper.basicUser, fakeUser]);
+
+        await store.dispatch(Actions.loadProfilesForCustomEmojis(testEmojis));
+
+        const state = store.getState();
+        const profiles = state.entities.users.profiles;
+        assert.ok(profiles[TestHelper.basicUser.id]);
+        assert.ok(profiles[fakeUser.id]);
+        assert.ok(!profiles[junkUserId]);
+    });
+
     it('searchCustomEmojis', async () => {
         const testImageData = fs.createReadStream('test/assets/images/test.png');
 
