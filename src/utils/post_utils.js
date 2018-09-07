@@ -197,18 +197,22 @@ export function comparePosts(a, b) {
     return 0;
 }
 
-function extractUserActivityData(userActivities) {
-    const postTypePriority = {
-        [Posts.POST_TYPES.JOIN_TEAM]: 0,
-        [Posts.POST_TYPES.ADD_TO_TEAM]: 1,
-        [Posts.POST_TYPES.LEAVE_TEAM]: 2,
-        [Posts.POST_TYPES.REMOVE_FROM_TEAM]: 3,
-        [Posts.POST_TYPES.JOIN_CHANNEL]: 4,
-        [Posts.POST_TYPES.ADD_TO_CHANNEL]: 5,
-        [Posts.POST_TYPES.LEAVE_CHANNEL]: 6,
-        [Posts.POST_TYPES.REMOVE_FROM_CHANNEL]: 7,
-    };
+export const postTypePriority = {
+    [Posts.POST_TYPES.JOIN_TEAM]: 0,
+    [Posts.POST_TYPES.ADD_TO_TEAM]: 1,
+    [Posts.POST_TYPES.LEAVE_TEAM]: 2,
+    [Posts.POST_TYPES.REMOVE_FROM_TEAM]: 3,
+    [Posts.POST_TYPES.JOIN_CHANNEL]: 4,
+    [Posts.POST_TYPES.ADD_TO_CHANNEL]: 5,
+    [Posts.POST_TYPES.LEAVE_CHANNEL]: 6,
+    [Posts.POST_TYPES.REMOVE_FROM_CHANNEL]: 7,
+};
 
+export function comparePostTypes(a, b) {
+    return postTypePriority[a.postType] - postTypePriority[b.postType];
+}
+
+function extractUserActivityData(userActivities) {
     const messageData = [];
     const allUserIds = [];
     const allUsernames = [];
@@ -237,7 +241,7 @@ function extractUserActivityData(userActivities) {
         }
     });
 
-    messageData.sort((a, b) => postTypePriority[a.postType] > postTypePriority[b.postType]);
+    messageData.sort(comparePostTypes);
 
     function reduceUsers(acc, curr) {
         if (!acc.includes(curr)) {
