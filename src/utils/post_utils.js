@@ -398,7 +398,7 @@ export function getOldestPostIdFromPosts(posts) {
     const oldestPost = posts[posts.length - 1];
     let oldestPostId = oldestPost.id;
     if (oldestPost.type === Posts.POST_TYPES.COMBINED_USER_ACTIVITY) {
-        oldestPostId = oldestPost.system_post_ids[0];
+        oldestPostId = oldestPost.system_post_ids[oldestPost.system_post_ids.length - 1];
     }
     return oldestPostId;
 }
