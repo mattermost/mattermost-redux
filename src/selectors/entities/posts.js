@@ -8,7 +8,7 @@ import {getMyPreferences} from 'selectors/entities/preferences';
 import {createIdsSelector} from 'utils/helpers';
 
 import {Posts, Preferences} from 'constants';
-import {isPostEphemeral, isSystemMessage, shouldFilterJoinLeavePost, comparePosts} from 'utils/post_utils';
+import {isPostEphemeral, isSystemMessage, shouldFilterJoinLeavePost, comparePosts, isPostPendingOrFailed} from 'utils/post_utils';
 import {getPreferenceKey} from 'utils/preference_utils';
 
 export function getAllPosts(state) {
@@ -459,7 +459,7 @@ export const getCurrentUsersLatestPost = createSelector(
             if (post.user_id !== currentUser.id ||
                (post.props && post.props.from_webhook) ||
                post.state === Posts.POST_DELETED ||
-               (isSystemMessage(post) || isPostEphemeral(post))) {
+               (isSystemMessage(post) || isPostEphemeral(post)) || isPostPendingOrFailed(post)) {
                 continue;
             }
 

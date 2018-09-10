@@ -12,7 +12,9 @@ import {
     combineSystemPosts,
     isSystemMessage,
     isUserActivityPost,
+    postTypePriority,
     shouldFilterJoinLeavePost,
+    comparePostTypes,
 } from 'utils/post_utils';
 
 describe('PostUtils', () => {
@@ -1407,6 +1409,47 @@ describe('PostUtils', () => {
             assert.equal(out.nextPosts[combinedPostId].user_activity_posts[0], postUA12);
             assert.equal(out.nextPosts[combinedPostId].user_activity_posts[1], postUA11);
             assert.deepEqual(out.nextPosts[combinedPostId].props.user_activity, expectedUserActivityPosts);
+        });
+    });
+
+    describe('comparePostTypes', () => {
+        const {
+            JOIN_TEAM,
+            ADD_TO_TEAM,
+            LEAVE_TEAM,
+            REMOVE_FROM_TEAM,
+            JOIN_CHANNEL,
+            ADD_TO_CHANNEL,
+            LEAVE_CHANNEL,
+            REMOVE_FROM_CHANNEL,
+        } = PostTypes;
+
+        const testCases = [
+            [],
+            [{postType: JOIN_TEAM}],
+            [{postType: JOIN_TEAM}, {postType: ADD_TO_TEAM}],
+            [{postType: ADD_TO_TEAM}, {postType: JOIN_TEAM}],
+            [{postType: ADD_TO_TEAM}, {postType: ADD_TO_TEAM}, {postType: JOIN_TEAM}],
+            [{postType: JOIN_TEAM}, {postType: ADD_TO_TEAM}, {postType: LEAVE_TEAM}, {postType: REMOVE_FROM_TEAM}],
+            [{postType: REMOVE_FROM_TEAM}, {postType: LEAVE_TEAM}, {postType: ADD_TO_TEAM}, {postType: JOIN_TEAM}],
+            [{postType: JOIN_CHANNEL}, {postType: ADD_TO_CHANNEL}, {postType: LEAVE_CHANNEL}, {postType: REMOVE_FROM_CHANNEL}],
+            [{postType: REMOVE_FROM_CHANNEL}, {postType: LEAVE_CHANNEL}, {postType: ADD_TO_CHANNEL}, {postType: JOIN_CHANNEL}],
+            [{postType: LEAVE_CHANNEL}, {postType: REMOVE_FROM_CHANNEL}, {postType: LEAVE_TEAM}, {postType: REMOVE_FROM_TEAM}],
+            [{postType: LEAVE_TEAM}, {postType: REMOVE_FROM_TEAM}, {postType: LEAVE_CHANNEL}, {postType: REMOVE_FROM_CHANNEL}],
+            [{postType: JOIN_CHANNEL}, {postType: LEAVE_CHANNEL}, {postType: JOIN_CHANNEL}, {postType: REMOVE_FROM_CHANNEL}, {postType: ADD_TO_CHANNEL}],
+        ];
+
+        it('should sort post type correctly', () => {
+            for (const testCase of testCases) {
+                let previousType;
+                testCase.sort(comparePostTypes).forEach((sortedTestCase, index) => {
+                    if (index > 0) {
+                        assert.ok(postTypePriority[previousType] <= postTypePriority[sortedTestCase.postType], `${previousType} should come first before ${sortedTestCase.postType}`);
+                    }
+
+                    previousType = sortedTestCase.postType;
+                });
+            }
         });
     });
 });
