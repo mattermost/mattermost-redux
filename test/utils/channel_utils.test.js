@@ -4,8 +4,9 @@
 import assert from 'assert';
 
 import General from 'constants/general';
+import TestHelper from 'test/test_helper';
 
-import {canManageMembersOldPermissions, isAutoClosed} from 'utils/channel_utils';
+import {canManageMembersOldPermissions, isAutoClosed, filterChannelsMatchingTerm} from 'utils/channel_utils';
 
 describe('ChannelUtils', () => {
     it('canManageMembersOldPermissions', () => {
@@ -144,5 +145,22 @@ describe('ChannelUtils', () => {
             'sidebar_settings--close_unused_direct_messages': {value: 'after_seven_days'},
             'channel_open_time--channelid': {value: (now - 1000).toString()},
         }, inactiveChannel, 0, now, 'channelid'));
+    });
+
+    it('filterChannelsMatchingTerm', () => {
+        const channel1 = TestHelper.fakeChannel();
+        channel1.display_name = 'channel1';
+        channel1.name = 'blargh1';
+        const channel2 = TestHelper.fakeChannel();
+        channel2.display_name = 'channel2';
+        channel2.name = 'blargh2';
+        const channels = [channel1, channel2];
+
+        assert.deepEqual(filterChannelsMatchingTerm(channels, 'chan'), channels);
+        assert.deepEqual(filterChannelsMatchingTerm(channels, 'CHAN'), channels);
+        assert.deepEqual(filterChannelsMatchingTerm(channels, 'blargh'), channels);
+        assert.deepEqual(filterChannelsMatchingTerm(channels, 'channel1'), [channel1]);
+        assert.deepEqual(filterChannelsMatchingTerm(channels, 'junk'), []);
+        assert.deepEqual(filterChannelsMatchingTerm(channels, 'annel'), []);
     });
 });

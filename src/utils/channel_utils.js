@@ -594,3 +594,18 @@ function getUserLocale(userId, profiles) {
 
     return locale;
 }
+
+export function filterChannelsMatchingTerm(channels, term) {
+    const lowercasedTerm = term.toLowerCase();
+
+    return channels.filter((channel) => {
+        if (!channel) {
+            return false;
+        }
+        const name = (channel.name || '').toLowerCase();
+        const displayName = (channel.display_name || '').toLowerCase();
+
+        return name.startsWith(lowercasedTerm) ||
+            displayName.startsWith(lowercasedTerm);
+    });
+}
