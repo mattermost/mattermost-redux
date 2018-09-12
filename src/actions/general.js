@@ -9,6 +9,8 @@ import {loadMe} from './users';
 import {loadRolesIfNeeded} from './roles';
 import {logError} from './errors';
 import {batchActions} from 'redux-batched-actions';
+import {getServerVersion} from 'selectors/entities/general';
+import {isMinimumServerVersion} from 'utils/helpers';
 
 import type {GeneralState} from '../types/general';
 import type {GenericClientResponse, logLevel} from '../types/client4';
@@ -183,9 +185,16 @@ export function getRedirectLocation(url: string): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         dispatch({type: GeneralTypes.REDIRECT_LOCATION_REQUEST, data: {}}, getState);
 
+        let pendingData: Promise<GenericClientResponse>;
+        if (isMinimumServerVersion(getServerVersion(getState()), 5, 3)) {
+            pendingData = Client4.getRedirectLocation(url);
+        } else {
+            pendingData = Promise.resolve({location: url});
+        }
+
         let data: GenericClientResponse;
         try {
-            data = await Client4.getRedirectLocation(url);
+            data = await pendingData;
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch, getState);
             dispatch({type: GeneralTypes.REDIRECT_LOCATION_FAILURE, data: error}, getState);

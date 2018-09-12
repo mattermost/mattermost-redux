@@ -68,10 +68,21 @@ function websocket(state: RequestStatusType = initialRequestState(), action: Gen
     );
 }
 
+function redirectLocation(state: RequestStatusType = initialRequestState(), action: GenericAction): RequestStatusType {
+    return handleRequest(
+        GeneralTypes.REDIRECT_LOCATION_REQUEST,
+        GeneralTypes.REDIRECT_LOCATION_SUCCESS,
+        GeneralTypes.REDIRECT_LOCATION_FAILURE,
+        state,
+        action
+    );
+}
+
 export default combineReducers({
     server,
     config,
     dataRetentionPolicy,
     license,
     websocket,
+    redirectLocation,
 });

@@ -4,6 +4,7 @@
 import assert from 'assert';
 import nock from 'nock';
 
+import {GeneralTypes} from 'action_types';
 import * as Actions from 'actions/general';
 import {Client4} from 'client';
 import {RequestStatus} from 'constants';
@@ -131,17 +132,47 @@ describe('Actions.General', () => {
         assert.equal(timezones.length === 0, false);
     });
 
-    it('getRedirectLocation', async () => {
-        nock(Client4.getBaseRoute()).
-            get('/redirect_location').
-            query(true).
-            reply(200);
+    describe('getRedirectLocation', () => {
+        it('new server', async () => {
+            store.dispatch({type: GeneralTypes.RECEIVED_SERVER_VERSION, data: '5.3.0'});
 
-        await Actions.getRedirectLocation()(store.dispatch, store.getState);
+            const mock = nock(Client4.getBaseRoute()).
+                get('/redirect_location').
+                query({url: 'http://examp.le'}).
+                reply(200, '{"location": "https://example.com"}');
 
-        const {server} = store.getState().requests.general;
-        if (server.status === RequestStatus.FAILURE) {
-            throw new Error(JSON.stringify(server.error));
-        }
+            let requestStatus = store.getState().requests.general.redirectLocation.status;
+            assert.equal(requestStatus, RequestStatus.NOT_STARTED);
+
+            // Should have followed the link
+            const result = await store.dispatch(Actions.getRedirectLocation('http://examp.le'));
+            assert.deepEqual(result.data, {location: 'https://example.com'});
+
+            requestStatus = store.getState().requests.general.redirectLocation.status;
+            assert.equal(requestStatus, RequestStatus.SUCCESS);
+
+            assert.equal(mock.isDone(), true);
+        });
+
+        it('old server', async () => {
+            store.dispatch({type: GeneralTypes.RECEIVED_SERVER_VERSION, data: '5.0.0'});
+
+            const mock = nock(Client4.getBaseRoute()).
+                get('/redirect_location').
+                reply(404);
+
+            let requestStatus = store.getState().requests.general.redirectLocation.status;
+            assert.equal(requestStatus, RequestStatus.NOT_STARTED);
+
+            // Should return the original link
+            const result = await store.dispatch(Actions.getRedirectLocation('http://examp.le'));
+            assert.deepEqual(result.data, {location: 'http://examp.le'});
+
+            requestStatus = store.getState().requests.general.redirectLocation.status;
+            assert.equal(requestStatus, RequestStatus.SUCCESS);
+
+            // Should not call the API on an old server
+            assert.equal(mock.isDone(), false);
+        });
     });
 });
