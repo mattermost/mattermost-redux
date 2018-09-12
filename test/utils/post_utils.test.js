@@ -1427,7 +1427,7 @@ describe('PostUtils', () => {
                 type: 'system_combined_user_activity',
                 system_post_ids: ['121', '122'],
             }];
-            assert.equal(getOldestPostIdFromPosts(posts), '121');
+            assert.equal(getOldestPostIdFromPosts(posts), '122');
         });
 
         it('Should return newest post from given posts', () => {
