@@ -32,6 +32,7 @@ import {
     completeDirectChannelInfo,
     completeDirectChannelDisplayName,
     getUserIdFromChannelName,
+    getChannelByName as getChannelByNameHelper,
     isChannelMuted,
     getDirectChannelName,
     isAutoClosed,
@@ -148,6 +149,10 @@ export function isChannelReadOnly(state, channel) {
 export function shouldHideDefaultChannel(state, channel) {
     return channel && channel.name === General.DEFAULT_CHANNEL &&
         !isCurrentUserSystemAdmin(state) && getConfig(state).ExperimentalHideTownSquareinLHS === 'true';
+}
+
+export function getChannelByName(state, channelName) {
+    return getChannelByNameHelper(getAllChannels(state), channelName);
 }
 
 export const getChannelSetInCurrentTeam = createSelector(

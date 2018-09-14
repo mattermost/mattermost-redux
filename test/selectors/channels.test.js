@@ -23,6 +23,7 @@ describe('Selectors.Channels', () => {
 
     const channel1 = TestHelper.fakeChannelWithId(team1.id);
     channel1.display_name = 'Channel Name';
+    channel1.name = 'Name';
 
     const channel2 = TestHelper.fakeChannelWithId(team1.id);
     channel2.total_msg_count = 2;
@@ -201,6 +202,10 @@ describe('Selectors.Channels', () => {
 
     it('get channel', () => {
         assert.deepEqual(Selectors.getChannel(testState, channel1.id), channel1);
+    });
+
+    it('get first channel that matches by name', () => {
+        assert.deepEqual(Selectors.getChannelByName(testState, channel1.name), channel1);
     });
 
     it('get unreads for current team', () => {
