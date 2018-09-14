@@ -70,6 +70,8 @@ export function completeDirectChannelInfo(usersState, teammateNameDisplay, chann
         const teammateId = getUserIdFromChannelName(usersState.currentUserId, channel.name);
 
         return Object.assign(dmChannelClone, {
+
+            // return empty string instead of `someone` default string for display_name
             display_name: displayUsername(usersState.profiles[teammateId], teammateNameDisplay, false),
             teammate_id: teammateId,
             status: usersState.statuses[teammateId] || 'offline',
