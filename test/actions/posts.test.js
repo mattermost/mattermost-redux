@@ -1590,18 +1590,23 @@ describe('Actions.Posts', () => {
         nock(Client4.getBaseRoute()).
             post('/opengraph').
             reply(200, {type: 'article', url: 'https://about.mattermost.com/', title: 'Mattermost private cloud messaging', description: 'Open source,  private cloud\nSlack-alternative, \nWorkplace messaging for web, PCs and phones.'});
-        await Actions.getOpenGraphMetadata(url)(dispatch, getState);
+        await dispatch(Actions.getOpenGraphMetadata(url));
 
         nock(Client4.getBaseRoute()).
             post('/opengraph').
             reply(200, {type: '', url: '', title: '', description: ''});
-        await Actions.getOpenGraphMetadata(docs)(dispatch, getState);
+        await dispatch(Actions.getOpenGraphMetadata(docs));
 
         const openGraphRequest = getState().requests.posts.openGraph;
 
         if (openGraphRequest.status === RequestStatus.FAILURE) {
             throw new Error(JSON.stringify(openGraphRequest.error));
         }
+
+        nock(Client4.getBaseRoute()).
+            post('/opengraph').
+            reply(200, null);
+        await dispatch(Actions.getOpenGraphMetadata(docs));
 
         const state = getState();
         const metadata = state.entities.posts.openGraph;

@@ -15,7 +15,7 @@ export function getEmojiImageUrl(emoji: Emoji): string {
 
     const filename = systemEmoji.filename || systemEmoji.aliases[0];
 
-    return '/static/emoji/' + filename + '.png';
+    return Client4.getSystemEmojiImageUrl(filename);
 }
 
 export function parseNeededCustomEmojisFromText(text: string, systemEmojis: Map<string, SystemEmoji>, customEmojisByName: Map<string, CustomEmoji>, nonExistentEmoji: Set<string>): Set<string> {

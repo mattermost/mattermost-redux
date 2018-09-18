@@ -70,7 +70,9 @@ export function completeDirectChannelInfo(usersState, teammateNameDisplay, chann
         const teammateId = getUserIdFromChannelName(usersState.currentUserId, channel.name);
 
         return Object.assign(dmChannelClone, {
-            display_name: displayUsername(usersState.profiles[teammateId], teammateNameDisplay),
+
+            // return empty string instead of `someone` default string for display_name
+            display_name: displayUsername(usersState.profiles[teammateId], teammateNameDisplay, false),
             teammate_id: teammateId,
             status: usersState.statuses[teammateId] || 'offline',
         });
@@ -593,4 +595,19 @@ function getUserLocale(userId, profiles) {
     }
 
     return locale;
+}
+
+export function filterChannelsMatchingTerm(channels, term) {
+    const lowercasedTerm = term.toLowerCase();
+
+    return channels.filter((channel) => {
+        if (!channel) {
+            return false;
+        }
+        const name = (channel.name || '').toLowerCase();
+        const displayName = (channel.display_name || '').toLowerCase();
+
+        return name.startsWith(lowercasedTerm) ||
+            displayName.startsWith(lowercasedTerm);
+    });
 }

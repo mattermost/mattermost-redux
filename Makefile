@@ -1,6 +1,6 @@
 .PHONY: check-style clean pre-run test install flow
 
-.npminstall: package.json
+node_modules: package.json
 	@if ! [ $(shell which npm) ]; then \
 		echo "npm is not installed"; \
 		exit 1; \
@@ -10,9 +10,7 @@
 
 	npm install --ignore-scripts
 
-	touch $@
-
-check-style: | pre-run .npminstall
+check-style: | pre-run node_modules
 	@echo Checking for style guide compliance
 
 	npm run check
@@ -21,7 +19,6 @@ clean:
 	@echo Cleaning app
 
 	rm -rf node_modules
-	rm -f .npminstall
 
 pre-run:
 	@echo Make sure no previous build are in the folder
@@ -44,14 +41,14 @@ flow: .flowinstall
 
 	npm run flow
 
-.flowinstall: .npminstall
+.flowinstall: node_modules
 	@echo Getting flow-typed packages
 
 	npm run flow-typed install
 
 	touch $@
 
-install: .npminstall
+install: node_modules
 
 bundle:
 	npm run build

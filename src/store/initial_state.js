@@ -212,6 +212,10 @@ const state: GlobalState = {
                 status: 'not_started',
                 error: null,
             },
+            redirectLocation: {
+                status: 'not_started',
+                error: null,
+            },
         },
         posts: {
             createPost: {

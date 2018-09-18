@@ -1,6 +1,10 @@
 {
   "name": "mattermost-redux",
   "version": "1.2.0",
+  "description": "Common code (API client, Redux stores, logic, utility functions) for building a Mattermost client",
+  "homepage": "https://github.com/mattermost/mattermost-redux",
+  "license": "  Apache-2.0",
+  "repository": "mattermost/mattermost-redux",
   "dependencies": {
     "deep-equal": "1.0.1",
     "eslint-plugin-header": "1.2.0",
@@ -67,6 +71,6 @@
     "flow": "flow",
     "flow-typed": "flow-typed",
     "test": "NODE_ENV=test mocha --opts test/mocha.opts",
-    "prepublishOnly": "npm run build"
+    "prepare": "npm run build"
   }
 }

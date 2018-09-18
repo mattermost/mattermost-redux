@@ -142,19 +142,7 @@ export function getCustomEmojis(
         }
 
         if (loadUsers) {
-            const usersToLoad = {};
-            Object.keys(data).forEach((key: string) => {
-                const emoji = data[key];
-                if (!getState().entities.users.profiles[emoji.creator_id]) {
-                    usersToLoad[emoji.creator_id] = true;
-                }
-            });
-
-            const userIds = Object.keys(usersToLoad);
-
-            if (userIds.length > 0) {
-                getProfilesByIds(userIds)(dispatch, getState);
-            }
+            dispatch(loadProfilesForCustomEmojis(data));
         }
 
         dispatch(batchActions([
@@ -169,6 +157,25 @@ export function getCustomEmojis(
         ]));
 
         return {data};
+    };
+}
+
+export function loadProfilesForCustomEmojis(emojis: Array<Object>): ActionFunc {
+    return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
+        const usersToLoad = {};
+        emojis.forEach((emoji: Object) => {
+            if (!getState().entities.users.profiles[emoji.creator_id]) {
+                usersToLoad[emoji.creator_id] = true;
+            }
+        });
+
+        const userIds = Object.keys(usersToLoad);
+
+        if (userIds.length > 0) {
+            await dispatch(getProfilesByIds(userIds));
+        }
+
+        return {data: true};
     };
 }
 
@@ -246,7 +253,7 @@ export function deleteCustomEmoji(emojiId: string): ActionFunc {
     };
 }
 
-export function searchCustomEmojis(term: string, options: Object = {}): ActionFunc {
+export function searchCustomEmojis(term: string, options: Object = {}, loadUsers: boolean = false): ActionFunc {
     return async (dispatch, getState) => {
         const serverVersion = Client4.getServerVersion();
         if (!isMinimumServerVersion(serverVersion, 4, 7)) {
@@ -266,6 +273,10 @@ export function searchCustomEmojis(term: string, options: Object = {}): ActionFu
                 logError(error),
             ]), getState);
             return {error};
+        }
+
+        if (loadUsers) {
+            dispatch(loadProfilesForCustomEmojis(data));
         }
 
         dispatch(batchActions([

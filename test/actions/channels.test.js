@@ -33,7 +33,7 @@ describe('Actions.Channels', () => {
     it('selectChannel', async () => {
         const channelId = TestHelper.generateId();
 
-        await Actions.selectChannel(channelId)(store.dispatch, store.getState);
+        await store.dispatch(Actions.selectChannel(channelId));
         await TestHelper.wait(100);
         const state = store.getState();
 
@@ -45,7 +45,7 @@ describe('Actions.Channels', () => {
             post('').
             reply(201, TestHelper.fakeChannelWithId(TestHelper.basicTeam.id));
 
-        await Actions.createChannel(TestHelper.fakeChannel(TestHelper.basicTeam.id), TestHelper.basicUser.id)(store.dispatch, store.getState);
+        await store.dispatch(Actions.createChannel(TestHelper.fakeChannel(TestHelper.basicTeam.id), TestHelper.basicUser.id));
 
         const createRequest = store.getState().requests.channels.createChannel;
         const membersRequest = store.getState().requests.channels.myMembers;
@@ -85,13 +85,13 @@ describe('Actions.Channels', () => {
             post('/ids').
             reply(200, [user]);
 
-        await getProfilesByIds([user.id])(store.dispatch, store.getState);
+        await store.dispatch(getProfilesByIds([user.id]));
 
         nock(Client4.getChannelsRoute()).
             post('/direct').
             reply(201, {...TestHelper.fakeChannelWithId(), type: 'D'});
 
-        const {data: created} = await Actions.createDirectChannel(TestHelper.basicUser.id, user.id)(store.dispatch, store.getState);
+        const {data: created} = await store.dispatch(Actions.createDirectChannel(TestHelper.basicUser.id, user.id));
 
         const createRequest = store.getState().requests.channels.createChannel;
         if (createRequest.status === RequestStatus.FAILURE) {
@@ -150,19 +150,19 @@ describe('Actions.Channels', () => {
         );
 
         TestHelper.mockLogin();
-        await login(TestHelper.basicUser.email, TestHelper.basicUser.password)(store.dispatch, store.getState);
+        await store.dispatch(login(TestHelper.basicUser.email, TestHelper.basicUser.password));
 
         nock(Client4.getUsersRoute()).
             post('/ids').
             reply(200, [user, user2]);
 
-        await getProfilesByIds([user.id, user2.id])(store.dispatch, store.getState);
+        await store.dispatch(getProfilesByIds([user.id, user2.id]));
 
         nock(Client4.getChannelsRoute()).
             post('/group').
             reply(201, {...TestHelper.fakeChannelWithId(), type: 'G'});
 
-        const result = await Actions.createGroupChannel([TestHelper.basicUser.id, user.id, user2.id])(store.dispatch, store.getState);
+        const result = await store.dispatch(Actions.createGroupChannel([TestHelper.basicUser.id, user.id, user2.id]));
         const created = result.data;
 
         assert.ok(!result.error, 'error was returned');
@@ -203,7 +203,7 @@ describe('Actions.Channels', () => {
             put(`/${channel.id}`).
             reply(200, channel);
 
-        await Actions.updateChannel(channel)(store.dispatch, store.getState);
+        await store.dispatch(Actions.updateChannel(channel));
 
         const updateRequest = store.getState().requests.channels.updateChannel;
         if (updateRequest.status === RequestStatus.FAILURE) {
@@ -226,7 +226,7 @@ describe('Actions.Channels', () => {
             put(`/${TestHelper.basicChannel.id}/patch`).
             reply(200, {...TestHelper.basicChannel, ...channel});
 
-        await Actions.patchChannel(TestHelper.basicChannel.id, channel)(store.dispatch, store.getState);
+        await store.dispatch(Actions.patchChannel(TestHelper.basicChannel.id, channel));
 
         const updateRequest = store.getState().requests.channels.updateChannel;
         if (updateRequest.status === RequestStatus.FAILURE) {
@@ -248,7 +248,7 @@ describe('Actions.Channels', () => {
 
         assert.equal(TestHelper.basicChannel.type, General.OPEN_CHANNEL);
 
-        await Actions.convertChannelToPrivate(TestHelper.basicChannel.id)(store.dispatch, store.getState);
+        await store.dispatch(Actions.convertChannelToPrivate(TestHelper.basicChannel.id));
 
         const updateRequest = store.getState().requests.channels.updateChannel;
         if (updateRequest.status === RequestStatus.FAILURE) {
@@ -267,7 +267,7 @@ describe('Actions.Channels', () => {
             get(`/${TestHelper.basicChannel.id}`).
             reply(200, TestHelper.basicChannel);
 
-        await Actions.getChannel(TestHelper.basicChannel.id)(store.dispatch, store.getState);
+        await store.dispatch(Actions.getChannel(TestHelper.basicChannel.id));
 
         const channelRequest = store.getState().requests.channels.getChannel;
         if (channelRequest.status === RequestStatus.FAILURE) {
@@ -283,7 +283,7 @@ describe('Actions.Channels', () => {
             get(`/name/${TestHelper.basicTeam.name}/channels/name/${TestHelper.basicChannel.name}?include_deleted=false`).
             reply(200, TestHelper.basicChannel);
 
-        await Actions.getChannelByNameAndTeamName(TestHelper.basicTeam.name, TestHelper.basicChannel.name)(store.dispatch, store.getState);
+        await store.dispatch(Actions.getChannelByNameAndTeamName(TestHelper.basicTeam.name, TestHelper.basicChannel.name));
 
         const channelRequest = store.getState().requests.channels.getChannel;
         if (channelRequest.status === RequestStatus.FAILURE) {
@@ -303,7 +303,7 @@ describe('Actions.Channels', () => {
             get(`/${TestHelper.basicChannel.id}/members/me`).
             reply(200, TestHelper.basicChannelMember);
 
-        await Actions.getChannelAndMyMember(TestHelper.basicChannel.id)(store.dispatch, store.getState);
+        await store.dispatch(Actions.getChannelAndMyMember(TestHelper.basicChannel.id));
 
         const channelRequest = store.getState().requests.channels.getChannel;
         if (channelRequest.status === RequestStatus.FAILURE) {
@@ -332,7 +332,7 @@ describe('Actions.Channels', () => {
             post('/direct').
             reply(201, {...TestHelper.fakeChannelWithId(), team_id: '', type: 'D'});
 
-        const {data: directChannel} = await Actions.createDirectChannel(TestHelper.basicUser.id, user.id)(store.dispatch, store.getState);
+        const {data: directChannel} = await store.dispatch(Actions.createDirectChannel(TestHelper.basicUser.id, user.id));
 
         nock(Client4.getUsersRoute()).
             get(`/me/teams/${TestHelper.basicTeam.id}/channels`).
@@ -342,7 +342,7 @@ describe('Actions.Channels', () => {
             get(`/me/teams/${TestHelper.basicTeam.id}/channels/members`).
             reply(200, [{user_id: TestHelper.basicUser.id, roles: 'channel_user', channel_id: directChannel.id}, TestHelper.basicChannelMember]);
 
-        await Actions.fetchMyChannelsAndMembers(TestHelper.basicTeam.id)(store.dispatch, store.getState);
+        await store.dispatch(Actions.fetchMyChannelsAndMembers(TestHelper.basicTeam.id));
 
         const channelsRequest = store.getState().requests.channels.myChannels;
         const membersRequest = store.getState().requests.channels.myMembers;
@@ -375,16 +375,16 @@ describe('Actions.Channels', () => {
             get(`/me/teams/${TestHelper.basicTeam.id}/channels/members`).
             reply(200, [TestHelper.basicChannelMember]);
 
-        await Actions.fetchMyChannelsAndMembers(TestHelper.basicTeam.id)(store.dispatch, store.getState);
+        await store.dispatch(Actions.fetchMyChannelsAndMembers(TestHelper.basicTeam.id));
 
         nock(Client4.getChannelsRoute()).
             put(`/${TestHelper.basicChannel.id}/members/${TestHelper.basicUser.id}/notify_props`).
             reply(200, OK_RESPONSE);
 
-        await Actions.updateChannelNotifyProps(
+        await store.dispatch(Actions.updateChannelNotifyProps(
             TestHelper.basicUser.id,
             TestHelper.basicChannel.id,
-            notifyProps)(store.dispatch, store.getState);
+            notifyProps));
 
         const updateRequest = store.getState().requests.channels.updateChannelNotifyProps;
         if (updateRequest.status === RequestStatus.FAILURE) {
@@ -428,11 +428,11 @@ describe('Actions.Channels', () => {
             post(`/${secondChannel.id}/members`).
             reply(201, {user_id: TestHelper.basicUser.id, roles: 'channel_user', channel_id: secondChannel.id});
 
-        await Actions.joinChannel(
+        await store.dispatch(Actions.joinChannel(
             TestHelper.basicUser.id,
             TestHelper.basicTeam.id,
             secondChannel.id
-        )(store.dispatch, store.getState);
+        ));
 
         nock(Client4.getUsersRoute()).
             get(`/me/teams/${TestHelper.basicTeam.id}/channels`).
@@ -442,7 +442,7 @@ describe('Actions.Channels', () => {
             get(`/me/teams/${TestHelper.basicTeam.id}/channels/members`).
             reply(200, [{user_id: TestHelper.basicUser.id, roles: 'channel_user', channel_id: secondChannel.id}, TestHelper.basicChannelMember]);
 
-        await Actions.fetchMyChannelsAndMembers(TestHelper.basicTeam.id)(store.dispatch, store.getState);
+        await store.dispatch(Actions.fetchMyChannelsAndMembers(TestHelper.basicTeam.id));
 
         nock(Client4.getIncomingHooksRoute()).
             post('').
@@ -457,7 +457,7 @@ describe('Actions.Channels', () => {
                 display_name: 'TestIncomingHook',
                 description: 'Some description.',
             });
-        const incomingHook = await createIncomingHook({channel_id: secondChannel.id, display_name: 'test', description: 'test'})(store.dispatch, store.getState);
+        const incomingHook = await store.dispatch(createIncomingHook({channel_id: secondChannel.id, display_name: 'test', description: 'test'}));
 
         nock(Client4.getOutgoingHooksRoute()).
             post('').
@@ -477,15 +477,19 @@ describe('Actions.Channels', () => {
                 description: '',
                 content_type: 'application/x-www-form-urlencoded',
             });
-        const outgoingHook = await createOutgoingHook({channel_id: secondChannel.id, team_id: TestHelper.basicTeam.id, display_name: 'TestOutgoingHook', trigger_words: [TestHelper.generateId()], callback_urls: ['http://notarealurl']})(store.dispatch, store.getState);
+        const outgoingHook = await store.dispatch(createOutgoingHook({
+            channel_id: secondChannel.id,
+            team_id: TestHelper.basicTeam.id,
+            display_name: 'TestOutgoingHook',
+            trigger_words: [TestHelper.generateId()],
+            callback_urls: ['http://notarealurl']}
+        ));
 
         nock(Client4.getChannelsRoute()).
             delete(`/${secondChannel.id}`).
             reply(200, OK_RESPONSE);
 
-        await Actions.deleteChannel(
-            secondChannel.id
-        )(store.dispatch, store.getState);
+        await store.dispatch(Actions.deleteChannel(secondChannel.id));
 
         const deleteRequest = store.getState().requests.channels.deleteChannel;
         if (deleteRequest.status === RequestStatus.FAILURE) {
@@ -515,7 +519,7 @@ describe('Actions.Channels', () => {
             get(`/me/teams/${TestHelper.basicTeam.id}/channels/members`).
             reply(200, [{user_id: TestHelper.basicUser.id, roles: 'channel_user', channel_id: userChannel.id}, TestHelper.basicChannelMember]);
 
-        await Actions.fetchMyChannelsAndMembers(TestHelper.basicTeam.id)(store.dispatch, store.getState);
+        await store.dispatch(Actions.fetchMyChannelsAndMembers(TestHelper.basicTeam.id));
 
         const members = store.getState().entities.channels.myMembers;
         const member = members[TestHelper.basicChannel.id];
@@ -527,10 +531,7 @@ describe('Actions.Channels', () => {
             post('/members/me/view').
             reply(200, OK_RESPONSE);
 
-        await Actions.viewChannel(
-            TestHelper.basicChannel.id,
-            userChannel.id
-        )(store.dispatch, store.getState);
+        await store.dispatch(Actions.viewChannel(TestHelper.basicChannel.id, userChannel.id));
 
         const updateRequest = store.getState().requests.channels.updateLastViewedAt;
         if (updateRequest.status === RequestStatus.FAILURE) {
@@ -555,7 +556,7 @@ describe('Actions.Channels', () => {
             get(`/me/teams/${TestHelper.basicTeam.id}/channels/members`).
             reply(200, [{user_id: TestHelper.basicUser.id, roles: 'channel_user', channel_id: userChannel.id}, TestHelper.basicChannelMember]);
 
-        await Actions.fetchMyChannelsAndMembers(TestHelper.basicTeam.id)(store.dispatch, store.getState);
+        await store.dispatch(Actions.fetchMyChannelsAndMembers(TestHelper.basicTeam.id));
 
         const timestamp = Date.now();
         let members = store.getState().entities.channels.myMembers;
@@ -566,9 +567,7 @@ describe('Actions.Channels', () => {
 
         await TestHelper.wait(50);
 
-        await Actions.markChannelAsViewed(
-            TestHelper.basicChannel.id
-        )(store.dispatch, store.getState);
+        await store.dispatch(Actions.markChannelAsViewed(TestHelper.basicChannel.id));
 
         members = store.getState().entities.channels.myMembers;
         member = members[TestHelper.basicChannel.id];
@@ -602,7 +601,7 @@ describe('Actions.Channels', () => {
                 },
             });
 
-            store.dispatch(Actions.markChannelAsUnread(teamId, channelId, [TestHelper.generateId()]), store.getState);
+            store.dispatch(Actions.markChannelAsUnread(teamId, channelId, [TestHelper.generateId()]));
 
             const state = store.getState();
             assert.equal(state.entities.channels.channels[channelId].total_msg_count, 11);
@@ -638,7 +637,7 @@ describe('Actions.Channels', () => {
                 },
             });
 
-            store.dispatch(Actions.markChannelAsUnread(teamId, channelId, [userId]), store.getState);
+            store.dispatch(Actions.markChannelAsUnread(teamId, channelId, [userId]));
 
             const state = store.getState();
             assert.equal(state.entities.channels.channels[channelId].total_msg_count, 11);
@@ -674,7 +673,7 @@ describe('Actions.Channels', () => {
                 },
             });
 
-            store.dispatch(Actions.markChannelAsUnread(teamId, channelId, [TestHelper.generateId()]), store.getState);
+            store.dispatch(Actions.markChannelAsUnread(teamId, channelId, [TestHelper.generateId()]));
 
             const state = store.getState();
             assert.equal(state.entities.channels.channels[channelId].total_msg_count, 11);
@@ -710,7 +709,7 @@ describe('Actions.Channels', () => {
                 },
             });
 
-            store.dispatch(Actions.markChannelAsUnread(teamId, channelId, [userId]), store.getState);
+            store.dispatch(Actions.markChannelAsUnread(teamId, channelId, [userId]));
 
             const state = store.getState();
             assert.equal(state.entities.channels.channels[channelId].total_msg_count, 11);
@@ -756,7 +755,7 @@ describe('Actions.Channels', () => {
                 },
             });
 
-            await Actions.markChannelAsRead(channelId)(store.dispatch, store.getState);
+            await store.dispatch(Actions.markChannelAsRead(channelId));
 
             const state = store.getState();
 
@@ -801,7 +800,7 @@ describe('Actions.Channels', () => {
                 },
             });
 
-            await Actions.markChannelAsRead(channelId)(store.dispatch, store.getState);
+            await store.dispatch(Actions.markChannelAsRead(channelId));
 
             const state = store.getState();
 
@@ -840,7 +839,7 @@ describe('Actions.Channels', () => {
                 },
             });
 
-            await Actions.markChannelAsRead(channelId)(store.dispatch, store.getState);
+            await store.dispatch(Actions.markChannelAsRead(channelId));
 
             const state = store.getState();
 
@@ -893,7 +892,7 @@ describe('Actions.Channels', () => {
                 },
             });
 
-            await Actions.markChannelAsRead(channelId1)(store.dispatch, store.getState);
+            await store.dispatch(Actions.markChannelAsRead(channelId1));
 
             const state = store.getState();
 
@@ -952,7 +951,7 @@ describe('Actions.Channels', () => {
                 },
             });
 
-            await Actions.markChannelAsRead(channelId1, channelId2)(store.dispatch, store.getState);
+            await store.dispatch(Actions.markChannelAsRead(channelId1, channelId2));
 
             const state = store.getState();
 
@@ -1011,7 +1010,7 @@ describe('Actions.Channels', () => {
                 },
             });
 
-            await Actions.markChannelAsRead(channelId2, channelId1)(store.dispatch, store.getState);
+            await store.dispatch(Actions.markChannelAsRead(channelId2, channelId1));
 
             const state = store.getState();
 
@@ -1076,7 +1075,7 @@ describe('Actions.Channels', () => {
                 },
             });
 
-            await Actions.markChannelAsRead(channelId1)(store.dispatch, store.getState);
+            await store.dispatch(Actions.markChannelAsRead(channelId1));
 
             const state = store.getState();
 
@@ -1144,7 +1143,7 @@ describe('Actions.Channels', () => {
                 },
             });
 
-            await Actions.markChannelAsRead(channelId1, channelId2)(store.dispatch, store.getState);
+            await store.dispatch(Actions.markChannelAsRead(channelId1, channelId2));
 
             const state = store.getState();
 
@@ -1212,7 +1211,7 @@ describe('Actions.Channels', () => {
                 },
             });
 
-            await Actions.markChannelAsRead(channelId1, channelId2)(store.dispatch, store.getState);
+            await store.dispatch(Actions.markChannelAsRead(channelId1, channelId2));
 
             const state = store.getState();
 
@@ -1264,7 +1263,7 @@ describe('Actions.Channels', () => {
             query(true).
             reply(200, [TestHelper.basicChannel, userChannel]);
 
-        await Actions.getChannels(TestHelper.basicTeam.id, 0)(store.dispatch, store.getState);
+        await store.dispatch(Actions.getChannels(TestHelper.basicTeam.id, 0));
 
         const moreRequest = store.getState().requests.channels.getChannels;
         if (moreRequest.status === RequestStatus.FAILURE) {
@@ -1287,7 +1286,7 @@ describe('Actions.Channels', () => {
             query(true).
             reply(200, [TestHelper.basicChannelMember]);
 
-        await Actions.getChannelMembers(TestHelper.basicChannel.id)(store.dispatch, store.getState);
+        await store.dispatch(Actions.getChannelMembers(TestHelper.basicChannel.id));
 
         const membersRequest = store.getState().requests.channels.members;
         if (membersRequest.status === RequestStatus.FAILURE) {
@@ -1306,7 +1305,7 @@ describe('Actions.Channels', () => {
             get(`/${TestHelper.basicChannel.id}/members/${TestHelper.basicUser.id}`).
             reply(200, TestHelper.basicChannelMember);
 
-        await Actions.getChannelMember(TestHelper.basicChannel.id, TestHelper.basicUser.id)(store.dispatch, store.getState);
+        await store.dispatch(Actions.getChannelMember(TestHelper.basicChannel.id, TestHelper.basicUser.id));
 
         const membersRequest = store.getState().requests.channels.members;
         if (membersRequest.status === RequestStatus.FAILURE) {
@@ -1325,7 +1324,7 @@ describe('Actions.Channels', () => {
             get(`/${TestHelper.basicChannel.id}/members/me`).
             reply(200, TestHelper.basicChannelMember);
 
-        await Actions.getMyChannelMember(TestHelper.basicChannel.id)(store.dispatch, store.getState);
+        await store.dispatch(Actions.getMyChannelMember(TestHelper.basicChannel.id));
 
         const membersRequest = store.getState().requests.channels.members;
         if (membersRequest.status === RequestStatus.FAILURE) {
@@ -1343,7 +1342,7 @@ describe('Actions.Channels', () => {
             post(`/${TestHelper.basicChannel.id}/members/ids`).
             reply(200, [TestHelper.basicChannelMember]);
 
-        await Actions.getChannelMembersByIds(TestHelper.basicChannel.id, [TestHelper.basicUser.id])(store.dispatch, store.getState);
+        await store.dispatch(Actions.getChannelMembersByIds(TestHelper.basicChannel.id, [TestHelper.basicUser.id]));
 
         const membersRequest = store.getState().requests.channels.members;
         if (membersRequest.status === RequestStatus.FAILURE) {
@@ -1362,9 +1361,7 @@ describe('Actions.Channels', () => {
             get(`/${TestHelper.basicChannel.id}/stats`).
             reply(200, {channel_id: TestHelper.basicChannel.id, member_count: 1});
 
-        await Actions.getChannelStats(
-            TestHelper.basicChannel.id
-        )(store.dispatch, store.getState);
+        await store.dispatch(Actions.getChannelStats(TestHelper.basicChannel.id));
 
         const statsRequest = store.getState().requests.channels.getChannelStats;
         if (statsRequest.status === RequestStatus.FAILURE) {
@@ -1396,19 +1393,13 @@ describe('Actions.Channels', () => {
             post(`/${TestHelper.basicChannel.id}/members`).
             reply(201, {channel_id: TestHelper.basicChannel.id, roles: 'channel_user', user_id: TestHelper.basicUser.id});
 
-        await Actions.joinChannel(
-            TestHelper.basicUser.id,
-            TestHelper.basicTeam.id,
-            channelId
-        )(store.dispatch, store.getState);
+        await store.dispatch(Actions.joinChannel(TestHelper.basicUser.id, TestHelper.basicTeam.id, channelId));
 
         nock(Client4.getChannelsRoute()).
             get(`/${TestHelper.basicChannel.id}/stats`).
             reply(200, {channel_id: TestHelper.basicChannel.id, member_count: 1});
 
-        await Actions.getChannelStats(
-            channelId
-        )(store.dispatch, store.getState);
+        await store.dispatch(Actions.getChannelStats(channelId));
 
         let state = store.getState();
         let {stats} = state.entities.channels;
@@ -1421,10 +1412,7 @@ describe('Actions.Channels', () => {
             post(`/${TestHelper.basicChannel.id}/members`).
             reply(201, {channel_id: TestHelper.basicChannel.id, roles: 'channel_user', user_id: user.id});
 
-        await Actions.addChannelMember(
-            channelId,
-            user.id
-        )(store.dispatch, store.getState);
+        await store.dispatch(Actions.addChannelMember(channelId, user.id));
 
         state = store.getState();
 
@@ -1467,28 +1455,19 @@ describe('Actions.Channels', () => {
             post(`/${TestHelper.basicChannel.id}/members`).
             reply(201, {channel_id: TestHelper.basicChannel.id, roles: 'channel_user', user_id: TestHelper.basicUser.id});
 
-        await Actions.joinChannel(
-            TestHelper.basicUser.id,
-            TestHelper.basicTeam.id,
-            channelId
-        )(store.dispatch, store.getState);
+        await store.dispatch(Actions.joinChannel(TestHelper.basicUser.id, TestHelper.basicTeam.id, channelId));
 
         nock(Client4.getChannelsRoute()).
             get(`/${TestHelper.basicChannel.id}/stats`).
             reply(200, {channel_id: TestHelper.basicChannel.id, member_count: 1});
 
-        await Actions.getChannelStats(
-            channelId
-        )(store.dispatch, store.getState);
+        await store.dispatch(Actions.getChannelStats(channelId));
 
         nock(Client4.getChannelsRoute()).
             post(`/${TestHelper.basicChannel.id}/members`).
             reply(201, {channel_id: TestHelper.basicChannel.id, roles: 'channel_user', user_id: user.id});
 
-        await Actions.addChannelMember(
-            channelId,
-            user.id
-        )(store.dispatch, store.getState);
+        await store.dispatch(Actions.addChannelMember(channelId, user.id));
 
         let state = store.getState();
         let {stats} = state.entities.channels;
@@ -1501,10 +1480,7 @@ describe('Actions.Channels', () => {
             delete(`/${TestHelper.basicChannel.id}/members/${user.id}`).
             reply(200, OK_RESPONSE);
 
-        await Actions.removeChannelMember(
-            channelId,
-            user.id
-        )(store.dispatch, store.getState);
+        await store.dispatch(Actions.removeChannelMember(channelId, user.id));
 
         state = store.getState();
 
@@ -1539,19 +1515,19 @@ describe('Actions.Channels', () => {
             post(`/${TestHelper.basicChannel.id}/members`).
             reply(201, {team_id: TestHelper.basicTeam.id, roles: 'channel_user', user_id: user.id});
 
-        await addUserToTeam(TestHelper.basicTeam.id, user.id)(store.dispatch, store.getState);
+        await store.dispatch(addUserToTeam(TestHelper.basicTeam.id, user.id));
         nock(Client4.getChannelsRoute()).
             post(`/${TestHelper.basicChannel.id}/members`).
             reply(201, {channel_id: TestHelper.basicChannel.id, roles: 'channel_user', user_id: user.id});
 
-        await Actions.addChannelMember(TestHelper.basicChannel.id, user.id)(store.dispatch, store.getState);
+        await store.dispatch(Actions.addChannelMember(TestHelper.basicChannel.id, user.id));
 
         const roles = General.CHANNEL_USER_ROLE + ' ' + General.CHANNEL_ADMIN_ROLE;
 
         nock(Client4.getChannelsRoute()).
             put(`/${TestHelper.basicChannel.id}/members/${user.id}/roles`).
             reply(200, {roles});
-        await Actions.updateChannelMemberRoles(TestHelper.basicChannel.id, user.id, roles)(store.dispatch, store.getState);
+        await store.dispatch(Actions.updateChannelMemberRoles(TestHelper.basicChannel.id, user.id, roles));
 
         const membersRequest = store.getState().requests.channels.updateChannelMember;
         const members = store.getState().entities.channels.membersInChannel;
@@ -1570,7 +1546,7 @@ describe('Actions.Channels', () => {
             post(`${TestHelper.basicChannel.id}`).
             reply(200, TestHelper.basicChannel);
 
-        await Actions.getChannel(TestHelper.basicChannel.id)(store.dispatch, store.getState);
+        await store.dispatch(Actions.getChannel(TestHelper.basicChannel.id));
 
         const channelRequest = store.getState().requests.channels.getChannel;
         if (channelRequest.status === RequestStatus.FAILURE) {
@@ -1579,10 +1555,7 @@ describe('Actions.Channels', () => {
 
         const header = 'this is an updated test header';
 
-        await Actions.updateChannelHeader(
-            TestHelper.basicChannel.id,
-            header
-        )(store.dispatch, store.getState);
+        await store.dispatch(Actions.updateChannelHeader(TestHelper.basicChannel.id, header));
 
         const {channels} = store.getState().entities.channels;
         const channel = channels[TestHelper.basicChannel.id];
@@ -1595,7 +1568,7 @@ describe('Actions.Channels', () => {
             post(`${TestHelper.basicChannel.id}`).
             reply(200, TestHelper.basicChannel);
 
-        await Actions.getChannel(TestHelper.basicChannel.id)(store.dispatch, store.getState);
+        await store.dispatch(Actions.getChannel(TestHelper.basicChannel.id));
 
         const channelRequest = store.getState().requests.channels.getChannel;
         if (channelRequest.status === RequestStatus.FAILURE) {
@@ -1603,10 +1576,7 @@ describe('Actions.Channels', () => {
         }
 
         const purpose = 'this is an updated test purpose';
-        await Actions.updateChannelPurpose(
-            TestHelper.basicChannel.id,
-            purpose
-        )(store.dispatch, store.getState);
+        await store.dispatch(Actions.updateChannelPurpose(TestHelper.basicChannel.id, purpose));
         const {channels} = store.getState().entities.channels;
         const channel = channels[TestHelper.basicChannel.id];
         assert.ok(channel);
@@ -1622,7 +1592,7 @@ describe('Actions.Channels', () => {
 
         async function test() {
             TestHelper.mockLogin();
-            await login(TestHelper.basicUser.email, 'password1')(store.dispatch, store.getState);
+            await store.dispatch(login(TestHelper.basicUser.email, 'password1'));
             nock(Client4.getChannelsRoute()).
                 get(`/${TestHelper.basicChannel.id}`).
                 reply(200, TestHelper.basicChannel);
@@ -1631,11 +1601,7 @@ describe('Actions.Channels', () => {
                 post(`/${TestHelper.basicChannel.id}/members`).
                 reply(201, {channel_id: TestHelper.basicChannel.id, roles: 'channel_user', user_id: TestHelper.basicUser.id});
 
-            await Actions.joinChannel(
-                TestHelper.basicUser.id,
-                TestHelper.basicTeam.id,
-                TestHelper.basicChannel.id
-            )(store.dispatch, store.getState);
+            await store.dispatch(Actions.joinChannel(TestHelper.basicUser.id, TestHelper.basicTeam.id, TestHelper.basicChannel.id));
 
             const {channels, myMembers} = store.getState().entities.channels;
             assert.ok(channels[TestHelper.basicChannel.id]);
@@ -1650,9 +1616,7 @@ describe('Actions.Channels', () => {
                 reply(200, OK_RESPONSE);
 
             // This action will retry after 1000ms
-            await Actions.leaveChannel(
-                TestHelper.basicChannel.id
-            )(store.dispatch, store.getState);
+            await store.dispatch(Actions.leaveChannel(TestHelper.basicChannel.id));
 
             setTimeout(test2, 300);
         }
@@ -1683,7 +1647,7 @@ describe('Actions.Channels', () => {
             post('').
             reply(201, {...TestHelper.fakeChannelWithId(TestHelper.basicTeam.id), ...newChannel});
 
-        const {data: channel} = await Actions.createChannel(newChannel, TestHelper.basicUser.id)(store.dispatch, store.getState);
+        const {data: channel} = await store.dispatch(Actions.createChannel(newChannel, TestHelper.basicUser.id));
         let channels = store.getState().entities.channels.channels;
         assert.ok(channels[channel.id]);
 
@@ -1691,9 +1655,7 @@ describe('Actions.Channels', () => {
             delete(`/${TestHelper.basicChannel.id}/members/${TestHelper.basicUser.id}`).
             reply(200, OK_RESPONSE);
 
-        await Actions.leaveChannel(
-            channel.id
-        )(store.dispatch, store.getState);
+        await store.dispatch(Actions.leaveChannel(channel.id));
         channels = store.getState().entities.channels.channels;
         const myMembers = store.getState().entities.channels.myMembers;
         assert.ok(!channels[channel.id]);
@@ -1709,11 +1671,7 @@ describe('Actions.Channels', () => {
             post(`/${TestHelper.basicChannel.id}/members`).
             reply(201, {channel_id: TestHelper.basicChannel.id, roles: 'channel_user', user_id: TestHelper.basicUser.id});
 
-        await Actions.joinChannel(
-            TestHelper.basicUser.id,
-            TestHelper.basicTeam.id,
-            TestHelper.basicChannel.id
-        )(store.dispatch, store.getState);
+        await store.dispatch(Actions.joinChannel(TestHelper.basicUser.id, TestHelper.basicTeam.id, TestHelper.basicChannel.id));
 
         const joinRequest = store.getState().requests.channels.joinChannel;
         if (joinRequest.status === RequestStatus.FAILURE) {
@@ -1761,12 +1719,12 @@ describe('Actions.Channels', () => {
             post(`/${secondChannel.id}/members`).
             reply(201, {channel_id: secondChannel.id, roles: 'channel_user', user_id: TestHelper.basicUser.id});
 
-        await Actions.joinChannel(
+        await store.dispatch(Actions.joinChannel(
             TestHelper.basicUser.id,
             TestHelper.basicTeam.id,
             null,
             secondChannel.name
-        )(store.dispatch, store.getState);
+        ));
 
         const joinRequest = store.getState().requests.channels.joinChannel;
         if (joinRequest.status === RequestStatus.FAILURE) {
@@ -1783,7 +1741,7 @@ describe('Actions.Channels', () => {
             put(`/${TestHelper.basicUser.id}/preferences`).
             reply(200, OK_RESPONSE);
 
-        await Actions.favoriteChannel(TestHelper.basicChannel.id)(store.dispatch, store.getState);
+        await store.dispatch(Actions.favoriteChannel(TestHelper.basicChannel.id));
 
         const state = store.getState();
         const prefKey = getPreferenceKey(Preferences.CATEGORY_FAVORITE_CHANNEL, TestHelper.basicChannel.id);
@@ -1797,7 +1755,7 @@ describe('Actions.Channels', () => {
             put(`/${TestHelper.basicUser.id}/preferences`).
             reply(200, OK_RESPONSE);
 
-        await Actions.favoriteChannel(TestHelper.basicChannel.id)(store.dispatch, store.getState);
+        await store.dispatch(Actions.favoriteChannel(TestHelper.basicChannel.id));
 
         let state = store.getState();
         let prefKey = getPreferenceKey(Preferences.CATEGORY_FAVORITE_CHANNEL, TestHelper.basicChannel.id);
@@ -1808,7 +1766,7 @@ describe('Actions.Channels', () => {
         nock(Client4.getUsersRoute()).
             delete(`/${TestHelper.basicUser.id}/preferences`).
             reply(200, OK_RESPONSE);
-        Actions.unfavoriteChannel(TestHelper.basicChannel.id)(store.dispatch, store.getState);
+        store.dispatch(Actions.unfavoriteChannel(TestHelper.basicChannel.id));
 
         state = store.getState();
         prefKey = getPreferenceKey(Preferences.CATEGORY_FAVORITE_CHANNEL, TestHelper.basicChannel.id);
@@ -1824,23 +1782,39 @@ describe('Actions.Channels', () => {
             query({name: prefix}).
             reply(200, [TestHelper.basicChannel]);
 
-        const result = await Actions.autocompleteChannels(
+        const result = await store.dispatch(Actions.autocompleteChannels(
             TestHelper.basicChannel.team_id,
             prefix
-        )(store.dispatch, store.getState);
+        ));
+
+        assert.deepEqual(result, {data: [TestHelper.basicChannel]});
+    });
+
+    it('autocompleteChannelsForSearch', async () => {
+        const prefix = TestHelper.basicChannel.name.slice(0, 5);
+
+        nock(Client4.getTeamRoute(TestHelper.basicChannel.team_id)).
+            get('/channels/search_autocomplete').
+            query({name: prefix}).
+            reply(200, [TestHelper.basicChannel]);
+
+        const result = await store.dispatch(Actions.autocompleteChannelsForSearch(
+            TestHelper.basicChannel.team_id,
+            prefix
+        ));
 
         assert.deepEqual(result, {data: [TestHelper.basicChannel]});
     });
 
     it('updateChannelScheme', async () => {
         TestHelper.mockLogin();
-        await login(TestHelper.basicChannelMember.email, 'password1')(store.dispatch, store.getState);
+        await store.dispatch(login(TestHelper.basicChannelMember.email, 'password1'));
 
         nock(Client4.getChannelsRoute()).
             post('').
             reply(201, TestHelper.fakeChannelWithId(TestHelper.basicTeam.id));
 
-        await Actions.createChannel(TestHelper.fakeChannel(TestHelper.basicTeam.id), TestHelper.basicUser.id)(store.dispatch, store.getState);
+        await store.dispatch(Actions.createChannel(TestHelper.fakeChannel(TestHelper.basicTeam.id), TestHelper.basicUser.id));
 
         const createRequest = store.getState().requests.channels.createChannel;
 
@@ -1856,7 +1830,7 @@ describe('Actions.Channels', () => {
             put('/' + id + '/scheme').
             reply(200, OK_RESPONSE);
 
-        await Actions.updateChannelScheme(id, schemeId)(store.dispatch, store.getState);
+        await store.dispatch(Actions.updateChannelScheme(id, schemeId));
 
         const request = store.getState().requests.channels.updateChannelScheme;
 
@@ -1871,7 +1845,7 @@ describe('Actions.Channels', () => {
 
     it('updateChannelMemberSchemeRoles', async () => {
         TestHelper.mockLogin();
-        await login(TestHelper.basicChannelMember.email, 'password1')(store.dispatch, store.getState);
+        await store.dispatch(login(TestHelper.basicChannelMember.email, 'password1'));
 
         nock(Client4.getChannelsRoute()).
             post('').
@@ -1879,7 +1853,7 @@ describe('Actions.Channels', () => {
 
         const userId = TestHelper.basicChannelMember.id;
 
-        await Actions.createChannel(TestHelper.fakeChannel(TestHelper.basicTeam.id), userId)(store.dispatch, store.getState);
+        await store.dispatch(Actions.createChannel(TestHelper.fakeChannel(TestHelper.basicTeam.id), userId));
 
         const createRequest = store.getState().requests.channels.createChannel;
 
@@ -1894,7 +1868,7 @@ describe('Actions.Channels', () => {
             put(`/${channelId}/members/${userId}/schemeRoles`).
             reply(200, OK_RESPONSE);
 
-        await Actions.updateChannelMemberSchemeRoles(channelId, userId, true, true)(store.dispatch, store.getState);
+        await store.dispatch(Actions.updateChannelMemberSchemeRoles(channelId, userId, true, true));
         const request = store.getState().requests.channels.updateChannelMemberSchemeRoles;
         if (request.status === RequestStatus.FAILURE) {
             throw new Error(JSON.stringify(request.error));
@@ -1909,7 +1883,7 @@ describe('Actions.Channels', () => {
             put(`/${channelId}/members/${userId}/schemeRoles`).
             reply(200, OK_RESPONSE);
 
-        await Actions.updateChannelMemberSchemeRoles(channelId, userId, false, false)(store.dispatch, store.getState);
+        await store.dispatch(Actions.updateChannelMemberSchemeRoles(channelId, userId, false, false));
         const request2 = store.getState().requests.channels.updateChannelMemberSchemeRoles;
         if (request2.status === RequestStatus.FAILURE) {
             throw new Error(JSON.stringify(request2.error));
