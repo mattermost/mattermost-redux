@@ -42,10 +42,7 @@ const getReactionsForPost = makeGetReactionsForPost();
 export function getUserIdsFromReactions(state, postId) {
     const reactions = getReactionsForPost(state, postId);
 
-    return reactions.reduce((acc, reaction) => {
-        acc.push(reaction.user_id);
-        return acc;
-    }, []);
+    return reactions.map((reaction) => reaction.user_id);
 }
 
 export function getOpenGraphMetadata(state) {
