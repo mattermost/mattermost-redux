@@ -28,8 +28,13 @@ describe('Selectors.Posts', () => {
     };
 
     const reaction1 = {user_id: user1.id, emoji_name: '+1'};
+    const reaction2 = {user_id: user1.id, emoji_name: 'smile'};
     const reactions = {
         a: {[reaction1.user_id + '-' + reaction1.emoji_name]: reaction1},
+        b: {
+            [reaction1.user_id + '-' + reaction1.emoji_name]: reaction1,
+            [reaction2.user_id + '-' + reaction2.emoji_name]: reaction2,
+        },
     };
 
     const testState = deepFreezeAndThrowOnMutation({
@@ -100,6 +105,17 @@ describe('Selectors.Posts', () => {
     it('should return reactions for post', () => {
         const getReactionsForPost = Selectors.makeGetReactionsForPost();
         assert.deepEqual(getReactionsForPost(testState, posts.a.id), [reaction1]);
+    });
+
+    it('should return all user IDs from the reactions of a post', () => { // eslint-disable-line
+        let allUserIds = Selectors.getUserIdsFromReactions(testState, posts.a.id);
+        assert.deepEqual(allUserIds, [reaction1.user_id]);
+
+        allUserIds = Selectors.getUserIdsFromReactions(testState, posts.b.id);
+        assert.deepEqual(allUserIds, [reaction1.user_id, reaction2.user_id]);
+
+        allUserIds = Selectors.getUserIdsFromReactions(testState, posts.c.id);
+        assert.deepEqual(allUserIds, []);
     });
 
     it('should return profiles for reactions', () => {
