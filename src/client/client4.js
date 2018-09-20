@@ -9,7 +9,6 @@ const FormData = require('form-data');
 import fetch from './fetch_etag';
 import {isMinimumServerVersion} from 'src/utils/helpers';
 
-const HEADER_TOKEN = 'Token';
 const HEADER_AUTH = 'Authorization';
 const HEADER_BEARER = 'BEARER';
 const HEADER_REQUESTED_WITH = 'X-Requested-With';
@@ -442,14 +441,10 @@ export default class Client4 {
             body.ldap_only = 'true';
         }
 
-        const {headers, data} = await this.doFetchWithResponse(
+        const {data} = await this.doFetchWithResponse(
             `${this.getUsersRoute()}/login`,
             {method: 'post', body: JSON.stringify(body)}
         );
-
-        if (headers.has(HEADER_TOKEN)) {
-            this.token = headers.get(HEADER_TOKEN);
-        }
 
         return data;
     };
@@ -464,14 +459,10 @@ export default class Client4 {
             token,
         };
 
-        const {headers, data} = await this.doFetchWithResponse(
+        const {data} = await this.doFetchWithResponse(
             `${this.getUsersRoute()}/login`,
             {method: 'post', body: JSON.stringify(body)}
         );
-
-        if (headers.has(HEADER_TOKEN)) {
-            this.token = headers.get(HEADER_TOKEN);
-        }
 
         return data;
     };
