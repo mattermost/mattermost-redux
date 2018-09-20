@@ -7,6 +7,20 @@ import {getPreferencesByCategory} from './preference_utils';
 import {hasNewPermissions} from 'selectors/entities/general';
 import {haveITeamPermission, haveIChannelPermission} from 'selectors/entities/roles';
 
+// TEST PROFILING HACK
+String.prototype.localeCompare0 = String.prototype.localeCompare;
+String.prototype.localeCompare = function(b) {
+    const a = this;
+    for (const char of a) {
+		if (char.charCodeAt() > 127) return a.localeCompare0(b);
+    }
+    for (const char of b) {
+    	if (char.charCodeAt() > 127) return a.localeCompare0(b);
+    }
+	return (a < b ? -1 : (a > b ? 1 : 0));
+}
+// END TEST PROFILING HACK
+
 const channelTypeOrder = {
     [General.OPEN_CHANNEL]: 0,
     [General.PRIVATE_CHANNEL]: 1,
