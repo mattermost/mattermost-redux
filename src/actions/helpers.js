@@ -17,6 +17,7 @@ export function forceLogoutIfNecessary(err: Client4Error, dispatch: DispatchFunc
     const {currentUserId} = getState().entities.users;
     if (err.status_code === HTTP_UNAUTHORIZED && err.url && err.url.indexOf('/login') === -1 && currentUserId) {
         Client4.setToken('');
+        dispatch({type: UserTypes.SESSION_EXPIRED});
         dispatch({type: UserTypes.LOGOUT_SUCCESS, data: {}});
     }
 }

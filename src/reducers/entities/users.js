@@ -87,6 +87,30 @@ function currentUserId(state = '', action) {
     return state;
 }
 
+// mySession manages information about the current session.
+//
+// It currently only tracks if the session has expired. If an explicit logout request occurs, some
+// API calls may fail as though the session has expired, but these are ignored until a login event
+// occurs.
+function mySession(state = {}, action) {
+    switch (action.type) {
+    case UserTypes.LOGIN_SUCCESS:
+        return {};
+
+    case UserTypes.LOGOUT_REQUEST:
+        return {expired: false};
+
+    case UserTypes.SESSION_EXPIRED:
+        if (state.expired === false || state.expired === true) {
+            return state;
+        }
+
+        return {expired: true};
+    }
+
+    return state;
+}
+
 function mySessions(state = [], action) {
     switch (action.type) {
     case UserTypes.RECEIVED_SESSIONS:
@@ -368,6 +392,9 @@ export default combineReducers({
 
     // the current selected user
     currentUserId,
+
+    // information about the current session
+    mySession,
 
     // array with the user's sessions
     mySessions,
