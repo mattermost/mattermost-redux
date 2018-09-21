@@ -3,7 +3,7 @@
 
 import {combineReducers} from 'redux';
 import {AdminTypes, UserTypes} from 'action_types';
-import {Stats} from 'constants';
+import {Stats, Plugins} from 'constants';
 import PluginState from 'constants/plugins';
 
 function logs(state = [], action) {
@@ -430,7 +430,7 @@ function pluginStatuses(state = {}, action) {
                 name: (nextState[id] && nextState[id].name) || plugin.name,
                 description: (nextState[id] && nextState[id].description) || plugin.description,
                 version: (nextState[id] && nextState[id].version) || plugin.version,
-                is_prepackaged: (nextState[id] && nextState[id].is_prepackaged) || plugin.is_prepackaged,
+                is_prepackaged: (nextState[id] && nextState[id].is_prepackaged) || Plugins.PREPACKAGED_PLUGINS.includes(id),
                 active: pluginState > 0,
                 state: pluginState,
                 instances,

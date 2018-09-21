@@ -13,6 +13,7 @@ import Teams from './teams';
 import Stats from './stats';
 import Permissions from './permissions';
 import Emoji from './emoji';
+import Plugins from './plugins';
 
 export {
     General,
@@ -26,5 +27,6 @@ export {
     Stats,
     Permissions,
     Emoji,
+    Plugins,
 };
 
