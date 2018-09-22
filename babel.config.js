@@ -12,7 +12,6 @@ module.exports = {
                 ios: 9,
             },
             loose: true,
-            modules: false,
             useBuiltIns: 'usage',
             shippedProposals: true,
         }],
