@@ -11,7 +11,6 @@ module.exports = {
                 edge: 15,
                 ios: 9,
             },
-            loose: true,
             useBuiltIns: 'usage',
             shippedProposals: true,
         }],
@@ -21,8 +20,6 @@ module.exports = {
         ['module-resolver', {
             root: ['./src', '.'],
         }],
-        ['@babel/proposal-class-properties', {
-            loose: true,
-        }],
+        '@babel/proposal-class-properties',
     ],
 };
