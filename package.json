@@ -9,7 +9,6 @@
     "url": "https://github.com/mattermost/mattermost-redux/issues"
   },
   "dependencies": {
-    "@babel/polyfill": "^7.0.0-beta.54",
     "deep-equal": "1.0.1",
     "eslint-plugin-header": "1.2.0",
     "form-data": "2.3.2",
@@ -28,15 +27,14 @@
     "shallow-equals": "1.0.0"
   },
   "devDependencies": {
-    "@babel/cli": "^7.0.0-beta.54",
-    "@babel/core": "^7.0.0-beta.54",
-    "@babel/plugin-proposal-class-properties": "^7.0.0-beta.54",
-    "@babel/preset-env": "^7.0.0-beta.54",
-    "@babel/preset-flow": "^7.0.0-beta.54",
-    "@babel/register": "^7.0.0-beta.54",
+    "@babel/cli": "^7.1.0",
+    "@babel/core": "^7.1.0",
+    "@babel/preset-env": "^7.1.0",
+    "@babel/preset-flow": "^7.0.0",
+    "@babel/register": "^7.0.0",
     "babel-core": "^7.0.0-bridge.0",
-    "babel-eslint": "8.2.3",
-    "babel-loader": "^8.0.0-beta.4",
+    "babel-eslint": "^8.2.3",
+    "babel-loader": "^8.0.2",
     "babel-plugin-module-resolver": "3.1.1",
     "chai": "4.1.2",
     "deep-freeze": "0.0.1",
