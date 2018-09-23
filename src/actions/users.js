@@ -610,6 +610,22 @@ export function getMe() {
     };
 }
 
+export function updateServiceTermsStatus(userId, serviceTermsId, accepted) {
+    return async (dispatch, getState) => {
+        await bindClientFunc(
+            Client4.updateServiceTermsStatus,
+            UserTypes.UPDATE_SERVICE_TERMS_STATUS_REQUEST,
+            UserTypes.UPDATE_SERVICE_TERMS_STATUS_SUCCESS,
+            UserTypes.UPDATE_SERVICE_TERMS_STATUS_FAILURE,
+            userId,
+            serviceTermsId,
+            accepted
+        )(dispatch, getState);
+        await getMe()(dispatch, getState);
+        return {data: true};
+    };
+}
+
 export function getUser(id) {
     return bindClientFunc(
         Client4.getUser,
@@ -1540,6 +1556,7 @@ export default {
     switchOAuthToEmail,
     switchEmailToLdap,
     switchLdapToEmail,
+    updateServiceTermsStatus,
     createUserAccessToken,
     getUserAccessToken,
     getUserAccessTokensForUser,
