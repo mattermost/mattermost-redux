@@ -321,7 +321,7 @@ function switchLogin(state: RequestStatusType = initialRequestState(), action: G
 function updateServiceTermsStatus(state: RequestStatusType = initialRequestState(), action: GenericAction): RequestStatusType {
     return handleRequest(
         UserTypes.UPDATE_SERVICE_TERMS_STATUS_REQUEST,
-        [UserTypes.RECEIVED_ME, UserTypes.UPDATE_ME_SUCCESS, UserTypes.UPDATE_SERVICE_TERMS_STATUS_SUCCESS],
+        UserTypes.UPDATE_SERVICE_TERMS_STATUS_SUCCESS,
         UserTypes.UPDATE_SERVICE_TERMS_STATUS_FAILURE,
         state,
         action

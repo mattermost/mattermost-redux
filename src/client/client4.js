@@ -416,9 +416,9 @@ export default class Client4 {
         );
     }
 
-    updateServiceTermsStatus = async (userId, serviceTermsId, accepted) => {
+    updateServiceTermsStatus = async (serviceTermsId, accepted) => {
         return this.doFetch(
-            `${this.getUserRoute(userId)}/service_terms`,
+            `${this.getUserRoute('me')}/service_terms`,
             {method: 'post', body: JSON.stringify({serviceTermsId, accepted})}
         );
     }

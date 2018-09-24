@@ -610,14 +610,13 @@ export function getMe() {
     };
 }
 
-export function updateServiceTermsStatus(userId, serviceTermsId, accepted) {
+export function updateServiceTermsStatus(serviceTermsId, accepted) {
     return async (dispatch, getState) => {
         await bindClientFunc(
             Client4.updateServiceTermsStatus,
             UserTypes.UPDATE_SERVICE_TERMS_STATUS_REQUEST,
             UserTypes.UPDATE_SERVICE_TERMS_STATUS_SUCCESS,
             UserTypes.UPDATE_SERVICE_TERMS_STATUS_FAILURE,
-            userId,
             serviceTermsId,
             accepted
         )(dispatch, getState);

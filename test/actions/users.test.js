@@ -115,6 +115,62 @@ describe('Actions.Users', () => {
         });
     });
 
+    it('updateServiceTermsStatus accept terms', async () => {
+        nock(Client4.getUsersRoute()).
+            post('').
+            reply(201, {...TestHelper.fakeUser(), id: TestHelper.generateId()});
+
+        nock(Client4.getBaseRoute()).
+            get('/users/me').
+            reply(200, {...TestHelper.fakeUserWithServiceTermsAccepted(), roles: 'basic_user'});
+
+        nock(Client4.getBaseRoute()).
+            post('/users/me/service_terms').
+            reply(200, OK_RESPONSE);
+
+        await Actions.updateServiceTermsStatus(1, true)(store.dispatch, store.getState);
+
+        const request = store.getState().requests.users.updateServiceTermsStatus;
+
+        if (request.status === RequestStatus.FAILURE) {
+            throw new Error(JSON.stringify(request.error));
+        }
+
+        const {currentUserId, profiles} = store.getState().entities.users;
+
+        assert.ok(currentUserId);
+        assert.ok(profiles[currentUserId]);
+        assert.equal(profiles[currentUserId].latest_service_terms_accepted, true);
+    });
+
+    it('updateServiceTermsStatus reject terms', async () => {
+        nock(Client4.getUsersRoute()).
+            post('').
+            reply(201, {...TestHelper.fakeUser(), id: TestHelper.generateId()});
+
+        nock(Client4.getBaseRoute()).
+            get('/users/me').
+            reply(200, {...TestHelper.fakeUserWithServiceTermsNotAccepted(), roles: 'basic_user'});
+
+        nock(Client4.getBaseRoute()).
+            post('/users/me/service_terms').
+            reply(200, OK_RESPONSE);
+
+        await Actions.updateServiceTermsStatus(1, false)(store.dispatch, store.getState);
+
+        const request = store.getState().requests.users.updateServiceTermsStatus;
+
+        if (request.status === RequestStatus.FAILURE) {
+            throw new Error(JSON.stringify(request.error));
+        }
+
+        const {currentUserId, profiles} = store.getState().entities.users;
+
+        assert.ok(currentUserId);
+        assert.ok(profiles[currentUserId]);
+        assert.equal(profiles[currentUserId].latest_service_terms_accepted, false);
+    });
+
     it('logout', async () => {
         nock(Client4.getUsersRoute()).
             post('/logout').

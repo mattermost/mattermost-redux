@@ -338,5 +338,101 @@ describe('Selectors.Users', () => {
             assert.deepEqual(getProfilesByIdsAndUsernames(testState, testCase.input), testCase.output);
         });
     });
+
+    it('showCustomTerms', () => {
+        const userId = 1234;
+        assert.equal(Selectors.showCustomTerms({
+            entities: {
+                general: {
+                    config: {
+                        CustomServiceTermsEnabled: 'true',
+                    },
+                    license: {
+                        IsLicensed: 'true',
+                    },
+                },
+                users: {
+                    currentUserId: userId,
+                    profiles: {
+                        [userId]: {id: userId, username: 'user', first_name: 'First', last_name: 'Last', latest_service_terms_accepted: false},
+                    },
+                },
+            },
+        }), true);
+
+        assert.equal(Selectors.showCustomTerms({
+            entities: {
+                general: {
+                    config: {
+                        CustomServiceTermsEnabled: 'false',
+                    },
+                    license: {
+                        IsLicensed: 'true',
+                    },
+                },
+                users: {
+                    currentUserId: userId,
+                    profiles: {
+                        [userId]: {id: userId, username: 'user', first_name: 'First', last_name: 'Last', latest_service_terms_accepted: false},
+                    },
+                },
+            },
+        }), false);
+
+        assert.equal(Selectors.showCustomTerms({
+            entities: {
+                general: {
+                    config: {
+                        CustomServiceTermsEnabled: 'true',
+                    },
+                    license: {
+                        IsLicensed: 'false',
+                    },
+                },
+                users: {
+                    currentUserId: userId,
+                    profiles: {
+                        [userId]: {id: userId, username: 'user', first_name: 'First', last_name: 'Last', latest_service_terms_accepted: false},
+                    },
+                },
+            },
+        }), false);
+
+        assert.equal(Selectors.showCustomTerms({
+            entities: {
+                general: {
+                    config: {
+                        CustomServiceTermsEnabled: 'true',
+                    },
+                    license: {
+                        IsLicensed: 'true',
+                    },
+                },
+                users: {
+                    currentUserId: userId,
+                    profiles: {
+                        [userId]: {id: userId, username: 'user', first_name: 'First', last_name: 'Last', latest_service_terms_accepted: true},
+                    },
+                },
+            },
+        }), false);
+
+        assert.equal(Selectors.showCustomTerms({
+            entities: {
+                general: {
+                    config: {
+                        CustomServiceTermsEnabled: 'true',
+                    },
+                    license: {
+                        IsLicensed: 'true',
+                    },
+                },
+                users: {
+                    currentUserId: userId,
+                    profiles: {},
+                },
+            },
+        }), false);
+    });
 });
 
