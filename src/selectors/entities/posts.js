@@ -477,12 +477,9 @@ export const getCurrentUsersLatestPost = createSelector(
     }
 );
 
-export const getPostIdsInChannel = createIdsSelector(
-    (state, channelId) => state.entities.posts.postsInChannel[channelId],
-    (postIdsInChannel) => {
-        return postIdsInChannel || [];
-    }
-);
+export function getPostIdsInChannel(state, channelId) {
+    return state.entities.posts.postsInChannel[channelId];
+}
 
 export const isPostIdSending = (state, postId) =>
     state.entities.posts.sendingPostIds.some((sendingPostId) => sendingPostId === postId);
