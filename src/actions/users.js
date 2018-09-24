@@ -30,7 +30,7 @@ import {
 } from './preferences';
 
 import {getConfig} from 'selectors/entities/general';
-import {getCurrentUserId} from 'selectors/entities/users';
+import {getCurrentUser, getCurrentUserId} from 'selectors/entities/users';
 
 export function checkMfa(loginId) {
     return async (dispatch, getState) => {
@@ -612,16 +612,22 @@ export function getMe() {
 
 export function updateServiceTermsStatus(serviceTermsId, accepted) {
     return async (dispatch, getState) => {
-        await bindClientFunc(
+        const {data, error} = await dispatch(bindClientFunc(
             Client4.updateServiceTermsStatus,
             UserTypes.UPDATE_SERVICE_TERMS_STATUS_REQUEST,
             UserTypes.UPDATE_SERVICE_TERMS_STATUS_SUCCESS,
             UserTypes.UPDATE_SERVICE_TERMS_STATUS_FAILURE,
             serviceTermsId,
             accepted
-        )(dispatch, getState);
-        await getMe()(dispatch, getState);
-        return {data: true};
+        ));
+        if (data && data.status === 'OK') {
+            dispatch({
+                type: UserTypes.RECEIVED_ME,
+                data: Object.assign({}, getCurrentUser(getState()), {latest_service_terms_accepted: JSON.parse(accepted)}),
+            });
+            return {data};
+        }
+        return {error};
     };
 }
 

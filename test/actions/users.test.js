@@ -116,13 +116,13 @@ describe('Actions.Users', () => {
     });
 
     it('updateServiceTermsStatus accept terms', async () => {
+        const user = TestHelper.basicUser;
         nock(Client4.getUsersRoute()).
             post('').
-            reply(201, {...TestHelper.fakeUser(), id: TestHelper.generateId()});
+            reply(201, TestHelper.fakeUserWithId());
 
-        nock(Client4.getBaseRoute()).
-            get('/users/me').
-            reply(200, {...TestHelper.fakeUserWithServiceTermsAccepted(), roles: 'basic_user'});
+        TestHelper.mockLogin();
+        await Actions.login(user.email, 'password1')(store.dispatch, store.getState);
 
         nock(Client4.getBaseRoute()).
             post('/users/me/service_terms').
@@ -144,13 +144,13 @@ describe('Actions.Users', () => {
     });
 
     it('updateServiceTermsStatus reject terms', async () => {
+        const user = TestHelper.basicUser;
         nock(Client4.getUsersRoute()).
             post('').
-            reply(201, {...TestHelper.fakeUser(), id: TestHelper.generateId()});
+            reply(201, TestHelper.fakeUserWithId());
 
-        nock(Client4.getBaseRoute()).
-            get('/users/me').
-            reply(200, {...TestHelper.fakeUserWithServiceTermsNotAccepted(), roles: 'basic_user'});
+        TestHelper.mockLogin();
+        await Actions.login(user.email, 'password1')(store.dispatch, store.getState);
 
         nock(Client4.getBaseRoute()).
             post('/users/me/service_terms').
