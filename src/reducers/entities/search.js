@@ -8,6 +8,9 @@ import {Preferences} from 'constants';
 function results(state = [], action) {
     switch (action.type) {
     case SearchTypes.RECEIVED_SEARCH_POSTS: {
+        if (action.isGettingMore) {
+            return state.concat(action.data.order);
+        }
         return action.data.order;
     }
     case PostTypes.REMOVE_POST: {
@@ -119,7 +122,7 @@ function recent(state = {}, action) {
     switch (type) {
     case SearchTypes.RECEIVED_SEARCH_TERM: {
         const nextState = {...state};
-        const {teamId, terms, isOrSearch} = data;
+        const {teamId, params: {terms, isOrSearch}} = data;
         const team = [...(nextState[teamId] || [])];
         const index = team.findIndex((r) => r.terms === terms);
         if (index === -1) {
@@ -157,6 +160,52 @@ function recent(state = {}, action) {
     }
 }
 
+function current(state = {}, action) {
+    const {data, type} = action;
+    switch (type) {
+    case SearchTypes.RECEIVED_SEARCH_TERM: {
+        const nextState = {...state};
+        const {teamId, params, isEnd} = data;
+        return {
+            ...nextState,
+            [teamId]: {
+                params,
+                isEnd,
+            },
+        };
+    }
+    case UserTypes.LOGOUT_SUCCESS:
+        return {};
+
+    default:
+        return state;
+    }
+}
+
+function isSearchingTerm(state = false, action) {
+    switch (action.type) {
+    case SearchTypes.SEARCH_POSTS_REQUEST:
+        return !action.isGettingMore;
+    case SearchTypes.SEARCH_POSTS_FAILURE:
+    case SearchTypes.SEARCH_POSTS_SUCCESS:
+        return false;
+    default:
+        return state;
+    }
+}
+
+function isSearchGettingMore(state = false, action) {
+    switch (action.type) {
+    case SearchTypes.SEARCH_POSTS_REQUEST:
+        return action.isGettingMore;
+    case SearchTypes.SEARCH_POSTS_FAILURE:
+    case SearchTypes.SEARCH_POSTS_SUCCESS:
+        return false;
+    default:
+        return state;
+    }
+}
+
 export default combineReducers({
 
     // An ordered array with posts ids of flagged posts
@@ -171,4 +220,13 @@ export default combineReducers({
     // Object where every key is a team composed with
     // an object where the key is the term and the value indicates is "or" search
     recent,
+
+    // Object holding the current searches for every team
+    current,
+
+    // Boolean true if we are are searching initally
+    isSearchingTerm,
+
+    // Boolean true if we are getting more search results
+    isSearchGettingMore,
 });
