@@ -405,6 +405,15 @@ export default class Client4 {
         );
     };
 
+    setDefaultProfileImage = async (userId) => {
+        this.trackEvent('api', 'api_users_set_default_profile_picture');
+
+        return this.doFetch(
+            `${this.getUserRoute(userId)}/image`,
+            {method: 'delete'}
+        );
+    };
+
     verifyUserEmail = async (token) => {
         return this.doFetch(
             `${this.getUsersRoute()}/email/verify`,
@@ -615,6 +624,10 @@ export default class Client4 {
         }
 
         return `${this.getUserRoute(userId)}/image${buildQueryString(params)}`;
+    };
+
+    getDefaultProfilePictureUrl = (userId) => {
+        return `${this.getUserRoute(userId)}/image/default`;
     };
 
     autocompleteUsers = async (name, teamId, channelId) => {

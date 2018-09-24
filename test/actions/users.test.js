@@ -1208,6 +1208,30 @@ describe('Actions.Users', () => {
         assert.ok(currentUser.last_picture_update > beforeTime);
     });
 
+    it('setDefaultProfileImage', async () => {
+        TestHelper.mockLogin();
+        await Actions.login(TestHelper.basicUser.email, 'password1')(store.dispatch, store.getState);
+
+        const currentUserId = store.getState().entities.users.currentUserId;
+
+        nock(Client4.getUsersRoute()).
+            delete(`/${TestHelper.basicUser.id}/image`).
+            reply(200, OK_RESPONSE);
+
+        await Actions.setDefaultProfileImage(currentUserId)(store.dispatch, store.getState);
+
+        const updateRequest = store.getState().requests.users.updateUser;
+        const {profiles} = store.getState().entities.users;
+        const currentUser = profiles[currentUserId];
+
+        if (updateRequest.status === RequestStatus.FAILURE) {
+            throw new Error(JSON.stringify(updateRequest.error));
+        }
+
+        assert.ok(currentUser);
+        assert.equal(currentUser.last_picture_update, 0);
+    });
+
     it('switchEmailToOAuth', async () => {
         if (TestHelper.isLiveServer()) {
             console.log('Skipping mock-only test');
