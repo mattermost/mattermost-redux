@@ -621,14 +621,24 @@ export function updateServiceTermsStatus(serviceTermsId, accepted) {
             accepted
         ));
         if (data && data.status === 'OK') {
+            const currentUser = getCurrentUser(getState());
             dispatch({
                 type: UserTypes.RECEIVED_ME,
-                data: Object.assign({}, getCurrentUser(getState()), {latest_service_terms_accepted: JSON.parse(accepted)}),
+                data: Object.assign({}, currentUser, {accepted_service_terms_id: JSON.parse(accepted) ? serviceTermsId : null}),
             });
             return {data};
         }
         return {error};
     };
+}
+
+export function getServiceTerms() {
+    return bindClientFunc(
+        Client4.getServiceTerms,
+        UserTypes.GET_SERVICE_TERMS_REQUEST,
+        UserTypes.GET_SERVICE_TERMS_SUCCESS,
+        UserTypes.GET_SERVICE_TERMS_FAILURE,
+    );
 }
 
 export function getUser(id) {
@@ -1561,6 +1571,7 @@ export default {
     switchOAuthToEmail,
     switchEmailToLdap,
     switchLdapToEmail,
+    getServiceTerms,
     updateServiceTermsStatus,
     createUserAccessToken,
     getUserAccessToken,

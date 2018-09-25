@@ -328,6 +328,16 @@ function updateServiceTermsStatus(state: RequestStatusType = initialRequestState
     );
 }
 
+function getServiceTerms(state: RequestStatusType = initialRequestState(), action: GenericAction): RequestStatusType {
+    return handleRequest(
+        UserTypes.GET_SERVICE_TERMS_REQUEST,
+        UserTypes.GET_SERVICE_TERMS_SUCCESS,
+        UserTypes.GET_SERVICE_TERMS_FAILURE,
+        state,
+        action
+    );
+}
+
 function createUserAccessToken(state: RequestStatusType = initialRequestState(), action: GenericAction): RequestStatusType {
     return handleRequest(
         UserTypes.CREATE_USER_ACCESS_TOKEN_REQUEST,
@@ -407,6 +417,7 @@ export default combineReducers({
     verifyEmail,
     passwordReset,
     switchLogin,
+    getServiceTerms,
     updateServiceTermsStatus,
     createUserAccessToken,
     getUserAccessToken,

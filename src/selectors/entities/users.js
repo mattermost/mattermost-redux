@@ -350,7 +350,7 @@ export const showCustomTerms = createSelector(
     getLicense,
     (config, user, license) => {
         // Defaults to false if the setting doesn't exist
-        return Boolean(license.IsLicensed === 'true' && config.CustomServiceTermsEnabled === 'true' && user && !user.latest_service_terms_accepted);
+        return Boolean(license.IsLicensed === 'true' && config.EnableCustomServiceTerms === 'true' && user && config.CustomServiceTermsId !== user.accepted_service_terms_id);
     }
 );
 

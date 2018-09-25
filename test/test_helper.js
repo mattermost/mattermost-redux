@@ -82,14 +82,14 @@ class TestHelper {
     fakeUserWithServiceTermsAccepted = () => {
         return {
             ...this.fakeUserWithId(),
-            latest_service_terms_accepted: true,
+            accepted_service_terms_id: 1,
         };
     };
 
     fakeUserWithServiceTermsNotAccepted = () => {
         return {
             ...this.fakeUserWithId(),
-            latest_service_terms_accepted: false,
+            accepted_service_terms_id: 0,
         };
     };
 

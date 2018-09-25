@@ -115,11 +115,36 @@ describe('Actions.Users', () => {
         });
     });
 
+    it('getServiceTerms', async () => {
+        if (TestHelper.isLiveServer()) {
+            console.log('Skipping mock-only test');
+            return;
+        }
+
+        const response = {
+            create_at: 1537880148600,
+            id: '123',
+            text: '#### Nisi hoc aquarum litor/n/net modo freta mallet agunt? Et ignarus!',
+            user_id: 'abcd',
+        };
+
+        nock(Client4.getBaseRoute()).
+            get('/service_terms').
+            reply(200, response);
+
+        await Actions.getServiceTerms()(store.dispatch, store.getState);
+
+        const request = store.getState().requests.users.getServiceTerms;
+        if (request.status === RequestStatus.FAILURE) {
+            throw new Error(JSON.stringify(request.error));
+        }
+    });
+
     it('updateServiceTermsStatus accept terms', async () => {
         const user = TestHelper.basicUser;
         nock(Client4.getUsersRoute()).
             post('').
-            reply(201, TestHelper.fakeUserWithId());
+            reply(201, TestHelper.fakeUserWithServiceTermsAccepted());
 
         TestHelper.mockLogin();
         await Actions.login(user.email, 'password1')(store.dispatch, store.getState);
@@ -140,14 +165,14 @@ describe('Actions.Users', () => {
 
         assert.ok(currentUserId);
         assert.ok(profiles[currentUserId]);
-        assert.equal(profiles[currentUserId].latest_service_terms_accepted, true);
+        assert.equal(profiles[currentUserId].accepted_service_terms_id, 1);
     });
 
     it('updateServiceTermsStatus reject terms', async () => {
         const user = TestHelper.basicUser;
         nock(Client4.getUsersRoute()).
             post('').
-            reply(201, TestHelper.fakeUserWithId());
+            reply(201, TestHelper.fakeUserWithServiceTermsNotAccepted());
 
         TestHelper.mockLogin();
         await Actions.login(user.email, 'password1')(store.dispatch, store.getState);
@@ -168,7 +193,7 @@ describe('Actions.Users', () => {
 
         assert.ok(currentUserId);
         assert.ok(profiles[currentUserId]);
-        assert.equal(profiles[currentUserId].latest_service_terms_accepted, false);
+        assert.notEqual(profiles[currentUserId].accepted_service_terms_id, 1);
     });
 
     it('logout', async () => {

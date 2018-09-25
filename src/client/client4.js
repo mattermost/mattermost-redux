@@ -423,6 +423,13 @@ export default class Client4 {
         );
     }
 
+    getServiceTerms = async () => {
+        return this.doFetch(
+            `${this.getBaseRoute()}/service_terms`,
+            {method: 'get'}
+        );
+    }
+
     sendVerificationEmail = async (email) => {
         return this.doFetch(
             `${this.getUsersRoute()}/email/verify/send`,
