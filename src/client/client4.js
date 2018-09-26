@@ -1474,17 +1474,17 @@ export default class Client4 {
         );
     };
 
-    searchPostsWithParams = async (teamId, params, includeDeletedChannels = false) => {
+    searchPostsWithParams = async (teamId, params) => {
         this.trackEvent('api', 'api_posts_search', {team_id: teamId});
 
         return this.doFetch(
-            `${this.getTeamRoute(teamId)}/posts/search?include_deleted_channels=${includeDeletedChannels}`,
+            `${this.getTeamRoute(teamId)}/posts/search`,
             {method: 'post', body: JSON.stringify(params)}
         );
     };
 
-    searchPosts = async (teamId, terms, isOrSearch, includeDeletedChannels = false) => {
-        return this.searchPostsWithParams(teamId, {terms, is_or_search: isOrSearch}, includeDeletedChannels);
+    searchPosts = async (teamId, terms, isOrSearch) => {
+        return this.searchPostsWithParams(teamId, {terms, is_or_search: isOrSearch});
     };
 
     getOpenGraphMetadata = async (url) => {

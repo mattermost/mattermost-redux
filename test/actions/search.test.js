@@ -51,7 +51,7 @@ describe('Actions.Search', () => {
         const search1 = 'try word';
 
         nock(Client4.getTeamsRoute()).
-            post(`/${TestHelper.basicTeam.id}/posts/search?include_deleted_channels=false`).
+            post(`/${TestHelper.basicTeam.id}/posts/search`).
             reply(200, {order: [post1.id], posts: {[post1.id]: post1}});
         nock(Client4.getChannelsRoute()).
             get(`/${TestHelper.basicChannel.id}/members/me`).

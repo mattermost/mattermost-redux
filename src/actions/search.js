@@ -14,6 +14,8 @@ import {forceLogoutIfNecessary} from './helpers';
 import {logError} from './errors';
 import {getProfilesAndStatusesForPosts} from './posts';
 
+const WEBAPP_SEARCH_PER_PAGE = 20;
+
 function getMissingChannelsFromPosts(posts) {
     return async (dispatch, getState) => {
         const {channels, membersInChannel, myMembers} = getState().entities.channels;
@@ -34,13 +36,17 @@ function getMissingChannelsFromPosts(posts) {
     };
 }
 
-export function searchPostsWithParams(teamId, params, includeDeletedChannels = false) {
+export function searchPostsWithParams(teamId, params) {
     return async (dispatch, getState) => {
-        dispatch({type: SearchTypes.SEARCH_POSTS_REQUEST}, getState);
+        const isGettingMore = (params.page > 0);
+        dispatch({
+            type: SearchTypes.SEARCH_POSTS_REQUEST,
+            isGettingMore,
+        }, getState);
 
         let posts;
         try {
-            posts = await Client4.searchPostsWithParams(teamId, params, includeDeletedChannels);
+            posts = await Client4.searchPostsWithParams(teamId, params);
 
             await Promise.all([
                 getProfilesAndStatusesForPosts(posts.posts, dispatch, getState),
@@ -59,13 +65,14 @@ export function searchPostsWithParams(teamId, params, includeDeletedChannels = f
             {
                 type: SearchTypes.RECEIVED_SEARCH_POSTS,
                 data: posts,
+                isGettingMore,
             },
             {
                 type: SearchTypes.RECEIVED_SEARCH_TERM,
                 data: {
                     teamId,
-                    terms: params.terms,
-                    isOrSearch: params.is_or_search,
+                    params,
+                    isEnd: (posts.order.length === 0),
                 },
             },
             {
@@ -78,7 +85,20 @@ export function searchPostsWithParams(teamId, params, includeDeletedChannels = f
 }
 
 export function searchPosts(teamId, terms, isOrSearch, includeDeletedChannels) {
-    return searchPostsWithParams(teamId, {terms, is_or_search: isOrSearch}, includeDeletedChannels);
+    return searchPostsWithParams(teamId, {terms, is_or_search: isOrSearch, include_deleted_channels: includeDeletedChannels, page: 0, per_page: WEBAPP_SEARCH_PER_PAGE});
+}
+
+export function getMorePostsForSearch() {
+    return async (dispatch, getState) => {
+        const teamId = getCurrentTeamId(getState());
+        const {params, isEnd} = getState().entities.search.current[teamId];
+        if (!isEnd) {
+            const newParams = Object.assign({}, params);
+            newParams.page = newParams.page + 1;
+            return await searchPostsWithParams(teamId, newParams)(dispatch, getState);
+        }
+        return {};
+    };
 }
 
 export function clearSearch() {
@@ -143,7 +163,7 @@ export function getRecentMentions() {
             const terms = termKeys.map(({key}) => key).join(' ').trim() + ' ';
 
             Client4.trackEvent('api', 'api_posts_search_mention');
-            posts = await Client4.searchPosts(teamId, terms, true, false);
+            posts = await Client4.searchPosts(teamId, terms, true);
 
             await Promise.all([
                 getProfilesAndStatusesForPosts(posts.posts, dispatch, getState),
