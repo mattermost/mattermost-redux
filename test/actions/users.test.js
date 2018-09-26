@@ -129,7 +129,7 @@ describe('Actions.Users', () => {
         };
 
         nock(Client4.getBaseRoute()).
-            get('/service_terms').
+            get('/terms_of_service').
             reply(200, response);
 
         await Actions.getServiceTerms()(store.dispatch, store.getState);
@@ -150,7 +150,7 @@ describe('Actions.Users', () => {
         await Actions.login(user.email, 'password1')(store.dispatch, store.getState);
 
         nock(Client4.getBaseRoute()).
-            post('/users/me/service_terms').
+            post('/users/me/terms_of_service').
             reply(200, OK_RESPONSE);
 
         await Actions.updateServiceTermsStatus(1, true)(store.dispatch, store.getState);
@@ -178,7 +178,7 @@ describe('Actions.Users', () => {
         await Actions.login(user.email, 'password1')(store.dispatch, store.getState);
 
         nock(Client4.getBaseRoute()).
-            post('/users/me/service_terms').
+            post('/users/me/terms_of_service').
             reply(200, OK_RESPONSE);
 
         await Actions.updateServiceTermsStatus(1, false)(store.dispatch, store.getState);

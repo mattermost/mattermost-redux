@@ -642,6 +642,16 @@ export function getServiceTerms() {
     );
 }
 
+export function createServiceTerms(text) {
+    return bindClientFunc(
+        Client4.createServiceTerms,
+        UserTypes.CREATE_SERVICE_TERMS_REQUEST,
+        UserTypes.CREATE_SERVICE_TERMS_SUCCESS,
+        UserTypes.CREATE_SERVICE_TERMS_FAILURE,
+        text,
+    );
+}
+
 export function getUser(id) {
     return bindClientFunc(
         Client4.getUser,
@@ -1573,6 +1583,7 @@ export default {
     switchEmailToLdap,
     switchLdapToEmail,
     getServiceTerms,
+    createServiceTerms,
     updateServiceTermsStatus,
     createUserAccessToken,
     getUserAccessToken,
