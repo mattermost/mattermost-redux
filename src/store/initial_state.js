@@ -18,6 +18,7 @@ const state: GlobalState = {
         },
         users: {
             currentUserId: '',
+            mySession: {},
             mySessions: [],
             myAudits: [],
             profiles: {},
