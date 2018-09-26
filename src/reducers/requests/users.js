@@ -318,6 +318,36 @@ function switchLogin(state: RequestStatusType = initialRequestState(), action: G
     );
 }
 
+function updateServiceTermsStatus(state: RequestStatusType = initialRequestState(), action: GenericAction): RequestStatusType {
+    return handleRequest(
+        UserTypes.UPDATE_SERVICE_TERMS_STATUS_REQUEST,
+        UserTypes.UPDATE_SERVICE_TERMS_STATUS_SUCCESS,
+        UserTypes.UPDATE_SERVICE_TERMS_STATUS_FAILURE,
+        state,
+        action
+    );
+}
+
+function getServiceTerms(state: RequestStatusType = initialRequestState(), action: GenericAction): RequestStatusType {
+    return handleRequest(
+        UserTypes.GET_SERVICE_TERMS_REQUEST,
+        UserTypes.GET_SERVICE_TERMS_SUCCESS,
+        UserTypes.GET_SERVICE_TERMS_FAILURE,
+        state,
+        action
+    );
+}
+
+function createServiceTerms(state: RequestStatusType = initialRequestState(), action: GenericAction): RequestStatusType {
+    return handleRequest(
+        UserTypes.CREATE_SERVICE_TERMS_REQUEST,
+        UserTypes.CREATE_SERVICE_TERMS_SUCCESS,
+        UserTypes.CREATE_SERVICE_TERMS_FAILURE,
+        state,
+        action
+    );
+}
+
 function createUserAccessToken(state: RequestStatusType = initialRequestState(), action: GenericAction): RequestStatusType {
     return handleRequest(
         UserTypes.CREATE_USER_ACCESS_TOKEN_REQUEST,
@@ -397,6 +427,9 @@ export default combineReducers({
     verifyEmail,
     passwordReset,
     switchLogin,
+    getServiceTerms,
+    createServiceTerms,
+    updateServiceTermsStatus,
     createUserAccessToken,
     getUserAccessToken,
     revokeUserAccessToken,

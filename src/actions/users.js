@@ -30,7 +30,7 @@ import {
 } from './preferences';
 
 import {getConfig} from 'selectors/entities/general';
-import {getCurrentUserId} from 'selectors/entities/users';
+import {getCurrentUser, getCurrentUserId} from 'selectors/entities/users';
 
 export function checkMfa(loginId) {
     return async (dispatch, getState) => {
@@ -608,6 +608,48 @@ export function getMe() {
         dispatch(loadRolesIfNeeded(me.data.roles.split(' ')));
         return me;
     };
+}
+
+export function updateServiceTermsStatus(serviceTermsId, accepted) {
+    return async (dispatch, getState) => {
+        const response = await dispatch(bindClientFunc(
+            Client4.updateServiceTermsStatus,
+            UserTypes.UPDATE_SERVICE_TERMS_STATUS_REQUEST,
+            UserTypes.UPDATE_SERVICE_TERMS_STATUS_SUCCESS,
+            UserTypes.UPDATE_SERVICE_TERMS_STATUS_FAILURE,
+            serviceTermsId,
+            accepted
+        ));
+        const {data, error} = response;
+        if (data) {
+            const currentUser = getCurrentUser(getState());
+            dispatch({
+                type: UserTypes.RECEIVED_ME,
+                data: Object.assign({}, currentUser, {accepted_service_terms_id: accepted ? serviceTermsId : null}),
+            });
+            return {data};
+        }
+        return {error};
+    };
+}
+
+export function getServiceTerms() {
+    return bindClientFunc(
+        Client4.getServiceTerms,
+        UserTypes.GET_SERVICE_TERMS_REQUEST,
+        UserTypes.GET_SERVICE_TERMS_SUCCESS,
+        UserTypes.GET_SERVICE_TERMS_FAILURE,
+    );
+}
+
+export function createServiceTerms(text) {
+    return bindClientFunc(
+        Client4.createServiceTerms,
+        UserTypes.CREATE_SERVICE_TERMS_REQUEST,
+        UserTypes.CREATE_SERVICE_TERMS_SUCCESS,
+        UserTypes.CREATE_SERVICE_TERMS_FAILURE,
+        text,
+    );
 }
 
 export function getUser(id) {
@@ -1540,6 +1582,9 @@ export default {
     switchOAuthToEmail,
     switchEmailToLdap,
     switchLdapToEmail,
+    getServiceTerms,
+    createServiceTerms,
+    updateServiceTermsStatus,
     createUserAccessToken,
     getUserAccessToken,
     getUserAccessTokensForUser,

@@ -7,7 +7,7 @@ import {General} from 'constants';
 const FormData = require('form-data');
 
 import fetch from './fetch_etag';
-import {isMinimumServerVersion} from 'src/utils/helpers';
+import {buildQueryString, isMinimumServerVersion} from 'src/utils/helpers';
 
 const HEADER_AUTH = 'Authorization';
 const HEADER_BEARER = 'BEARER';
@@ -413,6 +413,27 @@ export default class Client4 {
         return this.doFetch(
             `${this.getUsersRoute()}/email/verify`,
             {method: 'post', body: JSON.stringify({token})}
+        );
+    }
+
+    updateServiceTermsStatus = async (serviceTermsId, accepted) => {
+        return this.doFetch(
+            `${this.getUserRoute('me')}/terms_of_service`,
+            {method: 'post', body: JSON.stringify({serviceTermsId, accepted})}
+        );
+    }
+
+    getServiceTerms = async () => {
+        return this.doFetch(
+            `${this.getBaseRoute()}/terms_of_service`,
+            {method: 'get'}
+        );
+    }
+
+    createServiceTerms = async (text) => {
+        return this.doFetch(
+            `${this.getBaseRoute()}/terms_of_service`,
+            {method: 'post', body: JSON.stringify({text})}
         );
     }
 
@@ -2507,25 +2528,6 @@ export default class Client4 {
             }, {properties}, options));
         }
     }
-}
-
-function buildQueryString(parameters) {
-    const keys = Object.keys(parameters);
-    if (keys.length === 0) {
-        return '';
-    }
-
-    let query = '?';
-    for (let i = 0; i < keys.length; i++) {
-        const key = keys[i];
-        query += key + '=' + encodeURIComponent(parameters[key]);
-
-        if (i < keys.length - 1) {
-            query += '&';
-        }
-    }
-
-    return query;
 }
 
 function parseAndMergeNestedHeaders(originalHeaders) {
