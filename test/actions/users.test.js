@@ -144,7 +144,7 @@ describe('Actions.Users', () => {
         const user = TestHelper.basicUser;
         nock(Client4.getUsersRoute()).
             post('').
-            reply(201, TestHelper.fakeUserWithServiceTermsAccepted());
+            reply(201, {...TestHelper.fakeUserWithId(), accepted_service_terms_id: 1});
 
         TestHelper.mockLogin();
         await Actions.login(user.email, 'password1')(store.dispatch, store.getState);
@@ -172,7 +172,7 @@ describe('Actions.Users', () => {
         const user = TestHelper.basicUser;
         nock(Client4.getUsersRoute()).
             post('').
-            reply(201, TestHelper.fakeUserWithServiceTermsNotAccepted());
+            reply(201, {...TestHelper.fakeUserWithId(), accepted_service_terms_id: 0});
 
         TestHelper.mockLogin();
         await Actions.login(user.email, 'password1')(store.dispatch, store.getState);

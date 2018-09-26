@@ -612,7 +612,7 @@ export function getMe() {
 
 export function updateServiceTermsStatus(serviceTermsId, accepted) {
     return async (dispatch, getState) => {
-        const {data, error} = await dispatch(bindClientFunc(
+        const response = await dispatch(bindClientFunc(
             Client4.updateServiceTermsStatus,
             UserTypes.UPDATE_SERVICE_TERMS_STATUS_REQUEST,
             UserTypes.UPDATE_SERVICE_TERMS_STATUS_SUCCESS,
@@ -620,7 +620,8 @@ export function updateServiceTermsStatus(serviceTermsId, accepted) {
             serviceTermsId,
             accepted
         ));
-        if (data && data.status === 'OK') {
+        const {data, error} = response;
+        if (data) {
             const currentUser = getCurrentUser(getState());
             dispatch({
                 type: UserTypes.RECEIVED_ME,

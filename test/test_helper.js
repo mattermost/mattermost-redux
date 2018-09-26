@@ -79,20 +79,6 @@ class TestHelper {
         };
     };
 
-    fakeUserWithServiceTermsAccepted = () => {
-        return {
-            ...this.fakeUserWithId(),
-            accepted_service_terms_id: 1,
-        };
-    };
-
-    fakeUserWithServiceTermsNotAccepted = () => {
-        return {
-            ...this.fakeUserWithId(),
-            accepted_service_terms_id: 0,
-        };
-    };
-
     fakeTeam = () => {
         const name = this.generateId();
         let inviteId = this.generateId();
