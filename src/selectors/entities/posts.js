@@ -32,9 +32,17 @@ export function makeGetReactionsForPost() {
         getReactionsForPosts,
         (state, postId) => postId,
         (reactions, postId) => {
-            return Object.values(reactions[postId] || {});
+            return Object.values(reactions[postId] || []);
         }
     );
+}
+
+const getReactionsForPost = makeGetReactionsForPost();
+
+export function getUserIdsFromReactions(state, postId) {
+    const reactions = getReactionsForPost(state, postId);
+
+    return reactions.map((reaction) => reaction.user_id);
 }
 
 export function getOpenGraphMetadata(state) {
