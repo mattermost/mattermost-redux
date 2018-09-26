@@ -715,6 +715,9 @@ export function joinChannel(userId, teamId, channelId, channelName) {
 
 export function deleteChannel(channelId) {
     return async (dispatch, getState) => {
+        const state = getState();
+        const viewArchivedChannels = state.entities.general.config.ExperimentalViewArchivedChannels === 'true';
+
         dispatch({type: ChannelTypes.DELETE_CHANNEL_REQUEST}, getState);
 
         try {
@@ -730,7 +733,7 @@ export function deleteChannel(channelId) {
 
         const entities = getState().entities;
         const {channels, currentChannelId} = entities.channels;
-        if (channelId === currentChannelId) {
+        if (channelId === currentChannelId && !viewArchivedChannels) {
             const channel = Object.keys(channels).filter((key) => channels[key].name === General.DEFAULT_CHANNEL);
             let defaultChannelId = '';
             if (channel.length) {

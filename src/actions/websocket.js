@@ -546,9 +546,10 @@ function handleChannelDeletedEvent(msg, dispatch, getState) {
     const entities = getState().entities;
     const {channels, currentChannelId, channelsInTeam} = entities.channels;
     const {currentTeamId} = entities.teams;
+    const viewArchivedChannels = entities.general.config.ExperimentalViewArchivedChannels === 'true';
 
     if (msg.broadcast.team_id === currentTeamId) {
-        if (msg.data.channel_id === currentChannelId) {
+        if (msg.data.channel_id === currentChannelId && !viewArchivedChannels) {
             let channelId = '';
             const teamChannels = Array.from(channelsInTeam[currentTeamId]);
             const channel = teamChannels.filter((key) => channels[key].name === General.DEFAULT_CHANNEL);
