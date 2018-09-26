@@ -625,7 +625,7 @@ export function updateServiceTermsStatus(serviceTermsId, accepted) {
             const currentUser = getCurrentUser(getState());
             dispatch({
                 type: UserTypes.RECEIVED_ME,
-                data: Object.assign({}, currentUser, {accepted_service_terms_id: JSON.parse(accepted) ? serviceTermsId : null}),
+                data: Object.assign({}, currentUser, {accepted_service_terms_id: accepted ? serviceTermsId : null}),
             });
             return {data};
         }
