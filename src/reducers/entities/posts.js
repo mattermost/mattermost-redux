@@ -361,29 +361,25 @@ function handleRemovePost(posts = {}, postsInChannel = {}, postsInThread = {}, a
 
 function handleRethreadPost(postsMap, action) {
     const posts = postsMap.posts ? postsMap.posts : {};
-    const postsInChannel = postsMap.postsInThread ? postsMap.postsInChannel : {};
-    const postsInThread = postsMap.postsInThread ? postsMap.postsInThread : {};
-    var post = action.data.post;
-    const nextPosts = posts;
+    const postsInChannel = postsMap.postsInChannel || {};
+    const postsInThread = postsMap.postsInThread || {};
+    const post = action.data.post;
+    const nextPosts = {...posts};
     nextPosts[post.id] = post;
     const rootId = action.data.original_root_id;
 
-    const nextPostsForChannel = postsInChannel;
-    let nextPostsForThread = postsInThread;
+    const nextPostsInThread = {...postsInThread};
 
-    if (nextPosts[post.id]) {
-        if (postsInThread[rootId]) {
-            nextPostsForThread = nextPostsForThread || {...postsInThread};
-            const threadPosts = [...postsInThread[rootId]];
-            var threadIndex = threadPosts.indexOf(post.id);
-            if (threadIndex !== -1) {
-                threadPosts.splice(threadIndex, 1);
-            }
-            nextPostsForThread[rootId] = threadPosts;
+    if (postsInThread[rootId]) {
+        const threadPosts = [...postsInThread[rootId]];
+        var threadIndex = threadPosts.indexOf(post.id);
+        if (threadIndex !== -1) {
+            threadPosts.splice(threadIndex, 1);
         }
+        nextPostsInThread[rootId] = threadPosts;
     }
 
-    return {posts: nextPosts, postsInChannel: nextPostsForChannel, postsInThread: nextPostsForThread || postsInThread};
+    return {posts: nextPosts, postsInChannel, postsInThread: nextPostsInThread || postsInThread};
 }
 
 function handlePosts(posts = {}, postsInChannel = {}, postsInThread = {}, action) {
