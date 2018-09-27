@@ -1,9 +1,6 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
 
-import EventEmitter from 'utils/event_emitter';
-import {General} from 'constants';
-
 const FormData = require('form-data');
 
 import fetch from './fetch_etag';
@@ -13,7 +10,6 @@ const HEADER_AUTH = 'Authorization';
 const HEADER_BEARER = 'BEARER';
 const HEADER_REQUESTED_WITH = 'X-Requested-With';
 const HEADER_USER_AGENT = 'User-Agent';
-const HEADER_X_VERSION_ID = 'X-Version-Id';
 const HEADER_X_CLUSTER_ID = 'X-Cluster-Id';
 
 const PER_PAGE_DEFAULT = 60;
@@ -2459,16 +2455,6 @@ export default class Client4 {
                     defaultMessage: 'Received invalid response from the server.',
                 },
             };
-        }
-
-        // Need to only accept version in the header from requests that are not cached
-        // to avoid getting an old version from a cached response
-        if (headers.has(HEADER_X_VERSION_ID) && !headers.get('Cache-Control')) {
-            const serverVersion = headers.get(HEADER_X_VERSION_ID);
-            if (serverVersion && this.serverVersion !== serverVersion) {
-                this.serverVersion = serverVersion;
-                EventEmitter.emit(General.SERVER_VERSION_CHANGED, serverVersion);
-            }
         }
 
         if (headers.has(HEADER_X_CLUSTER_ID)) {
