@@ -851,7 +851,7 @@ export default class Client4 {
         this.trackEvent('api', 'api_teams_update_name', {team_id: team.id});
 
         return this.doFetch(
-            `${this.getTeamRoute(team.id)}`,
+            `${this.getTeamRoute(team.id)}/patch`,
             {method: 'put', body: JSON.stringify(team)}
         );
     };
