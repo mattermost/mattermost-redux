@@ -35,6 +35,9 @@ function results(state = [], action) {
 function matches(state = {}, action) {
     switch (action.type) {
     case SearchTypes.RECEIVED_SEARCH_POSTS:
+        if (action.isGettingMore) {
+            return Object.assign({}, state, action.data.matches);
+        }
         return action.data.matches || {};
     case PostTypes.REMOVE_POST: {
         if (!state[action.data.id]) {
@@ -122,7 +125,8 @@ function recent(state = {}, action) {
     switch (type) {
     case SearchTypes.RECEIVED_SEARCH_TERM: {
         const nextState = {...state};
-        const {teamId, params: {terms, isOrSearch}} = data;
+        const {teamId, params} = data;
+        const {terms, isOrSearch} = params || {};
         const team = [...(nextState[teamId] || [])];
         const index = team.findIndex((r) => r.terms === terms);
         if (index === -1) {
