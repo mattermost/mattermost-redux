@@ -226,7 +226,7 @@ describe('Actions.Teams', () => {
         };
 
         nock(Client4.getTeamsRoute()).
-            put(`/${team.id}`).
+            put(`/${team.id}/patch`).
             reply(200, team);
         await Actions.updateTeam(team)(store.dispatch, store.getState);
 
