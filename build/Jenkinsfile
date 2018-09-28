@@ -20,6 +20,12 @@ pipeline {
             }
         }
 
+        stage('Check types') {
+            steps {
+                sh "npm run flow"
+            }
+        }
+
         stage('Test') {
             steps {
                 sh "npm run test"
