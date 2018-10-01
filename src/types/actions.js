@@ -9,6 +9,7 @@ export type GetStateFunc = () => GlobalState;
 export type GenericAction = {|
     type: string,
     data: any,
+    meta?: any,
     error?: any
 |};
 
