@@ -11,12 +11,19 @@ pipeline {
         stage('Install') {
             steps {
                 sh "npm install --ignore-scripts"
+                sh "npm run flow-typed install"
             }
         }
 
         stage('Check style') {
             steps {
                 sh "npm run check"
+            }
+        }
+
+        stage('Check types') {
+            steps {
+                sh "npm run flow"
             }
         }
 
