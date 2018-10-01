@@ -52,12 +52,14 @@ export function getConfig(): ActionFunc {
         }
 
         if (config.SupportSettings && config.SupportSettings.CustomServiceTermsEnabled) {
-            const {data, error} = await dispatch(getServiceTerms());
-            if (error) {
-                return {error};
+            const result = await dispatch(getServiceTerms());
+            if (result.error) {
+                return {error: result.error};
             }
 
-            config.SupportSettings.CustomServiceTermsText = data.text;
+            if (result.data) {
+                config.SupportSettings.CustomServiceTermsText = result.data.text;
+            }
         }
         dispatch(batchActions([
             {
@@ -78,9 +80,9 @@ export function updateConfig(config: Object): ActionFunc {
         const stateConfig = getState().entities.admin.config;
         if (config.SupportSettings && config.SupportSettings.CustomServiceTermsEnabled) {
             if (stateConfig.SupportSettings.CustomServiceTermsText !== config.SupportSettings.CustomServiceTermsText) {
-                const {error} = await dispatch(createServiceTerms(config.SupportSettings.CustomServiceTermsText));
-                if (error) {
-                    return {error};
+                const result = await dispatch(createServiceTerms(config.SupportSettings.CustomServiceTermsText));
+                if (result.error) {
+                    return result;
                 }
             }
         }
