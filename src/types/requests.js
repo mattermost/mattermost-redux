@@ -33,7 +33,8 @@ export type GeneralRequestsStatuses = {|
     config: RequestStatusType,
     dataRetentionPolicy: RequestStatusType,
     license: RequestStatusType,
-    websocket: RequestStatusType
+    websocket: RequestStatusType,
+    redirectLocation: RequestStatusType
 |};
 
 export type PostsRequestsStatuses = {|

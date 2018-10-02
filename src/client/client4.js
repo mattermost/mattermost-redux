@@ -1,20 +1,15 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
 
-import EventEmitter from 'utils/event_emitter';
-import {General} from 'constants';
-
 const FormData = require('form-data');
 
 import fetch from './fetch_etag';
-import {isMinimumServerVersion} from 'src/utils/helpers';
+import {buildQueryString, isMinimumServerVersion} from 'src/utils/helpers';
 
-const HEADER_TOKEN = 'Token';
 const HEADER_AUTH = 'Authorization';
 const HEADER_BEARER = 'BEARER';
 const HEADER_REQUESTED_WITH = 'X-Requested-With';
 const HEADER_USER_AGENT = 'User-Agent';
-const HEADER_X_VERSION_ID = 'X-Version-Id';
 const HEADER_X_CLUSTER_ID = 'X-Cluster-Id';
 
 const PER_PAGE_DEFAULT = 60;
@@ -410,10 +405,40 @@ export default class Client4 {
         );
     };
 
+    setDefaultProfileImage = async (userId) => {
+        this.trackEvent('api', 'api_users_set_default_profile_picture');
+
+        return this.doFetch(
+            `${this.getUserRoute(userId)}/image`,
+            {method: 'delete'}
+        );
+    };
+
     verifyUserEmail = async (token) => {
         return this.doFetch(
             `${this.getUsersRoute()}/email/verify`,
             {method: 'post', body: JSON.stringify({token})}
+        );
+    }
+
+    updateServiceTermsStatus = async (serviceTermsId, accepted) => {
+        return this.doFetch(
+            `${this.getUserRoute('me')}/terms_of_service`,
+            {method: 'post', body: JSON.stringify({serviceTermsId, accepted})}
+        );
+    }
+
+    getServiceTerms = async () => {
+        return this.doFetch(
+            `${this.getBaseRoute()}/terms_of_service`,
+            {method: 'get'}
+        );
+    }
+
+    createServiceTerms = async (text) => {
+        return this.doFetch(
+            `${this.getBaseRoute()}/terms_of_service`,
+            {method: 'post', body: JSON.stringify({text})}
         );
     }
 
@@ -442,14 +467,10 @@ export default class Client4 {
             body.ldap_only = 'true';
         }
 
-        const {headers, data} = await this.doFetchWithResponse(
+        const {data} = await this.doFetchWithResponse(
             `${this.getUsersRoute()}/login`,
             {method: 'post', body: JSON.stringify(body)}
         );
-
-        if (headers.has(HEADER_TOKEN)) {
-            this.token = headers.get(HEADER_TOKEN);
-        }
 
         return data;
     };
@@ -464,14 +485,10 @@ export default class Client4 {
             token,
         };
 
-        const {headers, data} = await this.doFetchWithResponse(
+        const {data} = await this.doFetchWithResponse(
             `${this.getUsersRoute()}/login`,
             {method: 'post', body: JSON.stringify(body)}
         );
-
-        if (headers.has(HEADER_TOKEN)) {
-            this.token = headers.get(HEADER_TOKEN);
-        }
 
         return data;
     };
@@ -607,6 +624,10 @@ export default class Client4 {
         }
 
         return `${this.getUserRoute(userId)}/image${buildQueryString(params)}`;
+    };
+
+    getDefaultProfilePictureUrl = (userId) => {
+        return `${this.getUserRoute(userId)}/image/default`;
     };
 
     autocompleteUsers = async (name, teamId, channelId) => {
@@ -1490,17 +1511,17 @@ export default class Client4 {
         );
     };
 
-    searchPostsWithParams = async (teamId, params, includeDeletedChannels = false) => {
+    searchPostsWithParams = async (teamId, params) => {
         this.trackEvent('api', 'api_posts_search', {team_id: teamId});
 
         return this.doFetch(
-            `${this.getTeamRoute(teamId)}/posts/search?include_deleted_channels=${includeDeletedChannels}`,
+            `${this.getTeamRoute(teamId)}/posts/search`,
             {method: 'post', body: JSON.stringify(params)}
         );
     };
 
-    searchPosts = async (teamId, terms, isOrSearch, includeDeletedChannels = false) => {
-        return this.searchPostsWithParams(teamId, {terms, is_or_search: isOrSearch}, includeDeletedChannels);
+    searchPosts = async (teamId, terms, isOrSearch) => {
+        return this.searchPostsWithParams(teamId, {terms, is_or_search: isOrSearch});
     };
 
     getOpenGraphMetadata = async (url) => {
@@ -2456,16 +2477,6 @@ export default class Client4 {
             };
         }
 
-        // Need to only accept version in the header from requests that are not cached
-        // to avoid getting an old version from a cached response
-        if (headers.has(HEADER_X_VERSION_ID) && !headers.get('Cache-Control')) {
-            const serverVersion = headers.get(HEADER_X_VERSION_ID);
-            if (serverVersion && this.serverVersion !== serverVersion) {
-                this.serverVersion = serverVersion;
-                EventEmitter.emit(General.SERVER_VERSION_CHANGED, serverVersion);
-            }
-        }
-
         if (headers.has(HEADER_X_CLUSTER_ID)) {
             const clusterId = headers.get(HEADER_X_CLUSTER_ID);
             if (clusterId && this.clusterId !== clusterId) {
@@ -2523,25 +2534,6 @@ export default class Client4 {
             }, {properties}, options));
         }
     }
-}
-
-function buildQueryString(parameters) {
-    const keys = Object.keys(parameters);
-    if (keys.length === 0) {
-        return '';
-    }
-
-    let query = '?';
-    for (let i = 0; i < keys.length; i++) {
-        const key = keys[i];
-        query += key + '=' + encodeURIComponent(parameters[key]);
-
-        if (i < keys.length - 1) {
-            query += '&';
-        }
-    }
-
-    return query;
 }
 
 function parseAndMergeNestedHeaders(originalHeaders) {

@@ -90,6 +90,15 @@ describe('Actions.Admin', () => {
                 },
             });
 
+        nock(Client4.getBaseRoute()).
+            get('/terms_of_service').
+            reply(200, {
+                create_at: 1537976679426,
+                id: '1234',
+                text: 'Terms of Service',
+                user_id: '1',
+            });
+
         await Actions.getConfig()(store.dispatch, store.getState);
 
         const state = store.getState();
@@ -111,6 +120,15 @@ describe('Actions.Admin', () => {
                 TeamSettings: {
                     SiteName: 'Mattermost',
                 },
+            });
+
+        nock(Client4.getBaseRoute()).
+            post('/terms_of_service').
+            reply(201, {
+                create_at: 1537976679426,
+                id: '1234',
+                text: 'Terms of Service',
+                user_id: '1',
             });
 
         const {data} = await Actions.getConfig()(store.dispatch, store.getState);

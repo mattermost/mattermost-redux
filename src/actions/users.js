@@ -30,7 +30,7 @@ import {
 } from './preferences';
 
 import {getConfig} from 'selectors/entities/general';
-import {getCurrentUserId} from 'selectors/entities/users';
+import {getCurrentUser, getCurrentUserId} from 'selectors/entities/users';
 
 export function checkMfa(loginId) {
     return async (dispatch, getState) => {
@@ -610,6 +610,48 @@ export function getMe() {
     };
 }
 
+export function updateServiceTermsStatus(serviceTermsId, accepted) {
+    return async (dispatch, getState) => {
+        const response = await dispatch(bindClientFunc(
+            Client4.updateServiceTermsStatus,
+            UserTypes.UPDATE_SERVICE_TERMS_STATUS_REQUEST,
+            UserTypes.UPDATE_SERVICE_TERMS_STATUS_SUCCESS,
+            UserTypes.UPDATE_SERVICE_TERMS_STATUS_FAILURE,
+            serviceTermsId,
+            accepted
+        ));
+        const {data, error} = response;
+        if (data) {
+            const currentUser = getCurrentUser(getState());
+            dispatch({
+                type: UserTypes.RECEIVED_ME,
+                data: Object.assign({}, currentUser, {accepted_service_terms_id: accepted ? serviceTermsId : null}),
+            });
+            return {data};
+        }
+        return {error};
+    };
+}
+
+export function getServiceTerms() {
+    return bindClientFunc(
+        Client4.getServiceTerms,
+        UserTypes.GET_SERVICE_TERMS_REQUEST,
+        UserTypes.GET_SERVICE_TERMS_SUCCESS,
+        UserTypes.GET_SERVICE_TERMS_FAILURE,
+    );
+}
+
+export function createServiceTerms(text) {
+    return bindClientFunc(
+        Client4.createServiceTerms,
+        UserTypes.CREATE_SERVICE_TERMS_REQUEST,
+        UserTypes.CREATE_SERVICE_TERMS_SUCCESS,
+        UserTypes.CREATE_SERVICE_TERMS_FAILURE,
+        text,
+    );
+}
+
 export function getUser(id) {
     return bindClientFunc(
         Client4.getUser,
@@ -1172,6 +1214,32 @@ export function sendPasswordResetEmail(email) {
     );
 }
 
+export function setDefaultProfileImage(userId) {
+    return async (dispatch, getState) => {
+        dispatch({type: UserTypes.UPDATE_USER_REQUEST}, getState);
+
+        try {
+            await Client4.setDefaultProfileImage(userId);
+        } catch (error) {
+            dispatch({type: UserTypes.UPDATE_USER_FAILURE, error}, getState);
+            return {error};
+        }
+
+        const actions = [
+            {type: UserTypes.UPDATE_USER_SUCCESS},
+        ];
+
+        const profile = getState().entities.users.profiles[userId];
+        if (profile) {
+            actions.push({type: UserTypes.RECEIVED_PROFILE, data: {...profile, last_picture_update: 0}});
+        }
+
+        dispatch(batchActions(actions), getState);
+
+        return {data: true};
+    };
+}
+
 export function uploadProfileImage(userId, imageData) {
     return async (dispatch, getState) => {
         dispatch({type: UserTypes.UPDATE_USER_REQUEST}, getState);
@@ -1540,6 +1608,9 @@ export default {
     switchOAuthToEmail,
     switchEmailToLdap,
     switchLdapToEmail,
+    getServiceTerms,
+    createServiceTerms,
+    updateServiceTermsStatus,
     createUserAccessToken,
     getUserAccessToken,
     getUserAccessTokensForUser,

@@ -11,6 +11,7 @@ import {
     getMyCurrentChannelMembership,
 } from 'selectors/entities/common';
 
+import {getConfig, getLicense} from 'selectors/entities/general';
 import {getDirectShowPreferences} from 'selectors/entities/preferences';
 
 import {filterProfilesMatchingTerm, sortByUsername, isSystemAdmin} from 'utils/user_utils';
@@ -342,6 +343,16 @@ function removeCurrentUserFromList(profiles, currentUserId) {
         profiles.splice(index, 1);
     }
 }
+
+export const showCustomTerms = createSelector(
+    getConfig,
+    getCurrentUser,
+    getLicense,
+    (config, user, license) => {
+        // Defaults to false if the setting doesn't exist
+        return Boolean(license.IsLicensed === 'true' && config.EnableCustomServiceTerms === 'true' && user && config.CustomServiceTermsId !== user.accepted_service_terms_id);
+    }
+);
 
 export const getUsersInVisibleDMs = createSelector(
     getUsers,

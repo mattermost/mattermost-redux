@@ -9,6 +9,7 @@ import {Client4} from 'client';
 
 import {logError} from './errors';
 import {bindClientFunc, forceLogoutIfNecessary} from './helpers';
+import {getServiceTerms, createServiceTerms} from './users';
 import {batchActions} from 'redux-batched-actions';
 
 import type {ActionFunc} from '../types/actions';
@@ -37,22 +38,66 @@ export function getAudits(page: number = 0, perPage: number = General.PAGE_SIZE_
 }
 
 export function getConfig(): ActionFunc {
-    return bindClientFunc(
-        Client4.getConfig,
-        AdminTypes.GET_CONFIG_REQUEST,
-        [AdminTypes.RECEIVED_CONFIG, AdminTypes.GET_CONFIG_SUCCESS],
-        AdminTypes.GET_CONFIG_FAILURE
-    );
+    return async (dispatch, getState) => {
+        let config;
+        try {
+            config = await Client4.getConfig();
+        } catch (error) {
+            forceLogoutIfNecessary(error, dispatch, getState);
+            dispatch(batchActions([
+                {type: AdminTypes.GET_CONFIG_FAILURE, error},
+                logError(error),
+            ]), getState);
+            return {error};
+        }
+
+        if (config.SupportSettings && config.SupportSettings.CustomServiceTermsEnabled) {
+            const result = await dispatch(getServiceTerms());
+            if (result.error) {
+                return {error: result.error};
+            }
+
+            if (result.data) {
+                config.SupportSettings.CustomServiceTermsText = result.data.text;
+            }
+        }
+        dispatch(batchActions([
+            {
+                type: AdminTypes.RECEIVED_CONFIG,
+                data: config,
+            },
+            {
+                type: AdminTypes.GET_CONFIG_SUCCESS,
+            },
+        ]), getState);
+
+        return {data: config};
+    };
 }
 
 export function updateConfig(config: Object): ActionFunc {
-    return bindClientFunc(
-        Client4.updateConfig,
-        AdminTypes.UPDATE_CONFIG_REQUEST,
-        [AdminTypes.RECEIVED_CONFIG, AdminTypes.UPDATE_CONFIG_SUCCESS],
-        AdminTypes.UPDATE_CONFIG_FAILURE,
-        config
-    );
+    return async (dispatch, getState) => {
+        const stateConfig = getState().entities.admin.config;
+        if (config.SupportSettings && config.SupportSettings.CustomServiceTermsEnabled) {
+            if (stateConfig.SupportSettings.CustomServiceTermsText !== config.SupportSettings.CustomServiceTermsText) {
+                const result = await dispatch(createServiceTerms(config.SupportSettings.CustomServiceTermsText));
+                if (result.error) {
+                    return result;
+                }
+            }
+        }
+
+        if (config.SupportSettings && typeof config.SupportSettings === 'object') {
+            Reflect.deleteProperty(config.SupportSettings, 'CustomServiceTermsText');
+        }
+        return await dispatch(bindClientFunc(
+            Client4.updateConfig,
+            AdminTypes.UPDATE_CONFIG_REQUEST,
+            [AdminTypes.RECEIVED_CONFIG, AdminTypes.UPDATE_CONFIG_SUCCESS],
+            AdminTypes.UPDATE_CONFIG_FAILURE,
+            config
+        ));
+    };
 }
 
 export function reloadConfig(): ActionFunc {

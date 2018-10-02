@@ -185,14 +185,14 @@ export function getRedirectLocation(url: string): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         dispatch({type: GeneralTypes.REDIRECT_LOCATION_REQUEST, data: {}}, getState);
 
-        let pendingData: Promise<GenericClientResponse>;
+        let pendingData: Promise<Object>;
         if (isMinimumServerVersion(getServerVersion(getState()), 5, 3)) {
             pendingData = Client4.getRedirectLocation(url);
         } else {
             pendingData = Promise.resolve({location: url});
         }
 
-        let data: GenericClientResponse;
+        let data;
         try {
             data = await pendingData;
         } catch (error) {

@@ -67,6 +67,6 @@ export const getAutolinkedUrlSchemes = createSelector(
     }
 );
 
-export const getServerVersion = (state) => {
+export const getServerVersion = (state: GlobalState): string => {
     return state.entities.general.serverVersion;
 };
