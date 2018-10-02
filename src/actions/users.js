@@ -1214,6 +1214,32 @@ export function sendPasswordResetEmail(email) {
     );
 }
 
+export function setDefaultProfileImage(userId) {
+    return async (dispatch, getState) => {
+        dispatch({type: UserTypes.UPDATE_USER_REQUEST}, getState);
+
+        try {
+            await Client4.setDefaultProfileImage(userId);
+        } catch (error) {
+            dispatch({type: UserTypes.UPDATE_USER_FAILURE, error}, getState);
+            return {error};
+        }
+
+        const actions = [
+            {type: UserTypes.UPDATE_USER_SUCCESS},
+        ];
+
+        const profile = getState().entities.users.profiles[userId];
+        if (profile) {
+            actions.push({type: UserTypes.RECEIVED_PROFILE, data: {...profile, last_picture_update: 0}});
+        }
+
+        dispatch(batchActions(actions), getState);
+
+        return {data: true};
+    };
+}
+
 export function uploadProfileImage(userId, imageData) {
     return async (dispatch, getState) => {
         dispatch({type: UserTypes.UPDATE_USER_REQUEST}, getState);
