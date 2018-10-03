@@ -533,12 +533,37 @@ export function sortChannelsByDisplayName(locale, a, b) {
     return a.name.toLowerCase().localeCompare(b.name.toLowerCase(), locale, {numeric: true});
 }
 
+export function sortChannelsByLastPostTime(a, b) {
+    if (a.last_post_at > b.last_post_at) {
+        return -1;
+    }
+    if (a.last_post_at < b.last_post_at) {
+        return 1;
+    }
+    return 0;
+}
+
 export function sortChannelsByDisplayNameAndMuted(locale, members, a, b) {
     const aMember = members[a.id];
     const bMember = members[b.id];
 
     if (isChannelMuted(bMember) === isChannelMuted(aMember)) {
         return sortChannelsByDisplayName(locale, a, b);
+    }
+
+    if (!isChannelMuted(bMember) && isChannelMuted(aMember)) {
+        return 1;
+    }
+
+    return -1;
+}
+
+export function sortChannelsByLastPostTimeAndMuted(locale, members, a, b) {
+    const aMember = members[a.channel_id];
+    const bMember = members[b.channel_id];
+
+    if (isChannelMuted(bMember) === isChannelMuted(aMember)) {
+        return sortChannelsByLastPostTime(a, b);
     }
 
     if (!isChannelMuted(bMember) && isChannelMuted(aMember)) {

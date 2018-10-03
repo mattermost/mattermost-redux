@@ -40,7 +40,7 @@ import {
     isGroupChannelVisible,
     isGroupOrDirectChannelVisible,
     sortChannelsByDisplayName,
-    sortChannelsByDisplayNameAndMuted,
+    sortChannelsByLastPostTimeAndMuted,
 } from 'utils/channel_utils';
 import {createIdsSelector} from 'utils/helpers';
 
@@ -573,7 +573,7 @@ export const getSortedFavoriteChannelWithUnreadsIds = createIdsSelector(
             }
 
             return c;
-        }).sort(sortChannelsByDisplayNameAndMuted.bind(null, locale, myMembers));
+        }).sort(sortChannelsByLastPostTimeAndMuted.bind(null, locale, myMembers));
         return favoriteChannel.map((f) => f.id);
     }
 );
@@ -604,7 +604,7 @@ export const getSortedPublicChannelWithUnreadsIds = createIdsSelector(
             return !favoriteIds.includes(id) &&
                 teamChannelIds.includes(id) && channel.type === General.OPEN_CHANNEL;
         }).map((id) => channels[id]).
-            sort(sortChannelsByDisplayNameAndMuted.bind(null, locale, myMembers));
+            sort(sortChannelsByLastPostTimeAndMuted.bind(null, locale, myMembers));
 
         return publicChannels.map((c) => c.id);
     }
@@ -636,7 +636,7 @@ export const getSortedPrivateChannelWithUnreadsIds = createIdsSelector(
             return !favoriteIds.includes(id) && teamChannelIds.includes(id) &&
                 channel.type === General.PRIVATE_CHANNEL;
         }).map((id) => channels[id]).
-            sort(sortChannelsByDisplayNameAndMuted.bind(null, locale, myMembers));
+            sort(sortChannelsByLastPostTimeAndMuted.bind(null, locale, myMembers));
         return privateChannels.map((c) => c.id);
     }
 );
@@ -692,7 +692,7 @@ export const getSortedDirectChannelWithUnreadsIds = createIdsSelector(
             const channel = channels[id];
             return completeDirectChannelDisplayName(currentUser.id, profiles, settings, channel);
         }).
-            sort(sortChannelsByDisplayNameAndMuted.bind(null, locale, myMembers));
+            sort(sortChannelsByLastPostTimeAndMuted.bind(null, locale, myMembers));
         return directChannels.map((c) => c.id);
     }
 );
