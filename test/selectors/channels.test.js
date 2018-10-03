@@ -34,10 +34,12 @@ describe('Selectors.Channels', () => {
 
     const channel4 = TestHelper.fakeChannelWithId('');
     channel4.display_name = 'Channel 4';
+    channel4.last_post_at = 1;
 
     const channel5 = TestHelper.fakeChannelWithId(team1.id);
     channel5.type = General.PRIVATE_CHANNEL;
     channel5.display_name = 'Channel 5';
+    channel5.last_post_at = 1;
 
     const channel6 = TestHelper.fakeChannelWithId(team1.id);
     const channel7 = TestHelper.fakeChannelWithId('');
@@ -51,6 +53,7 @@ describe('Selectors.Channels', () => {
 
     const channel9 = TestHelper.fakeChannelWithId(team1.id);
     const channel10 = TestHelper.fakeChannelWithId(team1.id);
+    channel10.last_post_at = 0;
     const channel11 = TestHelper.fakeChannelWithId(team1.id);
     channel11.type = General.PRIVATE_CHANNEL;
 
@@ -527,6 +530,7 @@ describe('Selectors.Channels', () => {
     it('get sorted favorite channel ids in current team strict equal', () => {
         const chan1 = {...testState.entities.channels.channels[channel1.id]};
         chan1.total_msg_count = 10;
+        chan1.last_post_at = 1;
 
         const modifiedState = {
             ...testState,
@@ -550,6 +554,7 @@ describe('Selectors.Channels', () => {
 
         const chan9 = {...testState.entities.channels.channels[channel9.id]};
         chan9.display_name = 'abc';
+        chan9.last_post_at = 2;
 
         const updateState = {
             ...modifiedState,
@@ -573,6 +578,7 @@ describe('Selectors.Channels', () => {
     it('get sorted public channel ids in current team strict equal', () => {
         const chan10 = {...testState.entities.channels.channels[channel10.id]};
         chan10.header = 'This should not change the results';
+        chan10.last_post_at = 0;
 
         const modifiedState = {
             ...testState,
@@ -594,7 +600,7 @@ describe('Selectors.Channels', () => {
         assert.ok(fromOriginalState === fromModifiedState);
         assert.ok(fromModifiedState[0] === channel4.id);
 
-        chan10.display_name = 'abc';
+        chan10.last_post_at = 2;
         const updateState = {
             ...modifiedState,
             entities: {
@@ -617,6 +623,7 @@ describe('Selectors.Channels', () => {
     it('get sorted private channel ids in current team strict equal', () => {
         const chan11 = {...testState.entities.channels.channels[channel11.id]};
         chan11.header = 'This should not change the results';
+        chan11.last_post_at = 0;
 
         const modifiedState = {
             ...testState,
@@ -638,7 +645,7 @@ describe('Selectors.Channels', () => {
         assert.ok(fromOriginalState === fromModifiedState);
         assert.ok(fromModifiedState[0] === channel5.id);
 
-        chan11.display_name = 'abc';
+        chan11.last_post_at = 2;
         const updateState = {
             ...modifiedState,
             entities: {
