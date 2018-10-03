@@ -9,7 +9,7 @@ function results(state = [], action) {
     switch (action.type) {
     case SearchTypes.RECEIVED_SEARCH_POSTS: {
         if (action.isGettingMore) {
-            return state.concat(action.data.order);
+            return [...new Set(state.concat(action.data.order))];
         }
         return action.data.order;
     }
