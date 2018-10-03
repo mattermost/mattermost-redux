@@ -558,7 +558,7 @@ export function sortChannelsByDisplayNameAndMuted(locale, members, a, b) {
     return -1;
 }
 
-export function sortChannelsByLastPostTimeAndMuted(locale, members, a, b) {
+export function sortChannelsByLastPostTimeAndMuted(members, a, b) {
     const aMember = members[a.channel_id];
     const bMember = members[b.channel_id];
 
