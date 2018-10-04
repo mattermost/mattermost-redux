@@ -1,5 +1,6 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
+// @flow
 
 import {Client4} from 'client';
 import {Preferences} from 'constants';
@@ -12,8 +13,11 @@ import {bindClientFunc} from './helpers';
 import {getProfilesByIds, getProfilesInChannel} from './users';
 import {getChannelAndMyMember, getMyChannelMember} from './channels';
 
-export function deletePreferences(userId, preferences) {
-    return async (dispatch, getState) => {
+import type {GetStateFunc, DispatchFunc, ActionFunc} from '../types/actions';
+import type {PreferenceType} from '../types/preferences';
+
+export function deletePreferences(userId: string, preferences: Array<PreferenceType>): ActionFunc {
+    return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         const state = getState();
         const myPreferences = getMyPreferencesSelector(state);
         const currentPreferences = preferences.map((pref) => myPreferences[getPreferenceKey(pref.category, pref.name)]);
@@ -39,7 +43,7 @@ export function deletePreferences(userId, preferences) {
     };
 }
 
-export function getMyPreferences() {
+export function getMyPreferences(): ActionFunc {
     return bindClientFunc(
         Client4.getMyPreferences,
         PreferenceTypes.MY_PREFERENCES_REQUEST,
@@ -48,8 +52,8 @@ export function getMyPreferences() {
     );
 }
 
-export function makeDirectChannelVisibleIfNecessary(otherUserId) {
-    return async (dispatch, getState) => {
+export function makeDirectChannelVisibleIfNecessary(otherUserId: string): ActionFunc {
+    return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         const state = getState();
         const myPreferences = getMyPreferencesSelector(state);
         const currentUserId = getCurrentUserId(state);
@@ -64,15 +68,15 @@ export function makeDirectChannelVisibleIfNecessary(otherUserId) {
                 value: 'true',
             };
             getProfilesByIds([otherUserId])(dispatch, getState);
-            savePreferences(currentUserId, [preference])(dispatch, getState);
+            savePreferences(currentUserId, [preference])(dispatch);
         }
 
         return {data: true};
     };
 }
 
-export function makeGroupMessageVisibleIfNecessary(channelId) {
-    return async (dispatch, getState) => {
+export function makeGroupMessageVisibleIfNecessary(channelId: string): ActionFunc {
+    return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         const state = getState();
         const myPreferences = getMyPreferencesSelector(state);
         const currentUserId = getCurrentUserId(state);
@@ -95,15 +99,15 @@ export function makeGroupMessageVisibleIfNecessary(channelId) {
             }
 
             getProfilesInChannel(channelId, 0)(dispatch, getState);
-            savePreferences(currentUserId, [preference])(dispatch, getState);
+            savePreferences(currentUserId, [preference])(dispatch);
         }
 
         return {data: true};
     };
 }
 
-export function savePreferences(userId, preferences) {
-    return async (dispatch) => {
+export function savePreferences(userId: string, preferences: Array<PreferenceType>) {
+    return async (dispatch: DispatchFunc) => {
         dispatch({
             type: PreferenceTypes.RECEIVED_PREFERENCES,
             data: preferences,

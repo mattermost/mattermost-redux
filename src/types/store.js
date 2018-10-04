@@ -31,6 +31,7 @@ import type {
     SchemesRequestsStatuses,
 } from './requests';
 import type {Role} from './roles';
+import type {PreferenceType} from './preferences';
 
 export type GlobalState = {|
     entities: {|
@@ -40,7 +41,7 @@ export type GlobalState = {|
         channels: ChannelsState,
         posts: PostsState,
         preferences: {|
-            myPreferences: Object
+            myPreferences: {[string]: PreferenceType}
         |},
         admin: AdminState,
         jobs: JobsState,
