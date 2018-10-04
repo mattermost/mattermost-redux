@@ -14,8 +14,9 @@ import {getProfilesByIds, getProfilesInChannel} from './users';
 import {getChannelAndMyMember, getMyChannelMember} from './channels';
 
 import type {GetStateFunc, DispatchFunc, ActionFunc} from '../types/actions';
+import type {PreferenceType} from '../types/preferences';
 
-export function deletePreferences(userId: string, preferences: Object): ActionFunc {
+export function deletePreferences(userId: string, preferences: Array<PreferenceType>): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         const state = getState();
         const myPreferences = getMyPreferencesSelector(state);
@@ -105,7 +106,7 @@ export function makeGroupMessageVisibleIfNecessary(channelId: string): ActionFun
     };
 }
 
-export function savePreferences(userId: string, preferences: Array<Object>) {
+export function savePreferences(userId: string, preferences: Array<PreferenceType>) {
     return async (dispatch: DispatchFunc) => {
         dispatch({
             type: PreferenceTypes.RECEIVED_PREFERENCES,
