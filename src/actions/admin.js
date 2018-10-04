@@ -197,6 +197,15 @@ export function uploadBrandImage(imageData: File): ActionFunc {
     );
 }
 
+export function deleteBrandImage(): ActionFunc {
+    return bindClientFunc(
+        Client4.deleteBrandImage,
+        AdminTypes.DELETE_BRAND_IMAGE_REQUEST,
+        AdminTypes.DELETE_BRAND_IMAGE_SUCCESS,
+        AdminTypes.DELETE_BRAND_IMAGE_FAILURE
+    );
+}
+
 export function getClusterStatus(): ActionFunc {
     return bindClientFunc(
         Client4.getClusterStatus,
