@@ -1427,7 +1427,7 @@ describe('Actions.Channels', () => {
         assert.ok(channel);
         assert.ok(notChannel);
         assert.ok(channel.has(user.id));
-        assert.ifError(notChannel.has(user.id));
+        assert.equal(notChannel.has(user.id), false, 'user should not present in profilesNotInChannel');
 
         stats = state.entities.channels.stats;
         assert.ok(stats, 'stats');
@@ -1495,7 +1495,7 @@ describe('Actions.Channels', () => {
         assert.ok(channel);
         assert.ok(notChannel);
         assert.ok(notChannel.has(user.id));
-        assert.ifError(channel.has(user.id));
+        assert.equal(channel.has(user.id), false, 'user should not present in profilesInChannel');
 
         stats = state.entities.channels.stats;
         assert.ok(stats, 'stats');

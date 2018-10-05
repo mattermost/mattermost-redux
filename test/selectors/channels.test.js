@@ -358,7 +358,7 @@ describe('Selectors.Channels', () => {
         assert.ok(fromOriginalState === fromModifiedState);
 
         // it should't have a channel that belongs to a team
-        assert.ifError(fromModifiedState.includes(channel1.id));
+        assert.equal(fromModifiedState.includes(channel1.id), false, 'should not have a channel that belongs to a team');
     });
 
     it('get channel ids in current team strict equal', () => {
@@ -390,7 +390,7 @@ describe('Selectors.Channels', () => {
         assert.ok(fromOriginalState === fromModifiedState);
 
         // it should't have a direct channel
-        assert.ifError(fromModifiedState.includes(channel7.id));
+        assert.equal(fromModifiedState.includes(channel7.id), false, 'should not have direct channel on a team');
     });
 
     it('get channel ids for current team strict equal', () => {
