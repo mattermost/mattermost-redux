@@ -2,49 +2,38 @@
 // See LICENSE.txt for license information.
 
 import {createStore} from 'redux';
-import thunk from 'redux-thunk';
-import {REHYDRATE} from 'redux-persist/constants';
 import {createOfflineReducer, networkStatusChangedAction, offlineCompose} from 'redux-offline';
 import defaultOfflineConfig from 'redux-offline/lib/defaults';
-import createActionBuffer from 'redux-action-buffer';
 import reducerRegistry from 'store/reducer_registry';
 import {Client4} from 'client';
 
 import serviceReducer from 'reducers';
 
+import {offlineConfig, createReducer} from './helpers';
 import initialState from './initial_state';
-import {defaultOptions, offlineConfig, createReducer} from './helpers';
+import {createMiddleware} from './middleware';
 
-/***
-clientOptions object - This param allows users to configure the store from the client side.
-It has two properties currently:
-enableBuffer - bool - default = true - If true the store will buffer all actions until offline state rehydration occurs.
-additionalMiddleware - func | array - Allows for single or multiple additional middleware functions to be passed in from the client side.
-***/
+/**
+ * Configures and constructs the redux store. Accepts the following parameters:
+ * preloadedState - Any preloaded state to be applied to the store after it is initially configured.
+ * appReducer - An object containing any app-specific reducer functions that the client needs.
+ * userOfflineConfig - Any additional configuration data to be passed into redux-offline aside from the default values.
+ * getAppReducer - A function that returns the appReducer as defined above. Only used in development to enable hot reloading.
+ * clientOptions - An object containing additional options used when configuring the redux store. The following options are available:
+ *     additionalMiddleware - func | array - Allows for single or multiple additional middleware functions to be passed in from the client side.
+ *     enableBuffer - bool - default = true - If true, the store will buffer all actions until offline state rehydration occurs.
+ *     enableThunk - bool - default = true - If true, include the thunk middleware automatically. If false, thunk must be provided as part of additionalMiddleware.
+ */
 export default function configureOfflineServiceStore(preloadedState, appReducer, userOfflineConfig, getAppReducer, clientOptions = {}) {
     const baseState = Object.assign({}, initialState, preloadedState);
 
     const baseOfflineConfig = Object.assign({}, defaultOfflineConfig, offlineConfig, userOfflineConfig);
-    const options = Object.assign({}, defaultOptions, clientOptions);
-
-    const {additionalMiddleware, enableBuffer} = options;
-
-    let clientSideMiddleware = additionalMiddleware;
-
-    if (typeof clientSideMiddleware === 'function') {
-        clientSideMiddleware = [clientSideMiddleware];
-    }
-
-    const middleware = [thunk, ...clientSideMiddleware];
-    if (enableBuffer) {
-        middleware.push(createActionBuffer(REHYDRATE));
-    }
 
     const store = createStore(
         createOfflineReducer(createReducer(baseState, serviceReducer, appReducer)),
         baseState,
         offlineCompose(baseOfflineConfig)(
-            middleware,
+            createMiddleware(clientOptions),
             []
         )
     );
