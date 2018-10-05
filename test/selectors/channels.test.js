@@ -802,4 +802,43 @@ describe('Selectors.Channels', () => {
             assert.ok(fromModifiedState.length === 2);
         });
     });
+
+    describe('more_direct_channels selector', () => {
+        it('getChannelsWithUserProfiles', () => {
+            const channelWithUserProfiles = Selectors.getChannelsWithUserProfiles(testState);
+            assert.equal(channelWithUserProfiles.length, 1);
+            assert.equal(channelWithUserProfiles[0].profiles.length, 2);
+        });
+    });
+    describe('Selectors.matchExistsInChannelProfiles', () => {
+        const mockUser1 = {id: 'user1', password: 'password', username: 'user1', first_name: 'foo', last_name: 'bar', nickname: 'foobar'};
+        const mockUser2 = {id: 'user2', password: 'password', username: 'Hello', first_name: 'john', last_name: 'smith', nickname: 'jsmith'};
+        const mockUser3 = {id: 'user3', password: 'password', username: 'HelloWorld', first_name: 'steve', last_name: 'fleming', nickname: 'sfleming'};
+        const users = [mockUser1, mockUser2, mockUser3];
+        it('should return true for username', () => {
+            const searchTerm = 'Hello';
+            const exists = Selectors.matchExistsInChannelProfiles(users, searchTerm);
+            assert.equal(exists, true);
+        });
+        it('should return true for firstName', () => {
+            const searchTerm = 'john';
+            const exists = Selectors.matchExistsInChannelProfiles(users, searchTerm);
+            assert.equal(exists, true);
+        });
+        it('should return true for lastname', () => {
+            const searchTerm = 'fleming';
+            const exists = Selectors.matchExistsInChannelProfiles(users, searchTerm);
+            assert.equal(exists, true);
+        });
+        it('should return true for nickname', () => {
+            const searchTerm = 'foobar';
+            const exists = Selectors.matchExistsInChannelProfiles(users, searchTerm);
+            assert.equal(exists, true);
+        });
+        it('should return false if nothing matches', () => {
+            const searchTerm = 'non-existing';
+            const exists = Selectors.matchExistsInChannelProfiles(users, searchTerm);
+            assert.equal(exists, false);
+        });
+    });
 });
