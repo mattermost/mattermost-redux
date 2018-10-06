@@ -1,5 +1,10 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
+// @flow
+
+import type {ActionFunc, DispatchFunc, GetStateFunc} from 'types/actions';
+import type {UserProfile} from 'types/users';
+import type {TeamMembership} from 'types/teams';
 
 import {batchActions} from 'redux-batched-actions';
 import {Client4} from 'client';
@@ -32,12 +37,12 @@ import {
 import {getConfig} from 'selectors/entities/general';
 import {getCurrentUser, getCurrentUserId} from 'selectors/entities/users';
 
-export function checkMfa(loginId) {
+export function checkMfa(loginId: string): ActionFunc {
     return async (dispatch, getState) => {
-        dispatch({type: UserTypes.CHECK_MFA_REQUEST}, getState);
+        dispatch({type: UserTypes.CHECK_MFA_REQUEST, data: null}, getState);
         try {
             const data = await Client4.checkUserMfa(loginId);
-            dispatch({type: UserTypes.CHECK_MFA_SUCCESS}, getState);
+            dispatch({type: UserTypes.CHECK_MFA_SUCCESS, data: null}, getState);
             return {data: data.mfa_required};
         } catch (error) {
             dispatch(batchActions([
@@ -49,7 +54,7 @@ export function checkMfa(loginId) {
     };
 }
 
-export function generateMfaSecret(userId) {
+export function generateMfaSecret(userId: string): ActionFunc {
     return bindClientFunc(
         Client4.generateMfaSecret,
         UserTypes.MFA_SECRET_REQUEST,
@@ -59,11 +64,11 @@ export function generateMfaSecret(userId) {
     );
 }
 
-export function createUser(user, token, inviteId) {
+export function createUser(user: UserProfile, token: string, inviteId: string): ActionFunc {
     return async (dispatch, getState) => {
-        dispatch({type: UserTypes.CREATE_USER_REQUEST}, getState);
+        dispatch({type: UserTypes.CREATE_USER_REQUEST, data: null}, getState);
 
-        let created;
+        let created: UserProfile;
         try {
             created = await Client4.createUser(user, token, inviteId);
         } catch (error) {
@@ -78,7 +83,7 @@ export function createUser(user, token, inviteId) {
             return {error};
         }
 
-        const profiles = {};
+        const profiles: { [string]: UserProfile } = {};
         profiles[created.id] = created;
         dispatch({type: UserTypes.RECEIVED_PROFILES, data: profiles});
 
@@ -86,13 +91,13 @@ export function createUser(user, token, inviteId) {
     };
 }
 
-export function login(loginId, password, mfaToken = '', ldapOnly = false) {
+export function login(loginId: string, password: string, mfaToken: string = '', ldapOnly: boolean = false): ActionFunc {
     return async (dispatch, getState) => {
-        dispatch({type: UserTypes.LOGIN_REQUEST}, getState);
+        dispatch({type: UserTypes.LOGIN_REQUEST, data: null}, getState);
 
         const deviceId = getState().entities.general.deviceToken;
 
-        let data;
+        let data: UserProfile;
         try {
             data = await Client4.login(loginId, password, mfaToken, deviceId, ldapOnly);
         } catch (error) {
@@ -110,13 +115,13 @@ export function login(loginId, password, mfaToken = '', ldapOnly = false) {
     };
 }
 
-export function loginById(id, password, mfaToken = '') {
+export function loginById(id: string, password: string, mfaToken: string = ''): ActionFunc {
     return async (dispatch, getState) => {
-        dispatch({type: UserTypes.LOGIN_REQUEST}, getState);
+        dispatch({type: UserTypes.LOGIN_REQUEST, data: null}, getState);
 
         const deviceId = getState().entities.general.deviceToken;
 
-        let data;
+        let data: UserProfile;
         try {
             data = await Client4.loginById(id, password, mfaToken, deviceId);
         } catch (error) {
@@ -134,7 +139,7 @@ export function loginById(id, password, mfaToken = '') {
     };
 }
 
-function completeLogin(data) {
+function completeLogin(data: UserProfile): ActionFunc {
     return async (dispatch, getState) => {
         dispatch({
             type: UserTypes.RECEIVED_ME,
@@ -145,7 +150,7 @@ function completeLogin(data) {
 
         let teamMembers;
         try {
-            const membersRequest = Client4.getMyTeamMembers();
+            const membersRequest: Promise<Array<TeamMembership>> = Client4.getMyTeamMembers();
             const unreadsRequest = Client4.getMyTeamUnreads();
 
             teamMembers = await membersRequest;
@@ -208,14 +213,14 @@ function completeLogin(data) {
             }
         }
         if (roles.size > 0) {
-            dispatch(loadRolesIfNeeded(roles));
+            dispatch(loadRolesIfNeeded(Array.from(roles)));
         }
 
         return {data: true};
     };
 }
 
-export function loadMe() {
+export function loadMe(): ActionFunc {
     return async (dispatch, getState) => {
         const state = getState();
 
@@ -247,9 +252,9 @@ export function loadMe() {
     };
 }
 
-export function logout() {
+export function logout(): ActionFunc {
     return async (dispatch, getState) => {
-        dispatch({type: UserTypes.LOGOUT_REQUEST}, getState);
+        dispatch({type: UserTypes.LOGOUT_REQUEST, data: null}, getState);
 
         try {
             await Client4.logout();
@@ -257,11 +262,13 @@ export function logout() {
             // nothing to do here
         }
 
-        dispatch({type: UserTypes.LOGOUT_SUCCESS}, getState);
+        dispatch({type: UserTypes.LOGOUT_SUCCESS, data: null}, getState);
+
+        return {data: true};
     };
 }
 
-export function getTotalUsersStats() {
+export function getTotalUsersStats(): ActionFunc {
     return bindClientFunc(
         Client4.getTotalUsersStats,
         UserTypes.USER_STATS_REQUEST,
@@ -270,13 +277,13 @@ export function getTotalUsersStats() {
     );
 }
 
-export function getProfiles(page = 0, perPage = General.PROFILE_CHUNK_SIZE) {
+export function getProfiles(page: number = 0, perPage: number = General.PROFILE_CHUNK_SIZE): ActionFunc {
     return async (dispatch, getState) => {
-        dispatch({type: UserTypes.PROFILES_REQUEST}, getState);
+        dispatch({type: UserTypes.PROFILES_REQUEST, data: null}, getState);
 
         const {currentUserId} = getState().entities.users;
 
-        let profiles;
+        let profiles: Array<UserProfile>;
         try {
             profiles = await Client4.getProfiles(page, perPage);
             removeUserFromList(currentUserId, profiles);
@@ -303,7 +310,7 @@ export function getProfiles(page = 0, perPage = General.PROFILE_CHUNK_SIZE) {
     };
 }
 
-export function getMissingProfilesByIds(userIds) {
+export function getMissingProfilesByIds(userIds: Array<string>): ActionFunc {
     return async (dispatch, getState) => {
         const {profiles} = getState().entities.users;
 
@@ -323,12 +330,12 @@ export function getMissingProfilesByIds(userIds) {
     };
 }
 
-export function getMissingProfilesByUsernames(usernames) {
+export function getMissingProfilesByUsernames(usernames: Array<string>): ActionFunc {
     return async (dispatch, getState) => {
         const {profiles} = getState().entities.users;
 
         const usernameProfiles = Object.values(profiles).reduce((acc, profile) => {
-            acc[profile.username] = profile;
+            acc[(profile: UserProfile).username] = profile;
             return acc;
         }, {});
 
@@ -347,13 +354,13 @@ export function getMissingProfilesByUsernames(usernames) {
     };
 }
 
-export function getProfilesByIds(userIds) {
+export function getProfilesByIds(userIds: Array<string>): ActionFunc {
     return async (dispatch, getState) => {
-        dispatch({type: UserTypes.PROFILES_REQUEST}, getState);
+        dispatch({type: UserTypes.PROFILES_REQUEST, data: null}, getState);
 
         const {currentUserId} = getState().entities.users;
 
-        let profiles;
+        let profiles: Array<UserProfile>;
         try {
             profiles = await Client4.getProfilesByIds(userIds);
             removeUserFromList(currentUserId, profiles);
@@ -380,13 +387,13 @@ export function getProfilesByIds(userIds) {
     };
 }
 
-export function getProfilesByUsernames(usernames) {
+export function getProfilesByUsernames(usernames: Array<string>): ActionFunc {
     return async (dispatch, getState) => {
-        dispatch({type: UserTypes.PROFILES_REQUEST}, getState);
+        dispatch({type: UserTypes.PROFILES_REQUEST, data: null}, getState);
 
         const {currentUserId} = getState().entities.users;
 
-        let profiles;
+        let profiles: Array<UserProfile>;
         try {
             profiles = await Client4.getProfilesByUsernames(usernames);
             removeUserFromList(currentUserId, profiles);
@@ -413,13 +420,13 @@ export function getProfilesByUsernames(usernames) {
     };
 }
 
-export function getProfilesInTeam(teamId, page, perPage = General.PROFILE_CHUNK_SIZE, sort = '') {
+export function getProfilesInTeam(teamId: string, page: number, perPage: number = General.PROFILE_CHUNK_SIZE, sort: string = ''): ActionFunc {
     return async (dispatch, getState) => {
-        dispatch({type: UserTypes.PROFILES_IN_TEAM_REQUEST}, getState);
+        dispatch({type: UserTypes.PROFILES_IN_TEAM_REQUEST, data: null}, getState);
 
         const {currentUserId} = getState().entities.users;
 
-        let profiles;
+        let profiles: Array<UserProfile>;
         try {
             profiles = await Client4.getProfilesInTeam(teamId, page, perPage, sort);
         } catch (error) {
@@ -450,11 +457,11 @@ export function getProfilesInTeam(teamId, page, perPage = General.PROFILE_CHUNK_
     };
 }
 
-export function getProfilesNotInTeam(teamId, page, perPage = General.PROFILE_CHUNK_SIZE) {
+export function getProfilesNotInTeam(teamId: string, page: number, perPage: number = General.PROFILE_CHUNK_SIZE): ActionFunc {
     return async (dispatch, getState) => {
-        dispatch({type: UserTypes.PROFILES_NOT_IN_TEAM_REQUEST}, getState);
+        dispatch({type: UserTypes.PROFILES_NOT_IN_TEAM_REQUEST, data: null}, getState);
 
-        let profiles;
+        let profiles: Array<UserProfile>;
         try {
             profiles = await Client4.getProfilesNotInTeam(teamId, page, perPage);
         } catch (error) {
@@ -485,11 +492,11 @@ export function getProfilesNotInTeam(teamId, page, perPage = General.PROFILE_CHU
     };
 }
 
-export function getProfilesWithoutTeam(page, perPage = General.PROFILE_CHUNK_SIZE) {
+export function getProfilesWithoutTeam(page: number, perPage: number = General.PROFILE_CHUNK_SIZE): ActionFunc {
     return async (dispatch, getState) => {
-        dispatch({type: UserTypes.PROFILES_WITHOUT_TEAM_REQUEST}, getState);
+        dispatch({type: UserTypes.PROFILES_WITHOUT_TEAM_REQUEST, data: null}, getState);
 
-        let profiles;
+        let profiles: Array<UserProfile>;
         try {
             profiles = await Client4.getProfilesWithoutTeam(page, perPage);
         } catch (error) {
@@ -519,13 +526,13 @@ export function getProfilesWithoutTeam(page, perPage = General.PROFILE_CHUNK_SIZ
     };
 }
 
-export function getProfilesInChannel(channelId, page, perPage = General.PROFILE_CHUNK_SIZE, sort = '') {
+export function getProfilesInChannel(channelId: string, page: number, perPage: number = General.PROFILE_CHUNK_SIZE, sort: string = ''): ActionFunc {
     return async (dispatch, getState) => {
-        dispatch({type: UserTypes.PROFILES_IN_CHANNEL_REQUEST}, getState);
+        dispatch({type: UserTypes.PROFILES_IN_CHANNEL_REQUEST, data: null}, getState);
 
         const {currentUserId} = getState().entities.users;
 
-        let profiles;
+        let profiles: Array<UserProfile>;
         try {
             profiles = await Client4.getProfilesInChannel(channelId, page, perPage, sort);
         } catch (error) {
@@ -556,13 +563,13 @@ export function getProfilesInChannel(channelId, page, perPage = General.PROFILE_
     };
 }
 
-export function getProfilesNotInChannel(teamId, channelId, page, perPage = General.PROFILE_CHUNK_SIZE) {
+export function getProfilesNotInChannel(teamId: string, channelId: string, page: number, perPage: number = General.PROFILE_CHUNK_SIZE): ActionFunc {
     return async (dispatch, getState) => {
-        dispatch({type: UserTypes.PROFILES_NOT_IN_CHANNEL_REQUEST}, getState);
+        dispatch({type: UserTypes.PROFILES_NOT_IN_CHANNEL_REQUEST, data: null}, getState);
 
         const {currentUserId} = getState().entities.users;
 
-        let profiles;
+        let profiles: Array<UserProfile>;
         try {
             profiles = await Client4.getProfilesNotInChannel(teamId, channelId, page, perPage);
         } catch (error) {
@@ -593,7 +600,7 @@ export function getProfilesNotInChannel(teamId, channelId, page, perPage = Gener
     };
 }
 
-export function getMe() {
+export function getMe(): ActionFunc {
     return async (dispatch, getState) => {
         const getMeFunc = bindClientFunc(
             Client4.getMe,
@@ -610,7 +617,7 @@ export function getMe() {
     };
 }
 
-export function updateTermsOfServiceStatus(termsOfServiceId, accepted) {
+export function updateTermsOfServiceStatus(termsOfServiceId: string, accepted: boolean): ActionFunc {
     return async (dispatch, getState) => {
         const response = await dispatch(bindClientFunc(
             Client4.updateTermsOfServiceStatus,
@@ -633,7 +640,7 @@ export function updateTermsOfServiceStatus(termsOfServiceId, accepted) {
     };
 }
 
-export function getTermsOfService() {
+export function getTermsOfService(): ActionFunc {
     return bindClientFunc(
         Client4.getTermsOfService,
         UserTypes.GET_TERMS_OF_SERVICE_REQUEST,
@@ -642,7 +649,7 @@ export function getTermsOfService() {
     );
 }
 
-export function createTermsOfService(text) {
+export function createTermsOfService(text: string): ActionFunc {
     return bindClientFunc(
         Client4.createTermsOfService,
         UserTypes.CREATE_TERMS_OF_SERVICE_REQUEST,
@@ -652,7 +659,7 @@ export function createTermsOfService(text) {
     );
 }
 
-export function getUser(id) {
+export function getUser(id: string): ActionFunc {
     return bindClientFunc(
         Client4.getUser,
         UserTypes.USER_REQUEST,
@@ -662,7 +669,7 @@ export function getUser(id) {
     );
 }
 
-export function getUserByUsername(username) {
+export function getUserByUsername(username: string): ActionFunc {
     return bindClientFunc(
         Client4.getUserByUsername,
         UserTypes.USER_BY_USERNAME_REQUEST,
@@ -672,7 +679,7 @@ export function getUserByUsername(username) {
     );
 }
 
-export function getUserByEmail(email) {
+export function getUserByEmail(email: string): ActionFunc {
     return bindClientFunc(
         Client4.getUserByEmail,
         UserTypes.USER_REQUEST,
@@ -688,18 +695,18 @@ export function getUserByEmail(email) {
 // the array. Helps with performance because instead of making 75 different calls for
 // statuses, we are only making one call for 75 ids.
 // We could maybe clean it up somewhat by storing the array of ids in redux state possbily?
-let ids = [];
-const debouncedGetStatusesByIds = debounce(async (dispatch, getState) => {
+let ids: Array<string> = [];
+const debouncedGetStatusesByIds = debounce(async (dispatch: DispatchFunc, getState: GetStateFunc) => {
     getStatusesByIds([...new Set(ids)])(dispatch, getState);
 }, 20, false, () => {
     ids = [];
 });
-export function getStatusesByIdsBatchedDebounced(id) {
+export function getStatusesByIdsBatchedDebounced(id: string) {
     ids = [...ids, id];
     return debouncedGetStatusesByIds;
 }
 
-export function getStatusesByIds(userIds) {
+export function getStatusesByIds(userIds: Array<string>): ActionFunc {
     return bindClientFunc(
         Client4.getStatusesByIds,
         UserTypes.PROFILES_STATUSES_REQUEST,
@@ -709,7 +716,7 @@ export function getStatusesByIds(userIds) {
     );
 }
 
-export function getStatus(userId) {
+export function getStatus(userId: string): ActionFunc {
     return bindClientFunc(
         Client4.getStatus,
         UserTypes.PROFILE_STATUS_REQUEST,
@@ -719,9 +726,9 @@ export function getStatus(userId) {
     );
 }
 
-export function setStatus(status) {
+export function setStatus(status: string): ActionFunc {
     return async (dispatch, getState) => {
-        dispatch({type: UserTypes.SET_STATUS_REQUEST}, getState);
+        dispatch({type: UserTypes.SET_STATUS_REQUEST, data: null}, getState);
 
         try {
             await Client4.updateStatus(status);
@@ -748,7 +755,7 @@ export function setStatus(status) {
     };
 }
 
-export function getSessions(userId) {
+export function getSessions(userId: string): ActionFunc {
     return bindClientFunc(
         Client4.getSessions,
         UserTypes.SESSIONS_REQUEST,
@@ -758,9 +765,9 @@ export function getSessions(userId) {
     );
 }
 
-export function revokeSession(userId, sessionId) {
+export function revokeSession(userId: string, sessionId: string): ActionFunc {
     return async (dispatch, getState) => {
-        dispatch({type: UserTypes.REVOKE_SESSION_REQUEST}, getState);
+        dispatch({type: UserTypes.REVOKE_SESSION_REQUEST, data: null}, getState);
 
         try {
             await Client4.revokeSession(userId, sessionId);
@@ -787,9 +794,9 @@ export function revokeSession(userId, sessionId) {
     };
 }
 
-export function revokeAllSessionsForUser(userId) {
+export function revokeAllSessionsForUser(userId: string): ActionFunc {
     return async (dispatch, getState) => {
-        dispatch({type: UserTypes.REVOKE_ALL_USER_SESSIONS_REQUEST}, getState);
+        dispatch({type: UserTypes.REVOKE_ALL_USER_SESSIONS_REQUEST, data: null}, getState);
 
         try {
             await Client4.revokeAllSessionsForUser(userId);
@@ -813,7 +820,7 @@ export function revokeAllSessionsForUser(userId) {
     };
 }
 
-export function loadProfilesForDirect() {
+export function loadProfilesForDirect(): ActionFunc {
     return async (dispatch, getState) => {
         const state = getState();
         const config = state.entities.general.config;
@@ -846,7 +853,7 @@ export function loadProfilesForDirect() {
     };
 }
 
-export function getUserAudits(userId, page = 0, perPage = General.AUDITS_CHUNK_SIZE) {
+export function getUserAudits(userId: string, page: number = 0, perPage: number = General.AUDITS_CHUNK_SIZE): ActionFunc {
     return bindClientFunc(
         Client4.getUserAudits,
         UserTypes.AUDITS_REQUEST,
@@ -858,9 +865,9 @@ export function getUserAudits(userId, page = 0, perPage = General.AUDITS_CHUNK_S
     );
 }
 
-export function autocompleteUsers(term, teamId = '', channelId = '', options = {limit: 25}) {
+export function autocompleteUsers(term: string, teamId: string = '', channelId: string = '', options: {|limit: number|} = {limit: 25}): ActionFunc {
     return async (dispatch, getState) => {
-        dispatch({type: UserTypes.AUTOCOMPLETE_USERS_REQUEST}, getState);
+        dispatch({type: UserTypes.AUTOCOMPLETE_USERS_REQUEST, data: null}, getState);
 
         const {currentUserId} = getState().entities.users;
 
@@ -925,9 +932,9 @@ export function autocompleteUsers(term, teamId = '', channelId = '', options = {
     };
 }
 
-export function searchProfiles(term, options = {}) {
+export function searchProfiles(term: string, options: Object = {}): ActionFunc {
     return async (dispatch, getState) => {
-        dispatch({type: UserTypes.SEARCH_PROFILES_REQUEST}, getState);
+        dispatch({type: UserTypes.SEARCH_PROFILES_REQUEST, data: null}, getState);
 
         const {currentUserId} = getState().entities.users;
 
@@ -989,7 +996,7 @@ export function searchProfiles(term, options = {}) {
 }
 
 let statusIntervalId = '';
-export function startPeriodicStatusUpdates() {
+export function startPeriodicStatusUpdates(): ActionFunc {
     return async (dispatch, getState) => {
         clearInterval(statusIntervalId);
 
@@ -1015,7 +1022,7 @@ export function startPeriodicStatusUpdates() {
     };
 }
 
-export function stopPeriodicStatusUpdates() {
+export function stopPeriodicStatusUpdates(): ActionFunc {
     return async () => {
         if (statusIntervalId) {
             clearInterval(statusIntervalId);
@@ -1025,15 +1032,18 @@ export function stopPeriodicStatusUpdates() {
     };
 }
 
-export function updateMe(user) {
+export function updateMe(user: UserProfile): ActionFunc {
     return async (dispatch, getState) => {
-        dispatch({type: UserTypes.UPDATE_ME_REQUEST}, getState);
+        dispatch({type: UserTypes.UPDATE_ME_REQUEST, data: null}, getState);
 
         let data;
         try {
             data = await Client4.patchMe(user);
         } catch (error) {
-            dispatch({type: UserTypes.UPDATE_ME_FAILURE, error}, getState);
+            dispatch(batchActions([
+                {type: UserTypes.UPDATE_ME_FAILURE, error},
+                logError(error),
+            ]), getState);
             return {error};
         }
 
@@ -1047,15 +1057,18 @@ export function updateMe(user) {
     };
 }
 
-export function patchUser(user) {
+export function patchUser(user: UserProfile): ActionFunc {
     return async (dispatch, getState) => {
-        dispatch({type: UserTypes.UPDATE_USER_REQUEST}, getState);
+        dispatch({type: UserTypes.UPDATE_USER_REQUEST, data: null}, getState);
 
-        let data;
+        let data: UserProfile;
         try {
             data = await Client4.patchUser(user);
         } catch (error) {
-            dispatch({type: UserTypes.UPDATE_USER_FAILURE, error}, getState);
+            dispatch(batchActions([
+                {type: UserTypes.UPDATE_USER_FAILURE, error},
+                logError(error),
+            ]), getState);
             return {error};
         }
 
@@ -1068,14 +1081,17 @@ export function patchUser(user) {
     };
 }
 
-export function updateUserRoles(userId, roles) {
+export function updateUserRoles(userId: string, roles: Array<string>): ActionFunc {
     return async (dispatch, getState) => {
-        dispatch({type: UserTypes.UPDATE_USER_REQUEST}, getState);
+        dispatch({type: UserTypes.UPDATE_USER_REQUEST, data: null}, getState);
 
         try {
             await Client4.updateUserRoles(userId, roles);
         } catch (error) {
-            dispatch({type: UserTypes.UPDATE_USER_FAILURE, error}, getState);
+            dispatch(batchActions([
+                {type: UserTypes.UPDATE_USER_FAILURE, error},
+                logError(error),
+            ]), getState);
             return {error};
         }
 
@@ -1094,14 +1110,17 @@ export function updateUserRoles(userId, roles) {
     };
 }
 
-export function updateUserMfa(userId, activate, code = '') {
+export function updateUserMfa(userId: string, activate: boolean, code: string = ''): ActionFunc {
     return async (dispatch, getState) => {
-        dispatch({type: UserTypes.UPDATE_USER_REQUEST}, getState);
+        dispatch({type: UserTypes.UPDATE_USER_REQUEST, data: null}, getState);
 
         try {
             await Client4.updateUserMfa(userId, activate, code);
         } catch (error) {
-            dispatch({type: UserTypes.UPDATE_USER_FAILURE, error}, getState);
+            dispatch(batchActions([
+                {type: UserTypes.UPDATE_USER_FAILURE, error},
+                logError(error),
+            ]), getState);
             return {error};
         }
 
@@ -1120,14 +1139,17 @@ export function updateUserMfa(userId, activate, code = '') {
     };
 }
 
-export function updateUserPassword(userId, currentPassword, newPassword) {
+export function updateUserPassword(userId: string, currentPassword: string, newPassword: string): ActionFunc {
     return async (dispatch, getState) => {
-        dispatch({type: UserTypes.UPDATE_USER_REQUEST}, getState);
+        dispatch({type: UserTypes.UPDATE_USER_REQUEST, data: null}, getState);
 
         try {
             await Client4.updateUserPassword(userId, currentPassword, newPassword);
         } catch (error) {
-            dispatch({type: UserTypes.UPDATE_USER_FAILURE, error}, getState);
+            dispatch(batchActions([
+                {type: UserTypes.UPDATE_USER_FAILURE, error},
+                logError(error),
+            ]), getState);
             return {error};
         }
 
@@ -1146,14 +1168,17 @@ export function updateUserPassword(userId, currentPassword, newPassword) {
     };
 }
 
-export function updateUserActive(userId, active) {
+export function updateUserActive(userId: string, active: boolean): ActionFunc {
     return async (dispatch, getState) => {
-        dispatch({type: UserTypes.UPDATE_USER_REQUEST}, getState);
+        dispatch({type: UserTypes.UPDATE_USER_REQUEST, data: null}, getState);
 
         try {
             await Client4.updateUserActive(userId, active);
         } catch (error) {
-            dispatch({type: UserTypes.UPDATE_USER_FAILURE, error}, getState);
+            dispatch(batchActions([
+                {type: UserTypes.UPDATE_USER_FAILURE, error},
+                logError(error),
+            ]), getState);
             return {error};
         }
 
@@ -1173,7 +1198,7 @@ export function updateUserActive(userId, active) {
     };
 }
 
-export function verifyUserEmail(token) {
+export function verifyUserEmail(token: string): ActionFunc {
     return bindClientFunc(
         Client4.verifyUserEmail,
         UserTypes.VERIFY_EMAIL_REQUEST,
@@ -1183,7 +1208,7 @@ export function verifyUserEmail(token) {
     );
 }
 
-export function sendVerificationEmail(email) {
+export function sendVerificationEmail(email: string): ActionFunc {
     return bindClientFunc(
         Client4.sendVerificationEmail,
         UserTypes.VERIFY_EMAIL_REQUEST,
@@ -1193,7 +1218,7 @@ export function sendVerificationEmail(email) {
     );
 }
 
-export function resetUserPassword(token, newPassword) {
+export function resetUserPassword(token: string, newPassword: string): ActionFunc {
     return bindClientFunc(
         Client4.resetUserPassword,
         UserTypes.PASSWORD_RESET_REQUEST,
@@ -1204,7 +1229,7 @@ export function resetUserPassword(token, newPassword) {
     );
 }
 
-export function sendPasswordResetEmail(email) {
+export function sendPasswordResetEmail(email: string): ActionFunc {
     return bindClientFunc(
         Client4.sendPasswordResetEmail,
         UserTypes.PASSWORD_RESET_REQUEST,
@@ -1214,14 +1239,17 @@ export function sendPasswordResetEmail(email) {
     );
 }
 
-export function setDefaultProfileImage(userId) {
+export function setDefaultProfileImage(userId: string): ActionFunc {
     return async (dispatch, getState) => {
-        dispatch({type: UserTypes.UPDATE_USER_REQUEST}, getState);
+        dispatch({type: UserTypes.UPDATE_USER_REQUEST, data: null}, getState);
 
         try {
             await Client4.setDefaultProfileImage(userId);
         } catch (error) {
-            dispatch({type: UserTypes.UPDATE_USER_FAILURE, error}, getState);
+            dispatch(batchActions([
+                {type: UserTypes.UPDATE_USER_FAILURE, error},
+                logError(error),
+            ]), getState);
             return {error};
         }
 
@@ -1240,14 +1268,16 @@ export function setDefaultProfileImage(userId) {
     };
 }
 
-export function uploadProfileImage(userId, imageData) {
+export function uploadProfileImage(userId: string, imageData: any): ActionFunc {
     return async (dispatch, getState) => {
-        dispatch({type: UserTypes.UPDATE_USER_REQUEST}, getState);
+        dispatch({type: UserTypes.UPDATE_USER_REQUEST, data: null}, getState);
 
         try {
             await Client4.uploadProfileImage(userId, imageData);
         } catch (error) {
-            dispatch({type: UserTypes.UPDATE_USER_FAILURE, error}, getState);
+            dispatch(batchActions([
+                {type: UserTypes.UPDATE_USER_FAILURE, error},
+            ]), getState);
             return {error};
         }
 
@@ -1266,7 +1296,7 @@ export function uploadProfileImage(userId, imageData) {
     };
 }
 
-export function switchEmailToOAuth(service, email, password, mfaCode = '') {
+export function switchEmailToOAuth(service: string, email: string, password: string, mfaCode: string = ''): ActionFunc {
     return bindClientFunc(
         Client4.switchEmailToOAuth,
         UserTypes.SWITCH_LOGIN_REQUEST,
@@ -1279,7 +1309,7 @@ export function switchEmailToOAuth(service, email, password, mfaCode = '') {
     );
 }
 
-export function switchOAuthToEmail(currentService, email, password) {
+export function switchOAuthToEmail(currentService: string, email: string, password: string): ActionFunc {
     return bindClientFunc(
         Client4.switchOAuthToEmail,
         UserTypes.SWITCH_LOGIN_REQUEST,
@@ -1291,7 +1321,7 @@ export function switchOAuthToEmail(currentService, email, password) {
     );
 }
 
-export function switchEmailToLdap(email, emailPassword, ldapId, ldapPassword, mfaCode = '') {
+export function switchEmailToLdap(email: string, emailPassword: string, ldapId: string, ldapPassword: string, mfaCode: string = ''): ActionFunc {
     return bindClientFunc(
         Client4.switchEmailToLdap,
         UserTypes.SWITCH_LOGIN_REQUEST,
@@ -1305,7 +1335,7 @@ export function switchEmailToLdap(email, emailPassword, ldapId, ldapPassword, mf
     );
 }
 
-export function switchLdapToEmail(ldapPassword, email, emailPassword, mfaCode = '') {
+export function switchLdapToEmail(ldapPassword: string, email: string, emailPassword: string, mfaCode: string = ''): ActionFunc {
     return bindClientFunc(
         Client4.switchLdapToEmail,
         UserTypes.SWITCH_LOGIN_REQUEST,
@@ -1318,9 +1348,9 @@ export function switchLdapToEmail(ldapPassword, email, emailPassword, mfaCode = 
     );
 }
 
-export function createUserAccessToken(userId, description) {
+export function createUserAccessToken(userId: string, description: string): ActionFunc {
     return async (dispatch, getState) => {
-        dispatch({type: UserTypes.CREATE_USER_ACCESS_TOKEN_REQUEST});
+        dispatch({type: UserTypes.CREATE_USER_ACCESS_TOKEN_REQUEST, data: null});
 
         let data;
         try {
@@ -1360,9 +1390,9 @@ export function createUserAccessToken(userId, description) {
     };
 }
 
-export function getUserAccessToken(tokenId) {
+export function getUserAccessToken(tokenId: string): ActionFunc {
     return async (dispatch, getState) => {
-        dispatch({type: UserTypes.GET_USER_ACCESS_TOKEN_REQUEST});
+        dispatch({type: UserTypes.GET_USER_ACCESS_TOKEN_REQUEST, data: null});
 
         let data;
         try {
@@ -1402,9 +1432,9 @@ export function getUserAccessToken(tokenId) {
     };
 }
 
-export function getUserAccessTokens(page = 0, perPage = General.PROFILE_CHUNK_SIZE) {
+export function getUserAccessTokens(page: number = 0, perPage: number = General.PROFILE_CHUNK_SIZE): ActionFunc {
     return async (dispatch, getState) => {
-        dispatch({type: UserTypes.GET_USER_ACCESS_TOKEN_REQUEST});
+        dispatch({type: UserTypes.GET_USER_ACCESS_TOKEN_REQUEST, data: null});
         let data;
         try {
             data = await Client4.getUserAccessTokens(page, perPage);
@@ -1433,9 +1463,9 @@ export function getUserAccessTokens(page = 0, perPage = General.PROFILE_CHUNK_SI
     };
 }
 
-export function getUserAccessTokensForUser(userId, page = 0, perPage = General.PROFILE_CHUNK_SIZE) {
+export function getUserAccessTokensForUser(userId: string, page: number = 0, perPage: number = General.PROFILE_CHUNK_SIZE): ActionFunc {
     return async (dispatch, getState) => {
-        dispatch({type: UserTypes.GET_USER_ACCESS_TOKEN_REQUEST});
+        dispatch({type: UserTypes.GET_USER_ACCESS_TOKEN_REQUEST, data: null});
 
         let data;
         try {
@@ -1476,9 +1506,9 @@ export function getUserAccessTokensForUser(userId, page = 0, perPage = General.P
     };
 }
 
-export function revokeUserAccessToken(tokenId) {
+export function revokeUserAccessToken(tokenId: string): ActionFunc {
     return async (dispatch, getState) => {
-        dispatch({type: UserTypes.REVOKE_USER_ACCESS_TOKEN_REQUEST});
+        dispatch({type: UserTypes.REVOKE_USER_ACCESS_TOKEN_REQUEST, data: null});
 
         try {
             await Client4.revokeUserAccessToken(tokenId);
@@ -1505,9 +1535,9 @@ export function revokeUserAccessToken(tokenId) {
     };
 }
 
-export function disableUserAccessToken(tokenId) {
+export function disableUserAccessToken(tokenId: string): ActionFunc {
     return async (dispatch, getState) => {
-        dispatch({type: UserTypes.DISABLE_USER_ACCESS_TOKEN_REQUEST});
+        dispatch({type: UserTypes.DISABLE_USER_ACCESS_TOKEN_REQUEST, data: null});
 
         try {
             await Client4.disableUserAccessToken(tokenId);
@@ -1534,9 +1564,9 @@ export function disableUserAccessToken(tokenId) {
     };
 }
 
-export function enableUserAccessToken(tokenId) {
+export function enableUserAccessToken(tokenId: string): ActionFunc {
     return async (dispatch, getState) => {
-        dispatch({type: UserTypes.ENABLE_USER_ACCESS_TOKEN_REQUEST});
+        dispatch({type: UserTypes.ENABLE_USER_ACCESS_TOKEN_REQUEST, data: null});
 
         try {
             await Client4.enableUserAccessToken(tokenId);
@@ -1563,9 +1593,9 @@ export function enableUserAccessToken(tokenId) {
     };
 }
 
-export function clearUserAccessTokens() {
+export function clearUserAccessTokens(): ActionFunc {
     return async (dispatch) => {
-        dispatch({type: UserTypes.CLEAR_MY_USER_ACCESS_TOKENS});
+        dispatch({type: UserTypes.CLEAR_MY_USER_ACCESS_TOKENS, data: null});
         return {data: true};
     };
 }
