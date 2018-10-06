@@ -2,7 +2,7 @@
 // See LICENSE.txt for license information.
 // @flow
 
-import type {ActionFunc, DispatchFunc, GetStateFunc} from 'types/actions';
+import type {ActionFunc, ActionResult, DispatchFunc, GetStateFunc} from 'types/actions';
 import type {UserProfile} from 'types/users';
 import type {TeamMembership} from 'types/teams';
 
@@ -38,7 +38,7 @@ import {getConfig} from 'selectors/entities/general';
 import {getCurrentUser, getCurrentUserId} from 'selectors/entities/users';
 
 export function checkMfa(loginId: string): ActionFunc {
-    return async (dispatch, getState) => {
+    return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         dispatch({type: UserTypes.CHECK_MFA_REQUEST, data: null}, getState);
         try {
             const data = await Client4.checkUserMfa(loginId);
@@ -65,10 +65,10 @@ export function generateMfaSecret(userId: string): ActionFunc {
 }
 
 export function createUser(user: UserProfile, token: string, inviteId: string): ActionFunc {
-    return async (dispatch, getState) => {
+    return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         dispatch({type: UserTypes.CREATE_USER_REQUEST, data: null}, getState);
 
-        let created: UserProfile;
+        let created = null;
         try {
             created = await Client4.createUser(user, token, inviteId);
         } catch (error) {
@@ -83,8 +83,9 @@ export function createUser(user: UserProfile, token: string, inviteId: string): 
             return {error};
         }
 
-        const profiles: { [string]: UserProfile } = {};
-        profiles[created.id] = created;
+        const profiles: { [userId: string]: UserProfile } = {
+            [created.id]: created,
+        };
         dispatch({type: UserTypes.RECEIVED_PROFILES, data: profiles});
 
         return {data: created};
@@ -92,12 +93,12 @@ export function createUser(user: UserProfile, token: string, inviteId: string): 
 }
 
 export function login(loginId: string, password: string, mfaToken: string = '', ldapOnly: boolean = false): ActionFunc {
-    return async (dispatch, getState) => {
+    return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         dispatch({type: UserTypes.LOGIN_REQUEST, data: null}, getState);
 
         const deviceId = getState().entities.general.deviceToken;
 
-        let data: UserProfile;
+        let data = null;
         try {
             data = await Client4.login(loginId, password, mfaToken, deviceId, ldapOnly);
         } catch (error) {
@@ -116,12 +117,12 @@ export function login(loginId: string, password: string, mfaToken: string = '', 
 }
 
 export function loginById(id: string, password: string, mfaToken: string = ''): ActionFunc {
-    return async (dispatch, getState) => {
+    return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         dispatch({type: UserTypes.LOGIN_REQUEST, data: null}, getState);
 
         const deviceId = getState().entities.general.deviceToken;
 
-        let data: UserProfile;
+        let data = null;
         try {
             data = await Client4.loginById(id, password, mfaToken, deviceId);
         } catch (error) {
@@ -140,7 +141,7 @@ export function loginById(id: string, password: string, mfaToken: string = ''): 
 }
 
 function completeLogin(data: UserProfile): ActionFunc {
-    return async (dispatch, getState) => {
+    return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         dispatch({
             type: UserTypes.RECEIVED_ME,
             data,
@@ -148,7 +149,7 @@ function completeLogin(data: UserProfile): ActionFunc {
 
         Client4.setUserId(data.id);
 
-        let teamMembers;
+        let teamMembers = null;
         try {
             const membersRequest: Promise<Array<TeamMembership>> = Client4.getMyTeamMembers();
             const unreadsRequest = Client4.getMyTeamUnreads();
@@ -213,7 +214,7 @@ function completeLogin(data: UserProfile): ActionFunc {
             }
         }
         if (roles.size > 0) {
-            dispatch(loadRolesIfNeeded(Array.from(roles)));
+            dispatch(loadRolesIfNeeded([...roles]));
         }
 
         return {data: true};
@@ -221,7 +222,7 @@ function completeLogin(data: UserProfile): ActionFunc {
 }
 
 export function loadMe(): ActionFunc {
-    return async (dispatch, getState) => {
+    return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         const state = getState();
 
         const deviceId = state.entities.general.deviceToken;
@@ -253,7 +254,7 @@ export function loadMe(): ActionFunc {
 }
 
 export function logout(): ActionFunc {
-    return async (dispatch, getState) => {
+    return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         dispatch({type: UserTypes.LOGOUT_REQUEST, data: null}, getState);
 
         try {
@@ -278,12 +279,12 @@ export function getTotalUsersStats(): ActionFunc {
 }
 
 export function getProfiles(page: number = 0, perPage: number = General.PROFILE_CHUNK_SIZE): ActionFunc {
-    return async (dispatch, getState) => {
+    return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         dispatch({type: UserTypes.PROFILES_REQUEST, data: null}, getState);
 
         const {currentUserId} = getState().entities.users;
 
-        let profiles: Array<UserProfile>;
+        let profiles = null;
         try {
             profiles = await Client4.getProfiles(page, perPage);
             removeUserFromList(currentUserId, profiles);
@@ -311,7 +312,7 @@ export function getProfiles(page: number = 0, perPage: number = General.PROFILE_
 }
 
 export function getMissingProfilesByIds(userIds: Array<string>): ActionFunc {
-    return async (dispatch, getState) => {
+    return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         const {profiles} = getState().entities.users;
 
         const missingIds = [];
@@ -331,11 +332,11 @@ export function getMissingProfilesByIds(userIds: Array<string>): ActionFunc {
 }
 
 export function getMissingProfilesByUsernames(usernames: Array<string>): ActionFunc {
-    return async (dispatch, getState) => {
+    return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         const {profiles} = getState().entities.users;
 
-        const usernameProfiles = Object.values(profiles).reduce((acc, profile) => {
-            acc[(profile: UserProfile).username] = profile;
+        const usernameProfiles = Object.values(profiles).reduce((acc, profile: any) => {
+            acc[profile.username] = profile;
             return acc;
         }, {});
 
@@ -355,12 +356,12 @@ export function getMissingProfilesByUsernames(usernames: Array<string>): ActionF
 }
 
 export function getProfilesByIds(userIds: Array<string>): ActionFunc {
-    return async (dispatch, getState) => {
+    return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         dispatch({type: UserTypes.PROFILES_REQUEST, data: null}, getState);
 
         const {currentUserId} = getState().entities.users;
 
-        let profiles: Array<UserProfile>;
+        let profiles = null;
         try {
             profiles = await Client4.getProfilesByIds(userIds);
             removeUserFromList(currentUserId, profiles);
@@ -388,12 +389,12 @@ export function getProfilesByIds(userIds: Array<string>): ActionFunc {
 }
 
 export function getProfilesByUsernames(usernames: Array<string>): ActionFunc {
-    return async (dispatch, getState) => {
+    return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         dispatch({type: UserTypes.PROFILES_REQUEST, data: null}, getState);
 
         const {currentUserId} = getState().entities.users;
 
-        let profiles: Array<UserProfile>;
+        let profiles = null;
         try {
             profiles = await Client4.getProfilesByUsernames(usernames);
             removeUserFromList(currentUserId, profiles);
@@ -421,12 +422,12 @@ export function getProfilesByUsernames(usernames: Array<string>): ActionFunc {
 }
 
 export function getProfilesInTeam(teamId: string, page: number, perPage: number = General.PROFILE_CHUNK_SIZE, sort: string = ''): ActionFunc {
-    return async (dispatch, getState) => {
+    return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         dispatch({type: UserTypes.PROFILES_IN_TEAM_REQUEST, data: null}, getState);
 
         const {currentUserId} = getState().entities.users;
 
-        let profiles: Array<UserProfile>;
+        let profiles: null;
         try {
             profiles = await Client4.getProfilesInTeam(teamId, page, perPage, sort);
         } catch (error) {
@@ -458,10 +459,10 @@ export function getProfilesInTeam(teamId: string, page: number, perPage: number 
 }
 
 export function getProfilesNotInTeam(teamId: string, page: number, perPage: number = General.PROFILE_CHUNK_SIZE): ActionFunc {
-    return async (dispatch, getState) => {
+    return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         dispatch({type: UserTypes.PROFILES_NOT_IN_TEAM_REQUEST, data: null}, getState);
 
-        let profiles: Array<UserProfile>;
+        let profiles: null;
         try {
             profiles = await Client4.getProfilesNotInTeam(teamId, page, perPage);
         } catch (error) {
@@ -493,10 +494,10 @@ export function getProfilesNotInTeam(teamId: string, page: number, perPage: numb
 }
 
 export function getProfilesWithoutTeam(page: number, perPage: number = General.PROFILE_CHUNK_SIZE): ActionFunc {
-    return async (dispatch, getState) => {
+    return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         dispatch({type: UserTypes.PROFILES_WITHOUT_TEAM_REQUEST, data: null}, getState);
 
-        let profiles: Array<UserProfile>;
+        let profiles = null;
         try {
             profiles = await Client4.getProfilesWithoutTeam(page, perPage);
         } catch (error) {
@@ -527,12 +528,12 @@ export function getProfilesWithoutTeam(page: number, perPage: number = General.P
 }
 
 export function getProfilesInChannel(channelId: string, page: number, perPage: number = General.PROFILE_CHUNK_SIZE, sort: string = ''): ActionFunc {
-    return async (dispatch, getState) => {
+    return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         dispatch({type: UserTypes.PROFILES_IN_CHANNEL_REQUEST, data: null}, getState);
 
         const {currentUserId} = getState().entities.users;
 
-        let profiles: Array<UserProfile>;
+        let profiles = null;
         try {
             profiles = await Client4.getProfilesInChannel(channelId, page, perPage, sort);
         } catch (error) {
@@ -564,12 +565,12 @@ export function getProfilesInChannel(channelId: string, page: number, perPage: n
 }
 
 export function getProfilesNotInChannel(teamId: string, channelId: string, page: number, perPage: number = General.PROFILE_CHUNK_SIZE): ActionFunc {
-    return async (dispatch, getState) => {
+    return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         dispatch({type: UserTypes.PROFILES_NOT_IN_CHANNEL_REQUEST, data: null}, getState);
 
         const {currentUserId} = getState().entities.users;
 
-        let profiles: Array<UserProfile>;
+        let profiles = null;
         try {
             profiles = await Client4.getProfilesNotInChannel(teamId, channelId, page, perPage);
         } catch (error) {
@@ -601,14 +602,14 @@ export function getProfilesNotInChannel(teamId: string, channelId: string, page:
 }
 
 export function getMe(): ActionFunc {
-    return async (dispatch, getState) => {
+    return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         const getMeFunc = bindClientFunc(
             Client4.getMe,
             UserTypes.USER_REQUEST,
             [UserTypes.RECEIVED_ME, UserTypes.USER_SUCCESS],
             UserTypes.USER_FAILURE
         );
-        const me = await getMeFunc(dispatch, getState);
+        const me: $Subtype<ActionResult> = await getMeFunc(dispatch, getState);
         if (me.error) {
             return me;
         }
@@ -618,8 +619,8 @@ export function getMe(): ActionFunc {
 }
 
 export function updateTermsOfServiceStatus(termsOfServiceId: string, accepted: boolean): ActionFunc {
-    return async (dispatch, getState) => {
-        const response = await dispatch(bindClientFunc(
+    return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
+        const response: $Subtype<ActionResult> = await dispatch(bindClientFunc(
             Client4.updateTermsOfServiceStatus,
             UserTypes.UPDATE_TERMS_OF_SERVICE_STATUS_REQUEST,
             UserTypes.UPDATE_TERMS_OF_SERVICE_STATUS_SUCCESS,
@@ -632,7 +633,10 @@ export function updateTermsOfServiceStatus(termsOfServiceId: string, accepted: b
             const currentUser = getCurrentUser(getState());
             dispatch({
                 type: UserTypes.RECEIVED_ME,
-                data: Object.assign({}, currentUser, {accepted_terms_of_service_id: accepted ? termsOfServiceId : null}),
+                data: {
+                    ...currentUser,
+                    accepted_terms_of_service_id: accepted ? termsOfServiceId : null,
+                },
             });
             return {data};
         }
@@ -727,7 +731,7 @@ export function getStatus(userId: string): ActionFunc {
 }
 
 export function setStatus(status: string): ActionFunc {
-    return async (dispatch, getState) => {
+    return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         dispatch({type: UserTypes.SET_STATUS_REQUEST, data: null}, getState);
 
         try {
@@ -766,7 +770,7 @@ export function getSessions(userId: string): ActionFunc {
 }
 
 export function revokeSession(userId: string, sessionId: string): ActionFunc {
-    return async (dispatch, getState) => {
+    return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         dispatch({type: UserTypes.REVOKE_SESSION_REQUEST, data: null}, getState);
 
         try {
@@ -795,7 +799,7 @@ export function revokeSession(userId: string, sessionId: string): ActionFunc {
 }
 
 export function revokeAllSessionsForUser(userId: string): ActionFunc {
-    return async (dispatch, getState) => {
+    return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         dispatch({type: UserTypes.REVOKE_ALL_USER_SESSIONS_REQUEST, data: null}, getState);
 
         try {
@@ -821,7 +825,7 @@ export function revokeAllSessionsForUser(userId: string): ActionFunc {
 }
 
 export function loadProfilesForDirect(): ActionFunc {
-    return async (dispatch, getState) => {
+    return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         const state = getState();
         const config = state.entities.general.config;
         const {channels, myMembers} = state.entities.channels;
@@ -830,7 +834,7 @@ export function loadProfilesForDirect(): ActionFunc {
 
         const values = Object.values(channels);
         for (let i = 0; i < values.length; i++) {
-            const channel = values[i];
+            const channel: any = values[i];
             const member = myMembers[channel.id];
             if (!isDirectChannel(channel) && !isGroupChannel(channel)) {
                 continue;
@@ -866,7 +870,7 @@ export function getUserAudits(userId: string, page: number = 0, perPage: number 
 }
 
 export function autocompleteUsers(term: string, teamId: string = '', channelId: string = '', options: {|limit: number|} = {limit: 25}): ActionFunc {
-    return async (dispatch, getState) => {
+    return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         dispatch({type: UserTypes.AUTOCOMPLETE_USERS_REQUEST, data: null}, getState);
 
         const {currentUserId} = getState().entities.users;
@@ -933,7 +937,7 @@ export function autocompleteUsers(term: string, teamId: string = '', channelId: 
 }
 
 export function searchProfiles(term: string, options: Object = {}): ActionFunc {
-    return async (dispatch, getState) => {
+    return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         dispatch({type: UserTypes.SEARCH_PROFILES_REQUEST, data: null}, getState);
 
         const {currentUserId} = getState().entities.users;
@@ -995,10 +999,12 @@ export function searchProfiles(term: string, options: Object = {}): ActionFunc {
     };
 }
 
-let statusIntervalId = '';
+let statusIntervalId = null;
 export function startPeriodicStatusUpdates(): ActionFunc {
-    return async (dispatch, getState) => {
-        clearInterval(statusIntervalId);
+    return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
+        if (statusIntervalId) {
+            clearInterval(statusIntervalId);
+        }
 
         statusIntervalId = setInterval(
             () => {
@@ -1033,7 +1039,7 @@ export function stopPeriodicStatusUpdates(): ActionFunc {
 }
 
 export function updateMe(user: UserProfile): ActionFunc {
-    return async (dispatch, getState) => {
+    return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         dispatch({type: UserTypes.UPDATE_ME_REQUEST, data: null}, getState);
 
         let data;
@@ -1058,7 +1064,7 @@ export function updateMe(user: UserProfile): ActionFunc {
 }
 
 export function patchUser(user: UserProfile): ActionFunc {
-    return async (dispatch, getState) => {
+    return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         dispatch({type: UserTypes.UPDATE_USER_REQUEST, data: null}, getState);
 
         let data: UserProfile;
@@ -1082,7 +1088,7 @@ export function patchUser(user: UserProfile): ActionFunc {
 }
 
 export function updateUserRoles(userId: string, roles: Array<string>): ActionFunc {
-    return async (dispatch, getState) => {
+    return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         dispatch({type: UserTypes.UPDATE_USER_REQUEST, data: null}, getState);
 
         try {
@@ -1111,7 +1117,7 @@ export function updateUserRoles(userId: string, roles: Array<string>): ActionFun
 }
 
 export function updateUserMfa(userId: string, activate: boolean, code: string = ''): ActionFunc {
-    return async (dispatch, getState) => {
+    return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         dispatch({type: UserTypes.UPDATE_USER_REQUEST, data: null}, getState);
 
         try {
@@ -1140,7 +1146,7 @@ export function updateUserMfa(userId: string, activate: boolean, code: string = 
 }
 
 export function updateUserPassword(userId: string, currentPassword: string, newPassword: string): ActionFunc {
-    return async (dispatch, getState) => {
+    return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         dispatch({type: UserTypes.UPDATE_USER_REQUEST, data: null}, getState);
 
         try {
@@ -1169,7 +1175,7 @@ export function updateUserPassword(userId: string, currentPassword: string, newP
 }
 
 export function updateUserActive(userId: string, active: boolean): ActionFunc {
-    return async (dispatch, getState) => {
+    return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         dispatch({type: UserTypes.UPDATE_USER_REQUEST, data: null}, getState);
 
         try {
@@ -1240,7 +1246,7 @@ export function sendPasswordResetEmail(email: string): ActionFunc {
 }
 
 export function setDefaultProfileImage(userId: string): ActionFunc {
-    return async (dispatch, getState) => {
+    return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         dispatch({type: UserTypes.UPDATE_USER_REQUEST, data: null}, getState);
 
         try {
@@ -1269,7 +1275,7 @@ export function setDefaultProfileImage(userId: string): ActionFunc {
 }
 
 export function uploadProfileImage(userId: string, imageData: any): ActionFunc {
-    return async (dispatch, getState) => {
+    return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         dispatch({type: UserTypes.UPDATE_USER_REQUEST, data: null}, getState);
 
         try {
@@ -1349,7 +1355,7 @@ export function switchLdapToEmail(ldapPassword: string, email: string, emailPass
 }
 
 export function createUserAccessToken(userId: string, description: string): ActionFunc {
-    return async (dispatch, getState) => {
+    return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         dispatch({type: UserTypes.CREATE_USER_ACCESS_TOKEN_REQUEST, data: null});
 
         let data;
@@ -1391,7 +1397,7 @@ export function createUserAccessToken(userId: string, description: string): Acti
 }
 
 export function getUserAccessToken(tokenId: string): ActionFunc {
-    return async (dispatch, getState) => {
+    return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         dispatch({type: UserTypes.GET_USER_ACCESS_TOKEN_REQUEST, data: null});
 
         let data;
@@ -1433,7 +1439,7 @@ export function getUserAccessToken(tokenId: string): ActionFunc {
 }
 
 export function getUserAccessTokens(page: number = 0, perPage: number = General.PROFILE_CHUNK_SIZE): ActionFunc {
-    return async (dispatch, getState) => {
+    return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         dispatch({type: UserTypes.GET_USER_ACCESS_TOKEN_REQUEST, data: null});
         let data;
         try {
@@ -1464,7 +1470,7 @@ export function getUserAccessTokens(page: number = 0, perPage: number = General.
 }
 
 export function getUserAccessTokensForUser(userId: string, page: number = 0, perPage: number = General.PROFILE_CHUNK_SIZE): ActionFunc {
-    return async (dispatch, getState) => {
+    return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         dispatch({type: UserTypes.GET_USER_ACCESS_TOKEN_REQUEST, data: null});
 
         let data;
@@ -1507,7 +1513,7 @@ export function getUserAccessTokensForUser(userId: string, page: number = 0, per
 }
 
 export function revokeUserAccessToken(tokenId: string): ActionFunc {
-    return async (dispatch, getState) => {
+    return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         dispatch({type: UserTypes.REVOKE_USER_ACCESS_TOKEN_REQUEST, data: null});
 
         try {
@@ -1536,7 +1542,7 @@ export function revokeUserAccessToken(tokenId: string): ActionFunc {
 }
 
 export function disableUserAccessToken(tokenId: string): ActionFunc {
-    return async (dispatch, getState) => {
+    return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         dispatch({type: UserTypes.DISABLE_USER_ACCESS_TOKEN_REQUEST, data: null});
 
         try {
@@ -1565,7 +1571,7 @@ export function disableUserAccessToken(tokenId: string): ActionFunc {
 }
 
 export function enableUserAccessToken(tokenId: string): ActionFunc {
-    return async (dispatch, getState) => {
+    return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         dispatch({type: UserTypes.ENABLE_USER_ACCESS_TOKEN_REQUEST, data: null});
 
         try {

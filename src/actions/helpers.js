@@ -92,7 +92,7 @@ export function bindClientFunc(clientFunc: () => Promise<mixed>, request: Action
 }
 
 // Debounce function based on underscores modified to use es6 and a cb
-export function debounce(func: () => mixed, wait: number, immediate: boolean, cb: () => mixed) {
+export function debounce(func: (...args: any) => mixed, wait: number, immediate: boolean, cb: () => mixed) {
     let timeout;
     return function fx(...args: Array<any>) {
         const runLater = () => {
