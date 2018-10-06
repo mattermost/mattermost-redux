@@ -393,7 +393,7 @@ export function getGroupDisplayNameFromUserIds(userIds, profiles, currentUserId,
 
 export function isFavoriteChannel(myPreferences, id) {
     const fav = myPreferences[`${Preferences.CATEGORY_FAVORITE_CHANNEL}--${id}`];
-    return fav && fav.value === 'true';
+    return fav ? fav.value === 'true' : false;
 }
 
 export function isDefault(channel) {

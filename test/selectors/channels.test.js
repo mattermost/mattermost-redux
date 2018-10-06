@@ -689,6 +689,81 @@ describe('Selectors.Channels', () => {
         assert.throws(() => filterPostIDsInvalid(testStateC, postIDs), ReferenceError, filterErrorMessage);
     });
 
+    it('isCurrentChannelFavorite', () => {
+        assert.ok(Selectors.isCurrentChannelFavorite(testState) === true);
+
+        const newState = {
+            entities: {
+                channels: {
+                    currentChannelId: channel1.id,
+                },
+                preferences: {
+                    myPreferences: [],
+                },
+            },
+        };
+        assert.ok(Selectors.isCurrentChannelFavorite(newState) === false);
+    });
+
+    it('isCurrentChannelMuted', () => {
+        assert.ok(Selectors.isCurrentChannelMuted(testState) === false);
+
+        const newState = {
+            entities: {
+                channels: {
+                    ...testState.entities.channels,
+                    myMembers: {
+                        [channel1.id]: {
+                            notify_props: {
+                                mark_unread: 'mention',
+                            },
+                        },
+                    },
+                },
+            },
+        };
+        assert.ok(Selectors.isCurrentChannelMuted(newState) === true);
+    });
+
+    it('isCurrentChannelArchived', () => {
+        assert.ok(Selectors.isCurrentChannelArchived(testState) === false);
+
+        const newState = {
+            entities: {
+                ...testState.entities,
+                channels: {
+                    ...testState.entities.channels,
+                    channels: {
+                        [channel1.id]: {
+                            delete_at: 1,
+                        },
+                    },
+                },
+            },
+        };
+        assert.ok(Selectors.isCurrentChannelArchived(newState) === true);
+    });
+
+    it('isCurrentChannelDefault', () => {
+        assert.ok(Selectors.isCurrentChannelDefault(testState) === false);
+
+        const newState = {
+            entities: {
+                ...testState.entities,
+                channels: {
+                    ...testState.entities.channels,
+                    channels: {
+                        [channel1.id]: {
+                            display_name: 'Town Square',
+                            name: 'town-square',
+                        },
+                    },
+                },
+            },
+        };
+        assert.ok(Selectors.isCurrentChannelDefault(newState) === true);
+    });
+
     describe('getDirectAndGroupChannels', () => {
         const getDirectAndGroupChannels = Selectors.getDirectAndGroupChannels;
 
