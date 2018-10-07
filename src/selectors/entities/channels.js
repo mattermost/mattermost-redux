@@ -41,6 +41,8 @@ import {
     isGroupOrDirectChannelVisible,
     sortChannelsByDisplayName,
     sortChannelsByDisplayNameAndMuted,
+    isFavoriteChannel,
+    isDefault,
 } from 'utils/channel_utils';
 import {createIdsSelector} from 'utils/helpers';
 
@@ -131,6 +133,27 @@ export const getCurrentChannelStats = createSelector(
     (allChannelStats, currentChannelId) => {
         return allChannelStats[currentChannelId];
     }
+);
+
+export const isCurrentChannelFavorite = createSelector(
+    getMyPreferences,
+    getCurrentChannelId,
+    (preferences, channelId) => isFavoriteChannel(preferences, channelId),
+);
+
+export const isCurrentChannelMuted = createSelector(
+    getMyCurrentChannelMembership,
+    (membership) => isChannelMuted(membership),
+);
+
+export const isCurrentChannelArchived = createSelector(
+    getCurrentChannel,
+    (channel) => channel.delete_at !== 0,
+);
+
+export const isCurrentChannelDefault = createSelector(
+    getCurrentChannel,
+    (channel) => isDefault(channel),
 );
 
 export function isCurrentChannelReadOnly(state) {
