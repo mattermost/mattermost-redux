@@ -27,15 +27,15 @@
     "shallow-equals": "1.0.0"
   },
   "devDependencies": {
-    "@babel/cli": "^7.1.0",
-    "@babel/core": "^7.1.0",
+    "@babel/cli": "^7.1.2",
+    "@babel/core": "^7.1.2",
     "@babel/plugin-proposal-class-properties": "^7.1.0",
     "@babel/preset-env": "^7.1.0",
     "@babel/preset-flow": "^7.0.0",
     "@babel/register": "^7.0.0",
     "babel-core": "^7.0.0-bridge.0",
     "babel-eslint": "^8.2.3",
-    "babel-loader": "^8.0.2",
+    "babel-loader": "^8.0.4",
     "babel-plugin-module-resolver": "3.1.1",
     "chai": "4.1.2",
     "deep-freeze": "0.0.1",
