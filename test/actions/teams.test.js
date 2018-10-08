@@ -226,11 +226,38 @@ describe('Actions.Teams', () => {
         };
 
         nock(Client4.getTeamsRoute()).
-            put(`/${team.id}/patch`).
+            put(`/${team.id}`).
             reply(200, team);
         await Actions.updateTeam(team)(store.dispatch, store.getState);
 
         const updateRequest = store.getState().requests.teams.updateTeam;
+        const {teams} = store.getState().entities.teams;
+
+        if (updateRequest.status === RequestStatus.FAILURE) {
+            throw new Error(JSON.stringify(updateRequest.error));
+        }
+
+        const updated = teams[TestHelper.basicTeam.id];
+        assert.ok(updated);
+        assert.strictEqual(updated.display_name, displayName);
+        assert.strictEqual(updated.description, description);
+    });
+
+    it('patchTeam', async () => {
+        const displayName = 'The Patched Team';
+        const description = 'This is a team created by unit tests';
+        const team = {
+            ...TestHelper.basicTeam,
+            display_name: displayName,
+            description,
+        };
+
+        nock(Client4.getTeamsRoute()).
+            put(`/${team.id}/patch`).
+            reply(200, team);
+        await Actions.patchTeam(team)(store.dispatch, store.getState);
+
+        const updateRequest = store.getState().requests.teams.patchTeam;
         const {teams} = store.getState().entities.teams;
 
         if (updateRequest.status === RequestStatus.FAILURE) {

@@ -25,6 +25,10 @@ export default keyMirror({
     UPDATE_TEAM_SUCCESS: null,
     UPDATE_TEAM_FAILURE: null,
 
+    PATCH_TEAM_REQUEST: null,
+    PATCH_TEAM_SUCCESS: null,
+    PATCH_TEAM_FAILURE: null,
+
     SET_TEAM_ICON_REQUEST: null,
     SET_TEAM_ICON_SUCCESS: null,
     SET_TEAM_ICON_FAILURE: null,
