@@ -11,6 +11,7 @@ const HEADER_BEARER = 'BEARER';
 const HEADER_REQUESTED_WITH = 'X-Requested-With';
 const HEADER_USER_AGENT = 'User-Agent';
 const HEADER_X_CLUSTER_ID = 'X-Cluster-Id';
+const HEADER_X_VERSION_ID = 'X-Version-Id';
 
 const PER_PAGE_DEFAULT = 60;
 const LOGS_PER_PAGE_DEFAULT = 10000;
@@ -2472,6 +2473,13 @@ export default class Client4 {
                 },
                 url,
             };
+        }
+
+        if (headers.has(HEADER_X_VERSION_ID) && !headers.get('Cache-Control')) {
+            const serverVersion = headers.get(HEADER_X_VERSION_ID);
+            if (serverVersion && this.serverVersion !== serverVersion) {
+                this.serverVersion = serverVersion;
+            }
         }
 
         if (headers.has(HEADER_X_CLUSTER_ID)) {
