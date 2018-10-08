@@ -344,7 +344,7 @@ function removeCurrentUserFromList(profiles, currentUserId) {
     }
 }
 
-export const showCustomTerms = createSelector(
+export const shouldShowTermsOfService = createSelector(
     getConfig,
     getCurrentUser,
     getLicense,

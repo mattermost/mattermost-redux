@@ -339,9 +339,9 @@ describe('Selectors.Users', () => {
         });
     });
 
-    it('showCustomTerms', () => {
+    it('shouldShowTermsOfService', () => {
         const userId = 1234;
-        assert.equal(Selectors.showCustomTerms({
+        assert.equal(Selectors.shouldShowTermsOfService({
             entities: {
                 general: {
                     config: {
@@ -361,7 +361,7 @@ describe('Selectors.Users', () => {
             },
         }), true);
 
-        assert.equal(Selectors.showCustomTerms({
+        assert.equal(Selectors.shouldShowTermsOfService({
             entities: {
                 general: {
                     config: {
@@ -381,7 +381,7 @@ describe('Selectors.Users', () => {
             },
         }), false);
 
-        assert.equal(Selectors.showCustomTerms({
+        assert.equal(Selectors.shouldShowTermsOfService({
             entities: {
                 general: {
                     config: {
@@ -401,7 +401,7 @@ describe('Selectors.Users', () => {
             },
         }), false);
 
-        assert.equal(Selectors.showCustomTerms({
+        assert.equal(Selectors.shouldShowTermsOfService({
             entities: {
                 general: {
                     config: {
@@ -421,7 +421,7 @@ describe('Selectors.Users', () => {
             },
         }), false);
 
-        assert.equal(Selectors.showCustomTerms({
+        assert.equal(Selectors.shouldShowTermsOfService({
             entities: {
                 general: {
                     config: {
