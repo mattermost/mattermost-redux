@@ -6,11 +6,6 @@ import {enableBatching} from 'redux-batched-actions';
 import {General} from 'constants';
 import reducerRegistry from 'store/reducer_registry';
 
-export const defaultOptions = {
-    additionalMiddleware: [],
-    enableBuffer: true,
-};
-
 export const offlineConfig = {
     effect: (effect, action) => {
         if (typeof effect !== 'function') {

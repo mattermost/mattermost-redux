@@ -1620,14 +1620,17 @@ export default class Client4 {
     };
 
     logClientError = async (message, level = 'ERROR') => {
+        const url = `${this.getBaseRoute()}/logs`;
+
         if (!this.enableLogging) {
             throw {
                 message: 'Logging disabled.',
+                url,
             };
         }
 
         return this.doFetch(
-            `${this.getBaseRoute()}/logs`,
+            url,
             {method: 'post', body: JSON.stringify({message, level})}
         );
     };
@@ -2467,6 +2470,7 @@ export default class Client4 {
                     id: 'mobile.request.invalid_response',
                     defaultMessage: 'Received invalid response from the server.',
                 },
+                url,
             };
         }
 

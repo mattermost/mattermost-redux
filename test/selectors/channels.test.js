@@ -358,7 +358,7 @@ describe('Selectors.Channels', () => {
         assert.ok(fromOriginalState === fromModifiedState);
 
         // it should't have a channel that belongs to a team
-        assert.ifError(fromModifiedState.includes(channel1.id));
+        assert.equal(fromModifiedState.includes(channel1.id), false, 'should not have a channel that belongs to a team');
     });
 
     it('get channel ids in current team strict equal', () => {
@@ -390,7 +390,7 @@ describe('Selectors.Channels', () => {
         assert.ok(fromOriginalState === fromModifiedState);
 
         // it should't have a direct channel
-        assert.ifError(fromModifiedState.includes(channel7.id));
+        assert.equal(fromModifiedState.includes(channel7.id), false, 'should not have direct channel on a team');
     });
 
     it('get channel ids for current team strict equal', () => {
@@ -687,6 +687,81 @@ describe('Selectors.Channels', () => {
         assert.throws(() => Selectors.filterPostIds(), TypeError);
 
         assert.throws(() => filterPostIDsInvalid(testStateC, postIDs), ReferenceError, filterErrorMessage);
+    });
+
+    it('isCurrentChannelFavorite', () => {
+        assert.ok(Selectors.isCurrentChannelFavorite(testState) === true);
+
+        const newState = {
+            entities: {
+                channels: {
+                    currentChannelId: channel1.id,
+                },
+                preferences: {
+                    myPreferences: [],
+                },
+            },
+        };
+        assert.ok(Selectors.isCurrentChannelFavorite(newState) === false);
+    });
+
+    it('isCurrentChannelMuted', () => {
+        assert.ok(Selectors.isCurrentChannelMuted(testState) === false);
+
+        const newState = {
+            entities: {
+                channels: {
+                    ...testState.entities.channels,
+                    myMembers: {
+                        [channel1.id]: {
+                            notify_props: {
+                                mark_unread: 'mention',
+                            },
+                        },
+                    },
+                },
+            },
+        };
+        assert.ok(Selectors.isCurrentChannelMuted(newState) === true);
+    });
+
+    it('isCurrentChannelArchived', () => {
+        assert.ok(Selectors.isCurrentChannelArchived(testState) === false);
+
+        const newState = {
+            entities: {
+                ...testState.entities,
+                channels: {
+                    ...testState.entities.channels,
+                    channels: {
+                        [channel1.id]: {
+                            delete_at: 1,
+                        },
+                    },
+                },
+            },
+        };
+        assert.ok(Selectors.isCurrentChannelArchived(newState) === true);
+    });
+
+    it('isCurrentChannelDefault', () => {
+        assert.ok(Selectors.isCurrentChannelDefault(testState) === false);
+
+        const newState = {
+            entities: {
+                ...testState.entities,
+                channels: {
+                    ...testState.entities.channels,
+                    channels: {
+                        [channel1.id]: {
+                            display_name: 'Town Square',
+                            name: 'town-square',
+                        },
+                    },
+                },
+            },
+        };
+        assert.ok(Selectors.isCurrentChannelDefault(newState) === true);
     });
 
     describe('getDirectAndGroupChannels', () => {
