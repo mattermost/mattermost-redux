@@ -345,8 +345,8 @@ describe('Selectors.Users', () => {
             entities: {
                 general: {
                     config: {
-                        CustomServiceTermsId: '1',
-                        EnableCustomServiceTerms: 'true',
+                        CustomTermsOfServiceId: '1',
+                        EnableCustomTermsOfService: 'true',
                     },
                     license: {
                         IsLicensed: 'true',
@@ -355,7 +355,7 @@ describe('Selectors.Users', () => {
                 users: {
                     currentUserId: userId,
                     profiles: {
-                        [userId]: {id: userId, username: 'user', first_name: 'First', last_name: 'Last', accepted_service_terms_id: '0'},
+                        [userId]: {id: userId, username: 'user', first_name: 'First', last_name: 'Last', accepted_terms_of_service_id: '0'},
                     },
                 },
             },
@@ -365,8 +365,8 @@ describe('Selectors.Users', () => {
             entities: {
                 general: {
                     config: {
-                        CustomServiceTermsId: '1',
-                        EnableCustomServiceTerms: 'false',
+                        CustomTermsOfServiceId: '1',
+                        EnableCustomTermsOfService: 'false',
                     },
                     license: {
                         IsLicensed: 'true',
@@ -375,7 +375,7 @@ describe('Selectors.Users', () => {
                 users: {
                     currentUserId: userId,
                     profiles: {
-                        [userId]: {id: userId, username: 'user', first_name: 'First', last_name: 'Last', accepted_service_terms_id: '1'},
+                        [userId]: {id: userId, username: 'user', first_name: 'First', last_name: 'Last', accepted_terms_of_service_id: '1'},
                     },
                 },
             },
@@ -385,8 +385,8 @@ describe('Selectors.Users', () => {
             entities: {
                 general: {
                     config: {
-                        CustomServiceTermsId: '1',
-                        EnableCustomServiceTerms: 'true',
+                        CustomTermsOfServiceId: '1',
+                        EnableCustomTermsOfService: 'true',
                     },
                     license: {
                         IsLicensed: 'false',
@@ -395,7 +395,7 @@ describe('Selectors.Users', () => {
                 users: {
                     currentUserId: userId,
                     profiles: {
-                        [userId]: {id: userId, username: 'user', first_name: 'First', last_name: 'Last', accepted_service_terms_id: '1'},
+                        [userId]: {id: userId, username: 'user', first_name: 'First', last_name: 'Last', accepted_terms_of_service_id: '1'},
                     },
                 },
             },
@@ -405,8 +405,8 @@ describe('Selectors.Users', () => {
             entities: {
                 general: {
                     config: {
-                        CustomServiceTermsId: '1',
-                        EnableCustomServiceTerms: 'true',
+                        CustomTermsOfServiceId: '1',
+                        EnableCustomTermsOfService: 'true',
                     },
                     license: {
                         IsLicensed: 'true',
@@ -415,7 +415,7 @@ describe('Selectors.Users', () => {
                 users: {
                     currentUserId: userId,
                     profiles: {
-                        [userId]: {id: userId, username: 'user', first_name: 'First', last_name: 'Last', accepted_service_terms_id: '1'},
+                        [userId]: {id: userId, username: 'user', first_name: 'First', last_name: 'Last', accepted_terms_of_service_id: '1'},
                     },
                 },
             },
@@ -425,8 +425,8 @@ describe('Selectors.Users', () => {
             entities: {
                 general: {
                     config: {
-                        CustomServiceTermsId: '1',
-                        EnableCustomServiceTerms: 'true',
+                        CustomTermsOfServiceId: '1',
+                        EnableCustomTermsOfService: 'true',
                     },
                     license: {
                         IsLicensed: 'true',

@@ -115,7 +115,7 @@ describe('Actions.Users', () => {
         });
     });
 
-    it('getServiceTerms', async () => {
+    it('getTermsOfService', async () => {
         if (TestHelper.isLiveServer()) {
             console.log('Skipping mock-only test');
             return;
@@ -132,19 +132,19 @@ describe('Actions.Users', () => {
             get('/terms_of_service').
             reply(200, response);
 
-        await Actions.getServiceTerms()(store.dispatch, store.getState);
+        await Actions.getTermsOfService()(store.dispatch, store.getState);
 
-        const request = store.getState().requests.users.getServiceTerms;
+        const request = store.getState().requests.users.getTermsOfService;
         if (request.status === RequestStatus.FAILURE) {
             throw new Error(JSON.stringify(request.error));
         }
     });
 
-    it('updateServiceTermsStatus accept terms', async () => {
+    it('updateTermsOfServiceStatus accept terms', async () => {
         const user = TestHelper.basicUser;
         nock(Client4.getUsersRoute()).
             post('').
-            reply(201, {...TestHelper.fakeUserWithId(), accepted_service_terms_id: 1});
+            reply(201, {...TestHelper.fakeUserWithId(), accepted_terms_of_service_id: 1});
 
         TestHelper.mockLogin();
         await Actions.login(user.email, 'password1')(store.dispatch, store.getState);
@@ -153,9 +153,9 @@ describe('Actions.Users', () => {
             post('/users/me/terms_of_service').
             reply(200, OK_RESPONSE);
 
-        await Actions.updateServiceTermsStatus(1, true)(store.dispatch, store.getState);
+        await Actions.updateTermsOfServiceStatus(1, true)(store.dispatch, store.getState);
 
-        const request = store.getState().requests.users.updateServiceTermsStatus;
+        const request = store.getState().requests.users.updateTermsOfServiceStatus;
 
         if (request.status === RequestStatus.FAILURE) {
             throw new Error(JSON.stringify(request.error));
@@ -165,14 +165,14 @@ describe('Actions.Users', () => {
 
         assert.ok(currentUserId);
         assert.ok(profiles[currentUserId]);
-        assert.equal(profiles[currentUserId].accepted_service_terms_id, 1);
+        assert.equal(profiles[currentUserId].accepted_terms_of_service_id, 1);
     });
 
-    it('updateServiceTermsStatus reject terms', async () => {
+    it('updateTermsOfServiceStatus reject terms', async () => {
         const user = TestHelper.basicUser;
         nock(Client4.getUsersRoute()).
             post('').
-            reply(201, {...TestHelper.fakeUserWithId(), accepted_service_terms_id: 0});
+            reply(201, {...TestHelper.fakeUserWithId(), accepted_terms_of_service_id: 0});
 
         TestHelper.mockLogin();
         await Actions.login(user.email, 'password1')(store.dispatch, store.getState);
@@ -181,9 +181,9 @@ describe('Actions.Users', () => {
             post('/users/me/terms_of_service').
             reply(200, OK_RESPONSE);
 
-        await Actions.updateServiceTermsStatus(1, false)(store.dispatch, store.getState);
+        await Actions.updateTermsOfServiceStatus(1, false)(store.dispatch, store.getState);
 
-        const request = store.getState().requests.users.updateServiceTermsStatus;
+        const request = store.getState().requests.users.updateTermsOfServiceStatus;
 
         if (request.status === RequestStatus.FAILURE) {
             throw new Error(JSON.stringify(request.error));
@@ -193,7 +193,7 @@ describe('Actions.Users', () => {
 
         assert.ok(currentUserId);
         assert.ok(profiles[currentUserId]);
-        assert.notEqual(profiles[currentUserId].accepted_service_terms_id, 1);
+        assert.notEqual(profiles[currentUserId].accepted_terms_of_service_id, 1);
     });
 
     it('logout', async () => {
