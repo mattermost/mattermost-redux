@@ -211,6 +211,16 @@ export function updateTeam(team: Team): ActionFunc {
     );
 }
 
+export function patchTeam(team: Team): ActionFunc {
+    return bindClientFunc(
+        Client4.patchTeam,
+        TeamTypes.PATCH_TEAM_REQUEST,
+        [TeamTypes.PATCHED_TEAM, TeamTypes.PATCH_TEAM_SUCCESS],
+        TeamTypes.PATCH_TEAM_FAILURE,
+        team
+    );
+}
+
 export function getMyTeamMembers(): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         const getMyTeamMembersFunc = bindClientFunc(

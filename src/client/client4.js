@@ -856,6 +856,15 @@ export default class Client4 {
         );
     };
 
+    patchTeam = async (team) => {
+        this.trackEvent('api', 'api_teams_patch_name', {team_id: team.id});
+
+        return this.doFetch(
+            `${this.getTeamRoute(team.id)}/patch`,
+            {method: 'put', body: JSON.stringify(team)}
+        );
+    };
+
     updateTeamScheme = async (teamId, schemeId) => {
         const patch = {scheme_id: schemeId};
 

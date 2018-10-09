@@ -272,6 +272,10 @@ const state: GlobalState = {
                 status: 'not_started',
                 error: null,
             },
+            patchTeam: {
+                status: 'not_started',
+                error: null,
+            },
             getMyTeamMembers: {
                 status: 'not_started',
                 error: null,
