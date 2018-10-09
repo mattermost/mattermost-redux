@@ -211,7 +211,7 @@ export function updateTeam(team: Team): ActionFunc {
     );
 }
 
-export function patchTeam(team) {
+export function patchTeam(team: Team): ActionFunc {
     return bindClientFunc(
         Client4.patchTeam,
         TeamTypes.PATCH_TEAM_REQUEST,

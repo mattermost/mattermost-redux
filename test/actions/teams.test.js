@@ -257,17 +257,18 @@ describe('Actions.Teams', () => {
             reply(200, team);
         await Actions.patchTeam(team)(store.dispatch, store.getState);
 
-        const updateRequest = store.getState().requests.teams.patchTeam;
+        const patchRequest = store.getState().requests.teams.patchTeam;
         const {teams} = store.getState().entities.teams;
 
-        if (updateRequest.status === RequestStatus.FAILURE) {
-            throw new Error(JSON.stringify(updateRequest.error));
+        if (patchRequest.status === RequestStatus.FAILURE) {
+            throw new Error(JSON.stringify(patchRequest.error));
         }
 
-        const updated = teams[TestHelper.basicTeam.id];
-        assert.ok(updated);
-        assert.strictEqual(updated.display_name, displayName);
-        assert.strictEqual(updated.description, description);
+        const patched = teams[TestHelper.basicTeam.id];
+
+        assert.ok(patched);
+        assert.strictEqual(patched.display_name, displayName);
+        assert.strictEqual(patched.description, description);
     });
 
     it('Join Open Team', async () => {
