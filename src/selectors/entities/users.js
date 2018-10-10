@@ -344,13 +344,13 @@ function removeCurrentUserFromList(profiles, currentUserId) {
     }
 }
 
-export const showCustomTerms = createSelector(
+export const shouldShowTermsOfService = createSelector(
     getConfig,
     getCurrentUser,
     getLicense,
     (config, user, license) => {
         // Defaults to false if the setting doesn't exist
-        return Boolean(license.IsLicensed === 'true' && config.EnableCustomServiceTerms === 'true' && user && config.CustomServiceTermsId !== user.accepted_service_terms_id);
+        return Boolean(license.IsLicensed === 'true' && config.EnableCustomTermsOfService === 'true' && user && config.CustomTermsOfServiceId !== user.accepted_terms_of_service_id);
     }
 );
 

@@ -9,7 +9,7 @@ import {Client4} from 'client';
 
 import {logError} from './errors';
 import {bindClientFunc, forceLogoutIfNecessary} from './helpers';
-import {getServiceTerms, createServiceTerms} from './users';
+import {getTermsOfService, createTermsOfService} from './users';
 import {batchActions} from 'redux-batched-actions';
 
 import type {ActionFunc} from '../types/actions';
@@ -51,14 +51,14 @@ export function getConfig(): ActionFunc {
             return {error};
         }
 
-        if (config.SupportSettings && config.SupportSettings.CustomServiceTermsEnabled) {
-            const result = await dispatch(getServiceTerms());
+        if (config.SupportSettings && config.SupportSettings.CustomTermsOfServiceEnabled) {
+            const result = await dispatch(getTermsOfService());
             if (result.error) {
                 return {error: result.error};
             }
 
             if (result.data) {
-                config.SupportSettings.CustomServiceTermsText = result.data.text;
+                config.SupportSettings.CustomTermsOfServiceText = result.data.text;
             }
         }
         dispatch(batchActions([
@@ -78,9 +78,9 @@ export function getConfig(): ActionFunc {
 export function updateConfig(config: Object): ActionFunc {
     return async (dispatch, getState) => {
         const stateConfig = getState().entities.admin.config;
-        if (config.SupportSettings && config.SupportSettings.CustomServiceTermsEnabled) {
-            if (stateConfig.SupportSettings.CustomServiceTermsText !== config.SupportSettings.CustomServiceTermsText) {
-                const result = await dispatch(createServiceTerms(config.SupportSettings.CustomServiceTermsText));
+        if (config.SupportSettings && config.SupportSettings.CustomTermsOfServiceEnabled) {
+            if (stateConfig.SupportSettings.CustomTermsOfServiceText !== config.SupportSettings.CustomTermsOfServiceText) {
+                const result = await dispatch(createTermsOfService(config.SupportSettings.CustomTermsOfServiceText));
                 if (result.error) {
                     return result;
                 }
@@ -88,7 +88,7 @@ export function updateConfig(config: Object): ActionFunc {
         }
 
         if (config.SupportSettings && typeof config.SupportSettings === 'object') {
-            Reflect.deleteProperty(config.SupportSettings, 'CustomServiceTermsText');
+            Reflect.deleteProperty(config.SupportSettings, 'CustomTermsOfServiceText');
         }
         return await dispatch(bindClientFunc(
             Client4.updateConfig,
