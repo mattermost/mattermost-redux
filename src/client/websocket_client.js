@@ -51,13 +51,13 @@ class WebSocketClient {
 
             if (connectionUrl == null) {
                 console.log('websocket must have connection url'); //eslint-disable-line no-console
-                reject('websocket must have connection url');
+                reject(new Error('websocket must have connection url'));
                 return;
             }
 
             if (!dispatch) {
                 console.log('websocket must have a dispatch'); //eslint-disable-line no-console
-                reject('websocket must have a dispatch');
+                reject(new Error('websocket must have a dispatch'));
                 return;
             }
 
@@ -90,7 +90,7 @@ class WebSocketClient {
                 // If we're unable to set the origin header, the websocket won't connect, but the URL is likely malformed anyway
                 const errorMessage = 'websocket failed to parse origin from ' + connectionUrl;
                 console.warn(errorMessage); // eslint-disable-line no-console
-                reject(errorMessage);
+                reject(new Error(errorMessage));
                 return;
             }
 

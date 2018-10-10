@@ -115,7 +115,7 @@ export function getCustomEmojisInText(text: string): ActionFunc {
 
         const emojisToLoad = parseNeededCustomEmojisFromText(text, systemEmojis, customEmojisByName, nonExistentEmoji);
 
-        return await getCustomEmojisByName(Array.from(emojisToLoad))(dispatch, getState);
+        return getCustomEmojisByName(Array.from(emojisToLoad))(dispatch, getState);
     };
 }
 
@@ -193,7 +193,7 @@ export function getAllCustomEmojis(perPage: number = General.PAGE_SIZE_MAXIMUM):
         do {
             try {
                 let emojis = [];
-                emojis = await Client4.getCustomEmojis(page, perPage, Emoji.SORT_BY_NAME);
+                emojis = await Client4.getCustomEmojis(page, perPage, Emoji.SORT_BY_NAME); // eslint-disable-line no-await-in-loop
                 if (emojis.length < perPage) {
                     hasMore = false;
                 } else {

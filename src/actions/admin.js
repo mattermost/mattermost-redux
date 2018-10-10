@@ -90,7 +90,7 @@ export function updateConfig(config: Object): ActionFunc {
         if (config.SupportSettings && typeof config.SupportSettings === 'object') {
             Reflect.deleteProperty(config.SupportSettings, 'CustomTermsOfServiceText');
         }
-        return await dispatch(bindClientFunc(
+        return dispatch(bindClientFunc(
             Client4.updateConfig,
             AdminTypes.UPDATE_CONFIG_REQUEST,
             [AdminTypes.RECEIVED_CONFIG, AdminTypes.UPDATE_CONFIG_SUCCESS],

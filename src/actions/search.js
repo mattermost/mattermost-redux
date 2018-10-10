@@ -94,8 +94,8 @@ export function getMorePostsForSearch() {
         const {params, isEnd} = getState().entities.search.current[teamId];
         if (!isEnd) {
             const newParams = Object.assign({}, params);
-            newParams.page = newParams.page + 1;
-            return await searchPostsWithParams(teamId, newParams)(dispatch, getState);
+            newParams.page += 1;
+            return searchPostsWithParams(teamId, newParams)(dispatch, getState);
         }
         return {};
     };

@@ -17,6 +17,8 @@ import {PostTypes, TeamTypes, UserTypes, ChannelTypes} from 'action_types';
 import TestHelper from 'test/test_helper';
 import configureStore from 'test/test_store';
 
+const webSocketConnector = TestHelper.isLiveServer() ? require('ws') : MockWebSocket;
+
 describe('Actions.Websocket', () => {
     let store;
     let mockServer;
@@ -26,8 +28,7 @@ describe('Actions.Websocket', () => {
 
         const connUrl = (Client4.getUrl() + '/api/v4/websocket').replace(/^http:/, 'ws:');
         mockServer = new Server(connUrl);
-        const webSocketConnector = TestHelper.isLiveServer() ? require('ws') : MockWebSocket;
-        return await Actions.init(
+        return Actions.init(
             'web',
             null,
             null,
