@@ -6,5 +6,8 @@
   "plugins": [
     "mocha",
     "flowtype"
-  ]
+  ],
+  "rules": {
+    "mocha/no-exclusive-tests": 2
+  }
 }
