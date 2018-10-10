@@ -66,7 +66,7 @@
     "dev": "babel src --out-dir ${WEBAPP_DIR:-../mattermost-webapp}/node_modules/mattermost-redux --source-maps && npm run dev:flow-copy",
     "dev:flow-copy": "flow-copy-source src ${WEBAPP_DIR:-../mattermost-webapp}/node_modules/mattermost-redux",
     "dev-mobile": "babel src --out-dir ${MOBILE_DIR:-../mattermost-mobile}/node_modules/mattermost-redux --source-maps && npm run dev-mobile:flow-copy",
-    "dev-mobile:flow-copy": "flow-copy-source src ${MOBILE_DIR:-../mattermost-webapp}/node_modules/mattermost-redux",
+    "dev-mobile:flow-copy": "flow-copy-source src ${MOBILE_DIR:-../mattermost-mobile}/node_modules/mattermost-redux",
     "dev:watch": "babel --watch src --out-dir ${WEBAPP_DIR:-../mattermost-webapp}/node_modules/mattermost-redux --source-maps",
     "dev-mobile:watch": "babel --watch src --out-dir ${MOBILE_DIR:-../mattermost-mobile}/node_modules/mattermost-redux --source-maps",
     "check": "eslint --ignore-path .gitignore --ignore-pattern node_modules --quiet .",
