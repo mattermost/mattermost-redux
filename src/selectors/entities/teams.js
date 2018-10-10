@@ -85,6 +85,16 @@ export const getCurrentTeamUrl = createSelector(
     }
 );
 
+export const getCurrentRelativeTeamUrl = createSelector(
+    getCurrentTeam,
+    (currentTeam) => {
+        if (!currentTeam) {
+            return '/';
+        }
+        return `/${currentTeam.name}`;
+    }
+);
+
 export const getCurrentTeamStats = createSelector(
     getCurrentTeamId,
     getTeamStats,
