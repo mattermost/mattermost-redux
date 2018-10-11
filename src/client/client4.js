@@ -16,6 +16,8 @@ const HEADER_X_VERSION_ID = 'X-Version-Id';
 const PER_PAGE_DEFAULT = 60;
 const LOGS_PER_PAGE_DEFAULT = 10000;
 
+/* eslint-disable no-throw-literal */
+
 export default class Client4 {
     constructor() {
         this.logToConsole = false;

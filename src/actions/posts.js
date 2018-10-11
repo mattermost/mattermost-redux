@@ -449,7 +449,7 @@ export function getCustomEmojiForReaction(name) {
             return {data: true};
         }
 
-        return await dispatch(getCustomEmojiByName(name));
+        return dispatch(getCustomEmojiByName(name));
     };
 }
 
@@ -525,7 +525,7 @@ export function flagPost(postId) {
 
         Client4.trackEvent('action', 'action_posts_flag');
 
-        return await savePreferences(currentUserId, [preference])(dispatch, getState);
+        return savePreferences(currentUserId, [preference])(dispatch, getState);
     };
 }
 
@@ -1134,7 +1134,7 @@ export function unflagPost(postId) {
 
         Client4.trackEvent('action', 'action_posts_unflag');
 
-        return await deletePreferences(currentUserId, [preference])(dispatch, getState);
+        return deletePreferences(currentUserId, [preference])(dispatch, getState);
     };
 }
 

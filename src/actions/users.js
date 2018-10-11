@@ -106,7 +106,7 @@ export function login(loginId, password, mfaToken = '', ldapOnly = false) {
             return {error};
         }
 
-        return await completeLogin(data)(dispatch, getState);
+        return completeLogin(data)(dispatch, getState);
     };
 }
 
@@ -130,7 +130,7 @@ export function loginById(id, password, mfaToken = '') {
             return {error};
         }
 
-        return await completeLogin(data)(dispatch, getState);
+        return completeLogin(data)(dispatch, getState);
     };
 }
 
@@ -316,7 +316,7 @@ export function getMissingProfilesByIds(userIds) {
 
         if (missingIds.length > 0) {
             getStatusesByIds(missingIds)(dispatch, getState);
-            return await getProfilesByIds(missingIds)(dispatch, getState);
+            return getProfilesByIds(missingIds)(dispatch, getState);
         }
 
         return {data: []};
@@ -340,7 +340,7 @@ export function getMissingProfilesByUsernames(usernames) {
         });
 
         if (missingUsernames.length > 0) {
-            return await getProfilesByUsernames(missingUsernames)(dispatch, getState);
+            return getProfilesByUsernames(missingUsernames)(dispatch, getState);
         }
 
         return {data: []};

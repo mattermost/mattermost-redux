@@ -219,8 +219,8 @@ export const getChannelDrawerBadgeCount = createSelector(
         let messageCount = 0;
         Object.values(teamMembers).forEach((m) => {
             if (m.team_id !== currentTeamId) {
-                mentionCount = mentionCount + (m.mention_count || 0);
-                messageCount = messageCount + (m.msg_count || 0);
+                mentionCount += (m.mention_count || 0);
+                messageCount += (m.msg_count || 0);
             }
         });
 
