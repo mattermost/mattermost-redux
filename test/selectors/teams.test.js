@@ -255,4 +255,9 @@ describe('Selectors.Teams', () => {
         const mentions3 = factory3(testState, team3.id);
         assert.ok(mentions3 === 0);
     });
+
+    it('getCurrentRelativeTeamUrl', () => {
+        assert.deepEqual(Selectors.getCurrentRelativeTeamUrl(testState), '/' + team1.name);
+        assert.deepEqual(Selectors.getCurrentRelativeTeamUrl({entities: {teams: {teams: {}}}}), '/');
+    });
 });
