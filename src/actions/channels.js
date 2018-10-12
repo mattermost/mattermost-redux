@@ -468,8 +468,8 @@ export function getChannelAndMyMember(channelId) {
 }
 
 export function getChannelTimezones(channelId) {
-    return async (dispatch, getState) => {
-        dispatch({type: ChannelTypes.GET_CHANNELS_TIMEZONE_REQUEST}, getState);
+    return async (dispatch) => {
+        dispatch({type: ChannelTypes.GET_CHANNELS_TIMEZONE_REQUEST});
 
         let channelTimezones;
         try {
@@ -477,11 +477,11 @@ export function getChannelTimezones(channelId) {
 
             channelTimezones = await channelTimezonesRequest;
         } catch (error) {
-            forceLogoutIfNecessary(error, dispatch, getState);
+            forceLogoutIfNecessary(error, dispatch);
             dispatch(batchActions([
                 {type: ChannelTypes.GET_CHANNELS_TIMEZONE_FAILURE, error},
-                logError(error)(dispatch),
-            ]), getState);
+                logError(error),
+            ]));
             return {error};
         }
 
@@ -490,7 +490,7 @@ export function getChannelTimezones(channelId) {
                 type: ChannelTypes.GET_CHANNELS_TIMEZONE_SUCCESS,
                 data: channelTimezones,
             },
-        ]), getState);
+        ]));
 
         return {data: channelTimezones};
     };
