@@ -10,6 +10,7 @@ pipeline {
     stages {
         stage('Install') {
             steps {
+                sh "export"
                 sh "npm install --ignore-scripts"
                 sh "npm run flow-typed install"
             }
