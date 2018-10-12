@@ -19,10 +19,6 @@ export default keyMirror({
     RETHREAD_POST_REQUEST: null,
     RETHREAD_POST_SUCCESS: null,
     RETHREAD_POST_FAILURE: null,
-
-    RETHREAD_POST_REQUEST: null,
-    RETHREAD_POST_SUCCESS: null,
-    RETHREAD_POST_FAILURE: null,
     RETHREAD_POST_UPDATE: null,
 
     DELETE_POST_REQUEST: null,
