@@ -16,7 +16,7 @@ import {getProfilesAndStatusesForPosts} from './posts';
 
 const WEBAPP_SEARCH_PER_PAGE = 20;
 
-function getMissingChannelsFromPosts(posts) {
+export function getMissingChannelsFromPosts(posts) {
     return async (dispatch, getState) => {
         const {channels, membersInChannel, myMembers} = getState().entities.channels;
         const promises = [];
