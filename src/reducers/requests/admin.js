@@ -140,6 +140,16 @@ function uploadBrandImage(state: RequestStatusType = initialRequestState(), acti
     );
 }
 
+function deleteBrandImage(state: RequestStatusType = initialRequestState(), action: GenericAction): RequestStatusType {
+    return handleRequest(
+        AdminTypes.DELETE_BRAND_IMAGE_REQUEST,
+        AdminTypes.DELETE_BRAND_IMAGE_SUCCESS,
+        AdminTypes.DELETE_BRAND_IMAGE_FAILURE,
+        state,
+        action
+    );
+}
+
 function getClusterStatus(state: RequestStatusType = initialRequestState(), action: GenericAction): RequestStatusType {
     return handleRequest(
         AdminTypes.GET_CLUSTER_STATUS_REQUEST,
@@ -364,6 +374,7 @@ export default combineReducers({
     createCompliance,
     getCompliance,
     uploadBrandImage,
+    deleteBrandImage,
     getClusterStatus,
     testLdap,
     syncLdap,

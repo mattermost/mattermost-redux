@@ -2150,6 +2150,13 @@ export default class Client4 {
         );
     };
 
+    deleteBrandImage = async () => {
+        return this.doFetch(
+            `${this.getBrandRoute()}/image`,
+            {method: 'delete'}
+        );
+    };
+
     getClusterStatus = async () => {
         return this.doFetch(
             `${this.getBaseRoute()}/cluster/status`,
