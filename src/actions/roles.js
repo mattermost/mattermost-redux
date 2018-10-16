@@ -93,7 +93,7 @@ export function loadRolesIfNeeded(roles: Array<string>): ActionFunc {
             await setPendingRoles([])(dispatch, getState);
         }
         if (newRoles.size > 0) {
-            return await getRolesByNames(Array.from(newRoles))(dispatch, getState);
+            return getRolesByNames(Array.from(newRoles))(dispatch, getState);
         }
         return {data: state.entities.roles.roles};
     };

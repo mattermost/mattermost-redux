@@ -59,6 +59,7 @@ export type TeamsRequestsStatuses = {|
     getTeams: RequestStatusType,
     createTeam: RequestStatusType,
     updateTeam: RequestStatusType,
+    patchTeam: RequestStatusType,
     getMyTeamMembers: RequestStatusType,
     getTeamMembers: RequestStatusType,
     getTeamStats: RequestStatusType,

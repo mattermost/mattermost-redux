@@ -70,6 +70,16 @@ function updateTeam(state: RequestStatusType = initialRequestState(), action: Ge
     );
 }
 
+function patchTeam(state: RequestStatusType = initialRequestState(), action: GenericAction): RequestStatusType {
+    return handleRequest(
+        TeamTypes.PATCH_TEAM_REQUEST,
+        TeamTypes.PATCH_TEAM_SUCCESS,
+        TeamTypes.PATCH_TEAM_FAILURE,
+        state,
+        action
+    );
+}
+
 function updateTeamScheme(state: RequestStatusType = initialRequestState(), action: GenericAction): RequestStatusType {
     return handleRequest(
         TeamTypes.UPDATE_TEAM_SCHEME_REQUEST,
@@ -207,6 +217,7 @@ export default combineReducers({
     createTeam,
     deleteTeam,
     updateTeam,
+    patchTeam,
     updateTeamScheme,
     getMyTeamMembers,
     getMyTeamUnreads,

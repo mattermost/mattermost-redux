@@ -85,6 +85,16 @@ export const getCurrentTeamUrl = createSelector(
     }
 );
 
+export const getCurrentRelativeTeamUrl = createSelector(
+    getCurrentTeam,
+    (currentTeam) => {
+        if (!currentTeam) {
+            return '/';
+        }
+        return `/${currentTeam.name}`;
+    }
+);
+
 export const getCurrentTeamStats = createSelector(
     getCurrentTeamId,
     getTeamStats,
@@ -209,8 +219,8 @@ export const getChannelDrawerBadgeCount = createSelector(
         let messageCount = 0;
         Object.values(teamMembers).forEach((m) => {
             if (m.team_id !== currentTeamId) {
-                mentionCount = mentionCount + (m.mention_count || 0);
-                messageCount = messageCount + (m.msg_count || 0);
+                mentionCount += (m.mention_count || 0);
+                messageCount += (m.msg_count || 0);
             }
         });
 

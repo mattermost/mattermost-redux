@@ -106,7 +106,7 @@ export function login(loginId, password, mfaToken = '', ldapOnly = false) {
             return {error};
         }
 
-        return await completeLogin(data)(dispatch, getState);
+        return completeLogin(data)(dispatch, getState);
     };
 }
 
@@ -130,7 +130,7 @@ export function loginById(id, password, mfaToken = '') {
             return {error};
         }
 
-        return await completeLogin(data)(dispatch, getState);
+        return completeLogin(data)(dispatch, getState);
     };
 }
 
@@ -316,7 +316,7 @@ export function getMissingProfilesByIds(userIds) {
 
         if (missingIds.length > 0) {
             getStatusesByIds(missingIds)(dispatch, getState);
-            return await getProfilesByIds(missingIds)(dispatch, getState);
+            return getProfilesByIds(missingIds)(dispatch, getState);
         }
 
         return {data: []};
@@ -340,7 +340,7 @@ export function getMissingProfilesByUsernames(usernames) {
         });
 
         if (missingUsernames.length > 0) {
-            return await getProfilesByUsernames(missingUsernames)(dispatch, getState);
+            return getProfilesByUsernames(missingUsernames)(dispatch, getState);
         }
 
         return {data: []};
@@ -610,14 +610,14 @@ export function getMe() {
     };
 }
 
-export function updateServiceTermsStatus(serviceTermsId, accepted) {
+export function updateTermsOfServiceStatus(termsOfServiceId, accepted) {
     return async (dispatch, getState) => {
         const response = await dispatch(bindClientFunc(
-            Client4.updateServiceTermsStatus,
-            UserTypes.UPDATE_SERVICE_TERMS_STATUS_REQUEST,
-            UserTypes.UPDATE_SERVICE_TERMS_STATUS_SUCCESS,
-            UserTypes.UPDATE_SERVICE_TERMS_STATUS_FAILURE,
-            serviceTermsId,
+            Client4.updateTermsOfServiceStatus,
+            UserTypes.UPDATE_TERMS_OF_SERVICE_STATUS_REQUEST,
+            UserTypes.UPDATE_TERMS_OF_SERVICE_STATUS_SUCCESS,
+            UserTypes.UPDATE_TERMS_OF_SERVICE_STATUS_FAILURE,
+            termsOfServiceId,
             accepted
         ));
         const {data, error} = response;
@@ -625,7 +625,7 @@ export function updateServiceTermsStatus(serviceTermsId, accepted) {
             const currentUser = getCurrentUser(getState());
             dispatch({
                 type: UserTypes.RECEIVED_ME,
-                data: Object.assign({}, currentUser, {accepted_service_terms_id: accepted ? serviceTermsId : null}),
+                data: Object.assign({}, currentUser, {accepted_terms_of_service_id: accepted ? termsOfServiceId : null}),
             });
             return {data};
         }
@@ -633,21 +633,21 @@ export function updateServiceTermsStatus(serviceTermsId, accepted) {
     };
 }
 
-export function getServiceTerms() {
+export function getTermsOfService() {
     return bindClientFunc(
-        Client4.getServiceTerms,
-        UserTypes.GET_SERVICE_TERMS_REQUEST,
-        UserTypes.GET_SERVICE_TERMS_SUCCESS,
-        UserTypes.GET_SERVICE_TERMS_FAILURE,
+        Client4.getTermsOfService,
+        UserTypes.GET_TERMS_OF_SERVICE_REQUEST,
+        UserTypes.GET_TERMS_OF_SERVICE_SUCCESS,
+        UserTypes.GET_TERMS_OF_SERVICE_FAILURE,
     );
 }
 
-export function createServiceTerms(text) {
+export function createTermsOfService(text) {
     return bindClientFunc(
-        Client4.createServiceTerms,
-        UserTypes.CREATE_SERVICE_TERMS_REQUEST,
-        UserTypes.CREATE_SERVICE_TERMS_SUCCESS,
-        UserTypes.CREATE_SERVICE_TERMS_FAILURE,
+        Client4.createTermsOfService,
+        UserTypes.CREATE_TERMS_OF_SERVICE_REQUEST,
+        UserTypes.CREATE_TERMS_OF_SERVICE_SUCCESS,
+        UserTypes.CREATE_TERMS_OF_SERVICE_FAILURE,
         text,
     );
 }
@@ -1608,9 +1608,9 @@ export default {
     switchOAuthToEmail,
     switchEmailToLdap,
     switchLdapToEmail,
-    getServiceTerms,
-    createServiceTerms,
-    updateServiceTermsStatus,
+    getTermsOfService,
+    createTermsOfService,
+    updateTermsOfServiceStatus,
     createUserAccessToken,
     getUserAccessToken,
     getUserAccessTokensForUser,

@@ -441,6 +441,25 @@ describe('Actions.Admin', () => {
         }
     });
 
+    it('deleteBrandImage', async () => {
+        if (TestHelper.isLiveServer()) {
+            console.log('Skipping mock-only test');
+            return;
+        }
+
+        nock(Client4.getBaseRoute()).
+            delete('/brand/image').
+            reply(200, OK_RESPONSE);
+
+        await Actions.deleteBrandImage()(store.dispatch, store.getState);
+
+        const state = store.getState();
+        const request = state.requests.admin.deleteBrandImage;
+        if (request.status === RequestStatus.FAILURE) {
+            throw new Error('deleteBrandImage request failed');
+        }
+    });
+
     it('getClusterStatus', async () => {
         if (TestHelper.isLiveServer()) {
             console.log('Skipping mock-only test');

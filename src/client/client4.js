@@ -11,10 +11,12 @@ const HEADER_BEARER = 'BEARER';
 const HEADER_REQUESTED_WITH = 'X-Requested-With';
 const HEADER_USER_AGENT = 'User-Agent';
 const HEADER_X_CLUSTER_ID = 'X-Cluster-Id';
-const HEADER_X_VERSION_ID = 'X-Version-Id';
+export const HEADER_X_VERSION_ID = 'X-Version-Id';
 
 const PER_PAGE_DEFAULT = 60;
 const LOGS_PER_PAGE_DEFAULT = 10000;
+
+/* eslint-disable no-throw-literal */
 
 export default class Client4 {
     constructor() {
@@ -422,21 +424,21 @@ export default class Client4 {
         );
     }
 
-    updateServiceTermsStatus = async (serviceTermsId, accepted) => {
+    updateTermsOfServiceStatus = async (termsOfServiceId, accepted) => {
         return this.doFetch(
             `${this.getUserRoute('me')}/terms_of_service`,
-            {method: 'post', body: JSON.stringify({serviceTermsId, accepted})}
+            {method: 'post', body: JSON.stringify({termsOfServiceId, accepted})}
         );
     }
 
-    getServiceTerms = async () => {
+    getTermsOfService = async () => {
         return this.doFetch(
             `${this.getBaseRoute()}/terms_of_service`,
             {method: 'get'}
         );
     }
 
-    createServiceTerms = async (text) => {
+    createTermsOfService = async (text) => {
         return this.doFetch(
             `${this.getBaseRoute()}/terms_of_service`,
             {method: 'post', body: JSON.stringify({text})}
@@ -852,6 +854,15 @@ export default class Client4 {
 
         return this.doFetch(
             `${this.getTeamRoute(team.id)}`,
+            {method: 'put', body: JSON.stringify(team)}
+        );
+    };
+
+    patchTeam = async (team) => {
+        this.trackEvent('api', 'api_teams_patch_name', {team_id: team.id});
+
+        return this.doFetch(
+            `${this.getTeamRoute(team.id)}/patch`,
             {method: 'put', body: JSON.stringify(team)}
         );
     };
@@ -2143,6 +2154,13 @@ export default class Client4 {
         return this.doFetch(
             `${this.getBrandRoute()}/image`,
             request
+        );
+    };
+
+    deleteBrandImage = async () => {
+        return this.doFetch(
+            `${this.getBrandRoute()}/image`,
+            {method: 'delete'}
         );
     };
 

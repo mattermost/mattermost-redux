@@ -318,31 +318,31 @@ function switchLogin(state: RequestStatusType = initialRequestState(), action: G
     );
 }
 
-function updateServiceTermsStatus(state: RequestStatusType = initialRequestState(), action: GenericAction): RequestStatusType {
+function updateTermsOfServiceStatus(state: RequestStatusType = initialRequestState(), action: GenericAction): RequestStatusType {
     return handleRequest(
-        UserTypes.UPDATE_SERVICE_TERMS_STATUS_REQUEST,
-        UserTypes.UPDATE_SERVICE_TERMS_STATUS_SUCCESS,
-        UserTypes.UPDATE_SERVICE_TERMS_STATUS_FAILURE,
+        UserTypes.UPDATE_TERMS_OF_SERVICE_STATUS_REQUEST,
+        UserTypes.UPDATE_TERMS_OF_SERVICE_STATUS_SUCCESS,
+        UserTypes.UPDATE_TERMS_OF_SERVICE_STATUS_FAILURE,
         state,
         action
     );
 }
 
-function getServiceTerms(state: RequestStatusType = initialRequestState(), action: GenericAction): RequestStatusType {
+function getTermsOfService(state: RequestStatusType = initialRequestState(), action: GenericAction): RequestStatusType {
     return handleRequest(
-        UserTypes.GET_SERVICE_TERMS_REQUEST,
-        UserTypes.GET_SERVICE_TERMS_SUCCESS,
-        UserTypes.GET_SERVICE_TERMS_FAILURE,
+        UserTypes.GET_TERMS_OF_SERVICE_REQUEST,
+        UserTypes.GET_TERMS_OF_SERVICE_SUCCESS,
+        UserTypes.GET_TERMS_OF_SERVICE_FAILURE,
         state,
         action
     );
 }
 
-function createServiceTerms(state: RequestStatusType = initialRequestState(), action: GenericAction): RequestStatusType {
+function createTermsOfService(state: RequestStatusType = initialRequestState(), action: GenericAction): RequestStatusType {
     return handleRequest(
-        UserTypes.CREATE_SERVICE_TERMS_REQUEST,
-        UserTypes.CREATE_SERVICE_TERMS_SUCCESS,
-        UserTypes.CREATE_SERVICE_TERMS_FAILURE,
+        UserTypes.CREATE_TERMS_OF_SERVICE_REQUEST,
+        UserTypes.CREATE_TERMS_OF_SERVICE_SUCCESS,
+        UserTypes.CREATE_TERMS_OF_SERVICE_FAILURE,
         state,
         action
     );
@@ -427,9 +427,9 @@ export default combineReducers({
     verifyEmail,
     passwordReset,
     switchLogin,
-    getServiceTerms,
-    createServiceTerms,
-    updateServiceTermsStatus,
+    getTermsOfService,
+    createTermsOfService,
+    updateTermsOfServiceStatus,
     createUserAccessToken,
     getUserAccessToken,
     revokeUserAccessToken,

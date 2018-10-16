@@ -76,30 +76,27 @@ export function canEditPost(state, config, license, teamId, channelId, userId, p
 
     let canEdit = true;
 
-    if (canEdit && license.IsLicensed === 'true') {
-        if (hasNewPermissions(state)) {
-            canEdit = canEdit && haveIChannelPermission(state, {team: teamId, channel: channelId, permission: Permissions.EDIT_POST});
-            if (!isOwner) {
-                canEdit = canEdit && haveIChannelPermission(state, {team: teamId, channel: channelId, permission: Permissions.EDIT_OTHERS_POSTS});
-            }
-            if (config.PostEditTimeLimit !== '-1' && config.PostEditTimeLimit !== -1) {
-                const timeLeft = (post.create_at + (config.PostEditTimeLimit * 1000)) - Date.now();
-                if (timeLeft <= 0) {
-                    canEdit = false;
-                }
-            }
-        } else {
-            canEdit = isOwner && config.AllowEditPost !== 'never';
-            if (config.AllowEditPost === General.ALLOW_EDIT_POST_TIME_LIMIT) {
-                const timeLeft = (post.create_at + (config.PostEditTimeLimit * 1000)) - Date.now();
-                if (timeLeft <= 0) {
-                    canEdit = false;
-                }
+    if (hasNewPermissions(state)) {
+        canEdit = canEdit && haveIChannelPermission(state, {team: teamId, channel: channelId, permission: Permissions.EDIT_POST});
+        if (!isOwner) {
+            canEdit = canEdit && haveIChannelPermission(state, {team: teamId, channel: channelId, permission: Permissions.EDIT_OTHERS_POSTS});
+        }
+        if (license.IsLicensed === 'true' && config.PostEditTimeLimit !== '-1' && config.PostEditTimeLimit !== -1) {
+            const timeLeft = (post.create_at + (config.PostEditTimeLimit * 1000)) - Date.now();
+            if (timeLeft <= 0) {
+                canEdit = false;
             }
         }
     } else {
-        canEdit = canEdit && isOwner;
+        canEdit = isOwner && config.AllowEditPost !== 'never';
+        if (config.AllowEditPost === General.ALLOW_EDIT_POST_TIME_LIMIT) {
+            const timeLeft = (post.create_at + (config.PostEditTimeLimit * 1000)) - Date.now();
+            if (timeLeft <= 0) {
+                canEdit = false;
+            }
+        }
     }
+
     return canEdit;
 }
 

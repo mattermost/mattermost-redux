@@ -42,3 +42,5 @@ mattermost-redux-*.tgz
 # flow
 /flow-typed
 /.flowinstall
+
+.vscode/

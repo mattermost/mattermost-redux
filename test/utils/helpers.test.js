@@ -36,8 +36,8 @@ describe('Helpers', () => {
     });
 });
 
-describe('Utils.isEmail', function() {
-    it('', function() {
+describe('Utils.isEmail', () => {
+    it('', () => {
         for (const data of [
             {
                 email: 'prettyandsimple@example.com',

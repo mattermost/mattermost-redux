@@ -17,6 +17,8 @@ import {PostTypes, TeamTypes, UserTypes, ChannelTypes} from 'action_types';
 import TestHelper from 'test/test_helper';
 import configureStore from 'test/test_store';
 
+const webSocketConnector = TestHelper.isLiveServer() ? require('ws') : MockWebSocket;
+
 describe('Actions.Websocket', () => {
     let store;
     let mockServer;
@@ -26,8 +28,7 @@ describe('Actions.Websocket', () => {
 
         const connUrl = (Client4.getUrl() + '/api/v4/websocket').replace(/^http:/, 'ws:');
         mockServer = new Server(connUrl);
-        const webSocketConnector = TestHelper.isLiveServer() ? require('ws') : MockWebSocket;
-        return await Actions.init(
+        return Actions.init(
             'web',
             null,
             null,
@@ -259,6 +260,35 @@ describe('Actions.Websocket', () => {
                 team = {...Object.values(myTeams)[0]};
                 team.allow_open_invite = true;
                 TestHelper.basicClient4.updateTeam(team);
+            } else {
+                team = {id: '55pfercbm7bsmd11p5cjpgsbwr'};
+                mockServer.send(JSON.stringify({event: WebsocketEvents.UPDATE_TEAM, data: {team: `{"id":"55pfercbm7bsmd11p5cjpgsbwr","create_at":1495553950859,"update_at":1508250370054,"delete_at":0,"display_name":"${TestHelper.basicTeam.display_name}","name":"${TestHelper.basicTeam.name}","description":"description","email":"","type":"O","company_name":"","allowed_domains":"","invite_id":"m93f54fu5bfntewp8ctwonw19w","allow_open_invite":true}`}, broadcast: {omit_users: null, user_id: '', channel_id: '', team_id: ''}, seq: 26}));
+            }
+
+            setTimeout(() => {
+                const entities = store.getState().entities;
+                const {teams} = entities.teams;
+                const updated = teams[team.id];
+                assert.ok(updated);
+                assert.strictEqual(updated.allow_open_invite, true);
+                done();
+            }, 500);
+        }
+
+        test();
+    });
+
+    it('Websocket handle team patched', (done) => {
+        async function test() {
+            let team;
+            if (TestHelper.isLiveServer()) {
+                await TeamActions.getMyTeams()(store.dispatch, store.getState);
+                const {teams: myTeams} = store.getState().entities.teams;
+                assert.ok(Object.keys(myTeams));
+
+                team = {...Object.values(myTeams)[0]};
+                team.allow_open_invite = true;
+                TestHelper.basicClient4.patchTeam(team);
             } else {
                 team = {id: '55pfercbm7bsmd11p5cjpgsbwr'};
                 mockServer.send(JSON.stringify({event: WebsocketEvents.UPDATE_TEAM, data: {team: `{"id":"55pfercbm7bsmd11p5cjpgsbwr","create_at":1495553950859,"update_at":1508250370054,"delete_at":0,"display_name":"${TestHelper.basicTeam.display_name}","name":"${TestHelper.basicTeam.name}","description":"description","email":"","type":"O","company_name":"","allowed_domains":"","invite_id":"m93f54fu5bfntewp8ctwonw19w","allow_open_invite":true}`}, broadcast: {omit_users: null, user_id: '', channel_id: '', team_id: ''}, seq: 26}));

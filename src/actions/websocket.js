@@ -207,6 +207,9 @@ function handleEvent(msg, dispatch, getState) {
     case WebsocketEvents.UPDATE_TEAM:
         handleUpdateTeamEvent(msg, dispatch, getState);
         break;
+    case WebsocketEvents.PATCH_TEAM:
+        handlePatchTeamEvent(msg, dispatch, getState);
+        break;
 
     case WebsocketEvents.ADDED_TO_TEAM:
         handleTeamAddedEvent(msg, dispatch, getState);
@@ -428,6 +431,10 @@ function handleLeaveTeamEvent(msg, dispatch, getState) {
 
 function handleUpdateTeamEvent(msg, dispatch, getState) {
     dispatch({type: TeamTypes.UPDATED_TEAM, data: JSON.parse(msg.data.team)}, getState);
+}
+
+function handlePatchTeamEvent(msg, dispatch, getState) {
+    dispatch({type: TeamTypes.PATCHED_TEAM, data: JSON.parse(msg.data.team)}, getState);
 }
 
 async function handleTeamAddedEvent(msg, dispatch, getState) {
