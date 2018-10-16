@@ -76,11 +76,11 @@ const state: GlobalState = {
             alertStack: [],
         },
         integrations: {
-            incomingHooks: {},
-            outgoingHooks: {},
-            oauthApps: {},
-            systemCommands: {},
-            commands: {},
+            incomingHooks: [],
+            outgoingHooks: [],
+            oauthApps: [],
+            systemCommands: [],
+            commands: [],
         },
         files: {
             files: {},

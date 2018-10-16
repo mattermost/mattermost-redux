@@ -45,7 +45,7 @@ export type Command = {|
     "creator_id": string,
     "team_id": string,
     "trigger": string,
-    "method": "P" | "G",
+    "method": "P" | "G" | "",
     "username": string,
     "icon_url": string,
     "auto_complete": boolean,
@@ -71,9 +71,9 @@ export type OAuthApp = {|
 |};
 
 export type IntegrationsState = {|
-    incomingHooks: Object,
-    outgoingHooks: Object,
-    oauthApps: Object,
-    systemCommands: Object,
-    commands: Object
+    incomingHooks: Array<IncomingWebhook>,
+    outgoingHooks: Array<OutgoingWebhook>,
+    oauthApps: Array<OAuthApp>,
+    systemCommands: Array<Command>,
+    commands: Array<Command>
 |};
