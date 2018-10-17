@@ -577,7 +577,7 @@ export const getMapAndSortedUnreadChannelIds = createIdsSelector(
     getCurrentUser,
     getMyChannelMemberships,
     getLastPostPerChannel,
-    (state, lastUnreadChannel, unreadsAtTop, favoritesAtTop, sorting = 'alpha') => sorting,
+    (state, lastUnreadChannel, sorting = 'alpha') => sorting,
     mapAndSortChannelIds,
 );
 
@@ -585,6 +585,9 @@ export const getSortedUnreadChannelIds = createIdsSelector(
     getUnreadChannelIds,
     getFavoritesPreferences,
     getMapAndSortedUnreadChannelIds,
+    (state, lastUnreadChannel, unreadsAtTop, favoritesAtTop, sorting = 'alpha') => {
+        return getMapAndSortedUnreadChannelIds(state, lastUnreadChannel, sorting)
+    },
     (unreadChannelIds, favoritePreferences, mappedAndSortedUnreadChannelIds) => {
         return filterChannels(unreadChannelIds, favoritePreferences, mappedAndSortedUnreadChannelIds, false, false)
     },
@@ -649,14 +652,14 @@ export const getFavoriteChannelIds = createIdsSelector(
     getCurrentUser,
     getMyChannelMemberships,
     getLastPostPerChannel,
-    (state, lastUnreadChannel, unreadsAtTop, favoritesAtTop, sorting = 'alpha') => sorting,
+    (state, sorting = 'alpha') => sorting,
     mapAndSortChannelIds,
 );
 
 export const getSortedFavoriteChannelIds = createIdsSelector(
     getUnreadChannelIds,
     getFavoritesPreferences,
-    getFavoriteChannelIds,
+    (state, lastUnreadChannel, unreadsAtTop, favoritesAtTop, sorting) => getFavoriteChannelIds(state, sorting),
     (state, lastUnreadChannel, unreadsAtTop = true) => unreadsAtTop,
     (unreadChannelIds, favoritePreferences, favoriteChannelIds, unreadsAtTop) => {
         return filterChannels(unreadChannelIds, favoritePreferences, favoriteChannelIds, unreadsAtTop, false)
@@ -691,14 +694,14 @@ export const getPublicChannelIds = createIdsSelector(
     getCurrentUser,
     getMyChannelMemberships,
     getLastPostPerChannel,
-    (state, lastUnreadChannel, unreadsAtTop, favoritesAtTop, sorting = 'alpha') => sorting,
+    (state, sorting = 'alpha') => sorting,
     mapAndSortChannelIds,
 );
 
 export const getSortedPublicChannelIds = createIdsSelector(
     getUnreadChannelIds,
     getFavoritesPreferences,
-    getPublicChannelIds,
+    (state, lastUnreadChannel, unreadsAtTop, favoritesAtTop, sorting = 'alpha') => getPublicChannelIds(state, sorting),
     (state, lastUnreadChannel, unreadsAtTop = true) => unreadsAtTop,
     (state, lastUnreadChannel, unreadsAtTop, favoritesAtTop = true) => favoritesAtTop,
     filterChannels,
@@ -733,14 +736,14 @@ export const getPrivateChannelIds = createIdsSelector(
     getCurrentUser,
     getMyChannelMemberships,
     getLastPostPerChannel,
-    (state, lastUnreadChannel, unreadsAtTop, favoritesAtTop, sorting = 'alpha') => sorting,
+    (state, sorting = 'alpha') => sorting,
     mapAndSortChannelIds,
 );
 
 export const getSortedPrivateChannelIds = createIdsSelector(
     getUnreadChannelIds,
     getFavoritesPreferences,
-    getPrivateChannelIds,
+    (state, lastUnreadChannel, unreadsAtTop, favoritesAtTop, sorting = 'alpha') => getPrivateChannelIds(state, sorting),
     (state, lastUnreadChannel, unreadsAtTop = true) => unreadsAtTop,
     (state, lastUnreadChannel, unreadsAtTop, favoritesAtTop = true) => favoritesAtTop,
     filterChannels,
@@ -827,7 +830,7 @@ export const getDirectChannelIds = createIdsSelector(
     getCurrentUser,
     getMyChannelMemberships,
     getLastPostPerChannel,
-    (state, lastUnreadChannel, unreadsAtTop, favoritesAtTop, sorting = 'alpha') => sorting,
+    (state, sorting = 'alpha') => sorting,
     mapAndSortChannelIds,
 );
 
@@ -835,6 +838,7 @@ export const getSortedDirectChannelIds = createIdsSelector(
     getUnreadChannelIds,
     getFavoritesPreferences,
     getDirectChannelIds,
+    (state, lastUnreadChannel, unreadsAtTop, favoritesAtTop, sorting = 'alpha') => getDirectChannelIds(state, sorting),
     (state, lastUnreadChannel, unreadsAtTop = true) => unreadsAtTop,
     (state, lastUnreadChannel, unreadsAtTop, favoritesAtTop = true) => favoritesAtTop,
     filterChannels,
@@ -921,7 +925,7 @@ export const getAllChannelIds = createIdsSelector(
     getCurrentUser,
     getMyChannelMemberships,
     getLastPostPerChannel,
-    (state, lastUnreadChannel, unreadsAtTop, favoritesAtTop, sorting = 'alpha') => sorting,
+    (state, sorting = 'alpha') => sorting,
     mapAndSortChannelIds,
 );
 
@@ -929,6 +933,7 @@ export const getAllSortedChannelIds = createIdsSelector(
     getUnreadChannelIds,
     getFavoritesPreferences,
     getAllChannelIds,
+    (state, lastUnreadChannel, unreadsAtTop, favoritesAtTop, sorting = 'alpha') => getAllChannelIds(state, sorting),
     (state, lastUnreadChannel, unreadsAtTop = true) => unreadsAtTop,
     (state, lastUnreadChannel, unreadsAtTop, favoritesAtTop = true) => favoritesAtTop,
     filterChannels,
