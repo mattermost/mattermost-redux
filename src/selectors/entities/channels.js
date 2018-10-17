@@ -585,9 +585,9 @@ export const getSortedUnreadChannelIds = createIdsSelector(
     getUnreadChannelIds,
     getFavoritesPreferences,
     getMapAndSortedUnreadChannelIds,
-    () => false,
-    () => false,
-    filterChannels,
+    (unreadChannelIds, favoritePreferences, mappedAndSortedUnreadChannelIds) => {
+        return filterChannels(unreadChannelIds, favoritePreferences, mappedAndSortedUnreadChannelIds, false, false)
+    },
 );
 
 // Favorites
@@ -658,8 +658,9 @@ export const getSortedFavoriteChannelIds = createIdsSelector(
     getFavoritesPreferences,
     getFavoriteChannelIds,
     (state, lastUnreadChannel, unreadsAtTop = true) => unreadsAtTop,
-    () => false,
-    filterChannels,
+    (unreadChannelIds, favoritePreferences, favoriteChannelIds, unreadsAtTop) => {
+        return filterChannels(unreadChannelIds, favoritePreferences, favoriteChannelIds, unreadsAtTop, false)
+    },
 );
 
 // Public Channels
@@ -1032,35 +1033,38 @@ export const getSortedPublicChannelWithUnreadsIds = createIdsSelector(
     getUnreadChannelIds,
     getFavoritesPreferences,
     getPublicChannelIds,
-    () => false, // keepUnreadIds
     (state, lastUnreadChannel, unreadsAtTop, favoritesAtTop = true) => favoritesAtTop,
-    filterChannels,
+    (unreadChannelIds, favoritePreferences, publicChannelIds, favoritesAtTop) => {
+        return filterChannels(unreadChannelIds, favoritePreferences, publicChannelIds, false, favoritesAtTop)
+    },
 );
 
 export const getSortedPrivateChannelWithUnreadsIds = createIdsSelector(
     getUnreadChannelIds,
     getFavoritesPreferences,
     getPrivateChannelIds,
-    () => false, // keepUnreadIds
     (state, lastUnreadChannel, unreadsAtTop, favoritesAtTop = true) => favoritesAtTop,
-    filterChannels,
+    (unreadChannelIds, favoritePreferences, privateChannelId, favoritesAtTop) => {
+        return filterChannels(unreadChannelIds, favoritePreferences, privateChannelId, false, favoritesAtTop)
+    },
 );
 
 export const getSortedFavoriteChannelWithUnreadsIds = createIdsSelector(
     getUnreadChannelIds,
     getFavoritesPreferences,
     getFavoriteChannelIds,
-    () => false, // keepUnreadIds
-    () => false,
-    filterChannels,
+    (unreadChannelIds, favoritePreferences, favoriteChannelIds) => {
+        return filterChannels(unreadChannelIds, favoritePreferences, favoriteChannelIds, false, false)
+    },
 );
 
 export const getSortedDirectChannelWithUnreadsIds = createIdsSelector(
     getUnreadChannelIds,
     getFavoritesPreferences,
     getDirectChannelIds,
-    () => false, // keepUnreadIds
     (state, lastUnreadChannel, unreadsAtTop, favoritesAtTop = true) => favoritesAtTop,
-    filterChannels,
+    (unreadChannelIds, favoritePreferences, directChannelIds, favoritesAtTop) => {
+        return filterChannels(unreadChannelIds, favoritePreferences, directChannelIds, false, favoritesAtTop)
+    },
 );
 
