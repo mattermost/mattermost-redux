@@ -554,7 +554,7 @@ export const getUnreadChannels = createIdsSelector(
             return [];
         }
 
-        const allUnreadChannels = unreadIds.filter((u) => u).map((id) => {
+        const allUnreadChannels = unreadIds.map((id) => {
             const c = channels[id];
 
             if (c.delete_at !== 0) {
