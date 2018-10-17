@@ -1277,6 +1277,13 @@ export default class Client4 {
         );
     };
 
+    getChannelTimezones = async (channelId) => {
+        return this.doFetch(
+            `${this.getChannelRoute(channelId)}/timezones`,
+            {method: 'get'}
+        );
+    };
+
     getChannelMember = async (channelId, userId) => {
         return this.doFetch(
             `${this.getChannelMemberRoute(channelId, userId)}`,
