@@ -983,16 +983,16 @@ describe('Selectors.Channels', () => {
         });
     });
 
-    it('get ordered channel ids by_type in current team strict equal', () => {
-        const chan11 = {...testState.entities.channels.channels[channel11.id]};
-        chan11.header = 'This should not change the results';
+        it('get ordered channel ids by_type in current team strict equal', () => {
+            const chan11 = {...testState.entities.channels.channels[channel11.id]};
+            chan11.header = 'This should not change the results';
 
-        const sidebarPrefs = {
-            grouping: 'by_type',
-            sorting: 'alpha',
-            unreads_at_top: 'true',
-            favorite_at_top: 'true',
-        };
+            const sidebarPrefs = {
+                grouping: 'by_type',
+                sorting: 'alpha',
+                unreads_at_top: 'true',
+                favorite_at_top: 'true',
+            };
 
             const modifiedState = {
                 ...testState,
@@ -1096,8 +1096,8 @@ describe('Selectors.Channels', () => {
             const sidebarPrefs = {
                 grouping: 'never',
                 sorting: 'recent',
-                unreads_at_top: 'true',
-                favorite_at_top: 'true',
+                unreads_at_top: 'false',
+                favorite_at_top: 'false',
             };
 
             const modifiedState = {
@@ -1119,6 +1119,8 @@ describe('Selectors.Channels', () => {
                 null,
                 sidebarPrefs.grouping,
                 sidebarPrefs.sorting,
+                sidebarPrefs.unreads_at_top === 'true',
+                sidebarPrefs.favorite_at_top === 'true',
             );
 
             const fromModifiedState = Selectors.getOrderedChannelIds(
@@ -1126,6 +1128,8 @@ describe('Selectors.Channels', () => {
                 null,
                 sidebarPrefs.grouping,
                 sidebarPrefs.sorting,
+                sidebarPrefs.unreads_at_top === 'true',
+                sidebarPrefs.favorite_at_top === 'true',
             );
 
             assert.deepEqual(fromOriginalState, fromModifiedState);
@@ -1139,7 +1143,7 @@ describe('Selectors.Channels', () => {
                         ...modifiedState.entities.channels,
                         channels: {
                             ...modifiedState.entities.channels.channels,
-                            [channel5.id]: chan5,
+                            [chan5.id]: chan5,
                         },
                     },
                 },
@@ -1150,6 +1154,8 @@ describe('Selectors.Channels', () => {
                 null,
                 sidebarPrefs.grouping,
                 sidebarPrefs.sorting,
+                sidebarPrefs.unreads_at_top === 'true',
+                sidebarPrefs.favorite_at_top === 'true',
             );
 
             assert.notDeepEqual(fromModifiedState, fromRecencyInChan5State);
@@ -1176,6 +1182,8 @@ describe('Selectors.Channels', () => {
                 null,
                 sidebarPrefs.grouping,
                 sidebarPrefs.sorting,
+                sidebarPrefs.unreads_at_top === 'true',
+                sidebarPrefs.favorite_at_top === 'true',
             );
 
             assert.notDeepEqual(fromRecencyInChan5State, fromRecencyInChan6State);
