@@ -71,9 +71,9 @@ export type OAuthApp = {|
 |};
 
 export type IntegrationsState = {|
-    incomingHooks: Array<IncomingWebhook>,
-    outgoingHooks: Array<OutgoingWebhook>,
-    oauthApps: Array<OAuthApp>,
-    systemCommands: Array<Command>,
-    commands: Array<Command>
+    incomingHooks: {[string]: IncomingWebhook},
+    outgoingHooks: {[string]: OutgoingWebhook},
+    oauthApps: {[string]: OAuthApp},
+    systemCommands: {[string]: Command},
+    commands: {[string]: Command}
 |};
