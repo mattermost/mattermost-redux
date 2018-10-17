@@ -939,7 +939,121 @@ export const getAllSortedChannelIds = createIdsSelector(
     filterChannels,
 );
 
-export const getOrderedChannelIds = (state, lastUnreadChannel, grouping, sorting, unreadsAtTop, favoritesAtTop) => {
+export const getOrderedChannelIds = () => {
+    let lastChannels;
+
+    const hasChannelsChanged = (channels) => {
+        if (!lastChannels || lastChannels.length !== channels.length) {
+            return true;
+        }
+
+        for (let i = 0; i < channels.length; i++) {
+            if (channels[i].type !== lastChannels[i].type || channels[i].items !== lastChannels[i].items) {
+                return true;
+            }
+        }
+
+        return false;
+    };
+
+    return (state, lastUnreadChannel, grouping, sorting, unreadsAtTop, favoritesAtTop) => {
+        const channels = [];
+
+        if (grouping === 'by_type') {
+            channels.push({
+                type: 'public',
+                name: 'PUBLIC CHANNELS',
+                items: getSortedPublicChannelIds(
+                    state,
+                    lastUnreadChannel,
+                    unreadsAtTop,
+                    favoritesAtTop,
+                    sorting,
+                ),
+            });
+
+            channels.push({
+                type: 'private',
+                name: 'PRIVATE CHANNELS',
+                items: getSortedPrivateChannelIds(
+                    state,
+                    lastUnreadChannel,
+                    unreadsAtTop,
+                    favoritesAtTop,
+                    sorting,
+                ),
+            });
+
+            channels.push({
+                type: 'direct',
+                name: 'DIRECT MESSAGES',
+                items: getSortedDirectChannelIds(
+                    state,
+                    lastUnreadChannel,
+                    unreadsAtTop,
+                    favoritesAtTop,
+                    sorting,
+                ),
+            });
+        } else {
+            // Combine all channel types
+            let type = 'alpha';
+            let name = 'CHANNELS';
+            if (sorting === 'recent') {
+                type = 'recent';
+                name = 'RECENT ACTIVITY';
+            }
+
+            channels.push({
+                type,
+                name,
+                items: getAllSortedChannelIds(
+                    state,
+                    lastUnreadChannel,
+                    unreadsAtTop,
+                    favoritesAtTop,
+                    sorting,
+                ),
+            });
+        }
+
+        if (favoritesAtTop) {
+            channels.unshift({
+                type: 'favorite',
+                name: 'FAVORITE CHANNELS',
+                items: getSortedFavoriteChannelIds(
+                    state,
+                    lastUnreadChannel,
+                    unreadsAtTop,
+                    favoritesAtTop,
+                    sorting,
+                ),
+            });
+        }
+
+        if (unreadsAtTop) {
+            channels.unshift({
+                type: 'unreads',
+                name: 'UNREADS',
+                items: getSortedUnreadChannelIds(
+                    state,
+                    lastUnreadChannel,
+                    unreadsAtTop,
+                    favoritesAtTop,
+                    sorting,
+                ),
+            });
+        }
+
+        if (hasChannelsChanged(channels)) {
+            return lastChannels = channels;
+        }
+
+        return lastChannels;
+    };
+};
+
+export const getOrderedChannelIdsDeprecated = (state, lastUnreadChannel, grouping, sorting, unreadsAtTop, favoritesAtTop) => {
     const channels = [];
 
     if (grouping === 'by_type') {
