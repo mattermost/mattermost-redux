@@ -943,9 +943,7 @@ const hasChannelsChanged = (channels) => {
     }
 
     for (let i = 0; i < channels.length; i++) {
-        const lastChannelsItems = lastChannels[i].items.join(', ');
-        const channelsItems = channels[i].items.join(', ');
-        if (channels[i].type !== lastChannels[i].type || channelsItems !== lastChannelsItems) {
+        if (channels[i].type !== lastChannels[i].type || channels[i].items !== lastChannels[i].items) {
             return true;
         }
     }
