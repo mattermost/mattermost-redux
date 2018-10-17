@@ -209,16 +209,15 @@ export const getSidebarPreferences = createSelector(
         );
     },
     (state) => {
-        const sidebarPreference = get(
+        return get(
             state,
             Preferences.CATEGORY_SIDEBAR_SETTINGS,
             '',
             null
         );
-        return JSON.parse(sidebarPreference);
     },
     (showUnreadSection, sidebarPreference) => {
-        let sidebarPrefs = sidebarPreference;
+        let sidebarPrefs = JSON.parse(sidebarPreference);
         if (sidebarPrefs === null) {
             // Support unread settings for old implementation
             sidebarPrefs = {
