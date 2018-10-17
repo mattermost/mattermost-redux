@@ -1,5 +1,6 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
+// @flow
 
 import {IntegrationTypes} from 'action_types';
 import {General} from 'constants';
@@ -10,7 +11,10 @@ import {Client4} from 'client';
 import {logError} from './errors';
 import {bindClientFunc, forceLogoutIfNecessary} from './helpers';
 
-export function createIncomingHook(hook) {
+import type {DispatchFunc, GetStateFunc} from '../types/actions';
+import type {Command, IncomingWebhook, OAuthApp, OutgoingWebhook} from '../types/integrations';
+
+export function createIncomingHook(hook: IncomingWebhook) {
     return bindClientFunc(
         Client4.createIncomingWebhook,
         IntegrationTypes.CREATE_INCOMING_HOOK_REQUEST,
@@ -20,7 +24,7 @@ export function createIncomingHook(hook) {
     );
 }
 
-export function getIncomingHook(hookId) {
+export function getIncomingHook(hookId: string) {
     return bindClientFunc(
         Client4.getIncomingWebhook,
         IntegrationTypes.GET_INCOMING_HOOKS_REQUEST,
@@ -30,7 +34,7 @@ export function getIncomingHook(hookId) {
     );
 }
 
-export function getIncomingHooks(teamId = '', page = 0, perPage = General.PAGE_SIZE_DEFAULT) {
+export function getIncomingHooks(teamId: string = '', page: number = 0, perPage: number = General.PAGE_SIZE_DEFAULT) {
     return bindClientFunc(
         Client4.getIncomingWebhooks,
         IntegrationTypes.GET_INCOMING_HOOKS_REQUEST,
@@ -42,9 +46,9 @@ export function getIncomingHooks(teamId = '', page = 0, perPage = General.PAGE_S
     );
 }
 
-export function removeIncomingHook(hookId) {
-    return async (dispatch, getState) => {
-        dispatch({type: IntegrationTypes.DELETE_INCOMING_HOOK_REQUEST}, getState);
+export function removeIncomingHook(hookId: string) {
+    return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
+        dispatch({type: IntegrationTypes.DELETE_INCOMING_HOOK_REQUEST, data: {}}, getState);
 
         try {
             await Client4.removeIncomingWebhook(hookId);
@@ -72,7 +76,7 @@ export function removeIncomingHook(hookId) {
     };
 }
 
-export function updateIncomingHook(hook) {
+export function updateIncomingHook(hook: IncomingWebhook) {
     return bindClientFunc(
         Client4.updateIncomingWebhook,
         IntegrationTypes.UPDATE_INCOMING_HOOK_REQUEST,
@@ -82,7 +86,7 @@ export function updateIncomingHook(hook) {
     );
 }
 
-export function createOutgoingHook(hook) {
+export function createOutgoingHook(hook: OutgoingWebhook) {
     return bindClientFunc(
         Client4.createOutgoingWebhook,
         IntegrationTypes.CREATE_OUTGOING_HOOK_REQUEST,
@@ -92,7 +96,7 @@ export function createOutgoingHook(hook) {
     );
 }
 
-export function getOutgoingHook(hookId) {
+export function getOutgoingHook(hookId: string) {
     return bindClientFunc(
         Client4.getOutgoingWebhook,
         IntegrationTypes.GET_OUTGOING_HOOKS_REQUEST,
@@ -102,7 +106,7 @@ export function getOutgoingHook(hookId) {
     );
 }
 
-export function getOutgoingHooks(channelId = '', teamId = '', page = 0, perPage = General.PAGE_SIZE_DEFAULT) {
+export function getOutgoingHooks(channelId: string = '', teamId: string = '', page: number = 0, perPage: number = General.PAGE_SIZE_DEFAULT) {
     return bindClientFunc(
         Client4.getOutgoingWebhooks,
         IntegrationTypes.GET_OUTGOING_HOOKS_REQUEST,
@@ -115,9 +119,9 @@ export function getOutgoingHooks(channelId = '', teamId = '', page = 0, perPage 
     );
 }
 
-export function removeOutgoingHook(hookId) {
-    return async (dispatch, getState) => {
-        dispatch({type: IntegrationTypes.DELETE_OUTGOING_HOOK_REQUEST}, getState);
+export function removeOutgoingHook(hookId: string) {
+    return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
+        dispatch({type: IntegrationTypes.DELETE_OUTGOING_HOOK_REQUEST, data: {}}, getState);
 
         try {
             await Client4.removeOutgoingWebhook(hookId);
@@ -145,7 +149,7 @@ export function removeOutgoingHook(hookId) {
     };
 }
 
-export function updateOutgoingHook(hook) {
+export function updateOutgoingHook(hook: OutgoingWebhook) {
     return bindClientFunc(
         Client4.updateOutgoingWebhook,
         IntegrationTypes.UPDATE_OUTGOING_HOOK_REQUEST,
@@ -155,7 +159,7 @@ export function updateOutgoingHook(hook) {
     );
 }
 
-export function regenOutgoingHookToken(hookId) {
+export function regenOutgoingHookToken(hookId: string) {
     return bindClientFunc(
         Client4.regenOutgoingHookToken,
         IntegrationTypes.UPDATE_OUTGOING_HOOK_REQUEST,
@@ -165,7 +169,7 @@ export function regenOutgoingHookToken(hookId) {
     );
 }
 
-export function getCommands(teamId) {
+export function getCommands(teamId: string) {
     return bindClientFunc(
         Client4.getCommandsList,
         IntegrationTypes.GET_COMMANDS_REQUEST,
@@ -175,7 +179,7 @@ export function getCommands(teamId) {
     );
 }
 
-export function getAutocompleteCommands(teamId, page = 0, perPage = General.PAGE_SIZE_DEFAULT) {
+export function getAutocompleteCommands(teamId: string, page: number = 0, perPage: number = General.PAGE_SIZE_DEFAULT) {
     return bindClientFunc(
         Client4.getAutocompleteCommandsList,
         IntegrationTypes.GET_AUTOCOMPLETE_COMMANDS_REQUEST,
@@ -187,7 +191,7 @@ export function getAutocompleteCommands(teamId, page = 0, perPage = General.PAGE
     );
 }
 
-export function getCustomTeamCommands(teamId) {
+export function getCustomTeamCommands(teamId: string) {
     return bindClientFunc(
         Client4.getCustomTeamCommands,
         IntegrationTypes.GET_CUSTOM_TEAM_COMMANDS_REQUEST,
@@ -197,7 +201,7 @@ export function getCustomTeamCommands(teamId) {
     );
 }
 
-export function addCommand(command) {
+export function addCommand(command: Command) {
     return bindClientFunc(
         Client4.addCommand,
         IntegrationTypes.ADD_COMMAND_REQUEST,
@@ -207,7 +211,7 @@ export function addCommand(command) {
     );
 }
 
-export function editCommand(command) {
+export function editCommand(command: Command) {
     return bindClientFunc(
         Client4.editCommand,
         IntegrationTypes.EDIT_COMMAND_REQUEST,
@@ -217,7 +221,7 @@ export function editCommand(command) {
     );
 }
 
-export function executeCommand(command, args) {
+export function executeCommand(command: Command, args: Array<string>) {
     return bindClientFunc(
         Client4.executeCommand,
         IntegrationTypes.EXECUTE_COMMAND_REQUEST,
@@ -228,9 +232,9 @@ export function executeCommand(command, args) {
     );
 }
 
-export function regenCommandToken(id) {
-    return async (dispatch, getState) => {
-        dispatch({type: IntegrationTypes.REGEN_COMMAND_TOKEN_REQUEST}, getState);
+export function regenCommandToken(id: string) {
+    return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
+        dispatch({type: IntegrationTypes.REGEN_COMMAND_TOKEN_REQUEST, data: {}}, getState);
 
         let res;
         try {
@@ -262,9 +266,9 @@ export function regenCommandToken(id) {
     };
 }
 
-export function deleteCommand(id) {
-    return async (dispatch, getState) => {
-        dispatch({type: IntegrationTypes.DELETE_COMMAND_REQUEST}, getState);
+export function deleteCommand(id: string) {
+    return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
+        dispatch({type: IntegrationTypes.DELETE_COMMAND_REQUEST, data: {}}, getState);
 
         try {
             await Client4.deleteCommand(id);
@@ -292,7 +296,7 @@ export function deleteCommand(id) {
     };
 }
 
-export function addOAuthApp(app) {
+export function addOAuthApp(app: OAuthApp) {
     return bindClientFunc(
         Client4.createOAuthApp,
         IntegrationTypes.ADD_OAUTH_APP_REQUEST,
@@ -302,7 +306,7 @@ export function addOAuthApp(app) {
     );
 }
 
-export function editOAuthApp(app) {
+export function editOAuthApp(app: OAuthApp) {
     return bindClientFunc(
         Client4.editOAuthApp,
         IntegrationTypes.UPDATE_OAUTH_APP_REQUEST,
@@ -312,7 +316,7 @@ export function editOAuthApp(app) {
     );
 }
 
-export function getOAuthApps(page = 0, perPage = General.PAGE_SIZE_DEFAULT) {
+export function getOAuthApps(page: number = 0, perPage: number = General.PAGE_SIZE_DEFAULT) {
     return bindClientFunc(
         Client4.getOAuthApps,
         IntegrationTypes.GET_OAUTH_APPS_REQUEST,
@@ -323,7 +327,7 @@ export function getOAuthApps(page = 0, perPage = General.PAGE_SIZE_DEFAULT) {
     );
 }
 
-export function getOAuthApp(appId) {
+export function getOAuthApp(appId: string) {
     return bindClientFunc(
         Client4.getOAuthApp,
         IntegrationTypes.GET_OAUTH_APP_REQUEST,
@@ -333,9 +337,9 @@ export function getOAuthApp(appId) {
     );
 }
 
-export function deleteOAuthApp(id) {
-    return async (dispatch, getState) => {
-        dispatch({type: IntegrationTypes.DELETE_OAUTH_APP_REQUEST}, getState);
+export function deleteOAuthApp(id: string) {
+    return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
+        dispatch({type: IntegrationTypes.DELETE_OAUTH_APP_REQUEST, data: {}}, getState);
 
         try {
             await Client4.deleteOAuthApp(id);
@@ -363,7 +367,7 @@ export function deleteOAuthApp(id) {
     };
 }
 
-export function regenOAuthAppSecret(appId) {
+export function regenOAuthAppSecret(appId: string) {
     return bindClientFunc(
         Client4.regenOAuthAppSecret,
         IntegrationTypes.UPDATE_OAUTH_APP_REQUEST,
