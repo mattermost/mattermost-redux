@@ -633,9 +633,9 @@ export default class Client4 {
         return `${this.getUserRoute(userId)}/image/default`;
     };
 
-    autocompleteUsers = async (name, teamId, channelId) => {
+    autocompleteUsers = async (name, teamId, channelId, options) => {
         return this.doFetch(
-            `${this.getUsersRoute()}/autocomplete${buildQueryString({in_team: teamId, in_channel: channelId, name})}`,
+            `${this.getUsersRoute()}/autocomplete${buildQueryString({in_team: teamId, in_channel: channelId, name, limit: options.limit})}`,
             {method: 'get'}
         );
     };

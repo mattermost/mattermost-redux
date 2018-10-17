@@ -858,7 +858,7 @@ export function getUserAudits(userId, page = 0, perPage = General.AUDITS_CHUNK_S
     );
 }
 
-export function autocompleteUsers(term, teamId = '', channelId = '') {
+export function autocompleteUsers(term, teamId = '', channelId = '', options = {limit: 25}) {
     return async (dispatch, getState) => {
         dispatch({type: UserTypes.AUTOCOMPLETE_USERS_REQUEST}, getState);
 
@@ -866,7 +866,7 @@ export function autocompleteUsers(term, teamId = '', channelId = '') {
 
         let data;
         try {
-            data = await Client4.autocompleteUsers(term, teamId, channelId);
+            data = await Client4.autocompleteUsers(term, teamId, channelId, options);
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch, getState);
             dispatch(batchActions([
