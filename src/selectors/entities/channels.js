@@ -525,7 +525,7 @@ export const getSortedUnreadChannelIds = createIdsSelector(
             }
 
             return c;
-        }).filter((c) => c).sort((a, b) => {
+        }).sort((a, b) => {
             const aMember = myMembers[a.id];
             const bMember = myMembers[b.id];
             const aIsMention = a.type === General.DM_CHANNEL || (aMember && aMember.mention_count > 0);
