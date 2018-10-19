@@ -23,7 +23,7 @@ import {
 import {getLastPostPerChannel, getAllPosts} from 'selectors/entities/posts';
 import {getCurrentTeamId, getCurrentTeamMembership} from 'selectors/entities/teams';
 import {haveICurrentChannelPermission} from 'selectors/entities/roles';
-import {isCurrentUserSystemAdmin, getCurrentUserId, makeGetProfilesInChannel} from 'selectors/entities/users';
+import {isCurrentUserSystemAdmin, getCurrentUserId} from 'selectors/entities/users';
 
 import {
     buildDisplayableChannelList,
@@ -43,6 +43,7 @@ import {
     sortChannelsByDisplayNameAndMuted,
 } from 'utils/channel_utils';
 import {createIdsSelector} from 'utils/helpers';
+import {getUserIdsInChannels} from './users';
 
 export {
     getCurrentChannelId,
@@ -765,29 +766,20 @@ export const filterPostIds = (condition) => {
     );
 };
 
-const doGetProfilesInChannel = makeGetProfilesInChannel();
-const getOtherProfilesInChannel = (state) => {
-    return (channelId, currentUserId) => {
-        return doGetProfilesInChannel(state, channelId).filter((profile) => profile.id !== currentUserId);
-    };
+const getProfiles = (currentUserId, usersIdsInChannel, users) => {
+    return usersIdsInChannel.
+        filter((userId) => userId !== currentUserId).
+        map((userId) => users[userId]);
 };
 export const getChannelsWithUserProfiles = createSelector(
-    getOtherProfilesInChannel,
+    getUserIdsInChannels,
+    getUsers,
     getGroupChannels,
     getCurrentUserId,
-    (getProfiles, channels, currentUserId) => {
+    (channelUserMap, users, channels, currentUserId) => {
         return channels.map((channel) => {
-            const profiles = getProfiles(channel.id, currentUserId);
+            const profiles = getProfiles(currentUserId, channelUserMap[channel.id], users);
             return Object.assign({}, channel, {profiles});
         });
     }
 );
-export const matchExistsInChannelProfiles = (profiles, searchTerm) => {
-    const searchTermLower = searchTerm.toLowerCase();
-    return profiles.filter((profile) =>
-        profile.first_name.toLowerCase().indexOf(searchTermLower) !== -1 ||
-        profile.last_name.toLowerCase().indexOf(searchTermLower) !== -1 ||
-        profile.username.toLowerCase().indexOf(searchTermLower) !== -1 ||
-        profile.nickname.toLowerCase().indexOf(searchTermLower) !== -1
-    ).length > 0;
-};
