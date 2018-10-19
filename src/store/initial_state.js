@@ -134,6 +134,10 @@ const state: GlobalState = {
                 status: 'not_started',
                 error: null,
             },
+            getChannelTimezones: {
+                status: 'not_started',
+                error: null,
+            },
             members: {
                 status: 'not_started',
                 error: null,

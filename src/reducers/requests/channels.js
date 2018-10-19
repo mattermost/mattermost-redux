@@ -40,6 +40,16 @@ function myMembers(state: RequestStatusType = initialRequestState(), action: Gen
     );
 }
 
+function getChannelTimezones(state: RequestStatusType = initialRequestState(), action: GenericAction): RequestStatusType {
+    return handleRequest(
+        ChannelTypes.GET_CHANNELS_TIMEZONE_REQUEST,
+        ChannelTypes.GET_CHANNELS_TIMEZONE_SUCCESS,
+        ChannelTypes.GET_CHANNELS_TIMEZONE_FAILURE,
+        state,
+        action
+    );
+}
+
 function members(state: RequestStatusType = initialRequestState(), action: GenericAction): RequestStatusType {
     return handleRequest(
         ChannelTypes.CHANNEL_MEMBERS_REQUEST,
@@ -195,7 +205,9 @@ export default combineReducers({
     getChannelStats,
     addChannelMember,
     removeChannelMember,
+    getChannelTimezones,
     updateChannelMember,
     updateChannelScheme,
     updateChannelMemberSchemeRoles,
+
 });

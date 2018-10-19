@@ -633,9 +633,9 @@ export default class Client4 {
         return `${this.getUserRoute(userId)}/image/default`;
     };
 
-    autocompleteUsers = async (name, teamId, channelId) => {
+    autocompleteUsers = async (name, teamId, channelId, options) => {
         return this.doFetch(
-            `${this.getUsersRoute()}/autocomplete${buildQueryString({in_team: teamId, in_channel: channelId, name})}`,
+            `${this.getUsersRoute()}/autocomplete${buildQueryString({in_team: teamId, in_channel: channelId, name, limit: options.limit})}`,
             {method: 'get'}
         );
     };
@@ -1273,6 +1273,13 @@ export default class Client4 {
     getChannelMembers = async (channelId, page = 0, perPage = PER_PAGE_DEFAULT) => {
         return this.doFetch(
             `${this.getChannelMembersRoute(channelId)}${buildQueryString({page, per_page: perPage})}`,
+            {method: 'get'}
+        );
+    };
+
+    getChannelTimezones = async (channelId) => {
+        return this.doFetch(
+            `${this.getChannelRoute(channelId)}/timezones`,
             {method: 'get'}
         );
     };

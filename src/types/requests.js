@@ -23,6 +23,7 @@ export type ChannelsRequestsStatuses = {|
     getChannelStats: RequestStatusType,
     addChannelMember: RequestStatusType,
     removeChannelMember: RequestStatusType,
+    getChannelTimezones: RequestStatusType,
     updateChannelMember: RequestStatusType,
     updateChannelScheme: RequestStatusType,
     updateChannelMemberSchemeRoles: RequestStatusType,
