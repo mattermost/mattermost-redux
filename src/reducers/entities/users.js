@@ -2,7 +2,7 @@
 // See LICENSE.txt for license information.
 
 import {combineReducers} from 'redux';
-import {UserTypes} from 'action_types';
+import {UserTypes, PostTypes} from 'action_types';
 import {profileListToMap} from 'utils/user_utils';
 
 function profilesToSet(state, action) {
@@ -259,6 +259,21 @@ function profilesInChannel(state = {}, action) {
 
     case UserTypes.RECEIVED_PROFILE_NOT_IN_CHANNEL:
         return removeProfileFromSet(state, action);
+
+    // Infer the presence of users in a channel given posts from those users.
+    case PostTypes.RECEIVED_POSTS: {
+        const channelId = action.channelId;
+        const userIds = Object.values(action.data.posts).map((post) => post.user_id);
+
+        // Strictly speaking, a post is not proof that the user is still in the channel: they may
+        // have left. However, if we are viewing a post as such, they are likely to still be
+        // "in context", and are useful to mention as such.
+
+        return profileListToSet(state, {id: channelId,
+            data: userIds.map((userId) => ({
+                id: userId,
+            }))});
+    }
 
     case UserTypes.LOGOUT_SUCCESS:
         return {};
