@@ -455,6 +455,14 @@ function handleUserAddedEvent(msg, dispatch, getState) {
     const {currentUserId} = state.entities.users;
     const teamId = msg.data.team_id;
 
+    dispatch({
+        type: ChannelTypes.CHANNEL_MEMBER_ADDED,
+        data: {
+            channel_id: msg.broadcast.channel_id,
+            user_id: msg.data.user_id,
+        },
+    }, getState);
+
     if (msg.broadcast.channel_id === currentChannelId) {
         getChannelStats(teamId, currentChannelId)(dispatch, getState);
     }
@@ -469,6 +477,14 @@ function handleUserRemovedEvent(msg, dispatch, getState) {
     const {channels, currentChannelId} = state.entities.channels;
     const {currentTeamId} = state.entities.teams;
     const {currentUserId} = state.entities.users;
+
+    dispatch({
+        type: ChannelTypes.CHANNEL_MEMBER_REMOVED,
+        data: {
+            channel_id: msg.broadcast.channel_id,
+            user_id: msg.data.user_id,
+        },
+    }, getState);
 
     if (msg.broadcast.user_id === currentUserId && currentTeamId) {
         fetchMyChannelsAndMembers(currentTeamId)(dispatch, getState);
