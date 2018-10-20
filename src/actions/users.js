@@ -214,7 +214,7 @@ function completeLogin(data: UserProfile): ActionFunc {
             }
         }
         if (roles.size > 0) {
-            dispatch(loadRolesIfNeeded([...roles]));
+            dispatch(loadRolesIfNeeded(roles));
         }
 
         return {data: true};
