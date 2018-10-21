@@ -210,6 +210,17 @@ function isSearchGettingMore(state = false, action) {
     }
 }
 
+function rhsState(state = null, action) {
+    switch (action.type) {
+    case SearchTypes.UPDATE_RHS_STATE:
+        return action.state;
+    // case ActionTypes.SELECT_POST:
+    //     return null;
+    default:
+        return state;
+    }
+}
+
 export default combineReducers({
 
     // An ordered array with posts ids of flagged posts
@@ -233,4 +244,7 @@ export default combineReducers({
 
     // Boolean true if we are getting more search results
     isSearchGettingMore,
+
+    // String/constant that state of RHS window
+    rhsState,
 });

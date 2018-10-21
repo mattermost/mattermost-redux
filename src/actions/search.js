@@ -115,7 +115,17 @@ export function getFlaggedPosts() {
         const userId = getCurrentUserId(state);
         const teamId = getCurrentTeamId(state);
 
-        dispatch({type: SearchTypes.SEARCH_FLAGGED_POSTS_REQUEST}, getState);
+        const preRHSSearchActions = [
+            {
+                type: SearchTypes.SEARCH_FLAGGED_POSTS_REQUEST,
+            },
+            {
+                type: SearchTypes.UPDATE_RHS_STATE,
+                state: 'flag',
+            },
+        ];
+
+        dispatch(batchActions(preRHSSearchActions));
 
         let posts;
         try {

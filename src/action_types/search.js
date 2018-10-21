@@ -22,4 +22,6 @@ export default keyMirror({
     RECEIVED_SEARCH_TERM: null,
     REMOVE_SEARCH_POSTS: null,
     REMOVE_SEARCH_TERM: null,
+
+    UPDATE_RHS_STATE: null,
 });
