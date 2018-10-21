@@ -214,8 +214,11 @@ function rhsState(state = null, action) {
     switch (action.type) {
     case SearchTypes.UPDATE_RHS_STATE:
         return action.state;
+
+    // May be needed later when additional search actions are migrated to redux
     // case ActionTypes.SELECT_POST:
     //     return null;
+
     default:
         return state;
     }
