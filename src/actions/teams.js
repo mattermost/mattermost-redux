@@ -358,6 +358,17 @@ export function getTeamStats(teamId: string): ActionFunc {
     );
 }
 
+export function addUserToTeamFromInvite(token: string, inviteId: string): ActionFunc {
+    return bindClientFunc(
+        Client4.addToTeamFromInvite,
+        TeamTypes.ADD_TO_TEAM_FROM_INVITE_REQUEST,
+        TeamTypes.ADD_TO_TEAM_FROM_INVITE_SUCCESS,
+        TeamTypes.ADD_TO_TEAM_FROM_INVITE_FAILURE,
+        token,
+        inviteId,
+    );
+}
+
 export function addUserToTeam(teamId: string, userId: string): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         dispatch({type: TeamTypes.ADD_TEAM_MEMBER_REQUEST, data: null}, getState);
@@ -534,6 +545,16 @@ export function sendEmailInvitesToTeam(teamId: string, emails: Array<string>): A
         TeamTypes.TEAM_EMAIL_INVITE_FAILURE,
         teamId,
         emails
+    );
+}
+
+export function getTeamInviteInfo(inviteId: string): ActionFunc {
+    return bindClientFunc(
+        Client4.getTeamInviteInfo,
+        TeamTypes.TEAM_INVITE_INFO_REQUEST,
+        TeamTypes.TEAM_INVITE_INFO_SUCCESS,
+        TeamTypes.TEAM_INVITE_INFO_FAILURE,
+        inviteId,
     );
 }
 
