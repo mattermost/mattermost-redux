@@ -59,7 +59,7 @@ export function setPendingRoles(roles: Array<string>) {
     };
 }
 
-export function loadRolesIfNeeded(roles: Array<string>): ActionFunc {
+export function loadRolesIfNeeded(roles: Iterable<string>): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         const state = getState();
         let pendingRoles = new Set();
