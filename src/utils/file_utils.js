@@ -1,11 +1,9 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
 
-import {Files} from 'constants';
+import {Files, General} from 'constants';
 import {Client4} from 'client';
 import mimeDB from 'mime-db';
-
-import {DEFAULT_LOCALE} from 'constants/general';
 
 export function getFormattedFileSize(file) {
     const bytes = file.size;
@@ -88,7 +86,7 @@ export function getFilePreviewUrl(fileId) {
     return `${Client4.getFileRoute(fileId)}/preview`;
 }
 
-export function sortFileInfos(fileInfos = [], locale = DEFAULT_LOCALE) {
+export function sortFileInfos(fileInfos = [], locale = General.DEFAULT_LOCALE) {
     return fileInfos.sort((a, b) => {
         if (a.create_at !== b.create_at) {
             return a.create_at - b.create_at;
