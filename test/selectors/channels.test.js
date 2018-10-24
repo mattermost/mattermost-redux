@@ -877,4 +877,12 @@ describe('Selectors.Channels', () => {
             assert.ok(fromModifiedState.length === 2);
         });
     });
+
+    describe('more_direct_channels selector', () => {
+        it('getChannelsWithUserProfiles', () => {
+            const channelWithUserProfiles = Selectors.getChannelsWithUserProfiles(testState);
+            assert.equal(channelWithUserProfiles.length, 1);
+            assert.equal(channelWithUserProfiles[0].profiles.length, 2);
+        });
+    });
 });

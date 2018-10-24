@@ -45,6 +45,7 @@ import {
     isDefault,
 } from 'utils/channel_utils';
 import {createIdsSelector} from 'utils/helpers';
+import {getUserIdsInChannels} from './users';
 
 export {
     getCurrentChannelId,
@@ -787,3 +788,21 @@ export const filterPostIds = (condition) => {
         }
     );
 };
+
+const getProfiles = (currentUserId, usersIdsInChannel, users) => {
+    return usersIdsInChannel.
+        filter((userId) => userId !== currentUserId).
+        map((userId) => users[userId]);
+};
+export const getChannelsWithUserProfiles = createSelector(
+    getUserIdsInChannels,
+    getUsers,
+    getGroupChannels,
+    getCurrentUserId,
+    (channelUserMap, users, channels, currentUserId) => {
+        return channels.map((channel) => {
+            const profiles = getProfiles(currentUserId, channelUserMap[channel.id], users);
+            return Object.assign({}, channel, {profiles});
+        });
+    }
+);
