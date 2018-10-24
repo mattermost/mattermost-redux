@@ -213,6 +213,21 @@ export const getChannelsInCurrentTeam = createSelector(
     }
 );
 
+export const getChannelsNameMapInTeam = createSelector(
+    getAllChannels,
+    getChannelsInTeam,
+    (state, teamId) => teamId,
+    (channels, channelsInTeams, teamId) => {
+        const channelsInTeam = channelsInTeams[teamId] || [];
+        const channelMap = {};
+        channelsInTeam.forEach((id) => {
+            const channel = channels[id];
+            channelMap[channel.name] = channel;
+        });
+        return channelMap;
+    }
+);
+
 export const getChannelsNameMapInCurrentTeam = createSelector(
     getAllChannels,
     getChannelSetInCurrentTeam,

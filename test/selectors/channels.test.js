@@ -296,6 +296,20 @@ describe('Selectors.Channels', () => {
         assert.deepEqual(Selectors.getChannelsNameMapInCurrentTeam(testState), channelMap);
     });
 
+    it('get channel map for team', () => {
+        const channelMap = {
+            [channel1.name]: channel1,
+            [channel2.name]: channel2,
+            [channel5.name]: channel5,
+            [channel6.name]: channel6,
+            [channel8.name]: channel8,
+            [channel10.name]: channel10,
+            [channel11.name]: channel11,
+        };
+        assert.deepEqual(Selectors.getChannelsNameMapInTeam(testState, team1.id), channelMap);
+        assert.deepEqual(Selectors.getChannelsNameMapInTeam(testState, 'junk'), {});
+    });
+
     it('get channels by category', () => {
         const categories = Selectors.getChannelsByCategory(testState);
         const {
