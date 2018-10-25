@@ -579,13 +579,10 @@ export const getMapAndSortedUnreadChannelIds = createIdsSelector(
 
 export const getSortedUnreadChannelIds = createIdsSelector(
     getUnreadChannelIds,
-    getFavoritesPreferences,
     (state, lastUnreadChannel, unreadsAtTop, favoritesAtTop, sorting = 'alpha') => {
         return getMapAndSortedUnreadChannelIds(state, lastUnreadChannel, sorting);
     },
-    (unreadChannelIds, favoritePreferences, mappedAndSortedUnreadChannelIds) => {
-        return filterChannels(unreadChannelIds, favoritePreferences, mappedAndSortedUnreadChannelIds, false, false);
-    },
+    (unreadChannelIds, mappedAndSortedUnreadChannelIds) => mappedAndSortedUnreadChannelIds,
 );
 
 // Favorites
@@ -1068,11 +1065,8 @@ export const getSortedPrivateChannelWithUnreadsIds = createIdsSelector(
 
 export const getSortedFavoriteChannelWithUnreadsIds = createIdsSelector(
     getUnreadChannelIds,
-    getFavoritesPreferences,
     getFavoriteChannelIds,
-    (unreadChannelIds, favoritePreferences, favoriteChannelIds) => {
-        return filterChannels(unreadChannelIds, favoritePreferences, favoriteChannelIds, false, false);
-    },
+    (unreadChannelIds, favoriteChannelIds) => favoriteChannelIds,
 );
 
 export const getSortedDirectChannelWithUnreadsIds = createIdsSelector(
