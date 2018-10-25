@@ -975,14 +975,6 @@ describe('Selectors.Channels', () => {
             assert.ok(fromModifiedState.length === 2);
         });
 
-    describe('more_direct_channels selector', () => {
-        it('getChannelsWithUserProfiles', () => {
-            const channelWithUserProfiles = Selectors.getChannelsWithUserProfiles(testState);
-            assert.equal(channelWithUserProfiles.length, 1);
-            assert.equal(channelWithUserProfiles[0].profiles.length, 2);
-        });
-    });
-
         it('get ordered channel ids by_type in current team strict equal', () => {
             const chan11 = {...testState.entities.channels.channels[channel11.id]};
             chan11.header = 'This should not change the results';
@@ -1188,6 +1180,14 @@ describe('Selectors.Channels', () => {
 
             assert.notDeepEqual(fromRecencyInChan5State, fromRecencyInChan6State);
             assert.ok(fromRecencyInChan6State[0].items[0] === chan6.id);
+        });
+    });
+
+    describe('more_direct_channels selector', () => {
+        it('getChannelsWithUserProfiles', () => {
+            const channelWithUserProfiles = Selectors.getChannelsWithUserProfiles(testState);
+            assert.equal(channelWithUserProfiles.length, 1);
+            assert.equal(channelWithUserProfiles[0].profiles.length, 2);
         });
     });
 });
