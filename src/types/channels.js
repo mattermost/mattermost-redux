@@ -13,7 +13,8 @@ export type NotifyProps = {|
     desktop: 'default' | 'all' | 'mention' | 'none',
     email: 'default' | 'all' | 'mention' | 'none',
     mark_unread: 'all' | 'mention',
-    push: 'default' | 'all' | 'mention' | 'none'
+    push: 'default' | 'all' | 'mention' | 'none',
+    ignore_channel_mentions: 'default' | 'off' | 'on',
 |};
 
 export type Channel = {|
@@ -31,7 +32,11 @@ export type Channel = {|
     total_msg_count: number,
     extra_update_at: number,
     creator_id: string,
-    scheme_id: string
+    scheme_id: string,
+    isCurrent?: boolean,
+    teammate_id?: string,
+    status?: string,
+    fake?: boolean,
 |};
 
 export type ChannelMembership = {|
