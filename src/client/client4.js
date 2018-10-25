@@ -5,6 +5,7 @@ const FormData = require('form-data');
 
 import fetch from './fetch_etag';
 import {buildQueryString, isMinimumServerVersion} from 'src/utils/helpers';
+import {General} from 'constants';
 
 const HEADER_AUTH = 'Authorization';
 const HEADER_BEARER = 'BEARER';
@@ -633,7 +634,7 @@ export default class Client4 {
         return `${this.getUserRoute(userId)}/image/default`;
     };
 
-    autocompleteUsers = async (name, teamId, channelId, options) => {
+    autocompleteUsers = async (name, teamId, channelId, options = {limit: General.AUTOCOMPLETE_LIMIT_DEFAULT}) => {
         return this.doFetch(
             `${this.getUsersRoute()}/autocomplete${buildQueryString({in_team: teamId, in_channel: channelId, name, limit: options.limit})}`,
             {method: 'get'}
