@@ -544,10 +544,9 @@ export const getUnreadChannels = createIdsSelector(
     getCurrentUser,
     getUsers,
     getAllChannels,
-    getMyChannelMemberships,
     getUnreadChannelIds,
     getTeammateNameDisplaySetting,
-    (currentUser, profiles, channels, myMembers, unreadIds, settings) => {
+    (currentUser, profiles, channels, unreadIds, settings) => {
         // If we receive an unread for a channel and then a mention the channel
         // won't be sorted correctly until we receive a message in another channel
         if (!currentUser) {
