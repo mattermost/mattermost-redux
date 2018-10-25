@@ -554,7 +554,7 @@ export const getUnreadChannels = createIdsSelector(
             return [];
         }
 
-        const allUnreadChannels = unreadIds.filter((id) => channels[id] && channels[id].delete_at !== 0).map((id) => {
+        const allUnreadChannels = unreadIds.filter((id) => channels[id] && channels[id].delete_at === 0).map((id) => {
             const c = channels[id];
 
             if (c.type === General.DM_CHANNEL || c.type === General.GM_CHANNEL) {
