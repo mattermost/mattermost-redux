@@ -4,6 +4,7 @@
 import {createSelector} from 'reselect';
 
 import {getCurrentUserLocale} from 'selectors/entities/i18n';
+import {getPost} from 'selectors/entities/posts';
 
 import {sortFileInfos} from 'utils/file_utils';
 
@@ -25,9 +26,13 @@ export function getFilePublicLink(state) {
 
 export function makeGetFilesForPost() {
     return createSelector(
-        [getAllFiles, getFilesIdsForPost, getCurrentUserLocale],
-        (allFiles, fileIdsForPost, locale) => {
-            const fileInfos = fileIdsForPost.map((id) => allFiles[id]).filter((id) => Boolean(id));
+        [getPost, getAllFiles, getFilesIdsForPost, getCurrentUserLocale],
+        (post, allFiles, fileIdsForPost, locale) => {
+            let fileInfos = post.metadata && post.metadata.files && [...post.metadata.files];
+
+            if (!fileInfos) {
+                fileInfos = fileIdsForPost.map((id) => allFiles[id]).filter((id) => Boolean(id));
+            }
 
             return sortFileInfos(fileInfos, locale);
         }

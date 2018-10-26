@@ -29,9 +29,13 @@ export function getReactionsForPosts(state) {
 
 export function makeGetReactionsForPost() {
     return createSelector(
-        getReactionsForPosts,
         (state, postId) => postId,
-        (reactions, postId) => {
+        getPost,
+        getReactionsForPosts,
+        (postId, post, reactions) => {
+            if (post && post.metadata && post.metadata.reactions) {
+                return post.metadata.reactions;
+            }
             return Object.values(reactions[postId] || {});
         }
     );
