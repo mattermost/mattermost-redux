@@ -947,6 +947,7 @@ export async function getProfilesAndStatusesForPosts(posts, dispatch, getState) 
     const state = getState();
     const {currentUserId, profiles, statuses} = state.entities.users;
 
+    // Statuses and profiles of the users who made the posts
     const userIdsToLoad = new Set();
     const statusesToLoad = new Set();
 
@@ -975,17 +976,15 @@ export async function getProfilesAndStatusesForPosts(posts, dispatch, getState) 
         promises.push(getStatusesByIds(Array.from(statusesToLoad))(dispatch, getState));
     }
 
-    // Do this after firing the other requests as it's more expensive
+    // Profiles of users mentioned in the posts
     const usernamesToLoad = getNeededAtMentionedUsernames(state, posts);
-
-    let emojisToLoad;
-    if (getConfig(state).EnableCustomEmoji === 'true') {
-        emojisToLoad = getNeededCustomEmojis(state, posts);
-    }
 
     if (usernamesToLoad.size > 0) {
         promises.push(getProfilesByUsernames(Array.from(usernamesToLoad))(dispatch, getState));
     }
+
+    // Emojis used in the posts
+    const emojisToLoad = getNeededCustomEmojis(state, posts);
 
     if (emojisToLoad && emojisToLoad.size > 0) {
         promises.push(getCustomEmojisByName(Array.from(emojisToLoad))(dispatch, getState));
@@ -1055,12 +1054,20 @@ function buildPostAttachmentText(attachments) {
 }
 
 export function getNeededCustomEmojis(state, posts) {
+    let customEmojisToLoad = new Set();
+
+    if (getConfig(state).EnableCustomEmoji !== 'true') {
+        return customEmojisToLoad;
+    }
+
     let customEmojisByName; // Populate this lazily since it's relatively expensive
     const nonExistentEmoji = state.entities.emojis.nonExistentEmoji;
 
-    let customEmojisToLoad = new Set();
-
     Object.values(posts).forEach((post) => {
+        if (post.metadata) {
+            return;
+        }
+
         if (post.message.includes(':')) {
             if (!customEmojisByName) {
                 customEmojisByName = selectCustomEmojisByName(state);
