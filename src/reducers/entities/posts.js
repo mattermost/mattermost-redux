@@ -6,7 +6,7 @@ import {Posts} from 'constants';
 import {comparePosts, combineSystemPosts} from 'utils/post_utils';
 
 function handleReceivedPost(posts = {}, postsInChannel = {}, postsInThread = {}, action) {
-    const post = action.data;
+    const post = removeUnneededMetadata(action.data);
     const channelId = post.channel_id;
 
     const nextPosts = {
@@ -94,7 +94,9 @@ function handleReceivedPosts(posts = {}, postsInChannel = {}, postsInThread = {}
     const nextPostsInThread = {...postsInThread};
     const postsForChannel = postsInChannel[channelId] ? [...postsInChannel[channelId]] : [];
 
-    for (const newPost of Object.values(newPosts)) {
+    for (const post of Object.values(newPosts)) {
+        const newPost = removeUnneededMetadata(post);
+
         if (newPost.delete_at > 0) {
             // Mark the post as deleted if we have it
             if (nextPosts[newPost.id]) {
@@ -156,6 +158,23 @@ function handleReceivedPosts(posts = {}, postsInChannel = {}, postsInThread = {}
     nextPostsInChannel[channelId] = withCombineSystemPosts.postsForChannel;
 
     return {posts: withCombineSystemPosts.nextPosts, postsInChannel: nextPostsInChannel, postsInThread: nextPostsInThread};
+}
+
+export function removeUnneededMetadata(post) {
+    if (!post.metadata || (!post.metadata.emojis && !post.metadata.files)) {
+        return post;
+    }
+
+    const metadata = {...post.metadata};
+
+    // These fields are stored separately
+    Reflect.deleteProperty(metadata, 'emojis');
+    Reflect.deleteProperty(metadata, 'files');
+
+    return {
+        ...post,
+        metadata,
+    };
 }
 
 function handlePendingPosts(pendingPostIds = [], action) {
@@ -363,7 +382,7 @@ function handlePosts(posts = {}, postsInChannel = {}, postsInThread = {}, action
     switch (action.type) {
     case PostTypes.RECEIVED_POST: {
         const nextPosts = {...posts};
-        nextPosts[action.data.id] = action.data;
+        nextPosts[action.data.id] = removeUnneededMetadata(action.data);
         return {
             posts: nextPosts,
             postsInChannel,
