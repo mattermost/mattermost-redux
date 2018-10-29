@@ -10,6 +10,7 @@ import {
 } from 'action_types';
 
 import type {CustomEmoji} from '../../types/emojis';
+import type {Post} from '../../types/posts';
 import type {GenericAction} from '../../types/actions';
 
 export function customEmoji(state: {[string]: CustomEmoji} = {}, action: GenericAction): {[string]: CustomEmoji} {
@@ -37,14 +38,14 @@ export function customEmoji(state: {[string]: CustomEmoji} = {}, action: Generic
 
     case PostTypes.RECEIVED_NEW_POST:
     case PostTypes.RECEIVED_POST: {
-        const post = action.data;
+        const post: Post = action.data;
 
         return storeEmojisForPost(state, post);
     }
     case PostTypes.RECEIVED_POSTS: {
         const posts = Object.values(action.data.posts);
 
-        return posts.reduce(storeEmojisForPost, state);
+        return (posts: any).reduce(storeEmojisForPost, state); // Cast to any to avoid typing problems caused by Object.values
     }
 
     default:
@@ -52,7 +53,7 @@ export function customEmoji(state: {[string]: CustomEmoji} = {}, action: Generic
     }
 }
 
-function storeEmojisForPost(state, post) {
+function storeEmojisForPost(state: {[string]: CustomEmoji}, post: Post) {
     if (!post.metadata || !post.metadata.emojis) {
         return state;
     }
