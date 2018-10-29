@@ -869,7 +869,7 @@ export function getUserAudits(userId: string, page: number = 0, perPage: number 
     );
 }
 
-export function autocompleteUsers(term: string, teamId: string = '', channelId: string = '', options: {|limit: number|} = {limit: 25}): ActionFunc {
+export function autocompleteUsers(term: string, teamId: string = '', channelId: string = '', options: {|limit: number|} = {limit: General.AUTOCOMPLETE_LIMIT_DEFAULT}): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         dispatch({type: UserTypes.AUTOCOMPLETE_USERS_REQUEST, data: null}, getState);
 
