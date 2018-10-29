@@ -18,6 +18,8 @@ const state: GlobalState = {
         },
         users: {
             currentUserId: '',
+            myAcceptedTermsOfServiceId: '',
+            myTermsOfServiceAcceptedAt: 0,
             mySessions: [],
             myAudits: [],
             profiles: {},
@@ -351,6 +353,22 @@ const state: GlobalState = {
                 error: null,
             },
             getSessions: {
+                status: 'not_started',
+                error: null,
+            },
+            getTermsOfService: {
+                status: 'not_started',
+                error: null,
+            },
+            createTermsOfService: {
+                status: 'not_started',
+                error: null,
+            },
+            getMyTermsOfServiceStatus: {
+                status: 'not_started',
+                error: null,
+            },
+            updateMyTermsOfServiceStatus: {
                 status: 'not_started',
                 error: null,
             },

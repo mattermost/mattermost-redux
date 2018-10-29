@@ -318,11 +318,21 @@ function switchLogin(state: RequestStatusType = initialRequestState(), action: G
     );
 }
 
-function updateTermsOfServiceStatus(state: RequestStatusType = initialRequestState(), action: GenericAction): RequestStatusType {
+function getMyTermsOfServiceStatus(state: RequestStatusType = initialRequestState(), action: GenericAction): RequestStatusType {
     return handleRequest(
-        UserTypes.UPDATE_TERMS_OF_SERVICE_STATUS_REQUEST,
-        UserTypes.UPDATE_TERMS_OF_SERVICE_STATUS_SUCCESS,
-        UserTypes.UPDATE_TERMS_OF_SERVICE_STATUS_FAILURE,
+        UserTypes.GET_MY_TERMS_OF_SERVICE_STATUS_REQUEST,
+        UserTypes.GET_MY_TERMS_OF_SERVICE_STATUS_SUCCESS,
+        UserTypes.GET_MY_TERMS_OF_SERVICE_STATUS_FAILURE,
+        state,
+        action
+    );
+}
+
+function updateMyTermsOfServiceStatus(state: RequestStatusType = initialRequestState(), action: GenericAction): RequestStatusType {
+    return handleRequest(
+        UserTypes.UPDATE_MY_TERMS_OF_SERVICE_STATUS_REQUEST,
+        UserTypes.UPDATE_MY_TERMS_OF_SERVICE_STATUS_SUCCESS,
+        UserTypes.UPDATE_MY_TERMS_OF_SERVICE_STATUS_FAILURE,
         state,
         action
     );
@@ -429,7 +439,8 @@ export default combineReducers({
     switchLogin,
     getTermsOfService,
     createTermsOfService,
-    updateTermsOfServiceStatus,
+    getMyTermsOfServiceStatus,
+    updateMyTermsOfServiceStatus,
     createUserAccessToken,
     getUserAccessToken,
     revokeUserAccessToken,
