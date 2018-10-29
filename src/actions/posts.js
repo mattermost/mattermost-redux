@@ -938,8 +938,10 @@ export function getPostsAfterWithRetry(channelId, postId, page = 0, perPage = Po
 }
 
 // Note that getProfilesAndStatusesForPosts can take either an array of posts or a map of ids to posts
-export async function getProfilesAndStatusesForPosts(posts, dispatch, getState) {
-    if (!posts) {
+export async function getProfilesAndStatusesForPosts(postsArrayOrMap, dispatch, getState) {
+    const posts = Object.values(postsArrayOrMap);
+
+    if (!posts || posts.length === 0) {
         // Some API methods return {error} for no results
         return Promise.resolve();
     }
@@ -998,7 +1000,7 @@ export function getNeededAtMentionedUsernames(state, posts) {
 
     const usernamesToLoad = new Set();
 
-    Object.values(posts).forEach((post) => {
+    posts.forEach((post) => {
         if (!post.message.includes('@')) {
             return;
         }
@@ -1054,20 +1056,21 @@ function buildPostAttachmentText(attachments) {
 }
 
 export function getNeededCustomEmojis(state, posts) {
-    let customEmojisToLoad = new Set();
-
     if (getConfig(state).EnableCustomEmoji !== 'true') {
-        return customEmojisToLoad;
+        return new Set();
     }
+
+    // If post metadata is supported, custom emojis will have been provided as part of that
+    if (posts[0].metadata) {
+        return new Set();
+    }
+
+    let customEmojisToLoad = new Set();
 
     let customEmojisByName; // Populate this lazily since it's relatively expensive
     const nonExistentEmoji = state.entities.emojis.nonExistentEmoji;
 
-    Object.values(posts).forEach((post) => {
-        if (post.metadata) {
-            return;
-        }
-
+    posts.forEach((post) => {
         if (post.message.includes(':')) {
             if (!customEmojisByName) {
                 customEmojisByName = selectCustomEmojisByName(state);
