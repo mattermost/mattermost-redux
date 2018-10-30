@@ -59,6 +59,7 @@ export function canDeletePost(state, config, license, teamId, channelId, userId,
         return canDelete;
     }
 
+    // Backwards compatibility with pre-advanced permissions config settings.
     if (license.IsLicensed === 'true') {
         return (config.RestrictPostDelete === General.PERMISSIONS_ALL && (isOwner || isAdmin)) ||
             (config.RestrictPostDelete === General.PERMISSIONS_TEAM_ADMIN && isAdmin) ||
@@ -88,6 +89,7 @@ export function canEditPost(state, config, license, teamId, channelId, userId, p
             }
         }
     } else {
+        // Backwards compatibility with pre-advanced permissions config settings.
         canEdit = isOwner && config.AllowEditPost !== 'never';
         if (config.AllowEditPost === General.ALLOW_EDIT_POST_TIME_LIMIT) {
             const timeLeft = (post.create_at + (config.PostEditTimeLimit * 1000)) - Date.now();
@@ -98,19 +100,6 @@ export function canEditPost(state, config, license, teamId, channelId, userId, p
     }
 
     return canEdit;
-}
-
-export function editDisable(state, config, license, teamId, channelId, userId, post, editDisableAction) {
-    const canEdit = canEditPost(state, config, license, teamId, channelId, userId, post);
-
-    if (canEdit && license.IsLicensed === 'true') {
-        if (config.AllowEditPost === General.ALLOW_EDIT_POST_TIME_LIMIT || (config.PostEditTimeLimit !== -1 && config.PostEditTimeLimit !== '-1')) {
-            const timeLeft = (post.create_at + (config.PostEditTimeLimit * 1000)) - Date.now();
-            if (timeLeft > 0) {
-                editDisableAction.fireAfter(timeLeft + 1000);
-            }
-        }
-    }
 }
 
 export function getLastCreateAt(postsArray) {
