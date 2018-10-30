@@ -124,7 +124,7 @@ function samlCertStatus(state = {}, action) {
     }
 }
 
-function convertAnalyticsRowsToStats(data, name) {
+export function convertAnalyticsRowsToStats(data, name) {
     const stats = {};
     const clonedData = [...data];
 
