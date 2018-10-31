@@ -1,5 +1,6 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
+// @flow
 
 import {batchActions} from 'redux-batched-actions';
 
@@ -20,9 +21,16 @@ import {deletePreferences, savePreferences} from './preferences';
 import {getProfilesByIds, getProfilesByUsernames, getStatusesByIds} from './users';
 import {systemEmojis, getCustomEmojiByName, getCustomEmojisByName} from './emojis';
 
-export function getPost(postId) {
+import type {DispatchFunc, GetStateFunc, ActionFunc} from '../types/actions';
+import type {Post} from '../types/posts';
+import type {FileInfo} from '../types/files';
+import type {PreferenceType} from '../types/preferences';
+import type {GlobalState} from '../types/store';
+
+
+export function getPost(postId: string): ActionFunc {
     return async (dispatch, getState) => {
-        dispatch({type: PostTypes.GET_POSTS_REQUEST}, getState);
+        dispatch({type: PostTypes.GET_POSTS_REQUEST, data: null}, getState);
         let post;
 
         try {
@@ -51,7 +59,7 @@ export function getPost(postId) {
     };
 }
 
-export function createPost(post, files = []) {
+export function createPost(post: Post, files: Array<FileInfo> = []): ActionFunc {
     return async (dispatch, getState) => {
         const state = getState();
         const currentUserId = state.entities.users.currentUserId;
@@ -162,7 +170,7 @@ export function createPost(post, files = []) {
     };
 }
 
-export function createPostImmediately(post, files = []) {
+export function createPostImmediately(post: Post, files: Array<FileInfo> = []): ActionFunc {
     return async (dispatch, getState) => {
         const state = getState();
         const currentUserId = state.entities.users.currentUserId;
@@ -246,7 +254,7 @@ export function resetCreatePostRequest() {
     return {type: PostTypes.CREATE_POST_RESET_REQUEST};
 }
 
-export function deletePost(post) {
+export function deletePost(post: Post): ActionFunc {
     return async (dispatch, getState) => {
         const state = getState();
         const delPost = {...post};
@@ -283,7 +291,7 @@ export function deletePost(post) {
     };
 }
 
-export function editPost(post) {
+export function editPost(post: Post) {
     return bindClientFunc(
         Client4.patchPost,
         PostTypes.EDIT_POST_REQUEST,
@@ -293,9 +301,9 @@ export function editPost(post) {
     );
 }
 
-export function pinPost(postId) {
+export function pinPost(postId: string): ActionFunc {
     return async (dispatch, getState) => {
-        dispatch({type: PostTypes.EDIT_POST_REQUEST}, getState);
+        dispatch({type: PostTypes.EDIT_POST_REQUEST, data: null}, getState);
         let posts;
 
         try {
@@ -331,9 +339,9 @@ export function pinPost(postId) {
     };
 }
 
-export function unpinPost(postId) {
+export function unpinPost(postId: string): ActionFunc {
     return async (dispatch, getState) => {
-        dispatch({type: PostTypes.EDIT_POST_REQUEST}, getState);
+        dispatch({type: PostTypes.EDIT_POST_REQUEST, data: null}, getState);
         let posts;
 
         try {
@@ -369,9 +377,9 @@ export function unpinPost(postId) {
     };
 }
 
-export function addReaction(postId, emojiName) {
+export function addReaction(postId: string, emojiName: string): ActionFunc {
     return async (dispatch, getState) => {
-        dispatch({type: PostTypes.REACTION_REQUEST}, getState);
+        dispatch({type: PostTypes.REACTION_REQUEST, data: null}, getState);
 
         const currentUserId = getState().entities.users.currentUserId;
 
@@ -401,9 +409,9 @@ export function addReaction(postId, emojiName) {
     };
 }
 
-export function removeReaction(postId, emojiName) {
+export function removeReaction(postId: string, emojiName: string): ActionFunc {
     return async (dispatch, getState) => {
-        dispatch({type: PostTypes.REACTION_REQUEST}, getState);
+        dispatch({type: PostTypes.REACTION_REQUEST, data: null}, getState);
 
         const currentUserId = getState().entities.users.currentUserId;
 
@@ -432,7 +440,7 @@ export function removeReaction(postId, emojiName) {
     };
 }
 
-export function getCustomEmojiForReaction(name) {
+export function getCustomEmojiForReaction(name: string): ActionFunc {
     return async (dispatch, getState) => {
         const nonExistentEmoji = getState().entities.emojis.nonExistentEmoji;
         const customEmojisByName = selectCustomEmojisByName(getState());
@@ -453,9 +461,9 @@ export function getCustomEmojiForReaction(name) {
     };
 }
 
-export function getReactionsForPost(postId) {
+export function getReactionsForPost(postId: string): ActionFunc {
     return async (dispatch, getState) => {
-        dispatch({type: PostTypes.REACTION_REQUEST}, getState);
+        dispatch({type: PostTypes.REACTION_REQUEST, data: null}, getState);
 
         let reactions;
         try {
@@ -513,7 +521,7 @@ export function getReactionsForPost(postId) {
     };
 }
 
-export function flagPost(postId) {
+export function flagPost(postId: string): ActionFunc {
     return async (dispatch, getState) => {
         const {currentUserId} = getState().entities.users;
         const preference = {
@@ -525,13 +533,13 @@ export function flagPost(postId) {
 
         Client4.trackEvent('action', 'action_posts_flag');
 
-        return savePreferences(currentUserId, [preference])(dispatch, getState);
+        return savePreferences(currentUserId, [preference])(dispatch);
     };
 }
 
-export function getPostThread(postId, skipAddToChannel = true) {
+export function getPostThread(postId: string, skipAddToChannel: boolean = true): ActionFunc {
     return async (dispatch, getState) => {
-        dispatch({type: PostTypes.GET_POST_THREAD_REQUEST}, getState);
+        dispatch({type: PostTypes.GET_POST_THREAD_REQUEST, data: null}, getState);
 
         let posts;
         try {
@@ -564,10 +572,11 @@ export function getPostThread(postId, skipAddToChannel = true) {
     };
 }
 
-export function getPostThreadWithRetry(postId) {
+export function getPostThreadWithRetry(postId: string): ActionFunc {
     return async (dispatch, getState) => {
         dispatch({
             type: PostTypes.GET_POST_THREAD_REQUEST,
+            data: null
         });
 
         dispatch({
@@ -598,6 +607,7 @@ export function getPostThreadWithRetry(postId) {
                     onRetryScheduled: () => {
                         dispatch({
                             type: PostTypes.GET_POST_THREAD_WITH_RETRY_ATTEMPT,
+                            data: null
                         });
                     },
                     rollback: (success, error) => {
@@ -615,9 +625,9 @@ export function getPostThreadWithRetry(postId) {
     };
 }
 
-export function getPosts(channelId, page = 0, perPage = Posts.POST_CHUNK_SIZE) {
+export function getPosts(channelId: string, page: number = 0, perPage: number = Posts.POST_CHUNK_SIZE): ActionFunc {
     return async (dispatch, getState) => {
-        dispatch({type: PostTypes.GET_POSTS_REQUEST}, getState);
+        dispatch({type: PostTypes.GET_POSTS_REQUEST, data: null}, getState);
         let posts;
 
         try {
@@ -647,10 +657,11 @@ export function getPosts(channelId, page = 0, perPage = Posts.POST_CHUNK_SIZE) {
     };
 }
 
-export function getPostsWithRetry(channelId, page = 0, perPage = Posts.POST_CHUNK_SIZE) {
+export function getPostsWithRetry(channelId: string, page: number = 0, perPage: number = Posts.POST_CHUNK_SIZE): ActionFunc {
     return async (dispatch, getState) => {
         dispatch({
             type: PostTypes.GET_POSTS_REQUEST,
+            data: null,
         });
 
         dispatch({
@@ -679,6 +690,7 @@ export function getPostsWithRetry(channelId, page = 0, perPage = Posts.POST_CHUN
                     onRetryScheduled: () => {
                         dispatch({
                             type: PostTypes.GET_POSTS_WITH_RETRY_ATTEMPT,
+                            data: null,
                         });
                     },
                     rollback: (success, error) => {
@@ -696,9 +708,9 @@ export function getPostsWithRetry(channelId, page = 0, perPage = Posts.POST_CHUN
     };
 }
 
-export function getPostsSince(channelId, since) {
+export function getPostsSince(channelId: string, since: number): ActionFunc {
     return async (dispatch, getState) => {
-        dispatch({type: PostTypes.GET_POSTS_SINCE_REQUEST}, getState);
+        dispatch({type: PostTypes.GET_POSTS_SINCE_REQUEST, data: null}, getState);
 
         let posts;
         try {
@@ -728,9 +740,9 @@ export function getPostsSince(channelId, since) {
     };
 }
 
-export function getPostsSinceWithRetry(channelId, since) {
+export function getPostsSinceWithRetry(channelId: string, since: number): ActionFunc {
     return async (dispatch, getState) => {
-        dispatch({type: PostTypes.GET_POSTS_SINCE_REQUEST}, getState);
+        dispatch({type: PostTypes.GET_POSTS_SINCE_REQUEST, data: null}, getState);
 
         dispatch({
             type: PostTypes.GET_POSTS_SINCE_WITH_RETRY_ATTEMPT,
@@ -758,6 +770,7 @@ export function getPostsSinceWithRetry(channelId, since) {
                     onRetryScheduled: () => {
                         dispatch({
                             type: PostTypes.GET_POSTS_SINCE_WITH_RETRY_ATTEMPT,
+                            data: null,
                         });
                     },
                     rollback: (success, error) => {
@@ -775,9 +788,9 @@ export function getPostsSinceWithRetry(channelId, since) {
     };
 }
 
-export function getPostsBefore(channelId, postId, page = 0, perPage = Posts.POST_CHUNK_SIZE) {
+export function getPostsBefore(channelId: string, postId: string, page: number = 0, perPage: number = Posts.POST_CHUNK_SIZE): ActionFunc {
     return async (dispatch, getState) => {
-        dispatch({type: PostTypes.GET_POSTS_BEFORE_REQUEST}, getState);
+        dispatch({type: PostTypes.GET_POSTS_BEFORE_REQUEST, data: null}, getState);
 
         let posts;
         try {
@@ -807,10 +820,11 @@ export function getPostsBefore(channelId, postId, page = 0, perPage = Posts.POST
     };
 }
 
-export function getPostsBeforeWithRetry(channelId, postId, page = 0, perPage = Posts.POST_CHUNK_SIZE) {
+export function getPostsBeforeWithRetry(channelId: string, postId: string, page: number = 0, perPage: number = Posts.POST_CHUNK_SIZE): ActionFunc {
     return async (dispatch, getState) => {
         dispatch({
             type: PostTypes.GET_POSTS_BEFORE_REQUEST,
+            data: null,
         });
 
         dispatch({
@@ -839,6 +853,7 @@ export function getPostsBeforeWithRetry(channelId, postId, page = 0, perPage = P
                     onRetryScheduled: () => {
                         dispatch({
                             type: PostTypes.GET_POSTS_BEFORE_WITH_RETRY_ATTEMPT,
+                            data: null,
                         });
                     },
                     rollback: (success, error) => {
@@ -856,9 +871,9 @@ export function getPostsBeforeWithRetry(channelId, postId, page = 0, perPage = P
     };
 }
 
-export function getPostsAfter(channelId, postId, page = 0, perPage = Posts.POST_CHUNK_SIZE) {
+export function getPostsAfter(channelId: string, postId: string, page: number = 0, perPage: number = Posts.POST_CHUNK_SIZE): ActionFunc {
     return async (dispatch, getState) => {
-        dispatch({type: PostTypes.GET_POSTS_AFTER_REQUEST}, getState);
+        dispatch({type: PostTypes.GET_POSTS_AFTER_REQUEST, data: null}, getState);
 
         let posts;
         try {
@@ -888,10 +903,11 @@ export function getPostsAfter(channelId, postId, page = 0, perPage = Posts.POST_
     };
 }
 
-export function getPostsAfterWithRetry(channelId, postId, page = 0, perPage = Posts.POST_CHUNK_SIZE) {
+export function getPostsAfterWithRetry(channelId: string, postId: string, page: number = 0, perPage: number = Posts.POST_CHUNK_SIZE): ActionFunc {
     return async (dispatch, getState) => {
         dispatch({
             type: PostTypes.GET_POSTS_AFTER_REQUEST,
+            data: null,
         });
 
         dispatch({
@@ -920,6 +936,7 @@ export function getPostsAfterWithRetry(channelId, postId, page = 0, perPage = Po
                     onRetryScheduled: () => {
                         dispatch({
                             type: PostTypes.GET_POSTS_AFTER_WITH_RETRY_ATTEMPT,
+                            data: null,
                         });
                     },
                     rollback: (success, error) => {
@@ -938,7 +955,7 @@ export function getPostsAfterWithRetry(channelId, postId, page = 0, perPage = Po
 }
 
 // Note that getProfilesAndStatusesForPosts can take either an array of posts or a map of ids to posts
-export async function getProfilesAndStatusesForPosts(posts, dispatch, getState) {
+export async function getProfilesAndStatusesForPosts(posts: Array<Post>, dispatch: DispatchFunc, getState: GetStateFunc) {
     if (!posts) {
         // Some API methods return {error} for no results
         return Promise.resolve();
@@ -951,6 +968,8 @@ export async function getProfilesAndStatusesForPosts(posts, dispatch, getState) 
     const statusesToLoad = new Set();
 
     Object.values(posts).forEach((post) => {
+        // https://github.com/facebook/flow/issues/2221
+        // $FlowFixMe - Object.values currently does not have good flow support
         const userId = post.user_id;
 
         if (!statuses[userId]) {
@@ -994,13 +1013,16 @@ export async function getProfilesAndStatusesForPosts(posts, dispatch, getState) 
     return Promise.all(promises);
 }
 
-export function getNeededAtMentionedUsernames(state, posts) {
+export function getNeededAtMentionedUsernames(state: GlobalState, posts: Array<Post>) {
     let usersByUsername; // Populate this lazily since it's relatively expensive
 
-    const usernamesToLoad = new Set();
+    const usernamesToLoad: Set<string> = new Set();
 
     Object.values(posts).forEach((post) => {
-        if (!post.message.includes('@')) {
+        // https://github.com/facebook/flow/issues/2221
+        // $FlowFixMe - Object.values currently does not have good flow support
+        const message = post.message;
+        if (!message.includes('@')) {
             return;
         }
 
@@ -1011,7 +1033,7 @@ export function getNeededAtMentionedUsernames(state, posts) {
         const pattern = /\B@(([a-z0-9_.-]*[a-z0-9_])[.-]*)/gi;
 
         let match;
-        while ((match = pattern.exec(post.message)) !== null) {
+        while ((match = pattern.exec(message)) !== null) {
             // match[1] is the matched mention including trailing punctuation
             // match[2] is the matched mention without trailing punctuation
             if (General.SPECIAL_MENTIONS.indexOf(match[2]) !== -1) {
@@ -1054,25 +1076,30 @@ function buildPostAttachmentText(attachments) {
     return attachmentText;
 }
 
-export function getNeededCustomEmojis(state, posts) {
+export function getNeededCustomEmojis(state: GlobalState, posts: Array<Post>) {
     let customEmojisByName; // Populate this lazily since it's relatively expensive
     const nonExistentEmoji = state.entities.emojis.nonExistentEmoji;
 
-    let customEmojisToLoad = new Set();
+    let customEmojisToLoad: Set<string> = new Set();
 
     Object.values(posts).forEach((post) => {
-        if (post.message.includes(':')) {
+        // https://github.com/facebook/flow/issues/2221
+        // $FlowFixMe - Object.values currently does not have good flow support
+        const message = post.message;
+        if (message.includes(':')) {
             if (!customEmojisByName) {
                 customEmojisByName = selectCustomEmojisByName(state);
             }
 
-            const emojisFromPost = parseNeededCustomEmojisFromText(post.message, systemEmojis, customEmojisByName, nonExistentEmoji);
+            const emojisFromPost = parseNeededCustomEmojisFromText(message, systemEmojis, customEmojisByName, nonExistentEmoji);
 
             if (emojisFromPost.size > 0) {
                 customEmojisToLoad = new Set([...customEmojisToLoad, ...emojisFromPost]);
             }
         }
 
+        // https://github.com/facebook/flow/issues/2221
+        // $FlowFixMe - Object.values currently does not have good flow support
         const props = post.props;
         if (props && props.attachments && props.attachments.length) {
             if (!customEmojisByName) {
@@ -1094,7 +1121,7 @@ export function getNeededCustomEmojis(state, posts) {
     return customEmojisToLoad;
 }
 
-export function removePost(post) {
+export function removePost(post: Post): ActionFunc {
     return async (dispatch, getState) => {
         dispatch({
             type: PostTypes.REMOVE_POST,
@@ -1105,7 +1132,7 @@ export function removePost(post) {
     };
 }
 
-export function selectPost(postId) {
+export function selectPost(postId: string): ActionFunc {
     return async (dispatch, getState) => {
         dispatch({
             type: PostTypes.RECEIVED_POST_SELECTED,
@@ -1116,17 +1143,17 @@ export function selectPost(postId) {
     };
 }
 
-export function selectFocusedPostId(postId) {
+export function selectFocusedPostId(postId: string) {
     return {
         type: PostTypes.RECEIVED_FOCUSED_POST,
         data: postId,
     };
 }
 
-export function unflagPost(postId) {
+export function unflagPost(postId: string): ActionFunc {
     return async (dispatch, getState) => {
         const {currentUserId} = getState().entities.users;
-        const preference = {
+        const preference: PreferenceType = {
             user_id: currentUserId,
             category: Preferences.CATEGORY_FLAGGED_POST,
             name: postId,
@@ -1138,9 +1165,9 @@ export function unflagPost(postId) {
     };
 }
 
-export function getOpenGraphMetadata(url) {
+export function getOpenGraphMetadata(url: string): ActionFunc {
     return async (dispatch, getState) => {
-        dispatch({type: PostTypes.OPEN_GRAPH_REQUEST}, getState);
+        dispatch({type: PostTypes.OPEN_GRAPH_REQUEST, data: null}, getState);
 
         let data;
         try {
@@ -1172,7 +1199,7 @@ export function getOpenGraphMetadata(url) {
     };
 }
 
-export function doPostAction(postId, actionId, selectedOption = '') {
+export function doPostAction(postId: string, actionId: string, selectedOption: string = '') {
     return bindClientFunc(
         Client4.doPostAction,
         PostTypes.DO_POST_ACTION_REQUEST,
@@ -1184,7 +1211,7 @@ export function doPostAction(postId, actionId, selectedOption = '') {
     );
 }
 
-export function addMessageIntoHistory(message) {
+export function addMessageIntoHistory(message: string): ActionFunc {
     return async (dispatch, getState) => {
         dispatch({
             type: PostTypes.ADD_MESSAGE_INTO_HISTORY,
@@ -1195,7 +1222,7 @@ export function addMessageIntoHistory(message) {
     };
 }
 
-export function resetHistoryIndex(index) {
+export function resetHistoryIndex(index: string): ActionFunc {
     return async (dispatch, getState) => {
         dispatch({
             type: PostTypes.RESET_HISTORY_INDEX,
@@ -1206,7 +1233,7 @@ export function resetHistoryIndex(index) {
     };
 }
 
-export function moveHistoryIndexBack(index) {
+export function moveHistoryIndexBack(index: string): ActionFunc {
     return async (dispatch, getState) => {
         dispatch({
             type: PostTypes.MOVE_HISTORY_INDEX_BACK,
@@ -1217,7 +1244,7 @@ export function moveHistoryIndexBack(index) {
     };
 }
 
-export function moveHistoryIndexForward(index) {
+export function moveHistoryIndexForward(index: string): ActionFunc {
     return async (dispatch, getState) => {
         dispatch({
             type: PostTypes.MOVE_HISTORY_INDEX_FORWARD,

@@ -31,7 +31,9 @@ export type Post = {|
     type: PostType,
     props: Object,
     hashtags: string,
-    pending_post_id: string
+    pending_post_id: string,
+    failed: boolean,
+    file_ids: Array<string>
 |}
 
 export type PostsState = {|

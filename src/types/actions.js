@@ -20,7 +20,12 @@ type BatchAction = {
     payload: Array<GenericAction>;
 }
 
-type Action = GenericAction | Thunk | BatchAction
+export type PostAction = {
+    ...GenericAction,
+    postId?: string
+}
+
+type Action = GenericAction | Thunk | BatchAction | PostAction
 
 export type ActionResult = {|data: any|} | {|error: any|};
 export type DispatchFunc = (Action, ?GetStateFunc) => Promise<ActionResult>;
