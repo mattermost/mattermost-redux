@@ -44,7 +44,8 @@ export type ChannelMembership = {|
     notify_props: NotifyProps,
     last_update_at: number,
     scheme_user: boolean,
-    scheme_admin: boolean
+    scheme_admin: boolean,
+    post_root_id?: string
 |}
 
 export type ChannelsState = {|
