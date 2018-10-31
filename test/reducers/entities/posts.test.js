@@ -4,7 +4,10 @@
 import assert from 'assert';
 
 import {PostTypes} from 'action_types';
-import postsReducer, {removeUnneededMetadata} from 'reducers/entities/posts';
+import postsReducer, {
+    reactions as reactionsReducer,
+    removeUnneededMetadata,
+} from 'reducers/entities/posts';
 import deepFreeze from 'utils/deep_freeze';
 
 describe('Reducers.posts', () => {
@@ -321,6 +324,207 @@ describe('Reducers.posts', () => {
             assert.deepEqual(nextPost, {
                 id: 'post',
                 metadata: {},
+            });
+        });
+
+        it('should remove reactions', () => {
+            const post = deepFreeze({
+                id: 'post',
+                metadata: {
+                    reactions: [
+                        {user_id: 'abcd', emoji_name: '+1'},
+                        {user_id: 'efgh', emoji_name: '+1'},
+                        {user_id: 'abcd', emoji_name: '-1'},
+                    ],
+                },
+            });
+
+            const nextPost = removeUnneededMetadata(post);
+
+            assert.notEqual(nextPost, post);
+            assert.deepEqual(nextPost, {
+                id: 'post',
+                metadata: {},
+            });
+        });
+    });
+
+    describe('reactions', () => {
+        const testForSinglePost = (actionType) => () => {
+            it('no post metadata', () => {
+                const state = deepFreeze({});
+                const action = {
+                    type: actionType,
+                    data: {
+                        id: 'post',
+                    },
+                };
+
+                const nextState = reactionsReducer(state, action);
+
+                assert.equal(nextState, state);
+            });
+
+            it('no reactions in post metadata', () => {
+                const state = deepFreeze({});
+                const action = {
+                    type: actionType,
+                    data: {
+                        id: 'post',
+                        metadata: {},
+                    },
+                };
+
+                const nextState = reactionsReducer(state, action);
+
+                assert.notEqual(nextState, state);
+                assert.deepEqual(nextState, {
+                    post: {},
+                });
+            });
+
+            it('should save reactions', () => {
+                const state = deepFreeze({});
+                const action = {
+                    type: actionType,
+                    data: {
+                        id: 'post',
+                        metadata: {
+                            reactions: [
+                                {user_id: 'abcd', emoji_name: '+1'},
+                                {user_id: 'efgh', emoji_name: '+1'},
+                                {user_id: 'abcd', emoji_name: '-1'},
+                            ],
+                        },
+                    },
+                };
+
+                const nextState = reactionsReducer(state, action);
+
+                assert.notEqual(nextState, state);
+                assert.deepEqual(nextState, {
+                    post: {
+                        'abcd-+1': {user_id: 'abcd', emoji_name: '+1'},
+                        'efgh-+1': {user_id: 'efgh', emoji_name: '+1'},
+                        'abcd--1': {user_id: 'abcd', emoji_name: '-1'},
+                    },
+                });
+            });
+        };
+
+        describe('RECEIVED_NEW_POST', testForSinglePost(PostTypes.RECEIVED_NEW_POST));
+        describe('RECEIVED_POST', testForSinglePost(PostTypes.RECEIVED_POST));
+
+        describe('RECEIVED_POSTS', () => {
+            it('no post metadata', () => {
+                const state = deepFreeze({});
+                const action = {
+                    type: PostTypes.RECEIVED_POSTS,
+                    data: {
+                        posts: {
+                            post: {
+                                id: 'post',
+                            },
+                        },
+                    },
+                };
+
+                const nextState = reactionsReducer(state, action);
+
+                assert.equal(nextState, state);
+            });
+
+            it('no reactions in post metadata', () => {
+                const state = deepFreeze({});
+                const action = {
+                    type: PostTypes.RECEIVED_POSTS,
+                    data: {
+                        posts: {
+                            post: {
+                                id: 'post',
+                                metadata: {},
+                            },
+                        },
+                    },
+                };
+
+                const nextState = reactionsReducer(state, action);
+
+                assert.notEqual(nextState, state);
+                assert.deepEqual(nextState, {
+                    post: {},
+                });
+            });
+
+            it('should save reactions', () => {
+                const state = deepFreeze({});
+                const action = {
+                    type: PostTypes.RECEIVED_POSTS,
+                    data: {
+                        posts: {
+                            post: {
+                                id: 'post',
+                                metadata: {
+                                    reactions: [
+                                        {user_id: 'abcd', emoji_name: '+1'},
+                                        {user_id: 'efgh', emoji_name: '+1'},
+                                        {user_id: 'abcd', emoji_name: '-1'},
+                                    ],
+                                },
+                            },
+                        },
+                    },
+                };
+
+                const nextState = reactionsReducer(state, action);
+
+                assert.notEqual(nextState, state);
+                assert.deepEqual(nextState, {
+                    post: {
+                        'abcd-+1': {user_id: 'abcd', emoji_name: '+1'},
+                        'efgh-+1': {user_id: 'efgh', emoji_name: '+1'},
+                        'abcd--1': {user_id: 'abcd', emoji_name: '-1'},
+                    },
+                });
+            });
+
+            it('should save reactions for multiple posts', () => {
+                const state = deepFreeze({});
+                const action = {
+                    type: PostTypes.RECEIVED_POSTS,
+                    data: {
+                        posts: {
+                            post1: {
+                                id: 'post1',
+                                metadata: {
+                                    reactions: [
+                                        {user_id: 'abcd', emoji_name: '+1'},
+                                    ],
+                                },
+                            },
+                            post2: {
+                                id: 'post2',
+                                metadata: {
+                                    reactions: [
+                                        {user_id: 'abcd', emoji_name: '-1'},
+                                    ],
+                                },
+                            },
+                        },
+                    },
+                };
+
+                const nextState = reactionsReducer(state, action);
+
+                assert.notEqual(nextState, state);
+                assert.deepEqual(nextState, {
+                    post1: {
+                        'abcd-+1': {user_id: 'abcd', emoji_name: '+1'},
+                    },
+                    post2: {
+                        'abcd--1': {user_id: 'abcd', emoji_name: '-1'},
+                    },
+                });
             });
         });
     });

@@ -161,7 +161,7 @@ function handleReceivedPosts(posts = {}, postsInChannel = {}, postsInThread = {}
 }
 
 export function removeUnneededMetadata(post) {
-    if (!post.metadata || (!post.metadata.emojis && !post.metadata.files)) {
+    if (!post.metadata || (!post.metadata.emojis && !post.metadata.files && !post.metadata.reactions)) {
         return post;
     }
 
@@ -170,6 +170,7 @@ export function removeUnneededMetadata(post) {
     // These fields are stored separately
     Reflect.deleteProperty(metadata, 'emojis');
     Reflect.deleteProperty(metadata, 'files');
+    Reflect.deleteProperty(metadata, 'reactions');
 
     return {
         ...post,
@@ -445,7 +446,7 @@ function currentFocusedPostId(state = '', action) {
     }
 }
 
-function reactions(state = {}, action) {
+export function reactions(state = {}, action) {
     switch (action.type) {
     case PostTypes.RECEIVED_REACTIONS: {
         const reactionsList = action.data;
@@ -483,6 +484,19 @@ function reactions(state = {}, action) {
             [reaction.post_id]: nextReactions,
         };
     }
+
+    case PostTypes.RECEIVED_NEW_POST:
+    case PostTypes.RECEIVED_POST: {
+        const post = action.data;
+
+        return storeReactionsForPost(state, post);
+    }
+    case PostTypes.RECEIVED_POSTS: {
+        const posts = Object.values(action.data.posts);
+
+        return posts.reduce(storeReactionsForPost, state);
+    }
+
     case PostTypes.POST_DELETED:
     case PostTypes.REMOVE_POST: {
         const post = action.data;
@@ -502,6 +516,24 @@ function reactions(state = {}, action) {
     default:
         return state;
     }
+}
+
+function storeReactionsForPost(state, post) {
+    if (!post.metadata) {
+        return state;
+    }
+
+    const reactionsForPost = {};
+    if (post.metadata.reactions && post.metadata.reactions.length > 0) {
+        for (const reaction of post.metadata.reactions) {
+            reactionsForPost[reaction.user_id + '-' + reaction.emoji_name] = reaction;
+        }
+    }
+
+    return {
+        ...state,
+        [post.id]: reactionsForPost,
+    };
 }
 
 function openGraph(state = {}, action) {
