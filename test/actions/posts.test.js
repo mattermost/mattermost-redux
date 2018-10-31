@@ -1869,4 +1869,47 @@ describe('Actions.Posts', () => {
         index = getState().entities.posts.messagesHistory.index[Posts.MESSAGE_TYPES.COMMENT];
         assert.ok(index === 2);
     });
+
+    describe('getProfilesAndStatusesForPosts', () => {
+        describe('different values for posts argument', () => {
+            // Mock the state to prevent any followup requests since we aren't testing those
+            const currentUserId = 'user';
+            const post = {id: 'post', user_id: currentUserId, message: 'This is a post'};
+
+            const dispatch = null;
+            const getState = () => ({
+                entities: {
+                    general: {
+                        config: {
+                            EnableCustomEmoji: 'false',
+                        },
+                    },
+                    users: {
+                        currentUserId,
+                        statuses: {
+                            [currentUserId]: 'status',
+                        },
+                    },
+                },
+            });
+
+            it('null', async () => {
+                await Actions.getProfilesAndStatusesForPosts(null, dispatch, getState);
+            });
+
+            it('array of posts', async () => {
+                const posts = [post];
+
+                await Actions.getProfilesAndStatusesForPosts(posts, dispatch, getState);
+            });
+
+            it('object map of posts', async () => {
+                const posts = {
+                    [post.id]: post,
+                };
+
+                await Actions.getProfilesAndStatusesForPosts(posts, dispatch, getState);
+            });
+        });
+    });
 });

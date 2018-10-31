@@ -938,11 +938,15 @@ export function getPostsAfterWithRetry(channelId, postId, page = 0, perPage = Po
 }
 
 // Note that getProfilesAndStatusesForPosts can take either an array of posts or a map of ids to posts
-export async function getProfilesAndStatusesForPosts(postsArrayOrMap, dispatch, getState) {
+export function getProfilesAndStatusesForPosts(postsArrayOrMap, dispatch, getState) {
+    if (!postsArrayOrMap) {
+        // Some API methods return {error} for no results
+        return Promise.resolve();
+    }
+
     const posts = Object.values(postsArrayOrMap);
 
-    if (!posts || posts.length === 0) {
-        // Some API methods return {error} for no results
+    if (posts.length === 0) {
         return Promise.resolve();
     }
 
