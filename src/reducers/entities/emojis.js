@@ -3,12 +3,17 @@
 // @flow
 
 import {combineReducers} from 'redux';
-import {EmojiTypes, UserTypes} from 'action_types';
+import {
+    EmojiTypes,
+    PostTypes,
+    UserTypes,
+} from 'action_types';
 
 import type {CustomEmoji} from '../../types/emojis';
+import type {Post} from '../../types/posts';
 import type {GenericAction} from '../../types/actions';
 
-function customEmoji(state: {[string]: CustomEmoji} = {}, action: GenericAction): {[string]: CustomEmoji} {
+export function customEmoji(state: {[string]: CustomEmoji} = {}, action: GenericAction): {[string]: CustomEmoji} {
     switch (action.type) {
     case EmojiTypes.RECEIVED_CUSTOM_EMOJI: {
         const nextState = {...state};
@@ -31,9 +36,39 @@ function customEmoji(state: {[string]: CustomEmoji} = {}, action: GenericAction)
     case UserTypes.LOGOUT_SUCCESS:
         return {};
 
+    case PostTypes.RECEIVED_NEW_POST:
+    case PostTypes.RECEIVED_POST: {
+        const post: Post = action.data;
+
+        return storeEmojisForPost(state, post);
+    }
+    case PostTypes.RECEIVED_POSTS: {
+        const posts = Object.values(action.data.posts);
+
+        return (posts: any).reduce(storeEmojisForPost, state); // Cast to any to avoid typing problems caused by Object.values
+    }
+
     default:
         return state;
     }
+}
+
+function storeEmojisForPost(state: {[string]: CustomEmoji}, post: Post) {
+    if (!post.metadata || !post.metadata.emojis) {
+        return state;
+    }
+
+    return post.metadata.emojis.reduce((nextState, emoji) => {
+        if (nextState[emoji.id]) {
+            // Emoji is already in the store
+            return nextState;
+        }
+
+        return {
+            ...nextState,
+            [emoji.id]: emoji,
+        };
+    }, state);
 }
 
 function nonExistentEmoji(state = new Set(), action) {

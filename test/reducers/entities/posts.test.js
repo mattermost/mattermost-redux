@@ -4,10 +4,114 @@
 import assert from 'assert';
 
 import {PostTypes} from 'action_types';
-import postsReducer from 'reducers/entities/posts';
+import postsReducer, {removeUnneededMetadata} from 'reducers/entities/posts';
+import deepFreeze from 'utils/deep_freeze';
 
 describe('Reducers.posts', () => {
-    it('REMOVE_PENDING_POST on posts', async () => {
+    describe('RECEIVED_POST', () => {
+        it('should remove unneeded metadata', () => {
+            const state = deepFreeze({
+                posts: {},
+                postsInChannel: {},
+            });
+            const post = {
+                id: 'post',
+                metadata: {
+                    emojis: [{name: 'emoji'}],
+                    files: [{id: 'file', post_id: 'post'}],
+                },
+            };
+            const action = {
+                type: PostTypes.RECEIVED_POST,
+                data: post,
+            };
+
+            const nextState = postsReducer(state, action);
+
+            assert.deepEqual(nextState.posts, {
+                post: {
+                    id: 'post',
+                    metadata: {},
+                },
+            });
+        });
+    });
+
+    describe('RECEIVED_NEW_POST', () => {
+        it('should remove unneeded metadata', () => {
+            const state = deepFreeze({
+                posts: {},
+                postsInChannel: {},
+            });
+            const action = {
+                type: PostTypes.RECEIVED_NEW_POST,
+                data: {
+                    id: 'post',
+                    metadata: {
+                        emojis: [{name: 'emoji'}],
+                        files: [{id: 'file', post_id: 'post'}],
+                    },
+                },
+            };
+
+            const nextState = postsReducer(state, action);
+
+            assert.deepEqual(nextState.posts, {
+                post: {
+                    id: 'post',
+                    metadata: {},
+                },
+            });
+        });
+    });
+
+    describe('RECEIVED_POSTS', () => {
+        it('should remove unneeded metadata', () => {
+            const state = deepFreeze({
+                posts: {},
+                postsInChannel: {},
+            });
+            const action = {
+                type: PostTypes.RECEIVED_POSTS,
+                data: {
+                    order: ['post1'],
+                    posts: {
+                        post1: {
+                            id: 'post1',
+                            metadata: {
+                                emojis: [{name: 'emoji'}],
+                                files: [{id: 'file1', post_id: 'post1'}],
+                            },
+                        },
+                        post2: {
+                            id: 'post2',
+                            root_id: 'post1',
+                            metadata: {
+                                emojis: [{name: 'emoji'}],
+                                files: [{id: 'file2', post_id: 'post2'}],
+                            },
+                        },
+                    },
+                },
+            };
+
+            const nextState = postsReducer(state, action);
+
+            assert.deepEqual(nextState.posts, {
+                post1: {
+                    id: 'post1',
+                    metadata: {},
+                },
+                post2: {
+                    id: 'post2',
+                    root_id: 'post1',
+                    metadata: {},
+                },
+            });
+        });
+    });
+
+    it('REMOVE_PENDING_POST on posts', () => {
         const posts = {
             post_id: {},
             other_post_id: {},
@@ -161,6 +265,63 @@ describe('Reducers.posts', () => {
 
             const actualState = postsReducer({sendingPostIds: state}, action);
             assert.strictEqual(actualState.sendingPostIds, expectedState);
+        });
+    });
+
+    describe('removeUnneededMetadata', () => {
+        it('without metadata', () => {
+            const post = deepFreeze({
+                id: 'post',
+            });
+
+            const nextPost = removeUnneededMetadata(post);
+
+            assert.equal(nextPost, post);
+        });
+
+        it('with empty metadata', () => {
+            const post = deepFreeze({
+                id: 'post',
+                metadata: {},
+            });
+
+            const nextPost = removeUnneededMetadata(post);
+
+            assert.equal(nextPost, post);
+        });
+
+        it('should remove emojis', () => {
+            const post = deepFreeze({
+                id: 'post',
+                metadata: {
+                    emojis: [{name: 'emoji'}],
+                },
+            });
+
+            const nextPost = removeUnneededMetadata(post);
+
+            assert.notEqual(nextPost, post);
+            assert.deepEqual(nextPost, {
+                id: 'post',
+                metadata: {},
+            });
+        });
+
+        it('should remove files', () => {
+            const post = deepFreeze({
+                id: 'post',
+                metadata: {
+                    files: [{id: 'file', post_id: 'post'}],
+                },
+            });
+
+            const nextPost = removeUnneededMetadata(post);
+
+            assert.notEqual(nextPost, post);
+            assert.deepEqual(nextPost, {
+                id: 'post',
+                metadata: {},
+            });
         });
     });
 });
