@@ -27,7 +27,6 @@ import type {FileInfo} from '../types/files';
 import type {PreferenceType} from '../types/preferences';
 import type {GlobalState} from '../types/store';
 
-
 export function getPost(postId: string): ActionFunc {
     return async (dispatch, getState) => {
         dispatch({type: PostTypes.GET_POSTS_REQUEST, data: null}, getState);
@@ -576,7 +575,7 @@ export function getPostThreadWithRetry(postId: string): ActionFunc {
     return async (dispatch, getState) => {
         dispatch({
             type: PostTypes.GET_POST_THREAD_REQUEST,
-            data: null
+            data: null,
         });
 
         dispatch({
@@ -607,7 +606,7 @@ export function getPostThreadWithRetry(postId: string): ActionFunc {
                     onRetryScheduled: () => {
                         dispatch({
                             type: PostTypes.GET_POST_THREAD_WITH_RETRY_ATTEMPT,
-                            data: null
+                            data: null,
                         });
                     },
                     rollback: (success, error) => {
