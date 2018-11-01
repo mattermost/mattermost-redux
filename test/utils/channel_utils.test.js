@@ -6,8 +6,7 @@ import assert from 'assert';
 import {General, Preferences} from 'constants';
 import TestHelper from 'test/test_helper';
 
-import {canManageMembersOldPermissions, isAutoClosed, filterChannelsMatchingTerm} from 'utils/channel_utils';
-import {areChannelMentionsIgnored} from '../../src/utils/channel_utils';
+import {areChannelMentionsIgnored, canManageMembersOldPermissions, isAutoClosed, filterChannelsMatchingTerm} from 'utils/channel_utils';
 
 describe('ChannelUtils', () => {
     it('canManageMembersOldPermissions', () => {
