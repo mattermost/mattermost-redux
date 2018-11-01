@@ -1,36 +1,42 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
+// @flow
 
 import {ErrorTypes} from 'action_types';
 import serializeError from 'serialize-error';
 import {Client4} from 'client';
 import EventEmitter from 'utils/event_emitter';
 
-export function dismissErrorObject(index) {
+import type {DispatchFunc, ActionFunc} from '../types/actions';
+import type {Error} from '../types/errors';
+
+export function dismissErrorObject(index: number) {
     return {
         type: ErrorTypes.DISMISS_ERROR,
         index,
+        data: null,
     };
 }
 
-export function dismissError(index) {
-    return async (dispatch) => {
+export function dismissError(index: number): ActionFunc {
+    return async (dispatch: DispatchFunc) => {
         dispatch(dismissErrorObject(index));
 
         return {data: true};
     };
 }
 
-export function getLogErrorAction(error, displayable = false) {
+export function getLogErrorAction(error: Error, displayable: boolean = false) {
     return {
         type: ErrorTypes.LOG_ERROR,
         displayable,
         error,
+        data: null,
     };
 }
 
-export function logError(error, displayable = false) {
-    return async (dispatch) => {
+export function logError(error: Error, displayable: boolean = false): ActionFunc {
+    return async (dispatch: DispatchFunc) => {
         if (error.server_error_id === 'api.context.session_expired.app_error') {
             return {data: true};
         }
@@ -62,9 +68,9 @@ export function logError(error, displayable = false) {
     };
 }
 
-export function clearErrors() {
-    return async (dispatch) => {
-        dispatch({type: ErrorTypes.CLEAR_ERRORS});
+export function clearErrors(): ActionFunc {
+    return async (dispatch: DispatchFunc) => {
+        dispatch({type: ErrorTypes.CLEAR_ERRORS, data: null});
 
         return {data: true};
     };
