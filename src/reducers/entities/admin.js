@@ -124,22 +124,23 @@ function samlCertStatus(state = {}, action) {
     }
 }
 
-function convertAnalyticsRowsToStats(data, name) {
+export function convertAnalyticsRowsToStats(data, name) {
     const stats = {};
+    const clonedData = [...data];
 
     if (name === 'post_counts_day') {
-        data.reverse();
-        stats[Stats.POST_PER_DAY] = data;
+        clonedData.reverse();
+        stats[Stats.POST_PER_DAY] = clonedData;
         return stats;
     }
 
     if (name === 'user_counts_with_posts_day') {
-        data.reverse();
-        stats[Stats.USERS_WITH_POSTS_PER_DAY] = data;
+        clonedData.reverse();
+        stats[Stats.USERS_WITH_POSTS_PER_DAY] = clonedData;
         return stats;
     }
 
-    data.forEach((row) => {
+    clonedData.forEach((row) => {
         let key;
         switch (row.name) {
         case 'channel_open_count':
