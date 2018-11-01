@@ -538,6 +538,78 @@ describe('Selectors.Channels', () => {
         assert.ok(fromMentionState[0] === channel8.id);
     });
 
+    it('get sorted unread channels with muted and last read states', () => {
+        const mentionState = {
+            ...testState,
+            entities: {
+                ...testState.entities,
+                channels: {
+                    ...testState.entities.channels,
+                    myMembers: {
+                        ...testState.entities.channels.myMembers,
+                        [channel8.id]: {
+                            ...testState.entities.channels.myMembers[channel8.id],
+                            mention_count: 1,
+                        },
+                    },
+                },
+            },
+        };
+
+        const fromMentionState = Selectors.getSortedUnreadChannelIds(mentionState);
+
+        // Channel 8 with display_name 'ABC' is above all others
+        assert.ok(fromMentionState[0] === channel8.id);
+
+        // Channel 8 with display_name 'ABC' which was above all others should go down now.
+        // As is muted it should go to index 1 because there is another unread channel at index 2 though not mention
+
+        const mutedChannelState = {
+            ...mentionState,
+            entities: {
+                ...mentionState.entities,
+                channels: {
+                    ...mentionState.entities.channels,
+                    myMembers: {
+                        ...mentionState.entities.channels.myMembers,
+                        [channel8.id]: {
+                            ...mentionState.entities.channels.myMembers[channel8.id],
+                            notify_props: {
+                                mark_unread: 'mention',
+                            },
+                        },
+                    },
+                },
+            },
+        };
+
+        const fromMutedState = Selectors.getSortedUnreadChannelIds(mutedChannelState);
+        assert.ok(fromMutedState[1] === channel8.id);
+
+        const mutedReadState = {
+            ...mutedChannelState,
+            entities: {
+                ...mutedChannelState.entities,
+                channels: {
+                    ...mutedChannelState.entities.channels,
+                    myMembers: {
+                        ...mutedChannelState.entities.channels.myMembers,
+                        [channel8.id]: {
+                            ...mutedChannelState.entities.channels.myMembers[channel8.id],
+                            mention_count: 0,
+                        },
+                    },
+                },
+            },
+        };
+
+        const fromMutedReadState = Selectors.getSortedUnreadChannelIds(mutedReadState);
+        assert.ok(fromMutedReadState[1] !== channel8.id); //Should not be at that index as it is marked as read
+
+        const fromMutedReadStateAndLastMarked = Selectors.getSortedUnreadChannelIds(mutedReadState, {...channel8, hadMentions: true});
+        assert.ok(fromMutedReadStateAndLastMarked[1] === channel8.id); //Should be in the same index as it is last makred channel
+    });
+
     it('get sorted favorite channel ids in current team strict equal', () => {
         const chan1 = {...testState.entities.channels.channels[channel1.id]};
         chan1.total_msg_count = 10;
