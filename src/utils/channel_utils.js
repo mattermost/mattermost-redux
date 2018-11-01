@@ -557,18 +557,18 @@ export function isChannelMuted(member) {
 }
 
 export function areChannelMentionsIgnored(channelMemberNotifyProps, currentUserNotifyProps) {
-    let ignoreChannelMentionsDefault = 'ignore_channel_mentions_off';
+    let ignoreChannelMentionsDefault = Preferences.IGNORE_CHANNEL_MENTIONS_OFF;
 
     if (currentUserNotifyProps.channel && currentUserNotifyProps.channel === 'false') {
-        ignoreChannelMentionsDefault = 'ignore_channel_mentions_on';
+        ignoreChannelMentionsDefault = Preferences.IGNORE_CHANNEL_MENTIONS_ON;
     }
 
     let ignoreChannelMentions = channelMemberNotifyProps.ignore_channel_mentions;
-    if (!ignoreChannelMentions || ignoreChannelMentions === 'ignore_channel_mentions_not_set') {
+    if (!ignoreChannelMentions || ignoreChannelMentions === Preferences.IGNORE_CHANNEL_MENTIONS_DEFAULT) {
         ignoreChannelMentions = ignoreChannelMentionsDefault;
     }
 
-    return ignoreChannelMentions !== 'ignore_channel_mentions_off';
+    return ignoreChannelMentions !== Preferences.IGNORE_CHANNEL_MENTIONS_OFF;
 }
 
 function not(f) {

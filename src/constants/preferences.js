@@ -3,6 +3,10 @@
 // @flow
 
 export default {
+    IGNORE_CHANNEL_MENTIONS_ON: 'ignore_channel_mentions_on',
+    IGNORE_CHANNEL_MENTIONS_OFF: 'ignore_channel_mentions_off',
+    IGNORE_CHANNEL_MENTIONS_DEFAULT: 'ignore_channel_mentions_not_set',
+
     CATEGORY_CHANNEL_OPEN_TIME: 'channel_open_time',
     CATEGORY_CHANNEL_APPROXIMATE_VIEW_TIME: 'channel_approximate_view_time',
     CATEGORY_DIRECT_CHANNEL_SHOW: 'direct_channel_show',
