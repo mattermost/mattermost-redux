@@ -544,20 +544,28 @@ export const getSortedUnreadChannelIds = createIdsSelector(
         }).filter((c) => c).sort((a, b) => {
             const aMember = myMembers[a.id];
             const bMember = myMembers[b.id];
-            const aIsMention = a.type === General.DM_CHANNEL || (aMember && aMember.mention_count > 0);
+            let aIsMention = a.type === General.DM_CHANNEL || (aMember && aMember.mention_count > 0);
             let bIsMention = b.type === General.DM_CHANNEL || (bMember && bMember.mention_count > 0);
+
+            if (lastUnreadChannel && a.id === lastUnreadChannel.id && lastUnreadChannel.hadMentions) {
+                aIsMention = true;
+            }
 
             if (lastUnreadChannel && b.id === lastUnreadChannel.id && lastUnreadChannel.hadMentions) {
                 bIsMention = true;
             }
 
-            if (aIsMention === bIsMention && isChannelMuted(bMember) === isChannelMuted(aMember)) {
-                return sortChannelsByDisplayName(locale, a, b);
-            } else if (aIsMention || (isChannelMuted(bMember) && !isChannelMuted(aMember))) {
-                return -1;
+            if (aIsMention === bIsMention) {
+                if (isChannelMuted(aMember) === isChannelMuted(bMember)) {
+                    return sortChannelsByDisplayName(locale, a, b);
+                } else if (isChannelMuted(aMember)) {
+                    return 1; //push back aMember because is is muted
+                }
+            } else if (bIsMention) {
+                return 1; //pull bMember up as it has a mention
             }
 
-            return 1;
+            return -1;
         });
 
         return allUnreadChannels.map((c) => c.id);
