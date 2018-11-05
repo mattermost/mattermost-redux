@@ -341,6 +341,8 @@ describe('Selectors.Users', () => {
 
     it('shouldShowTermsOfService', () => {
         const userId = 1234;
+
+        // Test latest terms not accepted
         assert.equal(Selectors.shouldShowTermsOfService({
             entities: {
                 general: {
@@ -354,13 +356,17 @@ describe('Selectors.Users', () => {
                 },
                 users: {
                     currentUserId: userId,
+                    myAcceptedTermsOfServiceData: {
+                        id: '0',
+                    },
                     profiles: {
-                        [userId]: {id: userId, username: 'user', first_name: 'First', last_name: 'Last', accepted_terms_of_service_id: '0'},
+                        [userId]: {id: userId, username: 'user', first_name: 'First', last_name: 'Last'},
                     },
                 },
             },
         }), true);
 
+        // Test Feature disabled
         assert.equal(Selectors.shouldShowTermsOfService({
             entities: {
                 general: {
@@ -374,13 +380,17 @@ describe('Selectors.Users', () => {
                 },
                 users: {
                     currentUserId: userId,
+                    myAcceptedTermsOfServiceData: {
+                        id: '1',
+                    },
                     profiles: {
-                        [userId]: {id: userId, username: 'user', first_name: 'First', last_name: 'Last', accepted_terms_of_service_id: '1'},
+                        [userId]: {id: userId, username: 'user', first_name: 'First', last_name: 'Last'},
                     },
                 },
             },
         }), false);
 
+        // Test unlicensed
         assert.equal(Selectors.shouldShowTermsOfService({
             entities: {
                 general: {
@@ -394,13 +404,17 @@ describe('Selectors.Users', () => {
                 },
                 users: {
                     currentUserId: userId,
+                    myAcceptedTermsOfServiceData: {
+                        id: '1',
+                    },
                     profiles: {
-                        [userId]: {id: userId, username: 'user', first_name: 'First', last_name: 'Last', accepted_terms_of_service_id: '1'},
+                        [userId]: {id: userId, username: 'user', first_name: 'First', last_name: 'Last'},
                     },
                 },
             },
         }), false);
 
+        // Test terms already accepted
         assert.equal(Selectors.shouldShowTermsOfService({
             entities: {
                 general: {
@@ -414,13 +428,17 @@ describe('Selectors.Users', () => {
                 },
                 users: {
                     currentUserId: userId,
+                    myAcceptedTermsOfServiceData: {
+                        id: '1',
+                    },
                     profiles: {
-                        [userId]: {id: userId, username: 'user', first_name: 'First', last_name: 'Last', accepted_terms_of_service_id: '1'},
+                        [userId]: {id: userId, username: 'user', first_name: 'First', last_name: 'Last'},
                     },
                 },
             },
         }), false);
 
+        // Test not logged in
         assert.equal(Selectors.shouldShowTermsOfService({
             entities: {
                 general: {
@@ -434,6 +452,10 @@ describe('Selectors.Users', () => {
                 },
                 users: {
                     currentUserId: userId,
+                    myAcceptedTermsOfServiceData: {
+                        id: '',
+                        time: 0,
+                    },
                     profiles: {},
                 },
             },
