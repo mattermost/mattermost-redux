@@ -344,22 +344,20 @@ function removeCurrentUserFromList(profiles, currentUserId) {
     }
 }
 
-export function getMyAcceptedTermsOfServiceId(state) {
-    return state.entities.users.myAcceptedTermsOfServiceData.id;
-}
-
-export function getMyTermsOfServiceAcceptedAt(state) {
-    return state.entities.users.myAcceptedTermsOfServiceData.time;
+export function getMyAcceptedTermsOfServiceData(state) {
+    return state.entities.users.myAcceptedTermsOfServiceData;
 }
 
 export const shouldShowTermsOfService = createSelector(
     getConfig,
     getCurrentUser,
     getLicense,
-    getMyAcceptedTermsOfServiceId,
-    getMyTermsOfServiceAcceptedAt,
-    (config, user, license, acceptedTermsId, acceptedAt) => {
+    getMyAcceptedTermsOfServiceData,
+    (config, user, license, myAcceptedTermsOfServiceData) => {
         // Defaults to false if the user is not logged in or the setting doesn't exist
+
+        const acceptedTermsId = myAcceptedTermsOfServiceData.id;
+        const acceptedAt = myAcceptedTermsOfServiceData.time;
 
         const featureEnabled = license.IsLicensed === 'true' && config.EnableCustomTermsOfService === 'true';
         const reacceptanceTime = config.CustomTermsOfServiceReAcceptancePeriod * 1000 * 60 * 60 * 24;
