@@ -5,6 +5,7 @@ import assert from 'assert';
 
 import {PostTypes} from 'action_types';
 import postsReducer, {
+    openGraph as openGraphReducer,
     reactions as reactionsReducer,
     removeUnneededMetadata,
 } from 'reducers/entities/posts';
@@ -347,6 +348,60 @@ describe('Reducers.posts', () => {
                 metadata: {},
             });
         });
+
+        it('should remove OpenGraph data', () => {
+            const post = deepFreeze({
+                id: 'post',
+                metadata: {
+                    embeds: [{
+                        type: 'opengraph',
+                        url: 'https://example.com',
+                        data: {
+                            url: 'https://example.com',
+                            images: [{
+                                url: 'https://example.com/logo.png',
+                                width: 100,
+                                height: 100,
+                            }],
+                        },
+                    }],
+                },
+            });
+
+            const nextPost = removeUnneededMetadata(post);
+
+            assert.notEqual(nextPost, post);
+            assert.deepEqual(nextPost, {
+                id: 'post',
+                metadata: {
+                    embeds: [{
+                        type: 'opengraph',
+                        url: 'https://example.com',
+                    }],
+                },
+            });
+        });
+
+        it('should not affect non-OpenGraph embeds', () => {
+            const post = deepFreeze({
+                id: 'post',
+                metadata: {
+                    embeds: [
+                        {type: 'image', url: 'https://example.com/image'},
+                        {type: 'message_attachment'},
+                    ],
+                },
+                props: {
+                    attachments: [
+                        {text: 'This is an attachment'},
+                    ],
+                },
+            });
+
+            const nextPost = removeUnneededMetadata(post);
+
+            assert.equal(nextPost, post);
+        });
     });
 
     describe('reactions', () => {
@@ -524,6 +579,232 @@ describe('Reducers.posts', () => {
                     post2: {
                         'abcd--1': {user_id: 'abcd', emoji_name: '-1'},
                     },
+                });
+            });
+        });
+    });
+
+    describe('opengraph', () => {
+        const testForSinglePost = (actionType) => () => {
+            it('no post metadata', () => {
+                const state = deepFreeze({});
+                const action = {
+                    type: actionType,
+                    data: {
+                        id: 'post',
+                    },
+                };
+
+                const nextState = openGraphReducer(state, action);
+
+                assert.equal(nextState, state);
+            });
+
+            it('no embeds in post metadata', () => {
+                const state = deepFreeze({});
+                const action = {
+                    type: actionType,
+                    data: {
+                        id: 'post',
+                        metadata: {},
+                    },
+                };
+
+                const nextState = openGraphReducer(state, action);
+
+                assert.equal(nextState, state);
+            });
+
+            it('other types of embeds in post metadata', () => {
+                const state = deepFreeze({});
+                const action = {
+                    type: actionType,
+                    data: {
+                        id: 'post',
+                        metadata: {
+                            embeds: [{
+                                type: 'image',
+                                url: 'https://example.com/image.png',
+                            }, {
+                                type: 'message_attachment',
+                            }],
+                        },
+                    },
+                };
+
+                const nextState = openGraphReducer(state, action);
+
+                assert.equal(nextState, state);
+            });
+
+            it('should save opengraph data', () => {
+                const state = deepFreeze({});
+                const action = {
+                    type: actionType,
+                    data: {
+                        id: 'post',
+                        metadata: {
+                            embeds: [{
+                                type: 'opengraph',
+                                url: 'https://example.com',
+                                data: {
+                                    title: 'Example',
+                                    description: 'Example description',
+                                },
+                            }],
+                        },
+                    },
+                };
+
+                const nextState = openGraphReducer(state, action);
+
+                assert.notEqual(nextState, state);
+                assert.deepEqual(nextState, {
+                    'https://example.com': action.data.metadata.embeds[0].data,
+                });
+            });
+        };
+
+        describe('RECEIVED_NEW_POST', testForSinglePost(PostTypes.RECEIVED_NEW_POST));
+        describe('RECEIVED_POST', testForSinglePost(PostTypes.RECEIVED_POST));
+
+        describe('RECEIVED_POSTS', () => {
+            it('no post metadata', () => {
+                const state = deepFreeze({});
+                const action = {
+                    type: PostTypes.RECEIVED_POSTS,
+                    data: {
+                        posts: {
+                            post: {
+                                id: 'post',
+                            },
+                        },
+                    },
+                };
+
+                const nextState = openGraphReducer(state, action);
+
+                assert.equal(nextState, state);
+            });
+
+            it('no embeds in post metadata', () => {
+                const state = deepFreeze({});
+                const action = {
+                    type: PostTypes.RECEIVED_POSTS,
+                    data: {
+                        posts: {
+                            post: {
+                                id: 'post',
+                                metadata: {},
+                            },
+                        },
+                    },
+                };
+
+                const nextState = openGraphReducer(state, action);
+
+                assert.equal(nextState, state);
+            });
+
+            it('other types of embeds in post metadata', () => {
+                const state = deepFreeze({});
+                const action = {
+                    type: PostTypes.RECEIVED_POSTS,
+                    data: {
+                        posts: {
+                            post: {
+                                id: 'post',
+                                metadata: {
+                                    embeds: [{
+                                        type: 'image',
+                                        url: 'https://example.com/image.png',
+                                    }, {
+                                        type: 'message_attachment',
+                                    }],
+                                },
+                            },
+                        },
+                    },
+                };
+
+                const nextState = openGraphReducer(state, action);
+
+                assert.equal(nextState, state);
+            });
+
+            it('should save opengraph data', () => {
+                const state = deepFreeze({});
+                const action = {
+                    type: PostTypes.RECEIVED_POSTS,
+                    data: {
+                        posts: {
+                            post1: {
+                                id: 'post1',
+                                metadata: {
+                                    embeds: [{
+                                        type: 'opengraph',
+                                        url: 'https://example.com',
+                                        data: {
+                                            title: 'Example',
+                                            description: 'Example description',
+                                        },
+                                    }],
+                                },
+                            },
+                        },
+                    },
+                };
+
+                const nextState = openGraphReducer(state, action);
+
+                assert.notEqual(nextState, state);
+                assert.deepEqual(nextState, {
+                    'https://example.com': action.data.posts.post1.metadata.embeds[0].data,
+                });
+            });
+
+            it('should save reactions for multiple posts', () => {
+                const state = deepFreeze({});
+                const action = {
+                    type: PostTypes.RECEIVED_POSTS,
+                    data: {
+                        posts: {
+                            post1: {
+                                id: 'post1',
+                                metadata: {
+                                    embeds: [{
+                                        type: 'opengraph',
+                                        url: 'https://example.com',
+                                        data: {
+                                            title: 'Example',
+                                            description: 'Example description',
+                                        },
+                                    }],
+                                },
+                            },
+                            post2: {
+                                id: 'post2',
+                                metadata: {
+                                    embeds: [{
+                                        type: 'opengraph',
+                                        url: 'https://google.ca',
+                                        data: {
+                                            title: 'Google',
+                                            description: 'Something about search',
+                                        },
+                                    }],
+                                },
+                            },
+                        },
+                    },
+                };
+
+                const nextState = openGraphReducer(state, action);
+
+                assert.notEqual(nextState, state);
+                assert.deepEqual(nextState, {
+                    'https://example.com': action.data.posts.post1.metadata.embeds[0].data,
+                    'https://google.ca': action.data.posts.post2.metadata.embeds[0].data,
                 });
             });
         });
