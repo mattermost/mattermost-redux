@@ -87,26 +87,16 @@ function currentUserId(state = '', action) {
     return state;
 }
 
-function myAcceptedTermsOfServiceId(state = '', action) {
+function myAcceptedTermsOfServiceData(state = {id: '', time: 0}, action) {
     switch (action.type) {
     case UserTypes.RECEIVED_TERMS_OF_SERVICE_STATUS:
-        return action.data.terms_of_service_id;
+        return {
+            id: action.data.terms_of_service_id,
+            time: action.data.create_at,
+        };
 
     case UserTypes.LOGOUT_SUCCESS:
-        return '';
-
-    default:
-        return state;
-    }
-}
-
-function myTermsOfServiceAcceptedAt(state = 0, action) {
-    switch (action.type) {
-    case UserTypes.RECEIVED_TERMS_OF_SERVICE_STATUS:
-        return action.data.create_at;
-
-    case UserTypes.LOGOUT_SUCCESS:
-        return 0;
+        return {id: '', time: 0};
 
     default:
         return state;
@@ -395,11 +385,8 @@ export default combineReducers({
     // the current selected user
     currentUserId,
 
-    // the current user's accepted terms of service id
-    myAcceptedTermsOfServiceId,
-
-    // the current user's terms of service acceptance timestamp
-    myTermsOfServiceAcceptedAt,
+    // the current user's accepted terms of service id and acceptance timestamp
+    myAcceptedTermsOfServiceData,
 
     // array with the user's sessions
     mySessions,

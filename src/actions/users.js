@@ -232,12 +232,12 @@ export function loadMe(): ActionFunc {
         }
 
         const promises = [
-            getMe()(dispatch, getState),
-            getMyPreferences()(dispatch, getState),
-            getMyTeams()(dispatch, getState),
-            getMyTeamMembers()(dispatch, getState),
-            getMyTeamUnreads()(dispatch, getState),
-            getMyTermsOfServiceStatus()(dispatch, getState),
+            dispatch(getMe()),
+            dispatch(getMyPreferences()),
+            dispatch(getMyTeams()),
+            dispatch(getMyTeamMembers()),
+            dispatch(getMyTeamUnreads()),
+            dispatch(getMyTermsOfServiceStatus()),
         ];
 
         // Sometimes the server version is set in one or the other

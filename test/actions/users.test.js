@@ -158,12 +158,12 @@ describe('Actions.Users', () => {
             throw new Error(JSON.stringify(request.error));
         }
 
-        const {myAcceptedTermsOfServiceId, myTermsOfServiceAcceptedAt} = store.getState().entities.users;
+        const {myAcceptedTermsOfServiceData} = store.getState().entities.users;
 
-        assert.ok(myAcceptedTermsOfServiceId);
-        assert.ok(myTermsOfServiceAcceptedAt);
-        assert.equal(myAcceptedTermsOfServiceId, '123');
-        assert.equal(myTermsOfServiceAcceptedAt, 1537880148600);
+        assert.ok(myAcceptedTermsOfServiceData.id);
+        assert.ok(myAcceptedTermsOfServiceData.time);
+        assert.equal(myAcceptedTermsOfServiceData.id, '123');
+        assert.equal(myAcceptedTermsOfServiceData.time, 1537880148600);
     });
 
     it('updateMyTermsOfServiceStatus accept terms', async () => {
@@ -187,12 +187,12 @@ describe('Actions.Users', () => {
             throw new Error(JSON.stringify(request.error));
         }
 
-        const {currentUserId, myAcceptedTermsOfServiceId, myTermsOfServiceAcceptedAt} = store.getState().entities.users;
+        const {currentUserId, myAcceptedTermsOfServiceData} = store.getState().entities.users;
 
         assert.ok(currentUserId);
-        assert.ok(myAcceptedTermsOfServiceId);
-        assert.ok(myTermsOfServiceAcceptedAt);
-        assert.equal(myAcceptedTermsOfServiceId, 1);
+        assert.ok(myAcceptedTermsOfServiceData.id);
+        assert.ok(myAcceptedTermsOfServiceData.time);
+        assert.equal(myAcceptedTermsOfServiceData.id, 1);
     });
 
     it('updateMyTermsOfServiceStatus reject terms', async () => {

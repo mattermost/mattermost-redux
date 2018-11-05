@@ -345,11 +345,11 @@ function removeCurrentUserFromList(profiles, currentUserId) {
 }
 
 export function getMyAcceptedTermsOfServiceId(state) {
-    return state.entities.users.myAcceptedTermsOfServiceId;
+    return state.entities.users.myAcceptedTermsOfServiceData.id;
 }
 
 export function getMyTermsOfServiceAcceptedAt(state) {
-    return state.entities.users.myTermsOfServiceAcceptedAt;
+    return state.entities.users.myAcceptedTermsOfServiceData.time;
 }
 
 export const shouldShowTermsOfService = createSelector(

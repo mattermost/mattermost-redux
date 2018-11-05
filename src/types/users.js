@@ -21,8 +21,7 @@ export type UserProfile = {|
 
 export type UsersState = {|
     currentUserId: string,
-    myAcceptedTermsOfServiceId: string,
-    myTermsOfServiceAcceptedAt: number,
+    myAcceptedTermsOfServiceData: Object,
     mySessions: Array<Object>,
     myAudits: Array<Object>,
     profiles: {[string]: UserProfile},
