@@ -11,6 +11,7 @@ module.exports = {
                 ie: 11,
                 safari: 12,
             },
+            debug: process.env.NODE_ENV !== 'production',
             useBuiltIns: 'usage',
             shippedProposals: true,
         }],
