@@ -5,11 +5,11 @@ module.exports = {
     presets: [
         ['@babel/preset-env', {
             targets: {
+                chrome: 66,
+                firefox: 60,
+                edge: 42,
                 ie: 11,
-                chrome: 43,
-                firefox: 52,
-                edge: 15,
-                ios: 9,
+                safari: 12,
             },
             useBuiltIns: 'usage',
             shippedProposals: true,
