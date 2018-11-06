@@ -3,13 +3,8 @@
 
 /* eslint-disable */
 
-import fs from 'fs';
-import path from 'path';
-import register from 'babel-core/register';
-
-const rcPath = path.join(__dirname, '..', '.babelrc');
-const source = fs.readFileSync(rcPath).toString();
-const config = JSON.parse(source);
+import register from '@babel/register';
+import config from '../babel.config';
 
 global.window = {};
 
