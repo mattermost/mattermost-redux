@@ -5,6 +5,7 @@ const FormData = require('form-data');
 
 import fetch from './fetch_etag';
 import {buildQueryString, isMinimumServerVersion} from 'src/utils/helpers';
+import {cleanUrlForLogging} from 'src/utils/sentry';
 import {General} from 'constants';
 
 const HEADER_AUTH = 'Authorization';
@@ -1650,10 +1651,10 @@ export default class Client4 {
         const url = `${this.getBaseRoute()}/logs`;
 
         if (!this.enableLogging) {
-            throw {
+            throw new ClientError(this.getUrl(), {
                 message: 'Logging disabled.',
                 url,
-            };
+            });
         }
 
         return this.doFetch(
@@ -2485,10 +2486,10 @@ export default class Client4 {
 
     doFetchWithResponse = async (url, options) => {
         if (!this.online) {
-            throw {
+            throw new ClientError(this.getUrl(), {
                 message: 'no internet connection',
                 url,
-            };
+            });
         }
 
         const response = await fetch(url, this.getOptions(options));
@@ -2498,14 +2499,14 @@ export default class Client4 {
         try {
             data = await response.json();
         } catch (err) {
-            throw {
+            throw new ClientError(this.getUrl(), {
                 message: 'Received invalid response from the server.',
                 intl: {
                     id: 'mobile.request.invalid_response',
                     defaultMessage: 'Received invalid response from the server.',
                 },
                 url,
-            };
+            });
         }
 
         if (headers.has(HEADER_X_VERSION_ID) && !headers.get('Cache-Control')) {
@@ -2536,12 +2537,12 @@ export default class Client4 {
             console.error(msg); // eslint-disable-line no-console
         }
 
-        throw {
+        throw new ClientError(this.getUrl(), {
             message: msg,
             server_error_id: data.id,
             status_code: data.status_code,
             url,
-        };
+        });
     };
 
     trackEvent(category, event, props) {
@@ -2591,4 +2592,16 @@ function parseAndMergeNestedHeaders(originalHeaders) {
         headers.set(capitalizedKey, realVal);
     });
     return new Map([...headers, ...nestedHeaders]);
+}
+
+export class ClientError extends Error {
+    constructor(baseUrl, data) {
+        super(data.message + ': ' + cleanUrlForLogging(baseUrl, data.url));
+
+        this.message = data.message;
+        this.url = data.url;
+        this.intl = data.intl;
+        this.server_error_id = data.server_error_id;
+        this.status_code = data.status_code;
+    }
 }

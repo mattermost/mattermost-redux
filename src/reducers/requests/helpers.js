@@ -34,15 +34,10 @@ export function handleRequest(
             error: null,
         };
     case FAILURE: {
-        let error = action.error;
-        if (error instanceof Error) {
-            error = error.hasOwnProperty('intl') ? JSON.parse(JSON.stringify(error)) : error.toString();
-        }
-
         return {
             ...state,
             status: RequestStatus.FAILURE,
-            error,
+            error: action.error,
         };
     }
     default:
