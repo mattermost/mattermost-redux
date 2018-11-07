@@ -161,16 +161,55 @@ function handleReceivedPosts(posts = {}, postsInChannel = {}, postsInThread = {}
 }
 
 export function removeUnneededMetadata(post) {
-    if (!post.metadata || (!post.metadata.emojis && !post.metadata.files && !post.metadata.reactions)) {
+    if (!post.metadata) {
         return post;
     }
 
     const metadata = {...post.metadata};
+    let changed = false;
 
     // These fields are stored separately
-    Reflect.deleteProperty(metadata, 'emojis');
-    Reflect.deleteProperty(metadata, 'files');
-    Reflect.deleteProperty(metadata, 'reactions');
+    if (metadata.emojis) {
+        Reflect.deleteProperty(metadata, 'emojis');
+        changed = true;
+    }
+
+    if (metadata.files) {
+        Reflect.deleteProperty(metadata, 'files');
+        changed = true;
+    }
+
+    if (metadata.reactions) {
+        Reflect.deleteProperty(metadata, 'reactions');
+        changed = true;
+    }
+
+    if (metadata.embeds) {
+        let embedsChanged = false;
+
+        const newEmbeds = metadata.embeds.map((embed) => {
+            if (embed.type !== 'opengraph') {
+                return embed;
+            }
+
+            const newEmbed = {...embed};
+            Reflect.deleteProperty(newEmbed, 'data');
+
+            embedsChanged = true;
+
+            return newEmbed;
+        });
+
+        if (embedsChanged) {
+            metadata.embeds = newEmbeds;
+            changed = true;
+        }
+    }
+
+    if (!changed) {
+        // Nothing changed
+        return post;
+    }
 
     return {
         ...post,
@@ -536,7 +575,7 @@ function storeReactionsForPost(state, post) {
     };
 }
 
-function openGraph(state = {}, action) {
+export function openGraph(state = {}, action) {
     switch (action.type) {
     case PostTypes.RECEIVED_OPEN_GRAPH_METADATA: {
         const nextState = {...state};
@@ -544,11 +583,42 @@ function openGraph(state = {}, action) {
 
         return nextState;
     }
+
+    case PostTypes.RECEIVED_NEW_POST:
+    case PostTypes.RECEIVED_POST: {
+        const post = action.data;
+
+        return storeOpenGraphForPost(state, post);
+    }
+    case PostTypes.RECEIVED_POSTS: {
+        const posts = Object.values(action.data.posts);
+
+        return posts.reduce(storeOpenGraphForPost, state);
+    }
+
     case UserTypes.LOGOUT_SUCCESS:
         return {};
     default:
         return state;
     }
+}
+
+function storeOpenGraphForPost(state, post) {
+    if (!post.metadata || !post.metadata.embeds) {
+        return state;
+    }
+
+    return post.metadata.embeds.reduce((nextState, embed) => {
+        if (embed.type !== 'opengraph' || !embed.data) {
+            // Not an OpenGraph embed
+            return nextState;
+        }
+
+        return {
+            ...nextState,
+            [embed.url]: embed.data,
+        };
+    }, state);
 }
 
 function messagesHistory(state = {}, action) {
