@@ -11,7 +11,6 @@ module.exports = {
                 ie: 11,
                 safari: 12,
             },
-            debug: process.env.NODE_ENV !== 'production', // eslint-disable-line
             useBuiltIns: 'usage',
             shippedProposals: true,
         }],
