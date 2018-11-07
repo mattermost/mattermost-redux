@@ -96,8 +96,9 @@ export function removeUserFromList(userId: string, list: Array<UserProfile>): Ar
 
 export function filterProfilesMatchingTerm(users: Array<UserProfile>, term: string): Array<UserProfile> {
     let lowercasedTerm = term.toLowerCase();
-    if (lowercasedTerm.startsWith('@')) {
-        lowercasedTerm = lowercasedTerm.substr(1);
+    let trimmedTerm = lowercasedTerm
+    if (trimmedTerm.startsWith('@')) {
+        trimmedTerm = trimmedTerm.substr(1);
     }
 
     return users.filter((user: UserProfile) => {
@@ -117,12 +118,12 @@ export function filterProfilesMatchingTerm(users: Array<UserProfile>, term: stri
             emailDomain = split[1];
         }
 
-        return username.startsWith(lowercasedTerm) ||
-            full.startsWith(lowercasedTerm) ||
+        return username.startsWith(trimmedTerm) ||
+            full.startsWith(trimmedTerm) ||
             last.startsWith(lowercasedTerm) ||
-            nickname.startsWith(lowercasedTerm) ||
+            nickname.startsWith(trimmedTerm) ||
             email.startsWith(lowercasedTerm) ||
-            emailDomain.startsWith(lowercasedTerm);
+            emailDomain.startsWith(trimmedTerm);
     });
 }
 
