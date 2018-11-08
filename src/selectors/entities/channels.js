@@ -813,9 +813,13 @@ export const filterPostIds = (condition) => {
 };
 
 const getProfiles = (currentUserId, usersIdsInChannel, users) => {
-    return usersIdsInChannel.
-        filter((userId) => userId !== currentUserId).
-        map((userId) => users[userId]);
+    const profiles = [];
+    usersIdsInChannel.forEach((userId) => {
+        if (userId !== currentUserId) {
+            profiles.push(users[userId]);
+        }
+    });
+    return profiles;
 };
 export const getChannelsWithUserProfiles = createSelector(
     getUserIdsInChannels,
