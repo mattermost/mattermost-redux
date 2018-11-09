@@ -13,6 +13,10 @@ export function getConfig(state) {
     return state.entities.admin.config;
 }
 
+export function getLdapGroups(state) {
+    return state.entities.admin.ldapGroups;
+}
+
 export function getEnvironmentConfig(state) {
     return state.entities.admin.environmentConfig;
 }
