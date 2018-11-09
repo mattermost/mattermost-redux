@@ -2193,6 +2193,27 @@ export default class Client4 {
         );
     };
 
+    getLdapGroups = async (page = 0, perPage = PER_PAGE_DEFAULT) => {
+        return this.doFetch(
+            `${this.getBaseRoute()}/ldap/groups${buildQueryString({page, per_page: perPage})}`,
+            {method: 'get'}
+        );
+    };
+
+    linkLdapGroup = async (key) => {
+        return this.doFetch(
+            `${this.getBaseRoute()}/ldap/groups/${encodeURI(key)}/link`,
+            {method: 'post'}
+        );
+    };
+
+    unlinkLdapGroup = async (key) => {
+        return this.doFetch(
+            `${this.getBaseRoute()}/ldap/groups/${encodeURI(key)}/link`,
+            {method: 'delete'}
+        );
+    };
+
     getSamlCertificateStatus = async () => {
         return this.doFetch(
             `${this.getBaseRoute()}/saml/certificate/status`,
