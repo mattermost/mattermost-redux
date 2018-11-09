@@ -95,8 +95,8 @@ export function removeUserFromList(userId: string, list: Array<UserProfile>): Ar
 }
 
 export function filterProfilesMatchingTerm(users: Array<UserProfile>, term: string): Array<UserProfile> {
-    let lowercasedTerm = term.toLowerCase();
-    let trimmedTerm = lowercasedTerm
+    const lowercasedTerm = term.toLowerCase();
+    let trimmedTerm = lowercasedTerm;
     if (trimmedTerm.startsWith('@')) {
         trimmedTerm = trimmedTerm.substr(1);
     }
