@@ -3,8 +3,9 @@
 
 import assert from 'assert';
 
+import deepFreezeAndThrowOnMutation from 'utils/deep_freeze';
 import {AdminTypes, UserTypes} from 'action_types';
-import reducer from 'reducers/entities/admin';
+import reducer, {convertAnalyticsRowsToStats} from 'reducers/entities/admin';
 import PluginState from 'constants/plugins';
 
 describe('reducers.entities.admin', () => {
@@ -782,6 +783,13 @@ describe('reducers.entities.admin', () => {
 
             const actualState = reducer({pluginStatuses: state}, action);
             assert.deepEqual(actualState.pluginStatuses, expectedState);
+        });
+    });
+
+    describe('convertAnalyticsRowsToStats', () => {
+        it('data should not be mutated', () => {
+            const data = deepFreezeAndThrowOnMutation([{name: '1', value: 1}, {name: '2', value: 2}, {name: '3', value: 3}]);
+            convertAnalyticsRowsToStats(data, 'post_counts_day');
         });
     });
 });

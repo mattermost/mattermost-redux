@@ -35,7 +35,7 @@ import {
 } from './preferences';
 
 import {getConfig} from 'selectors/entities/general';
-import {getCurrentUser, getCurrentUserId} from 'selectors/entities/users';
+import {getCurrentUserId} from 'selectors/entities/users';
 
 export function checkMfa(loginId: string): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
@@ -177,6 +177,7 @@ function completeLogin(data: UserProfile): ActionFunc {
             dispatch(getMyPreferences()),
             dispatch(getMyTeams()),
             dispatch(getClientConfig()),
+            dispatch(getMyTermsOfServiceStatus()),
         ];
 
         const serverVersion = Client4.getServerVersion();
@@ -231,11 +232,12 @@ export function loadMe(): ActionFunc {
         }
 
         const promises = [
-            getMe()(dispatch, getState),
-            getMyPreferences()(dispatch, getState),
-            getMyTeams()(dispatch, getState),
-            getMyTeamMembers()(dispatch, getState),
-            getMyTeamUnreads()(dispatch, getState),
+            dispatch(getMe()),
+            dispatch(getMyPreferences()),
+            dispatch(getMyTeams()),
+            dispatch(getMyTeamMembers()),
+            dispatch(getMyTeamUnreads()),
+            dispatch(getMyTermsOfServiceStatus()),
         ];
 
         // Sometimes the server version is set in one or the other
@@ -618,24 +620,33 @@ export function getMe(): ActionFunc {
     };
 }
 
-export function updateTermsOfServiceStatus(termsOfServiceId: string, accepted: boolean): ActionFunc {
+export function getMyTermsOfServiceStatus(): ActionFunc {
+    return bindClientFunc(
+        Client4.getMyTermsOfServiceStatus,
+        UserTypes.GET_MY_TERMS_OF_SERVICE_STATUS_REQUEST,
+        [UserTypes.RECEIVED_TERMS_OF_SERVICE_STATUS, UserTypes.GET_MY_TERMS_OF_SERVICE_STATUS_SUCCESS],
+        UserTypes.GET_MY_TERMS_OF_SERVICE_STATUS_FAILURE,
+    );
+}
+
+export function updateMyTermsOfServiceStatus(termsOfServiceId: string, accepted: boolean): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         const response: $Subtype<ActionResult> = await dispatch(bindClientFunc(
-            Client4.updateTermsOfServiceStatus,
-            UserTypes.UPDATE_TERMS_OF_SERVICE_STATUS_REQUEST,
-            UserTypes.UPDATE_TERMS_OF_SERVICE_STATUS_SUCCESS,
-            UserTypes.UPDATE_TERMS_OF_SERVICE_STATUS_FAILURE,
+            Client4.updateMyTermsOfServiceStatus,
+            UserTypes.UPDATE_MY_TERMS_OF_SERVICE_STATUS_REQUEST,
+            UserTypes.UPDATE_MY_TERMS_OF_SERVICE_STATUS_SUCCESS,
+            UserTypes.UPDATE_MY_TERMS_OF_SERVICE_STATUS_FAILURE,
             termsOfServiceId,
             accepted
         ));
         const {data, error} = response;
         if (data) {
-            const currentUser = getCurrentUser(getState());
             dispatch({
-                type: UserTypes.RECEIVED_ME,
+                type: UserTypes.RECEIVED_TERMS_OF_SERVICE_STATUS,
                 data: {
-                    ...currentUser,
-                    accepted_terms_of_service_id: accepted ? termsOfServiceId : null,
+                    create_at: new Date().getTime(),
+                    terms_of_service_id: accepted ? termsOfServiceId : null,
+                    user_id: getCurrentUserId(getState()),
                 },
             });
             return {data};
@@ -1646,7 +1657,8 @@ export default {
     switchLdapToEmail,
     getTermsOfService,
     createTermsOfService,
-    updateTermsOfServiceStatus,
+    getMyTermsOfServiceStatus,
+    updateMyTermsOfServiceStatus,
     createUserAccessToken,
     getUserAccessToken,
     getUserAccessTokensForUser,

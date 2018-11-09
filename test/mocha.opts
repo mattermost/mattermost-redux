@@ -1,6 +1,5 @@
---compilers js:babel-core/register
+--require @babel/register
 --require test/setup.js
---require babel-polyfill
 --require isomorphic-fetch
 --recursive
 --reporter mocha-multi-reporters 
