@@ -1066,10 +1066,13 @@ describe('Actions.Admin', () => {
             return;
         }
 
-        const ldapGroups = [
-            {primary_key: 'test1', name: 'test1', mattermost_group_id: null, has_syncables: false},
-            {primary_key: 'test2', name: 'test2', mattermost_group_id: 'mattermost-id', has_syncables: true},
-        ];
+        const ldapGroups = {
+            count: 2,
+            groups: [
+                {primary_key: 'test1', name: 'test1', mattermost_group_id: null, has_syncables: false},
+                {primary_key: 'test2', name: 'test2', mattermost_group_id: 'mattermost-id', has_syncables: true},
+            ],
+        };
 
         nock(Client4.getBaseRoute()).
             get('/ldap/groups?page=0&per_page=100').
@@ -1085,8 +1088,8 @@ describe('Actions.Admin', () => {
 
         const groups = state.entities.admin.ldapGroups;
         assert.ok(groups);
-        assert.ok(groups[ldapGroups[0].primary_key]);
-        assert.ok(groups[ldapGroups[1].primary_key]);
+        assert.ok(groups[ldapGroups.groups[0].primary_key]);
+        assert.ok(groups[ldapGroups.groups[1].primary_key]);
     });
 
     it('linkLdapGroup', async () => {
@@ -1095,10 +1098,13 @@ describe('Actions.Admin', () => {
             return;
         }
 
-        const ldapGroups = [
-            {primary_key: 'test1', name: 'test1', mattermost_group_id: null, has_syncables: false},
-            {primary_key: 'test2', name: 'test2', mattermost_group_id: 'mattermost-id', has_syncables: true},
-        ];
+        const ldapGroups = {
+            count: 2,
+            groups: [
+                {primary_key: 'test1', name: 'test1', mattermost_group_id: null, has_syncables: false},
+                {primary_key: 'test2', name: 'test2', mattermost_group_id: 'mattermost-id', has_syncables: true},
+            ],
+        };
 
         nock(Client4.getBaseRoute()).
             get('/ldap/groups?page=0&per_page=100').
@@ -1127,10 +1133,13 @@ describe('Actions.Admin', () => {
             return;
         }
 
-        const ldapGroups = [
-            {primary_key: 'test1', name: 'test1', mattermost_group_id: null, has_syncables: false},
-            {primary_key: 'test2', name: 'test2', mattermost_group_id: 'mattermost-id', has_syncables: true},
-        ];
+        const ldapGroups = {
+            count: 2,
+            groups: [
+                {primary_key: 'test1', name: 'test1', mattermost_group_id: null, has_syncables: false},
+                {primary_key: 'test2', name: 'test2', mattermost_group_id: 'mattermost-id', has_syncables: true},
+            ],
+        };
 
         nock(Client4.getBaseRoute()).
             get('/ldap/groups?page=0&per_page=100').

@@ -807,20 +807,23 @@ describe('reducers.entities.admin', () => {
             const state = {};
             const action = {
                 type: AdminTypes.RECEIVED_LDAP_GROUPS,
-                data: [
-                    {
-                        primary_key: 'test1',
-                        name: 'test1',
-                        mattermost_group_id: null,
-                        has_syncables: null,
-                    },
-                    {
-                        primary_key: 'test2',
-                        name: 'test2',
-                        mattermost_group_id: 'mattermost-id',
-                        has_syncables: true,
-                    },
-                ],
+                data: {
+                    count: 2,
+                    groups: [
+                        {
+                            primary_key: 'test1',
+                            name: 'test1',
+                            mattermost_group_id: null,
+                            has_syncables: null,
+                        },
+                        {
+                            primary_key: 'test2',
+                            name: 'test2',
+                            mattermost_group_id: 'mattermost-id',
+                            has_syncables: true,
+                        },
+                    ],
+                },
             };
             const expectedState = {
                 test1: {
@@ -858,20 +861,23 @@ describe('reducers.entities.admin', () => {
             };
             const action = {
                 type: AdminTypes.RECEIVED_LDAP_GROUPS,
-                data: [
-                    {
-                        primary_key: 'test3',
-                        name: 'test3',
-                        mattermost_group_id: null,
-                        has_syncables: null,
-                    },
-                    {
-                        primary_key: 'test4',
-                        name: 'test4',
-                        mattermost_group_id: 'mattermost-id',
-                        has_syncables: false,
-                    },
-                ],
+                data: {
+                    count: 2,
+                    groups: [
+                        {
+                            primary_key: 'test3',
+                            name: 'test3',
+                            mattermost_group_id: null,
+                            has_syncables: null,
+                        },
+                        {
+                            primary_key: 'test4',
+                            name: 'test4',
+                            mattermost_group_id: 'mattermost-id',
+                            has_syncables: false,
+                        },
+                    ],
+                },
             };
             const expectedState = {
                 test3: {

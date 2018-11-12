@@ -71,6 +71,8 @@ const state: GlobalState = {
             config: {},
             environmentConfig: {},
             complianceReports: {},
+            ldapGroups: {},
+            ldapGroupsCount: 0,
         },
         jobs: {
             jobs: {},

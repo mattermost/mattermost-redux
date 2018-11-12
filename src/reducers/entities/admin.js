@@ -510,11 +510,22 @@ function pluginStatuses(state = {}, action) {
     }
 }
 
+function ldapGroupsCount(state = {}, action) {
+    switch (action.type) {
+    case AdminTypes.RECEIVED_LDAP_GROUPS:
+        return action.data.count;
+    case UserTypes.LOGOUT_SUCCESS:
+        return 0;
+    default:
+        return state;
+    }
+}
+
 function ldapGroups(state = {}, action) {
     switch (action.type) {
     case AdminTypes.RECEIVED_LDAP_GROUPS: {
         const nextState = {};
-        for (const group of action.data) {
+        for (const group of action.data.groups) {
             nextState[group.primary_key] = group;
         }
         return nextState;
@@ -611,4 +622,6 @@ export default combineReducers({
     // object representing the ldap groups
     ldapGroups,
 
+    // total ldap groups
+    ldapGroupsCount,
 });
