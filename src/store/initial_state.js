@@ -123,6 +123,11 @@ const state: GlobalState = {
             },
         },
         schemes: {schemes: {}},
+        groups: {
+            groups: {},
+            syncables: {},
+            members: {},
+        },
     },
     errors: [],
     requests: {

@@ -2487,6 +2487,43 @@ export default class Client4 {
         );
     };
 
+    // Groups
+
+    linkGroupSyncable = async (groupID, syncableID, syncableType, patch) => {
+        return this.doFetch(
+            `${this.getBaseRoute()}/groups/${groupID}/${syncableType}s/${syncableID}/link`,
+            {method: 'post', body: JSON.stringify(patch)}
+        );
+    };
+
+    unlinkGroupSyncable = async (groupID, syncableID, syncableType) => {
+        return this.doFetch(
+            `${this.getBaseRoute()}/groups/${groupID}/${syncableType}s/${syncableID}/link`,
+            {method: 'delete'}
+        );
+    };
+
+    getGroupSyncables = async (groupID, syncableType) => {
+        return this.doFetch(
+            `${this.getBaseRoute()}/groups/${groupID}/${syncableType}s`,
+            {method: 'get'}
+        );
+    };
+
+    getGroupMembers = async (groupID, page = 0, perPage = PER_PAGE_DEFAULT) => {
+        return this.doFetch(
+            `${this.getBaseRoute()}/groups/${groupID}/members${buildQueryString({page, per_page: perPage})}`,
+            {method: 'get'}
+        );
+    };
+
+    getGroup = async (groupID) => {
+        return this.doFetch(
+            `${this.getBaseRoute()}/groups/${groupID}`,
+            {method: 'get'}
+        );
+    };
+
     // Redirect Location
 
     getRedirectLocation = async (urlParam) => {

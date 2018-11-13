@@ -19,6 +19,7 @@ import JobTypes from './jobs';
 import SearchTypes from './search';
 import RoleTypes from './roles';
 import SchemeTypes from './schemes';
+import GroupTypes from './groups';
 
 export {
     ErrorTypes,
@@ -38,4 +39,5 @@ export {
     SearchTypes,
     RoleTypes,
     SchemeTypes,
+    GroupTypes,
 };
