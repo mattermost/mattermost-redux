@@ -102,10 +102,9 @@ function syncables(state = {}, action) {
 function members(state = {}, action) {
     switch (action.type) {
     case GroupTypes.RECEIVED_GROUP_MEMBERS: {
-        const {groupID} = action.data;
         return {
             ...state,
-            [groupID]: action.data,
+            [action.group_id]: action.data,
         };
     }
     default:

@@ -116,15 +116,28 @@ export function getGroupSyncables(groupID: string, syncableType: SyncableType): 
 }
 
 export function getGroupMembers(groupID: string, page: number = 0, perPage: number = General.LOGS_PAGE_SIZE_DEFAULT): ActionFunc {
-    return bindClientFunc(
-        Client4.getGroupMembers,
-        GroupTypes.GET_GROUP_MEMBERS_REQUEST,
-        [GroupTypes.RECEIVED_GROUP_MEMBERS, GroupTypes.GET_GROUP_MEMBERS_SUCCESS],
-        GroupTypes.GET_GROUP_MEMBERS_FAILURE,
-        groupID,
-        page,
-        perPage
-    );
+    return async (dispatch, getState) => {
+        dispatch({type: GroupTypes.GET_GROUP_MEMBERS_REQUEST, data: {groupID, page, perPage}});
+
+        let data;
+        try {
+            data = await Client4.getGroupMembers(groupID, page, perPage);
+        } catch (error) {
+            forceLogoutIfNecessary(error, dispatch, getState);
+            dispatch(batchActions([
+                {type: GroupTypes.GET_GROUP_MEMBERS_FAILURE, error, data: {groupID, page, perPage}},
+                logError(error),
+            ]));
+            return {error};
+        }
+
+        dispatch(batchActions([
+            {type: GroupTypes.GET_GROUP_MEMBERS_SUCCESS, data: null},
+            {type: GroupTypes.RECEIVED_GROUP_MEMBERS, group_id: groupID, data},
+        ]));
+
+        return {data: true};
+    };
 }
 
 export function getGroup(id: string): ActionFunc {
