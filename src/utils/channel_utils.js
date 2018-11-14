@@ -238,6 +238,7 @@ export function showCreateOption(state, config, license, teamId, channelType, is
         return true;
     }
 
+    // Backwards compatibility with pre-advanced permissions config settings.
     if (channelType === General.OPEN_CHANNEL) {
         if (config.RestrictPublicChannelCreation === General.SYSTEM_ADMIN_ROLE && !isSystemAdmin) {
             return false;
@@ -269,6 +270,7 @@ export function showManagementOptions(state, config, license, channel, isAdmin, 
         return true;
     }
 
+    // Backwards compatibility with pre-advanced permissions config settings.
     if (channel.type === General.OPEN_CHANNEL) {
         if (config.RestrictPublicChannelManagement === General.SYSTEM_ADMIN_ROLE && !isSystemAdmin) {
             return false;
@@ -308,6 +310,7 @@ export function showDeleteOption(state, config, license, channel, isAdmin, isSys
         return true;
     }
 
+    // Backwards compatibility with pre-advanced permissions config settings.
     if (channel.type === General.OPEN_CHANNEL) {
         if (config.RestrictPublicChannelDeletion === General.SYSTEM_ADMIN_ROLE && !isSystemAdmin) {
             return false;
@@ -333,6 +336,7 @@ export function showDeleteOption(state, config, license, channel, isAdmin, isSys
     return true;
 }
 
+// Backwards compatibility with pre-advanced permissions config settings.
 export function canManageMembersOldPermissions(channel, user, teamMember, channelMember, config, license) {
     if (channel.type === General.DM_CHANNEL ||
         channel.type === General.GM_CHANNEL ||
@@ -546,6 +550,20 @@ export function sortChannelsByDisplayNameAndMuted(locale, members, a, b) {
     }
 
     return -1;
+}
+
+export function sortChannelsByRecency(lastPosts, a, b) {
+    let aLastPostAt = a.last_post_at;
+    if (lastPosts[a.id] && lastPosts[a.id].update_at > a.last_post_at) {
+        aLastPostAt = lastPosts[a.id].update_at;
+    }
+
+    let bLastPostAt = b.last_post_at;
+    if (lastPosts[b.id] && lastPosts[b.id].update_at > b.last_post_at) {
+        bLastPostAt = lastPosts[b.id].update_at;
+    }
+
+    return bLastPostAt - aLastPostAt;
 }
 
 export function isChannelMuted(member) {

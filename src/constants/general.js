@@ -17,6 +17,8 @@ export default {
     SEARCH_TIMEOUT_MILLISECONDS: 100,
     STATUS_INTERVAL: 60000,
 
+    AUTOCOMPLETE_LIMIT_DEFAULT: 25,
+
     MENTION: 'mention',
 
     OUT_OF_OFFICE: 'ooo',
@@ -81,4 +83,8 @@ export default {
     DEFAULT_LOCALE: 'en',
 
     DEFAULT_AUTOLINKED_URL_SCHEMES: ['http', 'https', 'ftp', 'mailto', 'tel'],
+
+    DISABLED: 'disabled',
+    DEFAULT_ON: 'default_on',
+    DEFAULT_OFF: 'default_off',
 };

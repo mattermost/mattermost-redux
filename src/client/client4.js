@@ -5,6 +5,8 @@ const FormData = require('form-data');
 
 import fetch from './fetch_etag';
 import {buildQueryString, isMinimumServerVersion} from 'src/utils/helpers';
+import {cleanUrlForLogging} from 'src/utils/sentry';
+import {General} from 'constants';
 
 const HEADER_AUTH = 'Authorization';
 const HEADER_BEARER = 'BEARER';
@@ -424,7 +426,14 @@ export default class Client4 {
         );
     }
 
-    updateTermsOfServiceStatus = async (termsOfServiceId, accepted) => {
+    getMyTermsOfServiceStatus = async () => {
+        return this.doFetch(
+            `${this.getUserRoute('me')}/terms_of_service`,
+            {method: 'get'}
+        );
+    }
+
+    updateMyTermsOfServiceStatus = async (termsOfServiceId, accepted) => {
         return this.doFetch(
             `${this.getUserRoute('me')}/terms_of_service`,
             {method: 'post', body: JSON.stringify({termsOfServiceId, accepted})}
@@ -633,7 +642,7 @@ export default class Client4 {
         return `${this.getUserRoute(userId)}/image/default`;
     };
 
-    autocompleteUsers = async (name, teamId, channelId, options) => {
+    autocompleteUsers = async (name, teamId, channelId, options = {limit: General.AUTOCOMPLETE_LIMIT_DEFAULT}) => {
         return this.doFetch(
             `${this.getUsersRoute()}/autocomplete${buildQueryString({in_team: teamId, in_channel: channelId, name, limit: options.limit})}`,
             {method: 'get'}
@@ -1642,10 +1651,10 @@ export default class Client4 {
         const url = `${this.getBaseRoute()}/logs`;
 
         if (!this.enableLogging) {
-            throw {
+            throw new ClientError(this.getUrl(), {
                 message: 'Logging disabled.',
                 url,
-            };
+            });
         }
 
         return this.doFetch(
@@ -2477,10 +2486,10 @@ export default class Client4 {
 
     doFetchWithResponse = async (url, options) => {
         if (!this.online) {
-            throw {
+            throw new ClientError(this.getUrl(), {
                 message: 'no internet connection',
                 url,
-            };
+            });
         }
 
         const response = await fetch(url, this.getOptions(options));
@@ -2490,14 +2499,14 @@ export default class Client4 {
         try {
             data = await response.json();
         } catch (err) {
-            throw {
+            throw new ClientError(this.getUrl(), {
                 message: 'Received invalid response from the server.',
                 intl: {
                     id: 'mobile.request.invalid_response',
                     defaultMessage: 'Received invalid response from the server.',
                 },
                 url,
-            };
+            });
         }
 
         if (headers.has(HEADER_X_VERSION_ID) && !headers.get('Cache-Control')) {
@@ -2528,12 +2537,12 @@ export default class Client4 {
             console.error(msg); // eslint-disable-line no-console
         }
 
-        throw {
+        throw new ClientError(this.getUrl(), {
             message: msg,
             server_error_id: data.id,
             status_code: data.status_code,
             url,
-        };
+        });
     };
 
     trackEvent(category, event, props) {
@@ -2583,4 +2592,16 @@ function parseAndMergeNestedHeaders(originalHeaders) {
         headers.set(capitalizedKey, realVal);
     });
     return new Map([...headers, ...nestedHeaders]);
+}
+
+export class ClientError extends Error {
+    constructor(baseUrl, data) {
+        super(data.message + ': ' + cleanUrlForLogging(baseUrl, data.url));
+
+        this.message = data.message;
+        this.url = data.url;
+        this.intl = data.intl;
+        this.server_error_id = data.server_error_id;
+        this.status_code = data.status_code;
+    }
 }

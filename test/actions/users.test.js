@@ -140,39 +140,37 @@ describe('Actions.Users', () => {
         }
     });
 
-    it('updateTermsOfServiceStatus accept terms', async () => {
-        const user = TestHelper.basicUser;
-        nock(Client4.getUsersRoute()).
-            post('').
-            reply(201, {...TestHelper.fakeUserWithId(), accepted_terms_of_service_id: 1});
+    it('getMyTermsOfServiceStatus', async () => {
+        const response = {
+            create_at: 1537880148600,
+            terms_of_service_id: '123',
+            user_id: 'abcd',
+        };
 
-        TestHelper.mockLogin();
-        await Actions.login(user.email, 'password1')(store.dispatch, store.getState);
+        nock(Client4.getUserRoute('me')).
+            get('/terms_of_service').
+            reply(200, response);
 
-        nock(Client4.getBaseRoute()).
-            post('/users/me/terms_of_service').
-            reply(200, OK_RESPONSE);
+        await Actions.getMyTermsOfServiceStatus()(store.dispatch, store.getState);
 
-        await Actions.updateTermsOfServiceStatus(1, true)(store.dispatch, store.getState);
-
-        const request = store.getState().requests.users.updateTermsOfServiceStatus;
-
+        const request = store.getState().requests.users.getMyTermsOfServiceStatus;
         if (request.status === RequestStatus.FAILURE) {
             throw new Error(JSON.stringify(request.error));
         }
 
-        const {currentUserId, profiles} = store.getState().entities.users;
+        const {myAcceptedTermsOfServiceData} = store.getState().entities.users;
 
-        assert.ok(currentUserId);
-        assert.ok(profiles[currentUserId]);
-        assert.equal(profiles[currentUserId].accepted_terms_of_service_id, 1);
+        assert.ok(myAcceptedTermsOfServiceData.id);
+        assert.ok(myAcceptedTermsOfServiceData.time);
+        assert.equal(myAcceptedTermsOfServiceData.id, '123');
+        assert.equal(myAcceptedTermsOfServiceData.time, 1537880148600);
     });
 
-    it('updateTermsOfServiceStatus reject terms', async () => {
+    it('updateMyTermsOfServiceStatus accept terms', async () => {
         const user = TestHelper.basicUser;
         nock(Client4.getUsersRoute()).
             post('').
-            reply(201, {...TestHelper.fakeUserWithId(), accepted_terms_of_service_id: 0});
+            reply(201, {...TestHelper.fakeUserWithId()});
 
         TestHelper.mockLogin();
         await Actions.login(user.email, 'password1')(store.dispatch, store.getState);
@@ -181,19 +179,47 @@ describe('Actions.Users', () => {
             post('/users/me/terms_of_service').
             reply(200, OK_RESPONSE);
 
-        await Actions.updateTermsOfServiceStatus(1, false)(store.dispatch, store.getState);
+        await Actions.updateMyTermsOfServiceStatus(1, true)(store.dispatch, store.getState);
 
-        const request = store.getState().requests.users.updateTermsOfServiceStatus;
+        const request = store.getState().requests.users.updateMyTermsOfServiceStatus;
 
         if (request.status === RequestStatus.FAILURE) {
             throw new Error(JSON.stringify(request.error));
         }
 
-        const {currentUserId, profiles} = store.getState().entities.users;
+        const {currentUserId, myAcceptedTermsOfServiceData} = store.getState().entities.users;
 
         assert.ok(currentUserId);
-        assert.ok(profiles[currentUserId]);
-        assert.notEqual(profiles[currentUserId].accepted_terms_of_service_id, 1);
+        assert.ok(myAcceptedTermsOfServiceData.id);
+        assert.ok(myAcceptedTermsOfServiceData.time);
+        assert.equal(myAcceptedTermsOfServiceData.id, 1);
+    });
+
+    it('updateMyTermsOfServiceStatus reject terms', async () => {
+        const user = TestHelper.basicUser;
+        nock(Client4.getUsersRoute()).
+            post('').
+            reply(201, {...TestHelper.fakeUserWithId()});
+
+        TestHelper.mockLogin();
+        await Actions.login(user.email, 'password1')(store.dispatch, store.getState);
+
+        nock(Client4.getBaseRoute()).
+            post('/users/me/terms_of_service').
+            reply(200, OK_RESPONSE);
+
+        await Actions.updateMyTermsOfServiceStatus(1, false)(store.dispatch, store.getState);
+
+        const request = store.getState().requests.users.updateMyTermsOfServiceStatus;
+
+        if (request.status === RequestStatus.FAILURE) {
+            throw new Error(JSON.stringify(request.error));
+        }
+
+        const {currentUserId, myAcceptedTermsOfServiceId} = store.getState().entities.users;
+
+        assert.ok(currentUserId);
+        assert.notEqual(myAcceptedTermsOfServiceId, 1);
     });
 
     it('logout', async () => {
