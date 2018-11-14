@@ -90,30 +90,6 @@ export function unlinkGroupSyncable(groupID: string, syncableID: string, syncabl
 }
 
 export function getGroupSyncables(groupID: string, syncableType: SyncableType): ActionFunc {
-    // switch (syncableType) {
-    // case Groups.SYNCABLE_TYPE_TEAM:
-    //     return bindClientFunc(
-    //         Client4.getGroupSyncables,
-    //         GroupTypes.GET_GROUP_SYNCABLES_REQUEST,
-    //         [GroupTypes.RECEIVED_GROUP_TEAMS, GroupTypes.GET_GROUP_SYNCABLES_SUCCESS],
-    //         GroupTypes.GET_GROUP_SYNCABLES_FAILURE,
-    //         groupID,
-    //         syncableType,
-    //     );
-    // case Groups.SYNCABLE_TYPE_CHANNEL:
-    //     return bindClientFunc(
-    //         Client4.getGroupSyncables,
-    //         GroupTypes.GET_GROUP_SYNCABLES_REQUEST,
-    //         [GroupTypes.RECEIVED_GROUP_CHANNELS, GroupTypes.GET_GROUP_SYNCABLES_SUCCESS],
-    //         GroupTypes.GET_GROUP_SYNCABLES_FAILURE,
-    //         groupID,
-    //         syncableType,
-    //     );
-    // default:
-    //     console.warn(`unhandled syncable type ${syncableType}`); // eslint-disable-line no-console
-    // }
-    // return null;
-
     return async (dispatch, getState) => {
         dispatch({type: GroupTypes.GET_GROUP_SYNCABLES_REQUEST, data: {groupID, syncableType}});
 
