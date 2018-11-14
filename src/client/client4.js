@@ -2603,5 +2603,7 @@ export class ClientError extends Error {
         this.intl = data.intl;
         this.server_error_id = data.server_error_id;
         this.status_code = data.status_code;
+
+        Object.defineProperty(this, 'message', {enumerable: true});
     }
 }
