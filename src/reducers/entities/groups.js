@@ -7,21 +7,19 @@ import {GroupTypes} from 'action_types';
 function syncables(state = {}, action) {
     switch (action.type) {
     case GroupTypes.RECEIVED_GROUP_TEAMS: {
-        const {groupID} = action.data;
         return {
             ...state,
-            [groupID]: {
-                ...state[groupID],
+            [action.group_id]: {
+                ...state[action.group_id],
                 teams: action.data,
             },
         };
     }
     case GroupTypes.RECEIVED_GROUP_CHANNELS: {
-        const {groupID} = action.data;
         return {
             ...state,
-            [groupID]: {
-                ...state[groupID],
+            [action.group_id]: {
+                ...state[action.group_id],
                 channels: action.data,
             },
         };

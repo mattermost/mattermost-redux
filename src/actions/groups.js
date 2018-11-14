@@ -90,29 +90,64 @@ export function unlinkGroupSyncable(groupID: string, syncableID: string, syncabl
 }
 
 export function getGroupSyncables(groupID: string, syncableType: SyncableType): ActionFunc {
-    switch (syncableType) {
-    case Groups.SYNCABLE_TYPE_TEAM:
-        return bindClientFunc(
-            Client4.getGroupSyncables,
-            GroupTypes.GET_GROUP_SYNCABLES_REQUEST,
-            [GroupTypes.RECEIVED_GROUP_TEAMS, GroupTypes.GET_GROUP_SYNCABLES_SUCCESS],
-            GroupTypes.GET_GROUP_SYNCABLES_FAILURE,
-            groupID,
-            syncableType,
-        );
-    case Groups.SYNCABLE_TYPE_CHANNEL:
-        return bindClientFunc(
-            Client4.getGroupSyncables,
-            GroupTypes.GET_GROUP_SYNCABLES_REQUEST,
-            [GroupTypes.RECEIVED_GROUP_CHANNELS, GroupTypes.GET_GROUP_SYNCABLES_SUCCESS],
-            GroupTypes.GET_GROUP_SYNCABLES_FAILURE,
-            groupID,
-            syncableType,
-        );
-    default:
-        console.warn(`unhandled syncable type ${syncableType}`); // eslint-disable-line no-console
-    }
-    return null;
+    // switch (syncableType) {
+    // case Groups.SYNCABLE_TYPE_TEAM:
+    //     return bindClientFunc(
+    //         Client4.getGroupSyncables,
+    //         GroupTypes.GET_GROUP_SYNCABLES_REQUEST,
+    //         [GroupTypes.RECEIVED_GROUP_TEAMS, GroupTypes.GET_GROUP_SYNCABLES_SUCCESS],
+    //         GroupTypes.GET_GROUP_SYNCABLES_FAILURE,
+    //         groupID,
+    //         syncableType,
+    //     );
+    // case Groups.SYNCABLE_TYPE_CHANNEL:
+    //     return bindClientFunc(
+    //         Client4.getGroupSyncables,
+    //         GroupTypes.GET_GROUP_SYNCABLES_REQUEST,
+    //         [GroupTypes.RECEIVED_GROUP_CHANNELS, GroupTypes.GET_GROUP_SYNCABLES_SUCCESS],
+    //         GroupTypes.GET_GROUP_SYNCABLES_FAILURE,
+    //         groupID,
+    //         syncableType,
+    //     );
+    // default:
+    //     console.warn(`unhandled syncable type ${syncableType}`); // eslint-disable-line no-console
+    // }
+    // return null;
+
+    return async (dispatch, getState) => {
+        dispatch({type: GroupTypes.GET_GROUP_SYNCABLES_REQUEST, data: {groupID, syncableType}});
+
+        let data;
+        try {
+            data = await Client4.getGroupSyncables(groupID, syncableType);
+        } catch (error) {
+            forceLogoutIfNecessary(error, dispatch, getState);
+            dispatch(batchActions([
+                {type: GroupTypes.GET_GROUP_SYNCABLES_FAILURE, error, data: {groupID, syncableType}},
+                logError(error),
+            ]));
+            return {error};
+        }
+
+        var type;
+        switch (syncableType) {
+        case Groups.SYNCABLE_TYPE_TEAM:
+            type = GroupTypes.RECEIVED_GROUP_TEAMS;
+            break;
+        case Groups.SYNCABLE_TYPE_CHANNEL:
+            type = GroupTypes.RECEIVED_GROUP_CHANNELS;
+            break;
+        default:
+            console.warn(`unhandled syncable type ${syncableType}`); // eslint-disable-line no-console
+        }
+
+        dispatch(batchActions([
+            {type: GroupTypes.GET_GROUP_SYNCABLES_SUCCESS, data: null},
+            {type, data, group_id: groupID},
+        ]));
+
+        return {data: true};
+    };
 }
 
 export function getGroupMembers(groupID: string, page: number = 0, perPage: number = General.LOGS_PAGE_SIZE_DEFAULT): ActionFunc {
