@@ -43,7 +43,23 @@ export const getGroupChannels = createSelector(
 export const getGroupMembers = createSelector(
     (state) => state.entities.groups.members,
     (state, id) => id,
-    (allMembers, groupID) => {
-        return allMembers[groupID];
+    (memberData, groupID) => {
+        var groupMemberData = memberData[groupID];
+        if (!groupMemberData) {
+            return [];
+        }
+        return groupMemberData.members;
+    }
+);
+
+export const getGroupMemberCount = createSelector(
+    (state) => state.entities.groups.members,
+    (state, id) => id,
+    (memberData, groupID) => {
+        var groupMemberData = memberData[groupID];
+        if (!groupMemberData) {
+            return 0;
+        }
+        return memberData[groupID].totalMemberCount;
     }
 );

@@ -102,7 +102,10 @@ function members(state = {}, action) {
     case GroupTypes.RECEIVED_GROUP_MEMBERS: {
         return {
             ...state,
-            [action.group_id]: action.data,
+            [action.group_id]: {
+                members: action.data.members,
+                totalMemberCount: action.data.total_member_count,
+            },
         };
     }
     default:
