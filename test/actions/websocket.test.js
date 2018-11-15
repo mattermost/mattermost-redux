@@ -703,7 +703,7 @@ describe('Actions.Websocket', () => {
         test();
     });
 
-    it.only('handle open dialog', (done) => {
+    it('handle open dialog', (done) => {
         async function test() {
             if (TestHelper.isLiveServer()) {
                 // No live server version implemented for this test case.
