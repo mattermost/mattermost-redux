@@ -191,6 +191,24 @@ function oauthApps(state = {}, action) {
     }
 }
 
+function dialogTriggerId(state = '', action) {
+    switch (action.type) {
+    case IntegrationTypes.RECEIVED_DIALOG_TRIGGER_ID:
+        return action.data;
+    default:
+        return state;
+    }
+}
+
+function dialog(state = '', action) {
+    switch (action.type) {
+    case IntegrationTypes.RECEIVED_DIALOG:
+        return action.data;
+    default:
+        return state;
+    }
+}
+
 export default combineReducers({
 
     // object where every key is the hook id and has an object with the incoming hook details
@@ -207,4 +225,10 @@ export default combineReducers({
 
     // object to represent built-in slash commands
     systemCommands,
+
+    // trigger ID for interactive dialogs
+    dialogTriggerId,
+
+    // data for an interactive dialog to display
+    dialog,
 });

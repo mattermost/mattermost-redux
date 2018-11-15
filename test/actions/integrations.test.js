@@ -849,4 +849,29 @@ describe('Actions.Integrations', () => {
         const {oauthApps} = store.getState().entities.integrations;
         assert.ok(oauthApps[created.id].client_secret !== created.client_secret);
     });
+
+    it('submitInteractiveDialog', async () => {
+        nock(Client4.getBaseRoute()).
+            post('/actions/dialogs/submit').
+            reply(200, {errors: {name: 'some error'}});
+
+        const submit = {
+            url: 'https://mattermost.com',
+            callback_id: '123',
+            state: '123',
+            channel_id: TestHelper.generateId(),
+            team_id: TestHelper.generateId(),
+            submission: {name: 'value'},
+        };
+
+        const {data} = await store.dispatch(Actions.submitInteractiveDialog(submit));
+
+        const request = store.getState().requests.integrations.submitInteractiveDialog;
+        if (request.status === RequestStatus.FAILURE) {
+            throw new Error(JSON.stringify(request.error));
+        }
+
+        assert.ok(data.errors);
+        assert.equal(data.errors.name, 'some error');
+    });
 });
