@@ -1143,6 +1143,13 @@ export default class Client4 {
 
     // Channel Routes
 
+    getAllChannels = async () => {
+        return this.doFetch(
+            `${this.getChannelsRoute()}`,
+            {method: 'get'}
+        );
+    };
+
     createChannel = async (channel) => {
         this.trackEvent('api', 'api_channels_create', {team_id: channel.team_id});
 
@@ -1365,6 +1372,13 @@ export default class Client4 {
     searchChannels = async (teamId, term) => {
         return this.doFetch(
             `${this.getTeamRoute(teamId)}/channels/search`,
+            {method: 'post', body: JSON.stringify({term})}
+        );
+    };
+
+    searchAllChannels = async (term) => {
+        return this.doFetch(
+            `${this.getChannelsRoute()}/search`,
             {method: 'post', body: JSON.stringify({term})}
         );
     };

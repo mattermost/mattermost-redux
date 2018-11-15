@@ -12,6 +12,7 @@ import {bindClientFunc, forceLogoutIfNecessary} from './helpers';
 import {batchActions} from 'redux-batched-actions';
 
 import type {ActionFunc} from '../types/actions';
+import type {SyncableType, SyncablePatch} from '../types/group_syncables';
 
 export function linkGroupSyncable(groupID: string, syncableID: string, syncableType: SyncableType, patch: SyncablePatch): ActionFunc {
     return async (dispatch, getState) => {

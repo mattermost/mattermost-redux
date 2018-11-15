@@ -54,6 +54,10 @@ export {
     getMyCurrentChannelMembership,
 };
 
+export function getAllChannelsInAllTeams(state) {
+    return state.entities.channels.allChannels;
+}
+
 export function getAllChannels(state) {
     return state.entities.channels.channels;
 }
