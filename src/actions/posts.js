@@ -5,7 +5,7 @@ import {batchActions} from 'redux-batched-actions';
 
 import {Client4} from 'client';
 import {General, Preferences, Posts} from 'constants';
-import {PostTypes, FileTypes} from 'action_types';
+import {PostTypes, FileTypes, IntegrationTypes} from 'action_types';
 import {getUsersByUsername} from 'selectors/entities/users';
 import {getCustomEmojisByName as selectCustomEmojisByName} from 'selectors/entities/emojis';
 
@@ -1173,15 +1173,36 @@ export function getOpenGraphMetadata(url) {
 }
 
 export function doPostAction(postId, actionId, selectedOption = '') {
-    return bindClientFunc(
-        Client4.doPostAction,
-        PostTypes.DO_POST_ACTION_REQUEST,
-        [PostTypes.DO_POST_ACTION_SUCCESS],
-        PostTypes.DO_POST_ACTION_FAILURE,
-        postId,
-        actionId,
-        selectedOption
-    );
+    return async (dispatch, getState) => {
+        dispatch({type: PostTypes.DO_POST_ACTION_REQUEST}, getState);
+
+        let data;
+        try {
+            data = await Client4.doPostAction(postId, actionId, selectedOption);
+        } catch (error) {
+            forceLogoutIfNecessary(error, dispatch, getState);
+            dispatch(batchActions([
+                {type: PostTypes.DO_POST_ACTION_FAILURE, error},
+                logError(error),
+            ]));
+            return {error};
+        }
+
+        const actions = [{
+            type: PostTypes.DO_POST_ACTION_SUCCESS,
+        }];
+
+        if (data && data.trigger_id) {
+            actions.push({
+                type: IntegrationTypes.RECEIVED_DIALOG_TRIGGER_ID,
+                data: data.trigger_id,
+            });
+        }
+
+        dispatch(batchActions(actions));
+
+        return {data};
+    };
 }
 
 export function addMessageIntoHistory(message) {

@@ -220,6 +220,16 @@ function executeCommand(state: RequestStatusType = initialRequestState(), action
     );
 }
 
+function submitInteractiveDialog(state: RequestStatusType = initialRequestState(), action: GenericAction): RequestStatusType {
+    return handleRequest(
+        IntegrationTypes.SUBMIT_INTERACTIVE_DIALOG_REQUEST,
+        IntegrationTypes.SUBMIT_INTERACTIVE_DIALOG_SUCCESS,
+        IntegrationTypes.SUBMIT_INTERACTIVE_DIALOG_FAILURE,
+        state,
+        action
+    );
+}
+
 export default combineReducers({
     createIncomingHook,
     getIncomingHooks,
@@ -242,4 +252,5 @@ export default combineReducers({
     updateOAuthApp,
     executeCommand,
     getAutocompleteCommands,
+    submitInteractiveDialog,
 });
