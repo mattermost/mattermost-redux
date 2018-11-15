@@ -37,6 +37,7 @@ const WebsocketEvents = {
     LICENSE_CHANGED: 'license_changed',
     CONFIG_CHANGED: 'config_changed',
     PLUGIN_STATUSES_CHANGED: 'plugin_statuses_changed',
+    OPEN_DIALOG: 'open_dialog',
 };
 
 export default WebsocketEvents;
