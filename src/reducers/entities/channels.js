@@ -40,7 +40,7 @@ function currentChannelId(state = '', action) {
 function allChannels(state = {}, action) {
     switch (action.type) {
     case ChannelTypes.RECEIVED_ALL_CHANNELS:
-        return action.data
+        return action.data;
     case UserTypes.LOGOUT_SUCCESS:
         return {};
     default:
