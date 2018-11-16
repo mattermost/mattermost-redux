@@ -513,20 +513,9 @@ export function fetchMyChannelsAndMembers(teamId: string): ActionFunc {
         ]), getState);
 
         let channels;
-        try {
-            channels = await Client4.getMyChannels(teamId);
-        } catch (error) {
-            forceLogoutIfNecessary(error, dispatch, getState);
-            dispatch(batchActions([
-                {type: ChannelTypes.CHANNELS_FAILURE, error},
-                {type: ChannelTypes.CHANNEL_MEMBERS_FAILURE, error},
-                logError(error),
-            ]), getState);
-            return {error};
-        }
-
         let channelMembers;
         try {
+            channels = await Client4.getMyChannels(teamId);
             channelMembers = await Client4.getMyChannelMembers(teamId);
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch, getState);
