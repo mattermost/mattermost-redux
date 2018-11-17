@@ -515,8 +515,10 @@ export function fetchMyChannelsAndMembers(teamId: string): ActionFunc {
         let channels;
         let channelMembers;
         try {
-            channels = await Client4.getMyChannels(teamId);
-            channelMembers = await Client4.getMyChannelMembers(teamId);
+            const channelRequest = Client4.getMyChannels(teamId);
+            const memberRequest = Client4.getMyChannelMembers(teamId);
+            channels = await channelRequest;
+            channelMembers = await memberRequest;
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch, getState);
             dispatch(batchActions([
