@@ -1,7 +1,7 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
 
-import {General, Preferences, Permissions} from 'constants';
+import {General, Preferences, Permissions, Users} from 'constants';
 import {displayUsername} from './user_utils';
 import {getPreferencesByCategory} from './preference_utils';
 import {hasNewPermissions} from 'selectors/entities/general';
@@ -557,18 +557,18 @@ export function isChannelMuted(member) {
 }
 
 export function areChannelMentionsIgnored(channelMemberNotifyProps, currentUserNotifyProps) {
-    let ignoreChannelMentionsDefault = Preferences.IGNORE_CHANNEL_MENTIONS_OFF;
+    let ignoreChannelMentionsDefault = Users.IGNORE_CHANNEL_MENTIONS_OFF;
 
     if (currentUserNotifyProps.channel && currentUserNotifyProps.channel === 'false') {
-        ignoreChannelMentionsDefault = Preferences.IGNORE_CHANNEL_MENTIONS_ON;
+        ignoreChannelMentionsDefault = Users.IGNORE_CHANNEL_MENTIONS_ON;
     }
 
     let ignoreChannelMentions = channelMemberNotifyProps.ignore_channel_mentions;
-    if (!ignoreChannelMentions || ignoreChannelMentions === Preferences.IGNORE_CHANNEL_MENTIONS_DEFAULT) {
+    if (!ignoreChannelMentions || ignoreChannelMentions === Users.IGNORE_CHANNEL_MENTIONS_DEFAULT) {
         ignoreChannelMentions = ignoreChannelMentionsDefault;
     }
 
-    return ignoreChannelMentions !== Preferences.IGNORE_CHANNEL_MENTIONS_OFF;
+    return ignoreChannelMentions !== Users.IGNORE_CHANNEL_MENTIONS_OFF;
 }
 
 function not(f) {

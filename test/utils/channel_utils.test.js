@@ -3,7 +3,7 @@
 
 import assert from 'assert';
 
-import {General, Preferences} from 'constants';
+import {General, Users} from 'constants';
 import TestHelper from 'test/test_helper';
 
 import {areChannelMentionsIgnored, canManageMembersOldPermissions, isAutoClosed, filterChannelsMatchingTerm} from 'utils/channel_utils';
@@ -149,27 +149,27 @@ describe('ChannelUtils', () => {
 
     it('areChannelMentionsIgnored', () => {
         const currentUserNotifyProps1 = {channel: 'true'};
-        const channelMemberNotifyProps1 = {ignore_channel_mentions: Preferences.IGNORE_CHANNEL_MENTIONS_DEFAULT};
+        const channelMemberNotifyProps1 = {ignore_channel_mentions: Users.IGNORE_CHANNEL_MENTIONS_DEFAULT};
         assert.equal(false, areChannelMentionsIgnored(channelMemberNotifyProps1, currentUserNotifyProps1));
 
         const currentUserNotifyProps2 = {channel: 'true'};
-        const channelMemberNotifyProps2 = {ignore_channel_mentions: Preferences.IGNORE_CHANNEL_MENTIONS_OFF};
+        const channelMemberNotifyProps2 = {ignore_channel_mentions: Users.IGNORE_CHANNEL_MENTIONS_OFF};
         assert.equal(false, areChannelMentionsIgnored(channelMemberNotifyProps2, currentUserNotifyProps2));
 
         const currentUserNotifyProps3 = {channel: 'true'};
-        const channelMemberNotifyProps3 = {ignore_channel_mentions: Preferences.IGNORE_CHANNEL_MENTIONS_ON};
+        const channelMemberNotifyProps3 = {ignore_channel_mentions: Users.IGNORE_CHANNEL_MENTIONS_ON};
         assert.equal(true, areChannelMentionsIgnored(channelMemberNotifyProps3, currentUserNotifyProps3));
 
         const currentUserNotifyProps4 = {channel: 'false'};
-        const channelMemberNotifyProps4 = {ignore_channel_mentions: Preferences.IGNORE_CHANNEL_MENTIONS_DEFAULT};
+        const channelMemberNotifyProps4 = {ignore_channel_mentions: Users.IGNORE_CHANNEL_MENTIONS_DEFAULT};
         assert.equal(true, areChannelMentionsIgnored(channelMemberNotifyProps4, currentUserNotifyProps4));
 
         const currentUserNotifyProps5 = {channel: 'false'};
-        const channelMemberNotifyProps5 = {ignore_channel_mentions: Preferences.IGNORE_CHANNEL_MENTIONS_OFF};
+        const channelMemberNotifyProps5 = {ignore_channel_mentions: Users.IGNORE_CHANNEL_MENTIONS_OFF};
         assert.equal(false, areChannelMentionsIgnored(channelMemberNotifyProps5, currentUserNotifyProps5));
 
         const currentUserNotifyProps6 = {channel: 'false'};
-        const channelMemberNotifyProps6 = {ignore_channel_mentions: Preferences.IGNORE_CHANNEL_MENTIONS_ON};
+        const channelMemberNotifyProps6 = {ignore_channel_mentions: Users.IGNORE_CHANNEL_MENTIONS_ON};
         assert.equal(true, areChannelMentionsIgnored(channelMemberNotifyProps6, currentUserNotifyProps6));
     });
 
