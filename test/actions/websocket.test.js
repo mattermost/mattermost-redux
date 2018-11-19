@@ -702,4 +702,28 @@ describe('Actions.Websocket', () => {
 
         test();
     });
+
+    it('handle open dialog', (done) => {
+        async function test() {
+            if (TestHelper.isLiveServer()) {
+                // No live server version implemented for this test case.
+                this.skip();
+            } else {
+                mockServer.send(JSON.stringify({event: WebsocketEvents.OPEN_DIALOG, data: {dialog: JSON.stringify({url: 'someurl', trigger_id: 'sometriggerid', dialog: {}})}}));
+            }
+
+            await TestHelper.wait(200);
+
+            const state = store.getState();
+
+            const dialog = state.entities.integrations.dialog;
+            assert.ok(dialog);
+            assert.ok(dialog.url === 'someurl');
+            assert.ok(dialog.trigger_id === 'sometriggerid');
+            assert.ok(dialog.dialog);
+            done();
+        }
+
+        test();
+    });
 });

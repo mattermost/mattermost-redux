@@ -77,3 +77,14 @@ export type IntegrationsState = {|
     systemCommands: {[string]: Command},
     commands: {[string]: Command}
 |};
+
+export type DialogSubmission = {|
+    url: string,
+    callback_id: string,
+    state: string,
+    user_id: string,
+    channel_id: string,
+    team_id: string,
+    submission: {[string]: string},
+    cancelled: boolean,
+|};

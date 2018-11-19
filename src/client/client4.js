@@ -1919,6 +1919,13 @@ export default class Client4 {
         );
     };
 
+    submitInteractiveDialog = async (data) => {
+        return this.doFetch(
+            `${this.getBaseRoute()}/actions/dialogs/submit`,
+            {method: 'post', body: JSON.stringify(data)},
+        );
+    };
+
     // Emoji Routes
 
     createCustomEmoji = async (emoji, imageData) => {
