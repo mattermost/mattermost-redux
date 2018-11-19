@@ -14,18 +14,17 @@ class WebSocketClient {
         this.token = null;
         this.sequence = 1;
         this.connectFailCount = 0;
-        this.eventAction = null;
-        this.firstConnectAction = null;
-        this.reconnectAction = null;
-        this.errorAction = null;
-        this.closeAction = null;
-        this.connectingAction = null;
-        this.dispatch = null;
+        this.eventCallback = null;
+        this.firstConnectCallback = null;
+        this.reconnectCallback = null;
+        this.errorCallback = null;
+        this.closeCallback = null;
+        this.connectingCallback = null;
         this.stop = false;
         this.platform = '';
     }
 
-    initialize(token, dispatch, opts) {
+    initialize(token, opts) {
         const defaults = {
             forceConnection: true,
             connectionUrl: this.connectionUrl,
@@ -41,7 +40,7 @@ class WebSocketClient {
         if (forceConnection) {
             this.stop = false;
         }
-        this.dispatch = dispatch;
+
         return new Promise((resolve, reject) => {
             if (this.conn) {
                 resolve();
@@ -54,19 +53,13 @@ class WebSocketClient {
                 return;
             }
 
-            if (!dispatch) {
-                console.log('websocket must have a dispatch'); //eslint-disable-line no-console
-                reject(new Error('websocket must have a dispatch'));
-                return;
-            }
-
             if (this.connectFailCount === 0) {
                 console.log('websocket connecting to ' + connectionUrl); //eslint-disable-line no-console
             }
 
             Socket = webSocketConnector;
-            if (this.connectingAction) {
-                this.dispatch(this.connectingAction());
+            if (this.connectingCallback) {
+                this.connectingCallback();
             }
 
             const regex = /^(?:https?|wss?):(?:\/\/)?[^/]*/;
@@ -106,11 +99,11 @@ class WebSocketClient {
 
                 if (this.connectFailCount > 0) {
                     console.log('websocket re-established connection'); //eslint-disable-line no-console
-                    if (this.reconnectAction) {
-                        dispatch(this.reconnectAction());
+                    if (this.reconnectCallback) {
+                        this.reconnectCallback();
                     }
-                } else if (this.firstConnectAction) {
-                    dispatch(this.firstConnectAction());
+                } else if (this.firstConnectCallback) {
+                    this.firstConnectCallback();
                 }
 
                 this.connectFailCount = 0;
@@ -127,8 +120,8 @@ class WebSocketClient {
 
                 this.connectFailCount++;
 
-                if (this.closeAction) {
-                    dispatch(this.closeAction(this.connectFailCount));
+                if (this.closeCallback) {
+                    this.closeCallback(this.connectFailCount);
                 }
 
                 let retryTime = MIN_WEBSOCKET_RETRY_TIME;
@@ -151,7 +144,7 @@ class WebSocketClient {
                             clearTimeout(this.connectionTimeout);
                             return;
                         }
-                        this.initialize(token, dispatch, Object.assign({}, opts, {forceConnection: true}));
+                        this.initialize(token, opts);
                     },
                     retryTime
                 );
@@ -163,8 +156,8 @@ class WebSocketClient {
                     console.log(evt); //eslint-disable-line no-console
                 }
 
-                if (this.errorAction) {
-                    dispatch(this.errorAction(evt));
+                if (this.errorCallback) {
+                    this.errorCallback(evt);
                 }
             };
 
@@ -174,35 +167,35 @@ class WebSocketClient {
                     if (msg.error) {
                         console.warn(msg); //eslint-disable-line no-console
                     }
-                } else if (this.eventAction) {
-                    dispatch(this.eventAction(msg));
+                } else if (this.eventCallback) {
+                    this.eventCallback(msg);
                 }
             };
         });
     }
 
-    setConnectingAction(action) {
-        this.connectingAction = action;
+    setConnectingCallback(callback) {
+        this.connectingCallback = callback;
     }
 
-    setEventAction(action) {
-        this.eventAction = action;
+    setEventCallback(callback) {
+        this.eventCallback = callback;
     }
 
-    setFirstConnectAction(action) {
-        this.firstConnectAction = action;
+    setFirstConnectCallback(callback) {
+        this.firstConnectCallback = callback;
     }
 
-    setReconnectAction(action) {
-        this.reconnectAction = action;
+    setReconnectCallback(callback) {
+        this.reconnectCallback = callback;
     }
 
-    setErrorAction(action) {
-        this.errorAction = action;
+    setErrorCallback(callback) {
+        this.errorCallback = callback;
     }
 
-    setCloseAction(action) {
-        this.closeAction = action;
+    setCloseCallback(callback) {
+        this.closeCallback = callback;
     }
 
     close(stop = false) {
@@ -228,7 +221,7 @@ class WebSocketClient {
             this.conn.send(JSON.stringify(msg));
         } else if (!this.conn || this.conn.readyState === Socket.CLOSED) {
             this.conn = null;
-            this.initialize(this.token, this.dispatch, {forceConnection: true, platform: this.platform});
+            this.initialize(this.token, {platform: this.platform});
         }
     }
 

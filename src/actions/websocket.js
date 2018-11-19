@@ -64,11 +64,16 @@ import {getUserIdFromChannelName} from 'utils/channel_utils';
 import {isFromWebhook, isSystemMessage, getLastCreateAt, shouldIgnorePost} from 'utils/post_utils';
 import EventEmitter from 'utils/event_emitter';
 
+let doDispatch;
+
 export function init(platform, siteUrl, token, optionalWebSocket, additionalOptions = {}) {
     return async (dispatch, getState) => {
         const config = getConfig(getState());
         let connUrl = siteUrl || config.WebsocketURL || Client4.getUrl();
         const authToken = token || Client4.getToken();
+
+        // Set the dispatch and getState globally
+        doDispatch = dispatch;
 
         // replace the protocol with a websocket one
         if (platform !== 'ios' && platform !== 'android') {
@@ -89,11 +94,11 @@ export function init(platform, siteUrl, token, optionalWebSocket, additionalOpti
         }
 
         connUrl += `${Client4.getUrlVersion()}/websocket`;
-        websocketClient.setFirstConnectAction(handleFirstConnect);
-        websocketClient.setConnectingAction(handleConnecting);
-        websocketClient.setReconnectAction(handleReconnect);
-        websocketClient.setCloseAction(handleClose);
-        websocketClient.setEventAction(handleEvent);
+        websocketClient.setFirstConnectCallback(handleFirstConnect);
+        websocketClient.setEventCallback(handleEvent);
+        websocketClient.setReconnectCallback(handleReconnect);
+        websocketClient.setCloseCallback(handleClose);
+        websocketClient.setConnectingCallback(handleConnecting);
 
         const websocketOpts = {
             connectionUrl: connUrl,
@@ -105,7 +110,7 @@ export function init(platform, siteUrl, token, optionalWebSocket, additionalOpti
             websocketOpts.webSocketConnector = optionalWebSocket;
         }
 
-        return websocketClient.initialize(authToken, dispatch, websocketOpts);
+        return websocketClient.initialize(authToken, websocketOpts);
     };
 }
 
@@ -120,22 +125,7 @@ export function close(shouldReconnect = false) {
     };
 }
 
-function handleConnecting() {
-    return {type: GeneralTypes.WEBSOCKET_REQUEST};
-}
-
-function handleFirstConnect() {
-    return (dispatch) => {
-        if (reconnect) {
-            reconnect = false;
-            dispatch(handleReconnect());
-        } else {
-            dispatch({type: GeneralTypes.WEBSOCKET_SUCCESS});
-        }
-    };
-}
-
-function handleReconnect() {
+function doReconnect() {
     return (dispatch, getState) => {
         const state = getState();
         const currentTeamId = getCurrentTeamId(state);
@@ -186,122 +176,137 @@ function handleReconnect() {
             }
         }
 
-        return dispatch({type: GeneralTypes.WEBSOCKET_SUCCESS});
+        dispatch({type: GeneralTypes.WEBSOCKET_SUCCESS});
     };
+}
+
+function handleConnecting() {
+    doDispatch({type: GeneralTypes.WEBSOCKET_REQUEST});
+}
+
+function handleFirstConnect() {
+    if (reconnect) {
+        reconnect = false;
+        doDispatch(doReconnect());
+    } else {
+        doDispatch({type: GeneralTypes.WEBSOCKET_SUCCESS});
+    }
+}
+
+function handleReconnect() {
+    doDispatch(doReconnect());
 }
 
 function handleClose(connectFailCount) {
-    return {
+    doDispatch({
         type: GeneralTypes.WEBSOCKET_FAILURE,
         error: connectFailCount,
-    };
+    });
 }
 
 function handleEvent(msg) {
-    return (dispatch) => {
-        switch (msg.event) {
-        case WebsocketEvents.POSTED:
-        case WebsocketEvents.EPHEMERAL_MESSAGE:
-            dispatch(handleNewPostEvent(msg));
-            break;
-        case WebsocketEvents.POST_EDITED:
-            dispatch(handlePostEdited(msg));
-            break;
-        case WebsocketEvents.POST_DELETED:
-            dispatch(handlePostDeleted(msg));
-            break;
-        case WebsocketEvents.LEAVE_TEAM:
-            dispatch(handleLeaveTeamEvent(msg));
-            break;
-        case WebsocketEvents.UPDATE_TEAM:
-            dispatch(handleUpdateTeamEvent(msg));
-            break;
-        case WebsocketEvents.PATCH_TEAM:
-            dispatch(handlePatchTeamEvent(msg));
-            break;
-        case WebsocketEvents.ADDED_TO_TEAM:
-            dispatch(handleTeamAddedEvent(msg));
-            break;
-        case WebsocketEvents.USER_ADDED:
-            dispatch(handleUserAddedEvent(msg));
-            break;
-        case WebsocketEvents.USER_REMOVED:
-            dispatch(handleUserRemovedEvent(msg));
-            break;
-        case WebsocketEvents.USER_UPDATED:
-            dispatch(handleUserUpdatedEvent(msg));
-            break;
-        case WebsocketEvents.ROLE_ADDED:
-            dispatch(handleRoleAddedEvent(msg));
-            break;
-        case WebsocketEvents.ROLE_REMOVED:
-            dispatch(handleRoleRemovedEvent(msg));
-            break;
-        case WebsocketEvents.ROLE_UPDATED:
-            dispatch(handleRoleUpdatedEvent(msg));
-            break;
-        case WebsocketEvents.CHANNEL_CREATED:
-            dispatch(handleChannelCreatedEvent(msg));
-            break;
-        case WebsocketEvents.CHANNEL_DELETED:
-            dispatch(handleChannelDeletedEvent(msg));
-            break;
-        case WebsocketEvents.CHANNEL_UPDATED:
-            dispatch(handleChannelUpdatedEvent(msg));
-            break;
-        case WebsocketEvents.CHANNEL_CONVERTED:
-            dispatch(handleChannelConvertedEvent(msg));
-            break;
-        case WebsocketEvents.CHANNEL_VIEWED:
-            dispatch(handleChannelViewedEvent(msg));
-            break;
-        case WebsocketEvents.CHANNEL_MEMBER_UPDATED:
-            dispatch(handleChannelMemberUpdatedEvent(msg));
-            break;
-        case WebsocketEvents.DIRECT_ADDED:
-            dispatch(handleDirectAddedEvent(msg));
-            break;
-        case WebsocketEvents.PREFERENCE_CHANGED:
-            dispatch(handlePreferenceChangedEvent(msg));
-            break;
-        case WebsocketEvents.PREFERENCES_CHANGED:
-            dispatch(handlePreferencesChangedEvent(msg));
-            break;
-        case WebsocketEvents.PREFERENCES_DELETED:
-            dispatch(handlePreferencesDeletedEvent(msg));
-            break;
-        case WebsocketEvents.STATUS_CHANGED:
-            dispatch(handleStatusChangedEvent(msg));
-            break;
-        case WebsocketEvents.TYPING:
-            dispatch(handleUserTypingEvent(msg));
-            break;
-        case WebsocketEvents.HELLO:
-            handleHelloEvent(msg);
-            break;
-        case WebsocketEvents.REACTION_ADDED:
-            dispatch(handleReactionAddedEvent(msg));
-            break;
-        case WebsocketEvents.REACTION_REMOVED:
-            dispatch(handleReactionRemovedEvent(msg));
-            break;
-        case WebsocketEvents.EMOJI_ADDED:
-            dispatch(handleAddEmoji(msg));
-            break;
-        case WebsocketEvents.LICENSE_CHANGED:
-            dispatch(handleLicenseChangedEvent(msg));
-            break;
-        case WebsocketEvents.CONFIG_CHANGED:
-            dispatch(handleConfigChangedEvent(msg));
-            break;
-        case WebsocketEvents.PLUGIN_STATUSES_CHANGED:
-            dispatch(handlePluginStatusesChangedEvent(msg));
-            break;
-        case WebsocketEvents.OPEN_DIALOG:
-            dispatch(handleOpenDialogEvent(msg));
-            break;
-        }
-    };
+    switch (msg.event) {
+    case WebsocketEvents.POSTED:
+    case WebsocketEvents.EPHEMERAL_MESSAGE:
+        doDispatch(handleNewPostEvent(msg));
+        break;
+    case WebsocketEvents.POST_EDITED:
+        doDispatch(handlePostEdited(msg));
+        break;
+    case WebsocketEvents.POST_DELETED:
+        doDispatch(handlePostDeleted(msg));
+        break;
+    case WebsocketEvents.LEAVE_TEAM:
+        doDispatch(handleLeaveTeamEvent(msg));
+        break;
+    case WebsocketEvents.UPDATE_TEAM:
+        doDispatch(handleUpdateTeamEvent(msg));
+        break;
+    case WebsocketEvents.PATCH_TEAM:
+        doDispatch(handlePatchTeamEvent(msg));
+        break;
+    case WebsocketEvents.ADDED_TO_TEAM:
+        doDispatch(handleTeamAddedEvent(msg));
+        break;
+    case WebsocketEvents.USER_ADDED:
+        doDispatch(handleUserAddedEvent(msg));
+        break;
+    case WebsocketEvents.USER_REMOVED:
+        doDispatch(handleUserRemovedEvent(msg));
+        break;
+    case WebsocketEvents.USER_UPDATED:
+        doDispatch(handleUserUpdatedEvent(msg));
+        break;
+    case WebsocketEvents.ROLE_ADDED:
+        doDispatch(handleRoleAddedEvent(msg));
+        break;
+    case WebsocketEvents.ROLE_REMOVED:
+        doDispatch(handleRoleRemovedEvent(msg));
+        break;
+    case WebsocketEvents.ROLE_UPDATED:
+        doDispatch(handleRoleUpdatedEvent(msg));
+        break;
+    case WebsocketEvents.CHANNEL_CREATED:
+        doDispatch(handleChannelCreatedEvent(msg));
+        break;
+    case WebsocketEvents.CHANNEL_DELETED:
+        doDispatch(handleChannelDeletedEvent(msg));
+        break;
+    case WebsocketEvents.CHANNEL_UPDATED:
+        doDispatch(handleChannelUpdatedEvent(msg));
+        break;
+    case WebsocketEvents.CHANNEL_CONVERTED:
+        doDispatch(handleChannelConvertedEvent(msg));
+        break;
+    case WebsocketEvents.CHANNEL_VIEWED:
+        doDispatch(handleChannelViewedEvent(msg));
+        break;
+    case WebsocketEvents.CHANNEL_MEMBER_UPDATED:
+        doDispatch(handleChannelMemberUpdatedEvent(msg));
+        break;
+    case WebsocketEvents.DIRECT_ADDED:
+        doDispatch(handleDirectAddedEvent(msg));
+        break;
+    case WebsocketEvents.PREFERENCE_CHANGED:
+        doDispatch(handlePreferenceChangedEvent(msg));
+        break;
+    case WebsocketEvents.PREFERENCES_CHANGED:
+        doDispatch(handlePreferencesChangedEvent(msg));
+        break;
+    case WebsocketEvents.PREFERENCES_DELETED:
+        doDispatch(handlePreferencesDeletedEvent(msg));
+        break;
+    case WebsocketEvents.STATUS_CHANGED:
+        doDispatch(handleStatusChangedEvent(msg));
+        break;
+    case WebsocketEvents.TYPING:
+        doDispatch(handleUserTypingEvent(msg));
+        break;
+    case WebsocketEvents.HELLO:
+        handleHelloEvent(msg);
+        break;
+    case WebsocketEvents.REACTION_ADDED:
+        doDispatch(handleReactionAddedEvent(msg));
+        break;
+    case WebsocketEvents.REACTION_REMOVED:
+        doDispatch(handleReactionRemovedEvent(msg));
+        break;
+    case WebsocketEvents.EMOJI_ADDED:
+        doDispatch(handleAddEmoji(msg));
+        break;
+    case WebsocketEvents.LICENSE_CHANGED:
+        doDispatch(handleLicenseChangedEvent(msg));
+        break;
+    case WebsocketEvents.CONFIG_CHANGED:
+        doDispatch(handleConfigChangedEvent(msg));
+        break;
+    case WebsocketEvents.PLUGIN_STATUSES_CHANGED:
+        doDispatch(handlePluginStatusesChangedEvent(msg));
+        break;
+    case WebsocketEvents.OPEN_DIALOG:
+        doDispatch(handleOpenDialogEvent(msg));
+        break;
+    }
 }
 
 function handleNewPostEvent(msg) {
