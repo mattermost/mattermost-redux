@@ -1,7 +1,6 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
 
-import fs from 'fs';
 import assert from 'assert';
 import nock from 'nock';
 
@@ -11,8 +10,6 @@ import {Client4} from 'client';
 import {RequestStatus, Groups} from 'constants';
 import TestHelper from 'test/test_helper';
 import configureStore from 'test/test_store';
-
-const OK_RESPONSE = {status: 'OK'};
 
 describe('Actions.Groups', () => {
     let store;
