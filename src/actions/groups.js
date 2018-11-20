@@ -12,7 +12,7 @@ import {bindClientFunc, forceLogoutIfNecessary} from './helpers';
 import {batchActions} from 'redux-batched-actions';
 
 import type {ActionFunc} from '../types/actions';
-import type {SyncableType, SyncablePatch} from '../types/group_syncables';
+import type {SyncableType, SyncablePatch} from '../types/groups';
 
 export function linkGroupSyncable(groupID: string, syncableID: string, syncableType: SyncableType, patch: SyncablePatch): ActionFunc {
     return async (dispatch, getState) => {
@@ -67,15 +67,15 @@ export function unlinkGroupSyncable(groupID: string, syncableID: string, syncabl
         }
 
         var type;
-        var data = {group_id: groupID};
+        var data = {group_id: groupID, syncable_id: syncableID};
         switch (syncableType) {
         case Groups.SYNCABLE_TYPE_TEAM:
             type = GroupTypes.UNLINKED_GROUP_TEAM;
-            data.team_id = syncableID;
+            data.syncable_id = syncableID;
             break;
         case Groups.SYNCABLE_TYPE_CHANNEL:
             type = GroupTypes.UNLINKED_GROUP_CHANNEL;
-            data.channel_id = syncableID;
+            data.syncable_id = syncableID;
             break;
         default:
             console.warn(`unhandled syncable type ${syncableType}`); // eslint-disable-line no-console

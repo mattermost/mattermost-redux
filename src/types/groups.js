@@ -2,6 +2,13 @@
 // See LICENSE.txt for license information.
 // @flow
 
+export type SyncableType = 'team' | 'channel';
+
+export type SyncablePatch = {|
+    can_leave: boolean,
+    auto_add: boolean
+|};
+
 export type Group = {|
     id: string,
     name: string,

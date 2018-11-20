@@ -72,7 +72,7 @@ function syncables(state = {}, action) {
         const nextTeams = state[action.data.group_id].teams.slice();
 
         const index = nextTeams.findIndex((groupTeam) => {
-            return groupTeam.team_id === action.data.team_id;
+            return groupTeam.team_id === action.data.syncable_id;
         });
 
         if (index !== -1) {
@@ -91,7 +91,7 @@ function syncables(state = {}, action) {
         const nextChannels = state[action.data.group_id].channels.slice();
 
         const index = nextChannels.findIndex((groupChannel) => {
-            return groupChannel.channel_id === action.data.channel_id;
+            return groupChannel.channel_id === action.data.syncable_id;
         });
 
         if (index !== -1) {
