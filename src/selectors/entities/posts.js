@@ -473,7 +473,7 @@ export const makeIsPostCommentMention = () => {
         getAllPosts,
         getPostsInThread,
         getCurrentUser,
-        (state, postId) => getPost(state, postId),
+        getPost,
         (allPosts, postsInThread, currentUser, post) => {
             let threadRepliedToByCurrentUser = false;
             let isCommentMention = false;
