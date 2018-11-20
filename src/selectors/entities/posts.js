@@ -8,7 +8,7 @@ import {getMyPreferences} from 'selectors/entities/preferences';
 import {createIdsSelector} from 'utils/helpers';
 
 import {Posts, Preferences} from 'constants';
-import {isPostEphemeral, isSystemMessage, shouldFilterJoinLeavePost, comparePosts, isPostPendingOrFailed} from 'utils/post_utils';
+import {isPostEphemeral, isSystemMessage, shouldFilterJoinLeavePost, comparePosts, isPostPendingOrFailed, isPostCommentMention} from 'utils/post_utils';
 import {getPreferenceKey} from 'utils/preference_utils';
 
 export function getAllPosts(state) {
@@ -149,7 +149,6 @@ function formatPostInChannel(post, previousPost, index, allPosts, postsInThread,
     }
 
     let threadRepliedToByCurrentUser = false;
-    let threadCreatedByCurrentUser = false;
     let replyCount = 0;
     let isCommentMention = false;
 
@@ -173,23 +172,8 @@ function formatPostInChannel(post, previousPost, index, allPosts, postsInThread,
         }
 
         const rootPost = allPosts[rootId];
-        if (rootPost && rootPost.user_id === currentUser.id) {
-            threadCreatedByCurrentUser = true;
-        }
 
-        let commentsNotifyLevel = 'never';
-        if (currentUser.notify_props && currentUser.notify_props.comments) {
-            commentsNotifyLevel = currentUser.notify_props.comments;
-        }
-
-        const notCurrentUser = post.user_id !== currentUser.id || (post.props && post.props.from_webhook);
-        if (notCurrentUser) {
-            if (commentsNotifyLevel === 'any' && (threadCreatedByCurrentUser || threadRepliedToByCurrentUser)) {
-                isCommentMention = true;
-            } else if (commentsNotifyLevel === 'root' && threadCreatedByCurrentUser) {
-                isCommentMention = true;
-            }
-        }
+        isCommentMention = isPostCommentMention({post, currentUser, threadRepliedToByCurrentUser, rootPost});
     }
 
     return {
@@ -483,3 +467,37 @@ export function getPostIdsInChannel(state, channelId) {
 
 export const isPostIdSending = (state, postId) =>
     state.entities.posts.sendingPostIds.some((sendingPostId) => sendingPostId === postId);
+
+export const makeIsPostCommentMention = () => {
+    return createSelector(
+        getAllPosts,
+        getPostsInThread,
+        getCurrentUser,
+        getPost,
+        (allPosts, postsInThread, currentUser, post) => {
+            let threadRepliedToByCurrentUser = false;
+            let isCommentMention = false;
+            if (currentUser) {
+                const rootId = post.root_id || post.id;
+                const threadIds = postsInThread[rootId] || [];
+
+                for (const pid of threadIds) {
+                    const p = allPosts[pid];
+                    if (!p) {
+                        continue;
+                    }
+
+                    if (p.user_id === currentUser.id) {
+                        threadRepliedToByCurrentUser = true;
+                    }
+                }
+
+                const rootPost = allPosts[rootId];
+
+                isCommentMention = isPostCommentMention({post, currentUser, threadRepliedToByCurrentUser, rootPost});
+            }
+
+            return isCommentMention;
+        }
+    );
+};
