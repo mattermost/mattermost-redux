@@ -164,3 +164,11 @@ export type SchemesRequestsStatuses = {|
     getSchemeTeams: RequestStatusType,
     getSchemeChannels: RequestStatusType
 |};
+
+export type GroupsRequestsStatuses = {|
+    linkGroupSyncable: RequestStatusType,
+    unlinkGroupSyncable: RequestStatusType,
+    getGroupSyncables: RequestStatusType,
+    getGroupMembers: RequestStatusType,
+    getGroup: RequestStatusType,
+|};

@@ -25,11 +25,16 @@ function syncables(state = {}, action) {
         };
     }
     case GroupTypes.LINKED_GROUP_TEAM: {
-        const nextTeams = {...state}[action.data.group_id].teams;
+        let nextGroupTeams = [];
 
-        for (let i = 0, len = nextTeams.length; i < len; i++) {
-            if (nextTeams[i].team_id === action.data.team_id) {
-                nextTeams[i] = action.data;
+        if (!state[action.data.group_id] || !state[action.data.group_id].teams) {
+            nextGroupTeams = [action.data];
+        } else {
+            nextGroupTeams = {...state}[action.data.group_id].teams;
+            for (let i = 0, len = nextGroupTeams.length; i < len; i++) {
+                if (nextGroupTeams[i].team_id === action.data.team_id) {
+                    nextGroupTeams[i] = action.data;
+                }
             }
         }
 
@@ -37,16 +42,21 @@ function syncables(state = {}, action) {
             ...state,
             [action.data.group_id]: {
                 ...state[action.data.group_id],
-                teams: nextTeams,
+                teams: nextGroupTeams,
             },
         };
     }
     case GroupTypes.LINKED_GROUP_CHANNEL: {
-        const nextChannels = {...state}[action.data.group_id].channels;
+        let nextGroupChannels = [];
 
-        for (let i = 0, len = nextChannels.length; i < len; i++) {
-            if (nextChannels[i].channel_id === action.data.channel_id) {
-                nextChannels[i] = action.data;
+        if (!state[action.data.group_id] || !state[action.data.group_id].channels) {
+            nextGroupChannels = [action.data];
+        } else {
+            nextGroupChannels = {...state}[action.data.group_id].channels;
+            for (let i = 0, len = nextGroupChannels.length; i < len; i++) {
+                if (nextGroupChannels[i].channel_id === action.data.channel_id) {
+                    nextGroupChannels[i] = action.data;
+                }
             }
         }
 
@@ -54,18 +64,20 @@ function syncables(state = {}, action) {
             ...state,
             [action.data.group_id]: {
                 ...state[action.data.group_id],
-                channels: nextChannels,
+                channels: nextGroupChannels,
             },
         };
     }
     case GroupTypes.UNLINKED_GROUP_TEAM: {
-        const nextTeams = {...state}[action.data.group_id].teams;
+        const nextTeams = state[action.data.group_id].teams.slice();
 
         const index = nextTeams.findIndex((groupTeam) => {
             return groupTeam.team_id === action.data.team_id;
         });
 
-        nextTeams.splice(index, 1);
+        if (index !== -1) {
+            nextTeams.splice(index, 1);
+        }
 
         return {
             ...state,
@@ -76,13 +88,15 @@ function syncables(state = {}, action) {
         };
     }
     case GroupTypes.UNLINKED_GROUP_CHANNEL: {
-        const nextChannels = {...state}[action.data.group_id].channels;
+        const nextChannels = state[action.data.group_id].channels.slice();
 
         const index = nextChannels.findIndex((groupChannel) => {
             return groupChannel.channel_id === action.data.channel_id;
         });
 
-        nextChannels.splice(index, 1);
+        if (index !== -1) {
+            nextChannels.splice(index, 1);
+        }
 
         return {
             ...state,

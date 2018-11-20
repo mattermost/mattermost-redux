@@ -624,6 +624,28 @@ const state: GlobalState = {
                 error: null,
             },
         },
+        groups: {
+            linkGroupSyncable: {
+                status: 'not_started',
+                error: null,
+            },
+            unlinkGroupSyncable: {
+                status: 'not_started',
+                error: null,
+            },
+            getGroupSyncables: {
+                status: 'not_started',
+                error: null,
+            },
+            getGroupMembers: {
+                status: 'not_started',
+                error: null,
+            },
+            getGroup: {
+                status: 'not_started',
+                error: null,
+            },
+        },
     },
 };
 
