@@ -385,7 +385,7 @@ export function combineSystemPosts(postsIds = [], posts = {}, channelId) {
 }
 
 export function isPostCommentMention({post, currentUser, threadRepliedToByCurrentUser, rootPost}) {
-    let commentsNotifyLevel = 'never';
+    let commentsNotifyLevel = Preferences.COMMENTS_NEVER;
     let isCommentMention = false;
     let threadCreatedByCurrentUser = false;
 
@@ -398,9 +398,9 @@ export function isPostCommentMention({post, currentUser, threadRepliedToByCurren
 
     const notCurrentUser = post.user_id !== currentUser.id || (post.props && post.props.from_webhook);
     if (notCurrentUser) {
-        if (commentsNotifyLevel === 'any' && (threadCreatedByCurrentUser || threadRepliedToByCurrentUser)) {
+        if (commentsNotifyLevel === Preferences.COMMENTS_ANY && (threadCreatedByCurrentUser || threadRepliedToByCurrentUser)) {
             isCommentMention = true;
-        } else if (commentsNotifyLevel === 'root' && threadCreatedByCurrentUser) {
+        } else if (commentsNotifyLevel === Preferences.COMMENTS_ROOT && threadCreatedByCurrentUser) {
             isCommentMention = true;
         }
     }
