@@ -8,11 +8,14 @@ import {batchActions} from 'redux-batched-actions';
 
 import {Client4} from 'client';
 
+import {getCurrentChannelId} from 'selectors/entities/channels';
+import {getCurrentTeamId} from 'selectors/entities/teams';
+
 import {logError} from './errors';
 import {bindClientFunc, forceLogoutIfNecessary} from './helpers';
 
 import type {DispatchFunc, GetStateFunc} from '../types/actions';
-import type {Command, IncomingWebhook, OAuthApp, OutgoingWebhook} from '../types/integrations';
+import type {Command, DialogSubmission, IncomingWebhook, OAuthApp, OutgoingWebhook} from '../types/integrations';
 
 export function createIncomingHook(hook: IncomingWebhook) {
     return bindClientFunc(
@@ -375,4 +378,31 @@ export function regenOAuthAppSecret(appId: string) {
         IntegrationTypes.UPDATE_OAUTH_APP_FAILURE,
         appId
     );
+}
+
+export function submitInteractiveDialog(submission: DialogSubmission) {
+    return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
+        dispatch({type: IntegrationTypes.SUBMIT_INTERACTIVE_DIALOG_REQUEST, data: {}});
+
+        const state = getState();
+        submission.channel_id = getCurrentChannelId(state);
+        submission.team_id = getCurrentTeamId(state);
+
+        let data;
+        try {
+            data = await Client4.submitInteractiveDialog(submission);
+        } catch (error) {
+            forceLogoutIfNecessary(error, dispatch, getState);
+
+            dispatch(batchActions([
+                {type: IntegrationTypes.SUBMIT_INTERACTIVE_DIALOG_FAILURE, error},
+                logError(error),
+            ]), getState);
+            return {error};
+        }
+
+        dispatch({type: IntegrationTypes.SUBMIT_INTERACTIVE_DIALOG_SUCCESS, data: {}});
+
+        return {data};
+    };
 }

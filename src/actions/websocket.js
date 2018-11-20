@@ -51,6 +51,7 @@ import {
     UserTypes,
     RoleTypes,
     AdminTypes,
+    IntegrationTypes,
 } from 'action_types';
 import {General, WebsocketEvents, Preferences, Posts} from 'constants';
 
@@ -288,6 +289,9 @@ function handleEvent(msg, dispatch, getState) {
         break;
     case WebsocketEvents.PLUGIN_STATUSES_CHANGED:
         handlePluginStatusesChangedEvent(msg, dispatch, getState);
+        break;
+    case WebsocketEvents.OPEN_DIALOG:
+        handleOpenDialogEvent(msg, dispatch, getState);
         break;
     }
 }
@@ -806,6 +810,11 @@ function handlePluginStatusesChangedEvent(msg, dispatch) {
         type: AdminTypes.RECEIVED_PLUGIN_STATUSES,
         data: data.plugin_statuses,
     });
+}
+
+function handleOpenDialogEvent(msg, dispatch) {
+    const data = (msg.data && msg.data.dialog) || {};
+    dispatch({type: IntegrationTypes.RECEIVED_DIALOG, data: JSON.parse(data)});
 }
 
 // Helpers
