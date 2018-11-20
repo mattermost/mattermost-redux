@@ -15,6 +15,7 @@ import {
     postTypePriority,
     shouldFilterJoinLeavePost,
     comparePostTypes,
+    isPostCommentMention,
 } from 'utils/post_utils';
 
 describe('PostUtils', () => {
@@ -1452,6 +1453,109 @@ describe('PostUtils', () => {
                     previousType = sortedTestCase.postType;
                 });
             }
+        });
+    });
+
+    describe('isPostCommentMention', () => {
+        const currentUser = {
+            id: 'currentUser',
+            notify_props: {
+                comments: 'any',
+            },
+        };
+        it('should return true as root post is by user', () => {
+            const post = {
+                user_id: 'someotherUser',
+            };
+
+            const rootPost = {
+                user_id: 'currentUser',
+            };
+
+            const isCommentMention = isPostCommentMention({currentUser, post, rootPost, threadRepliedToByCurrentUser: false});
+            assert.equal(isCommentMention, true);
+        });
+
+        it('should return false as root post is not by user and did not participate in thread', () => {
+            const post = {
+                user_id: 'someotherUser',
+            };
+
+            const rootPost = {
+                user_id: 'differentUser',
+            };
+
+            const isCommentMention = isPostCommentMention({currentUser, post, rootPost, threadRepliedToByCurrentUser: false});
+            assert.equal(isCommentMention, false);
+        });
+
+        it('should return false post is by current User', () => {
+            const post = {
+                user_id: 'currentUser',
+            };
+
+            const rootPost = {
+                user_id: 'differentUser',
+            };
+
+            const isCommentMention = isPostCommentMention({currentUser, post, rootPost, threadRepliedToByCurrentUser: false});
+            assert.equal(isCommentMention, false);
+        });
+
+        it('should return true as post is by current User but it is a webhhok and user participated in thread', () => {
+            const post = {
+                user_id: 'currentUser',
+                props: {
+                    from_webhook: true,
+                },
+            };
+
+            const rootPost = {
+                user_id: 'differentUser',
+            };
+
+            const isCommentMention = isPostCommentMention({currentUser, post, rootPost, threadRepliedToByCurrentUser: true});
+            assert.equal(isCommentMention, true);
+        });
+
+        it('should return false as root post is not by currentUser and notify_props is root', () => {
+            const post = {
+                user_id: 'someotherUser',
+            };
+
+            const rootPost = {
+                user_id: 'differentUser',
+            };
+
+            const modifiedCurrentUser = {
+                ...currentUser,
+                notify_props: {
+                    comments: 'root',
+                },
+            };
+
+            const isCommentMention = isPostCommentMention({currentUser: modifiedCurrentUser, post, rootPost, threadRepliedToByCurrentUser: true});
+            assert.equal(isCommentMention, false);
+        });
+
+        it('should return true as root post is by currentUser and notify_props is root', () => {
+            const post = {
+                user_id: 'someotherUser',
+            };
+
+            const rootPost = {
+                user_id: 'currentUser',
+            };
+
+            const modifiedCurrentUser = {
+                ...currentUser,
+                notify_props: {
+                    comments: 'root',
+                },
+            };
+
+            const isCommentMention = isPostCommentMention({currentUser: modifiedCurrentUser, post, rootPost, threadRepliedToByCurrentUser: true});
+            assert.equal(isCommentMention, true);
         });
     });
 });
