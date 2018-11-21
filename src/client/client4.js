@@ -2553,6 +2553,11 @@ export default class Client4 {
     };
 
     trackEvent(category, event, props) {
+        // Temporary change to only track one event to reduce data rate - see MM-13062
+        if (event !== 'api_posts_create') {
+            return;
+        }
+
         const properties = Object.assign({category, type: event, user_actual_id: this.userId}, props);
         const options = {
             context: {
