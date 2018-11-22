@@ -119,6 +119,65 @@ function flagged(state = [], action) {
     }
 }
 
+function removePinnedPost(state, post) {
+    if (post && state[post.channel_id]) {
+        const postId = post.id;
+        const channelId = post.channel_id;
+        const pinnedPosts = [...state[channelId]];
+        const index = pinnedPosts.indexOf(postId);
+
+        if (index !== -1) {
+            pinnedPosts.splice(index, 1);
+            return {
+                ...state,
+                [channelId]: pinnedPosts,
+            };
+        }
+    }
+
+    return state;
+}
+
+function pinned(state = {}, action) {
+    switch (action.type) {
+    case SearchTypes.RECEIVED_SEARCH_PINNED_POSTS: {
+        const {channelId, pinned: posts} = action.data;
+        return {
+            ...state,
+            [channelId]: posts.order,
+        };
+    }
+    case PostTypes.POST_DELETED:
+    case PostTypes.REMOVE_POST: {
+        return removePinnedPost(state, action.data);
+    }
+    case PostTypes.RECEIVED_POST: {
+        const post = action.data;
+        if (post && post.is_pinned) {
+            const channelId = post.channel_id;
+            let pinnedPosts = [];
+            if (state[channelId]) {
+                pinnedPosts = [...state[channelId]];
+            }
+
+            pinnedPosts.unshift(post.id);
+            return {
+                ...state,
+                [channelId]: pinnedPosts,
+            };
+        }
+
+        return removePinnedPost(state, action.data);
+    }
+    case SearchTypes.REMOVE_SEARCH_POSTS:
+    case UserTypes.LOGOUT_SUCCESS:
+        return [];
+
+    default:
+        return state;
+    }
+}
+
 function recent(state = {}, action) {
     const {data, type} = action;
 
@@ -214,6 +273,9 @@ export default combineReducers({
 
     // An ordered array with posts ids of flagged posts
     flagged,
+
+    // An Object where every key is a channel id mapping to an ordered array with posts ids of pinned posts
+    pinned,
 
     // An ordered array with posts ids from the search results
     results,

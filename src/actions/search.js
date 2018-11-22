@@ -24,11 +24,11 @@ export function getMissingChannelsFromPosts(posts) {
         Object.values(posts).forEach((post) => {
             const id = post.channel_id;
             if (!channels[id] || !myMembers[id]) {
-                promises.push(getChannelAndMyMember(id)(dispatch, getState));
+                promises.push(dispatch(getChannelAndMyMember(id)));
             }
 
             if (!membersInChannel[id]) {
-                promises.push(getChannelMembers(id)(dispatch, getState));
+                promises.push(dispatch(getChannelMembers(id)));
             }
         });
 
@@ -42,7 +42,7 @@ export function searchPostsWithParams(teamId, params) {
         dispatch({
             type: SearchTypes.SEARCH_POSTS_REQUEST,
             isGettingMore,
-        }, getState);
+        });
 
         let posts;
         try {
@@ -50,14 +50,14 @@ export function searchPostsWithParams(teamId, params) {
 
             await Promise.all([
                 getProfilesAndStatusesForPosts(posts.posts, dispatch, getState),
-                getMissingChannelsFromPosts(posts.posts)(dispatch, getState),
+                dispatch(getMissingChannelsFromPosts(posts.posts)),
             ]);
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch, getState);
             dispatch(batchActions([
                 {type: SearchTypes.SEARCH_POSTS_FAILURE, error},
                 logError(error),
-            ]), getState);
+            ]));
             return {error};
         }
 
@@ -78,7 +78,7 @@ export function searchPostsWithParams(teamId, params) {
             {
                 type: SearchTypes.SEARCH_POSTS_SUCCESS,
             },
-        ], 'SEARCH_POST_BATCH'), getState);
+        ], 'SEARCH_POST_BATCH'));
 
         return {data: posts};
     };
@@ -95,15 +95,15 @@ export function getMorePostsForSearch() {
         if (!isEnd) {
             const newParams = Object.assign({}, params);
             newParams.page += 1;
-            return searchPostsWithParams(teamId, newParams)(dispatch, getState);
+            return dispatch(searchPostsWithParams(teamId, newParams));
         }
         return {};
     };
 }
 
 export function clearSearch() {
-    return async (dispatch, getState) => {
-        dispatch({type: SearchTypes.REMOVE_SEARCH_POSTS}, getState);
+    return async (dispatch) => {
+        dispatch({type: SearchTypes.REMOVE_SEARCH_POSTS});
 
         return {data: true};
     };
@@ -115,21 +115,21 @@ export function getFlaggedPosts() {
         const userId = getCurrentUserId(state);
         const teamId = getCurrentTeamId(state);
 
-        dispatch({type: SearchTypes.SEARCH_FLAGGED_POSTS_REQUEST}, getState);
+        dispatch({type: SearchTypes.SEARCH_FLAGGED_POSTS_REQUEST});
 
         let posts;
         try {
             posts = await Client4.getFlaggedPosts(userId, '', teamId);
             await Promise.all([
                 getProfilesAndStatusesForPosts(posts.posts, dispatch, getState),
-                getMissingChannelsFromPosts(posts.posts)(dispatch, getState),
+                dispatch(getMissingChannelsFromPosts(posts.posts)),
             ]);
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch, getState);
             dispatch(batchActions([
                 {type: SearchTypes.SEARCH_FLAGGED_POSTS_FAILURE, error},
                 logError(error),
-            ]), getState);
+            ]));
             return {error};
         }
 
@@ -141,9 +141,46 @@ export function getFlaggedPosts() {
             {
                 type: SearchTypes.SEARCH_FLAGGED_POSTS_SUCCESS,
             },
-        ], 'SEARCH_FLAGGED_POSTS_BATCH'), getState);
+        ], 'SEARCH_FLAGGED_POSTS_BATCH'));
 
         return {data: posts};
+    };
+}
+
+export function getPinnedPosts(channelId) {
+    return async (dispatch, getState) => {
+        dispatch({type: SearchTypes.SEARCH_PINNED_POSTS_REQUEST});
+
+        let result;
+        try {
+            result = await Client4.getPinnedPosts(channelId);
+            await Promise.all([
+                getProfilesAndStatusesForPosts(result.posts, dispatch, getState),
+                dispatch(getMissingChannelsFromPosts(result.posts)),
+            ]);
+        } catch (error) {
+            forceLogoutIfNecessary(error, dispatch, getState);
+            dispatch(batchActions([
+                {type: SearchTypes.SEARCH_PINNED_POSTS_FAILURE, error},
+                logError(error),
+            ]));
+            return {error};
+        }
+
+        dispatch(batchActions([
+            {
+                type: SearchTypes.RECEIVED_SEARCH_PINNED_POSTS,
+                data: {
+                    pinned: result,
+                    channelId,
+                },
+            },
+            {
+                type: SearchTypes.SEARCH_PINNED_POSTS_SUCCESS,
+            },
+        ], 'SEARCH_PINNED_POSTS_BATCH'));
+
+        return {data: result};
     };
 }
 
@@ -152,7 +189,7 @@ export function getRecentMentions() {
         const state = getState();
         const teamId = getCurrentTeamId(state);
 
-        dispatch({type: SearchTypes.SEARCH_RECENT_MENTIONS_REQUEST}, getState);
+        dispatch({type: SearchTypes.SEARCH_RECENT_MENTIONS_REQUEST});
 
         let posts;
         try {
@@ -167,14 +204,14 @@ export function getRecentMentions() {
 
             await Promise.all([
                 getProfilesAndStatusesForPosts(posts.posts, dispatch, getState),
-                getMissingChannelsFromPosts(posts.posts)(dispatch, getState),
+                dispatch(getMissingChannelsFromPosts(posts.posts)),
             ]);
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch, getState);
             dispatch(batchActions([
                 {type: SearchTypes.SEARCH_RECENT_MENTIONS_FAILURE, error},
                 logError(error),
-            ]), getState);
+            ]));
             return {error};
         }
 
@@ -186,21 +223,21 @@ export function getRecentMentions() {
             {
                 type: SearchTypes.SEARCH_RECENT_MENTIONS_SUCCESS,
             },
-        ], 'SEARCH_RECENT_MENTIONS_BATCH'), getState);
+        ], 'SEARCH_RECENT_MENTIONS_BATCH'));
 
         return {data: posts};
     };
 }
 
 export function removeSearchTerms(teamId, terms) {
-    return async (dispatch, getState) => {
+    return async (dispatch) => {
         dispatch({
             type: SearchTypes.REMOVE_SEARCH_TERM,
             data: {
                 teamId,
                 terms,
             },
-        }, getState);
+        });
 
         return {data: true};
     };

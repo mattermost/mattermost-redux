@@ -1620,6 +1620,152 @@ describe('Selectors.Posts', () => {
             assert.equal(actual, postsAny.e.id);
         });
     });
+
+    describe('makeIsPostCommentMention', () => {
+        const currentUser = {
+            ...testState.entities.users.profiles[user1.id],
+            notify_props: {
+                comments: 'any',
+            },
+        };
+
+        const modifiedState = {
+            ...testState,
+            entities: {
+                ...testState.entities,
+                users: {
+                    ...testState.entities.users,
+                    profiles: {
+                        ...testState.entities.users.profiles,
+                        [user1.id]: currentUser,
+                    },
+                },
+            },
+        };
+
+        const isPostCommentMention = Selectors.makeIsPostCommentMention();
+
+        it('Should return true as root post is by the current user', () => {
+            assert.equal(isPostCommentMention(modifiedState, 'e'), true);
+        });
+
+        it('Should return false as post is not from currentUser', () => {
+            assert.equal(isPostCommentMention(modifiedState, 'b'), false);
+        });
+
+        it('Should return true as post is from webhook but user created rootPost', () => {
+            const modifiedWbhookPostState = {
+                ...modifiedState,
+                entities: {
+                    ...modifiedState.entities,
+                    posts: {
+                        ...modifiedState.entities.posts,
+                        posts: {
+                            ...modifiedState.entities.posts.posts,
+                            e: {
+                                ...modifiedState.entities.posts.posts.e,
+                                props: {
+                                    from_webhook: true,
+                                },
+                                user_id: user1.id,
+                            },
+                        },
+                    },
+                },
+            };
+
+            assert.equal(isPostCommentMention(modifiedWbhookPostState, 'e'), true);
+        });
+
+        it('Should return true as user commented in the thread', () => {
+            const modifiedThreadState = {
+                ...modifiedState,
+                entities: {
+                    ...modifiedState.entities,
+                    posts: {
+                        ...modifiedState.entities.posts,
+                        posts: {
+                            ...modifiedState.entities.posts.posts,
+                            a: {
+                                ...modifiedState.entities.posts.posts.a,
+                                user_id: 'b',
+                            },
+                            c: {
+                                ...modifiedState.entities.posts.posts.c,
+                                user_id: user1.id,
+                            },
+                        },
+                    },
+                },
+            };
+
+            assert.equal(isPostCommentMention(modifiedThreadState, 'e'), true);
+        });
+
+        it('Should return false as user commented in the thread but notify_props is for root only', () => {
+            const modifiedCurrentUserForNotifyProps = {
+                ...testState.entities.users.profiles[user1.id],
+                notify_props: {
+                    comments: 'root',
+                },
+            };
+
+            const modifiedStateForRoot = {
+                ...modifiedState,
+                entities: {
+                    ...modifiedState.entities,
+                    posts: {
+                        ...modifiedState.entities.posts,
+                        posts: {
+                            ...modifiedState.entities.posts.posts,
+                            a: {
+                                ...modifiedState.entities.posts.posts.a,
+                                user_id: 'not current',
+                            },
+                            c: {
+                                ...modifiedState.entities.posts.posts.c,
+                                user_id: user1.id,
+                            },
+                        },
+                    },
+                    users: {
+                        ...modifiedState.entities.users,
+                        profiles: {
+                            ...modifiedState.entities.users.profiles,
+                            [user1.id]: modifiedCurrentUserForNotifyProps,
+                        },
+                    },
+                },
+            };
+
+            assert.equal(isPostCommentMention(modifiedStateForRoot, 'e'), false);
+        });
+
+        it('Should return false as user created root post', () => {
+            const modifiedCurrentUserForNotifyProps = {
+                ...testState.entities.users.profiles[user1.id],
+                notify_props: {
+                    comments: 'root',
+                },
+            };
+
+            const modifiedStateForRoot = {
+                ...modifiedState,
+                entities: {
+                    ...modifiedState.entities,
+                    users: {
+                        ...modifiedState.entities.users,
+                        profiles: {
+                            ...modifiedState.entities.users.profiles,
+                            [user1.id]: modifiedCurrentUserForNotifyProps,
+                        },
+                    },
+                },
+            };
+
+            assert.equal(isPostCommentMention(modifiedStateForRoot, 'e'), true);
+        });
+    });
 });
 
 describe('getCurrentUsersLatestPost', () => {
