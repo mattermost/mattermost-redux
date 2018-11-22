@@ -139,11 +139,9 @@ describe('Actions.Websocket', () => {
             mockServer.send(JSON.stringify({event: WebsocketEvents.POST_DELETED, data: {post: `{"id": "71k8gz5ompbpfkrzaxzodffj8w","create_at": 1508245311774,"update_at": 1508247709215,"edit_at": 1508247709215,"delete_at": 0,"is_pinned": false,"user_id": "${TestHelper.basicUser.id}","channel_id": "${post.channel_id}","root_id": "","parent_id": "","original_id": "","message": "Unit Test","type": "","props": {},"hashtags": "","pending_post_id": ""}`}, broadcast: {omit_users: null, user_id: '', channel_id: '18k9ffsuci8xxm7ak68zfdyrce', team_id: ''}, seq: 7}));
         }
 
-        store.subscribe(async () => {
-            const entities = store.getState().entities;
-            const {posts} = entities.posts;
-            assert.strictEqual(posts[post.id].state, Posts.POST_DELETED);
-        });
+        const entities = store.getState().entities;
+        const {posts} = entities.posts;
+        assert.strictEqual(posts[post.id].state, Posts.POST_DELETED);
     });
 
     it('Websocket Handle Reaction Added to Post', (done) => {
