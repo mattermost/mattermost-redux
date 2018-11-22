@@ -38,6 +38,20 @@ function flaggedPosts(state: RequestStatusType = initialRequestState(), action: 
     );
 }
 
+function pinnedPosts(state: RequestStatusType = initialRequestState(), action: GenericAction): RequestStatusType {
+    if (action.type === SearchTypes.REMOVE_SEARCH_POSTS) {
+        return initialRequestState();
+    }
+
+    return handleRequest(
+        SearchTypes.SEARCH_PINNED_POSTS_REQUEST,
+        SearchTypes.SEARCH_PINNED_POSTS_SUCCESS,
+        SearchTypes.SEARCH_PINNED_POSTS_FAILURE,
+        state,
+        action
+    );
+}
+
 function recentMentions(state: RequestStatusType = initialRequestState(), action: GenericAction): RequestStatusType {
     if (action.type === SearchTypes.REMOVE_SEARCH_POSTS) {
         return initialRequestState();
@@ -54,6 +68,7 @@ function recentMentions(state: RequestStatusType = initialRequestState(), action
 
 export default combineReducers({
     flaggedPosts,
+    pinnedPosts,
     recentMentions,
     searchPosts,
 });

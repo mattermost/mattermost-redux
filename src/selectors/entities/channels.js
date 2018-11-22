@@ -889,7 +889,7 @@ export const getChannelsWithUserProfiles = createSelector(
     getCurrentUserId,
     (channelUserMap, users, channels, currentUserId) => {
         return channels.map((channel) => {
-            const profiles = getProfiles(currentUserId, channelUserMap[channel.id], users);
+            const profiles = getProfiles(currentUserId, channelUserMap[channel.id] || [], users);
             return Object.assign({}, channel, {profiles});
         });
     }

@@ -1,7 +1,7 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
 
-import {PostTypes, SearchTypes, UserTypes} from 'action_types';
+import {PostTypes, SearchTypes, UserTypes, ChannelTypes} from 'action_types';
 import {Posts} from 'constants';
 import {comparePosts, combineSystemPosts} from 'utils/post_utils';
 
@@ -300,6 +300,28 @@ function handlePostDeleted(posts = {}, postsInChannel = {}, postsInThread = {}, 
     return {posts: nextPosts, postsInChannel: nextPostsForChannel, postsInThread: nextPostsForThread};
 }
 
+function handleChannelDeleted(posts = {}, postsInChannel = {}, postsInThread = {}, channelId) {
+    const nextPosts = {...posts};
+    const nextPostsForChannel = {...postsInChannel};
+    const nextPostsForThread = {...postsInThread};
+
+    for (const postId in nextPosts) {
+        if (nextPosts[postId].channel_id === channelId) {
+            Reflect.deleteProperty(nextPosts, postId);
+            Reflect.deleteProperty(nextPostsForThread, postId);
+            for (const rootId of Object.keys(nextPostsForThread)) {
+                nextPostsForThread[rootId] = nextPostsForThread[rootId].filter((id) => id !== postId);
+                if (nextPostsForThread[rootId].length === 0) {
+                    Reflect.deleteProperty(nextPostsForThread, rootId);
+                }
+            }
+        }
+    }
+    Reflect.deleteProperty(nextPostsForChannel, channelId);
+
+    return {posts: nextPosts, postsInChannel: nextPostsForChannel, postsInThread: nextPostsForThread};
+}
+
 function handleRemovePost(posts = {}, postsInChannel = {}, postsInThread = {}, action) {
     const post = action.data;
     const channelId = post.channel_id;
@@ -380,6 +402,12 @@ function handlePosts(posts = {}, postsInChannel = {}, postsInThread = {}, action
     case PostTypes.POST_DELETED:
         if (action.data) {
             return handlePostDeleted(posts, postsInChannel, postsInThread, action);
+        }
+        return {posts, postsInChannel, postsInThread};
+    case ChannelTypes.RECEIVED_CHANNEL_DELETED:
+    case ChannelTypes.DELETE_CHANNEL_SUCCESS:
+        if (!action.data.viewArchivedChannels) {
+            return handleChannelDeleted(posts, postsInChannel, postsInThread, action.data.id);
         }
         return {posts, postsInChannel, postsInThread};
     case PostTypes.REMOVE_POST:

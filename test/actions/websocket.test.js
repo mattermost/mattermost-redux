@@ -28,12 +28,12 @@ describe('Actions.Websocket', () => {
 
         const connUrl = (Client4.getUrl() + '/api/v4/websocket').replace(/^http:/, 'ws:');
         mockServer = new Server(connUrl);
-        return Actions.init(
+        return store.dispatch(Actions.init(
             'web',
             null,
             null,
             webSocketConnector
-        )(store.dispatch, store.getState);
+        ));
     });
 
     after(async () => {
@@ -139,11 +139,9 @@ describe('Actions.Websocket', () => {
             mockServer.send(JSON.stringify({event: WebsocketEvents.POST_DELETED, data: {post: `{"id": "71k8gz5ompbpfkrzaxzodffj8w","create_at": 1508245311774,"update_at": 1508247709215,"edit_at": 1508247709215,"delete_at": 0,"is_pinned": false,"user_id": "${TestHelper.basicUser.id}","channel_id": "${post.channel_id}","root_id": "","parent_id": "","original_id": "","message": "Unit Test","type": "","props": {},"hashtags": "","pending_post_id": ""}`}, broadcast: {omit_users: null, user_id: '', channel_id: '18k9ffsuci8xxm7ak68zfdyrce', team_id: ''}, seq: 7}));
         }
 
-        store.subscribe(async () => {
-            const entities = store.getState().entities;
-            const {posts} = entities.posts;
-            assert.strictEqual(posts[post.id].state, Posts.POST_DELETED);
-        });
+        const entities = store.getState().entities;
+        const {posts} = entities.posts;
+        assert.strictEqual(posts[post.id].state, Posts.POST_DELETED);
     });
 
     it('Websocket Handle Reaction Added to Post', (done) => {
@@ -207,7 +205,7 @@ describe('Actions.Websocket', () => {
 
                 await Client4.addReaction(TestHelper.basicUser.id, post.id, emoji);
 
-                function checkForAdd() {
+                const checkForAdd = () => {
                     return new Promise((resolve) => {
                         setTimeout(() => {
                             const nextEntities = store.getState().entities;
@@ -218,7 +216,7 @@ describe('Actions.Websocket', () => {
                             resolve();
                         }, 500);
                     });
-                }
+                };
 
                 await checkForAdd();
                 await Client4.removeReaction(TestHelper.basicUser.id, post.id, emoji);
@@ -253,7 +251,7 @@ describe('Actions.Websocket', () => {
         async function test() {
             let team;
             if (TestHelper.isLiveServer()) {
-                await TeamActions.getMyTeams()(store.dispatch, store.getState);
+                await store.dispatch(TeamActions.getMyTeams());
                 const {teams: myTeams} = store.getState().entities.teams;
                 assert.ok(Object.keys(myTeams));
 
@@ -282,7 +280,7 @@ describe('Actions.Websocket', () => {
         async function test() {
             let team;
             if (TestHelper.isLiveServer()) {
-                await TeamActions.getMyTeams()(store.dispatch, store.getState);
+                await store.dispatch(TeamActions.getMyTeams());
                 const {teams: myTeams} = store.getState().entities.teams;
                 assert.ok(Object.keys(myTeams));
 
@@ -318,12 +316,12 @@ describe('Actions.Websocket', () => {
             await client.addToTeam(team.id, TestHelper.basicUser.id);
             await client.addToChannel(TestHelper.basicUser.id, channel.id);
 
-            await GeneralActions.setStoreFromLocalData({
+            await store.dispatch(GeneralActions.setStoreFromLocalData({
                 url: Client4.getUrl(),
                 token: Client4.getToken(),
-            })(store.dispatch, store.getState);
-            await TeamActions.selectTeam(team)(store.dispatch, store.getState);
-            await ChannelActions.selectChannel(channel.id)(store.dispatch, store.getState);
+            }));
+            await store.dispatch(TeamActions.selectTeam(team));
+            await store.dispatch(ChannelActions.selectChannel(channel.id));
             await client.removeFromTeam(team.id, TestHelper.basicUser.id);
         } else {
             team = TestHelper.basicTeam;
@@ -348,12 +346,12 @@ describe('Actions.Websocket', () => {
                 TestHelper.basicTeam.invite_id
             );
 
-            await TeamActions.selectTeam(TestHelper.basicTeam)(store.dispatch, store.getState);
+            await store.dispatch(TeamActions.selectTeam(TestHelper.basicTeam));
 
-            await ChannelActions.addChannelMember(
+            await store.dispatch(ChannelActions.addChannelMember(
                 TestHelper.basicChannel.id,
                 user.id
-            )(store.dispatch, store.getState);
+            ));
         } else {
             user = {...TestHelper.fakeUser(), id: TestHelper.generateId()};
             store.dispatch({type: UserTypes.RECEIVED_PROFILE_IN_CHANNEL, data: {id: TestHelper.basicChannel.id, user_id: user.id}});
@@ -368,7 +366,7 @@ describe('Actions.Websocket', () => {
     it('Websocket Handle User Removed', async () => {
         let user;
         if (TestHelper.isLiveServer()) {
-            await TeamActions.selectTeam(TestHelper.basicTeam)(store.dispatch, store.getState);
+            await store.dispatch(TeamActions.selectTeam(TestHelper.basicTeam));
 
             user = await TestHelper.basicClient4.createUser(
                 TestHelper.fakeUser(),
@@ -377,15 +375,15 @@ describe('Actions.Websocket', () => {
                 TestHelper.basicTeam.invite_id
             );
 
-            await ChannelActions.addChannelMember(
+            await store.dispatch(ChannelActions.addChannelMember(
                 TestHelper.basicChannel.id,
                 user.id
-            )(store.dispatch, store.getState);
+            ));
 
-            await ChannelActions.removeChannelMember(
+            await store.dispatch(ChannelActions.removeChannelMember(
                 TestHelper.basicChannel.id,
                 user.id
-            )(store.dispatch, store.getState);
+            ));
         } else {
             user = {...TestHelper.fakeUser(), id: TestHelper.generateId()};
             store.dispatch({type: UserTypes.RECEIVED_PROFILE_NOT_IN_CHANNEL, data: {id: TestHelper.basicChannel.id, user_id: user.id}});
@@ -432,7 +430,7 @@ describe('Actions.Websocket', () => {
             let channel;
 
             if (TestHelper.isLiveServer()) {
-                await TeamActions.selectTeam(TestHelper.basicTeam)(store.dispatch, store.getState);
+                await store.dispatch(TeamActions.selectTeam(TestHelper.basicTeam));
                 channel = await Client4.createChannel(TestHelper.fakeChannel(TestHelper.basicTeam.id));
             } else {
                 channel = {id: '95tpi6f4apy39k6zxuo3msxzhy'};
@@ -508,11 +506,11 @@ describe('Actions.Websocket', () => {
 
     it('Websocket Handle Channel Deleted', (done) => {
         async function test() {
-            await TeamActions.selectTeam(TestHelper.basicTeam)(store.dispatch, store.getState);
-            await ChannelActions.selectChannel(TestHelper.basicChannel.id)(store.dispatch, store.getState);
+            await store.dispatch(TeamActions.selectTeam(TestHelper.basicTeam));
+            await store.dispatch(ChannelActions.selectChannel(TestHelper.basicChannel.id));
 
             if (TestHelper.isLiveServer()) {
-                await ChannelActions.fetchMyChannelsAndMembers(TestHelper.basicTeam.id)(store.dispatch, store.getState);
+                await store.dispatch(ChannelActions.fetchMyChannelsAndMembers(TestHelper.basicTeam.id));
                 await Client4.deleteChannel(
                     TestHelper.basicChannel.id
                 );
@@ -552,7 +550,7 @@ describe('Actions.Websocket', () => {
                 );
 
                 await client.login(user.email, 'password1');
-                await TeamActions.selectTeam(TestHelper.basicTeam)(store.dispatch, store.getState);
+                await store.dispatch(TeamActions.selectTeam(TestHelper.basicTeam));
                 await client.createDirectChannel([user.id, TestHelper.basicUser.id]);
             } else {
                 const channel = {id: TestHelper.generateId(), name: TestHelper.basicUser.id + '__' + TestHelper.generateId(), type: 'D'};
