@@ -484,6 +484,14 @@ function handleUserAddedEvent(msg) {
         const currentUserId = getCurrentUserId(state);
         const teamId = msg.data.team_id;
 
+        dispatch({
+            type: ChannelTypes.CHANNEL_MEMBER_ADDED,
+            data: {
+                channel_id: msg.broadcast.channel_id,
+                user_id: msg.data.user_id,
+            },
+        }, getState);
+
         if (msg.broadcast.channel_id === currentChannelId) {
             dispatch(getChannelStats(teamId, currentChannelId));
         }
@@ -501,6 +509,14 @@ function handleUserRemovedEvent(msg) {
         const currentChannelId = getCurrentChannelId(state);
         const currentTeamId = getCurrentTeamId(state);
         const currentUserId = getCurrentUserId(state);
+
+        dispatch({
+            type: ChannelTypes.CHANNEL_MEMBER_REMOVED,
+            data: {
+                channel_id: msg.broadcast.channel_id,
+                user_id: msg.data.user_id,
+            },
+        }, getState);
 
         if (msg.broadcast.user_id === currentUserId && currentTeamId) {
             const channel = channels[currentChannelId];
