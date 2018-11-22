@@ -767,7 +767,7 @@ export function deleteChannel(channelId: string): ActionFunc {
             dispatch({type: ChannelTypes.SELECT_CHANNEL, data: defaultChannelId}, getState);
         }
 
-        dispatch({type: ChannelTypes.DELETE_CHANNEL_SUCCESS, data: null}, getState);
+        dispatch({type: ChannelTypes.DELETE_CHANNEL_SUCCESS, data: {id: channelId, viewArchivedChannels}}, getState);
 
         return {data: true};
     };

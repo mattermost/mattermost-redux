@@ -163,6 +163,7 @@ describe('Selectors.Channels', () => {
                 profilesInChannel: {
                     [channel7.id]: new Set([user.id, user2.id, user3.id]),
                     [channel12.id]: new Set([user.id, user2.id]),
+                    [channel13.id]: null,
                 },
                 statuses: {},
             },
