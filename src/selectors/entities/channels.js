@@ -40,7 +40,6 @@ import {
     isGroupChannelVisible,
     isGroupOrDirectChannelVisible,
     sortChannelsByDisplayName,
-    sortChannelsByDisplayNameAndMuted,
     isFavoriteChannel,
     isDefault,
     sortChannelsByRecency,
@@ -77,18 +76,38 @@ export function getChannelMembersInChannels(state) {
     return state.entities.channels.membersInChannel;
 }
 
+function sortChannelsByRecencyOrAlpha(locale, lastPosts, sorting, a, b) {
+    if (sorting === 'recent') {
+        return sortChannelsByRecency(lastPosts, a, b);
+    }
+
+    return sortChannelsByDisplayName(locale, a, b);
+}
+
 export const mapAndSortChannelIds = (channels, currentUser, myMembers, lastPosts, sorting) => {
     const locale = currentUser.locale || General.DEFAULT_LOCALE;
 
-    if (sorting === 'recent') {
-        channels.sort((a, b) => {
-            return sortChannelsByRecency(lastPosts, a, b);
-        });
-    } else {
-        channels.sort(sortChannelsByDisplayNameAndMuted.bind(null, locale, myMembers));
-    }
+    const mutedChannelIds = channels.
+        filter((channel) => isChannelMuted(myMembers[channel.id])).
+        sort(sortChannelsByRecencyOrAlpha.bind(null, locale, lastPosts, sorting)).
+        map((channel) => channel.id);
 
-    return channels.map((c) => c.id);
+    const hasMentionedChannelIds = channels.
+        filter((channel) => {
+            const member = myMembers[channel.id];
+            return member && member.mention_count > 0 && !isChannelMuted(member);
+        }).
+        sort(sortChannelsByRecencyOrAlpha.bind(null, locale, lastPosts, sorting)).
+        map((channel) => channel.id);
+
+    const otherChannelIds = channels.
+        filter((channel) => {
+            return !mutedChannelIds.includes(channel.id) && !hasMentionedChannelIds.includes(channel.id);
+        }).
+        sort(sortChannelsByRecencyOrAlpha.bind(null, locale, lastPosts, sorting)).
+        map((channel) => channel.id);
+
+    return hasMentionedChannelIds.concat(otherChannelIds).concat(mutedChannelIds);
 };
 
 export function filterChannels(unreadIds, favoriteIds, channelIds, unreadsAtTop, favoritesAtTop) {
