@@ -72,10 +72,11 @@ describe('Selectors.Channels', () => {
     channel12.type = General.DM_CHANNEL;
     channel12.last_post_at = Date.now();
     channel12.name = getDirectChannelName(user.id, user2.id);
+    channel12.display_name = 'dm_test';
 
     const channel13 = TestHelper.fakeDmChannel(user.id, 'fakeUserId');
     channel13.total_msg_count = 3;
-    channel13.display_name = '';
+    channel13.display_name = 'test';
 
     const channels = {};
     channels[channel1.id] = channel1;

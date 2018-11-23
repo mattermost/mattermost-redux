@@ -40,15 +40,20 @@ function currentChannelId(state = '', action) {
 function channels(state = {}, action) {
     switch (action.type) {
     case ChannelTypes.RECEIVED_CHANNEL:
+        if (state[action.data.id] && action.data.type === General.DM_CHANNEL) {
+            action.data.display_name = action.data.display_name || state[action.data.id].display_name;
+        }
         return {
             ...state,
             [action.data.id]: action.data,
         };
-
     case ChannelTypes.RECEIVED_CHANNELS:
     case SchemeTypes.RECEIVED_SCHEME_CHANNELS: {
         const nextState = {...state};
         for (const channel of action.data) {
+            if (state[channel.id] && channel.type === General.DM_CHANNEL) {
+                channel.display_name = channel.display_name || state[channel.id].display_name;
+            }
             nextState[channel.id] = channel;
         }
         return nextState;
