@@ -1,7 +1,7 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
 
-import {General, Preferences, Permissions} from 'constants';
+import {General, Preferences, Permissions, Users} from 'constants';
 import {displayUsername} from './user_utils';
 import {getPreferencesByCategory} from './preference_utils';
 import {hasNewPermissions} from 'selectors/entities/general';
@@ -568,6 +568,21 @@ export function sortChannelsByRecency(lastPosts, a, b) {
 
 export function isChannelMuted(member) {
     return member && member.notify_props ? (member.notify_props.mark_unread === 'mention') : false;
+}
+
+export function areChannelMentionsIgnored(channelMemberNotifyProps, currentUserNotifyProps) {
+    let ignoreChannelMentionsDefault = Users.IGNORE_CHANNEL_MENTIONS_OFF;
+
+    if (currentUserNotifyProps.channel && currentUserNotifyProps.channel === 'false') {
+        ignoreChannelMentionsDefault = Users.IGNORE_CHANNEL_MENTIONS_ON;
+    }
+
+    let ignoreChannelMentions = channelMemberNotifyProps.ignore_channel_mentions;
+    if (!ignoreChannelMentions || ignoreChannelMentions === Users.IGNORE_CHANNEL_MENTIONS_DEFAULT) {
+        ignoreChannelMentions = ignoreChannelMentionsDefault;
+    }
+
+    return ignoreChannelMentions !== Users.IGNORE_CHANNEL_MENTIONS_OFF;
 }
 
 function not(f) {
