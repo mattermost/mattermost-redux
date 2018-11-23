@@ -543,12 +543,16 @@ describe('Selectors.Channels', () => {
         const fromModifiedState = Selectors.getSortedUnreadChannelIds(modifiedState);
         const fromMentionState = Selectors.getSortedUnreadChannelIds(mentionState);
 
-        // mentions should not be prioritized to the top
+        // mentions should be prioritized to the top
         assert.ok(fromOriginalState === fromModifiedState);
-        assert.ok(fromMentionState === fromModifiedState);
+        assert.ok(fromMentionState !== fromModifiedState);
 
-        // Channel 8 with display_name 'ABC' is above all others
-        assert.ok(fromMentionState[0] !== channel8.id);
+        // channel8 and channel2 are above all others
+        // since default order is "alpha", channel8 with display_name "ABC" should come first
+        assert.ok(fromMentionState[0] === channel8.id);
+
+        // followed by channel2 with display_name "DEF"
+        assert.ok(fromMentionState[1] === channel2.id);
     });
 
     it('get sorted favorite channel ids in current team strict equal', () => {
@@ -1078,9 +1082,13 @@ describe('Selectors.Channels', () => {
                 sidebarPrefs.unreads_at_top === 'true',
                 sidebarPrefs.favorite_at_top === 'true',
             );
-
             assert.notDeepEqual(fromModifiedState, fromRecencyInChan5State);
-            assert.ok(fromRecencyInChan5State[0].items[0] === chan5.id);
+
+            // first item should match channel2 since it has user mention
+            assert.ok(fromRecencyInChan5State[0].items[0] === channel2.id);
+
+            // second item should match chan5 since it's the most recent among other channels
+            assert.ok(fromRecencyInChan5State[0].items[1] === chan5.id);
 
             const chan6 = {...testState.entities.channels.channels[channel6.id]};
             chan6.last_post_at = (new Date()).getTime() + 500;
@@ -1108,7 +1116,12 @@ describe('Selectors.Channels', () => {
             );
 
             assert.notDeepEqual(fromRecencyInChan5State, fromRecencyInChan6State);
-            assert.ok(fromRecencyInChan6State[0].items[0] === chan6.id);
+
+            // first item should match channel2 since it has user mention
+            assert.ok(fromRecencyInChan5State[0].items[0] === channel2.id);
+
+            // second item should match chan6 since it's the most recent among other channels
+            assert.ok(fromRecencyInChan6State[0].items[1] === chan6.id);
         });
     });
 
