@@ -2,6 +2,10 @@
 // See LICENSE.txt for license information.
 // @flow
 
+import type {CustomEmoji} from './emojis';
+import type {FileInfo} from './files';
+import type {Reaction} from './reactions';
+
 export type PostType = 'system_add_remove' |
                        'system_add_to_channel' |
                        'system_channel_deleted' |
@@ -14,6 +18,27 @@ export type PostType = 'system_add_remove' |
                        'system_leave_channel' |
                        'system_purpose_change' |
                        'system_remove_from_channel';
+
+export type PostEmbedType = 'image' | 'message_attachment' | 'opengraph';
+
+export type PostEmbed = {|
+    type: PostEmbedType,
+    url: string,
+    data: Object
+|};
+
+export type PostImage = {|
+    height: number,
+    width: number
+|};
+
+export type PostMetadata = {|
+    embeds: Array<PostEmbed>,
+    emojis: Array<CustomEmoji>,
+    files: Array<FileInfo>,
+    images: {[string]: PostImage},
+    reactions: Array<Reaction>
+|};
 
 export type Post = {|
     id: string,
@@ -31,7 +56,8 @@ export type Post = {|
     type: PostType,
     props: Object,
     hashtags: string,
-    pending_post_id: string
+    pending_post_id: string,
+    metadata: PostMetadata
 |}
 
 export type PostsState = {|
