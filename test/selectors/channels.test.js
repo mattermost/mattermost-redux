@@ -542,8 +542,6 @@ describe('Selectors.Channels', () => {
         const fromOriginalState = Selectors.getSortedUnreadChannelIds(testState);
         const fromModifiedState = Selectors.getSortedUnreadChannelIds(modifiedState);
         const fromMentionState = Selectors.getSortedUnreadChannelIds(mentionState);
-        console.log('chan2.id', chan2.id, chan2.display_name, chan2.name);
-        console.log('channel8.id', channel8.id, channel8.display_name, channel8.name);
 
         // mentions should be prioritized to the top
         assert.ok(fromOriginalState === fromModifiedState);
