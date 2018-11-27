@@ -225,6 +225,7 @@ function completeLogin(data: UserProfile): ActionFunc {
 export function loadMe(): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         const state = getState();
+        const config = getConfig(state);
 
         const deviceId = state.entities.general.deviceToken;
         if (deviceId) {
@@ -237,12 +238,15 @@ export function loadMe(): ActionFunc {
             dispatch(getMyTeams()),
             dispatch(getMyTeamMembers()),
             dispatch(getMyTeamUnreads()),
-            dispatch(getMyTermsOfServiceStatus()),
         ];
+
+        if (config.EnableCustomTermsOfService === 'true') {
+            promises.push(dispatch(getMyTermsOfServiceStatus()));
+        }
 
         // Sometimes the server version is set in one or the other
         const serverVersion = Client4.getServerVersion() || getState().entities.general.serverVersion;
-        if (!isMinimumServerVersion(serverVersion, 4, 7) && getConfig(state).EnableCustomEmoji === 'true') {
+        if (!isMinimumServerVersion(serverVersion, 4, 7) && config.EnableCustomEmoji === 'true') {
             dispatch(getAllCustomEmojis());
         }
 
