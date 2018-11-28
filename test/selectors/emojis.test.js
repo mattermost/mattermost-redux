@@ -5,7 +5,7 @@ import assert from 'assert';
 import TestHelper from 'test/test_helper';
 import deepFreezeAndThrowOnMutation from 'utils/deep_freeze';
 
-import {getCustomEmojiIdsSortedByName} from 'selectors/entities/emojis';
+import {existsInCustomEmojis, getCustomEmojiIdsSortedByName} from 'selectors/entities/emojis';
 
 describe('Selectors.Integrations', () => {
     TestHelper.initBasic();
@@ -28,5 +28,23 @@ describe('Selectors.Integrations', () => {
 
     it('should get sorted emoji ids', () => {
         assert.deepEqual(getCustomEmojiIdsSortedByName(testState), [emoji3.id, emoji1.id, emoji2.id]);
+    });
+
+    it('should match existsInCustomEmojis', () => {
+        const testCases = [
+            {emojiName: 'a', output: true},
+            {emojiName: 'b', output: true},
+            {emojiName: '0', output: true},
+            {emojiName: 'notexist', output: false},
+            {emojiName: 'a b', output: false},
+        ];
+
+        testCases.forEach((testCase) => {
+            assert.equal(
+                existsInCustomEmojis(testState, testCase.emojiName),
+                testCase.output,
+                `existsInCustomEmojis('${testCase.emojiName}') should return ${testCase.output}`,
+            );
+        });
     });
 });

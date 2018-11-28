@@ -3,6 +3,8 @@
 // @flow
 
 import {createSelector} from 'reselect';
+
+import {doesMatchNamedEmoji} from 'utils/emoji_utils';
 import {createIdsSelector} from 'utils/helpers';
 
 import type {GlobalState} from 'types/store';
@@ -42,5 +44,13 @@ export const getCustomEmojiIdsSortedByName: (state: GlobalState) => Array<string
         return Object.keys(emojis).sort(
             (a: string, b: string): number => emojis[a].name.localeCompare(emojis[b].name)
         );
+    }
+);
+
+export const existsInCustomEmojis: (state: GlobalState, emojiName: string) => boolean = createSelector(
+    getCustomEmojisByName,
+    (_, emojiName) => emojiName,
+    (customEmojisByName, emojiName) => {
+        return doesMatchNamedEmoji(`:${emojiName}:`) && customEmojisByName.has(emojiName);
     }
 );

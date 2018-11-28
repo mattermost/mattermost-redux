@@ -79,4 +79,45 @@ describe('EmojiUtils', () => {
             assert.deepEqual(actual, expected);
         });
     });
+
+    describe('doesMatchNamedEmoji', () => {
+        const testCases = [{
+            input: ':named_emoji:',
+            output: true,
+        }, {
+            input: 'named_emoji',
+            output: false,
+        }, {
+            input: ':named_emoji',
+            output: false,
+        }, {
+            input: 'named_emoji:',
+            output: false,
+        }, {
+            input: '::named_emoji:',
+            output: false,
+        }, {
+            input: 'named emoji',
+            output: false,
+        }, {
+            input: ':named emoji:',
+            output: false,
+        }, {
+            input: ':named_emoji:!',
+            output: false,
+        }, {
+            input: ':named_emoji:aa',
+            output: false,
+        }];
+
+        for (const testCase of testCases) {
+            it(`test for - ${testCase.input}`, () => {
+                assert.equal(
+                    EmojiUtils.doesMatchNamedEmoji(testCase.input),
+                    testCase.output,
+                    `doesMatchNamedEmoji('${testCase.input}') should return ${testCase.output}`,
+                );
+            });
+        }
+    });
 });

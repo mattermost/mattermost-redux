@@ -6,6 +6,8 @@ import {Client4} from 'client';
 
 import type {Emoji, SystemEmoji, CustomEmoji} from '../types/emojis';
 
+export const NAMED_EMOJI_PATTERN = /:([A-Za-z0-9_-]+):/gi;
+
 export function getEmojiImageUrl(emoji: Emoji): string {
     if (emoji.id) {
         return Client4.getEmojiRoute(emoji.id) + '/image';
@@ -23,12 +25,10 @@ export function parseNeededCustomEmojisFromText(text: string, systemEmojis: Map<
         return new Set();
     }
 
-    const pattern = /:([A-Za-z0-9_-]+):/gi;
-
     const customEmojis = new Set();
 
     let match;
-    while ((match = pattern.exec(text)) !== null) {
+    while ((match = NAMED_EMOJI_PATTERN.exec(text)) !== null) {
         if (systemEmojis.has(match[1])) {
             // It's a system emoji, go the next match
             continue;
@@ -48,4 +48,14 @@ export function parseNeededCustomEmojisFromText(text: string, systemEmojis: Map<
     }
 
     return customEmojis;
+}
+
+export function doesMatchNamedEmoji(emojiName) {
+    const match = emojiName.match(NAMED_EMOJI_PATTERN);
+
+    if (match && match[0] === emojiName) {
+        return true;
+    }
+
+    return false;
 }
