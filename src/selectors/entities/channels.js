@@ -89,8 +89,8 @@ function sortChannelsByRecencyOrAlpha(locale, lastPosts, sorting, a, b) {
 //   2) otherChannelIds - All channels not included in hasMentionedChannelIds and mutedChannelIds are sorted next to hasMentionedChannelIds
 //   3) mutedChannelIds - Muted channels are always sorted last regardless of channel grouping
 // and then secondary by:
-//   1) alphabetical ("alpha") or chronological ("recency") order
-export const mapAndSortChannelIds = (channels, currentUser, myMembers, lastPosts, sorting, isUnreadChannel = false) => {
+//   4) alphabetical ("alpha") or chronological ("recency") order
+export const mapAndSortChannelIds = (channels, currentUser, myMembers, lastPosts, sorting, sortMentionsFirst = false) => {
     const locale = currentUser.locale || General.DEFAULT_LOCALE;
 
     const mutedChannelIds = channels.
@@ -99,7 +99,7 @@ export const mapAndSortChannelIds = (channels, currentUser, myMembers, lastPosts
         map((channel) => channel.id);
 
     let hasMentionedChannelIds = [];
-    if (isUnreadChannel) {
+    if (sortMentionsFirst) {
         hasMentionedChannelIds = channels.
             filter((channel) => {
                 const member = myMembers[channel.id];
