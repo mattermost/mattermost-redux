@@ -50,7 +50,7 @@ export function parseNeededCustomEmojisFromText(text: string, systemEmojis: Map<
     return customEmojis;
 }
 
-export function doesMatchNamedEmoji(emojiName) {
+export function doesMatchNamedEmoji(emojiName: string) {
     const match = emojiName.match(NAMED_EMOJI_PATTERN);
 
     if (match && match[0] === emojiName) {
