@@ -84,7 +84,13 @@ function sortChannelsByRecencyOrAlpha(locale, lastPosts, sorting, a, b) {
     return sortChannelsByDisplayName(locale, a, b);
 }
 
-export const mapAndSortChannelIds = (channels, currentUser, myMembers, lastPosts, sorting) => {
+// mapAndSortChannelIds sorts channels, primarily by:
+//   1) hasMentionedChannelIds - Only for unread channels group where channels with mention are always sorted first.
+//   2) otherChannelIds - All channels not included in hasMentionedChannelIds and mutedChannelIds are sorted next to hasMentionedChannelIds
+//   3) mutedChannelIds - Muted channels are always sorted last regardless of channel grouping
+// and then secondary by:
+//   4) alphabetical ("alpha") or chronological ("recency") order
+export const mapAndSortChannelIds = (channels, currentUser, myMembers, lastPosts, sorting, sortMentionsFirst = false) => {
     const locale = currentUser.locale || General.DEFAULT_LOCALE;
 
     const mutedChannelIds = channels.
@@ -92,13 +98,16 @@ export const mapAndSortChannelIds = (channels, currentUser, myMembers, lastPosts
         sort(sortChannelsByRecencyOrAlpha.bind(null, locale, lastPosts, sorting)).
         map((channel) => channel.id);
 
-    const hasMentionedChannelIds = channels.
-        filter((channel) => {
-            const member = myMembers[channel.id];
-            return member && member.mention_count > 0 && !isChannelMuted(member);
-        }).
-        sort(sortChannelsByRecencyOrAlpha.bind(null, locale, lastPosts, sorting)).
-        map((channel) => channel.id);
+    let hasMentionedChannelIds = [];
+    if (sortMentionsFirst) {
+        hasMentionedChannelIds = channels.
+            filter((channel) => {
+                const member = myMembers[channel.id];
+                return member && member.mention_count > 0 && !isChannelMuted(member);
+            }).
+            sort(sortChannelsByRecencyOrAlpha.bind(null, locale, lastPosts, sorting)).
+            map((channel) => channel.id);
+    }
 
     const otherChannelIds = channels.
         filter((channel) => {
@@ -592,7 +601,9 @@ export const getMapAndSortedUnreadChannelIds = createIdsSelector(
     getMyChannelMemberships,
     getLastPostPerChannel,
     (state, lastUnreadChannel, sorting = 'alpha') => sorting,
-    mapAndSortChannelIds,
+    (channels, currentUser, myMembers, lastPosts, sorting) => {
+        return mapAndSortChannelIds(channels, currentUser, myMembers, lastPosts, sorting, true);
+    },
 );
 
 export const getSortedUnreadChannelIds = createIdsSelector(
