@@ -1553,6 +1553,12 @@ export default class Client4 {
     };
 
     doPostAction = async (postId, actionId, selectedOption = '') => {
+        if (selectedOption) {
+            this.trackEvent('api', 'api_interactive_messages_menu_selected');
+        } else {
+            this.trackEvent('api', 'api_interactive_messages_button_clicked');
+        }
+
         return this.doFetch(
             `${this.getPostRoute(postId)}/actions/${encodeURIComponent(actionId)}`,
             {method: 'post', body: JSON.stringify({selected_option: selectedOption})}
@@ -1920,6 +1926,7 @@ export default class Client4 {
     };
 
     submitInteractiveDialog = async (data) => {
+        this.trackEvent('api', 'api_interactive_messages_dialog_submitted');
         return this.doFetch(
             `${this.getBaseRoute()}/actions/dialogs/submit`,
             {method: 'post', body: JSON.stringify(data)},
@@ -2553,8 +2560,13 @@ export default class Client4 {
     };
 
     trackEvent(category, event, props) {
-        // Temporary change to only track one event to reduce data rate - see MM-13062
-        if (event !== 'api_posts_create') {
+        // Temporary change to allow only certain events to reduce data rate - see MM-13062
+        if (![
+            'api_posts_create',
+            'api_interactive_messages_button_clicked',
+            'api_interactive_messages_menu_selected',
+            'api_interactive_messages_dialog_submitted',
+        ].includes(event)) {
             return;
         }
 
