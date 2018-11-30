@@ -11,6 +11,7 @@ export type RequestStatusType = {|
 export type ChannelsRequestsStatuses = {|
     getChannel: RequestStatusType,
     getChannels: RequestStatusType,
+    getAllChannels: RequestStatusType,
     myMembers: RequestStatusType,
     members: RequestStatusType,
     myChannels: RequestStatusType,
@@ -110,7 +111,10 @@ export type AdminRequestsStatuses = {|
     recycleDatabase: RequestStatusType,
     createCompliance: RequestStatusType,
     getCompliance: RequestStatusType,
-    testS3Connection: RequestStatusType
+    testS3Connection: RequestStatusType,
+    getLdapGroups: RequestStatusType,
+    linkLdapGroup: RequestStatusType,
+    unlinkLdapGroup: RequestStatusType
 |};
 
 export type EmojisRequestsStatuses = {|

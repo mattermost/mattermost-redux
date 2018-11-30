@@ -136,6 +136,10 @@ const state: GlobalState = {
                 status: 'not_started',
                 error: null,
             },
+            getAllChannels: {
+                status: 'not_started',
+                error: null,
+            },
             getChannels: {
                 status: 'not_started',
                 error: null,
@@ -462,6 +466,18 @@ const state: GlobalState = {
                 error: null,
             },
             getCompliance: {
+                status: 'not_started',
+                error: null,
+            },
+            getLdapGroups: {
+                status: 'not_started',
+                error: null,
+            },
+            unlinkLdapGroup: {
+                status: 'not_started',
+                error: null,
+            },
+            linkLdapGroup: {
                 status: 'not_started',
                 error: null,
             },
