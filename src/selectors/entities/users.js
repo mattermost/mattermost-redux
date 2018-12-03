@@ -414,6 +414,24 @@ export function makeGetProfilesInChannel() {
     );
 }
 
+export function makeGetProfilesNotInChannel() {
+    return createSelector(
+        getUsers,
+        getUserIdsNotInChannels,
+        (state, channelId) => channelId,
+        (state, channelId, skipInactive) => skipInactive,
+        (users, userIds, channelId, skipInactive = false) => {
+            const userIdsInChannel = userIds[channelId];
+
+            if (!userIdsInChannel) {
+                return [];
+            }
+
+            return sortAndInjectProfiles(users, userIdsInChannel, skipInactive);
+        }
+    );
+}
+
 export function makeGetProfilesByIdsAndUsernames() {
     return createSelector(
         getUsers,
