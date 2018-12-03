@@ -42,7 +42,8 @@ describe('Selectors.Users', () => {
     profilesInChannel[channel2.id] = new Set([user1.id, user2.id]);
 
     const profilesNotInChannel = {};
-    profilesNotInChannel[channel1.id] = new Set([user2.id]);
+    profilesNotInChannel[channel1.id] = new Set([user2.id, user3.id]);
+    profilesNotInChannel[channel2.id] = new Set([user4.id, user5.id]);
 
     const userSessions = [{
         create_at: 1,
@@ -311,6 +312,19 @@ describe('Selectors.Users', () => {
         const getProfilesInChannel = Selectors.makeGetProfilesInChannel();
         assert.deepEqual(getProfilesInChannel(state, channel1.id), [user1]);
         assert.deepEqual(getProfilesInChannel(state, channel1.id, true), [user1]);
+    });
+
+    it('makeGetProfilesNotInChannel', () => {
+        const getProfilesNotInChannel = Selectors.makeGetProfilesNotInChannel();
+
+        assert.deepEqual(getProfilesNotInChannel(testState, channel1.id, true), [user3].sort(sortByUsername));
+        assert.deepEqual(getProfilesNotInChannel(testState, channel1.id), [user2, user3].sort(sortByUsername));
+
+        assert.deepEqual(getProfilesNotInChannel(testState, channel2.id, true), [user4, user5].sort(sortByUsername));
+        assert.deepEqual(getProfilesNotInChannel(testState, channel2.id), [user4, user5].sort(sortByUsername));
+
+        assert.deepEqual(getProfilesNotInChannel(testState, 'nonexistentid'), []);
+        assert.deepEqual(getProfilesNotInChannel(testState, 'nonexistentid'), []);
     });
 
     it('makeGetProfilesByIdsAndUsernames', () => {
