@@ -73,6 +73,7 @@ export function loadRolesIfNeeded(roles: Iterable<string>): ActionFunc {
         }
         if (!state.entities.general.serverVersion) {
             setPendingRoles(Array.from(pendingRoles))(dispatch, getState);
+            setTimeout(() => dispatch(loadRolesIfNeeded([])), 500);
             return {data: []};
         }
         if (!hasNewPermissions(state)) {
