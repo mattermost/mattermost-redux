@@ -30,7 +30,7 @@ export function linkGroupSyncable(groupID: string, syncableID: string, syncableT
             return {error};
         }
 
-        var type;
+        let type;
         switch (syncableType) {
         case Groups.SYNCABLE_TYPE_TEAM:
             type = GroupTypes.LINKED_GROUP_TEAM;
@@ -66,8 +66,8 @@ export function unlinkGroupSyncable(groupID: string, syncableID: string, syncabl
             return {error};
         }
 
-        var type;
-        var data = {group_id: groupID, syncable_id: syncableID};
+        let type;
+        const data = {group_id: groupID, syncable_id: syncableID};
         switch (syncableType) {
         case Groups.SYNCABLE_TYPE_TEAM:
             type = GroupTypes.UNLINKED_GROUP_TEAM;
@@ -106,7 +106,7 @@ export function getGroupSyncables(groupID: string, syncableType: SyncableType): 
             return {error};
         }
 
-        var type;
+        let type;
         switch (syncableType) {
         case Groups.SYNCABLE_TYPE_TEAM:
             type = GroupTypes.RECEIVED_GROUP_TEAMS;

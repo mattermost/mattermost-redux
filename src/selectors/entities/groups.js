@@ -44,7 +44,7 @@ export const getGroupMembers = createSelector(
     (state) => state.entities.groups.members,
     (state, id) => id,
     (memberData, groupID) => {
-        var groupMemberData = memberData[groupID];
+        const groupMemberData = memberData[groupID];
         if (!groupMemberData) {
             return [];
         }
@@ -56,7 +56,7 @@ export const getGroupMemberCount = createSelector(
     (state) => state.entities.groups.members,
     (state, id) => id,
     (memberData, groupID) => {
-        var groupMemberData = memberData[groupID];
+        const groupMemberData = memberData[groupID];
         if (!groupMemberData) {
             return 0;
         }
