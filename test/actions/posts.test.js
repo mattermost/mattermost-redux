@@ -907,7 +907,7 @@ describe('Actions.Posts', () => {
             );
         });
 
-        it('do not load emojis when the post has metadata', () => {
+        it('get needed emojis even when the post has metadata', () => {
             assert.deepEqual(
                 Actions.getNeededCustomEmojis(state, [
                     {
@@ -917,7 +917,7 @@ describe('Actions.Posts', () => {
                         },
                     },
                 ]),
-                new Set([])
+                new Set(['emoji3'])
             );
         });
     });

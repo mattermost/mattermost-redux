@@ -22,9 +22,11 @@ export type SystemEmoji = {|
 
 export type Emoji = SystemEmoji | CustomEmoji;
 
+export type NonExistentEmoji = Set<string>;
+
 export type EmojisState = {|
     customEmoji: {
         [string]: CustomEmoji
     },
-    nonExistentEmoji: Set<string>
+    nonExistentEmoji: NonExistentEmoji
 |};

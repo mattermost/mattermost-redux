@@ -9,7 +9,7 @@ import {
     UserTypes,
 } from 'action_types';
 
-import type {CustomEmoji} from '../../types/emojis';
+import type {CustomEmoji, NonExistentEmoji} from '../../types/emojis';
 import type {Post} from '../../types/posts';
 import type {GenericAction} from '../../types/actions';
 
@@ -71,7 +71,7 @@ function storeEmojisForPost(state: {[string]: CustomEmoji}, post: Post) {
     }, state);
 }
 
-function nonExistentEmoji(state = new Set(), action) {
+export function nonExistentEmoji(state: NonExistentEmoji = new Set(), action: GenericAction): NonExistentEmoji {
     switch (action.type) {
     case EmojiTypes.CUSTOM_EMOJI_DOES_NOT_EXIST: {
         if (!state.has(action.data)) {
@@ -80,6 +80,20 @@ function nonExistentEmoji(state = new Set(), action) {
             return nextState;
         }
         return state;
+    }
+    case EmojiTypes.LOAD_NONEXISTENT_EMOJIS: {
+        const data = action.data || [];
+        const nextState = new Set(state);
+
+        let hasNewNonExistentEmoji = false;
+        for (const name of data) {
+            if (!hasNewNonExistentEmoji && !nextState.has(name)) {
+                hasNewNonExistentEmoji = true;
+            }
+
+            nextState.add(name);
+        }
+        return hasNewNonExistentEmoji ? nextState : state;
     }
     case EmojiTypes.RECEIVED_CUSTOM_EMOJI: {
         if (action.data && state.has(action.data.name)) {

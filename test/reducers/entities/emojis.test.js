@@ -3,8 +3,11 @@
 
 import assert from 'assert';
 
-import {PostTypes} from 'action_types';
-import {customEmoji as customEmojiReducer} from 'reducers/entities/emojis';
+import {EmojiTypes, PostTypes} from 'action_types';
+import {
+    customEmoji as customEmojiReducer,
+    nonExistentEmoji as nonExistentEmojiReducer,
+} from 'reducers/entities/emojis';
 import deepFreeze from 'utils/deep_freeze';
 
 describe('reducers/entities/emojis', () => {
@@ -253,6 +256,22 @@ describe('reducers/entities/emojis', () => {
                     emoji2: {id: 'emoji2'},
                     emoji3: {id: 'emoji3'},
                 });
+            });
+        });
+    });
+
+    describe('nonExistentEmoji', () => {
+        describe('LOAD_NONEXISTENT_EMOJIS', () => {
+            it('load non-existent custom emojis', () => {
+                const action = {
+                    type: EmojiTypes.LOAD_NONEXISTENT_EMOJIS,
+                    data: ['one'],
+                };
+
+                assert.deepEqual(nonExistentEmojiReducer(new Set(['one']), action), new Set(['one']));
+                assert.deepEqual(nonExistentEmojiReducer(new Set(['two']), action), new Set(['one', 'two']));
+                assert.deepEqual(nonExistentEmojiReducer(new Set(['two']), {...action, data: ['one', 'three']}), new Set(['one', 'two', 'three']));
+                assert.deepEqual(nonExistentEmojiReducer(new Set(['one', 'two']), {...action, data: ['four', 'three']}), new Set(['one', 'two', 'three', 'four']));
             });
         });
     });

@@ -5,7 +5,7 @@ import {batchActions} from 'redux-batched-actions';
 
 import {Client4} from 'client';
 import {General, Preferences, Posts} from 'constants';
-import {PostTypes, FileTypes, IntegrationTypes} from 'action_types';
+import {EmojiTypes, FileTypes, IntegrationTypes, PostTypes} from 'action_types';
 import {getUsersByUsername} from 'selectors/entities/users';
 import {getCustomEmojisByName as selectCustomEmojisByName} from 'selectors/entities/emojis';
 
@@ -991,9 +991,14 @@ export function getProfilesAndStatusesForPosts(postsArrayOrMap, dispatch, getSta
 
     // Emojis used in the posts
     const emojisToLoad = getNeededCustomEmojis(state, posts);
-
     if (emojisToLoad && emojisToLoad.size > 0) {
-        promises.push(getCustomEmojisByName(Array.from(emojisToLoad))(dispatch, getState));
+        if (posts[0].metadata) {
+            // If post metadata is supported, valid custom emojis are loaded into the store
+            // and as a result, "emojisToLoad" are actually non-existent custom emojis.
+            dispatch({type: EmojiTypes.LOAD_NONEXISTENT_EMOJIS, data: emojisToLoad}, getState);
+        } else {
+            promises.push(getCustomEmojisByName(Array.from(emojisToLoad))(dispatch, getState));
+        }
     }
 
     return Promise.all(promises);
@@ -1061,11 +1066,6 @@ function buildPostAttachmentText(attachments) {
 
 export function getNeededCustomEmojis(state, posts) {
     if (getConfig(state).EnableCustomEmoji !== 'true') {
-        return new Set();
-    }
-
-    // If post metadata is supported, custom emojis will have been provided as part of that
-    if (posts[0].metadata) {
         return new Set();
     }
 
