@@ -188,7 +188,7 @@ export function syncLdap(): ActionFunc {
     );
 }
 
-export function getLdapGroups(page: number = 0, perPage: number = General.LOGS_PAGE_SIZE_DEFAULT): ActionFunc {
+export function getLdapGroups(page: number = 0, perPage: number = General.PAGE_SIZE_MAXIMUM): ActionFunc {
     return bindClientFunc(
         Client4.getLdapGroups,
         AdminTypes.GET_LDAP_GROUPS_REQUEST,

@@ -127,7 +127,7 @@ export function getGroupSyncables(groupID: string, syncableType: SyncableType): 
     };
 }
 
-export function getGroupMembers(groupID: string, page: number = 0, perPage: number = General.LOGS_PAGE_SIZE_DEFAULT): ActionFunc {
+export function getGroupMembers(groupID: string, page: number = 0, perPage: number = General.PAGE_SIZE_DEFAULT): ActionFunc {
     return async (dispatch, getState) => {
         dispatch({type: GroupTypes.GET_GROUP_MEMBERS_REQUEST, data: {groupID, page, perPage}});
 
