@@ -16,7 +16,7 @@ import type {SyncableType, SyncablePatch} from '../types/groups';
 
 export function linkGroupSyncable(groupID: string, syncableID: string, syncableType: SyncableType, patch: SyncablePatch): ActionFunc {
     return async (dispatch, getState) => {
-        dispatch({type: GroupTypes.LINK_GROUP_SYNCABLE_REQUEST, data: {groupID, syncableID, type: syncableType}});
+        dispatch({type: GroupTypes.LINK_GROUP_SYNCABLE_REQUEST, data: {groupID, syncableID}});
 
         let data;
         try {
@@ -24,7 +24,7 @@ export function linkGroupSyncable(groupID: string, syncableID: string, syncableT
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch, getState);
             dispatch(batchActions([
-                {type: GroupTypes.LINK_GROUP_SYNCABLE_FAILURE, error, data: {groupID, syncableID, type: syncableType}},
+                {type: GroupTypes.LINK_GROUP_SYNCABLE_FAILURE, error, data: {groupID, syncableID}},
                 logError(error),
             ]));
             return {error};
@@ -53,14 +53,14 @@ export function linkGroupSyncable(groupID: string, syncableID: string, syncableT
 
 export function unlinkGroupSyncable(groupID: string, syncableID: string, syncableType: SyncableType): ActionFunc {
     return async (dispatch, getState) => {
-        dispatch({type: GroupTypes.UNLINK_GROUP_SYNCABLE_REQUEST, data: {groupID, syncableID, type: syncableType}});
+        dispatch({type: GroupTypes.UNLINK_GROUP_SYNCABLE_REQUEST, data: {groupID, syncableID}});
 
         try {
             await Client4.unlinkGroupSyncable(groupID, syncableID, syncableType);
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch, getState);
             dispatch(batchActions([
-                {type: GroupTypes.UNLINK_GROUP_SYNCABLE_FAILURE, error, data: {groupID, syncableID, type: syncableType}},
+                {type: GroupTypes.UNLINK_GROUP_SYNCABLE_FAILURE, error, data: {groupID, syncableID}},
                 logError(error),
             ]));
             return {error};
@@ -92,7 +92,7 @@ export function unlinkGroupSyncable(groupID: string, syncableID: string, syncabl
 
 export function getGroupSyncables(groupID: string, syncableType: SyncableType): ActionFunc {
     return async (dispatch, getState) => {
-        dispatch({type: GroupTypes.GET_GROUP_SYNCABLES_REQUEST, data: {groupID, syncableType}});
+        dispatch({type: GroupTypes.GET_GROUP_SYNCABLES_REQUEST, data: {groupID}});
 
         let data;
         try {
@@ -100,7 +100,7 @@ export function getGroupSyncables(groupID: string, syncableType: SyncableType): 
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch, getState);
             dispatch(batchActions([
-                {type: GroupTypes.GET_GROUP_SYNCABLES_FAILURE, error, data: {groupID, syncableType}},
+                {type: GroupTypes.GET_GROUP_SYNCABLES_FAILURE, error, data: {groupID}},
                 logError(error),
             ]));
             return {error};
