@@ -261,10 +261,10 @@ describe('reducers/entities/emojis', () => {
     });
 
     describe('nonExistentEmoji', () => {
-        describe('LOAD_NONEXISTENT_EMOJIS', () => {
+        describe('CUSTOM_EMOJIS_DO_NOT_EXIST', () => {
             it('load non-existent custom emojis', () => {
                 const action = {
-                    type: EmojiTypes.LOAD_NONEXISTENT_EMOJIS,
+                    type: EmojiTypes.CUSTOM_EMOJIS_DO_NOT_EXIST,
                     data: ['one'],
                 };
 

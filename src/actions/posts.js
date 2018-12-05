@@ -995,7 +995,7 @@ export function getProfilesAndStatusesForPosts(postsArrayOrMap, dispatch, getSta
         if (posts[0].metadata) {
             // If post metadata is supported, valid custom emojis are loaded into the store
             // and as a result, "emojisToLoad" are actually non-existent custom emojis.
-            dispatch({type: EmojiTypes.LOAD_NONEXISTENT_EMOJIS, data: emojisToLoad}, getState);
+            dispatch({type: EmojiTypes.CUSTOM_EMOJIS_DO_NOT_EXIST, data: emojisToLoad}, getState);
         } else {
             promises.push(getCustomEmojisByName(Array.from(emojisToLoad))(dispatch, getState));
         }

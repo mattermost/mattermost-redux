@@ -30,5 +30,5 @@ export default keyMirror({
     RECEIVED_CUSTOM_EMOJIS: null,
     DELETED_CUSTOM_EMOJI: null,
     CUSTOM_EMOJI_DOES_NOT_EXIST: null,
-    LOAD_NONEXISTENT_EMOJIS: null,
+    CUSTOM_EMOJIS_DO_NOT_EXIST: null,
 });

@@ -81,7 +81,7 @@ export function nonExistentEmoji(state: NonExistentEmoji = new Set(), action: Ge
         }
         return state;
     }
-    case EmojiTypes.LOAD_NONEXISTENT_EMOJIS: {
+    case EmojiTypes.CUSTOM_EMOJIS_DO_NOT_EXIST: {
         const data = action.data || [];
         const nextState = new Set(state);
 
