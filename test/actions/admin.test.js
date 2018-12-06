@@ -871,7 +871,11 @@ describe('Actions.Admin', () => {
             post('/plugins').
             reply(200, testPlugin);
 
-        await Actions.uploadPlugin(testFileData)(store.dispatch, store.getState);
+        await Actions.uploadPlugin(testFileData, false)(store.dispatch, store.getState);
+
+        // TODO: not sure how to add a test for Actions.uploadPlugin(testFileData, true)
+        // naive attempts failed.
+        // await Actions.uploadPlugin(testFileData, true)(store.dispatch, store.getState);
 
         const state = store.getState();
         const request = state.requests.admin.uploadPlugin;
