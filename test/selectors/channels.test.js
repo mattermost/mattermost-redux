@@ -72,10 +72,11 @@ describe('Selectors.Channels', () => {
     channel12.type = General.DM_CHANNEL;
     channel12.last_post_at = Date.now();
     channel12.name = getDirectChannelName(user.id, user2.id);
+    channel12.display_name = 'dm_test';
 
     const channel13 = TestHelper.fakeDmChannel(user.id, 'fakeUserId');
     channel13.total_msg_count = 3;
-    channel13.display_name = '';
+    channel13.display_name = 'test';
 
     const channels = {};
     channels[channel1.id] = channel1;
@@ -543,12 +544,16 @@ describe('Selectors.Channels', () => {
         const fromModifiedState = Selectors.getSortedUnreadChannelIds(modifiedState);
         const fromMentionState = Selectors.getSortedUnreadChannelIds(mentionState);
 
-        // mentions should not be prioritized to the top
+        // mentions should be prioritized to the top
         assert.ok(fromOriginalState === fromModifiedState);
-        assert.ok(fromMentionState === fromModifiedState);
+        assert.ok(fromMentionState !== fromModifiedState);
 
-        // Channel 8 with display_name 'ABC' is above all others
-        assert.ok(fromMentionState[0] !== channel8.id);
+        // channel8 and channel2 are above all others
+        // since default order is "alpha", channel8 with display_name "ABC" should come first
+        assert.ok(fromMentionState[0] === channel8.id);
+
+        // followed by channel2 with display_name "DEF"
+        assert.ok(fromMentionState[1] === channel2.id);
     });
 
     it('get sorted favorite channel ids in current team strict equal', () => {
@@ -1078,7 +1083,6 @@ describe('Selectors.Channels', () => {
                 sidebarPrefs.unreads_at_top === 'true',
                 sidebarPrefs.favorite_at_top === 'true',
             );
-
             assert.notDeepEqual(fromModifiedState, fromRecencyInChan5State);
             assert.ok(fromRecencyInChan5State[0].items[0] === chan5.id);
 

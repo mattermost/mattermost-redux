@@ -317,7 +317,7 @@ function handleNewPostEvent(msg) {
         const posts = getAllPosts(state);
         const post = JSON.parse(msg.data.post);
         const userId = post.user_id;
-        const currentUserId = getCurrentChannelId(state);
+        const currentUserId = getCurrentUserId(state);
         const status = getStatusForUserId(state, userId);
 
         getProfilesAndStatusesForPosts([post], dispatch, getState);
@@ -337,7 +337,7 @@ function handleNewPostEvent(msg) {
             break;
         }
 
-        if (post.root_id && !posts[post.root_id]) {
+        if (post.root_id && posts && !posts[post.root_id]) {
             let data;
             try {
                 data = await Client4.getPostThread(post.root_id);
@@ -347,8 +347,8 @@ function handleNewPostEvent(msg) {
 
             if (data) {
                 const rootUserId = data.posts[post.root_id].user_id;
-                const rootStatus = users.statuses[rootUserId];
-                if (!users.profiles[rootUserId] && rootUserId !== currentUserId) {
+                const rootStatus = getStatusForUserId(state, rootUserId);
+                if (!users[rootUserId] && rootUserId !== currentUserId) {
                     dispatch(getProfilesByIds([rootUserId]));
                 }
 
