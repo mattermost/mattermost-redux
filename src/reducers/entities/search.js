@@ -144,7 +144,7 @@ function pinned(state = {}, action) {
         const {channelId, pinned: posts} = action.data;
         return {
             ...state,
-            [channelId]: posts.order,
+            [channelId]: posts.order.reverse(),
         };
     }
     case PostTypes.POST_DELETED:
@@ -169,7 +169,16 @@ function pinned(state = {}, action) {
 
         return removePinnedPost(state, action.data);
     }
-    case SearchTypes.REMOVE_SEARCH_POSTS:
+    case SearchTypes.REMOVE_SEARCH_PINNED_POSTS: {
+        const {channelId} = action.data;
+        const nextState = {...state};
+        if (nextState[channelId]) {
+            Reflect.deleteProperty(nextState, channelId);
+            return nextState;
+        }
+
+        return state;
+    }
     case UserTypes.LOGOUT_SUCCESS:
         return [];
 
