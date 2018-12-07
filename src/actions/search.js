@@ -4,7 +4,7 @@
 import {batchActions} from 'redux-batched-actions';
 
 import {Client4} from 'client';
-import {SearchTypes} from 'action_types';
+import {PostTypes, SearchTypes} from 'action_types';
 
 import {getCurrentTeamId} from 'selectors/entities/teams';
 import {getCurrentUserId, getCurrentUserMentionKeys} from 'selectors/entities/users';
@@ -176,11 +176,32 @@ export function getPinnedPosts(channelId) {
                 },
             },
             {
+                type: PostTypes.RECEIVED_POSTS,
+                data: {
+                    order: [],
+                    posts: result.posts,
+                },
+                channelId,
+            },
+            {
                 type: SearchTypes.SEARCH_PINNED_POSTS_SUCCESS,
             },
         ], 'SEARCH_PINNED_POSTS_BATCH'));
 
         return {data: result};
+    };
+}
+
+export function clearPinnedPosts(channelId) {
+    return async (dispatch) => {
+        dispatch({
+            type: SearchTypes.REMOVE_SEARCH_PINNED_POSTS,
+            data: {
+                channelId,
+            },
+        });
+
+        return {data: true};
     };
 }
 
