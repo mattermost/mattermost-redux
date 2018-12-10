@@ -554,6 +554,32 @@ describe('Selectors.Channels', () => {
 
         // followed by channel2 with display_name "DEF"
         assert.ok(fromMentionState[1] === channel2.id);
+
+        const hasMentionMutedChannelState = {
+            ...mentionState,
+            entities: {
+                ...mentionState.entities,
+                channels: {
+                    ...mentionState.entities.channels,
+                    myMembers: {
+                        ...mentionState.entities.channels.myMembers,
+                        [channel8.id]: {
+                            mention_count: 1,
+                            notify_props: {
+                                mark_unread: 'mention',
+                            },
+                        },
+                    },
+                },
+            },
+        };
+
+        const fromHasMentionMutedChannelState = Selectors.getSortedUnreadChannelIds(hasMentionMutedChannelState);
+
+        // For channels with mentions, non-muted channel2 should come first before muted channel8.
+        assert.ok(fromHasMentionMutedChannelState[0] === channel2.id);
+        assert.ok(fromHasMentionMutedChannelState[1] === channel8.id);
+        assert.ok(fromHasMentionMutedChannelState[2] === channel7.id);
     });
 
     it('get sorted favorite channel ids in current team strict equal', () => {

@@ -85,11 +85,14 @@ function sortChannelsByRecencyOrAlpha(locale, lastPosts, sorting, a, b) {
 }
 
 // mapAndSortChannelIds sorts channels, primarily by:
-//   1) hasMentionedChannelIds - Only for unread channels group where channels with mention are always sorted first.
-//   2) otherChannelIds - All channels not included in hasMentionedChannelIds and mutedChannelIds are sorted next to hasMentionedChannelIds
-//   3) mutedChannelIds - Muted channels are always sorted last regardless of channel grouping
-// and then secondary by:
-//   4) alphabetical ("alpha") or chronological ("recency") order
+//   For all sections except unreads:
+//     a. All other unread channels
+//     b. Muted channels
+//   For unreads section:
+//     a. Non-muted channels with mentions
+//     b. Muted channels with mentions
+//     c. Remaining unread channels
+//   And then secondary by alphabetical ("alpha") or chronological ("recency") order
 export const mapAndSortChannelIds = (channels, currentUser, myMembers, lastPosts, sorting, sortMentionsFirst = false) => {
     const locale = currentUser.locale || General.DEFAULT_LOCALE;
 
@@ -116,7 +119,7 @@ export const mapAndSortChannelIds = (channels, currentUser, myMembers, lastPosts
         sort(sortChannelsByRecencyOrAlpha.bind(null, locale, lastPosts, sorting)).
         map((channel) => channel.id);
 
-    return hasMentionedChannelIds.concat(otherChannelIds).concat(mutedChannelIds);
+    return sortMentionsFirst ? hasMentionedChannelIds.concat(mutedChannelIds, otherChannelIds) : otherChannelIds.concat(mutedChannelIds);
 };
 
 export function filterChannels(unreadIds, favoriteIds, channelIds, unreadsAtTop, favoritesAtTop) {
