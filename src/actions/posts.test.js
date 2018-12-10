@@ -50,7 +50,6 @@ describe('Actions.Posts', () => {
         const {posts, postsInChannel} = state.entities.posts;
         assert.ok(posts);
         assert.ok(postsInChannel);
-        assert.ok(postsInChannel[channelId]);
 
         let found = false;
         for (const storedPost of Object.values(posts)) {
@@ -60,15 +59,7 @@ describe('Actions.Posts', () => {
             }
         }
         assert.ok(found, 'failed to find new post in posts');
-
-        found = false;
-        for (const postIdInChannel of postsInChannel[channelId]) {
-            if (posts[postIdInChannel].message === post.message) {
-                found = true;
-                break;
-            }
-        }
-        assert.ok(found, 'failed to find new post in postsInChannel');
+        assert.ok(!postsInChannel[channelId], 'postIds in channel do not exist');
     });
 
     it('resetCreatePostRequest', async () => {
@@ -254,20 +245,18 @@ describe('Actions.Posts', () => {
             post('').
             reply(201, TestHelper.fakePostWithId(channelId));
         await Actions.createPost(TestHelper.fakePost(channelId))(store.dispatch, store.getState);
-
         const initialPosts = store.getState().entities.posts;
-        const created = initialPosts.posts[initialPosts.postsInChannel[channelId][0]];
-
-        await Actions.deletePost(created)(store.dispatch, store.getState);
+        const postId = Object.keys(initialPosts.posts)[0];
+        await Actions.deletePost(initialPosts.posts[postId])(store.dispatch, store.getState);
 
         const state = store.getState();
         const {posts} = state.entities.posts;
 
         assert.ok(posts);
-        assert.ok(posts[created.id]);
-
+        assert.ok(posts[postId]);
+        console.log(posts[postId].id);
         assert.strictEqual(
-            posts[created.id].state,
+            posts[postId].state,
             Posts.POST_DELETED
         );
     });

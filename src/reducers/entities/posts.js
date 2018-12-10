@@ -14,10 +14,14 @@ function handleReceivedPost(posts = {}, postsInChannel = {}, postsInThread = {},
         [post.id]: post,
     };
 
+    if (!postsInChannel[channelId]) {
+        return {posts: nextPosts, postsInChannel, postsInThread};
+    }
+
     let nextPostsInChannel = postsInChannel;
 
     // Only change postsInChannel if the order of the posts needs to change
-    if (!postsInChannel[channelId] || !postsInChannel[channelId].includes(post.id)) {
+    if (!postsInChannel[channelId].includes(post.id)) {
         // If we don't already have the post, assume it's the most recent one
         const postsForChannel = postsInChannel[channelId] || [];
 
@@ -85,7 +89,14 @@ function handleReceivedPosts(posts = {}, postsInChannel = {}, postsInThread = {}
     // Change the state only if we have new posts,
     // otherwise there's no need to create a new object for the same state.
     if (!Object.keys(newPosts).length) {
-        return {posts, postsInChannel, postsInThread};
+        return {
+            posts,
+            postsInThread,
+            postsInChannel: {
+                ...postsInChannel,
+                [channelId]: [],
+            },
+        };
     }
 
     const nextPosts = {...posts};

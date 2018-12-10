@@ -39,6 +39,32 @@ describe('Reducers.posts', () => {
                 },
             });
         });
+
+        it('should not add postId to postsInChannel', () => {
+            const state = deepFreeze({
+                posts: {},
+                postsInChannel: {},
+            });
+            const post = {
+                id: 'postId',
+                channel_id: 'channelId',
+            };
+            const action = {
+                type: PostTypes.RECEIVED_POST,
+                data: post,
+            };
+
+            const nextState = postsReducer(state, action);
+
+            assert.deepEqual(nextState.posts, {
+                postId: {
+                    id: 'postId',
+                    channel_id: 'channelId',
+                },
+            });
+
+            assert.deepEqual(nextState.postsInChannel, {});
+        });
     });
 
     describe('RECEIVED_NEW_POST', () => {
@@ -65,6 +91,36 @@ describe('Reducers.posts', () => {
                     id: 'post',
                     metadata: {},
                 },
+            });
+        });
+
+        it('should add postId to postsInChannel', () => {
+            const state = deepFreeze({
+                posts: {},
+                postsInChannel: {
+                    channelId: [],
+                },
+            });
+            const post = {
+                id: 'postId',
+                channel_id: 'channelId',
+            };
+            const action = {
+                type: PostTypes.RECEIVED_NEW_POST,
+                data: post,
+            };
+
+            const nextState = postsReducer(state, action);
+
+            assert.deepEqual(nextState.posts, {
+                postId: {
+                    id: 'postId',
+                    channel_id: 'channelId',
+                },
+            });
+
+            assert.deepEqual(nextState.postsInChannel, {
+                channelId: ['postId'],
             });
         });
     });
@@ -111,6 +167,27 @@ describe('Reducers.posts', () => {
                     root_id: 'post1',
                     metadata: {},
                 },
+            });
+        });
+
+        it('should have empty postsInChannel for no posts in channel', () => {
+            const state = deepFreeze({
+                posts: {},
+                postsInChannel: {},
+            });
+            const action = {
+                type: PostTypes.RECEIVED_POSTS,
+                data: {
+                    order: [],
+                    posts: {},
+                },
+                channelId: 'channelId',
+            };
+
+            const nextState = postsReducer(state, action);
+
+            assert.deepEqual(nextState.postsInChannel, {
+                channelId: [],
             });
         });
     });
