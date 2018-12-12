@@ -502,6 +502,10 @@ export const canManageChannelMembers = createSelector(
             return false;
         }
 
+        if (channel.delete_at !== 0) {
+            return false;
+        }
+
         if (channel.type === General.DM_CHANNEL ||
             channel.type === General.GM_CHANNEL ||
             channel.name === General.DEFAULT_CHANNEL) {
