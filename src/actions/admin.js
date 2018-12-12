@@ -337,13 +337,13 @@ export function getUsersPerDayAnalytics(teamId: string = ''): ActionFunc {
     return getAnalytics('user_counts_with_posts_day', teamId);
 }
 
-export function uploadPlugin(fileData: File): ActionFunc {
+export function uploadPlugin(fileData: File, force: boolean = false): ActionFunc {
     return async (dispatch, getState) => {
         dispatch({type: AdminTypes.UPLOAD_PLUGIN_REQUEST, data: null});
 
         let data;
         try {
-            data = await Client4.uploadPlugin(fileData);
+            data = await Client4.uploadPlugin(fileData, force);
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch, getState);
             dispatch(batchActions([

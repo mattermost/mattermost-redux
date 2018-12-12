@@ -2415,10 +2415,13 @@ export default class Client4 {
 
     // Plugin Routes - EXPERIMENTAL - SUBJECT TO CHANGE
 
-    uploadPlugin = async (fileData) => {
+    uploadPlugin = async (fileData, force = false) => {
         this.trackEvent('api', 'api_plugin_upload');
 
         const formData = new FormData();
+        if (force) {
+            formData.append('force', 'true');
+        }
         formData.append('plugin', fileData);
 
         const request = {
