@@ -388,7 +388,7 @@ function handleNewPostEvent(msg) {
             actions.push({
                 type: PostTypes.RECEIVED_NEW_POST,
                 data: {
-                    ...posts,
+                    ...post,
                 },
             });
         }
