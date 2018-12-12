@@ -2419,13 +2419,14 @@ export default class Client4 {
         this.trackEvent('api', 'api_plugin_upload');
 
         const formData = new FormData();
-        formData.append('plugin', fileData);
         if (force) {
             formData.append('force', 'true');
         }
+        formData.append('plugin', fileData);
 
         const request = {
             method: 'post',
+
             body: formData,
         };
 

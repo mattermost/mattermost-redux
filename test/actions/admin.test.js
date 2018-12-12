@@ -864,17 +864,21 @@ describe('Actions.Admin', () => {
             return;
         }
 
-        const data1 = fs.createReadStream('test/assets/images/test.png');
-        const data2 = fs.createReadStream('test/assets/images/test.png');
+        const data1 = fs.createReadStream('test/setup.js');
+        const data2 = fs.createReadStream('test/setup.js');
         const testPlugin = {id: 'testplugin', webapp: {bundle_path: '/static/somebundle.js'}};
 
         nock(Client4.getBaseRoute()).
-            post('/plugins').
+            post('/plugins', (body) => {
+                return !body.match(/Content-Disposition: form-data; name="force"\r\n\r\ntrue\r\n/);
+            }).
             reply(200, testPlugin);
         await Actions.uploadPlugin(data1, false)(store.dispatch, store.getState);
 
         nock(Client4.getBaseRoute()).
-            post('/plugins').
+            post('/plugins', (body) => {
+                return body.match(/Content-Disposition: form-data; name="force"\r\n\r\ntrue\r\n/);
+            }).
             reply(200, testPlugin);
         await Actions.uploadPlugin(data2, true)(store.dispatch, store.getState);
 
