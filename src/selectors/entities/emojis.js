@@ -9,6 +9,9 @@ import type {GlobalState} from 'types/store';
 import type {CustomEmoji} from 'types/emojis';
 
 export function getCustomEmojis(state: GlobalState): {[string]: CustomEmoji} {
+    if (state.entities.general.config.EnableCustomEmoji !== 'true') {
+        return {};
+    }
     return state.entities.emojis.customEmoji;
 }
 

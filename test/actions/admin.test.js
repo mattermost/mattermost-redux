@@ -858,6 +858,41 @@ describe('Actions.Admin', () => {
         assert.ok(teamAnalytics[TestHelper.basicTeam.id][Stats.USERS_WITH_POSTS_PER_DAY]);
     });
 
+    it('overwritePlugin', async () => {
+        if (TestHelper.isLiveServer()) {
+            console.log('Skipping mock-only test');
+            return;
+        }
+
+        const data1 = fs.createReadStream('test/setup.js');
+        const data2 = fs.createReadStream('test/setup.js');
+        const testPlugin = {id: 'testplugin', webapp: {bundle_path: '/static/somebundle.js'}};
+
+        nock(Client4.getBaseRoute()).
+            post('/plugins', (body) => {
+                return !body.match(/Content-Disposition: form-data; name="force"\r\n\r\ntrue\r\n/);
+            }).
+            reply(200, testPlugin);
+        await Actions.uploadPlugin(data1, false)(store.dispatch, store.getState);
+
+        nock(Client4.getBaseRoute()).
+            post('/plugins', (body) => {
+                return body.match(/Content-Disposition: form-data; name="force"\r\n\r\ntrue\r\n/);
+            }).
+            reply(200, testPlugin);
+        await Actions.uploadPlugin(data2, true)(store.dispatch, store.getState);
+
+        const state = store.getState();
+        const request = state.requests.admin.uploadPlugin;
+        if (request.status === RequestStatus.FAILURE) {
+            throw new Error('uploadPlugin request failed err=' + request.error);
+        }
+
+        const plugins = state.entities.admin.plugins;
+        assert.ok(plugins);
+        assert.ok(plugins[testPlugin.id]);
+    });
+
     it('uploadPlugin', async () => {
         if (TestHelper.isLiveServer()) {
             console.log('Skipping mock-only test');
@@ -870,8 +905,7 @@ describe('Actions.Admin', () => {
         nock(Client4.getBaseRoute()).
             post('/plugins').
             reply(200, testPlugin);
-
-        await Actions.uploadPlugin(testFileData)(store.dispatch, store.getState);
+        await Actions.uploadPlugin(testFileData, false)(store.dispatch, store.getState);
 
         const state = store.getState();
         const request = state.requests.admin.uploadPlugin;
