@@ -369,6 +369,7 @@ function handleNewPostEvent(msg) {
             data: {
                 id: post.channel_id + post.root_id,
                 userId: post.user_id,
+                now: Date.now(),
             },
         }];
 
