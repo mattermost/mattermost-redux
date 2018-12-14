@@ -50,7 +50,7 @@
     "mocha": "5.2.0",
     "mocha-junit-reporter": "1.17.0",
     "mocha-multi-reporters": "1.1.7",
-    "mock-socket": "7.1.0",
+    "mock-socket": "8.0.5",
     "nock": "10.0.3",
     "react": "16.6.3",
     "redux-persist-node-storage": "2.0.0",
