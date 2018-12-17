@@ -43,18 +43,10 @@ export type PostsRequestsStatuses = {|
     editPost: RequestStatusType,
     deletePost: RequestStatusType,
     getPostThread: RequestStatusType,
-    getPostThreadRetryAttempts: number,
     getPosts: RequestStatusType,
-    getPostsRetryAttempts: number,
     getPostsSince: RequestStatusType,
-    getPostsSinceRetryAttempts: number,
     getPostsBefore: RequestStatusType,
-    getPostsBeforeRetryAttempts: number,
     getPostsAfter: RequestStatusType,
-    getPostsAfterRetryAttempts: number,
-    doPostAction: RequestStatusType,
-    openGraph: RequestStatusType,
-    reaction: RequestStatusType
 |};
 
 export type TeamsRequestsStatuses = {|

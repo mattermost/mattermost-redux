@@ -41,7 +41,6 @@ function handleReceivedPost(posts = {}, postsInChannel = {}, postsInThread = {},
 
     const withCombineSystemPosts = combineSystemPosts(nextPostsInChannel[channelId], nextPosts);
     nextPostsInChannel[channelId] = withCombineSystemPosts.postsForChannel;
-
     return {posts: withCombineSystemPosts.nextPosts, postsInChannel: nextPostsInChannel, postsInThread: nextPostsInThread};
 }
 

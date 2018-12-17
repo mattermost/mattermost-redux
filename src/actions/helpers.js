@@ -62,29 +62,37 @@ export function requestFailure(type: ActionType, error: Client4Error) {
  * @param {...Array<any>} args
  * @returns {ActionFunc} ActionFunc
  */
-export function bindClientFunc(clientFunc: () => Promise<mixed>, request: ActionType,
-    success: ActionType | Array<ActionType>, failure: ActionType, ...args: Array<any>): ActionFunc {
+export function bindClientFunc({
+    clientFunc,
+    onRequest,
+    onSuccess,
+    onFailure,
+    params = [],
+}): ActionFunc {
     return async (dispatch, getState) => {
-        dispatch(requestData(request), getState);
+        if (onRequest) {
+            dispatch(requestData(onRequest), getState);
+        }
 
         let data = null;
         try {
-            data = await clientFunc(...args);
+            data = await clientFunc(...params);
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch, getState);
-            dispatch(batchActions([
-                requestFailure(failure, error),
-                logError(error),
-            ]), getState);
+            const actions = [logError(error)];
+            if (onFailure) {
+                actions.push(requestFailure(onFailure, error));
+            }
+            dispatch(batchActions(actions));
             return {error};
         }
 
-        if (Array.isArray(success)) {
-            success.forEach((s) => {
+        if (Array.isArray(onSuccess)) {
+            onSuccess.forEach((s) => {
                 dispatcher(s, data, dispatch, getState);
             });
-        } else {
-            dispatcher(success, data, dispatch, getState);
+        } else if (onSuccess) {
+            dispatcher(onSuccess, data, dispatch, getState);
         }
 
         return {data};

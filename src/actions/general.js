@@ -114,23 +114,25 @@ export function getDataRetentionPolicy(): ActionFunc {
 }
 
 export function getLicenseConfig(): ActionFunc {
-    return bindClientFunc(
-        Client4.getClientLicenseOld,
-        GeneralTypes.CLIENT_LICENSE_REQUEST,
-        [GeneralTypes.CLIENT_LICENSE_RECEIVED, GeneralTypes.CLIENT_LICENSE_SUCCESS],
-        GeneralTypes.CLIENT_LICENSE_FAILURE
-    );
+    return bindClientFunc({
+        clientFunc: Client4.getClientLicenseOld,
+        onRequest: GeneralTypes.CLIENT_LICENSE_REQUEST,
+        onSuccess: [GeneralTypes.CLIENT_LICENSE_RECEIVED, GeneralTypes.CLIENT_LICENSE_SUCCESS],
+        onFailure: GeneralTypes.CLIENT_LICENSE_FAILURE,
+    });
 }
 
 export function logClientError(message: string, level: logLevel = 'ERROR') {
-    return bindClientFunc(
-        Client4.logClientError,
-        GeneralTypes.LOG_CLIENT_ERROR_REQUEST,
-        GeneralTypes.LOG_CLIENT_ERROR_SUCCESS,
-        GeneralTypes.LOG_CLIENT_ERROR_FAILURE,
-        message,
-        level
-    );
+    return bindClientFunc({
+        clientFunc: Client4.logClientError,
+        onRequest: GeneralTypes.LOG_CLIENT_ERROR_REQUEST,
+        onSuccess: GeneralTypes.LOG_CLIENT_ERROR_SUCCESS,
+        onFailure: GeneralTypes.LOG_CLIENT_ERROR_FAILURE,
+        params: [
+            message,
+            level,
+        ],
+    });
 }
 
 export function setAppState(state: $PropertyType<GeneralState, 'appState'>): ActionFunc {
@@ -168,12 +170,12 @@ export function setStoreFromLocalData(data: { token: string, url: string }): Act
 }
 
 export function getSupportedTimezones() {
-    return bindClientFunc(
-        Client4.getTimezones,
-        GeneralTypes.SUPPORTED_TIMEZONES_REQUEST,
-        [GeneralTypes.SUPPORTED_TIMEZONES_RECEIVED, GeneralTypes.SUPPORTED_TIMEZONES_SUCCESS],
-        GeneralTypes.SUPPORTED_TIMEZONES_FAILURE,
-    );
+    return bindClientFunc({
+        clientFunc: Client4.getTimezones,
+        onRequest: GeneralTypes.SUPPORTED_TIMEZONES_REQUEST,
+        onSuccess: [GeneralTypes.SUPPORTED_TIMEZONES_RECEIVED, GeneralTypes.SUPPORTED_TIMEZONES_SUCCESS],
+        onFailure: GeneralTypes.SUPPORTED_TIMEZONES_FAILURE,
+    });
 }
 
 export function setUrl(url: string) {

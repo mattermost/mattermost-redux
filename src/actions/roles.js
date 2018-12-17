@@ -12,44 +12,52 @@ import type {DispatchFunc, GetStateFunc, ActionFunc} from '../types/actions';
 import type {Role} from '../types/roles';
 
 export function getRolesByNames(rolesNames: Array<string>) {
-    return bindClientFunc(
-        Client4.getRolesByNames,
-        RoleTypes.ROLES_BY_NAMES_REQUEST,
-        [RoleTypes.RECEIVED_ROLES, RoleTypes.ROLES_BY_NAMES_SUCCESS],
-        RoleTypes.ROLES_BY_NAMES_FAILURE,
-        rolesNames
-    );
+    return bindClientFunc({
+        clientFunc: Client4.getRolesByNames,
+        onRequest: RoleTypes.ROLES_BY_NAMES_REQUEST,
+        onSuccess: [RoleTypes.RECEIVED_ROLES, RoleTypes.ROLES_BY_NAMES_SUCCESS],
+        onFailure: RoleTypes.ROLES_BY_NAMES_FAILURE,
+        params: [
+            rolesNames,
+        ],
+    });
 }
 
 export function getRoleByName(roleName: string) {
-    return bindClientFunc(
-        Client4.getRoleByName,
-        RoleTypes.ROLE_BY_NAME_REQUEST,
-        [RoleTypes.RECEIVED_ROLE, RoleTypes.ROLE_BY_NAME_SUCCESS],
-        RoleTypes.ROLE_BY_NAME_FAILURE,
-        roleName
-    );
+    return bindClientFunc({
+        clientFunc: Client4.getRoleByName,
+        onRequest: RoleTypes.ROLE_BY_NAME_REQUEST,
+        onSuccess: [RoleTypes.RECEIVED_ROLE, RoleTypes.ROLE_BY_NAME_SUCCESS],
+        onFailure: RoleTypes.ROLE_BY_NAME_FAILURE,
+        params: [
+            roleName,
+        ],
+    });
 }
 
 export function getRole(roleId: string) {
-    return bindClientFunc(
-        Client4.getRole,
-        RoleTypes.ROLE_BY_ID_REQUEST,
-        [RoleTypes.RECEIVED_ROLE, RoleTypes.ROLE_BY_ID_SUCCESS],
-        RoleTypes.ROLE_BY_ID_FAILURE,
-        roleId
-    );
+    return bindClientFunc({
+        clientFunc: Client4.getRole,
+        onRequest: RoleTypes.ROLE_BY_ID_REQUEST,
+        onSuccess: [RoleTypes.RECEIVED_ROLE, RoleTypes.ROLE_BY_ID_SUCCESS],
+        onFailure: RoleTypes.ROLE_BY_ID_FAILURE,
+        params: [
+            roleId,
+        ],
+    });
 }
 
 export function editRole(role: Role) {
-    return bindClientFunc(
-        Client4.patchRole,
-        RoleTypes.EDIT_ROLE_REQUEST,
-        [RoleTypes.RECEIVED_ROLE, RoleTypes.EDIT_ROLE_SUCCESS],
-        RoleTypes.EDIT_ROLE_FAILURE,
-        role.id,
-        role
-    );
+    return bindClientFunc({
+        clientFunc: Client4.patchRole,
+        onRequest: RoleTypes.EDIT_ROLE_REQUEST,
+        onSuccess: [RoleTypes.RECEIVED_ROLE, RoleTypes.EDIT_ROLE_SUCCESS],
+        onFailure: RoleTypes.EDIT_ROLE_FAILURE,
+        params: [
+            role.id,
+            role,
+        ],
+    });
 }
 
 export function setPendingRoles(roles: Array<string>) {

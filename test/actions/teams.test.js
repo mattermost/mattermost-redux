@@ -112,12 +112,7 @@ describe('Actions.Teams', () => {
         await Actions.getTeam(team.id)(store.dispatch, store.getState);
 
         const state = store.getState();
-        const {getTeam: teamRequest} = state.requests.teams;
         const {teams} = state.entities.teams;
-
-        if (teamRequest.status === RequestStatus.FAILURE) {
-            throw new Error(JSON.stringify(teamRequest.error));
-        }
 
         assert.ok(teams);
         assert.ok(teams[team.id]);
@@ -135,12 +130,7 @@ describe('Actions.Teams', () => {
         await Actions.getTeamByName(team.name)(store.dispatch, store.getState);
 
         const state = store.getState();
-        const {getTeam: teamRequest} = state.requests.teams;
         const {teams} = state.entities.teams;
-
-        if (teamRequest.status === RequestStatus.FAILURE) {
-            throw new Error(JSON.stringify(teamRequest.error));
-        }
 
         assert.ok(teams);
         assert.ok(teams[team.id]);
@@ -154,12 +144,7 @@ describe('Actions.Teams', () => {
             TestHelper.fakeTeam()
         )(store.dispatch, store.getState);
 
-        const createRequest = store.getState().requests.teams.createTeam;
         const {teams, myMembers, currentTeamId} = store.getState().entities.teams;
-
-        if (createRequest.status === RequestStatus.FAILURE) {
-            throw new Error(JSON.stringify(createRequest.error));
-        }
 
         const teamId = Object.keys(teams)[0];
         assert.strictEqual(Object.keys(teams).length, 1);
@@ -201,16 +186,6 @@ describe('Actions.Teams', () => {
             secondTeam.id
         )(store.dispatch, store.getState);
 
-        const deleteRequest = store.getState().requests.teams.deleteTeam;
-
-        if (deleteRequest === undefined) {
-            throw new Error(JSON.stringify(store.getState().requests.teams));
-        }
-
-        if (deleteRequest.status === RequestStatus.FAILURE) {
-            throw new Error(JSON.stringify(deleteRequest.error));
-        }
-
         const {teams, myMembers} = store.getState().entities.teams;
         assert.ifError(teams[secondTeam.id]);
         assert.ifError(myMembers[secondTeam.id]);
@@ -230,14 +205,9 @@ describe('Actions.Teams', () => {
             reply(200, team);
         await Actions.updateTeam(team)(store.dispatch, store.getState);
 
-        const updateRequest = store.getState().requests.teams.updateTeam;
         const {teams} = store.getState().entities.teams;
-
-        if (updateRequest.status === RequestStatus.FAILURE) {
-            throw new Error(JSON.stringify(updateRequest.error));
-        }
-
         const updated = teams[TestHelper.basicTeam.id];
+
         assert.ok(updated);
         assert.strictEqual(updated.display_name, displayName);
         assert.strictEqual(updated.description, description);
@@ -256,13 +226,7 @@ describe('Actions.Teams', () => {
             put(`/${team.id}/patch`).
             reply(200, team);
         await Actions.patchTeam(team)(store.dispatch, store.getState);
-
-        const patchRequest = store.getState().requests.teams.patchTeam;
         const {teams} = store.getState().entities.teams;
-
-        if (patchRequest.status === RequestStatus.FAILURE) {
-            throw new Error(JSON.stringify(patchRequest.error));
-        }
 
         const patched = teams[TestHelper.basicTeam.id];
 
@@ -340,21 +304,9 @@ describe('Actions.Teams', () => {
             reply(200, [{team_id: TestHelper.basicTeam.id, msg_count: 0, mention_count: 0}]);
         await Actions.getMyTeamUnreads()(store.dispatch, store.getState);
 
-        const {
-            getMyTeamMembers: membersRequest,
-            getMyTeamUnreads: unreadRequest,
-        } = store.getState().requests.teams;
         const members = store.getState().entities.teams.myMembers;
-
-        if (membersRequest.status === RequestStatus.FAILURE) {
-            throw new Error(JSON.stringify(membersRequest.error));
-        }
-
-        if (unreadRequest.status === RequestStatus.FAILURE) {
-            throw new Error(JSON.stringify(unreadRequest.error));
-        }
-
         const member = members[TestHelper.basicTeam.id];
+
         assert.ok(member);
         assert.ok(member.hasOwnProperty('mention_count'));
     });
@@ -365,12 +317,7 @@ describe('Actions.Teams', () => {
             reply(200, [{user_id: TestHelper.basicUser.id, team_id: TestHelper.basicTeam.id}]);
         await Actions.getTeamMembersForUser(TestHelper.basicUser.id)(store.dispatch, store.getState);
 
-        const membersRequest = store.getState().requests.teams.getTeamMembers;
         const membersInTeam = store.getState().entities.teams.membersInTeam;
-
-        if (membersRequest.status === RequestStatus.FAILURE) {
-            throw new Error(JSON.stringify(membersRequest.error));
-        }
 
         assert.ok(membersInTeam);
         assert.ok(membersInTeam[TestHelper.basicTeam.id]);
@@ -394,12 +341,7 @@ describe('Actions.Teams', () => {
             reply(200, {user_id: user.id, team_id: TestHelper.basicTeam.id});
         await Actions.getTeamMember(TestHelper.basicTeam.id, user.id)(store.dispatch, store.getState);
 
-        const membersRequest = store.getState().requests.teams.getTeamMembers;
         const members = store.getState().entities.teams.membersInTeam;
-
-        if (membersRequest.status === RequestStatus.FAILURE) {
-            throw new Error(JSON.stringify(membersRequest.error));
-        }
 
         assert.ok(members[TestHelper.basicTeam.id]);
         assert.ok(members[TestHelper.basicTeam.id][user.id]);
@@ -431,13 +373,7 @@ describe('Actions.Teams', () => {
             query(true).
             reply(200, [member1, member2, TestHelper.basicTeamMember]);
         await Actions.getTeamMembers(TestHelper.basicTeam.id)(store.dispatch, store.getState);
-
-        const membersRequest = store.getState().requests.teams.getTeamMembers;
         const membersInTeam = store.getState().entities.teams.membersInTeam;
-
-        if (membersRequest.status === RequestStatus.FAILURE) {
-            throw new Error(JSON.stringify(membersRequest.error));
-        }
 
         assert.ok(membersInTeam[TestHelper.basicTeam.id]);
         assert.ok(membersInTeam[TestHelper.basicTeam.id][TestHelper.basicUser.id]);
@@ -476,12 +412,7 @@ describe('Actions.Teams', () => {
             [user1.id, user2.id]
         )(store.dispatch, store.getState);
 
-        const membersRequest = store.getState().requests.teams.getTeamMembers;
         const members = store.getState().entities.teams.membersInTeam;
-
-        if (membersRequest.status === RequestStatus.FAILURE) {
-            throw new Error(JSON.stringify(membersRequest.error));
-        }
 
         assert.ok(members[TestHelper.basicTeam.id]);
         assert.ok(members[TestHelper.basicTeam.id][user1.id]);
@@ -495,11 +426,6 @@ describe('Actions.Teams', () => {
         await Actions.getTeamStats(TestHelper.basicTeam.id)(store.dispatch, store.getState);
 
         const {stats} = store.getState().entities.teams;
-        const statsRequest = store.getState().requests.teams.getTeamStats;
-
-        if (statsRequest.status === RequestStatus.FAILURE) {
-            throw new Error(JSON.stringify(statsRequest.error));
-        }
 
         const stat = stats[TestHelper.basicTeam.id];
         assert.ok(stat);
@@ -518,13 +444,7 @@ describe('Actions.Teams', () => {
             post('/members').
             reply(201, {user_id: user.id, team_id: TestHelper.basicTeam.id});
         await Actions.addUserToTeam(TestHelper.basicTeam.id, user.id)(store.dispatch, store.getState);
-
-        const membersRequest = store.getState().requests.teams.addUserToTeam;
         const members = store.getState().entities.teams.membersInTeam;
-
-        if (membersRequest.status === RequestStatus.FAILURE) {
-            throw new Error(JSON.stringify(membersRequest.error));
-        }
 
         assert.ok(members[TestHelper.basicTeam.id]);
         assert.ok(members[TestHelper.basicTeam.id][user.id]);
@@ -546,13 +466,8 @@ describe('Actions.Teams', () => {
             reply(201, [{user_id: user.id, team_id: TestHelper.basicTeam.id}, {user_id: user2.id, team_id: TestHelper.basicTeam.id}]);
         await Actions.addUsersToTeam(TestHelper.basicTeam.id, [user.id, user2.id])(store.dispatch, store.getState);
 
-        const membersRequest = store.getState().requests.teams.addUserToTeam;
         const members = store.getState().entities.teams.membersInTeam;
         const profilesInTeam = store.getState().entities.users.profilesInTeam;
-
-        if (membersRequest.status === RequestStatus.FAILURE) {
-            throw new Error(JSON.stringify(membersRequest.error));
-        }
 
         assert.ok(members[TestHelper.basicTeam.id]);
         assert.ok(members[TestHelper.basicTeam.id][user.id]);
@@ -577,11 +492,6 @@ describe('Actions.Teams', () => {
         let members = state.entities.teams.membersInTeam;
         let profilesInTeam = state.entities.users.profilesInTeam;
         let profilesNotInTeam = state.entities.users.profilesNotInTeam;
-        const addRequest = state.requests.teams.addUserToTeam;
-
-        if (addRequest.status === RequestStatus.FAILURE) {
-            throw new Error(JSON.stringify(addRequest.error));
-        }
 
         assert.ok(members[TestHelper.basicTeam.id]);
         assert.ok(members[TestHelper.basicTeam.id][user.id]);
@@ -592,17 +502,12 @@ describe('Actions.Teams', () => {
             delete('').
             reply(200, OK_RESPONSE);
         await Actions.removeUserFromTeam(TestHelper.basicTeam.id, user.id)(store.dispatch, store.getState);
+
         state = store.getState();
-
-        const removeRequest = state.requests.teams.removeUserFromTeam;
-
-        if (removeRequest.status === RequestStatus.FAILURE) {
-            throw new Error(JSON.stringify(removeRequest.error));
-        }
-
         members = state.entities.teams.membersInTeam;
         profilesInTeam = state.entities.users.profilesInTeam;
         profilesNotInTeam = state.entities.users.profilesNotInTeam;
+
         assert.ok(members[TestHelper.basicTeam.id]);
         assert.ok(!members[TestHelper.basicTeam.id][user.id]);
         assert.ok(!profilesInTeam[TestHelper.basicTeam.id].has(user.id));
@@ -627,12 +532,7 @@ describe('Actions.Teams', () => {
             reply(200, {user_id: user.id, team_id: TestHelper.basicTeam.id, roles});
         await Actions.updateTeamMemberRoles(TestHelper.basicTeam.id, user.id, roles)(store.dispatch, store.getState);
 
-        const membersRequest = store.getState().requests.teams.updateTeamMember;
         const members = store.getState().entities.teams.membersInTeam;
-
-        if (membersRequest.status === RequestStatus.FAILURE) {
-            throw new Error(JSON.stringify(membersRequest.error));
-        }
 
         assert.ok(members[TestHelper.basicTeam.id]);
         assert.ok(members[TestHelper.basicTeam.id][user.id]);
@@ -643,13 +543,8 @@ describe('Actions.Teams', () => {
         nock(Client4.getTeamRoute(TestHelper.basicTeam.id)).
             post('/invite/email').
             reply(200, OK_RESPONSE);
-        await Actions.sendEmailInvitesToTeam(TestHelper.basicTeam.id, ['fakeemail1@example.com', 'fakeemail2@example.com'])(store.dispatch, store.getState);
-
-        const inviteRequest = store.getState().requests.teams.emailInvite;
-
-        if (inviteRequest.status === RequestStatus.FAILURE) {
-            throw new Error(JSON.stringify(inviteRequest.error));
-        }
+        const {data} = await Actions.sendEmailInvitesToTeam(TestHelper.basicTeam.id, ['fakeemail1@example.com', 'fakeemail2@example.com'])(store.dispatch, store.getState);
+        assert.deepEqual(data, OK_RESPONSE);
     });
 
     it('checkIfTeamExists', async () => {
@@ -659,12 +554,6 @@ describe('Actions.Teams', () => {
 
         let {data: exists} = await Actions.checkIfTeamExists(TestHelper.basicTeam.name)(store.dispatch, store.getState);
 
-        let teamRequest = store.getState().requests.teams.getTeam;
-
-        if (teamRequest.status === RequestStatus.FAILURE) {
-            throw new Error(JSON.stringify(teamRequest.error));
-        }
-
         assert.ok(exists === true);
 
         nock(Client4.getTeamsRoute()).
@@ -672,12 +561,6 @@ describe('Actions.Teams', () => {
             reply(200, {exists: false});
         const {data} = await Actions.checkIfTeamExists('junk')(store.dispatch, store.getState);
         exists = data;
-
-        teamRequest = store.getState().requests.teams.getTeam;
-
-        if (teamRequest.status === RequestStatus.FAILURE) {
-            throw new Error(JSON.stringify(teamRequest.error));
-        }
 
         assert.ok(exists === false);
     });
@@ -693,13 +576,8 @@ describe('Actions.Teams', () => {
             post('/image').
             reply(200, OK_RESPONSE);
 
-        await Actions.setTeamIcon(team.id, imageData)(store.dispatch, store.getState);
-
-        const setTeamIconRequest = store.getState().requests.teams.setTeamIcon;
-
-        if (setTeamIconRequest.status === RequestStatus.FAILURE) {
-            throw new Error(JSON.stringify(setTeamIconRequest.error));
-        }
+        const {data} = await Actions.setTeamIcon(team.id, imageData)(store.dispatch, store.getState);
+        assert.deepEqual(data, OK_RESPONSE);
     });
 
     it('removeTeamIcon', async () => {
@@ -712,13 +590,8 @@ describe('Actions.Teams', () => {
             delete('/image').
             reply(200, OK_RESPONSE);
 
-        await Actions.removeTeamIcon(team.id)(store.dispatch, store.getState);
-
-        const removeTeamIconRequest = store.getState().requests.teams.removeTeamIcon;
-
-        if (removeTeamIconRequest.status === RequestStatus.FAILURE) {
-            throw new Error(JSON.stringify(removeTeamIconRequest.error));
-        }
+        const {data} = await Actions.removeTeamIcon(team.id)(store.dispatch, store.getState);
+        assert.deepEqual(data, OK_RESPONSE);
     });
 
     it('updateTeamScheme', async () => {
@@ -735,12 +608,7 @@ describe('Actions.Teams', () => {
         await Actions.updateTeamScheme(id, schemeId)(store.dispatch, store.getState);
 
         const state = store.getState();
-        const request = state.requests.teams.updateTeamScheme;
         const {teams} = state.entities.teams;
-
-        if (request.status === RequestStatus.FAILURE) {
-            throw new Error(JSON.stringify(request.error));
-        }
 
         const updated = teams[id];
         assert.ok(updated);
