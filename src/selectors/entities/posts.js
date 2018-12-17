@@ -32,7 +32,11 @@ export function makeGetReactionsForPost() {
         getReactionsForPosts,
         (state, postId) => postId,
         (reactions, postId) => {
-            return Object.values(reactions[postId] || {});
+            if (reactions[postId]) {
+                return reactions[postId];
+            }
+
+            return null;
         }
     );
 }
