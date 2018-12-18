@@ -887,10 +887,6 @@ describe('Actions.Admin', () => {
         if (request.status === RequestStatus.FAILURE) {
             throw new Error('uploadPlugin request failed err=' + request.error);
         }
-
-        const plugins = state.entities.admin.plugins;
-        assert.ok(plugins);
-        assert.ok(plugins[testPlugin.id]);
     });
 
     it('uploadPlugin', async () => {
@@ -912,10 +908,6 @@ describe('Actions.Admin', () => {
         if (request.status === RequestStatus.FAILURE) {
             throw new Error('uploadPlugin request failed err=' + request.error);
         }
-
-        const plugins = state.entities.admin.plugins;
-        assert.ok(plugins);
-        assert.ok(plugins[testPlugin.id]);
     });
 
     it('getPlugins', async () => {

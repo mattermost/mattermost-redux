@@ -28,8 +28,9 @@ describe('Selectors.Posts', () => {
     };
 
     const reaction1 = {user_id: user1.id, emoji_name: '+1'};
+    const reactionA = {[reaction1.user_id + '-' + reaction1.emoji_name]: reaction1};
     const reactions = {
-        a: {[reaction1.user_id + '-' + reaction1.emoji_name]: reaction1},
+        a: reactionA,
     };
 
     const testState = deepFreezeAndThrowOnMutation({
@@ -99,7 +100,7 @@ describe('Selectors.Posts', () => {
 
     it('should return reactions for post', () => {
         const getReactionsForPost = Selectors.makeGetReactionsForPost();
-        assert.deepEqual(getReactionsForPost(testState, posts.a.id), [reaction1]);
+        assert.deepEqual(getReactionsForPost(testState, posts.a.id), reactionA);
     });
 
     it('should return profiles for reactions', () => {
