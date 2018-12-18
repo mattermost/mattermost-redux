@@ -355,7 +355,6 @@ export function uploadPlugin(fileData: File, force: boolean = false): ActionFunc
 
         dispatch(batchActions([
             {type: AdminTypes.UPLOAD_PLUGIN_SUCCESS, data: null},
-            {type: AdminTypes.RECEIVED_PLUGIN, data: {...data, active: false}},
         ]));
 
         return {data};

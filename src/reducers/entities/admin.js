@@ -356,11 +356,6 @@ function userAccessTokensForUser(state = {}, action) {
 
 function plugins(state = {}, action) {
     switch (action.type) {
-    case AdminTypes.RECEIVED_PLUGIN: {
-        const nextState = {...state};
-        nextState[action.data.id] = action.data;
-        return nextState;
-    }
     case AdminTypes.RECEIVED_PLUGINS: {
         const nextState = {...state};
         const activePlugins = action.data.active;
@@ -439,25 +434,6 @@ function pluginStatuses(state = {}, action) {
         }
 
         return nextState;
-    }
-
-    case AdminTypes.RECEIVED_PLUGIN: {
-        const plugin = action.data;
-        const existingPlugin = state[plugin.id] || {instances: []};
-
-        return {
-            ...state,
-            [plugin.id]: {
-                ...existingPlugin,
-                id: plugin.id,
-                name: plugin.name,
-                description: plugin.description,
-                version: plugin.version,
-                is_prepackaged: false,
-                active: plugin.active,
-                state: PluginState.PLUGIN_STATE_NOT_RUNNING,
-            },
-        };
     }
 
     case AdminTypes.ENABLE_PLUGIN_REQUEST: {
