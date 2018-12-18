@@ -158,7 +158,7 @@ export const getJoinableTeams = createSelector(
             openTeams[id] = teams[id];
         }
 
-        return openTeams;
+        return Object.values(openTeams);
     }
 );
 
