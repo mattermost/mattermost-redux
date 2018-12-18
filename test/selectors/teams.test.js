@@ -79,10 +79,10 @@ describe('Selectors.Teams', () => {
     });
 
     it('getJoinableTeams', () => {
-        const openTeams = {};
-        openTeams[team3.id] = team3;
-        openTeams[team4.id] = team4;
-        assert.deepEqual(Selectors.getJoinableTeams(testState), openTeams);
+        const openTeams = [team3, team4];
+        const joinableTeams = Selectors.getJoinableTeams(testState);
+        assert.strictEqual(joinableTeams[0], openTeams[0]);
+        assert.strictEqual(joinableTeams[1], openTeams[1]);
     });
 
     it('getSortedJoinableTeams', () => {
