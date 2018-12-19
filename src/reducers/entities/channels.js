@@ -37,17 +37,6 @@ function currentChannelId(state = '', action) {
     }
 }
 
-function allChannels(state = {}, action) {
-    switch (action.type) {
-    case ChannelTypes.RECEIVED_ALL_CHANNELS:
-        return action.data;
-    case UserTypes.LOGOUT_SUCCESS:
-        return {};
-    default:
-        return state;
-    }
-}
-
 function channels(state = {}, action) {
     switch (action.type) {
     case ChannelTypes.RECEIVED_CHANNEL:
@@ -447,9 +436,6 @@ export default combineReducers({
 
     // object where every key is the channel id and has and object with the channel detail
     channels,
-
-    // object where every key is the channel id and has and object with the channel detail for all channels list
-    allChannels,
 
     // object where every key is a team id and has set of channel ids that are on the team
     channelsInTeam,

@@ -1314,16 +1314,14 @@ describe('Actions.Channels', () => {
             query(true).
             reply(200, [TestHelper.basicChannel, userChannel]);
 
-        await store.dispatch(Actions.getAllChannels(0));
+        const {data} = await store.dispatch(Actions.getAllChannels(0));
 
         const moreRequest = store.getState().requests.channels.getAllChannels;
         if (moreRequest.status === RequestStatus.FAILURE) {
             throw new Error(JSON.stringify(moreRequest.error));
         }
 
-        const {allChannels} = store.getState().entities.channels;
-
-        assert.ok(allChannels.length === 2);
+        assert.ok(data.length === 2);
     });
 
     it('searchAllChannels', async () => {
@@ -1359,16 +1357,14 @@ describe('Actions.Channels', () => {
             post('/search').
             reply(200, [TestHelper.basicChannel, userChannel]);
 
-        await store.dispatch(Actions.searchAllChannels('test', 0));
+        const {data} = await store.dispatch(Actions.searchAllChannels('test', 0));
 
         const moreRequest = store.getState().requests.channels.getAllChannels;
         if (moreRequest.status === RequestStatus.FAILURE) {
             throw new Error(JSON.stringify(moreRequest.error));
         }
 
-        const {allChannels} = store.getState().entities.channels;
-
-        assert.ok(allChannels.length === 2);
+        assert.ok(data.length === 2);
     });
 
     it('getChannelMembers', async () => {
