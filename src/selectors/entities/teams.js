@@ -152,13 +152,7 @@ export const getJoinableTeams = createSelector(
     getTeams,
     getJoinableTeamIds,
     (teams, joinableTeamIds) => {
-        const openTeams = {};
-
-        for (const id of joinableTeamIds) {
-            openTeams[id] = teams[id];
-        }
-
-        return openTeams;
+        return joinableTeamIds.map((id) => teams[id]);
     }
 );
 
