@@ -7,13 +7,18 @@ export function getAllGroups(state) {
     return state.entities.groups.groups;
 }
 
-export const getGroup = createSelector(
-    getAllGroups,
-    (state, id) => id,
-    (allGroups, groupID) => {
-        return allGroups[groupID];
+export function getGroup(state, id) {
+    return getAllGroups(state)[id];
+}
+
+export function getGroupMemberCount(state, id) {
+    const memberData = state.entities.groups.members;
+    const groupMemberData = memberData[id];
+    if (!groupMemberData) {
+        return 0;
     }
-);
+    return memberData[id].totalMemberCount;
+}
 
 const getGroupSyncables = createSelector(
     (state) => state.entities.groups.syncables,
@@ -49,17 +54,5 @@ export const getGroupMembers = createSelector(
             return [];
         }
         return groupMemberData.members;
-    }
-);
-
-export const getGroupMemberCount = createSelector(
-    (state) => state.entities.groups.members,
-    (state, id) => id,
-    (memberData, groupID) => {
-        const groupMemberData = memberData[groupID];
-        if (!groupMemberData) {
-            return 0;
-        }
-        return memberData[groupID].totalMemberCount;
     }
 );
