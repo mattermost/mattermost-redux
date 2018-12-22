@@ -9,13 +9,13 @@ import TestHelper from 'test/test_helper';
 import {isMinimumServerVersion} from 'utils/helpers';
 
 describe('Client4', () => {
-    before(() => {
+    beforeAll(() => {
         if (!nock.isActive()) {
             nock.activate();
         }
     });
 
-    after(() => {
+    afterAll(() => {
         nock.restore();
     });
 

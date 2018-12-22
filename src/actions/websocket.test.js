@@ -22,7 +22,7 @@ const webSocketConnector = TestHelper.isLiveServer() ? require('ws') : MockWebSo
 describe('Actions.Websocket', () => {
     let store;
     let mockServer;
-    before(async () => {
+    beforeAll(async () => {
         store = await configureStore();
         await TestHelper.initBasic(Client4);
 
@@ -36,7 +36,7 @@ describe('Actions.Websocket', () => {
         ));
     });
 
-    after(async () => {
+    afterAll(async () => {
         Actions.close()();
         mockServer.stop();
         await TestHelper.tearDown();
@@ -333,7 +333,7 @@ describe('Actions.Websocket', () => {
 
         const {myMembers} = store.getState().entities.teams;
         assert.ifError(myMembers[team.id]);
-    }).timeout(3000);
+    });
 
     it('Websocket Handle User Added', async () => {
         let user;

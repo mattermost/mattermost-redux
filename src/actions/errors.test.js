@@ -12,7 +12,7 @@ import configureStore from 'test/test_store';
 
 describe('Actions.Errors', () => {
     let store;
-    before(async () => {
+    beforeAll(async () => {
         await TestHelper.initBasic(Client4);
         Client4.setEnableLogging(true);
     });
@@ -21,7 +21,7 @@ describe('Actions.Errors', () => {
         store = await configureStore();
     });
 
-    after(async () => {
+    afterAll(async () => {
         await TestHelper.tearDown();
         Client4.setEnableLogging(false);
     });
