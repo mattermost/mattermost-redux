@@ -262,6 +262,18 @@ const state: GlobalState = {
                 error: null,
             },
             getPostsAfterRetryAttempts: 0,
+            doPostAction: {
+                status: 'not_started',
+                error: null,
+            },
+            openGraph: {
+                status: 'not_started',
+                error: null,
+            },
+            reaction: {
+                status: 'not_started',
+                error: null,
+            },
         },
         teams: {
             getMyTeams: {
@@ -305,6 +317,42 @@ const state: GlobalState = {
                 error: null,
             },
             updateTeamScheme: {
+                status: 'not_started',
+                error: null,
+            },
+            deleteTeam: {
+                status: 'not_started',
+                error: null,
+            },
+            emailInvite: {
+                status: 'not_started',
+                error: null,
+            },
+            getMyTeamUnreads: {
+                status: 'not_started',
+                error: null,
+            },
+            getTeam: {
+                status: 'not_started',
+                error: null,
+            },
+            joinTeam: {
+                status: 'not_started',
+                error: null,
+            },
+            removeTeamIcon: {
+                status: 'not_started',
+                error: null,
+            },
+            setTeamIcon: {
+                status: 'not_started',
+                error: null,
+            },
+            updateTeamMember: {
+                status: 'not_started',
+                error: null,
+            },
+            updateTeamMemberSchemeRoles: {
                 status: 'not_started',
                 error: null,
             },
@@ -398,6 +446,66 @@ const state: GlobalState = {
                 status: 'not_started',
                 error: null,
             },
+            createUserAccessToken: {
+                status: 'not_started',
+                error: null,
+            },
+            disableUserAccessToken: {
+                status: 'not_started',
+                error: null,
+            },
+            enableUserAccessToken: {
+                status: 'not_started',
+                error: null,
+            },
+            generateMfaSecret: {
+                status: 'not_started',
+                error: null,
+            },
+            getProfilesNotInTeam: {
+                status: 'not_started',
+                error: null,
+            },
+            getProfilesWithoutTeam: {
+                status: 'not_started',
+                error: null,
+            },
+            getStatus: {
+                status: 'not_started',
+                error: null,
+            },
+            getUserAccessToken: {
+                status: 'not_started',
+                error: null,
+            },
+            passwordReset: {
+                status: 'not_started',
+                error: null,
+            },
+            revokeAllSessionsForUser: {
+                status: 'not_started',
+                error: null,
+            },
+            revokeUserAccessToken: {
+                status: 'not_started',
+                error: null,
+            },
+            setStatus: {
+                status: 'not_started',
+                error: null,
+            },
+            switchLogin: {
+                status: 'not_started',
+                error: null,
+            },
+            updateUser: {
+                status: 'not_started',
+                error: null,
+            },
+            verifyEmail: {
+                status: 'not_started',
+                error: null,
+            },
         },
         preferences: {
             getMyPreferences: {
@@ -458,6 +566,102 @@ const state: GlobalState = {
                 status: 'not_started',
                 error: null,
             },
+            deleteBrandImage: {
+                status: 'not_started',
+                error: null,
+            },
+            disablePlugin: {
+                status: 'not_started',
+                error: null,
+            },
+            enablePlugin: {
+                status: 'not_started',
+                error: null,
+            },
+            getAnalytics: {
+                status: 'not_started',
+                error: null,
+            },
+            getClusterStatus: {
+                status: 'not_started',
+                error: null,
+            },
+            getEnvironmentConfig: {
+                status: 'not_started',
+                error: null,
+            },
+            getPluginStatuses: {
+                status: 'not_started',
+                error: null,
+            },
+            getPlugins: {
+                status: 'not_started',
+                error: null,
+            },
+            getSamlCertificateStatus: {
+                status: 'not_started',
+                error: null,
+            },
+            purgeElasticsearchIndexes: {
+                status: 'not_started',
+                error: null,
+            },
+            removeIdpSamlCertificate: {
+                status: 'not_started',
+                error: null,
+            },
+            removeLicense: {
+                status: 'not_started',
+                error: null,
+            },
+            removePlugin: {
+                status: 'not_started',
+                error: null,
+            },
+            removePrivateSamlCertificate: {
+                status: 'not_started',
+                error: null,
+            },
+            removePublicSamlCertificate: {
+                status: 'not_started',
+                error: null,
+            },
+            syncLdap: {
+                status: 'not_started',
+                error: null,
+            },
+            testElasticsearch: {
+                status: 'not_started',
+                error: null,
+            },
+            testLdap: {
+                status: 'not_started',
+                error: null,
+            },
+            uploadBrandImage: {
+                status: 'not_started',
+                error: null,
+            },
+            uploadIdpSamlCertificate: {
+                status: 'not_started',
+                error: null,
+            },
+            uploadLicense: {
+                status: 'not_started',
+                error: null,
+            },
+            uploadPlugin: {
+                status: 'not_started',
+                error: null,
+            },
+            uploadPrivateSamlCertificate: {
+                status: 'not_started',
+                error: null,
+            },
+            uploadPublicSamlCertificate: {
+                status: 'not_started',
+                error: null,
+            },
         },
         emojis: {
             createCustomEmoji: {
@@ -469,6 +673,14 @@ const state: GlobalState = {
                 error: null,
             },
             deleteCustomEmoji: {
+                status: 'not_started',
+                error: null,
+            },
+            getAllCustomEmojis: {
+                status: 'not_started',
+                error: null,
+            },
+            getCustomEmoji: {
                 status: 'not_started',
                 error: null,
             },
@@ -568,6 +780,14 @@ const state: GlobalState = {
                 status: 'not_started',
                 error: null,
             },
+            executeCommand: {
+                status: 'not_started',
+                error: null,
+            },
+            submitInteractiveDialog: {
+                status: 'not_started',
+                error: null,
+            },
         },
         roles: {
             getRolesByNames: {
@@ -613,6 +833,42 @@ const state: GlobalState = {
                 error: null,
             },
             getSchemeChannels: {
+                status: 'not_started',
+                error: null,
+            },
+        },
+        jobs: {
+            createJob: {
+                status: 'not_started',
+                error: null,
+            },
+            getJob: {
+                status: 'not_started',
+                error: null,
+            },
+            getJobs: {
+                status: 'not_started',
+                error: null,
+            },
+            cancelJob: {
+                status: 'not_started',
+                error: null,
+            },
+        },
+        search: {
+            flaggedPosts: {
+                status: 'not_started',
+                error: null,
+            },
+            pinnedPosts: {
+                status: 'not_started',
+                error: null,
+            },
+            recentMentions: {
+                status: 'not_started',
+                error: null,
+            },
+            searchPosts: {
                 status: 'not_started',
                 error: null,
             },

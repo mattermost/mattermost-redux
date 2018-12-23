@@ -29,6 +29,10 @@ export function parseNeededCustomEmojisFromText(text: string, systemEmojis: Map<
 
     let match;
     while ((match = pattern.exec(text)) !== null) {
+        if (!match) {
+            continue;
+        }
+
         if (systemEmojis.has(match[1])) {
             // It's a system emoji, go the next match
             continue;

@@ -8,7 +8,7 @@ import {PostTypes} from 'action_types';
 import {handleRequest, initialRequestState} from './helpers';
 
 import type {GenericAction} from '../../types/actions';
-import type {RequestStatusType} from '../../types/requests';
+import type {PostsRequestsStatuses, RequestStatusType} from '../../types/requests';
 
 function createPost(state: RequestStatusType = initialRequestState(), action: GenericAction): RequestStatusType {
     if (action.type === PostTypes.CREATE_POST_RESET_REQUEST) {
@@ -187,7 +187,7 @@ function doPostAction(state: RequestStatusType = initialRequestState(), action: 
     );
 }
 
-export default combineReducers({
+export default (combineReducers({
     createPost,
     editPost,
     deletePost,
@@ -204,4 +204,4 @@ export default combineReducers({
     reaction,
     openGraph,
     doPostAction,
-});
+}): (PostsRequestsStatuses, GenericAction) => PostsRequestsStatuses);

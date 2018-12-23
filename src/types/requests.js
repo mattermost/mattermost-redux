@@ -51,7 +51,10 @@ export type PostsRequestsStatuses = {|
     getPostsBefore: RequestStatusType,
     getPostsBeforeRetryAttempts: number,
     getPostsAfter: RequestStatusType,
-    getPostsAfterRetryAttempts: number
+    getPostsAfterRetryAttempts: number,
+    doPostAction: RequestStatusType,
+    openGraph: RequestStatusType,
+    reaction: RequestStatusType
 |};
 
 export type TeamsRequestsStatuses = {|
@@ -66,6 +69,15 @@ export type TeamsRequestsStatuses = {|
     addUserToTeam: RequestStatusType,
     removeUserFromTeam: RequestStatusType,
     updateTeamScheme: RequestStatusType,
+    deleteTeam: RequestStatusType,
+    emailInvite: RequestStatusType,
+    getMyTeamUnreads: RequestStatusType,
+    getTeam: RequestStatusType,
+    joinTeam: RequestStatusType,
+    removeTeamIcon: RequestStatusType,
+    setTeamIcon: RequestStatusType,
+    updateTeamMember: RequestStatusType,
+    updateTeamMemberSchemeRoles: RequestStatusType,
 |};
 
 export type UsersRequestsStatuses = {|
@@ -90,7 +102,22 @@ export type UsersRequestsStatuses = {|
     autocompleteUsers: RequestStatusType,
     searchProfiles: RequestStatusType,
     updateMe: RequestStatusType,
-    getTotalUsersStats: RequestStatusType
+    getTotalUsersStats: RequestStatusType,
+    createUserAccessToken: RequestStatusType,
+    disableUserAccessToken: RequestStatusType,
+    enableUserAccessToken: RequestStatusType,
+    generateMfaSecret: RequestStatusType,
+    getProfilesNotInTeam: RequestStatusType,
+    getProfilesWithoutTeam: RequestStatusType,
+    getStatus: RequestStatusType,
+    getUserAccessToken: RequestStatusType,
+    passwordReset: RequestStatusType,
+    revokeAllSessionsForUser: RequestStatusType,
+    revokeUserAccessToken: RequestStatusType,
+    setStatus: RequestStatusType,
+    switchLogin: RequestStatusType,
+    updateUser: RequestStatusType,
+    verifyEmail: RequestStatusType,
 |};
 
 export type PreferencesRequestsStatuses = {|
@@ -110,13 +137,39 @@ export type AdminRequestsStatuses = {|
     recycleDatabase: RequestStatusType,
     createCompliance: RequestStatusType,
     getCompliance: RequestStatusType,
-    testS3Connection: RequestStatusType
+    testS3Connection: RequestStatusType,
+    deleteBrandImage: RequestStatusType,
+    disablePlugin: RequestStatusType,
+    enablePlugin: RequestStatusType,
+    getAnalytics: RequestStatusType,
+    getClusterStatus: RequestStatusType,
+    getEnvironmentConfig: RequestStatusType,
+    getPluginStatuses: RequestStatusType,
+    getPlugins: RequestStatusType,
+    getSamlCertificateStatus: RequestStatusType,
+    purgeElasticsearchIndexes: RequestStatusType,
+    removeIdpSamlCertificate: RequestStatusType,
+    removeLicense: RequestStatusType,
+    removePlugin: RequestStatusType,
+    removePrivateSamlCertificate: RequestStatusType,
+    removePublicSamlCertificate: RequestStatusType,
+    syncLdap: RequestStatusType,
+    testElasticsearch: RequestStatusType,
+    testLdap: RequestStatusType,
+    uploadBrandImage: RequestStatusType,
+    uploadIdpSamlCertificate: RequestStatusType,
+    uploadLicense: RequestStatusType,
+    uploadPlugin: RequestStatusType,
+    uploadPrivateSamlCertificate: RequestStatusType,
+    uploadPublicSamlCertificate: RequestStatusType,
 |};
 
 export type EmojisRequestsStatuses = {|
     createCustomEmoji: RequestStatusType,
     getCustomEmojis: RequestStatusType,
-    deleteCustomEmoji: RequestStatusType
+    deleteCustomEmoji: RequestStatusType,
+    getAllCustomEmojis: RequestStatusType,
+    getCustomEmoji: RequestStatusType,
 |};
 
 export type FilesRequestsStatuses = {|
@@ -145,7 +198,9 @@ export type IntegrationsRequestsStatuses = {|
     updateOAuthApp: RequestStatusType,
     getOAuthApp: RequestStatusType,
     getOAuthApps: RequestStatusType,
-    deleteOAuthApp: RequestStatusType
+    deleteOAuthApp: RequestStatusType,
+    executeCommand: RequestStatusType,
+    submitInteractiveDialog: RequestStatusType,
 |};
 
 export type RolesRequestsStatuses = {|
@@ -163,4 +218,18 @@ export type SchemesRequestsStatuses = {|
     patchScheme: RequestStatusType,
     getSchemeTeams: RequestStatusType,
     getSchemeChannels: RequestStatusType
+|};
+
+export type JobsRequestsStatuses = {|
+    createJob: RequestStatusType,
+    getJob: RequestStatusType,
+    getJobs: RequestStatusType,
+    cancelJob: RequestStatusType,
+|};
+
+export type SearchRequestsStatuses = {|
+    flaggedPosts: RequestStatusType,
+    pinnedPosts: RequestStatusType,
+    recentMentions: RequestStatusType,
+    searchPosts: RequestStatusType,
 |};

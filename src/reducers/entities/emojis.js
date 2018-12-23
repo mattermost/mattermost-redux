@@ -9,7 +9,7 @@ import {
     UserTypes,
 } from 'action_types';
 
-import type {CustomEmoji} from '../../types/emojis';
+import type {EmojisState, CustomEmoji} from '../../types/emojis';
 import type {Post} from '../../types/posts';
 import type {GenericAction} from '../../types/actions';
 
@@ -53,7 +53,7 @@ export function customEmoji(state: {[string]: CustomEmoji} = {}, action: Generic
     }
 }
 
-function storeEmojisForPost(state: {[string]: CustomEmoji}, post: Post) {
+function storeEmojisForPost(state: {[string]: CustomEmoji}, post: Post): {[string]: CustomEmoji} {
     if (!post.metadata || !post.metadata.emojis) {
         return state;
     }
@@ -71,7 +71,7 @@ function storeEmojisForPost(state: {[string]: CustomEmoji}, post: Post) {
     }, state);
 }
 
-function nonExistentEmoji(state = new Set(), action) {
+function nonExistentEmoji(state: Set<string> = new Set(), action: GenericAction): Set<string> {
     switch (action.type) {
     case EmojiTypes.CUSTOM_EMOJI_DOES_NOT_EXIST: {
         if (!state.has(action.data)) {
@@ -111,7 +111,7 @@ function nonExistentEmoji(state = new Set(), action) {
     }
 }
 
-export default combineReducers({
+export default (combineReducers({
 
     // object where every key is the custom emoji id and has an object with the custom emoji details
     customEmoji,
@@ -119,4 +119,4 @@ export default combineReducers({
     // set containing custom emoji names that do not exist
     nonExistentEmoji,
 
-});
+}): (EmojisState, GenericAction) => EmojisState);

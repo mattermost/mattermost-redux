@@ -8,7 +8,7 @@ import {TeamTypes} from 'action_types';
 import {handleRequest, initialRequestState} from './helpers';
 
 import type {GenericAction} from '../../types/actions';
-import type {RequestStatusType} from '../../types/requests';
+import type {TeamsRequestsStatuses, RequestStatusType} from '../../types/requests';
 
 function getMyTeams(state: RequestStatusType = initialRequestState(), action: GenericAction): RequestStatusType {
     return handleRequest(
@@ -210,7 +210,7 @@ function updateTeamMemberSchemeRoles(state: RequestStatusType = initialRequestSt
     );
 }
 
-export default combineReducers({
+export default (combineReducers({
     getMyTeams,
     getTeams,
     getTeam,
@@ -231,4 +231,4 @@ export default combineReducers({
     setTeamIcon,
     removeTeamIcon,
     updateTeamMemberSchemeRoles,
-});
+}): (TeamsRequestsStatuses, GenericAction) => TeamsRequestsStatuses);

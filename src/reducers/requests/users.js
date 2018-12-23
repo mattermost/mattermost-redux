@@ -9,7 +9,7 @@ import {UserTypes} from 'action_types';
 import {handleRequest, initialRequestState} from './helpers';
 
 import type {GenericAction} from '../../types/actions';
-import type {RequestStatusType} from '../../types/requests';
+import type {UsersRequestsStatuses, RequestStatusType} from '../../types/requests';
 
 function checkMfa(state: RequestStatusType = initialRequestState(), action: GenericAction): RequestStatusType {
     switch (action.type) {
@@ -408,7 +408,7 @@ function enableUserAccessToken(state: RequestStatusType = initialRequestState(),
     );
 }
 
-export default combineReducers({
+export default (combineReducers({
     checkMfa,
     generateMfaSecret,
     login,
@@ -446,4 +446,4 @@ export default combineReducers({
     revokeUserAccessToken,
     disableUserAccessToken,
     enableUserAccessToken,
-});
+}): (UsersRequestsStatuses, GenericAction) => UsersRequestsStatuses);

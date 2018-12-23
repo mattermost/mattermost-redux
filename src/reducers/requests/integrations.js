@@ -8,7 +8,7 @@ import {IntegrationTypes} from 'action_types';
 import {handleRequest, initialRequestState} from './helpers';
 
 import type {GenericAction} from '../../types/actions';
-import type {RequestStatusType} from '../../types/requests';
+import type {IntegrationsRequestsStatuses, RequestStatusType} from '../../types/requests';
 
 function createIncomingHook(state: RequestStatusType = initialRequestState(), action: GenericAction): RequestStatusType {
     return handleRequest(
@@ -230,7 +230,7 @@ function submitInteractiveDialog(state: RequestStatusType = initialRequestState(
     );
 }
 
-export default combineReducers({
+export default (combineReducers({
     createIncomingHook,
     getIncomingHooks,
     deleteIncomingHook,
@@ -253,4 +253,4 @@ export default combineReducers({
     executeCommand,
     getAutocompleteCommands,
     submitInteractiveDialog,
-});
+}): (IntegrationsRequestsStatuses, GenericAction) => IntegrationsRequestsStatuses);

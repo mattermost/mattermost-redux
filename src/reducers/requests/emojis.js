@@ -8,7 +8,7 @@ import {EmojiTypes} from 'action_types';
 import {handleRequest, initialRequestState} from './helpers';
 
 import type {GenericAction} from '../../types/actions';
-import type {RequestStatusType} from '../../types/requests';
+import type {EmojisRequestsStatuses, RequestStatusType} from '../../types/requests';
 
 function createCustomEmoji(state: RequestStatusType = initialRequestState(), action: GenericAction): RequestStatusType {
     return handleRequest(
@@ -60,10 +60,10 @@ function deleteCustomEmoji(state: RequestStatusType = initialRequestState(), act
     );
 }
 
-export default combineReducers({
+export default (combineReducers({
     createCustomEmoji,
     getCustomEmoji,
     getCustomEmojis,
     getAllCustomEmojis,
     deleteCustomEmoji,
-});
+}): (EmojisRequestsStatuses, GenericAction) => EmojisRequestsStatuses);

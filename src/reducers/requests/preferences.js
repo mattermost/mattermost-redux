@@ -8,7 +8,7 @@ import {PreferenceTypes} from 'action_types';
 import {handleRequest, initialRequestState} from './helpers';
 
 import type {GenericAction} from '../../types/actions';
-import type {RequestStatusType} from '../../types/requests';
+import type {PreferencesRequestsStatuses, RequestStatusType} from '../../types/requests';
 
 function getMyPreferences(state: RequestStatusType = initialRequestState(), action: GenericAction): RequestStatusType {
     return handleRequest(
@@ -40,8 +40,8 @@ function deletePreferences(state: RequestStatusType = initialRequestState(), act
     );
 }
 
-export default combineReducers({
+export default (combineReducers({
     getMyPreferences,
     savePreferences,
     deletePreferences,
-});
+}): (PreferencesRequestsStatuses, GenericAction) => PreferencesRequestsStatuses);

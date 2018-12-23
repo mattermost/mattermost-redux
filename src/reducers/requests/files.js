@@ -9,7 +9,7 @@ import {RequestStatus} from 'constants';
 import {handleRequest, initialRequestState} from './helpers';
 
 import type {GenericAction} from '../../types/actions';
-import type {RequestStatusType} from '../../types/requests';
+import type {FilesRequestsStatuses, RequestStatusType} from '../../types/requests';
 
 function getFilesForPost(state: RequestStatusType = initialRequestState(), action: GenericAction): RequestStatusType {
     return handleRequest(
@@ -86,8 +86,8 @@ function uploadFiles(state: RequestStatusType = initialRequestState(), action: G
     );
 }
 
-export default combineReducers({
+export default (combineReducers({
     getFilesForPost,
     getFilePublicLink,
     uploadFiles,
-});
+}): (FilesRequestsStatuses, GenericAction) => FilesRequestsStatuses);

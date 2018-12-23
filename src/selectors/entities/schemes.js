@@ -21,9 +21,9 @@ export function getScheme(state: GlobalState, id: string): Scheme {
 }
 
 export function makeGetSchemeChannels() {
-    return createSelector(
+    return (createSelector(
         getAllChannels,
-        (state, props) => getScheme(state, props.schemeId),
+        (state, props: {schemeId: string}) => getScheme(state, props.schemeId),
         (allChannels, scheme) => {
             if (!scheme) {
                 return [];
@@ -47,13 +47,13 @@ export function makeGetSchemeChannels() {
 
             return schemeChannels;
         }
-    );
+    ): (GlobalState, {schemeId: string}) => Array<Channel>);
 }
 
 export function makeGetSchemeTeams() {
-    return createSelector(
+    return (createSelector(
         getTeams,
-        (state, props) => getScheme(state, props.schemeId),
+        (state, props: {schemeId: string}) => getScheme(state, props.schemeId),
         (allTeams, scheme) => {
             if (!scheme) {
                 return [];
@@ -77,5 +77,5 @@ export function makeGetSchemeTeams() {
 
             return schemeTeams;
         }
-    );
+    ): (GlobalState, {schemeId: string}) => Array<Team>);
 }
