@@ -49,6 +49,7 @@
     "flow-typed": "2.5.1",
     "jest": "23.6.0",
     "jest-cli": "23.6.0",
+    "jest-junit": "5.2.0",
     "mock-socket": "8.0.5",
     "nock": "10.0.3",
     "react": "16.6.3",
@@ -84,12 +85,16 @@
       "lcov",
       "text-summary"
     ],
+    "reporters": [
+      "default",
+      "jest-junit"
+    ],
     "setupTestFrameworkScriptFile": "<rootDir>/test/setup.js",
     "testPathIgnorePatterns": [
       "/node_modules/"
-    ],
-    "moduleNameMapper": {
-      "assets/images/video_player/(.*).png": "<rootDir>/dist/assets/images/video_player/$1@2x.png"
-    }
+    ]
+  },
+  "jest-junit": {
+    "output": "build/test-results.xml"
   }
 }
