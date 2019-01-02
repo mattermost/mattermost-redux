@@ -12,9 +12,14 @@ import {
 } from 'selectors/entities/common';
 
 import {getConfig, getLicense} from 'selectors/entities/general';
-import {getDirectShowPreferences} from 'selectors/entities/preferences';
+import {getDirectShowPreferences, getTeammateNameDisplaySetting} from 'selectors/entities/preferences';
 
-import {filterProfilesMatchingTerm, sortByUsername, isSystemAdmin} from 'utils/user_utils';
+import {
+    displayUsername,
+    filterProfilesMatchingTerm,
+    sortByUsername,
+    isSystemAdmin,
+} from 'utils/user_utils';
 
 export {
     getCurrentUserId,
@@ -462,6 +467,17 @@ export function makeGetProfilesByIdsAndUsernames() {
             }
 
             return userProfiles;
+        }
+    );
+}
+
+export function makeGetDisplayName() {
+    return createSelector(
+        (state, userId) => getUser(state, userId),
+        getTeammateNameDisplaySetting,
+        (state, _, useFallbackUsername = true) => useFallbackUsername,
+        (user, teammateNameDisplaySetting, useFallbackUsername) => {
+            return displayUsername(user, teammateNameDisplaySetting, useFallbackUsername);
         }
     );
 }
