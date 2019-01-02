@@ -3,7 +3,7 @@
 
 module.exports = {
     presets: [
-        ['@babel/preset-env', {
+        ['@babel/env', {
             targets: {
                 chrome: 66,
                 firefox: 60,
@@ -14,12 +14,13 @@ module.exports = {
             useBuiltIns: 'usage',
             shippedProposals: true,
         }],
-        '@babel/preset-flow',
     ],
     plugins: [
+        '@babel/transform-flow-comments',
+        '@babel/proposal-class-properties',
         ['module-resolver', {
             root: ['./src', '.'],
         }],
-        '@babel/proposal-class-properties',
     ],
 };
+
