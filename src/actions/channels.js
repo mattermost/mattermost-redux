@@ -934,16 +934,11 @@ export function addChannelMember(channelId: string, userId: string, postRootId: 
 
 export function removeChannelMember(channelId: string, userId: string): ActionFunc {
     return async (dispatch, getState) => {
-        dispatch({type: ChannelTypes.REMOVE_CHANNEL_MEMBER_REQUEST, data: null}, getState);
-
         try {
             await Client4.removeFromChannel(userId, channelId);
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch, getState);
-            dispatch(batchActions([
-                {type: ChannelTypes.REMOVE_CHANNEL_MEMBER_FAILURE, error},
-                logError(error),
-            ]), getState);
+            dispatch(logError(error));
             return {error};
         }
 

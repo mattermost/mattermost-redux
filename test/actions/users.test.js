@@ -378,12 +378,7 @@ describe('Actions.Users', () => {
             0
         )(store.dispatch, store.getState);
 
-        const profilesRequest = store.getState().requests.users.getProfilesInChannel;
         const {profiles, profilesInChannel} = store.getState().entities.users;
-
-        if (profilesRequest.status === RequestStatus.FAILURE) {
-            throw new Error(JSON.stringify(profilesRequest.error));
-        }
 
         const channel = profilesInChannel[TestHelper.basicChannel.id];
         assert.ok(channel.has(TestHelper.basicUser.id));
@@ -513,12 +508,7 @@ describe('Actions.Users', () => {
         )(store.dispatch, store.getState);
 
         const state = store.getState();
-        const searchRequest = state.requests.users.searchProfiles;
         const {profiles} = state.entities.users;
-
-        if (searchRequest.status === RequestStatus.FAILURE) {
-            throw new Error(JSON.stringify(searchRequest.error));
-        }
 
         assert.ok(profiles[user.id]);
         assert.equal(profiles[user.id].id, user.id);

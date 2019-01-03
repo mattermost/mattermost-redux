@@ -141,10 +141,6 @@ const state: GlobalState = {
                 status: 'not_started',
                 error: null,
             },
-            removeChannelMember: {
-                status: 'not_started',
-                error: null,
-            },
         },
         general: {
             server: {
@@ -249,15 +245,7 @@ const state: GlobalState = {
                 status: 'not_started',
                 error: null,
             },
-            getProfilesInChannel: {
-                status: 'not_started',
-                error: null,
-            },
             autocompleteUsers: {
-                status: 'not_started',
-                error: null,
-            },
-            searchProfiles: {
                 status: 'not_started',
                 error: null,
             },

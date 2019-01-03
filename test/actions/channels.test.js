@@ -1414,11 +1414,6 @@ describe('Actions.Channels', () => {
 
         state = store.getState();
 
-        const removeRequest = state.requests.channels.removeChannelMember;
-        if (removeRequest.status === RequestStatus.FAILURE) {
-            throw new Error(JSON.stringify(removeRequest.error));
-        }
-
         const {profilesInChannel, profilesNotInChannel} = state.entities.users;
         const channel = profilesInChannel[channelId];
         const notChannel = profilesNotInChannel[channelId];

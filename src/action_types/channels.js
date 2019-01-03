@@ -29,9 +29,7 @@ export default keyMirror({
 
     ADD_CHANNEL_MEMBER_SUCCESS: null,
 
-    REMOVE_CHANNEL_MEMBER_REQUEST: null,
     REMOVE_CHANNEL_MEMBER_SUCCESS: null,
-    REMOVE_CHANNEL_MEMBER_FAILURE: null,
 
     SELECT_CHANNEL: null,
     LEAVE_CHANNEL: null,

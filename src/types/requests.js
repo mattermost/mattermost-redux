@@ -13,7 +13,6 @@ export type ChannelsRequestsStatuses = {|
     myChannels: RequestStatusType,
     createChannel: RequestStatusType,
     updateChannel: RequestStatusType,
-    removeChannelMember: RequestStatusType,
 |};
 
 export type GeneralRequestsStatuses = {|
@@ -41,9 +40,7 @@ export type UsersRequestsStatuses = {|
     checkMfa: RequestStatusType,
     login: RequestStatusType,
     logout: RequestStatusType,
-    getProfilesInChannel: RequestStatusType,
     autocompleteUsers: RequestStatusType,
-    searchProfiles: RequestStatusType,
     updateMe: RequestStatusType,
 |};
 

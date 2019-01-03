@@ -68,31 +68,11 @@ function logout(state: RequestStatusType = initialRequestState(), action: Generi
     }
 }
 
-function getProfilesInChannel(state: RequestStatusType = initialRequestState(), action: GenericAction): RequestStatusType {
-    return handleRequest(
-        UserTypes.PROFILES_IN_CHANNEL_REQUEST,
-        UserTypes.PROFILES_IN_CHANNEL_SUCCESS,
-        UserTypes.PROFILES_IN_CHANNEL_FAILURE,
-        state,
-        action
-    );
-}
-
 function autocompleteUsers(state: RequestStatusType = initialRequestState(), action: GenericAction): RequestStatusType {
     return handleRequest(
         UserTypes.AUTOCOMPLETE_USERS_REQUEST,
         UserTypes.AUTOCOMPLETE_USERS_SUCCESS,
         UserTypes.AUTOCOMPLETE_USERS_FAILURE,
-        state,
-        action
-    );
-}
-
-function searchProfiles(state: RequestStatusType = initialRequestState(), action: GenericAction): RequestStatusType {
-    return handleRequest(
-        UserTypes.SEARCH_PROFILES_REQUEST,
-        UserTypes.SEARCH_PROFILES_SUCCESS,
-        UserTypes.SEARCH_PROFILES_FAILURE,
         state,
         action
     );
@@ -112,8 +92,6 @@ export default (combineReducers({
     checkMfa,
     login,
     logout,
-    getProfilesInChannel,
     autocompleteUsers,
-    searchProfiles,
     updateMe,
 }): (UsersRequestsStatuses, GenericAction) => UsersRequestsStatuses);

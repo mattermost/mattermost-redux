@@ -470,8 +470,6 @@ export function getProfilesWithoutTeam(page: number, perPage: number = General.P
 
 export function getProfilesInChannel(channelId: string, page: number, perPage: number = General.PROFILE_CHUNK_SIZE, sort: string = ''): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
-        dispatch({type: UserTypes.PROFILES_IN_CHANNEL_REQUEST, data: null}, getState);
-
         const {currentUserId} = getState().entities.users;
 
         let profiles = null;
@@ -479,10 +477,7 @@ export function getProfilesInChannel(channelId: string, page: number, perPage: n
             profiles = await Client4.getProfilesInChannel(channelId, page, perPage, sort);
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch, getState);
-            dispatch(batchActions([
-                {type: UserTypes.PROFILES_IN_CHANNEL_FAILURE, error},
-                logError(error),
-            ]), getState);
+            dispatch(logError(error));
             return {error};
         }
 
@@ -495,9 +490,6 @@ export function getProfilesInChannel(channelId: string, page: number, perPage: n
             {
                 type: UserTypes.RECEIVED_PROFILES_LIST,
                 data: removeUserFromList(currentUserId, [...profiles]),
-            },
-            {
-                type: UserTypes.PROFILES_IN_CHANNEL_SUCCESS,
             },
         ]), getState);
 
@@ -854,10 +846,7 @@ export function searchProfiles(term: string, options: Object = {}): ActionFunc {
             profiles = await Client4.searchUsers(term, options);
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch, getState);
-            dispatch(batchActions([
-                {type: UserTypes.SEARCH_PROFILES_FAILURE, error},
-                logError(error),
-            ]), getState);
+            dispatch(logError(error));
             return {error};
         }
 
@@ -895,12 +884,7 @@ export function searchProfiles(term: string, options: Object = {}): ActionFunc {
             });
         }
 
-        dispatch(batchActions([
-            ...actions,
-            {
-                type: UserTypes.SEARCH_PROFILES_SUCCESS,
-            },
-        ]), getState);
+        dispatch(batchActions(actions));
 
         return {data: profiles};
     };
