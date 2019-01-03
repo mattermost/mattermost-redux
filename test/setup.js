@@ -7,7 +7,6 @@ global.WebSocket = require('ws');
 
 require('isomorphic-fetch');
 
-// let logs;
 let warns;
 let errors;
 beforeAll(() => {
