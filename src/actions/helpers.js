@@ -55,11 +55,12 @@ export function requestFailure(type: ActionType, error: Client4Error) {
  * dispatches the specifed actions on request, success or failure.
  *
  * @export
- * @param {() => Promise<mixed>} clientFunc          clientFunc to execute
- * @param {ActionType} request                       ActionType to dispatch on request
- * @param {(ActionType | Array<ActionType>)} success ActionType to dispatch on success
- * @param {ActionType} failure                       ActionType to dispatch on failure
- * @param {...Array<any>} args
+ * @param {Object} obj                                       an object for destructirung required properties
+ * @param {() => Promise<mixed>} obj.clientFunc              clientFunc to execute
+ * @param {ActionType} obj.onRequest                         ActionType to dispatch on request
+ * @param {(ActionType | Array<ActionType>)} obj.onSuccess   ActionType to dispatch on success
+ * @param {ActionType} obj.onFailure                         ActionType to dispatch on failure
+ * @param {...Array<any>} obj.params
  * @returns {ActionFunc} ActionFunc
  */
 export function bindClientFunc({
