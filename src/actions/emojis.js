@@ -156,7 +156,10 @@ export function loadProfilesForCustomEmojis(emojis: Array<Object>): ActionFunc {
 
 export function getAllCustomEmojis(perPage: number = General.PAGE_SIZE_MAXIMUM): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
-        dispatch({type: EmojiTypes.CLEAR_CUSTOM_EMOJIS});
+        dispatch({
+            type: EmojiTypes.CLEAR_CUSTOM_EMOJIS,
+            data: null,
+        });
 
         let hasMore = true;
         let page = 0;

@@ -705,6 +705,7 @@ export function revokeSession(userId: string, sessionId: string): ActionFunc {
         dispatch({
             type: UserTypes.RECEIVED_REVOKED_SESSION,
             sessionId,
+            data: null,
         });
 
         return {data: true};

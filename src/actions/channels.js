@@ -448,6 +448,7 @@ export function fetchMyChannelsAndMembers(teamId: string): ActionFunc {
     return async (dispatch, getState) => {
         dispatch({
             type: ChannelTypes.CHANNELS_REQUEST,
+            data: null,
         });
 
         let channels;

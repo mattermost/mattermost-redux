@@ -68,6 +68,12 @@ export function bindClientFunc({
     onSuccess,
     onFailure,
     params = [],
+}: {
+  clientFunc: () => Promise<mixed>,
+  onRequest?: ActionType,
+  onSuccess?: ActionType | Array<ActionType>,
+  onFailure?: ActionType,
+  params?: Array<any>,
 }): ActionFunc {
     return async (dispatch, getState) => {
         if (onRequest) {

@@ -9,24 +9,11 @@ export type RequestStatusType = {|
 |};
 
 export type ChannelsRequestsStatuses = {|
-    getChannel: RequestStatusType,
     getChannels: RequestStatusType,
-    myMembers: RequestStatusType,
-    members: RequestStatusType,
     myChannels: RequestStatusType,
     createChannel: RequestStatusType,
     updateChannel: RequestStatusType,
-    updateChannelNotifyProps: RequestStatusType,
-    joinChannel: RequestStatusType,
-    deleteChannel: RequestStatusType,
-    updateLastViewedAt: RequestStatusType,
-    getChannelStats: RequestStatusType,
-    addChannelMember: RequestStatusType,
     removeChannelMember: RequestStatusType,
-    getChannelTimezones: RequestStatusType,
-    updateChannelMember: RequestStatusType,
-    updateChannelScheme: RequestStatusType,
-    updateChannelMemberSchemeRoles: RequestStatusType,
 |};
 
 export type GeneralRequestsStatuses = {|
@@ -41,75 +28,23 @@ export type GeneralRequestsStatuses = {|
 export type PostsRequestsStatuses = {|
     createPost: RequestStatusType,
     editPost: RequestStatusType,
-    deletePost: RequestStatusType,
     getPostThread: RequestStatusType,
-    getPosts: RequestStatusType,
-    getPostsSince: RequestStatusType,
-    getPostsBefore: RequestStatusType,
-    getPostsAfter: RequestStatusType,
 |};
 
 export type TeamsRequestsStatuses = {|
     getMyTeams: RequestStatusType,
     getTeams: RequestStatusType,
-    createTeam: RequestStatusType,
-    updateTeam: RequestStatusType,
-    patchTeam: RequestStatusType,
-    getMyTeamMembers: RequestStatusType,
-    getTeamMembers: RequestStatusType,
-    getTeamStats: RequestStatusType,
-    addUserToTeam: RequestStatusType,
-    removeUserFromTeam: RequestStatusType,
-    updateTeamScheme: RequestStatusType,
-    deleteTeam: RequestStatusType,
-    emailInvite: RequestStatusType,
-    getMyTeamUnreads: RequestStatusType,
-    getTeam: RequestStatusType,
     joinTeam: RequestStatusType,
-    removeTeamIcon: RequestStatusType,
-    setTeamIcon: RequestStatusType,
-    updateTeamMember: RequestStatusType,
-    updateTeamMemberSchemeRoles: RequestStatusType,
 |};
 
 export type UsersRequestsStatuses = {|
     checkMfa: RequestStatusType,
     login: RequestStatusType,
     logout: RequestStatusType,
-    create: RequestStatusType,
-    getProfiles: RequestStatusType,
-    getProfilesInTeam: RequestStatusType,
     getProfilesInChannel: RequestStatusType,
-    getProfilesNotInChannel: RequestStatusType,
-    getUser: RequestStatusType,
-    getUserByUsername: RequestStatusType,
-    getStatusesByIds: RequestStatusType,
-    getSessions: RequestStatusType,
-    getTermsOfService: RequestStatusType,
-    createTermsOfService: RequestStatusType,
-    getMyTermsOfServiceStatus: RequestStatusType,
-    updateMyTermsOfServiceStatus: RequestStatusType,
-    revokeSession: RequestStatusType,
-    getAudits: RequestStatusType,
     autocompleteUsers: RequestStatusType,
     searchProfiles: RequestStatusType,
     updateMe: RequestStatusType,
-    getTotalUsersStats: RequestStatusType,
-    createUserAccessToken: RequestStatusType,
-    disableUserAccessToken: RequestStatusType,
-    enableUserAccessToken: RequestStatusType,
-    generateMfaSecret: RequestStatusType,
-    getProfilesNotInTeam: RequestStatusType,
-    getProfilesWithoutTeam: RequestStatusType,
-    getStatus: RequestStatusType,
-    getUserAccessToken: RequestStatusType,
-    passwordReset: RequestStatusType,
-    revokeAllSessionsForUser: RequestStatusType,
-    revokeUserAccessToken: RequestStatusType,
-    setStatus: RequestStatusType,
-    switchLogin: RequestStatusType,
-    updateUser: RequestStatusType,
-    verifyEmail: RequestStatusType,
 |};
 
 export type PreferencesRequestsStatuses = {|
@@ -165,9 +100,7 @@ export type EmojisRequestsStatuses = {|
 |};
 
 export type FilesRequestsStatuses = {|
-    getFilesForPost: RequestStatusType,
     uploadFiles: RequestStatusType,
-    getFilePublicLink: RequestStatusType
 |};
 
 export type IntegrationsRequestsStatuses = {|
