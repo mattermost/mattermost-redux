@@ -25,12 +25,13 @@ import type {
     UsersRequestsStatuses,
     PreferencesRequestsStatuses,
     AdminRequestsStatuses,
-    EmojisRequestsStatuses,
     FilesRequestsStatuses,
     IntegrationsRequestsStatuses,
     RolesRequestsStatuses,
     SchemesRequestsStatuses,
     GroupsRequestsStatuses,
+    JobsRequestsStatuses,
+    SearchRequestsStatuses,
 } from './requests';
 import type {Role} from './roles';
 import type {PreferenceType} from './preferences';
@@ -73,11 +74,13 @@ export type GlobalState = {|
         users: UsersRequestsStatuses,
         preferences: PreferencesRequestsStatuses,
         admin: AdminRequestsStatuses,
-        emojis: EmojisRequestsStatuses,
         files: FilesRequestsStatuses,
         integrations: IntegrationsRequestsStatuses,
         roles: RolesRequestsStatuses,
         schemes: SchemesRequestsStatuses,
         groups: GroupsRequestsStatuses,
+        jobs: JobsRequestsStatuses,
+        schemes: SchemesRequestsStatuses,
+        search: SearchRequestsStatuses
     |}
 |};

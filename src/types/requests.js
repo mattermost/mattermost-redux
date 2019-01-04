@@ -9,7 +9,6 @@ export type RequestStatusType = {|
 |};
 
 export type ChannelsRequestsStatuses = {|
-    getChannel: RequestStatusType,
     getChannels: RequestStatusType,
     getAllChannels: RequestStatusType,
     myMembers: RequestStatusType,
@@ -17,17 +16,6 @@ export type ChannelsRequestsStatuses = {|
     myChannels: RequestStatusType,
     createChannel: RequestStatusType,
     updateChannel: RequestStatusType,
-    updateChannelNotifyProps: RequestStatusType,
-    joinChannel: RequestStatusType,
-    deleteChannel: RequestStatusType,
-    updateLastViewedAt: RequestStatusType,
-    getChannelStats: RequestStatusType,
-    addChannelMember: RequestStatusType,
-    removeChannelMember: RequestStatusType,
-    getChannelTimezones: RequestStatusType,
-    updateChannelMember: RequestStatusType,
-    updateChannelScheme: RequestStatusType,
-    updateChannelMemberSchemeRoles: RequestStatusType,
 |};
 
 export type GeneralRequestsStatuses = {|
@@ -42,56 +30,21 @@ export type GeneralRequestsStatuses = {|
 export type PostsRequestsStatuses = {|
     createPost: RequestStatusType,
     editPost: RequestStatusType,
-    deletePost: RequestStatusType,
     getPostThread: RequestStatusType,
-    getPostThreadRetryAttempts: number,
-    getPosts: RequestStatusType,
-    getPostsRetryAttempts: number,
-    getPostsSince: RequestStatusType,
-    getPostsSinceRetryAttempts: number,
-    getPostsBefore: RequestStatusType,
-    getPostsBeforeRetryAttempts: number,
-    getPostsAfter: RequestStatusType,
-    getPostsAfterRetryAttempts: number
 |};
 
 export type TeamsRequestsStatuses = {|
     getMyTeams: RequestStatusType,
     getTeams: RequestStatusType,
-    createTeam: RequestStatusType,
-    updateTeam: RequestStatusType,
-    patchTeam: RequestStatusType,
-    getMyTeamMembers: RequestStatusType,
-    getTeamMembers: RequestStatusType,
-    getTeamStats: RequestStatusType,
-    addUserToTeam: RequestStatusType,
-    removeUserFromTeam: RequestStatusType,
-    updateTeamScheme: RequestStatusType,
+    joinTeam: RequestStatusType,
 |};
 
 export type UsersRequestsStatuses = {|
     checkMfa: RequestStatusType,
     login: RequestStatusType,
     logout: RequestStatusType,
-    create: RequestStatusType,
-    getProfiles: RequestStatusType,
-    getProfilesInTeam: RequestStatusType,
-    getProfilesInChannel: RequestStatusType,
-    getProfilesNotInChannel: RequestStatusType,
-    getUser: RequestStatusType,
-    getUserByUsername: RequestStatusType,
-    getStatusesByIds: RequestStatusType,
-    getSessions: RequestStatusType,
-    getTermsOfService: RequestStatusType,
-    createTermsOfService: RequestStatusType,
-    getMyTermsOfServiceStatus: RequestStatusType,
-    updateMyTermsOfServiceStatus: RequestStatusType,
-    revokeSession: RequestStatusType,
-    getAudits: RequestStatusType,
     autocompleteUsers: RequestStatusType,
-    searchProfiles: RequestStatusType,
     updateMe: RequestStatusType,
-    getTotalUsersStats: RequestStatusType
 |};
 
 export type PreferencesRequestsStatuses = {|
@@ -114,19 +67,43 @@ export type AdminRequestsStatuses = {|
     testS3Connection: RequestStatusType,
     getLdapGroups: RequestStatusType,
     linkLdapGroup: RequestStatusType,
-    unlinkLdapGroup: RequestStatusType
+    unlinkLdapGroup: RequestStatusType,
+    deleteBrandImage: RequestStatusType,
+    disablePlugin: RequestStatusType,
+    enablePlugin: RequestStatusType,
+    getAnalytics: RequestStatusType,
+    getClusterStatus: RequestStatusType,
+    getEnvironmentConfig: RequestStatusType,
+    getPluginStatuses: RequestStatusType,
+    getPlugins: RequestStatusType,
+    getSamlCertificateStatus: RequestStatusType,
+    purgeElasticsearchIndexes: RequestStatusType,
+    removeIdpSamlCertificate: RequestStatusType,
+    removeLicense: RequestStatusType,
+    removePlugin: RequestStatusType,
+    removePrivateSamlCertificate: RequestStatusType,
+    removePublicSamlCertificate: RequestStatusType,
+    syncLdap: RequestStatusType,
+    testElasticsearch: RequestStatusType,
+    testLdap: RequestStatusType,
+    uploadBrandImage: RequestStatusType,
+    uploadIdpSamlCertificate: RequestStatusType,
+    uploadLicense: RequestStatusType,
+    uploadPlugin: RequestStatusType,
+    uploadPrivateSamlCertificate: RequestStatusType,
+    uploadPublicSamlCertificate: RequestStatusType,
 |};
 
 export type EmojisRequestsStatuses = {|
     createCustomEmoji: RequestStatusType,
     getCustomEmojis: RequestStatusType,
-    deleteCustomEmoji: RequestStatusType
+    deleteCustomEmoji: RequestStatusType,
+    getAllCustomEmojis: RequestStatusType,
+    getCustomEmoji: RequestStatusType,
 |};
 
 export type FilesRequestsStatuses = {|
-    getFilesForPost: RequestStatusType,
     uploadFiles: RequestStatusType,
-    getFilePublicLink: RequestStatusType
 |};
 
 export type IntegrationsRequestsStatuses = {|
@@ -149,7 +126,9 @@ export type IntegrationsRequestsStatuses = {|
     updateOAuthApp: RequestStatusType,
     getOAuthApp: RequestStatusType,
     getOAuthApps: RequestStatusType,
-    deleteOAuthApp: RequestStatusType
+    deleteOAuthApp: RequestStatusType,
+    executeCommand: RequestStatusType,
+    submitInteractiveDialog: RequestStatusType,
 |};
 
 export type RolesRequestsStatuses = {|
@@ -175,4 +154,18 @@ export type GroupsRequestsStatuses = {|
     getGroupSyncables: RequestStatusType,
     getGroupMembers: RequestStatusType,
     getGroup: RequestStatusType,
+|};
+
+export type JobsRequestsStatuses = {|
+    createJob: RequestStatusType,
+    getJob: RequestStatusType,
+    getJobs: RequestStatusType,
+    cancelJob: RequestStatusType,
+|};
+
+export type SearchRequestsStatuses = {|
+    flaggedPosts: RequestStatusType,
+    pinnedPosts: RequestStatusType,
+    recentMentions: RequestStatusType,
+    searchPosts: RequestStatusType,
 |};

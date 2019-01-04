@@ -1,6 +1,5 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
-// @flow
 
 import {combineReducers} from 'redux';
 
@@ -12,7 +11,6 @@ import teams from './teams';
 import users from './users';
 import preferences from './preferences';
 import integrations from './integrations';
-import emojis from './emojis';
 import admin from './admin';
 import jobs from './jobs';
 import search from './search';
@@ -29,7 +27,6 @@ export default combineReducers({
     users,
     preferences,
     integrations,
-    emojis,
     admin,
     jobs,
     search,

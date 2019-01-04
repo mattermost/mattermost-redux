@@ -28,10 +28,10 @@ function alertStack(state: Array<AlertType> = [], action: GenericAction) {
     }
 }
 
-export default combineReducers({
+export default (combineReducers({
 
     // array acting as a stack where every object is an alert
     alertStack,
 
-});
+}): ({| alertStack: Array<AlertType> |}, GenericAction) => {| alertStack: Array<AlertType> |});
 

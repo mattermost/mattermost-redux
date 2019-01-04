@@ -8,7 +8,7 @@ import {RoleTypes} from 'action_types';
 import {handleRequest, initialRequestState} from './helpers';
 
 import type {GenericAction} from '../../types/actions';
-import type {RequestStatusType} from '../../types/requests';
+import type {RolesRequestsStatuses, RequestStatusType} from '../../types/requests';
 
 function getRolesByNames(state: RequestStatusType = initialRequestState(), action: GenericAction): RequestStatusType {
     return handleRequest(
@@ -50,9 +50,9 @@ function editRole(state: RequestStatusType = initialRequestState(), action: Gene
     );
 }
 
-export default combineReducers({
+export default (combineReducers({
     getRolesByNames,
     getRoleByName,
     getRole,
     editRole,
-});
+}): (RolesRequestsStatuses, GenericAction) => RolesRequestsStatuses);

@@ -56,77 +56,74 @@ export function selectTeam(team: Team): ActionFunc {
 }
 
 export function getMyTeams(): ActionFunc {
-    return bindClientFunc(
-        Client4.getMyTeams,
-        TeamTypes.MY_TEAMS_REQUEST,
-        [TeamTypes.RECEIVED_TEAMS_LIST, TeamTypes.MY_TEAMS_SUCCESS],
-        TeamTypes.MY_TEAMS_FAILURE
-    );
+    return bindClientFunc({
+        clientFunc: Client4.getMyTeams,
+        onRequest: TeamTypes.MY_TEAMS_REQUEST,
+        onSuccess: [TeamTypes.RECEIVED_TEAMS_LIST, TeamTypes.MY_TEAMS_SUCCESS],
+        onFailure: TeamTypes.MY_TEAMS_FAILURE,
+    });
 }
 
 export function getMyTeamUnreads(): ActionFunc {
-    return bindClientFunc(
-        Client4.getMyTeamUnreads,
-        TeamTypes.MY_TEAM_UNREADS_REQUEST,
-        [TeamTypes.RECEIVED_MY_TEAM_UNREADS, TeamTypes.MY_TEAM_UNREADS_SUCCESS],
-        TeamTypes.MY_TEAM_UNREADS_FAILURE
-    );
+    return bindClientFunc({
+        clientFunc: Client4.getMyTeamUnreads,
+        onSuccess: TeamTypes.RECEIVED_MY_TEAM_UNREADS,
+    });
 }
 
 export function getTeam(teamId: string): ActionFunc {
-    return bindClientFunc(
-        Client4.getTeam,
-        TeamTypes.GET_TEAM_REQUEST,
-        [TeamTypes.RECEIVED_TEAM, TeamTypes.GET_TEAM_SUCCESS],
-        TeamTypes.GET_TEAM_FAILURE,
-        teamId
-    );
+    return bindClientFunc({
+        clientFunc: Client4.getTeam,
+        onSuccess: TeamTypes.RECEIVED_TEAM,
+        params: [
+            teamId,
+        ],
+    });
 }
 
 export function getTeamByName(teamName: string): ActionFunc {
-    return bindClientFunc(
-        Client4.getTeamByName,
-        TeamTypes.GET_TEAM_REQUEST,
-        [TeamTypes.RECEIVED_TEAM, TeamTypes.GET_TEAM_SUCCESS],
-        TeamTypes.GET_TEAM_FAILURE,
-        teamName
-    );
+    return bindClientFunc({
+        clientFunc: Client4.getTeamByName,
+        onSuccess: TeamTypes.RECEIVED_TEAM,
+        params: [
+            teamName,
+        ],
+    });
 }
 
 export function getTeams(page: number = 0, perPage: number = General.TEAMS_CHUNK_SIZE): ActionFunc {
-    return bindClientFunc(
-        Client4.getTeams,
-        TeamTypes.GET_TEAMS_REQUEST,
-        [TeamTypes.RECEIVED_TEAMS_LIST, TeamTypes.GET_TEAMS_SUCCESS],
-        TeamTypes.GET_TEAMS_FAILURE,
-        page,
-        perPage
-    );
+    return bindClientFunc({
+        clientFunc: Client4.getTeams,
+        onRequest: TeamTypes.GET_TEAMS_REQUEST,
+        onSuccess: [TeamTypes.RECEIVED_TEAMS_LIST, TeamTypes.GET_TEAMS_SUCCESS],
+        onFailure: TeamTypes.GET_TEAMS_FAILURE,
+        params: [
+            page,
+            perPage,
+        ],
+    });
 }
 
 export function searchTeams(term: string): ActionFunc {
-    return bindClientFunc(
-        Client4.searchTeams,
-        TeamTypes.GET_TEAMS_REQUEST,
-        [TeamTypes.RECEIVED_TEAMS_LIST, TeamTypes.GET_TEAMS_SUCCESS],
-        TeamTypes.GET_TEAMS_FAILURE,
-        term,
-    );
+    return bindClientFunc({
+        clientFunc: Client4.searchTeams,
+        onRequest: TeamTypes.GET_TEAMS_REQUEST,
+        onSuccess: [TeamTypes.RECEIVED_TEAMS_LIST, TeamTypes.GET_TEAMS_SUCCESS],
+        onFailure: TeamTypes.GET_TEAMS_FAILURE,
+        params: [
+            term,
+        ],
+    });
 }
 
 export function createTeam(team: Team): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
-        dispatch({type: TeamTypes.CREATE_TEAM_REQUEST, data: null}, getState);
-
         let created;
         try {
             created = await Client4.createTeam(team);
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch, getState);
-            dispatch(batchActions([
-                {type: TeamTypes.CREATE_TEAM_FAILURE, error},
-                logError(error),
-            ]), getState);
+            dispatch(logError(error));
             return {error};
         }
 
@@ -152,9 +149,6 @@ export function createTeam(team: Team): ActionFunc {
                 type: TeamTypes.SELECT_TEAM,
                 data: created.id,
             },
-            {
-                type: TeamTypes.CREATE_TEAM_SUCCESS,
-            },
         ]), getState);
         dispatch(loadRolesIfNeeded(member.roles.split(' ')));
 
@@ -164,16 +158,11 @@ export function createTeam(team: Team): ActionFunc {
 
 export function deleteTeam(teamId: string): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
-        dispatch({type: TeamTypes.DELETE_TEAM_REQUEST, data: null}, getState);
-
         try {
             await Client4.deleteTeam(teamId);
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch, getState);
-            dispatch(batchActions([
-                {type: TeamTypes.DELETE_TEAM_FAILURE, error},
-                logError(error),
-            ]), getState);
+            dispatch(logError(error));
             return {error};
         }
 
@@ -189,9 +178,6 @@ export function deleteTeam(teamId: string): ActionFunc {
             {
                 type: TeamTypes.RECEIVED_TEAM_DELETED,
                 data: {id: teamId},
-            },
-            {
-                type: TeamTypes.DELETE_TEAM_SUCCESS,
             }
         );
 
@@ -202,33 +188,31 @@ export function deleteTeam(teamId: string): ActionFunc {
 }
 
 export function updateTeam(team: Team): ActionFunc {
-    return bindClientFunc(
-        Client4.updateTeam,
-        TeamTypes.UPDATE_TEAM_REQUEST,
-        [TeamTypes.UPDATED_TEAM, TeamTypes.UPDATE_TEAM_SUCCESS],
-        TeamTypes.UPDATE_TEAM_FAILURE,
-        team
-    );
+    return bindClientFunc({
+        clientFunc: Client4.updateTeam,
+        onSuccess: TeamTypes.UPDATED_TEAM,
+        params: [
+            team,
+        ],
+    });
 }
 
 export function patchTeam(team: Team): ActionFunc {
-    return bindClientFunc(
-        Client4.patchTeam,
-        TeamTypes.PATCH_TEAM_REQUEST,
-        [TeamTypes.PATCHED_TEAM, TeamTypes.PATCH_TEAM_SUCCESS],
-        TeamTypes.PATCH_TEAM_FAILURE,
-        team
-    );
+    return bindClientFunc({
+        clientFunc: Client4.patchTeam,
+        onSuccess: TeamTypes.PATCHED_TEAM,
+        params: [
+            team,
+        ],
+    });
 }
 
 export function getMyTeamMembers(): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
-        const getMyTeamMembersFunc = bindClientFunc(
-            Client4.getMyTeamMembers,
-            TeamTypes.MY_TEAM_MEMBERS_REQUEST,
-            [TeamTypes.RECEIVED_MY_TEAM_MEMBERS, TeamTypes.MY_TEAM_MEMBERS_SUCCESS],
-            TeamTypes.MY_TEAM_MEMBERS_FAILURE
-        );
+        const getMyTeamMembersFunc = bindClientFunc({
+            clientFunc: Client4.getMyTeamMembers,
+            onSuccess: TeamTypes.RECEIVED_MY_TEAM_MEMBERS,
+        });
 
         const teamMembers: ActionResult = await getMyTeamMembersFunc(dispatch, getState);
 
@@ -249,21 +233,21 @@ export function getMyTeamMembers(): ActionFunc {
 }
 
 export function getTeamMembers(teamId: string, page: number = 0, perPage: number = General.TEAMS_CHUNK_SIZE): ActionFunc {
-    return bindClientFunc(
-        Client4.getTeamMembers,
-        TeamTypes.GET_TEAM_MEMBERS_REQUEST,
-        [TeamTypes.RECEIVED_MEMBERS_IN_TEAM, TeamTypes.GET_TEAM_MEMBERS_SUCCESS],
-        TeamTypes.GET_TEAM_MEMBERS_FAILURE,
-        teamId,
-        page,
-        perPage
-    );
+    return bindClientFunc({
+        clientFunc: Client4.getTeamMembers,
+        onRequest: TeamTypes.GET_TEAM_MEMBERS_REQUEST,
+        onSuccess: [TeamTypes.RECEIVED_MEMBERS_IN_TEAM, TeamTypes.GET_TEAM_MEMBERS_SUCCESS],
+        onFailure: TeamTypes.GET_TEAM_MEMBERS_FAILURE,
+        params: [
+            teamId,
+            page,
+            perPage,
+        ],
+    });
 }
 
 export function getTeamMember(teamId: string, userId: string): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
-        dispatch({type: TeamTypes.TEAM_MEMBERS_REQUEST, data: null}, getState);
-
         let member;
         try {
             const memberRequest = Client4.getTeamMember(teamId, userId);
@@ -273,22 +257,14 @@ export function getTeamMember(teamId: string, userId: string): ActionFunc {
             member = await memberRequest;
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch, getState);
-            dispatch(batchActions([
-                {type: TeamTypes.TEAM_MEMBERS_FAILURE, error},
-                logError(error),
-            ]), getState);
+            dispatch(logError(error));
             return {error};
         }
 
-        dispatch(batchActions([
-            {
-                type: TeamTypes.RECEIVED_MEMBERS_IN_TEAM,
-                data: [member],
-            },
-            {
-                type: TeamTypes.TEAM_MEMBERS_SUCCESS,
-            },
-        ]), getState);
+        dispatch({
+            type: TeamTypes.RECEIVED_MEMBERS_IN_TEAM,
+            data: [member],
+        });
 
         return {data: member};
     };
@@ -296,8 +272,6 @@ export function getTeamMember(teamId: string, userId: string): ActionFunc {
 
 export function getTeamMembersByIds(teamId: string, userIds: Array<string>): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
-        dispatch({type: TeamTypes.TEAM_MEMBERS_REQUEST, data: null}, getState);
-
         let members;
         try {
             const membersRequest = Client4.getTeamMembersByIds(teamId, userIds);
@@ -307,81 +281,72 @@ export function getTeamMembersByIds(teamId: string, userIds: Array<string>): Act
             members = await membersRequest;
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch, getState);
-            dispatch(batchActions([
-                {type: TeamTypes.TEAM_MEMBERS_FAILURE, error},
-                logError(error),
-            ]), getState);
+            dispatch(logError(error));
             return {error};
         }
 
-        dispatch(batchActions([
-            {
-                type: TeamTypes.RECEIVED_MEMBERS_IN_TEAM,
-                data: members,
-            },
-            {
-                type: TeamTypes.TEAM_MEMBERS_SUCCESS,
-            },
-        ]), getState);
+        dispatch({
+            type: TeamTypes.RECEIVED_MEMBERS_IN_TEAM,
+            data: members,
+        });
 
         return {data: members};
     };
 }
 
 export function getTeamsForUser(userId: string): ActionFunc {
-    return bindClientFunc(
-        Client4.getTeamsForUser,
-        TeamTypes.GET_TEAMS_REQUEST,
-        [TeamTypes.RECEIVED_TEAMS_LIST, TeamTypes.GET_TEAMS_SUCCESS],
-        TeamTypes.GET_TEAMS_FAILURE,
-        userId
-    );
+    return bindClientFunc({
+        clientFunc: Client4.getTeamsForUser,
+        onRequest: TeamTypes.GET_TEAMS_REQUEST,
+        onSuccess: [TeamTypes.RECEIVED_TEAMS_LIST, TeamTypes.GET_TEAMS_SUCCESS],
+        onFailure: TeamTypes.GET_TEAMS_FAILURE,
+        params: [
+            userId,
+        ],
+    });
 }
 
 export function getTeamMembersForUser(userId: string): ActionFunc {
-    return bindClientFunc(
-        Client4.getTeamMembersForUser,
-        TeamTypes.TEAM_MEMBERS_REQUEST,
-        [TeamTypes.RECEIVED_TEAM_MEMBERS, TeamTypes.TEAM_MEMBERS_SUCCESS],
-        TeamTypes.TEAM_MEMBERS_FAILURE,
-        userId
-    );
+    return bindClientFunc({
+        clientFunc: Client4.getTeamMembersForUser,
+        onSuccess: TeamTypes.RECEIVED_TEAM_MEMBERS,
+        params: [
+            userId,
+        ],
+    });
 }
 
 export function getTeamStats(teamId: string): ActionFunc {
-    return bindClientFunc(
-        Client4.getTeamStats,
-        TeamTypes.TEAM_STATS_REQUEST,
-        [TeamTypes.RECEIVED_TEAM_STATS, TeamTypes.TEAM_STATS_SUCCESS],
-        TeamTypes.TEAM_STATS_FAILURE,
-        teamId
-    );
+    return bindClientFunc({
+        clientFunc: Client4.getTeamStats,
+        onSuccess: TeamTypes.RECEIVED_TEAM_STATS,
+        params: [
+            teamId,
+        ],
+    });
 }
 
 export function addUserToTeamFromInvite(token: string, inviteId: string): ActionFunc {
-    return bindClientFunc(
-        Client4.addToTeamFromInvite,
-        TeamTypes.ADD_TO_TEAM_FROM_INVITE_REQUEST,
-        TeamTypes.ADD_TO_TEAM_FROM_INVITE_SUCCESS,
-        TeamTypes.ADD_TO_TEAM_FROM_INVITE_FAILURE,
-        token,
-        inviteId,
-    );
+    return bindClientFunc({
+        clientFunc: Client4.addToTeamFromInvite,
+        onRequest: TeamTypes.ADD_TO_TEAM_FROM_INVITE_REQUEST,
+        onSuccess: TeamTypes.ADD_TO_TEAM_FROM_INVITE_SUCCESS,
+        onFailure: TeamTypes.ADD_TO_TEAM_FROM_INVITE_FAILURE,
+        params: [
+            token,
+            inviteId,
+        ],
+    });
 }
 
 export function addUserToTeam(teamId: string, userId: string): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
-        dispatch({type: TeamTypes.ADD_TEAM_MEMBER_REQUEST, data: null}, getState);
-
         let member;
         try {
             member = await Client4.addToTeam(teamId, userId);
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch, getState);
-            dispatch(batchActions([
-                {type: TeamTypes.ADD_TEAM_MEMBER_FAILURE, error},
-                logError(error),
-            ]), getState);
+            dispatch(logError(error));
             return {error};
         }
 
@@ -394,9 +359,6 @@ export function addUserToTeam(teamId: string, userId: string): ActionFunc {
                 type: TeamTypes.RECEIVED_MEMBER_IN_TEAM,
                 data: member,
             },
-            {
-                type: TeamTypes.ADD_TEAM_MEMBER_SUCCESS,
-            },
         ]), getState);
 
         return {data: member};
@@ -405,17 +367,12 @@ export function addUserToTeam(teamId: string, userId: string): ActionFunc {
 
 export function addUsersToTeam(teamId: string, userIds: Array<string>): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
-        dispatch({type: TeamTypes.ADD_TEAM_MEMBER_REQUEST, data: null}, getState);
-
         let members;
         try {
             members = await Client4.addUsersToTeam(teamId, userIds);
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch, getState);
-            dispatch(batchActions([
-                {type: TeamTypes.ADD_TEAM_MEMBER_FAILURE, error},
-                logError(error),
-            ]), getState);
+            dispatch(logError(error));
             return {error};
         }
 
@@ -432,9 +389,6 @@ export function addUsersToTeam(teamId: string, userIds: Array<string>): ActionFu
                 type: TeamTypes.RECEIVED_MEMBERS_IN_TEAM,
                 data: members,
             },
-            {
-                type: TeamTypes.ADD_TEAM_MEMBER_SUCCESS,
-            },
         ]), getState);
 
         return {data: members};
@@ -443,16 +397,11 @@ export function addUsersToTeam(teamId: string, userIds: Array<string>): ActionFu
 
 export function removeUserFromTeam(teamId: string, userId: string): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
-        dispatch({type: TeamTypes.REMOVE_TEAM_MEMBER_REQUEST, data: null}, getState);
-
         try {
             await Client4.removeFromTeam(teamId, userId);
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch, getState);
-            dispatch(batchActions([
-                {type: TeamTypes.REMOVE_TEAM_MEMBER_FAILURE, error},
-                logError(error),
-            ]), getState);
+            dispatch(logError(error));
             return {error};
         }
 
@@ -469,9 +418,6 @@ export function removeUserFromTeam(teamId: string, userId: string): ActionFunc {
             {
                 type: TeamTypes.REMOVE_MEMBER_FROM_TEAM,
                 data: member,
-            },
-            {
-                type: TeamTypes.REMOVE_TEAM_MEMBER_SUCCESS,
             },
         ];
 
@@ -502,79 +448,58 @@ export function removeUserFromTeam(teamId: string, userId: string): ActionFunc {
 
 export function updateTeamMemberRoles(teamId: string, userId: string, roles: string): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
-        dispatch({type: TeamTypes.UPDATE_TEAM_MEMBER_REQUEST, data: null}, getState);
-
         try {
             await Client4.updateTeamMemberRoles(teamId, userId, roles);
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch, getState);
-            dispatch(batchActions([
-                {type: TeamTypes.UPDATE_TEAM_MEMBER_FAILURE, error},
-                logError(error),
-            ]), getState);
+            dispatch(logError(error));
             return {error};
         }
 
-        const actions = [
-            {
-                type: TeamTypes.UPDATE_TEAM_MEMBER_SUCCESS,
-            },
-        ];
-
         const membersInTeam = getState().entities.teams.membersInTeam[teamId];
         if (membersInTeam && membersInTeam[userId]) {
-            actions.push(
-                {
-                    type: TeamTypes.RECEIVED_MEMBER_IN_TEAM,
-                    data: {...membersInTeam[userId], roles},
-                }
-            );
+            dispatch({
+                type: TeamTypes.RECEIVED_MEMBER_IN_TEAM,
+                data: {...membersInTeam[userId], roles},
+            });
         }
-
-        dispatch(batchActions(actions), getState);
 
         return {data: true};
     };
 }
 
 export function sendEmailInvitesToTeam(teamId: string, emails: Array<string>): ActionFunc {
-    return bindClientFunc(
-        Client4.sendEmailInvitesToTeam,
-        TeamTypes.TEAM_EMAIL_INVITE_REQUEST,
-        [TeamTypes.TEAM_EMAIL_INVITE_SUCCESS],
-        TeamTypes.TEAM_EMAIL_INVITE_FAILURE,
-        teamId,
-        emails
-    );
+    return bindClientFunc({
+        clientFunc: Client4.sendEmailInvitesToTeam,
+        params: [
+            teamId,
+            emails,
+        ],
+    });
 }
 
 export function getTeamInviteInfo(inviteId: string): ActionFunc {
-    return bindClientFunc(
-        Client4.getTeamInviteInfo,
-        TeamTypes.TEAM_INVITE_INFO_REQUEST,
-        TeamTypes.TEAM_INVITE_INFO_SUCCESS,
-        TeamTypes.TEAM_INVITE_INFO_FAILURE,
-        inviteId,
-    );
+    return bindClientFunc({
+        clientFunc: Client4.getTeamInviteInfo,
+        onRequest: TeamTypes.TEAM_INVITE_INFO_REQUEST,
+        onSuccess: TeamTypes.TEAM_INVITE_INFO_SUCCESS,
+        onFailure: TeamTypes.TEAM_INVITE_INFO_FAILURE,
+        params: [
+            inviteId,
+        ],
+    });
 }
 
 export function checkIfTeamExists(teamName: string): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
-        dispatch({type: TeamTypes.GET_TEAM_REQUEST, data: null}, getState);
-
         let data;
         try {
             data = await Client4.checkIfTeamExists(teamName);
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch, getState);
-            dispatch(batchActions([
-                {type: TeamTypes.GET_TEAM_FAILURE, error},
-                logError(error),
-            ]));
+            dispatch(logError(error));
             return {error};
         }
-
-        dispatch({type: TeamTypes.GET_TEAM_SUCCESS, data: null});
 
         return {data: data.exists};
     };
@@ -591,7 +516,7 @@ export function joinTeam(inviteId: string, teamId: string): ActionFunc {
             dispatch(batchActions([
                 {type: TeamTypes.JOIN_TEAM_FAILURE, error},
                 logError(error),
-            ]), getState);
+            ]));
             return {error};
         }
 
@@ -608,36 +533,32 @@ export function joinTeam(inviteId: string, teamId: string): ActionFunc {
 }
 
 export function setTeamIcon(teamId: string, imageData: File): ActionFunc {
-    return bindClientFunc(
-        Client4.setTeamIcon,
-        TeamTypes.SET_TEAM_ICON_REQUEST,
-        TeamTypes.SET_TEAM_ICON_SUCCESS,
-        TeamTypes.SET_TEAM_ICON_FAILURE,
-        teamId,
-        imageData
-    );
+    return bindClientFunc({
+        clientFunc: Client4.setTeamIcon,
+        params: [
+            teamId,
+            imageData,
+        ],
+    });
 }
 
 export function removeTeamIcon(teamId: string): ActionFunc {
-    return bindClientFunc(
-        Client4.removeTeamIcon,
-        TeamTypes.REMOVE_TEAM_ICON_REQUEST,
-        TeamTypes.REMOVE_TEAM_ICON_SUCCESS,
-        TeamTypes.REMOVE_TEAM_ICON_FAILURE,
-        teamId,
-    );
+    return bindClientFunc({
+        clientFunc: Client4.removeTeamIcon,
+        params: [
+            teamId,
+        ],
+    });
 }
 
 export function updateTeamScheme(teamId: string, schemeId: string): ActionFunc {
-    return bindClientFunc(
-        async () => {
+    return bindClientFunc({
+        clientFunc: async () => {
             await Client4.updateTeamScheme(teamId, schemeId);
             return {teamId, schemeId};
         },
-        TeamTypes.UPDATE_TEAM_SCHEME_REQUEST,
-        [TeamTypes.UPDATE_TEAM_SCHEME_SUCCESS, TeamTypes.UPDATED_TEAM_SCHEME],
-        TeamTypes.UPDATE_TEAM_SCHEME_FAILURE,
-    );
+        onSuccess: TeamTypes.UPDATED_TEAM_SCHEME,
+    });
 }
 
 export function updateTeamMemberSchemeRoles(
@@ -646,13 +567,11 @@ export function updateTeamMemberSchemeRoles(
     isSchemeUser: boolean,
     isSchemeAdmin: boolean
 ): ActionFunc {
-    return bindClientFunc(
-        async () => {
+    return bindClientFunc({
+        clientFunc: async () => {
             await Client4.updateTeamMemberSchemeRoles(teamId, userId, isSchemeUser, isSchemeAdmin);
             return {teamId, userId, isSchemeUser, isSchemeAdmin};
         },
-        TeamTypes.UPDATE_TEAM_MEMBER_SCHEME_ROLES_REQUEST,
-        [TeamTypes.UPDATE_TEAM_MEMBER_SCHEME_ROLES_SUCCESS, TeamTypes.UPDATED_TEAM_MEMBER_SCHEME_ROLES],
-        TeamTypes.UPDATE_TEAM_MEMBER_SCHEME_ROLES_FAILURE,
-    );
+        onSuccess: TeamTypes.UPDATED_TEAM_MEMBER_SCHEME_ROLES,
+    });
 }
