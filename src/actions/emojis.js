@@ -16,14 +16,15 @@ import {logError} from './errors';
 import {bindClientFunc, forceLogoutIfNecessary} from './helpers';
 
 import type {GetStateFunc, DispatchFunc, ActionFunc} from '../types/actions';
+import type {CustomEmoji, SystemEmoji} from '../types/emojis';
 
-export let systemEmojis: Map<string, Object> = new Map();
+export let systemEmojis: Map<string, SystemEmoji> = new Map();
 
-export function setSystemEmojis(emojis: Map<string, Object>) {
+export function setSystemEmojis(emojis: Map<string, SystemEmoji>) {
     systemEmojis = emojis;
 }
 
-export function createCustomEmoji(emoji: Object, image: Object): ActionFunc {
+export function createCustomEmoji(emoji: CustomEmoji, image: File): ActionFunc {
     return bindClientFunc({
         clientFunc: Client4.createCustomEmoji,
         onSuccess: EmojiTypes.RECEIVED_CUSTOM_EMOJI,
@@ -135,10 +136,10 @@ export function getCustomEmojis(
     };
 }
 
-export function loadProfilesForCustomEmojis(emojis: Array<Object>): ActionFunc {
+export function loadProfilesForCustomEmojis(emojis: Array<CustomEmoji>): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         const usersToLoad = {};
-        emojis.forEach((emoji: Object) => {
+        emojis.forEach((emoji: CustomEmoji) => {
             if (!getState().entities.users.profiles[emoji.creator_id]) {
                 usersToLoad[emoji.creator_id] = true;
             }

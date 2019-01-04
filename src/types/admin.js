@@ -2,10 +2,12 @@
 // See LICENSE.txt for license information.
 // @flow
 
+import type {Config} from './general';
+
 export type AdminState = {|
     logs: Array<Object>,
     audits: Object,
-    config: Object,
-    environmentConfig: Object,
+    config: ?Config,
+    environmentConfig: ?Config,
     complianceReports: Object
 |};

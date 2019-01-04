@@ -1,13 +1,16 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
+// @flow
 
 import {ErrorTypes} from 'action_types';
 
-export default (state = [], action) => {
+import type {GenericAction} from '../../types/actions';
+
+export default (state: Array<Object> = [], action: GenericAction): Array<Object> => {
     switch (action.type) {
     case ErrorTypes.DISMISS_ERROR: {
         const nextState = [...state];
-        nextState.splice(action.index, 1);
+        nextState.splice(action.index || 0, 1);
 
         return nextState;
     }

@@ -963,7 +963,8 @@ function buildPostAttachmentText(attachments) {
 }
 
 export function getNeededCustomEmojis(state, posts) {
-    if (getConfig(state).EnableCustomEmoji !== 'true') {
+    const config = getConfig(state);
+    if (!config || config.EnableCustomEmoji !== 'true') {
         return new Set();
     }
 

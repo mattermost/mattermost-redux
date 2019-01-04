@@ -97,7 +97,7 @@ export const getTeammateNameDisplaySetting = createSelector(
         const key = getPreferenceKey(Preferences.CATEGORY_DISPLAY_SETTINGS, Preferences.NAME_NAME_FORMAT);
         if (preferences[key]) {
             return preferences[key].value;
-        } else if (config.TeammateNameDisplay) {
+        } else if (config && config.TeammateNameDisplay) {
             return config.TeammateNameDisplay;
         }
         return General.TEAMMATE_NAME_DISPLAY.SHOW_USERNAME;
@@ -124,7 +124,7 @@ const getThemePreference = createSelector(
 );
 
 const getDefaultTheme = createSelector(getConfig, (config) => {
-    if (config.DefaultTheme) {
+    if (config && config.DefaultTheme) {
         const theme = Preferences.THEMES[config.DefaultTheme];
         if (theme) {
             return theme;
@@ -201,11 +201,11 @@ const defaultSidebarPrefs = {
 export const getSidebarPreferences = createSelector(
     (state) => {
         const config = getConfig(state);
-        return config.ExperimentalGroupUnreadChannels !== General.DISABLED && getBool(
+        return config && config.ExperimentalGroupUnreadChannels !== General.DISABLED && getBool(
             state,
             Preferences.CATEGORY_SIDEBAR_SETTINGS,
             'show_unread_section',
-            config.ExperimentalGroupUnreadChannels === General.DEFAULT_ON
+            config && config.ExperimentalGroupUnreadChannels === General.DEFAULT_ON
         );
     },
     (state) => {

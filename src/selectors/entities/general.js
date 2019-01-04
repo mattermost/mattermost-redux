@@ -8,12 +8,13 @@ import {isMinimumServerVersion} from 'utils/helpers';
 import {General} from 'constants';
 
 import type {GlobalState} from '../../types/store';
+import type {Config, License} from '../../types/general';
 
-export function getConfig(state: GlobalState): Object {
+export function getConfig(state: GlobalState): ?Config {
     return state.entities.general.config;
 }
 
-export function getLicense(state: GlobalState): Object {
+export function getLicense(state: GlobalState): License {
     return state.entities.general.license;
 }
 
@@ -21,8 +22,8 @@ export function getSupportedTimezones(state: GlobalState): Array<string> {
     return state.entities.general.timezones;
 }
 
-export function getCurrentUrl(state: GlobalState): string {
-    return state.entities.general.credentials.url;
+export function getCurrentUrl(state: GlobalState): ?string {
+    return state.entities.general.credentials && state.entities.general.credentials.url;
 }
 
 export function hasNewPermissions(state: GlobalState): boolean {
@@ -37,7 +38,11 @@ export function hasNewPermissions(state: GlobalState): boolean {
 export const canUploadFilesOnMobile: (GlobalState) => boolean = createSelector(
     getConfig,
     getLicense,
-    (config: Object, license: Object): boolean => {
+    (config: ?Config, license: License): boolean => {
+        if (!config) {
+            return false;
+        }
+
         // Defaults to true if either setting doesn't exist
         return config.EnableFileAttachments !== 'false' &&
            (license.IsLicensed === 'false' || license.Compliance === 'false' || config.EnableMobileFileUpload !== 'false');
@@ -47,7 +52,11 @@ export const canUploadFilesOnMobile: (GlobalState) => boolean = createSelector(
 export const canDownloadFilesOnMobile: (GlobalState) => boolean = createSelector(
     getConfig,
     getLicense,
-    (config: Object, license: Object): boolean => {
+    (config: ?Config, license: License): boolean => {
+        if (!config) {
+            return false;
+        }
+
         // Defaults to true if the setting doesn't exist
         return license.IsLicensed === 'false' || license.Compliance === 'false' || config.EnableMobileFileDownload !== 'false';
     }
@@ -55,8 +64,8 @@ export const canDownloadFilesOnMobile: (GlobalState) => boolean = createSelector
 
 export const getAutolinkedUrlSchemes: (GlobalState) => string[] = createSelector(
     getConfig,
-    (config: Object): string[] => {
-        if (!config.CustomUrlSchemes) {
+    (config: ?Config): string[] => {
+        if (!config || !config.CustomUrlSchemes) {
             return General.DEFAULT_AUTOLINKED_URL_SCHEMES;
         }
 

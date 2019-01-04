@@ -42,14 +42,14 @@ function config(state = {}, action) {
         return action.data;
     }
     case AdminTypes.ENABLED_PLUGIN: {
-        const nextPluginSettings = {...state.PluginSettings};
+        const nextPluginSettings = {...(state | {}).PluginSettings};
         const nextPluginStates = {...nextPluginSettings.PluginStates};
         nextPluginStates[action.data] = {Enable: true};
         nextPluginSettings.PluginStates = nextPluginStates;
         return {...state, PluginSettings: nextPluginSettings};
     }
     case AdminTypes.DISABLED_PLUGIN: {
-        const nextPluginSettings = {...state.PluginSettings};
+        const nextPluginSettings = {...(state | {}).PluginSettings};
         const nextPluginStates = {...nextPluginSettings.PluginStates};
         nextPluginStates[action.data] = {Enable: false};
         nextPluginSettings.PluginStates = nextPluginStates;

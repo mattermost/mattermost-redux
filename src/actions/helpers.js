@@ -137,10 +137,10 @@ export class FormattedError extends Error {
     intl: {
       id: string,
       defaultMessage: string,
-      values: Object
+      values: {[string]: mixed}
     }
 
-    constructor(id: string, defaultMessage: string, values: Object = {}) {
+    constructor(id: string, defaultMessage: string, values: {[string]: mixed} = {}) {
         super(defaultMessage);
         this.intl = {
             id,

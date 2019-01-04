@@ -13,6 +13,7 @@ import {batchActions} from 'redux-batched-actions';
 
 import type {ActionFunc} from '../types/actions';
 import type {Job} from '../types/jobs';
+import type {Config} from '../types/general';
 
 export function getLogs(page: number = 0, perPage: number = General.LOGS_PAGE_SIZE_DEFAULT): ActionFunc {
     return bindClientFunc({
@@ -49,7 +50,7 @@ export function getConfig(): ActionFunc {
     });
 }
 
-export function updateConfig(config: Object): ActionFunc {
+export function updateConfig(config: ?Config): ActionFunc {
     return bindClientFunc({
         clientFunc: Client4.updateConfig,
         onRequest: AdminTypes.UPDATE_CONFIG_REQUEST,
@@ -79,7 +80,7 @@ export function getEnvironmentConfig(): ActionFunc {
     });
 }
 
-export function testEmail(config: Object): ActionFunc {
+export function testEmail(config: ?Config): ActionFunc {
     return bindClientFunc({
         clientFunc: Client4.testEmail,
         onRequest: AdminTypes.TEST_EMAIL_REQUEST,
@@ -91,7 +92,7 @@ export function testEmail(config: Object): ActionFunc {
     });
 }
 
-export function testS3Connection(config: Object): ActionFunc {
+export function testS3Connection(config: ?Config): ActionFunc {
     return bindClientFunc({
         clientFunc: Client4.testS3Connection,
         onRequest: AdminTypes.TEST_S3_REQUEST,
@@ -278,7 +279,7 @@ export function removeIdpSamlCertificate(): ActionFunc {
     });
 }
 
-export function testElasticsearch(config: Object): ActionFunc {
+export function testElasticsearch(config: ?Config): ActionFunc {
     return bindClientFunc({
         clientFunc: Client4.testElasticsearch,
         onRequest: AdminTypes.TEST_ELASTICSEARCH_REQUEST,

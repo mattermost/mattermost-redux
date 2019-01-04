@@ -8,11 +8,13 @@ const state: GlobalState = {
     entities: {
         general: {
             appState: false,
-            credentials: {},
-            config: {},
-            dataRetentionPolicy: {},
+            credentials: null,
+            config: null,
+            dataRetentionPolicy: null,
             deviceToken: '',
-            license: {},
+            license: {
+                IsLicensed: 'false',
+            },
             serverVersion: '',
             timezones: [],
         },
@@ -68,8 +70,8 @@ const state: GlobalState = {
         admin: {
             logs: [],
             audits: {},
-            config: {},
-            environmentConfig: {},
+            config: null,
+            environmentConfig: null,
             complianceReports: {},
         },
         jobs: {

@@ -69,7 +69,7 @@ let doDispatch;
 export function init(platform, siteUrl, token, optionalWebSocket, additionalOptions = {}) {
     return async (dispatch, getState) => {
         const config = getConfig(getState());
-        let connUrl = siteUrl || config.WebsocketURL || Client4.getUrl();
+        let connUrl = siteUrl || (config && config.WebsocketURL) || Client4.getUrl();
         const authToken = token || Client4.getToken();
 
         // Set the dispatch and getState globally
@@ -619,7 +619,7 @@ function handleChannelDeletedEvent(msg) {
         const currentChannelId = getCurrentChannelId(state);
         const currentTeamId = getCurrentTeamId(state);
         const config = getConfig(state);
-        const viewArchivedChannels = config.ExperimentalViewArchivedChannels === 'true';
+        const viewArchivedChannels = config && config.ExperimentalViewArchivedChannels === 'true';
 
         if (msg.broadcast.team_id === currentTeamId) {
             if (msg.data.channel_id === currentChannelId && !viewArchivedChannels) {
@@ -781,7 +781,7 @@ function handleUserTypingEvent(msg) {
                 type: WebsocketEvents.STOP_TYPING,
                 data,
             });
-        }, parseInt(config.TimeBetweenUserTypingUpdatesMilliseconds, 10));
+        }, parseInt(config && config.TimeBetweenUserTypingUpdatesMilliseconds, 10));
 
         if (!profiles[userId] && userId !== currentUserId) {
             dispatch(getProfilesByIds([userId]));
@@ -929,7 +929,7 @@ let lastTimeTypingSent = 0;
 export function userTyping(channelId, parentPostId) {
     return async (dispatch, getState) => {
         const state = getState();
-        const config = getConfig(state);
+        const config = getConfig(state) || {};
         const t = Date.now();
         const stats = getCurrentChannelStats(state);
         const membersInChannel = stats ? stats.member_count : 0;
