@@ -48,11 +48,9 @@ describe('Actions.Channels', () => {
         await store.dispatch(Actions.createChannel(TestHelper.fakeChannel(TestHelper.basicTeam.id), TestHelper.basicUser.id));
 
         const createRequest = store.getState().requests.channels.createChannel;
-        const membersRequest = store.getState().requests.channels.myMembers;
+
         if (createRequest.status === RequestStatus.FAILURE) {
             throw new Error(JSON.stringify(createRequest.error));
-        } else if (membersRequest.status === RequestStatus.FAILURE) {
-            throw new Error(JSON.stringify(membersRequest.error));
         }
 
         const {channels, myMembers} = store.getState().entities.channels;
@@ -269,11 +267,6 @@ describe('Actions.Channels', () => {
 
         await store.dispatch(Actions.getChannel(TestHelper.basicChannel.id));
 
-        const channelRequest = store.getState().requests.channels.getChannel;
-        if (channelRequest.status === RequestStatus.FAILURE) {
-            throw new Error(JSON.stringify(channelRequest.error));
-        }
-
         const {channels} = store.getState().entities.channels;
         assert.ok(channels[TestHelper.basicChannel.id]);
     });
@@ -284,11 +277,6 @@ describe('Actions.Channels', () => {
             reply(200, TestHelper.basicChannel);
 
         await store.dispatch(Actions.getChannelByNameAndTeamName(TestHelper.basicTeam.name, TestHelper.basicChannel.name));
-
-        const channelRequest = store.getState().requests.channels.getChannel;
-        if (channelRequest.status === RequestStatus.FAILURE) {
-            throw new Error(JSON.stringify(channelRequest.error));
-        }
 
         const {channels} = store.getState().entities.channels;
         assert.ok(channels[TestHelper.basicChannel.id]);
@@ -304,11 +292,6 @@ describe('Actions.Channels', () => {
             reply(200, TestHelper.basicChannelMember);
 
         await store.dispatch(Actions.getChannelAndMyMember(TestHelper.basicChannel.id));
-
-        const channelRequest = store.getState().requests.channels.getChannel;
-        if (channelRequest.status === RequestStatus.FAILURE) {
-            throw new Error(JSON.stringify(channelRequest.error));
-        }
 
         const {channels, myMembers} = store.getState().entities.channels;
         assert.ok(channels[TestHelper.basicChannel.id]);
@@ -344,14 +327,6 @@ describe('Actions.Channels', () => {
 
         await store.dispatch(Actions.fetchMyChannelsAndMembers(TestHelper.basicTeam.id));
 
-        const channelsRequest = store.getState().requests.channels.myChannels;
-        const membersRequest = store.getState().requests.channels.myMembers;
-        if (channelsRequest.status === RequestStatus.FAILURE) {
-            throw new Error(JSON.stringify(channelsRequest.error));
-        } else if (membersRequest.status === RequestStatus.FAILURE) {
-            throw new Error(JSON.stringify(membersRequest.error));
-        }
-
         const {channels, channelsInTeam, myMembers} = store.getState().entities.channels;
         assert.ok(channels);
         assert.ok(myMembers);
@@ -385,11 +360,6 @@ describe('Actions.Channels', () => {
             TestHelper.basicUser.id,
             TestHelper.basicChannel.id,
             notifyProps));
-
-        const updateRequest = store.getState().requests.channels.updateChannelNotifyProps;
-        if (updateRequest.status === RequestStatus.FAILURE) {
-            throw new Error(JSON.stringify(updateRequest.error));
-        }
 
         const members = store.getState().entities.channels.myMembers;
         const member = members[TestHelper.basicChannel.id];
@@ -491,11 +461,6 @@ describe('Actions.Channels', () => {
 
         await store.dispatch(Actions.deleteChannel(secondChannel.id));
 
-        const deleteRequest = store.getState().requests.channels.deleteChannel;
-        if (deleteRequest.status === RequestStatus.FAILURE) {
-            throw new Error(JSON.stringify(deleteRequest.error));
-        }
-
         const {incomingHooks, outgoingHooks} = store.getState().entities.integrations;
 
         assert.ifError(incomingHooks[incomingHook.id]);
@@ -532,11 +497,6 @@ describe('Actions.Channels', () => {
             reply(200, OK_RESPONSE);
 
         await store.dispatch(Actions.viewChannel(TestHelper.basicChannel.id, userChannel.id));
-
-        const updateRequest = store.getState().requests.channels.updateLastViewedAt;
-        if (updateRequest.status === RequestStatus.FAILURE) {
-            throw new Error(JSON.stringify(updateRequest.error));
-        }
     });
 
     it('markChannelAsViewed', async () => {
@@ -1288,11 +1248,6 @@ describe('Actions.Channels', () => {
 
         await store.dispatch(Actions.getChannelMembers(TestHelper.basicChannel.id));
 
-        const membersRequest = store.getState().requests.channels.members;
-        if (membersRequest.status === RequestStatus.FAILURE) {
-            throw new Error(JSON.stringify(membersRequest.error));
-        }
-
         const {membersInChannel} = store.getState().entities.channels;
 
         assert.ok(membersInChannel);
@@ -1306,11 +1261,6 @@ describe('Actions.Channels', () => {
             reply(200, TestHelper.basicChannelMember);
 
         await store.dispatch(Actions.getChannelMember(TestHelper.basicChannel.id, TestHelper.basicUser.id));
-
-        const membersRequest = store.getState().requests.channels.members;
-        if (membersRequest.status === RequestStatus.FAILURE) {
-            throw new Error(JSON.stringify(membersRequest.error));
-        }
 
         const {membersInChannel} = store.getState().entities.channels;
 
@@ -1326,11 +1276,6 @@ describe('Actions.Channels', () => {
 
         await store.dispatch(Actions.getMyChannelMember(TestHelper.basicChannel.id));
 
-        const membersRequest = store.getState().requests.channels.members;
-        if (membersRequest.status === RequestStatus.FAILURE) {
-            throw new Error(JSON.stringify(membersRequest.error));
-        }
-
         const {myMembers} = store.getState().entities.channels;
 
         assert.ok(myMembers);
@@ -1343,11 +1288,6 @@ describe('Actions.Channels', () => {
             reply(200, [TestHelper.basicChannelMember]);
 
         await store.dispatch(Actions.getChannelMembersByIds(TestHelper.basicChannel.id, [TestHelper.basicUser.id]));
-
-        const membersRequest = store.getState().requests.channels.members;
-        if (membersRequest.status === RequestStatus.FAILURE) {
-            throw new Error(JSON.stringify(membersRequest.error));
-        }
 
         const {membersInChannel} = store.getState().entities.channels;
 
@@ -1362,11 +1302,6 @@ describe('Actions.Channels', () => {
             reply(200, {channel_id: TestHelper.basicChannel.id, member_count: 1});
 
         await store.dispatch(Actions.getChannelStats(TestHelper.basicChannel.id));
-
-        const statsRequest = store.getState().requests.channels.getChannelStats;
-        if (statsRequest.status === RequestStatus.FAILURE) {
-            throw new Error(JSON.stringify(statsRequest.error));
-        }
 
         const {stats} = store.getState().entities.channels;
         const stat = stats[TestHelper.basicChannel.id];
@@ -1415,11 +1350,6 @@ describe('Actions.Channels', () => {
         await store.dispatch(Actions.addChannelMember(channelId, user.id));
 
         state = store.getState();
-
-        const addRequest = state.requests.channels.addChannelMember;
-        if (addRequest.status === RequestStatus.FAILURE) {
-            throw new Error(JSON.stringify(addRequest.error));
-        }
 
         const {profilesInChannel, profilesNotInChannel} = state.entities.users;
         const channel = profilesInChannel[channelId];
@@ -1484,11 +1414,6 @@ describe('Actions.Channels', () => {
 
         state = store.getState();
 
-        const removeRequest = state.requests.channels.removeChannelMember;
-        if (removeRequest.status === RequestStatus.FAILURE) {
-            throw new Error(JSON.stringify(removeRequest.error));
-        }
-
         const {profilesInChannel, profilesNotInChannel} = state.entities.users;
         const channel = profilesInChannel[channelId];
         const notChannel = profilesNotInChannel[channelId];
@@ -1529,12 +1454,7 @@ describe('Actions.Channels', () => {
             reply(200, {roles});
         await store.dispatch(Actions.updateChannelMemberRoles(TestHelper.basicChannel.id, user.id, roles));
 
-        const membersRequest = store.getState().requests.channels.updateChannelMember;
         const members = store.getState().entities.channels.membersInChannel;
-
-        if (membersRequest.status === RequestStatus.FAILURE) {
-            throw new Error(JSON.stringify(membersRequest.error));
-        }
 
         assert.ok(members[TestHelper.basicChannel.id]);
         assert.ok(members[TestHelper.basicChannel.id][user.id]);
@@ -1547,11 +1467,6 @@ describe('Actions.Channels', () => {
             reply(200, TestHelper.basicChannel);
 
         await store.dispatch(Actions.getChannel(TestHelper.basicChannel.id));
-
-        const channelRequest = store.getState().requests.channels.getChannel;
-        if (channelRequest.status === RequestStatus.FAILURE) {
-            throw new Error(JSON.stringify(channelRequest.error));
-        }
 
         const header = 'this is an updated test header';
 
@@ -1569,11 +1484,6 @@ describe('Actions.Channels', () => {
             reply(200, TestHelper.basicChannel);
 
         await store.dispatch(Actions.getChannel(TestHelper.basicChannel.id));
-
-        const channelRequest = store.getState().requests.channels.getChannel;
-        if (channelRequest.status === RequestStatus.FAILURE) {
-            throw new Error(JSON.stringify(channelRequest.error));
-        }
 
         const purpose = 'this is an updated test purpose';
         await store.dispatch(Actions.updateChannelPurpose(TestHelper.basicChannel.id, purpose));
@@ -1673,11 +1583,6 @@ describe('Actions.Channels', () => {
 
         await store.dispatch(Actions.joinChannel(TestHelper.basicUser.id, TestHelper.basicTeam.id, TestHelper.basicChannel.id));
 
-        const joinRequest = store.getState().requests.channels.joinChannel;
-        if (joinRequest.status === RequestStatus.FAILURE) {
-            throw new Error(JSON.stringify(joinRequest.error));
-        }
-
         const {channels, myMembers} = store.getState().entities.channels;
         assert.ok(channels[TestHelper.basicChannel.id]);
         assert.ok(myMembers[TestHelper.basicChannel.id]);
@@ -1725,11 +1630,6 @@ describe('Actions.Channels', () => {
             null,
             secondChannel.name
         ));
-
-        const joinRequest = store.getState().requests.channels.joinChannel;
-        if (joinRequest.status === RequestStatus.FAILURE) {
-            throw new Error(JSON.stringify(joinRequest.error));
-        }
 
         const {channels, myMembers} = store.getState().entities.channels;
         assert.ok(channels[secondChannel.id]);
@@ -1831,13 +1731,6 @@ describe('Actions.Channels', () => {
             reply(200, OK_RESPONSE);
 
         await store.dispatch(Actions.updateChannelScheme(id, schemeId));
-
-        const request = store.getState().requests.channels.updateChannelScheme;
-
-        if (request.status === RequestStatus.FAILURE) {
-            throw new Error(JSON.stringify(request.error));
-        }
-
         const updated = store.getState().entities.channels.channels[id];
         assert.ok(updated);
         assert.equal(updated.scheme_id, schemeId);
@@ -1855,12 +1748,6 @@ describe('Actions.Channels', () => {
 
         await store.dispatch(Actions.createChannel(TestHelper.fakeChannel(TestHelper.basicTeam.id), userId));
 
-        const createRequest = store.getState().requests.channels.createChannel;
-
-        if (createRequest.status === RequestStatus.FAILURE) {
-            throw new Error(JSON.stringify(createRequest.error));
-        }
-
         const {channels} = store.getState().entities.channels;
         const channelId = channels[Object.keys(channels)[0]].id;
 
@@ -1869,11 +1756,6 @@ describe('Actions.Channels', () => {
             reply(200, OK_RESPONSE);
 
         await store.dispatch(Actions.updateChannelMemberSchemeRoles(channelId, userId, true, true));
-        const request = store.getState().requests.channels.updateChannelMemberSchemeRoles;
-        if (request.status === RequestStatus.FAILURE) {
-            throw new Error(JSON.stringify(request.error));
-        }
-
         const update1 = store.getState().entities.channels.membersInChannel[channelId][userId];
         assert.ok(update1);
         assert.equal(update1.scheme_admin, true);
@@ -1884,10 +1766,6 @@ describe('Actions.Channels', () => {
             reply(200, OK_RESPONSE);
 
         await store.dispatch(Actions.updateChannelMemberSchemeRoles(channelId, userId, false, false));
-        const request2 = store.getState().requests.channels.updateChannelMemberSchemeRoles;
-        if (request2.status === RequestStatus.FAILURE) {
-            throw new Error(JSON.stringify(request2.error));
-        }
 
         const update2 = store.getState().entities.channels.membersInChannel[channelId][userId];
         assert.ok(update2);
@@ -1929,15 +1807,10 @@ describe('Actions.Channels', () => {
         nock(Client4.getChannelsRoute()).
             get(`/${TestHelper.basicChannel.id}/timezones`).
             query(true).
-            reply(200, [response]);
+            reply(200, response);
 
-        await Actions.getChannelTimezones(channelId)(dispatch, getState);
+        const {data} = await Actions.getChannelTimezones(channelId)(dispatch, getState);
 
-        const getChannelTimezones = getState().requests.channels.getChannelTimezones;
-        if (getChannelTimezones.status === RequestStatus.FAILURE) {
-            throw new Error(JSON.stringify(getChannelTimezones.error));
-        }
-
-        assert(getChannelTimezones.status === RequestStatus.SUCCESS);
+        assert.deepEqual(response, data);
     });
 });

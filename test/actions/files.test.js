@@ -90,12 +90,7 @@ describe('Actions.Files', () => {
 
         await Actions.getFilesForPost(postForFile.id)(store.dispatch, store.getState);
 
-        const filesRequest = store.getState().requests.files.getFilesForPost;
         const {files: allFiles, fileIdsByPostId} = store.getState().entities.files;
-
-        if (filesRequest.status === RequestStatus.FAILURE) {
-            throw new Error(JSON.stringify(filesRequest.error));
-        }
 
         assert.ok(allFiles);
         assert.ok(allFiles[fileId]);
@@ -141,12 +136,7 @@ describe('Actions.Files', () => {
 
         await Actions.getMissingFilesForPost(postForFile.id)(store.dispatch, store.getState);
 
-        const filesRequest = store.getState().requests.files.getFilesForPost;
         const {files: allFiles, fileIdsByPostId} = store.getState().entities.files;
-
-        if (filesRequest.status === RequestStatus.FAILURE) {
-            throw new Error(JSON.stringify(filesRequest.error));
-        }
 
         assert.ok(allFiles);
         assert.ok(allFiles[fileId]);
@@ -178,11 +168,6 @@ describe('Actions.Files', () => {
         await Actions.getFilePublicLink(fileId)(store.dispatch, store.getState);
 
         const state = store.getState();
-        const request = state.requests.files.getFilePublicLink;
-        if (request.status === RequestStatus.FAILURE) {
-            console.log(JSON.stringify(request));
-            throw new Error('getFilePublicLink request failed');
-        }
 
         const filePublicLink = state.entities.files.filePublicLink.link;
         assert.equal('https://mattermost.com/files/ndans23ry2rtjd1z73g6i5f3fc/public?h=rE1-b2N1VVVMsAQssjwlfNawbVOwUy1TRDuTeGC_tys', filePublicLink);

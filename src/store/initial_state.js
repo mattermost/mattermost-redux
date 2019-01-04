@@ -125,23 +125,7 @@ const state: GlobalState = {
     errors: [],
     requests: {
         channels: {
-            getChannel: {
-                status: 'not_started',
-                error: null,
-            },
             getChannels: {
-                status: 'not_started',
-                error: null,
-            },
-            myMembers: {
-                status: 'not_started',
-                error: null,
-            },
-            getChannelTimezones: {
-                status: 'not_started',
-                error: null,
-            },
-            members: {
                 status: 'not_started',
                 error: null,
             },
@@ -154,46 +138,6 @@ const state: GlobalState = {
                 error: null,
             },
             updateChannel: {
-                status: 'not_started',
-                error: null,
-            },
-            updateChannelNotifyProps: {
-                status: 'not_started',
-                error: null,
-            },
-            joinChannel: {
-                status: 'not_started',
-                error: null,
-            },
-            deleteChannel: {
-                status: 'not_started',
-                error: null,
-            },
-            updateLastViewedAt: {
-                status: 'not_started',
-                error: null,
-            },
-            getChannelStats: {
-                status: 'not_started',
-                error: null,
-            },
-            addChannelMember: {
-                status: 'not_started',
-                error: null,
-            },
-            removeChannelMember: {
-                status: 'not_started',
-                error: null,
-            },
-            updateChannelMember: {
-                status: 'not_started',
-                error: null,
-            },
-            updateChannelScheme: {
-                status: 'not_started',
-                error: null,
-            },
-            updateChannelMemberSchemeRoles: {
                 status: 'not_started',
                 error: null,
             },
@@ -233,44 +177,7 @@ const state: GlobalState = {
                 status: 'not_started',
                 error: null,
             },
-            deletePost: {
-                status: 'not_started',
-                error: null,
-            },
             getPostThread: {
-                status: 'not_started',
-                error: null,
-            },
-            getPostThreadRetryAttempts: 0,
-            getPosts: {
-                status: 'not_started',
-                error: null,
-            },
-            getPostsRetryAttempts: 0,
-            getPostsSince: {
-                status: 'not_started',
-                error: null,
-            },
-            getPostsSinceRetryAttempts: 0,
-            getPostsBefore: {
-                status: 'not_started',
-                error: null,
-            },
-            getPostsBeforeRetryAttempts: 0,
-            getPostsAfter: {
-                status: 'not_started',
-                error: null,
-            },
-            getPostsAfterRetryAttempts: 0,
-            doPostAction: {
-                status: 'not_started',
-                error: null,
-            },
-            openGraph: {
-                status: 'not_started',
-                error: null,
-            },
-            reaction: {
                 status: 'not_started',
                 error: null,
             },
@@ -284,75 +191,7 @@ const state: GlobalState = {
                 status: 'not_started',
                 error: null,
             },
-            createTeam: {
-                status: 'not_started',
-                error: null,
-            },
-            updateTeam: {
-                status: 'not_started',
-                error: null,
-            },
-            patchTeam: {
-                status: 'not_started',
-                error: null,
-            },
-            getMyTeamMembers: {
-                status: 'not_started',
-                error: null,
-            },
-            getTeamMembers: {
-                status: 'not_started',
-                error: null,
-            },
-            getTeamStats: {
-                status: 'not_started',
-                error: null,
-            },
-            addUserToTeam: {
-                status: 'not_started',
-                error: null,
-            },
-            removeUserFromTeam: {
-                status: 'not_started',
-                error: null,
-            },
-            updateTeamScheme: {
-                status: 'not_started',
-                error: null,
-            },
-            deleteTeam: {
-                status: 'not_started',
-                error: null,
-            },
-            emailInvite: {
-                status: 'not_started',
-                error: null,
-            },
-            getMyTeamUnreads: {
-                status: 'not_started',
-                error: null,
-            },
-            getTeam: {
-                status: 'not_started',
-                error: null,
-            },
             joinTeam: {
-                status: 'not_started',
-                error: null,
-            },
-            removeTeamIcon: {
-                status: 'not_started',
-                error: null,
-            },
-            setTeamIcon: {
-                status: 'not_started',
-                error: null,
-            },
-            updateTeamMember: {
-                status: 'not_started',
-                error: null,
-            },
-            updateTeamMemberSchemeRoles: {
                 status: 'not_started',
                 error: null,
             },
@@ -370,139 +209,11 @@ const state: GlobalState = {
                 status: 'not_started',
                 error: null,
             },
-            create: {
-                status: 'not_started',
-                error: null,
-            },
-            getProfiles: {
-                status: 'not_started',
-                error: null,
-            },
-            getProfilesInTeam: {
-                status: 'not_started',
-                error: null,
-            },
-            getProfilesInChannel: {
-                status: 'not_started',
-                error: null,
-            },
-            getProfilesNotInChannel: {
-                status: 'not_started',
-                error: null,
-            },
-            getUser: {
-                status: 'not_started',
-                error: null,
-            },
-            getUserByUsername: {
-                status: 'not_started',
-                error: null,
-            },
-            getStatusesByIds: {
-                status: 'not_started',
-                error: null,
-            },
-            getSessions: {
-                status: 'not_started',
-                error: null,
-            },
-            getTermsOfService: {
-                status: 'not_started',
-                error: null,
-            },
-            createTermsOfService: {
-                status: 'not_started',
-                error: null,
-            },
-            getMyTermsOfServiceStatus: {
-                status: 'not_started',
-                error: null,
-            },
-            updateMyTermsOfServiceStatus: {
-                status: 'not_started',
-                error: null,
-            },
-            revokeSession: {
-                status: 'not_started',
-                error: null,
-            },
-            getAudits: {
-                status: 'not_started',
-                error: null,
-            },
             autocompleteUsers: {
                 status: 'not_started',
                 error: null,
             },
-            searchProfiles: {
-                status: 'not_started',
-                error: null,
-            },
             updateMe: {
-                status: 'not_started',
-                error: null,
-            },
-            getTotalUsersStats: {
-                status: 'not_started',
-                error: null,
-            },
-            createUserAccessToken: {
-                status: 'not_started',
-                error: null,
-            },
-            disableUserAccessToken: {
-                status: 'not_started',
-                error: null,
-            },
-            enableUserAccessToken: {
-                status: 'not_started',
-                error: null,
-            },
-            generateMfaSecret: {
-                status: 'not_started',
-                error: null,
-            },
-            getProfilesNotInTeam: {
-                status: 'not_started',
-                error: null,
-            },
-            getProfilesWithoutTeam: {
-                status: 'not_started',
-                error: null,
-            },
-            getStatus: {
-                status: 'not_started',
-                error: null,
-            },
-            getUserAccessToken: {
-                status: 'not_started',
-                error: null,
-            },
-            passwordReset: {
-                status: 'not_started',
-                error: null,
-            },
-            revokeAllSessionsForUser: {
-                status: 'not_started',
-                error: null,
-            },
-            revokeUserAccessToken: {
-                status: 'not_started',
-                error: null,
-            },
-            setStatus: {
-                status: 'not_started',
-                error: null,
-            },
-            switchLogin: {
-                status: 'not_started',
-                error: null,
-            },
-            updateUser: {
-                status: 'not_started',
-                error: null,
-            },
-            verifyEmail: {
                 status: 'not_started',
                 error: null,
             },
@@ -663,38 +374,8 @@ const state: GlobalState = {
                 error: null,
             },
         },
-        emojis: {
-            createCustomEmoji: {
-                status: 'not_started',
-                error: null,
-            },
-            getCustomEmojis: {
-                status: 'not_started',
-                error: null,
-            },
-            deleteCustomEmoji: {
-                status: 'not_started',
-                error: null,
-            },
-            getAllCustomEmojis: {
-                status: 'not_started',
-                error: null,
-            },
-            getCustomEmoji: {
-                status: 'not_started',
-                error: null,
-            },
-        },
         files: {
-            getFilesForPost: {
-                status: 'not_started',
-                error: null,
-            },
             uploadFiles: {
-                status: 'not_started',
-                error: null,
-            },
-            getFilePublicLink: {
                 status: 'not_started',
                 error: null,
             },

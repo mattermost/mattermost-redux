@@ -6,20 +6,10 @@ import {combineReducers} from 'redux';
 import {FileTypes} from 'action_types';
 import {RequestStatus} from 'constants';
 
-import {handleRequest, initialRequestState} from './helpers';
+import {initialRequestState} from './helpers';
 
 import type {GenericAction} from '../../types/actions';
 import type {FilesRequestsStatuses, RequestStatusType} from '../../types/requests';
-
-function getFilesForPost(state: RequestStatusType = initialRequestState(), action: GenericAction): RequestStatusType {
-    return handleRequest(
-        FileTypes.FETCH_FILES_FOR_POST_REQUEST,
-        FileTypes.FETCH_FILES_FOR_POST_SUCCESS,
-        FileTypes.FETCH_FILES_FOR_POST_FAILURE,
-        state,
-        action
-    );
-}
 
 export function handleUploadFilesRequest(
     REQUEST: string,
@@ -65,16 +55,6 @@ export function handleUploadFilesRequest(
     }
 }
 
-function getFilePublicLink(state: RequestStatusType = initialRequestState(), action: GenericAction): RequestStatusType {
-    return handleRequest(
-        FileTypes.GET_FILE_PUBLIC_LINK_REQUEST,
-        FileTypes.GET_FILE_PUBLIC_LINK_SUCCESS,
-        FileTypes.GET_FILE_PUBLIC_LINK_FAILURE,
-        state,
-        action
-    );
-}
-
 function uploadFiles(state: RequestStatusType = initialRequestState(), action: GenericAction): RequestStatusType {
     return handleUploadFilesRequest(
         FileTypes.UPLOAD_FILES_REQUEST,
@@ -87,7 +67,5 @@ function uploadFiles(state: RequestStatusType = initialRequestState(), action: G
 }
 
 export default (combineReducers({
-    getFilesForPost,
-    getFilePublicLink,
     uploadFiles,
 }): (FilesRequestsStatuses, GenericAction) => FilesRequestsStatuses);

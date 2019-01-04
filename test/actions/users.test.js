@@ -36,12 +36,7 @@ describe('Actions.Users', () => {
         const {data: user} = await Actions.createUser(userToCreate)(store.dispatch, store.getState);
 
         const state = store.getState();
-        const createRequest = state.requests.users.create;
         const {profiles} = state.entities.users;
-
-        if (createRequest.status === RequestStatus.FAILURE) {
-            throw new Error(JSON.stringify(createRequest.error));
-        }
 
         assert.ok(profiles);
         assert.ok(profiles[user.id]);
@@ -95,14 +90,9 @@ describe('Actions.Users', () => {
         await Actions.loginById(user.id, 'password1')(store.dispatch, store.getState);
 
         const state = store.getState();
-        const loginRequest = state.requests.users.login;
         const {currentUserId, profiles} = state.entities.users;
         const preferences = state.entities.preferences.myPreferences;
         const teamMembers = state.entities.teams.myMembers;
-
-        if (loginRequest.status === RequestStatus.FAILURE) {
-            throw new Error(JSON.stringify(loginRequest.error));
-        }
 
         assert.ok(currentUserId);
         assert.ok(profiles);
@@ -122,22 +112,19 @@ describe('Actions.Users', () => {
         }
 
         const response = {
-            create_at: 1537880148600,
-            id: '123',
-            text: '#### Nisi hoc aquarum litor/n/net modo freta mallet agunt? Et ignarus!',
-            user_id: 'abcd',
+            create_at: 1537976679426,
+            id: '1234',
+            text: 'Terms of Service',
+            user_id: '1',
         };
 
         nock(Client4.getBaseRoute()).
             get('/terms_of_service').
             reply(200, response);
 
-        await Actions.getTermsOfService()(store.dispatch, store.getState);
+        const {data} = await Actions.getTermsOfService()(store.dispatch, store.getState);
 
-        const request = store.getState().requests.users.getTermsOfService;
-        if (request.status === RequestStatus.FAILURE) {
-            throw new Error(JSON.stringify(request.error));
-        }
+        assert.deepEqual(data, response);
     });
 
     it('getMyTermsOfServiceStatus', async () => {
@@ -152,11 +139,6 @@ describe('Actions.Users', () => {
             reply(200, response);
 
         await Actions.getMyTermsOfServiceStatus()(store.dispatch, store.getState);
-
-        const request = store.getState().requests.users.getMyTermsOfServiceStatus;
-        if (request.status === RequestStatus.FAILURE) {
-            throw new Error(JSON.stringify(request.error));
-        }
 
         const {myAcceptedTermsOfServiceData} = store.getState().entities.users;
 
@@ -181,12 +163,6 @@ describe('Actions.Users', () => {
 
         await Actions.updateMyTermsOfServiceStatus(1, true)(store.dispatch, store.getState);
 
-        const request = store.getState().requests.users.updateMyTermsOfServiceStatus;
-
-        if (request.status === RequestStatus.FAILURE) {
-            throw new Error(JSON.stringify(request.error));
-        }
-
         const {currentUserId, myAcceptedTermsOfServiceData} = store.getState().entities.users;
 
         assert.ok(currentUserId);
@@ -209,12 +185,6 @@ describe('Actions.Users', () => {
             reply(200, OK_RESPONSE);
 
         await Actions.updateMyTermsOfServiceStatus(1, false)(store.dispatch, store.getState);
-
-        const request = store.getState().requests.users.updateMyTermsOfServiceStatus;
-
-        if (request.status === RequestStatus.FAILURE) {
-            throw new Error(JSON.stringify(request.error));
-        }
 
         const {currentUserId, myAcceptedTermsOfServiceId} = store.getState().entities.users;
 
@@ -281,13 +251,7 @@ describe('Actions.Users', () => {
             reply(200, [TestHelper.basicUser]);
 
         await Actions.getProfiles(0)(store.dispatch, store.getState);
-
-        const profilesRequest = store.getState().requests.users.getProfiles;
         const {profiles} = store.getState().entities.users;
-
-        if (profilesRequest.status === RequestStatus.FAILURE) {
-            throw new Error(JSON.stringify(profilesRequest.error));
-        }
 
         assert.ok(Object.keys(profiles).length);
     });
@@ -304,13 +268,7 @@ describe('Actions.Users', () => {
             reply(200, [user]);
 
         await Actions.getProfilesByIds([user.id])(store.dispatch, store.getState);
-
-        const profilesRequest = store.getState().requests.users.getProfiles;
         const {profiles} = store.getState().entities.users;
-
-        if (profilesRequest.status === RequestStatus.FAILURE) {
-            throw new Error(JSON.stringify(profilesRequest.error));
-        }
 
         assert.ok(profiles[user.id]);
     });
@@ -327,8 +285,8 @@ describe('Actions.Users', () => {
             reply(200, [user]);
 
         await Actions.getMissingProfilesByIds([user.id])(store.dispatch, store.getState);
-
         const {profiles} = store.getState().entities.users;
+
         assert.ok(profiles[user.id]);
     });
 
@@ -344,13 +302,7 @@ describe('Actions.Users', () => {
             reply(200, [user]);
 
         await Actions.getProfilesByUsernames([user.username])(store.dispatch, store.getState);
-
-        const profilesRequest = store.getState().requests.users.getProfiles;
         const {profiles} = store.getState().entities.users;
-
-        if (profilesRequest.status === RequestStatus.FAILURE) {
-            throw new Error(JSON.stringify(profilesRequest.error));
-        }
 
         assert.ok(profiles[user.id]);
     });
@@ -363,14 +315,9 @@ describe('Actions.Users', () => {
 
         await Actions.getProfilesInTeam(TestHelper.basicTeam.id, 0)(store.dispatch, store.getState);
 
-        const profilesRequest = store.getState().requests.users.getProfilesInTeam;
         const {profilesInTeam, profiles} = store.getState().entities.users;
-
-        if (profilesRequest.status === RequestStatus.FAILURE) {
-            throw new Error(JSON.stringify(profilesRequest.error));
-        }
-
         const team = profilesInTeam[TestHelper.basicTeam.id];
+
         assert.ok(team);
         assert.ok(team.has(TestHelper.basicUser.id));
         assert.equal(Object.keys(profiles).length, team.size, 'profiles != profiles in team');
@@ -392,14 +339,9 @@ describe('Actions.Users', () => {
 
         await Actions.getProfilesNotInTeam(team.id, 0)(store.dispatch, store.getState);
 
-        const profilesRequest = store.getState().requests.users.getProfilesNotInTeam;
         const {profilesNotInTeam} = store.getState().entities.users;
-
-        if (profilesRequest.status === RequestStatus.FAILURE) {
-            throw new Error(JSON.stringify(profilesRequest.error));
-        }
-
         const notInTeam = profilesNotInTeam[team.id];
+
         assert.ok(notInTeam);
         assert.ok(notInTeam.size > 0);
     });
@@ -417,13 +359,7 @@ describe('Actions.Users', () => {
             reply(200, [user]);
 
         await Actions.getProfilesWithoutTeam(0)(store.dispatch, store.getState);
-
-        const profilesRequest = store.getState().requests.users.getProfilesWithoutTeam;
         const {profilesWithoutTeam, profiles} = store.getState().entities.users;
-
-        if (profilesRequest.status === RequestStatus.FAILURE) {
-            throw new Error(JSON.stringify(profilesRequest.error));
-        }
 
         assert.ok(profilesWithoutTeam);
         assert.ok(profilesWithoutTeam.size > 0);
@@ -442,12 +378,7 @@ describe('Actions.Users', () => {
             0
         )(store.dispatch, store.getState);
 
-        const profilesRequest = store.getState().requests.users.getProfilesInChannel;
         const {profiles, profilesInChannel} = store.getState().entities.users;
-
-        if (profilesRequest.status === RequestStatus.FAILURE) {
-            throw new Error(JSON.stringify(profilesRequest.error));
-        }
 
         const channel = profilesInChannel[TestHelper.basicChannel.id];
         assert.ok(channel.has(TestHelper.basicUser.id));
@@ -478,12 +409,7 @@ describe('Actions.Users', () => {
             0
         )(store.dispatch, store.getState);
 
-        const profilesRequest = store.getState().requests.users.getProfilesNotInChannel;
         const {profiles, profilesNotInChannel} = store.getState().entities.users;
-
-        if (profilesRequest.status === RequestStatus.FAILURE) {
-            throw new Error(JSON.stringify(profilesRequest.error));
-        }
 
         const channel = profilesNotInChannel[TestHelper.basicChannel.id];
         assert.ok(channel.has(user.id));
@@ -506,12 +432,7 @@ describe('Actions.Users', () => {
         )(store.dispatch, store.getState);
 
         const state = store.getState();
-        const profileRequest = state.requests.users.getUser;
         const {profiles} = state.entities.users;
-
-        if (profileRequest.status === RequestStatus.FAILURE) {
-            throw new Error(JSON.stringify(profileRequest.error));
-        }
 
         assert.ok(profiles[user.id]);
         assert.equal(profiles[user.id].id, user.id);
@@ -525,12 +446,7 @@ describe('Actions.Users', () => {
         await Actions.getMe()(store.dispatch, store.getState);
 
         const state = store.getState();
-        const profileRequest = state.requests.users.getUser;
         const {profiles, currentUserId} = state.entities.users;
-
-        if (profileRequest.status === RequestStatus.FAILURE) {
-            throw new Error(JSON.stringify(profileRequest.error));
-        }
 
         assert.ok(profiles[currentUserId]);
         assert.equal(profiles[currentUserId].id, currentUserId);
@@ -552,12 +468,7 @@ describe('Actions.Users', () => {
         )(store.dispatch, store.getState);
 
         const state = store.getState();
-        const profileRequest = state.requests.users.getUserByUsername;
         const {profiles} = state.entities.users;
-
-        if (profileRequest.status === RequestStatus.FAILURE) {
-            throw new Error(JSON.stringify(profileRequest.error));
-        }
 
         assert.ok(profiles[user.id]);
         assert.equal(profiles[user.id].username, user.username);
@@ -579,12 +490,7 @@ describe('Actions.Users', () => {
         )(store.dispatch, store.getState);
 
         const state = store.getState();
-        const profileRequest = state.requests.users.getUser;
         const {profiles} = state.entities.users;
-
-        if (profileRequest.status === RequestStatus.FAILURE) {
-            throw new Error(JSON.stringify(profileRequest.error));
-        }
 
         assert.ok(profiles[user.id]);
         assert.equal(profiles[user.id].email, user.email);
@@ -602,12 +508,7 @@ describe('Actions.Users', () => {
         )(store.dispatch, store.getState);
 
         const state = store.getState();
-        const searchRequest = state.requests.users.searchProfiles;
         const {profiles} = state.entities.users;
-
-        if (searchRequest.status === RequestStatus.FAILURE) {
-            throw new Error(JSON.stringify(searchRequest.error));
-        }
 
         assert.ok(profiles[user.id]);
         assert.equal(profiles[user.id].id, user.id);
@@ -622,12 +523,7 @@ describe('Actions.Users', () => {
             [TestHelper.basicUser.id]
         )(store.dispatch, store.getState);
 
-        const statusesRequest = store.getState().requests.users.getStatusesByIds;
         const statuses = store.getState().entities.users.statuses;
-
-        if (statusesRequest.status === RequestStatus.FAILURE) {
-            throw new Error(JSON.stringify(statusesRequest.error));
-        }
 
         assert.ok(statuses[TestHelper.basicUser.id]);
         assert.equal(Object.keys(statuses).length, 1);
@@ -640,11 +536,6 @@ describe('Actions.Users', () => {
         await Actions.getTotalUsersStats()(store.dispatch, store.getState);
 
         const {stats} = store.getState().entities.users;
-        const statsRequest = store.getState().requests.users.getTotalUsersStats;
-
-        if (statsRequest.status === RequestStatus.FAILURE) {
-            throw new Error(JSON.stringify(statsRequest.error));
-        }
 
         assert.equal(stats.total_users_count, 2605);
     });
@@ -660,13 +551,7 @@ describe('Actions.Users', () => {
             user.id
         )(store.dispatch, store.getState);
 
-        const statusRequest = store.getState().requests.users.getStatus;
         const statuses = store.getState().entities.users.statuses;
-
-        if (statusRequest.status === RequestStatus.FAILURE) {
-            throw new Error(JSON.stringify(statusRequest.error));
-        }
-
         assert.ok(statuses[user.id]);
     });
 
@@ -679,13 +564,7 @@ describe('Actions.Users', () => {
             {user_id: TestHelper.basicUser.id, status: 'away'}
         )(store.dispatch, store.getState);
 
-        const statusRequest = store.getState().requests.users.setStatus;
         const statuses = store.getState().entities.users.statuses;
-
-        if (statusRequest.status === RequestStatus.FAILURE) {
-            throw new Error(JSON.stringify(statusRequest.error));
-        }
-
         assert.ok(statuses[TestHelper.basicUser.id] === 'away');
     });
 
@@ -696,12 +575,7 @@ describe('Actions.Users', () => {
 
         await Actions.getSessions(TestHelper.basicUser.id)(store.dispatch, store.getState);
 
-        const sessionsRequest = store.getState().requests.users.getSessions;
         const sessions = store.getState().entities.users.mySessions;
-
-        if (sessionsRequest.status === RequestStatus.FAILURE) {
-            throw new Error(JSON.stringify(sessionsRequest.error));
-        }
 
         assert.ok(sessions.length);
         assert.equal(sessions[0].user_id, TestHelper.basicUser.id);
@@ -714,11 +588,7 @@ describe('Actions.Users', () => {
 
         await Actions.getSessions(TestHelper.basicUser.id)(store.dispatch, store.getState);
 
-        const sessionsRequest = store.getState().requests.users.getSessions;
         let sessions = store.getState().entities.users.mySessions;
-        if (sessionsRequest.status === RequestStatus.FAILURE) {
-            throw new Error(JSON.stringify(sessionsRequest.error));
-        }
 
         const sessionsLength = sessions.length;
 
@@ -726,11 +596,6 @@ describe('Actions.Users', () => {
             post(`/users/${TestHelper.basicUser.id}/sessions/revoke`).
             reply(200, OK_RESPONSE);
         await Actions.revokeSession(TestHelper.basicUser.id, sessions[0].id)(store.dispatch, store.getState);
-
-        const revokeRequest = store.getState().requests.users.revokeSession;
-        if (revokeRequest.status === RequestStatus.FAILURE) {
-            throw new Error(JSON.stringify(revokeRequest.error));
-        }
 
         sessions = store.getState().entities.users.mySessions;
         assert.ok(sessions.length === sessionsLength - 1);
@@ -749,23 +614,14 @@ describe('Actions.Users', () => {
 
         await Actions.getSessions(TestHelper.basicUser.id)(store.dispatch, store.getState);
 
-        const sessionsRequest = store.getState().requests.users.getSessions;
         const sessions = store.getState().entities.users.mySessions;
-
-        if (sessionsRequest.status === RequestStatus.FAILURE) {
-            throw new Error(JSON.stringify(sessionsRequest.error));
-        }
 
         nock(Client4.getBaseRoute()).
             post(`/users/${TestHelper.basicUser.id}/sessions/revoke`).
             reply(200, OK_RESPONSE);
 
-        await Actions.revokeSession(TestHelper.basicUser.id, sessions[0].id)(store.dispatch, store.getState);
-
-        const revokeRequest = store.getState().requests.users.revokeSession;
-        if (revokeRequest.status === RequestStatus.FAILURE) {
-            throw new Error(JSON.stringify(revokeRequest.error));
-        }
+        const {data: revokeSessionResponse} = await Actions.revokeSession(TestHelper.basicUser.id, sessions[0].id)(store.dispatch, store.getState);
+        assert.deepEqual(revokeSessionResponse, true);
 
         nock(Client4.getUsersRoute()).
             get('').
@@ -773,15 +629,12 @@ describe('Actions.Users', () => {
 
         await Actions.getProfiles(0)(store.dispatch, store.getState);
 
-        const logoutRequest = store.getState().requests.users.logout;
-        if (logoutRequest.status === RequestStatus.FAILURE) {
-            throw new Error(JSON.stringify(logoutRequest.error));
-        }
-
+        const basicUser = TestHelper.basicUser;
         nock(Client4.getUsersRoute()).
             post('/login').
-            reply(200, TestHelper.basicUser);
-        await TestHelper.basicClient4.login(TestHelper.basicUser.email, 'password1');
+            reply(200, basicUser);
+        const response = await TestHelper.basicClient4.login(TestHelper.basicUser.email, 'password1');
+        assert.deepEqual(response.email, basicUser.email);
     });
 
     it('revokeAllSessionsForCurrentUser', async () => {
@@ -807,24 +660,14 @@ describe('Actions.Users', () => {
             reply(200, [{id: TestHelper.generateId(), create_at: 1507756921338, expires_at: 1510348921338, last_activity_at: 1507821125630, user_id: TestHelper.basicUser.id, device_id: '', roles: 'system_admin system_user'}, {id: TestHelper.generateId(), create_at: 1507756921338, expires_at: 1510348921338, last_activity_at: 1507821125630, user_id: TestHelper.basicUser.id, device_id: '', roles: 'system_admin system_user'}]);
         await Actions.getSessions(user.id)(store.dispatch, store.getState);
 
-        const sessionsRequest = store.getState().requests.users.getSessions;
-
-        if (sessionsRequest.status === RequestStatus.FAILURE) {
-            throw new Error(JSON.stringify(sessionsRequest.error));
-        }
-
         sessions = store.getState().entities.users.mySessions;
         assert.ok(sessions.length > 1);
 
         nock(Client4.getBaseRoute()).
             post(`/users/${user.id}/sessions/revoke/all`).
             reply(200, OK_RESPONSE);
-        await Actions.revokeAllSessionsForUser(user.id)(store.dispatch, store.getState);
-
-        const revokeRequest = store.getState().requests.users.revokeAllSessionsForUser;
-        if (revokeRequest.status === RequestStatus.FAILURE) {
-            throw new Error(JSON.stringify(revokeRequest.error));
-        }
+        const {data} = await Actions.revokeAllSessionsForUser(user.id)(store.dispatch, store.getState);
+        assert.deepEqual(data, true);
 
         nock(Client4.getUsersRoute()).
             get('').
@@ -855,12 +698,7 @@ describe('Actions.Users', () => {
 
         await Actions.getUserAudits(TestHelper.basicUser.id)(store.dispatch, store.getState);
 
-        const auditsRequest = store.getState().requests.users.getAudits;
         const audits = store.getState().entities.users.myAudits;
-
-        if (auditsRequest.status === RequestStatus.FAILURE) {
-            throw new Error(JSON.stringify(auditsRequest.error));
-        }
 
         assert.ok(audits.length);
         assert.equal(audits[0].user_id, TestHelper.basicUser.id);
@@ -988,13 +826,8 @@ describe('Actions.Users', () => {
             },
         })(store.dispatch, store.getState);
 
-        const updateRequest = store.getState().requests.users.updateUser;
         const {profiles} = store.getState().entities.users;
         const updateNotifyProps = profiles[currentUserId].notify_props;
-
-        if (updateRequest.status === RequestStatus.FAILURE) {
-            throw new Error(JSON.stringify(updateRequest.error));
-        }
 
         assert.equal(updateNotifyProps.comments, 'any');
         assert.equal(updateNotifyProps.email, 'false');
@@ -1014,13 +847,8 @@ describe('Actions.Users', () => {
 
         await Actions.updateUserRoles(currentUserId, 'system_user system_admin')(store.dispatch, store.getState);
 
-        const updateRequest = store.getState().requests.users.updateUser;
         const {profiles} = store.getState().entities.users;
         const currentUserRoles = profiles[currentUserId].roles;
-
-        if (updateRequest.status === RequestStatus.FAILURE) {
-            throw new Error(JSON.stringify(updateRequest.error));
-        }
 
         assert.equal(currentUserRoles, 'system_user system_admin');
     });
@@ -1042,13 +870,8 @@ describe('Actions.Users', () => {
 
         await Actions.updateUserMfa(currentUserId, false, '')(store.dispatch, store.getState);
 
-        const updateRequest = store.getState().requests.users.updateUser;
         const {profiles} = store.getState().entities.users;
         const currentUserMfa = profiles[currentUserId].mfa_active;
-
-        if (updateRequest.status === RequestStatus.FAILURE) {
-            throw new Error(JSON.stringify(updateRequest.error));
-        }
 
         assert.equal(currentUserMfa, false);
     });
@@ -1066,13 +889,8 @@ describe('Actions.Users', () => {
 
         await Actions.updateUserPassword(currentUserId, 'password1', 'password1')(store.dispatch, store.getState);
 
-        const updateRequest = store.getState().requests.users.updateUser;
         const {profiles} = store.getState().entities.users;
         const currentUser = profiles[currentUserId];
-
-        if (updateRequest.status === RequestStatus.FAILURE) {
-            throw new Error(JSON.stringify(updateRequest.error));
-        }
 
         assert.ok(currentUser);
         assert.ok(currentUser.last_password_update_at > beforeTime);
@@ -1102,18 +920,15 @@ describe('Actions.Users', () => {
             console.log('Skipping mock-only test');
             return;
         }
+        const response = {secret: 'somesecret', qr_code: 'someqrcode'};
 
         nock(Client4.getBaseRoute()).
             post('/users/me/mfa/generate').
-            reply(200, {secret: 'somesecret', qr_code: 'someqrcode'});
+            reply(200, response);
 
-        await Actions.generateMfaSecret('me')(store.dispatch, store.getState);
+        const {data} = await Actions.generateMfaSecret('me')(store.dispatch, store.getState);
 
-        const request = store.getState().requests.users.generateMfaSecret;
-
-        if (request.status === RequestStatus.FAILURE) {
-            throw new Error(JSON.stringify(request.error));
-        }
+        assert.deepEqual(data, response);
     });
 
     it('updateUserActive', async () => {
@@ -1130,12 +945,7 @@ describe('Actions.Users', () => {
             reply(200, OK_RESPONSE);
         await Actions.updateUserActive(user.id, false)(store.dispatch, store.getState);
 
-        const updateRequest = store.getState().requests.users.updateUser;
         const {profiles} = store.getState().entities.users;
-
-        if (updateRequest.status === RequestStatus.FAILURE) {
-            throw new Error(JSON.stringify(updateRequest.error));
-        }
 
         assert.ok(profiles[user.id]);
         assert.ok(profiles[user.id].delete_at > beforeTime);
@@ -1151,13 +961,9 @@ describe('Actions.Users', () => {
             post('/users/email/verify').
             reply(200, OK_RESPONSE);
 
-        await Actions.verifyUserEmail('sometoken')(store.dispatch, store.getState);
+        const {data} = await Actions.verifyUserEmail('sometoken')(store.dispatch, store.getState);
 
-        const request = store.getState().requests.users.verifyEmail;
-
-        if (request.status === RequestStatus.FAILURE) {
-            throw new Error(JSON.stringify(request.error));
-        }
+        assert.deepEqual(data, OK_RESPONSE);
     });
 
     it('sendVerificationEmail', async () => {
@@ -1165,13 +971,9 @@ describe('Actions.Users', () => {
             post('/users/email/verify/send').
             reply(200, OK_RESPONSE);
 
-        await Actions.sendVerificationEmail(TestHelper.basicUser.email)(store.dispatch, store.getState);
+        const {data} = await Actions.sendVerificationEmail(TestHelper.basicUser.email)(store.dispatch, store.getState);
 
-        const request = store.getState().requests.users.verifyEmail;
-
-        if (request.status === RequestStatus.FAILURE) {
-            throw new Error(JSON.stringify(request.error));
-        }
+        assert.deepEqual(data, OK_RESPONSE);
     });
 
     it('resetUserPassword', async () => {
@@ -1184,13 +986,9 @@ describe('Actions.Users', () => {
             post('/users/password/reset').
             reply(200, OK_RESPONSE);
 
-        await Actions.resetUserPassword('sometoken', 'newpassword')(store.dispatch, store.getState);
+        const {data} = await Actions.resetUserPassword('sometoken', 'newpassword')(store.dispatch, store.getState);
 
-        const request = store.getState().requests.users.passwordReset;
-
-        if (request.status === RequestStatus.FAILURE) {
-            throw new Error(JSON.stringify(request.error));
-        }
+        assert.deepEqual(data, OK_RESPONSE);
     });
 
     it('sendPasswordResetEmail', async () => {
@@ -1198,13 +996,9 @@ describe('Actions.Users', () => {
             post('/users/password/reset/send').
             reply(200, OK_RESPONSE);
 
-        await Actions.sendPasswordResetEmail(TestHelper.basicUser.email)(store.dispatch, store.getState);
+        const {data} = await Actions.sendPasswordResetEmail(TestHelper.basicUser.email)(store.dispatch, store.getState);
 
-        const request = store.getState().requests.users.passwordReset;
-
-        if (request.status === RequestStatus.FAILURE) {
-            throw new Error(JSON.stringify(request.error));
-        }
+        assert.deepEqual(data, OK_RESPONSE);
     });
 
     it('uploadProfileImage', async () => {
@@ -1222,13 +1016,8 @@ describe('Actions.Users', () => {
 
         await Actions.uploadProfileImage(currentUserId, testImageData)(store.dispatch, store.getState);
 
-        const updateRequest = store.getState().requests.users.updateUser;
         const {profiles} = store.getState().entities.users;
         const currentUser = profiles[currentUserId];
-
-        if (updateRequest.status === RequestStatus.FAILURE) {
-            throw new Error(JSON.stringify(updateRequest.error));
-        }
 
         assert.ok(currentUser);
         assert.ok(currentUser.last_picture_update > beforeTime);
@@ -1246,13 +1035,8 @@ describe('Actions.Users', () => {
 
         await Actions.setDefaultProfileImage(currentUserId)(store.dispatch, store.getState);
 
-        const updateRequest = store.getState().requests.users.updateUser;
         const {profiles} = store.getState().entities.users;
         const currentUser = profiles[currentUserId];
-
-        if (updateRequest.status === RequestStatus.FAILURE) {
-            throw new Error(JSON.stringify(updateRequest.error));
-        }
 
         assert.ok(currentUser);
         assert.equal(currentUser.last_picture_update, 0);
@@ -1268,13 +1052,8 @@ describe('Actions.Users', () => {
             post('/users/login/switch').
             reply(200, {follow_link: '/login'});
 
-        await Actions.switchEmailToOAuth('gitlab', TestHelper.basicUser.email, TestHelper.basicUser.password)(store.dispatch, store.getState);
-
-        const request = store.getState().requests.users.switchLogin;
-
-        if (request.status === RequestStatus.FAILURE) {
-            throw new Error(JSON.stringify(request.error));
-        }
+        const {data} = await Actions.switchEmailToOAuth('gitlab', TestHelper.basicUser.email, TestHelper.basicUser.password)(store.dispatch, store.getState);
+        assert.deepEqual(data, {follow_link: '/login'});
     });
 
     it('switchOAuthToEmail', async () => {
@@ -1287,13 +1066,9 @@ describe('Actions.Users', () => {
             post('/users/login/switch').
             reply(200, {follow_link: '/login'});
 
-        await Actions.switchOAuthToEmail('gitlab', TestHelper.basicUser.email, TestHelper.basicUser.password)(store.dispatch, store.getState);
+        const {data} = await Actions.switchOAuthToEmail('gitlab', TestHelper.basicUser.email, TestHelper.basicUser.password)(store.dispatch, store.getState);
 
-        const request = store.getState().requests.users.switchLogin;
-
-        if (request.status === RequestStatus.FAILURE) {
-            throw new Error(JSON.stringify(request.error));
-        }
+        assert.deepEqual(data, {follow_link: '/login'});
     });
 
     it('switchEmailToLdap', async () => {
@@ -1306,13 +1081,9 @@ describe('Actions.Users', () => {
             post('/users/login/switch').
             reply(200, {follow_link: '/login'});
 
-        await Actions.switchEmailToLdap(TestHelper.basicUser.email, TestHelper.basicUser.password, 'someid', 'somepassword')(store.dispatch, store.getState);
+        const {data} = await Actions.switchEmailToLdap(TestHelper.basicUser.email, TestHelper.basicUser.password, 'someid', 'somepassword')(store.dispatch, store.getState);
 
-        const request = store.getState().requests.users.switchLogin;
-
-        if (request.status === RequestStatus.FAILURE) {
-            throw new Error(JSON.stringify(request.error));
-        }
+        assert.deepEqual(data, {follow_link: '/login'});
     });
 
     it('switchLdapToEmail', (done) => {
@@ -1327,13 +1098,8 @@ describe('Actions.Users', () => {
                 post('/users/login/switch').
                 reply(200, {follow_link: '/login'});
 
-            await Actions.switchLdapToEmail('somepassword', TestHelper.basicUser.email, TestHelper.basicUser.password)(store.dispatch, store.getState);
-
-            const request = store.getState().requests.users.switchLogin;
-
-            if (request.status === RequestStatus.FAILURE) {
-                throw new Error(JSON.stringify(request.error));
-            }
+            const {data} = await Actions.switchLdapToEmail('somepassword', TestHelper.basicUser.email, TestHelper.basicUser.password)(store.dispatch, store.getState);
+            assert.deepEqual(data, {follow_link: '/login'});
 
             done();
         }
@@ -1354,13 +1120,8 @@ describe('Actions.Users', () => {
 
             const {data} = await Actions.createUserAccessToken(currentUserId, 'test token')(store.dispatch, store.getState);
 
-            const request = store.getState().requests.users.createUserAccessToken;
             const {myUserAccessTokens} = store.getState().entities.users;
             const {userAccessTokensByUser} = store.getState().entities.admin;
-
-            if (request.status === RequestStatus.FAILURE) {
-                throw new Error(JSON.stringify(request.error));
-            }
 
             assert.ok(myUserAccessTokens);
             assert.ok(myUserAccessTokens[data.id]);
@@ -1393,13 +1154,8 @@ describe('Actions.Users', () => {
 
         await Actions.getUserAccessToken(data.id)(store.dispatch, store.getState);
 
-        const request = store.getState().requests.users.getUserAccessToken;
         const {myUserAccessTokens} = store.getState().entities.users;
         const {userAccessTokensByUser, userAccessTokens} = store.getState().entities.admin;
-
-        if (request.status === RequestStatus.FAILURE) {
-            throw new Error(JSON.stringify(request.error));
-        }
 
         assert.ok(myUserAccessTokens);
         assert.ok(myUserAccessTokens[data.id]);
@@ -1432,13 +1188,8 @@ describe('Actions.Users', () => {
 
         await Actions.getUserAccessTokens()(store.dispatch, store.getState);
 
-        const request = store.getState().requests.users.getUserAccessToken;
         const {myUserAccessTokens} = store.getState().entities.users;
         const {userAccessTokensByUser, userAccessTokens} = store.getState().entities.admin;
-
-        if (request.status === RequestStatus.FAILURE) {
-            throw new Error(JSON.stringify(request.error));
-        }
 
         assert.ok(myUserAccessTokens);
         assert.ok(myUserAccessTokens[data.id]);
@@ -1471,13 +1222,8 @@ describe('Actions.Users', () => {
 
         await Actions.getUserAccessTokensForUser(currentUserId)(store.dispatch, store.getState);
 
-        const request = store.getState().requests.users.getUserAccessToken;
         const {myUserAccessTokens} = store.getState().entities.users;
         const {userAccessTokensByUser, userAccessTokens} = store.getState().entities.admin;
-
-        if (request.status === RequestStatus.FAILURE) {
-            throw new Error(JSON.stringify(request.error));
-        }
 
         assert.ok(myUserAccessTokens);
         assert.ok(myUserAccessTokens[data.id]);
@@ -1523,14 +1269,9 @@ describe('Actions.Users', () => {
 
         await Actions.revokeUserAccessToken(data.id)(store.dispatch, store.getState);
 
-        const request = store.getState().requests.users.revokeUserAccessToken;
         myUserAccessTokens = store.getState().entities.users.myUserAccessTokens;
         userAccessTokensByUser = store.getState().entities.admin.userAccessTokensByUser;
         userAccessTokens = store.getState().entities.admin.userAccessTokens;
-
-        if (request.status === RequestStatus.FAILURE) {
-            throw new Error(JSON.stringify(request.error));
-        }
 
         assert.ok(myUserAccessTokens);
         assert.ok(!myUserAccessTokens[data.id]);
@@ -1574,14 +1315,9 @@ describe('Actions.Users', () => {
 
         await Actions.disableUserAccessToken(testId)(store.dispatch, store.getState);
 
-        const request = store.getState().requests.users.revokeUserAccessToken;
         myUserAccessTokens = store.getState().entities.users.myUserAccessTokens;
         userAccessTokensByUser = store.getState().entities.admin.userAccessTokensByUser;
         userAccessTokens = store.getState().entities.admin.userAccessTokens;
-
-        if (request.status === RequestStatus.FAILURE) {
-            throw new Error(JSON.stringify(request.error));
-        }
 
         assert.ok(myUserAccessTokens);
         assert.ok(myUserAccessTokens[testId]);
@@ -1631,14 +1367,9 @@ describe('Actions.Users', () => {
 
         await Actions.enableUserAccessToken(testId)(store.dispatch, store.getState);
 
-        const request = store.getState().requests.users.revokeUserAccessToken;
         myUserAccessTokens = store.getState().entities.users.myUserAccessTokens;
         userAccessTokensByUser = store.getState().entities.admin.userAccessTokensByUser;
         userAccessTokens = store.getState().entities.admin.userAccessTokens;
-
-        if (request.status === RequestStatus.FAILURE) {
-            throw new Error(JSON.stringify(request.error));
-        }
 
         assert.ok(myUserAccessTokens);
         assert.ok(myUserAccessTokens[testId]);

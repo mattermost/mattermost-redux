@@ -55,36 +55,51 @@ export function requestFailure(type: ActionType, error: Client4Error) {
  * dispatches the specifed actions on request, success or failure.
  *
  * @export
- * @param {() => Promise<mixed>} clientFunc          clientFunc to execute
- * @param {ActionType} request                       ActionType to dispatch on request
- * @param {(ActionType | Array<ActionType>)} success ActionType to dispatch on success
- * @param {ActionType} failure                       ActionType to dispatch on failure
- * @param {...Array<any>} args
+ * @param {Object} obj                                       an object for destructirung required properties
+ * @param {() => Promise<mixed>} obj.clientFunc              clientFunc to execute
+ * @param {ActionType} obj.onRequest                         ActionType to dispatch on request
+ * @param {(ActionType | Array<ActionType>)} obj.onSuccess   ActionType to dispatch on success
+ * @param {ActionType} obj.onFailure                         ActionType to dispatch on failure
+ * @param {...Array<any>} obj.params
  * @returns {ActionFunc} ActionFunc
  */
-export function bindClientFunc(clientFunc: () => Promise<mixed>, request: ActionType,
-    success: ActionType | Array<ActionType>, failure: ActionType, ...args: Array<any>): ActionFunc {
+export function bindClientFunc({
+    clientFunc,
+    onRequest,
+    onSuccess,
+    onFailure,
+    params = [],
+}: {
+  clientFunc: () => Promise<mixed>,
+  onRequest?: ActionType,
+  onSuccess?: ActionType | Array<ActionType>,
+  onFailure?: ActionType,
+  params?: Array<any>,
+}): ActionFunc {
     return async (dispatch, getState) => {
-        dispatch(requestData(request), getState);
+        if (onRequest) {
+            dispatch(requestData(onRequest), getState);
+        }
 
         let data = null;
         try {
-            data = await clientFunc(...args);
+            data = await clientFunc(...params);
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch, getState);
-            dispatch(batchActions([
-                requestFailure(failure, error),
-                logError(error),
-            ]), getState);
+            const actions = [logError(error)];
+            if (onFailure) {
+                actions.push(requestFailure(onFailure, error));
+            }
+            dispatch(batchActions(actions));
             return {error};
         }
 
-        if (Array.isArray(success)) {
-            success.forEach((s) => {
+        if (Array.isArray(onSuccess)) {
+            onSuccess.forEach((s) => {
                 dispatcher(s, data, dispatch, getState);
             });
-        } else {
-            dispatcher(success, data, dispatch, getState);
+        } else if (onSuccess) {
+            dispatcher(onSuccess, data, dispatch, getState);
         }
 
         return {data};

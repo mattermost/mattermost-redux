@@ -12,30 +12,21 @@ import type {DispatchFunc, GetStateFunc} from '../types/actions';
 
 export function getFilesForPost(postId: string) {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
-        dispatch({type: FileTypes.FETCH_FILES_FOR_POST_REQUEST, data: {}}, getState);
         let files;
 
         try {
             files = await Client4.getFileInfosForPost(postId);
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch, getState);
-            dispatch(batchActions([
-                {type: FileTypes.FETCH_FILES_FOR_POST_FAILURE, error},
-                logError(error),
-            ]), getState);
+            dispatch(logError(error));
             return {error};
         }
 
-        dispatch(batchActions([
-            {
-                type: FileTypes.RECEIVED_FILES_FOR_POST,
-                data: files,
-                postId,
-            },
-            {
-                type: FileTypes.FETCH_FILES_FOR_POST_SUCCESS,
-            },
-        ]), getState);
+        dispatch({
+            type: FileTypes.RECEIVED_FILES_FOR_POST,
+            data: files,
+            postId,
+        });
 
         return {data: true};
     };
@@ -101,11 +92,11 @@ export function uploadFile(channelId: string, rootId: string, clientIds: Array<S
 }
 
 export function getFilePublicLink(fileId: string) {
-    return bindClientFunc(
-        Client4.getFilePublicLink,
-        FileTypes.GET_FILE_PUBLIC_LINK_REQUEST,
-        [FileTypes.RECEIVED_FILE_PUBLIC_LINK, FileTypes.GET_FILE_PUBLIC_LINK_SUCCESS],
-        FileTypes.GET_FILE_PUBLIC_LINK_FAILURE,
-        fileId
-    );
+    return bindClientFunc({
+        clientFunc: Client4.getFilePublicLink,
+        onSuccess: FileTypes.RECEIVED_FILE_PUBLIC_LINK,
+        params: [
+            fileId,
+        ],
+    });
 }

@@ -9,7 +9,6 @@ import * as Actions from 'actions/emojis';
 import {Client4} from 'client';
 
 import {GeneralTypes} from 'action_types';
-import {RequestStatus} from 'constants';
 import TestHelper from 'test/test_helper';
 import configureStore from 'test/test_store';
 
@@ -45,10 +44,6 @@ describe('Actions.Emojis', () => {
         )(store.dispatch, store.getState);
 
         const state = store.getState();
-        const request = state.requests.emojis.createCustomEmoji;
-        if (request.status === RequestStatus.FAILURE) {
-            throw new Error('createCustomEmoji request failed');
-        }
 
         const emojis = state.entities.emojis.customEmoji;
         assert.ok(emojis);
@@ -78,10 +73,6 @@ describe('Actions.Emojis', () => {
         await Actions.getCustomEmojis()(store.dispatch, store.getState);
 
         const state = store.getState();
-        const request = state.requests.emojis.getCustomEmojis;
-        if (request.status === RequestStatus.FAILURE) {
-            throw new Error(request.error);
-        }
 
         const emojis = state.entities.emojis.customEmoji;
         assert.ok(emojis);
@@ -130,10 +121,6 @@ describe('Actions.Emojis', () => {
         await Actions.getAllCustomEmojis(1)(store.dispatch, store.getState);
 
         let state = store.getState();
-        let request = state.requests.emojis.getAllCustomEmojis;
-        if (request.status === RequestStatus.FAILURE) {
-            throw new Error(request.error);
-        }
 
         let emojis = state.entities.emojis.customEmoji;
         assert.ok(emojis);
@@ -159,10 +146,6 @@ describe('Actions.Emojis', () => {
         await Actions.getAllCustomEmojis(1)(store.dispatch, store.getState);
 
         state = store.getState();
-        request = state.requests.emojis.getAllCustomEmojis;
-        if (request.status === RequestStatus.FAILURE) {
-            throw new Error('getAllCustomEmojis request failed');
-        }
 
         emojis = state.entities.emojis.customEmoji;
         assert.ok(emojis);
@@ -198,10 +181,6 @@ describe('Actions.Emojis', () => {
         await Actions.deleteCustomEmoji(created.id)(store.dispatch, store.getState);
 
         const state = store.getState();
-        const request = state.requests.emojis.deleteCustomEmoji;
-        if (request.status === RequestStatus.FAILURE) {
-            throw new Error('removeCustomEmoji request failed');
-        }
 
         const emojis = state.entities.emojis.customEmoji;
         assert.ok(!emojis[created.id]);
@@ -267,10 +246,6 @@ describe('Actions.Emojis', () => {
         await Actions.searchCustomEmojis(created.name, {prefix_only: true})(store.dispatch, store.getState);
 
         const state = store.getState();
-        const request = state.requests.emojis.getCustomEmojis;
-        if (request.status === RequestStatus.FAILURE) {
-            throw new Error(request.error);
-        }
 
         const emojis = state.entities.emojis.customEmoji;
         assert.ok(emojis);
@@ -309,10 +284,6 @@ describe('Actions.Emojis', () => {
         await Actions.autocompleteCustomEmojis(created.name)(store.dispatch, store.getState);
 
         const state = store.getState();
-        const request = state.requests.emojis.getCustomEmojis;
-        if (request.status === RequestStatus.FAILURE) {
-            throw new Error(request.error);
-        }
 
         const emojis = state.entities.emojis.customEmoji;
         assert.ok(emojis);
@@ -346,27 +317,11 @@ describe('Actions.Emojis', () => {
 
         await Actions.getCustomEmoji(created.id)(store.dispatch, store.getState);
 
-        let state = store.getState();
-        let request = state.requests.emojis.getCustomEmoji;
-        if (request.status === RequestStatus.FAILURE) {
-            throw new Error(request.error);
-        }
-
-        assert.ok(request.status === RequestStatus.SUCCESS);
+        const state = store.getState();
 
         const emojis = state.entities.emojis.customEmoji;
         assert.ok(emojis);
         assert.ok(emojis[created.id]);
-
-        nock(Client4.getEmojisRoute()).
-            get(`/${created.id}`).
-            reply(500, {});
-
-        await Actions.getCustomEmoji(created.id)(store.dispatch, store.getState);
-
-        state = store.getState();
-        request = state.requests.emojis.getCustomEmoji;
-        assert.ok(request.status === RequestStatus.FAILURE);
     });
 
     it('getCustomEmojiByName', async () => {
@@ -394,12 +349,6 @@ describe('Actions.Emojis', () => {
         await Actions.getCustomEmojiByName(created.name)(store.dispatch, store.getState);
 
         let state = store.getState();
-        let request = state.requests.emojis.getCustomEmoji;
-        if (request.status === RequestStatus.FAILURE) {
-            throw new Error(request.error);
-        }
-
-        assert.ok(request.status === RequestStatus.SUCCESS);
 
         const emojis = state.entities.emojis.customEmoji;
         assert.ok(emojis);
@@ -414,8 +363,6 @@ describe('Actions.Emojis', () => {
         await Actions.getCustomEmojiByName(missingName)(store.dispatch, store.getState);
 
         state = store.getState();
-        request = state.requests.emojis.getCustomEmoji;
-        assert.ok(request.status === RequestStatus.FAILURE);
         assert.ok(state.entities.emojis.nonExistentEmoji.has(missingName));
 
         Client4.serverVersion = '4.6.0';

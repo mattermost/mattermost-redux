@@ -520,12 +520,7 @@ describe('Actions.Posts', () => {
         )(store.dispatch, store.getState);
 
         const state = store.getState();
-        const getRequest = state.requests.posts.getPosts;
         const {posts, postsInChannel, postsInThread} = state.entities.posts;
-
-        if (getRequest.status === RequestStatus.FAILURE) {
-            throw new Error(JSON.stringify(getRequest.error));
-        }
 
         assert.ok(posts);
         assert.ok(postsInChannel);
@@ -613,12 +608,7 @@ describe('Actions.Posts', () => {
         await TestHelper.wait(500); // wait for retry action to complete after 200ms
 
         const state = store.getState();
-        const getRequest = state.requests.posts.getPosts;
         const {posts, postsInChannel, postsInThread} = state.entities.posts;
-
-        if (getRequest.status === RequestStatus.FAILURE) {
-            throw new Error(JSON.stringify(getRequest.error));
-        }
 
         assert.ok(posts);
         assert.ok(postsInChannel);
@@ -971,12 +961,7 @@ describe('Actions.Posts', () => {
         )(store.dispatch, store.getState);
 
         const state = store.getState();
-        const getRequest = state.requests.posts.getPostsSince;
         const {posts, postsInChannel} = state.entities.posts;
-
-        if (getRequest.status === RequestStatus.FAILURE) {
-            throw new Error(JSON.stringify(getRequest.error));
-        }
 
         assert.ok(posts);
         assert.ok(postsInChannel);
@@ -1047,12 +1032,7 @@ describe('Actions.Posts', () => {
         await TestHelper.wait(300);
 
         const state = store.getState();
-        const getRequest = state.requests.posts.getPostsSince;
         const {posts, postsInChannel} = state.entities.posts;
-
-        if (getRequest.status === RequestStatus.FAILURE) {
-            throw new Error(JSON.stringify(getRequest.error));
-        }
 
         assert.ok(posts);
         assert.ok(postsInChannel);
@@ -1115,12 +1095,7 @@ describe('Actions.Posts', () => {
         )(store.dispatch, store.getState);
 
         const state = store.getState();
-        const getRequest = state.requests.posts.getPostsBefore;
         const {posts, postsInChannel, postsInThread} = state.entities.posts;
-
-        if (getRequest.status === RequestStatus.FAILURE) {
-            throw new Error(JSON.stringify(getRequest.error));
-        }
 
         assert.ok(posts);
         assert.ok(postsInChannel);
@@ -1197,12 +1172,7 @@ describe('Actions.Posts', () => {
         await TestHelper.wait(300);
 
         const state = store.getState();
-        const getRequest = state.requests.posts.getPostsBefore;
         const {posts, postsInChannel} = state.entities.posts;
-
-        if (getRequest.status === RequestStatus.FAILURE) {
-            throw new Error(JSON.stringify(getRequest.error));
-        }
 
         assert.ok(posts);
         assert.ok(postsInChannel);
@@ -1266,12 +1236,7 @@ describe('Actions.Posts', () => {
         )(store.dispatch, store.getState);
 
         const state = store.getState();
-        const getRequest = state.requests.posts.getPostsAfter;
         const {posts, postsInChannel, postsInThread} = state.entities.posts;
-
-        if (getRequest.status === RequestStatus.FAILURE) {
-            throw new Error(JSON.stringify(getRequest.error));
-        }
 
         assert.ok(posts);
         assert.ok(postsInChannel);
@@ -1348,12 +1313,7 @@ describe('Actions.Posts', () => {
         await TestHelper.wait(300);
 
         const state = store.getState();
-        const getRequest = state.requests.posts.getPostsAfter;
         const {posts, postsInChannel} = state.entities.posts;
-
-        if (getRequest.status === RequestStatus.FAILURE) {
-            throw new Error(JSON.stringify(getRequest.error));
-        }
 
         assert.ok(posts);
         assert.ok(postsInChannel);
@@ -1527,12 +1487,6 @@ describe('Actions.Posts', () => {
             reply(201, {user_id: TestHelper.basicUser.id, post_id: post1.id, emoji_name: emojiName, create_at: 1508168444721});
         await Actions.addReaction(post1.id, emojiName)(dispatch, getState);
 
-        const reactionRequest = getState().requests.posts.reaction;
-
-        if (reactionRequest.status === RequestStatus.FAILURE) {
-            throw new Error(JSON.stringify(reactionRequest.error));
-        }
-
         const state = getState();
         const reactions = state.entities.posts.reactions[post1.id];
         assert.ok(reactions);
@@ -1563,12 +1517,6 @@ describe('Actions.Posts', () => {
             delete(`/${TestHelper.basicUser.id}/posts/${post1.id}/reactions/${emojiName}`).
             reply(200, OK_RESPONSE);
         await Actions.removeReaction(post1.id, emojiName)(dispatch, getState);
-
-        const reactionRequest = getState().requests.posts.reaction;
-
-        if (reactionRequest.status === RequestStatus.FAILURE) {
-            throw new Error(JSON.stringify(reactionRequest.error));
-        }
 
         const state = getState();
         const reactions = state.entities.posts.reactions[post1.id];
@@ -1606,14 +1554,9 @@ describe('Actions.Posts', () => {
             reply(200, [{user_id: TestHelper.basicUser.id, post_id: post1.id, emoji_name: emojiName, create_at: 1508168444721}]);
         await Actions.getReactionsForPost(post1.id)(dispatch, getState);
 
-        const reactionRequest = getState().requests.posts.reaction;
-
-        if (reactionRequest.status === RequestStatus.FAILURE) {
-            throw new Error(JSON.stringify(reactionRequest.error));
-        }
-
         const state = getState();
         const reactions = state.entities.posts.reactions[post1.id];
+
         assert.ok(reactions);
         assert.ok(reactions[TestHelper.basicUser.id + '-' + emojiName]);
     });
@@ -1674,12 +1617,6 @@ describe('Actions.Posts', () => {
             reply(200, {type: '', url: '', title: '', description: ''});
         await dispatch(Actions.getOpenGraphMetadata(docs));
 
-        const openGraphRequest = getState().requests.posts.openGraph;
-
-        if (openGraphRequest.status === RequestStatus.FAILURE) {
-            throw new Error(JSON.stringify(openGraphRequest.error));
-        }
-
         nock(Client4.getBaseRoute()).
             post('/opengraph').
             reply(200, null);
@@ -1702,13 +1639,8 @@ describe('Actions.Posts', () => {
             post('/posts/posth67ja7ntdkek6g13dp3wka/actions/action7ja7ntdkek6g13dp3wka').
             reply(200, {});
 
-        await Actions.doPostAction('posth67ja7ntdkek6g13dp3wka', 'action7ja7ntdkek6g13dp3wka', 'option')(store.dispatch, store.getState);
-
-        const state = store.getState();
-        const request = state.requests.posts.doPostAction;
-        if (request.status === RequestStatus.FAILURE) {
-            throw new Error('doPostAction request failed');
-        }
+        const {data} = await Actions.doPostAction('posth67ja7ntdkek6g13dp3wka', 'action7ja7ntdkek6g13dp3wka', 'option')(store.dispatch, store.getState);
+        assert.deepEqual(data, {});
     });
 
     it('addMessageIntoHistory', async () => {

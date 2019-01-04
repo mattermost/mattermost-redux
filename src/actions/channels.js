@@ -37,15 +37,6 @@ export function selectChannel(channelId: string): ActionFunc {
 
 export function createChannel(channel: Channel, userId: string): ActionFunc {
     return async (dispatch, getState) => {
-        dispatch(batchActions([
-            {
-                type: ChannelTypes.CREATE_CHANNEL_REQUEST,
-            },
-            {
-                type: ChannelTypes.CHANNEL_MEMBERS_REQUEST,
-            },
-        ]), getState);
-
         let created;
         try {
             created = await Client4.createChannel(channel);
@@ -54,10 +45,6 @@ export function createChannel(channel: Channel, userId: string): ActionFunc {
             dispatch(batchActions([
                 {
                     type: ChannelTypes.CREATE_CHANNEL_FAILURE,
-                    error,
-                },
-                {
-                    type: ChannelTypes.CHANNEL_MEMBERS_FAILURE,
                     error,
                 },
                 logError(error),
@@ -92,9 +79,6 @@ export function createChannel(channel: Channel, userId: string): ActionFunc {
             ...actions,
             {
                 type: ChannelTypes.CREATE_CHANNEL_SUCCESS,
-            },
-            {
-                type: ChannelTypes.CHANNEL_MEMBERS_SUCCESS,
             },
         ]), getState);
 
@@ -332,8 +316,6 @@ export function convertChannelToPrivate(channelId: string): ActionFunc {
 
 export function updateChannelNotifyProps(userId: string, channelId: string, props: NotifyProps): ActionFunc {
     return async (dispatch, getState) => {
-        dispatch({type: ChannelTypes.NOTIFY_PROPS_REQUEST, data: null}, getState);
-
         const notifyProps = {
             user_id: userId,
             channel_id: channelId,
@@ -344,29 +326,21 @@ export function updateChannelNotifyProps(userId: string, channelId: string, prop
             await Client4.updateChannelNotifyProps(notifyProps);
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch, getState);
+            dispatch(logError(error));
 
-            dispatch(batchActions([
-                {type: ChannelTypes.NOTIFY_PROPS_FAILURE, error},
-                logError(error),
-            ]), getState);
             return {error};
         }
 
         const member = getState().entities.channels.myMembers[channelId] || {};
         const currentNotifyProps = member.notify_props || {};
 
-        dispatch(batchActions([
-            {
-                type: ChannelTypes.RECEIVED_CHANNEL_PROPS,
-                data: {
-                    channel_id: channelId,
-                    notifyProps: {...currentNotifyProps, ...notifyProps},
-                },
+        dispatch({
+            type: ChannelTypes.RECEIVED_CHANNEL_PROPS,
+            data: {
+                channel_id: channelId,
+                notifyProps: {...currentNotifyProps, ...notifyProps},
             },
-            {
-                type: ChannelTypes.NOTIFY_PROPS_SUCCESS,
-            },
-        ]), getState);
+        });
 
         return {data: true};
     };
@@ -374,8 +348,6 @@ export function updateChannelNotifyProps(userId: string, channelId: string, prop
 
 export function getChannelByNameAndTeamName(teamName: string, channelName: string, includeDeleted: boolean = false): ActionFunc {
     return async (dispatch, getState) => {
-        dispatch({type: ChannelTypes.CHANNEL_REQUEST, data: null}, getState);
-
         let data;
         try {
             data = await Client4.getChannelByNameAndTeamName(teamName, channelName, includeDeleted);
@@ -388,15 +360,10 @@ export function getChannelByNameAndTeamName(teamName: string, channelName: strin
             return {error};
         }
 
-        dispatch(batchActions([
-            {
-                type: ChannelTypes.RECEIVED_CHANNEL,
-                data,
-            },
-            {
-                type: ChannelTypes.CHANNEL_SUCCESS,
-            },
-        ]), getState);
+        dispatch({
+            type: ChannelTypes.RECEIVED_CHANNEL,
+            data,
+        });
 
         return {data};
     };
@@ -404,8 +371,6 @@ export function getChannelByNameAndTeamName(teamName: string, channelName: strin
 
 export function getChannel(channelId: string): ActionFunc {
     return async (dispatch, getState) => {
-        dispatch({type: ChannelTypes.CHANNEL_REQUEST, data: null}, getState);
-
         let data;
         try {
             data = await Client4.getChannel(channelId);
@@ -418,15 +383,10 @@ export function getChannel(channelId: string): ActionFunc {
             return {error};
         }
 
-        dispatch(batchActions([
-            {
-                type: ChannelTypes.RECEIVED_CHANNEL,
-                data,
-            },
-            {
-                type: ChannelTypes.CHANNEL_SUCCESS,
-            },
-        ]), getState);
+        dispatch({
+            type: ChannelTypes.RECEIVED_CHANNEL,
+            data,
+        });
 
         return {data};
     };
@@ -434,8 +394,6 @@ export function getChannel(channelId: string): ActionFunc {
 
 export function getChannelAndMyMember(channelId: string): ActionFunc {
     return async (dispatch, getState) => {
-        dispatch({type: ChannelTypes.CHANNEL_REQUEST, data: null}, getState);
-
         let channel;
         let member;
         try {
@@ -459,9 +417,6 @@ export function getChannelAndMyMember(channelId: string): ActionFunc {
                 data: channel,
             },
             {
-                type: ChannelTypes.CHANNEL_SUCCESS,
-            },
-            {
                 type: ChannelTypes.RECEIVED_MY_CHANNEL_MEMBER,
                 data: member,
             },
@@ -474,8 +429,6 @@ export function getChannelAndMyMember(channelId: string): ActionFunc {
 
 export function getChannelTimezones(channelId: string): ActionFunc {
     return async (dispatch, getState) => {
-        dispatch({type: ChannelTypes.GET_CHANNELS_TIMEZONE_REQUEST, data: null});
-
         let channelTimezones;
         try {
             const channelTimezonesRequest = Client4.getChannelTimezones(channelId);
@@ -483,19 +436,9 @@ export function getChannelTimezones(channelId: string): ActionFunc {
             channelTimezones = await channelTimezonesRequest;
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch, getState);
-            dispatch(batchActions([
-                {type: ChannelTypes.GET_CHANNELS_TIMEZONE_FAILURE, error},
-                logError(error),
-            ]));
+            dispatch(logError(error));
             return {error};
         }
-
-        dispatch(batchActions([
-            {
-                type: ChannelTypes.GET_CHANNELS_TIMEZONE_SUCCESS,
-                data: channelTimezones,
-            },
-        ]));
 
         return {data: channelTimezones};
     };
@@ -503,14 +446,10 @@ export function getChannelTimezones(channelId: string): ActionFunc {
 
 export function fetchMyChannelsAndMembers(teamId: string): ActionFunc {
     return async (dispatch, getState) => {
-        dispatch(batchActions([
-            {
-                type: ChannelTypes.CHANNELS_REQUEST,
-            },
-            {
-                type: ChannelTypes.CHANNEL_MEMBERS_REQUEST,
-            },
-        ]), getState);
+        dispatch({
+            type: ChannelTypes.CHANNELS_REQUEST,
+            data: null,
+        });
 
         let channels;
         let channelMembers;
@@ -523,7 +462,6 @@ export function fetchMyChannelsAndMembers(teamId: string): ActionFunc {
             forceLogoutIfNecessary(error, dispatch, getState);
             dispatch(batchActions([
                 {type: ChannelTypes.CHANNELS_FAILURE, error},
-                {type: ChannelTypes.CHANNEL_MEMBERS_FAILURE, error},
                 logError(error),
             ]), getState);
             return {error};
@@ -546,9 +484,6 @@ export function fetchMyChannelsAndMembers(teamId: string): ActionFunc {
                 remove: getChannelsIdForTeam(getState(), teamId),
                 currentUserId,
             },
-            {
-                type: ChannelTypes.CHANNEL_MEMBERS_SUCCESS,
-            },
         ]), getState);
         const roles = new Set();
         for (const member of channelMembers) {
@@ -566,8 +501,6 @@ export function fetchMyChannelsAndMembers(teamId: string): ActionFunc {
 
 export function getMyChannelMembers(teamId: string): ActionFunc {
     return async (dispatch, getState) => {
-        dispatch({type: ChannelTypes.CHANNEL_MY_MEMBERS_REQUEST, data: null}, getState);
-
         let channelMembers;
         try {
             const channelMembersRequest = Client4.getMyChannelMembers(teamId);
@@ -575,26 +508,18 @@ export function getMyChannelMembers(teamId: string): ActionFunc {
             channelMembers = await channelMembersRequest;
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch, getState);
-            dispatch(batchActions([
-                {type: ChannelTypes.CHANNEL_MY_MEMBERS_FAILURE, error},
-                logError(error),
-            ]), getState);
+            dispatch(logError(error));
             return {error};
         }
 
         const {currentUserId} = getState().entities.users;
 
-        dispatch(batchActions([
-            {
-                type: ChannelTypes.RECEIVED_MY_CHANNEL_MEMBERS,
-                data: channelMembers,
-                remove: getChannelsIdForTeam(getState(), teamId),
-                currentUserId,
-            },
-            {
-                type: ChannelTypes.CHANNEL_MY_MEMBERS_SUCCESS,
-            },
-        ]), getState);
+        dispatch({
+            type: ChannelTypes.RECEIVED_MY_CHANNEL_MEMBERS,
+            data: channelMembers,
+            remove: getChannelsIdForTeam(getState(), teamId),
+            currentUserId,
+        });
 
         const roles = new Set();
         for (const member of channelMembers) {
@@ -612,8 +537,6 @@ export function getMyChannelMembers(teamId: string): ActionFunc {
 
 export function getChannelMembers(channelId: string, page: number = 0, perPage: number = General.CHANNELS_CHUNK_SIZE): ActionFunc {
     return async (dispatch, getState) => {
-        dispatch({type: ChannelTypes.CHANNEL_MEMBERS_REQUEST, data: null}, getState);
-
         let channelMembers;
         try {
             const channelMembersRequest = Client4.getChannelMembers(channelId, page, perPage);
@@ -621,25 +544,17 @@ export function getChannelMembers(channelId: string, page: number = 0, perPage: 
             channelMembers = await channelMembersRequest;
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch, getState);
-            dispatch(batchActions([
-                {type: ChannelTypes.CHANNEL_MEMBERS_FAILURE, error},
-                logError(error),
-            ]), getState);
+            dispatch(logError(error));
             return {error};
         }
 
         const userIds = channelMembers.map((cm) => cm.user_id);
         getMissingProfilesByIds(userIds)(dispatch, getState);
 
-        dispatch(batchActions([
-            {
-                type: ChannelTypes.RECEIVED_CHANNEL_MEMBERS,
-                data: channelMembers,
-            },
-            {
-                type: ChannelTypes.CHANNEL_MEMBERS_SUCCESS,
-            },
-        ]), getState);
+        dispatch({
+            type: ChannelTypes.RECEIVED_CHANNEL_MEMBERS,
+            data: channelMembers,
+        });
 
         return {data: channelMembers};
     };
@@ -689,8 +604,6 @@ export function leaveChannel(channelId: string): ActionFunc {
 
 export function joinChannel(userId: string, teamId: string, channelId: string, channelName: string): ActionFunc {
     return async (dispatch, getState) => {
-        dispatch({type: ChannelTypes.JOIN_CHANNEL_REQUEST, data: null}, getState);
-
         let member: ?ChannelMembership;
         let channel;
         try {
@@ -707,10 +620,7 @@ export function joinChannel(userId: string, teamId: string, channelId: string, c
             }
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch, getState);
-            dispatch(batchActions([
-                {type: ChannelTypes.JOIN_CHANNEL_FAILURE, error},
-                logError(error),
-            ]), getState);
+            dispatch(logError(error));
             return {error};
         }
 
@@ -724,9 +634,6 @@ export function joinChannel(userId: string, teamId: string, channelId: string, c
             {
                 type: ChannelTypes.RECEIVED_MY_CHANNEL_MEMBER,
                 data: member,
-            },
-            {
-                type: ChannelTypes.JOIN_CHANNEL_SUCCESS,
             },
         ]), getState);
         if (member) {
@@ -742,16 +649,11 @@ export function deleteChannel(channelId: string): ActionFunc {
         const state = getState();
         const viewArchivedChannels = state.entities.general.config.ExperimentalViewArchivedChannels === 'true';
 
-        dispatch({type: ChannelTypes.DELETE_CHANNEL_REQUEST, data: null}, getState);
-
         try {
             await Client4.deleteChannel(channelId);
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch, getState);
-            dispatch(batchActions([
-                {type: ChannelTypes.DELETE_CHANNEL_FAILURE, error},
-                logError(error),
-            ]), getState);
+            dispatch(logError(error));
             return {error};
         }
 
@@ -787,20 +689,16 @@ export function viewChannel(channelId: string, prevChannelId: string = ''): Acti
             savePreferences(currentUserId, preferences)(dispatch);
         }
 
-        dispatch({type: ChannelTypes.UPDATE_LAST_VIEWED_REQUEST, data: null}, getState);
-
         try {
             await Client4.viewMyChannel(channelId, prevChannelId);
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch, getState);
-            dispatch(batchActions([
-                {type: ChannelTypes.UPDATE_LAST_VIEWED_FAILURE, error},
-                logError(error),
-            ]), getState);
+            dispatch(logError(error));
+
             return {error};
         }
 
-        const actions = [{type: ChannelTypes.UPDATE_LAST_VIEWED_SUCCESS}];
+        const actions = [];
 
         const {myMembers} = getState().entities.channels;
         const member = myMembers[channelId];
@@ -984,29 +882,19 @@ export function searchChannels(teamId: string, term: string): ActionFunc {
 
 export function getChannelStats(channelId: string): ActionFunc {
     return async (dispatch, getState) => {
-        dispatch({type: ChannelTypes.CHANNEL_STATS_REQUEST, data: null}, getState);
-
         let stat;
         try {
             stat = await Client4.getChannelStats(channelId);
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch, getState);
-            dispatch(batchActions([
-                {type: ChannelTypes.CHANNEL_STATS_FAILURE, error},
-                logError(error),
-            ]), getState);
+            dispatch(logError(error));
             return {error};
         }
 
-        dispatch(batchActions([
-            {
-                type: ChannelTypes.RECEIVED_CHANNEL_STATS,
-                data: stat,
-            },
-            {
-                type: ChannelTypes.CHANNEL_STATS_SUCCESS,
-            },
-        ]), getState);
+        dispatch({
+            type: ChannelTypes.RECEIVED_CHANNEL_STATS,
+            data: stat,
+        });
 
         return {data: stat};
     };
@@ -1014,17 +902,12 @@ export function getChannelStats(channelId: string): ActionFunc {
 
 export function addChannelMember(channelId: string, userId: string, postRootId: string = ''): ActionFunc {
     return async (dispatch, getState) => {
-        dispatch({type: ChannelTypes.ADD_CHANNEL_MEMBER_REQUEST, data: null}, getState);
-
         let member;
         try {
             member = await Client4.addToChannel(userId, channelId, postRootId);
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch, getState);
-            dispatch(batchActions([
-                {type: ChannelTypes.ADD_CHANNEL_MEMBER_FAILURE, error},
-                logError(error),
-            ]), getState);
+            dispatch(logError(error));
             return {error};
         }
 
@@ -1051,16 +934,11 @@ export function addChannelMember(channelId: string, userId: string, postRootId: 
 
 export function removeChannelMember(channelId: string, userId: string): ActionFunc {
     return async (dispatch, getState) => {
-        dispatch({type: ChannelTypes.REMOVE_CHANNEL_MEMBER_REQUEST, data: null}, getState);
-
         try {
             await Client4.removeFromChannel(userId, channelId);
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch, getState);
-            dispatch(batchActions([
-                {type: ChannelTypes.REMOVE_CHANNEL_MEMBER_FAILURE, error},
-                logError(error),
-            ]), getState);
+            dispatch(logError(error));
             return {error};
         }
 
@@ -1083,36 +961,21 @@ export function removeChannelMember(channelId: string, userId: string): ActionFu
 
 export function updateChannelMemberRoles(channelId: string, userId: string, roles: string): ActionFunc {
     return async (dispatch, getState) => {
-        dispatch({type: ChannelTypes.UPDATE_CHANNEL_MEMBER_REQUEST, data: null}, getState);
-
         try {
             await Client4.updateChannelMemberRoles(channelId, userId, roles);
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch, getState);
-            dispatch(batchActions([
-                {type: ChannelTypes.UPDATE_CHANNEL_MEMBER_FAILURE, error},
-                logError(error),
-            ]), getState);
+            dispatch(logError(error));
             return {error};
         }
 
-        const actions = [
-            {
-                type: ChannelTypes.UPDATE_CHANNEL_MEMBER_SUCCESS,
-            },
-        ];
-
         const membersInChannel = getState().entities.channels.membersInChannel[channelId];
         if (membersInChannel && membersInChannel[userId]) {
-            actions.push(
-                {
-                    type: ChannelTypes.RECEIVED_CHANNEL_MEMBER,
-                    data: {...membersInChannel[userId], roles},
-                }
-            );
+            dispatch({
+                type: ChannelTypes.RECEIVED_CHANNEL_MEMBER,
+                data: {...membersInChannel[userId], roles},
+            });
         }
-
-        dispatch(batchActions(actions), getState);
 
         return {data: true};
     };
@@ -1154,16 +1017,9 @@ export function markChannelAsRead(channelId: string, prevChannelId: string, upda
     return async (dispatch, getState) => {
         // Send channel last viewed at to the server
         if (updateLastViewedAt) {
-            dispatch({type: ChannelTypes.UPDATE_LAST_VIEWED_REQUEST, data: null}, getState);
-
-            Client4.viewMyChannel(channelId, prevChannelId).then(() => {
-                dispatch({type: ChannelTypes.UPDATE_LAST_VIEWED_SUCCESS, data: null}, getState);
-            }).catch((error) => {
+            Client4.viewMyChannel(channelId, prevChannelId).then().catch((error) => {
                 forceLogoutIfNecessary(error, dispatch, getState);
-                dispatch(batchActions([
-                    {type: ChannelTypes.UPDATE_LAST_VIEWED_FAILURE, error},
-                    logError(error),
-                ]), getState);
+                dispatch(logError(error));
                 return {error};
             });
         }
@@ -1271,35 +1127,35 @@ export function markChannelAsUnread(teamId: string, channelId: string, mentions:
 }
 
 export function getChannelMembersByIds(channelId: string, userIds: Array<string>) {
-    return bindClientFunc(
-        Client4.getChannelMembersByIds,
-        ChannelTypes.CHANNEL_MEMBERS_REQUEST,
-        [ChannelTypes.RECEIVED_CHANNEL_MEMBERS, ChannelTypes.CHANNEL_MEMBERS_SUCCESS],
-        ChannelTypes.CHANNEL_MEMBERS_FAILURE,
-        channelId,
-        userIds
-    );
+    return bindClientFunc({
+        clientFunc: Client4.getChannelMembersByIds,
+        onSuccess: ChannelTypes.RECEIVED_CHANNEL_MEMBERS,
+        params: [
+            channelId,
+            userIds,
+        ],
+    });
 }
 
 export function getChannelMember(channelId: string, userId: string) {
-    return bindClientFunc(
-        Client4.getChannelMember,
-        ChannelTypes.CHANNEL_MEMBERS_REQUEST,
-        [ChannelTypes.RECEIVED_CHANNEL_MEMBER, ChannelTypes.CHANNEL_MEMBERS_SUCCESS],
-        ChannelTypes.CHANNEL_MEMBERS_FAILURE,
-        channelId,
-        userId
-    );
+    return bindClientFunc({
+        clientFunc: Client4.getChannelMember,
+        onSuccess: ChannelTypes.RECEIVED_CHANNEL_MEMBER,
+        params: [
+            channelId,
+            userId,
+        ],
+    });
 }
 
 export function getMyChannelMember(channelId: string) {
-    return bindClientFunc(
-        Client4.getMyChannelMember,
-        ChannelTypes.CHANNEL_MEMBERS_REQUEST,
-        [ChannelTypes.RECEIVED_MY_CHANNEL_MEMBER, ChannelTypes.CHANNEL_MEMBERS_SUCCESS],
-        ChannelTypes.CHANNEL_MEMBERS_FAILURE,
-        channelId
-    );
+    return bindClientFunc({
+        clientFunc: Client4.getMyChannelMember,
+        onSuccess: ChannelTypes.RECEIVED_MY_CHANNEL_MEMBER,
+        params: [
+            channelId,
+        ],
+    });
 }
 
 export function favoriteChannel(channelId: string): ActionFunc {
@@ -1335,27 +1191,23 @@ export function unfavoriteChannel(channelId: string): ActionFunc {
 }
 
 export function updateChannelScheme(channelId: string, schemeId: string) {
-    return bindClientFunc(
-        async () => {
+    return bindClientFunc({
+        clientFunc: async () => {
             await Client4.updateChannelScheme(channelId, schemeId);
             return {channelId, schemeId};
         },
-        ChannelTypes.UPDATE_CHANNEL_SCHEME_REQUEST,
-        [ChannelTypes.UPDATE_CHANNEL_SCHEME_SUCCESS, ChannelTypes.UPDATED_CHANNEL_SCHEME],
-        ChannelTypes.UPDATE_CHANNEL_SCHEME_FAILURE,
-    );
+        onSuccess: ChannelTypes.UPDATED_CHANNEL_SCHEME,
+    });
 }
 
 export function updateChannelMemberSchemeRoles(channelId: string, userId: string, isSchemeUser: boolean, isSchemeAdmin: boolean) {
-    return bindClientFunc(
-        async () => {
+    return bindClientFunc({
+        clientFunc: async () => {
             await Client4.updateChannelMemberSchemeRoles(channelId, userId, isSchemeUser, isSchemeAdmin);
             return {channelId, userId, isSchemeUser, isSchemeAdmin};
         },
-        ChannelTypes.UPDATE_CHANNEL_MEMBER_SCHEME_ROLES_REQUEST,
-        [ChannelTypes.UPDATE_CHANNEL_MEMBER_SCHEME_ROLES_SUCCESS, ChannelTypes.UPDATED_CHANNEL_MEMBER_SCHEME_ROLES],
-        ChannelTypes.UPDATE_CHANNEL_MEMBER_SCHEME_ROLES_FAILURE,
-    );
+        onSuccess: ChannelTypes.UPDATED_CHANNEL_MEMBER_SCHEME_ROLES,
+    });
 }
 
 export default {
