@@ -9,7 +9,7 @@ export type ChannelStats = {|
     member_count: number
 |};
 
-export type NotifyProps = {|
+export type ChannelNotifyProps = {|
     desktop: 'default' | 'all' | 'mention' | 'none',
     email: 'default' | 'all' | 'mention' | 'none',
     mark_unread: 'all' | 'mention',
@@ -46,7 +46,7 @@ export type ChannelMembership = {|
     last_viewed_at: number,
     msg_count: number,
     mention_count: number,
-    notify_props: NotifyProps,
+    notify_props: ChannelNotifyProps,
     last_update_at: number,
     scheme_user: boolean,
     scheme_admin: boolean,

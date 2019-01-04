@@ -2,7 +2,7 @@
 // See LICENSE.txt for license information.
 // @flow
 
-export type NotifyProps = {|
+export type UserNotifyProps = {|
     desktop: 'default' | 'all' | 'mention' | 'none',
     desktop_sound: 'true' | 'false',
     email: 'true' | 'false',

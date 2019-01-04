@@ -8,9 +8,9 @@ import {getPreferencesByCategory} from './preference_utils';
 import {hasNewPermissions} from 'selectors/entities/general';
 import {haveITeamPermission, haveIChannelPermission} from 'selectors/entities/roles';
 
-import type {Channel, ChannelMembership, ChannelType, NotifyProps as ChannelNotifyProps} from '../types/channels';
+import type {Channel, ChannelMembership, ChannelType, ChannelNotifyProps} from '../types/channels';
 import type {Post} from '../types/posts';
-import type {UserProfile, UsersState, NotifyProps as UserNotifyProps} from '../types/users';
+import type {UserProfile, UsersState, UserNotifyProps} from '../types/users';
 import type {GlobalState} from '../types/store';
 import type {TeamMembership} from '../types/teams';
 import type {PreferenceType} from '../types/preferences';
