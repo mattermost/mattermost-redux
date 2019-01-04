@@ -33,3 +33,9 @@ export type UsersState = {|
     statuses: {[string]: string},
     stats: Object,
 |};
+
+export type UserTimezone = {|
+    useAutomaticTimezone: boolean | string,
+    automaticTimezone: string,
+    manualTimezone: string,
+|};

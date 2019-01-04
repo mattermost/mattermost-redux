@@ -88,3 +88,18 @@ export type DialogSubmission = {|
     submission: {[string]: string},
     cancelled: boolean,
 |};
+
+export type DialogElement = {|
+      display_name: string,
+      name: string,
+      type: string,
+      subtype: string,
+      default: string,
+      placeholder: string,
+      help_text: string,
+      optional: boolean,
+      min_length: number,
+      max_length: number,
+      data_source: string,
+      options: Array<{text: string, value: Object}>,
+|};

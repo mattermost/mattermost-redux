@@ -1,11 +1,14 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
+// @flow
 
 import {Files, General} from 'constants';
 import {Client4} from 'client';
 import mimeDB from 'mime-db';
 
-export function getFormattedFileSize(file) {
+import type {FileInfo} from '../types/files';
+
+export function getFormattedFileSize(file: FileInfo): string {
     const bytes = file.size;
     const fileSizes = [
         ['TB', 1024 * 1024 * 1024 * 1024],
@@ -23,7 +26,7 @@ export function getFormattedFileSize(file) {
     return `${bytes} B`;
 }
 
-export function getFileType(file) {
+export function getFileType(file: FileInfo): string {
     if (!file || !file.extension) {
         return 'other';
     }
@@ -60,7 +63,7 @@ function buildExtToMime() {
     });
 }
 
-export function lookupMimeType(filename) {
+export function lookupMimeType(filename: string): string {
     if (!extToMime) {
         buildExtToMime();
     }
@@ -70,23 +73,23 @@ export function lookupMimeType(filename) {
     return extToMime[ext] || 'application/octet-stream';
 }
 
-export function getFileUrl(fileId) {
+export function getFileUrl(fileId: string): string {
     return Client4.getFileRoute(fileId);
 }
 
-export function getFileDownloadUrl(fileId) {
+export function getFileDownloadUrl(fileId: string): string {
     return `${Client4.getFileRoute(fileId)}?download=1`;
 }
 
-export function getFileThumbnailUrl(fileId) {
+export function getFileThumbnailUrl(fileId: string): string {
     return `${Client4.getFileRoute(fileId)}/thumbnail`;
 }
 
-export function getFilePreviewUrl(fileId) {
+export function getFilePreviewUrl(fileId: string): string {
     return `${Client4.getFileRoute(fileId)}/preview`;
 }
 
-export function sortFileInfos(fileInfos = [], locale = General.DEFAULT_LOCALE) {
+export function sortFileInfos(fileInfos: Array<FileInfo> = [], locale: string = General.DEFAULT_LOCALE): Array<FileInfo> {
     return fileInfos.sort((a, b) => {
         if (a.create_at !== b.create_at) {
             return a.create_at - b.create_at;

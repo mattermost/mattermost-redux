@@ -1,7 +1,16 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
+// @flow
 
-export function checkDialogElementForError(elem, value) {
+import type {DialogElement} from '../types/integrations';
+
+type DialogError = {|
+    id: string,
+    defaultMessage: string,
+    values?: Object,
+|};
+
+export function checkDialogElementForError(elem: DialogElement, value: Object): ?DialogError {
     if (!value && !elem.optional) {
         return {
             id: 'interactive_dialog.error.required',
@@ -52,7 +61,7 @@ export function checkDialogElementForError(elem, value) {
 
 // If we're returned errors that don't match any of the elements we have,
 // ignore them and complete the dialog
-export function checkIfErrorsMatchElements(errors = {}, elements = []) {
+export function checkIfErrorsMatchElements(errors: {[string]: DialogError} = {}, elements: Array<DialogElement> = []) {
     for (const name in errors) {
         if (!errors.hasOwnProperty(name)) {
             continue;
