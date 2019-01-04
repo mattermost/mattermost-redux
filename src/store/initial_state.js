@@ -195,42 +195,6 @@ const state: GlobalState = {
                 status: 'not_started',
                 error: null,
             },
-            deleteTeam: {
-                status: 'not_started',
-                error: null,
-            },
-            emailInvite: {
-                status: 'not_started',
-                error: null,
-            },
-            getMyTeamUnreads: {
-                status: 'not_started',
-                error: null,
-            },
-            getTeam: {
-                status: 'not_started',
-                error: null,
-            },
-            joinTeam: {
-                status: 'not_started',
-                error: null,
-            },
-            removeTeamIcon: {
-                status: 'not_started',
-                error: null,
-            },
-            setTeamIcon: {
-                status: 'not_started',
-                error: null,
-            },
-            updateTeamMember: {
-                status: 'not_started',
-                error: null,
-            },
-            updateTeamMemberSchemeRoles: {
-                status: 'not_started',
-                error: null,
-            },
         },
         users: {
             checkMfa: {
