@@ -29,6 +29,8 @@ import type {
     IntegrationsRequestsStatuses,
     RolesRequestsStatuses,
     SchemesRequestsStatuses,
+    JobsRequestsStatuses,
+    SearchRequestsStatuses,
 } from './requests';
 import type {Role} from './roles';
 import type {PreferenceType} from './preferences';
@@ -74,6 +76,8 @@ export type GlobalState = {|
         files: FilesRequestsStatuses,
         integrations: IntegrationsRequestsStatuses,
         roles: RolesRequestsStatuses,
-        schemes: SchemesRequestsStatuses
+        jobs: JobsRequestsStatuses,
+        schemes: SchemesRequestsStatuses,
+        search: SearchRequestsStatuses
     |}
 |};

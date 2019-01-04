@@ -34,7 +34,7 @@ export function hasNewPermissions(state: GlobalState): boolean {
            (version.match(/^4.8.\d.\d\d\d\d.*$/) !== null && isMinimumServerVersion(version, 4, 8, 0));
 }
 
-export const canUploadFilesOnMobile = createSelector(
+export const canUploadFilesOnMobile: (GlobalState) => boolean = createSelector(
     getConfig,
     getLicense,
     (config: Object, license: Object): boolean => {
@@ -44,7 +44,7 @@ export const canUploadFilesOnMobile = createSelector(
     }
 );
 
-export const canDownloadFilesOnMobile = createSelector(
+export const canDownloadFilesOnMobile: (GlobalState) => boolean = createSelector(
     getConfig,
     getLicense,
     (config: Object, license: Object): boolean => {
@@ -53,7 +53,7 @@ export const canDownloadFilesOnMobile = createSelector(
     }
 );
 
-export const getAutolinkedUrlSchemes = createSelector(
+export const getAutolinkedUrlSchemes: (GlobalState) => string[] = createSelector(
     getConfig,
     (config: Object): string[] => {
         if (!config.CustomUrlSchemes) {

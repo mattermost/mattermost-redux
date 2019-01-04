@@ -8,7 +8,7 @@ import {AdminTypes} from 'action_types';
 import {handleRequest, initialRequestState} from './helpers';
 
 import type {GenericAction} from '../../types/actions';
-import type {RequestStatusType} from '../../types/requests';
+import type {AdminRequestsStatuses, RequestStatusType} from '../../types/requests';
 
 function getLogs(state: RequestStatusType = initialRequestState(), action: GenericAction): RequestStatusType {
     return handleRequest(
@@ -360,7 +360,7 @@ function disablePlugin(state: RequestStatusType = initialRequestState(), action:
     );
 }
 
-export default combineReducers({
+export default (combineReducers({
     getLogs,
     getAudits,
     getConfig,
@@ -396,5 +396,4 @@ export default combineReducers({
     removePlugin,
     enablePlugin,
     disablePlugin,
-});
-
+}): (AdminRequestsStatuses, GenericAction) => AdminRequestsStatuses);

@@ -18,11 +18,11 @@ export function getMyChannelMemberships(state: GlobalState): {[string]: ChannelM
     return state.entities.channels.myMembers;
 }
 
-export const getMyCurrentChannelMembership = createSelector(
+export const getMyCurrentChannelMembership: (GlobalState) => ?ChannelMembership = createSelector(
     getCurrentChannelId,
     getMyChannelMemberships,
     (currentChannelId, channelMemberships) => {
-        return channelMemberships[currentChannelId] || {};
+        return channelMemberships[currentChannelId] || null;
     }
 );
 

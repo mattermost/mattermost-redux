@@ -8,7 +8,7 @@ import {SearchTypes} from 'action_types';
 import {handleRequest, initialRequestState} from './helpers';
 
 import type {GenericAction} from '../../types/actions';
-import type {RequestStatusType} from '../../types/requests';
+import type {SearchRequestsStatuses, RequestStatusType} from '../../types/requests';
 
 function searchPosts(state: RequestStatusType = initialRequestState(), action: GenericAction): RequestStatusType {
     if (action.type === SearchTypes.REMOVE_SEARCH_POSTS) {
@@ -66,9 +66,9 @@ function recentMentions(state: RequestStatusType = initialRequestState(), action
     );
 }
 
-export default combineReducers({
+export default (combineReducers({
     flaggedPosts,
     pinnedPosts,
     recentMentions,
     searchPosts,
-});
+}): (SearchRequestsStatuses, GenericAction) => SearchRequestsStatuses);

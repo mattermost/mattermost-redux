@@ -8,7 +8,7 @@ import {ChannelTypes} from 'action_types';
 import {handleRequest, initialRequestState} from './helpers';
 
 import type {GenericAction} from '../../types/actions';
-import type {RequestStatusType} from '../../types/requests';
+import type {ChannelsRequestsStatuses, RequestStatusType} from '../../types/requests';
 
 function getChannel(state: RequestStatusType = initialRequestState(), action: GenericAction): RequestStatusType {
     return handleRequest(
@@ -190,7 +190,7 @@ function updateChannelMemberSchemeRoles(state: RequestStatusType = initialReques
     );
 }
 
-export default combineReducers({
+export default (combineReducers({
     getChannel,
     getChannels,
     myMembers,
@@ -210,4 +210,4 @@ export default combineReducers({
     updateChannelScheme,
     updateChannelMemberSchemeRoles,
 
-});
+}): (ChannelsRequestsStatuses, GenericAction) => ChannelsRequestsStatuses);

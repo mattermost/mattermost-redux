@@ -5,7 +5,7 @@
 import {combineReducers} from 'redux';
 import {SchemeTypes, UserTypes} from 'action_types';
 import type {GenericAction} from 'types/actions';
-import type {Scheme} from 'types/schemes';
+import type {SchemesState, Scheme} from 'types/schemes';
 
 function schemes(state: { [string]: Scheme } = {}, action: GenericAction): { [string]: Scheme } {
     switch (action.type) {
@@ -40,4 +40,4 @@ function schemes(state: { [string]: Scheme } = {}, action: GenericAction): { [st
     }
 }
 
-export default combineReducers({schemes});
+export default (combineReducers({schemes}): (SchemesState, GenericAction) => SchemesState);
