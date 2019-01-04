@@ -3,8 +3,9 @@
 // @flow
 
 import type {Team} from 'types/teams';
+import type {IDMappedObjects} from 'types/utilities';
 
-export function teamListToMap(teamList: Array<Team>): {[string]: Team} {
+export function teamListToMap(teamList: Array<Team>): IDMappedObjects<Team> {
     const teams = {};
     for (let i = 0; i < teamList.length; i++) {
         teams[teamList[i].id] = teamList[i];

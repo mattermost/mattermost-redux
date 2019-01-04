@@ -2,6 +2,9 @@
 // See LICENSE.txt for license information.
 // @flow
 
+import type {IDMappedObjects, UserIDMappedObjects, RelationOneToMany, RelationOneToOne} from './utilities';
+import type {Team} from './teams';
+
 export type ChannelType = 'O' | 'P' | 'D' | 'G';
 
 export type ChannelStats = {|
@@ -55,9 +58,9 @@ export type ChannelMembership = {|
 
 export type ChannelsState = {|
     currentChannelId: string,
-    channels: { [string]: Channel },
-    channelsInTeam: { [string]: Array<string> },
-    myMembers: { [string]: ChannelMembership },
-    membersInChannel: { [string]: { [string]: ChannelMembership } },
-    stats: { [string]: ChannelStats }
+    channels: IDMappedObjects<Channel>,
+    channelsInTeam: RelationOneToMany<Team, Channel>,
+    myMembers: RelationOneToOne<Channel, ChannelMembership>,
+    membersInChannel: RelationOneToOne<Channel, UserIDMappedObjects<ChannelMembership>>,
+    stats: RelationOneToOne<Channel, ChannelStats>,
 |};

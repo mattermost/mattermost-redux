@@ -2,6 +2,9 @@
 // See LICENSE.txt for license information.
 // @flow
 
+import type {Channel} from './channels';
+import type {IDMappedObjects, RelationOneToMany, RelationOneToOne} from './utilities';
+
 export type UserNotifyProps = {|
     desktop: 'default' | 'all' | 'mention' | 'none',
     desktop_sound: 'true' | 'false',
@@ -38,13 +41,13 @@ export type UsersState = {|
     myAcceptedTermsOfServiceData: Object,
     mySessions: Array<Object>,
     myAudits: Array<Object>,
-    profiles: {[string]: UserProfile},
+    profiles: IDMappedObjects<UserProfile>,
     profilesInTeam: Object,
     profilesNotInTeam: Object,
     profilesWithoutTeam: Set<Object>,
-    profilesInChannel: {[string]: Array<string>},
-    profilesNotInChannel: {[string]: Array<string>},
-    statuses: {[string]: string},
+    profilesInChannel: RelationOneToMany<Channel, UserProfile>,
+    profilesNotInChannel: RelationOneToMany<Channel, UserProfile>,
+    statuses: RelationOneToOne<UserProfile, string>,
     stats: Object,
 |};
 

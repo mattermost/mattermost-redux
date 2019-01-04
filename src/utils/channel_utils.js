@@ -14,6 +14,7 @@ import type {UserProfile, UsersState, UserNotifyProps} from '../types/users';
 import type {GlobalState} from '../types/store';
 import type {TeamMembership} from '../types/teams';
 import type {PreferenceType} from '../types/preferences';
+import type {RelationOneToOne, IDMappedObjects} from '../types/utilities';
 
 const channelTypeOrder = {
     [General.OPEN_CHANNEL]: 0,
@@ -32,7 +33,7 @@ const channelTypeOrder = {
  *  favoriteChannels: [...]
  * }
  */
-export function buildDisplayableChannelList(usersState: UsersState, allChannels: Array<Channel>, myMembers: {[string]: ChannelMembership}, config: Object, myPreferences: {[string]: PreferenceType}, teammateNameDisplay: string, lastPosts: {[string]: Post}) {
+export function buildDisplayableChannelList(usersState: UsersState, allChannels: Array<Channel>, myMembers: RelationOneToOne<Channel, ChannelMembership>, config: Object, myPreferences: {[string]: PreferenceType}, teammateNameDisplay: string, lastPosts: RelationOneToOne<Channel, Post>) {
     const missingDirectChannels = createMissingDirectChannels(usersState.currentUserId, allChannels, myPreferences);
 
     const {currentUserId, profiles} = usersState;
@@ -51,7 +52,7 @@ export function buildDisplayableChannelList(usersState: UsersState, allChannels:
     };
 }
 
-export function buildDisplayableChannelListWithUnreadSection(usersState: UsersState, myChannels: Array<Channel>, myMembers: {[string]: ChannelMembership}, config: Object, myPreferences: {[string]: PreferenceType}, teammateNameDisplay: string, lastPosts: {[string]: Post}) {
+export function buildDisplayableChannelListWithUnreadSection(usersState: UsersState, myChannels: Array<Channel>, myMembers: RelationOneToOne<Channel, ChannelMembership>, config: Object, myPreferences: {[string]: PreferenceType}, teammateNameDisplay: string, lastPosts: RelationOneToOne<Channel, Post>) {
     const {currentUserId, profiles} = usersState;
     const locale = getUserLocale(currentUserId, profiles);
 
@@ -90,7 +91,7 @@ export function completeDirectChannelInfo(usersState: UsersState, teammateNameDi
     return channel;
 }
 
-export function completeDirectChannelDisplayName(currentUserId: string, profiles: {[string]: UserProfile}, teammateNameDisplay: string, channel: Channel): Channel {
+export function completeDirectChannelDisplayName(currentUserId: string, profiles: IDMappedObjects<UserProfile>, teammateNameDisplay: string, channel: Channel): Channel {
     if (isDirectChannel(channel)) {
         const dmChannelClone = {...channel};
         const teammateId = getUserIdFromChannelName(currentUserId, channel.name);
@@ -122,7 +123,7 @@ export function cleanUpUrlable(input: string): string {
     return cleaned;
 }
 
-export function getChannelByName(channels: {[string]: Channel}, name: string): ?Channel {
+export function getChannelByName(channels: IDMappedObjects<Channel>, name: string): ?Channel {
     const channelIds = Object.keys(channels);
     for (let i = 0; i < channelIds.length; i++) {
         const id = channelIds[i];
@@ -217,7 +218,7 @@ export function isGroupChannelVisible(config: Object, myPreferences: {[string]: 
     return isUnread || !isAutoClosed(config, myPreferences, channel, lastPost ? lastPost.create_at : 0, 0);
 }
 
-export function isGroupOrDirectChannelVisible(channel: Channel, memberships: {[string]: ChannelMembership}, config: Object, myPreferences: {[string]: PreferenceType}, currentUserId: string, users: {[string]: UserProfile}, lastPosts: {[string]: Post}): boolean {
+export function isGroupOrDirectChannelVisible(channel: Channel, memberships: RelationOneToOne<Channel, ChannelMembership>, config: Object, myPreferences: {[string]: PreferenceType}, currentUserId: string, users: IDMappedObjects<UserProfile>, lastPosts: RelationOneToOne<Channel, Post>): boolean {
     const lastPost = lastPosts[channel.id];
     if (isGroupChannel(channel) && isGroupChannelVisible(config, myPreferences, channel, lastPost, isUnreadChannel(memberships, channel))) {
         return true;
@@ -384,7 +385,7 @@ export function getChannelsIdForTeam(state: GlobalState, teamId: string): Array<
     }, []);
 }
 
-export function getGroupDisplayNameFromUserIds(userIds: Array<string>, profiles: {[string]: UserProfile}, currentUserId: string, teammateNameDisplay: string): string {
+export function getGroupDisplayNameFromUserIds(userIds: Array<string>, profiles: IDMappedObjects<UserProfile>, currentUserId: string, teammateNameDisplay: string): string {
     const names = [];
     userIds.forEach((id) => {
         if (id !== currentUserId) {
@@ -486,7 +487,7 @@ function channelHasMentions(members, channel) {
     return false;
 }
 
-function channelHasUnreadMessages(members: {[string]: ChannelMembership}, channel: Channel): boolean {
+function channelHasUnreadMessages(members: RelationOneToOne<Channel, ChannelMembership>, channel: Channel): boolean {
     const member = members[channel.id];
     if (member) {
         const msgCount = channel.total_msg_count - member.msg_count;
@@ -497,7 +498,7 @@ function channelHasUnreadMessages(members: {[string]: ChannelMembership}, channe
     return false;
 }
 
-function isUnreadChannel(members: {[string]: ChannelMembership}, channel: Channel): boolean {
+function isUnreadChannel(members: RelationOneToOne<Channel, ChannelMembership>, channel: Channel): boolean {
     const member = members[channel.id];
     if (member) {
         const msgCount = channel.total_msg_count - member.msg_count;
@@ -551,7 +552,7 @@ export function sortChannelsByDisplayName(locale: string, a: Channel, b: Channel
     return a.name.toLowerCase().localeCompare(b.name.toLowerCase(), locale, {numeric: true});
 }
 
-export function sortChannelsByDisplayNameAndMuted(locale: string, members: {[string]: ChannelMembership}, a: Channel, b: Channel): number {
+export function sortChannelsByDisplayNameAndMuted(locale: string, members: RelationOneToOne<Channel, ChannelMembership>, a: Channel, b: Channel): number {
     const aMember = members[a.id];
     const bMember = members[b.id];
 
@@ -566,7 +567,7 @@ export function sortChannelsByDisplayNameAndMuted(locale: string, members: {[str
     return -1;
 }
 
-export function sortChannelsByRecency(lastPosts: {[string]: Post}, a: Channel, b: Channel): number {
+export function sortChannelsByRecency(lastPosts: RelationOneToOne<Channel, Post>, a: Channel, b: Channel): number {
     let aLastPostAt = a.last_post_at;
     if (lastPosts[a.id] && lastPosts[a.id].update_at > a.last_post_at) {
         aLastPostAt = lastPosts[a.id].update_at;
@@ -615,7 +616,7 @@ function buildNotFavoriteChannels(channels: Array<Channel>, myPreferences: {[str
     return channels.filter((channel) => !isFavoriteChannel(myPreferences, channel.id));
 }
 
-function buildDirectAndGroupChannels(channels: Array<Channel>, memberships: {[string]: ChannelMembership}, config: Object, myPreferences: {[string]: PreferenceType}, currentUserId: string, users: {[string]: UserProfile}, lastPosts: {[string]: Post}): Array<Channel> {
+function buildDirectAndGroupChannels(channels: Array<Channel>, memberships: RelationOneToOne<Channel, ChannelMembership>, config: Object, myPreferences: {[string]: PreferenceType}, currentUserId: string, users: IDMappedObjects<UserProfile>, lastPosts: RelationOneToOne<Channel, Post>): Array<Channel> {
     return channels.filter((channel) => {
         return isGroupOrDirectChannelVisible(channel, memberships, config, myPreferences, currentUserId, users, lastPosts);
     });
