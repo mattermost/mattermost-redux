@@ -1,7 +1,10 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
+// @flow
 
-export function getUserCurrentTimezone(userTimezone) {
+import type {UserTimezone} from '../types/users';
+
+export function getUserCurrentTimezone(userTimezone: UserTimezone): ?string {
     if (!userTimezone) {
         return null;
     }
@@ -22,7 +25,7 @@ export function getUserCurrentTimezone(userTimezone) {
     return manualTimezone;
 }
 
-export function getTimezoneRegion(timezone) {
+export function getTimezoneRegion(timezone: string): string {
     if (timezone) {
         const split = timezone.split('/');
         if (split.length > 1) {

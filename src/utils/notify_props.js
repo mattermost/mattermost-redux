@@ -1,9 +1,10 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
+// @flow
 
 import {Preferences} from 'constants';
 
-export function getEmailInterval(enableEmailNotification, enableEmailBatching, emailIntervalPreference) {
+export function getEmailInterval(enableEmailNotification: boolean, enableEmailBatching: number, emailIntervalPreference: number): number {
     const {
         INTERVAL_NEVER,
         INTERVAL_IMMEDIATE,
