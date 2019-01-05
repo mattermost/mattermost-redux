@@ -7,8 +7,8 @@ import {
     getCurrentChannelId,
     getCurrentUser,
     getCurrentUserId,
-    getUsers,
     getMyCurrentChannelMembership,
+    getUsers,
 } from 'selectors/entities/common';
 
 import {getConfig, getLicense} from 'selectors/entities/general';
@@ -227,20 +227,21 @@ function filterProfiles(profiles, filters) {
     if (!filters || Object.keys(filters).length === 0) {
         return profiles;
     }
-    const filteredProfiles = {};
 
-    for (const [id, profile] of Object.entries(profiles)) {
-        if (filters.role && filters.role !== '') {
-            if (profile.roles && profile.roles.indexOf(filters.role) !== -1) {
-                filteredProfiles[id] = profile;
-            }
-        } else if (filters.inactive) {
-            if (profile.delete_at !== 0) {
-                filteredProfiles[id] = profile;
-            }
-        }
+    let users = Object.values(profiles);
+
+    if (filters.role && filters.role !== '') {
+        users = users.filter((user) => user.roles && user.roles.indexOf(filters.role) !== -1);
     }
-    return filteredProfiles;
+
+    if (filters.inactive) {
+        users = users.filter((user) => user.delete_at !== 0);
+    }
+
+    return users.reduce((acc, user) => {
+        acc[user.id] = user;
+        return acc;
+    }, {});
 }
 
 export const getProfilesInCurrentChannel = createSelector(
@@ -341,7 +342,7 @@ export function searchProfilesInCurrentTeam(state, term, skipCurrent = false) {
 
 export function searchProfilesInTeam(state, teamId, term, skipCurrent = false, filters = {}) {
     const profiles = filterProfilesMatchingTerm(getProfilesInTeam(state, teamId), term);
-    const filteredProfiles = filterProfiles(profiles, filters);
+    const filteredProfiles = Object.values(filterProfiles(profiles, filters));
     if (skipCurrent) {
         removeCurrentUserFromList(filteredProfiles, getCurrentUserId(state));
     }
@@ -360,7 +361,7 @@ export function searchProfilesNotInCurrentTeam(state, term, skipCurrent = false)
 
 export function searchProfilesWithoutTeam(state, term, skipCurrent = false, filters = {}) {
     const profiles = filterProfilesMatchingTerm(getProfilesWithoutTeam(state), term);
-    const filteredProfiles = filterProfiles(profiles, filters);
+    const filteredProfiles = Object.values(filterProfiles(profiles, filters));
     if (skipCurrent) {
         removeCurrentUserFromList(filteredProfiles, getCurrentUserId(state));
     }
