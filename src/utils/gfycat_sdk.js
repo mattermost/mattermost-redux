@@ -1,5 +1,6 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
+// @flow
 
 import Gfycat from 'gfycat-sdk';
 
@@ -10,7 +11,7 @@ let activeKey = null;
 let activeSecret = null;
 let instance = null;
 
-export default function(key, secret) {
+export default function(key: string, secret: string): Gfycat {
     if (instance && activeKey === key && activeSecret === secret) {
         return instance;
     }
