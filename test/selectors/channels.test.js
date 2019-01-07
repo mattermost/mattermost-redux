@@ -248,7 +248,7 @@ describe('Selectors.Channels', () => {
     });
 
     it('get unreads', () => {
-        assert.deepEqual(Selectors.getUnreads(testState), {messageCount: 6, mentionCount: 5});
+        assert.deepEqual(Selectors.getUnreads(testState), {messageCount: 4, mentionCount: 4});
     });
 
     it('get unreads with a missing profile entity', () => {
@@ -267,7 +267,7 @@ describe('Selectors.Channels', () => {
             },
         };
 
-        assert.deepEqual(Selectors.getUnreads(newState), {messageCount: 6, mentionCount: 3});
+        assert.deepEqual(Selectors.getUnreads(newState), {messageCount: 4, mentionCount: 2});
         assert.deepEqual(Selectors.getUnreadsInCurrentTeam(newState), {messageCount: 3, mentionCount: 1});
     });
 
@@ -290,7 +290,7 @@ describe('Selectors.Channels', () => {
                 },
             },
         };
-        assert.deepEqual(Selectors.getUnreads(newState), {messageCount: 6, mentionCount: 3});
+        assert.deepEqual(Selectors.getUnreads(newState), {messageCount: 4, mentionCount: 2});
         assert.deepEqual(Selectors.getUnreadsInCurrentTeam(newState), {messageCount: 3, mentionCount: 1});
     });
 
@@ -314,7 +314,7 @@ describe('Selectors.Channels', () => {
             },
         };
 
-        assert.deepEqual(Selectors.getUnreads(newState), {messageCount: 5, mentionCount: 4});
+        assert.deepEqual(Selectors.getUnreads(newState), {messageCount: 3, mentionCount: 3});
         assert.deepEqual(Selectors.getUnreadsInCurrentTeam(newState), {messageCount: 2, mentionCount: 2});
     });
 
