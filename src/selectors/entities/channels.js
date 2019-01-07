@@ -442,8 +442,8 @@ export const getUnreads: (GlobalState) => {messageCount: number, mentionCount: n
             const channel = channels[channelId];
             const m = myMembers[channelId];
 
-            if (channel && m && (channel.team_id === currentTeamId || channel.type === 'D')) {
-                let otherUserId = '';
+            if (channel && m && (channel.team_id === currentTeamId || channel.type === General.DM_CHANNEL || channel.type === General.GM_CHANNEL)) {
+                let otherUserId;
                 if (channel.type === 'D') {
                     otherUserId = getUserIdFromChannelName(currentUserId, channel.name);
                     if (users[otherUserId] && users[otherUserId].delete_at === 0) {
