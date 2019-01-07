@@ -153,11 +153,13 @@ export function getGroupMembers(groupID: string, page: number = 0, perPage: numb
 }
 
 export function getGroup(id: string): ActionFunc {
-    return bindClientFunc(
-        Client4.getGroup,
-        GroupTypes.GET_GROUP_REQUEST,
-        [GroupTypes.RECEIVED_GROUP, GroupTypes.GET_GROUP_SUCCESS],
-        GroupTypes.GET_GROUP_FAILURE,
-        id,
-    );
+    return bindClientFunc({
+        clientFunc: Client4.getGroup,
+        onRequest: GroupTypes.GET_GROUP_REQUEST,
+        onSuccess: [GroupTypes.RECEIVED_GROUP, GroupTypes.GET_GROUP_SUCCESS],
+        onFailure: GroupTypes.GET_GROUP_FAILURE,
+        params: [
+            id,
+        ],
+    });
 }

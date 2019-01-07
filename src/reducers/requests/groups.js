@@ -8,7 +8,7 @@ import {GroupTypes} from 'action_types';
 import {handleRequest, initialRequestState} from './helpers';
 
 import type {GenericAction} from '../../types/actions';
-import type {RequestStatusType} from '../../types/requests';
+import type {RequestStatusType, GroupsRequestsStatuses} from '../../types/requests';
 
 function linkGroupSyncable(state: RequestStatusType = initialRequestState(), action: GenericAction): RequestStatusType {
     return handleRequest(
@@ -60,11 +60,11 @@ function getGroup(state: RequestStatusType = initialRequestState(), action: Gene
     );
 }
 
-export default combineReducers({
+export default (combineReducers({
     linkGroupSyncable,
     unlinkGroupSyncable,
     getGroupSyncables,
     getGroupMembers,
     getGroup,
-});
+}): (GroupsRequestsStatuses, GenericAction) => GroupsRequestsStatuses);
 

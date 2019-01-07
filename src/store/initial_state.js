@@ -132,10 +132,6 @@ const state: GlobalState = {
     errors: [],
     requests: {
         channels: {
-            getChannel: {
-                status: 'not_started',
-                error: null,
-            },
             getAllChannels: {
                 status: 'not_started',
                 error: null,
@@ -372,6 +368,18 @@ const state: GlobalState = {
                 status: 'not_started',
                 error: null,
             },
+            uploadPrivateSamlCertificate: {
+                status: 'not_started',
+                error: null,
+            },
+            uploadPublicSamlCertificate: {
+                status: 'not_started',
+                error: null,
+            },
+            uploadPlugin: {
+                status: 'not_started',
+                error: null,
+            },
             uploadLicense: {
                 status: 'not_started',
                 error: null,
@@ -391,15 +399,22 @@ const state: GlobalState = {
         },
         emojis: {
             createCustomEmoji: {
-            uploadPlugin: {
                 status: 'not_started',
                 error: null,
             },
-            uploadPrivateSamlCertificate: {
+            getCustomEmojis: {
                 status: 'not_started',
                 error: null,
             },
-            uploadPublicSamlCertificate: {
+            deleteCustomEmoji: {
+                status: 'not_started',
+                error: null,
+            },
+            getAllCustomEmojis: {
+                status: 'not_started',
+                error: null,
+            },
+            getCustomEmoji: {
                 status: 'not_started',
                 error: null,
             },
@@ -566,6 +581,10 @@ const state: GlobalState = {
                 error: null,
             },
             getGroup: {
+                status: 'not_started',
+                error: null,
+            },
+        },
         jobs: {
             createJob: {
                 status: 'not_started',

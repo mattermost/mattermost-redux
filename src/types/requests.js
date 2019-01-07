@@ -11,8 +11,6 @@ export type RequestStatusType = {|
 export type ChannelsRequestsStatuses = {|
     getChannels: RequestStatusType,
     getAllChannels: RequestStatusType,
-    myMembers: RequestStatusType,
-    members: RequestStatusType,
     myChannels: RequestStatusType,
     createChannel: RequestStatusType,
     updateChannel: RequestStatusType,

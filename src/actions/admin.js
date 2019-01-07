@@ -207,14 +207,16 @@ export function syncLdap(): ActionFunc {
 }
 
 export function getLdapGroups(page: number = 0, perPage: number = General.PAGE_SIZE_MAXIMUM): ActionFunc {
-    return bindClientFunc(
-        Client4.getLdapGroups,
-        AdminTypes.GET_LDAP_GROUPS_REQUEST,
-        [AdminTypes.RECEIVED_LDAP_GROUPS, AdminTypes.GET_LDAP_GROUPS_SUCCESS],
-        AdminTypes.GET_LDAP_GROUPS_FAILURE,
-        page,
-        perPage
-    );
+    return bindClientFunc({
+        clientFunc: Client4.getLdapGroups,
+        onRequest: AdminTypes.GET_LDAP_GROUPS_REQUEST,
+        onSuccess: [AdminTypes.RECEIVED_LDAP_GROUPS, AdminTypes.GET_LDAP_GROUPS_SUCCESS],
+        onFailure: AdminTypes.GET_LDAP_GROUPS_FAILURE,
+        params: [
+            page,
+            perPage,
+        ],
+    });
 }
 
 export function linkLdapGroup(key: string): ActionFunc {
