@@ -1,7 +1,11 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
 
-import {createSelector} from 'reselect';
+const emptyList = [];
+const emptySyncables = {
+    teams: [],
+    channels: [],
+};
 
 export function getAllGroups(state) {
     return state.entities.groups.groups;
@@ -20,39 +24,22 @@ export function getGroupMemberCount(state, id) {
     return memberData[id].totalMemberCount;
 }
 
-const getGroupSyncables = createSelector(
-    (state) => state.entities.groups.syncables,
-    (state, id) => id,
-    (allSyncables, groupID) => {
-        return allSyncables[groupID] || {
-            teams: [],
-            channels: [],
-        };
-    }
-);
+function getGroupSyncables(state, id) {
+    return state.entities.groups.syncables[id] || emptySyncables;
+}
 
-export const getGroupTeams = createSelector(
-    getGroupSyncables,
-    (groupSyncables) => {
-        return groupSyncables.teams;
-    }
-);
+export function getGroupTeams(state, id) {
+    return getGroupSyncables(state, id).teams;
+}
 
-export const getGroupChannels = createSelector(
-    getGroupSyncables,
-    (groupSyncables) => {
-        return groupSyncables.channels;
-    }
-);
+export function getGroupChannels(state, id) {
+    return getGroupSyncables(state, id).channels;
+}
 
-export const getGroupMembers = createSelector(
-    (state) => state.entities.groups.members,
-    (state, id) => id,
-    (memberData, groupID) => {
-        const groupMemberData = memberData[groupID];
-        if (!groupMemberData) {
-            return [];
-        }
-        return groupMemberData.members;
+export function getGroupMembers(state, id) {
+    const groupMemberData = state.entities.groups.members[id];
+    if (!groupMemberData) {
+        return emptyList;
     }
-);
+    return groupMemberData.members;
+}
