@@ -2,7 +2,7 @@
 // See LICENSE.txt for license information.
 // @flow
 
-import type {UserTimezone} from '../types/users';
+import type {UserTimezone} from 'types/users';
 
 export function getUserCurrentTimezone(userTimezone: UserTimezone): ?string {
     if (!userTimezone) {

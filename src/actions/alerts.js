@@ -5,8 +5,8 @@
 import {AlertTypes} from 'action_types';
 import {Alerts} from 'constants';
 
-import type {ActionFunc} from '../types/actions';
-import type {AlertType} from '../types/alerts';
+import type {ActionFunc} from 'types/actions';
+import type {AlertType} from 'types/alerts';
 
 export function pushNotificationAlert(message: string): ActionFunc {
     return async (dispatch, getState) => {

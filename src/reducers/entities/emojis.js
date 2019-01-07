@@ -9,10 +9,10 @@ import {
     UserTypes,
 } from 'action_types';
 
-import type {EmojisState, CustomEmoji} from '../../types/emojis';
-import type {Post} from '../../types/posts';
-import type {GenericAction} from '../../types/actions';
-import type {IDMappedObjects} from '../../types/utilities';
+import type {EmojisState, CustomEmoji} from 'types/emojis';
+import type {Post} from 'types/posts';
+import type {GenericAction} from 'types/actions';
+import type {IDMappedObjects} from 'types/utilities';
 
 export function customEmoji(state: IDMappedObjects<CustomEmoji> = {}, action: GenericAction): IDMappedObjects<CustomEmoji> {
     switch (action.type) {

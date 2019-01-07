@@ -8,13 +8,13 @@ import {getPreferencesByCategory} from './preference_utils';
 import {hasNewPermissions} from 'selectors/entities/general';
 import {haveITeamPermission, haveIChannelPermission} from 'selectors/entities/roles';
 
-import type {Channel, ChannelMembership, ChannelType, ChannelNotifyProps} from '../types/channels';
-import type {Post} from '../types/posts';
-import type {UserProfile, UsersState, UserNotifyProps} from '../types/users';
-import type {GlobalState} from '../types/store';
-import type {TeamMembership} from '../types/teams';
-import type {PreferenceType} from '../types/preferences';
-import type {RelationOneToOne, IDMappedObjects} from '../types/utilities';
+import type {Channel, ChannelMembership, ChannelType, ChannelNotifyProps} from 'types/channels';
+import type {Post} from 'types/posts';
+import type {UserProfile, UsersState, UserNotifyProps} from 'types/users';
+import type {GlobalState} from 'types/store';
+import type {TeamMembership} from 'types/teams';
+import type {PreferenceType} from 'types/preferences';
+import type {RelationOneToOne, IDMappedObjects} from 'types/utilities';
 
 const channelTypeOrder = {
     [General.OPEN_CHANNEL]: 0,

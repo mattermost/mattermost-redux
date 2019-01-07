@@ -7,8 +7,8 @@ import {GeneralTypes} from 'action_types';
 
 import {handleRequest, initialRequestState} from './helpers';
 
-import type {GenericAction} from '../../types/actions';
-import type {GeneralRequestsStatuses, RequestStatusType} from '../../types/requests';
+import type {GenericAction} from 'types/actions';
+import type {GeneralRequestsStatuses, RequestStatusType} from 'types/requests';
 
 function server(state: RequestStatusType = initialRequestState(), action: GenericAction): RequestStatusType {
     if (action.type === GeneralTypes.PING_RESET) {

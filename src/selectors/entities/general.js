@@ -7,7 +7,7 @@ import {isMinimumServerVersion} from 'utils/helpers';
 
 import {General} from 'constants';
 
-import type {GlobalState} from '../../types/store';
+import type {GlobalState} from 'types/store';
 
 export function getConfig(state: GlobalState): Object {
     return state.entities.general.config;

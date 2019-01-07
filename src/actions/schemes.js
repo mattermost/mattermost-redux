@@ -9,8 +9,8 @@ import {batchActions} from 'redux-batched-actions';
 
 import {bindClientFunc, forceLogoutIfNecessary} from './helpers';
 import {logError} from './errors';
-import type {Scheme, SchemeScope, SchemePatch} from '../types/schemes';
-import type {ActionFunc} from '../types/actions';
+import type {Scheme, SchemeScope, SchemePatch} from 'types/schemes';
+import type {ActionFunc} from 'types/actions';
 
 export function getScheme(schemeId: string): ActionFunc {
     return bindClientFunc({

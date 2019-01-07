@@ -8,7 +8,7 @@ import {Client4} from 'client';
 import {FileTypes} from 'action_types';
 import {logError} from './errors';
 import {bindClientFunc, forceLogoutIfNecessary} from './helpers';
-import type {DispatchFunc, GetStateFunc} from '../types/actions';
+import type {DispatchFunc, GetStateFunc} from 'types/actions';
 
 export function getFilesForPost(postId: string) {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {

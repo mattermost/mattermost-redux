@@ -2,7 +2,7 @@
 // See LICENSE.txt for license information.
 // @flow
 
-import type {DialogElement} from '../types/integrations';
+import type {DialogElement} from 'types/integrations';
 
 type DialogError = {|
     id: string,

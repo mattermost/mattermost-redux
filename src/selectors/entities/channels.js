@@ -54,13 +54,13 @@ export {
     getMyCurrentChannelMembership,
 };
 
-import type {GlobalState} from '../../types/store';
-import type {Channel, ChannelStats, ChannelMembership} from '../../types/channels';
-import type {UsersState, UserProfile} from '../../types/users';
-import type {PreferenceType} from '../../types/preferences';
-import type {Post} from '../../types/posts';
-import type {TeamMembership, Team} from '../../types/teams';
-import type {NameMappedObjects, UserIDMappedObjects, IDMappedObjects, RelationOneToOne, RelationOneToMany} from '../../types/utilities';
+import type {GlobalState} from 'types/store';
+import type {Channel, ChannelStats, ChannelMembership} from 'types/channels';
+import type {UsersState, UserProfile} from 'types/users';
+import type {PreferenceType} from 'types/preferences';
+import type {Post} from 'types/posts';
+import type {TeamMembership, Team} from 'types/teams';
+import type {NameMappedObjects, UserIDMappedObjects, IDMappedObjects, RelationOneToOne, RelationOneToMany} from 'types/utilities';
 
 type SortingType = 'recent' | 'alpha';
 
