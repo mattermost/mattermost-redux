@@ -435,7 +435,7 @@ export const getUnreads: (GlobalState) => {messageCount: number, mentionCount: n
     getCurrentTeamId,
     getMyTeams,
     getTeamMemberships,
-    (channels: IDMappedObjects<Channel>, myMembers: RelationOneToOne<Channel, ChannelMembership>, users: IDMappedObjects<UserProfile>, currentUserId: string, currentTeamId: string, myTeams: Array<Team>, myTeamMemberships: Array<TeamMembership>): {messageCount: number, mentionCount: number} => {
+    (channels: IDMappedObjects<Channel>, myMembers: RelationOneToOne<Channel, ChannelMembership>, users: IDMappedObjects<UserProfile>, currentUserId: string, currentTeamId: string, myTeams: Array<Team>, myTeamMemberships: RelationOneToOne<Team, TeamMembership>): {messageCount: number, mentionCount: number} => {
         let messageCountForCurrentTeam = 0; // Includes message count from channels of current team plus all GM'S and all DM's across teams
         let mentionCountForCurrentTeam = 0; // Includes mention count from channels of current team plus all GM'S and all DM's across teams
         Object.keys(myMembers).forEach((channelId) => {
@@ -443,7 +443,7 @@ export const getUnreads: (GlobalState) => {messageCount: number, mentionCount: n
             const m = myMembers[channelId];
 
             if (channel && m && (channel.team_id === currentTeamId || channel.type === General.DM_CHANNEL || channel.type === General.GM_CHANNEL)) {
-                let otherUserId;
+                let otherUserId = '';
                 if (channel.type === 'D') {
                     otherUserId = getUserIdFromChannelName(currentUserId, channel.name);
                     if (users[otherUserId] && users[otherUserId].delete_at === 0) {

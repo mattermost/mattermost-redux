@@ -186,7 +186,7 @@ describe('Selectors.Channels', () => {
                     [team2.id]: {
                         id: team2.id,
                         mention_count: 1,
-                        msg_count: 2,
+                        msg_count: 1,
                     },
                 },
             },
