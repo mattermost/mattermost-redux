@@ -7,8 +7,8 @@ import {PreferenceTypes} from 'action_types';
 
 import {handleRequest, initialRequestState} from './helpers';
 
-import type {GenericAction} from '../../types/actions';
-import type {PreferencesRequestsStatuses, RequestStatusType} from '../../types/requests';
+import type {GenericAction} from 'types/actions';
+import type {PreferencesRequestsStatuses, RequestStatusType} from 'types/requests';
 
 function getMyPreferences(state: RequestStatusType = initialRequestState(), action: GenericAction): RequestStatusType {
     return handleRequest(

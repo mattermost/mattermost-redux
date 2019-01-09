@@ -7,8 +7,8 @@ import {IntegrationTypes} from 'action_types';
 
 import {handleRequest, initialRequestState} from './helpers';
 
-import type {GenericAction} from '../../types/actions';
-import type {IntegrationsRequestsStatuses, RequestStatusType} from '../../types/requests';
+import type {GenericAction} from 'types/actions';
+import type {IntegrationsRequestsStatuses, RequestStatusType} from 'types/requests';
 
 function createIncomingHook(state: RequestStatusType = initialRequestState(), action: GenericAction): RequestStatusType {
     return handleRequest(

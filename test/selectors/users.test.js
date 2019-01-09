@@ -17,25 +17,33 @@ describe('Selectors.Users', () => {
 
     const user1 = TestHelper.fakeUserWithId();
     user1.notify_props = {mention_keys: 'testkey1,testkey2'};
+    user1.roles = 'system_admin system_user';
     const user2 = TestHelper.fakeUserWithId();
     user2.delete_at = 1;
     const user3 = TestHelper.fakeUserWithId();
     const user4 = TestHelper.fakeUserWithId();
     const user5 = TestHelper.fakeUserWithId();
+    const user6 = TestHelper.fakeUserWithId();
+    user6.roles = 'system_admin system_user';
+    const user7 = TestHelper.fakeUserWithId();
+    user7.delete_at = 1;
+    user7.roles = 'system_admin system_user';
     const profiles = {};
     profiles[user1.id] = user1;
     profiles[user2.id] = user2;
     profiles[user3.id] = user3;
     profiles[user4.id] = user4;
     profiles[user5.id] = user5;
+    profiles[user6.id] = user6;
+    profiles[user7.id] = user7;
 
     const profilesInTeam = {};
-    profilesInTeam[team1.id] = new Set([user1.id, user2.id]);
+    profilesInTeam[team1.id] = new Set([user1.id, user2.id, user7.id]);
 
     const profilesNotInTeam = {};
     profilesNotInTeam[team1.id] = new Set([user3.id, user4.id]);
 
-    const profilesWithoutTeam = new Set([user5.id]);
+    const profilesWithoutTeam = new Set([user5.id, user6.id]);
 
     const profilesInChannel = {};
     profilesInChannel[channel1.id] = new Set([user1.id]);
@@ -204,20 +212,50 @@ describe('Selectors.Users', () => {
         });
     });
 
-    it('getProfiles', () => {
-        const users = [user1, user2, user3, user4, user5].sort(sortByUsername);
-        assert.deepEqual(Selectors.getProfiles(testState), users);
+    describe('getProfiles', () => {
+        it('getProfiles without filter', () => {
+            const users = [user1, user2, user3, user4, user5, user6, user7].sort(sortByUsername);
+            assert.deepEqual(Selectors.getProfiles(testState), users);
+        });
+
+        it('getProfiles with role filter', () => {
+            const users = [user1, user6, user7].sort(sortByUsername);
+            assert.deepEqual(Selectors.getProfiles(testState, {role: 'system_admin'}), users);
+        });
+        it('getProfiles with inactive', () => {
+            const users = [user2, user7].sort(sortByUsername);
+            assert.deepEqual(Selectors.getProfiles(testState, {inactive: true}), users);
+        });
+        it('getProfiles with multiple filters', () => {
+            const users = [user7];
+            assert.deepEqual(Selectors.getProfiles(testState, {role: 'system_admin', inactive: true}), users);
+        });
     });
 
     it('getProfilesInCurrentTeam', () => {
-        const users = [user1, user2].sort(sortByUsername);
+        const users = [user1, user2, user7].sort(sortByUsername);
         assert.deepEqual(Selectors.getProfilesInCurrentTeam(testState), users);
     });
-
-    it('getProfilesInTeam', () => {
-        const users = [user1, user2].sort(sortByUsername);
-        assert.deepEqual(Selectors.getProfilesInTeam(testState, team1.id), users);
-        assert.deepEqual(Selectors.getProfilesInTeam(testState, 'junk'), []);
+    describe('getProfilesInTeam', () => {
+        it('getProfilesInTeam without filter', () => {
+            const users = [user1, user2, user7].sort(sortByUsername);
+            assert.deepEqual(Selectors.getProfilesInTeam(testState, team1.id), users);
+            assert.deepEqual(Selectors.getProfilesInTeam(testState, 'junk'), []);
+        });
+        it('getProfilesInTeam with role filter', () => {
+            const users = [user1, user7].sort(sortByUsername);
+            assert.deepEqual(Selectors.getProfilesInTeam(testState, team1.id, {role: 'system_admin'}), users);
+            assert.deepEqual(Selectors.getProfilesInTeam(testState, 'junk', {role: 'system_admin'}), []);
+        });
+        it('getProfilesInTeam with inactive filter', () => {
+            const users = [user2, user7].sort(sortByUsername);
+            assert.deepEqual(Selectors.getProfilesInTeam(testState, team1.id, {inactive: true}), users);
+            assert.deepEqual(Selectors.getProfilesInTeam(testState, 'junk', {inactive: true}), []);
+        });
+        it('getProfilesInTeam with multiple filters', () => {
+            const users = [user7];
+            assert.deepEqual(Selectors.getProfilesInTeam(testState, team1.id, {role: 'system_admin', inactive: true}), users);
+        });
     });
 
     it('getProfilesNotInCurrentTeam', () => {
@@ -225,14 +263,29 @@ describe('Selectors.Users', () => {
         assert.deepEqual(Selectors.getProfilesNotInCurrentTeam(testState), users);
     });
 
-    it('getProfilesWithoutTeam', () => {
-        assert.deepEqual(Selectors.getProfilesWithoutTeam(testState), [user5]);
+    describe('getProfilesWithoutTeam', () => {
+        it('getProfilesWithoutTeam', () => {
+            const users = [user5, user6].sort(sortByUsername);
+            assert.deepEqual(Selectors.getProfilesWithoutTeam(testState), users);
+        });
+        it('getProfilesWithoutTeam with filter', () => {
+            assert.deepEqual(Selectors.getProfilesWithoutTeam(testState, {role: 'system_admin'}), [user6]);
+        });
     });
 
-    it('searchProfiles', () => {
-        assert.deepEqual(Selectors.searchProfiles(testState, user1.username), [user1]);
-        assert.deepEqual(Selectors.searchProfiles(testState, user2.first_name + ' ' + user2.last_name), [user2]);
-        assert.deepEqual(Selectors.searchProfiles(testState, user1.username, true), []);
+    describe('searchProfiles', () => {
+        it('searchProfiles without filter', () => {
+            assert.deepEqual(Selectors.searchProfiles(testState, user1.username), [user1]);
+            assert.deepEqual(Selectors.searchProfiles(testState, user2.first_name + ' ' + user2.last_name), [user2]);
+            assert.deepEqual(Selectors.searchProfiles(testState, user1.username, true), []);
+        });
+
+        it('searchProfiles with filters', () => {
+            assert.deepEqual(Selectors.searchProfiles(testState, user1.username, false, {role: 'system_admin'}), [user1]);
+            assert.deepEqual(Selectors.searchProfiles(testState, user3.username, false, {role: 'system_admin'}), []);
+            assert.deepEqual(Selectors.searchProfiles(testState, user3.username, false, {inactive: true}), []);
+            assert.deepEqual(Selectors.searchProfiles(testState, user2.username, false, {inactive: true}), [user2]);
+        });
     });
 
     it('searchProfilesInCurrentChannel', () => {
@@ -250,9 +303,19 @@ describe('Selectors.Users', () => {
         assert.deepEqual(Selectors.searchProfilesInCurrentTeam(testState, user1.username, true), []);
     });
 
-    it('searchProfilesInTeam', () => {
-        assert.deepEqual(Selectors.searchProfilesInTeam(testState, team1.id, user1.username), [user1]);
-        assert.deepEqual(Selectors.searchProfilesInTeam(testState, team1.id, user1.username, true), []);
+    describe('searchProfilesInTeam', () => {
+        it('searchProfilesInTeam without filter', () => {
+            assert.deepEqual(Selectors.searchProfilesInTeam(testState, team1.id, user1.username), [user1]);
+            assert.deepEqual(Selectors.searchProfilesInTeam(testState, team1.id, user1.username, true), []);
+        });
+        it('searchProfilesInTeam with filter', () => {
+            assert.deepEqual(Selectors.searchProfilesInTeam(testState, team1.id, user1.username, false, {role: 'system_admin'}), [user1]);
+            assert.deepEqual(Selectors.searchProfilesInTeam(testState, team1.id, user1.username, false, {inactive: true}), []);
+        });
+        it('getProfiles with multiple filters', () => {
+            const users = [user7];
+            assert.deepEqual(Selectors.searchProfilesInTeam(testState, team1.id, user7.username, false, {role: 'system_admin', inactive: true}), users);
+        });
     });
 
     it('searchProfilesNotInCurrentTeam', () => {
@@ -260,13 +323,18 @@ describe('Selectors.Users', () => {
         assert.deepEqual(Selectors.searchProfilesNotInCurrentTeam(testState, user3.username, true), [user3]);
     });
 
-    it('searchProfilesWithoutTeam', () => {
-        assert.deepEqual(Selectors.searchProfilesWithoutTeam(testState, user5.username), [user5]);
-        assert.deepEqual(Selectors.searchProfilesWithoutTeam(testState, user5.username, true), [user5]);
+    describe('searchProfilesWithoutTeam', () => {
+        it('searchProfilesWithoutTeam without filter', () => {
+            assert.deepEqual(Selectors.searchProfilesWithoutTeam(testState, user5.username), [user5]);
+            assert.deepEqual(Selectors.searchProfilesWithoutTeam(testState, user5.username, true), [user5]);
+        });
+        it('searchProfilesWithoutTeam with filter', () => {
+            assert.deepEqual(Selectors.searchProfilesWithoutTeam(testState, user6.username, false, {role: 'system_admin'}), [user6]);
+            assert.deepEqual(Selectors.searchProfilesWithoutTeam(testState, user5.username, false, {inactive: true}), []);
+        });
     });
-
     it('isCurrentUserSystemAdmin', () => {
-        assert.deepEqual(Selectors.isCurrentUserSystemAdmin(testState), false);
+        assert.deepEqual(Selectors.isCurrentUserSystemAdmin(testState), true);
     });
 
     it('getUserByUsername', () => {

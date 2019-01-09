@@ -5,6 +5,8 @@
 import type {CustomEmoji} from './emojis';
 import type {FileInfo} from './files';
 import type {Reaction} from './reactions';
+import type {Channel} from './channels';
+import type {RelationOneToMany, IDMappedObjects} from './utilities';
 
 export type PostType = 'system_add_remove' |
                        'system_add_to_channel' |
@@ -61,9 +63,9 @@ export type Post = {|
 |}
 
 export type PostsState = {|
-    posts: {[string]: Post},
-    postsInChannel: {[string]: Array<string>},
-    postsInThread: {[string]: Array<string>},
+    posts: IDMappedObjects<Post>,
+    postsInChannel: RelationOneToMany<Channel, Post>,
+    postsInThread: RelationOneToMany<Post, Post>,
     selectedPostId: string,
     currentFocusedPostId: string,
     messagesHistory: {|

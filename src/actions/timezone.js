@@ -4,7 +4,7 @@
 import {getCurrentUser} from 'selectors/entities/users';
 import {getUserTimezone} from 'selectors/entities/timezone';
 import {updateMe} from 'actions/users';
-import type {DispatchFunc, GetStateFunc} from '../types/actions';
+import type {DispatchFunc, GetStateFunc} from 'types/actions';
 
 export function autoUpdateTimezone(deviceTimezone: string) {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {

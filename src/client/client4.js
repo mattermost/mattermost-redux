@@ -522,11 +522,11 @@ export default class Client4 {
         return response;
     };
 
-    getProfiles = async (page = 0, perPage = PER_PAGE_DEFAULT) => {
+    getProfiles = async (page = 0, perPage = PER_PAGE_DEFAULT, options = {}) => {
         this.trackEvent('api', 'api_profiles_get');
 
         return this.doFetch(
-            `${this.getUsersRoute()}${buildQueryString({page, per_page: perPage})}`,
+            `${this.getUsersRoute()}${buildQueryString({page, per_page: perPage, ...options})}`,
             {method: 'get'}
         );
     };

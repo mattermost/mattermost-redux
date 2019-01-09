@@ -7,8 +7,8 @@ import {SearchTypes} from 'action_types';
 
 import {handleRequest, initialRequestState} from './helpers';
 
-import type {GenericAction} from '../../types/actions';
-import type {SearchRequestsStatuses, RequestStatusType} from '../../types/requests';
+import type {GenericAction} from 'types/actions';
+import type {SearchRequestsStatuses, RequestStatusType} from 'types/requests';
 
 function searchPosts(state: RequestStatusType = initialRequestState(), action: GenericAction): RequestStatusType {
     if (action.type === SearchTypes.REMOVE_SEARCH_POSTS) {

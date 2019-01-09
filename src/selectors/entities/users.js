@@ -7,8 +7,8 @@ import {
     getCurrentChannelId,
     getCurrentUser,
     getCurrentUserId,
-    getUsers,
     getMyCurrentChannelMembership,
+    getUsers,
 } from 'selectors/entities/common';
 
 import {getConfig, getLicense} from 'selectors/entities/general';
@@ -217,10 +217,32 @@ function sortAndInjectProfiles(profiles, profileSet, skipInactive = false) {
 
 export const getProfiles = createSelector(
     getUsers,
-    (profiles) => {
-        return sortAndInjectProfiles(profiles, PROFILE_SET_ALL);
+    (state, filters) => filters,
+    (profiles, filters) => {
+        return sortAndInjectProfiles(filterProfiles(profiles, filters), PROFILE_SET_ALL);
     }
 );
+
+function filterProfiles(profiles, filters) {
+    if (!filters || Object.keys(filters).length === 0) {
+        return profiles;
+    }
+
+    let users = Object.values(profiles);
+
+    if (filters.role && filters.role !== '') {
+        users = users.filter((user) => user.roles && user.roles.indexOf(filters.role) !== -1);
+    }
+
+    if (filters.inactive) {
+        users = users.filter((user) => user.delete_at !== 0);
+    }
+
+    return users.reduce((acc, user) => {
+        acc[user.id] = user;
+        return acc;
+    }, {});
+}
 
 export const getProfilesInCurrentChannel = createSelector(
     getUsers,
@@ -250,8 +272,9 @@ export const getProfilesInTeam = createSelector(
     getUsers,
     getUserIdsInTeams,
     (state, teamId) => teamId,
-    (profiles, usersInTeams, teamId) => {
-        return sortAndInjectProfiles(profiles, usersInTeams[teamId] || new Set());
+    (state, teamId, filters) => filters,
+    (profiles, usersInTeams, teamId, filters) => {
+        return sortAndInjectProfiles(filterProfiles(profiles, filters), usersInTeams[teamId] || new Set());
     }
 );
 
@@ -266,8 +289,9 @@ export const getProfilesNotInCurrentTeam = createSelector(
 export const getProfilesWithoutTeam = createSelector(
     getUsers,
     getUserIdsWithoutTeam,
-    (profiles, withoutTeamProfileSet) => {
-        return sortAndInjectProfiles(profiles, withoutTeamProfileSet);
+    (state, filters) => filters,
+    (profiles, withoutTeamProfileSet, filters) => {
+        return sortAndInjectProfiles(filterProfiles(profiles, filters), withoutTeamProfileSet);
     }
 );
 
@@ -279,13 +303,14 @@ export function getTotalUsersStats(state) {
     return state.entities.users.stats;
 }
 
-export function searchProfiles(state, term, skipCurrent = false) {
-    const profiles = filterProfilesMatchingTerm(Object.values(getUsers(state)), term);
+export function searchProfiles(state, term, skipCurrent = false, filters = {}) {
+    const profiles = filterProfilesMatchingTerm(Object.values(getUsers(state)), term, filters);
+    const filteredProfiles = Object.values(filterProfiles(profiles, filters));
     if (skipCurrent) {
-        removeCurrentUserFromList(profiles, getCurrentUserId(state));
+        removeCurrentUserFromList(filteredProfiles, getCurrentUserId(state));
     }
 
-    return profiles;
+    return filteredProfiles;
 }
 
 export function searchProfilesInCurrentChannel(state, term, skipCurrent = false) {
@@ -315,13 +340,14 @@ export function searchProfilesInCurrentTeam(state, term, skipCurrent = false) {
     return profiles;
 }
 
-export function searchProfilesInTeam(state, teamId, term, skipCurrent = false) {
+export function searchProfilesInTeam(state, teamId, term, skipCurrent = false, filters = {}) {
     const profiles = filterProfilesMatchingTerm(getProfilesInTeam(state, teamId), term);
+    const filteredProfiles = Object.values(filterProfiles(profiles, filters));
     if (skipCurrent) {
-        removeCurrentUserFromList(profiles, getCurrentUserId(state));
+        removeCurrentUserFromList(filteredProfiles, getCurrentUserId(state));
     }
 
-    return profiles;
+    return filteredProfiles;
 }
 
 export function searchProfilesNotInCurrentTeam(state, term, skipCurrent = false) {
@@ -333,13 +359,14 @@ export function searchProfilesNotInCurrentTeam(state, term, skipCurrent = false)
     return profiles;
 }
 
-export function searchProfilesWithoutTeam(state, term, skipCurrent = false) {
+export function searchProfilesWithoutTeam(state, term, skipCurrent = false, filters = {}) {
     const profiles = filterProfilesMatchingTerm(getProfilesWithoutTeam(state), term);
+    const filteredProfiles = Object.values(filterProfiles(profiles, filters));
     if (skipCurrent) {
-        removeCurrentUserFromList(profiles, getCurrentUserId(state));
+        removeCurrentUserFromList(filteredProfiles, getCurrentUserId(state));
     }
 
-    return profiles;
+    return filteredProfiles;
 }
 
 function removeCurrentUserFromList(profiles, currentUserId) {

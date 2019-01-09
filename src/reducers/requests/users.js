@@ -8,8 +8,8 @@ import {UserTypes} from 'action_types';
 
 import {handleRequest, initialRequestState} from './helpers';
 
-import type {GenericAction} from '../../types/actions';
-import type {UsersRequestsStatuses, RequestStatusType} from '../../types/requests';
+import type {GenericAction} from 'types/actions';
+import type {UsersRequestsStatuses, RequestStatusType} from 'types/requests';
 
 function checkMfa(state: RequestStatusType = initialRequestState(), action: GenericAction): RequestStatusType {
     switch (action.type) {

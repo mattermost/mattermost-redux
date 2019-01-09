@@ -170,6 +170,25 @@ describe('Selectors.Channels', () => {
             },
             teams: {
                 currentTeamId: team1.id,
+                teams: {
+                    [team1.id]: {
+                        id: team1.id,
+                    },
+                    [team2.id]: {
+                        id: team2.id,
+                    },
+                },
+                myMembers: {
+                    [team1.id]: {
+                        mention_count: 2,
+                        msg_count: 10,
+                    },
+                    [team2.id]: {
+                        id: team2.id,
+                        mention_count: 1,
+                        msg_count: 1,
+                    },
+                },
             },
             channels: {
                 currentChannelId: channel1.id,

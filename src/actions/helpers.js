@@ -7,8 +7,8 @@ import {Client4} from 'client';
 import {UserTypes} from 'action_types';
 import {logError} from './errors';
 
-import type {Client4Error} from '../types/client4';
-import type {ActionFunc, GenericAction, DispatchFunc, GetStateFunc} from '../types/actions';
+import type {Client4Error} from 'types/client4';
+import type {ActionFunc, GenericAction, DispatchFunc, GetStateFunc} from 'types/actions';
 type ActionType = string;
 
 const HTTP_UNAUTHORIZED = 401;

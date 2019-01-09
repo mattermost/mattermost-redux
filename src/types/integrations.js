@@ -2,6 +2,8 @@
 // See LICENSE.txt for license information.
 // @flow
 
+import type {IDMappedObjects} from './utilities';
+
 export type IncomingWebhook = {|
     id: string,
     create_at: number,
@@ -71,11 +73,11 @@ export type OAuthApp = {|
 |};
 
 export type IntegrationsState = {|
-    incomingHooks: {[string]: IncomingWebhook},
-    outgoingHooks: {[string]: OutgoingWebhook},
-    oauthApps: {[string]: OAuthApp},
-    systemCommands: {[string]: Command},
-    commands: {[string]: Command}
+    incomingHooks: IDMappedObjects<IncomingWebhook>,
+    outgoingHooks: IDMappedObjects<OutgoingWebhook>,
+    oauthApps: IDMappedObjects<OAuthApp>,
+    systemCommands: IDMappedObjects<Command>,
+    commands: IDMappedObjects<Command>
 |};
 
 export type DialogSubmission = {|

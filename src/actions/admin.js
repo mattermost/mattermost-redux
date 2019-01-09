@@ -11,8 +11,8 @@ import {logError} from './errors';
 import {bindClientFunc, forceLogoutIfNecessary} from './helpers';
 import {batchActions} from 'redux-batched-actions';
 
-import type {ActionFunc} from '../types/actions';
-import type {Job} from '../types/jobs';
+import type {ActionFunc} from 'types/actions';
+import type {Job} from 'types/jobs';
 
 export function getLogs(page: number = 0, perPage: number = General.LOGS_PAGE_SIZE_DEFAULT): ActionFunc {
     return bindClientFunc({

@@ -15,9 +15,9 @@ import {bindClientFunc, forceLogoutIfNecessary} from './helpers';
 import {getMissingProfilesByIds} from './users';
 import {loadRolesIfNeeded} from './roles';
 
-import type {ActionFunc, DispatchFunc, GetStateFunc} from '../types/actions';
-import type {Channel, NotifyProps, ChannelMembership} from '../types/channels';
-import type {PreferenceType} from '../types/preferences';
+import type {ActionFunc, DispatchFunc, GetStateFunc} from 'types/actions';
+import type {Channel, ChannelNotifyProps, ChannelMembership} from 'types/channels';
+import type {PreferenceType} from 'types/preferences';
 
 export function selectChannel(channelId: string): ActionFunc {
     return async (dispatch, getState) => {
@@ -314,7 +314,7 @@ export function convertChannelToPrivate(channelId: string): ActionFunc {
     };
 }
 
-export function updateChannelNotifyProps(userId: string, channelId: string, props: NotifyProps): ActionFunc {
+export function updateChannelNotifyProps(userId: string, channelId: string, props: ChannelNotifyProps): ActionFunc {
     return async (dispatch, getState) => {
         const notifyProps = {
             user_id: userId,
