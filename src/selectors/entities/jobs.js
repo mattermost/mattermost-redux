@@ -6,8 +6,9 @@ import {createSelector} from 'reselect';
 
 import type {GlobalState} from 'types/store';
 import type {JobType, Job} from 'types/jobs';
+import type {IDMappedObjects} from 'types/utilities';
 
-export function getAllJobs(state: GlobalState): {[string]: Job} {
+export function getAllJobs(state: GlobalState): IDMappedObjects<Job> {
     return state.entities.jobs.jobs;
 }
 

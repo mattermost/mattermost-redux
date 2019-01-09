@@ -15,8 +15,9 @@ import {displayUsername} from 'utils/user_utils';
 import type {Typing} from '../../types/typing';
 import type {UserProfile} from '../../types/users';
 import type {GlobalState} from '../../types/store';
+import type {IDMappedObjects} from '../../types/utilities';
 
-const getUsersTypingImpl = (profiles: {[string]: UserProfile}, teammateNameDisplay: string, channelId: string, parentPostId: string, typing: Typing): Array<string> => {
+const getUsersTypingImpl = (profiles: IDMappedObjects<UserProfile>, teammateNameDisplay: string, channelId: string, parentPostId: string, typing: Typing): Array<string> => {
     const id = channelId + parentPostId;
 
     if (typing[id]) {
