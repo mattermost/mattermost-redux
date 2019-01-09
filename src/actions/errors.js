@@ -7,8 +7,8 @@ import serializeError from 'serialize-error';
 import {Client4} from 'client';
 import EventEmitter from 'utils/event_emitter';
 
-import type {DispatchFunc, ActionFunc} from '../types/actions';
-import type {Error} from '../types/errors';
+import type {DispatchFunc, ActionFunc} from 'types/actions';
+import type {Error} from 'types/errors';
 
 export function dismissErrorObject(index: number) {
     return {

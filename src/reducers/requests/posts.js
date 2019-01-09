@@ -7,8 +7,8 @@ import {PostTypes} from 'action_types';
 
 import {handleRequest, initialRequestState} from './helpers';
 
-import type {GenericAction} from '../../types/actions';
-import type {PostsRequestsStatuses, RequestStatusType} from '../../types/requests';
+import type {GenericAction} from 'types/actions';
+import type {PostsRequestsStatuses, RequestStatusType} from 'types/requests';
 
 function createPost(state: RequestStatusType = initialRequestState(), action: GenericAction): RequestStatusType {
     if (action.type === PostTypes.CREATE_POST_RESET_REQUEST) {

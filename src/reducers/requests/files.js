@@ -8,8 +8,8 @@ import {RequestStatus} from 'constants';
 
 import {initialRequestState} from './helpers';
 
-import type {GenericAction} from '../../types/actions';
-import type {FilesRequestsStatuses, RequestStatusType} from '../../types/requests';
+import type {GenericAction} from 'types/actions';
+import type {FilesRequestsStatuses, RequestStatusType} from 'types/requests';
 
 export function handleUploadFilesRequest(
     REQUEST: string,

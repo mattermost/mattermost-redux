@@ -14,8 +14,8 @@ import {getCurrentTeamId} from 'selectors/entities/teams';
 import {logError} from './errors';
 import {bindClientFunc, forceLogoutIfNecessary} from './helpers';
 
-import type {DispatchFunc, GetStateFunc} from '../types/actions';
-import type {Command, DialogSubmission, IncomingWebhook, OAuthApp, OutgoingWebhook} from '../types/integrations';
+import type {DispatchFunc, GetStateFunc} from 'types/actions';
+import type {Command, DialogSubmission, IncomingWebhook, OAuthApp, OutgoingWebhook} from 'types/integrations';
 
 export function createIncomingHook(hook: IncomingWebhook) {
     return bindClientFunc({

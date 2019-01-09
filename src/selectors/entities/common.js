@@ -2,10 +2,10 @@
 // See LICENSE.txt for license information.
 // @flow
 
-import type {GlobalState} from '../../types/store';
-import type {UserProfile} from '../../types/users';
-import type {ChannelMembership, Channel} from '../../types/channels';
-import type {RelationOneToOne, IDMappedObjects} from '../../types/utilities';
+import type {GlobalState} from 'types/store';
+import type {UserProfile} from 'types/users';
+import type {ChannelMembership, Channel} from 'types/channels';
+import type {RelationOneToOne, IDMappedObjects} from 'types/utilities';
 
 import {createSelector} from 'reselect';
 

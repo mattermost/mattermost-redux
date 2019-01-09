@@ -4,7 +4,7 @@
 
 import {Client4} from 'client';
 
-import type {Emoji, SystemEmoji, CustomEmoji} from '../types/emojis';
+import type {Emoji, SystemEmoji, CustomEmoji} from 'types/emojis';
 
 export function getEmojiImageUrl(emoji: Emoji): string {
     if (emoji.id) {

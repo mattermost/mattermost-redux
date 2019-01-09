@@ -4,8 +4,8 @@
 
 import {RequestStatus} from 'constants';
 
-import type {GenericAction} from '../../types/actions';
-import type {RequestStatusType} from '../../types/requests';
+import type {GenericAction} from 'types/actions';
+import type {RequestStatusType} from 'types/requests';
 
 export function initialRequestState(): RequestStatusType {
     return {

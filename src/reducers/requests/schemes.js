@@ -7,8 +7,8 @@ import {SchemeTypes} from 'action_types';
 
 import {handleRequest, initialRequestState} from './helpers';
 
-import type {GenericAction} from '../../types/actions';
-import type {SchemesRequestsStatuses, RequestStatusType} from '../../types/requests';
+import type {GenericAction} from 'types/actions';
+import type {SchemesRequestsStatuses, RequestStatusType} from 'types/requests';
 
 function getSchemes(state: RequestStatusType = initialRequestState(), action: GenericAction): RequestStatusType {
     return handleRequest(

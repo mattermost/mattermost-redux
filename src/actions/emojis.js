@@ -15,7 +15,7 @@ import {isMinimumServerVersion} from 'utils/helpers';
 import {logError} from './errors';
 import {bindClientFunc, forceLogoutIfNecessary} from './helpers';
 
-import type {GetStateFunc, DispatchFunc, ActionFunc} from '../types/actions';
+import type {GetStateFunc, DispatchFunc, ActionFunc} from 'types/actions';
 
 export let systemEmojis: Map<string, Object> = new Map();
 

@@ -6,8 +6,8 @@ import {createSelector} from 'reselect';
 
 import {Alerts} from 'constants';
 
-import type {AlertType} from '../../types/alerts';
-import type {GlobalState} from '../../types/store';
+import type {AlertType} from 'types/alerts';
+import type {GlobalState} from 'types/store';
 
 export function getAlerts(state: GlobalState) {
     return state.entities.alerts.alertStack;
