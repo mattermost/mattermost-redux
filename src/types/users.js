@@ -61,10 +61,10 @@ export type UserTimezone = {|
 
 export type UserActivity = {
     [PostType]: {
-        [string]: {|
+        [$ID<UserProfile>]: {|
             ids: Array<$ID<UserProfile>>,
             usernames: Array<$PropertyType<UserProfile, 'username'>>,
-        |} | Array<string>,
+        |} | Array<$ID<UserProfile>>,
     },
 };
 
