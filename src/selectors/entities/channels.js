@@ -21,7 +21,7 @@ import {
     getVisibleGroupIds,
 } from 'selectors/entities/preferences';
 import {getLastPostPerChannel, getAllPosts} from 'selectors/entities/posts';
-import {getCurrentTeamId, getCurrentTeamMembership} from 'selectors/entities/teams';
+import {getCurrentTeamId, getCurrentTeamMembership, getMyTeams, getTeamMemberships} from 'selectors/entities/teams';
 import {haveICurrentChannelPermission} from 'selectors/entities/roles';
 import {isCurrentUserSystemAdmin, getCurrentUserId} from 'selectors/entities/users';
 
@@ -416,36 +416,57 @@ export const getUnreads = createSelector(
     getMyChannelMemberships,
     getUsers,
     getCurrentUserId,
-    (channels, myMembers, users, currentUserId) => {
-        let messageCount = 0;
-        let mentionCount = 0;
+    getCurrentTeamId,
+    getMyTeams,
+    getTeamMemberships,
+    (channels, myMembers, users, currentUserId, currentTeamId, myTeams, myTeamMemberships) => {
+        let messageCountForCurrentTeam = 0; // Includes message count from channels of current team plus all GM'S and all DM's across teams
+        let mentionCountForCurrentTeam = 0; // Includes mention count from channels of current team plus all GM'S and all DM's across teams
         Object.keys(myMembers).forEach((channelId) => {
             const channel = channels[channelId];
             const m = myMembers[channelId];
 
-            if (channel && m) {
-                let otherUserId;
+            if (channel && m && (channel.team_id === currentTeamId || channel.type === General.DM_CHANNEL || channel.type === General.GM_CHANNEL)) {
+                let otherUserId = '';
                 if (channel.type === 'D') {
                     otherUserId = getUserIdFromChannelName(currentUserId, channel.name);
                     if (users[otherUserId] && users[otherUserId].delete_at === 0) {
-                        mentionCount += channel.total_msg_count - m.msg_count;
+                        mentionCountForCurrentTeam += channel.total_msg_count - m.msg_count;
                     }
                 } else if (m.mention_count > 0 && channel.delete_at === 0) {
-                    mentionCount += m.mention_count;
+                    mentionCountForCurrentTeam += m.mention_count;
                 }
+
                 if (m.notify_props && m.notify_props.mark_unread !== 'mention' && channel.total_msg_count - m.msg_count > 0) {
                     if (channel.type === 'D') {
                         if (users[otherUserId] && users[otherUserId].delete_at === 0) {
-                            messageCount += 1;
+                            messageCountForCurrentTeam += 1;
                         }
                     } else if (channel.delete_at === 0) {
-                        messageCount += 1;
+                        messageCountForCurrentTeam += 1;
                     }
                 }
             }
         });
 
-        return {messageCount, mentionCount};
+        // Includes mention count and message count from teams other than the current team
+        // This count does not include GM's and DM's
+        const otherTeamsUnreadCountForChannels = myTeams.reduce((acc, team) => {
+            if (currentTeamId !== team.id) {
+                const member = myTeamMemberships[team.id];
+                acc.messageCount += member.msg_count;
+                acc.mentionCount += member.mention_count;
+            }
+
+            return acc;
+        }, {messageCount: 0, mentionCount: 0});
+
+        const totalTeamsUnreadCount = {
+            messageCount: messageCountForCurrentTeam + otherTeamsUnreadCountForChannels.messageCount,
+            mentionCount: mentionCountForCurrentTeam + otherTeamsUnreadCountForChannels.mentionCount,
+        };
+
+        return totalTeamsUnreadCount;
     }
 );
 
@@ -1110,4 +1131,3 @@ export const getSortedDirectChannelWithUnreadsIds = createIdsSelector(
         return filterChannels(unreadChannelIds, favoritePreferences, directChannelIds, false, favoritesAtTop);
     },
 );
-
