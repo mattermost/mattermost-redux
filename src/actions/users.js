@@ -273,13 +273,13 @@ export function getTotalUsersStats(): ActionFunc {
     });
 }
 
-export function getProfiles(page: number = 0, perPage: number = General.PROFILE_CHUNK_SIZE): ActionFunc {
+export function getProfiles(page: number = 0, perPage: number = General.PROFILE_CHUNK_SIZE, options: Object = {}): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         const {currentUserId} = getState().entities.users;
 
         let profiles = null;
         try {
-            profiles = await Client4.getProfiles(page, perPage);
+            profiles = await Client4.getProfiles(page, perPage, options);
             removeUserFromList(currentUserId, profiles);
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch, getState);
