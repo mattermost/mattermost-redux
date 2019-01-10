@@ -486,6 +486,73 @@ function pluginStatuses(state = {}, action) {
     }
 }
 
+function ldapGroupsCount(state = {}, action) {
+    switch (action.type) {
+    case AdminTypes.RECEIVED_LDAP_GROUPS:
+        return action.data.count;
+    case UserTypes.LOGOUT_SUCCESS:
+        return 0;
+    default:
+        return state;
+    }
+}
+
+function ldapGroups(state = {}, action) {
+    switch (action.type) {
+    case AdminTypes.RECEIVED_LDAP_GROUPS: {
+        const nextState = {};
+        for (const group of action.data.groups) {
+            nextState[group.primary_key] = group;
+        }
+        return nextState;
+    }
+    case AdminTypes.LINKED_LDAP_GROUP: {
+        const nextState = {...state};
+        if (nextState[action.data.primary_key]) {
+            nextState[action.data.primary_key] = action.data;
+        }
+        return nextState;
+    }
+    case AdminTypes.UNLINKED_LDAP_GROUP: {
+        const nextState = {...state};
+        if (nextState[action.data]) {
+            nextState[action.data] = {
+                ...nextState[action.data],
+                mattermost_group_id: null,
+                has_syncables: null,
+                failed: false,
+            };
+        }
+        return nextState;
+    }
+    case AdminTypes.LINK_LDAP_GROUP_FAILURE: {
+        const nextState = {...state};
+        if (nextState[action.data]) {
+            nextState[action.data] = {
+                ...nextState[action.data],
+                failed: true,
+            };
+        }
+        return nextState;
+    }
+    case AdminTypes.UNLINK_LDAP_GROUP_FAILURE: {
+        const nextState = {...state};
+        if (nextState[action.data]) {
+            nextState[action.data] = {
+                ...nextState[action.data],
+                failed: true,
+            };
+        }
+        return nextState;
+    }
+    case UserTypes.LOGOUT_SUCCESS:
+        return {};
+
+    default:
+        return state;
+    }
+}
+
 export default combineReducers({
 
     // array of strings each representing a log entry
@@ -527,4 +594,10 @@ export default combineReducers({
 
     // object with plugin ids as keys and objects representing plugin statuses across the cluster
     pluginStatuses,
+
+    // object representing the ldap groups
+    ldapGroups,
+
+    // total ldap groups
+    ldapGroupsCount,
 });

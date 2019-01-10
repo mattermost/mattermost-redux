@@ -71,6 +71,8 @@ const state: GlobalState = {
             config: {},
             environmentConfig: {},
             complianceReports: {},
+            ldapGroups: {},
+            ldapGroupsCount: 0,
         },
         jobs: {
             jobs: {},
@@ -121,10 +123,19 @@ const state: GlobalState = {
             },
         },
         schemes: {schemes: {}},
+        groups: {
+            groups: {},
+            syncables: {},
+            members: {},
+        },
     },
     errors: [],
     requests: {
         channels: {
+            getAllChannels: {
+                status: 'not_started',
+                error: null,
+            },
             getChannels: {
                 status: 'not_started',
                 error: null,
@@ -373,6 +384,18 @@ const state: GlobalState = {
                 status: 'not_started',
                 error: null,
             },
+            getLdapGroups: {
+                status: 'not_started',
+                error: null,
+            },
+            unlinkLdapGroup: {
+                status: 'not_started',
+                error: null,
+            },
+            linkLdapGroup: {
+                status: 'not_started',
+                error: null,
+            },
         },
         files: {
             uploadFiles: {
@@ -550,6 +573,28 @@ const state: GlobalState = {
                 error: null,
             },
             searchPosts: {
+                status: 'not_started',
+                error: null,
+            },
+        },
+        groups: {
+            linkGroupSyncable: {
+                status: 'not_started',
+                error: null,
+            },
+            unlinkGroupSyncable: {
+                status: 'not_started',
+                error: null,
+            },
+            getGroupSyncables: {
+                status: 'not_started',
+                error: null,
+            },
+            getGroupMembers: {
+                status: 'not_started',
+                error: null,
+            },
+            getGroup: {
                 status: 'not_started',
                 error: null,
             },

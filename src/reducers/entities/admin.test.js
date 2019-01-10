@@ -614,4 +614,270 @@ describe('reducers.entities.admin', () => {
             convertAnalyticsRowsToStats(data, 'post_counts_day');
         });
     });
+
+    describe('ldapGroups', () => {
+        it('initial state', () => {
+            const state = {};
+            const action = {};
+            const expectedState = {};
+
+            const actualState = reducer({ldapGroups: state}, action);
+            assert.deepEqual(actualState.ldapGroups, expectedState);
+        });
+
+        it('RECEIVED_LDAP_GROUPS, empty initial state', () => {
+            const state = {};
+            const action = {
+                type: AdminTypes.RECEIVED_LDAP_GROUPS,
+                data: {
+                    count: 2,
+                    groups: [
+                        {
+                            primary_key: 'test1',
+                            name: 'test1',
+                            mattermost_group_id: null,
+                            has_syncables: null,
+                        },
+                        {
+                            primary_key: 'test2',
+                            name: 'test2',
+                            mattermost_group_id: 'mattermost-id',
+                            has_syncables: true,
+                        },
+                    ],
+                },
+            };
+            const expectedState = {
+                test1: {
+                    primary_key: 'test1',
+                    name: 'test1',
+                    mattermost_group_id: null,
+                    has_syncables: null,
+                },
+                test2: {
+                    primary_key: 'test2',
+                    name: 'test2',
+                    mattermost_group_id: 'mattermost-id',
+                    has_syncables: true,
+                },
+            };
+
+            const actualState = reducer({ldapGroups: state}, action);
+            assert.deepEqual(actualState.ldapGroups, expectedState);
+        });
+
+        it('RECEIVED_LDAP_GROUPS, previously populated', () => {
+            const state = {
+                test1: {
+                    primary_key: 'test1',
+                    name: 'test1',
+                    mattermost_group_id: null,
+                    has_syncables: null,
+                },
+                test2: {
+                    primary_key: 'test2',
+                    name: 'test2',
+                    mattermost_group_id: 'mattermost-id',
+                    has_syncables: true,
+                },
+            };
+            const action = {
+                type: AdminTypes.RECEIVED_LDAP_GROUPS,
+                data: {
+                    count: 2,
+                    groups: [
+                        {
+                            primary_key: 'test3',
+                            name: 'test3',
+                            mattermost_group_id: null,
+                            has_syncables: null,
+                        },
+                        {
+                            primary_key: 'test4',
+                            name: 'test4',
+                            mattermost_group_id: 'mattermost-id',
+                            has_syncables: false,
+                        },
+                    ],
+                },
+            };
+            const expectedState = {
+                test3: {
+                    primary_key: 'test3',
+                    name: 'test3',
+                    mattermost_group_id: null,
+                    has_syncables: null,
+                },
+                test4: {
+                    primary_key: 'test4',
+                    name: 'test4',
+                    mattermost_group_id: 'mattermost-id',
+                    has_syncables: false,
+                },
+            };
+
+            const actualState = reducer({ldapGroups: state}, action);
+            assert.deepEqual(actualState.ldapGroups, expectedState);
+        });
+
+        it('LINKED_LDAP_GROUP', () => {
+            const state = {
+                test1: {
+                    primary_key: 'test1',
+                    name: 'test1',
+                    mattermost_group_id: null,
+                    has_syncables: null,
+                },
+                test2: {
+                    primary_key: 'test2',
+                    name: 'test2',
+                    mattermost_group_id: 'mattermost-id',
+                    has_syncables: true,
+                },
+            };
+            const action = {
+                type: AdminTypes.LINKED_LDAP_GROUP,
+                data: {
+                    primary_key: 'test1',
+                    name: 'test1',
+                    mattermost_group_id: 'new-mattermost-id',
+                    has_syncables: false,
+                },
+            };
+            const expectedState = {
+                test1: {
+                    primary_key: 'test1',
+                    name: 'test1',
+                    mattermost_group_id: 'new-mattermost-id',
+                    has_syncables: false,
+                },
+                test2: {
+                    primary_key: 'test2',
+                    name: 'test2',
+                    mattermost_group_id: 'mattermost-id',
+                    has_syncables: true,
+                },
+            };
+
+            const actualState = reducer({ldapGroups: state}, action);
+            assert.deepEqual(actualState.ldapGroups, expectedState);
+        });
+
+        it('UNLINKED_LDAP_GROUP', () => {
+            const state = {
+                test1: {
+                    primary_key: 'test1',
+                    name: 'test1',
+                    mattermost_group_id: null,
+                    has_syncables: null,
+                },
+                test2: {
+                    primary_key: 'test2',
+                    name: 'test2',
+                    mattermost_group_id: 'mattermost-id',
+                    has_syncables: true,
+                },
+            };
+            const action = {
+                type: AdminTypes.UNLINKED_LDAP_GROUP,
+                data: 'test2',
+            };
+            const expectedState = {
+                test1: {
+                    primary_key: 'test1',
+                    name: 'test1',
+                    mattermost_group_id: null,
+                    has_syncables: null,
+                },
+                test2: {
+                    primary_key: 'test2',
+                    name: 'test2',
+                    mattermost_group_id: null,
+                    has_syncables: null,
+                    failed: false,
+                },
+            };
+
+            const actualState = reducer({ldapGroups: state}, action);
+            assert.deepEqual(actualState.ldapGroups, expectedState);
+        });
+
+        it('LINK_LDAP_GROUP_FAILURE', () => {
+            const state = {
+                test1: {
+                    primary_key: 'test1',
+                    name: 'test1',
+                    mattermost_group_id: null,
+                    has_syncables: null,
+                },
+                test2: {
+                    primary_key: 'test2',
+                    name: 'test2',
+                    mattermost_group_id: 'mattermost-id',
+                    has_syncables: true,
+                },
+            };
+            const action = {
+                type: AdminTypes.LINK_LDAP_GROUP_FAILURE,
+                data: 'test1',
+            };
+            const expectedState = {
+                test1: {
+                    primary_key: 'test1',
+                    name: 'test1',
+                    mattermost_group_id: null,
+                    has_syncables: null,
+                    failed: true,
+                },
+                test2: {
+                    primary_key: 'test2',
+                    name: 'test2',
+                    mattermost_group_id: 'mattermost-id',
+                    has_syncables: true,
+                },
+            };
+
+            const actualState = reducer({ldapGroups: state}, action);
+            assert.deepEqual(actualState.ldapGroups, expectedState);
+        });
+
+        it('LINK_LDAP_GROUP_FAILURE', () => {
+            const state = {
+                test1: {
+                    primary_key: 'test1',
+                    name: 'test1',
+                    mattermost_group_id: null,
+                    has_syncables: null,
+                },
+                test2: {
+                    primary_key: 'test2',
+                    name: 'test2',
+                    mattermost_group_id: 'mattermost-id',
+                    has_syncables: true,
+                },
+            };
+            const action = {
+                type: AdminTypes.LINK_LDAP_GROUP_FAILURE,
+                data: 'test2',
+            };
+            const expectedState = {
+                test1: {
+                    primary_key: 'test1',
+                    name: 'test1',
+                    mattermost_group_id: null,
+                    has_syncables: null,
+                },
+                test2: {
+                    primary_key: 'test2',
+                    name: 'test2',
+                    mattermost_group_id: 'mattermost-id',
+                    has_syncables: true,
+                    failed: true,
+                },
+            };
+
+            const actualState = reducer({ldapGroups: state}, action);
+            assert.deepEqual(actualState.ldapGroups, expectedState);
+        });
+    });
 });

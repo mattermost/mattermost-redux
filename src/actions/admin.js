@@ -206,6 +206,76 @@ export function syncLdap(): ActionFunc {
     });
 }
 
+export function getLdapGroups(page: number = 0, perPage: number = General.PAGE_SIZE_MAXIMUM): ActionFunc {
+    return bindClientFunc({
+        clientFunc: Client4.getLdapGroups,
+        onRequest: AdminTypes.GET_LDAP_GROUPS_REQUEST,
+        onSuccess: [AdminTypes.RECEIVED_LDAP_GROUPS, AdminTypes.GET_LDAP_GROUPS_SUCCESS],
+        onFailure: AdminTypes.GET_LDAP_GROUPS_FAILURE,
+        params: [
+            page,
+            perPage,
+        ],
+    });
+}
+
+export function linkLdapGroup(key: string): ActionFunc {
+    return async (dispatch, getState) => {
+        dispatch({type: AdminTypes.LINK_LDAP_GROUP_REQUEST, data: key});
+
+        let data;
+        try {
+            data = await Client4.linkLdapGroup(key);
+        } catch (error) {
+            forceLogoutIfNecessary(error, dispatch, getState);
+            dispatch(batchActions([
+                {type: AdminTypes.LINK_LDAP_GROUP_FAILURE, error, data: key},
+                logError(error),
+            ]));
+            return {error};
+        }
+
+        dispatch(batchActions([
+            {type: AdminTypes.LINK_LDAP_GROUP_SUCCESS, data: null},
+            {
+                type: AdminTypes.LINKED_LDAP_GROUP,
+                data: {
+                    primary_key: key,
+                    name: data.display_name,
+                    mattermost_group_id: data.id,
+                    has_syncables: false,
+                },
+            },
+        ]));
+
+        return {data: true};
+    };
+}
+
+export function unlinkLdapGroup(key: string): ActionFunc {
+    return async (dispatch, getState) => {
+        dispatch({type: AdminTypes.UNLINK_LDAP_GROUP_REQUEST, data: key});
+
+        try {
+            await Client4.unlinkLdapGroup(key);
+        } catch (error) {
+            forceLogoutIfNecessary(error, dispatch, getState);
+            dispatch(batchActions([
+                {type: AdminTypes.UNLINK_LDAP_GROUP_FAILURE, error, data: key},
+                logError(error),
+            ]));
+            return {error};
+        }
+
+        dispatch(batchActions([
+            {type: AdminTypes.UNLINK_LDAP_GROUP_SUCCESS, data: null},
+            {type: AdminTypes.UNLINKED_LDAP_GROUP, data: key},
+        ]));
+
+        return {data: true};
+    };
+}
+
 export function getSamlCertificateStatus(): ActionFunc {
     return bindClientFunc({
         clientFunc: Client4.getSamlCertificateStatus,

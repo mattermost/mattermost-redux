@@ -50,8 +50,19 @@ function getChannels(state: RequestStatusType = initialRequestState(), action: G
     );
 }
 
+function getAllChannels(state: RequestStatusType = initialRequestState(), action: GenericAction): RequestStatusType {
+    return handleRequest(
+        ChannelTypes.GET_ALL_CHANNELS_REQUEST,
+        ChannelTypes.GET_ALL_CHANNELS_SUCCESS,
+        ChannelTypes.GET_ALL_CHANNELS_FAILURE,
+        state,
+        action
+    );
+}
+
 export default (combineReducers({
     getChannels,
+    getAllChannels,
     myChannels,
     createChannel,
     updateChannel,

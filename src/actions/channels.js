@@ -787,6 +787,36 @@ export function getChannels(teamId: string, page: number = 0, perPage: number = 
     };
 }
 
+export function getAllChannels(page: number = 0, perPage: number = General.CHANNELS_CHUNK_SIZE): ActionFunc {
+    return async (dispatch, getState) => {
+        dispatch({type: ChannelTypes.GET_ALL_CHANNELS_REQUEST, data: null}, getState);
+
+        let channels;
+        try {
+            channels = await Client4.getAllChannels(page, perPage);
+        } catch (error) {
+            forceLogoutIfNecessary(error, dispatch, getState);
+            dispatch(batchActions([
+                {type: ChannelTypes.GET_ALL_CHANNELS_FAILURE, error},
+                logError(error),
+            ]), getState);
+            return {error};
+        }
+
+        dispatch(batchActions([
+            {
+                type: ChannelTypes.RECEIVED_ALL_CHANNELS,
+                data: channels,
+            },
+            {
+                type: ChannelTypes.GET_ALL_CHANNELS_SUCCESS,
+            },
+        ]), getState);
+
+        return {data: channels};
+    };
+}
+
 export function autocompleteChannels(teamId: string, term: string): ActionFunc {
     return async (dispatch, getState) => {
         dispatch({type: ChannelTypes.GET_CHANNELS_REQUEST, data: null}, getState);
@@ -873,6 +903,36 @@ export function searchChannels(teamId: string, term: string): ActionFunc {
             },
             {
                 type: ChannelTypes.GET_CHANNELS_SUCCESS,
+            },
+        ]), getState);
+
+        return {data: channels};
+    };
+}
+
+export function searchAllChannels(term: string): ActionFunc {
+    return async (dispatch, getState) => {
+        dispatch({type: ChannelTypes.GET_ALL_CHANNELS_REQUEST, data: null}, getState);
+
+        let channels;
+        try {
+            channels = await Client4.searchAllChannels(term);
+        } catch (error) {
+            forceLogoutIfNecessary(error, dispatch, getState);
+            dispatch(batchActions([
+                {type: ChannelTypes.GET_ALL_CHANNELS_FAILURE, error},
+                logError(error),
+            ]), getState);
+            return {error};
+        }
+
+        dispatch(batchActions([
+            {
+                type: ChannelTypes.RECEIVED_ALL_CHANNELS,
+                data: channels,
+            },
+            {
+                type: ChannelTypes.GET_ALL_CHANNELS_SUCCESS,
             },
         ]), getState);
 

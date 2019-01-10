@@ -48,6 +48,7 @@ function channels(state = {}, action) {
             [action.data.id]: action.data,
         };
     case ChannelTypes.RECEIVED_CHANNELS:
+    case ChannelTypes.RECEIVED_ALL_CHANNELS:
     case SchemeTypes.RECEIVED_SCHEME_CHANNELS: {
         const nextState = {...state};
         for (const channel of action.data) {

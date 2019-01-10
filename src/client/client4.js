@@ -1143,6 +1143,13 @@ export default class Client4 {
 
     // Channel Routes
 
+    getAllChannels = async (page = 0, perPage = PER_PAGE_DEFAULT) => {
+        return this.doFetch(
+            `${this.getChannelsRoute()}${buildQueryString({page, per_page: perPage})}`,
+            {method: 'get'}
+        );
+    };
+
     createChannel = async (channel) => {
         this.trackEvent('api', 'api_channels_create', {team_id: channel.team_id});
 
@@ -1365,6 +1372,13 @@ export default class Client4 {
     searchChannels = async (teamId, term) => {
         return this.doFetch(
             `${this.getTeamRoute(teamId)}/channels/search`,
+            {method: 'post', body: JSON.stringify({term})}
+        );
+    };
+
+    searchAllChannels = async (term) => {
+        return this.doFetch(
+            `${this.getChannelsRoute()}/search`,
             {method: 'post', body: JSON.stringify({term})}
         );
     };
@@ -2208,6 +2222,27 @@ export default class Client4 {
         );
     };
 
+    getLdapGroups = async (page = 0, perPage = PER_PAGE_DEFAULT) => {
+        return this.doFetch(
+            `${this.getBaseRoute()}/ldap/groups${buildQueryString({page, per_page: perPage})}`,
+            {method: 'get'}
+        );
+    };
+
+    linkLdapGroup = async (key) => {
+        return this.doFetch(
+            `${this.getBaseRoute()}/ldap/groups/${encodeURI(key)}/link`,
+            {method: 'post'}
+        );
+    };
+
+    unlinkLdapGroup = async (key) => {
+        return this.doFetch(
+            `${this.getBaseRoute()}/ldap/groups/${encodeURI(key)}/link`,
+            {method: 'delete'}
+        );
+    };
+
     getSamlCertificateStatus = async () => {
         return this.doFetch(
             `${this.getBaseRoute()}/saml/certificate/status`,
@@ -2480,6 +2515,43 @@ export default class Client4 {
         return this.doFetch(
             `${this.getPluginRoute(pluginId)}/disable`,
             {method: 'post'}
+        );
+    };
+
+    // Groups
+
+    linkGroupSyncable = async (groupID, syncableID, syncableType, patch) => {
+        return this.doFetch(
+            `${this.getBaseRoute()}/groups/${groupID}/${syncableType}s/${syncableID}/link`,
+            {method: 'post', body: JSON.stringify(patch)}
+        );
+    };
+
+    unlinkGroupSyncable = async (groupID, syncableID, syncableType) => {
+        return this.doFetch(
+            `${this.getBaseRoute()}/groups/${groupID}/${syncableType}s/${syncableID}/link`,
+            {method: 'delete'}
+        );
+    };
+
+    getGroupSyncables = async (groupID, syncableType) => {
+        return this.doFetch(
+            `${this.getBaseRoute()}/groups/${groupID}/${syncableType}s`,
+            {method: 'get'}
+        );
+    };
+
+    getGroupMembers = async (groupID, page = 0, perPage = PER_PAGE_DEFAULT) => {
+        return this.doFetch(
+            `${this.getBaseRoute()}/groups/${groupID}/members${buildQueryString({page, per_page: perPage})}`,
+            {method: 'get'}
+        );
+    };
+
+    getGroup = async (groupID) => {
+        return this.doFetch(
+            `${this.getBaseRoute()}/groups/${groupID}`,
+            {method: 'get'}
         );
     };
 

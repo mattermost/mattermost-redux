@@ -180,6 +180,36 @@ function syncLdap(state: RequestStatusType = initialRequestState(), action: Gene
     );
 }
 
+function getLdapGroups(state: RequestStatusType = initialRequestState(), action: GenericAction): RequestStatusType {
+    return handleRequest(
+        AdminTypes.GET_LDAP_GROUPS_REQUEST,
+        AdminTypes.GET_LDAP_GROUPS_SUCCESS,
+        AdminTypes.GET_LDAP_GROUPS_FAILURE,
+        state,
+        action
+    );
+}
+
+function linkLdapGroup(state: RequestStatusType = initialRequestState(), action: GenericAction): RequestStatusType {
+    return handleRequest(
+        AdminTypes.LINK_LDAP_GROUP_REQUEST,
+        AdminTypes.LINK_LDAP_GROUP_SUCCESS,
+        AdminTypes.LINK_LDAP_GROUP_FAILURE,
+        state,
+        action
+    );
+}
+
+function unlinkLdapGroup(state: RequestStatusType = initialRequestState(), action: GenericAction): RequestStatusType {
+    return handleRequest(
+        AdminTypes.UNLINK_LDAP_GROUP_REQUEST,
+        AdminTypes.UNLINK_LDAP_GROUP_SUCCESS,
+        AdminTypes.UNLINK_LDAP_GROUP_FAILURE,
+        state,
+        action
+    );
+}
+
 function getSamlCertificateStatus(state: RequestStatusType = initialRequestState(), action: GenericAction): RequestStatusType {
     return handleRequest(
         AdminTypes.SAML_CERT_STATUS_REQUEST,
@@ -378,6 +408,9 @@ export default (combineReducers({
     getClusterStatus,
     testLdap,
     syncLdap,
+    getLdapGroups,
+    linkLdapGroup,
+    unlinkLdapGroup,
     getSamlCertificateStatus,
     uploadPublicSamlCertificate,
     uploadPrivateSamlCertificate,
