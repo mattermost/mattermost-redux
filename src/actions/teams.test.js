@@ -17,7 +17,7 @@ const OK_RESPONSE = {status: 'OK'};
 
 describe('Actions.Teams', () => {
     let store;
-    before(async () => {
+    beforeAll(async () => {
         await TestHelper.initBasic(Client4);
     });
 
@@ -25,7 +25,7 @@ describe('Actions.Teams', () => {
         store = await configureStore();
     });
 
-    after(async () => {
+    afterAll(async () => {
         await TestHelper.tearDown();
     });
 

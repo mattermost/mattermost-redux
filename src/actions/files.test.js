@@ -15,7 +15,7 @@ const FormData = require('form-data');
 
 describe('Actions.Files', () => {
     let store;
-    before(async () => {
+    beforeAll(async () => {
         await TestHelper.initBasic(Client4);
     });
 
@@ -23,7 +23,7 @@ describe('Actions.Files', () => {
         store = await configureStore();
     });
 
-    after(async () => {
+    afterAll(async () => {
         await TestHelper.tearDown();
     });
 

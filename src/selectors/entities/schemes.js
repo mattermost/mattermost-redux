@@ -31,7 +31,7 @@ export function makeGetSchemeChannels() {
 
             if (scheme.scope === ScopeTypes.TEAM) {
                 const msg = `Not implemented: scheme '${scheme.id}' is team-scope but 'getSchemeChannels' only accepts channel-scoped schemes.`;
-                console.warn(msg); // eslint-disable-line no-console
+                console.log(msg); // eslint-disable-line no-console
                 return [];
             }
 
@@ -61,7 +61,7 @@ export function makeGetSchemeTeams() {
 
             if (scheme.scope === ScopeTypes.CHANNEL) {
                 const msg = `Error: scheme '${scheme.id}' is channel-scoped but 'getSchemeChannels' only accepts team-scoped schemes.`;
-                console.warn(msg); // eslint-disable-line no-console
+                console.log(msg); // eslint-disable-line no-console
                 return [];
             }
 

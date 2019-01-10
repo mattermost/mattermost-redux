@@ -1,11 +1,35 @@
-// Copyright (c) 2017 Mattermost, Inc. All Rights Reserved.
-// See License.txt for license information.
+// Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
+// See LICENSE.txt for license information.
 
-/* eslint-disable */
+/* eslint-disable no-console */
 
-import register from '@babel/register';
-import config from '../babel.config';
+global.WebSocket = require('ws');
 
-global.window = {};
+require('isomorphic-fetch');
 
-register(config);
+let warns;
+let errors;
+beforeAll(() => {
+    console.originalWarn = console.warn;
+    console.warn = jest.fn((...params) => {
+        console.originalWarn(...params);
+        warns.push(params);
+    });
+
+    console.originalError = console.error;
+    console.error = jest.fn((...params) => {
+        console.originalError(...params);
+        errors.push(params);
+    });
+});
+
+beforeEach(() => {
+    warns = [];
+    errors = [];
+});
+
+afterEach(() => {
+    if (warns.length > 0 || errors.length > 0) {
+        throw new Error('Unexpected console logs' + warns + errors);
+    }
+});
