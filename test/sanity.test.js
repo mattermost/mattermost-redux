@@ -1,10 +1,8 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
 
-global.WebSocket = require('ws');
-
 // Set up a global hooks to make debugging tests less of a pain
-before(() => {
+beforeAll(() => {
     process.on('unhandledRejection', (reason) => {
         // Rethrow so that tests will actually fail and not just timeout
         throw reason;

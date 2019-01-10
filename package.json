@@ -35,6 +35,7 @@
     "@babel/register": "7.0.0",
     "babel-core": "7.0.0-bridge.0",
     "babel-eslint": "10.0.1",
+    "babel-jest": "23.6.0",
     "babel-loader": "8.0.4",
     "babel-plugin-module-resolver": "3.1.1",
     "chai": "4.2.0",
@@ -42,13 +43,13 @@
     "eslint": "5.9.0",
     "eslint-config-mattermost": "github:mattermost/eslint-config-mattermost",
     "eslint-plugin-flowtype": "3.2.0",
-    "eslint-plugin-mocha": "5.2.0",
+    "eslint-plugin-jest": "22.0.0",
     "fetch-mock": "7.2.5",
     "flow-bin": "0.89.0",
     "flow-typed": "2.5.1",
-    "mocha": "5.2.0",
-    "mocha-junit-reporter": "1.17.0",
-    "mocha-multi-reporters": "1.1.7",
+    "jest": "23.6.0",
+    "jest-cli": "23.6.0",
+    "jest-junit": "5.2.0",
     "mock-socket": "8.0.5",
     "nock": "10.0.3",
     "react": "16.6.3",
@@ -70,7 +71,30 @@
     "fix": "eslint --ignore-path .gitignore --ignore-pattern node_modules --quiet . --fix",
     "flow": "flow",
     "flow-typed": "flow-typed",
-    "test": "NODE_ENV=test mocha --opts test/mocha.opts",
+    "test": "jest --forceExit --detectOpenHandles",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage",
     "prepare": "npm run build"
+  },
+  "jest": {
+    "clearMocks": true,
+    "collectCoverageFrom": [
+      "src/**/*.{js}"
+    ],
+    "coverageReporters": [
+      "lcov",
+      "text-summary"
+    ],
+    "reporters": [
+      "default",
+      "jest-junit"
+    ],
+    "setupTestFrameworkScriptFile": "<rootDir>/test/setup.js",
+    "testPathIgnorePatterns": [
+      "/node_modules/"
+    ]
+  },
+  "jest-junit": {
+    "output": "build/test-results.xml"
   }
 }

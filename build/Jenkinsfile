@@ -29,13 +29,13 @@ pipeline {
 
         stage('Test') {
             steps {
-                sh "npm run test"
+                sh 'make test'
             }
-        }
-    }
-    post {
-        always {
-            junit 'build/test-results.xml'
+            post {
+                always {
+                    junit 'build/test-results.xml'
+                }
+            }
         }
     }
 }
