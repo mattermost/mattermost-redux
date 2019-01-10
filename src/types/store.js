@@ -32,7 +32,6 @@ import type {
     GroupsRequestsStatuses,
     JobsRequestsStatuses,
     SearchRequestsStatuses,
-    EmojisRequestsStatuses,
 } from './requests';
 import type {Role} from './roles';
 import type {PreferenceType} from './preferences';
@@ -83,6 +82,5 @@ export type GlobalState = {|
         jobs: JobsRequestsStatuses,
         schemes: SchemesRequestsStatuses,
         search: SearchRequestsStatuses,
-        emojis: EmojisRequestsStatuses,
     |}
 |};

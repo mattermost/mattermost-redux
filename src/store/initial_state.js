@@ -368,11 +368,7 @@ const state: GlobalState = {
                 status: 'not_started',
                 error: null,
             },
-            uploadPrivateSamlCertificate: {
-                status: 'not_started',
-                error: null,
-            },
-            uploadPublicSamlCertificate: {
+            uploadLicense: {
                 status: 'not_started',
                 error: null,
             },
@@ -380,7 +376,11 @@ const state: GlobalState = {
                 status: 'not_started',
                 error: null,
             },
-            uploadLicense: {
+            uploadPrivateSamlCertificate: {
+                status: 'not_started',
+                error: null,
+            },
+            uploadPublicSamlCertificate: {
                 status: 'not_started',
                 error: null,
             },
@@ -393,28 +393,6 @@ const state: GlobalState = {
                 error: null,
             },
             linkLdapGroup: {
-                status: 'not_started',
-                error: null,
-            },
-        },
-        emojis: {
-            createCustomEmoji: {
-                status: 'not_started',
-                error: null,
-            },
-            getCustomEmojis: {
-                status: 'not_started',
-                error: null,
-            },
-            deleteCustomEmoji: {
-                status: 'not_started',
-                error: null,
-            },
-            getAllCustomEmojis: {
-                status: 'not_started',
-                error: null,
-            },
-            getCustomEmoji: {
                 status: 'not_started',
                 error: null,
             },
@@ -563,28 +541,6 @@ const state: GlobalState = {
                 error: null,
             },
         },
-        groups: {
-            linkGroupSyncable: {
-                status: 'not_started',
-                error: null,
-            },
-            unlinkGroupSyncable: {
-                status: 'not_started',
-                error: null,
-            },
-            getGroupSyncables: {
-                status: 'not_started',
-                error: null,
-            },
-            getGroupMembers: {
-                status: 'not_started',
-                error: null,
-            },
-            getGroup: {
-                status: 'not_started',
-                error: null,
-            },
-        },
         jobs: {
             createJob: {
                 status: 'not_started',
@@ -617,6 +573,28 @@ const state: GlobalState = {
                 error: null,
             },
             searchPosts: {
+                status: 'not_started',
+                error: null,
+            },
+        },
+        groups: {
+            linkGroupSyncable: {
+                status: 'not_started',
+                error: null,
+            },
+            unlinkGroupSyncable: {
+                status: 'not_started',
+                error: null,
+            },
+            getGroupSyncables: {
+                status: 'not_started',
+                error: null,
+            },
+            getGroupMembers: {
+                status: 'not_started',
+                error: null,
+            },
+            getGroup: {
                 status: 'not_started',
                 error: null,
             },

@@ -13,15 +13,13 @@ import configureStore from 'test/test_store';
 
 describe('Actions.Groups', () => {
     let store;
-    before(async () => {
-        await TestHelper.initBasic(Client4);
-    });
 
     beforeEach(async () => {
+        await TestHelper.initBasic(Client4);
         store = await configureStore();
     });
 
-    after(async () => {
+    afterEach(async () => {
         await TestHelper.tearDown();
     });
 
