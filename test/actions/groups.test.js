@@ -24,11 +24,6 @@ describe('Actions.Groups', () => {
     });
 
     it('getGroupSyncables', async () => {
-        if (TestHelper.isLiveServer()) {
-            console.log('Skipping mock-only test');
-            return;
-        }
-
         const groupID = '5rgoajywb3nfbdtyafbod47rya';
 
         const groupTeams = [
@@ -114,11 +109,6 @@ describe('Actions.Groups', () => {
     });
 
     it('getGroupMembers', async () => {
-        if (TestHelper.isLiveServer()) {
-            console.log('Skipping mock-only test');
-            return;
-        }
-
         const groupID = '5rgoajywb3nfbdtyafbod47rya';
 
         const response = {
@@ -181,11 +171,6 @@ describe('Actions.Groups', () => {
     });
 
     it('getGroup', async () => {
-        if (TestHelper.isLiveServer()) {
-            console.log('Skipping mock-only test');
-            return;
-        }
-
         const groupID = '5rgoajywb3nfbdtyafbod47rya';
 
         const response = {
@@ -220,11 +205,6 @@ describe('Actions.Groups', () => {
     });
 
     it('linkGroupSyncable', async () => {
-        if (TestHelper.isLiveServer()) {
-            console.log('Skipping mock-only test');
-            return;
-        }
-
         const groupID = '5rgoajywb3nfbdtyafbod47rya';
         const teamID = 'ge63nq31sbfy3duzq5f7yqn1kh';
         const channelID = 'o3tdawqxot8kikzq8bk54zggbc';
@@ -269,11 +249,6 @@ describe('Actions.Groups', () => {
     });
 
     it('unlinkGroupSyncable', async () => {
-        if (TestHelper.isLiveServer()) {
-            console.log('Skipping mock-only test');
-            return;
-        }
-
         const groupID = '5rgoajywb3nfbdtyafbod47rya';
         const teamID = 'ge63nq31sbfy3duzq5f7yqn1kh';
         const channelID = 'o3tdawqxot8kikzq8bk54zggbc';

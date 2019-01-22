@@ -194,7 +194,6 @@ If you want to go back to using the package specified redux in your web or mobil
 app you can stop the server and run `rm -rf .npminstall` to force
 your project to reset to the specified package version on next server start.  
 
-
 ### Contribute Code
 
 If you're contributing to help [migrate the webapp to Redux](https://docs.mattermost.com/developer/webapp-to-redux.html) go ahead and submit your PR. If you're just fixing a small bug or adding a small improvement then feel free to submit a PR for it. For everything else, please either work on an issue labeled `[Help Wanted]` or open an issue if there's something else that you'd like to work on.
@@ -203,22 +202,4 @@ Feel free to drop by [the Redux channel](https://pre-release.mattermost.com/core
 
 ### Running the Tests
 
-`make test` will run the tests against a mocked server.
-
-To run the tests against a live server, you must have a system admin user with the email `redux-admin@simulator.amazonses.com` and password `password1`. If you're using a developer copy of the Mattermost server, you can create this user by running:
-
-```
-go build ./cmd/platform
-./platform user create --email "redux-admin@simulator.amazonses.com" --password "password1" --username "redux-admin" --system_admin
-```
-
-If you're using a release binary for the server, just run:
-```
-./bin/platform user create --email "redux-admin@simulator.amazonses.com" --password "password1" --username "redux-admin" --system_admin
-```
-
-The server needs to be available at `http://localhost:8065`. This can be overridden by setting an environment variable named `MATTERMOST_SERVER_URL`.
-
-Finally, set "EnableOpenServer", "EnableCustomEmoji", "EnableLinkPreviews", "EnableUserAccessTokens" and "EnableOAuthServiceProvider" to `true` and "EnableOnlyAdminIntegrations" to `false` in your config.json. If you don't have a config.json yet, create it by copying default.json.
-
-With that set up, you can run the tests against your server with `npm run test-no-mock`.
+`make test` will run the unit tests against a mocked server.
