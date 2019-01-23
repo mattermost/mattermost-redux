@@ -106,11 +106,6 @@ describe('Actions.Users', () => {
     });
 
     it('getTermsOfService', async () => {
-        if (TestHelper.isLiveServer()) {
-            console.log('Skipping mock-only test');
-            return;
-        }
-
         const response = {
             create_at: 1537976679426,
             id: '1234',
@@ -854,11 +849,6 @@ describe('Actions.Users', () => {
     });
 
     it('updateUserMfa', async () => {
-        if (TestHelper.isLiveServer()) {
-            console.log('Skipping mock-only test');
-            return;
-        }
-
         TestHelper.mockLogin();
         await Actions.login(TestHelper.basicUser.email, 'password1')(store.dispatch, store.getState);
 
@@ -916,10 +906,6 @@ describe('Actions.Users', () => {
     });
 
     it('generateMfaSecret', async () => {
-        if (TestHelper.isLiveServer()) {
-            console.log('Skipping mock-only test');
-            return;
-        }
         const response = {secret: 'somesecret', qr_code: 'someqrcode'};
 
         nock(Client4.getBaseRoute()).
@@ -952,11 +938,6 @@ describe('Actions.Users', () => {
     });
 
     it('verifyUserEmail', async () => {
-        if (TestHelper.isLiveServer()) {
-            console.log('Skipping mock-only test');
-            return;
-        }
-
         nock(Client4.getBaseRoute()).
             post('/users/email/verify').
             reply(200, OK_RESPONSE);
@@ -977,11 +958,6 @@ describe('Actions.Users', () => {
     });
 
     it('resetUserPassword', async () => {
-        if (TestHelper.isLiveServer()) {
-            console.log('Skipping mock-only test');
-            return;
-        }
-
         nock(Client4.getBaseRoute()).
             post('/users/password/reset').
             reply(200, OK_RESPONSE);
@@ -1043,11 +1019,6 @@ describe('Actions.Users', () => {
     });
 
     it('switchEmailToOAuth', async () => {
-        if (TestHelper.isLiveServer()) {
-            console.log('Skipping mock-only test');
-            return;
-        }
-
         nock(Client4.getBaseRoute()).
             post('/users/login/switch').
             reply(200, {follow_link: '/login'});
@@ -1057,11 +1028,6 @@ describe('Actions.Users', () => {
     });
 
     it('switchOAuthToEmail', async () => {
-        if (TestHelper.isLiveServer()) {
-            console.log('Skipping mock-only test');
-            return;
-        }
-
         nock(Client4.getBaseRoute()).
             post('/users/login/switch').
             reply(200, {follow_link: '/login'});
@@ -1072,11 +1038,6 @@ describe('Actions.Users', () => {
     });
 
     it('switchEmailToLdap', async () => {
-        if (TestHelper.isLiveServer()) {
-            console.log('Skipping mock-only test');
-            return;
-        }
-
         nock(Client4.getBaseRoute()).
             post('/users/login/switch').
             reply(200, {follow_link: '/login'});
@@ -1088,12 +1049,6 @@ describe('Actions.Users', () => {
 
     it('switchLdapToEmail', (done) => {
         async function test() {
-            if (TestHelper.isLiveServer()) {
-                console.log('Skipping mock-only test');
-                done();
-                return;
-            }
-
             nock(Client4.getBaseRoute()).
                 post('/users/login/switch').
                 reply(200, {follow_link: '/login'});

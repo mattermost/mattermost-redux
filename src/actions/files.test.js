@@ -152,11 +152,6 @@ describe('Actions.Files', () => {
     });
 
     it('getFilePublicLink', async () => {
-        if (TestHelper.isLiveServer()) {
-            console.log('Skipping mock-only test');
-            return;
-        }
-
         const fileId = 't1izsr9uspgi3ynggqu6xxjn9y';
         nock(Client4.getBaseRoute()).
             get(`/files/${fileId}/link`).

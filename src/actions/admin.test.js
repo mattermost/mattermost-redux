@@ -260,11 +260,6 @@ describe('Actions.Admin', () => {
     });
 
     it('recycleDatabase', async () => {
-        if (TestHelper.isLiveServer()) {
-            console.log('Skipping mock-only test');
-            return;
-        }
-
         nock(Client4.getBaseRoute()).
             post('/database/recycle').
             reply(200, OK_RESPONSE);
@@ -279,11 +274,6 @@ describe('Actions.Admin', () => {
     });
 
     it('createComplianceReport', async () => {
-        if (TestHelper.isLiveServer()) {
-            console.log('Skipping mock-only test');
-            return;
-        }
-
         const job = {
             desc: 'testjob',
             emails: 'joram@example.com',
@@ -322,11 +312,6 @@ describe('Actions.Admin', () => {
     });
 
     it('getComplianceReport', async () => {
-        if (TestHelper.isLiveServer()) {
-            console.log('Skipping mock-only test');
-            return;
-        }
-
         const job = {
             desc: 'testjob',
             emails: 'joram@example.com',
@@ -371,11 +356,6 @@ describe('Actions.Admin', () => {
     });
 
     it('getComplianceReports', async () => {
-        if (TestHelper.isLiveServer()) {
-            console.log('Skipping mock-only test');
-            return;
-        }
-
         const job = {
             desc: 'testjob',
             emails: 'joram@example.com',
@@ -421,11 +401,6 @@ describe('Actions.Admin', () => {
     });
 
     it('uploadBrandImage', async () => {
-        if (TestHelper.isLiveServer()) {
-            console.log('Skipping mock-only test');
-            return;
-        }
-
         const testImageData = fs.createReadStream('test/assets/images/test.png');
 
         nock(Client4.getBaseRoute()).
@@ -442,11 +417,6 @@ describe('Actions.Admin', () => {
     });
 
     it('deleteBrandImage', async () => {
-        if (TestHelper.isLiveServer()) {
-            console.log('Skipping mock-only test');
-            return;
-        }
-
         nock(Client4.getBaseRoute()).
             delete('/brand/image').
             reply(200, OK_RESPONSE);
@@ -461,11 +431,6 @@ describe('Actions.Admin', () => {
     });
 
     it('getClusterStatus', async () => {
-        if (TestHelper.isLiveServer()) {
-            console.log('Skipping mock-only test');
-            return;
-        }
-
         nock(Client4.getBaseRoute()).
             get('/cluster/status').
             reply(200, [
@@ -490,11 +455,6 @@ describe('Actions.Admin', () => {
     });
 
     it('testLdap', async () => {
-        if (TestHelper.isLiveServer()) {
-            console.log('Skipping mock-only test');
-            return;
-        }
-
         nock(Client4.getBaseRoute()).
             post('/ldap/test').
             reply(200, OK_RESPONSE);
@@ -509,11 +469,6 @@ describe('Actions.Admin', () => {
     });
 
     it('syncLdap', async () => {
-        if (TestHelper.isLiveServer()) {
-            console.log('Skipping mock-only test');
-            return;
-        }
-
         nock(Client4.getBaseRoute()).
             post('/ldap/sync').
             reply(200, OK_RESPONSE);
@@ -528,11 +483,6 @@ describe('Actions.Admin', () => {
     });
 
     it('getSamlCertificateStatus', async () => {
-        if (TestHelper.isLiveServer()) {
-            console.log('Skipping mock-only test');
-            return;
-        }
-
         nock(Client4.getBaseRoute()).
             get('/saml/certificate/status').
             reply(200, {
@@ -557,11 +507,6 @@ describe('Actions.Admin', () => {
     });
 
     it('uploadPublicSamlCertificate', async () => {
-        if (TestHelper.isLiveServer()) {
-            console.log('Skipping mock-only test');
-            return;
-        }
-
         const testFileData = fs.createReadStream('test/assets/images/test.png');
 
         nock(Client4.getBaseRoute()).
@@ -578,11 +523,6 @@ describe('Actions.Admin', () => {
     });
 
     it('uploadPrivateSamlCertificate', async () => {
-        if (TestHelper.isLiveServer()) {
-            console.log('Skipping mock-only test');
-            return;
-        }
-
         const testFileData = fs.createReadStream('test/assets/images/test.png');
 
         nock(Client4.getBaseRoute()).
@@ -599,11 +539,6 @@ describe('Actions.Admin', () => {
     });
 
     it('uploadIdpSamlCertificate', async () => {
-        if (TestHelper.isLiveServer()) {
-            console.log('Skipping mock-only test');
-            return;
-        }
-
         const testFileData = fs.createReadStream('test/assets/images/test.png');
 
         nock(Client4.getBaseRoute()).
@@ -620,11 +555,6 @@ describe('Actions.Admin', () => {
     });
 
     it('removePublicSamlCertificate', async () => {
-        if (TestHelper.isLiveServer()) {
-            console.log('Skipping mock-only test');
-            return;
-        }
-
         nock(Client4.getBaseRoute()).
             delete('/saml/certificate/public').
             reply(200, OK_RESPONSE);
@@ -639,11 +569,6 @@ describe('Actions.Admin', () => {
     });
 
     it('removePrivateSamlCertificate', async () => {
-        if (TestHelper.isLiveServer()) {
-            console.log('Skipping mock-only test');
-            return;
-        }
-
         nock(Client4.getBaseRoute()).
             delete('/saml/certificate/private').
             reply(200, OK_RESPONSE);
@@ -658,11 +583,6 @@ describe('Actions.Admin', () => {
     });
 
     it('removeIdpSamlCertificate', async () => {
-        if (TestHelper.isLiveServer()) {
-            console.log('Skipping mock-only test');
-            return;
-        }
-
         nock(Client4.getBaseRoute()).
             delete('/saml/certificate/idp').
             reply(200, OK_RESPONSE);
@@ -677,11 +597,6 @@ describe('Actions.Admin', () => {
     });
 
     it('testElasticsearch', async () => {
-        if (TestHelper.isLiveServer()) {
-            console.log('Skipping mock-only test');
-            return;
-        }
-
         nock(Client4.getBaseRoute()).
             post('/elasticsearch/test').
             reply(200, OK_RESPONSE);
@@ -696,11 +611,6 @@ describe('Actions.Admin', () => {
     });
 
     it('purgeElasticsearchIndexes', async () => {
-        if (TestHelper.isLiveServer()) {
-            console.log('Skipping mock-only test');
-            return;
-        }
-
         nock(Client4.getBaseRoute()).
             post('/elasticsearch/purge_indexes').
             reply(200, OK_RESPONSE);
@@ -715,11 +625,6 @@ describe('Actions.Admin', () => {
     });
 
     it('uploadLicense', async () => {
-        if (TestHelper.isLiveServer()) {
-            console.log('Skipping mock-only test');
-            return;
-        }
-
         const testFileData = fs.createReadStream('test/assets/images/test.png');
 
         nock(Client4.getBaseRoute()).
@@ -736,11 +641,6 @@ describe('Actions.Admin', () => {
     });
 
     it('removeLicense', async () => {
-        if (TestHelper.isLiveServer()) {
-            console.log('Skipping mock-only test');
-            return;
-        }
-
         nock(Client4.getBaseRoute()).
             delete('/license').
             reply(200, OK_RESPONSE);
@@ -859,11 +759,6 @@ describe('Actions.Admin', () => {
     });
 
     it('overwritePlugin', async () => {
-        if (TestHelper.isLiveServer()) {
-            console.log('Skipping mock-only test');
-            return;
-        }
-
         const data1 = fs.createReadStream('test/setup.js');
         const data2 = fs.createReadStream('test/setup.js');
         const testPlugin = {id: 'testplugin', webapp: {bundle_path: '/static/somebundle.js'}};
@@ -890,11 +785,6 @@ describe('Actions.Admin', () => {
     });
 
     it('uploadPlugin', async () => {
-        if (TestHelper.isLiveServer()) {
-            console.log('Skipping mock-only test');
-            return;
-        }
-
         const testFileData = fs.createReadStream('test/assets/images/test.png');
         const testPlugin = {id: 'testplugin', webapp: {bundle_path: '/static/somebundle.js'}};
 
@@ -911,11 +801,6 @@ describe('Actions.Admin', () => {
     });
 
     it('getPlugins', async () => {
-        if (TestHelper.isLiveServer()) {
-            console.log('Skipping mock-only test');
-            return;
-        }
-
         const testPlugin = {id: 'testplugin', webapp: {bundle_path: '/static/somebundle.js'}};
         const testPlugin2 = {id: 'testplugin2', webapp: {bundle_path: '/static/somebundle.js'}};
 
@@ -940,11 +825,6 @@ describe('Actions.Admin', () => {
     });
 
     it('getPluginStatuses', async () => {
-        if (TestHelper.isLiveServer()) {
-            console.log('Skipping mock-only test');
-            return;
-        }
-
         const testPluginStatus = {
             plugin_id: 'testplugin',
             state: 1,
@@ -975,11 +855,6 @@ describe('Actions.Admin', () => {
     });
 
     it('removePlugin', async () => {
-        if (TestHelper.isLiveServer()) {
-            console.log('Skipping mock-only test');
-            return;
-        }
-
         const testPlugin = {id: 'testplugin3', webapp: {bundle_path: '/static/somebundle.js'}};
 
         nock(Client4.getBaseRoute()).
@@ -1011,11 +886,6 @@ describe('Actions.Admin', () => {
     });
 
     it('enablePlugin', async () => {
-        if (TestHelper.isLiveServer()) {
-            console.log('Skipping mock-only test');
-            return;
-        }
-
         const testPlugin = {id: TestHelper.generateId(), webapp: {bundle_path: '/static/somebundle.js'}};
 
         nock(Client4.getBaseRoute()).
@@ -1049,11 +919,6 @@ describe('Actions.Admin', () => {
     });
 
     it('disablePlugin', async () => {
-        if (TestHelper.isLiveServer()) {
-            console.log('Skipping mock-only test');
-            return;
-        }
-
         const testPlugin = {id: TestHelper.generateId(), webapp: {bundle_path: '/static/somebundle.js'}};
 
         nock(Client4.getBaseRoute()).
@@ -1087,11 +952,6 @@ describe('Actions.Admin', () => {
     });
 
     it('getLdapGroups', async () => {
-        if (TestHelper.isLiveServer()) {
-            console.log('Skipping mock-only test');
-            return;
-        }
-
         const ldapGroups = {
             count: 2,
             groups: [
@@ -1119,11 +979,6 @@ describe('Actions.Admin', () => {
     });
 
     it('linkLdapGroup', async () => {
-        if (TestHelper.isLiveServer()) {
-            console.log('Skipping mock-only test');
-            return;
-        }
-
         const ldapGroups = {
             count: 2,
             groups: [
@@ -1154,11 +1009,6 @@ describe('Actions.Admin', () => {
     });
 
     it('unlinkLdapGroup', async () => {
-        if (TestHelper.isLiveServer()) {
-            console.log('Skipping mock-only test');
-            return;
-        }
-
         const ldapGroups = {
             count: 2,
             groups: [

@@ -1581,12 +1581,6 @@ describe('Actions.Channels', () => {
     });
 
     it('leaveChannel', (done) => {
-        if (TestHelper.isLiveServer()) {
-            console.log('Skipping mock-only test');
-            done();
-            return;
-        }
-
         async function test() {
             TestHelper.mockLogin();
             await store.dispatch(login(TestHelper.basicUser.email, 'password1'));
