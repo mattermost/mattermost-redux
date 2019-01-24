@@ -254,7 +254,6 @@ describe('Actions.Posts', () => {
 
         assert.ok(posts);
         assert.ok(posts[postId]);
-        console.log(posts[postId].id);
         assert.strictEqual(
             posts[postId].state,
             Posts.POST_DELETED

@@ -40,7 +40,7 @@ describe('Reducers.posts', () => {
             });
         });
 
-        it('should not add postId to postsInChannel', () => {
+        it('should not add postId to postsInChannel when postsInChannel[channelId] is undefined', () => {
             const state = deepFreeze({
                 posts: {},
                 postsInChannel: {},
@@ -94,7 +94,7 @@ describe('Reducers.posts', () => {
             });
         });
 
-        it('should add postId to postsInChannel', () => {
+        it('should add postId to postsInChannel when postsInChannel[channelId] is set', () => {
             const state = deepFreeze({
                 posts: {},
                 postsInChannel: {
@@ -170,7 +170,7 @@ describe('Reducers.posts', () => {
             });
         });
 
-        it('should have empty postsInChannel for no posts in channel', () => {
+        it('should have empty postsInChannel when there are no posts in channel', () => {
             const state = deepFreeze({
                 posts: {},
                 postsInChannel: {},
