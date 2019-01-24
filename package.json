@@ -61,7 +61,7 @@
     "ws": "6.1.2"
   },
   "scripts": {
-    "build": "babel src --out-dir .",
+    "build": "babel src --out-dir . --ignore '**/*.test.js'",
     "webpack": "webpack",
     "dev": "babel src --out-dir ${WEBAPP_DIR:-../mattermost-webapp}/node_modules/mattermost-redux --source-maps",
     "dev-mobile": "babel src --out-dir ${MOBILE_DIR:-../mattermost-mobile}/node_modules/mattermost-redux --source-maps",
