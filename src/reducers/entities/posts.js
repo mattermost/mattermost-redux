@@ -90,7 +90,7 @@ function handleReceivedPosts(posts = {}, postsInChannel = {}, postsInThread = {}
     // otherwise there's no need to create a new object for the same state.
     if (!Object.keys(newPosts).length) {
         if (!postsInChannel[channelId]) {
-            // if postsInChannel does not exist for a channel then set an empty array at it has not posts
+            // if postsInChannel does not exist for a channel then set an empty array at it has no posts
             return {
                 posts,
                 postsInThread,
