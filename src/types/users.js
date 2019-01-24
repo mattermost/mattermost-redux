@@ -3,7 +3,8 @@
 // @flow
 
 import type {Channel} from './channels';
-import type {IDMappedObjects, RelationOneToMany, RelationOneToOne} from './utilities';
+import type {PostType} from './posts';
+import type {$ID, IDMappedObjects, RelationOneToMany, RelationOneToOne} from './utilities';
 
 export type UserNotifyProps = {|
     desktop: 'default' | 'all' | 'mention' | 'none',
@@ -34,6 +35,7 @@ export type UserProfile = {|
     position: string,
     roles: string,
     locale: string,
+    notify_props?: UserNotifyProps,
 |};
 
 export type UsersState = {|
@@ -56,3 +58,13 @@ export type UserTimezone = {|
     automaticTimezone: string,
     manualTimezone: string,
 |};
+
+export type UserActivity = {
+    [PostType]: {
+        [$ID<UserProfile>]: {|
+            ids: Array<$ID<UserProfile>>,
+            usernames: Array<$PropertyType<UserProfile, 'username'>>,
+        |} | Array<$ID<UserProfile>>,
+    },
+};
+

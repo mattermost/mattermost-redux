@@ -6,10 +6,11 @@ import type {CustomEmoji} from './emojis';
 import type {FileInfo} from './files';
 import type {Reaction} from './reactions';
 import type {Channel} from './channels';
-import type {RelationOneToMany, IDMappedObjects} from './utilities';
+import type {RelationOneToOne, RelationOneToMany, IDMappedObjects} from './utilities';
 
 export type PostType = 'system_add_remove' |
                        'system_add_to_channel' |
+                       'system_add_to_team' |
                        'system_channel_deleted' |
                        'system_displayname_change' |
                        'system_convert_channel' |
@@ -59,13 +60,32 @@ export type Post = {|
     props: Object,
     hashtags: string,
     pending_post_id: string,
-    metadata: PostMetadata
+    metadata: PostMetadata,
+    failed?: boolean,
+    user_activity_posts?: Array<Post>,
+    state?: 'DELETED',
 |}
+
+export type PostWithFormatData = {|
+    ...Post,
+    commentedOnPost: Post,
+    isFirstReply: boolean,
+    isLastReply: boolean,
+    previousPostIsComment: boolean,
+    commentedOnPost: Post,
+    consecutivePostByUser: boolean,
+    replyCount: number,
+    isCommentMention: boolean,
+    highlight: boolean,
+|};
 
 export type PostsState = {|
     posts: IDMappedObjects<Post>,
     postsInChannel: RelationOneToMany<Channel, Post>,
     postsInThread: RelationOneToMany<Post, Post>,
+    reactions: RelationOneToOne<Post, Array<Reaction>>,
+    openGraph: RelationOneToOne<Post, Object>,
+    sendingPostIds: Array<string>,
     selectedPostId: string,
     currentFocusedPostId: string,
     messagesHistory: {|

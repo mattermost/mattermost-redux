@@ -9,5 +9,6 @@ export type Search = {|
 
 export type SearchState = {|
     results: Array<string>,
-    recent: {[string]: Array<Search>}
+    recent: {[string]: Array<Search>},
+    matches: {[string]: Array<string>},
 |};

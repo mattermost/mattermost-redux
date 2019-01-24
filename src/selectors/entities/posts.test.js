@@ -19,12 +19,12 @@ describe('Selectors.Posts', () => {
     profiles[user1.id] = user1;
 
     const posts = {
-        a: {id: 'a', channel_id: '1', create_at: 1, user_id: user1.id},
-        b: {id: 'b', channel_id: '1', create_at: 2, user_id: user1.id},
-        c: {id: 'c', root_id: 'a', channel_id: '1', create_at: 3, user_id: 'b'},
-        d: {id: 'd', root_id: 'b', channel_id: '1', create_at: 4, user_id: 'b'},
-        e: {id: 'e', root_id: 'a', channel_id: '1', create_at: 5, user_id: 'b'},
-        f: {id: 'f', channel_id: '2', create_at: 6, user_id: 'b'},
+        a: {id: 'a', channel_id: '1', create_at: 1, highlight: false, user_id: user1.id},
+        b: {id: 'b', channel_id: '1', create_at: 2, highlight: false, user_id: user1.id},
+        c: {id: 'c', root_id: 'a', channel_id: '1', create_at: 3, highlight: false, user_id: 'b'},
+        d: {id: 'd', root_id: 'b', channel_id: '1', create_at: 4, highlight: false, user_id: 'b'},
+        e: {id: 'e', root_id: 'a', channel_id: '1', create_at: 5, highlight: false, user_id: 'b'},
+        f: {id: 'f', channel_id: '2', create_at: 6, highlight: false, user_id: 'b'},
     };
 
     const reaction1 = {user_id: user1.id, emoji_name: '+1'};
@@ -236,13 +236,13 @@ describe('Selectors.Posts', () => {
         profilesAny[userAny.id] = userAny;
 
         const postsAny = {
-            a: {id: 'a', channel_id: '1', create_at: 1, user_id: userAny.id},
-            b: {id: 'b', channel_id: '1', create_at: 2, user_id: 'b'},
-            c: {id: 'c', root_id: 'a', channel_id: '1', create_at: 3, user_id: 'b'},
-            d: {id: 'd', root_id: 'b', channel_id: '1', create_at: 4, user_id: userAny.id},
-            e: {id: 'e', root_id: 'a', channel_id: '1', create_at: 5, user_id: 'b'},
-            f: {id: 'f', root_id: 'b', channel_id: '1', create_at: 6, user_id: 'b'},
-            g: {id: 'g', channel_id: '2', create_at: 7, user_id: 'b'},
+            a: {id: 'a', channel_id: '1', create_at: 1, highlight: false, user_id: userAny.id},
+            b: {id: 'b', channel_id: '1', create_at: 2, highlight: false, user_id: 'b'},
+            c: {id: 'c', root_id: 'a', channel_id: '1', create_at: 3, highlight: false, user_id: 'b'},
+            d: {id: 'd', root_id: 'b', channel_id: '1', create_at: 4, highlight: false, user_id: userAny.id},
+            e: {id: 'e', root_id: 'a', channel_id: '1', create_at: 5, highlight: false, user_id: 'b'},
+            f: {id: 'f', root_id: 'b', channel_id: '1', create_at: 6, highlight: false, user_id: 'b'},
+            g: {id: 'g', channel_id: '2', create_at: 7, highlight: false, user_id: 'b'},
         };
 
         const testStateAny = deepFreezeAndThrowOnMutation({
@@ -345,13 +345,13 @@ describe('Selectors.Posts', () => {
         profilesRoot[userRoot.id] = userRoot;
 
         const postsRoot = {
-            a: {id: 'a', channel_id: '1', create_at: 1, user_id: userRoot.id},
-            b: {id: 'b', channel_id: '1', create_at: 2, user_id: 'b'},
-            c: {id: 'c', root_id: 'a', channel_id: '1', create_at: 3, user_id: 'b'},
-            d: {id: 'd', root_id: 'b', channel_id: '1', create_at: 4, user_id: userRoot.id},
-            e: {id: 'e', root_id: 'a', channel_id: '1', create_at: 5, user_id: 'b'},
-            f: {id: 'f', root_id: 'b', channel_id: '1', create_at: 6, user_id: 'b'},
-            g: {id: 'g', channel_id: '2', create_at: 7, user_id: 'b'},
+            a: {id: 'a', channel_id: '1', create_at: 1, highlight: false, user_id: userRoot.id},
+            b: {id: 'b', channel_id: '1', create_at: 2, highlight: false, user_id: 'b'},
+            c: {id: 'c', root_id: 'a', channel_id: '1', create_at: 3, highlight: false, user_id: 'b'},
+            d: {id: 'd', root_id: 'b', channel_id: '1', create_at: 4, highlight: false, user_id: userRoot.id},
+            e: {id: 'e', root_id: 'a', channel_id: '1', create_at: 5, highlight: false, user_id: 'b'},
+            f: {id: 'f', root_id: 'b', channel_id: '1', create_at: 6, highlight: false, user_id: 'b'},
+            g: {id: 'g', channel_id: '2', create_at: 7, highlight: false, user_id: 'b'},
         };
 
         const testStateRoot = deepFreezeAndThrowOnMutation({
@@ -454,13 +454,13 @@ describe('Selectors.Posts', () => {
         profilesNever[userNever.id] = userNever;
 
         const postsNever = {
-            a: {id: 'a', channel_id: '1', create_at: 1, user_id: userNever.id},
-            b: {id: 'b', channel_id: '1', create_at: 2, user_id: 'b'},
-            c: {id: 'c', root_id: 'a', channel_id: '1', create_at: 3, user_id: 'b'},
-            d: {id: 'd', root_id: 'b', channel_id: '1', create_at: 4, user_id: userNever.id},
-            e: {id: 'e', root_id: 'a', channel_id: '1', create_at: 5, user_id: 'b'},
-            f: {id: 'f', root_id: 'b', channel_id: '1', create_at: 6, user_id: 'b'},
-            g: {id: 'g', channel_id: '2', create_at: 7, user_id: 'b'},
+            a: {id: 'a', channel_id: '1', create_at: 1, highlight: false, user_id: userNever.id},
+            b: {id: 'b', channel_id: '1', create_at: 2, highlight: false, user_id: 'b'},
+            c: {id: 'c', root_id: 'a', channel_id: '1', create_at: 3, highlight: false, user_id: 'b'},
+            d: {id: 'd', root_id: 'b', channel_id: '1', create_at: 4, highlight: false, user_id: userNever.id},
+            e: {id: 'e', root_id: 'a', channel_id: '1', create_at: 5, highlight: false, user_id: 'b'},
+            f: {id: 'f', root_id: 'b', channel_id: '1', create_at: 6, highlight: false, user_id: 'b'},
+            g: {id: 'g', channel_id: '2', create_at: 7, highlight: false, user_id: 'b'},
         };
 
         const testStateNever = deepFreezeAndThrowOnMutation({
@@ -563,10 +563,10 @@ describe('Selectors.Posts', () => {
         profilesAny[userAny.id] = userAny;
 
         const postsAny = {
-            a: {id: 'a', channel_id: '1', create_at: 1, user_id: userAny.id},
-            b: {id: 'b', root_id: 'a', channel_id: '1', create_at: 2, user_id: 'b'},
-            c: {id: 'c', root_id: 'a', channel_id: '1', create_at: 3, user_id: 'b', type: Posts.POST_TYPES.EPHEMERAL},
-            d: {id: 'd', channel_id: '2', create_at: 4, user_id: 'b'},
+            a: {id: 'a', channel_id: '1', create_at: 1, highlight: false, user_id: userAny.id},
+            b: {id: 'b', root_id: 'a', channel_id: '1', create_at: 2, highlight: false, user_id: 'b'},
+            c: {id: 'c', root_id: 'a', channel_id: '1', create_at: 3, highlight: false, user_id: 'b', type: Posts.POST_TYPES.EPHEMERAL},
+            d: {id: 'd', channel_id: '2', create_at: 4, highlight: false, user_id: 'b'},
         };
 
         const testStateAny = deepFreezeAndThrowOnMutation({
@@ -636,10 +636,10 @@ describe('Selectors.Posts', () => {
         profilesAny[userAny.id] = userAny;
 
         const postsAny = {
-            a: {id: 'a', channel_id: '1', create_at: 1, user_id: userAny.id},
-            b: {id: 'b', root_id: 'a', channel_id: '1', create_at: 2, user_id: 'b', type: Posts.POST_TYPES.EPHEMERAL},
-            c: {id: 'c', root_id: 'a', channel_id: '1', create_at: 3, user_id: 'b', state: Posts.POST_DELETED},
-            d: {id: 'd', channel_id: '2', create_at: 4, user_id: 'b'},
+            a: {id: 'a', channel_id: '1', create_at: 1, highlight: false, user_id: userAny.id},
+            b: {id: 'b', root_id: 'a', channel_id: '1', create_at: 2, highlight: false, user_id: 'b', type: Posts.POST_TYPES.EPHEMERAL},
+            c: {id: 'c', root_id: 'a', channel_id: '1', create_at: 3, highlight: false, user_id: 'b', state: Posts.POST_DELETED},
+            d: {id: 'd', channel_id: '2', create_at: 4, highlight: false, user_id: 'b'},
         };
 
         const testStateAny = deepFreezeAndThrowOnMutation({
@@ -1597,11 +1597,11 @@ describe('Selectors.Posts', () => {
 
         it('return first post which dosent have POST_DELETED state', () => {
             const postsAny = {
-                a: {id: 'a', channel_id: 'a', create_at: 1, user_id: 'a'},
-                b: {id: 'b', root_id: 'a', channel_id: 'abcd', create_at: 3, user_id: 'b', state: Posts.POST_DELETED},
-                c: {id: 'c', root_id: 'a', channel_id: 'abcd', create_at: 3, user_id: 'b', type: 'system_join_channel'},
-                d: {id: 'd', root_id: 'a', channel_id: 'abcd', create_at: 3, user_id: 'b', type: Posts.POST_TYPES.EPHEMERAL},
-                e: {id: 'e', channel_id: 'abcd', create_at: 4, user_id: 'b'},
+                a: {id: 'a', channel_id: 'a', create_at: 1, highlight: false, user_id: 'a'},
+                b: {id: 'b', root_id: 'a', channel_id: 'abcd', create_at: 3, highlight: false, user_id: 'b', state: Posts.POST_DELETED},
+                c: {id: 'c', root_id: 'a', channel_id: 'abcd', create_at: 3, highlight: false, user_id: 'b', type: 'system_join_channel'},
+                d: {id: 'd', root_id: 'a', channel_id: 'abcd', create_at: 3, highlight: false, user_id: 'b', type: Posts.POST_TYPES.EPHEMERAL},
+                e: {id: 'e', channel_id: 'abcd', create_at: 4, highlight: false, user_id: 'b'},
             };
             const state = {
                 entities: {
@@ -1798,12 +1798,12 @@ describe('getCurrentUsersLatestPost', () => {
 
     it('return first post which user can edit', () => {
         const postsAny = {
-            a: {id: 'a', channel_id: 'a', create_at: 1, user_id: 'a'},
-            b: {id: 'b', root_id: 'a', channel_id: 'abcd', create_at: 3, user_id: 'b', state: Posts.POST_DELETED},
-            c: {id: 'c', root_id: 'a', channel_id: 'abcd', create_at: 3, user_id: 'b', type: 'system_join_channel'},
-            d: {id: 'd', root_id: 'a', channel_id: 'abcd', create_at: 3, user_id: 'b', type: Posts.POST_TYPES.EPHEMERAL},
-            e: {id: 'e', channel_id: 'abcd', create_at: 4, user_id: 'c'},
-            f: {id: 'f', channel_id: 'abcd', create_at: 4, user_id: user1.id},
+            a: {id: 'a', channel_id: 'a', create_at: 1, highlight: false, user_id: 'a'},
+            b: {id: 'b', root_id: 'a', channel_id: 'abcd', create_at: 3, highlight: false, user_id: 'b', state: Posts.POST_DELETED},
+            c: {id: 'c', root_id: 'a', channel_id: 'abcd', create_at: 3, highlight: false, user_id: 'b', type: 'system_join_channel'},
+            d: {id: 'd', root_id: 'a', channel_id: 'abcd', create_at: 3, highlight: false, user_id: 'b', type: Posts.POST_TYPES.EPHEMERAL},
+            e: {id: 'e', channel_id: 'abcd', create_at: 4, highlight: false, user_id: 'c'},
+            f: {id: 'f', channel_id: 'abcd', create_at: 4, highlight: false, user_id: user1.id},
         };
         const state = {
             entities: {
@@ -1829,12 +1829,12 @@ describe('getCurrentUsersLatestPost', () => {
 
     it('return first post which user can edit ignore pending and failed', () => {
         const postsAny = {
-            a: {id: 'a', channel_id: 'a', create_at: 1, user_id: 'a'},
-            b: {id: 'b', channel_id: 'abcd', create_at: 4, user_id: user1.id, pending_post_id: 'b'},
-            c: {id: 'c', channel_id: 'abcd', create_at: 4, user_id: user1.id, failed: true},
-            d: {id: 'd', root_id: 'a', channel_id: 'abcd', create_at: 3, user_id: 'b', type: Posts.POST_TYPES.EPHEMERAL},
-            e: {id: 'e', channel_id: 'abcd', create_at: 4, user_id: 'c'},
-            f: {id: 'f', channel_id: 'abcd', create_at: 4, user_id: user1.id},
+            a: {id: 'a', channel_id: 'a', create_at: 1, highlight: false, user_id: 'a'},
+            b: {id: 'b', channel_id: 'abcd', create_at: 4, highlight: false, user_id: user1.id, pending_post_id: 'b'},
+            c: {id: 'c', channel_id: 'abcd', create_at: 4, highlight: false, user_id: user1.id, failed: true},
+            d: {id: 'd', root_id: 'a', channel_id: 'abcd', create_at: 3, highlight: false, user_id: 'b', type: Posts.POST_TYPES.EPHEMERAL},
+            e: {id: 'e', channel_id: 'abcd', create_at: 4, highlight: false, user_id: 'c'},
+            f: {id: 'f', channel_id: 'abcd', create_at: 4, highlight: false, user_id: user1.id},
         };
         const state = {
             entities: {
@@ -1860,12 +1860,12 @@ describe('getCurrentUsersLatestPost', () => {
 
     it('return first post which has rootId match', () => {
         const postsAny = {
-            a: {id: 'a', channel_id: 'a', create_at: 1, user_id: 'a'},
-            b: {id: 'b', root_id: 'a', channel_id: 'abcd', create_at: 3, user_id: 'b', state: Posts.POST_DELETED},
-            c: {id: 'c', root_id: 'a', channel_id: 'abcd', create_at: 3, user_id: 'b', type: 'system_join_channel'},
-            d: {id: 'd', root_id: 'a', channel_id: 'abcd', create_at: 3, user_id: 'b', type: Posts.POST_TYPES.EPHEMERAL},
-            e: {id: 'e', channel_id: 'abcd', create_at: 4, user_id: 'c'},
-            f: {id: 'f', root_id: 'e', channel_id: 'abcd', create_at: 4, user_id: user1.id},
+            a: {id: 'a', channel_id: 'a', create_at: 1, highlight: false, user_id: 'a'},
+            b: {id: 'b', root_id: 'a', channel_id: 'abcd', create_at: 3, highlight: false, user_id: 'b', state: Posts.POST_DELETED},
+            c: {id: 'c', root_id: 'a', channel_id: 'abcd', create_at: 3, highlight: false, user_id: 'b', type: 'system_join_channel'},
+            d: {id: 'd', root_id: 'a', channel_id: 'abcd', create_at: 3, highlight: false, user_id: 'b', type: Posts.POST_TYPES.EPHEMERAL},
+            e: {id: 'e', channel_id: 'abcd', create_at: 4, highlight: false, user_id: 'c'},
+            f: {id: 'f', root_id: 'e', channel_id: 'abcd', create_at: 4, highlight: false, user_id: user1.id},
         };
         const state = {
             entities: {

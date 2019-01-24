@@ -52,6 +52,9 @@ const state: GlobalState = {
             posts: {},
             postsInChannel: {},
             postsInThread: {},
+            sendingPostIds: [],
+            reactions: {},
+            openGraph: {},
             selectedPostId: '',
             currentFocusedPostId: '',
             messagesHistory: {
@@ -99,6 +102,7 @@ const state: GlobalState = {
         search: {
             results: [],
             recent: {},
+            matches: {},
         },
         typing: {},
         roles: {
