@@ -190,6 +190,30 @@ describe('Reducers.posts', () => {
                 channelId: [],
             });
         });
+
+        it('should not add channelId entity to postsInChannel if there were no posts in channel and it has receivedNewPosts on action', () => {
+            const state = deepFreeze({
+                posts: {},
+                postsInChannel: {},
+            });
+            const action = {
+                type: PostTypes.RECEIVED_POSTS,
+                data: {
+                    order: ['postId'],
+                    posts: {
+                        postId: {
+                            id: 'postId',
+                        },
+                    },
+                },
+                channelId: 'channelId',
+                receivedNewPosts: true,
+            };
+
+            const nextState = postsReducer(state, action);
+
+            assert.deepEqual(nextState.postsInChannel, {});
+        });
     });
 
     it('REMOVE_PENDING_POST on posts', () => {

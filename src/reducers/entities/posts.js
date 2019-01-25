@@ -103,6 +103,12 @@ function handleReceivedPosts(posts = {}, postsInChannel = {}, postsInThread = {}
         return {posts, postsInChannel, postsInThread};
     }
 
+    // if PostTypes.RECEIVED_POSTS is called because of debounce action in webapp for new posts
+    // then check if postsInChannel exist for channel before adding them to the store
+    if (action.receivedNewPosts && !postsInChannel[channelId]) {
+        return {posts, postsInChannel, postsInThread};
+    }
+
     const nextPosts = {...posts};
     const nextPostsInChannel = {...postsInChannel};
     const nextPostsInThread = {...postsInThread};
