@@ -3,7 +3,7 @@
 
 import {createSelector} from 'reselect';
 
-import {DEFAULT_LOCALE} from 'constants/general';
+import {General} from 'constants';
 
 import {getCurrentUrl} from 'selectors/entities/general';
 
@@ -152,13 +152,7 @@ export const getJoinableTeams = createSelector(
     getTeams,
     getJoinableTeamIds,
     (teams, joinableTeamIds) => {
-        const openTeams = {};
-
-        for (const id of joinableTeamIds) {
-            openTeams[id] = teams[id];
-        }
-
-        return openTeams;
+        return joinableTeamIds.map((id) => teams[id]);
     }
 );
 
@@ -175,10 +169,10 @@ export const getSortedJoinableTeams = createSelector(
 
         function sortTeams(a, b) {
             if (a.display_name !== b.display_name) {
-                return a.display_name.toLowerCase().localeCompare(b.display_name.toLowerCase(), locale || DEFAULT_LOCALE, {numeric: true});
+                return a.display_name.toLowerCase().localeCompare(b.display_name.toLowerCase(), locale || General.DEFAULT_LOCALE, {numeric: true});
             }
 
-            return a.name.toLowerCase().localeCompare(b.name.toLowerCase(), locale || DEFAULT_LOCALE, {numeric: true});
+            return a.name.toLowerCase().localeCompare(b.name.toLowerCase(), locale || General.DEFAULT_LOCALE, {numeric: true});
         }
 
         return Object.values(openTeams).sort(sortTeams);

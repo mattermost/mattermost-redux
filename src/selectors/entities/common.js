@@ -2,9 +2,10 @@
 // See LICENSE.txt for license information.
 // @flow
 
-import type {GlobalState} from '../../types/store';
-import type {UserProfile} from '../../types/users';
-import type {ChannelMembership} from '../../types/channels';
+import type {GlobalState} from 'types/store';
+import type {UserProfile} from 'types/users';
+import type {ChannelMembership, Channel} from 'types/channels';
+import type {RelationOneToOne, IDMappedObjects} from 'types/utilities';
 
 import {createSelector} from 'reselect';
 
@@ -14,15 +15,15 @@ export function getCurrentChannelId(state: GlobalState): string {
     return state.entities.channels.currentChannelId;
 }
 
-export function getMyChannelMemberships(state: GlobalState): {[string]: ChannelMembership} {
+export function getMyChannelMemberships(state: GlobalState): RelationOneToOne<Channel, ChannelMembership> {
     return state.entities.channels.myMembers;
 }
 
-export const getMyCurrentChannelMembership = createSelector(
+export const getMyCurrentChannelMembership: (GlobalState) => ?ChannelMembership = createSelector(
     getCurrentChannelId,
     getMyChannelMemberships,
     (currentChannelId, channelMemberships) => {
-        return channelMemberships[currentChannelId] || {};
+        return channelMemberships[currentChannelId] || null;
     }
 );
 
@@ -36,6 +37,6 @@ export function getCurrentUserId(state: GlobalState): string {
     return state.entities.users.currentUserId;
 }
 
-export function getUsers(state: GlobalState): {[string]: UserProfile} {
+export function getUsers(state: GlobalState): IDMappedObjects<UserProfile> {
     return state.entities.users.profiles;
 }

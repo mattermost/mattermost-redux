@@ -34,7 +34,7 @@ export default function keyMirror<T: {}>(obj: T): $ObjMapi<T, <K>(K) => K> {
     }
 
     type Out = {[string]: $Keys<typeof obj>;}
-    const ret:Out = {};
+    const ret: Out = {};
     for (const key in obj) {
         if (!obj.hasOwnProperty(key)) {
             continue;

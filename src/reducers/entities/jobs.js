@@ -5,10 +5,11 @@
 import {combineReducers} from 'redux';
 import {JobTypes} from 'action_types';
 
-import type {JobType, Job} from '../../types/jobs';
-import type {GenericAction} from '../../types/actions';
+import type {JobsState, JobType, Job} from 'types/jobs';
+import type {GenericAction} from 'types/actions';
+import type {IDMappedObjects} from 'types/utilities';
 
-function jobs(state: {[string]: Job} = {}, action: GenericAction): {[string]: Job} {
+function jobs(state: IDMappedObjects<Job> = {}, action: GenericAction): IDMappedObjects<Job> {
     switch (action.type) {
     case JobTypes.RECEIVED_JOB: {
         const nextState = {...state};
@@ -41,7 +42,7 @@ function jobsByTypeList(state: {[JobType]: Array<Job>} = {}, action: GenericActi
     }
 }
 
-export default combineReducers({
+export default (combineReducers({
 
     // object where every key is the job id and has an object with the job details
     jobs,
@@ -49,4 +50,4 @@ export default combineReducers({
     // object where every key is a job type and contains a list of jobs.
     jobsByTypeList,
 
-});
+}): (JobsState, GenericAction) => JobsState);

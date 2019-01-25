@@ -5,7 +5,7 @@ import {batchActions} from 'redux-batched-actions';
 
 import {Client4} from 'client';
 import {General, Preferences, Posts} from 'constants';
-import {PostTypes, FileTypes} from 'action_types';
+import {PostTypes, FileTypes, IntegrationTypes} from 'action_types';
 import {getUsersByUsername, getCurrentUserId} from 'selectors/entities/users';
 import {getCustomEmojisByName as selectCustomEmojisByName} from 'selectors/entities/emojis';
 
@@ -22,7 +22,6 @@ import {systemEmojis, getCustomEmojiByName, getCustomEmojisByName} from './emoji
 
 export function getPost(postId) {
     return async (dispatch, getState) => {
-        dispatch({type: PostTypes.GET_POSTS_REQUEST}, getState);
         let post;
 
         try {
@@ -45,7 +44,7 @@ export function getPost(postId) {
             {
                 type: PostTypes.GET_POSTS_SUCCESS,
             },
-        ]), getState);
+        ]));
 
         return {data: post};
     };
@@ -284,13 +283,15 @@ export function deletePost(post) {
 }
 
 export function editPost(post) {
-    return bindClientFunc(
-        Client4.patchPost,
-        PostTypes.EDIT_POST_REQUEST,
-        [PostTypes.RECEIVED_POST, PostTypes.EDIT_POST_SUCCESS],
-        PostTypes.EDIT_POST_FAILURE,
-        post
-    );
+    return bindClientFunc({
+        clientFunc: Client4.patchPost,
+        onRequest: PostTypes.EDIT_POST_REQUEST,
+        onSuccess: [PostTypes.RECEIVED_POST, PostTypes.EDIT_POST_SUCCESS],
+        onFailure: PostTypes.EDIT_POST_FAILURE,
+        params: [
+            post,
+        ],
+    });
 }
 
 export function pinPost(postId) {
@@ -371,8 +372,6 @@ export function unpinPost(postId) {
 
 export function addReaction(postId, emojiName) {
     return async (dispatch, getState) => {
-        dispatch({type: PostTypes.REACTION_REQUEST}, getState);
-
         const currentUserId = getState().entities.users.currentUserId;
 
         let reaction;
@@ -380,22 +379,14 @@ export function addReaction(postId, emojiName) {
             reaction = await Client4.addReaction(currentUserId, postId, emojiName);
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch, getState);
-            dispatch(batchActions([
-                {type: PostTypes.REACTION_FAILURE, error},
-                logError(error),
-            ]), getState);
+            dispatch(logError(error));
             return {error};
         }
 
-        dispatch(batchActions([
-            {
-                type: PostTypes.REACTION_SUCCESS,
-            },
-            {
-                type: PostTypes.RECEIVED_REACTION,
-                data: reaction,
-            },
-        ]));
+        dispatch({
+            type: PostTypes.RECEIVED_REACTION,
+            data: reaction,
+        });
 
         return {data: true};
     };
@@ -403,30 +394,20 @@ export function addReaction(postId, emojiName) {
 
 export function removeReaction(postId, emojiName) {
     return async (dispatch, getState) => {
-        dispatch({type: PostTypes.REACTION_REQUEST}, getState);
-
         const currentUserId = getState().entities.users.currentUserId;
 
         try {
             await Client4.removeReaction(currentUserId, postId, emojiName);
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch, getState);
-            dispatch(batchActions([
-                {type: PostTypes.REACTION_FAILURE, error},
-                logError(error),
-            ]), getState);
+            dispatch(logError(error));
             return {error};
         }
 
-        dispatch(batchActions([
-            {
-                type: PostTypes.REACTION_SUCCESS,
-            },
-            {
-                type: PostTypes.REACTION_DELETED,
-                data: {user_id: currentUserId, post_id: postId, emoji_name: emojiName},
-            },
-        ]));
+        dispatch({
+            type: PostTypes.REACTION_DELETED,
+            data: {user_id: currentUserId, post_id: postId, emoji_name: emojiName},
+        });
 
         return {data: true};
     };
@@ -455,17 +436,12 @@ export function getCustomEmojiForReaction(name) {
 
 export function getReactionsForPost(postId) {
     return async (dispatch, getState) => {
-        dispatch({type: PostTypes.REACTION_REQUEST}, getState);
-
         let reactions;
         try {
             reactions = await Client4.getReactionsForPost(postId);
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch, getState);
-            dispatch(batchActions([
-                {type: PostTypes.REACTION_FAILURE, error},
-                logError(error),
-            ]), getState);
+            dispatch(logError(error));
             return {error};
         }
 
@@ -499,9 +475,6 @@ export function getReactionsForPost(postId) {
         }
 
         dispatch(batchActions([
-            {
-                type: PostTypes.REACTION_SUCCESS,
-            },
             {
                 type: PostTypes.RECEIVED_REACTIONS,
                 data: reactions,
@@ -617,7 +590,6 @@ export function getPostThreadWithRetry(postId) {
 
 export function getPosts(channelId, page = 0, perPage = Posts.POST_CHUNK_SIZE) {
     return async (dispatch, getState) => {
-        dispatch({type: PostTypes.GET_POSTS_REQUEST}, getState);
         let posts;
 
         try {
@@ -625,23 +597,15 @@ export function getPosts(channelId, page = 0, perPage = Posts.POST_CHUNK_SIZE) {
             getProfilesAndStatusesForPosts(posts.posts, dispatch, getState);
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch, getState);
-            dispatch(batchActions([
-                {type: PostTypes.GET_POSTS_FAILURE, error},
-                logError(error),
-            ]), getState);
+            dispatch(logError(error));
             return {error};
         }
 
-        dispatch(batchActions([
-            {
-                type: PostTypes.RECEIVED_POSTS,
-                data: posts,
-                channelId,
-            },
-            {
-                type: PostTypes.GET_POSTS_SUCCESS,
-            },
-        ]), getState);
+        dispatch({
+            type: PostTypes.RECEIVED_POSTS,
+            data: posts,
+            channelId,
+        });
 
         return {data: posts};
     };
@@ -649,10 +613,6 @@ export function getPosts(channelId, page = 0, perPage = Posts.POST_CHUNK_SIZE) {
 
 export function getPostsWithRetry(channelId, page = 0, perPage = Posts.POST_CHUNK_SIZE) {
     return async (dispatch, getState) => {
-        dispatch({
-            type: PostTypes.GET_POSTS_REQUEST,
-        });
-
         dispatch({
             type: PostTypes.GET_POSTS_WITH_RETRY_ATTEMPT,
             data: {},
@@ -672,7 +632,7 @@ export function getPostsWithRetry(channelId, page = 0, perPage = Posts.POST_CHUN
                             {
                                 type: PostTypes.GET_POSTS_SUCCESS,
                             },
-                        ]), getState);
+                        ]));
                     },
                     maxRetry: 2,
                     cancel: true,
@@ -683,10 +643,7 @@ export function getPostsWithRetry(channelId, page = 0, perPage = Posts.POST_CHUN
                     },
                     rollback: (success, error) => {
                         forceLogoutIfNecessary(error, dispatch, getState);
-                        dispatch(batchActions([
-                            {type: PostTypes.GET_POSTS_FAILURE, error},
-                            logError(error),
-                        ]), getState);
+                        dispatch(logError(error));
                     },
                 },
             },
@@ -730,18 +687,13 @@ export function getPostsUnread(channelId) {
 
 export function getPostsSince(channelId, since) {
     return async (dispatch, getState) => {
-        dispatch({type: PostTypes.GET_POSTS_SINCE_REQUEST}, getState);
-
         let posts;
         try {
             posts = await Client4.getPostsSince(channelId, since);
             getProfilesAndStatusesForPosts(posts.posts, dispatch, getState);
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch, getState);
-            dispatch(batchActions([
-                {type: PostTypes.GET_POSTS_SINCE_FAILURE, error},
-                logError(error),
-            ]), getState);
+            dispatch(logError(error));
             return {error};
         }
 
@@ -754,7 +706,7 @@ export function getPostsSince(channelId, since) {
             {
                 type: PostTypes.GET_POSTS_SINCE_SUCCESS,
             },
-        ]), getState);
+        ]));
 
         return {data: posts};
     };
@@ -762,8 +714,6 @@ export function getPostsSince(channelId, since) {
 
 export function getPostsSinceWithRetry(channelId, since) {
     return async (dispatch, getState) => {
-        dispatch({type: PostTypes.GET_POSTS_SINCE_REQUEST}, getState);
-
         dispatch({
             type: PostTypes.GET_POSTS_SINCE_WITH_RETRY_ATTEMPT,
             data: {},
@@ -783,7 +733,7 @@ export function getPostsSinceWithRetry(channelId, since) {
                             {
                                 type: PostTypes.GET_POSTS_SINCE_SUCCESS,
                             },
-                        ]), getState);
+                        ]));
                     },
                     maxRetry: 2,
                     cancel: true,
@@ -794,10 +744,7 @@ export function getPostsSinceWithRetry(channelId, since) {
                     },
                     rollback: (success, error) => {
                         forceLogoutIfNecessary(error, dispatch, getState);
-                        dispatch(batchActions([
-                            {type: PostTypes.GET_POSTS_SINCE_FAILURE, error},
-                            logError(error),
-                        ]), getState);
+                        dispatch(logError(error));
                     },
                 },
             },
@@ -809,31 +756,21 @@ export function getPostsSinceWithRetry(channelId, since) {
 
 export function getPostsBefore(channelId, postId, page = 0, perPage = Posts.POST_CHUNK_SIZE) {
     return async (dispatch, getState) => {
-        dispatch({type: PostTypes.GET_POSTS_BEFORE_REQUEST}, getState);
-
         let posts;
         try {
             posts = await Client4.getPostsBefore(channelId, postId, page, perPage);
             getProfilesAndStatusesForPosts(posts.posts, dispatch, getState);
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch, getState);
-            dispatch(batchActions([
-                {type: PostTypes.GET_POSTS_BEFORE_FAILURE, error},
-                logError(error),
-            ]), getState);
+            dispatch(logError(error));
             return {error};
         }
 
-        dispatch(batchActions([
-            {
-                type: PostTypes.RECEIVED_POSTS,
-                data: posts,
-                channelId,
-            },
-            {
-                type: PostTypes.GET_POSTS_BEFORE_SUCCESS,
-            },
-        ]), getState);
+        dispatch({
+            type: PostTypes.RECEIVED_POSTS,
+            data: posts,
+            channelId,
+        });
 
         return {data: posts};
     };
@@ -841,10 +778,6 @@ export function getPostsBefore(channelId, postId, page = 0, perPage = Posts.POST
 
 export function getPostsBeforeWithRetry(channelId, postId, page = 0, perPage = Posts.POST_CHUNK_SIZE) {
     return async (dispatch, getState) => {
-        dispatch({
-            type: PostTypes.GET_POSTS_BEFORE_REQUEST,
-        });
-
         dispatch({
             type: PostTypes.GET_POSTS_BEFORE_WITH_RETRY_ATTEMPT,
             data: {},
@@ -855,16 +788,11 @@ export function getPostsBeforeWithRetry(channelId, postId, page = 0, perPage = P
                         const {posts} = payload;
                         getProfilesAndStatusesForPosts(posts, dispatch, getState);
 
-                        dispatch(batchActions([
-                            {
-                                type: PostTypes.RECEIVED_POSTS,
-                                data: payload,
-                                channelId,
-                            },
-                            {
-                                type: PostTypes.GET_POSTS_BEFORE_SUCCESS,
-                            },
-                        ]), getState);
+                        dispatch({
+                            type: PostTypes.RECEIVED_POSTS,
+                            data: payload,
+                            channelId,
+                        });
                     },
                     maxRetry: 2,
                     cancel: true,
@@ -875,10 +803,7 @@ export function getPostsBeforeWithRetry(channelId, postId, page = 0, perPage = P
                     },
                     rollback: (success, error) => {
                         forceLogoutIfNecessary(error, dispatch, getState);
-                        dispatch(batchActions([
-                            {type: PostTypes.GET_POSTS_BEFORE_FAILURE, error},
-                            logError(error),
-                        ]), getState);
+                        dispatch(logError(error));
                     },
                 },
             },
@@ -890,31 +815,21 @@ export function getPostsBeforeWithRetry(channelId, postId, page = 0, perPage = P
 
 export function getPostsAfter(channelId, postId, page = 0, perPage = Posts.POST_CHUNK_SIZE) {
     return async (dispatch, getState) => {
-        dispatch({type: PostTypes.GET_POSTS_AFTER_REQUEST}, getState);
-
         let posts;
         try {
             posts = await Client4.getPostsAfter(channelId, postId, page, perPage);
             getProfilesAndStatusesForPosts(posts.posts, dispatch, getState);
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch, getState);
-            dispatch(batchActions([
-                {type: PostTypes.GET_POSTS_AFTER_FAILURE, error},
-                logError(error),
-            ]), getState);
+            dispatch(getState);
             return {error};
         }
 
-        dispatch(batchActions([
-            {
-                type: PostTypes.RECEIVED_POSTS,
-                data: posts,
-                channelId,
-            },
-            {
-                type: PostTypes.GET_POSTS_AFTER_SUCCESS,
-            },
-        ]), getState);
+        dispatch({
+            type: PostTypes.RECEIVED_POSTS,
+            data: posts,
+            channelId,
+        });
 
         return {data: posts};
     };
@@ -922,10 +837,6 @@ export function getPostsAfter(channelId, postId, page = 0, perPage = Posts.POST_
 
 export function getPostsAfterWithRetry(channelId, postId, page = 0, perPage = Posts.POST_CHUNK_SIZE) {
     return async (dispatch, getState) => {
-        dispatch({
-            type: PostTypes.GET_POSTS_AFTER_REQUEST,
-        });
-
         dispatch({
             type: PostTypes.GET_POSTS_AFTER_WITH_RETRY_ATTEMPT,
             data: {},
@@ -936,16 +847,11 @@ export function getPostsAfterWithRetry(channelId, postId, page = 0, perPage = Po
                         const {posts} = payload;
                         getProfilesAndStatusesForPosts(posts, dispatch, getState);
 
-                        dispatch(batchActions([
-                            {
-                                type: PostTypes.RECEIVED_POSTS,
-                                data: payload,
-                                channelId,
-                            },
-                            {
-                                type: PostTypes.GET_POSTS_AFTER_SUCCESS,
-                            },
-                        ]), getState);
+                        dispatch({
+                            type: PostTypes.RECEIVED_POSTS,
+                            data: payload,
+                            channelId,
+                        });
                     },
                     maxRetry: 2,
                     cancel: true,
@@ -956,10 +862,7 @@ export function getPostsAfterWithRetry(channelId, postId, page = 0, perPage = Po
                     },
                     rollback: (success, error) => {
                         forceLogoutIfNecessary(error, dispatch, getState);
-                        dispatch(batchActions([
-                            {type: PostTypes.GET_POSTS_AFTER_FAILURE, error},
-                            logError(error),
-                        ]), getState);
+                        dispatch(logError(error));
                     },
                 },
             },
@@ -970,15 +873,22 @@ export function getPostsAfterWithRetry(channelId, postId, page = 0, perPage = Po
 }
 
 // Note that getProfilesAndStatusesForPosts can take either an array of posts or a map of ids to posts
-export async function getProfilesAndStatusesForPosts(posts, dispatch, getState) {
-    if (!posts) {
+export function getProfilesAndStatusesForPosts(postsArrayOrMap, dispatch, getState) {
+    if (!postsArrayOrMap) {
         // Some API methods return {error} for no results
+        return Promise.resolve();
+    }
+
+    const posts = Object.values(postsArrayOrMap);
+
+    if (posts.length === 0) {
         return Promise.resolve();
     }
 
     const state = getState();
     const {currentUserId, profiles, statuses} = state.entities.users;
 
+    // Statuses and profiles of the users who made the posts
     const userIdsToLoad = new Set();
     const statusesToLoad = new Set();
 
@@ -1007,17 +917,15 @@ export async function getProfilesAndStatusesForPosts(posts, dispatch, getState) 
         promises.push(getStatusesByIds(Array.from(statusesToLoad))(dispatch, getState));
     }
 
-    // Do this after firing the other requests as it's more expensive
+    // Profiles of users mentioned in the posts
     const usernamesToLoad = getNeededAtMentionedUsernames(state, posts);
-
-    let emojisToLoad;
-    if (getConfig(state).EnableCustomEmoji === 'true') {
-        emojisToLoad = getNeededCustomEmojis(state, posts);
-    }
 
     if (usernamesToLoad.size > 0) {
         promises.push(getProfilesByUsernames(Array.from(usernamesToLoad))(dispatch, getState));
     }
+
+    // Emojis used in the posts
+    const emojisToLoad = getNeededCustomEmojis(state, posts);
 
     if (emojisToLoad && emojisToLoad.size > 0) {
         promises.push(getCustomEmojisByName(Array.from(emojisToLoad))(dispatch, getState));
@@ -1031,7 +939,7 @@ export function getNeededAtMentionedUsernames(state, posts) {
 
     const usernamesToLoad = new Set();
 
-    Object.values(posts).forEach((post) => {
+    posts.forEach((post) => {
         if (!post.message.includes('@')) {
             return;
         }
@@ -1087,12 +995,21 @@ function buildPostAttachmentText(attachments) {
 }
 
 export function getNeededCustomEmojis(state, posts) {
-    let customEmojisByName; // Populate this lazily since it's relatively expensive
-    const nonExistentEmoji = state.entities.emojis.nonExistentEmoji;
+    if (getConfig(state).EnableCustomEmoji !== 'true') {
+        return new Set();
+    }
+
+    // If post metadata is supported, custom emojis will have been provided as part of that
+    if (posts[0].metadata) {
+        return new Set();
+    }
 
     let customEmojisToLoad = new Set();
 
-    Object.values(posts).forEach((post) => {
+    let customEmojisByName; // Populate this lazily since it's relatively expensive
+    const nonExistentEmoji = state.entities.emojis.nonExistentEmoji;
+
+    posts.forEach((post) => {
         if (post.message.includes(':')) {
             if (!customEmojisByName) {
                 customEmojisByName = selectCustomEmojisByName(state);
@@ -1172,48 +1089,46 @@ export function unflagPost(postId) {
 
 export function getOpenGraphMetadata(url) {
     return async (dispatch, getState) => {
-        dispatch({type: PostTypes.OPEN_GRAPH_REQUEST}, getState);
-
         let data;
         try {
             data = await Client4.getOpenGraphMetadata(url);
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch, getState);
-            dispatch(batchActions([
-                {type: PostTypes.OPEN_GRAPH_FAILURE, error},
-                logError(error),
-            ]), getState);
+            dispatch(logError(error));
             return {error};
         }
 
-        const actions = [{
-            type: PostTypes.OPEN_GRAPH_SUCCESS,
-        }];
-
         if (data && (data.url || data.type || data.title || data.description)) {
-            actions.push({
+            dispatch({
                 type: PostTypes.RECEIVED_OPEN_GRAPH_METADATA,
                 data,
                 url,
             });
         }
 
-        dispatch(batchActions(actions), getState);
-
         return {data};
     };
 }
 
 export function doPostAction(postId, actionId, selectedOption = '') {
-    return bindClientFunc(
-        Client4.doPostAction,
-        PostTypes.DO_POST_ACTION_REQUEST,
-        [PostTypes.DO_POST_ACTION_SUCCESS],
-        PostTypes.DO_POST_ACTION_FAILURE,
-        postId,
-        actionId,
-        selectedOption
-    );
+    return async (dispatch, getState) => {
+        let data;
+        try {
+            data = await Client4.doPostAction(postId, actionId, selectedOption);
+        } catch (error) {
+            forceLogoutIfNecessary(error, dispatch, getState);
+            dispatch(logError(error));
+            return {error};
+        }
+
+        if (data && data.trigger_id) {
+            dispatch({
+                type: IntegrationTypes.RECEIVED_DIALOG_TRIGGER_ID,
+                data: data.trigger_id,
+            });
+        }
+        return {data};
+    };
 }
 
 export function addMessageIntoHistory(message) {

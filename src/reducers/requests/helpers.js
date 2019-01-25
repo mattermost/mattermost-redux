@@ -4,8 +4,8 @@
 
 import {RequestStatus} from 'constants';
 
-import type {GenericAction} from '../../types/actions';
-import type {RequestStatusType} from '../../types/requests';
+import type {GenericAction} from 'types/actions';
+import type {RequestStatusType} from 'types/requests';
 
 export function initialRequestState(): RequestStatusType {
     return {
@@ -34,15 +34,10 @@ export function handleRequest(
             error: null,
         };
     case FAILURE: {
-        let error = action.error;
-        if (error instanceof Error) {
-            error = error.hasOwnProperty('intl') ? JSON.parse(JSON.stringify(error)) : error.toString();
-        }
-
         return {
             ...state,
             status: RequestStatus.FAILURE,
-            error,
+            error: action.error,
         };
     }
     default:

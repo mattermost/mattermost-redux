@@ -1,6 +1,5 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
-// @flow
 
 import {combineReducers} from 'redux';
 
@@ -21,6 +20,7 @@ import jobs from './jobs';
 import search from './search';
 import roles from './roles';
 import schemes from './schemes';
+import groups from './groups';
 
 export default combineReducers({
     general,
@@ -40,4 +40,5 @@ export default combineReducers({
     search,
     roles,
     schemes,
+    groups,
 });

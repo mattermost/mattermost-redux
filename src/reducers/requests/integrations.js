@@ -7,8 +7,8 @@ import {IntegrationTypes} from 'action_types';
 
 import {handleRequest, initialRequestState} from './helpers';
 
-import type {GenericAction} from '../../types/actions';
-import type {RequestStatusType} from '../../types/requests';
+import type {GenericAction} from 'types/actions';
+import type {IntegrationsRequestsStatuses, RequestStatusType} from 'types/requests';
 
 function createIncomingHook(state: RequestStatusType = initialRequestState(), action: GenericAction): RequestStatusType {
     return handleRequest(
@@ -220,7 +220,17 @@ function executeCommand(state: RequestStatusType = initialRequestState(), action
     );
 }
 
-export default combineReducers({
+function submitInteractiveDialog(state: RequestStatusType = initialRequestState(), action: GenericAction): RequestStatusType {
+    return handleRequest(
+        IntegrationTypes.SUBMIT_INTERACTIVE_DIALOG_REQUEST,
+        IntegrationTypes.SUBMIT_INTERACTIVE_DIALOG_SUCCESS,
+        IntegrationTypes.SUBMIT_INTERACTIVE_DIALOG_FAILURE,
+        state,
+        action
+    );
+}
+
+export default (combineReducers({
     createIncomingHook,
     getIncomingHooks,
     deleteIncomingHook,
@@ -242,4 +252,5 @@ export default combineReducers({
     updateOAuthApp,
     executeCommand,
     getAutocompleteCommands,
-});
+    submitInteractiveDialog,
+}): (IntegrationsRequestsStatuses, GenericAction) => IntegrationsRequestsStatuses);

@@ -7,14 +7,19 @@ import {
     getCurrentChannelId,
     getCurrentUser,
     getCurrentUserId,
-    getUsers,
     getMyCurrentChannelMembership,
+    getUsers,
 } from 'selectors/entities/common';
 
 import {getConfig, getLicense} from 'selectors/entities/general';
-import {getDirectShowPreferences} from 'selectors/entities/preferences';
+import {getDirectShowPreferences, getTeammateNameDisplaySetting} from 'selectors/entities/preferences';
 
-import {filterProfilesMatchingTerm, sortByUsername, isSystemAdmin} from 'utils/user_utils';
+import {
+    displayUsername,
+    filterProfilesMatchingTerm,
+    sortByUsername,
+    isSystemAdmin,
+} from 'utils/user_utils';
 
 export {
     getCurrentUserId,
@@ -212,10 +217,32 @@ function sortAndInjectProfiles(profiles, profileSet, skipInactive = false) {
 
 export const getProfiles = createSelector(
     getUsers,
-    (profiles) => {
-        return sortAndInjectProfiles(profiles, PROFILE_SET_ALL);
+    (state, filters) => filters,
+    (profiles, filters) => {
+        return sortAndInjectProfiles(filterProfiles(profiles, filters), PROFILE_SET_ALL);
     }
 );
+
+function filterProfiles(profiles, filters) {
+    if (!filters || Object.keys(filters).length === 0) {
+        return profiles;
+    }
+
+    let users = Object.values(profiles);
+
+    if (filters.role && filters.role !== '') {
+        users = users.filter((user) => user.roles && user.roles.indexOf(filters.role) !== -1);
+    }
+
+    if (filters.inactive) {
+        users = users.filter((user) => user.delete_at !== 0);
+    }
+
+    return users.reduce((acc, user) => {
+        acc[user.id] = user;
+        return acc;
+    }, {});
+}
 
 export const getProfilesInCurrentChannel = createSelector(
     getUsers,
@@ -245,8 +272,9 @@ export const getProfilesInTeam = createSelector(
     getUsers,
     getUserIdsInTeams,
     (state, teamId) => teamId,
-    (profiles, usersInTeams, teamId) => {
-        return sortAndInjectProfiles(profiles, usersInTeams[teamId] || new Set());
+    (state, teamId, filters) => filters,
+    (profiles, usersInTeams, teamId, filters) => {
+        return sortAndInjectProfiles(filterProfiles(profiles, filters), usersInTeams[teamId] || new Set());
     }
 );
 
@@ -261,8 +289,9 @@ export const getProfilesNotInCurrentTeam = createSelector(
 export const getProfilesWithoutTeam = createSelector(
     getUsers,
     getUserIdsWithoutTeam,
-    (profiles, withoutTeamProfileSet) => {
-        return sortAndInjectProfiles(profiles, withoutTeamProfileSet);
+    (state, filters) => filters,
+    (profiles, withoutTeamProfileSet, filters) => {
+        return sortAndInjectProfiles(filterProfiles(profiles, filters), withoutTeamProfileSet);
     }
 );
 
@@ -274,13 +303,14 @@ export function getTotalUsersStats(state) {
     return state.entities.users.stats;
 }
 
-export function searchProfiles(state, term, skipCurrent = false) {
-    const profiles = filterProfilesMatchingTerm(Object.values(getUsers(state)), term);
+export function searchProfiles(state, term, skipCurrent = false, filters = {}) {
+    const profiles = filterProfilesMatchingTerm(Object.values(getUsers(state)), term, filters);
+    const filteredProfiles = Object.values(filterProfiles(profiles, filters));
     if (skipCurrent) {
-        removeCurrentUserFromList(profiles, getCurrentUserId(state));
+        removeCurrentUserFromList(filteredProfiles, getCurrentUserId(state));
     }
 
-    return profiles;
+    return filteredProfiles;
 }
 
 export function searchProfilesInCurrentChannel(state, term, skipCurrent = false) {
@@ -310,13 +340,14 @@ export function searchProfilesInCurrentTeam(state, term, skipCurrent = false) {
     return profiles;
 }
 
-export function searchProfilesInTeam(state, teamId, term, skipCurrent = false) {
+export function searchProfilesInTeam(state, teamId, term, skipCurrent = false, filters = {}) {
     const profiles = filterProfilesMatchingTerm(getProfilesInTeam(state, teamId), term);
+    const filteredProfiles = Object.values(filterProfiles(profiles, filters));
     if (skipCurrent) {
-        removeCurrentUserFromList(profiles, getCurrentUserId(state));
+        removeCurrentUserFromList(filteredProfiles, getCurrentUserId(state));
     }
 
-    return profiles;
+    return filteredProfiles;
 }
 
 export function searchProfilesNotInCurrentTeam(state, term, skipCurrent = false) {
@@ -328,13 +359,14 @@ export function searchProfilesNotInCurrentTeam(state, term, skipCurrent = false)
     return profiles;
 }
 
-export function searchProfilesWithoutTeam(state, term, skipCurrent = false) {
+export function searchProfilesWithoutTeam(state, term, skipCurrent = false, filters = {}) {
     const profiles = filterProfilesMatchingTerm(getProfilesWithoutTeam(state), term);
+    const filteredProfiles = Object.values(filterProfiles(profiles, filters));
     if (skipCurrent) {
-        removeCurrentUserFromList(profiles, getCurrentUserId(state));
+        removeCurrentUserFromList(filteredProfiles, getCurrentUserId(state));
     }
 
-    return profiles;
+    return filteredProfiles;
 }
 
 function removeCurrentUserFromList(profiles, currentUserId) {
@@ -344,13 +376,25 @@ function removeCurrentUserFromList(profiles, currentUserId) {
     }
 }
 
+export function getMyAcceptedTermsOfServiceData(state) {
+    return state.entities.users.myAcceptedTermsOfServiceData;
+}
+
 export const shouldShowTermsOfService = createSelector(
     getConfig,
     getCurrentUser,
     getLicense,
-    (config, user, license) => {
-        // Defaults to false if the setting doesn't exist
-        return Boolean(license.IsLicensed === 'true' && config.EnableCustomTermsOfService === 'true' && user && config.CustomTermsOfServiceId !== user.accepted_terms_of_service_id);
+    getMyAcceptedTermsOfServiceData,
+    (config, user, license, myAcceptedTermsOfServiceData) => {
+        // Defaults to false if the user is not logged in or the setting doesn't exist
+
+        const acceptedTermsId = myAcceptedTermsOfServiceData.id;
+        const acceptedAt = myAcceptedTermsOfServiceData.time;
+
+        const featureEnabled = license.IsLicensed === 'true' && config.EnableCustomTermsOfService === 'true';
+        const reacceptanceTime = config.CustomTermsOfServiceReAcceptancePeriod * 1000 * 60 * 60 * 24;
+        const timeElapsed = new Date().getTime() - acceptedAt;
+        return Boolean(user && featureEnabled && (config.CustomTermsOfServiceId !== acceptedTermsId || timeElapsed > reacceptanceTime));
     }
 );
 
@@ -402,6 +446,24 @@ export function makeGetProfilesInChannel() {
     );
 }
 
+export function makeGetProfilesNotInChannel() {
+    return createSelector(
+        getUsers,
+        getUserIdsNotInChannels,
+        (state, channelId) => channelId,
+        (state, channelId, skipInactive) => skipInactive,
+        (users, userIds, channelId, skipInactive = false) => {
+            const userIdsInChannel = userIds[channelId];
+
+            if (!userIdsInChannel) {
+                return [];
+            }
+
+            return sortAndInjectProfiles(users, userIdsInChannel, skipInactive);
+        }
+    );
+}
+
 export function makeGetProfilesByIdsAndUsernames() {
     return createSelector(
         getUsers,
@@ -432,6 +494,17 @@ export function makeGetProfilesByIdsAndUsernames() {
             }
 
             return userProfiles;
+        }
+    );
+}
+
+export function makeGetDisplayName() {
+    return createSelector(
+        (state, userId) => getUser(state, userId),
+        getTeammateNameDisplaySetting,
+        (state, _, useFallbackUsername = true) => useFallbackUsername,
+        (user, teammateNameDisplaySetting, useFallbackUsername) => {
+            return displayUsername(user, teammateNameDisplaySetting, useFallbackUsername);
         }
     );
 }

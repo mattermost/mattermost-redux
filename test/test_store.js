@@ -40,3 +40,16 @@ export default async function testConfigureStore(preloadedState) {
 
     return store;
 }
+
+// This should probably be replaced by redux-mock-store like the web app
+export function mockDispatch(dispatch) {
+    const mocked = (action) => {
+        dispatch(action);
+
+        mocked.actions.push(action);
+    };
+
+    mocked.actions = [];
+
+    return mocked;
+}

@@ -10,7 +10,13 @@ export type GenericAction = {|
     type: string,
     data: any,
     meta?: any,
-    error?: any
+    error?: any,
+    index?: number,
+    displayable?: boolean,
+    postId?: string,
+    sessionId?: string,
+    currentUserId?: string,
+    remove?: Function,
 |};
 
 type Thunk = (DispatchFunc, GetStateFunc) => Promise<ActionResult>; // eslint-disable-line no-use-before-define

@@ -4,7 +4,7 @@
 
 import {Client4} from 'client';
 
-import type {Emoji, SystemEmoji, CustomEmoji} from '../types/emojis';
+import type {Emoji, SystemEmoji, CustomEmoji} from 'types/emojis';
 
 export function getEmojiImageUrl(emoji: Emoji): string {
     if (emoji.id) {
@@ -29,6 +29,10 @@ export function parseNeededCustomEmojisFromText(text: string, systemEmojis: Map<
 
     let match;
     while ((match = pattern.exec(text)) !== null) {
+        if (!match) {
+            continue;
+        }
+
         if (systemEmojis.has(match[1])) {
             // It's a system emoji, go the next match
             continue;

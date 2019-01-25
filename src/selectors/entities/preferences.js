@@ -190,3 +190,42 @@ export function makeGetStyleFromTheme() {
         }
     );
 }
+
+const defaultSidebarPrefs = {
+    grouping: 'by_type',
+    unreads_at_top: 'true',
+    favorite_at_top: 'true',
+    sorting: 'alpha',
+};
+
+export const getSidebarPreferences = createSelector(
+    (state) => {
+        const config = getConfig(state);
+        return config.ExperimentalGroupUnreadChannels !== General.DISABLED && getBool(
+            state,
+            Preferences.CATEGORY_SIDEBAR_SETTINGS,
+            'show_unread_section',
+            config.ExperimentalGroupUnreadChannels === General.DEFAULT_ON
+        );
+    },
+    (state) => {
+        return get(
+            state,
+            Preferences.CATEGORY_SIDEBAR_SETTINGS,
+            '',
+            null
+        );
+    },
+    (showUnreadSection, sidebarPreference) => {
+        let sidebarPrefs = JSON.parse(sidebarPreference);
+        if (sidebarPrefs === null) {
+            // Support unread settings for old implementation
+            sidebarPrefs = {
+                ...defaultSidebarPrefs,
+                unreads_at_top: showUnreadSection ? 'true' : 'false',
+            };
+        }
+
+        return sidebarPrefs;
+    }
+);

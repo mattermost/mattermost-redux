@@ -13,8 +13,8 @@ import {bindClientFunc} from './helpers';
 import {getProfilesByIds, getProfilesInChannel} from './users';
 import {getChannelAndMyMember, getMyChannelMember} from './channels';
 
-import type {GetStateFunc, DispatchFunc, ActionFunc} from '../types/actions';
-import type {PreferenceType} from '../types/preferences';
+import type {GetStateFunc, DispatchFunc, ActionFunc} from 'types/actions';
+import type {PreferenceType} from 'types/preferences';
 
 export function deletePreferences(userId: string, preferences: Array<PreferenceType>): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
@@ -44,12 +44,12 @@ export function deletePreferences(userId: string, preferences: Array<PreferenceT
 }
 
 export function getMyPreferences(): ActionFunc {
-    return bindClientFunc(
-        Client4.getMyPreferences,
-        PreferenceTypes.MY_PREFERENCES_REQUEST,
-        [PreferenceTypes.RECEIVED_ALL_PREFERENCES, PreferenceTypes.MY_PREFERENCES_SUCCESS],
-        PreferenceTypes.MY_PREFERENCES_FAILURE
-    );
+    return bindClientFunc({
+        clientFunc: Client4.getMyPreferences,
+        onRequest: PreferenceTypes.MY_PREFERENCES_REQUEST,
+        onSuccess: [PreferenceTypes.RECEIVED_ALL_PREFERENCES, PreferenceTypes.MY_PREFERENCES_SUCCESS],
+        onFailure: PreferenceTypes.MY_PREFERENCES_FAILURE,
+    });
 }
 
 export function makeDirectChannelVisibleIfNecessary(otherUserId: string): ActionFunc {

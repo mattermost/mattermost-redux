@@ -12,10 +12,12 @@ import {getTeammateNameDisplaySetting} from 'selectors/entities/preferences';
 
 import {displayUsername} from 'utils/user_utils';
 
-import type {Typing} from '../../types/typing';
-import type {UserProfile} from '../../types/users';
+import type {Typing} from 'types/typing';
+import type {UserProfile} from 'types/users';
+import type {GlobalState} from 'types/store';
+import type {IDMappedObjects} from 'types/utilities';
 
-const getUsersTypingImpl = (profiles: {[string]: UserProfile}, teammateNameDisplay: string, channelId: string, parentPostId: string, typing: Typing): Array<string> => {
+const getUsersTypingImpl = (profiles: IDMappedObjects<UserProfile>, teammateNameDisplay: string, channelId: string, parentPostId: string, typing: Typing): Array<string> => {
     const id = channelId + parentPostId;
 
     if (typing[id]) {
@@ -32,17 +34,17 @@ const getUsersTypingImpl = (profiles: {[string]: UserProfile}, teammateNameDispl
 };
 
 export const makeGetUsersTypingByChannelAndPost = () => {
-    return createSelector(
+    return (createSelector(
         getUsers,
         getTeammateNameDisplaySetting,
-        (state, options) => options.channelId,
-        (state, options) => options.postId,
-        (state) => state.entities.typing,
+        (state: GlobalState, options: {channelId: string, postId: string}): string => options.channelId,
+        (state: GlobalState, options: {channelId: string, postId: string}): string => options.postId,
+        (state: GlobalState): Typing => state.entities.typing,
         getUsersTypingImpl,
-    );
+    ): (state: GlobalState, {channelId: string, postId: string}) => Array<string>);
 };
 
-export const getUsersTyping = createSelector(
+export const getUsersTyping: (state: GlobalState) => Array<string> = createSelector(
     getUsers,
     getTeammateNameDisplaySetting,
     getCurrentChannelId,

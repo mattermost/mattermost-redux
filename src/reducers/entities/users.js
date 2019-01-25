@@ -2,7 +2,7 @@
 // See LICENSE.txt for license information.
 
 import {combineReducers} from 'redux';
-import {UserTypes} from 'action_types';
+import {UserTypes, ChannelTypes} from 'action_types';
 import {profileListToMap} from 'utils/user_utils';
 
 function profilesToSet(state, action) {
@@ -85,6 +85,22 @@ function currentUserId(state = '', action) {
     }
 
     return state;
+}
+
+function myAcceptedTermsOfServiceData(state = {id: '', time: 0}, action) {
+    switch (action.type) {
+    case UserTypes.RECEIVED_TERMS_OF_SERVICE_STATUS:
+        return {
+            id: action.data.terms_of_service_id,
+            time: action.data.create_at,
+        };
+
+    case UserTypes.LOGOUT_SUCCESS:
+        return {id: '', time: 0};
+
+    default:
+        return state;
+    }
 }
 
 function mySessions(state = [], action) {
@@ -244,6 +260,12 @@ function profilesInChannel(state = {}, action) {
     case UserTypes.RECEIVED_PROFILE_NOT_IN_CHANNEL:
         return removeProfileFromSet(state, action);
 
+    case ChannelTypes.CHANNEL_MEMBER_REMOVED:
+        return removeProfileFromSet(state, {data: {
+            id: action.data.channel_id,
+            user_id: action.data.user_id,
+        }});
+
     case UserTypes.LOGOUT_SUCCESS:
         return {};
 
@@ -265,6 +287,12 @@ function profilesNotInChannel(state = {}, action) {
 
     case UserTypes.RECEIVED_PROFILE_IN_CHANNEL:
         return removeProfileFromSet(state, action);
+
+    case ChannelTypes.CHANNEL_MEMBER_ADDED:
+        return removeProfileFromSet(state, {data: {
+            id: action.data.channel_id,
+            user_id: action.data.user_id,
+        }});
 
     case UserTypes.LOGOUT_SUCCESS:
         return {};
@@ -368,6 +396,9 @@ export default combineReducers({
 
     // the current selected user
     currentUserId,
+
+    // the current user's accepted terms of service id and acceptance timestamp
+    myAcceptedTermsOfServiceData,
 
     // array with the user's sessions
     mySessions,

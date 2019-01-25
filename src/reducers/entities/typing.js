@@ -4,8 +4,8 @@
 
 import {WebsocketEvents} from 'constants';
 
-import type {Typing} from '../../types/typing';
-import type {GenericAction} from '../../types/actions';
+import type {Typing} from 'types/typing';
+import type {GenericAction} from 'types/actions';
 
 export default function typing(state: Typing = {}, action: GenericAction): Typing {
     const {

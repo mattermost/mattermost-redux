@@ -5,6 +5,7 @@ const FormData = require('form-data');
 
 import fetch from './fetch_etag';
 import {buildQueryString, isMinimumServerVersion} from 'src/utils/helpers';
+import {cleanUrlForLogging} from 'src/utils/sentry';
 import {General} from 'constants';
 
 const HEADER_AUTH = 'Authorization';
@@ -425,7 +426,14 @@ export default class Client4 {
         );
     }
 
-    updateTermsOfServiceStatus = async (termsOfServiceId, accepted) => {
+    getMyTermsOfServiceStatus = async () => {
+        return this.doFetch(
+            `${this.getUserRoute('me')}/terms_of_service`,
+            {method: 'get'}
+        );
+    }
+
+    updateMyTermsOfServiceStatus = async (termsOfServiceId, accepted) => {
         return this.doFetch(
             `${this.getUserRoute('me')}/terms_of_service`,
             {method: 'post', body: JSON.stringify({termsOfServiceId, accepted})}
@@ -514,11 +522,11 @@ export default class Client4 {
         return response;
     };
 
-    getProfiles = async (page = 0, perPage = PER_PAGE_DEFAULT) => {
+    getProfiles = async (page = 0, perPage = PER_PAGE_DEFAULT, options = {}) => {
         this.trackEvent('api', 'api_profiles_get');
 
         return this.doFetch(
-            `${this.getUsersRoute()}${buildQueryString({page, per_page: perPage})}`,
+            `${this.getUsersRoute()}${buildQueryString({page, per_page: perPage, ...options})}`,
             {method: 'get'}
         );
     };
@@ -1135,6 +1143,13 @@ export default class Client4 {
 
     // Channel Routes
 
+    getAllChannels = async (page = 0, perPage = PER_PAGE_DEFAULT) => {
+        return this.doFetch(
+            `${this.getChannelsRoute()}${buildQueryString({page, per_page: perPage})}`,
+            {method: 'get'}
+        );
+    };
+
     createChannel = async (channel) => {
         this.trackEvent('api', 'api_channels_create', {team_id: channel.team_id});
 
@@ -1361,6 +1376,13 @@ export default class Client4 {
         );
     };
 
+    searchAllChannels = async (term) => {
+        return this.doFetch(
+            `${this.getChannelsRoute()}/search`,
+            {method: 'post', body: JSON.stringify({term})}
+        );
+    };
+
     updateChannelMemberSchemeRoles = async (channelId, userId, isSchemeUser, isSchemeAdmin) => {
         const body = {scheme_user: isSchemeUser, scheme_admin: isSchemeAdmin};
         return this.doFetch(
@@ -1552,6 +1574,12 @@ export default class Client4 {
     };
 
     doPostAction = async (postId, actionId, selectedOption = '') => {
+        if (selectedOption) {
+            this.trackEvent('api', 'api_interactive_messages_menu_selected');
+        } else {
+            this.trackEvent('api', 'api_interactive_messages_button_clicked');
+        }
+
         return this.doFetch(
             `${this.getPostRoute(postId)}/actions/${encodeURIComponent(actionId)}`,
             {method: 'post', body: JSON.stringify({selected_option: selectedOption})}
@@ -1650,10 +1678,10 @@ export default class Client4 {
         const url = `${this.getBaseRoute()}/logs`;
 
         if (!this.enableLogging) {
-            throw {
+            throw new ClientError(this.getUrl(), {
                 message: 'Logging disabled.',
                 url,
-            };
+            });
         }
 
         return this.doFetch(
@@ -1915,6 +1943,14 @@ export default class Client4 {
         return this.doFetch(
             `${this.getOAuthAppRoute(appId)}/regen_secret`,
             {method: 'post'}
+        );
+    };
+
+    submitInteractiveDialog = async (data) => {
+        this.trackEvent('api', 'api_interactive_messages_dialog_submitted');
+        return this.doFetch(
+            `${this.getBaseRoute()}/actions/dialogs/submit`,
+            {method: 'post', body: JSON.stringify(data)},
         );
     };
 
@@ -2193,6 +2229,27 @@ export default class Client4 {
         );
     };
 
+    getLdapGroups = async (page = 0, perPage = PER_PAGE_DEFAULT) => {
+        return this.doFetch(
+            `${this.getBaseRoute()}/ldap/groups${buildQueryString({page, per_page: perPage})}`,
+            {method: 'get'}
+        );
+    };
+
+    linkLdapGroup = async (key) => {
+        return this.doFetch(
+            `${this.getBaseRoute()}/ldap/groups/${encodeURI(key)}/link`,
+            {method: 'post'}
+        );
+    };
+
+    unlinkLdapGroup = async (key) => {
+        return this.doFetch(
+            `${this.getBaseRoute()}/ldap/groups/${encodeURI(key)}/link`,
+            {method: 'delete'}
+        );
+    };
+
     getSamlCertificateStatus = async () => {
         return this.doFetch(
             `${this.getBaseRoute()}/saml/certificate/status`,
@@ -2400,10 +2457,13 @@ export default class Client4 {
 
     // Plugin Routes - EXPERIMENTAL - SUBJECT TO CHANGE
 
-    uploadPlugin = async (fileData) => {
+    uploadPlugin = async (fileData, force = false) => {
         this.trackEvent('api', 'api_plugin_upload');
 
         const formData = new FormData();
+        if (force) {
+            formData.append('force', 'true');
+        }
         formData.append('plugin', fileData);
 
         const request = {
@@ -2465,6 +2525,43 @@ export default class Client4 {
         );
     };
 
+    // Groups
+
+    linkGroupSyncable = async (groupID, syncableID, syncableType, patch) => {
+        return this.doFetch(
+            `${this.getBaseRoute()}/groups/${groupID}/${syncableType}s/${syncableID}/link`,
+            {method: 'post', body: JSON.stringify(patch)}
+        );
+    };
+
+    unlinkGroupSyncable = async (groupID, syncableID, syncableType) => {
+        return this.doFetch(
+            `${this.getBaseRoute()}/groups/${groupID}/${syncableType}s/${syncableID}/link`,
+            {method: 'delete'}
+        );
+    };
+
+    getGroupSyncables = async (groupID, syncableType) => {
+        return this.doFetch(
+            `${this.getBaseRoute()}/groups/${groupID}/${syncableType}s`,
+            {method: 'get'}
+        );
+    };
+
+    getGroupMembers = async (groupID, page = 0, perPage = PER_PAGE_DEFAULT) => {
+        return this.doFetch(
+            `${this.getBaseRoute()}/groups/${groupID}/members${buildQueryString({page, per_page: perPage})}`,
+            {method: 'get'}
+        );
+    };
+
+    getGroup = async (groupID) => {
+        return this.doFetch(
+            `${this.getBaseRoute()}/groups/${groupID}`,
+            {method: 'get'}
+        );
+    };
+
     // Redirect Location
 
     getRedirectLocation = async (urlParam) => {
@@ -2485,10 +2582,10 @@ export default class Client4 {
 
     doFetchWithResponse = async (url, options) => {
         if (!this.online) {
-            throw {
+            throw new ClientError(this.getUrl(), {
                 message: 'no internet connection',
                 url,
-            };
+            });
         }
 
         const response = await fetch(url, this.getOptions(options));
@@ -2498,14 +2595,14 @@ export default class Client4 {
         try {
             data = await response.json();
         } catch (err) {
-            throw {
+            throw new ClientError(this.getUrl(), {
                 message: 'Received invalid response from the server.',
                 intl: {
                     id: 'mobile.request.invalid_response',
                     defaultMessage: 'Received invalid response from the server.',
                 },
                 url,
-            };
+            });
         }
 
         if (headers.has(HEADER_X_VERSION_ID) && !headers.get('Cache-Control')) {
@@ -2536,15 +2633,25 @@ export default class Client4 {
             console.error(msg); // eslint-disable-line no-console
         }
 
-        throw {
+        throw new ClientError(this.getUrl(), {
             message: msg,
             server_error_id: data.id,
             status_code: data.status_code,
             url,
-        };
+        });
     };
 
     trackEvent(category, event, props) {
+        // Temporary change to allow only certain events to reduce data rate - see MM-13062
+        if (![
+            'api_posts_create',
+            'api_interactive_messages_button_clicked',
+            'api_interactive_messages_menu_selected',
+            'api_interactive_messages_dialog_submitted',
+        ].includes(event)) {
+            return;
+        }
+
         const properties = Object.assign({category, type: event, user_actual_id: this.userId}, props);
         const options = {
             context: {
@@ -2591,4 +2698,20 @@ function parseAndMergeNestedHeaders(originalHeaders) {
         headers.set(capitalizedKey, realVal);
     });
     return new Map([...headers, ...nestedHeaders]);
+}
+
+export class ClientError extends Error {
+    constructor(baseUrl, data) {
+        super(data.message + ': ' + cleanUrlForLogging(baseUrl, data.url));
+
+        this.message = data.message;
+        this.url = data.url;
+        this.intl = data.intl;
+        this.server_error_id = data.server_error_id;
+        this.status_code = data.status_code;
+
+        // Ensure message is treated as a property of this class when object spreading. Without this,
+        // copying the object by using `{...error}` would not include the message.
+        Object.defineProperty(this, 'message', {enumerable: true});
+    }
 }

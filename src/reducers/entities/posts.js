@@ -1,12 +1,12 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
 
-import {PostTypes, SearchTypes, UserTypes} from 'action_types';
+import {PostTypes, SearchTypes, UserTypes, ChannelTypes} from 'action_types';
 import {Posts} from 'constants';
 import {comparePosts, combineSystemPosts} from 'utils/post_utils';
 
 function handleReceivedPost(posts = {}, postsInChannel = {}, postsInThread = {}, action) {
-    const post = action.data;
+    const post = removeUnneededMetadata(action.data);
     const channelId = post.channel_id;
 
     const nextPosts = {
@@ -41,7 +41,6 @@ function handleReceivedPost(posts = {}, postsInChannel = {}, postsInThread = {},
 
     const withCombineSystemPosts = combineSystemPosts(nextPostsInChannel[channelId], nextPosts);
     nextPostsInChannel[channelId] = withCombineSystemPosts.postsForChannel;
-
     return {posts: withCombineSystemPosts.nextPosts, postsInChannel: nextPostsInChannel, postsInThread: nextPostsInThread};
 }
 
@@ -94,7 +93,9 @@ function handleReceivedPosts(posts = {}, postsInChannel = {}, postsInThread = {}
     const nextPostsInThread = {...postsInThread};
     const postsForChannel = postsInChannel[channelId] ? [...postsInChannel[channelId]] : [];
 
-    for (const newPost of Object.values(newPosts)) {
+    for (const post of Object.values(newPosts)) {
+        const newPost = removeUnneededMetadata(post);
+
         if (newPost.delete_at > 0) {
             // Mark the post as deleted if we have it
             if (nextPosts[newPost.id]) {
@@ -156,6 +157,63 @@ function handleReceivedPosts(posts = {}, postsInChannel = {}, postsInThread = {}
     nextPostsInChannel[channelId] = withCombineSystemPosts.postsForChannel;
 
     return {posts: withCombineSystemPosts.nextPosts, postsInChannel: nextPostsInChannel, postsInThread: nextPostsInThread};
+}
+
+export function removeUnneededMetadata(post) {
+    if (!post.metadata) {
+        return post;
+    }
+
+    const metadata = {...post.metadata};
+    let changed = false;
+
+    // These fields are stored separately
+    if (metadata.emojis) {
+        Reflect.deleteProperty(metadata, 'emojis');
+        changed = true;
+    }
+
+    if (metadata.files) {
+        Reflect.deleteProperty(metadata, 'files');
+        changed = true;
+    }
+
+    if (metadata.reactions) {
+        Reflect.deleteProperty(metadata, 'reactions');
+        changed = true;
+    }
+
+    if (metadata.embeds) {
+        let embedsChanged = false;
+
+        const newEmbeds = metadata.embeds.map((embed) => {
+            if (embed.type !== 'opengraph') {
+                return embed;
+            }
+
+            const newEmbed = {...embed};
+            Reflect.deleteProperty(newEmbed, 'data');
+
+            embedsChanged = true;
+
+            return newEmbed;
+        });
+
+        if (embedsChanged) {
+            metadata.embeds = newEmbeds;
+            changed = true;
+        }
+    }
+
+    if (!changed) {
+        // Nothing changed
+        return post;
+    }
+
+    return {
+        ...post,
+        metadata,
+    };
 }
 
 function handlePendingPosts(pendingPostIds = [], action) {
@@ -300,6 +358,28 @@ function handlePostDeleted(posts = {}, postsInChannel = {}, postsInThread = {}, 
     return {posts: nextPosts, postsInChannel: nextPostsForChannel, postsInThread: nextPostsForThread};
 }
 
+function handleChannelDeleted(posts = {}, postsInChannel = {}, postsInThread = {}, channelId) {
+    const nextPosts = {...posts};
+    const nextPostsForChannel = {...postsInChannel};
+    const nextPostsForThread = {...postsInThread};
+
+    for (const postId in nextPosts) {
+        if (nextPosts[postId].channel_id === channelId) {
+            Reflect.deleteProperty(nextPosts, postId);
+            Reflect.deleteProperty(nextPostsForThread, postId);
+            for (const rootId of Object.keys(nextPostsForThread)) {
+                nextPostsForThread[rootId] = nextPostsForThread[rootId].filter((id) => id !== postId);
+                if (nextPostsForThread[rootId].length === 0) {
+                    Reflect.deleteProperty(nextPostsForThread, rootId);
+                }
+            }
+        }
+    }
+    Reflect.deleteProperty(nextPostsForChannel, channelId);
+
+    return {posts: nextPosts, postsInChannel: nextPostsForChannel, postsInThread: nextPostsForThread};
+}
+
 function handleRemovePost(posts = {}, postsInChannel = {}, postsInThread = {}, action) {
     const post = action.data;
     const channelId = post.channel_id;
@@ -363,7 +443,7 @@ function handlePosts(posts = {}, postsInChannel = {}, postsInThread = {}, action
     switch (action.type) {
     case PostTypes.RECEIVED_POST: {
         const nextPosts = {...posts};
-        nextPosts[action.data.id] = action.data;
+        nextPosts[action.data.id] = removeUnneededMetadata(action.data);
         return {
             posts: nextPosts,
             postsInChannel,
@@ -380,6 +460,12 @@ function handlePosts(posts = {}, postsInChannel = {}, postsInThread = {}, action
     case PostTypes.POST_DELETED:
         if (action.data) {
             return handlePostDeleted(posts, postsInChannel, postsInThread, action);
+        }
+        return {posts, postsInChannel, postsInThread};
+    case ChannelTypes.RECEIVED_CHANNEL_DELETED:
+    case ChannelTypes.DELETE_CHANNEL_SUCCESS:
+        if (!action.data.viewArchivedChannels) {
+            return handleChannelDeleted(posts, postsInChannel, postsInThread, action.data.id);
         }
         return {posts, postsInChannel, postsInThread};
     case PostTypes.REMOVE_POST:
@@ -426,7 +512,7 @@ function currentFocusedPostId(state = '', action) {
     }
 }
 
-function reactions(state = {}, action) {
+export function reactions(state = {}, action) {
     switch (action.type) {
     case PostTypes.RECEIVED_REACTIONS: {
         const reactionsList = action.data;
@@ -464,6 +550,19 @@ function reactions(state = {}, action) {
             [reaction.post_id]: nextReactions,
         };
     }
+
+    case PostTypes.RECEIVED_NEW_POST:
+    case PostTypes.RECEIVED_POST: {
+        const post = action.data;
+
+        return storeReactionsForPost(state, post);
+    }
+    case PostTypes.RECEIVED_POSTS: {
+        const posts = Object.values(action.data.posts);
+
+        return posts.reduce(storeReactionsForPost, state);
+    }
+
     case PostTypes.POST_DELETED:
     case PostTypes.REMOVE_POST: {
         const post = action.data;
@@ -485,7 +584,25 @@ function reactions(state = {}, action) {
     }
 }
 
-function openGraph(state = {}, action) {
+function storeReactionsForPost(state, post) {
+    if (!post.metadata) {
+        return state;
+    }
+
+    const reactionsForPost = {};
+    if (post.metadata.reactions && post.metadata.reactions.length > 0) {
+        for (const reaction of post.metadata.reactions) {
+            reactionsForPost[reaction.user_id + '-' + reaction.emoji_name] = reaction;
+        }
+    }
+
+    return {
+        ...state,
+        [post.id]: reactionsForPost,
+    };
+}
+
+export function openGraph(state = {}, action) {
     switch (action.type) {
     case PostTypes.RECEIVED_OPEN_GRAPH_METADATA: {
         const nextState = {...state};
@@ -493,11 +610,42 @@ function openGraph(state = {}, action) {
 
         return nextState;
     }
+
+    case PostTypes.RECEIVED_NEW_POST:
+    case PostTypes.RECEIVED_POST: {
+        const post = action.data;
+
+        return storeOpenGraphForPost(state, post);
+    }
+    case PostTypes.RECEIVED_POSTS: {
+        const posts = Object.values(action.data.posts);
+
+        return posts.reduce(storeOpenGraphForPost, state);
+    }
+
     case UserTypes.LOGOUT_SUCCESS:
         return {};
     default:
         return state;
     }
+}
+
+function storeOpenGraphForPost(state, post) {
+    if (!post.metadata || !post.metadata.embeds) {
+        return state;
+    }
+
+    return post.metadata.embeds.reduce((nextState, embed) => {
+        if (embed.type !== 'opengraph' || !embed.data) {
+            // Not an OpenGraph embed
+            return nextState;
+        }
+
+        return {
+            ...nextState,
+            [embed.url]: embed.data,
+        };
+    }, state);
 }
 
 function messagesHistory(state = {}, action) {

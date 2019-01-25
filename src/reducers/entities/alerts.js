@@ -5,8 +5,8 @@
 import {combineReducers} from 'redux';
 import {AlertTypes, UserTypes} from 'action_types';
 
-import type {AlertType} from '../../types/alerts';
-import type {GenericAction} from '../../types/actions';
+import type {AlertType} from 'types/alerts';
+import type {GenericAction} from 'types/actions';
 
 function alertStack(state: Array<AlertType> = [], action: GenericAction) {
     const nextState = [...state];
@@ -28,10 +28,10 @@ function alertStack(state: Array<AlertType> = [], action: GenericAction) {
     }
 }
 
-export default combineReducers({
+export default (combineReducers({
 
     // array acting as a stack where every object is an alert
     alertStack,
 
-});
+}): ({| alertStack: Array<AlertType> |}, GenericAction) => {| alertStack: Array<AlertType> |});
 

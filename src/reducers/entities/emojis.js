@@ -3,12 +3,18 @@
 // @flow
 
 import {combineReducers} from 'redux';
-import {EmojiTypes, UserTypes} from 'action_types';
+import {
+    EmojiTypes,
+    PostTypes,
+    UserTypes,
+} from 'action_types';
 
-import type {CustomEmoji} from '../../types/emojis';
-import type {GenericAction} from '../../types/actions';
+import type {EmojisState, CustomEmoji} from 'types/emojis';
+import type {Post} from 'types/posts';
+import type {GenericAction} from 'types/actions';
+import type {IDMappedObjects} from 'types/utilities';
 
-function customEmoji(state: {[string]: CustomEmoji} = {}, action: GenericAction): {[string]: CustomEmoji} {
+export function customEmoji(state: IDMappedObjects<CustomEmoji> = {}, action: GenericAction): IDMappedObjects<CustomEmoji> {
     switch (action.type) {
     case EmojiTypes.RECEIVED_CUSTOM_EMOJI: {
         const nextState = {...state};
@@ -31,12 +37,42 @@ function customEmoji(state: {[string]: CustomEmoji} = {}, action: GenericAction)
     case UserTypes.LOGOUT_SUCCESS:
         return {};
 
+    case PostTypes.RECEIVED_NEW_POST:
+    case PostTypes.RECEIVED_POST: {
+        const post: Post = action.data;
+
+        return storeEmojisForPost(state, post);
+    }
+    case PostTypes.RECEIVED_POSTS: {
+        const posts = Object.values(action.data.posts);
+
+        return (posts: any).reduce(storeEmojisForPost, state); // Cast to any to avoid typing problems caused by Object.values
+    }
+
     default:
         return state;
     }
 }
 
-function nonExistentEmoji(state = new Set(), action) {
+function storeEmojisForPost(state: IDMappedObjects<CustomEmoji>, post: Post): IDMappedObjects<CustomEmoji> {
+    if (!post.metadata || !post.metadata.emojis) {
+        return state;
+    }
+
+    return post.metadata.emojis.reduce((nextState, emoji) => {
+        if (nextState[emoji.id]) {
+            // Emoji is already in the store
+            return nextState;
+        }
+
+        return {
+            ...nextState,
+            [emoji.id]: emoji,
+        };
+    }, state);
+}
+
+function nonExistentEmoji(state: Set<string> = new Set(), action: GenericAction): Set<string> {
     switch (action.type) {
     case EmojiTypes.CUSTOM_EMOJI_DOES_NOT_EXIST: {
         if (!state.has(action.data)) {
@@ -76,7 +112,7 @@ function nonExistentEmoji(state = new Set(), action) {
     }
 }
 
-export default combineReducers({
+export default (combineReducers({
 
     // object where every key is the custom emoji id and has an object with the custom emoji details
     customEmoji,
@@ -84,4 +120,4 @@ export default combineReducers({
     // set containing custom emoji names that do not exist
     nonExistentEmoji,
 
-});
+}): (EmojisState, GenericAction) => EmojisState);

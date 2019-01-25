@@ -21,9 +21,9 @@ export function getScheme(state: GlobalState, id: string): Scheme {
 }
 
 export function makeGetSchemeChannels() {
-    return createSelector(
+    return (createSelector(
         getAllChannels,
-        (state, props) => getScheme(state, props.schemeId),
+        (state, props: {schemeId: string}) => getScheme(state, props.schemeId),
         (allChannels, scheme) => {
             if (!scheme) {
                 return [];
@@ -31,7 +31,7 @@ export function makeGetSchemeChannels() {
 
             if (scheme.scope === ScopeTypes.TEAM) {
                 const msg = `Not implemented: scheme '${scheme.id}' is team-scope but 'getSchemeChannels' only accepts channel-scoped schemes.`;
-                console.warn(msg); // eslint-disable-line no-console
+                console.log(msg); // eslint-disable-line no-console
                 return [];
             }
 
@@ -47,13 +47,13 @@ export function makeGetSchemeChannels() {
 
             return schemeChannels;
         }
-    );
+    ): (GlobalState, {schemeId: string}) => Array<Channel>);
 }
 
 export function makeGetSchemeTeams() {
-    return createSelector(
+    return (createSelector(
         getTeams,
-        (state, props) => getScheme(state, props.schemeId),
+        (state, props: {schemeId: string}) => getScheme(state, props.schemeId),
         (allTeams, scheme) => {
             if (!scheme) {
                 return [];
@@ -61,7 +61,7 @@ export function makeGetSchemeTeams() {
 
             if (scheme.scope === ScopeTypes.CHANNEL) {
                 const msg = `Error: scheme '${scheme.id}' is channel-scoped but 'getSchemeChannels' only accepts team-scoped schemes.`;
-                console.warn(msg); // eslint-disable-line no-console
+                console.log(msg); // eslint-disable-line no-console
                 return [];
             }
 
@@ -77,5 +77,5 @@ export function makeGetSchemeTeams() {
 
             return schemeTeams;
         }
-    );
+    ): (GlobalState, {schemeId: string}) => Array<Team>);
 }

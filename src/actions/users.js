@@ -35,7 +35,7 @@ import {
 } from './preferences';
 
 import {getConfig} from 'selectors/entities/general';
-import {getCurrentUser, getCurrentUserId} from 'selectors/entities/users';
+import {getCurrentUserId} from 'selectors/entities/users';
 
 export function checkMfa(loginId: string): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
@@ -55,31 +55,22 @@ export function checkMfa(loginId: string): ActionFunc {
 }
 
 export function generateMfaSecret(userId: string): ActionFunc {
-    return bindClientFunc(
-        Client4.generateMfaSecret,
-        UserTypes.MFA_SECRET_REQUEST,
-        UserTypes.MFA_SECRET_SUCCESS,
-        UserTypes.MFA_SECRET_FAILURE,
-        userId
-    );
+    return bindClientFunc({
+        clientFunc: Client4.generateMfaSecret,
+        params: [
+            userId,
+        ],
+    });
 }
 
 export function createUser(user: UserProfile, token: string, inviteId: string): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
-        dispatch({type: UserTypes.CREATE_USER_REQUEST, data: null}, getState);
-
         let created = null;
         try {
             created = await Client4.createUser(user, token, inviteId);
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch, getState);
-            dispatch(batchActions([
-                {
-                    type: UserTypes.CREATE_USER_FAILURE,
-                    error,
-                },
-                logError(error),
-            ]), getState);
+            dispatch(logError(error));
             return {error};
         }
 
@@ -177,6 +168,7 @@ function completeLogin(data: UserProfile): ActionFunc {
             dispatch(getMyPreferences()),
             dispatch(getMyTeams()),
             dispatch(getClientConfig()),
+            dispatch(getMyTermsOfServiceStatus()),
         ];
 
         const serverVersion = Client4.getServerVersion();
@@ -224,6 +216,7 @@ function completeLogin(data: UserProfile): ActionFunc {
 export function loadMe(): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         const state = getState();
+        const config = getConfig(state);
 
         const deviceId = state.entities.general.deviceToken;
         if (deviceId) {
@@ -231,16 +224,20 @@ export function loadMe(): ActionFunc {
         }
 
         const promises = [
-            getMe()(dispatch, getState),
-            getMyPreferences()(dispatch, getState),
-            getMyTeams()(dispatch, getState),
-            getMyTeamMembers()(dispatch, getState),
-            getMyTeamUnreads()(dispatch, getState),
+            dispatch(getMe()),
+            dispatch(getMyPreferences()),
+            dispatch(getMyTeams()),
+            dispatch(getMyTeamMembers()),
+            dispatch(getMyTeamUnreads()),
         ];
+
+        if (config.EnableCustomTermsOfService === 'true') {
+            promises.push(dispatch(getMyTermsOfServiceStatus()));
+        }
 
         // Sometimes the server version is set in one or the other
         const serverVersion = Client4.getServerVersion() || getState().entities.general.serverVersion;
-        if (!isMinimumServerVersion(serverVersion, 4, 7) && getConfig(state).EnableCustomEmoji === 'true') {
+        if (!isMinimumServerVersion(serverVersion, 4, 7) && config.EnableCustomEmoji === 'true') {
             dispatch(getAllCustomEmojis());
         }
 
@@ -270,42 +267,30 @@ export function logout(): ActionFunc {
 }
 
 export function getTotalUsersStats(): ActionFunc {
-    return bindClientFunc(
-        Client4.getTotalUsersStats,
-        UserTypes.USER_STATS_REQUEST,
-        [UserTypes.RECEIVED_USER_STATS, UserTypes.USER_STATS_SUCCESS],
-        UserTypes.USER_STATS_FAILURE,
-    );
+    return bindClientFunc({
+        clientFunc: Client4.getTotalUsersStats,
+        onSuccess: UserTypes.RECEIVED_USER_STATS,
+    });
 }
 
-export function getProfiles(page: number = 0, perPage: number = General.PROFILE_CHUNK_SIZE): ActionFunc {
+export function getProfiles(page: number = 0, perPage: number = General.PROFILE_CHUNK_SIZE, options: Object = {}): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
-        dispatch({type: UserTypes.PROFILES_REQUEST, data: null}, getState);
-
         const {currentUserId} = getState().entities.users;
 
         let profiles = null;
         try {
-            profiles = await Client4.getProfiles(page, perPage);
+            profiles = await Client4.getProfiles(page, perPage, options);
             removeUserFromList(currentUserId, profiles);
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch, getState);
-            dispatch(batchActions([
-                {type: UserTypes.PROFILES_FAILURE, error},
-                logError(error),
-            ]), getState);
+            dispatch(logError(error));
             return {error};
         }
 
-        dispatch(batchActions([
-            {
-                type: UserTypes.RECEIVED_PROFILES_LIST,
-                data: profiles,
-            },
-            {
-                type: UserTypes.PROFILES_SUCCESS,
-            },
-        ]), getState);
+        dispatch({
+            type: UserTypes.RECEIVED_PROFILES_LIST,
+            data: profiles,
+        });
 
         return {data: profiles};
     };
@@ -357,8 +342,6 @@ export function getMissingProfilesByUsernames(usernames: Array<string>): ActionF
 
 export function getProfilesByIds(userIds: Array<string>): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
-        dispatch({type: UserTypes.PROFILES_REQUEST, data: null}, getState);
-
         const {currentUserId} = getState().entities.users;
 
         let profiles = null;
@@ -367,22 +350,14 @@ export function getProfilesByIds(userIds: Array<string>): ActionFunc {
             removeUserFromList(currentUserId, profiles);
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch, getState);
-            dispatch(batchActions([
-                {type: UserTypes.PROFILES_FAILURE, error},
-                logError(error),
-            ]), getState);
+            dispatch(logError(error));
             return {error};
         }
 
-        dispatch(batchActions([
-            {
-                type: UserTypes.RECEIVED_PROFILES_LIST,
-                data: profiles,
-            },
-            {
-                type: UserTypes.PROFILES_SUCCESS,
-            },
-        ]), getState);
+        dispatch({
+            type: UserTypes.RECEIVED_PROFILES_LIST,
+            data: profiles,
+        });
 
         return {data: profiles};
     };
@@ -390,8 +365,6 @@ export function getProfilesByIds(userIds: Array<string>): ActionFunc {
 
 export function getProfilesByUsernames(usernames: Array<string>): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
-        dispatch({type: UserTypes.PROFILES_REQUEST, data: null}, getState);
-
         const {currentUserId} = getState().entities.users;
 
         let profiles = null;
@@ -400,22 +373,14 @@ export function getProfilesByUsernames(usernames: Array<string>): ActionFunc {
             removeUserFromList(currentUserId, profiles);
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch, getState);
-            dispatch(batchActions([
-                {type: UserTypes.PROFILES_FAILURE, error},
-                logError(error),
-            ]), getState);
+            dispatch(logError(error));
             return {error};
         }
 
-        dispatch(batchActions([
-            {
-                type: UserTypes.RECEIVED_PROFILES_LIST,
-                data: profiles,
-            },
-            {
-                type: UserTypes.PROFILES_SUCCESS,
-            },
-        ]), getState);
+        dispatch({
+            type: UserTypes.RECEIVED_PROFILES_LIST,
+            data: profiles,
+        });
 
         return {data: profiles};
     };
@@ -423,8 +388,6 @@ export function getProfilesByUsernames(usernames: Array<string>): ActionFunc {
 
 export function getProfilesInTeam(teamId: string, page: number, perPage: number = General.PROFILE_CHUNK_SIZE, sort: string = ''): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
-        dispatch({type: UserTypes.PROFILES_IN_TEAM_REQUEST, data: null}, getState);
-
         const {currentUserId} = getState().entities.users;
 
         let profiles: null;
@@ -432,10 +395,7 @@ export function getProfilesInTeam(teamId: string, page: number, perPage: number 
             profiles = await Client4.getProfilesInTeam(teamId, page, perPage, sort);
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch, getState);
-            dispatch(batchActions([
-                {type: UserTypes.PROFILES_IN_TEAM_FAILURE, error},
-                logError(error),
-            ]), getState);
+            dispatch(logError(error));
             return {error};
         }
 
@@ -449,9 +409,6 @@ export function getProfilesInTeam(teamId: string, page: number, perPage: number 
                 type: UserTypes.RECEIVED_PROFILES_LIST,
                 data: removeUserFromList(currentUserId, [...profiles]),
             },
-            {
-                type: UserTypes.PROFILES_IN_TEAM_SUCCESS,
-            },
         ]), getState);
 
         return {data: profiles};
@@ -460,17 +417,12 @@ export function getProfilesInTeam(teamId: string, page: number, perPage: number 
 
 export function getProfilesNotInTeam(teamId: string, page: number, perPage: number = General.PROFILE_CHUNK_SIZE): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
-        dispatch({type: UserTypes.PROFILES_NOT_IN_TEAM_REQUEST, data: null}, getState);
-
         let profiles: null;
         try {
             profiles = await Client4.getProfilesNotInTeam(teamId, page, perPage);
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch, getState);
-            dispatch(batchActions([
-                {type: UserTypes.PROFILES_NOT_IN_TEAM_FAILURE, error},
-                logError(error),
-            ]), getState);
+            dispatch(logError(error));
             return {error};
         }
 
@@ -484,9 +436,6 @@ export function getProfilesNotInTeam(teamId: string, page: number, perPage: numb
                 type: UserTypes.RECEIVED_PROFILES_LIST,
                 data: profiles,
             },
-            {
-                type: UserTypes.PROFILES_NOT_IN_TEAM_SUCCESS,
-            },
         ]), getState);
 
         return {data: profiles};
@@ -495,17 +444,12 @@ export function getProfilesNotInTeam(teamId: string, page: number, perPage: numb
 
 export function getProfilesWithoutTeam(page: number, perPage: number = General.PROFILE_CHUNK_SIZE): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
-        dispatch({type: UserTypes.PROFILES_WITHOUT_TEAM_REQUEST, data: null}, getState);
-
         let profiles = null;
         try {
             profiles = await Client4.getProfilesWithoutTeam(page, perPage);
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch, getState);
-            dispatch(batchActions([
-                {type: UserTypes.PROFILES_WITHOUT_TEAM_FAILURE, error},
-                logError(error),
-            ]), getState);
+            dispatch(logError(error));
             return {error};
         }
 
@@ -518,9 +462,6 @@ export function getProfilesWithoutTeam(page: number, perPage: number = General.P
                 type: UserTypes.RECEIVED_PROFILES_LIST,
                 data: profiles,
             },
-            {
-                type: UserTypes.PROFILES_WITHOUT_TEAM_SUCCESS,
-            },
         ]), getState);
 
         return {data: profiles};
@@ -529,8 +470,6 @@ export function getProfilesWithoutTeam(page: number, perPage: number = General.P
 
 export function getProfilesInChannel(channelId: string, page: number, perPage: number = General.PROFILE_CHUNK_SIZE, sort: string = ''): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
-        dispatch({type: UserTypes.PROFILES_IN_CHANNEL_REQUEST, data: null}, getState);
-
         const {currentUserId} = getState().entities.users;
 
         let profiles = null;
@@ -538,10 +477,7 @@ export function getProfilesInChannel(channelId: string, page: number, perPage: n
             profiles = await Client4.getProfilesInChannel(channelId, page, perPage, sort);
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch, getState);
-            dispatch(batchActions([
-                {type: UserTypes.PROFILES_IN_CHANNEL_FAILURE, error},
-                logError(error),
-            ]), getState);
+            dispatch(logError(error));
             return {error};
         }
 
@@ -555,9 +491,6 @@ export function getProfilesInChannel(channelId: string, page: number, perPage: n
                 type: UserTypes.RECEIVED_PROFILES_LIST,
                 data: removeUserFromList(currentUserId, [...profiles]),
             },
-            {
-                type: UserTypes.PROFILES_IN_CHANNEL_SUCCESS,
-            },
         ]), getState);
 
         return {data: profiles};
@@ -566,8 +499,6 @@ export function getProfilesInChannel(channelId: string, page: number, perPage: n
 
 export function getProfilesNotInChannel(teamId: string, channelId: string, page: number, perPage: number = General.PROFILE_CHUNK_SIZE): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
-        dispatch({type: UserTypes.PROFILES_NOT_IN_CHANNEL_REQUEST, data: null}, getState);
-
         const {currentUserId} = getState().entities.users;
 
         let profiles = null;
@@ -575,10 +506,7 @@ export function getProfilesNotInChannel(teamId: string, channelId: string, page:
             profiles = await Client4.getProfilesNotInChannel(teamId, channelId, page, perPage);
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch, getState);
-            dispatch(batchActions([
-                {type: UserTypes.PROFILES_NOT_IN_CHANNEL_FAILURE, error},
-                logError(error),
-            ]), getState);
+            dispatch(logError(error));
             return {error};
         }
 
@@ -592,9 +520,6 @@ export function getProfilesNotInChannel(teamId: string, channelId: string, page:
                 type: UserTypes.RECEIVED_PROFILES_LIST,
                 data: removeUserFromList(currentUserId, [...profiles]),
             },
-            {
-                type: UserTypes.PROFILES_NOT_IN_CHANNEL_SUCCESS,
-            },
         ]), getState);
 
         return {data: profiles};
@@ -603,12 +528,10 @@ export function getProfilesNotInChannel(teamId: string, channelId: string, page:
 
 export function getMe(): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
-        const getMeFunc = bindClientFunc(
-            Client4.getMe,
-            UserTypes.USER_REQUEST,
-            [UserTypes.RECEIVED_ME, UserTypes.USER_SUCCESS],
-            UserTypes.USER_FAILURE
-        );
+        const getMeFunc = bindClientFunc({
+            clientFunc: Client4.getMe,
+            onSuccess: UserTypes.RECEIVED_ME,
+        });
         const me: $Subtype<ActionResult> = await getMeFunc(dispatch, getState);
         if (me.error) {
             return me;
@@ -618,24 +541,30 @@ export function getMe(): ActionFunc {
     };
 }
 
-export function updateTermsOfServiceStatus(termsOfServiceId: string, accepted: boolean): ActionFunc {
+export function getMyTermsOfServiceStatus(): ActionFunc {
+    return bindClientFunc({
+        clientFunc: Client4.getMyTermsOfServiceStatus,
+        onSuccess: UserTypes.RECEIVED_TERMS_OF_SERVICE_STATUS,
+    });
+}
+
+export function updateMyTermsOfServiceStatus(termsOfServiceId: string, accepted: boolean): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
-        const response: $Subtype<ActionResult> = await dispatch(bindClientFunc(
-            Client4.updateTermsOfServiceStatus,
-            UserTypes.UPDATE_TERMS_OF_SERVICE_STATUS_REQUEST,
-            UserTypes.UPDATE_TERMS_OF_SERVICE_STATUS_SUCCESS,
-            UserTypes.UPDATE_TERMS_OF_SERVICE_STATUS_FAILURE,
-            termsOfServiceId,
-            accepted
-        ));
+        const response: $Subtype<ActionResult> = await dispatch(bindClientFunc({
+            clientFunc: Client4.updateMyTermsOfServiceStatus,
+            params: [
+                termsOfServiceId,
+                accepted,
+            ],
+        }));
         const {data, error} = response;
         if (data) {
-            const currentUser = getCurrentUser(getState());
             dispatch({
-                type: UserTypes.RECEIVED_ME,
+                type: UserTypes.RECEIVED_TERMS_OF_SERVICE_STATUS,
                 data: {
-                    ...currentUser,
-                    accepted_terms_of_service_id: accepted ? termsOfServiceId : null,
+                    create_at: new Date().getTime(),
+                    terms_of_service_id: accepted ? termsOfServiceId : null,
+                    user_id: getCurrentUserId(getState()),
                 },
             });
             return {data};
@@ -645,52 +574,48 @@ export function updateTermsOfServiceStatus(termsOfServiceId: string, accepted: b
 }
 
 export function getTermsOfService(): ActionFunc {
-    return bindClientFunc(
-        Client4.getTermsOfService,
-        UserTypes.GET_TERMS_OF_SERVICE_REQUEST,
-        UserTypes.GET_TERMS_OF_SERVICE_SUCCESS,
-        UserTypes.GET_TERMS_OF_SERVICE_FAILURE,
-    );
+    return bindClientFunc({
+        clientFunc: Client4.getTermsOfService,
+    });
 }
 
 export function createTermsOfService(text: string): ActionFunc {
-    return bindClientFunc(
-        Client4.createTermsOfService,
-        UserTypes.CREATE_TERMS_OF_SERVICE_REQUEST,
-        UserTypes.CREATE_TERMS_OF_SERVICE_SUCCESS,
-        UserTypes.CREATE_TERMS_OF_SERVICE_FAILURE,
-        text,
-    );
+    return bindClientFunc({
+        clientFunc: Client4.createTermsOfService,
+        params: [
+            text,
+        ],
+    });
 }
 
 export function getUser(id: string): ActionFunc {
-    return bindClientFunc(
-        Client4.getUser,
-        UserTypes.USER_REQUEST,
-        [UserTypes.RECEIVED_PROFILE, UserTypes.USER_SUCCESS],
-        UserTypes.USER_FAILURE,
-        id
-    );
+    return bindClientFunc({
+        clientFunc: Client4.getUser,
+        onSuccess: UserTypes.RECEIVED_PROFILE,
+        params: [
+            id,
+        ],
+    });
 }
 
 export function getUserByUsername(username: string): ActionFunc {
-    return bindClientFunc(
-        Client4.getUserByUsername,
-        UserTypes.USER_BY_USERNAME_REQUEST,
-        [UserTypes.RECEIVED_PROFILE, UserTypes.USER_BY_USERNAME_SUCCESS],
-        UserTypes.USER_BY_USERNAME_FAILURE,
-        username
-    );
+    return bindClientFunc({
+        clientFunc: Client4.getUserByUsername,
+        onSuccess: UserTypes.RECEIVED_PROFILE,
+        params: [
+            username,
+        ],
+    });
 }
 
 export function getUserByEmail(email: string): ActionFunc {
-    return bindClientFunc(
-        Client4.getUserByEmail,
-        UserTypes.USER_REQUEST,
-        [UserTypes.RECEIVED_PROFILE, UserTypes.USER_SUCCESS],
-        UserTypes.USER_FAILURE,
-        email
-    );
+    return bindClientFunc({
+        clientFunc: Client4.getUserByEmail,
+        onSuccess: UserTypes.RECEIVED_PROFILE,
+        params: [
+            email,
+        ],
+    });
 }
 
 // We create an array to hold the id's that we want to get a status for. We build our
@@ -711,88 +636,69 @@ export function getStatusesByIdsBatchedDebounced(id: string) {
 }
 
 export function getStatusesByIds(userIds: Array<string>): ActionFunc {
-    return bindClientFunc(
-        Client4.getStatusesByIds,
-        UserTypes.PROFILES_STATUSES_REQUEST,
-        [UserTypes.RECEIVED_STATUSES, UserTypes.PROFILES_STATUSES_SUCCESS],
-        UserTypes.PROFILES_STATUSES_FAILURE,
-        userIds
-    );
+    return bindClientFunc({
+        clientFunc: Client4.getStatusesByIds,
+        onSuccess: UserTypes.RECEIVED_STATUSES,
+        params: [
+            userIds,
+        ],
+    });
 }
 
 export function getStatus(userId: string): ActionFunc {
-    return bindClientFunc(
-        Client4.getStatus,
-        UserTypes.PROFILE_STATUS_REQUEST,
-        [UserTypes.RECEIVED_STATUS, UserTypes.PROFILE_STATUS_SUCCESS],
-        UserTypes.PROFILE_STATUS_FAILURE,
-        userId
-    );
+    return bindClientFunc({
+        clientFunc: Client4.getStatus,
+        onSuccess: UserTypes.RECEIVED_STATUS,
+        params: [
+            userId,
+        ],
+    });
 }
 
 export function setStatus(status: string): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
-        dispatch({type: UserTypes.SET_STATUS_REQUEST, data: null}, getState);
-
         try {
             await Client4.updateStatus(status);
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch, getState);
-            dispatch(batchActions([
-                {type: UserTypes.SET_STATUS_FAILURE, error},
-                logError(error),
-            ]), getState);
+            dispatch(logError(error));
             return {error};
         }
 
-        dispatch(batchActions([
-            {
-                type: UserTypes.RECEIVED_STATUS,
-                data: status,
-            },
-            {
-                type: UserTypes.SET_STATUS_SUCCESS,
-            },
-        ]), getState);
+        dispatch({
+            type: UserTypes.RECEIVED_STATUS,
+            data: status,
+        });
 
         return {data: status};
     };
 }
 
 export function getSessions(userId: string): ActionFunc {
-    return bindClientFunc(
-        Client4.getSessions,
-        UserTypes.SESSIONS_REQUEST,
-        [UserTypes.RECEIVED_SESSIONS, UserTypes.SESSIONS_SUCCESS],
-        UserTypes.SESSIONS_FAILURE,
-        userId
-    );
+    return bindClientFunc({
+        clientFunc: Client4.getSessions,
+        onSuccess: UserTypes.RECEIVED_SESSIONS,
+        params: [
+            userId,
+        ],
+    });
 }
 
 export function revokeSession(userId: string, sessionId: string): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
-        dispatch({type: UserTypes.REVOKE_SESSION_REQUEST, data: null}, getState);
-
         try {
             await Client4.revokeSession(userId, sessionId);
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch, getState);
-            dispatch(batchActions([
-                {type: UserTypes.REVOKE_SESSION_FAILURE, error},
-                logError(error),
-            ]), getState);
+            dispatch(logError(error));
             return {error};
         }
 
-        dispatch(batchActions([
-            {
-                type: UserTypes.RECEIVED_REVOKED_SESSION,
-                sessionId,
-            },
-            {
-                type: UserTypes.REVOKE_SESSION_SUCCESS,
-            },
-        ]), getState);
+        dispatch({
+            type: UserTypes.RECEIVED_REVOKED_SESSION,
+            sessionId,
+            data: null,
+        });
 
         return {data: true};
     };
@@ -800,16 +706,11 @@ export function revokeSession(userId: string, sessionId: string): ActionFunc {
 
 export function revokeAllSessionsForUser(userId: string): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
-        dispatch({type: UserTypes.REVOKE_ALL_USER_SESSIONS_REQUEST, data: null}, getState);
-
         try {
             await Client4.revokeAllSessionsForUser(userId);
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch, getState);
-            dispatch(batchActions([
-                {type: UserTypes.REVOKE_ALL_USER_SESSIONS_FAILURE, error},
-                logError(error),
-            ]), getState);
+            dispatch(logError(error));
             return {error};
         }
         const data = {isCurrentUser: userId === getCurrentUserId(getState())};
@@ -858,15 +759,15 @@ export function loadProfilesForDirect(): ActionFunc {
 }
 
 export function getUserAudits(userId: string, page: number = 0, perPage: number = General.AUDITS_CHUNK_SIZE): ActionFunc {
-    return bindClientFunc(
-        Client4.getUserAudits,
-        UserTypes.AUDITS_REQUEST,
-        [UserTypes.RECEIVED_AUDITS, UserTypes.AUDITS_SUCCESS],
-        UserTypes.AUDITS_FAILURE,
-        userId,
-        page,
-        perPage
-    );
+    return bindClientFunc({
+        clientFunc: Client4.getUserAudits,
+        onSuccess: UserTypes.RECEIVED_AUDITS,
+        params: [
+            userId,
+            page,
+            perPage,
+        ],
+    });
 }
 
 export function autocompleteUsers(term: string, teamId: string = '', channelId: string = '', options: {|limit: number|} = {limit: General.AUTOCOMPLETE_LIMIT_DEFAULT}): ActionFunc {
@@ -938,8 +839,6 @@ export function autocompleteUsers(term: string, teamId: string = '', channelId: 
 
 export function searchProfiles(term: string, options: Object = {}): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
-        dispatch({type: UserTypes.SEARCH_PROFILES_REQUEST, data: null}, getState);
-
         const {currentUserId} = getState().entities.users;
 
         let profiles;
@@ -947,10 +846,7 @@ export function searchProfiles(term: string, options: Object = {}): ActionFunc {
             profiles = await Client4.searchUsers(term, options);
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch, getState);
-            dispatch(batchActions([
-                {type: UserTypes.SEARCH_PROFILES_FAILURE, error},
-                logError(error),
-            ]), getState);
+            dispatch(logError(error));
             return {error};
         }
 
@@ -988,12 +884,7 @@ export function searchProfiles(term: string, options: Object = {}): ActionFunc {
             });
         }
 
-        dispatch(batchActions([
-            ...actions,
-            {
-                type: UserTypes.SEARCH_PROFILES_SUCCESS,
-            },
-        ]), getState);
+        dispatch(batchActions(actions));
 
         return {data: profiles};
     };
@@ -1064,24 +955,16 @@ export function updateMe(user: UserProfile): ActionFunc {
 }
 
 export function patchUser(user: UserProfile): ActionFunc {
-    return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
-        dispatch({type: UserTypes.UPDATE_USER_REQUEST, data: null}, getState);
-
+    return async (dispatch: DispatchFunc) => {
         let data: UserProfile;
         try {
             data = await Client4.patchUser(user);
         } catch (error) {
-            dispatch(batchActions([
-                {type: UserTypes.UPDATE_USER_FAILURE, error},
-                logError(error),
-            ]), getState);
+            dispatch(logError(error));
             return {error};
         }
 
-        dispatch(batchActions([
-            {type: UserTypes.RECEIVED_PROFILE, data},
-            {type: UserTypes.UPDATE_USER_SUCCESS},
-        ]), getState);
+        dispatch({type: UserTypes.RECEIVED_PROFILE, data});
 
         return {data};
     };
@@ -1089,28 +972,16 @@ export function patchUser(user: UserProfile): ActionFunc {
 
 export function updateUserRoles(userId: string, roles: Array<string>): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
-        dispatch({type: UserTypes.UPDATE_USER_REQUEST, data: null}, getState);
-
         try {
             await Client4.updateUserRoles(userId, roles);
         } catch (error) {
-            dispatch(batchActions([
-                {type: UserTypes.UPDATE_USER_FAILURE, error},
-                logError(error),
-            ]), getState);
             return {error};
         }
 
-        const actions = [
-            {type: UserTypes.UPDATE_USER_SUCCESS},
-        ];
-
         const profile = getState().entities.users.profiles[userId];
         if (profile) {
-            actions.push({type: UserTypes.RECEIVED_PROFILE, data: {...profile, roles}});
+            dispatch({type: UserTypes.RECEIVED_PROFILE, data: {...profile, roles}});
         }
-
-        dispatch(batchActions(actions), getState);
 
         return {data: true};
     };
@@ -1118,28 +989,17 @@ export function updateUserRoles(userId: string, roles: Array<string>): ActionFun
 
 export function updateUserMfa(userId: string, activate: boolean, code: string = ''): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
-        dispatch({type: UserTypes.UPDATE_USER_REQUEST, data: null}, getState);
-
         try {
             await Client4.updateUserMfa(userId, activate, code);
         } catch (error) {
-            dispatch(batchActions([
-                {type: UserTypes.UPDATE_USER_FAILURE, error},
-                logError(error),
-            ]), getState);
+            dispatch(logError(error));
             return {error};
         }
 
-        const actions = [
-            {type: UserTypes.UPDATE_USER_SUCCESS},
-        ];
-
         const profile = getState().entities.users.profiles[userId];
         if (profile) {
-            actions.push({type: UserTypes.RECEIVED_PROFILE, data: {...profile, mfa_active: activate}});
+            dispatch({type: UserTypes.RECEIVED_PROFILE, data: {...profile, mfa_active: activate}});
         }
-
-        dispatch(batchActions(actions), getState);
 
         return {data: true};
     };
@@ -1147,28 +1007,17 @@ export function updateUserMfa(userId: string, activate: boolean, code: string = 
 
 export function updateUserPassword(userId: string, currentPassword: string, newPassword: string): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
-        dispatch({type: UserTypes.UPDATE_USER_REQUEST, data: null}, getState);
-
         try {
             await Client4.updateUserPassword(userId, currentPassword, newPassword);
         } catch (error) {
-            dispatch(batchActions([
-                {type: UserTypes.UPDATE_USER_FAILURE, error},
-                logError(error),
-            ]), getState);
+            dispatch(logError(error));
             return {error};
         }
 
-        const actions = [
-            {type: UserTypes.UPDATE_USER_SUCCESS},
-        ];
-
         const profile = getState().entities.users.profiles[userId];
         if (profile) {
-            actions.push({type: UserTypes.RECEIVED_PROFILE, data: {...profile, last_password_update_at: new Date().getTime()}});
+            dispatch({type: UserTypes.RECEIVED_PROFILE, data: {...profile, last_password_update_at: new Date().getTime()}});
         }
-
-        dispatch(batchActions(actions), getState);
 
         return {data: true};
     };
@@ -1176,99 +1025,73 @@ export function updateUserPassword(userId: string, currentPassword: string, newP
 
 export function updateUserActive(userId: string, active: boolean): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
-        dispatch({type: UserTypes.UPDATE_USER_REQUEST, data: null}, getState);
-
         try {
             await Client4.updateUserActive(userId, active);
         } catch (error) {
-            dispatch(batchActions([
-                {type: UserTypes.UPDATE_USER_FAILURE, error},
-                logError(error),
-            ]), getState);
+            dispatch(logError(error));
             return {error};
         }
-
-        const actions = [
-            {type: UserTypes.UPDATE_USER_SUCCESS},
-        ];
 
         const profile = getState().entities.users.profiles[userId];
         if (profile) {
             const deleteAt = active ? 0 : new Date().getTime();
-            actions.push({type: UserTypes.RECEIVED_PROFILE, data: {...profile, delete_at: deleteAt}});
+            dispatch({type: UserTypes.RECEIVED_PROFILE, data: {...profile, delete_at: deleteAt}});
         }
-
-        dispatch(batchActions(actions), getState);
 
         return {data: true};
     };
 }
 
 export function verifyUserEmail(token: string): ActionFunc {
-    return bindClientFunc(
-        Client4.verifyUserEmail,
-        UserTypes.VERIFY_EMAIL_REQUEST,
-        UserTypes.VERIFY_EMAIL_SUCCESS,
-        UserTypes.VERIFY_EMAIL_FAILURE,
-        token
-    );
+    return bindClientFunc({
+        clientFunc: Client4.verifyUserEmail,
+        params: [
+            token,
+        ],
+    });
 }
 
 export function sendVerificationEmail(email: string): ActionFunc {
-    return bindClientFunc(
-        Client4.sendVerificationEmail,
-        UserTypes.VERIFY_EMAIL_REQUEST,
-        UserTypes.VERIFY_EMAIL_SUCCESS,
-        UserTypes.VERIFY_EMAIL_FAILURE,
-        email
-    );
+    return bindClientFunc({
+        clientFunc: Client4.sendVerificationEmail,
+        params: [
+            email,
+        ],
+    });
 }
 
 export function resetUserPassword(token: string, newPassword: string): ActionFunc {
-    return bindClientFunc(
-        Client4.resetUserPassword,
-        UserTypes.PASSWORD_RESET_REQUEST,
-        UserTypes.PASSWORD_RESET_SUCCESS,
-        UserTypes.PASSWORD_RESET_FAILURE,
-        token,
-        newPassword
-    );
+    return bindClientFunc({
+        clientFunc: Client4.resetUserPassword,
+        params: [
+            token,
+            newPassword,
+        ],
+    });
 }
 
 export function sendPasswordResetEmail(email: string): ActionFunc {
-    return bindClientFunc(
-        Client4.sendPasswordResetEmail,
-        UserTypes.PASSWORD_RESET_REQUEST,
-        UserTypes.PASSWORD_RESET_SUCCESS,
-        UserTypes.PASSWORD_RESET_FAILURE,
-        email
-    );
+    return bindClientFunc({
+        clientFunc: Client4.sendPasswordResetEmail,
+        params: [
+            email,
+        ],
+    });
 }
 
 export function setDefaultProfileImage(userId: string): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
-        dispatch({type: UserTypes.UPDATE_USER_REQUEST, data: null}, getState);
-
         try {
             await Client4.setDefaultProfileImage(userId);
         } catch (error) {
-            dispatch(batchActions([
-                {type: UserTypes.UPDATE_USER_FAILURE, error},
-                logError(error),
-            ]), getState);
+            dispatch(logError(error));
             return {error};
         }
 
-        const actions = [
-            {type: UserTypes.UPDATE_USER_SUCCESS},
-        ];
-
         const profile = getState().entities.users.profiles[userId];
         if (profile) {
-            actions.push({type: UserTypes.RECEIVED_PROFILE, data: {...profile, last_picture_update: 0}});
+            dispatch({type: UserTypes.RECEIVED_PROFILE, data: {...profile, last_picture_update: 0}});
         }
-
-        dispatch(batchActions(actions), getState);
 
         return {data: true};
     };
@@ -1276,104 +1099,81 @@ export function setDefaultProfileImage(userId: string): ActionFunc {
 
 export function uploadProfileImage(userId: string, imageData: any): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
-        dispatch({type: UserTypes.UPDATE_USER_REQUEST, data: null}, getState);
-
         try {
             await Client4.uploadProfileImage(userId, imageData);
         } catch (error) {
-            dispatch(batchActions([
-                {type: UserTypes.UPDATE_USER_FAILURE, error},
-            ]), getState);
             return {error};
         }
 
-        const actions = [
-            {type: UserTypes.UPDATE_USER_SUCCESS},
-        ];
-
         const profile = getState().entities.users.profiles[userId];
         if (profile) {
-            actions.push({type: UserTypes.RECEIVED_PROFILE, data: {...profile, last_picture_update: new Date().getTime()}});
+            dispatch({type: UserTypes.RECEIVED_PROFILE, data: {...profile, last_picture_update: new Date().getTime()}});
         }
-
-        dispatch(batchActions(actions), getState);
 
         return {data: true};
     };
 }
 
 export function switchEmailToOAuth(service: string, email: string, password: string, mfaCode: string = ''): ActionFunc {
-    return bindClientFunc(
-        Client4.switchEmailToOAuth,
-        UserTypes.SWITCH_LOGIN_REQUEST,
-        UserTypes.SWITCH_LOGIN_SUCCESS,
-        UserTypes.SWITCH_LOGIN_FAILURE,
-        service,
-        email,
-        password,
-        mfaCode
-    );
+    return bindClientFunc({
+        clientFunc: Client4.switchEmailToOAuth,
+        params: [
+            service,
+            email,
+            password,
+            mfaCode,
+        ],
+    });
 }
 
 export function switchOAuthToEmail(currentService: string, email: string, password: string): ActionFunc {
-    return bindClientFunc(
-        Client4.switchOAuthToEmail,
-        UserTypes.SWITCH_LOGIN_REQUEST,
-        UserTypes.SWITCH_LOGIN_SUCCESS,
-        UserTypes.SWITCH_LOGIN_FAILURE,
-        currentService,
-        email,
-        password
-    );
+    return bindClientFunc({
+        clientFunc: Client4.switchOAuthToEmail,
+        params: [
+            currentService,
+            email,
+            password,
+        ],
+    });
 }
 
 export function switchEmailToLdap(email: string, emailPassword: string, ldapId: string, ldapPassword: string, mfaCode: string = ''): ActionFunc {
-    return bindClientFunc(
-        Client4.switchEmailToLdap,
-        UserTypes.SWITCH_LOGIN_REQUEST,
-        UserTypes.SWITCH_LOGIN_SUCCESS,
-        UserTypes.SWITCH_LOGIN_FAILURE,
-        email,
-        emailPassword,
-        ldapId,
-        ldapPassword,
-        mfaCode
-    );
+    return bindClientFunc({
+        clientFunc: Client4.switchEmailToLdap,
+        params: [
+            email,
+            emailPassword,
+            ldapId,
+            ldapPassword,
+            mfaCode,
+        ],
+    });
 }
 
 export function switchLdapToEmail(ldapPassword: string, email: string, emailPassword: string, mfaCode: string = ''): ActionFunc {
-    return bindClientFunc(
-        Client4.switchLdapToEmail,
-        UserTypes.SWITCH_LOGIN_REQUEST,
-        UserTypes.SWITCH_LOGIN_SUCCESS,
-        UserTypes.SWITCH_LOGIN_FAILURE,
-        ldapPassword,
-        email,
-        emailPassword,
-        mfaCode
-    );
+    return bindClientFunc({
+        clientFunc: Client4.switchLdapToEmail,
+        params: [
+            ldapPassword,
+            email,
+            emailPassword,
+            mfaCode,
+        ],
+    });
 }
 
 export function createUserAccessToken(userId: string, description: string): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
-        dispatch({type: UserTypes.CREATE_USER_ACCESS_TOKEN_REQUEST, data: null});
-
         let data;
         try {
             data = await Client4.createUserAccessToken(userId, description);
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch, getState);
-            dispatch(batchActions([
-                {type: UserTypes.CREATE_USER_ACCESS_TOKEN_FAILURE, error},
-                logError(error),
-            ]), getState);
+            dispatch(logError(error));
             return {error};
         }
 
         const actions = [
-            {
-                type: UserTypes.CREATE_USER_ACCESS_TOKEN_SUCCESS,
-            },
             {
                 type: AdminTypes.RECEIVED_USER_ACCESS_TOKEN,
                 data: {...data, token: ''},
@@ -1398,24 +1198,16 @@ export function createUserAccessToken(userId: string, description: string): Acti
 
 export function getUserAccessToken(tokenId: string): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
-        dispatch({type: UserTypes.GET_USER_ACCESS_TOKEN_REQUEST, data: null});
-
         let data;
         try {
             data = await Client4.getUserAccessToken(tokenId);
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch, getState);
-            dispatch(batchActions([
-                {type: UserTypes.GET_USER_ACCESS_TOKEN_FAILURE, error},
-                logError(error),
-            ]), getState);
+            dispatch(logError(error));
             return {error};
         }
 
         const actions = [
-            {
-                type: UserTypes.GET_USER_ACCESS_TOKEN_SUCCESS,
-            },
             {
                 type: AdminTypes.RECEIVED_USER_ACCESS_TOKEN,
                 data,
@@ -1440,23 +1232,16 @@ export function getUserAccessToken(tokenId: string): ActionFunc {
 
 export function getUserAccessTokens(page: number = 0, perPage: number = General.PROFILE_CHUNK_SIZE): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
-        dispatch({type: UserTypes.GET_USER_ACCESS_TOKEN_REQUEST, data: null});
         let data;
         try {
             data = await Client4.getUserAccessTokens(page, perPage);
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch, getState);
-            dispatch(batchActions([
-                {type: UserTypes.GET_USER_ACCESS_TOKEN_FAILURE, error},
-                logError(error),
-            ]), getState);
+            dispatch(logError(error));
             return {error};
         }
 
         const actions = [
-            {
-                type: UserTypes.GET_USER_ACCESS_TOKEN_SUCCESS,
-            },
             {
                 type: AdminTypes.RECEIVED_USER_ACCESS_TOKENS,
                 data,
@@ -1471,24 +1256,16 @@ export function getUserAccessTokens(page: number = 0, perPage: number = General.
 
 export function getUserAccessTokensForUser(userId: string, page: number = 0, perPage: number = General.PROFILE_CHUNK_SIZE): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
-        dispatch({type: UserTypes.GET_USER_ACCESS_TOKEN_REQUEST, data: null});
-
         let data;
         try {
             data = await Client4.getUserAccessTokensForUser(userId, page, perPage);
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch, getState);
-            dispatch(batchActions([
-                {type: UserTypes.GET_USER_ACCESS_TOKEN_FAILURE, error},
-                logError(error),
-            ]), getState);
+            dispatch(logError(error));
             return {error};
         }
 
         const actions = [
-            {
-                type: UserTypes.GET_USER_ACCESS_TOKEN_SUCCESS,
-            },
             {
                 type: AdminTypes.RECEIVED_USER_ACCESS_TOKENS_FOR_USER,
                 data,
@@ -1514,28 +1291,18 @@ export function getUserAccessTokensForUser(userId: string, page: number = 0, per
 
 export function revokeUserAccessToken(tokenId: string): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
-        dispatch({type: UserTypes.REVOKE_USER_ACCESS_TOKEN_REQUEST, data: null});
-
         try {
             await Client4.revokeUserAccessToken(tokenId);
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch, getState);
-            dispatch(batchActions([
-                {type: UserTypes.REVOKE_USER_ACCESS_TOKEN_FAILURE, error},
-                logError(error),
-            ]), getState);
+            dispatch(logError(error));
             return {error};
         }
 
-        dispatch(batchActions([
-            {
-                type: UserTypes.REVOKE_USER_ACCESS_TOKEN_SUCCESS,
-            },
-            {
-                type: UserTypes.REVOKED_USER_ACCESS_TOKEN,
-                data: tokenId,
-            },
-        ]));
+        dispatch({
+            type: UserTypes.REVOKED_USER_ACCESS_TOKEN,
+            data: tokenId,
+        });
 
         return {data: true};
     };
@@ -1543,28 +1310,18 @@ export function revokeUserAccessToken(tokenId: string): ActionFunc {
 
 export function disableUserAccessToken(tokenId: string): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
-        dispatch({type: UserTypes.DISABLE_USER_ACCESS_TOKEN_REQUEST, data: null});
-
         try {
             await Client4.disableUserAccessToken(tokenId);
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch, getState);
-            dispatch(batchActions([
-                {type: UserTypes.DISABLE_USER_ACCESS_TOKEN_FAILURE, error},
-                logError(error),
-            ]), getState);
+            dispatch(logError(error));
             return {error};
         }
 
-        dispatch(batchActions([
-            {
-                type: UserTypes.DISABLE_USER_ACCESS_TOKEN_SUCCESS,
-            },
-            {
-                type: UserTypes.DISABLED_USER_ACCESS_TOKEN,
-                data: tokenId,
-            },
-        ]));
+        dispatch({
+            type: UserTypes.DISABLED_USER_ACCESS_TOKEN,
+            data: tokenId,
+        });
 
         return {data: true};
     };
@@ -1572,28 +1329,18 @@ export function disableUserAccessToken(tokenId: string): ActionFunc {
 
 export function enableUserAccessToken(tokenId: string): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
-        dispatch({type: UserTypes.ENABLE_USER_ACCESS_TOKEN_REQUEST, data: null});
-
         try {
             await Client4.enableUserAccessToken(tokenId);
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch, getState);
-            dispatch(batchActions([
-                {type: UserTypes.ENABLE_USER_ACCESS_TOKEN_FAILURE, error},
-                logError(error),
-            ]), getState);
+            dispatch(logError(error));
             return {error};
         }
 
-        dispatch(batchActions([
-            {
-                type: UserTypes.ENABLE_USER_ACCESS_TOKEN_SUCCESS,
-            },
-            {
-                type: UserTypes.ENABLED_USER_ACCESS_TOKEN,
-                data: tokenId,
-            },
-        ]));
+        dispatch({
+            type: UserTypes.ENABLED_USER_ACCESS_TOKEN,
+            data: tokenId,
+        });
 
         return {data: true};
     };
@@ -1646,7 +1393,8 @@ export default {
     switchLdapToEmail,
     getTermsOfService,
     createTermsOfService,
-    updateTermsOfServiceStatus,
+    getMyTermsOfServiceStatus,
+    updateMyTermsOfServiceStatus,
     createUserAccessToken,
     getUserAccessToken,
     getUserAccessTokensForUser,

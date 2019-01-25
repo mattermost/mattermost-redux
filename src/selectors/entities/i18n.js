@@ -3,9 +3,9 @@
 
 import {getCurrentUser} from 'selectors/entities/common';
 
-import {DEFAULT_LOCALE} from 'constants/general';
+import {General} from 'constants';
 
-export function getCurrentUserLocale(state, defaultLocale = DEFAULT_LOCALE) {
+export function getCurrentUserLocale(state, defaultLocale = General.DEFAULT_LOCALE) {
     const currentUser = getCurrentUser(state);
 
     if (!currentUser) {
