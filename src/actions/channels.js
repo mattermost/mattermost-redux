@@ -118,7 +118,7 @@ export function createDirectChannel(userId: string, otherUserId: string): Action
             {user_id: userId, category: Preferences.CATEGORY_CHANNEL_OPEN_TIME, name: created.id, value: new Date().getTime().toString()},
         ];
 
-        savePreferences(userId, preferences)(dispatch);
+        savePreferences(userId, preferences)(dispatch, getState);
 
         dispatch(batchActions([
             {
@@ -686,7 +686,7 @@ export function viewChannel(channelId: string, prevChannelId: string = ''): Acti
             const preferences = [
                 {user_id: currentUserId, category: Preferences.CATEGORY_CHANNEL_APPROXIMATE_VIEW_TIME, name: channelId, value: new Date().getTime().toString()},
             ];
-            savePreferences(currentUserId, preferences)(dispatch);
+            savePreferences(currentUserId, preferences)(dispatch, getState);
         }
 
         try {
@@ -1230,7 +1230,7 @@ export function favoriteChannel(channelId: string): ActionFunc {
 
         Client4.trackEvent('action', 'action_channels_favorite');
 
-        return savePreferences(currentUserId, [preference])(dispatch);
+        return savePreferences(currentUserId, [preference])(dispatch, getState);
     };
 }
 

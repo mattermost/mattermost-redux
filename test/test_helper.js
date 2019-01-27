@@ -130,6 +130,23 @@ class TestHelper {
         };
     };
 
+    /**
+     * Creates fake preferences
+     * @userId user_id property value
+     * @quantity preference quantity to be created
+     * @increaseBy increases name field index value
+      */
+    fakePreferences = (userId, quantity = 1, increaseBy = 1) => {
+        return Array(quantity).
+            fill(0).
+            map((_, index) => ({
+                user_id: userId,
+                category: 'test',
+                name: `test${index + increaseBy}`,
+                value: 'test',
+            }));
+    }
+
     mockScheme = () => {
         return {
             name: this.generateId(),

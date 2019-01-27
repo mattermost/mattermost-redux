@@ -69,61 +69,112 @@ describe('Actions.Preferences', () => {
         assert.deepEqual(existingPreferences[1], myPreferences['test--test2']);
     });
 
-    it('savePrefrences', async () => {
-        const user = TestHelper.basicUser;
-        const existingPreferences = [
-            {
-                user_id: user.id,
-                category: 'test',
-                name: 'test1',
-                value: 'test',
-            },
-        ];
+    describe('Actions.savePreference', () => {
+        let user;
+        let existingPreferences;
 
-        nock(Client4.getUsersRoute()).
-            put(`/${TestHelper.basicUser.id}/preferences`).
-            reply(200, OK_RESPONSE);
-        await Client4.savePreferences(user.id, existingPreferences);
+        beforeEach(async () => {
+            user = TestHelper.basicUser;
+            existingPreferences = TestHelper.fakePreferences(user.id);
 
-        nock(Client4.getUsersRoute()).
-            get('/me/preferences').
-            reply(200, existingPreferences);
-        await Actions.getMyPreferences()(store.dispatch, store.getState);
+            const initState = {entities: {
+                users: {
+                    currentUserId: user.id,
+                },
+            }};
 
-        const preferences = [
-            {
-                user_id: user.id,
-                category: 'test',
-                name: 'test2',
-                value: 'test',
-            },
-            {
-                user_id: user.id,
-                category: 'test',
-                name: 'test3',
-                value: 'test',
-            },
-        ];
+            store = await configureStore(initState);
+        });
 
-        nock(Client4.getUsersRoute()).
-            put(`/${TestHelper.basicUser.id}/preferences`).
-            reply(200, OK_RESPONSE);
-        await Actions.savePreferences(user.id, preferences)(store.dispatch, store.getState);
+        it('savePrefrences', async () => {
+            nock(Client4.getUsersRoute()).
+                put(`/${TestHelper.basicUser.id}/preferences`).
+                reply(200, OK_RESPONSE);
+            await Client4.savePreferences(user.id, existingPreferences);
 
-        const state = store.getState();
-        const request = state.requests.preferences.savePreferences;
-        const {myPreferences} = state.entities.preferences;
+            nock(Client4.getUsersRoute()).
+                get('/me/preferences').
+                reply(200, existingPreferences);
+            await Actions.getMyPreferences()(store.dispatch, store.getState);
 
-        if (request.status === RequestStatus.FAILURE) {
-            throw new Error(JSON.stringify(request.error));
-        }
+            const preferences = TestHelper.fakePreferences(user.id, 1, 2);
 
-        assert.ok(myPreferences['test--test1'], 'first preference doesn\'t exist');
-        assert.deepEqual(existingPreferences[0], myPreferences['test--test1']);
-        assert.ok(myPreferences['test--test2'], 'second preference doesn\'t exist');
-        assert.deepEqual(preferences[0], myPreferences['test--test2']);
-        assert.ok(myPreferences['test--test3'], 'third preference doesn\'t exist');
-        assert.deepEqual(preferences[1], myPreferences['test--test3']);
+            nock(Client4.getUsersRoute()).
+                put(`/${TestHelper.basicUser.id}/preferences`).
+                reply(200, OK_RESPONSE);
+            await Actions.savePreferences(user.id, preferences)(store.dispatch, store.getState);
+
+            const state = store.getState();
+            const request = state.requests.preferences.savePreferences;
+            const {myPreferences} = state.entities.preferences;
+
+            if (request.status === RequestStatus.FAILURE) {
+                throw new Error(JSON.stringify(request.error));
+            }
+
+            assert.ok(myPreferences['test--test1'], 'first preference doesn\'t exist');
+            assert.deepStrictEqual(existingPreferences[0], myPreferences['test--test1']);
+            assert.ok(myPreferences['test--test2'], 'second preference doesn\'t exist');
+            assert.deepStrictEqual(preferences[0], myPreferences['test--test2']);
+        });
+
+        it('saveCurrentUserPreferences', async () => {
+            nock(Client4.getUsersRoute()).
+                get('/me/preferences').
+                reply(200, existingPreferences);
+            await Actions.getMyPreferences()(store.dispatch, store.getState);
+
+            const newPreferences = TestHelper.fakePreferences(user.id, 2, 2);
+
+            nock(Client4.getUsersRoute()).
+                put(`/${TestHelper.basicUser.id}/preferences`).
+                reply(200, OK_RESPONSE);
+            await Actions.saveCurrentUserPreferences(newPreferences)(store.dispatch, store.getState);
+
+            const state = store.getState();
+            const request = state.requests.preferences.savePreferences;
+            const {myPreferences} = state.entities.preferences;
+
+            if (request.status === RequestStatus.FAILURE) {
+                throw new Error(JSON.stringify(request.error));
+            }
+
+            assert.ok(myPreferences['test--test1'], 'first preference doesn\'t exist');
+            assert.deepStrictEqual(existingPreferences[0], myPreferences['test--test1']);
+            assert.ok(myPreferences['test--test2'], 'second preference doesn\'t exist');
+            assert.deepStrictEqual(newPreferences[0], myPreferences['test--test2']);
+            assert.ok(myPreferences['test--test3'], 'third preference doesn\'t exist');
+            assert.deepStrictEqual(newPreferences[1], myPreferences['test--test3']);
+        });
+
+        it('savePreference', async () => {
+            nock(Client4.getUsersRoute()).
+                get('/me/preferences').
+                reply(200, existingPreferences);
+            await Actions.getMyPreferences()(store.dispatch, store.getState);
+
+            const newPreferences = TestHelper.fakePreferences(user.id, 2, 2);
+            const {category, name, value} = newPreferences[0];
+
+            nock(Client4.getUsersRoute()).
+                put(`/${TestHelper.basicUser.id}/preferences`).
+                reply(200, OK_RESPONSE);
+            await Actions.savePreference(category, name, value)(store.dispatch, store.getState);
+
+            const state = store.getState();
+            const request = state.requests.preferences.savePreferences;
+            const {myPreferences} = state.entities.preferences;
+
+            if (request.status === RequestStatus.FAILURE) {
+                throw new Error(JSON.stringify(request.error));
+            }
+
+            assert.ok(myPreferences['test--test1'], 'first preference doesn\'t exist');
+            assert.deepStrictEqual(existingPreferences[0], myPreferences['test--test1']);
+
+            assert.ok(myPreferences['test--test2'], 'second preference doesn\'t exist');
+            assert.deepStrictEqual(newPreferences[0], myPreferences['test--test2']);
+        });
     });
 
     it('deletePreferences', async () => {

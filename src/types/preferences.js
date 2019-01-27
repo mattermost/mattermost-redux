@@ -8,3 +8,31 @@ export type PreferenceType = {|
     user_id: string,
     value: string
 |}
+
+export type Theme = {|
+    awayIndicator: string,
+    buttonBg: string,
+    buttonColor: string,
+    centerChannelBg: string,
+    centerChannelColor: string,
+    codeTheme: string,
+    dndIndicator: string,
+    errorTextColor: string,
+    linkColor: string,
+    mentionBg: string,
+    mentionBj: string,
+    mentionColor: string,
+    mentionHighlightBg: string,
+    mentionHighlightLink: string,
+    newMessageSeparator: string,
+    onlineIndicator: string,
+    sidebarBg: string,
+    sidebarHeaderBg: string,
+    sidebarHeaderTextColor: string,
+    sidebarText: string,
+    sidebarTextActiveBorder: string,
+    sidebarTextActiveColor: string,
+    sidebarTextHoverBg: string,
+    sidebarUnreadText: string,
+    type: string,
+|}

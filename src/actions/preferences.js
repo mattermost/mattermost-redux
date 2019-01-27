@@ -68,7 +68,7 @@ export function makeDirectChannelVisibleIfNecessary(otherUserId: string): Action
                 value: 'true',
             };
             getProfilesByIds([otherUserId])(dispatch, getState);
-            savePreferences(currentUserId, [preference])(dispatch);
+            savePreferences(currentUserId, [preference])(dispatch, getState);
         }
 
         return {data: true};
@@ -99,32 +99,55 @@ export function makeGroupMessageVisibleIfNecessary(channelId: string): ActionFun
             }
 
             getProfilesInChannel(channelId, 0)(dispatch, getState);
-            savePreferences(currentUserId, [preference])(dispatch);
+            savePreferences(currentUserId, [preference])(dispatch, getState);
         }
 
         return {data: true};
     };
 }
 
-export function savePreferences(userId: string, preferences: Array<PreferenceType>) {
+export function savePreferences(userId: string, preferences: Array<PreferenceType>): ActionFunc {
     return async (dispatch: DispatchFunc) => {
-        dispatch({
-            type: PreferenceTypes.RECEIVED_PREFERENCES,
-            data: preferences,
-            meta: {
-                offline: {
-                    effect: () => Client4.savePreferences(userId, preferences),
-                    commit: {
-                        type: PreferenceTypes.RECEIVED_PREFERENCES,
-                    },
-                    rollback: {
-                        type: PreferenceTypes.DELETED_PREFERENCES,
-                        data: preferences,
-                    },
-                },
-            },
-        });
+        dispatchPrefSave(dispatch, userId, preferences);
+        return {data: true};
+    };
+}
+
+export function saveCurrentUserPreferences(preferences: Array<PreferenceType>): ActionFunc {
+    return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
+        const userId = getCurrentUserId(getState());
+
+        dispatchPrefSave(dispatch, userId, preferences);
 
         return {data: true};
     };
+}
+
+export function savePreference(category: string, name: string, value: string): ActionFunc {
+    return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
+        const userId = getCurrentUserId(getState());
+
+        dispatchPrefSave(dispatch, userId, [{user_id: userId, category, name, value}]);
+
+        return {data: true};
+    };
+}
+
+function dispatchPrefSave(dispatch: DispatchFunc, userId: string, preferences: Array<PreferenceType>) {
+    dispatch({
+        type: PreferenceTypes.RECEIVED_PREFERENCES,
+        data: preferences,
+        meta: {
+            offline: {
+                effect: () => Client4.savePreferences(userId, preferences),
+                commit: {
+                    type: PreferenceTypes.RECEIVED_PREFERENCES,
+                },
+                rollback: {
+                    type: PreferenceTypes.DELETED_PREFERENCES,
+                    data: preferences,
+                },
+            },
+        },
+    });
 }
