@@ -1,6 +1,12 @@
 #!/usr/bin/env groovy
 
 pipeline {
+
+    options {
+        buildDiscarder(logRotator(numToKeepStr: '2'))
+        timeout(time: 30, unit: 'MINUTES')
+    }
+
     agent {
         docker {
             image 'node:8'
