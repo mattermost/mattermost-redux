@@ -42,7 +42,6 @@ export default class Client4 {
             connectionError: 'There appears to be a problem with your internet connection.',
             unknownError: 'We received an unexpected status code from the server.',
         };
-
     }
 
     getUrl() {
@@ -70,7 +69,7 @@ export default class Client4 {
     }
 
     setCSRF(csrfToken) {
-        this.csrf = csrfToken
+        this.csrf = csrfToken;
     }
 
     setAcceptLanguage(locale) {
