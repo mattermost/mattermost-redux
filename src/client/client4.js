@@ -43,7 +43,6 @@ export default class Client4 {
             unknownError: 'We received an unexpected status code from the server.',
         };
 
-        this.setCSRFFromCookie();
     }
 
     getUrl() {
@@ -70,17 +69,8 @@ export default class Client4 {
         this.token = token;
     }
 
-    setCSRFFromCookie() {
-        if (typeof document !== 'undefined' && typeof document.cookie !== 'undefined') {
-            const cookies = document.cookie.split(';');
-            for (let i = 0; i < cookies.length; i++) {
-                const cookie = cookies[i].trim();
-                if (cookie.startsWith('MMCSRF=')) {
-                    this.csrf = cookie.replace('MMCSRF=', '');
-                    break;
-                }
-            }
-        }
+    setCSRF(csrfToken) {
+        this.csrf = csrfToken
     }
 
     setAcceptLanguage(locale) {
@@ -505,8 +495,6 @@ export default class Client4 {
             {method: 'post', body: JSON.stringify(body)}
         );
 
-        this.setCSRFFromCookie();
-
         return data;
     };
 
@@ -524,8 +512,6 @@ export default class Client4 {
             `${this.getUsersRoute()}/login`,
             {method: 'post', body: JSON.stringify(body)}
         );
-
-        this.setCSRFFromCookie();
 
         return data;
     };
