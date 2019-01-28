@@ -12,9 +12,9 @@ import {batchActions} from 'redux-batched-actions';
 import {getServerVersion} from 'selectors/entities/general';
 import {isMinimumServerVersion} from 'utils/helpers';
 
-import type {GeneralState} from '../types/general';
-import type {GenericClientResponse, logLevel} from '../types/client4';
-import type {GetStateFunc, DispatchFunc, ActionFunc} from '../types/actions';
+import type {GeneralState} from 'types/general';
+import type {GenericClientResponse, logLevel} from 'types/client4';
+import type {GetStateFunc, DispatchFunc, ActionFunc} from 'types/actions';
 
 export function getPing(): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {

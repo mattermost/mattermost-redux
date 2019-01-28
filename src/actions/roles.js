@@ -8,8 +8,8 @@ import {getRoles} from 'selectors/entities/roles';
 import {hasNewPermissions} from 'selectors/entities/general';
 
 import {bindClientFunc} from './helpers';
-import type {DispatchFunc, GetStateFunc, ActionFunc} from '../types/actions';
-import type {Role} from '../types/roles';
+import type {DispatchFunc, GetStateFunc, ActionFunc} from 'types/actions';
+import type {Role} from 'types/roles';
 
 export function getRolesByNames(rolesNames: Array<string>) {
     return bindClientFunc({

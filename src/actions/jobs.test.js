@@ -15,7 +15,7 @@ const OK_RESPONSE = {status: 'OK'};
 
 describe('Actions.Jobs', () => {
     let store;
-    before(async () => {
+    beforeAll(async () => {
         await TestHelper.initBasic(Client4);
     });
 
@@ -23,16 +23,11 @@ describe('Actions.Jobs', () => {
         store = await configureStore();
     });
 
-    after(async () => {
+    afterAll(async () => {
         await TestHelper.tearDown();
     });
 
     it('createJob', async () => {
-        if (TestHelper.isLiveServer()) {
-            console.log('Skipping mock-only test');
-            return;
-        }
-
         const job = {
             type: 'data_retention',
         };
@@ -60,11 +55,6 @@ describe('Actions.Jobs', () => {
     });
 
     it('getJob', async () => {
-        if (TestHelper.isLiveServer()) {
-            console.log('Skipping mock-only test');
-            return;
-        }
-
         nock(Client4.getBaseRoute()).
             get('/jobs/six4h67ja7ntdkek6g13dp3wka').
             reply(200, {
@@ -88,11 +78,6 @@ describe('Actions.Jobs', () => {
     });
 
     it('cancelJob', async () => {
-        if (TestHelper.isLiveServer()) {
-            console.log('Skipping mock-only test');
-            return;
-        }
-
         nock(Client4.getBaseRoute()).
             post('/jobs/six4h67ja7ntdkek6g13dp3wka/cancel').
             reply(200, OK_RESPONSE);
@@ -107,11 +92,6 @@ describe('Actions.Jobs', () => {
     });
 
     it('getJobs', async () => {
-        if (TestHelper.isLiveServer()) {
-            console.log('Skipping mock-only test');
-            return;
-        }
-
         nock(Client4.getBaseRoute()).
             get('/jobs').
             query(true).
@@ -136,11 +116,6 @@ describe('Actions.Jobs', () => {
     });
 
     it('getJobsByType', async () => {
-        if (TestHelper.isLiveServer()) {
-            console.log('Skipping mock-only test');
-            return;
-        }
-
         nock(Client4.getBaseRoute()).
             get('/jobs/type/data_retention').
             query(true).

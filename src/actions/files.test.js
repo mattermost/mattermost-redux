@@ -15,7 +15,7 @@ const FormData = require('form-data');
 
 describe('Actions.Files', () => {
     let store;
-    before(async () => {
+    beforeAll(async () => {
         await TestHelper.initBasic(Client4);
     });
 
@@ -23,7 +23,7 @@ describe('Actions.Files', () => {
         store = await configureStore();
     });
 
-    after(async () => {
+    afterAll(async () => {
         await TestHelper.tearDown();
     });
 
@@ -152,11 +152,6 @@ describe('Actions.Files', () => {
     });
 
     it('getFilePublicLink', async () => {
-        if (TestHelper.isLiveServer()) {
-            console.log('Skipping mock-only test');
-            return;
-        }
-
         const fileId = 't1izsr9uspgi3ynggqu6xxjn9y';
         nock(Client4.getBaseRoute()).
             get(`/files/${fileId}/link`).

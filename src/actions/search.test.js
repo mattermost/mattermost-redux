@@ -12,7 +12,7 @@ import configureStore from 'test/test_store';
 
 describe('Actions.Search', () => {
     let store;
-    before(async () => {
+    beforeAll(async () => {
         await TestHelper.initBasic(Client4);
     });
 
@@ -20,7 +20,7 @@ describe('Actions.Search', () => {
         store = await configureStore();
     });
 
-    after(async () => {
+    afterAll(async () => {
         await TestHelper.tearDown();
     });
 

@@ -3,8 +3,10 @@
 // @flow
 
 import {General, Preferences} from 'constants';
-import type {UserProfile} from 'types/users';
 import {localizeMessage} from 'utils/i18n_utils';
+
+import type {UserProfile} from 'types/users';
+import type {IDMappedObjects} from 'types/utilities';
 
 export function getFullName(user: UserProfile): string {
     if (user.first_name && user.last_name) {
@@ -75,7 +77,7 @@ export function hasPostAllPublicRole(roles: string): boolean {
     return rolesIncludePermission(roles, General.SYSTEM_POST_ALL_PUBLIC_ROLE);
 }
 
-export function profileListToMap(profileList: Array<UserProfile>): {[string]: UserProfile} {
+export function profileListToMap(profileList: Array<UserProfile>): IDMappedObjects<UserProfile> {
     const profiles = {};
     for (let i = 0; i < profileList.length; i++) {
         profiles[profileList[i].id] = profileList[i];

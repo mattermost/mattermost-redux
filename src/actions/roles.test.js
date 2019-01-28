@@ -14,7 +14,7 @@ import configureStore from 'test/test_store';
 describe('Actions.Roles', () => {
     let store;
 
-    before(async () => {
+    beforeAll(async () => {
         await TestHelper.initBasic(Client4);
     });
 
@@ -22,7 +22,7 @@ describe('Actions.Roles', () => {
         store = await configureStore();
     });
 
-    after(async () => {
+    afterAll(async () => {
         await TestHelper.tearDown();
     });
 

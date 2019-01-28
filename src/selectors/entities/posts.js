@@ -1,5 +1,6 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
+// @flow
 
 import {createSelector} from 'reselect';
 
@@ -11,26 +12,34 @@ import {Posts, Preferences} from 'constants';
 import {isPostEphemeral, isSystemMessage, shouldFilterJoinLeavePost, comparePosts, isPostPendingOrFailed, isPostCommentMention} from 'utils/post_utils';
 import {getPreferenceKey} from 'utils/preference_utils';
 
-export function getAllPosts(state) {
+import type {GlobalState} from 'types/store';
+import type {Post, PostWithFormatData} from 'types/posts';
+import type {Reaction} from 'types/reactions';
+import type {UserProfile} from 'types/users';
+import type {Channel} from 'types/channels';
+
+import type {$ID, IDMappedObjects, RelationOneToOne, RelationOneToMany} from '../../types/utilities';
+
+export function getAllPosts(state: GlobalState) {
     return state.entities.posts.posts;
 }
 
-export function getPost(state, postId) {
+export function getPost(state: GlobalState, postId: $ID<Post>): Post {
     return getAllPosts(state)[postId];
 }
 
-export function getPostsInThread(state) {
+export function getPostsInThread(state: GlobalState): RelationOneToMany<Post, Post> {
     return state.entities.posts.postsInThread;
 }
 
-export function getReactionsForPosts(state) {
+export function getReactionsForPosts(state: GlobalState): RelationOneToOne<Post, Array<Reaction>> {
     return state.entities.posts.reactions;
 }
 
-export function makeGetReactionsForPost() {
+export function makeGetReactionsForPost(): (GlobalState, $ID<Post>) => ?Array<Reaction> {
     return createSelector(
         getReactionsForPosts,
-        (state, postId) => postId,
+        (state: GlobalState, postId) => postId,
         (reactions, postId) => {
             if (reactions[postId]) {
                 return reactions[postId];
@@ -41,22 +50,22 @@ export function makeGetReactionsForPost() {
     );
 }
 
-export function getOpenGraphMetadata(state) {
+export function getOpenGraphMetadata(state: GlobalState): RelationOneToOne<Post, Object> {
     return state.entities.posts.openGraph;
 }
 
-export function getOpenGraphMetadataForUrl(state, url) {
+export function getOpenGraphMetadataForUrl(state: GlobalState, url: string): Object {
     return state.entities.posts.openGraph[url];
 }
 
-export const getPostIdsInCurrentChannel = createIdsSelector(
-    (state) => state.entities.posts.postsInChannel[state.entities.channels.currentChannelId],
+export const getPostIdsInCurrentChannel: (state: GlobalState) => Array<$ID<Post>> = createIdsSelector(
+    (state: GlobalState) => state.entities.posts.postsInChannel[state.entities.channels.currentChannelId],
     (postIdsInCurrentChannel) => {
         return postIdsInCurrentChannel || [];
     }
 );
 
-export const getPostsInCurrentChannel = createSelector(
+export const getPostsInCurrentChannel: (GlobalState) => Array<Post> = createSelector(
     getAllPosts,
     getPostIdsInCurrentChannel,
     (posts, postIds) => {
@@ -64,11 +73,11 @@ export const getPostsInCurrentChannel = createSelector(
     }
 );
 
-export function makeGetPostIdsForThread() {
+export function makeGetPostIdsForThread(): (GlobalState, $ID<Post>) => Array<$ID<Post>> {
     return createIdsSelector(
         getAllPosts,
-        (state, rootId) => state.entities.posts.postsInThread[rootId] || [],
-        (state, rootId) => state.entities.posts.posts[rootId],
+        (state: GlobalState, rootId) => state.entities.posts.postsInThread[rootId] || [],
+        (state: GlobalState, rootId) => state.entities.posts.posts[rootId],
         (posts, postsForThread, rootPost) => {
             const thread = [];
 
@@ -90,12 +99,12 @@ export function makeGetPostIdsForThread() {
     );
 }
 
-export function makeGetPostIdsAroundPost() {
+export function makeGetPostIdsAroundPost(): (GlobalState, $ID<Post>, $ID<Channel>, {postBeforeCount: number, postAfterCount: number}) => ?Array<$ID<Post>> {
     return createIdsSelector(
-        (state, focusedPostId, channelId) => state.entities.posts.postsInChannel[channelId],
-        (state, focusedPostId) => focusedPostId,
-        (state, focusedPostId, channelId, options) => options && options.postsBeforeCount,
-        (state, focusedPostId, channelId, options) => options && options.postsAfterCount,
+        (state: GlobalState, focusedPostId, channelId) => state.entities.posts.postsInChannel[channelId],
+        (state: GlobalState, focusedPostId) => focusedPostId,
+        (state: GlobalState, focusedPostId, channelId, options) => options && options.postsBeforeCount,
+        (state: GlobalState, focusedPostId, channelId, options) => options && options.postsAfterCount,
         (postIds, focusedPostId, postsBeforeCount = Posts.POST_CHUNK_SIZE / 2, postsAfterCount = Posts.POST_CHUNK_SIZE / 2) => {
             if (!postIds) {
                 return null;
@@ -115,17 +124,22 @@ export function makeGetPostIdsAroundPost() {
     );
 }
 
-function formatPostInChannel(post, previousPost, index, allPosts, postsInThread, postIds, currentUser) {
+function formatPostInChannel(post: Post, previousPost: ?Post, index: number, allPosts: IDMappedObjects<Post>, postsInThread: RelationOneToMany<Post, Post>, postIds: Array<$ID<Post>>, currentUser: UserProfile, focusedPostId: $ID<Post>): PostWithFormatData {
     let isFirstReply = false;
     let isLastReply = false;
+    let highlight = false;
     let commentedOnPost;
 
+    if (post.id === focusedPostId) {
+        highlight = true;
+    }
+
     if (post.root_id) {
-        if (previousPost.root_id !== post.root_id) {
+        if (previousPost && previousPost.root_id !== post.root_id) {
             // Post is the first reply in a list of consecutive replies
             isFirstReply = true;
 
-            if (previousPost.id !== post.root_id) {
+            if (previousPost && previousPost.id !== post.root_id) {
                 commentedOnPost = allPosts[post.root_id];
             }
         }
@@ -137,14 +151,15 @@ function formatPostInChannel(post, previousPost, index, allPosts, postsInThread,
     }
 
     let previousPostIsComment = false;
-    if (previousPost.root_id) {
+    if (previousPost && previousPost.root_id) {
         previousPostIsComment = true;
     }
 
     const postFromWebhook = Boolean(post.props && post.props.from_webhook);
-    const prevPostFromWebhook = Boolean(previousPost.props && previousPost.props.from_webhook);
+    const prevPostFromWebhook = Boolean(previousPost && previousPost.props && previousPost.props.from_webhook);
     let consecutivePostByUser = false;
-    if (previousPost.user_id === post.user_id &&
+    if (previousPost &&
+            previousPost.user_id === post.user_id &&
             post.create_at - previousPost.create_at <= Posts.POST_COLLAPSE_TIMEOUT &&
             !postFromWebhook && !prevPostFromWebhook &&
             !isSystemMessage(post) && !isSystemMessage(previousPost)) {
@@ -189,17 +204,18 @@ function formatPostInChannel(post, previousPost, index, allPosts, postsInThread,
         consecutivePostByUser,
         replyCount,
         isCommentMention,
+        highlight,
     };
 }
 
-export function makeGetPostsInChannel() {
+export function makeGetPostsInChannel(): (GlobalState, $ID<Channel>, number) => ?Array<PostWithFormatData> {
     return createSelector(
         getAllPosts,
         getPostsInThread,
-        (state, channelId) => state.entities.posts.postsInChannel[channelId],
+        (state: GlobalState, channelId: $ID<Channel>) => state.entities.posts.postsInChannel[channelId],
         getCurrentUser,
         getMyPreferences,
-        (state, channelId, numPosts) => numPosts || Posts.POST_CHUNK_SIZE,
+        (state: GlobalState, channelId: $ID<Channel>, numPosts: number) => numPosts || Posts.POST_CHUNK_SIZE,
         (allPosts, postsInThread, postIds, currentUser, myPreferences, numPosts) => {
             if (!postIds || !currentUser) {
                 return null;
@@ -217,8 +233,8 @@ export function makeGetPostsInChannel() {
                     continue;
                 }
 
-                const previousPost = allPosts[postIds[i + 1]] || {create_at: 0};
-                posts.push(formatPostInChannel(post, previousPost, i, allPosts, postsInThread, postIds, currentUser));
+                const previousPost = allPosts[postIds[i + 1]] || null;
+                posts.push(formatPostInChannel(post, previousPost, i, allPosts, postsInThread, postIds, currentUser, ''));
             }
 
             return posts;
@@ -226,12 +242,12 @@ export function makeGetPostsInChannel() {
     );
 }
 
-export function makeGetPostsAroundPost() {
+export function makeGetPostsAroundPost(): (GlobalState, $ID<Post>, $ID<Channel>) => ?Array<PostWithFormatData> {
     return createSelector(
         getAllPosts,
         getPostsInThread,
-        (state, postId, channelId) => state.entities.posts.postsInChannel[channelId],
-        (state, postId) => postId,
+        (state: GlobalState, postId, channelId) => state.entities.posts.postsInChannel[channelId],
+        (state: GlobalState, postId) => postId,
         getCurrentUser,
         getMyPreferences,
         (allPosts, postsInThread, postIds, focusedPostId, currentUser, myPreferences) => {
@@ -260,12 +276,8 @@ export function makeGetPostsAroundPost() {
                     continue;
                 }
 
-                const previousPost = allPosts[slicedPostIds[i + 1]] || {create_at: 0};
-                const formattedPost = formatPostInChannel(post, previousPost, i, allPosts, postsInThread, slicedPostIds, currentUser);
-
-                if (post.id === focusedPostId) {
-                    formattedPost.highlight = true;
-                }
+                const previousPost = allPosts[slicedPostIds[i + 1]] || null;
+                const formattedPost = formatPostInChannel(post, previousPost, i, allPosts, postsInThread, slicedPostIds, currentUser, focusedPostId);
 
                 posts.push(formattedPost);
             }
@@ -278,11 +290,11 @@ export function makeGetPostsAroundPost() {
 // Returns a function that creates a creates a selector that will get the posts for a given thread.
 // That selector will take a props object (containing a rootId field) as its
 // only argument and will be memoized based on that argument.
-export function makeGetPostsForThread() {
+export function makeGetPostsForThread(): (GlobalState, {rootId: $ID<Post>}) => Array<Post> {
     return createSelector(
         getAllPosts,
-        (state, {rootId}) => state.entities.posts.postsInThread[rootId] || [],
-        (state, {rootId}) => state.entities.posts.posts[rootId],
+        (state: GlobalState, {rootId}) => state.entities.posts.postsInThread[rootId] || [],
+        (state: GlobalState, {rootId}) => state.entities.posts.posts[rootId],
         (posts, postsForThread, rootPost) => {
             const thread = [];
 
@@ -304,7 +316,7 @@ export function makeGetPostsForThread() {
     );
 }
 
-export function makeGetCommentCountForPost() {
+export function makeGetCommentCountForPost(): (GlobalState, {post: Post}) => number {
     return createSelector(
         getAllPosts,
         (state, {post}) => state.entities.posts.postsInThread[post ? post.id : ''] || [],
@@ -326,9 +338,9 @@ export function makeGetCommentCountForPost() {
     );
 }
 
-export const getSearchResults = createSelector(
+export const getSearchResults: (GlobalState) => Array<Post> = createSelector(
     getAllPosts,
-    (state) => state.entities.search.results,
+    (state: GlobalState) => state.entities.search.results,
     (posts, postIds) => {
         if (!postIds) {
             return [];
@@ -341,13 +353,13 @@ export const getSearchResults = createSelector(
 // Returns the matched text from the search results, if the server has provided them.
 // These matches will only be present if the server is running Mattermost 5.1 or higher
 // with Elasticsearch enabled to search posts. Otherwise, null will be returned.
-export function getSearchMatches(state) {
+export function getSearchMatches(state: GlobalState): {[string]: Array<string>} {
     return state.entities.search.matches;
 }
 
-export function makeGetMessageInHistoryItem(type) {
+export function makeGetMessageInHistoryItem(type: string): (GlobalState) => string {
     return createSelector(
-        (state) => state.entities.posts.messagesHistory,
+        (state: GlobalState) => state.entities.posts.messagesHistory,
         (messagesHistory) => {
             const idx = messagesHistory.index[type];
             const messages = messagesHistory.messages;
@@ -359,10 +371,10 @@ export function makeGetMessageInHistoryItem(type) {
     );
 }
 
-export function makeGetPostsForIds() {
+export function makeGetPostsForIds(): (GlobalState, Array<$ID<Post>>) => Array<Post> {
     return createIdsSelector(
         getAllPosts,
-        (state, postIds) => postIds,
+        (state: GlobalState, postIds) => postIds,
         (allPosts, postIds) => {
             if (!postIds) {
                 return [];
@@ -373,9 +385,9 @@ export function makeGetPostsForIds() {
     );
 }
 
-export const getLastPostPerChannel = createSelector(
+export const getLastPostPerChannel: (GlobalState) => RelationOneToOne<Channel, Post> = createSelector(
     getAllPosts,
-    (state) => state.entities.posts.postsInChannel,
+    (state: GlobalState) => state.entities.posts.postsInChannel,
     (allPosts, allChannels) => {
         const ret = {};
 
@@ -395,9 +407,9 @@ export const getLastPostPerChannel = createSelector(
     }
 );
 
-export const getMostRecentPostIdInChannel = createSelector(
+export const getMostRecentPostIdInChannel: (GlobalState, $ID<Channel>) => ?$ID<Post> = createSelector(
     getAllPosts,
-    (state, channelId) => state.entities.posts.postsInChannel[channelId],
+    (state: GlobalState, channelId) => state.entities.posts.postsInChannel[channelId],
     getMyPreferences,
     (posts, postIdsInChannel, preferences) => {
         if (!postIdsInChannel) {
@@ -424,7 +436,7 @@ export const getMostRecentPostIdInChannel = createSelector(
     }
 );
 
-export const getLatestReplyablePostId = createSelector(
+export const getLatestReplyablePostId: (GlobalState) => ?$ID<Post> = createSelector(
     getPostsInCurrentChannel,
     (posts) => {
         for (const post of posts) {
@@ -436,7 +448,7 @@ export const getLatestReplyablePostId = createSelector(
     }
 );
 
-export const getCurrentUsersLatestPost = createSelector(
+export const getCurrentUsersLatestPost: (GlobalState, $ID<Post>) => ?Post = createSelector(
     getPostsInCurrentChannel,
     getCurrentUser,
     (_, rootId) => rootId,
@@ -465,14 +477,14 @@ export const getCurrentUsersLatestPost = createSelector(
     }
 );
 
-export function getPostIdsInChannel(state, channelId) {
+export function getPostIdsInChannel(state: GlobalState, channelId: $ID<Channel>): Array<$ID<Post>> {
     return state.entities.posts.postsInChannel[channelId];
 }
 
-export const isPostIdSending = (state, postId) =>
+export const isPostIdSending = (state: GlobalState, postId: $ID<Post>): boolean =>
     state.entities.posts.sendingPostIds.some((sendingPostId) => sendingPostId === postId);
 
-export const makeIsPostCommentMention = () => {
+export const makeIsPostCommentMention = (): ((GlobalState, $ID<Post>) => boolean) => {
     return createSelector(
         getAllPosts,
         getPostsInThread,

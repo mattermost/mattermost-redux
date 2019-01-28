@@ -9,9 +9,8 @@ import Client4 from 'client/client4';
 import {DEFAULT_LOCALE} from 'constants/general';
 import {generateId} from 'utils/helpers';
 
-const DEFAULT_SERVER = `${process.env.MATTERMOST_SERVER_URL || 'http://localhost:8065'}`; //eslint-disable-line no-process-env
-const EMAIL = `${process.env.MATTERMOST_REDUX_EMAIL || 'redux-admin@simulator.amazonses.com'}`; //eslint-disable-line no-process-env
-const PASSWORD = `${process.env.MATTERMOST_REDUX_PASSWORD || 'password1'}`; //eslint-disable-line no-process-env
+const DEFAULT_SERVER = 'http://localhost:8065';
+const PASSWORD = 'password1';
 
 class TestHelper {
     constructor() {
@@ -324,23 +323,6 @@ class TestHelper {
             reply(200, [{user_id: this.basicUser.id, category: 'tutorial_step', name: this.basicUser.id, value: '999'}]);
     }
 
-    initRealEntities = async () => {
-        try {
-            this.basicUser = await this.basicClient4.login(EMAIL, PASSWORD);
-            this.basicUser.password = PASSWORD;
-            this.basicTeam = await this.basicClient4.createTeam(this.fakeTeam());
-            this.basicChannel = await this.basicClient4.createChannel(this.fakeChannel(this.basicTeam.id));
-            this.basicPost = await this.basicClient4.createPost(this.fakePost(this.basicChannel.id));
-        } catch (error) {
-            console.error('Unable to initialize against server: ' + error); //eslint-disable-line no-console
-            throw error;
-        }
-    }
-
-    isLiveServer = () => {
-        return process.env.TEST_SERVER; //eslint-disable-line no-process-env
-    }
-
     initMockEntities = () => {
         this.basicUser = this.fakeUserWithId();
         this.basicUser.roles = 'system_user system_admin';
@@ -424,12 +406,8 @@ class TestHelper {
         client4.setUrl(DEFAULT_SERVER);
         this.basicClient4 = client4;
 
-        if (process.env.TEST_SERVER) { //eslint-disable-line no-process-env
-            await this.initRealEntities();
-        } else {
-            this.initMockEntities();
-            this.activateMocking();
-        }
+        this.initMockEntities();
+        this.activateMocking();
 
         return {
             client4: this.basicClient4,
@@ -441,11 +419,7 @@ class TestHelper {
     };
 
     tearDown = async () => {
-        if (process.env.TEST_SERVER) { //eslint-disable-line no-process-env
-            await this.basicClient4.logout();
-        } else {
-            nock.restore();
-        }
+        nock.restore();
 
         this.basicClient4 = null;
         this.basicUser = null;

@@ -7,5 +7,7 @@ export type AdminState = {|
     audits: Object,
     config: Object,
     environmentConfig: Object,
-    complianceReports: Object
+    complianceReports: Object,
+    ldapGroups: Object,
+    ldapGroupsCount: number
 |};

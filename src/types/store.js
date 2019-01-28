@@ -16,6 +16,7 @@ import type {FilesState} from './files';
 import type {EmojisState} from './emojis';
 import type {SchemesState} from './schemes';
 import type {Typing} from './typing';
+import type {GroupsState} from './groups';
 import type {
     ChannelsRequestsStatuses,
     GeneralRequestsStatuses,
@@ -28,6 +29,7 @@ import type {
     IntegrationsRequestsStatuses,
     RolesRequestsStatuses,
     SchemesRequestsStatuses,
+    GroupsRequestsStatuses,
     JobsRequestsStatuses,
     SearchRequestsStatuses,
 } from './requests';
@@ -61,6 +63,7 @@ export type GlobalState = {|
         },
         schemes: SchemesState,
         gifs: Object,
+        groups: GroupsState,
     |},
     errors: Array<Object>,
     requests: {|
@@ -74,8 +77,10 @@ export type GlobalState = {|
         files: FilesRequestsStatuses,
         integrations: IntegrationsRequestsStatuses,
         roles: RolesRequestsStatuses,
+        schemes: SchemesRequestsStatuses,
+        groups: GroupsRequestsStatuses,
         jobs: JobsRequestsStatuses,
         schemes: SchemesRequestsStatuses,
-        search: SearchRequestsStatuses
+        search: SearchRequestsStatuses,
     |}
 |};

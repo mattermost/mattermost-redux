@@ -14,6 +14,7 @@ import Stats from './stats';
 import Permissions from './permissions';
 import Emoji from './emoji';
 import Plugins from './plugins';
+import Groups from './groups';
 import Users from './users';
 
 export {
@@ -29,6 +30,7 @@ export {
     Permissions,
     Emoji,
     Plugins,
+    Groups,
     Users,
 };
 

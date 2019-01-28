@@ -10,6 +10,7 @@ export type RequestStatusType = {|
 
 export type ChannelsRequestsStatuses = {|
     getChannels: RequestStatusType,
+    getAllChannels: RequestStatusType,
     myChannels: RequestStatusType,
     createChannel: RequestStatusType,
     updateChannel: RequestStatusType,
@@ -62,6 +63,9 @@ export type AdminRequestsStatuses = {|
     createCompliance: RequestStatusType,
     getCompliance: RequestStatusType,
     testS3Connection: RequestStatusType,
+    getLdapGroups: RequestStatusType,
+    linkLdapGroup: RequestStatusType,
+    unlinkLdapGroup: RequestStatusType,
     deleteBrandImage: RequestStatusType,
     disablePlugin: RequestStatusType,
     enablePlugin: RequestStatusType,
@@ -140,6 +144,14 @@ export type SchemesRequestsStatuses = {|
     patchScheme: RequestStatusType,
     getSchemeTeams: RequestStatusType,
     getSchemeChannels: RequestStatusType
+|};
+
+export type GroupsRequestsStatuses = {|
+    linkGroupSyncable: RequestStatusType,
+    unlinkGroupSyncable: RequestStatusType,
+    getGroupSyncables: RequestStatusType,
+    getGroupMembers: RequestStatusType,
+    getGroup: RequestStatusType,
 |};
 
 export type JobsRequestsStatuses = {|

@@ -3,11 +3,18 @@
     "./node_modules/eslint-config-mattermost/.eslintrc.json",
     "plugin:flowtype/recommended"
   ],
+  "env": {
+    "jest": true
+  },
   "plugins": [
-    "mocha",
     "flowtype"
   ],
-  "rules": {
-    "mocha/no-exclusive-tests": 2
-  }
+  "overrides": [
+    {
+      "files": ["*.test.js"],
+      "env": {
+        "jest": true
+      }
+    }
+  ]
 }

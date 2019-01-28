@@ -13,8 +13,8 @@ import {bindClientFunc} from './helpers';
 import {getProfilesByIds, getProfilesInChannel} from './users';
 import {getChannelAndMyMember, getMyChannelMember} from './channels';
 
-import type {GetStateFunc, DispatchFunc, ActionFunc} from '../types/actions';
-import type {PreferenceType} from '../types/preferences';
+import type {GetStateFunc, DispatchFunc, ActionFunc} from 'types/actions';
+import type {PreferenceType} from 'types/preferences';
 
 export function deletePreferences(userId: string, preferences: Array<PreferenceType>): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {

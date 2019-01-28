@@ -154,62 +154,22 @@ describe('Selectors.Preferences', () => {
         assert.deepEqual(Selectors.getGroupShowPreferences(testState), [prefGp1, prefGp2]);
     });
 
-    it('getTeammateNameDisplaySetting', () => {
-        it('only preference set (3.10 and lower)', () => {
-            assert.equal(
-                Selectors.getTeammateNameDisplaySetting({
-                    entities: {
-                        general: {
-                            config: {},
-                        },
-                        preferences: {
-                            myPreferences: {
-                                [`${Preferences.CATEGORY_DISPLAY_SETTINGS}--${Preferences.NAME_NAME_FORMAT}`]: General.TEAMMATE_NAME_DISPLAY.SHOW_FULLNAME,
-                            },
+    it('get teammate name display setting', () => {
+        assert.equal(
+            Selectors.getTeammateNameDisplaySetting({
+                entities: {
+                    general: {
+                        config: {
+                            TeammateNameDisplay: General.TEAMMATE_NAME_DISPLAY.SHOW_NICKNAME_FULLNAME,
                         },
                     },
-                }),
-                General.TEAMMATE_NAME_DISPLAY.SHOW_NICKNAME_FULLNAME
-            );
-        });
-
-        it('both preference and config set (server created before 4.0)', () => {
-            assert.equal(
-                Selectors.getTeammateNameDisplaySetting({
-                    entities: {
-                        general: {
-                            config: {
-                                TeammateNameDisplay: General.TEAMMATE_NAME_DISPLAY.SHOW_NICKNAME_FULLNAME,
-                            },
-                        },
-                        preferences: {
-                            myPreferences: {
-                                [`${Preferences.CATEGORY_DISPLAY_SETTINGS}--${Preferences.NAME_NAME_FORMAT}`]: General.TEAMMATE_NAME_DISPLAY.SHOW_FULLNAME,
-                            },
-                        },
+                    preferences: {
+                        myPreferences: {},
                     },
-                }),
-                General.TEAMMATE_NAME_DISPLAY.SHOW_NICKNAME_FULLNAME
-            );
-        });
-
-        it('only config set (server created after or at 4.0)', () => {
-            assert.equal(
-                Selectors.getTeammateNameDisplaySetting({
-                    entities: {
-                        general: {
-                            config: {
-                                TeammateNameDisplay: General.TEAMMATE_NAME_DISPLAY.SHOW_NICKNAME_FULLNAME,
-                            },
-                        },
-                        preferences: {
-                            myPreferences: {},
-                        },
-                    },
-                }),
-                General.TEAMMATE_NAME_DISPLAY.SHOW_NICKNAME_FULLNAME
-            );
-        });
+                },
+            }),
+            General.TEAMMATE_NAME_DISPLAY.SHOW_NICKNAME_FULLNAME
+        );
     });
 
     describe('get theme', () => {

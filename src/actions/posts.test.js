@@ -19,7 +19,7 @@ const OK_RESPONSE = {status: 'OK'};
 
 describe('Actions.Posts', () => {
     let store;
-    before(async () => {
+    beforeAll(async () => {
         await TestHelper.initBasic(Client4);
     });
 
@@ -27,7 +27,7 @@ describe('Actions.Posts', () => {
         store = await configureStore();
     });
 
-    after(async () => {
+    afterAll(async () => {
         await TestHelper.tearDown();
     });
 
@@ -156,11 +156,6 @@ describe('Actions.Posts', () => {
     });
 
     // it('retry failed post', async () => {
-    //     if (TestHelper.isLiveServer()) {
-    //         console.log('Skipping mock-only test');
-    //         return;
-    //     }
-
     //     const channelId = TestHelper.basicChannel.id;
     //     const post = TestHelper.fakePost(channelId);
 
@@ -420,11 +415,6 @@ describe('Actions.Posts', () => {
     });
 
     it('getPostThreadWithRetry', async () => {
-        if (TestHelper.isLiveServer()) {
-            console.log('Skipping mock-only test');
-            return;
-        }
-
         const channelId = TestHelper.basicChannel.id;
 
         nock(Client4.getPostsRoute()).
@@ -547,11 +537,6 @@ describe('Actions.Posts', () => {
     });
 
     it('getPostsWithRetry', async () => {
-        if (TestHelper.isLiveServer()) {
-            console.log('Skipping mock-only test');
-            return;
-        }
-
         const channelId = TestHelper.basicChannel.id;
         const post = TestHelper.basicPost;
 
@@ -974,11 +959,6 @@ describe('Actions.Posts', () => {
     });
 
     it('getPostsSinceWithRetry', async () => {
-        if (TestHelper.isLiveServer()) {
-            console.log('Skipping mock-only test');
-            return;
-        }
-
         const channelId = TestHelper.basicChannel.id;
         const post = TestHelper.basicPost;
 
@@ -1112,11 +1092,6 @@ describe('Actions.Posts', () => {
     });
 
     it('getPostsBeforeWithRetry', async () => {
-        if (TestHelper.isLiveServer()) {
-            console.log('Skipping mock-only test');
-            return;
-        }
-
         const channelId = TestHelper.basicChannel.id;
         const post = TestHelper.basicPost;
 
@@ -1253,11 +1228,6 @@ describe('Actions.Posts', () => {
     });
 
     it('getPostsAfterWithRetry', async () => {
-        if (TestHelper.isLiveServer()) {
-            console.log('Skipping mock-only test');
-            return;
-        }
-
         const channelId = TestHelper.basicChannel.id;
         const post = TestHelper.basicPost;
 
@@ -1630,11 +1600,6 @@ describe('Actions.Posts', () => {
     });
 
     it('doPostAction', async () => {
-        if (TestHelper.isLiveServer()) {
-            console.log('Skipping mock-only test');
-            return;
-        }
-
         nock(Client4.getBaseRoute()).
             post('/posts/posth67ja7ntdkek6g13dp3wka/actions/action7ja7ntdkek6g13dp3wka').
             reply(200, {});

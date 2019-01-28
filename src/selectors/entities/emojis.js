@@ -7,8 +7,9 @@ import {createIdsSelector} from 'utils/helpers';
 
 import type {GlobalState} from 'types/store';
 import type {CustomEmoji} from 'types/emojis';
+import type {IDMappedObjects} from 'types/utilities';
 
-export function getCustomEmojis(state: GlobalState): {[string]: CustomEmoji} {
+export function getCustomEmojis(state: GlobalState): IDMappedObjects<CustomEmoji> {
     if (state.entities.general.config.EnableCustomEmoji !== 'true') {
         return {};
     }
@@ -28,7 +29,7 @@ export const getCustomEmojisAsMap: (state: GlobalState) => Map<string, CustomEmo
 
 export const getCustomEmojisByName: (state: GlobalState) => Map<string, CustomEmoji> = createSelector(
     getCustomEmojis,
-    (emojis: {[string]: CustomEmoji}): Map<string, CustomEmoji> => {
+    (emojis: IDMappedObjects<CustomEmoji>): Map<string, CustomEmoji> => {
         const map: Map<string, CustomEmoji> = new Map();
 
         Object.keys(emojis).forEach((key: string) => {
@@ -41,7 +42,7 @@ export const getCustomEmojisByName: (state: GlobalState) => Map<string, CustomEm
 
 export const getCustomEmojiIdsSortedByName: (state: GlobalState) => Array<string> = createIdsSelector(
     (state) => state.entities.emojis.customEmoji,
-    (emojis: {[string]: CustomEmoji}): Array<string> => {
+    (emojis: IDMappedObjects<CustomEmoji>): Array<string> => {
         return Object.keys(emojis).sort(
             (a: string, b: string): number => emojis[a].name.localeCompare(emojis[b].name)
         );

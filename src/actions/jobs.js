@@ -9,8 +9,8 @@ import {General} from 'constants';
 
 import {bindClientFunc} from './helpers';
 
-import type {ActionFunc} from '../types/actions';
-import type {JobType, Job} from '../types/jobs';
+import type {ActionFunc} from 'types/actions';
+import type {JobType, Job} from 'types/jobs';
 
 export function createJob(job: Job): ActionFunc {
     return bindClientFunc({

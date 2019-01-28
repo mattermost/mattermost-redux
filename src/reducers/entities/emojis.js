@@ -9,11 +9,12 @@ import {
     UserTypes,
 } from 'action_types';
 
-import type {EmojisState, CustomEmoji} from '../../types/emojis';
-import type {Post} from '../../types/posts';
-import type {GenericAction} from '../../types/actions';
+import type {EmojisState, CustomEmoji} from 'types/emojis';
+import type {Post} from 'types/posts';
+import type {GenericAction} from 'types/actions';
+import type {IDMappedObjects} from 'types/utilities';
 
-export function customEmoji(state: {[string]: CustomEmoji} = {}, action: GenericAction): {[string]: CustomEmoji} {
+export function customEmoji(state: IDMappedObjects<CustomEmoji> = {}, action: GenericAction): IDMappedObjects<CustomEmoji> {
     switch (action.type) {
     case EmojiTypes.RECEIVED_CUSTOM_EMOJI: {
         const nextState = {...state};
@@ -53,7 +54,7 @@ export function customEmoji(state: {[string]: CustomEmoji} = {}, action: Generic
     }
 }
 
-function storeEmojisForPost(state: {[string]: CustomEmoji}, post: Post): {[string]: CustomEmoji} {
+function storeEmojisForPost(state: IDMappedObjects<CustomEmoji>, post: Post): IDMappedObjects<CustomEmoji> {
     if (!post.metadata || !post.metadata.emojis) {
         return state;
     }

@@ -2,6 +2,9 @@
 // See LICENSE.txt for license information.
 // @flow
 
+import type {IDMappedObjects, UserIDMappedObjects, RelationOneToMany, RelationOneToOne} from './utilities';
+import type {Team} from './teams';
+
 export type ChannelType = 'O' | 'P' | 'D' | 'G';
 
 export type ChannelStats = {|
@@ -9,11 +12,12 @@ export type ChannelStats = {|
     member_count: number
 |};
 
-export type NotifyProps = {|
+export type ChannelNotifyProps = {|
     desktop: 'default' | 'all' | 'mention' | 'none',
     email: 'default' | 'all' | 'mention' | 'none',
     mark_unread: 'all' | 'mention',
-    push: 'default' | 'all' | 'mention' | 'none'
+    push: 'default' | 'all' | 'mention' | 'none',
+    ignore_channel_mentions: 'default' | 'off' | 'on',
 |};
 
 export type Channel = {|
@@ -31,7 +35,11 @@ export type Channel = {|
     total_msg_count: number,
     extra_update_at: number,
     creator_id: string,
-    scheme_id: string
+    scheme_id: string,
+    isCurrent?: boolean,
+    teammate_id?: string,
+    status?: string,
+    fake?: boolean,
 |};
 
 export type ChannelMembership = {|
@@ -41,7 +49,7 @@ export type ChannelMembership = {|
     last_viewed_at: number,
     msg_count: number,
     mention_count: number,
-    notify_props: NotifyProps,
+    notify_props: ChannelNotifyProps,
     last_update_at: number,
     scheme_user: boolean,
     scheme_admin: boolean,
@@ -50,9 +58,9 @@ export type ChannelMembership = {|
 
 export type ChannelsState = {|
     currentChannelId: string,
-    channels: { [string]: Channel },
-    channelsInTeam: { [string]: Array<string> },
-    myMembers: { [string]: ChannelMembership },
-    membersInChannel: { [string]: { [string]: ChannelMembership } },
-    stats: { [string]: ChannelStats }
+    channels: IDMappedObjects<Channel>,
+    channelsInTeam: RelationOneToMany<Team, Channel>,
+    myMembers: RelationOneToOne<Channel, ChannelMembership>,
+    membersInChannel: RelationOneToOne<Channel, UserIDMappedObjects<ChannelMembership>>,
+    stats: RelationOneToOne<Channel, ChannelStats>,
 |};

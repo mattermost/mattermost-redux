@@ -16,7 +16,7 @@ const OK_RESPONSE = {status: 'OK'};
 
 describe('Actions.Preferences', () => {
     let store;
-    before(async () => {
+    beforeAll(async () => {
         await TestHelper.initBasic(Client4);
     });
 
@@ -24,7 +24,7 @@ describe('Actions.Preferences', () => {
         store = await configureStore();
     });
 
-    after(async () => {
+    afterAll(async () => {
         await TestHelper.tearDown();
     });
 
@@ -232,5 +232,5 @@ describe('Actions.Preferences', () => {
         preference = myPreferences[`${Preferences.CATEGORY_DIRECT_CHANNEL_SHOW}--${user2.id}`];
         assert.ok(preference, 'preference for showing direct channel doesn\'t exist');
         assert.equal(preference.value, 'true', 'preference for showing direct channel is not true');
-    }).timeout(2000);
+    });
 });

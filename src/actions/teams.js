@@ -13,8 +13,8 @@ import {bindClientFunc, forceLogoutIfNecessary} from './helpers';
 import {getProfilesByIds, getStatusesByIds} from './users';
 import {loadRolesIfNeeded} from './roles';
 
-import type {GetStateFunc, DispatchFunc, ActionFunc, ActionResult} from '../types/actions';
-import type {Team} from '../types/teams';
+import type {GetStateFunc, DispatchFunc, ActionFunc, ActionResult} from 'types/actions';
+import type {Team} from 'types/teams';
 
 async function getProfilesAndStatusesForMembers(userIds, dispatch, getState) {
     const {currentUserId, profiles, statuses} = getState().entities.users;
