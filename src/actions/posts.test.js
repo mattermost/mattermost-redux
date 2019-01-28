@@ -59,6 +59,8 @@ describe('Actions.Posts', () => {
             }
         }
         assert.ok(found, 'failed to find new post in posts');
+
+        // postsInChannel[channelId] should not exist as create post should not add entry to postsInChannel when it did not exist before
         assert.ok(!postsInChannel[channelId], 'postIds in channel do not exist');
     });
 
