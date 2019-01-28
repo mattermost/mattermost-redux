@@ -4,7 +4,7 @@
 import {batchActions} from 'redux-batched-actions';
 
 import {Client4} from 'client';
-import {PostTypes, SearchTypes} from 'action_types';
+import {SearchTypes} from 'action_types';
 
 import {getCurrentTeamId} from 'selectors/entities/teams';
 import {getCurrentUserId, getCurrentUserMentionKeys} from 'selectors/entities/users';
@@ -12,7 +12,10 @@ import {getCurrentUserId, getCurrentUserMentionKeys} from 'selectors/entities/us
 import {getChannelAndMyMember, getChannelMembers} from './channels';
 import {forceLogoutIfNecessary} from './helpers';
 import {logError} from './errors';
-import {getProfilesAndStatusesForPosts} from './posts';
+import {
+    getProfilesAndStatusesForPosts,
+    receivedPosts,
+} from './posts';
 
 const WEBAPP_SEARCH_PER_PAGE = 20;
 
@@ -67,6 +70,7 @@ export function searchPostsWithParams(teamId, params) {
                 data: posts,
                 isGettingMore,
             },
+            receivedPosts(posts),
             {
                 type: SearchTypes.RECEIVED_SEARCH_TERM,
                 data: {
@@ -138,6 +142,7 @@ export function getFlaggedPosts() {
                 type: SearchTypes.RECEIVED_SEARCH_FLAGGED_POSTS,
                 data: posts,
             },
+            receivedPosts(posts),
             {
                 type: SearchTypes.SEARCH_FLAGGED_POSTS_SUCCESS,
             },
@@ -175,14 +180,7 @@ export function getPinnedPosts(channelId) {
                     channelId,
                 },
             },
-            {
-                type: PostTypes.RECEIVED_POSTS,
-                data: {
-                    order: [],
-                    posts: result.posts,
-                },
-                channelId,
-            },
+            receivedPosts(result),
             {
                 type: SearchTypes.SEARCH_PINNED_POSTS_SUCCESS,
             },
@@ -241,6 +239,7 @@ export function getRecentMentions() {
                 type: SearchTypes.RECEIVED_SEARCH_POSTS,
                 data: posts,
             },
+            receivedPosts(posts),
             {
                 type: SearchTypes.SEARCH_RECENT_MENTIONS_SUCCESS,
             },

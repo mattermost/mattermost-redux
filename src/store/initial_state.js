@@ -53,7 +53,6 @@ const state: GlobalState = {
             posts: {},
             postsInChannel: {},
             postsInThread: {},
-            sendingPostIds: [],
             reactions: {},
             openGraph: {},
             selectedPostId: '',

@@ -28,6 +28,10 @@ import {
     getPostsSince,
     getProfilesAndStatusesForPosts,
     getCustomEmojiForReaction,
+    postDeleted,
+    receivedNewPost,
+    receivedPost,
+    receivedPostThread,
 } from './posts';
 import {
     getMyPreferences,
@@ -360,11 +364,7 @@ function handleNewPostEvent(msg) {
                     dispatch(getStatusesByIds([rootUserId]));
                 }
 
-                dispatch({
-                    type: PostTypes.RECEIVED_POSTS,
-                    data,
-                    channelId: post.channel_id,
-                }, getState);
+                dispatch(receivedPostThread(data, post.root_id));
             }
         }
 
@@ -385,12 +385,7 @@ function handleNewPostEvent(msg) {
                 dispatch(makeGroupMessageVisibleIfNecessary(post.channel_id));
             }
 
-            actions.push({
-                type: PostTypes.RECEIVED_NEW_POST,
-                data: {
-                    ...post,
-                },
-            });
+            actions.push(receivedNewPost(post));
         }
 
         dispatch(batchActions(actions));
@@ -426,14 +421,14 @@ function handlePostEdited(msg) {
         const data = JSON.parse(msg.data.post);
 
         getProfilesAndStatusesForPosts([data], dispatch, getState);
-        dispatch({type: PostTypes.RECEIVED_POST, data});
+        dispatch(receivedPost(data));
     };
 }
 
 function handlePostDeleted(msg) {
     const data = JSON.parse(msg.data.post);
 
-    return {type: PostTypes.POST_DELETED, data};
+    return postDeleted(data);
 }
 
 function handleLeaveTeamEvent(msg) {

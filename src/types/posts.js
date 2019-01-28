@@ -85,7 +85,7 @@ export type PostsState = {|
     postsInThread: RelationOneToMany<Post, Post>,
     reactions: RelationOneToOne<Post, Array<Reaction>>,
     openGraph: RelationOneToOne<Post, Object>,
-    sendingPostIds: Array<string>,
+    pendingPostIds: Array<string>,
     selectedPostId: string,
     currentFocusedPostId: string,
     messagesHistory: {|
