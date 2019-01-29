@@ -132,6 +132,7 @@ describe('Reducers.posts', () => {
             data: {id: 'post_id', channel_id: 'channel_id'},
             result: {
                 currentFocusedPostId: '',
+                expandedURLs: {},
                 messagesHistory: {},
                 openGraph: {},
                 reactions: {},
@@ -175,6 +176,7 @@ describe('Reducers.posts', () => {
             data: {id: 'channel_id', viewArchivedChannels: false},
             result: {
                 currentFocusedPostId: '',
+                expandedURLs: {},
                 messagesHistory: {},
                 openGraph: {},
                 reactions: {},
@@ -222,6 +224,7 @@ describe('Reducers.posts', () => {
             data: {id: 'channel_id', viewArchivedChannels: true},
             result: {
                 currentFocusedPostId: '',
+                expandedURLs: {},
                 messagesHistory: {},
                 openGraph: {},
                 reactions: {},
