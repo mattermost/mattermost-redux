@@ -1,7 +1,7 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
 
-import {PostTypes, SearchTypes, UserTypes, ChannelTypes} from 'action_types';
+import {PostTypes, SearchTypes, UserTypes, ChannelTypes, GeneralTypes} from 'action_types';
 import {Posts} from 'constants';
 import {comparePosts, combineSystemPosts} from 'utils/post_utils';
 
@@ -723,6 +723,23 @@ function messagesHistory(state = {}, action) {
     }
 }
 
+function expandedURLs(state = {}, action) {
+    switch (action.type) {
+    case GeneralTypes.REDIRECT_LOCATION_SUCCESS:
+        return {
+            ...state,
+            [action.url]: action.data.location,
+        };
+    case GeneralTypes.REDIRECT_LOCATION_FAILURE:
+        return {
+            ...state,
+            [action.url]: action.url,
+        };
+    default:
+        return state;
+    }
+}
+
 export default function(state = {}, action) {
     const {posts, postsInChannel, postsInThread} = handlePosts(state.posts, state.postsInChannel, state.postsInThread, action);
 
@@ -757,6 +774,8 @@ export default function(state = {}, action) {
 
         // History of posts and comments
         messagesHistory: messagesHistory(state.messagesHistory, action),
+
+        expandedURLs: expandedURLs(state.expandedURLs, action),
     };
 
     if (state.posts === nextState.posts && state.postsInChannel === nextState.postsInChannel &&

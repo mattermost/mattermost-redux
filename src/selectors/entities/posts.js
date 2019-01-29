@@ -517,3 +517,7 @@ export const makeIsPostCommentMention = (): ((GlobalState, $ID<Post>) => boolean
         }
     );
 };
+
+export function getExpandedLink(state: GlobalState, link: string): string {
+    return state.entities.posts.expandedURLs[link];
+}
