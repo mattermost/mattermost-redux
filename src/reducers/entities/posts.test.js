@@ -3,7 +3,7 @@
 
 import assert from 'assert';
 
-import {PostTypes, ChannelTypes} from 'action_types';
+import {PostTypes, ChannelTypes, GeneralTypes} from 'action_types';
 import postsReducer, {
     openGraph as openGraphReducer,
     reactions as reactionsReducer,
@@ -893,6 +893,35 @@ describe('Reducers.posts', () => {
                     'https://example.com': action.data.posts.post1.metadata.embeds[0].data,
                     'https://google.ca': action.data.posts.post2.metadata.embeds[0].data,
                 });
+            });
+        });
+    });
+    describe('expandedURLs', () => {
+        it('should store the URLs on REDIRECT_LOCATION_SUCCESS', () => {
+            const state = deepFreeze({});
+            const action = {
+                type: GeneralTypes.REDIRECT_LOCATION_SUCCESS,
+                url: 'a',
+                data: {
+                    location: 'b',
+                },
+            };
+            const nextState = postsReducer(state, action);
+            assert.notEqual(state, nextState);
+            assert.deepEqual(nextState.expandedURLs, {
+                a: 'b',
+            });
+        });
+        it('should store the non-expanded URL on REDIRECT_LOCATION_FAILURE', () => {
+            const state = deepFreeze({});
+            const action = {
+                type: GeneralTypes.REDIRECT_LOCATION_FAILURE,
+                url: 'b',
+            };
+            const nextState = postsReducer(state, action);
+            assert.notEqual(state, nextState);
+            assert.deepEqual(nextState.expandedURLs, {
+                b: 'b',
             });
         });
     });
