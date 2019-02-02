@@ -1095,6 +1095,29 @@ export function doPostAction(postId, actionId, selectedOption = '') {
                 data: data.trigger_id,
             });
         }
+
+        return {data};
+    };
+}
+
+export function doPostActionWithCookie(postId, actionId, actionCookie, selectedOption = '') {
+    return async (dispatch, getState) => {
+        let data;
+        try {
+            data = await Client4.doPostActionWithCookie(postId, actionId, actionCookie, selectedOption);
+        } catch (error) {
+            forceLogoutIfNecessary(error, dispatch, getState);
+            dispatch(logError(error));
+            return {error};
+        }
+
+        if (data && data.trigger_id) {
+            dispatch({
+                type: IntegrationTypes.RECEIVED_DIALOG_TRIGGER_ID,
+                data: data.trigger_id,
+            });
+        }
+
         return {data};
     };
 }
