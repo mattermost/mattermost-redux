@@ -237,7 +237,7 @@ export const getProfiles: (GlobalState, Filters) => Array<UserProfile> = createS
     }
 );
 
-function filterProfiles(profiles: IDMappedObjects<UserProfile>, filters: ?Filters): IDMappedObjects<UserProfile> {
+function filterProfiles(profiles: IDMappedObjects<UserProfile>, filters?: Filters): IDMappedObjects<UserProfile> {
     if (!filters) {
         return profiles;
     }
@@ -245,7 +245,7 @@ function filterProfiles(profiles: IDMappedObjects<UserProfile>, filters: ?Filter
     let users = Object.keys(profiles).map((key) => profiles[key]);
 
     if (filters.role && filters.role !== '') {
-        users = users.filter((user) => user.roles && user.roles.indexOf((filters && filters.role) || '') !== -1);
+        users = users.filter((user) => user.roles && user.roles.includes((filters && filters.role) || ''));
     }
 
     if (filters.inactive) {
@@ -300,7 +300,7 @@ export const getProfilesNotInCurrentTeam: (GlobalState) => Array<UserProfile> = 
     }
 );
 
-export const getProfilesWithoutTeam: (GlobalState, ?Filters) => Array<UserProfile> = createSelector(
+export const getProfilesWithoutTeam: (GlobalState, filters?: Filters) => Array<UserProfile> = createSelector(
     getUsers,
     getUserIdsWithoutTeam,
     (state, filters) => filters,
@@ -317,7 +317,7 @@ export function getTotalUsersStats(state: GlobalState): Object {
     return state.entities.users.stats;
 }
 
-export function searchProfiles(state: GlobalState, term: string, skipCurrent: boolean = false, filters: ?Filters = null): Array<UserProfile> {
+export function searchProfiles(state: GlobalState, term: string, skipCurrent: boolean = false, filters?: Filters): Array<UserProfile> {
     const users = getUsers(state);
     const profiles = filterProfilesMatchingTerm(Object.keys(users).map((key) => users[key]), term);
     const filteredProfilesMap = filterProfiles(profileListToMap(profiles), filters);
@@ -356,7 +356,7 @@ export function searchProfilesInCurrentTeam(state: GlobalState, term: string, sk
     return profiles;
 }
 
-export function searchProfilesInTeam(state: GlobalState, teamId: $ID<Team>, term: string, skipCurrent: boolean = false, filters: ?Filters = null): Array<UserProfile> {
+export function searchProfilesInTeam(state: GlobalState, teamId: $ID<Team>, term: string, skipCurrent: boolean = false, filters?: Filters): Array<UserProfile> {
     const profiles = filterProfilesMatchingTerm(getProfilesInTeam(state, teamId), term);
     const filteredProfilesMap = filterProfiles(profileListToMap(profiles), filters);
     const filteredProfiles = Object.keys(filteredProfilesMap).map((key) => filteredProfilesMap[key]);
@@ -376,7 +376,7 @@ export function searchProfilesNotInCurrentTeam(state: GlobalState, term: string,
     return profiles;
 }
 
-export function searchProfilesWithoutTeam(state: GlobalState, term: string, skipCurrent: boolean = false, filters: ?Filters = null): Array<UserProfile> {
+export function searchProfilesWithoutTeam(state: GlobalState, term: string, skipCurrent: boolean = false, filters?: Filters): Array<UserProfile> {
     const filteredProfiles = filterProfilesMatchingTerm(getProfilesWithoutTeam(state, filters), term);
     if (skipCurrent) {
         removeCurrentUserFromList(filteredProfiles, getCurrentUserId(state));
