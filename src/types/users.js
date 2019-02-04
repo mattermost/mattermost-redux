@@ -3,6 +3,7 @@
 // @flow
 
 import type {Channel} from './channels';
+import type {Team} from './teams';
 import type {PostType} from './posts';
 import type {$ID, IDMappedObjects, RelationOneToMany, RelationOneToOne} from './utilities';
 
@@ -35,7 +36,12 @@ export type UserProfile = {|
     position: string,
     roles: string,
     locale: string,
-    notify_props?: UserNotifyProps,
+    notify_props: UserNotifyProps,
+    timezone?: {|
+        useAutomaticTimezone: string,
+        automaticTimezone: string,
+        manualTimezone: string,
+    |},
 |};
 
 export type UsersState = {|
@@ -44,8 +50,8 @@ export type UsersState = {|
     mySessions: Array<Object>,
     myAudits: Array<Object>,
     profiles: IDMappedObjects<UserProfile>,
-    profilesInTeam: Object,
-    profilesNotInTeam: Object,
+    profilesInTeam: RelationOneToMany<Team, UserProfile>,
+    profilesNotInTeam: RelationOneToMany<Team, UserProfile>,
     profilesWithoutTeam: Set<Object>,
     profilesInChannel: RelationOneToMany<Channel, UserProfile>,
     profilesNotInChannel: RelationOneToMany<Channel, UserProfile>,
@@ -67,4 +73,3 @@ export type UserActivity = {
         |} | Array<$ID<UserProfile>>,
     },
 };
-
