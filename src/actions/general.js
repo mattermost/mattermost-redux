@@ -199,11 +199,11 @@ export function getRedirectLocation(url: string): ActionFunc {
             data = await pendingData;
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch, getState);
-            dispatch({type: GeneralTypes.REDIRECT_LOCATION_FAILURE, data: error}, getState);
+            dispatch({type: GeneralTypes.REDIRECT_LOCATION_FAILURE, data: {error, url}}, getState);
             return {error};
         }
 
-        dispatch({type: GeneralTypes.REDIRECT_LOCATION_SUCCESS, data}, getState);
+        dispatch({type: GeneralTypes.REDIRECT_LOCATION_SUCCESS, data: {data, url}}, getState);
         return {data};
     };
 }

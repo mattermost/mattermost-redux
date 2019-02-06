@@ -6,7 +6,7 @@ import {General, Preferences} from 'constants';
 import {localizeMessage} from 'utils/i18n_utils';
 
 import type {UserProfile} from 'types/users';
-import type {IDMappedObjects} from 'types/utilities';
+import type {IDMappedObjects, $ID} from 'types/utilities';
 
 export function getFullName(user: UserProfile): string {
     if (user.first_name && user.last_name) {
@@ -85,7 +85,7 @@ export function profileListToMap(profileList: Array<UserProfile>): IDMappedObjec
     return profiles;
 }
 
-export function removeUserFromList(userId: string, list: Array<UserProfile>): Array<UserProfile> {
+export function removeUserFromList(userId: $ID<UserProfile>, list: Array<UserProfile>): Array<UserProfile> {
     for (let i = list.length - 1; i >= 0; i--) {
         if (list[i].id === userId) {
             list.splice(i, 1);
@@ -98,6 +98,10 @@ export function removeUserFromList(userId: string, list: Array<UserProfile>): Ar
 
 export function filterProfilesMatchingTerm(users: Array<UserProfile>, term: string): Array<UserProfile> {
     const lowercasedTerm = term.toLowerCase();
+    let trimmedTerm = lowercasedTerm;
+    if (trimmedTerm.startsWith('@')) {
+        trimmedTerm = trimmedTerm.substr(1);
+    }
 
     return users.filter((user: UserProfile) => {
         if (!user) {
@@ -110,21 +114,18 @@ export function filterProfilesMatchingTerm(users: Array<UserProfile>, term: stri
         const email = (user.email || '').toLowerCase();
         const nickname = (user.nickname || '').toLowerCase();
 
-        let emailPrefix = '';
         let emailDomain = '';
         const split = email.split('@');
-        emailPrefix = split[0];
         if (split.length > 1) {
             emailDomain = split[1];
         }
 
-        return username.startsWith(lowercasedTerm) ||
-            first.startsWith(lowercasedTerm) ||
+        return username.startsWith(trimmedTerm) ||
+            full.startsWith(trimmedTerm) ||
             last.startsWith(lowercasedTerm) ||
-            full.startsWith(lowercasedTerm) ||
-            nickname.startsWith(term) ||
-            emailPrefix.startsWith(term) ||
-            emailDomain.startsWith(term);
+            nickname.startsWith(trimmedTerm) ||
+            email.startsWith(lowercasedTerm) ||
+            emailDomain.startsWith(trimmedTerm);
     });
 }
 
