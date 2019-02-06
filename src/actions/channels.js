@@ -20,18 +20,9 @@ import type {Channel, ChannelNotifyProps, ChannelMembership} from 'types/channel
 import type {PreferenceType} from 'types/preferences';
 
 export function selectChannel(channelId: string): ActionFunc {
-    return async (dispatch, getState) => {
-        try {
-            dispatch({
-                type: ChannelTypes.SELECT_CHANNEL,
-                data: channelId,
-            }, getState);
-        } catch (error) {
-            logError(error);
-            return {error};
-        }
-
-        return {data: true};
+    return {
+        type: ChannelTypes.SELECT_CHANNEL,
+        data: channelId,
     };
 }
 
