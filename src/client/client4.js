@@ -13,6 +13,7 @@ const HEADER_BEARER = 'BEARER';
 const HEADER_REQUESTED_WITH = 'X-Requested-With';
 const HEADER_USER_AGENT = 'User-Agent';
 const HEADER_X_CLUSTER_ID = 'X-Cluster-Id';
+const HEADER_X_CSRF_TOKEN = 'X-CSRF-Token';
 export const HEADER_X_VERSION_ID = 'X-Version-Id';
 
 const PER_PAGE_DEFAULT = 60;
@@ -26,6 +27,7 @@ export default class Client4 {
         this.serverVersion = '';
         this.clusterId = '';
         this.token = '';
+        this.csrf = '';
         this.url = '';
         this.urlVersion = '/api/v4';
         this.userAgent = null;
@@ -64,6 +66,10 @@ export default class Client4 {
 
     setToken(token) {
         this.token = token;
+    }
+
+    setCSRF(csrfToken) {
+        this.csrf = csrfToken;
     }
 
     setAcceptLanguage(locale) {
@@ -264,6 +270,10 @@ export default class Client4 {
 
         if (this.token) {
             headers[HEADER_AUTH] = `${HEADER_BEARER} ${this.token}`;
+        }
+
+        if (options.method && options.method.toLowerCase() !== 'get' && this.csrf) {
+            headers[HEADER_X_CSRF_TOKEN] = this.csrf;
         }
 
         if (this.includeCookies) {

@@ -30,4 +30,4 @@ module.name_mapper='^utils\(.*\)$' -> '<PROJECT_ROOT>/src/utils/\1'
 module.name_mapper='^types\(.*\)$' -> '<PROJECT_ROOT>/src/types/\1'
 
 [version]
-0.89.0
+0.91.0

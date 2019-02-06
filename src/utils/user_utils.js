@@ -6,7 +6,7 @@ import {General, Preferences} from 'constants';
 import {localizeMessage} from 'utils/i18n_utils';
 
 import type {UserProfile} from 'types/users';
-import type {IDMappedObjects} from 'types/utilities';
+import type {IDMappedObjects, $ID} from 'types/utilities';
 
 export function getFullName(user: UserProfile): string {
     if (user.first_name && user.last_name) {
@@ -85,7 +85,7 @@ export function profileListToMap(profileList: Array<UserProfile>): IDMappedObjec
     return profiles;
 }
 
-export function removeUserFromList(userId: string, list: Array<UserProfile>): Array<UserProfile> {
+export function removeUserFromList(userId: $ID<UserProfile>, list: Array<UserProfile>): Array<UserProfile> {
     for (let i = list.length - 1; i >= 0; i--) {
         if (list[i].id === userId) {
             list.splice(i, 1);
