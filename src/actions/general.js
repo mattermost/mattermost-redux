@@ -203,7 +203,7 @@ export function getRedirectLocation(url: string): ActionFunc {
             return {error};
         }
 
-        dispatch({type: GeneralTypes.REDIRECT_LOCATION_SUCCESS, data: {data, url}}, getState);
+        dispatch({type: GeneralTypes.REDIRECT_LOCATION_SUCCESS, data: {...data, url}}, getState);
         return {data};
     };
 }
