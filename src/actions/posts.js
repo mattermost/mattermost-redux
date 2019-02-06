@@ -1158,7 +1158,7 @@ export function handleNewPost(msg) {
         const state = getState();
         const currentUserId = getCurrentUserId(state);
         const post = JSON.parse(msg.data.post);
-        const myChannelMember = getMyChannelMemberSelector(getState(), post.channel_id);
+        const myChannelMember = getMyChannelMemberSelector(state, post.channel_id);
         let websocketMessageProps = {};
         if (msg) {
             websocketMessageProps = msg.data;
