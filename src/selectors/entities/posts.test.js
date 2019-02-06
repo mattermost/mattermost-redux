@@ -1914,3 +1914,35 @@ describe('getCurrentUsersLatestPost', () => {
         assert.equal(Selectors.isPostIdSending(state), false);
     });
 });
+
+describe('getExpandedLink', () => {
+    it('should get the expanded link from the state', () => {
+        const state = {
+            entities: {
+                posts: {
+                    expandedURLs: {
+                        a: 'b',
+                        c: 'd',
+                    },
+                },
+            },
+        };
+        assert.equal(Selectors.getExpandedLink(state, 'a'), 'b');
+        assert.equal(Selectors.getExpandedLink(state, 'c'), 'd');
+    });
+
+    it('should return undefined if it is not saved', () => {
+        const state = {
+            entities: {
+                posts: {
+                    expandedURLs: {
+                        a: 'b',
+                        c: 'd',
+                    },
+                },
+            },
+        };
+        assert.equal(Selectors.getExpandedLink(state, 'b'), undefined);
+        assert.equal(Selectors.getExpandedLink(state, ''), undefined);
+    });
+});
