@@ -127,18 +127,19 @@ function doReconnect() {
                 }
             }
 
-            dispatch(fetchMyChannelsAndMembers(currentTeamId)).then(() => {
+            dispatch(getStatusesByIds(Object.keys(statusesToLoad)));
+            dispatch(fetchMyChannelsAndMembers(currentTeamId)).then(({data}) => {
                 dispatch(loadProfilesForDirect());
-            });
 
-            dispatch(getPosts(currentChannelId)).then(({error}) => {
-                // Getting the posts return the user is not authorized, redirecting to the default channel
-                if (error && error.status_code === 403) {
-                    EventEmitter.emit(General.DEFAULT_CHANNEL, currentTeamId);
+                if (data && data.members) {
+                    const stillMemberOfCurrentChannel = data.members.find((m) => m.channel_id === currentChannelId);
+                    if (!stillMemberOfCurrentChannel) {
+                        EventEmitter.emit(General.SWITCH_TO_DEFAULT_CHANNEL, currentTeamId);
+                    }
                 }
             });
 
-            dispatch(getStatusesByIds(Object.keys(statusesToLoad)));
+            dispatch(getPosts(currentChannelId));
             dispatch(getMyTeamUnreads());
 
             const myTeamMembers = getTeamMemberships(getState());
@@ -420,7 +421,7 @@ function handleUserRemovedEvent(msg) {
 
             if (msg.data.channel_id === currentChannelId) {
                 // emit the event so the client can change his own state
-                EventEmitter.emit(General.DEFAULT_CHANNEL, currentTeamId);
+                EventEmitter.emit(General.SWITCH_TO_DEFAULT_CHANNEL, currentTeamId);
             }
         } else if (msg.data.channel_id === currentChannelId) {
             dispatch(getChannelStats(currentTeamId, currentChannelId));

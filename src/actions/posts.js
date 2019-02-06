@@ -1187,12 +1187,7 @@ function completePostReceive(post, websocketMessageProps) {
         const rootPost = Selectors.getPost(state, post.root_id);
 
         if (post.root_id && !rootPost) {
-            const {data: posts} = await dispatch(getPostThread(post.root_id));
-            if (posts) {
-                dispatch(lastPostActions(post, websocketMessageProps));
-            }
-
-            return;
+            dispatch(getPostThread(post.root_id));
         }
 
         dispatch(lastPostActions(post, websocketMessageProps));
