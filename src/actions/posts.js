@@ -1167,13 +1167,11 @@ export function handleNewPost(msg) {
 
         dispatch(completePostReceive(post, websocketMessageProps));
 
-        if (msg && msg.data) {
-            if (msg.data.channel_type === General.DM_CHANNEL) {
-                const otherUserId = getUserIdFromChannelName(currentUserId, msg.data.channel_name);
-                dispatch(makeDirectChannelVisibleIfNecessary(otherUserId));
-            } else if (msg.data.channel_type === General.GM_CHANNEL) {
-                dispatch(makeGroupMessageVisibleIfNecessary(post.channel_id));
-            }
+        if (msg.data.channel_type === General.DM_CHANNEL) {
+            const otherUserId = getUserIdFromChannelName(currentUserId, msg.data.channel_name);
+            dispatch(makeDirectChannelVisibleIfNecessary(otherUserId));
+        } else if (msg.data.channel_type === General.GM_CHANNEL) {
+            dispatch(makeGroupMessageVisibleIfNecessary(post.channel_id));
         }
     };
 }
