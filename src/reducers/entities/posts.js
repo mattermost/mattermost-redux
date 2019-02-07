@@ -281,24 +281,39 @@ export function postsInChannel(state = {}, action, prevPosts, nextPosts) {
     case PostTypes.RECEIVED_NEW_POST: {
         const post = action.data;
 
-        const postsForChannel = state[post.channel_id];
-
-        if (!postsForChannel) {
+        if (!state[post.channel_id]) {
             // Don't save newly created posts until the channel has been properly loaded
             return state;
         }
 
-        if (postsForChannel.includes(post.id)) {
-            // We already have this post
+        const postsForChannel = state[post.channel_id];
+        const nextPostsForChannel = [...postsForChannel];
+
+        let changed = false;
+
+        // Add the new post to the channel
+        if (!nextPostsForChannel.includes(post.id)) {
+            nextPostsForChannel.unshift(post.id);
+            changed = true;
+        }
+
+        // If this is a new non-pending post, remove any pending post that exists for it
+        if (post.pending_post_id && post.id !== post.pending_post_id) {
+            const index = nextPostsForChannel.indexOf(post.pending_post_id);
+
+            if (index !== -1) {
+                nextPostsForChannel.splice(index, 1);
+                changed = true;
+            }
+        }
+
+        if (!changed) {
             return state;
         }
 
         return {
             ...state,
-            [post.channel_id]: [
-                post.id,
-                ...postsForChannel,
-            ],
+            [post.channel_id]: nextPostsForChannel,
         };
     }
 
@@ -464,12 +479,26 @@ export function postsInThread(state = {}, action, prevPosts) {
         const postsForThread = state[post.root_id] || [];
         const nextPostsForThread = [...postsForThread];
 
-        const index = nextPostsForThread.indexOf(post.pending_post_id);
-        if (index === -1) {
+        let changed = false;
+
+        // Add the post to the thread if we don't have it already
+        if (!nextPostsForThread.includes(post.id)) {
             nextPostsForThread.push(post.id);
-        } else {
-            // Replace the pending post with the newly created one
-            nextPostsForThread[index] = post.id;
+            changed = true;
+        }
+
+        // If this is a new non-pending post, remove any pending post that exists for it
+        if (post.pending_post_id && post.id !== post.pending_post_id) {
+            const index = nextPostsForThread.indexOf(post.pending_post_id);
+
+            if (index !== -1) {
+                nextPostsForThread.splice(index, 1);
+                changed = true;
+            }
+        }
+
+        if (!changed) {
+            return state;
         }
 
         return {

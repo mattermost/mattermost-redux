@@ -603,6 +603,38 @@ describe('postsInChannel', () => {
 
             expect(nextState).toBe(state);
         });
+
+        it('should remove a previously pending post', () => {
+            const state = deepFreeze({
+                channel1: ['post1', 'pending', 'post2'],
+            });
+
+            const nextState = reducers.postsInChannel(state, {
+                type: PostTypes.RECEIVED_NEW_POST,
+                data: {id: 'post3', channel_id: 'channel1', pending_post_id: 'pending'},
+            });
+
+            expect(nextState).not.toBe(state);
+            expect(nextState).toEqual({
+                channel1: ['post3', 'post1', 'post2'],
+            });
+        });
+
+        it('should just add the new post if the pending post was already removed', () => {
+            const state = deepFreeze({
+                channel1: ['post1', 'post2'],
+            });
+
+            const nextState = reducers.postsInChannel(state, {
+                type: PostTypes.RECEIVED_NEW_POST,
+                data: {id: 'post3', channel_id: 'channel1', pending_post_id: 'pending'},
+            });
+
+            expect(nextState).not.toBe(state);
+            expect(nextState).toEqual({
+                channel1: ['post3', 'post1', 'post2'],
+            });
+        });
     });
 
     describe('receiving a single post', () => {
@@ -619,6 +651,22 @@ describe('postsInChannel', () => {
             expect(nextState).not.toBe(state);
             expect(nextState).toEqual({
                 channel1: ['post1', 'post3', 'post2'],
+            });
+        });
+
+        it('should do nothing for a pending post that was already removed', () => {
+            const state = deepFreeze({
+                channel1: ['post1', 'post2'],
+            });
+
+            const nextState = reducers.postsInChannel(state, {
+                type: PostTypes.RECEIVED_POST,
+                data: {id: 'post3', channel_id: 'channel1', pending_post_id: 'pending'},
+            });
+
+            expect(nextState).toBe(state);
+            expect(nextState).toEqual({
+                channel1: ['post1', 'post2'],
             });
         });
 
@@ -1151,7 +1199,23 @@ describe('postsInThread', () => {
 
             expect(nextState).not.toBe(state);
             expect(nextState).toEqual({
-                root1: ['comment1', 'comment3', 'comment2'],
+                root1: ['comment1', 'comment2', 'comment3'],
+            });
+        });
+
+        it('should do nothing for a pending comment that was already removed', () => {
+            const state = deepFreeze({
+                root1: ['comment1', 'comment2'],
+            });
+
+            const nextState = reducers.postsInThread(state, {
+                type: PostTypes.RECEIVED_POST,
+                data: {id: 'comment2', root_id: 'root1', pending_post_id: 'pending'},
+            });
+
+            expect(nextState).toBe(state);
+            expect(nextState).toEqual({
+                root1: ['comment1', 'comment2'],
             });
         });
 
@@ -1199,6 +1263,22 @@ describe('postsInThread', () => {
             expect(nextState.root1).toBe(state.root1);
             expect(nextState).toEqual({
                 root1: ['comment1'],
+            });
+        });
+
+        it('should do nothing for a duplicate post', () => {
+            const state = deepFreeze({
+                root1: ['comment1', 'comment2'],
+            });
+
+            const nextState = reducers.postsInThread(state, {
+                type: PostTypes.RECEIVED_POST,
+                data: {id: 'comment1'},
+            });
+
+            expect(nextState).toBe(state);
+            expect(nextState).toEqual({
+                root1: ['comment1', 'comment2'],
             });
         });
     });
