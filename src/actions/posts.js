@@ -1159,10 +1159,7 @@ export function handleNewPost(msg) {
         const currentUserId = getCurrentUserId(state);
         const post = JSON.parse(msg.data.post);
         const myChannelMember = getMyChannelMemberSelector(state, post.channel_id);
-        let websocketMessageProps = {};
-        if (msg) {
-            websocketMessageProps = msg.data;
-        }
+        const websocketMessageProps = msg.data;
 
         if (myChannelMember && Object.keys(myChannelMember).length === 0 && myChannelMember.constructor === 'Object') {
             await dispatch(getMyChannelMember(post.channel_id));
