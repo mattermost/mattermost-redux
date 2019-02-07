@@ -299,7 +299,7 @@ export function deletePost(post) {
                 meta: {
                     offline: {
                         effect: () => Client4.deletePost(post.id),
-                        commit: {type: ''}, // redux-offline always needs to dispatch something on commit
+                        commit: {type: 'do_nothing'}, // redux-offline always needs to dispatch something on commit
                         rollback: receivedPost(delPost),
                     },
                 },
