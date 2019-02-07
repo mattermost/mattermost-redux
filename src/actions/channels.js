@@ -19,7 +19,7 @@ import type {ActionFunc, DispatchFunc, GetStateFunc} from 'types/actions';
 import type {Channel, ChannelNotifyProps, ChannelMembership} from 'types/channels';
 import type {PreferenceType} from 'types/preferences';
 
-export function selectChannel(channelId: string): ActionFunc {
+export function selectChannel(channelId: string) {
     return {
         type: ChannelTypes.SELECT_CHANNEL,
         data: channelId,
