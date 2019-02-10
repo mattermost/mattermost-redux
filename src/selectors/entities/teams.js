@@ -143,7 +143,8 @@ export const getJoinableTeamIds = createIdsSelector(
         return Object.keys(teams).filter((id) => {
             const team = teams[id];
             const member = myMembers[id];
-            return team.delete_at === 0 && team.allow_open_invite && !member;
+            const isPublic = team.allow_open_invite || team.is_public;
+            return team.delete_at === 0 && isPublic && !member;
         });
     }
 );

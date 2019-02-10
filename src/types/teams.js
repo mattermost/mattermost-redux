@@ -13,8 +13,6 @@ export type TeamMembership = {|
     scheme_admin: boolean
 |};
 
-export type TeamType = 'O' | 'I';
-
 export type Team = {|
     id: string,
     create_at: number,
@@ -24,11 +22,11 @@ export type Team = {|
     name: string,
     description: string,
     email: string,
-    type: TeamType,
     company_name: string,
     allowed_domains: string,
     invite_id: string,
     allow_open_invite: boolean,
+    is_public: boolean,
     scheme_id: string
 |};
 

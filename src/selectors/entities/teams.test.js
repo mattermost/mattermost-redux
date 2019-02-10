@@ -23,12 +23,12 @@ describe('Selectors.Teams', () => {
     teams[team5.id] = team5;
     team1.display_name = 'Marketeam';
     team2.display_name = 'Core Team';
-    team3.allow_open_invite = true;
-    team4.allow_open_invite = true;
+    team3.is_public = true;
+    team4.is_public = true;
     team3.display_name = 'Team AA';
     team4.display_name = 'aa-team';
     team5.delete_at = 10;
-    team5.allow_open_invite = true;
+    team5.is_public = true;
 
     const user = TestHelper.fakeUserWithId();
     const user2 = TestHelper.fakeUserWithId();
@@ -111,7 +111,7 @@ describe('Selectors.Teams', () => {
                         ...testState.entities.teams.teams,
                         [team3.id]: {
                             ...team3,
-                            allow_open_invite: false,
+                            is_public: false,
                         },
                     },
                 },

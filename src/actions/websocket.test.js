@@ -138,14 +138,14 @@ describe('Actions.Websocket', () => {
     it('Websocket handle team updated', (done) => {
         async function test() {
             const team = {id: '55pfercbm7bsmd11p5cjpgsbwr'};
-            mockServer.emit('message', JSON.stringify({event: WebsocketEvents.UPDATE_TEAM, data: {team: `{"id":"55pfercbm7bsmd11p5cjpgsbwr","create_at":1495553950859,"update_at":1508250370054,"delete_at":0,"display_name":"${TestHelper.basicTeam.display_name}","name":"${TestHelper.basicTeam.name}","description":"description","email":"","type":"O","company_name":"","allowed_domains":"","invite_id":"m93f54fu5bfntewp8ctwonw19w","allow_open_invite":true}`}, broadcast: {omit_users: null, user_id: '', channel_id: '', team_id: ''}, seq: 26}));
+            mockServer.emit('message', JSON.stringify({event: WebsocketEvents.UPDATE_TEAM, data: {team: `{"id":"55pfercbm7bsmd11p5cjpgsbwr","create_at":1495553950859,"update_at":1508250370054,"delete_at":0,"display_name":"${TestHelper.basicTeam.display_name}","name":"${TestHelper.basicTeam.name}","description":"description","email":"","type":"O","company_name":"","allowed_domains":"","invite_id":"m93f54fu5bfntewp8ctwonw19w","is_public":true}`}, broadcast: {omit_users: null, user_id: '', channel_id: '', team_id: ''}, seq: 26}));
 
             setTimeout(() => {
                 const entities = store.getState().entities;
                 const {teams} = entities.teams;
                 const updated = teams[team.id];
                 assert.ok(updated);
-                assert.strictEqual(updated.allow_open_invite, true);
+                assert.strictEqual(updated.is_public, true);
                 done();
             }, 500);
         }
@@ -156,14 +156,14 @@ describe('Actions.Websocket', () => {
     it('Websocket handle team patched', (done) => {
         async function test() {
             const team = {id: '55pfercbm7bsmd11p5cjpgsbwr'};
-            mockServer.emit('message', JSON.stringify({event: WebsocketEvents.UPDATE_TEAM, data: {team: `{"id":"55pfercbm7bsmd11p5cjpgsbwr","create_at":1495553950859,"update_at":1508250370054,"delete_at":0,"display_name":"${TestHelper.basicTeam.display_name}","name":"${TestHelper.basicTeam.name}","description":"description","email":"","type":"O","company_name":"","allowed_domains":"","invite_id":"m93f54fu5bfntewp8ctwonw19w","allow_open_invite":true}`}, broadcast: {omit_users: null, user_id: '', channel_id: '', team_id: ''}, seq: 26}));
+            mockServer.emit('message', JSON.stringify({event: WebsocketEvents.UPDATE_TEAM, data: {team: `{"id":"55pfercbm7bsmd11p5cjpgsbwr","create_at":1495553950859,"update_at":1508250370054,"delete_at":0,"display_name":"${TestHelper.basicTeam.display_name}","name":"${TestHelper.basicTeam.name}","description":"description","email":"","type":"O","company_name":"","allowed_domains":"","invite_id":"m93f54fu5bfntewp8ctwonw19w","is_public":true}`}, broadcast: {omit_users: null, user_id: '', channel_id: '', team_id: ''}, seq: 26}));
 
             setTimeout(() => {
                 const entities = store.getState().entities;
                 const {teams} = entities.teams;
                 const updated = teams[team.id];
                 assert.ok(updated);
-                assert.strictEqual(updated.allow_open_invite, true);
+                assert.strictEqual(updated.is_public, true);
                 done();
             }, 500);
         }

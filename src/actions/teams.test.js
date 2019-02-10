@@ -77,7 +77,7 @@ describe('Actions.Teams', () => {
     });
 
     it('getTeams', async () => {
-        let team = {...TestHelper.fakeTeam(), allow_open_invite: true};
+        let team = {...TestHelper.fakeTeam(), is_public: true};
 
         nock(Client4.getTeamsRoute()).
             post('').
@@ -256,8 +256,8 @@ describe('Actions.Teams', () => {
 
         nock(Client4.getTeamsRoute()).
             post('').
-            reply(201, {...TestHelper.fakeTeamWithId(), allow_open_invite: true});
-        const team = await client.createTeam({...TestHelper.fakeTeam(), allow_open_invite: true});
+            reply(201, {...TestHelper.fakeTeamWithId(), is_public: true});
+        const team = await client.createTeam({...TestHelper.fakeTeam(), is_public: true});
 
         store.dispatch({type: GeneralTypes.RECEIVED_SERVER_VERSION, data: '4.0.0'});
 
