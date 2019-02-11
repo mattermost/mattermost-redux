@@ -543,7 +543,7 @@ export function getPostThread(rootId) {
             {
                 type: PostTypes.GET_POST_THREAD_SUCCESS,
             },
-        ]), getState);
+        ]));
 
         return {data: posts};
     };
