@@ -337,7 +337,11 @@ function handleNewPostEvent(msg) {
             break;
         }
 
-        if (post.root_id && posts && !posts[post.root_id]) {
+        const postsInChannel = getPostIdsInChannel(getState(), post.channel_id);
+
+        // skip calling getPostThread if there are no postsInChannel.
+        // This leads to having few posts in channel before the first visit.
+        if (post.root_id && posts && !posts[post.root_id] && postsInChannel && postsInChannel.length !== 0) {
             let data;
             try {
                 data = await Client4.getPostThread(post.root_id);
@@ -382,14 +386,10 @@ function handleNewPostEvent(msg) {
             }
 
             actions.push({
-                type: PostTypes.RECEIVED_POSTS,
+                type: PostTypes.RECEIVED_NEW_POST,
                 data: {
-                    order: [],
-                    posts: {
-                        [post.id]: post,
-                    },
+                    ...post,
                 },
-                channelId: post.channel_id,
             });
         }
 
