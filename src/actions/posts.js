@@ -1188,22 +1188,18 @@ function completePostReceive(post, websocketMessageProps) {
             dispatch(getPostThread(post.root_id));
         }
 
-        dispatch(lastPostActions(post, websocketMessageProps));
+        dispatch(lastPostAction(post, websocketMessageProps));
     };
 }
 
-function lastPostActions(post, websocketMessageProps) {
+function lastPostAction(post, websocketMessageProps) {
     return async (dispatch, getState) => {
         const state = getState();
         const actions = [{
-            type: PostTypes.RECEIVED_POSTS,
+            type: PostTypes.RECEIVED_NEW_POST,
             data: {
-                order: [],
-                posts: {
-                    [post.id]: post,
-                },
+                ...post,
             },
-            channelId: post.channel_id,
         }, {
             type: WebsocketEvents.STOP_TYPING,
             data: {

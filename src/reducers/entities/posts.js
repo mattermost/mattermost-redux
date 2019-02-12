@@ -14,10 +14,14 @@ function handleReceivedPost(posts = {}, postsInChannel = {}, postsInThread = {},
         [post.id]: post,
     };
 
+    if (!postsInChannel[channelId]) {
+        return {posts: nextPosts, postsInChannel, postsInThread};
+    }
+
     let nextPostsInChannel = postsInChannel;
 
     // Only change postsInChannel if the order of the posts needs to change
-    if (!postsInChannel[channelId] || !postsInChannel[channelId].includes(post.id)) {
+    if (!postsInChannel[channelId].includes(post.id)) {
         // If we don't already have the post, assume it's the most recent one
         const postsForChannel = postsInChannel[channelId] || [];
 
@@ -85,6 +89,23 @@ function handleReceivedPosts(posts = {}, postsInChannel = {}, postsInThread = {}
     // Change the state only if we have new posts,
     // otherwise there's no need to create a new object for the same state.
     if (!Object.keys(newPosts).length) {
+        if (!postsInChannel[channelId]) {
+            // if postsInChannel does not exist for a channel then set an empty array as it has no posts
+            return {
+                posts,
+                postsInThread,
+                postsInChannel: {
+                    ...postsInChannel,
+                    [channelId]: [],
+                },
+            };
+        }
+        return {posts, postsInChannel, postsInThread};
+    }
+
+    // if PostTypes.RECEIVED_POSTS is called because of debounce action in webapp for new posts
+    // then check if postsInChannel exist for channel before adding them to the store
+    if (action.receivedNewPosts && !postsInChannel[channelId]) {
         return {posts, postsInChannel, postsInThread};
     }
 
