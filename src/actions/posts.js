@@ -206,7 +206,7 @@ export function createPostImmediately(post, files = []) {
             forceLogoutIfNecessary(error, dispatch, getState);
             dispatch(batchActions([
                 {type: PostTypes.CREATE_POST_FAILURE, error},
-                {type: PostTypes.REMOVE_PENDING_POST, data: {id: pendingPostId, channel_id: newPost.channel_id}},
+                {type: PostTypes.REMOVE_PENDING_POST, data: {id: pendingPostId, channel_id: newPost.channel_id, root_id: newPost.root_id}},
                 logError(error),
             ]), getState);
             return {error};

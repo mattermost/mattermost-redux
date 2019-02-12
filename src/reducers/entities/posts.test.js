@@ -156,65 +156,63 @@ describe('Reducers.posts', () => {
 
     it('RECEIVED_CHANNEL_DELETED and DELETE_CHANNEL_SUCCESS on posts with viewArchivedChannels false', async () => {
         const posts = {
-            post_id: {channel_id: 'channel_id'},
-            other_post_id: {channel_id: 'other_channel_id'},
-            other_post_more_id: {channel_id: 'other_channel_more_id'},
+            post_id: {id: 'post_id', channel_id: 'channel_id'},
+            comment_id: {id: 'comment_id', channel_id: 'channel_id', root_id: 'post_id'},
+            other_post_id: {id: 'other_post_id', channel_id: 'other_channel_id'},
+            other_comment_id: {id: 'other_comment_id', channel_id: 'other_channel_id', root_id: 'other_post_id'},
         };
         const postsInChannel = {
-            channel_id: ['post_id', 'post_id2'],
-            other_channel_id: ['other_post_id', 'other_post_id2'],
-            other_channel_more_id: ['other_post_more_id', 'other_post_more_id2'],
+            channel_id: ['post_id', 'post_id2', 'comment_id'],
+            other_channel_id: ['other_post_id', 'other_comment_id'],
         };
         const postsInThread = {
-            post_id: ['other_post_id', 'other_post_more_id'],
-            other_post_id: ['post_id', 'other_post_more_id'],
+            post_id: ['comment_id'],
+            other_post_id: ['other_comment_id'],
         };
 
         let state = {posts, postsInChannel, postsInThread};
         const testAction = {
             type: ChannelTypes.RECEIVED_CHANNEL_DELETED,
             data: {id: 'channel_id', viewArchivedChannels: false},
-            result: {
-                currentFocusedPostId: '',
-                expandedURLs: {},
-                messagesHistory: {},
-                openGraph: {},
-                reactions: {},
-                selectedPostId: '',
-                posts: {
-                    other_post_id: {channel_id: 'other_channel_id'},
-                    other_post_more_id: {channel_id: 'other_channel_more_id'},
-                },
-                postsInChannel: {
-                    other_channel_id: ['other_post_id', 'other_post_id2'],
-                    other_channel_more_id: ['other_post_more_id', 'other_post_more_id2'],
-                },
-                postsInThread: {
-                    other_post_id: ['other_post_more_id'],
-                },
-                pendingPostIds: [],
-                sendingPostIds: [],
-            },
         };
 
         state = postsReducer(state, testAction);
-        assert.deepEqual(state, testAction.result);
+        assert.deepEqual(state, {
+            currentFocusedPostId: '',
+            expandedURLs: {},
+            messagesHistory: {},
+            openGraph: {},
+            reactions: {},
+            selectedPostId: '',
+            posts: {
+                other_post_id: {id: 'other_post_id', channel_id: 'other_channel_id'},
+                other_comment_id: {id: 'other_comment_id', channel_id: 'other_channel_id', root_id: 'other_post_id'},
+            },
+            postsInChannel: {
+                other_channel_id: ['other_post_id', 'other_comment_id'],
+            },
+            postsInThread: {
+                other_post_id: ['other_comment_id'],
+            },
+            pendingPostIds: [],
+            sendingPostIds: [],
+        });
     });
 
     it('RECEIVED_CHANNEL_DELETED and DELETE_CHANNEL_SUCCESS on posts with viewArchivedChannels true', async () => {
         const posts = {
-            post_id: {channel_id: 'channel_id'},
-            other_post_id: {channel_id: 'other_channel_id'},
-            other_post_more_id: {channel_id: 'other_channel_more_id'},
+            post_id: {id: 'post_id', channel_id: 'channel_id'},
+            comment_id: {id: 'comment_id', channel_id: 'channel_id', root_id: 'post_id'},
+            other_post_id: {id: 'other_post_id', channel_id: 'other_channel_id'},
+            other_comment_id: {id: 'other_comment_id', channel_id: 'other_channel_id', root_id: 'other_post_id'},
         };
         const postsInChannel = {
-            channel_id: ['post_id', 'post_id2'],
-            other_channel_id: ['other_post_id', 'other_post_id2'],
-            other_channel_more_id: ['other_post_more_id', 'other_post_more_id2'],
+            channel_id: ['post_id', 'post_id2', 'comment_id'],
+            other_channel_id: ['other_post_id', 'other_comment_id'],
         };
         const postsInThread = {
-            post_id: ['other_post_id', 'other_post_more_id'],
-            other_post_id: ['post_id', 'other_post_more_id'],
+            post_id: ['comment_id'],
+            other_post_id: ['other_comment_id'],
         };
 
         let state = {posts, postsInChannel, postsInThread};
@@ -222,22 +220,22 @@ describe('Reducers.posts', () => {
         const testAction = {
             type: ChannelTypes.RECEIVED_CHANNEL_DELETED,
             data: {id: 'channel_id', viewArchivedChannels: true},
-            result: {
-                currentFocusedPostId: '',
-                expandedURLs: {},
-                messagesHistory: {},
-                openGraph: {},
-                reactions: {},
-                selectedPostId: '',
-                posts,
-                postsInChannel,
-                postsInThread,
-                pendingPostIds: [],
-                sendingPostIds: [],
-            },
         };
+
         state = postsReducer(state, testAction);
-        assert.deepEqual(state, testAction.result);
+        assert.deepEqual(state, {
+            currentFocusedPostId: '',
+            expandedURLs: {},
+            messagesHistory: {},
+            openGraph: {},
+            reactions: {},
+            selectedPostId: '',
+            posts,
+            postsInChannel,
+            postsInThread,
+            pendingPostIds: [],
+            sendingPostIds: [],
+        });
     });
 
     describe('sendingPostIds', () => {
