@@ -606,7 +606,7 @@ export function reactions(state = {}, action) {
 }
 
 function storeReactionsForPost(state, post) {
-    if (!post.metadata) {
+    if (!post.metadata || !post.metadata.reactions) {
         return state;
     }
 
