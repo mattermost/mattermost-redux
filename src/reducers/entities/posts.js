@@ -280,34 +280,35 @@ function postsInChannel(state = {}, action, prevPosts, nextPosts) {
 
         const postsForChannel = state[post.channel_id];
 
-        let nextPostsForChannel;
-        if (postsForChannel) {
-            if (postsForChannel.includes(post.id)) {
-                return state;
-            }
+        if (!postsForChannel) {
+            // Don't save newly created posts until the channel has been properly loaded
+            return state;
+        }
 
-            nextPostsForChannel = [
-                ...postsForChannel,
-                post.id,
-            ];
-        } else {
-            nextPostsForChannel = [post.id];
+        if (postsForChannel.includes(post.id)) {
+            return state;
         }
 
         return {
             ...state,
-            [post.channel_id]: nextPostsForChannel,
+            [post.channel_id]: [post.id, ...postsForChannel],
         };
     }
 
     case PostTypes.RECEIVED_POSTS: {
         const newPosts = Object.values(action.data.posts);
 
-        if (newPosts.length === 0) {
+        const postsForChannel = state[action.channelId];
+
+        if (newPosts.length === 0 && postsForChannel) {
             return state;
         }
 
-        const postsForChannel = state[action.channelId];
+        if (action.receivedNewPosts && !postsForChannel) {
+            // Don't save newly created posts until the channel has been properly loaded
+            return state;
+        }
+
         const nextPostsForChannel = postsForChannel ? [...postsForChannel] : [];
 
         for (const post of newPosts) {
@@ -686,7 +687,7 @@ export function reactions(state = {}, action) {
 }
 
 function storeReactionsForPost(state, post) {
-    if (!post.metadata) {
+    if (!post.metadata || !post.metadata.reactions) {
         return state;
     }
 
