@@ -27,7 +27,7 @@ export function isPostFlagged(postId: $ID<Post>, myPreferences: {[string]: Prefe
 }
 
 export function isSystemMessage(post: Post): boolean {
-    return post.type && post.type.startsWith(Posts.SYSTEM_MESSAGE_PREFIX);
+    return Boolean(post.type && post.type.startsWith(Posts.SYSTEM_MESSAGE_PREFIX));
 }
 
 export function isFromWebhook(post: Post): boolean {
