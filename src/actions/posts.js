@@ -1079,25 +1079,7 @@ export function getOpenGraphMetadata(url) {
 }
 
 export function doPostAction(postId, actionId, selectedOption = '') {
-    return async (dispatch, getState) => {
-        let data;
-        try {
-            data = await Client4.doPostAction(postId, actionId, selectedOption);
-        } catch (error) {
-            forceLogoutIfNecessary(error, dispatch, getState);
-            dispatch(logError(error));
-            return {error};
-        }
-
-        if (data && data.trigger_id) {
-            dispatch({
-                type: IntegrationTypes.RECEIVED_DIALOG_TRIGGER_ID,
-                data: data.trigger_id,
-            });
-        }
-
-        return {data};
-    };
+    return doPostActionWithCookie(postId, actionId, '', selectedOption);
 }
 
 export function doPostActionWithCookie(postId, actionId, actionCookie, selectedOption = '') {
