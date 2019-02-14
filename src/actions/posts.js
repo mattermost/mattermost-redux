@@ -60,7 +60,7 @@ export function receivedPostsInChannel(posts, channelId) {
 
 export function receivedPostsInThread(posts, rootId) {
     return {
-        type: PostTypes.RECEIVED_POSTS_IN_CHANNEL,
+        type: PostTypes.RECEIVED_POSTS_IN_THREAD,
         data: posts,
         rootId,
     };
