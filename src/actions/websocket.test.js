@@ -57,8 +57,8 @@ describe('Actions.Websocket', () => {
         mockServer.emit('message', JSON.stringify({event: WebsocketEvents.POSTED, data: {channel_display_name: TestHelper.basicChannel.display_name, channel_name: TestHelper.basicChannel.name, channel_type: 'O', post: `{"id": "71k8gz5ompbpfkrzaxzodffj8w", "create_at": 1508245311774, "update_at": 1508245311774, "edit_at": 0, "delete_at": 0, "is_pinned": false, "user_id": "${TestHelper.basicUser.id}", "channel_id": "${channelId}", "root_id": "", "parent_id": "", "original_id": "", "message": "Unit Test", "type": "", "props": {}, "hashtags": "", "pending_post_id": "t36kso9nwtdhbm8dbkd6g4eeby: 1508245311749"}`, sender_name: TestHelper.basicUser.username, team_id: TestHelper.basicTeam.id}, broadcast: {omit_users: null, user_id: '', channel_id: channelId, team_id: ''}, seq: 2}));
 
         const entities = store.getState().entities;
-        const {posts, postsInChannel} = entities.posts;
-        const postId = postsInChannel[channelId][0];
+        const {posts} = entities.posts;
+        const postId = Object.keys(posts)[0];
 
         assert.ok(posts[postId].message.indexOf('Unit Test') > -1);
     });
