@@ -510,7 +510,7 @@ describe('Reducers.posts', () => {
                     type: actionType,
                     data: {
                         id: 'post',
-                        metadata: {},
+                        metadata: {reactions: []},
                     },
                 };
 
@@ -519,6 +519,23 @@ describe('Reducers.posts', () => {
                 assert.notEqual(nextState, state);
                 assert.deepEqual(nextState, {
                     post: {},
+                });
+            });
+
+            it('should not clobber reactions when metadata empty', () => {
+                const state = deepFreeze({post: {name: 'smiley', post_id: 'post'}});
+                const action = {
+                    type: actionType,
+                    data: {
+                        id: 'post',
+                        metadata: {},
+                    },
+                };
+
+                const nextState = reactionsReducer(state, action);
+
+                assert.deepEqual(nextState, {
+                    post: {name: 'smiley', post_id: 'post'},
                 });
             });
 
@@ -581,7 +598,7 @@ describe('Reducers.posts', () => {
                         posts: {
                             post: {
                                 id: 'post',
-                                metadata: {},
+                                metadata: {reactions: []},
                             },
                         },
                     },
