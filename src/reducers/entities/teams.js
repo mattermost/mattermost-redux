@@ -159,7 +159,7 @@ function myMembers(state = {}, action) {
             ...state,
             [teamId]: {
                 ...member,
-                msg_count: Math.max(member.msg_count - amount, 0),
+                msg_count: Math.max(member.msg_count - Math.abs(amount), 0),
             },
         };
     }
