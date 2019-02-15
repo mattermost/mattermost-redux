@@ -35,6 +35,8 @@ export default keyMirror({
     RECEIVED_NEW_POST: null,
 
     RECEIVED_POSTS: null,
+    RECEIVED_POSTS_AFTER: null,
+    RECEIVED_POSTS_BEFORE: null,
     RECEIVED_POSTS_IN_CHANNEL: null,
     RECEIVED_POSTS_IN_THREAD: null,
     RECEIVED_POSTS_SINCE: null,
