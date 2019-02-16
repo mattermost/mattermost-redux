@@ -547,3 +547,23 @@ export function disablePlugin(pluginId: string): ActionFunc {
         return {data: true};
     };
 }
+
+export function getOAuthAppInfo(clientId: String): ActionFunc {
+    return bindClientFunc({
+        clientFunc: Client4.getOAuthAppInfo,
+        params: [clientId],
+    });
+}
+
+export function allowOAuth2(params: URLSearchParams): ActionFunc {
+    const responseType = params.get('response_type');
+    const clientId = params.get('client_id');
+    const redirectUri = params.get('redirect_uri');
+    const state = params.get('state');
+    const scope = params.get('scope');
+
+    return bindClientFunc({
+        clientFunc: Client4.authorizeOAuthApp,
+        params: [responseType, clientId, redirectUri, state, scope],
+    });
+}

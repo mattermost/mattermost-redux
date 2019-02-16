@@ -1353,6 +1353,25 @@ export function clearUserAccessTokens(): ActionFunc {
     };
 }
 
+export function getAuthorizedApps(): ActionFunc {
+    return (dispatch: DispatchFunc, getState: GetStateFunc) => {
+        const currentUserId = getCurrentUserId(getState());
+        const getAuthAppsAction = bindClientFunc({
+            clientFunc: Client4.getAuthorizedOAuthApps,
+            params: [currentUserId],
+        });
+
+        return dispatch(getAuthAppsAction);
+    };
+}
+
+export function deauthorizeOAuthApp(appId: String): ActionFunc {
+    return bindClientFunc({
+        clientFunc: Client4.deauthorizeOAuthApp,
+        params: [appId],
+    });
+}
+
 export default {
     checkMfa,
     generateMfaSecret,

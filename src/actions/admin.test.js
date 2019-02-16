@@ -1037,4 +1037,30 @@ describe('Actions.Admin', () => {
         assert.ok(groups[key].mattermost_group_id === null);
         assert.ok(groups[key].has_syncables === null);
     });
+
+    it('getOAuthAppInfo', async () => {
+        const clientId = 'appId';
+        nock(Client4.getOAuthAppRoute(clientId)).
+            get('/info').
+            reply(200, OK_RESPONSE);
+
+        const {data, error} = await store.dispatch(Actions.getOAuthAppInfo(clientId));
+
+        assert.ok(data);
+        assert.deepStrictEqual(data, OK_RESPONSE);
+        assert.ok(!error);
+    });
+
+    it('allowOAuth2', async () => {
+        nock(Client4.getUrl()).
+            post('/oauth/authorize').
+            reply(200, OK_RESPONSE);
+
+        const params = new URLSearchParams('');
+        const {data, error} = await store.dispatch(Actions.allowOAuth2(params));
+
+        assert.ok(data);
+        assert.deepStrictEqual(data, OK_RESPONSE);
+        assert.ok(!error);
+    });
 });

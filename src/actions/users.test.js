@@ -1358,4 +1358,33 @@ describe('Actions.Users', () => {
 
         assert.ok(Object.values(myUserAccessTokens).length === 0);
     });
+
+    it('getAuthorizedApps', async () => {
+        const dispatch = store.dispatch;
+        const user = TestHelper.basicUser;
+        TestHelper.mockLogin();
+        await dispatch(Actions.login(user.email, user.password));
+
+        nock(Client4.getUserRoute(user.id)).
+            get('/oauth/apps/authorized').
+            reply(200, OK_RESPONSE);
+
+        const {data, error} = await dispatch(Actions.getAuthorizedApps());
+
+        assert.ok(data);
+        assert.deepStrictEqual(data, OK_RESPONSE);
+        assert.ok(!error);
+    });
+
+    it('deauthorizeOAuthApp', async () => {
+        nock(Client4.getUrl()).
+            post('/oauth/deauthorize').
+            reply(200, OK_RESPONSE);
+
+        const {data, error} = await store.dispatch(Actions.deauthorizeOAuthApp('appId'));
+
+        assert.ok(data);
+        assert.deepStrictEqual(data, OK_RESPONSE);
+        assert.ok(!error);
+    });
 });
