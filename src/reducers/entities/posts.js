@@ -1,7 +1,7 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
 
-import {PostTypes, SearchTypes, UserTypes, ChannelTypes} from 'action_types';
+import {PostTypes, SearchTypes, UserTypes, ChannelTypes, GeneralTypes} from 'action_types';
 import {Posts} from 'constants';
 import {comparePosts, combineSystemPosts} from 'utils/post_utils';
 
@@ -14,10 +14,14 @@ function handleReceivedPost(posts = {}, postsInChannel = {}, postsInThread = {},
         [post.id]: post,
     };
 
+    if (!postsInChannel[channelId]) {
+        return {posts: nextPosts, postsInChannel, postsInThread};
+    }
+
     let nextPostsInChannel = postsInChannel;
 
     // Only change postsInChannel if the order of the posts needs to change
-    if (!postsInChannel[channelId] || !postsInChannel[channelId].includes(post.id)) {
+    if (!postsInChannel[channelId].includes(post.id)) {
         // If we don't already have the post, assume it's the most recent one
         const postsForChannel = postsInChannel[channelId] || [];
 
@@ -85,6 +89,23 @@ function handleReceivedPosts(posts = {}, postsInChannel = {}, postsInThread = {}
     // Change the state only if we have new posts,
     // otherwise there's no need to create a new object for the same state.
     if (!Object.keys(newPosts).length) {
+        if (!postsInChannel[channelId]) {
+            // if postsInChannel does not exist for a channel then set an empty array as it has no posts
+            return {
+                posts,
+                postsInThread,
+                postsInChannel: {
+                    ...postsInChannel,
+                    [channelId]: [],
+                },
+            };
+        }
+        return {posts, postsInChannel, postsInThread};
+    }
+
+    // if PostTypes.RECEIVED_POSTS is called because of debounce action in webapp for new posts
+    // then check if postsInChannel exist for channel before adding them to the store
+    if (action.receivedNewPosts && !postsInChannel[channelId]) {
         return {posts, postsInChannel, postsInThread};
     }
 
@@ -585,7 +606,7 @@ export function reactions(state = {}, action) {
 }
 
 function storeReactionsForPost(state, post) {
-    if (!post.metadata) {
+    if (!post.metadata || !post.metadata.reactions) {
         return state;
     }
 
@@ -723,6 +744,23 @@ function messagesHistory(state = {}, action) {
     }
 }
 
+function expandedURLs(state = {}, action) {
+    switch (action.type) {
+    case GeneralTypes.REDIRECT_LOCATION_SUCCESS:
+        return {
+            ...state,
+            [action.url]: action.data.location,
+        };
+    case GeneralTypes.REDIRECT_LOCATION_FAILURE:
+        return {
+            ...state,
+            [action.url]: action.url,
+        };
+    default:
+        return state;
+    }
+}
+
 export default function(state = {}, action) {
     const {posts, postsInChannel, postsInThread} = handlePosts(state.posts, state.postsInChannel, state.postsInThread, action);
 
@@ -757,6 +795,8 @@ export default function(state = {}, action) {
 
         // History of posts and comments
         messagesHistory: messagesHistory(state.messagesHistory, action),
+
+        expandedURLs: expandedURLs(state.expandedURLs, action),
     };
 
     if (state.posts === nextState.posts && state.postsInChannel === nextState.postsInChannel &&

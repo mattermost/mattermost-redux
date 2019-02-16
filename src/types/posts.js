@@ -94,5 +94,6 @@ export type PostsState = {|
             post: number,
             comment: number
         |}
-    |}
+    |},
+    expandedURLs: {[string]: string},
 |};

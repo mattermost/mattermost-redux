@@ -1180,8 +1180,11 @@ function completePostReceive(post, websocketMessageProps) {
     return async (dispatch, getState) => {
         const state = getState();
         const rootPost = Selectors.getPost(state, post.root_id);
+        const postsInChannel = Selectors.getPostIdsInChannel(state, post.channel_id);
 
-        if (post.root_id && !rootPost) {
+        // skip calling getPostThread if there are no postsInChannel.
+        // This leads to having few posts in channel before the first visit.
+        if (post.root_id && !rootPost && postsInChannel && postsInChannel.length !== 0) {
             dispatch(getPostThread(post.root_id));
         }
 
