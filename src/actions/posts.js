@@ -4,21 +4,31 @@
 import {batchActions} from 'redux-batched-actions';
 
 import {Client4} from 'client';
-import {General, Preferences, Posts} from 'constants';
+import {General, Preferences, Posts, WebsocketEvents} from 'constants';
 import {PostTypes, FileTypes, IntegrationTypes} from 'action_types';
-import {getUsersByUsername} from 'selectors/entities/users';
+
+import {getCurrentChannelId, getMyChannelMember as getMyChannelMemberSelector} from 'selectors/entities/channels';
 import {getCustomEmojisByName as selectCustomEmojisByName} from 'selectors/entities/emojis';
-
-import * as Selectors from 'selectors/entities/posts';
 import {getConfig} from 'selectors/entities/general';
+import * as Selectors from 'selectors/entities/posts';
+import {getCurrentUserId, getUsersByUsername} from 'selectors/entities/users';
 
+import {getUserIdFromChannelName} from 'utils/channel_utils';
 import {parseNeededCustomEmojisFromText} from 'utils/emoji_utils';
+import {isFromWebhook, isSystemMessage, shouldIgnorePost} from 'utils/post_utils';
 
-import {bindClientFunc, forceLogoutIfNecessary} from './helpers';
-import {logError} from './errors';
-import {deletePreferences, savePreferences} from './preferences';
-import {getProfilesByIds, getProfilesByUsernames, getStatusesByIds} from './users';
+import {getMyChannelMember, markChannelAsUnread, markChannelAsRead, markChannelAsViewed} from './channels';
 import {systemEmojis, getCustomEmojiByName, getCustomEmojisByName} from './emojis';
+import {logError} from './errors';
+import {bindClientFunc, forceLogoutIfNecessary} from './helpers';
+
+import {
+    deletePreferences,
+    makeDirectChannelVisibleIfNecessary,
+    makeGroupMessageVisibleIfNecessary,
+    savePreferences,
+} from './preferences';
+import {getProfilesByIds, getProfilesByUsernames, getStatusesByIds} from './users';
 
 export function getPost(postId) {
     return async (dispatch, getState) => {
@@ -1143,6 +1153,95 @@ export function moveHistoryIndexForward(index) {
     };
 }
 
+export function handleNewPost(msg) {
+    return async (dispatch, getState) => {
+        const state = getState();
+        const currentUserId = getCurrentUserId(state);
+        const post = JSON.parse(msg.data.post);
+        const myChannelMember = getMyChannelMemberSelector(state, post.channel_id);
+        const websocketMessageProps = msg.data;
+
+        if (myChannelMember && Object.keys(myChannelMember).length === 0 && myChannelMember.constructor === 'Object') {
+            await dispatch(getMyChannelMember(post.channel_id));
+        }
+
+        dispatch(completePostReceive(post, websocketMessageProps));
+
+        if (msg.data.channel_type === General.DM_CHANNEL) {
+            const otherUserId = getUserIdFromChannelName(currentUserId, msg.data.channel_name);
+            dispatch(makeDirectChannelVisibleIfNecessary(otherUserId));
+        } else if (msg.data.channel_type === General.GM_CHANNEL) {
+            dispatch(makeGroupMessageVisibleIfNecessary(post.channel_id));
+        }
+    };
+}
+
+function completePostReceive(post, websocketMessageProps) {
+    return async (dispatch, getState) => {
+        const state = getState();
+        const rootPost = Selectors.getPost(state, post.root_id);
+        const postsInChannel = Selectors.getPostIdsInChannel(state, post.channel_id);
+
+        // skip calling getPostThread if there are no postsInChannel.
+        // This leads to having few posts in channel before the first visit.
+        if (post.root_id && !rootPost && postsInChannel && postsInChannel.length !== 0) {
+            dispatch(getPostThread(post.root_id));
+        }
+
+        dispatch(lastPostActions(post, websocketMessageProps));
+    };
+}
+
+function lastPostActions(post, websocketMessageProps) {
+    return async (dispatch, getState) => {
+        const state = getState();
+        const actions = [{
+            type: PostTypes.RECEIVED_POSTS,
+            data: {
+                order: [],
+                posts: {
+                    [post.id]: post,
+                },
+            },
+            channelId: post.channel_id,
+        }, {
+            type: WebsocketEvents.STOP_TYPING,
+            data: {
+                id: post.channel_id + post.root_id,
+                userId: post.user_id,
+                now: Date.now(),
+            },
+        }];
+
+        dispatch(batchActions(actions));
+
+        if (shouldIgnorePost(post)) {
+            return;
+        }
+
+        let markAsRead = false;
+        let markAsReadOnServer = false;
+        if (
+            post.user_id === getCurrentUserId(state) &&
+            !isSystemMessage(post) &&
+            !isFromWebhook(post)
+        ) {
+            markAsRead = true;
+            markAsReadOnServer = false;
+        } else if (post.channel_id === getCurrentChannelId(state)) {
+            markAsRead = true;
+            markAsReadOnServer = true;
+        }
+
+        if (markAsRead) {
+            dispatch(markChannelAsRead(post.channel_id, null, markAsReadOnServer));
+            dispatch(markChannelAsViewed(post.channel_id));
+        } else {
+            dispatch(markChannelAsUnread(websocketMessageProps.team_id, post.channel_id, websocketMessageProps.mentions));
+        }
+    };
+}
+
 export default {
     createPost,
     createPostImmediately,
@@ -1166,4 +1265,5 @@ export default {
     resetHistoryIndex,
     moveHistoryIndexBack,
     moveHistoryIndexForward,
+    handleNewPost,
 };
