@@ -32,11 +32,11 @@ export function getPostsInThread(state: GlobalState): RelationOneToMany<Post, Po
     return state.entities.posts.postsInThread;
 }
 
-export function getReactionsForPosts(state: GlobalState): RelationOneToOne<Post, Array<Reaction>> {
+export function getReactionsForPosts(state: GlobalState): RelationOneToOne<Post, {[string]: Reaction}> {
     return state.entities.posts.reactions;
 }
 
-export function makeGetReactionsForPost(): (GlobalState, $ID<Post>) => ?Array<Reaction> {
+export function makeGetReactionsForPost(): (GlobalState, $ID<Post>) => ?{[string]: Reaction} {
     return createSelector(
         getReactionsForPosts,
         (state: GlobalState, postId) => postId,
