@@ -326,7 +326,7 @@ export function getTeamStats(teamId: string): ActionFunc {
     });
 }
 
-export function addUserToTeamFromInvite(token: string, inviteId: string): ActionFunc {
+export function addUserToTeamFromInvite(token: string, inviteId: string, teamId: string): ActionFunc {
     return bindClientFunc({
         clientFunc: Client4.addToTeamFromInvite,
         onRequest: TeamTypes.ADD_TO_TEAM_FROM_INVITE_REQUEST,
@@ -335,6 +335,7 @@ export function addUserToTeamFromInvite(token: string, inviteId: string): Action
         params: [
             token,
             inviteId,
+            teamId,
         ],
     });
 }
@@ -529,6 +530,34 @@ export function joinTeam(inviteId: string, teamId: string): ActionFunc {
 
         dispatch({type: TeamTypes.JOIN_TEAM_SUCCESS, data: null}, getState);
         return {data: true};
+    };
+}
+
+export function joinTeamById(teamId: string): ActionFunc {
+    return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
+        dispatch({type: TeamTypes.JOIN_TEAM_REQUEST, data: null}, getState);
+
+        let membership;
+        try {
+            membership = await Client4.joinTeamById(teamId);
+        } catch (error) {
+            forceLogoutIfNecessary(error, dispatch, getState);
+            dispatch(batchActions([
+                {type: TeamTypes.JOIN_TEAM_FAILURE, error},
+                logError(error),
+            ]));
+            return {error};
+        }
+
+        getMyTeamUnreads()(dispatch, getState);
+
+        await Promise.all([
+            getTeam(teamId)(dispatch, getState),
+            getMyTeamMembers()(dispatch, getState),
+        ]);
+
+        dispatch({type: TeamTypes.JOIN_TEAM_SUCCESS, data: null}, getState);
+        return {data: membership};
     };
 }
 

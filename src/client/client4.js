@@ -296,7 +296,7 @@ export default class Client4 {
 
     // User Routes
 
-    createUser = async (user, token, inviteId) => {
+    createUser = async (user, token, inviteId, teamId) => {
         this.trackEvent('api', 'api_users_create');
 
         const queryParams = {};
@@ -307,6 +307,10 @@ export default class Client4 {
 
         if (inviteId) {
             queryParams.iid = inviteId;
+        }
+
+        if (teamId) {
+            queryParams.id = teamId;
         }
 
         return this.doFetch(
@@ -1025,6 +1029,14 @@ export default class Client4 {
 
     joinTeam = async (inviteId) => {
         const query = buildQueryString({invite_id: inviteId});
+        return this.doFetch(
+            `${this.getTeamsRoute()}/members/invite${query}`,
+            {method: 'post'}
+        );
+    };
+
+    joinTeamById = async (teamId) => {
+        const query = buildQueryString({team_id: teamId});
         return this.doFetch(
             `${this.getTeamsRoute()}/members/invite${query}`,
             {method: 'post'}
