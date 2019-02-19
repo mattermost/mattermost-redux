@@ -174,5 +174,26 @@ describe('Actions.General', () => {
             // Should not call the API on an old server
             assert.equal(mock.isDone(), false);
         });
+
+        it('should save the correct location', async () => {
+            store.dispatch({type: GeneralTypes.RECEIVED_SERVER_VERSION, data: '5.3.0'});
+
+            nock(Client4.getBaseRoute()).
+                get('/redirect_location').
+                query({url: 'http://examp.le'}).
+                reply(200, '{"location": "https://example.com"}');
+
+            // Save the found URL if it finds one
+            await store.dispatch(Actions.getRedirectLocation('http://examp.le'));
+
+            const existingURL = store.getState().entities.posts.expandedURLs['http://examp.le'];
+            assert.equal(existingURL, 'https://example.com');
+
+            // Save the found URL if it finds one
+            await store.dispatch(Actions.getRedirectLocation('http://nonexisting.url'));
+
+            const nonexistingURL = store.getState().entities.posts.expandedURLs['http://nonexisting.url'];
+            assert.equal(nonexistingURL, 'http://nonexisting.url');
+        });
     });
 });
