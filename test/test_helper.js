@@ -65,6 +65,7 @@ class TestHelper {
             last_name: this.generateId(),
             create_at: Date.now(),
             delete_at: 0,
+            roles: 'system_user',
         };
     };
 

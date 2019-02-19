@@ -3,11 +3,12 @@
 
 import {createSelector} from 'reselect';
 
-import {General} from 'constants';
+import {General, Permissions} from 'constants';
 
 import {getConfig, getCurrentUrl} from 'selectors/entities/general';
+import {haveISystemPermission} from 'selectors/entities/roles';
 
-import {createIdsSelector} from 'utils/helpers';
+import {createIdsSelector, isMinimumServerVersion} from 'utils/helpers';
 import {isTeamAdmin} from 'utils/user_utils';
 
 export function getCurrentTeamId(state) {
@@ -137,14 +138,75 @@ export function getTeamMember(state, teamId, userId) {
     return null;
 }
 
-export const getJoinableTeamIds = createIdsSelector(
+export const getListableTeamIds = createIdsSelector(
     getTeams,
     getTeamMemberships,
-    (teams, myMembers) => {
+    (state) => haveISystemPermission(state, {permission: Permissions.LIST_PUBLIC_TEAMS}),
+    (state) => haveISystemPermission(state, {permission: Permissions.LIST_PRIVATE_TEAMS}),
+    (state) => state.entities.general.serverVersion,
+    (teams, myMembers, canListPublicTeams, canListPrivateTeams, serverVersion) => {
         return Object.keys(teams).filter((id) => {
             const team = teams[id];
             const member = myMembers[id];
-            return team.delete_at === 0 && team.allow_open_invite && !member;
+            let canList = team.allow_open_invite;
+            if (isMinimumServerVersion(serverVersion, 5, 10, 0) ||
+                   (serverVersion.indexOf('dev') !== -1 && isMinimumServerVersion(serverVersion, 5, 8, 0)) ||
+                   (serverVersion.match(/^5.8.\d.\d\d\d\d.*$/) !== null && isMinimumServerVersion(serverVersion, 5, 8, 0))) {
+                canList = (canListPrivateTeams && !team.allow_open_invite) || (canListPublicTeams && team.allow_open_invite);
+            }
+            return team.delete_at === 0 && canList && !member;
+        });
+    }
+);
+
+export const getListableTeams = createSelector(
+    getTeams,
+    getListableTeamIds,
+    (teams, listableTeamIds) => {
+        return listableTeamIds.map((id) => teams[id]);
+    }
+);
+
+export const getSortedListableTeams = createSelector(
+    getTeams,
+    getListableTeamIds,
+    (state, locale) => locale,
+    (teams, listableTeamIds, locale) => {
+        const listableTeams = {};
+
+        for (const id of listableTeamIds) {
+            listableTeams[id] = teams[id];
+        }
+
+        function sortTeams(a, b) {
+            if (a.display_name !== b.display_name) {
+                return a.display_name.toLowerCase().localeCompare(b.display_name.toLowerCase(), locale || General.DEFAULT_LOCALE, {numeric: true});
+            }
+
+            return a.name.toLowerCase().localeCompare(b.name.toLowerCase(), locale || General.DEFAULT_LOCALE, {numeric: true});
+        }
+
+        return Object.values(listableTeams).sort(sortTeams);
+    }
+);
+
+export const getJoinableTeamIds = createIdsSelector(
+    getTeams,
+    getTeamMemberships,
+    (state) => haveISystemPermission(state, {permission: Permissions.JOIN_PUBLIC_TEAMS}),
+    (state) => haveISystemPermission(state, {permission: Permissions.JOIN_PRIVATE_TEAMS}),
+    (state) => state.entities.general.serverVersion,
+    (teams, myMembers, canJoinPublicTeams, canJoinPrivateTeams, serverVersion) => {
+        return Object.keys(teams).filter((id) => {
+            const team = teams[id];
+            const member = myMembers[id];
+            let canJoin = team.allow_open_invite;
+            if (isMinimumServerVersion(serverVersion, 5, 10, 0) ||
+                   (serverVersion.indexOf('dev') !== -1 && isMinimumServerVersion(serverVersion, 5, 8, 0)) ||
+                   (serverVersion.match(/^5.8.\d.\d\d\d\d.*$/) !== null && isMinimumServerVersion(serverVersion, 5, 8, 0))) {
+                canJoin = (canJoinPrivateTeams && !team.allow_open_invite) || (canJoinPublicTeams && team.allow_open_invite);
+            }
+            return team.delete_at === 0 && canJoin && !member;
         });
     }
 );
@@ -162,10 +224,10 @@ export const getSortedJoinableTeams = createSelector(
     getJoinableTeamIds,
     (state, locale) => locale,
     (teams, joinableTeamIds, locale) => {
-        const openTeams = {};
+        const joinableTeams = {};
 
         for (const id of joinableTeamIds) {
-            openTeams[id] = teams[id];
+            joinableTeams[id] = teams[id];
         }
 
         function sortTeams(a, b) {
@@ -176,7 +238,7 @@ export const getSortedJoinableTeams = createSelector(
             return a.name.toLowerCase().localeCompare(b.name.toLowerCase(), locale || General.DEFAULT_LOCALE, {numeric: true});
         }
 
-        return Object.values(openTeams).sort(sortTeams);
+        return Object.values(joinableTeams).sort(sortTeams);
     }
 );
 
