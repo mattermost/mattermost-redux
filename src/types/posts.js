@@ -83,7 +83,7 @@ export type PostsState = {|
     posts: IDMappedObjects<Post>,
     postsInChannel: RelationOneToMany<Channel, Post>,
     postsInThread: RelationOneToMany<Post, Post>,
-    reactions: RelationOneToOne<Post, Array<Reaction>>,
+    reactions: RelationOneToOne<Post, {[string]: Reaction}>,
     openGraph: RelationOneToOne<Post, Object>,
     sendingPostIds: Array<string>,
     selectedPostId: string,

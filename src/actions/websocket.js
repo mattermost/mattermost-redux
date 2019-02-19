@@ -1,8 +1,6 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
 
-import {batchActions} from 'redux-batched-actions';
-
 import {Client4} from 'client';
 import websocketClient from 'client/websocket_client';
 import {
@@ -15,31 +13,16 @@ import {
     fetchMyChannelsAndMembers,
     getChannelAndMyMember,
     getChannelStats,
-    updateChannelHeader,
-    updateChannelPurpose,
-    markChannelAsUnread,
     markChannelAsRead,
-    selectChannel,
-    markChannelAsViewed,
 } from './channels';
 import {
     getPost,
     getPosts,
-    getPostsSince,
     getProfilesAndStatusesForPosts,
     getCustomEmojiForReaction,
+    handleNewPost,
 } from './posts';
-import {
-    getMyPreferences,
-    makeDirectChannelVisibleIfNecessary,
-    makeGroupMessageVisibleIfNecessary,
-} from './preferences';
-import {
-    getLicenseConfig,
-    getClientConfig,
-} from './general';
-
-import {getTeam, getTeams, getMyTeams, getMyTeamMembers, getMyTeamUnreads} from './teams';
+import {getTeam, getMyTeamUnreads} from './teams';
 
 import {
     ChannelTypes,
@@ -53,15 +36,15 @@ import {
     AdminTypes,
     IntegrationTypes,
 } from 'action_types';
-import {General, WebsocketEvents, Preferences, Posts} from 'constants';
+import {General, WebsocketEvents, Preferences} from 'constants';
 
 import {getAllChannels, getChannel, getChannelsInTeam, getCurrentChannelId, getCurrentChannelStats} from 'selectors/entities/channels';
 import {getConfig} from 'selectors/entities/general';
-import {getAllPosts, getPostIdsInChannel} from 'selectors/entities/posts';
+import {getAllPosts} from 'selectors/entities/posts';
+import {getDirectShowPreferences} from 'selectors/entities/preferences';
 import {getCurrentTeamId, getTeamMemberships, getTeams as getTeamsSelector} from 'selectors/entities/teams';
-import {getCurrentUser, getCurrentUserId, getUsers, getUserStatuses, getStatusForUserId} from 'selectors/entities/users';
-import {getUserIdFromChannelName} from 'utils/channel_utils';
-import {isFromWebhook, isSystemMessage, getLastCreateAt, shouldIgnorePost} from 'utils/post_utils';
+import {getCurrentUser, getCurrentUserId, getUsers, getUserStatuses} from 'selectors/entities/users';
+import {fromAutoResponder} from 'utils/post_utils';
 import EventEmitter from 'utils/event_emitter';
 
 let doDispatch;
@@ -132,36 +115,32 @@ function doReconnect() {
         const currentChannelId = getCurrentChannelId(state);
         const currentUserId = getCurrentUserId(state);
 
-        // We try and get the posts for the current channel as soon as possible
-        if (currentChannelId) {
-            dispatch(markChannelAsRead(currentChannelId));
-            dispatch(loadPostsHelper(currentChannelId));
-        }
-
-        dispatch(getLicenseConfig());
-        dispatch(getClientConfig());
-        dispatch(getMyTeams());
-        dispatch(getMyTeamMembers());
-        dispatch(getMyTeamUnreads());
-        dispatch(getMyPreferences());
-        dispatch(loadProfilesForDirect());
-        dispatch(getTeams());
-
         if (currentTeamId) {
-            dispatch(fetchMyChannelsAndMembers(currentTeamId)).then(({data}) => {
-                if (data && currentChannelId) {
-                    const {channels, members} = data;
-                    const stillMemberOfCurrentChannel = members.find((m) => m.channel_id === currentChannelId);
+            const dmPrefs = getDirectShowPreferences(state);
+            const statusesToLoad = {
+                [currentUserId]: true,
+            };
 
+            for (const pref of dmPrefs) {
+                if (pref.value === 'true') {
+                    statusesToLoad[pref.name] = true;
+                }
+            }
+
+            dispatch(getStatusesByIds(Object.keys(statusesToLoad)));
+            dispatch(fetchMyChannelsAndMembers(currentTeamId)).then(({data}) => {
+                dispatch(loadProfilesForDirect());
+
+                if (data && data.members) {
+                    const stillMemberOfCurrentChannel = data.members.find((m) => m.channel_id === currentChannelId);
                     if (!stillMemberOfCurrentChannel) {
-                        const defaultChannel = channels.find((c) => c.team_id === currentTeamId && c.name === General.DEFAULT_CHANNEL);
-                        if (defaultChannel) {
-                            EventEmitter.emit(General.DEFAULT_CHANNEL, defaultChannel.display_name);
-                            selectChannel(defaultChannel.id)(dispatch, getState);
-                        }
+                        EventEmitter.emit(General.SWITCH_TO_DEFAULT_CHANNEL, currentTeamId);
                     }
                 }
             });
+
+            dispatch(getPosts(currentChannelId));
+            dispatch(getMyTeamUnreads());
 
             const myTeamMembers = getTeamMemberships(getState());
             if (!myTeamMembers[currentTeamId]) {
@@ -172,7 +151,7 @@ function doReconnect() {
                         team_id: currentTeamId,
                     },
                 };
-                handleLeaveTeamEvent(newMsg, dispatch, getState);
+                dispatch(handleLeaveTeamEvent(newMsg));
             }
         }
 
@@ -311,112 +290,16 @@ function handleEvent(msg) {
 
 function handleNewPostEvent(msg) {
     return async (dispatch, getState) => {
-        const state = getState();
-        const currentChannelId = getCurrentChannelId(state);
-        const users = getUsers(state);
-        const posts = getAllPosts(state);
         const post = JSON.parse(msg.data.post);
-        const userId = post.user_id;
-        const currentUserId = getCurrentUserId(state);
-        const status = getStatusForUserId(state, userId);
 
+        dispatch(handleNewPost(msg));
         getProfilesAndStatusesForPosts([post], dispatch, getState);
 
-        // getProfilesAndStatusesForPosts only gets the status if it doesn't exist, but we
-        // also want it if the user does not appear to be online
-        if (userId !== currentUserId && status && status !== General.ONLINE) {
-            dispatch(getStatusesByIds([userId]));
-        }
-
-        switch (post.type) {
-        case Posts.POST_TYPES.HEADER_CHANGE:
-            dispatch(updateChannelHeader(post.channel_id, post.props.new_header));
-            break;
-        case Posts.POST_TYPES.PURPOSE_CHANGE:
-            dispatch(updateChannelPurpose(post.channel_id, post.props.new_purpose));
-            break;
-        }
-
-        const postsInChannel = getPostIdsInChannel(getState(), post.channel_id);
-
-        // skip calling getPostThread if there are no postsInChannel.
-        // This leads to having few posts in channel before the first visit.
-        if (post.root_id && posts && !posts[post.root_id] && postsInChannel && postsInChannel.length !== 0) {
-            let data;
-            try {
-                data = await Client4.getPostThread(post.root_id);
-            } catch (e) {
-                console.warn('failed to get thread for new post event', e); // eslint-disable-line no-console
-            }
-
-            if (data) {
-                const rootUserId = data.posts[post.root_id].user_id;
-                const rootStatus = getStatusForUserId(state, rootUserId);
-                if (!users[rootUserId] && rootUserId !== currentUserId) {
-                    dispatch(getProfilesByIds([rootUserId]));
-                }
-
-                if (rootStatus !== General.ONLINE) {
-                    dispatch(getStatusesByIds([rootUserId]));
-                }
-
-                dispatch({
-                    type: PostTypes.RECEIVED_POSTS,
-                    data,
-                    channelId: post.channel_id,
-                }, getState);
-            }
-        }
-
-        const actions = [{
-            type: WebsocketEvents.STOP_TYPING,
-            data: {
-                id: post.channel_id + post.root_id,
-                userId: post.user_id,
-                now: Date.now(),
-            },
-        }];
-
-        if (!posts[post.id]) {
-            if (msg.data.channel_type === General.DM_CHANNEL) {
-                const otherUserId = getUserIdFromChannelName(currentUserId, msg.data.channel_name);
-                dispatch(makeDirectChannelVisibleIfNecessary(otherUserId));
-            } else if (msg.data.channel_type === General.GM_CHANNEL) {
-                dispatch(makeGroupMessageVisibleIfNecessary(post.channel_id));
-            }
-
-            actions.push({
-                type: PostTypes.RECEIVED_NEW_POST,
-                data: {
-                    ...post,
-                },
+        if (post.user_id !== getCurrentUserId(getState()) && !fromAutoResponder(post)) {
+            dispatch({
+                type: UserTypes.RECEIVED_STATUSES,
+                data: [{user_id: post.user_id, status: General.ONLINE}],
             });
-        }
-
-        dispatch(batchActions(actions));
-
-        if (shouldIgnorePost(post)) {
-            // if the post type is in the ignore list we'll do nothing with the read state
-            return;
-        }
-
-        let markAsRead = false;
-        let markAsReadOnServer = false;
-        if (userId === currentUserId && !isSystemMessage(post) && !isFromWebhook(post)) {
-            // In case the current user posted the message and that message wasn't triggered by a system message
-            markAsRead = true;
-            markAsReadOnServer = false;
-        } else if (post.channel_id === currentChannelId) {
-            // if the post is for the channel that the user is currently viewing we'll mark the channel as read
-            markAsRead = true;
-            markAsReadOnServer = true;
-        }
-
-        if (markAsRead) {
-            dispatch(markChannelAsRead(post.channel_id, null, markAsReadOnServer));
-            dispatch(markChannelAsViewed(post.channel_id));
-        } else {
-            dispatch(markChannelAsUnread(msg.data.team_id, post.channel_id, msg.data.mentions));
         }
     };
 }
@@ -537,11 +420,8 @@ function handleUserRemovedEvent(msg) {
             }
 
             if (msg.data.channel_id === currentChannelId) {
-                const defaultChannel = Object.values(channels).find((c) => c.team_id === currentTeamId && c.name === General.DEFAULT_CHANNEL);
-
                 // emit the event so the client can change his own state
-                EventEmitter.emit(General.DEFAULT_CHANNEL, defaultChannel.display_name);
-                dispatch(selectChannel(defaultChannel.id));
+                EventEmitter.emit(General.SWITCH_TO_DEFAULT_CHANNEL, currentTeamId);
             }
         } else if (msg.data.channel_id === currentChannelId) {
             dispatch(getChannelStats(currentTeamId, currentChannelId));
@@ -685,12 +565,13 @@ function handleChannelConvertedEvent(msg) {
 
 function handleChannelViewedEvent(msg) {
     return (dispatch, getState) => {
+        const state = getState();
         const {channel_id: channelId} = msg.data;
-        const currentChannelId = getCurrentChannelId(getState());
+        const currentChannelId = getCurrentChannelId(state);
+        const currentUserId = getCurrentUserId(state);
 
-        if (channelId !== currentChannelId) {
+        if (channelId !== currentChannelId && currentUserId === msg.broadcast.user_activity) {
             dispatch(markChannelAsRead(channelId, null, false));
-            dispatch(markChannelAsViewed(channelId));
         }
     };
 }
@@ -901,26 +782,6 @@ function getAddedDmUsersIfNecessary(preferences) {
 
         if (needStatuses.length > 0) {
             dispatch(getStatusesByIds(needStatuses));
-        }
-    };
-}
-
-function loadPostsHelper(channelId) {
-    return (dispatch, getState) => {
-        const state = getState();
-        const posts = getAllPosts(state);
-        const postsIds = getPostIdsInChannel(state, channelId);
-
-        let latestPostTime = 0;
-        if (postsIds && postsIds.length) {
-            const postsForChannel = postsIds.map((id) => posts[id]);
-            latestPostTime = getLastCreateAt(postsForChannel);
-        }
-
-        if (latestPostTime === 0) {
-            dispatch(getPosts(channelId));
-        } else {
-            dispatch(getPostsSince(channelId, latestPostTime));
         }
     };
 }
