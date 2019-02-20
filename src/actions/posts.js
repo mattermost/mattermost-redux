@@ -1089,10 +1089,14 @@ export function getOpenGraphMetadata(url) {
 }
 
 export function doPostAction(postId, actionId, selectedOption = '') {
+    return doPostActionWithCookie(postId, actionId, '', selectedOption);
+}
+
+export function doPostActionWithCookie(postId, actionId, actionCookie, selectedOption = '') {
     return async (dispatch, getState) => {
         let data;
         try {
-            data = await Client4.doPostAction(postId, actionId, selectedOption);
+            data = await Client4.doPostActionWithCookie(postId, actionId, actionCookie, selectedOption);
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch, getState);
             dispatch(logError(error));
@@ -1105,6 +1109,7 @@ export function doPostAction(postId, actionId, selectedOption = '') {
                 data: data.trigger_id,
             });
         }
+
         return {data};
     };
 }

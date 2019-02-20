@@ -1577,15 +1577,25 @@ export default class Client4 {
     };
 
     doPostAction = async (postId, actionId, selectedOption = '') => {
+        return this.doPostActionWithCookie(postId, actionId, '', selectedOption);
+    };
+
+    doPostActionWithCookie = async (postId, actionId, actionCookie, selectedOption = '') => {
         if (selectedOption) {
             this.trackEvent('api', 'api_interactive_messages_menu_selected');
         } else {
             this.trackEvent('api', 'api_interactive_messages_button_clicked');
         }
 
+        const msg = {
+            selected_option: selectedOption,
+        };
+        if (actionCookie !== '') {
+            msg.cookie = actionCookie;
+        }
         return this.doFetch(
             `${this.getPostRoute(postId)}/actions/${encodeURIComponent(actionId)}`,
-            {method: 'post', body: JSON.stringify({selected_option: selectedOption})}
+            {method: 'post', body: JSON.stringify(msg)}
         );
     };
 
