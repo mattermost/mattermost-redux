@@ -1017,8 +1017,8 @@ describe('Reducers.posts', () => {
             const state = deepFreeze({});
             const action = {
                 type: GeneralTypes.REDIRECT_LOCATION_SUCCESS,
-                url: 'a',
                 data: {
+                    url: 'a',
                     location: 'b',
                 },
             };
@@ -1032,7 +1032,9 @@ describe('Reducers.posts', () => {
             const state = deepFreeze({});
             const action = {
                 type: GeneralTypes.REDIRECT_LOCATION_FAILURE,
-                url: 'b',
+                data: {
+                    url: 'b',
+                },
             };
             const nextState = postsReducer(state, action);
             assert.notEqual(state, nextState);

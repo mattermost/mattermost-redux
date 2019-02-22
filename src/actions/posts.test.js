@@ -1598,6 +1598,15 @@ describe('Actions.Posts', () => {
         assert.deepEqual(data, {});
     });
 
+    it('doPostActionWithCookie', async () => {
+        nock(Client4.getBaseRoute()).
+            post('/posts/posth67ja7ntdkek6g13dp3wka/actions/action7ja7ntdkek6g13dp3wka').
+            reply(200, {});
+
+        const {data} = await Actions.doPostActionWithCookie('posth67ja7ntdkek6g13dp3wka', 'action7ja7ntdkek6g13dp3wka', '', 'option')(store.dispatch, store.getState);
+        assert.deepEqual(data, {});
+    });
+
     it('addMessageIntoHistory', async () => {
         const {dispatch, getState} = store;
 
