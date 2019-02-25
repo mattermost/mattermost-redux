@@ -2277,8 +2277,8 @@ describe('expandedURLs', () => {
         const state = deepFreeze({});
         const action = {
             type: GeneralTypes.REDIRECT_LOCATION_SUCCESS,
-            url: 'a',
             data: {
+                url: 'a',
                 location: 'b',
             },
         };
@@ -2294,7 +2294,9 @@ describe('expandedURLs', () => {
         const state = deepFreeze({});
         const action = {
             type: GeneralTypes.REDIRECT_LOCATION_FAILURE,
-            url: 'b',
+            data: {
+                url: 'b',
+            },
         };
 
         const nextState = reducers.expandedURLs(state, action);

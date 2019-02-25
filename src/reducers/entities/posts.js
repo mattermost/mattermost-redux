@@ -901,12 +901,12 @@ export function expandedURLs(state = {}, action) {
     case GeneralTypes.REDIRECT_LOCATION_SUCCESS:
         return {
             ...state,
-            [action.url]: action.data.location,
+            [action.data.url]: action.data.location,
         };
     case GeneralTypes.REDIRECT_LOCATION_FAILURE:
         return {
             ...state,
-            [action.url]: action.url,
+            [action.data.url]: action.data.url,
         };
     default:
         return state;
@@ -957,7 +957,8 @@ export default function(state = {}, action) {
         state.currentFocusedPostId === nextState.currentFocusedPostId &&
         state.reactions === nextState.reactions &&
         state.openGraph === nextState.openGraph &&
-        state.messagesHistory === nextState.messagesHistory) {
+        state.messagesHistory === nextState.messagesHistory &&
+        state.expandedURLs === nextState.expandedURLs) {
         // None of the children have changed so don't even let the parent object change
         return state;
     }
