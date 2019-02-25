@@ -125,6 +125,89 @@ describe('Reducers.posts', () => {
         });
     });
 
+    describe('RECEIVED_NEW_POST for a previous pending post', () => {
+        it('should remove unneeded metadata', () => {
+            const pendingPostId = 'pending_post_id';
+            const state = deepFreeze({
+                posts: {},
+                postsInChannel: {},
+            });
+            const action = {
+                type: PostTypes.RECEIVED_NEW_POST,
+                data: {
+                    id: pendingPostId,
+                    pending_post_id: pendingPostId,
+                    metadata: {
+                        emojis: [{name: 'emoji'}],
+                        files: [{id: 'file', post_id: 'post'}],
+                    },
+                },
+            };
+
+            let nextState = postsReducer(state, action);
+
+            assert.deepEqual(nextState.posts, {
+                pending_post_id: {
+                    id: pendingPostId,
+                    pending_post_id: pendingPostId,
+                    metadata: {},
+                },
+            });
+
+            const action2 = {
+                type: PostTypes.RECEIVED_NEW_POST,
+                data: {
+                    id: 'post',
+                    pending_post_id: pendingPostId,
+                    metadata: {
+                        emojis: [{name: 'emoji'}],
+                        files: [{id: 'file', post_id: 'post'}],
+                    },
+                },
+            };
+
+            nextState = postsReducer(state, action2);
+
+            assert.deepEqual(nextState.posts, {
+                post: {
+                    id: 'post',
+                    pending_post_id: pendingPostId,
+                    metadata: {},
+                },
+            });
+        });
+
+        it('should add postId to postsInChannel when postsInChannel[channelId] is set', () => {
+            const state = deepFreeze({
+                posts: {},
+                postsInChannel: {
+                    channelId: [],
+                },
+            });
+            const post = {
+                id: 'postId',
+                channel_id: 'channelId',
+            };
+            const action = {
+                type: PostTypes.RECEIVED_NEW_POST,
+                data: post,
+            };
+
+            const nextState = postsReducer(state, action);
+
+            assert.deepEqual(nextState.posts, {
+                postId: {
+                    id: 'postId',
+                    channel_id: 'channelId',
+                },
+            });
+
+            assert.deepEqual(nextState.postsInChannel, {
+                channelId: ['postId'],
+            });
+        });
+    });
+
     describe('RECEIVED_POSTS', () => {
         it('should remove unneeded metadata', () => {
             const state = deepFreeze({
