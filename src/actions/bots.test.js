@@ -1,0 +1,131 @@
+// Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
+// See LICENSE.txt for license information.
+
+import assert from 'assert';
+import nock from 'nock';
+
+import * as BotActions from 'actions/bots';
+import {Client4} from 'client';
+
+import TestHelper from 'test/test_helper';
+import configureStore from 'test/test_store';
+
+describe('Actions.Bots', () => {
+    let store;
+    beforeAll(async () => {
+        await TestHelper.initBasic(Client4);
+    });
+
+    beforeEach(async () => {
+        store = await configureStore();
+    });
+
+    afterAll(async () => {
+        await TestHelper.tearDown();
+    });
+
+    it('loadBots', async () => {
+        const bots = [TestHelper.fakeBot()];
+        nock(Client4.getBotsRoute()).
+            get('').
+            query(true).
+            reply(201, bots);
+
+        await BotActions.loadBots()(store.dispatch, store.getState);
+
+        const state = store.getState();
+        const botsResult = state.entities.bots.accounts;
+        assert.equal(bots.length, Object.values(botsResult).length);
+    });
+
+    it('loadBot', async () => {
+        const bot = TestHelper.fakeBot();
+        nock(Client4.getBotRoute(bot.user_id)).
+            get('').
+            query(true).
+            reply(201, bot);
+
+        await BotActions.loadBot(bot.user_id)(store.dispatch, store.getState);
+
+        const state = store.getState();
+        const botsResult = state.entities.bots.accounts[bot.user_id];
+        assert.equal(bot.username, botsResult.username);
+    });
+
+    it('createBot', async () => {
+        const bot = TestHelper.fakeBot();
+        nock(Client4.getBotRoute()).
+            post('').
+            reply(200, bot);
+        await BotActions.createBot(bot)(store.dispatch, store.getState);
+
+        const state = store.getState();
+        const botsResult = state.entities.bots.accounts[bot.user_id];
+        assert.equal(bot.username, botsResult.username);
+    });
+
+    it('patchBot', async () => {
+        const bot = TestHelper.fakeBot();
+        nock(Client4.getBotRoute()).
+            post('').
+            reply(200, bot);
+        await BotActions.createBot(bot)(store.dispatch, store.getState);
+
+        bot.username = 'mynewusername';
+
+        nock(Client4.getBotRoute(bot.user_id)).
+            put('').
+            reply(200, bot);
+        await BotActions.patchBot(bot.user_id, bot)(store.dispatch, store.getState);
+
+        const state = store.getState();
+        const botsResult = state.entities.bots.accounts[bot.user_id];
+        assert.equal(bot.username, botsResult.username);
+    });
+
+    it('disableBot', async () => {
+        const bot = TestHelper.fakeBot();
+        nock(Client4.getBotRoute()).
+            post('').
+            reply(200, bot);
+        await BotActions.createBot(bot)(store.dispatch, store.getState);
+
+        bot.delete_at = 1507840900065;
+        nock(Client4.getBotRoute(bot.user_id)).
+            post('/disable').
+            reply(200, bot);
+        await BotActions.disableBot(bot.user_id)(store.dispatch, store.getState);
+
+        const state = store.getState();
+        const botsResult = state.entities.bots.accounts[bot.user_id];
+        assert.equal(bot.delete_at, botsResult.delete_at);
+
+        bot.delete_at = 0;
+        nock(Client4.getBotRoute(bot.user_id)).
+            post('/enable').
+            reply(200, bot);
+        await BotActions.enableBot(bot.user_id)(store.dispatch, store.getState);
+
+        const state2 = store.getState();
+        const botsResult2 = state2.entities.bots.accounts[bot.user_id];
+        assert.equal(bot.delete_at, botsResult2.delete_at);
+    });
+
+    it('assignBot', async () => {
+        const bot = TestHelper.fakeBot();
+        nock(Client4.getBotRoute()).
+            post('').
+            reply(200, bot);
+        await BotActions.createBot(bot)(store.dispatch, store.getState);
+
+        bot.owner_id = TestHelper.generateId();
+        nock(Client4.getBotRoute(bot.user_id)).
+            post('/assign/' + bot.owner_id).
+            reply(200, bot);
+        await BotActions.assignBot(bot.user_id, bot.owner_id)(store.dispatch, store.getState);
+
+        const state = store.getState();
+        const botsResult = state.entities.bots.accounts[bot.user_id];
+        assert.equal(bot.owner_id, botsResult.owner_id);
+    });
+});

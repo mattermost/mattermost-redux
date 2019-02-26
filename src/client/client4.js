@@ -260,6 +260,14 @@ export default class Client4 {
         return `${this.getBaseRoute()}/redirect_location`;
     }
 
+    getBotsRoute() {
+        return `${this.getBaseRoute()}/bots`;
+    }
+
+    getBotRoute(botUserId) {
+        return `${this.getBotsRoute()}/${botUserId}`;
+    }
+
     getOptions(options) {
         const newOptions = Object.assign({}, options);
 
@@ -2584,6 +2592,71 @@ export default class Client4 {
         const url = `${this.getRedirectLocationRoute()}${buildQueryString({url: urlParam})}`;
         return this.doFetch(url, {method: 'get'});
     };
+
+    // Bot Routes
+
+    createBot = async (bot) => {
+        return this.doFetch(
+            `${this.getBotRoute()}`,
+            {method: 'post', body: JSON.stringify(bot)}
+        );
+    }
+
+    patchBot = async (botUserId, botPatch) => {
+        return this.doFetch(
+            `${this.getBotRoute(botUserId)}`,
+            {method: 'put', body: JSON.stringify(botPatch)}
+        );
+    }
+
+    getBot = async (botUserId) => {
+        return this.doFetch(
+            `${this.getBotRoute(botUserId)}`,
+            {method: 'get'}
+        );
+    }
+
+    getBots = async (page = 0, perPage = PER_PAGE_DEFAULT) => {
+        return this.doFetch(
+            `${this.getBotsRoute()}${buildQueryString({page, per_page: perPage})}`,
+            {method: 'get'}
+        );
+    }
+
+    getBotsIncludeDeleted = async (page = 0, perPage = PER_PAGE_DEFAULT) => {
+        return this.doFetch(
+            `${this.getBotsRoute()}${buildQueryString({include_deleted: true, page, per_page: perPage})}`,
+            {method: 'get'}
+        );
+    }
+
+    getBotsOrphaned = async (page = 0, perPage = PER_PAGE_DEFAULT) => {
+        return this.doFetch(
+            `${this.getBotsRoute()}${buildQueryString({only_orphaned: true, page, per_page: perPage})}`,
+            {method: 'get'}
+        );
+    }
+
+    disableBot = async (botUserId) => {
+        return this.doFetch(
+            `${this.getBotRoute(botUserId)}/disable`,
+            {method: 'post'}
+        );
+    }
+
+    enableBot = async (botUserId) => {
+        return this.doFetch(
+            `${this.getBotRoute(botUserId)}/enable`,
+            {method: 'post'}
+        );
+    }
+
+    assignBot = async (botUserId, newOwnerId) => {
+        return this.doFetch(
+            `${this.getBotRoute(botUserId)}/assign/${newOwnerId}`,
+            {method: 'post'}
+        );
+    }
 
     // Client Helpers
 

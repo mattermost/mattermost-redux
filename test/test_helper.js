@@ -301,6 +301,18 @@ class TestHelper {
         };
     };
 
+    fakeBot = () => {
+        return {
+            user_id: this.generateId(),
+            username: this.generateId(),
+            display_name: 'Fake bot',
+            owner_id: this.generateId(),
+            create_at: 1507840900004,
+            update_at: 1507840900004,
+            delete_at: 0,
+        };
+    }
+
     mockLogin = () => {
         nock(this.basicClient4.getUsersRoute()).
             post('/login').

@@ -20,6 +20,7 @@ import SearchTypes from './search';
 import RoleTypes from './roles';
 import SchemeTypes from './schemes';
 import GroupTypes from './groups';
+import BotTypes from './bots';
 
 export {
     ErrorTypes,
@@ -40,4 +41,5 @@ export {
     RoleTypes,
     SchemeTypes,
     GroupTypes,
+    BotTypes,
 };
