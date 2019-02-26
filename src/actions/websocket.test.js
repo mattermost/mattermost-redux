@@ -7,6 +7,7 @@ import {Server, WebSocket as MockWebSocket} from 'mock-socket';
 
 import * as Actions from 'actions/websocket';
 import * as ChannelActions from 'actions/channels';
+import * as PostActions from 'actions/posts';
 import * as TeamActions from 'actions/teams';
 
 import {Client4} from 'client';
@@ -80,7 +81,7 @@ describe('Actions.Websocket', () => {
         post.channel_id = TestHelper.basicChannel.id;
 
         post.id = '71k8gz5ompbpfkrzaxzodffj8w';
-        store.dispatch({type: PostTypes.RECEIVED_POST, data: post});
+        store.dispatch(PostActions.receivedPost(post));
         mockServer.emit('message', JSON.stringify({event: WebsocketEvents.POST_DELETED, data: {post: `{"id": "71k8gz5ompbpfkrzaxzodffj8w","create_at": 1508245311774,"update_at": 1508247709215,"edit_at": 1508247709215,"delete_at": 0,"is_pinned": false,"user_id": "${TestHelper.basicUser.id}","channel_id": "${post.channel_id}","root_id": "","parent_id": "","original_id": "","message": "Unit Test","type": "","props": {},"hashtags": "","pending_post_id": ""}`}, broadcast: {omit_users: null, user_id: '', channel_id: '18k9ffsuci8xxm7ak68zfdyrce', team_id: ''}, seq: 7}));
 
         const entities = store.getState().entities;

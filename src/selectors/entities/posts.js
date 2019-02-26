@@ -482,7 +482,7 @@ export function getPostIdsInChannel(state: GlobalState, channelId: $ID<Channel>)
 }
 
 export const isPostIdSending = (state: GlobalState, postId: $ID<Post>): boolean =>
-    state.entities.posts.sendingPostIds.some((sendingPostId) => sendingPostId === postId);
+    state.entities.posts.pendingPostIds.some((sendingPostId) => sendingPostId === postId);
 
 export const makeIsPostCommentMention = (): ((GlobalState, $ID<Post>) => boolean) => {
     return createSelector(
