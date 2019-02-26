@@ -1899,7 +1899,7 @@ describe('getCurrentUsersLatestPost', () => {
                 posts: {
                     posts: {},
                     postsInChannel: {},
-                    sendingPostIds: ['1', '2', '3'],
+                    pendingPostIds: ['1', '2', '3'],
                 },
                 channels: {
                     currentChannelId: 'abcd',

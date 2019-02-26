@@ -21,6 +21,8 @@ import {
     getProfilesAndStatusesForPosts,
     getCustomEmojiForReaction,
     handleNewPost,
+    postDeleted,
+    receivedPost,
 } from './posts';
 import {getTeam, getMyTeamUnreads} from './teams';
 
@@ -309,14 +311,14 @@ function handlePostEdited(msg) {
         const data = JSON.parse(msg.data.post);
 
         getProfilesAndStatusesForPosts([data], dispatch, getState);
-        dispatch({type: PostTypes.RECEIVED_POST, data});
+        dispatch(receivedPost(data));
     };
 }
 
 function handlePostDeleted(msg) {
     const data = JSON.parse(msg.data.post);
 
-    return {type: PostTypes.POST_DELETED, data};
+    return postDeleted(data);
 }
 
 function handleLeaveTeamEvent(msg) {

@@ -49,7 +49,7 @@ const state: GlobalState = {
             posts: {},
             postsInChannel: {},
             postsInThread: {},
-            sendingPostIds: [],
+            pendingPostIds: [],
             reactions: {},
             openGraph: {},
             selectedPostId: '',
