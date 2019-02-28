@@ -199,6 +199,7 @@ describe('Selectors.Channels', () => {
             },
             posts: {
                 posts: {},
+                postsInChannel: {},
             },
             preferences: {
                 myPreferences,

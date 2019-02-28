@@ -281,34 +281,61 @@ export function postsInChannel(state = {}, action, prevPosts, nextPosts) {
     case PostTypes.RECEIVED_NEW_POST: {
         const post = action.data;
 
-        if (!state[post.channel_id]) {
-            // Don't save newly created posts until the channel has been properly loaded
+        const postsForChannel = state[post.channel_id];
+        if (!postsForChannel) {
+            // Don't save newly created posts until the channel has been loaded
             return state;
         }
 
-        const postsForChannel = state[post.channel_id];
-        const nextPostsForChannel = [...postsForChannel];
+        const recentBlockIndex = postsForChannel.findIndex((block) => block.recent);
+        if (recentBlockIndex === -1 && postsForChannel.length > 0) {
+            // Don't save newly created posts until the most recent posts for the channel have been loaded, unless
+            // the channel is completely empty
+            return state;
+        }
+
+        let nextRecentBlock;
+        if (recentBlockIndex === -1) {
+            nextRecentBlock = {
+                order: [],
+                recent: true,
+            };
+        } else {
+            const recentBlock = postsForChannel[recentBlockIndex];
+            nextRecentBlock = {
+                ...recentBlock,
+                order: [...recentBlock.order],
+            };
+        }
 
         let changed = false;
 
         // Add the new post to the channel
-        if (!nextPostsForChannel.includes(post.id)) {
-            nextPostsForChannel.unshift(post.id);
+        if (!nextRecentBlock.order.includes(post.id)) {
+            nextRecentBlock.order.unshift(post.id);
             changed = true;
         }
 
-        // If this is a new non-pending post, remove any pending post that exists for it
+        // If this is a newly created post, remove any pending post that exists for it
         if (post.pending_post_id && post.id !== post.pending_post_id) {
-            const index = nextPostsForChannel.indexOf(post.pending_post_id);
+            const index = nextRecentBlock.order.indexOf(post.pending_post_id);
 
             if (index !== -1) {
-                nextPostsForChannel.splice(index, 1);
+                nextRecentBlock.order.splice(index, 1);
                 changed = true;
             }
         }
 
         if (!changed) {
             return state;
+        }
+
+        const nextPostsForChannel = [...postsForChannel];
+
+        if (recentBlockIndex === -1) {
+            nextPostsForChannel.push(nextRecentBlock);
+        } else {
+            nextPostsForChannel[recentBlockIndex] = nextRecentBlock;
         }
 
         return {
@@ -320,7 +347,7 @@ export function postsInChannel(state = {}, action, prevPosts, nextPosts) {
     case PostTypes.RECEIVED_POST: {
         const post = action.data;
 
-        // Receiving a single post doesn't usually affect the order of posts in a channel, except for when we we've
+        // Receiving a single post doesn't usually affect the order of posts in a channel, except for when we've
         // received a newly created post that was previously stored as pending
 
         if (!post.pending_post_id) {
@@ -329,15 +356,30 @@ export function postsInChannel(state = {}, action, prevPosts, nextPosts) {
 
         const postsForChannel = state[post.channel_id] || [];
 
-        const index = postsForChannel.indexOf(post.pending_post_id);
-        if (index === -1) {
-            // We don't have the pending post stored
+        const recentBlockIndex = postsForChannel.findIndex((block) => block.recent);
+        if (recentBlockIndex === -1) {
+            // Nothing to do since there's no recent block and only the recent block should contain pending posts
             return state;
         }
 
+        const recentBlock = postsForChannel[recentBlockIndex];
+
         // Replace the pending post with the newly created one
+        const index = recentBlock.order.indexOf(post.pending_post_id);
+        if (index === -1) {
+            // No pending post found to remove
+            return state;
+        }
+
+        const nextRecentBlock = {
+            ...recentBlock,
+            order: [...recentBlock.order],
+        };
+
+        nextRecentBlock.order[index] = post.id;
+
         const nextPostsForChannel = [...postsForChannel];
-        nextPostsForChannel[index] = post.id;
+        nextPostsForChannel[recentBlockIndex] = nextRecentBlock;
 
         return {
             ...state,
@@ -345,31 +387,157 @@ export function postsInChannel(state = {}, action, prevPosts, nextPosts) {
         };
     }
 
-    case PostTypes.RECEIVED_POSTS_IN_CHANNEL:
-    case PostTypes.RECEIVED_POSTS_SINCE: {
-        const posts = Object.values(action.data.posts);
+    case PostTypes.RECEIVED_POSTS_IN_CHANNEL: {
+        const recent = action.recent;
+        const order = action.data.order;
 
-        if (posts.length === 0 && state[action.channelId]) {
+        if (order.length === 0 && state[action.channelId]) {
             // No new posts received when we already have posts
             return state;
         }
 
         const postsForChannel = state[action.channelId] || [];
-        const nextPostsForChannel = [...postsForChannel];
+        let nextPostsForChannel = [...postsForChannel];
 
-        for (const post of posts) {
-            if (nextPostsForChannel.includes(post.id)) {
-                // We already have the post
+        if (recent) {
+            // The newly received block is now the most recent, so unmark the current most recent block
+            const recentBlockIndex = postsForChannel.findIndex((block) => block.recent);
+            if (recentBlockIndex !== -1) {
+                const recentBlock = postsForChannel[recentBlockIndex];
+
+                if (recentBlock.order.length === order.length &&
+                    recentBlock.order[0] === order[0] &&
+                    recentBlock.order[recentBlock.order.length - 1] === order[order.length - 1]) {
+                    // The newly received posts are identical to the most recent block, so there's nothing to do
+                    return state;
+                }
+
+                // Unmark the most recent block since the new posts are more recent
+                const nextRecentBlock = {
+                    ...recentBlock,
+                    recent: false,
+                };
+
+                nextPostsForChannel[recentBlockIndex] = nextRecentBlock;
+            }
+        }
+
+        // Add the new most recent block
+        nextPostsForChannel.push({
+            order,
+            recent,
+        });
+
+        // Merge overlapping blocks
+        nextPostsForChannel = mergePostBlocks(nextPostsForChannel, nextPosts);
+
+        return {
+            ...state,
+            [action.channelId]: nextPostsForChannel,
+        };
+    }
+
+    case PostTypes.RECEIVED_POSTS_AFTER: {
+        const order = action.data.order;
+        const afterPostId = action.afterPostId;
+
+        if (order.length === 0) {
+            // No posts received
+            return state;
+        }
+
+        const postsForChannel = state[action.channelId] || [];
+
+        // Add a new block including the previous post and then have mergePostBlocks sort out any overlap or duplicates
+        const newBlock = {
+            order: [...order, afterPostId],
+            recent: false,
+        };
+
+        let nextPostsForChannel = [...postsForChannel, newBlock];
+        nextPostsForChannel = mergePostBlocks(nextPostsForChannel, nextPosts);
+
+        return {
+            ...state,
+            [action.channelId]: nextPostsForChannel,
+        };
+    }
+
+    case PostTypes.RECEIVED_POSTS_BEFORE: {
+        const order = action.data.order;
+        const beforePostId = action.beforePostId;
+
+        if (order.length === 0) {
+            // No posts received
+            return state;
+        }
+
+        const postsForChannel = state[action.channelId] || [];
+
+        // Add a new block including the next post and then have mergePostBlocks sort out any overlap or duplicates
+        const newBlock = {
+            order: [beforePostId, ...order],
+            recent: false,
+        };
+
+        let nextPostsForChannel = [...postsForChannel, newBlock];
+        nextPostsForChannel = mergePostBlocks(nextPostsForChannel, nextPosts);
+
+        return {
+            ...state,
+            [action.channelId]: nextPostsForChannel,
+        };
+    }
+
+    case PostTypes.RECEIVED_POSTS_SINCE: {
+        const order = action.data.order;
+
+        if (order.length === 0 && state[action.channelId]) {
+            // No new posts received when we already have posts
+            return state;
+        }
+
+        const postsForChannel = state[action.channelId] || [];
+
+        const recentBlockIndex = postsForChannel.findIndex((block) => block.recent);
+        if (recentBlockIndex === -1) {
+            // Nothing to do since this shouldn't be dispatched if we haven't loaded the most recent posts yet
+            return state;
+        }
+
+        const recentBlock = postsForChannel[recentBlockIndex];
+
+        const mostRecentCreateAt = nextPosts[recentBlock.order[0]].create_at;
+
+        const nextRecentBlock = {
+            ...recentBlock,
+            order: [...recentBlock.order],
+        };
+
+        // Add any new posts to the most recent block while skipping ones that were only updated
+        for (let i = order.length - 1; i >= 0; i--) {
+            const postId = order[i];
+
+            if (nextPosts[postId].create_at <= mostRecentCreateAt) {
+                // This is an old post
                 continue;
             }
 
-            // Just add the post id to the end of the order and we'll sort it out later
-            nextPostsForChannel.push(post.id);
+            // This post is newer than what we have
+            nextRecentBlock.order.unshift(postId);
         }
 
-        nextPostsForChannel.sort((a, b) => {
+        if (nextRecentBlock.order.length === recentBlock.order.length) {
+            // Nothing was added
+            return state;
+        }
+
+        nextRecentBlock.order.sort((a, b) => {
             return comparePosts(nextPosts[a], nextPosts[b]);
         });
+
+        const nextPostsForChannel = [...postsForChannel];
+        nextPostsForChannel[recentBlockIndex] = nextRecentBlock;
 
         return {
             ...state,
@@ -380,16 +548,38 @@ export function postsInChannel(state = {}, action, prevPosts, nextPosts) {
     case PostTypes.POST_DELETED: {
         const post = action.data;
 
-        const postsForChannel = state[post.channel_id];
-        if (!postsForChannel) {
+        // Deleting a post removes its comments from the order, but does not remove the post itself
+
+        const postsForChannel = state[post.channel_id] || [];
+        if (postsForChannel.length === 0) {
             return state;
         }
 
-        // Remove this post's comments from the channel
-        const nextPostsForChannel = postsForChannel.filter((postId) => prevPosts[postId].root_id !== post.id);
-        if (nextPostsForChannel.length === postsForChannel.length) {
+        let changed = false;
+
+        let nextPostsForChannel = [...postsForChannel];
+        for (let i = 0; i < nextPostsForChannel.length; i++) {
+            const block = nextPostsForChannel[i];
+
+            // Remove any comments for this post
+            const nextOrder = block.order.filter((postId) => prevPosts[postId].root_id !== post.id);
+
+            if (nextOrder.length !== block.order.length) {
+                nextPostsForChannel[i] = {
+                    ...block,
+                    order: nextOrder,
+                };
+
+                changed = true;
+            }
+        }
+
+        if (!changed) {
+            // Nothing was removed
             return state;
         }
+
+        nextPostsForChannel = removeEmptyPostBlocks(nextPostsForChannel);
 
         return {
             ...state,
@@ -400,16 +590,38 @@ export function postsInChannel(state = {}, action, prevPosts, nextPosts) {
     case PostTypes.POST_REMOVED: {
         const post = action.data;
 
-        const postsForChannel = state[post.channel_id];
-        if (!postsForChannel) {
+        // Removing a post removes it as well as its comments
+
+        const postsForChannel = state[post.channel_id] || [];
+        if (postsForChannel.length === 0) {
             return state;
         }
 
+        let changed = false;
+
         // Remove the post and its comments from the channel
-        const nextPostsForChannel = postsForChannel.filter((postId) => prevPosts[postId].id !== post.id && prevPosts[postId].root_id !== post.id);
-        if (nextPostsForChannel.length === postsForChannel.length) {
+        let nextPostsForChannel = [...postsForChannel];
+        for (let i = 0; i < nextPostsForChannel.length; i++) {
+            const block = nextPostsForChannel[i];
+
+            const nextOrder = block.order.filter((postId) => postId !== post.id && prevPosts[postId].root_id !== post.id);
+
+            if (nextOrder.length !== block.order.length) {
+                nextPostsForChannel[i] = {
+                    ...block,
+                    order: nextOrder,
+                };
+
+                changed = true;
+            }
+        }
+
+        if (!changed) {
+            // Nothing was removed
             return state;
         }
+
+        nextPostsForChannel = removeEmptyPostBlocks(nextPostsForChannel);
 
         return {
             ...state,
@@ -443,6 +655,84 @@ export function postsInChannel(state = {}, action, prevPosts, nextPosts) {
     default:
         return state;
     }
+}
+
+export function removeEmptyPostBlocks(blocks) {
+    return blocks.filter((block) => block.order.length !== 0);
+}
+
+export function mergePostBlocks(blocks, posts) {
+    let nextBlocks = [...blocks];
+
+    // Remove any blocks that may have become empty by removing posts
+    nextBlocks = removeEmptyPostBlocks(blocks);
+
+    // Sort blocks so that the most recent one comes first
+    nextBlocks.sort((a, b) => {
+        const aStartsAt = posts[a.order[0]].create_at;
+        const bStartsAt = posts[b.order[0]].create_at;
+
+        return bStartsAt - aStartsAt;
+    });
+
+    // Merge adjacent blocks
+    let i = 0;
+    while (i < nextBlocks.length - 1) {
+        // Since we know the start of a is more recent than the start of b, they'll overlap if the last post in a is
+        // older than the first post in b
+        const a = nextBlocks[i];
+        const aEndsAt = posts[a.order[a.order.length - 1]].create_at;
+
+        const b = nextBlocks[i + 1];
+        const bStartsAt = posts[b.order[0]].create_at;
+
+        if (aEndsAt <= bStartsAt) {
+            // The blocks overlap, so combine them and remove the second block
+            nextBlocks[i] = {
+                order: mergePostOrder(a.order, b.order, posts),
+            };
+
+            nextBlocks[i].recent = a.recent || b.recent;
+
+            nextBlocks.splice(i + 1, 1);
+
+            // Do another iteration on this index since it may need to be merged into the next
+        } else {
+            // The blocks don't overlap, so move on to the next one
+            i += 1;
+        }
+    }
+
+    if (blocks.length === nextBlocks.length) {
+        // No changes were made
+        return blocks;
+    }
+
+    return nextBlocks;
+}
+
+export function mergePostOrder(left, right, posts) {
+    const result = [...left];
+
+    // Add without duplicates
+    const seen = new Set(left);
+    for (const id of right) {
+        if (seen.has(id)) {
+            continue;
+        }
+
+        result.push(id);
+    }
+
+    if (result.length === left.length) {
+        // No new items added
+        return left;
+    }
+
+    // Re-sort so that the most recent post comes first
+    result.sort((a, b) => posts[b].create_at - posts[a].create_at);
+
+    return result;
 }
 
 export function postsInThread(state = {}, action, prevPosts) {
@@ -486,6 +776,8 @@ export function postsInThread(state = {}, action, prevPosts) {
         };
     }
 
+    case PostTypes.RECEIVED_POSTS_AFTER:
+    case PostTypes.RECEIVED_POSTS_BEFORE:
     case PostTypes.RECEIVED_POSTS_IN_CHANNEL:
     case PostTypes.RECEIVED_POSTS_SINCE: {
         const newPosts = Object.values(action.data.posts);

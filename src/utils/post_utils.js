@@ -152,7 +152,7 @@ export function shouldFilterJoinLeavePost(post: Post, showJoinLeave: boolean, cu
 }
 
 function isJoinLeavePostForUsername(post: Post, currentUsername: string): boolean {
-    if (!post.props) {
+    if (!post.props || !currentUsername) {
         return false;
     }
 
