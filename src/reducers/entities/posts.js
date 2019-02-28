@@ -43,6 +43,23 @@ function handleReceivedPost(posts = {}, postsInChannel = {}, postsInThread = {},
         ];
     }
 
+    // Remove any temporary posts
+    if (nextPosts[post.pending_post_id] && post.id !== post.pending_post_id) {
+        Reflect.deleteProperty(nextPosts, post.pending_post_id);
+
+        const channelIndex = nextPostsInChannel[channelId].indexOf(post.pending_post_id);
+        if (channelIndex !== -1) {
+            nextPostsInChannel[channelId].splice(channelIndex, 1);
+        }
+
+        if (post.root_id && postsInThread[post.root_id]) {
+            const threadIndex = nextPostsInThread[post.root_id].indexOf(post.pending_post_id);
+            if (threadIndex !== -1) {
+                nextPostsInThread[post.root_id].splice(threadIndex, 1);
+            }
+        }
+    }
+
     const withCombineSystemPosts = combineSystemPosts(nextPostsInChannel[channelId], nextPosts);
     nextPostsInChannel[channelId] = withCombineSystemPosts.postsForChannel;
     return {posts: withCombineSystemPosts.nextPosts, postsInChannel: nextPostsInChannel, postsInThread: nextPostsInThread};
