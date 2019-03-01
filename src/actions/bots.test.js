@@ -25,7 +25,7 @@ describe('Actions.Bots', () => {
     });
 
     it('loadBots', async () => {
-        const bots = [TestHelper.fakeBot()];
+        const bots = [TestHelper.fakeBot(), TestHelper.fakeBot()];
         nock(Client4.getBotsRoute()).
             get('').
             query(true).
@@ -90,6 +90,7 @@ describe('Actions.Bots', () => {
             reply(200, bot);
         await BotActions.createBot(bot)(store.dispatch, store.getState);
 
+        // Disable the bot by setting delete_at to a value > 0
         bot.delete_at = 1507840900065;
         nock(Client4.getBotRoute(bot.user_id)).
             post('/disable').
