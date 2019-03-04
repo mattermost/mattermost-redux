@@ -22,6 +22,7 @@ describe('Selectors.Teams', () => {
     teams[team4.id] = team4;
     teams[team5.id] = team5;
     team1.display_name = 'Marketeam';
+    team1.name = 'marketing_team';
     team2.display_name = 'Core Team';
     team3.allow_open_invite = true;
     team4.allow_open_invite = true;
@@ -259,5 +260,36 @@ describe('Selectors.Teams', () => {
     it('getCurrentRelativeTeamUrl', () => {
         assert.deepEqual(Selectors.getCurrentRelativeTeamUrl(testState), '/' + team1.name);
         assert.deepEqual(Selectors.getCurrentRelativeTeamUrl({entities: {teams: {teams: {}}}}), '/');
+    });
+
+    it('getCurrentTeamUrl', () => {
+        const siteURL = 'http://localhost:8065';
+        const general = {
+            config: {SiteURL: siteURL},
+            credentials: {},
+        };
+
+        const withSiteURLState = {
+            ...testState,
+            entities: {
+                ...testState.entities,
+                general,
+            },
+        };
+        withSiteURLState.entities.general = general;
+        assert.deepEqual(Selectors.getCurrentTeamUrl(withSiteURLState), siteURL + '/' + team1.name);
+
+        const credentialURL = 'http://localhost';
+        const withCredentialURLState = {
+            ...withSiteURLState,
+            entities: {
+                ...withSiteURLState.entities,
+                general: {
+                    ...withSiteURLState.entities.general,
+                    credentials: {url: credentialURL},
+                },
+            },
+        };
+        assert.deepEqual(Selectors.getCurrentTeamUrl(withCredentialURLState), credentialURL + '/' + team1.name);
     });
 });

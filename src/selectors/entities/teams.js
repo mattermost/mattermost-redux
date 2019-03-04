@@ -5,7 +5,7 @@ import {createSelector} from 'reselect';
 
 import {General} from 'constants';
 
-import {getCurrentUrl} from 'selectors/entities/general';
+import {getConfig, getCurrentUrl} from 'selectors/entities/general';
 
 import {createIdsSelector} from 'utils/helpers';
 import {isTeamAdmin} from 'utils/user_utils';
@@ -80,8 +80,9 @@ export const isCurrentUserCurrentTeamAdmin = createSelector(
 export const getCurrentTeamUrl = createSelector(
     getCurrentUrl,
     getCurrentTeam,
-    (currentUrl, currentTeam) => {
-        return `${currentUrl}/${currentTeam.name}`;
+    (state) => getConfig(state).SiteURL,
+    (currentURL, currentTeam, siteURL) => {
+        return `${currentURL || siteURL}/${currentTeam.name}`;
     }
 );
 
