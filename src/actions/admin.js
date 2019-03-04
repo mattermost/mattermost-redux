@@ -206,7 +206,7 @@ export function syncLdap(): ActionFunc {
     });
 }
 
-export function getLdapGroups(page: number = 0, perPage: number = General.PAGE_SIZE_MAXIMUM): ActionFunc {
+export function getLdapGroups(page: number = 0, perPage: number = General.PAGE_SIZE_MAXIMUM, opts: object = {}): ActionFunc {
     return bindClientFunc({
         clientFunc: Client4.getLdapGroups,
         onRequest: AdminTypes.GET_LDAP_GROUPS_REQUEST,
@@ -215,6 +215,7 @@ export function getLdapGroups(page: number = 0, perPage: number = General.PAGE_S
         params: [
             page,
             perPage,
+            opts,
         ],
     });
 }

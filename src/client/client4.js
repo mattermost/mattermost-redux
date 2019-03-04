@@ -2250,9 +2250,10 @@ export default class Client4 {
         );
     };
 
-    getLdapGroups = async (page = 0, perPage = PER_PAGE_DEFAULT) => {
+    getLdapGroups = async (page = 0, perPage = PER_PAGE_DEFAULT, opts = {}) => {
+        const query = {page, per_page: perPage, ...opts};
         return this.doFetch(
-            `${this.getBaseRoute()}/ldap/groups${buildQueryString({page, per_page: perPage})}`,
+            `${this.getBaseRoute()}/ldap/groups${buildQueryString(query)}`,
             {method: 'get'}
         );
     };
