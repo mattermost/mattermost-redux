@@ -3,7 +3,7 @@
 
 import {combineReducers} from 'redux';
 
-import {BotTypes} from 'action_types';
+import {BotTypes, UserTypes} from 'action_types';
 
 function accounts(state = {}, action) {
     switch (action.type) {
@@ -21,6 +21,8 @@ function accounts(state = {}, action) {
         nextState[bot.user_id] = bot;
         return nextState;
     }
+    case UserTypes.LOGOUT_SUCCESS:
+        return {};
     default:
         return state;
     }

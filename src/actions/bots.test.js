@@ -5,6 +5,7 @@ import assert from 'assert';
 import nock from 'nock';
 
 import * as BotActions from 'actions/bots';
+import * as UserActions from 'actions/users';
 import {Client4} from 'client';
 
 import TestHelper from 'test/test_helper';
@@ -31,7 +32,7 @@ describe('Actions.Bots', () => {
             query(true).
             reply(201, bots);
 
-        await BotActions.loadBots()(store.dispatch, store.getState);
+        await store.dispatch(BotActions.loadBots());
 
         const state = store.getState();
         const botsResult = state.entities.bots.accounts;
@@ -45,7 +46,7 @@ describe('Actions.Bots', () => {
             query(true).
             reply(201, bot);
 
-        await BotActions.loadBot(bot.user_id)(store.dispatch, store.getState);
+        await store.dispatch(BotActions.loadBot(bot.user_id));
 
         const state = store.getState();
         const botsResult = state.entities.bots.accounts[bot.user_id];
@@ -57,7 +58,7 @@ describe('Actions.Bots', () => {
         nock(Client4.getBotRoute()).
             post('').
             reply(200, bot);
-        await BotActions.createBot(bot)(store.dispatch, store.getState);
+        await store.dispatch(BotActions.createBot(bot));
 
         const state = store.getState();
         const botsResult = state.entities.bots.accounts[bot.user_id];
@@ -69,14 +70,14 @@ describe('Actions.Bots', () => {
         nock(Client4.getBotRoute()).
             post('').
             reply(200, bot);
-        await BotActions.createBot(bot)(store.dispatch, store.getState);
+        await store.dispatch(BotActions.createBot(bot));
 
         bot.username = 'mynewusername';
 
         nock(Client4.getBotRoute(bot.user_id)).
             put('').
             reply(200, bot);
-        await BotActions.patchBot(bot.user_id, bot)(store.dispatch, store.getState);
+        await store.dispatch(BotActions.patchBot(bot.user_id, bot));
 
         const state = store.getState();
         const botsResult = state.entities.bots.accounts[bot.user_id];
@@ -88,14 +89,14 @@ describe('Actions.Bots', () => {
         nock(Client4.getBotRoute()).
             post('').
             reply(200, bot);
-        await BotActions.createBot(bot)(store.dispatch, store.getState);
+        await store.dispatch(BotActions.createBot(bot));
 
         // Disable the bot by setting delete_at to a value > 0
         bot.delete_at = 1507840900065;
         nock(Client4.getBotRoute(bot.user_id)).
             post('/disable').
             reply(200, bot);
-        await BotActions.disableBot(bot.user_id)(store.dispatch, store.getState);
+        await store.dispatch(BotActions.disableBot(bot.user_id));
 
         const state = store.getState();
         const botsResult = state.entities.bots.accounts[bot.user_id];
@@ -105,7 +106,7 @@ describe('Actions.Bots', () => {
         nock(Client4.getBotRoute(bot.user_id)).
             post('/enable').
             reply(200, bot);
-        await BotActions.enableBot(bot.user_id)(store.dispatch, store.getState);
+        await store.dispatch(BotActions.enableBot(bot.user_id));
 
         const state2 = store.getState();
         const botsResult2 = state2.entities.bots.accounts[bot.user_id];
@@ -117,16 +118,35 @@ describe('Actions.Bots', () => {
         nock(Client4.getBotRoute()).
             post('').
             reply(200, bot);
-        await BotActions.createBot(bot)(store.dispatch, store.getState);
+        await store.dispatch(BotActions.createBot(bot));
 
         bot.owner_id = TestHelper.generateId();
         nock(Client4.getBotRoute(bot.user_id)).
             post('/assign/' + bot.owner_id).
             reply(200, bot);
-        await BotActions.assignBot(bot.user_id, bot.owner_id)(store.dispatch, store.getState);
+        await store.dispatch(BotActions.assignBot(bot.user_id, bot.owner_id));
 
         const state = store.getState();
         const botsResult = state.entities.bots.accounts[bot.user_id];
         assert.equal(bot.owner_id, botsResult.owner_id);
+    });
+
+    it('logout', async () => {
+        // Fill redux store with somthing
+        const bot = TestHelper.fakeBot();
+        nock(Client4.getBotRoute()).
+            post('').
+            reply(200, bot);
+        await store.dispatch(BotActions.createBot(bot));
+
+        // Should be cleared by logout
+        nock(Client4.getUsersRoute()).
+            post('/logout').
+            reply(200, {status: 'OK'});
+        await store.dispatch(UserActions.logout());
+
+        // Check is clear
+        const state = store.getState();
+        assert.equal(0, Object.keys(state.entities.bots.accounts).length);
     });
 });
