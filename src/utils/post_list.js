@@ -156,6 +156,26 @@ export function makeCombineUserActivityPosts() {
     );
 }
 
+export function isStartOfNewMessages(item) {
+    return item === START_OF_NEW_MESSAGES;
+}
+
+export function isDateLine(item) {
+    return item.startsWith(DATE_LINE);
+}
+
+export function getDateForDateLine(item) {
+    return parseInt(item.substring(DATE_LINE.length), 10);
+}
+
+export function isCombinedUserActivityPost(item) {
+    return (/^user-activity-(?:[^_]+_)*[^_]+$/).test(item);
+}
+
+export function getPostIdsForCombinedUserActivityPost(item) {
+    return item.substring(COMBINED_USER_ACTIVITY.length).split('_');
+}
+
 export const postTypePriority = {
     [Posts.POST_TYPES.JOIN_TEAM]: 0,
     [Posts.POST_TYPES.ADD_TO_TEAM]: 1,

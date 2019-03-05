@@ -12,6 +12,10 @@ import {
     combineUserActivitySystemPost,
     comparePostTypes,
     DATE_LINE,
+    getDateForDateLine,
+    getPostIdsForCombinedUserActivityPost,
+    isCombinedUserActivityPost,
+    isDateLine,
     makeCombineUserActivityPosts,
     makePreparePostIdsForPostList,
     postTypePriority,
@@ -783,6 +787,43 @@ describe('makeCombineUserActivityPosts', () => {
             expect(combineUserActivityPosts.recomputations()).toBe(4);
             expect(result).not.toBe(initialResult);
         });
+    });
+});
+
+describe('isDateLine', () => {
+    test('should correctly identify date line items', () => {
+        expect(isDateLine('')).toBe(false);
+        expect(isDateLine('date')).toBe(false);
+        expect(isDateLine('date-')).toBe(true);
+        expect(isDateLine('date-0')).toBe(true);
+        expect(isDateLine('date-1531152392')).toBe(true);
+        expect(isDateLine('date-1531152392-index')).toBe(true);
+    });
+});
+
+describe('getDateForDateLine', () => {
+    test('should get date correctly without suffix', () => {
+        expect(getDateForDateLine('date-1234')).toBe(1234);
+    });
+
+    test('should get date correctly with suffix', () => {
+        expect(getDateForDateLine('date-1234-suffix')).toBe(1234);
+    });
+});
+
+describe('isCombinedUserActivityPost', () => {
+    test('should correctly identify combined user activity posts', () => {
+        expect(isCombinedUserActivityPost('post1')).toBe(false);
+        expect(isCombinedUserActivityPost('date-1234')).toBe(false);
+        expect(isCombinedUserActivityPost('user-activity-post1')).toBe(true);
+        expect(isCombinedUserActivityPost('user-activity-post1_post2')).toBe(true);
+        expect(isCombinedUserActivityPost('user-activity-post1_post2_post4')).toBe(true);
+    });
+});
+
+describe('getPostIdsForCombinedUserActivityPost', () => {
+    test('should get IDs correctly', () => {
+        expect(getPostIdsForCombinedUserActivityPost('user-activity-post1_post2_post3')).toEqual(['post1', 'post2', 'post3']);
     });
 });
 
