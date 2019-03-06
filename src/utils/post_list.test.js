@@ -19,15 +19,15 @@ import {
     isCombinedUserActivityPost,
     isDateLine,
     makeCombineUserActivityPosts,
+    makeFilterPostsAndAddSeparators,
     makeGenerateCombinedPost,
-    makePreparePostIdsForPostList,
     postTypePriority,
     START_OF_NEW_MESSAGES,
 } from './post_list';
 
-describe('makePreparePostIdsForPostList', () => {
+describe('makeFilterPostsAndAddSeparators', () => {
     it('filter join/leave posts', () => {
-        const preparePostIdsForPostList = makePreparePostIdsForPostList();
+        const filterPostsAndAddSeparators = makeFilterPostsAndAddSeparators();
         const time = Date.now();
         const today = new Date();
         today.setHours(0, 0, 0, 0);
@@ -56,7 +56,7 @@ describe('makePreparePostIdsForPostList', () => {
         const indicateNewMessages = true;
 
         // Defaults to show post
-        let now = preparePostIdsForPostList(state, {postIds, lastViewedAt, indicateNewMessages});
+        let now = filterPostsAndAddSeparators(state, {postIds, lastViewedAt, indicateNewMessages});
         assert.deepEqual(now, [
             '1002',
             '1001',
@@ -82,7 +82,7 @@ describe('makePreparePostIdsForPostList', () => {
             },
         };
 
-        now = preparePostIdsForPostList(state, {postIds, lastViewedAt, indicateNewMessages});
+        now = filterPostsAndAddSeparators(state, {postIds, lastViewedAt, indicateNewMessages});
         assert.deepEqual(now, [
             '1002',
             '1001',
@@ -108,7 +108,7 @@ describe('makePreparePostIdsForPostList', () => {
             },
         };
 
-        now = preparePostIdsForPostList(state, {postIds, lastViewedAt, indicateNewMessages});
+        now = filterPostsAndAddSeparators(state, {postIds, lastViewedAt, indicateNewMessages});
         assert.deepEqual(now, [
             '1001',
             'date-' + today.getTime(),
@@ -129,7 +129,7 @@ describe('makePreparePostIdsForPostList', () => {
             },
         };
 
-        now = preparePostIdsForPostList(state, {postIds, lastViewedAt, indicateNewMessages});
+        now = filterPostsAndAddSeparators(state, {postIds, lastViewedAt, indicateNewMessages});
 
         assert.deepEqual(now, [
             '1002',
@@ -139,7 +139,7 @@ describe('makePreparePostIdsForPostList', () => {
     });
 
     it('new messages indicator', () => {
-        const preparePostIdsForPostList = makePreparePostIdsForPostList();
+        const filterPostsAndAddSeparators = makeFilterPostsAndAddSeparators();
         const time = Date.now();
         const today = new Date();
         today.setHours(0, 0, 0, 0);
@@ -168,7 +168,7 @@ describe('makePreparePostIdsForPostList', () => {
         const postIds = ['1010', '1005', '1000']; // Remember that we list the posts backwards
 
         // Do not show new messages indicator before all posts
-        let now = preparePostIdsForPostList(state, {postIds, lastViewedAt: 0, indicateNewMessages: true});
+        let now = filterPostsAndAddSeparators(state, {postIds, lastViewedAt: 0, indicateNewMessages: true});
         assert.deepEqual(now, [
             '1010',
             '1005',
@@ -176,7 +176,7 @@ describe('makePreparePostIdsForPostList', () => {
             'date-' + today.getTime(),
         ]);
 
-        now = preparePostIdsForPostList(state, {postIds, indicateNewMessages: true});
+        now = filterPostsAndAddSeparators(state, {postIds, indicateNewMessages: true});
         assert.deepEqual(now, [
             '1010',
             '1005',
@@ -184,7 +184,7 @@ describe('makePreparePostIdsForPostList', () => {
             'date-' + today.getTime(),
         ]);
 
-        now = preparePostIdsForPostList(state, {postIds, lastViewedAt: time + 999, indicateNewMessages: false});
+        now = filterPostsAndAddSeparators(state, {postIds, lastViewedAt: time + 999, indicateNewMessages: false});
         assert.deepEqual(now, [
             '1010',
             '1005',
@@ -193,7 +193,7 @@ describe('makePreparePostIdsForPostList', () => {
         ]);
 
         // Show new messages indicator before all posts
-        now = preparePostIdsForPostList(state, {postIds, lastViewedAt: time + 999, indicateNewMessages: true});
+        now = filterPostsAndAddSeparators(state, {postIds, lastViewedAt: time + 999, indicateNewMessages: true});
         assert.deepEqual(now, [
             '1010',
             '1005',
@@ -203,7 +203,7 @@ describe('makePreparePostIdsForPostList', () => {
         ]);
 
         // Show indicator between posts
-        now = preparePostIdsForPostList(state, {postIds, lastViewedAt: time + 1003, indicateNewMessages: true});
+        now = filterPostsAndAddSeparators(state, {postIds, lastViewedAt: time + 1003, indicateNewMessages: true});
         assert.deepEqual(now, [
             '1010',
             '1005',
@@ -212,7 +212,7 @@ describe('makePreparePostIdsForPostList', () => {
             'date-' + today.getTime(),
         ]);
 
-        now = preparePostIdsForPostList(state, {postIds, lastViewedAt: time + 1006, indicateNewMessages: true});
+        now = filterPostsAndAddSeparators(state, {postIds, lastViewedAt: time + 1006, indicateNewMessages: true});
         assert.deepEqual(now, [
             '1010',
             START_OF_NEW_MESSAGES,
@@ -222,7 +222,7 @@ describe('makePreparePostIdsForPostList', () => {
         ]);
 
         // Don't show indicator when all posts are read
-        now = preparePostIdsForPostList(state, {postIds, lastViewedAt: time + 1020});
+        now = filterPostsAndAddSeparators(state, {postIds, lastViewedAt: time + 1020});
         assert.deepEqual(now, [
             '1010',
             '1005',
@@ -232,7 +232,7 @@ describe('makePreparePostIdsForPostList', () => {
     });
 
     it('memoization', () => {
-        const preparePostIdsForPostList = makePreparePostIdsForPostList();
+        const filterPostsAndAddSeparators = makeFilterPostsAndAddSeparators();
         const time = Date.now();
         const today = new Date();
         const tomorrow = new Date((24 * 60 * 60 * 1000) + today.getTime());
@@ -279,7 +279,7 @@ describe('makePreparePostIdsForPostList', () => {
         ];
         let lastViewedAt = initialPosts['1001'].create_at + 1;
 
-        let now = preparePostIdsForPostList(state, {postIds, lastViewedAt, indicateNewMessages: true});
+        let now = filterPostsAndAddSeparators(state, {postIds, lastViewedAt, indicateNewMessages: true});
         assert.deepEqual(now, [
             '1006',
             '1004',
@@ -292,7 +292,7 @@ describe('makePreparePostIdsForPostList', () => {
 
         // No changes
         let prev = now;
-        now = preparePostIdsForPostList(state, {postIds, lastViewedAt, indicateNewMessages: true});
+        now = filterPostsAndAddSeparators(state, {postIds, lastViewedAt, indicateNewMessages: true});
         assert.equal(now, prev);
         assert.deepEqual(now, [
             '1006',
@@ -308,7 +308,7 @@ describe('makePreparePostIdsForPostList', () => {
         lastViewedAt = initialPosts['1001'].create_at + 2;
 
         prev = now;
-        now = preparePostIdsForPostList(state, {postIds, lastViewedAt, indicateNewMessages: true});
+        now = filterPostsAndAddSeparators(state, {postIds, lastViewedAt, indicateNewMessages: true});
         assert.equal(now, prev);
         assert.deepEqual(now, [
             '1006',
@@ -324,7 +324,7 @@ describe('makePreparePostIdsForPostList', () => {
         lastViewedAt = initialPosts['1003'].create_at + 1;
 
         prev = now;
-        now = preparePostIdsForPostList(state, {postIds, lastViewedAt, indicateNewMessages: true});
+        now = filterPostsAndAddSeparators(state, {postIds, lastViewedAt, indicateNewMessages: true});
         assert.notEqual(now, prev);
         assert.deepEqual(now, [
             '1006',
@@ -337,7 +337,7 @@ describe('makePreparePostIdsForPostList', () => {
         ]);
 
         prev = now;
-        now = preparePostIdsForPostList(state, {postIds, lastViewedAt, indicateNewMessages: true});
+        now = filterPostsAndAddSeparators(state, {postIds, lastViewedAt, indicateNewMessages: true});
         assert.equal(now, prev);
         assert.deepEqual(now, [
             '1006',
@@ -353,7 +353,7 @@ describe('makePreparePostIdsForPostList', () => {
         postIds = [...postIds];
 
         prev = now;
-        now = preparePostIdsForPostList(state, {postIds, lastViewedAt, indicateNewMessages: true});
+        now = filterPostsAndAddSeparators(state, {postIds, lastViewedAt, indicateNewMessages: true});
         assert.equal(now, prev);
         assert.deepEqual(now, [
             '1006',
@@ -381,7 +381,7 @@ describe('makePreparePostIdsForPostList', () => {
         };
 
         prev = now;
-        now = preparePostIdsForPostList(state, {postIds, lastViewedAt, indicateNewMessages: true});
+        now = filterPostsAndAddSeparators(state, {postIds, lastViewedAt, indicateNewMessages: true});
         assert.equal(now, prev);
         assert.deepEqual(now, [
             '1006',
@@ -409,7 +409,7 @@ describe('makePreparePostIdsForPostList', () => {
         };
 
         prev = now;
-        now = preparePostIdsForPostList(state, {postIds, lastViewedAt, indicateNewMessages: true});
+        now = filterPostsAndAddSeparators(state, {postIds, lastViewedAt, indicateNewMessages: true});
         assert.equal(now, prev);
         assert.deepEqual(now, [
             '1006',
@@ -441,7 +441,7 @@ describe('makePreparePostIdsForPostList', () => {
         };
 
         prev = now;
-        now = preparePostIdsForPostList(state, {postIds, lastViewedAt, indicateNewMessages: true});
+        now = filterPostsAndAddSeparators(state, {postIds, lastViewedAt, indicateNewMessages: true});
         assert.notEqual(now, prev);
         assert.deepEqual(now, [
             '1004',
@@ -453,7 +453,7 @@ describe('makePreparePostIdsForPostList', () => {
         ]);
 
         prev = now;
-        now = preparePostIdsForPostList(state, {postIds, lastViewedAt, indicateNewMessages: true});
+        now = filterPostsAndAddSeparators(state, {postIds, lastViewedAt, indicateNewMessages: true});
         assert.equal(now, prev);
         assert.deepEqual(now, [
             '1004',
@@ -541,6 +541,36 @@ describe('makeCombineUserActivityPosts', () => {
         ]);
     });
 
+    test('should "combine" a single activity post', () => {
+        const combineUserActivityPosts = makeCombineUserActivityPosts();
+
+        const postIds = deepFreeze([
+            'post1',
+            'post2',
+            'post3',
+        ]);
+        const state = {
+            entities: {
+                posts: {
+                    posts: {
+                        post1: {id: 'post1'},
+                        post2: {id: 'post2', type: Posts.POST_TYPES.LEAVE_CHANNEL},
+                        post3: {id: 'post3'},
+                    },
+                },
+            },
+        };
+
+        const result = combineUserActivityPosts(state, postIds);
+
+        expect(result).not.toBe(postIds);
+        expect(result).toEqual([
+            'post1',
+            COMBINED_USER_ACTIVITY + 'post2',
+            'post3',
+        ]);
+    });
+
     test('should not combine with regular messages', () => {
         const combineUserActivityPosts = makeCombineUserActivityPosts();
 
@@ -597,7 +627,12 @@ describe('makeCombineUserActivityPosts', () => {
 
         const result = combineUserActivityPosts(state, postIds);
 
-        expect(result).toBe(postIds);
+        expect(result).not.toBe(postIds);
+        expect(result).toEqual([
+            COMBINED_USER_ACTIVITY + 'post1',
+            'post2',
+            COMBINED_USER_ACTIVITY + 'post3',
+        ]);
     });
 
     test('should not combine across non-post items', () => {
@@ -628,11 +663,11 @@ describe('makeCombineUserActivityPosts', () => {
 
         expect(result).not.toBe(postIds);
         expect(result).toEqual([
-            'post1',
+            COMBINED_USER_ACTIVITY + 'post1',
             START_OF_NEW_MESSAGES,
             COMBINED_USER_ACTIVITY + 'post2_post3',
             DATE_LINE + '1001',
-            'post4',
+            COMBINED_USER_ACTIVITY + 'post4',
         ]);
     });
 

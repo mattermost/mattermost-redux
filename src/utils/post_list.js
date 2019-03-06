@@ -113,6 +113,7 @@ export function makeCombineUserActivityPosts() {
             let combinedCount = 0;
 
             const out = [];
+            let changed = false;
 
             for (let i = 0; i < postIds.length; i++) {
                 const postId = postIds[i];
@@ -131,14 +132,19 @@ export function makeCombineUserActivityPosts() {
                 const postIsUserActivity = isUserActivityPost(post.type);
 
                 if (postIsUserActivity && lastPostIsUserActivity && combinedCount < MAX_COMBINED_SYSTEM_POSTS) {
-                    // Ensure the previous item has the prefix and then add the new post ID to the end of it
-                    if (!out[out.length - 1].startsWith(COMBINED_USER_ACTIVITY)) {
-                        out[out.length - 1] = COMBINED_USER_ACTIVITY + out[out.length - 1];
-                    }
-
+                    // Add the ID to the previous combined post
                     out[out.length - 1] += '_' + postId;
 
                     combinedCount += 1;
+
+                    changed = true;
+                } else if (postIsUserActivity) {
+                    // Start a new combined post, even if the "combined" post is only a single post
+                    out.push(COMBINED_USER_ACTIVITY + postId);
+
+                    combinedCount = 1;
+
+                    changed = true;
                 } else {
                     out.push(postId);
 
@@ -148,7 +154,7 @@ export function makeCombineUserActivityPosts() {
                 lastPostIsUserActivity = postIsUserActivity;
             }
 
-            if (postIds.length === out.length) {
+            if (!changed) {
                 // Nothing was combined, so return the original array
                 return postIds;
             }
