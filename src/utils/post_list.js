@@ -1,13 +1,15 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
 
+import {createSelector} from 'reselect';
+
 import {Posts, Preferences} from 'constants';
 
 import {makeGetPostsForIds} from 'selectors/entities/posts';
 import {getBool} from 'selectors/entities/preferences';
 import {getCurrentUser} from 'selectors/entities/users';
 
-import {createIdsSelector} from 'utils/helpers';
+import {createIdsSelector, memoizeResult} from 'utils/helpers';
 import {isUserActivityPost, shouldFilterJoinLeavePost} from 'utils/post_utils';
 
 export const COMBINED_USER_ACTIVITY = 'user-activity-';
@@ -174,6 +176,43 @@ export function isCombinedUserActivityPost(item) {
 
 export function getPostIdsForCombinedUserActivityPost(item) {
     return item.substring(COMBINED_USER_ACTIVITY.length).split('_');
+}
+
+export function makeGenerateCombinedPost() {
+    const getPostsForIds = makeGetPostsForIds();
+    const getPostIds = memoizeResult(getPostIdsForCombinedUserActivityPost);
+
+    return createSelector(
+        (state, combinedId) => combinedId,
+        (state, combinedId) => getPostsForIds(state, getPostIds(combinedId)),
+        (combinedId, posts) => {
+            // All posts should be in the same channel
+            const channelId = posts[0].channel_id;
+
+            // Assume that the last post is the oldest one
+            const createAt = posts[posts.length - 1].create_at;
+
+            const messages = posts.map((post) => post.message);
+
+            return {
+                id: combinedId,
+                root_id: '',
+                channel_id: channelId,
+                create_at: createAt,
+                delete_at: 0,
+                message: messages.join('\n'),
+                props: {
+                    messages,
+                    user_activity: combineUserActivitySystemPost(posts),
+                },
+                state: '',
+                system_post_ids: posts.map((post) => post.id),
+                type: Posts.POST_TYPES.COMBINED_USER_ACTIVITY,
+                user_activity_posts: posts,
+                user_id: '',
+            };
+        }
+    );
 }
 
 export const postTypePriority = {

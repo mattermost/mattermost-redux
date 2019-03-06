@@ -17,6 +17,7 @@ import {
     isCombinedUserActivityPost,
     isDateLine,
     makeCombineUserActivityPosts,
+    makeGenerateCombinedPost,
     makePreparePostIdsForPostList,
     postTypePriority,
     START_OF_NEW_MESSAGES,
@@ -824,6 +825,207 @@ describe('isCombinedUserActivityPost', () => {
 describe('getPostIdsForCombinedUserActivityPost', () => {
     test('should get IDs correctly', () => {
         expect(getPostIdsForCombinedUserActivityPost('user-activity-post1_post2_post3')).toEqual(['post1', 'post2', 'post3']);
+    });
+});
+
+describe('makeGenerateCombinedPost', () => {
+    test('should output a combined post', () => {
+        const generateCombinedPost = makeGenerateCombinedPost();
+
+        const state = {
+            entities: {
+                posts: {
+                    posts: {
+                        post1: {
+                            id: 'post1',
+                            channel_id: 'channel1',
+                            create_at: 1002,
+                            delete_at: 0,
+                            message: 'joe added to the channel by bill.',
+                            props: {
+                                addedUsername: 'joe',
+                                addedUserId: 'user2',
+                                username: 'bill',
+                                userId: 'user1',
+                            },
+                            type: Posts.POST_TYPES.ADD_TO_CHANNEL,
+                            user_id: 'user1',
+                        },
+                        post2: {
+                            id: 'post2',
+                            channel_id: 'channel1',
+                            create_at: 1001,
+                            delete_at: 0,
+                            message: 'alice added to the channel by bill.',
+                            props: {
+                                addedUsername: 'alice',
+                                addedUserId: 'user3',
+                                username: 'bill',
+                                userId: 'user1',
+                            },
+                            type: Posts.POST_TYPES.ADD_TO_CHANNEL,
+                            user_id: 'user1',
+                        },
+                        post3: {
+                            id: 'post3',
+                            channel_id: 'channel1',
+                            create_at: 1000,
+                            delete_at: 0,
+                            message: 'bill joined the channel.',
+                            props: {
+                                username: 'bill',
+                                userId: 'user1',
+                            },
+                            type: Posts.POST_TYPES.JOIN_CHANNEL,
+                            user_id: 'user1',
+                        },
+                    },
+                },
+            },
+        };
+        const combinedId = 'user-activity-post1_post2_post3';
+
+        const result = generateCombinedPost(state, combinedId);
+
+        expect(result).toEqual({
+            id: combinedId,
+            root_id: '',
+            channel_id: 'channel1',
+            create_at: 1000,
+            delete_at: 0,
+            message: 'joe added to the channel by bill.\nalice added to the channel by bill.\nbill joined the channel.',
+            props: {
+                messages: [
+                    'joe added to the channel by bill.',
+                    'alice added to the channel by bill.',
+                    'bill joined the channel.',
+                ],
+                user_activity: {
+                    allUserIds: ['user2', 'user3', 'user1'],
+                    allUsernames: [],
+                    messageData: [
+                        {
+                            postType: Posts.POST_TYPES.JOIN_CHANNEL,
+                            userIds: ['user1'],
+                        },
+                        {
+                            postType: Posts.POST_TYPES.ADD_TO_CHANNEL,
+                            userIds: ['user2', 'user3'],
+                            actorId: 'user1',
+                        },
+                    ],
+                },
+            },
+            state: '',
+            system_post_ids: ['post1', 'post2', 'post3'],
+            type: Posts.POST_TYPES.COMBINED_USER_ACTIVITY,
+            user_activity_posts: [
+                state.entities.posts.posts.post1,
+                state.entities.posts.posts.post2,
+                state.entities.posts.posts.post3,
+            ],
+            user_id: '',
+        });
+    });
+
+    describe('memoization', () => {
+        const initialState = {
+            entities: {
+                posts: {
+                    posts: {
+                        post1: {id: 'post1'},
+                        post2: {id: 'post2'},
+                    },
+                },
+            },
+        };
+        const initialCombinedId = 'user-activity-post1_post2';
+
+        test('should not recalculate when called twice with the same ID', () => {
+            const generateCombinedPost = makeGenerateCombinedPost();
+
+            expect(generateCombinedPost.recomputations()).toBe(0);
+
+            generateCombinedPost(initialState, initialCombinedId);
+
+            expect(generateCombinedPost.recomputations()).toBe(1);
+
+            generateCombinedPost(initialState, initialCombinedId);
+
+            expect(generateCombinedPost.recomputations()).toBe(1);
+        });
+
+        test('should recalculate when called twice with different IDs', () => {
+            const generateCombinedPost = makeGenerateCombinedPost();
+
+            expect(generateCombinedPost.recomputations()).toBe(0);
+
+            let combinedId = initialCombinedId;
+            generateCombinedPost(initialState, combinedId);
+
+            expect(generateCombinedPost.recomputations()).toBe(1);
+
+            combinedId = 'user-activity-post2';
+            generateCombinedPost(initialState, combinedId);
+
+            expect(generateCombinedPost.recomputations()).toBe(2);
+        });
+
+        test('should not recalculate when a different post changes', () => {
+            const generateCombinedPost = makeGenerateCombinedPost();
+
+            expect(generateCombinedPost.recomputations()).toBe(0);
+
+            let state = initialState;
+            generateCombinedPost(state, initialCombinedId);
+
+            expect(generateCombinedPost.recomputations()).toBe(1);
+
+            state = {
+                ...state,
+                entities: {
+                    ...state.entities,
+                    posts: {
+                        ...state.entities.posts,
+                        posts: {
+                            ...state.entities.posts.posts,
+                            post3: {id: 'post3'},
+                        },
+                    },
+                },
+            };
+            generateCombinedPost(state, initialCombinedId);
+
+            expect(generateCombinedPost.recomputations()).toBe(1);
+        });
+
+        test('should recalculate when one of the included posts change', () => {
+            const generateCombinedPost = makeGenerateCombinedPost();
+
+            expect(generateCombinedPost.recomputations()).toBe(0);
+
+            let state = initialState;
+            generateCombinedPost(state, initialCombinedId);
+
+            expect(generateCombinedPost.recomputations()).toBe(1);
+
+            state = {
+                ...state,
+                entities: {
+                    ...state.entities,
+                    posts: {
+                        ...state.entities.posts,
+                        posts: {
+                            ...state.entities.posts.posts,
+                            post2: {id: 'post2', update_at: 1234},
+                        },
+                    },
+                },
+            };
+            generateCombinedPost(state, initialCombinedId);
+
+            expect(generateCombinedPost.recomputations()).toBe(2);
+        });
     });
 });
 
