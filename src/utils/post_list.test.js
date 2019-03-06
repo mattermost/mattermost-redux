@@ -13,6 +13,8 @@ import {
     comparePostTypes,
     DATE_LINE,
     getDateForDateLine,
+    getFirstPostId,
+    getLastPostId,
     getPostIdsForCombinedUserActivityPost,
     isCombinedUserActivityPost,
     isDateLine,
@@ -825,6 +827,42 @@ describe('isCombinedUserActivityPost', () => {
 describe('getPostIdsForCombinedUserActivityPost', () => {
     test('should get IDs correctly', () => {
         expect(getPostIdsForCombinedUserActivityPost('user-activity-post1_post2_post3')).toEqual(['post1', 'post2', 'post3']);
+    });
+});
+
+describe('getFirstPostId', () => {
+    test('should return the first item if it is a post', () => {
+        expect(getFirstPostId(['post1', 'post2', 'post3'])).toBe('post1');
+    });
+
+    test('should return the first ID from a combined post', () => {
+        expect(getFirstPostId(['user-activity-post2_post3', 'post4', 'user-activity-post5_post6'])).toBe('post2');
+    });
+
+    test('should skip date separators', () => {
+        expect(getFirstPostId(['date-1234', 'user-activity-post1_post2', 'post3', 'post4', 'date-1000'])).toBe('post1');
+    });
+
+    test('should skip the new message line', () => {
+        expect(getFirstPostId([START_OF_NEW_MESSAGES, 'post2', 'post3', 'post4'])).toBe('post2');
+    });
+});
+
+describe('getLastPostId', () => {
+    test('should return the last item if it is a post', () => {
+        expect(getLastPostId(['post1', 'post2', 'post3'])).toBe('post3');
+    });
+
+    test('should return the last ID from a combined post', () => {
+        expect(getLastPostId(['user-activity-post2_post3', 'post4', 'user-activity-post5_post6'])).toBe('post6');
+    });
+
+    test('should skip date separators', () => {
+        expect(getLastPostId(['date-1234', 'user-activity-post1_post2', 'post3', 'post4', 'date-1000'])).toBe('post4');
+    });
+
+    test('should skip the new message line', () => {
+        expect(getLastPostId(['post2', 'post3', 'post4', START_OF_NEW_MESSAGES])).toBe('post4');
     });
 });
 

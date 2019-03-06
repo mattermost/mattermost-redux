@@ -178,6 +178,52 @@ export function getPostIdsForCombinedUserActivityPost(item) {
     return item.substring(COMBINED_USER_ACTIVITY.length).split('_');
 }
 
+export function getFirstPostId(items) {
+    for (let i = 0; i < items.length; i++) {
+        const item = items[i];
+
+        if (isStartOfNewMessages(item) || isDateLine(item)) {
+            // This is not a post at all
+            continue;
+        }
+
+        if (isCombinedUserActivityPost(item)) {
+            // This is a combined post, so find the first post ID from it
+            const combinedIds = getPostIdsForCombinedUserActivityPost(item);
+
+            return combinedIds[0];
+        }
+
+        // This is a post ID
+        return item;
+    }
+
+    return '';
+}
+
+export function getLastPostId(items) {
+    for (let i = items.length - 1; i >= 0; i--) {
+        const item = items[i];
+
+        if (isStartOfNewMessages(item) || isDateLine(item)) {
+            // This is not a post at all
+            continue;
+        }
+
+        if (isCombinedUserActivityPost(item)) {
+            // This is a combined post, so find the first post ID from it
+            const combinedIds = getPostIdsForCombinedUserActivityPost(item);
+
+            return combinedIds[combinedIds.length - 1];
+        }
+
+        // This is a post ID
+        return item;
+    }
+
+    return '';
+}
+
 export function makeGenerateCombinedPost() {
     const getPostsForIds = makeGetPostsForIds();
     const getPostIds = memoizeResult(getPostIdsForCombinedUserActivityPost);
