@@ -964,7 +964,7 @@ describe('Actions.Admin', () => {
             get('/ldap/groups?page=0&per_page=100').
             reply(200, ldapGroups);
 
-        await Actions.getLdapGroups(0, 100)(store.dispatch, store.getState);
+        await Actions.getLdapGroups(0, 100, null)(store.dispatch, store.getState);
 
         const state = store.getState();
         const request = state.requests.admin.getLdapGroups;
@@ -991,7 +991,7 @@ describe('Actions.Admin', () => {
             get('/ldap/groups?page=0&per_page=100').
             reply(200, ldapGroups);
 
-        await Actions.getLdapGroups(0, 100)(store.dispatch, store.getState);
+        await Actions.getLdapGroups(0, 100, null)(store.dispatch, store.getState);
 
         const key = 'test1';
 
@@ -1021,7 +1021,7 @@ describe('Actions.Admin', () => {
             get('/ldap/groups?page=0&per_page=100').
             reply(200, ldapGroups);
 
-        await Actions.getLdapGroups(0, 100)(store.dispatch, store.getState);
+        await Actions.getLdapGroups(0, 100, null)(store.dispatch, store.getState);
 
         const key = 'test2';
 

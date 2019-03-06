@@ -56,3 +56,9 @@ export type GroupsState = {|
     members: Object,
     groups: { [string]: Group },
 |};
+
+export type GroupSearchOpts = {|
+    q: string,
+    is_linked?: boolean,
+    is_configured?: boolean,
+|};
