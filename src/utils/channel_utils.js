@@ -498,7 +498,7 @@ function channelHasUnreadMessages(members: RelationOneToOne<Channel, ChannelMemb
     return false;
 }
 
-function isUnreadChannel(members: RelationOneToOne<Channel, ChannelMembership>, channel: Channel): boolean {
+export function isUnreadChannel(members: RelationOneToOne<Channel, ChannelMembership>, channel: Channel): boolean {
     const member = members[channel.id];
     if (member) {
         const msgCount = channel.total_msg_count - member.msg_count;
