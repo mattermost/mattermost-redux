@@ -907,7 +907,21 @@ export function getNeededCustomEmojis(state, posts) {
 }
 
 export function removePost(post) {
-    return postRemoved(post);
+    return (dispatch, getState) => {
+        if (post.type === Posts.POST_TYPES.COMBINED_USER_ACTIVITY) {
+            const state = getState();
+
+            for (const systemPostId of post.system_post_ids) {
+                const systemPost = Selectors.getPost(state, systemPostId);
+
+                if (systemPost) {
+                    dispatch(removePost(systemPost));
+                }
+            }
+        } else {
+            dispatch(postRemoved(post));
+        }
+    };
 }
 
 export function selectPost(postId) {
