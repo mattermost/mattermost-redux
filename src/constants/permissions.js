@@ -36,6 +36,10 @@ export default {
     GET_PUBLIC_LINK: 'get_public_link',
     MANAGE_WEBHOOKS: 'manage_webhooks',
     MANAGE_OTHERS_WEBHOOKS: 'manage_others_webhooks',
+    MANAGE_INCOMING_WEBHOOKS: 'manage_incoming_webhooks',
+    MANAGE_OTHERS_INCOMING_WEBHOOKS: 'manage_others_incoming_webhooks',
+    MANAGE_OUTGOING_WEBHOOKS: 'manage_outgoing_webhooks',
+    MANAGE_OTHERS_OUTGOING_WEBHOOKS: 'manage_others_outgoing_webhooks',
     MANAGE_OAUTH: 'manage_oauth',
     MANAGE_SYSTEM_WIDE_OAUTH: 'manage_system_wide_oauth',
     CREATE_POST: 'create_post',
@@ -56,4 +60,7 @@ export default {
     MANAGE_JOBS: 'manage_jobs',
     MANAGE_EMOJIS: 'manage_emojis',
     MANAGE_OTHERS_EMOJIS: 'manage_others_emojis',
+    CREATE_EMOJIS: 'create_emojis',
+    DELETE_EMOJIS: 'delete_emojis',
+    DELETE_OTHERS_EMOJIS: 'delete_others_emojis',
 };
