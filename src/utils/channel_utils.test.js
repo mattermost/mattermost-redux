@@ -6,7 +6,13 @@ import assert from 'assert';
 import {General, Users} from 'constants';
 import TestHelper from 'test/test_helper';
 
-import {areChannelMentionsIgnored, canManageMembersOldPermissions, isAutoClosed, filterChannelsMatchingTerm} from 'utils/channel_utils';
+import {
+    areChannelMentionsIgnored,
+    canManageMembersOldPermissions,
+    isAutoClosed,
+    filterChannelsMatchingTerm,
+    sortChannelsByRecency,
+} from 'utils/channel_utils';
 
 describe('ChannelUtils', () => {
     it('canManageMembersOldPermissions', () => {
@@ -188,5 +194,33 @@ describe('ChannelUtils', () => {
         assert.deepEqual(filterChannelsMatchingTerm(channels, 'channel1'), [channel1]);
         assert.deepEqual(filterChannelsMatchingTerm(channels, 'junk'), []);
         assert.deepEqual(filterChannelsMatchingTerm(channels, 'annel'), []);
+    });
+
+    it('sortChannelsByRecency', () => {
+        const channelA = TestHelper.fakeChannel();
+        channelA.id = 'channel_a';
+        channelA.last_post_at = 1;
+
+        const channelB = TestHelper.fakeChannel();
+        channelB.last_post_at = 2;
+        channelB.id = 'channel_b';
+
+        // sorting depends on channel's last_post_at when both channels don't have last post
+        assert.deepEqual(sortChannelsByRecency({}, channelA, channelB), 1);
+
+        // sorting depends on create_at of channel's last post if it's greater than the channel's last_post_at
+        const lastPosts = {
+            channel_a: {id: 'post_id_1', create_at: 5, update_at: 5},
+            channel_b: {id: 'post_id_2', create_at: 7, update_at: 7},
+        };
+        assert.deepEqual(sortChannelsByRecency(lastPosts, channelA, channelB), 2, 'should return 2, comparison of create_at (7 - 5)');
+
+        // sorting remains the same even if channel's last post is updated (e.g. edited, updated reaction, etc)
+        lastPosts.channel_a.update_at = 10;
+        assert.deepEqual(sortChannelsByRecency(lastPosts, channelA, channelB), 2, 'should return 2, comparison of create_at (7 - 5)');
+
+        // sorting depends on create_at of channel's last post if it's greater than the channel's last_post_at
+        lastPosts.channel_a.create_at = 10;
+        assert.deepEqual(sortChannelsByRecency(lastPosts, channelA, channelB), -3, 'should return 2, comparison of create_at (7 - 10)');
     });
 });
