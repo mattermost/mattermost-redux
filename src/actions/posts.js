@@ -1078,7 +1078,7 @@ function lastPostActions(post, websocketMessageProps) {
     return async (dispatch, getState) => {
         const state = getState();
         const actions = [
-            receivedPost(post),
+            receivedNewPost(post),
             {
                 type: WebsocketEvents.STOP_TYPING,
                 data: {
