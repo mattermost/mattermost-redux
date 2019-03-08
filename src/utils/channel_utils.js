@@ -498,7 +498,7 @@ function channelHasUnreadMessages(members: RelationOneToOne<Channel, ChannelMemb
     return false;
 }
 
-function isUnreadChannel(members: RelationOneToOne<Channel, ChannelMembership>, channel: Channel): boolean {
+export function isUnreadChannel(members: RelationOneToOne<Channel, ChannelMembership>, channel: Channel): boolean {
     const member = members[channel.id];
     if (member) {
         const msgCount = channel.total_msg_count - member.msg_count;
@@ -569,13 +569,13 @@ export function sortChannelsByDisplayNameAndMuted(locale: string, members: Relat
 
 export function sortChannelsByRecency(lastPosts: RelationOneToOne<Channel, Post>, a: Channel, b: Channel): number {
     let aLastPostAt = a.last_post_at;
-    if (lastPosts[a.id] && lastPosts[a.id].update_at > a.last_post_at) {
-        aLastPostAt = lastPosts[a.id].update_at;
+    if (lastPosts[a.id] && lastPosts[a.id].create_at > a.last_post_at) {
+        aLastPostAt = lastPosts[a.id].create_at;
     }
 
     let bLastPostAt = b.last_post_at;
-    if (lastPosts[b.id] && lastPosts[b.id].update_at > b.last_post_at) {
-        bLastPostAt = lastPosts[b.id].update_at;
+    if (lastPosts[b.id] && lastPosts[b.id].create_at > b.last_post_at) {
+        bLastPostAt = lastPosts[b.id].create_at;
     }
 
     return bLastPostAt - aLastPostAt;
