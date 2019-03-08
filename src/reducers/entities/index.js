@@ -21,6 +21,7 @@ import search from './search';
 import roles from './roles';
 import schemes from './schemes';
 import groups from './groups';
+import bots from './bots';
 
 export default combineReducers({
     general,
@@ -41,4 +42,5 @@ export default combineReducers({
     roles,
     schemes,
     groups,
+    bots,
 });
