@@ -5,7 +5,6 @@
 export type SyncableType = 'team' | 'channel';
 
 export type SyncablePatch = {|
-    can_leave: boolean,
     auto_add: boolean
 |};
 
@@ -27,7 +26,6 @@ export type GroupTeam = {|
     team_display_name: string,
     team_type: string,
     group_id: string,
-    can_leave: boolean,
     auto_add: boolean,
     create_at: number,
     delete_at: number,
@@ -42,7 +40,6 @@ export type GroupChannel = {|
     team_display_name: string,
     team_type: string,
     group_id: string,
-    can_leave: boolean,
     auto_add: boolean,
     create_at: number,
     delete_at: number,
