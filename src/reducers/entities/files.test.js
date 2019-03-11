@@ -13,7 +13,7 @@ import deepFreeze from 'utils/deep_freeze';
 describe('reducers/entities/files', () => {
     describe('files', () => {
         const testForSinglePost = (actionType) => () => {
-            it('no post metadata', () => {
+            it('no post metadata attribute', () => {
                 const state = deepFreeze({});
                 const action = {
                     type: actionType,
@@ -27,13 +27,30 @@ describe('reducers/entities/files', () => {
                 assert.equal(nextState, state);
             });
 
+            it('empty post metadata attribute', () => {
+                const state = deepFreeze({});
+                const action = {
+                    type: actionType,
+                    data: {
+                        id: 'post',
+                    },
+                    metadata: {},
+                };
+
+                const nextState = filesReducer(state, action);
+
+                assert.equal(nextState, state);
+            });
+
             it('no files in post metadata', () => {
                 const state = deepFreeze({});
                 const action = {
                     type: actionType,
                     data: {
                         id: 'post',
-                        metadata: {},
+                        metadata: {
+                            files: [],
+                        },
                     },
                 };
 
@@ -167,8 +184,7 @@ describe('reducers/entities/files', () => {
 
     describe('fileIdsByPostId', () => {
         const testForSinglePost = (actionType) => () => {
-            it('no post metadata', () => {
-                const state = deepFreeze({});
+            describe('no post metadata', () => {
                 const action = {
                     type: actionType,
                     data: {
@@ -176,13 +192,24 @@ describe('reducers/entities/files', () => {
                     },
                 };
 
-                const nextState = fileIdsByPostIdReducer(state, action);
+                it('no previous state', () => {
+                    const state = deepFreeze({});
+                    const nextState = fileIdsByPostIdReducer(state, action);
 
-                assert.equal(nextState, state);
+                    assert.equal(nextState, state);
+                });
+
+                it('with previous state', () => {
+                    const state = deepFreeze({
+                        post: ['file1'],
+                    });
+                    const nextState = fileIdsByPostIdReducer(state, action);
+
+                    assert.equal(nextState, state);
+                });
             });
 
-            it('no files in post metadata', () => {
-                const state = deepFreeze({});
+            describe('no files property in post metadata', () => {
                 const action = {
                     type: actionType,
                     data: {
@@ -191,16 +218,58 @@ describe('reducers/entities/files', () => {
                     },
                 };
 
-                const nextState = fileIdsByPostIdReducer(state, action);
+                it('no previous state', () => {
+                    const state = deepFreeze({});
+                    const nextState = fileIdsByPostIdReducer(state, action);
 
-                assert.notEqual(nextState, state);
-                assert.deepEqual(nextState, {
-                    post: [],
+                    assert.equal(nextState, state);
+                });
+
+                it('with previous state', () => {
+                    const state = deepFreeze({
+                        post: ['file1'],
+                    });
+                    const nextState = fileIdsByPostIdReducer(state, action);
+
+                    assert.equal(nextState, state);
                 });
             });
 
-            it('should save files', () => {
-                const state = deepFreeze({});
+            describe('empty files property in post metadata', () => {
+                const action = {
+                    type: actionType,
+                    data: {
+                        id: 'post',
+                        metadata: {
+                            files: [],
+                        },
+                    },
+                };
+
+                it('no previous state', () => {
+                    const state = deepFreeze({});
+                    const nextState = fileIdsByPostIdReducer(state, action);
+
+                    assert.notEqual(nextState, state);
+                    assert.deepEqual(nextState, {
+                        post: [],
+                    });
+                });
+
+                it('with previous state', () => {
+                    const state = deepFreeze({
+                        post: ['file1'],
+                    });
+                    const nextState = fileIdsByPostIdReducer(state, action);
+
+                    assert.notEqual(nextState, state);
+                    assert.deepEqual(nextState, {
+                        post: [],
+                    });
+                });
+            });
+
+            describe('new files', () => {
                 const action = {
                     type: actionType,
                     data: {
@@ -211,11 +280,26 @@ describe('reducers/entities/files', () => {
                     },
                 };
 
-                const nextState = fileIdsByPostIdReducer(state, action);
+                it('no previous state', () => {
+                    const state = deepFreeze({});
+                    const nextState = fileIdsByPostIdReducer(state, action);
 
-                assert.notEqual(nextState, state);
-                assert.deepEqual(nextState, {
-                    post: ['file1', 'file2'],
+                    assert.notEqual(nextState, state);
+                    assert.deepEqual(nextState, {
+                        post: ['file1', 'file2'],
+                    });
+                });
+
+                it('with previous state', () => {
+                    const state = deepFreeze({
+                        post: ['fileOld'],
+                    });
+                    const nextState = fileIdsByPostIdReducer(state, action);
+
+                    assert.notEqual(nextState, state);
+                    assert.deepEqual(nextState, {
+                        post: ['file1', 'file2'],
+                    });
                 });
             });
         };
@@ -224,8 +308,7 @@ describe('reducers/entities/files', () => {
         describe('RECEIVED_POST', testForSinglePost(PostTypes.RECEIVED_POST));
 
         describe('RECEIVED_POSTS', () => {
-            it('no post metadata', () => {
-                const state = deepFreeze({});
+            describe('no post metadata', () => {
                 const action = {
                     type: PostTypes.RECEIVED_POSTS,
                     data: {
@@ -237,13 +320,24 @@ describe('reducers/entities/files', () => {
                     },
                 };
 
-                const nextState = fileIdsByPostIdReducer(state, action);
+                it('no previous state', () => {
+                    const state = deepFreeze({});
+                    const nextState = fileIdsByPostIdReducer(state, action);
 
-                assert.equal(nextState, state);
+                    assert.equal(nextState, state);
+                });
+
+                it('with previous state', () => {
+                    const state = deepFreeze({
+                        post: ['file1'],
+                    });
+                    const nextState = fileIdsByPostIdReducer(state, action);
+
+                    assert.equal(nextState, state);
+                });
             });
 
-            it('no files in post metadata', () => {
-                const state = deepFreeze({});
+            describe('no files property in post metadata', () => {
                 const action = {
                     type: PostTypes.RECEIVED_POSTS,
                     data: {
@@ -256,16 +350,62 @@ describe('reducers/entities/files', () => {
                     },
                 };
 
-                const nextState = fileIdsByPostIdReducer(state, action);
+                it('no previous state', () => {
+                    const state = deepFreeze({});
+                    const nextState = fileIdsByPostIdReducer(state, action);
 
-                assert.notEqual(nextState, state);
-                assert.deepEqual(nextState, {
-                    post: [],
+                    assert.equal(nextState, state);
+                });
+
+                it('with previous state', () => {
+                    const state = deepFreeze({
+                        post: ['file1'],
+                    });
+                    const nextState = fileIdsByPostIdReducer(state, action);
+
+                    assert.equal(nextState, state);
                 });
             });
 
-            it('should save files', () => {
-                const state = deepFreeze({});
+            describe('empty files property in post metadata', () => {
+                const action = {
+                    type: PostTypes.RECEIVED_POSTS,
+                    data: {
+                        posts: {
+                            post: {
+                                id: 'post',
+                                metadata: {
+                                    files: [],
+                                },
+                            },
+                        },
+                    },
+                };
+
+                it('no previous state', () => {
+                    const state = deepFreeze({});
+                    const nextState = fileIdsByPostIdReducer(state, action);
+
+                    assert.notEqual(nextState, state);
+                    assert.deepEqual(nextState, {
+                        post: [],
+                    });
+                });
+
+                it('with previous state', () => {
+                    const state = deepFreeze({
+                        post: ['file1'],
+                    });
+                    const nextState = fileIdsByPostIdReducer(state, action);
+
+                    assert.notEqual(nextState, state);
+                    assert.deepEqual(nextState, {
+                        post: [],
+                    });
+                });
+            });
+
+            describe('new files for single post', () => {
                 const action = {
                     type: PostTypes.RECEIVED_POSTS,
                     data: {
@@ -280,16 +420,30 @@ describe('reducers/entities/files', () => {
                     },
                 };
 
-                const nextState = fileIdsByPostIdReducer(state, action);
+                it('no previous state', () => {
+                    const state = deepFreeze({});
+                    const nextState = fileIdsByPostIdReducer(state, action);
 
-                assert.notEqual(nextState, state);
-                assert.deepEqual(nextState, {
-                    post: ['file1', 'file2'],
+                    assert.notEqual(nextState, state);
+                    assert.deepEqual(nextState, {
+                        post: ['file1', 'file2'],
+                    });
+                });
+
+                it('with previous state', () => {
+                    const state = deepFreeze({
+                        post: ['fileOld'],
+                    });
+                    const nextState = fileIdsByPostIdReducer(state, action);
+
+                    assert.notEqual(nextState, state);
+                    assert.deepEqual(nextState, {
+                        post: ['file1', 'file2'],
+                    });
                 });
             });
 
-            it('should save files for multiple posts', () => {
-                const state = deepFreeze({});
+            describe('should save files for multiple posts', () => {
                 const action = {
                     type: PostTypes.RECEIVED_POSTS,
                     data: {
@@ -310,12 +464,31 @@ describe('reducers/entities/files', () => {
                     },
                 };
 
-                const nextState = fileIdsByPostIdReducer(state, action);
+                it('no previous state for post1', () => {
+                    const state = deepFreeze({
+                        post2: ['fileOld2'],
+                    });
+                    const nextState = fileIdsByPostIdReducer(state, action);
 
-                assert.notEqual(nextState, state);
-                assert.deepEqual(nextState, {
-                    post1: ['file1', 'file2'],
-                    post2: ['file3', 'file4'],
+                    assert.notEqual(nextState, state);
+                    assert.deepEqual(nextState, {
+                        post1: ['file1', 'file2'],
+                        post2: ['file3', 'file4'],
+                    });
+                });
+
+                it('previous state for post1', () => {
+                    const state = deepFreeze({
+                        post1: ['fileOld1'],
+                        post2: ['fileOld2'],
+                    });
+                    const nextState = fileIdsByPostIdReducer(state, action);
+
+                    assert.notEqual(nextState, state);
+                    assert.deepEqual(nextState, {
+                        post1: ['file1', 'file2'],
+                        post2: ['file3', 'file4'],
+                    });
                 });
             });
         });
