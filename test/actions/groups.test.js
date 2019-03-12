@@ -32,7 +32,6 @@ describe('Actions.Groups', () => {
                 team_display_name: 'dolphins',
                 team_type: 'O',
                 group_id: '5rgoajywb3nfbdtyafbod47rya',
-                can_leave: true,
                 auto_add: true,
                 create_at: 1542643748412,
                 delete_at: 0,
@@ -43,7 +42,6 @@ describe('Actions.Groups', () => {
                 team_display_name: 'developers',
                 team_type: 'O',
                 group_id: '5rgoajywb3nfbdtyafbod47rya',
-                can_leave: true,
                 auto_add: true,
                 create_at: 1542643825026,
                 delete_at: 0,
@@ -60,7 +58,6 @@ describe('Actions.Groups', () => {
                 team_display_name: 'developers',
                 team_type: 'O',
                 group_id: '5rgoajywb3nfbdtyafbod47rya',
-                can_leave: true,
                 auto_add: true,
                 create_at: 1542644105041,
                 delete_at: 0,
@@ -74,7 +71,6 @@ describe('Actions.Groups', () => {
                 team_display_name: 'dolphins',
                 team_type: 'O',
                 group_id: '5rgoajywb3nfbdtyafbod47rya',
-                can_leave: true,
                 auto_add: true,
                 create_at: 1542644105042,
                 delete_at: 0,
@@ -212,7 +208,6 @@ describe('Actions.Groups', () => {
         const groupTeamResponse = {
             team_id: 'ge63nq31sbfy3duzq5f7yqn1kh',
             group_id: '5rgoajywb3nfbdtyafbod47rya',
-            can_leave: true,
             auto_add: true,
             create_at: 1542643748412,
             delete_at: 0,
@@ -222,7 +217,6 @@ describe('Actions.Groups', () => {
         const groupChannelResponse = {
             channel_id: 'o3tdawqxot8kikzq8bk54zggbc',
             group_id: '5rgoajywb3nfbdtyafbod47rya',
-            can_leave: true,
             auto_add: true,
             create_at: 1542644105041,
             delete_at: 0,
@@ -256,7 +250,6 @@ describe('Actions.Groups', () => {
         const groupTeamResponse = {
             team_id: 'ge63nq31sbfy3duzq5f7yqn1kh',
             group_id: '5rgoajywb3nfbdtyafbod47rya',
-            can_leave: true,
             auto_add: true,
             create_at: 1542643748412,
             delete_at: 0,
@@ -266,7 +259,6 @@ describe('Actions.Groups', () => {
         const groupChannelResponse = {
             channel_id: 'o3tdawqxot8kikzq8bk54zggbc',
             group_id: '5rgoajywb3nfbdtyafbod47rya',
-            can_leave: true,
             auto_add: true,
             create_at: 1542644105041,
             delete_at: 0,
