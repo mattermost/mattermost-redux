@@ -25,6 +25,7 @@ export default {
     INTERVAL_HOUR: 60 * 60,
     INTERVAL_IMMEDIATE: 30, // "immediate" is a 30 second interval
     INTERVAL_NEVER: 0,
+    INTERVAL_NOT_SET: -1,
 
     CATEGORY_DISPLAY_SETTINGS: 'display_settings',
     NAME_NAME_FORMAT: 'name_format',
