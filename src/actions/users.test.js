@@ -139,6 +139,7 @@ describe('Actions.Users', () => {
 
         assert.ok(myAcceptedTermsOfServiceData.id);
         assert.ok(myAcceptedTermsOfServiceData.time);
+        assert.equal(myAcceptedTermsOfServiceData.loaded, true);
         assert.equal(myAcceptedTermsOfServiceData.id, '123');
         assert.equal(myAcceptedTermsOfServiceData.time, 1537880148600);
     });
@@ -163,6 +164,7 @@ describe('Actions.Users', () => {
         assert.ok(currentUserId);
         assert.ok(myAcceptedTermsOfServiceData.id);
         assert.ok(myAcceptedTermsOfServiceData.time);
+        assert.equal(myAcceptedTermsOfServiceData.loaded, true);
         assert.equal(myAcceptedTermsOfServiceData.id, 1);
     });
 

@@ -474,127 +474,189 @@ describe('Selectors.Users', () => {
         assert.deepEqual(Selectors.makeGetDisplayName()(newTestState, 'not_exist_id', false), '');
     });
 
-    it('shouldShowTermsOfService', () => {
+    describe('shouldShowTermsOfService', () => {
         const userId = 1234;
 
-        // Test latest terms not accepted
-        assert.equal(Selectors.shouldShowTermsOfService({
-            entities: {
-                general: {
-                    config: {
-                        CustomTermsOfServiceId: '1',
-                        EnableCustomTermsOfService: 'true',
+        it('should be false when the terms of service status is not yet loaded', () => {
+            assert.equal(Selectors.shouldShowTermsOfService({
+                entities: {
+                    general: {
+                        config: {
+                            CustomTermsOfServiceId: '1',
+                            EnableCustomTermsOfService: 'true',
+                        },
+                        license: {
+                            IsLicensed: 'true',
+                        },
                     },
-                    license: {
-                        IsLicensed: 'true',
+                    users: {
+                        currentUserId: userId,
+                        myAcceptedTermsOfServiceData: {
+                            id: '',
+                            loaded: false,
+                        },
+                        profiles: {
+                            [userId]: {id: userId, username: 'user', first_name: 'First', last_name: 'Last'},
+                        },
                     },
                 },
-                users: {
-                    currentUserId: userId,
-                    myAcceptedTermsOfServiceData: {
-                        id: '0',
-                    },
-                    profiles: {
-                        [userId]: {id: userId, username: 'user', first_name: 'First', last_name: 'Last'},
-                    },
-                },
-            },
-        }), true);
+            }), false);
+        });
 
-        // Test Feature disabled
-        assert.equal(Selectors.shouldShowTermsOfService({
-            entities: {
-                general: {
-                    config: {
-                        CustomTermsOfServiceId: '1',
-                        EnableCustomTermsOfService: 'false',
+        it('should be true when no terms have been accepted', () => {
+            assert.equal(Selectors.shouldShowTermsOfService({
+                entities: {
+                    general: {
+                        config: {
+                            CustomTermsOfServiceId: '1',
+                            EnableCustomTermsOfService: 'true',
+                        },
+                        license: {
+                            IsLicensed: 'true',
+                        },
                     },
-                    license: {
-                        IsLicensed: 'true',
+                    users: {
+                        currentUserId: userId,
+                        myAcceptedTermsOfServiceData: {
+                            id: '',
+                            loaded: true,
+                        },
+                        profiles: {
+                            [userId]: {id: userId, username: 'user', first_name: 'First', last_name: 'Last'},
+                        },
                     },
                 },
-                users: {
-                    currentUserId: userId,
-                    myAcceptedTermsOfServiceData: {
-                        id: '1',
-                    },
-                    profiles: {
-                        [userId]: {id: userId, username: 'user', first_name: 'First', last_name: 'Last'},
-                    },
-                },
-            },
-        }), false);
+            }), true);
+        });
 
-        // Test unlicensed
-        assert.equal(Selectors.shouldShowTermsOfService({
-            entities: {
-                general: {
-                    config: {
-                        CustomTermsOfServiceId: '1',
-                        EnableCustomTermsOfService: 'true',
+        it('should be true when the latest terms have not been accepted', () => {
+            assert.equal(Selectors.shouldShowTermsOfService({
+                entities: {
+                    general: {
+                        config: {
+                            CustomTermsOfServiceId: '1',
+                            EnableCustomTermsOfService: 'true',
+                        },
+                        license: {
+                            IsLicensed: 'true',
+                        },
                     },
-                    license: {
-                        IsLicensed: 'false',
+                    users: {
+                        currentUserId: userId,
+                        myAcceptedTermsOfServiceData: {
+                            id: '0',
+                            loaded: true,
+                        },
+                        profiles: {
+                            [userId]: {id: userId, username: 'user', first_name: 'First', last_name: 'Last'},
+                        },
                     },
                 },
-                users: {
-                    currentUserId: userId,
-                    myAcceptedTermsOfServiceData: {
-                        id: '1',
-                    },
-                    profiles: {
-                        [userId]: {id: userId, username: 'user', first_name: 'First', last_name: 'Last'},
-                    },
-                },
-            },
-        }), false);
+            }), true);
+        });
 
-        // Test terms already accepted
-        assert.equal(Selectors.shouldShowTermsOfService({
-            entities: {
-                general: {
-                    config: {
-                        CustomTermsOfServiceId: '1',
-                        EnableCustomTermsOfService: 'true',
+        it('should be false when the feature has been disabled', () => {
+            assert.equal(Selectors.shouldShowTermsOfService({
+                entities: {
+                    general: {
+                        config: {
+                            CustomTermsOfServiceId: '1',
+                            EnableCustomTermsOfService: 'false',
+                        },
+                        license: {
+                            IsLicensed: 'true',
+                        },
                     },
-                    license: {
-                        IsLicensed: 'true',
+                    users: {
+                        currentUserId: userId,
+                        myAcceptedTermsOfServiceData: {
+                            id: '0',
+                            loaded: true,
+                        },
+                        profiles: {
+                            [userId]: {id: userId, username: 'user', first_name: 'First', last_name: 'Last'},
+                        },
                     },
                 },
-                users: {
-                    currentUserId: userId,
-                    myAcceptedTermsOfServiceData: {
-                        id: '1',
-                    },
-                    profiles: {
-                        [userId]: {id: userId, username: 'user', first_name: 'First', last_name: 'Last'},
-                    },
-                },
-            },
-        }), false);
+            }), false);
+        });
 
-        // Test not logged in
-        assert.equal(Selectors.shouldShowTermsOfService({
-            entities: {
-                general: {
-                    config: {
-                        CustomTermsOfServiceId: '1',
-                        EnableCustomTermsOfService: 'true',
+        it('should be false when the license does not support the feature', () => {
+            assert.equal(Selectors.shouldShowTermsOfService({
+                entities: {
+                    general: {
+                        config: {
+                            CustomTermsOfServiceId: '1',
+                            EnableCustomTermsOfService: 'true',
+                        },
+                        license: {
+                            IsLicensed: 'false',
+                        },
                     },
-                    license: {
-                        IsLicensed: 'true',
+                    users: {
+                        currentUserId: userId,
+                        myAcceptedTermsOfServiceData: {
+                            id: '0',
+                            loaded: true,
+                        },
+                        profiles: {
+                            [userId]: {id: userId, username: 'user', first_name: 'First', last_name: 'Last'},
+                        },
                     },
                 },
-                users: {
-                    currentUserId: userId,
-                    myAcceptedTermsOfServiceData: {
-                        id: '',
-                        time: 0,
+            }), false);
+        });
+
+        it('should be false when the terms have already been accepted', () => {
+            assert.equal(Selectors.shouldShowTermsOfService({
+                entities: {
+                    general: {
+                        config: {
+                            CustomTermsOfServiceId: '1',
+                            EnableCustomTermsOfService: 'true',
+                        },
+                        license: {
+                            IsLicensed: 'true',
+                        },
                     },
-                    profiles: {},
+                    users: {
+                        currentUserId: userId,
+                        myAcceptedTermsOfServiceData: {
+                            id: '1',
+                            loaded: true,
+                        },
+                        profiles: {
+                            [userId]: {id: userId, username: 'user', first_name: 'First', last_name: 'Last'},
+                        },
+                    },
                 },
-            },
-        }), false);
+            }), false);
+        });
+
+        it('should be false when there is no longer a user logged in', () => {
+            assert.equal(Selectors.shouldShowTermsOfService({
+                entities: {
+                    general: {
+                        config: {
+                            CustomTermsOfServiceId: '1',
+                            EnableCustomTermsOfService: 'true',
+                        },
+                        license: {
+                            IsLicensed: 'true',
+                        },
+                    },
+                    users: {
+                        currentUserId: userId,
+                        myAcceptedTermsOfServiceData: {
+                            id: '',
+                            time: 0,
+                            loaded: true,
+                        },
+                        profiles: {},
+                    },
+                },
+            }), false);
+        });
     });
 });
 

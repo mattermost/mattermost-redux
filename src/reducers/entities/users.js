@@ -87,16 +87,17 @@ function currentUserId(state = '', action) {
     return state;
 }
 
-function myAcceptedTermsOfServiceData(state = {id: '', time: 0}, action) {
+function myAcceptedTermsOfServiceData(state = {id: '', time: 0, loaded: false}, action) {
     switch (action.type) {
     case UserTypes.RECEIVED_TERMS_OF_SERVICE_STATUS:
         return {
             id: action.data.terms_of_service_id,
             time: action.data.create_at,
+            loaded: true,
         };
 
     case UserTypes.LOGOUT_SUCCESS:
-        return {id: '', time: 0};
+        return {id: '', time: 0, loaded: false};
 
     default:
         return state;

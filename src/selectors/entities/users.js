@@ -386,6 +386,11 @@ export const shouldShowTermsOfService = createSelector(
     getLicense,
     getMyAcceptedTermsOfServiceData,
     (config, user, license, myAcceptedTermsOfServiceData) => {
+        // Assume false until we have actually fetched details about this user's term of service.
+        if (!myAcceptedTermsOfServiceData.loaded) {
+            return false;
+        }
+
         // Defaults to false if the user is not logged in or the setting doesn't exist
 
         const acceptedTermsId = myAcceptedTermsOfServiceData.id;
@@ -394,6 +399,7 @@ export const shouldShowTermsOfService = createSelector(
         const featureEnabled = license.IsLicensed === 'true' && config.EnableCustomTermsOfService === 'true';
         const reacceptanceTime = config.CustomTermsOfServiceReAcceptancePeriod * 1000 * 60 * 60 * 24;
         const timeElapsed = new Date().getTime() - acceptedAt;
+
         return Boolean(user && featureEnabled && (config.CustomTermsOfServiceId !== acceptedTermsId || timeElapsed > reacceptanceTime));
     }
 );
