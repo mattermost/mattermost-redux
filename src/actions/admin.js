@@ -13,6 +13,7 @@ import {batchActions} from 'redux-batched-actions';
 
 import type {ActionFunc} from 'types/actions';
 import type {Job} from 'types/jobs';
+import type {GroupSearchOpts} from 'types/groups';
 
 export function getLogs(page: number = 0, perPage: number = General.LOGS_PAGE_SIZE_DEFAULT): ActionFunc {
     return bindClientFunc({
@@ -206,7 +207,7 @@ export function syncLdap(): ActionFunc {
     });
 }
 
-export function getLdapGroups(page: number = 0, perPage: number = General.PAGE_SIZE_MAXIMUM): ActionFunc {
+export function getLdapGroups(page: number = 0, perPage: number = General.PAGE_SIZE_MAXIMUM, opts: GroupSearchOpts = {q: ''}): ActionFunc {
     return bindClientFunc({
         clientFunc: Client4.getLdapGroups,
         onRequest: AdminTypes.GET_LDAP_GROUPS_REQUEST,
@@ -215,6 +216,7 @@ export function getLdapGroups(page: number = 0, perPage: number = General.PAGE_S
         params: [
             page,
             perPage,
+            opts,
         ],
     });
 }

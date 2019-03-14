@@ -13,6 +13,7 @@ import TestHelper from 'test/test_helper';
 import configureStore from 'test/test_store';
 
 const OK_RESPONSE = {status: 'OK'};
+const NO_GROUPS_RESPONSE = {count: 0, groups: []};
 
 describe('Actions.Admin', () => {
     let store;
@@ -964,7 +965,7 @@ describe('Actions.Admin', () => {
             get('/ldap/groups?page=0&per_page=100').
             reply(200, ldapGroups);
 
-        await Actions.getLdapGroups(0, 100)(store.dispatch, store.getState);
+        await Actions.getLdapGroups(0, 100, null)(store.dispatch, store.getState);
 
         const state = store.getState();
         const request = state.requests.admin.getLdapGroups;
@@ -976,6 +977,84 @@ describe('Actions.Admin', () => {
         assert.ok(groups);
         assert.ok(groups[ldapGroups.groups[0].primary_key]);
         assert.ok(groups[ldapGroups.groups[1].primary_key]);
+    });
+
+    it('getLdapGroups is_linked', async () => {
+        nock(Client4.getBaseRoute()).
+            get('/ldap/groups?page=0&per_page=100&q=&is_linked=true').
+            reply(200, NO_GROUPS_RESPONSE);
+
+        await Actions.getLdapGroups(0, 100, {q: '', is_linked: true})(store.dispatch, store.getState);
+
+        let state = store.getState();
+        let request = state.requests.admin.getLdapGroups;
+        if (request.status === RequestStatus.FAILURE) {
+            throw new Error('getLdapGroups request failed err=' + request.error);
+        }
+
+        nock(Client4.getBaseRoute()).
+            get('/ldap/groups?page=0&per_page=100&q=&is_linked=false').
+            reply(200, NO_GROUPS_RESPONSE);
+
+        await Actions.getLdapGroups(0, 100, {q: '', is_linked: false})(store.dispatch, store.getState);
+
+        state = store.getState();
+        request = state.requests.admin.getLdapGroups;
+        if (request.status === RequestStatus.FAILURE) {
+            throw new Error('getLdapGroups request failed err=' + request.error);
+        }
+    });
+
+    it('getLdapGroups is_configured', async () => {
+        nock(Client4.getBaseRoute()).
+            get('/ldap/groups?page=0&per_page=100&q=&is_configured=true').
+            reply(200, NO_GROUPS_RESPONSE);
+
+        await Actions.getLdapGroups(0, 100, {q: '', is_configured: true})(store.dispatch, store.getState);
+
+        let state = store.getState();
+        let request = state.requests.admin.getLdapGroups;
+        if (request.status === RequestStatus.FAILURE) {
+            throw new Error('getLdapGroups request failed err=' + request.error);
+        }
+
+        nock(Client4.getBaseRoute()).
+            get('/ldap/groups?page=0&per_page=100&q=&is_configured=false').
+            reply(200, NO_GROUPS_RESPONSE);
+
+        await Actions.getLdapGroups(0, 100, {q: '', is_configured: false})(store.dispatch, store.getState);
+
+        state = store.getState();
+        request = state.requests.admin.getLdapGroups;
+        if (request.status === RequestStatus.FAILURE) {
+            throw new Error('getLdapGroups request failed err=' + request.error);
+        }
+    });
+
+    it('getLdapGroups with name query', async () => {
+        nock(Client4.getBaseRoute()).
+            get('/ldap/groups?page=0&per_page=100&q=est').
+            reply(200, NO_GROUPS_RESPONSE);
+
+        await Actions.getLdapGroups(0, 100, {q: 'est'})(store.dispatch, store.getState);
+
+        let state = store.getState();
+        let request = state.requests.admin.getLdapGroups;
+        if (request.status === RequestStatus.FAILURE) {
+            throw new Error('getLdapGroups request failed err=' + request.error);
+        }
+
+        nock(Client4.getBaseRoute()).
+            get('/ldap/groups?page=0&per_page=100&q=esta').
+            reply(200, NO_GROUPS_RESPONSE);
+
+        await Actions.getLdapGroups(0, 100, {q: 'esta'})(store.dispatch, store.getState);
+
+        state = store.getState();
+        request = state.requests.admin.getLdapGroups;
+        if (request.status === RequestStatus.FAILURE) {
+            throw new Error('getLdapGroups request failed err=' + request.error);
+        }
     });
 
     it('linkLdapGroup', async () => {
@@ -991,7 +1070,7 @@ describe('Actions.Admin', () => {
             get('/ldap/groups?page=0&per_page=100').
             reply(200, ldapGroups);
 
-        await Actions.getLdapGroups(0, 100)(store.dispatch, store.getState);
+        await Actions.getLdapGroups(0, 100, null)(store.dispatch, store.getState);
 
         const key = 'test1';
 
@@ -1021,7 +1100,7 @@ describe('Actions.Admin', () => {
             get('/ldap/groups?page=0&per_page=100').
             reply(200, ldapGroups);
 
-        await Actions.getLdapGroups(0, 100)(store.dispatch, store.getState);
+        await Actions.getLdapGroups(0, 100, null)(store.dispatch, store.getState);
 
         const key = 'test2';
 
