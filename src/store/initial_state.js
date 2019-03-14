@@ -21,6 +21,7 @@ const state: GlobalState = {
             myAcceptedTermsOfServiceData: {
                 id: '',
                 time: 0,
+                loaded: false,
             },
             mySessions: [],
             myAudits: [],
