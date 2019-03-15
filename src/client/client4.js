@@ -739,9 +739,10 @@ export default class Client4 {
         );
     };
 
-    updateStatus = async (status) => {
+    updateStatus = async (status, manual) => {
+        const queryString = manual === false ? '?manual=false' : '';
         return this.doFetch(
-            `${this.getUserRoute(status.user_id)}/status`,
+            `${this.getUserRoute(status.user_id)}/status${queryString}`,
             {method: 'put', body: JSON.stringify(status)}
         );
     };

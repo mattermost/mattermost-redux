@@ -655,10 +655,10 @@ export function getStatus(userId: string): ActionFunc {
     });
 }
 
-export function setStatus(status: string): ActionFunc {
+export function setStatus(status: string, manual: boolean): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         try {
-            await Client4.updateStatus(status);
+            await Client4.updateStatus(status, manual);
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch, getState);
             dispatch(logError(error));
