@@ -170,7 +170,7 @@ export function createGroupChannel(userIds: Array<string>): ActionFunc {
             return {error};
         }
 
-        const member = {
+        let member = {
             channel_id: created.id,
             user_id: currentUserId,
             roles: `${General.CHANNEL_USER_ROLE}`,
@@ -180,6 +180,10 @@ export function createGroupChannel(userIds: Array<string>): ActionFunc {
             notify_props: {desktop: 'default', mark_unread: 'all'},
             last_update_at: created.create_at,
         };
+
+        if (created.create_at !== created.update_at) {
+            member = await Client4.getMyChannelMember(created.id);
+        }
 
         dispatch(markGroupChannelOpen(created.id));
 
