@@ -182,7 +182,12 @@ export function createGroupChannel(userIds: Array<string>): ActionFunc {
         };
 
         if (created.create_at !== created.update_at) {
-            member = await Client4.getMyChannelMember(created.id);
+            try {
+                member = await Client4.getMyChannelMember(created.id);
+            } catch (error) {
+                // Log the error and keep going with the generated membership.
+                dispatch(logError(error));
+            }
         }
 
         dispatch(markGroupChannelOpen(created.id));
