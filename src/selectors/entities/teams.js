@@ -3,13 +3,14 @@
 
 import {createSelector} from 'reselect';
 
-import {General, Permissions} from 'constants';
+import {Permissions} from 'constants';
 
 import {getConfig, getCurrentUrl} from 'selectors/entities/general';
 import {haveISystemPermission} from 'selectors/entities/roles';
 
 import {createIdsSelector, isMinimumServerVersion} from 'utils/helpers';
 import {isTeamAdmin} from 'utils/user_utils';
+import {sortTeamsWithLocale} from 'utils/team_utils';
 
 export function getCurrentTeamId(state) {
     return state.entities.teams.currentTeamId;
@@ -178,15 +179,7 @@ export const getSortedListableTeams = createSelector(
             listableTeams[id] = teams[id];
         }
 
-        function sortTeams(a, b) {
-            if (a.display_name !== b.display_name) {
-                return a.display_name.toLowerCase().localeCompare(b.display_name.toLowerCase(), locale || General.DEFAULT_LOCALE, {numeric: true});
-            }
-
-            return a.name.toLowerCase().localeCompare(b.name.toLowerCase(), locale || General.DEFAULT_LOCALE, {numeric: true});
-        }
-
-        return Object.values(listableTeams).sort(sortTeams);
+        return Object.values(listableTeams).sort(sortTeamsWithLocale(locale));
     }
 );
 
@@ -230,15 +223,7 @@ export const getSortedJoinableTeams = createSelector(
             joinableTeams[id] = teams[id];
         }
 
-        function sortTeams(a, b) {
-            if (a.display_name !== b.display_name) {
-                return a.display_name.toLowerCase().localeCompare(b.display_name.toLowerCase(), locale || General.DEFAULT_LOCALE, {numeric: true});
-            }
-
-            return a.name.toLowerCase().localeCompare(b.name.toLowerCase(), locale || General.DEFAULT_LOCALE, {numeric: true});
-        }
-
-        return Object.values(joinableTeams).sort(sortTeams);
+        return Object.values(joinableTeams).sort(sortTeamsWithLocale(locale));
     }
 );
 
@@ -247,13 +232,7 @@ export const getMySortedTeamIds = createIdsSelector(
     getTeamMemberships,
     (state, locale) => locale,
     (teams, myMembers, locale) => {
-        return Object.values(teams).filter((t) => myMembers[t.id]).sort((a, b) => {
-            if (a.display_name !== b.display_name) {
-                return a.display_name.toLowerCase().localeCompare(b.display_name.toLowerCase(), locale, {numeric: true});
-            }
-
-            return a.name.toLowerCase().localeCompare(b.name.toLowerCase(), locale, {numeric: true});
-        }).map((t) => t.id);
+        return Object.values(teams).filter((t) => myMembers[t.id]).sort(sortTeamsWithLocale(locale)).map((t) => t.id);
     }
 );
 

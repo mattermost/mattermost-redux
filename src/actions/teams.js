@@ -7,7 +7,6 @@ import {Client4} from 'client';
 import {General} from 'constants';
 import {ChannelTypes, TeamTypes, UserTypes} from 'action_types';
 import EventEmitter from 'utils/event_emitter';
-import {isMinimumServerVersion} from 'utils/helpers';
 
 import {logError} from './errors';
 import {bindClientFunc, forceLogoutIfNecessary} from './helpers';
@@ -16,6 +15,7 @@ import {loadRolesIfNeeded} from './roles';
 
 import type {GetStateFunc, DispatchFunc, ActionFunc, ActionResult} from 'types/actions';
 import type {Team} from 'types/teams';
+import {isCompatibleWithJoinViewTeamPermissions} from 'selectors/entities/general';
 
 async function getProfilesAndStatusesForMembers(userIds, dispatch, getState) {
     const {currentUserId, profiles, statuses} = getState().entities.users;
@@ -511,12 +511,9 @@ export function joinTeam(inviteId: string, teamId: string): ActionFunc {
         dispatch({type: TeamTypes.JOIN_TEAM_REQUEST, data: null}, getState);
 
         const state = getState();
-        const serverVersion = state.entities.general.serverVersion;
-        const currentUserId = state.entities.users.currentUserId;
         try {
-            if (isMinimumServerVersion(serverVersion, 5, 10, 0) ||
-                   (serverVersion.indexOf('dev') !== -1 && isMinimumServerVersion(serverVersion, 5, 8, 0)) ||
-                   (serverVersion.match(/^5.8.\d.\d\d\d\d.*$/) !== null && isMinimumServerVersion(serverVersion, 5, 8, 0))) {
+            if (isCompatibleWithJoinViewTeamPermissions(state)) {
+                const currentUserId = state.entities.users.currentUserId;
                 await Client4.addToTeam(teamId, currentUserId);
             } else {
                 await Client4.joinTeam(inviteId);
