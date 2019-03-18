@@ -519,6 +519,10 @@ export const makeIsPostCommentMention = (): ((GlobalState, $ID<Post>) => boolean
         getCurrentUser,
         getPost,
         (allPosts, postsInThread, currentUser, post) => {
+            if (!post) {
+                return false;
+            }
+
             let threadRepliedToByCurrentUser = false;
             let isCommentMention = false;
             if (currentUser) {
