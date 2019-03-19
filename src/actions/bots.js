@@ -40,7 +40,7 @@ export function loadBot(botUserId) {
 
 export function loadBots(page = 0, perPage = BOTS_PER_PAGE_DEFAULT) {
     return bindClientFunc({
-        clientFunc: Client4.getBots,
+        clientFunc: Client4.getBotsIncludeDeleted,
         onSuccess: BotTypes.RECEIVED_BOT_ACCOUNTS,
         params: [
             page,

@@ -55,7 +55,7 @@ describe('Actions.Bots', () => {
 
     it('createBot', async () => {
         const bot = TestHelper.fakeBot();
-        nock(Client4.getBotRoute()).
+        nock(Client4.getBotsRoute()).
             post('').
             reply(200, bot);
         await store.dispatch(BotActions.createBot(bot));
