@@ -2598,7 +2598,7 @@ export default class Client4 {
 
     createBot = async (bot) => {
         return this.doFetch(
-            `${this.getBotRoute()}`,
+            `${this.getBotsRoute()}`,
             {method: 'post', body: JSON.stringify(bot)}
         );
     }
