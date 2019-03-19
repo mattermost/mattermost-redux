@@ -15,6 +15,7 @@ import {loadRolesIfNeeded} from './roles';
 
 import type {GetStateFunc, DispatchFunc, ActionFunc, ActionResult} from 'types/actions';
 import type {Team} from 'types/teams';
+import {isCompatibleWithJoinViewTeamPermissions} from 'selectors/entities/general';
 
 async function getProfilesAndStatusesForMembers(userIds, dispatch, getState) {
     const {currentUserId, profiles, statuses} = getState().entities.users;
@@ -509,8 +510,14 @@ export function joinTeam(inviteId: string, teamId: string): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         dispatch({type: TeamTypes.JOIN_TEAM_REQUEST, data: null}, getState);
 
+        const state = getState();
         try {
-            await Client4.joinTeam(inviteId);
+            if (isCompatibleWithJoinViewTeamPermissions(state)) {
+                const currentUserId = state.entities.users.currentUserId;
+                await Client4.addToTeam(teamId, currentUserId);
+            } else {
+                await Client4.joinTeam(inviteId);
+            }
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch, getState);
             dispatch(batchActions([

@@ -25,6 +25,13 @@ export function getCurrentUrl(state: GlobalState): string {
     return state.entities.general.credentials.url;
 }
 
+export function isCompatibleWithJoinViewTeamPermissions(state: GlobalState): boolean {
+    const version = state.entities.general.serverVersion;
+    return isMinimumServerVersion(version, 5, 10, 0) ||
+       (version.indexOf('dev') !== -1 && isMinimumServerVersion(version, 5, 8, 0)) ||
+       (version.match(/^5.8.\d.\d\d\d\d.*$/) !== null && isMinimumServerVersion(version, 5, 8, 0));
+}
+
 export function hasNewPermissions(state: GlobalState): boolean {
     const version = state.entities.general.serverVersion;
 

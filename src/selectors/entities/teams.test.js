@@ -9,6 +9,7 @@ import * as Selectors from 'selectors/entities/teams';
 import {General} from 'constants';
 
 describe('Selectors.Teams', () => {
+    TestHelper.initMockEntities();
     const team1 = TestHelper.fakeTeamWithId();
     const team2 = TestHelper.fakeTeamWithId();
     const team3 = TestHelper.fakeTeamWithId();
@@ -60,6 +61,12 @@ describe('Selectors.Teams', () => {
                 myMembers,
                 membersInTeam,
             },
+            roles: {
+                roles: TestHelper.basicRoles,
+            },
+            general: {
+                serverVersion: '5.8.0',
+            },
         },
     });
 
@@ -91,6 +98,232 @@ describe('Selectors.Teams', () => {
         const joinableTeams = Selectors.getSortedJoinableTeams(testState);
         assert.strictEqual(joinableTeams[0], openTeams[0]);
         assert.strictEqual(joinableTeams[1], openTeams[1]);
+    });
+
+    it('getListableTeams', () => {
+        const openTeams = [team3, team4];
+        const listableTeams = Selectors.getListableTeams(testState);
+        assert.strictEqual(listableTeams[0], openTeams[0]);
+        assert.strictEqual(listableTeams[1], openTeams[1]);
+    });
+
+    it('getListedJoinableTeams', () => {
+        const openTeams = [team4, team3];
+        const joinableTeams = Selectors.getSortedListableTeams(testState);
+        assert.strictEqual(joinableTeams[0], openTeams[0]);
+        assert.strictEqual(joinableTeams[1], openTeams[1]);
+    });
+
+    it('getJoinableTeamsUsingPermissions', () => {
+        const privateTeams = [team1, team2];
+        const openTeams = [team3, team4];
+        let modifiedState = {
+            entities: {
+                ...testState.entities,
+                teams: {
+                    ...testState.entities.teams,
+                    myMembers: {},
+                },
+                roles: {
+                    roles: {
+                        system_user: {
+                            ...testState.entities.roles.roles.system_user,
+                            permissions: ['join_private_teams'],
+                        },
+                    },
+                },
+                general: {
+                    serverVersion: '5.10.0',
+                },
+            },
+        };
+        let joinableTeams = Selectors.getJoinableTeams(modifiedState);
+        assert.strictEqual(joinableTeams[0], privateTeams[0]);
+        assert.strictEqual(joinableTeams[1], privateTeams[1]);
+
+        modifiedState = {
+            entities: {
+                ...testState.entities,
+                teams: {
+                    ...testState.entities.teams,
+                    myMembers: {},
+                },
+                roles: {
+                    roles: {
+                        system_user: {
+                            permissions: ['join_public_teams'],
+                        },
+                    },
+                },
+                general: {
+                    serverVersion: '5.10.0',
+                },
+            },
+        };
+        joinableTeams = Selectors.getJoinableTeams(modifiedState);
+        assert.strictEqual(joinableTeams[0], openTeams[0]);
+        assert.strictEqual(joinableTeams[1], openTeams[1]);
+
+        modifiedState = {
+            entities: {
+                ...testState.entities,
+                teams: {
+                    ...testState.entities.teams,
+                    myMembers: {},
+                },
+                roles: {
+                    roles: {
+                        system_user: {
+                            permissions: ['join_public_teams', 'join_private_teams'],
+                        },
+                    },
+                },
+                general: {
+                    serverVersion: '5.10.0',
+                },
+            },
+        };
+        joinableTeams = Selectors.getJoinableTeams(modifiedState);
+        assert.strictEqual(joinableTeams[0], privateTeams[0]);
+        assert.strictEqual(joinableTeams[1], privateTeams[1]);
+        assert.strictEqual(joinableTeams[2], openTeams[0]);
+        assert.strictEqual(joinableTeams[3], openTeams[1]);
+    });
+
+    it('getSortedJoinableTeamsUsingPermissions', () => {
+        const privateTeams = [team2, team1];
+        const openTeams = [team4, team3];
+        const modifiedState = {
+            entities: {
+                ...testState.entities,
+                teams: {
+                    ...testState.entities.teams,
+                    myMembers: {},
+                },
+                roles: {
+                    roles: {
+                        system_user: {
+                            ...testState.entities.roles.roles.system_user,
+                            permissions: ['join_public_teams', 'join_private_teams'],
+                        },
+                    },
+                },
+                general: {
+                    serverVersion: '5.10.0',
+                },
+            },
+        };
+        const joinableTeams = Selectors.getSortedJoinableTeams(modifiedState);
+        assert.strictEqual(joinableTeams[0], openTeams[0]);
+        assert.strictEqual(joinableTeams[1], privateTeams[0]);
+        assert.strictEqual(joinableTeams[2], privateTeams[1]);
+        assert.strictEqual(joinableTeams[3], openTeams[1]);
+    });
+
+    it('getListableTeamsUsingPermissions', () => {
+        const privateTeams = [team1, team2];
+        const openTeams = [team3, team4];
+        let modifiedState = {
+            entities: {
+                ...testState.entities,
+                teams: {
+                    ...testState.entities.teams,
+                    myMembers: {},
+                },
+                roles: {
+                    roles: {
+                        system_user: {
+                            ...testState.entities.roles.roles.system_user,
+                            permissions: ['list_private_teams'],
+                        },
+                    },
+                },
+                general: {
+                    serverVersion: '5.10.0',
+                },
+            },
+        };
+        let listableTeams = Selectors.getListableTeams(modifiedState);
+        assert.strictEqual(listableTeams[0], privateTeams[0]);
+        assert.strictEqual(listableTeams[1], privateTeams[1]);
+
+        modifiedState = {
+            entities: {
+                ...testState.entities,
+                teams: {
+                    ...testState.entities.teams,
+                    myMembers: {},
+                },
+                roles: {
+                    roles: {
+                        system_user: {
+                            permissions: ['list_public_teams'],
+                        },
+                    },
+                },
+                general: {
+                    serverVersion: '5.10.0',
+                },
+            },
+        };
+        listableTeams = Selectors.getListableTeams(modifiedState);
+        assert.strictEqual(listableTeams[0], openTeams[0]);
+        assert.strictEqual(listableTeams[1], openTeams[1]);
+
+        modifiedState = {
+            entities: {
+                ...testState.entities,
+                teams: {
+                    ...testState.entities.teams,
+                    myMembers: {},
+                },
+                roles: {
+                    roles: {
+                        system_user: {
+                            permissions: ['list_public_teams', 'list_private_teams'],
+                        },
+                    },
+                },
+                general: {
+                    serverVersion: '5.10.0',
+                },
+            },
+        };
+        listableTeams = Selectors.getListableTeams(modifiedState);
+        assert.strictEqual(listableTeams[0], privateTeams[0]);
+        assert.strictEqual(listableTeams[1], privateTeams[1]);
+        assert.strictEqual(listableTeams[2], openTeams[0]);
+        assert.strictEqual(listableTeams[3], openTeams[1]);
+    });
+
+    it('getSortedListableTeamsUsingPermissions', () => {
+        const privateTeams = [team2, team1];
+        const openTeams = [team4, team3];
+        const modifiedState = {
+            entities: {
+                ...testState.entities,
+                teams: {
+                    ...testState.entities.teams,
+                    myMembers: {},
+                },
+                roles: {
+                    roles: {
+                        system_user: {
+                            ...testState.entities.roles.roles.system_user,
+                            permissions: ['list_public_teams', 'list_private_teams'],
+                        },
+                    },
+                },
+                general: {
+                    serverVersion: '5.10.0',
+                },
+            },
+        };
+        const listableTeams = Selectors.getSortedListableTeams(modifiedState);
+        assert.strictEqual(listableTeams[0], openTeams[0]);
+        assert.strictEqual(listableTeams[1], privateTeams[0]);
+        assert.strictEqual(listableTeams[2], privateTeams[1]);
+        assert.strictEqual(listableTeams[3], openTeams[1]);
     });
 
     it('isCurrentUserCurrentTeamAdmin', () => {
