@@ -5,10 +5,10 @@ import {createSelector} from 'reselect';
 
 import {Permissions} from 'constants';
 
-import {getConfig, getCurrentUrl} from 'selectors/entities/general';
+import {getConfig, getCurrentUrl, isCompatibleWithJoinViewTeamPermissions} from 'selectors/entities/general';
 import {haveISystemPermission} from 'selectors/entities/roles';
 
-import {createIdsSelector, isMinimumServerVersion} from 'utils/helpers';
+import {createIdsSelector} from 'utils/helpers';
 import {isTeamAdmin} from 'utils/user_utils';
 import {sortTeamsWithLocale} from 'utils/team_utils';
 
@@ -144,15 +144,13 @@ export const getListableTeamIds = createIdsSelector(
     getTeamMemberships,
     (state) => haveISystemPermission(state, {permission: Permissions.LIST_PUBLIC_TEAMS}),
     (state) => haveISystemPermission(state, {permission: Permissions.LIST_PRIVATE_TEAMS}),
-    (state) => state.entities.general.serverVersion,
-    (teams, myMembers, canListPublicTeams, canListPrivateTeams, serverVersion) => {
+    isCompatibleWithJoinViewTeamPermissions,
+    (teams, myMembers, canListPublicTeams, canListPrivateTeams, compatibleWithJoinViewTeamPermissions) => {
         return Object.keys(teams).filter((id) => {
             const team = teams[id];
             const member = myMembers[id];
             let canList = team.allow_open_invite;
-            if (isMinimumServerVersion(serverVersion, 5, 10, 0) ||
-                   (serverVersion.indexOf('dev') !== -1 && isMinimumServerVersion(serverVersion, 5, 8, 0)) ||
-                   (serverVersion.match(/^5.8.\d.\d\d\d\d.*$/) !== null && isMinimumServerVersion(serverVersion, 5, 8, 0))) {
+            if (compatibleWithJoinViewTeamPermissions) {
                 canList = (canListPrivateTeams && !team.allow_open_invite) || (canListPublicTeams && team.allow_open_invite);
             }
             return team.delete_at === 0 && canList && !member;
@@ -188,15 +186,13 @@ export const getJoinableTeamIds = createIdsSelector(
     getTeamMemberships,
     (state) => haveISystemPermission(state, {permission: Permissions.JOIN_PUBLIC_TEAMS}),
     (state) => haveISystemPermission(state, {permission: Permissions.JOIN_PRIVATE_TEAMS}),
-    (state) => state.entities.general.serverVersion,
-    (teams, myMembers, canJoinPublicTeams, canJoinPrivateTeams, serverVersion) => {
+    isCompatibleWithJoinViewTeamPermissions,
+    (teams, myMembers, canJoinPublicTeams, canJoinPrivateTeams, compatibleWithJoinViewTeamPermissions) => {
         return Object.keys(teams).filter((id) => {
             const team = teams[id];
             const member = myMembers[id];
             let canJoin = team.allow_open_invite;
-            if (isMinimumServerVersion(serverVersion, 5, 10, 0) ||
-                   (serverVersion.indexOf('dev') !== -1 && isMinimumServerVersion(serverVersion, 5, 8, 0)) ||
-                   (serverVersion.match(/^5.8.\d.\d\d\d\d.*$/) !== null && isMinimumServerVersion(serverVersion, 5, 8, 0))) {
+            if (compatibleWithJoinViewTeamPermissions) {
                 canJoin = (canJoinPrivateTeams && !team.allow_open_invite) || (canJoinPublicTeams && team.allow_open_invite);
             }
             return team.delete_at === 0 && canJoin && !member;
