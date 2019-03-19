@@ -64,23 +64,11 @@ import {Client4} from 'mattermost-redux/client';
 Client4.setUrl('https://your-mattermost-url.com');
 
 function loginAndGetUser(username, password, callback) {
-    Client4.login(username, password).then(
-        () => {
-            Client4.getMe().then(
-                (data) => {
-                    callback(data);
-                }
-            ).catch(
-                (error) => {
-                    console.error(error);
-                }
-            );
-        }
-    ).catch(
-        (error) => {
-            console.error(error);
-        }
-    );
+    Client4
+        .login(username, password)
+        .then(Client4.getMe)
+        .then(callback)
+        .catch(console.error);
 }
 ```
 
