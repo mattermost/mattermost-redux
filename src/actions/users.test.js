@@ -122,27 +122,6 @@ describe('Actions.Users', () => {
         assert.deepEqual(data, response);
     });
 
-    it('getMyTermsOfServiceStatus', async () => {
-        const response = {
-            create_at: 1537880148600,
-            terms_of_service_id: '123',
-            user_id: 'abcd',
-        };
-
-        nock(Client4.getUserRoute('me')).
-            get('/terms_of_service').
-            reply(200, response);
-
-        await Actions.getMyTermsOfServiceStatus()(store.dispatch, store.getState);
-
-        const {myAcceptedTermsOfServiceData} = store.getState().entities.users;
-
-        assert.ok(myAcceptedTermsOfServiceData.id);
-        assert.ok(myAcceptedTermsOfServiceData.time);
-        assert.equal(myAcceptedTermsOfServiceData.id, '123');
-        assert.equal(myAcceptedTermsOfServiceData.time, 1537880148600);
-    });
-
     it('updateMyTermsOfServiceStatus accept terms', async () => {
         const user = TestHelper.basicUser;
         nock(Client4.getUsersRoute()).
@@ -158,12 +137,13 @@ describe('Actions.Users', () => {
 
         await Actions.updateMyTermsOfServiceStatus(1, true)(store.dispatch, store.getState);
 
-        const {currentUserId, myAcceptedTermsOfServiceData} = store.getState().entities.users;
+        const {currentUserId} = store.getState().entities.users;
+        const currentUser = store.getState().entities.users.profiles[currentUserId];
 
         assert.ok(currentUserId);
-        assert.ok(myAcceptedTermsOfServiceData.id);
-        assert.ok(myAcceptedTermsOfServiceData.time);
-        assert.equal(myAcceptedTermsOfServiceData.id, 1);
+        assert.ok(currentUser.terms_of_service_id);
+        assert.ok(currentUser.terms_of_service_create_at);
+        assert.equal(currentUser.terms_of_service_id, 1);
     });
 
     it('updateMyTermsOfServiceStatus reject terms', async () => {

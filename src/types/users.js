@@ -37,6 +37,8 @@ export type UserProfile = {|
     roles: string,
     locale: string,
     notify_props: UserNotifyProps,
+    terms_of_service_id: string,
+    terms_of_service_create_at: number,
     timezone?: {|
         useAutomaticTimezone: string,
         automaticTimezone: string,
