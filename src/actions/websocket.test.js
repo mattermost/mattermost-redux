@@ -283,7 +283,7 @@ describe('Actions.Websocket', () => {
             await store.dispatch(TeamActions.selectTeam(TestHelper.basicTeam));
             await store.dispatch(ChannelActions.selectChannel(TestHelper.basicChannel.id));
 
-            store.dispatch({type: ChannelTypes.RECEIVED_CHANNEL, data: {id: TestHelper.generateId(), name: General.DEFAULT_CHANNEL, team_id: TestHelper.basicTeam.id}});
+            store.dispatch({type: ChannelTypes.RECEIVED_CHANNEL, data: {id: TestHelper.generateId(), name: General.DEFAULT_CHANNEL, team_id: TestHelper.basicTeam.id, display_name: General.DEFAULT_CHANNEL}});
             store.dispatch({type: ChannelTypes.RECEIVED_CHANNEL, data: TestHelper.basicChannel});
 
             nock(Client4.getUserRoute('me')).

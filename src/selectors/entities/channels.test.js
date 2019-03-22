@@ -199,7 +199,6 @@ describe('Selectors.Channels', () => {
             },
             posts: {
                 posts: {},
-                postsInChannel: {},
             },
             preferences: {
                 myPreferences,
@@ -1170,187 +1169,219 @@ describe('Selectors.Channels', () => {
         });
     });
 
-    describe('canManageAnyChannelMembersInCurrentTeam', () => {
-        it('will return false if channel_user does not have permissions to manage channel members', () => {
-            const newState = {
+    describe('get_redirect_channel_name_for_team selector', () => {
+        it('getRedirectChannelNameForTeam without advanced permissions', () => {
+            const modifiedState = {
+                ...testState,
                 entities: {
                     ...testState.entities,
-                    roles: {
-                        roles: {
-                            channel_user: {
-                                permissions: [],
-                            },
-                        },
-                    },
-                    channels: {
-                        ...testState.entities.channels,
-                        myMembers: {
-                            ...testState.entities.channels.myMembers,
-                            [channel1.id]: {
-                                ...testState.entities.channels.myMembers[channel1.id],
-                                roles: 'channel_user',
-                            },
-                            [channel5.id]: {
-                                ...testState.entities.channels.myMembers[channel5.id],
-                                roles: 'channel_user',
-                            },
-                        },
+                    general: {
+                        ...testState.entities.general,
+                        serverVersion: '4.8.0',
                     },
                 },
             };
-
-            assert.ok(Selectors.canManageAnyChannelMembersInCurrentTeam(newState) === false);
+            assert.equal(Selectors.getRedirectChannelNameForTeam(modifiedState, team1.id), General.DEFAULT_CHANNEL);
         });
 
-        it('will return true if channel_user has permissions to manage public channel members', () => {
-            const newState = {
+        it('getRedirectChannelNameForTeam with advanced permissions but without JOIN_PUBLIC_CHANNELS permission', () => {
+            const modifiedState = {
+                ...testState,
                 entities: {
                     ...testState.entities,
-                    roles: {
-                        roles: {
-                            channel_user: {
-                                permissions: ['manage_public_channel_members'],
-                            },
-                        },
-                    },
                     channels: {
                         ...testState.entities.channels,
-                        myMembers: {
-                            ...testState.entities.channels.myMembers,
-                            [channel1.id]: {
-                                ...testState.entities.channels.myMembers[channel1.id],
-                                roles: 'channel_user',
+                        channels: {
+                            ...testState.entities.channels.channels,
+                            'new-not-member-channel': {
+                                id: 'new-not-member-channel',
+                                display_name: '111111',
+                                name: 'new-not-member-channel',
+                                team_id: team1.id,
                             },
-                            [channel5.id]: {
-                                ...testState.entities.channels.myMembers[channel5.id],
-                                roles: 'channel_user',
+                            [channel1.id]: {
+                                id: channel1.id,
+                                display_name: 'aaaaaa',
+                                name: 'test-channel',
+                                team_id: team1.id,
                             },
                         },
                     },
+                    roles: {
+                        roles: {
+                            system_user: {permissions: []},
+                        },
+                    },
+                    general: {
+                        ...testState.entities.general,
+                        serverVersion: '5.12.0',
+                    },
                 },
             };
-
-            assert.ok(Selectors.canManageAnyChannelMembersInCurrentTeam(newState) === true);
+            assert.equal(Selectors.getRedirectChannelNameForTeam(modifiedState, team1.id), 'test-channel');
         });
 
-        it('will return true if channel_user has permissions to manage private channel members', () => {
-            const newState = {
+        it('getRedirectChannelNameForTeam with advanced permissions and with JOIN_PUBLIC_CHANNELS permission', () => {
+            const modifiedState = {
+                ...testState,
                 entities: {
                     ...testState.entities,
                     roles: {
                         roles: {
-                            channel_user: {
-                                permissions: ['manage_private_channel_members'],
-                            },
+                            system_user: {permissions: ['join_public_channels']},
                         },
                     },
+                    general: {
+                        ...testState.entities.general,
+                        serverVersion: '5.12.0',
+                    },
+                },
+            };
+            assert.equal(Selectors.getRedirectChannelNameForTeam(modifiedState, team1.id), General.DEFAULT_CHANNEL);
+        });
+
+        it('getRedirectChannelNameForTeam with advanced permissions but without JOIN_PUBLIC_CHANNELS permission but being member of town-square', () => {
+            const modifiedState = {
+                ...testState,
+                entities: {
+                    ...testState.entities,
                     channels: {
                         ...testState.entities.channels,
-                        myMembers: {
-                            ...testState.entities.channels.myMembers,
-                            [channel1.id]: {
-                                ...testState.entities.channels.myMembers[channel1.id],
-                                roles: 'channel_user',
+                        channels: {
+                            ...testState.entities.channels.channels,
+                            'new-not-member-channel': {
+                                id: 'new-not-member-channel',
+                                display_name: '111111',
+                                name: 'new-not-member-channel',
+                                team_id: team1.id,
                             },
-                            [channel5.id]: {
-                                ...testState.entities.channels.myMembers[channel5.id],
-                                roles: 'channel_user',
+                            [channel1.id]: {
+                                id: channel1.id,
+                                display_name: 'Town Square',
+                                name: 'town-square',
+                                team_id: team1.id,
                             },
                         },
+                    },
+                    roles: {
+                        roles: {
+                            system_user: {permissions: []},
+                        },
+                    },
+                    general: {
+                        ...testState.entities.general,
+                        serverVersion: '5.12.0',
                     },
                 },
             };
-
-            assert.ok(Selectors.canManageAnyChannelMembersInCurrentTeam(newState) === true);
+            assert.equal(Selectors.getRedirectChannelNameForTeam(modifiedState, team1.id), General.DEFAULT_CHANNEL);
         });
 
-        it('will return false if channel admins have permissions, but the user is not a channel admin of any channel', () => {
-            const newState = {
+        it('getRedirectChannelNameForTeam without advanced permissions in not current team', () => {
+            const modifiedState = {
+                ...testState,
                 entities: {
                     ...testState.entities,
-                    roles: {
-                        roles: {
-                            channel_admin: {
-                                permissions: ['manage_public_channel_members'],
-                            },
-                        },
+                    general: {
+                        ...testState.entities.general,
+                        serverVersion: '4.8.0',
                     },
+                },
+            };
+            assert.equal(Selectors.getRedirectChannelNameForTeam(modifiedState, team2.id), General.DEFAULT_CHANNEL);
+        });
+
+        it('getRedirectChannelNameForTeam with advanced permissions but without JOIN_PUBLIC_CHANNELS permission in not current team', () => {
+            const modifiedState = {
+                ...testState,
+                entities: {
+                    ...testState.entities,
                     channels: {
                         ...testState.entities.channels,
-                        myMembers: {
-                            ...testState.entities.channels.myMembers,
-                            [channel1.id]: {
-                                ...testState.entities.channels.myMembers[channel1.id],
-                                roles: 'channel_user',
+                        channels: {
+                            ...testState.entities.channels.channels,
+                            'new-not-member-channel': {
+                                id: 'new-not-member-channel',
+                                display_name: '111111',
+                                name: 'new-not-member-channel',
+                                team_id: team2.id,
                             },
-                            [channel5.id]: {
-                                ...testState.entities.channels.myMembers[channel5.id],
-                                roles: 'channel_user',
+                            [channel3.id]: {
+                                id: channel3.id,
+                                display_name: 'aaaaaa',
+                                name: 'test-channel',
+                                team_id: team2.id,
                             },
                         },
                     },
+                    roles: {
+                        roles: {
+                            system_user: {permissions: []},
+                        },
+                    },
+                    general: {
+                        ...testState.entities.general,
+                        serverVersion: '5.12.0',
+                    },
                 },
             };
-
-            assert.ok(Selectors.canManageAnyChannelMembersInCurrentTeam(newState) === false);
+            assert.equal(Selectors.getRedirectChannelNameForTeam(modifiedState, team2.id), 'test-channel');
         });
 
-        it('will return true if channel admins have permission, and the user is a channel admin of some channel', () => {
-            const newState = {
+        it('getRedirectChannelNameForTeam with advanced permissions and with JOIN_PUBLIC_CHANNELS permission in not current team', () => {
+            const modifiedState = {
+                ...testState,
                 entities: {
                     ...testState.entities,
                     roles: {
                         roles: {
-                            channel_admin: {
-                                permissions: ['manage_public_channel_members'],
-                            },
+                            system_user: {permissions: ['join_public_channels']},
                         },
                     },
+                    general: {
+                        ...testState.entities.general,
+                        serverVersion: '5.12.0',
+                    },
+                },
+            };
+            assert.equal(Selectors.getRedirectChannelNameForTeam(modifiedState, team2.id), General.DEFAULT_CHANNEL);
+        });
+
+        it('getRedirectChannelNameForTeam with advanced permissions but without JOIN_PUBLIC_CHANNELS permission but being member of town-square in not current team', () => {
+            const modifiedState = {
+                ...testState,
+                entities: {
+                    ...testState.entities,
                     channels: {
                         ...testState.entities.channels,
-                        myMembers: {
-                            ...testState.entities.channels.myMembers,
-                            [channel1.id]: {
-                                ...testState.entities.channels.myMembers[channel1.id],
-                                roles: 'channel_user channel_admin',
+                        channels: {
+                            ...testState.entities.channels.channels,
+                            'new-not-member-channel': {
+                                id: 'new-not-member-channel',
+                                display_name: '111111',
+                                name: 'new-not-member-channel',
+                                team_id: team2.id,
                             },
-                            [channel5.id]: {
-                                ...testState.entities.channels.myMembers[channel5.id],
-                                roles: 'channel_user',
+                            [channel3.id]: {
+                                id: channel3.id,
+                                display_name: 'Town Square',
+                                name: 'town-square',
+                                team_id: team2.id,
                             },
                         },
                     },
-                },
-            };
-
-            assert.ok(Selectors.canManageAnyChannelMembersInCurrentTeam(newState) === true);
-        });
-
-        it('will return true if team admins have permission, and the user is a team admin', () => {
-            const newState = {
-                entities: {
-                    ...testState.entities,
                     roles: {
                         roles: {
-                            team_admin: {
-                                permissions: ['manage_public_channel_members'],
-                            },
+                            system_user: {permissions: []},
                         },
                     },
-                    users: {
-                        ...testState.entities.users,
-                        profiles: {
-                            ...testState.entities.users.profiles,
-                            [user.id]: {
-                                ...testState.entities.users.profiles[user.id],
-                                roles: 'team_admin',
-                            },
-                        },
+                    general: {
+                        ...testState.entities.general,
+                        serverVersion: '5.12.0',
                     },
                 },
             };
-
-            assert.ok(Selectors.canManageAnyChannelMembersInCurrentTeam(newState) === true);
+            assert.equal(Selectors.getRedirectChannelNameForTeam(modifiedState, team2.id), General.DEFAULT_CHANNEL);
         });
     });
 });
