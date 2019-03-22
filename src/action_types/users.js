@@ -32,7 +32,6 @@ export default keyMirror({
     UPDATE_ME_FAILURE: null,
 
     RECEIVED_ME: null,
-    RECEIVED_TERMS_OF_SERVICE_STATUS: null,
     RECEIVED_PROFILE: null,
     RECEIVED_PROFILES: null,
     RECEIVED_PROFILES_LIST: null,

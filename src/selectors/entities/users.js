@@ -392,10 +392,6 @@ function removeCurrentUserFromList(profiles: Array<UserProfile>, currentUserId: 
     }
 }
 
-export function getMyAcceptedTermsOfServiceData(state: GlobalState): Object {
-    return state.entities.users.myAcceptedTermsOfServiceData;
-}
-
 export const shouldShowTermsOfService: (GlobalState) => boolean = createSelector(
     getConfig,
     getCurrentUser,
