@@ -152,6 +152,17 @@ function profiles(state = {}, action) {
 
     case UserTypes.LOGOUT_SUCCESS:
         return {};
+    case UserTypes.RECEIVED_TERMS_OF_SERVICE_STATUS: {
+        const data = action.data || action.payload;
+        return {
+            ...state,
+            [data.user_id]: {
+                ...state[data.user_id],
+                terms_of_service_id: data.terms_of_service_id,
+                terms_of_service_create_at: data.terms_of_service_create_at,
+            },
+        };
+    }
 
     default:
         return state;
