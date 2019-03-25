@@ -555,7 +555,7 @@ export function updateMyTermsOfServiceStatus(termsOfServiceId: string, accepted:
                 dispatch({
                     type: UserTypes.RECEIVED_TERMS_OF_SERVICE_STATUS,
                     data: {
-                        create_at: new Date().getTime(),
+                        terms_of_service_create_at: new Date().getTime(),
                         terms_of_service_id: accepted ? termsOfServiceId : null,
                         user_id: getCurrentUserId(getState()),
                     },
