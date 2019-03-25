@@ -140,9 +140,16 @@ function profiles(state = {}, action) {
     case UserTypes.RECEIVED_ME:
     case UserTypes.RECEIVED_PROFILE: {
         const data = action.data || action.payload;
+        const user = {...data};
+        const oldUser = state[data.id];
+        if (oldUser) {
+            user.terms_of_service_id = oldUser.terms_of_service_id;
+            user.terms_of_service_create_at = oldUser.terms_of_service_create_at;
+        }
+
         return {
             ...state,
-            [data.id]: {...data},
+            [data.id]: user,
         };
     }
     case UserTypes.RECEIVED_PROFILES_LIST:
