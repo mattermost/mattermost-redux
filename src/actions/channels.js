@@ -182,7 +182,9 @@ export function createGroupChannel(userIds: Array<string>): ActionFunc {
             last_update_at: created.create_at,
         };
 
-        if (created.create_at !== created.update_at) {
+        // Check the channel previous existency: if the channel already have
+        // posts is because it existed before.
+        if (created.total_msg_count > 0) {
             const storeMember = getMyChannelMemberSelector(getState(), created.id);
             if (storeMember === null) {
                 try {
