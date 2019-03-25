@@ -9,6 +9,7 @@ import {General, Preferences} from 'constants';
 import {ChannelTypes, PreferenceTypes, UserTypes} from 'action_types';
 import {savePreferences, deletePreferences} from 'actions/preferences';
 import {getChannelsIdForTeam} from 'utils/channel_utils';
+import {getMyChannelMember as getMyChannelMemberSelector} from 'selectors/entities/channels';
 
 import {logError} from './errors';
 import {bindClientFunc, forceLogoutIfNecessary} from './helpers';
@@ -170,7 +171,7 @@ export function createGroupChannel(userIds: Array<string>): ActionFunc {
             return {error};
         }
 
-        const member = {
+        let member = {
             channel_id: created.id,
             user_id: currentUserId,
             roles: `${General.CHANNEL_USER_ROLE}`,
@@ -180,6 +181,22 @@ export function createGroupChannel(userIds: Array<string>): ActionFunc {
             notify_props: {desktop: 'default', mark_unread: 'all'},
             last_update_at: created.create_at,
         };
+
+        // Check the channel previous existency: if the channel already have
+        // posts is because it existed before.
+        if (created.total_msg_count > 0) {
+            const storeMember = getMyChannelMemberSelector(getState(), created.id);
+            if (storeMember === null) {
+                try {
+                    member = await Client4.getMyChannelMember(created.id);
+                } catch (error) {
+                    // Log the error and keep going with the generated membership.
+                    dispatch(logError(error));
+                }
+            } else {
+                member = storeMember;
+            }
+        }
 
         dispatch(markGroupChannelOpen(created.id));
 
@@ -206,7 +223,7 @@ export function createGroupChannel(userIds: Array<string>): ActionFunc {
                 data: profilesInChannel,
             },
         ]), getState);
-        dispatch(loadRolesIfNeeded(member.roles.split(' ')));
+        dispatch(loadRolesIfNeeded((member && member.roles.split(' ')) || []));
 
         return {data: created};
     };
