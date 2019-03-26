@@ -1055,6 +1055,13 @@ export default class Client4 {
         );
     };
 
+    invalidateAllEmailInvites = async () => {
+        return this.doFetch(
+            `${this.getTeamsRoute()}/invites/email`,
+            {method: 'delete'}
+        );
+    };
+
     getTeamInviteInfo = async (inviteId) => {
         return this.doFetch(
             `${this.getTeamsRoute()}/invite/${inviteId}`,
