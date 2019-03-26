@@ -18,10 +18,6 @@ const state: GlobalState = {
         },
         users: {
             currentUserId: '',
-            myAcceptedTermsOfServiceData: {
-                id: '',
-                time: 0,
-            },
             mySessions: [],
             myAudits: [],
             profiles: {},

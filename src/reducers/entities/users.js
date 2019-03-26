@@ -87,22 +87,6 @@ function currentUserId(state = '', action) {
     return state;
 }
 
-function myAcceptedTermsOfServiceData(state = {id: '', time: 0}, action) {
-    switch (action.type) {
-    case UserTypes.RECEIVED_TERMS_OF_SERVICE_STATUS:
-        return {
-            id: action.data.terms_of_service_id,
-            time: action.data.create_at,
-        };
-
-    case UserTypes.LOGOUT_SUCCESS:
-        return {id: '', time: 0};
-
-    default:
-        return state;
-    }
-}
-
 function mySessions(state = [], action) {
     switch (action.type) {
     case UserTypes.RECEIVED_SESSIONS:
@@ -156,9 +140,16 @@ function profiles(state = {}, action) {
     case UserTypes.RECEIVED_ME:
     case UserTypes.RECEIVED_PROFILE: {
         const data = action.data || action.payload;
+        const user = {...data};
+        const oldUser = state[data.id];
+        if (oldUser) {
+            user.terms_of_service_id = oldUser.terms_of_service_id;
+            user.terms_of_service_create_at = oldUser.terms_of_service_create_at;
+        }
+
         return {
             ...state,
-            [data.id]: {...data},
+            [data.id]: user,
         };
     }
     case UserTypes.RECEIVED_PROFILES_LIST:
@@ -168,6 +159,17 @@ function profiles(state = {}, action) {
 
     case UserTypes.LOGOUT_SUCCESS:
         return {};
+    case UserTypes.RECEIVED_TERMS_OF_SERVICE_STATUS: {
+        const data = action.data || action.payload;
+        return {
+            ...state,
+            [data.user_id]: {
+                ...state[data.user_id],
+                terms_of_service_id: data.terms_of_service_id,
+                terms_of_service_create_at: data.terms_of_service_create_at,
+            },
+        };
+    }
 
     default:
         return state;
@@ -396,9 +398,6 @@ export default combineReducers({
 
     // the current selected user
     currentUserId,
-
-    // the current user's accepted terms of service id and acceptance timestamp
-    myAcceptedTermsOfServiceData,
 
     // array with the user's sessions
     mySessions,

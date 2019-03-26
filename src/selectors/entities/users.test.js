@@ -491,9 +491,6 @@ describe('Selectors.Users', () => {
                 },
                 users: {
                     currentUserId: userId,
-                    myAcceptedTermsOfServiceData: {
-                        id: '0',
-                    },
                     profiles: {
                         [userId]: {id: userId, username: 'user', first_name: 'First', last_name: 'Last'},
                     },
@@ -515,9 +512,6 @@ describe('Selectors.Users', () => {
                 },
                 users: {
                     currentUserId: userId,
-                    myAcceptedTermsOfServiceData: {
-                        id: '1',
-                    },
                     profiles: {
                         [userId]: {id: userId, username: 'user', first_name: 'First', last_name: 'Last'},
                     },
@@ -539,9 +533,6 @@ describe('Selectors.Users', () => {
                 },
                 users: {
                     currentUserId: userId,
-                    myAcceptedTermsOfServiceData: {
-                        id: '1',
-                    },
                     profiles: {
                         [userId]: {id: userId, username: 'user', first_name: 'First', last_name: 'Last'},
                     },
@@ -563,11 +554,8 @@ describe('Selectors.Users', () => {
                 },
                 users: {
                     currentUserId: userId,
-                    myAcceptedTermsOfServiceData: {
-                        id: '1',
-                    },
                     profiles: {
-                        [userId]: {id: userId, username: 'user', first_name: 'First', last_name: 'Last'},
+                        [userId]: {id: userId, username: 'user', first_name: 'First', last_name: 'Last', terms_of_service_id: '1', terms_of_service_create_at: new Date().getTime()},
                     },
                 },
             },
@@ -587,10 +575,6 @@ describe('Selectors.Users', () => {
                 },
                 users: {
                     currentUserId: userId,
-                    myAcceptedTermsOfServiceData: {
-                        id: '',
-                        time: 0,
-                    },
                     profiles: {},
                 },
             },

@@ -168,7 +168,6 @@ function completeLogin(data: UserProfile): ActionFunc {
             dispatch(getMyPreferences()),
             dispatch(getMyTeams()),
             dispatch(getClientConfig()),
-            dispatch(getMyTermsOfServiceStatus()),
         ];
 
         const serverVersion = Client4.getServerVersion();
@@ -230,10 +229,6 @@ export function loadMe(): ActionFunc {
             dispatch(getMyTeamMembers()),
             dispatch(getMyTeamUnreads()),
         ];
-
-        if (config.EnableCustomTermsOfService === 'true') {
-            promises.push(dispatch(getMyTermsOfServiceStatus()));
-        }
 
         // Sometimes the server version is set in one or the other
         const serverVersion = Client4.getServerVersion() || getState().entities.general.serverVersion;
@@ -541,13 +536,6 @@ export function getMe(): ActionFunc {
     };
 }
 
-export function getMyTermsOfServiceStatus(): ActionFunc {
-    return bindClientFunc({
-        clientFunc: Client4.getMyTermsOfServiceStatus,
-        onSuccess: UserTypes.RECEIVED_TERMS_OF_SERVICE_STATUS,
-    });
-}
-
 export function updateMyTermsOfServiceStatus(termsOfServiceId: string, accepted: boolean): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         const response: $Subtype<ActionResult> = await dispatch(bindClientFunc({
@@ -559,14 +547,16 @@ export function updateMyTermsOfServiceStatus(termsOfServiceId: string, accepted:
         }));
         const {data, error} = response;
         if (data) {
-            dispatch({
-                type: UserTypes.RECEIVED_TERMS_OF_SERVICE_STATUS,
-                data: {
-                    create_at: new Date().getTime(),
-                    terms_of_service_id: accepted ? termsOfServiceId : null,
-                    user_id: getCurrentUserId(getState()),
-                },
-            });
+            if (accepted) {
+                dispatch({
+                    type: UserTypes.RECEIVED_TERMS_OF_SERVICE_STATUS,
+                    data: {
+                        terms_of_service_create_at: new Date().getTime(),
+                        terms_of_service_id: accepted ? termsOfServiceId : null,
+                        user_id: getCurrentUserId(getState()),
+                    },
+                });
+            }
             return {data};
         }
         return {error};
@@ -1393,7 +1383,6 @@ export default {
     switchLdapToEmail,
     getTermsOfService,
     createTermsOfService,
-    getMyTermsOfServiceStatus,
     updateMyTermsOfServiceStatus,
     createUserAccessToken,
     getUserAccessToken,
