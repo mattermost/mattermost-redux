@@ -35,7 +35,7 @@ import {
 } from './preferences';
 
 import {getConfig} from 'selectors/entities/general';
-import {getCurrentUserId, getCurrentUser} from 'selectors/entities/users';
+import {getCurrentUserId} from 'selectors/entities/users';
 
 export function checkMfa(loginId: string): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
@@ -548,10 +548,6 @@ export function updateMyTermsOfServiceStatus(termsOfServiceId: string, accepted:
         const {data, error} = response;
         if (data) {
             if (accepted) {
-                const user = {...getCurrentUser(getState())};
-                user.terms_of_service_id = termsOfServiceId;
-                user.terms_of_service_create_at = new Date().getTime();
-
                 dispatch({
                     type: UserTypes.RECEIVED_TERMS_OF_SERVICE_STATUS,
                     data: {
