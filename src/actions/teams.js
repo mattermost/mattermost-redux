@@ -582,3 +582,9 @@ export function updateTeamMemberSchemeRoles(
         onSuccess: TeamTypes.UPDATED_TEAM_MEMBER_SCHEME_ROLES,
     });
 }
+
+export function invalidateAllEmailInvites(): ActionFunc {
+    return bindClientFunc({
+        clientFunc: Client4.invalidateAllEmailInvites,
+    });
+}
