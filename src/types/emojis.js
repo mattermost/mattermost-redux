@@ -9,7 +9,7 @@ export type CustomEmoji = {|
     delete_at: number,
     creator_id: string,
     name: string,
-    mimeType: string,
+    mime_type: string,
 |}
 
 export type SystemEmoji = {|
