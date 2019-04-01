@@ -1197,26 +1197,27 @@ export const getMyFirstChannelForTeams: (GlobalState) => RelationOneToOne<Team, 
     getAllChannels,
     getMyChannelMemberships,
     getCurrentUser,
-    (channels: IDMappedObjects<Channel>, members: RelationOneToOne<Channel, ChannelMembership>, currentUser: UserProfile): RelationOneToOne<Team, Channel> => {
+    (allChannels: IDMappedObjects<Channel>, myChannelMemberships: RelationOneToOne<Channel, ChannelMembership>, currentUser: UserProfile): RelationOneToOne<Team, Channel> => {
         const locale = currentUser.locale || General.DEFAULT_LOCALE;
-        const result: RelationOneToOne<Team, Channel> = {};
-        for (const channel of Object.keys(channels).map((key) => channels[key]).sort(sortChannelsByDisplayName.bind(null, locale))) {
-            if (!result[channel.team_id] && members[channel.id]) {
+        const result = {};
+        for (const channel of Object.keys(allChannels).map((key) => allChannels[key]).sort(sortChannelsByDisplayName.bind(null, locale))) {
+            if (!result[channel.team_id] && myChannelMemberships[channel.id]) {
                 result[channel.team_id] = channel;
             }
         }
-        return result
+        return result;
     }
 );
 
 export const getRedirectChannelNameForTeam = (state: GlobalState, teamId: string): string => {
-    const defaultChannels = getDefaultChannelForTeams(state);
-    const firstChannelForTeams = getMyFirstChannelForTeams(state);
-    const canIJoinPublicTeams = !hasNewPermissions(state) || haveITeamPermission(state, {team: teamId, permission: Permissions.JOIN_PUBLIC_CHANNELS});
-    const members = getMyChannelMemberships(state);
+    const defaultChannelForTeam = getDefaultChannelForTeams(state)[teamId];
+    const myFirstChannelForTeam = getMyFirstChannelForTeams(state)[teamId];
+    const canIJoinPublicChannelsInTeam = !hasNewPermissions(state) || haveITeamPermission(state, {team: teamId, permission: Permissions.JOIN_PUBLIC_CHANNELS});
+    const myChannelMemberships = getMyChannelMemberships(state);
 
-    if ((!defaultChannels[teamId] || !members[defaultChannels[teamId].id]) && !canIJoinPublicTeams) {
-        return (firstChannelForTeams[teamId] && firstChannelForTeams[teamId].name) || General.DEFAULT_CHANNEL;
+    const iAmMemberOfTheTeamDefaultChannel = Boolean(defaultChannelForTeam && myChannelMemberships[defaultChannelForTeam.id]);
+    if (iAmMemberOfTheTeamDefaultChannel || canIJoinPublicChannelsInTeam) {
+        return General.DEFAULT_CHANNEL;
     }
-    return General.DEFAULT_CHANNEL;
+    return (myFirstChannelForTeam && myFirstChannelForTeam.name) || General.DEFAULT_CHANNEL;
 };
