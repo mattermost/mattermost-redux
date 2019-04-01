@@ -29,7 +29,8 @@ export type Team = {|
     allowed_domains: string,
     invite_id: string,
     allow_open_invite: boolean,
-    scheme_id: string
+    scheme_id: string,
+    group_constrained: boolean,
 |};
 
 export type TeamsState = {|

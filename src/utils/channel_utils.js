@@ -430,6 +430,7 @@ function createFakeChannel(userId: string, otherUserId: string): Channel {
         id: '',
         display_name: '',
         creator_id: '',
+        group_constrained: false,
     };
 }
 

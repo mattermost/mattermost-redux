@@ -40,6 +40,7 @@ export type Channel = {|
     teammate_id?: string,
     status?: string,
     fake?: boolean,
+    group_constrained: boolean,
 |};
 
 export type ChannelMembership = {|
