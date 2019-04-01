@@ -23,7 +23,7 @@ import {
 } from 'selectors/entities/preferences';
 import {getLastPostPerChannel, getAllPosts} from 'selectors/entities/posts';
 import {getCurrentTeamId, getCurrentTeamMembership, getMyTeams, getTeamMemberships} from 'selectors/entities/teams';
-import {haveICurrentChannelPermission, haveIChannelPermission, haveICurrentTeamPermission} from 'selectors/entities/roles';
+import {haveICurrentChannelPermission, haveIChannelPermission} from 'selectors/entities/roles';
 import {isCurrentUserSystemAdmin, getCurrentUserId} from 'selectors/entities/users';
 
 import {
@@ -414,14 +414,6 @@ export const getChannelsWithUnreadSection: (GlobalState) => {unreadChannels: Arr
 export const getDefaultChannel: (GlobalState) => ?Channel = createSelector(
     getAllChannels,
     getCurrentTeamId,
-    (channels: IDMappedObjects<Channel>, teamId: string): ?Channel => {
-        return Object.keys(channels).map((key) => channels[key]).find((c) => c && c.team_id === teamId && c.name === General.DEFAULT_CHANNEL);
-    }
-);
-
-export const getDefaultChannelForTeam: (GlobalState, string) => ?Channel = createSelector(
-    getAllChannels,
-    (state, teamId) => teamId,
     (channels: IDMappedObjects<Channel>, teamId: string): ?Channel => {
         return Object.keys(channels).map((key) => channels[key]).find((c) => c && c.team_id === teamId && c.name === General.DEFAULT_CHANNEL);
     }
@@ -1188,20 +1180,37 @@ export const getSortedDirectChannelWithUnreadsIds: (GlobalState, Channel, boolea
     },
 );
 
-export const getRedirectChannelNameForTeam: (GlobalState, string) => string = createSelector(
+export const getDefaultChannelForTeams: (GlobalState) => RelationOneToOne<Team, Channel> = createSelector(
     getAllChannels,
-    getDefaultChannelForTeam,
-    getMyChannelMemberships,
-    (state, teamId) => teamId,
-    (state: GlobalState): boolean => !hasNewPermissions(state) || haveICurrentTeamPermission(state, {permission: Permissions.JOIN_PUBLIC_CHANNELS}),
-    getCurrentUser,
-    (channels: IDMappedObjects<Channel>, defaultChannel: ?Channel, members: RelationOneToOne<Channel, ChannelMembership>, teamId: string, canIJoinPublicTeams: boolean, currentUser: UserProfile): string => {
-        if ((!defaultChannel || !members[defaultChannel.id]) && !canIJoinPublicTeams) {
-            const locale = currentUser.locale || General.DEFAULT_LOCALE;
-            const myChannelsInTeam = Object.keys(channels).map((key) => channels[key]).filter((c) => c.team_id === teamId && members[c.id]);
-            const sortedChannels = myChannelsInTeam.sort(sortChannelsByDisplayName.bind(null, locale));
-            return sortedChannels[0] && sortedChannels[0].name;
+    (channels: IDMappedObjects<Channel>): RelationOneToOne<Team, Channel> => {
+        const result = {};
+        for (const channel of Object.keys(channels).map((key) => channels[key])) {
+            if (channel && channel.name === General.DEFAULT_CHANNEL) {
+                result[channel.team_id] = channel;
+            }
         }
-        return General.DEFAULT_CHANNEL;
+        return result;
     }
 );
+
+export function makeGetRedirectChannelNameForTeam(): (GlobalState, string) => string {
+    return createSelector(
+        getAllChannels,
+        getDefaultChannelForTeams,
+        getMyChannelMemberships,
+        (state: GlobalState, teamId: string): string => teamId,
+        (state: GlobalState, teamId: string): boolean => !hasNewPermissions(state) || haveITeamPermission(state, {team: teamId, permission: Permissions.JOIN_PUBLIC_CHANNELS}),
+        getCurrentUser,
+        (channels: IDMappedObjects<Channel>, defaultChannels: RelationOneToOne<Team, Channel>, members: RelationOneToOne<Channel, ChannelMembership>, teamId: string, canIJoinPublicTeams: boolean, currentUser: UserProfile): string => {
+            if ((!defaultChannels[teamId] || !members[defaultChannels[teamId].id]) && !canIJoinPublicTeams) {
+                const locale = currentUser.locale || General.DEFAULT_LOCALE;
+                const myChannelsInTeam = Object.keys(channels).map((key) => channels[key]).filter((c) => c.team_id === teamId && members[c.id]);
+                const sortedChannels = myChannelsInTeam.sort(sortChannelsByDisplayName.bind(null, locale));
+                return sortedChannels[0] && sortedChannels[0].name;
+            }
+            return General.DEFAULT_CHANNEL;
+        }
+    );
+}
+
+export const getRedirectChannelNameForTeam = makeGetRedirectChannelNameForTeam();

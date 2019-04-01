@@ -504,8 +504,11 @@ function handleChannelDeletedEvent(msg) {
         if (msg.broadcast.team_id === currentTeamId) {
             if (msg.data.channel_id === currentChannelId && !viewArchivedChannels) {
                 const channel = getChannelByName(state, getRedirectChannelNameForTeam(state, currentTeamId));
-
-                dispatch({type: ChannelTypes.SELECT_CHANNEL, data: channel && channel.id});
+                let redirectChannelId = '';
+                if (channel && channel.id) {
+                    redirectChannelId = channel.id;
+                }
+                dispatch({type: ChannelTypes.SELECT_CHANNEL, data: redirectChannelId});
                 EventEmitter.emit(General.DEFAULT_CHANNEL, '');
             }
 

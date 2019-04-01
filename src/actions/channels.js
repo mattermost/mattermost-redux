@@ -670,8 +670,12 @@ export function deleteChannel(channelId: string): ActionFunc {
         const {currentChannelId} = entities.channels;
         if (channelId === currentChannelId && !viewArchivedChannels) {
             const channel = getChannelByName(state, getRedirectChannelNameForTeam(state, getCurrentTeamId(state)));
+            let redirectChannelId = '';
+            if (channel && channel.id) {
+                redirectChannelId = channel.id;
+            }
 
-            dispatch({type: ChannelTypes.SELECT_CHANNEL, data: channel && channel.id}, getState);
+            dispatch({type: ChannelTypes.SELECT_CHANNEL, data: redirectChannelId}, getState);
         }
 
         dispatch({type: ChannelTypes.DELETE_CHANNEL_SUCCESS, data: {id: channelId, viewArchivedChannels}}, getState);
