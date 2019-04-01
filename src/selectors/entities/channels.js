@@ -23,7 +23,7 @@ import {
 } from 'selectors/entities/preferences';
 import {getLastPostPerChannel, getAllPosts} from 'selectors/entities/posts';
 import {getCurrentTeamId, getCurrentTeamMembership, getMyTeams, getTeamMemberships} from 'selectors/entities/teams';
-import {haveICurrentChannelPermission, haveIChannelPermission} from 'selectors/entities/roles';
+import {haveICurrentChannelPermission, haveIChannelPermission, haveITeamPermission} from 'selectors/entities/roles';
 import {isCurrentUserSystemAdmin, getCurrentUserId} from 'selectors/entities/users';
 
 import {

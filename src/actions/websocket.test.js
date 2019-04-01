@@ -220,7 +220,7 @@ describe('Actions.Websocket', () => {
 
     it('Websocket Handle Channel Created', (done) => {
         async function test() {
-            const channel = {id: '95tpi6f4apy39k6zxuo3msxzhy'};
+            const channel = {id: '95tpi6f4apy39k6zxuo3msxzhy', display_name: 'test'};
             store.dispatch({type: ChannelTypes.RECEIVED_CHANNEL, data: channel});
             mockServer.emit('message', JSON.stringify({event: WebsocketEvents.CHANNEL_CREATED, data: {channel_id: '95tpi6f4apy39k6zxuo3msxzhy', team_id: TestHelper.basicTeam.id}, broadcast: {omit_users: null, user_id: 't36kso9nwtdhbm8dbkd6g4eeby', channel_id: '', team_id: ''}, seq: 57}));
 
