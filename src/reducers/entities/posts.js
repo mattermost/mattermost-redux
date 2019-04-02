@@ -502,7 +502,8 @@ function handlePosts(posts = {}, postsInChannel = {}, postsInThread = {}, action
         return {posts, postsInChannel, postsInThread};
     case ChannelTypes.RECEIVED_CHANNEL_DELETED:
     case ChannelTypes.DELETE_CHANNEL_SUCCESS:
-        if (!action.data.viewArchivedChannels) {
+    case ChannelTypes.LEAVE_CHANNEL:
+        if (action.data && !action.data.viewArchivedChannels) {
             return handleChannelDeleted(posts, postsInChannel, postsInThread, action.data.id);
         }
         return {posts, postsInChannel, postsInThread};
