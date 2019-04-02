@@ -534,7 +534,7 @@ describe('Actions.Channels', () => {
         assert.ok(member.last_viewed_at > timestamp);
     });
 
-    describe('markChannelAsUnread', async () => {
+    describe('markChannelAsUnread', () => {
         it('plain message', async () => {
             const teamId = TestHelper.generateId();
             const channelId = TestHelper.generateId();
@@ -680,7 +680,7 @@ describe('Actions.Channels', () => {
         });
     });
 
-    describe('markChannelAsRead', async () => {
+    describe('markChannelAsRead', () => {
         it('one read channel', async () => {
             const channelId = TestHelper.generateId();
             const teamId = TestHelper.generateId();
