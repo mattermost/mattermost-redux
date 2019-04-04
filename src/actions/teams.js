@@ -211,7 +211,7 @@ export function patchTeam(team: Team): ActionFunc {
 export function regenerateTeamInviteId(teamId: string): ActionFunc {
     return bindClientFunc({
         clientFunc: Client4.regenerateTeamInviteId,
-        onSuccess: TeamTypes.REGENERATE_TEAM_INVITE_ID,
+        onSuccess: TeamTypes.REGENERATED_TEAM_INVITE_ID,
         params: [
             teamId,
         ],
