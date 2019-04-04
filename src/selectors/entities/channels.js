@@ -574,6 +574,11 @@ export const canManageAnyChannelMembers: (GlobalState) => boolean = createSelect
         for (const channelId of Object.keys(members)) {
             const channel = getChannel(state, channelId);
 
+            // Channel of this membership is not loaded into redux at this time
+            if (!channel) {
+                continue;
+            }
+
             if (channel.type === General.OPEN_CHANNEL && haveIChannelPermission(state, {permission: Permissions.MANAGE_PUBLIC_CHANNEL_MEMBERS, channel: channelId, team: currentTeamId})) {
                 return true;
             } else if (channel.type === General.PRIVATE_CHANNEL && haveIChannelPermission(state, {permission: Permissions.MANAGE_PRIVATE_CHANNEL_MEMBERS, channel: channelId, team: currentTeamId})) {
