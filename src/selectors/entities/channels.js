@@ -566,6 +566,7 @@ export const canManageChannelMembers: (GlobalState) => boolean = createSelector(
     }
 );
 
+// Determine if the user has permissions to manage members in at least one channel of the current team
 export const canManageAnyChannelMembers: (GlobalState) => boolean = createSelector(
     getMyChannelMemberships,
     getCurrentTeamId,
@@ -574,8 +575,7 @@ export const canManageAnyChannelMembers: (GlobalState) => boolean = createSelect
         for (const channelId of Object.keys(members)) {
             const channel = getChannel(state, channelId);
 
-            // Channel of this membership is not loaded into redux at this time
-            if (!channel) {
+            if (!channel || channel.team_id !== currentTeamId) {
                 continue;
             }
 
