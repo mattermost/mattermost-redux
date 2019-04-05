@@ -567,7 +567,7 @@ export const canManageChannelMembers: (GlobalState) => boolean = createSelector(
 );
 
 // Determine if the user has permissions to manage members in at least one channel of the current team
-export const canManageAnyChannelMembers: (GlobalState) => boolean = createSelector(
+export const canManageAnyChannelMembersInCurrentTeam: (GlobalState) => boolean = createSelector(
     getMyChannelMemberships,
     getCurrentTeamId,
     (state: GlobalState): GlobalState => state,

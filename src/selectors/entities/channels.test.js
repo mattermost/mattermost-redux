@@ -1169,7 +1169,7 @@ describe('Selectors.Channels', () => {
         });
     });
 
-    describe('canManageAnyChannelMembers', () => {
+    describe('canManageAnyChannelMembersInCurrentTeam', () => {
         it('will return false if channel_user does not have permissions to manage channel members', () => {
             const newState = {
                 entities: {
@@ -1198,7 +1198,7 @@ describe('Selectors.Channels', () => {
                 },
             };
 
-            assert.ok(Selectors.canManageAnyChannelMembers(newState) === false);
+            assert.ok(Selectors.canManageAnyChannelMembersInCurrentTeam(newState) === false);
         });
 
         it('will return true if channel_user has permissions to manage public channel members', () => {
@@ -1229,7 +1229,7 @@ describe('Selectors.Channels', () => {
                 },
             };
 
-            assert.ok(Selectors.canManageAnyChannelMembers(newState) === true);
+            assert.ok(Selectors.canManageAnyChannelMembersInCurrentTeam(newState) === true);
         });
 
         it('will return true if channel_user has permissions to manage private channel members', () => {
@@ -1260,7 +1260,7 @@ describe('Selectors.Channels', () => {
                 },
             };
 
-            assert.ok(Selectors.canManageAnyChannelMembers(newState) === true);
+            assert.ok(Selectors.canManageAnyChannelMembersInCurrentTeam(newState) === true);
         });
 
         it('will return false if channel admins have permissions, but the user is not a channel admin of any channel', () => {
@@ -1291,7 +1291,7 @@ describe('Selectors.Channels', () => {
                 },
             };
 
-            assert.ok(Selectors.canManageAnyChannelMembers(newState) === false);
+            assert.ok(Selectors.canManageAnyChannelMembersInCurrentTeam(newState) === false);
         });
 
         it('will return true if channel admins have permission, and the user is a channel admin of some channel', () => {
@@ -1322,7 +1322,7 @@ describe('Selectors.Channels', () => {
                 },
             };
 
-            assert.ok(Selectors.canManageAnyChannelMembers(newState) === true);
+            assert.ok(Selectors.canManageAnyChannelMembersInCurrentTeam(newState) === true);
         });
 
         it('will return true if team admins have permission, and the user is a team admin', () => {
@@ -1349,7 +1349,7 @@ describe('Selectors.Channels', () => {
                 },
             };
 
-            assert.ok(Selectors.canManageAnyChannelMembers(newState) === true);
+            assert.ok(Selectors.canManageAnyChannelMembersInCurrentTeam(newState) === true);
         });
     });
 });
