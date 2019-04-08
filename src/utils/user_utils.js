@@ -96,6 +96,22 @@ export function removeUserFromList(userId: $ID<UserProfile>, list: Array<UserPro
     return list;
 }
 
+// Splits the term by a splitStr and composes a list of the parts of
+// the split concatenated with the rest, forming a set of suggesitons
+// matchable with startsWith
+//
+// E.g.: for "one.two.three" by "." it would yield
+// ["one.two.three", "two.three", "three"]
+export function getSuggestionsSplitBy(term: string, splitStr: string): Array<string> {
+    const splitTerm = term.split(splitStr);
+    return splitTerm.map((st, i) => splitTerm.slice(i).join(splitStr));
+}
+
+export function getSuggestionsSplitByMultiple(term: string, splitStrs: Array<string>): Array<string> {
+    // $FlowFixMe - Array.flatMap is not yet implemented in Flow
+    return [...new Set(splitStrs.flatMap((splitStr) => getSuggestionsSplitBy(term, splitStr)))];
+}
+
 export function filterProfilesMatchingTerm(users: Array<UserProfile>, term: string): Array<UserProfile> {
     const lowercasedTerm = term.toLowerCase();
     let trimmedTerm = lowercasedTerm;
@@ -107,25 +123,27 @@ export function filterProfilesMatchingTerm(users: Array<UserProfile>, term: stri
         if (!user) {
             return false;
         }
-        const username = (user.username || '').toLowerCase();
+
+        const profileSuggestions = [];
+        const usernameSuggestions = getSuggestionsSplitByMultiple((user.username || '').toLowerCase(), General.AUTOCOMPLETE_SPLIT_CHARACTERS);
+        profileSuggestions.push(...usernameSuggestions);
         const first = (user.first_name || '').toLowerCase();
         const last = (user.last_name || '').toLowerCase();
         const full = first + ' ' + last;
+        profileSuggestions.push(first, last, full);
+        profileSuggestions.push((user.nickname || '').toLowerCase());
         const email = (user.email || '').toLowerCase();
-        const nickname = (user.nickname || '').toLowerCase();
+        profileSuggestions.push(email);
+        profileSuggestions.push((user.nickname || '').toLowerCase());
 
-        let emailDomain = '';
         const split = email.split('@');
         if (split.length > 1) {
-            emailDomain = split[1];
+            profileSuggestions.push(split[1]);
         }
 
-        return username.startsWith(trimmedTerm) ||
-            full.startsWith(trimmedTerm) ||
-            last.startsWith(lowercasedTerm) ||
-            nickname.startsWith(trimmedTerm) ||
-            email.startsWith(lowercasedTerm) ||
-            emailDomain.startsWith(trimmedTerm);
+        return profileSuggestions.
+            filter((suggestion) => suggestion !== '').
+            some((suggestion) => suggestion.startsWith(trimmedTerm));
     });
 }
 
