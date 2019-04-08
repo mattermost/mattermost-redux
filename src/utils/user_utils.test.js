@@ -4,7 +4,12 @@
 import assert from 'assert';
 
 import {Preferences} from 'constants';
-import {displayUsername, filterProfilesMatchingTerm} from 'utils/user_utils';
+import {
+    displayUsername,
+    filterProfilesMatchingTerm,
+    getSuggestionsSplitBy,
+    getSuggestionsSplitByMultiple,
+} from 'utils/user_utils';
 
 describe('user utils', () => {
     describe('displayUsername', () => {
@@ -53,14 +58,14 @@ describe('user utils', () => {
     describe('filterProfilesMatchingTerm', () => {
         const userA = {
             id: 100,
-            username: 'testUser',
+            username: 'testUser.split_10-',
             nickname: 'nick',
             first_name: 'First',
             last_name: 'Last1',
         };
         const userB = {
             id: 101,
-            username: 'extraPerson',
+            username: 'extraPerson-split',
             nickname: 'somebody',
             first_name: 'First',
             last_name: 'Last2',
@@ -78,6 +83,11 @@ describe('user utils', () => {
 
         it('should match by username', () => {
             assert.deepEqual(filterProfilesMatchingTerm(users, 'testUser'), [userA]);
+        });
+
+        it('should match by split part of the username', () => {
+            assert.deepEqual(filterProfilesMatchingTerm(users, 'split'), [userA, userB]);
+            assert.deepEqual(filterProfilesMatchingTerm(users, '10'), [userA]);
         });
 
         it('should match by firstname', () => {
@@ -130,6 +140,24 @@ describe('user utils', () => {
 
         it('should ignore leading @ for firstname', () => {
             assert.deepEqual(filterProfilesMatchingTerm(users, '@first'), [userA, userB]);
+        });
+    });
+
+    describe('Utils.getSuggestionsSplitBy', () => {
+        test('correct suggestions when splitting by a character', () => {
+            const term = 'one.two.three';
+            const expectedSuggestions = ['one.two.three', 'two.three', 'three'];
+
+            expect(getSuggestionsSplitBy(term, '.')).toEqual(expectedSuggestions);
+        });
+    });
+
+    describe('Utils.getSuggestionsSplitByMultiple', () => {
+        test('correct suggestions when splitting by multiple characters', () => {
+            const term = 'one.two-three';
+            const expectedSuggestions = ['one.two-three', 'two-three', 'three'];
+
+            expect(getSuggestionsSplitByMultiple(term, ['.', '-'])).toEqual(expectedSuggestions);
         });
     });
 });
