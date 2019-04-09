@@ -396,7 +396,7 @@ function handlePostDeleted(posts = {}, postsInChannel = {}, postsInThread = {}, 
     return {posts: nextPosts, postsInChannel: nextPostsForChannel, postsInThread: nextPostsForThread};
 }
 
-function handleChannelDeleted(posts = {}, postsInChannel = {}, postsInThread = {}, channelId) {
+function handleChannelRemoved(posts = {}, postsInChannel = {}, postsInThread = {}, channelId) {
     const nextPosts = {...posts};
     const nextPostsForChannel = {...postsInChannel};
     const nextPostsForThread = {...postsInThread};
@@ -504,7 +504,7 @@ function handlePosts(posts = {}, postsInChannel = {}, postsInThread = {}, action
     case ChannelTypes.DELETE_CHANNEL_SUCCESS:
     case ChannelTypes.LEAVE_CHANNEL:
         if (action.data && !action.data.viewArchivedChannels) {
-            return handleChannelDeleted(posts, postsInChannel, postsInThread, action.data.id);
+            return handleChannelRemoved(posts, postsInChannel, postsInThread, action.data.id);
         }
         return {posts, postsInChannel, postsInThread};
     case PostTypes.REMOVE_POST:
