@@ -686,7 +686,7 @@ describe('Actions.Posts', () => {
         );
     });
 
-    describe('getNeededCustomEmojis', async () => {
+    describe('getNeededCustomEmojis', () => {
         const state = {
             entities: {
                 emojis: {
