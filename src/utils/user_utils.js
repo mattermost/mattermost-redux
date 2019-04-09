@@ -108,8 +108,12 @@ export function getSuggestionsSplitBy(term: string, splitStr: string): Array<str
 }
 
 export function getSuggestionsSplitByMultiple(term: string, splitStrs: Array<string>): Array<string> {
-    // $FlowFixMe - Array.flatMap is not yet implemented in Flow
-    return [...new Set(splitStrs.flatMap((splitStr) => getSuggestionsSplitBy(term, splitStr)))];
+    const suggestions = splitStrs.reduce((acc, val) => {
+        getSuggestionsSplitBy(term, val).forEach((suggestion) => acc.add(suggestion));
+        return acc;
+    }, new Set());
+
+    return [...suggestions];
 }
 
 export function filterProfilesMatchingTerm(users: Array<UserProfile>, term: string): Array<UserProfile> {
