@@ -354,6 +354,7 @@ describe('posts', () => {
     for (const actionType of [
         ChannelTypes.RECEIVED_CHANNEL_DELETED,
         ChannelTypes.DELETE_CHANNEL_SUCCESS,
+        ChannelTypes.LEAVE_CHANNEL,
     ]) {
         describe(`when a channel is deleted (${actionType})`, () => {
             it('should remove any posts in that channel', () => {
@@ -2220,6 +2221,7 @@ describe('postsInChannel', () => {
     for (const actionType of [
         ChannelTypes.RECEIVED_CHANNEL_DELETED,
         ChannelTypes.DELETE_CHANNEL_SUCCESS,
+        ChannelTypes.LEAVE_CHANNEL,
     ]) {
         describe(`when a channel is deleted (${actionType})`, () => {
             it('should remove any posts in that channel', () => {
@@ -3006,6 +3008,7 @@ describe('postsInThread', () => {
     for (const actionType of [
         ChannelTypes.RECEIVED_CHANNEL_DELETED,
         ChannelTypes.DELETE_CHANNEL_SUCCESS,
+        ChannelTypes.LEAVE_CHANNEL,
     ]) {
         describe(`when a channel is deleted (${actionType})`, () => {
             it('should remove any threads in that channel', () => {

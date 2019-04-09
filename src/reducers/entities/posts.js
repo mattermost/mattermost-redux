@@ -140,8 +140,9 @@ export function handlePosts(state = {}, action) {
     }
 
     case ChannelTypes.RECEIVED_CHANNEL_DELETED:
-    case ChannelTypes.DELETE_CHANNEL_SUCCESS: {
-        if (action.data.viewArchivedChannels) {
+    case ChannelTypes.DELETE_CHANNEL_SUCCESS:
+    case ChannelTypes.LEAVE_CHANNEL: {
+        if (action.data && action.data.viewArchivedChannels) {
             // Nothing to do since we still want to store posts in archived channels
             return state;
         }
@@ -622,8 +623,9 @@ export function postsInChannel(state = {}, action, prevPosts, nextPosts) {
     }
 
     case ChannelTypes.RECEIVED_CHANNEL_DELETED:
-    case ChannelTypes.DELETE_CHANNEL_SUCCESS: {
-        if (action.data.viewArchivedChannels) {
+    case ChannelTypes.DELETE_CHANNEL_SUCCESS:
+    case ChannelTypes.LEAVE_CHANNEL: {
+        if (action.data && action.data.viewArchivedChannels) {
             // Nothing to do since we still want to store posts in archived channels
             return state;
         }
@@ -891,8 +893,9 @@ export function postsInThread(state = {}, action, prevPosts) {
     }
 
     case ChannelTypes.RECEIVED_CHANNEL_DELETED:
-    case ChannelTypes.DELETE_CHANNEL_SUCCESS: {
-        if (action.data.viewArchivedChannels) {
+    case ChannelTypes.DELETE_CHANNEL_SUCCESS:
+    case ChannelTypes.LEAVE_CHANNEL: {
+        if (action.data && action.data.viewArchivedChannels) {
             // Nothing to do since we still want to store posts in archived channels
             return state;
         }
