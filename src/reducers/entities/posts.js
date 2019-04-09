@@ -71,19 +71,7 @@ export function handlePosts(state = {}, action) {
     switch (action.type) {
     case PostTypes.RECEIVED_POST:
     case PostTypes.RECEIVED_NEW_POST: {
-        const post = removeUnneededMetadata(action.data);
-
-        const nextState = {
-            ...state,
-            [post.id]: post,
-        };
-
-        if (post.id && post.pending_post_id !== post.id) {
-            // Remove any pending posts
-            Reflect.deleteProperty(nextState, post.pending_post_id);
-        }
-
-        return nextState;
+        return handlePostReceived({...state}, action.data);
     }
 
     case PostTypes.RECEIVED_POSTS: {
@@ -95,32 +83,8 @@ export function handlePosts(state = {}, action) {
 
         const nextState = {...state};
 
-        for (let post of posts) {
-            post = removeUnneededMetadata(post);
-
-            if (post.delete_at > 0) {
-                // Mark the post as deleted if we have it
-                if (nextState[post.id]) {
-                    nextState[post.id] = {
-                        ...post,
-                        state: Posts.POST_DELETED,
-                        file_ids: [],
-                        has_reactions: false,
-                    };
-                } else {
-                    continue;
-                }
-            }
-
-            // Only change the stored post if it's changed since we last received it
-            if (!nextState[post.id] || nextState[post.id].update_at < post.update_at) {
-                nextState[post.id] = post;
-            }
-
-            // Remove any temporary posts
-            if (nextState[post.pending_post_id]) {
-                Reflect.deleteProperty(nextState, post.pending_post_id);
-            }
+        for (const post of posts) {
+            handlePostReceived(nextState, post);
         }
 
         return nextState;
@@ -208,6 +172,34 @@ export function handlePosts(state = {}, action) {
     default:
         return state;
     }
+}
+
+function handlePostReceived(nextState, post) {
+    if (nextState[post.id] && nextState[post.id].update_at >= post.update_at) {
+        // The stored post is newer than the one we've received
+        return nextState;
+    }
+
+    if (post.delete_at > 0) {
+        // We've received a deleted post, so mark the post as deleted if we already have it
+        if (nextState[post.id]) {
+            nextState[post.id] = {
+                ...removeUnneededMetadata(post),
+                state: Posts.POST_DELETED,
+                file_ids: [],
+                has_reactions: false,
+            };
+        }
+    } else {
+        nextState[post.id] = removeUnneededMetadata(post);
+    }
+
+    // Delete any pending post that existed for this post
+    if (post.pending_post_id && post.id !== post.pending_post_id && nextState[post.pending_post_id]) {
+        Reflect.deleteProperty(nextState, post.pending_post_id);
+    }
+
+    return nextState;
 }
 
 export function handlePendingPosts(state = [], action) {
