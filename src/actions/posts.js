@@ -30,6 +30,8 @@ import {
 } from './preferences';
 import {getProfilesByIds, getProfilesByUsernames, getStatusesByIds} from './users';
 
+// receivedPost should be dispatched after a single post from the server. This typically happens when an existing post
+// is updated.
 export function receivedPost(post) {
     return {
         type: PostTypes.RECEIVED_POST,
@@ -37,6 +39,8 @@ export function receivedPost(post) {
     };
 }
 
+// receivedNewPost should be dispatched when receiving a newly created post or when sending a request to the server
+// to make a new post.
 export function receivedNewPost(post) {
     return {
         type: PostTypes.RECEIVED_NEW_POST,
@@ -44,6 +48,8 @@ export function receivedNewPost(post) {
     };
 }
 
+// receivedPosts should be dispatched when receiving multiple posts from the server that may or may not be ordered.
+// This will typically be used alongside other actions like receivedPostsAfter which require the posts to be ordered.
 export function receivedPosts(posts) {
     return {
         type: PostTypes.RECEIVED_POSTS,
@@ -51,6 +57,7 @@ export function receivedPosts(posts) {
     };
 }
 
+// receivedPostsAfter should be dispatched when receiving an ordered list of posts that come before a given post.
 export function receivedPostsAfter(posts, channelId, afterPostId) {
     return {
         type: PostTypes.RECEIVED_POSTS_AFTER,
@@ -60,6 +67,7 @@ export function receivedPostsAfter(posts, channelId, afterPostId) {
     };
 }
 
+// receivedPostsBefore should be dispatched when receiving an ordered list of posts that come after a given post.
 export function receivedPostsBefore(posts, channelId, beforePostId) {
     return {
         type: PostTypes.RECEIVED_POSTS_BEFORE,
@@ -69,6 +77,9 @@ export function receivedPostsBefore(posts, channelId, beforePostId) {
     };
 }
 
+// receivedPostsSince should be dispatched when receiving a list of posts that have been updated since a certain time.
+// Due to how the API endpoint works, some of these posts will be ordered, but others will not, so this needs special
+// handling from the reducers.
 export function receivedPostsSince(posts, channelId) {
     return {
         type: PostTypes.RECEIVED_POSTS_SINCE,
@@ -77,6 +88,8 @@ export function receivedPostsSince(posts, channelId) {
     };
 }
 
+// receivedPostsInChannel should be dispatched when receiving a list of ordered posts within a channel when the
+// the adjacent posts are not known.
 export function receivedPostsInChannel(posts, channelId, recent = false) {
     return {
         type: PostTypes.RECEIVED_POSTS_IN_CHANNEL,
@@ -86,6 +99,7 @@ export function receivedPostsInChannel(posts, channelId, recent = false) {
     };
 }
 
+// receivedPostsInThread should be dispatched when receiving a list of unordered posts in a thread.
 export function receivedPostsInThread(posts, rootId) {
     return {
         type: PostTypes.RECEIVED_POSTS_IN_THREAD,
@@ -94,6 +108,8 @@ export function receivedPostsInThread(posts, rootId) {
     };
 }
 
+// postDeleted should be dispatched when a post has been deleted and should be replaced with a "message deleted"
+// placeholder. This typically happens when a post is deleted by another user.
 export function postDeleted(post) {
     return {
         type: PostTypes.POST_DELETED,
@@ -101,6 +117,8 @@ export function postDeleted(post) {
     };
 }
 
+// postRemoved should be dispatched when a post should be immediately removed. This typically happens when a post is
+// deleted by the current user.
 export function postRemoved(post) {
     return {
         type: PostTypes.POST_REMOVED,
