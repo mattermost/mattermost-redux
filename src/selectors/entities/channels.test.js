@@ -1168,4 +1168,188 @@ describe('Selectors.Channels', () => {
             assert.equal(channelWithUserProfiles[0].profiles.length, 2);
         });
     });
+
+    describe('canManageAnyChannelMembersInCurrentTeam', () => {
+        it('will return false if channel_user does not have permissions to manage channel members', () => {
+            const newState = {
+                entities: {
+                    ...testState.entities,
+                    roles: {
+                        roles: {
+                            channel_user: {
+                                permissions: [],
+                            },
+                        },
+                    },
+                    channels: {
+                        ...testState.entities.channels,
+                        myMembers: {
+                            ...testState.entities.channels.myMembers,
+                            [channel1.id]: {
+                                ...testState.entities.channels.myMembers[channel1.id],
+                                roles: 'channel_user',
+                            },
+                            [channel5.id]: {
+                                ...testState.entities.channels.myMembers[channel5.id],
+                                roles: 'channel_user',
+                            },
+                        },
+                    },
+                },
+            };
+
+            assert.ok(Selectors.canManageAnyChannelMembersInCurrentTeam(newState) === false);
+        });
+
+        it('will return true if channel_user has permissions to manage public channel members', () => {
+            const newState = {
+                entities: {
+                    ...testState.entities,
+                    roles: {
+                        roles: {
+                            channel_user: {
+                                permissions: ['manage_public_channel_members'],
+                            },
+                        },
+                    },
+                    channels: {
+                        ...testState.entities.channels,
+                        myMembers: {
+                            ...testState.entities.channels.myMembers,
+                            [channel1.id]: {
+                                ...testState.entities.channels.myMembers[channel1.id],
+                                roles: 'channel_user',
+                            },
+                            [channel5.id]: {
+                                ...testState.entities.channels.myMembers[channel5.id],
+                                roles: 'channel_user',
+                            },
+                        },
+                    },
+                },
+            };
+
+            assert.ok(Selectors.canManageAnyChannelMembersInCurrentTeam(newState) === true);
+        });
+
+        it('will return true if channel_user has permissions to manage private channel members', () => {
+            const newState = {
+                entities: {
+                    ...testState.entities,
+                    roles: {
+                        roles: {
+                            channel_user: {
+                                permissions: ['manage_private_channel_members'],
+                            },
+                        },
+                    },
+                    channels: {
+                        ...testState.entities.channels,
+                        myMembers: {
+                            ...testState.entities.channels.myMembers,
+                            [channel1.id]: {
+                                ...testState.entities.channels.myMembers[channel1.id],
+                                roles: 'channel_user',
+                            },
+                            [channel5.id]: {
+                                ...testState.entities.channels.myMembers[channel5.id],
+                                roles: 'channel_user',
+                            },
+                        },
+                    },
+                },
+            };
+
+            assert.ok(Selectors.canManageAnyChannelMembersInCurrentTeam(newState) === true);
+        });
+
+        it('will return false if channel admins have permissions, but the user is not a channel admin of any channel', () => {
+            const newState = {
+                entities: {
+                    ...testState.entities,
+                    roles: {
+                        roles: {
+                            channel_admin: {
+                                permissions: ['manage_public_channel_members'],
+                            },
+                        },
+                    },
+                    channels: {
+                        ...testState.entities.channels,
+                        myMembers: {
+                            ...testState.entities.channels.myMembers,
+                            [channel1.id]: {
+                                ...testState.entities.channels.myMembers[channel1.id],
+                                roles: 'channel_user',
+                            },
+                            [channel5.id]: {
+                                ...testState.entities.channels.myMembers[channel5.id],
+                                roles: 'channel_user',
+                            },
+                        },
+                    },
+                },
+            };
+
+            assert.ok(Selectors.canManageAnyChannelMembersInCurrentTeam(newState) === false);
+        });
+
+        it('will return true if channel admins have permission, and the user is a channel admin of some channel', () => {
+            const newState = {
+                entities: {
+                    ...testState.entities,
+                    roles: {
+                        roles: {
+                            channel_admin: {
+                                permissions: ['manage_public_channel_members'],
+                            },
+                        },
+                    },
+                    channels: {
+                        ...testState.entities.channels,
+                        myMembers: {
+                            ...testState.entities.channels.myMembers,
+                            [channel1.id]: {
+                                ...testState.entities.channels.myMembers[channel1.id],
+                                roles: 'channel_user channel_admin',
+                            },
+                            [channel5.id]: {
+                                ...testState.entities.channels.myMembers[channel5.id],
+                                roles: 'channel_user',
+                            },
+                        },
+                    },
+                },
+            };
+
+            assert.ok(Selectors.canManageAnyChannelMembersInCurrentTeam(newState) === true);
+        });
+
+        it('will return true if team admins have permission, and the user is a team admin', () => {
+            const newState = {
+                entities: {
+                    ...testState.entities,
+                    roles: {
+                        roles: {
+                            team_admin: {
+                                permissions: ['manage_public_channel_members'],
+                            },
+                        },
+                    },
+                    users: {
+                        ...testState.entities.users,
+                        profiles: {
+                            ...testState.entities.users.profiles,
+                            [user.id]: {
+                                ...testState.entities.users.profiles[user.id],
+                                roles: 'team_admin',
+                            },
+                        },
+                    },
+                },
+            };
+
+            assert.ok(Selectors.canManageAnyChannelMembersInCurrentTeam(newState) === true);
+        });
+    });
 });
