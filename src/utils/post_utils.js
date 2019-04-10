@@ -388,6 +388,7 @@ export function combineSystemPosts(postsIds: Array<string> = [], posts: IDMapped
                 type: Posts.POST_TYPES.COMBINED_USER_ACTIVITY,
                 user_activity_posts: userActivitySystemPosts,
                 user_id: '',
+                metadata: {},
             };
 
             nextPosts[combinedPost.id] = combinedPost;

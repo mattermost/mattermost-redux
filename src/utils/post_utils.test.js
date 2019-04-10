@@ -1136,6 +1136,7 @@ describe('PostUtils', () => {
             assert.equal(out.nextPosts[combinedPostId].system_post_ids[1], '11');
             assert.equal(out.nextPosts[combinedPostId].user_activity_posts[0], postUA12);
             assert.equal(out.nextPosts[combinedPostId].user_activity_posts[1], postUA11);
+            assert.deepEqual(out.nextPosts[combinedPostId].metadata, {});
             assert.deepEqual(out.nextPosts[combinedPostId].props.user_activity, expectedUserActivityPosts);
             assert.deepEqual(out.nextPosts[combinedPostId].props.messages, [postUA12.message, postUA11.message]);
             assert.equal(out.nextPosts[combinedPostId].message, [postUA12.message, postUA11.message].join('\n'));
