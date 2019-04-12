@@ -1059,12 +1059,6 @@ describe('Actions.Posts', () => {
             reply(200, OK_RESPONSE);
         await Actions.pinPost(post1.id)(dispatch, getState);
 
-        const editRequest = getState().requests.posts.editPost;
-
-        if (editRequest.status === RequestStatus.FAILURE) {
-            throw new Error(JSON.stringify(editRequest.error));
-        }
-
         const state = getState();
         const post = state.entities.posts.posts[post1.id];
         assert.ok(post);
@@ -1098,12 +1092,6 @@ describe('Actions.Posts', () => {
             post(`/${post1.id}/unpin`).
             reply(200, OK_RESPONSE);
         await Actions.unpinPost(post1.id)(dispatch, getState);
-
-        const editRequest = getState().requests.posts.editPost;
-
-        if (editRequest.status === RequestStatus.FAILURE) {
-            throw new Error(JSON.stringify(editRequest.error));
-        }
 
         const state = getState();
         const post = state.entities.posts.posts[post1.id];

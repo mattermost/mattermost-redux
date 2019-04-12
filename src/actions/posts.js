@@ -390,7 +390,11 @@ export function pinPost(postId) {
 
         const post = Selectors.getPost(getState(), postId);
         if (post) {
-            actions.push(receivedPost({...post, is_pinned: true}));
+            actions.push(receivedPost({
+                ...post,
+                is_pinned: true,
+                update_at: Date.now(),
+            }));
         }
 
         dispatch(batchActions(actions), getState);
@@ -423,7 +427,11 @@ export function unpinPost(postId) {
 
         const post = Selectors.getPost(getState(), postId);
         if (post) {
-            actions.push(receivedPost({...post, is_pinned: false}));
+            actions.push(receivedPost({
+                ...post,
+                is_pinned: false,
+                update_at: Date.now(),
+            }));
         }
 
         dispatch(batchActions(actions), getState);
