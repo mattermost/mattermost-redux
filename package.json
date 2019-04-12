@@ -71,7 +71,7 @@
     "fix": "eslint --ignore-path .gitignore --ignore-pattern node_modules --quiet . --fix",
     "flow": "flow",
     "flow-typed": "flow-typed",
-    "test": "jest --forceExit --detectOpenHandles",
+    "test": "jest --forceExit --detectOpenHandles --maxWorkers=2",
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage",
     "prepare": "npm run build"
