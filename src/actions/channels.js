@@ -589,7 +589,7 @@ export function leaveChannel(channelId: string): ActionFunc {
             meta: {
                 offline: {
                     effect: () => Client4.removeFromChannel(currentUserId, channelId),
-                    commit: {type: ChannelTypes.LEAVE_CHANNEL},
+                    commit: {type: 'do_nothing'}, // redux-offline always needs to dispatch something on commit
                     rollback: () => {
                         dispatch(batchActions([
                             {
