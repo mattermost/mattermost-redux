@@ -23,7 +23,7 @@ import {
 } from 'selectors/entities/preferences';
 import {getLastPostPerChannel, getAllPosts} from 'selectors/entities/posts';
 import {getCurrentTeamId, getCurrentTeamMembership, getMyTeams, getTeamMemberships} from 'selectors/entities/teams';
-import {haveICurrentChannelPermission} from 'selectors/entities/roles';
+import {haveICurrentChannelPermission, haveIChannelPermission} from 'selectors/entities/roles';
 import {isCurrentUserSystemAdmin, getCurrentUserId} from 'selectors/entities/users';
 
 import {
@@ -563,6 +563,29 @@ export const canManageChannelMembers: (GlobalState) => boolean = createSelector(
         }
 
         return canManageMembersOldPermissions(channel, user, teamMembership, channelMembership, config, license);
+    }
+);
+
+// Determine if the user has permissions to manage members in at least one channel of the current team
+export const canManageAnyChannelMembersInCurrentTeam: (GlobalState) => boolean = createSelector(
+    getMyChannelMemberships,
+    getCurrentTeamId,
+    (state: GlobalState): GlobalState => state,
+    (members: RelationOneToOne<Channel, ChannelMembership>, currentTeamId: string, state: GlobalState): boolean => {
+        for (const channelId of Object.keys(members)) {
+            const channel = getChannel(state, channelId);
+
+            if (!channel || channel.team_id !== currentTeamId) {
+                continue;
+            }
+
+            if (channel.type === General.OPEN_CHANNEL && haveIChannelPermission(state, {permission: Permissions.MANAGE_PUBLIC_CHANNEL_MEMBERS, channel: channelId, team: currentTeamId})) {
+                return true;
+            } else if (channel.type === General.PRIVATE_CHANNEL && haveIChannelPermission(state, {permission: Permissions.MANAGE_PRIVATE_CHANNEL_MEMBERS, channel: channelId, team: currentTeamId})) {
+                return true;
+            }
+        }
+        return false;
     }
 );
 
