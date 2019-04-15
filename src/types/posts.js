@@ -6,7 +6,12 @@ import type {CustomEmoji} from './emojis';
 import type {FileInfo} from './files';
 import type {Reaction} from './reactions';
 import type {Channel} from './channels';
-import type {RelationOneToOne, RelationOneToMany, IDMappedObjects} from './utilities';
+import type {
+    $ID,
+    RelationOneToOne,
+    RelationOneToMany,
+    IDMappedObjects,
+} from './utilities';
 
 export type PostType = 'system_add_remove' |
                        'system_add_to_channel' |
@@ -43,7 +48,7 @@ export type PostMetadata = {|
     reactions: Array<Reaction>
 |};
 
-export type Post = {|
+export type Post = {
     id: string,
     create_at: number,
     update_at: number,
@@ -64,11 +69,9 @@ export type Post = {|
     failed?: boolean,
     user_activity_posts?: Array<Post>,
     state?: 'DELETED',
-|}
+};
 
-export type PostWithFormatData = {|
-    ...Post,
-    commentedOnPost: Post,
+export type PostWithFormatData = Post & {
     isFirstReply: boolean,
     isLastReply: boolean,
     previousPostIsComment: boolean,
@@ -77,15 +80,20 @@ export type PostWithFormatData = {|
     replyCount: number,
     isCommentMention: boolean,
     highlight: boolean,
+};
+
+export type PostOrderBlock = {|
+    order: Array<string>,
+    recent: boolean,
 |};
 
 export type PostsState = {|
     posts: IDMappedObjects<Post>,
-    postsInChannel: RelationOneToMany<Channel, Post>,
+    postsInChannel: {[$ID<Channel>]: Array<PostOrderBlock>},
     postsInThread: RelationOneToMany<Post, Post>,
     reactions: RelationOneToOne<Post, {[string]: Reaction}>,
     openGraph: RelationOneToOne<Post, Object>,
-    sendingPostIds: Array<string>,
+    pendingPostIds: Array<string>,
     selectedPostId: string,
     currentFocusedPostId: string,
     messagesHistory: {|

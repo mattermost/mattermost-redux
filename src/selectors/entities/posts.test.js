@@ -42,8 +42,12 @@ describe('Selectors.Posts', () => {
             posts: {
                 posts,
                 postsInChannel: {
-                    1: ['e', 'd', 'c', 'b', 'a'],
-                    2: ['f'],
+                    1: [
+                        {order: ['e', 'd', 'c', 'b', 'a'], recent: true},
+                    ],
+                    2: [
+                        {order: ['f'], recent: true},
+                    ],
                 },
                 postsInThread: {
                     a: ['c', 'e'],
@@ -254,8 +258,12 @@ describe('Selectors.Posts', () => {
                 posts: {
                     posts: postsAny,
                     postsInChannel: {
-                        1: ['f', 'e', 'd', 'c', 'b', 'a'],
-                        2: ['g'],
+                        1: [
+                            {order: ['f', 'e', 'd', 'c', 'b', 'a'], recent: true},
+                        ],
+                        2: [
+                            {order: ['g'], recent: true},
+                        ],
                     },
                     postsInThread: {
                         a: ['c', 'e'],
@@ -363,8 +371,12 @@ describe('Selectors.Posts', () => {
                 posts: {
                     posts: postsRoot,
                     postsInChannel: {
-                        1: ['f', 'e', 'd', 'c', 'b', 'a'],
-                        2: ['g'],
+                        1: [
+                            {order: ['f', 'e', 'd', 'c', 'b', 'a'], recent: true},
+                        ],
+                        2: [
+                            {order: ['g'], recent: true},
+                        ],
                     },
                     postsInThread: {
                         a: ['c', 'e'],
@@ -472,8 +484,12 @@ describe('Selectors.Posts', () => {
                 posts: {
                     posts: postsNever,
                     postsInChannel: {
-                        1: ['f', 'e', 'd', 'c', 'b', 'a'],
-                        2: ['g'],
+                        1: [
+                            {order: ['f', 'e', 'd', 'c', 'b', 'a'], recent: true},
+                        ],
+                        2: [
+                            {order: ['g'], recent: true},
+                        ],
                     },
                     postsInThread: {
                         a: ['c', 'e'],
@@ -578,8 +594,12 @@ describe('Selectors.Posts', () => {
                 posts: {
                     posts: postsAny,
                     postsInChannel: {
-                        1: ['c', 'b', 'a'],
-                        2: ['d'],
+                        1: [
+                            {order: ['c', 'b', 'a'], recent: true},
+                        ],
+                        2: [
+                            {order: ['d'], recent: true},
+                        ],
                     },
                     postsInThread: {
                         a: ['b', 'c'],
@@ -651,8 +671,12 @@ describe('Selectors.Posts', () => {
                 posts: {
                     posts: postsAny,
                     postsInChannel: {
-                        1: ['c', 'b', 'a'],
-                        2: ['d'],
+                        1: [
+                            {order: ['c', 'b', 'a'], recent: true},
+                        ],
+                        2: [
+                            {order: ['d'], recent: true},
+                        ],
                     },
                     postsInThread: {
                         a: ['b', 'c'],
@@ -752,180 +776,6 @@ describe('Selectors.Posts', () => {
         assert.equal(getHistoryMessageComment(testState2), 'test1');
         assert.equal(getHistoryMessagePost(testState3), '');
         assert.equal(getHistoryMessageComment(testState3), '');
-    });
-
-    describe('getPostIdsInCurrentChannel', () => {
-        it('no posts', () => {
-            const currentChannelId = '1234';
-
-            const state = {
-                entities: {
-                    channels: {
-                        currentChannelId,
-                    },
-                    posts: {
-                        postsInChannel: {},
-                    },
-                },
-            };
-            const expected = [];
-
-            assert.deepEqual(Selectors.getPostIdsInCurrentChannel(state), expected);
-        });
-
-        it('posts in channel', () => {
-            const currentChannelId = '1234';
-
-            const state = {
-                entities: {
-                    channels: {
-                        currentChannelId,
-                    },
-                    posts: {
-                        postsInChannel: {
-                            [currentChannelId]: ['a', 'b', 'c', 'd'],
-                            abcd: ['e', 'f', 'g'],
-                        },
-                    },
-                },
-            };
-            const expected = state.entities.posts.postsInChannel[currentChannelId];
-
-            assert.equal(Selectors.getPostIdsInCurrentChannel(state), expected);
-        });
-
-        it('memoization', () => {
-            const currentChannelId = '1234';
-
-            let state = {
-                entities: {
-                    channels: {
-                        currentChannelId,
-                    },
-                    posts: {
-                        postsInChannel: {},
-                    },
-                },
-            };
-
-            // No posts, no changes
-            let previous = Selectors.getPostIdsInCurrentChannel(state);
-            let now = Selectors.getPostIdsInCurrentChannel(state);
-            assert.deepEqual(now, []);
-            assert.equal(now, previous);
-
-            // No posts in current channel
-            state = {
-                ...state,
-                entities: {
-                    ...state.entities,
-                    posts: {
-                        ...state.entities.posts,
-                        postsInChannel: {
-                            ...state.entities.posts.postsInChannel,
-                            abcd: ['e', 'f', 'g'],
-                        },
-                    },
-                },
-            };
-
-            previous = now;
-            now = Selectors.getPostIdsInCurrentChannel(state);
-            assert.deepEqual(now, []);
-            assert.equal(now, previous);
-
-            // Posts in channel
-            state = {
-                ...state,
-                entities: {
-                    ...state.entities,
-                    posts: {
-                        ...state.entities.posts,
-                        postsInChannel: {
-                            ...state.entities.posts.postsInChannel,
-                            [currentChannelId]: ['a', 'b', 'c', 'd'],
-                        },
-                    },
-                },
-            };
-
-            previous = now;
-            now = Selectors.getPostIdsInCurrentChannel(state);
-            assert.deepEqual(now, ['a', 'b', 'c', 'd']);
-            assert.notEqual(now, previous);
-
-            previous = now;
-            now = Selectors.getPostIdsInCurrentChannel(state);
-            assert.deepEqual(now, ['a', 'b', 'c', 'd']);
-            assert.equal(now, previous);
-
-            // Posts in channel, changes with same ids
-            state = {
-                ...state,
-                entities: {
-                    ...state.entities,
-                    posts: {
-                        ...state.entities.posts,
-                        postsInChannel: {
-                            ...state.entities.posts.postsInChannel,
-                            [currentChannelId]: ['a', 'b', 'c', 'd'],
-                        },
-                    },
-                },
-            };
-
-            previous = now;
-            now = Selectors.getPostIdsInCurrentChannel(state);
-            assert.deepEqual(now, ['a', 'b', 'c', 'd']);
-            assert.equal(now, previous);
-
-            // New posts in channel
-            state = {
-                ...state,
-                entities: {
-                    ...state.entities,
-                    posts: {
-                        ...state.entities.posts,
-                        postsInChannel: {
-                            ...state.entities.posts.postsInChannel,
-                            [currentChannelId]: ['a', 'b', 'c', 'd', 'h'],
-                        },
-                    },
-                },
-            };
-
-            previous = now;
-            now = Selectors.getPostIdsInCurrentChannel(state);
-            assert.deepEqual(now, ['a', 'b', 'c', 'd', 'h']);
-            assert.notEqual(now, previous);
-
-            previous = now;
-            now = Selectors.getPostIdsInCurrentChannel(state);
-            assert.deepEqual(now, ['a', 'b', 'c', 'd', 'h']);
-            assert.equal(now, previous);
-
-            // Change of channel
-            state = {
-                ...state,
-                entities: {
-                    ...state.entities,
-                    channels: {
-                        ...state.entities.channels,
-                        currentChannelId: 'abcd',
-                    },
-                },
-            };
-
-            previous = now;
-            now = Selectors.getPostIdsInCurrentChannel(state);
-            assert.deepEqual(now, ['e', 'f', 'g']);
-            assert.notEqual(now, previous);
-
-            previous = now;
-            now = Selectors.getPostIdsInCurrentChannel(state);
-            assert.deepEqual(now, ['e', 'f', 'g']);
-            assert.equal(now, previous);
-        });
     });
 
     describe('getPostIdsForThread', () => {
@@ -1137,7 +987,9 @@ describe('Selectors.Posts', () => {
                 entities: {
                     posts: {
                         postsInChannel: {
-                            1234: ['a'],
+                            1234: [
+                                {order: ['a'], recent: true},
+                            ],
                         },
                     },
                 },
@@ -1153,7 +1005,9 @@ describe('Selectors.Posts', () => {
                 entities: {
                     posts: {
                         postsInChannel: {
-                            1234: ['a', 'b', 'c', 'd', 'e'],
+                            1234: [
+                                {order: ['a', 'b', 'c', 'd', 'e'], recent: true},
+                            ],
                         },
                     },
                 },
@@ -1169,13 +1023,15 @@ describe('Selectors.Posts', () => {
                 entities: {
                     posts: {
                         postsInChannel: {
-                            1234: ['a', 'b', 'c', 'd', 'e'],
+                            1234: [
+                                {order: ['a', 'b', 'c', 'd', 'e'], recent: true},
+                            ],
                         },
                     },
                 },
             };
 
-            assert.deepEqual(getPostIdsAroundPost(state, 'e', '1234', {postsBeforeCount: 3}), ['b', 'c', 'd', 'e']);
+            assert.deepEqual(getPostIdsAroundPost(state, 'a', '1234', {postsBeforeCount: 2}), ['a', 'b', 'c']);
         });
 
         it('posts after limit', () => {
@@ -1185,13 +1041,15 @@ describe('Selectors.Posts', () => {
                 entities: {
                     posts: {
                         postsInChannel: {
-                            1234: ['a', 'b', 'c', 'd', 'e'],
+                            1234: [
+                                {order: ['a', 'b', 'c', 'd', 'e'], recent: true},
+                            ],
                         },
                     },
                 },
             };
 
-            assert.deepEqual(getPostIdsAroundPost(state, 'a', '1234', {postsAfterCount: 2}), ['a', 'b', 'c']);
+            assert.deepEqual(getPostIdsAroundPost(state, 'e', '1234', {postsAfterCount: 3}), ['b', 'c', 'd', 'e']);
         });
 
         it('posts before/after limit', () => {
@@ -1201,13 +1059,15 @@ describe('Selectors.Posts', () => {
                 entities: {
                     posts: {
                         postsInChannel: {
-                            1234: ['a', 'b', 'c', 'd', 'e', 'f'],
+                            1234: [
+                                {order: ['a', 'b', 'c', 'd', 'e', 'f'], recent: true},
+                            ],
                         },
                     },
                 },
             };
 
-            assert.deepEqual(getPostIdsAroundPost(state, 'c', '1234', {postsBeforeCount: 1, postsAfterCount: 2}), ['b', 'c', 'd', 'e']);
+            assert.deepEqual(getPostIdsAroundPost(state, 'c', '1234', {postsBeforeCount: 2, postsAfterCount: 1}), ['b', 'c', 'd', 'e']);
         });
 
         it('memoization', () => {
@@ -1217,7 +1077,9 @@ describe('Selectors.Posts', () => {
                 entities: {
                     posts: {
                         postsInChannel: {
-                            1234: ['a', 'b', 'c', 'd', 'e'],
+                            1234: [
+                                {order: ['a', 'b', 'c', 'd', 'e'], recent: true},
+                            ],
                         },
                     },
                 },
@@ -1238,7 +1100,9 @@ describe('Selectors.Posts', () => {
                         ...state.entities.posts,
                         postsInChannel: {
                             ...state.entities.posts.postsInChannel,
-                            abcd: ['g', 'h', 'i', 'j', 'k', 'l'],
+                            abcd: [
+                                {order: ['g', 'h', 'i', 'j', 'k', 'l'], recent: true},
+                            ],
                         },
                     },
                 },
@@ -1258,7 +1122,9 @@ describe('Selectors.Posts', () => {
                         ...state.entities.posts,
                         postsInChannel: {
                             ...state.entities.posts.postsInChannel,
-                            1234: [...state.entities.posts.postsInChannel['1234'], 'f'],
+                            1234: [
+                                {order: ['a', 'b', 'c', 'd', 'e', 'f'], recent: true},
+                            ],
                         },
                     },
                 },
@@ -1287,34 +1153,34 @@ describe('Selectors.Posts', () => {
 
             // With limits
             previous = now;
-            now = getPostIdsAroundPost(state, 'i', 'abcd', {postsBeforeCount: 1, postsAfterCount: 2});
+            now = getPostIdsAroundPost(state, 'i', 'abcd', {postsBeforeCount: 2, postsAfterCount: 1});
             assert.deepEqual(now, ['h', 'i', 'j', 'k']);
             assert.notEqual(now, previous);
 
             previous = now;
-            now = getPostIdsAroundPost(state, 'i', 'abcd', {postsBeforeCount: 1, postsAfterCount: 2}); // Note that the options object is a new object each time
+            now = getPostIdsAroundPost(state, 'i', 'abcd', {postsBeforeCount: 2, postsAfterCount: 1}); // Note that the options object is a new object each time
             assert.deepEqual(now, ['h', 'i', 'j', 'k']);
             assert.equal(now, previous);
 
             // Change of limits
             previous = now;
-            now = getPostIdsAroundPost(state, 'i', 'abcd', {postsBeforeCount: 2, postsAfterCount: 1});
+            now = getPostIdsAroundPost(state, 'i', 'abcd', {postsBeforeCount: 1, postsAfterCount: 2});
             assert.deepEqual(now, ['g', 'h', 'i', 'j']);
             assert.notEqual(now, previous);
 
             previous = now;
-            now = getPostIdsAroundPost(state, 'i', 'abcd', {postsBeforeCount: 2, postsAfterCount: 1});
+            now = getPostIdsAroundPost(state, 'i', 'abcd', {postsBeforeCount: 1, postsAfterCount: 2});
             assert.deepEqual(now, ['g', 'h', 'i', 'j']);
             assert.equal(now, previous);
 
             // Change of post
             previous = now;
-            now = getPostIdsAroundPost(state, 'j', 'abcd', {postsBeforeCount: 2, postsAfterCount: 1});
+            now = getPostIdsAroundPost(state, 'j', 'abcd', {postsBeforeCount: 1, postsAfterCount: 2});
             assert.deepEqual(now, ['h', 'i', 'j', 'k']);
             assert.notEqual(now, previous);
 
             previous = now;
-            now = getPostIdsAroundPost(state, 'j', 'abcd', {postsBeforeCount: 2, postsAfterCount: 1});
+            now = getPostIdsAroundPost(state, 'j', 'abcd', {postsBeforeCount: 1, postsAfterCount: 2});
             assert.deepEqual(now, ['h', 'i', 'j', 'k']);
             assert.equal(now, previous);
 
@@ -1327,13 +1193,15 @@ describe('Selectors.Posts', () => {
                         ...state.entities.posts,
                         postsInChannel: {
                             ...state.entities.posts.postsInChannel,
-                            abcd: ['y', ...state.entities.posts.postsInChannel.abcd, 'z'],
+                            abcd: [
+                                {order: ['y', 'g', 'h', 'i', 'j', 'k', 'l', 'f', 'z'], recent: true},
+                            ],
                         },
                     },
                 },
             };
             previous = now;
-            now = getPostIdsAroundPost(state, 'j', 'abcd', {postsBeforeCount: 2, postsAfterCount: 1});
+            now = getPostIdsAroundPost(state, 'j', 'abcd', {postsBeforeCount: 1, postsAfterCount: 2});
             assert.deepEqual(now, ['h', 'i', 'j', 'k']);
             assert.equal(now, previous);
 
@@ -1346,19 +1214,21 @@ describe('Selectors.Posts', () => {
                         ...state.entities.posts,
                         postsInChannel: {
                             ...state.entities.posts.postsInChannel,
-                            abcd: ['y', 'g', 'i', 'h', 'j', 'l', 'k', 'z'],
+                            abcd: [
+                                {order: ['y', 'g', 'i', 'h', 'j', 'l', 'k', 'z'], recent: true},
+                            ],
                         },
                     },
                 },
             };
 
             previous = now;
-            now = getPostIdsAroundPost(state, 'j', 'abcd', {postsBeforeCount: 2, postsAfterCount: 1});
+            now = getPostIdsAroundPost(state, 'j', 'abcd', {postsBeforeCount: 1, postsAfterCount: 2});
             assert.deepEqual(now, ['i', 'h', 'j', 'l']);
             assert.notEqual(now, previous);
 
             previous = now;
-            now = getPostIdsAroundPost(state, 'j', 'abcd', {postsBeforeCount: 2, postsAfterCount: 1});
+            now = getPostIdsAroundPost(state, 'j', 'abcd', {postsBeforeCount: 1, postsAfterCount: 2});
             assert.deepEqual(now, ['i', 'h', 'j', 'l']);
             assert.equal(now, previous);
         });
@@ -1371,20 +1241,24 @@ describe('Selectors.Posts', () => {
                 entities: {
                     posts: {
                         postsInChannel: {
-                            1234: ['a', 'b', 'c', 'd', 'e', 'f'],
-                            abcd: ['g', 'h', 'i'],
+                            1234: [
+                                {order: ['a', 'b', 'c', 'd', 'e', 'f'], recent: true},
+                            ],
+                            abcd: [
+                                {order: ['g', 'h', 'i'], recent: true},
+                            ],
                         },
                     },
                 },
             };
 
             const previous1 = getPostIdsAroundPost1(state, 'c', '1234');
-            const previous2 = getPostIdsAroundPost2(state, 'h', 'abcd', {postsBeforeCount: 0, postsAfterCount: 1});
+            const previous2 = getPostIdsAroundPost2(state, 'h', 'abcd', {postsBeforeCount: 1, postsAfterCount: 0});
 
             assert.notEqual(previous1, previous2);
 
             const now1 = getPostIdsAroundPost1(state, 'c', '1234');
-            const now2 = getPostIdsAroundPost2(state, 'i', 'abcd', {postsBeforeCount: 0, postsAfterCount: 1});
+            const now2 = getPostIdsAroundPost2(state, 'i', 'abcd', {postsBeforeCount: 1, postsAfterCount: 0});
 
             assert.equal(now1, previous1);
             assert.notEqual(now2, previous2);
@@ -1526,14 +1400,15 @@ describe('Selectors.Posts', () => {
                 1002: {id: '1002'},
                 1003: {id: '1003'},
             };
-            const testPostsInChannel = {
-                channelId: ['1000', '1001', '1002', '1003'],
-            };
             const state = {
                 entities: {
                     posts: {
                         posts: testPosts,
-                        postsInChannel: testPostsInChannel,
+                        postsInChannel: {
+                            channelId: [
+                                {order: ['1000', '1001', '1002', '1003'], recent: true},
+                            ],
+                        },
                     },
                     preferences: {
                         myPreferences: {
@@ -1554,14 +1429,15 @@ describe('Selectors.Posts', () => {
                 1002: {id: '1002'},
                 1003: {id: '1003'},
             };
-            const testPostsInChannel = {
-                channelId: ['1000', '1001', '1002', '1003'],
-            };
             const state = {
                 entities: {
                     posts: {
                         posts: testPosts,
-                        postsInChannel: testPostsInChannel,
+                        postsInChannel: {
+                            channelId: [
+                                {order: ['1000', '1001', '1002', '1003'], recent: true},
+                            ],
+                        },
                     },
                     preferences: {
                         myPreferences: {
@@ -1578,21 +1454,26 @@ describe('Selectors.Posts', () => {
 
     describe('getLatestReplyablePostId', () => {
         it('no posts', () => {
-            const noPosts = {};
             const state = {
                 entities: {
-                    posts: {
-                        posts: noPosts,
-                        postsInChannel: [],
-                    },
                     channels: {
                         currentChannelId: 'abcd',
+                    },
+                    posts: {
+                        posts: {},
+                        postsInChannel: [],
+                    },
+                    preferences: {
+                        myPreferences: {},
+                    },
+                    users: {
+                        profiles: {},
                     },
                 },
             };
             const actual = Selectors.getLatestReplyablePostId(state);
 
-            assert.equal(actual, null);
+            expect(actual).toEqual('');
         });
 
         it('return first post which dosent have POST_DELETED state', () => {
@@ -1605,20 +1486,28 @@ describe('Selectors.Posts', () => {
             };
             const state = {
                 entities: {
+                    channels: {
+                        currentChannelId: 'abcd',
+                    },
                     posts: {
                         posts: postsAny,
                         postsInChannel: {
-                            abcd: ['b', 'c', 'd', 'e'],
+                            abcd: [
+                                {order: ['b', 'c', 'd', 'e'], recent: true},
+                            ],
                         },
                     },
-                    channels: {
-                        currentChannelId: 'abcd',
+                    preferences: {
+                        myPreferences: {},
+                    },
+                    users: {
+                        profiles: {},
                     },
                 },
             };
             const actual = Selectors.getLatestReplyablePostId(state);
 
-            assert.equal(actual, postsAny.e.id);
+            expect(actual).toEqual(postsAny.e.id);
         });
     });
 
@@ -1769,6 +1658,170 @@ describe('Selectors.Posts', () => {
     });
 });
 
+describe('getPostIdsInCurrentChannel', () => {
+    test('should return null when channel is not loaded', () => {
+        const state = {
+            entities: {
+                channels: {
+                    currentChannelId: 'channel1',
+                },
+                posts: {
+                    postsInChannel: {},
+                },
+            },
+        };
+
+        const postIds = Selectors.getPostIdsInCurrentChannel(state);
+
+        expect(postIds).toBe(null);
+    });
+
+    test('should return null when recent posts are not loaded', () => {
+        const state = {
+            entities: {
+                channels: {
+                    currentChannelId: 'channel1',
+                },
+                posts: {
+                    postsInChannel: {
+                        channel1: [
+                            {order: ['post1', 'post2']},
+                        ],
+                    },
+                },
+            },
+        };
+
+        const postIds = Selectors.getPostIdsInCurrentChannel(state);
+
+        expect(postIds).toBe(null);
+    });
+
+    test('should return post order from recent block', () => {
+        const state = {
+            entities: {
+                channels: {
+                    currentChannelId: 'channel1',
+                },
+                posts: {
+                    postsInChannel: {
+                        channel1: [
+                            {order: ['post1', 'post2'], recent: true},
+                        ],
+                    },
+                },
+            },
+        };
+
+        const postIds = Selectors.getPostIdsInCurrentChannel(state);
+
+        expect(postIds).toBe(state.entities.posts.postsInChannel.channel1[0].order);
+    });
+});
+
+describe('getPostsInCurrentChannel', () => {
+    test('should return null when channel is not loaded', () => {
+        const state = {
+            entities: {
+                channels: {
+                    currentChannelId: 'channel1',
+                },
+                posts: {
+                    posts: {},
+                    postsInChannel: {},
+                    postsInThread: {},
+                },
+                preferences: {
+                    myPreferences: {
+                        [`${Preferences.CATEGORY_ADVANCED_SETTINGS}--${Preferences.ADVANCED_FILTER_JOIN_LEAVE}`]: {value: 'true'},
+                    },
+                },
+                users: {
+                    profiles: {},
+                },
+            },
+        };
+
+        const postIds = Selectors.getPostsInCurrentChannel(state);
+
+        expect(postIds).toEqual(null);
+    });
+
+    test('should return null when recent posts are not loaded', () => {
+        const post1 = {id: 'post1'};
+        const post2 = {id: 'post2'};
+
+        const state = {
+            entities: {
+                channels: {
+                    currentChannelId: 'channel1',
+                },
+                posts: {
+                    posts: {
+                        post1,
+                        post2,
+                    },
+                    postsInChannel: {
+                        channel1: [
+                            {order: ['post1', 'post2']},
+                        ],
+                    },
+                    postsInThread: {},
+                },
+                preferences: {
+                    myPreferences: {
+                        [`${Preferences.CATEGORY_ADVANCED_SETTINGS}--${Preferences.ADVANCED_FILTER_JOIN_LEAVE}`]: {value: 'true'},
+                    },
+                },
+                users: {
+                    profiles: {},
+                },
+            },
+        };
+
+        const postIds = Selectors.getPostsInCurrentChannel(state);
+
+        expect(postIds).toEqual(null);
+    });
+
+    test('should return post order from recent block', () => {
+        const post1 = {id: 'post1'};
+        const post2 = {id: 'post2'};
+
+        const state = {
+            entities: {
+                channels: {
+                    currentChannelId: 'channel1',
+                },
+                posts: {
+                    posts: {
+                        post1,
+                        post2,
+                    },
+                    postsInChannel: {
+                        channel1: [
+                            {order: ['post1', 'post2'], recent: true},
+                        ],
+                    },
+                    postsInThread: {},
+                },
+                preferences: {
+                    myPreferences: {
+                        [`${Preferences.CATEGORY_ADVANCED_SETTINGS}--${Preferences.ADVANCED_FILTER_JOIN_LEAVE}`]: {value: 'true'},
+                    },
+                },
+                users: {
+                    profiles: {},
+                },
+            },
+        };
+
+        const postIds = Selectors.getPostsInCurrentChannel(state);
+
+        expect(postIds).toMatchObject([post1, post2]);
+    });
+});
+
 describe('getCurrentUsersLatestPost', () => {
     const user1 = TestHelper.fakeUserWithId();
     user1.notify_props = {};
@@ -1786,6 +1839,9 @@ describe('getCurrentUsersLatestPost', () => {
                     posts: noPosts,
                     postsInChannel: [],
                 },
+                preferences: {
+                    myPreferences: {},
+                },
                 channels: {
                     currentChannelId: 'abcd',
                 },
@@ -1793,7 +1849,7 @@ describe('getCurrentUsersLatestPost', () => {
         };
         const actual = Selectors.getCurrentUsersLatestPost(state);
 
-        assert.equal(actual, null);
+        expect(actual).toEqual(null);
     });
 
     it('return first post which user can edit', () => {
@@ -1814,8 +1870,14 @@ describe('getCurrentUsersLatestPost', () => {
                 posts: {
                     posts: postsAny,
                     postsInChannel: {
-                        abcd: ['b', 'c', 'd', 'e', 'f'],
+                        abcd: [
+                            {order: ['b', 'c', 'd', 'e', 'f'], recent: true},
+                        ],
                     },
+                    postsInThread: {},
+                },
+                preferences: {
+                    myPreferences: {},
                 },
                 channels: {
                     currentChannelId: 'abcd',
@@ -1824,7 +1886,7 @@ describe('getCurrentUsersLatestPost', () => {
         };
         const actual = Selectors.getCurrentUsersLatestPost(state);
 
-        assert.equal(actual, postsAny.f);
+        expect(actual).toMatchObject(postsAny.f);
     });
 
     it('return first post which user can edit ignore pending and failed', () => {
@@ -1845,8 +1907,14 @@ describe('getCurrentUsersLatestPost', () => {
                 posts: {
                     posts: postsAny,
                     postsInChannel: {
-                        abcd: ['b', 'c', 'd', 'e', 'f'],
+                        abcd: [
+                            {order: ['b', 'c', 'd', 'e', 'f'], recent: true},
+                        ],
                     },
+                    postsInThread: {},
+                },
+                preferences: {
+                    myPreferences: {},
                 },
                 channels: {
                     currentChannelId: 'abcd',
@@ -1855,7 +1923,7 @@ describe('getCurrentUsersLatestPost', () => {
         };
         const actual = Selectors.getCurrentUsersLatestPost(state);
 
-        assert.equal(actual, postsAny.f);
+        expect(actual).toMatchObject(postsAny.f);
     });
 
     it('return first post which has rootId match', () => {
@@ -1876,8 +1944,14 @@ describe('getCurrentUsersLatestPost', () => {
                 posts: {
                     posts: postsAny,
                     postsInChannel: {
-                        abcd: ['b', 'c', 'd', 'e', 'f'],
+                        abcd: [
+                            {order: ['b', 'c', 'd', 'e', 'f'], recent: true},
+                        ],
                     },
+                    postsInThread: {},
+                },
+                preferences: {
+                    myPreferences: {},
                 },
                 channels: {
                     currentChannelId: 'abcd',
@@ -1886,7 +1960,38 @@ describe('getCurrentUsersLatestPost', () => {
         };
         const actual = Selectors.getCurrentUsersLatestPost(state, 'e');
 
-        assert.equal(actual, postsAny.f);
+        expect(actual).toMatchObject(postsAny.f);
+    });
+
+    it('should not return posts outside of the recent block', () => {
+        const postsAny = {
+            a: {id: 'a', channel_id: 'a', create_at: 1, user_id: 'a'},
+        };
+        const state = {
+            entities: {
+                users: {
+                    currentUserId: user1.id,
+                    profiles,
+                },
+                posts: {
+                    posts: postsAny,
+                    postsInChannel: {
+                        abcd: [
+                            {order: ['a'], recent: false},
+                        ],
+                    },
+                },
+                preferences: {
+                    myPreferences: {},
+                },
+                channels: {
+                    currentChannelId: 'abcd',
+                },
+            },
+        };
+        const actual = Selectors.getCurrentUsersLatestPost(state, 'e');
+
+        assert.equal(actual, null);
     });
 
     it('determine the sending posts', () => {
@@ -1899,7 +2004,10 @@ describe('getCurrentUsersLatestPost', () => {
                 posts: {
                     posts: {},
                     postsInChannel: {},
-                    sendingPostIds: ['1', '2', '3'],
+                    pendingPostIds: ['1', '2', '3'],
+                },
+                preferences: {
+                    myPreferences: {},
                 },
                 channels: {
                     currentChannelId: 'abcd',

@@ -24,13 +24,15 @@ export function files(state = {}, action) {
 
         return storeFilesForPost(state, post);
     }
+
     case PostTypes.RECEIVED_POSTS: {
         const posts = Object.values(action.data.posts);
 
         return posts.reduce(storeFilesForPost, state);
     }
 
-    case PostTypes.POST_DELETED: {
+    case PostTypes.POST_DELETED:
+    case PostTypes.POST_REMOVED: {
         if (action.data && action.data.file_ids && action.data.file_ids.length) {
             const nextState = {...state};
             const fileIds = action.data.file_ids;
@@ -85,13 +87,15 @@ export function fileIdsByPostId(state = {}, action) {
 
         return storeFilesIdsForPost(state, post);
     }
+
     case PostTypes.RECEIVED_POSTS: {
         const posts = Object.values(action.data.posts);
 
         return posts.reduce(storeFilesIdsForPost, state);
     }
 
-    case PostTypes.POST_DELETED: {
+    case PostTypes.POST_DELETED:
+    case PostTypes.POST_REMOVED: {
         if (action.data) {
             const nextState = {...state};
             Reflect.deleteProperty(nextState, action.data.id);
