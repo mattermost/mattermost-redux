@@ -1170,6 +1170,222 @@ describe('Selectors.Channels', () => {
         });
     });
 
+    describe('get_redirect_channel_name_for_team selector', () => {
+        it('getRedirectChannelNameForTeam without advanced permissions', () => {
+            const modifiedState = {
+                ...testState,
+                entities: {
+                    ...testState.entities,
+                    general: {
+                        ...testState.entities.general,
+                        serverVersion: '4.8.0',
+                    },
+                },
+            };
+            assert.equal(Selectors.getRedirectChannelNameForTeam(modifiedState, team1.id), General.DEFAULT_CHANNEL);
+        });
+
+        it('getRedirectChannelNameForTeam with advanced permissions but without JOIN_PUBLIC_CHANNELS permission', () => {
+            const modifiedState = {
+                ...testState,
+                entities: {
+                    ...testState.entities,
+                    channels: {
+                        ...testState.entities.channels,
+                        channels: {
+                            ...testState.entities.channels.channels,
+                            'new-not-member-channel': {
+                                id: 'new-not-member-channel',
+                                display_name: '111111',
+                                name: 'new-not-member-channel',
+                                team_id: team1.id,
+                            },
+                            [channel1.id]: {
+                                id: channel1.id,
+                                display_name: 'aaaaaa',
+                                name: 'test-channel',
+                                team_id: team1.id,
+                            },
+                        },
+                    },
+                    roles: {
+                        roles: {
+                            system_user: {permissions: []},
+                        },
+                    },
+                    general: {
+                        ...testState.entities.general,
+                        serverVersion: '5.12.0',
+                    },
+                },
+            };
+            assert.equal(Selectors.getRedirectChannelNameForTeam(modifiedState, team1.id), 'test-channel');
+        });
+
+        it('getRedirectChannelNameForTeam with advanced permissions and with JOIN_PUBLIC_CHANNELS permission', () => {
+            const modifiedState = {
+                ...testState,
+                entities: {
+                    ...testState.entities,
+                    roles: {
+                        roles: {
+                            system_user: {permissions: ['join_public_channels']},
+                        },
+                    },
+                    general: {
+                        ...testState.entities.general,
+                        serverVersion: '5.12.0',
+                    },
+                },
+            };
+            assert.equal(Selectors.getRedirectChannelNameForTeam(modifiedState, team1.id), General.DEFAULT_CHANNEL);
+        });
+
+        it('getRedirectChannelNameForTeam with advanced permissions but without JOIN_PUBLIC_CHANNELS permission but being member of town-square', () => {
+            const modifiedState = {
+                ...testState,
+                entities: {
+                    ...testState.entities,
+                    channels: {
+                        ...testState.entities.channels,
+                        channels: {
+                            ...testState.entities.channels.channels,
+                            'new-not-member-channel': {
+                                id: 'new-not-member-channel',
+                                display_name: '111111',
+                                name: 'new-not-member-channel',
+                                team_id: team1.id,
+                            },
+                            [channel1.id]: {
+                                id: channel1.id,
+                                display_name: 'Town Square',
+                                name: 'town-square',
+                                team_id: team1.id,
+                            },
+                        },
+                    },
+                    roles: {
+                        roles: {
+                            system_user: {permissions: []},
+                        },
+                    },
+                    general: {
+                        ...testState.entities.general,
+                        serverVersion: '5.12.0',
+                    },
+                },
+            };
+            assert.equal(Selectors.getRedirectChannelNameForTeam(modifiedState, team1.id), General.DEFAULT_CHANNEL);
+        });
+
+        it('getRedirectChannelNameForTeam without advanced permissions in not current team', () => {
+            const modifiedState = {
+                ...testState,
+                entities: {
+                    ...testState.entities,
+                    general: {
+                        ...testState.entities.general,
+                        serverVersion: '4.8.0',
+                    },
+                },
+            };
+            assert.equal(Selectors.getRedirectChannelNameForTeam(modifiedState, team2.id), General.DEFAULT_CHANNEL);
+        });
+
+        it('getRedirectChannelNameForTeam with advanced permissions but without JOIN_PUBLIC_CHANNELS permission in not current team', () => {
+            const modifiedState = {
+                ...testState,
+                entities: {
+                    ...testState.entities,
+                    channels: {
+                        ...testState.entities.channels,
+                        channels: {
+                            ...testState.entities.channels.channels,
+                            'new-not-member-channel': {
+                                id: 'new-not-member-channel',
+                                display_name: '111111',
+                                name: 'new-not-member-channel',
+                                team_id: team2.id,
+                            },
+                            [channel3.id]: {
+                                id: channel3.id,
+                                display_name: 'aaaaaa',
+                                name: 'test-channel',
+                                team_id: team2.id,
+                            },
+                        },
+                    },
+                    roles: {
+                        roles: {
+                            system_user: {permissions: []},
+                        },
+                    },
+                    general: {
+                        ...testState.entities.general,
+                        serverVersion: '5.12.0',
+                    },
+                },
+            };
+            assert.equal(Selectors.getRedirectChannelNameForTeam(modifiedState, team2.id), 'test-channel');
+        });
+
+        it('getRedirectChannelNameForTeam with advanced permissions and with JOIN_PUBLIC_CHANNELS permission in not current team', () => {
+            const modifiedState = {
+                ...testState,
+                entities: {
+                    ...testState.entities,
+                    roles: {
+                        roles: {
+                            system_user: {permissions: ['join_public_channels']},
+                        },
+                    },
+                    general: {
+                        ...testState.entities.general,
+                        serverVersion: '5.12.0',
+                    },
+                },
+            };
+            assert.equal(Selectors.getRedirectChannelNameForTeam(modifiedState, team2.id), General.DEFAULT_CHANNEL);
+        });
+
+        it('getRedirectChannelNameForTeam with advanced permissions but without JOIN_PUBLIC_CHANNELS permission but being member of town-square in not current team', () => {
+            const modifiedState = {
+                ...testState,
+                entities: {
+                    ...testState.entities,
+                    channels: {
+                        ...testState.entities.channels,
+                        channels: {
+                            ...testState.entities.channels.channels,
+                            'new-not-member-channel': {
+                                id: 'new-not-member-channel',
+                                display_name: '111111',
+                                name: 'new-not-member-channel',
+                                team_id: team2.id,
+                            },
+                            [channel3.id]: {
+                                id: channel3.id,
+                                display_name: 'Town Square',
+                                name: 'town-square',
+                                team_id: team2.id,
+                            },
+                        },
+                    },
+                    roles: {
+                        roles: {
+                            system_user: {permissions: []},
+                        },
+                    },
+                    general: {
+                        ...testState.entities.general,
+                        serverVersion: '5.12.0',
+                    },
+                },
+            };
+            assert.equal(Selectors.getRedirectChannelNameForTeam(modifiedState, team2.id), General.DEFAULT_CHANNEL);
+        });
+    });
+
     describe('canManageAnyChannelMembersInCurrentTeam', () => {
         it('will return false if channel_user does not have permissions to manage channel members', () => {
             const newState = {

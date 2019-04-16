@@ -9,7 +9,8 @@ import {General, Preferences} from 'constants';
 import {ChannelTypes, PreferenceTypes, UserTypes} from 'action_types';
 import {savePreferences, deletePreferences} from 'actions/preferences';
 import {getChannelsIdForTeam} from 'utils/channel_utils';
-import {getMyChannelMember as getMyChannelMemberSelector} from 'selectors/entities/channels';
+import {getMyChannelMember as getMyChannelMemberSelector, getChannelByName, getRedirectChannelNameForTeam} from 'selectors/entities/channels';
+import {getCurrentTeamId} from 'selectors/entities/teams';
 
 import {logError} from './errors';
 import {bindClientFunc, forceLogoutIfNecessary} from './helpers';
@@ -654,7 +655,7 @@ export function joinChannel(userId: string, teamId: string, channelId: string, c
 
 export function deleteChannel(channelId: string): ActionFunc {
     return async (dispatch, getState) => {
-        const state = getState();
+        let state = getState();
         const viewArchivedChannels = state.entities.general.config.ExperimentalViewArchivedChannels === 'true';
 
         try {
@@ -665,16 +666,13 @@ export function deleteChannel(channelId: string): ActionFunc {
             return {error};
         }
 
-        const entities = getState().entities;
-        const {channels, currentChannelId} = entities.channels;
+        state = getState();
+        const {currentChannelId} = state.entities.channels;
         if (channelId === currentChannelId && !viewArchivedChannels) {
-            const channel = Object.keys(channels).filter((key) => channels[key].name === General.DEFAULT_CHANNEL);
-            let defaultChannelId = '';
-            if (channel.length) {
-                defaultChannelId = channel[0];
+            const channel = getChannelByName(state, getRedirectChannelNameForTeam(state, getCurrentTeamId(state)));
+            if (channel && channel.id) {
+                dispatch({type: ChannelTypes.SELECT_CHANNEL, data: channel.id}, getState);
             }
-
-            dispatch({type: ChannelTypes.SELECT_CHANNEL, data: defaultChannelId}, getState);
         }
 
         dispatch({type: ChannelTypes.DELETE_CHANNEL_SUCCESS, data: {id: channelId, viewArchivedChannels}}, getState);

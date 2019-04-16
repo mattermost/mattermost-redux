@@ -40,7 +40,7 @@ import {
 } from 'action_types';
 import {General, WebsocketEvents, Preferences} from 'constants';
 
-import {getAllChannels, getChannel, getChannelsInTeam, getCurrentChannelId, getCurrentChannelStats} from 'selectors/entities/channels';
+import {getAllChannels, getChannel, getCurrentChannelId, getChannelByName, getRedirectChannelNameForTeam, getCurrentChannelStats} from 'selectors/entities/channels';
 import {getConfig} from 'selectors/entities/general';
 import {getAllPosts} from 'selectors/entities/posts';
 import {getDirectShowPreferences} from 'selectors/entities/preferences';
@@ -496,8 +496,6 @@ function handleChannelCreatedEvent(msg) {
 function handleChannelDeletedEvent(msg) {
     return (dispatch, getState) => {
         const state = getState();
-        const channels = getAllChannels(state);
-        const channelsInTeam = getChannelsInTeam(state);
         const currentChannelId = getCurrentChannelId(state);
         const currentTeamId = getCurrentTeamId(state);
         const config = getConfig(state);
@@ -505,15 +503,10 @@ function handleChannelDeletedEvent(msg) {
 
         if (msg.broadcast.team_id === currentTeamId) {
             if (msg.data.channel_id === currentChannelId && !viewArchivedChannels) {
-                let channelId = '';
-                const teamChannels = Array.from(channelsInTeam[currentTeamId]);
-                const channel = teamChannels.filter((key) => channels[key].name === General.DEFAULT_CHANNEL);
-
-                if (channel.length) {
-                    channelId = channel[0];
+                const channel = getChannelByName(state, getRedirectChannelNameForTeam(state, currentTeamId));
+                if (channel && channel.id) {
+                    dispatch({type: ChannelTypes.SELECT_CHANNEL, data: channel.id});
                 }
-
-                dispatch({type: ChannelTypes.SELECT_CHANNEL, data: channelId});
                 EventEmitter.emit(General.DEFAULT_CHANNEL, '');
             }
 

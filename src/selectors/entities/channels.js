@@ -23,7 +23,7 @@ import {
 } from 'selectors/entities/preferences';
 import {getLastPostPerChannel, getAllPosts} from 'selectors/entities/posts';
 import {getCurrentTeamId, getCurrentTeamMembership, getMyTeams, getTeamMemberships} from 'selectors/entities/teams';
-import {haveICurrentChannelPermission, haveIChannelPermission} from 'selectors/entities/roles';
+import {haveICurrentChannelPermission, haveIChannelPermission, haveITeamPermission} from 'selectors/entities/roles';
 import {isCurrentUserSystemAdmin, getCurrentUserId} from 'selectors/entities/users';
 
 import {
@@ -1179,3 +1179,45 @@ export const getSortedDirectChannelWithUnreadsIds: (GlobalState, Channel, boolea
         return filterChannels(unreadChannelIds, favoritePreferences, directChannelIds, false, favoritesAtTop);
     },
 );
+
+export const getDefaultChannelForTeams: (GlobalState) => RelationOneToOne<Team, Channel> = createSelector(
+    getAllChannels,
+    (channels: IDMappedObjects<Channel>): RelationOneToOne<Team, Channel> => {
+        const result = {};
+        for (const channel of Object.keys(channels).map((key) => channels[key])) {
+            if (channel && channel.name === General.DEFAULT_CHANNEL) {
+                result[channel.team_id] = channel;
+            }
+        }
+        return result;
+    }
+);
+
+export const getMyFirstChannelForTeams: (GlobalState) => RelationOneToOne<Team, Channel> = createSelector(
+    getAllChannels,
+    getMyChannelMemberships,
+    getCurrentUser,
+    (allChannels: IDMappedObjects<Channel>, myChannelMemberships: RelationOneToOne<Channel, ChannelMembership>, currentUser: UserProfile): RelationOneToOne<Team, Channel> => {
+        const locale = currentUser.locale || General.DEFAULT_LOCALE;
+        const result = {};
+        for (const channel of Object.keys(allChannels).map((key) => allChannels[key]).sort(sortChannelsByDisplayName.bind(null, locale))) {
+            if (!result[channel.team_id] && myChannelMemberships[channel.id]) {
+                result[channel.team_id] = channel;
+            }
+        }
+        return result;
+    }
+);
+
+export const getRedirectChannelNameForTeam = (state: GlobalState, teamId: string): string => {
+    const defaultChannelForTeam = getDefaultChannelForTeams(state)[teamId];
+    const myFirstChannelForTeam = getMyFirstChannelForTeams(state)[teamId];
+    const canIJoinPublicChannelsInTeam = !hasNewPermissions(state) || haveITeamPermission(state, {team: teamId, permission: Permissions.JOIN_PUBLIC_CHANNELS});
+    const myChannelMemberships = getMyChannelMemberships(state);
+
+    const iAmMemberOfTheTeamDefaultChannel = Boolean(defaultChannelForTeam && myChannelMemberships[defaultChannelForTeam.id]);
+    if (iAmMemberOfTheTeamDefaultChannel || canIJoinPublicChannelsInTeam) {
+        return General.DEFAULT_CHANNEL;
+    }
+    return (myFirstChannelForTeam && myFirstChannelForTeam.name) || General.DEFAULT_CHANNEL;
+};
