@@ -60,11 +60,44 @@ function getGroup(state: RequestStatusType = initialRequestState(), action: Gene
     );
 }
 
+function getAllGroupsAssociatedToTeam(state: RequestStatusType = initialRequestState(), action: GenericAction): RequestStatusType {
+    return handleRequest(
+        GroupTypes.GET_ALL_GROUPS_ASSOCIATED_TO_TEAM_REQUEST,
+        GroupTypes.GET_ALL_GROUPS_ASSOCIATED_TO_TEAM_SUCCESS,
+        GroupTypes.GET_ALL_GROUPS_ASSOCIATED_TO_TEAM_FAILURE,
+        state,
+        action
+    );
+}
+
+function getGroupsAssociatedToTeam(state: RequestStatusType = initialRequestState(), action: GenericAction): RequestStatusType {
+    return handleRequest(
+        GroupTypes.GET_GROUPS_ASSOCIATED_TO_TEAM_REQUEST,
+        GroupTypes.GET_GROUPS_ASSOCIATED_TO_TEAM_SUCCESS,
+        GroupTypes.GET_GROUPS_ASSOCIATED_TO_TEAM_FAILURE,
+        state,
+        action
+    );
+}
+
+function getGroupsNotAssociatedToTeam(state: RequestStatusType = initialRequestState(), action: GenericAction): RequestStatusType {
+    return handleRequest(
+        GroupTypes.GET_GROUPS_NOT_ASSOCIATED_TO_TEAM_REQUEST,
+        GroupTypes.GET_GROUPS_NOT_ASSOCIATED_TO_TEAM_SUCCESS,
+        GroupTypes.GET_GROUPS_NOT_ASSOCIATED_TO_TEAM_FAILURE,
+        state,
+        action
+    );
+}
+
 export default (combineReducers({
     linkGroupSyncable,
     unlinkGroupSyncable,
     getGroupSyncables,
     getGroupMembers,
     getGroup,
+    getAllGroupsAssociatedToTeam,
+    getGroupsAssociatedToTeam,
+    getGroupsNotAssociatedToTeam,
 }): (GroupsRequestsStatuses, GenericAction) => GroupsRequestsStatuses);
 

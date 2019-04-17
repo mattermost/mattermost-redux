@@ -69,6 +69,9 @@ function syncables(state = {}, action) {
         };
     }
     case GroupTypes.UNLINKED_GROUP_TEAM: {
+        if (!state[action.data.group_id]) {
+            return state;
+        }
         const nextTeams = state[action.data.group_id].teams.slice();
 
         const index = nextTeams.findIndex((groupTeam) => {
@@ -134,6 +137,13 @@ function groups(state = {}, action) {
             ...state,
             [action.data.id]: action.data,
         };
+    }
+    case GroupTypes.RECEIVED_GROUPS: {
+        const nextState = {...state};
+        for (const group of action.data) {
+            nextState[group.id] = group;
+        }
+        return nextState;
     }
     default:
         return state;

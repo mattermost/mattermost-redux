@@ -19,6 +19,7 @@ export type Group = {|
     update_at: number,
     delete_at: number,
     has_syncables: boolean,
+    member_count: number,
 |};
 
 export type GroupTeam = {|

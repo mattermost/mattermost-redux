@@ -38,5 +38,6 @@ export type TeamsState = {|
     teams: { [string]: Team },
     myMembers: { [string]: TeamMembership },
     membersInTeam: Object,
-    stats: Object
+    stats: Object,
+    groupsAssociatedToTeam: Object,
 |};
