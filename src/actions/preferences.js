@@ -5,7 +5,7 @@
 import {Client4} from 'client';
 import {Preferences} from 'constants';
 import {PreferenceTypes} from 'action_types';
-import {getMyPreferences as getMyPreferencesSelector} from 'selectors/entities/preferences';
+import {getMyPreferences as getMyPreferencesSelector, makeGetCategory} from 'selectors/entities/preferences';
 import {getCurrentUserId} from 'selectors/entities/users';
 import {getPreferenceKey} from 'utils/preference_utils';
 
@@ -125,6 +125,45 @@ export function savePreferences(userId: string, preferences: Array<PreferenceTyp
             },
         });
 
+        return {data: true};
+    };
+}
+
+export function saveTheme(teamId: string, theme: {}): ActionFunc {
+    return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
+        const state = getState();
+        const currentUserId = getCurrentUserId(state);
+        const preference: PreferenceType = {
+            user_id: currentUserId,
+            category: Preferences.CATEGORY_THEME,
+            name: teamId,
+            value: JSON.stringify(theme),
+        };
+
+        await savePreferences(currentUserId, [preference])(dispatch);
+        return {data: true};
+    };
+}
+
+export function deleteUnnecessaryThemes(teamId: string): ActionFunc {
+    return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
+        const state = getState();
+
+        // $FlowFixMe
+        const getCategory: (state: any, preferenceId: string) => void = makeGetCategory();
+        const themePreferences: Array<PreferenceType> = getCategory(state, Preferences.CATEGORY_THEME);
+        const currentUserId = getCurrentUserId(state);
+
+        if (teamId !== '' && themePreferences.length > 1) {
+            // no extra handling to be done to delete team-specific themes
+            return {data: true};
+        }
+
+        const toDelete = themePreferences.filter((pref) => pref.name !== '' && pref !== teamId);
+
+        if (toDelete.length > 0) {
+            await deletePreferences(currentUserId, toDelete)(dispatch, getState);
+        }
         return {data: true};
     };
 }
