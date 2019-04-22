@@ -62,12 +62,14 @@ describe('Actions.Search', () => {
         const state = getState();
         const {recent, results} = state.entities.search;
         const {posts} = state.entities.posts;
+        const current = state.entities.search.current[TestHelper.basicTeam.id];
         assert.ok(recent[TestHelper.basicTeam.id]);
         const searchIsPresent = recent[TestHelper.basicTeam.id].findIndex((r) => r.terms === search1);
         assert.ok(searchIsPresent !== -1);
         assert.equal(Object.keys(recent[TestHelper.basicTeam.id]).length, 1);
         assert.equal(results.length, 1);
         assert.ok(posts[results[0]]);
+        assert.ok(current.isEnd);
 
         // DISABLED
         // Test for posts from a user in a channel

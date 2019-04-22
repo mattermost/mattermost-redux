@@ -72,7 +72,7 @@ export function searchPostsWithParams(teamId, params) {
                 data: {
                     teamId,
                     params,
-                    isEnd: (posts.order.length === 0),
+                    isEnd: (posts.order.length < params.per_page),
                 },
             },
             {
