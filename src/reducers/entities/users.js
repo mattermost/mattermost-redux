@@ -268,6 +268,7 @@ function profilesInChannel(state = {}, action) {
             user_id: action.data.user_id,
         }});
 
+    case ChannelTypes.SELECT_CHANNEL:
     case UserTypes.LOGOUT_SUCCESS:
         return {};
 
@@ -296,6 +297,7 @@ function profilesNotInChannel(state = {}, action) {
             user_id: action.data.user_id,
         }});
 
+    case ChannelTypes.SELECT_CHANNEL:
     case UserTypes.LOGOUT_SUCCESS:
         return {};
 

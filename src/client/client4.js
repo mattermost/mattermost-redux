@@ -570,11 +570,18 @@ export default class Client4 {
         );
     };
 
-    getProfilesNotInTeam = async (teamId, page = 0, perPage = PER_PAGE_DEFAULT) => {
-        this.trackEvent('api', 'api_profiles_get_not_in_team', {team_id: teamId});
+    getProfilesNotInTeam = async (teamId, groupConstrained, page = 0, perPage = PER_PAGE_DEFAULT) => {
+        this.trackEvent('api', 'api_profiles_get_not_in_team', {team_id: teamId, group_constrained: groupConstrained});
+
+        let queryStringObj;
+        if (groupConstrained) {
+            queryStringObj = {not_in_team: teamId, page, per_page: perPage, group_constrained: true};
+        } else {
+            queryStringObj = {not_in_team: teamId, page, per_page: perPage};
+        }
 
         return this.doFetch(
-            `${this.getUsersRoute()}${buildQueryString({not_in_team: teamId, page, per_page: perPage})}`,
+            `${this.getUsersRoute()}${buildQueryString(queryStringObj)}`,
             {method: 'get'}
         );
     };
@@ -604,11 +611,18 @@ export default class Client4 {
         );
     };
 
-    getProfilesNotInChannel = async (teamId, channelId, page = 0, perPage = PER_PAGE_DEFAULT) => {
-        this.trackEvent('api', 'api_profiles_get_not_in_channel', {team_id: teamId, channel_id: channelId});
+    getProfilesNotInChannel = async (teamId, channelId, groupConstrained, page = 0, perPage = PER_PAGE_DEFAULT) => {
+        this.trackEvent('api', 'api_profiles_get_not_in_channel', {team_id: teamId, channel_id: channelId, group_constrained: groupConstrained});
+
+        let queryStringObj;
+        if (groupConstrained) {
+            queryStringObj = {in_team: teamId, not_in_channel: channelId, group_constrained: true, page, per_page: perPage};
+        } else {
+            queryStringObj = {in_team: teamId, not_in_channel: channelId, page, per_page: perPage};
+        }
 
         return this.doFetch(
-            `${this.getUsersRoute()}${buildQueryString({in_team: teamId, not_in_channel: channelId, page, per_page: perPage})}`,
+            `${this.getUsersRoute()}${buildQueryString(queryStringObj)}`,
             {method: 'get'}
         );
     };
