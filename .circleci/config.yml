@@ -1,0 +1,61 @@
+version: 2.1
+executors:
+  default:
+    working_directory: ~/mattermost-redux
+    docker:
+      - image: circleci/node:11.3.0
+
+jobs:
+  install:
+    executor:
+      name: default
+    steps:
+      - checkout
+      - run: ls -la
+      - restore_cache:
+          keys:
+            - test-dependencies-{{ checksum "package.json" }}
+
+      - run: npm install --ignore-scripts
+      - run: npm run flow-typed install
+      - run: ls -la
+      - save_cache:
+          paths:
+            - node_modules
+            - flow-typed
+          key: test-dependencies-{{ checksum "package.json" }}
+
+  lint:
+    executor:
+      name: default
+    steps:
+      - checkout
+      - restore_cache:
+          keys:
+            - test-dependencies-{{ checksum "package.json" }}
+      - run: npm run check
+      - run: npm run flow
+
+  test:
+    executor:
+      name: default
+    steps:
+      - checkout
+      - restore_cache:
+          keys:
+            - test-dependencies-{{ checksum "package.json" }}
+      - run: npm test
+      - store_test_results:
+          path: build/
+
+workflows:
+  version: 2
+  pr-build:
+    jobs:
+      - install
+      - lint:
+          requires:
+            - install
+      - test:
+          requires:
+            - lint
