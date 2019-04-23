@@ -57,6 +57,6 @@ describe('FileUtils', () => {
 
         jpgFilePaths.forEach((filePath) => {
             assert.equal(FileUtils.lookupMimeType(filePath), mimeType);
-        })
+        });
     });
 });
