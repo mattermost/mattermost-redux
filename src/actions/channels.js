@@ -966,11 +966,11 @@ export function getChannelStats(channelId: string): ActionFunc {
     };
 }
 
-export function addChannelMember(channelId: string, userId: string, postRootId: string = ''): ActionFunc {
+export function addChannelMember(channelId: string, userId: string, postRootId: string = '', channelAsViewed: boolean = true): ActionFunc {
     return async (dispatch, getState) => {
         let member;
         try {
-            member = await Client4.addToChannel(userId, channelId, postRootId);
+            member = await Client4.addToChannel(userId, channelId, postRootId, channelAsViewed);
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch, getState);
             dispatch(logError(error));
