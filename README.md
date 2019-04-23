@@ -1,4 +1,4 @@
-# Mattermost Redux
+# Mattermost Redux ![CircleCI branch](https://img.shields.io/circleci/project/github/mattermost/mattermost-redux/master.svg)
 
 The project purpose is consolidating the storage, web utilities and logic of the webapp and React Native mobile clients into a single driver. We encourage you to use mattermost-redux to power your own Mattermost clients or integrations.
 
