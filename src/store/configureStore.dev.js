@@ -7,7 +7,6 @@ import devTools from 'remote-redux-devtools';
 import {createOfflineReducer, networkStatusChangedAction, offlineCompose} from 'redux-offline';
 import defaultOfflineConfig from 'redux-offline/lib/defaults';
 import reducerRegistry from 'store/reducer_registry';
-import {Client4} from 'client';
 
 const devToolsEnhancer = (
     typeof window !== 'undefined' && window.__REDUX_DEVTOOLS_EXTENSION__ ? // eslint-disable-line no-underscore-dangle
@@ -66,7 +65,6 @@ export default function configureServiceStore(preloadedState, appReducer, userOf
 
     if (baseOfflineConfig.detectNetwork) {
         baseOfflineConfig.detectNetwork((online) => {
-            Client4.setOnline(online);
             store.dispatch(networkStatusChangedAction(online));
         });
     }

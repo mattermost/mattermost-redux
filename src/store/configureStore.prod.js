@@ -5,7 +5,6 @@ import {createStore} from 'redux';
 import {createOfflineReducer, networkStatusChangedAction, offlineCompose} from 'redux-offline';
 import defaultOfflineConfig from 'redux-offline/lib/defaults';
 import reducerRegistry from 'store/reducer_registry';
-import {Client4} from 'client';
 
 import serviceReducer from 'reducers';
 
@@ -49,7 +48,6 @@ export default function configureOfflineServiceStore(preloadedState, appReducer,
 
     if (baseOfflineConfig.detectNetwork) {
         baseOfflineConfig.detectNetwork((online) => {
-            Client4.setOnline(online);
             store.dispatch(networkStatusChangedAction(online));
         });
     }
