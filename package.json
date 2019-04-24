@@ -89,9 +89,7 @@
       "default",
       "jest-junit"
     ],
-    "setupFilesAfterEnv": [
-      "<rootDir>/test/setup.js"
-    ],
+    "setupTestFrameworkScriptFile": "<rootDir>/test/setup.js",
     "testPathIgnorePatterns": [
       "/node_modules/"
     ]
