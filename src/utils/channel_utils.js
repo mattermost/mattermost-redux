@@ -656,3 +656,15 @@ export function filterChannelsMatchingTerm(channels: Array<Channel>, term: strin
             displayName.startsWith(lowercasedTerm);
     });
 }
+
+export function filterGroupChannelsMatchingTerm(groupChannels: Array<Channel>, term: string): Array<Channel> {
+    const lowercasedTerm = term.toLowerCase();
+
+    return groupChannels.filter((channel: Channel): boolean => {
+        const displayName = (channel.display_name || '').toLowerCase();
+
+        return displayName.
+            split(', ').
+            some((username) => username.startsWith(lowercasedTerm));
+    });
+}

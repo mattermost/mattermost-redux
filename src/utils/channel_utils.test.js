@@ -12,6 +12,7 @@ import {
     isAutoClosed,
     filterChannelsMatchingTerm,
     sortChannelsByRecency,
+    filterGroupChannelsMatchingTerm,
 } from 'utils/channel_utils';
 
 describe('ChannelUtils', () => {
@@ -222,5 +223,18 @@ describe('ChannelUtils', () => {
         // sorting depends on create_at of channel's last post if it's greater than the channel's last_post_at
         lastPosts.channel_a.create_at = 10;
         assert.deepEqual(sortChannelsByRecency(lastPosts, channelA, channelB), -3, 'should return 2, comparison of create_at (7 - 10)');
+    });
+
+    it('filter group channels matching term', () => {
+        const c1 = {display_name: 'samuel.palmer, emily.meyer, aaron.medina'};
+        const c2 = {display_name: 'aaron.peterson, samuel.palmer'};
+        const c3 = {display_name: 'samuel.palmer, emily.meyer'};
+
+        const channels = [c1, c2, c3];
+
+        assert.deepEqual(filterGroupChannelsMatchingTerm(channels, 'samuel.pal'), [c1, c2, c3]);
+        assert.deepEqual(filterGroupChannelsMatchingTerm(channels, 'palmer'), []);
+        assert.deepEqual(filterGroupChannelsMatchingTerm(channels, 'AA'), [c1, c2]);
+        assert.deepEqual(filterGroupChannelsMatchingTerm(channels, 'em'), [c1, c3]);
     });
 });
