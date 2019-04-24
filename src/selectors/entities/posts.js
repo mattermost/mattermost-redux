@@ -58,20 +58,19 @@ export function getOpenGraphMetadataForUrl(state: GlobalState, url: string): Obj
     return state.entities.posts.openGraph[url];
 }
 
-export const getPostIdsInCurrentChannel: (state: GlobalState) => Array<$ID<Post>> = createIdsSelector(
-    (state: GlobalState) => state.entities.posts.postsInChannel[state.entities.channels.currentChannelId],
-    (postIdsInCurrentChannel) => {
-        return postIdsInCurrentChannel || [];
-    }
-);
+// getPostIdsInCurrentChannel returns the IDs of posts loaded at the bottom of the channel. It does not include older
+// posts such as those loaded by viewing a thread or a permalink.
+export function getPostIdsInCurrentChannel(state: GlobalState): ?Array<$ID<Post>> {
+    return getPostIdsInChannel(state, state.entities.channels.currentChannelId);
+}
 
-export const getPostsInCurrentChannel: (GlobalState) => Array<Post> = createSelector(
-    getAllPosts,
-    getPostIdsInCurrentChannel,
-    (posts, postIds) => {
-        return postIds.map((id) => posts[id]);
-    }
-);
+// getPostsInCurrentChannel returns the posts loaded at the bottom of the channel. It does not include older posts
+// such as those loaded by viewing a thread or a permalink.
+export const getPostsInCurrentChannel: (GlobalState) => ?Array<PostWithFormatData> = (() => {
+    const getPostsInChannel = makeGetPostsInChannel();
+
+    return (state: GlobalState) => getPostsInChannel(state, state.entities.channels.currentChannelId, -1);
+})();
 
 export function makeGetPostIdsForThread(): (GlobalState, $ID<Post>) => Array<$ID<Post>> {
     return createIdsSelector(
@@ -99,25 +98,38 @@ export function makeGetPostIdsForThread(): (GlobalState, $ID<Post>) => Array<$ID
     );
 }
 
-export function makeGetPostIdsAroundPost(): (GlobalState, $ID<Post>, $ID<Channel>, {postBeforeCount: number, postAfterCount: number}) => ?Array<$ID<Post>> {
+export function makeGetPostIdsAroundPost(): (GlobalState, $ID<Post>, $ID<Channel>, {postsBeforeCount: number, postsAfterCount: number}) => ?Array<$ID<Post>> {
     return createIdsSelector(
-        (state: GlobalState, focusedPostId, channelId) => state.entities.posts.postsInChannel[channelId],
-        (state: GlobalState, focusedPostId) => focusedPostId,
-        (state: GlobalState, focusedPostId, channelId, options) => options && options.postsBeforeCount,
-        (state: GlobalState, focusedPostId, channelId, options) => options && options.postsAfterCount,
-        (postIds, focusedPostId, postsBeforeCount = Posts.POST_CHUNK_SIZE / 2, postsAfterCount = Posts.POST_CHUNK_SIZE / 2) => {
-            if (!postIds) {
+        (state: GlobalState, postId, channelId) => state.entities.posts.postsInChannel[channelId],
+        (state: GlobalState, postId) => postId,
+        (state: GlobalState, postId, channelId, options) => options && options.postsBeforeCount,
+        (state: GlobalState, postId, channelId, options) => options && options.postsAfterCount,
+        (postsForChannel, postId, postsBeforeCount = Posts.POST_CHUNK_SIZE / 2, postsAfterCount = Posts.POST_CHUNK_SIZE / 2) => {
+            if (!postsForChannel) {
                 return null;
             }
 
-            const focusedPostIndex = postIds.indexOf(focusedPostId);
-            if (focusedPostIndex === -1) {
+            let postIds: ?Array<$ID<Post>> = null;
+            let postIndex = -1;
+
+            for (const block of postsForChannel) {
+                const index = block.order.indexOf(postId);
+
+                if (index === -1) {
+                    continue;
+                }
+
+                postIds = block.order;
+                postIndex = index;
+            }
+
+            if (postIndex === -1 || !postIds) {
                 return null;
             }
 
-            const desiredPostIndexBefore = focusedPostIndex - postsBeforeCount;
-            const minPostIndex = desiredPostIndexBefore < 0 ? 0 : desiredPostIndexBefore;
-            const maxPostIndex = focusedPostIndex + postsAfterCount + 1; // Needs the extra 1 to include the focused post
+            // Remember that posts that come after the post have a smaller index
+            const minPostIndex = postsAfterCount === -1 ? 0 : Math.max(postIndex - postsAfterCount, 0);
+            const maxPostIndex = postsBeforeCount === -1 ? postIds.length : Math.min(postIndex + postsBeforeCount + 1, postIds.length); // Needs the extra 1 to include the focused post
 
             return postIds.slice(minPostIndex, maxPostIndex);
         }
@@ -208,16 +220,18 @@ function formatPostInChannel(post: Post, previousPost: ?Post, index: number, all
     };
 }
 
+// makeGetPostsInChannel creates a selector that returns up to the given number of posts loaded at the bottom of the
+// given channel. It does not include older posts such as those loaded by viewing a thread or a permalink.
 export function makeGetPostsInChannel(): (GlobalState, $ID<Channel>, number) => ?Array<PostWithFormatData> {
     return createSelector(
         getAllPosts,
         getPostsInThread,
-        (state: GlobalState, channelId: $ID<Channel>) => state.entities.posts.postsInChannel[channelId],
+        (state: GlobalState, channelId: $ID<Channel>) => getPostIdsInChannel(state, channelId),
         getCurrentUser,
         getMyPreferences,
         (state: GlobalState, channelId: $ID<Channel>, numPosts: number) => numPosts || Posts.POST_CHUNK_SIZE,
-        (allPosts, postsInThread, postIds, currentUser, myPreferences, numPosts) => {
-            if (!postIds || !currentUser) {
+        (allPosts, postsInThread, allPostIds, currentUser, myPreferences, numPosts) => {
+            if (!allPostIds) {
                 return null;
             }
 
@@ -226,10 +240,12 @@ export function makeGetPostsInChannel(): (GlobalState, $ID<Channel>, number) => 
             const joinLeavePref = myPreferences[getPreferenceKey(Preferences.CATEGORY_ADVANCED_SETTINGS, Preferences.ADVANCED_FILTER_JOIN_LEAVE)];
             const showJoinLeave = joinLeavePref ? joinLeavePref.value !== 'false' : true;
 
-            for (let i = 0; i < postIds.length && i < numPosts; i++) {
+            const postIds = numPosts === -1 ? allPostIds : allPostIds.slice(0, numPosts);
+
+            for (let i = 0; i < postIds.length; i++) {
                 const post = allPosts[postIds[i]];
 
-                if (shouldFilterJoinLeavePost(post, showJoinLeave, currentUser.username)) {
+                if (shouldFilterJoinLeavePost(post, showJoinLeave, currentUser ? currentUser.username : '')) {
                     continue;
                 }
 
@@ -243,41 +259,37 @@ export function makeGetPostsInChannel(): (GlobalState, $ID<Channel>, number) => 
 }
 
 export function makeGetPostsAroundPost(): (GlobalState, $ID<Post>, $ID<Channel>) => ?Array<PostWithFormatData> {
+    const getPostIdsAroundPost = makeGetPostIdsAroundPost();
+    const options = {
+        postsBeforeCount: -1, // Where this is used in the web app, view state is used to determine how far back to display
+        postsAfterCount: Posts.POST_CHUNK_SIZE / 2,
+    };
+
     return createSelector(
+        (state: GlobalState, focusedPostId, channelId) => getPostIdsAroundPost(state, focusedPostId, channelId, options),
         getAllPosts,
         getPostsInThread,
-        (state: GlobalState, postId, channelId) => state.entities.posts.postsInChannel[channelId],
-        (state: GlobalState, postId) => postId,
+        (state: GlobalState, focusedPostId) => focusedPostId,
         getCurrentUser,
         getMyPreferences,
-        (allPosts, postsInThread, postIds, focusedPostId, currentUser, myPreferences) => {
+        (postIds, allPosts, postsInThread, focusedPostId, currentUser, myPreferences) => {
             if (!postIds || !currentUser) {
                 return null;
             }
-
-            const focusedPostIndex = postIds.indexOf(focusedPostId);
-            if (focusedPostIndex === -1) {
-                return null;
-            }
-
-            const desiredPostIndexBefore = focusedPostIndex - (Posts.POST_CHUNK_SIZE / 2);
-            const minPostIndex = desiredPostIndexBefore < 0 ? 0 : desiredPostIndexBefore;
-
-            const slicedPostIds = postIds.slice(minPostIndex);
 
             const posts = [];
             const joinLeavePref = myPreferences[getPreferenceKey(Preferences.CATEGORY_ADVANCED_SETTINGS, Preferences.ADVANCED_FILTER_JOIN_LEAVE)];
             const showJoinLeave = joinLeavePref ? joinLeavePref.value !== 'false' : true;
 
-            for (let i = 0; i < slicedPostIds.length; i++) {
-                const post = allPosts[slicedPostIds[i]];
+            for (let i = 0; i < postIds.length; i++) {
+                const post = allPosts[postIds[i]];
 
                 if (shouldFilterJoinLeavePost(post, showJoinLeave, currentUser.username)) {
                     continue;
                 }
 
-                const previousPost = allPosts[slicedPostIds[i + 1]] || null;
-                const formattedPost = formatPostInChannel(post, previousPost, i, allPosts, postsInThread, slicedPostIds, currentUser, focusedPostId);
+                const previousPost = allPosts[postIds[i + 1]] || null;
+                const formattedPost = formatPostInChannel(post, previousPost, i, allPosts, postsInThread, postIds, currentUser, focusedPostId);
 
                 posts.push(formattedPost);
             }
@@ -388,18 +400,18 @@ export function makeGetPostsForIds(): (GlobalState, Array<$ID<Post>>) => Array<P
 export const getLastPostPerChannel: (GlobalState) => RelationOneToOne<Channel, Post> = createSelector(
     getAllPosts,
     (state: GlobalState) => state.entities.posts.postsInChannel,
-    (allPosts, allChannels) => {
+    (allPosts, postsInChannel) => {
         const ret = {};
 
-        for (const channelId in allChannels) {
-            if (allChannels.hasOwnProperty(channelId)) {
-                const channelPosts = allChannels[channelId];
-                if (channelPosts.length > 0) {
-                    const postId = channelPosts[0];
-                    if (allPosts.hasOwnProperty(postId)) {
-                        ret[channelId] = allPosts[postId];
-                    }
-                }
+        for (const [channelId, postsForChannel] of Object.entries(postsInChannel)) {
+            const recentBlock = (postsForChannel: any).find((block) => block.recent);
+            if (!recentBlock) {
+                continue;
+            }
+
+            const postId = recentBlock.order[0];
+            if (allPosts.hasOwnProperty(postId)) {
+                ret[channelId] = allPosts[postId];
             }
         }
 
@@ -409,7 +421,7 @@ export const getLastPostPerChannel: (GlobalState) => RelationOneToOne<Channel, P
 
 export const getMostRecentPostIdInChannel: (GlobalState, $ID<Channel>) => ?$ID<Post> = createSelector(
     getAllPosts,
-    (state: GlobalState, channelId) => state.entities.posts.postsInChannel[channelId],
+    (state: GlobalState, channelId) => getPostIdsInChannel(state, channelId),
     getMyPreferences,
     (posts, postIdsInChannel, preferences) => {
         if (!postIdsInChannel) {
@@ -436,53 +448,69 @@ export const getMostRecentPostIdInChannel: (GlobalState, $ID<Channel>) => ?$ID<P
     }
 );
 
-export const getLatestReplyablePostId: (GlobalState) => ?$ID<Post> = createSelector(
+export const getLatestReplyablePostId: (GlobalState) => $ID<Post> = createSelector(
     getPostsInCurrentChannel,
     (posts) => {
-        for (const post of posts) {
-            if (post.state !== Posts.POST_DELETED && !isSystemMessage(post) && !isPostEphemeral(post)) {
-                return post.id;
-            }
+        if (!posts) {
+            return '';
         }
-        return null;
+
+        const latestReplyablePost = posts.find((post) => post.state !== Posts.POST_DELETED && !isSystemMessage(post) && !isPostEphemeral(post));
+        if (!latestReplyablePost) {
+            return '';
+        }
+
+        return latestReplyablePost.id;
     }
 );
 
-export const getCurrentUsersLatestPost: (GlobalState, $ID<Post>) => ?Post = createSelector(
+export const getCurrentUsersLatestPost: (GlobalState, $ID<Post>) => ?PostWithFormatData = createSelector(
     getPostsInCurrentChannel,
     getCurrentUser,
     (_, rootId) => rootId,
     (posts, currentUser, rootId) => {
-        let lastPost = null;
-        for (const post of posts) {
+        if (!posts) {
+            return null;
+        }
+
+        const lastPost = posts.find((post) => {
             // don't edit webhook posts, deleted posts, or system messages
             if (post.user_id !== currentUser.id ||
-               (post.props && post.props.from_webhook) ||
-               post.state === Posts.POST_DELETED ||
-               (isSystemMessage(post) || isPostEphemeral(post)) || isPostPendingOrFailed(post)) {
-                continue;
+                (post.props && post.props.from_webhook) ||
+                post.state === Posts.POST_DELETED ||
+                (isSystemMessage(post) || isPostEphemeral(post)) || isPostPendingOrFailed(post)) {
+                return false;
             }
 
             if (rootId) {
-                if (post.root_id === rootId || post.id === rootId) {
-                    lastPost = post;
-                    break;
-                }
-            } else {
-                lastPost = post;
-                break;
+                return post.root_id === rootId || post.id === rootId;
             }
-        }
+
+            return true;
+        });
+
         return lastPost;
     }
 );
 
-export function getPostIdsInChannel(state: GlobalState, channelId: $ID<Channel>): Array<$ID<Post>> {
-    return state.entities.posts.postsInChannel[channelId];
+// getPostIdsInChannel returns the IDs of posts loaded at the bottom of the given channel. It does not include older
+// posts such as those loaded by viewing a thread or a permalink.
+export function getPostIdsInChannel(state: GlobalState, channelId: $ID<Channel>): ?Array<$ID<Post>> {
+    const postsForChannel = state.entities.posts.postsInChannel[channelId];
+    if (!postsForChannel) {
+        return null;
+    }
+
+    const recentBlock = postsForChannel.find((block) => block.recent);
+    if (!recentBlock) {
+        return null;
+    }
+
+    return recentBlock.order;
 }
 
 export const isPostIdSending = (state: GlobalState, postId: $ID<Post>): boolean =>
-    state.entities.posts.sendingPostIds.some((sendingPostId) => sendingPostId === postId);
+    state.entities.posts.pendingPostIds.some((sendingPostId) => sendingPostId === postId);
 
 export const makeIsPostCommentMention = (): ((GlobalState, $ID<Post>) => boolean) => {
     return createSelector(
@@ -491,6 +519,10 @@ export const makeIsPostCommentMention = (): ((GlobalState, $ID<Post>) => boolean
         getCurrentUser,
         getPost,
         (allPosts, postsInThread, currentUser, post) => {
+            if (!post) {
+                return false;
+            }
+
             let threadRepliedToByCurrentUser = false;
             let isCommentMention = false;
             if (currentUser) {

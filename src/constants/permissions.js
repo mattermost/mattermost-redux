@@ -67,4 +67,5 @@ export default {
     CREATE_EMOJIS: 'create_emojis',
     DELETE_EMOJIS: 'delete_emojis',
     DELETE_OTHERS_EMOJIS: 'delete_others_emojis',
+    VIEW_MEMBERS: 'view_members',
 };

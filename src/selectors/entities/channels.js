@@ -23,7 +23,7 @@ import {
 } from 'selectors/entities/preferences';
 import {getLastPostPerChannel, getAllPosts} from 'selectors/entities/posts';
 import {getCurrentTeamId, getCurrentTeamMembership, getMyTeams, getTeamMemberships} from 'selectors/entities/teams';
-import {haveICurrentChannelPermission} from 'selectors/entities/roles';
+import {haveICurrentChannelPermission, haveIChannelPermission, haveITeamPermission} from 'selectors/entities/roles';
 import {isCurrentUserSystemAdmin, getCurrentUserId} from 'selectors/entities/users';
 
 import {
@@ -563,6 +563,29 @@ export const canManageChannelMembers: (GlobalState) => boolean = createSelector(
         }
 
         return canManageMembersOldPermissions(channel, user, teamMembership, channelMembership, config, license);
+    }
+);
+
+// Determine if the user has permissions to manage members in at least one channel of the current team
+export const canManageAnyChannelMembersInCurrentTeam: (GlobalState) => boolean = createSelector(
+    getMyChannelMemberships,
+    getCurrentTeamId,
+    (state: GlobalState): GlobalState => state,
+    (members: RelationOneToOne<Channel, ChannelMembership>, currentTeamId: string, state: GlobalState): boolean => {
+        for (const channelId of Object.keys(members)) {
+            const channel = getChannel(state, channelId);
+
+            if (!channel || channel.team_id !== currentTeamId) {
+                continue;
+            }
+
+            if (channel.type === General.OPEN_CHANNEL && haveIChannelPermission(state, {permission: Permissions.MANAGE_PUBLIC_CHANNEL_MEMBERS, channel: channelId, team: currentTeamId})) {
+                return true;
+            } else if (channel.type === General.PRIVATE_CHANNEL && haveIChannelPermission(state, {permission: Permissions.MANAGE_PRIVATE_CHANNEL_MEMBERS, channel: channelId, team: currentTeamId})) {
+                return true;
+            }
+        }
+        return false;
     }
 );
 
@@ -1156,3 +1179,45 @@ export const getSortedDirectChannelWithUnreadsIds: (GlobalState, Channel, boolea
         return filterChannels(unreadChannelIds, favoritePreferences, directChannelIds, false, favoritesAtTop);
     },
 );
+
+export const getDefaultChannelForTeams: (GlobalState) => RelationOneToOne<Team, Channel> = createSelector(
+    getAllChannels,
+    (channels: IDMappedObjects<Channel>): RelationOneToOne<Team, Channel> => {
+        const result = {};
+        for (const channel of Object.keys(channels).map((key) => channels[key])) {
+            if (channel && channel.name === General.DEFAULT_CHANNEL) {
+                result[channel.team_id] = channel;
+            }
+        }
+        return result;
+    }
+);
+
+export const getMyFirstChannelForTeams: (GlobalState) => RelationOneToOne<Team, Channel> = createSelector(
+    getAllChannels,
+    getMyChannelMemberships,
+    getCurrentUser,
+    (allChannels: IDMappedObjects<Channel>, myChannelMemberships: RelationOneToOne<Channel, ChannelMembership>, currentUser: UserProfile): RelationOneToOne<Team, Channel> => {
+        const locale = currentUser.locale || General.DEFAULT_LOCALE;
+        const result = {};
+        for (const channel of Object.keys(allChannels).map((key) => allChannels[key]).sort(sortChannelsByDisplayName.bind(null, locale))) {
+            if (!result[channel.team_id] && myChannelMemberships[channel.id]) {
+                result[channel.team_id] = channel;
+            }
+        }
+        return result;
+    }
+);
+
+export const getRedirectChannelNameForTeam = (state: GlobalState, teamId: string): string => {
+    const defaultChannelForTeam = getDefaultChannelForTeams(state)[teamId];
+    const myFirstChannelForTeam = getMyFirstChannelForTeams(state)[teamId];
+    const canIJoinPublicChannelsInTeam = !hasNewPermissions(state) || haveITeamPermission(state, {team: teamId, permission: Permissions.JOIN_PUBLIC_CHANNELS});
+    const myChannelMemberships = getMyChannelMemberships(state);
+
+    const iAmMemberOfTheTeamDefaultChannel = Boolean(defaultChannelForTeam && myChannelMemberships[defaultChannelForTeam.id]);
+    if (iAmMemberOfTheTeamDefaultChannel || canIJoinPublicChannelsInTeam) {
+        return General.DEFAULT_CHANNEL;
+    }
+    return (myFirstChannelForTeam && myFirstChannelForTeam.name) || General.DEFAULT_CHANNEL;
+};

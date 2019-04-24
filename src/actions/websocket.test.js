@@ -7,6 +7,7 @@ import {Server, WebSocket as MockWebSocket} from 'mock-socket';
 
 import * as Actions from 'actions/websocket';
 import * as ChannelActions from 'actions/channels';
+import * as PostActions from 'actions/posts';
 import * as TeamActions from 'actions/teams';
 
 import {Client4} from 'client';
@@ -80,7 +81,7 @@ describe('Actions.Websocket', () => {
         post.channel_id = TestHelper.basicChannel.id;
 
         post.id = '71k8gz5ompbpfkrzaxzodffj8w';
-        store.dispatch({type: PostTypes.RECEIVED_POST, data: post});
+        store.dispatch(PostActions.receivedPost(post));
         mockServer.emit('message', JSON.stringify({event: WebsocketEvents.POST_DELETED, data: {post: `{"id": "71k8gz5ompbpfkrzaxzodffj8w","create_at": 1508245311774,"update_at": 1508247709215,"edit_at": 1508247709215,"delete_at": 0,"is_pinned": false,"user_id": "${TestHelper.basicUser.id}","channel_id": "${post.channel_id}","root_id": "","parent_id": "","original_id": "","message": "Unit Test","type": "","props": {},"hashtags": "","pending_post_id": ""}`}, broadcast: {omit_users: null, user_id: '', channel_id: '18k9ffsuci8xxm7ak68zfdyrce', team_id: ''}, seq: 7}));
 
         const entities = store.getState().entities;
@@ -219,7 +220,7 @@ describe('Actions.Websocket', () => {
 
     it('Websocket Handle Channel Created', (done) => {
         async function test() {
-            const channel = {id: '95tpi6f4apy39k6zxuo3msxzhy'};
+            const channel = {id: '95tpi6f4apy39k6zxuo3msxzhy', display_name: 'test'};
             store.dispatch({type: ChannelTypes.RECEIVED_CHANNEL, data: channel});
             mockServer.emit('message', JSON.stringify({event: WebsocketEvents.CHANNEL_CREATED, data: {channel_id: '95tpi6f4apy39k6zxuo3msxzhy', team_id: TestHelper.basicTeam.id}, broadcast: {omit_users: null, user_id: 't36kso9nwtdhbm8dbkd6g4eeby', channel_id: '', team_id: ''}, seq: 57}));
 
@@ -282,7 +283,7 @@ describe('Actions.Websocket', () => {
             await store.dispatch(TeamActions.selectTeam(TestHelper.basicTeam));
             await store.dispatch(ChannelActions.selectChannel(TestHelper.basicChannel.id));
 
-            store.dispatch({type: ChannelTypes.RECEIVED_CHANNEL, data: {id: TestHelper.generateId(), name: General.DEFAULT_CHANNEL, team_id: TestHelper.basicTeam.id}});
+            store.dispatch({type: ChannelTypes.RECEIVED_CHANNEL, data: {id: TestHelper.generateId(), name: General.DEFAULT_CHANNEL, team_id: TestHelper.basicTeam.id, display_name: General.DEFAULT_CHANNEL}});
             store.dispatch({type: ChannelTypes.RECEIVED_CHANNEL, data: TestHelper.basicChannel});
 
             nock(Client4.getUserRoute('me')).

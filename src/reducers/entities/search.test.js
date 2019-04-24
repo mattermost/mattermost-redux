@@ -59,11 +59,11 @@ describe('reducers.entities.search', () => {
             });
         });
 
-        describe('PostTypes.REMOVE_POST', () => {
+        describe('PostTypes.POST_REMOVED', () => {
             it('post in results', () => {
                 const inputState = ['abcd', 'efgh'];
                 const action = {
-                    type: PostTypes.REMOVE_POST,
+                    type: PostTypes.POST_REMOVED,
                     data: {
                         id: 'efgh',
                     },
@@ -77,7 +77,7 @@ describe('reducers.entities.search', () => {
             it('post not in results', () => {
                 const inputState = ['abcd', 'efgh'];
                 const action = {
-                    type: PostTypes.REMOVE_POST,
+                    type: PostTypes.POST_REMOVED,
                     data: {
                         id: '1234',
                     },
@@ -196,14 +196,14 @@ describe('reducers.entities.search', () => {
             });
         });
 
-        describe('PostTypes.REMOVE_POST', () => {
+        describe('PostTypes.POST_REMOVED', () => {
             it('post in results', () => {
                 const inputState = {
                     abcd: ['test', 'testing'],
                     efgh: ['tests'],
                 };
                 const action = {
-                    type: PostTypes.REMOVE_POST,
+                    type: PostTypes.POST_REMOVED,
                     data: {
                         id: 'efgh',
                     },
@@ -222,7 +222,7 @@ describe('reducers.entities.search', () => {
                     efgh: ['tests'],
                 };
                 const action = {
-                    type: PostTypes.REMOVE_POST,
+                    type: PostTypes.POST_REMOVED,
                     data: {
                         id: '1234',
                     },

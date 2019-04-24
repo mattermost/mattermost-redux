@@ -7,19 +7,16 @@ import {General, Posts, Preferences, Permissions} from 'constants';
 import {hasNewPermissions} from 'selectors/entities/general';
 import {haveIChannelPermission} from 'selectors/entities/roles';
 
-import {generateId} from './helpers';
 import {getPreferenceKey} from './preference_utils';
 
 import type {GlobalState} from 'types/store.js';
 import type {PreferenceType} from 'types/preferences.js';
 import type {Post, PostType} from 'types/posts.js';
-import type {UserProfile, UserActivity} from 'types/users.js';
+import type {UserProfile} from 'types/users.js';
 import type {Team} from 'types/teams';
 import type {Channel} from 'types/channels';
 
-import type {$ID, IDMappedObjects} from 'types/utilities';
-
-const MAX_COMBINED_SYSTEM_POSTS = 100;
+import type {$ID} from 'types/utilities';
 
 export function isPostFlagged(postId: $ID<Post>, myPreferences: {[string]: PreferenceType}): boolean {
     const key = getPreferenceKey(Preferences.CATEGORY_FLAGGED_POST, postId);
@@ -152,7 +149,7 @@ export function shouldFilterJoinLeavePost(post: Post, showJoinLeave: boolean, cu
 }
 
 function isJoinLeavePostForUsername(post: Post, currentUsername: string): boolean {
-    if (!post.props) {
+    if (!post.props || !currentUsername) {
         return false;
     }
 
@@ -191,227 +188,6 @@ export function comparePosts(a: Post, b: Post): number {
     }
 
     return 0;
-}
-
-export const postTypePriority = {
-    [Posts.POST_TYPES.JOIN_TEAM]: 0,
-    [Posts.POST_TYPES.ADD_TO_TEAM]: 1,
-    [Posts.POST_TYPES.LEAVE_TEAM]: 2,
-    [Posts.POST_TYPES.REMOVE_FROM_TEAM]: 3,
-    [Posts.POST_TYPES.JOIN_CHANNEL]: 4,
-    [Posts.POST_TYPES.ADD_TO_CHANNEL]: 5,
-    [Posts.POST_TYPES.LEAVE_CHANNEL]: 6,
-    [Posts.POST_TYPES.REMOVE_FROM_CHANNEL]: 7,
-    [Posts.POST_TYPES.PURPOSE_CHANGE]: 8,
-    [Posts.POST_TYPES.HEADER_CHANGE]: 9,
-    [Posts.POST_TYPES.JOIN_LEAVE]: 10,
-    [Posts.POST_TYPES.DISPLAYNAME_CHANGE]: 11,
-    [Posts.POST_TYPES.CONVERT_CHANNEL]: 12,
-    [Posts.POST_TYPES.CHANNEL_DELETED]: 13,
-    [Posts.POST_TYPES.ADD_REMOVE]: 14,
-    [Posts.POST_TYPES.EPHEMERAL]: 15,
-};
-
-export function comparePostTypes(a: {postType: PostType}, b: {postType: PostType}): number {
-    return postTypePriority[a.postType] - postTypePriority[b.postType];
-}
-
-function extractUserActivityData(userActivities: UserActivity) {
-    const messageData = [];
-    const allUserIds = [];
-    const allUsernames = [];
-
-    Object.keys(userActivities).map((key) => [key, userActivities[key]]).forEach(([postType, values]) => {
-        if (
-            postType === Posts.POST_TYPES.ADD_TO_TEAM ||
-            postType === Posts.POST_TYPES.ADD_TO_CHANNEL ||
-            postType === Posts.POST_TYPES.REMOVE_FROM_CHANNEL
-        ) {
-            Object.keys(values).map((key) => [key, values[key]]).forEach(([actorId, users]) => {
-                if (Array.isArray(users)) {
-                    throw new Error('Invalid Post activity data');
-                }
-                const {ids, usernames} = users;
-                messageData.push({postType, userIds: [...usernames, ...ids], actorId});
-                if (ids.length > 0) {
-                    allUserIds.push(...ids);
-                }
-
-                if (usernames.length > 0) {
-                    allUsernames.push(...usernames);
-                }
-                allUserIds.push(actorId);
-            });
-        } else {
-            if (!Array.isArray(values)) {
-                throw new Error('Invalid Post activity data');
-            }
-            messageData.push({postType, userIds: values});
-            allUserIds.push(...values);
-        }
-    });
-
-    messageData.sort(comparePostTypes);
-
-    function reduceUsers(acc, curr) {
-        if (!acc.includes(curr)) {
-            acc.push(curr);
-        }
-        return acc;
-    }
-
-    return {
-        allUserIds: allUserIds.reduce(reduceUsers, []),
-        allUsernames: allUsernames.reduce(reduceUsers, []),
-        messageData,
-    };
-}
-
-export function combineUserActivitySystemPost(systemPosts: Array<Post> = []) {
-    if (systemPosts.length === 0) {
-        return null;
-    }
-
-    const userActivities = systemPosts.reduce((acc: UserActivity, post: Post): UserActivity => {
-        const postType = post.type;
-        let userActivityProps = acc;
-        const combinedPostType = userActivityProps[postType];
-
-        if (
-            postType === Posts.POST_TYPES.ADD_TO_TEAM ||
-            postType === Posts.POST_TYPES.ADD_TO_CHANNEL ||
-            postType === Posts.POST_TYPES.REMOVE_FROM_CHANNEL
-        ) {
-            const userId = post.props.addedUserId || post.props.removedUserId;
-            const username = post.props.addedUsername || post.props.removedUsername;
-            if (combinedPostType) {
-                if (Array.isArray(combinedPostType[post.user_id])) {
-                    throw new Error('Invalid Post activity data');
-                }
-                const users = combinedPostType[post.user_id] || {ids: [], usernames: []};
-                if (userId) {
-                    if (!users.ids.includes(userId)) {
-                        users.ids.push(userId);
-                    }
-                } else if (username && !users.usernames.includes(username)) {
-                    users.usernames.push(username);
-                }
-                combinedPostType[post.user_id] = users;
-            } else {
-                const users = {ids: [], usernames: []};
-                if (userId) {
-                    users.ids.push(userId);
-                } else if (username) {
-                    users.usernames.push(username);
-                }
-                userActivityProps[postType] = {
-                    [post.user_id]: users,
-                };
-            }
-        } else {
-            const propsUserId = post.user_id;
-
-            if (combinedPostType) {
-                if (!Array.isArray(combinedPostType)) {
-                    throw new Error('Invalid Post activity data');
-                }
-                if (!combinedPostType.includes(propsUserId)) {
-                    userActivityProps[postType] = [...combinedPostType, propsUserId];
-                }
-            } else {
-                userActivityProps = {...userActivityProps, [postType]: [propsUserId]};
-            }
-        }
-
-        return userActivityProps;
-    }, {});
-
-    return extractUserActivityData(userActivities);
-}
-
-export function combineSystemPosts(postsIds: Array<string> = [], posts: IDMappedObjects<Post> = {}, channelId: $ID<Channel>): {postsForChannel: Array<string>, nextPosts: IDMappedObjects<Post>} {
-    if (postsIds.length === 0) {
-        return {postsForChannel: postsIds, nextPosts: posts};
-    }
-
-    const postsForChannel = [];
-    const nextPosts = {...posts};
-
-    let userActivitySystemPosts = [];
-    let systemPostIds = [];
-    let messages = [];
-    let createAt;
-    let combinedPostId;
-
-    postsIds.forEach((p, i) => {
-        const channelPost = posts[p];
-        const combinedOrUserActivityPost = isUserActivityPost(channelPost.type) || channelPost.type === Posts.POST_TYPES.COMBINED_USER_ACTIVITY;
-        if (channelPost.delete_at === 0 && combinedOrUserActivityPost) {
-            if (!createAt || createAt > channelPost.create_at) {
-                createAt = channelPost.create_at;
-            }
-
-            if (isUserActivityPost(channelPost.type)) {
-                userActivitySystemPosts.push(channelPost);
-                systemPostIds.push(channelPost.id);
-                messages.push(channelPost.message);
-
-                if (nextPosts[channelPost.id]) {
-                    nextPosts[channelPost.id] = {...channelPost, state: Posts.POST_DELETED, delete_at: 1};
-                }
-            } else if (channelPost.type === Posts.POST_TYPES.COMBINED_USER_ACTIVITY) {
-                userActivitySystemPosts.push(...channelPost.user_activity_posts);
-                systemPostIds.push(...channelPost.system_post_ids);
-                messages.push(...channelPost.props.messages);
-
-                combinedPostId = channelPost.id;
-            }
-        }
-        if (
-            (!combinedOrUserActivityPost && userActivitySystemPosts.length > 0) ||
-            userActivitySystemPosts.length === MAX_COMBINED_SYSTEM_POSTS ||
-            (userActivitySystemPosts.length > 0 && i === postsIds.length - 1)
-        ) {
-            const combinedPost = {
-                id: combinedPostId || generateId(),
-                root_id: '',
-                channel_id: channelId,
-                create_at: createAt,
-                delete_at: 0,
-                message: messages.join('\n'),
-                props: {
-                    messages,
-                    user_activity: combineUserActivitySystemPost(userActivitySystemPosts),
-                },
-                state: '',
-                system_post_ids: systemPostIds,
-                type: Posts.POST_TYPES.COMBINED_USER_ACTIVITY,
-                user_activity_posts: userActivitySystemPosts,
-                user_id: '',
-            };
-
-            nextPosts[combinedPost.id] = combinedPost;
-            postsForChannel.push(combinedPost.id);
-
-            userActivitySystemPosts = [];
-            systemPostIds = [];
-            messages = [];
-            createAt = null;
-            combinedPostId = null;
-
-            if (!combinedOrUserActivityPost) {
-                postsForChannel.push(channelPost.id);
-            }
-        } else if (!combinedOrUserActivityPost) {
-            postsForChannel.push(channelPost.id);
-        }
-    });
-
-    postsForChannel.sort((a, b) => {
-        return comparePosts(nextPosts[a], nextPosts[b]);
-    });
-
-    return {postsForChannel, nextPosts};
 }
 
 export function isPostCommentMention({post, currentUser, threadRepliedToByCurrentUser, rootPost}: {post: Post, currentUser: UserProfile, threadRepliedToByCurrentUser: boolean, rootPost: Post}): boolean {

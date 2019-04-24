@@ -13,7 +13,7 @@ function results(state = [], action) {
         }
         return action.data.order;
     }
-    case PostTypes.REMOVE_POST: {
+    case PostTypes.POST_REMOVED: {
         const postId = action.data ? action.data.id : null;
         const index = state.indexOf(postId);
         if (index !== -1) {
@@ -39,7 +39,7 @@ function matches(state = {}, action) {
             return Object.assign({}, state, action.data.matches);
         }
         return action.data.matches || {};
-    case PostTypes.REMOVE_POST: {
+    case PostTypes.POST_REMOVED: {
         if (!state[action.data.id]) {
             return state;
         }
@@ -62,7 +62,7 @@ function flagged(state = [], action) {
     case SearchTypes.RECEIVED_SEARCH_FLAGGED_POSTS: {
         return action.data.order;
     }
-    case PostTypes.REMOVE_POST: {
+    case PostTypes.POST_REMOVED: {
         const postId = action.data ? action.data.id : null;
         const index = state.indexOf(postId);
         if (index !== -1) {
@@ -148,7 +148,7 @@ function pinned(state = {}, action) {
         };
     }
     case PostTypes.POST_DELETED:
-    case PostTypes.REMOVE_POST: {
+    case PostTypes.POST_REMOVED: {
         return removePinnedPost(state, action.data);
     }
     case PostTypes.RECEIVED_POST: {
