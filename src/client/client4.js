@@ -882,6 +882,15 @@ export default class Client4 {
         );
     };
 
+    regenerateTeamInviteId = async (teamId) => {
+        this.trackEvent('api', 'api_teams_regenerate_invite_id', {team_id: teamId});
+
+        return this.doFetch(
+            `${this.getTeamRoute(teamId)}/regenerate_invite_id`,
+            {method: 'post'}
+        );
+    };
+
     updateTeamScheme = async (teamId, schemeId) => {
         const patch = {scheme_id: schemeId};
 

@@ -208,6 +208,16 @@ export function patchTeam(team: Team): ActionFunc {
     });
 }
 
+export function regenerateTeamInviteId(teamId: string): ActionFunc {
+    return bindClientFunc({
+        clientFunc: Client4.regenerateTeamInviteId,
+        onSuccess: TeamTypes.REGENERATED_TEAM_INVITE_ID,
+        params: [
+            teamId,
+        ],
+    });
+}
+
 export function getMyTeamMembers(): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         const getMyTeamMembersFunc = bindClientFunc({
