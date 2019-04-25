@@ -37,6 +37,7 @@ export default keyMirror({
     SELECT_TEAM: null,
     UPDATED_TEAM: null,
     PATCHED_TEAM: null,
+    REGENERATED_TEAM_INVITE_ID: null,
     RECEIVED_TEAM: null,
     RECEIVED_TEAMS: null,
     RECEIVED_TEAM_DELETED: null,
