@@ -424,9 +424,13 @@ export function getProfilesNotInTeam(teamId: string, groupConstrained: boolean, 
             return {error};
         }
 
+        const receivedProfilesListActionType = groupConstrained ?
+            UserTypes.RECEIVED_PROFILES_LIST_NOT_IN_TEAM_AND_REPLACE :
+            UserTypes.RECEIVED_PROFILES_LIST_NOT_IN_TEAM;
+
         dispatch(batchActions([
             {
-                type: UserTypes.RECEIVED_PROFILES_LIST_NOT_IN_TEAM,
+                type: receivedProfilesListActionType,
                 data: profiles,
                 id: teamId,
             },
@@ -508,9 +512,13 @@ export function getProfilesNotInChannel(teamId: string, channelId: string, group
             return {error};
         }
 
+        const receivedProfilesListActionType = groupConstrained ?
+            UserTypes.RECEIVED_PROFILES_LIST_NOT_IN_CHANNEL_AND_REPLACE :
+            UserTypes.RECEIVED_PROFILES_LIST_NOT_IN_CHANNEL;
+
         dispatch(batchActions([
             {
-                type: UserTypes.RECEIVED_PROFILES_LIST_NOT_IN_CHANNEL,
+                type: receivedProfilesListActionType,
                 data: profiles,
                 id: channelId,
             },
