@@ -278,9 +278,8 @@ describe('Actions.Preferences', () => {
         assert.deepEqual(myPreferences[`theme--${team.id}`].value, JSON.stringify(newTheme));
     });
 
-    it('deleteOtherThemes', async () => {
+    it('deleteTeamSpecificThemes', async () => {
         const user = TestHelper.basicUser;
-        const team = TestHelper.basicTeam;
         const theme = {
             type: 'Mattermost Dark',
         };
@@ -288,7 +287,7 @@ describe('Actions.Preferences', () => {
             {
                 user_id: user.id,
                 category: 'theme',
-                name: team.id,
+                name: '',
                 value: JSON.stringify(theme),
             },
             {
@@ -322,7 +321,7 @@ describe('Actions.Preferences', () => {
         nock(Client4.getUsersRoute()).
             delete(`/${TestHelper.basicUser.id}/preferences`).
             reply(200, OK_RESPONSE);
-        await Actions.deleteOtherThemes(team.id)(store.dispatch, store.getState);
+        await Actions.deleteTeamSpecificThemes()(store.dispatch, store.getState);
 
         const state = store.getState();
         const request = state.requests.preferences.savePreferences;
@@ -333,7 +332,7 @@ describe('Actions.Preferences', () => {
         }
 
         assert.equal(Object.entries(myPreferences).length, 1);
-        assert.ok(myPreferences[`theme--${team.id}`], 'theme preference doesn\'t exist');
-        assert.equal(myPreferences[`theme--${team.id}`].value, JSON.stringify(theme));
+        assert.ok(myPreferences['theme--'], 'theme preference doesn\'t exist');
+        assert.equal(myPreferences['theme--'].value, JSON.stringify(theme));
     });
 });
