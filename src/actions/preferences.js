@@ -136,7 +136,7 @@ export function saveTheme(teamId: string, theme: {}): ActionFunc {
         const preference: PreferenceType = {
             user_id: currentUserId,
             category: Preferences.CATEGORY_THEME,
-            name: teamId,
+            name: teamId || '',
             value: JSON.stringify(theme),
         };
 
@@ -145,7 +145,7 @@ export function saveTheme(teamId: string, theme: {}): ActionFunc {
     };
 }
 
-export function deleteUnnecessaryThemes(teamId: string): ActionFunc {
+export function deleteOtherThemes(teamId: string): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         const state = getState();
 
@@ -154,12 +154,12 @@ export function deleteUnnecessaryThemes(teamId: string): ActionFunc {
         const themePreferences: Array<PreferenceType> = getCategory(state, Preferences.CATEGORY_THEME);
         const currentUserId = getCurrentUserId(state);
 
-        if (teamId !== '' && themePreferences.length > 1) {
+        if (teamId === '' || themePreferences.length <= 1) {
             // no extra handling to be done to delete team-specific themes
             return {data: true};
         }
 
-        const toDelete = themePreferences.filter((pref) => pref.name !== '' && pref !== teamId);
+        const toDelete = themePreferences.filter((pref) => pref.name !== '' && pref.name !== teamId);
 
         if (toDelete.length > 0) {
             await deletePreferences(currentUserId, toDelete)(dispatch, getState);
