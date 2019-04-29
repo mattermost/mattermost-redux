@@ -23,7 +23,7 @@
     "redux-persist": "4.9.1",
     "redux-thunk": "2.3.0",
     "reselect": "4.0.0",
-    "serialize-error": "4.0.0",
+    "serialize-error": "2.1.0",
     "shallow-equals": "1.0.0"
   },
   "devDependencies": {
