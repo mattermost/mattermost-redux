@@ -152,6 +152,9 @@ export type GroupsRequestsStatuses = {|
     getGroupSyncables: RequestStatusType,
     getGroupMembers: RequestStatusType,
     getGroup: RequestStatusType,
+    getAllGroupsAssociatedToTeam: RequestStatusType,
+    getGroupsAssociatedToTeam: RequestStatusType,
+    getGroupsNotAssociatedToTeam: RequestStatusType,
 |};
 
 export type JobsRequestsStatuses = {|

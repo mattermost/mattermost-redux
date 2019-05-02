@@ -600,6 +600,18 @@ const state: GlobalState = {
                 status: 'not_started',
                 error: null,
             },
+            getAllGroupsAssociatedToTeam: {
+                status: 'not_started',
+                error: null,
+            },
+            getGroupsAssociatedToTeam: {
+                status: 'not_started',
+                error: null,
+            },
+            getGroupsNotAssociatedToTeam: {
+                status: 'not_started',
+                error: null,
+            },
         },
     },
 };
