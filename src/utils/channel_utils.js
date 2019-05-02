@@ -14,7 +14,7 @@ import type {UserProfile, UsersState, UserNotifyProps} from 'types/users';
 import type {GlobalState} from 'types/store';
 import type {TeamMembership} from 'types/teams';
 import type {PreferenceType} from 'types/preferences';
-import {RelationOneToOne, IDMappedObjects} from 'types/utilities';
+import type {RelationOneToOne, IDMappedObjects} from 'types/utilities';
 
 const channelTypeOrder = {
     [General.OPEN_CHANNEL]: 0,

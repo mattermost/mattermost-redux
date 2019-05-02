@@ -647,7 +647,7 @@ export const getUnreadChannels: (GlobalState, ?Channel) => Array<Channel> = crea
     getAllChannels,
     getUnreadChannelIds,
     getTeammateNameDisplaySetting,
-    (currentUser, profiles, userIdsInChannels, channels, unreadIds, settings) => {
+    (currentUser, profiles, userIdsInChannels: Object, channels, unreadIds, settings) => {
         // If we receive an unread for a channel and then a mention the channel
         // won't be sorted correctly until we receive a message in another channel
         if (!currentUser) {
@@ -700,7 +700,7 @@ export const getFavoriteChannels: (GlobalState) => Array<Channel> = createIdsSel
     getConfig,
     getMyPreferences,
     getCurrentChannelId,
-    (currentUser: UserProfile, profiles: IDMappedObjects<UserProfile>, userIdsInChannels: IDMappedObjects<Set<string>>, channels: IDMappedObjects<Channel>, myMembers: RelationOneToOne<Channel, ChannelMembership>, favoriteIds: Array<string>, teamChannelIds: Array<string>, settings: string, config: Object, prefs: {[string]: PreferenceType}, currentChannelId: string): Array<Channel> => {
+    (currentUser: UserProfile, profiles: IDMappedObjects<UserProfile>, userIdsInChannels: Object, channels: IDMappedObjects<Channel>, myMembers: RelationOneToOne<Channel, ChannelMembership>, favoriteIds: Array<string>, teamChannelIds: Array<string>, settings: string, config: Object, prefs: {[string]: PreferenceType}, currentChannelId: string): Array<Channel> => {
         if (!currentUser) {
             return [];
         }
@@ -857,7 +857,7 @@ export const getDirectChannels: (GlobalState) => Array<Channel> = createSelector
     getMyPreferences,
     getLastPostPerChannel,
     getCurrentChannelId,
-    (currentUser: UserProfile, profiles: IDMappedObjects<UserProfile>, userIdsInChannels: IDMappedObjects<Set<string>>, channels: IDMappedObjects<Channel>, teammates: Array<string>, groupIds: Array<string>, settings: Object, config: Object, preferences: {[string]: PreferenceType}, lastPosts: RelationOneToOne<Channel, Post>, currentChannelId: string): Array<Channel> => {
+    (currentUser: UserProfile, profiles: IDMappedObjects<UserProfile>, userIdsInChannels: Object, channels: IDMappedObjects<Channel>, teammates: Array<string>, groupIds: Array<string>, settings: Object, config: Object, preferences: {[string]: PreferenceType}, lastPosts: RelationOneToOne<Channel, Post>, currentChannelId: string): Array<Channel> => {
         if (!currentUser) {
             return [];
         }
@@ -906,7 +906,7 @@ export const getDirectAndGroupChannels: (GlobalState) => Array<Channel> = create
     getUserIdsInChannels,
     getAllChannels,
     getTeammateNameDisplaySetting,
-    (currentUser: UserProfile, profiles: IDMappedObjects<UserProfile>, userIdsInChannels: IDMappedObjects<Set<string>>, channels: IDMappedObjects<Channel>, settings): Array<Channel> => {
+    (currentUser: UserProfile, profiles: IDMappedObjects<UserProfile>, userIdsInChannels: Object, channels: IDMappedObjects<Channel>, settings): Array<Channel> => {
         if (!currentUser) {
             return [];
         }
