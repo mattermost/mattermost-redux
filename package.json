@@ -46,7 +46,7 @@
     "eslint-plugin-jest": "22.5.1",
     "expect": "24.7.1",
     "fetch-mock": "7.3.3",
-    "flow-bin": "0.98.0",
+    "flow-bin": "0.95.1",
     "flow-typed": "2.5.1",
     "jest": "24.7.1",
     "jest-cli": "24.7.1",
