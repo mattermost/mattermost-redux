@@ -3,7 +3,17 @@
 
 module.exports = {
     presets: [
-        '@babel/env',
+        ['@babel/env', {
+            targets: {
+                chrome: 66,
+                firefox: 60,
+                edge: 42,
+                ie: 11,
+                safari: 12,
+            },
+            useBuiltIns: 'usage',
+            shippedProposals: true,
+        }],
     ],
     plugins: [
         '@babel/transform-flow-comments',
