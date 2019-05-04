@@ -406,7 +406,7 @@ export function getAuthorizedOAuthApps() {
     };
 }
 
-export function deautorizeOAuthApp(clientId: string) {
+export function deauthorizeOAuthApp(clientId: string) {
     return bindClientFunc({
         clientFunc: Client4.deauthorizeOAuthApp,
         onRequest: IntegrationTypes.DEAUTHORIZE_OAUTH_APP_REQUEST,
