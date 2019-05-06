@@ -6,7 +6,7 @@ import assert from 'assert';
 import deepFreezeAndThrowOnMutation from 'utils/deep_freeze';
 import * as Selectors from 'selectors/entities/groups';
 
-describe('Selectors.Schemes', () => {
+describe('Selectors.Groups', () => {
     const teamID = 'c6ubwm63apgftbjs71enbjjpsh';
     const expectedAssociatedGroupID1 = 'xh585kyz3tn55q6ipfo57btwnc';
     const expectedAssociatedGroupID2 = 'emdwu98u6jg9xfn9p5zu48bojo';
