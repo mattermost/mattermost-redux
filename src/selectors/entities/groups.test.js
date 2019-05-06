@@ -73,7 +73,7 @@ describe('Selectors.Groups', () => {
             },
             teams: {
                 groupsAssociatedToTeam: {
-                    c6ubwm63apgftbjs71enbjjpsh: associatedGroupIDs,
+                    [teamID]: associatedGroupIDs,
                 },
             },
         },
