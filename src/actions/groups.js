@@ -45,7 +45,7 @@ export function linkGroupSyncable(groupID: string, syncableID: string, syncableT
             console.warn(`unhandled syncable type ${syncableType}`); // eslint-disable-line no-console
         }
 
-        dispatches.push(...[{type: GroupTypes.LINK_GROUP_SYNCABLE_SUCCESS, data: null}, {type, data}]);
+        dispatches.push({type: GroupTypes.LINK_GROUP_SYNCABLE_SUCCESS, data: null}, {type, data});
 
         dispatch(batchActions(dispatches));
 
