@@ -56,7 +56,7 @@ describe('Selectors.Groups', () => {
                         has_syncables: false,
                         member_count: 8,
                     },
-                    emdwu98u6jg9xfn9p5zu48bojo: {
+                    [expectedAssociatedGroupID2]: {
                         id: expectedAssociatedGroupID2,
                         name: '7ybu9oy77jgedqp4pph8f4j5ge',
                         display_name: 'xyz',
