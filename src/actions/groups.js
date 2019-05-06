@@ -86,7 +86,7 @@ export function unlinkGroupSyncable(groupID: string, syncableID: string, syncabl
             console.warn(`unhandled syncable type ${syncableType}`); // eslint-disable-line no-console
         }
 
-        dispatches.push(...[{type: GroupTypes.UNLINK_GROUP_SYNCABLE_SUCCESS, data: null}, {type, data}]);
+        dispatches.push({type: GroupTypes.UNLINK_GROUP_SYNCABLE_SUCCESS, data: null}, {type, data});
 
         dispatch(batchActions(dispatches));
 
