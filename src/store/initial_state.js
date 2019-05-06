@@ -44,6 +44,7 @@ const state: GlobalState = {
             myMembers: {},
             membersInChannel: {},
             stats: {},
+            groupsAssociatedToChannel: {},
         },
         posts: {
             expandedURLs: {},
@@ -604,11 +605,23 @@ const state: GlobalState = {
                 status: 'not_started',
                 error: null,
             },
+            getAllGroupsAssociatedToChannel: {
+                status: 'not_started',
+                error: null,
+            },
             getGroupsAssociatedToTeam: {
                 status: 'not_started',
                 error: null,
             },
+            getGroupsAssociatedToChannel: {
+                status: 'not_started',
+                error: null,
+            },
             getGroupsNotAssociatedToTeam: {
+                status: 'not_started',
+                error: null,
+            },
+            getGroupsNotAssociatedToChannel: {
                 status: 'not_started',
                 error: null,
             },

@@ -51,6 +51,11 @@ function getTeamGroupIDSet(state, teamID) {
     return new Set(arr);
 }
 
+function getChannelGroupIDSet(state, channelID) {
+    var arr = state.entities.channels.groupsAssociatedToChannel[channelID] || [];
+    return new Set(arr);
+}
+
 export const getGroupsNotAssociatedToTeam = createSelector(
     getAllGroups,
     (state, teamID) => getTeamGroupIDSet(state, teamID),
@@ -64,5 +69,21 @@ export const getGroupsAssociatedToTeam = createSelector(
     (state, teamID) => getTeamGroupIDSet(state, teamID),
     (allGroups, teamGroupIDSet) => {
         return Object.entries(allGroups).filter(([groupID]) => teamGroupIDSet.has(groupID)).map((entry) => entry[1]);
+    }
+);
+
+export const getGroupsNotAssociatedToChannel = createSelector(
+    getAllGroups,
+    (state, channelID) => getChannelGroupIDSet(state, channelID),
+    (allGroups, channelGroupIDSet) => {
+        return Object.entries(allGroups).filter(([groupID]) => !channelGroupIDSet.has(groupID)).map((entry) => entry[1]);
+    }
+);
+
+export const getGroupsAssociatedToChannel = createSelector(
+    getAllGroups,
+    (state, channelID) => getChannelGroupIDSet(state, channelID),
+    (allGroups, channelGroupIDSet) => {
+        return Object.entries(allGroups).filter(([groupID]) => channelGroupIDSet.has(groupID)).map((entry) => entry[1]);
     }
 );
