@@ -15,6 +15,7 @@ import {
     getDateForDateLine,
     getFirstPostId,
     getLastPostId,
+    getLastPostIndex,
     getPostIdsForCombinedUserActivityPost,
     isCombinedUserActivityPost,
     isDateLine,
@@ -898,6 +899,24 @@ describe('getLastPostId', () => {
 
     test('should skip the new message line', () => {
         expect(getLastPostId(['post2', 'post3', 'post4', START_OF_NEW_MESSAGES])).toBe('post4');
+    });
+});
+
+describe('getLastPostIndex', () => {
+    test.only('should return index of last post for list of all regular posts', () => {
+        expect(getLastPostIndex(['post1', 'post2', 'post3'])).toBe(2);
+    });
+
+    test.only('should return index of last combined post', () => {
+        expect(getLastPostIndex(['user-activity-post2_post3', 'post4', 'user-activity-post5_post6'])).toBe(2);
+    });
+
+    test.only('should skip date separators and return index of last post', () => {
+        expect(getLastPostIndex(['date-1234', 'user-activity-post1_post2', 'post3', 'post4', 'date-1000'])).toBe(3);
+    });
+
+    test.only('should skip the new message line and return index of last post', () => {
+        expect(getLastPostIndex(['post2', 'post3', 'post4', START_OF_NEW_MESSAGES])).toBe(2);
     });
 });
 

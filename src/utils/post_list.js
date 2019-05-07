@@ -230,6 +230,19 @@ export function getLastPostId(items) {
     return '';
 }
 
+export function getLastPostIndex(postIds) {
+    let index = 0;
+    for (let i = postIds.length - 1; i > 0; i--) {
+        const item = postIds[i];
+        if (!isStartOfNewMessages(item) && !isDateLine(item)) {
+            index = i;
+            break;
+        }
+    }
+
+    return index;
+}
+
 export function makeGenerateCombinedPost() {
     const getPostsForIds = makeGetPostsForIds();
     const getPostIds = memoizeResult(getPostIdsForCombinedUserActivityPost);
