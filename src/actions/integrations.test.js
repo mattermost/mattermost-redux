@@ -806,6 +806,29 @@ describe('Actions.Integrations', () => {
         assert.ok(oauthApps);
     });
 
+    it('getAuthorizedOAuthApps', async () => {
+        nock(Client4.getOAuthAppsRoute()).
+            post('').
+            reply(201, TestHelper.fakeOAuthAppWithId());
+
+        const {data: created} = await Actions.addOAuthApp(TestHelper.fakeOAuthApp())(store.dispatch, store.getState);
+
+        const user = TestHelper.basicUser;
+        nock(`${Client4.getUserRoute(user.id)}/oauth/apps/authorized`).
+            get('').
+            reply(200, [created]);
+
+        await Actions.getAuthorizedOAuthApps()(store.dispatch, store.getState);
+
+        const request = store.getState().requests.integrations.getOAuthApps;
+        if (request.status === RequestStatus.FAILURE) {
+            throw new Error(JSON.stringify(request.error));
+        }
+
+        const {oauthApps} = store.getState().entities.integrations;
+        assert.ok(oauthApps);
+    });
+
     it('deleteOAuthApp', async () => {
         nock(Client4.getOAuthAppsRoute()).
             post('').
