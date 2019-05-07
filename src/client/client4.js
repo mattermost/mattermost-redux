@@ -1432,6 +1432,13 @@ export default class Client4 {
         );
     };
 
+    searchGroupChannels = async (term) => {
+        return this.doFetch(
+            `${this.getChannelsRoute()}/search_group`,
+            {method: 'post', body: JSON.stringify({term})}
+        );
+    };
+
     updateChannelMemberSchemeRoles = async (channelId, userId, isSchemeUser, isSchemeAdmin) => {
         const body = {scheme_user: isSchemeUser, scheme_admin: isSchemeAdmin};
         return this.doFetch(
