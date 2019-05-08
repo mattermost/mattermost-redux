@@ -237,11 +237,12 @@ export function loadMe(): ActionFunc {
             dispatch(getAllCustomEmojis());
         }
 
-        const results: $Subtype<ActionResult>[] = await Promise.all(promises);
+        await Promise.all(promises);
 
         const {currentUserId} = getState().entities.users;
+        const user = getState().entities.users.profiles[currentUserId];
         Client4.setUserId(currentUserId);
-        Client4.setUserRoles(results[0].data.roles);
+        Client4.setUserRoles(user.roles);
 
         return {data: true};
     };
