@@ -525,4 +525,41 @@ describe('Selectors.Teams', () => {
         };
         assert.deepEqual(Selectors.getCurrentTeamUrl(withCredentialURLState), credentialURL + '/' + team1.name);
     });
+
+    it('getCurrentTeamUrl with falsy currentTeam', () => {
+        const siteURL = 'http://localhost:8065';
+        const general = {
+            config: {SiteURL: siteURL},
+            credentials: {},
+        };
+        const falsyCurrentTeamIds = ['', null, undefined];
+        falsyCurrentTeamIds.forEach((falsyCurrentTeamId) => {
+            const withSiteURLState = {
+                ...testState,
+                entities: {
+                    ...testState.entities,
+                    teams: {
+                        ...testState.entities.teams,
+                        currentTeamId: falsyCurrentTeamId,
+                    },
+                    general,
+                },
+            };
+            withSiteURLState.entities.general = general;
+            assert.deepEqual(Selectors.getCurrentTeamUrl(withSiteURLState), siteURL);
+
+            const credentialURL = 'http://localhost';
+            const withCredentialURLState = {
+                ...withSiteURLState,
+                entities: {
+                    ...withSiteURLState.entities,
+                    general: {
+                        ...withSiteURLState.entities.general,
+                        credentials: {url: credentialURL},
+                    },
+                },
+            };
+            assert.deepEqual(Selectors.getCurrentTeamUrl(withCredentialURLState), credentialURL);
+        });
+    });
 });
