@@ -1,6 +1,8 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
 
+import {isSystemAdmin} from '../utils/user_utils';
+
 const FormData = require('form-data');
 
 import fetch from './fetch_etag';
@@ -2743,7 +2745,7 @@ export default class Client4 {
         const properties = Object.assign({
             category,
             type: event,
-            user_actual_role: this.userRoles,
+            user_actual_role: isSystemAdmin(this.userRoles) ? 'system_admin' : null,
             user_actual_id: this.userId,
         }, props);
         const options = {
