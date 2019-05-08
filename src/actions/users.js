@@ -139,6 +139,7 @@ function completeLogin(data: UserProfile): ActionFunc {
         });
 
         Client4.setUserId(data.id);
+        Client4.setUserRoles(data.roles);
 
         let teamMembers = null;
         try {
@@ -236,10 +237,11 @@ export function loadMe(): ActionFunc {
             dispatch(getAllCustomEmojis());
         }
 
-        await Promise.all(promises);
+        const results: $Subtype<ActionResult>[] = await Promise.all(promises);
 
         const {currentUserId} = getState().entities.users;
         Client4.setUserId(currentUserId);
+        Client4.setUserRoles(results[0].data.roles);
 
         return {data: true};
     };

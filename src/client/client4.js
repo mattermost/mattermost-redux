@@ -83,6 +83,10 @@ export default class Client4 {
         this.userId = userId;
     }
 
+    setUserRoles(roles) {
+        this.userRoles = roles;
+    }
+
     setDiagnosticId(diagnosticId) {
         this.diagnosticId = diagnosticId;
     }
@@ -2736,7 +2740,12 @@ export default class Client4 {
             return;
         }
 
-        const properties = Object.assign({category, type: event, user_actual_id: this.userId}, props);
+        const properties = Object.assign({
+            category,
+            type: event,
+            user_actual_role: this.userRoles,
+            user_actual_id: this.userId,
+        }, props);
         const options = {
             context: {
                 ip: '0.0.0.0',
