@@ -10,8 +10,6 @@ export default keyMirror({
     CREATE_POST_FAILURE: null,
     CREATE_POST_RESET_REQUEST: null,
 
-    REMOVE_PENDING_POST: null,
-
     EDIT_POST_REQUEST: null,
     EDIT_POST_SUCCESS: null,
     EDIT_POST_FAILURE: null,
@@ -31,12 +29,20 @@ export default keyMirror({
 
     RECEIVED_POST: null,
     RECEIVED_NEW_POST: null,
+
     RECEIVED_POSTS: null,
+    RECEIVED_POSTS_AFTER: null,
+    RECEIVED_POSTS_BEFORE: null,
+    RECEIVED_POSTS_IN_CHANNEL: null,
+    RECEIVED_POSTS_IN_THREAD: null,
+    RECEIVED_POSTS_SINCE: null,
+
+    POST_DELETED: null,
+    POST_REMOVED: null,
+
     RECEIVED_FOCUSED_POST: null,
     RECEIVED_POST_SELECTED: null,
     RECEIVED_EDIT_POST: null,
-    POST_DELETED: null,
-    REMOVE_POST: null,
     RECEIVED_REACTION: null,
     RECEIVED_REACTIONS: null,
     REACTION_DELETED: null,

@@ -91,25 +91,15 @@ export function completeDirectChannelInfo(usersState: UsersState, teammateNameDi
     return channel;
 }
 
-export function completeDirectChannelDisplayName(currentUserId: string, profiles: IDMappedObjects<UserProfile>, teammateNameDisplay: string, channel: Channel): Channel {
+export function completeDirectChannelDisplayName(currentUserId: string, profiles: IDMappedObjects<UserProfile>, userIdsInChannel: Set<string>, teammateNameDisplay: string, channel: Channel): Channel {
     if (isDirectChannel(channel)) {
         const dmChannelClone = {...channel};
         const teammateId = getUserIdFromChannelName(currentUserId, channel.name);
 
         return Object.assign(dmChannelClone, {display_name: displayUsername(profiles[teammateId], teammateNameDisplay)});
-    } else if (isGroupChannel(channel)) {
-        const usernames = channel.display_name.split(', ');
-        const users = Object.keys(profiles).map((key) => profiles[key]);
-        const userIds = [];
-        usernames.forEach((username) => {
-            const u = users.find((p) => p.username === username);
-            if (u) {
-                userIds.push(u.id);
-            }
-        });
-        if (usernames.length === userIds.length) {
-            return {...channel, display_name: getGroupDisplayNameFromUserIds(userIds, profiles, currentUserId, teammateNameDisplay)};
-        }
+    } else if (isGroupChannel(channel) && userIdsInChannel && userIdsInChannel.size > 0) {
+        const displayName = getGroupDisplayNameFromUserIds(Array.from(userIdsInChannel), profiles, currentUserId, teammateNameDisplay);
+        return {...channel, display_name: displayName};
     }
 
     return channel;

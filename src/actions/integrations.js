@@ -8,6 +8,7 @@ import {batchActions} from 'redux-batched-actions';
 
 import {Client4} from 'client';
 
+import {getCurrentUserId} from 'selectors/entities/users';
 import {getCurrentChannelId} from 'selectors/entities/channels';
 import {getCurrentTeamId} from 'selectors/entities/teams';
 
@@ -375,6 +376,43 @@ export function getOAuthApp(appId: string) {
         params: [
             appId,
         ],
+    });
+}
+
+export function getAuthorizedOAuthApps() {
+    return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
+        dispatch({type: IntegrationTypes.GET_AUTHORIZED_OAUTH_APPS_REQUEST, data: {}});
+
+        const state = getState();
+        const currentUserId = getCurrentUserId(state);
+
+        let data;
+        try {
+            data = await Client4.getAuthorizedOAuthApps(currentUserId);
+        } catch (error) {
+            forceLogoutIfNecessary(error, dispatch, getState);
+
+            dispatch(batchActions([
+                {type: IntegrationTypes.GET_AUTHORIZED_OAUTH_APPS_FAILURE, error},
+                logError(error),
+            ]), getState);
+
+            return {error};
+        }
+
+        dispatch({type: IntegrationTypes.GET_AUTHORIZED_OAUTH_APPS_SUCCESS, data: {}});
+
+        return {data};
+    };
+}
+
+export function deauthorizeOAuthApp(clientId: string) {
+    return bindClientFunc({
+        clientFunc: Client4.deauthorizeOAuthApp,
+        onRequest: IntegrationTypes.DEAUTHORIZE_OAUTH_APP_REQUEST,
+        onSuccess: IntegrationTypes.DEAUTHORIZE_OAUTH_APP_SUCCESS,
+        onFailure: IntegrationTypes.DEAUTHORIZE_OAUTH_APP_FAILURE,
+        params: [clientId],
     });
 }
 

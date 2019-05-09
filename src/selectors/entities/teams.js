@@ -84,7 +84,12 @@ export const getCurrentTeamUrl = createSelector(
     getCurrentTeam,
     (state) => getConfig(state).SiteURL,
     (currentURL, currentTeam, siteURL) => {
-        return `${currentURL || siteURL}/${currentTeam.name}`;
+        const rootURL = `${currentURL || siteURL}`;
+        if (!currentTeam) {
+            return rootURL;
+        }
+
+        return `${rootURL}/${currentTeam.name}`;
     }
 );
 

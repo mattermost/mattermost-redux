@@ -68,7 +68,7 @@ export function lookupMimeType(filename: string): string {
         buildExtToMime();
     }
 
-    const ext = filename.split('.').pop();
+    const ext = filename.split('.').pop().toLowerCase();
 
     return extToMime[ext] || 'application/octet-stream';
 }

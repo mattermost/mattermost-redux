@@ -233,4 +233,106 @@ describe('Actions.Preferences', () => {
         assert.ok(preference, 'preference for showing direct channel doesn\'t exist');
         assert.equal(preference.value, 'true', 'preference for showing direct channel is not true');
     });
+
+    it('saveTheme', async () => {
+        const user = TestHelper.basicUser;
+        const team = TestHelper.basicTeam;
+        const existingPreferences = [
+            {
+                user_id: user.id,
+                category: 'theme',
+                name: team.id,
+                value: JSON.stringify({
+                    type: 'Mattermost',
+                }),
+            },
+        ];
+
+        nock(Client4.getUsersRoute()).
+            put(`/${TestHelper.basicUser.id}/preferences`).
+            reply(200, OK_RESPONSE);
+        await Client4.savePreferences(user.id, existingPreferences);
+
+        nock(Client4.getUsersRoute()).
+            get('/me/preferences').
+            reply(200, existingPreferences);
+        await Actions.getMyPreferences()(store.dispatch, store.getState);
+
+        const newTheme = {
+            type: 'Mattermost Dark',
+        };
+        nock(Client4.getUsersRoute()).
+            put(`/${TestHelper.basicUser.id}/preferences`).
+            reply(200, OK_RESPONSE);
+        await Actions.saveTheme(team.id, newTheme)(store.dispatch, store.getState);
+
+        const state = store.getState();
+        const request = state.requests.preferences.savePreferences;
+        const {myPreferences} = state.entities.preferences;
+
+        if (request.status === RequestStatus.FAILURE) {
+            throw new Error(JSON.stringify(request.error));
+        }
+
+        assert.ok(myPreferences[`theme--${team.id}`], 'theme preference doesn\'t exist');
+        assert.deepEqual(myPreferences[`theme--${team.id}`].value, JSON.stringify(newTheme));
+    });
+
+    it('deleteTeamSpecificThemes', async () => {
+        const user = TestHelper.basicUser;
+        const theme = {
+            type: 'Mattermost Dark',
+        };
+        const existingPreferences = [
+            {
+                user_id: user.id,
+                category: 'theme',
+                name: '',
+                value: JSON.stringify(theme),
+            },
+            {
+                user_id: user.id,
+                category: 'theme',
+                name: TestHelper.generateId(),
+                value: JSON.stringify({
+                    type: 'Mattermost',
+                }),
+            },
+            {
+                user_id: user.id,
+                category: 'theme',
+                name: TestHelper.generateId(),
+                value: JSON.stringify({
+                    type: 'Mattermost',
+                }),
+            },
+        ];
+
+        nock(Client4.getUsersRoute()).
+            put(`/${TestHelper.basicUser.id}/preferences`).
+            reply(200, OK_RESPONSE);
+        await Client4.savePreferences(user.id, existingPreferences);
+
+        nock(Client4.getUsersRoute()).
+            get('/me/preferences').
+            reply(200, existingPreferences);
+        await Actions.getMyPreferences()(store.dispatch, store.getState);
+
+        nock(Client4.getUsersRoute()).
+            delete(`/${TestHelper.basicUser.id}/preferences`).
+            reply(200, OK_RESPONSE);
+        await Actions.deleteTeamSpecificThemes()(store.dispatch, store.getState);
+
+        const state = store.getState();
+        const request = state.requests.preferences.savePreferences;
+        const {myPreferences} = state.entities.preferences;
+
+        if (request.status === RequestStatus.FAILURE) {
+            throw new Error(JSON.stringify(request.error));
+        }
+
+        assert.equal(Object.entries(myPreferences).length, 1);
+        assert.ok(myPreferences['theme--'], 'theme preference doesn\'t exist');
+        assert.equal(myPreferences['theme--'].value, JSON.stringify(theme));
+    });
 });

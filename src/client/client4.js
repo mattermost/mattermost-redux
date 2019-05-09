@@ -36,7 +36,6 @@ export default class Client4 {
         this.userId = '';
         this.diagnosticId = '';
         this.includeCookies = true;
-        this.online = true;
 
         this.translations = {
             connectionError: 'There appears to be a problem with your internet connection.',
@@ -50,10 +49,6 @@ export default class Client4 {
 
     setUrl(url) {
         this.url = url;
-    }
-
-    setOnline(online) {
-        this.online = online;
     }
 
     setUserAgent(userAgent) {
@@ -884,6 +879,15 @@ export default class Client4 {
         return this.doFetch(
             `${this.getTeamRoute(team.id)}/patch`,
             {method: 'put', body: JSON.stringify(team)}
+        );
+    };
+
+    regenerateTeamInviteId = async (teamId) => {
+        this.trackEvent('api', 'api_teams_regenerate_invite_id', {team_id: teamId});
+
+        return this.doFetch(
+            `${this.getTeamRoute(teamId)}/regenerate_invite_id`,
+            {method: 'post'}
         );
     };
 
@@ -2668,13 +2672,6 @@ export default class Client4 {
     };
 
     doFetchWithResponse = async (url, options) => {
-        if (!this.online) {
-            throw new ClientError(this.getUrl(), {
-                message: 'no internet connection',
-                url,
-            });
-        }
-
         const response = await fetch(url, this.getOptions(options));
         const headers = parseAndMergeNestedHeaders(response.headers);
 
