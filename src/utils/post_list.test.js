@@ -942,6 +942,7 @@ describe('makeGenerateCombinedPost', () => {
                             },
                             type: Posts.POST_TYPES.ADD_TO_CHANNEL,
                             user_id: 'user1',
+                            metadata: {},
                         },
                         post2: {
                             id: 'post2',
@@ -957,6 +958,7 @@ describe('makeGenerateCombinedPost', () => {
                             },
                             type: Posts.POST_TYPES.ADD_TO_CHANNEL,
                             user_id: 'user1',
+                            metadata: {},
                         },
                         post3: {
                             id: 'post3',
@@ -970,6 +972,7 @@ describe('makeGenerateCombinedPost', () => {
                             },
                             type: Posts.POST_TYPES.JOIN_CHANNEL,
                             user_id: 'user1',
+                            metadata: {},
                         },
                     },
                 },
@@ -1017,6 +1020,7 @@ describe('makeGenerateCombinedPost', () => {
                 state.entities.posts.posts.post3,
             ],
             user_id: '',
+            metadata: {},
         });
     });
 

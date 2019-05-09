@@ -275,6 +275,7 @@ export function makeGenerateCombinedPost() {
                 type: Posts.POST_TYPES.COMBINED_USER_ACTIVITY,
                 user_activity_posts: posts,
                 user_id: '',
+                metadata: {},
             };
         }
     );
