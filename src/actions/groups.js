@@ -30,9 +30,12 @@ export function linkGroupSyncable(groupID: string, syncableID: string, syncableT
             return {error};
         }
 
+        const dispatches = [];
+
         let type;
         switch (syncableType) {
         case Groups.SYNCABLE_TYPE_TEAM:
+            dispatches.push({type: GroupTypes.RECEIVED_GROUPS_ASSOCIATED_TO_TEAM, data: {teamID: syncableID, groups: [{id: groupID}]}});
             type = GroupTypes.LINKED_GROUP_TEAM;
             break;
         case Groups.SYNCABLE_TYPE_CHANNEL:
@@ -42,10 +45,9 @@ export function linkGroupSyncable(groupID: string, syncableID: string, syncableT
             console.warn(`unhandled syncable type ${syncableType}`); // eslint-disable-line no-console
         }
 
-        dispatch(batchActions([
-            {type: GroupTypes.LINK_GROUP_SYNCABLE_SUCCESS, data: null},
-            {type, data},
-        ]));
+        dispatches.push(...[{type: GroupTypes.LINK_GROUP_SYNCABLE_SUCCESS, data: null}, {type, data}]);
+
+        dispatch(batchActions(dispatches));
 
         return {data: true};
     };
@@ -66,12 +68,15 @@ export function unlinkGroupSyncable(groupID: string, syncableID: string, syncabl
             return {error};
         }
 
+        const dispatches = [];
+
         let type;
         const data = {group_id: groupID, syncable_id: syncableID};
         switch (syncableType) {
         case Groups.SYNCABLE_TYPE_TEAM:
             type = GroupTypes.UNLINKED_GROUP_TEAM;
             data.syncable_id = syncableID;
+            dispatches.push({type: GroupTypes.RECEIVED_GROUPS_NOT_ASSOCIATED_TO_TEAM, data: {teamID: syncableID, groups: [{id: groupID}]}});
             break;
         case Groups.SYNCABLE_TYPE_CHANNEL:
             type = GroupTypes.UNLINKED_GROUP_CHANNEL;
@@ -81,10 +86,9 @@ export function unlinkGroupSyncable(groupID: string, syncableID: string, syncabl
             console.warn(`unhandled syncable type ${syncableType}`); // eslint-disable-line no-console
         }
 
-        dispatch(batchActions([
-            {type: GroupTypes.UNLINK_GROUP_SYNCABLE_SUCCESS, data: null},
-            {type, data},
-        ]));
+        dispatches.push(...[{type: GroupTypes.UNLINK_GROUP_SYNCABLE_SUCCESS, data: null}, {type, data}]);
+
+        dispatch(batchActions(dispatches));
 
         return {data: true};
     };
@@ -160,6 +164,55 @@ export function getGroup(id: string): ActionFunc {
         onFailure: GroupTypes.GET_GROUP_FAILURE,
         params: [
             id,
+        ],
+    });
+}
+
+export function getGroupsNotAssociatedToTeam(teamID: string, q: string = '', page: number = 0, perPage: number = General.PAGE_SIZE_DEFAULT): ActionFunc {
+    return bindClientFunc({
+        clientFunc: Client4.getGroupsNotAssociatedToTeam,
+        onRequest: GroupTypes.GET_GROUPS_NOT_ASSOCIATED_TO_TEAM_REQUEST,
+        onSuccess: [GroupTypes.RECEIVED_GROUPS, GroupTypes.GET_GROUPS_NOT_ASSOCIATED_TO_TEAM_SUCCESS],
+        onFailure: GroupTypes.GET_GROUPS_NOT_ASSOCIATED_TO_TEAM_FAILURE,
+        params: [
+            teamID,
+            q,
+            page,
+            perPage,
+        ],
+    });
+}
+
+export function getAllGroupsAssociatedToTeam(teamID: string): ActionFunc {
+    return bindClientFunc({
+        clientFunc: async (param1) => {
+            const result = await Client4.getAllGroupsAssociatedToTeam(param1);
+            result.teamID = param1;
+            return result;
+        },
+        onRequest: GroupTypes.GET_ALL_GROUPS_ASSOCIATED_TO_TEAM_REQUEST,
+        onSuccess: [GroupTypes.RECEIVED_ALL_GROUPS_ASSOCIATED_TO_TEAM, GroupTypes.GET_ALL_GROUPS_ASSOCIATED_TO_TEAM_SUCCESS],
+        onFailure: GroupTypes.GET_ALL_GROUPS_ASSOCIATED_TO_TEAM_FAILURE,
+        params: [
+            teamID,
+        ],
+    });
+}
+
+export function getGroupsAssociatedToTeam(teamID: string, q: string = '', page: number = 0, perPage: number = General.PAGE_SIZE_DEFAULT): ActionFunc {
+    return bindClientFunc({
+        clientFunc: async (param1, param2, param3, param4) => {
+            const result = await Client4.getGroupsAssociatedToTeam(param1, param2, param3, param4);
+            return {groups: result.groups, totalGroupCount: result.total_group_count, teamID: param1};
+        },
+        onRequest: GroupTypes.GET_GROUPS_ASSOCIATED_TO_TEAM_REQUEST,
+        onSuccess: [GroupTypes.RECEIVED_GROUPS_ASSOCIATED_TO_TEAM, GroupTypes.GET_GROUPS_ASSOCIATED_TO_TEAM_SUCCESS],
+        onFailure: GroupTypes.GET_GROUPS_ASSOCIATED_TO_TEAM_FAILURE,
+        params: [
+            teamID,
+            q,
+            page,
+            perPage,
         ],
     });
 }

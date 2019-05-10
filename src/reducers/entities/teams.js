@@ -2,7 +2,7 @@
 // See LICENSE.txt for license information.
 
 import {combineReducers} from 'redux';
-import {ChannelTypes, TeamTypes, UserTypes, SchemeTypes} from 'action_types';
+import {ChannelTypes, TeamTypes, UserTypes, SchemeTypes, GroupTypes} from 'action_types';
 import {teamListToMap} from 'utils/team_utils';
 
 function currentTeamId(state = '', action) {
@@ -320,6 +320,43 @@ function stats(state = {}, action) {
     }
 }
 
+function groupsAssociatedToTeam(state = {}, action) {
+    switch (action.type) {
+    case GroupTypes.RECEIVED_GROUPS_ASSOCIATED_TO_TEAM: {
+        const {teamID, groups} = action.data;
+        const nextState = {...state};
+        const associatedGroupIDs = new Set(state[teamID] || []);
+        for (const group of groups) {
+            associatedGroupIDs.add(group.id);
+        }
+        nextState[teamID] = Array.from(associatedGroupIDs);
+        return nextState;
+    }
+    case GroupTypes.RECEIVED_ALL_GROUPS_ASSOCIATED_TO_TEAM: {
+        const {teamID, groups} = action.data;
+        const nextState = {...state};
+        const associatedGroupIDs = new Set([]);
+        for (const group of groups) {
+            associatedGroupIDs.add(group.id);
+        }
+        nextState[teamID] = Array.from(associatedGroupIDs);
+        return nextState;
+    }
+    case GroupTypes.RECEIVED_GROUPS_NOT_ASSOCIATED_TO_TEAM: {
+        const {teamID, groups} = action.data;
+        const nextState = {...state};
+        const associatedGroupIDs = new Set(state[teamID] || []);
+        for (const group of groups) {
+            associatedGroupIDs.delete(group.id);
+        }
+        nextState[teamID] = Array.from(associatedGroupIDs);
+        return nextState;
+    }
+    default:
+        return state;
+    }
+}
+
 function updateTeamMemberSchemeRoles(state, action) {
     const {teamId, userId, isSchemeUser, isSchemeAdmin} = action.data;
     const team = state[teamId];
@@ -358,4 +395,6 @@ export default combineReducers({
 
     // object where every key is the team id and has an object with the team stats
     stats,
+
+    groupsAssociatedToTeam,
 });

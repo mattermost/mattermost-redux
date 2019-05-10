@@ -1,6 +1,8 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
 
+import {createSelector} from 'reselect';
+
 const emptyList = [];
 const emptySyncables = {
     teams: [],
@@ -43,3 +45,24 @@ export function getGroupMembers(state, id) {
     }
     return groupMemberData.members;
 }
+
+function getTeamGroupIDSet(state, teamID) {
+    var arr = state.entities.teams.groupsAssociatedToTeam[teamID] || [];
+    return new Set(arr);
+}
+
+export const getGroupsNotAssociatedToTeam = createSelector(
+    getAllGroups,
+    (state, teamID) => getTeamGroupIDSet(state, teamID),
+    (allGroups, teamGroupIDSet) => {
+        return Object.entries(allGroups).filter(([groupID]) => !teamGroupIDSet.has(groupID)).map((entry) => entry[1]);
+    }
+);
+
+export const getGroupsAssociatedToTeam = createSelector(
+    getAllGroups,
+    (state, teamID) => getTeamGroupIDSet(state, teamID),
+    (allGroups, teamGroupIDSet) => {
+        return Object.entries(allGroups).filter(([groupID]) => teamGroupIDSet.has(groupID)).map((entry) => entry[1]);
+    }
+);
