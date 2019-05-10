@@ -2745,7 +2745,7 @@ export default class Client4 {
         const properties = Object.assign({
             category,
             type: event,
-            user_actual_role: this.userRoles && isSystemAdmin(this.userRoles) ? 'system_admin' : 'system_member',
+            user_actual_role: this.userRoles && isSystemAdmin(this.userRoles) ? 'system_admin, system_user' : 'system_user',
             user_actual_id: this.userId,
         }, props);
         const options = {
