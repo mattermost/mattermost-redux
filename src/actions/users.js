@@ -139,6 +139,7 @@ function completeLogin(data: UserProfile): ActionFunc {
         });
 
         Client4.setUserId(data.id);
+        Client4.setUserRoles(data.roles);
 
         let teamMembers = null;
         try {
@@ -239,7 +240,9 @@ export function loadMe(): ActionFunc {
         await Promise.all(promises);
 
         const {currentUserId} = getState().entities.users;
+        const user = getState().entities.users.profiles[currentUserId];
         Client4.setUserId(currentUserId);
+        Client4.setUserRoles(user.roles);
 
         return {data: true};
     };
