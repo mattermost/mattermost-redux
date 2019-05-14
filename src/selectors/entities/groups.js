@@ -46,15 +46,19 @@ export function getGroupMembers(state, id) {
     return groupMemberData.members;
 }
 
-function getTeamGroupIDSet(state, teamID) {
-    var arr = state.entities.teams.groupsAssociatedToTeam[teamID] || [];
-    return new Set(arr);
-}
+const teamGroupIDs = (state, teamID) => state.entities.teams.groupsAssociatedToTeam[teamID] || [];
 
-function getChannelGroupIDSet(state, channelID) {
-    var arr = state.entities.channels.groupsAssociatedToChannel[channelID] || [];
-    return new Set(arr);
-}
+const channelGroupIDs = (state, channelID) => state.entities.channels.groupsAssociatedToChannel[channelID] || [];
+
+const getTeamGroupIDSet = createSelector(
+    teamGroupIDs,
+    (teamIDs) => new Set(teamIDs),
+);
+
+const getChannelGroupIDSet = createSelector(
+    channelGroupIDs,
+    (channelIDs) => new Set(channelIDs),
+);
 
 export const getGroupsNotAssociatedToTeam = createSelector(
     getAllGroups,
