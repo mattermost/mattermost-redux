@@ -153,8 +153,11 @@ export type GroupsRequestsStatuses = {|
     getGroupMembers: RequestStatusType,
     getGroup: RequestStatusType,
     getAllGroupsAssociatedToTeam: RequestStatusType,
+    getAllGroupsAssociatedToChannel: RequestStatusType,
     getGroupsAssociatedToTeam: RequestStatusType,
+    getGroupsAssociatedToChannel: RequestStatusType,
     getGroupsNotAssociatedToTeam: RequestStatusType,
+    getGroupsNotAssociatedToChannel: RequestStatusType,
 |};
 
 export type JobsRequestsStatuses = {|

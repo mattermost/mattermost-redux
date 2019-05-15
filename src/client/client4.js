@@ -2602,10 +2602,26 @@ export default class Client4 {
         );
     };
 
+    getGroupsNotAssociatedToChannel = async (channelID, q = '', page = 0, perPage = PER_PAGE_DEFAULT) => {
+        this.trackEvent('api', 'api_groups_get_not_associated_to_channel', {channel_id: channelID});
+        return this.doFetch(
+            `${this.getBaseRoute()}/groups${buildQueryString({not_associated_to_channel: channelID, page, per_page: perPage, q, include_member_count: true})}`,
+            {method: 'get'}
+        );
+    };
+
     getGroupsAssociatedToTeam = async (teamID, q = '', page = 0, perPage = PER_PAGE_DEFAULT) => {
-        this.trackEvent('api', 'api_groups_get_not_associated_to_team', {team_id: teamID});
+        this.trackEvent('api', 'api_groups_get_associated_to_team', {team_id: teamID});
         return this.doFetch(
             `${this.getBaseRoute()}/teams/${teamID}/groups${buildQueryString({page, per_page: perPage, q, include_member_count: true})}`,
+            {method: 'get'}
+        );
+    };
+
+    getGroupsAssociatedToChannel = async (channelID, q = '', page = 0, perPage = PER_PAGE_DEFAULT) => {
+        this.trackEvent('api', 'api_groups_get_associated_to_channel', {channel_id: channelID});
+        return this.doFetch(
+            `${this.getBaseRoute()}/channels/${channelID}/groups${buildQueryString({page, per_page: perPage, q, include_member_count: true})}`,
             {method: 'get'}
         );
     };
@@ -2613,6 +2629,13 @@ export default class Client4 {
     getAllGroupsAssociatedToTeam = async (teamID) => {
         return this.doFetch(
             `${this.getBaseRoute()}/teams/${teamID}/groups?paginate=false`,
+            {method: 'get'}
+        );
+    };
+
+    getAllGroupsAssociatedToChannel = async (channelID) => {
+        return this.doFetch(
+            `${this.getBaseRoute()}/channels/${channelID}/groups?paginate=false`,
             {method: 'get'}
         );
     };

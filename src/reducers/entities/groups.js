@@ -91,6 +91,9 @@ function syncables(state = {}, action) {
         };
     }
     case GroupTypes.UNLINKED_GROUP_CHANNEL: {
+        if (!state[action.data.group_id]) {
+            return state;
+        }
         const nextChannels = state[action.data.group_id].channels.slice();
 
         const index = nextChannels.findIndex((groupChannel) => {

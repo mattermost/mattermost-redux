@@ -6,18 +6,23 @@ import assert from 'assert';
 import deepFreezeAndThrowOnMutation from 'utils/deep_freeze';
 import * as Selectors from 'selectors/entities/groups';
 
-describe('Selectors.Schemes', () => {
+describe('Selectors.Groups', () => {
     const teamID = 'c6ubwm63apgftbjs71enbjjpsh';
     const expectedAssociatedGroupID1 = 'xh585kyz3tn55q6ipfo57btwnc';
     const expectedAssociatedGroupID2 = 'emdwu98u6jg9xfn9p5zu48bojo';
-    const associatedGroupIDs = [expectedAssociatedGroupID1, expectedAssociatedGroupID2];
+    const teamAssociatedGroupIDs = [expectedAssociatedGroupID1, expectedAssociatedGroupID2];
+
+    const channelID = 'c6ubwm63apgftbjs71enbjjpzz';
+    const expectedAssociatedGroupID3 = 'xos794c6tfb57eog481acokozc';
+    const expectedAssociatedGroupID4 = 'tnd8zod9f3fdtqosxjmhwucbth';
+    const channelAssociatedGroupIDs = [expectedAssociatedGroupID3, expectedAssociatedGroupID4];
     const testState = deepFreezeAndThrowOnMutation({
         entities: {
             groups: {
                 syncables: {},
                 members: {},
                 groups: {
-                    xh585kyz3tn55q6ipfo57btwnc: {
+                    [expectedAssociatedGroupID1]: {
                         id: expectedAssociatedGroupID1,
                         name: '9uobsi3xb3y5tfjb3ze7umnh1o',
                         display_name: 'abc',
@@ -30,8 +35,8 @@ describe('Selectors.Schemes', () => {
                         has_syncables: false,
                         member_count: 2,
                     },
-                    xos794c6tfb57eog481acokozc: {
-                        id: 'xos794c6tfb57eog481acokozc',
+                    [expectedAssociatedGroupID3]: {
+                        id: expectedAssociatedGroupID3,
                         name: '5mte953ncbfpunpr3zmtopiwbo',
                         display_name: 'developers',
                         description: '',
@@ -43,20 +48,20 @@ describe('Selectors.Schemes', () => {
                         has_syncables: false,
                         member_count: 5,
                     },
-                    tnd8zod9f3fdtqosxjmhwucbth: {
-                        id: 'tnd8zod9f3fdtqosxjmhwucbth',
+                    [expectedAssociatedGroupID4]: {
+                        id: [expectedAssociatedGroupID4],
                         name: 'nobctj4brfgtpj3a1peiyq47tc',
                         display_name: 'engineering',
                         description: '',
                         source: 'ldap',
-                        remote_id: 'engineering',
                         create_at: 1553808971099,
+                        remote_id: 'engineering',
                         update_at: 1553808971099,
                         delete_at: 0,
                         has_syncables: false,
                         member_count: 8,
                     },
-                    emdwu98u6jg9xfn9p5zu48bojo: {
+                    [expectedAssociatedGroupID2]: {
                         id: expectedAssociatedGroupID2,
                         name: '7ybu9oy77jgedqp4pph8f4j5ge',
                         display_name: 'xyz',
@@ -73,7 +78,12 @@ describe('Selectors.Schemes', () => {
             },
             teams: {
                 groupsAssociatedToTeam: {
-                    c6ubwm63apgftbjs71enbjjpsh: associatedGroupIDs,
+                    [teamID]: teamAssociatedGroupIDs,
+                },
+            },
+            channels: {
+                groupsAssociatedToChannel: {
+                    [channelID]: channelAssociatedGroupIDs,
                 },
             },
         },
@@ -88,7 +98,20 @@ describe('Selectors.Schemes', () => {
     });
 
     it('getGroupsNotAssociatedToTeam', () => {
-        const expected = Object.entries(testState.entities.groups.groups).filter(([groupID]) => !associatedGroupIDs.includes(groupID)).map(([, group]) => group);
+        const expected = Object.entries(testState.entities.groups.groups).filter(([groupID]) => !teamAssociatedGroupIDs.includes(groupID)).map(([, group]) => group);
         assert.deepEqual(Selectors.getGroupsNotAssociatedToTeam(testState, teamID), expected);
+    });
+
+    it('getGroupsAssociatedToChannel', () => {
+        const expected = [
+            testState.entities.groups.groups[expectedAssociatedGroupID3],
+            testState.entities.groups.groups[expectedAssociatedGroupID4],
+        ];
+        assert.deepEqual(Selectors.getGroupsAssociatedToChannel(testState, channelID), expected);
+    });
+
+    it('getGroupsNotAssociatedToChannel', () => {
+        const expected = Object.entries(testState.entities.groups.groups).filter(([groupID]) => !channelAssociatedGroupIDs.includes(groupID)).map(([, group]) => group);
+        assert.deepEqual(Selectors.getGroupsNotAssociatedToChannel(testState, channelID), expected);
     });
 });

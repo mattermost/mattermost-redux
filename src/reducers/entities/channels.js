@@ -2,7 +2,7 @@
 // See LICENSE.txt for license information.
 
 import {combineReducers} from 'redux';
-import {ChannelTypes, UserTypes, SchemeTypes} from 'action_types';
+import {ChannelTypes, UserTypes, SchemeTypes, GroupTypes} from 'action_types';
 import {General} from 'constants';
 
 function channelListToSet(state, action) {
@@ -408,6 +408,43 @@ function stats(state = {}, action) {
     }
 }
 
+function groupsAssociatedToChannel(state = {}, action) {
+    switch (action.type) {
+    case GroupTypes.RECEIVED_GROUPS_ASSOCIATED_TO_CHANNEL: {
+        const {channelID, groups} = action.data;
+        const nextState = {...state};
+        const associatedGroupIDs = new Set(state[channelID] || []);
+        for (const group of groups) {
+            associatedGroupIDs.add(group.id);
+        }
+        nextState[channelID] = Array.from(associatedGroupIDs);
+        return nextState;
+    }
+    case GroupTypes.RECEIVED_ALL_GROUPS_ASSOCIATED_TO_CHANNEL: {
+        const {channelID, groups} = action.data;
+        const nextState = {...state};
+        const associatedGroupIDs = new Set([]);
+        for (const group of groups) {
+            associatedGroupIDs.add(group.id);
+        }
+        nextState[channelID] = Array.from(associatedGroupIDs);
+        return nextState;
+    }
+    case GroupTypes.RECEIVED_GROUPS_NOT_ASSOCIATED_TO_CHANNEL: {
+        const {channelID, groups} = action.data;
+        const nextState = {...state};
+        const associatedGroupIDs = new Set(state[channelID] || []);
+        for (const group of groups) {
+            associatedGroupIDs.delete(group.id);
+        }
+        nextState[channelID] = Array.from(associatedGroupIDs);
+        return nextState;
+    }
+    default:
+        return state;
+    }
+}
+
 function updateChannelMemberSchemeRoles(state, action) {
     const {channelId, userId, isSchemeUser, isSchemeAdmin} = action.data;
     const channel = state[channelId];
@@ -449,4 +486,6 @@ export default combineReducers({
 
     // object where every key is the channel id and has an object with the channel stats
     stats,
+
+    groupsAssociatedToChannel,
 });

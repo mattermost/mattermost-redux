@@ -485,4 +485,186 @@ describe('Actions.Groups', () => {
             assert.ok(expectedIDs.includes(id));
         });
     });
+
+    it('getAllGroupsAssociatedToChannel', async () => {
+        const channelID = '5rgoajywb3nfbdtyafbod47ryb';
+
+        const response = {
+            groups: [
+                {
+                    id: 'xh585kyz3tn55q6ipfo57btwnc',
+                    name: '9uobsi3xb3y5tfjb3ze7umnh1o',
+                    display_name: 'abc',
+                    description: '',
+                    source: 'ldap',
+                    remote_id: 'abc',
+                    create_at: 1553808969975,
+                    update_at: 1553808969975,
+                    delete_at: 0,
+                    has_syncables: false,
+                    member_count: 2,
+                },
+                {
+                    id: 'tnd8zod9f3fdtqosxjmhwucbth',
+                    name: 'nobctj4brfgtpj3a1peiyq47tc',
+                    display_name: 'engineering',
+                    description: '',
+                    source: 'ldap',
+                    remote_id: 'engineering',
+                    create_at: 1553808971099,
+                    update_at: 1553808971099,
+                    delete_at: 0,
+                    has_syncables: false,
+                    member_count: 8,
+                },
+                {
+                    id: 'qhdp6g7aubbpiyja7c4sgpe7tc',
+                    name: 'x5bjwa4kwirpmqudhp5dterine',
+                    display_name: 'qa',
+                    description: '',
+                    source: 'ldap',
+                    remote_id: 'qa',
+                    create_at: 1553808971548,
+                    update_at: 1553808971548,
+                    delete_at: 0,
+                    has_syncables: false,
+                    member_count: 2,
+                },
+            ],
+            total_group_count: 3,
+        };
+
+        nock(Client4.getBaseRoute()).
+            get(`/channels/${channelID}/groups?paginate=false`).
+            reply(200, response);
+
+        await Actions.getAllGroupsAssociatedToChannel(channelID)(store.dispatch, store.getState);
+
+        const state = store.getState();
+        const request = state.requests.groups.getAllGroupsAssociatedToChannel;
+        if (request.status === RequestStatus.FAILURE) {
+            throw new Error('getGroup request failed err=' + request.error);
+        }
+
+        const groupIDs = state.entities.channels.groupsAssociatedToChannel[channelID];
+        assert.strictEqual(groupIDs.length, response.groups.length);
+        groupIDs.forEach((id) => {
+            assert.ok(response.groups.map((group) => group.id).includes(id));
+        });
+    });
+
+    it('getGroupsAssociatedToChannel', async () => {
+        const channelID = '5rgoajywb3nfbdtyafbod47ryb';
+
+        store = await configureStore({
+            entities: {
+                channels: {
+                    groupsAssociatedToChannel: {
+                        [channelID]: ['existing1', 'existing2'],
+                    },
+                },
+            },
+        });
+
+        const response = {
+            groups: [
+                {
+                    id: 'tnd8zod9f3fdtqosxjmhwucbth',
+                    name: 'nobctj4brfgtpj3a1peiyq47tc',
+                    display_name: 'engineering',
+                    description: '',
+                    source: 'ldap',
+                    remote_id: 'engineering',
+                    create_at: 1553808971099,
+                    update_at: 1553808971099,
+                    delete_at: 0,
+                    has_syncables: false,
+                    member_count: 8,
+                },
+                {
+                    id: 'qhdp6g7aubbpiyja7c4sgpe7tc',
+                    name: 'x5bjwa4kwirpmqudhp5dterine',
+                    display_name: 'qa',
+                    description: '',
+                    source: 'ldap',
+                    remote_id: 'qa',
+                    create_at: 1553808971548,
+                    update_at: 1553808971548,
+                    delete_at: 0,
+                    has_syncables: false,
+                    member_count: 2,
+                },
+            ],
+            total_group_count: 3,
+        };
+
+        nock(Client4.getBaseRoute()).
+            get(`/channels/${channelID}/groups?page=100&per_page=60&q=0&include_member_count=true`).
+            reply(200, response);
+
+        await Actions.getGroupsAssociatedToChannel(channelID, 0, 100)(store.dispatch, store.getState);
+
+        const state = store.getState();
+        const request = state.requests.groups.getGroupsAssociatedToChannel;
+        if (request.status === RequestStatus.FAILURE) {
+            throw new Error('getGroup request failed err=' + request.error);
+        }
+
+        const groupIDs = state.entities.channels.groupsAssociatedToChannel[channelID];
+        var expectedIDs = ['existing1', 'existing2'].concat(response.groups.map((group) => group.id));
+        assert.strictEqual(groupIDs.length, expectedIDs.length);
+        groupIDs.forEach((id) => {
+            assert.ok(expectedIDs.includes(id));
+        });
+    });
+
+    it('getGroupsNotAssociatedToChannel', async () => {
+        const channelID = '5rgoajywb3nfbdtyafbod47ryb';
+
+        store = await configureStore({
+            entities: {
+                channels: {
+                    groupsAssociatedToChannel: {
+                        [channelID]: ['existing1', 'existing2'],
+                    },
+                },
+            },
+        });
+
+        const response = [
+            {
+                id: 'existing1',
+                name: 'nobctj4brfgtpj3a1peiyq47tc',
+                display_name: 'engineering',
+                description: '',
+                source: 'ldap',
+                remote_id: 'engineering',
+                create_at: 1553808971099,
+                update_at: 1553808971099,
+                delete_at: 0,
+                has_syncables: false,
+                member_count: 8,
+            },
+        ];
+
+        nock(Client4.getBaseRoute()).
+            get(`/groups?not_associated_to_channel=${channelID}&page=100&per_page=60&q=0&include_member_count=true`).
+            reply(200, response);
+
+        await Actions.getGroupsNotAssociatedToChannel(channelID, 0, 100)(store.dispatch, store.getState);
+
+        const state = store.getState();
+        const request = state.requests.groups.getGroupsNotAssociatedToChannel;
+        if (request.status === RequestStatus.FAILURE) {
+            throw new Error('getGroup request failed err=' + request.error);
+        }
+
+        const groupIDs = state.entities.channels.groupsAssociatedToChannel[channelID];
+        var expectedIDs = ['existing2'].concat(response.map((group) => group.id));
+        assert.strictEqual(groupIDs.length, expectedIDs.length);
+        groupIDs.forEach((id) => {
+            assert.ok(expectedIDs.includes(id));
+        });
+    });
 });
+
