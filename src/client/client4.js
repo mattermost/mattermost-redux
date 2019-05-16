@@ -573,11 +573,9 @@ export default class Client4 {
     getProfilesNotInTeam = async (teamId, groupConstrained, page = 0, perPage = PER_PAGE_DEFAULT) => {
         this.trackEvent('api', 'api_profiles_get_not_in_team', {team_id: teamId, group_constrained: groupConstrained});
 
-        let queryStringObj;
+        const queryStringObj = {not_in_team: teamId, page, per_page: perPage};
         if (groupConstrained) {
-            queryStringObj = {not_in_team: teamId, page, per_page: perPage, group_constrained: true};
-        } else {
-            queryStringObj = {not_in_team: teamId, page, per_page: perPage};
+            queryStringObj.group_constrained = true;
         }
 
         return this.doFetch(
@@ -614,11 +612,9 @@ export default class Client4 {
     getProfilesNotInChannel = async (teamId, channelId, groupConstrained, page = 0, perPage = PER_PAGE_DEFAULT) => {
         this.trackEvent('api', 'api_profiles_get_not_in_channel', {team_id: teamId, channel_id: channelId, group_constrained: groupConstrained});
 
-        let queryStringObj;
+        const queryStringObj = {in_team: teamId, not_in_channel: channelId, page, per_page: perPage};
         if (groupConstrained) {
-            queryStringObj = {in_team: teamId, not_in_channel: channelId, group_constrained: true, page, per_page: perPage};
-        } else {
-            queryStringObj = {in_team: teamId, not_in_channel: channelId, page, per_page: perPage};
+            queryStringObj.group_constrained = true;
         }
 
         return this.doFetch(
