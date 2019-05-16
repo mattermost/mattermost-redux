@@ -18,9 +18,9 @@ function profilesToSet(state, action) {
     };
 }
 
-function profileListToSet(state, action) {
+function profileListToSet(state, action, replace = false) {
     const id = action.id;
-    const nextSet = new Set(state[id]);
+    const nextSet = replace ? new Set() : new Set(state[id]);
     if (action.data) {
         action.data.forEach((profile) => {
             nextSet.add(profile.id);
@@ -209,6 +209,9 @@ function profilesNotInTeam(state = {}, action) {
     case UserTypes.RECEIVED_PROFILES_LIST_NOT_IN_TEAM:
         return profileListToSet(state, action);
 
+    case UserTypes.RECEIVED_PROFILES_LIST_NOT_IN_TEAM_AND_REPLACE:
+        return profileListToSet(state, action, true);
+
     case UserTypes.RECEIVED_PROFILE_IN_TEAM:
         return removeProfileFromSet(state, action);
 
@@ -283,6 +286,9 @@ function profilesNotInChannel(state = {}, action) {
 
     case UserTypes.RECEIVED_PROFILES_LIST_NOT_IN_CHANNEL:
         return profileListToSet(state, action);
+
+    case UserTypes.RECEIVED_PROFILES_LIST_NOT_IN_CHANNEL_AND_REPLACE:
+        return profileListToSet(state, action, true);
 
     case UserTypes.RECEIVED_PROFILES_NOT_IN_CHANNEL:
         return profilesToSet(state, action);

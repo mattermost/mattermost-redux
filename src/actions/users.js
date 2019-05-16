@@ -413,20 +413,24 @@ export function getProfilesInTeam(teamId: string, page: number, perPage: number 
     };
 }
 
-export function getProfilesNotInTeam(teamId: string, page: number, perPage: number = General.PROFILE_CHUNK_SIZE): ActionFunc {
+export function getProfilesNotInTeam(teamId: string, groupConstrained: boolean, page: number, perPage: number = General.PROFILE_CHUNK_SIZE): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         let profiles: null;
         try {
-            profiles = await Client4.getProfilesNotInTeam(teamId, page, perPage);
+            profiles = await Client4.getProfilesNotInTeam(teamId, groupConstrained, page, perPage);
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch, getState);
             dispatch(logError(error));
             return {error};
         }
 
+        const receivedProfilesListActionType = groupConstrained ?
+            UserTypes.RECEIVED_PROFILES_LIST_NOT_IN_TEAM_AND_REPLACE :
+            UserTypes.RECEIVED_PROFILES_LIST_NOT_IN_TEAM;
+
         dispatch(batchActions([
             {
-                type: UserTypes.RECEIVED_PROFILES_LIST_NOT_IN_TEAM,
+                type: receivedProfilesListActionType,
                 data: profiles,
                 id: teamId,
             },
@@ -495,22 +499,26 @@ export function getProfilesInChannel(channelId: string, page: number, perPage: n
     };
 }
 
-export function getProfilesNotInChannel(teamId: string, channelId: string, page: number, perPage: number = General.PROFILE_CHUNK_SIZE): ActionFunc {
+export function getProfilesNotInChannel(teamId: string, channelId: string, groupConstrained: boolean, page: number, perPage: number = General.PROFILE_CHUNK_SIZE): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         const {currentUserId} = getState().entities.users;
 
         let profiles = null;
         try {
-            profiles = await Client4.getProfilesNotInChannel(teamId, channelId, page, perPage);
+            profiles = await Client4.getProfilesNotInChannel(teamId, channelId, groupConstrained, page, perPage);
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch, getState);
             dispatch(logError(error));
             return {error};
         }
 
+        const receivedProfilesListActionType = groupConstrained ?
+            UserTypes.RECEIVED_PROFILES_LIST_NOT_IN_CHANNEL_AND_REPLACE :
+            UserTypes.RECEIVED_PROFILES_LIST_NOT_IN_CHANNEL;
+
         dispatch(batchActions([
             {
-                type: UserTypes.RECEIVED_PROFILES_LIST_NOT_IN_CHANNEL,
+                type: receivedProfilesListActionType,
                 data: profiles,
                 id: channelId,
             },

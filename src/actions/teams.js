@@ -489,7 +489,7 @@ export function sendEmailInvitesToTeam(teamId: string, emails: Array<string>): A
     });
 }
 
-export function sendEmailGuestInvitesToChannelsTeam(teamId: string, channelIds: Array<string>, emails: Array<string>, message: string): ActionFunc {
+export function sendEmailGuestInvitesToChannels(teamId: string, channelIds: Array<string>, emails: Array<string>, message: string): ActionFunc {
     return bindClientFunc({
         clientFunc: Client4.sendEmailGuestInvitesToChannels,
         params: [

@@ -45,7 +45,7 @@ export function linkGroupSyncable(groupID: string, syncableID: string, syncableT
             console.warn(`unhandled syncable type ${syncableType}`); // eslint-disable-line no-console
         }
 
-        dispatches.push(...[{type: GroupTypes.LINK_GROUP_SYNCABLE_SUCCESS, data: null}, {type, data}]);
+        dispatches.push({type: GroupTypes.LINK_GROUP_SYNCABLE_SUCCESS, data: null}, {type, data});
 
         dispatch(batchActions(dispatches));
 
@@ -86,7 +86,7 @@ export function unlinkGroupSyncable(groupID: string, syncableID: string, syncabl
             console.warn(`unhandled syncable type ${syncableType}`); // eslint-disable-line no-console
         }
 
-        dispatches.push(...[{type: GroupTypes.UNLINK_GROUP_SYNCABLE_SUCCESS, data: null}, {type, data}]);
+        dispatches.push({type: GroupTypes.UNLINK_GROUP_SYNCABLE_SUCCESS, data: null}, {type, data});
 
         dispatch(batchActions(dispatches));
 
@@ -183,6 +183,21 @@ export function getGroupsNotAssociatedToTeam(teamID: string, q: string = '', pag
     });
 }
 
+export function getGroupsNotAssociatedToChannel(channelID: string, q: string = '', page: number = 0, perPage: number = General.PAGE_SIZE_DEFAULT): ActionFunc {
+    return bindClientFunc({
+        clientFunc: Client4.getGroupsNotAssociatedToChannel,
+        onRequest: GroupTypes.GET_GROUPS_NOT_ASSOCIATED_TO_CHANNEL_REQUEST,
+        onSuccess: [GroupTypes.RECEIVED_GROUPS, GroupTypes.GET_GROUPS_NOT_ASSOCIATED_TO_CHANNEL_SUCCESS],
+        onFailure: GroupTypes.GET_GROUPS_NOT_ASSOCIATED_TO_CHANNEL_FAILURE,
+        params: [
+            channelID,
+            q,
+            page,
+            perPage,
+        ],
+    });
+}
+
 export function getAllGroupsAssociatedToTeam(teamID: string): ActionFunc {
     return bindClientFunc({
         clientFunc: async (param1) => {
@@ -199,6 +214,22 @@ export function getAllGroupsAssociatedToTeam(teamID: string): ActionFunc {
     });
 }
 
+export function getAllGroupsAssociatedToChannel(channelID: string): ActionFunc {
+    return bindClientFunc({
+        clientFunc: async (param1) => {
+            const result = await Client4.getAllGroupsAssociatedToChannel(param1);
+            result.channelID = param1;
+            return result;
+        },
+        onRequest: GroupTypes.GET_ALL_GROUPS_ASSOCIATED_TO_CHANNEL_REQUEST,
+        onSuccess: [GroupTypes.RECEIVED_ALL_GROUPS_ASSOCIATED_TO_CHANNEL, GroupTypes.GET_ALL_GROUPS_ASSOCIATED_TO_CHANNEL_SUCCESS],
+        onFailure: GroupTypes.GET_ALL_GROUPS_ASSOCIATED_TO_CHANNEL_FAILURE,
+        params: [
+            channelID,
+        ],
+    });
+}
+
 export function getGroupsAssociatedToTeam(teamID: string, q: string = '', page: number = 0, perPage: number = General.PAGE_SIZE_DEFAULT): ActionFunc {
     return bindClientFunc({
         clientFunc: async (param1, param2, param3, param4) => {
@@ -210,6 +241,24 @@ export function getGroupsAssociatedToTeam(teamID: string, q: string = '', page: 
         onFailure: GroupTypes.GET_GROUPS_ASSOCIATED_TO_TEAM_FAILURE,
         params: [
             teamID,
+            q,
+            page,
+            perPage,
+        ],
+    });
+}
+
+export function getGroupsAssociatedToChannel(channelID: string, q: string = '', page: number = 0, perPage: number = General.PAGE_SIZE_DEFAULT): ActionFunc {
+    return bindClientFunc({
+        clientFunc: async (param1, param2, param3, param4) => {
+            const result = await Client4.getGroupsAssociatedToChannel(param1, param2, param3, param4);
+            return {groups: result.groups, totalGroupCount: result.total_group_count, channelID: param1};
+        },
+        onRequest: GroupTypes.GET_GROUPS_ASSOCIATED_TO_CHANNEL_REQUEST,
+        onSuccess: [GroupTypes.RECEIVED_GROUPS_ASSOCIATED_TO_CHANNEL, GroupTypes.GET_GROUPS_ASSOCIATED_TO_CHANNEL_SUCCESS],
+        onFailure: GroupTypes.GET_GROUPS_ASSOCIATED_TO_CHANNEL_FAILURE,
+        params: [
+            channelID,
             q,
             page,
             perPage,

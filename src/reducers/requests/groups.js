@@ -70,11 +70,31 @@ function getAllGroupsAssociatedToTeam(state: RequestStatusType = initialRequestS
     );
 }
 
+function getAllGroupsAssociatedToChannel(state: RequestStatusType = initialRequestState(), action: GenericAction): RequestStatusType {
+    return handleRequest(
+        GroupTypes.GET_ALL_GROUPS_ASSOCIATED_TO_CHANNEL_REQUEST,
+        GroupTypes.GET_ALL_GROUPS_ASSOCIATED_TO_CHANNEL_SUCCESS,
+        GroupTypes.GET_ALL_GROUPS_ASSOCIATED_TO_CHANNEL_FAILURE,
+        state,
+        action
+    );
+}
+
 function getGroupsAssociatedToTeam(state: RequestStatusType = initialRequestState(), action: GenericAction): RequestStatusType {
     return handleRequest(
         GroupTypes.GET_GROUPS_ASSOCIATED_TO_TEAM_REQUEST,
         GroupTypes.GET_GROUPS_ASSOCIATED_TO_TEAM_SUCCESS,
         GroupTypes.GET_GROUPS_ASSOCIATED_TO_TEAM_FAILURE,
+        state,
+        action
+    );
+}
+
+function getGroupsAssociatedToChannel(state: RequestStatusType = initialRequestState(), action: GenericAction): RequestStatusType {
+    return handleRequest(
+        GroupTypes.GET_GROUPS_ASSOCIATED_TO_CHANNEL_REQUEST,
+        GroupTypes.GET_GROUPS_ASSOCIATED_TO_CHANNEL_SUCCESS,
+        GroupTypes.GET_GROUPS_ASSOCIATED_TO_CHANNEL_FAILURE,
         state,
         action
     );
@@ -90,6 +110,16 @@ function getGroupsNotAssociatedToTeam(state: RequestStatusType = initialRequestS
     );
 }
 
+function getGroupsNotAssociatedToChannel(state: RequestStatusType = initialRequestState(), action: GenericAction): RequestStatusType {
+    return handleRequest(
+        GroupTypes.GET_GROUPS_NOT_ASSOCIATED_TO_CHANNEL_REQUEST,
+        GroupTypes.GET_GROUPS_NOT_ASSOCIATED_TO_CHANNEL_SUCCESS,
+        GroupTypes.GET_GROUPS_NOT_ASSOCIATED_TO_CHANNEL_FAILURE,
+        state,
+        action
+    );
+}
+
 export default (combineReducers({
     linkGroupSyncable,
     unlinkGroupSyncable,
@@ -97,7 +127,10 @@ export default (combineReducers({
     getGroupMembers,
     getGroup,
     getAllGroupsAssociatedToTeam,
+    getAllGroupsAssociatedToChannel,
     getGroupsAssociatedToTeam,
+    getGroupsAssociatedToChannel,
     getGroupsNotAssociatedToTeam,
+    getGroupsNotAssociatedToChannel,
 }): (GroupsRequestsStatuses, GenericAction) => GroupsRequestsStatuses);
 
