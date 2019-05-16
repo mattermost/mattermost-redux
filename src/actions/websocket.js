@@ -40,12 +40,13 @@ import {
 } from 'action_types';
 import {General, WebsocketEvents, Preferences} from 'constants';
 
-import {getAllChannels, getChannel, getCurrentChannelId, getChannelByName, getRedirectChannelNameForTeam, getCurrentChannelStats} from 'selectors/entities/channels';
+import {getAllChannels, getChannel, getChannelsNameMapInTeam, getCurrentChannelId, getRedirectChannelNameForTeam, getCurrentChannelStats} from 'selectors/entities/channels';
 import {getConfig} from 'selectors/entities/general';
 import {getAllPosts} from 'selectors/entities/posts';
 import {getDirectShowPreferences} from 'selectors/entities/preferences';
 import {getCurrentTeamId, getTeamMemberships, getTeams as getTeamsSelector} from 'selectors/entities/teams';
 import {getCurrentUser, getCurrentUserId, getUsers, getUserStatuses} from 'selectors/entities/users';
+import {getChannelByName} from 'utils/channel_utils';
 import {fromAutoResponder} from 'utils/post_utils';
 import EventEmitter from 'utils/event_emitter';
 
@@ -503,7 +504,8 @@ function handleChannelDeletedEvent(msg) {
 
         if (msg.broadcast.team_id === currentTeamId) {
             if (msg.data.channel_id === currentChannelId && !viewArchivedChannels) {
-                const channel = getChannelByName(state, getRedirectChannelNameForTeam(state, currentTeamId));
+                const channelsInTeam = getChannelsNameMapInTeam(state, currentTeamId);
+                const channel = getChannelByName(channelsInTeam, getRedirectChannelNameForTeam(state, currentTeamId));
                 if (channel && channel.id) {
                     dispatch({type: ChannelTypes.SELECT_CHANNEL, data: channel.id});
                 }
