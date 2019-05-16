@@ -570,11 +570,16 @@ export default class Client4 {
         );
     };
 
-    getProfilesNotInTeam = async (teamId, page = 0, perPage = PER_PAGE_DEFAULT) => {
-        this.trackEvent('api', 'api_profiles_get_not_in_team', {team_id: teamId});
+    getProfilesNotInTeam = async (teamId, groupConstrained, page = 0, perPage = PER_PAGE_DEFAULT) => {
+        this.trackEvent('api', 'api_profiles_get_not_in_team', {team_id: teamId, group_constrained: groupConstrained});
+
+        const queryStringObj = {not_in_team: teamId, page, per_page: perPage};
+        if (groupConstrained) {
+            queryStringObj.group_constrained = true;
+        }
 
         return this.doFetch(
-            `${this.getUsersRoute()}${buildQueryString({not_in_team: teamId, page, per_page: perPage})}`,
+            `${this.getUsersRoute()}${buildQueryString(queryStringObj)}`,
             {method: 'get'}
         );
     };
@@ -604,11 +609,16 @@ export default class Client4 {
         );
     };
 
-    getProfilesNotInChannel = async (teamId, channelId, page = 0, perPage = PER_PAGE_DEFAULT) => {
-        this.trackEvent('api', 'api_profiles_get_not_in_channel', {team_id: teamId, channel_id: channelId});
+    getProfilesNotInChannel = async (teamId, channelId, groupConstrained, page = 0, perPage = PER_PAGE_DEFAULT) => {
+        this.trackEvent('api', 'api_profiles_get_not_in_channel', {team_id: teamId, channel_id: channelId, group_constrained: groupConstrained});
+
+        const queryStringObj = {in_team: teamId, not_in_channel: channelId, page, per_page: perPage};
+        if (groupConstrained) {
+            queryStringObj.group_constrained = true;
+        }
 
         return this.doFetch(
-            `${this.getUsersRoute()}${buildQueryString({in_team: teamId, not_in_channel: channelId, page, per_page: perPage})}`,
+            `${this.getUsersRoute()}${buildQueryString(queryStringObj)}`,
             {method: 'get'}
         );
     };
