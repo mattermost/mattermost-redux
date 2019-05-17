@@ -34,28 +34,6 @@ export function removeUnneededMetadata(post) {
         changed = true;
     }
 
-    if (metadata.embeds) {
-        let embedsChanged = false;
-
-        const newEmbeds = metadata.embeds.map((embed) => {
-            if (embed.type !== 'opengraph') {
-                return embed;
-            }
-
-            const newEmbed = {...embed};
-            Reflect.deleteProperty(newEmbed, 'data');
-
-            embedsChanged = true;
-
-            return newEmbed;
-        });
-
-        if (embedsChanged) {
-            metadata.embeds = newEmbeds;
-            changed = true;
-        }
-    }
-
     if (!changed) {
         // Nothing changed
         return post;
@@ -1041,52 +1019,6 @@ function storeReactionsForPost(state, post) {
     };
 }
 
-export function openGraph(state = {}, action) {
-    switch (action.type) {
-    case PostTypes.RECEIVED_OPEN_GRAPH_METADATA: {
-        const nextState = {...state};
-        nextState[action.url] = action.data;
-
-        return nextState;
-    }
-
-    case PostTypes.RECEIVED_NEW_POST:
-    case PostTypes.RECEIVED_POST: {
-        const post = action.data;
-
-        return storeOpenGraphForPost(state, post);
-    }
-    case PostTypes.RECEIVED_POSTS: {
-        const posts = Object.values(action.data.posts);
-
-        return posts.reduce(storeOpenGraphForPost, state);
-    }
-
-    case UserTypes.LOGOUT_SUCCESS:
-        return {};
-    default:
-        return state;
-    }
-}
-
-function storeOpenGraphForPost(state, post) {
-    if (!post.metadata || !post.metadata.embeds) {
-        return state;
-    }
-
-    return post.metadata.embeds.reduce((nextState, embed) => {
-        if (embed.type !== 'opengraph' || !embed.data) {
-            // Not an OpenGraph embed
-            return nextState;
-        }
-
-        return {
-            ...nextState,
-            [embed.url]: embed.data,
-        };
-    }, state);
-}
-
 function messagesHistory(state = {}, action) {
     switch (action.type) {
     case PostTypes.ADD_MESSAGE_INTO_HISTORY: {
@@ -1207,9 +1139,6 @@ export default function(state = {}, action) {
         // Object mapping post ids to an object of emoji reactions using userId-emojiName as keys
         reactions: reactions(state.reactions, action),
 
-        // Object mapping URLs to their relevant opengraph metadata for link previews
-        openGraph: openGraph(state.openGraph, action),
-
         // History of posts and comments
         messagesHistory: messagesHistory(state.messagesHistory, action),
 
@@ -1222,7 +1151,6 @@ export default function(state = {}, action) {
         state.selectedPostId === nextState.selectedPostId &&
         state.currentFocusedPostId === nextState.currentFocusedPostId &&
         state.reactions === nextState.reactions &&
-        state.openGraph === nextState.openGraph &&
         state.messagesHistory === nextState.messagesHistory &&
         state.expandedURLs === nextState.expandedURLs) {
         // None of the children have changed so don't even let the parent object change

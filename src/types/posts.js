@@ -92,7 +92,6 @@ export type PostsState = {|
     postsInChannel: {[$ID<Channel>]: Array<PostOrderBlock>},
     postsInThread: RelationOneToMany<Post, Post>,
     reactions: RelationOneToOne<Post, {[string]: Reaction}>,
-    openGraph: RelationOneToOne<Post, Object>,
     pendingPostIds: Array<string>,
     selectedPostId: string,
     currentFocusedPostId: string,

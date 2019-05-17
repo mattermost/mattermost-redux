@@ -50,14 +50,6 @@ export function makeGetReactionsForPost(): (GlobalState, $ID<Post>) => ?{[string
     );
 }
 
-export function getOpenGraphMetadata(state: GlobalState): RelationOneToOne<Post, Object> {
-    return state.entities.posts.openGraph;
-}
-
-export function getOpenGraphMetadataForUrl(state: GlobalState, url: string): Object {
-    return state.entities.posts.openGraph[url];
-}
-
 // getPostIdsInCurrentChannel returns the IDs of posts loaded at the bottom of the channel. It does not include older
 // posts such as those loaded by viewing a thread or a permalink.
 export function getPostIdsInCurrentChannel(state: GlobalState): ?Array<$ID<Post>> {

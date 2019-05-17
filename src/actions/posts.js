@@ -954,29 +954,6 @@ export function unflagPost(postId) {
     };
 }
 
-export function getOpenGraphMetadata(url) {
-    return async (dispatch, getState) => {
-        let data;
-        try {
-            data = await Client4.getOpenGraphMetadata(url);
-        } catch (error) {
-            forceLogoutIfNecessary(error, dispatch, getState);
-            dispatch(logError(error));
-            return {error};
-        }
-
-        if (data && (data.url || data.type || data.title || data.description)) {
-            dispatch({
-                type: PostTypes.RECEIVED_OPEN_GRAPH_METADATA,
-                data,
-                url,
-            });
-        }
-
-        return {data};
-    };
-}
-
 export function doPostAction(postId, actionId, selectedOption = '') {
     return doPostActionWithCookie(postId, actionId, '', selectedOption);
 }
