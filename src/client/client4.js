@@ -1144,6 +1144,15 @@ export default class Client4 {
         );
     };
 
+    sendEmailGuestInvitesToChannels = async (teamId, channelIds, emails, message) => {
+        this.trackEvent('api', 'api_teams_invite_guests', {team_id: teamId, channel_ids: channelIds});
+
+        return this.doFetch(
+            `${this.getTeamRoute(teamId)}/invite-guests/email`,
+            {method: 'post', body: JSON.stringify({emails, channels: channelIds, message})}
+        );
+    };
+
     importTeam = async (teamId, file, importFrom) => {
         const formData = new FormData();
         formData.append('file', file, file.name);
