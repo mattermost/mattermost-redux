@@ -68,4 +68,7 @@ export default {
     DELETE_EMOJIS: 'delete_emojis',
     DELETE_OTHERS_EMOJIS: 'delete_others_emojis',
     VIEW_MEMBERS: 'view_members',
+    INVITE_GUEST: 'invite_guest',
+    PROMOTE_GUEST: 'promote_guest',
+    DEMOTE_TO_GUEST: 'demote_to_guest',
 };
