@@ -8,8 +8,8 @@ import {Client4} from 'client';
 import {General, Preferences} from 'constants';
 import {ChannelTypes, PreferenceTypes, UserTypes} from 'action_types';
 import {savePreferences, deletePreferences} from 'actions/preferences';
-import {getChannelsIdForTeam} from 'utils/channel_utils';
-import {getMyChannelMember as getMyChannelMemberSelector, getChannelByName, getRedirectChannelNameForTeam} from 'selectors/entities/channels';
+import {getChannelsIdForTeam, getChannelByName} from 'utils/channel_utils';
+import {getChannelsNameMapInTeam, getMyChannelMember as getMyChannelMemberSelector, getRedirectChannelNameForTeam} from 'selectors/entities/channels';
 import {getCurrentTeamId} from 'selectors/entities/teams';
 
 import {logError} from './errors';
@@ -669,7 +669,9 @@ export function deleteChannel(channelId: string): ActionFunc {
         state = getState();
         const {currentChannelId} = state.entities.channels;
         if (channelId === currentChannelId && !viewArchivedChannels) {
-            const channel = getChannelByName(state, getRedirectChannelNameForTeam(state, getCurrentTeamId(state)));
+            const teamId = getCurrentTeamId(state);
+            const channelsInTeam = getChannelsNameMapInTeam(state, teamId);
+            const channel = getChannelByName(channelsInTeam, getRedirectChannelNameForTeam(state, teamId));
             if (channel && channel.id) {
                 dispatch({type: ChannelTypes.SELECT_CHANNEL, data: channel.id}, getState);
             }
