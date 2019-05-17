@@ -609,6 +609,15 @@ export default class Client4 {
         );
     };
 
+    getProfilesInGroupChannels = async (channelsIds) => {
+        this.trackEvent('api', 'api_profiles_get_in_group_channels', {channelsIds});
+
+        return this.doFetch(
+            `${this.getUsersRoute()}/group_channels`,
+            {method: 'post', body: JSON.stringify(channelsIds)}
+        );
+    };
+
     getProfilesNotInChannel = async (teamId, channelId, groupConstrained, page = 0, perPage = PER_PAGE_DEFAULT) => {
         this.trackEvent('api', 'api_profiles_get_not_in_channel', {team_id: teamId, channel_id: channelId, group_constrained: groupConstrained});
 
@@ -1434,7 +1443,7 @@ export default class Client4 {
 
     searchGroupChannels = async (term) => {
         return this.doFetch(
-            `${this.getChannelsRoute()}/search_group`,
+            `${this.getChannelsRoute()}/group/search`,
             {method: 'post', body: JSON.stringify({term})}
         );
     };

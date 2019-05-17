@@ -81,6 +81,7 @@ export default {
 
     MAX_USERS_IN_GM: 8,
     MIN_USERS_IN_GM: 3,
+    MAX_GROUP_CHANNELS_FOR_PROFILES: 50,
 
     DEFAULT_LOCALE: 'en',
 
