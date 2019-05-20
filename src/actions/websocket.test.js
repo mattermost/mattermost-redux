@@ -4,15 +4,24 @@
 import assert from 'assert';
 import nock from 'nock';
 import {Server, WebSocket as MockWebSocket} from 'mock-socket';
+import thunk from 'redux-thunk';
+import configureMockStore from 'redux-mock-store';
 
 import * as Actions from 'actions/websocket';
 import * as ChannelActions from 'actions/channels';
 import * as PostActions from 'actions/posts';
 import * as TeamActions from 'actions/teams';
+import * as UserActions from 'actions/users';
 
 import {Client4} from 'client';
 import {General, Posts, RequestStatus, WebsocketEvents} from 'constants';
-import {PostTypes, TeamTypes, UserTypes, ChannelTypes} from 'action_types';
+import {
+    PostTypes,
+    TeamTypes,
+    UserTypes,
+    ChannelTypes,
+    GeneralTypes,
+} from 'action_types';
 import TestHelper from 'test/test_helper';
 import configureStore from 'test/test_store';
 
@@ -428,5 +437,64 @@ describe('Actions.Websocket', () => {
         }
 
         test();
+    });
+
+    it('handle doReconnect', async () => {
+        const initialState = {
+            entities: {
+                teams: {
+                    currentTeamId: 'team-id',
+                    myMembers: {
+                        'team-id': ['user-id'],
+                    },
+                },
+                channels: {
+                    currentChannelId: 'channel-id',
+                },
+                users: {
+                    currentUserId: 'user-id',
+                },
+                preferences: {
+                    myPreferences: {},
+                },
+            },
+        };
+        const mockStore = configureMockStore([thunk]);
+        const testStore = await mockStore(initialState);
+
+        const MOCK_GET_STATUSES_BY_IDS = 'MOCK_GET_STATUSES_BY_IDS';
+        const MOCK_GET_POSTS = 'MOCK_GET_POSTS';
+        const MOCK_MY_TEAM_UNREADS = 'MOCK_MY_TEAM_UNREADS';
+        const MOCK_GET_MY_TEAMS = 'MOCK_GET_MY_TEAMS';
+        const MOCK_GET_MY_TEAM_MEMBERS = 'MOCK_GET_MY_TEAM_MEMBERS';
+
+        UserActions.getStatusesByIds = jest.fn().mockReturnValueOnce({
+            type: MOCK_GET_STATUSES_BY_IDS,
+        });
+        PostActions.getPosts = jest.fn().mockReturnValueOnce({
+            type: MOCK_GET_POSTS,
+        });
+        TeamActions.getMyTeamUnreads = jest.fn().mockReturnValueOnce({
+            type: MOCK_MY_TEAM_UNREADS,
+        });
+        TeamActions.getMyTeams = jest.fn().mockReturnValueOnce({
+            type: MOCK_GET_MY_TEAMS,
+        });
+        TeamActions.getMyTeamMembers = jest.fn().mockReturnValueOnce({
+            type: MOCK_GET_MY_TEAM_MEMBERS,
+        });
+
+        const expectedActions = [
+            {type: MOCK_GET_STATUSES_BY_IDS},
+            {type: MOCK_GET_POSTS},
+            {type: MOCK_MY_TEAM_UNREADS},
+            {type: MOCK_GET_MY_TEAMS},
+            {type: MOCK_GET_MY_TEAM_MEMBERS},
+            {type: GeneralTypes.WEBSOCKET_SUCCESS},
+        ];
+
+        await testStore.dispatch(Actions.doReconnect());
+
+        expect(testStore.getActions()).toEqual(expect.arrayContaining(expectedActions));
     });
 });

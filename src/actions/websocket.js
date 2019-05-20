@@ -116,7 +116,7 @@ export function close(shouldReconnect = false) {
     };
 }
 
-function doReconnect() {
+export function doReconnect() {
     return (dispatch, getState) => {
         const state = getState();
         const currentTeamId = getCurrentTeamId(state);
