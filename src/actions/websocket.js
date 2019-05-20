@@ -24,7 +24,12 @@ import {
     postDeleted,
     receivedPost,
 } from './posts';
-import {getTeam, getMyTeamUnreads} from './teams';
+import {
+    getTeam,
+    getMyTeamUnreads,
+    getMyTeams,
+    getMyTeamMembers,
+} from './teams';
 
 import {
     ChannelTypes,
@@ -144,6 +149,8 @@ function doReconnect() {
 
             dispatch(getPosts(currentChannelId));
             dispatch(getMyTeamUnreads());
+            dispatch(getMyTeams());
+            dispatch(getMyTeamMembers());
 
             const myTeamMembers = getTeamMemberships(getState());
             if (!myTeamMembers[currentTeamId]) {
