@@ -438,63 +438,107 @@ describe('Actions.Websocket', () => {
 
         test();
     });
+});
 
-    it('handle doReconnect', async () => {
-        const initialState = {
-            entities: {
+describe('Actions.Websocket doReconnect', () => {
+    const mockStore = configureMockStore([thunk]);
+
+    const currentTeamId = 'team-id';
+    const currentUserId = 'user-id';
+    const currentChannelId = 'channel-id';
+
+    nock(Client4.getBaseRoute()).
+        get(`/users/me/teams/${currentTeamId}/channels/members`).
+        reply(200, []);
+
+    const initialState = {
+        entities: {
+            teams: {
+                currentTeamId,
+                myMembers: {
+                    [currentTeamId]: [currentUserId],
+                },
                 teams: {
-                    currentTeamId: 'team-id',
-                    myMembers: {
-                        'team-id': ['user-id'],
+                    [currentTeamId]: {
+                        id: currentTeamId,
                     },
                 },
-                channels: {
-                    currentChannelId: 'channel-id',
-                },
-                users: {
-                    currentUserId: 'user-id',
-                },
-                preferences: {
-                    myPreferences: {},
-                },
             },
-        };
-        const mockStore = configureMockStore([thunk]);
-        const testStore = await mockStore(initialState);
+            channels: {
+                currentChannelId,
+            },
+            users: {
+                currentUserId,
+            },
+            preferences: {
+                myPreferences: {},
+            },
+        },
+    };
 
-        const MOCK_GET_STATUSES_BY_IDS = 'MOCK_GET_STATUSES_BY_IDS';
-        const MOCK_GET_POSTS = 'MOCK_GET_POSTS';
-        const MOCK_MY_TEAM_UNREADS = 'MOCK_MY_TEAM_UNREADS';
-        const MOCK_GET_MY_TEAMS = 'MOCK_GET_MY_TEAMS';
-        const MOCK_GET_MY_TEAM_MEMBERS = 'MOCK_GET_MY_TEAM_MEMBERS';
+    const MOCK_GET_STATUSES_BY_IDS = 'MOCK_GET_STATUSES_BY_IDS';
+    const MOCK_GET_POSTS = 'MOCK_GET_POSTS';
+    const MOCK_MY_TEAM_UNREADS = 'MOCK_MY_TEAM_UNREADS';
+    const MOCK_GET_MY_TEAMS = 'MOCK_GET_MY_TEAMS';
+    const MOCK_GET_MY_TEAM_MEMBERS = 'MOCK_GET_MY_TEAM_MEMBERS';
 
-        UserActions.getStatusesByIds = jest.fn().mockReturnValueOnce({
+    beforeAll(() => {
+        UserActions.getStatusesByIds = jest.fn().mockReturnValue({
             type: MOCK_GET_STATUSES_BY_IDS,
         });
-        PostActions.getPosts = jest.fn().mockReturnValueOnce({
-            type: MOCK_GET_POSTS,
-        });
-        TeamActions.getMyTeamUnreads = jest.fn().mockReturnValueOnce({
+        TeamActions.getMyTeamUnreads = jest.fn().mockReturnValue({
             type: MOCK_MY_TEAM_UNREADS,
         });
-        TeamActions.getMyTeams = jest.fn().mockReturnValueOnce({
+        TeamActions.getMyTeams = jest.fn().mockReturnValue({
             type: MOCK_GET_MY_TEAMS,
         });
-        TeamActions.getMyTeamMembers = jest.fn().mockReturnValueOnce({
+        TeamActions.getMyTeamMembers = jest.fn().mockReturnValue({
             type: MOCK_GET_MY_TEAM_MEMBERS,
         });
+        PostActions.getPosts = jest.fn().mockReturnValue({
+            type: MOCK_GET_POSTS,
+        });
+    });
+
+    it('handle doReconnect', async () => {
+        const testStore = await mockStore(initialState);
 
         const expectedActions = [
             {type: MOCK_GET_STATUSES_BY_IDS},
-            {type: MOCK_GET_POSTS},
             {type: MOCK_MY_TEAM_UNREADS},
             {type: MOCK_GET_MY_TEAMS},
             {type: MOCK_GET_MY_TEAM_MEMBERS},
+            {type: MOCK_GET_POSTS},
             {type: GeneralTypes.WEBSOCKET_SUCCESS},
         ];
 
         await testStore.dispatch(Actions.doReconnect());
 
         expect(testStore.getActions()).toEqual(expect.arrayContaining(expectedActions));
+    });
+
+    it('handle doReconnect after user left current team', async () => {
+        const state = {...initialState};
+        state.entities.teams.myMembers = {};
+        const testStore = await mockStore(state);
+
+        const expectedActions = [
+            {type: MOCK_GET_STATUSES_BY_IDS},
+            {type: MOCK_MY_TEAM_UNREADS},
+            {type: MOCK_GET_MY_TEAMS},
+            {type: MOCK_GET_MY_TEAM_MEMBERS},
+            {type: TeamTypes.LEAVE_TEAM, data: initialState.entities.teams.teams[currentTeamId]},
+            {type: GeneralTypes.WEBSOCKET_SUCCESS},
+        ];
+
+        const expectedMissingActions = [
+            {type: MOCK_GET_POSTS},
+        ];
+
+        await testStore.dispatch(Actions.doReconnect());
+
+        const actions = testStore.getActions();
+        expect(actions).toEqual(expect.arrayContaining(expectedActions));
+        expect(actions).not.toEqual(expect.arrayContaining(expectedMissingActions));
     });
 });
