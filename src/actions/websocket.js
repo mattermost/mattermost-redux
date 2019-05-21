@@ -145,16 +145,15 @@ export function doReconnect() {
             const currentTeamMembership = getCurrentTeamMembership(getState());
             if (currentTeamMembership) {
                 dispatch(getPosts(currentChannelId));
-                dispatch(fetchMyChannelsAndMembers(currentTeamId)).then(({data}) => {
-                    dispatch(loadProfilesForDirect());
+                const {data} = await dispatch(fetchMyChannelsAndMembers(currentTeamId));
+                dispatch(loadProfilesForDirect());
 
-                    if (data && data.members) {
-                        const stillMemberOfCurrentChannel = data.members.find((m) => m.channel_id === currentChannelId);
-                        if (!stillMemberOfCurrentChannel) {
-                            EventEmitter.emit(General.SWITCH_TO_DEFAULT_CHANNEL, currentTeamId);
-                        }
+                if (data && data.members) {
+                    const stillMemberOfCurrentChannel = data.members.find((m) => m.channel_id === currentChannelId);
+                    if (!stillMemberOfCurrentChannel) {
+                        EventEmitter.emit(General.SWITCH_TO_DEFAULT_CHANNEL, currentTeamId);
                     }
-                });
+                }
             } else {
                 // If the user is no longer a member of this team when reconnecting
                 const newMsg = {

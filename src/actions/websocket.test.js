@@ -447,10 +447,6 @@ describe('Actions.Websocket doReconnect', () => {
     const currentUserId = 'user-id';
     const currentChannelId = 'channel-id';
 
-    nock(Client4.getBaseRoute()).
-        get(`/users/me/teams/${currentTeamId}/channels/members`).
-        reply(200, []);
-
     const initialState = {
         entities: {
             teams: {
@@ -477,27 +473,57 @@ describe('Actions.Websocket doReconnect', () => {
     };
 
     const MOCK_GET_STATUSES_BY_IDS = 'MOCK_GET_STATUSES_BY_IDS';
-    const MOCK_GET_POSTS = 'MOCK_GET_POSTS';
     const MOCK_MY_TEAM_UNREADS = 'MOCK_MY_TEAM_UNREADS';
     const MOCK_GET_MY_TEAMS = 'MOCK_GET_MY_TEAMS';
     const MOCK_GET_MY_TEAM_MEMBERS = 'MOCK_GET_MY_TEAM_MEMBERS';
+    const MOCK_GET_POSTS = 'MOCK_GET_POSTS';
+    const MOCK_CHANNELS_REQUEST = 'MOCK_CHANNELS_REQUEST';
 
     beforeAll(() => {
         UserActions.getStatusesByIds = jest.fn().mockReturnValue({
             type: MOCK_GET_STATUSES_BY_IDS,
         });
+        nock(Client4.getBaseRoute()).
+            get('/status/ids').
+            reply(200, []);
+
         TeamActions.getMyTeamUnreads = jest.fn().mockReturnValue({
             type: MOCK_MY_TEAM_UNREADS,
         });
+        nock(Client4.getBaseRoute()).
+            get('/users/me/teams/unread').
+            reply(200, []);
+
         TeamActions.getMyTeams = jest.fn().mockReturnValue({
             type: MOCK_GET_MY_TEAMS,
         });
+        nock(Client4.getBaseRoute()).
+            get('/users/me/teams').
+            reply(200, []);
+
         TeamActions.getMyTeamMembers = jest.fn().mockReturnValue({
             type: MOCK_GET_MY_TEAM_MEMBERS,
         });
+        nock(Client4.getBaseRoute()).
+            get(`/users/me/teams/${currentTeamId}/channels/members`).
+            reply(200, []);
+
         PostActions.getPosts = jest.fn().mockReturnValue({
             type: MOCK_GET_POSTS,
         });
+        nock(Client4.getBaseRoute()).
+            get(`/channels/${currentChannelId}/posts`).
+            reply(200, []);
+
+        ChannelActions.fetchMyChannelsAndMembers = jest.fn().mockReturnValue({
+            type: MOCK_CHANNELS_REQUEST,
+        });
+        nock(Client4.getBaseRoute()).
+            get(`/users/me/teams/${currentTeamId}/channels`).
+            reply(200, []);
+        nock(Client4.getBaseRoute()).
+            get(`/users/me/teams/${currentTeamId}/channels/members`).
+            reply(200, []);
     });
 
     it('handle doReconnect', async () => {
@@ -509,6 +535,7 @@ describe('Actions.Websocket doReconnect', () => {
             {type: MOCK_GET_MY_TEAMS},
             {type: MOCK_GET_MY_TEAM_MEMBERS},
             {type: MOCK_GET_POSTS},
+            {type: MOCK_CHANNELS_REQUEST},
             {type: GeneralTypes.WEBSOCKET_SUCCESS},
         ];
 
@@ -533,6 +560,7 @@ describe('Actions.Websocket doReconnect', () => {
 
         const expectedMissingActions = [
             {type: MOCK_GET_POSTS},
+            {type: MOCK_CHANNELS_REQUEST},
         ];
 
         await testStore.dispatch(Actions.doReconnect());
