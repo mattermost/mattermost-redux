@@ -1420,10 +1420,15 @@ export default class Client4 {
         );
     };
 
-    searchAllChannels = async (term) => {
+    searchAllChannels = async (term, notAssociatedToGroup = '', excludeDefaultChannels = false) => {
+        const body = {
+            term,
+            not_associated_to_group: notAssociatedToGroup,
+            exclude_default_channels: excludeDefaultChannels,
+        };
         return this.doFetch(
             `${this.getChannelsRoute()}/search`,
-            {method: 'post', body: JSON.stringify({term})}
+            {method: 'post', body: JSON.stringify(body)}
         );
     };
 

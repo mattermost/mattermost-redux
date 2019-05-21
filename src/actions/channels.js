@@ -918,13 +918,13 @@ export function searchChannels(teamId: string, term: string): ActionFunc {
     };
 }
 
-export function searchAllChannels(term: string): ActionFunc {
+export function searchAllChannels(term: string, notAssociatedToGroup: string = '', excludeDefaultChannels: boolean = false): ActionFunc {
     return async (dispatch, getState) => {
         dispatch({type: ChannelTypes.GET_ALL_CHANNELS_REQUEST, data: null}, getState);
 
         let channels;
         try {
-            channels = await Client4.searchAllChannels(term);
+            channels = await Client4.searchAllChannels(term, notAssociatedToGroup, excludeDefaultChannels);
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch, getState);
             dispatch(batchActions([
