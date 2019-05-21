@@ -24,7 +24,12 @@ import {
     postDeleted,
     receivedPost,
 } from './posts';
-import {getTeam, getMyTeamUnreads} from './teams';
+import {
+    getTeam,
+    getMyTeamUnreads,
+    getMyTeams,
+    getMyTeamMembers,
+} from './teams';
 
 import {
     ChannelTypes,
@@ -44,7 +49,7 @@ import {getAllChannels, getChannel, getChannelsNameMapInTeam, getCurrentChannelI
 import {getConfig} from 'selectors/entities/general';
 import {getAllPosts} from 'selectors/entities/posts';
 import {getDirectShowPreferences} from 'selectors/entities/preferences';
-import {getCurrentTeamId, getTeamMemberships, getTeams as getTeamsSelector} from 'selectors/entities/teams';
+import {getCurrentTeamId, getCurrentTeamMembership, getTeams as getTeamsSelector} from 'selectors/entities/teams';
 import {getCurrentUser, getCurrentUserId, getUsers, getUserStatuses} from 'selectors/entities/users';
 import {getChannelByName} from 'utils/channel_utils';
 import {fromAutoResponder} from 'utils/post_utils';
@@ -111,8 +116,8 @@ export function close(shouldReconnect = false) {
     };
 }
 
-function doReconnect() {
-    return (dispatch, getState) => {
+export function doReconnect() {
+    return async (dispatch, getState) => {
         const state = getState();
         const currentTeamId = getCurrentTeamId(state);
         const currentChannelId = getCurrentChannelId(state);
@@ -131,7 +136,16 @@ function doReconnect() {
             }
 
             dispatch(getStatusesByIds(Object.keys(statusesToLoad)));
-            dispatch(fetchMyChannelsAndMembers(currentTeamId)).then(({data}) => {
+            dispatch(getMyTeamUnreads());
+
+            // We need to wait for these actions so that we have an
+            // up-to-date state of the current user's team memberships.
+            await dispatch(getMyTeams());
+            await dispatch(getMyTeamMembers());
+            const currentTeamMembership = getCurrentTeamMembership(getState());
+            if (currentTeamMembership) {
+                dispatch(getPosts(currentChannelId));
+                const {data} = await dispatch(fetchMyChannelsAndMembers(currentTeamId));
                 dispatch(loadProfilesForDirect());
 
                 if (data && data.members) {
@@ -140,13 +154,7 @@ function doReconnect() {
                         EventEmitter.emit(General.SWITCH_TO_DEFAULT_CHANNEL, currentTeamId);
                     }
                 }
-            });
-
-            dispatch(getPosts(currentChannelId));
-            dispatch(getMyTeamUnreads());
-
-            const myTeamMembers = getTeamMemberships(getState());
-            if (!myTeamMembers[currentTeamId]) {
+            } else {
                 // If the user is no longer a member of this team when reconnecting
                 const newMsg = {
                     data: {
