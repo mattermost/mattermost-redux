@@ -1181,9 +1181,15 @@ export default class Client4 {
 
     // Channel Routes
 
-    getAllChannels = async (page = 0, perPage = PER_PAGE_DEFAULT) => {
+    getAllChannels = async (page = 0, perPage = PER_PAGE_DEFAULT, notAssociatedToGroup = '', excludeDefaultChannels = false) => {
+        const queryData = {
+            page,
+            per_page: perPage,
+            not_associated_to_group: notAssociatedToGroup,
+            exclude_default_channels: excludeDefaultChannels,
+        };
         return this.doFetch(
-            `${this.getChannelsRoute()}${buildQueryString({page, per_page: perPage})}`,
+            `${this.getChannelsRoute()}${buildQueryString(queryData)}`,
             {method: 'get'}
         );
     };
