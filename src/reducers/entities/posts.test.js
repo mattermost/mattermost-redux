@@ -672,6 +672,24 @@ describe('postsInChannel', () => {
                 ],
             });
         });
+
+        it('should not include a previously removed post', () => {
+            const state = deepFreeze({
+                channel1: [
+                    {order: ['post1'], recent: true},
+                ],
+            });
+
+            const nextState = reducers.postsInChannel(state, {
+                type: PostTypes.POST_REMOVED,
+                data: {id: 'post1', channel_id: 'channel1'},
+            });
+
+            expect(nextState).not.toBe(state);
+            expect(nextState).toEqual({
+                channel1: [],
+            });
+        });
     });
 
     describe('receiving a single post', () => {
