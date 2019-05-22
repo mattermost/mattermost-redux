@@ -16,6 +16,7 @@ describe('Selectors.Preferences', () => {
     const directCategory = Preferences.CATEGORY_DIRECT_CHANNEL_SHOW;
     const groupCategory = Preferences.CATEGORY_GROUP_CHANNEL_SHOW;
     const favCategory = Preferences.CATEGORY_FAVORITE_CHANNEL;
+    const advancedCategory = Preferences.CATEGORY_ADVANCED_SETTINGS;
 
     const name1 = 'testname1';
     const value1 = 'true';
@@ -29,6 +30,9 @@ describe('Selectors.Preferences', () => {
     const dmPref1 = {category: directCategory, name: dm1, value: 'true'};
     const dm2 = 'teammate2';
     const dmPref2 = {category: directCategory, name: dm2, value: 'false'};
+
+    const ctrl1 = 'send_on_ctrl_enter';
+    const ctrlPref1 = {category: advancedCategory, name: 'send_on_ctrl_enter', value: 'true'};
 
     const gp1 = 'group1';
     const prefGp1 = {category: groupCategory, name: gp1, value: 'true'};
@@ -47,6 +51,7 @@ describe('Selectors.Preferences', () => {
     myPreferences[`${category2}--${name2}`] = pref2;
     myPreferences[`${directCategory}--${dm1}`] = dmPref1;
     myPreferences[`${directCategory}--${dm2}`] = dmPref2;
+    myPreferences[`${advancedCategory}--${ctrl1}`] = ctrlPref1;
     myPreferences[`${groupCategory}--${gp1}`] = prefGp1;
     myPreferences[`${groupCategory}--${gp2}`] = prefGp2;
     myPreferences[`${favCategory}--${fav1}`] = favPref1;
@@ -148,6 +153,10 @@ describe('Selectors.Preferences', () => {
 
     it('get direct channel show preferences', () => {
         assert.deepEqual(Selectors.getDirectShowPreferences(testState), [dmPref1, dmPref2]);
+    });
+
+    it('get ctrl + enter on preference', () => {
+        assert.deepEqual(Selectors.getSendOnCtrlEnterPreferences(testState), true);
     });
 
     it('get group channel show preferences', () => {

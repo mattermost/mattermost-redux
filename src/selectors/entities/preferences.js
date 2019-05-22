@@ -27,7 +27,7 @@ export function get(state, category, name, defaultValue = '') {
 }
 
 export function getSendOnCtrlEnterPreferences(state) {
-    const key = getPreferenceKey('advanced_settings', 'send_on_ctrl_enter');
+    const key = getPreferenceKey(Preferences.CATEGORY_ADVANCED_SETTINGS, 'send_on_ctrl_enter');
     const prefs = getMyPreferences(state);
 
     if (!(key in prefs)) {
