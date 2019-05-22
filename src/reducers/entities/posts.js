@@ -1181,7 +1181,7 @@ export function expandedURLs(state = {}, action) {
 
 export default function(state = {}, action) {
     const nextPosts = handlePosts(state.posts, action);
-    const nextPostsInChannel = postsInChannel(state.postsInChannel, action, state.posts || {}, nextPosts);
+    const nextPostsInChannel = postsInChannel(state.postsInChannel, action, state.posts, nextPosts);
 
     const nextState = {
 
