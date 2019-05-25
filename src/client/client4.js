@@ -1181,9 +1181,15 @@ export default class Client4 {
 
     // Channel Routes
 
-    getAllChannels = async (page = 0, perPage = PER_PAGE_DEFAULT) => {
+    getAllChannels = async (page = 0, perPage = PER_PAGE_DEFAULT, notAssociatedToGroup = '', excludeDefaultChannels = false) => {
+        const queryData = {
+            page,
+            per_page: perPage,
+            not_associated_to_group: notAssociatedToGroup,
+            exclude_default_channels: excludeDefaultChannels,
+        };
         return this.doFetch(
-            `${this.getChannelsRoute()}${buildQueryString({page, per_page: perPage})}`,
+            `${this.getChannelsRoute()}${buildQueryString(queryData)}`,
             {method: 'get'}
         );
     };
@@ -1414,10 +1420,15 @@ export default class Client4 {
         );
     };
 
-    searchAllChannels = async (term) => {
+    searchAllChannels = async (term, notAssociatedToGroup = '', excludeDefaultChannels = false) => {
+        const body = {
+            term,
+            not_associated_to_group: notAssociatedToGroup,
+            exclude_default_channels: excludeDefaultChannels,
+        };
         return this.doFetch(
             `${this.getChannelsRoute()}/search`,
-            {method: 'post', body: JSON.stringify({term})}
+            {method: 'post', body: JSON.stringify(body)}
         );
     };
 
