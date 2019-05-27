@@ -8,7 +8,6 @@ import deepFreeze from 'utils/deep_freeze';
 import {getPreferenceKey} from 'utils/preference_utils';
 
 import {
-    COMBINED_USER_ACTIVITY,
     combineUserActivitySystemPost,
     comparePostTypes,
     DATE_LINE,
@@ -538,7 +537,7 @@ describe('makeCombineUserActivityPosts', () => {
 
         expect(result).not.toBe(postIds);
         expect(result).toEqual([
-            COMBINED_USER_ACTIVITY + 'post1_post2_post3',
+            Posts.COMBINED_USER_ACTIVITY_PREFIX + 'post1_post2_post3',
         ]);
     });
 
@@ -567,7 +566,7 @@ describe('makeCombineUserActivityPosts', () => {
         expect(result).not.toBe(postIds);
         expect(result).toEqual([
             'post1',
-            COMBINED_USER_ACTIVITY + 'post2',
+            Posts.COMBINED_USER_ACTIVITY_PREFIX + 'post2',
             'post3',
         ]);
     });
@@ -600,9 +599,9 @@ describe('makeCombineUserActivityPosts', () => {
 
         expect(result).not.toBe(postIds);
         expect(result).toEqual([
-            COMBINED_USER_ACTIVITY + 'post1_post2',
+            Posts.COMBINED_USER_ACTIVITY_PREFIX + 'post1_post2',
             'post3',
-            COMBINED_USER_ACTIVITY + 'post4_post5',
+            Posts.COMBINED_USER_ACTIVITY_PREFIX + 'post4_post5',
         ]);
     });
 
@@ -630,9 +629,9 @@ describe('makeCombineUserActivityPosts', () => {
 
         expect(result).not.toBe(postIds);
         expect(result).toEqual([
-            COMBINED_USER_ACTIVITY + 'post1',
+            Posts.COMBINED_USER_ACTIVITY_PREFIX + 'post1',
             'post2',
-            COMBINED_USER_ACTIVITY + 'post3',
+            Posts.COMBINED_USER_ACTIVITY_PREFIX + 'post3',
         ]);
     });
 
@@ -664,11 +663,11 @@ describe('makeCombineUserActivityPosts', () => {
 
         expect(result).not.toBe(postIds);
         expect(result).toEqual([
-            COMBINED_USER_ACTIVITY + 'post1',
+            Posts.COMBINED_USER_ACTIVITY_PREFIX + 'post1',
             START_OF_NEW_MESSAGES,
-            COMBINED_USER_ACTIVITY + 'post2_post3',
+            Posts.COMBINED_USER_ACTIVITY_PREFIX + 'post2_post3',
             DATE_LINE + '1001',
-            COMBINED_USER_ACTIVITY + 'post4',
+            Posts.COMBINED_USER_ACTIVITY_PREFIX + 'post4',
         ]);
     });
 

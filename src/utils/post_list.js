@@ -12,11 +12,8 @@ import {getCurrentUser} from 'selectors/entities/users';
 import {createIdsSelector, memoizeResult} from 'utils/helpers';
 import {isUserActivityPost, shouldFilterJoinLeavePost} from 'utils/post_utils';
 
-export const COMBINED_USER_ACTIVITY = 'user-activity-';
 export const DATE_LINE = 'date-';
 export const START_OF_NEW_MESSAGES = 'start-of-new-messages';
-
-const MAX_COMBINED_SYSTEM_POSTS = 100;
 
 function shouldShowJoinLeaveMessages(state) {
     // This setting is true or not set if join/leave messages are to be displayed
@@ -131,7 +128,7 @@ export function makeCombineUserActivityPosts() {
                 const post = posts[postId];
                 const postIsUserActivity = isUserActivityPost(post.type);
 
-                if (postIsUserActivity && lastPostIsUserActivity && combinedCount < MAX_COMBINED_SYSTEM_POSTS) {
+                if (postIsUserActivity && lastPostIsUserActivity && combinedCount < Posts.MAX_COMBINED_SYSTEM_POSTS) {
                     // Add the ID to the previous combined post
                     out[out.length - 1] += '_' + postId;
 
@@ -140,7 +137,7 @@ export function makeCombineUserActivityPosts() {
                     changed = true;
                 } else if (postIsUserActivity) {
                     // Start a new combined post, even if the "combined" post is only a single post
-                    out.push(COMBINED_USER_ACTIVITY + postId);
+                    out.push(Posts.COMBINED_USER_ACTIVITY_PREFIX + postId);
 
                     combinedCount = 1;
 
@@ -181,7 +178,7 @@ export function isCombinedUserActivityPost(item) {
 }
 
 export function getPostIdsForCombinedUserActivityPost(item) {
-    return item.substring(COMBINED_USER_ACTIVITY.length).split('_');
+    return item.substring(Posts.COMBINED_USER_ACTIVITY_PREFIX.length).split('_');
 }
 
 export function getFirstPostId(items) {
