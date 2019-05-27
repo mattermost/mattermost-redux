@@ -1,6 +1,7 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
 
+import {batchActionsWithThunk} from 'utils/helpers';
 import {batchActions} from 'redux-batched-actions';
 
 import {Client4} from 'client';
@@ -29,6 +30,7 @@ import {
     savePreferences,
 } from './preferences';
 import {getProfilesByIds, getProfilesByUsernames, getStatusesByIds} from './users';
+
 
 // receivedPost should be dispatched after a single post from the server. This typically happens when an existing post
 // is updated.
@@ -235,14 +237,15 @@ export function createPost(post, files = []) {
                         // If the failure was because: the root post was deleted or
                         // TownSquareIsReadOnly=true then remove the post
                         if (error.server_error_id === 'api.post.create_post.root_id.app_error' ||
-                            error.server_error_id === 'api.post.create_post.town_square_read_only'
+                            error.server_error_id === 'api.post.create_post.town_square_read_only' ||
+                            error.server_error_id === 'plugin.message_will_be_posted.dismiss_post'
                         ) {
                             actions.push(removePost(data));
                         } else {
                             actions.push(receivedPost(data));
                         }
 
-                        dispatch(batchActions(actions));
+                        dispatch(batchActionsWithThunk(actions));
                     },
                 },
             },
@@ -916,6 +919,7 @@ export function removePost(post) {
                 }
             }
         } else {
+            console.log('REMOVE',post);
             dispatch(postRemoved(post));
         }
     };

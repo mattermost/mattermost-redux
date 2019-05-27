@@ -4,6 +4,30 @@
 
 import {createSelectorCreator, defaultMemoize} from 'reselect';
 import shallowEqual from 'shallow-equals';
+import {batchActions as batchActionsDefault} from 'redux-batched-actions';
+
+function isPlainObject(obj) {
+    return Object.prototype.toString.call(obj) === '[object Object]';
+}
+
+export function batchActionsWithThunk(actions) {
+    return (dispatch, getState) => {
+        const promises = actions.map((action) => handleInnerAction(action, getState));
+        return Promise.all(promises).then((objectActions) => dispatch(batchActionsDefault(objectActions)));
+    };
+}
+
+function handleInnerAction(action, getState) {
+    if (typeof action === 'function') {
+        return new Promise((resolve) => {
+            const innerDispatch = (innerAction) => resolve(handleInnerAction(innerAction, getState));
+            action(innerDispatch, getState);
+        });
+    } else if (isPlainObject(action)) {
+        return Promise.resolve(action);
+    }
+    throw new Error('dispatch error');
+}
 
 export function memoizeResult(func: Function): Function {
     let lastArgs = null;
