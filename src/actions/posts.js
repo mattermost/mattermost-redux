@@ -919,7 +919,6 @@ export function removePost(post) {
                 }
             }
         } else {
-            console.log('REMOVE',post);
             dispatch(postRemoved(post));
         }
     };
