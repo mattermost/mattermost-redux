@@ -511,6 +511,11 @@ export function postsInChannel(state = {}, action, prevPosts, nextPosts) {
         for (let i = order.length - 1; i >= 0; i--) {
             const postId = order[i];
 
+            if (!nextPosts[postId]) {
+                // the post was removed from the list
+                continue;
+            }
+
             if (nextPosts[postId].create_at <= mostRecentCreateAt) {
                 // This is an old post
                 continue;
