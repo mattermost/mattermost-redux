@@ -7,6 +7,7 @@ import {createSelector} from 'reselect';
 import {
     getCurrentChannelId,
     getUsers,
+    createDeepEqualSelector,
 } from 'selectors/entities/common';
 import {getTeammateNameDisplaySetting} from 'selectors/entities/preferences';
 
@@ -34,7 +35,7 @@ const getUsersTypingImpl = (profiles: IDMappedObjects<UserProfile>, teammateName
 };
 
 export const makeGetUsersTypingByChannelAndPost = () => {
-    return (createSelector(
+    return (createDeepEqualSelector(
         getUsers,
         getTeammateNameDisplaySetting,
         (state: GlobalState, options: {channelId: string, postId: string}): string => options.channelId,
