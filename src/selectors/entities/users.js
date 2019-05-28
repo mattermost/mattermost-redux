@@ -10,6 +10,7 @@ import {
     getCurrentUserId,
     getMyCurrentChannelMembership,
     getUsers,
+    createDeepEqualSelector,
 } from 'selectors/entities/common';
 
 import {getConfig, getLicense} from 'selectors/entities/general';
@@ -475,7 +476,7 @@ export function makeGetProfilesNotInChannel(): (GlobalState, $ID<Channel>, boole
 }
 
 export function makeGetProfilesByIdsAndUsernames(): (GlobalState, {allUserIds: Array<$ID<UserProfile>>, allUsernames: Array<$Username<UserProfile>>}) => Array<UserProfile> {
-    return createSelector(
+    return createDeepEqualSelector(
         getUsers,
         getUsersByUsername,
         (state, props) => props.allUserIds,

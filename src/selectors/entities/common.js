@@ -7,7 +7,9 @@ import type {UserProfile} from 'types/users';
 import type {ChannelMembership, Channel} from 'types/channels';
 import type {RelationOneToOne, IDMappedObjects} from 'types/utilities';
 
-import {createSelector} from 'reselect';
+import {createSelector, createSelectorCreator, defaultMemoize} from 'reselect';
+
+import isEqual from 'lodash.isEqual';
 
 // Channels
 
@@ -40,3 +42,8 @@ export function getCurrentUserId(state: GlobalState): string {
 export function getUsers(state: GlobalState): IDMappedObjects<UserProfile> {
     return state.entities.users.profiles;
 }
+
+export const createDeepEqualSelector = createSelectorCreator(
+    defaultMemoize,
+    isEqual
+);
