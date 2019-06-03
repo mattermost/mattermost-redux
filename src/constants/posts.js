@@ -36,8 +36,6 @@ export default {
         POST: 'post',
         COMMENT: 'comment',
     },
-    COMBINED_USER_ACTIVITY_PREFIX: 'user-activity-',
-    MAX_COMBINED_SYSTEM_POSTS: 100,
     MAX_PREV_MSGS: 100,
     POST_COLLAPSE_TIMEOUT: 1000 * 60 * 5, // five minutes
     IGNORE_POST_TYPES: [
