@@ -1081,7 +1081,7 @@ export function updateChannelPurpose(channelId: string, purpose: string): Action
     };
 }
 
-export function markChannelAsRead(channelId: string, prevChannelId: string, updateLastViewedAt: boolean = true): ActionFunc {
+export function markChannelAsRead(channelId: string, prevChannelId: string | null, updateLastViewedAt: boolean = true): ActionFunc {
     return async (dispatch, getState) => {
         // Send channel last viewed at to the server
         if (updateLastViewedAt) {
@@ -1097,11 +1097,9 @@ export function markChannelAsRead(channelId: string, prevChannelId: string, upda
 
         // Update channel member objects to set all mentions and posts as viewed
         const channel = channels[channelId];
-        const prevChannel = channels[prevChannelId]; // May be null since prevChannelId is optional
 
         // Update team member objects to set mentions and posts in channel as viewed
         const channelMember = myMembers[channelId];
-        const prevChannelMember = myMembers[prevChannelId]; // May also be null
 
         const actions = [];
 
@@ -1125,24 +1123,28 @@ export function markChannelAsRead(channelId: string, prevChannelId: string, upda
             });
         }
 
-        if (prevChannel && prevChannelMember) {
-            actions.push({
-                type: ChannelTypes.DECREMENT_UNREAD_MSG_COUNT,
-                data: {
-                    teamId: prevChannel.team_id,
-                    channelId: prevChannelId,
-                    amount: prevChannel.total_msg_count - prevChannelMember.msg_count,
-                },
-            });
+        if (prevChannelId) {
+            const prevChannel = channels[prevChannelId];
+            const prevChannelMember = myMembers[prevChannelId];
+            if (prevChannel && prevChannelMember) {
+                actions.push({
+                    type: ChannelTypes.DECREMENT_UNREAD_MSG_COUNT,
+                    data: {
+                        teamId: prevChannel.team_id,
+                        channelId: prevChannelId,
+                        amount: prevChannel.total_msg_count - prevChannelMember.msg_count,
+                    },
+                });
 
-            actions.push({
-                type: ChannelTypes.DECREMENT_UNREAD_MENTION_COUNT,
-                data: {
-                    teamId: prevChannel.team_id,
-                    channelId: prevChannelId,
-                    amount: prevChannelMember.mention_count,
-                },
-            });
+                actions.push({
+                    type: ChannelTypes.DECREMENT_UNREAD_MENTION_COUNT,
+                    data: {
+                        teamId: prevChannel.team_id,
+                        channelId: prevChannelId,
+                        amount: prevChannelMember.mention_count,
+                    },
+                });
+            }
         }
 
         if (actions.length > 0) {

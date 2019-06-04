@@ -17,12 +17,13 @@ export type GenericAction = {|
     sessionId?: string,
     currentUserId?: string,
     remove?: Function,
+    url?: string
 |};
 
 type Thunk = (DispatchFunc, GetStateFunc) => Promise<ActionResult>; // eslint-disable-line no-use-before-define
 
 type BatchAction = {
-    type: 'BATCHING_REDUCER.BATCH';
+    type: string;
     payload: Array<GenericAction>;
 }
 

@@ -1030,7 +1030,7 @@ describe('Actions.Posts', () => {
         nock(Client4.getUsersRoute()).
             delete(`/${TestHelper.basicUser.id}/preferences`).
             reply(200, OK_RESPONSE);
-        Actions.unflagPost(post1.id)(dispatch, getState);
+        await Actions.unflagPost(post1.id)(dispatch, getState);
         state = getState();
         const unflagged = state.entities.preferences.myPreferences[prefKey];
         assert.ifError(unflagged);

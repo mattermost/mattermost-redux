@@ -29,11 +29,17 @@ export type PostType = 'system_add_remove' |
 
 export type PostEmbedType = 'image' | 'message_attachment' | 'opengraph';
 
+/* eslint-disable no-use-before-define */
+
 export type PostEmbed = {|
     type: PostEmbedType,
     url: string,
-    data: Object
+    data: Object,
+    failed: boolean,
+    file_ids: Array<string>
 |};
+
+/* eslint-enable no-use-before-define */
 
 export type PostImage = {|
     height: number,
