@@ -2,7 +2,7 @@
 // See LICENSE.txt for license information.
 // @flow
 
-import {General, Posts, Preferences, Permissions} from 'constants';
+import {General, Posts, PostTypes, Preferences, Permissions} from 'constants';
 
 import {hasNewPermissions} from 'selectors/entities/general';
 import {haveIChannelPermission} from 'selectors/entities/roles';
@@ -25,6 +25,10 @@ export function isPostFlagged(postId: $ID<Post>, myPreferences: {[string]: Prefe
 
 export function isSystemMessage(post: Post): boolean {
     return Boolean(post.type && post.type.startsWith(Posts.SYSTEM_MESSAGE_PREFIX));
+}
+
+export function isMeMessage(post: Post): boolean {
+    return Boolean(post.type && post.type === Posts.POST_TYPES.ME);
 }
 
 export function isFromWebhook(post: Post): boolean {
