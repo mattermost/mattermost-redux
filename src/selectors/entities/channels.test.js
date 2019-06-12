@@ -236,6 +236,14 @@ describe('Selectors.Channels', () => {
         assert.deepEqual(Selectors.getOtherChannels(testState), [channel6]);
     });
 
+    it('get public, unarchived channels not member of', () => {
+        assert.deepEqual(Selectors.getOtherUnArchivedChannels(testState), [channel6]);
+    });
+
+    it('get archived channels that user is member of', () => {
+        assert.deepEqual(Selectors.getArchivedChannels(testState), []);
+    });
+
     it('get channel', () => {
         assert.deepEqual(Selectors.getChannel(testState, channel1.id), channel1);
     });
