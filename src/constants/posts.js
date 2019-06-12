@@ -25,6 +25,7 @@ export const PostTypes = {
 
     COMBINED_USER_ACTIVITY: 'system_combined_user_activity',
     ME: 'me',
+    ADD_BOT_TEAMS_CHANNELS: 'add_bot_teams_channels',
 };
 
 export default {

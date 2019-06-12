@@ -226,6 +226,7 @@ export function createPost(post, files = []) {
                             ...newPost,
                             id: pendingPostId,
                             failed: true,
+                            update_at: Date.now(),
                         };
                         dispatch({type: PostTypes.CREATE_POST_FAILURE, error});
 
