@@ -2,7 +2,7 @@
 // See LICENSE.txt for license information.
 // @flow
 
-import {General, Posts, PostTypes, Preferences, Permissions} from 'constants';
+import {General, Posts, Preferences, Permissions} from 'constants';
 
 import {hasNewPermissions} from 'selectors/entities/general';
 import {haveIChannelPermission} from 'selectors/entities/roles';
