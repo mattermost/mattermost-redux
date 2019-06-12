@@ -226,6 +226,7 @@ export function createPost(post, files = []) {
                             ...newPost,
                             id: pendingPostId,
                             failed: true,
+                            update_at: Date.now(),
                         };
 
                         const actions = [
