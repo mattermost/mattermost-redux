@@ -71,4 +71,6 @@ export default keyMirror({
 
     UPDATED_CHANNEL_SCHEME: null,
     UPDATED_CHANNEL_MEMBER_SCHEME_ROLES: null,
+
+    RECEIVED_CHANNEL_MEMBERS_MINUS_GROUP_MEMBERS: null,
 });

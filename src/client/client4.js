@@ -2744,6 +2744,14 @@ export default class Client4 {
         );
     }
 
+    channelMembersMinusGroupMembers = async (channelID, groupIDs, page, perPage) => {
+        const query = `group_ids=${groupIDs.join(',')}&page=${page}&per_page=${perPage}`;
+        return this.doFetch(
+            `${this.getChannelRoute(channelID)}/members_minus_group_members?${query}`,
+            {method: 'get'},
+        );
+    }
+
     // Client Helpers
 
     doFetch = async (url, options) => {

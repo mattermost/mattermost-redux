@@ -1894,4 +1894,19 @@ describe('Actions.Channels', () => {
 
         assert.deepEqual(response, data);
     });
+
+    it('membersMinusGroupMembers', async () => {
+        const channelID = 'cid10000000000000000000000';
+        const groupIDs = ['gid10000000000000000000000', 'gid20000000000000000000000'];
+        const page = 7;
+        const perPage = 63;
+
+        nock(Client4.getBaseRoute()).get(
+            `/channels/${channelID}/members_minus_group_members?group_ids=${groupIDs.join(',')}&page=${page}&per_page=${perPage}`).
+            reply(200, {users: [], total_count: 0});
+
+        const {error} = await Actions.membersMinusGroupMembers(channelID, groupIDs, page, perPage)(store.dispatch, store.getState);
+
+        assert.equal(error, null);
+    });
 });
