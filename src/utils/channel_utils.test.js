@@ -12,6 +12,7 @@ import {
     isAutoClosed,
     filterChannelsMatchingTerm,
     sortChannelsByRecency,
+    sortChannelsByDisplayName,
 } from 'utils/channel_utils';
 
 describe('ChannelUtils', () => {
@@ -222,5 +223,33 @@ describe('ChannelUtils', () => {
         // sorting depends on create_at of channel's last post if it's greater than the channel's last_post_at
         lastPosts.channel_a.create_at = 10;
         assert.deepEqual(sortChannelsByRecency(lastPosts, channelA, channelB), -3, 'should return 2, comparison of create_at (7 - 10)');
+    });
+
+    it('sortChannelsByDisplayName', () => {
+        const channelA = {
+            name: 'channelA',
+            team_id: 'teamId',
+            display_name: 'Unit Test channelA',
+            type: 'O',
+            delete_at: 0,
+            total_msg_count: 0,
+        };
+
+        const channelB = {
+            name: 'channelB',
+            team_id: 'teamId',
+            display_name: 'Unit Test channelB',
+            type: 'O',
+            delete_at: 0,
+            total_msg_count: 0,
+        };
+
+        assert.equal(sortChannelsByDisplayName('en', channelA, channelB), -1);
+        assert.equal(sortChannelsByDisplayName('en', channelB, channelA), 1);
+
+        // When a channel does not have a display name set
+        Reflect.deleteProperty(channelB, 'display_name');
+        assert.equal(sortChannelsByDisplayName('en', channelA, channelB), -1);
+        assert.equal(sortChannelsByDisplayName('en', channelB, channelA), 1);
     });
 });

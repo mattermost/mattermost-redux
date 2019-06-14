@@ -536,7 +536,8 @@ function filterName(name: string): string {
 }
 
 export function sortChannelsByDisplayName(locale: string, a: Channel, b: Channel): number {
-    if (a.display_name !== b.display_name) {
+    // if both channels have the display_name defined
+    if (a.display_name && b.display_name && a.display_name !== b.display_name) {
         return a.display_name.toLowerCase().localeCompare(b.display_name.toLowerCase(), locale, {numeric: true});
     }
 
