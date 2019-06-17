@@ -44,8 +44,18 @@ describe('Selectors.Channels', () => {
     channel5.display_name = 'Channel 5';
     channel5.last_post_at = Date.now();
 
+    const channel5Del = TestHelper.fakeChannelWithId('');
+    channel5Del.type = General.PRIVATE_CHANNEL;
+    channel5Del.display_name = 'Channel 5 Archived';
+    channel5Del.last_post_at = Date.now();
+    channel5Del.delete_at = 555;
+
     const channel6 = TestHelper.fakeChannelWithId(team1.id);
     channel6.last_post_at = Date.now();
+
+    const channel6Del = TestHelper.fakeChannelWithId(team1.id);
+    channel6Del.last_post_at = Date.now();
+    channel6Del.delete_at = 444;
 
     const channel7 = TestHelper.fakeChannelWithId('');
     channel7.display_name = [user.username, user2.username, user3.username].join(', ');
@@ -84,7 +94,9 @@ describe('Selectors.Channels', () => {
     channels[channel3.id] = channel3;
     channels[channel4.id] = channel4;
     channels[channel5.id] = channel5;
+    channels[channel5Del.id] = channel5Del;
     channels[channel6.id] = channel6;
+    channels[channel6Del.id] = channel6Del;
     channels[channel7.id] = channel7;
     channels[channel8.id] = channel8;
     channels[channel9.id] = channel9;
@@ -94,7 +106,7 @@ describe('Selectors.Channels', () => {
     channels[channel13.id] = channel13;
 
     const channelsInTeam = {};
-    channelsInTeam[team1.id] = [channel1.id, channel2.id, channel5.id, channel6.id, channel8.id, channel10.id, channel11.id];
+    channelsInTeam[team1.id] = [channel1.id, channel2.id, channel5.id, channel5Del.id, channel6.id, channel6Del.id, channel8.id, channel10.id, channel11.id];
     channelsInTeam[team2.id] = [channel3.id];
     channelsInTeam[''] = [channel4.id, channel7.id, channel9.id, channel13.id];
 
@@ -109,7 +121,10 @@ describe('Selectors.Channels', () => {
     membersInChannel[channel4.id][user.id] = {channel_id: channel4.id, user_id: user.id};
     membersInChannel[channel5.id] = {};
     membersInChannel[channel5.id][user.id] = {channel_id: channel5.id, user_id: user.id};
+    membersInChannel[channel5Del.id] = {};
+    membersInChannel[channel5Del.id][user.id] = {channel_id: channel5Del.id, user_id: user.id};
     membersInChannel[channel6.id] = {};
+    membersInChannel[channel6Del.id] = {};
     membersInChannel[channel7.id] = {};
     membersInChannel[channel7.id][user.id] = {channel_id: channel7.id, user_id: user.id};
     membersInChannel[channel7.id][user2.id] = {channel_id: channel7.id, user_id: user2.id};
@@ -135,6 +150,7 @@ describe('Selectors.Channels', () => {
     myMembers[channel3.id] = {channel_id: channel3.id, user_id: user.id, msg_count: 1, mention_count: 1, notify_props: {}};
     myMembers[channel4.id] = {channel_id: channel4.id, user_id: user.id};
     myMembers[channel5.id] = {channel_id: channel5.id, user_id: user.id};
+    myMembers[channel5Del.id] = {channel_id: channel5Del.id, user_id: user.id};
     myMembers[channel7.id] = {channel_id: channel7.id, user_id: user.id, msg_count: 0, notify_props: {}};
     myMembers[channel8.id] = {channel_id: channel8.id, user_id: user.id, msg_count: 0, notify_props: {}};
     myMembers[channel9.id] = {channel_id: channel9.id, user_id: user.id};
@@ -213,12 +229,12 @@ describe('Selectors.Channels', () => {
     const sortUsernames = (a, b) => a.localeCompare(b, General.DEFAULT_LOCALE, {numeric: true});
 
     it('should return channels in current team', () => {
-        const channelsInCurrentTeam = [channel1, channel2, channel5, channel6, channel8, channel10, channel11].sort(sortChannelsByDisplayName.bind(null, []));
+        const channelsInCurrentTeam = [channel1, channel2, channel5, channel5Del, channel6, channel6Del, channel8, channel10, channel11].sort(sortChannelsByDisplayName.bind(null, []));
         assert.deepEqual(Selectors.getChannelsInCurrentTeam(testState), channelsInCurrentTeam);
     });
 
     it('get my channels in current team and DMs', () => {
-        const channelsInCurrentTeam = [channel1, channel2, channel5, channel8, channel10, channel11].sort(sortChannelsByDisplayName.bind(null, []));
+        const channelsInCurrentTeam = [channel1, channel2, channel5, channel5Del, channel8, channel10, channel11].sort(sortChannelsByDisplayName.bind(null, []));
         assert.deepEqual(Selectors.getMyChannels(testState), [
             ...channelsInCurrentTeam,
             channel4,
@@ -233,7 +249,15 @@ describe('Selectors.Channels', () => {
     });
 
     it('get public channels not member of', () => {
-        assert.deepEqual(Selectors.getOtherChannels(testState), [channel6]);
+        assert.deepEqual(Selectors.getOtherChannels(testState), [channel6, channel6Del].sort(sortChannelsByDisplayName.bind(null, [])));
+    });
+
+    it('get public, unarchived channels not member of', () => {
+        assert.deepEqual(Selectors.getOtherChannels(testState, false), [channel6]);
+    });
+
+    it('get archived channels that user is member of', () => {
+        assert.deepEqual(Selectors.getArchivedChannels(testState), [channel5Del]);
     });
 
     it('get channel', () => {
@@ -324,7 +348,9 @@ describe('Selectors.Channels', () => {
             [channel1.name]: channel1,
             [channel2.name]: channel2,
             [channel5.name]: channel5,
+            [channel5Del.name]: channel5Del,
             [channel6.name]: channel6,
+            [channel6Del.name]: channel6Del,
             [channel8.name]: channel8,
             [channel10.name]: channel10,
             [channel11.name]: channel11,
@@ -337,7 +363,9 @@ describe('Selectors.Channels', () => {
             [channel1.name]: channel1,
             [channel2.name]: channel2,
             [channel5.name]: channel5,
+            [channel5Del.name]: channel5Del,
             [channel6.name]: channel6,
+            [channel6Del.name]: channel6Del,
             [channel8.name]: channel8,
             [channel10.name]: channel10,
             [channel11.name]: channel11,
