@@ -598,3 +598,16 @@ export function invalidateAllEmailInvites(): ActionFunc {
         clientFunc: Client4.invalidateAllEmailInvites,
     });
 }
+
+export function membersMinusGroupMembers(teamID: string, groupIDs: Array<string>, page: number = 0, perPage: number = General.PROFILE_CHUNK_SIZE): ActionFunc {
+    return bindClientFunc({
+        clientFunc: Client4.teamMembersMinusGroupMembers,
+        onSuccess: TeamTypes.RECEIVED_TEAM_MEMBERS_MINUS_GROUP_MEMBERS,
+        params: [
+            teamID,
+            groupIDs,
+            page,
+            perPage,
+        ],
+    });
+}
