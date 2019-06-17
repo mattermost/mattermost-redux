@@ -9,6 +9,7 @@ import {Permissions} from 'constants';
 import {
     canEditPost,
     isSystemMessage,
+    isMeMessage,
     isUserActivityPost,
     shouldFilterJoinLeavePost,
     isPostCommentMention,
@@ -482,6 +483,28 @@ describe('PostUtils', () => {
 
             const isCommentMention = isPostCommentMention({currentUser: modifiedCurrentUser, post, rootPost, threadRepliedToByCurrentUser: true});
             assert.equal(isCommentMention, true);
+        });
+    });
+
+    describe('isMeMessage', () => {
+        it('should correctly identify messages generated from /me', () => {
+            for (const data of [
+                {
+                    post: {type: 'hello'},
+                    result: false,
+                },
+                {
+                    post: {type: 'ME'},
+                    result: false,
+                },
+                {
+                    post: {type: PostTypes.ME},
+                    result: true,
+                },
+            ]) {
+                const confirmation = isMeMessage(data.post);
+                assert.equal(confirmation, data.result, data.post);
+            }
         });
     });
 });

@@ -363,11 +363,20 @@ export const getMyChannels: (GlobalState) => Array<Channel> = createSelector(
     }
 );
 
-export const getOtherChannels: (GlobalState) => Array<Channel> = createSelector(
+export const getOtherChannels: (GlobalState, ?boolean) => Array<Channel> = createSelector(
+    getChannelsInCurrentTeam,
+    getMyChannelMemberships,
+    (state: GlobalState, archived: ?boolean = true) => archived,
+    (channels: Array<Channel>, myMembers: RelationOneToOne<Channel, ChannelMembership>, archived: ?boolean): Array<Channel> => {
+        return channels.filter((c) => !myMembers.hasOwnProperty(c.id) && c.type === General.OPEN_CHANNEL && (archived ? true : c.delete_at === 0));
+    }
+);
+
+export const getArchivedChannels: (GlobalState) => Array<Channel> = createSelector(
     getChannelsInCurrentTeam,
     getMyChannelMemberships,
     (channels: Array<Channel>, myMembers: RelationOneToOne<Channel, ChannelMembership>): Array<Channel> => {
-        return channels.filter((c) => !myMembers.hasOwnProperty(c.id) && c.type === General.OPEN_CHANNEL);
+        return channels.filter((c) => myMembers.hasOwnProperty(c.id) && c.delete_at !== 0);
     }
 );
 

@@ -241,8 +241,13 @@ export function loadMe(): ActionFunc {
 
         const {currentUserId} = getState().entities.users;
         const user = getState().entities.users.profiles[currentUserId];
-        Client4.setUserId(currentUserId);
-        Client4.setUserRoles(user.roles);
+        if (currentUserId) {
+            Client4.setUserId(currentUserId);
+        }
+
+        if (user) {
+            Client4.setUserRoles(user.roles);
+        }
 
         return {data: true};
     };

@@ -226,23 +226,20 @@ export function createPost(post, files = []) {
                             ...newPost,
                             id: pendingPostId,
                             failed: true,
+                            update_at: Date.now(),
                         };
-
-                        const actions = [
-                            {type: PostTypes.CREATE_POST_FAILURE, error},
-                        ];
+                        dispatch({type: PostTypes.CREATE_POST_FAILURE, error});
 
                         // If the failure was because: the root post was deleted or
                         // TownSquareIsReadOnly=true then remove the post
                         if (error.server_error_id === 'api.post.create_post.root_id.app_error' ||
-                            error.server_error_id === 'api.post.create_post.town_square_read_only'
+                            error.server_error_id === 'api.post.create_post.town_square_read_only' ||
+                            error.server_error_id === 'plugin.message_will_be_posted.dismiss_post'
                         ) {
-                            actions.push(removePost(data));
+                            dispatch(removePost(data));
                         } else {
-                            actions.push(receivedPost(data));
+                            dispatch(receivedPost(data));
                         }
-
-                        dispatch(batchActions(actions));
                     },
                 },
             },
