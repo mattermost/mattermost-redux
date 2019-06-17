@@ -2,15 +2,18 @@
 // See LICENSE.txt for license information.
 
 import {createSelector} from 'reselect';
+import moment from 'moment-timezone';
 
 import {Posts, Preferences} from 'constants';
 
 import {makeGetPostsForIds} from 'selectors/entities/posts';
 import {getBool} from 'selectors/entities/preferences';
+import {isTimezoneEnabled} from 'selectors/entities/timezone';
 import {getCurrentUser} from 'selectors/entities/users';
 
 import {createIdsSelector, memoizeResult} from 'utils/helpers';
 import {isUserActivityPost, shouldFilterJoinLeavePost} from 'utils/post_utils';
+import {getUserCurrentTimezone} from 'utils/timezone_utils';
 
 export const COMBINED_USER_ACTIVITY = 'user-activity-';
 export const DATE_LINE = 'date-';
@@ -47,7 +50,8 @@ export function makeFilterPostsAndAddSeparators() {
         (state) => state.entities.posts.selectedPostId,
         getCurrentUser,
         shouldShowJoinLeaveMessages,
-        (posts, lastViewedAt, indicateNewMessages, selectedPostId, currentUser, showJoinLeave) => {
+        isTimezoneEnabled,
+        (posts, lastViewedAt, indicateNewMessages, selectedPostId, currentUser, showJoinLeave, timeZoneEnabled) => {
             if (posts.length === 0 || !currentUser) {
                 return [];
             }
@@ -75,6 +79,15 @@ export function makeFilterPostsAndAddSeparators() {
 
                 // Push on a date header if the last post was on a different day than the current one
                 const postDate = new Date(post.create_at);
+                if (timeZoneEnabled) {
+                    const currentOffset = postDate.getTimezoneOffset() * 60 * 1000;
+                    const timezone = getUserCurrentTimezone(currentUser.timezone);
+                    if (timezone) {
+                        const timezoneOffset = moment.tz.zone(timezone).utcOffset(post.create_at) * 60 * 1000;
+                        postDate.setTime(post.create_at + (currentOffset - timezoneOffset));
+                    }
+                }
+
                 postDate.setHours(0, 0, 0, 0);
 
                 if (!lastDate || lastDate.toDateString() !== postDate.toDateString()) {
