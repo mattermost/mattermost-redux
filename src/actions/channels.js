@@ -1291,7 +1291,6 @@ export function membersMinusGroupMembers(channelID: string, groupIDs: Array<stri
     });
 }
 
-
 export default {
     selectChannel,
     createChannel,
