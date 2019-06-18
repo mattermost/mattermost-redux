@@ -1278,6 +1278,19 @@ export function updateChannelMemberSchemeRoles(channelId: string, userId: string
     });
 }
 
+export function membersMinusGroupMembers(channelID: string, groupIDs: Array<string>, page: number = 0, perPage: number = General.PROFILE_CHUNK_SIZE): ActionFunc {
+    return bindClientFunc({
+        clientFunc: Client4.channelMembersMinusGroupMembers,
+        onSuccess: ChannelTypes.RECEIVED_CHANNEL_MEMBERS_MINUS_GROUP_MEMBERS,
+        params: [
+            channelID,
+            groupIDs,
+            page,
+            perPage,
+        ],
+    });
+}
+
 export default {
     selectChannel,
     createChannel,
@@ -1308,4 +1321,5 @@ export default {
     markChannelAsUnread,
     favoriteChannel,
     unfavoriteChannel,
+    membersMinusGroupMembers,
 };
