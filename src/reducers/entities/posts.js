@@ -500,7 +500,7 @@ export function postsInChannel(state = {}, action, prevPosts, nextPosts) {
 
         const recentBlock = postsForChannel[recentBlockIndex];
 
-        const mostRecentCreateAt = nextPosts[recentBlock.order[0]].create_at;
+        const mostOldestCreateAt = nextPosts[recentBlock.order[recentBlock.order.length - 1]].create_at;
 
         const nextRecentBlock = {
             ...recentBlock,
@@ -516,8 +516,13 @@ export function postsInChannel(state = {}, action, prevPosts, nextPosts) {
                 continue;
             }
 
-            if (nextPosts[postId].create_at <= mostRecentCreateAt) {
+            if (nextPosts[postId].create_at <= mostOldestCreateAt) {
                 // This is an old post
+                continue;
+            }
+
+            if (nextRecentBlock.order.indexOf(postId) !== -1) {
+                // This postId exists so no need to add it again
                 continue;
             }
 
