@@ -1326,6 +1326,46 @@ describe('postsInChannel', () => {
             });
         });
 
+        it('should save any posts in between', () => {
+            const state = deepFreeze({
+                channel1: [
+                    {order: ['post2', 'post4'], recent: true},
+                ],
+            });
+
+            const nextPosts = {
+                post1: {id: 'post1', channel_id: 'channel1', create_at: 4000},
+                post2: {id: 'post2', channel_id: 'channel1', create_at: 3000},
+                post3: {id: 'post3', channel_id: 'channel1', create_at: 2000},
+                post4: {id: 'post4', channel_id: 'channel1', create_at: 1000},
+                post5: {id: 'post5', channel_id: 'channel1', create_at: 500},
+                post6: {id: 'post6', channel_id: 'channel1', create_at: 300},
+            };
+
+            const nextState = reducers.postsInChannel(state, {
+                type: PostTypes.RECEIVED_POSTS_SINCE,
+                channelId: 'channel1',
+                data: {
+                    posts: {
+                        post1: nextPosts.post1,
+                        post2: nextPosts.post2,
+                        post3: nextPosts.post5,
+                        post4: nextPosts.post4,
+                        post5: nextPosts.post5,
+                        post6: nextPosts.post6,
+                    },
+                    order: ['post1', 'post2', 'post3', 'post4', 'post5', 'post6'],
+                },
+            }, null, nextPosts);
+
+            expect(nextState).not.toBe(state);
+            expect(nextState).toEqual({
+                channel1: [
+                    {order: ['post1', 'post2', 'post3', 'post4'], recent: true},
+                ],
+            });
+        });
+
         it('should do nothing if only receiving updated posts', () => {
             const state = deepFreeze({
                 channel1: [
