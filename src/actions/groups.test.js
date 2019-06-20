@@ -365,7 +365,7 @@ describe('Actions.Groups', () => {
             throw new Error('getGroup request failed err=' + request.error);
         }
 
-        const groupIDs = state.entities.teams.groupsAssociatedToTeam[teamID];
+        const groupIDs = state.entities.teams.groupsAssociatedToTeam[teamID].ids;
         assert.strictEqual(groupIDs.length, response.groups.length);
         groupIDs.forEach((id) => {
             assert.ok(response.groups.map((group) => group.id).includes(id));
@@ -379,7 +379,7 @@ describe('Actions.Groups', () => {
             entities: {
                 teams: {
                     groupsAssociatedToTeam: {
-                        [teamID]: ['existing1', 'existing2'],
+                        [teamID]: {ids: ['existing1', 'existing2']},
                     },
                 },
             },
@@ -429,12 +429,15 @@ describe('Actions.Groups', () => {
             throw new Error('getGroup request failed err=' + request.error);
         }
 
-        const groupIDs = state.entities.teams.groupsAssociatedToTeam[teamID];
+        const groupIDs = state.entities.teams.groupsAssociatedToTeam[teamID].ids;
         var expectedIDs = ['existing1', 'existing2'].concat(response.groups.map((group) => group.id));
         assert.strictEqual(groupIDs.length, expectedIDs.length);
         groupIDs.forEach((id) => {
             assert.ok(expectedIDs.includes(id));
         });
+
+        const count = state.entities.teams.groupsAssociatedToTeam[teamID].totalCount;
+        assert.equal(count, response.total_group_count);
     });
 
     it('getGroupsNotAssociatedToTeam', async () => {
@@ -546,7 +549,7 @@ describe('Actions.Groups', () => {
             throw new Error('getGroup request failed err=' + request.error);
         }
 
-        const groupIDs = state.entities.channels.groupsAssociatedToChannel[channelID];
+        const groupIDs = state.entities.channels.groupsAssociatedToChannel[channelID].ids;
         assert.strictEqual(groupIDs.length, response.groups.length);
         groupIDs.forEach((id) => {
             assert.ok(response.groups.map((group) => group.id).includes(id));
@@ -560,7 +563,7 @@ describe('Actions.Groups', () => {
             entities: {
                 channels: {
                     groupsAssociatedToChannel: {
-                        [channelID]: ['existing1', 'existing2'],
+                        [channelID]: {ids: ['existing1', 'existing2']},
                     },
                 },
             },
@@ -610,12 +613,15 @@ describe('Actions.Groups', () => {
             throw new Error('getGroup request failed err=' + request.error);
         }
 
-        const groupIDs = state.entities.channels.groupsAssociatedToChannel[channelID];
+        const groupIDs = state.entities.channels.groupsAssociatedToChannel[channelID].ids;
         var expectedIDs = ['existing1', 'existing2'].concat(response.groups.map((group) => group.id));
         assert.strictEqual(groupIDs.length, expectedIDs.length);
         groupIDs.forEach((id) => {
             assert.ok(expectedIDs.includes(id));
         });
+
+        const count = state.entities.channels.groupsAssociatedToChannel[channelID].totalCount;
+        assert.equal(count, response.total_group_count);
     });
 
     it('getGroupsNotAssociatedToChannel', async () => {
@@ -625,7 +631,7 @@ describe('Actions.Groups', () => {
             entities: {
                 channels: {
                     groupsAssociatedToChannel: {
-                        [channelID]: ['existing1', 'existing2'],
+                        [channelID]: {ids: ['existing1', 'existing2']},
                     },
                 },
             },
@@ -659,7 +665,7 @@ describe('Actions.Groups', () => {
             throw new Error('getGroup request failed err=' + request.error);
         }
 
-        const groupIDs = state.entities.channels.groupsAssociatedToChannel[channelID];
+        const groupIDs = state.entities.channels.groupsAssociatedToChannel[channelID].ids;
         var expectedIDs = ['existing2'].concat(response.map((group) => group.id));
         assert.strictEqual(groupIDs.length, expectedIDs.length);
         groupIDs.forEach((id) => {
