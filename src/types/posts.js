@@ -69,6 +69,7 @@ export type Post = {
     failed?: boolean,
     user_activity_posts?: Array<Post>,
     state?: 'DELETED',
+    has_reactions?: boolean,
 };
 
 export type PostWithFormatData = Post & {
