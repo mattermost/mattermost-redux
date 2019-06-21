@@ -536,7 +536,7 @@ export function getProfilesInGroupChannels(channelsIds: Array<string>): ActionFu
             }
         }
 
-        dispatch(batchActions(actions), getState);
+        dispatch(batchActions(actions));
 
         return {data: channelProfiles};
     };
