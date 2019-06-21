@@ -4,7 +4,9 @@
 
 export type GeneralState = {|
     appState: boolean,
-    credentials: Object,
+    credentials: {|
+        url: String,
+    |},
     config: Object,
     dataRetentionPolicy: Object,
     deviceToken: string,
