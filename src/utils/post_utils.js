@@ -220,3 +220,15 @@ export function isPostCommentMention({post, currentUser, threadRepliedToByCurren
 export function fromAutoResponder(post: Post): boolean {
     return Boolean(post.type && (post.type === Posts.SYSTEM_AUTO_RESPONDER));
 }
+
+/**
+ * hasReactions determines if the given post has reactions, taking into account servers
+ * without post metadata.
+ *
+ * On a server without post metadata, the reactions attribute will initially be null, so we must
+ * rely on has_reactions as populated by the server. Once reactions are loaded, or on a newer
+ * server with post metadata enabled, we can examine the reactions list exclusively.
+ */
+export function hasReactions(post: Post): boolean {
+    return (post.metadata && post.metadata.reactions) ? post.metadata.reactions.length > 0 : Boolean(post.has_reactions);
+}

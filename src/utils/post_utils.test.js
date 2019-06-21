@@ -13,6 +13,7 @@ import {
     isUserActivityPost,
     shouldFilterJoinLeavePost,
     isPostCommentMention,
+    hasReactions,
 } from 'utils/post_utils';
 
 describe('PostUtils', () => {
@@ -505,6 +506,58 @@ describe('PostUtils', () => {
                 const confirmation = isMeMessage(data.post);
                 assert.equal(confirmation, data.result, data.post);
             }
+        });
+    });
+
+    describe('hasReactions', () => {
+        it('should be false when no post metadata or has_reactions', () => {
+            const post = {};
+            assert.equal(hasReactions(post), false);
+        });
+
+        describe('should match has_reactions', () => {
+            [true, false].forEach((postHasReactions) => {
+                it('when no post metadata', () => {
+                    const post = {
+                        has_reactions: postHasReactions,
+                    };
+                    assert.equal(hasReactions(post), postHasReactions);
+                });
+
+                it('when post metadata is empty', () => {
+                    const post = {
+                        metadata: {},
+                        has_reactions: postHasReactions,
+                    };
+                    assert.equal(hasReactions(post), postHasReactions);
+                });
+            });
+        });
+
+        describe('should examine post metadata, ignoring has_reactions', () => {
+            it('when reactions is empty', () => {
+                [true, false].forEach((postHasReactions) => {
+                    const post = {
+                        metadata: {
+                            reactions: [],
+                        },
+                        has_reactions: postHasReactions,
+                    };
+                    assert.equal(hasReactions(post), false);
+                });
+            });
+
+            it('when reactions is not empty', () => {
+                [true, false].forEach((postHasReactions) => {
+                    const post = {
+                        metadata: {
+                            reactions: ['reaction1'],
+                        },
+                        has_reactions: postHasReactions,
+                    };
+                    assert.equal(hasReactions(post), true);
+                });
+            });
         });
     });
 });
