@@ -148,6 +148,14 @@ function groups(state = {}, action) {
         }
         return nextState;
     }
+    case GroupTypes.RECEIVED_GROUPS_ASSOCIATED_TO_TEAM:
+    case GroupTypes.RECEIVED_GROUPS_ASSOCIATED_TO_CHANNEL: {
+        const nextState = {...state};
+        for (const group of action.data.groups) {
+            nextState[group.id] = group;
+        }
+        return nextState;
+    }
     default:
         return state;
     }
