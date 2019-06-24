@@ -429,7 +429,7 @@ describe('Actions.Groups', () => {
             throw new Error('getGroup request failed err=' + request.error);
         }
 
-        const groupIDs = state.entities.teams.groupsAssociatedToTeam[teamID];
+        const groupIDs = state.entities.teams.groupsAssociatedToTeam[teamID].ids;
         var expectedIDs = ['tnd8zod9f3fdtqosxjmhwucbth', 'qhdp6g7aubbpiyja7c4sgpe7tc'];
         assert.strictEqual(groupIDs.length, expectedIDs.length);
         groupIDs.forEach((id) => {
@@ -448,7 +448,7 @@ describe('Actions.Groups', () => {
             entities: {
                 teams: {
                     groupsAssociatedToTeam: {
-                        [teamID]: ['existing1', 'existing2'],
+                        [teamID]: {ids: ['existing1', 'existing2']},
                     },
                 },
             },
@@ -482,7 +482,7 @@ describe('Actions.Groups', () => {
             throw new Error('getGroup request failed err=' + request.error);
         }
 
-        const groupIDs = state.entities.teams.groupsAssociatedToTeam[teamID];
+        const groupIDs = state.entities.teams.groupsAssociatedToTeam[teamID].ids;
         var expectedIDs = ['existing2'].concat(response.map((group) => group.id));
         assert.strictEqual(groupIDs.length, expectedIDs.length);
         groupIDs.forEach((id) => {
@@ -614,7 +614,7 @@ describe('Actions.Groups', () => {
             throw new Error('getGroup request failed err=' + request.error);
         }
 
-        const groupIDs = state.entities.channels.groupsAssociatedToChannel[channelID];
+        const groupIDs = state.entities.channels.groupsAssociatedToChannel[channelID].ids;
         var expectedIDs = ['tnd8zod9f3fdtqosxjmhwucbth', 'qhdp6g7aubbpiyja7c4sgpe7tc'];
         assert.strictEqual(groupIDs.length, expectedIDs.length);
         groupIDs.forEach((id) => {
