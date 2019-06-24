@@ -948,6 +948,13 @@ export function searchAllChannels(term: string, notAssociatedToGroup: string = '
     };
 }
 
+export function searchGroupChannels(term: string): ActionFunc {
+    return bindClientFunc({
+        clientFunc: Client4.searchGroupChannels,
+        params: [term],
+    });
+}
+
 export function getChannelStats(channelId: string): ActionFunc {
     return async (dispatch, getState) => {
         let stat;
@@ -1312,6 +1319,7 @@ export default {
     autocompleteChannels,
     autocompleteChannelsForSearch,
     searchChannels,
+    searchGroupChannels,
     getChannelStats,
     addChannelMember,
     removeChannelMember,
