@@ -1217,8 +1217,9 @@ export const getMyFirstChannelForTeams: (GlobalState) => RelationOneToOne<Team, 
         const result = {};
         for (const team of myTeams) {
             // Get a sorted array of all channels in the team that the current user is a member of
+            // $FlowFixMe
             const teamChannels = Object.values(allChannels).
-                filter((channel) => channel && channel.team_id === team.id && myChannelMemberships[channel.id]).
+                filter((channel: Channel) => channel && channel.team_id === team.id && Boolean(myChannelMemberships[channel.id])).
                 sort(sortChannelsByDisplayName.bind(null, locale));
 
             if (teamChannels.length === 0) {
