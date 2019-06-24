@@ -269,6 +269,19 @@ export default class Client4 {
         return `${this.getBotsRoute()}/${botUserId}`;
     }
 
+    getCSRFFromCookie() {
+        if (typeof document !== 'undefined' && typeof document.cookie !== 'undefined') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.startsWith('MMCSRF=')) {
+                    return cookie.replace('MMCSRF=', '');
+                }
+            }
+        }
+        return '';
+    }
+
     getOptions(options) {
         const newOptions = Object.assign({}, options);
 
@@ -281,8 +294,9 @@ export default class Client4 {
             headers[HEADER_AUTH] = `${HEADER_BEARER} ${this.token}`;
         }
 
-        if (options.method && options.method.toLowerCase() !== 'get' && this.csrf) {
-            headers[HEADER_X_CSRF_TOKEN] = this.csrf;
+        const csrfToken = this.csrf || this.getCSRFFromCookie();
+        if (options.method && options.method.toLowerCase() !== 'get' && csrfToken) {
+            headers[HEADER_X_CSRF_TOKEN] = csrfToken;
         }
 
         if (this.includeCookies) {
