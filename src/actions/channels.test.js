@@ -1550,7 +1550,7 @@ describe('Actions.Channels', () => {
 
     it('updateChannelHeader', async () => {
         nock(Client4.getChannelsRoute()).
-            post(`${TestHelper.basicChannel.id}`).
+            get(`/${TestHelper.basicChannel.id}`).
             reply(200, TestHelper.basicChannel);
 
         await store.dispatch(Actions.getChannel(TestHelper.basicChannel.id));
@@ -1567,7 +1567,7 @@ describe('Actions.Channels', () => {
 
     it('updateChannelPurpose', async () => {
         nock(Client4.getChannelsRoute()).
-            post(`${TestHelper.basicChannel.id}`).
+            get(`/${TestHelper.basicChannel.id}`).
             reply(200, TestHelper.basicChannel);
 
         await store.dispatch(Actions.getChannel(TestHelper.basicChannel.id));
