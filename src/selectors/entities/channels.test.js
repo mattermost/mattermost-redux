@@ -1598,3 +1598,115 @@ describe('Selectors.Channels', () => {
         });
     });
 });
+
+describe('getMyFirstChannelForTeams', () => {
+    test('should return the first channel in each team', () => {
+        const state = {
+            entities: {
+                channels: {
+                    channels: {
+                        channelA: {id: 'channelA', name: 'channelA', team_id: 'team1'},
+                        channelB: {id: 'channelB', name: 'channelB', team_id: 'team2'},
+                        channelC: {id: 'channelC', name: 'channelC', team_id: 'team1'},
+                    },
+                    myMembers: {
+                        channelA: {},
+                        channelB: {},
+                        channelC: {},
+                    },
+                },
+                teams: {
+                    myMembers: {
+                        team1: {},
+                        team2: {},
+                    },
+                    teams: {
+                        team1: {id: 'team1'},
+                        team2: {id: 'team2'},
+                    },
+                },
+                users: {
+                    currentUserId: 'user',
+                    profiles: {
+                        user: {},
+                    },
+                },
+            },
+        };
+
+        expect(Selectors.getMyFirstChannelForTeams(state)).toEqual({
+            team1: state.entities.channels.channels.channelA,
+            team2: state.entities.channels.channels.channelB,
+        });
+    });
+
+    test('should only return channels that the current user is a member of', () => {
+        const state = {
+            entities: {
+                channels: {
+                    channels: {
+                        channelA: {id: 'channelA', name: 'channelA', team_id: 'team1'},
+                        channelB: {id: 'channelB', name: 'channelB', team_id: 'team1'},
+                    },
+                    myMembers: {
+                        channelB: {},
+                    },
+                },
+                teams: {
+                    myMembers: {
+                        team1: {},
+                    },
+                    teams: {
+                        team1: {id: 'team1'},
+                    },
+                },
+                users: {
+                    currentUserId: 'user',
+                    profiles: {
+                        user: {},
+                    },
+                },
+            },
+        };
+
+        expect(Selectors.getMyFirstChannelForTeams(state)).toEqual({
+            team1: state.entities.channels.channels.channelB,
+        });
+    });
+
+    test('should only return teams that the current user is a member of', () => {
+        const state = {
+            entities: {
+                channels: {
+                    channels: {
+                        channelA: {id: 'channelA', name: 'channelA', team_id: 'team1'},
+                        channelB: {id: 'channelB', name: 'channelB', team_id: 'team2'},
+                    },
+                    myMembers: {
+                        channelA: {},
+                        channelB: {},
+                    },
+                },
+                teams: {
+                    myMembers: {
+                        team1: {},
+                    },
+                    teams: {
+                        team1: {id: 'team1'},
+                        team2: {id: 'team2'},
+                    },
+                },
+                users: {
+                    currentUserId: 'user',
+                    profiles: {
+                        user: {},
+                    },
+                },
+            },
+        };
+
+        expect(Selectors.getMyFirstChannelForTeams(state)).toEqual({
+            team1: state.entities.channels.channels.channelA,
+        });
+    });
+});
