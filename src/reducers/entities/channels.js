@@ -37,7 +37,7 @@ function currentChannelId(state = '', action) {
     }
 }
 
-function channels(state = {}, action) {
+export function channels(state = {}, action) {
     switch (action.type) {
     case ChannelTypes.RECEIVED_CHANNEL:
         if (state[action.data.id] && action.data.type === General.DM_CHANNEL) {
@@ -61,17 +61,26 @@ function channels(state = {}, action) {
     }
     case ChannelTypes.RECEIVED_CHANNEL_DELETED: {
         const {id, deleteAt} = action.data;
-        const newState = {
+
+        if (!state[id]) {
+            return state;
+        }
+
+        return {
             ...state,
             [id]: {
                 ...state[id],
                 delete_at: deleteAt,
             },
         };
-        return newState;
     }
     case ChannelTypes.UPDATE_CHANNEL_HEADER: {
         const {channelId, header} = action.data;
+
+        if (!state[channelId]) {
+            return state;
+        }
+
         return {
             ...state,
             [channelId]: {
@@ -82,6 +91,11 @@ function channels(state = {}, action) {
     }
     case ChannelTypes.UPDATE_CHANNEL_PURPOSE: {
         const {channelId, purpose} = action.data;
+
+        if (!state[channelId]) {
+            return state;
+        }
+
         return {
             ...state,
             [channelId]: {
