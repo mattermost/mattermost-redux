@@ -468,6 +468,16 @@ function updateChannelMemberSchemeRoles(state, action) {
     return state;
 }
 
+function totalCount(state = 0, action) {
+    switch (action.type) {
+    case ChannelTypes.RECEIVED_TOTAL_CHANNEL_COUNT: {
+        return action.data;
+    }
+    default:
+        return state;
+    }
+}
+
 export default combineReducers({
 
     // the current selected channel
@@ -489,4 +499,6 @@ export default combineReducers({
     stats,
 
     groupsAssociatedToChannel,
+
+    totalCount,
 });
