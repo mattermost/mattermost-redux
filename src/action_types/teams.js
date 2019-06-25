@@ -55,4 +55,6 @@ export default keyMirror({
     UPDATED_TEAM_MEMBER_SCHEME_ROLES: null,
 
     RECEIVED_TEAM_MEMBERS_MINUS_GROUP_MEMBERS: null,
+
+    RECEIVED_TOTAL_TEAM_COUNT: null,
 });

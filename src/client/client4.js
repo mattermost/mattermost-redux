@@ -934,9 +934,9 @@ export default class Client4 {
         );
     };
 
-    getTeams = async (page = 0, perPage = PER_PAGE_DEFAULT) => {
+    getTeams = async (page = 0, perPage = PER_PAGE_DEFAULT, includeTotalCount = false) => {
         return this.doFetch(
-            `${this.getTeamsRoute()}${buildQueryString({page, per_page: perPage})}`,
+            `${this.getTeamsRoute()}${buildQueryString({page, per_page: perPage, include_total_count: includeTotalCount})}`,
             {method: 'get'}
         );
     };

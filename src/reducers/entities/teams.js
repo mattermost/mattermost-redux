@@ -380,6 +380,16 @@ function updateTeamMemberSchemeRoles(state, action) {
     return state;
 }
 
+function totalCount(state = 0, action) {
+    switch (action.type) {
+    case TeamTypes.RECEIVED_TOTAL_TEAM_COUNT: {
+        return action.data;
+    }
+    default:
+        return state;
+    }
+}
+
 export default combineReducers({
 
     // the current selected team
@@ -398,4 +408,6 @@ export default combineReducers({
     stats,
 
     groupsAssociatedToTeam,
+
+    totalCount,
 });

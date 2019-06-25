@@ -100,6 +100,31 @@ describe('Actions.Teams', () => {
         assert.ok(Object.keys(teams).length > 0);
     });
 
+    it('getTeams with total count', async () => {
+        let team = {...TestHelper.fakeTeam(), allow_open_invite: true};
+
+        nock(Client4.getTeamsRoute()).
+            post('').
+            reply(201, {...team, id: TestHelper.generateId()});
+        team = await Client4.createTeam(team);
+
+        nock(Client4.getTeamsRoute()).
+            get('').
+            query(true).
+            reply(200, {teams: [team], total_count: 43});
+        await Actions.getTeams(0, 1, true)(store.dispatch, store.getState);
+
+        const teamsRequest = store.getState().requests.teams.getTeams;
+        const {teams, totalCount} = store.getState().entities.teams;
+
+        if (teamsRequest.status === RequestStatus.FAILURE) {
+            throw new Error(JSON.stringify(teamsRequest.error));
+        }
+
+        assert.ok(Object.keys(teams).length > 0);
+        assert.equal(totalCount, 43);
+    });
+
     it('getTeam', async () => {
         nock(Client4.getTeamsRoute()).
             post('').
