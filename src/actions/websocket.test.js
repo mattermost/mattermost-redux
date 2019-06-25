@@ -529,6 +529,7 @@ describe('Actions.Websocket doReconnect', () => {
     it('handle doReconnect', async () => {
         const testStore = await mockStore(initialState);
 
+        const timestamp = 1000;
         const expectedActions = [
             {type: MOCK_GET_STATUSES_BY_IDS},
             {type: MOCK_MY_TEAM_UNREADS},
@@ -536,10 +537,10 @@ describe('Actions.Websocket doReconnect', () => {
             {type: MOCK_GET_MY_TEAM_MEMBERS},
             {type: MOCK_GET_POSTS},
             {type: MOCK_CHANNELS_REQUEST},
-            {type: GeneralTypes.WEBSOCKET_SUCCESS},
+            {type: GeneralTypes.WEBSOCKET_SUCCESS, timestamp},
         ];
 
-        await testStore.dispatch(Actions.doReconnect());
+        await testStore.dispatch(Actions.doReconnect(timestamp));
 
         expect(testStore.getActions()).toEqual(expect.arrayContaining(expectedActions));
     });
@@ -549,13 +550,14 @@ describe('Actions.Websocket doReconnect', () => {
         state.entities.teams.myMembers = {};
         const testStore = await mockStore(state);
 
+        const timestamp = 1000;
         const expectedActions = [
             {type: MOCK_GET_STATUSES_BY_IDS},
             {type: MOCK_MY_TEAM_UNREADS},
             {type: MOCK_GET_MY_TEAMS},
             {type: MOCK_GET_MY_TEAM_MEMBERS},
             {type: TeamTypes.LEAVE_TEAM, data: initialState.entities.teams.teams[currentTeamId]},
-            {type: GeneralTypes.WEBSOCKET_SUCCESS},
+            {type: GeneralTypes.WEBSOCKET_SUCCESS, timestamp},
         ];
 
         const expectedMissingActions = [
@@ -563,7 +565,7 @@ describe('Actions.Websocket doReconnect', () => {
             {type: MOCK_CHANNELS_REQUEST},
         ];
 
-        await testStore.dispatch(Actions.doReconnect());
+        await testStore.dispatch(Actions.doReconnect(timestamp));
 
         const actions = testStore.getActions();
         expect(actions).toEqual(expect.arrayContaining(expectedActions));
