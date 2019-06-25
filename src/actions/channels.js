@@ -795,6 +795,40 @@ export function getChannels(teamId: string, page: number = 0, perPage: number = 
     };
 }
 
+export function getAllChannelsWithCount(page: number = 0, perPage: number = General.CHANNELS_CHUNK_SIZE, notAssociatedToGroup: string = '', excludeDefaultChannels: boolean = false): ActionFunc {
+    return async (dispatch, getState) => {
+        dispatch({type: ChannelTypes.GET_ALL_CHANNELS_REQUEST, data: null}, getState);
+
+        let payload;
+        try {
+            payload = await Client4.getAllChannels(page, perPage, notAssociatedToGroup, excludeDefaultChannels, true);
+        } catch (error) {
+            forceLogoutIfNecessary(error, dispatch, getState);
+            dispatch(batchActions([
+                {type: ChannelTypes.GET_ALL_CHANNELS_FAILURE, error},
+                logError(error),
+            ]), getState);
+            return {error};
+        }
+
+        dispatch(batchActions([
+            {
+                type: ChannelTypes.RECEIVED_ALL_CHANNELS,
+                data: payload.channels,
+            },
+            {
+                type: ChannelTypes.GET_ALL_CHANNELS_SUCCESS,
+            },
+            {
+                type: ChannelTypes.RECEIVED_TOTAL_CHANNEL_COUNT,
+                data: payload.total_count,
+            },
+        ]), getState);
+
+        return {data: payload};
+    };
+}
+
 export function getAllChannels(page: number = 0, perPage: number = General.CHANNELS_CHUNK_SIZE, notAssociatedToGroup: string = '', excludeDefaultChannels: boolean = false): ActionFunc {
     return async (dispatch, getState) => {
         dispatch({type: ChannelTypes.GET_ALL_CHANNELS_REQUEST, data: null}, getState);
