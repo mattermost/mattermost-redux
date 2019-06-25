@@ -114,6 +114,9 @@ function mySessions(state = [], action) {
         }
         return state;
 
+    case UserTypes.REVOKE_SESSIONS_FOR_ALL_USERS_SUCCESS:
+        return [];
+
     case UserTypes.LOGOUT_SUCCESS:
         return [];
 
