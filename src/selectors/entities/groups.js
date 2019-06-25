@@ -46,9 +46,9 @@ export function getGroupMembers(state, id) {
     return groupMemberData.members;
 }
 
-const teamGroupIDs = (state, teamID) => state.entities.teams.groupsAssociatedToTeam[teamID].ids || [];
+const teamGroupIDs = (state, teamID) => state.entities.teams.groupsAssociatedToTeam[teamID]?.ids || [];
 
-const channelGroupIDs = (state, channelID) => state.entities.channels.groupsAssociatedToChannel[channelID].ids || [];
+const channelGroupIDs = (state, channelID) => state.entities.channels.groupsAssociatedToChannel[channelID]?.ids || [];
 
 const getTeamGroupIDSet = createSelector(
     teamGroupIDs,
