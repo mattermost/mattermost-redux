@@ -14,7 +14,7 @@ When filling in a section please remove the help text and the above text.
 - [ ] Ran `make test` to ensure unit tests passed
 - [ ] Ran `make flow` to ensure type checking passed
 - [ ] Added or updated unit tests (required for all new features)
-- [ ] All new/modified APIs include changes to the drivers
+- [ ] All new/modified APIs include changes to the [JavaScript driver](https://github.com/mattermost/mattermost-redux/blob/master/src/client/client4.js)
 
 #### Test Information
 This PR was tested on: [Device name(s), OS version(s)] 
