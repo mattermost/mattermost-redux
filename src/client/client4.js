@@ -370,6 +370,24 @@ export default class Client4 {
         );
     }
 
+    promoteGuestToUser = async (userId) => {
+        this.trackEvent('api', 'api_users_promote_guest_to_user');
+
+        return this.doFetch(
+            `${this.getUserRoute(userId)}/promote`,
+            {method: 'post'}
+        );
+    }
+
+    demoteUserToGuest = async (userId) => {
+        this.trackEvent('api', 'api_users_demote_user_to_guest');
+
+        return this.doFetch(
+            `${this.getUserRoute(userId)}/demote`,
+            {method: 'post'}
+        );
+    }
+
     updateUserRoles = async (userId, roles) => {
         this.trackEvent('api', 'api_users_update_roles');
 
