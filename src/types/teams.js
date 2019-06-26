@@ -40,4 +40,5 @@ export type TeamsState = {|
     membersInTeam: Object,
     stats: Object,
     groupsAssociatedToTeam: Object,
+    totalCount: number,
 |};

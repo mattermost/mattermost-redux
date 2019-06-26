@@ -504,6 +504,44 @@ export function getProfilesInChannel(channelId: string, page: number, perPage: n
     };
 }
 
+export function getProfilesInGroupChannels(channelsIds: Array<string>): ActionFunc {
+    return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
+        const {currentUserId} = getState().entities.users;
+
+        let channelProfiles = null;
+        try {
+            channelProfiles = await Client4.getProfilesInGroupChannels(channelsIds.slice(0, General.MAX_GROUP_CHANNELS_FOR_PROFILES));
+        } catch (error) {
+            forceLogoutIfNecessary(error, dispatch, getState);
+            dispatch(logError(error));
+            return {error};
+        }
+
+        const actions = [];
+        for (const channelId in channelProfiles) {
+            if (channelProfiles.hasOwnProperty(channelId)) {
+                const profiles = channelProfiles[channelId];
+
+                actions.push(
+                    {
+                        type: UserTypes.RECEIVED_PROFILES_LIST_IN_CHANNEL,
+                        data: profiles,
+                        id: channelId,
+                    },
+                    {
+                        type: UserTypes.RECEIVED_PROFILES_LIST,
+                        data: removeUserFromList(currentUserId, [...profiles]),
+                    },
+                );
+            }
+        }
+
+        dispatch(batchActions(actions));
+
+        return {data: channelProfiles};
+    };
+}
+
 export function getProfilesNotInChannel(teamId: string, channelId: string, groupConstrained: boolean, page: number, perPage: number = General.PROFILE_CHUNK_SIZE): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         const {currentUserId} = getState().entities.users;
@@ -754,7 +792,7 @@ export function loadProfilesForDirect(): ActionFunc {
                         makeDirectChannelVisibleIfNecessary(otherUserId)(dispatch, getState);
                     }
                 } else if ((member.mention_count > 0 || member.msg_count < channel.total_msg_count) &&
-                    isGroupChannel(channel) && !isGroupChannelVisible(config, myPreferences, channel)) {
+                           isGroupChannel(channel) && !isGroupChannelVisible(config, myPreferences, channel)) {
                     makeGroupMessageVisibleIfNecessary(channel.id)(dispatch, getState);
                 }
             }

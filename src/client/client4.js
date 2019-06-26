@@ -609,6 +609,15 @@ export default class Client4 {
         );
     };
 
+    getProfilesInGroupChannels = async (channelsIds) => {
+        this.trackEvent('api', 'api_profiles_get_in_group_channels', {channelsIds});
+
+        return this.doFetch(
+            `${this.getUsersRoute()}/group_channels`,
+            {method: 'post', body: JSON.stringify(channelsIds)}
+        );
+    };
+
     getProfilesNotInChannel = async (teamId, channelId, groupConstrained, page = 0, perPage = PER_PAGE_DEFAULT) => {
         this.trackEvent('api', 'api_profiles_get_not_in_channel', {team_id: teamId, channel_id: channelId, group_constrained: groupConstrained});
 
@@ -925,9 +934,9 @@ export default class Client4 {
         );
     };
 
-    getTeams = async (page = 0, perPage = PER_PAGE_DEFAULT) => {
+    getTeams = async (page = 0, perPage = PER_PAGE_DEFAULT, includeTotalCount = false) => {
         return this.doFetch(
-            `${this.getTeamsRoute()}${buildQueryString({page, per_page: perPage})}`,
+            `${this.getTeamsRoute()}${buildQueryString({page, per_page: perPage, include_total_count: includeTotalCount})}`,
             {method: 'get'}
         );
     };
@@ -1190,12 +1199,13 @@ export default class Client4 {
 
     // Channel Routes
 
-    getAllChannels = async (page = 0, perPage = PER_PAGE_DEFAULT, notAssociatedToGroup = '', excludeDefaultChannels = false) => {
+    getAllChannels = async (page = 0, perPage = PER_PAGE_DEFAULT, notAssociatedToGroup = '', excludeDefaultChannels = false, includeTotalCount = false) => {
         const queryData = {
             page,
             per_page: perPage,
             not_associated_to_group: notAssociatedToGroup,
             exclude_default_channels: excludeDefaultChannels,
+            include_total_count: includeTotalCount,
         };
         return this.doFetch(
             `${this.getChannelsRoute()}${buildQueryString(queryData)}`,
@@ -1438,6 +1448,13 @@ export default class Client4 {
         return this.doFetch(
             `${this.getChannelsRoute()}/search`,
             {method: 'post', body: JSON.stringify(body)}
+        );
+    };
+
+    searchGroupChannels = async (term) => {
+        return this.doFetch(
+            `${this.getChannelsRoute()}/group/search`,
+            {method: 'post', body: JSON.stringify({term})}
         );
     };
 
@@ -2749,6 +2766,14 @@ export default class Client4 {
         const query = `group_ids=${groupIDs.join(',')}&page=${page}&per_page=${perPage}`;
         return this.doFetch(
             `${this.getTeamRoute(teamID)}/members_minus_group_members?${query}`,
+            {method: 'get'},
+        );
+    }
+
+    channelMembersMinusGroupMembers = async (channelID, groupIDs, page, perPage) => {
+        const query = `group_ids=${groupIDs.join(',')}&page=${page}&per_page=${perPage}`;
+        return this.doFetch(
+            `${this.getChannelRoute(channelID)}/members_minus_group_members?${query}`,
             {method: 'get'},
         );
     }

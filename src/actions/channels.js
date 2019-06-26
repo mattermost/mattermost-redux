@@ -795,6 +795,40 @@ export function getChannels(teamId: string, page: number = 0, perPage: number = 
     };
 }
 
+export function getAllChannelsWithCount(page: number = 0, perPage: number = General.CHANNELS_CHUNK_SIZE, notAssociatedToGroup: string = '', excludeDefaultChannels: boolean = false): ActionFunc {
+    return async (dispatch, getState) => {
+        dispatch({type: ChannelTypes.GET_ALL_CHANNELS_REQUEST, data: null}, getState);
+
+        let payload;
+        try {
+            payload = await Client4.getAllChannels(page, perPage, notAssociatedToGroup, excludeDefaultChannels, true);
+        } catch (error) {
+            forceLogoutIfNecessary(error, dispatch, getState);
+            dispatch(batchActions([
+                {type: ChannelTypes.GET_ALL_CHANNELS_FAILURE, error},
+                logError(error),
+            ]), getState);
+            return {error};
+        }
+
+        dispatch(batchActions([
+            {
+                type: ChannelTypes.RECEIVED_ALL_CHANNELS,
+                data: payload.channels,
+            },
+            {
+                type: ChannelTypes.GET_ALL_CHANNELS_SUCCESS,
+            },
+            {
+                type: ChannelTypes.RECEIVED_TOTAL_CHANNEL_COUNT,
+                data: payload.total_count,
+            },
+        ]), getState);
+
+        return {data: payload};
+    };
+}
+
 export function getAllChannels(page: number = 0, perPage: number = General.CHANNELS_CHUNK_SIZE, notAssociatedToGroup: string = '', excludeDefaultChannels: boolean = false): ActionFunc {
     return async (dispatch, getState) => {
         dispatch({type: ChannelTypes.GET_ALL_CHANNELS_REQUEST, data: null}, getState);
@@ -946,6 +980,13 @@ export function searchAllChannels(term: string, notAssociatedToGroup: string = '
 
         return {data: channels};
     };
+}
+
+export function searchGroupChannels(term: string): ActionFunc {
+    return bindClientFunc({
+        clientFunc: Client4.searchGroupChannels,
+        params: [term],
+    });
 }
 
 export function getChannelStats(channelId: string): ActionFunc {
@@ -1278,6 +1319,19 @@ export function updateChannelMemberSchemeRoles(channelId: string, userId: string
     });
 }
 
+export function membersMinusGroupMembers(channelID: string, groupIDs: Array<string>, page: number = 0, perPage: number = General.PROFILE_CHUNK_SIZE): ActionFunc {
+    return bindClientFunc({
+        clientFunc: Client4.channelMembersMinusGroupMembers,
+        onSuccess: ChannelTypes.RECEIVED_CHANNEL_MEMBERS_MINUS_GROUP_MEMBERS,
+        params: [
+            channelID,
+            groupIDs,
+            page,
+            perPage,
+        ],
+    });
+}
+
 export default {
     selectChannel,
     createChannel,
@@ -1299,6 +1353,7 @@ export default {
     autocompleteChannels,
     autocompleteChannelsForSearch,
     searchChannels,
+    searchGroupChannels,
     getChannelStats,
     addChannelMember,
     removeChannelMember,
@@ -1308,4 +1363,5 @@ export default {
     markChannelAsUnread,
     favoriteChannel,
     unfavoriteChannel,
+    membersMinusGroupMembers,
 };
