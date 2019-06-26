@@ -146,7 +146,7 @@ describe('user utils', () => {
     describe('Utils.getSuggestionsSplitBy', () => {
         test('correct suggestions when splitting by a character', () => {
             const term = 'one.two.three';
-            const expectedSuggestions = ['one.two.three', 'two.three', 'three'];
+            const expectedSuggestions = ['one.two.three', '.two.three', 'two.three', '.three', 'three'];
 
             expect(getSuggestionsSplitBy(term, '.')).toEqual(expectedSuggestions);
         });
@@ -155,7 +155,7 @@ describe('user utils', () => {
     describe('Utils.getSuggestionsSplitByMultiple', () => {
         test('correct suggestions when splitting by multiple characters', () => {
             const term = 'one.two-three';
-            const expectedSuggestions = ['one.two-three', 'two-three', 'three'];
+            const expectedSuggestions = ['one.two-three', '.two-three', 'two-three', '-three', 'three'];
 
             expect(getSuggestionsSplitByMultiple(term, ['.', '-'])).toEqual(expectedSuggestions);
         });

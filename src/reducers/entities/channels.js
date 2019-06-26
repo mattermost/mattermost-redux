@@ -37,7 +37,7 @@ function currentChannelId(state = '', action) {
     }
 }
 
-function channels(state = {}, action) {
+export function channels(state = {}, action) {
     switch (action.type) {
     case ChannelTypes.RECEIVED_CHANNEL:
         if (state[action.data.id] && action.data.type === General.DM_CHANNEL) {
@@ -61,17 +61,26 @@ function channels(state = {}, action) {
     }
     case ChannelTypes.RECEIVED_CHANNEL_DELETED: {
         const {id, deleteAt} = action.data;
-        const newState = {
+
+        if (!state[id]) {
+            return state;
+        }
+
+        return {
             ...state,
             [id]: {
                 ...state[id],
                 delete_at: deleteAt,
             },
         };
-        return newState;
     }
     case ChannelTypes.UPDATE_CHANNEL_HEADER: {
         const {channelId, header} = action.data;
+
+        if (!state[channelId]) {
+            return state;
+        }
+
         return {
             ...state,
             [channelId]: {
@@ -82,6 +91,11 @@ function channels(state = {}, action) {
     }
     case ChannelTypes.UPDATE_CHANNEL_PURPOSE: {
         const {channelId, purpose} = action.data;
+
+        if (!state[channelId]) {
+            return state;
+        }
+
         return {
             ...state,
             [channelId]: {
@@ -411,13 +425,13 @@ function stats(state = {}, action) {
 function groupsAssociatedToChannel(state = {}, action) {
     switch (action.type) {
     case GroupTypes.RECEIVED_GROUPS_ASSOCIATED_TO_CHANNEL: {
-        const {channelID, groups} = action.data;
+        const {channelID, groups, totalGroupCount} = action.data;
         const nextState = {...state};
-        const associatedGroupIDs = new Set(state[channelID] || []);
+        const associatedGroupIDs = new Set(state[channelID] ? state[channelID].ids : []);
         for (const group of groups) {
             associatedGroupIDs.add(group.id);
         }
-        nextState[channelID] = Array.from(associatedGroupIDs);
+        nextState[channelID] = {ids: Array.from(associatedGroupIDs), totalCount: totalGroupCount};
         return nextState;
     }
     case GroupTypes.RECEIVED_ALL_GROUPS_ASSOCIATED_TO_CHANNEL: {
@@ -427,13 +441,14 @@ function groupsAssociatedToChannel(state = {}, action) {
         for (const group of groups) {
             associatedGroupIDs.add(group.id);
         }
-        nextState[channelID] = Array.from(associatedGroupIDs);
+        const ids = Array.from(associatedGroupIDs);
+        nextState[channelID] = {ids, totalCount: ids.length};
         return nextState;
     }
     case GroupTypes.RECEIVED_GROUPS_NOT_ASSOCIATED_TO_CHANNEL: {
         const {channelID, groups} = action.data;
         const nextState = {...state};
-        const associatedGroupIDs = new Set(state[channelID] || []);
+        const associatedGroupIDs = new Set(state[channelID] ? state[channelID].ids : []);
         for (const group of groups) {
             associatedGroupIDs.delete(group.id);
         }
@@ -467,6 +482,16 @@ function updateChannelMemberSchemeRoles(state, action) {
     return state;
 }
 
+function totalCount(state = 0, action) {
+    switch (action.type) {
+    case ChannelTypes.RECEIVED_TOTAL_CHANNEL_COUNT: {
+        return action.data;
+    }
+    default:
+        return state;
+    }
+}
+
 export default combineReducers({
 
     // the current selected channel
@@ -488,4 +513,6 @@ export default combineReducers({
     stats,
 
     groupsAssociatedToChannel,
+
+    totalCount,
 });

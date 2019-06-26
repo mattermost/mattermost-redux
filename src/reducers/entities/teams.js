@@ -323,13 +323,13 @@ function stats(state = {}, action) {
 function groupsAssociatedToTeam(state = {}, action) {
     switch (action.type) {
     case GroupTypes.RECEIVED_GROUPS_ASSOCIATED_TO_TEAM: {
-        const {teamID, groups} = action.data;
+        const {teamID, groups, totalGroupCount} = action.data;
         const nextState = {...state};
-        const associatedGroupIDs = new Set(state[teamID] || []);
+        const associatedGroupIDs = new Set(state[teamID] ? state[teamID].ids : []);
         for (const group of groups) {
             associatedGroupIDs.add(group.id);
         }
-        nextState[teamID] = Array.from(associatedGroupIDs);
+        nextState[teamID] = {ids: Array.from(associatedGroupIDs), totalCount: totalGroupCount};
         return nextState;
     }
     case GroupTypes.RECEIVED_ALL_GROUPS_ASSOCIATED_TO_TEAM: {
@@ -339,13 +339,14 @@ function groupsAssociatedToTeam(state = {}, action) {
         for (const group of groups) {
             associatedGroupIDs.add(group.id);
         }
-        nextState[teamID] = Array.from(associatedGroupIDs);
+        const ids = Array.from(associatedGroupIDs);
+        nextState[teamID] = {ids, totalCount: ids.length};
         return nextState;
     }
     case GroupTypes.RECEIVED_GROUPS_NOT_ASSOCIATED_TO_TEAM: {
         const {teamID, groups} = action.data;
         const nextState = {...state};
-        const associatedGroupIDs = new Set(state[teamID] || []);
+        const associatedGroupIDs = new Set(state[teamID] ? state[teamID].ids : []);
         for (const group of groups) {
             associatedGroupIDs.delete(group.id);
         }
@@ -379,6 +380,16 @@ function updateTeamMemberSchemeRoles(state, action) {
     return state;
 }
 
+function totalCount(state = 0, action) {
+    switch (action.type) {
+    case TeamTypes.RECEIVED_TOTAL_TEAM_COUNT: {
+        return action.data;
+    }
+    default:
+        return state;
+    }
+}
+
 export default combineReducers({
 
     // the current selected team
@@ -397,4 +408,6 @@ export default combineReducers({
     stats,
 
     groupsAssociatedToTeam,
+
+    totalCount,
 });

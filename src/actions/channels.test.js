@@ -1284,6 +1284,56 @@ describe('Actions.Channels', () => {
         assert.ok(data.length === 2);
     });
 
+    it('getAllChannelsWithCount', async () => {
+        const userClient = TestHelper.createClient4();
+
+        nock(Client4.getUsersRoute()).
+            post('').
+            query(true).
+            reply(201, TestHelper.fakeUserWithId());
+
+        const user = await TestHelper.basicClient4.createUser(
+            TestHelper.fakeUser(),
+            null,
+            null,
+            TestHelper.basicTeam.invite_id
+        );
+
+        nock(Client4.getUsersRoute()).
+            post('/login').
+            reply(200, user);
+
+        await userClient.login(user.email, 'password1');
+
+        nock(Client4.getChannelsRoute()).
+            post('').
+            reply(201, TestHelper.fakeChannelWithId(TestHelper.basicTeam.id));
+
+        const userChannel = await userClient.createChannel(
+            TestHelper.fakeChannel(TestHelper.basicTeam.id)
+        );
+
+        const mockTotalCount = 84;
+        nock(Client4.getChannelsRoute()).
+            get('').
+            query(true).
+            reply(200, {channels: [TestHelper.basicChannel, userChannel], total_count: mockTotalCount});
+
+        assert.ok(store.getState().entities.channels.totalCount === 0);
+
+        const {data} = await store.dispatch(Actions.getAllChannelsWithCount(0));
+
+        const moreRequest = store.getState().requests.channels.getAllChannels;
+        if (moreRequest.status === RequestStatus.FAILURE) {
+            throw new Error(JSON.stringify(moreRequest.error));
+        }
+
+        assert.ok(data.channels.length === 2);
+        assert.ok(data.total_count === mockTotalCount);
+
+        assert.ok(store.getState().entities.channels.totalCount === mockTotalCount);
+    });
+
     it('searchAllChannels', async () => {
         const userClient = TestHelper.createClient4();
 
@@ -1550,7 +1600,7 @@ describe('Actions.Channels', () => {
 
     it('updateChannelHeader', async () => {
         nock(Client4.getChannelsRoute()).
-            post(`${TestHelper.basicChannel.id}`).
+            get(`/${TestHelper.basicChannel.id}`).
             reply(200, TestHelper.basicChannel);
 
         await store.dispatch(Actions.getChannel(TestHelper.basicChannel.id));
@@ -1567,7 +1617,7 @@ describe('Actions.Channels', () => {
 
     it('updateChannelPurpose', async () => {
         nock(Client4.getChannelsRoute()).
-            post(`${TestHelper.basicChannel.id}`).
+            get(`/${TestHelper.basicChannel.id}`).
             reply(200, TestHelper.basicChannel);
 
         await store.dispatch(Actions.getChannel(TestHelper.basicChannel.id));
@@ -1893,5 +1943,20 @@ describe('Actions.Channels', () => {
         const {data} = await Actions.getChannelTimezones(channelId)(dispatch, getState);
 
         assert.deepEqual(response, data);
+    });
+
+    it('membersMinusGroupMembers', async () => {
+        const channelID = 'cid10000000000000000000000';
+        const groupIDs = ['gid10000000000000000000000', 'gid20000000000000000000000'];
+        const page = 7;
+        const perPage = 63;
+
+        nock(Client4.getBaseRoute()).get(
+            `/channels/${channelID}/members_minus_group_members?group_ids=${groupIDs.join(',')}&page=${page}&per_page=${perPage}`).
+            reply(200, {users: [], total_count: 0});
+
+        const {error} = await Actions.membersMinusGroupMembers(channelID, groupIDs, page, perPage)(store.dispatch, store.getState);
+
+        assert.equal(error, null);
     });
 });

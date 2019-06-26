@@ -65,4 +65,5 @@ export type ChannelsState = {|
     membersInChannel: RelationOneToOne<Channel, UserIDMappedObjects<ChannelMembership>>,
     stats: RelationOneToOne<Channel, ChannelStats>,
     groupsAssociatedToChannel: Object,
+    totalCount: number,
 |};

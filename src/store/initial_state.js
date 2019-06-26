@@ -36,6 +36,7 @@ const state: GlobalState = {
             membersInTeam: {},
             stats: {},
             groupsAssociatedToTeam: {},
+            totalCount: 0,
         },
         channels: {
             currentChannelId: '',
@@ -45,6 +46,7 @@ const state: GlobalState = {
             membersInChannel: {},
             stats: {},
             groupsAssociatedToChannel: {},
+            totalCount: 0,
         },
         posts: {
             expandedURLs: {},

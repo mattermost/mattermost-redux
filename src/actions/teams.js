@@ -92,17 +92,43 @@ export function getTeamByName(teamName: string): ActionFunc {
     });
 }
 
-export function getTeams(page: number = 0, perPage: number = General.TEAMS_CHUNK_SIZE): ActionFunc {
-    return bindClientFunc({
-        clientFunc: Client4.getTeams,
-        onRequest: TeamTypes.GET_TEAMS_REQUEST,
-        onSuccess: [TeamTypes.RECEIVED_TEAMS_LIST, TeamTypes.GET_TEAMS_SUCCESS],
-        onFailure: TeamTypes.GET_TEAMS_FAILURE,
-        params: [
-            page,
-            perPage,
-        ],
-    });
+export function getTeams(page: number = 0, perPage: number = General.TEAMS_CHUNK_SIZE, includeTotalCount: boolean = false): ActionFunc {
+    return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
+        let data;
+
+        dispatch({type: TeamTypes.GET_TEAMS_REQUEST, data}, getState);
+
+        try {
+            data = await Client4.getTeams(page, perPage, includeTotalCount);
+        } catch (error) {
+            forceLogoutIfNecessary(error, dispatch, getState);
+            dispatch({type: TeamTypes.GET_TEAMS_FAILURE, data}, getState);
+            dispatch(logError(error));
+            return {error};
+        }
+
+        const actions = [
+            {
+                type: TeamTypes.RECEIVED_TEAMS_LIST,
+                data: includeTotalCount ? data.teams : data,
+            },
+            {
+                type: TeamTypes.GET_TEAMS_SUCCESS,
+                data,
+            },
+        ];
+
+        if (includeTotalCount) {
+            actions.push({
+                type: TeamTypes.RECEIVED_TOTAL_TEAM_COUNT,
+                data: data.total_count,
+            });
+        }
+
+        dispatch(batchActions(actions), getState);
+
+        return {data};
+    };
 }
 
 export function searchTeams(term: string): ActionFunc {

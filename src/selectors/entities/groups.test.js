@@ -78,12 +78,12 @@ describe('Selectors.Groups', () => {
             },
             teams: {
                 groupsAssociatedToTeam: {
-                    [teamID]: teamAssociatedGroupIDs,
+                    [teamID]: {ids: teamAssociatedGroupIDs},
                 },
             },
             channels: {
                 groupsAssociatedToChannel: {
-                    [channelID]: channelAssociatedGroupIDs,
+                    [channelID]: {ids: channelAssociatedGroupIDs},
                 },
             },
         },

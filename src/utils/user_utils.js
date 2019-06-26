@@ -101,10 +101,25 @@ export function removeUserFromList(userId: $ID<UserProfile>, list: Array<UserPro
 // matchable with startsWith
 //
 // E.g.: for "one.two.three" by "." it would yield
-// ["one.two.three", "two.three", "three"]
+// ["one.two.three", ".two.three", "two.three", ".three", "three"]
 export function getSuggestionsSplitBy(term: string, splitStr: string): Array<string> {
     const splitTerm = term.split(splitStr);
-    return splitTerm.map((st, i) => splitTerm.slice(i).join(splitStr));
+    const initialSuggestions = splitTerm.map((st, i) => splitTerm.slice(i).join(splitStr));
+
+    let suggestions = [];
+    if (splitStr === ' ') {
+        suggestions = initialSuggestions;
+    } else {
+        suggestions = initialSuggestions.reduce((acc, val) => {
+            if (acc.length === 0) {
+                acc.push(val);
+            } else {
+                acc.push(splitStr + val, val);
+            }
+            return acc;
+        }, []);
+    }
+    return suggestions;
 }
 
 export function getSuggestionsSplitByMultiple(term: string, splitStrs: Array<string>): Array<string> {

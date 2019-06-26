@@ -1209,15 +1209,26 @@ export const getDefaultChannelForTeams: (GlobalState) => RelationOneToOne<Team, 
 export const getMyFirstChannelForTeams: (GlobalState) => RelationOneToOne<Team, Channel> = createSelector(
     getAllChannels,
     getMyChannelMemberships,
+    getMyTeams,
     getCurrentUser,
-    (allChannels: IDMappedObjects<Channel>, myChannelMemberships: RelationOneToOne<Channel, ChannelMembership>, currentUser: UserProfile): RelationOneToOne<Team, Channel> => {
+    (allChannels: IDMappedObjects<Channel>, myChannelMemberships: RelationOneToOne<Channel, ChannelMembership>, myTeams: Array<Team>, currentUser: UserProfile): RelationOneToOne<Team, Channel> => {
         const locale = currentUser.locale || General.DEFAULT_LOCALE;
+
         const result = {};
-        for (const channel of Object.keys(allChannels).map((key) => allChannels[key]).sort(sortChannelsByDisplayName.bind(null, locale))) {
-            if (!result[channel.team_id] && myChannelMemberships[channel.id]) {
-                result[channel.team_id] = channel;
+        for (const team of myTeams) {
+            // Get a sorted array of all channels in the team that the current user is a member of
+            // $FlowFixMe
+            const teamChannels = Object.values(allChannels).
+                filter((channel: Channel) => channel && channel.team_id === team.id && Boolean(myChannelMemberships[channel.id])).
+                sort(sortChannelsByDisplayName.bind(null, locale));
+
+            if (teamChannels.length === 0) {
+                continue;
             }
+
+            result[team.id] = teamChannels[0];
         }
+
         return result;
     }
 );
