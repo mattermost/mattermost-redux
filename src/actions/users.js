@@ -623,6 +623,20 @@ export function getTermsOfService(): ActionFunc {
     });
 }
 
+export function promoteGuestToUser(userId: string): ActionFunc {
+    return bindClientFunc({
+        clientFunc: Client4.promoteGuestToUser,
+        params: [userId],
+    });
+}
+
+export function demoteUserToGuest(userId: string): ActionFunc {
+    return bindClientFunc({
+        clientFunc: Client4.demoteUserToGuest,
+        params: [userId],
+    });
+}
+
 export function createTermsOfService(text: string): ActionFunc {
     return bindClientFunc({
         clientFunc: Client4.createTermsOfService,
