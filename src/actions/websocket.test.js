@@ -478,6 +478,7 @@ describe('Actions.Websocket doReconnect', () => {
     const MOCK_GET_MY_TEAM_MEMBERS = 'MOCK_GET_MY_TEAM_MEMBERS';
     const MOCK_GET_POSTS = 'MOCK_GET_POSTS';
     const MOCK_CHANNELS_REQUEST = 'MOCK_CHANNELS_REQUEST';
+    const MOCK_CHECK_FOR_MODIFIED_USERS = 'MOCK_CHECK_FOR_MODIFIED_USERS';
 
     beforeAll(() => {
         UserActions.getStatusesByIds = jest.fn().mockReturnValue({
@@ -524,6 +525,13 @@ describe('Actions.Websocket doReconnect', () => {
         nock(Client4.getBaseRoute()).
             get(`/users/me/teams/${currentTeamId}/channels/members`).
             reply(200, []);
+
+        UserActions.checkForModifiedUsers = jest.fn().mockReturnValue({
+            type: MOCK_CHECK_FOR_MODIFIED_USERS,
+        });
+        nock(Client4.getBaseRoute()).
+            get('/users/ids').
+            reply(200, []);
     });
 
     it('handle doReconnect', async () => {
@@ -537,6 +545,7 @@ describe('Actions.Websocket doReconnect', () => {
             {type: MOCK_GET_MY_TEAM_MEMBERS},
             {type: MOCK_GET_POSTS},
             {type: MOCK_CHANNELS_REQUEST},
+            {type: MOCK_CHECK_FOR_MODIFIED_USERS},
             {type: GeneralTypes.WEBSOCKET_SUCCESS, timestamp},
         ];
 
@@ -557,6 +566,7 @@ describe('Actions.Websocket doReconnect', () => {
             {type: MOCK_GET_MY_TEAMS},
             {type: MOCK_GET_MY_TEAM_MEMBERS},
             {type: TeamTypes.LEAVE_TEAM, data: initialState.entities.teams.teams[currentTeamId]},
+            {type: MOCK_CHECK_FOR_MODIFIED_USERS},
             {type: GeneralTypes.WEBSOCKET_SUCCESS, timestamp},
         ];
 

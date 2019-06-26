@@ -4,6 +4,7 @@
 import {Client4} from 'client';
 import websocketClient from 'client/websocket_client';
 import {
+    checkForModifiedUsers,
     getMe,
     getProfilesByIds,
     getStatusesByIds,
@@ -168,6 +169,8 @@ export function doReconnect(now) {
                 dispatch(handleLeaveTeamEvent(newMsg));
             }
         }
+
+        dispatch(checkForModifiedUsers());
 
         dispatch({
             type: GeneralTypes.WEBSOCKET_SUCCESS,

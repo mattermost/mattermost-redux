@@ -543,11 +543,11 @@ export default class Client4 {
         );
     };
 
-    getProfilesByIds = async (userIds) => {
+    getProfilesByIds = async (userIds, options = {}) => {
         this.trackEvent('api', 'api_profiles_get_by_ids');
 
         return this.doFetch(
-            `${this.getUsersRoute()}/ids`,
+            `${this.getUsersRoute()}/ids${buildQueryString(options)}`,
             {method: 'post', body: JSON.stringify(userIds)}
         );
     };
