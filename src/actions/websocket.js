@@ -120,6 +120,21 @@ export function close(shouldReconnect = false) {
     };
 }
 
+export function doFirstConnect(now) {
+    return async (dispatch, getState) => {
+        const state = getState();
+
+        if (state.websocket.lastDisconnectAt) {
+            dispatch(checkForModifiedUsers());
+        }
+
+        dispatch({
+            type: GeneralTypes.WEBSOCKET_SUCCESS,
+            timestamp: now,
+        });
+    };
+}
+
 export function doReconnect(now) {
     return async (dispatch, getState) => {
         const state = getState();
@@ -190,10 +205,7 @@ function handleFirstConnect() {
         reconnect = false;
         doDispatch(doReconnect(now));
     } else {
-        doDispatch({
-            type: GeneralTypes.WEBSOCKET_SUCCESS,
-            timestamp: now,
-        });
+        doDispatch(doFirstConnect(now));
     }
 }
 

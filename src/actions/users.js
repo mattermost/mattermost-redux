@@ -1398,7 +1398,7 @@ export function clearUserAccessTokens(): ActionFunc {
 }
 
 export function checkForModifiedUsers() {
-    return (dispatch, getState) => {
+    return (dispatch: DispatchFunc, getState: GetStateFunc) => {
         const state = getState();
         const users = getUsers(state);
         const lastDisconnectAt = state.websocket.lastDisconnectAt;
