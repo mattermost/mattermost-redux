@@ -1353,6 +1353,9 @@ describe('Actions.Users', () => {
 
             store = await configureStore({
                 entities: {
+                    general: {
+                        serverVersion: '5.14.0',
+                    },
                     users: {
                         profiles: {
                             user1,
@@ -1371,6 +1374,25 @@ describe('Actions.Users', () => {
             expect(profiles.user1).toBe(user1);
             expect(profiles.user2).not.toBe(user2);
             expect(profiles.user2).toEqual({id: 'user2', update_at: 2000});
+        });
+
+        test('should do nothing on older servers', async () => {
+            const lastDisconnectAt = 1500;
+            store = await configureStore({
+                entities: {
+                    general: {
+                        serverVersion: '5.13.0',
+                    },
+                    users: {
+                        profiles: {},
+                    },
+                },
+                websocket: {
+                    lastDisconnectAt,
+                },
+            });
+
+            await store.dispatch(Actions.checkForModifiedUsers());
         });
     });
 });
