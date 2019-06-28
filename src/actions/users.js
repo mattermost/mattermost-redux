@@ -34,7 +34,7 @@ import {
     makeGroupMessageVisibleIfNecessary,
 } from './preferences';
 
-import {getConfig} from 'selectors/entities/general';
+import {getConfig, getServerVersion} from 'selectors/entities/general';
 import {getCurrentUserId, getUsers} from 'selectors/entities/users';
 
 export function checkMfa(loginId: string): ActionFunc {
@@ -1398,12 +1398,17 @@ export function clearUserAccessTokens(): ActionFunc {
 }
 
 export function checkForModifiedUsers() {
-    return (dispatch: DispatchFunc, getState: GetStateFunc) => {
+    return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         const state = getState();
         const users = getUsers(state);
         const lastDisconnectAt = state.websocket.lastDisconnectAt;
+        const serverVersion = getServerVersion(state);
 
-        return dispatch(getProfilesByIds(Object.keys(users), {since: lastDisconnectAt}));
+        if (!isMinimumServerVersion(serverVersion, 5, 14)) {
+            return;
+        }
+
+        await dispatch(getProfilesByIds(Object.keys(users), {since: lastDisconnectAt}));
     };
 }
 
