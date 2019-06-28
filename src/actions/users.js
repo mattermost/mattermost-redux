@@ -769,10 +769,10 @@ export function revokeAllSessionsForUser(userId: string): ActionFunc {
     };
 }
 
-export function revokeSessionsForAllUsers(userId: string): ActionFunc {
+export function revokeSessionsForAllUsers(): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         try {
-            await Client4.revokeSessionsForAllUsers(userId);
+            await Client4.revokeSessionsForAllUsers();
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch, getState);
             dispatch(logError(error));
