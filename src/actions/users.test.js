@@ -692,7 +692,7 @@ describe('Actions.Users', () => {
         assert.ok(sessions.length > 1);
 
         nock(Client4.getBaseRoute()).
-            post(`/users/${user.id}/sessions/revoke/all_users`).
+            post('/users/sessions/revoke/all').
             reply(200, OK_RESPONSE);
         const {data} = await Actions.revokeSessionsForAllUsers(user.id)(store.dispatch, store.getState);
         assert.deepEqual(data, true);

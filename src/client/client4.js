@@ -701,9 +701,9 @@ export default class Client4 {
         );
     };
 
-    revokeSessionsForAllUsers = async (userId) => {
+    revokeSessionsForAllUsers = async () => {
         return this.doFetch(
-            `${this.getUserRoute(userId)}/sessions/revoke/all_users`,
+            `${this.getUsersRoute()}/sessions/revoke/all`,
             {method: 'post'}
         );
     };
