@@ -131,7 +131,7 @@ export function loginById(id: string, password: string, mfaToken: string = ''): 
     };
 }
 
-function completeLogin(data: UserProfile): ActionFunc {
+export function completeLogin(data: UserProfile): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         dispatch({
             type: UserTypes.RECEIVED_ME,
