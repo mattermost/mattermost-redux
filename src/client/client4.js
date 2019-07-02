@@ -1503,6 +1503,13 @@ export default class Client4 {
         );
     };
 
+    getPostsUnread = async (channelId, userId) => {
+        return this.doFetch(
+            `${this.getUserRoute(userId)}/channels/${channelId}/posts/unread`,
+            {method: 'get'}
+        );
+    };
+
     getPostsSince = async (channelId, since) => {
         return this.doFetch(
             `${this.getChannelRoute(channelId)}/posts${buildQueryString({since})}`,

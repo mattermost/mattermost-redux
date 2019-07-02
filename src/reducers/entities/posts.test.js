@@ -610,10 +610,9 @@ describe('postsInChannel', () => {
                 data: {id: 'post1', channel_id: 'channel1'},
             });
 
-            expect(nextState).toBe(state);
             expect(nextState).toEqual({
                 channel1: [
-                    {order: ['post2', 'post3'], recent: false},
+                    {order: ['post2', 'post3'], recent: false}, {order: ['post1'], recent: true},
                 ],
             });
         });
@@ -1558,6 +1557,7 @@ describe('postsInChannel', () => {
                     order: ['post1', 'post2'],
                 },
                 afterPostId: 'post3',
+                recent: false,
             }, null, nextPosts);
 
             expect(nextState).not.toBe(state);
@@ -1590,6 +1590,7 @@ describe('postsInChannel', () => {
                     order: ['post1', 'post2'],
                 },
                 afterPostId: 'post3',
+                recent: false,
             }, null, nextPosts);
 
             expect(nextState).not.toBe(state);

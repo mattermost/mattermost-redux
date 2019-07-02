@@ -281,11 +281,6 @@ export function postsInChannel(state = {}, action, prevPosts, nextPosts) {
         }
 
         const recentBlockIndex = postsForChannel.findIndex((block) => block.recent);
-        if (recentBlockIndex === -1 && postsForChannel.length > 0) {
-            // Don't save newly created posts until the most recent posts for the channel have been loaded, unless
-            // the channel is completely empty
-            return state;
-        }
 
         let nextRecentBlock;
         if (recentBlockIndex === -1) {
@@ -444,7 +439,7 @@ export function postsInChannel(state = {}, action, prevPosts, nextPosts) {
         // Add a new block including the previous post and then have mergePostBlocks sort out any overlap or duplicates
         const newBlock = {
             order: [...order, afterPostId],
-            recent: false,
+            recent: action.recent,
         };
 
         let nextPostsForChannel = [...postsForChannel, newBlock];
