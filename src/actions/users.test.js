@@ -10,6 +10,7 @@ import {Client4} from 'client';
 import {RequestStatus} from 'constants';
 import TestHelper from 'test/test_helper';
 import configureStore from 'test/test_store';
+import deepFreeze from 'utils/deep_freeze';
 
 const OK_RESPONSE = {status: 'OK'};
 
@@ -1378,7 +1379,7 @@ describe('Actions.Users', () => {
 
         test('should do nothing on older servers', async () => {
             const lastDisconnectAt = 1500;
-            store = await configureStore({
+            const originalState = deepFreeze({
                 entities: {
                     general: {
                         serverVersion: '5.13.0',
@@ -1392,7 +1393,12 @@ describe('Actions.Users', () => {
                 },
             });
 
+            store = await configureStore(originalState);
+
             await store.dispatch(Actions.checkForModifiedUsers());
+
+            const profiles = store.getState().entities.users.profiles;
+            expect(profiles).toBe(originalState.entities.users.profiles);
         });
     });
 });
