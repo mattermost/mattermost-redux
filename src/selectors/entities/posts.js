@@ -526,7 +526,7 @@ export function getPostIdsInChannel(state: GlobalState, channelId: $ID<Channel>)
     return recentBlock.order;
 }
 
-export function getPostsChunkInChannelAroundTime(state: GlobalState, channelId: $ID<Channel>, timeStamp: number): ?Array<$ID<Post>> {
+export function getPostsChunkInChannelAroundTime(state: GlobalState, channelId: $ID<Channel>, timeStamp: number): ?Object {
     const postsEnitiy = state.entities.posts;
     const postsForChannel = postsEnitiy.postsInChannel[channelId];
     const posts = postsEnitiy.posts;
