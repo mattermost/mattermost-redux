@@ -433,6 +433,10 @@ export function getPostsPerDayAnalytics(teamId: string = ''): ActionFunc {
     return getAnalytics('post_counts_day', teamId);
 }
 
+export function getBotPostsPerDayAnalytics(teamId: string = ''): ActionFunc {
+    return getAnalytics('bot_post_counts_day', teamId);
+}
+
 export function getUsersPerDayAnalytics(teamId: string = ''): ActionFunc {
     return getAnalytics('user_counts_with_posts_day', teamId);
 }
