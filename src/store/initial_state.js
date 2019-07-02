@@ -629,6 +629,11 @@ const state: GlobalState = {
             },
         },
     },
+    websocket: {
+        connected: false,
+        lastConnectAt: 0,
+        lastDisconnectAt: 0,
+    },
 };
 
 export default state;

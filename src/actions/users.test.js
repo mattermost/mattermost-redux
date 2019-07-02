@@ -10,6 +10,7 @@ import {Client4} from 'client';
 import {RequestStatus} from 'constants';
 import TestHelper from 'test/test_helper';
 import configureStore from 'test/test_store';
+import deepFreeze from 'utils/deep_freeze';
 
 const OK_RESPONSE = {status: 'OK'};
 
@@ -1337,5 +1338,67 @@ describe('Actions.Users', () => {
         const {myUserAccessTokens} = store.getState().entities.users;
 
         assert.ok(Object.values(myUserAccessTokens).length === 0);
+    });
+
+    describe('checkForModifiedUsers', () => {
+        test('should request users by IDs that have changed since the last websocket disconnect', async () => {
+            const lastDisconnectAt = 1500;
+
+            const user1 = {id: 'user1', update_at: 1000};
+            const user2 = {id: 'user2', update_at: 1000};
+
+            nock(Client4.getUsersRoute()).
+                post('/ids').
+                query({since: lastDisconnectAt}).
+                reply(200, [{...user2, update_at: 2000}]);
+
+            store = await configureStore({
+                entities: {
+                    general: {
+                        serverVersion: '5.14.0',
+                    },
+                    users: {
+                        profiles: {
+                            user1,
+                            user2,
+                        },
+                    },
+                },
+                websocket: {
+                    lastDisconnectAt,
+                },
+            });
+
+            await store.dispatch(Actions.checkForModifiedUsers());
+
+            const profiles = store.getState().entities.users.profiles;
+            expect(profiles.user1).toBe(user1);
+            expect(profiles.user2).not.toBe(user2);
+            expect(profiles.user2).toEqual({id: 'user2', update_at: 2000});
+        });
+
+        test('should do nothing on older servers', async () => {
+            const lastDisconnectAt = 1500;
+            const originalState = deepFreeze({
+                entities: {
+                    general: {
+                        serverVersion: '5.13.0',
+                    },
+                    users: {
+                        profiles: {},
+                    },
+                },
+                websocket: {
+                    lastDisconnectAt,
+                },
+            });
+
+            store = await configureStore(originalState);
+
+            await store.dispatch(Actions.checkForModifiedUsers());
+
+            const profiles = store.getState().entities.users.profiles;
+            expect(profiles).toBe(originalState.entities.users.profiles);
+        });
     });
 });
