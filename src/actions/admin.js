@@ -477,9 +477,7 @@ export function installPluginFromUrl(url: string, force: boolean = false): Actio
             return {error};
         }
 
-        dispatch(batchActions([
-            {type: AdminTypes.INSTALL_PLUGIN_FROM_URL_SUCCESS, data: null},
-        ]));
+        dispatch({type: AdminTypes.INSTALL_PLUGIN_FROM_URL_SUCCESS, data: null});
 
         return {data};
     };
