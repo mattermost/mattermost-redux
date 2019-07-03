@@ -465,6 +465,28 @@ export function uploadPlugin(fileData: File, force: boolean = false): ActionFunc
     };
 }
 
+export function installPluginFromUrl(url: string, force: boolean = false): ActionFunc {
+    return async (dispatch, getState) => {
+        dispatch({type: AdminTypes.INSTALL_PLUGIN_FROM_URL_REQUEST, data: null});
+
+        let data;
+        try {
+            data = await Client4.installPluginFromUrl(url, force);
+        } catch (error) {
+            forceLogoutIfNecessary(error, dispatch, getState);
+            dispatch(batchActions([
+                {type: AdminTypes.INSTALL_PLUGIN_FROM_URL_FAILURE, error},
+                logError(error),
+            ]));
+            return {error};
+        }
+
+        dispatch({type: AdminTypes.INSTALL_PLUGIN_FROM_URL_SUCCESS, data: null});
+
+        return {data};
+    };
+}
+
 export function getPlugins(): ActionFunc {
     return bindClientFunc({
         clientFunc: Client4.getPlugins,
