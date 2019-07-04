@@ -49,6 +49,13 @@ export default class Client4 {
         return this.url;
     }
 
+    getAbsoluteUrl(baseUrl) {
+        if (typeof baseUrl !== 'string' || !baseUrl.startsWith('/')) {
+            return baseUrl;
+        }
+        return this.getUrl() + baseUrl;
+    }
+
     setUrl(url) {
         this.url = url;
     }
