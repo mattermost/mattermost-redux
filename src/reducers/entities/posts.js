@@ -917,7 +917,7 @@ export function postsInThread(state = {}, action, prevPosts) {
         // Remove entries for any thread in the channel
         const nextState = {...state};
         for (const rootId of Object.keys(state)) {
-            if (prevPosts[rootId].channel_id === channelId) {
+            if (prevPosts[rootId] && prevPosts[rootId].channel_id === channelId) {
                 Reflect.deleteProperty(nextState, rootId);
                 postDeleted = true;
             }
