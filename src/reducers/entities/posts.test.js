@@ -884,7 +884,10 @@ describe('postsInChannel', () => {
 
             expect(nextState).not.toBe(state);
             expect(nextState).toEqual({
-                channel1: [],
+                channel1: [{
+                    order: [],
+                    recent: true,
+                }],
             });
         });
 
@@ -1143,7 +1146,10 @@ describe('postsInChannel', () => {
 
             expect(nextState).not.toBe(state);
             expect(nextState).toEqual({
-                channel1: [],
+                channel1: [{
+                    order: [],
+                    recent: false,
+                }],
             });
         });
 

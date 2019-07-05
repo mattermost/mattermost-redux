@@ -661,6 +661,10 @@ export function mergePostBlocks(blocks, posts) {
     // Remove any blocks that may have become empty by removing posts
     nextBlocks = removeEmptyPostBlocks(blocks);
 
+    if (!nextBlocks.length) {
+        return blocks;
+    }
+
     // Sort blocks so that the most recent one comes first
     nextBlocks.sort((a, b) => {
         const aStartsAt = posts[a.order[0]].create_at;
