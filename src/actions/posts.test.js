@@ -385,6 +385,7 @@ describe('Actions.Posts', () => {
 
         nock(Client4.getUsersRoute()).
             get(`/${userId}/channels/${channelId}/posts/unread`).
+            query(true).
             reply(200, response);
 
         await Actions.getPostsUnread(channelId)(dispatch, getState);
