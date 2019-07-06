@@ -701,6 +701,13 @@ export default class Client4 {
         );
     };
 
+    revokeSessionsForAllUsers = async () => {
+        return this.doFetch(
+            `${this.getUsersRoute()}/sessions/revoke/all`,
+            {method: 'post'}
+        );
+    };
+
     getUserAudits = async (userId, page = 0, perPage = PER_PAGE_DEFAULT) => {
         return this.doFetch(
             `${this.getUserRoute(userId)}/audits${buildQueryString({page, per_page: perPage})}`,
@@ -2550,6 +2557,17 @@ export default class Client4 {
         return this.doFetch(
             this.getPluginsRoute(),
             request
+        );
+    };
+
+    installPluginFromUrl = async (pluginDownloadUrl, force = false) => {
+        this.trackEvent('api', 'api_install_plugin');
+
+        const queryParams = {plugin_download_url: pluginDownloadUrl, force};
+
+        return this.doFetch(
+            `${this.getPluginsRoute()}/install_from_url${buildQueryString(queryParams)}`,
+            {method: 'post'}
         );
     };
 

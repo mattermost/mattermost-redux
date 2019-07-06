@@ -666,6 +666,59 @@ describe('Actions.Users', () => {
         await TestHelper.basicClient4.login(TestHelper.basicUser.email, 'password1');
     });
 
+    it('revokeSessionsForAllUsers', async () => {
+        const user = TestHelper.basicUser;
+        nock(Client4.getUsersRoute()).
+            post('/logout').
+            reply(200, OK_RESPONSE);
+        await TestHelper.basicClient4.logout();
+        let sessions = store.getState().entities.users.mySessions;
+
+        assert.strictEqual(sessions.length, 0);
+
+        TestHelper.mockLogin();
+        await Actions.loginById(user.id, 'password1')(store.dispatch, store.getState);
+
+        nock(Client4.getUsersRoute()).
+            post('/login').
+            reply(200, TestHelper.basicUser);
+        await TestHelper.basicClient4.login(TestHelper.basicUser.email, 'password1');
+
+        nock(Client4.getBaseRoute()).
+            get(`/users/${user.id}/sessions`).
+            reply(200, [{id: TestHelper.generateId(), create_at: 1507756921338, expires_at: 1510348921338, last_activity_at: 1507821125630, user_id: TestHelper.basicUser.id, device_id: '', roles: 'system_admin system_user'}, {id: TestHelper.generateId(), create_at: 1507756921338, expires_at: 1510348921338, last_activity_at: 1507821125630, user_id: TestHelper.basicUser.id, device_id: '', roles: 'system_admin system_user'}]);
+        await Actions.getSessions(user.id)(store.dispatch, store.getState);
+
+        sessions = store.getState().entities.users.mySessions;
+        assert.ok(sessions.length > 1);
+
+        nock(Client4.getBaseRoute()).
+            post('/users/sessions/revoke/all').
+            reply(200, OK_RESPONSE);
+        const {data} = await Actions.revokeSessionsForAllUsers(user.id)(store.dispatch, store.getState);
+        assert.deepEqual(data, true);
+
+        nock(Client4.getUsersRoute()).
+            get('').
+            query(true).
+            reply(401, {});
+        await Actions.getProfiles(0)(store.dispatch, store.getState);
+
+        const logoutRequest = store.getState().requests.users.logout;
+        if (logoutRequest.status === RequestStatus.FAILURE) {
+            throw new Error(JSON.stringify(logoutRequest.error));
+        }
+
+        sessions = store.getState().entities.users.mySessions;
+
+        assert.strictEqual(sessions.length, 0);
+
+        nock(Client4.getUsersRoute()).
+            post('/login').
+            reply(200, TestHelper.basicUser);
+        await TestHelper.basicClient4.login(TestHelper.basicUser.email, 'password1');
+    });
+
     it('getUserAudits', async () => {
         nock(Client4.getUsersRoute()).
             get(`/${TestHelper.basicUser.id}/audits`).
