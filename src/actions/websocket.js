@@ -1,5 +1,6 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
+// @flow
 
 import {Client4} from 'client';
 import websocketClient from 'client/websocket_client';
@@ -54,11 +55,12 @@ import {getCurrentUser, getCurrentUserId, getUsers, getUserStatuses} from 'selec
 import {getChannelByName} from 'utils/channel_utils';
 import {fromAutoResponder} from 'utils/post_utils';
 import EventEmitter from 'utils/event_emitter';
+import type {ActionFunc, DispatchFunc, GetStateFunc, PlatformType} from '../types/actions';
 
 let doDispatch;
 
-export function init(platform, siteUrl, token, optionalWebSocket, additionalOptions = {}) {
-    return async (dispatch, getState) => {
+export function init(platform: PlatformType, siteUrl: ?string, token: ?string, optionalWebSocket: Object, additionalOptions: Object = {}) {
+    return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         const config = getConfig(getState());
         let connUrl = siteUrl || config.WebsocketURL || Client4.getUrl();
         const authToken = token || Client4.getToken();
@@ -106,18 +108,18 @@ export function init(platform, siteUrl, token, optionalWebSocket, additionalOpti
 }
 
 let reconnect = false;
-export function close(shouldReconnect = false) {
-    return async (dispatch) => {
+export function close(shouldReconnect: boolean = false) {
+    return async (dispatch: DispatchFunc) => {
         reconnect = shouldReconnect;
         websocketClient.close(true);
         if (dispatch) {
-            dispatch({type: GeneralTypes.WEBSOCKET_CLOSED});
+            dispatch({type: GeneralTypes.WEBSOCKET_CLOSED, data: null});
         }
     };
 }
 
 export function doReconnect() {
-    return async (dispatch, getState) => {
+    return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         const state = getState();
         const currentTeamId = getCurrentTeamId(state);
         const currentChannelId = getCurrentChannelId(state);
@@ -145,7 +147,8 @@ export function doReconnect() {
             const currentTeamMembership = getCurrentTeamMembership(getState());
             if (currentTeamMembership) {
                 dispatch(getPosts(currentChannelId));
-                const {data} = await dispatch(fetchMyChannelsAndMembers(currentTeamId));
+                const fethcResult = await dispatch(fetchMyChannelsAndMembers(currentTeamId));
+                const data = fethcResult.data || null;
                 dispatch(loadProfilesForDirect());
 
                 if (data && data.members) {
@@ -166,12 +169,13 @@ export function doReconnect() {
             }
         }
 
-        dispatch({type: GeneralTypes.WEBSOCKET_SUCCESS});
+        dispatch({type: GeneralTypes.WEBSOCKET_SUCCESS, data: null});
+        return {data: true};
     };
 }
 
 function handleConnecting() {
-    doDispatch({type: GeneralTypes.WEBSOCKET_REQUEST});
+    doDispatch({type: GeneralTypes.WEBSOCKET_REQUEST, data: null});
 }
 
 function handleFirstConnect() {
@@ -179,7 +183,7 @@ function handleFirstConnect() {
         reconnect = false;
         doDispatch(doReconnect());
     } else {
-        doDispatch({type: GeneralTypes.WEBSOCKET_SUCCESS});
+        doDispatch({type: GeneralTypes.WEBSOCKET_SUCCESS, data: null});
     }
 }
 
@@ -191,6 +195,7 @@ function handleClose(connectFailCount) {
     doDispatch({
         type: GeneralTypes.WEBSOCKET_FAILURE,
         error: connectFailCount,
+        data: null,
     });
 }
 
@@ -212,9 +217,10 @@ function handleEvent(msg) {
     case WebsocketEvents.UPDATE_TEAM:
         doDispatch(handleUpdateTeamEvent(msg));
         break;
-    case WebsocketEvents.PATCH_TEAM:
-        doDispatch(handlePatchTeamEvent(msg));
-        break;
+
+    // case WebsocketEvents.PATCH_TEAM:
+    //     doDispatch(handlePatchTeamEvent(msg));
+    //     break;
     case WebsocketEvents.ADDED_TO_TEAM:
         doDispatch(handleTeamAddedEvent(msg));
         break;
@@ -312,15 +318,17 @@ function handleNewPostEvent(msg) {
                 data: [{user_id: post.user_id, status: General.ONLINE}],
             });
         }
+        return {data: true};
     };
 }
 
 function handlePostEdited(msg) {
-    return (dispatch, getState) => {
+    return async (dispatch, getState) => {
         const data = JSON.parse(msg.data.post);
 
         getProfilesAndStatusesForPosts([data], dispatch, getState);
         dispatch(receivedPost(data));
+        return {data: true};
     };
 }
 
@@ -330,8 +338,8 @@ function handlePostDeleted(msg) {
     return postDeleted(data);
 }
 
-function handleLeaveTeamEvent(msg) {
-    return (dispatch, getState) => {
+function handleLeaveTeamEvent(msg): ActionFunc {
+    return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         const state = getState();
         const teams = getTeamsSelector(state);
         const currentTeamId = getCurrentTeamId(state);
@@ -345,6 +353,7 @@ function handleLeaveTeamEvent(msg) {
                 EventEmitter.emit('leave_team');
             }
         }
+        return {data: true};
     };
 }
 
@@ -355,12 +364,12 @@ function handleUpdateTeamEvent(msg) {
     };
 }
 
-function handlePatchTeamEvent(msg) {
-    return {
-        type: TeamTypes.PATCHED_TEAM,
-        data: JSON.parse(msg.data.team),
-    };
-}
+// function handlePatchTeamEvent(msg) {
+//     return {
+//         type: TeamTypes.PATCHED_TEAM,
+//         data: JSON.parse(msg.data.team),
+//     };
+// }
 
 function handleTeamAddedEvent(msg) {
     return async (dispatch) => {
@@ -368,11 +377,12 @@ function handleTeamAddedEvent(msg) {
             dispatch(getTeam(msg.data.team_id)),
             dispatch(getMyTeamUnreads()),
         ]);
+        return {data: true};
     };
 }
 
 function handleUserAddedEvent(msg) {
-    return (dispatch, getState) => {
+    return async (dispatch, getState) => {
         const state = getState();
         const currentChannelId = getCurrentChannelId(state);
         const currentTeamId = getCurrentTeamId(state);
@@ -388,17 +398,18 @@ function handleUserAddedEvent(msg) {
         }, getState);
 
         if (msg.broadcast.channel_id === currentChannelId) {
-            dispatch(getChannelStats(teamId, currentChannelId));
+            dispatch(getChannelStats(currentChannelId));
         }
 
         if (teamId === currentTeamId && msg.data.user_id === currentUserId) {
             dispatch(getChannelAndMyMember(msg.broadcast.channel_id));
         }
+        return {data: true};
     };
 }
 
 function handleUserRemovedEvent(msg) {
-    return (dispatch, getState) => {
+    return async (dispatch, getState) => {
         const state = getState();
         const channels = getAllChannels(state);
         const currentChannelId = getCurrentChannelId(state);
@@ -435,13 +446,14 @@ function handleUserRemovedEvent(msg) {
                 EventEmitter.emit(General.SWITCH_TO_DEFAULT_CHANNEL, currentTeamId);
             }
         } else if (msg.data.channel_id === currentChannelId) {
-            dispatch(getChannelStats(currentTeamId, currentChannelId));
+            dispatch(getChannelStats(currentChannelId));
         }
+        return {data: true};
     };
 }
 
 function handleUserUpdatedEvent(msg) {
-    return (dispatch, getState) => {
+    return async (dispatch, getState) => {
         const currentUser = getCurrentUser(getState());
         const user = msg.data.user;
 
@@ -459,6 +471,7 @@ function handleUserUpdatedEvent(msg) {
                 },
             });
         }
+        return {data: true};
     };
 }
 
@@ -490,7 +503,7 @@ function handleRoleUpdatedEvent(msg) {
 }
 
 function handleChannelCreatedEvent(msg) {
-    return (dispatch, getState) => {
+    return async (dispatch, getState) => {
         const {channel_id: channelId, team_id: teamId} = msg.data;
         const state = getState();
         const channels = getAllChannels(state);
@@ -499,11 +512,12 @@ function handleChannelCreatedEvent(msg) {
         if (teamId === currentTeamId && !channels[channelId]) {
             dispatch(getChannelAndMyMember(channelId));
         }
+        return {data: true};
     };
 }
 
 function handleChannelDeletedEvent(msg) {
-    return (dispatch, getState) => {
+    return async (dispatch, getState) => {
         const state = getState();
         const currentChannelId = getCurrentChannelId(state);
         const currentTeamId = getCurrentTeamId(state);
@@ -524,16 +538,17 @@ function handleChannelDeletedEvent(msg) {
 
             dispatch(fetchMyChannelsAndMembers(currentTeamId));
         }
+        return {data: true};
     };
 }
 
 function handleChannelUpdatedEvent(msg) {
-    return (dispatch, getState) => {
+    return async (dispatch, getState) => {
         let channel;
         try {
             channel = msg.data ? JSON.parse(msg.data.channel) : null;
         } catch (err) {
-            return;
+            return {error: err};
         }
 
         const currentChannelId = getCurrentChannelId(getState());
@@ -549,12 +564,13 @@ function handleChannelUpdatedEvent(msg) {
                 EventEmitter.emit(WebsocketEvents.CHANNEL_UPDATED, channel);
             }
         }
+        return {data: true};
     };
 }
 
 // handleChannelConvertedEvent handles updating of channel which is converted from public to private
 function handleChannelConvertedEvent(msg) {
-    return (dispatch, getState) => {
+    return async (dispatch, getState) => {
         const channelId = msg.data.channel_id;
         if (channelId) {
             const channel = getChannel(getState(), channelId);
@@ -565,11 +581,12 @@ function handleChannelConvertedEvent(msg) {
                 });
             }
         }
+        return {data: true};
     };
 }
 
 function handleChannelViewedEvent(msg) {
-    return (dispatch, getState) => {
+    return async (dispatch, getState) => {
         const state = getState();
         const {channel_id: channelId} = msg.data;
         const currentChannelId = getCurrentChannelId(state);
@@ -578,6 +595,7 @@ function handleChannelViewedEvent(msg) {
         if (channelId !== currentChannelId && currentUserId === msg.broadcast.user_id) {
             dispatch(markChannelAsRead(channelId, null, false));
         }
+        return {data: true};
     };
 }
 
@@ -591,22 +609,24 @@ function handleChannelMemberUpdatedEvent(msg) {
 }
 
 function handleDirectAddedEvent(msg) {
-    return (dispatch) => {
+    return async (dispatch) => {
         dispatch(getChannelAndMyMember(msg.broadcast.channel_id));
+        return {data: true};
     };
 }
 
 function handlePreferenceChangedEvent(msg) {
-    return (dispatch) => {
+    return async (dispatch) => {
         const preference = JSON.parse(msg.data.preference);
         dispatch({type: PreferenceTypes.RECEIVED_PREFERENCES, data: [preference]});
 
         dispatch(getAddedDmUsersIfNecessary([preference]));
+        return {data: true};
     };
 }
 
 function handlePreferencesChangedEvent(msg) {
-    return (dispatch, getState) => {
+    return async (dispatch, getState) => {
         const preferences = JSON.parse(msg.data.preferences);
         const posts = getAllPosts(getState());
 
@@ -618,6 +638,7 @@ function handlePreferencesChangedEvent(msg) {
 
         dispatch(getAddedDmUsersIfNecessary(preferences));
         dispatch({type: PreferenceTypes.RECEIVED_PREFERENCES, data: preferences});
+        return {data: true};
     };
 }
 
@@ -643,7 +664,7 @@ function handleHelloEvent(msg) {
 }
 
 function handleUserTypingEvent(msg) {
-    return (dispatch, getState) => {
+    return async (dispatch, getState) => {
         const state = getState();
         const profiles = getUsers(state);
         const statuses = getUserStatuses(state);
@@ -677,11 +698,13 @@ function handleUserTypingEvent(msg) {
         if (status !== General.ONLINE) {
             dispatch(getStatusesByIds([userId]));
         }
+
+        return {data: true};
     };
 }
 
 function handleReactionAddedEvent(msg) {
-    return (dispatch) => {
+    return async (dispatch) => {
         const {data} = msg;
         const reaction = JSON.parse(data.reaction);
 
@@ -691,6 +714,7 @@ function handleReactionAddedEvent(msg) {
             type: PostTypes.RECEIVED_REACTION,
             data: reaction,
         });
+        return {data: true};
     };
 }
 
@@ -742,15 +766,16 @@ function handlePluginStatusesChangedEvent(msg) {
 }
 
 function handleOpenDialogEvent(msg) {
-    return (dispatch) => {
+    return async (dispatch) => {
         const data = (msg.data && msg.data.dialog) || {};
         dispatch({type: IntegrationTypes.RECEIVED_DIALOG, data: JSON.parse(data)});
+        return {data: true};
     };
 }
 
 // Helpers
 function getAddedDmUsersIfNecessary(preferences) {
-    return (dispatch, getState) => {
+    return async (dispatch, getState) => {
         const userIds = [];
 
         for (const preference of preferences) {
@@ -760,7 +785,7 @@ function getAddedDmUsersIfNecessary(preferences) {
         }
 
         if (userIds.length === 0) {
-            return;
+            return {data: true};
         }
 
         const state = getState();
@@ -788,12 +813,14 @@ function getAddedDmUsersIfNecessary(preferences) {
         if (needStatuses.length > 0) {
             dispatch(getStatusesByIds(needStatuses));
         }
+
+        return {data: true};
     };
 }
 
 let lastTimeTypingSent = 0;
-export function userTyping(channelId, parentPostId) {
-    return async (dispatch, getState) => {
+export function userTyping(channelId: string, parentPostId: string): ActionFunc {
+    return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         const state = getState();
         const config = getConfig(state);
         const t = Date.now();

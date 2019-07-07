@@ -536,7 +536,7 @@ describe('Actions.Websocket doReconnect', () => {
             {type: MOCK_GET_MY_TEAM_MEMBERS},
             {type: MOCK_GET_POSTS},
             {type: MOCK_CHANNELS_REQUEST},
-            {type: GeneralTypes.WEBSOCKET_SUCCESS},
+            {type: GeneralTypes.WEBSOCKET_SUCCESS, data: null},
         ];
 
         await testStore.dispatch(Actions.doReconnect());
@@ -555,7 +555,7 @@ describe('Actions.Websocket doReconnect', () => {
             {type: MOCK_GET_MY_TEAMS},
             {type: MOCK_GET_MY_TEAM_MEMBERS},
             {type: TeamTypes.LEAVE_TEAM, data: initialState.entities.teams.teams[currentTeamId]},
-            {type: GeneralTypes.WEBSOCKET_SUCCESS},
+            {type: GeneralTypes.WEBSOCKET_SUCCESS, data: null},
         ];
 
         const expectedMissingActions = [
