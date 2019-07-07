@@ -18,6 +18,7 @@ module.exports = {
     plugins: [
         '@babel/transform-flow-comments',
         '@babel/proposal-class-properties',
+        '@babel/plugin-proposal-optional-chaining',
         ['module-resolver', {
             root: ['./src', '.'],
         }],

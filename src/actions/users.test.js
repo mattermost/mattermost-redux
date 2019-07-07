@@ -10,6 +10,7 @@ import {Client4} from 'client';
 import {RequestStatus} from 'constants';
 import TestHelper from 'test/test_helper';
 import configureStore from 'test/test_store';
+import deepFreeze from 'utils/deep_freeze';
 
 const OK_RESPONSE = {status: 'OK'};
 
@@ -642,6 +643,59 @@ describe('Actions.Users', () => {
             post(`/users/${user.id}/sessions/revoke/all`).
             reply(200, OK_RESPONSE);
         const {data} = await Actions.revokeAllSessionsForUser(user.id)(store.dispatch, store.getState);
+        assert.deepEqual(data, true);
+
+        nock(Client4.getUsersRoute()).
+            get('').
+            query(true).
+            reply(401, {});
+        await Actions.getProfiles(0)(store.dispatch, store.getState);
+
+        const logoutRequest = store.getState().requests.users.logout;
+        if (logoutRequest.status === RequestStatus.FAILURE) {
+            throw new Error(JSON.stringify(logoutRequest.error));
+        }
+
+        sessions = store.getState().entities.users.mySessions;
+
+        assert.strictEqual(sessions.length, 0);
+
+        nock(Client4.getUsersRoute()).
+            post('/login').
+            reply(200, TestHelper.basicUser);
+        await TestHelper.basicClient4.login(TestHelper.basicUser.email, 'password1');
+    });
+
+    it('revokeSessionsForAllUsers', async () => {
+        const user = TestHelper.basicUser;
+        nock(Client4.getUsersRoute()).
+            post('/logout').
+            reply(200, OK_RESPONSE);
+        await TestHelper.basicClient4.logout();
+        let sessions = store.getState().entities.users.mySessions;
+
+        assert.strictEqual(sessions.length, 0);
+
+        TestHelper.mockLogin();
+        await Actions.loginById(user.id, 'password1')(store.dispatch, store.getState);
+
+        nock(Client4.getUsersRoute()).
+            post('/login').
+            reply(200, TestHelper.basicUser);
+        await TestHelper.basicClient4.login(TestHelper.basicUser.email, 'password1');
+
+        nock(Client4.getBaseRoute()).
+            get(`/users/${user.id}/sessions`).
+            reply(200, [{id: TestHelper.generateId(), create_at: 1507756921338, expires_at: 1510348921338, last_activity_at: 1507821125630, user_id: TestHelper.basicUser.id, device_id: '', roles: 'system_admin system_user'}, {id: TestHelper.generateId(), create_at: 1507756921338, expires_at: 1510348921338, last_activity_at: 1507821125630, user_id: TestHelper.basicUser.id, device_id: '', roles: 'system_admin system_user'}]);
+        await Actions.getSessions(user.id)(store.dispatch, store.getState);
+
+        sessions = store.getState().entities.users.mySessions;
+        assert.ok(sessions.length > 1);
+
+        nock(Client4.getBaseRoute()).
+            post('/users/sessions/revoke/all').
+            reply(200, OK_RESPONSE);
+        const {data} = await Actions.revokeSessionsForAllUsers(user.id)(store.dispatch, store.getState);
         assert.deepEqual(data, true);
 
         nock(Client4.getUsersRoute()).
@@ -1337,5 +1391,67 @@ describe('Actions.Users', () => {
         const {myUserAccessTokens} = store.getState().entities.users;
 
         assert.ok(Object.values(myUserAccessTokens).length === 0);
+    });
+
+    describe('checkForModifiedUsers', () => {
+        test('should request users by IDs that have changed since the last websocket disconnect', async () => {
+            const lastDisconnectAt = 1500;
+
+            const user1 = {id: 'user1', update_at: 1000};
+            const user2 = {id: 'user2', update_at: 1000};
+
+            nock(Client4.getUsersRoute()).
+                post('/ids').
+                query({since: lastDisconnectAt}).
+                reply(200, [{...user2, update_at: 2000}]);
+
+            store = await configureStore({
+                entities: {
+                    general: {
+                        serverVersion: '5.14.0',
+                    },
+                    users: {
+                        profiles: {
+                            user1,
+                            user2,
+                        },
+                    },
+                },
+                websocket: {
+                    lastDisconnectAt,
+                },
+            });
+
+            await store.dispatch(Actions.checkForModifiedUsers());
+
+            const profiles = store.getState().entities.users.profiles;
+            expect(profiles.user1).toBe(user1);
+            expect(profiles.user2).not.toBe(user2);
+            expect(profiles.user2).toEqual({id: 'user2', update_at: 2000});
+        });
+
+        test('should do nothing on older servers', async () => {
+            const lastDisconnectAt = 1500;
+            const originalState = deepFreeze({
+                entities: {
+                    general: {
+                        serverVersion: '5.13.0',
+                    },
+                    users: {
+                        profiles: {},
+                    },
+                },
+                websocket: {
+                    lastDisconnectAt,
+                },
+            });
+
+            store = await configureStore(originalState);
+
+            await store.dispatch(Actions.checkForModifiedUsers());
+
+            const profiles = store.getState().entities.users.profiles;
+            expect(profiles).toBe(originalState.entities.users.profiles);
+        });
     });
 });

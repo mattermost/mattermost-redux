@@ -134,6 +134,12 @@ export function convertAnalyticsRowsToStats(data, name) {
         return stats;
     }
 
+    if (name === 'bot_post_counts_day') {
+        clonedData.reverse();
+        stats[Stats.BOT_POST_PER_DAY] = clonedData;
+        return stats;
+    }
+
     if (name === 'user_counts_with_posts_day') {
         clonedData.reverse();
         stats[Stats.USERS_WITH_POSTS_PER_DAY] = clonedData;

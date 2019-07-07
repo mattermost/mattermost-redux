@@ -4,6 +4,7 @@
 import {Client4} from 'client';
 import websocketClient from 'client/websocket_client';
 import {
+    checkForModifiedUsers,
     getMe,
     getProfilesByIds,
     getStatusesByIds,
@@ -111,12 +112,30 @@ export function close(shouldReconnect = false) {
         reconnect = shouldReconnect;
         websocketClient.close(true);
         if (dispatch) {
-            dispatch({type: GeneralTypes.WEBSOCKET_CLOSED});
+            dispatch({
+                type: GeneralTypes.WEBSOCKET_CLOSED,
+                timestamp: Date.now(),
+            });
         }
     };
 }
 
-export function doReconnect() {
+export function doFirstConnect(now) {
+    return async (dispatch, getState) => {
+        const state = getState();
+
+        if (state.websocket.lastDisconnectAt) {
+            dispatch(checkForModifiedUsers());
+        }
+
+        dispatch({
+            type: GeneralTypes.WEBSOCKET_SUCCESS,
+            timestamp: now,
+        });
+    };
+}
+
+export function doReconnect(now) {
     return async (dispatch, getState) => {
         const state = getState();
         const currentTeamId = getCurrentTeamId(state);
@@ -166,7 +185,12 @@ export function doReconnect() {
             }
         }
 
-        dispatch({type: GeneralTypes.WEBSOCKET_SUCCESS});
+        dispatch(checkForModifiedUsers());
+
+        dispatch({
+            type: GeneralTypes.WEBSOCKET_SUCCESS,
+            timestamp: now,
+        });
     };
 }
 
@@ -175,22 +199,25 @@ function handleConnecting() {
 }
 
 function handleFirstConnect() {
+    const now = Date.now();
+
     if (reconnect) {
         reconnect = false;
-        doDispatch(doReconnect());
+        doDispatch(doReconnect(now));
     } else {
-        doDispatch({type: GeneralTypes.WEBSOCKET_SUCCESS});
+        doDispatch(doFirstConnect(now));
     }
 }
 
 function handleReconnect() {
-    doDispatch(doReconnect());
+    doDispatch(doReconnect(Date.now()));
 }
 
 function handleClose(connectFailCount) {
     doDispatch({
         type: GeneralTypes.WEBSOCKET_FAILURE,
         error: connectFailCount,
+        timestamp: Date.now(),
     });
 }
 

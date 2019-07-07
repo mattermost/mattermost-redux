@@ -3154,6 +3154,26 @@ describe('postsInThread', () => {
                     root2: ['comment3'],
                 });
             });
+
+            it('should not error if a post is missing from prevPosts', () => {
+                const state = deepFreeze({
+                    root1: ['comment1'],
+                });
+
+                const prevPosts = {
+                    comment1: {id: 'comment1', channel_id: 'channel1', root_id: 'root1'},
+                };
+
+                const nextState = reducers.postsInThread(state, {
+                    type: actionType,
+                    data: {
+                        id: 'channel1',
+                        viewArchivedChannels: false,
+                    },
+                }, prevPosts);
+
+                expect(nextState).toBe(state);
+            });
         });
     }
 });

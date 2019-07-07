@@ -561,11 +561,11 @@ export default class Client4 {
         );
     };
 
-    getProfilesByIds = async (userIds) => {
+    getProfilesByIds = async (userIds, options = {}) => {
         this.trackEvent('api', 'api_profiles_get_by_ids');
 
         return this.doFetch(
-            `${this.getUsersRoute()}/ids`,
+            `${this.getUsersRoute()}/ids${buildQueryString(options)}`,
             {method: 'post', body: JSON.stringify(userIds)}
         );
     };
@@ -715,6 +715,13 @@ export default class Client4 {
     revokeAllSessionsForUser = async (userId) => {
         return this.doFetch(
             `${this.getUserRoute(userId)}/sessions/revoke/all`,
+            {method: 'post'}
+        );
+    };
+
+    revokeSessionsForAllUsers = async () => {
+        return this.doFetch(
+            `${this.getUsersRoute()}/sessions/revoke/all`,
             {method: 'post'}
         );
     };
@@ -2577,6 +2584,17 @@ export default class Client4 {
         return this.doFetch(
             this.getPluginsRoute(),
             request
+        );
+    };
+
+    installPluginFromUrl = async (pluginDownloadUrl, force = false) => {
+        this.trackEvent('api', 'api_install_plugin');
+
+        const queryParams = {plugin_download_url: pluginDownloadUrl, force};
+
+        return this.doFetch(
+            `${this.getPluginsRoute()}/install_from_url${buildQueryString(queryParams)}`,
+            {method: 'post'}
         );
     };
 

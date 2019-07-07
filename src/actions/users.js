@@ -34,8 +34,8 @@ import {
     makeGroupMessageVisibleIfNecessary,
 } from './preferences';
 
-import {getConfig} from 'selectors/entities/general';
-import {getCurrentUserId} from 'selectors/entities/users';
+import {getConfig, getServerVersion} from 'selectors/entities/general';
+import {getCurrentUserId, getUsers} from 'selectors/entities/users';
 
 export function checkMfa(loginId: string): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
@@ -343,13 +343,13 @@ export function getMissingProfilesByUsernames(usernames: Array<string>): ActionF
     };
 }
 
-export function getProfilesByIds(userIds: Array<string>): ActionFunc {
+export function getProfilesByIds(userIds: Array<string>, options: Object): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         const {currentUserId} = getState().entities.users;
 
         let profiles = null;
         try {
-            profiles = await Client4.getProfilesByIds(userIds);
+            profiles = await Client4.getProfilesByIds(userIds, options);
             removeUserFromList(currentUserId, profiles);
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch, getState);
@@ -779,6 +779,23 @@ export function revokeAllSessionsForUser(userId: string): ActionFunc {
             },
         ]), getState);
 
+        return {data: true};
+    };
+}
+
+export function revokeSessionsForAllUsers(): ActionFunc {
+    return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
+        try {
+            await Client4.revokeSessionsForAllUsers();
+        } catch (error) {
+            forceLogoutIfNecessary(error, dispatch, getState);
+            dispatch(logError(error));
+            return {error};
+        }
+        dispatch({
+            type: UserTypes.REVOKE_SESSIONS_FOR_ALL_USERS_SUCCESS,
+            data: null,
+        });
         return {data: true};
     };
 }
@@ -1411,6 +1428,21 @@ export function clearUserAccessTokens(): ActionFunc {
     };
 }
 
+export function checkForModifiedUsers() {
+    return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
+        const state = getState();
+        const users = getUsers(state);
+        const lastDisconnectAt = state.websocket.lastDisconnectAt;
+        const serverVersion = getServerVersion(state);
+
+        if (!isMinimumServerVersion(serverVersion, 5, 14)) {
+            return;
+        }
+
+        await dispatch(getProfilesByIds(Object.keys(users), {since: lastDisconnectAt}));
+    };
+}
+
 export default {
     checkMfa,
     generateMfaSecret,
@@ -1431,6 +1463,7 @@ export default {
     loadProfilesForDirect,
     revokeSession,
     revokeAllSessionsForUser,
+    revokeSessionsForAllUsers,
     getUserAudits,
     searchProfiles,
     startPeriodicStatusUpdates,
@@ -1458,4 +1491,5 @@ export default {
     revokeUserAccessToken,
     disableUserAccessToken,
     enableUserAccessToken,
+    checkForModifiedUsers,
 };
