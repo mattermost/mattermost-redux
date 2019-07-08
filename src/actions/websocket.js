@@ -222,10 +222,6 @@ function handleEvent(msg) {
     case WebsocketEvents.UPDATE_TEAM:
         doDispatch(handleUpdateTeamEvent(msg));
         break;
-
-    // case WebsocketEvents.PATCH_TEAM:
-    //     doDispatch(handlePatchTeamEvent(msg));
-    //     break;
     case WebsocketEvents.ADDED_TO_TEAM:
         doDispatch(handleTeamAddedEvent(msg));
         break;
@@ -365,13 +361,6 @@ function handleUpdateTeamEvent(msg) {
         data: JSON.parse(msg.data.team),
     };
 }
-
-// function handlePatchTeamEvent(msg) {
-//     return {
-//         type: TeamTypes.PATCHED_TEAM,
-//         data: JSON.parse(msg.data.team),
-//     };
-// }
 
 function handleTeamAddedEvent(msg) {
     return async (dispatch) => {
@@ -515,7 +504,7 @@ function handleChannelCreatedEvent(msg) {
 }
 
 function handleChannelDeletedEvent(msg) {
-    return async (dispatch, getState) => {
+    return (dispatch, getState) => {
         const state = getState();
         const currentChannelId = getCurrentChannelId(state);
         const currentTeamId = getCurrentTeamId(state);
@@ -536,7 +525,6 @@ function handleChannelDeletedEvent(msg) {
 
             dispatch(fetchMyChannelsAndMembers(currentTeamId));
         }
-        return {data: true};
     };
 }
 
@@ -605,9 +593,8 @@ function handleChannelMemberUpdatedEvent(msg) {
 }
 
 function handleDirectAddedEvent(msg) {
-    return async (dispatch) => {
+    return (dispatch) => {
         dispatch(getChannelAndMyMember(msg.broadcast.channel_id));
-        return {data: true};
     };
 }
 
