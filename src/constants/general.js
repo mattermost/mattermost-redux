@@ -33,12 +33,15 @@ export default {
     PERMISSIONS_TEAM_ADMIN: 'team_admin',
     PERMISSIONS_SYSTEM_ADMIN: 'system_admin',
 
+    TEAM_GUEST_ROLE: 'team_guest',
     TEAM_USER_ROLE: 'team_user',
     TEAM_ADMIN_ROLE: 'team_admin',
 
+    CHANNEL_GUEST_ROLE: 'channel_guest',
     CHANNEL_USER_ROLE: 'channel_user',
     CHANNEL_ADMIN_ROLE: 'channel_admin',
 
+    SYSTEM_GUEST_ROLE: 'system_guest',
     SYSTEM_USER_ROLE: 'system_user',
     SYSTEM_ADMIN_ROLE: 'system_admin',
     SYSTEM_USER_ACCESS_TOKEN_ROLE: 'system_user_access_token',
