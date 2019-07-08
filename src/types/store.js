@@ -82,5 +82,10 @@ export type GlobalState = {|
         jobs: JobsRequestsStatuses,
         schemes: SchemesRequestsStatuses,
         search: SearchRequestsStatuses,
+    |},
+    websocket: {|
+        connected: boolean,
+        lastConnectAt: number,
+        lastDisconnectAt: number,
     |}
 |};

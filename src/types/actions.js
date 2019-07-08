@@ -17,6 +17,7 @@ export type GenericAction = {|
     sessionId?: string,
     currentUserId?: string,
     remove?: Function,
+    timestamp?: number,
 |};
 
 type Thunk = (DispatchFunc, GetStateFunc) => (Promise<ActionResult> | void); // eslint-disable-line no-use-before-define

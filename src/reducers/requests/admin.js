@@ -340,6 +340,16 @@ function uploadPlugin(state: RequestStatusType = initialRequestState(), action: 
     );
 }
 
+function installPluginFromUrl(state: RequestStatusType = initialRequestState(), action: GenericAction): RequestStatusType {
+    return handleRequest(
+        AdminTypes.INSTALL_PLUGIN_FROM_URL_REQUEST,
+        AdminTypes.INSTALL_PLUGIN_FROM_URL_SUCCESS,
+        AdminTypes.INSTALL_PLUGIN_FROM_URL_FAILURE,
+        state,
+        action
+    );
+}
+
 function getPlugins(state: RequestStatusType = initialRequestState(), action: GenericAction): RequestStatusType {
     return handleRequest(
         AdminTypes.GET_PLUGIN_REQUEST,
@@ -424,6 +434,7 @@ export default (combineReducers({
     removeLicense,
     getAnalytics,
     uploadPlugin,
+    installPluginFromUrl,
     getPlugins,
     getPluginStatuses,
     removePlugin,

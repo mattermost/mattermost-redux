@@ -329,6 +329,10 @@ const state: GlobalState = {
                 status: 'not_started',
                 error: null,
             },
+            installPluginFromUrl: {
+                status: 'not_started',
+                error: null,
+            },
             purgeElasticsearchIndexes: {
                 status: 'not_started',
                 error: null,
@@ -628,6 +632,11 @@ const state: GlobalState = {
                 error: null,
             },
         },
+    },
+    websocket: {
+        connected: false,
+        lastConnectAt: 0,
+        lastDisconnectAt: 0,
     },
 };
 

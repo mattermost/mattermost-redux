@@ -18,6 +18,7 @@ export default keyMirror({
     TOTAL_COMMANDS: null,
     TOTAL_SESSIONS: null,
     POST_PER_DAY: null,
+    BOT_POST_PER_DAY: null,
     USERS_WITH_POSTS_PER_DAY: null,
     RECENTLY_ACTIVE_USERS: null,
     NEWLY_CREATED_USERS: null,

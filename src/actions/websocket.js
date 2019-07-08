@@ -5,6 +5,7 @@
 import {Client4} from 'client';
 import websocketClient from 'client/websocket_client';
 import {
+    checkForModifiedUsers,
     getMe,
     getProfilesByIds,
     getStatusesByIds,
@@ -118,12 +119,33 @@ export function close(shouldReconnect: boolean = false) {
         reconnect = shouldReconnect;
         websocketClient.close(true);
         if (dispatch) {
-            dispatch({type: GeneralTypes.WEBSOCKET_CLOSED, data: null});
+            dispatch({
+                type: GeneralTypes.WEBSOCKET_CLOSED,
+                timestamp: Date.now(),
+                data: null,
+            });
         }
     };
 }
 
-export function doReconnect() {
+export function doFirstConnect(now: number) {
+    return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
+        const state = getState();
+
+        if (state.websocket.lastDisconnectAt) {
+            dispatch(checkForModifiedUsers());
+        }
+
+        dispatch({
+            type: GeneralTypes.WEBSOCKET_SUCCESS,
+            timestamp: now,
+            data: null,
+        });
+        return {data: true};
+    };
+}
+
+export function doReconnect(now: number) {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         const state = getState();
         const currentTeamId = getCurrentTeamId(state);
@@ -174,7 +196,13 @@ export function doReconnect() {
             }
         }
 
-        dispatch({type: GeneralTypes.WEBSOCKET_SUCCESS, data: null});
+        dispatch(checkForModifiedUsers());
+
+        dispatch({
+            type: GeneralTypes.WEBSOCKET_SUCCESS,
+            timestamp: now,
+            data: null,
+        });
         return {data: true};
     };
 }
@@ -184,16 +212,18 @@ function handleConnecting() {
 }
 
 function handleFirstConnect() {
+    const now = Date.now();
+
     if (reconnect) {
         reconnect = false;
-        doDispatch(doReconnect());
+        doDispatch(doReconnect(now));
     } else {
-        doDispatch({type: GeneralTypes.WEBSOCKET_SUCCESS, data: null});
+        doDispatch(doFirstConnect(now));
     }
 }
 
 function handleReconnect() {
-    doDispatch(doReconnect());
+    doDispatch(doReconnect(Date.now()));
 }
 
 function handleClose(connectFailCount) {
@@ -201,6 +231,7 @@ function handleClose(connectFailCount) {
         type: GeneralTypes.WEBSOCKET_FAILURE,
         error: connectFailCount,
         data: null,
+        timestamp: Date.now(),
     });
 }
 

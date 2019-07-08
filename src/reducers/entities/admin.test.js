@@ -612,6 +612,7 @@ describe('reducers.entities.admin', () => {
         it('data should not be mutated', () => {
             const data = deepFreezeAndThrowOnMutation([{name: '1', value: 1}, {name: '2', value: 2}, {name: '3', value: 3}]);
             convertAnalyticsRowsToStats(data, 'post_counts_day');
+            convertAnalyticsRowsToStats(data, 'bot_post_counts_day');
         });
     });
 

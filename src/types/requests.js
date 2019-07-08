@@ -75,6 +75,7 @@ export type AdminRequestsStatuses = {|
     getPluginStatuses: RequestStatusType,
     getPlugins: RequestStatusType,
     getSamlCertificateStatus: RequestStatusType,
+    installPluginFromUrl: RequestStatusType,
     purgeElasticsearchIndexes: RequestStatusType,
     removeIdpSamlCertificate: RequestStatusType,
     removeLicense: RequestStatusType,
