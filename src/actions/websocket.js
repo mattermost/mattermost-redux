@@ -55,7 +55,12 @@ import {getCurrentUser, getCurrentUserId, getUsers, getUserStatuses} from 'selec
 import {getChannelByName} from 'utils/channel_utils';
 import {fromAutoResponder} from 'utils/post_utils';
 import EventEmitter from 'utils/event_emitter';
-import type {ActionFunc, DispatchFunc, GetStateFunc, PlatformType} from '../types/actions';
+import type {
+    ActionFunc,
+    DispatchFunc,
+    GetStateFunc,
+    PlatformType,
+} from '../types/actions';
 
 let doDispatch;
 
@@ -306,7 +311,7 @@ function handleEvent(msg) {
 }
 
 function handleNewPostEvent(msg) {
-    return async (dispatch, getState) => {
+    return (dispatch, getState) => {
         const post = JSON.parse(msg.data.post);
 
         dispatch(handleNewPost(msg));
@@ -318,17 +323,15 @@ function handleNewPostEvent(msg) {
                 data: [{user_id: post.user_id, status: General.ONLINE}],
             });
         }
-        return {data: true};
     };
 }
 
 function handlePostEdited(msg) {
-    return async (dispatch, getState) => {
+    return (dispatch, getState) => {
         const data = JSON.parse(msg.data.post);
 
         getProfilesAndStatusesForPosts([data], dispatch, getState);
         dispatch(receivedPost(data));
-        return {data: true};
     };
 }
 
@@ -338,8 +341,8 @@ function handlePostDeleted(msg) {
     return postDeleted(data);
 }
 
-function handleLeaveTeamEvent(msg): ActionFunc {
-    return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
+function handleLeaveTeamEvent(msg) {
+    return (dispatch, getState) => {
         const state = getState();
         const teams = getTeamsSelector(state);
         const currentTeamId = getCurrentTeamId(state);
@@ -353,7 +356,6 @@ function handleLeaveTeamEvent(msg): ActionFunc {
                 EventEmitter.emit('leave_team');
             }
         }
-        return {data: true};
     };
 }
 
@@ -382,7 +384,7 @@ function handleTeamAddedEvent(msg) {
 }
 
 function handleUserAddedEvent(msg) {
-    return async (dispatch, getState) => {
+    return (dispatch, getState) => {
         const state = getState();
         const currentChannelId = getCurrentChannelId(state);
         const currentTeamId = getCurrentTeamId(state);
@@ -404,12 +406,11 @@ function handleUserAddedEvent(msg) {
         if (teamId === currentTeamId && msg.data.user_id === currentUserId) {
             dispatch(getChannelAndMyMember(msg.broadcast.channel_id));
         }
-        return {data: true};
     };
 }
 
 function handleUserRemovedEvent(msg) {
-    return async (dispatch, getState) => {
+    return (dispatch, getState) => {
         const state = getState();
         const channels = getAllChannels(state);
         const currentChannelId = getCurrentChannelId(state);
@@ -448,12 +449,11 @@ function handleUserRemovedEvent(msg) {
         } else if (msg.data.channel_id === currentChannelId) {
             dispatch(getChannelStats(currentChannelId));
         }
-        return {data: true};
     };
 }
 
 function handleUserUpdatedEvent(msg) {
-    return async (dispatch, getState) => {
+    return (dispatch, getState) => {
         const currentUser = getCurrentUser(getState());
         const user = msg.data.user;
 
@@ -471,7 +471,6 @@ function handleUserUpdatedEvent(msg) {
                 },
             });
         }
-        return {data: true};
     };
 }
 
@@ -503,7 +502,7 @@ function handleRoleUpdatedEvent(msg) {
 }
 
 function handleChannelCreatedEvent(msg) {
-    return async (dispatch, getState) => {
+    return (dispatch, getState) => {
         const {channel_id: channelId, team_id: teamId} = msg.data;
         const state = getState();
         const channels = getAllChannels(state);
@@ -512,7 +511,6 @@ function handleChannelCreatedEvent(msg) {
         if (teamId === currentTeamId && !channels[channelId]) {
             dispatch(getChannelAndMyMember(channelId));
         }
-        return {data: true};
     };
 }
 
@@ -570,7 +568,7 @@ function handleChannelUpdatedEvent(msg) {
 
 // handleChannelConvertedEvent handles updating of channel which is converted from public to private
 function handleChannelConvertedEvent(msg) {
-    return async (dispatch, getState) => {
+    return (dispatch, getState) => {
         const channelId = msg.data.channel_id;
         if (channelId) {
             const channel = getChannel(getState(), channelId);
@@ -581,12 +579,11 @@ function handleChannelConvertedEvent(msg) {
                 });
             }
         }
-        return {data: true};
     };
 }
 
 function handleChannelViewedEvent(msg) {
-    return async (dispatch, getState) => {
+    return (dispatch, getState) => {
         const state = getState();
         const {channel_id: channelId} = msg.data;
         const currentChannelId = getCurrentChannelId(state);
@@ -595,7 +592,6 @@ function handleChannelViewedEvent(msg) {
         if (channelId !== currentChannelId && currentUserId === msg.broadcast.user_id) {
             dispatch(markChannelAsRead(channelId, null, false));
         }
-        return {data: true};
     };
 }
 
@@ -616,17 +612,16 @@ function handleDirectAddedEvent(msg) {
 }
 
 function handlePreferenceChangedEvent(msg) {
-    return async (dispatch) => {
+    return (dispatch) => {
         const preference = JSON.parse(msg.data.preference);
         dispatch({type: PreferenceTypes.RECEIVED_PREFERENCES, data: [preference]});
 
         dispatch(getAddedDmUsersIfNecessary([preference]));
-        return {data: true};
     };
 }
 
 function handlePreferencesChangedEvent(msg) {
-    return async (dispatch, getState) => {
+    return (dispatch, getState) => {
         const preferences = JSON.parse(msg.data.preferences);
         const posts = getAllPosts(getState());
 
@@ -638,7 +633,6 @@ function handlePreferencesChangedEvent(msg) {
 
         dispatch(getAddedDmUsersIfNecessary(preferences));
         dispatch({type: PreferenceTypes.RECEIVED_PREFERENCES, data: preferences});
-        return {data: true};
     };
 }
 
@@ -664,7 +658,7 @@ function handleHelloEvent(msg) {
 }
 
 function handleUserTypingEvent(msg) {
-    return async (dispatch, getState) => {
+    return (dispatch, getState) => {
         const state = getState();
         const profiles = getUsers(state);
         const statuses = getUserStatuses(state);
@@ -698,13 +692,11 @@ function handleUserTypingEvent(msg) {
         if (status !== General.ONLINE) {
             dispatch(getStatusesByIds([userId]));
         }
-
-        return {data: true};
     };
 }
 
 function handleReactionAddedEvent(msg) {
-    return async (dispatch) => {
+    return (dispatch) => {
         const {data} = msg;
         const reaction = JSON.parse(data.reaction);
 
@@ -714,7 +706,6 @@ function handleReactionAddedEvent(msg) {
             type: PostTypes.RECEIVED_REACTION,
             data: reaction,
         });
-        return {data: true};
     };
 }
 
@@ -766,16 +757,15 @@ function handlePluginStatusesChangedEvent(msg) {
 }
 
 function handleOpenDialogEvent(msg) {
-    return async (dispatch) => {
+    return (dispatch) => {
         const data = (msg.data && msg.data.dialog) || {};
         dispatch({type: IntegrationTypes.RECEIVED_DIALOG, data: JSON.parse(data)});
-        return {data: true};
     };
 }
 
 // Helpers
 function getAddedDmUsersIfNecessary(preferences) {
-    return async (dispatch, getState) => {
+    return (dispatch, getState) => {
         const userIds = [];
 
         for (const preference of preferences) {
@@ -785,7 +775,7 @@ function getAddedDmUsersIfNecessary(preferences) {
         }
 
         if (userIds.length === 0) {
-            return {data: true};
+            return;
         }
 
         const state = getState();
@@ -813,8 +803,6 @@ function getAddedDmUsersIfNecessary(preferences) {
         if (needStatuses.length > 0) {
             dispatch(getStatusesByIds(needStatuses));
         }
-
-        return {data: true};
     };
 }
 

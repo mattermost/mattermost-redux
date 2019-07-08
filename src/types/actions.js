@@ -19,7 +19,7 @@ export type GenericAction = {|
     remove?: Function,
 |};
 
-type Thunk = (DispatchFunc, GetStateFunc) => Promise<ActionResult>; // eslint-disable-line no-use-before-define
+type Thunk = (DispatchFunc, GetStateFunc) => (Promise<ActionResult> | void); // eslint-disable-line no-use-before-define
 
 type BatchAction = {
     type: 'BATCHING_REDUCER.BATCH';
