@@ -550,7 +550,7 @@ export function getPostsChunkInChannelAroundTime(state: GlobalState, channelId: 
 export function getUnreadPostsChunk(state: GlobalState, channelId: $ID<Channel>, timeStamp: number): ?Object {
     const postsEntity = state.entities.posts;
     const posts = postsEntity.posts;
-    const recentChunk = getRecentPostsChunkInChannel(state, channelId, timeStamp);
+    const recentChunk = getRecentPostsChunkInChannel(state, channelId);
     if (recentChunk && recentChunk.order.length) {
         const {order} = recentChunk;
         const oldestPostInBlock = posts[order[order.length - 1]];
