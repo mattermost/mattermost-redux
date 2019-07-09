@@ -661,6 +661,8 @@ export function mergePostBlocks(blocks, posts) {
     // Remove any blocks that may have become empty by removing posts
     nextBlocks = removeEmptyPostBlocks(blocks);
 
+    // If a channel does not have any posts(Experimental feature where join and leave messages don't exist)
+    // return the previous state i.e an empty block
     if (!nextBlocks.length) {
         return blocks;
     }
