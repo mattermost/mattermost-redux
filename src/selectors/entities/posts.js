@@ -98,19 +98,16 @@ export function makeGetPostIdsForThread(): (GlobalState, $ID<Post>) => Array<$ID
     );
 }
 
-export function makeGetPostIdsAroundPost(): (GlobalState, $ID<Post>, $ID<Channel>, {postsBeforeCount: number, postsAfterCount: number}) => ?Array<$ID<Post>> {
+export function makeGetPostsChunkAroundPost(): (GlobalState, $ID<Post>, $ID<Channel>) => Object {
     return createIdsSelector(
         (state: GlobalState, postId, channelId) => state.entities.posts.postsInChannel[channelId],
         (state: GlobalState, postId) => postId,
-        (state: GlobalState, postId, channelId, options) => options && options.postsBeforeCount,
-        (state: GlobalState, postId, channelId, options) => options && options.postsAfterCount,
-        (postsForChannel, postId, postsBeforeCount = Posts.POST_CHUNK_SIZE / 2, postsAfterCount = Posts.POST_CHUNK_SIZE / 2) => {
+        (postsForChannel, postId) => {
             if (!postsForChannel) {
                 return null;
             }
 
-            let postIds: ?Array<$ID<Post>> = null;
-            let postIndex = -1;
+            let postChunk = null;
 
             for (const block of postsForChannel) {
                 const index = block.order.indexOf(postId);
@@ -119,17 +116,32 @@ export function makeGetPostIdsAroundPost(): (GlobalState, $ID<Post>, $ID<Channel
                     continue;
                 }
 
-                postIds = block.order;
-                postIndex = index;
+                postChunk = block;
             }
 
-            if (postIndex === -1 || !postIds) {
+            return postChunk;
+        }
+    );
+}
+
+export function makeGetPostIdsAroundPost(): (GlobalState, $ID<Post>, $ID<Channel>, {postsBeforeCount: number, postsAfterCount: number}) => ?Array<$ID<Post>> {
+    const getPostsChunkAroundPost = makeGetPostsChunkAroundPost();
+    return createIdsSelector(
+        (state: GlobalState, postId, channelId) => getPostsChunkAroundPost(state, postId, channelId),
+        (state: GlobalState, postId) => postId,
+        (state: GlobalState, postId, channelId, options) => options && options.postsBeforeCount,
+        (state: GlobalState, postId, channelId, options) => options && options.postsAfterCount,
+        (postsChunk, postId, postsBeforeCount = Posts.POST_CHUNK_SIZE / 2, postsAfterCount = Posts.POST_CHUNK_SIZE / 2) => {
+            if (!postsChunk || !postsChunk.order) {
                 return null;
             }
 
+            const postIds = postsChunk.order;
+            const index = postIds.indexOf(postId);
+
             // Remember that posts that come after the post have a smaller index
-            const minPostIndex = postsAfterCount === -1 ? 0 : Math.max(postIndex - postsAfterCount, 0);
-            const maxPostIndex = postsBeforeCount === -1 ? postIds.length : Math.min(postIndex + postsBeforeCount + 1, postIds.length); // Needs the extra 1 to include the focused post
+            const minPostIndex = postsAfterCount === -1 ? 0 : Math.max(index - postsAfterCount, 0);
+            const maxPostIndex = postsBeforeCount === -1 ? postIds.length : Math.min(index + postsBeforeCount + 1, postIds.length); // Needs the extra 1 to include the focused post
 
             return postIds.slice(minPostIndex, maxPostIndex);
         }
@@ -493,20 +505,63 @@ export const getCurrentUsersLatestPost: (GlobalState, $ID<Post>) => ?PostWithFor
     }
 );
 
-// getPostIdsInChannel returns the IDs of posts loaded at the bottom of the given channel. It does not include older
-// posts such as those loaded by viewing a thread or a permalink.
-export function getPostIdsInChannel(state: GlobalState, channelId: $ID<Channel>): ?Array<$ID<Post>> {
+export function getRecentPostsChunkInChannel(state: GlobalState, channelId: $ID<Channel>): Object {
     const postsForChannel = state.entities.posts.postsInChannel[channelId];
     if (!postsForChannel) {
         return null;
     }
 
-    const recentBlock = postsForChannel.find((block) => block.recent);
+    return postsForChannel.find((block) => block.recent);
+}
+
+// getPostIdsInChannel returns the IDs of posts loaded at the bottom of the given channel. It does not include older
+// posts such as those loaded by viewing a thread or a permalink.
+export function getPostIdsInChannel(state: GlobalState, channelId: $ID<Channel>): ?Array<$ID<Post>> {
+    const recentBlock = getRecentPostsChunkInChannel(state, channelId);
+
     if (!recentBlock) {
         return null;
     }
 
     return recentBlock.order;
+}
+
+export function getPostsChunkInChannelAroundTime(state: GlobalState, channelId: $ID<Channel>, timeStamp: number): ?Object {
+    const postsEntity = state.entities.posts;
+    const postsForChannel = postsEntity.postsInChannel[channelId];
+    const posts = postsEntity.posts;
+    if (!postsForChannel) {
+        return null;
+    }
+
+    const blockAroundTimestamp = postsForChannel.find((block) => {
+        const {order} = block;
+        const recentPostInBlock = posts[order[0]];
+        const oldestPostInBlock = posts[order[order.length - 1]];
+        if (recentPostInBlock && oldestPostInBlock) {
+            return (recentPostInBlock.create_at >= timeStamp && oldestPostInBlock.create_at <= timeStamp);
+        }
+        return false;
+    });
+
+    return blockAroundTimestamp;
+}
+
+export function getUnreadPostsChunk(state: GlobalState, channelId: $ID<Channel>, timeStamp: number): ?Object {
+    const postsEntity = state.entities.posts;
+    const posts = postsEntity.posts;
+    const recentChunk = getRecentPostsChunkInChannel(state, channelId);
+    if (recentChunk && recentChunk.order.length) {
+        const {order} = recentChunk;
+        const oldestPostInBlock = posts[order[order.length - 1]];
+
+        // check for only oldest posts because this can be higher than the latest post if the last post is edited
+        if (oldestPostInBlock.create_at <= timeStamp) {
+            return recentChunk;
+        }
+    }
+
+    return getPostsChunkInChannelAroundTime(state, channelId, timeStamp);
 }
 
 export const isPostIdSending = (state: GlobalState, postId: $ID<Post>): boolean =>
