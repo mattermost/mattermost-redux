@@ -527,9 +527,9 @@ export function getPostIdsInChannel(state: GlobalState, channelId: $ID<Channel>)
 }
 
 export function getPostsChunkInChannelAroundTime(state: GlobalState, channelId: $ID<Channel>, timeStamp: number): ?Object {
-    const postsEnitiy = state.entities.posts;
-    const postsForChannel = postsEnitiy.postsInChannel[channelId];
-    const posts = postsEnitiy.posts;
+    const postsEntity = state.entities.posts;
+    const postsForChannel = postsEntity.postsInChannel[channelId];
+    const posts = postsEntity.posts;
     if (!postsForChannel) {
         return null;
     }
@@ -539,12 +539,29 @@ export function getPostsChunkInChannelAroundTime(state: GlobalState, channelId: 
         const recentPostInBlock = posts[order[0]];
         const oldestPostInBlock = posts[order[order.length - 1]];
         if (recentPostInBlock && oldestPostInBlock) {
-            return (recentPostInBlock.create_at > timeStamp && oldestPostInBlock.create_at < timeStamp) || recentPostInBlock.create_at === timeStamp || oldestPostInBlock.create_at === timeStamp;
+            return (recentPostInBlock.create_at >= timeStamp && oldestPostInBlock.create_at <= timeStamp);
         }
         return false;
     });
 
     return blockAroundTimestamp;
+}
+
+export function getUnreadPostsChunk(state: GlobalState, channelId: $ID<Channel>, timeStamp: number): ?Object {
+    const postsEntity = state.entities.posts;
+    const posts = postsEntity.posts;
+    const recentChunk = getRecentPostsChunkInChannel(state, channelId, timeStamp);
+    if (recentChunk && recentChunk.order.length) {
+        const {order} = recentChunk;
+        const oldestPostInBlock = posts[order[order.length - 1]];
+
+        // check for only oldest posts because this can be higher than the latest post if the last post is edited
+        if (oldestPostInBlock.create_at <= timeStamp) {
+            return recentChunk;
+        }
+    }
+
+    return getPostsChunkInChannelAroundTime(state, channelId, timeStamp);
 }
 
 export const isPostIdSending = (state: GlobalState, postId: $ID<Post>): boolean =>

@@ -1503,6 +1503,56 @@ describe('Selectors.Posts', () => {
         });
     });
 
+    describe('getUnreadPostsChunk', () => {
+        it('should return recent chunk even if the timstamp is greater than the last post', () => {
+            const state = {
+                entities: {
+                    posts: {
+                        posts: {
+                            e: {id: 'e', create_at: 1010},
+                            j: {id: 'j', create_at: 1001},
+                            a: {id: 'a', create_at: 1020},
+                            f: {id: 'f', create_at: 1010},
+                        },
+                        postsInChannel: {
+                            1234: [
+                                {order: ['a', 'b', 'c', 'd', 'e', 'f'], recent: true},
+                                {order: ['e', 'f', 'g', 'h', 'i', 'j'], recent: false},
+                            ],
+                        },
+                    },
+                },
+            };
+
+            const unreadPostsChunk = Selectors.getUnreadPostsChunk(state, 1234, 1030);
+            assert.deepEqual(unreadPostsChunk, {order: ['a', 'b', 'c', 'd', 'e', 'f'], recent: true});
+        });
+
+        it('should return a not recent chunk based on the timestamp', () => {
+            const state = {
+                entities: {
+                    posts: {
+                        posts: {
+                            e: {id: 'e', create_at: 1010},
+                            j: {id: 'j', create_at: 1001},
+                            a: {id: 'a', create_at: 1020},
+                            f: {id: 'f', create_at: 1010},
+                        },
+                        postsInChannel: {
+                            1234: [
+                                {order: ['a', 'b', 'c', 'd', 'e', 'f'], recent: true},
+                                {order: ['e', 'f', 'g', 'h', 'i', 'j'], recent: false},
+                            ],
+                        },
+                    },
+                },
+            };
+
+            const unreadPostsChunk = Selectors.getUnreadPostsChunk(state, 1234, 1002);
+            assert.deepEqual(unreadPostsChunk, {order: ['e', 'f', 'g', 'h', 'i', 'j'], recent: false});
+        });
+    });
+
     describe('getPostsForIds', () => {
         it('selector', () => {
             const getPostsForIds = Selectors.makeGetPostsForIds();
