@@ -1266,6 +1266,293 @@ describe('Selectors.Posts', () => {
         });
     });
 
+    describe('makeGetPostsChunkAroundPost', () => {
+        it('no posts around', () => {
+            const getPostsChunkAroundPost = Selectors.makeGetPostsChunkAroundPost();
+
+            const state = {
+                entities: {
+                    posts: {
+                        postsInChannel: {
+                            1234: [
+                                {order: ['a'], recent: true},
+                            ],
+                        },
+                    },
+                },
+            };
+
+            assert.deepEqual(getPostsChunkAroundPost(state, 'a', '1234'), {order: ['a'], recent: true});
+        });
+
+        it('posts around', () => {
+            const getPostsChunkAroundPost = Selectors.makeGetPostsChunkAroundPost();
+
+            const state = {
+                entities: {
+                    posts: {
+                        postsInChannel: {
+                            1234: [
+                                {order: ['a', 'b', 'c', 'd', 'e'], recent: true},
+                            ],
+                        },
+                    },
+                },
+            };
+
+            assert.deepEqual(getPostsChunkAroundPost(state, 'c', '1234'), {order: ['a', 'b', 'c', 'd', 'e'], recent: true});
+        });
+
+        it('no matching posts', () => {
+            const getPostsChunkAroundPost = Selectors.makeGetPostsChunkAroundPost();
+
+            const state = {
+                entities: {
+                    posts: {
+                        postsInChannel: {
+                            1234: [
+                                {order: ['a', 'b', 'c', 'd', 'e', 'f'], recent: true},
+                            ],
+                        },
+                    },
+                },
+            };
+
+            assert.deepEqual(getPostsChunkAroundPost(state, 'noChunk', '1234'), null);
+        });
+
+        it('memoization', () => {
+            const getPostsChunkAroundPost = Selectors.makeGetPostsChunkAroundPost();
+
+            let state = {
+                entities: {
+                    posts: {
+                        postsInChannel: {
+                            1234: [
+                                {order: ['a', 'b', 'c', 'd', 'e'], recent: true},
+                            ],
+                        },
+                    },
+                },
+            };
+
+            // No limit, no changes
+            let previous = getPostsChunkAroundPost(state, 'c', '1234');
+
+            // Changes to posts in another channel
+            state = {
+                ...state,
+                entities: {
+                    ...state.entities,
+                    posts: {
+                        ...state.entities.posts,
+                        postsInChannel: {
+                            ...state.entities.posts.postsInChannel,
+                            abcd: [
+                                {order: ['g', 'h', 'i', 'j', 'k', 'l'], recent: true},
+                            ],
+                        },
+                    },
+                },
+            };
+
+            let now = getPostsChunkAroundPost(state, 'c', '1234');
+            assert.deepEqual(now, {order: ['a', 'b', 'c', 'd', 'e'], recent: true});
+            assert.equal(now, previous);
+
+            // Changes to posts in this channel
+            state = {
+                ...state,
+                entities: {
+                    ...state.entities,
+                    posts: {
+                        ...state.entities.posts,
+                        postsInChannel: {
+                            ...state.entities.posts.postsInChannel,
+                            1234: [
+                                {order: ['a', 'b', 'c', 'd', 'e', 'f'], recent: true},
+                            ],
+                        },
+                    },
+                },
+            };
+
+            previous = now;
+            now = getPostsChunkAroundPost(state, 'c', '1234');
+            assert.deepEqual(now, {order: ['a', 'b', 'c', 'd', 'e', 'f'], recent: true});
+            assert.notEqual(now, previous);
+
+            previous = now;
+            now = getPostsChunkAroundPost(state, 'c', '1234');
+            assert.deepEqual(now, {order: ['a', 'b', 'c', 'd', 'e', 'f'], recent: true});
+            assert.equal(now, previous);
+
+            // Change of channel
+            previous = now;
+            now = getPostsChunkAroundPost(state, 'i', 'abcd');
+            assert.deepEqual(now, {order: ['g', 'h', 'i', 'j', 'k', 'l'], recent: true});
+            assert.notEqual(now, previous);
+
+            previous = now;
+            now = getPostsChunkAroundPost(state, 'i', 'abcd');
+            assert.deepEqual(now, {order: ['g', 'h', 'i', 'j', 'k', 'l'], recent: true});
+            assert.equal(now, previous);
+
+            // Change of post in the chunk
+            previous = now;
+            now = getPostsChunkAroundPost(state, 'j', 'abcd');
+            assert.deepEqual(now, {order: ['g', 'h', 'i', 'j', 'k', 'l'], recent: true});
+            assert.equal(now, previous);
+
+            // Change of post order
+            state = {
+                ...state,
+                entities: {
+                    ...state.entities,
+                    posts: {
+                        ...state.entities.posts,
+                        postsInChannel: {
+                            ...state.entities.posts.postsInChannel,
+                            abcd: [
+                                {order: ['y', 'g', 'i', 'h', 'j', 'l', 'k', 'z'], recent: true},
+                            ],
+                        },
+                    },
+                },
+            };
+
+            previous = now;
+            now = getPostsChunkAroundPost(state, 'j', 'abcd');
+            assert.deepEqual(now, {order: ['y', 'g', 'i', 'h', 'j', 'l', 'k', 'z'], recent: true});
+            assert.notEqual(now, previous);
+
+            previous = now;
+            now = getPostsChunkAroundPost(state, 'j', 'abcd');
+            assert.deepEqual(now, {order: ['y', 'g', 'i', 'h', 'j', 'l', 'k', 'z'], recent: true});
+            assert.equal(now, previous);
+        });
+    });
+    describe('getRecentPostsChunkInChannel', () => {
+        it('Should return as recent chunk exists', () => {
+            const state = {
+                entities: {
+                    posts: {
+                        postsInChannel: {
+                            1234: [
+                                {order: ['a', 'b', 'c', 'd', 'e', 'f'], recent: true},
+                            ],
+                        },
+                    },
+                },
+            };
+
+            const recentPostsChunkInChannel = Selectors.getRecentPostsChunkInChannel(state, 1234);
+            assert.deepEqual(recentPostsChunkInChannel, {order: ['a', 'b', 'c', 'd', 'e', 'f'], recent: true});
+        });
+
+        it('Should return null as recent chunk does not exists', () => {
+            const state = {
+                entities: {
+                    posts: {
+                        postsInChannel: {
+                            1234: [
+                                {order: ['a', 'b', 'c', 'd', 'e', 'f'], recent: false},
+                            ],
+                        },
+                    },
+                },
+            };
+
+            const recentPostsChunkInChannel = Selectors.getRecentPostsChunkInChannel(state, 1234);
+            assert.deepEqual(recentPostsChunkInChannel, null);
+        });
+    });
+
+    describe('getPostsChunkInChannelAroundTime', () => {
+        it('getPostsChunkInChannelAroundTime', () => {
+            const state = {
+                entities: {
+                    posts: {
+                        posts: {
+                            e: {id: 'e', create_at: 1010},
+                            j: {id: 'j', create_at: 1001},
+                            a: {id: 'a', create_at: 1020},
+                            f: {id: 'f', create_at: 1010},
+                        },
+                        postsInChannel: {
+                            1234: [
+                                {order: ['a', 'b', 'c', 'd', 'e', 'f'], recent: true},
+                                {order: ['e', 'f', 'g', 'h', 'i', 'j'], recent: false},
+                            ],
+                        },
+                    },
+                },
+            };
+
+            const postsChunkInChannelAroundTime1 = Selectors.getPostsChunkInChannelAroundTime(state, 1234, 1011);
+            assert.deepEqual(postsChunkInChannelAroundTime1, {order: ['a', 'b', 'c', 'd', 'e', 'f'], recent: true});
+
+            const postsChunkInChannelAroundTime2 = Selectors.getPostsChunkInChannelAroundTime(state, 1234, 1002);
+            assert.deepEqual(postsChunkInChannelAroundTime2, {order: ['e', 'f', 'g', 'h', 'i', 'j'], recent: false});
+
+            const postsChunkInChannelAroundTime3 = Selectors.getPostsChunkInChannelAroundTime(state, 1234, 1010);
+            assert.deepEqual(postsChunkInChannelAroundTime3, {order: ['a', 'b', 'c', 'd', 'e', 'f'], recent: true});
+
+            const postsChunkInChannelAroundTime4 = Selectors.getPostsChunkInChannelAroundTime(state, 1234, 1020);
+            assert.deepEqual(postsChunkInChannelAroundTime4, {order: ['a', 'b', 'c', 'd', 'e', 'f'], recent: true});
+        });
+    });
+
+    describe('getUnreadPostsChunk', () => {
+        it('should return recent chunk even if the timstamp is greater than the last post', () => {
+            const state = {
+                entities: {
+                    posts: {
+                        posts: {
+                            e: {id: 'e', create_at: 1010},
+                            j: {id: 'j', create_at: 1001},
+                            a: {id: 'a', create_at: 1020},
+                            f: {id: 'f', create_at: 1010},
+                        },
+                        postsInChannel: {
+                            1234: [
+                                {order: ['a', 'b', 'c', 'd', 'e', 'f'], recent: true},
+                                {order: ['e', 'f', 'g', 'h', 'i', 'j'], recent: false},
+                            ],
+                        },
+                    },
+                },
+            };
+
+            const unreadPostsChunk = Selectors.getUnreadPostsChunk(state, 1234, 1030);
+            assert.deepEqual(unreadPostsChunk, {order: ['a', 'b', 'c', 'd', 'e', 'f'], recent: true});
+        });
+
+        it('should return a not recent chunk based on the timestamp', () => {
+            const state = {
+                entities: {
+                    posts: {
+                        posts: {
+                            e: {id: 'e', create_at: 1010},
+                            j: {id: 'j', create_at: 1001},
+                            a: {id: 'a', create_at: 1020},
+                            f: {id: 'f', create_at: 1010},
+                        },
+                        postsInChannel: {
+                            1234: [
+                                {order: ['a', 'b', 'c', 'd', 'e', 'f'], recent: true},
+                                {order: ['e', 'f', 'g', 'h', 'i', 'j'], recent: false},
+                            ],
+                        },
+                    },
+                },
+            };
+
+            const unreadPostsChunk = Selectors.getUnreadPostsChunk(state, 1234, 1002);
+            assert.deepEqual(unreadPostsChunk, {order: ['e', 'f', 'g', 'h', 'i', 'j'], recent: false});
+        });
+    });
+
     describe('getPostsForIds', () => {
         it('selector', () => {
             const getPostsForIds = Selectors.makeGetPostsForIds();

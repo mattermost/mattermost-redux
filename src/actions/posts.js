@@ -58,12 +58,13 @@ export function receivedPosts(posts) {
 }
 
 // receivedPostsAfter should be dispatched when receiving an ordered list of posts that come before a given post.
-export function receivedPostsAfter(posts, channelId, afterPostId) {
+export function receivedPostsAfter(posts, channelId, afterPostId, recent = false) {
     return {
         type: PostTypes.RECEIVED_POSTS_AFTER,
         channelId,
         data: posts,
         afterPostId,
+        recent,
     };
 }
 
@@ -620,6 +621,33 @@ export function getPosts(channelId, page = 0, perPage = Posts.POST_CHUNK_SIZE) {
     };
 }
 
+export function getPostsUnread(channelId) {
+    return async (dispatch, getState) => {
+        const userId = getCurrentUserId(getState());
+        let posts;
+        try {
+            posts = await Client4.getPostsUnread(channelId, userId);
+            getProfilesAndStatusesForPosts(posts.posts, dispatch, getState);
+        } catch (error) {
+            forceLogoutIfNecessary(error, dispatch, getState);
+            dispatch(logError(error));
+            return {error};
+        }
+
+        dispatch(batchActions([
+            receivedPosts(posts),
+            receivedPostsInChannel(posts, channelId, posts.next_post_id === ''),
+        ]));
+        dispatch({
+            type: PostTypes.RECEIVED_POSTS,
+            data: posts,
+            channelId,
+        });
+
+        return {data: posts};
+    };
+}
+
 export function getPostsSince(channelId, since) {
     return async (dispatch, getState) => {
         let posts;
@@ -679,7 +707,7 @@ export function getPostsAfter(channelId, postId, page = 0, perPage = Posts.POST_
 
         dispatch(batchActions([
             receivedPosts(posts),
-            receivedPostsAfter(posts, channelId, postId),
+            receivedPostsAfter(posts, channelId, postId, posts.next_post_id === ''),
         ]));
 
         return {data: posts};
@@ -722,7 +750,7 @@ export function getPostsAround(channelId, postId, perPage = Posts.POST_CHUNK_SIZ
 
         dispatch(batchActions([
             receivedPosts(posts),
-            receivedPostsInChannel(posts, channelId),
+            receivedPostsInChannel(posts, channelId, after.posts.next_post_id === ''),
         ]));
 
         return {data: posts};

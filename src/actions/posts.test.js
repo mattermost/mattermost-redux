@@ -369,6 +369,31 @@ describe('Actions.Posts', () => {
         assert.ok(!reactions[post1.id]);
     });
 
+    it('getPostsUnread', async () => {
+        const {dispatch, getState} = store;
+        const channelId = TestHelper.basicChannel.id;
+        const post = TestHelper.fakePostWithId(channelId);
+        const userId = getState().entities.users.currentUserId;
+        const response = {
+            posts: {
+                [post.id]: post,
+            },
+            order: [post.id],
+            next_post_id: '',
+            prev_post_id: '',
+        };
+
+        nock(Client4.getUsersRoute()).
+            get(`/${userId}/channels/${channelId}/posts/unread`).
+            query(true).
+            reply(200, response);
+
+        await Actions.getPostsUnread(channelId)(dispatch, getState);
+        const {posts} = getState().entities.posts;
+
+        assert.ok(posts[post.id]);
+    });
+
     it('getPostThread', async () => {
         const channelId = TestHelper.basicChannel.id;
         const post = {id: TestHelper.generateId(), channel_id: channelId, message: ''};
@@ -895,6 +920,54 @@ describe('Actions.Posts', () => {
         expect(state.entities.posts.postsInThread).toEqual({
             post1: ['post2'],
         });
+    });
+
+    it('getPostsAfter with empty next_post_id', async () => {
+        const channelId = 'channel1';
+
+        const post1 = {id: 'post1', channel_id: channelId, create_at: 1001, message: ''};
+        const post2 = {id: 'post2', channel_id: channelId, root_id: 'post1', create_at: 1002, message: ''};
+        const post3 = {id: 'post3', channel_id: channelId, create_at: 1003, message: ''};
+
+        store = await configureStore({
+            entities: {
+                posts: {
+                    posts: {
+                        post1,
+                    },
+                    postsInChannel: {
+                        channel1: [
+                            {order: ['post1'], recent: false},
+                        ],
+                    },
+                },
+            },
+        });
+
+        const postList = {
+            order: [post3.id, post2.id],
+            posts: {
+                post2,
+                post3,
+            },
+            next_post_id: '',
+        };
+
+        nock(Client4.getChannelsRoute()).
+            get(`/${channelId}/posts`).
+            query(true).
+            reply(200, postList);
+
+        const result = await store.dispatch(Actions.getPostsAfter(channelId, 'post1', 0, 10));
+
+        expect(result).toEqual({data: postList});
+
+        const state = store.getState();
+
+        expect(state.entities.posts.posts).toEqual({post1, post2, post3});
+        expect(state.entities.posts.postsInChannel.channel1).toEqual([
+            {order: ['post3', 'post2', 'post1'], recent: true},
+        ]);
     });
 
     it('getPostsAround', async () => {
