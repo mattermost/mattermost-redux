@@ -350,6 +350,7 @@ function handleNewPostEvent(msg) {
                 data: [{user_id: post.user_id, status: General.ONLINE}],
             });
         }
+        return {data: true};
     };
 }
 
@@ -359,6 +360,7 @@ function handlePostEdited(msg) {
 
         getProfilesAndStatusesForPosts([data], dispatch, getState);
         dispatch(receivedPost(data));
+        return {data: true};
     };
 }
 
@@ -383,6 +385,7 @@ function handleLeaveTeamEvent(msg) {
                 EventEmitter.emit('leave_team');
             }
         }
+        return {data: true};
     };
 }
 
@@ -426,6 +429,7 @@ function handleUserAddedEvent(msg) {
         if (teamId === currentTeamId && msg.data.user_id === currentUserId) {
             dispatch(getChannelAndMyMember(msg.broadcast.channel_id));
         }
+        return {data: true};
     };
 }
 
@@ -469,6 +473,7 @@ function handleUserRemovedEvent(msg) {
         } else if (msg.data.channel_id === currentChannelId) {
             dispatch(getChannelStats(currentChannelId));
         }
+        return {data: true};
     };
 }
 
@@ -491,6 +496,7 @@ function handleUserUpdatedEvent(msg) {
                 },
             });
         }
+        return {data: true};
     };
 }
 
@@ -531,6 +537,7 @@ function handleChannelCreatedEvent(msg) {
         if (teamId === currentTeamId && !channels[channelId]) {
             dispatch(getChannelAndMyMember(channelId));
         }
+        return {data: true};
     };
 }
 
@@ -556,6 +563,7 @@ function handleChannelDeletedEvent(msg) {
 
             dispatch(fetchMyChannelsAndMembers(currentTeamId));
         }
+        return {data: true};
     };
 }
 
@@ -598,6 +606,7 @@ function handleChannelConvertedEvent(msg) {
                 });
             }
         }
+        return {data: true};
     };
 }
 
@@ -611,6 +620,7 @@ function handleChannelViewedEvent(msg) {
         if (channelId !== currentChannelId && currentUserId === msg.broadcast.user_id) {
             dispatch(markChannelAsRead(channelId, null, false));
         }
+        return {data: true};
     };
 }
 
@@ -626,6 +636,7 @@ function handleChannelMemberUpdatedEvent(msg) {
 function handleDirectAddedEvent(msg) {
     return (dispatch) => {
         dispatch(getChannelAndMyMember(msg.broadcast.channel_id));
+        return {data: true};
     };
 }
 
@@ -635,6 +646,7 @@ function handlePreferenceChangedEvent(msg) {
         dispatch({type: PreferenceTypes.RECEIVED_PREFERENCES, data: [preference]});
 
         dispatch(getAddedDmUsersIfNecessary([preference]));
+        return {data: true};
     };
 }
 
@@ -651,6 +663,7 @@ function handlePreferencesChangedEvent(msg) {
 
         dispatch(getAddedDmUsersIfNecessary(preferences));
         dispatch({type: PreferenceTypes.RECEIVED_PREFERENCES, data: preferences});
+        return {data: true};
     };
 }
 
@@ -710,6 +723,7 @@ function handleUserTypingEvent(msg) {
         if (status !== General.ONLINE) {
             dispatch(getStatusesByIds([userId]));
         }
+        return {data: true};
     };
 }
 
@@ -724,6 +738,7 @@ function handleReactionAddedEvent(msg) {
             type: PostTypes.RECEIVED_REACTION,
             data: reaction,
         });
+        return {data: true};
     };
 }
 
@@ -778,6 +793,7 @@ function handleOpenDialogEvent(msg) {
     return (dispatch) => {
         const data = (msg.data && msg.data.dialog) || {};
         dispatch({type: IntegrationTypes.RECEIVED_DIALOG, data: JSON.parse(data)});
+        return {data: true};
     };
 }
 
@@ -793,7 +809,7 @@ function getAddedDmUsersIfNecessary(preferences) {
         }
 
         if (userIds.length === 0) {
-            return;
+            return {data: true};
         }
 
         const state = getState();
@@ -821,6 +837,7 @@ function getAddedDmUsersIfNecessary(preferences) {
         if (needStatuses.length > 0) {
             dispatch(getStatusesByIds(needStatuses));
         }
+        return {data: true};
     };
 }
 
