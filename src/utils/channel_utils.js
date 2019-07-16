@@ -584,7 +584,7 @@ export function areChannelMentionsIgnored(channelMemberNotifyProps: ChannelNotif
         ignoreChannelMentionsDefault = Users.IGNORE_CHANNEL_MENTIONS_ON;
     }
 
-    let ignoreChannelMentions = channelMemberNotifyProps.ignore_channel_mentions;
+    let ignoreChannelMentions = channelMemberNotifyProps && channelMemberNotifyProps.ignore_channel_mentions;
     if (!ignoreChannelMentions || ignoreChannelMentions === Users.IGNORE_CHANNEL_MENTIONS_DEFAULT) {
         ignoreChannelMentions = ignoreChannelMentionsDefault;
     }
