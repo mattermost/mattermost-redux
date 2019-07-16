@@ -246,7 +246,7 @@ describe('reducers.entities.search', () => {
             const action = {
                 type: SearchTypes.REMOVE_SEARCH_POSTS,
             };
-            const expectedState = {};
+            const expectedState = [];
 
             const actualState = reducer({matches: inputState}, action);
             assert.deepEqual(actualState.matches, expectedState);
@@ -260,7 +260,7 @@ describe('reducers.entities.search', () => {
             const action = {
                 type: UserTypes.LOGOUT_SUCCESS,
             };
-            const expectedState = {};
+            const expectedState = [];
 
             const actualState = reducer({matches: inputState}, action);
             assert.deepEqual(actualState.matches, expectedState);

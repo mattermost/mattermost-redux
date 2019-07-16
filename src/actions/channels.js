@@ -1122,7 +1122,7 @@ export function updateChannelPurpose(channelId: string, purpose: string): Action
     };
 }
 
-export function markChannelAsRead(channelId: string, prevChannelId: string, updateLastViewedAt: boolean = true): ActionFunc {
+export function markChannelAsRead(channelId: string, prevChannelId: ?string, updateLastViewedAt: boolean = true): ActionFunc {
     return async (dispatch, getState) => {
         // Send channel last viewed at to the server
         if (updateLastViewedAt) {
@@ -1138,11 +1138,11 @@ export function markChannelAsRead(channelId: string, prevChannelId: string, upda
 
         // Update channel member objects to set all mentions and posts as viewed
         const channel = channels[channelId];
-        const prevChannel = channels[prevChannelId]; // May be null since prevChannelId is optional
+        const prevChannel = prevChannelId ? channels[prevChannelId] : null; // May be null since prevChannelId is optional
 
         // Update team member objects to set mentions and posts in channel as viewed
         const channelMember = myMembers[channelId];
-        const prevChannelMember = myMembers[prevChannelId]; // May also be null
+        const prevChannelMember = prevChannelId ? myMembers[prevChannelId] : null; // May also be null
 
         const actions = [];
 
