@@ -1422,10 +1422,11 @@ export function checkForModifiedUsers() {
         const serverVersion = getServerVersion(state);
 
         if (!isMinimumServerVersion(serverVersion, 5, 14)) {
-            return;
+            return {data: true};
         }
 
         await dispatch(getProfilesByIds(Object.keys(users), {since: lastDisconnectAt}));
+        return {data: true};
     };
 }
 

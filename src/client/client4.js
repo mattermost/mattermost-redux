@@ -1548,6 +1548,13 @@ export default class Client4 {
         );
     };
 
+    getPostsUnread = async (channelId, userId, limitAfter = 30, limitBefore = 30) => {
+        return this.doFetch(
+            `${this.getUserRoute(userId)}/channels/${channelId}/posts/unread${buildQueryString({limit_after: limitAfter, limit_before: limitBefore})}`,
+            {method: 'get'}
+        );
+    };
+
     getPostsSince = async (channelId, since) => {
         return this.doFetch(
             `${this.getChannelRoute(channelId)}/posts${buildQueryString({since})}`,

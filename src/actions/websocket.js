@@ -1,5 +1,6 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
+// @flow
 
 import {Client4} from 'client';
 import websocketClient from 'client/websocket_client';
@@ -55,11 +56,17 @@ import {getCurrentUser, getCurrentUserId, getUsers, getUserStatuses} from 'selec
 import {getChannelByName} from 'utils/channel_utils';
 import {fromAutoResponder} from 'utils/post_utils';
 import EventEmitter from 'utils/event_emitter';
+import type {
+    ActionFunc,
+    DispatchFunc,
+    GetStateFunc,
+    PlatformType,
+} from '../types/actions';
 
 let doDispatch;
 
-export function init(platform, siteUrl, token, optionalWebSocket, additionalOptions = {}) {
-    return async (dispatch, getState) => {
+export function init(platform: PlatformType, siteUrl: ?string, token: ?string, optionalWebSocket: Object, additionalOptions: Object = {}) {
+    return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         const config = getConfig(getState());
         let connUrl = siteUrl || config.WebsocketURL || Client4.getUrl();
         const authToken = token || Client4.getToken();
@@ -107,21 +114,22 @@ export function init(platform, siteUrl, token, optionalWebSocket, additionalOpti
 }
 
 let reconnect = false;
-export function close(shouldReconnect = false) {
-    return async (dispatch) => {
+export function close(shouldReconnect: boolean = false) {
+    return async (dispatch: DispatchFunc) => {
         reconnect = shouldReconnect;
         websocketClient.close(true);
         if (dispatch) {
             dispatch({
                 type: GeneralTypes.WEBSOCKET_CLOSED,
                 timestamp: Date.now(),
+                data: null,
             });
         }
     };
 }
 
-export function doFirstConnect(now) {
-    return async (dispatch, getState) => {
+export function doFirstConnect(now: number) {
+    return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         const state = getState();
 
         if (state.websocket.lastDisconnectAt) {
@@ -131,12 +139,14 @@ export function doFirstConnect(now) {
         dispatch({
             type: GeneralTypes.WEBSOCKET_SUCCESS,
             timestamp: now,
+            data: null,
         });
+        return {data: true};
     };
 }
 
-export function doReconnect(now) {
-    return async (dispatch, getState) => {
+export function doReconnect(now: number) {
+    return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         const state = getState();
         const currentTeamId = getCurrentTeamId(state);
         const currentChannelId = getCurrentChannelId(state);
@@ -164,7 +174,8 @@ export function doReconnect(now) {
             const currentTeamMembership = getCurrentTeamMembership(getState());
             if (currentTeamMembership) {
                 dispatch(getPosts(currentChannelId));
-                const {data} = await dispatch(fetchMyChannelsAndMembers(currentTeamId));
+                const fethcResult = await dispatch(fetchMyChannelsAndMembers(currentTeamId));
+                const data = fethcResult.data || null;
                 dispatch(loadProfilesForDirect());
 
                 if (data && data.members) {
@@ -190,12 +201,14 @@ export function doReconnect(now) {
         dispatch({
             type: GeneralTypes.WEBSOCKET_SUCCESS,
             timestamp: now,
+            data: null,
         });
+        return {data: true};
     };
 }
 
 function handleConnecting() {
-    doDispatch({type: GeneralTypes.WEBSOCKET_REQUEST});
+    doDispatch({type: GeneralTypes.WEBSOCKET_REQUEST, data: null});
 }
 
 function handleFirstConnect() {
@@ -217,6 +230,7 @@ function handleClose(connectFailCount) {
     doDispatch({
         type: GeneralTypes.WEBSOCKET_FAILURE,
         error: connectFailCount,
+        data: null,
         timestamp: Date.now(),
     });
 }
@@ -238,9 +252,6 @@ function handleEvent(msg) {
         break;
     case WebsocketEvents.UPDATE_TEAM:
         doDispatch(handleUpdateTeamEvent(msg));
-        break;
-    case WebsocketEvents.PATCH_TEAM:
-        doDispatch(handlePatchTeamEvent(msg));
         break;
     case WebsocketEvents.ADDED_TO_TEAM:
         doDispatch(handleTeamAddedEvent(msg));
@@ -327,7 +338,7 @@ function handleEvent(msg) {
 }
 
 function handleNewPostEvent(msg) {
-    return async (dispatch, getState) => {
+    return (dispatch, getState) => {
         const post = JSON.parse(msg.data.post);
 
         dispatch(handleNewPost(msg));
@@ -339,6 +350,7 @@ function handleNewPostEvent(msg) {
                 data: [{user_id: post.user_id, status: General.ONLINE}],
             });
         }
+        return {data: true};
     };
 }
 
@@ -348,6 +360,7 @@ function handlePostEdited(msg) {
 
         getProfilesAndStatusesForPosts([data], dispatch, getState);
         dispatch(receivedPost(data));
+        return {data: true};
     };
 }
 
@@ -372,6 +385,7 @@ function handleLeaveTeamEvent(msg) {
                 EventEmitter.emit('leave_team');
             }
         }
+        return {data: true};
     };
 }
 
@@ -382,19 +396,13 @@ function handleUpdateTeamEvent(msg) {
     };
 }
 
-function handlePatchTeamEvent(msg) {
-    return {
-        type: TeamTypes.PATCHED_TEAM,
-        data: JSON.parse(msg.data.team),
-    };
-}
-
 function handleTeamAddedEvent(msg) {
     return async (dispatch) => {
         await Promise.all([
             dispatch(getTeam(msg.data.team_id)),
             dispatch(getMyTeamUnreads()),
         ]);
+        return {data: true};
     };
 }
 
@@ -415,12 +423,13 @@ function handleUserAddedEvent(msg) {
         }, getState);
 
         if (msg.broadcast.channel_id === currentChannelId) {
-            dispatch(getChannelStats(teamId, currentChannelId));
+            dispatch(getChannelStats(currentChannelId));
         }
 
         if (teamId === currentTeamId && msg.data.user_id === currentUserId) {
             dispatch(getChannelAndMyMember(msg.broadcast.channel_id));
         }
+        return {data: true};
     };
 }
 
@@ -462,8 +471,9 @@ function handleUserRemovedEvent(msg) {
                 EventEmitter.emit(General.SWITCH_TO_DEFAULT_CHANNEL, currentTeamId);
             }
         } else if (msg.data.channel_id === currentChannelId) {
-            dispatch(getChannelStats(currentTeamId, currentChannelId));
+            dispatch(getChannelStats(currentChannelId));
         }
+        return {data: true};
     };
 }
 
@@ -486,6 +496,7 @@ function handleUserUpdatedEvent(msg) {
                 },
             });
         }
+        return {data: true};
     };
 }
 
@@ -526,6 +537,7 @@ function handleChannelCreatedEvent(msg) {
         if (teamId === currentTeamId && !channels[channelId]) {
             dispatch(getChannelAndMyMember(channelId));
         }
+        return {data: true};
     };
 }
 
@@ -551,16 +563,17 @@ function handleChannelDeletedEvent(msg) {
 
             dispatch(fetchMyChannelsAndMembers(currentTeamId));
         }
+        return {data: true};
     };
 }
 
 function handleChannelUpdatedEvent(msg) {
-    return (dispatch, getState) => {
+    return async (dispatch, getState) => {
         let channel;
         try {
             channel = msg.data ? JSON.parse(msg.data.channel) : null;
         } catch (err) {
-            return;
+            return {error: err};
         }
 
         const currentChannelId = getCurrentChannelId(getState());
@@ -576,6 +589,7 @@ function handleChannelUpdatedEvent(msg) {
                 EventEmitter.emit(WebsocketEvents.CHANNEL_UPDATED, channel);
             }
         }
+        return {data: true};
     };
 }
 
@@ -592,6 +606,7 @@ function handleChannelConvertedEvent(msg) {
                 });
             }
         }
+        return {data: true};
     };
 }
 
@@ -605,6 +620,7 @@ function handleChannelViewedEvent(msg) {
         if (channelId !== currentChannelId && currentUserId === msg.broadcast.user_id) {
             dispatch(markChannelAsRead(channelId, null, false));
         }
+        return {data: true};
     };
 }
 
@@ -620,6 +636,7 @@ function handleChannelMemberUpdatedEvent(msg) {
 function handleDirectAddedEvent(msg) {
     return (dispatch) => {
         dispatch(getChannelAndMyMember(msg.broadcast.channel_id));
+        return {data: true};
     };
 }
 
@@ -629,6 +646,7 @@ function handlePreferenceChangedEvent(msg) {
         dispatch({type: PreferenceTypes.RECEIVED_PREFERENCES, data: [preference]});
 
         dispatch(getAddedDmUsersIfNecessary([preference]));
+        return {data: true};
     };
 }
 
@@ -645,6 +663,7 @@ function handlePreferencesChangedEvent(msg) {
 
         dispatch(getAddedDmUsersIfNecessary(preferences));
         dispatch({type: PreferenceTypes.RECEIVED_PREFERENCES, data: preferences});
+        return {data: true};
     };
 }
 
@@ -704,6 +723,7 @@ function handleUserTypingEvent(msg) {
         if (status !== General.ONLINE) {
             dispatch(getStatusesByIds([userId]));
         }
+        return {data: true};
     };
 }
 
@@ -718,6 +738,7 @@ function handleReactionAddedEvent(msg) {
             type: PostTypes.RECEIVED_REACTION,
             data: reaction,
         });
+        return {data: true};
     };
 }
 
@@ -772,6 +793,7 @@ function handleOpenDialogEvent(msg) {
     return (dispatch) => {
         const data = (msg.data && msg.data.dialog) || {};
         dispatch({type: IntegrationTypes.RECEIVED_DIALOG, data: JSON.parse(data)});
+        return {data: true};
     };
 }
 
@@ -787,7 +809,7 @@ function getAddedDmUsersIfNecessary(preferences) {
         }
 
         if (userIds.length === 0) {
-            return;
+            return {data: true};
         }
 
         const state = getState();
@@ -815,12 +837,13 @@ function getAddedDmUsersIfNecessary(preferences) {
         if (needStatuses.length > 0) {
             dispatch(getStatusesByIds(needStatuses));
         }
+        return {data: true};
     };
 }
 
 let lastTimeTypingSent = 0;
-export function userTyping(channelId, parentPostId) {
-    return async (dispatch, getState) => {
+export function userTyping(channelId: string, parentPostId: string): ActionFunc {
+    return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         const state = getState();
         const config = getConfig(state);
         const t = Date.now();
