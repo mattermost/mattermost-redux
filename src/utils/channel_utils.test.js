@@ -178,6 +178,14 @@ describe('ChannelUtils', () => {
         const currentUserNotifyProps6 = {channel: 'false'};
         const channelMemberNotifyProps6 = {ignore_channel_mentions: Users.IGNORE_CHANNEL_MENTIONS_ON};
         assert.equal(true, areChannelMentionsIgnored(channelMemberNotifyProps6, currentUserNotifyProps6));
+
+        const currentUserNotifyProps7 = {channel: true};
+        const channelMemberNotifyProps7 = null;
+        assert.equal(false, areChannelMentionsIgnored(channelMemberNotifyProps7, currentUserNotifyProps7));
+
+        const currentUserNotifyProps8 = {channel: false};
+        const channelMemberNotifyProps8 = null;
+        assert.equal(false, areChannelMentionsIgnored(channelMemberNotifyProps8, currentUserNotifyProps8));
     });
 
     it('filterChannelsMatchingTerm', () => {
