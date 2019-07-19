@@ -91,7 +91,7 @@ class WebSocketClient {
             this.token = token;
 
             this.conn.onopen = () => {
-                if (token && platform !== 'android') {
+                if (token) {
                     // we check for the platform as a workaround until we fix on the server that further authentications
                     // are ignored
                     this.sendMessage('authentication_challenge', {token});
