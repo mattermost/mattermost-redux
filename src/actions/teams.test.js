@@ -333,7 +333,7 @@ describe('Actions.Teams', () => {
         const member = members[TestHelper.basicTeam.id];
 
         assert.ok(member);
-        assert.ok(member.hasOwnProperty('mention_count'));
+        assert.ok(Object.prototype.hasOwnProperty.call(member, 'mention_count'));
     });
 
     it('getTeamMembersForUser', async () => {

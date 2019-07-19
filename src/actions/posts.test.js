@@ -1267,9 +1267,6 @@ describe('Actions.Posts', () => {
     });
 
     it('getCustomEmojiForReaction', async () => {
-        const oldVersion = Client4.getServerVersion();
-        Client4.serverVersion = '4.7.0';
-
         const testImageData = fs.createReadStream('test/assets/images/test.png');
         const {dispatch, getState} = store;
 
@@ -1302,8 +1299,6 @@ describe('Actions.Posts', () => {
         assert.ok(emojis);
         assert.ok(emojis[created.id]);
         assert.ok(state.entities.emojis.nonExistentEmoji.has(missingEmojiName));
-
-        Client4.serverVersion = oldVersion;
     });
 
     it('getOpenGraphMetadata', async () => {
