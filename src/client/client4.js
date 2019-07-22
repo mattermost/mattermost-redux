@@ -370,6 +370,24 @@ export default class Client4 {
         );
     }
 
+    promoteGuestToUser = async (userId) => {
+        this.trackEvent('api', 'api_users_promote_guest_to_user');
+
+        return this.doFetch(
+            `${this.getUserRoute(userId)}/promote`,
+            {method: 'post'}
+        );
+    }
+
+    demoteUserToGuest = async (userId) => {
+        this.trackEvent('api', 'api_users_demote_user_to_guest');
+
+        return this.doFetch(
+            `${this.getUserRoute(userId)}/demote`,
+            {method: 'post'}
+        );
+    }
+
     updateUserRoles = async (userId, roles) => {
         this.trackEvent('api', 'api_users_update_roles');
 
@@ -1141,6 +1159,15 @@ export default class Client4 {
         return this.doFetch(
             `${this.getTeamRoute(teamId)}/invite/email`,
             {method: 'post', body: JSON.stringify(emails)}
+        );
+    };
+
+    sendEmailGuestInvitesToChannels = async (teamId, channelIds, emails, message) => {
+        this.trackEvent('api', 'api_teams_invite_guests', {team_id: teamId, channel_ids: channelIds});
+
+        return this.doFetch(
+            `${this.getTeamRoute(teamId)}/invite-guests/email`,
+            {method: 'post', body: JSON.stringify({emails, channels: channelIds, message})}
         );
     };
 

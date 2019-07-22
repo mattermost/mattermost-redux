@@ -79,7 +79,7 @@ export function getChannelsInTeam(state: GlobalState): RelationOneToMany<Team, C
 export const getDirectChannelsSet: (GlobalState) => Set<string> = createSelector(
     getChannelsInTeam,
     (channelsInTeam: RelationOneToMany<Team, Channel>): Set<string> => {
-        return new Set(channelsInTeam['']) || new Set();
+        return (channelsInTeam && new Set(channelsInTeam[''])) || new Set();
     }
 );
 
@@ -263,7 +263,7 @@ export const getChannelSetInCurrentTeam: (GlobalState) => Array<string> = create
     getCurrentTeamId,
     getChannelsInTeam,
     (currentTeamId: string, channelsInTeam: RelationOneToMany<Team, Channel>): Array<string> => {
-        return channelsInTeam[currentTeamId] || [];
+        return (channelsInTeam && channelsInTeam[currentTeamId]) || [];
     }
 );
 
