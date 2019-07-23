@@ -10,7 +10,6 @@ import {getProfilesByIds} from 'actions/users';
 import {getCustomEmojisByName as selectCustomEmojisByName} from 'selectors/entities/emojis';
 
 import {parseNeededCustomEmojisFromText} from 'utils/emoji_utils';
-import {isMinimumServerVersion} from 'utils/helpers';
 
 import {logError} from './errors';
 import {bindClientFunc, forceLogoutIfNecessary} from './helpers';
@@ -46,11 +45,6 @@ export function getCustomEmoji(emojiId: string): ActionFunc {
 
 export function getCustomEmojiByName(name: string): ActionFunc {
     return async (dispatch, getState) => {
-        const serverVersion = Client4.getServerVersion();
-        if (!isMinimumServerVersion(serverVersion, 4, 7)) {
-            return {data: {}};
-        }
-
         let data;
         try {
             data = await Client4.getCustomEmojiByName(name);
@@ -214,11 +208,6 @@ export function deleteCustomEmoji(emojiId: string): ActionFunc {
 
 export function searchCustomEmojis(term: string, options: Object = {}, loadUsers: boolean = false): ActionFunc {
     return async (dispatch, getState) => {
-        const serverVersion = Client4.getServerVersion();
-        if (!isMinimumServerVersion(serverVersion, 4, 7)) {
-            return {data: []};
-        }
-
         let data;
         try {
             data = await Client4.searchCustomEmoji(term, options);
@@ -244,11 +233,6 @@ export function searchCustomEmojis(term: string, options: Object = {}, loadUsers
 
 export function autocompleteCustomEmojis(name: string): ActionFunc {
     return async (dispatch, getState) => {
-        const serverVersion = Client4.getServerVersion();
-        if (!isMinimumServerVersion(serverVersion, 4, 7)) {
-            return {data: []};
-        }
-
         let data;
         try {
             data = await Client4.autocompleteCustomEmoji(name);
