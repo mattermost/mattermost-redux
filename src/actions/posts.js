@@ -744,6 +744,8 @@ export function getPostsAround(channelId, postId, perPage = Posts.POST_CHUNK_SIZ
                 postId,
                 ...before.order,
             ],
+            next_post_id: after.next_post_id,
+            before_post_id: before.before_post_id,
         };
 
         getProfilesAndStatusesForPosts(posts.posts, dispatch, getState);
