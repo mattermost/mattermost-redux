@@ -115,7 +115,7 @@ export const getMyTeams = createSelector(
     getTeams,
     getTeamMemberships,
     (teams, members) => {
-        return Object.values(teams).filter((t) => members[t.id] && !t.delete_at);
+        return Object.values(teams).filter((t) => members[t.id] && t.delete_at === 0);
     }
 );
 
