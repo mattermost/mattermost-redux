@@ -875,7 +875,7 @@ export const getDirectChannels: (GlobalState) => Array<Channel> = createSelector
         const directChannelsIds = [];
         teammates.reduce((result, teammateId) => {
             const name = getDirectChannelName(currentUser.id, teammateId);
-            const channel = channelValues.find((c: Channel) => c.name === name); //eslint-disable-line max-nested-callbacks
+            const channel = channelValues.find((c: Channel) => c && c.name === name); //eslint-disable-line max-nested-callbacks
             if (channel) {
                 const lastPost = lastPosts[channel.id];
                 const otherUser = profiles[getUserIdFromChannelName(currentUser.id, channel.name)];
