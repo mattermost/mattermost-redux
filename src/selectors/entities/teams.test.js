@@ -43,6 +43,7 @@ describe('Selectors.Teams', () => {
     const myMembers = {};
     myMembers[team1.id] = {team_id: team1.id, user_id: user.id, roles: General.TEAM_USER_ROLE, mention_count: 1};
     myMembers[team2.id] = {team_id: team2.id, user_id: user.id, roles: General.TEAM_USER_ROLE, mention_count: 3};
+    myMembers[team5.id] = {team_id: team5.id, user_id: user.id, roles: General.TEAM_USER_ROLE, mention_count: 0};
 
     const membersInTeam = {};
     membersInTeam[team1.id] = {};
