@@ -189,9 +189,11 @@ describe('Selectors.Channels', () => {
                 teams: {
                     [team1.id]: {
                         id: team1.id,
+                        delete_at: 0,
                     },
                     [team2.id]: {
                         id: team2.id,
+                        delete_at: 0,
                     },
                 },
                 myMembers: {
@@ -1621,8 +1623,8 @@ describe('getMyFirstChannelForTeams', () => {
                         team2: {},
                     },
                     teams: {
-                        team1: {id: 'team1'},
-                        team2: {id: 'team2'},
+                        team1: {id: 'team1', delete_at: 0},
+                        team2: {id: 'team2', delete_at: 0},
                     },
                 },
                 users: {
@@ -1657,7 +1659,7 @@ describe('getMyFirstChannelForTeams', () => {
                         team1: {},
                     },
                     teams: {
-                        team1: {id: 'team1'},
+                        team1: {id: 'team1', delete_at: 0},
                     },
                 },
                 users: {
@@ -1692,8 +1694,8 @@ describe('getMyFirstChannelForTeams', () => {
                         team1: {},
                     },
                     teams: {
-                        team1: {id: 'team1'},
-                        team2: {id: 'team2'},
+                        team1: {id: 'team1', delete_at: 0},
+                        team2: {id: 'team2', delete_at: 0},
                     },
                 },
                 users: {
