@@ -551,7 +551,15 @@ export function getUnreadPostsChunk(state: GlobalState, channelId: $ID<Channel>,
     const postsEntity = state.entities.posts;
     const posts = postsEntity.posts;
     const recentChunk = getRecentPostsChunkInChannel(state, channelId);
-    if (recentChunk && recentChunk.order.length) {
+    if (recentChunk) {
+        // This would happen if there are no posts in channel.
+        // If the system messages are deleted by sys admin.
+        // Experimental changes like hiding Join/Leave still will have recent chunk so it follows the default path based on timestamp
+
+        if (!recentChunk.order.length) {
+            return recentChunk;
+        }
+
         const {order} = recentChunk;
         const oldestPostInBlock = posts[order[order.length - 1]];
 

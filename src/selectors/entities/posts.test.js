@@ -1551,6 +1551,24 @@ describe('Selectors.Posts', () => {
             const unreadPostsChunk = Selectors.getUnreadPostsChunk(state, 1234, 1002);
             assert.deepEqual(unreadPostsChunk, {order: ['e', 'f', 'g', 'h', 'i', 'j'], recent: false});
         });
+
+        it('should return recent chunk if it is an empty array', () => {
+            const state = {
+                entities: {
+                    posts: {
+                        posts: {},
+                        postsInChannel: {
+                            1234: [
+                                {order: [], recent: true},
+                            ],
+                        },
+                    },
+                },
+            };
+
+            const unreadPostsChunk = Selectors.getUnreadPostsChunk(state, 1234, 1002);
+            assert.deepEqual(unreadPostsChunk, {order: [], recent: true});
+        });
     });
 
     describe('getPostsForIds', () => {
