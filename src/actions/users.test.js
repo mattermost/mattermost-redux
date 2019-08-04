@@ -576,7 +576,6 @@ describe('Actions.Users', () => {
         sessions = store.getState().entities.users.mySessions;
         assert.ok(sessions.length === sessionsLength - 1);
 
-        TestHelper.basicClient4.token = '';
         nock(Client4.getUsersRoute()).
             post('/login').
             reply(200, TestHelper.basicUser);

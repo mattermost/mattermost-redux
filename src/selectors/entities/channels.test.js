@@ -189,9 +189,11 @@ describe('Selectors.Channels', () => {
                 teams: {
                     [team1.id]: {
                         id: team1.id,
+                        delete_at: 0,
                     },
                     [team2.id]: {
                         id: team2.id,
+                        delete_at: 0,
                     },
                 },
                 myMembers: {
@@ -437,6 +439,45 @@ describe('Selectors.Channels', () => {
 
         // it should't have a channel that belongs to a team
         assert.equal(fromModifiedState.includes(channel1.id), false, 'should not have a channel that belongs to a team');
+    });
+
+    it('get direct channel ids for channels with non-null values', () => {
+        const dmChannel1 = TestHelper.fakeDmChannel(user.id, 'fakeUserId1');
+        const dmChannel2 = TestHelper.fakeDmChannel(user.id, 'fakeUserId2');
+
+        const modifiedState = {
+            ...testState,
+            entities: {
+                ...testState.entities,
+                channels: {
+                    ...testState.entities.channels,
+                    channels: {
+                        ...testState.entities.channels.channels,
+                        [dmChannel1.id]: dmChannel1,
+                        [dmChannel2.id]: null,
+                    },
+                },
+                preferences: {
+                    ...testState.entities.preferences,
+                    myPreferences: {
+                        [`${Preferences.CATEGORY_DIRECT_CHANNEL_SHOW}--${dmChannel1.teammate_id}`]: {
+                            category: Preferences.CATEGORY_DIRECT_CHANNEL_SHOW,
+                            name: dmChannel1.teammate_id,
+                            value: 'true',
+                        },
+                        [`${Preferences.CATEGORY_DIRECT_CHANNEL_SHOW}--${dmChannel2.teammate_id}`]: {
+                            category: Preferences.CATEGORY_DIRECT_CHANNEL_SHOW,
+                            name: dmChannel2.teammate_id,
+                            value: 'true',
+                        },
+                    },
+                },
+            },
+        };
+
+        const fromModifiedState = Selectors.getDirectChannelIds(modifiedState);
+        assert.equal(fromModifiedState.length, 1);
+        assert.equal(fromModifiedState[0], dmChannel1.id);
     });
 
     it('get channel ids in current team strict equal', () => {
@@ -1621,8 +1662,8 @@ describe('getMyFirstChannelForTeams', () => {
                         team2: {},
                     },
                     teams: {
-                        team1: {id: 'team1'},
-                        team2: {id: 'team2'},
+                        team1: {id: 'team1', delete_at: 0},
+                        team2: {id: 'team2', delete_at: 0},
                     },
                 },
                 users: {
@@ -1657,7 +1698,7 @@ describe('getMyFirstChannelForTeams', () => {
                         team1: {},
                     },
                     teams: {
-                        team1: {id: 'team1'},
+                        team1: {id: 'team1', delete_at: 0},
                     },
                 },
                 users: {
@@ -1692,8 +1733,8 @@ describe('getMyFirstChannelForTeams', () => {
                         team1: {},
                     },
                     teams: {
-                        team1: {id: 'team1'},
-                        team2: {id: 'team2'},
+                        team1: {id: 'team1', delete_at: 0},
+                        team2: {id: 'team2', delete_at: 0},
                     },
                 },
                 users: {

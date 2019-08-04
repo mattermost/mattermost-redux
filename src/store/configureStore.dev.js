@@ -47,7 +47,6 @@ export default function configureServiceStore(preloadedState, appReducer, userOf
     const store = createStore(
         createOfflineReducer(createDevReducer(baseState, serviceReducer, appReducer)),
         baseState,
-        // eslint-disable-line - offlineCompose(config)(middleware, other funcs)
         offlineCompose(baseOfflineConfig)(
             createMiddleware(clientOptions),
             loadReduxDevtools ? [devToolsEnhancer()] : []

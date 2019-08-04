@@ -980,6 +980,8 @@ describe('Actions.Posts', () => {
                 post2: {id: 'post2', create_at: 10001, message: ''},
             },
             order: ['post1', 'post2'],
+            next_post_id: 'post0',
+            before_post_id: 'post3',
         };
         const postsThread = {
             posts: {
@@ -987,6 +989,8 @@ describe('Actions.Posts', () => {
                 post3: {id: 'post3', root_id: 'root', create_at: 10000, message: ''},
             },
             order: ['post3'],
+            next_post_id: 'post2',
+            before_post_id: 'post5',
         };
         const postsBefore = {
             posts: {
@@ -994,6 +998,8 @@ describe('Actions.Posts', () => {
                 post5: {id: 'post5', create_at: 9998, message: ''},
             },
             order: ['post4', 'post5'],
+            next_post_id: 'post3',
+            before_post_id: 'post6',
         };
 
         nock(Client4.getChannelsRoute()).
@@ -1023,6 +1029,8 @@ describe('Actions.Posts', () => {
                 postId,
                 ...postsBefore.order,
             ],
+            next_post_id: postsAfter.next_post_id,
+            before_post_id: postsBefore.before_post_id,
         });
 
         const {posts, postsInChannel, postsInThread} = store.getState().entities.posts;
@@ -1267,9 +1275,6 @@ describe('Actions.Posts', () => {
     });
 
     it('getCustomEmojiForReaction', async () => {
-        const oldVersion = Client4.getServerVersion();
-        Client4.serverVersion = '4.7.0';
-
         const testImageData = fs.createReadStream('test/assets/images/test.png');
         const {dispatch, getState} = store;
 
@@ -1302,8 +1307,6 @@ describe('Actions.Posts', () => {
         assert.ok(emojis);
         assert.ok(emojis[created.id]);
         assert.ok(state.entities.emojis.nonExistentEmoji.has(missingEmojiName));
-
-        Client4.serverVersion = oldVersion;
     });
 
     it('getOpenGraphMetadata', async () => {

@@ -115,7 +115,7 @@ export const getMyTeams = createSelector(
     getTeams,
     getTeamMemberships,
     (teams, members) => {
-        return Object.values(teams).filter((t) => members[t.id]);
+        return Object.values(teams).filter((t) => members[t.id] && t.delete_at === 0);
     }
 );
 
@@ -229,18 +229,17 @@ export const getSortedJoinableTeams = createSelector(
 );
 
 export const getMySortedTeamIds = createIdsSelector(
-    getTeams,
-    getTeamMemberships,
+    getMyTeams,
     (state, locale) => locale,
-    (teams, myMembers, locale) => {
-        return Object.values(teams).filter((t) => myMembers[t.id]).sort(sortTeamsWithLocale(locale)).map((t) => t.id);
+    (teams, locale) => {
+        return teams.sort(sortTeamsWithLocale(locale)).map((t) => t.id);
     }
 );
 
 export const getMyTeamsCount = createSelector(
-    getTeamMemberships,
+    getMyTeams,
     (teams) => {
-        return Object.keys(teams).length;
+        return teams.length;
     }
 );
 

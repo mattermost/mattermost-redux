@@ -224,9 +224,6 @@ describe('Actions.Emojis', () => {
     it('searchCustomEmojis', async () => {
         const testImageData = fs.createReadStream('test/assets/images/test.png');
 
-        const oldVersion = Client4.getServerVersion();
-        Client4.serverVersion = '4.7.0';
-
         nock(Client4.getEmojisRoute()).
             post('').
             reply(201, {id: TestHelper.generateId(), create_at: 1507918415696, update_at: 1507918415696, delete_at: 0, creator_id: TestHelper.basicUser.id, name: TestHelper.generateId()});
@@ -250,19 +247,10 @@ describe('Actions.Emojis', () => {
         const emojis = state.entities.emojis.customEmoji;
         assert.ok(emojis);
         assert.ok(emojis[created.id]);
-
-        Client4.serverVersion = '4.6.0';
-        const {data} = await Actions.searchCustomEmojis(created.name, {prefix_only: true})(store.dispatch, store.getState);
-        assert.ok(data.length === 0);
-
-        Client4.serverVersion = oldVersion;
     });
 
     it('autocompleteCustomEmojis', async () => {
         const testImageData = fs.createReadStream('test/assets/images/test.png');
-
-        const oldVersion = Client4.getServerVersion();
-        Client4.serverVersion = '4.7.0';
 
         nock(Client4.getEmojisRoute()).
             post('').
@@ -288,12 +276,6 @@ describe('Actions.Emojis', () => {
         const emojis = state.entities.emojis.customEmoji;
         assert.ok(emojis);
         assert.ok(emojis[created.id]);
-
-        Client4.serverVersion = '4.6.0';
-        const {data} = await Actions.autocompleteCustomEmojis(created.name)(store.dispatch, store.getState);
-        assert.ok(data.length === 0);
-
-        Client4.serverVersion = oldVersion;
     });
 
     it('getCustomEmoji', async () => {
@@ -326,9 +308,6 @@ describe('Actions.Emojis', () => {
 
     it('getCustomEmojiByName', async () => {
         const testImageData = fs.createReadStream('test/assets/images/test.png');
-
-        const oldVersion = Client4.getServerVersion();
-        Client4.serverVersion = '4.7.0';
 
         nock(Client4.getEmojisRoute()).
             post('').
@@ -364,19 +343,10 @@ describe('Actions.Emojis', () => {
 
         state = store.getState();
         assert.ok(state.entities.emojis.nonExistentEmoji.has(missingName));
-
-        Client4.serverVersion = '4.6.0';
-        const {data} = await Actions.getCustomEmojiByName(created.name)(store.dispatch, store.getState);
-        assert.ok(Object.keys(data).length === 0);
-
-        Client4.serverVersion = oldVersion;
     });
 
     it('getCustomEmojisByName', async () => {
         const testImageData = fs.createReadStream('test/assets/images/test.png');
-
-        const oldVersion = Client4.getServerVersion();
-        Client4.serverVersion = '4.7.0';
 
         nock(Client4.getEmojisRoute()).
             post('').
@@ -405,15 +375,10 @@ describe('Actions.Emojis', () => {
         const state = store.getState();
         assert.ok(state.entities.emojis.customEmoji[created.id]);
         assert.ok(state.entities.emojis.nonExistentEmoji.has(missingName));
-
-        Client4.serverVersion = oldVersion;
     });
 
     it('getCustomEmojisInText', async () => {
         const testImageData = fs.createReadStream('test/assets/images/test.png');
-
-        const oldVersion = Client4.getServerVersion();
-        Client4.serverVersion = '4.7.0';
 
         nock(Client4.getEmojisRoute()).
             post('').
@@ -442,7 +407,5 @@ describe('Actions.Emojis', () => {
         const state = store.getState();
         assert.ok(state.entities.emojis.customEmoji[created.id]);
         assert.ok(state.entities.emojis.nonExistentEmoji.has(missingName));
-
-        Client4.serverVersion = oldVersion;
     });
 });
