@@ -5,7 +5,7 @@ import {batchActions} from 'redux-batched-actions';
 
 import {Client4} from 'client';
 import {General, Preferences, Posts, WebsocketEvents} from 'constants';
-import {PostTypes, FileTypes, IntegrationTypes} from 'action_types';
+import {PostTypes, FileTypes, IntegrationTypes, ChannelTypes} from 'action_types';
 
 import {getCurrentChannelId, getMyChannelMember as getMyChannelMemberSelector} from 'selectors/entities/channels';
 import {getCustomEmojisByName as selectCustomEmojisByName} from 'selectors/entities/emojis';
@@ -362,6 +362,24 @@ export function editPost(post) {
             post,
         ],
     });
+}
+
+export function setUnreadChannel(postId) {
+    return async (dispatch, getState) => {
+        try {
+            await Client4.markChannelAsUnread(postId);
+        } catch (error) {
+            forceLogoutIfNecessary(error, dispatch, getState);
+            dispatch(logError(error));
+            return {error};
+        }
+        dispatch({
+            type: ChannelTypes.CHANNEL_UNREAD_SUCCESS,
+            data: null,
+        });
+        // NOTE: should we update the data from the channel?
+        return {data: true};
+    };
 }
 
 export function pinPost(postId) {

@@ -139,6 +139,17 @@ export function channels(state = {}, action) {
         return {...state, [channelId]: {...channel, scheme_id: schemeId}};
     }
 
+    case ChannelTypes.CHANNEL_UNREAD_SUCCESS: {
+        const {channelId, messageCount, userMentions} = action.data;
+        const channelState = state[channelId];
+
+        if (!channelState) {
+            return state;
+        }
+
+        return {...state, [channelId]: {...channelState, total_msg_count: messageCount, mention_count: userMentions}}
+    }
+
     case UserTypes.LOGOUT_SUCCESS:
         return {};
     default:
