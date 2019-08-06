@@ -366,8 +366,9 @@ export function editPost(post) {
 
 export function setUnreadChannel(postId) {
     return async (dispatch, getState) => {
+        let unreadChan;
         try {
-            await Client4.markChannelAsUnread(postId);
+            unreadChan = await Client4.markChannelAsUnread(postId);
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch, getState);
             dispatch(logError(error));
@@ -375,9 +376,8 @@ export function setUnreadChannel(postId) {
         }
         dispatch({
             type: ChannelTypes.CHANNEL_UNREAD_SUCCESS,
-            data: null,
+            data: unreadChan,
         });
-        // NOTE: should we update the data from the channel?
         return {data: true};
     };
 }
