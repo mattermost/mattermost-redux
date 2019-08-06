@@ -20,7 +20,7 @@
     "redux": "4.0.4",
     "redux-action-buffer": "1.2.0",
     "redux-batched-actions": "0.4.1",
-    "redux-offline": "git+https://github.com/enahum/redux-offline.git#4bd85e7e3b279a2b11fb4d587808d583d2b5e7b5",
+    "redux-offline": "git+https://github.com/enahum/redux-offline.git#973b5d322a5690beb0c9999be4ed44871690cae9",
     "redux-persist": "4.9.1",
     "redux-thunk": "2.3.0",
     "reselect": "4.0.0",
