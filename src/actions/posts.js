@@ -364,19 +364,29 @@ export function editPost(post) {
     });
 }
 
-export function setUnreadChannel(postId) {
+export function setUnreadPost(userId, postId) {
     return async (dispatch, getState) => {
         let unreadChan;
+        const state = getState();
         try {
-            unreadChan = await Client4.markChannelAsUnread(postId);
+            unreadChan = await Client4.markPostAsUnread(userId, postId);
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch, getState);
             dispatch(logError(error));
             return {error};
         }
+
+        const oldMsgCount = state.entities.channels.channels[unreadChan.channel_id].msgCount;
+
         dispatch({
-            type: ChannelTypes.CHANNEL_UNREAD_SUCCESS,
-            data: unreadChan,
+            type: ChannelTypes.POST_UNREAD_SUCCESS,
+            data: {
+                teamId: unreadChan.team_id,
+                channelId: unreadChan.channel_id,
+                msgCount: unreadChan.msg_count,
+                mentionCount: unreadChan.mention_count,
+                deltaMsgs: oldMsgCount - unreadChan.msg_count,
+            },
         });
         return {data: true};
     };

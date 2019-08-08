@@ -1631,11 +1631,11 @@ export default class Client4 {
         );
     };
 
-    markChannelAsUnread = async (postId) => {
-        this.trackEvent('api', 'api_post_set_unread_channel');
+    markPostAsUnread = async (userId, postId) => {
+        this.trackEvent('api', 'api_post_set_unread_post');
 
         return this.doFetch(
-            `${this.getPostRoute(postId)}/set-unread`,
+            `${this.getUserRoute(userId)}${this.getPostRoute(postId)}/set-unread`,
             {method: 'post'}
         );
     }

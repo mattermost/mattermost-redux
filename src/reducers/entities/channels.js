@@ -139,17 +139,6 @@ export function channels(state = {}, action) {
         return {...state, [channelId]: {...channel, scheme_id: schemeId}};
     }
 
-    case ChannelTypes.CHANNEL_UNREAD_SUCCESS: {
-        const {channelId, msgCount, userMentions} = action.data;
-        const channelState = state[channelId];
-
-        if (!channelState) {
-            return state;
-        }
-
-        return {...state, [channelId]: {...channelState, total_msg_count: msgCount, mention_count: userMentions}};
-    }
-
     case UserTypes.LOGOUT_SUCCESS:
         return {};
     default:
@@ -314,6 +303,15 @@ function myMembers(state = {}, action) {
     }
     case ChannelTypes.UPDATED_CHANNEL_MEMBER_SCHEME_ROLES: {
         return updateChannelMemberSchemeRoles(state, action);
+    }
+    case ChannelTypes.POST_UNREAD_SUCCESS: {
+        const data = action.data;
+        const channelState = state[data.channelId];
+
+        if (!channelState) {
+            return state;
+        }
+        return {...state, [data.channelId]: {...channelState, msg_count: data.msgCount, mention_count: data.mentionCount}};
     }
     case UserTypes.LOGOUT_SUCCESS:
         return {};

@@ -1117,6 +1117,47 @@ describe('Actions.Posts', () => {
         assert.ifError(unflagged);
     });
 
+    it('setUnreadPost', async () => {
+        const teamId = TestHelper.generateId();
+        const channelId = TestHelper.generateId();
+        const userId = TestHelper.generateId();
+
+        store = await configureStore({
+            entities: {
+                channels: {
+                    channels: {
+                        [channelId]: {team_id: teamId, total_msg_count: 10},
+                    },
+                    myMembers: {
+                        [channelId]: {msg_count: 10, mention_count: 0},
+                    },
+                },
+                teams: {
+                    myMembers: {
+                        [teamId]: {msg_count: 15, mention_count: 0},
+                    },
+                },
+                users: {
+                    currentUserId: userId,
+                },
+            },
+        });
+        const post = {id: 'post1', channel_id: 'channel1', create_at: 1000, message: ''};
+        nock(Client4.getChannelsRoute()).post(`/${post.id}`).reply(200, {
+            team_id: teamId,
+            channel_id: channelId,
+            msg_count: 3,
+            mention_count: 1,
+        });
+        const state = store.getState();
+        assert.equal(state.entities.channels.myMembers[channelId], null);
+        assert.equal(state.entities.channels.channels[channelId].total_msg_count, 10);
+        assert.equal(state.entities.channels.myMembers[channelId].msg_count, 3);
+        assert.equal(state.entities.channels.myMembers[channelId].mention_count, 1);
+        assert.equal(state.entities.teams.myMembers[teamId].msg_count, 8);
+        assert.equal(state.entities.teams.myMembers[teamId].mention_count, 1);
+    });
+
     it('pinPost', async () => {
         const {dispatch, getState} = store;
 
