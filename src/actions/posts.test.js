@@ -1121,6 +1121,7 @@ describe('Actions.Posts', () => {
         const teamId = TestHelper.generateId();
         const channelId = TestHelper.generateId();
         const userId = TestHelper.generateId();
+        const postId = TestHelper.generateId();
 
         store = await configureStore({
             entities: {
@@ -1142,15 +1143,18 @@ describe('Actions.Posts', () => {
                 },
             },
         });
-        const post = {id: 'post1', channel_id: 'channel1', create_at: 1000, message: ''};
-        nock(Client4.getChannelsRoute()).post(`/${post.id}`).reply(200, {
+
+        nock(Client4.getUserRoute(userId)).post(`/posts/${postId}/set_unread`).reply(200, {
             team_id: teamId,
             channel_id: channelId,
             msg_count: 3,
             mention_count: 1,
         });
+
+        await store.dispatch(Actions.setUnreadPost(userId, postId));
         const state = store.getState();
-        assert.equal(state.entities.channels.myMembers[channelId], null);
+
+        // assert.equal(state.entities.channels.myMembers[channelId], null);
         assert.equal(state.entities.channels.channels[channelId].total_msg_count, 10);
         assert.equal(state.entities.channels.myMembers[channelId].msg_count, 3);
         assert.equal(state.entities.channels.myMembers[channelId].mention_count, 1);

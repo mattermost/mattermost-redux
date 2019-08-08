@@ -376,8 +376,7 @@ export function setUnreadPost(userId, postId) {
             return {error};
         }
 
-        const oldMsgCount = state.entities.channels.channels[unreadChan.channel_id].msgCount;
-
+        const oldMsgCount = state.entities.channels.myMembers[unreadChan.channel_id].msg_count;
         dispatch({
             type: ChannelTypes.POST_UNREAD_SUCCESS,
             data: {
@@ -385,7 +384,7 @@ export function setUnreadPost(userId, postId) {
                 channelId: unreadChan.channel_id,
                 msgCount: unreadChan.msg_count,
                 mentionCount: unreadChan.mention_count,
-                deltaMsgs: oldMsgCount - unreadChan.msg_count,
+                deltaMsgs: oldMsgCount ? oldMsgCount - unreadChan.msg_count : unreadChan.msg_count,
             },
         });
         return {data: true};

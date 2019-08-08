@@ -1635,7 +1635,7 @@ export default class Client4 {
         this.trackEvent('api', 'api_post_set_unread_post');
 
         return this.doFetch(
-            `${this.getUserRoute(userId)}${this.getPostRoute(postId)}/set-unread`,
+            `${this.getUserRoute(userId)}/posts/${postId}/set_unread`,
             {method: 'post'}
         );
     }
