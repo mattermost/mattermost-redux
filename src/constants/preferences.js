@@ -70,6 +70,7 @@ export default {
             mentionHighlightBg: '#ffe577',
             mentionHighlightLink: '#166de0',
             codeTheme: 'github',
+            keyboardAppearance: 'light',
         },
         organization: {
             type: 'Organization',
@@ -96,6 +97,7 @@ export default {
             mentionHighlightBg: '#f3e197',
             mentionHighlightLink: '#2f81b7',
             codeTheme: 'github',
+            keyboardAppearance: 'light',
         },
         mattermostDark: {
             type: 'Mattermost Dark',
@@ -122,6 +124,7 @@ export default {
             mentionHighlightBg: '#984063',
             mentionHighlightLink: '#a4ffeb',
             codeTheme: 'solarized-dark',
+            keyboardAppearance: 'dark',
         },
         windows10: {
             type: 'Windows Dark',
@@ -148,6 +151,7 @@ export default {
             mentionHighlightBg: '#784098',
             mentionHighlightLink: '#a4ffeb',
             codeTheme: 'monokai',
+            keyboardAppearance: 'dark',
         },
     },
 };
