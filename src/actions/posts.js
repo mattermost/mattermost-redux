@@ -599,12 +599,12 @@ export function getPostThread(rootId) {
     };
 }
 
-export function getPosts(channelId, page = 0, perPage = Posts.POST_CHUNK_SIZE) {
+export function getPosts(channelId, page = 0, perPage = Posts.POST_CHUNK_SIZE, fetchRoot = false) {
     return async (dispatch, getState) => {
         let posts;
 
         try {
-            posts = await Client4.getPosts(channelId, page, perPage);
+            posts = await Client4.getPosts(channelId, page, perPage, fetchRoot);
             getProfilesAndStatusesForPosts(posts.posts, dispatch, getState);
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch, getState);
