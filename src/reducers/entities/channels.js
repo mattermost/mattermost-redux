@@ -311,7 +311,7 @@ function myMembers(state = {}, action) {
         if (!channelState) {
             return state;
         }
-        return {...state, [data.channelId]: {...channelState, msg_count: data.msgCount, mention_count: data.mentionCount}};
+        return {...state, [data.channelId]: {...channelState, msg_count: data.msgCount, mention_count: data.mentionCount, last_viewed_at: data.lastViewedAt}};
     }
     case UserTypes.LOGOUT_SUCCESS:
         return {};

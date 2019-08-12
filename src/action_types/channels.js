@@ -76,5 +76,7 @@ export default keyMirror({
 
     RECEIVED_TOTAL_CHANNEL_COUNT: null,
 
+    POST_UNREAD_FAILURE: null,
+    POST_UNREAD_REQUEST: null,
     POST_UNREAD_SUCCESS: null,
 });

@@ -1130,7 +1130,7 @@ describe('Actions.Posts', () => {
                         [channelId]: {team_id: teamId, total_msg_count: 10},
                     },
                     myMembers: {
-                        [channelId]: {msg_count: 10, mention_count: 0},
+                        [channelId]: {msg_count: 10, mention_count: 0, last_viewed_at: 0},
                     },
                 },
                 teams: {
@@ -1148,16 +1148,17 @@ describe('Actions.Posts', () => {
             team_id: teamId,
             channel_id: channelId,
             msg_count: 3,
+            last_viewed_at: 1565605543,
             mention_count: 1,
         });
 
         await store.dispatch(Actions.setUnreadPost(userId, postId));
         const state = store.getState();
 
-        // assert.equal(state.entities.channels.myMembers[channelId], null);
         assert.equal(state.entities.channels.channels[channelId].total_msg_count, 10);
         assert.equal(state.entities.channels.myMembers[channelId].msg_count, 3);
         assert.equal(state.entities.channels.myMembers[channelId].mention_count, 1);
+        assert.equal(state.entities.channels.myMembers[channelId].last_viewed_at, 1565605543);
         assert.equal(state.entities.teams.myMembers[teamId].msg_count, 8);
         assert.equal(state.entities.teams.myMembers[teamId].mention_count, 1);
     });
