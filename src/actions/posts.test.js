@@ -1142,6 +1142,14 @@ describe('Actions.Posts', () => {
                     currentUserId: userId,
                 },
             },
+            requests: {
+                channels: {
+                    unreadFromPost: {
+                        status: 'not_started',
+                        error: null,
+                    },
+                },
+            },
         });
 
         nock(Client4.getUserRoute(userId)).post(`/posts/${postId}/set_unread`).reply(200, {
@@ -1161,6 +1169,7 @@ describe('Actions.Posts', () => {
         assert.equal(state.entities.channels.myMembers[channelId].last_viewed_at, 1565605543);
         assert.equal(state.entities.teams.myMembers[teamId].msg_count, 8);
         assert.equal(state.entities.teams.myMembers[teamId].mention_count, 1);
+        assert.equal(state.requests.channels.unreadFromPost.status, RequestStatus.SUCCESS);
     });
 
     it('pinPost', async () => {

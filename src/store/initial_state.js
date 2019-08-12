@@ -157,6 +157,10 @@ const state: GlobalState = {
                 status: 'not_started',
                 error: null,
             },
+            unreadFromPost: {
+                status: 'not_started',
+                error: null,
+            },
         },
         general: {
             server: {

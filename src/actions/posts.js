@@ -382,18 +382,19 @@ export function setUnreadPost(userId, postId) {
         }
 
         const oldMsgCount = state.entities.channels.myMembers[unreadChan.channel_id].msg_count;
+        const data = {
+            teamId: unreadChan.team_id,
+            channelId: unreadChan.channel_id,
+            msgCount: unreadChan.msg_count,
+            mentionCount: unreadChan.mention_count,
+            lastViewedAt: unreadChan.last_viewed_at,
+            deltaMsgs: oldMsgCount ? oldMsgCount - unreadChan.msg_count : unreadChan.msg_count,
+        };
         dispatch({
             type: ChannelTypes.POST_UNREAD_SUCCESS,
-            data: {
-                teamId: unreadChan.team_id,
-                channelId: unreadChan.channel_id,
-                msgCount: unreadChan.msg_count,
-                mentionCount: unreadChan.mention_count,
-                lastViewedAt: unreadChan.last_viewed_at,
-                deltaMsgs: oldMsgCount ? oldMsgCount - unreadChan.msg_count : unreadChan.msg_count,
-            },
+            data,
         });
-        return {data: true};
+        return {data};
     };
 }
 

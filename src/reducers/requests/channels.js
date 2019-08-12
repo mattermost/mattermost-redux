@@ -60,10 +60,21 @@ function getAllChannels(state: RequestStatusType = initialRequestState(), action
     );
 }
 
+function unreadFromPost(state: RequestStatusType = initialRequestState(), action: GenericAction): RequestStatusType {
+    return handleRequest(
+        ChannelTypes.POST_UNREAD_REQUEST,
+        ChannelTypes.POST_UNREAD_SUCCESS,
+        ChannelTypes.POST_UNREAD_FAILURE,
+        state,
+        action
+    );
+}
+
 export default (combineReducers({
     getChannels,
     getAllChannels,
     myChannels,
     createChannel,
     updateChannel,
+    unreadFromPost,
 }): (ChannelsRequestsStatuses, GenericAction) => ChannelsRequestsStatuses);
