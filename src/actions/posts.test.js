@@ -1556,4 +1556,40 @@ describe('Actions.Posts', () => {
             });
         });
     });
+
+    describe('getThreadsForPosts', () => {
+        describe('different values for posts argument', () => {
+            // Mock the state to prevent any followup requests since we aren't testing those
+            const currentUserId = 'user';
+            const post1 = {id: 'post1', user_id: currentUserId, message: 'This is a post1'};
+            const post2 = {id: 'post2', user_id: currentUserId, message: 'This is a post2'};
+
+            const dispatch = null;
+            const getState = () => ({
+                entities: {
+                    general: {
+                        config: {
+                            EnableCustomEmoji: 'false',
+                        },
+                    },
+                    users: {
+                        currentUserId,
+                        statuses: {
+                            [currentUserId]: 'status',
+                        },
+                    },
+                },
+            });
+
+            it('null', async () => {
+                await Actions.getThreadsForPosts(null, dispatch, getState);
+            });
+
+            it('array of posts', async () => {
+                const posts = [post1, post2];
+
+                await Actions.getThreadsForPosts(posts, dispatch, getState);
+            });
+        });
+    });
 });

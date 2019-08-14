@@ -11,6 +11,7 @@ import {getCurrentChannelId, getMyChannelMember as getMyChannelMemberSelector} f
 import {getCustomEmojisByName as selectCustomEmojisByName} from 'selectors/entities/emojis';
 import {getConfig} from 'selectors/entities/general';
 import * as Selectors from 'selectors/entities/posts';
+import * as PostActions from 'actions/posts';
 import {getCurrentUserId, getUsersByUsername} from 'selectors/entities/users';
 
 import {getUserIdFromChannelName} from 'utils/channel_utils';
@@ -757,6 +758,28 @@ export function getPostsAround(channelId, postId, perPage = Posts.POST_CHUNK_SIZ
 
         return {data: posts};
     };
+}
+
+// getThreadsForPosts is intended for an array of posts that have been batched
+// (see the actions/websocket_actions/handleNewPostEvents function in the webapp)
+export function getThreadsForPosts(posts, dispatch, getState) {
+    if (!Array.isArray(posts) || posts.length === 0) {
+        return Promise.resolve();
+    }
+
+    const promises = [];
+
+    posts.forEach((post) => {
+        if (!post.root_id) {
+            return;
+        }
+        const rootPost = Selectors.getPost(getState(), post.root_id);
+        if (post.root_id && !rootPost) {
+            promises.push(PostActions.getPostThread(post.root_id)(dispatch, getState));
+        }
+    });
+
+    return Promise.all(promises);
 }
 
 // Note that getProfilesAndStatusesForPosts can take either an array of posts or a map of ids to posts
