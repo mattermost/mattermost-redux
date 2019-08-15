@@ -774,7 +774,7 @@ export function getThreadsForPosts(posts, dispatch, getState) {
             return;
         }
         const rootPost = Selectors.getPost(getState(), post.root_id);
-        if (post.root_id && !rootPost) {
+        if (!rootPost) {
             promises.push(PostActions.getPostThread(post.root_id)(dispatch, getState));
         }
     });
