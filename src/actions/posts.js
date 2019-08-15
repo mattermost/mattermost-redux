@@ -775,7 +775,7 @@ export function getThreadsForPosts(posts, dispatch, getState) {
         }
         const rootPost = Selectors.getPost(getState(), post.root_id);
         if (!rootPost) {
-            promises.push(PostActions.getPostThread(post.root_id)(dispatch, getState));
+            promises.push(dispatch(PostActions.getPostThread(post.root_id));
         }
     });
 
