@@ -759,6 +759,32 @@ export function getPostsAround(channelId, postId, perPage = Posts.POST_CHUNK_SIZ
     };
 }
 
+// getThreadsForPosts is intended for an array of posts that have been batched
+// (see the actions/websocket_actions/handleNewPostEvents function in the webapp)
+export function getThreadsForPosts(posts) {
+    return (dispatch, getState) => {
+        if (!Array.isArray(posts) || !posts.length) {
+            return {data: true};
+        }
+
+        const state = getState();
+        const promises = [];
+
+        posts.forEach((post) => {
+            if (!post.root_id) {
+                return;
+            }
+
+            const rootPost = Selectors.getPost(state, post.root_id);
+            if (!rootPost) {
+                promises.push(dispatch(getPostThread(post.root_id)));
+            }
+        });
+
+        return Promise.all(promises);
+    };
+}
+
 // Note that getProfilesAndStatusesForPosts can take either an array of posts or a map of ids to posts
 export function getProfilesAndStatusesForPosts(postsArrayOrMap, dispatch, getState) {
     if (!postsArrayOrMap) {
