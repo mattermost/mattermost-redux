@@ -11,7 +11,6 @@ import {getCurrentChannelId, getMyChannelMember as getMyChannelMemberSelector} f
 import {getCustomEmojisByName as selectCustomEmojisByName} from 'selectors/entities/emojis';
 import {getConfig} from 'selectors/entities/general';
 import * as Selectors from 'selectors/entities/posts';
-import * as PostActions from 'actions/posts';
 import {getCurrentUserId, getUsersByUsername} from 'selectors/entities/users';
 
 import {getUserIdFromChannelName} from 'utils/channel_utils';
@@ -778,7 +777,7 @@ export function getThreadsForPosts(posts) {
 
             const rootPost = Selectors.getPost(state, post.root_id);
             if (!rootPost) {
-                promises.push(dispatch(PostActions.getPostThread(post.root_id)));
+                promises.push(dispatch(getPostThread(post.root_id)));
             }
         });
 
