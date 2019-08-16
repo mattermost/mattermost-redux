@@ -1600,7 +1600,7 @@ describe('Actions.Posts', () => {
         });
 
         it('handlesNull', async () => {
-            const ret = store.dispatch(Actions.getThreadsForPosts(null));
+            const ret = await store.dispatch(Actions.getThreadsForPosts(null));
             expect(ret).toEqual({data: true});
 
             const state = store.getState();
