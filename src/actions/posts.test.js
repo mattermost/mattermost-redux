@@ -1558,38 +1558,95 @@ describe('Actions.Posts', () => {
     });
 
     describe('getThreadsForPosts', () => {
-        describe('different values for posts argument', () => {
-            // Mock the state to prevent any followup requests since we aren't testing those
-            const currentUserId = 'user';
-            const post1 = {id: 'post1', user_id: currentUserId, message: 'This is a post1'};
-            const post2 = {id: 'post2', user_id: currentUserId, message: 'This is a post2'};
+        beforeAll(async () => {
+            await TestHelper.initBasic(Client4);
+        });
 
-            const dispatch = null;
-            const getState = () => ({
-                entities: {
-                    general: {
-                        config: {
-                            EnableCustomEmoji: 'false',
-                        },
-                    },
-                    users: {
-                        currentUserId,
-                        statuses: {
-                            [currentUserId]: 'status',
-                        },
-                    },
+        afterAll(async () => {
+            await TestHelper.tearDown();
+        });
+
+        let channelId;
+        let post1;
+        let post2;
+        let post3;
+        let comment;
+
+        beforeEach(async () => {
+            store = await configureStore();
+
+            channelId = TestHelper.basicChannel.id;
+            post1 = {id: TestHelper.generateId(), channel_id: channelId, message: ''};
+            post2 = {id: TestHelper.generateId(), channel_id: channelId, message: ''};
+            comment = {id: TestHelper.generateId(), root_id: post1.id, channel_id: channelId, message: ''};
+            post3 = {id: TestHelper.generateId(), channel_id: channelId, message: ''};
+
+            store.dispatch(Actions.receivedPostsInChannel({
+                order: [post2.id, post3.id],
+                posts: {[post2.id]: post2, [post3.id]: post3},
+            }, channelId));
+
+            const threadList = {
+                order: [post1.id],
+                posts: {
+                    [post1.id]: post1,
+                    [comment.id]: comment,
                 },
-            });
+            };
 
-            it('null', async () => {
-                await Actions.getThreadsForPosts(null, dispatch, getState);
-            });
+            nock(Client4.getPostsRoute()).
+                get(`/${post1.id}/thread`).
+                reply(200, threadList);
+        });
 
-            it('array of posts', async () => {
-                const posts = [post1, post2];
+        it('handlesNull', async () => {
+            const ret = store.dispatch(Actions.getThreadsForPosts(null));
+            expect(ret).toEqual({data: true});
 
-                await Actions.getThreadsForPosts(posts, dispatch, getState);
-            });
+            const state = store.getState();
+
+            const getRequest = state.requests.posts.getPostThread;
+            if (getRequest.status === RequestStatus.FAILURE) {
+                throw new Error(JSON.stringify(getRequest.error));
+            }
+
+            const {
+                postsInChannel,
+                postsInThread,
+            } = state.entities.posts;
+
+            assert.ok(postsInChannel[channelId]);
+            assert.deepEqual(postsInChannel[channelId][0].order, [post2.id, post3.id]);
+            assert.ok(!postsInThread[post1.id]);
+
+            const found = postsInChannel[channelId].find((block) => block.order.indexOf(comment.id) !== -1);
+            assert.ok(!found, 'should not have found comment in postsInChannel');
+        });
+
+        it('pullsUpTheThreadOfAMissingPost', async () => {
+            await store.dispatch(Actions.getThreadsForPosts([comment]));
+
+            const state = store.getState();
+
+            const getRequest = state.requests.posts.getPostThread;
+            if (getRequest.status === RequestStatus.FAILURE) {
+                throw new Error(JSON.stringify(getRequest.error));
+            }
+
+            const {
+                posts,
+                postsInChannel,
+                postsInThread,
+            } = state.entities.posts;
+
+            assert.ok(posts);
+            assert.deepEqual(postsInChannel[channelId][0].order, [post2.id, post3.id]);
+            assert.ok(posts[post1.id]);
+            assert.ok(postsInThread[post1.id]);
+            assert.deepEqual(postsInThread[post1.id], [comment.id]);
+
+            const found = postsInChannel[channelId].find((block) => block.order.indexOf(comment.id) !== -1);
+            assert.ok(!found, 'should not have found comment in postsInChannel');
         });
     });
 });
