@@ -11,7 +11,7 @@ import {Client4} from 'client';
 import {General} from 'constants';
 import {UserTypes, TeamTypes, AdminTypes} from 'action_types';
 import {getAllCustomEmojis} from 'actions/emojis';
-import {getClientConfig} from 'actions/general';
+import {getClientConfig, setServerVersion} from 'actions/general';
 import {getMyTeams, getMyTeamMembers, getMyTeamUnreads} from 'actions/teams';
 import {loadRolesIfNeeded} from 'actions/roles';
 
@@ -172,6 +172,7 @@ function completeLogin(data: UserProfile): ActionFunc {
         ];
 
         const serverVersion = Client4.getServerVersion();
+        dispatch(setServerVersion(serverVersion));
         if (!isMinimumServerVersion(serverVersion, 4, 7) && getConfig(getState()).EnableCustomEmoji === 'true') {
             dispatch(getAllCustomEmojis());
         }
@@ -233,6 +234,7 @@ export function loadMe(): ActionFunc {
 
         // Sometimes the server version is set in one or the other
         const serverVersion = Client4.getServerVersion() || getState().entities.general.serverVersion;
+        dispatch(setServerVersion(serverVersion));
         if (!isMinimumServerVersion(serverVersion, 4, 7) && config.EnableCustomEmoji === 'true') {
             dispatch(getAllCustomEmojis());
         }
