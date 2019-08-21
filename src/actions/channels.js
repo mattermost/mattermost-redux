@@ -20,6 +20,7 @@ import {loadRolesIfNeeded} from './roles';
 import type {ActionFunc, DispatchFunc, GetStateFunc} from 'types/actions';
 import type {Channel, ChannelNotifyProps, ChannelMembership} from 'types/channels';
 import type {PreferenceType} from 'types/preferences';
+import type {GlobalState} from 'types/store';
 
 export function selectChannel(channelId: string) {
     return {
@@ -683,6 +684,7 @@ export function deleteChannel(channelId: string): ActionFunc {
     };
 }
 
+// TODO: check this one too
 export function viewChannel(channelId: string, prevChannelId: string = ''): ActionFunc {
     return async (dispatch, getState) => {
         const {currentUserId} = getState().entities.users;
@@ -1122,11 +1124,24 @@ export function updateChannelPurpose(channelId: string, purpose: string): Action
     };
 }
 
+function isManuallyUnread(channelId: string, getState: () => GlobaState): boolean {
+    if (channelId) {
+        const initialState = getState();
+        const isUnread = initialState.entities.channels.manuallyUnread[channelId];
+        return isUnread !== undefined && isUnread;
+    }
+    return false;
+
+}
+
 export function markChannelAsRead(channelId: string, prevChannelId: ?string, updateLastViewedAt: boolean = true): ActionFunc {
     return async (dispatch, getState) => {
+        const pchanMannuallyUnread = isManuallyUnread(prevChannelId, getState);
+        const preChanId = !pchanMannuallyUnread ? prevChannelId : "";
+
         // Send channel last viewed at to the server
         if (updateLastViewedAt) {
-            Client4.viewMyChannel(channelId, prevChannelId).then().catch((error) => {
+            Client4.viewMyChannel(channelId, prechan).then().catch((error) => {
                 forceLogoutIfNecessary(error, dispatch, getState);
                 dispatch(logError(error));
                 return {error};
@@ -1138,11 +1153,11 @@ export function markChannelAsRead(channelId: string, prevChannelId: ?string, upd
 
         // Update channel member objects to set all mentions and posts as viewed
         const channel = channels[channelId];
-        const prevChannel = prevChannelId ? channels[prevChannelId] : null; // May be null since prevChannelId is optional
+        const prevChannel = preChanId ? channels[prevChannelId] : null; // May be null since prevChannelId is optional
 
         // Update team member objects to set mentions and posts in channel as viewed
         const channelMember = myMembers[channelId];
-        const prevChannelMember = prevChannelId ? myMembers[prevChannelId] : null; // May also be null
+        const prevChannelMember = preChanId ? myMembers[prevChannelId] : null; // May also be null
 
         const actions = [];
 
