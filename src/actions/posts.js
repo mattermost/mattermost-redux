@@ -366,18 +366,13 @@ export function editPost(post) {
 
 export function setUnreadPost(userId, postId) {
     return async (dispatch, getState) => {
-        dispatch({type: ChannelTypes.POST_UNREAD_REQUEST});
-
         let unreadChan;
         const state = getState();
         try {
             unreadChan = await Client4.markPostAsUnread(userId, postId);
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch, getState);
-            dispatch(batchActions([
-                {type: PostTypes.POST_UNREAD_FAILURE, error},
-                logError(error),
-            ]));
+            dispatch(logError(error));
             return {error};
         }
         let delta;
@@ -386,7 +381,7 @@ export function setUnreadPost(userId, postId) {
         } else {
             delta = unreadChan.msg_count;
         }
-        
+
         const data = {
             teamId: unreadChan.team_id,
             channelId: unreadChan.channel_id,

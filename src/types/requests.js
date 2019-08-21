@@ -14,7 +14,6 @@ export type ChannelsRequestsStatuses = {|
     myChannels: RequestStatusType,
     createChannel: RequestStatusType,
     updateChannel: RequestStatusType,
-    unreadFromPost: RequestStatusType,
 |};
 
 export type GeneralRequestsStatuses = {|
