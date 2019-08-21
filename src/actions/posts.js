@@ -366,7 +366,7 @@ export function editPost(post) {
 
 export function setUnreadPost(userId, postId) {
     return async (dispatch, getState) => {
-        dispatch({type: ChannelTypes.POST_UNREAD_REQUEST}, getState);
+        dispatch({type: ChannelTypes.POST_UNREAD_REQUEST});
 
         let unreadChan;
         const state = getState();
@@ -377,18 +377,23 @@ export function setUnreadPost(userId, postId) {
             dispatch(batchActions([
                 {type: PostTypes.POST_UNREAD_FAILURE, error},
                 logError(error),
-            ]), getState);
+            ]));
             return {error};
         }
-
-        const oldMsgCount = state.entities.channels.myMembers[unreadChan.channel_id].msg_count;
+        let delta;
+        if (state.entities.channels.myMembers[unreadChan.channel_id]) {
+            delta = state.entities.channels.myMembers[unreadChan.channel_id].msg_count - unreadChan.msg_count;
+        } else {
+            delta = unreadChan.msg_count;
+        }
+        
         const data = {
             teamId: unreadChan.team_id,
             channelId: unreadChan.channel_id,
             msgCount: unreadChan.msg_count,
             mentionCount: unreadChan.mention_count,
             lastViewedAt: unreadChan.last_viewed_at,
-            deltaMsgs: oldMsgCount ? oldMsgCount - unreadChan.msg_count : unreadChan.msg_count,
+            deltaMsgs: delta,
         };
         dispatch({
             type: ChannelTypes.POST_UNREAD_SUCCESS,
