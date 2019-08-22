@@ -504,6 +504,7 @@ function totalCount(state = 0, action) {
 export function manuallyUnread(state = {}, action) {
     switch (action.type) {
     case ChannelTypes.REMOVE_MANUALLY_UNREAD: {
+        // use destructuring to both remove the element and create the new state if it exist.
         const {[action.data.channelId]: removeThis, ...newState} = state;
         if (removeThis) {
             return newState;

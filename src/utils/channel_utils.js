@@ -647,3 +647,11 @@ export function filterChannelsMatchingTerm(channels: Array<Channel>, term: strin
             displayName.startsWith(lowercasedTerm);
     });
 }
+
+export function isManuallyUnread(channelId: ?string, state: GlobalState): boolean {
+    if (channelId) {
+        const isUnread = state.entities.channels.manuallyUnread[channelId];
+        return typeof (isUnread) !== 'undefined' && isUnread;
+    }
+    return false;
+}

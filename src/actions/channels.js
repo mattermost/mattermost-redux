@@ -8,12 +8,12 @@ import {Client4} from 'client';
 import {General, Preferences} from 'constants';
 import {ChannelTypes, PreferenceTypes, UserTypes} from 'action_types';
 import {savePreferences, deletePreferences} from 'actions/preferences';
-import {getChannelsIdForTeam, getChannelByName} from 'utils/channel_utils';
+import {getChannelsIdForTeam, getChannelByName, isManuallyUnread} from 'utils/channel_utils';
 import {getChannelsNameMapInTeam, getMyChannelMember as getMyChannelMemberSelector, getRedirectChannelNameForTeam} from 'selectors/entities/channels';
 import {getCurrentTeamId} from 'selectors/entities/teams';
 
 import {logError} from './errors';
-import {bindClientFunc, forceLogoutIfNecessary, isManuallyUnread} from './helpers';
+import {bindClientFunc, forceLogoutIfNecessary} from './helpers';
 import {getMissingProfilesByIds} from './users';
 import {loadRolesIfNeeded} from './roles';
 
@@ -748,12 +748,13 @@ export function markChannelAsViewed(channelId: string, prevChannelId: string = '
 
         const {myMembers} = getState().entities.channels;
         const member = myMembers[channelId];
+        const state = getState();
         if (member) {
             actions.push({
                 type: ChannelTypes.RECEIVED_MY_CHANNEL_MEMBER,
                 data: {...member, last_viewed_at: Date.now()},
             });
-            if (isManuallyUnread(channelId, getState())) {
+            if (isManuallyUnread(channelId, state)) {
                 actions.push({
                     type: ChannelTypes.REMOVE_MANUALLY_UNREAD,
                     data: {channelId},
@@ -764,7 +765,7 @@ export function markChannelAsViewed(channelId: string, prevChannelId: string = '
         }
 
         const prevMember = myMembers[prevChannelId];
-        if (prevMember && isManuallyUnread(prevChannelId, getState())) {
+        if (prevMember && isManuallyUnread(prevChannelId, state)) {
             actions.push({
                 type: ChannelTypes.RECEIVED_MY_CHANNEL_MEMBER,
                 data: {...prevMember, last_viewed_at: Date.now()},
