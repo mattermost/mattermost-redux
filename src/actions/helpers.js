@@ -9,6 +9,7 @@ import {logError} from './errors';
 
 import type {Client4Error} from 'types/client4';
 import type {ActionFunc, GenericAction, DispatchFunc, GetStateFunc} from 'types/actions';
+import type {GlobalState} from 'types/store';
 type ActionType = string;
 
 const HTTP_UNAUTHORIZED = 401;
@@ -148,4 +149,12 @@ export class FormattedError extends Error {
             values,
         };
     }
+}
+
+export function isManuallyUnread(channelId: ?string, state: GlobalState): boolean {
+    if (channelId) {
+        const isUnread = state.entities.channels.manuallyUnread[channelId];
+        return typeof (isUnread) !== 'undefined' && isUnread;
+    }
+    return false;
 }

@@ -183,7 +183,7 @@ describe('channels', () => {
                 type: ChannelTypes.REMOVE_MANUALLY_UNREAD,
                 data: {channelId: 'channel1'},
             });
-            expect(nextState.channel1).toBe(false);
+            expect(nextState.channel1).toBe(undefined);
         });
         test('shouldn\'t do nothing if channel was undefined', () => {
             const state = deepFreeze({
