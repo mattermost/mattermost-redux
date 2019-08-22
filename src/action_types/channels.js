@@ -77,4 +77,6 @@ export default keyMirror({
     RECEIVED_TOTAL_CHANNEL_COUNT: null,
 
     POST_UNREAD_SUCCESS: null,
+
+    REMOVE_MANUALLY_UNREAD: null,
 });

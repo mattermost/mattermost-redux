@@ -51,7 +51,8 @@ export function makeFilterPostsAndAddSeparators() {
         getCurrentUser,
         shouldShowJoinLeaveMessages,
         isTimezoneEnabled,
-        (posts, lastViewedAt, indicateNewMessages, selectedPostId, currentUser, showJoinLeave, timeZoneEnabled) => {
+        (state, {channelId}) => state.entities.channels.manuallyUnread[channelId],
+        (posts, lastViewedAt, indicateNewMessages, selectedPostId, currentUser, showJoinLeave, timeZoneEnabled, isManuallyUnread) => {
             if (posts.length === 0 || !currentUser) {
                 return [];
             }
@@ -99,6 +100,7 @@ export function makeFilterPostsAndAddSeparators() {
                 if (
                     lastViewedAt &&
                     post.create_at > lastViewedAt &&
+                    (post.user_id !== currentUser.id || isManuallyUnread) &&
                     !addedNewMessagesIndicator &&
                     indicateNewMessages
                 ) {
