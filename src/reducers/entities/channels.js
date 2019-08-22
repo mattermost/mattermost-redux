@@ -501,7 +501,7 @@ function totalCount(state = 0, action) {
     }
 }
 
-function manuallyUnread(state = {}, action) {
+export function manuallyUnread(state = {}, action) {
     switch (action.type) {
     case ChannelTypes.REMOVE_MANUALLY_UNREAD: {
         if (state[action.data.channelId]) {
