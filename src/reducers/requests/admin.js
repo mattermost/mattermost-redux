@@ -80,6 +80,16 @@ function testEmail(state: RequestStatusType = initialRequestState(), action: Gen
     );
 }
 
+function testSiteURL(state: RequestStatusType = initialRequestState(), action: GenericAction): RequestStatusType {
+    return handleRequest(
+        AdminTypes.TEST_SITE_URL_REQUEST,
+        AdminTypes.TEST_SITE_URL_SUCCESS,
+        AdminTypes.TEST_SITE_URL_FAILURE,
+        state,
+        action
+    );
+}
+
 function testS3Connection(state: RequestStatusType = initialRequestState(), action: GenericAction): RequestStatusType {
     return handleRequest(
         AdminTypes.TEST_S3_REQUEST,
@@ -408,6 +418,7 @@ export default (combineReducers({
     reloadConfig,
     getEnvironmentConfig,
     testEmail,
+    testSiteURL,
     testS3Connection,
     invalidateCaches,
     recycleDatabase,
