@@ -231,7 +231,7 @@ describe('Actions.Admin', () => {
             post('/site_url/test').
             reply(200, OK_RESPONSE);
 
-        await Actions.testSiteURL("http://lo.cal")(store.dispatch, store.getState);
+        await Actions.testSiteURL('http://lo.cal')(store.dispatch, store.getState);
 
         const state = store.getState();
         const request = state.requests.admin.testSiteURL;
