@@ -514,6 +514,15 @@ export function getRecentPostsChunkInChannel(state: GlobalState, channelId: $ID<
     return postsForChannel.find((block) => block.recent);
 }
 
+export function getOldestPostsChunkInChannel(state: GlobalState, channelId: $ID<Channel>): Object {
+    const postsForChannel = state.entities.posts.postsInChannel[channelId];
+    if (!postsForChannel) {
+        return null;
+    }
+
+    return postsForChannel.find((block) => block.oldest);
+}
+
 // getPostIdsInChannel returns the IDs of posts loaded at the bottom of the given channel. It does not include older
 // posts such as those loaded by viewing a thread or a permalink.
 export function getPostIdsInChannel(state: GlobalState, channelId: $ID<Channel>): ?Array<$ID<Post>> {
@@ -566,6 +575,18 @@ export function getUnreadPostsChunk(state: GlobalState, channelId: $ID<Channel>,
         // check for only oldest posts because this can be higher than the latest post if the last post is edited
         if (oldestPostInBlock.create_at <= timeStamp) {
             return recentChunk;
+        }
+    }
+
+    const oldestPostsChunk = getOldestPostsChunkInChannel(state, channelId);
+
+    if (oldestPostsChunk && oldestPostsChunk.order.length) {
+        const {order} = oldestPostsChunk;
+        const oldestPostInBlock = posts[order[order.length - 1]];
+
+        // check for only oldest posts because this can be higher than the latest post if the last post is edited
+        if (oldestPostInBlock.create_at >= timeStamp) {
+            return oldestPostsChunk;
         }
     }
 
