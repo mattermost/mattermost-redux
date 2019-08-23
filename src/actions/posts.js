@@ -5,7 +5,7 @@ import {batchActions} from 'redux-batched-actions';
 
 import {Client4} from 'client';
 import {General, Preferences, Posts, WebsocketEvents} from 'constants';
-import {PostTypes, FileTypes, IntegrationTypes} from 'action_types';
+import {PostTypes, FileTypes, IntegrationTypes, ChannelTypes} from 'action_types';
 
 import {getCurrentChannelId, getMyChannelMember as getMyChannelMemberSelector} from 'selectors/entities/channels';
 import {getCustomEmojisByName as selectCustomEmojisByName} from 'selectors/entities/emojis';
@@ -362,6 +362,40 @@ export function editPost(post) {
             post,
         ],
     });
+}
+
+export function setUnreadPost(userId, postId) {
+    return async (dispatch, getState) => {
+        let unreadChan;
+        const state = getState();
+        try {
+            unreadChan = await Client4.markPostAsUnread(userId, postId);
+        } catch (error) {
+            forceLogoutIfNecessary(error, dispatch, getState);
+            dispatch(logError(error));
+            return {error};
+        }
+        let delta;
+        if (state.entities.channels.myMembers[unreadChan.channel_id]) {
+            delta = state.entities.channels.myMembers[unreadChan.channel_id].msg_count - unreadChan.msg_count;
+        } else {
+            delta = unreadChan.msg_count;
+        }
+
+        const data = {
+            teamId: unreadChan.team_id,
+            channelId: unreadChan.channel_id,
+            msgCount: unreadChan.msg_count,
+            mentionCount: unreadChan.mention_count,
+            lastViewedAt: unreadChan.last_viewed_at,
+            deltaMsgs: delta,
+        };
+        dispatch({
+            type: ChannelTypes.POST_UNREAD_SUCCESS,
+            data,
+        });
+        return {data};
+    };
 }
 
 export function pinPost(postId) {

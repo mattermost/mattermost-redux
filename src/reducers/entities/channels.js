@@ -304,6 +304,15 @@ function myMembers(state = {}, action) {
     case ChannelTypes.UPDATED_CHANNEL_MEMBER_SCHEME_ROLES: {
         return updateChannelMemberSchemeRoles(state, action);
     }
+    case ChannelTypes.POST_UNREAD_SUCCESS: {
+        const data = action.data;
+        const channelState = state[data.channelId];
+
+        if (!channelState) {
+            return state;
+        }
+        return {...state, [data.channelId]: {...channelState, msg_count: data.msgCount, mention_count: data.mentionCount, last_viewed_at: data.lastViewedAt}};
+    }
     case UserTypes.LOGOUT_SUCCESS:
         return {};
     default:

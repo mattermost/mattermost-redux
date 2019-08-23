@@ -197,6 +197,7 @@ function myMembers(state = {}, action) {
             },
         };
     }
+
     case TeamTypes.LEAVE_TEAM:
     case TeamTypes.RECEIVED_TEAM_DELETED: {
         const nextState = {...state};
@@ -206,6 +207,22 @@ function myMembers(state = {}, action) {
     }
     case TeamTypes.UPDATED_TEAM_MEMBER_SCHEME_ROLES: {
         return updateTeamMemberSchemeRoles(state, action);
+    }
+
+    case ChannelTypes.POST_UNREAD_SUCCESS: {
+        const {teamId, deltaMsgs, mentionCount} = action.data;
+        const teamState = state[teamId];
+        if (!teamState) {
+            return state;
+        }
+
+        const newTeamState = {
+            ...teamState,
+            msg_count: teamState.msg_count - deltaMsgs,
+            mention_count: teamState.mention_count + mentionCount,
+        };
+
+        return {...state, [teamId]: newTeamState};
     }
     case UserTypes.LOGOUT_SUCCESS:
         return {};
