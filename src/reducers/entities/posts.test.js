@@ -686,7 +686,10 @@ describe('postsInChannel', () => {
 
             expect(nextState).not.toBe(state);
             expect(nextState).toEqual({
-                channel1: [],
+                channel1: [{
+                    order: [],
+                    recent: true,
+                }],
             });
         });
     });
@@ -3776,5 +3779,45 @@ describe('expandedURLs', () => {
         assert.deepEqual(nextState, {
             b: 'b',
         });
+    });
+});
+
+describe('removeNonRecentEmptyPostBlocks', () => {
+    it('should filter empty blocks', () => {
+        const blocks = [{
+            order: [],
+            recent: false,
+        }, {
+            order: ['1', '2'],
+            recent: false,
+        }];
+
+        const filteredBlocks = reducers.removeNonRecentEmptyPostBlocks(blocks);
+        assert.deepEqual(filteredBlocks, [{
+            order: ['1', '2'],
+            recent: false,
+        }]);
+    });
+
+    it('should not filter empty recent block', () => {
+        const blocks = [{
+            order: [],
+            recent: true,
+        }, {
+            order: ['1', '2'],
+            recent: false,
+        }, {
+            order: [],
+            recent: false,
+        }];
+
+        const filteredBlocks = reducers.removeNonRecentEmptyPostBlocks(blocks);
+        assert.deepEqual(filteredBlocks, [{
+            order: [],
+            recent: true,
+        }, {
+            order: ['1', '2'],
+            recent: false,
+        }]);
     });
 });
