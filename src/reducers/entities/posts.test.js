@@ -554,7 +554,7 @@ describe('postsInChannel', () => {
             const nextState = reducers.postsInChannel(state, {
                 type: PostTypes.RECEIVED_NEW_POST,
                 data: {id: 'post1', channel_id: 'channel1'},
-            });
+            }, {}, {});
 
             expect(nextState).toBe(state);
             expect(nextState).toEqual({});
@@ -635,19 +635,19 @@ describe('postsInChannel', () => {
         it('should remove a previously pending post', () => {
             const state = deepFreeze({
                 channel1: [
-                    {order: ['post1', 'pending', 'post2'], recent: true},
+                    {order: ['pending', 'post2', 'post1'], recent: true},
                 ],
             });
 
             const nextState = reducers.postsInChannel(state, {
                 type: PostTypes.RECEIVED_NEW_POST,
                 data: {id: 'post3', channel_id: 'channel1', pending_post_id: 'pending'},
-            });
+            }, {}, {post1: {create_at: 1}, post2: {create_at: 2}, post3: {create_at: 3}});
 
             expect(nextState).not.toBe(state);
             expect(nextState).toEqual({
                 channel1: [
-                    {order: ['post3', 'post1', 'post2'], recent: true},
+                    {order: ['post3', 'post2', 'post1'], recent: true},
                 ],
             });
         });
