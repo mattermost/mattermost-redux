@@ -310,6 +310,11 @@ export function postsInChannel(state = {}, action, prevPosts, nextPosts) {
 
             if (index !== -1) {
                 nextRecentBlock.order.splice(index, 1);
+
+                // Need to re-sort to make sure any other pending posts come first
+                nextRecentBlock.order.sort((a, b) => {
+                    return comparePosts(nextPosts[a], nextPosts[b]);
+                });
                 changed = true;
             }
         }
