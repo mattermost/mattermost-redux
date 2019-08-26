@@ -375,6 +375,7 @@ export function setUnreadPost(userId, postId) {
             return {error};
         }
         let delta;
+
         const state = getState();
         if (state.entities.channels.myMembers[unreadChan.channel_id]) {
             delta = state.entities.channels.myMembers[unreadChan.channel_id].msg_count - unreadChan.msg_count;
@@ -790,6 +791,32 @@ export function getPostsAround(channelId, postId, perPage = Posts.POST_CHUNK_SIZ
         ]));
 
         return {data: posts};
+    };
+}
+
+// getThreadsForPosts is intended for an array of posts that have been batched
+// (see the actions/websocket_actions/handleNewPostEvents function in the webapp)
+export function getThreadsForPosts(posts) {
+    return (dispatch, getState) => {
+        if (!Array.isArray(posts) || !posts.length) {
+            return {data: true};
+        }
+
+        const state = getState();
+        const promises = [];
+
+        posts.forEach((post) => {
+            if (!post.root_id) {
+                return;
+            }
+
+            const rootPost = Selectors.getPost(state, post.root_id);
+            if (!rootPost) {
+                promises.push(dispatch(getPostThread(post.root_id)));
+            }
+        });
+
+        return Promise.all(promises);
     };
 }
 
