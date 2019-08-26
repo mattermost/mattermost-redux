@@ -66,4 +66,5 @@ export type ChannelsState = {|
     stats: RelationOneToOne<Channel, ChannelStats>,
     groupsAssociatedToChannel: Object,
     totalCount: number,
+    manuallyUnread: RelationOneToOne<Channel, boolean>,
 |};

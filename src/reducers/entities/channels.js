@@ -501,6 +501,29 @@ function totalCount(state = 0, action) {
     }
 }
 
+export function manuallyUnread(state = {}, action) {
+    switch (action.type) {
+    case ChannelTypes.REMOVE_MANUALLY_UNREAD: {
+        if (state[action.data.channelId]) {
+            const newState = {...state};
+            delete newState[action.data.channelId];
+            return newState;
+        }
+        return state;
+    }
+    case UserTypes.LOGOUT_SUCCESS: {
+        // user is logging out, remove any reference
+        return {};
+    }
+
+    case ChannelTypes.POST_UNREAD_SUCCESS: {
+        return {...state, [action.data.channelId]: true};
+    }
+    default:
+        return state;
+    }
+}
+
 export default combineReducers({
 
     // the current selected channel
@@ -524,4 +547,7 @@ export default combineReducers({
     groupsAssociatedToChannel,
 
     totalCount,
+
+    // object where every key is the channel id, if present means a user requested to mark that channel as unread.
+    manuallyUnread,
 });

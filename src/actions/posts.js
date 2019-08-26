@@ -367,7 +367,6 @@ export function editPost(post) {
 export function setUnreadPost(userId, postId) {
     return async (dispatch, getState) => {
         let unreadChan;
-        const state = getState();
         try {
             unreadChan = await Client4.markPostAsUnread(userId, postId);
         } catch (error) {
@@ -376,6 +375,8 @@ export function setUnreadPost(userId, postId) {
             return {error};
         }
         let delta;
+
+        const state = getState();
         if (state.entities.channels.myMembers[unreadChan.channel_id]) {
             delta = state.entities.channels.myMembers[unreadChan.channel_id].msg_count - unreadChan.msg_count;
         } else {
