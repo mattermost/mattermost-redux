@@ -747,14 +747,14 @@ export function getPostsAround(channelId, postId, perPage = Posts.POST_CHUNK_SIZ
                 ...before.order,
             ],
             next_post_id: after.next_post_id,
-            before_post_id: before.before_post_id,
+            prev_post_id: before.prev_post_id,
         };
 
         getProfilesAndStatusesForPosts(posts.posts, dispatch, getState);
 
         dispatch(batchActions([
             receivedPosts(posts),
-            receivedPostsInChannel(posts, channelId, after.posts.next_post_id === '', before.posts.prev_post_id === ''),
+            receivedPostsInChannel(posts, channelId, after.next_post_id === '', before.prev_post_id === ''),
         ]));
 
         return {data: posts};

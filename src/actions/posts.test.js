@@ -1032,7 +1032,7 @@ describe('Actions.Posts', () => {
                 ...postsBefore.order,
             ],
             next_post_id: postsAfter.next_post_id,
-            before_post_id: postsBefore.before_post_id,
+            prev_post_id: postsBefore.prev_post_id,
         });
 
         const {posts, postsInChannel, postsInThread} = store.getState().entities.posts;
