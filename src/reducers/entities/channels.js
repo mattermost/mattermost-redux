@@ -504,18 +504,24 @@ function totalCount(state = 0, action) {
 export function manuallyUnread(state = {}, action) {
     switch (action.type) {
     case ChannelTypes.REMOVE_MANUALLY_UNREAD: {
-        // use destructuring to both remove the element and create the new state if it exist.
-        const {[action.data.channelId]: removeThis, ...newState} = state;
-        if (removeThis) {
+        if (state[action.data.channelId]) {
+            const newState = {...state};
+            delete newState[action.data.channelId];
             return newState;
         }
-        break;
+        return state;
     }
+    case UserTypes.LOGOUT_SUCCESS: {
+        // user is logging out, remove any reference
+        return {};
+    }
+
     case ChannelTypes.POST_UNREAD_SUCCESS: {
         return {...state, [action.data.channelId]: true};
     }
+    default:
+        return state;
     }
-    return state;
 }
 
 export default combineReducers({

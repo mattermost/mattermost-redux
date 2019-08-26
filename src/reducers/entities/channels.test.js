@@ -1,7 +1,7 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
 
-import {ChannelTypes} from 'action_types';
+import {ChannelTypes, UserTypes} from 'action_types';
 import deepFreeze from 'utils/deep_freeze';
 
 import * as Reducers from './channels';
@@ -193,6 +193,18 @@ describe('channels', () => {
                 data: {channelId: 'channel1'},
             });
             expect(nextState.channel1).toBe(undefined);
+        });
+        test('remove all marks if user logs out', () => {
+            const state = deepFreeze({
+                channel1: true,
+                channel231: false,
+            });
+            const nextState = Reducers.manuallyUnread(state, {
+                type: UserTypes.LOGOUT_SUCCESS,
+                data: {},
+            });
+            expect(nextState.channel1).toBe(undefined);
+            expect(nextState.channel231).toBe(undefined);
         });
     });
 });

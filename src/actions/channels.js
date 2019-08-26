@@ -690,8 +690,7 @@ export function viewChannel(channelId: string, prevChannelId: string = ''): Acti
         const {myPreferences} = getState().entities.preferences;
         const viewTimePref = myPreferences[`${Preferences.CATEGORY_CHANNEL_APPROXIMATE_VIEW_TIME}--${channelId}`];
         const viewTime = viewTimePref ? parseInt(viewTimePref.value, 10) : 0;
-        const pchanMannuallyUnread = isManuallyUnread(prevChannelId, getState());
-        const preChanId = pchanMannuallyUnread ? '' : prevChannelId;
+        const prevChanManuallyUnread = isManuallyUnread(prevChannelId, getState());
 
         if (viewTime < new Date().getTime() - (3 * 60 * 60 * 1000)) {
             const preferences = [
@@ -701,7 +700,7 @@ export function viewChannel(channelId: string, prevChannelId: string = ''): Acti
         }
 
         try {
-            await Client4.viewMyChannel(channelId, preChanId);
+            await Client4.viewMyChannel(channelId, prevChanManuallyUnread ? '' : prevChannelId);
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch, getState);
             dispatch(logError(error));
@@ -727,8 +726,8 @@ export function viewChannel(channelId: string, prevChannelId: string = ''): Acti
             dispatch(loadRolesIfNeeded(member.roles.split(' ')));
         }
 
-        const prevMember = myMembers[preChanId];
-        if (prevMember) {
+        const prevMember = myMembers[prevChannelId];
+        if (!prevChanManuallyUnread && prevMember) {
             actions.push({
                 type: ChannelTypes.RECEIVED_MY_CHANNEL_MEMBER,
                 data: {...prevMember, last_viewed_at: new Date().getTime()},
@@ -1141,12 +1140,11 @@ export function updateChannelPurpose(channelId: string, purpose: string): Action
 
 export function markChannelAsRead(channelId: string, prevChannelId: ?string, updateLastViewedAt: boolean = true): ActionFunc {
     return async (dispatch, getState) => {
-        const pchanMannuallyUnread = isManuallyUnread(prevChannelId, getState());
-        const preChanId = pchanMannuallyUnread ? '' : prevChannelId;
+        const prevChanManuallyUnread = isManuallyUnread(prevChannelId, getState());
 
         // Send channel last viewed at to the server
         if (updateLastViewedAt) {
-            Client4.viewMyChannel(channelId, preChanId).then().catch((error) => {
+            Client4.viewMyChannel(channelId, prevChanManuallyUnread ? '' : prevChannelId).then().catch((error) => {
                 forceLogoutIfNecessary(error, dispatch, getState);
                 dispatch(logError(error));
                 return {error};
@@ -1158,11 +1156,11 @@ export function markChannelAsRead(channelId: string, prevChannelId: ?string, upd
 
         // Update channel member objects to set all mentions and posts as viewed
         const channel = channels[channelId];
-        const prevChannel = preChanId ? channels[preChanId] : null; // May be null since prevChannelId is optional
+        const prevChannel = (!prevChanManuallyUnread && prevChannelId) ? channels[prevChannelId] : null; // May be null since prevChannelId is optional
 
         // Update team member objects to set mentions and posts in channel as viewed
         const channelMember = myMembers[channelId];
-        const prevChannelMember = preChanId ? myMembers[preChanId] : null; // May also be null
+        const prevChannelMember = (!prevChanManuallyUnread && prevChannelId) ? myMembers[prevChannelId] : null; // May also be null
 
         const actions = [];
 
