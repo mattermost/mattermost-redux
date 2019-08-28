@@ -599,7 +599,7 @@ export function getPostThread(rootId) {
     };
 }
 
-export function getPosts(channelId, page = 0, perPage = Posts.POST_CHUNK_SIZE, fetchRoot = false) {
+export function getPosts(channelId, page = 0, perPage = Posts.POST_CHUNK_SIZE, fetchRoot = true) {
     return async (dispatch, getState) => {
         let posts;
 
@@ -621,12 +621,12 @@ export function getPosts(channelId, page = 0, perPage = Posts.POST_CHUNK_SIZE, f
     };
 }
 
-export function getPostsUnread(channelId) {
+export function getPostsUnread(channelId, fetchRoot = true) {
     return async (dispatch, getState) => {
         const userId = getCurrentUserId(getState());
         let posts;
         try {
-            posts = await Client4.getPostsUnread(channelId, userId);
+            posts = await Client4.getPostsUnread(channelId, userId, fetchRoot);
             getProfilesAndStatusesForPosts(posts.posts, dispatch, getState);
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch, getState);
@@ -648,11 +648,11 @@ export function getPostsUnread(channelId) {
     };
 }
 
-export function getPostsSince(channelId, since) {
+export function getPostsSince(channelId, since, fetchRoot = true) {
     return async (dispatch, getState) => {
         let posts;
         try {
-            posts = await Client4.getPostsSince(channelId, since);
+            posts = await Client4.getPostsSince(channelId, since, fetchRoot);
             getProfilesAndStatusesForPosts(posts.posts, dispatch, getState);
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch, getState);
@@ -672,11 +672,11 @@ export function getPostsSince(channelId, since) {
     };
 }
 
-export function getPostsBefore(channelId, postId, page = 0, perPage = Posts.POST_CHUNK_SIZE) {
+export function getPostsBefore(channelId, postId, page = 0, perPage = Posts.POST_CHUNK_SIZE, fetchRoot = true) {
     return async (dispatch, getState) => {
         let posts;
         try {
-            posts = await Client4.getPostsBefore(channelId, postId, page, perPage);
+            posts = await Client4.getPostsBefore(channelId, postId, page, perPage, fetchRoot);
             getProfilesAndStatusesForPosts(posts.posts, dispatch, getState);
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch, getState);
@@ -693,11 +693,11 @@ export function getPostsBefore(channelId, postId, page = 0, perPage = Posts.POST
     };
 }
 
-export function getPostsAfter(channelId, postId, page = 0, perPage = Posts.POST_CHUNK_SIZE) {
+export function getPostsAfter(channelId, postId, page = 0, perPage = Posts.POST_CHUNK_SIZE, fetchRoot = true) {
     return async (dispatch, getState) => {
         let posts;
         try {
-            posts = await Client4.getPostsAfter(channelId, postId, page, perPage);
+            posts = await Client4.getPostsAfter(channelId, postId, page, perPage, fetchRoot);
             getProfilesAndStatusesForPosts(posts.posts, dispatch, getState);
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch, getState);
@@ -714,7 +714,7 @@ export function getPostsAfter(channelId, postId, page = 0, perPage = Posts.POST_
     };
 }
 
-export function getPostsAround(channelId, postId, perPage = Posts.POST_CHUNK_SIZE / 2) {
+export function getPostsAround(channelId, postId, perPage = Posts.POST_CHUNK_SIZE / 2, fetchRoot = true) {
     return async (dispatch, getState) => {
         let after;
         let thread;
@@ -722,9 +722,9 @@ export function getPostsAround(channelId, postId, perPage = Posts.POST_CHUNK_SIZ
 
         try {
             [after, thread, before] = await Promise.all([
-                Client4.getPostsAfter(channelId, postId, 0, perPage),
-                Client4.getPostThread(postId),
-                Client4.getPostsBefore(channelId, postId, 0, perPage),
+                Client4.getPostsAfter(channelId, postId, 0, perPage, fetchRoot),
+                Client4.getPostThread(postId, fetchRoot),
+                Client4.getPostsBefore(channelId, postId, 0, perPage, fetchRoot),
             ]);
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch, getState);
