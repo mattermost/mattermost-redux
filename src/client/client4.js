@@ -1313,6 +1313,15 @@ export default class Client4 {
         );
     };
 
+    updateChannelPrivacy = async (channelId, privacy) => {
+        this.trackEvent('api', 'api_channels_update_privacy', {channel_id: channelId, privacy});
+
+        return this.doFetch(
+            `${this.getChannelRoute(channelId)}/privacy`,
+            {method: 'put', body: JSON.stringify({privacy})}
+        );
+    };
+
     patchChannel = async (channelId, channelPatch) => {
         this.trackEvent('api', 'api_channels_patch', {channel_id: channelId});
 
