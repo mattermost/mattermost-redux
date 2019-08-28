@@ -69,12 +69,13 @@ export function receivedPostsAfter(posts, channelId, afterPostId, recent = false
 }
 
 // receivedPostsBefore should be dispatched when receiving an ordered list of posts that come after a given post.
-export function receivedPostsBefore(posts, channelId, beforePostId) {
+export function receivedPostsBefore(posts, channelId, beforePostId, oldest = false) {
     return {
         type: PostTypes.RECEIVED_POSTS_BEFORE,
         channelId,
         data: posts,
         beforePostId,
+        oldest,
     };
 }
 
@@ -91,12 +92,13 @@ export function receivedPostsSince(posts, channelId) {
 
 // receivedPostsInChannel should be dispatched when receiving a list of ordered posts within a channel when the
 // the adjacent posts are not known.
-export function receivedPostsInChannel(posts, channelId, recent = false) {
+export function receivedPostsInChannel(posts, channelId, recent = false, oldest = false) {
     return {
         type: PostTypes.RECEIVED_POSTS_IN_CHANNEL,
         channelId,
         data: posts,
         recent,
+        oldest,
     };
 }
 
@@ -614,7 +616,7 @@ export function getPosts(channelId, page = 0, perPage = Posts.POST_CHUNK_SIZE) {
 
         dispatch(batchActions([
             receivedPosts(posts),
-            receivedPostsInChannel(posts, channelId, page === 0),
+            receivedPostsInChannel(posts, channelId, page === 0, posts.prev_post_id === ''),
         ]));
 
         return {data: posts};
@@ -636,7 +638,7 @@ export function getPostsUnread(channelId) {
 
         dispatch(batchActions([
             receivedPosts(posts),
-            receivedPostsInChannel(posts, channelId, posts.next_post_id === ''),
+            receivedPostsInChannel(posts, channelId, posts.next_post_id === '', posts.prev_post_id === ''),
         ]));
         dispatch({
             type: PostTypes.RECEIVED_POSTS,
@@ -686,7 +688,7 @@ export function getPostsBefore(channelId, postId, page = 0, perPage = Posts.POST
 
         dispatch(batchActions([
             receivedPosts(posts),
-            receivedPostsBefore(posts, channelId, postId),
+            receivedPostsBefore(posts, channelId, postId, posts.prev_post_id === ''),
         ]));
 
         return {data: posts};
@@ -752,7 +754,7 @@ export function getPostsAround(channelId, postId, perPage = Posts.POST_CHUNK_SIZ
 
         dispatch(batchActions([
             receivedPosts(posts),
-            receivedPostsInChannel(posts, channelId, after.posts.next_post_id === ''),
+            receivedPostsInChannel(posts, channelId, after.posts.next_post_id === '', before.posts.prev_post_id === ''),
         ]));
 
         return {data: posts};

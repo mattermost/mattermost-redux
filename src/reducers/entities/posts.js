@@ -381,7 +381,7 @@ export function postsInChannel(state = {}, action, prevPosts, nextPosts) {
     }
 
     case PostTypes.RECEIVED_POSTS_IN_CHANNEL: {
-        const recent = action.recent;
+        const {recent, oldest} = action;
         const order = action.data.order;
 
         if (order.length === 0 && state[action.channelId]) {
@@ -419,6 +419,7 @@ export function postsInChannel(state = {}, action, prevPosts, nextPosts) {
         nextPostsForChannel.push({
             order,
             recent,
+            oldest,
         });
 
         // Merge overlapping blocks
@@ -457,8 +458,8 @@ export function postsInChannel(state = {}, action, prevPosts, nextPosts) {
     }
 
     case PostTypes.RECEIVED_POSTS_BEFORE: {
-        const order = action.data.order;
-        const beforePostId = action.beforePostId;
+        const {order} = action.data;
+        const {beforePostId, oldest} = action;
 
         if (order.length === 0) {
             // No posts received
@@ -471,6 +472,7 @@ export function postsInChannel(state = {}, action, prevPosts, nextPosts) {
         const newBlock = {
             order: [beforePostId, ...order],
             recent: false,
+            oldest,
         };
 
         let nextPostsForChannel = [...postsForChannel, newBlock];
@@ -703,6 +705,7 @@ export function mergePostBlocks(blocks, posts) {
             };
 
             nextBlocks[i].recent = a.recent || b.recent;
+            nextBlocks[i].oldest = a.oldest || b.oldest;
 
             nextBlocks.splice(i + 1, 1);
 
