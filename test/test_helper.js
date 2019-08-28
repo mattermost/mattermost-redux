@@ -317,7 +317,7 @@ class TestHelper {
     mockLogin = () => {
         nock(this.basicClient4.getUsersRoute()).
             post('/login').
-            reply(200, this.basicUser);
+            reply(200, this.basicUser, {'X-Version-Id': 'Server Version'});
 
         nock(this.basicClient4.getUserRoute('me')).
             get('/teams/members').

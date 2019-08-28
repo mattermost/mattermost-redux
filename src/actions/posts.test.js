@@ -474,7 +474,7 @@ describe('Actions.Posts', () => {
         });
         expect(state.entities.posts.postsInChannel).toEqual({
             channel1: [
-                {order: ['post4', 'post3', 'post2', 'post1'], recent: true},
+                {order: ['post4', 'post3', 'post2', 'post1'], recent: true, oldest: false},
             ],
         });
         expect(state.entities.posts.postsInThread).toEqual({
@@ -837,7 +837,7 @@ describe('Actions.Posts', () => {
                     },
                     postsInChannel: {
                         channel1: [
-                            {order: ['post1'], recent: false},
+                            {order: ['post1'], recent: false, oldest: false},
                         ],
                     },
                 },
@@ -850,6 +850,8 @@ describe('Actions.Posts', () => {
                 post2,
                 post1,
             },
+            prev_post_id: '',
+            next_post_id: 'post3',
         };
 
         nock(Client4.getChannelsRoute()).
@@ -865,7 +867,7 @@ describe('Actions.Posts', () => {
 
         expect(state.entities.posts.posts).toEqual({post1, post2, post3});
         expect(state.entities.posts.postsInChannel.channel1).toEqual([
-            {order: ['post3', 'post2', 'post1'], recent: false},
+            {order: ['post3', 'post2', 'post1'], recent: false, oldest: true},
         ]);
         expect(state.entities.posts.postsInThread).toEqual({
             post1: ['post2'],
@@ -1044,7 +1046,7 @@ describe('Actions.Posts', () => {
         expect(posts).toHaveProperty('root');
 
         // should only store the posts that we know the order of
-        expect(postsInChannel[channelId]).toEqual([{order: ['post1', 'post2', 'post3', 'post4', 'post5'], recent: false}]);
+        expect(postsInChannel[channelId]).toEqual([{order: ['post1', 'post2', 'post3', 'post4', 'post5'], recent: false, oldest: false}]);
 
         // should populate postsInThread
         expect(postsInThread.root).toEqual(['post3']);
@@ -1553,6 +1555,151 @@ describe('Actions.Posts', () => {
                 };
 
                 await Actions.getProfilesAndStatusesForPosts(posts, dispatch, getState);
+            });
+        });
+    });
+
+    describe('getThreadsForPosts', () => {
+        beforeAll(async () => {
+            await TestHelper.initBasic(Client4);
+        });
+
+        afterAll(async () => {
+            await TestHelper.tearDown();
+        });
+
+        let channelId;
+        let post1;
+        let post2;
+        let post3;
+        let comment;
+
+        beforeEach(async () => {
+            store = await configureStore();
+
+            channelId = TestHelper.basicChannel.id;
+            post1 = {id: TestHelper.generateId(), channel_id: channelId, message: ''};
+            post2 = {id: TestHelper.generateId(), channel_id: channelId, message: ''};
+            comment = {id: TestHelper.generateId(), root_id: post1.id, channel_id: channelId, message: ''};
+            post3 = {id: TestHelper.generateId(), channel_id: channelId, message: ''};
+
+            store.dispatch(Actions.receivedPostsInChannel({
+                order: [post2.id, post3.id],
+                posts: {[post2.id]: post2, [post3.id]: post3},
+            }, channelId));
+
+            const threadList = {
+                order: [post1.id],
+                posts: {
+                    [post1.id]: post1,
+                    [comment.id]: comment,
+                },
+            };
+
+            nock(Client4.getPostsRoute()).
+                get(`/${post1.id}/thread`).
+                reply(200, threadList);
+        });
+
+        it('handlesNull', async () => {
+            const ret = await store.dispatch(Actions.getThreadsForPosts(null));
+            expect(ret).toEqual({data: true});
+
+            const state = store.getState();
+
+            const getRequest = state.requests.posts.getPostThread;
+            if (getRequest.status === RequestStatus.FAILURE) {
+                throw new Error(JSON.stringify(getRequest.error));
+            }
+
+            const {
+                postsInChannel,
+                postsInThread,
+            } = state.entities.posts;
+
+            assert.ok(postsInChannel[channelId]);
+            assert.deepEqual(postsInChannel[channelId][0].order, [post2.id, post3.id]);
+            assert.ok(!postsInThread[post1.id]);
+
+            const found = postsInChannel[channelId].find((block) => block.order.indexOf(comment.id) !== -1);
+            assert.ok(!found, 'should not have found comment in postsInChannel');
+        });
+
+        it('pullsUpTheThreadOfAMissingPost', async () => {
+            await store.dispatch(Actions.getThreadsForPosts([comment]));
+
+            const state = store.getState();
+
+            const getRequest = state.requests.posts.getPostThread;
+            if (getRequest.status === RequestStatus.FAILURE) {
+                throw new Error(JSON.stringify(getRequest.error));
+            }
+
+            const {
+                posts,
+                postsInChannel,
+                postsInThread,
+            } = state.entities.posts;
+
+            assert.ok(posts);
+            assert.deepEqual(postsInChannel[channelId][0].order, [post2.id, post3.id]);
+            assert.ok(posts[post1.id]);
+            assert.ok(postsInThread[post1.id]);
+            assert.deepEqual(postsInThread[post1.id], [comment.id]);
+
+            const found = postsInChannel[channelId].find((block) => block.order.indexOf(comment.id) !== -1);
+            assert.ok(!found, 'should not have found comment in postsInChannel');
+        });
+    });
+
+    describe('receivedPostsBefore', () => {
+        it('Should return default false for oldest key if param does not exist', () => {
+            const posts = [];
+            const result = Actions.receivedPostsBefore(posts, 'channelId', 'beforePostId');
+            assert.deepEqual(result, {
+                type: PostTypes.RECEIVED_POSTS_BEFORE,
+                channelId: 'channelId',
+                data: posts,
+                beforePostId: 'beforePostId',
+                oldest: false,
+            });
+        });
+
+        it('Should return true for oldest key', () => {
+            const posts = [];
+            const result = Actions.receivedPostsBefore(posts, 'channelId', 'beforePostId', true);
+            assert.deepEqual(result, {
+                type: PostTypes.RECEIVED_POSTS_BEFORE,
+                channelId: 'channelId',
+                data: posts,
+                beforePostId: 'beforePostId',
+                oldest: true,
+            });
+        });
+    });
+
+    describe('receivedPostsInChannel', () => {
+        it('Should return default false for both recent and oldest keys if params dont exist', () => {
+            const posts = [];
+            const result = Actions.receivedPostsInChannel(posts, 'channelId');
+            assert.deepEqual(result, {
+                type: PostTypes.RECEIVED_POSTS_IN_CHANNEL,
+                channelId: 'channelId',
+                data: posts,
+                recent: false,
+                oldest: false,
+            });
+        });
+
+        it('Should return true for oldest and recent keys', () => {
+            const posts = [];
+            const result = Actions.receivedPostsInChannel(posts, 'channelId', true, true);
+            assert.deepEqual(result, {
+                type: PostTypes.RECEIVED_POSTS_IN_CHANNEL,
+                channelId: 'channelId',
+                data: posts,
+                recent: true,
+                oldest: true,
             });
         });
     });

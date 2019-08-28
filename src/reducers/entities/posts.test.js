@@ -554,7 +554,7 @@ describe('postsInChannel', () => {
             const nextState = reducers.postsInChannel(state, {
                 type: PostTypes.RECEIVED_NEW_POST,
                 data: {id: 'post1', channel_id: 'channel1'},
-            });
+            }, {}, {});
 
             expect(nextState).toBe(state);
             expect(nextState).toEqual({});
@@ -635,19 +635,19 @@ describe('postsInChannel', () => {
         it('should remove a previously pending post', () => {
             const state = deepFreeze({
                 channel1: [
-                    {order: ['post1', 'pending', 'post2'], recent: true},
+                    {order: ['pending', 'post2', 'post1'], recent: true},
                 ],
             });
 
             const nextState = reducers.postsInChannel(state, {
                 type: PostTypes.RECEIVED_NEW_POST,
                 data: {id: 'post3', channel_id: 'channel1', pending_post_id: 'pending'},
-            });
+            }, {}, {post1: {create_at: 1}, post2: {create_at: 2}, post3: {create_at: 3}});
 
             expect(nextState).not.toBe(state);
             expect(nextState).toEqual({
                 channel1: [
-                    {order: ['post3', 'post1', 'post2'], recent: true},
+                    {order: ['post3', 'post2', 'post1'], recent: true},
                 ],
             });
         });
@@ -686,7 +686,10 @@ describe('postsInChannel', () => {
 
             expect(nextState).not.toBe(state);
             expect(nextState).toEqual({
-                channel1: [],
+                channel1: [{
+                    order: [],
+                    recent: true,
+                }],
             });
         });
     });
@@ -1260,6 +1263,42 @@ describe('postsInChannel', () => {
                 ],
             });
         });
+
+        it('should save with chunk as oldest', () => {
+            const state = deepFreeze({
+                channel1: [
+                    {order: ['post1', 'post2'], recent: true},
+                ],
+            });
+
+            const nextPosts = {
+                post1: {id: 'post1', channel_id: 'channel1', create_at: 4000},
+                post2: {id: 'post2', channel_id: 'channel1', create_at: 3000},
+                post3: {id: 'post3', channel_id: 'channel1', create_at: 2000},
+                post4: {id: 'post4', channel_id: 'channel1', create_at: 1000},
+            };
+
+            const nextState = reducers.postsInChannel(state, {
+                type: PostTypes.RECEIVED_POSTS_IN_CHANNEL,
+                channelId: 'channel1',
+                data: {
+                    posts: {
+                        post2: nextPosts.post2,
+                        post3: nextPosts.post3,
+                    },
+                    order: ['post2', 'post3'],
+                },
+                recent: false,
+                oldest: true,
+            }, null, nextPosts);
+
+            expect(nextState).not.toBe(state);
+            expect(nextState).toEqual({
+                channel1: [
+                    {order: ['post1', 'post2', 'post3'], recent: true, oldest: true},
+                ],
+            });
+        });
     });
 
     describe('receiving posts since', () => {
@@ -1776,6 +1815,37 @@ describe('postsInChannel', () => {
             expect(nextState).toEqual({
                 channel1: [
                     {order: ['post1', 'post2', 'post3'], recent: false},
+                ],
+            });
+        });
+
+        it('should have oldest set to false', () => {
+            const state = deepFreeze({});
+
+            const nextPosts = {
+                post1: {id: 'post1', channel_id: 'channel1', create_at: 4000},
+                post2: {id: 'post2', channel_id: 'channel1', create_at: 3000},
+                post3: {id: 'post3', channel_id: 'channel1', create_at: 2000},
+            };
+
+            const nextState = reducers.postsInChannel(state, {
+                type: PostTypes.RECEIVED_POSTS_BEFORE,
+                channelId: 'channel1',
+                data: {
+                    posts: {
+                        post2: nextPosts.post2,
+                        post3: nextPosts.post3,
+                    },
+                    order: ['post2', 'post3'],
+                },
+                beforePostId: 'post1',
+                oldest: false,
+            }, null, nextPosts);
+
+            expect(nextState).not.toBe(state);
+            expect(nextState).toEqual({
+                channel1: [
+                    {order: ['post1', 'post2', 'post3'], recent: false, oldest: false},
                 ],
             });
         });
@@ -2522,6 +2592,25 @@ describe('mergePostBlocks', () => {
         expect(nextBlocks).not.toBe(blocks);
         expect(nextBlocks).toEqual([
             {order: ['a', 'b', 'c'], recent: true},
+        ]);
+    });
+
+    it('should keep merged blocks marked as oldest', () => {
+        const blocks = [
+            {order: ['a', 'b'], oldest: true},
+            {order: ['b', 'c'], oldest: false},
+        ];
+        const posts = {
+            a: {create_at: 1002},
+            b: {create_at: 1001},
+            c: {create_at: 1000},
+        };
+
+        const nextBlocks = reducers.mergePostBlocks(blocks, posts);
+
+        expect(nextBlocks).not.toBe(blocks);
+        expect(nextBlocks).toEqual([
+            {order: ['a', 'b', 'c'], oldest: true},
         ]);
     });
 
@@ -3776,5 +3865,45 @@ describe('expandedURLs', () => {
         assert.deepEqual(nextState, {
             b: 'b',
         });
+    });
+});
+
+describe('removeNonRecentEmptyPostBlocks', () => {
+    it('should filter empty blocks', () => {
+        const blocks = [{
+            order: [],
+            recent: false,
+        }, {
+            order: ['1', '2'],
+            recent: false,
+        }];
+
+        const filteredBlocks = reducers.removeNonRecentEmptyPostBlocks(blocks);
+        assert.deepEqual(filteredBlocks, [{
+            order: ['1', '2'],
+            recent: false,
+        }]);
+    });
+
+    it('should not filter empty recent block', () => {
+        const blocks = [{
+            order: [],
+            recent: true,
+        }, {
+            order: ['1', '2'],
+            recent: false,
+        }, {
+            order: [],
+            recent: false,
+        }];
+
+        const filteredBlocks = reducers.removeNonRecentEmptyPostBlocks(blocks);
+        assert.deepEqual(filteredBlocks, [{
+            order: [],
+            recent: true,
+        }, {
+            order: ['1', '2'],
+            recent: false,
+        }]);
     });
 });
