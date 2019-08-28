@@ -21,6 +21,7 @@ import RoleTypes from './roles';
 import SchemeTypes from './schemes';
 import GroupTypes from './groups';
 import BotTypes from './bots';
+import PluginTypes from './plugins';
 
 export {
     ErrorTypes,
@@ -42,4 +43,5 @@ export {
     SchemeTypes,
     GroupTypes,
     BotTypes,
+    PluginTypes,
 };
