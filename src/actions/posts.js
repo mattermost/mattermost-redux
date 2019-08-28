@@ -628,7 +628,7 @@ export function getPostsUnread(channelId, fetchRoot = true) {
         const userId = getCurrentUserId(getState());
         let posts;
         try {
-            posts = await Client4.getPostsUnread(channelId, userId, fetchRoot);
+            posts = await Client4.getPostsUnread(channelId, userId, 30, 30, fetchRoot);
             getProfilesAndStatusesForPosts(posts.posts, dispatch, getState);
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch, getState);
