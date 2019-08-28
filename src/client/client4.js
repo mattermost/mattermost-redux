@@ -2272,7 +2272,7 @@ export default class Client4 {
     testSiteURL = async (siteURL) => {
         return this.doFetch(
             `${this.getBaseRoute()}/site_url/test`,
-            {method: 'post', body: siteURL}
+            {method: 'post', body: JSON.stringify({site_url: siteURL})}
         );
     };
 
