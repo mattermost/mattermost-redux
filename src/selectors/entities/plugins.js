@@ -12,6 +12,6 @@ export function getMarketplacePlugins(state) {
 export const getMarketplaceInstalledPlugins = createSelector(
     getMarketplacePlugins,
     (plugins) => {
-        return Object.values(plugins).filter((p) => p.Status === MarketplacePluginStatus.INSTALLED);
+        return Object.values(plugins).filter((p) => p.State === MarketplacePluginStatus.INSTALLED);
     }
 );
