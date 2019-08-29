@@ -61,7 +61,7 @@ function deviceToken(state = '', action) {
 function license(state = {}, action) {
     switch (action.type) {
     case GeneralTypes.CLIENT_LICENSE_RECEIVED:
-        return Object.assign({}, state, action.data);
+        return action.data;
     case GeneralTypes.CLIENT_LICENSE_RESET:
     case UserTypes.LOGOUT_SUCCESS:
         return {};

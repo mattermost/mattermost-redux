@@ -310,6 +310,11 @@ export function postsInChannel(state = {}, action, prevPosts, nextPosts) {
 
             if (index !== -1) {
                 nextRecentBlock.order.splice(index, 1);
+
+                // Need to re-sort to make sure any other pending posts come first
+                nextRecentBlock.order.sort((a, b) => {
+                    return comparePosts(nextPosts[a], nextPosts[b]);
+                });
                 changed = true;
             }
         }
@@ -579,7 +584,7 @@ export function postsInChannel(state = {}, action, prevPosts, nextPosts) {
             return state;
         }
 
-        nextPostsForChannel = removeEmptyPostBlocks(nextPostsForChannel);
+        nextPostsForChannel = removeNonRecentEmptyPostBlocks(nextPostsForChannel);
 
         return {
             ...state,
@@ -621,7 +626,7 @@ export function postsInChannel(state = {}, action, prevPosts, nextPosts) {
             return state;
         }
 
-        nextPostsForChannel = removeEmptyPostBlocks(nextPostsForChannel);
+        nextPostsForChannel = removeNonRecentEmptyPostBlocks(nextPostsForChannel);
 
         return {
             ...state,
@@ -658,15 +663,15 @@ export function postsInChannel(state = {}, action, prevPosts, nextPosts) {
     }
 }
 
-export function removeEmptyPostBlocks(blocks) {
-    return blocks.filter((block) => block.order.length !== 0);
+export function removeNonRecentEmptyPostBlocks(blocks) {
+    return blocks.filter((block) => block.order.length !== 0 || block.recent);
 }
 
 export function mergePostBlocks(blocks, posts) {
     let nextBlocks = [...blocks];
 
     // Remove any blocks that may have become empty by removing posts
-    nextBlocks = removeEmptyPostBlocks(blocks);
+    nextBlocks = removeNonRecentEmptyPostBlocks(blocks);
 
     // If a channel does not have any posts(Experimental feature where join and leave messages don't exist)
     // return the previous state i.e an empty block
