@@ -253,7 +253,7 @@ export default class Client4 {
     }
 
     getPluginsMarketplaceRoute() {
-        return `${this.getBaseRoute()}/plugins/marketplace`;
+        return `${this.getPluginsRoute()}/marketplace`;
     }
 
     getRolesRoute() {
