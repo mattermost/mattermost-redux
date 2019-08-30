@@ -11,8 +11,3 @@ export default {
     PLUGIN_STATE_STOPPING: 5,
     PREPACKAGED_PLUGINS: ['zoom', 'jira', 'mattermost-autolink', 'com.mattermost.nps', 'com.mattermost.custom-attributes', 'github', 'com.mattermost.welcomebot', 'com.mattermost.aws-sns'],
 };
-
-export const MarketplacePluginStatus = {
-    NOT_INSTALLED: 0,
-    INSTALLED: 1,
-};

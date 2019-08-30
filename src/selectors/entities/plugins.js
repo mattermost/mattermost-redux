@@ -3,8 +3,6 @@
 
 import {createSelector} from 'reselect';
 
-import {MarketplacePluginStatus} from 'constants/plugins';
-
 export function getMarketplacePlugins(state) {
     return state.entities.plugins.marketplacePlugins;
 }
@@ -12,6 +10,6 @@ export function getMarketplacePlugins(state) {
 export const getMarketplaceInstalledPlugins = createSelector(
     getMarketplacePlugins,
     (plugins) => {
-        return Object.values(plugins).filter((p) => p.State === MarketplacePluginStatus.INSTALLED);
+        return Object.values(plugins).filter((p) => p.InstalledVersion !== '');
     }
 );
