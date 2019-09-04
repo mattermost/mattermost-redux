@@ -4,7 +4,7 @@
 import {createSelector} from 'reselect';
 
 export function getMarketplacePlugins(state) {
-    return state.entities.plugins.marketplacePlugins;
+    return state.entities.plugins.marketplacePlugins.data;
 }
 
 export const getMarketplaceInstalledPlugins = createSelector(
