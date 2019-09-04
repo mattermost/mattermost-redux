@@ -252,6 +252,10 @@ export default class Client4 {
         return `${this.getPluginsRoute()}/${pluginId}`;
     }
 
+    getPluginsMarketplaceRoute() {
+        return `${this.getPluginsRoute()}/marketplace`;
+    }
+
     getRolesRoute() {
         return `${this.getBaseRoute()}/roles`;
     }
@@ -2632,6 +2636,13 @@ export default class Client4 {
             {method: 'get'}
         );
     };
+
+    getMarketplacePlugins = async () => {
+        return this.doFetch(
+            this.getPluginsMarketplaceRoute(),
+            {method: 'get'}
+        );
+    }
 
     getPluginStatuses = async () => {
         return this.doFetch(
