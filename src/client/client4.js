@@ -2619,10 +2619,14 @@ export default class Client4 {
         );
     };
 
-    installPluginFromUrl = async (pluginDownloadUrl, force = false) => {
+    installPluginFromUrl = async (pluginDownloadUrl, pluginSignatureUrl = null, force = false) => {
         this.trackEvent('api', 'api_install_plugin');
 
-        const queryParams = {plugin_download_url: pluginDownloadUrl, force};
+        const queryParams = {
+            download_url: pluginDownloadUrl,
+            signature_url: pluginSignatureUrl || '',
+            force,
+        };
 
         return this.doFetch(
             `${this.getPluginsRoute()}/install_from_url${buildQueryString(queryParams)}`,
