@@ -2619,12 +2619,12 @@ export default class Client4 {
         );
     };
 
-    installPluginFromUrl = async (pluginDownloadUrl, pluginSignatureUrl = null, force = false) => {
+    installPluginFromUrl = async (pluginDownloadUrl, force = false, signatureDownloadUrl = null) => {
         this.trackEvent('api', 'api_install_plugin');
 
         const queryParams = {
-            download_url: pluginDownloadUrl,
-            signature_url: pluginSignatureUrl || '',
+            plugin_download_url: pluginDownloadUrl,
+            signature_download_url: signatureDownloadUrl || '',
             force,
         };
 
