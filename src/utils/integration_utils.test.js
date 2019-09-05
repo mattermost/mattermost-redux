@@ -46,6 +46,14 @@ describe('integration utils', () => {
         it('should return error on bad url element', () => {
             assert.equal(checkDialogElementForError({type: 'text', subtype: 'url'}, 'totallyawebsite').id, 'interactive_dialog.error.bad_url');
         });
+
+        it('should return null when value is in the options', () => {
+            assert.equal(checkDialogElementForError({type: 'radio', options: [{value: 'Sales'}]}, 'Sales'), null);
+        });
+
+        it('should return error when value is not in the options', () => {
+            assert.equal(checkDialogElementForError({type: 'radio', options: [{value: 'Sales'}]}, 'Sale').id, 'interactive_dialog.error.invalid_option');
+        });
     });
 
     describe('checkIfErrorsMatchElements', () => {
