@@ -25,6 +25,7 @@ import {
     handleNewPost,
     postDeleted,
     receivedPost,
+    getUnreadPostData,
 } from './posts';
 import {
     getTeam,
@@ -247,6 +248,9 @@ function handleEvent(msg) {
     case WebsocketEvents.POST_DELETED:
         doDispatch(handlePostDeleted(msg));
         break;
+    case WebsocketEvents.POST_UNREAD:
+        doDispatch(handlePostUnread(msg));
+        break;
     case WebsocketEvents.LEAVE_TEAM:
         doDispatch(handleLeaveTeamEvent(msg));
         break;
@@ -368,6 +372,31 @@ function handlePostDeleted(msg) {
     const data = JSON.parse(msg.data.post);
 
     return postDeleted(data);
+}
+
+function handlePostUnread(msg) {
+    return (dispatch, getState) => {
+        const state = getState();
+        let delta;
+        if (state.entities.channels.myMembers[msg.data.channel_id]) {
+            delta = state.entities.channels.myMembers[msg.broadcast.channel_id].msg_count - msg.data.msg_count;
+        } else {
+            delta = msg.data.msg_count;
+        }
+        const info = {
+            ...msg.data,
+            user_id: msg.broadcast.user_id,
+            team_id: msg.broadcast.team_id,
+            channel_id: msg.broadcast.channel_id,
+            deltaMsgs: delta,
+        };
+        const data = getUnreadPostData(info, state);
+        dispatch({
+            type: ChannelTypes.POST_UNREAD_SUCCESS,
+            data,
+        });
+        return {data};
+    };
 }
 
 function handleLeaveTeamEvent(msg) {
