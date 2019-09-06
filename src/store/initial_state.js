@@ -273,6 +273,10 @@ const state: GlobalState = {
                 status: 'not_started',
                 error: null,
             },
+            testSiteURL: {
+                status: 'not_started',
+                error: null,
+            },
             testS3Connection: {
                 status: 'not_started',
                 error: null,

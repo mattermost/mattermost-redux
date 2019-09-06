@@ -58,6 +58,7 @@ export type AdminRequestsStatuses = {|
     updateConfig: RequestStatusType,
     reloadConfig: RequestStatusType,
     testEmail: RequestStatusType,
+    testSiteURL: RequestStatusType,
     invalidateCaches: RequestStatusType,
     recycleDatabase: RequestStatusType,
     createCompliance: RequestStatusType,
