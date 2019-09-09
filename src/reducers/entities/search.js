@@ -160,7 +160,10 @@ function pinned(state = {}, action) {
                 pinnedPosts = [...state[channelId]];
             }
 
-            pinnedPosts.unshift(post.id);
+            if (pinnedPosts.indexOf(post.id) < 0) {
+                pinnedPosts.unshift(post.id);
+            }
+
             return {
                 ...state,
                 [channelId]: pinnedPosts,
