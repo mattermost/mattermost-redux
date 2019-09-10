@@ -268,9 +268,9 @@ describe('reducers.entities.search', () => {
     });
 
     describe('pinned', () => {
-        it ('do not show multiples of the same post', () => {
+        it('do not show multiples of the same post', () => {
             const inputState = {
-                'abcd': ['1234', '5678'],
+                abcd: ['1234', '5678'],
             };
             const action = {
                 type: PostTypes.RECEIVED_POST,
