@@ -6,13 +6,13 @@ import {bindClientFunc} from './helpers';
 
 import {PluginTypes} from 'action_types';
 
-export function getMarketplacePlugins(searchTerm) {
+export function getMarketplacePlugins(filter = '') {
     return bindClientFunc({
         clientFunc: Client4.getMarketplacePlugins,
         onSuccess: PluginTypes.RECEIVED_MARKETPLACE_PLUGINS,
         onFailure: PluginTypes.GET_MARKETPLACE_PLUGINS_FAILURE,
         params: [
-            searchTerm || '',
+            filter,
         ],
     });
 }
