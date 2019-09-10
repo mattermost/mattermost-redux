@@ -2643,7 +2643,7 @@ export default class Client4 {
 
     getMarketplacePlugins = async (filter) => {
         return this.doFetch(
-            `${this.getPluginsMarketplaceRoute()}${buildQueryString({filter})}`,
+            `${this.getPluginsMarketplaceRoute()}${buildQueryString({filter: filter || ''})}`,
             {method: 'get'}
         );
     }
