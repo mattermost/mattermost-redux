@@ -465,13 +465,13 @@ export function uploadPlugin(fileData: File, force: boolean = false): ActionFunc
     };
 }
 
-export function installPluginFromUrl(url: string, force: boolean = false): ActionFunc {
+export function installPluginFromUrl(url: string, force: boolean = false, signatureUrl: ?string = null): ActionFunc {
     return async (dispatch, getState) => {
         dispatch({type: AdminTypes.INSTALL_PLUGIN_FROM_URL_REQUEST, data: null});
 
         let data;
         try {
-            data = await Client4.installPluginFromUrl(url, force);
+            data = await Client4.installPluginFromUrl(url, force, signatureUrl);
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch, getState);
             dispatch(batchActions([
