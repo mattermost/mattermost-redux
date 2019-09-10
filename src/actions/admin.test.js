@@ -805,7 +805,7 @@ describe('Actions.Admin', () => {
         const downloadUrl = 'testplugin.tar.gz';
         const testPlugin = {id: 'testplugin', webapp: {bundle_path: '/static/somebundle.js'}};
 
-        let urlMatch = `/plugins/install_from_url?plugin_download_url=${downloadUrl}&force=false`;
+        let urlMatch = `/plugins/install_from_url?plugin_download_url=${downloadUrl}&signature_download_url=&force=false`;
         nock(Client4.getBaseRoute()).
             post(urlMatch).
             reply(200, testPlugin);
@@ -817,7 +817,7 @@ describe('Actions.Admin', () => {
             throw new Error('uploadPlugin request failed err=' + request.error);
         }
 
-        urlMatch = `/plugins/install_from_url?plugin_download_url=${downloadUrl}&force=true`;
+        urlMatch = `/plugins/install_from_url?plugin_download_url=${downloadUrl}&signature_download_url=&force=true`;
         nock(Client4.getBaseRoute()).
             post(urlMatch).
             reply(200, testPlugin);
@@ -834,11 +834,29 @@ describe('Actions.Admin', () => {
         const downloadUrl = 'testplugin.tar.gz';
         const testPlugin = {id: 'testplugin', webapp: {bundle_path: '/static/somebundle.js'}};
 
-        const urlMatch = `/plugins/install_from_url?plugin_download_url=${downloadUrl}&force=false`;
+        const urlMatch = `/plugins/install_from_url?plugin_download_url=${downloadUrl}&signature_download_url=&force=false`;
         nock(Client4.getBaseRoute()).
             post(urlMatch).
             reply(200, testPlugin);
         await Actions.installPluginFromUrl(downloadUrl, false)(store.dispatch, store.getState);
+
+        const state = store.getState();
+        const request = state.requests.admin.installPluginFromUrl;
+        if (request.status === RequestStatus.FAILURE) {
+            throw new Error('uploadPlugin request failed err=' + request.error);
+        }
+    });
+
+    it('installPluginFromUrlWithSignature', async () => {
+        const downloadUrl = 'testplugin.tar.gz';
+        const signatureUrl = 'testplugin.tar.gz.asc';
+        const testPlugin = {id: 'testplugin', webapp: {bundle_path: '/static/somebundle.js'}};
+
+        const urlMatch = `/plugins/install_from_url?plugin_download_url=${downloadUrl}&signature_download_url=${signatureUrl}&force=false`;
+        nock(Client4.getBaseRoute()).
+            post(urlMatch).
+            reply(200, testPlugin);
+        await Actions.installPluginFromUrl(downloadUrl, false, signatureUrl)(store.dispatch, store.getState);
 
         const state = store.getState();
         const request = state.requests.admin.installPluginFromUrl;

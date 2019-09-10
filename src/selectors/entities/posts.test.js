@@ -1468,6 +1468,42 @@ describe('Selectors.Posts', () => {
         });
     });
 
+    describe('getOldestPostsChunkInChannel', () => {
+        it('Should return as oldest chunk exists', () => {
+            const state = {
+                entities: {
+                    posts: {
+                        postsInChannel: {
+                            1234: [
+                                {order: ['a', 'b', 'c', 'd', 'e', 'f'], oldest: true, recent: true},
+                            ],
+                        },
+                    },
+                },
+            };
+
+            const oldestPostsChunkInChannel = Selectors.getOldestPostsChunkInChannel(state, 1234);
+            assert.deepEqual(oldestPostsChunkInChannel, {order: ['a', 'b', 'c', 'd', 'e', 'f'], recent: true, oldest: true});
+        });
+
+        it('Should return null as recent chunk does not exists', () => {
+            const state = {
+                entities: {
+                    posts: {
+                        postsInChannel: {
+                            1234: [
+                                {order: ['a', 'b', 'c', 'd', 'e', 'f'], recent: false, oldest: false},
+                            ],
+                        },
+                    },
+                },
+            };
+
+            const oldestPostsChunkInChannel = Selectors.getOldestPostsChunkInChannel(state, 1234);
+            assert.deepEqual(oldestPostsChunkInChannel, null);
+        });
+    });
+
     describe('getPostsChunkInChannelAroundTime', () => {
         it('getPostsChunkInChannelAroundTime', () => {
             const state = {
@@ -1568,6 +1604,28 @@ describe('Selectors.Posts', () => {
 
             const unreadPostsChunk = Selectors.getUnreadPostsChunk(state, 1234, 1002);
             assert.deepEqual(unreadPostsChunk, {order: [], recent: true});
+        });
+
+        it('should return oldest chunk if timstamp greater than the oldest post', () => {
+            const state = {
+                entities: {
+                    posts: {
+                        posts: {
+                            a: {id: 'a', create_at: 1001},
+                            b: {id: 'b', create_at: 1002},
+                            c: {id: 'c', create_at: 1003},
+                        },
+                        postsInChannel: {
+                            1234: [
+                                {order: ['a', 'b', 'c'], recent: true, oldest: true},
+                            ],
+                        },
+                    },
+                },
+            };
+
+            const unreadPostsChunk = Selectors.getUnreadPostsChunk(state, 1234, 1000);
+            assert.deepEqual(unreadPostsChunk, {order: ['a', 'b', 'c'], recent: true, oldest: true});
         });
     });
 
