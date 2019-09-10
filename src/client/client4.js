@@ -2637,9 +2637,9 @@ export default class Client4 {
         );
     };
 
-    getMarketplacePlugins = async () => {
+    getMarketplacePlugins = async (searchTerm) => {
         return this.doFetch(
-            this.getPluginsMarketplaceRoute(),
+            `${this.getPluginsMarketplaceRoute()}${buildQueryString({filter: searchTerm})}`,
             {method: 'get'}
         );
     }

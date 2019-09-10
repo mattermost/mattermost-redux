@@ -37,4 +37,25 @@ describe('Actions.Plugins', () => {
         const marketplacePluginsResult = state.entities.plugins.marketplacePlugins;
         assert.equal(marketplacePlugins.length, Object.values(marketplacePluginsResult).length);
     });
+
+    it('loadMarketplacePlugins failure', async () => {
+        const getMarketplaceError = {
+            message: 'Failed to get plugins from the marketplace server.',
+            server_error_id: 'app.plugin.marketplace_plugins.app_error',
+            status_code: 500,
+            url: 'http://localhost:8065/api/v4/plugins/marketplace',
+        };
+
+        nock(Client4.getPluginsMarketplaceRoute()).
+            get('').
+            query(true).
+            reply(500, getMarketplaceError);
+
+        await store.dispatch(PluginActions.getMarketplacePlugins());
+
+        const state = store.getState();
+        const marketplacePluginsError = state.entities.plugins.marketplacePlugins.serverError;
+        assert.equal(marketplacePluginsError.message, getMarketplaceError.message);
+        assert.equal(marketplacePluginsError.status_code, getMarketplaceError.status_code);
+    });
 });
