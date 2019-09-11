@@ -85,6 +85,7 @@ export type PostWithFormatData = Post & {
 export type PostOrderBlock = {|
     order: Array<string>,
     recent: boolean,
+    oldest: boolean,
 |};
 
 export type PostsState = {|

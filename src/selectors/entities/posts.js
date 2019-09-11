@@ -514,6 +514,15 @@ export function getRecentPostsChunkInChannel(state: GlobalState, channelId: $ID<
     return postsForChannel.find((block) => block.recent);
 }
 
+export function getOldestPostsChunkInChannel(state: GlobalState, channelId: $ID<Channel>): Object {
+    const postsForChannel = state.entities.posts.postsInChannel[channelId];
+    if (!postsForChannel) {
+        return null;
+    }
+
+    return postsForChannel.find((block) => block.oldest);
+}
+
 // getPostIdsInChannel returns the IDs of posts loaded at the bottom of the given channel. It does not include older
 // posts such as those loaded by viewing a thread or a permalink.
 export function getPostIdsInChannel(state: GlobalState, channelId: $ID<Channel>): ?Array<$ID<Post>> {
@@ -551,6 +560,21 @@ export function getUnreadPostsChunk(state: GlobalState, channelId: $ID<Channel>,
     const postsEntity = state.entities.posts;
     const posts = postsEntity.posts;
     const recentChunk = getRecentPostsChunkInChannel(state, channelId);
+
+    /* 1. lastViewedAt can be greater than the most recent chunk in case of edited posts etc.
+          * return if recent block exists and oldest post is created after the last lastViewedAt timestamp
+          i.e all posts are read and the lastViewedAt is greater than the last post
+
+       2. lastViewedAt can be less than the first post in a channel if all the last viewed posts are deleted
+          * return if oldest block exist and oldest post created_at is greater than the last viewed post
+          i.e all posts are unread so the lastViewedAt is lessthan the first post
+
+      The above two exceptions are added because we cannot select the chunk based on timestamp alone as these cases are out of bounds
+
+      3. Normal cases where there are few unreads and few reads in a chunk as that is how unread API returns data
+          * return getPostsChunkInChannelAroundTime
+    */
+
     if (recentChunk) {
         // This would happen if there are no posts in channel.
         // If the system messages are deleted by sys admin.
@@ -566,6 +590,17 @@ export function getUnreadPostsChunk(state: GlobalState, channelId: $ID<Channel>,
         // check for only oldest posts because this can be higher than the latest post if the last post is edited
         if (oldestPostInBlock.create_at <= timeStamp) {
             return recentChunk;
+        }
+    }
+
+    const oldestPostsChunk = getOldestPostsChunkInChannel(state, channelId);
+
+    if (oldestPostsChunk && oldestPostsChunk.order.length) {
+        const {order} = oldestPostsChunk;
+        const oldestPostInBlock = posts[order[order.length - 1]];
+
+        if (oldestPostInBlock.create_at >= timeStamp) {
+            return oldestPostsChunk;
         }
     }
 

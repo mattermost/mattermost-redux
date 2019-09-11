@@ -61,6 +61,7 @@ describe('Actions.Users', () => {
         const {currentUserId, profiles} = state.entities.users;
         const preferences = state.entities.preferences.myPreferences;
         const teamMembers = state.entities.teams.myMembers;
+        const serverVersion = state.entities.general.serverVersion;
 
         if (loginRequest.status === RequestStatus.FAILURE) {
             throw new Error(JSON.stringify(loginRequest.error));
@@ -70,6 +71,7 @@ describe('Actions.Users', () => {
         assert.ok(profiles);
         assert.ok(profiles[currentUserId]);
         assert.ok(Object.keys(preferences).length);
+        assert.ok(serverVersion);
 
         Object.keys(teamMembers).forEach((id) => {
             assert.ok(teamMembers[id].team_id);
