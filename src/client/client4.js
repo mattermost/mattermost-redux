@@ -2937,6 +2937,7 @@ export default class Client4 {
             'ui_marketplace_configure',
             'ui_marketplace_opened',
             'ui_marketplace_closed',
+            'ui_marketplace_search',
         ].includes(event)) {
             return;
         }
