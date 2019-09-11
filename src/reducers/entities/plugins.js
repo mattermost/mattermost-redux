@@ -16,7 +16,7 @@ function marketplacePlugins(state = getInitialState(), action) {
     case PluginTypes.RECEIVED_MARKETPLACE_PLUGINS: {
         return {
             ...state,
-            data: action.data,
+            data: action.data ? action.data : [],
             serverError: null,
         };
     }
