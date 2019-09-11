@@ -2933,6 +2933,10 @@ export default class Client4 {
             'api_interactive_messages_button_clicked',
             'api_interactive_messages_menu_selected',
             'api_interactive_messages_dialog_submitted',
+            'ui_marketplace_download',
+            'ui_marketplace_configure',
+            'ui_marketplace_opened',
+            'ui_marketplace_closed',
         ].includes(event)) {
             return;
         }
