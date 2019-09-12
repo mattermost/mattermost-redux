@@ -10,6 +10,6 @@ export function getMarketplacePlugins(state) {
 export const getMarketplaceInstalledPlugins = createSelector(
     getMarketplacePlugins,
     (plugins) => {
-        return Object.values(plugins).filter((p) => p.InstalledVersion !== '');
+        return Object.values(plugins).filter((p) => p.installed_version !== '');
     }
 );
