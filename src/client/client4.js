@@ -2912,16 +2912,6 @@ export default class Client4 {
     };
 
     trackEvent(category, event, props) {
-        // Temporary change to allow only certain events to reduce data rate - see MM-13062
-        if (![
-            'api_posts_create',
-            'api_interactive_messages_button_clicked',
-            'api_interactive_messages_menu_selected',
-            'api_interactive_messages_dialog_submitted',
-        ].includes(event)) {
-            return;
-        }
-
         const properties = Object.assign({
             category,
             type: event,
@@ -2941,6 +2931,22 @@ export default class Client4 {
             },
             anonymousId: '00000000000000000000000000',
         };
+
+        if (global && global.window && global.window.uplink && global.window.uplink.initialized) {
+            global.window.uplink.track('event', properties);
+        } else if (global && global.uplink) {
+            global.uplink.track('event', properties);
+        }
+
+        // Temporary change to allow only certain events to reduce data rate - see MM-13062
+        if (![
+            'api_posts_create',
+            'api_interactive_messages_button_clicked',
+            'api_interactive_messages_menu_selected',
+            'api_interactive_messages_dialog_submitted',
+        ].includes(event)) {
+            return;
+        }
 
         if (global && global.window && global.window.analytics && global.window.analytics.initialized) {
             global.window.analytics.track('event', properties, options);
