@@ -4,26 +4,10 @@
 import {combineReducers} from 'redux';
 import {PluginTypes} from 'action_types';
 
-function getInitialState() {
-    return {
-        data: [],
-        serverError: null,
-    };
-}
-
-function marketplacePlugins(state = getInitialState(), action) {
+function marketplacePlugins(state = [], action) {
     switch (action.type) {
     case PluginTypes.RECEIVED_MARKETPLACE_PLUGINS: {
-        return {
-            data: action.data ? action.data : [],
-            serverError: null,
-        };
-    }
-    case PluginTypes.GET_MARKETPLACE_PLUGINS_FAILURE: {
-        return {
-            data: [],
-            serverError: action.error,
-        };
+        return action.data ? action.data : [];
     }
     default:
         return state;
