@@ -20,7 +20,8 @@ export const HEADER_X_VERSION_ID = 'X-Version-Id';
 
 const PER_PAGE_DEFAULT = 60;
 const LOGS_PER_PAGE_DEFAULT = 10000;
-
+export const DEFAULT_LIMIT_BEFORE = 30;
+export const DEFAULT_LIMIT_AFTER = 30;
 /* eslint-disable no-throw-literal */
 
 export default class Client4 {
@@ -1577,41 +1578,41 @@ export default class Client4 {
         );
     };
 
-    getPosts = async (channelId, page = 0, perPage = PER_PAGE_DEFAULT) => {
+    getPosts = async (channelId, page = 0, perPage = PER_PAGE_DEFAULT, fetchThreads = true) => {
         return this.doFetch(
-            `${this.getChannelRoute(channelId)}/posts${buildQueryString({page, per_page: perPage})}`,
+            `${this.getChannelRoute(channelId)}/posts${buildQueryString({page, per_page: perPage, fetchThreads})}`,
             {method: 'get'}
         );
     };
 
-    getPostsUnread = async (channelId, userId, limitAfter = 30, limitBefore = 30) => {
+    getPostsUnread = async (channelId, userId, limitAfter = DEFAULT_LIMIT_AFTER, limitBefore = DEFAULT_LIMIT_BEFORE, fetchThreads = true) => {
         return this.doFetch(
-            `${this.getUserRoute(userId)}/channels/${channelId}/posts/unread${buildQueryString({limit_after: limitAfter, limit_before: limitBefore})}`,
+            `${this.getUserRoute(userId)}/channels/${channelId}/posts/unread${buildQueryString({limit_after: limitAfter, limit_before: limitBefore, fetchThreads})}`,
             {method: 'get'}
         );
     };
 
-    getPostsSince = async (channelId, since) => {
+    getPostsSince = async (channelId, since, fetchThreads = true) => {
         return this.doFetch(
-            `${this.getChannelRoute(channelId)}/posts${buildQueryString({since})}`,
+            `${this.getChannelRoute(channelId)}/posts${buildQueryString({since, fetchThreads})}`,
             {method: 'get'}
         );
     };
 
-    getPostsBefore = async (channelId, postId, page = 0, perPage = PER_PAGE_DEFAULT) => {
+    getPostsBefore = async (channelId, postId, page = 0, perPage = PER_PAGE_DEFAULT, fetchThreads = true) => {
         this.trackEvent('api', 'api_posts_get_before', {channel_id: channelId});
 
         return this.doFetch(
-            `${this.getChannelRoute(channelId)}/posts${buildQueryString({before: postId, page, per_page: perPage})}`,
+            `${this.getChannelRoute(channelId)}/posts${buildQueryString({before: postId, page, per_page: perPage, fetchThreads})}`,
             {method: 'get'}
         );
     };
 
-    getPostsAfter = async (channelId, postId, page = 0, perPage = PER_PAGE_DEFAULT) => {
+    getPostsAfter = async (channelId, postId, page = 0, perPage = PER_PAGE_DEFAULT, fetchThreads = true) => {
         this.trackEvent('api', 'api_posts_get_after', {channel_id: channelId});
 
         return this.doFetch(
-            `${this.getChannelRoute(channelId)}/posts${buildQueryString({after: postId, page, per_page: perPage})}`,
+            `${this.getChannelRoute(channelId)}/posts${buildQueryString({after: postId, page, per_page: perPage, fetchThreads})}`,
             {method: 'get'}
         );
     };
