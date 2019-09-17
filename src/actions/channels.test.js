@@ -238,6 +238,28 @@ describe('Actions.Channels', () => {
         assert.strictEqual(channels[channelId].header, 'MM with Redux2');
     });
 
+    it('updateChannelPrivacy', async () => {
+        const publicChannel = TestHelper.basicChannel;
+        nock(Client4.getChannelRoute(publicChannel.id)).
+            put('/privacy').
+            reply(200, {...publicChannel, type: General.PRIVATE_CHANNEL});
+
+        assert.equal(publicChannel.type, General.OPEN_CHANNEL);
+
+        await store.dispatch(Actions.updateChannelPrivacy(publicChannel.id, General.PRIVATE_CHANNEL));
+
+        const updateRequest = store.getState().requests.channels.updateChannel;
+        if (updateRequest.status === RequestStatus.FAILURE) {
+            throw new Error(JSON.stringify(updateRequest.error));
+        }
+
+        const {channels} = store.getState().entities.channels;
+        const channelId = Object.keys(channels)[0];
+        assert.ok(channelId);
+        assert.ok(channels[channelId]);
+        assert.equal(channels[channelId].type, General.PRIVATE_CHANNEL);
+    });
+
     it('convertChannelToPrivate', async () => {
         const publicChannel = TestHelper.basicChannel;
         nock(Client4.getChannelRoute(publicChannel.id)).

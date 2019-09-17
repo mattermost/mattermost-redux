@@ -292,6 +292,37 @@ export function updateChannel(channel: Channel): ActionFunc {
     };
 }
 
+export function updateChannelPrivacy(channelId: string, privacy: string): ActionFunc {
+    return async (dispatch, getState) => {
+        dispatch({type: ChannelTypes.UPDATE_CHANNEL_REQUEST, data: null}, getState);
+
+        let updatedChannel;
+        try {
+            updatedChannel = await Client4.updateChannelPrivacy(channelId, privacy);
+        } catch (error) {
+            forceLogoutIfNecessary(error, dispatch, getState);
+
+            dispatch(batchActions([
+                {type: ChannelTypes.UPDATE_CHANNEL_FAILURE, error},
+                logError(error),
+            ]), getState);
+            return {error};
+        }
+
+        dispatch(batchActions([
+            {
+                type: ChannelTypes.RECEIVED_CHANNEL,
+                data: updatedChannel,
+            },
+            {
+                type: ChannelTypes.UPDATE_CHANNEL_SUCCESS,
+            },
+        ]), getState);
+
+        return {data: updatedChannel};
+    };
+}
+
 export function convertChannelToPrivate(channelId: string): ActionFunc {
     return async (dispatch, getState) => {
         dispatch({type: ChannelTypes.UPDATE_CHANNEL_REQUEST, data: null}, getState);
