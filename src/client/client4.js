@@ -253,6 +253,10 @@ export default class Client4 {
         return `${this.getPluginsRoute()}/${pluginId}`;
     }
 
+    getPluginsMarketplaceRoute() {
+        return `${this.getPluginsRoute()}/marketplace`;
+    }
+
     getRolesRoute() {
         return `${this.getBaseRoute()}/roles`;
     }
@@ -2650,6 +2654,13 @@ export default class Client4 {
         );
     };
 
+    getMarketplacePlugins = async (filter) => {
+        return this.doFetch(
+            `${this.getPluginsMarketplaceRoute()}${buildQueryString({filter: filter || ''})}`,
+            {method: 'get'}
+        );
+    }
+
     getPluginStatuses = async () => {
         return this.doFetch(
             `${this.getPluginsRoute()}/statuses`,
@@ -2928,6 +2939,11 @@ export default class Client4 {
             'api_interactive_messages_button_clicked',
             'api_interactive_messages_menu_selected',
             'api_interactive_messages_dialog_submitted',
+            'ui_marketplace_download',
+            'ui_marketplace_configure',
+            'ui_marketplace_opened',
+            'ui_marketplace_closed',
+            'ui_marketplace_search',
         ].includes(event)) {
             return;
         }
