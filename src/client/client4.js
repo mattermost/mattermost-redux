@@ -20,7 +20,8 @@ export const HEADER_X_VERSION_ID = 'X-Version-Id';
 
 const PER_PAGE_DEFAULT = 60;
 const LOGS_PER_PAGE_DEFAULT = 10000;
-
+export const DEFAULT_LIMIT_BEFORE = 30;
+export const DEFAULT_LIMIT_AFTER = 30;
 /* eslint-disable no-throw-literal */
 
 export default class Client4 {
@@ -250,6 +251,10 @@ export default class Client4 {
 
     getPluginRoute(pluginId) {
         return `${this.getPluginsRoute()}/${pluginId}`;
+    }
+
+    getPluginsMarketplaceRoute() {
+        return `${this.getPluginsRoute()}/marketplace`;
     }
 
     getRolesRoute() {
@@ -600,11 +605,11 @@ export default class Client4 {
         );
     };
 
-    getProfilesInTeam = async (teamId, page = 0, perPage = PER_PAGE_DEFAULT, sort = '') => {
+    getProfilesInTeam = async (teamId, page = 0, perPage = PER_PAGE_DEFAULT, sort = '', options = {}) => {
         this.trackEvent('api', 'api_profiles_get_in_team', {team_id: teamId, sort});
 
         return this.doFetch(
-            `${this.getUsersRoute()}${buildQueryString({in_team: teamId, page, per_page: perPage, sort})}`,
+            `${this.getUsersRoute()}${buildQueryString({...options, in_team: teamId, page, per_page: perPage, sort})}`,
             {method: 'get'}
         );
     };
@@ -623,11 +628,11 @@ export default class Client4 {
         );
     };
 
-    getProfilesWithoutTeam = async (page = 0, perPage = PER_PAGE_DEFAULT) => {
+    getProfilesWithoutTeam = async (page = 0, perPage = PER_PAGE_DEFAULT, options = {}) => {
         this.trackEvent('api', 'api_profiles_get_without_team');
 
         return this.doFetch(
-            `${this.getUsersRoute()}${buildQueryString({without_team: 1, page, per_page: perPage})}`,
+            `${this.getUsersRoute()}${buildQueryString({...options, without_team: 1, page, per_page: perPage})}`,
             {method: 'get'}
         );
     };
@@ -1313,6 +1318,15 @@ export default class Client4 {
         );
     };
 
+    updateChannelPrivacy = async (channelId, privacy) => {
+        this.trackEvent('api', 'api_channels_update_privacy', {channel_id: channelId, privacy});
+
+        return this.doFetch(
+            `${this.getChannelRoute(channelId)}/privacy`,
+            {method: 'put', body: JSON.stringify({privacy})}
+        );
+    };
+
     patchChannel = async (channelId, channelPatch) => {
         this.trackEvent('api', 'api_channels_patch', {channel_id: channelId});
 
@@ -1568,41 +1582,41 @@ export default class Client4 {
         );
     };
 
-    getPosts = async (channelId, page = 0, perPage = PER_PAGE_DEFAULT) => {
+    getPosts = async (channelId, page = 0, perPage = PER_PAGE_DEFAULT, fetchThreads = true) => {
         return this.doFetch(
-            `${this.getChannelRoute(channelId)}/posts${buildQueryString({page, per_page: perPage})}`,
+            `${this.getChannelRoute(channelId)}/posts${buildQueryString({page, per_page: perPage, fetchThreads})}`,
             {method: 'get'}
         );
     };
 
-    getPostsUnread = async (channelId, userId, limitAfter = 30, limitBefore = 30) => {
+    getPostsUnread = async (channelId, userId, limitAfter = DEFAULT_LIMIT_AFTER, limitBefore = DEFAULT_LIMIT_BEFORE, fetchThreads = true) => {
         return this.doFetch(
-            `${this.getUserRoute(userId)}/channels/${channelId}/posts/unread${buildQueryString({limit_after: limitAfter, limit_before: limitBefore})}`,
+            `${this.getUserRoute(userId)}/channels/${channelId}/posts/unread${buildQueryString({limit_after: limitAfter, limit_before: limitBefore, fetchThreads})}`,
             {method: 'get'}
         );
     };
 
-    getPostsSince = async (channelId, since) => {
+    getPostsSince = async (channelId, since, fetchThreads = true) => {
         return this.doFetch(
-            `${this.getChannelRoute(channelId)}/posts${buildQueryString({since})}`,
+            `${this.getChannelRoute(channelId)}/posts${buildQueryString({since, fetchThreads})}`,
             {method: 'get'}
         );
     };
 
-    getPostsBefore = async (channelId, postId, page = 0, perPage = PER_PAGE_DEFAULT) => {
+    getPostsBefore = async (channelId, postId, page = 0, perPage = PER_PAGE_DEFAULT, fetchThreads = true) => {
         this.trackEvent('api', 'api_posts_get_before', {channel_id: channelId});
 
         return this.doFetch(
-            `${this.getChannelRoute(channelId)}/posts${buildQueryString({before: postId, page, per_page: perPage})}`,
+            `${this.getChannelRoute(channelId)}/posts${buildQueryString({before: postId, page, per_page: perPage, fetchThreads})}`,
             {method: 'get'}
         );
     };
 
-    getPostsAfter = async (channelId, postId, page = 0, perPage = PER_PAGE_DEFAULT) => {
+    getPostsAfter = async (channelId, postId, page = 0, perPage = PER_PAGE_DEFAULT, fetchThreads = true) => {
         this.trackEvent('api', 'api_posts_get_after', {channel_id: channelId});
 
         return this.doFetch(
-            `${this.getChannelRoute(channelId)}/posts${buildQueryString({after: postId, page, per_page: perPage})}`,
+            `${this.getChannelRoute(channelId)}/posts${buildQueryString({after: postId, page, per_page: perPage, fetchThreads})}`,
             {method: 'get'}
         );
     };
@@ -2649,6 +2663,13 @@ export default class Client4 {
         );
     };
 
+    getMarketplacePlugins = async (filter) => {
+        return this.doFetch(
+            `${this.getPluginsMarketplaceRoute()}${buildQueryString({filter: filter || ''})}`,
+            {method: 'get'}
+        );
+    }
+
     getPluginStatuses = async () => {
         return this.doFetch(
             `${this.getPluginsRoute()}/statuses`,
@@ -2927,6 +2948,11 @@ export default class Client4 {
             'api_interactive_messages_button_clicked',
             'api_interactive_messages_menu_selected',
             'api_interactive_messages_dialog_submitted',
+            'ui_marketplace_download',
+            'ui_marketplace_configure',
+            'ui_marketplace_opened',
+            'ui_marketplace_closed',
+            'ui_marketplace_search',
         ].includes(event)) {
             return;
         }
