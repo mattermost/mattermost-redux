@@ -64,6 +64,30 @@ describe('Actions.Posts', () => {
         assert.ok(!postsInChannel[channelId], 'postIds in channel do not exist');
     });
 
+    it('maintain reply_count', async () => {
+        const channelId = TestHelper.basicChannel.id;
+        const post = TestHelper.fakePostWithId(channelId);
+        const post2 = TestHelper.fakePostWithId(channelId);
+
+        post2.root_id = post.id;
+
+        nock(Client4.getPostsRoute()).
+            post('').
+            reply(201, {...post, id: TestHelper.generateId()});
+
+        await Actions.createPost(post)(store.dispatch, store.getState);
+
+        nock(Client4.getPostsRoute()).
+            post('').
+            reply(201, {...post2, id: TestHelper.generateId()});
+
+        await Actions.createPost(post2)(store.dispatch, store.getState);
+        assert.equal(store.getState().entities.posts[post.id].reply_count, 1);
+
+        await Actions.deletePost(post2.id)(store.dispatch, store.getState);
+        assert.equal(store.getState().entities.posts[post.id].reply_count, 0);
+    });
+
     it('resetCreatePostRequest', async () => {
         const channelId = TestHelper.basicChannel.id;
         const post = TestHelper.fakePost(channelId);
