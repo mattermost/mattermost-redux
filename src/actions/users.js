@@ -391,13 +391,13 @@ export function getProfilesByUsernames(usernames: Array<string>): ActionFunc {
     };
 }
 
-export function getProfilesInTeam(teamId: string, page: number, perPage: number = General.PROFILE_CHUNK_SIZE, sort: string = ''): ActionFunc {
+export function getProfilesInTeam(teamId: string, page: number, perPage: number = General.PROFILE_CHUNK_SIZE, sort: string = '', options: Object = {}): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         const {currentUserId} = getState().entities.users;
 
         let profiles: null;
         try {
-            profiles = await Client4.getProfilesInTeam(teamId, page, perPage, sort);
+            profiles = await Client4.getProfilesInTeam(teamId, page, perPage, sort, options);
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch, getState);
             dispatch(logError(error));
@@ -451,11 +451,11 @@ export function getProfilesNotInTeam(teamId: string, groupConstrained: boolean, 
     };
 }
 
-export function getProfilesWithoutTeam(page: number, perPage: number = General.PROFILE_CHUNK_SIZE): ActionFunc {
+export function getProfilesWithoutTeam(page: number, perPage: number = General.PROFILE_CHUNK_SIZE, options: Object = {}): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         let profiles = null;
         try {
-            profiles = await Client4.getProfilesWithoutTeam(page, perPage);
+            profiles = await Client4.getProfilesWithoutTeam(page, perPage, options);
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch, getState);
             dispatch(logError(error));

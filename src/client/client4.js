@@ -605,11 +605,11 @@ export default class Client4 {
         );
     };
 
-    getProfilesInTeam = async (teamId, page = 0, perPage = PER_PAGE_DEFAULT, sort = '') => {
+    getProfilesInTeam = async (teamId, page = 0, perPage = PER_PAGE_DEFAULT, sort = '', options = {}) => {
         this.trackEvent('api', 'api_profiles_get_in_team', {team_id: teamId, sort});
 
         return this.doFetch(
-            `${this.getUsersRoute()}${buildQueryString({in_team: teamId, page, per_page: perPage, sort})}`,
+            `${this.getUsersRoute()}${buildQueryString({...options, in_team: teamId, page, per_page: perPage, sort})}`,
             {method: 'get'}
         );
     };
@@ -628,11 +628,11 @@ export default class Client4 {
         );
     };
 
-    getProfilesWithoutTeam = async (page = 0, perPage = PER_PAGE_DEFAULT) => {
+    getProfilesWithoutTeam = async (page = 0, perPage = PER_PAGE_DEFAULT, options = {}) => {
         this.trackEvent('api', 'api_profiles_get_without_team');
 
         return this.doFetch(
-            `${this.getUsersRoute()}${buildQueryString({without_team: 1, page, per_page: perPage})}`,
+            `${this.getUsersRoute()}${buildQueryString({...options, without_team: 1, page, per_page: perPage})}`,
             {method: 'get'}
         );
     };
