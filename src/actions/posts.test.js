@@ -73,19 +73,23 @@ describe('Actions.Posts', () => {
 
         nock(Client4.getPostsRoute()).
             post('').
-            reply(201, {...post, id: TestHelper.generateId()});
+            reply(201, post);
 
         await Actions.createPost(post)(store.dispatch, store.getState);
 
         nock(Client4.getPostsRoute()).
             post('').
-            reply(201, {...post2, id: TestHelper.generateId()});
+            reply(201, post2);
 
         await Actions.createPost(post2)(store.dispatch, store.getState);
-        assert.equal(store.getState().entities.posts[post.id].reply_count, 1);
 
-        await Actions.deletePost(post2.id)(store.dispatch, store.getState);
-        assert.equal(store.getState().entities.posts[post.id].reply_count, 0);
+        assert.equal(store.getState().entities.posts.posts[post.id].reply_count, 1);
+
+        await Actions.deletePost(post2)(store.dispatch, store.getState);
+        await Actions.removePost(post2)(store.dispatch, store.getState);
+
+        assert.equal(store.getState().entities.posts.posts[post.id].reply_count, 0);
+        nock.cleanAll();
     });
 
     it('resetCreatePostRequest', async () => {
