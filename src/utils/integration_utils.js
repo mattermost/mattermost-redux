@@ -54,6 +54,14 @@ export function checkDialogElementForError(elem: DialogElement, value: Object): 
                 };
             }
         }
+    } else if (type === 'radio') {
+        const options = elem.options;
+        if (typeof value !== 'undefined' && Array.isArray(options) && !options.some((e) => e.value === value)) {
+            return {
+                id: 'interactive_dialog.error.invalid_option',
+                defaultMessage: 'Must be a valid option',
+            };
+        }
     }
 
     return null;

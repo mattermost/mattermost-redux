@@ -33,6 +33,10 @@ export default keyMirror({
     TEST_EMAIL_SUCCESS: null,
     TEST_EMAIL_FAILURE: null,
 
+    TEST_SITE_URL_REQUEST: null,
+    TEST_SITE_URL_SUCCESS: null,
+    TEST_SITE_URL_FAILURE: null,
+
     TEST_S3_REQUEST: null,
     TEST_S3_SUCCESS: null,
     TEST_S3_FAILURE: null,

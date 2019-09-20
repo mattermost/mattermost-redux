@@ -92,6 +92,18 @@ export function testEmail(config: Object): ActionFunc {
     });
 }
 
+export function testSiteURL(siteURL: String): ActionFunc {
+    return bindClientFunc({
+        clientFunc: Client4.testSiteURL,
+        onRequest: AdminTypes.TEST_SITE_URL_REQUEST,
+        onSuccess: AdminTypes.TEST_SITE_URL_SUCCESS,
+        onFailure: AdminTypes.TEST_SITE_URL_FAILURE,
+        params: [
+            siteURL,
+        ],
+    });
+}
+
 export function testS3Connection(config: Object): ActionFunc {
     return bindClientFunc({
         clientFunc: Client4.testS3Connection,

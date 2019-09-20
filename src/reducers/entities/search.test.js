@@ -266,4 +266,23 @@ describe('reducers.entities.search', () => {
             assert.deepEqual(actualState.matches, expectedState);
         });
     });
+
+    describe('pinned', () => {
+        it('do not show multiples of the same post', () => {
+            const inputState = {
+                abcd: ['1234', '5678'],
+            };
+            const action = {
+                type: PostTypes.RECEIVED_POST,
+                data: {
+                    id: '5678',
+                    is_pinned: true,
+                    channel_id: 'abcd',
+                },
+            };
+
+            const actualState = reducer({pinned: inputState}, action);
+            assert.deepEqual(actualState.pinned, inputState);
+        });
+    });
 });
