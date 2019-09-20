@@ -368,12 +368,8 @@ export function editPost(post) {
 }
 
 export function getUnreadPostData(unreadChan, state) {
-    let delta;
-    if (state.entities.channels.myMembers[unreadChan.channel_id]) {
-        delta = state.entities.channels.myMembers[unreadChan.channel_id].msg_count - unreadChan.msg_count;
-    } else {
-        delta = unreadChan.msg_count;
-    }
+    const member = getMyChannelMemberSelector(state, unreadChan.channel_id);
+    const delta = member ? member.msg_count - unreadChan.msg_count : unreadChan.msg_count;
 
     const data = {
         teamId: unreadChan.team_id,
