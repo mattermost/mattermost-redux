@@ -306,8 +306,11 @@ function myMembers(state = {}, action) {
     }
     case ChannelTypes.POST_UNREAD_SUCCESS: {
         const data = action.data;
-        const channelState = state[data.channelId] || {};
+        const channelState = state[data.channelId];
 
+        if (!channelState) {
+            return state;
+        }
         return {...state, [data.channelId]: {...channelState, msg_count: data.msgCount, mention_count: data.mentionCount, last_viewed_at: data.lastViewedAt}};
     }
     case UserTypes.LOGOUT_SUCCESS:
