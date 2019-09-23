@@ -386,7 +386,7 @@ function handlePostUnread(msg) {
     return (dispatch, getState) => {
         const state = getState();
 
-        const member = getMyChannelMember(state, msg.data.channel_id);
+        const member = getMyChannelMember(state, msg.broadcast.channel_id);
         const delta = member ? member.msg_count - msg.data.msg_count : msg.data.msg_count;
         const info = {
             ...msg.data,
