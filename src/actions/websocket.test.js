@@ -103,6 +103,25 @@ describe('Actions.Websocket', () => {
         const channelId = TestHelper.generateId();
         const userId = TestHelper.generateId();
 
+        store = await configureStore({
+            entities: {
+                channels: {
+                    channels: {
+                        [channelId]: {id: channelId},
+                    },
+                    myMembers: {
+                        [channelId]: {msg_count: 10, mention_count: 0, last_viewed_at: 0},
+                    },
+                },
+            },
+        });
+        await store.dispatch(Actions.init(
+            'web',
+            null,
+            null,
+            MockWebSocket
+        ));
+
         mockServer.emit('message', JSON.stringify({
             event: WebsocketEvents.POST_UNREAD,
             data: {
