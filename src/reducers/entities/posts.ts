@@ -71,6 +71,7 @@ export function handlePosts(state: RelationOneToOne<Post, Post> = {}, action) {
         const newState = {...state};
 
         if (action.type === PostTypes.RECEIVED_NEW_POST && post.root_id && state[post.root_id] && post.pending_post_id && post.id !== post.pending_post_id) {
+            debugger;
             const rootPost = state[post.root_id];
 
             newState[post.root_id] = {...rootPost, reply_count: (rootPost.reply_count || 0) + 1};
