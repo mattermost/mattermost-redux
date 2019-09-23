@@ -48,7 +48,15 @@ import {
 } from 'action_types';
 import {General, WebsocketEvents, Preferences} from 'constants';
 
-import {getAllChannels, getChannel, getChannelsNameMapInTeam, getCurrentChannelId, getRedirectChannelNameForTeam, getCurrentChannelStats} from 'selectors/entities/channels';
+import {
+    getAllChannels,
+    getChannel,
+    getChannelsNameMapInTeam,
+    getCurrentChannelId,
+    getCurrentChannelStats,
+    getMyChannelMember,
+    getRedirectChannelNameForTeam,
+} from 'selectors/entities/channels';
 import {getConfig} from 'selectors/entities/general';
 import {getAllPosts} from 'selectors/entities/posts';
 import {getDirectShowPreferences} from 'selectors/entities/preferences';
@@ -377,12 +385,9 @@ function handlePostDeleted(msg) {
 function handlePostUnread(msg) {
     return (dispatch, getState) => {
         const state = getState();
-        let delta;
-        if (state.entities.channels.myMembers[msg.data.channel_id]) {
-            delta = state.entities.channels.myMembers[msg.broadcast.channel_id].msg_count - msg.data.msg_count;
-        } else {
-            delta = msg.data.msg_count;
-        }
+
+        const member = getMyChannelMember(state, msg.data.channel_id);
+        const delta = member ? member.msg_count - msg.data.msg_count : msg.data.msg_count;
         const info = {
             ...msg.data,
             user_id: msg.broadcast.user_id,
