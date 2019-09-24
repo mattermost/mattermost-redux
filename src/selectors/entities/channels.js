@@ -195,13 +195,9 @@ export const getCurrentChannel: (GlobalState) => Channel = createSelector(
     }
 );
 
-export const getMyChannelMember: (GlobalState, string) => ?ChannelMembership = createSelector(
-    getMyChannelMemberships,
-    (state: GlobalState, channelId: string): string => channelId,
-    (channelMemberships: RelationOneToOne<Channel, ChannelMembership>, channelId: string): ?ChannelMembership => {
-        return channelMemberships[channelId] || null;
-    }
-);
+export function getMyChannelMember(state: GlobalState, channelId: string): ?ChannelMembership {
+    return state.entities.channels.myMembers[channelId];
+}
 
 export const getCurrentChannelStats: (GlobalState) => ChannelStats = createSelector(
     getAllChannelStats,

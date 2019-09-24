@@ -210,16 +210,13 @@ function myMembers(state = {}, action) {
     }
 
     case ChannelTypes.POST_UNREAD_SUCCESS: {
-        const {teamId, deltaMsgs, mentionCount} = action.data;
-        const teamState = state[teamId];
-        if (!teamState) {
-            return state;
-        }
+        const {teamId, deltaMsgs, mentionCount, msgCount} = action.data;
+        const teamState = (typeof state[teamId] === 'undefined' ? {} : state[teamId]);
 
         const newTeamState = {
             ...teamState,
-            msg_count: teamState.msg_count - deltaMsgs,
-            mention_count: teamState.mention_count + mentionCount,
+            msg_count: (typeof teamState.msg_count === 'undefined' ? msgCount : teamState.msg_count - deltaMsgs),
+            mention_count: (typeof teamState.mention_count === 'undefined' ? mentionCount : teamState.mention_count + mentionCount),
         };
 
         return {...state, [teamId]: newTeamState};

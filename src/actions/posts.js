@@ -367,6 +367,22 @@ export function editPost(post) {
     });
 }
 
+export function getUnreadPostData(unreadChan, state) {
+    const member = getMyChannelMemberSelector(state, unreadChan.channel_id);
+    const delta = member ? member.msg_count - unreadChan.msg_count : unreadChan.msg_count;
+
+    const data = {
+        teamId: unreadChan.team_id,
+        channelId: unreadChan.channel_id,
+        msgCount: unreadChan.msg_count,
+        mentionCount: unreadChan.mention_count,
+        lastViewedAt: unreadChan.last_viewed_at,
+        deltaMsgs: delta,
+    };
+
+    return data;
+}
+
 export function setUnreadPost(userId, postId) {
     return async (dispatch, getState) => {
         let unreadChan;
@@ -377,23 +393,9 @@ export function setUnreadPost(userId, postId) {
             dispatch(logError(error));
             return {error};
         }
-        let delta;
 
         const state = getState();
-        if (state.entities.channels.myMembers[unreadChan.channel_id]) {
-            delta = state.entities.channels.myMembers[unreadChan.channel_id].msg_count - unreadChan.msg_count;
-        } else {
-            delta = unreadChan.msg_count;
-        }
-
-        const data = {
-            teamId: unreadChan.team_id,
-            channelId: unreadChan.channel_id,
-            msgCount: unreadChan.msg_count,
-            mentionCount: unreadChan.mention_count,
-            lastViewedAt: unreadChan.last_viewed_at,
-            deltaMsgs: delta,
-        };
+        const data = getUnreadPostData(unreadChan, state);
         dispatch({
             type: ChannelTypes.POST_UNREAD_SUCCESS,
             data,

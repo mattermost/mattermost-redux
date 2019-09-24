@@ -25,6 +25,7 @@ import {
     handleNewPost,
     postDeleted,
     receivedPost,
+    getUnreadPostData,
 } from './posts';
 import {
     getTeam,
@@ -47,7 +48,15 @@ import {
 } from 'action_types';
 import {General, WebsocketEvents, Preferences} from 'constants';
 
-import {getAllChannels, getChannel, getChannelsNameMapInTeam, getCurrentChannelId, getRedirectChannelNameForTeam, getCurrentChannelStats} from 'selectors/entities/channels';
+import {
+    getAllChannels,
+    getChannel,
+    getChannelsNameMapInTeam,
+    getCurrentChannelId,
+    getCurrentChannelStats,
+    getMyChannelMember,
+    getRedirectChannelNameForTeam,
+} from 'selectors/entities/channels';
 import {getConfig} from 'selectors/entities/general';
 import {getAllPosts} from 'selectors/entities/posts';
 import {getDirectShowPreferences} from 'selectors/entities/preferences';
@@ -247,6 +256,9 @@ function handleEvent(msg) {
     case WebsocketEvents.POST_DELETED:
         doDispatch(handlePostDeleted(msg));
         break;
+    case WebsocketEvents.POST_UNREAD:
+        doDispatch(handlePostUnread(msg));
+        break;
     case WebsocketEvents.LEAVE_TEAM:
         doDispatch(handleLeaveTeamEvent(msg));
         break;
@@ -368,6 +380,28 @@ function handlePostDeleted(msg) {
     const data = JSON.parse(msg.data.post);
 
     return postDeleted(data);
+}
+
+function handlePostUnread(msg) {
+    return (dispatch, getState) => {
+        const state = getState();
+
+        const member = getMyChannelMember(state, msg.broadcast.channel_id);
+        const delta = member ? member.msg_count - msg.data.msg_count : msg.data.msg_count;
+        const info = {
+            ...msg.data,
+            user_id: msg.broadcast.user_id,
+            team_id: msg.broadcast.team_id,
+            channel_id: msg.broadcast.channel_id,
+            deltaMsgs: delta,
+        };
+        const data = getUnreadPostData(info, state);
+        dispatch({
+            type: ChannelTypes.POST_UNREAD_SUCCESS,
+            data,
+        });
+        return {data};
+    };
 }
 
 function handleLeaveTeamEvent(msg) {
