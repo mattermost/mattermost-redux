@@ -8,14 +8,18 @@ import {General} from 'constants';
 import {ChannelTypes, TeamTypes, UserTypes} from 'action_types';
 import EventEmitter from 'utils/event_emitter';
 
+import {selectChannel} from './channels';
 import {logError} from './errors';
 import {bindClientFunc, forceLogoutIfNecessary} from './helpers';
 import {getProfilesByIds, getStatusesByIds} from './users';
 import {loadRolesIfNeeded} from './roles';
 
+import {isCompatibleWithJoinViewTeamPermissions} from 'selectors/entities/general';
+import {getCurrentTeamId} from 'selectors/entities/teams';
+import {getCurrentUserId} from 'selectors/entities/users';
+
 import type {GetStateFunc, DispatchFunc, ActionFunc, ActionResult} from 'types/actions';
 import type {Team} from 'types/teams';
-import {isCompatibleWithJoinViewTeamPermissions} from 'selectors/entities/general';
 
 async function getProfilesAndStatusesForMembers(userIds, dispatch, getState) {
     const {currentUserId, profiles, statuses} = getState().entities.users;
@@ -459,9 +463,9 @@ export function removeUserFromTeam(teamId: string, userId: string): ActionFunc {
         ];
 
         const state = getState();
-        const {currentUserId} = state.entities.users;
+        const currentUserId = getCurrentUserId(state);
 
-        if (currentUserId === userId) {
+        if (userId === currentUserId) {
             const {channels, myMembers} = state.entities.channels;
 
             for (const channelMember of Object.values(myMembers)) {
@@ -474,6 +478,10 @@ export function removeUserFromTeam(teamId: string, userId: string): ActionFunc {
                         data: channel,
                     });
                 }
+            }
+
+            if (teamId === getCurrentTeamId(state)) {
+                actions.push(selectChannel(''));
             }
         }
 
