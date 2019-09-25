@@ -502,41 +502,100 @@ describe('Actions.Teams', () => {
         assert.ok(profilesInTeam[TestHelper.basicTeam.id].has(user2.id));
     });
 
-    it('removeUserFromTeam', async () => {
-        nock(Client4.getUsersRoute()).
-            post('').
-            reply(201, TestHelper.fakeUserWithId());
-        const user = await TestHelper.basicClient4.createUser(TestHelper.fakeUser());
+    describe('removeUserFromTeam', () => {
+        const team = {id: 'team'};
+        const user = {id: 'user'};
 
-        nock(Client4.getTeamRoute(TestHelper.basicTeam.id)).
-            post('/members').
-            reply(201, {user_id: user.id, team_id: TestHelper.basicTeam.id});
-        await Actions.addUserToTeam(TestHelper.basicTeam.id, user.id)(store.dispatch, store.getState);
+        test('should remove the user from the team', async () => {
+            store = await configureStore({
+                entities: {
+                    teams: {
+                        membersInTeam: {
+                            [team.id]: {
+                                [user.id]: {},
+                            },
+                        },
+                    },
+                    users: {
+                        currentUserId: '',
+                        profilesInTeam: {
+                            [team.id]: [user.id],
+                        },
+                        profilesNotInTeam: {
+                            [team.id]: [],
+                        },
+                    },
+                },
+            });
 
-        let state = store.getState();
-        let members = state.entities.teams.membersInTeam;
-        let profilesInTeam = state.entities.users.profilesInTeam;
-        let profilesNotInTeam = state.entities.users.profilesNotInTeam;
+            nock(Client4.getTeamMemberRoute(team.id, user.id)).
+                delete('').
+                reply(200, OK_RESPONSE);
+            await store.dispatch(Actions.removeUserFromTeam(team.id, user.id));
 
-        assert.ok(members[TestHelper.basicTeam.id]);
-        assert.ok(members[TestHelper.basicTeam.id][user.id]);
-        assert.ok(profilesInTeam[TestHelper.basicTeam.id].has(user.id));
-        assert.ok(!profilesNotInTeam[TestHelper.basicTeam.id].has(user.id));
+            const state = store.getState();
+            expect(state.entities.teams.membersInTeam[team.id]).toEqual({});
+            expect(state.entities.users.profilesInTeam[team.id]).toEqual(new Set());
+            expect(state.entities.users.profilesNotInTeam[team.id]).toEqual(new Set([user.id]));
+        });
 
-        nock(Client4.getTeamMemberRoute(TestHelper.basicTeam.id, user.id)).
-            delete('').
-            reply(200, OK_RESPONSE);
-        await Actions.removeUserFromTeam(TestHelper.basicTeam.id, user.id)(store.dispatch, store.getState);
+        test('should leave all channels when leaving a team', async () => {
+            const channel1 = {id: 'channel1', team_id: team.id};
+            const channel2 = {id: 'channel2', team_id: 'team2'};
 
-        state = store.getState();
-        members = state.entities.teams.membersInTeam;
-        profilesInTeam = state.entities.users.profilesInTeam;
-        profilesNotInTeam = state.entities.users.profilesNotInTeam;
+            store = await configureStore({
+                entities: {
+                    channels: {
+                        channels: {
+                            [channel1.id]: channel1,
+                            [channel2.id]: channel2,
+                        },
+                        myMembers: {
+                            [channel1.id]: {user_id: user.id, channel_id: channel1.id},
+                            [channel2.id]: {user_id: user.id, channel_id: channel2.id},
+                        },
+                    },
+                    users: {
+                        currentUserId: user.id,
+                    },
+                },
+            });
 
-        assert.ok(members[TestHelper.basicTeam.id]);
-        assert.ok(!members[TestHelper.basicTeam.id][user.id]);
-        assert.ok(!profilesInTeam[TestHelper.basicTeam.id].has(user.id));
-        assert.ok(profilesNotInTeam[TestHelper.basicTeam.id].has(user.id));
+            nock(Client4.getTeamMemberRoute(team.id, user.id)).
+                delete('').
+                reply(200, OK_RESPONSE);
+            await store.dispatch(Actions.removeUserFromTeam(team.id, user.id));
+
+            const state = store.getState();
+            expect(state.entities.channels.myMembers[channel1.id]).toBeFalsy();
+            expect(state.entities.channels.myMembers[channel2.id]).toBeTruthy();
+        });
+
+        test('should clear the current channel when leaving a team', async () => {
+            const channel = {id: 'channel'};
+
+            store = await configureStore({
+                entities: {
+                    channels: {
+                        channels: {
+                            [channel.id]: channel,
+                        },
+                        myMembers: {},
+                    },
+                    users: {
+                        currentUserId: user.id,
+                    },
+                },
+            });
+
+            nock(Client4.getTeamMemberRoute(team.id, user.id)).
+                delete('').
+                reply(200, OK_RESPONSE);
+            await store.dispatch(Actions.removeUserFromTeam(team.id, user.id));
+
+            const state = store.getState();
+            expect(state.entities.channels.currentChannelId).toBe('');
+        });
     });
 
     it('updateTeamMemberRoles', async () => {
