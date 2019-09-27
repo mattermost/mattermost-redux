@@ -573,13 +573,13 @@ export function flagPost(postId) {
     };
 }
 
-export function getPostThread(rootId, fetchThreads = true) {
+export function getPostThread(rootId) {
     return async (dispatch, getState) => {
         dispatch({type: PostTypes.GET_POST_THREAD_REQUEST}, getState);
 
         let posts;
         try {
-            posts = await Client4.getPostThread(rootId, fetchThreads);
+            posts = await Client4.getPostThread(rootId);
             getProfilesAndStatusesForPosts(posts.posts, dispatch, getState);
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch, getState);
@@ -764,7 +764,7 @@ export function getPostsAround(channelId, postId, perPage = Posts.POST_CHUNK_SIZ
 
 // getThreadsForPosts is intended for an array of posts that have been batched
 // (see the actions/websocket_actions/handleNewPostEvents function in the webapp)
-export function getThreadsForPosts(posts, fetchThreads = true) {
+export function getThreadsForPosts(posts) {
     return (dispatch, getState) => {
         if (!Array.isArray(posts) || !posts.length) {
             return {data: true};
@@ -780,7 +780,7 @@ export function getThreadsForPosts(posts, fetchThreads = true) {
 
             const rootPost = Selectors.getPost(state, post.root_id);
             if (!rootPost) {
-                promises.push(dispatch(getPostThread(post.root_id, fetchThreads)));
+                promises.push(dispatch(getPostThread(post.root_id)));
             }
         });
 
@@ -1132,7 +1132,7 @@ function completePostReceive(post, websocketMessageProps) {
         const rootPost = Selectors.getPost(state, post.root_id);
 
         if (post.root_id && !rootPost) {
-            dispatch(getPostThread(post.root_id, true));
+            dispatch(getPostThread(post.root_id));
         }
 
         dispatch(lastPostActions(post, websocketMessageProps));
