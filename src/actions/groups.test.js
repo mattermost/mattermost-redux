@@ -7,7 +7,7 @@ import nock from 'nock';
 import * as Actions from 'actions/groups';
 import {Client4} from 'client';
 
-import {RequestStatus, Groups} from 'constants';
+import {RequestStatus, Groups} from '../constants';
 import TestHelper from 'test/test_helper';
 import configureStore from 'test/test_store';
 
@@ -430,7 +430,7 @@ describe('Actions.Groups', () => {
         }
 
         const groupIDs = state.entities.teams.groupsAssociatedToTeam[teamID].ids;
-        var expectedIDs = ['tnd8zod9f3fdtqosxjmhwucbth', 'qhdp6g7aubbpiyja7c4sgpe7tc'];
+        const expectedIDs = ['tnd8zod9f3fdtqosxjmhwucbth', 'qhdp6g7aubbpiyja7c4sgpe7tc'];
         assert.strictEqual(groupIDs.length, expectedIDs.length);
         groupIDs.forEach((id) => {
             assert.ok(expectedIDs.includes(id));
@@ -483,7 +483,7 @@ describe('Actions.Groups', () => {
         }
 
         const groupIDs = state.entities.teams.groupsAssociatedToTeam[teamID].ids;
-        var expectedIDs = ['existing2'].concat(response.map((group) => group.id));
+        const expectedIDs = ['existing2'].concat(response.map((group) => group.id));
         assert.strictEqual(groupIDs.length, expectedIDs.length);
         groupIDs.forEach((id) => {
             assert.ok(expectedIDs.includes(id));
@@ -615,7 +615,7 @@ describe('Actions.Groups', () => {
         }
 
         const groupIDs = state.entities.channels.groupsAssociatedToChannel[channelID].ids;
-        var expectedIDs = ['tnd8zod9f3fdtqosxjmhwucbth', 'qhdp6g7aubbpiyja7c4sgpe7tc'];
+        const expectedIDs = ['tnd8zod9f3fdtqosxjmhwucbth', 'qhdp6g7aubbpiyja7c4sgpe7tc'];
         assert.strictEqual(groupIDs.length, expectedIDs.length);
         groupIDs.forEach((id) => {
             assert.ok(expectedIDs.includes(id));
@@ -668,7 +668,7 @@ describe('Actions.Groups', () => {
         }
 
         const groupIDs = state.entities.channels.groupsAssociatedToChannel[channelID].ids;
-        var expectedIDs = ['existing2'].concat(response.map((group) => group.id));
+        const expectedIDs = ['existing2'].concat(response.map((group) => group.id));
         assert.strictEqual(groupIDs.length, expectedIDs.length);
         groupIDs.forEach((id) => {
             assert.ok(expectedIDs.includes(id));

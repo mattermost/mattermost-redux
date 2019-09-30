@@ -1,0 +1,44 @@
+{
+    "include": ["src", "types"],
+    "typeAcquisition": {
+        "enable": true
+    },
+    "compilerOptions": {
+        "incremental": true,
+        "target": "es5",
+        "module": "commonjs",
+        "lib": ["dom", "esnext"],
+        "allowJs": true,
+        "importHelpers": true,
+        "declaration": true,
+        "sourceMap": true,
+        "rootDir": "./",
+        "strict": false,
+        "noImplicitAny": false,
+        "strictNullChecks": true,
+        "strictFunctionTypes": false,
+        "strictPropertyInitialization": true,
+        "noImplicitThis": false,
+        "alwaysStrict": true,
+        "noUnusedLocals": false,
+        "downlevelIteration": true,
+        "noUnusedParameters": false,
+        "noImplicitReturns": true,
+        "noFallthroughCasesInSwitch": true,
+        "moduleResolution": "node",
+        "baseUrl": "./",
+        "paths": {
+            "*": ["src/*","node_modules/*"],
+            "utils/*": ["src/utils/*"],
+            "types/*": ["src/types/*"],
+            "constants": ["src/constants/*"],
+            "action_types/*": ["src/action_types/*"],
+            "action_types": ["src/action_types"],
+            "test/*": ["test/*"],
+            "src/*": ["src/*"]
+        },
+        "rootDirs": ["src", "test"],
+        "jsx": "react",
+        "esModuleInterop": true
+    }
+}

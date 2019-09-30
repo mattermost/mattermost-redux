@@ -1,106 +1,101 @@
 {
   "name": "mattermost-redux",
-  "version": "5.3.1",
-  "description": "Common code (API client, Redux stores, logic, utility functions) for building a Mattermost client",
-  "homepage": "https://github.com/mattermost/mattermost-redux",
-  "license": "Apache-2.0",
-  "repository": "github:mattermost/mattermost-redux",
-  "bugs": {
-    "url": "https://github.com/mattermost/mattermost-redux/issues"
+  "version": "0.1.0",
+  "main": "build/index.js",
+  "module": "build/mattermost-redux.esm.js",
+  "typings": "build/index.d.ts",
+  "files": [
+    "build"
+  ],
+  "scripts": {
+    "start": "tsdx watch -i ./src/client/client4.ts -i ./src/client/websocket_client.ts",
+    "build": "tsdx build -i ./src/client/client4.ts -i ./src/client/websocket_client.ts",
+    "test": "tsdx test",
+    "lint": "eslint 'src/**/*.ts' --fix"
   },
   "dependencies": {
-    "deep-equal": "1.0.1",
-    "eslint-plugin-header": "3.0.0",
-    "form-data": "2.5.0",
-    "gfycat-sdk": "1.4.18",
-    "harmony-reflect": "1.6.1",
+    "@typescript-eslint/eslint-plugin": "^2.3.1",
+    "@typescript-eslint/parser": "2.3.1",
+    "gfycat-sdk": "latest",
+    "moment-timezone": "^0.5.25",
     "isomorphic-fetch": "2.2.1",
-    "mime-db": "1.40.0",
-    "moment-timezone": "0.5.26",
-    "redux": "4.0.4",
-    "redux-action-buffer": "1.2.0",
-    "redux-batched-actions": "0.4.1",
-    "redux-offline": "git+https://github.com/enahum/redux-offline.git#885024de96b6ec73650c340c8928066585c413df",
+    "redux": "^4.0.1",
+    "redux-action-buffer": "^1.2.0",
+    "redux-offline": "git+https://github.com/enahum/redux-offline.git#4bd85e7e3b279a2b11fb4d587808d583d2b5e7b5",
     "redux-persist": "4.9.1",
-    "redux-thunk": "2.3.0",
-    "reselect": "4.0.0",
-    "serialize-error": "2.1.0",
-    "shallow-equals": "1.0.0"
+    "redux-persist-node-storage": "^2.0.0",
+    "redux-thunk": "^2.3.0",
+    "remote-redux-devtools": "^0.5.16",
+    "reselect": "^4.0.0",
+    "serialize-error": "^4.1.0",
+    "shallow-equals": "^1.0.0",
+    "source-map-support": "^0.5.12"
   },
-  "devDependencies": {
-    "@babel/cli": "7.5.5",
-    "@babel/core": "7.5.5",
-    "@babel/plugin-proposal-class-properties": "7.5.5",
-    "@babel/plugin-proposal-optional-chaining": "7.2.0",
-    "@babel/plugin-transform-flow-comments": "7.5.5",
-    "@babel/polyfill": "7.4.4",
-    "@babel/preset-env": "7.5.5",
-    "@babel/register": "7.5.5",
-    "babel-eslint": "10.0.2",
-    "babel-jest": "24.8.0",
-    "babel-loader": "8.0.6",
-    "babel-plugin-module-resolver": "3.2.0",
-    "core-js": "3.1.4",
-    "chai": "4.2.0",
-    "deep-freeze": "0.0.1",
-    "eslint": "6.0.1",
-    "eslint-config-mattermost": "github:mattermost/eslint-config-mattermost#6fe27a2bd1f9df4d4eb96fac6fcdcc0fee0ecbd7",
-    "eslint-plugin-flowtype": "3.12.1",
-    "eslint-plugin-jest": "22.11.1",
-    "expect": "24.8.0",
-    "fetch-mock": "7.3.7",
-    "flow-bin": "0.95.1",
-    "flow-typed": "2.5.1",
-    "jest": "24.8.0",
-    "jest-cli": "24.8.0",
-    "jest-junit": "6.4.0",
-    "mock-socket": "8.0.5",
-    "nock": "10.0.6",
-    "react": "16.8.6",
-    "redux-mock-store": "1.5.3",
-    "redux-persist-node-storage": "2.0.0",
-    "remote-redux-devtools": "0.5.16",
-    "uglifyjs-webpack-plugin": "2.1.3",
-    "webpack": "4.36.1",
-    "ws": "7.1.1"
-  },
-  "scripts": {
-    "build": "babel src --out-dir . --ignore '**/*.test.js'",
-    "webpack": "webpack",
-    "dev": "babel src --out-dir ${WEBAPP_DIR:-../mattermost-webapp}/node_modules/mattermost-redux --source-maps",
-    "dev-mobile": "babel src --out-dir ${MOBILE_DIR:-../mattermost-mobile}/node_modules/mattermost-redux --source-maps",
-    "dev:watch": "babel --watch src --out-dir ${WEBAPP_DIR:-../mattermost-webapp}/node_modules/mattermost-redux --source-maps",
-    "dev-mobile:watch": "babel --watch src --out-dir ${MOBILE_DIR:-../mattermost-mobile}/node_modules/mattermost-redux --source-maps",
-    "check": "eslint --ignore-path .gitignore --ignore-pattern node_modules --quiet .",
-    "fix": "eslint --ignore-path .gitignore --ignore-pattern node_modules --quiet . --fix",
-    "flow": "flow",
-    "flow-typed": "flow-typed",
-    "test": "jest --forceExit --detectOpenHandles --maxWorkers=2",
-    "test:watch": "jest --watch",
-    "test:coverage": "jest --coverage",
-    "prepare": "npm run build"
+  "husky": {
+    "hooks": {
+      "pre-commit": "tsdx lint"
+    }
   },
   "jest": {
-    "clearMocks": true,
-    "collectCoverageFrom": [
-      "src/**/*.{js}"
+    "globals": {
+      "ts-jest": {
+        "tsConfig": "tsconfig.json",
+        "diagnostics": true
+      },
+      "NODE_ENV": "test"
+    },
+    "rootDir": ".",
+    "moduleDirectories": [
+      "node_modules",
+      "src"
     ],
-    "coverageReporters": [
-      "lcov",
-      "text-summary"
-    ],
-    "reporters": [
-      "default",
-      "jest-junit"
+    "moduleFileExtensions": [
+      "ts",
+      "tsx",
+      "js",
+      "jsx",
+      "json"
     ],
     "setupFilesAfterEnv": [
       "<rootDir>/test/setup.js"
     ],
-    "testPathIgnorePatterns": [
-      "/node_modules/"
-    ]
+    "transform": {
+      "^.+\\.(tsx|js|jsx)?$": "ts-jest"
+    },
+    "transformIgnorePatterns": [
+      "<rootDir>/node_modules/"
+    ],
+    "testMatch": [
+      "<rootDir>/src/**/?(*.)(spec|test).(ts|js)?(x)"
+    ],
+    "verbose": true,
+    "moduleNameMapper": {
+      "^src/(.*)$": "<rootDir>/src/$1",
+      "^test/(.*)$": "<rootDir>/test/$1",
+      "^utils/(.*)$": "<rootDir>/src/utils/$1",
+      "^action_types$": "<rootDir>/src/action_types",
+      "^constants$": "<rootDir>/src/constants",
+      "^action_types/(.*)$": "<rootDir>/src/action_types/$1",
+      "^@/(.*)$": "<rootDir>/src/$1"
+    }
   },
-  "jest-junit": {
-    "output": "build/test-results.xml"
+  "devDependencies": {
+    "@babel/plugin-proposal-optional-chaining": "^7.6.0",
+    "@types/jest": "^24.0.18",
+    "babel-eslint": "^10.0.3",
+    "babel-plugin-module-resolver": "^3.2.0",
+    "eslint-config-mattermost": "github:mattermost/eslint-config-mattermost#6fe27a2bd1f9df4d4eb96fac6fcdcc0fee0ecbd7",
+    "eslint-import-resolver-webpack": "0.11.1",
+    "eslint-plugin-cypress": "2.7.0",
+    "eslint-plugin-header": "3.0.0",
+    "eslint-plugin-import": "2.18.2",
+    "form-data": "^2.5.1",
+    "husky": "^3.0.5",
+    "mock-socket": "^9.0.0",
+    "nock": "^11.3.5",
+    "redux-mock-store": "^1.5.3",
+    "tsdx": "^0.9.2",
+    "tslib": "^1.10.0",
+    "typescript": "^3.6.3"
   }
 }

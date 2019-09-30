@@ -9,7 +9,7 @@ import * as Actions from 'actions/posts';
 import {login} from 'actions/users';
 import {setSystemEmojis, createCustomEmoji} from 'actions/emojis';
 import {Client4} from 'client';
-import {Preferences, Posts, RequestStatus} from 'constants';
+import {Preferences, Posts, RequestStatus} from '../constants';
 import {PostTypes} from 'action_types';
 import TestHelper from 'test/test_helper';
 import configureStore from 'test/test_store';

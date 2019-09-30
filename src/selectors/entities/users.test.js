@@ -3,7 +3,7 @@
 
 import assert from 'assert';
 
-import {General, Preferences} from 'constants';
+import {General, Preferences} from '../../constants';
 import deepFreezeAndThrowOnMutation from 'utils/deep_freeze';
 import {sortByUsername} from 'utils/user_utils';
 import TestHelper from 'test/test_helper';

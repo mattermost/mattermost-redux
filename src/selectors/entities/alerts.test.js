@@ -5,7 +5,7 @@ import assert from 'assert';
 
 import deepFreezeAndThrowOnMutation from 'utils/deep_freeze';
 import * as Selectors from 'selectors/entities/alerts';
-import {Alerts} from 'constants';
+import {Alerts} from '../../constants';
 
 describe('Selectors.Alerts', () => {
     const alertStack = [
