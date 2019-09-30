@@ -1575,9 +1575,9 @@ export default class Client4 {
         );
     };
 
-    getPostThread = async (postId) => {
+    getPostThread = async (postId, fetchThreads = true) => {
         return this.doFetch(
-            `${this.getPostRoute(postId)}/thread`,
+            `${this.getPostRoute(postId)}/thread${buildQueryString({fetchThreads})}`,
             {method: 'get'}
         );
     };
