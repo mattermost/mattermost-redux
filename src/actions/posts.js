@@ -29,7 +29,6 @@ import {
     savePreferences,
 } from './preferences';
 import {getProfilesByIds, getProfilesByUsernames, getStatusesByIds} from './users';
-import {DEFAULT_LIMIT_AFTER, DEFAULT_LIMIT_BEFORE} from '../client/client4';
 
 // receivedPost should be dispatched after a single post from the server. This typically happens when an existing post
 // is updated.
@@ -573,13 +572,13 @@ export function flagPost(postId) {
     };
 }
 
-export function getPostThread(rootId, fetchThreads = true) {
+export function getPostThread(rootId) {
     return async (dispatch, getState) => {
         dispatch({type: PostTypes.GET_POST_THREAD_REQUEST}, getState);
 
         let posts;
         try {
-            posts = await Client4.getPostThread(rootId, fetchThreads);
+            posts = await Client4.getPostThread(rootId);
             getProfilesAndStatusesForPosts(posts.posts, dispatch, getState);
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch, getState);
@@ -602,12 +601,12 @@ export function getPostThread(rootId, fetchThreads = true) {
     };
 }
 
-export function getPosts(channelId, page = 0, perPage = Posts.POST_CHUNK_SIZE, fetchThreads = true) {
+export function getPosts(channelId, page = 0, perPage = Posts.POST_CHUNK_SIZE) {
     return async (dispatch, getState) => {
         let posts;
 
         try {
-            posts = await Client4.getPosts(channelId, page, perPage, fetchThreads);
+            posts = await Client4.getPosts(channelId, page, perPage);
             getProfilesAndStatusesForPosts(posts.posts, dispatch, getState);
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch, getState);
@@ -624,12 +623,12 @@ export function getPosts(channelId, page = 0, perPage = Posts.POST_CHUNK_SIZE, f
     };
 }
 
-export function getPostsUnread(channelId, fetchThreads = true) {
+export function getPostsUnread(channelId) {
     return async (dispatch, getState) => {
         const userId = getCurrentUserId(getState());
         let posts;
         try {
-            posts = await Client4.getPostsUnread(channelId, userId, DEFAULT_LIMIT_BEFORE, DEFAULT_LIMIT_AFTER, fetchThreads);
+            posts = await Client4.getPostsUnread(channelId, userId);
             getProfilesAndStatusesForPosts(posts.posts, dispatch, getState);
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch, getState);
@@ -651,11 +650,11 @@ export function getPostsUnread(channelId, fetchThreads = true) {
     };
 }
 
-export function getPostsSince(channelId, since, fetchThreads = true) {
+export function getPostsSince(channelId, since) {
     return async (dispatch, getState) => {
         let posts;
         try {
-            posts = await Client4.getPostsSince(channelId, since, fetchThreads);
+            posts = await Client4.getPostsSince(channelId, since);
             getProfilesAndStatusesForPosts(posts.posts, dispatch, getState);
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch, getState);
@@ -675,11 +674,11 @@ export function getPostsSince(channelId, since, fetchThreads = true) {
     };
 }
 
-export function getPostsBefore(channelId, postId, page = 0, perPage = Posts.POST_CHUNK_SIZE, fetchThreads = true) {
+export function getPostsBefore(channelId, postId, page = 0, perPage = Posts.POST_CHUNK_SIZE) {
     return async (dispatch, getState) => {
         let posts;
         try {
-            posts = await Client4.getPostsBefore(channelId, postId, page, perPage, fetchThreads);
+            posts = await Client4.getPostsBefore(channelId, postId, page, perPage);
             getProfilesAndStatusesForPosts(posts.posts, dispatch, getState);
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch, getState);
@@ -696,11 +695,11 @@ export function getPostsBefore(channelId, postId, page = 0, perPage = Posts.POST
     };
 }
 
-export function getPostsAfter(channelId, postId, page = 0, perPage = Posts.POST_CHUNK_SIZE, fetchThreads = true) {
+export function getPostsAfter(channelId, postId, page = 0, perPage = Posts.POST_CHUNK_SIZE) {
     return async (dispatch, getState) => {
         let posts;
         try {
-            posts = await Client4.getPostsAfter(channelId, postId, page, perPage, fetchThreads);
+            posts = await Client4.getPostsAfter(channelId, postId, page, perPage);
             getProfilesAndStatusesForPosts(posts.posts, dispatch, getState);
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch, getState);
@@ -717,7 +716,7 @@ export function getPostsAfter(channelId, postId, page = 0, perPage = Posts.POST_
     };
 }
 
-export function getPostsAround(channelId, postId, perPage = Posts.POST_CHUNK_SIZE / 2, fetchThreads = true) {
+export function getPostsAround(channelId, postId, perPage = Posts.POST_CHUNK_SIZE / 2) {
     return async (dispatch, getState) => {
         let after;
         let thread;
@@ -725,9 +724,9 @@ export function getPostsAround(channelId, postId, perPage = Posts.POST_CHUNK_SIZ
 
         try {
             [after, thread, before] = await Promise.all([
-                Client4.getPostsAfter(channelId, postId, 0, perPage, fetchThreads),
-                Client4.getPostThread(postId, fetchThreads),
-                Client4.getPostsBefore(channelId, postId, 0, perPage, fetchThreads),
+                Client4.getPostsAfter(channelId, postId, 0, perPage),
+                Client4.getPostThread(postId),
+                Client4.getPostsBefore(channelId, postId, 0, perPage),
             ]);
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch, getState);
@@ -764,7 +763,7 @@ export function getPostsAround(channelId, postId, perPage = Posts.POST_CHUNK_SIZ
 
 // getThreadsForPosts is intended for an array of posts that have been batched
 // (see the actions/websocket_actions/handleNewPostEvents function in the webapp)
-export function getThreadsForPosts(posts, fetchThreads = true) {
+export function getThreadsForPosts(posts) {
     return (dispatch, getState) => {
         if (!Array.isArray(posts) || !posts.length) {
             return {data: true};
@@ -780,7 +779,7 @@ export function getThreadsForPosts(posts, fetchThreads = true) {
 
             const rootPost = Selectors.getPost(state, post.root_id);
             if (!rootPost) {
-                promises.push(dispatch(getPostThread(post.root_id, fetchThreads)));
+                promises.push(dispatch(getPostThread(post.root_id)));
             }
         });
 
@@ -1132,7 +1131,7 @@ function completePostReceive(post, websocketMessageProps) {
         const rootPost = Selectors.getPost(state, post.root_id);
 
         if (post.root_id && !rootPost) {
-            dispatch(getPostThread(post.root_id, true));
+            dispatch(getPostThread(post.root_id));
         }
 
         dispatch(lastPostActions(post, websocketMessageProps));
