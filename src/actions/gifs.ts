@@ -326,22 +326,22 @@ export function searchByIdIfNeeded(gfyId) {
     };
 }
 export function saveSearchScrollPosition(scrollPosition) {
-    return (dispatch) => {
+    return (dispatch: DispatchFunc) => {
         dispatch(searchScrollPosition(scrollPosition));
     };
 }
 export function saveSearchPriorLocation(priorLocation) {
-    return (dispatch) => {
+    return (dispatch: DispatchFunc) => {
         dispatch(searchPriorLocation(priorLocation));
     };
 }
 export function searchTextUpdate(searchText) {
-    return (dispatch) => {
+    return (dispatch: DispatchFunc) => {
         dispatch(updateSearchText(searchText));
     };
 }
 export function saveSearchBarText(searchBarText) {
-    return (dispatch) => {
+    return (dispatch: DispatchFunc) => {
         dispatch(searchBarTextSave(searchBarText));
     };
 } // CATEGORIES

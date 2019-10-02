@@ -33,7 +33,7 @@
   },
   "husky": {
     "hooks": {
-      "pre-commit": "tsdx lint"
+      "pre-commit": "npm run lint"
     }
   },
   "jest": {
@@ -60,7 +60,7 @@
       "<rootDir>/test/setup.js"
     ],
     "transform": {
-      "^.+\\.(tsx|js|jsx)?$": "ts-jest"
+      "^.+\\.(ts|tsx|js|jsx)?$": "ts-jest"
     },
     "transformIgnorePatterns": [
       "<rootDir>/node_modules/"
@@ -82,6 +82,7 @@
   "devDependencies": {
     "@babel/plugin-proposal-optional-chaining": "^7.6.0",
     "@types/jest": "^24.0.18",
+    "@types/moment-timezone": "^0.5.12",
     "babel-eslint": "^10.0.3",
     "babel-plugin-module-resolver": "^3.2.0",
     "eslint-config-mattermost": "github:mattermost/eslint-config-mattermost#6fe27a2bd1f9df4d4eb96fac6fcdcc0fee0ecbd7",

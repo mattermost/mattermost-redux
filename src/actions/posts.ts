@@ -790,7 +790,7 @@ export function getThreadsForPosts(posts, fetchThreads = true) {
 }
 
 // Note that getProfilesAndStatusesForPosts can take either an array of posts or a map of ids to posts
-export function getProfilesAndStatusesForPosts(postsArrayOrMap: Array<Post>|Map<string, Post>, dispatch, getState) {
+export function getProfilesAndStatusesForPosts(postsArrayOrMap: Array<Post>|Map<string, Post>, dispatch: DispatchFunc, getState: GetStateFunc) {
     if (!postsArrayOrMap) {
         // Some API methods return {error} for no results
         return Promise.resolve();
@@ -825,7 +825,7 @@ export function getProfilesAndStatusesForPosts(postsArrayOrMap: Array<Post>|Map<
         }
     });
 
-    const promises: Promise<ActionResult>[] = [];
+    const promises: any[] = [];
     if (userIdsToLoad.size > 0) {
         promises.push(getProfilesByIds(Array.from(userIdsToLoad))(dispatch, getState));
     }

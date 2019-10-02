@@ -9,11 +9,11 @@ import {getChannelAndMyMember, getChannelMembers} from './channels';
 import {forceLogoutIfNecessary} from './helpers';
 import {logError} from './errors';
 import {getProfilesAndStatusesForPosts, receivedPosts} from './posts';
-import {ActionResult, batchActions, DispatchFunc, GetStateFunc} from 'types/actions';
+import {ActionResult, batchActions, DispatchFunc, GetStateFunc, ActionFunc} from 'types/actions';
 import {RelationOneToOne} from 'types/utilities';
 import {Post} from 'types/posts';
 const WEBAPP_SEARCH_PER_PAGE = 20;
-export function getMissingChannelsFromPosts(posts: RelationOneToOne<Post, Post>) {
+export function getMissingChannelsFromPosts(posts: RelationOneToOne<Post, Post>): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         const {
             channels,
@@ -35,7 +35,7 @@ export function getMissingChannelsFromPosts(posts: RelationOneToOne<Post, Post>)
         return Promise.all(promises);
     };
 }
-export function searchPostsWithParams(teamId, params) {
+export function searchPostsWithParams(teamId, params): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         const isGettingMore = params.page > 0;
         dispatch({
@@ -47,8 +47,10 @@ export function searchPostsWithParams(teamId, params) {
         try {
             posts = await Client4.searchPostsWithParams(teamId, params);
 
-            //TODO: investigate
-            //await Promise.all([getProfilesAndStatusesForPosts(posts.posts, dispatch, getState), dispatch(getMissingChannelsFromPosts(posts.posts))]);
+            const profilesAndStatuses = getProfilesAndStatusesForPosts(posts.posts, dispatch, getState);
+            const missingChannels = dispatch(getMissingChannelsFromPosts(posts.posts));
+            const arr: [Promise<any>, Promise<any>] = [profilesAndStatuses, missingChannels];
+            await Promise.all(arr);
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch, getState);
             dispatch(batchActions([{
@@ -88,7 +90,7 @@ export function searchPosts(teamId, terms, isOrSearch, includeDeletedChannels) {
         per_page: WEBAPP_SEARCH_PER_PAGE,
     });
 }
-export function getMorePostsForSearch() {
+export function getMorePostsForSearch(): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         const teamId = getCurrentTeamId(getState());
         const {
@@ -102,10 +104,10 @@ export function getMorePostsForSearch() {
             return dispatch(searchPostsWithParams(teamId, newParams));
         }
 
-        return {};
+        return {data: true};
     };
 }
-export function clearSearch() {
+export function clearSearch(): ActionFunc {
     return async (dispatch) => {
         dispatch({
             type: SearchTypes.REMOVE_SEARCH_POSTS,
@@ -115,7 +117,7 @@ export function clearSearch() {
         };
     };
 }
-export function getFlaggedPosts() {
+export function getFlaggedPosts(): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         const state = getState();
         const userId = getCurrentUserId(state);
@@ -128,8 +130,7 @@ export function getFlaggedPosts() {
         try {
             posts = await Client4.getFlaggedPosts(userId, '', teamId);
 
-            // TODO: investigate
-            // await Promise.all([getProfilesAndStatusesForPosts(posts.posts, dispatch, getState), dispatch(getMissingChannelsFromPosts(posts.posts))]);
+            await Promise.all([getProfilesAndStatusesForPosts(posts.posts, dispatch, getState) as any, dispatch(getMissingChannelsFromPosts(posts.posts)) as any]);
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch, getState);
             dispatch(batchActions([{
@@ -152,7 +153,7 @@ export function getFlaggedPosts() {
         };
     };
 }
-export function getPinnedPosts(channelId) {
+export function getPinnedPosts(channelId): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         dispatch({
             type: SearchTypes.SEARCH_PINNED_POSTS_REQUEST,
@@ -162,9 +163,10 @@ export function getPinnedPosts(channelId) {
         try {
             result = await Client4.getPinnedPosts(channelId);
 
-            // TODO: investigate
-
-            // await Promise.all([getProfilesAndStatusesForPosts(result.posts, dispatch, getState), dispatch(getMissingChannelsFromPosts(result.posts))]);
+            const profilesAndStatuses = getProfilesAndStatusesForPosts(result.posts, dispatch, getState);
+            const missingChannels = dispatch(getMissingChannelsFromPosts(result.posts));
+            const arr: [Promise<any>, Promise<any>] = [profilesAndStatuses, missingChannels];
+            await Promise.all(arr);
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch, getState);
             dispatch(batchActions([{
@@ -190,7 +192,7 @@ export function getPinnedPosts(channelId) {
         };
     };
 }
-export function clearPinnedPosts(channelId) {
+export function clearPinnedPosts(channelId): ActionFunc {
     return async (dispatch) => {
         dispatch({
             type: SearchTypes.REMOVE_SEARCH_PINNED_POSTS,
@@ -203,7 +205,7 @@ export function clearPinnedPosts(channelId) {
         };
     };
 }
-export function getRecentMentions() {
+export function getRecentMentions(): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         const state = getState();
         const teamId = getCurrentTeamId(state);
@@ -224,17 +226,10 @@ export function getRecentMentions() {
             Client4.trackEvent('api', 'api_posts_search_mention');
             posts = await Client4.searchPosts(teamId, terms, true);
 
-            /*
-            TODO: investigate
-
-src/actions/search.ts:219:106 - error TS2345: Argument of type '(dispatch: DispatchFunc, getState: GetStateFunc) => Promise<ActionResult[]>' is not assignable to parameter of type 'Action'.
-  Type '(dispatch: DispatchFunc, getState: GetStateFunc) => Promise<ActionResult[]>' is not assignable to type 'ActionFunc'.
-
-219             await Promise.all([getProfilesAndStatusesForPosts(posts.posts, dispatch, getState), dispatch(getMissingChannelsFromPosts(posts.posts))]);
-                                                                                                             ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-             */
-            //            await Promise.all([getProfilesAndStatusesForPosts(posts.posts, dispatch, getState), dispatch(getMissingChannelsFromPosts(posts.posts))]);
+            const profilesAndStatuses = getProfilesAndStatusesForPosts(posts.posts, dispatch, getState);
+            const missingChannels = dispatch(getMissingChannelsFromPosts(posts.posts));
+            const arr: [Promise<any>, Promise<any>] = [profilesAndStatuses, missingChannels];
+            await Promise.all(arr);
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch, getState);
             dispatch(batchActions([{
@@ -257,7 +252,7 @@ src/actions/search.ts:219:106 - error TS2345: Argument of type '(dispatch: Dispa
         };
     };
 }
-export function removeSearchTerms(teamId, terms) {
+export function removeSearchTerms(teamId, terms): ActionFunc {
     return async (dispatch) => {
         dispatch({
             type: SearchTypes.REMOVE_SEARCH_TERM,

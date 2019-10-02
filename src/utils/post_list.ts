@@ -68,8 +68,11 @@ export function makeFilterPostsAndAddSeparators() {
                 const timezone = getUserCurrentTimezone(currentUser.timezone);
 
                 if (timezone) {
-                    const timezoneOffset = moment.tz.zone(timezone).utcOffset(post.create_at) * 60 * 1000;
-                    postDate.setTime(post.create_at + (currentOffset - timezoneOffset));
+                    const zone = moment.tz.zone(timezone);
+                    if (zone) {
+                        const timezoneOffset = zone.utcOffset(post.create_at) * 60 * 1000;
+                        postDate.setTime(post.create_at + (currentOffset - timezoneOffset));
+                    }
                 }
             }
 

@@ -13,7 +13,7 @@ export type GenericAction = {
     postId?: string;
     sessionId?: string;
     currentUserId?: string;
-    remove?: Function;
+    remove?: Function|string[];
     timestamp?: number;
     [extraProps: string]: any;
 };
@@ -32,7 +32,7 @@ export type ActionResult = {
 };
 
 export type DispatchFunc = (action: Action, getState?: GetStateFunc | null) => Promise<ActionResult>;
-export type ActionFunc = (dispatch: DispatchFunc, getState: GetStateFunc) => Promise<ActionResult>;
+export type ActionFunc = (dispatch: DispatchFunc, getState: GetStateFunc) => Promise<ActionResult|ActionResult[]>;
 export type PlatformType = 'web' | 'ios' | 'android';
 
 export const BATCH = 'BATCHING_REDUCER.BATCH';

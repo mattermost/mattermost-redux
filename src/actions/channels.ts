@@ -565,7 +565,7 @@ export function fetchMyChannelsAndMembers(teamId: string): ActionFunc {
         }, {
             type: ChannelTypes.RECEIVED_MY_CHANNEL_MEMBERS,
             data: channelMembers,
-            remove: getChannelsIdForTeam(getState(), teamId) as any, // TODO: investigate this
+            remove: getChannelsIdForTeam(getState(), teamId),
             currentUserId,
         }]), getState);
         const roles = new Set<string>();

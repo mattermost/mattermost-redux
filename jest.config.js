@@ -18,7 +18,7 @@ module.exports = {
     moduleDirectories: ['node_modules', 'src'],
     moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json'],
     transform: {
-        '^.+\\.(tsx|js|jsx)?$': 'ts-jest',
+        '^.+\\.(tsx|js|ts|jsx)?$': 'ts-jest',
     },
     transformIgnorePatterns: ['<rootDir>/node_modules/'],
     testMatch: [
