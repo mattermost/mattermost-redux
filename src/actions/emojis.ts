@@ -7,12 +7,11 @@ import {getProfilesByIds} from 'actions/users';
 import {getCustomEmojisByName as selectCustomEmojisByName} from 'selectors/entities/emojis';
 import {parseNeededCustomEmojisFromText} from 'utils/emoji_utils';
 
-import {GetStateFunc, DispatchFunc, ActionFunc, Action, ActionResult} from 'types/actions';
+import {GetStateFunc, DispatchFunc, ActionFunc, ActionResult} from 'types/actions';
 
 import {logError} from './errors';
 import {bindClientFunc, forceLogoutIfNecessary} from './helpers';
-import {SystemEmoji} from 'types/emojis';
-import {UserProfile} from 'types/users';
+import {SystemEmoji, CustomEmoji} from 'types/emojis';
 export let systemEmojis: Map<string, SystemEmoji> = new Map();
 export function setSystemEmojis(emojis: Map<string, SystemEmoji>) {
     systemEmojis = emojis;
@@ -71,7 +70,7 @@ export function getCustomEmojisByName(names: Array<string>): ActionFunc {
             };
         }
 
-        const promises: Promise<ActionResult>[] = [];
+        const promises: Promise<ActionResult|ActionResult[]>[] = [];
         names.forEach((name) => promises.push(getCustomEmojiByName(name)(dispatch, getState)));
         await Promise.all(promises);
         return {
@@ -121,10 +120,10 @@ export function getCustomEmojis(page = 0, perPage: number = General.PAGE_SIZE_DE
         };
     };
 }
-export function loadProfilesForCustomEmojis(emojis: Array<any>): ActionFunc {
+export function loadProfilesForCustomEmojis(emojis: Array<CustomEmoji>): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         const usersToLoad: {[x: string]: boolean} = {};
-        emojis.forEach((emoji: any) => {
+        emojis.forEach((emoji: CustomEmoji) => {
             if (!getState().entities.users.profiles[emoji.creator_id]) {
                 usersToLoad[emoji.creator_id] = true;
             }

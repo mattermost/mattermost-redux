@@ -39,7 +39,7 @@ async function getProfilesAndStatusesForMembers(userIds, dispatch, getState) {
             statusesToLoad.push(userId);
         }
     });
-    const requests: Promise<ActionResult>[] = [];
+    const requests: Promise<ActionResult|ActionResult[]>[] = [];
 
     if (profilesToLoad.length) {
         requests.push(getProfilesByIds(profilesToLoad)(dispatch, getState));
@@ -246,7 +246,7 @@ export function getMyTeamMembers(): ActionFunc {
             clientFunc: Client4.getMyTeamMembers,
             onSuccess: TeamTypes.RECEIVED_MY_TEAM_MEMBERS,
         });
-        const teamMembers: ActionResult = await getMyTeamMembersFunc(dispatch, getState);
+        const teamMembers = (await getMyTeamMembersFunc(dispatch, getState)) as ActionResult;
 
         if ('data' in teamMembers && teamMembers.data) {
             const roles = new Set<string>();

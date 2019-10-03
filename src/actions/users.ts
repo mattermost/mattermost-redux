@@ -601,8 +601,9 @@ export function getMe(): ActionFunc {
         if ('error' in me) {
             return me;
         }
-
-        dispatch(loadRolesIfNeeded(me.data.roles.split(' ')));
+        if ('data' in me) {
+            dispatch(loadRolesIfNeeded(me.data.roles.split(' ')));
+        }
         return me;
     };
 }

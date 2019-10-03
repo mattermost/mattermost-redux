@@ -50,4 +50,6 @@ coverage
 /.rts2_cache_cjs/
 /.rts2_cache_esm/
 /dist/
+/build/
 /tsconfig.tsbuildinfo
+junit.xml

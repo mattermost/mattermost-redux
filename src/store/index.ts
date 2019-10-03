@@ -2,9 +2,5 @@
 // See LICENSE.txt for license information.
 
 /* eslint-disable global-require, no-process-env */
-if (process.env.NODE_ENV === 'production') {
-    module.exports = require('./configureStore.prod');
-} else {
-    module.exports = require('./configureStore.dev');
-}
-/* eslint-enable global-require, no-process-env */
+const config = process.env.NODE_ENV === 'production' ? require('./configureStore.prod').default : require('./configureStore.dev').default;
+export default config;

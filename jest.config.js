@@ -1,11 +1,6 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
 
-// const tsconfig = require('./tsconfig.json');
-// const moduleNameMapper = require('tsconfig-paths-jest')(tsconfig);
-// eslint-disable-next-line no-console
-// console.log(moduleNameMapper);
-
 module.exports = {
     globals: {
         'ts-jest': {
@@ -14,12 +9,10 @@ module.exports = {
         },
         NODE_ENV: 'test',
     },
+    preset: 'ts-jest/presets/js-with-babel',
     rootDir: '.',
     moduleDirectories: ['node_modules', 'src'],
     moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json'],
-    transform: {
-        '^.+\\.(tsx|js|ts|jsx)?$': 'ts-jest',
-    },
     transformIgnorePatterns: ['<rootDir>/node_modules/'],
     testMatch: [
         '<rootDir>/src/**/?(*.)(spec|test).(ts|js)?(x)',
@@ -27,7 +20,18 @@ module.exports = {
     setupFilesAfterEnv: [
         '<rootDir>/test/setup.js',
     ],
-
+    clearMocks: true,
+    collectCoverageFrom: [
+        'src/**/*.{js}',
+    ],
+    coverageReporters: [
+        'lcov',
+        'text-summary',
+    ],
+    reporters: [
+        'default',
+        'jest-junit',
+    ],
     verbose: true,
     moduleNameMapper: {
         '^src/(.*)$': '<rootDir>/src/$1',
