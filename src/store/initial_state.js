@@ -511,14 +511,6 @@ const state: GlobalState = {
                 status: 'not_started',
                 error: null,
             },
-            getRoleByName: {
-                status: 'not_started',
-                error: null,
-            },
-            getRole: {
-                status: 'not_started',
-                error: null,
-            },
             editRole: {
                 status: 'not_started',
                 error: null,

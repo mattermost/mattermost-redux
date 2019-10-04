@@ -133,8 +133,6 @@ export type IntegrationsRequestsStatuses = {|
 
 export type RolesRequestsStatuses = {|
     getRolesByNames: RequestStatusType,
-    getRoleByName: RequestStatusType,
-    getRole: RequestStatusType,
     editRole: RequestStatusType
 |};
 

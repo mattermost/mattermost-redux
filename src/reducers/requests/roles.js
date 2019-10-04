@@ -20,26 +20,6 @@ function getRolesByNames(state: RequestStatusType = initialRequestState(), actio
     );
 }
 
-function getRoleByName(state: RequestStatusType = initialRequestState(), action: GenericAction): RequestStatusType {
-    return handleRequest(
-        RoleTypes.ROLE_BY_NAME_REQUEST,
-        RoleTypes.ROLE_BY_NAME_SUCCESS,
-        RoleTypes.ROLE_BY_NAME_FAILURE,
-        state,
-        action
-    );
-}
-
-function getRole(state: RequestStatusType = initialRequestState(), action: GenericAction): RequestStatusType {
-    return handleRequest(
-        RoleTypes.ROLE_BY_ID_REQUEST,
-        RoleTypes.ROLE_BY_ID_SUCCESS,
-        RoleTypes.ROLE_BY_ID_FAILURE,
-        state,
-        action
-    );
-}
-
 function editRole(state: RequestStatusType = initialRequestState(), action: GenericAction): RequestStatusType {
     return handleRequest(
         RoleTypes.EDIT_ROLE_REQUEST,
@@ -52,7 +32,5 @@ function editRole(state: RequestStatusType = initialRequestState(), action: Gene
 
 export default (combineReducers({
     getRolesByNames,
-    getRoleByName,
-    getRole,
     editRole,
 }): (RolesRequestsStatuses, GenericAction) => RolesRequestsStatuses);

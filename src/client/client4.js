@@ -2521,22 +2521,6 @@ export default class Client4 {
         );
     };
 
-    // Role Routes
-
-    getRole = async (roleId) => {
-        return this.doFetch(
-            `${this.getRolesRoute()}/${roleId}`,
-            {method: 'get'}
-        );
-    };
-
-    getRoleByName = async (roleName) => {
-        return this.doFetch(
-            `${this.getRolesRoute()}/name/${roleName}`,
-            {method: 'get'}
-        );
-    };
-
     getRolesByNames = async (rolesNames) => {
         return this.doFetch(
             `${this.getRolesRoute()}/names`,

@@ -23,30 +23,6 @@ export function getRolesByNames(rolesNames: Array<string>) {
     });
 }
 
-export function getRoleByName(roleName: string) {
-    return bindClientFunc({
-        clientFunc: Client4.getRoleByName,
-        onRequest: RoleTypes.ROLE_BY_NAME_REQUEST,
-        onSuccess: [RoleTypes.RECEIVED_ROLE, RoleTypes.ROLE_BY_NAME_SUCCESS],
-        onFailure: RoleTypes.ROLE_BY_NAME_FAILURE,
-        params: [
-            roleName,
-        ],
-    });
-}
-
-export function getRole(roleId: string) {
-    return bindClientFunc({
-        clientFunc: Client4.getRole,
-        onRequest: RoleTypes.ROLE_BY_ID_REQUEST,
-        onSuccess: [RoleTypes.RECEIVED_ROLE, RoleTypes.ROLE_BY_ID_SUCCESS],
-        onFailure: RoleTypes.ROLE_BY_ID_FAILURE,
-        params: [
-            roleId,
-        ],
-    });
-}
-
 export function editRole(role: Role) {
     return bindClientFunc({
         clientFunc: Client4.patchRole,
