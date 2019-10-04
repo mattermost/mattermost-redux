@@ -159,27 +159,7 @@ const state: GlobalState = {
             },
         },
         general: {
-            server: {
-                status: 'not_started',
-                error: null,
-            },
-            config: {
-                status: 'not_started',
-                error: null,
-            },
-            dataRetentionPolicy: {
-                status: 'not_started',
-                error: null,
-            },
-            license: {
-                status: 'not_started',
-                error: null,
-            },
             websocket: {
-                status: 'not_started',
-                error: null,
-            },
-            redirectLocation: {
                 status: 'not_started',
                 error: null,
             },
