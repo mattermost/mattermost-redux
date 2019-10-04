@@ -17,12 +17,7 @@ export type ChannelsRequestsStatuses = {|
 |};
 
 export type GeneralRequestsStatuses = {|
-    server: RequestStatusType,
-    config: RequestStatusType,
-    dataRetentionPolicy: RequestStatusType,
-    license: RequestStatusType,
     websocket: RequestStatusType,
-    redirectLocation: RequestStatusType
 |};
 
 export type PostsRequestsStatuses = {|
