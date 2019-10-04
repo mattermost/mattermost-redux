@@ -77,7 +77,9 @@ export function removeUserFromList(userId: $ID<UserProfile>, list: Array<UserPro
     }
 
     return list;
-} // Splits the term by a splitStr and composes a list of the parts of
+}
+
+// Splits the term by a splitStr and composes a list of the parts of
 // the split concatenated with the rest, forming a set of suggesitons
 // matchable with startsWith
 //

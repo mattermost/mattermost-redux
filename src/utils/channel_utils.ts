@@ -254,7 +254,9 @@ export function showCreateOption(state: GlobalState, config: any, license: any, 
 
     if (license.IsLicensed !== 'true') {
         return true;
-    } // Backwards compatibility with pre-advanced permissions config settings.
+    }
+
+    // Backwards compatibility with pre-advanced permissions config settings.
 
     if (channelType === General.OPEN_CHANNEL) {
         if (config.RestrictPublicChannelCreation === General.SYSTEM_ADMIN_ROLE && !isSystemAdmin) {
@@ -293,7 +295,9 @@ export function showManagementOptions(state: GlobalState, config: any, license: 
 
     if (license.IsLicensed !== 'true') {
         return true;
-    } // Backwards compatibility with pre-advanced permissions config settings.
+    }
+
+    // Backwards compatibility with pre-advanced permissions config settings.
 
     if (channel.type === General.OPEN_CHANNEL) {
         if (config.RestrictPublicChannelManagement === General.SYSTEM_ADMIN_ROLE && !isSystemAdmin) {
@@ -344,7 +348,9 @@ export function showDeleteOption(state: GlobalState, config: any, license: any, 
 
     if (license.IsLicensed !== 'true') {
         return true;
-    } // Backwards compatibility with pre-advanced permissions config settings.
+    }
+
+    // Backwards compatibility with pre-advanced permissions config settings.
 
     if (channel.type === General.OPEN_CHANNEL) {
         if (config.RestrictPublicChannelDeletion === General.SYSTEM_ADMIN_ROLE && !isSystemAdmin) {
@@ -373,7 +379,9 @@ export function showDeleteOption(state: GlobalState, config: any, license: any, 
     }
 
     return true;
-} // Backwards compatibility with pre-advanced permissions config settings.
+}
+
+// Backwards compatibility with pre-advanced permissions config settings.
 
 export function canManageMembersOldPermissions(channel: Channel, user: UserProfile, teamMember: TeamMembership, channelMember: ChannelMembership, config: any, license: any): boolean {
     if (channel.type === General.DM_CHANNEL || channel.type === General.GM_CHANNEL || channel.name === General.DEFAULT_CHANNEL) {
@@ -443,7 +451,9 @@ export function isFavoriteChannel(myPreferences: {
 }
 export function isDefault(channel: Channel): boolean {
     return channel.name === General.DEFAULT_CHANNEL;
-} //====================================================
+}
+
+//====================================================
 
 function createFakeChannel(userId: string, otherUserId: string): Channel {
     return {

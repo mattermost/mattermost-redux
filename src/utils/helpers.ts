@@ -21,7 +21,9 @@ export function memoizeResult<F extends Function>(func: F): any {
 
         return lastResult;
     };
-} // Use this selector when you want a shallow comparison of the arguments and you want to memoize the result
+}
+
+// Use this selector when you want a shallow comparison of the arguments and you want to memoize the result
 // try and use this only when your selector returns an array of ids
 
 export const createIdsSelector = createSelectorCreator(memoizeResult); // Use this selector when you want a shallow comparison of the arguments and you don't need to memoize the result
@@ -48,7 +50,9 @@ export const isMinimumServerVersion = (currentVersion: string, minMajorVersion =
 
     if (major < minMajorVersion) {
         return false;
-    } // Major version is equal, check minor
+    }
+
+    // Major version is equal, check minor
 
     if (minor > minMinorVersion) {
         return true;
@@ -56,7 +60,9 @@ export const isMinimumServerVersion = (currentVersion: string, minMajorVersion =
 
     if (minor < minMinorVersion) {
         return false;
-    } // Minor version is equal, check dot
+    }
+
+    // Minor version is equal, check dot
 
     if (dot > minDotVersion) {
         return true;
@@ -64,7 +70,9 @@ export const isMinimumServerVersion = (currentVersion: string, minMajorVersion =
 
     if (dot < minDotVersion) {
         return false;
-    } // Dot version is equal
+    }
+
+    // Dot version is equal
 
     return true;
 }; // Generates a RFC-4122 version 4 compliant globally unique identifier.

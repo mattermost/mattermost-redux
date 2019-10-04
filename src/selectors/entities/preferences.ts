@@ -94,7 +94,9 @@ const getDefaultTheme = createSelector(getConfig, (config) => {
         if (theme) {
             return theme;
         }
-    } // If no config.DefaultTheme or value doesn't refer to a valid theme name...
+    }
+
+    // If no config.DefaultTheme or value doesn't refer to a valid theme name...
 
     return Preferences.THEMES.default;
 });
@@ -110,7 +112,9 @@ export const getTheme = createShallowSelector(getThemePreference, getDefaultThem
     if (typeof theme === 'string') {
     // A custom theme will be a JSON-serialized object stored in a preference
         theme = JSON.parse(theme);
-    } // At this point, the theme should be a plain object
+    }
+
+    // At this point, the theme should be a plain object
     // If this is a system theme, find it in case the user's theme is missing any fields
 
     if (theme.type && theme.type !== 'custom') {
@@ -130,7 +134,9 @@ export const getTheme = createShallowSelector(getThemePreference, getDefaultThem
             // Fix a case where upper case theme colours are rendered as black
             theme[key] = theme[key].toLowerCase();
         }
-    } // Backwards compatability with old name
+    }
+
+    // Backwards compatability with old name
 
     if (!theme.mentionBg) {
         theme.mentionBg = theme.mentionBj;

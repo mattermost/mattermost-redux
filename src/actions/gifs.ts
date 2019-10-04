@@ -22,7 +22,9 @@ export function saveAppProps(appProps) {
         gfycatSdk(GfycatApiKey, GfycatApiSecret).authenticate();
         dispatch(saveAppPropsRequest(appProps));
     };
-} // SEARCH
+}
+
+// SEARCH
 
 export function selectSearchText(searchText) {
     return {
@@ -344,7 +346,9 @@ export function saveSearchBarText(searchBarText) {
     return (dispatch: DispatchFunc) => {
         dispatch(searchBarTextSave(searchBarText));
     };
-} // CATEGORIES
+}
+
+// CATEGORIES
 
 export function categoriesListRequest() {
     return {

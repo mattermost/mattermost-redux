@@ -1362,7 +1362,9 @@ export function markChannelAsRead(channelId: string, prevChannelId?: string | nu
             data: true,
         };
     };
-} // Increments the number of posts in the channel by 1 and marks it as unread if necessary
+}
+
+// Increments the number of posts in the channel by 1 and marks it as unread if necessary
 
 export function markChannelAsUnread(teamId: string, channelId: string, mentions: Array<string>): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {

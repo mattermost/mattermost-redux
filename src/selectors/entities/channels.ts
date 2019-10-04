@@ -45,7 +45,9 @@ function sortChannelsByRecencyOrAlpha(locale, lastPosts, sorting: SortingType, a
     }
 
     return sortChannelsByDisplayName(locale, a, b);
-} // mapAndSortChannelIds sorts channels, primarily by:
+}
+
+// mapAndSortChannelIds sorts channels, primarily by:
 //   For all sections except unreads:
 //     a. All other unread channels
 //     b. Muted channels
@@ -497,7 +499,9 @@ export const getFavoriteChannels: (a: GlobalState) => Array<Channel> = createIds
 
         if (channel.delete_at !== 0 && channel.id !== currentChannelId) {
             return false;
-        } // Deleted users from CLI will not have a profiles entry
+        }
+
+        // Deleted users from CLI will not have a profiles entry
 
         if (channel.type === General.DM_CHANNEL && !profiles[otherUserId]) {
             return false;
@@ -619,7 +623,9 @@ export const getDirectChannelIds: (e: GlobalState, d: Channel, c: boolean, b: bo
 export const getSortedDirectChannelIds: (e: GlobalState, d: Channel|null, c: boolean, b: boolean, a: SortingType) => Array<string> = createIdsSelector(getUnreadChannelIds, getFavoritesPreferences, (state, lastUnreadChannel, unreadsAtTop, favoritesAtTop, sorting: SortingType = 'alpha') => getDirectChannelIds(state, lastUnreadChannel, unreadsAtTop, favoritesAtTop, sorting), (state, lastUnreadChannel, unreadsAtTop = true) => unreadsAtTop, (state, lastUnreadChannel, unreadsAtTop, favoritesAtTop = true) => favoritesAtTop, filterChannels);
 export function getGroupOrDirectChannelVisibility(state: GlobalState, channelId: string): boolean {
     return isGroupOrDirectChannelVisible(getChannel(state, channelId), getMyChannelMemberships(state), getConfig(state), getMyPreferences(state), getCurrentUser(state).id, getUsers(state), getLastPostPerChannel(state));
-} // Filters post IDs by the given condition.
+}
+
+// Filters post IDs by the given condition.
 // The condition function receives as parameters the associated channel object and the post object.
 
 export const filterPostIds = (condition: (b: Channel, a: Post) => boolean) => {

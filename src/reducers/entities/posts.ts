@@ -102,7 +102,9 @@ export function handlePosts(state: RelationOneToOne<Post, Post> = {}, action) {
 
         if (!state[post.id]) {
             return state;
-        } // Mark the post as deleted
+        }
+
+        // Mark the post as deleted
 
         const nextState = {...state,
             [post.id]: {...state[post.id],
@@ -117,7 +119,9 @@ export function handlePosts(state: RelationOneToOne<Post, Post> = {}, action) {
             nextState[post.root_id] = {...rootPost,
                 reply_count: (rootPost.reply_count || 0) - 1,
             };
-        } // Remove any of its comments
+        }
+
+        // Remove any of its comments
 
         for (const otherPost of Object.values(state)) {
             if (otherPost.root_id === post.id) {
@@ -134,7 +138,9 @@ export function handlePosts(state: RelationOneToOne<Post, Post> = {}, action) {
 
         if (!state[post.id]) {
             return state;
-        } // Remove the post itself
+        }
+
+        // Remove the post itself
 
         const nextState = {...state,
         };
@@ -204,7 +210,9 @@ function handlePostReceived(nextState, post) {
         }
     } else {
         nextState[post.id] = removeUnneededMetadata(post);
-    } // Delete any pending post that existed for this post
+    }
+
+    // Delete any pending post that existed for this post
 
     if (post.pending_post_id && post.id !== post.pending_post_id && nextState[post.pending_post_id]) {
         Reflect.deleteProperty(nextState, post.pending_post_id);
@@ -229,7 +237,9 @@ export function handlePendingPosts(state: Array<string> = [], action) {
         if (index !== -1) {
             // An entry already exists for this post
             return state;
-        } // Add the new pending post ID
+        }
+
+        // Add the new pending post ID
 
         const nextState = [...state];
         nextState.push(post.pending_post_id);
@@ -244,7 +254,9 @@ export function handlePendingPosts(state: Array<string> = [], action) {
         if (index === -1) {
             // There's nothing to remove
             return state;
-        } // The post has been removed, so remove the entry for it
+        }
+
+        // The post has been removed, so remove the entry for it
 
         const nextState = [...state];
         nextState.splice(index, 1);
@@ -265,7 +277,9 @@ export function handlePendingPosts(state: Array<string> = [], action) {
         if (index === -1) {
             // There's nothing to remove
             return state;
-        } // The post has actually been created, so remove the entry for it
+        }
+
+        // The post has actually been created, so remove the entry for it
 
         const nextState = [...state];
         nextState.splice(index, 1);
@@ -308,7 +322,9 @@ export function postsInChannel(state = {}, action, prevPosts, nextPosts) {
         if (!nextRecentBlock.order.includes(post.id)) {
             nextRecentBlock.order.unshift(post.id);
             changed = true;
-        } // If this is a newly created post, remove any pending post that exists for it
+        }
+
+        // If this is a newly created post, remove any pending post that exists for it
 
         if (post.pending_post_id && post.id !== post.pending_post_id) {
             const index = nextRecentBlock.order.indexOf(post.pending_post_id);
@@ -403,14 +419,18 @@ export function postsInChannel(state = {}, action, prevPosts, nextPosts) {
                 if (recentBlock.order.length === order.length && recentBlock.order[0] === order[0] && recentBlock.order[recentBlock.order.length - 1] === order[order.length - 1]) {
                     // The newly received posts are identical to the most recent block, so there's nothing to do
                     return state;
-                } // Unmark the most recent block since the new posts are more recent
+                }
+
+                // Unmark the most recent block since the new posts are more recent
 
                 const nextRecentBlock = {...recentBlock,
                     recent: false,
                 };
                 nextPostsForChannel[recentBlockIndex] = nextRecentBlock;
             }
-        } // Add the new most recent block
+        }
+
+        // Add the new most recent block
 
         nextPostsForChannel.push({
             order,
@@ -515,7 +535,9 @@ export function postsInChannel(state = {}, action, prevPosts, nextPosts) {
             if (nextRecentBlock.order.indexOf(postId) !== -1) {
             // This postId exists so no need to add it again
                 continue;
-            } // This post is newer than what we have
+            }
+
+            // This post is newer than what we have
 
             nextRecentBlock.order.unshift(postId);
         }
@@ -623,7 +645,9 @@ export function postsInChannel(state = {}, action, prevPosts, nextPosts) {
         if (!state[channelId]) {
             // Nothing to do since we have no posts for this channel
             return state;
-        } // Remove the entry for the deleted channel
+        }
+
+        // Remove the entry for the deleted channel
 
         const nextState = {...state,
         };
@@ -649,7 +673,9 @@ export function mergePostBlocks(blocks, posts) {
 
     if (!nextBlocks.length) {
         return blocks;
-    } // Sort blocks so that the most recent one comes first
+    }
+
+    // Sort blocks so that the most recent one comes first
 
     nextBlocks.sort((a, b) => {
         const aStartsAt = posts[a.order[0]].create_at;
@@ -704,7 +730,9 @@ export function mergePostOrder(left, right, posts) {
     if (result.length === left.length) {
     // No new items added
         return left;
-    } // Re-sort so that the most recent post comes first
+    }
+
+    // Re-sort so that the most recent post comes first
 
     result.sort((a, b) => posts[b].create_at - posts[a].create_at);
     return result;
@@ -728,7 +756,9 @@ export function postsInThread(state: {[x: string]: string[]} = {}, action, prevP
         if (!postsForThread.includes(post.id)) {
             nextPostsForThread.push(post.id);
             changed = true;
-        } // If this is a new non-pending post, remove any pending post that exists for it
+        }
+
+        // If this is a new non-pending post, remove any pending post that exists for it
 
         if (post.pending_post_id && post.id !== post.pending_post_id) {
             const index = nextPostsForThread.indexOf(post.pending_post_id);
@@ -857,7 +887,9 @@ export function postsInThread(state: {[x: string]: string[]} = {}, action, prevP
             return {...state,
                 [post.root_id]: nextPostsForThread,
             };
-        } // This is not a comment, so remove any comments on it
+        }
+
+        // This is not a comment, so remove any comments on it
 
         const postsForThread = state[post.id];
 

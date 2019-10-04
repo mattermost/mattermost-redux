@@ -30,7 +30,9 @@ export function getComponents(inColor: string): {
             blue: parseInt(match[3], 10),
             alpha: match[4] ? parseFloat(match[4]) : 1,
         };
-    } // Hex color
+    }
+
+    // Hex color
 
     if (color[0] === '#') {
         color = color.slice(1);

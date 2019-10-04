@@ -113,7 +113,9 @@ export function bindClientFunc({
             data,
         };
     };
-} // Debounce function based on underscores modified to use es6 and a cb
+}
+
+// Debounce function based on underscores modified to use es6 and a cb
 
 export function debounce(func: (...args: any) => unknown, wait: number, immediate: boolean, cb: () => unknown) {
     let timeout;

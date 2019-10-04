@@ -66,7 +66,9 @@ export function checkDialogElementForError(elem: DialogElement, value: any): Dia
     }
 
     return null;
-} // If we're returned errors that don't match any of the elements we have,
+}
+
+// If we're returned errors that don't match any of the elements we have,
 // ignore them and complete the dialog
 
 export function checkIfErrorsMatchElements(errors: {

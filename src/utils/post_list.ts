@@ -29,7 +29,9 @@ export function makePreparePostIdsForPostList() {
         postIds = combineUserActivityPosts(state, postIds);
         return postIds;
     };
-} // Returns a selector that, given the state and an object containing an array of postIds and an optional
+}
+
+// Returns a selector that, given the state and an object containing an array of postIds and an optional
 // timestamp of when the channel was last read, returns a memoized array of postIds interspersed with
 // day indicators and an optional new message indicator.
 
@@ -55,11 +57,15 @@ export function makeFilterPostsAndAddSeparators() {
 
             if (!post || post.type === Posts.POST_TYPES.EPHEMERAL_ADD_TO_CHANNEL && !selectedPostId) {
                 continue;
-            } // Filter out join/leave messages if necessary
+            }
+
+            // Filter out join/leave messages if necessary
 
             if (shouldFilterJoinLeavePost(post, showJoinLeave, currentUser.username)) {
                 continue;
-            } // Push on a date header if the last post was on a different day than the current one
+            }
+
+            // Push on a date header if the last post was on a different day than the current one
 
             const postDate = new Date(post.create_at);
 
@@ -89,7 +95,9 @@ export function makeFilterPostsAndAddSeparators() {
             }
 
             out.push(post.id);
-        } // Flip it back to newest to oldest
+        }
+
+        // Flip it back to newest to oldest
 
         return out.reverse();
     });
@@ -169,7 +177,9 @@ export function getFirstPostId(items) {
             // This is a combined post, so find the first post ID from it
             const combinedIds = getPostIdsForCombinedUserActivityPost(item);
             return combinedIds[0];
-        } // This is a post ID
+        }
+
+        // This is a post ID
 
         return item;
     }
@@ -189,7 +199,9 @@ export function getLastPostId(items) {
             // This is a combined post, so find the first post ID from it
             const combinedIds = getPostIdsForCombinedUserActivityPost(item);
             return combinedIds[combinedIds.length - 1];
-        } // This is a post ID
+        }
+
+        // This is a post ID
 
         return item;
     }

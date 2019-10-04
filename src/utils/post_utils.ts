@@ -68,7 +68,9 @@ export function canDeletePost(state: GlobalState, config: any, license: any, tea
         }
 
         return canDelete;
-    } // Backwards compatibility with pre-advanced permissions config settings.
+    }
+
+    // Backwards compatibility with pre-advanced permissions config settings.
 
     if (license.IsLicensed === 'true') {
         return config.RestrictPostDelete === General.PERMISSIONS_ALL && (isOwner || isAdmin) || config.RestrictPostDelete === General.PERMISSIONS_TEAM_ADMIN && isAdmin || config.RestrictPostDelete === General.PERMISSIONS_SYSTEM_ADMIN && isSystemAdmin;
@@ -135,11 +137,15 @@ const joinLeavePostTypes = [Posts.POST_TYPES.JOIN_LEAVE, Posts.POST_TYPES.JOIN_C
 export function shouldFilterJoinLeavePost(post: Post, showJoinLeave: boolean, currentUsername: string): boolean {
     if (showJoinLeave) {
         return false;
-    } // Don't filter out non-join/leave messages
+    }
+
+    // Don't filter out non-join/leave messages
 
     if (joinLeavePostTypes.indexOf(post.type) === -1) {
         return false;
-    } // Don't filter out join/leave messages about the current user
+    }
+
+    // Don't filter out join/leave messages about the current user
 
     return !isJoinLeavePostForUsername(post, currentUsername);
 }

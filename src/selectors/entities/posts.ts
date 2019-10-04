@@ -43,12 +43,16 @@ export function getOpenGraphMetadata(state: GlobalState): RelationOneToOne<Post,
 }
 export function getOpenGraphMetadataForUrl(state: GlobalState, url: string): object {
     return state.entities.posts.openGraph[url];
-} // getPostIdsInCurrentChannel returns the IDs of posts loaded at the bottom of the channel. It does not include older
+}
+
+// getPostIdsInCurrentChannel returns the IDs of posts loaded at the bottom of the channel. It does not include older
 // posts such as those loaded by viewing a thread or a permalink.
 
 export function getPostIdsInCurrentChannel(state: GlobalState): Array<$ID<Post>> | undefined | null {
     return getPostIdsInChannel(state, state.entities.channels.currentChannelId);
-} // getPostsInCurrentChannel returns the posts loaded at the bottom of the channel. It does not include older posts
+}
+
+// getPostsInCurrentChannel returns the posts loaded at the bottom of the channel. It does not include older posts
 // such as those loaded by viewing a thread or a permalink.
 
 export const getPostsInCurrentChannel: (a: GlobalState) => Array<PostWithFormatData> | undefined | null = (() => {
@@ -199,7 +203,9 @@ function formatPostInChannel(post: Post, previousPost: Post | undefined | null, 
         isCommentMention,
         highlight,
     };
-} // makeGetPostsInChannel creates a selector that returns up to the given number of posts loaded at the bottom of the
+}
+
+// makeGetPostsInChannel creates a selector that returns up to the given number of posts loaded at the bottom of the
 // given channel. It does not include older posts such as those loaded by viewing a thread or a permalink.
 
 export function makeGetPostsInChannel(): (c: GlobalState, b: $ID<Channel>, a: number) => Array<PostWithFormatData> | undefined | null {
@@ -258,7 +264,9 @@ export function makeGetPostsAroundPost(): (c: GlobalState, b: $ID<Post>, a: $ID<
 
         return posts;
     });
-} // Returns a function that creates a creates a selector that will get the posts for a given thread.
+}
+
+// Returns a function that creates a creates a selector that will get the posts for a given thread.
 // That selector will take a props object (containing a rootId field) as its
 // only argument and will be memoized based on that argument.
 
@@ -387,7 +395,9 @@ export const getMostRecentPostIdInChannel: (b: GlobalState, a: $ID<Channel>) => 
         }
 
         return postId;
-    } // return the most recent message in the channel
+    }
+
+    // return the most recent message in the channel
 
     return postIdsInChannel[0];
 });
@@ -440,7 +450,9 @@ export function getOldestPostsChunkInChannel(state: GlobalState, channelId: $ID<
     }
 
     return postsForChannel.find((block) => block.oldest);
-} // getPostIdsInChannel returns the IDs of posts loaded at the bottom of the given channel. It does not include older
+}
+
+// getPostIdsInChannel returns the IDs of posts loaded at the bottom of the given channel. It does not include older
 // posts such as those loaded by viewing a thread or a permalink.
 
 export function getPostIdsInChannel(state: GlobalState, channelId: $ID<Channel>): Array<$ID<Post>> | undefined | null {

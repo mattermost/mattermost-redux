@@ -30,7 +30,9 @@ export default ((url?: string, options: Options = {headers: {}}) => {
 
             return response;
         });
-    } // all other requests go straight to fetch
+    }
+
+    // all other requests go straight to fetch
 
     return Reflect.apply(fetch, undefined, [url, options]); //eslint-disable-line no-undefined
 });

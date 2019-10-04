@@ -328,7 +328,9 @@ export default class Client4 {
         return {...newOptions,
             headers,
         };
-    } // User Routes
+    }
+
+    // User Routes
 
     createUser = async (user, token, inviteId) => {
         this.trackEvent('api', 'api_users_create');

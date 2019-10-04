@@ -35,7 +35,9 @@ export function init(platform: PlatformType, siteUrl: string | undefined | null,
                 connUrl = connUrl.replace(/^https:/, 'wss:');
             } else {
                 connUrl = connUrl.replace(/^http:/, 'ws:');
-            } // append a port number if one isn't already specified
+            }
+
+            // append a port number if one isn't already specified
 
             if (!(/:\d+$/).test(connUrl)) {
                 if (connUrl.startsWith('wss:')) {
@@ -620,7 +622,9 @@ function handleChannelUpdatedEvent(msg) {
             data: true,
         };
     };
-} // handleChannelConvertedEvent handles updating of channel which is converted from public to private
+}
+
+// handleChannelConvertedEvent handles updating of channel which is converted from public to private
 
 function handleChannelConvertedEvent(msg) {
     return (dispatch: DispatchFunc, getState: GetStateFunc) => {
@@ -854,7 +858,9 @@ function handleOpenDialogEvent(msg) {
             data: true,
         };
     };
-} // Helpers
+}
+
+// Helpers
 
 function getAddedDmUsersIfNecessary(preferences) {
     return (dispatch: DispatchFunc, getState: GetStateFunc) => {

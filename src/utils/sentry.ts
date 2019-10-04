@@ -11,7 +11,9 @@ export function cleanUrlForLogging(baseUrl: string, apiUrl: string): string {
 
     if (index !== -1) {
         url = url.substring(0, index);
-    } // A non-exhaustive whitelist to exclude parts of the URL that are unimportant (eg IDs) or may be sentsitive
+    }
+
+    // A non-exhaustive whitelist to exclude parts of the URL that are unimportant (eg IDs) or may be sentsitive
     // (eg email addresses). We prefer filtering out fields that aren't recognized because there should generally
     // be enough left over for debugging.
     //
