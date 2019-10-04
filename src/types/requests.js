@@ -175,3 +175,7 @@ export type SearchRequestsStatuses = {|
     recentMentions: RequestStatusType,
     searchPosts: RequestStatusType,
 |};
+
+export type PluginsRequestsStatuses = {|
+    installMarketplacePlugin: RequestStatusType,
+|};

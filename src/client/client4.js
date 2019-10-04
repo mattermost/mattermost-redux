@@ -2661,6 +2661,15 @@ export default class Client4 {
         );
     }
 
+    installMarketplacePlugin = async (id, version) => {
+        this.trackEvent('api', 'api_install_marketplace_plugin');
+
+        return this.doFetch(
+            `${this.getPluginsMarketplaceRoute()}`,
+            {method: 'post', body: JSON.stringify({id, version})}
+        );
+    }
+
     getPluginStatuses = async () => {
         return this.doFetch(
             `${this.getPluginsRoute()}/statuses`,

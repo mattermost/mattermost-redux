@@ -6,6 +6,7 @@ import nock from 'nock';
 
 import * as PluginActions from 'actions/plugins';
 import {Client4} from 'client';
+import {RequestStatus} from 'constants';
 
 import TestHelper from 'test/test_helper';
 import configureStore from 'test/test_store';
@@ -36,5 +37,19 @@ describe('Actions.Plugins', () => {
         const state = store.getState();
         const marketplacePluginsResult = state.entities.plugins.marketplacePlugins;
         assert.equal(marketplacePlugins.length, Object.values(marketplacePluginsResult).length);
+    });
+
+    it('installMarketplacePlugin', async () => {
+        const id = 'com.mattermost.demo';
+        const version = '1.2.3';
+        nock(Client4.getPluginsMarketplaceRoute()).
+            post('', {id, version}).
+            reply(200, {});
+
+        await store.dispatch(PluginActions.installMarketplacePlugin(id, version));
+
+        const state = store.getState();
+        const request = state.requests.plugins.installMarketplacePlugin;
+        assert.equal(request.status, RequestStatus.SUCCESS);
     });
 });
