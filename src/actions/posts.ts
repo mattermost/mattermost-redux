@@ -3,7 +3,7 @@
 
 import {Client4, DEFAULT_LIMIT_AFTER, DEFAULT_LIMIT_BEFORE} from 'client';
 import {General, Preferences, Posts, WebsocketEvents} from '../constants';
-import {PostTypes, FileTypes, IntegrationTypes} from 'action_types';
+import {PostTypes, ChannelTypes, FileTypes, IntegrationTypes} from 'action_types';
 
 import {getCurrentChannelId, getMyChannelMember as getMyChannelMemberSelector} from 'selectors/entities/channels';
 import {getCustomEmojisByName as selectCustomEmojisByName} from 'selectors/entities/emojis';
@@ -211,6 +211,20 @@ export function createPost(post, files: any[] = []) {
                             {
                                 type: PostTypes.CREATE_POST_SUCCESS,
                             },
+                            {
+                                type: ChannelTypes.INCREMENT_TOTAL_MSG_COUNT,
+                                data: {
+                                    channelId: newPost.channel_id,
+                                    amount: 1,
+                                },
+                            },
+                            {
+                                type: ChannelTypes.DECREMENT_UNREAD_MSG_COUNT,
+                                data: {
+                                    channelId: newPost.channel_id,
+                                    amount: 1,
+                                },
+                            },
                         ];
 
                         if (files) {
@@ -305,6 +319,20 @@ export function createPostImmediately(post: Post, files: any[] = []) {
             receivedPost(newPost),
             {
                 type: PostTypes.CREATE_POST_SUCCESS,
+            },
+            {
+                type: ChannelTypes.INCREMENT_TOTAL_MSG_COUNT,
+                data: {
+                    channelId: newPost.channel_id,
+                    amount: 1,
+                },
+            },
+            {
+                type: ChannelTypes.DECREMENT_UNREAD_MSG_COUNT,
+                data: {
+                    channelId: newPost.channel_id,
+                    amount: 1,
+                },
             },
         ];
 
