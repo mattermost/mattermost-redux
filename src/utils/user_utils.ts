@@ -15,6 +15,7 @@ export function getFullName(user: UserProfile): string {
 
     return '';
 }
+
 export function displayUsername(user: UserProfile, teammateNameDisplay: string, useFallbackUsername = true): string {
     let name = useFallbackUsername ? localizeMessage('channel_loader.someone', 'Someone') : '';
 
@@ -34,31 +35,40 @@ export function displayUsername(user: UserProfile, teammateNameDisplay: string, 
 
     return name;
 }
+
 export function rolesIncludePermission(roles: string, permission: string): boolean {
     const rolesArray = roles.split(' ');
     return rolesArray.includes(permission);
 }
+
 export function isAdmin(roles: string): boolean {
     return isSystemAdmin(roles) || isTeamAdmin(roles);
 }
+
 export function isTeamAdmin(roles: string): boolean {
     return rolesIncludePermission(roles, General.TEAM_ADMIN_ROLE);
 }
+
 export function isSystemAdmin(roles: string): boolean {
     return rolesIncludePermission(roles, General.SYSTEM_ADMIN_ROLE);
 }
+
 export function isChannelAdmin(roles: string): boolean {
     return rolesIncludePermission(roles, General.CHANNEL_ADMIN_ROLE);
 }
+
 export function hasUserAccessTokenRole(roles: string): boolean {
     return rolesIncludePermission(roles, General.SYSTEM_USER_ACCESS_TOKEN_ROLE);
 }
+
 export function hasPostAllRole(roles: string): boolean {
     return rolesIncludePermission(roles, General.SYSTEM_POST_ALL_ROLE);
 }
+
 export function hasPostAllPublicRole(roles: string): boolean {
     return rolesIncludePermission(roles, General.SYSTEM_POST_ALL_PUBLIC_ROLE);
 }
+
 export function profileListToMap(profileList: Array<UserProfile>): IDMappedObjects<UserProfile> {
     const profiles = {};
 
@@ -68,6 +78,7 @@ export function profileListToMap(profileList: Array<UserProfile>): IDMappedObjec
 
     return profiles;
 }
+
 export function removeUserFromList(userId: $ID<UserProfile>, list: Array<UserProfile>): Array<UserProfile> {
     for (let i = list.length - 1; i >= 0; i--) {
         if (list[i].id === userId) {
@@ -107,6 +118,7 @@ export function getSuggestionsSplitBy(term: string, splitStr: string): Array<str
 
     return suggestions;
 }
+
 export function getSuggestionsSplitByMultiple(term: string, splitStrs: Array<string>): Array<string> {
     const suggestions = splitStrs.reduce((acc, val) => {
         getSuggestionsSplitBy(term, val).forEach((suggestion) => acc.add(suggestion));
@@ -114,6 +126,7 @@ export function getSuggestionsSplitByMultiple(term: string, splitStrs: Array<str
     }, new Set<string>());
     return [...suggestions];
 }
+
 export function filterProfilesMatchingTerm(users: Array<UserProfile>, term: string): Array<UserProfile> {
     const lowercasedTerm = term.toLowerCase();
     let trimmedTerm = lowercasedTerm;
@@ -147,6 +160,7 @@ export function filterProfilesMatchingTerm(users: Array<UserProfile>, term: stri
         return profileSuggestions.filter((suggestion) => suggestion !== '').some((suggestion) => suggestion.startsWith(trimmedTerm));
     });
 }
+
 export function sortByUsername(a: UserProfile, b: UserProfile): number {
     const nameA = a.username;
     const nameB = b.username;

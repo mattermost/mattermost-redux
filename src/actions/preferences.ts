@@ -40,6 +40,7 @@ export function deletePreferences(userId: string, preferences: Array<PreferenceT
         };
     };
 }
+
 export function getMyPreferences(): ActionFunc {
     return bindClientFunc({
         clientFunc: Client4.getMyPreferences,
@@ -48,6 +49,7 @@ export function getMyPreferences(): ActionFunc {
         onFailure: PreferenceTypes.MY_PREFERENCES_FAILURE,
     });
 }
+
 export function makeDirectChannelVisibleIfNecessary(otherUserId: string): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         const state = getState();
@@ -71,6 +73,7 @@ export function makeDirectChannelVisibleIfNecessary(otherUserId: string): Action
         };
     };
 }
+
 export function makeGroupMessageVisibleIfNecessary(channelId: string): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         const state = getState();
@@ -104,6 +107,7 @@ export function makeGroupMessageVisibleIfNecessary(channelId: string): ActionFun
         };
     };
 }
+
 export function savePreferences(userId: string, preferences: Array<PreferenceType>) {
     return async (dispatch: DispatchFunc) => {
         dispatch({
@@ -127,6 +131,7 @@ export function savePreferences(userId: string, preferences: Array<PreferenceTyp
         };
     };
 }
+
 export function saveTheme(teamId: string, theme: {}): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         const state = getState();
@@ -143,6 +148,7 @@ export function saveTheme(teamId: string, theme: {}): ActionFunc {
         };
     };
 }
+
 export function deleteTeamSpecificThemes(): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         const state = getState(); // $FlowFixMe

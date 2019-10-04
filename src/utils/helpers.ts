@@ -95,6 +95,7 @@ export function generateId(): string {
     });
     return id;
 }
+
 export function isEmail(email: string): boolean {
     // writing a regex to match all valid email addresses is really, really hard. (see http://stackoverflow.com/a/201378)
     // this regex ensures:
@@ -104,6 +105,7 @@ export function isEmail(email: string): boolean {
     // this prevents <Outlook Style> outlook.style@domain.com addresses and multiple comma-separated addresses from being accepted
     return (/^[^ ,@]+@[^ ,@]+$/).test(email);
 }
+
 export function buildQueryString(parameters: {}): string {
     const keys = Object.keys(parameters);
 

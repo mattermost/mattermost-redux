@@ -13,21 +13,26 @@ import {GlobalState} from 'types/store';
 export function getCurrentTeamId(state: GlobalState) {
     return state.entities.teams.currentTeamId;
 }
+
 export const getTeamByName = createSelector(getTeams, (state, name) => name, (teams, name) => {
     return Object.values(teams).find((team: Team) => team.name === name);
 });
 export function getTeams(state: GlobalState) {
     return state.entities.teams.teams;
 }
+
 export function getTeamStats(state: GlobalState) {
     return state.entities.teams.stats;
 }
+
 export function getTeamMemberships(state: GlobalState) {
     return state.entities.teams.myMembers;
 }
+
 export function getMembersInTeams(state: GlobalState) {
     return state.entities.teams.membersInTeam;
 }
+
 export const getTeamsList = createSelector(getTeams, (teams) => {
     return Object.values(teams);
 });
@@ -38,6 +43,7 @@ export function getTeam(state, id) {
     const teams = getTeams(state);
     return teams[id];
 }
+
 export const getCurrentTeamMembership = createSelector(getCurrentTeamId, getTeamMemberships, (currentTeamId, teamMemberships) => {
     return teamMemberships[currentTeamId];
 });
@@ -86,6 +92,7 @@ export function getTeamMember(state, teamId, userId) {
 
     return null;
 }
+
 export const getListableTeamIds = createIdsSelector(getTeams, getTeamMemberships, (state) => haveISystemPermission(state, {
     permission: Permissions.LIST_PUBLIC_TEAMS,
 }), (state) => haveISystemPermission(state, {

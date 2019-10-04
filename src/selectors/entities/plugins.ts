@@ -4,6 +4,7 @@ import {createSelector} from 'reselect';
 export function getMarketplacePlugins(state) {
     return state.entities.plugins.marketplacePlugins;
 }
+
 export const getMarketplaceInstalledPlugins = createSelector(getMarketplacePlugins, (plugins) => {
     return Object.values(plugins).filter((p: any) => p.installed_version !== '');
 });

@@ -24,27 +24,35 @@ export function isPostFlagged(postId: $ID<Post>, myPreferences: {
 export function isSystemMessage(post: Post): boolean {
     return Boolean(post.type && post.type.startsWith(Posts.SYSTEM_MESSAGE_PREFIX));
 }
+
 export function isMeMessage(post: Post): boolean {
     return Boolean(post.type && post.type === Posts.POST_TYPES.ME);
 }
+
 export function isFromWebhook(post: Post): boolean {
     return post.props && post.props.from_webhook;
 }
+
 export function isPostEphemeral(post: Post): boolean {
     return post.type === Posts.POST_TYPES.EPHEMERAL || post.type === Posts.POST_TYPES.EPHEMERAL_ADD_TO_CHANNEL || post.state === Posts.POST_DELETED;
 }
+
 export function shouldIgnorePost(post: Post): boolean {
     return Posts.IGNORE_POST_TYPES.includes(post.type);
 }
+
 export function isUserActivityPost(postType: PostType): boolean {
     return Posts.USER_ACTIVITY_POST_TYPES.includes(postType);
 }
+
 export function isPostOwner(userId: $ID<UserProfile>, post: Post) {
     return userId === post.user_id;
 }
+
 export function isEdited(post: Post): boolean {
     return post.edit_at > 0;
 }
+
 export function canDeletePost(state: GlobalState, config: any, license: any, teamId: $ID<Team>, channelId: $ID<Channel>, userId: $ID<UserProfile>, post: Post, isAdmin: boolean, isSystemAdmin: boolean): boolean {
     if (!post) {
         return false;
@@ -78,6 +86,7 @@ export function canDeletePost(state: GlobalState, config: any, license: any, tea
 
     return isOwner || isAdmin;
 }
+
 export function canEditPost(state: GlobalState, config: any, license: any, teamId: $ID<Team>, channelId: $ID<Channel>, userId: $ID<UserProfile>, post: Post): boolean {
     if (!post || isSystemMessage(post)) {
         return false;
@@ -123,6 +132,7 @@ export function canEditPost(state: GlobalState, config: any, license: any, teamI
 
     return canEdit;
 }
+
 export function getLastCreateAt(postsArray: Array<Post>): number {
     const createAt = postsArray.map((p) => p.create_at);
 
@@ -171,6 +181,7 @@ function isJoinLeavePostForUsername(post: Post, currentUsername: string): boolea
 export function isPostPendingOrFailed(post: Post): boolean {
     return post.failed || post.id === post.pending_post_id;
 }
+
 export function comparePosts(a: Post, b: Post): number {
     const aIsPendingOrFailed = isPostPendingOrFailed(a);
     const bIsPendingOrFailed = isPostPendingOrFailed(b);
@@ -189,6 +200,7 @@ export function comparePosts(a: Post, b: Post): number {
 
     return 0;
 }
+
 export function isPostCommentMention({
     post,
     currentUser,
@@ -224,6 +236,7 @@ export function isPostCommentMention({
 
     return isCommentMention;
 }
+
 export function fromAutoResponder(post: Post): boolean {
     return Boolean(post.type && post.type === Posts.SYSTEM_AUTO_RESPONDER);
 }

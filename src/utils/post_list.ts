@@ -102,6 +102,7 @@ export function makeFilterPostsAndAddSeparators() {
         return out.reverse();
     });
 }
+
 export function makeCombineUserActivityPosts() {
     return createIdsSelector((state, postIds) => postIds, (state) => state.entities.posts.posts, (postIds, posts) => {
         let lastPostIsUserActivity = false;
@@ -149,21 +150,27 @@ export function makeCombineUserActivityPosts() {
         return out;
     });
 }
+
 export function isStartOfNewMessages(item) {
     return item === START_OF_NEW_MESSAGES;
 }
+
 export function isDateLine(item) {
     return item.startsWith(DATE_LINE);
 }
+
 export function getDateForDateLine(item) {
     return parseInt(item.substring(DATE_LINE.length), 10);
 }
+
 export function isCombinedUserActivityPost(item) {
     return (/^user-activity-(?:[^_]+_)*[^_]+$/).test(item);
 }
+
 export function getPostIdsForCombinedUserActivityPost(item) {
     return item.substring(COMBINED_USER_ACTIVITY.length).split('_');
 }
+
 export function getFirstPostId(items) {
     for (let i = 0; i < items.length; i++) {
         const item = items[i];
@@ -186,6 +193,7 @@ export function getFirstPostId(items) {
 
     return '';
 }
+
 export function getLastPostId(items) {
     for (let i = items.length - 1; i >= 0; i--) {
         const item = items[i];
@@ -208,6 +216,7 @@ export function getLastPostId(items) {
 
     return '';
 }
+
 export function getLastPostIndex(postIds) {
     let index = 0;
 
@@ -222,6 +231,7 @@ export function getLastPostIndex(postIds) {
 
     return index;
 }
+
 export function makeGenerateCombinedPost() {
     const getPostsForIds = makeGetPostsForIds();
     const getPostIds = memoizeResult(getPostIdsForCombinedUserActivityPost);
@@ -251,6 +261,7 @@ export function makeGenerateCombinedPost() {
         };
     });
 }
+
 export const postTypePriority = {
     [Posts.POST_TYPES.JOIN_TEAM]: 0,
     [Posts.POST_TYPES.ADD_TO_TEAM]: 1,

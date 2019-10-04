@@ -17,6 +17,7 @@ export function createJob(job: Job): ActionFunc {
         params: [job],
     });
 }
+
 export function getJob(id: string): ActionFunc {
     return bindClientFunc({
         clientFunc: Client4.getJob,
@@ -26,6 +27,7 @@ export function getJob(id: string): ActionFunc {
         params: [id],
     });
 }
+
 export function getJobs(page = 0, perPage: number = General.JOBS_CHUNK_SIZE): ActionFunc {
     return bindClientFunc({
         clientFunc: Client4.getJobs,
@@ -35,6 +37,7 @@ export function getJobs(page = 0, perPage: number = General.JOBS_CHUNK_SIZE): Ac
         params: [page, perPage],
     });
 }
+
 export function getJobsByType(type: JobType, page = 0, perPage: number = General.JOBS_CHUNK_SIZE): ActionFunc {
     return bindClientFunc({
         clientFunc: Client4.getJobsByType,
@@ -44,6 +47,7 @@ export function getJobsByType(type: JobType, page = 0, perPage: number = General
         params: [type, page, perPage],
     });
 }
+
 export function cancelJob(job: string): ActionFunc {
     return bindClientFunc({
         clientFunc: Client4.cancelJob,

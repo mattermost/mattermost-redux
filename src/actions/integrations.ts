@@ -22,6 +22,7 @@ export function createIncomingHook(hook: IncomingWebhook) {
         params: [hook],
     });
 }
+
 export function getIncomingHook(hookId: string) {
     return bindClientFunc({
         clientFunc: Client4.getIncomingWebhook,
@@ -31,6 +32,7 @@ export function getIncomingHook(hookId: string) {
         params: [hookId],
     });
 }
+
 export function getIncomingHooks(teamId = '', page = 0, perPage: number = General.PAGE_SIZE_DEFAULT) {
     return bindClientFunc({
         clientFunc: Client4.getIncomingWebhooks,
@@ -40,6 +42,7 @@ export function getIncomingHooks(teamId = '', page = 0, perPage: number = Genera
         params: [teamId, page, perPage],
     });
 }
+
 export function removeIncomingHook(hookId: string) {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         dispatch({
@@ -73,6 +76,7 @@ export function removeIncomingHook(hookId: string) {
         };
     };
 }
+
 export function updateIncomingHook(hook: IncomingWebhook) {
     return bindClientFunc({
         clientFunc: Client4.updateIncomingWebhook,
@@ -82,6 +86,7 @@ export function updateIncomingHook(hook: IncomingWebhook) {
         params: [hook],
     });
 }
+
 export function createOutgoingHook(hook: OutgoingWebhook) {
     return bindClientFunc({
         clientFunc: Client4.createOutgoingWebhook,
@@ -91,6 +96,7 @@ export function createOutgoingHook(hook: OutgoingWebhook) {
         params: [hook],
     });
 }
+
 export function getOutgoingHook(hookId: string) {
     return bindClientFunc({
         clientFunc: Client4.getOutgoingWebhook,
@@ -100,6 +106,7 @@ export function getOutgoingHook(hookId: string) {
         params: [hookId],
     });
 }
+
 export function getOutgoingHooks(channelId = '', teamId = '', page = 0, perPage: number = General.PAGE_SIZE_DEFAULT) {
     return bindClientFunc({
         clientFunc: Client4.getOutgoingWebhooks,
@@ -109,6 +116,7 @@ export function getOutgoingHooks(channelId = '', teamId = '', page = 0, perPage:
         params: [channelId, teamId, page, perPage],
     });
 }
+
 export function removeOutgoingHook(hookId: string) {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         dispatch({
@@ -142,6 +150,7 @@ export function removeOutgoingHook(hookId: string) {
         };
     };
 }
+
 export function updateOutgoingHook(hook: OutgoingWebhook) {
     return bindClientFunc({
         clientFunc: Client4.updateOutgoingWebhook,
@@ -151,6 +160,7 @@ export function updateOutgoingHook(hook: OutgoingWebhook) {
         params: [hook],
     });
 }
+
 export function regenOutgoingHookToken(hookId: string) {
     return bindClientFunc({
         clientFunc: Client4.regenOutgoingHookToken,
@@ -160,6 +170,7 @@ export function regenOutgoingHookToken(hookId: string) {
         params: [hookId],
     });
 }
+
 export function getCommands(teamId: string) {
     return bindClientFunc({
         clientFunc: Client4.getCommandsList,
@@ -169,6 +180,7 @@ export function getCommands(teamId: string) {
         params: [teamId],
     });
 }
+
 export function getAutocompleteCommands(teamId: string, page = 0, perPage: number = General.PAGE_SIZE_DEFAULT) {
     return bindClientFunc({
         clientFunc: Client4.getAutocompleteCommandsList,
@@ -178,6 +190,7 @@ export function getAutocompleteCommands(teamId: string, page = 0, perPage: numbe
         params: [teamId, page, perPage],
     });
 }
+
 export function getCustomTeamCommands(teamId: string) {
     return bindClientFunc({
         clientFunc: Client4.getCustomTeamCommands,
@@ -187,6 +200,7 @@ export function getCustomTeamCommands(teamId: string) {
         params: [teamId],
     });
 }
+
 export function addCommand(command: Command) {
     return bindClientFunc({
         clientFunc: Client4.addCommand,
@@ -196,6 +210,7 @@ export function addCommand(command: Command) {
         params: [command],
     });
 }
+
 export function editCommand(command: Command) {
     return bindClientFunc({
         clientFunc: Client4.editCommand,
@@ -205,6 +220,7 @@ export function editCommand(command: Command) {
         params: [command],
     });
 }
+
 export function executeCommand(command: Command, args: Array<string>) {
     return bindClientFunc({
         clientFunc: Client4.executeCommand,
@@ -214,6 +230,7 @@ export function executeCommand(command: Command, args: Array<string>) {
         params: [command, args],
     });
 }
+
 export function regenCommandToken(id: string) {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         dispatch({
@@ -249,6 +266,7 @@ export function regenCommandToken(id: string) {
         };
     };
 }
+
 export function deleteCommand(id: string) {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         dispatch({
@@ -282,6 +300,7 @@ export function deleteCommand(id: string) {
         };
     };
 }
+
 export function addOAuthApp(app: OAuthApp) {
     return bindClientFunc({
         clientFunc: Client4.createOAuthApp,
@@ -291,6 +310,7 @@ export function addOAuthApp(app: OAuthApp) {
         params: [app],
     });
 }
+
 export function editOAuthApp(app: OAuthApp) {
     return bindClientFunc({
         clientFunc: Client4.editOAuthApp,
@@ -300,6 +320,7 @@ export function editOAuthApp(app: OAuthApp) {
         params: [app],
     });
 }
+
 export function getOAuthApps(page = 0, perPage: number = General.PAGE_SIZE_DEFAULT) {
     return bindClientFunc({
         clientFunc: Client4.getOAuthApps,
@@ -309,6 +330,7 @@ export function getOAuthApps(page = 0, perPage: number = General.PAGE_SIZE_DEFAU
         params: [page, perPage],
     });
 }
+
 export function getOAuthApp(appId: string) {
     return bindClientFunc({
         clientFunc: Client4.getOAuthApp,
@@ -318,6 +340,7 @@ export function getOAuthApp(appId: string) {
         params: [appId],
     });
 }
+
 export function getAuthorizedOAuthApps() {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         dispatch({
@@ -350,6 +373,7 @@ export function getAuthorizedOAuthApps() {
         };
     };
 }
+
 export function deauthorizeOAuthApp(clientId: string) {
     return bindClientFunc({
         clientFunc: Client4.deauthorizeOAuthApp,
@@ -359,6 +383,7 @@ export function deauthorizeOAuthApp(clientId: string) {
         params: [clientId],
     });
 }
+
 export function deleteOAuthApp(id: string) {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         dispatch({
@@ -392,6 +417,7 @@ export function deleteOAuthApp(id: string) {
         };
     };
 }
+
 export function regenOAuthAppSecret(appId: string) {
     return bindClientFunc({
         clientFunc: Client4.regenOAuthAppSecret,
@@ -401,6 +427,7 @@ export function regenOAuthAppSecret(appId: string) {
         params: [appId],
     });
 }
+
 export function submitInteractiveDialog(submission: DialogSubmission) {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         dispatch({

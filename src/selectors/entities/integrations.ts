@@ -7,15 +7,19 @@ import {GlobalState} from 'types/store';
 export function getIncomingHooks(state: GlobalState) {
     return state.entities.integrations.incomingHooks;
 }
+
 export function getOutgoingHooks(state: GlobalState) {
     return state.entities.integrations.outgoingHooks;
 }
+
 export function getCommands(state: GlobalState) {
     return state.entities.integrations.commands;
 }
+
 export function getOAuthApps(state: GlobalState) {
     return state.entities.integrations.oauthApps;
 }
+
 export function getSystemCommands(state: GlobalState) {
     return state.entities.integrations.systemCommands;
 }

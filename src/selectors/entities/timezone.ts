@@ -15,6 +15,7 @@ export function getUserTimezone(state, id) {
         manualTimezone: '',
     };
 }
+
 export function isTimezoneEnabled(state) {
     const {
         config,

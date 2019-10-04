@@ -14,10 +14,12 @@ export function getSchemes(state: GlobalState): {
 } {
     return state.entities.schemes.schemes;
 }
+
 export function getScheme(state: GlobalState, id: string): Scheme {
     const schemes = getSchemes(state);
     return schemes[id];
 }
+
 export function makeGetSchemeChannels() {
     return (createSelector(getAllChannels, (state, props: {
         schemeId: string;
@@ -47,6 +49,7 @@ export function makeGetSchemeChannels() {
         schemeId: string;
     }) => Array<Channel>);
 }
+
 export function makeGetSchemeTeams() {
     return (createSelector(getTeams, (state, props: {
         schemeId: string;

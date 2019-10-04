@@ -38,12 +38,14 @@ export function requestData(type: ActionType): GenericAction {
         data: null,
     };
 }
+
 export function requestSuccess(type: ActionType, data: any) {
     return {
         type,
         data,
     };
 }
+
 export function requestFailure(type: ActionType, error: Client4Error): any {
     return {
         type,
@@ -149,6 +151,7 @@ export function debounce(func: (...args: any) => unknown, wait: number, immediat
         }
     };
 }
+
 export class FormattedError extends Error {
     intl: {
         id: string;

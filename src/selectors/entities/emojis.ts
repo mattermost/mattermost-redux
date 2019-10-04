@@ -12,6 +12,7 @@ export function getCustomEmojis(state: GlobalState): IDMappedObjects<CustomEmoji
 
     return state.entities.emojis.customEmoji;
 }
+
 export const getCustomEmojisAsMap: (state: GlobalState) => Map<string, CustomEmoji> = createSelector(getCustomEmojis, (emojis) => {
     const map = new Map();
     Object.keys(emojis).forEach((key: string) => {

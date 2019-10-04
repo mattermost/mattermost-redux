@@ -32,8 +32,6 @@
     "dev-mobile:watch": "ttsc --watch --outDir ${MOBILE_DIR:-../mattermost-mobile}/node_modules/mattermost-redux"
   },
   "dependencies": {
-    "@typescript-eslint/eslint-plugin": "^2.3.1",
-    "@typescript-eslint/parser": "2.3.1",
     "gfycat-sdk": "latest",
     "moment-timezone": "^0.5.25",
     "isomorphic-fetch": "2.2.1",
@@ -46,8 +44,7 @@
     "remote-redux-devtools": "^0.5.16",
     "reselect": "^4.0.0",
     "serialize-error": "^4.1.0",
-    "shallow-equals": "^1.0.0",
-    "source-map-support": "^0.5.12"
+    "shallow-equals": "^1.0.0"
   },
   "husky": {
     "hooks": {
@@ -66,12 +63,14 @@
     "@babel/preset-env": "^7.6.2",
     "@babel/preset-typescript": "^7.6.0",
     "@babel/runtime": "^7.6.2",
+    "@typescript-eslint/eslint-plugin": "^2.3.1",
+    "@typescript-eslint/parser": "2.3.1",
     "@types/jest": "^24.0.18",
     "@types/moment-timezone": "^0.5.12",
+    "@types/node": "^12.7.11",
     "@zerollup/ts-transform-paths": "^1.7.3",
     "babel-eslint": "^10.0.3",
     "babel-plugin-module-resolver": "^3.2.0",
-    "copyfiles": "^2.1.1",
     "core-js": "^3.2.1",
     "cross-env": "^6.0.3",
     "eslint": "^6.5.1",
@@ -95,6 +94,7 @@
     "ts-jest": "^24.1.0",
     "tslib": "^1.10.0",
     "ttypescript": "^1.5.7",
+    "source-map-support": "^0.5.12",
     "typescript": "^3.6.3"
   }
 }

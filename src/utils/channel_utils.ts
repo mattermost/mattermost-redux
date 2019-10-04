@@ -52,6 +52,7 @@ export function buildDisplayableChannelList(usersState: UsersState, allChannels:
         directAndGroupChannels,
     };
 }
+
 export function buildDisplayableChannelListWithUnreadSection(usersState: UsersState, myChannels: Array<Channel>, myMembers: RelationOneToOne<Channel, ChannelMembership>, config: any, myPreferences: {
     [x: string]: PreferenceType;
 }, teammateNameDisplay: string, lastPosts: RelationOneToOne<Channel, Post>) {
@@ -75,6 +76,7 @@ export function buildDisplayableChannelListWithUnreadSection(usersState: UsersSt
         directAndGroupChannels,
     };
 }
+
 export function completeDirectChannelInfo(usersState: UsersState, teammateNameDisplay: string, channel: Channel): Channel {
     if (isDirectChannel(channel)) {
         const teammateId = getUserIdFromChannelName(usersState.currentUserId, channel.name); // return empty string instead of `someone` default string for display_name
@@ -90,6 +92,7 @@ export function completeDirectChannelInfo(usersState: UsersState, teammateNameDi
 
     return channel;
 }
+
 export function completeDirectChannelDisplayName(currentUserId: string, profiles: IDMappedObjects<UserProfile>, userIdsInChannel: Set<string>, teammateNameDisplay: string, channel: Channel): Channel {
     if (isDirectChannel(channel)) {
         const dmChannelClone = {...channel,
@@ -107,6 +110,7 @@ export function completeDirectChannelDisplayName(currentUserId: string, profiles
 
     return channel;
 }
+
 export function cleanUpUrlable(input: string): string {
     let cleaned = input.trim().replace(/-/g, ' ').replace(/[^\w\s]/gi, '').toLowerCase().replace(/\s/g, '-');
     cleaned = cleaned.replace(/-{2,}/, '-');
@@ -114,6 +118,7 @@ export function cleanUpUrlable(input: string): string {
     cleaned = cleaned.replace(/-+$/, '');
     return cleaned;
 }
+
 export function getChannelByName(channels: IDMappedObjects<Channel>, name: string): Channel | undefined | null {
     const channelIds = Object.keys(channels);
 
@@ -127,6 +132,7 @@ export function getChannelByName(channels: IDMappedObjects<Channel>, name: strin
 
     return null;
 }
+
 export function getDirectChannelName(id: string, otherId: string): string {
     let handle;
 
@@ -138,6 +144,7 @@ export function getDirectChannelName(id: string, otherId: string): string {
 
     return handle;
 }
+
 export function getUserIdFromChannelName(userId: string, channelName: string): string {
     const ids = channelName.split('__');
     let otherUserId = '';
@@ -150,6 +157,7 @@ export function getUserIdFromChannelName(userId: string, channelName: string): s
 
     return otherUserId;
 }
+
 export function isAutoClosed(config: any, myPreferences: {
     [x: string]: PreferenceType;
 }, channel: Channel, channelActivity: number, channelArchiveTime: number, currentChannelId = ''): boolean {
@@ -189,9 +197,11 @@ export function isAutoClosed(config: any, myPreferences: {
 
     return false;
 }
+
 export function isDirectChannel(channel: Channel): boolean {
     return channel.type === General.DM_CHANNEL;
 }
+
 export function isDirectChannelVisible(otherUserOrOtherUserId: UserProfile | string, config: any, myPreferences: {
     [x: string]: PreferenceType;
 }, channel: Channel, lastPost?: Post | null, isUnread?: boolean, currentChannelId = ''): boolean {
@@ -205,9 +215,11 @@ export function isDirectChannelVisible(otherUserOrOtherUserId: UserProfile | str
 
     return isUnread || !isAutoClosed(config, myPreferences, channel, lastPost ? lastPost.create_at : 0, otherUser ? otherUser.delete_at : 0, currentChannelId);
 }
+
 export function isGroupChannel(channel: Channel): boolean {
     return channel.type === General.GM_CHANNEL;
 }
+
 export function isGroupChannelVisible(config: any, myPreferences: {
     [x: string]: PreferenceType;
 }, channel: Channel, lastPost?: Post, isUnread?: boolean): boolean {
@@ -219,6 +231,7 @@ export function isGroupChannelVisible(config: any, myPreferences: {
 
     return isUnread || !isAutoClosed(config, myPreferences, channel, lastPost ? lastPost.create_at : 0, 0);
 }
+
 export function isGroupOrDirectChannelVisible(channel: Channel, memberships: RelationOneToOne<Channel, ChannelMembership>, config: any, myPreferences: {
     [x: string]: PreferenceType;
 }, currentUserId: string, users: IDMappedObjects<UserProfile>, lastPosts: RelationOneToOne<Channel, Post>): boolean {
@@ -235,6 +248,7 @@ export function isGroupOrDirectChannelVisible(channel: Channel, memberships: Rel
     const otherUserId = getUserIdFromChannelName(currentUserId, channel.name);
     return isDirectChannelVisible(users[otherUserId] || otherUserId, config, myPreferences, channel, lastPost, isUnreadChannel(memberships, channel));
 }
+
 export function showCreateOption(state: GlobalState, config: any, license: any, teamId: string, channelType: ChannelType, isAdmin: boolean, isSystemAdmin: boolean): boolean {
     if (hasNewPermissions(state)) {
         if (channelType === General.OPEN_CHANNEL) {
@@ -274,6 +288,7 @@ export function showCreateOption(state: GlobalState, config: any, license: any, 
 
     return true;
 }
+
 export function showManagementOptions(state: GlobalState, config: any, license: any, channel: Channel, isAdmin: boolean, isSystemAdmin: boolean, isChannelAdmin: boolean): boolean {
     if (hasNewPermissions(state)) {
         if (channel.type === General.OPEN_CHANNEL) {
@@ -327,6 +342,7 @@ export function showManagementOptions(state: GlobalState, config: any, license: 
 
     return true;
 }
+
 export function showDeleteOption(state: GlobalState, config: any, license: any, channel: Channel, isAdmin: boolean, isSystemAdmin: boolean, isChannelAdmin: boolean): boolean {
     if (hasNewPermissions(state)) {
         if (channel.type === General.OPEN_CHANNEL) {
@@ -414,6 +430,7 @@ export function canManageMembersOldPermissions(channel: Channel, user: UserProfi
 
     return true;
 }
+
 export function getChannelsIdForTeam(state: GlobalState, teamId: string): Array<string> {
     const {
         channels,
@@ -426,6 +443,7 @@ export function getChannelsIdForTeam(state: GlobalState, teamId: string): Array<
         return res;
     }, [] as string[]);
 }
+
 export function getGroupDisplayNameFromUserIds(userIds: Array<string>, profiles: IDMappedObjects<UserProfile>, currentUserId: string, teammateNameDisplay: string): string {
     const names: string[] = [];
     userIds.forEach((id) => {
@@ -443,12 +461,14 @@ export function getGroupDisplayNameFromUserIds(userIds: Array<string>, profiles:
 
     return names.sort(sortUsernames).join(', ');
 }
+
 export function isFavoriteChannel(myPreferences: {
     [x: string]: PreferenceType;
 }, id: string) {
     const fav = myPreferences[`${Preferences.CATEGORY_FAVORITE_CHANNEL}--${id}`];
     return fav ? fav.value === 'true' : false;
 }
+
 export function isDefault(channel: Channel): boolean {
     return channel.name === General.DEFAULT_CHANNEL;
 }
@@ -567,9 +587,11 @@ function isNotDeletedChannel(channel: Channel) {
 export function isOpenChannel(channel: Channel): boolean {
     return channel.type === General.OPEN_CHANNEL;
 }
+
 export function isPrivateChannel(channel: Channel): boolean {
     return channel.type === General.PRIVATE_CHANNEL;
 }
+
 export function sortChannelsByTypeAndDisplayName(locale: string, a: Channel, b: Channel): number {
     if (channelTypeOrder[a.type] !== channelTypeOrder[b.type]) {
         if (channelTypeOrder[a.type] < channelTypeOrder[b.type]) {
@@ -609,6 +631,7 @@ export function sortChannelsByDisplayName(locale: string, a: Channel, b: Channel
         numeric: true,
     });
 }
+
 export function sortChannelsByDisplayNameAndMuted(locale: string, members: RelationOneToOne<Channel, ChannelMembership>, a: Channel, b: Channel): number {
     const aMember = members[a.id];
     const bMember = members[b.id];
@@ -623,6 +646,7 @@ export function sortChannelsByDisplayNameAndMuted(locale: string, members: Relat
 
     return -1;
 }
+
 export function sortChannelsByRecency(lastPosts: RelationOneToOne<Channel, Post>, a: Channel, b: Channel): number {
     let aLastPostAt = a.last_post_at;
 
@@ -638,9 +662,11 @@ export function sortChannelsByRecency(lastPosts: RelationOneToOne<Channel, Post>
 
     return bLastPostAt - aLastPostAt;
 }
+
 export function isChannelMuted(member: ChannelMembership): boolean {
     return member && member.notify_props ? member.notify_props.mark_unread === 'mention' : false;
 }
+
 export function areChannelMentionsIgnored(channelMemberNotifyProps: ChannelNotifyProps, currentUserNotifyProps: UserNotifyProps) {
     let ignoreChannelMentionsDefault = Users.IGNORE_CHANNEL_MENTIONS_OFF;
 

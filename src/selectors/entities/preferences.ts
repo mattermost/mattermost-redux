@@ -11,6 +11,7 @@ import {PreferencesType, PreferenceType} from 'types/preferences';
 export function getMyPreferences(state) {
     return state.entities.preferences.myPreferences;
 }
+
 export function get(state: GlobalState, category, name, defaultValue: any = '') {
     const key = getPreferenceKey(category, name);
     const prefs = getMyPreferences(state);
@@ -21,14 +22,17 @@ export function get(state: GlobalState, category, name, defaultValue: any = '') 
 
     return prefs[key].value;
 }
+
 export function getBool(state, category, name, defaultValue = false) {
     const value = get(state, category, name, String(defaultValue));
     return value !== 'false';
 }
+
 export function getInt(state, category, name, defaultValue = 0) {
     const value = get(state, category, name, defaultValue);
     return parseInt(value, 10);
 }
+
 export function makeGetCategory() {
     return createSelector(getMyPreferences, (state, category) => category, (preferences: PreferencesType, category) => {
         const prefix = category + '--';
@@ -56,6 +60,7 @@ export function getFavoritesPreferences(state) {
     const favorites = getFavoritesCategory(state, Preferences.CATEGORY_FAVORITE_CHANNEL);
     return favorites.filter((f) => f.value === 'true').map((f) => f.name);
 }
+
 export const getVisibleTeammate = createSelector(getDirectShowPreferences, (direct) => {
     return direct.filter((dm) => dm.value === 'true' && dm.name).map((dm) => dm.name);
 });

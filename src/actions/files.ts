@@ -76,6 +76,7 @@ export function uploadFile(channelId: string, rootId: string, clientIds: Array<s
         };
     };
 }
+
 export function getFilePublicLink(fileId: string) {
     return bindClientFunc({
         clientFunc: Client4.getFilePublicLink,

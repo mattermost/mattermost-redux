@@ -13,6 +13,7 @@ export function dismissErrorObject(index: number) {
         data: null,
     };
 }
+
 export function dismissError(index: number): ActionFunc {
     return async (dispatch: DispatchFunc) => {
         dispatch(dismissErrorObject(index));
@@ -21,6 +22,7 @@ export function dismissError(index: number): ActionFunc {
         };
     };
 }
+
 export function getLogErrorAction(error: serializeError.ErrorObject, displayable = false) {
     return {
         type: ErrorTypes.LOG_ERROR,
@@ -29,6 +31,7 @@ export function getLogErrorAction(error: serializeError.ErrorObject, displayable
         data: null,
     };
 }
+
 export function logError(error: Error, displayable = false): ActionFunc {
     return async (dispatch: DispatchFunc) => {
         if (error.server_error_id === 'api.context.session_expired.app_error') {
@@ -64,6 +67,7 @@ export function logError(error: Error, displayable = false): ActionFunc {
         };
     };
 }
+
 export function clearErrors(): ActionFunc {
     return async (dispatch: DispatchFunc) => {
         dispatch({

@@ -19,6 +19,7 @@ export function getScheme(schemeId: string): ActionFunc {
         params: [schemeId],
     });
 }
+
 export function getSchemes(scope: SchemeScope, page = 0, perPage: number = General.PAGE_SIZE_DEFAULT): ActionFunc {
     return bindClientFunc({
         clientFunc: Client4.getSchemes,
@@ -28,6 +29,7 @@ export function getSchemes(scope: SchemeScope, page = 0, perPage: number = Gener
         params: [scope, page, perPage],
     });
 }
+
 export function createScheme(scheme: Scheme): ActionFunc {
     return bindClientFunc({
         clientFunc: Client4.createScheme,
@@ -37,6 +39,7 @@ export function createScheme(scheme: Scheme): ActionFunc {
         params: [scheme],
     });
 }
+
 export function deleteScheme(schemeId: string): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         dispatch({
@@ -73,6 +76,7 @@ export function deleteScheme(schemeId: string): ActionFunc {
         };
     };
 }
+
 export function patchScheme(schemeId: string, scheme: SchemePatch): ActionFunc {
     return bindClientFunc({
         clientFunc: Client4.patchScheme,
@@ -82,6 +86,7 @@ export function patchScheme(schemeId: string, scheme: SchemePatch): ActionFunc {
         params: [schemeId, scheme],
     });
 }
+
 export function getSchemeTeams(schemeId: string, page = 0, perPage: number = General.PAGE_SIZE_DEFAULT): ActionFunc {
     return bindClientFunc({
         clientFunc: Client4.getSchemeTeams,
@@ -91,6 +96,7 @@ export function getSchemeTeams(schemeId: string, page = 0, perPage: number = Gen
         params: [schemeId, page, perPage],
     });
 }
+
 export function getSchemeChannels(schemeId: string, page = 0, perPage: number = General.PAGE_SIZE_DEFAULT): ActionFunc {
     return bindClientFunc({
         clientFunc: Client4.getSchemeChannels,

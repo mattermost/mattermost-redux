@@ -23,6 +23,7 @@ export function getUserCurrentTimezone(userTimezone?: UserTimezone): string | un
 
     return manualTimezone;
 }
+
 export function getTimezoneRegion(timezone: string): string {
     if (timezone) {
         const split = timezone.split('/');

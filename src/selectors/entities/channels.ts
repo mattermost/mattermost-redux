@@ -26,12 +26,15 @@ type SortingType = 'recent' | 'alpha';
 export function getAllChannels(state: GlobalState): IDMappedObjects<Channel> {
     return state.entities.channels.channels;
 }
+
 export function getAllChannelStats(state: GlobalState): RelationOneToOne<Channel, ChannelStats> {
     return state.entities.channels.stats;
 }
+
 export function getChannelsInTeam(state: GlobalState): RelationOneToMany<Team, Channel> {
     return state.entities.channels.channelsInTeam;
 }
+
 export const getDirectChannelsSet: (a: GlobalState) => Set<string> = createSelector(getChannelsInTeam, (channelsInTeam: RelationOneToMany<Team, Channel>): Set<string> => {
     return channelsInTeam && new Set(channelsInTeam['']) || new Set();
 });
@@ -91,6 +94,7 @@ export function filterChannels(unreadIds: Array<string>, favoriteIds: Array<stri
 
     return channels;
 }
+
 export function makeGetChannel(): (b: GlobalState, a: {
     id: string;
 }) => Channel {
@@ -104,6 +108,7 @@ export function makeGetChannel(): (b: GlobalState, a: {
         return channel;
     });
 }
+
 export const getChannel: (b: GlobalState, a: string) => Channel = createSelector(getAllChannels, (state: GlobalState, id: string): string => id, (state: GlobalState): UsersState => state.entities.users, getTeammateNameDisplaySetting, (allChannels: IDMappedObjects<Channel>, channelId: string, users: UsersState, teammateNameDisplay: string): Channel => {
     const channel = allChannels[channelId];
 
@@ -143,18 +148,23 @@ export const isCurrentChannelDefault: (a: GlobalState) => boolean = createSelect
 export function isCurrentChannelReadOnly(state: GlobalState): boolean {
     return isChannelReadOnly(state, getCurrentChannel(state));
 }
+
 export function isChannelReadOnlyById(state: GlobalState, channelId: string): boolean {
     return isChannelReadOnly(state, getChannel(state, channelId));
 }
+
 export function isChannelReadOnly(state: GlobalState, channel: Channel): boolean {
     return channel && channel.name === General.DEFAULT_CHANNEL && !isCurrentUserSystemAdmin(state) && getConfig(state).ExperimentalTownSquareIsReadOnly === 'true';
 }
+
 export function shouldHideDefaultChannel(state: GlobalState, channel: Channel): boolean {
     return channel && channel.name === General.DEFAULT_CHANNEL && !isCurrentUserSystemAdmin(state) && getConfig(state).ExperimentalHideTownSquareinLHS === 'true';
 }
+
 export function getChannelByName(state: GlobalState, channelName: string): Channel | undefined | null {
     return getChannelByNameHelper(getAllChannels(state), channelName);
 }
+
 export const getChannelSetInCurrentTeam: (a: GlobalState) => Array<string> = createSelector(getCurrentTeamId, getChannelsInTeam, (currentTeamId: string, channelsInTeam: RelationOneToMany<Team, Channel>): Array<string> => {
     return channelsInTeam && channelsInTeam[currentTeamId] || [];
 });

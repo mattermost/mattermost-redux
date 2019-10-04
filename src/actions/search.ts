@@ -35,6 +35,7 @@ export function getMissingChannelsFromPosts(posts: RelationOneToOne<Post, Post>)
         return Promise.all(promises);
     };
 }
+
 export function searchPostsWithParams(teamId, params): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         const isGettingMore = params.page > 0;
@@ -81,6 +82,7 @@ export function searchPostsWithParams(teamId, params): ActionFunc {
         };
     };
 }
+
 export function searchPosts(teamId, terms, isOrSearch, includeDeletedChannels) {
     return searchPostsWithParams(teamId, {
         terms,
@@ -90,6 +92,7 @@ export function searchPosts(teamId, terms, isOrSearch, includeDeletedChannels) {
         per_page: WEBAPP_SEARCH_PER_PAGE,
     });
 }
+
 export function getMorePostsForSearch(): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         const teamId = getCurrentTeamId(getState());
@@ -107,6 +110,7 @@ export function getMorePostsForSearch(): ActionFunc {
         return {data: true};
     };
 }
+
 export function clearSearch(): ActionFunc {
     return async (dispatch) => {
         dispatch({
@@ -117,6 +121,7 @@ export function clearSearch(): ActionFunc {
         };
     };
 }
+
 export function getFlaggedPosts(): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         const state = getState();
@@ -153,6 +158,7 @@ export function getFlaggedPosts(): ActionFunc {
         };
     };
 }
+
 export function getPinnedPosts(channelId): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         dispatch({
@@ -192,6 +198,7 @@ export function getPinnedPosts(channelId): ActionFunc {
         };
     };
 }
+
 export function clearPinnedPosts(channelId): ActionFunc {
     return async (dispatch) => {
         dispatch({
@@ -205,6 +212,7 @@ export function clearPinnedPosts(channelId): ActionFunc {
         };
     };
 }
+
 export function getRecentMentions(): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         const state = getState();
@@ -252,6 +260,7 @@ export function getRecentMentions(): ActionFunc {
         };
     };
 }
+
 export function removeSearchTerms(teamId, terms): ActionFunc {
     return async (dispatch) => {
         dispatch({
@@ -266,6 +275,7 @@ export function removeSearchTerms(teamId, terms): ActionFunc {
         };
     };
 }
+
 export default {
     clearSearch,
     removeSearchTerms,

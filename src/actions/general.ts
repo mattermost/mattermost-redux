@@ -64,6 +64,7 @@ export function getPing(): ActionFunc {
         };
     };
 }
+
 export function resetPing(): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         dispatch({
@@ -75,6 +76,7 @@ export function resetPing(): ActionFunc {
         };
     };
 }
+
 export function getClientConfig(): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         dispatch({
@@ -109,6 +111,7 @@ export function getClientConfig(): ActionFunc {
         };
     };
 }
+
 export function getDataRetentionPolicy(): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         dispatch({
@@ -141,6 +144,7 @@ export function getDataRetentionPolicy(): ActionFunc {
         };
     };
 }
+
 export function getLicenseConfig(): ActionFunc {
     return bindClientFunc({
         clientFunc: Client4.getClientLicenseOld,
@@ -149,6 +153,7 @@ export function getLicenseConfig(): ActionFunc {
         onFailure: GeneralTypes.CLIENT_LICENSE_FAILURE,
     });
 }
+
 export function logClientError(message: string, level: logLevel = 'ERROR') {
     return bindClientFunc({
         clientFunc: Client4.logClientError,
@@ -158,6 +163,7 @@ export function logClientError(message: string, level: logLevel = 'ERROR') {
         params: [message, level],
     });
 }
+
 export function setAppState(state: GeneralState['appState']): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         dispatch({
@@ -169,6 +175,7 @@ export function setAppState(state: GeneralState['appState']): ActionFunc {
         };
     };
 }
+
 export function setDeviceToken(token: GeneralState['deviceToken']): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         dispatch({
@@ -180,6 +187,7 @@ export function setDeviceToken(token: GeneralState['deviceToken']): ActionFunc {
         };
     };
 }
+
 export function setServerVersion(serverVersion: string): ActionFunc {
     return async (dispatch, getState: GetStateFunc) => {
         dispatch({
@@ -192,6 +200,7 @@ export function setServerVersion(serverVersion: string): ActionFunc {
         };
     };
 }
+
 export function setStoreFromLocalData(data: {
     token: string;
     url: string;
@@ -202,6 +211,7 @@ export function setStoreFromLocalData(data: {
         return loadMe()(dispatch, getState);
     };
 }
+
 export function getSupportedTimezones() {
     return bindClientFunc({
         clientFunc: Client4.getTimezones,
@@ -210,10 +220,12 @@ export function getSupportedTimezones() {
         onFailure: GeneralTypes.SUPPORTED_TIMEZONES_FAILURE,
     });
 }
+
 export function setUrl(url: string) {
     Client4.setUrl(url);
     return true;
 }
+
 export function getRedirectLocation(url: string): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         dispatch({
@@ -259,6 +271,7 @@ export function getRedirectLocation(url: string): ActionFunc {
         };
     };
 }
+
 export default {
     getPing,
     getClientConfig,

@@ -35,6 +35,7 @@ export function getAudits(page = 0, perPage: number = General.PAGE_SIZE_DEFAULT)
         ],
     });
 }
+
 export function getConfig(): ActionFunc {
     return bindClientFunc({
         clientFunc: Client4.getConfig,
@@ -224,6 +225,7 @@ export function getLdapGroups(page = 0, perPage: number = General.PAGE_SIZE_MAXI
         ],
     });
 }
+
 export function linkLdapGroup(key: string): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         dispatch({
@@ -263,6 +265,7 @@ export function linkLdapGroup(key: string): ActionFunc {
         };
     };
 }
+
 export function unlinkLdapGroup(key: string): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         dispatch({
@@ -296,6 +299,7 @@ export function unlinkLdapGroup(key: string): ActionFunc {
         };
     };
 }
+
 export function getSamlCertificateStatus(): ActionFunc {
     return bindClientFunc({
         clientFunc: Client4.getSamlCertificateStatus,
@@ -304,6 +308,7 @@ export function getSamlCertificateStatus(): ActionFunc {
         onFailure: AdminTypes.SAML_CERT_STATUS_FAILURE,
     });
 }
+
 export function uploadPublicSamlCertificate(fileData: File): ActionFunc {
     return bindClientFunc({
         clientFunc: Client4.uploadPublicSamlCertificate,
@@ -313,6 +318,7 @@ export function uploadPublicSamlCertificate(fileData: File): ActionFunc {
         params: [fileData],
     });
 }
+
 export function uploadPrivateSamlCertificate(fileData: File): ActionFunc {
     return bindClientFunc({
         clientFunc: Client4.uploadPrivateSamlCertificate,
@@ -322,6 +328,7 @@ export function uploadPrivateSamlCertificate(fileData: File): ActionFunc {
         params: [fileData],
     });
 }
+
 export function uploadIdpSamlCertificate(fileData: File): ActionFunc {
     return bindClientFunc({
         clientFunc: Client4.uploadIdpSamlCertificate,
@@ -331,6 +338,7 @@ export function uploadIdpSamlCertificate(fileData: File): ActionFunc {
         params: [fileData],
     });
 }
+
 export function removePublicSamlCertificate(): ActionFunc {
     return bindClientFunc({
         clientFunc: Client4.deletePublicSamlCertificate,
@@ -339,6 +347,7 @@ export function removePublicSamlCertificate(): ActionFunc {
         onFailure: AdminTypes.DELETE_SAML_PUBLIC_FAILURE,
     });
 }
+
 export function removePrivateSamlCertificate(): ActionFunc {
     return bindClientFunc({
         clientFunc: Client4.deletePrivateSamlCertificate,
@@ -347,6 +356,7 @@ export function removePrivateSamlCertificate(): ActionFunc {
         onFailure: AdminTypes.DELETE_SAML_PRIVATE_FAILURE,
     });
 }
+
 export function removeIdpSamlCertificate(): ActionFunc {
     return bindClientFunc({
         clientFunc: Client4.deleteIdpSamlCertificate,
@@ -355,6 +365,7 @@ export function removeIdpSamlCertificate(): ActionFunc {
         onFailure: AdminTypes.DELETE_SAML_IDP_FAILURE,
     });
 }
+
 export function testElasticsearch(config: any): ActionFunc {
     return bindClientFunc({
         clientFunc: Client4.testElasticsearch,
@@ -364,6 +375,7 @@ export function testElasticsearch(config: any): ActionFunc {
         params: [config],
     });
 }
+
 export function purgeElasticsearchIndexes(): ActionFunc {
     return bindClientFunc({
         clientFunc: Client4.purgeElasticsearchIndexes,
@@ -372,6 +384,7 @@ export function purgeElasticsearchIndexes(): ActionFunc {
         onFailure: AdminTypes.PURGE_ELASTICSEARCH_INDEXES_FAILURE,
     });
 }
+
 export function uploadLicense(fileData: File): ActionFunc {
     return bindClientFunc({
         clientFunc: Client4.uploadLicense,
@@ -381,6 +394,7 @@ export function uploadLicense(fileData: File): ActionFunc {
         params: [fileData],
     });
 }
+
 export function removeLicense(): ActionFunc {
     return bindClientFunc({
         clientFunc: Client4.removeLicense,
@@ -389,6 +403,7 @@ export function removeLicense(): ActionFunc {
         onFailure: AdminTypes.REMOVE_LICENSE_FAILURE,
     });
 }
+
 export function getAnalytics(name: string, teamId = ''): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         dispatch({
@@ -436,21 +451,27 @@ export function getAnalytics(name: string, teamId = ''): ActionFunc {
         };
     };
 }
+
 export function getStandardAnalytics(teamId = ''): ActionFunc {
     return getAnalytics('standard', teamId);
 }
+
 export function getAdvancedAnalytics(teamId = ''): ActionFunc {
     return getAnalytics('extra_counts', teamId);
 }
+
 export function getPostsPerDayAnalytics(teamId = ''): ActionFunc {
     return getAnalytics('post_counts_day', teamId);
 }
+
 export function getBotPostsPerDayAnalytics(teamId = ''): ActionFunc {
     return getAnalytics('bot_post_counts_day', teamId);
 }
+
 export function getUsersPerDayAnalytics(teamId = ''): ActionFunc {
     return getAnalytics('user_counts_with_posts_day', teamId);
 }
+
 export function uploadPlugin(fileData: File, force = false): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         dispatch({
@@ -481,6 +502,7 @@ export function uploadPlugin(fileData: File, force = false): ActionFunc {
         };
     };
 }
+
 export function installPluginFromUrl(url: string, force = false): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         dispatch({
@@ -511,6 +533,7 @@ export function installPluginFromUrl(url: string, force = false): ActionFunc {
         };
     };
 }
+
 export function getPlugins(): ActionFunc {
     return bindClientFunc({
         clientFunc: Client4.getPlugins,
@@ -519,6 +542,7 @@ export function getPlugins(): ActionFunc {
         onFailure: AdminTypes.GET_PLUGIN_FAILURE,
     });
 }
+
 export function getPluginStatuses(): ActionFunc {
     return bindClientFunc({
         clientFunc: Client4.getPluginStatuses,
@@ -527,6 +551,7 @@ export function getPluginStatuses(): ActionFunc {
         onFailure: AdminTypes.GET_PLUGIN_STATUSES_FAILURE,
     });
 }
+
 export function removePlugin(pluginId: string): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         dispatch({
@@ -560,6 +585,7 @@ export function removePlugin(pluginId: string): ActionFunc {
         };
     };
 }
+
 export function enablePlugin(pluginId: string): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         dispatch({
@@ -593,6 +619,7 @@ export function enablePlugin(pluginId: string): ActionFunc {
         };
     };
 }
+
 export function disablePlugin(pluginId: string): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         dispatch({

@@ -19,6 +19,7 @@ function getFilesIdsForPost(state, postId) {
 export function getFilePublicLink(state) {
     return state.entities.files.filePublicLink;
 }
+
 export function makeGetFilesForPost() {
     return createSelector([getAllFiles, getFilesIdsForPost, getCurrentUserLocale], (allFiles, fileIdsForPost, locale) => {
         const fileInfos = fileIdsForPost.map((id) => allFiles[id]).filter((id) => Boolean(id));

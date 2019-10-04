@@ -18,6 +18,7 @@ export function getRolesByNames(rolesNames: Array<string>) {
         params: [rolesNames],
     });
 }
+
 export function getRoleByName(roleName: string) {
     return bindClientFunc({
         clientFunc: Client4.getRoleByName,
@@ -27,6 +28,7 @@ export function getRoleByName(roleName: string) {
         params: [roleName],
     });
 }
+
 export function getRole(roleId: string) {
     return bindClientFunc({
         clientFunc: Client4.getRole,
@@ -36,6 +38,7 @@ export function getRole(roleId: string) {
         params: [roleId],
     });
 }
+
 export function editRole(role: Role) {
     return bindClientFunc({
         clientFunc: Client4.patchRole,
@@ -45,6 +48,7 @@ export function editRole(role: Role) {
         params: [role.id, role],
     });
 }
+
 export function setPendingRoles(roles: Array<string>) {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         dispatch({
@@ -56,6 +60,7 @@ export function setPendingRoles(roles: Array<string>) {
         };
     };
 }
+
 export function loadRolesIfNeeded(roles: Iterable<string>): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         const state = getState();

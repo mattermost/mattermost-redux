@@ -48,12 +48,14 @@ export function checkMfa(loginId: string): ActionFunc {
         }
     };
 }
+
 export function generateMfaSecret(userId: string): ActionFunc {
     return bindClientFunc({
         clientFunc: Client4.generateMfaSecret,
         params: [userId],
     });
 }
+
 export function createUser(user: UserProfile, token: string, inviteId: string): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         let created;
@@ -82,6 +84,7 @@ export function createUser(user: UserProfile, token: string, inviteId: string): 
         };
     };
 }
+
 export function login(loginId: string, password: string, mfaToken = '', ldapOnly = false): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         dispatch({
@@ -106,6 +109,7 @@ export function login(loginId: string, password: string, mfaToken = '', ldapOnly
         return completeLogin(data)(dispatch, getState);
     };
 }
+
 export function loginById(id: string, password: string, mfaToken = ''): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         dispatch({
@@ -251,6 +255,7 @@ export function loadMe(): ActionFunc {
         };
     };
 }
+
 export function logout(): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         dispatch({
@@ -272,12 +277,14 @@ export function logout(): ActionFunc {
         };
     };
 }
+
 export function getTotalUsersStats(): ActionFunc {
     return bindClientFunc({
         clientFunc: Client4.getTotalUsersStats,
         onSuccess: UserTypes.RECEIVED_USER_STATS,
     });
 }
+
 export function getProfiles(page = 0, perPage: number = General.PROFILE_CHUNK_SIZE, options: any = {}): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         const {
@@ -305,6 +312,7 @@ export function getProfiles(page = 0, perPage: number = General.PROFILE_CHUNK_SI
         };
     };
 }
+
 export function getMissingProfilesByIds(userIds: Array<string>): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         const {
@@ -327,6 +335,7 @@ export function getMissingProfilesByIds(userIds: Array<string>): ActionFunc {
         };
     };
 }
+
 export function getMissingProfilesByUsernames(usernames: Array<string>): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         const {
@@ -352,6 +361,7 @@ export function getMissingProfilesByUsernames(usernames: Array<string>): ActionF
         };
     };
 }
+
 export function getProfilesByIds(userIds: Array<string>, options?: any): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         const {
@@ -379,6 +389,7 @@ export function getProfilesByIds(userIds: Array<string>, options?: any): ActionF
         };
     };
 }
+
 export function getProfilesByUsernames(usernames: Array<string>): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         const {
@@ -406,6 +417,7 @@ export function getProfilesByUsernames(usernames: Array<string>): ActionFunc {
         };
     };
 }
+
 export function getProfilesInTeam(teamId: string, page: number, perPage: number = General.PROFILE_CHUNK_SIZE, sort = '', options: any = {}): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         const {
@@ -436,6 +448,7 @@ export function getProfilesInTeam(teamId: string, page: number, perPage: number 
         };
     };
 }
+
 export function getProfilesNotInTeam(teamId: string, groupConstrained: boolean, page: number, perPage: number = General.PROFILE_CHUNK_SIZE): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         let profiles;
@@ -464,6 +477,7 @@ export function getProfilesNotInTeam(teamId: string, groupConstrained: boolean, 
         };
     };
 }
+
 export function getProfilesWithoutTeam(page: number, perPage: number = General.PROFILE_CHUNK_SIZE, options: any = {}): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         let profiles = null;
@@ -490,6 +504,7 @@ export function getProfilesWithoutTeam(page: number, perPage: number = General.P
         };
     };
 }
+
 export function getProfilesInChannel(channelId: string, page: number, perPage: number = General.PROFILE_CHUNK_SIZE, sort = ''): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         const {
@@ -520,6 +535,7 @@ export function getProfilesInChannel(channelId: string, page: number, perPage: n
         };
     };
 }
+
 export function getProfilesInGroupChannels(channelsIds: Array<string>): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         const {
@@ -559,6 +575,7 @@ export function getProfilesInGroupChannels(channelsIds: Array<string>): ActionFu
         };
     };
 }
+
 export function getProfilesNotInChannel(teamId: string, channelId: string, groupConstrained: boolean, page: number, perPage: number = General.PROFILE_CHUNK_SIZE): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         const {
@@ -590,6 +607,7 @@ export function getProfilesNotInChannel(teamId: string, channelId: string, group
         };
     };
 }
+
 export function getMe(): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         const getMeFunc = bindClientFunc({
@@ -607,6 +625,7 @@ export function getMe(): ActionFunc {
         return me;
     };
 }
+
 export function updateMyTermsOfServiceStatus(termsOfServiceId: string, accepted: boolean): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         const response: ActionResult = await dispatch(bindClientFunc({
@@ -636,29 +655,34 @@ export function updateMyTermsOfServiceStatus(termsOfServiceId: string, accepted:
         };
     };
 }
+
 export function getTermsOfService(): ActionFunc {
     return bindClientFunc({
         clientFunc: Client4.getTermsOfService,
     });
 }
+
 export function promoteGuestToUser(userId: string): ActionFunc {
     return bindClientFunc({
         clientFunc: Client4.promoteGuestToUser,
         params: [userId],
     });
 }
+
 export function demoteUserToGuest(userId: string): ActionFunc {
     return bindClientFunc({
         clientFunc: Client4.demoteUserToGuest,
         params: [userId],
     });
 }
+
 export function createTermsOfService(text: string): ActionFunc {
     return bindClientFunc({
         clientFunc: Client4.createTermsOfService,
         params: [text],
     });
 }
+
 export function getUser(id: string): ActionFunc {
     return bindClientFunc({
         clientFunc: Client4.getUser,
@@ -666,6 +690,7 @@ export function getUser(id: string): ActionFunc {
         params: [id],
     });
 }
+
 export function getUserByUsername(username: string): ActionFunc {
     return bindClientFunc({
         clientFunc: Client4.getUserByUsername,
@@ -673,6 +698,7 @@ export function getUserByUsername(username: string): ActionFunc {
         params: [username],
     });
 }
+
 export function getUserByEmail(email: string): ActionFunc {
     return bindClientFunc({
         clientFunc: Client4.getUserByEmail,
@@ -698,6 +724,7 @@ export function getStatusesByIdsBatchedDebounced(id: string) {
     ids = [...ids, id];
     return debouncedGetStatusesByIds;
 }
+
 export function getStatusesByIds(userIds: Array<string>): ActionFunc {
     return bindClientFunc({
         clientFunc: Client4.getStatusesByIds,
@@ -705,6 +732,7 @@ export function getStatusesByIds(userIds: Array<string>): ActionFunc {
         params: [userIds],
     });
 }
+
 export function getStatus(userId: string): ActionFunc {
     return bindClientFunc({
         clientFunc: Client4.getStatus,
@@ -712,6 +740,7 @@ export function getStatus(userId: string): ActionFunc {
         params: [userId],
     });
 }
+
 export function setStatus(status: string): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         try {
@@ -733,6 +762,7 @@ export function setStatus(status: string): ActionFunc {
         };
     };
 }
+
 export function getSessions(userId: string): ActionFunc {
     return bindClientFunc({
         clientFunc: Client4.getSessions,
@@ -740,6 +770,7 @@ export function getSessions(userId: string): ActionFunc {
         params: [userId],
     });
 }
+
 export function revokeSession(userId: string, sessionId: string): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         try {
@@ -762,6 +793,7 @@ export function revokeSession(userId: string, sessionId: string): ActionFunc {
         };
     };
 }
+
 export function revokeAllSessionsForUser(userId: string): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         try {
@@ -786,6 +818,7 @@ export function revokeAllSessionsForUser(userId: string): ActionFunc {
         };
     };
 }
+
 export function revokeSessionsForAllUsers(): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         try {
@@ -807,6 +840,7 @@ export function revokeSessionsForAllUsers(): ActionFunc {
         };
     };
 }
+
 export function loadProfilesForDirect(): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         const state = getState();
@@ -850,6 +884,7 @@ export function loadProfilesForDirect(): ActionFunc {
         };
     };
 }
+
 export function getUserAudits(userId: string, page = 0, perPage: number = General.AUDITS_CHUNK_SIZE): ActionFunc {
     return bindClientFunc({
         clientFunc: Client4.getUserAudits,
@@ -857,6 +892,7 @@ export function getUserAudits(userId: string, page = 0, perPage: number = Genera
         params: [userId, page, perPage],
     });
 }
+
 export function autocompleteUsers(term: string, teamId = '', channelId = '', options: {
     limit: number;
 } = {
@@ -926,6 +962,7 @@ export function autocompleteUsers(term: string, teamId = '', channelId = '', opt
         };
     };
 }
+
 export function searchProfiles(term: string, options: any = {}): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         const {
@@ -1015,6 +1052,7 @@ export function startPeriodicStatusUpdates(): ActionFunc {
         };
     };
 }
+
 export function stopPeriodicStatusUpdates(): ActionFunc {
     return async () => {
         if (statusIntervalId) {
@@ -1026,6 +1064,7 @@ export function stopPeriodicStatusUpdates(): ActionFunc {
         };
     };
 }
+
 export function updateMe(user: UserProfile): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         dispatch({
@@ -1058,6 +1097,7 @@ export function updateMe(user: UserProfile): ActionFunc {
         };
     };
 }
+
 export function patchUser(user: UserProfile): ActionFunc {
     return async (dispatch: DispatchFunc) => {
         let data: UserProfile;
@@ -1080,6 +1120,7 @@ export function patchUser(user: UserProfile): ActionFunc {
         };
     };
 }
+
 export function updateUserRoles(userId: string, roles: Array<string>): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         try {
@@ -1106,6 +1147,7 @@ export function updateUserRoles(userId: string, roles: Array<string>): ActionFun
         };
     };
 }
+
 export function updateUserMfa(userId: string, activate: boolean, code = ''): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         try {
@@ -1133,6 +1175,7 @@ export function updateUserMfa(userId: string, activate: boolean, code = ''): Act
         };
     };
 }
+
 export function updateUserPassword(userId: string, currentPassword: string, newPassword: string): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         try {
@@ -1160,6 +1203,7 @@ export function updateUserPassword(userId: string, currentPassword: string, newP
         };
     };
 }
+
 export function updateUserActive(userId: string, active: boolean): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         try {
@@ -1188,30 +1232,35 @@ export function updateUserActive(userId: string, active: boolean): ActionFunc {
         };
     };
 }
+
 export function verifyUserEmail(token: string): ActionFunc {
     return bindClientFunc({
         clientFunc: Client4.verifyUserEmail,
         params: [token],
     });
 }
+
 export function sendVerificationEmail(email: string): ActionFunc {
     return bindClientFunc({
         clientFunc: Client4.sendVerificationEmail,
         params: [email],
     });
 }
+
 export function resetUserPassword(token: string, newPassword: string): ActionFunc {
     return bindClientFunc({
         clientFunc: Client4.resetUserPassword,
         params: [token, newPassword],
     });
 }
+
 export function sendPasswordResetEmail(email: string): ActionFunc {
     return bindClientFunc({
         clientFunc: Client4.sendPasswordResetEmail,
         params: [email],
     });
 }
+
 export function setDefaultProfileImage(userId: string): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         try {
@@ -1239,6 +1288,7 @@ export function setDefaultProfileImage(userId: string): ActionFunc {
         };
     };
 }
+
 export function uploadProfileImage(userId: string, imageData: any): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         try {
@@ -1265,30 +1315,35 @@ export function uploadProfileImage(userId: string, imageData: any): ActionFunc {
         };
     };
 }
+
 export function switchEmailToOAuth(service: string, email: string, password: string, mfaCode = ''): ActionFunc {
     return bindClientFunc({
         clientFunc: Client4.switchEmailToOAuth,
         params: [service, email, password, mfaCode],
     });
 }
+
 export function switchOAuthToEmail(currentService: string, email: string, password: string): ActionFunc {
     return bindClientFunc({
         clientFunc: Client4.switchOAuthToEmail,
         params: [currentService, email, password],
     });
 }
+
 export function switchEmailToLdap(email: string, emailPassword: string, ldapId: string, ldapPassword: string, mfaCode = ''): ActionFunc {
     return bindClientFunc({
         clientFunc: Client4.switchEmailToLdap,
         params: [email, emailPassword, ldapId, ldapPassword, mfaCode],
     });
 }
+
 export function switchLdapToEmail(ldapPassword: string, email: string, emailPassword: string, mfaCode = ''): ActionFunc {
     return bindClientFunc({
         clientFunc: Client4.switchLdapToEmail,
         params: [ldapPassword, email, emailPassword, mfaCode],
     });
 }
+
 export function createUserAccessToken(userId: string, description: string): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         let data;
@@ -1328,6 +1383,7 @@ export function createUserAccessToken(userId: string, description: string): Acti
         };
     };
 }
+
 export function getUserAccessToken(tokenId: string): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         let data;
@@ -1363,6 +1419,7 @@ export function getUserAccessToken(tokenId: string): ActionFunc {
         };
     };
 }
+
 export function getUserAccessTokens(page = 0, perPage: number = General.PROFILE_CHUNK_SIZE): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         let data;
@@ -1387,6 +1444,7 @@ export function getUserAccessTokens(page = 0, perPage: number = General.PROFILE_
         };
     };
 }
+
 export function getUserAccessTokensForUser(userId: string, page = 0, perPage: number = General.PROFILE_CHUNK_SIZE): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         let data;
@@ -1423,6 +1481,7 @@ export function getUserAccessTokensForUser(userId: string, page = 0, perPage: nu
         };
     };
 }
+
 export function revokeUserAccessToken(tokenId: string): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         try {
@@ -1444,6 +1503,7 @@ export function revokeUserAccessToken(tokenId: string): ActionFunc {
         };
     };
 }
+
 export function disableUserAccessToken(tokenId: string): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         try {
@@ -1465,6 +1525,7 @@ export function disableUserAccessToken(tokenId: string): ActionFunc {
         };
     };
 }
+
 export function enableUserAccessToken(tokenId: string): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         try {
@@ -1486,6 +1547,7 @@ export function enableUserAccessToken(tokenId: string): ActionFunc {
         };
     };
 }
+
 export function clearUserAccessTokens(): ActionFunc {
     return async (dispatch) => {
         dispatch({
@@ -1497,6 +1559,7 @@ export function clearUserAccessTokens(): ActionFunc {
         };
     };
 }
+
 export function checkForModifiedUsers() {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         const state = getState();
@@ -1518,6 +1581,7 @@ export function checkForModifiedUsers() {
         };
     };
 }
+
 export default {
     checkMfa,
     generateMfaSecret,

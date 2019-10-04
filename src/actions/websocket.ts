@@ -82,6 +82,7 @@ export function close(shouldReconnect = false) {
         }
     };
 }
+
 export function doFirstConnect(now: number) {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         const state = getState();
@@ -100,6 +101,7 @@ export function doFirstConnect(now: number) {
         };
     };
 }
+
 export function doReconnect(now: number) {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         const state = getState();

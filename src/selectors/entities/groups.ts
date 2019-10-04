@@ -10,9 +10,11 @@ const emptySyncables = {
 export function getAllGroups(state) {
     return state.entities.groups.groups;
 }
+
 export function getGroup(state, id) {
     return getAllGroups(state)[id];
 }
+
 export function getGroupMemberCount(state, id) {
     const memberData = state.entities.groups.members;
     const groupMemberData = memberData[id];
@@ -31,9 +33,11 @@ function getGroupSyncables(state, id) {
 export function getGroupTeams(state, id) {
     return getGroupSyncables(state, id).teams;
 }
+
 export function getGroupChannels(state, id) {
     return getGroupSyncables(state, id).channels;
 }
+
 export function getGroupMembers(state, id) {
     const groupMemberData = state.entities.groups.members[id];
 

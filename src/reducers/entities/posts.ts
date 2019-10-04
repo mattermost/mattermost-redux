@@ -59,6 +59,7 @@ export function removeUnneededMetadata(post) {
         metadata,
     };
 }
+
 export function handlePosts(state: RelationOneToOne<Post, Post> = {}, action) {
     switch (action.type) {
     case PostTypes.RECEIVED_POST:
@@ -290,6 +291,7 @@ export function handlePendingPosts(state: Array<string> = [], action) {
         return state;
     }
 }
+
 export function postsInChannel(state = {}, action, prevPosts, nextPosts) {
     switch (action.type) {
     case PostTypes.RECEIVED_NEW_POST:
@@ -662,9 +664,11 @@ export function postsInChannel(state = {}, action, prevPosts, nextPosts) {
         return state;
     }
 }
+
 export function removeNonRecentEmptyPostBlocks(blocks) {
     return blocks.filter((block) => block.order.length !== 0 || block.recent);
 }
+
 export function mergePostBlocks(blocks, posts) {
     let nextBlocks = [...blocks]; // Remove any blocks that may have become empty by removing posts
 
@@ -714,6 +718,7 @@ export function mergePostBlocks(blocks, posts) {
 
     return nextBlocks;
 }
+
 export function mergePostOrder(left, right, posts) {
     const result = [...left]; // Add without duplicates
 
@@ -737,6 +742,7 @@ export function mergePostOrder(left, right, posts) {
     result.sort((a, b) => posts[b].create_at - posts[a].create_at);
     return result;
 }
+
 export function postsInThread(state: {[x: string]: string[]} = {}, action, prevPosts) {
     switch (action.type) {
     case PostTypes.RECEIVED_NEW_POST:
@@ -1214,6 +1220,7 @@ export function expandedURLs(state = {}, action) {
         return state;
     }
 }
+
 export default function(state: Partial<PostsState> = {}, action) {
     const nextPosts = handlePosts(state.posts, action);
     const nextPostsInChannel = postsInChannel(state.postsInChannel, action, state.posts, nextPosts);

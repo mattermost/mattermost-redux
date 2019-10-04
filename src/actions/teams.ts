@@ -63,6 +63,7 @@ export function selectTeam(team: Team): ActionFunc {
         };
     };
 }
+
 export function getMyTeams(): ActionFunc {
     return bindClientFunc({
         clientFunc: Client4.getMyTeams,
@@ -71,12 +72,14 @@ export function getMyTeams(): ActionFunc {
         onFailure: TeamTypes.MY_TEAMS_FAILURE,
     });
 }
+
 export function getMyTeamUnreads(): ActionFunc {
     return bindClientFunc({
         clientFunc: Client4.getMyTeamUnreads,
         onSuccess: TeamTypes.RECEIVED_MY_TEAM_UNREADS,
     });
 }
+
 export function getTeam(teamId: string): ActionFunc {
     return bindClientFunc({
         clientFunc: Client4.getTeam,
@@ -84,6 +87,7 @@ export function getTeam(teamId: string): ActionFunc {
         params: [teamId],
     });
 }
+
 export function getTeamByName(teamName: string): ActionFunc {
     return bindClientFunc({
         clientFunc: Client4.getTeamByName,
@@ -91,6 +95,7 @@ export function getTeamByName(teamName: string): ActionFunc {
         params: [teamName],
     });
 }
+
 export function getTeams(page = 0, perPage: number = General.TEAMS_CHUNK_SIZE, includeTotalCount = false): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         let data;
@@ -134,6 +139,7 @@ export function getTeams(page = 0, perPage: number = General.TEAMS_CHUNK_SIZE, i
         };
     };
 }
+
 export function searchTeams(term: string): ActionFunc {
     return bindClientFunc({
         clientFunc: Client4.searchTeams,
@@ -143,6 +149,7 @@ export function searchTeams(term: string): ActionFunc {
         params: [term],
     });
 }
+
 export function createTeam(team: Team): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         let created;
@@ -181,6 +188,7 @@ export function createTeam(team: Team): ActionFunc {
         };
     };
 }
+
 export function deleteTeam(teamId: string): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         try {
@@ -219,6 +227,7 @@ export function deleteTeam(teamId: string): ActionFunc {
         };
     };
 }
+
 export function updateTeam(team: Team): ActionFunc {
     return bindClientFunc({
         clientFunc: Client4.updateTeam,
@@ -226,6 +235,7 @@ export function updateTeam(team: Team): ActionFunc {
         params: [team],
     });
 }
+
 export function patchTeam(team: Team): ActionFunc {
     return bindClientFunc({
         clientFunc: Client4.patchTeam,
@@ -233,6 +243,7 @@ export function patchTeam(team: Team): ActionFunc {
         params: [team],
     });
 }
+
 export function regenerateTeamInviteId(teamId: string): ActionFunc {
     return bindClientFunc({
         clientFunc: Client4.regenerateTeamInviteId,
@@ -240,6 +251,7 @@ export function regenerateTeamInviteId(teamId: string): ActionFunc {
         params: [teamId],
     });
 }
+
 export function getMyTeamMembers(): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         const getMyTeamMembersFunc = bindClientFunc({
@@ -265,6 +277,7 @@ export function getMyTeamMembers(): ActionFunc {
         return teamMembers;
     };
 }
+
 export function getTeamMembers(teamId: string, page = 0, perPage: number = General.TEAMS_CHUNK_SIZE): ActionFunc {
     return bindClientFunc({
         clientFunc: Client4.getTeamMembers,
@@ -274,6 +287,7 @@ export function getTeamMembers(teamId: string, page = 0, perPage: number = Gener
         params: [teamId, page, perPage],
     });
 }
+
 export function getTeamMember(teamId: string, userId: string): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         let member;
@@ -299,6 +313,7 @@ export function getTeamMember(teamId: string, userId: string): ActionFunc {
         };
     };
 }
+
 export function getTeamMembersByIds(teamId: string, userIds: Array<string>): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         let members;
@@ -324,6 +339,7 @@ export function getTeamMembersByIds(teamId: string, userIds: Array<string>): Act
         };
     };
 }
+
 export function getTeamsForUser(userId: string): ActionFunc {
     return bindClientFunc({
         clientFunc: Client4.getTeamsForUser,
@@ -333,6 +349,7 @@ export function getTeamsForUser(userId: string): ActionFunc {
         params: [userId],
     });
 }
+
 export function getTeamMembersForUser(userId: string): ActionFunc {
     return bindClientFunc({
         clientFunc: Client4.getTeamMembersForUser,
@@ -340,6 +357,7 @@ export function getTeamMembersForUser(userId: string): ActionFunc {
         params: [userId],
     });
 }
+
 export function getTeamStats(teamId: string): ActionFunc {
     return bindClientFunc({
         clientFunc: Client4.getTeamStats,
@@ -347,6 +365,7 @@ export function getTeamStats(teamId: string): ActionFunc {
         params: [teamId],
     });
 }
+
 export function addUserToTeamFromInvite(token: string, inviteId: string): ActionFunc {
     return bindClientFunc({
         clientFunc: Client4.addToTeamFromInvite,
@@ -356,6 +375,7 @@ export function addUserToTeamFromInvite(token: string, inviteId: string): Action
         params: [token, inviteId],
     });
 }
+
 export function addUserToTeam(teamId: string, userId: string): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         let member;
@@ -385,6 +405,7 @@ export function addUserToTeam(teamId: string, userId: string): ActionFunc {
         };
     };
 }
+
 export function addUsersToTeam(teamId: string, userIds: Array<string>): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         let members;
@@ -416,6 +437,7 @@ export function addUsersToTeam(teamId: string, userIds: Array<string>): ActionFu
         };
     };
 }
+
 export function removeUserFromTeam(teamId: string, userId: string): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         try {
@@ -473,6 +495,7 @@ export function removeUserFromTeam(teamId: string, userId: string): ActionFunc {
         };
     };
 }
+
 export function updateTeamMemberRoles(teamId: string, userId: string, roles: string): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         try {
@@ -501,18 +524,21 @@ export function updateTeamMemberRoles(teamId: string, userId: string, roles: str
         };
     };
 }
+
 export function sendEmailInvitesToTeam(teamId: string, emails: Array<string>): ActionFunc {
     return bindClientFunc({
         clientFunc: Client4.sendEmailInvitesToTeam,
         params: [teamId, emails],
     });
 }
+
 export function sendEmailGuestInvitesToChannels(teamId: string, channelIds: Array<string>, emails: Array<string>, message: string): ActionFunc {
     return bindClientFunc({
         clientFunc: Client4.sendEmailGuestInvitesToChannels,
         params: [teamId, channelIds, emails, message],
     });
 }
+
 export function getTeamInviteInfo(inviteId: string): ActionFunc {
     return bindClientFunc({
         clientFunc: Client4.getTeamInviteInfo,
@@ -522,6 +548,7 @@ export function getTeamInviteInfo(inviteId: string): ActionFunc {
         params: [inviteId],
     });
 }
+
 export function checkIfTeamExists(teamName: string): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         let data;
@@ -541,6 +568,7 @@ export function checkIfTeamExists(teamName: string): ActionFunc {
         };
     };
 }
+
 export function joinTeam(inviteId: string, teamId: string): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         dispatch({
@@ -578,18 +606,21 @@ export function joinTeam(inviteId: string, teamId: string): ActionFunc {
         };
     };
 }
+
 export function setTeamIcon(teamId: string, imageData: File): ActionFunc {
     return bindClientFunc({
         clientFunc: Client4.setTeamIcon,
         params: [teamId, imageData],
     });
 }
+
 export function removeTeamIcon(teamId: string): ActionFunc {
     return bindClientFunc({
         clientFunc: Client4.removeTeamIcon,
         params: [teamId],
     });
 }
+
 export function updateTeamScheme(teamId: string, schemeId: string): ActionFunc {
     return bindClientFunc({
         clientFunc: async () => {
@@ -602,6 +633,7 @@ export function updateTeamScheme(teamId: string, schemeId: string): ActionFunc {
         onSuccess: TeamTypes.UPDATED_TEAM_SCHEME,
     });
 }
+
 export function updateTeamMemberSchemeRoles(teamId: string, userId: string, isSchemeUser: boolean, isSchemeAdmin: boolean): ActionFunc {
     return bindClientFunc({
         clientFunc: async () => {
@@ -616,11 +648,13 @@ export function updateTeamMemberSchemeRoles(teamId: string, userId: string, isSc
         onSuccess: TeamTypes.UPDATED_TEAM_MEMBER_SCHEME_ROLES,
     });
 }
+
 export function invalidateAllEmailInvites(): ActionFunc {
     return bindClientFunc({
         clientFunc: Client4.invalidateAllEmailInvites,
     });
 }
+
 export function membersMinusGroupMembers(teamID: string, groupIDs: Array<string>, page = 0, perPage: number = General.PROFILE_CHUNK_SIZE): ActionFunc {
     return bindClientFunc({
         clientFunc: Client4.teamMembersMinusGroupMembers,

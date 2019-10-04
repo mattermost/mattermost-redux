@@ -53,6 +53,7 @@ export function getComponents(inColor: string): {
         alpha: 1,
     };
 }
+
 export function changeOpacity(oldColor: string, opacity: number): string {
     const {
         red,

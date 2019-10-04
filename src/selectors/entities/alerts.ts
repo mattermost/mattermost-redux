@@ -8,9 +8,11 @@ import {GlobalState} from 'types/store';
 export function getAlerts(state: GlobalState) {
     return state.entities.alerts.alertStack;
 }
+
 export function getLatestAlert(state: GlobalState) {
     return state.entities.alerts.alertStack[0];
 }
+
 export const getLatestNotificationAlert: (state: GlobalState) => AlertType | undefined | null = createSelector(getAlerts, (alerts) => {
     return alerts.find((a) => a.type === Alerts.ALERT_NOTIFICATION);
 });

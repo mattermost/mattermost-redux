@@ -7,9 +7,11 @@ import {IDMappedObjects} from 'types/utilities';
 export function getAllJobs(state: GlobalState): IDMappedObjects<Job> {
     return state.entities.jobs.jobs;
 }
+
 export function getJobsByType(state: GlobalState): JobsByType {
     return state.entities.jobs.jobsByTypeList;
 }
+
 export function makeGetJobsByType(type: JobType): (state: GlobalState) => Array<Job> {
     return createSelector(getJobsByType, (jobsByType) => {
         return jobsByType[type] || [];

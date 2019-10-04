@@ -13,6 +13,7 @@ export function saveAppPropsRequest(props) {
         props,
     };
 }
+
 export function saveAppProps(appProps) {
     return (dispatch: DispatchFunc, getState: GetStateFunc) => {
         const {
@@ -32,30 +33,35 @@ export function selectSearchText(searchText) {
         searchText,
     };
 }
+
 export function updateSearchText(searchText) {
     return {
         type: GifTypes.UPDATE_SEARCH_TEXT,
         searchText,
     };
 }
+
 export function searchBarTextSave(searchBarText) {
     return {
         type: GifTypes.SAVE_SEARCH_BAR_TEXT,
         searchBarText,
     };
 }
+
 export function invalidateSearchText(searchText) {
     return {
         type: GifTypes.INVALIDATE_SEARCH_TEXT,
         searchText,
     };
 }
+
 export function requestSearch(searchText) {
     return {
         type: GifTypes.REQUEST_SEARCH,
         searchText,
     };
 }
+
 export function receiveSearch({
     searchText,
     count,
@@ -72,12 +78,14 @@ export function receiveSearch({
         receivedAt: Date.now(),
     };
 }
+
 export function receiveSearchEnd(searchText) {
     return {
         type: GifTypes.RECEIVE_SEARCH_END,
         searchText,
     };
 }
+
 export function errorSearching(err, searchText) {
     return {
         type: GifTypes.SEARCH_FAILURE,
@@ -85,6 +93,7 @@ export function errorSearching(err, searchText) {
         err,
     };
 }
+
 export function receiveCategorySearch({
     tagName,
     json,
@@ -96,11 +105,13 @@ export function receiveCategorySearch({
         receiveAt: Date.now(),
     };
 }
+
 export function clearSearchResults() {
     return {
         type: GifTypes.CLEAR_SEARCH_RESULTS,
     };
 }
+
 export function requestSearchById(gfyId) {
     return {
         type: GifTypes.SEARCH_BY_ID_REQUEST,
@@ -109,6 +120,7 @@ export function requestSearchById(gfyId) {
         },
     };
 }
+
 export function receiveSearchById(gfyId, gfyItem) {
     return {
         type: GifTypes.SEARCH_BY_ID_SUCCESS,
@@ -118,6 +130,7 @@ export function receiveSearchById(gfyId, gfyItem) {
         },
     };
 }
+
 export function errorSearchById(err, gfyId) {
     return {
         type: GifTypes.SEARCH_BY_ID_FAILURE,
@@ -125,18 +138,21 @@ export function errorSearchById(err, gfyId) {
         gfyId,
     };
 }
+
 export function searchScrollPosition(scrollPosition) {
     return {
         type: GifTypes.SAVE_SEARCH_SCROLL_POSITION,
         scrollPosition,
     };
 }
+
 export function searchPriorLocation(priorLocation) {
     return {
         type: GifTypes.SAVE_SEARCH_PRIOR_LOCATION,
         priorLocation,
     };
 }
+
 export function searchGfycat({
     searchText,
     count = 30,
@@ -189,6 +205,7 @@ export function searchGfycat({
         }).catch((err) => dispatch(errorSearching(err, searchText)));
     };
 }
+
 export function searchCategory({
     tagName = '',
     gfyCount = 30,
@@ -240,6 +257,7 @@ export function searchCategory({
         }).catch((err) => dispatch(errorSearching(err, tagName)));
     };
 }
+
 export function shouldSearch(state, searchText) {
     const resultsByTerm = state.search.resultsByTerm[searchText];
 
@@ -253,6 +271,7 @@ export function shouldSearch(state, searchText) {
 
     return resultsByTerm.didInvalidate;
 }
+
 export function searchIfNeeded(searchText) {
     return (dispatch: DispatchFunc, getState: GetStateFunc) => {
         if (shouldSearch(getState(), searchText)) {
@@ -270,6 +289,7 @@ export function searchIfNeeded(searchText) {
         return Promise.resolve();
     };
 }
+
 export function searchIfNeededInitial(searchText) {
     return (dispatch: DispatchFunc, getState: GetStateFunc) => {
         dispatch(updateSearchText(searchText));
@@ -289,6 +309,7 @@ export function searchIfNeededInitial(searchText) {
         return Promise.resolve();
     };
 }
+
 export function shouldSearchInitial(state, searchText) {
     const resultsByTerm = state.entities.gifs.search.resultsByTerm[searchText];
 
@@ -300,6 +321,7 @@ export function shouldSearchInitial(state, searchText) {
 
     return false;
 }
+
 export function searchById(gfyId) {
     return (dispatch: DispatchFunc, getState: GetStateFunc) => {
         const {
@@ -315,9 +337,11 @@ export function searchById(gfyId) {
         }).catch((err) => dispatch(errorSearchById(err, gfyId)));
     };
 }
+
 export function shouldSearchById(state, gfyId) {
     return !state.entities.gifs.cache.gifs[gfyId];
 }
+
 export function searchByIdIfNeeded(gfyId) {
     return (dispatch: DispatchFunc, getState: GetStateFunc) => {
         if (shouldSearchById(getState(), gfyId)) {
@@ -327,21 +351,25 @@ export function searchByIdIfNeeded(gfyId) {
         return Promise.resolve(getState().entities.gifs.cache.gifs[gfyId]); //TODO: investigate
     };
 }
+
 export function saveSearchScrollPosition(scrollPosition) {
     return (dispatch: DispatchFunc) => {
         dispatch(searchScrollPosition(scrollPosition));
     };
 }
+
 export function saveSearchPriorLocation(priorLocation) {
     return (dispatch: DispatchFunc) => {
         dispatch(searchPriorLocation(priorLocation));
     };
 }
+
 export function searchTextUpdate(searchText) {
     return (dispatch: DispatchFunc) => {
         dispatch(updateSearchText(searchText));
     };
 }
+
 export function saveSearchBarText(searchBarText) {
     return (dispatch: DispatchFunc) => {
         dispatch(searchBarTextSave(searchBarText));
@@ -355,18 +383,21 @@ export function categoriesListRequest() {
         type: GifTypes.REQUEST_CATEGORIES_LIST,
     };
 }
+
 export function categoriesListReceived(json) {
     return {
         type: GifTypes.CATEGORIES_LIST_RECEIVED,
         ...json,
     };
 }
+
 export function categoriesListFailure(err) {
     return {
         type: GifTypes.CATEGORIES_LIST_FAILURE,
         err,
     };
 }
+
 export function requestCategoriesList({
     count = 60,
 } = {}) {
@@ -407,6 +438,7 @@ export function requestCategoriesList({
         });
     };
 }
+
 export function requestCategoriesListIfNeeded({
     count,
 } = {count: undefined}) {
@@ -422,6 +454,7 @@ export function requestCategoriesListIfNeeded({
         }));
     };
 }
+
 export function shouldRequestCategoriesList(state) {
     const {
         hasMore,
@@ -450,12 +483,14 @@ export function cacheRequest() {
         },
     };
 }
+
 export function cacheGifs(gifs) {
     return {
         type: GifTypes.CACHE_GIFS,
         gifs,
     };
 }
+
 export function cacheGifsRequest(gifs) {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         dispatch(cacheRequest());

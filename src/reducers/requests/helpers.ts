@@ -9,6 +9,7 @@ export function initialRequestState(): RequestStatusType {
         error: null,
     };
 }
+
 export function handleRequest(REQUEST: string, SUCCESS: string, FAILURE: string, state: RequestStatusType, action: GenericAction): RequestStatusType {
     switch (action.type) {
     case REQUEST:

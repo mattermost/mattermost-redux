@@ -16,6 +16,7 @@ export let systemEmojis: Map<string, SystemEmoji> = new Map();
 export function setSystemEmojis(emojis: Map<string, SystemEmoji>) {
     systemEmojis = emojis;
 }
+
 export function createCustomEmoji(emoji: any, image: any): ActionFunc {
     return bindClientFunc({
         clientFunc: Client4.createCustomEmoji,
@@ -23,6 +24,7 @@ export function createCustomEmoji(emoji: any, image: any): ActionFunc {
         params: [emoji, image],
     });
 }
+
 export function getCustomEmoji(emojiId: string): ActionFunc {
     return bindClientFunc({
         clientFunc: Client4.getCustomEmoji,
@@ -30,6 +32,7 @@ export function getCustomEmoji(emojiId: string): ActionFunc {
         params: [emojiId],
     });
 }
+
 export function getCustomEmojiByName(name: string): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         let data;
@@ -62,6 +65,7 @@ export function getCustomEmojiByName(name: string): ActionFunc {
         };
     };
 }
+
 export function getCustomEmojisByName(names: Array<string>): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         if (!names || names.length === 0) {
@@ -78,6 +82,7 @@ export function getCustomEmojisByName(names: Array<string>): ActionFunc {
         };
     };
 }
+
 export function getCustomEmojisInText(text: string): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         if (!text) {
@@ -93,6 +98,7 @@ export function getCustomEmojisInText(text: string): ActionFunc {
         return getCustomEmojisByName(Array.from(emojisToLoad))(dispatch, getState);
     };
 }
+
 export function getCustomEmojis(page = 0, perPage: number = General.PAGE_SIZE_DEFAULT, sort: string = Emoji.SORT_BY_NAME, loadUsers = false): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         let data;
@@ -120,6 +126,7 @@ export function getCustomEmojis(page = 0, perPage: number = General.PAGE_SIZE_DE
         };
     };
 }
+
 export function loadProfilesForCustomEmojis(emojis: Array<CustomEmoji>): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         const usersToLoad: {[x: string]: boolean} = {};
@@ -139,6 +146,7 @@ export function loadProfilesForCustomEmojis(emojis: Array<CustomEmoji>): ActionF
         };
     };
 }
+
 export function getAllCustomEmojis(perPage: number = General.PAGE_SIZE_MAXIMUM): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         dispatch({
@@ -179,6 +187,7 @@ export function getAllCustomEmojis(perPage: number = General.PAGE_SIZE_MAXIMUM):
         };
     };
 }
+
 export function deleteCustomEmoji(emojiId: string): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         try {
@@ -202,6 +211,7 @@ export function deleteCustomEmoji(emojiId: string): ActionFunc {
         };
     };
 }
+
 export function searchCustomEmojis(term: string, options: any = {}, loadUsers = false): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         let data;
@@ -229,6 +239,7 @@ export function searchCustomEmojis(term: string, options: any = {}, loadUsers = 
         };
     };
 }
+
 export function autocompleteCustomEmojis(name: string): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         let data;

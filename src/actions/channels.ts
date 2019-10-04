@@ -24,6 +24,7 @@ export function selectChannel(channelId: string) {
         data: channelId,
     };
 }
+
 export function createChannel(channel: Channel, userId: string): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         let created;
@@ -83,6 +84,7 @@ export function createChannel(channel: Channel, userId: string): ActionFunc {
         };
     };
 }
+
 export function createDirectChannel(userId: string, otherUserId: string): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         dispatch({
@@ -155,6 +157,7 @@ export function createDirectChannel(userId: string, otherUserId: string): Action
         };
     };
 }
+
 export function markGroupChannelOpen(channelId: string): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         const {
@@ -174,6 +177,7 @@ export function markGroupChannelOpen(channelId: string): ActionFunc {
         return dispatch(savePreferences(currentUserId, preferences));
     };
 }
+
 export function createGroupChannel(userIds: Array<string>): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         dispatch({
@@ -257,6 +261,7 @@ export function createGroupChannel(userIds: Array<string>): ActionFunc {
         };
     };
 }
+
 export function patchChannel(channelId: string, patch: Channel): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         dispatch({
@@ -289,6 +294,7 @@ export function patchChannel(channelId: string, patch: Channel): ActionFunc {
         };
     };
 }
+
 export function updateChannel(channel: Channel): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         dispatch({
@@ -321,6 +327,7 @@ export function updateChannel(channel: Channel): ActionFunc {
         };
     };
 }
+
 export function updateChannelPrivacy(channelId: string, privacy: string): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         dispatch({
@@ -353,6 +360,7 @@ export function updateChannelPrivacy(channelId: string, privacy: string): Action
         };
     };
 }
+
 export function convertChannelToPrivate(channelId: string): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         dispatch({
@@ -385,6 +393,7 @@ export function convertChannelToPrivate(channelId: string): ActionFunc {
         };
     };
 }
+
 export function updateChannelNotifyProps(userId: string, channelId: string, props: ChannelNotifyProps): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         const notifyProps = {
@@ -419,6 +428,7 @@ export function updateChannelNotifyProps(userId: string, channelId: string, prop
         };
     };
 }
+
 export function getChannelByNameAndTeamName(teamName: string, channelName: string, includeDeleted = false): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         let data;
@@ -445,6 +455,7 @@ export function getChannelByNameAndTeamName(teamName: string, channelName: strin
         };
     };
 }
+
 export function getChannel(channelId: string): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         let data;
@@ -471,6 +482,7 @@ export function getChannel(channelId: string): ActionFunc {
         };
     };
 }
+
 export function getChannelAndMyMember(channelId: string): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         let channel;
@@ -508,6 +520,7 @@ export function getChannelAndMyMember(channelId: string): ActionFunc {
         };
     };
 }
+
 export function getChannelTimezones(channelId: string): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         let channelTimezones;
@@ -528,6 +541,7 @@ export function getChannelTimezones(channelId: string): ActionFunc {
         };
     };
 }
+
 export function fetchMyChannelsAndMembers(teamId: string): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         dispatch({
@@ -588,6 +602,7 @@ export function fetchMyChannelsAndMembers(teamId: string): ActionFunc {
         };
     };
 }
+
 export function getMyChannelMembers(teamId: string): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         let channelMembers;
@@ -629,6 +644,7 @@ export function getMyChannelMembers(teamId: string): ActionFunc {
         };
     };
 }
+
 export function getChannelMembers(channelId: string, page = 0, perPage: number = General.CHANNELS_CHUNK_SIZE): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         let channelMembers;
@@ -655,6 +671,7 @@ export function getChannelMembers(channelId: string, page = 0, perPage: number =
         };
     };
 }
+
 export function leaveChannel(channelId: string): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         const state = getState();
@@ -703,6 +720,7 @@ export function leaveChannel(channelId: string): ActionFunc {
         };
     };
 }
+
 export function joinChannel(userId: string, teamId: string, channelId: string, channelName: string): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         let member: ChannelMembership | undefined | null;
@@ -752,6 +770,7 @@ export function joinChannel(userId: string, teamId: string, channelId: string, c
         };
     };
 }
+
 export function deleteChannel(channelId: string): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         let state = getState();
@@ -797,6 +816,7 @@ export function deleteChannel(channelId: string): ActionFunc {
         };
     };
 }
+
 export function viewChannel(channelId: string, prevChannelId = ''): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         const {
@@ -862,6 +882,7 @@ export function viewChannel(channelId: string, prevChannelId = ''): ActionFunc {
         };
     };
 }
+
 export function markChannelAsViewed(channelId: string, prevChannelId = ''): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         const actions: Action[] = [];
@@ -901,6 +922,7 @@ export function markChannelAsViewed(channelId: string, prevChannelId = ''): Acti
         };
     };
 }
+
 export function getChannels(teamId: string, page = 0, perPage: number = General.CHANNELS_CHUNK_SIZE): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         dispatch({
@@ -934,6 +956,7 @@ export function getChannels(teamId: string, page = 0, perPage: number = General.
         };
     };
 }
+
 export function getAllChannelsWithCount(page = 0, perPage: number = General.CHANNELS_CHUNK_SIZE, notAssociatedToGroup = '', excludeDefaultChannels = false): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         dispatch({
@@ -969,6 +992,7 @@ export function getAllChannelsWithCount(page = 0, perPage: number = General.CHAN
         };
     };
 }
+
 export function getAllChannels(page = 0, perPage: number = General.CHANNELS_CHUNK_SIZE, notAssociatedToGroup = '', excludeDefaultChannels = false): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         dispatch({
@@ -1001,6 +1025,7 @@ export function getAllChannels(page = 0, perPage: number = General.CHANNELS_CHUN
         };
     };
 }
+
 export function autocompleteChannels(teamId: string, term: string): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         dispatch({
@@ -1034,6 +1059,7 @@ export function autocompleteChannels(teamId: string, term: string): ActionFunc {
         };
     };
 }
+
 export function autocompleteChannelsForSearch(teamId: string, term: string): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         dispatch({
@@ -1067,6 +1093,7 @@ export function autocompleteChannelsForSearch(teamId: string, term: string): Act
         };
     };
 }
+
 export function searchChannels(teamId: string, term: string): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         dispatch({
@@ -1100,6 +1127,7 @@ export function searchChannels(teamId: string, term: string): ActionFunc {
         };
     };
 }
+
 export function searchAllChannels(term: string, notAssociatedToGroup = '', excludeDefaultChannels = false): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         dispatch({
@@ -1132,12 +1160,14 @@ export function searchAllChannels(term: string, notAssociatedToGroup = '', exclu
         };
     };
 }
+
 export function searchGroupChannels(term: string): ActionFunc {
     return bindClientFunc({
         clientFunc: Client4.searchGroupChannels,
         params: [term],
     });
 }
+
 export function getChannelStats(channelId: string): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         let stat;
@@ -1161,6 +1191,7 @@ export function getChannelStats(channelId: string): ActionFunc {
         };
     };
 }
+
 export function addChannelMember(channelId: string, userId: string, postRootId = ''): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         let member;
@@ -1196,6 +1227,7 @@ export function addChannelMember(channelId: string, userId: string, postRootId =
         };
     };
 }
+
 export function removeChannelMember(channelId: string, userId: string): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         try {
@@ -1226,6 +1258,7 @@ export function removeChannelMember(channelId: string, userId: string): ActionFu
         };
     };
 }
+
 export function updateChannelMemberRoles(channelId: string, userId: string, roles: string): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         try {
@@ -1254,6 +1287,7 @@ export function updateChannelMemberRoles(channelId: string, userId: string, role
         };
     };
 }
+
 export function updateChannelHeader(channelId: string, header: string): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         Client4.trackEvent('action', 'action_channels_update_header', {
@@ -1271,6 +1305,7 @@ export function updateChannelHeader(channelId: string, header: string): ActionFu
         };
     };
 }
+
 export function updateChannelPurpose(channelId: string, purpose: string): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         Client4.trackEvent('action', 'action_channels_update_purpose', {
@@ -1288,6 +1323,7 @@ export function updateChannelPurpose(channelId: string, purpose: string): Action
         };
     };
 }
+
 export function markChannelAsRead(channelId: string, prevChannelId?: string | null, updateLastViewedAt = true): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
     // Send channel last viewed at to the server
@@ -1408,6 +1444,7 @@ export function markChannelAsUnread(teamId: string, channelId: string, mentions:
         };
     };
 }
+
 export function getChannelMembersByIds(channelId: string, userIds: Array<string>) {
     return bindClientFunc({
         clientFunc: Client4.getChannelMembersByIds,
@@ -1415,6 +1452,7 @@ export function getChannelMembersByIds(channelId: string, userIds: Array<string>
         params: [channelId, userIds],
     });
 }
+
 export function getChannelMember(channelId: string, userId: string) {
     return bindClientFunc({
         clientFunc: Client4.getChannelMember,
@@ -1422,6 +1460,7 @@ export function getChannelMember(channelId: string, userId: string) {
         params: [channelId, userId],
     });
 }
+
 export function getMyChannelMember(channelId: string) {
     return bindClientFunc({
         clientFunc: Client4.getMyChannelMember,
@@ -1429,6 +1468,7 @@ export function getMyChannelMember(channelId: string) {
         params: [channelId],
     });
 }
+
 export function favoriteChannel(channelId: string): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         const {
@@ -1444,6 +1484,7 @@ export function favoriteChannel(channelId: string): ActionFunc {
         return savePreferences(currentUserId, [preference])(dispatch);
     };
 }
+
 export function unfavoriteChannel(channelId: string): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         const {
@@ -1459,6 +1500,7 @@ export function unfavoriteChannel(channelId: string): ActionFunc {
         return deletePreferences(currentUserId, [preference])(dispatch, getState);
     };
 }
+
 export function updateChannelScheme(channelId: string, schemeId: string) {
     return bindClientFunc({
         clientFunc: async () => {
@@ -1471,6 +1513,7 @@ export function updateChannelScheme(channelId: string, schemeId: string) {
         onSuccess: ChannelTypes.UPDATED_CHANNEL_SCHEME,
     });
 }
+
 export function updateChannelMemberSchemeRoles(channelId: string, userId: string, isSchemeUser: boolean, isSchemeAdmin: boolean) {
     return bindClientFunc({
         clientFunc: async () => {
@@ -1485,6 +1528,7 @@ export function updateChannelMemberSchemeRoles(channelId: string, userId: string
         onSuccess: ChannelTypes.UPDATED_CHANNEL_MEMBER_SCHEME_ROLES,
     });
 }
+
 export function membersMinusGroupMembers(channelID: string, groupIDs: Array<string>, page = 0, perPage: number = General.PROFILE_CHUNK_SIZE): ActionFunc {
     return bindClientFunc({
         clientFunc: Client4.channelMembersMinusGroupMembers,
@@ -1492,6 +1536,7 @@ export function membersMinusGroupMembers(channelID: string, groupIDs: Array<stri
         params: [channelID, groupIDs, page, perPage],
     });
 }
+
 export default {
     selectChannel,
     createChannel,

@@ -12,6 +12,7 @@ export function teamListToMap(teamList: Array<Team>): IDMappedObjects<Team> {
 
     return teams;
 }
+
 export function sortTeamsWithLocale(locale: string): (a: Team, b: Team) => number {
     return (a: Team, b: Team): number => {
         if (a.display_name !== b.display_name) {
