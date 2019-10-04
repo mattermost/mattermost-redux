@@ -16,20 +16,20 @@
     "build"
   ],
   "scripts": {
-    "start": "rollup -c --watch",
-    "build": "cross-env NODE_ENV=production ./node_modules/.bin/rollup -c",
+    "start": "tsc --watch",
+    "build": "cross-env NODE_ENV=production tsc && cross-env NODE_ENV=production rollup -c",
     "check": "eslint --ignore-path .gitignore --ignore-pattern node_modules --quiet 'src/**/*.ts'",
     "fix": "eslint --ignore-path .gitignore --ignore-pattern node_modules --quiet 'src/**/*.ts' --fix",
-    "tsc": "tsc",
-    "tsc:watch": "tsc --watch",
+    "tsc": "tsc --noEmit",
+    "tsc:watch": "tsc --noEmit --watch",
     "test": "jest --forceExit --detectOpenHandles --maxWorkers=2",
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage",
     "prepare": "npm run build",
-    "dev": "copyfiles ./package.json ${WEBAPP_DIR:-../mattermost-webapp}/node_modules/mattermost-redux && rollup --watch -c --environment OUTPUT_FOLDER:${WEBAPP_DIR:-../mattermost-webapp}/node_modules/mattermost-redux",
-    "dev-mobile": "copyfiles ./package.json ${MOBILE_DIR:-../mattermost-mobile}/node_modules/mattermost-redux && rollup --watch -c --environment OUTPUT_FOLDER:${MOBILE_DIR:-../mattermost-mobile}/node_modules/mattermost-redux",
-    "dev:watch": "copyfiles ./package.json ${WEBAPP_DIR:-../mattermost-webapp}/node_modules/mattermost-redux && rollup --watch -c --environment OUTPUT_FOLDER:${WEBAPP_DIR:-../mattermost-webapp}/node_modules/mattermost-redux",
-    "dev-mobile:watch": "copyfiles ./package.json ${MOBILE_DIR:-../mattermost-mobile}/node_modules/mattermost-redux && rollup --watch -c --environment OUTPUT_FOLDER:${MOBILE_DIR:-../mattermost-mobile}/node_modules/mattermost-redux"
+    "dev": "ttsc --outDir ${WEBAPP_DIR:-../mattermost-webapp}/node_modules/mattermost-redux",
+    "dev-mobile": "ttsc --outDir ${MOBILE_DIR:-../mattermost-mobile}/node_modules/mattermost-redux",
+    "dev:watch": "ttsc --watch --outDir ${WEBAPP_DIR:-../mattermost-webapp}/node_modules/mattermost-redux",
+    "dev-mobile:watch": "ttsc --watch --outDir ${MOBILE_DIR:-../mattermost-mobile}/node_modules/mattermost-redux"
   },
   "dependencies": {
     "@typescript-eslint/eslint-plugin": "^2.3.1",
@@ -58,6 +58,7 @@
     "output": "build/test-results.xml"
   },
   "devDependencies": {
+    "@babel/core": "^7.6.2",
     "@babel/plugin-proposal-class-properties": "^7.5.5",
     "@babel/plugin-proposal-object-rest-spread": "^7.6.2",
     "@babel/plugin-proposal-optional-chaining": "^7.6.0",
@@ -67,9 +68,11 @@
     "@babel/runtime": "^7.6.2",
     "@types/jest": "^24.0.18",
     "@types/moment-timezone": "^0.5.12",
+    "@zerollup/ts-transform-paths": "^1.7.3",
     "babel-eslint": "^10.0.3",
     "babel-plugin-module-resolver": "^3.2.0",
     "copyfiles": "^2.1.1",
+    "core-js": "^3.2.1",
     "cross-env": "^6.0.3",
     "eslint": "^6.5.1",
     "eslint-config-mattermost": "github:mattermost/eslint-config-mattermost#6fe27a2bd1f9df4d4eb96fac6fcdcc0fee0ecbd7",
@@ -91,6 +94,7 @@
     "rollup-plugin-typescript2": "^0.24.3",
     "ts-jest": "^24.1.0",
     "tslib": "^1.10.0",
+    "ttypescript": "^1.5.7",
     "typescript": "^3.6.3"
   }
 }

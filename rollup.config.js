@@ -38,7 +38,7 @@ module.exports = inputs.map((input) => ({
         }),
         typescript({
             // eslint-disable-next-line global-require
-            typescript: require('typescript'),
+            typescript: require('ttypescript'),
             rollupCommonJSResolveHack: true,
             exclude: '**/__tests__/**',
             clean: true,

@@ -3,7 +3,7 @@
 import {Client4} from 'client';
 import {EmojiTypes} from 'action_types';
 import {General, Emoji} from '../constants';
-import {getProfilesByIds} from 'actions/users';
+import {getProfilesByIds} from './users';
 import {getCustomEmojisByName as selectCustomEmojisByName} from 'selectors/entities/emojis';
 import {parseNeededCustomEmojisFromText} from 'utils/emoji_utils';
 

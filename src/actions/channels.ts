@@ -3,7 +3,7 @@
 import {Client4} from 'client';
 import {General, Preferences} from '../constants';
 import {ChannelTypes, PreferenceTypes, UserTypes} from 'action_types';
-import {savePreferences, deletePreferences} from 'actions/preferences';
+import {savePreferences, deletePreferences} from './preferences';
 import {getChannelsIdForTeam, getChannelByName} from 'utils/channel_utils';
 import {getChannelsNameMapInTeam, getMyChannelMember as getMyChannelMemberSelector, getRedirectChannelNameForTeam} from 'selectors/entities/channels';
 import {getCurrentTeamId} from 'selectors/entities/teams';

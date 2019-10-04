@@ -2,7 +2,7 @@
 // See LICENSE.txt for license information.
 import {combineReducers} from 'redux';
 import {General} from '../constants';
-import reducerRegistry from 'store/reducer_registry';
+import reducerRegistry from './reducer_registry';
 import {enableBatching} from 'types/actions';
 export const offlineConfig = {
     effect: (effect, action) => {

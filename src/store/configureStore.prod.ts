@@ -4,7 +4,7 @@
 import {createStore} from 'redux';
 import {createOfflineReducer, networkStatusChangedAction, offlineCompose} from 'redux-offline';
 import defaultOfflineConfig from 'redux-offline/lib/defaults';
-import reducerRegistry from 'store/reducer_registry';
+import reducerRegistry from './reducer_registry';
 
 import serviceReducer from 'reducers';
 

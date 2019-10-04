@@ -2,7 +2,7 @@
 // See LICENSE.txt for license information.
 import {getCurrentUser} from 'selectors/entities/users';
 import {getUserTimezone} from 'selectors/entities/timezone';
-import {updateMe} from 'actions/users';
+import {updateMe} from './users';
 import {DispatchFunc, GetStateFunc} from 'types/actions';
 export function autoUpdateTimezone(deviceTimezone: string) {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {

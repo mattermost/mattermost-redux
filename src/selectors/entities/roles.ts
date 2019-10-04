@@ -6,6 +6,8 @@ import {getTeamMemberships, getCurrentTeamId} from './teams';
 import {GlobalState} from 'types/store';
 import {getMySystemPermissions, getMySystemRoles, getRoles} from 'selectors/entities/roles_helpers';
 
+export {getMySystemPermissions, getMySystemRoles, getRoles};
+
 export const getMyTeamRoles = createSelector(getTeamMemberships, (teamsMemberships) => {
     const roles = {};
 

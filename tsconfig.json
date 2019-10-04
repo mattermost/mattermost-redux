@@ -16,7 +16,7 @@
         "rootDir": "./src",
         "outDir": "./build",
         "strict": false,
-        "noEmit": true,
+        "noEmit": false,
         "noImplicitAny": false,
         "strictNullChecks": true,
         "strictFunctionTypes": false,
@@ -31,15 +31,22 @@
         "moduleResolution": "node",
         "baseUrl": "./",
         "paths": {
-            "*": ["src/*","node_modules/*"],
             "utils/*": ["src/utils/*"],
             "types/*": ["src/types/*"],
-            "constants": ["src/constants/*"],
-            "action_types/*": ["src/action_types/*"],
+            "constants/*": ["src/constants/*"],
+            "client": ["src/client"],
+            "selectors/*": ["src/selectors/*"],
+            "store/*": ["src/store/*"],
             "action_types": ["src/action_types"],
             "test/*": ["test/*"],
-            "src/*": ["src/*"]
+            "*": ["src/*","node_modules/*"]
         },
+        "plugins": [
+            {
+                "transform": "@zerollup/ts-transform-paths",
+                "exclude": ["*"]
+            }
+        ],
         "jsx": "react",
         "esModuleInterop": true
     }

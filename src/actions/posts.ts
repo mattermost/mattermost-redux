@@ -1,7 +1,7 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
 
-import {Client4} from 'client';
+import {Client4, DEFAULT_LIMIT_AFTER, DEFAULT_LIMIT_BEFORE} from 'client';
 import {General, Preferences, Posts, WebsocketEvents} from '../constants';
 import {PostTypes, FileTypes, IntegrationTypes} from 'action_types';
 
@@ -27,7 +27,6 @@ import {
     savePreferences,
 } from './preferences';
 import {getProfilesByIds, getProfilesByUsernames, getStatusesByIds} from './users';
-import {DEFAULT_LIMIT_AFTER, DEFAULT_LIMIT_BEFORE} from 'client/client4';
 import {Action, ActionFunc, ActionResult, batchActions, DispatchFunc, GetStateFunc} from 'types/actions';
 import {GlobalState} from 'types/store';
 import {Post} from 'types/posts';

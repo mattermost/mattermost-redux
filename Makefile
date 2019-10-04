@@ -23,33 +23,13 @@ clean:
 pre-run:
 	@echo Make sure no previous build are in the folder
 
-	@rm -rf actions
-	@rm -rf action_types
-	@rm -rf client
-	@rm -rf constants
-	@rm -rf reducers
-	@rm -rf selectors
-	@rm -rf store
-	@rm -rf utils
-	@rm -rf lib
+	@rm -rf build/*
 
-test: check-style flow
+test: check-style
 	npm test
 
-flow: .flowinstall
-	@echo Checking types
-
-	npm run flow
-
-.flowinstall: node_modules
-	@echo Getting flow-typed packages
-
-	npm run flow-typed install
-
-	touch $@
 
 install: node_modules
 
 bundle:
 	npm run build
-	npm run webpack
