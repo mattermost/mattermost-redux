@@ -554,24 +554,6 @@ const state: GlobalState = {
                 error: null,
             },
         },
-        jobs: {
-            createJob: {
-                status: 'not_started',
-                error: null,
-            },
-            getJob: {
-                status: 'not_started',
-                error: null,
-            },
-            getJobs: {
-                status: 'not_started',
-                error: null,
-            },
-            cancelJob: {
-                status: 'not_started',
-                error: null,
-            },
-        },
         search: {
             flaggedPosts: {
                 status: 'not_started',
