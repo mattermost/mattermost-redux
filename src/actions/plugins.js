@@ -20,9 +20,6 @@ export function getMarketplacePlugins(filter) {
 export function installMarketplacePlugin(id, version) {
     return bindClientFunc({
         clientFunc: Client4.installMarketplacePlugin,
-        onRequest: PluginTypes.INSTALL_MARKETPLACE_PLUGIN_REQUEST,
-        onSuccess: PluginTypes.INSTALL_MARKETPLACE_PLUGIN_SUCCESS,
-        onFailure: PluginTypes.INSTALL_MARKETPLACE_PLUGIN_FAILURE,
         params: [
             id,
             version,

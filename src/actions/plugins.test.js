@@ -42,14 +42,12 @@ describe('Actions.Plugins', () => {
     it('installMarketplacePlugin', async () => {
         const id = 'com.mattermost.demo';
         const version = '1.2.3';
+        const success = {success: true};
         nock(Client4.getPluginsMarketplaceRoute()).
             post('', {id, version}).
-            reply(200, {});
+            reply(200, success);
 
-        await store.dispatch(PluginActions.installMarketplacePlugin(id, version));
-
-        const state = store.getState();
-        const request = state.requests.plugins.installMarketplacePlugin;
-        assert.equal(request.status, RequestStatus.SUCCESS);
+        const result = await store.dispatch(PluginActions.installMarketplacePlugin(id, version));
+        assert.deepEqual(result, {data: success});
     });
 });

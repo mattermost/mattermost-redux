@@ -17,7 +17,6 @@ import search from './search';
 import roles from './roles';
 import schemes from './schemes';
 import groups from './groups';
-import plugins from './plugins';
 
 export default combineReducers({
     channels,
@@ -34,5 +33,4 @@ export default combineReducers({
     roles,
     schemes,
     groups,
-    plugins,
 });
