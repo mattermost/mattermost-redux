@@ -30,7 +30,6 @@ import type {
     RolesRequestsStatuses,
     SchemesRequestsStatuses,
     GroupsRequestsStatuses,
-    JobsRequestsStatuses,
     SearchRequestsStatuses,
 } from './requests';
 import type {Role} from './roles';
@@ -79,7 +78,6 @@ export type GlobalState = {|
         roles: RolesRequestsStatuses,
         schemes: SchemesRequestsStatuses,
         groups: GroupsRequestsStatuses,
-        jobs: JobsRequestsStatuses,
         schemes: SchemesRequestsStatuses,
         search: SearchRequestsStatuses,
     |},

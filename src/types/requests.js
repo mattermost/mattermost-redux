@@ -162,13 +162,6 @@ export type GroupsRequestsStatuses = {|
     getGroupsNotAssociatedToChannel: RequestStatusType,
 |};
 
-export type JobsRequestsStatuses = {|
-    createJob: RequestStatusType,
-    getJob: RequestStatusType,
-    getJobs: RequestStatusType,
-    cancelJob: RequestStatusType,
-|};
-
 export type SearchRequestsStatuses = {|
     flaggedPosts: RequestStatusType,
     pinnedPosts: RequestStatusType,
