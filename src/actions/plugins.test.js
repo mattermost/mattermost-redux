@@ -6,7 +6,6 @@ import nock from 'nock';
 
 import * as PluginActions from 'actions/plugins';
 import {Client4} from 'client';
-import {RequestStatus} from 'constants';
 
 import TestHelper from 'test/test_helper';
 import configureStore from 'test/test_store';
