@@ -5,7 +5,7 @@ import {batchActions} from 'redux-batched-actions';
 
 import {Client4} from 'client';
 import {General, Preferences, Posts, WebsocketEvents} from 'constants';
-import {PostTypes, ChannelTypes, FileTypes, IntegrationTypes} from 'action_types';
+import {PostTypes, FileTypes, IntegrationTypes, ChannelTypes} from 'action_types';
 
 import {getCurrentChannelId, getMyChannelMember as getMyChannelMemberSelector} from 'selectors/entities/channels';
 import {getCustomEmojisByName as selectCustomEmojisByName} from 'selectors/entities/emojis';
@@ -633,6 +633,7 @@ export function getPostThread(rootId, fetchThreads = true) {
 export function getPosts(channelId, page = 0, perPage = Posts.POST_CHUNK_SIZE, fetchThreads = true) {
     return async (dispatch, getState) => {
         let posts;
+        let atOldestPost = false;
 
         try {
             posts = await Client4.getPosts(channelId, page, perPage, fetchThreads);
@@ -643,21 +644,29 @@ export function getPosts(channelId, page = 0, perPage = Posts.POST_CHUNK_SIZE, f
             return {error};
         }
 
+        // #backwards-compatibility #version-5.14
+        // Else condition is added because prev_post_id does not exist prior to 5.14v
+        if (Object.prototype.hasOwnProperty.call(posts, 'prev_post_id')) {
+            atOldestPost = posts.prev_post_id === '';
+        } else {
+            atOldestPost = posts.length < Posts.POST_CHUNK_SIZE;
+        }
+
         dispatch(batchActions([
             receivedPosts(posts),
-            receivedPostsInChannel(posts, channelId, page === 0, posts.prev_post_id === ''),
+            receivedPostsInChannel(posts, channelId, page === 0, atOldestPost),
         ]));
 
         return {data: posts};
     };
 }
 
-export function getPostsUnread(channelId, fetchThreads = true) {
+export function getPostsUnread(channelId, limitAfter = 30, limitBefore = 30) {
     return async (dispatch, getState) => {
         const userId = getCurrentUserId(getState());
         let posts;
         try {
-            posts = await Client4.getPostsUnread(channelId, userId, DEFAULT_LIMIT_BEFORE, DEFAULT_LIMIT_AFTER, fetchThreads);
+            posts = await Client4.getPostsUnread(channelId, userId, limitAfter, limitBefore);
             getProfilesAndStatusesForPosts(posts.posts, dispatch, getState);
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch, getState);
@@ -666,6 +675,34 @@ export function getPostsUnread(channelId, fetchThreads = true) {
         }
 
         dispatch(batchActions([
+            receivedPosts(posts),
+            receivedPostsInChannel(posts, channelId, posts.next_post_id === '', posts.prev_post_id === ''),
+        ]));
+        dispatch({
+            type: PostTypes.RECEIVED_POSTS,
+            data: posts,
+            channelId,
+        });
+
+        return {data: posts};
+    };
+}
+
+export function getPostsUnreadAndCleanOldPosts(channelId, limitAfter = 30, limitBefore = 30) {
+    return async (dispatch, getState) => {
+        const userId = getCurrentUserId(getState());
+        let posts;
+        try {
+            posts = await Client4.getPostsUnread(channelId, userId, limitAfter, limitBefore);
+            getProfilesAndStatusesForPosts(posts.posts, dispatch, getState);
+        } catch (error) {
+            forceLogoutIfNecessary(error, dispatch, getState);
+            dispatch(logError(error));
+            return {error};
+        }
+
+        dispatch(batchActions([
+            {type: ChannelTypes.CLEANUP_CHANNEL_POSTS, data: {id: channelId}},
             receivedPosts(posts),
             receivedPostsInChannel(posts, channelId, posts.next_post_id === '', posts.prev_post_id === ''),
         ]));
@@ -706,6 +743,7 @@ export function getPostsSince(channelId, since, fetchThreads = true) {
 export function getPostsBefore(channelId, postId, page = 0, perPage = Posts.POST_CHUNK_SIZE, fetchThreads = true) {
     return async (dispatch, getState) => {
         let posts;
+        let atOldestPost = false;
         try {
             posts = await Client4.getPostsBefore(channelId, postId, page, perPage, fetchThreads);
             getProfilesAndStatusesForPosts(posts.posts, dispatch, getState);
@@ -715,9 +753,17 @@ export function getPostsBefore(channelId, postId, page = 0, perPage = Posts.POST
             return {error};
         }
 
+        // #backwards-compatibility #version-5.14
+        // Else condition is added because prev_post_id does not exist prior to 5.14v
+        if (Object.prototype.hasOwnProperty.call(posts, 'prev_post_id')) {
+            atOldestPost = posts.prev_post_id === '';
+        } else {
+            atOldestPost = posts.length < Posts.POST_CHUNK_SIZE;
+        }
+
         dispatch(batchActions([
             receivedPosts(posts),
-            receivedPostsBefore(posts, channelId, postId, posts.prev_post_id === ''),
+            receivedPostsBefore(posts, channelId, postId, atOldestPost),
         ]));
 
         return {data: posts};
@@ -727,6 +773,8 @@ export function getPostsBefore(channelId, postId, page = 0, perPage = Posts.POST
 export function getPostsAfter(channelId, postId, page = 0, perPage = Posts.POST_CHUNK_SIZE, fetchThreads = true) {
     return async (dispatch, getState) => {
         let posts;
+        let atRecentPost = false;
+
         try {
             posts = await Client4.getPostsAfter(channelId, postId, page, perPage, fetchThreads);
             getProfilesAndStatusesForPosts(posts.posts, dispatch, getState);
@@ -736,9 +784,17 @@ export function getPostsAfter(channelId, postId, page = 0, perPage = Posts.POST_
             return {error};
         }
 
+        // #backwards-compatibility #version-5.14
+        // Else condition is added because prev_post_id does not exist prior to 5.14v
+        if (Object.prototype.hasOwnProperty.call(posts, 'next_post_id')) {
+            atRecentPost = posts.next_post_id === '';
+        } else {
+            atRecentPost = posts.length < Posts.POST_CHUNK_SIZE;
+        }
+
         dispatch(batchActions([
             receivedPosts(posts),
-            receivedPostsAfter(posts, channelId, postId, posts.next_post_id === ''),
+            receivedPostsAfter(posts, channelId, postId, atRecentPost),
         ]));
 
         return {data: posts};
@@ -750,6 +806,8 @@ export function getPostsAround(channelId, postId, perPage = Posts.POST_CHUNK_SIZ
         let after;
         let thread;
         let before;
+        let atOldestPost = false;
+        let atRecentPost = false;
 
         try {
             [after, thread, before] = await Promise.all([
@@ -781,9 +839,19 @@ export function getPostsAround(channelId, postId, perPage = Posts.POST_CHUNK_SIZ
 
         getProfilesAndStatusesForPosts(posts.posts, dispatch, getState);
 
+        // #backwards-compatibility #version-5.14
+        // Else condition is added because prev_post_id and next_post_id does not exist prior to 5.14v
+        if (Object.prototype.hasOwnProperty.call(before, 'prev_post_id')) {
+            atOldestPost = before.prev_post_id === '';
+            atRecentPost = after.next_post_id === '';
+        } else {
+            atOldestPost = before.order.length < perPage;
+            atRecentPost = after.order.length < perPage;
+        }
+
         dispatch(batchActions([
             receivedPosts(posts),
-            receivedPostsInChannel(posts, channelId, after.next_post_id === '', before.prev_post_id === ''),
+            receivedPostsInChannel(posts, channelId, atRecentPost, atOldestPost),
         ]));
 
         return {data: posts};

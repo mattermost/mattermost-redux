@@ -1011,7 +1011,7 @@ describe('Actions.Posts', () => {
             },
             order: ['post1', 'post2'],
             next_post_id: 'post0',
-            before_post_id: 'post3',
+            prev_post_id: 'post3',
         };
         const postsThread = {
             posts: {
@@ -1020,7 +1020,7 @@ describe('Actions.Posts', () => {
             },
             order: ['post3'],
             next_post_id: 'post2',
-            before_post_id: 'post5',
+            prev_post_id: 'post5',
         };
         const postsBefore = {
             posts: {
@@ -1029,7 +1029,7 @@ describe('Actions.Posts', () => {
             },
             order: ['post4', 'post5'],
             next_post_id: 'post3',
-            before_post_id: 'post6',
+            prev_post_id: 'post6',
         };
 
         nock(Client4.getChannelsRoute()).

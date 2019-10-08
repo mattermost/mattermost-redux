@@ -154,6 +154,7 @@ export function handlePosts(state = {}, action) {
 
     case ChannelTypes.RECEIVED_CHANNEL_DELETED:
     case ChannelTypes.DELETE_CHANNEL_SUCCESS:
+    case ChannelTypes.CLEANUP_CHANNEL_POSTS:
     case ChannelTypes.LEAVE_CHANNEL: {
         if (action.data && action.data.viewArchivedChannels) {
             // Nothing to do since we still want to store posts in archived channels
@@ -649,6 +650,7 @@ export function postsInChannel(state = {}, action, prevPosts, nextPosts) {
 
     case ChannelTypes.RECEIVED_CHANNEL_DELETED:
     case ChannelTypes.DELETE_CHANNEL_SUCCESS:
+    case ChannelTypes.CLEANUP_CHANNEL_POSTS:
     case ChannelTypes.LEAVE_CHANNEL: {
         if (action.data && action.data.viewArchivedChannels) {
             // Nothing to do since we still want to store posts in archived channels
