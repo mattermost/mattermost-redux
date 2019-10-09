@@ -17,3 +17,12 @@ export function getMarketplacePlugins(filter) {
     });
 }
 
+export function installMarketplacePlugin(id, version) {
+    return bindClientFunc({
+        clientFunc: Client4.installMarketplacePlugin,
+        params: [
+            id,
+            version,
+        ],
+    });
+}

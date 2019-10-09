@@ -37,4 +37,16 @@ describe('Actions.Plugins', () => {
         const marketplacePluginsResult = state.entities.plugins.marketplacePlugins;
         assert.equal(marketplacePlugins.length, Object.values(marketplacePluginsResult).length);
     });
+
+    it('installMarketplacePlugin', async () => {
+        const id = 'com.mattermost.demo';
+        const version = '1.2.3';
+        const success = {success: true};
+        nock(Client4.getPluginsMarketplaceRoute()).
+            post('', {id, version}).
+            reply(200, success);
+
+        const result = await store.dispatch(PluginActions.installMarketplacePlugin(id, version));
+        assert.deepEqual(result, {data: success});
+    });
 });
