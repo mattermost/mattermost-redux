@@ -9,9 +9,6 @@ export default keyMirror({
     REMOVED_APP_CREDENTIALS: null,
     RECEIVED_APP_DEVICE_TOKEN: null,
 
-    PING_REQUEST: null,
-    PING_SUCCESS: null,
-    PING_FAILURE: null,
     PING_RESET: null,
 
     RECEIVED_SERVER_VERSION: null,
