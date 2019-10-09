@@ -17,9 +17,7 @@ import type {GenericClientResponse, logLevel} from 'types/client4';
 import type {GetStateFunc, DispatchFunc, ActionFunc} from 'types/actions';
 
 export function getPing(): ActionFunc {
-    return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
-        dispatch({type: GeneralTypes.PING_REQUEST, data: {}}, getState);
-
+    return async () => {
         let data: GenericClientResponse;
         let pingError = new FormattedError(
             'mobile.server_ping_failed',
@@ -29,7 +27,6 @@ export function getPing(): ActionFunc {
             data = await Client4.ping();
             if (data.status !== 'OK') {
                 // successful ping but not the right return {data}
-                dispatch({type: GeneralTypes.PING_FAILURE, data: {}, error: pingError}, getState);
                 return {error: pingError};
             }
         } catch (error) { // Client4Error
@@ -37,11 +34,9 @@ export function getPing(): ActionFunc {
                 // When the server requires a client certificate to connect.
                 pingError = error;
             }
-            dispatch({type: GeneralTypes.PING_FAILURE, data: {}, error: pingError}, getState);
             return {error: pingError};
         }
 
-        dispatch({type: GeneralTypes.PING_SUCCESS, data}, getState);
         return {data};
     };
 }
