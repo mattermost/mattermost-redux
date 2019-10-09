@@ -50,20 +50,11 @@ export function resetPing(): ActionFunc {
 
 export function getClientConfig(): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
-        dispatch({type: GeneralTypes.CLIENT_CONFIG_REQUEST, data: {}}, getState);
-
         let data;
         try {
             data = await Client4.getClientConfigOld();
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch, getState);
-            dispatch(batchActions([
-                {
-                    type: GeneralTypes.CLIENT_CONFIG_FAILURE,
-                    error,
-                },
-                logError(error),
-            ]), getState);
             return {error};
         }
 
@@ -72,7 +63,6 @@ export function getClientConfig(): ActionFunc {
 
         dispatch(batchActions([
             {type: GeneralTypes.CLIENT_CONFIG_RECEIVED, data},
-            {type: GeneralTypes.CLIENT_CONFIG_SUCCESS},
         ]));
 
         return {data};

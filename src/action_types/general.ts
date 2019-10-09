@@ -13,9 +13,6 @@ export default keyMirror({
 
     RECEIVED_SERVER_VERSION: null,
 
-    CLIENT_CONFIG_REQUEST: null,
-    CLIENT_CONFIG_SUCCESS: null,
-    CLIENT_CONFIG_FAILURE: null,
     CLIENT_CONFIG_RECEIVED: null,
     CLIENT_CONFIG_RESET: null,
 
