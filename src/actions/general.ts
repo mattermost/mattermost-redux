@@ -71,8 +71,6 @@ export function getClientConfig(): ActionFunc {
 
 export function getDataRetentionPolicy(): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
-        dispatch({type: GeneralTypes.DATA_RETENTION_POLICY_REQUEST, data: {}}, getState);
-
         let data;
         try {
             data = await Client4.getDataRetentionPolicy();
@@ -80,7 +78,6 @@ export function getDataRetentionPolicy(): ActionFunc {
             forceLogoutIfNecessary(error, dispatch, getState);
             dispatch(batchActions([
                 {
-                    type: GeneralTypes.DATA_RETENTION_POLICY_FAILURE,
                     error,
                 },
                 logError(error),
@@ -90,7 +87,6 @@ export function getDataRetentionPolicy(): ActionFunc {
 
         dispatch(batchActions([
             {type: GeneralTypes.RECEIVED_DATA_RETENTION_POLICY, data},
-            {type: GeneralTypes.DATA_RETENTION_POLICY_SUCCESS},
         ]));
 
         return {data};
