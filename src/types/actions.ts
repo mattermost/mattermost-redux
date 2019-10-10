@@ -22,6 +22,9 @@ type Thunk = (b: DispatchFunc, a: GetStateFunc) => Promise<ActionResult> | Actio
 type BatchAction = {
     type: 'BATCHING_REDUCER.BATCH';
     payload: Array<GenericAction>;
+    meta: {
+        batch: true;
+    };
 };
 export type Action = GenericAction | Thunk | BatchAction | ActionFunc;
 
