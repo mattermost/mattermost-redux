@@ -32,19 +32,19 @@
     "dev-mobile:watch": "ttsc --watch --outDir ${MOBILE_DIR:-../mattermost-mobile}/node_modules/mattermost-redux"
   },
   "dependencies": {
-    "gfycat-sdk": "latest",
-    "moment-timezone": "^0.5.25",
+    "gfycat-sdk": "1.4.18",
+    "moment-timezone": "0.5.26",
     "isomorphic-fetch": "2.2.1",
-    "redux": "^4.0.1",
-    "redux-action-buffer": "^1.2.0",
-    "redux-offline": "git+https://github.com/enahum/redux-offline.git#4bd85e7e3b279a2b11fb4d587808d583d2b5e7b5",
+    "redux": "4.0.4",
+    "redux-action-buffer": "1.2.0",
+    "redux-offline": "git+https://github.com/enahum/redux-offline.git#885024de96b6ec73650c340c8928066585c413df",
     "redux-persist": "4.9.1",
-    "redux-persist-node-storage": "^2.0.0",
-    "redux-thunk": "^2.3.0",
-    "remote-redux-devtools": "^0.5.16",
-    "reselect": "^4.0.0",
-    "serialize-error": "^4.1.0",
-    "shallow-equals": "^1.0.0"
+    "redux-persist-node-storage": "2.0.0",
+    "redux-thunk": "2.3.0",
+    "remote-redux-devtools": "0.5.16",
+    "reselect": "4.0.0",
+    "serialize-error": "2.1.0",
+    "shallow-equals": "1.0.0"
   },
   "husky": {
     "hooks": {

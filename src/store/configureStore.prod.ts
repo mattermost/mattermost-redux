@@ -6,7 +6,7 @@ import {createOfflineReducer, networkStatusChangedAction, offlineCompose} from '
 import defaultOfflineConfig from 'redux-offline/lib/defaults';
 import reducerRegistry from './reducer_registry';
 
-import serviceReducer from 'reducers';
+import serviceReducer from '../reducers';
 
 import {offlineConfig, createReducer} from './helpers';
 import initialState from './initial_state';

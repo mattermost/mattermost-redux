@@ -24,10 +24,11 @@ export const offlineConfig = {
 };
 export function createReducer(baseState, ...reducers) {
     reducerRegistry.setReducers(Object.assign({}, ...reducers));
-    const baseReducer = combineReducers(reducerRegistry.getReducers()); // Root reducer wrapper that listens for reset events.
+    const baseReducer = combineReducers(reducerRegistry.getReducers());
+
+    // Root reducer wrapper that listens for reset events.
     // Returns whatever is passed for the data property
     // as the new state.
-
     function offlineReducer(state = {}, action) {
         if (action.type === General.OFFLINE_STORE_RESET) {
             return baseReducer(baseState, action);

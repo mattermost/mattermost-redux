@@ -20,7 +20,7 @@ const devToolsEnhancer = typeof windowAny !== 'undefined' && windowAny.__REDUX_D
             realtime: true,
         });
     };
-import serviceReducer from 'reducers';
+import serviceReducer from '../reducers';
 import deepFreezeAndThrowOnMutation from 'utils/deep_freeze';
 import initialState from './initial_state';
 import {offlineConfig, createReducer} from './helpers';
