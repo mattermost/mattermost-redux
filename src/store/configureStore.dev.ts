@@ -22,7 +22,6 @@ const devToolsEnhancer = typeof windowAny !== 'undefined' && windowAny.__REDUX_D
     };
 import serviceReducer from 'reducers';
 import deepFreezeAndThrowOnMutation from 'utils/deep_freeze';
-
 import initialState from './initial_state';
 import {offlineConfig, createReducer} from './helpers';
 import {createMiddleware} from './middleware';
@@ -38,17 +37,26 @@ import {createMiddleware} from './middleware';
  *     enableBuffer - bool - default = true - If true, the store will buffer all actions until offline state rehydration occurs.
  *     enableThunk - bool - default = true - If true, include the thunk middleware automatically. If false, thunk must be provided as part of additionalMiddleware.
  */
-
 export default function configureServiceStore(preloadedState, appReducer, userOfflineConfig, getAppReducer, clientOptions) {
     const baseOfflineConfig = Object.assign({}, defaultOfflineConfig, offlineConfig, userOfflineConfig);
     const baseState = Object.assign({}, initialState, preloadedState);
+
     const loadReduxDevtools = process.env.NODE_ENV !== 'test'; //eslint-disable-line no-process-env
 
-    const store = createStore(createOfflineReducer(createDevReducer(baseState, serviceReducer, appReducer)), baseState, offlineCompose(baseOfflineConfig)(createMiddleware(clientOptions), loadReduxDevtools ? [devToolsEnhancer()] : []));
+    const store = createStore(
+        createOfflineReducer(createDevReducer(baseState, serviceReducer, appReducer)),
+        baseState,
+        offlineCompose(baseOfflineConfig)(
+            createMiddleware(clientOptions),
+            loadReduxDevtools ? [devToolsEnhancer()] : []
+        )
+    );
+
     reducerRegistry.setChangeListener((reducers) => {
         store.replaceReducer(createOfflineReducer(createDevReducer(baseState, reducers)));
-    }); // launch store persistor
+    });
 
+    // launch store persistor
     if (baseOfflineConfig.persist) {
         baseOfflineConfig.persist(store, baseOfflineConfig.persistOptions, baseOfflineConfig.persistCallback);
     }
@@ -63,13 +71,10 @@ export default function configureServiceStore(preloadedState, appReducer, userOf
     // Enable Webpack hot module replacement for reducers
         (module as any).hot.accept(() => {
             const nextServiceReducer = require('../reducers').default; // eslint-disable-line global-require
-
             let nextAppReducer;
-
             if (getAppReducer) {
                 nextAppReducer = getAppReducer(); // eslint-disable-line global-require
             }
-
             store.replaceReducer(createDevReducer(baseState, reducerRegistry.getReducers(), nextServiceReducer, nextAppReducer));
         });
     }
