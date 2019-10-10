@@ -8,9 +8,7 @@
   "bugs": {
     "url": "https://github.com/mattermost/mattermost-redux/issues"
   },
-  "main": "build/client4.cjs.min.js",
-  "module": "build/client4.esm.min.js",
-  "jsnext:main": "build/client4.esm.min.js",
+  "main": "build/mattermost.client4.js",
   "types": "build/index.d.ts",
   "files": [
     "build"
