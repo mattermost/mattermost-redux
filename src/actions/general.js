@@ -164,8 +164,6 @@ export function setUrl(url: string) {
 
 export function getRedirectLocation(url: string): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
-        dispatch({type: GeneralTypes.REDIRECT_LOCATION_REQUEST, data: {}}, getState);
-
         let pendingData: Promise<Object>;
         if (isMinimumServerVersion(getServerVersion(getState()), 5, 3)) {
             pendingData = Client4.getRedirectLocation(url);
