@@ -25,6 +25,30 @@ describe('Actions.General', () => {
         await TestHelper.tearDown();
     });
 
+    it('getPing - Invalid URL', async () => {
+        const serverUrl = Client4.getUrl();
+        Client4.setUrl('notarealurl');
+        const {data} = await Actions.getPing()(store.dispatch, store.getState);
+
+        assert.deepEqual(data, undefined);
+        Client4.setUrl(serverUrl);
+    });
+
+    it('getPing', async () => {
+        const response = {
+            status: 'OK',
+            version: '4.0.0',
+        };
+
+        nock(Client4.getBaseRoute()).
+            get('/system/ping').
+            query(true).
+            reply(200, response);
+
+        const {data} = await Actions.getPing()(store.dispatch, store.getState);
+        assert.deepEqual(data, response);
+    });
+
     it('getClientConfig', async () => {
         nock(Client4.getBaseRoute()).
             get('/config/client').
