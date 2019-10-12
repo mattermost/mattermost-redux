@@ -31,6 +31,9 @@ module.exports = inputs.map((input) => ({
 
         }),
         typescript({
+            tsconfigOverride: {
+                compilerOptions: {module: 'esnext'},
+            },
             // eslint-disable-next-line global-require
             typescript: require('ttypescript'),
             rollupCommonJSResolveHack: true,
