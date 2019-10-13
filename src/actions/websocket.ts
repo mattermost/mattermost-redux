@@ -71,7 +71,7 @@ export function init(platform: PlatformType, siteUrl: string | undefined | null,
 }
 
 let reconnect = false;
-export function close(shouldReconnect: boolean = false) {
+export function close(shouldReconnect = false) {
     return async (dispatch: DispatchFunc) => {
         reconnect = shouldReconnect;
         websocketClient.close(true);

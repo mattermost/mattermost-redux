@@ -829,7 +829,7 @@ export function loadProfilesForDirect(): ActionFunc {
     };
 }
 
-export function getUserAudits(userId: string, page: number = 0, perPage: number = General.AUDITS_CHUNK_SIZE): ActionFunc {
+export function getUserAudits(userId: string, page = 0, perPage: number = General.AUDITS_CHUNK_SIZE): ActionFunc {
     return bindClientFunc({
         clientFunc: Client4.getUserAudits,
         onSuccess: UserTypes.RECEIVED_AUDITS,
@@ -1058,7 +1058,7 @@ export function updateUserRoles(userId: string, roles: Array<string>): ActionFun
     };
 }
 
-export function updateUserMfa(userId: string, activate: boolean, code: string = ''): ActionFunc {
+export function updateUserMfa(userId: string, activate: boolean, code = ''): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         try {
             await Client4.updateUserMfa(userId, activate, code);
@@ -1185,7 +1185,7 @@ export function uploadProfileImage(userId: string, imageData: any): ActionFunc {
     };
 }
 
-export function switchEmailToOAuth(service: string, email: string, password: string, mfaCode: string = ''): ActionFunc {
+export function switchEmailToOAuth(service: string, email: string, password: string, mfaCode = ''): ActionFunc {
     return bindClientFunc({
         clientFunc: Client4.switchEmailToOAuth,
         params: [
@@ -1208,7 +1208,7 @@ export function switchOAuthToEmail(currentService: string, email: string, passwo
     });
 }
 
-export function switchEmailToLdap(email: string, emailPassword: string, ldapId: string, ldapPassword: string, mfaCode: string = ''): ActionFunc {
+export function switchEmailToLdap(email: string, emailPassword: string, ldapId: string, ldapPassword: string, mfaCode = ''): ActionFunc {
     return bindClientFunc({
         clientFunc: Client4.switchEmailToLdap,
         params: [
@@ -1221,7 +1221,7 @@ export function switchEmailToLdap(email: string, emailPassword: string, ldapId: 
     });
 }
 
-export function switchLdapToEmail(ldapPassword: string, email: string, emailPassword: string, mfaCode: string = ''): ActionFunc {
+export function switchLdapToEmail(ldapPassword: string, email: string, emailPassword: string, mfaCode = ''): ActionFunc {
     return bindClientFunc({
         clientFunc: Client4.switchLdapToEmail,
         params: [
@@ -1251,7 +1251,7 @@ export function createUserAccessToken(userId: string, description: string): Acti
                 token: '',
             },
         }];
-        
+
         const {currentUserId} = getState().entities.users;
         if (userId === currentUserId) {
             actions.push(
@@ -1300,7 +1300,7 @@ export function getUserAccessToken(tokenId: string): ActionFunc {
     };
 }
 
-export function getUserAccessTokens(page: number = 0, perPage: number = General.PROFILE_CHUNK_SIZE): ActionFunc {
+export function getUserAccessTokens(page = 0, perPage: number = General.PROFILE_CHUNK_SIZE): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         let data;
 
@@ -1325,7 +1325,7 @@ export function getUserAccessTokens(page: number = 0, perPage: number = General.
     };
 }
 
-export function getUserAccessTokensForUser(userId: string, page: number = 0, perPage: number = General.PROFILE_CHUNK_SIZE): ActionFunc {
+export function getUserAccessTokensForUser(userId: string, page = 0, perPage: number = General.PROFILE_CHUNK_SIZE): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         let data;
         try {

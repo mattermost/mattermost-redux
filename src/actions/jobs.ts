@@ -32,7 +32,7 @@ export function getJob(id: string): ActionFunc {
     });
 }
 
-export function getJobs(page: number = 0, perPage: number = General.JOBS_CHUNK_SIZE): ActionFunc {
+export function getJobs(page = 0, perPage: number = General.JOBS_CHUNK_SIZE): ActionFunc {
     return bindClientFunc({
         clientFunc: Client4.getJobs,
         onRequest: JobTypes.GET_JOBS_REQUEST,
@@ -45,7 +45,7 @@ export function getJobs(page: number = 0, perPage: number = General.JOBS_CHUNK_S
     });
 }
 
-export function getJobsByType(type: JobType, page: number = 0, perPage: number = General.JOBS_CHUNK_SIZE): ActionFunc {
+export function getJobsByType(type: JobType, page = 0, perPage: number = General.JOBS_CHUNK_SIZE): ActionFunc {
     return bindClientFunc({
         clientFunc: Client4.getJobsByType,
         onRequest: JobTypes.GET_JOBS_REQUEST,

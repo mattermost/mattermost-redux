@@ -22,7 +22,7 @@ export function getScheme(schemeId: string): ActionFunc {
     });
 }
 
-export function getSchemes(scope: SchemeScope, page: number = 0, perPage: number = General.PAGE_SIZE_DEFAULT): ActionFunc {
+export function getSchemes(scope: SchemeScope, page = 0, perPage: number = General.PAGE_SIZE_DEFAULT): ActionFunc {
     return bindClientFunc({
         clientFunc: Client4.getSchemes,
         onRequest: SchemeTypes.GET_SCHEMES_REQUEST,
@@ -86,7 +86,7 @@ export function patchScheme(schemeId: string, scheme: SchemePatch): ActionFunc {
     });
 }
 
-export function getSchemeTeams(schemeId: string, page: number = 0, perPage: number = General.PAGE_SIZE_DEFAULT): ActionFunc {
+export function getSchemeTeams(schemeId: string, page = 0, perPage: number = General.PAGE_SIZE_DEFAULT): ActionFunc {
     return bindClientFunc({
         clientFunc: Client4.getSchemeTeams,
         onRequest: SchemeTypes.GET_SCHEME_TEAMS_REQUEST,
@@ -100,7 +100,7 @@ export function getSchemeTeams(schemeId: string, page: number = 0, perPage: numb
     });
 }
 
-export function getSchemeChannels(schemeId: string, page: number = 0, perPage: number = General.PAGE_SIZE_DEFAULT): ActionFunc {
+export function getSchemeChannels(schemeId: string, page = 0, perPage: number = General.PAGE_SIZE_DEFAULT): ActionFunc {
     return bindClientFunc({
         clientFunc: Client4.getSchemeChannels,
         onRequest: SchemeTypes.GET_SCHEME_CHANNELS_REQUEST,

@@ -37,7 +37,7 @@ export function getIncomingHook(hookId: string) {
     });
 }
 
-export function getIncomingHooks(teamId: string = '', page: number = 0, perPage: number = General.PAGE_SIZE_DEFAULT) {
+export function getIncomingHooks(teamId = '', page = 0, perPage: number = General.PAGE_SIZE_DEFAULT) {
     return bindClientFunc({
         clientFunc: Client4.getIncomingWebhooks,
         onRequest: IntegrationTypes.GET_INCOMING_HOOKS_REQUEST,
@@ -117,7 +117,7 @@ export function getOutgoingHook(hookId: string) {
     });
 }
 
-export function getOutgoingHooks(channelId: string = '', teamId: string = '', page: number = 0, perPage: number = General.PAGE_SIZE_DEFAULT) {
+export function getOutgoingHooks(channelId = '', teamId = '', page = 0, perPage: number = General.PAGE_SIZE_DEFAULT) {
     return bindClientFunc({
         clientFunc: Client4.getOutgoingWebhooks,
         onRequest: IntegrationTypes.GET_OUTGOING_HOOKS_REQUEST,
@@ -198,7 +198,7 @@ export function getCommands(teamId: string) {
     });
 }
 
-export function getAutocompleteCommands(teamId: string, page: number = 0, perPage: number = General.PAGE_SIZE_DEFAULT) {
+export function getAutocompleteCommands(teamId: string, page = 0, perPage: number = General.PAGE_SIZE_DEFAULT) {
     return bindClientFunc({
         clientFunc: Client4.getAutocompleteCommandsList,
         onRequest: IntegrationTypes.GET_AUTOCOMPLETE_COMMANDS_REQUEST,
@@ -349,7 +349,7 @@ export function editOAuthApp(app: OAuthApp) {
     });
 }
 
-export function getOAuthApps(page: number = 0, perPage: number = General.PAGE_SIZE_DEFAULT) {
+export function getOAuthApps(page = 0, perPage: number = General.PAGE_SIZE_DEFAULT) {
     return bindClientFunc({
         clientFunc: Client4.getOAuthApps,
         onRequest: IntegrationTypes.GET_OAUTH_APPS_REQUEST,

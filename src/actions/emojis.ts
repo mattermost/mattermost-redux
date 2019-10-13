@@ -96,10 +96,10 @@ export function getCustomEmojisInText(text: string): ActionFunc {
 }
 
 export function getCustomEmojis(
-    page: number = 0,
+    page = 0,
     perPage: number = General.PAGE_SIZE_DEFAULT,
     sort: string = Emoji.SORT_BY_NAME,
-    loadUsers: boolean = false
+    loadUsers = false
 ): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         let data;
@@ -122,7 +122,6 @@ export function getCustomEmojis(
         });
 
         return {data};
-        
     };
 }
 

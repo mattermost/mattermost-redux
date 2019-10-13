@@ -397,7 +397,7 @@ export default class Client4 {
         return this.doFetch(
             `${this.getUserRoute(userId)}/roles`,
             {method: 'put', body: JSON.stringify({roles})}
-        );    
+        );
     };
     updateUserMfa = async (userId, activate, code) => {
         const body: any = {
