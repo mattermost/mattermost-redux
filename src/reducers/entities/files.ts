@@ -1,12 +1,13 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
+
 import {combineReducers} from 'redux';
 import {FileTypes, PostTypes, UserTypes} from 'action_types';
+
 export function files(state = {}, action) {
     switch (action.type) {
     case FileTypes.RECEIVED_UPLOAD_FILES:
-    case FileTypes.RECEIVED_FILES_FOR_POST:
-    {
+    case FileTypes.RECEIVED_FILES_FOR_POST: {
         const filesById = action.data.reduce((filesMap, file) => {
             return {...filesMap,
                 [file.id]: file,
@@ -18,28 +19,27 @@ export function files(state = {}, action) {
     }
 
     case PostTypes.RECEIVED_NEW_POST:
-    case PostTypes.RECEIVED_POST:
-    {
+    case PostTypes.RECEIVED_POST: {
         const post = action.data;
+
         return storeFilesForPost(state, post);
     }
 
-    case PostTypes.RECEIVED_POSTS:
-    {
+    case PostTypes.RECEIVED_POSTS: {
         const posts = Object.values(action.data.posts);
+
         return posts.reduce(storeFilesForPost, state);
     }
 
     case PostTypes.POST_DELETED:
-    case PostTypes.POST_REMOVED:
-    {
+    case PostTypes.POST_REMOVED: {
         if (action.data && action.data.file_ids && action.data.file_ids.length) {
-            const nextState = {...state,
-            };
+            const nextState = {...state};
             const fileIds = action.data.file_ids;
             fileIds.forEach((id) => {
                 Reflect.deleteProperty(nextState, id);
             });
+
             return nextState;
         }
 
@@ -48,7 +48,6 @@ export function files(state = {}, action) {
 
     case UserTypes.LOGOUT_SUCCESS:
         return {};
-
     default:
         return state;
     }
@@ -65,7 +64,8 @@ function storeFilesForPost(state, post) {
             return nextState;
         }
 
-        return {...nextState,
+        return {
+            ...nextState,
             [file.id]: file,
         };
     }, state);
@@ -73,12 +73,8 @@ function storeFilesForPost(state, post) {
 
 export function fileIdsByPostId(state = {}, action) {
     switch (action.type) {
-    case FileTypes.RECEIVED_FILES_FOR_POST:
-    {
-        const {
-            data,
-            postId,
-        } = action;
+    case FileTypes.RECEIVED_FILES_FOR_POST: {
+        const {data, postId} = action;
         const filesIdsForPost = data.map((file) => file.id);
         return {...state,
             [postId]: filesIdsForPost,
@@ -86,24 +82,22 @@ export function fileIdsByPostId(state = {}, action) {
     }
 
     case PostTypes.RECEIVED_NEW_POST:
-    case PostTypes.RECEIVED_POST:
-    {
+    case PostTypes.RECEIVED_POST: {
         const post = action.data;
+
         return storeFilesIdsForPost(state, post);
     }
 
-    case PostTypes.RECEIVED_POSTS:
-    {
+    case PostTypes.RECEIVED_POSTS: {
         const posts = Object.values(action.data.posts);
+
         return posts.reduce(storeFilesIdsForPost, state);
     }
 
     case PostTypes.POST_DELETED:
-    case PostTypes.POST_REMOVED:
-    {
+    case PostTypes.POST_REMOVED: {
         if (action.data) {
-            const nextState = {...state,
-            };
+            const nextState = {...state};
             Reflect.deleteProperty(nextState, action.data.id);
             return nextState;
         }
@@ -113,7 +107,6 @@ export function fileIdsByPostId(state = {}, action) {
 
     case UserTypes.LOGOUT_SUCCESS:
         return {};
-
     default:
         return state;
     }
@@ -124,18 +117,17 @@ function storeFilesIdsForPost(state, post) {
         return state;
     }
 
-    return {...state,
+    return {
+        ...state,
         [post.id]: post.metadata.files ? post.metadata.files.map((file) => file.id) : [],
     };
 }
 
 function filePublicLink(state = {}, action) {
     switch (action.type) {
-    case FileTypes.RECEIVED_FILE_PUBLIC_LINK:
-    {
+    case FileTypes.RECEIVED_FILE_PUBLIC_LINK: {
         return action.data;
     }
-
     case UserTypes.LOGOUT_SUCCESS:
         return '';
 

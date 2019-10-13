@@ -10,8 +10,7 @@ export default function typing(state: Typing = {}, action: GenericAction): Typin
     } = action;
 
     switch (type) {
-    case WebsocketEvents.TYPING:
-    {
+    case WebsocketEvents.TYPING: {
         const {
             id,
             userId,
@@ -19,8 +18,10 @@ export default function typing(state: Typing = {}, action: GenericAction): Typin
         } = data;
 
         if (id && userId) {
-            return {...state,
-                [id]: {...(state[id] || {}),
+            return {
+                ...state,
+                [id]: {
+                    ...(state[id] || {}),
                     [userId]: now,
                 },
             };
@@ -28,9 +29,7 @@ export default function typing(state: Typing = {}, action: GenericAction): Typin
 
         return state;
     }
-
-    case WebsocketEvents.STOP_TYPING:
-    {
+    case WebsocketEvents.STOP_TYPING: {
         const {
             id,
             userId,
@@ -38,10 +37,11 @@ export default function typing(state: Typing = {}, action: GenericAction): Typin
         } = data;
 
         if (state[id] && state[id][userId] <= now) {
-            const nextState = {...state,
-                [id]: {...state[id],
-                },
+            const nextState = {
+                ...state,
+                [id]: {...state[id]},
             };
+
             Reflect.deleteProperty(nextState[id], userId);
 
             if (Object.keys(nextState[id]).length === 0) {

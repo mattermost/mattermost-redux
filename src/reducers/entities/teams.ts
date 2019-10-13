@@ -11,7 +11,6 @@ function currentTeamId(state = '', action) {
 
     case UserTypes.LOGOUT_SUCCESS:
         return '';
-
     default:
         return state;
     }
@@ -22,7 +21,6 @@ function teams(state = {}, action) {
     case TeamTypes.RECEIVED_TEAMS_LIST:
     case SchemeTypes.RECEIVED_SCHEME_TEAMS:
         return Object.assign({}, state, teamListToMap(action.data));
-
     case TeamTypes.RECEIVED_TEAMS:
         return Object.assign({}, state, action.data);
 
@@ -30,16 +28,14 @@ function teams(state = {}, action) {
     case TeamTypes.UPDATED_TEAM:
     case TeamTypes.PATCHED_TEAM:
     case TeamTypes.RECEIVED_TEAM:
-        return {...state,
+        return {
+            ...state,
             [action.data.id]: action.data,
         };
 
-    case TeamTypes.RECEIVED_TEAM_DELETED:
-    {
-        const nextState = {...state,
-        };
+    case TeamTypes.RECEIVED_TEAM_DELETED: {
+        const nextState = {...state};
         const teamId = action.data.id;
-
         if (nextState.hasOwnProperty(teamId)) {
             Reflect.deleteProperty(nextState, teamId);
             return nextState;
@@ -48,23 +44,15 @@ function teams(state = {}, action) {
         return state;
     }
 
-    case TeamTypes.UPDATED_TEAM_SCHEME:
-    {
-        const {
-            teamId,
-            schemeId,
-        } = action.data;
+    case TeamTypes.UPDATED_TEAM_SCHEME: {
+        const {teamId, schemeId} = action.data;
         const team = state[teamId];
 
         if (!team) {
             return state;
         }
 
-        return {...state,
-            [teamId]: {...team,
-                scheme_id: schemeId,
-            },
-        };
+        return {...state, [teamId]: {...team, scheme_id: schemeId}};
     }
 
     case UserTypes.LOGOUT_SUCCESS:
@@ -85,67 +73,48 @@ function myMembers(state = {}, action) {
     }
 
     switch (action.type) {
-    case TeamTypes.RECEIVED_MY_TEAM_MEMBER:
-    {
-        const nextState = {...state,
-        };
+    case TeamTypes.RECEIVED_MY_TEAM_MEMBER: {
+        const nextState = {...state};
         const member = action.data;
-
         if (member.delete_at === 0) {
             nextState[member.team_id] = member;
         }
-
         return nextState;
     }
-
-    case TeamTypes.RECEIVED_MY_TEAM_MEMBERS:
-    {
+    case TeamTypes.RECEIVED_MY_TEAM_MEMBERS: {
         const nextState = {};
         const members = action.data;
-
         for (const m of members) {
             if (m.delete_at == null || m.delete_at === 0) {
-                const prevMember = state[m.team_id] || {
-                    mention_count: 0,
-                    msg_count: 0,
-                };
-                nextState[m.team_id] = {...prevMember,
+                const prevMember = state[m.team_id] || {mention_count: 0, msg_count: 0};
+                nextState[m.team_id] = {
+                    ...prevMember,
                     ...m,
                 };
             }
         }
-
         return nextState;
     }
-
-    case TeamTypes.RECEIVED_TEAMS_LIST:
-    {
-        const nextState = {...state,
-        };
+    case TeamTypes.RECEIVED_TEAMS_LIST: {
+        const nextState = {...state};
         const receivedTeams = teamListToMap(action.data);
         updateState(receivedTeams, nextState);
         return nextState;
     }
-
-    case TeamTypes.RECEIVED_TEAMS:
-    {
-        const nextState = {...state,
-        };
+    case TeamTypes.RECEIVED_TEAMS: {
+        const nextState = {...state};
         const receivedTeams = action.data;
         updateState(receivedTeams, nextState);
         return nextState;
     }
-
-    case TeamTypes.RECEIVED_MY_TEAM_UNREADS:
-    {
-        const nextState = {...state,
-        };
+    case TeamTypes.RECEIVED_MY_TEAM_UNREADS: {
+        const nextState = {...state};
         const unreads = action.data;
-
         for (const u of unreads) {
             const msgCount = u.msg_count < 0 ? 0 : u.msg_count;
             const mentionCount = u.mention_count < 0 ? 0 : u.mention_count;
-            const m = {...state[u.team_id],
+            const m = {
+                ...state[u.team_id],
                 mention_count: mentionCount,
                 msg_count: msgCount,
             };
@@ -154,14 +123,8 @@ function myMembers(state = {}, action) {
 
         return nextState;
     }
-
-    case ChannelTypes.INCREMENT_UNREAD_MSG_COUNT:
-    {
-        const {
-            teamId,
-            amount,
-            onlyMentions,
-        } = action.data;
+    case ChannelTypes.INCREMENT_UNREAD_MSG_COUNT: {
+        const {teamId, amount, onlyMentions} = action.data;
         const member = state[teamId];
 
         if (!member) {
@@ -174,19 +137,16 @@ function myMembers(state = {}, action) {
             return state;
         }
 
-        return {...state,
-            [teamId]: {...member,
+        return {
+            ...state,
+            [teamId]: {
+                ...member,
                 msg_count: member.msg_count + amount,
             },
         };
     }
-
-    case ChannelTypes.DECREMENT_UNREAD_MSG_COUNT:
-    {
-        const {
-            teamId,
-            amount,
-        } = action.data;
+    case ChannelTypes.DECREMENT_UNREAD_MSG_COUNT: {
+        const {teamId, amount} = action.data;
         const member = state[teamId];
 
         if (!member) {
@@ -194,19 +154,16 @@ function myMembers(state = {}, action) {
             return state;
         }
 
-        return {...state,
-            [teamId]: {...member,
+        return {
+            ...state,
+            [teamId]: {
+                ...member,
                 msg_count: Math.max(member.msg_count - Math.abs(amount), 0),
             },
         };
     }
-
-    case ChannelTypes.INCREMENT_UNREAD_MENTION_COUNT:
-    {
-        const {
-            teamId,
-            amount,
-        } = action.data;
+    case ChannelTypes.INCREMENT_UNREAD_MENTION_COUNT: {
+        const {teamId, amount} = action.data;
         const member = state[teamId];
 
         if (!member) {
@@ -214,19 +171,16 @@ function myMembers(state = {}, action) {
             return state;
         }
 
-        return {...state,
-            [teamId]: {...member,
+        return {
+            ...state,
+            [teamId]: {
+                ...member,
                 mention_count: member.mention_count + amount,
             },
         };
     }
-
-    case ChannelTypes.DECREMENT_UNREAD_MENTION_COUNT:
-    {
-        const {
-            teamId,
-            amount,
-        } = action.data;
+    case ChannelTypes.DECREMENT_UNREAD_MENTION_COUNT: {
+        const {teamId, amount} = action.data;
         const member = state[teamId];
 
         if (!member) {
@@ -234,31 +188,26 @@ function myMembers(state = {}, action) {
             return state;
         }
 
-        return {...state,
-            [teamId]: {...member,
+        return {
+            ...state,
+            [teamId]: {
+                ...member,
                 mention_count: Math.max(member.mention_count - amount, 0),
             },
         };
     }
-
     case TeamTypes.LEAVE_TEAM:
-    case TeamTypes.RECEIVED_TEAM_DELETED:
-    {
-        const nextState = {...state,
-        };
+    case TeamTypes.RECEIVED_TEAM_DELETED: {
+        const nextState = {...state};
         const data = action.data;
         Reflect.deleteProperty(nextState, data.id);
         return nextState;
     }
-
-    case TeamTypes.UPDATED_TEAM_MEMBER_SCHEME_ROLES:
-    {
+    case TeamTypes.UPDATED_TEAM_MEMBER_SCHEME_ROLES: {
         return updateTeamMemberSchemeRoles(state, action);
     }
-
     case UserTypes.LOGOUT_SUCCESS:
         return {};
-
     default:
         return state;
     }
@@ -266,33 +215,25 @@ function myMembers(state = {}, action) {
 
 function membersInTeam(state = {}, action) {
     switch (action.type) {
-    case TeamTypes.RECEIVED_MEMBER_IN_TEAM:
-    {
+    case TeamTypes.RECEIVED_MEMBER_IN_TEAM: {
         const data = action.data;
-        const members = {...(state[data.team_id] || {}),
-        };
+        const members = {...(state[data.team_id] || {})};
         members[data.user_id] = data;
-        return {...state,
+        return {
+            ...state,
             [data.team_id]: members,
         };
     }
-
-    case TeamTypes.RECEIVED_TEAM_MEMBERS:
-    {
+    case TeamTypes.RECEIVED_TEAM_MEMBERS: {
         const data = action.data;
-
         if (data && data.length) {
-            const nextState = {...state,
-            };
-
+            const nextState = {...state};
             for (const member of data) {
                 if (nextState[member.team_id]) {
-                    nextState[member.team_id] = {...nextState[member.team_id],
-                    };
+                    nextState[member.team_id] = {...nextState[member.team_id]};
                 } else {
                     nextState[member.team_id] = {};
                 }
-
                 nextState[member.team_id][member.user_id] = member;
             }
 
@@ -301,51 +242,40 @@ function membersInTeam(state = {}, action) {
 
         return state;
     }
-
-    case TeamTypes.RECEIVED_MEMBERS_IN_TEAM:
-    {
+    case TeamTypes.RECEIVED_MEMBERS_IN_TEAM: {
         const data = action.data;
-
         if (data && data.length) {
             const teamId = data[0].team_id;
-            const members = {...(state[teamId] || {}),
-            };
-
+            const members = {...(state[teamId] || {})};
             for (const member of data) {
                 members[member.user_id] = member;
             }
 
-            return {...state,
+            return {
+                ...state,
                 [teamId]: members,
             };
         }
 
         return state;
     }
-
-    case TeamTypes.REMOVE_MEMBER_FROM_TEAM:
-    {
+    case TeamTypes.REMOVE_MEMBER_FROM_TEAM: {
         const data = action.data;
         const members = state[data.team_id];
-
         if (members) {
-            const nextState = {...members,
-            };
+            const nextState = {...members};
             Reflect.deleteProperty(nextState, data.user_id);
-            return {...state,
+            return {
+                ...state,
                 [data.team_id]: nextState,
             };
         }
 
         return state;
     }
-
-    case TeamTypes.RECEIVED_TEAM_DELETED:
-    {
-        const nextState = {...state,
-        };
+    case TeamTypes.RECEIVED_TEAM_DELETED: {
+        const nextState = {...state};
         const teamId = action.data.id;
-
         if (nextState.hasOwnProperty(teamId)) {
             Reflect.deleteProperty(nextState, teamId);
             return nextState;
@@ -353,15 +283,11 @@ function membersInTeam(state = {}, action) {
 
         return state;
     }
-
-    case TeamTypes.UPDATED_TEAM_MEMBER_SCHEME_ROLES:
-    {
+    case TeamTypes.UPDATED_TEAM_MEMBER_SCHEME_ROLES: {
         return updateTeamMemberSchemeRoles(state, action);
     }
-
     case UserTypes.LOGOUT_SUCCESS:
         return {};
-
     default:
         return state;
     }
@@ -369,20 +295,16 @@ function membersInTeam(state = {}, action) {
 
 function stats(state = {}, action) {
     switch (action.type) {
-    case TeamTypes.RECEIVED_TEAM_STATS:
-    {
+    case TeamTypes.RECEIVED_TEAM_STATS: {
         const stat = action.data;
-        return {...state,
+        return {
+            ...state,
             [stat.team_id]: stat,
         };
     }
-
-    case TeamTypes.RECEIVED_TEAM_DELETED:
-    {
-        const nextState = {...state,
-        };
+    case TeamTypes.RECEIVED_TEAM_DELETED: {
+        const nextState = {...state};
         const teamId = action.data.id;
-
         if (nextState.hasOwnProperty(teamId)) {
             Reflect.deleteProperty(nextState, teamId);
             return nextState;
@@ -390,10 +312,8 @@ function stats(state = {}, action) {
 
         return state;
     }
-
     case UserTypes.LOGOUT_SUCCESS:
         return {};
-
     default:
         return state;
     }
@@ -401,89 +321,54 @@ function stats(state = {}, action) {
 
 function groupsAssociatedToTeam(state = {}, action) {
     switch (action.type) {
-    case GroupTypes.RECEIVED_GROUPS_ASSOCIATED_TO_TEAM:
-    {
-        const {
-            teamID,
-            groups,
-            totalGroupCount,
-        } = action.data;
-        const nextState = {...state,
-        };
+    case GroupTypes.RECEIVED_GROUPS_ASSOCIATED_TO_TEAM: {
+        const {teamID, groups, totalGroupCount} = action.data;
+        const nextState = {...state};
         const associatedGroupIDs = new Set(state[teamID] ? state[teamID].ids : []);
-
         for (const group of groups) {
             associatedGroupIDs.add(group.id);
         }
-
-        nextState[teamID] = {
-            ids: Array.from(associatedGroupIDs),
-            totalCount: totalGroupCount,
-        };
+        nextState[teamID] = {ids: Array.from(associatedGroupIDs), totalCount: totalGroupCount};
         return nextState;
     }
-
-    case GroupTypes.RECEIVED_ALL_GROUPS_ASSOCIATED_TO_TEAM:
-    {
-        const {
-            teamID,
-            groups,
-        } = action.data;
-        const nextState = {...state,
-        };
+    case GroupTypes.RECEIVED_ALL_GROUPS_ASSOCIATED_TO_TEAM: {
+        const {teamID, groups} = action.data;
+        const nextState = {...state};
         const associatedGroupIDs = new Set<string>([]);
-
         for (const group of groups) {
             associatedGroupIDs.add(group.id);
         }
-
         const ids = Array.from(associatedGroupIDs);
-        nextState[teamID] = {
-            ids,
-            totalCount: ids.length,
-        };
+        nextState[teamID] = {ids, totalCount: ids.length};
         return nextState;
     }
-
-    case GroupTypes.RECEIVED_GROUPS_NOT_ASSOCIATED_TO_TEAM:
-    {
-        const {
-            teamID,
-            groups,
-        } = action.data;
-        const nextState = {...state,
-        };
+    case GroupTypes.RECEIVED_GROUPS_NOT_ASSOCIATED_TO_TEAM: {
+        const {teamID, groups} = action.data;
+        const nextState = {...state};
         const associatedGroupIDs = new Set(state[teamID] ? state[teamID].ids : []);
-
         for (const group of groups) {
             associatedGroupIDs.delete(group.id);
         }
-
         nextState[teamID] = Array.from(associatedGroupIDs);
         return nextState;
     }
-
     default:
         return state;
     }
 }
 
 function updateTeamMemberSchemeRoles(state, action) {
-    const {
-        teamId,
-        userId,
-        isSchemeUser,
-        isSchemeAdmin,
-    } = action.data;
+    const {teamId, userId, isSchemeUser, isSchemeAdmin} = action.data;
     const team = state[teamId];
-
     if (team) {
         const member = team[userId];
-
         if (member) {
-            return {...state,
-                [teamId]: {...state[teamId],
-                    [userId]: {...state[teamId][userId],
+            return {
+                ...state,
+                [teamId]: {
+                    ...state[teamId],
+                    [userId]: {
+                        ...state[teamId][userId],
                         scheme_user: isSchemeUser,
                         scheme_admin: isSchemeAdmin,
                     },
@@ -491,17 +376,14 @@ function updateTeamMemberSchemeRoles(state, action) {
             };
         }
     }
-
     return state;
 }
 
 function totalCount(state = 0, action) {
     switch (action.type) {
-    case TeamTypes.RECEIVED_TOTAL_TEAM_COUNT:
-    {
+    case TeamTypes.RECEIVED_TOTAL_TEAM_COUNT: {
         return action.data;
     }
-
     default:
         return state;
     }
@@ -523,6 +405,8 @@ export default combineReducers({
 
     // object where every key is the team id and has an object with the team stats
     stats,
+
     groupsAssociatedToTeam,
+
     totalCount,
 });

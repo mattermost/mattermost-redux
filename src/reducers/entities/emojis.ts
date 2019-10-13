@@ -8,47 +8,34 @@ import {GenericAction} from 'types/actions';
 import {IDMappedObjects} from 'types/utilities';
 export function customEmoji(state: IDMappedObjects<CustomEmoji> = {}, action: GenericAction): IDMappedObjects<CustomEmoji> {
     switch (action.type) {
-    case EmojiTypes.RECEIVED_CUSTOM_EMOJI:
-    {
-        const nextState = {...state,
-        };
+    case EmojiTypes.RECEIVED_CUSTOM_EMOJI: {
+        const nextState = {...state};
         nextState[action.data.id] = action.data;
         return nextState;
     }
-
-    case EmojiTypes.RECEIVED_CUSTOM_EMOJIS:
-    {
-        const nextState = {...state,
-        };
-
+    case EmojiTypes.RECEIVED_CUSTOM_EMOJIS: {
+        const nextState = {...state};
         for (const emoji of action.data) {
             nextState[emoji.id] = emoji;
         }
-
         return nextState;
     }
-
-    case EmojiTypes.DELETED_CUSTOM_EMOJI:
-    {
-        const nextState = {...state,
-        };
+    case EmojiTypes.DELETED_CUSTOM_EMOJI: {
+        const nextState = {...state};
         Reflect.deleteProperty(nextState, action.data.id);
         return nextState;
     }
-
     case EmojiTypes.CLEAR_CUSTOM_EMOJIS:
     case UserTypes.LOGOUT_SUCCESS:
         return {};
 
     case PostTypes.RECEIVED_NEW_POST:
-    case PostTypes.RECEIVED_POST:
-    {
+    case PostTypes.RECEIVED_POST: {
         const post: Post = action.data;
+
         return storeEmojisForPost(state, post);
     }
-
-    case PostTypes.RECEIVED_POSTS:
-    {
+    case PostTypes.RECEIVED_POSTS: {
         const posts = Object.values(action.data.posts);
         return (posts as any).reduce(storeEmojisForPost, state); // Cast to any to avoid typing problems caused by Object.values
     }
@@ -69,7 +56,8 @@ function storeEmojisForPost(state: IDMappedObjects<CustomEmoji>, post: Post): ID
             return nextState;
         }
 
-        return {...nextState,
+        return {
+            ...nextState,
             [emoji.id]: emoji,
         };
     }, state);
@@ -77,44 +65,35 @@ function storeEmojisForPost(state: IDMappedObjects<CustomEmoji>, post: Post): ID
 
 function nonExistentEmoji(state: Set<string> = new Set(), action: GenericAction): Set<string> {
     switch (action.type) {
-    case EmojiTypes.CUSTOM_EMOJI_DOES_NOT_EXIST:
-    {
+    case EmojiTypes.CUSTOM_EMOJI_DOES_NOT_EXIST: {
         if (!state.has(action.data)) {
             const nextState = new Set(state);
             nextState.add(action.data);
             return nextState;
         }
-
         return state;
     }
-
-    case EmojiTypes.RECEIVED_CUSTOM_EMOJI:
-    {
+    case EmojiTypes.RECEIVED_CUSTOM_EMOJI: {
         if (action.data && state.has(action.data.name)) {
             const nextState = new Set(state);
             nextState.delete(action.data.name);
             return nextState;
         }
-
         return state;
     }
-
-    case EmojiTypes.RECEIVED_CUSTOM_EMOJIS:
-    {
+    case EmojiTypes.RECEIVED_CUSTOM_EMOJIS: {
         const data = action.data || [];
         const nextState = new Set(state);
-        let changed = false;
 
+        let changed = false;
         for (const emoji of data) {
             if (emoji && nextState.has(emoji.name)) {
                 nextState.delete(emoji.name);
                 changed = true;
             }
         }
-
         return changed ? nextState : state;
     }
-
     case EmojiTypes.CLEAR_CUSTOM_EMOJIS:
     case UserTypes.LOGOUT_SUCCESS:
         return new Set();

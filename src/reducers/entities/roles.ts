@@ -1,5 +1,6 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
+
 import {combineReducers} from 'redux';
 import {RoleTypes, UserTypes} from 'action_types';
 
@@ -7,10 +8,8 @@ function pending(state = new Set(), action) {
     switch (action.type) {
     case RoleTypes.SET_PENDING_ROLES:
         return action.data;
-
     case UserTypes.LOGOUT_SUCCESS:
         return new Set();
-
     default:
         return state;
     }
@@ -18,39 +17,29 @@ function pending(state = new Set(), action) {
 
 function roles(state = {}, action) {
     switch (action.type) {
-    case RoleTypes.RECEIVED_ROLES:
-    {
+    case RoleTypes.RECEIVED_ROLES: {
         if (action.data) {
-            const nextState = {...state,
-            };
-
+            const nextState = {...state};
             for (const role of action.data) {
                 nextState[role.name] = role;
             }
-
             return nextState;
         }
 
         return state;
     }
-
-    case RoleTypes.ROLE_DELETED:
-    {
+    case RoleTypes.ROLE_DELETED: {
         if (action.data) {
-            const nextState = {...state,
-            };
+            const nextState = {...state};
             Reflect.deleteProperty(nextState, action.data.name);
             return nextState;
         }
 
         return state;
     }
-
-    case RoleTypes.RECEIVED_ROLE:
-    {
+    case RoleTypes.RECEIVED_ROLE: {
         if (action.data) {
-            const nextState = {...state,
-            };
+            const nextState = {...state};
             nextState[action.data.name] = action.data;
             return nextState;
         }
@@ -60,7 +49,6 @@ function roles(state = {}, action) {
 
     case UserTypes.LOGOUT_SUCCESS:
         return {};
-
     default:
         return state;
     }

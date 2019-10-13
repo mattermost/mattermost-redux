@@ -16,10 +16,7 @@ export function saveAppPropsRequest(props) {
 
 export function saveAppProps(appProps) {
     return (dispatch: DispatchFunc, getState: GetStateFunc) => {
-        const {
-            GfycatApiKey,
-            GfycatApiSecret,
-        } = getState().entities.general.config;
+        const {GfycatApiKey, GfycatApiSecret} = getState().entities.general.config;
         gfycatSdk(GfycatApiKey, GfycatApiSecret).authenticate();
         dispatch(saveAppPropsRequest(appProps));
     };
@@ -62,12 +59,7 @@ export function requestSearch(searchText) {
     };
 }
 
-export function receiveSearch({
-    searchText,
-    count,
-    start,
-    json,
-}) {
+export function receiveSearch({searchText, count, start, json}) {
     return {
         type: GifTypes.RECEIVE_SEARCH,
         searchText,
@@ -94,10 +86,7 @@ export function errorSearching(err, searchText) {
     };
 }
 
-export function receiveCategorySearch({
-    tagName,
-    json,
-}) {
+export function receiveCategorySearch({tagName, json}) {
     return {
         type: GifTypes.RECEIVE_CATEGORY_SEARCH,
         searchText: tagName,
@@ -153,32 +142,17 @@ export function searchPriorLocation(priorLocation) {
     };
 }
 
-export function searchGfycat({
-    searchText,
-    count = 30,
-    startIndex = 0,
-}) {
+export function searchGfycat({searchText, count = 30, startIndex = 0}) {
     let start = startIndex;
     return (dispatch: DispatchFunc, getState: GetStateFunc) => {
-        const {
-            GfycatApiKey,
-            GfycatApiSecret,
-        } = getState().entities.general.config;
-        const {
-            resultsByTerm,
-        } = getState().entities.gifs.search;
-
+        const {GfycatApiKey, GfycatApiSecret} = getState().entities.general.config;
+        const {resultsByTerm} = getState().entities.gifs.search;
         if (resultsByTerm[searchText]) {
             start = resultsByTerm[searchText].start + count;
         }
-
-        dispatch(requestSearch(searchText));
+        dispatch(requestSearch(searchText, count, start));
         gfycatSdk(GfycatApiKey, GfycatApiSecret).authenticate();
-        return gfycatSdk(GfycatApiKey, GfycatApiSecret).search({
-            search_text: searchText,
-            count,
-            start,
-        }).then((json) => {
+        return gfycatSdk(GfycatApiKey, GfycatApiSecret).search({search_text: searchText, count, start}).then((json) => {
             if (json.errorMessage) {
                 // There was no results before
                 if (resultsByTerm[searchText].items) {
@@ -189,78 +163,63 @@ export function searchGfycat({
             } else {
                 dispatch(updateSearchText(searchText));
                 dispatch(cacheGifsRequest(json.gfycats));
-                dispatch(receiveSearch({
-                    searchText,
-                    count,
-                    start,
-                    json,
-                }));
-                const context = getState().entities.gifs.categories.tagsDict[searchText] ? 'category' : 'search';
-                Client4.trackEvent('gfycat', 'views', {
-                    context,
-                    count: json.gfycats.length,
-                    keyword: searchText,
-                });
+                dispatch(receiveSearch({searchText, count, start, json}));
+
+                const context = getState().entities.gifs.categories.tagsDict[searchText] ?
+                    'category' :
+                    'search';
+                Client4.trackEvent(
+                    'gfycat',
+                    'views',
+                    {context, count: json.gfycats.length, keyword: searchText}
+                );
             }
-        }).catch((err) => dispatch(errorSearching(err, searchText)));
+        }).catch(
+            (err) => dispatch(errorSearching(err, searchText))
+        );
     };
 }
 
-export function searchCategory({
-    tagName = '',
-    gfyCount = 30,
-    cursorPos = undefined,
-}) {
+export function searchCategory({tagName = '', gfyCount = 30, cursorPos}) {
     let cursor = cursorPos;
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
-        const {
-            GfycatApiKey,
-            GfycatApiSecret,
-        } = getState().entities.general.config;
-        const {
-            resultsByTerm,
-        } = getState().entities.gifs.search;
-
+        const {GfycatApiKey, GfycatApiSecret} = getState().entities.general.config;
+        const {resultsByTerm} = getState().entities.gifs.search;
         if (resultsByTerm[tagName]) {
             cursor = resultsByTerm[tagName].cursor;
         }
-
         dispatch(requestSearch(tagName));
-        return gfycatSdk(GfycatApiKey, GfycatApiSecret).getTrendingCategories({
-            tagName,
-            gfyCount,
-            cursor,
-        }).then((json) => {
-            if (json.errorMessage) {
-                if (resultsByTerm[tagName].gfycats) {
-                    dispatch(receiveSearchEnd(tagName));
+        return gfycatSdk(GfycatApiKey, GfycatApiSecret).getTrendingCategories({tagName, gfyCount, cursor}).then(
+            (json) => {
+                if (json.errorMessage) {
+                    if (resultsByTerm[tagName].gfycats) {
+                        dispatch(receiveSearchEnd(tagName));
+                    } else {
+                        dispatch(errorSearching(json, tagName));
+                    }
                 } else {
-                    dispatch(errorSearching(json, tagName));
-                }
-            } else {
-                dispatch(updateSearchText(tagName));
-                dispatch(cacheGifsRequest(json.gfycats));
-                dispatch(receiveCategorySearch({
-                    tagName,
-                    json,
-                }));
-                Client4.trackEvent('gfycat', 'views', {
-                    context: 'category',
-                    count: json.gfycats.length,
-                    keyword: tagName,
-                }); // preload categories list
+                    dispatch(updateSearchText(tagName));
+                    dispatch(cacheGifsRequest(json.gfycats));
+                    dispatch(receiveCategorySearch({tagName, json}));
 
-                if (tagName === 'trending') {
-                    dispatch(requestCategoriesListIfNeeded() as any);
+                    Client4.trackEvent(
+                        'gfycat',
+                        'views',
+                        {context: 'category', count: json.gfycats.length, keyword: tagName}
+                    );
+
+                    // preload categories list
+                    if (tagName === 'trending') {
+                        dispatch(requestCategoriesListIfNeeded());
+                    }
                 }
             }
-        }).catch((err) => dispatch(errorSearching(err, tagName)));
+        ).catch((err) => dispatch(errorSearching(err, tagName)));
     };
 }
 
 export function shouldSearch(state, searchText) {
     const resultsByTerm = state.search.resultsByTerm[searchText];
-
     if (!resultsByTerm) {
         return true;
     } else if (resultsByTerm.isFetching) {
@@ -268,7 +227,6 @@ export function shouldSearch(state, searchText) {
     } else if (resultsByTerm.moreRemaining) {
         return true;
     }
-
     return resultsByTerm.didInvalidate;
 }
 
@@ -276,16 +234,10 @@ export function searchIfNeeded(searchText) {
     return (dispatch: DispatchFunc, getState: GetStateFunc) => {
         if (shouldSearch(getState(), searchText)) {
             if (searchText.toLowerCase() === 'trending') {
-                return dispatch(searchCategory({
-                    tagName: searchText,
-                }));
+                return dispatch(searchCategory({tagName: searchText}));
             }
-
-            return dispatch(searchGfycat({
-                searchText,
-            }));
+            return dispatch(searchGfycat({searchText}));
         }
-
         return Promise.resolve();
     };
 }
@@ -293,26 +245,18 @@ export function searchIfNeeded(searchText) {
 export function searchIfNeededInitial(searchText) {
     return (dispatch: DispatchFunc, getState: GetStateFunc) => {
         dispatch(updateSearchText(searchText));
-
         if (shouldSearchInitial(getState(), searchText)) {
             if (searchText.toLowerCase() === 'trending') {
-                return dispatch(searchCategory({
-                    tagName: searchText,
-                }));
+                return dispatch(searchCategory({tagName: searchText}));
             }
-
-            return dispatch(searchGfycat({
-                searchText,
-            }));
+            return dispatch(searchGfycat({searchText}));
         }
-
         return Promise.resolve();
     };
 }
 
 export function shouldSearchInitial(state, searchText) {
     const resultsByTerm = state.entities.gifs.search.resultsByTerm[searchText];
-
     if (!resultsByTerm) {
         return true;
     } else if (resultsByTerm.isFetching) {
@@ -324,22 +268,19 @@ export function shouldSearchInitial(state, searchText) {
 
 export function searchById(gfyId) {
     return (dispatch: DispatchFunc, getState: GetStateFunc) => {
-        const {
-            GfycatApiKey,
-            GfycatApiSecret,
-        } = getState().entities.general.config;
+        const {GfycatApiKey, GfycatApiSecret} = getState().entities.general.config;
         dispatch(requestSearchById(gfyId));
-        return gfycatSdk(GfycatApiKey, GfycatApiSecret).searchById({
-            id: gfyId,
-        }).then((response) => {
-            dispatch(receiveSearchById(gfyId, response.gfyItem));
-            dispatch(cacheGifsRequest([response.gfyItem]));
-        }).catch((err) => dispatch(errorSearchById(err, gfyId)));
+        return gfycatSdk(GfycatApiKey, GfycatApiSecret).searchById({id: gfyId}).then(
+            (response) => {
+                dispatch(receiveSearchById(gfyId, response.gfyItem));
+                dispatch(cacheGifsRequest([response.gfyItem]));
+            }
+        ).catch((err) => dispatch(errorSearchById(err, gfyId)));
     };
 }
 
 export function shouldSearchById(state, gfyId) {
-    return !state.entities.gifs.cache.gifs[gfyId];
+    return !state.entities.gifs.cache.gifs[gfyId]; //TODO investigate, used to be !state.cache.gifs[gfyId];
 }
 
 export function searchByIdIfNeeded(gfyId) {
@@ -348,7 +289,7 @@ export function searchByIdIfNeeded(gfyId) {
             return dispatch(searchById(gfyId));
         }
 
-        return Promise.resolve(getState().entities.gifs.cache.gifs[gfyId]); //TODO: investigate
+        return Promise.resolve(getState().entities.gifs.cache.gifs[gfyId]); //TODO: investigate, used to be getState().cache.gifs[gfyId]
     };
 }
 
@@ -398,44 +339,33 @@ export function categoriesListFailure(err) {
     };
 }
 
-export function requestCategoriesList({
-    count = 60,
-} = {}) {
+export function requestCategoriesList({count = 60} = {}) {
     return (dispatch: DispatchFunc, getState: GetStateFunc) => {
-        const {
-            GfycatApiKey,
-            GfycatApiSecret,
-        } = getState().entities.general.config;
+        const {GfycatApiKey, GfycatApiSecret} = getState().entities.general.config;
         const state = getState().entities.gifs.categories;
-
         if (!shouldRequestCategoriesList(state)) {
             return Promise.resolve();
         }
-
         dispatch(categoriesListRequest());
-        const {
-            cursor,
-        } = state;
-        const options = {...(count && {
-            count,
-        }),
-        ...(cursor && {
-            cursor,
-        }),
+        const {cursor} = state;
+        const options = {
+            ...(count && {count}),
+            ...(cursor && {cursor}),
         };
         return gfycatSdk(GfycatApiKey, GfycatApiSecret).getCategories(options).then((json) => {
             const newGfycats = json.tags.reduce((gfycats, tag) => {
                 if (tag.gfycats[0] && tag.gfycats[0].width) {
                     return [...gfycats, ...tag.gfycats];
                 }
-
                 return gfycats;
             }, []);
             dispatch(cacheGifsRequest(newGfycats));
             dispatch(categoriesListReceived(json));
-        }).catch((err) => {
-            dispatch(categoriesListFailure(err));
-        });
+        }).catch(
+            (err) => {
+                dispatch(categoriesListFailure(err));
+            }
+        );
     };
 }
 
@@ -444,24 +374,15 @@ export function requestCategoriesListIfNeeded({
 } = {count: undefined}) {
     return (dispatch: DispatchFunc, getState: GetStateFunc) => {
         const state = getState().entities.gifs.categories;
-
         if (state.tagsList && state.tagsList.length) {
-            return Promise.resolve({count: undefined});
+            return Promise.resolve();
         }
-
-        return dispatch(requestCategoriesList({
-            count,
-        }));
+        return dispatch(requestCategoriesList({count}));
     };
 }
 
 export function shouldRequestCategoriesList(state) {
-    const {
-        hasMore,
-        isFetching,
-        tagsList,
-    } = state;
-
+    const {hasMore, isFetching, tagsList} = state;
     if (!tagsList || !tagsList.length) {
         return true;
     } else if (isFetching) {
@@ -469,7 +390,6 @@ export function shouldRequestCategoriesList(state) {
     } else if (hasMore) {
         return true;
     }
-
     return false;
 }
 

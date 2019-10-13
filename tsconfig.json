@@ -37,6 +37,7 @@
             "selectors/*": ["src/selectors/*"],
             "store/*": ["src/store/*"],
             "action_types": ["src/action_types"],
+            "actions/*": ["src/action_types/*"],
             "test/*": ["test/*"],
             "*": ["src/*","node_modules/*"]
         },

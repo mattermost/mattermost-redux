@@ -1,5 +1,6 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
+
 import {combineReducers} from 'redux';
 import {PreferenceTypes, UserTypes} from 'action_types';
 
@@ -9,8 +10,7 @@ function getKey(preference) {
 
 function myPreferences(state = {}, action) {
     switch (action.type) {
-    case PreferenceTypes.RECEIVED_ALL_PREFERENCES:
-    {
+    case PreferenceTypes.RECEIVED_ALL_PREFERENCES: {
         const nextState = {};
 
         if (action.data) {
@@ -22,10 +22,8 @@ function myPreferences(state = {}, action) {
         return nextState;
     }
 
-    case PreferenceTypes.RECEIVED_PREFERENCES:
-    {
-        const nextState = {...state,
-        };
+    case PreferenceTypes.RECEIVED_PREFERENCES: {
+        const nextState = {...state};
 
         if (action.data) {
             for (const preference of action.data) {
@@ -35,11 +33,8 @@ function myPreferences(state = {}, action) {
 
         return nextState;
     }
-
-    case PreferenceTypes.DELETED_PREFERENCES:
-    {
-        const nextState = {...state,
-        };
+    case PreferenceTypes.DELETED_PREFERENCES: {
+        const nextState = {...state};
 
         if (action.data) {
             for (const preference of action.data) {
@@ -52,7 +47,6 @@ function myPreferences(state = {}, action) {
 
     case UserTypes.LOGOUT_SUCCESS:
         return {};
-
     default:
         return state;
     }

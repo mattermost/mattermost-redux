@@ -1,64 +1,76 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
+
 import {combineReducers} from 'redux';
 import {GifTypes} from 'action_types';
+
 const SEARCH_SELECTORS = {
-    [GifTypes.SELECT_SEARCH_TEXT]: (state, action) => ({...state,
+    [GifTypes.SELECT_SEARCH_TEXT]: (state, action) => ({
+        ...state,
         searchText: action.searchText,
     }),
-    [GifTypes.INVALIDATE_SEARCH_TEXT]: (state, action) => ({...state,
-        resultsByTerm: {...state.resultsByTerm[action.searchText],
+    [GifTypes.INVALIDATE_SEARCH_TEXT]: (state, action) => ({
+        ...state,
+        resultsByTerm: {
+            ...state.resultsByTerm[action.searchText],
             didInvalidate: true,
         },
     }),
-    [GifTypes.REQUEST_SEARCH]: (state, action) => ({...state,
+    [GifTypes.REQUEST_SEARCH]: (state, action) => ({
+        ...state,
         resultsByTerm: TERM_SELECTOR[action.type](state.resultsByTerm, action),
     }),
-    [GifTypes.RECEIVE_SEARCH]: (state, action) => ({...state,
+    [GifTypes.RECEIVE_SEARCH]: (state, action) => ({
+        ...state,
         searchText: action.searchText,
         resultsByTerm: TERM_SELECTOR[action.type](state.resultsByTerm, action),
     }),
-    [GifTypes.RECEIVE_SEARCH_END]: (state, action) => ({...state,
+    [GifTypes.RECEIVE_SEARCH_END]: (state, action) => ({
+        ...state,
         searchText: action.searchText,
         resultsByTerm: TERM_SELECTOR[action.type](state.resultsByTerm, action),
     }),
-    [GifTypes.RECEIVE_CATEGORY_SEARCH]: (state, action) => ({...state,
+    [GifTypes.RECEIVE_CATEGORY_SEARCH]: (state, action) => ({
+        ...state,
         searchText: action.searchText,
         resultsByTerm: TERM_SELECTOR[action.type](state.resultsByTerm, action),
     }),
-    [GifTypes.SEARCH_FAILURE]: (state, action) => ({...state,
+    [GifTypes.SEARCH_FAILURE]: (state, action) => ({
+        ...state,
         searchText: action.searchText,
         resultsByTerm: TERM_SELECTOR[action.type](state.resultsByTerm, action),
     }),
-    [GifTypes.CLEAR_SEARCH_RESULTS]: (state) => ({...state,
+    [GifTypes.CLEAR_SEARCH_RESULTS]: (state) => ({
+        ...state,
         searchText: '',
         resultsByTerm: {},
     }),
-    [GifTypes.SAVE_SEARCH_SCROLL_POSITION]: (state, action) => ({...state,
+    [GifTypes.SAVE_SEARCH_SCROLL_POSITION]: (state, action) => ({
+        ...state,
         scrollPosition: action.scrollPosition,
     }),
-    [GifTypes.SAVE_SEARCH_PRIOR_LOCATION]: (state, action) => ({...state,
+    [GifTypes.SAVE_SEARCH_PRIOR_LOCATION]: (state, action) => ({
+        ...state,
         priorLocation: action.priorLocation,
     }),
-    [GifTypes.UPDATE_SEARCH_TEXT]: (state, action) => ({...state,
+    [GifTypes.UPDATE_SEARCH_TEXT]: (state, action) => ({
+        ...state,
         searchText: action.searchText,
     }),
-    [GifTypes.SAVE_SEARCH_BAR_TEXT]: (state, action) => ({...state,
+    [GifTypes.SAVE_SEARCH_BAR_TEXT]: (state, action) => ({
+        ...state,
         searchBarText: action.searchBarText,
     }),
 };
+
 const CATEGORIES_SELECTORS = {
-    [GifTypes.REQUEST_CATEGORIES_LIST]: (state) => ({...state,
+    [GifTypes.REQUEST_CATEGORIES_LIST]: (state) => ({
+        ...state,
         isFetching: true,
     }),
     [GifTypes.CATEGORIES_LIST_RECEIVED]: (state, action) => {
-        const {
-            cursor,
-            tags,
-        } = action;
-        const {
-            tagsList: oldTagsList = [],
-        } = state;
+        const {cursor, tags} = action;
+        const {tagsList: oldTagsList = []} = state;
         const tagsDict = {};
         const newTagsList = tags.filter((item) => {
             return Boolean(item && item.gfycats[0] && item.gfycats[0].width);
@@ -70,7 +82,8 @@ const CATEGORIES_SELECTORS = {
             };
         });
         const tagsList = [...oldTagsList, ...newTagsList];
-        return {...state,
+        return {
+            ...state,
             cursor,
             hasMore: Boolean(cursor),
             isFetching: false,
@@ -78,13 +91,17 @@ const CATEGORIES_SELECTORS = {
             tagsDict,
         };
     },
-    [GifTypes.CATEGORIES_LIST_FAILURE]: (state) => ({...state,
+    [GifTypes.CATEGORIES_LIST_FAILURE]: (state) => ({
+        ...state,
         isFetching: false,
     }),
 };
+
 const TERM_SELECTOR = {
-    [GifTypes.REQUEST_SEARCH]: (state, action) => ({...state,
-        [action.searchText]: {...state[action.searchText],
+    [GifTypes.REQUEST_SEARCH]: (state, action) => ({
+        ...state,
+        [action.searchText]: {
+            ...state[action.searchText],
             isFetching: true,
             didInvalidate: false,
             pages: PAGE_SELECTOR[action.type](state[action.searchText], action),
@@ -95,11 +112,23 @@ const TERM_SELECTOR = {
             return Boolean(item.gfyId && item.width && item.height);
         });
         const newItems = gfycats.map((gfycat) => gfycat.gfyId);
-        return {...state,
-            [action.searchText]: {...state[action.searchText],
+        return {
+            ...state,
+            [action.searchText]: {
+                ...state[action.searchText],
                 isFetching: false,
-                items: typeof state[action.searchText] !== 'undefined' && state[action.searchText].items ? [...state[action.searchText].items, ...newItems] : newItems,
-                moreRemaining: typeof state[action.searchText] !== 'undefined' && state[action.searchText].items ? [...state[action.searchText].items, ...action.gfycats].length < action.found : action.gfycats.length < action.found,
+                items: typeof state[action.searchText] !== 'undefined' &&
+                    state[action.searchText].items ?
+                    [...state[action.searchText].items, ...newItems] :
+                    newItems,
+                moreRemaining:
+                    typeof state[action.searchText] !== 'undefined' &&
+                    state[action.searchText].items ?
+                        [
+                            ...state[action.searchText].items,
+                            ...action.gfycats,
+                        ].length < action.found :
+                        action.gfycats.length < action.found,
                 count: action.count,
                 found: action.found,
                 start: action.start,
@@ -114,23 +143,32 @@ const TERM_SELECTOR = {
             return Boolean(item.gfyId && item.width && item.height);
         });
         const newItems = gfycats.map((gfycat) => gfycat.gfyId);
-        return {...state,
-            [action.searchText]: {...state[action.searchText],
+        return {
+            ...state,
+            [action.searchText]: {
+                ...state[action.searchText],
                 isFetching: false,
-                items: typeof state[action.searchText] !== 'undefined' && state[action.searchText].items ? [...state[action.searchText].items, ...newItems] : newItems,
+                items: typeof state[action.searchText] !== 'undefined' &&
+                    state[action.searchText].items ?
+                    [...state[action.searchText].items, ...newItems] :
+                    newItems,
                 cursor: action.cursor,
                 moreRemaining: Boolean(action.cursor),
             },
         };
     },
-    [GifTypes.RECEIVE_SEARCH_END]: (state, action) => ({...state,
-        [action.searchText]: {...state[action.searchText],
+    [GifTypes.RECEIVE_SEARCH_END]: (state, action) => ({
+        ...state,
+        [action.searchText]: {
+            ...state[action.searchText],
             isFetching: false,
             moreRemaining: false,
         },
     }),
-    [GifTypes.SEARCH_FAILURE]: (state, action) => ({...state,
-        [action.searchText]: {...state[action.searchText],
+    [GifTypes.SEARCH_FAILURE]: (state, action) => ({
+        ...state,
+        [action.searchText]: {
+            ...state[action.searchText],
             isFetching: false,
             items: [],
             moreRemaining: false,
@@ -146,25 +184,29 @@ const PAGE_SELECTOR = {
         if (typeof state.pages == 'undefined') {
             return {};
         }
-
-        return {...state.pages,
-        };
+        return {...state.pages};
     },
-    [GifTypes.RECEIVE_SEARCH]: (state, action) => ({...state.pages,
+    [GifTypes.RECEIVE_SEARCH]: (state, action) => ({
+        ...state.pages,
         [action.currentPage]: action.gfycats.map((gfycat) => gfycat.gfyId),
     }),
 };
+
 const CACHE_SELECTORS = {
-    [GifTypes.CACHE_GIFS]: (state, action) => ({...state,
+    [GifTypes.CACHE_GIFS]: (state, action) => ({
+        ...state,
         gifs: CACHE_GIF_SELECTOR[action.type](state.gifs, action),
         updating: false,
     }),
-    [GifTypes.CACHE_REQUEST]: (state, action) => ({...state,
+    [GifTypes.CACHE_REQUEST]: (state, action) => ({
+        ...state,
         ...action.payload,
     }),
 };
+
 const CACHE_GIF_SELECTOR = {
-    [GifTypes.CACHE_GIFS]: (state, action) => ({...state,
+    [GifTypes.CACHE_GIFS]: (state, action) => ({
+        ...state,
         ...action.gifs.reduce((map, obj) => {
             map[obj.gfyId] = obj;
             return map;
@@ -173,15 +215,10 @@ const CACHE_GIF_SELECTOR = {
 };
 
 function appReducer(state = {}, action) {
-    const nextState = {...state,
-    };
-
+    const nextState = {...state};
     switch (action.type) {
     case GifTypes.SAVE_APP_PROPS:
-        return {...nextState,
-            ...action.props,
-        };
-
+        return {...nextState, ...action.props};
     default:
         return state;
     }

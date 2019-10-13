@@ -38,6 +38,7 @@ module.exports = {
         '^src/(.*)$': '<rootDir>/src/$1',
         '^test/(.*)$': '<rootDir>/test/$1',
         '^utils/(.*)$': '<rootDir>/src/utils/$1',
+        '^actions/(.*)$': '<rootDir>/src/actions/$1',
         '^action_types$': '<rootDir>/src/action_types',
         '^constants$': '<rootDir>/src/constants',
         '^action_types/(.*)$': '<rootDir>/src/action_types/$1',

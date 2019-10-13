@@ -5,31 +5,22 @@ import {BotTypes, UserTypes} from 'action_types';
 
 function accounts(state = {}, action) {
     switch (action.type) {
-    case BotTypes.RECEIVED_BOT_ACCOUNTS:
-    {
+    case BotTypes.RECEIVED_BOT_ACCOUNTS: {
         const newBots = action.data;
-        const nextState = {...state,
-        };
-
+        const nextState = {...state};
         for (const bot of newBots) {
             nextState[bot.user_id] = bot;
         }
-
         return nextState;
     }
-
-    case BotTypes.RECEIVED_BOT_ACCOUNT:
-    {
+    case BotTypes.RECEIVED_BOT_ACCOUNT: {
         const bot = action.data;
-        const nextState = {...state,
-        };
+        const nextState = {...state};
         nextState[bot.user_id] = bot;
         return nextState;
     }
-
     case UserTypes.LOGOUT_SUCCESS:
         return {};
-
     default:
         return state;
     }

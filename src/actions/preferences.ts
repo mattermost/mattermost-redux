@@ -19,6 +19,7 @@ export function deletePreferences(userId: string, preferences: Array<PreferenceT
         const state = getState();
         const myPreferences = getMyPreferencesSelector(state);
         const currentPreferences = preferences.map((pref) => myPreferences[getPreferenceKey(pref.category, pref.name)]);
+
         dispatch({
             type: PreferenceTypes.DELETED_PREFERENCES,
             data: preferences,
@@ -35,9 +36,8 @@ export function deletePreferences(userId: string, preferences: Array<PreferenceT
                 },
             },
         });
-        return {
-            data: true,
-        };
+
+        return {data: true};
     };
 }
 
@@ -55,6 +55,7 @@ export function makeDirectChannelVisibleIfNecessary(otherUserId: string): Action
         const state = getState();
         const myPreferences = getMyPreferencesSelector(state);
         const currentUserId = getCurrentUserId(state);
+
         let preference = myPreferences[getPreferenceKey(Preferences.CATEGORY_DIRECT_CHANNEL_SHOW, otherUserId)];
 
         if (!preference || preference.value === 'false') {
@@ -68,9 +69,7 @@ export function makeDirectChannelVisibleIfNecessary(otherUserId: string): Action
             savePreferences(currentUserId, [preference])(dispatch);
         }
 
-        return {
-            data: true,
-        };
+        return {data: true};
     };
 }
 
@@ -79,9 +78,8 @@ export function makeGroupMessageVisibleIfNecessary(channelId: string): ActionFun
         const state = getState();
         const myPreferences = getMyPreferencesSelector(state);
         const currentUserId = getCurrentUserId(state);
-        const {
-            channels,
-        } = state.entities.channels;
+        const {channels} = state.entities.channels;
+
         let preference = myPreferences[getPreferenceKey(Preferences.CATEGORY_GROUP_CHANNEL_SHOW, channelId)];
 
         if (!preference || preference.value === 'false') {
@@ -102,9 +100,7 @@ export function makeGroupMessageVisibleIfNecessary(channelId: string): ActionFun
             savePreferences(currentUserId, [preference])(dispatch);
         }
 
-        return {
-            data: true,
-        };
+        return {data: true};
     };
 }
 
@@ -126,9 +122,8 @@ export function savePreferences(userId: string, preferences: Array<PreferenceTyp
                 },
             },
         });
-        return {
-            data: true,
-        };
+
+        return {data: true};
     };
 }
 
@@ -142,28 +137,25 @@ export function saveTheme(teamId: string, theme: {}): ActionFunc {
             name: teamId || '',
             value: JSON.stringify(theme),
         };
+
         await savePreferences(currentUserId, [preference])(dispatch);
-        return {
-            data: true,
-        };
+        return {data: true};
     };
 }
 
 export function deleteTeamSpecificThemes(): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
-        const state = getState(); // $FlowFixMe
+        const state = getState();
 
         const getCategory: (state: any, preferenceId: string) => Array<PreferenceType> = makeGetCategory();
         const themePreferences: Array<PreferenceType> = getCategory(state, Preferences.CATEGORY_THEME);
         const currentUserId = getCurrentUserId(state);
-        const toDelete = themePreferences.filter((pref) => pref.name !== '');
 
+        const toDelete = themePreferences.filter((pref) => pref.name !== '');
         if (toDelete.length > 0) {
             await deletePreferences(currentUserId, toDelete)(dispatch, getState);
         }
 
-        return {
-            data: true,
-        };
+        return {data: true};
     };
 }

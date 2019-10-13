@@ -93,7 +93,9 @@ export function testSiteURL(siteURL: string): ActionFunc {
         onRequest: AdminTypes.TEST_SITE_URL_REQUEST,
         onSuccess: AdminTypes.TEST_SITE_URL_SUCCESS,
         onFailure: AdminTypes.TEST_SITE_URL_FAILURE,
-        params: [siteURL],
+        params: [
+            siteURL,
+        ],
     });
 }
 
@@ -228,75 +230,58 @@ export function getLdapGroups(page = 0, perPage: number = General.PAGE_SIZE_MAXI
 
 export function linkLdapGroup(key: string): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
-        dispatch({
-            type: AdminTypes.LINK_LDAP_GROUP_REQUEST,
-            data: key,
-        });
-        let data;
+        dispatch({type: AdminTypes.LINK_LDAP_GROUP_REQUEST, data: key});
 
+        let data;
         try {
             data = await Client4.linkLdapGroup(key);
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch, getState);
-            dispatch(batchActions([{
-                type: AdminTypes.LINK_LDAP_GROUP_FAILURE,
-                error,
-                data: key,
-            }, logError(error)]));
-            return {
-                error,
-            };
+            dispatch(batchActions([
+                {type: AdminTypes.LINK_LDAP_GROUP_FAILURE, error, data: key},
+                logError(error),
+            ]));
+            return {error};
         }
 
-        dispatch(batchActions([{
-            type: AdminTypes.LINK_LDAP_GROUP_SUCCESS,
-            data: null,
-        }, {
-            type: AdminTypes.LINKED_LDAP_GROUP,
-            data: {
-                primary_key: key,
-                name: data.display_name,
-                mattermost_group_id: data.id,
-                has_syncables: false,
+        dispatch(batchActions([
+            {type: AdminTypes.LINK_LDAP_GROUP_SUCCESS, data: null},
+            {
+                type: AdminTypes.LINKED_LDAP_GROUP,
+                data: {
+                    primary_key: key,
+                    name: data.display_name,
+                    mattermost_group_id: data.id,
+                    has_syncables: false,
+                },
             },
-        }]));
-        return {
-            data: true,
-        };
+        ]));
+
+        return {data: true};
     };
 }
 
 export function unlinkLdapGroup(key: string): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
-        dispatch({
-            type: AdminTypes.UNLINK_LDAP_GROUP_REQUEST,
-            data: key,
-        });
+        dispatch({type: AdminTypes.UNLINK_LDAP_GROUP_REQUEST, data: key});
 
         try {
             await Client4.unlinkLdapGroup(key);
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch, getState);
-            dispatch(batchActions([{
-                type: AdminTypes.UNLINK_LDAP_GROUP_FAILURE,
-                error,
-                data: key,
-            }, logError(error)]));
-            return {
-                error,
-            };
+            dispatch(batchActions([
+                {type: AdminTypes.UNLINK_LDAP_GROUP_FAILURE, error, data: key},
+                logError(error),
+            ]));
+            return {error};
         }
 
-        dispatch(batchActions([{
-            type: AdminTypes.UNLINK_LDAP_GROUP_SUCCESS,
-            data: null,
-        }, {
-            type: AdminTypes.UNLINKED_LDAP_GROUP,
-            data: key,
-        }]));
-        return {
-            data: true,
-        };
+        dispatch(batchActions([
+            {type: AdminTypes.UNLINK_LDAP_GROUP_SUCCESS, data: null},
+            {type: AdminTypes.UNLINKED_LDAP_GROUP, data: key},
+        ]));
+
+        return {data: true};
     };
 }
 
@@ -315,7 +300,9 @@ export function uploadPublicSamlCertificate(fileData: File): ActionFunc {
         onRequest: AdminTypes.UPLOAD_SAML_PUBLIC_REQUEST,
         onSuccess: AdminTypes.UPLOAD_SAML_PUBLIC_SUCCESS,
         onFailure: AdminTypes.UPLOAD_SAML_PUBLIC_FAILURE,
-        params: [fileData],
+        params: [
+            fileData,
+        ],
     });
 }
 
@@ -325,7 +312,9 @@ export function uploadPrivateSamlCertificate(fileData: File): ActionFunc {
         onRequest: AdminTypes.UPLOAD_SAML_PRIVATE_REQUEST,
         onSuccess: AdminTypes.UPLOAD_SAML_PRIVATE_SUCCESS,
         onFailure: AdminTypes.UPLOAD_SAML_PRIVATE_FAILURE,
-        params: [fileData],
+        params: [
+            fileData,
+        ],
     });
 }
 
@@ -335,7 +324,9 @@ export function uploadIdpSamlCertificate(fileData: File): ActionFunc {
         onRequest: AdminTypes.UPLOAD_SAML_IDP_REQUEST,
         onSuccess: AdminTypes.UPLOAD_SAML_IDP_SUCCESS,
         onFailure: AdminTypes.UPLOAD_SAML_IDP_FAILURE,
-        params: [fileData],
+        params: [
+            fileData,
+        ],
     });
 }
 
@@ -372,7 +363,9 @@ export function testElasticsearch(config: any): ActionFunc {
         onRequest: AdminTypes.TEST_ELASTICSEARCH_REQUEST,
         onSuccess: AdminTypes.TEST_ELASTICSEARCH_SUCCESS,
         onFailure: AdminTypes.TEST_ELASTICSEARCH_FAILURE,
-        params: [config],
+        params: [
+            config,
+        ],
     });
 }
 
@@ -391,7 +384,9 @@ export function uploadLicense(fileData: File): ActionFunc {
         onRequest: AdminTypes.UPLOAD_LICENSE_REQUEST,
         onSuccess: AdminTypes.UPLOAD_LICENSE_SUCCESS,
         onFailure: AdminTypes.UPLOAD_LICENSE_FAILURE,
-        params: [fileData],
+        params: [
+            fileData,
+        ],
     });
 }
 
@@ -406,49 +401,30 @@ export function removeLicense(): ActionFunc {
 
 export function getAnalytics(name: string, teamId = ''): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
-        dispatch({
-            type: AdminTypes.GET_ANALYTICS_REQUEST,
-            data: null,
-        }, getState);
-        let data;
+        dispatch({type: AdminTypes.GET_ANALYTICS_REQUEST, data: null}, getState);
 
+        let data;
         try {
             data = await Client4.getAnalytics(name, teamId);
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch, getState);
-            dispatch(batchActions([{
-                type: AdminTypes.GET_ANALYTICS_FAILURE,
-                error,
-            }, logError(error)]), getState);
-            return {
-                error,
-            };
+            dispatch(batchActions([
+                {type: AdminTypes.GET_ANALYTICS_FAILURE, error},
+                logError(error),
+            ]), getState);
+            return {error};
         }
 
-        const actions: Action[] = [{
-            type: AdminTypes.GET_ANALYTICS_SUCCESS,
-            data: null,
-        }];
-
+        const actions: Action[] = [{type: AdminTypes.GET_ANALYTICS_SUCCESS, data: null}];
         if (teamId === '') {
-            actions.push({
-                type: AdminTypes.RECEIVED_SYSTEM_ANALYTICS,
-                data,
-                name,
-            });
+            actions.push({type: AdminTypes.RECEIVED_SYSTEM_ANALYTICS, data, name});
         } else {
-            actions.push({
-                type: AdminTypes.RECEIVED_TEAM_ANALYTICS,
-                data,
-                name,
-                teamId,
-            });
+            actions.push({type: AdminTypes.RECEIVED_TEAM_ANALYTICS, data, name, teamId});
         }
 
         dispatch(batchActions(actions), getState);
-        return {
-            data,
-        };
+
+        return {data};
     };
 }
 
@@ -474,63 +450,47 @@ export function getUsersPerDayAnalytics(teamId = ''): ActionFunc {
 
 export function uploadPlugin(fileData: File, force = false): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
-        dispatch({
-            type: AdminTypes.UPLOAD_PLUGIN_REQUEST,
-            data: null,
-        });
-        let data;
+        dispatch({type: AdminTypes.UPLOAD_PLUGIN_REQUEST, data: null});
 
+        let data;
         try {
             data = await Client4.uploadPlugin(fileData, force);
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch, getState);
-            dispatch(batchActions([{
-                type: AdminTypes.UPLOAD_PLUGIN_FAILURE,
-                error,
-            }, logError(error)]));
-            return {
-                error,
-            };
+            dispatch(batchActions([
+                {type: AdminTypes.UPLOAD_PLUGIN_FAILURE, error},
+                logError(error),
+            ]));
+            return {error};
         }
 
-        dispatch(batchActions([{
-            type: AdminTypes.UPLOAD_PLUGIN_SUCCESS,
-            data: null,
-        }]));
-        return {
-            data,
-        };
+        dispatch(batchActions([
+            {type: AdminTypes.UPLOAD_PLUGIN_SUCCESS, data: null},
+        ]));
+
+        return {data};
     };
 }
 
 export function installPluginFromUrl(url: string, force = false): ActionFunc {
-    return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
-        dispatch({
-            type: AdminTypes.INSTALL_PLUGIN_FROM_URL_REQUEST,
-            data: null,
-        });
-        let data;
+    return async (dispatch, getState) => {
+        dispatch({type: AdminTypes.INSTALL_PLUGIN_FROM_URL_REQUEST, data: null});
 
+        let data;
         try {
             data = await Client4.installPluginFromUrl(url, force);
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch, getState);
-            dispatch(batchActions([{
-                type: AdminTypes.INSTALL_PLUGIN_FROM_URL_FAILURE,
-                error,
-            }, logError(error)]));
-            return {
-                error,
-            };
+            dispatch(batchActions([
+                {type: AdminTypes.INSTALL_PLUGIN_FROM_URL_FAILURE, error},
+                logError(error),
+            ]));
+            return {error};
         }
 
-        dispatch({
-            type: AdminTypes.INSTALL_PLUGIN_FROM_URL_SUCCESS,
-            data: null,
-        });
-        return {
-            data,
-        };
+        dispatch({type: AdminTypes.INSTALL_PLUGIN_FROM_URL_SUCCESS, data: null});
+
+        return {data};
     };
 }
 
@@ -554,102 +514,72 @@ export function getPluginStatuses(): ActionFunc {
 
 export function removePlugin(pluginId: string): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
-        dispatch({
-            type: AdminTypes.REMOVE_PLUGIN_REQUEST,
-            data: pluginId,
-        });
+        dispatch({type: AdminTypes.REMOVE_PLUGIN_REQUEST, data: pluginId});
 
         try {
             await Client4.removePlugin(pluginId);
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch, getState);
-            dispatch(batchActions([{
-                type: AdminTypes.REMOVE_PLUGIN_FAILURE,
-                error,
-                data: pluginId,
-            }, logError(error)]));
-            return {
-                error,
-            };
+            dispatch(batchActions([
+                {type: AdminTypes.REMOVE_PLUGIN_FAILURE, error, data: pluginId},
+                logError(error),
+            ]));
+            return {error};
         }
 
-        dispatch(batchActions([{
-            type: AdminTypes.REMOVE_PLUGIN_SUCCESS,
-            data: null,
-        }, {
-            type: AdminTypes.REMOVED_PLUGIN,
-            data: pluginId,
-        }]));
-        return {
-            data: true,
-        };
+        dispatch(batchActions([
+            {type: AdminTypes.REMOVE_PLUGIN_SUCCESS, data: null},
+            {type: AdminTypes.REMOVED_PLUGIN, data: pluginId},
+        ]));
+
+        return {data: true};
     };
 }
 
 export function enablePlugin(pluginId: string): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
-        dispatch({
-            type: AdminTypes.ENABLE_PLUGIN_REQUEST,
-            data: pluginId,
-        });
+        dispatch({type: AdminTypes.ENABLE_PLUGIN_REQUEST, data: pluginId});
 
         try {
             await Client4.enablePlugin(pluginId);
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch, getState);
-            dispatch(batchActions([{
-                type: AdminTypes.ENABLE_PLUGIN_FAILURE,
-                error,
-                data: pluginId,
-            }, logError(error)]));
-            return {
-                error,
-            };
+            dispatch(batchActions([
+                {type: AdminTypes.ENABLE_PLUGIN_FAILURE, error, data: pluginId},
+                logError(error),
+            ]));
+            return {error};
         }
 
-        dispatch(batchActions([{
-            type: AdminTypes.ENABLE_PLUGIN_SUCCESS,
-            data: null,
-        }, {
-            type: AdminTypes.ENABLED_PLUGIN,
-            data: pluginId,
-        }]));
-        return {
-            data: true,
-        };
+        dispatch(batchActions([
+            {type: AdminTypes.ENABLE_PLUGIN_SUCCESS, data: null},
+            {type: AdminTypes.ENABLED_PLUGIN, data: pluginId},
+        ]));
+
+        return {data: true};
     };
 }
 
 export function disablePlugin(pluginId: string): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
-        dispatch({
-            type: AdminTypes.DISABLE_PLUGIN_REQUEST,
-            data: pluginId,
-        });
+        dispatch({type: AdminTypes.DISABLE_PLUGIN_REQUEST, data: pluginId});
 
         try {
             await Client4.disablePlugin(pluginId);
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch, getState);
-            dispatch(batchActions([{
-                type: AdminTypes.DISABLE_PLUGIN_FAILURE,
-                error,
-                data: pluginId,
-            }, logError(error)]));
-            return {
-                error,
-            };
+            dispatch(batchActions([
+                {type: AdminTypes.DISABLE_PLUGIN_FAILURE, error, data: pluginId},
+                logError(error),
+            ]));
+            return {error};
         }
 
-        dispatch(batchActions([{
-            type: AdminTypes.DISABLE_PLUGIN_SUCCESS,
-            data: null,
-        }, {
-            type: AdminTypes.DISABLED_PLUGIN,
-            data: pluginId,
-        }]));
-        return {
-            data: true,
-        };
+        dispatch(batchActions([
+            {type: AdminTypes.DISABLE_PLUGIN_SUCCESS, data: null},
+            {type: AdminTypes.DISABLED_PLUGIN, data: pluginId},
+        ]));
+
+        return {data: true};
     };
 }

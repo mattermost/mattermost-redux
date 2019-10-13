@@ -3,36 +3,28 @@
 import {ErrorTypes} from 'action_types';
 export default ((state: Array<{error;displayable;date}> = [], action) => {
     switch (action.type) {
-    case ErrorTypes.DISMISS_ERROR:
-    {
+    case ErrorTypes.DISMISS_ERROR: {
         const nextState = [...state];
         nextState.splice(action.index, 1);
+
         return nextState;
     }
-
-    case ErrorTypes.LOG_ERROR:
-    {
+    case ErrorTypes.LOG_ERROR: {
         const nextState = [...state];
-        const {
-            displayable,
-            error,
-        } = action;
+        const {displayable, error} = action;
         nextState.push({
             displayable,
             error,
             date: new Date(Date.now()).toUTCString(),
         });
+
         return nextState;
     }
-
     case ErrorTypes.RESTORE_ERRORS:
         return action.data;
-
-    case ErrorTypes.CLEAR_ERRORS:
-    {
+    case ErrorTypes.CLEAR_ERRORS: {
         return [];
     }
-
     default:
         return state;
     }

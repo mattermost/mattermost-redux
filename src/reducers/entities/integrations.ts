@@ -1,42 +1,30 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
+
 import {combineReducers} from 'redux';
 import {IntegrationTypes, UserTypes, ChannelTypes} from 'action_types';
 
 function incomingHooks(state = {}, action) {
     switch (action.type) {
-    case IntegrationTypes.RECEIVED_INCOMING_HOOK:
-    {
-        const nextState = {...state,
-        };
+    case IntegrationTypes.RECEIVED_INCOMING_HOOK: {
+        const nextState = {...state};
         nextState[action.data.id] = action.data;
         return nextState;
     }
-
-    case IntegrationTypes.RECEIVED_INCOMING_HOOKS:
-    {
-        const nextState = {...state,
-        };
-
+    case IntegrationTypes.RECEIVED_INCOMING_HOOKS: {
+        const nextState = {...state};
         for (const hook of action.data) {
             nextState[hook.id] = hook;
         }
-
         return nextState;
     }
-
-    case IntegrationTypes.DELETED_INCOMING_HOOK:
-    {
-        const nextState = {...state,
-        };
+    case IntegrationTypes.DELETED_INCOMING_HOOK: {
+        const nextState = {...state};
         Reflect.deleteProperty(nextState, action.data.id);
         return nextState;
     }
-
-    case ChannelTypes.RECEIVED_CHANNEL_DELETED:
-    {
-        const nextState = {...state,
-        };
+    case ChannelTypes.RECEIVED_CHANNEL_DELETED: {
+        const nextState = {...state};
         let deleted = false;
         Object.keys(nextState).forEach((id) => {
             if (nextState[id].channel_id === action.data.id) {
@@ -51,7 +39,6 @@ function incomingHooks(state = {}, action) {
 
         return state;
     }
-
     case UserTypes.LOGOUT_SUCCESS:
         return {};
 
@@ -62,38 +49,25 @@ function incomingHooks(state = {}, action) {
 
 function outgoingHooks(state = {}, action) {
     switch (action.type) {
-    case IntegrationTypes.RECEIVED_OUTGOING_HOOK:
-    {
-        const nextState = {...state,
-        };
+    case IntegrationTypes.RECEIVED_OUTGOING_HOOK: {
+        const nextState = {...state};
         nextState[action.data.id] = action.data;
         return nextState;
     }
-
-    case IntegrationTypes.RECEIVED_OUTGOING_HOOKS:
-    {
-        const nextState = {...state,
-        };
-
+    case IntegrationTypes.RECEIVED_OUTGOING_HOOKS: {
+        const nextState = {...state};
         for (const hook of action.data) {
             nextState[hook.id] = hook;
         }
-
         return nextState;
     }
-
-    case IntegrationTypes.DELETED_OUTGOING_HOOK:
-    {
-        const nextState = {...state,
-        };
+    case IntegrationTypes.DELETED_OUTGOING_HOOK: {
+        const nextState = {...state};
         Reflect.deleteProperty(nextState, action.data.id);
         return nextState;
     }
-
-    case ChannelTypes.RECEIVED_CHANNEL_DELETED:
-    {
-        const nextState = {...state,
-        };
+    case ChannelTypes.RECEIVED_CHANNEL_DELETED: {
+        const nextState = {...state};
         let deleted = false;
         Object.keys(nextState).forEach((id) => {
             if (nextState[id].channel_id === action.data.id) {
@@ -108,7 +82,6 @@ function outgoingHooks(state = {}, action) {
 
         return state;
     }
-
     case UserTypes.LOGOUT_SUCCESS:
         return {};
 
@@ -120,11 +93,8 @@ function outgoingHooks(state = {}, action) {
 function commands(state = {}, action) {
     switch (action.type) {
     case IntegrationTypes.RECEIVED_COMMANDS:
-    case IntegrationTypes.RECEIVED_CUSTOM_TEAM_COMMANDS:
-    {
-        const nextState = {...state,
-        };
-
+    case IntegrationTypes.RECEIVED_CUSTOM_TEAM_COMMANDS: {
+        const nextState = {...state};
         for (const command of action.data) {
             if (command.id) {
                 const id = command.id;
@@ -134,37 +104,30 @@ function commands(state = {}, action) {
 
         return nextState;
     }
-
     case IntegrationTypes.RECEIVED_COMMAND:
         if (action.data.id) {
-            return {...state,
+            return {
+                ...state,
                 [action.data.id]: action.data,
             };
         }
 
         return state;
-
-    case IntegrationTypes.RECEIVED_COMMAND_TOKEN:
-    {
-        const {
-            id,
-            token,
-        } = action.data;
-        return {...state,
-            [id]: {...state[id],
+    case IntegrationTypes.RECEIVED_COMMAND_TOKEN: {
+        const {id, token} = action.data;
+        return {
+            ...state,
+            [id]: {
+                ...state[id],
                 token,
             },
         };
     }
-
-    case IntegrationTypes.DELETED_COMMAND:
-    {
-        const nextState = {...state,
-        };
+    case IntegrationTypes.DELETED_COMMAND: {
+        const nextState = {...state};
         Reflect.deleteProperty(nextState, action.data.id);
         return nextState;
     }
-
     case UserTypes.LOGOUT_SUCCESS:
         return {};
 
@@ -175,28 +138,24 @@ function commands(state = {}, action) {
 
 function systemCommands(state = {}, action) {
     switch (action.type) {
-    case IntegrationTypes.RECEIVED_COMMANDS:
-    {
+    case IntegrationTypes.RECEIVED_COMMANDS: {
         const nextCommands = {};
-
         for (const command of action.data) {
             if (!command.id) {
                 nextCommands[command.trigger] = command;
             }
         }
-
         return nextCommands;
     }
-
     case IntegrationTypes.RECEIVED_COMMAND:
         if (!action.data.id) {
-            return {...state,
+            return {
+                ...state,
                 [action.data.trigger]: action.data,
             };
         }
 
         return state;
-
     case UserTypes.LOGOUT_SUCCESS:
         return {};
 
@@ -207,31 +166,23 @@ function systemCommands(state = {}, action) {
 
 function oauthApps(state = {}, action) {
     switch (action.type) {
-    case IntegrationTypes.RECEIVED_OAUTH_APPS:
-    {
-        const nextState = {...state,
-        };
-
+    case IntegrationTypes.RECEIVED_OAUTH_APPS: {
+        const nextState = {...state};
         for (const app of action.data) {
             nextState[app.id] = app;
         }
-
         return nextState;
     }
-
     case IntegrationTypes.RECEIVED_OAUTH_APP:
-        return {...state,
+        return {
+            ...state,
             [action.data.id]: action.data,
         };
-
-    case IntegrationTypes.DELETED_OAUTH_APP:
-    {
-        const nextState = {...state,
-        };
+    case IntegrationTypes.DELETED_OAUTH_APP: {
+        const nextState = {...state};
         Reflect.deleteProperty(nextState, action.data.id);
         return nextState;
     }
-
     case UserTypes.LOGOUT_SUCCESS:
         return {};
 
@@ -244,7 +195,6 @@ function dialogTriggerId(state = '', action) {
     switch (action.type) {
     case IntegrationTypes.RECEIVED_DIALOG_TRIGGER_ID:
         return action.data;
-
     default:
         return state;
     }
@@ -254,7 +204,6 @@ function dialog(state = '', action) {
     switch (action.type) {
     case IntegrationTypes.RECEIVED_DIALOG:
         return action.data;
-
     default:
         return state;
     }

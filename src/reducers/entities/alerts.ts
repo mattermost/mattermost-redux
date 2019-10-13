@@ -9,18 +9,14 @@ function alertStack(state: Array<AlertType> = [], action: GenericAction) {
     const nextState = [...state];
 
     switch (action.type) {
-    case AlertTypes.PUSH_ALERT:
-    {
+    case AlertTypes.PUSH_ALERT: {
         nextState.unshift(action.data);
         return nextState;
     }
-
-    case AlertTypes.CLEAR_ALERT:
-    {
+    case AlertTypes.CLEAR_ALERT: {
         nextState.shift();
         return nextState;
     }
-
     case UserTypes.LOGOUT_SUCCESS:
         return [];
 

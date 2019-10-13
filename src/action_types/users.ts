@@ -1,27 +1,36 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
+
 import keyMirror from 'utils/key_mirror';
+
 export default keyMirror({
     CREATE_USER_REQUEST: null,
     CREATE_USER_SUCCESS: null,
     CREATE_USER_FAILURE: null,
+
     LOGIN_REQUEST: null,
     LOGIN_SUCCESS: null,
     LOGIN_FAILURE: null,
+
     LOGOUT_REQUEST: null,
     LOGOUT_SUCCESS: null,
     LOGOUT_FAILURE: null,
+
     REVOKE_ALL_USER_SESSIONS_SUCCESS: null,
     REVOKE_SESSIONS_FOR_ALL_USERS_SUCCESS: null,
+
     CHECK_MFA_REQUEST: null,
     CHECK_MFA_SUCCESS: null,
     CHECK_MFA_FAILURE: null,
+
     AUTOCOMPLETE_USERS_REQUEST: null,
     AUTOCOMPLETE_USERS_SUCCESS: null,
     AUTOCOMPLETE_USERS_FAILURE: null,
+
     UPDATE_ME_REQUEST: null,
     UPDATE_ME_SUCCESS: null,
     UPDATE_ME_FAILURE: null,
+
     RECEIVED_ME: null,
     RECEIVED_TERMS_OF_SERVICE_STATUS: null,
     RECEIVED_PROFILE: null,

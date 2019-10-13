@@ -11,10 +11,10 @@ export function removeUnneededMetadata(post) {
         return post;
     }
 
-    const metadata = {...post.metadata,
-    };
-    let changed = false; // These fields are stored separately
+    const metadata = {...post.metadata};
+    let changed = false;
 
+    // These fields are stored separately
     if (metadata.emojis) {
         Reflect.deleteProperty(metadata, 'emojis');
         changed = true;
@@ -32,15 +32,17 @@ export function removeUnneededMetadata(post) {
 
     if (metadata.embeds) {
         let embedsChanged = false;
+
         const newEmbeds = metadata.embeds.map((embed) => {
             if (embed.type !== 'opengraph') {
                 return embed;
             }
 
-            const newEmbed = {...embed,
-            };
+            const newEmbed = {...embed};
             Reflect.deleteProperty(newEmbed, 'data');
+
             embedsChanged = true;
+
             return newEmbed;
         });
 
@@ -51,11 +53,12 @@ export function removeUnneededMetadata(post) {
     }
 
     if (!changed) {
-    // Nothing changed
+        // Nothing changed
         return post;
     }
 
-    return {...post,
+    return {
+        ...post,
         metadata,
     };
 }
@@ -63,32 +66,27 @@ export function removeUnneededMetadata(post) {
 export function handlePosts(state: RelationOneToOne<Post, Post> = {}, action) {
     switch (action.type) {
     case PostTypes.RECEIVED_POST:
-    case PostTypes.RECEIVED_NEW_POST:
-    {
+    case PostTypes.RECEIVED_NEW_POST: {
         const post = action.data;
-        const newState = {...state,
-        };
+        const newState = {...state};
 
         if (action.type === PostTypes.RECEIVED_NEW_POST && post.root_id && state[post.root_id] && post.pending_post_id && post.id !== post.pending_post_id) {
             const rootPost = state[post.root_id];
-            newState[post.root_id] = {...rootPost,
-                reply_count: (rootPost.reply_count || 0) + 1,
-            };
+
+            newState[post.root_id] = {...rootPost, reply_count: (rootPost.reply_count || 0) + 1};
         }
 
         return handlePostReceived(newState, post);
     }
 
-    case PostTypes.RECEIVED_POSTS:
-    {
+    case PostTypes.RECEIVED_POSTS: {
         const posts = Object.values(action.data.posts);
 
         if (posts.length === 0) {
             return state;
         }
 
-        const nextState = {...state,
-        };
+        const nextState = {...state};
 
         for (const post of posts) {
             handlePostReceived(nextState, post);
@@ -97,8 +95,7 @@ export function handlePosts(state: RelationOneToOne<Post, Post> = {}, action) {
         return nextState;
     }
 
-    case PostTypes.POST_DELETED:
-    {
+    case PostTypes.POST_DELETED: {
         const post: Post = action.data;
 
         if (!state[post.id]) {
@@ -106,24 +103,21 @@ export function handlePosts(state: RelationOneToOne<Post, Post> = {}, action) {
         }
 
         // Mark the post as deleted
-
-        const nextState = {...state,
-            [post.id]: {...state[post.id],
+        const nextState = {
+            ...state,
+            [post.id]: {
+                ...state[post.id],
                 state: Posts.POST_DELETED,
                 file_ids: [],
                 has_reactions: false,
             },
         };
-
         if (post.root_id && state[post.root_id]) {
             const rootPost = state[post.root_id];
-            nextState[post.root_id] = {...rootPost,
-                reply_count: (rootPost.reply_count || 0) - 1,
-            };
+            nextState[post.root_id] = {...rootPost, reply_count: (rootPost.reply_count || 0) - 1};
         }
 
         // Remove any of its comments
-
         for (const otherPost of Object.values(state)) {
             if (otherPost.root_id === post.id) {
                 Reflect.deleteProperty(nextState, otherPost.id);
@@ -133,8 +127,7 @@ export function handlePosts(state: RelationOneToOne<Post, Post> = {}, action) {
         return nextState;
     }
 
-    case PostTypes.POST_REMOVED:
-    {
+    case PostTypes.POST_REMOVED: {
         const post = action.data;
 
         if (!state[post.id]) {
@@ -142,11 +135,10 @@ export function handlePosts(state: RelationOneToOne<Post, Post> = {}, action) {
         }
 
         // Remove the post itself
+        const nextState = {...state};
+        Reflect.deleteProperty(nextState, post.id);
 
-        const nextState = {...state,
-        };
-        Reflect.deleteProperty(nextState, post.id); // Remove any of its comments
-
+        // Remove any of its comments
         for (const otherPost of Object.values(state)) {
             if (otherPost.root_id === post.id) {
                 Reflect.deleteProperty(nextState, otherPost.id);
@@ -158,19 +150,18 @@ export function handlePosts(state: RelationOneToOne<Post, Post> = {}, action) {
 
     case ChannelTypes.RECEIVED_CHANNEL_DELETED:
     case ChannelTypes.DELETE_CHANNEL_SUCCESS:
-    case ChannelTypes.LEAVE_CHANNEL:
-    {
+    case ChannelTypes.LEAVE_CHANNEL: {
         if (action.data && action.data.viewArchivedChannels) {
             // Nothing to do since we still want to store posts in archived channels
             return state;
         }
 
         const channelId = action.data.id;
-        let postDeleted = false; // Remove any posts in the deleted channel
 
-        const nextState = {...state,
-        };
+        let postDeleted = false;
 
+        // Remove any posts in the deleted channel
+        const nextState = {...state};
         for (const post of Object.values(state)) {
             if (post.channel_id === channelId) {
                 Reflect.deleteProperty(nextState, post.id);
@@ -188,7 +179,6 @@ export function handlePosts(state: RelationOneToOne<Post, Post> = {}, action) {
 
     case UserTypes.LOGOUT_SUCCESS:
         return {};
-
     default:
         return state;
     }
@@ -196,14 +186,15 @@ export function handlePosts(state: RelationOneToOne<Post, Post> = {}, action) {
 
 function handlePostReceived(nextState, post) {
     if (nextState[post.id] && nextState[post.id].update_at >= post.update_at) {
-    // The stored post is newer than the one we've received
+        // The stored post is newer than the one we've received
         return nextState;
     }
 
     if (post.delete_at > 0) {
-    // We've received a deleted post, so mark the post as deleted if we already have it
+        // We've received a deleted post, so mark the post as deleted if we already have it
         if (nextState[post.id]) {
-            nextState[post.id] = {...removeUnneededMetadata(post),
+            nextState[post.id] = {
+                ...removeUnneededMetadata(post),
                 state: Posts.POST_DELETED,
                 file_ids: [],
                 has_reactions: false,
@@ -214,7 +205,6 @@ function handlePostReceived(nextState, post) {
     }
 
     // Delete any pending post that existed for this post
-
     if (post.pending_post_id && post.id !== post.pending_post_id && nextState[post.pending_post_id]) {
         Reflect.deleteProperty(nextState, post.pending_post_id);
     }
@@ -224,8 +214,7 @@ function handlePostReceived(nextState, post) {
 
 export function handlePendingPosts(state: Array<string> = [], action) {
     switch (action.type) {
-    case PostTypes.RECEIVED_NEW_POST:
-    {
+    case PostTypes.RECEIVED_NEW_POST: {
         const post = action.data;
 
         if (!post.pending_post_id) {
@@ -241,15 +230,14 @@ export function handlePendingPosts(state: Array<string> = [], action) {
         }
 
         // Add the new pending post ID
-
         const nextState = [...state];
         nextState.push(post.pending_post_id);
+
         return nextState;
     }
-
-    case PostTypes.POST_REMOVED:
-    {
+    case PostTypes.POST_REMOVED: {
         const post = action.data;
+
         const index = state.indexOf(post.id);
 
         if (index === -1) {
@@ -258,14 +246,12 @@ export function handlePendingPosts(state: Array<string> = [], action) {
         }
 
         // The post has been removed, so remove the entry for it
-
         const nextState = [...state];
         nextState.splice(index, 1);
+
         return nextState;
     }
-
-    case PostTypes.RECEIVED_POST:
-    {
+    case PostTypes.RECEIVED_POST: {
         const post = action.data;
 
         if (!post.pending_post_id) {
@@ -281,9 +267,9 @@ export function handlePendingPosts(state: Array<string> = [], action) {
         }
 
         // The post has actually been created, so remove the entry for it
-
         const nextState = [...state];
         nextState.splice(index, 1);
+
         return nextState;
     }
 
@@ -294,19 +280,18 @@ export function handlePendingPosts(state: Array<string> = [], action) {
 
 export function postsInChannel(state = {}, action, prevPosts, nextPosts) {
     switch (action.type) {
-    case PostTypes.RECEIVED_NEW_POST:
-    {
+    case PostTypes.RECEIVED_NEW_POST: {
         const post = action.data;
-        const postsForChannel = state[post.channel_id];
 
+        const postsForChannel = state[post.channel_id];
         if (!postsForChannel) {
             // Don't save newly created posts until the channel has been loaded
             return state;
         }
 
         const recentBlockIndex = postsForChannel.findIndex((block) => block.recent);
-        let nextRecentBlock;
 
+        let nextRecentBlock;
         if (recentBlockIndex === -1) {
             nextRecentBlock = {
                 order: [],
@@ -314,26 +299,28 @@ export function postsInChannel(state = {}, action, prevPosts, nextPosts) {
             };
         } else {
             const recentBlock = postsForChannel[recentBlockIndex];
-            nextRecentBlock = {...recentBlock,
+            nextRecentBlock = {
+                ...recentBlock,
                 order: [...recentBlock.order],
             };
         }
 
-        let changed = false; // Add the new post to the channel
+        let changed = false;
 
+        // Add the new post to the channel
         if (!nextRecentBlock.order.includes(post.id)) {
             nextRecentBlock.order.unshift(post.id);
             changed = true;
         }
 
         // If this is a newly created post, remove any pending post that exists for it
-
         if (post.pending_post_id && post.id !== post.pending_post_id) {
             const index = nextRecentBlock.order.indexOf(post.pending_post_id);
 
             if (index !== -1) {
-                nextRecentBlock.order.splice(index, 1); // Need to re-sort to make sure any other pending posts come first
+                nextRecentBlock.order.splice(index, 1);
 
+                // Need to re-sort to make sure any other pending posts come first
                 nextRecentBlock.order.sort((a, b) => {
                     return comparePosts(nextPosts[a], nextPosts[b]);
                 });
@@ -353,14 +340,16 @@ export function postsInChannel(state = {}, action, prevPosts, nextPosts) {
             nextPostsForChannel[recentBlockIndex] = nextRecentBlock;
         }
 
-        return {...state,
+        return {
+            ...state,
             [post.channel_id]: nextPostsForChannel,
         };
     }
 
-    case PostTypes.RECEIVED_POST:
-    {
-        const post = action.data; // Receiving a single post doesn't usually affect the order of posts in a channel, except for when we've
+    case PostTypes.RECEIVED_POST: {
+        const post = action.data;
+
+        // Receiving a single post doesn't usually affect the order of posts in a channel, except for when we've
         // received a newly created post that was previously stored as pending
 
         if (!post.pending_post_id) {
@@ -368,39 +357,40 @@ export function postsInChannel(state = {}, action, prevPosts, nextPosts) {
         }
 
         const postsForChannel = state[post.channel_id] || [];
-        const recentBlockIndex = postsForChannel.findIndex((block) => block.recent);
 
+        const recentBlockIndex = postsForChannel.findIndex((block) => block.recent);
         if (recentBlockIndex === -1) {
             // Nothing to do since there's no recent block and only the recent block should contain pending posts
             return state;
         }
 
-        const recentBlock = postsForChannel[recentBlockIndex]; // Replace the pending post with the newly created one
+        const recentBlock = postsForChannel[recentBlockIndex];
 
+        // Replace the pending post with the newly created one
         const index = recentBlock.order.indexOf(post.pending_post_id);
-
         if (index === -1) {
             // No pending post found to remove
             return state;
         }
 
-        const nextRecentBlock = {...recentBlock,
+        const nextRecentBlock = {
+            ...recentBlock,
             order: [...recentBlock.order],
         };
+
         nextRecentBlock.order[index] = post.id;
+
         const nextPostsForChannel = [...postsForChannel];
         nextPostsForChannel[recentBlockIndex] = nextRecentBlock;
-        return {...state,
+
+        return {
+            ...state,
             [post.channel_id]: nextPostsForChannel,
         };
     }
 
-    case PostTypes.RECEIVED_POSTS_IN_CHANNEL:
-    {
-        const {
-            recent,
-            oldest,
-        } = action;
+    case PostTypes.RECEIVED_POSTS_IN_CHANNEL: {
+        const {recent, oldest} = action;
         const order = action.data.order;
 
         if (order.length === 0 && state[action.channelId]) {
@@ -414,40 +404,43 @@ export function postsInChannel(state = {}, action, prevPosts, nextPosts) {
         if (recent) {
             // The newly received block is now the most recent, so unmark the current most recent block
             const recentBlockIndex = postsForChannel.findIndex((block) => block.recent);
-
             if (recentBlockIndex !== -1) {
                 const recentBlock = postsForChannel[recentBlockIndex];
 
-                if (recentBlock.order.length === order.length && recentBlock.order[0] === order[0] && recentBlock.order[recentBlock.order.length - 1] === order[order.length - 1]) {
+                if (recentBlock.order.length === order.length &&
+                    recentBlock.order[0] === order[0] &&
+                    recentBlock.order[recentBlock.order.length - 1] === order[order.length - 1]) {
                     // The newly received posts are identical to the most recent block, so there's nothing to do
                     return state;
                 }
 
                 // Unmark the most recent block since the new posts are more recent
-
-                const nextRecentBlock = {...recentBlock,
+                const nextRecentBlock = {
+                    ...recentBlock,
                     recent: false,
                 };
+
                 nextPostsForChannel[recentBlockIndex] = nextRecentBlock;
             }
         }
 
         // Add the new most recent block
-
         nextPostsForChannel.push({
             order,
             recent,
             oldest,
-        }); // Merge overlapping blocks
+        });
 
+        // Merge overlapping blocks
         nextPostsForChannel = mergePostBlocks(nextPostsForChannel, nextPosts);
-        return {...state,
+
+        return {
+            ...state,
             [action.channelId]: nextPostsForChannel,
         };
     }
 
-    case PostTypes.RECEIVED_POSTS_AFTER:
-    {
+    case PostTypes.RECEIVED_POSTS_AFTER: {
         const order = action.data.order;
         const afterPostId = action.afterPostId;
 
@@ -456,50 +449,51 @@ export function postsInChannel(state = {}, action, prevPosts, nextPosts) {
             return state;
         }
 
-        const postsForChannel = state[action.channelId] || []; // Add a new block including the previous post and then have mergePostBlocks sort out any overlap or duplicates
+        const postsForChannel = state[action.channelId] || [];
 
+        // Add a new block including the previous post and then have mergePostBlocks sort out any overlap or duplicates
         const newBlock = {
             order: [...order, afterPostId],
             recent: action.recent,
         };
+
         let nextPostsForChannel = [...postsForChannel, newBlock];
         nextPostsForChannel = mergePostBlocks(nextPostsForChannel, nextPosts);
-        return {...state,
+
+        return {
+            ...state,
             [action.channelId]: nextPostsForChannel,
         };
     }
 
-    case PostTypes.RECEIVED_POSTS_BEFORE:
-    {
-        const {
-            order,
-        } = action.data;
-        const {
-            beforePostId,
-            oldest,
-        } = action;
+    case PostTypes.RECEIVED_POSTS_BEFORE: {
+        const {order} = action.data;
+        const {beforePostId, oldest} = action;
 
         if (order.length === 0) {
             // No posts received
             return state;
         }
 
-        const postsForChannel = state[action.channelId] || []; // Add a new block including the next post and then have mergePostBlocks sort out any overlap or duplicates
+        const postsForChannel = state[action.channelId] || [];
 
+        // Add a new block including the next post and then have mergePostBlocks sort out any overlap or duplicates
         const newBlock = {
             order: [beforePostId, ...order],
             recent: false,
             oldest,
         };
+
         let nextPostsForChannel = [...postsForChannel, newBlock];
         nextPostsForChannel = mergePostBlocks(nextPostsForChannel, nextPosts);
-        return {...state,
+
+        return {
+            ...state,
             [action.channelId]: nextPostsForChannel,
         };
     }
 
-    case PostTypes.RECEIVED_POSTS_SINCE:
-    {
+    case PostTypes.RECEIVED_POSTS_SINCE: {
         const order = action.data.order;
 
         if (order.length === 0 && state[action.channelId]) {
@@ -508,39 +502,42 @@ export function postsInChannel(state = {}, action, prevPosts, nextPosts) {
         }
 
         const postsForChannel = state[action.channelId] || [];
-        const recentBlockIndex = postsForChannel.findIndex((block) => block.recent);
 
+        const recentBlockIndex = postsForChannel.findIndex((block) => block.recent);
         if (recentBlockIndex === -1) {
             // Nothing to do since this shouldn't be dispatched if we haven't loaded the most recent posts yet
             return state;
         }
 
         const recentBlock = postsForChannel[recentBlockIndex];
-        const mostOldestCreateAt = nextPosts[recentBlock.order[recentBlock.order.length - 1]].create_at;
-        const nextRecentBlock = {...recentBlock,
-            order: [...recentBlock.order],
-        }; // Add any new posts to the most recent block while skipping ones that were only updated
 
+        const mostOldestCreateAt = nextPosts[recentBlock.order[recentBlock.order.length - 1]].create_at;
+
+        const nextRecentBlock = {
+            ...recentBlock,
+            order: [...recentBlock.order],
+        };
+
+        // Add any new posts to the most recent block while skipping ones that were only updated
         for (let i = order.length - 1; i >= 0; i--) {
             const postId = order[i];
 
             if (!nextPosts[postId]) {
-            // the post was removed from the list
+                // the post was removed from the list
                 continue;
             }
 
             if (nextPosts[postId].create_at <= mostOldestCreateAt) {
-            // This is an old post
+                // This is an old post
                 continue;
             }
 
             if (nextRecentBlock.order.indexOf(postId) !== -1) {
-            // This postId exists so no need to add it again
+                // This postId exists so no need to add it again
                 continue;
             }
 
             // This post is newer than what we have
-
             nextRecentBlock.order.unshift(postId);
         }
 
@@ -552,35 +549,41 @@ export function postsInChannel(state = {}, action, prevPosts, nextPosts) {
         nextRecentBlock.order.sort((a, b) => {
             return comparePosts(nextPosts[a], nextPosts[b]);
         });
+
         const nextPostsForChannel = [...postsForChannel];
         nextPostsForChannel[recentBlockIndex] = nextRecentBlock;
-        return {...state,
+
+        return {
+            ...state,
             [action.channelId]: nextPostsForChannel,
         };
     }
 
-    case PostTypes.POST_DELETED:
-    {
-        const post = action.data; // Deleting a post removes its comments from the order, but does not remove the post itself
+    case PostTypes.POST_DELETED: {
+        const post = action.data;
+
+        // Deleting a post removes its comments from the order, but does not remove the post itself
 
         const postsForChannel = state[post.channel_id] || [];
-
         if (postsForChannel.length === 0) {
             return state;
         }
 
         let changed = false;
+
         let nextPostsForChannel = [...postsForChannel];
-
         for (let i = 0; i < nextPostsForChannel.length; i++) {
-            const block = nextPostsForChannel[i]; // Remove any comments for this post
+            const block = nextPostsForChannel[i];
 
+            // Remove any comments for this post
             const nextOrder = block.order.filter((postId) => prevPosts[postId].root_id !== post.id);
 
             if (nextOrder.length !== block.order.length) {
-                nextPostsForChannel[i] = {...block,
+                nextPostsForChannel[i] = {
+                    ...block,
                     order: nextOrder,
                 };
+
                 changed = true;
             }
         }
@@ -591,33 +594,38 @@ export function postsInChannel(state = {}, action, prevPosts, nextPosts) {
         }
 
         nextPostsForChannel = removeNonRecentEmptyPostBlocks(nextPostsForChannel);
-        return {...state,
+
+        return {
+            ...state,
             [post.channel_id]: nextPostsForChannel,
         };
     }
 
-    case PostTypes.POST_REMOVED:
-    {
-        const post = action.data; // Removing a post removes it as well as its comments
+    case PostTypes.POST_REMOVED: {
+        const post = action.data;
+
+        // Removing a post removes it as well as its comments
 
         const postsForChannel = state[post.channel_id] || [];
-
         if (postsForChannel.length === 0) {
             return state;
         }
 
-        let changed = false; // Remove the post and its comments from the channel
+        let changed = false;
 
+        // Remove the post and its comments from the channel
         let nextPostsForChannel = [...postsForChannel];
-
         for (let i = 0; i < nextPostsForChannel.length; i++) {
             const block = nextPostsForChannel[i];
+
             const nextOrder = block.order.filter((postId) => postId !== post.id && prevPosts[postId].root_id !== post.id);
 
             if (nextOrder.length !== block.order.length) {
-                nextPostsForChannel[i] = {...block,
+                nextPostsForChannel[i] = {
+                    ...block,
                     order: nextOrder,
                 };
+
                 changed = true;
             }
         }
@@ -628,15 +636,16 @@ export function postsInChannel(state = {}, action, prevPosts, nextPosts) {
         }
 
         nextPostsForChannel = removeNonRecentEmptyPostBlocks(nextPostsForChannel);
-        return {...state,
+
+        return {
+            ...state,
             [post.channel_id]: nextPostsForChannel,
         };
     }
 
     case ChannelTypes.RECEIVED_CHANNEL_DELETED:
     case ChannelTypes.DELETE_CHANNEL_SUCCESS:
-    case ChannelTypes.LEAVE_CHANNEL:
-    {
+    case ChannelTypes.LEAVE_CHANNEL: {
         if (action.data && action.data.viewArchivedChannels) {
             // Nothing to do since we still want to store posts in archived channels
             return state;
@@ -650,16 +659,14 @@ export function postsInChannel(state = {}, action, prevPosts, nextPosts) {
         }
 
         // Remove the entry for the deleted channel
-
-        const nextState = {...state,
-        };
+        const nextState = {...state};
         Reflect.deleteProperty(nextState, channelId);
+
         return nextState;
     }
 
     case UserTypes.LOGOUT_SUCCESS:
         return {};
-
     default:
         return state;
     }
@@ -670,30 +677,33 @@ export function removeNonRecentEmptyPostBlocks(blocks) {
 }
 
 export function mergePostBlocks(blocks, posts) {
-    let nextBlocks = [...blocks]; // Remove any blocks that may have become empty by removing posts
+    let nextBlocks = [...blocks];
 
-    nextBlocks = removeNonRecentEmptyPostBlocks(blocks); // If a channel does not have any posts(Experimental feature where join and leave messages don't exist)
+    // Remove any blocks that may have become empty by removing posts
+    nextBlocks = removeNonRecentEmptyPostBlocks(blocks);
+
+    // If a channel does not have any posts(Experimental feature where join and leave messages don't exist)
     // return the previous state i.e an empty block
-
     if (!nextBlocks.length) {
         return blocks;
     }
 
     // Sort blocks so that the most recent one comes first
-
     nextBlocks.sort((a, b) => {
         const aStartsAt = posts[a.order[0]].create_at;
         const bStartsAt = posts[b.order[0]].create_at;
+
         return bStartsAt - aStartsAt;
-    }); // Merge adjacent blocks
+    });
 
+    // Merge adjacent blocks
     let i = 0;
-
     while (i < nextBlocks.length - 1) {
-    // Since we know the start of a is more recent than the start of b, they'll overlap if the last post in a is
-    // older than the first post in b
+        // Since we know the start of a is more recent than the start of b, they'll overlap if the last post in a is
+        // older than the first post in b
         const a = nextBlocks[i];
         const aEndsAt = posts[a.order[a.order.length - 1]].create_at;
+
         const b = nextBlocks[i + 1];
         const bStartsAt = posts[b.order[0]].create_at;
 
@@ -702,9 +712,13 @@ export function mergePostBlocks(blocks, posts) {
             nextBlocks[i] = {
                 order: mergePostOrder(a.order, b.order, posts),
             };
+
             nextBlocks[i].recent = a.recent || b.recent;
             nextBlocks[i].oldest = a.oldest || b.oldest;
-            nextBlocks.splice(i + 1, 1); // Do another iteration on this index since it may need to be merged into the next
+
+            nextBlocks.splice(i + 1, 1);
+
+            // Do another iteration on this index since it may need to be merged into the next
         } else {
             // The blocks don't overlap, so move on to the next one
             i += 1;
@@ -712,7 +726,7 @@ export function mergePostBlocks(blocks, posts) {
     }
 
     if (blocks.length === nextBlocks.length) {
-    // No changes were made
+        // No changes were made
         return blocks;
     }
 
@@ -720,10 +734,10 @@ export function mergePostBlocks(blocks, posts) {
 }
 
 export function mergePostOrder(left, right, posts) {
-    const result = [...left]; // Add without duplicates
+    const result = [...left];
 
+    // Add without duplicates
     const seen = new Set(left);
-
     for (const id of right) {
         if (seen.has(id)) {
             continue;
@@ -733,21 +747,20 @@ export function mergePostOrder(left, right, posts) {
     }
 
     if (result.length === left.length) {
-    // No new items added
+        // No new items added
         return left;
     }
 
     // Re-sort so that the most recent post comes first
-
     result.sort((a, b) => posts[b].create_at - posts[a].create_at);
+
     return result;
 }
 
 export function postsInThread(state: {[x: string]: string[]} = {}, action, prevPosts) {
     switch (action.type) {
     case PostTypes.RECEIVED_NEW_POST:
-    case PostTypes.RECEIVED_POST:
-    {
+    case PostTypes.RECEIVED_POST: {
         const post = action.data;
 
         if (!post.root_id) {
@@ -757,6 +770,7 @@ export function postsInThread(state: {[x: string]: string[]} = {}, action, prevP
 
         const postsForThread = state[post.root_id] || [];
         const nextPostsForThread = [...postsForThread];
+
         let changed = false;
 
         if (!postsForThread.includes(post.id)) {
@@ -765,7 +779,6 @@ export function postsInThread(state: {[x: string]: string[]} = {}, action, prevP
         }
 
         // If this is a new non-pending post, remove any pending post that exists for it
-
         if (post.pending_post_id && post.id !== post.pending_post_id) {
             const index = nextPostsForThread.indexOf(post.pending_post_id);
 
@@ -779,7 +792,8 @@ export function postsInThread(state: {[x: string]: string[]} = {}, action, prevP
             return state;
         }
 
-        return {...state,
+        return {
+            ...state,
             [post.root_id]: nextPostsForThread,
         };
     }
@@ -787,8 +801,7 @@ export function postsInThread(state: {[x: string]: string[]} = {}, action, prevP
     case PostTypes.RECEIVED_POSTS_AFTER:
     case PostTypes.RECEIVED_POSTS_BEFORE:
     case PostTypes.RECEIVED_POSTS_IN_CHANNEL:
-    case PostTypes.RECEIVED_POSTS_SINCE:
-    {
+    case PostTypes.RECEIVED_POSTS_SINCE: {
         const newPosts: Post[] = Object.values(action.data.posts);
 
         if (newPosts.length === 0) {
@@ -800,13 +813,14 @@ export function postsInThread(state: {[x: string]: string[]} = {}, action, prevP
 
         for (const post of newPosts) {
             if (!post.root_id) {
-            // Only store comments, not the root post
+                // Only store comments, not the root post
                 continue;
             }
 
             const postsForThread = state[post.root_id] || [];
-            const nextPostsForThread = nextState[post.root_id] || [...postsForThread]; // Add the post to the thread
+            const nextPostsForThread = nextState[post.root_id] || [...postsForThread];
 
+            // Add the post to the thread
             if (!nextPostsForThread.includes(post.id)) {
                 nextPostsForThread.push(post.id);
             }
@@ -818,13 +832,13 @@ export function postsInThread(state: {[x: string]: string[]} = {}, action, prevP
             return state;
         }
 
-        return {...state,
+        return {
+            ...state,
             ...nextState,
         };
     }
 
-    case PostTypes.RECEIVED_POSTS_IN_THREAD:
-    {
+    case PostTypes.RECEIVED_POSTS_IN_THREAD: {
         const newPosts: Post[] = Object.values(action.data.posts);
 
         if (newPosts.length === 0) {
@@ -837,93 +851,89 @@ export function postsInThread(state: {[x: string]: string[]} = {}, action, prevP
 
         for (const post of newPosts) {
             if (post.root_id !== action.rootId) {
-            // Only store comments
+                // Only store comments
                 continue;
             }
 
             if (nextPostsForThread.includes(post.id)) {
-            // Don't store duplicates
+                // Don't store duplicates
                 continue;
             }
 
             nextPostsForThread.push(post.id);
         }
 
-        return {...state,
+        return {
+            ...state,
             [action.rootId]: nextPostsForThread,
         };
     }
 
-    case PostTypes.POST_DELETED:
-    {
+    case PostTypes.POST_DELETED: {
         const post = action.data;
-        const postsForThread = state[post.id];
 
+        const postsForThread = state[post.id];
         if (!postsForThread) {
             // Nothing to remove
             return state;
         }
 
-        const nextState = {...state,
-        };
+        const nextState = {...state};
         Reflect.deleteProperty(nextState, post.id);
+
         return nextState;
     }
 
-    case PostTypes.POST_REMOVED:
-    {
+    case PostTypes.POST_REMOVED: {
         const post = action.data;
 
         if (post.root_id) {
             // This is a comment, so remove it from the thread
             const postsForThread = state[post.root_id];
-
             if (!postsForThread) {
                 return state;
             }
 
             const index = postsForThread.findIndex((postId) => postId === post.id);
-
             if (index === -1) {
                 return state;
             }
 
             const nextPostsForThread = [...postsForThread];
             nextPostsForThread.splice(index, 1);
-            return {...state,
+
+            return {
+                ...state,
                 [post.root_id]: nextPostsForThread,
             };
         }
 
         // This is not a comment, so remove any comments on it
-
         const postsForThread = state[post.id];
-
         if (!postsForThread) {
             return state;
         }
 
-        const nextState = {...state,
-        };
+        const nextState = {...state};
         Reflect.deleteProperty(nextState, post.id);
+
         return nextState;
     }
 
     case ChannelTypes.RECEIVED_CHANNEL_DELETED:
     case ChannelTypes.DELETE_CHANNEL_SUCCESS:
-    case ChannelTypes.LEAVE_CHANNEL:
-    {
+    case ChannelTypes.LEAVE_CHANNEL: {
         if (action.data && action.data.viewArchivedChannels) {
             // Nothing to do since we still want to store posts in archived channels
             return state;
         }
 
         const channelId = action.data.id;
-        let postDeleted = false; // Remove entries for any thread in the channel
 
-        const nextState = {...state,
-        };
+        let postDeleted = false;
 
+        // Remove entries for any thread in the channel
+        const nextState = {...state};
         for (const rootId of Object.keys(state)) {
             if (prevPosts[rootId] && prevPosts[rootId].channel_id === channelId) {
                 Reflect.deleteProperty(nextState, rootId);
@@ -941,7 +951,6 @@ export function postsInThread(state: {[x: string]: string[]} = {}, action, prevP
 
     case UserTypes.LOGOUT_SUCCESS:
         return {};
-
     default:
         return state;
     }
@@ -951,10 +960,8 @@ function selectedPostId(state = '', action) {
     switch (action.type) {
     case PostTypes.RECEIVED_POST_SELECTED:
         return action.data;
-
     case UserTypes.LOGOUT_SUCCESS:
         return '';
-
     default:
         return state;
     }
@@ -964,10 +971,8 @@ function currentFocusedPostId(state = '', action) {
     switch (action.type) {
     case PostTypes.RECEIVED_FOCUSED_POST:
         return action.data;
-
     case UserTypes.LOGOUT_SUCCESS:
         return '';
-
     default:
         return state;
     }
@@ -975,67 +980,64 @@ function currentFocusedPostId(state = '', action) {
 
 export function reactions(state = {}, action) {
     switch (action.type) {
-    case PostTypes.RECEIVED_REACTIONS:
-    {
+    case PostTypes.RECEIVED_REACTIONS: {
         const reactionsList = action.data;
         const nextReactions = {};
         reactionsList.forEach((reaction) => {
             nextReactions[reaction.user_id + '-' + reaction.emoji_name] = reaction;
         });
-        return {...state,
+
+        return {
+            ...state,
             [action.postId]: nextReactions,
         };
     }
-
-    case PostTypes.RECEIVED_REACTION:
-    {
+    case PostTypes.RECEIVED_REACTION: {
         const reaction = action.data;
-        const nextReactions = {...(state[reaction.post_id] || {}),
-        };
+        const nextReactions = {...(state[reaction.post_id] || {})};
         nextReactions[reaction.user_id + '-' + reaction.emoji_name] = reaction;
-        return {...state,
+
+        return {
+            ...state,
             [reaction.post_id]: nextReactions,
         };
     }
-
-    case PostTypes.REACTION_DELETED:
-    {
+    case PostTypes.REACTION_DELETED: {
         const reaction = action.data;
-        const nextReactions = {...(state[reaction.post_id] || {}),
-        };
-
+        const nextReactions = {...(state[reaction.post_id] || {})};
         if (!nextReactions[reaction.user_id + '-' + reaction.emoji_name]) {
             return state;
         }
 
         Reflect.deleteProperty(nextReactions, reaction.user_id + '-' + reaction.emoji_name);
-        return {...state,
+
+        return {
+            ...state,
             [reaction.post_id]: nextReactions,
         };
     }
 
     case PostTypes.RECEIVED_NEW_POST:
-    case PostTypes.RECEIVED_POST:
-    {
+    case PostTypes.RECEIVED_POST: {
         const post = action.data;
+
         return storeReactionsForPost(state, post);
     }
 
-    case PostTypes.RECEIVED_POSTS:
-    {
+    case PostTypes.RECEIVED_POSTS: {
         const posts = Object.values(action.data.posts);
+
         return posts.reduce(storeReactionsForPost, state);
     }
 
     case PostTypes.POST_DELETED:
-    case PostTypes.POST_REMOVED:
-    {
+    case PostTypes.POST_REMOVED: {
         const post = action.data;
 
         if (post && state[post.id]) {
-            const nextState = {...state,
-            };
+            const nextState = {...state};
             Reflect.deleteProperty(nextState, post.id);
+
             return nextState;
         }
 
@@ -1044,7 +1046,6 @@ export function reactions(state = {}, action) {
 
     case UserTypes.LOGOUT_SUCCESS:
         return {};
-
     default:
         return state;
     }
@@ -1056,44 +1057,41 @@ function storeReactionsForPost(state, post) {
     }
 
     const reactionsForPost = {};
-
     if (post.metadata.reactions && post.metadata.reactions.length > 0) {
         for (const reaction of post.metadata.reactions) {
             reactionsForPost[reaction.user_id + '-' + reaction.emoji_name] = reaction;
         }
     }
 
-    return {...state,
+    return {
+        ...state,
         [post.id]: reactionsForPost,
     };
 }
 
 export function openGraph(state = {}, action) {
     switch (action.type) {
-    case PostTypes.RECEIVED_OPEN_GRAPH_METADATA:
-    {
-        const nextState = {...state,
-        };
+    case PostTypes.RECEIVED_OPEN_GRAPH_METADATA: {
+        const nextState = {...state};
         nextState[action.url] = action.data;
+
         return nextState;
     }
 
     case PostTypes.RECEIVED_NEW_POST:
-    case PostTypes.RECEIVED_POST:
-    {
+    case PostTypes.RECEIVED_POST: {
         const post = action.data;
+
         return storeOpenGraphForPost(state, post);
     }
-
-    case PostTypes.RECEIVED_POSTS:
-    {
+    case PostTypes.RECEIVED_POSTS: {
         const posts = Object.values(action.data.posts);
+
         return posts.reduce(storeOpenGraphForPost, state);
     }
 
     case UserTypes.LOGOUT_SUCCESS:
         return {};
-
     default:
         return state;
     }
@@ -1110,7 +1108,8 @@ function storeOpenGraphForPost(state, post) {
             return nextState;
         }
 
-        return {...nextState,
+        return {
+            ...nextState,
             [embed.url]: embed.data,
         };
     }, state);
@@ -1118,8 +1117,7 @@ function storeOpenGraphForPost(state, post) {
 
 function messagesHistory(state: {messages?;index?} = {}, action) {
     switch (action.type) {
-    case PostTypes.ADD_MESSAGE_INTO_HISTORY:
-    {
+    case PostTypes.ADD_MESSAGE_INTO_HISTORY: {
         const nextIndex = {};
         let nextMessages = state.messages ? [...state.messages] : [];
         nextMessages.push(action.data);
@@ -1135,70 +1133,58 @@ function messagesHistory(state: {messages?;index?} = {}, action) {
             index: nextIndex,
         };
     }
-
-    case PostTypes.RESET_HISTORY_INDEX:
-    {
+    case PostTypes.RESET_HISTORY_INDEX: {
         const index = {};
         index[Posts.MESSAGE_TYPES.POST] = -1;
         index[Posts.MESSAGE_TYPES.COMMENT] = -1;
+
         const messages = state.messages || [];
-        const nextIndex = state.index ? {...state.index,
-        } : index;
+        const nextIndex = state.index ? {...state.index} : index;
         nextIndex[action.data] = messages.length;
         return {
             messages: state.messages,
             index: nextIndex,
         };
     }
-
-    case PostTypes.MOVE_HISTORY_INDEX_BACK:
-    {
+    case PostTypes.MOVE_HISTORY_INDEX_BACK: {
         const index = {};
         index[Posts.MESSAGE_TYPES.POST] = -1;
         index[Posts.MESSAGE_TYPES.COMMENT] = -1;
-        const nextIndex = state.index ? {...state.index,
-        } : index;
 
+        const nextIndex = state.index ? {...state.index} : index;
         if (nextIndex[action.data] > 0) {
             nextIndex[action.data]--;
         }
-
         return {
             messages: state.messages,
             index: nextIndex,
         };
     }
-
-    case PostTypes.MOVE_HISTORY_INDEX_FORWARD:
-    {
+    case PostTypes.MOVE_HISTORY_INDEX_FORWARD: {
         const index = {};
         index[Posts.MESSAGE_TYPES.POST] = -1;
         index[Posts.MESSAGE_TYPES.COMMENT] = -1;
-        const messages = state.messages || [];
-        const nextIndex = state.index ? {...state.index,
-        } : index;
 
+        const messages = state.messages || [];
+        const nextIndex = state.index ? {...state.index} : index;
         if (nextIndex[action.data] < messages.length) {
             nextIndex[action.data]++;
         }
-
         return {
             messages: state.messages,
             index: nextIndex,
         };
     }
-
-    case UserTypes.LOGOUT_SUCCESS:
-    {
+    case UserTypes.LOGOUT_SUCCESS: {
         const index = {};
         index[Posts.MESSAGE_TYPES.POST] = -1;
         index[Posts.MESSAGE_TYPES.COMMENT] = -1;
+
         return {
             messages: [],
             index,
         };
     }
-
     default:
         return state;
     }
@@ -1207,15 +1193,15 @@ function messagesHistory(state: {messages?;index?} = {}, action) {
 export function expandedURLs(state = {}, action) {
     switch (action.type) {
     case GeneralTypes.REDIRECT_LOCATION_SUCCESS:
-        return {...state,
+        return {
+            ...state,
             [action.data.url]: action.data.location,
         };
-
     case GeneralTypes.REDIRECT_LOCATION_FAILURE:
-        return {...state,
+        return {
+            ...state,
             [action.data.url]: action.data.url,
         };
-
     default:
         return state;
     }
@@ -1224,6 +1210,7 @@ export function expandedURLs(state = {}, action) {
 export default function(state: Partial<PostsState> = {}, action) {
     const nextPosts = handlePosts(state.posts, action);
     const nextPostsInChannel = postsInChannel(state.postsInChannel, action, state.posts, nextPosts);
+
     const nextState = {
 
         // Object mapping post ids to post objects
@@ -1253,11 +1240,20 @@ export default function(state: Partial<PostsState> = {}, action) {
 
         // History of posts and comments
         messagesHistory: messagesHistory(state.messagesHistory, action),
+
         expandedURLs: expandedURLs(state.expandedURLs, action),
     };
 
-    if (state.posts === nextState.posts && state.postsInChannel === nextState.postsInChannel && state.postsInThread === nextState.postsInThread && state.pendingPostIds === nextState.pendingPostIds && state.selectedPostId === nextState.selectedPostId && state.currentFocusedPostId === nextState.currentFocusedPostId && state.reactions === nextState.reactions && state.openGraph === nextState.openGraph && state.messagesHistory === nextState.messagesHistory && state.expandedURLs === nextState.expandedURLs) {
-    // None of the children have changed so don't even let the parent object change
+    if (state.posts === nextState.posts && state.postsInChannel === nextState.postsInChannel &&
+        state.postsInThread === nextState.postsInThread &&
+        state.pendingPostIds === nextState.pendingPostIds &&
+        state.selectedPostId === nextState.selectedPostId &&
+        state.currentFocusedPostId === nextState.currentFocusedPostId &&
+        state.reactions === nextState.reactions &&
+        state.openGraph === nextState.openGraph &&
+        state.messagesHistory === nextState.messagesHistory &&
+        state.expandedURLs === nextState.expandedURLs) {
+        // None of the children have changed so don't even let the parent object change
         return state;
     }
 

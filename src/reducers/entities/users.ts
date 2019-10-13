@@ -1,5 +1,6 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
+
 import {combineReducers} from 'redux';
 import {UserTypes, ChannelTypes} from 'action_types';
 import {profileListToMap} from 'utils/user_utils';
@@ -10,7 +11,9 @@ function profilesToSet(state, action) {
     Object.keys(action.data).forEach((key) => {
         nextSet.add(key);
     });
-    return {...state,
+
+    return {
+        ...state,
         [id]: nextSet,
     };
 }
@@ -18,12 +21,13 @@ function profilesToSet(state, action) {
 function profileListToSet(state, action, replace = false) {
     const id = action.id;
     const nextSet = replace ? new Set() : new Set(state[id]);
-
     if (action.data) {
         action.data.forEach((profile) => {
             nextSet.add(profile.id);
         });
-        return {...state,
+
+        return {
+            ...state,
             [id]: nextSet,
         };
     }
@@ -34,12 +38,13 @@ function profileListToSet(state, action, replace = false) {
 function removeProfileListFromSet(state, action) {
     const id = action.id;
     const nextSet = new Set(state[id]);
-
     if (action.data) {
         action.data.forEach((profile) => {
             nextSet.delete(profile.id);
         });
-        return {...state,
+
+        return {
+            ...state,
             [id]: nextSet,
         };
     }
@@ -48,34 +53,30 @@ function removeProfileListFromSet(state, action) {
 }
 
 function addProfileToSet(state, action) {
-    const {
-        id,
-        user_id: userId,
-    } = action.data;
+    const {id, user_id: userId} = action.data;
     const nextSet = new Set(state[id]);
     nextSet.add(userId);
-    return {...state,
+    return {
+        ...state,
         [id]: nextSet,
     };
 }
 
 function removeProfileFromSet(state, action) {
-    const {
-        id,
-        user_id: userId,
-    } = action.data;
+    const {id, user_id: userId} = action.data;
     const nextSet = new Set(state[id]);
     nextSet.delete(userId);
-    return {...state,
+    return {
+        ...state,
         [id]: nextSet,
     };
 }
 
 function currentUserId(state = '', action) {
     switch (action.type) {
-    case UserTypes.RECEIVED_ME:
-    {
+    case UserTypes.RECEIVED_ME: {
         const data = action.data || action.payload;
+
         return data.id;
     }
 
@@ -91,18 +92,15 @@ function mySessions(state: Array<{id}> = [], action) {
     case UserTypes.RECEIVED_SESSIONS:
         return [...action.data];
 
-    case UserTypes.RECEIVED_REVOKED_SESSION:
-    {
+    case UserTypes.RECEIVED_REVOKED_SESSION: {
         let index = -1;
         const length = state.length;
-
         for (let i = 0; i < length; i++) {
             if (state[i].id === action.sessionId) {
                 index = i;
                 break;
             }
         }
-
         if (index > -1) {
             return state.slice(0, index).concat(state.slice(index + 1));
         }
@@ -114,7 +112,6 @@ function mySessions(state: Array<{id}> = [], action) {
         if (action.data.isCurrentUser === true) {
             return [];
         }
-
         return state;
 
     case UserTypes.REVOKE_SESSIONS_FOR_ALL_USERS_SUCCESS:
@@ -144,37 +141,33 @@ function myAudits(state = [], action) {
 function profiles(state = {}, action) {
     switch (action.type) {
     case UserTypes.RECEIVED_ME:
-    case UserTypes.RECEIVED_PROFILE:
-    {
+    case UserTypes.RECEIVED_PROFILE: {
         const data = action.data || action.payload;
-        const user = {...data,
-        };
+        const user = {...data};
         const oldUser = state[data.id];
-
         if (oldUser) {
             user.terms_of_service_id = oldUser.terms_of_service_id;
             user.terms_of_service_create_at = oldUser.terms_of_service_create_at;
         }
 
-        return {...state,
+        return {
+            ...state,
             [data.id]: user,
         };
     }
-
     case UserTypes.RECEIVED_PROFILES_LIST:
         return Object.assign({}, state, profileListToMap(action.data));
-
     case UserTypes.RECEIVED_PROFILES:
         return Object.assign({}, state, action.data);
 
     case UserTypes.LOGOUT_SUCCESS:
         return {};
-
-    case UserTypes.RECEIVED_TERMS_OF_SERVICE_STATUS:
-    {
+    case UserTypes.RECEIVED_TERMS_OF_SERVICE_STATUS: {
         const data = action.data || action.payload;
-        return {...state,
-            [data.user_id]: {...state[data.user_id],
+        return {
+            ...state,
+            [data.user_id]: {
+                ...state[data.user_id],
                 terms_of_service_id: data.terms_of_service_id,
                 terms_of_service_create_at: data.terms_of_service_create_at,
             },
@@ -238,27 +231,21 @@ function profilesNotInTeam(state = {}, action) {
 
 function profilesWithoutTeam(state = new Set(), action) {
     switch (action.type) {
-    case UserTypes.RECEIVED_PROFILE_WITHOUT_TEAM:
-    {
+    case UserTypes.RECEIVED_PROFILE_WITHOUT_TEAM: {
         const nextSet = new Set(state);
         Object.values(action.data).forEach((id) => nextSet.add(id));
         return nextSet;
     }
-
-    case UserTypes.RECEIVED_PROFILES_LIST_WITHOUT_TEAM:
-    {
+    case UserTypes.RECEIVED_PROFILES_LIST_WITHOUT_TEAM: {
         const nextSet = new Set(state);
         action.data.forEach((user) => nextSet.add(user.id));
         return nextSet;
     }
-
-    case UserTypes.RECEIVED_PROFILE_IN_TEAM:
-    {
+    case UserTypes.RECEIVED_PROFILE_IN_TEAM: {
         const nextSet = new Set(state);
         nextSet.delete(action.data.id);
         return nextSet;
     }
-
     case UserTypes.LOGOUT_SUCCESS:
         return new Set();
 
@@ -282,12 +269,10 @@ function profilesInChannel(state = {}, action) {
         return removeProfileFromSet(state, action);
 
     case ChannelTypes.CHANNEL_MEMBER_REMOVED:
-        return removeProfileFromSet(state, {
-            data: {
-                id: action.data.channel_id,
-                user_id: action.data.user_id,
-            },
-        });
+        return removeProfileFromSet(state, {data: {
+            id: action.data.channel_id,
+            user_id: action.data.user_id,
+        }});
 
     case UserTypes.LOGOUT_SUCCESS:
         return {};
@@ -315,12 +300,10 @@ function profilesNotInChannel(state = {}, action) {
         return removeProfileFromSet(state, action);
 
     case ChannelTypes.CHANNEL_MEMBER_ADDED:
-        return removeProfileFromSet(state, {
-            data: {
-                id: action.data.channel_id,
-                user_id: action.data.user_id,
-            },
-        });
+        return removeProfileFromSet(state, {data: {
+            id: action.data.channel_id,
+            user_id: action.data.user_id,
+        }});
 
     case UserTypes.LOGOUT_SUCCESS:
         return {};
@@ -332,15 +315,13 @@ function profilesNotInChannel(state = {}, action) {
 
 function statuses(state = {}, action) {
     switch (action.type) {
-    case UserTypes.RECEIVED_STATUS:
-    {
+    case UserTypes.RECEIVED_STATUS: {
         const nextState = Object.assign({}, state);
         nextState[action.data.user_id] = action.data.status;
+
         return nextState;
     }
-
-    case UserTypes.RECEIVED_STATUSES:
-    {
+    case UserTypes.RECEIVED_STATUSES: {
         const nextState = Object.assign({}, state);
 
         for (const s of action.data) {
@@ -349,7 +330,6 @@ function statuses(state = {}, action) {
 
         return nextState;
     }
-
     case UserTypes.LOGOUT_SUCCESS:
         return {};
 
@@ -360,18 +340,14 @@ function statuses(state = {}, action) {
 
 function myUserAccessTokens(state = {}, action) {
     switch (action.type) {
-    case UserTypes.RECEIVED_MY_USER_ACCESS_TOKEN:
-    {
-        const nextState = {...state,
-        };
+    case UserTypes.RECEIVED_MY_USER_ACCESS_TOKEN: {
+        const nextState = {...state};
         nextState[action.data.id] = action.data;
+
         return nextState;
     }
-
-    case UserTypes.RECEIVED_MY_USER_ACCESS_TOKENS:
-    {
-        const nextState = {...state,
-        };
+    case UserTypes.RECEIVED_MY_USER_ACCESS_TOKENS: {
+        const nextState = {...state};
 
         for (const uat of action.data) {
             nextState[uat.id] = uat;
@@ -379,40 +355,28 @@ function myUserAccessTokens(state = {}, action) {
 
         return nextState;
     }
-
-    case UserTypes.REVOKED_USER_ACCESS_TOKEN:
-    {
-        const nextState = {...state,
-        };
+    case UserTypes.REVOKED_USER_ACCESS_TOKEN: {
+        const nextState = {...state};
         Reflect.deleteProperty(nextState, action.data);
+
         return nextState;
     }
 
-    case UserTypes.ENABLED_USER_ACCESS_TOKEN:
-    {
+    case UserTypes.ENABLED_USER_ACCESS_TOKEN: {
         if (state[action.data]) {
-            const nextState = {...state,
-            };
-            nextState[action.data] = {...nextState[action.data],
-                is_active: true,
-            };
+            const nextState = {...state};
+            nextState[action.data] = {...nextState[action.data], is_active: true};
             return nextState;
         }
-
         return state;
     }
 
-    case UserTypes.DISABLED_USER_ACCESS_TOKEN:
-    {
+    case UserTypes.DISABLED_USER_ACCESS_TOKEN: {
         if (state[action.data]) {
-            const nextState = {...state,
-            };
-            nextState[action.data] = {...nextState[action.data],
-                is_active: false,
-            };
+            const nextState = {...state};
+            nextState[action.data] = {...nextState[action.data], is_active: false};
             return nextState;
         }
-
         return state;
     }
 
@@ -427,14 +391,13 @@ function myUserAccessTokens(state = {}, action) {
 
 function stats(state = {}, action) {
     switch (action.type) {
-    case UserTypes.RECEIVED_USER_STATS:
-    {
+    case UserTypes.RECEIVED_USER_STATS: {
         const stat = action.data;
-        return {...state,
+        return {
+            ...state,
             ...stat,
         };
     }
-
     default:
         return state;
     }

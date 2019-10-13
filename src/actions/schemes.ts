@@ -16,17 +16,23 @@ export function getScheme(schemeId: string): ActionFunc {
         onRequest: SchemeTypes.GET_SCHEME_REQUEST,
         onSuccess: [SchemeTypes.RECEIVED_SCHEME, SchemeTypes.GET_SCHEME_SUCCESS],
         onFailure: SchemeTypes.GET_SCHEME_FAILURE,
-        params: [schemeId],
+        params: [
+            schemeId,
+        ],
     });
 }
 
-export function getSchemes(scope: SchemeScope, page = 0, perPage: number = General.PAGE_SIZE_DEFAULT): ActionFunc {
+export function getSchemes(scope: SchemeScope, page: number = 0, perPage: number = General.PAGE_SIZE_DEFAULT): ActionFunc {
     return bindClientFunc({
         clientFunc: Client4.getSchemes,
         onRequest: SchemeTypes.GET_SCHEMES_REQUEST,
         onSuccess: [SchemeTypes.RECEIVED_SCHEMES, SchemeTypes.GET_SCHEMES_SUCCESS],
         onFailure: SchemeTypes.GET_SCHEMES_FAILURE,
-        params: [scope, page, perPage],
+        params: [
+            scope,
+            page,
+            perPage,
+        ],
     });
 }
 
@@ -36,7 +42,9 @@ export function createScheme(scheme: Scheme): ActionFunc {
         onRequest: SchemeTypes.CREATE_SCHEME_REQUEST,
         onSuccess: [SchemeTypes.CREATED_SCHEME, SchemeTypes.CREATE_SCHEME_SUCCESS],
         onFailure: SchemeTypes.CREATE_SCHEME_FAILURE,
-        params: [scheme],
+        params: [
+            scheme,
+        ],
     });
 }
 
@@ -47,33 +55,21 @@ export function deleteScheme(schemeId: string): ActionFunc {
             data: null,
         }, getState);
         let data = null;
-
         try {
             data = await Client4.deleteScheme(schemeId);
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch, getState);
-            dispatch(batchActions([{
-                type: SchemeTypes.DELETE_SCHEME_FAILURE,
-                error,
-            }, logError(error)]), getState);
-            return {
-                error,
-            };
+            dispatch(batchActions([
+                {type: SchemeTypes.DELETE_SCHEME_FAILURE, error},
+                logError(error),
+            ]), getState);
+            return {error};
         }
 
-        dispatch({
-            type: SchemeTypes.DELETED_SCHEME,
-            data: {
-                schemeId,
-            },
-        }, getState);
-        dispatch({
-            type: SchemeTypes.DELETE_SCHEME_SUCCESS,
-            data: null,
-        }, getState);
-        return {
-            data,
-        };
+        dispatch({type: SchemeTypes.DELETED_SCHEME, data: {schemeId}}, getState);
+        dispatch({type: SchemeTypes.DELETE_SCHEME_SUCCESS, data: null}, getState);
+
+        return {data};
     };
 }
 
@@ -83,26 +79,37 @@ export function patchScheme(schemeId: string, scheme: SchemePatch): ActionFunc {
         onRequest: SchemeTypes.PATCH_SCHEME_REQUEST,
         onSuccess: [SchemeTypes.PATCHED_SCHEME, SchemeTypes.PATCH_SCHEME_SUCCESS],
         onFailure: SchemeTypes.PATCH_SCHEME_FAILURE,
-        params: [schemeId, scheme],
+        params: [
+            schemeId,
+            scheme,
+        ],
     });
 }
 
-export function getSchemeTeams(schemeId: string, page = 0, perPage: number = General.PAGE_SIZE_DEFAULT): ActionFunc {
+export function getSchemeTeams(schemeId: string, page: number = 0, perPage: number = General.PAGE_SIZE_DEFAULT): ActionFunc {
     return bindClientFunc({
         clientFunc: Client4.getSchemeTeams,
         onRequest: SchemeTypes.GET_SCHEME_TEAMS_REQUEST,
         onSuccess: [SchemeTypes.RECEIVED_SCHEME_TEAMS, SchemeTypes.GET_SCHEME_TEAMS_SUCCESS],
         onFailure: SchemeTypes.GET_SCHEME_TEAMS_FAILURE,
-        params: [schemeId, page, perPage],
+        params: [
+            schemeId,
+            page,
+            perPage,
+        ],
     });
 }
 
-export function getSchemeChannels(schemeId: string, page = 0, perPage: number = General.PAGE_SIZE_DEFAULT): ActionFunc {
+export function getSchemeChannels(schemeId: string, page: number = 0, perPage: number = General.PAGE_SIZE_DEFAULT): ActionFunc {
     return bindClientFunc({
         clientFunc: Client4.getSchemeChannels,
         onRequest: SchemeTypes.GET_SCHEME_CHANNELS_REQUEST,
         onSuccess: [SchemeTypes.RECEIVED_SCHEME_CHANNELS, SchemeTypes.GET_SCHEME_CHANNELS_SUCCESS],
         onFailure: SchemeTypes.GET_SCHEME_CHANNELS_FAILURE,
-        params: [schemeId, page, perPage],
+        params: [
+            schemeId,
+            page,
+            perPage,
+        ],
     });
 }

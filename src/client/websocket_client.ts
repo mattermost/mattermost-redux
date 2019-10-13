@@ -38,13 +38,8 @@ class WebSocketClient {
             connectionUrl: this.connectionUrl,
             webSocketConnector: WebSocket,
         };
-        const {
-            connectionUrl,
-            forceConnection,
-            webSocketConnector,
-            platform,
-            ...additionalOptions
-        } = Object.assign({}, defaults, opts);
+
+        const {connectionUrl, forceConnection, webSocketConnector, platform, ...additionalOptions} = Object.assign({}, defaults, opts);
 
         if (platform) {
             this.platform = platform;
@@ -62,7 +57,6 @@ class WebSocketClient {
 
             if (connectionUrl == null) {
                 console.log('websocket must have connection url'); //eslint-disable-line no-console
-
                 reject(new Error('websocket must have connection url'));
                 return;
             }
@@ -72,15 +66,14 @@ class WebSocketClient {
             }
 
             Socket = webSocketConnector;
-
             if (this.connectingCallback) {
                 this.connectingCallback();
             }
 
             const regex = /^(?:https?|wss?):(?:\/\/)?[^/]*/;
-            const captured = regex.exec(connectionUrl);
-            let origin;
+            const captured = (regex).exec(connectionUrl);
 
+            let origin;
             if (captured) {
                 origin = captured[0];
 
@@ -89,7 +82,6 @@ class WebSocketClient {
                     // the websocket will append them
                     const split = origin.split(':');
                     const port = split[2];
-
                     if (port === '80' || port === '443') {
                         origin = `${split[0]}:${split[1]}`;
                     }
@@ -98,17 +90,11 @@ class WebSocketClient {
                 // If we're unable to set the origin header, the websocket won't connect, but the URL is likely malformed anyway
                 const errorMessage = 'websocket failed to parse origin from ' + connectionUrl;
                 console.warn(errorMessage); // eslint-disable-line no-console
-
                 reject(new Error(errorMessage));
                 return;
             }
 
-            this.conn = new Socket(connectionUrl, [], {
-                headers: {
-                    origin,
-                },
-                ...(additionalOptions || {}),
-            });
+            this.conn = new Socket(connectionUrl, [], {headers: {origin}, ...(additionalOptions || {})});
             this.connectionUrl = connectionUrl;
             this.token = token;
 
@@ -116,14 +102,11 @@ class WebSocketClient {
                 if (token) {
                     // we check for the platform as a workaround until we fix on the server that further authentications
                     // are ignored
-                    this.sendMessage('authentication_challenge', {
-                        token,
-                    });
+                    this.sendMessage('authentication_challenge', {token});
                 }
 
                 if (this.connectFailCount > 0) {
                     console.log('websocket re-established connection'); //eslint-disable-line no-console
-
                     if (this.reconnectCallback) {
                         this.reconnectCallback();
                     }
@@ -149,11 +132,11 @@ class WebSocketClient {
                     this.closeCallback(this.connectFailCount);
                 }
 
-                let retryTime = MIN_WEBSOCKET_RETRY_TIME; // If we've failed a bunch of connections then start backing off
+                let retryTime = MIN_WEBSOCKET_RETRY_TIME;
 
+                // If we've failed a bunch of connections then start backing off
                 if (this.connectFailCount > MAX_WEBSOCKET_FAILS) {
                     retryTime = MIN_WEBSOCKET_RETRY_TIME * this.connectFailCount;
-
                     if (retryTime > MAX_WEBSOCKET_RETRY_TIME) {
                         retryTime = MAX_WEBSOCKET_RETRY_TIME;
                     }
@@ -163,20 +146,21 @@ class WebSocketClient {
                     clearTimeout(this.connectionTimeout);
                 }
 
-                this.connectionTimeout = setTimeout(() => {
-                    if (this.stop) {
-                        clearTimeout(this.connectionTimeout);
-                        return;
-                    }
-
-                    this.initialize(token, opts);
-                }, retryTime);
+                this.connectionTimeout = setTimeout(
+                    () => {
+                        if (this.stop) {
+                            clearTimeout(this.connectionTimeout);
+                            return;
+                        }
+                        this.initialize(token, opts);
+                    },
+                    retryTime
+                );
             };
 
             this.conn!.onerror = (evt) => {
                 if (this.connectFailCount <= 1) {
                     console.log('websocket error'); //eslint-disable-line no-console
-
                     console.log(evt); //eslint-disable-line no-console
                 }
 
@@ -187,7 +171,6 @@ class WebSocketClient {
 
             this.conn!.onmessage = (evt) => {
                 const msg = JSON.parse(evt.data);
-
                 if (msg.seq_reply) {
                     if (msg.error) {
                         console.warn(msg); //eslint-disable-line no-console
@@ -227,10 +210,8 @@ class WebSocketClient {
         this.stop = stop;
         this.connectFailCount = 0;
         this.sequence = 1;
-
         if (this.conn && this.conn.readyState === Socket.OPEN) {
             this.conn.onclose = () => {}; //eslint-disable-line no-empty-function
-
             this.conn.close();
             this.conn = undefined;
             console.log('websocket closed'); //eslint-disable-line no-console
@@ -248,9 +229,7 @@ class WebSocketClient {
             this.conn.send(JSON.stringify(msg));
         } else if (!this.conn || this.conn.readyState === Socket.CLOSED) {
             this.conn = undefined;
-            this.initialize(this.token, {
-                platform: this.platform,
-            });
+            this.initialize(this.token, {platform: this.platform});
         }
     }
 

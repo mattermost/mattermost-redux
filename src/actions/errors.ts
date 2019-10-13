@@ -17,9 +17,8 @@ export function dismissErrorObject(index: number) {
 export function dismissError(index: number): ActionFunc {
     return async (dispatch: DispatchFunc) => {
         dispatch(dismissErrorObject(index));
-        return {
-            data: true,
-        };
+
+        return {data: true};
     };
 }
 
@@ -35,18 +34,15 @@ export function getLogErrorAction(error: serializeError.ErrorObject, displayable
 export function logError(error: Error, displayable = false): ActionFunc {
     return async (dispatch: DispatchFunc) => {
         if (error.server_error_id === 'api.context.session_expired.app_error') {
-            return {
-                data: true,
-            };
+            return {data: true};
         }
 
         const serializedError = serializeError(error);
-        let sendToServer = true;
 
+        let sendToServer = true;
         if (error.stack && error.stack.includes('TypeError: Failed to fetch')) {
             sendToServer = false;
         }
-
         if (error.server_error_id) {
             sendToServer = false;
         }
@@ -55,27 +51,23 @@ export function logError(error: Error, displayable = false): ActionFunc {
             try {
                 const stringifiedSerializedError = JSON.stringify(serializedError).toString();
                 await Client4.logClientError(stringifiedSerializedError);
-            } catch (err) {// avoid crashing the app if an error sending
+            } catch (err) {
+                // avoid crashing the app if an error sending
                 // the error occurs.
             }
         }
 
         EventEmitter.emit(ErrorTypes.LOG_ERROR, error);
         dispatch(getLogErrorAction(serializedError, displayable));
-        return {
-            data: true,
-        };
+
+        return {data: true};
     };
 }
 
 export function clearErrors(): ActionFunc {
     return async (dispatch: DispatchFunc) => {
-        dispatch({
-            type: ErrorTypes.CLEAR_ERRORS,
-            data: null,
-        });
-        return {
-            data: true,
-        };
+        dispatch({type: ErrorTypes.CLEAR_ERRORS, data: null});
+
+        return {data: true};
     };
 }

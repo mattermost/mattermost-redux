@@ -10,22 +10,16 @@ import {logError} from './errors';
 type ActionType = string;
 const HTTP_UNAUTHORIZED = 401;
 export function forceLogoutIfNecessary(err: Client4Error, dispatch: DispatchFunc, getState: GetStateFunc) {
-    const {
-        currentUserId,
-    } = getState().entities.users;
+    const {currentUserId} = getState().entities.users;
 
     if ('status_code' in err && err.status_code === HTTP_UNAUTHORIZED && err.url && err.url.indexOf('/login') === -1 && currentUserId) {
         Client4.setToken('');
-        dispatch({
-            type: UserTypes.LOGOUT_SUCCESS,
-            data: {},
-        });
+        dispatch({type: UserTypes.LOGOUT_SUCCESS, data: {}});
     }
 }
 
 function dispatcher(type: ActionType, data: any, dispatch: DispatchFunc, getState: GetStateFunc) {
-    if (type.indexOf('SUCCESS') === -1) {
-    // we don't want to pass the data for the request types
+    if (type.indexOf('SUCCESS') === -1) { // we don't want to pass the data for the request types
         dispatch(requestSuccess(type, data), getState);
     } else {
         dispatch(requestData(type), getState);
@@ -55,7 +49,7 @@ export function requestFailure(type: ActionType, error: Client4Error): any {
 
 /**
  * Returns an ActionFunc which calls a specfied (client) function and
- * dispatches the specifed actions on request, success or failure.void
+ * dispatches the specifed actions on request, success or failure.
  *
  * @export
  * @param {Object} obj                                       an object for destructirung required properties
@@ -86,21 +80,16 @@ export function bindClientFunc({
         }
 
         let data = null;
-
         try {
             data = await clientFunc(...params);
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch, getState);
             const actions: Action[] = [logError(error)];
-
             if (onFailure) {
                 actions.push(requestFailure(onFailure, error));
             }
-
             dispatch(batchActions(actions));
-            return {
-                error,
-            };
+            return {error};
         }
 
         if (Array.isArray(onSuccess)) {
@@ -111,9 +100,7 @@ export function bindClientFunc({
             dispatcher(onSuccess, data, dispatch, getState);
         }
 
-        return {
-            data,
-        };
+        return {data};
     };
 }
 
@@ -124,27 +111,20 @@ export function debounce(func: (...args: any) => unknown, wait: number, immediat
     return function fx(...args: Array<any>) {
         const runLater = () => {
             timeout = null;
-
             if (!immediate) {
                 Reflect.apply(func, this, args);
-
                 if (cb) {
                     cb();
                 }
             }
         };
-
         const callNow = immediate && !timeout;
-
         if (timeout) {
             clearTimeout(timeout);
         }
-
         timeout = setTimeout(runLater, wait);
-
         if (callNow) {
             Reflect.apply(func, this, args);
-
             if (cb) {
                 cb();
             }

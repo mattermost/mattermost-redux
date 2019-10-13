@@ -17,9 +17,7 @@ export function getFilesForPost(postId: string) {
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch, getState);
             dispatch(logError(error));
-            return {
-                error,
-            };
+            return {error};
         }
 
         dispatch({
@@ -27,24 +25,21 @@ export function getFilesForPost(postId: string) {
             data: files,
             postId,
         });
-        return {
-            data: true,
-        };
+
+        return {data: true};
     };
 }
 
 export function uploadFile(channelId: string, rootId: string, clientIds: Array<string>, fileFormData: File, formBoundary: string) {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
-        dispatch({
-            type: FileTypes.UPLOAD_FILES_REQUEST,
-            data: {},
-        }, getState);
-        let files;
+        dispatch({type: FileTypes.UPLOAD_FILES_REQUEST, data: {}}, getState);
 
+        let files;
         try {
             files = await Client4.uploadFile(fileFormData, formBoundary);
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch, getState);
+
             const failure = {
                 type: FileTypes.UPLOAD_FILES_FAILURE,
                 clientIds,
@@ -52,28 +47,31 @@ export function uploadFile(channelId: string, rootId: string, clientIds: Array<s
                 rootId,
                 error,
             };
+
             dispatch(batchActions([failure, logError(error)]), getState);
-            return {
-                error,
-            };
+            return {error};
         }
 
         const data = files.file_infos.map((file, index) => {
-            return {...file,
+            return {
+                ...file,
                 clientId: files.client_ids[index],
             };
         });
-        dispatch(batchActions([{
-            type: FileTypes.RECEIVED_UPLOAD_FILES,
-            data,
-            channelId,
-            rootId,
-        }, {
-            type: FileTypes.UPLOAD_FILES_SUCCESS,
-        }]), getState);
-        return {
-            data: files,
-        };
+
+        dispatch(batchActions([
+            {
+                type: FileTypes.RECEIVED_UPLOAD_FILES,
+                data,
+                channelId,
+                rootId,
+            },
+            {
+                type: FileTypes.UPLOAD_FILES_SUCCESS,
+            },
+        ]), getState);
+
+        return {data: files};
     };
 }
 
@@ -81,6 +79,8 @@ export function getFilePublicLink(fileId: string) {
     return bindClientFunc({
         clientFunc: Client4.getFilePublicLink,
         onSuccess: FileTypes.RECEIVED_FILE_PUBLIC_LINK,
-        params: [fileId],
+        params: [
+            fileId,
+        ],
     });
 }

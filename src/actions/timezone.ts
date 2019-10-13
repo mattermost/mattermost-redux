@@ -16,9 +16,12 @@ export function autoUpdateTimezone(deviceTimezone: string) {
                 automaticTimezone: deviceTimezone,
                 manualTimezone: currentTimezone.manualTimezone,
             };
-            const updatedUser = {...currentUer,
+
+            const updatedUser = {
+                ...currentUer,
                 timezone,
             };
+
             updateMe(updatedUser)(dispatch, getState);
         }
     };

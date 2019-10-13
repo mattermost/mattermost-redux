@@ -8,26 +8,18 @@ import {IDMappedObjects} from 'types/utilities';
 
 function jobs(state: IDMappedObjects<Job> = {}, action: GenericAction): IDMappedObjects<Job> {
     switch (action.type) {
-    case JobTypes.RECEIVED_JOB:
-    {
-        const nextState = {...state,
-        };
+    case JobTypes.RECEIVED_JOB: {
+        const nextState = {...state};
         nextState[action.data.id] = action.data;
         return nextState;
     }
-
-    case JobTypes.RECEIVED_JOBS:
-    {
-        const nextState = {...state,
-        };
-
+    case JobTypes.RECEIVED_JOBS: {
+        const nextState = {...state};
         for (const job of action.data) {
             nextState[job.id] = job;
         }
-
         return nextState;
     }
-
     default:
         return state;
     }
@@ -35,18 +27,13 @@ function jobs(state: IDMappedObjects<Job> = {}, action: GenericAction): IDMapped
 
 function jobsByTypeList(state: JobsByType = {}, action: GenericAction): JobsByType {
     switch (action.type) {
-    case JobTypes.RECEIVED_JOBS_BY_TYPE:
-    {
-        const nextState = {...state,
-        };
-
+    case JobTypes.RECEIVED_JOBS_BY_TYPE: {
+        const nextState = {...state};
         if (action.data && action.data.length && action.data.length > 0) {
             nextState[action.data[0].type] = action.data;
         }
-
         return nextState;
     }
-
     default:
         return state;
     }

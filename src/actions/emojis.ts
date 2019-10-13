@@ -21,7 +21,10 @@ export function createCustomEmoji(emoji: any, image: any): ActionFunc {
     return bindClientFunc({
         clientFunc: Client4.createCustomEmoji,
         onSuccess: EmojiTypes.RECEIVED_CUSTOM_EMOJI,
-        params: [emoji, image],
+        params: [
+            emoji,
+            image,
+        ],
     });
 }
 
@@ -29,7 +32,9 @@ export function getCustomEmoji(emojiId: string): ActionFunc {
     return bindClientFunc({
         clientFunc: Client4.getCustomEmoji,
         onSuccess: EmojiTypes.RECEIVED_CUSTOM_EMOJI,
-        params: [emojiId],
+        params: [
+            emojiId,
+        ],
     });
 }
 
@@ -43,74 +48,68 @@ export function getCustomEmojiByName(name: string): ActionFunc {
             forceLogoutIfNecessary(error, dispatch, getState);
 
             if (error.status_code === 404) {
-                dispatch({
-                    type: EmojiTypes.CUSTOM_EMOJI_DOES_NOT_EXIST,
-                    data: name,
-                });
+                dispatch({type: EmojiTypes.CUSTOM_EMOJI_DOES_NOT_EXIST, data: name});
             } else {
                 dispatch(logError(error));
             }
 
-            return {
-                error,
-            };
+            return {error};
         }
 
         dispatch({
             type: EmojiTypes.RECEIVED_CUSTOM_EMOJI,
             data,
         });
-        return {
-            data,
-        };
+
+        return {data};
     };
 }
 
 export function getCustomEmojisByName(names: Array<string>): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         if (!names || names.length === 0) {
-            return {
-                data: true,
-            };
+            return {data: true};
         }
 
         const promises: Promise<ActionResult|ActionResult[]>[] = [];
         names.forEach((name) => promises.push(getCustomEmojiByName(name)(dispatch, getState)));
+
         await Promise.all(promises);
-        return {
-            data: true,
-        };
+        return {data: true};
     };
 }
 
 export function getCustomEmojisInText(text: string): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         if (!text) {
-            return {
-                data: true,
-            };
+            return {data: true};
         }
 
         const state = getState();
         const nonExistentEmoji = state.entities.emojis.nonExistentEmoji;
         const customEmojisByName = selectCustomEmojisByName(state);
+
         const emojisToLoad = parseNeededCustomEmojisFromText(text, systemEmojis, customEmojisByName, nonExistentEmoji);
+
         return getCustomEmojisByName(Array.from(emojisToLoad))(dispatch, getState);
     };
 }
 
-export function getCustomEmojis(page = 0, perPage: number = General.PAGE_SIZE_DEFAULT, sort: string = Emoji.SORT_BY_NAME, loadUsers = false): ActionFunc {
+export function getCustomEmojis(
+    page: number = 0,
+    perPage: number = General.PAGE_SIZE_DEFAULT,
+    sort: string = Emoji.SORT_BY_NAME,
+    loadUsers: boolean = false
+): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         let data;
-
         try {
             data = await Client4.getCustomEmojis(page, perPage, sort);
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch, getState);
+
             dispatch(logError(error));
-            return {
-                error,
-            };
+            return {error};
         }
 
         if (loadUsers) {
@@ -121,9 +120,9 @@ export function getCustomEmojis(page = 0, perPage: number = General.PAGE_SIZE_DE
             type: EmojiTypes.RECEIVED_CUSTOM_EMOJIS,
             data,
         });
-        return {
-            data,
-        };
+
+        return {data};
+        
     };
 }
 
@@ -135,15 +134,14 @@ export function loadProfilesForCustomEmojis(emojis: Array<CustomEmoji>): ActionF
                 usersToLoad[emoji.creator_id] = true;
             }
         });
+
         const userIds = Object.keys(usersToLoad);
 
         if (userIds.length > 0) {
             await dispatch(getProfilesByIds(userIds));
         }
 
-        return {
-            data: true,
-        };
+        return {data: true};
     };
 }
 
@@ -153,6 +151,7 @@ export function getAllCustomEmojis(perPage: number = General.PAGE_SIZE_MAXIMUM):
             type: EmojiTypes.CLEAR_CUSTOM_EMOJIS,
             data: null,
         });
+
         let hasMore = true;
         let page = 0;
         const allEmojis = [];
@@ -161,20 +160,17 @@ export function getAllCustomEmojis(perPage: number = General.PAGE_SIZE_MAXIMUM):
             try {
                 let emojis = [];
                 emojis = await Client4.getCustomEmojis(page, perPage, Emoji.SORT_BY_NAME); // eslint-disable-line no-await-in-loop
-
                 if (emojis.length < perPage) {
                     hasMore = false;
                 } else {
                     page += 1;
                 }
-
                 allEmojis.push(...emojis);
             } catch (error) {
                 forceLogoutIfNecessary(error, dispatch, getState);
+
                 dispatch(logError(error));
-                return {
-                    error: true,
-                };
+                return {error: true};
             }
         } while (hasMore);
 
@@ -182,9 +178,8 @@ export function getAllCustomEmojis(perPage: number = General.PAGE_SIZE_MAXIMUM):
             type: EmojiTypes.RECEIVED_CUSTOM_EMOJIS,
             data: allEmojis,
         });
-        return {
-            data: true,
-        };
+
+        return {data: true};
     };
 }
 
@@ -194,36 +189,30 @@ export function deleteCustomEmoji(emojiId: string): ActionFunc {
             await Client4.deleteCustomEmoji(emojiId);
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch, getState);
+
             dispatch(logError(error));
-            return {
-                error,
-            };
+            return {error};
         }
 
         dispatch({
             type: EmojiTypes.DELETED_CUSTOM_EMOJI,
-            data: {
-                id: emojiId,
-            },
+            data: {id: emojiId},
         });
-        return {
-            data: true,
-        };
+
+        return {data: true};
     };
 }
 
 export function searchCustomEmojis(term: string, options: any = {}, loadUsers = false): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         let data;
-
         try {
             data = await Client4.searchCustomEmoji(term, options);
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch, getState);
+
             dispatch(logError(error));
-            return {
-                error,
-            };
+            return {error};
         }
 
         if (loadUsers) {
@@ -234,32 +223,28 @@ export function searchCustomEmojis(term: string, options: any = {}, loadUsers = 
             type: EmojiTypes.RECEIVED_CUSTOM_EMOJIS,
             data,
         });
-        return {
-            data,
-        };
+
+        return {data};
     };
 }
 
 export function autocompleteCustomEmojis(name: string): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         let data;
-
         try {
             data = await Client4.autocompleteCustomEmoji(name);
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch, getState);
+
             dispatch(logError(error));
-            return {
-                error,
-            };
+            return {error};
         }
 
         dispatch({
             type: EmojiTypes.RECEIVED_CUSTOM_EMOJIS,
             data,
         });
-        return {
-            data,
-        };
+
+        return {data};
     };
 }

@@ -13,29 +13,23 @@ function schemes(state: {
     switch (action.type) {
     case SchemeTypes.CREATED_SCHEME:
     case SchemeTypes.PATCHED_SCHEME:
-    case SchemeTypes.RECEIVED_SCHEME:
-    {
-        return {...state,
+    case SchemeTypes.RECEIVED_SCHEME: {
+        return {
+            ...state,
             [action.data.id]: action.data,
         };
     }
 
-    case SchemeTypes.RECEIVED_SCHEMES:
-    {
-        const nextState = {...state,
-        };
-
+    case SchemeTypes.RECEIVED_SCHEMES: {
+        const nextState = {...state};
         for (const scheme of action.data) {
             nextState[scheme.id] = scheme;
         }
-
         return nextState;
     }
 
-    case SchemeTypes.DELETED_SCHEME:
-    {
-        const nextState = {...state,
-        };
+    case SchemeTypes.DELETED_SCHEME: {
+        const nextState = {...state};
         Reflect.deleteProperty(nextState, action.data.schemeId);
         return nextState;
     }

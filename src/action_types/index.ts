@@ -20,4 +20,26 @@ import SchemeTypes from './schemes';
 import GroupTypes from './groups';
 import BotTypes from './bots';
 import PluginTypes from './plugins';
-export {ErrorTypes, GeneralTypes, UserTypes, TeamTypes, ChannelTypes, PostTypes, FileTypes, PreferenceTypes, IntegrationTypes, EmojiTypes, GifTypes, AdminTypes, AlertTypes, JobTypes, SearchTypes, RoleTypes, SchemeTypes, GroupTypes, BotTypes, PluginTypes};
+
+export {
+    ErrorTypes,
+    GeneralTypes,
+    UserTypes,
+    TeamTypes,
+    ChannelTypes,
+    PostTypes,
+    FileTypes,
+    PreferenceTypes,
+    IntegrationTypes,
+    EmojiTypes,
+    GifTypes,
+    AdminTypes,
+    AlertTypes,
+    JobTypes,
+    SearchTypes,
+    RoleTypes,
+    SchemeTypes,
+    GroupTypes,
+    BotTypes,
+    PluginTypes,
+};

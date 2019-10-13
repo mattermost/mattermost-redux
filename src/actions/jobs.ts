@@ -14,7 +14,9 @@ export function createJob(job: Job): ActionFunc {
         onRequest: JobTypes.CREATE_JOB_REQUEST,
         onSuccess: [JobTypes.RECEIVED_JOB, JobTypes.CREATE_JOB_SUCCESS],
         onFailure: JobTypes.CREATE_JOB_FAILURE,
-        params: [job],
+        params: [
+            job,
+        ],
     });
 }
 
@@ -24,27 +26,36 @@ export function getJob(id: string): ActionFunc {
         onRequest: JobTypes.GET_JOB_REQUEST,
         onSuccess: [JobTypes.RECEIVED_JOB, JobTypes.GET_JOB_SUCCESS],
         onFailure: JobTypes.GET_JOB_FAILURE,
-        params: [id],
+        params: [
+            id,
+        ],
     });
 }
 
-export function getJobs(page = 0, perPage: number = General.JOBS_CHUNK_SIZE): ActionFunc {
+export function getJobs(page: number = 0, perPage: number = General.JOBS_CHUNK_SIZE): ActionFunc {
     return bindClientFunc({
         clientFunc: Client4.getJobs,
         onRequest: JobTypes.GET_JOBS_REQUEST,
         onSuccess: [JobTypes.RECEIVED_JOBS, JobTypes.GET_JOBS_SUCCESS],
         onFailure: JobTypes.GET_JOBS_FAILURE,
-        params: [page, perPage],
+        params: [
+            page,
+            perPage,
+        ],
     });
 }
 
-export function getJobsByType(type: JobType, page = 0, perPage: number = General.JOBS_CHUNK_SIZE): ActionFunc {
+export function getJobsByType(type: JobType, page: number = 0, perPage: number = General.JOBS_CHUNK_SIZE): ActionFunc {
     return bindClientFunc({
         clientFunc: Client4.getJobsByType,
         onRequest: JobTypes.GET_JOBS_REQUEST,
         onSuccess: [JobTypes.RECEIVED_JOBS, JobTypes.RECEIVED_JOBS_BY_TYPE, JobTypes.GET_JOBS_SUCCESS],
         onFailure: JobTypes.GET_JOBS_FAILURE,
-        params: [type, page, perPage],
+        params: [
+            type,
+            page,
+            perPage,
+        ],
     });
 }
 
@@ -54,6 +65,8 @@ export function cancelJob(job: string): ActionFunc {
         onRequest: JobTypes.CANCEL_JOB_REQUEST,
         onSuccess: JobTypes.CANCEL_JOB_SUCCESS,
         onFailure: JobTypes.CANCEL_JOB_FAILURE,
-        params: [job],
+        params: [
+            job,
+        ],
     });
 }
