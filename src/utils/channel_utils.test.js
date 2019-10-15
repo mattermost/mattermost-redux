@@ -13,7 +13,6 @@ import {
     filterChannelsMatchingTerm,
     sortChannelsByRecency,
     sortChannelsByDisplayName,
-    isManuallyUnread,
 } from 'utils/channel_utils';
 
 describe('ChannelUtils', () => {
@@ -260,22 +259,5 @@ describe('ChannelUtils', () => {
         Reflect.deleteProperty(channelB, 'display_name');
         assert.equal(sortChannelsByDisplayName('en', channelA, channelB), -1);
         assert.equal(sortChannelsByDisplayName('en', channelB, channelA), 1);
-    });
-
-    it('manuallyUnread', () => {
-        const state = {
-            entities: {
-                channels: {
-                    manuallyUnread: {
-                        channel1: true,
-                        channel2: false,
-                    },
-                },
-            },
-        };
-        assert.equal(isManuallyUnread('channel1', state), true);
-        assert.equal(isManuallyUnread(undefined, state), false);
-        assert.equal(isManuallyUnread('channel2', state), false);
-        assert.equal(isManuallyUnread('channel3', state), false);
     });
 });
