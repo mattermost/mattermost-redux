@@ -50,8 +50,8 @@ export function makeFilterPostsAndAddSeparators() {
                 return [];
             }
 
-        const out: string[] = [];
-        let lastDate;
+            const out: string[] = [];
+            let lastDate;
             let addedNewMessagesIndicator = false;
 
             // Iterating through the posts from oldest to newest
@@ -76,11 +76,11 @@ export function makeFilterPostsAndAddSeparators() {
                     const currentOffset = postDate.getTimezoneOffset() * 60 * 1000;
                     const timezone = getUserCurrentTimezone(currentUser.timezone);
                     if (timezone) {
-                      const zone = moment.tz.zone(timezone);
-                      if (zone) {
-                          const timezoneOffset = zone.utcOffset(post.create_at) * 60 * 1000;
-                          postDate.setTime(post.create_at + (currentOffset - timezoneOffset));
-                      }
+                        const zone = moment.tz.zone(timezone);
+                        if (zone) {
+                            const timezoneOffset = zone.utcOffset(post.create_at) * 60 * 1000;
+                            postDate.setTime(post.create_at + (currentOffset - timezoneOffset));
+                        }
                     }
                 }
 
@@ -119,7 +119,7 @@ export function makeCombineUserActivityPosts() {
         (postIds, posts) => {
             let lastPostIsUserActivity = false;
             let combinedCount = 0;
-        const out: string[] = [];
+            const out: string[] = [];
             let changed = false;
 
             for (let i = 0; i < postIds.length; i++) {

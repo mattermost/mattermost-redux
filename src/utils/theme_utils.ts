@@ -15,7 +15,7 @@ export function makeStyleFromTheme(getStyleFromTheme: (a: any) => any): (a: any)
 
 const rgbPattern = /^rgba?\((\d+),(\d+),(\d+)(?:,([\d.]+))?\)$/;
 
-export function getComponents(inColor: string): {red: number, green: number, blue: number, alpha: number} {
+export function getComponents(inColor: string): {red: number; green: number; blue: number; alpha: number} {
     let color = inColor;
 
     // RGB color

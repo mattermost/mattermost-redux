@@ -191,7 +191,7 @@ export function comparePosts(a: Post, b: Post): number {
     return 0;
 }
 
-export function isPostCommentMention({post, currentUser, threadRepliedToByCurrentUser, rootPost}: {post: Post, currentUser: UserProfile, threadRepliedToByCurrentUser: boolean, rootPost: Post}): boolean {
+export function isPostCommentMention({post, currentUser, threadRepliedToByCurrentUser, rootPost}: {post: Post; currentUser: UserProfile; threadRepliedToByCurrentUser: boolean; rootPost: Post}): boolean {
     let commentsNotifyLevel = Preferences.COMMENTS_NEVER;
     let isCommentMention = false;
     let threadCreatedByCurrentUser = false;

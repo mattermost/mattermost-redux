@@ -33,7 +33,7 @@ export const createShallowSelector = createSelectorCreator(defaultMemoize, shall
 // versions, and a non-equal minor version will ignore dot version.
 // currentVersion is a string, e.g '4.6.0'
 // minMajorVersion, minMinorVersion, minDotVersion are integers
-export const isMinimumServerVersion = (currentVersion: string, minMajorVersion: number = 0, minMinorVersion: number = 0, minDotVersion: number = 0): boolean => {
+export const isMinimumServerVersion = (currentVersion: string, minMajorVersion = 0, minMinorVersion = 0, minDotVersion = 0): boolean => {
     if (!currentVersion || typeof currentVersion !== 'string') {
         return false;
     }
