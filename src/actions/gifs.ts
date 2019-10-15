@@ -150,7 +150,7 @@ export function searchGfycat({searchText, count = 30, startIndex = 0}) {
         if (resultsByTerm[searchText]) {
             start = resultsByTerm[searchText].start + count;
         }
-        dispatch(requestSearch(searchText, count, start));
+        dispatch(requestSearch(searchText));
         gfycatSdk(GfycatApiKey, GfycatApiSecret).authenticate();
         return gfycatSdk(GfycatApiKey, GfycatApiSecret).search({search_text: searchText, count, start}).then((json) => {
             if (json.errorMessage) {
@@ -180,7 +180,7 @@ export function searchGfycat({searchText, count = 30, startIndex = 0}) {
     };
 }
 
-export function searchCategory({tagName = '', gfyCount = 30, cursorPos}) {
+export function searchCategory({tagName = '', gfyCount = 30, cursorPos = undefined}) {
     let cursor = cursorPos;
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         const {GfycatApiKey, GfycatApiSecret} = getState().entities.general.config;
@@ -210,7 +210,7 @@ export function searchCategory({tagName = '', gfyCount = 30, cursorPos}) {
 
                     // preload categories list
                     if (tagName === 'trending') {
-                        dispatch(requestCategoriesListIfNeeded());
+                        dispatch(requestCategoriesListIfNeeded() as any);
                     }
                 }
             }
