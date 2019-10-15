@@ -20,7 +20,6 @@ export function parseNeededCustomEmojisFromText(text: string, systemEmojis: Map<
     const pattern = /:([A-Za-z0-9_-]+):/gi;
     const customEmojis = new Set<string>();
     let match;
-
     while ((match = pattern.exec(text)) !== null) {
         if (!match) {
             continue;

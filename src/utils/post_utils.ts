@@ -61,29 +61,19 @@ export function canDeletePost(state: GlobalState, config: any, license: any, tea
     const isOwner = isPostOwner(userId, post);
 
     if (hasNewPermissions(state)) {
-        const canDelete = haveIChannelPermission(state, {
-            team: teamId,
-            channel: channelId,
-            permission: Permissions.DELETE_POST,
-        });
-
+        const canDelete = haveIChannelPermission(state, {team: teamId, channel: channelId, permission: Permissions.DELETE_POST});
         if (!isOwner) {
-            return canDelete && haveIChannelPermission(state, {
-                team: teamId,
-                channel: channelId,
-                permission: Permissions.DELETE_OTHERS_POSTS,
-            });
+            return canDelete && haveIChannelPermission(state, {team: teamId, channel: channelId, permission: Permissions.DELETE_OTHERS_POSTS});
         }
-
         return canDelete;
     }
 
     // Backwards compatibility with pre-advanced permissions config settings.
-
     if (license.IsLicensed === 'true') {
-        return config.RestrictPostDelete === General.PERMISSIONS_ALL && (isOwner || isAdmin) || config.RestrictPostDelete === General.PERMISSIONS_TEAM_ADMIN && isAdmin || config.RestrictPostDelete === General.PERMISSIONS_SYSTEM_ADMIN && isSystemAdmin;
+        return (config.RestrictPostDelete === General.PERMISSIONS_ALL && (isOwner || isAdmin)) ||
+            (config.RestrictPostDelete === General.PERMISSIONS_TEAM_ADMIN && isAdmin) ||
+            (config.RestrictPostDelete === General.PERMISSIONS_SYSTEM_ADMIN && isSystemAdmin);
     }
-
     return isOwner || isAdmin;
 }
 
@@ -96,34 +86,21 @@ export function canEditPost(state: GlobalState, config: any, license: any, teamI
     let canEdit = true;
 
     if (hasNewPermissions(state)) {
-        canEdit = canEdit && haveIChannelPermission(state, {
-            team: teamId,
-            channel: channelId,
-            permission: Permissions.EDIT_POST,
-        });
-
+        canEdit = canEdit && haveIChannelPermission(state, {team: teamId, channel: channelId, permission: Permissions.EDIT_POST});
         if (!isOwner) {
-            canEdit = canEdit && haveIChannelPermission(state, {
-                team: teamId,
-                channel: channelId,
-                permission: Permissions.EDIT_OTHERS_POSTS,
-            });
+            canEdit = canEdit && haveIChannelPermission(state, {team: teamId, channel: channelId, permission: Permissions.EDIT_OTHERS_POSTS});
         }
-
         if (license.IsLicensed === 'true' && config.PostEditTimeLimit !== '-1' && config.PostEditTimeLimit !== -1) {
-            const timeLeft = post.create_at + config.PostEditTimeLimit * 1000 - Date.now();
-
+            const timeLeft = (post.create_at + (config.PostEditTimeLimit * 1000)) - Date.now();
             if (timeLeft <= 0) {
                 canEdit = false;
             }
         }
     } else {
-    // Backwards compatibility with pre-advanced permissions config settings.
+        // Backwards compatibility with pre-advanced permissions config settings.
         canEdit = isOwner && config.AllowEditPost !== 'never';
-
         if (config.AllowEditPost === General.ALLOW_EDIT_POST_TIME_LIMIT) {
-            const timeLeft = post.create_at + config.PostEditTimeLimit * 1000 - Date.now();
-
+            const timeLeft = (post.create_at + (config.PostEditTimeLimit * 1000)) - Date.now();
             if (timeLeft <= 0) {
                 canEdit = false;
             }
@@ -142,21 +119,33 @@ export function getLastCreateAt(postsArray: Array<Post>): number {
 
     return 0;
 }
-const joinLeavePostTypes = [Posts.POST_TYPES.JOIN_LEAVE, Posts.POST_TYPES.JOIN_CHANNEL, Posts.POST_TYPES.LEAVE_CHANNEL, Posts.POST_TYPES.ADD_REMOVE, Posts.POST_TYPES.ADD_TO_CHANNEL, Posts.POST_TYPES.REMOVE_FROM_CHANNEL, Posts.POST_TYPES.JOIN_TEAM, Posts.POST_TYPES.LEAVE_TEAM, Posts.POST_TYPES.ADD_TO_TEAM, Posts.POST_TYPES.REMOVE_FROM_TEAM, Posts.POST_TYPES.COMBINED_USER_ACTIVITY]; // Returns true if a post should be hidden when the user has Show Join/Leave Messages disabled
 
+const joinLeavePostTypes = [
+    Posts.POST_TYPES.JOIN_LEAVE,
+    Posts.POST_TYPES.JOIN_CHANNEL,
+    Posts.POST_TYPES.LEAVE_CHANNEL,
+    Posts.POST_TYPES.ADD_REMOVE,
+    Posts.POST_TYPES.ADD_TO_CHANNEL,
+    Posts.POST_TYPES.REMOVE_FROM_CHANNEL,
+    Posts.POST_TYPES.JOIN_TEAM,
+    Posts.POST_TYPES.LEAVE_TEAM,
+    Posts.POST_TYPES.ADD_TO_TEAM,
+    Posts.POST_TYPES.REMOVE_FROM_TEAM,
+    Posts.POST_TYPES.COMBINED_USER_ACTIVITY,
+];
+
+// Returns true if a post should be hidden when the user has Show Join/Leave Messages disabled
 export function shouldFilterJoinLeavePost(post: Post, showJoinLeave: boolean, currentUsername: string): boolean {
     if (showJoinLeave) {
         return false;
     }
 
     // Don't filter out non-join/leave messages
-
     if (joinLeavePostTypes.indexOf(post.type) === -1) {
         return false;
     }
 
     // Don't filter out join/leave messages about the current user
-
     return !isJoinLeavePostForUsername(post, currentUsername);
 }
 
@@ -175,7 +164,9 @@ function isJoinLeavePostForUsername(post: Post, currentUsername: string): boolea
         }
     }
 
-    return post.props.username === currentUsername || post.props.addedUsername === currentUsername || post.props.removedUsername === currentUsername;
+    return post.props.username === currentUsername ||
+        post.props.addedUsername === currentUsername ||
+        post.props.removedUsername === currentUsername;
 }
 
 export function isPostPendingOrFailed(post: Post): boolean {
@@ -185,7 +176,6 @@ export function isPostPendingOrFailed(post: Post): boolean {
 export function comparePosts(a: Post, b: Post): number {
     const aIsPendingOrFailed = isPostPendingOrFailed(a);
     const bIsPendingOrFailed = isPostPendingOrFailed(b);
-
     if (aIsPendingOrFailed && !bIsPendingOrFailed) {
         return -1;
     } else if (!aIsPendingOrFailed && bIsPendingOrFailed) {
@@ -201,17 +191,7 @@ export function comparePosts(a: Post, b: Post): number {
     return 0;
 }
 
-export function isPostCommentMention({
-    post,
-    currentUser,
-    threadRepliedToByCurrentUser,
-    rootPost,
-}: {
-    post: Post;
-    currentUser: UserProfile;
-    threadRepliedToByCurrentUser: boolean;
-    rootPost: Post;
-}): boolean {
+export function isPostCommentMention({post, currentUser, threadRepliedToByCurrentUser, rootPost}: {post: Post, currentUser: UserProfile, threadRepliedToByCurrentUser: boolean, rootPost: Post}): boolean {
     let commentsNotifyLevel = Preferences.COMMENTS_NEVER;
     let isCommentMention = false;
     let threadCreatedByCurrentUser = false;
@@ -219,13 +199,11 @@ export function isPostCommentMention({
     if (rootPost && rootPost.user_id === currentUser.id) {
         threadCreatedByCurrentUser = true;
     }
-
     if (currentUser.notify_props && currentUser.notify_props.comments) {
         commentsNotifyLevel = currentUser.notify_props.comments;
     }
 
-    const notCurrentUser = post.user_id !== currentUser.id || post.props && post.props.from_webhook;
-
+    const notCurrentUser = post.user_id !== currentUser.id || (post.props && post.props.from_webhook);
     if (notCurrentUser) {
         if (commentsNotifyLevel === Preferences.COMMENTS_ANY && (threadCreatedByCurrentUser || threadRepliedToByCurrentUser)) {
             isCommentMention = true;
@@ -233,10 +211,9 @@ export function isPostCommentMention({
             isCommentMention = true;
         }
     }
-
     return isCommentMention;
 }
 
 export function fromAutoResponder(post: Post): boolean {
-    return Boolean(post.type && post.type === Posts.SYSTEM_AUTO_RESPONDER);
+    return Boolean(post.type && (post.type === Posts.SYSTEM_AUTO_RESPONDER));
 }

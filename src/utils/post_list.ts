@@ -34,121 +34,141 @@ export function makePreparePostIdsForPostList() {
 // Returns a selector that, given the state and an object containing an array of postIds and an optional
 // timestamp of when the channel was last read, returns a memoized array of postIds interspersed with
 // day indicators and an optional new message indicator.
-
 export function makeFilterPostsAndAddSeparators() {
     const getPostsForIds = makeGetPostsForIds();
-    return createIdsSelector((state, {
-        postIds,
-    }) => getPostsForIds(state, postIds), (state, {
-        lastViewedAt,
-    }) => lastViewedAt, (state, {
-        indicateNewMessages,
-    }) => indicateNewMessages, (state) => state.entities.posts.selectedPostId, getCurrentUser, shouldShowJoinLeaveMessages, isTimezoneEnabled, (posts, lastViewedAt, indicateNewMessages, selectedPostId, currentUser, showJoinLeave, timeZoneEnabled) => {
-        if (posts.length === 0 || !currentUser) {
-            return [];
-        }
+
+    return createIdsSelector(
+        (state, {postIds}) => getPostsForIds(state, postIds),
+        (state, {lastViewedAt}) => lastViewedAt,
+        (state, {indicateNewMessages}) => indicateNewMessages,
+        (state) => state.entities.posts.selectedPostId,
+        getCurrentUser,
+        shouldShowJoinLeaveMessages,
+        isTimezoneEnabled,
+        (posts, lastViewedAt, indicateNewMessages, selectedPostId, currentUser, showJoinLeave, timeZoneEnabled) => {
+            if (posts.length === 0 || !currentUser) {
+                return [];
+            }
 
         const out: string[] = [];
         let lastDate;
-        let addedNewMessagesIndicator = false; // Iterating through the posts from oldest to newest
+            let addedNewMessagesIndicator = false;
 
-        for (let i = posts.length - 1; i >= 0; i--) {
-            const post = posts[i];
+            // Iterating through the posts from oldest to newest
+            for (let i = posts.length - 1; i >= 0; i--) {
+                const post = posts[i];
 
-            if (!post || post.type === Posts.POST_TYPES.EPHEMERAL_ADD_TO_CHANNEL && !selectedPostId) {
-                continue;
-            }
+                if (
+                    !post ||
+                    (post.type === Posts.POST_TYPES.EPHEMERAL_ADD_TO_CHANNEL && !selectedPostId)
+                ) {
+                    continue;
+                }
 
-            // Filter out join/leave messages if necessary
+                // Filter out join/leave messages if necessary
+                if (shouldFilterJoinLeavePost(post, showJoinLeave, currentUser.username)) {
+                    continue;
+                }
 
-            if (shouldFilterJoinLeavePost(post, showJoinLeave, currentUser.username)) {
-                continue;
-            }
-
-            // Push on a date header if the last post was on a different day than the current one
-
-            const postDate = new Date(post.create_at);
-
-            if (timeZoneEnabled) {
-                const currentOffset = postDate.getTimezoneOffset() * 60 * 1000;
-                const timezone = getUserCurrentTimezone(currentUser.timezone);
-
-                if (timezone) {
-                    const zone = moment.tz.zone(timezone);
-                    if (zone) {
-                        const timezoneOffset = zone.utcOffset(post.create_at) * 60 * 1000;
-                        postDate.setTime(post.create_at + (currentOffset - timezoneOffset));
+                // Push on a date header if the last post was on a different day than the current one
+                const postDate = new Date(post.create_at);
+                if (timeZoneEnabled) {
+                    const currentOffset = postDate.getTimezoneOffset() * 60 * 1000;
+                    const timezone = getUserCurrentTimezone(currentUser.timezone);
+                    if (timezone) {
+                      const zone = moment.tz.zone(timezone);
+                      if (zone) {
+                          const timezoneOffset = zone.utcOffset(post.create_at) * 60 * 1000;
+                          postDate.setTime(post.create_at + (currentOffset - timezoneOffset));
+                      }
                     }
                 }
+
+                postDate.setHours(0, 0, 0, 0);
+
+                if (!lastDate || lastDate.toDateString() !== postDate.toDateString()) {
+                    out.push(DATE_LINE + postDate.getTime());
+
+                    lastDate = postDate;
+                }
+
+                if (
+                    lastViewedAt &&
+                    post.create_at > lastViewedAt &&
+                    post.user_id !== currentUser.id &&
+                    !addedNewMessagesIndicator &&
+                    indicateNewMessages
+                ) {
+                    out.push(START_OF_NEW_MESSAGES);
+                    addedNewMessagesIndicator = true;
+                }
+
+                out.push(post.id);
             }
 
-            postDate.setHours(0, 0, 0, 0);
-
-            if (!lastDate || lastDate.toDateString() !== postDate.toDateString()) {
-                out.push(DATE_LINE + postDate.getTime());
-                lastDate = postDate;
-            }
-
-            if (lastViewedAt && post.create_at > lastViewedAt && post.user_id !== currentUser.id && !addedNewMessagesIndicator && indicateNewMessages) {
-                out.push(START_OF_NEW_MESSAGES);
-                addedNewMessagesIndicator = true;
-            }
-
-            out.push(post.id);
+            // Flip it back to newest to oldest
+            return out.reverse();
         }
-
-        // Flip it back to newest to oldest
-
-        return out.reverse();
-    });
+    );
 }
 
 export function makeCombineUserActivityPosts() {
-    return createIdsSelector((state, postIds) => postIds, (state) => state.entities.posts.posts, (postIds, posts) => {
-        let lastPostIsUserActivity = false;
-        let combinedCount = 0;
+    return createIdsSelector(
+        (state, postIds) => postIds,
+        (state) => state.entities.posts.posts,
+        (postIds, posts) => {
+            let lastPostIsUserActivity = false;
+            let combinedCount = 0;
         const out: string[] = [];
-        let changed = false;
+            let changed = false;
 
-        for (let i = 0; i < postIds.length; i++) {
-            const postId = postIds[i];
+            for (let i = 0; i < postIds.length; i++) {
+                const postId = postIds[i];
 
-            if (postId === START_OF_NEW_MESSAGES || postId.startsWith(DATE_LINE)) {
-                // Not a post, so it won't be combined
-                out.push(postId);
-                lastPostIsUserActivity = false;
-                combinedCount = 0;
-                continue;
+                if (postId === START_OF_NEW_MESSAGES || postId.startsWith(DATE_LINE)) {
+                    // Not a post, so it won't be combined
+                    out.push(postId);
+
+                    lastPostIsUserActivity = false;
+                    combinedCount = 0;
+
+                    continue;
+                }
+
+                const post = posts[postId];
+                const postIsUserActivity = isUserActivityPost(post.type);
+
+                if (postIsUserActivity && lastPostIsUserActivity && combinedCount < MAX_COMBINED_SYSTEM_POSTS) {
+                    // Add the ID to the previous combined post
+                    out[out.length - 1] += '_' + postId;
+
+                    combinedCount += 1;
+
+                    changed = true;
+                } else if (postIsUserActivity) {
+                    // Start a new combined post, even if the "combined" post is only a single post
+                    out.push(COMBINED_USER_ACTIVITY + postId);
+
+                    combinedCount = 1;
+
+                    changed = true;
+                } else {
+                    out.push(postId);
+
+                    combinedCount = 0;
+                }
+
+                lastPostIsUserActivity = postIsUserActivity;
             }
 
-            const post = posts[postId];
-            const postIsUserActivity = isUserActivityPost(post.type);
-
-            if (postIsUserActivity && lastPostIsUserActivity && combinedCount < MAX_COMBINED_SYSTEM_POSTS) {
-                // Add the ID to the previous combined post
-                out[out.length - 1] += '_' + postId;
-                combinedCount += 1;
-                changed = true;
-            } else if (postIsUserActivity) {
-                // Start a new combined post, even if the "combined" post is only a single post
-                out.push(COMBINED_USER_ACTIVITY + postId);
-                combinedCount = 1;
-                changed = true;
-            } else {
-                out.push(postId);
-                combinedCount = 0;
+            if (!changed) {
+                // Nothing was combined, so return the original array
+                return postIds;
             }
 
-            lastPostIsUserActivity = postIsUserActivity;
-        }
-
-        if (!changed) {
-            // Nothing was combined, so return the original array
-            return postIds;
-        }
-
-        return out;
-    });
+            return out;
+        },
+    );
 }
 
 export function isStartOfNewMessages(item) {
@@ -183,11 +203,11 @@ export function getFirstPostId(items) {
         if (isCombinedUserActivityPost(item)) {
             // This is a combined post, so find the first post ID from it
             const combinedIds = getPostIdsForCombinedUserActivityPost(item);
+
             return combinedIds[0];
         }
 
         // This is a post ID
-
         return item;
     }
 
@@ -206,11 +226,11 @@ export function getLastPostId(items) {
         if (isCombinedUserActivityPost(item)) {
             // This is a combined post, so find the first post ID from it
             const combinedIds = getPostIdsForCombinedUserActivityPost(item);
+
             return combinedIds[combinedIds.length - 1];
         }
 
         // This is a post ID
-
         return item;
     }
 
@@ -219,10 +239,8 @@ export function getLastPostId(items) {
 
 export function getLastPostIndex(postIds) {
     let index = 0;
-
     for (let i = postIds.length - 1; i > 0; i--) {
         const item = postIds[i];
-
         if (!isStartOfNewMessages(item) && !isDateLine(item)) {
             index = i;
             break;
@@ -235,31 +253,39 @@ export function getLastPostIndex(postIds) {
 export function makeGenerateCombinedPost() {
     const getPostsForIds = makeGetPostsForIds();
     const getPostIds = memoizeResult(getPostIdsForCombinedUserActivityPost);
-    return createSelector((state, combinedId) => combinedId, (state, combinedId) => getPostsForIds(state, getPostIds(combinedId)), (combinedId, posts) => {
-    // All posts should be in the same channel
-        const channelId = posts[0].channel_id; // Assume that the last post is the oldest one
 
-        const createAt = posts[posts.length - 1].create_at;
-        const messages = posts.map((post) => post.message);
-        return {
-            id: combinedId,
-            root_id: '',
-            channel_id: channelId,
-            create_at: createAt,
-            delete_at: 0,
-            message: messages.join('\n'),
-            props: {
-                messages,
-                user_activity: combineUserActivitySystemPost(posts),
-            },
-            state: '',
-            system_post_ids: posts.map((post) => post.id),
-            type: Posts.POST_TYPES.COMBINED_USER_ACTIVITY,
-            user_activity_posts: posts,
-            user_id: '',
-            metadata: {},
-        };
-    });
+    return createSelector(
+        (state, combinedId) => combinedId,
+        (state, combinedId) => getPostsForIds(state, getPostIds(combinedId)),
+        (combinedId, posts) => {
+            // All posts should be in the same channel
+            const channelId = posts[0].channel_id;
+
+            // Assume that the last post is the oldest one
+            const createAt = posts[posts.length - 1].create_at;
+
+            const messages = posts.map((post) => post.message);
+
+            return {
+                id: combinedId,
+                root_id: '',
+                channel_id: channelId,
+                create_at: createAt,
+                delete_at: 0,
+                message: messages.join('\n'),
+                props: {
+                    messages,
+                    user_activity: combineUserActivitySystemPost(posts),
+                },
+                state: '',
+                system_post_ids: posts.map((post) => post.id),
+                type: Posts.POST_TYPES.COMBINED_USER_ACTIVITY,
+                user_activity_posts: posts,
+                user_id: '',
+                metadata: {},
+            };
+        }
+    );
 }
 
 export const postTypePriority = {
@@ -280,6 +306,7 @@ export const postTypePriority = {
     [Posts.POST_TYPES.ADD_REMOVE]: 14,
     [Posts.POST_TYPES.EPHEMERAL]: 15,
 };
+
 export function comparePostTypes(a, b) {
     return postTypePriority[a.postType] - postTypePriority[b.postType];
 }
@@ -289,22 +316,17 @@ function extractUserActivityData(userActivities: any) {
     const allUserIds: string[] = [];
     const allUsernames: string[] = [];
     Object.entries(userActivities).forEach(([postType, values]: [string, any]) => {
-        if (postType === Posts.POST_TYPES.ADD_TO_TEAM || postType === Posts.POST_TYPES.ADD_TO_CHANNEL || postType === Posts.POST_TYPES.REMOVE_FROM_CHANNEL) {
+        if (
+            postType === Posts.POST_TYPES.ADD_TO_TEAM ||
+            postType === Posts.POST_TYPES.ADD_TO_CHANNEL ||
+            postType === Posts.POST_TYPES.REMOVE_FROM_CHANNEL
+        ) {
             Object.keys(values).map((key) => [key, values[key]]).forEach(([actorId, users]) => {
                 if (Array.isArray(users)) {
                     throw new Error('Invalid Post activity data');
                 }
-
-                const {
-                    ids,
-                    usernames,
-                } = users;
-                messageData.push({
-                    postType,
-                    userIds: [...usernames, ...ids],
-                    actorId,
-                });
-
+                const {ids, usernames} = users;
+                messageData.push({postType, userIds: [...usernames, ...ids], actorId});
                 if (ids.length > 0) {
                     allUserIds.push(...ids);
                 }
@@ -312,28 +334,23 @@ function extractUserActivityData(userActivities: any) {
                 if (usernames.length > 0) {
                     allUsernames.push(...usernames);
                 }
-
                 allUserIds.push(actorId);
             });
         } else {
             if (!Array.isArray(values)) {
                 throw new Error('Invalid Post activity data');
             }
-
-            messageData.push({
-                postType,
-                userIds: values,
-            });
+            messageData.push({postType, userIds: values});
             allUserIds.push(...values);
         }
     });
+
     messageData.sort(comparePostTypes);
 
     function reduceUsers(acc, curr) {
         if (!acc.includes(curr)) {
             acc.push(curr);
         }
-
         return acc;
     }
 
@@ -354,20 +371,18 @@ export function combineUserActivitySystemPost(systemPosts: Array<Post> = []) {
         let userActivityProps = acc;
         const combinedPostType = userActivityProps[postType];
 
-        if (postType === Posts.POST_TYPES.ADD_TO_TEAM || postType === Posts.POST_TYPES.ADD_TO_CHANNEL || postType === Posts.POST_TYPES.REMOVE_FROM_CHANNEL) {
+        if (
+            postType === Posts.POST_TYPES.ADD_TO_TEAM ||
+            postType === Posts.POST_TYPES.ADD_TO_CHANNEL ||
+            postType === Posts.POST_TYPES.REMOVE_FROM_CHANNEL
+        ) {
             const userId = post.props.addedUserId || post.props.removedUserId;
             const username = post.props.addedUsername || post.props.removedUsername;
-
             if (combinedPostType) {
                 if (Array.isArray(combinedPostType[post.user_id])) {
                     throw new Error('Invalid Post activity data');
                 }
-
-                const users = combinedPostType[post.user_id] || {
-                    ids: [],
-                    usernames: [],
-                };
-
+                const users = combinedPostType[post.user_id] || {ids: [], usernames: []};
                 if (userId) {
                     if (!users.ids.includes(userId)) {
                         users.ids.push(userId);
@@ -375,7 +390,6 @@ export function combineUserActivitySystemPost(systemPosts: Array<Post> = []) {
                 } else if (username && !users.usernames.includes(username)) {
                     users.usernames.push(username);
                 }
-
                 combinedPostType[post.user_id] = users;
             } else {
                 const users = {
@@ -388,7 +402,6 @@ export function combineUserActivitySystemPost(systemPosts: Array<Post> = []) {
                 } else if (username) {
                     users.usernames.push(username);
                 }
-
                 userActivityProps[postType] = {
                     [post.user_id]: users,
                 };
@@ -400,18 +413,16 @@ export function combineUserActivitySystemPost(systemPosts: Array<Post> = []) {
                 if (!Array.isArray(combinedPostType)) {
                     throw new Error('Invalid Post activity data');
                 }
-
                 if (!combinedPostType.includes(propsUserId)) {
                     userActivityProps[postType] = [...combinedPostType, propsUserId];
                 }
             } else {
-                userActivityProps = {...userActivityProps,
-                    [postType]: [propsUserId],
-                };
+                userActivityProps = {...userActivityProps, [postType]: [propsUserId]};
             }
         }
 
         return userActivityProps;
     }, {});
+
     return extractUserActivityData(userActivities);
 }

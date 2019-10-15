@@ -6,7 +6,12 @@ import mimeDB from 'mime-db';
 import {FileInfo} from 'types/files';
 export function getFormattedFileSize(file: FileInfo): string {
     const bytes = file.size;
-    const fileSizes = [['TB', 1024 * 1024 * 1024 * 1024], ['GB', 1024 * 1024 * 1024], ['MB', 1024 * 1024], ['KB', 1024]];
+    const fileSizes = [
+        ['TB', 1024 * 1024 * 1024 * 1024],
+        ['GB', 1024 * 1024 * 1024],
+        ['MB', 1024 * 1024],
+        ['KB', 1024],
+    ];
     const size = fileSizes.find((unitAndMinBytes) => {
         const minBytes = unitAndMinBytes[1];
         return bytes > minBytes;
@@ -25,20 +30,29 @@ export function getFileType(file: FileInfo): string {
     }
 
     const fileExt = file.extension.toLowerCase();
-    const fileTypes = ['image', 'code', 'pdf', 'video', 'audio', 'spreadsheet', 'word', 'presentation', 'patch'];
+    const fileTypes = [
+        'image',
+        'code',
+        'pdf',
+        'video',
+        'audio',
+        'spreadsheet',
+        'word',
+        'presentation',
+        'patch',
+    ];
     return fileTypes.find((fileType) => {
         const constForFileTypeExtList = `${fileType}_types`.toUpperCase();
         const fileTypeExts = Files[constForFileTypeExtList];
         return fileTypeExts.indexOf(fileExt) > -1;
     }) || 'other';
 }
-let extToMime;
 
+let extToMime;
 function buildExtToMime() {
     extToMime = {};
     Object.keys(mimeDB).forEach((key) => {
         const mime = mimeDB[key];
-
         if (mime.extensions) {
             mime.extensions.forEach((ext) => {
                 extToMime[ext] = key;
@@ -78,8 +92,6 @@ export function sortFileInfos(fileInfos: Array<FileInfo> = [], locale: string = 
             return a.create_at - b.create_at;
         }
 
-        return a.name.localeCompare(b.name, locale, {
-            numeric: true,
-        });
+        return a.name.localeCompare(b.name, locale, {numeric: true});
     });
 }

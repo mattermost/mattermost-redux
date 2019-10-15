@@ -62,21 +62,33 @@ function sortChannelsByRecencyOrAlpha(locale, lastPosts, sorting: SortingType, a
 
 export const mapAndSortChannelIds = (channels: Array<Channel>, currentUser: UserProfile, myMembers: RelationOneToOne<Channel, ChannelMembership>, lastPosts: RelationOneToOne<Channel, Post>, sorting: SortingType, sortMentionsFirst = false): Array<string> => {
     const locale = currentUser.locale || General.DEFAULT_LOCALE;
-    const mutedChannelIds = channels.filter((channel) => isChannelMuted(myMembers[channel.id])).sort(sortChannelsByRecencyOrAlpha.bind(null, locale, lastPosts, sorting)).map((channel) => channel.id);
-    let hasMentionedChannelIds: string[] = [];
 
+    const mutedChannelIds = channels.
+        filter((channel) => isChannelMuted(myMembers[channel.id])).
+        sort(sortChannelsByRecencyOrAlpha.bind(null, locale, lastPosts, sorting)).
+        map((channel) => channel.id);
+
+    let hasMentionedChannelIds: string[] = [];
     if (sortMentionsFirst) {
-        hasMentionedChannelIds = channels.filter((channel) => {
-            const member = myMembers[channel.id];
-            return member && member.mention_count > 0 && !isChannelMuted(member);
-        }).sort(sortChannelsByRecencyOrAlpha.bind(null, locale, lastPosts, sorting)).map((channel) => channel.id);
+        hasMentionedChannelIds = channels.
+            filter((channel) => {
+                const member = myMembers[channel.id];
+                return member && member.mention_count > 0 && !isChannelMuted(member);
+            }).
+            sort(sortChannelsByRecencyOrAlpha.bind(null, locale, lastPosts, sorting)).
+            map((channel) => channel.id);
     }
 
-    const otherChannelIds = channels.filter((channel) => {
-        return !mutedChannelIds.includes(channel.id) && !hasMentionedChannelIds.includes(channel.id);
-    }).sort(sortChannelsByRecencyOrAlpha.bind(null, locale, lastPosts, sorting)).map((channel) => channel.id);
+    const otherChannelIds = channels.
+        filter((channel) => {
+            return !mutedChannelIds.includes(channel.id) && !hasMentionedChannelIds.includes(channel.id);
+        }).
+        sort(sortChannelsByRecencyOrAlpha.bind(null, locale, lastPosts, sorting)).
+        map((channel) => channel.id);
+
     return sortMentionsFirst ? hasMentionedChannelIds.concat(mutedChannelIds, otherChannelIds) : otherChannelIds.concat(mutedChannelIds);
 };
+
 export function filterChannels(unreadIds: Array<string>, favoriteIds: Array<string>, channelIds: Array<string>, unreadsAtTop: boolean, favoritesAtTop: boolean): Array<string> {
     let channels: Array<string> = channelIds;
 

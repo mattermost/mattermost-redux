@@ -22,30 +22,53 @@ export function getCurrentUrl(state: GlobalState): string {
 
 export function isCompatibleWithJoinViewTeamPermissions(state: GlobalState): boolean {
     const version = state.entities.general.serverVersion;
-    return isMinimumServerVersion(version, 5, 10, 0) || version.indexOf('dev') !== -1 && isMinimumServerVersion(version, 5, 8, 0) || version.match(/^5.8.\d.\d\d\d\d.*$/) !== null && isMinimumServerVersion(version, 5, 8, 0);
+    return isMinimumServerVersion(version, 5, 10, 0) ||
+       (version.indexOf('dev') !== -1 && isMinimumServerVersion(version, 5, 8, 0)) ||
+       (version.match(/^5.8.\d.\d\d\d\d.*$/) !== null && isMinimumServerVersion(version, 5, 8, 0));
 }
 
 export function hasNewPermissions(state: GlobalState): boolean {
-    const version = state.entities.general.serverVersion; // FIXME This must be changed to 4, 9, 0 before we generate the 4.9.0 release
+    const version = state.entities.general.serverVersion;
 
-    return isMinimumServerVersion(version, 4, 9, 0) || version.indexOf('dev') !== -1 && isMinimumServerVersion(version, 4, 8, 0) || version.match(/^4.8.\d.\d\d\d\d.*$/) !== null && isMinimumServerVersion(version, 4, 8, 0);
+    // FIXME This must be changed to 4, 9, 0 before we generate the 4.9.0 release
+    return isMinimumServerVersion(version, 4, 9, 0) ||
+           (version.indexOf('dev') !== -1 && isMinimumServerVersion(version, 4, 8, 0)) ||
+           (version.match(/^4.8.\d.\d\d\d\d.*$/) !== null && isMinimumServerVersion(version, 4, 8, 0));
 }
 
-export const canUploadFilesOnMobile: (a: GlobalState) => boolean = createSelector(getConfig, getLicense, (config: any, license: any): boolean => {
-    // Defaults to true if either setting doesn't exist
-    return config.EnableFileAttachments !== 'false' && (license.IsLicensed === 'false' || license.Compliance === 'false' || config.EnableMobileFileUpload !== 'false');
-});
-export const canDownloadFilesOnMobile: (a: GlobalState) => boolean = createSelector(getConfig, getLicense, (config: any, license: any): boolean => {
-    // Defaults to true if the setting doesn't exist
-    return license.IsLicensed === 'false' || license.Compliance === 'false' || config.EnableMobileFileDownload !== 'false';
-});
-export const getAutolinkedUrlSchemes: (a: GlobalState) => string[] = createSelector(getConfig, (config: any): string[] => {
-    if (!config.CustomUrlSchemes) {
-        return General.DEFAULT_AUTOLINKED_URL_SCHEMES;
+export const canUploadFilesOnMobile: (a: GlobalState) => boolean = createSelector(
+    getConfig,
+    getLicense,
+    (config: any, license: any): boolean => {
+        // Defaults to true if either setting doesn't exist
+        return config.EnableFileAttachments !== 'false' &&
+           (license.IsLicensed === 'false' || license.Compliance === 'false' || config.EnableMobileFileUpload !== 'false');
     }
+);
 
-    return [...General.DEFAULT_AUTOLINKED_URL_SCHEMES, ...config.CustomUrlSchemes.split(',')];
-});
+export const canDownloadFilesOnMobile: (a: GlobalState) => boolean = createSelector(
+    getConfig,
+    getLicense,
+    (config: any, license: any): boolean => {
+        // Defaults to true if the setting doesn't exist
+        return license.IsLicensed === 'false' || license.Compliance === 'false' || config.EnableMobileFileDownload !== 'false';
+    }
+);
+
+export const getAutolinkedUrlSchemes: (a: GlobalState) => string[] = createSelector(
+    getConfig,
+    (config: any): string[] => {
+        if (!config.CustomUrlSchemes) {
+            return General.DEFAULT_AUTOLINKED_URL_SCHEMES;
+        }
+
+        return [
+            ...General.DEFAULT_AUTOLINKED_URL_SCHEMES,
+            ...config.CustomUrlSchemes.split(','),
+        ];
+    }
+);
+
 export const getServerVersion = (state: GlobalState): string => {
     return state.entities.general.serverVersion;
 };

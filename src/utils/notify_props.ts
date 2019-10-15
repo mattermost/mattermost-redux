@@ -8,16 +8,17 @@ export function getEmailInterval(enableEmailNotification: boolean, enableEmailBa
         INTERVAL_FIFTEEN_MINUTES,
         INTERVAL_HOUR,
     } = Preferences;
+
     const validValuesWithEmailBatching = [INTERVAL_IMMEDIATE, INTERVAL_NEVER, INTERVAL_FIFTEEN_MINUTES, INTERVAL_HOUR];
     const validValuesWithoutEmailBatching = [INTERVAL_IMMEDIATE, INTERVAL_NEVER];
 
     if (!enableEmailNotification) {
         return INTERVAL_NEVER;
     } else if (enableEmailBatching && validValuesWithEmailBatching.indexOf(emailIntervalPreference) === -1) {
-    // When email batching is enabled, the default interval is 15 minutes
+        // When email batching is enabled, the default interval is 15 minutes
         return INTERVAL_FIFTEEN_MINUTES;
     } else if (!enableEmailBatching && validValuesWithoutEmailBatching.indexOf(emailIntervalPreference) === -1) {
-    // When email batching is not enabled, the default interval is immediately
+        // When email batching is not enabled, the default interval is immediately
         return INTERVAL_IMMEDIATE;
     }
 

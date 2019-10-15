@@ -12,18 +12,12 @@ export default function(key: string, secret: string): Gfycat {
     }
 
     if (!key || !secret) {
-        instance = new Gfycat({
-            client_id: defaultKey,
-            client_secret: defaultSecret,
-        });
+        instance = new Gfycat({client_id: defaultKey, client_secret: defaultSecret});
         return instance;
     }
 
     activeKey = key;
     activeSecret = secret;
-    instance = new Gfycat({
-        client_id: key,
-        client_secret: secret,
-    });
+    instance = new Gfycat({client_id: key, client_secret: secret});
     return instance;
 }

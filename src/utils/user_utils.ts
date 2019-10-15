@@ -16,7 +16,11 @@ export function getFullName(user: UserProfile): string {
     return '';
 }
 
-export function displayUsername(user: UserProfile, teammateNameDisplay: string, useFallbackUsername = true): string {
+export function displayUsername(
+    user: UserProfile,
+    teammateNameDisplay: string,
+    useFallbackUsername: boolean = true,
+): string {
     let name = useFallbackUsername ? localizeMessage('channel_loader.someone', 'Someone') : '';
 
     if (user) {
@@ -71,11 +75,9 @@ export function hasPostAllPublicRole(roles: string): boolean {
 
 export function profileListToMap(profileList: Array<UserProfile>): IDMappedObjects<UserProfile> {
     const profiles = {};
-
     for (let i = 0; i < profileList.length; i++) {
         profiles[profileList[i].id] = profileList[i];
     }
-
     return profiles;
 }
 
@@ -96,7 +98,6 @@ export function removeUserFromList(userId: $ID<UserProfile>, list: Array<UserPro
 //
 // E.g.: for "one.two.three" by "." it would yield
 // ["one.two.three", ".two.three", "two.three", ".three", "three"]
-
 export function getSuggestionsSplitBy(term: string, splitStr: string): Array<string> {
     const splitTerm = term.split(splitStr);
     const initialSuggestions = splitTerm.map((st, i) => splitTerm.slice(i).join(splitStr));
@@ -111,11 +112,9 @@ export function getSuggestionsSplitBy(term: string, splitStr: string): Array<str
             } else {
                 acc.push(splitStr + val, val);
             }
-
             return acc;
         }, [] as string[]);
     }
-
     return suggestions;
 }
 
@@ -124,13 +123,13 @@ export function getSuggestionsSplitByMultiple(term: string, splitStrs: Array<str
         getSuggestionsSplitBy(term, val).forEach((suggestion) => acc.add(suggestion));
         return acc;
     }, new Set<string>());
+
     return [...suggestions];
 }
 
 export function filterProfilesMatchingTerm(users: Array<UserProfile>, term: string): Array<UserProfile> {
     const lowercasedTerm = term.toLowerCase();
     let trimmedTerm = lowercasedTerm;
-
     if (trimmedTerm.startsWith('@')) {
         trimmedTerm = trimmedTerm.substr(1);
     }
@@ -151,18 +150,21 @@ export function filterProfilesMatchingTerm(users: Array<UserProfile>, term: stri
         const email = (user.email || '').toLowerCase();
         profileSuggestions.push(email);
         profileSuggestions.push((user.nickname || '').toLowerCase());
-        const split = email.split('@');
 
+        const split = email.split('@');
         if (split.length > 1) {
             profileSuggestions.push(split[1]);
         }
 
-        return profileSuggestions.filter((suggestion) => suggestion !== '').some((suggestion) => suggestion.startsWith(trimmedTerm));
+        return profileSuggestions.
+            filter((suggestion) => suggestion !== '').
+            some((suggestion) => suggestion.startsWith(trimmedTerm));
     });
 }
 
 export function sortByUsername(a: UserProfile, b: UserProfile): number {
     const nameA = a.username;
     const nameB = b.username;
+
     return nameA.localeCompare(nameB);
 }

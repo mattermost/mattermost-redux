@@ -4,7 +4,10 @@ import {GlobalState} from 'types/store';
 import {UserProfile} from 'types/users';
 import {ChannelMembership, Channel} from 'types/channels';
 import {RelationOneToOne, IDMappedObjects} from 'types/utilities';
-import {createSelector} from 'reselect'; // Channels
+
+import {createSelector} from 'reselect';
+
+// Channels
 
 export function getCurrentChannelId(state: GlobalState): string {
     return state.entities.channels.currentChannelId;
@@ -16,7 +19,9 @@ export function getMyChannelMemberships(state: GlobalState): RelationOneToOne<Ch
 
 export const getMyCurrentChannelMembership: (a: GlobalState) => ChannelMembership | undefined | null = createSelector(getCurrentChannelId, getMyChannelMemberships, (currentChannelId, channelMemberships) => {
     return channelMemberships[currentChannelId] || null;
-}); // Users
+});
+
+// Users
 
 export function getCurrentUser(state: GlobalState): UserProfile {
     return state.entities.users.profiles[getCurrentUserId(state)];

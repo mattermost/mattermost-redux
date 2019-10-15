@@ -13,7 +13,13 @@ function searchPosts(state: RequestStatusType = initialRequestState(), action: G
         return initialRequestState();
     }
 
-    return handleRequest(SearchTypes.SEARCH_POSTS_REQUEST, SearchTypes.SEARCH_POSTS_SUCCESS, SearchTypes.SEARCH_POSTS_FAILURE, state, action);
+    return handleRequest(
+        SearchTypes.SEARCH_POSTS_REQUEST,
+        SearchTypes.SEARCH_POSTS_SUCCESS,
+        SearchTypes.SEARCH_POSTS_FAILURE,
+        state,
+        action
+    );
 }
 
 function flaggedPosts(state: RequestStatusType = initialRequestState(), action: GenericAction): RequestStatusType {
@@ -21,7 +27,13 @@ function flaggedPosts(state: RequestStatusType = initialRequestState(), action: 
         return initialRequestState();
     }
 
-    return handleRequest(SearchTypes.SEARCH_FLAGGED_POSTS_REQUEST, SearchTypes.SEARCH_FLAGGED_POSTS_SUCCESS, SearchTypes.SEARCH_FLAGGED_POSTS_FAILURE, state, action);
+    return handleRequest(
+        SearchTypes.SEARCH_FLAGGED_POSTS_REQUEST,
+        SearchTypes.SEARCH_FLAGGED_POSTS_SUCCESS,
+        SearchTypes.SEARCH_FLAGGED_POSTS_FAILURE,
+        state,
+        action
+    );
 }
 
 function pinnedPosts(state: RequestStatusType = initialRequestState(), action: GenericAction): RequestStatusType {
@@ -29,7 +41,13 @@ function pinnedPosts(state: RequestStatusType = initialRequestState(), action: G
         return initialRequestState();
     }
 
-    return handleRequest(SearchTypes.SEARCH_PINNED_POSTS_REQUEST, SearchTypes.SEARCH_PINNED_POSTS_SUCCESS, SearchTypes.SEARCH_PINNED_POSTS_FAILURE, state, action);
+    return handleRequest(
+        SearchTypes.SEARCH_PINNED_POSTS_REQUEST,
+        SearchTypes.SEARCH_PINNED_POSTS_SUCCESS,
+        SearchTypes.SEARCH_PINNED_POSTS_FAILURE,
+        state,
+        action
+    );
 }
 
 function recentMentions(state: RequestStatusType = initialRequestState(), action: GenericAction): RequestStatusType {
@@ -37,7 +55,13 @@ function recentMentions(state: RequestStatusType = initialRequestState(), action
         return initialRequestState();
     }
 
-    return handleRequest(SearchTypes.SEARCH_RECENT_MENTIONS_REQUEST, SearchTypes.SEARCH_RECENT_MENTIONS_SUCCESS, SearchTypes.SEARCH_RECENT_MENTIONS_FAILURE, state, action);
+    return handleRequest(
+        SearchTypes.SEARCH_RECENT_MENTIONS_REQUEST,
+        SearchTypes.SEARCH_RECENT_MENTIONS_SUCCESS,
+        SearchTypes.SEARCH_RECENT_MENTIONS_FAILURE,
+        state,
+        action
+    );
 }
 
 export default (combineReducers({

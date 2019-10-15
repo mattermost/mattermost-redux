@@ -5,14 +5,13 @@ export function getUserCurrentTimezone(userTimezone?: UserTimezone): string | un
     if (!userTimezone) {
         return null;
     }
-
     const {
         useAutomaticTimezone,
         automaticTimezone,
         manualTimezone,
     } = userTimezone;
-    let useAutomatic = useAutomaticTimezone;
 
+    let useAutomatic = useAutomaticTimezone;
     if (typeof useAutomaticTimezone === 'string') {
         useAutomatic = useAutomaticTimezone === 'true';
     }
@@ -20,14 +19,12 @@ export function getUserCurrentTimezone(userTimezone?: UserTimezone): string | un
     if (useAutomatic) {
         return automaticTimezone;
     }
-
     return manualTimezone;
 }
 
 export function getTimezoneRegion(timezone: string): string {
     if (timezone) {
         const split = timezone.split('/');
-
         if (split.length > 1) {
             return split.pop()!.replace(/_/g, ' ');
         }

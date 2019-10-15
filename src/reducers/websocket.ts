@@ -1,5 +1,6 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
+
 import {GeneralTypes, UserTypes} from 'action_types';
 
 function getInitialState() {
@@ -12,12 +13,14 @@ function getInitialState() {
 
 export default function(state = getInitialState(), action) {
     if (!state.connected && action.type === GeneralTypes.WEBSOCKET_SUCCESS) {
-        return {...state,
+        return {
+            ...state,
             connected: true,
             lastConnectAt: action.timestamp,
         };
     } else if (state.connected && (action.type === GeneralTypes.WEBSOCKET_FAILURE || action.type === GeneralTypes.WEBSOCKET_CLOSED)) {
-        return {...state,
+        return {
+            ...state,
             connected: false,
             lastDisconnectAt: action.timestamp,
         };

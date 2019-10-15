@@ -10,27 +10,32 @@ export function initialRequestState(): RequestStatusType {
     };
 }
 
-export function handleRequest(REQUEST: string, SUCCESS: string, FAILURE: string, state: RequestStatusType, action: GenericAction): RequestStatusType {
+export function handleRequest(
+    REQUEST: string,
+    SUCCESS: string,
+    FAILURE: string,
+    state: RequestStatusType,
+    action: GenericAction
+): RequestStatusType {
     switch (action.type) {
     case REQUEST:
-        return {...state,
+        return {
+            ...state,
             status: RequestStatus.STARTED,
         };
-
     case SUCCESS:
-        return {...state,
+        return {
+            ...state,
             status: RequestStatus.SUCCESS,
             error: null,
         };
-
-    case FAILURE:
-    {
-        return {...state,
+    case FAILURE: {
+        return {
+            ...state,
             status: RequestStatus.FAILURE,
             error: action.error,
         };
     }
-
     default:
         return state;
     }

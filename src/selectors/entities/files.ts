@@ -1,7 +1,10 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
+
 import {createSelector} from 'reselect';
+
 import {getCurrentUserLocale} from 'selectors/entities/i18n';
+
 import {sortFileInfos} from 'utils/file_utils';
 
 function getAllFiles(state) {
@@ -21,8 +24,12 @@ export function getFilePublicLink(state) {
 }
 
 export function makeGetFilesForPost() {
-    return createSelector([getAllFiles, getFilesIdsForPost, getCurrentUserLocale], (allFiles, fileIdsForPost, locale) => {
-        const fileInfos = fileIdsForPost.map((id) => allFiles[id]).filter((id) => Boolean(id));
-        return sortFileInfos(fileInfos, locale);
-    });
+    return createSelector(
+        [getAllFiles, getFilesIdsForPost, getCurrentUserLocale],
+        (allFiles, fileIdsForPost, locale) => {
+            const fileInfos = fileIdsForPost.map((id) => allFiles[id]).filter((id) => Boolean(id));
+
+            return sortFileInfos(fileInfos, locale);
+        }
+    );
 }

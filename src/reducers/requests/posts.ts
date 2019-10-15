@@ -11,15 +11,33 @@ function createPost(state: RequestStatusType = initialRequestState(), action: Ge
         return initialRequestState();
     }
 
-    return handleRequest(PostTypes.CREATE_POST_REQUEST, PostTypes.CREATE_POST_SUCCESS, PostTypes.CREATE_POST_FAILURE, state, action);
+    return handleRequest(
+        PostTypes.CREATE_POST_REQUEST,
+        PostTypes.CREATE_POST_SUCCESS,
+        PostTypes.CREATE_POST_FAILURE,
+        state,
+        action
+    );
 }
 
 function editPost(state: RequestStatusType = initialRequestState(), action: GenericAction): RequestStatusType {
-    return handleRequest(PostTypes.EDIT_POST_REQUEST, PostTypes.EDIT_POST_SUCCESS, PostTypes.EDIT_POST_FAILURE, state, action);
+    return handleRequest(
+        PostTypes.EDIT_POST_REQUEST,
+        PostTypes.EDIT_POST_SUCCESS,
+        PostTypes.EDIT_POST_FAILURE,
+        state,
+        action
+    );
 }
 
 function getPostThread(state: RequestStatusType = initialRequestState(), action: GenericAction): RequestStatusType {
-    return handleRequest(PostTypes.GET_POST_THREAD_REQUEST, PostTypes.GET_POST_THREAD_SUCCESS, PostTypes.GET_POST_THREAD_FAILURE, state, action);
+    return handleRequest(
+        PostTypes.GET_POST_THREAD_REQUEST,
+        PostTypes.GET_POST_THREAD_SUCCESS,
+        PostTypes.GET_POST_THREAD_FAILURE,
+        state,
+        action
+    );
 }
 
 export default (combineReducers({

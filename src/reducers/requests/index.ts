@@ -1,5 +1,6 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
+
 import {combineReducers} from 'redux';
 
 import channels from './channels';
@@ -16,6 +17,7 @@ import search from './search';
 import roles from './roles';
 import schemes from './schemes';
 import groups from './groups';
+
 export default combineReducers({
     channels,
     files,

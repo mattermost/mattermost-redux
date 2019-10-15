@@ -38,7 +38,6 @@ class EventEmitter {
                 return true;
             }
         }
-
         return false;
     }
 
@@ -55,7 +54,6 @@ class EventEmitter {
             });
             return true;
         }
-
         return false;
     }
 }

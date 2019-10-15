@@ -22,9 +22,7 @@ export function checkDialogElementForError(elem: DialogElement, value: any): Dia
             return {
                 id: 'interactive_dialog.error.too_short',
                 defaultMessage: 'Minimum input length is {minLength}.',
-                values: {
-                    minLength: elem.min_length,
-                },
+                values: {minLength: elem.min_length},
             };
         }
 
@@ -78,7 +76,6 @@ export function checkIfErrorsMatchElements(errors: {
         if (!errors.hasOwnProperty(name)) {
             continue;
         }
-
         for (const elem of elements) {
             if (elem.name === name) {
                 return true;

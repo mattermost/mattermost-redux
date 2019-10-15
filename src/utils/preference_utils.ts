@@ -12,5 +12,6 @@ export function getPreferencesByCategory(myPreferences: any, category: string): 
             preferences.set(key.substring(prefix.length), myPreferences[key]);
         }
     });
+
     return preferences;
 }

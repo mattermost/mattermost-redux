@@ -37,4 +37,12 @@ export const makeGetUsersTypingByChannelAndPost = () => {
         postId: string;
     }) => Array<string>);
 };
-export const getUsersTyping: (state: GlobalState) => Array<string> = createSelector(getUsers, getTeammateNameDisplaySetting, getCurrentChannelId, (state) => state.entities.posts.selectedPostId, (state) => state.entities.typing, getUsersTypingImpl);
+
+export const getUsersTyping: (state: GlobalState) => Array<string> = createSelector(
+    getUsers,
+    getTeammateNameDisplaySetting,
+    getCurrentChannelId,
+    (state) => state.entities.posts.selectedPostId,
+    (state) => state.entities.typing,
+    getUsersTypingImpl,
+);

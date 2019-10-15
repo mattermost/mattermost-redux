@@ -42,7 +42,6 @@ export default function deepFreezeAndThrowOnMutation(object: any): any {
     for (const key in object) {
         if (object.hasOwnProperty(key)) {
             object.__defineGetter__(key, identity.bind(null, object[key])); // eslint-disable-line no-underscore-dangle
-
             object.__defineSetter__(key, throwOnImmutableMutation.bind(null, key)); // eslint-disable-line no-underscore-dangle
         }
     }
@@ -60,7 +59,11 @@ export default function deepFreezeAndThrowOnMutation(object: any): any {
 }
 
 function throwOnImmutableMutation(key: string, value: any) {
-    throw Error('You attempted to set the key `' + key + '` with the value `' + JSON.stringify(value) + '` on an object that is meant to be immutable and has been frozen.');
+    throw Error(
+        'You attempted to set the key `' + key + '` with the value `' +
+        JSON.stringify(value) + '` on an object that is meant to be immutable ' +
+        'and has been frozen.'
+    );
 }
 
 function identity(value: any): any {

@@ -22,6 +22,7 @@ export const offlineConfig = {
         return retries > 10;
     },
 };
+
 export function createReducer(baseState, ...reducers) {
     reducerRegistry.setReducers(Object.assign({}, ...reducers));
     const baseReducer = combineReducers(reducerRegistry.getReducers());

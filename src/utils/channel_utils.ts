@@ -79,9 +79,11 @@ export function buildDisplayableChannelListWithUnreadSection(usersState: UsersSt
 
 export function completeDirectChannelInfo(usersState: UsersState, teammateNameDisplay: string, channel: Channel): Channel {
     if (isDirectChannel(channel)) {
-        const teammateId = getUserIdFromChannelName(usersState.currentUserId, channel.name); // return empty string instead of `someone` default string for display_name
+        const teammateId = getUserIdFromChannelName(usersState.currentUserId, channel.name);
 
-        return {...channel,
+        // return empty string instead of `someone` default string for display_name
+        return {
+            ...channel,
             display_name: displayUsername(usersState.profiles[teammateId], teammateNameDisplay, false),
             teammate_id: teammateId,
             status: usersState.statuses[teammateId] || 'offline',
@@ -95,17 +97,13 @@ export function completeDirectChannelInfo(usersState: UsersState, teammateNameDi
 
 export function completeDirectChannelDisplayName(currentUserId: string, profiles: IDMappedObjects<UserProfile>, userIdsInChannel: Set<string>, teammateNameDisplay: string, channel: Channel): Channel {
     if (isDirectChannel(channel)) {
-        const dmChannelClone = {...channel,
-        };
+        const dmChannelClone = {...channel};
         const teammateId = getUserIdFromChannelName(currentUserId, channel.name);
-        return Object.assign(dmChannelClone, {
-            display_name: displayUsername(profiles[teammateId], teammateNameDisplay),
-        });
+
+        return Object.assign(dmChannelClone, {display_name: displayUsername(profiles[teammateId], teammateNameDisplay)});
     } else if (isGroupChannel(channel) && userIdsInChannel && userIdsInChannel.size > 0) {
         const displayName = getGroupDisplayNameFromUserIds(Array.from(userIdsInChannel), profiles, currentUserId, teammateNameDisplay);
-        return {...channel,
-            display_name: displayName,
-        };
+        return {...channel, display_name: displayName};
     }
 
     return channel;
@@ -121,15 +119,12 @@ export function cleanUpUrlable(input: string): string {
 
 export function getChannelByName(channels: IDMappedObjects<Channel>, name: string): Channel | undefined | null {
     const channelIds = Object.keys(channels);
-
     for (let i = 0; i < channelIds.length; i++) {
         const id = channelIds[i];
-
         if (channels[id].name === name) {
             return channels[id];
         }
     }
-
     return null;
 }
 
@@ -148,7 +143,6 @@ export function getDirectChannelName(id: string, otherId: string): string {
 export function getUserIdFromChannelName(userId: string, channelName: string): string {
     const ids = channelName.split('__');
     let otherUserId = '';
-
     if (ids[0] === userId) {
         otherUserId = ids[1];
     } else {
@@ -170,8 +164,9 @@ export function isAutoClosed(config: any, myPreferences: {
     }
 
     const openTimePref = myPreferences[`${Preferences.CATEGORY_CHANNEL_OPEN_TIME}--${channel.id}`];
-    const openTime = openTimePref ? parseInt(openTimePref.value!, 10) : 0; // Only close archived channels when not being viewed
+    const openTime = openTimePref ? parseInt(openTimePref.value!, 10) : 0;
 
+    // Only close archived channels when not being viewed
     if (channel.id !== currentChannelId && channelArchiveTime && channelArchiveTime > openTime) {
         return true;
     }
@@ -179,22 +174,17 @@ export function isAutoClosed(config: any, myPreferences: {
     if (config.CloseUnusedDirectMessages !== 'true' || isFavoriteChannel(myPreferences, channel.id)) {
         return false;
     }
-
     const autoClose = myPreferences[`${Preferences.CATEGORY_SIDEBAR_SETTINGS}--close_unused_direct_messages`];
-
     if (!autoClose || autoClose.value === 'after_seven_days') {
         if (channelActivity && channelActivity > cutoff) {
             return false;
         }
-
         if (openTime > cutoff) {
             return false;
         }
-
         const lastActivity = channel.last_post_at;
         return !lastActivity || lastActivity < cutoff;
     }
-
     return false;
 }
 
@@ -208,11 +198,9 @@ export function isDirectChannelVisible(otherUserOrOtherUserId: UserProfile | str
     const otherUser = typeof otherUserOrOtherUserId === 'object' ? otherUserOrOtherUserId : null;
     const otherUserId = typeof otherUserOrOtherUserId === 'object' ? otherUserOrOtherUserId.id : otherUserOrOtherUserId;
     const dm = myPreferences[`${Preferences.CATEGORY_DIRECT_CHANNEL_SHOW}--${otherUserId}`];
-
     if (!dm || dm.value !== 'true') {
         return false;
     }
-
     return isUnread || !isAutoClosed(config, myPreferences, channel, lastPost ? lastPost.create_at : 0, otherUser ? otherUser.delete_at : 0, currentChannelId);
 }
 
@@ -224,11 +212,9 @@ export function isGroupChannelVisible(config: any, myPreferences: {
     [x: string]: PreferenceType;
 }, channel: Channel, lastPost?: Post, isUnread?: boolean): boolean {
     const gm = myPreferences[`${Preferences.CATEGORY_GROUP_CHANNEL_SHOW}--${channel.id}`];
-
     if (!gm || gm.value !== 'true') {
         return false;
     }
-
     return isUnread || !isAutoClosed(config, myPreferences, channel, lastPost ? lastPost.create_at : 0, 0);
 }
 
@@ -236,15 +222,12 @@ export function isGroupOrDirectChannelVisible(channel: Channel, memberships: Rel
     [x: string]: PreferenceType;
 }, currentUserId: string, users: IDMappedObjects<UserProfile>, lastPosts: RelationOneToOne<Channel, Post>): boolean {
     const lastPost = lastPosts[channel.id];
-
     if (isGroupChannel(channel) && isGroupChannelVisible(config, myPreferences, channel, lastPost, isUnreadChannel(memberships, channel))) {
         return true;
     }
-
     if (!isDirectChannel(channel)) {
         return false;
     }
-
     const otherUserId = getUserIdFromChannelName(currentUserId, channel.name);
     return isDirectChannelVisible(users[otherUserId] || otherUserId, config, myPreferences, channel, lastPost, isUnreadChannel(memberships, channel));
 }
@@ -252,17 +235,10 @@ export function isGroupOrDirectChannelVisible(channel: Channel, memberships: Rel
 export function showCreateOption(state: GlobalState, config: any, license: any, teamId: string, channelType: ChannelType, isAdmin: boolean, isSystemAdmin: boolean): boolean {
     if (hasNewPermissions(state)) {
         if (channelType === General.OPEN_CHANNEL) {
-            return haveITeamPermission(state, {
-                team: teamId,
-                permission: Permissions.CREATE_PUBLIC_CHANNEL,
-            });
+            return haveITeamPermission(state, {team: teamId, permission: Permissions.CREATE_PUBLIC_CHANNEL});
         } else if (channelType === General.PRIVATE_CHANNEL) {
-            return haveITeamPermission(state, {
-                team: teamId,
-                permission: Permissions.CREATE_PRIVATE_CHANNEL,
-            });
+            return haveITeamPermission(state, {team: teamId, permission: Permissions.CREATE_PRIVATE_CHANNEL});
         }
-
         return true;
     }
 
@@ -271,7 +247,6 @@ export function showCreateOption(state: GlobalState, config: any, license: any, 
     }
 
     // Backwards compatibility with pre-advanced permissions config settings.
-
     if (channelType === General.OPEN_CHANNEL) {
         if (config.RestrictPublicChannelCreation === General.SYSTEM_ADMIN_ROLE && !isSystemAdmin) {
             return false;
@@ -292,19 +267,10 @@ export function showCreateOption(state: GlobalState, config: any, license: any, 
 export function showManagementOptions(state: GlobalState, config: any, license: any, channel: Channel, isAdmin: boolean, isSystemAdmin: boolean, isChannelAdmin: boolean): boolean {
     if (hasNewPermissions(state)) {
         if (channel.type === General.OPEN_CHANNEL) {
-            return haveIChannelPermission(state, {
-                channel: channel.id,
-                team: channel.team_id,
-                permission: Permissions.MANAGE_PUBLIC_CHANNEL_PROPERTIES,
-            });
+            return haveIChannelPermission(state, {channel: channel.id, team: channel.team_id, permission: Permissions.MANAGE_PUBLIC_CHANNEL_PROPERTIES});
         } else if (channel.type === General.PRIVATE_CHANNEL) {
-            return haveIChannelPermission(state, {
-                channel: channel.id,
-                team: channel.team_id,
-                permission: Permissions.MANAGE_PRIVATE_CHANNEL_PROPERTIES,
-            });
+            return haveIChannelPermission(state, {channel: channel.id, team: channel.team_id, permission: Permissions.MANAGE_PRIVATE_CHANNEL_PROPERTIES});
         }
-
         return true;
     }
 
@@ -313,16 +279,13 @@ export function showManagementOptions(state: GlobalState, config: any, license: 
     }
 
     // Backwards compatibility with pre-advanced permissions config settings.
-
     if (channel.type === General.OPEN_CHANNEL) {
         if (config.RestrictPublicChannelManagement === General.SYSTEM_ADMIN_ROLE && !isSystemAdmin) {
             return false;
         }
-
         if (config.RestrictPublicChannelManagement === General.TEAM_ADMIN_ROLE && !isAdmin) {
             return false;
         }
-
         if (config.RestrictPublicChannelManagement === General.CHANNEL_ADMIN_ROLE && !isChannelAdmin && !isAdmin) {
             return false;
         }
@@ -330,11 +293,9 @@ export function showManagementOptions(state: GlobalState, config: any, license: 
         if (config.RestrictPrivateChannelManagement === General.SYSTEM_ADMIN_ROLE && !isSystemAdmin) {
             return false;
         }
-
         if (config.RestrictPrivateChannelManagement === General.TEAM_ADMIN_ROLE && !isAdmin) {
             return false;
         }
-
         if (config.RestrictPrivateChannelManagement === General.CHANNEL_ADMIN_ROLE && !isChannelAdmin && !isAdmin) {
             return false;
         }
@@ -346,19 +307,10 @@ export function showManagementOptions(state: GlobalState, config: any, license: 
 export function showDeleteOption(state: GlobalState, config: any, license: any, channel: Channel, isAdmin: boolean, isSystemAdmin: boolean, isChannelAdmin: boolean): boolean {
     if (hasNewPermissions(state)) {
         if (channel.type === General.OPEN_CHANNEL) {
-            return haveIChannelPermission(state, {
-                channel: channel.id,
-                team: channel.team_id,
-                permission: Permissions.DELETE_PUBLIC_CHANNEL,
-            });
+            return haveIChannelPermission(state, {channel: channel.id, team: channel.team_id, permission: Permissions.DELETE_PUBLIC_CHANNEL});
         } else if (channel.type === General.PRIVATE_CHANNEL) {
-            return haveIChannelPermission(state, {
-                channel: channel.id,
-                team: channel.team_id,
-                permission: Permissions.DELETE_PRIVATE_CHANNEL,
-            });
+            return haveIChannelPermission(state, {channel: channel.id, team: channel.team_id, permission: Permissions.DELETE_PRIVATE_CHANNEL});
         }
-
         return true;
     }
 
@@ -367,16 +319,13 @@ export function showDeleteOption(state: GlobalState, config: any, license: any, 
     }
 
     // Backwards compatibility with pre-advanced permissions config settings.
-
     if (channel.type === General.OPEN_CHANNEL) {
         if (config.RestrictPublicChannelDeletion === General.SYSTEM_ADMIN_ROLE && !isSystemAdmin) {
             return false;
         }
-
         if (config.RestrictPublicChannelDeletion === General.TEAM_ADMIN_ROLE && !isAdmin) {
             return false;
         }
-
         if (config.RestrictPublicChannelDeletion === General.CHANNEL_ADMIN_ROLE && !isChannelAdmin && !isAdmin) {
             return false;
         }
@@ -384,11 +333,9 @@ export function showDeleteOption(state: GlobalState, config: any, license: any, 
         if (config.RestrictPrivateChannelDeletion === General.SYSTEM_ADMIN_ROLE && !isSystemAdmin) {
             return false;
         }
-
         if (config.RestrictPrivateChannelDeletion === General.TEAM_ADMIN_ROLE && !isAdmin) {
             return false;
         }
-
         if (config.RestrictPrivateChannelDeletion === General.CHANNEL_ADMIN_ROLE && !isChannelAdmin && !isAdmin) {
             return false;
         }
@@ -400,7 +347,9 @@ export function showDeleteOption(state: GlobalState, config: any, license: any, 
 // Backwards compatibility with pre-advanced permissions config settings.
 
 export function canManageMembersOldPermissions(channel: Channel, user: UserProfile, teamMember: TeamMembership, channelMember: ChannelMembership, config: any, license: any): boolean {
-    if (channel.type === General.DM_CHANNEL || channel.type === General.GM_CHANNEL || channel.name === General.DEFAULT_CHANNEL) {
+    if (channel.type === General.DM_CHANNEL ||
+        channel.type === General.GM_CHANNEL ||
+        channel.name === General.DEFAULT_CHANNEL) {
         return false;
     }
 
@@ -410,19 +359,16 @@ export function canManageMembersOldPermissions(channel: Channel, user: UserProfi
 
     if (channel.type === General.PRIVATE_CHANNEL) {
         const isSystemAdmin = user.roles.includes(General.SYSTEM_ADMIN_ROLE);
-
         if (config.RestrictPrivateChannelManageMembers === General.PERMISSIONS_SYSTEM_ADMIN && !isSystemAdmin) {
             return false;
         }
 
         const isTeamAdmin = teamMember.roles.includes(General.TEAM_ADMIN_ROLE);
-
         if (config.RestrictPrivateChannelManageMembers === General.PERMISSIONS_TEAM_ADMIN && !isTeamAdmin && !isSystemAdmin) {
             return false;
         }
 
         const isChannelAdmin = channelMember.roles.includes(General.CHANNEL_ADMIN_ROLE);
-
         if (config.RestrictPrivateChannelManageMembers === General.PERMISSIONS_CHANNEL_ADMIN && !isChannelAdmin && !isTeamAdmin && !isSystemAdmin) {
             return false;
         }
@@ -432,14 +378,12 @@ export function canManageMembersOldPermissions(channel: Channel, user: UserProfi
 }
 
 export function getChannelsIdForTeam(state: GlobalState, teamId: string): Array<string> {
-    const {
-        channels,
-    } = state.entities.channels;
+    const {channels} = state.entities.channels;
+
     return Object.keys(channels).map((key) => channels[key]).reduce((res, channel: Channel) => {
         if (channel.team_id === teamId) {
             res.push(channel.id);
         }
-
         return res;
     }, [] as string[]);
 }
@@ -454,9 +398,7 @@ export function getGroupDisplayNameFromUserIds(userIds: Array<string>, profiles:
 
     function sortUsernames(a, b) {
         const locale = getUserLocale(currentUserId, profiles);
-        return a.localeCompare(b, locale, {
-            numeric: true,
-        });
+        return a.localeCompare(b, locale, {numeric: true});
     }
 
     return names.sort(sortUsernames).join(', ');
@@ -505,18 +447,19 @@ function createMissingDirectChannels(currentUserId: string, allChannels: Array<C
     [x: string]: PreferenceType;
 }): Array<Channel> {
     const directChannelsDisplayPreferences = getPreferencesByCategory(myPreferences, Preferences.CATEGORY_DIRECT_CHANNEL_SHOW);
-    return Array.from(directChannelsDisplayPreferences).filter((entry) => entry[1] === 'true').map((entry) => entry[0]).filter((teammateId) => !allChannels.some(isDirectChannelForUser.bind(null, currentUserId, teammateId))).map(createFakeChannelCurried(currentUserId));
+
+    return Array.
+        from(directChannelsDisplayPreferences).
+        filter((entry) => entry[1] === 'true').
+        map((entry) => entry[0]).
+        filter((teammateId) => !allChannels.some(isDirectChannelForUser.bind(null, currentUserId, teammateId))).
+        map(createFakeChannelCurried(currentUserId));
 }
 
 function completeDirectGroupInfo(usersState, teammateNameDisplay, channel) {
-    const {
-        currentUserId,
-        profiles,
-        profilesInChannel,
-    } = usersState;
+    const {currentUserId, profiles, profilesInChannel} = usersState;
     const profilesIds = profilesInChannel[channel.id];
-    const gm = {...channel,
-    };
+    const gm = {...channel};
 
     if (profilesIds) {
         gm.display_name = getGroupDisplayNameFromUserIds(profilesIds, profiles, currentUserId, teammateNameDisplay);
@@ -528,12 +471,10 @@ function completeDirectGroupInfo(usersState, teammateNameDisplay, channel) {
     const userIds: string[] = [];
     usernames.forEach((username: string) => {
         const u = users.find((p): boolean => p.username === username);
-
         if (u) {
             userIds.push(u.id);
         }
     });
-
     if (usernames.length === userIds.length) {
         gm.display_name = getGroupDisplayNameFromUserIds(userIds, profiles, currentUserId, teammateNameDisplay);
         return gm;
@@ -548,21 +489,18 @@ function isDirectChannelForUser(userId, otherUserId, channel) {
 
 function channelHasMentions(members, channel) {
     const member = members[channel.id];
-
     if (member) {
         return member.mention_count > 0;
     }
-
     return false;
 }
 
 function channelHasUnreadMessages(members: RelationOneToOne<Channel, ChannelMembership>, channel: Channel): boolean {
     const member = members[channel.id];
-
     if (member) {
         const msgCount = channel.total_msg_count - member.msg_count;
         const onlyMentions = member.notify_props && member.notify_props.mark_unread === General.MENTION;
-        return Boolean(msgCount) && !onlyMentions && member.mention_count === 0;
+        return (Boolean(msgCount) && !onlyMentions && member.mention_count === 0);
     }
 
     return false;
@@ -570,11 +508,10 @@ function channelHasUnreadMessages(members: RelationOneToOne<Channel, ChannelMemb
 
 export function isUnreadChannel(members: RelationOneToOne<Channel, ChannelMembership>, channel: Channel): boolean {
     const member = members[channel.id];
-
     if (member) {
         const msgCount = channel.total_msg_count - member.msg_count;
         const onlyMentions = member.notify_props && member.notify_props.mark_unread === General.MENTION;
-        return member.mention_count > 0 || Boolean(msgCount) && !onlyMentions;
+        return (member.mention_count > 0 || (Boolean(msgCount) && !onlyMentions));
     }
 
     return false;
@@ -605,14 +542,10 @@ export function sortChannelsByTypeAndDisplayName(locale: string, a: Channel, b: 
     const bDisplayName = filterName(b.display_name);
 
     if (aDisplayName !== bDisplayName) {
-        return aDisplayName.toLowerCase().localeCompare(bDisplayName.toLowerCase(), locale, {
-            numeric: true,
-        });
+        return aDisplayName.toLowerCase().localeCompare(bDisplayName.toLowerCase(), locale, {numeric: true});
     }
 
-    return a.name.toLowerCase().localeCompare(b.name.toLowerCase(), locale, {
-        numeric: true,
-    });
+    return a.name.toLowerCase().localeCompare(b.name.toLowerCase(), locale, {numeric: true});
 }
 
 function filterName(name: string): string {
@@ -622,14 +555,10 @@ function filterName(name: string): string {
 export function sortChannelsByDisplayName(locale: string, a: Channel, b: Channel): number {
     // if both channels have the display_name defined
     if (a.display_name && b.display_name && a.display_name !== b.display_name) {
-        return a.display_name.toLowerCase().localeCompare(b.display_name.toLowerCase(), locale, {
-            numeric: true,
-        });
+        return a.display_name.toLowerCase().localeCompare(b.display_name.toLowerCase(), locale, {numeric: true});
     }
 
-    return a.name.toLowerCase().localeCompare(b.name.toLowerCase(), locale, {
-        numeric: true,
-    });
+    return a.name.toLowerCase().localeCompare(b.name.toLowerCase(), locale, {numeric: true});
 }
 
 export function sortChannelsByDisplayNameAndMuted(locale: string, members: RelationOneToOne<Channel, ChannelMembership>, a: Channel, b: Channel): number {
@@ -649,13 +578,11 @@ export function sortChannelsByDisplayNameAndMuted(locale: string, members: Relat
 
 export function sortChannelsByRecency(lastPosts: RelationOneToOne<Channel, Post>, a: Channel, b: Channel): number {
     let aLastPostAt = a.last_post_at;
-
     if (lastPosts[a.id] && lastPosts[a.id].create_at > a.last_post_at) {
         aLastPostAt = lastPosts[a.id].create_at;
     }
 
     let bLastPostAt = b.last_post_at;
-
     if (lastPosts[b.id] && lastPosts[b.id].create_at > b.last_post_at) {
         bLastPostAt = lastPosts[b.id].create_at;
     }
@@ -664,7 +591,7 @@ export function sortChannelsByRecency(lastPosts: RelationOneToOne<Channel, Post>
 }
 
 export function isChannelMuted(member: ChannelMembership): boolean {
-    return member && member.notify_props ? member.notify_props.mark_unread === 'mention' : false;
+    return member && member.notify_props ? (member.notify_props.mark_unread === 'mention') : false;
 }
 
 export function areChannelMentionsIgnored(channelMemberNotifyProps: ChannelNotifyProps, currentUserNotifyProps: UserNotifyProps) {
@@ -675,7 +602,6 @@ export function areChannelMentionsIgnored(channelMemberNotifyProps: ChannelNotif
     }
 
     let ignoreChannelMentions = channelMemberNotifyProps && channelMemberNotifyProps.ignore_channel_mentions;
-
     if (!ignoreChannelMentions || ignoreChannelMentions === Users.IGNORE_CHANNEL_MENTIONS_DEFAULT) {
         ignoreChannelMentions = ignoreChannelMentionsDefault as any;
     }
@@ -684,7 +610,11 @@ export function areChannelMentionsIgnored(channelMemberNotifyProps: ChannelNotif
 }
 
 function buildChannels(usersState: UsersState, channels: Array<Channel>, missingDirectChannels: Array<Channel>, teammateNameDisplay: string, locale: string): Array<Channel> {
-    return channels.concat(missingDirectChannels).map((c) => completeDirectChannelInfo(usersState, teammateNameDisplay, c)).filter(isNotDeletedChannel).sort(sortChannelsByTypeAndDisplayName.bind(null, locale));
+    return channels.
+        concat(missingDirectChannels).
+        map((c) => completeDirectChannelInfo(usersState, teammateNameDisplay, c)).
+        filter(isNotDeletedChannel).
+        sort(sortChannelsByTypeAndDisplayName.bind(null, locale));
 }
 
 function buildFavoriteChannels(channels: Array<Channel>, myPreferences: {
@@ -708,16 +638,17 @@ function buildDirectAndGroupChannels(channels: Array<Channel>, memberships: Rela
 }
 
 function buildChannelsWithMentions(channels, members, locale) {
-    return channels.filter(channelHasMentions.bind(null, members)).sort(sortChannelsByDisplayName.bind(null, locale));
+    return channels.filter(channelHasMentions.bind(null, members)).
+        sort(sortChannelsByDisplayName.bind(null, locale));
 }
 
 function buildUnreadChannels(channels, members, locale) {
-    return channels.filter(channelHasUnreadMessages.bind(null, members)).sort(sortChannelsByDisplayName.bind(null, locale));
+    return channels.filter(channelHasUnreadMessages.bind(null, members)).
+        sort(sortChannelsByDisplayName.bind(null, locale));
 }
 
 function getUserLocale(userId, profiles) {
     let locale = General.DEFAULT_LOCALE;
-
     if (profiles && profiles[userId] && profiles[userId].locale) {
         locale = profiles[userId].locale;
     }
@@ -727,13 +658,15 @@ function getUserLocale(userId, profiles) {
 
 export function filterChannelsMatchingTerm(channels: Array<Channel>, term: string): Array<Channel> {
     const lowercasedTerm = term.toLowerCase();
+
     return channels.filter((channel: Channel): boolean => {
         if (!channel) {
             return false;
         }
-
         const name = (channel.name || '').toLowerCase();
         const displayName = (channel.display_name || '').toLowerCase();
-        return name.startsWith(lowercasedTerm) || displayName.startsWith(lowercasedTerm);
+
+        return name.startsWith(lowercasedTerm) ||
+            displayName.startsWith(lowercasedTerm);
     });
 }
