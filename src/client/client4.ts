@@ -1501,11 +1501,14 @@ export default class Client4 {
         );
     };
 
-    searchAllChannels = async (term, notAssociatedToGroup = '', excludeDefaultChannels = false) => {
+    searchAllChannels = async (term: string, notAssociatedToGroup = '', excludeDefaultChannels = false, paginate = false, page = 0, perPage = General.PAGE_SIZE_DEFAULT) => {
         const body = {
             term,
             not_associated_to_group: notAssociatedToGroup,
             exclude_default_channels: excludeDefaultChannels,
+            paginate,
+            page,
+            per_page: perPage,
         };
         return this.doFetch(
             `${this.getChannelsRoute()}/search`,
