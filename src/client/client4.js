@@ -2945,6 +2945,7 @@ export default class Client4 {
         // Temporary change to allow only certain events to reduce data rate - see MM-13062
         if (![
             'api_posts_create',
+            'api_install_marketplace_plugin',
             'api_interactive_messages_button_clicked',
             'api_interactive_messages_menu_selected',
             'api_interactive_messages_dialog_submitted',
