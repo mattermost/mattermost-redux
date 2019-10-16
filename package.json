@@ -9,12 +9,12 @@
     "url": "https://github.com/mattermost/mattermost-redux/issues"
   },
   "scripts": {
-    "start": "tsc --watch",
-    "build": "cross-env NODE_ENV=production tsc && cross-env NODE_ENV=production rollup -c",
+    "start": "ttsc --watch",
+    "build": "cross-env NODE_ENV=production ttsc && cross-env NODE_ENV=production rollup -c",
     "check": "eslint --ignore-path .gitignore --ignore-pattern node_modules --quiet 'src/**/*.ts'",
     "fix": "eslint --ignore-path .gitignore --ignore-pattern node_modules --quiet 'src/**/*.ts' --fix",
-    "tsc": "tsc --noEmit",
-    "tsc:watch": "tsc --noEmit --watch",
+    "tsc": "ttsc --noEmit",
+    "tsc:watch": "ttsc --noEmit --watch",
     "test": "jest --forceExit --detectOpenHandles --maxWorkers=2",
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage",
