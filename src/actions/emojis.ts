@@ -12,6 +12,7 @@ import {GetStateFunc, DispatchFunc, ActionFunc, ActionResult} from 'types/action
 import {logError} from './errors';
 import {bindClientFunc, forceLogoutIfNecessary} from './helpers';
 import {SystemEmoji, CustomEmoji} from 'types/emojis';
+import { Dictionary } from 'types/utilities';
 export let systemEmojis: Map<string, SystemEmoji> = new Map();
 export function setSystemEmojis(emojis: Map<string, SystemEmoji>) {
     systemEmojis = emojis;
@@ -127,7 +128,7 @@ export function getCustomEmojis(
 
 export function loadProfilesForCustomEmojis(emojis: Array<CustomEmoji>): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
-        const usersToLoad: {[x: string]: boolean} = {};
+        const usersToLoad: Dictionary<boolean> = {};
         emojis.forEach((emoji: CustomEmoji) => {
             if (!getState().entities.users.profiles[emoji.creator_id]) {
                 usersToLoad[emoji.creator_id] = true;

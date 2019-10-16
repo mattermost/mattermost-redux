@@ -18,6 +18,7 @@ import {logError} from './errors';
 import {bindClientFunc, forceLogoutIfNecessary} from './helpers';
 import {getMissingProfilesByIds} from './users';
 import {loadRolesIfNeeded} from './roles';
+import { UserProfile } from 'types/users';
 export function selectChannel(channelId: string) {
     return {
         type: ChannelTypes.SELECT_CHANNEL,
@@ -169,7 +170,7 @@ export function createGroupChannel(userIds: Array<string>): ActionFunc {
             return {error};
         }
 
-        let member: any = {
+        let member: Partial<ChannelMembership|undefined> = {
             channel_id: created.id,
             user_id: currentUserId,
             roles: `${General.CHANNEL_USER_ROLE}`,
@@ -198,9 +199,7 @@ export function createGroupChannel(userIds: Array<string>): ActionFunc {
 
         dispatch(markGroupChannelOpen(created.id));
 
-        const profilesInChannel = userIds.map((id) => {
-            return {id};
-        });
+        const profilesInChannel = userIds.map((id) => ({id}));
         profilesInChannel.push({id: currentUserId}); // currentUserId is optionally in userIds, but the reducer will get rid of a duplicate
 
         dispatch(batchActions([
@@ -221,7 +220,7 @@ export function createGroupChannel(userIds: Array<string>): ActionFunc {
                 data: profilesInChannel,
             },
         ]), getState);
-        dispatch(loadRolesIfNeeded((member && member.roles.split(' ')) || []));
+        dispatch(loadRolesIfNeeded((member && member.roles && member.roles.split(' ')) || []));
 
         return {data: created};
     };
@@ -554,7 +553,7 @@ export function getMyChannelMembers(teamId: string): ActionFunc {
         dispatch({
             type: ChannelTypes.RECEIVED_MY_CHANNEL_MEMBERS,
             data: channelMembers,
-            remove: getChannelsIdForTeam(getState(), teamId) as any, // TODO: investigate
+            remove: getChannelsIdForTeam(getState(), teamId),
             currentUserId,
         });
         const roles = new Set<string>();
@@ -1151,7 +1150,7 @@ export function updateChannelPurpose(channelId: string, purpose: string): Action
     };
 }
 
-export function markChannelAsRead(channelId: string, prevChannelId?: string | null, updateLastViewedAt = true): ActionFunc {
+export function markChannelAsRead(channelId: string, prevChannelId?: string, updateLastViewedAt = true): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         // Send channel last viewed at to the server
         if (updateLastViewedAt) {

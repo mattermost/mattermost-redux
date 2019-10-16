@@ -1,8 +1,9 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
 import {AlertTypeType} from 'types/alerts';
+import { Dictionary } from 'types/utilities';
 
-const alerts: {[x: string]: AlertTypeType} =
+const alerts: Dictionary<AlertTypeType> =
 {
     ALERT_NOTIFICATION: 'notification',
     ALERT_DEVELOPER: 'developer',

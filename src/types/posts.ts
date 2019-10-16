@@ -10,6 +10,7 @@ import {
     RelationOneToOne,
     RelationOneToMany,
     IDMappedObjects,
+    Dictionary,
 } from './utilities';
 
 export type PostType = 'system_add_remove' |
@@ -43,7 +44,7 @@ export type PostMetadata = {
     embeds: Array<PostEmbed>;
     emojis: Array<CustomEmoji>;
     files: Array<FileInfo>;
-    images: {[x: string]: PostImage};
+    images: Dictionary<PostImage>;
     reactions: Array<Reaction>;
 };
 

@@ -24,3 +24,7 @@ export type UsernameMappedObjects<E extends {username}> = {
 export type EmailMappedObjects<E extends {email}> = {
     [x in $Email<E>]: E;
 };
+
+export type Dictionary<T> = {
+    [key: string]: T,
+};

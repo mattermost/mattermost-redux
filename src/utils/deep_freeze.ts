@@ -8,8 +8,6 @@
  *
  */
 
-/* eslint-disable header/header */
-const disableOnIe11 = window && window.navigator && window.navigator.userAgent && window.navigator.userAgent.indexOf('Trident') !== -1;
 
 /**
  * If your application is accepting different values for the same field over
@@ -30,11 +28,6 @@ const disableOnIe11 = window && window.navigator && window.navigator.userAgent &
  */
 
 export default function deepFreezeAndThrowOnMutation(object: any): any {
-    // Some objects in IE11 don't have a hasOwnProperty method so don't even bother trying to freeze them
-    if (disableOnIe11) {
-        return object;
-    }
-
     if (typeof object !== 'object' || object === null || Object.isFrozen(object) || Object.isSealed(object)) {
         return object;
     }

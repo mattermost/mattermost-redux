@@ -4,7 +4,7 @@ import {ChannelTypes, GeneralTypes, PostTypes, UserTypes} from 'action_types';
 import {Posts} from '../../constants';
 import {comparePosts} from 'utils/post_utils';
 import {Post, PostsState} from 'types/posts';
-import {RelationOneToOne} from 'types/utilities';
+import {RelationOneToOne, Dictionary} from 'types/utilities';
 
 export function removeUnneededMetadata(post) {
     if (!post.metadata) {
@@ -757,7 +757,7 @@ export function mergePostOrder(left, right, posts) {
     return result;
 }
 
-export function postsInThread(state: {[x: string]: string[]} = {}, action, prevPosts) {
+export function postsInThread(state: Dictionary<string[]> = {}, action, prevPosts) {
     switch (action.type) {
     case PostTypes.RECEIVED_NEW_POST:
     case PostTypes.RECEIVED_POST: {
@@ -809,7 +809,7 @@ export function postsInThread(state: {[x: string]: string[]} = {}, action, prevP
             return state;
         }
 
-        const nextState: {[x: string]: string[]} = {};
+        const nextState: Dictionary<string[]> = {};
 
         for (const post of newPosts) {
             if (!post.root_id) {
