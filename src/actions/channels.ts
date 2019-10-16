@@ -18,7 +18,7 @@ import {logError} from './errors';
 import {bindClientFunc, forceLogoutIfNecessary} from './helpers';
 import {getMissingProfilesByIds} from './users';
 import {loadRolesIfNeeded} from './roles';
-import { UserProfile } from 'types/users';
+import {UserProfile} from 'types/users';
 export function selectChannel(channelId: string) {
     return {
         type: ChannelTypes.SELECT_CHANNEL,

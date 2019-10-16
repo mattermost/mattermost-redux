@@ -12,7 +12,7 @@ import {GetStateFunc, DispatchFunc, ActionFunc, ActionResult} from 'types/action
 import {logError} from './errors';
 import {bindClientFunc, forceLogoutIfNecessary} from './helpers';
 import {SystemEmoji, CustomEmoji} from 'types/emojis';
-import { Dictionary } from 'types/utilities';
+import {Dictionary} from 'types/utilities';
 export let systemEmojis: Map<string, SystemEmoji> = new Map();
 export function setSystemEmojis(emojis: Map<string, SystemEmoji>) {
     systemEmojis = emojis;

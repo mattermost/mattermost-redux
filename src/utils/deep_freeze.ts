@@ -8,6 +8,7 @@
  *
  */
 
+/* eslint-disable header/header */
 
 /**
  * If your application is accepting different values for the same field over
@@ -28,6 +29,8 @@
  */
 
 export default function deepFreezeAndThrowOnMutation(object: any): any {
+    // Some objects in IE11 don't have a hasOwnProperty method so don't even bother trying to freeze them
+
     if (typeof object !== 'object' || object === null || Object.isFrozen(object) || Object.isSealed(object)) {
         return object;
     }

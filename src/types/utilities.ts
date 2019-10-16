@@ -26,5 +26,5 @@ export type EmailMappedObjects<E extends {email}> = {
 };
 
 export type Dictionary<T> = {
-    [key: string]: T,
+    [key: string]: T;
 };
