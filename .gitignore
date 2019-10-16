@@ -53,3 +53,10 @@ coverage
 /build/
 /tsconfig.tsbuildinfo
 junit.xml
+index.d.ts
+index.js
+index.js.map
+mattermost.client4.js
+mattermost.client4.js.map
+mattermost.websocket_client.js
+mattermost.websocket_client.js.map

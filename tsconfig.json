@@ -1,5 +1,5 @@
 {
-    "include": ["src", "types"],
+    "include": ["src"],
     "exclude": ["node_modules", "build"],
     "typeAcquisition": {
         "enable": true
@@ -13,7 +13,7 @@
         "declaration": true,
         "sourceMap": true,
         "rootDir": "./src",
-        "outDir": "./build",
+        "outDir": "./",
         "strict": false,
         "noEmit": false,
         "noImplicitAny": false,

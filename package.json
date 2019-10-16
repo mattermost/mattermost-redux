@@ -8,11 +8,6 @@
   "bugs": {
     "url": "https://github.com/mattermost/mattermost-redux/issues"
   },
-  "main": "build/mattermost.client4.js",
-  "types": "build/index.d.ts",
-  "files": [
-    "build"
-  ],
   "scripts": {
     "start": "tsc --watch",
     "build": "cross-env NODE_ENV=production tsc && cross-env NODE_ENV=production rollup -c",
