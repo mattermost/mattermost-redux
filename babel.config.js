@@ -15,10 +15,13 @@ const config = {
             useBuiltIns: 'usage',
             shippedProposals: true,
         }],
+        '@babel/typescript',
     ],
     plugins: [
-        '@babel/transform-flow-comments',
+        '@babel/plugin-transform-runtime',
+        '@babel/plugin-syntax-dynamic-import',
         '@babel/proposal-class-properties',
+        '@babel/proposal-object-rest-spread',
         '@babel/plugin-proposal-optional-chaining',
         ['module-resolver', {
             root: ['./src', '.'],

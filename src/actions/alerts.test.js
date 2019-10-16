@@ -4,7 +4,7 @@
 import assert from 'assert';
 
 import * as Actions from 'actions/alerts';
-import {Alerts} from 'constants';
+import {Alerts} from '../constants';
 import configureStore from 'test/test_store';
 
 describe('Actions.Alerts', () => {
