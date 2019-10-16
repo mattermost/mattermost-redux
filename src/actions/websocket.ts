@@ -1,7 +1,7 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
 import {Client4} from 'client';
-import websocketClient from 'client/websocket_client';
+import websocketClient from '../client/websocket_client';
 
 import {ChannelTypes, GeneralTypes, EmojiTypes, PostTypes, PreferenceTypes, TeamTypes, UserTypes, RoleTypes, AdminTypes, IntegrationTypes} from 'action_types';
 import {General, WebsocketEvents, Preferences} from '../constants';
