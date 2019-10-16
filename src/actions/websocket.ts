@@ -577,7 +577,7 @@ function handleChannelViewedEvent(msg) {
         const currentUserId = getCurrentUserId(state);
 
         if (channelId !== currentChannelId && currentUserId === msg.broadcast.user_id) {
-            dispatch(markChannelAsRead(channelId, null, false));
+            dispatch(markChannelAsRead(channelId, undefined, false));
         }
         return {data: true};
     };

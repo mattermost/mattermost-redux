@@ -1205,7 +1205,7 @@ function lastPostActions(post, websocketMessageProps) {
         }
 
         if (markAsRead) {
-            dispatch(markChannelAsRead(post.channel_id, null, markAsReadOnServer));
+            dispatch(markChannelAsRead(post.channel_id, undefined, markAsReadOnServer));
             dispatch(markChannelAsViewed(post.channel_id));
         } else {
             dispatch(markChannelAsUnread(websocketMessageProps.team_id, post.channel_id, websocketMessageProps.mentions));
