@@ -1056,7 +1056,7 @@ export function reactions(state = {}, action) {
 }
 
 function storeReactionsForPost(state, post) {
-    if (!post.metadata || !post.metadata.reactions) {
+    if (!post.metadata || !post.metadata.reactions || post.delete_at > 0) {
         return state;
     }
 
