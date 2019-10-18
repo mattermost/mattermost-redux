@@ -775,7 +775,7 @@ export function viewChannel(channelId: string, prevChannelId = ''): ActionFunc {
 }
 
 export function markChannelAsViewed(channelId: string, prevChannelId = ''): ActionFunc {
-    return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
+    return (dispatch: DispatchFunc, getState: GetStateFunc) => {
         const actions: Action[] = [];
 
         const {myMembers} = getState().entities.channels;
@@ -806,7 +806,7 @@ export function markChannelAsViewed(channelId: string, prevChannelId = ''): Acti
         }
 
         if (actions.length) {
-            dispatch(batchActions(actions), getState);
+            dispatch(batchActions(actions));
         }
 
         return {data: true};

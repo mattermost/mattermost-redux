@@ -35,7 +35,7 @@ export type ActionResult = {
 };
 
 export type DispatchFunc = (action: Action, getState?: GetStateFunc | null) => Promise<ActionResult>;
-export type ActionFunc = (dispatch: DispatchFunc, getState: GetStateFunc) => Promise<ActionResult|ActionResult[]>;
+export type ActionFunc = (dispatch: DispatchFunc, getState: GetStateFunc) => Promise<ActionResult|ActionResult[]> | ActionResult;
 export type PlatformType = 'web' | 'ios' | 'android';
 
 export const BATCH = 'BATCHING_REDUCER.BATCH';

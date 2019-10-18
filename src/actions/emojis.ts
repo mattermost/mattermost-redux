@@ -72,8 +72,8 @@ export function getCustomEmojisByName(names: Array<string>): ActionFunc {
             return {data: true};
         }
 
-        const promises: Promise<ActionResult|ActionResult[]>[] = [];
-        names.forEach((name) => promises.push(getCustomEmojiByName(name)(dispatch, getState)));
+        const promises: Promise<ActionResult>[] = [];
+        names.forEach((name) => promises.push(dispatch(getCustomEmojiByName(name))));
 
         await Promise.all(promises);
         return {data: true};

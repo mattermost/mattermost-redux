@@ -39,14 +39,14 @@ async function getProfilesAndStatusesForMembers(userIds, dispatch, getState) {
             statusesToLoad.push(userId);
         }
     });
-    const requests: Promise<ActionResult|ActionResult[]>[] = [];
+    const requests: Promise<ActionResult>[] = [];
 
     if (profilesToLoad.length) {
-        requests.push(getProfilesByIds(profilesToLoad)(dispatch, getState));
+        requests.push(dispatch(getProfilesByIds(profilesToLoad)));
     }
 
     if (statusesToLoad.length) {
-        requests.push(getStatusesByIds(statusesToLoad)(dispatch, getState));
+        requests.push(dispatch(getStatusesByIds(statusesToLoad)));
     }
 
     await Promise.all(requests);
