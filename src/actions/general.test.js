@@ -7,7 +7,7 @@ import nock from 'nock';
 import {GeneralTypes} from 'action_types';
 import * as Actions from 'actions/general';
 import {Client4} from 'client';
-import {RequestStatus} from 'constants';
+import {RequestStatus} from '../constants';
 
 import TestHelper from 'test/test_helper';
 import configureStore from 'test/test_store';

@@ -9,7 +9,7 @@ import {
     GeneralTypes,
     PostTypes,
 } from 'action_types';
-import {Posts} from 'constants';
+import {Posts} from '../../constants';
 import * as reducers from 'reducers/entities/posts';
 import deepFreeze from 'utils/deep_freeze';
 

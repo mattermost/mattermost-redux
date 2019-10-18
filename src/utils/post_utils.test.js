@@ -4,7 +4,7 @@
 import assert from 'assert';
 
 import {PostTypes} from 'constants/posts';
-import {Permissions} from 'constants';
+import {Permissions} from '../constants';
 
 import {
     canEditPost,
