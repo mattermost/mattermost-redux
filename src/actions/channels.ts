@@ -985,7 +985,6 @@ export function searchAllChannels(term: string, notAssociatedToGroup = '', exclu
         dispatch({type: ChannelTypes.GET_ALL_CHANNELS_REQUEST, data: null}, getState);
 
         let response;
-        let channels;
         try {
             response = await Client4.searchAllChannels(term, notAssociatedToGroup, excludeDefaultChannels, paginate, page, perPage);
         } catch (error) {
@@ -997,9 +996,7 @@ export function searchAllChannels(term: string, notAssociatedToGroup = '', exclu
             return {error};
         }
 
-        if (paginate) {
-            channels = response.channels;
-        }
+        const channels = paginate ? response.channels : response;
 
         dispatch(batchActions([
             {
