@@ -2528,6 +2528,10 @@ export default class Client4 {
         );
     };
 
+    // Role Routes
+
+    getRole = async (roleId) => {
+
     patchRole = async (roleId, rolePatch) => {
         return this.doFetch(
             `${this.getRolesRoute()}/${roleId}/patch`,

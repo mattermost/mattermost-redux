@@ -14,27 +14,32 @@ import type {Role} from 'types/roles';
 export function getRolesByNames(rolesNames: Array<string>) {
     return bindClientFunc({
         clientFunc: Client4.getRolesByNames,
-        onRequest: RoleTypes.ROLES_BY_NAMES_REQUEST,
-        onSuccess: [RoleTypes.RECEIVED_ROLES, RoleTypes.ROLES_BY_NAMES_SUCCESS],
-        onFailure: RoleTypes.ROLES_BY_NAMES_FAILURE,
         params: [
             rolesNames,
         ],
     });
 }
 
-export function editRole(role: Role) {
+export function getRoleByName(roleName: string) {
     return bindClientFunc({
-        clientFunc: Client4.patchRole,
-        onRequest: RoleTypes.EDIT_ROLE_REQUEST,
-        onSuccess: [RoleTypes.RECEIVED_ROLE, RoleTypes.EDIT_ROLE_SUCCESS],
-        onFailure: RoleTypes.EDIT_ROLE_FAILURE,
+        clientFunc: Client4.getRoleByName,
+        onRequest: RoleTypes.ROLE_BY_NAME_REQUEST,
+        onSuccess: [RoleTypes.RECEIVED_ROLE, RoleTypes.ROLE_BY_NAME_SUCCESS],
+        onFailure: RoleTypes.ROLE_BY_NAME_FAILURE,
         params: [
-            role.id,
-            role,
+            roleName,
         ],
     });
-}
+
+export function getRole(roleId) {
+    return bindClientFunc(
+        Client4.getRole,
+        RoleTypes.ROLE_BY_ID_REQUEST,
+        [RoleTypes.RECEIVED_ROLE, RoleTypes.ROLE_BY_ID_SUCCESS],
+        RoleTypes.ROLE_BY_ID_FAILURE,
+        roleId
+    );
+}    
 
 export function setPendingRoles(roles: Array<string>) {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {

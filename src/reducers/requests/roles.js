@@ -20,16 +20,6 @@ function getRolesByNames(state: RequestStatusType = initialRequestState(), actio
     );
 }
 
-function editRole(state: RequestStatusType = initialRequestState(), action: GenericAction): RequestStatusType {
-    return handleRequest(
-        RoleTypes.EDIT_ROLE_REQUEST,
-        RoleTypes.EDIT_ROLE_SUCCESS,
-        RoleTypes.EDIT_ROLE_FAILURE,
-        state,
-        action
-    );
-}
-
 export default (combineReducers({
     getRolesByNames,
     editRole,

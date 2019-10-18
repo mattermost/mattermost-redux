@@ -9,14 +9,6 @@ export default keyMirror({
     ROLES_BY_NAMES_SUCCESS: null,
     ROLES_BY_NAMES_FAILURE: null,
 
-    ROLE_BY_NAME_REQUEST: null,
-    ROLE_BY_NAME_SUCCESS: null,
-    ROLE_BY_NAME_FAILURE: null,
-
-    ROLE_BY_ID_REQUEST: null,
-    ROLE_BY_ID_SUCCESS: null,
-    ROLE_BY_ID_FAILURE: null,
-
     EDIT_ROLE_REQUEST: null,
     EDIT_ROLE_SUCCESS: null,
     EDIT_ROLE_FAILURE: null,
