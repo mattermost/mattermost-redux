@@ -7,7 +7,7 @@ import {GeneralTypes} from 'action_types';
 import {getServerVersion} from 'selectors/entities/general';
 import {isMinimumServerVersion} from 'utils/helpers';
 import {GeneralState} from 'types/general';
-import {GenericClientResponse, logLevel} from 'types/client4';
+import {logLevel} from 'types/client4';
 import {GetStateFunc, DispatchFunc, ActionFunc, batchActions} from 'types/actions';
 
 import {logError} from './errors';
@@ -17,7 +17,7 @@ import {bindClientFunc, forceLogoutIfNecessary, FormattedError} from './helpers'
 
 export function getPing(): ActionFunc {
     return async () => {
-        let data: GenericClientResponse;
+        let data;
         let pingError = new FormattedError(
             'mobile.server_ping_failed',
             'Cannot connect to the server. Please check your server URL and internet connection.'
@@ -78,6 +78,7 @@ export function getDataRetentionPolicy(): ActionFunc {
             forceLogoutIfNecessary(error, dispatch, getState);
             dispatch(batchActions([
                 {
+                    type: GeneralTypes.RECEIVED_DATA_RETENTION_POLICY,
                     error,
                 },
                 logError(error),
@@ -163,7 +164,7 @@ export function setUrl(url: string) {
 
 export function getRedirectLocation(url: string): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
-        let pendingData: Promise<Object>;
+        let pendingData: Promise<any>;
         if (isMinimumServerVersion(getServerVersion(getState()), 5, 3)) {
             pendingData = Client4.getRedirectLocation(url);
         } else {
