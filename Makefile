@@ -1,4 +1,4 @@
-.PHONY: check-style clean pre-run test install flow
+.PHONY: check-style clean pre-run test install
 
 node_modules: package.json
 	@if ! [ $(shell which npm) ]; then \
@@ -15,15 +15,15 @@ check-style: | pre-run node_modules
 
 	npm run check
 
-clean:
+clean: pre-run
 	@echo Cleaning app
 
-	rm -rf node_modules
+	rm -rf node_modules 
 
 pre-run:
 	@echo Make sure no previous build are in the folder
 
-	@rm -rf build/*
+	@rm -rf build/* actions client constants reducers selectors store utils types mattermost.client4* index.* mattermost.websocket_client*
 
 test: check-style
 	npm test
@@ -31,5 +31,5 @@ test: check-style
 
 install: node_modules
 
-bundle:
+bundle: | pre-run node_modules
 	npm run build
