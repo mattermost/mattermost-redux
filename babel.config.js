@@ -24,7 +24,7 @@ const config = {
         '@babel/proposal-object-rest-spread',
         '@babel/plugin-proposal-optional-chaining',
         ['module-resolver', {
-            root: ['./src', '.'],
+            root: ['./src', './test'],
         }],
     ],
 };
