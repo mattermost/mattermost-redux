@@ -994,12 +994,12 @@ export default class Client4 {
         );
     };
 
-    searchTeams = (term) => {
+    searchTeams = (term, paginate = false, page = 0, perPage = General.PAGE_SIZE_DEFAULT) => {
         this.trackEvent('api', 'api_search_teams');
 
         return this.doFetch(
             `${this.getTeamsRoute()}/search`,
-            {method: 'post', body: JSON.stringify({term})}
+            {method: 'post', body: JSON.stringify({term, paginate, page, per_page: perPage})}
         );
     };
 
