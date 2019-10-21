@@ -647,12 +647,3 @@ export function filterChannelsMatchingTerm(channels: Array<Channel>, term: strin
             displayName.startsWith(lowercasedTerm);
     });
 }
-
-// isManually unread looks into state if the provided channelId is marked as unread by the user.
-export function isManuallyUnread(channelId: ?string, state: GlobalState): boolean {
-    if (channelId) {
-        const isUnread = state.entities.channels.manuallyUnread[channelId];
-        return Boolean(isUnread);
-    }
-    return false;
-}

@@ -8,8 +8,13 @@ import {Client4} from 'client';
 import {General, Preferences} from 'constants';
 import {ChannelTypes, PreferenceTypes, UserTypes} from 'action_types';
 import {savePreferences, deletePreferences} from 'actions/preferences';
-import {getChannelsIdForTeam, getChannelByName, isManuallyUnread} from 'utils/channel_utils';
-import {getChannelsNameMapInTeam, getMyChannelMember as getMyChannelMemberSelector, getRedirectChannelNameForTeam} from 'selectors/entities/channels';
+import {getChannelsIdForTeam, getChannelByName} from 'utils/channel_utils';
+import {
+    getChannelsNameMapInTeam,
+    getMyChannelMember as getMyChannelMemberSelector,
+    getRedirectChannelNameForTeam,
+    isManuallyUnread,
+} from 'selectors/entities/channels';
 import {getCurrentTeamId} from 'selectors/entities/teams';
 
 import {logError} from './errors';
@@ -721,7 +726,7 @@ export function viewChannel(channelId: string, prevChannelId: string = ''): Acti
         const {myPreferences} = getState().entities.preferences;
         const viewTimePref = myPreferences[`${Preferences.CATEGORY_CHANNEL_APPROXIMATE_VIEW_TIME}--${channelId}`];
         const viewTime = viewTimePref ? parseInt(viewTimePref.value, 10) : 0;
-        const prevChanManuallyUnread = isManuallyUnread(prevChannelId, getState());
+        const prevChanManuallyUnread = isManuallyUnread(getState(), prevChannelId);
 
         if (viewTime < new Date().getTime() - (3 * 60 * 60 * 1000)) {
             const preferences = [
@@ -744,7 +749,7 @@ export function viewChannel(channelId: string, prevChannelId: string = ''): Acti
         const {myMembers} = getState().entities.channels;
         const member = myMembers[channelId];
         if (member) {
-            if (isManuallyUnread(channelId, getState())) {
+            if (isManuallyUnread(getState(), channelId)) {
                 actions.push({
                     type: ChannelTypes.REMOVE_MANUALLY_UNREAD,
                     data: {channelId},
@@ -784,7 +789,7 @@ export function markChannelAsViewed(channelId: string, prevChannelId: string = '
                 type: ChannelTypes.RECEIVED_MY_CHANNEL_MEMBER,
                 data: {...member, last_viewed_at: Date.now()},
             });
-            if (isManuallyUnread(channelId, state)) {
+            if (isManuallyUnread(state, channelId)) {
                 actions.push({
                     type: ChannelTypes.REMOVE_MANUALLY_UNREAD,
                     data: {channelId},
@@ -795,7 +800,7 @@ export function markChannelAsViewed(channelId: string, prevChannelId: string = '
         }
 
         const prevMember = myMembers[prevChannelId];
-        if (prevMember && isManuallyUnread(prevChannelId, state)) {
+        if (prevMember && !isManuallyUnread(getState(), prevChannelId)) {
             actions.push({
                 type: ChannelTypes.RECEIVED_MY_CHANNEL_MEMBER,
                 data: {...prevMember, last_viewed_at: Date.now()},
@@ -1171,7 +1176,7 @@ export function updateChannelPurpose(channelId: string, purpose: string): Action
 
 export function markChannelAsRead(channelId: string, prevChannelId: ?string, updateLastViewedAt: boolean = true): ActionFunc {
     return async (dispatch, getState) => {
-        const prevChanManuallyUnread = isManuallyUnread(prevChannelId, getState());
+        const prevChanManuallyUnread = isManuallyUnread(getState(), prevChannelId);
 
         // Send channel last viewed at to the server
         if (updateLastViewedAt) {
@@ -1215,7 +1220,7 @@ export function markChannelAsRead(channelId: string, prevChannelId: ?string, upd
             });
         }
 
-        if (channel && isManuallyUnread(channelId, getState())) {
+        if (channel && isManuallyUnread(getState(), channelId)) {
             actions.push({
                 type: ChannelTypes.REMOVE_MANUALLY_UNREAD,
                 data: {channelId},
