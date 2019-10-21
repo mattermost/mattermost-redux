@@ -3488,6 +3488,21 @@ describe('reactions', () => {
                     },
                 });
             });
+
+            it('should not save reaction for a deleted post', () => {
+                const state = deepFreeze({});
+                const action = {
+                    type: actionType,
+                    data: {
+                        id: 'post',
+                        delete_at: '1571366424287',
+                    },
+                };
+
+                const nextState = reducers.reactions(state, action);
+
+                assert.equal(nextState, state);
+            });
         });
     }
 
@@ -3599,6 +3614,43 @@ describe('reactions', () => {
                 },
                 post2: {
                     'abcd--1': {user_id: 'abcd', emoji_name: '-1'},
+                },
+            });
+        });
+
+        it('should save reactions for multiple posts except deleted posts', () => {
+            const state = deepFreeze({});
+            const action = {
+                type: PostTypes.RECEIVED_POSTS,
+                data: {
+                    posts: {
+                        post1: {
+                            id: 'post1',
+                            metadata: {
+                                reactions: [
+                                    {user_id: 'abcd', emoji_name: '+1'},
+                                ],
+                            },
+                        },
+                        post2: {
+                            id: 'post2',
+                            delete_at: '1571366424287',
+                            metadata: {
+                                reactions: [
+                                    {user_id: 'abcd', emoji_name: '-1'},
+                                ],
+                            },
+                        },
+                    },
+                },
+            };
+
+            const nextState = reducers.reactions(state, action);
+
+            assert.notEqual(nextState, state);
+            assert.deepEqual(nextState, {
+                post1: {
+                    'abcd-+1': {user_id: 'abcd', emoji_name: '+1'},
                 },
             });
         });
