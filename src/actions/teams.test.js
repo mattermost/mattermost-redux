@@ -8,7 +8,7 @@ import fs from 'fs';
 import * as Actions from 'actions/teams';
 import {login} from 'actions/users';
 import {Client4} from 'client';
-import {General, RequestStatus} from 'constants';
+import {General, RequestStatus} from '../constants';
 import {GeneralTypes} from 'action_types';
 import TestHelper from 'test/test_helper';
 import configureStore from 'test/test_store';

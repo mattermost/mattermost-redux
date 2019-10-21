@@ -5,6 +5,16 @@ executors:
     docker:
       - image: circleci/node:11.3.0
 
+aliases:
+  - &restore_cache
+    restore_cache:
+      key: dependencies-{{ checksum "package-lock.json" }}
+  - &save_cache
+    save_cache:
+      key: dependencies-{{ checksum "package-lock.json" }}
+      paths:
+        - node_modules
+
 jobs:
   install:
     executor:
@@ -12,38 +22,26 @@ jobs:
     steps:
       - checkout
       - run: ls -la
-      - restore_cache:
-          keys:
-            - test-dependencies-{{ checksum "package.json" }}
-
-      - run: npm install --ignore-scripts
-      - run: npm run flow-typed install
+      - *restore_cache
+      - run: npm install
       - run: ls -la
-      - save_cache:
-          paths:
-            - node_modules
-            - flow-typed
-          key: test-dependencies-{{ checksum "package.json" }}
+      - *save_cache
 
   lint:
     executor:
       name: default
     steps:
       - checkout
-      - restore_cache:
-          keys:
-            - test-dependencies-{{ checksum "package.json" }}
+      - *restore_cache
       - run: npm run check
-      - run: npm run flow
+      - run: npm run tsc
 
   test:
     executor:
       name: default
     steps:
       - checkout
-      - restore_cache:
-          keys:
-            - test-dependencies-{{ checksum "package.json" }}
+      - *restore_cache
       - run: npm test
       - store_test_results:
           path: build/
