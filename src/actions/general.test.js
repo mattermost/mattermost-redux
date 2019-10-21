@@ -4,10 +4,10 @@
 import assert from 'assert';
 import nock from 'nock';
 
+import {FormattedError} from './helpers.ts';
 import {GeneralTypes} from 'action_types';
 import * as Actions from 'actions/general';
 import {Client4} from 'client';
-import {RequestStatus} from '../constants';
 
 import TestHelper from 'test/test_helper';
 import configureStore from 'test/test_store';
@@ -29,25 +29,35 @@ describe('Actions.General', () => {
     it('getPing - Invalid URL', async () => {
         const serverUrl = Client4.getUrl();
         Client4.setUrl('notarealurl');
-        await Actions.getPing(true)(store.dispatch, store.getState);
 
-        const {server} = store.getState().requests.general;
-        assert.ok(server.status === RequestStatus.FAILURE && server.error);
-        Client4.setUrl(serverUrl);
-    });
+        const pingError = new FormattedError(
+            'mobile.server_ping_failed',
+            'Cannot connect to the server. Please check your server URL and internet connection.'
+        );
 
-    it('getPing', async () => {
         nock(Client4.getBaseRoute()).
             get('/system/ping').
             query(true).
-            reply(200, {status: 'OK', version: '4.0.0'});
+            reply(401, {error: 'ping error', code: 401});
 
-        await Actions.getPing()(store.dispatch, store.getState);
+        const {error} = await Actions.getPing()(store.dispatch, store.getState);
+        Client4.setUrl(serverUrl);
+        assert.deepEqual(error, pingError);
+    });
 
-        const {server} = store.getState().requests.general;
-        if (server.status === RequestStatus.FAILURE) {
-            throw new Error(JSON.stringify(server.error));
-        }
+    it('getPing', async () => {
+        const response = {
+            status: 'OK',
+            version: '4.0.0',
+        };
+
+        nock(Client4.getBaseRoute()).
+            get('/system/ping').
+            query(true).
+            reply(200, response);
+
+        const {data} = await Actions.getPing()(store.dispatch, store.getState);
+        assert.deepEqual(data, response);
     });
 
     it('getClientConfig', async () => {
@@ -57,11 +67,6 @@ describe('Actions.General', () => {
             reply(200, {Version: '4.0.0', BuildNumber: '3', BuildDate: 'Yesterday', BuildHash: '1234'});
 
         await Actions.getClientConfig()(store.dispatch, store.getState);
-
-        const configRequest = store.getState().requests.general.config;
-        if (configRequest.status === RequestStatus.FAILURE) {
-            throw new Error(JSON.stringify(configRequest.error));
-        }
 
         const clientConfig = store.getState().entities.general.config;
 
@@ -79,11 +84,6 @@ describe('Actions.General', () => {
             reply(200, {IsLicensed: 'false'});
 
         await Actions.getLicenseConfig()(store.dispatch, store.getState);
-
-        const licenseRequest = store.getState().requests.general.license;
-        if (licenseRequest.status === RequestStatus.FAILURE) {
-            throw new Error(JSON.stringify(licenseRequest.error));
-        }
 
         const licenseConfig = store.getState().entities.general.license;
 
@@ -133,27 +133,6 @@ describe('Actions.General', () => {
     });
 
     describe('getRedirectLocation', () => {
-        it('new server', async () => {
-            store.dispatch({type: GeneralTypes.RECEIVED_SERVER_VERSION, data: '5.3.0'});
-
-            const mock = nock(Client4.getBaseRoute()).
-                get('/redirect_location').
-                query({url: 'http://examp.le'}).
-                reply(200, '{"location": "https://example.com"}');
-
-            let requestStatus = store.getState().requests.general.redirectLocation.status;
-            assert.equal(requestStatus, RequestStatus.NOT_STARTED);
-
-            // Should have followed the link
-            const result = await store.dispatch(Actions.getRedirectLocation('http://examp.le'));
-            assert.deepEqual(result.data, {location: 'https://example.com'});
-
-            requestStatus = store.getState().requests.general.redirectLocation.status;
-            assert.equal(requestStatus, RequestStatus.SUCCESS);
-
-            assert.equal(mock.isDone(), true);
-        });
-
         it('old server', async () => {
             store.dispatch({type: GeneralTypes.RECEIVED_SERVER_VERSION, data: '5.0.0'});
 
@@ -161,15 +140,9 @@ describe('Actions.General', () => {
                 get('/redirect_location').
                 reply(404);
 
-            let requestStatus = store.getState().requests.general.redirectLocation.status;
-            assert.equal(requestStatus, RequestStatus.NOT_STARTED);
-
             // Should return the original link
             const result = await store.dispatch(Actions.getRedirectLocation('http://examp.le'));
             assert.deepEqual(result.data, {location: 'http://examp.le'});
-
-            requestStatus = store.getState().requests.general.redirectLocation.status;
-            assert.equal(requestStatus, RequestStatus.SUCCESS);
 
             // Should not call the API on an old server
             assert.equal(mock.isDone(), false);
