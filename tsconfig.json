@@ -1,0 +1,53 @@
+{
+    "include": ["src"],
+    "exclude": ["node_modules", "build"],
+    "typeAcquisition": {
+        "enable": true
+    },
+    "compilerOptions": {
+        "target": "es5",
+        "module": "commonjs",
+        "lib": ["dom", "esnext"],
+        "allowJs": false,
+        "importHelpers": true,
+        "declaration": true,
+        "sourceMap": true,
+        "rootDir": "./src",
+        "outDir": "./",
+        "strict": false,
+        "noEmit": false,
+        "noImplicitAny": false,
+        "strictNullChecks": true,
+        "strictFunctionTypes": false,
+        "strictPropertyInitialization": true,
+        "noImplicitThis": false,
+        "alwaysStrict": true,
+        "noUnusedLocals": false,
+        "downlevelIteration": true,
+        "noUnusedParameters": false,
+        "noImplicitReturns": true,
+        "noFallthroughCasesInSwitch": true,
+        "moduleResolution": "node",
+        "baseUrl": "./",
+        "paths": {
+            "utils/*": ["src/utils/*"],
+            "types/*": ["src/types/*"],
+            "constants/*": ["src/constants/*"],
+            "client": ["src/client"],
+            "selectors/*": ["src/selectors/*"],
+            "store/*": ["src/store/*"],
+            "action_types": ["src/action_types"],
+            "actions/*": ["src/action_types/*"],
+            "test/*": ["test/*"],
+            "*": ["src/*","node_modules/*"]
+        },
+        "plugins": [
+            {
+                "transform": "@zerollup/ts-transform-paths",
+                "exclude": ["*"]
+            }
+        ],
+        "jsx": "react",
+        "esModuleInterop": true
+    }
+}

@@ -14,7 +14,7 @@ import * as TeamActions from 'actions/teams';
 import * as UserActions from 'actions/users';
 
 import {Client4} from 'client';
-import {General, Posts, RequestStatus, WebsocketEvents} from 'constants';
+import {General, Posts, RequestStatus, WebsocketEvents} from '../constants';
 import {
     PostTypes,
     TeamTypes,

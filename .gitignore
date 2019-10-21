@@ -47,3 +47,16 @@ mattermost-redux-*.tgz
 
 # test coverage
 coverage
+/.rts2_cache_cjs/
+/.rts2_cache_esm/
+/dist/
+/build/
+/tsconfig.tsbuildinfo
+junit.xml
+index.d.ts
+index.js
+index.js.map
+mattermost.client4.js
+mattermost.client4.js.map
+mattermost.websocket_client.js
+mattermost.websocket_client.js.map

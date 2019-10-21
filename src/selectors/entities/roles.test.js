@@ -6,7 +6,8 @@ import assert from 'assert';
 import deepFreezeAndThrowOnMutation from 'utils/deep_freeze';
 import TestHelper from 'test/test_helper';
 import * as Selectors from 'selectors/entities/roles';
-import {General} from 'constants';
+import {General} from '../../constants';
+import {getMySystemPermissions, getMySystemRoles, getRoles} from 'selectors/entities/roles_helpers';
 
 describe('Selectors.Roles', () => {
     const team1 = TestHelper.fakeTeamWithId();
@@ -140,7 +141,7 @@ describe('Selectors.Roles', () => {
             channel: channelsRoles,
         };
         assert.deepEqual(Selectors.getMyRoles(testState), myRoles);
-        assert.deepEqual(Selectors.getMySystemRoles(testState), myRoles.system);
+        assert.deepEqual(getMySystemRoles(testState), myRoles.system);
         assert.deepEqual(Selectors.getMyTeamRoles(testState), myRoles.team);
         assert.deepEqual(Selectors.getMyChannelRoles(testState), myRoles.channel);
     });
@@ -157,11 +158,11 @@ describe('Selectors.Roles', () => {
             test_channel_c_role2: {permissions: ['channel_c_role2']},
             test_user_role2: {permissions: ['user_role2']},
         };
-        assert.deepEqual(Selectors.getRoles(testState), loadedRoles);
+        assert.deepEqual(getRoles(testState), loadedRoles);
     });
 
     it('should return my system permission on getMySystemPermissions', () => {
-        assert.deepEqual(Selectors.getMySystemPermissions(testState), new Set([
+        assert.deepEqual(getMySystemPermissions(testState), new Set([
             'user_role2',
         ]));
     });

@@ -9,7 +9,7 @@ import {addUserToTeam} from 'actions/teams';
 import {getProfilesByIds, login} from 'actions/users';
 import {createIncomingHook, createOutgoingHook} from 'actions/integrations';
 import {Client4} from 'client';
-import {General, RequestStatus, Preferences} from 'constants';
+import {General, RequestStatus, Preferences} from '../constants';
 import {getPreferenceKey} from 'utils/preference_utils';
 import TestHelper from 'test/test_helper';
 import configureStore from 'test/test_store';

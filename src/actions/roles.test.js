@@ -6,7 +6,7 @@ import nock from 'nock';
 
 import * as Actions from 'actions/roles';
 import {Client4} from 'client';
-import {RequestStatus} from 'constants';
+import {RequestStatus} from '../constants';
 
 import TestHelper from 'test/test_helper';
 import configureStore from 'test/test_store';

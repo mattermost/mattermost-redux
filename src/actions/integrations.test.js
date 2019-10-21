@@ -8,7 +8,7 @@ import * as Actions from 'actions/integrations';
 import * as TeamsActions from 'actions/teams';
 import {Client4} from 'client';
 
-import {RequestStatus} from 'constants';
+import {RequestStatus} from '../constants';
 import TestHelper from 'test/test_helper';
 import configureStore from 'test/test_store';
 
