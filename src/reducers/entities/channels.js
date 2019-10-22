@@ -311,7 +311,7 @@ function myMembers(state = {}, action) {
     }
 }
 
-function membersInChannel(state = {}, action) {
+export function membersInChannel(state = {}, action) {
     switch (action.type) {
     case ChannelTypes.RECEIVED_MY_CHANNEL_MEMBER:
     case ChannelTypes.RECEIVED_CHANNEL_MEMBER: {
@@ -352,7 +352,7 @@ function membersInChannel(state = {}, action) {
         if (action.data) {
             const data = action.data;
             const members = {...(state[data.id] || {})};
-            if (members) {
+            if (state[data.id]) {
                 Reflect.deleteProperty(members, data.user_id);
                 return {
                     ...state,
