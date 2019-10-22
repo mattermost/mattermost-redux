@@ -347,6 +347,7 @@ function membersInChannel(state = {}, action) {
         return nextState;
     }
     case ChannelTypes.LEAVE_CHANNEL:
+    case ChannelTypes.REMOVE_MEMBER_FROM_CHANNEL:
     case UserTypes.RECEIVED_PROFILE_NOT_IN_CHANNEL: {
         if (action.data) {
             const data = action.data;
