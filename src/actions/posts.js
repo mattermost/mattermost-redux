@@ -7,7 +7,7 @@ import {Client4} from 'client';
 import {General, Preferences, Posts, WebsocketEvents} from 'constants';
 import {PostTypes, ChannelTypes, FileTypes, IntegrationTypes} from 'action_types';
 
-import {getCurrentChannelId, getMyChannelMember as getMyChannelMemberSelector} from 'selectors/entities/channels';
+import {getCurrentChannelId, getMyChannelMember as getMyChannelMemberSelector, isManuallyUnread} from 'selectors/entities/channels';
 import {getCustomEmojisByName as selectCustomEmojisByName} from 'selectors/entities/emojis';
 import {getConfig} from 'selectors/entities/general';
 import * as Selectors from 'selectors/entities/posts';
@@ -1204,7 +1204,7 @@ function completePostReceive(post, websocketMessageProps) {
     };
 }
 
-function lastPostActions(post, websocketMessageProps) {
+export function lastPostActions(post, websocketMessageProps) {
     return async (dispatch, getState) => {
         const state = getState();
         const actions = [
@@ -1219,7 +1219,7 @@ function lastPostActions(post, websocketMessageProps) {
             },
         ];
 
-        dispatch(batchActions(actions));
+        await dispatch(batchActions(actions));
 
         if (shouldIgnorePost(post)) {
             return;
@@ -1227,23 +1227,25 @@ function lastPostActions(post, websocketMessageProps) {
 
         let markAsRead = false;
         let markAsReadOnServer = false;
-        if (
-            post.user_id === getCurrentUserId(state) &&
-            !isSystemMessage(post) &&
-            !isFromWebhook(post)
-        ) {
-            markAsRead = true;
-            markAsReadOnServer = false;
-        } else if (post.channel_id === getCurrentChannelId(state)) {
-            markAsRead = true;
-            markAsReadOnServer = true;
+        if (!isManuallyUnread(getState(), post.channel_id)) {
+            if (
+                post.user_id === getCurrentUserId(state) &&
+                !isSystemMessage(post) &&
+                !isFromWebhook(post)
+            ) {
+                markAsRead = true;
+                markAsReadOnServer = false;
+            } else if (post.channel_id === getCurrentChannelId(state)) {
+                markAsRead = true;
+                markAsReadOnServer = true;
+            }
         }
 
         if (markAsRead) {
-            dispatch(markChannelAsRead(post.channel_id, null, markAsReadOnServer));
-            dispatch(markChannelAsViewed(post.channel_id));
+            await dispatch(markChannelAsRead(post.channel_id, null, markAsReadOnServer));
+            await dispatch(markChannelAsViewed(post.channel_id));
         } else {
-            dispatch(markChannelAsUnread(websocketMessageProps.team_id, post.channel_id, websocketMessageProps.mentions));
+            await dispatch(markChannelAsUnread(websocketMessageProps.team_id, post.channel_id, websocketMessageProps.mentions));
         }
     };
 }

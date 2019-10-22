@@ -778,7 +778,7 @@ export function viewChannel(channelId: string, prevChannelId: string = ''): Acti
 }
 
 export function markChannelAsViewed(channelId: string, prevChannelId: string = ''): ActionFunc {
-    return async (dispatch, getState) => {
+    return (dispatch, getState) => {
         const actions = [];
 
         const {myMembers} = getState().entities.channels;
@@ -809,7 +809,7 @@ export function markChannelAsViewed(channelId: string, prevChannelId: string = '
         }
 
         if (actions.length) {
-            dispatch(batchActions(actions), getState);
+            dispatch(batchActions(actions));
         }
 
         return {data: true};

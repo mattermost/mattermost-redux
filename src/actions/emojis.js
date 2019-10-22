@@ -70,13 +70,13 @@ export function getCustomEmojiByName(name: string): ActionFunc {
 }
 
 export function getCustomEmojisByName(names: Array<string>): ActionFunc {
-    return async (dispatch, getState) => {
+    return async (dispatch) => {
         if (!names || names.length === 0) {
             return {data: true};
         }
 
         const promises = [];
-        names.forEach((name) => promises.push(getCustomEmojiByName(name)(dispatch, getState)));
+        names.forEach((name) => promises.push(dispatch(getCustomEmojiByName(name))));
 
         await Promise.all(promises);
         return {data: true};
