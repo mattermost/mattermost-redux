@@ -31,6 +31,6 @@ type Action = GenericAction | Thunk | BatchAction
 
 export type ActionResult = {|data: any|} | {|error: any|};
 export type DispatchFunc = (Action, ?GetStateFunc) => Promise<ActionResult>;
-export type ActionFunc = (DispatchFunc, GetStateFunc) => Promise<ActionResult>;
+export type ActionFunc = (DispatchFunc, GetStateFunc) => (Promise<ActionResult> | ActionResult);
 
 export type PlatformType = 'web' | 'ios' | 'android'
