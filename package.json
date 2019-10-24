@@ -8,6 +8,9 @@
   "bugs": {
     "url": "https://github.com/mattermost/mattermost-redux/issues"
   },
+  "files": [
+    "rollup.config.js"
+  ],
   "scripts": {
     "start": "ttsc --watch",
     "build": "cross-env NODE_ENV=production ttsc && cross-env NODE_ENV=production rollup -c",
