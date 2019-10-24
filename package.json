@@ -9,7 +9,16 @@
     "url": "https://github.com/mattermost/mattermost-redux/issues"
   },
   "files": [
-    "rollup.config.js"
+    "action_types",
+    "actions",
+    "client",
+    "constants",
+    "reducers",
+    "rollup.config.js",
+    "selectors",
+    "store",
+    "types",
+    "utils"
   ],
   "scripts": {
     "start": "ttsc --watch",
