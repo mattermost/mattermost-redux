@@ -4,7 +4,7 @@
 import {ChannelTypes} from 'action_types';
 import deepFreeze from 'utils/deep_freeze';
 
-import * as Reducers from './channels';
+import channelsReducer, * as Reducers from './channels';
 
 describe('channels', () => {
     describe('RECEIVED_CHANNEL_DELETED', () => {
@@ -159,15 +159,24 @@ describe('channels', () => {
     describe('REMOVE_MEMBER_FROM_CHANNEL', () => {
         test('should remove the channel member', () => {
             const state = deepFreeze({
-                channel1: {
-                    memberId1: 'member-data-1',
-                },
-                channel2: {
-                    memberId2: 'member-data-2',
+                channels: {},
+                channelsInTeam: {},
+                currentChannelId: '',
+                groupsAssociatedToChannel: {},
+                myMembers: {},
+                stats: {},
+                totalCount: 0,
+                membersInChannel: {
+                    channel1: {
+                        memberId1: 'member-data-1',
+                    },
+                    channel2: {
+                        memberId2: 'member-data-2',
+                    },
                 },
             });
 
-            const nextState = Reducers.membersInChannel(state, {
+            const nextState = channelsReducer(state, {
                 type: ChannelTypes.REMOVE_MEMBER_FROM_CHANNEL,
                 data: {
                     id: 'channel2',
@@ -175,21 +184,30 @@ describe('channels', () => {
                 },
             });
 
-            expect(nextState.channel2).toEqual({});
-            expect(nextState.channel1).toEqual(state.channel1);
+            expect(nextState.membersInChannel.channel2).toEqual({});
+            expect(nextState.membersInChannel.channel1).toEqual(state.membersInChannel.channel1);
         });
 
         test('should work when channel member doesn\'t exist', () => {
             const state = deepFreeze({
-                channel1: {
-                    memberId1: 'member-data-1',
-                },
-                channel2: {
-                    memberId2: 'member-data-2',
+                channels: {},
+                channelsInTeam: {},
+                currentChannelId: '',
+                groupsAssociatedToChannel: {},
+                myMembers: {},
+                stats: {},
+                totalCount: 0,
+                membersInChannel: {
+                    channel1: {
+                        memberId1: 'member-data-1',
+                    },
+                    channel2: {
+                        memberId2: 'member-data-2',
+                    },
                 },
             });
 
-            const nextState = Reducers.membersInChannel(state, {
+            const nextState = channelsReducer(state, {
                 type: ChannelTypes.REMOVE_MEMBER_FROM_CHANNEL,
                 data: {
                     id: 'channel2',
@@ -202,15 +220,24 @@ describe('channels', () => {
 
         test('should work when channel doesn\'t exist', () => {
             const state = deepFreeze({
-                channel1: {
-                    memberId1: 'member-data-1',
-                },
-                channel2: {
-                    memberId2: 'member-data-2',
+                channels: {},
+                channelsInTeam: {},
+                currentChannelId: '',
+                groupsAssociatedToChannel: {},
+                myMembers: {},
+                stats: {},
+                totalCount: 0,
+                membersInChannel: {
+                    channel1: {
+                        memberId1: 'member-data-1',
+                    },
+                    channel2: {
+                        memberId2: 'member-data-2',
+                    },
                 },
             });
 
-            const nextState = Reducers.membersInChannel(state, {
+            const nextState = channelsReducer(state, {
                 type: ChannelTypes.REMOVE_MEMBER_FROM_CHANNEL,
                 data: {
                     id: 'channel3',

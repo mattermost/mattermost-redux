@@ -310,7 +310,7 @@ function myMembers(state = {}, action) {
     }
 }
 
-export function membersInChannel(state = {}, action) {
+function membersInChannel(state = {}, action) {
     switch (action.type) {
     case ChannelTypes.RECEIVED_MY_CHANNEL_MEMBER:
     case ChannelTypes.RECEIVED_CHANNEL_MEMBER: {
