@@ -36,7 +36,7 @@ function currentChannelId(state = '', action) {
     }
 }
 
-export function channels(state = {}, action) {
+function channels(state = {}, action) {
     switch (action.type) {
     case ChannelTypes.RECEIVED_CHANNEL:
         if (state[action.data.id] && action.data.type === General.DM_CHANNEL) {
