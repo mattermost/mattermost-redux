@@ -155,4 +155,70 @@ describe('channels', () => {
             expect(nextState).toBe(state);
         });
     });
+
+    describe('REMOVE_MEMBER_FROM_CHANNEL', () => {
+        test('should remove the channel member', () => {
+            const state = deepFreeze({
+                channel1: {
+                    memberId1: 'member-data-1',
+                },
+                channel2: {
+                    memberId2: 'member-data-2',
+                },
+            });
+
+            const nextState = Reducers.membersInChannel(state, {
+                type: ChannelTypes.REMOVE_MEMBER_FROM_CHANNEL,
+                data: {
+                    id: 'channel2',
+                    user_id: 'memberId2',
+                },
+            });
+
+            expect(nextState.channel2).toEqual({});
+            expect(nextState.channel1).toEqual(state.channel1);
+        });
+
+        test('should work when channel member doesn\'t exist', () => {
+            const state = deepFreeze({
+                channel1: {
+                    memberId1: 'member-data-1',
+                },
+                channel2: {
+                    memberId2: 'member-data-2',
+                },
+            });
+
+            const nextState = Reducers.membersInChannel(state, {
+                type: ChannelTypes.REMOVE_MEMBER_FROM_CHANNEL,
+                data: {
+                    id: 'channel2',
+                    user_id: 'test',
+                },
+            });
+
+            expect(nextState).toEqual(state);
+        });
+
+        test('should work when channel doesn\'t exist', () => {
+            const state = deepFreeze({
+                channel1: {
+                    memberId1: 'member-data-1',
+                },
+                channel2: {
+                    memberId2: 'member-data-2',
+                },
+            });
+
+            const nextState = Reducers.membersInChannel(state, {
+                type: ChannelTypes.REMOVE_MEMBER_FROM_CHANNEL,
+                data: {
+                    id: 'channel3',
+                    user_id: 'memberId2',
+                },
+            });
+
+            expect(nextState).toEqual(state);
+        });
+    });
 });
