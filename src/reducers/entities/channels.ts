@@ -36,7 +36,7 @@ function currentChannelId(state = '', action) {
     }
 }
 
-export function channels(state = {}, action) {
+function channels(state = {}, action) {
     switch (action.type) {
     case ChannelTypes.RECEIVED_CHANNEL:
         if (state[action.data.id] && action.data.type === General.DM_CHANNEL) {
@@ -310,7 +310,7 @@ function myMembers(state = {}, action) {
     }
 }
 
-export function membersInChannel(state = {}, action) {
+function membersInChannel(state = {}, action) {
     switch (action.type) {
     case ChannelTypes.RECEIVED_MY_CHANNEL_MEMBER:
     case ChannelTypes.RECEIVED_CHANNEL_MEMBER: {
