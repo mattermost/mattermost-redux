@@ -3,7 +3,7 @@
 
 import assert from 'assert';
 
-import {General, Users} from 'constants';
+import {General, Users} from '../constants';
 import TestHelper from 'test/test_helper';
 
 import {

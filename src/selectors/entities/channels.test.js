@@ -7,7 +7,7 @@ import deepFreezeAndThrowOnMutation from 'utils/deep_freeze';
 import TestHelper from 'test/test_helper';
 import {sortChannelsByDisplayName, getDirectChannelName} from 'utils/channel_utils';
 import * as Selectors from 'selectors/entities/channels';
-import {General, Preferences} from 'constants';
+import {General, Preferences} from '../../constants';
 
 describe('Selectors.Channels', () => {
     const team1 = TestHelper.fakeTeamWithId();

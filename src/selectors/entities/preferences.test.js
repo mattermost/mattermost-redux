@@ -3,7 +3,7 @@
 
 import assert from 'assert';
 
-import {General, Preferences} from 'constants';
+import {General, Preferences} from '../../constants';
 
 import * as Selectors from 'selectors/entities/preferences';
 

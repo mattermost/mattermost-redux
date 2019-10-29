@@ -3,7 +3,7 @@
 
 import assert from 'assert';
 
-import {Preferences} from 'constants';
+import {Preferences} from '../constants';
 import {getEmailInterval} from 'utils/notify_props';
 
 describe('user utils', () => {
