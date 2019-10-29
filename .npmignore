@@ -4,7 +4,6 @@ test
 ISSUE_TEMPLATE.md
 Makefile
 PULL_REQUEST_TEMPLATE.md
-.eslintrc.json
 .gitattributes
 .gitignore
 .npmignore
