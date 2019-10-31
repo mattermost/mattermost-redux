@@ -198,7 +198,7 @@ function recent(state = {}, action) {
     case SearchTypes.RECEIVED_SEARCH_TERM: {
         const nextState = {...state};
         const {teamId, params} = data;
-        const {terms, isOrSearch} = params || {};
+        const {terms, isOrSearch} = (params || {}) as any;
         const team = [...(nextState[teamId] || [])];
         const index = team.findIndex((r) => r.terms === terms);
         if (index === -1) {
