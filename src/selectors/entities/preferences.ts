@@ -1,6 +1,6 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
-import {createSelector} from 'reselect';
+import * as reselect from 'reselect';
 import {General, Preferences} from '../../constants';
 import {getConfig} from 'selectors/entities/general';
 import {getCurrentTeamId} from 'selectors/entities/teams';
@@ -34,7 +34,7 @@ export function getInt(state, category, name, defaultValue = 0) {
 }
 
 export function makeGetCategory() {
-    return createSelector(
+    return reselect.createSelector(
         getMyPreferences,
         (state, category) => category,
         (preferences, category) => {
@@ -71,21 +71,21 @@ export function getFavoritesPreferences(state) {
     return favorites.filter((f) => f.value === 'true').map((f) => f.name);
 }
 
-export const getVisibleTeammate = createSelector(
+export const getVisibleTeammate = reselect.createSelector(
     getDirectShowPreferences,
     (direct) => {
         return direct.filter((dm) => dm.value === 'true' && dm.name).map((dm) => dm.name);
     }
 );
 
-export const getVisibleGroupIds = createSelector(
+export const getVisibleGroupIds = reselect.createSelector(
     getGroupShowPreferences,
     (groups) => {
         return groups.filter((dm) => dm.value === 'true' && dm.name).map((dm) => dm.name);
     }
 );
 
-export const getTeammateNameDisplaySetting = createSelector(
+export const getTeammateNameDisplaySetting = reselect.createSelector(
     getConfig,
     getMyPreferences,
     (config, preferences) => {
@@ -99,7 +99,7 @@ export const getTeammateNameDisplaySetting = createSelector(
     }
 );
 
-const getThemePreference = createSelector(
+const getThemePreference = reselect.createSelector(
     getMyPreferences,
     getCurrentTeamId,
     (myPreferences, currentTeamId) => {
@@ -118,7 +118,7 @@ const getThemePreference = createSelector(
     }
 );
 
-const getDefaultTheme = createSelector(getConfig, (config) => {
+const getDefaultTheme = reselect.createSelector(getConfig, (config) => {
     if (config.DefaultTheme) {
         const theme = Preferences.THEMES[config.DefaultTheme];
         if (theme) {
@@ -177,7 +177,7 @@ export const getTheme = createShallowSelector(
 );
 
 export function makeGetStyleFromTheme() {
-    return createSelector(
+    return reselect.createSelector(
         getTheme,
         (state, getStyleFromTheme) => getStyleFromTheme,
         (theme, getStyleFromTheme) => {
@@ -193,7 +193,7 @@ const defaultSidebarPrefs = {
     sorting: 'alpha',
 };
 
-export const getSidebarPreferences = createSelector(
+export const getSidebarPreferences = reselect.createSelector(
     (state: GlobalState) => {
         const config = getConfig(state);
         return config.ExperimentalGroupUnreadChannels !== General.DISABLED && getBool(

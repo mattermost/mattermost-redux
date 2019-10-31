@@ -16,7 +16,7 @@ import {fromAutoResponder} from 'utils/post_utils';
 import EventEmitter from 'utils/event_emitter';
 import {getMyPreferences} from './preferences';
 
-import {ActionFunc, DispatchFunc, GetStateFunc, PlatformType} from '../types/actions';
+import {ActionFunc, DispatchFunc, GetStateFunc, PlatformType} from 'types/actions';
 
 import {getTeam, getMyTeamUnreads, getMyTeams, getMyTeamMembers} from './teams';
 import {getPost, getPosts, getProfilesAndStatusesForPosts, getCustomEmojiForReaction, handleNewPost, postDeleted, receivedPost} from './posts';
