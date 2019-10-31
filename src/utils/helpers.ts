@@ -1,6 +1,6 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
-import {createSelectorCreator, defaultMemoize} from 'reselect';
+import * as reselect from 'reselect';
 import shallowEqual from 'shallow-equals';
 export function memoizeResult<F extends Function>(func: F): any {
     let lastArgs: IArguments|null = null;
@@ -23,10 +23,10 @@ export function memoizeResult<F extends Function>(func: F): any {
 
 // Use this selector when you want a shallow comparison of the arguments and you want to memoize the result
 // try and use this only when your selector returns an array of ids
-export const createIdsSelector = createSelectorCreator(memoizeResult);
+export const createIdsSelector = reselect.createSelectorCreator(memoizeResult);
 
 // Use this selector when you want a shallow comparison of the arguments and you don't need to memoize the result
-export const createShallowSelector = createSelectorCreator(defaultMemoize, shallowEqual);
+export const createShallowSelector = reselect.createSelectorCreator(reselect.defaultMemoize, shallowEqual);
 
 // isMinimumServerVersion will return true if currentVersion is equal to higher or than the
 // the provided minimum version. A non-equal major version will ignore minor and dot
