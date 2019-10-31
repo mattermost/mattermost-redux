@@ -7,11 +7,13 @@ import {getCurrentUserLocale} from 'selectors/entities/i18n';
 
 import {sortFileInfos} from 'utils/file_utils';
 
-function getAllFiles(state) {
+import * as types from 'types';
+
+function getAllFiles(state: types.store.GlobalState) {
     return state.entities.files.files;
 }
 
-function getFilesIdsForPost(state, postId) {
+function getFilesIdsForPost(state: types.store.GlobalState, postId: string) {
     if (postId) {
         return state.entities.files.fileIdsByPostId[postId] || [];
     }

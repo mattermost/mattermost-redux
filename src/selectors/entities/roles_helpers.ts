@@ -3,13 +3,13 @@
 import * as reselect from 'reselect';
 import {GlobalState} from 'types/store';
 import {getCurrentUser} from 'selectors/entities/common';
-import {UserProfile} from 'types/users';
+import * as types from 'types';
 
 export function getRoles(state: GlobalState) {
     return state.entities.roles.roles;
 }
 
-export const getMySystemRoles = reselect.createSelector(getCurrentUser, (user: UserProfile) => {
+export const getMySystemRoles = reselect.createSelector(getCurrentUser, (user: types.users.UserProfile) => {
     if (user) {
         return new Set<string>(user.roles.split(' '));
     }

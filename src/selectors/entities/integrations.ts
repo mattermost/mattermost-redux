@@ -4,25 +4,25 @@
 import * as reselect from 'reselect';
 
 import {getCurrentTeamId} from 'selectors/entities/teams';
-import {GlobalState} from 'types/store';
+import * as types from 'types';
 
-export function getIncomingHooks(state: GlobalState) {
+export function getIncomingHooks(state: types.store.GlobalState) {
     return state.entities.integrations.incomingHooks;
 }
 
-export function getOutgoingHooks(state: GlobalState) {
+export function getOutgoingHooks(state: types.store.GlobalState) {
     return state.entities.integrations.outgoingHooks;
 }
 
-export function getCommands(state: GlobalState) {
+export function getCommands(state: types.store.GlobalState) {
     return state.entities.integrations.commands;
 }
 
-export function getOAuthApps(state: GlobalState) {
+export function getOAuthApps(state: types.store.GlobalState) {
     return state.entities.integrations.oauthApps;
 }
 
-export function getSystemCommands(state: GlobalState) {
+export function getSystemCommands(state: types.store.GlobalState) {
     return state.entities.integrations.systemCommands;
 }
 

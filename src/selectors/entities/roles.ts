@@ -3,7 +3,7 @@
 import * as reselect from 'reselect';
 import {getCurrentUser, getCurrentChannelId} from 'selectors/entities/common';
 import {getTeamMemberships, getCurrentTeamId} from './teams';
-import {GlobalState} from 'types/store';
+import * as types from 'types';
 import {getMySystemPermissions, getMySystemRoles, getRoles} from 'selectors/entities/roles_helpers';
 
 export {getMySystemPermissions, getMySystemRoles, getRoles};
@@ -24,7 +24,7 @@ export const getMyTeamRoles = reselect.createSelector(
 );
 
 export const getMyChannelRoles = reselect.createSelector(
-    (state: GlobalState) => state.entities.channels.myMembers,
+    (state: types.store.GlobalState) => state.entities.channels.myMembers,
     (channelsMemberships) => {
         const roles = {};
         if (channelsMemberships) {
