@@ -62,6 +62,7 @@ import type {
     GetStateFunc,
     PlatformType,
 } from '../types/actions';
+import {getMyPreferences} from './preferences';
 
 let doDispatch;
 
@@ -147,6 +148,7 @@ export function doFirstConnect(now: number) {
 
 export function doReconnect(now: number) {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
+        await dispatch(getMyPreferences());
         const state = getState();
         const currentTeamId = getCurrentTeamId(state);
         const currentChannelId = getCurrentChannelId(state);
