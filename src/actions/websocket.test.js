@@ -10,7 +10,6 @@ import configureMockStore from 'redux-mock-store';
 import * as Actions from 'actions/websocket';
 import * as ChannelActions from 'actions/channels';
 import * as PostActions from 'actions/posts';
-import * as PreferenceActions from 'actions/preferences';
 import * as TeamActions from 'actions/teams';
 import * as UserActions from 'actions/users';
 
@@ -480,7 +479,6 @@ describe('Actions.Websocket doReconnect', () => {
     const MOCK_GET_POSTS = 'MOCK_GET_POSTS';
     const MOCK_CHANNELS_REQUEST = 'MOCK_CHANNELS_REQUEST';
     const MOCK_CHECK_FOR_MODIFIED_USERS = 'MOCK_CHECK_FOR_MODIFIED_USERS';
-    const MOCK_GET_PREFERENCES = 'MOCK_GET_PREFERENCES';
 
     beforeAll(() => {
         UserActions.getStatusesByIds = jest.fn().mockReturnValue({
@@ -534,13 +532,6 @@ describe('Actions.Websocket doReconnect', () => {
         nock(Client4.getBaseRoute()).
             get('/users/ids').
             reply(200, []);
-
-        PreferenceActions.getMyPreferences = jest.fn().mockReturnValue({
-            type: MOCK_GET_PREFERENCES,
-        });
-        nock(Client4.getBaseRoute()).
-            get('/users/me/preferences').
-            reply(200, []);
     });
 
     it('handle doReconnect', async () => {
@@ -548,7 +539,6 @@ describe('Actions.Websocket doReconnect', () => {
 
         const timestamp = 1000;
         const expectedActions = [
-            {type: MOCK_GET_PREFERENCES},
             {type: MOCK_GET_STATUSES_BY_IDS},
             {type: MOCK_MY_TEAM_UNREADS},
             {type: MOCK_GET_MY_TEAMS},
@@ -561,7 +551,7 @@ describe('Actions.Websocket doReconnect', () => {
 
         await testStore.dispatch(Actions.doReconnect(timestamp));
 
-        expect(testStore.getActions()).toEqual(expectedActions);
+        expect(testStore.getActions()).toEqual(expect.arrayContaining(expectedActions));
     });
 
     it('handle doReconnect after user left current team', async () => {
