@@ -2,9 +2,9 @@
 // See LICENSE.txt for license information.
 import {createSelector} from 'reselect';
 import {createIdsSelector} from 'utils/helpers';
-import {GlobalState} from 'mm_types/store';
-import {CustomEmoji} from 'mm_types/emojis';
-import {IDMappedObjects} from 'mm_types/utilities';
+import {GlobalState} from 'types/store';
+import {CustomEmoji} from 'types/emojis';
+import {IDMappedObjects} from 'types/utilities';
 export function getCustomEmojis(state: GlobalState): IDMappedObjects<CustomEmoji> {
     if (state.entities.general.config.EnableCustomEmoji !== 'true') {
         return {};

@@ -8,17 +8,17 @@ import {getChannelsIdForTeam, getChannelByName} from 'utils/channel_utils';
 import {getChannelsNameMapInTeam, getMyChannelMember as getMyChannelMemberSelector, getRedirectChannelNameForTeam} from 'selectors/entities/channels';
 import {getCurrentTeamId} from 'selectors/entities/teams';
 
-import {Action, ActionFunc, batchActions, DispatchFunc, GetStateFunc} from 'mm_types/actions';
+import {Action, ActionFunc, batchActions, DispatchFunc, GetStateFunc} from 'types/actions';
 
-import {Channel, ChannelNotifyProps, ChannelMembership} from 'mm_types/channels';
+import {Channel, ChannelNotifyProps, ChannelMembership} from 'types/channels';
 
-import {PreferenceType} from 'mm_types/preferences';
+import {PreferenceType} from 'types/preferences';
 
 import {logError} from './errors';
 import {bindClientFunc, forceLogoutIfNecessary} from './helpers';
 import {getMissingProfilesByIds} from './users';
 import {loadRolesIfNeeded} from './roles';
-import {UserProfile} from 'mm_types/users';
+import {UserProfile} from 'types/users';
 export function selectChannel(channelId: string) {
     return {
         type: ChannelTypes.SELECT_CHANNEL,

@@ -3,8 +3,8 @@
 import {combineReducers} from 'redux';
 import {PostTypes} from 'action_types';
 import {handleRequest, initialRequestState} from './helpers';
-import {GenericAction} from 'mm_types/actions';
-import {PostsRequestsStatuses, RequestStatusType} from 'mm_types/requests';
+import {GenericAction} from 'types/actions';
+import {PostsRequestsStatuses, RequestStatusType} from 'types/requests';
 
 function createPost(state: RequestStatusType = initialRequestState(), action: GenericAction): RequestStatusType {
     if (action.type === PostTypes.CREATE_POST_RESET_REQUEST) {

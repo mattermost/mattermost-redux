@@ -8,7 +8,7 @@ import * as constants from './constants';
 import * as reducers from './reducers';
 import * as selectors from './selectors';
 import store from './store';
-import * as types from './mm_types';
+import * as types from './types';
 import * as utils from './utils';
 
 export {action_types, actions, client, constants, reducers, selectors, store, types, utils};

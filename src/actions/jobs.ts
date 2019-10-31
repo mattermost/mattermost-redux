@@ -4,8 +4,8 @@ import {JobTypes} from 'action_types';
 import {Client4} from 'client';
 import {General} from '../constants';
 
-import {ActionFunc} from 'mm_types/actions';
-import {JobType, Job} from 'mm_types/jobs';
+import {ActionFunc} from 'types/actions';
+import {JobType, Job} from 'types/jobs';
 
 import {bindClientFunc} from './helpers';
 export function createJob(job: Job): ActionFunc {

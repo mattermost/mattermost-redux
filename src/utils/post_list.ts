@@ -10,7 +10,7 @@ import {getCurrentUser} from 'selectors/entities/users';
 import {createIdsSelector, memoizeResult} from 'utils/helpers';
 import {isUserActivityPost, shouldFilterJoinLeavePost} from 'utils/post_utils';
 import {getUserCurrentTimezone} from 'utils/timezone_utils';
-import {Post} from 'mm_types/posts';
+import {Post} from 'types/posts';
 export const COMBINED_USER_ACTIVITY = 'user-activity-';
 export const DATE_LINE = 'date-';
 export const START_OF_NEW_MESSAGES = 'start-of-new-messages';

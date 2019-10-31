@@ -3,7 +3,7 @@
 import {GifTypes} from 'action_types';
 import {Client4} from 'client';
 import gfycatSdk from 'utils/gfycat_sdk';
-import {ActionResult, DispatchFunc, GetStateFunc} from 'mm_types/actions';
+import {ActionResult, DispatchFunc, GetStateFunc} from 'types/actions';
 
 // APP PROPS
 

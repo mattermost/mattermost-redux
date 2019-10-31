@@ -9,9 +9,9 @@ import {getChannelAndMyMember, getChannelMembers} from './channels';
 import {forceLogoutIfNecessary} from './helpers';
 import {logError} from './errors';
 import {getProfilesAndStatusesForPosts, receivedPosts} from './posts';
-import {ActionResult, batchActions, DispatchFunc, GetStateFunc, ActionFunc} from 'mm_types/actions';
-import {RelationOneToOne} from 'mm_types/utilities';
-import {Post} from 'mm_types/posts';
+import {ActionResult, batchActions, DispatchFunc, GetStateFunc, ActionFunc} from 'types/actions';
+import {RelationOneToOne} from 'types/utilities';
+import {Post} from 'types/posts';
 const WEBAPP_SEARCH_PER_PAGE = 20;
 export function getMissingChannelsFromPosts(posts: RelationOneToOne<Post, Post>): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {

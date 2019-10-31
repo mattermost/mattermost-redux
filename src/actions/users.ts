@@ -1,8 +1,8 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
-import {Action, ActionFunc, ActionResult, batchActions, DispatchFunc, GetStateFunc} from 'mm_types/actions';
-import {UserProfile} from 'mm_types/users';
-import {TeamMembership} from 'mm_types/teams';
+import {Action, ActionFunc, ActionResult, batchActions, DispatchFunc, GetStateFunc} from 'types/actions';
+import {UserProfile} from 'types/users';
+import {TeamMembership} from 'types/teams';
 import {Client4} from 'client';
 import {General} from '../constants';
 import {UserTypes, TeamTypes, AdminTypes} from 'action_types';

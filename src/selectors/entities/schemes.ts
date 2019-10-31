@@ -5,10 +5,10 @@ import {ScopeTypes} from 'constants/schemes';
 import {createSelector} from 'reselect';
 import {getAllChannels} from 'selectors/entities/channels';
 import {getTeams} from 'selectors/entities/teams';
-import {GlobalState} from 'mm_types/store';
-import {Scheme} from 'mm_types/schemes';
-import {Channel} from 'mm_types/channels';
-import {Team} from 'mm_types/teams';
+import {GlobalState} from 'types/store';
+import {Scheme} from 'types/schemes';
+import {Channel} from 'types/channels';
+import {Team} from 'types/teams';
 export function getSchemes(state: GlobalState): {
     [x: string]: Scheme;
 } {

@@ -4,13 +4,13 @@ import {General, Preferences, Permissions, Users} from '../constants';
 
 import {hasNewPermissions} from 'selectors/entities/general';
 import {haveITeamPermission, haveIChannelPermission} from 'selectors/entities/roles';
-import {Channel, ChannelMembership, ChannelType, ChannelNotifyProps} from 'mm_types/channels';
-import {Post} from 'mm_types/posts';
-import {UserProfile, UsersState, UserNotifyProps} from 'mm_types/users';
-import {GlobalState} from 'mm_types/store';
-import {TeamMembership} from 'mm_types/teams';
-import {PreferenceType} from 'mm_types/preferences';
-import {RelationOneToOne, IDMappedObjects} from 'mm_types/utilities';
+import {Channel, ChannelMembership, ChannelType, ChannelNotifyProps} from 'types/channels';
+import {Post} from 'types/posts';
+import {UserProfile, UsersState, UserNotifyProps} from 'types/users';
+import {GlobalState} from 'types/store';
+import {TeamMembership} from 'types/teams';
+import {PreferenceType} from 'types/preferences';
+import {RelationOneToOne, IDMappedObjects} from 'types/utilities';
 
 import {getPreferencesByCategory} from './preference_utils';
 import {displayUsername} from './user_utils';

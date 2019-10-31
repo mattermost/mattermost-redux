@@ -3,8 +3,8 @@
 import {combineReducers} from 'redux';
 import {SchemeTypes} from 'action_types';
 
-import {GenericAction} from 'mm_types/actions';
-import {SchemesRequestsStatuses, RequestStatusType} from 'mm_types/requests';
+import {GenericAction} from 'types/actions';
+import {SchemesRequestsStatuses, RequestStatusType} from 'types/requests';
 
 import {handleRequest, initialRequestState} from './helpers';
 

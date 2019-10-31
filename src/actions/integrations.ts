@@ -7,9 +7,9 @@ import {getCurrentUserId} from 'selectors/entities/users';
 import {getCurrentChannelId} from 'selectors/entities/channels';
 import {getCurrentTeamId} from 'selectors/entities/teams';
 
-import {batchActions, DispatchFunc, GetStateFunc} from 'mm_types/actions';
+import {batchActions, DispatchFunc, GetStateFunc} from 'types/actions';
 
-import {Command, DialogSubmission, IncomingWebhook, OAuthApp, OutgoingWebhook} from 'mm_types/integrations';
+import {Command, DialogSubmission, IncomingWebhook, OAuthApp, OutgoingWebhook} from 'types/integrations';
 
 import {logError} from './errors';
 import {bindClientFunc, forceLogoutIfNecessary} from './helpers';

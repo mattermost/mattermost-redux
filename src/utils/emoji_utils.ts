@@ -1,7 +1,7 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
 import {Client4} from 'client';
-import {Emoji, SystemEmoji, CustomEmoji} from 'mm_types/emojis';
+import {Emoji, SystemEmoji, CustomEmoji} from 'types/emojis';
 export function getEmojiImageUrl(emoji: Emoji): string {
     if (emoji.id) {
         return Client4.getEmojiRoute(emoji.id) + '/image';

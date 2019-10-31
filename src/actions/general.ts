@@ -6,9 +6,9 @@ import {GeneralTypes} from 'action_types';
 
 import {getServerVersion} from 'selectors/entities/general';
 import {isMinimumServerVersion} from 'utils/helpers';
-import {GeneralState} from 'mm_types/general';
-import {logLevel} from 'mm_types/client4';
-import {GetStateFunc, DispatchFunc, ActionFunc, batchActions} from 'mm_types/actions';
+import {GeneralState} from 'types/general';
+import {logLevel} from 'types/client4';
+import {GetStateFunc, DispatchFunc, ActionFunc, batchActions} from 'types/actions';
 
 import {logError} from './errors';
 import {loadRolesIfNeeded} from './roles';

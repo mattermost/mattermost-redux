@@ -3,8 +3,8 @@
 import {ChannelTypes, GeneralTypes, PostTypes, UserTypes} from 'action_types';
 import {Posts} from '../../constants';
 import {comparePosts} from 'utils/post_utils';
-import {Post, PostsState} from 'mm_types/posts';
-import {RelationOneToOne, Dictionary} from 'mm_types/utilities';
+import {Post, PostsState} from 'types/posts';
+import {RelationOneToOne, Dictionary} from 'types/utilities';
 
 export function removeUnneededMetadata(post) {
     if (!post.metadata) {

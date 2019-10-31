@@ -2,8 +2,8 @@
 // See LICENSE.txt for license information.
 import {combineReducers} from 'redux';
 import {SchemeTypes, UserTypes} from 'action_types';
-import {GenericAction} from 'mm_types/actions';
-import {SchemesState, Scheme} from 'mm_types/schemes';
+import {GenericAction} from 'types/actions';
+import {SchemesState, Scheme} from 'types/schemes';
 
 function schemes(state: {
     [x: string]: Scheme;

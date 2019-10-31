@@ -7,8 +7,8 @@ import {haveISystemPermission} from 'selectors/entities/roles_helpers';
 import {createIdsSelector} from 'utils/helpers';
 import {isTeamAdmin} from 'utils/user_utils';
 import {sortTeamsWithLocale} from 'utils/team_utils';
-import {Team, TeamMembership} from 'mm_types/teams';
-import {GlobalState} from 'mm_types/store';
+import {Team, TeamMembership} from 'types/teams';
+import {GlobalState} from 'types/store';
 
 export function getCurrentTeamId(state: GlobalState) {
     return state.entities.teams.currentTeamId;

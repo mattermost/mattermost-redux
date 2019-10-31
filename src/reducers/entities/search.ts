@@ -3,7 +3,7 @@
 import {combineReducers} from 'redux';
 import {PostTypes, PreferenceTypes, SearchTypes, UserTypes} from 'action_types';
 import {Preferences} from '../../constants';
-import {PreferenceType} from 'mm_types/preferences';
+import {PreferenceType} from 'types/preferences';
 
 function results(state: Array<string> = [], action) {
     switch (action.type) {

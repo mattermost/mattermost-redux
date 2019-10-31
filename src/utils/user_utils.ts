@@ -2,8 +2,8 @@
 // See LICENSE.txt for license information.
 import {General, Preferences} from '../constants';
 import {localizeMessage} from 'utils/i18n_utils';
-import {UserProfile} from 'mm_types/users';
-import {IDMappedObjects, $ID} from 'mm_types/utilities';
+import {UserProfile} from 'types/users';
+import {IDMappedObjects, $ID} from 'types/utilities';
 export function getFullName(user: UserProfile): string {
     if (user.first_name && user.last_name) {
         return user.first_name + ' ' + user.last_name;

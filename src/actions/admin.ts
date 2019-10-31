@@ -4,9 +4,9 @@ import {AdminTypes} from 'action_types';
 import {General} from '../constants';
 import {Client4} from 'client';
 
-import {Action, ActionFunc, batchActions, DispatchFunc, GetStateFunc} from 'mm_types/actions';
-import {Job} from 'mm_types/jobs';
-import {GroupSearchOpts} from 'mm_types/groups';
+import {Action, ActionFunc, batchActions, DispatchFunc, GetStateFunc} from 'types/actions';
+import {Job} from 'types/jobs';
+import {GroupSearchOpts} from 'types/groups';
 
 import {bindClientFunc, forceLogoutIfNecessary} from './helpers';
 import {logError} from './errors';

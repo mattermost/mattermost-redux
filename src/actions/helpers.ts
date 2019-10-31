@@ -3,8 +3,8 @@
 import {Client4} from 'client';
 import {UserTypes} from 'action_types';
 
-import {Client4Error} from 'mm_types/client4';
-import {batchActions, Action, ActionFunc, GenericAction, DispatchFunc, GetStateFunc} from 'mm_types/actions';
+import {Client4Error} from 'types/client4';
+import {batchActions, Action, ActionFunc, GenericAction, DispatchFunc, GetStateFunc} from 'types/actions';
 
 import {logError} from './errors';
 type ActionType = string;

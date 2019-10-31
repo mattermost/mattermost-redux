@@ -7,9 +7,9 @@ import {getMyPreferences as getMyPreferencesSelector, makeGetCategory} from 'sel
 import {getCurrentUserId} from 'selectors/entities/users';
 import {getPreferenceKey} from 'utils/preference_utils';
 
-import {GetStateFunc, DispatchFunc, ActionFunc} from 'mm_types/actions';
+import {GetStateFunc, DispatchFunc, ActionFunc} from 'types/actions';
 
-import {PreferenceType} from 'mm_types/preferences';
+import {PreferenceType} from 'types/preferences';
 
 import {bindClientFunc} from './helpers';
 import {getProfilesByIds, getProfilesInChannel} from './users';

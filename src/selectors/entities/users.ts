@@ -6,12 +6,12 @@ import {getConfig, getLicense} from 'selectors/entities/general';
 import {getDirectShowPreferences, getTeammateNameDisplaySetting} from 'selectors/entities/preferences';
 import {displayUsername, filterProfilesMatchingTerm, sortByUsername, isSystemAdmin, profileListToMap} from 'utils/user_utils';
 export {getCurrentUserId, getCurrentUser, getUsers};
-import {GlobalState} from 'mm_types/store';
-import {UserProfile} from 'mm_types/users';
-import {Reaction} from 'mm_types/reactions';
-import {Team} from 'mm_types/teams';
-import {Channel} from 'mm_types/channels';
-import {RelationOneToOne, RelationOneToMany, IDMappedObjects, UsernameMappedObjects, EmailMappedObjects, $ID, $Username, $Email} from 'mm_types/utilities';
+import {GlobalState} from 'types/store';
+import {UserProfile} from 'types/users';
+import {Reaction} from 'types/reactions';
+import {Team} from 'types/teams';
+import {Channel} from 'types/channels';
+import {RelationOneToOne, RelationOneToMany, IDMappedObjects, UsernameMappedObjects, EmailMappedObjects, $ID, $Username, $Email} from 'types/utilities';
 type Filters = {
     role?: string;
     inactive?: boolean;

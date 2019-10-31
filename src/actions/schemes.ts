@@ -4,9 +4,9 @@ import {Client4} from 'client';
 import {SchemeTypes} from 'action_types';
 import {General} from '../constants';
 
-import {Scheme, SchemeScope, SchemePatch} from 'mm_types/schemes';
+import {Scheme, SchemeScope, SchemePatch} from 'types/schemes';
 
-import {ActionFunc, batchActions, DispatchFunc, GetStateFunc} from 'mm_types/actions';
+import {ActionFunc, batchActions, DispatchFunc, GetStateFunc} from 'types/actions';
 
 import {bindClientFunc, forceLogoutIfNecessary} from './helpers';
 import {logError} from './errors';

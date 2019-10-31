@@ -5,8 +5,8 @@ import {RoleTypes} from 'action_types';
 import {getRoles} from 'selectors/entities/roles_helpers';
 import {hasNewPermissions} from 'selectors/entities/general';
 
-import {DispatchFunc, GetStateFunc, ActionFunc} from 'mm_types/actions';
-import {Role} from 'mm_types/roles';
+import {DispatchFunc, GetStateFunc, ActionFunc} from 'types/actions';
+import {Role} from 'types/roles';
 
 import {bindClientFunc} from './helpers';
 export function getRolesByNames(rolesNames: Array<string>) {

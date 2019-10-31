@@ -2,9 +2,9 @@
 // See LICENSE.txt for license information.
 import {combineReducers} from 'redux';
 import {JobTypes} from 'action_types';
-import {JobsState, JobType, Job, JobsByType} from 'mm_types/jobs';
-import {GenericAction} from 'mm_types/actions';
-import {IDMappedObjects} from 'mm_types/utilities';
+import {JobsState, JobType, Job, JobsByType} from 'types/jobs';
+import {GenericAction} from 'types/actions';
+import {IDMappedObjects} from 'types/utilities';
 
 function jobs(state: IDMappedObjects<Job> = {}, action: GenericAction): IDMappedObjects<Job> {
     switch (action.type) {
