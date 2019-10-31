@@ -19,6 +19,7 @@
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage",
     "prepare": "npm run build",
+    "preinstall": "npm run build",
     "dev": "ttsc --outDir ${WEBAPP_DIR:-../mattermost-webapp}/node_modules/mattermost-redux",
     "dev-mobile": "ttsc --outDir ${MOBILE_DIR:-../mattermost-mobile}/node_modules/mattermost-redux",
     "dev:watch": "ttsc --watch --outDir ${WEBAPP_DIR:-../mattermost-webapp}/node_modules/mattermost-redux",
