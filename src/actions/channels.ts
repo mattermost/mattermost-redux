@@ -949,13 +949,17 @@ export function autocompleteChannelsForSearch(teamId: string, term: string): Act
     };
 }
 
-export function searchChannels(teamId: string, term: string): ActionFunc {
+export function searchChannels(teamId: string, term: string, archived?: boolean): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         dispatch({type: ChannelTypes.GET_CHANNELS_REQUEST, data: null}, getState);
 
         let channels;
         try {
-            channels = await Client4.searchChannels(teamId, term);
+            if (archived) {
+                channels = await Client4.searchArchivedChannels(teamId, term);
+            } else {
+                channels = await Client4.searchChannels(teamId, term);
+            }
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch, getState);
             dispatch(batchActions([

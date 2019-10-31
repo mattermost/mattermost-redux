@@ -1501,6 +1501,13 @@ export default class Client4 {
         );
     };
 
+    searchArchivedChannels = async (teamId, term) => {
+        return this.doFetch(
+            `${this.getTeamRoute(teamId)}/channels/search_archived`,
+            {method: 'post', body: JSON.stringify({term})}
+        );
+    };
+
     searchAllChannels = async (term, notAssociatedToGroup = '', excludeDefaultChannels = false) => {
         const body = {
             term,
