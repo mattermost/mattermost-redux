@@ -11,16 +11,16 @@ import {getCurrentTeamId} from 'selectors/entities/teams';
 
 import {getCurrentUserId} from 'selectors/entities/users';
 
-import {GetStateFunc, DispatchFunc, ActionFunc, ActionResult, batchActions, Action} from 'types/actions';
+import {GetStateFunc, DispatchFunc, ActionFunc, ActionResult, batchActions, Action} from 'mm_types/actions';
 
-import {Team} from 'types/teams';
+import {Team} from 'mm_types/teams';
 
 import {selectChannel} from './channels';
 import {logError} from './errors';
 import {bindClientFunc, forceLogoutIfNecessary} from './helpers';
 import {getProfilesByIds, getStatusesByIds} from './users';
 import {loadRolesIfNeeded} from './roles';
-import {UserProfile} from 'types/users';
+import {UserProfile} from 'mm_types/users';
 
 async function getProfilesAndStatusesForMembers(userIds, dispatch, getState) {
     const {

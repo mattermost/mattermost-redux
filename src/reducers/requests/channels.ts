@@ -3,8 +3,8 @@
 import {combineReducers} from 'redux';
 import {ChannelTypes} from 'action_types';
 
-import {GenericAction} from 'types/actions';
-import {ChannelsRequestsStatuses, RequestStatusType} from 'types/requests';
+import {GenericAction} from 'mm_types/actions';
+import {ChannelsRequestsStatuses, RequestStatusType} from 'mm_types/requests';
 
 import {handleRequest, initialRequestState} from './helpers';
 

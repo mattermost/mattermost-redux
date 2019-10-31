@@ -1,7 +1,7 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
 import * as reselect from 'reselect';
-import {GlobalState} from 'types/store';
+import {GlobalState} from 'mm_types/store';
 const emptyList = [];
 const emptySyncables = {
     teams: [],

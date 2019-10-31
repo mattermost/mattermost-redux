@@ -4,8 +4,8 @@ import {GroupTypes} from 'action_types';
 import {General, Groups} from '../constants';
 import {Client4} from 'client';
 
-import {Action, ActionFunc, batchActions, DispatchFunc, GetStateFunc} from 'types/actions';
-import {SyncableType, SyncablePatch} from 'types/groups';
+import {Action, ActionFunc, batchActions, DispatchFunc, GetStateFunc} from 'mm_types/actions';
+import {SyncableType, SyncablePatch} from 'mm_types/groups';
 
 import {bindClientFunc, forceLogoutIfNecessary} from './helpers';
 import {logError} from './errors';

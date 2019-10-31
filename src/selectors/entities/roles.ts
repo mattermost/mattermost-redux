@@ -3,7 +3,7 @@
 import * as reselect from 'reselect';
 import {getCurrentUser, getCurrentChannelId} from 'selectors/entities/common';
 import {getTeamMemberships, getCurrentTeamId} from './teams';
-import {GlobalState} from 'types/store';
+import {GlobalState} from 'mm_types/store';
 import {getMySystemPermissions, getMySystemRoles, getRoles} from 'selectors/entities/roles_helpers';
 
 export {getMySystemPermissions, getMySystemRoles, getRoles};

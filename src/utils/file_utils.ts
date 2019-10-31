@@ -3,7 +3,7 @@
 import {Files, General} from '../constants';
 import {Client4} from 'client';
 import mimeDB from 'mime-db';
-import {FileInfo} from 'types/files';
+import {FileInfo} from 'mm_types/files';
 export function getFormattedFileSize(file: FileInfo): string {
     const bytes = file.size;
     const fileSizes = [

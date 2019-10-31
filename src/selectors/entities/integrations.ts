@@ -4,7 +4,7 @@
 import * as reselect from 'reselect';
 
 import {getCurrentTeamId} from 'selectors/entities/teams';
-import {GlobalState} from 'types/store';
+import {GlobalState} from 'mm_types/store';
 
 export function getIncomingHooks(state: GlobalState) {
     return state.entities.integrations.incomingHooks;

@@ -2,7 +2,7 @@
 // See LICENSE.txt for license information.
 import {combineReducers} from 'redux';
 import {GroupTypes} from 'action_types';
-import {GroupChannel, GroupSyncables, GroupTeam} from 'types/groups';
+import {GroupChannel, GroupSyncables, GroupTeam} from 'mm_types/groups';
 
 function syncables(state = {}, action) {
     switch (action.type) {

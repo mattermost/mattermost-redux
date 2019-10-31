@@ -3,7 +3,7 @@
 import {getCurrentUser} from 'selectors/entities/users';
 import {getUserTimezone} from 'selectors/entities/timezone';
 import {updateMe} from './users';
-import {DispatchFunc, GetStateFunc} from 'types/actions';
+import {DispatchFunc, GetStateFunc} from 'mm_types/actions';
 export function autoUpdateTimezone(deviceTimezone: string) {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         const currentUer = getCurrentUser(getState());

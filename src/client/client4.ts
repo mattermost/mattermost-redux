@@ -8,7 +8,7 @@ import {General} from '../constants';
 import {isSystemAdmin} from 'utils/user_utils';
 
 import fetch from './fetch_etag';
-import {UserProfile} from 'types/users';
+import {UserProfile} from 'mm_types/users';
 
 const FormData = require('form-data');
 const HEADER_AUTH = 'Authorization';

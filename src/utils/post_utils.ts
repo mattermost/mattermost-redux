@@ -4,13 +4,13 @@ import {General, Posts, Preferences, Permissions} from '../constants';
 import {hasNewPermissions} from 'selectors/entities/general';
 import {haveIChannelPermission} from 'selectors/entities/roles';
 
-import {GlobalState} from 'types/store';
-import {PreferenceType} from 'types/preferences';
-import {Post, PostType} from 'types/posts';
-import {UserProfile} from 'types/users';
-import {Team} from 'types/teams';
-import {Channel} from 'types/channels';
-import {$ID} from 'types/utilities';
+import {GlobalState} from 'mm_types/store';
+import {PreferenceType} from 'mm_types/preferences';
+import {Post, PostType} from 'mm_types/posts';
+import {UserProfile} from 'mm_types/users';
+import {Team} from 'mm_types/teams';
+import {Channel} from 'mm_types/channels';
+import {$ID} from 'mm_types/utilities';
 
 import {getPreferenceKey} from './preference_utils';
 

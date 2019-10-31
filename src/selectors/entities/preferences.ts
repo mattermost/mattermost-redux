@@ -6,8 +6,8 @@ import {getConfig} from 'selectors/entities/general';
 import {getCurrentTeamId} from 'selectors/entities/teams';
 import {createShallowSelector} from 'utils/helpers';
 import {getPreferenceKey} from 'utils/preference_utils';
-import {GlobalState} from 'types/store';
-import {PreferencesType, PreferenceType} from 'types/preferences';
+import {GlobalState} from 'mm_types/store';
+import {PreferencesType, PreferenceType} from 'mm_types/preferences';
 export function getMyPreferences(state) {
     return state.entities.preferences.myPreferences;
 }

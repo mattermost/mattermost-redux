@@ -3,7 +3,7 @@
 import {combineReducers} from 'redux';
 import {General} from '../constants';
 import reducerRegistry from './reducer_registry';
-import {enableBatching} from 'types/actions';
+import {enableBatching} from 'mm_types/actions';
 export const offlineConfig = {
     effect: (effect, action) => {
         if (typeof effect !== 'function') {

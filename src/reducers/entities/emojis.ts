@@ -2,10 +2,10 @@
 // See LICENSE.txt for license information.
 import {combineReducers} from 'redux';
 import {EmojiTypes, PostTypes, UserTypes} from 'action_types';
-import {EmojisState, CustomEmoji} from 'types/emojis';
-import {Post} from 'types/posts';
-import {GenericAction} from 'types/actions';
-import {IDMappedObjects} from 'types/utilities';
+import {EmojisState, CustomEmoji} from 'mm_types/emojis';
+import {Post} from 'mm_types/posts';
+import {GenericAction} from 'mm_types/actions';
+import {IDMappedObjects} from 'mm_types/utilities';
 export function customEmoji(state: IDMappedObjects<CustomEmoji> = {}, action: GenericAction): IDMappedObjects<CustomEmoji> {
     switch (action.type) {
     case EmojiTypes.RECEIVED_CUSTOM_EMOJI: {

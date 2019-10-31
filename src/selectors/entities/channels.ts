@@ -13,13 +13,13 @@ import {buildDisplayableChannelList, buildDisplayableChannelListWithUnreadSectio
 import {createIdsSelector} from 'utils/helpers';
 
 export {getCurrentChannelId, getMyChannelMemberships, getMyCurrentChannelMembership};
-import {GlobalState} from 'types/store';
-import {Channel, ChannelStats, ChannelMembership} from 'types/channels';
-import {UsersState, UserProfile} from 'types/users';
-import {PreferenceType} from 'types/preferences';
-import {Post} from 'types/posts';
-import {TeamMembership, Team} from 'types/teams';
-import {NameMappedObjects, UserIDMappedObjects, IDMappedObjects, RelationOneToOne, RelationOneToMany} from 'types/utilities';
+import {GlobalState} from 'mm_types/store';
+import {Channel, ChannelStats, ChannelMembership} from 'mm_types/channels';
+import {UsersState, UserProfile} from 'mm_types/users';
+import {PreferenceType} from 'mm_types/preferences';
+import {Post} from 'mm_types/posts';
+import {TeamMembership, Team} from 'mm_types/teams';
+import {NameMappedObjects, UserIDMappedObjects, IDMappedObjects, RelationOneToOne, RelationOneToMany} from 'mm_types/utilities';
 
 import {getUserIdsInChannels} from './users';
 type SortingType = 'recent' | 'alpha';

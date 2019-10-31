@@ -27,9 +27,9 @@ import {
     savePreferences,
 } from './preferences';
 import {getProfilesByIds, getProfilesByUsernames, getStatusesByIds} from './users';
-import {Action, ActionFunc, ActionResult, batchActions, DispatchFunc, GetStateFunc} from 'types/actions';
-import {GlobalState} from 'types/store';
-import {Post} from 'types/posts';
+import {Action, ActionFunc, ActionResult, batchActions, DispatchFunc, GetStateFunc} from 'mm_types/actions';
+import {GlobalState} from 'mm_types/store';
+import {Post} from 'mm_types/posts';
 
 // receivedPost should be dispatched after a single post from the server. This typically happens when an existing post
 // is updated.

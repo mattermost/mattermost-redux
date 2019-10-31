@@ -4,8 +4,8 @@ import {combineReducers} from 'redux';
 import {FileTypes} from 'action_types';
 import {RequestStatus} from '../../constants';
 
-import {GenericAction} from 'types/actions';
-import {FilesRequestsStatuses, RequestStatusType} from 'types/requests';
+import {GenericAction} from 'mm_types/actions';
+import {FilesRequestsStatuses, RequestStatusType} from 'mm_types/requests';
 
 import {initialRequestState} from './helpers';
 

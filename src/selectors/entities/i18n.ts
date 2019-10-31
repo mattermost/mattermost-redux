@@ -2,7 +2,7 @@
 // See LICENSE.txt for license information.
 import {getCurrentUser} from 'selectors/entities/common';
 import {General} from '../../constants';
-import {GlobalState} from 'types/store';
+import {GlobalState} from 'mm_types/store';
 export function getCurrentUserLocale(state: GlobalState, defaultLocale = General.DEFAULT_LOCALE) {
     const currentUser = getCurrentUser(state);
 

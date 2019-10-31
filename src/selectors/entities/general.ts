@@ -3,7 +3,7 @@
 import {createSelector} from 'reselect';
 import {isMinimumServerVersion} from 'utils/helpers';
 import {General} from '../../constants';
-import {GlobalState} from 'types/store';
+import {GlobalState} from 'mm_types/store';
 export function getConfig(state: GlobalState): any {
     return state.entities.general.config;
 }

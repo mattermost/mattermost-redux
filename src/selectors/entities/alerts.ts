@@ -2,8 +2,8 @@
 // See LICENSE.txt for license information.
 import {createSelector} from 'reselect';
 import {Alerts} from '../../constants';
-import {AlertType} from 'types/alerts';
-import {GlobalState} from 'types/store';
+import {AlertType} from 'mm_types/alerts';
+import {GlobalState} from 'mm_types/store';
 
 export function getAlerts(state: GlobalState) {
     return state.entities.alerts.alertStack;

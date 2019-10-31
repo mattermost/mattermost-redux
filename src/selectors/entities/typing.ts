@@ -4,10 +4,10 @@ import {createSelector} from 'reselect';
 import {getCurrentChannelId, getUsers} from 'selectors/entities/common';
 import {getTeammateNameDisplaySetting} from 'selectors/entities/preferences';
 import {displayUsername} from 'utils/user_utils';
-import {Typing} from 'types/typing';
-import {UserProfile} from 'types/users';
-import {GlobalState} from 'types/store';
-import {IDMappedObjects} from 'types/utilities';
+import {Typing} from 'mm_types/typing';
+import {UserProfile} from 'mm_types/users';
+import {GlobalState} from 'mm_types/store';
+import {IDMappedObjects} from 'mm_types/utilities';
 
 const getUsersTypingImpl = (profiles: IDMappedObjects<UserProfile>, teammateNameDisplay: string, channelId: string, parentPostId: string, typing: Typing): Array<string> => {
     const id = channelId + parentPostId;

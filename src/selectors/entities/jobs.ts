@@ -1,9 +1,9 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
 import {createSelector} from 'reselect';
-import {GlobalState} from 'types/store';
-import {JobType, Job, JobsByType} from 'types/jobs';
-import {IDMappedObjects} from 'types/utilities';
+import {GlobalState} from 'mm_types/store';
+import {JobType, Job, JobsByType} from 'mm_types/jobs';
+import {IDMappedObjects} from 'mm_types/utilities';
 export function getAllJobs(state: GlobalState): IDMappedObjects<Job> {
     return state.entities.jobs.jobs;
 }

@@ -2,8 +2,8 @@
 // See LICENSE.txt for license information.
 import {combineReducers} from 'redux';
 import {AlertTypes, UserTypes} from 'action_types';
-import {AlertType} from 'types/alerts';
-import {GenericAction} from 'types/actions';
+import {AlertType} from 'mm_types/alerts';
+import {GenericAction} from 'mm_types/actions';
 
 function alertStack(state: Array<AlertType> = [], action: GenericAction) {
     const nextState = [...state];
