@@ -10,7 +10,7 @@ import {getCurrentUser} from 'selectors/entities/users';
 import {createIdsSelector, memoizeResult} from 'utils/helpers';
 import {isUserActivityPost, shouldFilterJoinLeavePost} from 'utils/post_utils';
 import {getUserCurrentTimezone} from 'utils/timezone_utils';
-import {Post} from 'types/posts';
+import * as types from 'types';
 export const COMBINED_USER_ACTIVITY = 'user-activity-';
 export const DATE_LINE = 'date-';
 export const START_OF_NEW_MESSAGES = 'start-of-new-messages';
@@ -361,7 +361,7 @@ function extractUserActivityData(userActivities: any) {
     };
 }
 
-export function combineUserActivitySystemPost(systemPosts: Array<Post> = []) {
+export function combineUserActivitySystemPost(systemPosts: Array<types.posts.Post> = []) {
     if (systemPosts.length === 0) {
         return null;
     }
