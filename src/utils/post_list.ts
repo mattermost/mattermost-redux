@@ -1,6 +1,6 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
-import {createSelector} from 'reselect';
+import reselect from 'reselect';
 import moment from 'moment-timezone';
 import {Posts, Preferences} from '../constants';
 import {makeGetPostsForIds} from 'selectors/entities/posts';
@@ -254,7 +254,7 @@ export function makeGenerateCombinedPost() {
     const getPostsForIds = makeGetPostsForIds();
     const getPostIds = memoizeResult(getPostIdsForCombinedUserActivityPost);
 
-    return createSelector(
+    return reselect.createSelector(
         (state, combinedId) => combinedId,
         (state, combinedId) => getPostsForIds(state, getPostIds(combinedId)),
         (combinedId, posts) => {

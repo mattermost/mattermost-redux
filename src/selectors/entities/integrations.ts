@@ -1,7 +1,7 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
 
-import {createSelector} from 'reselect';
+import reselect from 'reselect';
 
 import {getCurrentTeamId} from 'selectors/entities/teams';
 import {GlobalState} from 'types/store';
@@ -29,7 +29,7 @@ export function getSystemCommands(state: GlobalState) {
 /**
  * get outgoing hooks in current team
  */
-export const getOutgoingHooksInCurrentTeam = createSelector(
+export const getOutgoingHooksInCurrentTeam = reselect.createSelector(
     getCurrentTeamId,
     getOutgoingHooks,
     (teamId, hooks) => {
@@ -37,7 +37,7 @@ export const getOutgoingHooksInCurrentTeam = createSelector(
     }
 );
 
-export const getAllCommands = createSelector(
+export const getAllCommands = reselect.createSelector(
     getCommands,
     getSystemCommands,
     (commands, systemCommands) => {
@@ -48,7 +48,7 @@ export const getAllCommands = createSelector(
     }
 );
 
-export const getAutocompleteCommandsList = createSelector(
+export const getAutocompleteCommandsList = reselect.createSelector(
     getAllCommands,
     getCurrentTeamId,
     (commands, currentTeamId) => {

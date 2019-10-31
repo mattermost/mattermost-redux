@@ -1,7 +1,7 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
 
-import {createSelector} from 'reselect';
+import reselect from 'reselect';
 
 import {getCurrentUserLocale} from 'selectors/entities/i18n';
 
@@ -24,7 +24,7 @@ export function getFilePublicLink(state) {
 }
 
 export function makeGetFilesForPost() {
-    return createSelector(
+    return reselect.createSelector(
         [getAllFiles, getFilesIdsForPost, getCurrentUserLocale],
         (allFiles, fileIdsForPost, locale) => {
             const fileInfos = fileIdsForPost.map((id) => allFiles[id]).filter((id) => Boolean(id));
