@@ -2,7 +2,7 @@
 // See LICENSE.txt for license information.
 
 /* eslint-disable no-undefined */
-import redux from 'redux';
+import * as redux from 'redux';
 import devTools from 'remote-redux-devtools';
 import {createOfflineReducer, networkStatusChangedAction, offlineCompose} from 'redux-offline';
 import defaultOfflineConfig from 'redux-offline/lib/defaults';

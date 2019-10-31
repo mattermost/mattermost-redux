@@ -1,7 +1,7 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
 
-import redux from 'redux';
+import * as redux from 'redux';
 import {createOfflineReducer, networkStatusChangedAction, offlineCompose} from 'redux-offline';
 import defaultOfflineConfig from 'redux-offline/lib/defaults';
 import reducerRegistry from './reducer_registry';

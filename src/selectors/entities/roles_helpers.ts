@@ -1,6 +1,6 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
-import reselect from 'reselect';
+import * as reselect from 'reselect';
 import {GlobalState} from 'types/store';
 import {getCurrentUser} from 'selectors/entities/common';
 import {UserProfile} from 'types/users';
