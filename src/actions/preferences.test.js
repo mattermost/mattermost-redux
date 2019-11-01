@@ -7,7 +7,7 @@ import nock from 'nock';
 import * as Actions from 'actions/preferences';
 import {login} from 'actions/users';
 import {Client4} from 'client';
-import {Preferences, RequestStatus} from 'constants';
+import {Preferences, RequestStatus} from '../constants';
 
 import TestHelper from 'test/test_helper';
 import configureStore from 'test/test_store';
@@ -160,7 +160,7 @@ describe('Actions.Preferences', () => {
         await Actions.getMyPreferences()(store.dispatch, store.getState);
 
         nock(Client4.getUsersRoute()).
-            delete(`/${TestHelper.basicUser.id}/preferences`).
+            post(`/${TestHelper.basicUser.id}/preferences/delete`).
             reply(200, OK_RESPONSE);
         await Actions.deletePreferences(user.id, [
             existingPreferences[0],
@@ -280,6 +280,9 @@ describe('Actions.Preferences', () => {
 
     it('deleteTeamSpecificThemes', async () => {
         const user = TestHelper.basicUser;
+        TestHelper.mockLogin();
+        await login(user.email, user.password)(store.dispatch, store.getState);
+
         const theme = {
             type: 'Mattermost Dark',
         };
@@ -309,7 +312,7 @@ describe('Actions.Preferences', () => {
         ];
 
         nock(Client4.getUsersRoute()).
-            put(`/${TestHelper.basicUser.id}/preferences`).
+            put(`/${user.id}/preferences`).
             reply(200, OK_RESPONSE);
         await Client4.savePreferences(user.id, existingPreferences);
 
@@ -319,7 +322,7 @@ describe('Actions.Preferences', () => {
         await Actions.getMyPreferences()(store.dispatch, store.getState);
 
         nock(Client4.getUsersRoute()).
-            delete(`/${TestHelper.basicUser.id}/preferences`).
+            post(`/${user.id}/preferences/delete`).
             reply(200, OK_RESPONSE);
         await Actions.deleteTeamSpecificThemes()(store.dispatch, store.getState);
 

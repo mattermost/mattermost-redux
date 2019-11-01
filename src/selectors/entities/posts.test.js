@@ -3,7 +3,7 @@
 
 import assert from 'assert';
 
-import {Posts, Preferences} from 'constants';
+import {Posts, Preferences} from '../../constants';
 
 import * as Selectors from 'selectors/entities/posts';
 import {makeGetProfilesForReactions} from 'selectors/entities/users';

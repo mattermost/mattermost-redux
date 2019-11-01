@@ -10,3 +10,10 @@ PULL_REQUEST_TEMPLATE.md
 .npmignore
 .npminstall
 .tmp
+.circleci
+jest.config.js
+babel.config.js
+.editorconfig                          
+.eslintignore                          
+mattermost-redux.iml 
+.eslintrc.json
