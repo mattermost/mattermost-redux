@@ -42,6 +42,5 @@ module.exports = {
         '^action_types$': '<rootDir>/src/action_types',
         '^constants$': '<rootDir>/src/constants',
         '^action_types/(.*)$': '<rootDir>/src/action_types/$1',
-        '^@/(.*)$': '<rootDir>/src/$1',
     },
 };

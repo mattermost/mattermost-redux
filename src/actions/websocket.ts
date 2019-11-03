@@ -14,8 +14,9 @@ import {getCurrentUser, getCurrentUserId, getUsers, getUserStatuses} from 'selec
 import {getChannelByName} from 'utils/channel_utils';
 import {fromAutoResponder} from 'utils/post_utils';
 import EventEmitter from 'utils/event_emitter';
+import {getMyPreferences} from './preferences';
 
-import {ActionFunc, DispatchFunc, GetStateFunc, PlatformType} from '../types/actions';
+import {ActionFunc, DispatchFunc, GetStateFunc, PlatformType} from 'types/actions';
 
 import {getTeam, getMyTeamUnreads, getMyTeams, getMyTeamMembers} from './teams';
 import {getPost, getPosts, getProfilesAndStatusesForPosts, getCustomEmojiForReaction, handleNewPost, postDeleted, receivedPost} from './posts';
@@ -104,6 +105,7 @@ export function doFirstConnect(now: number) {
 
 export function doReconnect(now: number) {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
+        await dispatch(getMyPreferences());
         const state = getState();
         const currentTeamId = getCurrentTeamId(state);
         const currentChannelId = getCurrentChannelId(state);

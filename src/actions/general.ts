@@ -7,7 +7,7 @@ import {GeneralTypes} from 'action_types';
 import {getServerVersion} from 'selectors/entities/general';
 import {isMinimumServerVersion} from 'utils/helpers';
 import {GeneralState} from 'types/general';
-import {GenericClientResponse, logLevel} from 'types/client4';
+import {logLevel} from 'types/client4';
 import {GetStateFunc, DispatchFunc, ActionFunc, batchActions} from 'types/actions';
 
 import {logError} from './errors';
@@ -16,9 +16,7 @@ import {loadMe} from './users';
 import {bindClientFunc, forceLogoutIfNecessary, FormattedError} from './helpers';
 
 export function getPing(): ActionFunc {
-    return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
-        dispatch({type: GeneralTypes.PING_REQUEST, data: {}}, getState);
-
+    return async () => {
         let data;
         let pingError = new FormattedError(
             'mobile.server_ping_failed',
@@ -28,7 +26,6 @@ export function getPing(): ActionFunc {
             data = await Client4.ping();
             if (data.status !== 'OK') {
                 // successful ping but not the right return {data}
-                dispatch({type: GeneralTypes.PING_FAILURE, data: {}, error: pingError}, getState);
                 return {error: pingError};
             }
         } catch (error) { // Client4Error
@@ -36,11 +33,9 @@ export function getPing(): ActionFunc {
                 // When the server requires a client certificate to connect.
                 pingError = error;
             }
-            dispatch({type: GeneralTypes.PING_FAILURE, data: {}, error: pingError}, getState);
             return {error: pingError};
         }
 
-        dispatch({type: GeneralTypes.PING_SUCCESS, data}, getState);
         return {data};
     };
 }
@@ -55,20 +50,11 @@ export function resetPing(): ActionFunc {
 
 export function getClientConfig(): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
-        dispatch({type: GeneralTypes.CLIENT_CONFIG_REQUEST, data: {}}, getState);
-
         let data;
         try {
             data = await Client4.getClientConfigOld();
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch, getState);
-            dispatch(batchActions([
-                {
-                    type: GeneralTypes.CLIENT_CONFIG_FAILURE,
-                    error,
-                },
-                logError(error),
-            ]), getState);
             return {error};
         }
 
@@ -77,7 +63,6 @@ export function getClientConfig(): ActionFunc {
 
         dispatch(batchActions([
             {type: GeneralTypes.CLIENT_CONFIG_RECEIVED, data},
-            {type: GeneralTypes.CLIENT_CONFIG_SUCCESS},
         ]));
 
         return {data};
@@ -86,8 +71,6 @@ export function getClientConfig(): ActionFunc {
 
 export function getDataRetentionPolicy(): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
-        dispatch({type: GeneralTypes.DATA_RETENTION_POLICY_REQUEST, data: {}}, getState);
-
         let data;
         try {
             data = await Client4.getDataRetentionPolicy();
@@ -95,7 +78,7 @@ export function getDataRetentionPolicy(): ActionFunc {
             forceLogoutIfNecessary(error, dispatch, getState);
             dispatch(batchActions([
                 {
-                    type: GeneralTypes.DATA_RETENTION_POLICY_FAILURE,
+                    type: GeneralTypes.RECEIVED_DATA_RETENTION_POLICY,
                     error,
                 },
                 logError(error),
@@ -105,7 +88,6 @@ export function getDataRetentionPolicy(): ActionFunc {
 
         dispatch(batchActions([
             {type: GeneralTypes.RECEIVED_DATA_RETENTION_POLICY, data},
-            {type: GeneralTypes.DATA_RETENTION_POLICY_SUCCESS},
         ]));
 
         return {data};
@@ -115,9 +97,7 @@ export function getDataRetentionPolicy(): ActionFunc {
 export function getLicenseConfig(): ActionFunc {
     return bindClientFunc({
         clientFunc: Client4.getClientLicenseOld,
-        onRequest: GeneralTypes.CLIENT_LICENSE_REQUEST,
-        onSuccess: [GeneralTypes.CLIENT_LICENSE_RECEIVED, GeneralTypes.CLIENT_LICENSE_SUCCESS],
-        onFailure: GeneralTypes.CLIENT_LICENSE_FAILURE,
+        onSuccess: [GeneralTypes.CLIENT_LICENSE_RECEIVED],
     });
 }
 
@@ -184,8 +164,6 @@ export function setUrl(url: string) {
 
 export function getRedirectLocation(url: string): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
-        dispatch({type: GeneralTypes.REDIRECT_LOCATION_REQUEST, data: {}}, getState);
-
         let pendingData: Promise<any>;
         if (isMinimumServerVersion(getServerVersion(getState()), 5, 3)) {
             pendingData = Client4.getRedirectLocation(url);

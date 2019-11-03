@@ -6,7 +6,9 @@ import {bindClientFunc} from './helpers';
 
 import {PluginTypes} from 'action_types';
 
-export function getMarketplacePlugins(filter) {
+import {ActionFunc} from 'types/actions';
+
+export function getMarketplacePlugins(filter): ActionFunc {
     return bindClientFunc({
         clientFunc: Client4.getMarketplacePlugins,
         onSuccess: PluginTypes.RECEIVED_MARKETPLACE_PLUGINS,

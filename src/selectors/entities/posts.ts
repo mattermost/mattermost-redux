@@ -12,7 +12,7 @@ import {Post, PostWithFormatData} from 'types/posts';
 import {Reaction} from 'types/reactions';
 import {UserProfile} from 'types/users';
 import {Channel} from 'types/channels';
-import {$ID, IDMappedObjects, RelationOneToOne, RelationOneToMany} from '../../types/utilities';
+import {$ID, IDMappedObjects, RelationOneToOne, RelationOneToMany} from 'types/utilities';
 export function getAllPosts(state: GlobalState) {
     return state.entities.posts.posts;
 }
