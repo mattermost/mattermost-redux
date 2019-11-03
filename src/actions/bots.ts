@@ -5,9 +5,11 @@ import {Client4} from 'client';
 import {BotTypes} from 'action_types';
 import {bindClientFunc} from './helpers';
 
+import {ActionFunc} from 'types/actions';
+
 const BOTS_PER_PAGE_DEFAULT = 20;
 
-export function createBot(bot) {
+export function createBot(bot): ActionFunc {
     return bindClientFunc({
         clientFunc: Client4.createBot,
         onSuccess: BotTypes.RECEIVED_BOT_ACCOUNT,
@@ -17,7 +19,7 @@ export function createBot(bot) {
     });
 }
 
-export function patchBot(botUserId, botPatch) {
+export function patchBot(botUserId, botPatch): ActionFunc {
     return bindClientFunc({
         clientFunc: Client4.patchBot,
         onSuccess: BotTypes.RECEIVED_BOT_ACCOUNT,
@@ -28,7 +30,7 @@ export function patchBot(botUserId, botPatch) {
     });
 }
 
-export function loadBot(botUserId) {
+export function loadBot(botUserId): ActionFunc {
     return bindClientFunc({
         clientFunc: Client4.getBot,
         onSuccess: BotTypes.RECEIVED_BOT_ACCOUNT,
@@ -38,7 +40,7 @@ export function loadBot(botUserId) {
     });
 }
 
-export function loadBots(page = 0, perPage = BOTS_PER_PAGE_DEFAULT) {
+export function loadBots(page = 0, perPage = BOTS_PER_PAGE_DEFAULT): ActionFunc {
     return bindClientFunc({
         clientFunc: Client4.getBotsIncludeDeleted,
         onSuccess: BotTypes.RECEIVED_BOT_ACCOUNTS,
@@ -49,7 +51,7 @@ export function loadBots(page = 0, perPage = BOTS_PER_PAGE_DEFAULT) {
     });
 }
 
-export function disableBot(botUserId) {
+export function disableBot(botUserId): ActionFunc {
     return bindClientFunc({
         clientFunc: Client4.disableBot,
         onSuccess: BotTypes.RECEIVED_BOT_ACCOUNT,
@@ -59,7 +61,7 @@ export function disableBot(botUserId) {
     });
 }
 
-export function enableBot(botUserId) {
+export function enableBot(botUserId): ActionFunc {
     return bindClientFunc({
         clientFunc: Client4.enableBot,
         onSuccess: BotTypes.RECEIVED_BOT_ACCOUNT,
@@ -69,7 +71,7 @@ export function enableBot(botUserId) {
     });
 }
 
-export function assignBot(botUserId, newOwnerId) {
+export function assignBot(botUserId, newOwnerId): ActionFunc {
     return bindClientFunc({
         clientFunc: Client4.assignBot,
         onSuccess: BotTypes.RECEIVED_BOT_ACCOUNT,

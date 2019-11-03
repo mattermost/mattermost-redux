@@ -1,6 +1,6 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
-import {createSelector} from 'reselect';
+import * as reselect from 'reselect';
 import {Permissions} from '../../constants';
 import {getConfig, getCurrentUrl, isCompatibleWithJoinViewTeamPermissions} from 'selectors/entities/general';
 import {haveISystemPermission} from 'selectors/entities/roles_helpers';
@@ -14,7 +14,7 @@ export function getCurrentTeamId(state: GlobalState) {
     return state.entities.teams.currentTeamId;
 }
 
-export const getTeamByName = createSelector(getTeams, (state, name) => name, (teams, name) => {
+export const getTeamByName = reselect.createSelector(getTeams, (state, name) => name, (teams, name) => {
     return Object.values(teams).find((team: Team) => team.name === name);
 });
 export function getTeams(state: GlobalState) {
@@ -33,14 +33,14 @@ export function getMembersInTeams(state: GlobalState) {
     return state.entities.teams.membersInTeam;
 }
 
-export const getTeamsList = createSelector(
+export const getTeamsList = reselect.createSelector(
     getTeams,
     (teams) => {
         return Object.values(teams);
     }
 );
 
-export const getCurrentTeam = createSelector(
+export const getCurrentTeam = reselect.createSelector(
     getTeams,
     getCurrentTeamId,
     (teams, currentTeamId) => {
@@ -53,7 +53,7 @@ export function getTeam(state, id) {
     return teams[id];
 }
 
-export const getCurrentTeamMembership = createSelector(
+export const getCurrentTeamMembership = reselect.createSelector(
     getCurrentTeamId,
     getTeamMemberships,
     (currentTeamId, teamMemberships) => {
@@ -61,7 +61,7 @@ export const getCurrentTeamMembership = createSelector(
     }
 );
 
-export const isCurrentUserCurrentTeamAdmin = createSelector(
+export const isCurrentUserCurrentTeamAdmin = reselect.createSelector(
     getCurrentTeamMembership,
     (member) => {
         if (member) {
@@ -72,7 +72,7 @@ export const isCurrentUserCurrentTeamAdmin = createSelector(
     }
 );
 
-export const getCurrentTeamUrl = createSelector(
+export const getCurrentTeamUrl = reselect.createSelector(
     getCurrentUrl,
     getCurrentTeam,
     (state) => getConfig(state).SiteURL,
@@ -86,7 +86,7 @@ export const getCurrentTeamUrl = createSelector(
     }
 );
 
-export const getCurrentRelativeTeamUrl = createSelector(
+export const getCurrentRelativeTeamUrl = reselect.createSelector(
     getCurrentTeam,
     (currentTeam) => {
         if (!currentTeam) {
@@ -96,7 +96,7 @@ export const getCurrentRelativeTeamUrl = createSelector(
     }
 );
 
-export const getCurrentTeamStats = createSelector(
+export const getCurrentTeamStats = reselect.createSelector(
     getCurrentTeamId,
     getTeamStats,
     (currentTeamId, teamStats) => {
@@ -104,7 +104,7 @@ export const getCurrentTeamStats = createSelector(
     }
 );
 
-export const getMyTeams = createSelector(
+export const getMyTeams = reselect.createSelector(
     getTeams,
     getTeamMemberships,
     (teams, members) => {
@@ -112,7 +112,7 @@ export const getMyTeams = createSelector(
     }
 );
 
-export const getMyTeamMember = createSelector(
+export const getMyTeamMember = reselect.createSelector(
     getTeamMemberships,
     (state, teamId) => teamId,
     (teamMemberships, teamId) => {
@@ -120,7 +120,7 @@ export const getMyTeamMember = createSelector(
     }
 );
 
-export const getMembersInCurrentTeam = createSelector(
+export const getMembersInCurrentTeam = reselect.createSelector(
     getCurrentTeamId,
     getMembersInTeams,
     (currentTeamId, teamMembers) => {
@@ -156,7 +156,7 @@ export const getListableTeamIds = createIdsSelector(
     }
 );
 
-export const getListableTeams = createSelector(
+export const getListableTeams = reselect.createSelector(
     getTeams,
     getListableTeamIds,
     (teams, listableTeamIds) => {
@@ -164,7 +164,7 @@ export const getListableTeams = createSelector(
     }
 );
 
-export const getSortedListableTeams = createSelector(
+export const getSortedListableTeams = reselect.createSelector(
     getTeams,
     getListableTeamIds,
     (state, locale) => locale,
@@ -198,7 +198,7 @@ export const getJoinableTeamIds = createIdsSelector(
     }
 );
 
-export const getJoinableTeams = createSelector(
+export const getJoinableTeams = reselect.createSelector(
     getTeams,
     getJoinableTeamIds,
     (teams, joinableTeamIds) => {
@@ -206,7 +206,7 @@ export const getJoinableTeams = createSelector(
     }
 );
 
-export const getSortedJoinableTeams = createSelector(
+export const getSortedJoinableTeams = reselect.createSelector(
     getTeams,
     getJoinableTeamIds,
     (state, locale) => locale,
@@ -229,7 +229,7 @@ export const getMySortedTeamIds = createIdsSelector(
     }
 );
 
-export const getMyTeamsCount = createSelector(
+export const getMyTeamsCount = reselect.createSelector(
     getMyTeams,
     (teams) => {
         return teams.length;
@@ -240,7 +240,7 @@ export const getMyTeamsCount = createSelector(
 // > 0 means is returning the mention count
 // 0 means that there are no unread messages
 // -1 means that there are unread messages but no mentions
-export const getChannelDrawerBadgeCount = createSelector(
+export const getChannelDrawerBadgeCount = reselect.createSelector(
     getCurrentTeamId,
     getTeamMemberships,
     (currentTeamId, teamMembers) => {
@@ -269,7 +269,7 @@ export const getChannelDrawerBadgeCount = createSelector(
 // 0 means that there are no unread messages
 // -1 means that there are unread messages but no mentions
 export function makeGetBadgeCountForTeamId() {
-    return createSelector(
+    return reselect.createSelector(
         getTeamMemberships,
         (state, id) => id,
         (members, teamId) => {
