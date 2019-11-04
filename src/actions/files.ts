@@ -3,12 +3,12 @@
 import {Client4} from 'client';
 import {FileTypes} from 'action_types';
 
-import {Action, batchActions, DispatchFunc, GetStateFunc} from 'types/actions';
+import {Action, batchActions, DispatchFunc, GetStateFunc, ActionFunc} from 'types/actions';
 
 import {logError} from './errors';
 import {bindClientFunc, forceLogoutIfNecessary} from './helpers';
 
-export function getFilesForPost(postId: string) {
+export function getFilesForPost(postId: string): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         let files;
 
@@ -30,7 +30,7 @@ export function getFilesForPost(postId: string) {
     };
 }
 
-export function uploadFile(channelId: string, rootId: string, clientIds: Array<string>, fileFormData: File, formBoundary: string) {
+export function uploadFile(channelId: string, rootId: string, clientIds: Array<string>, fileFormData: File, formBoundary: string): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         dispatch({type: FileTypes.UPLOAD_FILES_REQUEST, data: {}}, getState);
 
@@ -75,7 +75,7 @@ export function uploadFile(channelId: string, rootId: string, clientIds: Array<s
     };
 }
 
-export function getFilePublicLink(fileId: string) {
+export function getFilePublicLink(fileId: string): ActionFunc {
     return bindClientFunc({
         clientFunc: Client4.getFilePublicLink,
         onSuccess: FileTypes.RECEIVED_FILE_PUBLIC_LINK,

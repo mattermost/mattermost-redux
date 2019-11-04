@@ -3,10 +3,9 @@
 import {combineReducers} from 'redux';
 import {EmojiTypes, PostTypes, UserTypes} from 'action_types';
 import {EmojisState, CustomEmoji} from 'types/emojis';
-import {Post} from 'types/posts';
-import {GenericAction} from 'types/actions';
-import {IDMappedObjects} from 'types/utilities';
-export function customEmoji(state: IDMappedObjects<CustomEmoji> = {}, action: GenericAction): IDMappedObjects<CustomEmoji> {
+import * as types from 'types';
+
+export function customEmoji(state: types.utilities.IDMappedObjects<CustomEmoji> = {}, action: types.actions.GenericAction): types.utilities.IDMappedObjects<CustomEmoji> {
     switch (action.type) {
     case EmojiTypes.RECEIVED_CUSTOM_EMOJI: {
         const nextState = {...state};
@@ -31,7 +30,7 @@ export function customEmoji(state: IDMappedObjects<CustomEmoji> = {}, action: Ge
 
     case PostTypes.RECEIVED_NEW_POST:
     case PostTypes.RECEIVED_POST: {
-        const post: Post = action.data;
+        const post: types.posts.Post = action.data;
 
         return storeEmojisForPost(state, post);
     }
@@ -45,7 +44,7 @@ export function customEmoji(state: IDMappedObjects<CustomEmoji> = {}, action: Ge
     }
 }
 
-function storeEmojisForPost(state: IDMappedObjects<CustomEmoji>, post: Post): IDMappedObjects<CustomEmoji> {
+function storeEmojisForPost(state: types.utilities.IDMappedObjects<CustomEmoji>, post: types.posts.Post): types.utilities.IDMappedObjects<CustomEmoji> {
     if (!post.metadata || !post.metadata.emojis) {
         return state;
     }
@@ -63,7 +62,7 @@ function storeEmojisForPost(state: IDMappedObjects<CustomEmoji>, post: Post): ID
     }, state);
 }
 
-function nonExistentEmoji(state: Set<string> = new Set(), action: GenericAction): Set<string> {
+function nonExistentEmoji(state: Set<string> = new Set(), action: types.actions.GenericAction): Set<string> {
     switch (action.type) {
     case EmojiTypes.CUSTOM_EMOJI_DOES_NOT_EXIST: {
         if (!state.has(action.data)) {
@@ -110,4 +109,4 @@ export default (combineReducers({
 
     // set containing custom emoji names that do not exist
     nonExistentEmoji,
-}) as (b: EmojisState, a: GenericAction) => EmojisState);
+}) as (b: EmojisState, a: types.actions.GenericAction) => EmojisState);
