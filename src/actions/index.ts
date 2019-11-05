@@ -14,7 +14,6 @@ import * as gifs from './gifs';
 import * as helpers from './helpers';
 import * as integrations from './integrations';
 import * as jobs from './jobs';
-import * as plugins from './plugins';
 import * as posts from './posts';
 import * as preferences from './preferences';
 import * as roles from './roles';
@@ -39,7 +38,6 @@ export {
     integrations,
     helpers,
     jobs,
-    plugins,
     posts,
     preferences,
     roles,
