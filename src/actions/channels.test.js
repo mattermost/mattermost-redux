@@ -1292,7 +1292,7 @@ describe('Actions.Channels', () => {
         );
 
         nock(Client4.getTeamsRoute()).
-            get(`/${TestHelper.basicTeam.id}/channels/archived`).
+            get(`/${TestHelper.basicTeam.id}/channels/deleted`).
             query(true).
             reply(200, [TestHelper.basicChannel, userChannel]);
 
