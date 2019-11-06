@@ -148,7 +148,7 @@ export default class Client4 {
     }
 
     getArchivedChannelsRoute() {
-        return `${this.getChannelsRoute()}/archived`;
+        return `${this.getChannelsRoute()}/deleted`;
     }
 
     getChannelRoute(channelId) {
@@ -1395,7 +1395,7 @@ export default class Client4 {
     };
     getArchivedChannels = async (teamId, page = 0, perPage = PER_PAGE_DEFAULT) => {
         return this.doFetch(
-            `${this.getTeamRoute(teamId)}/channels/archived${buildQueryString({page, per_page: perPage})}`,
+            `${this.getTeamRoute(teamId)}/channels/deleted${buildQueryString({page, per_page: perPage})}`,
             {method: 'get'}
         );
     };
