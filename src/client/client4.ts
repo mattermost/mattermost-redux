@@ -15,6 +15,7 @@ import {Post} from 'types/posts';
 import {Job} from 'types/jobs';
 import {Role} from 'types/roles';
 import {Scheme} from 'types/schemes';
+import {Options} from 'types/client4';
 
 const FormData = require('form-data');
 const HEADER_AUTH = 'Authorization';
@@ -48,7 +49,7 @@ export default class Client4 {
         connectionError: 'There appears to be a problem with your internet connection.',
         unknownError: 'We received an unexpected status code from the server.',
     };
-    userRoles?: any;
+    userRoles?: string;
 
     getUrl() {
         return this.url;
@@ -97,7 +98,7 @@ export default class Client4 {
         this.userId = userId;
     }
 
-    setUserRoles(roles) {
+    setUserRoles(roles: string) {
         this.userRoles = roles;
     }
 
@@ -298,10 +299,10 @@ export default class Client4 {
         return '';
     }
 
-    getOptions(options) {
-        const newOptions = Object.assign({}, options);
+    getOptions(options: Options) {
+        const newOptions: Options = {...options};
 
-        const headers = {
+        const headers: {[x: string]: string} = {
             [HEADER_REQUESTED_WITH]: 'XMLHttpRequest',
             ...this.defaultHeaders,
         };
@@ -335,7 +336,7 @@ export default class Client4 {
 
     // User Routes
 
-    createUser = async (user, token, inviteId) => {
+    createUser = async (user: UserProfile, token: string, inviteId: string) => {
         this.trackEvent('api', 'api_users_create');
 
         const queryParams: any = {};
@@ -354,14 +355,14 @@ export default class Client4 {
         );
     }
 
-    patchMe = async (userPatch) => {
+    patchMe = async (userPatch: Partial<UserProfile>) => {
         return this.doFetch(
             `${this.getUserRoute('me')}/patch`,
             {method: 'put', body: JSON.stringify(userPatch)}
         );
     }
 
-    patchUser = async (userPatch) => {
+    patchUser = async (userPatch: Partial<UserProfile> & {id: string}) => {
         this.trackEvent('api', 'api_users_patch');
 
         return this.doFetch(
@@ -370,7 +371,7 @@ export default class Client4 {
         );
     }
 
-    updateUser = async (user) => {
+    updateUser = async (user: UserProfile) => {
         this.trackEvent('api', 'api_users_update');
 
         return this.doFetch(
@@ -397,7 +398,7 @@ export default class Client4 {
         );
     }
 
-    updateUserRoles = async (userId: string, roles) => {
+    updateUserRoles = async (userId: string, roles: string) => {
         this.trackEvent('api', 'api_users_update_roles');
 
         return this.doFetch(
@@ -405,7 +406,7 @@ export default class Client4 {
             {method: 'put', body: JSON.stringify({roles})}
         );
     };
-    updateUserMfa = async (userId: string, activate, code) => {
+    updateUserMfa = async (userId: string, activate: boolean, code: string) => {
         const body: any = {
             activate,
         };
@@ -861,7 +862,7 @@ export default class Client4 {
         );
     }
 
-    authorizeOAuthApp = async (responseType, clientId: string, redirectUri: string, state, scope) => {
+    authorizeOAuthApp = async (responseType: string, clientId: string, redirectUri: string, state: string, scope: string) => {
         return this.doFetch(
             `${this.url}/oauth/authorize`,
             {method: 'post', body: JSON.stringify({client_id: clientId, response_type: responseType, redirect_uri: redirectUri, state, scope})}
