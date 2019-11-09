@@ -508,13 +508,13 @@ describe('Selectors.Users', () => {
                 }
             },
         };
-        // should match username
+        // should match full name
         assert.deepStrictEqual(Selectors.makeGetDisplayName()(newTestState, testUser2.id), 'First2 Last2');
 
-        // // should match default name "Someone" for not found user
+        // should match default name "Someone" for not found user
         assert.deepStrictEqual(Selectors.makeGetDisplayName()(newTestState, 'not_exist_id'), 'Someone');
 
-        // // should match empty string when not using default fallback
+        // should match empty string when not using default fallback
         assert.deepStrictEqual(Selectors.makeGetDisplayName()(newTestState, 'not_exist_id', false), '');
 
         /*
@@ -535,7 +535,7 @@ describe('Selectors.Users', () => {
 
         newTestState.entities.general.config.TeammateNameDisplay = General.TEAMMATE_NAME_DISPLAY.SHOW_FULLNAME;
 
-        // should match username
+        // should match full name
         assert.deepStrictEqual(Selectors.makeGetDisplayName()(newTestState, testUser2.id), 'First2 Last2');
 
         // // should match default name "Someone" for not found user
