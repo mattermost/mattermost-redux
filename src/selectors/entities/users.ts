@@ -486,8 +486,11 @@ export function makeGetDisplayName(): (a: GlobalState, b: $ID<UserProfile>, c: b
         (state, userId) => getUser(state, userId),
         getTeammateNameDisplaySetting,
         (state, _, useFallbackUsername = true) => useFallbackUsername,
-        (user, teammateNameDisplaySetting, useFallbackUsername) => {
-            return displayUsername(user, teammateNameDisplaySetting, useFallbackUsername);
+        getConfig,
+        (user, teammateNameDisplaySetting, useFallbackUsername, config) => {
+            const useAdminTemmateNameDisplaySetting = config.LockTeammateNameDisplay === 'true';
+            const adminTeammateNameDisplaySetting = config.TeammateNameDisplay;
+            return displayUsername(user, teammateNameDisplaySetting, useFallbackUsername, useAdminTemmateNameDisplaySetting, adminTeammateNameDisplaySetting);
         }
     );
 }
