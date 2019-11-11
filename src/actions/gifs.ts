@@ -129,14 +129,14 @@ export function errorSearchById(err: any, gfyId: string) {
     };
 }
 
-export function searchScrollPosition(scrollPosition: any) {
+export function searchScrollPosition(scrollPosition: number) {
     return {
         type: GifTypes.SAVE_SEARCH_SCROLL_POSITION,
         scrollPosition,
     };
 }
 
-export function searchPriorLocation(priorLocation: any) {
+export function searchPriorLocation(priorLocation: number) {
     return {
         type: GifTypes.SAVE_SEARCH_PRIOR_LOCATION,
         priorLocation,
@@ -294,13 +294,13 @@ export function searchByIdIfNeeded(gfyId: string) {
     };
 }
 
-export function saveSearchScrollPosition(scrollPosition: any) {
+export function saveSearchScrollPosition(scrollPosition: number) {
     return (dispatch: DispatchFunc) => {
         dispatch(searchScrollPosition(scrollPosition));
     };
 }
 
-export function saveSearchPriorLocation(priorLocation: any) {
+export function saveSearchPriorLocation(priorLocation: number) {
     return (dispatch: DispatchFunc) => {
         dispatch(searchPriorLocation(priorLocation));
     };
