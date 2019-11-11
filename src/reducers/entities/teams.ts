@@ -3,8 +3,12 @@
 import {combineReducers} from 'redux';
 import {ChannelTypes, TeamTypes, UserTypes, SchemeTypes, GroupTypes} from 'action_types';
 import {teamListToMap} from 'utils/team_utils';
+import {Team, TeamMembership} from 'types/teams';
+import {UserProfile} from 'types/users';
+import {RelationOneToOne, IDMappedObjects} from 'types/utilities';
+import {GenericAction} from 'types/actions';
 
-function currentTeamId(state = '', action) {
+function currentTeamId(state = '', action: GenericAction) {
     switch (action.type) {
     case TeamTypes.SELECT_TEAM:
         return action.data;
@@ -16,7 +20,7 @@ function currentTeamId(state = '', action) {
     }
 }
 
-function teams(state = {}, action) {
+function teams(state: IDMappedObjects<Team> = {}, action: GenericAction) {
     switch (action.type) {
     case TeamTypes.RECEIVED_TEAMS_LIST:
     case SchemeTypes.RECEIVED_SCHEME_TEAMS:
@@ -63,8 +67,8 @@ function teams(state = {}, action) {
     }
 }
 
-function myMembers(state = {}, action) {
-    function updateState(receivedTeams = {}, currentState = {}) {
+function myMembers(state: RelationOneToOne<Team, TeamMembership> = {}, action: GenericAction) {
+    function updateState(receivedTeams: IDMappedObjects<Team> = {}, currentState: RelationOneToOne<Team, TeamMembership> = {}) {
         return Object.keys(receivedTeams).forEach((teamId) => {
             if (receivedTeams[teamId].delete_at > 0 && currentState[teamId]) {
                 Reflect.deleteProperty(currentState, teamId);
@@ -82,7 +86,7 @@ function myMembers(state = {}, action) {
         return nextState;
     }
     case TeamTypes.RECEIVED_MY_TEAM_MEMBERS: {
-        const nextState = {};
+        const nextState: RelationOneToOne<Team, TeamMembership> = {};
         const members = action.data;
         for (const m of members) {
             if (m.delete_at == null || m.delete_at === 0) {
@@ -204,7 +208,7 @@ function myMembers(state = {}, action) {
         return nextState;
     }
     case TeamTypes.UPDATED_TEAM_MEMBER_SCHEME_ROLES: {
-        return updateTeamMemberSchemeRoles(state, action);
+        return updateMyTeamMemberSchemeRoles(state, action);
     }
     case UserTypes.LOGOUT_SUCCESS:
         return {};
@@ -213,7 +217,7 @@ function myMembers(state = {}, action) {
     }
 }
 
-function membersInTeam(state = {}, action) {
+function membersInTeam(state: RelationOneToOne<Team, RelationOneToOne<UserProfile, TeamMembership>> = {}, action: GenericAction) {
     switch (action.type) {
     case TeamTypes.RECEIVED_MEMBER_IN_TEAM: {
         const data = action.data;
@@ -293,7 +297,7 @@ function membersInTeam(state = {}, action) {
     }
 }
 
-function stats(state = {}, action) {
+function stats(state = {}, action: GenericAction) {
     switch (action.type) {
     case TeamTypes.RECEIVED_TEAM_STATS: {
         const stat = action.data;
@@ -319,7 +323,7 @@ function stats(state = {}, action) {
     }
 }
 
-function groupsAssociatedToTeam(state = {}, action) {
+function groupsAssociatedToTeam(state: RelationOneToOne<Team, {ids: string[]; totalCount: number}> = {}, action: GenericAction) {
     switch (action.type) {
     case GroupTypes.RECEIVED_GROUPS_ASSOCIATED_TO_TEAM: {
         const {teamID, groups, totalGroupCount} = action.data;
@@ -349,7 +353,7 @@ function groupsAssociatedToTeam(state = {}, action) {
         for (const group of groups) {
             associatedGroupIDs.delete(group.id);
         }
-        nextState[teamID] = Array.from(associatedGroupIDs);
+        nextState[teamID] = {ids: Array.from(associatedGroupIDs), totalCount: associatedGroupIDs.size};
         return nextState;
     }
     default:
@@ -357,7 +361,7 @@ function groupsAssociatedToTeam(state = {}, action) {
     }
 }
 
-function updateTeamMemberSchemeRoles(state, action) {
+function updateTeamMemberSchemeRoles(state: RelationOneToOne<Team, RelationOneToOne<UserProfile, TeamMembership>>, action: GenericAction) {
     const {teamId, userId, isSchemeUser, isSchemeAdmin} = action.data;
     const team = state[teamId];
     if (team) {
@@ -379,7 +383,23 @@ function updateTeamMemberSchemeRoles(state, action) {
     return state;
 }
 
-function totalCount(state = 0, action) {
+function updateMyTeamMemberSchemeRoles(state: RelationOneToOne<Team, TeamMembership>, action: GenericAction) {
+    const {teamId, userId, isSchemeUser, isSchemeAdmin} = action.data;
+    const member = state[teamId];
+    if (member) {
+        return {
+            ...state,
+            [teamId]: {
+                ...state[teamId],
+                scheme_user: isSchemeUser,
+                scheme_admin: isSchemeAdmin,
+            },
+        };
+    }
+    return state;
+}
+
+function totalCount(state = 0, action: GenericAction) {
     switch (action.type) {
     case TeamTypes.RECEIVED_TOTAL_TEAM_COUNT: {
         return action.data;
