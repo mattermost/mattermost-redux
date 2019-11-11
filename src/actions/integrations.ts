@@ -7,13 +7,13 @@ import {getCurrentUserId} from 'selectors/entities/users';
 import {getCurrentChannelId} from 'selectors/entities/channels';
 import {getCurrentTeamId} from 'selectors/entities/teams';
 
-import {batchActions, DispatchFunc, GetStateFunc} from 'types/actions';
+import {batchActions, DispatchFunc, GetStateFunc, ActionFunc} from 'types/actions';
 
 import {Command, DialogSubmission, IncomingWebhook, OAuthApp, OutgoingWebhook} from 'types/integrations';
 
 import {logError} from './errors';
 import {bindClientFunc, forceLogoutIfNecessary} from './helpers';
-export function createIncomingHook(hook: IncomingWebhook) {
+export function createIncomingHook(hook: IncomingWebhook): ActionFunc {
     return bindClientFunc({
         clientFunc: Client4.createIncomingWebhook,
         onRequest: IntegrationTypes.CREATE_INCOMING_HOOK_REQUEST,
@@ -25,7 +25,7 @@ export function createIncomingHook(hook: IncomingWebhook) {
     });
 }
 
-export function getIncomingHook(hookId: string) {
+export function getIncomingHook(hookId: string): ActionFunc {
     return bindClientFunc({
         clientFunc: Client4.getIncomingWebhook,
         onRequest: IntegrationTypes.GET_INCOMING_HOOKS_REQUEST,
@@ -37,7 +37,7 @@ export function getIncomingHook(hookId: string) {
     });
 }
 
-export function getIncomingHooks(teamId = '', page = 0, perPage: number = General.PAGE_SIZE_DEFAULT) {
+export function getIncomingHooks(teamId = '', page = 0, perPage: number = General.PAGE_SIZE_DEFAULT): ActionFunc {
     return bindClientFunc({
         clientFunc: Client4.getIncomingWebhooks,
         onRequest: IntegrationTypes.GET_INCOMING_HOOKS_REQUEST,
@@ -51,7 +51,7 @@ export function getIncomingHooks(teamId = '', page = 0, perPage: number = Genera
     });
 }
 
-export function removeIncomingHook(hookId: string) {
+export function removeIncomingHook(hookId: string): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         dispatch({type: IntegrationTypes.DELETE_INCOMING_HOOK_REQUEST, data: {}}, getState);
 
@@ -81,7 +81,7 @@ export function removeIncomingHook(hookId: string) {
     };
 }
 
-export function updateIncomingHook(hook: IncomingWebhook) {
+export function updateIncomingHook(hook: IncomingWebhook): ActionFunc {
     return bindClientFunc({
         clientFunc: Client4.updateIncomingWebhook,
         onRequest: IntegrationTypes.UPDATE_INCOMING_HOOK_REQUEST,
@@ -93,7 +93,7 @@ export function updateIncomingHook(hook: IncomingWebhook) {
     });
 }
 
-export function createOutgoingHook(hook: OutgoingWebhook) {
+export function createOutgoingHook(hook: OutgoingWebhook): ActionFunc {
     return bindClientFunc({
         clientFunc: Client4.createOutgoingWebhook,
         onRequest: IntegrationTypes.CREATE_OUTGOING_HOOK_REQUEST,
@@ -105,7 +105,7 @@ export function createOutgoingHook(hook: OutgoingWebhook) {
     });
 }
 
-export function getOutgoingHook(hookId: string) {
+export function getOutgoingHook(hookId: string): ActionFunc {
     return bindClientFunc({
         clientFunc: Client4.getOutgoingWebhook,
         onRequest: IntegrationTypes.GET_OUTGOING_HOOKS_REQUEST,
@@ -117,7 +117,7 @@ export function getOutgoingHook(hookId: string) {
     });
 }
 
-export function getOutgoingHooks(channelId = '', teamId = '', page = 0, perPage: number = General.PAGE_SIZE_DEFAULT) {
+export function getOutgoingHooks(channelId = '', teamId = '', page = 0, perPage: number = General.PAGE_SIZE_DEFAULT): ActionFunc {
     return bindClientFunc({
         clientFunc: Client4.getOutgoingWebhooks,
         onRequest: IntegrationTypes.GET_OUTGOING_HOOKS_REQUEST,
@@ -132,7 +132,7 @@ export function getOutgoingHooks(channelId = '', teamId = '', page = 0, perPage:
     });
 }
 
-export function removeOutgoingHook(hookId: string) {
+export function removeOutgoingHook(hookId: string): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         dispatch({type: IntegrationTypes.DELETE_OUTGOING_HOOK_REQUEST, data: {}}, getState);
 
@@ -162,7 +162,7 @@ export function removeOutgoingHook(hookId: string) {
     };
 }
 
-export function updateOutgoingHook(hook: OutgoingWebhook) {
+export function updateOutgoingHook(hook: OutgoingWebhook): ActionFunc {
     return bindClientFunc({
         clientFunc: Client4.updateOutgoingWebhook,
         onRequest: IntegrationTypes.UPDATE_OUTGOING_HOOK_REQUEST,
@@ -174,7 +174,7 @@ export function updateOutgoingHook(hook: OutgoingWebhook) {
     });
 }
 
-export function regenOutgoingHookToken(hookId: string) {
+export function regenOutgoingHookToken(hookId: string): ActionFunc {
     return bindClientFunc({
         clientFunc: Client4.regenOutgoingHookToken,
         onRequest: IntegrationTypes.UPDATE_OUTGOING_HOOK_REQUEST,
@@ -186,7 +186,7 @@ export function regenOutgoingHookToken(hookId: string) {
     });
 }
 
-export function getCommands(teamId: string) {
+export function getCommands(teamId: string): ActionFunc {
     return bindClientFunc({
         clientFunc: Client4.getCommandsList,
         onRequest: IntegrationTypes.GET_COMMANDS_REQUEST,
@@ -198,7 +198,7 @@ export function getCommands(teamId: string) {
     });
 }
 
-export function getAutocompleteCommands(teamId: string, page = 0, perPage: number = General.PAGE_SIZE_DEFAULT) {
+export function getAutocompleteCommands(teamId: string, page = 0, perPage: number = General.PAGE_SIZE_DEFAULT): ActionFunc {
     return bindClientFunc({
         clientFunc: Client4.getAutocompleteCommandsList,
         onRequest: IntegrationTypes.GET_AUTOCOMPLETE_COMMANDS_REQUEST,
@@ -212,7 +212,7 @@ export function getAutocompleteCommands(teamId: string, page = 0, perPage: numbe
     });
 }
 
-export function getCustomTeamCommands(teamId: string) {
+export function getCustomTeamCommands(teamId: string): ActionFunc {
     return bindClientFunc({
         clientFunc: Client4.getCustomTeamCommands,
         onRequest: IntegrationTypes.GET_CUSTOM_TEAM_COMMANDS_REQUEST,
@@ -224,7 +224,7 @@ export function getCustomTeamCommands(teamId: string) {
     });
 }
 
-export function addCommand(command: Command) {
+export function addCommand(command: Command): ActionFunc {
     return bindClientFunc({
         clientFunc: Client4.addCommand,
         onRequest: IntegrationTypes.ADD_COMMAND_REQUEST,
@@ -236,7 +236,7 @@ export function addCommand(command: Command) {
     });
 }
 
-export function editCommand(command: Command) {
+export function editCommand(command: Command): ActionFunc {
     return bindClientFunc({
         clientFunc: Client4.editCommand,
         onRequest: IntegrationTypes.EDIT_COMMAND_REQUEST,
@@ -248,7 +248,7 @@ export function editCommand(command: Command) {
     });
 }
 
-export function executeCommand(command: Command, args: Array<string>) {
+export function executeCommand(command: Command, args: Array<string>): ActionFunc {
     return bindClientFunc({
         clientFunc: Client4.executeCommand,
         onRequest: IntegrationTypes.EXECUTE_COMMAND_REQUEST,
@@ -261,7 +261,7 @@ export function executeCommand(command: Command, args: Array<string>) {
     });
 }
 
-export function regenCommandToken(id: string) {
+export function regenCommandToken(id: string): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         dispatch({type: IntegrationTypes.REGEN_COMMAND_TOKEN_REQUEST, data: {}}, getState);
 
@@ -295,7 +295,7 @@ export function regenCommandToken(id: string) {
     };
 }
 
-export function deleteCommand(id: string) {
+export function deleteCommand(id: string): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         dispatch({type: IntegrationTypes.DELETE_COMMAND_REQUEST, data: {}}, getState);
 
@@ -325,7 +325,7 @@ export function deleteCommand(id: string) {
     };
 }
 
-export function addOAuthApp(app: OAuthApp) {
+export function addOAuthApp(app: OAuthApp): ActionFunc {
     return bindClientFunc({
         clientFunc: Client4.createOAuthApp,
         onRequest: IntegrationTypes.ADD_OAUTH_APP_REQUEST,
@@ -337,7 +337,7 @@ export function addOAuthApp(app: OAuthApp) {
     });
 }
 
-export function editOAuthApp(app: OAuthApp) {
+export function editOAuthApp(app: OAuthApp): ActionFunc {
     return bindClientFunc({
         clientFunc: Client4.editOAuthApp,
         onRequest: IntegrationTypes.UPDATE_OAUTH_APP_REQUEST,
@@ -349,7 +349,7 @@ export function editOAuthApp(app: OAuthApp) {
     });
 }
 
-export function getOAuthApps(page = 0, perPage: number = General.PAGE_SIZE_DEFAULT) {
+export function getOAuthApps(page = 0, perPage: number = General.PAGE_SIZE_DEFAULT): ActionFunc {
     return bindClientFunc({
         clientFunc: Client4.getOAuthApps,
         onRequest: IntegrationTypes.GET_OAUTH_APPS_REQUEST,
@@ -362,7 +362,7 @@ export function getOAuthApps(page = 0, perPage: number = General.PAGE_SIZE_DEFAU
     });
 }
 
-export function getOAuthApp(appId: string) {
+export function getOAuthApp(appId: string): ActionFunc {
     return bindClientFunc({
         clientFunc: Client4.getOAuthApp,
         onRequest: IntegrationTypes.GET_OAUTH_APP_REQUEST,
@@ -374,7 +374,7 @@ export function getOAuthApp(appId: string) {
     });
 }
 
-export function getAuthorizedOAuthApps() {
+export function getAuthorizedOAuthApps(): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         dispatch({type: IntegrationTypes.GET_AUTHORIZED_OAUTH_APPS_REQUEST, data: {}});
 
@@ -401,7 +401,7 @@ export function getAuthorizedOAuthApps() {
     };
 }
 
-export function deauthorizeOAuthApp(clientId: string) {
+export function deauthorizeOAuthApp(clientId: string): ActionFunc {
     return bindClientFunc({
         clientFunc: Client4.deauthorizeOAuthApp,
         onRequest: IntegrationTypes.DEAUTHORIZE_OAUTH_APP_REQUEST,
@@ -411,7 +411,7 @@ export function deauthorizeOAuthApp(clientId: string) {
     });
 }
 
-export function deleteOAuthApp(id: string) {
+export function deleteOAuthApp(id: string): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         dispatch({type: IntegrationTypes.DELETE_OAUTH_APP_REQUEST, data: {}}, getState);
 
@@ -441,7 +441,7 @@ export function deleteOAuthApp(id: string) {
     };
 }
 
-export function regenOAuthAppSecret(appId: string) {
+export function regenOAuthAppSecret(appId: string): ActionFunc {
     return bindClientFunc({
         clientFunc: Client4.regenOAuthAppSecret,
         onRequest: IntegrationTypes.UPDATE_OAUTH_APP_REQUEST,
@@ -453,7 +453,7 @@ export function regenOAuthAppSecret(appId: string) {
     });
 }
 
-export function submitInteractiveDialog(submission: DialogSubmission) {
+export function submitInteractiveDialog(submission: DialogSubmission): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         dispatch({type: IntegrationTypes.SUBMIT_INTERACTIVE_DIALOG_REQUEST, data: {}});
 

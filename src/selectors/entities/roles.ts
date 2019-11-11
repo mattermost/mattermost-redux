@@ -1,14 +1,14 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
-import {createSelector} from 'reselect';
+import * as reselect from 'reselect';
 import {getCurrentUser, getCurrentChannelId} from 'selectors/entities/common';
 import {getTeamMemberships, getCurrentTeamId} from './teams';
-import {GlobalState} from 'types/store';
+import * as types from 'types';
 import {getMySystemPermissions, getMySystemRoles, getRoles} from 'selectors/entities/roles_helpers';
 
 export {getMySystemPermissions, getMySystemRoles, getRoles};
 
-export const getMyTeamRoles = createSelector(
+export const getMyTeamRoles = reselect.createSelector(
     getTeamMemberships,
     (teamsMemberships) => {
         const roles = {};
@@ -23,8 +23,8 @@ export const getMyTeamRoles = createSelector(
     }
 );
 
-export const getMyChannelRoles = createSelector(
-    (state: GlobalState) => state.entities.channels.myMembers,
+export const getMyChannelRoles = reselect.createSelector(
+    (state: types.store.GlobalState) => state.entities.channels.myMembers,
     (channelsMemberships) => {
         const roles = {};
         if (channelsMemberships) {
@@ -38,7 +38,7 @@ export const getMyChannelRoles = createSelector(
     }
 );
 
-export const getMyRoles = createSelector(
+export const getMyRoles = reselect.createSelector(
     getMySystemRoles,
     getMyTeamRoles,
     getMyChannelRoles,
@@ -51,7 +51,7 @@ export const getMyRoles = createSelector(
     }
 );
 
-export const getRolesById = createSelector(
+export const getRolesById = reselect.createSelector(
     getRoles,
     (rolesByName) => {
         const rolesById = {};
@@ -62,7 +62,7 @@ export const getRolesById = createSelector(
     }
 );
 
-export const getMyCurrentTeamPermissions = createSelector(
+export const getMyCurrentTeamPermissions = reselect.createSelector(
     getMyTeamRoles,
     getRoles,
     getMySystemPermissions,
@@ -85,7 +85,7 @@ export const getMyCurrentTeamPermissions = createSelector(
     }
 );
 
-export const getMyCurrentChannelPermissions = createSelector(
+export const getMyCurrentChannelPermissions = reselect.createSelector(
     getMyChannelRoles,
     getRoles,
     getMyCurrentTeamPermissions,
@@ -108,7 +108,7 @@ export const getMyCurrentChannelPermissions = createSelector(
     }
 );
 
-export const getMyTeamPermissions = createSelector(
+export const getMyTeamPermissions = reselect.createSelector(
     getMyTeamRoles,
     getRoles,
     getMySystemPermissions,
@@ -131,7 +131,7 @@ export const getMyTeamPermissions = createSelector(
     }
 );
 
-export const getMyChannelPermissions = createSelector(
+export const getMyChannelPermissions = reselect.createSelector(
     getMyChannelRoles,
     getRoles,
     getMyTeamPermissions,
@@ -154,7 +154,7 @@ export const getMyChannelPermissions = createSelector(
     }
 );
 
-export const haveISystemPermission = createSelector(
+export const haveISystemPermission = reselect.createSelector(
     getMySystemPermissions,
     (state, options) => options.permission,
     (permissions, permission) => {
@@ -162,7 +162,7 @@ export const haveISystemPermission = createSelector(
     }
 );
 
-export const haveITeamPermission = createSelector(
+export const haveITeamPermission = reselect.createSelector(
     getMyTeamPermissions,
     (state, options) => options.permission,
     (permissions, permission) => {
@@ -170,7 +170,7 @@ export const haveITeamPermission = createSelector(
     }
 );
 
-export const haveIChannelPermission = createSelector(
+export const haveIChannelPermission = reselect.createSelector(
     getMyChannelPermissions,
     (state, options) => options.permission,
     (permissions, permission) => {
@@ -178,7 +178,7 @@ export const haveIChannelPermission = createSelector(
     }
 );
 
-export const haveICurrentTeamPermission = createSelector(
+export const haveICurrentTeamPermission = reselect.createSelector(
     getMyCurrentTeamPermissions,
     (state, options) => options.permission,
     (permissions, permission) => {
@@ -186,7 +186,7 @@ export const haveICurrentTeamPermission = createSelector(
     }
 );
 
-export const haveICurrentChannelPermission = createSelector(
+export const haveICurrentChannelPermission = reselect.createSelector(
     getMyCurrentChannelPermissions,
     (state, options) => options.permission,
     (permissions, permission) => {

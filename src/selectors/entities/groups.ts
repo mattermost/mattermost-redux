@@ -1,6 +1,6 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
-import {createSelector} from 'reselect';
+import * as reselect from 'reselect';
 import {GlobalState} from 'types/store';
 const emptyList = [];
 const emptySyncables = {
@@ -49,17 +49,17 @@ const teamGroupIDs = (state: GlobalState, teamID) => (state.entities.teams.group
 
 const channelGroupIDs = (state: GlobalState, channelID) => (state.entities.channels.groupsAssociatedToChannel[channelID] == null ? undefined : state.entities.channels.groupsAssociatedToChannel[channelID].ids == null ? undefined : state.entities.channels.groupsAssociatedToChannel[channelID].ids) || [];
 
-const getTeamGroupIDSet = createSelector(
+const getTeamGroupIDSet = reselect.createSelector(
     teamGroupIDs,
     (teamIDs) => new Set(teamIDs),
 );
 
-const getChannelGroupIDSet = createSelector(
+const getChannelGroupIDSet = reselect.createSelector(
     channelGroupIDs,
     (channelIDs) => new Set(channelIDs),
 );
 
-export const getGroupsNotAssociatedToTeam = createSelector(
+export const getGroupsNotAssociatedToTeam = reselect.createSelector(
     getAllGroups,
     (state, teamID) => getTeamGroupIDSet(state, teamID),
     (allGroups, teamGroupIDSet) => {
@@ -67,7 +67,7 @@ export const getGroupsNotAssociatedToTeam = createSelector(
     }
 );
 
-export const getGroupsAssociatedToTeam = createSelector(
+export const getGroupsAssociatedToTeam = reselect.createSelector(
     getAllGroups,
     (state, teamID) => getTeamGroupIDSet(state, teamID),
     (allGroups, teamGroupIDSet) => {
@@ -75,7 +75,7 @@ export const getGroupsAssociatedToTeam = createSelector(
     }
 );
 
-export const getGroupsNotAssociatedToChannel = createSelector(
+export const getGroupsNotAssociatedToChannel = reselect.createSelector(
     getAllGroups,
     (state, channelID) => getChannelGroupIDSet(state, channelID),
     (allGroups, channelGroupIDSet) => {
@@ -83,7 +83,7 @@ export const getGroupsNotAssociatedToChannel = createSelector(
     }
 );
 
-export const getGroupsAssociatedToChannel = createSelector(
+export const getGroupsAssociatedToChannel = reselect.createSelector(
     getAllGroups,
     (state, channelID) => getChannelGroupIDSet(state, channelID),
     (allGroups, channelGroupIDSet) => {
