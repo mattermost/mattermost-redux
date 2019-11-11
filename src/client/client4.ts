@@ -147,10 +147,6 @@ export default class Client4 {
         return `${this.getBaseRoute()}/channels`;
     }
 
-    getArchivedChannelsRoute() {
-        return `${this.getChannelsRoute()}/deleted`;
-    }
-
     getChannelRoute(channelId) {
         return `${this.getChannelsRoute()}/${channelId}`;
     }
