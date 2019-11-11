@@ -10,12 +10,9 @@ PULL_REQUEST_TEMPLATE.md
 .npmignore
 .npminstall
 .tmp
-src
 .circleci
 jest.config.js
 babel.config.js
-rollup.config.js
-tsconfig.json
 .editorconfig                          
 .eslintignore                          
 mattermost-redux.iml 
