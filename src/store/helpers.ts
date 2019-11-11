@@ -32,7 +32,7 @@ export function createReducer(baseState, ...reducers) {
     // as the new state.
     function offlineReducer(state = {}, action) {
         if (action.type === General.OFFLINE_STORE_RESET) {
-            return baseReducer(baseState, action);
+            return baseReducer(action.data || baseState, action);
         }
 
         return baseReducer(state, action);

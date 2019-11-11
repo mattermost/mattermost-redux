@@ -44,6 +44,7 @@ export default keyMirror({
 
     SELECT_CHANNEL: null,
     LEAVE_CHANNEL: null,
+    REMOVE_MEMBER_FROM_CHANNEL: null,
     RECEIVED_CHANNEL: null,
     RECEIVED_CHANNELS: null,
     RECEIVED_ALL_CHANNELS: null,

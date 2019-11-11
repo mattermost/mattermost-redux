@@ -2,7 +2,7 @@
 // See LICENSE.txt for license information.
 
 /* eslint-disable no-undefined */
-import {createStore} from 'redux';
+import * as redux from 'redux';
 import devTools from 'remote-redux-devtools';
 import {createOfflineReducer, networkStatusChangedAction, offlineCompose} from 'redux-offline';
 import defaultOfflineConfig from 'redux-offline/lib/defaults';
@@ -43,7 +43,7 @@ export default function configureServiceStore(preloadedState, appReducer, userOf
 
     const loadReduxDevtools = process.env.NODE_ENV !== 'test'; //eslint-disable-line no-process-env
 
-    const store = createStore(
+    const store = redux.createStore(
         createOfflineReducer(createDevReducer(baseState, serviceReducer, appReducer)),
         baseState,
         offlineCompose(baseOfflineConfig)(

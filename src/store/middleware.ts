@@ -8,7 +8,7 @@ const defaultOptions = {
     enableBuffer: true,
     enableThunk: true,
 };
-export function createMiddleware(clientOptions) {
+export function createMiddleware(clientOptions): ThunkMiddleware[] {
     const options = Object.assign({}, defaultOptions, clientOptions);
     const {
         additionalMiddleware,

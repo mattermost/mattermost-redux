@@ -1,15 +1,15 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
-import {createSelector} from 'reselect';
+import * as reselect from 'reselect';
 import {GlobalState} from 'types/store';
 import {getCurrentUser} from 'selectors/entities/common';
-import {UserProfile} from 'types/users';
+import * as types from 'types';
 
 export function getRoles(state: GlobalState) {
     return state.entities.roles.roles;
 }
 
-export const getMySystemRoles = createSelector(getCurrentUser, (user: UserProfile) => {
+export const getMySystemRoles = reselect.createSelector(getCurrentUser, (user: types.users.UserProfile) => {
     if (user) {
         return new Set<string>(user.roles.split(' '));
     }
@@ -17,7 +17,7 @@ export const getMySystemRoles = createSelector(getCurrentUser, (user: UserProfil
     return new Set<string>();
 });
 
-export const getMySystemPermissions = createSelector(getMySystemRoles, getRoles, (mySystemRoles: Set<string>, roles) => {
+export const getMySystemPermissions = reselect.createSelector(getMySystemRoles, getRoles, (mySystemRoles: Set<string>, roles) => {
     const permissions = new Set<string>();
 
     for (const roleName of mySystemRoles) {
@@ -31,6 +31,6 @@ export const getMySystemPermissions = createSelector(getMySystemRoles, getRoles,
     return permissions;
 });
 
-export const haveISystemPermission = createSelector(getMySystemPermissions, (state, options) => options.permission, (permissions, permission) => {
+export const haveISystemPermission = reselect.createSelector(getMySystemPermissions, (state, options) => options.permission, (permissions, permission) => {
     return permissions.has(permission);
 });
