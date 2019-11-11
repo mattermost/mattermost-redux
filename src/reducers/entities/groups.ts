@@ -3,8 +3,11 @@
 import {combineReducers} from 'redux';
 import {GroupTypes} from 'action_types';
 import {GroupChannel, GroupSyncables, GroupTeam} from 'types/groups';
+import {GenericAction} from 'types/actions';
+import {Team, TeamMembership} from 'types/teams';
+import {ChannelMembership} from 'types/channels';
 
-function syncables(state = {}, action) {
+function syncables(state: any = {}, action: GenericAction) {
     switch (action.type) {
     case GroupTypes.RECEIVED_GROUP_TEAMS: {
         return {
@@ -72,7 +75,7 @@ function syncables(state = {}, action) {
         if (!state[action.data.group_id]) {
             return state;
         }
-        const nextTeams = state[action.data.group_id].teams.slice();
+        const nextTeams = state[action.data.group_id].teams.slice() as TeamMembership[];
 
         const index = nextTeams.findIndex((groupTeam) => {
             return groupTeam.team_id === action.data.syncable_id;
@@ -96,7 +99,7 @@ function syncables(state = {}, action) {
         }
         const nextChannels = state[action.data.group_id].channels.slice();
 
-        const index = nextChannels.findIndex((groupChannel) => {
+        const index = nextChannels.findIndex((groupChannel: ChannelMembership) => {
             return groupChannel.channel_id === action.data.syncable_id;
         });
 
@@ -117,7 +120,7 @@ function syncables(state = {}, action) {
     }
 }
 
-function members(state = {}, action) {
+function members(state: any = {}, action: GenericAction) {
     switch (action.type) {
     case GroupTypes.RECEIVED_GROUP_MEMBERS: {
         return {
@@ -133,7 +136,7 @@ function members(state = {}, action) {
     }
 }
 
-function groups(state = {}, action) {
+function groups(state: any = {}, action: GenericAction) {
     switch (action.type) {
     case GroupTypes.RECEIVED_GROUP: {
         return {

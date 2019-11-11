@@ -63,3 +63,11 @@ export type UserActivity = {
         } | Array<$ID<UserProfile>>;
     };
 };
+
+export type UserStatus = {
+	user_id: string;
+	status: string;
+	manual: boolean;
+	last_activity_at: number;
+	active_channel?: string;
+}

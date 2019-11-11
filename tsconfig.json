@@ -1,13 +1,21 @@
 {
-    "include": ["src"],
-    "exclude": ["node_modules", "build"],
+    "include": [
+        "src"
+    ],
+    "exclude": [
+        "node_modules",
+        "build"
+    ],
     "typeAcquisition": {
         "enable": true
     },
     "compilerOptions": {
         "target": "es5",
         "module": "commonjs",
-        "lib": ["dom", "esnext"],
+        "lib": [
+            "dom",
+            "esnext"
+        ],
         "allowJs": false,
         "importHelpers": true,
         "declaration": true,
@@ -16,7 +24,7 @@
         "outDir": "./",
         "strict": false,
         "noEmit": false,
-        "noImplicitAny": false,
+        "noImplicitAny": true,
         "strictNullChecks": true,
         "strictFunctionTypes": false,
         "strictPropertyInitialization": true,
@@ -30,21 +38,44 @@
         "moduleResolution": "node",
         "baseUrl": "./",
         "paths": {
-            "utils/*": ["src/utils/*"],
-            "types/*": ["src/types/*"],
-            "constants/*": ["src/constants/*"],
-            "client": ["src/client"],
-            "selectors/*": ["src/selectors/*"],
-            "store/*": ["src/store/*"],
-            "action_types": ["src/action_types"],
-            "actions/*": ["src/action_types/*"],
-            "test/*": ["test/*"],
-            "*": ["src/*","node_modules/*"]
+            "utils/*": [
+                "src/utils/*"
+            ],
+            "types/*": [
+                "src/types/*"
+            ],
+            "constants/*": [
+                "src/constants/*"
+            ],
+            "client": [
+                "src/client"
+            ],
+            "selectors/*": [
+                "src/selectors/*"
+            ],
+            "store/*": [
+                "src/store/*"
+            ],
+            "action_types": [
+                "src/action_types"
+            ],
+            "actions/*": [
+                "src/action_types/*"
+            ],
+            "test/*": [
+                "test/*"
+            ],
+            "*": [
+                "src/*",
+                "node_modules/*"
+            ]
         },
         "plugins": [
             {
                 "transform": "@zerollup/ts-transform-paths",
-                "exclude": ["*"]
+                "exclude": [
+                    "*"
+                ]
             }
         ],
         "jsx": "react",

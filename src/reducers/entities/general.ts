@@ -3,8 +3,9 @@
 
 import {combineReducers} from 'redux';
 import {GeneralTypes, UserTypes} from 'action_types';
+import {GenericAction} from 'types/actions';
 
-function config(state = {}, action) {
+function config(state: any = {}, action: GenericAction) {
     switch (action.type) {
     case GeneralTypes.CLIENT_CONFIG_RECEIVED:
         return Object.assign({}, state, action.data);
@@ -16,7 +17,7 @@ function config(state = {}, action) {
     }
 }
 
-function appState(state = false, action) {
+function appState(state = false, action: GenericAction) {
     switch (action.type) {
     case GeneralTypes.RECEIVED_APP_STATE:
         return action.data;
@@ -26,7 +27,7 @@ function appState(state = false, action) {
     }
 }
 
-function credentials(state = {}, action) {
+function credentials(state: any = {}, action: GenericAction) {
     switch (action.type) {
     case GeneralTypes.RECEIVED_APP_CREDENTIALS:
         return Object.assign({}, state, action.data);
@@ -38,7 +39,7 @@ function credentials(state = {}, action) {
     }
 }
 
-function dataRetentionPolicy(state = {}, action) {
+function dataRetentionPolicy(state: any = {}, action: GenericAction) {
     switch (action.type) {
     case GeneralTypes.RECEIVED_DATA_RETENTION_POLICY:
         return action.data;
@@ -49,7 +50,7 @@ function dataRetentionPolicy(state = {}, action) {
     }
 }
 
-function deviceToken(state = '', action) {
+function deviceToken(state = '', action: GenericAction) {
     switch (action.type) {
     case GeneralTypes.RECEIVED_APP_DEVICE_TOKEN:
         return action.data;
@@ -58,7 +59,7 @@ function deviceToken(state = '', action) {
     }
 }
 
-function license(state = {}, action) {
+function license(state: any = {}, action: GenericAction) {
     switch (action.type) {
     case GeneralTypes.CLIENT_LICENSE_RECEIVED:
         return action.data;
@@ -70,7 +71,7 @@ function license(state = {}, action) {
     }
 }
 
-function timezones(state = [], action) {
+function timezones(state = [], action: GenericAction) {
     switch (action.type) {
     case GeneralTypes.SUPPORTED_TIMEZONES_RECEIVED:
         return action.data;
@@ -81,7 +82,7 @@ function timezones(state = [], action) {
     }
 }
 
-function serverVersion(state = '', action) {
+function serverVersion(state = '', action: GenericAction) {
     switch (action.type) {
     case GeneralTypes.RECEIVED_SERVER_VERSION:
         return action.data;

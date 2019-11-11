@@ -3,8 +3,9 @@
 
 import {combineReducers} from 'redux';
 import {RoleTypes, UserTypes} from 'action_types';
+import {GenericAction} from 'types/actions';
 
-function pending(state = new Set(), action) {
+function pending(state = new Set(), action: GenericAction) {
     switch (action.type) {
     case RoleTypes.SET_PENDING_ROLES:
         return action.data;
@@ -15,7 +16,7 @@ function pending(state = new Set(), action) {
     }
 }
 
-function roles(state = {}, action) {
+function roles(state: any = {}, action: GenericAction) {
     switch (action.type) {
     case RoleTypes.RECEIVED_ROLES: {
         if (action.data) {

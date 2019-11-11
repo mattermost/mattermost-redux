@@ -1,14 +1,16 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
-import createActionBuffer from 'redux-action-buffer';
-import {REHYDRATE} from 'redux-persist/constants';
 import thunk, {ThunkMiddleware} from 'redux-thunk';
+
+const REHYDRATE = require('redux-persist/constants');
+const createActionBuffer = require('redux-action-buffer');
+
 const defaultOptions = {
     additionalMiddleware: [],
     enableBuffer: true,
     enableThunk: true,
 };
-export function createMiddleware(clientOptions): ThunkMiddleware[] {
+export function createMiddleware(clientOptions: any): ThunkMiddleware[] {
     const options = Object.assign({}, defaultOptions, clientOptions);
     const {
         additionalMiddleware,

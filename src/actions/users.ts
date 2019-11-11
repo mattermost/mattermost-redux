@@ -1,7 +1,7 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
 import {Action, ActionFunc, ActionResult, batchActions, DispatchFunc, GetStateFunc} from 'types/actions';
-import {UserProfile} from 'types/users';
+import {UserProfile, UserStatus} from 'types/users';
 import {TeamMembership} from 'types/teams';
 import {Client4} from 'client';
 import {General} from '../constants';
@@ -21,6 +21,7 @@ import {getCurrentUserId, getUsers} from 'selectors/entities/users';
 import {logError} from './errors';
 import {bindClientFunc, forceLogoutIfNecessary, debounce} from './helpers';
 import {getMyPreferences, makeDirectChannelVisibleIfNecessary, makeGroupMessageVisibleIfNecessary} from './preferences';
+import {Dictionary} from 'types/utilities';
 export function checkMfa(loginId: string): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         dispatch({type: UserTypes.CHECK_MFA_REQUEST, data: null}, getState);
@@ -314,7 +315,7 @@ export function getMissingProfilesByUsernames(usernames: Array<string>): ActionF
         const usernameProfiles = Object.values(profiles).reduce((acc, profile: any) => {
             acc[profile.username] = profile;
             return acc;
-        }, {});
+        }, {} as Dictionary<UserProfile>);
         const missingUsernames: string[] = [];
         usernames.forEach((username) => {
             if (!usernameProfiles[username]) {
@@ -709,7 +710,7 @@ export function getStatus(userId: string): ActionFunc {
     });
 }
 
-export function setStatus(status: string): ActionFunc {
+export function setStatus(status: UserStatus): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         try {
             await Client4.updateStatus(status);
@@ -961,7 +962,7 @@ export function searchProfiles(term: string, options: any = {}): ActionFunc {
     };
 }
 
-let statusIntervalId;
+let statusIntervalId: NodeJS.Timeout|null;
 export function startPeriodicStatusUpdates(): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         if (statusIntervalId) {

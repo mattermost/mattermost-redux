@@ -11,7 +11,7 @@ export default ((url?: string, options: Options = {headers: {}}) => {
         const etag = etags[url!];
         const cachedResponse = data[`${url}${etag}`]; // ensure etag is for url
         if (etag) {
-            options.headers['If-None-Match'] = etag;
+            options.headers!['If-None-Match'] = etag;
         }
 
         return fetch(url!, options).

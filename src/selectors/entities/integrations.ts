@@ -33,7 +33,7 @@ export const getOutgoingHooksInCurrentTeam = reselect.createSelector(
     getCurrentTeamId,
     getOutgoingHooks,
     (teamId, hooks) => {
-        return Object.values(hooks).filter((o) => o.teamId === teamId);
+        return Object.values(hooks).filter((o) => o.team_id === teamId);
     }
 );
 

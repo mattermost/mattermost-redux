@@ -3,78 +3,80 @@
 
 import {combineReducers} from 'redux';
 import {GifTypes} from 'action_types';
+import {GenericAction} from 'types/actions';
+import {Dictionary} from 'types/utilities';
 
-const SEARCH_SELECTORS = {
-    [GifTypes.SELECT_SEARCH_TEXT]: (state, action) => ({
+const SEARCH_SELECTORS: Dictionary<Function> = {
+    [GifTypes.SELECT_SEARCH_TEXT]: (state: any, action: GenericAction) => ({
         ...state,
         searchText: action.searchText,
     }),
-    [GifTypes.INVALIDATE_SEARCH_TEXT]: (state, action) => ({
+    [GifTypes.INVALIDATE_SEARCH_TEXT]: (state: any, action: GenericAction) => ({
         ...state,
         resultsByTerm: {
             ...state.resultsByTerm[action.searchText],
             didInvalidate: true,
         },
     }),
-    [GifTypes.REQUEST_SEARCH]: (state, action) => ({
+    [GifTypes.REQUEST_SEARCH]: (state: any, action: GenericAction) => ({
         ...state,
         resultsByTerm: TERM_SELECTOR[action.type](state.resultsByTerm, action),
     }),
-    [GifTypes.RECEIVE_SEARCH]: (state, action) => ({
-        ...state,
-        searchText: action.searchText,
-        resultsByTerm: TERM_SELECTOR[action.type](state.resultsByTerm, action),
-    }),
-    [GifTypes.RECEIVE_SEARCH_END]: (state, action) => ({
+    [GifTypes.RECEIVE_SEARCH]: (state: any, action: GenericAction) => ({
         ...state,
         searchText: action.searchText,
         resultsByTerm: TERM_SELECTOR[action.type](state.resultsByTerm, action),
     }),
-    [GifTypes.RECEIVE_CATEGORY_SEARCH]: (state, action) => ({
+    [GifTypes.RECEIVE_SEARCH_END]: (state: any, action: GenericAction) => ({
         ...state,
         searchText: action.searchText,
         resultsByTerm: TERM_SELECTOR[action.type](state.resultsByTerm, action),
     }),
-    [GifTypes.SEARCH_FAILURE]: (state, action) => ({
+    [GifTypes.RECEIVE_CATEGORY_SEARCH]: (state: any, action: GenericAction) => ({
         ...state,
         searchText: action.searchText,
         resultsByTerm: TERM_SELECTOR[action.type](state.resultsByTerm, action),
     }),
-    [GifTypes.CLEAR_SEARCH_RESULTS]: (state) => ({
+    [GifTypes.SEARCH_FAILURE]: (state: any, action: GenericAction) => ({
+        ...state,
+        searchText: action.searchText,
+        resultsByTerm: TERM_SELECTOR[action.type](state.resultsByTerm, action),
+    }),
+    [GifTypes.CLEAR_SEARCH_RESULTS]: (state: any) => ({
         ...state,
         searchText: '',
         resultsByTerm: {},
     }),
-    [GifTypes.SAVE_SEARCH_SCROLL_POSITION]: (state, action) => ({
+    [GifTypes.SAVE_SEARCH_SCROLL_POSITION]: (state: any, action: GenericAction) => ({
         ...state,
         scrollPosition: action.scrollPosition,
     }),
-    [GifTypes.SAVE_SEARCH_PRIOR_LOCATION]: (state, action) => ({
+    [GifTypes.SAVE_SEARCH_PRIOR_LOCATION]: (state: any, action: GenericAction) => ({
         ...state,
         priorLocation: action.priorLocation,
     }),
-    [GifTypes.UPDATE_SEARCH_TEXT]: (state, action) => ({
+    [GifTypes.UPDATE_SEARCH_TEXT]: (state: any, action: GenericAction) => ({
         ...state,
         searchText: action.searchText,
     }),
-    [GifTypes.SAVE_SEARCH_BAR_TEXT]: (state, action) => ({
+    [GifTypes.SAVE_SEARCH_BAR_TEXT]: (state: any, action: GenericAction) => ({
         ...state,
         searchBarText: action.searchBarText,
     }),
 };
 
-const CATEGORIES_SELECTORS = {
-    [GifTypes.REQUEST_CATEGORIES_LIST]: (state) => ({
+const CATEGORIES_SELECTORS: Dictionary<Function> = {
+    [GifTypes.REQUEST_CATEGORIES_LIST]: (state: any) => ({
         ...state,
         isFetching: true,
     }),
-    [GifTypes.CATEGORIES_LIST_RECEIVED]: (state, action) => {
+    [GifTypes.CATEGORIES_LIST_RECEIVED]: (state: any, action: GenericAction) => {
         const {cursor, tags} = action;
         const {tagsList: oldTagsList = []} = state;
-        const tagsDict = {};
-        const newTagsList = tags.filter((item) => {
+        const tagsDict: any = {};
+        const newTagsList = tags.filter((item: any) => {
             return Boolean(item && item.gfycats[0] && item.gfycats[0].width);
-        }).map((item) => {
+        }).map((item: any) => {
             tagsDict[item.tag] = true;
             return {
                 tagName: item.tag,
@@ -91,14 +93,14 @@ const CATEGORIES_SELECTORS = {
             tagsDict,
         };
     },
-    [GifTypes.CATEGORIES_LIST_FAILURE]: (state) => ({
+    [GifTypes.CATEGORIES_LIST_FAILURE]: (state: any) => ({
         ...state,
         isFetching: false,
     }),
 };
 
-const TERM_SELECTOR = {
-    [GifTypes.REQUEST_SEARCH]: (state, action) => ({
+const TERM_SELECTOR: Dictionary<Function> = {
+    [GifTypes.REQUEST_SEARCH]: (state: any, action: GenericAction) => ({
         ...state,
         [action.searchText]: {
             ...state[action.searchText],
@@ -107,11 +109,11 @@ const TERM_SELECTOR = {
             pages: PAGE_SELECTOR[action.type](state[action.searchText], action),
         },
     }),
-    [GifTypes.RECEIVE_SEARCH]: (state, action) => {
-        const gfycats = action.gfycats.filter((item) => {
+    [GifTypes.RECEIVE_SEARCH]: (state: any, action: GenericAction) => {
+        const gfycats = action.gfycats.filter((item: any) => {
             return Boolean(item.gfyId && item.width && item.height);
         });
-        const newItems = gfycats.map((gfycat) => gfycat.gfyId);
+        const newItems = gfycats.map((gfycat: any) => gfycat.gfyId);
         return {
             ...state,
             [action.searchText]: {
@@ -138,11 +140,11 @@ const TERM_SELECTOR = {
             },
         };
     },
-    [GifTypes.RECEIVE_CATEGORY_SEARCH]: (state, action) => {
-        const gfycats = action.gfycats.filter((item) => {
+    [GifTypes.RECEIVE_CATEGORY_SEARCH]: (state: any, action: GenericAction) => {
+        const gfycats = action.gfycats.filter((item: any) => {
             return Boolean(item.gfyId && item.width && item.height);
         });
-        const newItems = gfycats.map((gfycat) => gfycat.gfyId);
+        const newItems = gfycats.map((gfycat: any) => gfycat.gfyId);
         return {
             ...state,
             [action.searchText]: {
@@ -157,7 +159,7 @@ const TERM_SELECTOR = {
             },
         };
     },
-    [GifTypes.RECEIVE_SEARCH_END]: (state, action) => ({
+    [GifTypes.RECEIVE_SEARCH_END]: (state: any, action: GenericAction) => ({
         ...state,
         [action.searchText]: {
             ...state[action.searchText],
@@ -165,7 +167,7 @@ const TERM_SELECTOR = {
             moreRemaining: false,
         },
     }),
-    [GifTypes.SEARCH_FAILURE]: (state, action) => ({
+    [GifTypes.SEARCH_FAILURE]: (state: any, action: GenericAction) => ({
         ...state,
         [action.searchText]: {
             ...state[action.searchText],
@@ -179,42 +181,42 @@ const TERM_SELECTOR = {
         },
     }),
 };
-const PAGE_SELECTOR = {
-    [GifTypes.REQUEST_SEARCH]: (state: {pages?} = {}) => {
+const PAGE_SELECTOR: Dictionary<Function> = {
+    [GifTypes.REQUEST_SEARCH]: (state: {pages?: any} = {}) => {
         if (typeof state.pages == 'undefined') {
             return {};
         }
         return {...state.pages};
     },
-    [GifTypes.RECEIVE_SEARCH]: (state, action) => ({
+    [GifTypes.RECEIVE_SEARCH]: (state: any, action: GenericAction) => ({
         ...state.pages,
-        [action.currentPage]: action.gfycats.map((gfycat) => gfycat.gfyId),
+        [action.currentPage]: action.gfycats.map((gfycat: any) => gfycat.gfyId),
     }),
 };
 
-const CACHE_SELECTORS = {
-    [GifTypes.CACHE_GIFS]: (state, action) => ({
+const CACHE_SELECTORS: Dictionary<Function> = {
+    [GifTypes.CACHE_GIFS]: (state: any, action: GenericAction) => ({
         ...state,
         gifs: CACHE_GIF_SELECTOR[action.type](state.gifs, action),
         updating: false,
     }),
-    [GifTypes.CACHE_REQUEST]: (state, action) => ({
+    [GifTypes.CACHE_REQUEST]: (state: any, action: GenericAction) => ({
         ...state,
         ...action.payload,
     }),
 };
 
-const CACHE_GIF_SELECTOR = {
-    [GifTypes.CACHE_GIFS]: (state, action) => ({
+const CACHE_GIF_SELECTOR: Dictionary<Function> = {
+    [GifTypes.CACHE_GIFS]: (state: any, action: GenericAction) => ({
         ...state,
-        ...action.gifs.reduce((map, obj) => {
+        ...action.gifs.reduce((map: any, obj: any) => {
             map[obj.gfyId] = obj;
             return map;
         }, {}),
     }),
 };
 
-function appReducer(state = {}, action) {
+function appReducer(state: any = {}, action: GenericAction) {
     const nextState = {...state};
     switch (action.type) {
     case GifTypes.SAVE_APP_PROPS:
@@ -224,17 +226,17 @@ function appReducer(state = {}, action) {
     }
 }
 
-function categoriesReducer(state = {}, action) {
+function categoriesReducer(state: any = {}, action: GenericAction) {
     const selector = CATEGORIES_SELECTORS[action.type];
     return selector ? selector(state, action) : state;
 }
 
-function searchReducer(state = {}, action) {
+function searchReducer(state: any = {}, action: GenericAction) {
     const selector = SEARCH_SELECTORS[action.type];
     return selector ? selector(state, action) : state;
 }
 
-function cacheReducer(state = {}, action) {
+function cacheReducer(state: any = {}, action: GenericAction) {
     const selector = CACHE_SELECTORS[action.type];
     return selector ? selector(state, action) : state;
 }

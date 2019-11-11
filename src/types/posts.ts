@@ -77,7 +77,7 @@ export type PostWithFormatData = Post & {
     isFirstReply: boolean;
     isLastReply: boolean;
     previousPostIsComment: boolean;
-    commentedOnPost: Post;
+    commentedOnPost?: Post;
     consecutivePostByUser: boolean;
     replyCount: number;
     isCommentMention: boolean;
@@ -86,8 +86,16 @@ export type PostWithFormatData = Post & {
 
 export type PostOrderBlock = {
     order: Array<string>;
-    recent: boolean;
-    oldest: boolean;
+    recent?: boolean;
+    oldest?: boolean;
+};
+
+export type MessageHistory = {
+    messages: Array<string>;
+    index: {
+        post: number;
+        comment: number;
+    };
 };
 
 export type PostsState = {
@@ -106,12 +114,6 @@ export type PostsState = {
     pendingPostIds: Array<string>;
     selectedPostId: string;
     currentFocusedPostId: string;
-    messagesHistory: {
-        messages: Array<string>;
-        index: {
-            post: number;
-            comment: number;
-        };
-    };
+    messagesHistory: MessageHistory;
     expandedURLs: { [x: string]: string};
 };

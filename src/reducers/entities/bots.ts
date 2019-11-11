@@ -2,8 +2,9 @@
 // See LICENSE.txt for license information.
 import {combineReducers} from 'redux';
 import {BotTypes, UserTypes} from 'action_types';
+import {GenericAction} from 'types/actions';
 
-function accounts(state = {}, action) {
+function accounts(state: any = {}, action: GenericAction) {
     switch (action.type) {
     case BotTypes.RECEIVED_BOT_ACCOUNTS: {
         const newBots = action.data;

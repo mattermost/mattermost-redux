@@ -18,6 +18,8 @@ import {GroupsState} from './groups';
 import {ChannelsRequestsStatuses, GeneralRequestsStatuses, PostsRequestsStatuses, TeamsRequestsStatuses, UsersRequestsStatuses, PreferencesRequestsStatuses, AdminRequestsStatuses, FilesRequestsStatuses, IntegrationsRequestsStatuses, RolesRequestsStatuses, SchemesRequestsStatuses, GroupsRequestsStatuses, JobsRequestsStatuses, SearchRequestsStatuses} from './requests';
 import {Role} from './roles';
 import {PreferenceType} from './preferences';
+import {MarketplacePlugin} from './plugins';
+
 export type GlobalState = {
     entities: {
         general: GeneralState;
@@ -25,6 +27,9 @@ export type GlobalState = {
         teams: TeamsState;
         channels: ChannelsState;
         posts: PostsState;
+        bots: {
+            accounts: Array<any>;
+        };
         preferences: {
             myPreferences: {
                 [x: string]: PreferenceType;
@@ -48,6 +53,9 @@ export type GlobalState = {
         };
         schemes: SchemesState;
         gifs: any;
+        plugins: {
+            marketplacePlugins: Array<MarketplacePlugin>;
+        };
         groups: GroupsState;
     };
     errors: Array<any>;

@@ -22,4 +22,10 @@ export type FilesState = {
     fileIdsByPostId: {
         [x: string]: Array<string>;
     };
+    filePublicLink?: string;
 };
+
+export type FileUploadResponse = {
+	file_infos: FileInfo[];
+    client_ids: string[];
+}

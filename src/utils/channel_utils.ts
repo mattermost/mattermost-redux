@@ -396,7 +396,7 @@ export function getGroupDisplayNameFromUserIds(userIds: Array<string>, profiles:
         }
     });
 
-    function sortUsernames(a, b) {
+    function sortUsernames(a: string, b: string) {
         const locale = getUserLocale(currentUserId, profiles);
         return a.localeCompare(b, locale, {numeric: true});
     }
@@ -456,7 +456,7 @@ function createMissingDirectChannels(currentUserId: string, allChannels: Array<C
         map(createFakeChannelCurried(currentUserId));
 }
 
-function completeDirectGroupInfo(usersState, teammateNameDisplay, channel) {
+function completeDirectGroupInfo(usersState: UsersState, teammateNameDisplay: string, channel: Channel) {
     const {currentUserId, profiles, profilesInChannel} = usersState;
     const profilesIds = profilesInChannel[channel.id];
     const gm = {...channel};
@@ -483,11 +483,11 @@ function completeDirectGroupInfo(usersState, teammateNameDisplay, channel) {
     return channel;
 }
 
-function isDirectChannelForUser(userId, otherUserId, channel) {
+function isDirectChannelForUser(userId: string, otherUserId: string, channel: Channel) {
     return channel.type === General.DM_CHANNEL && getUserIdFromChannelName(userId, channel.name) === otherUserId;
 }
 
-function channelHasMentions(members, channel) {
+function channelHasMentions(members: RelationOneToOne<Channel, ChannelMembership>, channel: Channel) {
     const member = members[channel.id];
     if (member) {
         return member.mention_count > 0;
@@ -637,17 +637,17 @@ function buildDirectAndGroupChannels(channels: Array<Channel>, memberships: Rela
     });
 }
 
-function buildChannelsWithMentions(channels, members, locale) {
+function buildChannelsWithMentions(channels: Array<Channel>, members: RelationOneToOne<Channel, ChannelMembership>, locale: string) {
     return channels.filter(channelHasMentions.bind(null, members)).
         sort(sortChannelsByDisplayName.bind(null, locale));
 }
 
-function buildUnreadChannels(channels, members, locale) {
+function buildUnreadChannels(channels: Array<Channel>, members: RelationOneToOne<Channel, ChannelMembership>, locale: string) {
     return channels.filter(channelHasUnreadMessages.bind(null, members)).
         sort(sortChannelsByDisplayName.bind(null, locale));
 }
 
-function getUserLocale(userId, profiles) {
+function getUserLocale(userId: string, profiles: IDMappedObjects<UserProfile>) {
     let locale = General.DEFAULT_LOCALE;
     if (profiles && profiles[userId] && profiles[userId].locale) {
         locale = profiles[userId].locale;

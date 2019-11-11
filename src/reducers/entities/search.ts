@@ -4,8 +4,10 @@ import {combineReducers} from 'redux';
 import {PostTypes, PreferenceTypes, SearchTypes, UserTypes} from 'action_types';
 import {Preferences} from '../../constants';
 import {PreferenceType} from 'types/preferences';
+import {GenericAction} from 'types/actions';
+import {Post} from 'types/posts';
 
-function results(state: Array<string> = [], action) {
+function results(state: Array<string> = [], action: GenericAction) {
     switch (action.type) {
     case SearchTypes.RECEIVED_SEARCH_POSTS: {
         if (action.isGettingMore) {
@@ -32,7 +34,7 @@ function results(state: Array<string> = [], action) {
     }
 }
 
-function matches(state = {}, action) {
+function matches(state: any = {}, action: GenericAction) {
     switch (action.type) {
     case SearchTypes.RECEIVED_SEARCH_POSTS:
         if (action.isGettingMore) {
@@ -57,7 +59,7 @@ function matches(state = {}, action) {
     }
 }
 
-function flagged(state: Array<string> = [], action) {
+function flagged(state: Array<string> = [], action: GenericAction) {
     switch (action.type) {
     case SearchTypes.RECEIVED_SEARCH_FLAGGED_POSTS: {
         return action.data.order;
@@ -76,7 +78,7 @@ function flagged(state: Array<string> = [], action) {
         if (action.data) {
             const nextState = [...state];
             let hasNewFlaggedPosts = false;
-            action.data.forEach((pref) => {
+            action.data.forEach((pref: PreferenceType) => {
                 if (pref.category === Preferences.CATEGORY_FLAGGED_POST) {
                     const exists = nextState.find((p) => p === pref.name);
                     if (!exists) {
@@ -119,7 +121,7 @@ function flagged(state: Array<string> = [], action) {
     }
 }
 
-function removePinnedPost(state, post) {
+function removePinnedPost(state: any, post: Post) {
     if (post && state[post.channel_id]) {
         const postId = post.id;
         const channelId = post.channel_id;
@@ -138,7 +140,7 @@ function removePinnedPost(state, post) {
     return state;
 }
 
-function pinned(state = {}, action) {
+function pinned(state: any = {}, action: GenericAction) {
     switch (action.type) {
     case SearchTypes.RECEIVED_SEARCH_PINNED_POSTS: {
         const {channelId, pinned: posts} = action.data;
@@ -191,7 +193,7 @@ function pinned(state = {}, action) {
     }
 }
 
-function recent(state = {}, action) {
+function recent(state: any = {}, action: GenericAction) {
     const {data, type} = action;
 
     switch (type) {
@@ -236,7 +238,7 @@ function recent(state = {}, action) {
     }
 }
 
-function current(state = {}, action) {
+function current(state: any = {}, action: GenericAction) {
     const {data, type} = action;
     switch (type) {
     case SearchTypes.RECEIVED_SEARCH_TERM: {
@@ -258,7 +260,7 @@ function current(state = {}, action) {
     }
 }
 
-function isSearchingTerm(state = false, action) {
+function isSearchingTerm(state = false, action: GenericAction) {
     switch (action.type) {
     case SearchTypes.SEARCH_POSTS_REQUEST:
         return !action.isGettingMore;
@@ -270,7 +272,7 @@ function isSearchingTerm(state = false, action) {
     }
 }
 
-function isSearchGettingMore(state = false, action) {
+function isSearchGettingMore(state = false, action: GenericAction) {
     switch (action.type) {
     case SearchTypes.SEARCH_POSTS_REQUEST:
         return action.isGettingMore;

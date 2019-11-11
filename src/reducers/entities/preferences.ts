@@ -3,15 +3,17 @@
 
 import {combineReducers} from 'redux';
 import {PreferenceTypes, UserTypes} from 'action_types';
+import {GenericAction} from 'types/actions';
+import {PreferenceType} from 'types/preferences';
 
-function getKey(preference) {
+function getKey(preference: PreferenceType) {
     return `${preference.category}--${preference.name}`;
 }
 
-function myPreferences(state = {}, action) {
+function myPreferences(state: any = {}, action: GenericAction) {
     switch (action.type) {
     case PreferenceTypes.RECEIVED_ALL_PREFERENCES: {
-        const nextState = {};
+        const nextState: any = {};
 
         if (action.data) {
             for (const preference of action.data) {

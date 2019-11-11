@@ -23,7 +23,7 @@ export type OutgoingWebhook = {
     delete_at: number;
     creator_id: string;
     channel_id: string;
-    teamId: string;
+    team_id: string;
     trigger_words: Array<string>;
     trigger_when: number;
     callback_urls: Array<string>;

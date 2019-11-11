@@ -4,8 +4,10 @@
 import {combineReducers} from 'redux';
 import {UserTypes, ChannelTypes} from 'action_types';
 import {profileListToMap} from 'utils/user_utils';
+import {GenericAction} from 'types/actions';
+import {UserProfile} from 'types/users';
 
-function profilesToSet(state, action) {
+function profilesToSet(state: any, action: GenericAction) {
     const id = action.id;
     const nextSet = new Set(state[id]);
     Object.keys(action.data).forEach((key) => {
@@ -18,11 +20,11 @@ function profilesToSet(state, action) {
     };
 }
 
-function profileListToSet(state, action, replace = false) {
+function profileListToSet(state: any, action: GenericAction, replace = false) {
     const id = action.id;
     const nextSet = replace ? new Set() : new Set(state[id]);
     if (action.data) {
-        action.data.forEach((profile) => {
+        action.data.forEach((profile: UserProfile) => {
             nextSet.add(profile.id);
         });
 
@@ -35,11 +37,11 @@ function profileListToSet(state, action, replace = false) {
     return state;
 }
 
-function removeProfileListFromSet(state, action) {
+function removeProfileListFromSet(state: any, action: GenericAction) {
     const id = action.id;
     const nextSet = new Set(state[id]);
     if (action.data) {
-        action.data.forEach((profile) => {
+        action.data.forEach((profile: UserProfile) => {
             nextSet.delete(profile.id);
         });
 
@@ -52,7 +54,7 @@ function removeProfileListFromSet(state, action) {
     return state;
 }
 
-function addProfileToSet(state, action) {
+function addProfileToSet(state: any, action: GenericAction) {
     const {id, user_id: userId} = action.data;
     const nextSet = new Set(state[id]);
     nextSet.add(userId);
@@ -62,7 +64,7 @@ function addProfileToSet(state, action) {
     };
 }
 
-function removeProfileFromSet(state, action) {
+function removeProfileFromSet(state: any, action: GenericAction) {
     const {id, user_id: userId} = action.data;
     const nextSet = new Set(state[id]);
     nextSet.delete(userId);
@@ -72,7 +74,7 @@ function removeProfileFromSet(state, action) {
     };
 }
 
-function currentUserId(state = '', action) {
+function currentUserId(state = '', action: GenericAction) {
     switch (action.type) {
     case UserTypes.RECEIVED_ME: {
         const data = action.data || action.payload;
@@ -87,7 +89,7 @@ function currentUserId(state = '', action) {
     return state;
 }
 
-function mySessions(state: Array<{id}> = [], action) {
+function mySessions(state: Array<{id: string}> = [], action: GenericAction) {
     switch (action.type) {
     case UserTypes.RECEIVED_SESSIONS:
         return [...action.data];
@@ -125,7 +127,7 @@ function mySessions(state: Array<{id}> = [], action) {
     }
 }
 
-function myAudits(state = [], action) {
+function myAudits(state = [], action: GenericAction) {
     switch (action.type) {
     case UserTypes.RECEIVED_AUDITS:
         return [...action.data];
@@ -138,7 +140,7 @@ function myAudits(state = [], action) {
     }
 }
 
-function profiles(state = {}, action) {
+function profiles(state: any = {}, action: GenericAction) {
     switch (action.type) {
     case UserTypes.RECEIVED_ME:
     case UserTypes.RECEIVED_PROFILE: {
@@ -179,7 +181,7 @@ function profiles(state = {}, action) {
     }
 }
 
-function profilesInTeam(state = {}, action) {
+function profilesInTeam(state: any = {}, action: GenericAction) {
     switch (action.type) {
     case UserTypes.RECEIVED_PROFILE_IN_TEAM:
         return addProfileToSet(state, action);
@@ -204,7 +206,7 @@ function profilesInTeam(state = {}, action) {
     }
 }
 
-function profilesNotInTeam(state = {}, action) {
+function profilesNotInTeam(state: any = {}, action: GenericAction) {
     switch (action.type) {
     case UserTypes.RECEIVED_PROFILE_NOT_IN_TEAM:
         return addProfileToSet(state, action);
@@ -229,7 +231,7 @@ function profilesNotInTeam(state = {}, action) {
     }
 }
 
-function profilesWithoutTeam(state = new Set(), action) {
+function profilesWithoutTeam(state = new Set(), action: GenericAction) {
     switch (action.type) {
     case UserTypes.RECEIVED_PROFILE_WITHOUT_TEAM: {
         const nextSet = new Set(state);
@@ -238,7 +240,7 @@ function profilesWithoutTeam(state = new Set(), action) {
     }
     case UserTypes.RECEIVED_PROFILES_LIST_WITHOUT_TEAM: {
         const nextSet = new Set(state);
-        action.data.forEach((user) => nextSet.add(user.id));
+        action.data.forEach((user: UserProfile) => nextSet.add(user.id));
         return nextSet;
     }
     case UserTypes.RECEIVED_PROFILE_IN_TEAM: {
@@ -254,7 +256,7 @@ function profilesWithoutTeam(state = new Set(), action) {
     }
 }
 
-function profilesInChannel(state = {}, action) {
+function profilesInChannel(state: any = {}, action: GenericAction) {
     switch (action.type) {
     case UserTypes.RECEIVED_PROFILE_IN_CHANNEL:
         return addProfileToSet(state, action);
@@ -269,10 +271,12 @@ function profilesInChannel(state = {}, action) {
         return removeProfileFromSet(state, action);
 
     case ChannelTypes.CHANNEL_MEMBER_REMOVED:
-        return removeProfileFromSet(state, {data: {
-            id: action.data.channel_id,
-            user_id: action.data.user_id,
-        }});
+        return removeProfileFromSet(state, {
+            type: '',
+            data: {
+                id: action.data.channel_id,
+                user_id: action.data.user_id,
+            }});
 
     case UserTypes.LOGOUT_SUCCESS:
         return {};
@@ -282,7 +286,7 @@ function profilesInChannel(state = {}, action) {
     }
 }
 
-function profilesNotInChannel(state = {}, action) {
+function profilesNotInChannel(state: any = {}, action: GenericAction) {
     switch (action.type) {
     case UserTypes.RECEIVED_PROFILE_NOT_IN_CHANNEL:
         return addProfileToSet(state, action);
@@ -300,10 +304,12 @@ function profilesNotInChannel(state = {}, action) {
         return removeProfileFromSet(state, action);
 
     case ChannelTypes.CHANNEL_MEMBER_ADDED:
-        return removeProfileFromSet(state, {data: {
-            id: action.data.channel_id,
-            user_id: action.data.user_id,
-        }});
+        return removeProfileFromSet(state, {
+            type: '',
+            data: {
+                id: action.data.channel_id,
+                user_id: action.data.user_id,
+            }});
 
     case UserTypes.LOGOUT_SUCCESS:
         return {};
@@ -313,7 +319,7 @@ function profilesNotInChannel(state = {}, action) {
     }
 }
 
-function statuses(state = {}, action) {
+function statuses(state: any = {}, action: GenericAction) {
     switch (action.type) {
     case UserTypes.RECEIVED_STATUS: {
         const nextState = Object.assign({}, state);
@@ -338,7 +344,7 @@ function statuses(state = {}, action) {
     }
 }
 
-function myUserAccessTokens(state = {}, action) {
+function myUserAccessTokens(state: any = {}, action: GenericAction) {
     switch (action.type) {
     case UserTypes.RECEIVED_MY_USER_ACCESS_TOKEN: {
         const nextState = {...state};
@@ -389,7 +395,7 @@ function myUserAccessTokens(state = {}, action) {
     }
 }
 
-function stats(state = {}, action) {
+function stats(state = {}, action: GenericAction) {
     switch (action.type) {
     case UserTypes.RECEIVED_USER_STATS: {
         const stat = action.data;
