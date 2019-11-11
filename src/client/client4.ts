@@ -1501,12 +1501,11 @@ export default class Client4 {
         );
     };
 
-    searchAllChannels = async (term: string, notAssociatedToGroup = '', excludeDefaultChannels = false, paginate = false, page = 0, perPage = General.PAGE_SIZE_DEFAULT) => {
+    searchAllChannels = async (term: string, notAssociatedToGroup = '', excludeDefaultChannels = false, page?: number, perPage?: number) => {
         const body = {
             term,
             not_associated_to_group: notAssociatedToGroup,
             exclude_default_channels: excludeDefaultChannels,
-            paginate,
             page,
             per_page: perPage,
         };

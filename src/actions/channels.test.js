@@ -1400,7 +1400,7 @@ describe('Actions.Channels', () => {
             post('/search').
             reply(200, {channels: [TestHelper.basicChannel, userChannel], total_count: 2});
 
-        const response = await store.dispatch(Actions.searchAllChannels('test', '', false, true));
+        const response = await store.dispatch(Actions.searchAllChannels('test', '', false, 0, 100));
 
         const paginatedRequest = store.getState().requests.channels.getAllChannels;
         if (paginatedRequest.status === RequestStatus.FAILURE) {
