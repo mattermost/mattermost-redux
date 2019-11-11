@@ -120,7 +120,7 @@ class TestHelper {
 
     fakeOutgoingHook = (teamId) => {
         return {
-            teamId,
+            team_id: teamId,
         };
     };
 
