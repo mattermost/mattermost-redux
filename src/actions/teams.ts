@@ -138,13 +138,13 @@ export function getTeams(page = 0, perPage: number = General.TEAMS_CHUNK_SIZE, i
     };
 }
 
-export function searchTeams(term: string, paginate = false, page = 0, perPage = General.PAGE_SIZE_DEFAULT): ActionFunc {
+export function searchTeams(term: string, page?: number, perPage?: number): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         dispatch({type: TeamTypes.GET_TEAMS_REQUEST, data: null}, getState);
 
         let response;
         try {
-            response = await Client4.searchTeams(term, paginate, page, perPage);
+            response = await Client4.searchTeams(term, page, perPage);
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch, getState);
             dispatch(batchActions([
@@ -154,7 +154,7 @@ export function searchTeams(term: string, paginate = false, page = 0, perPage = 
             return {error};
         }
 
-        const teams = paginate ? response.teams : response;
+        const teams = response.teams || response;
 
         dispatch(batchActions([
             {
