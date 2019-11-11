@@ -996,7 +996,7 @@ export function searchAllChannels(term: string, notAssociatedToGroup = '', exclu
             return {error};
         }
 
-        const channels = (page == null && perPage == null) ? response : response.channels;
+        const channels = response.channels || response;
 
         dispatch(batchActions([
             {
