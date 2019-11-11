@@ -461,7 +461,7 @@ function groupsAssociatedToChannel(state = {}, action) {
 }
 
 function updateChannelMemberSchemeRoles(state, action) {
-    const {channelId, userId, isSchemeUser, isSchemeAdmin} = action.data;
+    const {channelId, userId, isSchemeUser, isSchemeAdmin, data} = action.data;
     const channel = state[channelId];
     if (channel) {
         const member = channel[userId];
@@ -472,6 +472,7 @@ function updateChannelMemberSchemeRoles(state, action) {
                     ...state[channelId],
                     [userId]: {
                         ...state[channelId][userId],
+                        roles: data.roles,
                         scheme_user: isSchemeUser,
                         scheme_admin: isSchemeAdmin,
                     },

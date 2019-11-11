@@ -1342,7 +1342,8 @@ export function updateChannelMemberSchemeRoles(channelId: string, userId: string
     return bindClientFunc({
         clientFunc: async () => {
             await Client4.updateChannelMemberSchemeRoles(channelId, userId, isSchemeUser, isSchemeAdmin);
-            return {channelId, userId, isSchemeUser, isSchemeAdmin};
+            const data = await Client4.getChannelMember(channelId, userId);
+            return {channelId, userId, isSchemeUser, isSchemeAdmin, data};
         },
         onSuccess: ChannelTypes.UPDATED_CHANNEL_MEMBER_SCHEME_ROLES,
     });
