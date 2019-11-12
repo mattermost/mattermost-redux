@@ -25,6 +25,7 @@
     "dev-mobile:watch": "ttsc --watch --outDir ${MOBILE_DIR:-../mattermost-mobile}/node_modules/mattermost-redux"
   },
   "dependencies": {
+    "form-data": "2.5.1",
     "gfycat-sdk": "1.4.18",
     "moment-timezone": "0.5.26",
     "isomorphic-fetch": "2.2.1",
@@ -72,7 +73,6 @@
     "eslint-plugin-cypress": "2.7.0",
     "eslint-plugin-header": "3.0.0",
     "eslint-plugin-import": "2.18.2",
-    "form-data": "2.5.1",
     "husky": "3.0.5",
     "jest": "24.8.0",
     "jest-junit": "6.4.0",
