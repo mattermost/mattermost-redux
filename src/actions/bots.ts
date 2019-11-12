@@ -6,10 +6,11 @@ import {BotTypes} from 'action_types';
 import {bindClientFunc} from './helpers';
 
 import {ActionFunc} from 'types/actions';
+import {Bot, BotPatch} from 'types/bots';
 
 const BOTS_PER_PAGE_DEFAULT = 20;
 
-export function createBot(bot): ActionFunc {
+export function createBot(bot: Bot): ActionFunc {
     return bindClientFunc({
         clientFunc: Client4.createBot,
         onSuccess: BotTypes.RECEIVED_BOT_ACCOUNT,
@@ -19,7 +20,7 @@ export function createBot(bot): ActionFunc {
     });
 }
 
-export function patchBot(botUserId, botPatch): ActionFunc {
+export function patchBot(botUserId: string, botPatch: BotPatch): ActionFunc {
     return bindClientFunc({
         clientFunc: Client4.patchBot,
         onSuccess: BotTypes.RECEIVED_BOT_ACCOUNT,
@@ -30,7 +31,7 @@ export function patchBot(botUserId, botPatch): ActionFunc {
     });
 }
 
-export function loadBot(botUserId): ActionFunc {
+export function loadBot(botUserId: string): ActionFunc {
     return bindClientFunc({
         clientFunc: Client4.getBot,
         onSuccess: BotTypes.RECEIVED_BOT_ACCOUNT,
@@ -51,7 +52,7 @@ export function loadBots(page = 0, perPage = BOTS_PER_PAGE_DEFAULT): ActionFunc 
     });
 }
 
-export function disableBot(botUserId): ActionFunc {
+export function disableBot(botUserId: string): ActionFunc {
     return bindClientFunc({
         clientFunc: Client4.disableBot,
         onSuccess: BotTypes.RECEIVED_BOT_ACCOUNT,
@@ -61,7 +62,7 @@ export function disableBot(botUserId): ActionFunc {
     });
 }
 
-export function enableBot(botUserId): ActionFunc {
+export function enableBot(botUserId: string): ActionFunc {
     return bindClientFunc({
         clientFunc: Client4.enableBot,
         onSuccess: BotTypes.RECEIVED_BOT_ACCOUNT,
@@ -71,7 +72,7 @@ export function enableBot(botUserId): ActionFunc {
     });
 }
 
-export function assignBot(botUserId, newOwnerId): ActionFunc {
+export function assignBot(botUserId: string, newOwnerId: string): ActionFunc {
     return bindClientFunc({
         clientFunc: Client4.assignBot,
         onSuccess: BotTypes.RECEIVED_BOT_ACCOUNT,

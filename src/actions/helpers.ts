@@ -68,7 +68,7 @@ export function bindClientFunc({
     onFailure,
     params = [],
 }: {
-    clientFunc: (...args) => Promise<any>;
+    clientFunc: (...args: any[]) => Promise<any>;
     onRequest?: ActionType;
     onSuccess?: ActionType | Array<ActionType>;
     onFailure?: ActionType;
@@ -79,7 +79,7 @@ export function bindClientFunc({
             dispatch(requestData(onRequest), getState);
         }
 
-        let data = null;
+        let data: any = null;
         try {
             data = await clientFunc(...params);
         } catch (error) {
@@ -107,7 +107,7 @@ export function bindClientFunc({
 // Debounce function based on underscores modified to use es6 and a cb
 
 export function debounce(func: (...args: any) => unknown, wait: number, immediate: boolean, cb: () => unknown) {
-    let timeout;
+    let timeout: NodeJS.Timeout|null;
     return function fx(...args: Array<any>) {
         const runLater = () => {
             timeout = null;

@@ -67,6 +67,9 @@ const state: GlobalState = {
         preferences: {
             myPreferences: {},
         },
+        bots: {
+            accounts: {},
+        },
         admin: {
             logs: [],
             audits: {},
@@ -75,6 +78,8 @@ const state: GlobalState = {
             complianceReports: {},
             ldapGroups: {},
             ldapGroupsCount: 0,
+            userAccessTokens: [],
+            clusterInfo: {},
         },
         jobs: {
             jobs: {},
@@ -89,6 +94,9 @@ const state: GlobalState = {
             oauthApps: {},
             systemCommands: {},
             commands: {},
+        },
+        plugins: {
+            marketplacePlugins: [],
         },
         files: {
             files: {},

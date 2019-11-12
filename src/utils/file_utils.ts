@@ -2,8 +2,11 @@
 // See LICENSE.txt for license information.
 import {Files, General} from '../constants';
 import {Client4} from 'client';
-import mimeDB from 'mime-db';
 import {FileInfo} from 'types/files';
+import {Dictionary} from 'types/utilities';
+
+const mimeDB = require('mime-db');
+
 export function getFormattedFileSize(file: FileInfo): string {
     const bytes = file.size;
     const fileSizes = [
@@ -48,13 +51,13 @@ export function getFileType(file: FileInfo): string {
     }) || 'other';
 }
 
-let extToMime;
+let extToMime: Dictionary<string>;
 function buildExtToMime() {
     extToMime = {};
     Object.keys(mimeDB).forEach((key) => {
         const mime = mimeDB[key];
         if (mime.extensions) {
-            mime.extensions.forEach((ext) => {
+            mime.extensions.forEach((ext: string) => {
                 extToMime[ext] = key;
             });
         }

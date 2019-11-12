@@ -1,8 +1,9 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
+
 export function makeStyleFromTheme(getStyleFromTheme: (a: any) => any): (a: any) => any {
-    let lastTheme;
-    let style;
+    let lastTheme: any;
+    let style: any;
     return (theme: any) => {
         if (!style || theme !== lastTheme) {
             style = getStyleFromTheme(theme);

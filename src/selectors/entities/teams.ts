@@ -8,16 +8,17 @@ import {createIdsSelector} from 'utils/helpers';
 import {isTeamAdmin} from 'utils/user_utils';
 import {sortTeamsWithLocale} from 'utils/team_utils';
 import {Team, TeamMembership} from 'types/teams';
+import {IDMappedObjects} from 'types/utilities';
 import {GlobalState} from 'types/store';
 
 export function getCurrentTeamId(state: GlobalState) {
     return state.entities.teams.currentTeamId;
 }
 
-export const getTeamByName = reselect.createSelector(getTeams, (state, name) => name, (teams, name) => {
+export const getTeamByName = reselect.createSelector(getTeams, (state: GlobalState, name: string) => name, (teams: IDMappedObjects<Team>, name: string): Team|undefined => {
     return Object.values(teams).find((team: Team) => team.name === name);
 });
-export function getTeams(state: GlobalState) {
+export function getTeams(state: GlobalState): IDMappedObjects<Team> {
     return state.entities.teams.teams;
 }
 
@@ -48,7 +49,7 @@ export const getCurrentTeam = reselect.createSelector(
     }
 );
 
-export function getTeam(state, id) {
+export function getTeam(state: GlobalState, id: string): Team {
     const teams = getTeams(state);
     return teams[id];
 }
@@ -56,7 +57,7 @@ export function getTeam(state, id) {
 export const getCurrentTeamMembership = reselect.createSelector(
     getCurrentTeamId,
     getTeamMemberships,
-    (currentTeamId, teamMemberships) => {
+    (currentTeamId: string, teamMemberships: {[x: string]: TeamMembership}): TeamMembership => {
         return teamMemberships[currentTeamId];
     }
 );
@@ -114,7 +115,7 @@ export const getMyTeams = reselect.createSelector(
 
 export const getMyTeamMember = reselect.createSelector(
     getTeamMemberships,
-    (state, teamId) => teamId,
+    (state: GlobalState, teamId: string) => teamId,
     (teamMemberships, teamId) => {
         return teamMemberships[teamId] || {};
     }
@@ -128,7 +129,7 @@ export const getMembersInCurrentTeam = reselect.createSelector(
     }
 );
 
-export function getTeamMember(state, teamId, userId) {
+export function getTeamMember(state: GlobalState, teamId: string, userId: string) {
     const members = getMembersInTeams(state)[teamId];
     if (members) {
         return members[userId];
@@ -167,9 +168,9 @@ export const getListableTeams = reselect.createSelector(
 export const getSortedListableTeams = reselect.createSelector(
     getTeams,
     getListableTeamIds,
-    (state, locale) => locale,
+    (state: GlobalState, locale: string) => locale,
     (teams, listableTeamIds, locale) => {
-        const listableTeams = {};
+        const listableTeams: {[x: string]: Team} = {};
 
         for (const id of listableTeamIds) {
             listableTeams[id] = teams[id];
@@ -182,8 +183,8 @@ export const getSortedListableTeams = reselect.createSelector(
 export const getJoinableTeamIds = createIdsSelector(
     getTeams,
     getTeamMemberships,
-    (state) => haveISystemPermission(state, {permission: Permissions.JOIN_PUBLIC_TEAMS}),
-    (state) => haveISystemPermission(state, {permission: Permissions.JOIN_PRIVATE_TEAMS}),
+    (state: GlobalState) => haveISystemPermission(state, {permission: Permissions.JOIN_PUBLIC_TEAMS}),
+    (state: GlobalState) => haveISystemPermission(state, {permission: Permissions.JOIN_PRIVATE_TEAMS}),
     isCompatibleWithJoinViewTeamPermissions,
     (teams, myMembers, canJoinPublicTeams, canJoinPrivateTeams, compatibleWithJoinViewTeamPermissions) => {
         return Object.keys(teams).filter((id) => {
@@ -209,9 +210,9 @@ export const getJoinableTeams = reselect.createSelector(
 export const getSortedJoinableTeams = reselect.createSelector(
     getTeams,
     getJoinableTeamIds,
-    (state, locale) => locale,
+    (state: GlobalState, locale: string) => locale,
     (teams, joinableTeamIds, locale) => {
-        const joinableTeams = {};
+        const joinableTeams: {[x: string]: Team} = {};
 
         for (const id of joinableTeamIds) {
             joinableTeams[id] = teams[id];
@@ -223,7 +224,7 @@ export const getSortedJoinableTeams = reselect.createSelector(
 
 export const getMySortedTeamIds = createIdsSelector(
     getMyTeams,
-    (state, locale) => locale,
+    (state: GlobalState, locale: string) => locale,
     (teams, locale) => {
         return teams.sort(sortTeamsWithLocale(locale)).map((t) => t.id);
     }
@@ -271,7 +272,7 @@ export const getChannelDrawerBadgeCount = reselect.createSelector(
 export function makeGetBadgeCountForTeamId() {
     return reselect.createSelector(
         getTeamMemberships,
-        (state, id) => id,
+        (state: GlobalState, id: string) => id,
         (members, teamId) => {
             const member = members[teamId];
             let badgeCount = 0;

@@ -8,11 +8,12 @@ import {createShallowSelector} from 'utils/helpers';
 import {getPreferenceKey} from 'utils/preference_utils';
 import {GlobalState} from 'types/store';
 import {PreferencesType, PreferenceType} from 'types/preferences';
-export function getMyPreferences(state) {
+
+export function getMyPreferences(state: GlobalState) {
     return state.entities.preferences.myPreferences;
 }
 
-export function get(state: GlobalState, category, name, defaultValue: any = '') {
+export function get(state: GlobalState, category: string, name: string, defaultValue: any = '') {
     const key = getPreferenceKey(category, name);
     const prefs = getMyPreferences(state);
 
@@ -23,12 +24,12 @@ export function get(state: GlobalState, category, name, defaultValue: any = '') 
     return prefs[key].value;
 }
 
-export function getBool(state, category, name, defaultValue = false) {
+export function getBool(state: GlobalState, category: string, name: string, defaultValue = false) {
     const value = get(state, category, name, String(defaultValue));
     return value !== 'false';
 }
 
-export function getInt(state, category, name, defaultValue = 0) {
+export function getInt(state: GlobalState, category: string, name: string, defaultValue = 0) {
     const value = get(state, category, name, defaultValue);
     return parseInt(value, 10);
 }
@@ -36,7 +37,7 @@ export function getInt(state, category, name, defaultValue = 0) {
 export function makeGetCategory() {
     return reselect.createSelector(
         getMyPreferences,
-        (state, category) => category,
+        (state: GlobalState, category: string) => category,
         (preferences, category) => {
             const prefix = category + '--';
             const prefsInCategory: PreferenceType[] = [];
@@ -54,19 +55,19 @@ export function makeGetCategory() {
 
 const getDirectShowCategory = makeGetCategory();
 
-export function getDirectShowPreferences(state) {
+export function getDirectShowPreferences(state: GlobalState) {
     return getDirectShowCategory(state, Preferences.CATEGORY_DIRECT_CHANNEL_SHOW);
 }
 
 const getGroupShowCategory = makeGetCategory();
 
-export function getGroupShowPreferences(state) {
+export function getGroupShowPreferences(state: GlobalState) {
     return getGroupShowCategory(state, Preferences.CATEGORY_GROUP_CHANNEL_SHOW);
 }
 
 const getFavoritesCategory = makeGetCategory();
 
-export function getFavoritesPreferences(state) {
+export function getFavoritesPreferences(state: GlobalState) {
     const favorites = getFavoritesCategory(state, Preferences.CATEGORY_FAVORITE_CHANNEL);
     return favorites.filter((f) => f.value === 'true').map((f) => f.name);
 }
@@ -134,7 +135,7 @@ export const getTheme = createShallowSelector(
     getThemePreference,
     getDefaultTheme,
     (themePreference, defaultTheme) => {
-        let theme;
+        let theme: any;
         if (themePreference) {
             theme = themePreference.value;
         } else {
@@ -150,7 +151,7 @@ export const getTheme = createShallowSelector(
 
         // If this is a system theme, find it in case the user's theme is missing any fields
         if (theme.type && theme.type !== 'custom') {
-            const match = Object.values(Preferences.THEMES).find((v) => v.type === theme.type);
+            const match = Object.values(Preferences.THEMES).find((v: any) => v.type === theme.type) as any;
             if (match) {
                 if (!match.mentionBg) {
                     match.mentionBg = match.mentionBj;
@@ -179,7 +180,7 @@ export const getTheme = createShallowSelector(
 export function makeGetStyleFromTheme() {
     return reselect.createSelector(
         getTheme,
-        (state, getStyleFromTheme) => getStyleFromTheme,
+        (state: GlobalState, getStyleFromTheme: Function) => getStyleFromTheme,
         (theme, getStyleFromTheme) => {
             return getStyleFromTheme(theme);
         }

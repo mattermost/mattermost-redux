@@ -17,7 +17,7 @@ export type GenericAction = {
     timestamp?: number;
     [extraProps: string]: any;
 };
-type Thunk = (b: DispatchFunc, a: GetStateFunc) => Promise<ActionResult> | ActionResult;
+export type Thunk = (b: DispatchFunc, a: GetStateFunc) => Promise<ActionResult> | ActionResult;
 
 type BatchAction = {
     type: 'BATCHING_REDUCER.BATCH';
@@ -44,32 +44,16 @@ export function batchActions(actions: Action[], type = BATCH) {
     return {type, meta: {batch: true}, payload: actions};
 }
 
-export function enableBatching(reduce) {
+export type Reducer<S = any, A extends Action = Action> = (
+    state: S | undefined,
+    action: A
+  ) => S
+
+export function enableBatching<S>(reduce: Reducer<S>): Reducer<S> {
     return function batchingReducer(state, action) {
-        if (action && action.meta && action.meta.batch) {
+        if (action && 'meta' in action && action.meta.batch) {
             return action.payload.reduce(batchingReducer, state);
         }
         return reduce(state, action);
-    };
-}
-
-export function batchDispatchMiddleware(store_) {
-    function dispatchChildActions(store, action) {
-        if (action.meta && action.meta.batch) {
-            action.payload.forEach((childAction) => {
-                dispatchChildActions(store, childAction);
-            });
-        } else {
-            store.dispatch(action);
-        }
-    }
-
-    return (next) => {
-        return (action) => {
-            if (action && action.meta && action.meta.batch) {
-                dispatchChildActions(store_, action);
-            }
-            return next(action);
-        };
     };
 }

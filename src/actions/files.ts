@@ -7,6 +7,7 @@ import {Action, batchActions, DispatchFunc, GetStateFunc, ActionFunc} from 'type
 
 import {logError} from './errors';
 import {bindClientFunc, forceLogoutIfNecessary} from './helpers';
+import {FileUploadResponse} from 'types/files';
 
 export function getFilesForPost(postId: string): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
@@ -34,7 +35,7 @@ export function uploadFile(channelId: string, rootId: string, clientIds: Array<s
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         dispatch({type: FileTypes.UPLOAD_FILES_REQUEST, data: {}}, getState);
 
-        let files;
+        let files: FileUploadResponse;
         try {
             files = await Client4.uploadFile(fileFormData, formBoundary);
         } catch (error) {

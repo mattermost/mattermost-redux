@@ -49,6 +49,15 @@ export type ChannelMembership = {
     scheme_admin: boolean;
     post_root_id?: string;
 };
+export type ChannelUnread = {
+    channel_id: string;
+    user_id: string;
+    team_id: string;
+    msg_count: number;
+    mention_count: number;
+    last_viewed_at: number;
+    deltaMsgs: number;
+};
 export type ChannelsState = {
     currentChannelId: string;
     channels: IDMappedObjects<Channel>;

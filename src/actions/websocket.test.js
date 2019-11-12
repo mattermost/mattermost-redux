@@ -114,6 +114,11 @@ describe('Actions.Websocket', () => {
                         [channelId]: {msg_count: 10, mention_count: 0, last_viewed_at: 0},
                     },
                 },
+                teams: {
+                    myMembers: {
+                        [teamId]: {msg_count: 10, mention_count: 0},
+                    },
+                },
             },
         });
         await store.dispatch(Actions.init(

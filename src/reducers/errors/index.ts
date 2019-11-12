@@ -1,11 +1,12 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
 import {ErrorTypes} from 'action_types';
-export default ((state: Array<{error;displayable;date}> = [], action) => {
+import {GenericAction} from 'types/actions';
+export default ((state: Array<{error: any;displayable?: boolean;date: string}> = [], action: GenericAction) => {
     switch (action.type) {
     case ErrorTypes.DISMISS_ERROR: {
         const nextState = [...state];
-        nextState.splice(action.index, 1);
+        nextState.splice(action.index!, 1);
 
         return nextState;
     }

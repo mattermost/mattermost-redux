@@ -4,14 +4,19 @@ import * as reselect from 'reselect';
 import {getCurrentUser, getCurrentChannelId} from 'selectors/entities/common';
 import {getTeamMemberships, getCurrentTeamId} from './teams';
 import * as types from 'types';
-import {getMySystemPermissions, getMySystemRoles, getRoles} from 'selectors/entities/roles_helpers';
+import {getMySystemPermissions, getMySystemRoles, getRoles, PermissionsOptions} from 'selectors/entities/roles_helpers';
+import {GlobalState} from 'types/store';
+import {Dictionary} from 'types/utilities';
+import {Role} from 'types/roles';
+import {Channel} from 'types/channels';
+import {Team} from 'types/teams';
 
 export {getMySystemPermissions, getMySystemRoles, getRoles};
 
 export const getMyTeamRoles = reselect.createSelector(
     getTeamMemberships,
     (teamsMemberships) => {
-        const roles = {};
+        const roles: Dictionary<Set<string>> = {};
         if (teamsMemberships) {
             for (const key in teamsMemberships) {
                 if (teamsMemberships.hasOwnProperty(key) && teamsMemberships[key].roles) {
@@ -26,7 +31,7 @@ export const getMyTeamRoles = reselect.createSelector(
 export const getMyChannelRoles = reselect.createSelector(
     (state: types.store.GlobalState) => state.entities.channels.myMembers,
     (channelsMemberships) => {
-        const roles = {};
+        const roles: Dictionary<Set<string>> = {};
         if (channelsMemberships) {
             for (const key in channelsMemberships) {
                 if (channelsMemberships.hasOwnProperty(key) && channelsMemberships[key].roles) {
@@ -54,7 +59,7 @@ export const getMyRoles = reselect.createSelector(
 export const getRolesById = reselect.createSelector(
     getRoles,
     (rolesByName) => {
-        const rolesById = {};
+        const rolesById: Dictionary<Role> = {};
         for (const role of Object.values(rolesByName)) {
             rolesById[role.id] = role;
         }
@@ -112,11 +117,11 @@ export const getMyTeamPermissions = reselect.createSelector(
     getMyTeamRoles,
     getRoles,
     getMySystemPermissions,
-    (state, options) => options.team,
+    (state: GlobalState, options: PermissionsOptions) => options.team,
     (myTeamRoles, roles, systemPermissions, teamId) => {
         const permissions = new Set();
-        if (myTeamRoles[teamId]) {
-            for (const roleName of myTeamRoles[teamId]) {
+        if (myTeamRoles[teamId!]) {
+            for (const roleName of myTeamRoles[teamId!]) {
                 if (roles[roleName]) {
                     for (const permission of roles[roleName].permissions) {
                         permissions.add(permission);
@@ -135,11 +140,11 @@ export const getMyChannelPermissions = reselect.createSelector(
     getMyChannelRoles,
     getRoles,
     getMyTeamPermissions,
-    (state, options) => options.channel,
+    (state, options: PermissionsOptions) => options.channel,
     (myChannelRoles, roles, teamPermissions, channelId) => {
         const permissions = new Set();
-        if (myChannelRoles[channelId]) {
-            for (const roleName of myChannelRoles[channelId]) {
+        if (myChannelRoles[channelId!]) {
+            for (const roleName of myChannelRoles[channelId!]) {
                 if (roles[roleName]) {
                     for (const permission of roles[roleName].permissions) {
                         permissions.add(permission);
@@ -156,7 +161,7 @@ export const getMyChannelPermissions = reselect.createSelector(
 
 export const haveISystemPermission = reselect.createSelector(
     getMySystemPermissions,
-    (state, options) => options.permission,
+    (state: GlobalState, options: PermissionsOptions) => options.permission,
     (permissions, permission) => {
         return permissions.has(permission);
     }
@@ -180,7 +185,7 @@ export const haveIChannelPermission = reselect.createSelector(
 
 export const haveICurrentTeamPermission = reselect.createSelector(
     getMyCurrentTeamPermissions,
-    (state, options) => options.permission,
+    (state: GlobalState, options: PermissionsOptions) => options.permission,
     (permissions, permission) => {
         return permissions.has(permission);
     }
@@ -188,7 +193,7 @@ export const haveICurrentTeamPermission = reselect.createSelector(
 
 export const haveICurrentChannelPermission = reselect.createSelector(
     getMyCurrentChannelPermissions,
-    (state, options) => options.permission,
+    (state: GlobalState, options: PermissionsOptions) => options.permission,
     (permissions, permission) => {
         return permissions.has(permission);
     }
