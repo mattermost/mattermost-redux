@@ -1778,7 +1778,3 @@ describe('getMyFirstChannelForTeams', () => {
         });
     });
 });
-
-describe('see how many unread items there are', () => {
-
-})
