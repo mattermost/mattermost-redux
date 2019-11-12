@@ -43,12 +43,12 @@ export function getFileType(file: FileInfo): string {
     ];
     return fileTypes.find((fileType) => {
         const constForFileTypeExtList = `${fileType}_types`.toUpperCase();
-        const fileTypeExts = Files[constForFileTypeExtList];
+        const fileTypeExts: string[] = Files[constForFileTypeExtList];
         return fileTypeExts.indexOf(fileExt) > -1;
     }) || 'other';
 }
 
-let extToMime;
+let extToMime: {[x: string]: string};
 function buildExtToMime() {
     extToMime = {};
     Object.keys(mimeDB).forEach((key) => {

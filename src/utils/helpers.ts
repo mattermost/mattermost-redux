@@ -2,11 +2,12 @@
 // See LICENSE.txt for license information.
 import * as reselect from 'reselect';
 import shallowEqual from 'shallow-equals';
+
 export function memoizeResult<F extends Function>(func: F): any {
     let lastArgs: IArguments|null = null;
-    let lastResult = null; // we reference arguments instead of spreading them for performance reasons
+    let lastResult: any = null; // we reference arguments instead of spreading them for performance reasons
 
-    return function shallowCompare(...args) {
+    return function shallowCompare(...args: any[]) {
         if (!shallowEqual(lastArgs, args)) {
             //eslint-disable-line prefer-rest-params
             // apply arguments instead of spreading for performance.
@@ -101,7 +102,7 @@ export function isEmail(email: string): boolean {
     return (/^[^ ,@]+@[^ ,@]+$/).test(email);
 }
 
-export function buildQueryString(parameters: {}): string {
+export function buildQueryString(parameters: {[x: string]: string | number | boolean}): string {
     const keys = Object.keys(parameters);
     if (keys.length === 0) {
         return '';

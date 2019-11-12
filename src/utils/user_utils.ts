@@ -74,7 +74,7 @@ export function hasPostAllPublicRole(roles: string): boolean {
 }
 
 export function profileListToMap(profileList: Array<UserProfile>): IDMappedObjects<UserProfile> {
-    const profiles = {};
+    const profiles: IDMappedObjects<UserProfile> = {};
     for (let i = 0; i < profileList.length; i++) {
         profiles[profileList[i].id] = profileList[i];
     }

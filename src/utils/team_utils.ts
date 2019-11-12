@@ -4,7 +4,7 @@ import {Team} from 'types/teams';
 import {IDMappedObjects} from 'types/utilities';
 import {General} from '../constants';
 export function teamListToMap(teamList: Array<Team>): IDMappedObjects<Team> {
-    const teams = {};
+    const teams: IDMappedObjects<Team> = {};
     for (let i = 0; i < teamList.length; i++) {
         teams[teamList[i].id] = teamList[i];
     }
