@@ -8,7 +8,7 @@ import {Posts, Preferences} from '../../constants';
 import {isPostEphemeral, isSystemMessage, shouldFilterJoinLeavePost, comparePosts, isPostPendingOrFailed, isPostCommentMention} from 'utils/post_utils';
 import {getPreferenceKey} from 'utils/preference_utils';
 import {GlobalState} from 'types/store';
-import {Post, PostWithFormatData, MessageHistory} from 'types/posts';
+import {Post, PostWithFormatData, MessageHistory, PostOrderBlock} from 'types/posts';
 import {Reaction} from 'types/reactions';
 import {UserProfile} from 'types/users';
 import {Channel} from 'types/channels';
@@ -91,7 +91,7 @@ export function makeGetPostIdsForThread(): (b: GlobalState, a: $ID<Post>) => Arr
     );
 }
 
-export function makeGetPostsChunkAroundPost(): (c: GlobalState, b: $ID<Post>, a: $ID<Channel>) => any {
+export function makeGetPostsChunkAroundPost(): (c: GlobalState, b: $ID<Post>, a: $ID<Channel>) => PostOrderBlock| null | undefined {
     return createIdsSelector(
         (state: GlobalState, postId: string, channelId: string) => state.entities.posts.postsInChannel[channelId],
         (state: GlobalState, postId) => postId,
@@ -420,7 +420,7 @@ export const getLastPostPerChannel: (a: GlobalState) => RelationOneToOne<Channel
         const ret: Dictionary<Post> = {};
 
         for (const [channelId, postsForChannel] of Object.entries(postsInChannel)) {
-            const recentBlock = (postsForChannel as any).find((block: any) => block.recent);
+            const recentBlock = (postsForChannel).find((block) => block.recent);
             if (!recentBlock) {
                 continue;
             }
@@ -474,6 +474,7 @@ export const getLatestReplyablePostId: (a: GlobalState) => $ID<Post> = createSel
         return latestReplyablePost.id;
     }
 );
+
 export const getCurrentUsersLatestPost: (b: GlobalState, a: $ID<Post>) => PostWithFormatData | undefined | null = createSelector(getPostsInCurrentChannel, getCurrentUser, (_: any, rootId: string) => rootId, (posts, currentUser, rootId) => {
     if (!posts) {
         return null;
@@ -493,7 +494,8 @@ export const getCurrentUsersLatestPost: (b: GlobalState, a: $ID<Post>) => PostWi
     });
     return lastPost;
 });
-export function getRecentPostsChunkInChannel(state: GlobalState, channelId: $ID<Channel>): any {
+
+export function getRecentPostsChunkInChannel(state: GlobalState, channelId: $ID<Channel>): PostOrderBlock|null|undefined {
     const postsForChannel = state.entities.posts.postsInChannel[channelId];
 
     if (!postsForChannel) {
@@ -503,7 +505,7 @@ export function getRecentPostsChunkInChannel(state: GlobalState, channelId: $ID<
     return postsForChannel.find((block) => block.recent);
 }
 
-export function getOldestPostsChunkInChannel(state: GlobalState, channelId: $ID<Channel>): any {
+export function getOldestPostsChunkInChannel(state: GlobalState, channelId: $ID<Channel>): PostOrderBlock|null|undefined {
     const postsForChannel = state.entities.posts.postsInChannel[channelId];
 
     if (!postsForChannel) {

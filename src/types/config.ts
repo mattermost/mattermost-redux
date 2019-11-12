@@ -22,6 +22,7 @@ export type Config = {
     CloseUnusedDirectMessages: string;
     CustomBrandText: string;
     CustomDescriptionText: string;
+    CustomTermsOfServiceId: string;
     CustomTermsOfServiceReAcceptancePeriod: string;
     CustomUrlSchemes: string;
     DataRetentionEnableFileDeletion: string;

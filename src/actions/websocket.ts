@@ -691,7 +691,7 @@ function handleUserTypingEvent(msg: WebSocketMessage) {
                 type: WebsocketEvents.STOP_TYPING,
                 data,
             });
-        }, parseInt(config.TimeBetweenUserTypingUpdatesMilliseconds, 10));
+        }, parseInt(config.TimeBetweenUserTypingUpdatesMilliseconds!, 10));
 
         if (!profiles[userId] && userId !== currentUserId) {
             dispatch(getProfilesByIds([userId]));
@@ -828,8 +828,8 @@ export function userTyping(channelId: string, parentPostId: string): ActionFunc 
         const stats = getCurrentChannelStats(state);
         const membersInChannel = stats ? stats.member_count : 0;
 
-        if (((t - lastTimeTypingSent) > config.TimeBetweenUserTypingUpdatesMilliseconds) &&
-            (membersInChannel < config.MaxNotificationsPerChannel) && (config.EnableUserTypingMessages === 'true')) {
+        if (((t - lastTimeTypingSent) > parseInt(config.TimeBetweenUserTypingUpdatesMilliseconds!, 10)) &&
+            (membersInChannel < parseInt(config.MaxNotificationsPerChannel!, 10)) && (config.EnableUserTypingMessages === 'true')) {
             websocketClient.userTyping(channelId, parentPostId);
             lastTimeTypingSent = t;
         }

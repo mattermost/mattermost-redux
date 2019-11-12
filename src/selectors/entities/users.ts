@@ -378,7 +378,7 @@ export const shouldShowTermsOfService: (a: GlobalState) => boolean = createSelec
         const acceptedAt = user ? user.terms_of_service_create_at : 0;
 
         const featureEnabled = license.IsLicensed === 'true' && config.EnableCustomTermsOfService === 'true';
-        const reacceptanceTime = config.CustomTermsOfServiceReAcceptancePeriod * 1000 * 60 * 60 * 24;
+        const reacceptanceTime = parseInt(config.CustomTermsOfServiceReAcceptancePeriod!, 10) * 1000 * 60 * 60 * 24;
         const timeElapsed = new Date().getTime() - acceptedAt;
         return Boolean(user && featureEnabled && (config.CustomTermsOfServiceId !== acceptedTermsId || timeElapsed > reacceptanceTime));
     }
@@ -454,7 +454,7 @@ export function makeGetProfilesByIdsAndUsernames(): (a: GlobalState, b: {allUser
     return createSelector(
         getUsers,
         getUsersByUsername,
-        (state: GlobalState, props: any) => props.allUserIds,
+        (state: GlobalState, props: {allUserIds: Array<$ID<UserProfile>>; allUsernames: Array<$Username<UserProfile>>}) => props.allUserIds,
         (state, props) => props.allUsernames,
         (allProfilesById: Dictionary<UserProfile>, allProfilesByUsername: Dictionary<UserProfile>, allUserIds: Array<string>, allUsernames: Array<string>) => {
             const userProfiles: UserProfile[] = [];
@@ -490,7 +490,7 @@ export function makeGetDisplayName(): (a: GlobalState, b: $ID<UserProfile>, c: b
         getTeammateNameDisplaySetting,
         (state, _, useFallbackUsername = true) => useFallbackUsername,
         (user, teammateNameDisplaySetting, useFallbackUsername) => {
-            return displayUsername(user, teammateNameDisplaySetting, useFallbackUsername);
+            return displayUsername(user, teammateNameDisplaySetting!, useFallbackUsername);
         }
     );
 }

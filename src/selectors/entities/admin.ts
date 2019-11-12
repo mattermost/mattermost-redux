@@ -1,9 +1,7 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
-import {GlobalState} from 'types/store';
 
-// Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
-// See LICENSE.txt for license information.
+import {GlobalState} from 'types/store';
 
 export function getLogs(state: GlobalState) {
     return state.entities.admin.logs;

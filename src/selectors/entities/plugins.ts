@@ -11,6 +11,6 @@ export function getMarketplacePlugins(state: GlobalState) {
 export const getMarketplaceInstalledPlugins = reselect.createSelector(
     getMarketplacePlugins,
     (plugins) => {
-        return Object.values(plugins).filter((p: any) => p.installed_version !== '');
+        return Object.values(plugins).filter((p) => p.installed_version !== '');
     }
 );
