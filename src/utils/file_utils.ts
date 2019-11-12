@@ -40,6 +40,7 @@ export function getFileType(file: FileInfo): string {
         'video',
         'audio',
         'spreadsheet',
+        'text',
         'word',
         'presentation',
         'patch',
