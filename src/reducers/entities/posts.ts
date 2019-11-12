@@ -3,8 +3,8 @@
 import {ChannelTypes, GeneralTypes, PostTypes, UserTypes} from 'action_types';
 import {Posts} from '../../constants';
 import {comparePosts} from 'utils/post_utils';
-import {Post, PostsState, PostOrderBlock} from 'types/posts';
-import {RelationOneToOne, Dictionary, IDMappedObjects} from 'types/utilities';
+import {Post, PostsState, PostOrderBlock, MessageHistory} from 'types/posts';
+import {RelationOneToOne, Dictionary, IDMappedObjects, RelationOneToMany} from 'types/utilities';
 import {GenericAction} from 'types/actions';
 import {Reaction} from 'types/reactions';
 
@@ -280,7 +280,7 @@ export function handlePendingPosts(state: Array<string> = [], action: GenericAct
     }
 }
 
-export function postsInChannel(state: any = {}, action: GenericAction, prevPosts: IDMappedObjects<Post>, nextPosts: Dictionary<Post>) {
+export function postsInChannel(state: Dictionary<Array<PostOrderBlock>> = {}, action: GenericAction, prevPosts: IDMappedObjects<Post>, nextPosts: Dictionary<Post>) {
     switch (action.type) {
     case PostTypes.RECEIVED_NEW_POST: {
         const post = action.data as Post;
@@ -759,7 +759,7 @@ export function mergePostOrder(left: string[], right: string[], posts: Dictionar
     return result;
 }
 
-export function postsInThread(state: Dictionary<string[]> = {}, action: GenericAction, prevPosts: Dictionary<Post>) {
+export function postsInThread(state: RelationOneToMany<Post, Post> = {}, action: GenericAction, prevPosts: Dictionary<Post>) {
     switch (action.type) {
     case PostTypes.RECEIVED_NEW_POST:
     case PostTypes.RECEIVED_POST: {
@@ -980,7 +980,7 @@ function currentFocusedPostId(state = '', action: GenericAction) {
     }
 }
 
-export function reactions(state: any = {}, action: GenericAction) {
+export function reactions(state: RelationOneToOne<Post, Dictionary<Reaction>> = {}, action: GenericAction) {
     switch (action.type) {
     case PostTypes.RECEIVED_REACTIONS: {
         const reactionsList = action.data;
@@ -1071,7 +1071,7 @@ function storeReactionsForPost(state: any, post: Post) {
     };
 }
 
-export function openGraph(state: any = {}, action: GenericAction) {
+export function openGraph(state: RelationOneToOne<Post, any> = {}, action: GenericAction) {
     switch (action.type) {
     case PostTypes.RECEIVED_OPEN_GRAPH_METADATA: {
         const nextState = {...state};
@@ -1117,7 +1117,7 @@ function storeOpenGraphForPost(state: any, post: Post) {
     }, state);
 }
 
-function messagesHistory(state: {messages?: any[];index?: Dictionary<number>} = {}, action: GenericAction) {
+function messagesHistory(state: Partial<MessageHistory> = {}, action: GenericAction) {
     switch (action.type) {
     case PostTypes.ADD_MESSAGE_INTO_HISTORY: {
         const nextIndex: Dictionary<number> = {};
@@ -1192,7 +1192,7 @@ function messagesHistory(state: {messages?: any[];index?: Dictionary<number>} = 
     }
 }
 
-export function expandedURLs(state: any = {}, action: GenericAction) {
+export function expandedURLs(state: Dictionary<string> = {}, action: GenericAction) {
     switch (action.type) {
     case GeneralTypes.REDIRECT_LOCATION_SUCCESS:
         return {

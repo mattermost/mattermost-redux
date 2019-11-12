@@ -10,8 +10,8 @@ import {offlineConfig, createReducer} from './helpers';
 import initialState from './initial_state';
 import {createMiddleware} from './middleware';
 
-const {createOfflineReducer, networkStatusChangedAction, offlineCompose} = require('redux-offline');
-const defaultOfflineConfig = require('redux-offline/lib/defaults');
+import {createOfflineReducer, networkStatusChangedAction, offlineCompose} from 'redux-offline';
+import defaultOfflineConfig from 'redux-offline/lib/defaults';
 
 /**
  * Configures and constructs the redux store. Accepts the following parameters:

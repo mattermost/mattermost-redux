@@ -4,7 +4,9 @@ import {combineReducers} from 'redux';
 import {ChannelTypes, UserTypes, SchemeTypes, GroupTypes} from 'action_types';
 import {General} from '../../constants';
 import {GenericAction} from 'types/actions';
-import {Channel} from 'types/channels';
+import {Channel, ChannelMembership, ChannelStats} from 'types/channels';
+import {RelationOneToMany, RelationOneToOne, IDMappedObjects, UserIDMappedObjects} from 'types/utilities';
+import {Team} from 'types/teams';
 
 function channelListToSet(state: any, action: GenericAction) {
     const nextState = {...state};
@@ -38,7 +40,7 @@ function currentChannelId(state = '', action: GenericAction) {
     }
 }
 
-function channels(state: any = {}, action: GenericAction) {
+function channels(state: IDMappedObjects<Channel> = {}, action: GenericAction) {
     switch (action.type) {
     case ChannelTypes.RECEIVED_CHANNEL:
         if (state[action.data.id] && action.data.type === General.DM_CHANNEL) {
@@ -147,7 +149,7 @@ function channels(state: any = {}, action: GenericAction) {
     }
 }
 
-function channelsInTeam(state: any = {}, action: GenericAction) {
+function channelsInTeam(state: RelationOneToMany<Team, Channel> = {}, action: GenericAction) {
     switch (action.type) {
     case ChannelTypes.RECEIVED_CHANNEL: {
         const nextSet = new Set(state[action.data.team_id]);
@@ -173,7 +175,7 @@ function channelsInTeam(state: any = {}, action: GenericAction) {
     }
 }
 
-function myMembers(state: any = {}, action: GenericAction) {
+function myMembers(state: RelationOneToOne<Channel, ChannelMembership> = {}, action: GenericAction) {
     switch (action.type) {
     case ChannelTypes.RECEIVED_MY_CHANNEL_MEMBER: {
         const channelMember = action.data;
@@ -312,7 +314,7 @@ function myMembers(state: any = {}, action: GenericAction) {
     }
 }
 
-function membersInChannel(state: any = {}, action: GenericAction) {
+function membersInChannel(state: RelationOneToOne<Channel, UserIDMappedObjects<ChannelMembership>> = {}, action: GenericAction) {
     switch (action.type) {
     case ChannelTypes.RECEIVED_MY_CHANNEL_MEMBER:
     case ChannelTypes.RECEIVED_CHANNEL_MEMBER: {
@@ -374,7 +376,7 @@ function membersInChannel(state: any = {}, action: GenericAction) {
     }
 }
 
-function stats(state: any = {}, action: GenericAction) {
+function stats(state: RelationOneToOne<Channel, ChannelStats> = {}, action: GenericAction) {
     switch (action.type) {
     case ChannelTypes.RECEIVED_CHANNEL_STATS: {
         const nextState = {...state};

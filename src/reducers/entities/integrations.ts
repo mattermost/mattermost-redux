@@ -4,10 +4,10 @@
 import {combineReducers} from 'redux';
 import {IntegrationTypes, UserTypes, ChannelTypes} from 'action_types';
 import {GenericAction} from 'types/actions';
-import {Command} from 'types/integrations';
-import {Dictionary} from 'types/utilities';
+import {Command, IncomingWebhook, OutgoingWebhook, OAuthApp} from 'types/integrations';
+import {Dictionary, IDMappedObjects} from 'types/utilities';
 
-function incomingHooks(state: any = {}, action: GenericAction) {
+function incomingHooks(state: IDMappedObjects<IncomingWebhook> = {}, action: GenericAction) {
     switch (action.type) {
     case IntegrationTypes.RECEIVED_INCOMING_HOOK: {
         const nextState = {...state};
@@ -50,7 +50,7 @@ function incomingHooks(state: any = {}, action: GenericAction) {
     }
 }
 
-function outgoingHooks(state: any = {}, action: GenericAction) {
+function outgoingHooks(state: IDMappedObjects<OutgoingWebhook> = {}, action: GenericAction) {
     switch (action.type) {
     case IntegrationTypes.RECEIVED_OUTGOING_HOOK: {
         const nextState = {...state};
@@ -93,7 +93,7 @@ function outgoingHooks(state: any = {}, action: GenericAction) {
     }
 }
 
-function commands(state: any = {}, action: GenericAction) {
+function commands(state: IDMappedObjects<Command> = {}, action: GenericAction) {
     switch (action.type) {
     case IntegrationTypes.RECEIVED_COMMANDS:
     case IntegrationTypes.RECEIVED_CUSTOM_TEAM_COMMANDS: {
@@ -139,7 +139,7 @@ function commands(state: any = {}, action: GenericAction) {
     }
 }
 
-function systemCommands(state: any = {}, action: GenericAction) {
+function systemCommands(state: IDMappedObjects<Command> = {}, action: GenericAction) {
     switch (action.type) {
     case IntegrationTypes.RECEIVED_COMMANDS: {
         const nextCommands: Dictionary<Command> = {};
@@ -167,7 +167,7 @@ function systemCommands(state: any = {}, action: GenericAction) {
     }
 }
 
-function oauthApps(state: any = {}, action: GenericAction) {
+function oauthApps(state: IDMappedObjects<OAuthApp> = {}, action: GenericAction) {
     switch (action.type) {
     case IntegrationTypes.RECEIVED_OAUTH_APPS: {
         const nextState = {...state};

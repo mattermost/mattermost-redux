@@ -2,8 +2,8 @@
 // See LICENSE.txt for license information.
 import thunk, {ThunkMiddleware} from 'redux-thunk';
 
-const REHYDRATE = require('redux-persist/constants');
-const createActionBuffer = require('redux-action-buffer');
+import createActionBuffer from 'redux-action-buffer';
+import {REHYDRATE} from 'redux-persist/constants';
 
 const defaultOptions = {
     additionalMiddleware: [],

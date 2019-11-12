@@ -4,8 +4,9 @@
 import {combineReducers} from 'redux';
 import {GeneralTypes, UserTypes} from 'action_types';
 import {GenericAction} from 'types/actions';
+import {Config} from 'types/config';
 
-function config(state: any = {}, action: GenericAction) {
+function config(state: Partial<Config> = {}, action: GenericAction) {
     switch (action.type) {
     case GeneralTypes.CLIENT_CONFIG_RECEIVED:
         return Object.assign({}, state, action.data);
@@ -71,7 +72,7 @@ function license(state: any = {}, action: GenericAction) {
     }
 }
 
-function timezones(state = [], action: GenericAction) {
+function timezones(state: string[] = [], action: GenericAction) {
     switch (action.type) {
     case GeneralTypes.SUPPORTED_TIMEZONES_RECEIVED:
         return action.data;

@@ -3,10 +3,10 @@
 
 /* eslint-disable no-undefined */
 import * as redux from 'redux';
-const {createOfflineReducer, networkStatusChangedAction, offlineCompose} = require('redux-offline');
-const defaultOfflineConfig = require('redux-offline/lib/defaults');
+import {createOfflineReducer, networkStatusChangedAction, offlineCompose} from 'redux-offline';
+import defaultOfflineConfig from 'redux-offline/lib/defaults';
 import reducerRegistry from './reducer_registry';
-const devTools = require('remote-redux-devtools');
+import devTools from 'remote-redux-devtools';
 
 const windowAny = window as any;
 

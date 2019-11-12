@@ -6,8 +6,9 @@ import {FileTypes, PostTypes, UserTypes} from 'action_types';
 import {GenericAction} from 'types/actions';
 import {Post} from 'types/posts';
 import {FileInfo} from 'types/files';
+import {Dictionary} from 'types/utilities';
 
-export function files(state: any = {}, action: GenericAction) {
+export function files(state: Dictionary<FileInfo> = {}, action: GenericAction) {
     switch (action.type) {
     case FileTypes.RECEIVED_UPLOAD_FILES:
     case FileTypes.RECEIVED_FILES_FOR_POST: {
@@ -56,7 +57,7 @@ export function files(state: any = {}, action: GenericAction) {
     }
 }
 
-function storeFilesForPost(state: any, post: Post) {
+function storeFilesForPost(state: Dictionary<FileInfo>, post: Post) {
     if (!post.metadata || !post.metadata.files) {
         return state;
     }
@@ -74,7 +75,7 @@ function storeFilesForPost(state: any, post: Post) {
     }, state);
 }
 
-export function fileIdsByPostId(state: any = {}, action: GenericAction) {
+export function fileIdsByPostId(state: Dictionary<Array<string>> = {}, action: GenericAction) {
     switch (action.type) {
     case FileTypes.RECEIVED_FILES_FOR_POST: {
         const {data, postId} = action;
@@ -115,7 +116,7 @@ export function fileIdsByPostId(state: any = {}, action: GenericAction) {
     }
 }
 
-function storeFilesIdsForPost(state: any, post: Post) {
+function storeFilesIdsForPost(state: Dictionary<string[]>, post: Post) {
     if (!post.metadata || !post.metadata.files) {
         return state;
     }
@@ -126,7 +127,7 @@ function storeFilesIdsForPost(state: any, post: Post) {
     };
 }
 
-function filePublicLink(state: any = {}, action: GenericAction) {
+function filePublicLink(state: string | null = null, action: GenericAction) {
     switch (action.type) {
     case FileTypes.RECEIVED_FILE_PUBLIC_LINK: {
         return action.data;

@@ -19,6 +19,8 @@ import {ChannelsRequestsStatuses, GeneralRequestsStatuses, PostsRequestsStatuses
 import {Role} from './roles';
 import {PreferenceType} from './preferences';
 import {MarketplacePlugin} from './plugins';
+import {Bot} from './bots';
+import {Dictionary} from './utilities';
 
 export type GlobalState = {
     entities: {
@@ -28,7 +30,7 @@ export type GlobalState = {
         channels: ChannelsState;
         posts: PostsState;
         bots: {
-            accounts: Array<any>;
+            accounts: Dictionary<Bot>;
         };
         preferences: {
             myPreferences: {

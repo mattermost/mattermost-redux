@@ -6,8 +6,11 @@ import {UserTypes, ChannelTypes} from 'action_types';
 import {profileListToMap} from 'utils/user_utils';
 import {GenericAction} from 'types/actions';
 import {UserProfile} from 'types/users';
+import {RelationOneToMany, IDMappedObjects, RelationOneToOne} from 'types/utilities';
+import {Team} from 'types/teams';
+import {Channel} from 'types/channels';
 
-function profilesToSet(state: any, action: GenericAction) {
+function profilesToSet(state: RelationOneToMany<Team, UserProfile>, action: GenericAction) {
     const id = action.id;
     const nextSet = new Set(state[id]);
     Object.keys(action.data).forEach((key) => {
@@ -20,7 +23,7 @@ function profilesToSet(state: any, action: GenericAction) {
     };
 }
 
-function profileListToSet(state: any, action: GenericAction, replace = false) {
+function profileListToSet(state: RelationOneToMany<Team, UserProfile>, action: GenericAction, replace = false) {
     const id = action.id;
     const nextSet = replace ? new Set() : new Set(state[id]);
     if (action.data) {
@@ -37,7 +40,7 @@ function profileListToSet(state: any, action: GenericAction, replace = false) {
     return state;
 }
 
-function removeProfileListFromSet(state: any, action: GenericAction) {
+function removeProfileListFromSet(state: RelationOneToMany<Team, UserProfile>, action: GenericAction) {
     const id = action.id;
     const nextSet = new Set(state[id]);
     if (action.data) {
@@ -54,7 +57,7 @@ function removeProfileListFromSet(state: any, action: GenericAction) {
     return state;
 }
 
-function addProfileToSet(state: any, action: GenericAction) {
+function addProfileToSet(state: RelationOneToMany<Team, UserProfile>, action: GenericAction) {
     const {id, user_id: userId} = action.data;
     const nextSet = new Set(state[id]);
     nextSet.add(userId);
@@ -64,7 +67,7 @@ function addProfileToSet(state: any, action: GenericAction) {
     };
 }
 
-function removeProfileFromSet(state: any, action: GenericAction) {
+function removeProfileFromSet(state: RelationOneToMany<Team, UserProfile>, action: GenericAction) {
     const {id, user_id: userId} = action.data;
     const nextSet = new Set(state[id]);
     nextSet.delete(userId);
@@ -140,7 +143,7 @@ function myAudits(state = [], action: GenericAction) {
     }
 }
 
-function profiles(state: any = {}, action: GenericAction) {
+function profiles(state: IDMappedObjects<UserProfile> = {}, action: GenericAction) {
     switch (action.type) {
     case UserTypes.RECEIVED_ME:
     case UserTypes.RECEIVED_PROFILE: {
@@ -181,7 +184,7 @@ function profiles(state: any = {}, action: GenericAction) {
     }
 }
 
-function profilesInTeam(state: any = {}, action: GenericAction) {
+function profilesInTeam(state: RelationOneToMany<Team, UserProfile> = {}, action: GenericAction) {
     switch (action.type) {
     case UserTypes.RECEIVED_PROFILE_IN_TEAM:
         return addProfileToSet(state, action);
@@ -206,7 +209,7 @@ function profilesInTeam(state: any = {}, action: GenericAction) {
     }
 }
 
-function profilesNotInTeam(state: any = {}, action: GenericAction) {
+function profilesNotInTeam(state: RelationOneToMany<Team, UserProfile> = {}, action: GenericAction) {
     switch (action.type) {
     case UserTypes.RECEIVED_PROFILE_NOT_IN_TEAM:
         return addProfileToSet(state, action);
@@ -231,11 +234,11 @@ function profilesNotInTeam(state: any = {}, action: GenericAction) {
     }
 }
 
-function profilesWithoutTeam(state = new Set(), action: GenericAction) {
+function profilesWithoutTeam(state: Set<string> = new Set(), action: GenericAction) {
     switch (action.type) {
     case UserTypes.RECEIVED_PROFILE_WITHOUT_TEAM: {
         const nextSet = new Set(state);
-        Object.values(action.data).forEach((id) => nextSet.add(id));
+        Object.values(action.data).forEach((id: string) => nextSet.add(id));
         return nextSet;
     }
     case UserTypes.RECEIVED_PROFILES_LIST_WITHOUT_TEAM: {
@@ -256,7 +259,7 @@ function profilesWithoutTeam(state = new Set(), action: GenericAction) {
     }
 }
 
-function profilesInChannel(state: any = {}, action: GenericAction) {
+function profilesInChannel(state: RelationOneToMany<Channel, UserProfile> = {}, action: GenericAction) {
     switch (action.type) {
     case UserTypes.RECEIVED_PROFILE_IN_CHANNEL:
         return addProfileToSet(state, action);
@@ -286,7 +289,7 @@ function profilesInChannel(state: any = {}, action: GenericAction) {
     }
 }
 
-function profilesNotInChannel(state: any = {}, action: GenericAction) {
+function profilesNotInChannel(state: RelationOneToMany<Channel, UserProfile> = {}, action: GenericAction) {
     switch (action.type) {
     case UserTypes.RECEIVED_PROFILE_NOT_IN_CHANNEL:
         return addProfileToSet(state, action);
@@ -319,7 +322,7 @@ function profilesNotInChannel(state: any = {}, action: GenericAction) {
     }
 }
 
-function statuses(state: any = {}, action: GenericAction) {
+function statuses(state: RelationOneToOne<UserProfile, string> = {}, action: GenericAction) {
     switch (action.type) {
     case UserTypes.RECEIVED_STATUS: {
         const nextState = Object.assign({}, state);

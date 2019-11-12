@@ -10,7 +10,7 @@ import {ActionFunc} from 'types/actions';
 
 export type MarketplacePluginFilter = {
     Page: number;
-	PerPage: number;
+    PerPage: number;
     Filter: string;
     ServerVersion: string;
 }

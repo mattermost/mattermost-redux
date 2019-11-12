@@ -100,20 +100,13 @@ export type MessageHistory = {
 
 export type PostsState = {
     posts: IDMappedObjects<Post>;
-    postsInChannel: {
-        [x: string]: Array<PostOrderBlock>;
-    };
+    postsInChannel: Dictionary<Array<PostOrderBlock>>;
     postsInThread: RelationOneToMany<Post, Post>;
-    reactions: RelationOneToOne<
-        Post,
-        {
-            [x: string]: Reaction;
-        }
-        >;
+    reactions: RelationOneToOne<Post, Dictionary<Reaction>>;
     openGraph: RelationOneToOne<Post, any>;
     pendingPostIds: Array<string>;
     selectedPostId: string;
     currentFocusedPostId: string;
     messagesHistory: MessageHistory;
-    expandedURLs: { [x: string]: string};
+    expandedURLs: Dictionary<string>;
 };

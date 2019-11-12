@@ -67,7 +67,7 @@ const state: GlobalState = {
             myPreferences: {},
         },
         bots: {
-            accounts: [],
+            accounts: {},
         },
         admin: {
             logs: [],

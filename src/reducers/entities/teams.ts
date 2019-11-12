@@ -297,7 +297,7 @@ function membersInTeam(state: RelationOneToOne<Team, RelationOneToOne<UserProfil
     }
 }
 
-function stats(state = {}, action: GenericAction) {
+function stats(state: any = {}, action: GenericAction) {
     switch (action.type) {
     case TeamTypes.RECEIVED_TEAM_STATS: {
         const stat = action.data;

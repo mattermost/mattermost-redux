@@ -3,8 +3,10 @@
 import {combineReducers} from 'redux';
 import {BotTypes, UserTypes} from 'action_types';
 import {GenericAction} from 'types/actions';
+import {Dictionary} from 'types/utilities';
+import {Bot} from 'types/bots';
 
-function accounts(state: any = {}, action: GenericAction) {
+function accounts(state: Dictionary<Bot> = {}, action: GenericAction) {
     switch (action.type) {
     case BotTypes.RECEIVED_BOT_ACCOUNTS: {
         const newBots = action.data;

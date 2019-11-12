@@ -44,7 +44,7 @@ export type UsersState = {
     profiles: IDMappedObjects<UserProfile>;
     profilesInTeam: RelationOneToMany<Team, UserProfile>;
     profilesNotInTeam: RelationOneToMany<Team, UserProfile>;
-    profilesWithoutTeam: Set<any>;
+    profilesWithoutTeam: Set<string>;
     profilesInChannel: RelationOneToMany<Channel, UserProfile>;
     profilesNotInChannel: RelationOneToMany<Channel, UserProfile>;
     statuses: RelationOneToOne<UserProfile, string>;

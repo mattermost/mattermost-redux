@@ -6,6 +6,8 @@ import {Preferences} from '../../constants';
 import {PreferenceType} from 'types/preferences';
 import {GenericAction} from 'types/actions';
 import {Post} from 'types/posts';
+import {Dictionary} from 'types/utilities';
+import {Search} from 'types/search';
 
 function results(state: Array<string> = [], action: GenericAction) {
     switch (action.type) {
@@ -34,7 +36,7 @@ function results(state: Array<string> = [], action: GenericAction) {
     }
 }
 
-function matches(state: any = {}, action: GenericAction) {
+function matches(state: Dictionary<Array<string>> = {}, action: GenericAction) {
     switch (action.type) {
     case SearchTypes.RECEIVED_SEARCH_POSTS:
         if (action.isGettingMore) {
@@ -121,7 +123,7 @@ function flagged(state: Array<string> = [], action: GenericAction) {
     }
 }
 
-function removePinnedPost(state: any, post: Post) {
+function removePinnedPost(state: Dictionary<Array<string>>, post: Post) {
     if (post && state[post.channel_id]) {
         const postId = post.id;
         const channelId = post.channel_id;
@@ -140,7 +142,7 @@ function removePinnedPost(state: any, post: Post) {
     return state;
 }
 
-function pinned(state: any = {}, action: GenericAction) {
+function pinned(state: Dictionary<Array<string>> = {}, action: GenericAction) {
     switch (action.type) {
     case SearchTypes.RECEIVED_SEARCH_PINNED_POSTS: {
         const {channelId, pinned: posts} = action.data;
@@ -193,7 +195,7 @@ function pinned(state: any = {}, action: GenericAction) {
     }
 }
 
-function recent(state: any = {}, action: GenericAction) {
+function recent(state: Dictionary<Array<Search>> = {}, action: GenericAction) {
     const {data, type} = action;
 
     switch (type) {
