@@ -217,7 +217,6 @@ function myMembers(state: RelationOneToOne<Team, TeamMembership> = {}, action: G
 
         const teamState = state[teamId];
         if (!teamState) {
-            console.log('nosta', state, teamId);
             return state;
         }
 
