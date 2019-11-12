@@ -1041,7 +1041,7 @@ export function patchUser(user: UserProfile): ActionFunc {
     };
 }
 
-export function updateUserRoles(userId: string, roles: Array<string>): ActionFunc {
+export function updateUserRoles(userId: string, roles: string): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         try {
             await Client4.updateUserRoles(userId, roles);

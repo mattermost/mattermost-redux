@@ -9,6 +9,13 @@ import {isSystemAdmin} from 'utils/user_utils';
 
 import fetch from './fetch_etag';
 import {UserProfile} from 'types/users';
+import {Team} from 'types/teams';
+import {Channel} from 'types/channels';
+import {Post} from 'types/posts';
+import {Job} from 'types/jobs';
+import {Role} from 'types/roles';
+import {Scheme} from 'types/schemes';
+import {Options} from 'types/client4';
 
 const FormData = require('form-data');
 const HEADER_AUTH = 'Authorization';
@@ -32,9 +39,9 @@ export default class Client4 {
     csrf = '';
     url = '';
     urlVersion = '/api/v4';
-    userAgent = null;
+    userAgent: string|null = null;
     enableLogging = false;
-    defaultHeaders = {};
+    defaultHeaders: {[x: string]: string} = {};
     userId = '';
     diagnosticId = '';
     includeCookies = true;
@@ -42,24 +49,24 @@ export default class Client4 {
         connectionError: 'There appears to be a problem with your internet connection.',
         unknownError: 'We received an unexpected status code from the server.',
     };
-    userRoles?: any;
+    userRoles?: string;
 
     getUrl() {
         return this.url;
     }
 
-    getAbsoluteUrl(baseUrl) {
+    getAbsoluteUrl(baseUrl: string) {
         if (typeof baseUrl !== 'string' || !baseUrl.startsWith('/')) {
             return baseUrl;
         }
         return this.getUrl() + baseUrl;
     }
 
-    setUrl(url) {
+    setUrl(url: string) {
         this.url = url;
     }
 
-    setUserAgent(userAgent) {
+    setUserAgent(userAgent: string) {
         this.userAgent = userAgent;
     }
 
@@ -67,35 +74,35 @@ export default class Client4 {
         return this.token;
     }
 
-    setToken(token) {
+    setToken(token: string) {
         this.token = token;
     }
 
-    setCSRF(csrfToken) {
+    setCSRF(csrfToken: string) {
         this.csrf = csrfToken;
     }
 
-    setAcceptLanguage(locale) {
+    setAcceptLanguage(locale: string) {
         this.defaultHeaders['Accept-Language'] = locale;
     }
 
-    setEnableLogging(enable) {
+    setEnableLogging(enable: boolean) {
         this.enableLogging = enable;
     }
 
-    setIncludeCookies(include) {
+    setIncludeCookies(include: boolean) {
         this.includeCookies = include;
     }
 
-    setUserId(userId) {
+    setUserId(userId: string) {
         this.userId = userId;
     }
 
-    setUserRoles(roles) {
+    setUserRoles(roles: string) {
         this.userRoles = roles;
     }
 
-    setDiagnosticId(diagnosticId) {
+    setDiagnosticId(diagnosticId: string) {
         this.diagnosticId = diagnosticId;
     }
 
@@ -115,7 +122,7 @@ export default class Client4 {
         return `${this.getBaseRoute()}/users`;
     }
 
-    getUserRoute(userId) {
+    getUserRoute(userId: string) {
         return `${this.getUsersRoute()}/${userId}`;
     }
 
@@ -123,23 +130,23 @@ export default class Client4 {
         return `${this.getBaseRoute()}/teams`;
     }
 
-    getTeamRoute(teamId) {
+    getTeamRoute(teamId: string) {
         return `${this.getTeamsRoute()}/${teamId}`;
     }
 
-    getTeamSchemeRoute(teamId) {
+    getTeamSchemeRoute(teamId: string) {
         return `${this.getTeamRoute(teamId)}/scheme`;
     }
 
-    getTeamNameRoute(teamName) {
+    getTeamNameRoute(teamName: string) {
         return `${this.getTeamsRoute()}/name/${teamName}`;
     }
 
-    getTeamMembersRoute(teamId) {
+    getTeamMembersRoute(teamId: string) {
         return `${this.getTeamRoute(teamId)}/members`;
     }
 
-    getTeamMemberRoute(teamId, userId) {
+    getTeamMemberRoute(teamId: string, userId: string) {
         return `${this.getTeamMembersRoute(teamId)}/${userId}`;
     }
 
@@ -147,19 +154,19 @@ export default class Client4 {
         return `${this.getBaseRoute()}/channels`;
     }
 
-    getChannelRoute(channelId) {
+    getChannelRoute(channelId: string) {
         return `${this.getChannelsRoute()}/${channelId}`;
     }
 
-    getChannelMembersRoute(channelId) {
+    getChannelMembersRoute(channelId: string) {
         return `${this.getChannelRoute(channelId)}/members`;
     }
 
-    getChannelMemberRoute(channelId, userId) {
+    getChannelMemberRoute(channelId: string, userId: string) {
         return `${this.getChannelMembersRoute(channelId)}/${userId}`;
     }
 
-    getChannelSchemeRoute(channelId) {
+    getChannelSchemeRoute(channelId: string) {
         return `${this.getChannelRoute(channelId)}/scheme`;
     }
 
@@ -167,7 +174,7 @@ export default class Client4 {
         return `${this.getBaseRoute()}/posts`;
     }
 
-    getPostRoute(postId) {
+    getPostRoute(postId: string) {
         return `${this.getPostsRoute()}/${postId}`;
     }
 
@@ -183,11 +190,11 @@ export default class Client4 {
         return `${this.getBaseRoute()}/files`;
     }
 
-    getFileRoute(fileId) {
+    getFileRoute(fileId: string) {
         return `${this.getFilesRoute()}/${fileId}`;
     }
 
-    getPreferencesRoute(userId) {
+    getPreferencesRoute(userId: string) {
         return `${this.getUserRoute(userId)}/preferences`;
     }
 
@@ -195,7 +202,7 @@ export default class Client4 {
         return `${this.getBaseRoute()}/hooks/incoming`;
     }
 
-    getIncomingHookRoute(hookId) {
+    getIncomingHookRoute(hookId: string) {
         return `${this.getBaseRoute()}/hooks/incoming/${hookId}`;
     }
 
@@ -203,7 +210,7 @@ export default class Client4 {
         return `${this.getBaseRoute()}/hooks/outgoing`;
     }
 
-    getOutgoingHookRoute(hookId) {
+    getOutgoingHookRoute(hookId: string) {
         return `${this.getBaseRoute()}/hooks/outgoing/${hookId}`;
     }
 
@@ -215,7 +222,7 @@ export default class Client4 {
         return `${this.getBaseRoute()}/oauth/apps`;
     }
 
-    getOAuthAppRoute(appId) {
+    getOAuthAppRoute(appId: string) {
         return `${this.getOAuthAppsRoute()}/${appId}`;
     }
 
@@ -223,7 +230,7 @@ export default class Client4 {
         return `${this.getBaseRoute()}/emoji`;
     }
 
-    getEmojiRoute(emojiId) {
+    getEmojiRoute(emojiId: string) {
         return `${this.getEmojisRoute()}/${emojiId}`;
     }
 
@@ -247,7 +254,7 @@ export default class Client4 {
         return `${this.getBaseRoute()}/plugins`;
     }
 
-    getPluginRoute(pluginId) {
+    getPluginRoute(pluginId: string) {
         return `${this.getPluginsRoute()}/${pluginId}`;
     }
 
@@ -275,7 +282,7 @@ export default class Client4 {
         return `${this.getBaseRoute()}/bots`;
     }
 
-    getBotRoute(botUserId) {
+    getBotRoute(botUserId: string) {
         return `${this.getBotsRoute()}/${botUserId}`;
     }
 
@@ -292,10 +299,10 @@ export default class Client4 {
         return '';
     }
 
-    getOptions(options) {
-        const newOptions = Object.assign({}, options);
+    getOptions(options: Options) {
+        const newOptions: Options = {...options};
 
-        const headers = {
+        const headers: {[x: string]: string} = {
             [HEADER_REQUESTED_WITH]: 'XMLHttpRequest',
             ...this.defaultHeaders,
         };
@@ -329,7 +336,7 @@ export default class Client4 {
 
     // User Routes
 
-    createUser = async (user, token, inviteId) => {
+    createUser = async (user: UserProfile, token: string, inviteId: string) => {
         this.trackEvent('api', 'api_users_create');
 
         const queryParams: any = {};
@@ -348,14 +355,14 @@ export default class Client4 {
         );
     }
 
-    patchMe = async (userPatch) => {
+    patchMe = async (userPatch: Partial<UserProfile>) => {
         return this.doFetch(
             `${this.getUserRoute('me')}/patch`,
             {method: 'put', body: JSON.stringify(userPatch)}
         );
     }
 
-    patchUser = async (userPatch) => {
+    patchUser = async (userPatch: Partial<UserProfile> & {id: string}) => {
         this.trackEvent('api', 'api_users_patch');
 
         return this.doFetch(
@@ -364,7 +371,7 @@ export default class Client4 {
         );
     }
 
-    updateUser = async (user) => {
+    updateUser = async (user: UserProfile) => {
         this.trackEvent('api', 'api_users_update');
 
         return this.doFetch(
@@ -373,7 +380,7 @@ export default class Client4 {
         );
     }
 
-    promoteGuestToUser = async (userId) => {
+    promoteGuestToUser = async (userId: string) => {
         this.trackEvent('api', 'api_users_promote_guest_to_user');
 
         return this.doFetch(
@@ -382,7 +389,7 @@ export default class Client4 {
         );
     }
 
-    demoteUserToGuest = async (userId) => {
+    demoteUserToGuest = async (userId: string) => {
         this.trackEvent('api', 'api_users_demote_user_to_guest');
 
         return this.doFetch(
@@ -391,7 +398,7 @@ export default class Client4 {
         );
     }
 
-    updateUserRoles = async (userId, roles) => {
+    updateUserRoles = async (userId: string, roles: string) => {
         this.trackEvent('api', 'api_users_update_roles');
 
         return this.doFetch(
@@ -399,7 +406,7 @@ export default class Client4 {
             {method: 'put', body: JSON.stringify({roles})}
         );
     };
-    updateUserMfa = async (userId, activate, code) => {
+    updateUserMfa = async (userId: string, activate: boolean, code: string) => {
         const body: any = {
             activate,
         };
@@ -414,7 +421,7 @@ export default class Client4 {
         );
     }
 
-    updateUserPassword = async (userId, currentPassword, newPassword) => {
+    updateUserPassword = async (userId: string, currentPassword: string, newPassword: string) => {
         this.trackEvent('api', 'api_users_newpassword');
 
         return this.doFetch(
@@ -423,7 +430,7 @@ export default class Client4 {
         );
     }
 
-    resetUserPassword = async (token, newPassword) => {
+    resetUserPassword = async (token: string, newPassword: string) => {
         this.trackEvent('api', 'api_users_reset_password');
 
         return this.doFetch(
@@ -432,7 +439,7 @@ export default class Client4 {
         );
     }
 
-    sendPasswordResetEmail = async (email) => {
+    sendPasswordResetEmail = async (email: string) => {
         this.trackEvent('api', 'api_users_send_password_reset');
 
         return this.doFetch(
@@ -441,7 +448,7 @@ export default class Client4 {
         );
     }
 
-    updateUserActive = async (userId, active) => {
+    updateUserActive = async (userId: string, active: boolean) => {
         this.trackEvent('api', 'api_users_update_active');
 
         return this.doFetch(
@@ -450,7 +457,7 @@ export default class Client4 {
         );
     }
 
-    uploadProfileImage = async (userId, imageData) => {
+    uploadProfileImage = async (userId: string, imageData: File) => {
         this.trackEvent('api', 'api_users_update_profile_picture');
 
         const formData = new FormData();
@@ -472,7 +479,7 @@ export default class Client4 {
         );
     };
 
-    setDefaultProfileImage = async (userId) => {
+    setDefaultProfileImage = async (userId: string) => {
         this.trackEvent('api', 'api_users_set_default_profile_picture');
 
         return this.doFetch(
@@ -481,14 +488,14 @@ export default class Client4 {
         );
     };
 
-    verifyUserEmail = async (token) => {
+    verifyUserEmail = async (token: string) => {
         return this.doFetch(
             `${this.getUsersRoute()}/email/verify`,
             {method: 'post', body: JSON.stringify({token})}
         );
     }
 
-    updateMyTermsOfServiceStatus = async (termsOfServiceId, accepted) => {
+    updateMyTermsOfServiceStatus = async (termsOfServiceId: string, accepted: boolean) => {
         return this.doFetch(
             `${this.getUserRoute('me')}/terms_of_service`,
             {method: 'post', body: JSON.stringify({termsOfServiceId, accepted})}
@@ -502,21 +509,21 @@ export default class Client4 {
         );
     }
 
-    createTermsOfService = async (text) => {
+    createTermsOfService = async (text: string) => {
         return this.doFetch(
             `${this.getBaseRoute()}/terms_of_service`,
             {method: 'post', body: JSON.stringify({text})}
         );
     }
 
-    sendVerificationEmail = async (email) => {
+    sendVerificationEmail = async (email: string) => {
         return this.doFetch(
             `${this.getUsersRoute()}/email/verify/send`,
             {method: 'post', body: JSON.stringify({email})}
         );
     }
 
-    login = async (loginId, password, token = '', deviceId = '', ldapOnly = false) => {
+    login = async (loginId: string, password: string, token = '', deviceId = '', ldapOnly = false) => {
         this.trackEvent('api', 'api_users_login');
 
         if (ldapOnly) {
@@ -542,7 +549,7 @@ export default class Client4 {
         return data;
     };
 
-    loginById = async (id, password, token = '', deviceId = '') => {
+    loginById = async (id: string, password: string, token = '', deviceId = '') => {
         this.trackEvent('api', 'api_users_login');
         const body: any = {
             device_id: deviceId,
@@ -585,7 +592,7 @@ export default class Client4 {
         );
     };
 
-    getProfilesByIds = async (userIds, options = {}) => {
+    getProfilesByIds = async (userIds: string[], options = {}) => {
         this.trackEvent('api', 'api_profiles_get_by_ids');
 
         return this.doFetch(
@@ -594,7 +601,7 @@ export default class Client4 {
         );
     };
 
-    getProfilesByUsernames = async (usernames) => {
+    getProfilesByUsernames = async (usernames: string[]) => {
         this.trackEvent('api', 'api_profiles_get_by_usernames');
 
         return this.doFetch(
@@ -603,7 +610,7 @@ export default class Client4 {
         );
     };
 
-    getProfilesInTeam = async (teamId, page = 0, perPage = PER_PAGE_DEFAULT, sort = '', options = {}) => {
+    getProfilesInTeam = async (teamId: string, page = 0, perPage = PER_PAGE_DEFAULT, sort = '', options = {}) => {
         this.trackEvent('api', 'api_profiles_get_in_team', {team_id: teamId, sort});
 
         return this.doFetch(
@@ -612,7 +619,7 @@ export default class Client4 {
         );
     };
 
-    getProfilesNotInTeam = async (teamId, groupConstrained, page = 0, perPage = PER_PAGE_DEFAULT) => {
+    getProfilesNotInTeam = async (teamId: string, groupConstrained: boolean, page = 0, perPage = PER_PAGE_DEFAULT) => {
         this.trackEvent('api', 'api_profiles_get_not_in_team', {team_id: teamId, group_constrained: groupConstrained});
 
         const queryStringObj: any = {not_in_team: teamId, page, per_page: perPage};
@@ -635,7 +642,7 @@ export default class Client4 {
         );
     };
 
-    getProfilesInChannel = async (channelId, page = 0, perPage = PER_PAGE_DEFAULT, sort = '') => {
+    getProfilesInChannel = async (channelId: string, page = 0, perPage = PER_PAGE_DEFAULT, sort = '') => {
         this.trackEvent('api', 'api_profiles_get_in_channel', {channel_id: channelId});
 
         const serverVersion = this.getServerVersion();
@@ -651,7 +658,7 @@ export default class Client4 {
         );
     };
 
-    getProfilesInGroupChannels = async (channelsIds) => {
+    getProfilesInGroupChannels = async (channelsIds: string[]) => {
         this.trackEvent('api', 'api_profiles_get_in_group_channels', {channelsIds});
 
         return this.doFetch(
@@ -660,7 +667,7 @@ export default class Client4 {
         );
     };
 
-    getProfilesNotInChannel = async (teamId, channelId, groupConstrained, page = 0, perPage = PER_PAGE_DEFAULT) => {
+    getProfilesNotInChannel = async (teamId: string, channelId: string, groupConstrained: boolean, page = 0, perPage = PER_PAGE_DEFAULT) => {
         this.trackEvent('api', 'api_profiles_get_not_in_channel', {team_id: teamId, channel_id: channelId, group_constrained: groupConstrained});
 
         const queryStringObj: any = {in_team: teamId, not_in_channel: channelId, page, per_page: perPage};
@@ -681,28 +688,28 @@ export default class Client4 {
         );
     };
 
-    getUser = async (userId) => {
+    getUser = async (userId: string) => {
         return this.doFetch(
             `${this.getUserRoute(userId)}`,
             {method: 'get'}
         );
     };
 
-    getUserByUsername = async (username) => {
+    getUserByUsername = async (username: string) => {
         return this.doFetch(
             `${this.getUsersRoute()}/username/${username}`,
             {method: 'get'}
         );
     };
 
-    getUserByEmail = async (email) => {
+    getUserByEmail = async (email: string) => {
         return this.doFetch(
             `${this.getUsersRoute()}/email/${email}`,
             {method: 'get'}
         );
     };
 
-    getProfilePictureUrl = (userId, lastPictureUpdate) => {
+    getProfilePictureUrl = (userId: string, lastPictureUpdate: number) => {
         const params: any = {};
 
         if (lastPictureUpdate) {
@@ -711,10 +718,10 @@ export default class Client4 {
 
         return `${this.getUserRoute(userId)}/image${buildQueryString(params)}`;
     };
-    getDefaultProfilePictureUrl = (userId) => {
+    getDefaultProfilePictureUrl = (userId: string) => {
         return `${this.getUserRoute(userId)}/image/default`;
     };
-    autocompleteUsers = async (name, teamId, channelId, options = {
+    autocompleteUsers = async (name: string, teamId: string, channelId: string, options = {
         limit: General.AUTOCOMPLETE_LIMIT_DEFAULT,
     }) => {
         return this.doFetch(`${this.getUsersRoute()}/autocomplete${buildQueryString({
@@ -726,21 +733,21 @@ export default class Client4 {
             method: 'get',
         });
     };
-    getSessions = async (userId) => {
+    getSessions = async (userId: string) => {
         return this.doFetch(
             `${this.getUserRoute(userId)}/sessions`,
             {method: 'get'}
         );
     };
 
-    revokeSession = async (userId, sessionId) => {
+    revokeSession = async (userId: string, sessionId: string) => {
         return this.doFetch(
             `${this.getUserRoute(userId)}/sessions/revoke`,
             {method: 'post', body: JSON.stringify({session_id: sessionId})}
         );
     };
 
-    revokeAllSessionsForUser = async (userId) => {
+    revokeAllSessionsForUser = async (userId: string) => {
         return this.doFetch(
             `${this.getUserRoute(userId)}/sessions/revoke/all`,
             {method: 'post'}
@@ -754,35 +761,35 @@ export default class Client4 {
         );
     };
 
-    getUserAudits = async (userId, page = 0, perPage = PER_PAGE_DEFAULT) => {
+    getUserAudits = async (userId: string, page = 0, perPage = PER_PAGE_DEFAULT) => {
         return this.doFetch(
             `${this.getUserRoute(userId)}/audits${buildQueryString({page, per_page: perPage})}`,
             {method: 'get'}
         );
     };
 
-    checkUserMfa = async (loginId) => {
+    checkUserMfa = async (loginId: string) => {
         return this.doFetch(
             `${this.getUsersRoute()}/mfa`,
             {method: 'post', body: JSON.stringify({login_id: loginId})}
         );
     };
 
-    generateMfaSecret = async (userId) => {
+    generateMfaSecret = async (userId: string) => {
         return this.doFetch(
             `${this.getUserRoute(userId)}/mfa/generate`,
             {method: 'post'}
         );
     };
 
-    attachDevice = async (deviceId) => {
+    attachDevice = async (deviceId: string) => {
         return this.doFetch(
             `${this.getUsersRoute()}/sessions/device`,
             {method: 'put', body: JSON.stringify({device_id: deviceId})}
         );
     };
 
-    searchUsers = (term, options) => {
+    searchUsers = (term: string, options) => {
         this.trackEvent('api', 'api_search_users');
 
         return this.doFetch(
@@ -791,14 +798,14 @@ export default class Client4 {
         );
     };
 
-    getStatusesByIds = async (userIds) => {
+    getStatusesByIds = async (userIds: string[]) => {
         return this.doFetch(
             `${this.getUsersRoute()}/status/ids`,
             {method: 'post', body: JSON.stringify(userIds)}
         );
     };
 
-    getStatus = async (userId) => {
+    getStatus = async (userId: string) => {
         return this.doFetch(
             `${this.getUserRoute(userId)}/status`,
             {method: 'get'}
@@ -812,7 +819,7 @@ export default class Client4 {
         );
     };
 
-    switchEmailToOAuth = async (service, email, password, mfaCode = '') => {
+    switchEmailToOAuth = async (service: string, email: string, password: string, mfaCode = '') => {
         this.trackEvent('api', 'api_users_email_to_oauth');
 
         return this.doFetch(
@@ -821,7 +828,7 @@ export default class Client4 {
         );
     };
 
-    switchOAuthToEmail = async (currentService, email, password) => {
+    switchOAuthToEmail = async (currentService: string, email: string, password: string) => {
         this.trackEvent('api', 'api_users_oauth_to_email');
 
         return this.doFetch(
@@ -830,7 +837,7 @@ export default class Client4 {
         );
     };
 
-    switchEmailToLdap = async (email, emailPassword, ldapId, ldapPassword, mfaCode = '') => {
+    switchEmailToLdap = async (email: string, emailPassword: string, ldapId: string, ldapPassword: string, mfaCode = '') => {
         this.trackEvent('api', 'api_users_email_to_ldap');
 
         return this.doFetch(
@@ -839,7 +846,7 @@ export default class Client4 {
         );
     };
 
-    switchLdapToEmail = async (ldapPassword, email, emailPassword, mfaCode = '') => {
+    switchLdapToEmail = async (ldapPassword: string, email: string, emailPassword: string, mfaCode = '') => {
         this.trackEvent('api', 'api_users_ldap_to_email');
 
         return this.doFetch(
@@ -848,28 +855,28 @@ export default class Client4 {
         );
     };
 
-    getAuthorizedOAuthApps = async (userId) => {
+    getAuthorizedOAuthApps = async (userId: string) => {
         return this.doFetch(
             `${this.getUserRoute(userId)}/oauth/apps/authorized`,
             {method: 'get'}
         );
     }
 
-    authorizeOAuthApp = async (responseType, clientId, redirectUri, state, scope) => {
+    authorizeOAuthApp = async (responseType: string, clientId: string, redirectUri: string, state: string, scope: string) => {
         return this.doFetch(
             `${this.url}/oauth/authorize`,
             {method: 'post', body: JSON.stringify({client_id: clientId, response_type: responseType, redirect_uri: redirectUri, state, scope})}
         );
     }
 
-    deauthorizeOAuthApp = async (clientId) => {
+    deauthorizeOAuthApp = async (clientId: string) => {
         return this.doFetch(
             `${this.url}/oauth/deauthorize`,
             {method: 'post', body: JSON.stringify({client_id: clientId})}
         );
     }
 
-    createUserAccessToken = async (userId, description) => {
+    createUserAccessToken = async (userId: string, description: string) => {
         this.trackEvent('api', 'api_users_create_access_token');
 
         return this.doFetch(
@@ -878,14 +885,14 @@ export default class Client4 {
         );
     }
 
-    getUserAccessToken = async (tokenId) => {
+    getUserAccessToken = async (tokenId: string) => {
         return this.doFetch(
             `${this.getUsersRoute()}/tokens/${tokenId}`,
             {method: 'get'}
         );
     }
 
-    getUserAccessTokensForUser = async (userId, page = 0, perPage = PER_PAGE_DEFAULT) => {
+    getUserAccessTokensForUser = async (userId: string, page = 0, perPage = PER_PAGE_DEFAULT) => {
         return this.doFetch(
             `${this.getUserRoute(userId)}/tokens${buildQueryString({page, per_page: perPage})}`,
             {method: 'get'}
@@ -899,7 +906,7 @@ export default class Client4 {
         );
     }
 
-    revokeUserAccessToken = async (tokenId) => {
+    revokeUserAccessToken = async (tokenId: string) => {
         this.trackEvent('api', 'api_users_revoke_access_token');
 
         return this.doFetch(
@@ -908,14 +915,14 @@ export default class Client4 {
         );
     }
 
-    disableUserAccessToken = async (tokenId) => {
+    disableUserAccessToken = async (tokenId: string) => {
         return this.doFetch(
             `${this.getUsersRoute()}/tokens/disable`,
             {method: 'post', body: JSON.stringify({token_id: tokenId})}
         );
     }
 
-    enableUserAccessToken = async (tokenId) => {
+    enableUserAccessToken = async (tokenId: string) => {
         return this.doFetch(
             `${this.getUsersRoute()}/tokens/enable`,
             {method: 'post', body: JSON.stringify({token_id: tokenId})}
@@ -924,7 +931,7 @@ export default class Client4 {
 
     // Team Routes
 
-    createTeam = async (team) => {
+    createTeam = async (team: Team) => {
         this.trackEvent('api', 'api_teams_create');
 
         return this.doFetch(
@@ -933,7 +940,7 @@ export default class Client4 {
         );
     };
 
-    deleteTeam = async (teamId) => {
+    deleteTeam = async (teamId: string) => {
         this.trackEvent('api', 'api_teams_delete');
 
         return this.doFetch(
@@ -942,7 +949,7 @@ export default class Client4 {
         );
     };
 
-    updateTeam = async (team) => {
+    updateTeam = async (team: Team) => {
         this.trackEvent('api', 'api_teams_update_name', {team_id: team.id});
 
         return this.doFetch(
@@ -951,7 +958,7 @@ export default class Client4 {
         );
     };
 
-    patchTeam = async (team) => {
+    patchTeam = async (team: Partial<Team> & {id: string}) => {
         this.trackEvent('api', 'api_teams_patch_name', {team_id: team.id});
 
         return this.doFetch(
@@ -960,7 +967,7 @@ export default class Client4 {
         );
     };
 
-    regenerateTeamInviteId = async (teamId) => {
+    regenerateTeamInviteId = async (teamId: string) => {
         this.trackEvent('api', 'api_teams_regenerate_invite_id', {team_id: teamId});
 
         return this.doFetch(
@@ -969,7 +976,7 @@ export default class Client4 {
         );
     };
 
-    updateTeamScheme = async (teamId, schemeId) => {
+    updateTeamScheme = async (teamId: string, schemeId: string) => {
         const patch = {scheme_id: schemeId};
 
         this.trackEvent('api', 'api_teams_update_scheme', {team_id: teamId, ...patch});
@@ -980,7 +987,7 @@ export default class Client4 {
         );
     };
 
-    checkIfTeamExists = async (teamName) => {
+    checkIfTeamExists = async (teamName: string) => {
         return this.doFetch(
             `${this.getTeamNameRoute(teamName)}/exists`,
             {method: 'get'}
@@ -994,7 +1001,7 @@ export default class Client4 {
         );
     };
 
-    searchTeams = (term) => {
+    searchTeams = (term: string) => {
         this.trackEvent('api', 'api_search_teams');
 
         return this.doFetch(
@@ -1003,14 +1010,14 @@ export default class Client4 {
         );
     };
 
-    getTeam = async (teamId) => {
+    getTeam = async (teamId: string) => {
         return this.doFetch(
             this.getTeamRoute(teamId),
             {method: 'get'}
         );
     };
 
-    getTeamByName = async (teamName) => {
+    getTeamByName = async (teamName: string) => {
         this.trackEvent('api', 'api_teams_get_team_by_name');
 
         return this.doFetch(
@@ -1026,7 +1033,7 @@ export default class Client4 {
         );
     };
 
-    getTeamsForUser = async (userId) => {
+    getTeamsForUser = async (userId: string) => {
         return this.doFetch(
             `${this.getUserRoute(userId)}/teams`,
             {method: 'get'}
@@ -1047,35 +1054,35 @@ export default class Client4 {
         );
     };
 
-    getTeamMembers = async (teamId, page = 0, perPage = PER_PAGE_DEFAULT) => {
+    getTeamMembers = async (teamId: string, page = 0, perPage = PER_PAGE_DEFAULT) => {
         return this.doFetch(
             `${this.getTeamMembersRoute(teamId)}${buildQueryString({page, per_page: perPage})}`,
             {method: 'get'}
         );
     };
 
-    getTeamMembersForUser = async (userId) => {
+    getTeamMembersForUser = async (userId: string) => {
         return this.doFetch(
             `${this.getUserRoute(userId)}/teams/members`,
             {method: 'get'}
         );
     };
 
-    getTeamMember = async (teamId, userId) => {
+    getTeamMember = async (teamId: string, userId: string) => {
         return this.doFetch(
             `${this.getTeamMemberRoute(teamId, userId)}`,
             {method: 'get'}
         );
     };
 
-    getTeamMembersByIds = async (teamId, userIds) => {
+    getTeamMembersByIds = async (teamId: string, userIds: string[]) => {
         return this.doFetch(
             `${this.getTeamMembersRoute(teamId)}/ids`,
             {method: 'post', body: JSON.stringify(userIds)}
         );
     };
 
-    addToTeam = async (teamId, userId) => {
+    addToTeam = async (teamId: string, userId: string) => {
         this.trackEvent('api', 'api_teams_invite_members', {team_id: teamId});
 
         const member = {user_id: userId, team_id: teamId};
@@ -1095,7 +1102,7 @@ export default class Client4 {
         );
     };
 
-    addUsersToTeam = async (teamId, userIds) => {
+    addUsersToTeam = async (teamId: string, userIds: string[]) => {
         this.trackEvent('api', 'api_teams_batch_add_members', {team_id: teamId, count: userIds.length});
 
         const members: any = [];
@@ -1106,7 +1113,7 @@ export default class Client4 {
         );
     };
 
-    joinTeam = async (inviteId) => {
+    joinTeam = async (inviteId: string) => {
         const query = buildQueryString({invite_id: inviteId});
         return this.doFetch(
             `${this.getTeamsRoute()}/members/invite${query}`,
@@ -1114,7 +1121,7 @@ export default class Client4 {
         );
     };
 
-    removeFromTeam = async (teamId, userId) => {
+    removeFromTeam = async (teamId: string, userId: string) => {
         this.trackEvent('api', 'api_teams_remove_members', {team_id: teamId});
 
         return this.doFetch(
@@ -1123,7 +1130,7 @@ export default class Client4 {
         );
     };
 
-    getTeamStats = async (teamId) => {
+    getTeamStats = async (teamId: string) => {
         return this.doFetch(
             `${this.getTeamRoute(teamId)}/stats`,
             {method: 'get'}
@@ -1144,14 +1151,14 @@ export default class Client4 {
         );
     };
 
-    getTeamInviteInfo = async (inviteId) => {
+    getTeamInviteInfo = async (inviteId: string) => {
         return this.doFetch(
             `${this.getTeamsRoute()}/invite/${inviteId}`,
             {method: 'get'}
         );
     };
 
-    updateTeamMemberRoles = async (teamId, userId, roles) => {
+    updateTeamMemberRoles = async (teamId: string, userId: string, roles) => {
         this.trackEvent('api', 'api_teams_update_member_roles', {team_id: teamId});
 
         return this.doFetch(
@@ -1160,7 +1167,7 @@ export default class Client4 {
         );
     };
 
-    sendEmailInvitesToTeam = async (teamId, emails) => {
+    sendEmailInvitesToTeam = async (teamId: string, emails: string[]) => {
         this.trackEvent('api', 'api_teams_invite_members', {team_id: teamId});
 
         return this.doFetch(
@@ -1169,7 +1176,7 @@ export default class Client4 {
         );
     };
 
-    sendEmailGuestInvitesToChannels = async (teamId, channelIds, emails, message) => {
+    sendEmailGuestInvitesToChannels = async (teamId: string, channelIds: string[], emails: string[], message: string) => {
         this.trackEvent('api', 'api_teams_invite_guests', {team_id: teamId, channel_ids: channelIds});
 
         return this.doFetch(
@@ -1178,7 +1185,7 @@ export default class Client4 {
         );
     };
 
-    importTeam = async (teamId, file, importFrom) => {
+    importTeam = async (teamId: string, file, importFrom) => {
         const formData = new FormData();
         formData.append('file', file, file.name);
         formData.append('filesize', file.size);
@@ -1201,7 +1208,7 @@ export default class Client4 {
         );
     };
 
-    getTeamIconUrl = (teamId, lastTeamIconUpdate) => {
+    getTeamIconUrl = (teamId: string, lastTeamIconUpdate: number) => {
         const params: any = {};
         if (lastTeamIconUpdate) {
             params._ = lastTeamIconUpdate;
@@ -1210,7 +1217,7 @@ export default class Client4 {
         return `${this.getTeamRoute(teamId)}/image${buildQueryString(params)}`;
     };
 
-    setTeamIcon = async (teamId, imageData) => {
+    setTeamIcon = async (teamId: string, imageData: File) => {
         this.trackEvent('api', 'api_team_set_team_icon');
 
         const formData = new FormData();
@@ -1233,7 +1240,7 @@ export default class Client4 {
         );
     };
 
-    removeTeamIcon = async (teamId) => {
+    removeTeamIcon = async (teamId: string) => {
         this.trackEvent('api', 'api_team_remove_team_icon');
 
         return this.doFetch(
@@ -1242,7 +1249,7 @@ export default class Client4 {
         );
     };
 
-    updateTeamMemberSchemeRoles = async (teamId, userId, isSchemeUser, isSchemeAdmin) => {
+    updateTeamMemberSchemeRoles = async (teamId: string, userId: string, isSchemeUser: boolean, isSchemeAdmin: boolean) => {
         const body = {scheme_user: isSchemeUser, scheme_admin: isSchemeAdmin};
         return this.doFetch(
             `${this.getTeamRoute(teamId)}/members/${userId}/schemeRoles`,
@@ -1266,7 +1273,7 @@ export default class Client4 {
         );
     };
 
-    createChannel = async (channel) => {
+    createChannel = async (channel: Channel) => {
         this.trackEvent('api', 'api_channels_create', {team_id: channel.team_id});
 
         return this.doFetch(
@@ -1275,7 +1282,7 @@ export default class Client4 {
         );
     };
 
-    createDirectChannel = async (userIds) => {
+    createDirectChannel = async (userIds: string[]) => {
         this.trackEvent('api', 'api_channels_create_direct');
 
         return this.doFetch(
@@ -1284,7 +1291,7 @@ export default class Client4 {
         );
     };
 
-    createGroupChannel = async (userIds) => {
+    createGroupChannel = async (userIds: string[]) => {
         this.trackEvent('api', 'api_channels_create_group');
 
         return this.doFetch(
@@ -1293,7 +1300,7 @@ export default class Client4 {
         );
     };
 
-    deleteChannel = async (channelId) => {
+    deleteChannel = async (channelId: string) => {
         this.trackEvent('api', 'api_channels_delete', {channel_id: channelId});
 
         return this.doFetch(
@@ -1302,7 +1309,7 @@ export default class Client4 {
         );
     };
 
-    updateChannel = async (channel) => {
+    updateChannel = async (channel: Channel) => {
         this.trackEvent('api', 'api_channels_update', {channel_id: channel.id});
 
         return this.doFetch(
@@ -1311,7 +1318,7 @@ export default class Client4 {
         );
     };
 
-    convertChannelToPrivate = async (channelId) => {
+    convertChannelToPrivate = async (channelId: string) => {
         this.trackEvent('api', 'api_channels_convert_to_private', {channel_id: channelId});
 
         return this.doFetch(
@@ -1320,7 +1327,7 @@ export default class Client4 {
         );
     };
 
-    updateChannelPrivacy = async (channelId, privacy) => {
+    updateChannelPrivacy = async (channelId: string, privacy) => {
         this.trackEvent('api', 'api_channels_update_privacy', {channel_id: channelId, privacy});
 
         return this.doFetch(
@@ -1329,7 +1336,7 @@ export default class Client4 {
         );
     };
 
-    patchChannel = async (channelId, channelPatch) => {
+    patchChannel = async (channelId: string, channelPatch: Partial<Channel>) => {
         this.trackEvent('api', 'api_channels_patch', {channel_id: channelId});
 
         return this.doFetch(
@@ -1347,7 +1354,7 @@ export default class Client4 {
         );
     };
 
-    updateChannelScheme = async (channelId, schemeId) => {
+    updateChannelScheme = async (channelId: string, schemeId: string) => {
         const patch = {scheme_id: schemeId};
 
         this.trackEvent('api', 'api_channels_update_scheme', {channel_id: channelId, ...patch});
@@ -1358,7 +1365,7 @@ export default class Client4 {
         );
     };
 
-    getChannel = async (channelId) => {
+    getChannel = async (channelId: string) => {
         this.trackEvent('api', 'api_channel_get', {channel_id: channelId});
 
         return this.doFetch(
@@ -1367,14 +1374,14 @@ export default class Client4 {
         );
     };
 
-    getChannelByName = async (teamId, channelName, includeDeleted = false) => {
+    getChannelByName = async (teamId: string, channelName: string, includeDeleted = false) => {
         return this.doFetch(
             `${this.getTeamRoute(teamId)}/channels/name/${channelName}?include_deleted=${includeDeleted}`,
             {method: 'get'}
         );
     };
 
-    getChannelByNameAndTeamName = async (teamName, channelName, includeDeleted = false) => {
+    getChannelByNameAndTeamName = async (teamName: string, channelName: string, includeDeleted = false) => {
         this.trackEvent('api', 'api_channel_get_by_name_and_teamName', {channel_name: channelName, team_name: teamName, include_deleted: includeDeleted});
 
         return this.doFetch(
@@ -1383,63 +1390,63 @@ export default class Client4 {
         );
     };
 
-    getChannels = async (teamId, page = 0, perPage = PER_PAGE_DEFAULT) => {
+    getChannels = async (teamId: string, page = 0, perPage = PER_PAGE_DEFAULT) => {
         return this.doFetch(
             `${this.getTeamRoute(teamId)}/channels${buildQueryString({page, per_page: perPage})}`,
             {method: 'get'}
         );
     };
 
-    getMyChannels = async (teamId) => {
+    getMyChannels = async (teamId: string) => {
         return this.doFetch(
             `${this.getUserRoute('me')}/teams/${teamId}/channels`,
             {method: 'get'}
         );
     };
 
-    getMyChannelMember = async (channelId) => {
+    getMyChannelMember = async (channelId: string) => {
         return this.doFetch(
             `${this.getChannelMemberRoute(channelId, 'me')}`,
             {method: 'get'}
         );
     };
 
-    getMyChannelMembers = async (teamId) => {
+    getMyChannelMembers = async (teamId: string) => {
         return this.doFetch(
             `${this.getUserRoute('me')}/teams/${teamId}/channels/members`,
             {method: 'get'}
         );
     };
 
-    getChannelMembers = async (channelId, page = 0, perPage = PER_PAGE_DEFAULT) => {
+    getChannelMembers = async (channelId: string, page = 0, perPage = PER_PAGE_DEFAULT) => {
         return this.doFetch(
             `${this.getChannelMembersRoute(channelId)}${buildQueryString({page, per_page: perPage})}`,
             {method: 'get'}
         );
     };
 
-    getChannelTimezones = async (channelId) => {
+    getChannelTimezones = async (channelId: string) => {
         return this.doFetch(
             `${this.getChannelRoute(channelId)}/timezones`,
             {method: 'get'}
         );
     };
 
-    getChannelMember = async (channelId, userId) => {
+    getChannelMember = async (channelId: string, userId: string) => {
         return this.doFetch(
             `${this.getChannelMemberRoute(channelId, userId)}`,
             {method: 'get'}
         );
     };
 
-    getChannelMembersByIds = async (channelId, userIds) => {
+    getChannelMembersByIds = async (channelId: string, userIds: string[]) => {
         return this.doFetch(
             `${this.getChannelMembersRoute(channelId)}/ids`,
             {method: 'post', body: JSON.stringify(userIds)}
         );
     };
 
-    addToChannel = async (userId, channelId, postRootId = '') => {
+    addToChannel = async (userId: string, channelId: string, postRootId = '') => {
         this.trackEvent('api', 'api_channels_add_member', {channel_id: channelId});
 
         const member = {user_id: userId, channel_id: channelId, post_root_id: postRootId};
@@ -1449,7 +1456,7 @@ export default class Client4 {
         );
     };
 
-    removeFromChannel = async (userId, channelId) => {
+    removeFromChannel = async (userId: string, channelId: string) => {
         this.trackEvent('api', 'api_channels_remove_member', {channel_id: channelId});
 
         return this.doFetch(
@@ -1458,21 +1465,21 @@ export default class Client4 {
         );
     };
 
-    updateChannelMemberRoles = async (channelId, userId, roles) => {
+    updateChannelMemberRoles = async (channelId: string, userId: string, roles) => {
         return this.doFetch(
             `${this.getChannelMemberRoute(channelId, userId)}/roles`,
             {method: 'put', body: JSON.stringify({roles})}
         );
     };
 
-    getChannelStats = async (channelId) => {
+    getChannelStats = async (channelId: string) => {
         return this.doFetch(
             `${this.getChannelRoute(channelId)}/stats`,
             {method: 'get'}
         );
     };
 
-    viewMyChannel = async (channelId, prevChannelId) => {
+    viewMyChannel = async (channelId: string, prevChannelId?: string) => {
         const data = {channel_id: channelId, prev_channel_id: prevChannelId};
         return this.doFetch(
             `${this.getChannelsRoute()}/members/me/view`,
@@ -1480,28 +1487,28 @@ export default class Client4 {
         );
     };
 
-    autocompleteChannels = async (teamId, name) => {
+    autocompleteChannels = async (teamId: string, name: string) => {
         return this.doFetch(
             `${this.getTeamRoute(teamId)}/channels/autocomplete${buildQueryString({name})}`,
             {method: 'get'}
         );
     };
 
-    autocompleteChannelsForSearch = async (teamId, name) => {
+    autocompleteChannelsForSearch = async (teamId: string, name: string) => {
         return this.doFetch(
             `${this.getTeamRoute(teamId)}/channels/search_autocomplete${buildQueryString({name})}`,
             {method: 'get'}
         );
     };
 
-    searchChannels = async (teamId, term) => {
+    searchChannels = async (teamId: string, term: string) => {
         return this.doFetch(
             `${this.getTeamRoute(teamId)}/channels/search`,
             {method: 'post', body: JSON.stringify({term})}
         );
     };
 
-    searchAllChannels = async (term, notAssociatedToGroup = '', excludeDefaultChannels = false) => {
+    searchAllChannels = async (term: string, notAssociatedToGroup = '', excludeDefaultChannels = false) => {
         const body = {
             term,
             not_associated_to_group: notAssociatedToGroup,
@@ -1513,14 +1520,14 @@ export default class Client4 {
         );
     };
 
-    searchGroupChannels = async (term) => {
+    searchGroupChannels = async (term: string) => {
         return this.doFetch(
             `${this.getChannelsRoute()}/group/search`,
             {method: 'post', body: JSON.stringify({term})}
         );
     };
 
-    updateChannelMemberSchemeRoles = async (channelId, userId, isSchemeUser, isSchemeAdmin) => {
+    updateChannelMemberSchemeRoles = async (channelId: string, userId: string, isSchemeUser: boolean, isSchemeAdmin: boolean) => {
         const body = {scheme_user: isSchemeUser, scheme_admin: isSchemeAdmin};
         return this.doFetch(
             `${this.getChannelRoute(channelId)}/members/${userId}/schemeRoles`,
@@ -1530,7 +1537,7 @@ export default class Client4 {
 
     // Post Routes
 
-    createPost = async (post) => {
+    createPost = async (post: Post) => {
         this.trackEvent('api', 'api_posts_create', {channel_id: post.channel_id});
 
         if (post.root_id != null && post.root_id !== '') {
@@ -1543,7 +1550,7 @@ export default class Client4 {
         );
     };
 
-    updatePost = async (post) => {
+    updatePost = async (post: Post) => {
         this.trackEvent('api', 'api_posts_update', {channel_id: post.channel_id});
 
         return this.doFetch(
@@ -1552,14 +1559,14 @@ export default class Client4 {
         );
     };
 
-    getPost = async (postId) => {
+    getPost = async (postId: string) => {
         return this.doFetch(
             `${this.getPostRoute(postId)}`,
             {method: 'get'}
         );
     };
 
-    patchPost = async (postPatch) => {
+    patchPost = async (postPatch: Partial<Post> & {id: string}) => {
         this.trackEvent('api', 'api_posts_patch', {channel_id: postPatch.channel_id});
 
         return this.doFetch(
@@ -1568,7 +1575,7 @@ export default class Client4 {
         );
     };
 
-    deletePost = async (postId) => {
+    deletePost = async (postId: string) => {
         this.trackEvent('api', 'api_posts_delete');
 
         return this.doFetch(
@@ -1577,35 +1584,35 @@ export default class Client4 {
         );
     };
 
-    getPostThread = async (postId, fetchThreads = true) => {
+    getPostThread = async (postId: string, fetchThreads = true) => {
         return this.doFetch(
             `${this.getPostRoute(postId)}/thread${buildQueryString({fetchThreads})}`,
             {method: 'get'}
         );
     };
 
-    getPosts = async (channelId, page = 0, perPage = PER_PAGE_DEFAULT, fetchThreads = true) => {
+    getPosts = async (channelId: string, page = 0, perPage = PER_PAGE_DEFAULT, fetchThreads = true) => {
         return this.doFetch(
             `${this.getChannelRoute(channelId)}/posts${buildQueryString({page, per_page: perPage, fetchThreads})}`,
             {method: 'get'}
         );
     };
 
-    getPostsUnread = async (channelId, userId, limitAfter = DEFAULT_LIMIT_AFTER, limitBefore = DEFAULT_LIMIT_BEFORE, fetchThreads = true) => {
+    getPostsUnread = async (channelId: string, userId: string, limitAfter = DEFAULT_LIMIT_AFTER, limitBefore = DEFAULT_LIMIT_BEFORE, fetchThreads = true) => {
         return this.doFetch(
             `${this.getUserRoute(userId)}/channels/${channelId}/posts/unread${buildQueryString({limit_after: limitAfter, limit_before: limitBefore, fetchThreads})}`,
             {method: 'get'}
         );
     };
 
-    getPostsSince = async (channelId, since, fetchThreads = true) => {
+    getPostsSince = async (channelId: string, since: number, fetchThreads = true) => {
         return this.doFetch(
             `${this.getChannelRoute(channelId)}/posts${buildQueryString({since, fetchThreads})}`,
             {method: 'get'}
         );
     };
 
-    getPostsBefore = async (channelId, postId, page = 0, perPage = PER_PAGE_DEFAULT, fetchThreads = true) => {
+    getPostsBefore = async (channelId: string, postId: string, page = 0, perPage = PER_PAGE_DEFAULT, fetchThreads = true) => {
         this.trackEvent('api', 'api_posts_get_before', {channel_id: channelId});
 
         return this.doFetch(
@@ -1614,7 +1621,7 @@ export default class Client4 {
         );
     };
 
-    getPostsAfter = async (channelId, postId, page = 0, perPage = PER_PAGE_DEFAULT, fetchThreads = true) => {
+    getPostsAfter = async (channelId: string, postId: string, page = 0, perPage = PER_PAGE_DEFAULT, fetchThreads = true) => {
         this.trackEvent('api', 'api_posts_get_after', {channel_id: channelId});
 
         return this.doFetch(
@@ -1623,14 +1630,14 @@ export default class Client4 {
         );
     };
 
-    getFileInfosForPost = async (postId) => {
+    getFileInfosForPost = async (postId: string) => {
         return this.doFetch(
             `${this.getPostRoute(postId)}/files/info`,
             {method: 'get'}
         );
     };
 
-    getFlaggedPosts = async (userId, channelId = '', teamId = '', page = 0, perPage = PER_PAGE_DEFAULT) => {
+    getFlaggedPosts = async (userId: string, channelId = '', teamId = '', page = 0, perPage = PER_PAGE_DEFAULT) => {
         this.trackEvent('api', 'api_posts_get_flagged', {team_id: teamId});
 
         return this.doFetch(
@@ -1639,7 +1646,7 @@ export default class Client4 {
         );
     };
 
-    getPinnedPosts = async (channelId) => {
+    getPinnedPosts = async (channelId: string) => {
         this.trackEvent('api', 'api_posts_get_pinned', {channel_id: channelId});
         return this.doFetch(
             `${this.getChannelRoute(channelId)}/pinned`,
@@ -1647,7 +1654,7 @@ export default class Client4 {
         );
     };
 
-    pinPost = async (postId) => {
+    pinPost = async (postId: string) => {
         this.trackEvent('api', 'api_posts_pin');
 
         return this.doFetch(
@@ -1656,7 +1663,7 @@ export default class Client4 {
         );
     };
 
-    unpinPost = async (postId) => {
+    unpinPost = async (postId: string) => {
         this.trackEvent('api', 'api_posts_unpin');
 
         return this.doFetch(
@@ -1665,7 +1672,7 @@ export default class Client4 {
         );
     };
 
-    addReaction = async (userId, postId, emojiName) => {
+    addReaction = async (userId: string, postId: string, emojiName: string) => {
         this.trackEvent('api', 'api_reactions_save', {post_id: postId});
 
         return this.doFetch(
@@ -1674,7 +1681,7 @@ export default class Client4 {
         );
     };
 
-    removeReaction = async (userId, postId, emojiName) => {
+    removeReaction = async (userId: string, postId: string, emojiName: string) => {
         this.trackEvent('api', 'api_reactions_delete', {post_id: postId});
 
         return this.doFetch(
@@ -1683,14 +1690,14 @@ export default class Client4 {
         );
     };
 
-    getReactionsForPost = async (postId) => {
+    getReactionsForPost = async (postId: string) => {
         return this.doFetch(
             `${this.getPostRoute(postId)}/reactions`,
             {method: 'get'}
         );
     };
 
-    searchPostsWithParams = async (teamId, params) => {
+    searchPostsWithParams = async (teamId: string, params) => {
         this.trackEvent('api', 'api_posts_search', {team_id: teamId});
 
         return this.doFetch(
@@ -1699,22 +1706,22 @@ export default class Client4 {
         );
     };
 
-    searchPosts = async (teamId, terms, isOrSearch) => {
+    searchPosts = async (teamId: string, terms: string, isOrSearch: boolean) => {
         return this.searchPostsWithParams(teamId, {terms, is_or_search: isOrSearch});
     };
 
-    getOpenGraphMetadata = async (url) => {
+    getOpenGraphMetadata = async (url: string) => {
         return this.doFetch(
             `${this.getBaseRoute()}/opengraph`,
             {method: 'post', body: JSON.stringify({url})}
         );
     };
 
-    doPostAction = async (postId, actionId, selectedOption = '') => {
+    doPostAction = async (postId: string, actionId: string, selectedOption = '') => {
         return this.doPostActionWithCookie(postId, actionId, '', selectedOption);
     };
 
-    doPostActionWithCookie = async (postId, actionId, actionCookie, selectedOption = '') => {
+    doPostActionWithCookie = async (postId: string, actionId: string, actionCookie, selectedOption = '') => {
         if (selectedOption) {
             this.trackEvent('api', 'api_interactive_messages_menu_selected');
         } else {
@@ -1735,7 +1742,7 @@ export default class Client4 {
 
     // Files Routes
 
-    getFileUrl(fileId, timestamp) {
+    getFileUrl(fileId: string, timestamp: number) {
         let url = `${this.getFileRoute(fileId)}`;
         if (timestamp) {
             url += `?${timestamp}`;
@@ -1744,7 +1751,7 @@ export default class Client4 {
         return url;
     }
 
-    getFileThumbnailUrl(fileId, timestamp) {
+    getFileThumbnailUrl(fileId: string, timestamp: number) {
         let url = `${this.getFileRoute(fileId)}/thumbnail`;
         if (timestamp) {
             url += `?${timestamp}`;
@@ -1753,7 +1760,7 @@ export default class Client4 {
         return url;
     }
 
-    getFilePreviewUrl(fileId, timestamp) {
+    getFilePreviewUrl(fileId: string, timestamp: number) {
         let url = `${this.getFileRoute(fileId)}/preview`;
         if (timestamp) {
             url += `?${timestamp}`;
@@ -1781,7 +1788,7 @@ export default class Client4 {
         );
     };
 
-    getFilePublicLink = async (fileId) => {
+    getFilePublicLink = async (fileId: string) => {
         return this.doFetch(
             `${this.getFileRoute(fileId)}/link`,
             {method: 'get'}
@@ -1790,7 +1797,7 @@ export default class Client4 {
 
     // Preference Routes
 
-    savePreferences = async (userId, preferences) => {
+    savePreferences = async (userId: string, preferences) => {
         return this.doFetch(
             `${this.getPreferencesRoute(userId)}`,
             {method: 'put', body: JSON.stringify(preferences)}
@@ -1804,7 +1811,7 @@ export default class Client4 {
         );
     };
 
-    deletePreferences = async (userId, preferences) => {
+    deletePreferences = async (userId: string, preferences) => {
         return this.doFetch(
             `${this.getPreferencesRoute(userId)}/delete`,
             {method: 'post', body: JSON.stringify(preferences)}
@@ -1820,7 +1827,7 @@ export default class Client4 {
         );
     };
 
-    logClientError = async (message, level = 'ERROR') => {
+    logClientError = async (message: string, level = 'ERROR') => {
         const url = `${this.getBaseRoute()}/logs`;
 
         if (!this.enableLogging) {
@@ -1850,7 +1857,7 @@ export default class Client4 {
         );
     };
 
-    getTranslations = async (url) => {
+    getTranslations = async (url: string) => {
         return this.doFetch(
             url,
             {method: 'get'}
@@ -1879,7 +1886,7 @@ export default class Client4 {
         );
     };
 
-    getIncomingWebhook = async (hookId) => {
+    getIncomingWebhook = async (hookId: string) => {
         return this.doFetch(
             `${this.getIncomingHookRoute(hookId)}`,
             {method: 'get'}
@@ -1902,7 +1909,7 @@ export default class Client4 {
         );
     };
 
-    removeIncomingWebhook = async (hookId) => {
+    removeIncomingWebhook = async (hookId: string) => {
         this.trackEvent('api', 'api_integrations_deleted');
 
         return this.doFetch(
@@ -1929,7 +1936,7 @@ export default class Client4 {
         );
     };
 
-    getOutgoingWebhook = async (hookId) => {
+    getOutgoingWebhook = async (hookId: string) => {
         return this.doFetch(
             `${this.getOutgoingHookRoute(hookId)}`,
             {method: 'get'}
@@ -1956,7 +1963,7 @@ export default class Client4 {
         );
     };
 
-    removeOutgoingWebhook = async (hookId) => {
+    removeOutgoingWebhook = async (hookId: string) => {
         this.trackEvent('api', 'api_integrations_deleted');
 
         return this.doFetch(
@@ -1974,28 +1981,28 @@ export default class Client4 {
         );
     };
 
-    regenOutgoingHookToken = async (id) => {
+    regenOutgoingHookToken = async (id: string) => {
         return this.doFetch(
             `${this.getOutgoingHookRoute(id)}/regen_token`,
             {method: 'post'}
         );
     };
 
-    getCommandsList = async (teamId) => {
+    getCommandsList = async (teamId: string) => {
         return this.doFetch(
             `${this.getCommandsRoute()}?team_id=${teamId}`,
             {method: 'get'}
         );
     };
 
-    getAutocompleteCommandsList = async (teamId, page = 0, perPage = PER_PAGE_DEFAULT) => {
+    getAutocompleteCommandsList = async (teamId: string, page = 0, perPage = PER_PAGE_DEFAULT) => {
         return this.doFetch(
             `${this.getTeamRoute(teamId)}/commands/autocomplete${buildQueryString({page, per_page: perPage})}`,
             {method: 'get'}
         );
     };
 
-    getCustomTeamCommands = async (teamId) => {
+    getCustomTeamCommands = async (teamId: string) => {
         return this.doFetch(
             `${this.getCommandsRoute()}?team_id=${teamId}&custom_only=true`,
             {method: 'get'}
@@ -2029,14 +2036,14 @@ export default class Client4 {
         );
     };
 
-    regenCommandToken = async (id) => {
+    regenCommandToken = async (id: string) => {
         return this.doFetch(
             `${this.getCommandsRoute()}/${id}/regen_token`,
             {method: 'put'}
         );
     };
 
-    deleteCommand = async (id) => {
+    deleteCommand = async (id: string) => {
         this.trackEvent('api', 'api_integrations_deleted');
 
         return this.doFetch(
@@ -2068,21 +2075,21 @@ export default class Client4 {
         );
     };
 
-    getOAuthApp = async (appId) => {
+    getOAuthApp = async (appId: string) => {
         return this.doFetch(
             `${this.getOAuthAppRoute(appId)}`,
             {method: 'get'}
         );
     };
 
-    getOAuthAppInfo = async (appId) => {
+    getOAuthAppInfo = async (appId: string) => {
         return this.doFetch(
             `${this.getOAuthAppRoute(appId)}/info`,
             {method: 'get'}
         );
     };
 
-    deleteOAuthApp = async (appId) => {
+    deleteOAuthApp = async (appId: string) => {
         this.trackEvent('api', 'api_apps_delete');
 
         return this.doFetch(
@@ -2091,7 +2098,7 @@ export default class Client4 {
         );
     };
 
-    regenOAuthAppSecret = async (appId) => {
+    regenOAuthAppSecret = async (appId: string) => {
         return this.doFetch(
             `${this.getOAuthAppRoute(appId)}/regen_secret`,
             {method: 'post'}
@@ -2108,7 +2115,7 @@ export default class Client4 {
 
     // Emoji Routes
 
-    createCustomEmoji = async (emoji, imageData) => {
+    createCustomEmoji = async (emoji, imageData: File) => {
         this.trackEvent('api', 'api_emoji_custom_add');
 
         const formData = new FormData();
@@ -2131,14 +2138,14 @@ export default class Client4 {
         );
     };
 
-    getCustomEmoji = async (id) => {
+    getCustomEmoji = async (id: string) => {
         return this.doFetch(
             `${this.getEmojisRoute()}/${id}`,
             {method: 'get'}
         );
     };
 
-    getCustomEmojiByName = async (name) => {
+    getCustomEmojiByName = async (name: string) => {
         return this.doFetch(
             `${this.getEmojisRoute()}/name/${name}`,
             {method: 'get'}
@@ -2152,7 +2159,7 @@ export default class Client4 {
         );
     };
 
-    deleteCustomEmoji = async (emojiId) => {
+    deleteCustomEmoji = async (emojiId: string) => {
         this.trackEvent('api', 'api_emoji_custom_delete');
 
         return this.doFetch(
@@ -2161,22 +2168,22 @@ export default class Client4 {
         );
     };
 
-    getSystemEmojiImageUrl = (filename) => {
+    getSystemEmojiImageUrl = (filename: string) => {
         return `${this.url}/static/emoji/${filename}.png`;
     };
 
-    getCustomEmojiImageUrl = (id) => {
+    getCustomEmojiImageUrl = (id: string) => {
         return `${this.getEmojiRoute(id)}/image`;
     };
 
-    searchCustomEmoji = async (term, options = {}) => {
+    searchCustomEmoji = async (term: string, options = {}) => {
         return this.doFetch(
             `${this.getEmojisRoute()}/search`,
             {method: 'post', body: JSON.stringify({term, ...options})}
         );
     };
 
-    autocompleteCustomEmoji = async (name) => {
+    autocompleteCustomEmoji = async (name: string) => {
         return this.doFetch(
             `${this.getEmojisRoute()}/autocomplete${buildQueryString({name})}`,
             {method: 'get'}
@@ -2203,7 +2210,7 @@ export default class Client4 {
 
     // Jobs Routes
 
-    getJob = async (id) => {
+    getJob = async (id: string) => {
         return this.doFetch(
             `${this.getJobsRoute()}/${id}`,
             {method: 'get'}
@@ -2217,21 +2224,21 @@ export default class Client4 {
         );
     };
 
-    getJobsByType = async (type, page = 0, perPage = PER_PAGE_DEFAULT) => {
+    getJobsByType = async (type: string, page = 0, perPage = PER_PAGE_DEFAULT) => {
         return this.doFetch(
             `${this.getJobsRoute()}/type/${type}${buildQueryString({page, per_page: perPage})}`,
             {method: 'get'}
         );
     };
 
-    createJob = async (job) => {
+    createJob = async (job: Job) => {
         return this.doFetch(
             `${this.getJobsRoute()}`,
             {method: 'post', body: JSON.stringify(job)}
         );
     };
 
-    cancelJob = async (id) => {
+    cancelJob = async (id: string) => {
         return this.doFetch(
             `${this.getJobsRoute()}/${id}/cancel`,
             {method: 'post'}
@@ -2289,7 +2296,7 @@ export default class Client4 {
         );
     };
 
-    testSiteURL = async (siteURL) => {
+    testSiteURL = async (siteURL: string) => {
         return this.doFetch(
             `${this.getBaseRoute()}/site_url/test`,
             {method: 'post', body: JSON.stringify({site_url: siteURL})}
@@ -2317,14 +2324,14 @@ export default class Client4 {
         );
     };
 
-    createComplianceReport = async (job) => {
+    createComplianceReport = async (job: Job) => {
         return this.doFetch(
             `${this.getBaseRoute()}/compliance/reports`,
             {method: 'post', body: JSON.stringify(job)}
         );
     };
 
-    getComplianceReport = async (reportId) => {
+    getComplianceReport = async (reportId: string) => {
         return this.doFetch(
             `${this.getBaseRoute()}/compliance/reports/${reportId}`,
             {method: 'get'}
@@ -2338,7 +2345,7 @@ export default class Client4 {
         );
     };
 
-    uploadBrandImage = async (imageData) => {
+    uploadBrandImage = async (imageData: File) => {
         const formData = new FormData();
         formData.append('image', imageData);
         const request: any = {
@@ -2394,14 +2401,14 @@ export default class Client4 {
         );
     };
 
-    linkLdapGroup = async (key) => {
+    linkLdapGroup = async (key: string) => {
         return this.doFetch(
             `${this.getBaseRoute()}/ldap/groups/${encodeURI(key)}/link`,
             {method: 'post'}
         );
     };
 
-    unlinkLdapGroup = async (key) => {
+    unlinkLdapGroup = async (key: string) => {
         return this.doFetch(
             `${this.getBaseRoute()}/ldap/groups/${encodeURI(key)}/link`,
             {method: 'delete'}
@@ -2415,7 +2422,7 @@ export default class Client4 {
         );
     };
 
-    uploadPublicSamlCertificate = async (fileData) => {
+    uploadPublicSamlCertificate = async (fileData: File) => {
         const formData = new FormData();
         formData.append('certificate', fileData);
 
@@ -2428,7 +2435,7 @@ export default class Client4 {
         );
     };
 
-    uploadPrivateSamlCertificate = async (fileData) => {
+    uploadPrivateSamlCertificate = async (fileData: File) => {
         const formData = new FormData();
         formData.append('certificate', fileData);
 
@@ -2441,7 +2448,7 @@ export default class Client4 {
         );
     };
 
-    uploadIdpSamlCertificate = async (fileData) => {
+    uploadIdpSamlCertificate = async (fileData: File) => {
         const formData = new FormData();
         formData.append('certificate', fileData);
 
@@ -2489,7 +2496,7 @@ export default class Client4 {
         );
     };
 
-    uploadLicense = async (fileData) => {
+    uploadLicense = async (fileData: File) => {
         this.trackEvent('api', 'api_license_upload');
 
         const formData = new FormData();
@@ -2528,28 +2535,28 @@ export default class Client4 {
 
     // Role Routes
 
-    getRole = async (roleId) => {
+    getRole = async (roleId: string) => {
         return this.doFetch(
             `${this.getRolesRoute()}/${roleId}`,
             {method: 'get'}
         );
     };
 
-    getRoleByName = async (roleName) => {
+    getRoleByName = async (roleName: string) => {
         return this.doFetch(
             `${this.getRolesRoute()}/name/${roleName}`,
             {method: 'get'}
         );
     };
 
-    getRolesByNames = async (rolesNames) => {
+    getRolesByNames = async (rolesNames: string[]) => {
         return this.doFetch(
             `${this.getRolesRoute()}/names`,
             {method: 'post', body: JSON.stringify(rolesNames)}
         );
     };
 
-    patchRole = async (roleId, rolePatch) => {
+    patchRole = async (roleId: string, rolePatch: Partial<Role>) => {
         return this.doFetch(
             `${this.getRolesRoute()}/${roleId}/patch`,
             {method: 'put', body: JSON.stringify(rolePatch)}
@@ -2565,7 +2572,7 @@ export default class Client4 {
         );
     };
 
-    createScheme = async (scheme) => {
+    createScheme = async (scheme: Scheme) => {
         this.trackEvent('api', 'api_schemes_create');
 
         return this.doFetch(
@@ -2574,14 +2581,14 @@ export default class Client4 {
         );
     };
 
-    getScheme = async (schemeId) => {
+    getScheme = async (schemeId: string) => {
         return this.doFetch(
             `${this.getSchemesRoute()}/${schemeId}`,
             {method: 'get'}
         );
     };
 
-    deleteScheme = async (schemeId) => {
+    deleteScheme = async (schemeId: string) => {
         this.trackEvent('api', 'api_schemes_delete');
 
         return this.doFetch(
@@ -2590,7 +2597,7 @@ export default class Client4 {
         );
     };
 
-    patchScheme = async (schemeId, schemePatch) => {
+    patchScheme = async (schemeId: string, schemePatch: Partial<Scheme>) => {
         this.trackEvent('api', 'api_schemes_patch', {scheme_id: schemeId});
 
         return this.doFetch(
@@ -2599,14 +2606,14 @@ export default class Client4 {
         );
     };
 
-    getSchemeTeams = async (schemeId, page = 0, perPage = PER_PAGE_DEFAULT) => {
+    getSchemeTeams = async (schemeId: string, page = 0, perPage = PER_PAGE_DEFAULT) => {
         return this.doFetch(
             `${this.getSchemesRoute()}/${schemeId}/teams${buildQueryString({page, per_page: perPage})}`,
             {method: 'get'}
         );
     };
 
-    getSchemeChannels = async (schemeId, page = 0, perPage = PER_PAGE_DEFAULT) => {
+    getSchemeChannels = async (schemeId: string, page = 0, perPage = PER_PAGE_DEFAULT) => {
         return this.doFetch(
             `${this.getSchemesRoute()}/${schemeId}/channels${buildQueryString({page, per_page: perPage})}`,
             {method: 'get'}
@@ -2615,7 +2622,7 @@ export default class Client4 {
 
     // Plugin Routes - EXPERIMENTAL - SUBJECT TO CHANGE
 
-    uploadPlugin = async (fileData, force = false) => {
+    uploadPlugin = async (fileData: File, force = false) => {
         this.trackEvent('api', 'api_plugin_upload');
 
         const formData = new FormData();
@@ -2641,7 +2648,7 @@ export default class Client4 {
         );
     };
 
-    installPluginFromUrl = async (pluginDownloadUrl, force = false) => {
+    installPluginFromUrl = async (pluginDownloadUrl: string, force = false) => {
         this.trackEvent('api', 'api_install_plugin');
 
         const queryParams = {plugin_download_url: pluginDownloadUrl, force};
@@ -2673,7 +2680,7 @@ export default class Client4 {
         );
     };
 
-    removePlugin = async (pluginId) => {
+    removePlugin = async (pluginId: string) => {
         return this.doFetch(
             this.getPluginRoute(pluginId),
             {method: 'delete'}
@@ -2687,14 +2694,14 @@ export default class Client4 {
         );
     };
 
-    enablePlugin = async (pluginId) => {
+    enablePlugin = async (pluginId: string) => {
         return this.doFetch(
             `${this.getPluginRoute(pluginId)}/enable`,
             {method: 'post'}
         );
     };
 
-    disablePlugin = async (pluginId) => {
+    disablePlugin = async (pluginId: string) => {
         return this.doFetch(
             `${this.getPluginRoute(pluginId)}/disable`,
             {method: 'post'}
@@ -2703,42 +2710,42 @@ export default class Client4 {
 
     // Groups
 
-    linkGroupSyncable = async (groupID, syncableID, syncableType, patch) => {
+    linkGroupSyncable = async (groupID: string, syncableID: string, syncableType: string, patch) => {
         return this.doFetch(
             `${this.getBaseRoute()}/groups/${groupID}/${syncableType}s/${syncableID}/link`,
             {method: 'post', body: JSON.stringify(patch)}
         );
     };
 
-    unlinkGroupSyncable = async (groupID, syncableID, syncableType) => {
+    unlinkGroupSyncable = async (groupID: string, syncableID: string, syncableType: string) => {
         return this.doFetch(
             `${this.getBaseRoute()}/groups/${groupID}/${syncableType}s/${syncableID}/link`,
             {method: 'delete'}
         );
     };
 
-    getGroupSyncables = async (groupID, syncableType) => {
+    getGroupSyncables = async (groupID: string, syncableType: string) => {
         return this.doFetch(
             `${this.getBaseRoute()}/groups/${groupID}/${syncableType}s`,
             {method: 'get'}
         );
     };
 
-    getGroupMembers = async (groupID, page = 0, perPage = PER_PAGE_DEFAULT) => {
+    getGroupMembers = async (groupID: string, page = 0, perPage = PER_PAGE_DEFAULT) => {
         return this.doFetch(
             `${this.getBaseRoute()}/groups/${groupID}/members${buildQueryString({page, per_page: perPage})}`,
             {method: 'get'}
         );
     };
 
-    getGroup = async (groupID) => {
+    getGroup = async (groupID: string) => {
         return this.doFetch(
             `${this.getBaseRoute()}/groups/${groupID}`,
             {method: 'get'}
         );
     };
 
-    getGroupsNotAssociatedToTeam = async (teamID, q = '', page = 0, perPage = PER_PAGE_DEFAULT) => {
+    getGroupsNotAssociatedToTeam = async (teamID: string, q = '', page = 0, perPage = PER_PAGE_DEFAULT) => {
         this.trackEvent('api', 'api_groups_get_not_associated_to_team', {team_id: teamID});
         return this.doFetch(
             `${this.getBaseRoute()}/groups${buildQueryString({not_associated_to_team: teamID, page, per_page: perPage, q, include_member_count: true})}`,
@@ -2746,7 +2753,7 @@ export default class Client4 {
         );
     };
 
-    getGroupsNotAssociatedToChannel = async (channelID, q = '', page = 0, perPage = PER_PAGE_DEFAULT) => {
+    getGroupsNotAssociatedToChannel = async (channelID: string, q = '', page = 0, perPage = PER_PAGE_DEFAULT) => {
         this.trackEvent('api', 'api_groups_get_not_associated_to_channel', {channel_id: channelID});
         return this.doFetch(
             `${this.getBaseRoute()}/groups${buildQueryString({not_associated_to_channel: channelID, page, per_page: perPage, q, include_member_count: true})}`,
@@ -2754,7 +2761,7 @@ export default class Client4 {
         );
     };
 
-    getGroupsAssociatedToTeam = async (teamID, q = '', page = 0, perPage = PER_PAGE_DEFAULT) => {
+    getGroupsAssociatedToTeam = async (teamID: string, q = '', page = 0, perPage = PER_PAGE_DEFAULT) => {
         this.trackEvent('api', 'api_groups_get_associated_to_team', {team_id: teamID});
         return this.doFetch(
             `${this.getBaseRoute()}/teams/${teamID}/groups${buildQueryString({page, per_page: perPage, q, include_member_count: true})}`,
@@ -2762,7 +2769,7 @@ export default class Client4 {
         );
     };
 
-    getGroupsAssociatedToChannel = async (channelID, q = '', page = 0, perPage = PER_PAGE_DEFAULT) => {
+    getGroupsAssociatedToChannel = async (channelID: string, q = '', page = 0, perPage = PER_PAGE_DEFAULT) => {
         this.trackEvent('api', 'api_groups_get_associated_to_channel', {channel_id: channelID});
         return this.doFetch(
             `${this.getBaseRoute()}/channels/${channelID}/groups${buildQueryString({page, per_page: perPage, q, include_member_count: true})}`,
@@ -2770,14 +2777,14 @@ export default class Client4 {
         );
     };
 
-    getAllGroupsAssociatedToTeam = async (teamID) => {
+    getAllGroupsAssociatedToTeam = async (teamID: string) => {
         return this.doFetch(
             `${this.getBaseRoute()}/teams/${teamID}/groups?paginate=false`,
             {method: 'get'}
         );
     };
 
-    getAllGroupsAssociatedToChannel = async (channelID) => {
+    getAllGroupsAssociatedToChannel = async (channelID: string) => {
         return this.doFetch(
             `${this.getBaseRoute()}/channels/${channelID}/groups?paginate=false`,
             {method: 'get'}
@@ -2803,14 +2810,14 @@ export default class Client4 {
         );
     }
 
-    patchBot = async (botUserId, botPatch) => {
+    patchBot = async (botUserId: string, botPatch) => {
         return this.doFetch(
             `${this.getBotRoute(botUserId)}`,
             {method: 'put', body: JSON.stringify(botPatch)}
         );
     }
 
-    getBot = async (botUserId) => {
+    getBot = async (botUserId: string) => {
         return this.doFetch(
             `${this.getBotRoute(botUserId)}`,
             {method: 'get'}
@@ -2838,28 +2845,28 @@ export default class Client4 {
         );
     }
 
-    disableBot = async (botUserId) => {
+    disableBot = async (botUserId: string) => {
         return this.doFetch(
             `${this.getBotRoute(botUserId)}/disable`,
             {method: 'post'}
         );
     }
 
-    enableBot = async (botUserId) => {
+    enableBot = async (botUserId: string) => {
         return this.doFetch(
             `${this.getBotRoute(botUserId)}/enable`,
             {method: 'post'}
         );
     }
 
-    assignBot = async (botUserId, newOwnerId) => {
+    assignBot = async (botUserId: string, newOwnerId: string) => {
         return this.doFetch(
             `${this.getBotRoute(botUserId)}/assign/${newOwnerId}`,
             {method: 'post'}
         );
     }
 
-    teamMembersMinusGroupMembers = async (teamID, groupIDs, page, perPage) => {
+    teamMembersMinusGroupMembers = async (teamID: string, groupIDs: string[], page: number, perPage: number) => {
         const query = `group_ids=${groupIDs.join(',')}&page=${page}&per_page=${perPage}`;
         return this.doFetch(
             `${this.getTeamRoute(teamID)}/members_minus_group_members?${query}`,
@@ -2867,7 +2874,7 @@ export default class Client4 {
         );
     }
 
-    channelMembersMinusGroupMembers = async (channelID, groupIDs, page, perPage) => {
+    channelMembersMinusGroupMembers = async (channelID: string, groupIDs: string[], page: number, perPage: number) => {
         const query = `group_ids=${groupIDs.join(',')}&page=${page}&per_page=${perPage}`;
         return this.doFetch(
             `${this.getChannelRoute(channelID)}/members_minus_group_members?${query}`,
@@ -2877,13 +2884,13 @@ export default class Client4 {
 
     // Client Helpers
 
-    doFetch = async (url, options) => {
+    doFetch = async (url: string, options) => {
         const {data} = await this.doFetchWithResponse(url, options);
 
         return data;
     };
 
-    doFetchWithResponse = async (url, options) => {
+    doFetchWithResponse = async (url: string, options) => {
         const response = await fetch(url, this.getOptions(options));
         const headers = parseAndMergeNestedHeaders(response.headers);
 
@@ -2937,7 +2944,7 @@ export default class Client4 {
         });
     };
 
-    trackEvent(category, event, props?) {
+    trackEvent(category: string, event: string, props?) {
         // Temporary change to allow only certain events to reduce data rate - see MM-13062
         if (![
             'api_posts_create',
@@ -2991,14 +2998,14 @@ export default class Client4 {
 function parseAndMergeNestedHeaders(originalHeaders) {
     const headers = new Map();
     let nestedHeaders = new Map();
-    originalHeaders.forEach((val, key) => {
+    originalHeaders.forEach((val: string, key: string) => {
         const capitalizedKey = key.replace(/\b[a-z]/g, (l) => l.toUpperCase());
         let realVal = val;
         if (val && val.match(/\n\S+:\s\S+/)) {
             const nestedHeaderStrings = val.split('\n');
-            realVal = nestedHeaderStrings.shift();
+            realVal = nestedHeaderStrings.shift() as string;
             const moreNestedHeaders = new Map(
-                nestedHeaderStrings.map((h) => h.split(/:\s/))
+                nestedHeaderStrings.map((h: any) => h.split(/:\s/))
             );
             nestedHeaders = new Map([...nestedHeaders, ...moreNestedHeaders]);
         }
@@ -3012,7 +3019,7 @@ export class ClientError extends Error {
     intl: { defaultMessage: string; id: string } | { defaultMessage: string; id: string } | { id: string; defaultMessage: string; values: any } | { id: string; defaultMessage: string };
     server_error_id: any;
     status_code: any;
-    constructor(baseUrl, data) {
+    constructor(baseUrl: string, data) {
         super(data.message + ': ' + cleanUrlForLogging(baseUrl, data.url));
 
         this.message = data.message;
