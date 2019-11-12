@@ -8,4 +8,6 @@ export type AdminState = {
     complianceReports: any;
     ldapGroups: any;
     ldapGroupsCount: number;
+    userAccessTokens: any[];
+    clusterInfo: any;
 };

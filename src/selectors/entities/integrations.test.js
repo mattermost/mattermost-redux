@@ -5,7 +5,7 @@ import assert from 'assert';
 import TestHelper from 'test/test_helper';
 import deepFreezeAndThrowOnMutation from 'utils/deep_freeze';
 
-import {getAllCommands, getAutocompleteCommandsList, getOutgoingHooksInCurrentTeam} from 'selectors/entities/integrations';
+import {getAllCommands, getAutocompleteCommandsList, getOutgoingHooksInCurrentTeam} from './integrations';
 
 describe('Selectors.Integrations', () => {
     TestHelper.initBasic();

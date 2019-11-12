@@ -3,10 +3,12 @@
 import {ChannelTypes, GeneralTypes, PostTypes, UserTypes} from 'action_types';
 import {Posts} from '../../constants';
 import {comparePosts} from 'utils/post_utils';
-import {Post, PostsState} from 'types/posts';
-import {RelationOneToOne, Dictionary} from 'types/utilities';
+import {Post, PostsState, PostOrderBlock, MessageHistory} from 'types/posts';
+import {RelationOneToOne, Dictionary, IDMappedObjects, RelationOneToMany} from 'types/utilities';
+import {GenericAction} from 'types/actions';
+import {Reaction} from 'types/reactions';
 
-export function removeUnneededMetadata(post) {
+export function removeUnneededMetadata(post: Post) {
     if (!post.metadata) {
         return post;
     }
@@ -63,7 +65,7 @@ export function removeUnneededMetadata(post) {
     };
 }
 
-export function handlePosts(state: RelationOneToOne<Post, Post> = {}, action) {
+export function handlePosts(state: RelationOneToOne<Post, Post> = {}, action: GenericAction) {
     switch (action.type) {
     case PostTypes.RECEIVED_POST:
     case PostTypes.RECEIVED_NEW_POST: {
@@ -80,7 +82,7 @@ export function handlePosts(state: RelationOneToOne<Post, Post> = {}, action) {
     }
 
     case PostTypes.RECEIVED_POSTS: {
-        const posts = Object.values(action.data.posts);
+        const posts = Object.values(action.data.posts) as Post[];
 
         if (posts.length === 0) {
             return state;
@@ -184,7 +186,7 @@ export function handlePosts(state: RelationOneToOne<Post, Post> = {}, action) {
     }
 }
 
-function handlePostReceived(nextState, post) {
+function handlePostReceived(nextState: any, post: Post) {
     if (nextState[post.id] && nextState[post.id].update_at >= post.update_at) {
         // The stored post is newer than the one we've received
         return nextState;
@@ -212,7 +214,7 @@ function handlePostReceived(nextState, post) {
     return nextState;
 }
 
-export function handlePendingPosts(state: Array<string> = [], action) {
+export function handlePendingPosts(state: Array<string> = [], action: GenericAction) {
     switch (action.type) {
     case PostTypes.RECEIVED_NEW_POST: {
         const post = action.data;
@@ -278,10 +280,10 @@ export function handlePendingPosts(state: Array<string> = [], action) {
     }
 }
 
-export function postsInChannel(state = {}, action, prevPosts, nextPosts) {
+export function postsInChannel(state: Dictionary<Array<PostOrderBlock>> = {}, action: GenericAction, prevPosts: IDMappedObjects<Post>, nextPosts: Dictionary<Post>) {
     switch (action.type) {
     case PostTypes.RECEIVED_NEW_POST: {
-        const post = action.data;
+        const post = action.data as Post;
 
         const postsForChannel = state[post.channel_id];
         if (!postsForChannel) {
@@ -289,9 +291,9 @@ export function postsInChannel(state = {}, action, prevPosts, nextPosts) {
             return state;
         }
 
-        const recentBlockIndex = postsForChannel.findIndex((block) => block.recent);
+        const recentBlockIndex = postsForChannel.findIndex((block: PostOrderBlock) => block.recent);
 
-        let nextRecentBlock;
+        let nextRecentBlock: PostOrderBlock;
         if (recentBlockIndex === -1) {
             nextRecentBlock = {
                 order: [],
@@ -358,7 +360,7 @@ export function postsInChannel(state = {}, action, prevPosts, nextPosts) {
 
         const postsForChannel = state[post.channel_id] || [];
 
-        const recentBlockIndex = postsForChannel.findIndex((block) => block.recent);
+        const recentBlockIndex = postsForChannel.findIndex((block: PostOrderBlock) => block.recent);
         if (recentBlockIndex === -1) {
             // Nothing to do since there's no recent block and only the recent block should contain pending posts
             return state;
@@ -403,7 +405,7 @@ export function postsInChannel(state = {}, action, prevPosts, nextPosts) {
 
         if (recent) {
             // The newly received block is now the most recent, so unmark the current most recent block
-            const recentBlockIndex = postsForChannel.findIndex((block) => block.recent);
+            const recentBlockIndex = postsForChannel.findIndex((block: PostOrderBlock) => block.recent);
             if (recentBlockIndex !== -1) {
                 const recentBlock = postsForChannel[recentBlockIndex];
 
@@ -503,7 +505,7 @@ export function postsInChannel(state = {}, action, prevPosts, nextPosts) {
 
         const postsForChannel = state[action.channelId] || [];
 
-        const recentBlockIndex = postsForChannel.findIndex((block) => block.recent);
+        const recentBlockIndex = postsForChannel.findIndex((block: PostOrderBlock) => block.recent);
         if (recentBlockIndex === -1) {
             // Nothing to do since this shouldn't be dispatched if we haven't loaded the most recent posts yet
             return state;
@@ -513,7 +515,7 @@ export function postsInChannel(state = {}, action, prevPosts, nextPosts) {
 
         const mostOldestCreateAt = nextPosts[recentBlock.order[recentBlock.order.length - 1]].create_at;
 
-        const nextRecentBlock = {
+        const nextRecentBlock: PostOrderBlock = {
             ...recentBlock,
             order: [...recentBlock.order],
         };
@@ -576,7 +578,7 @@ export function postsInChannel(state = {}, action, prevPosts, nextPosts) {
             const block = nextPostsForChannel[i];
 
             // Remove any comments for this post
-            const nextOrder = block.order.filter((postId) => prevPosts[postId].root_id !== post.id);
+            const nextOrder = block.order.filter((postId: string) => prevPosts[postId].root_id !== post.id);
 
             if (nextOrder.length !== block.order.length) {
                 nextPostsForChannel[i] = {
@@ -618,7 +620,7 @@ export function postsInChannel(state = {}, action, prevPosts, nextPosts) {
         for (let i = 0; i < nextPostsForChannel.length; i++) {
             const block = nextPostsForChannel[i];
 
-            const nextOrder = block.order.filter((postId) => postId !== post.id && prevPosts[postId].root_id !== post.id);
+            const nextOrder = block.order.filter((postId: string) => postId !== post.id && prevPosts[postId].root_id !== post.id);
 
             if (nextOrder.length !== block.order.length) {
                 nextPostsForChannel[i] = {
@@ -672,11 +674,11 @@ export function postsInChannel(state = {}, action, prevPosts, nextPosts) {
     }
 }
 
-export function removeNonRecentEmptyPostBlocks(blocks) {
-    return blocks.filter((block) => block.order.length !== 0 || block.recent);
+export function removeNonRecentEmptyPostBlocks(blocks: PostOrderBlock[]) {
+    return blocks.filter((block: PostOrderBlock) => block.order.length !== 0 || block.recent);
 }
 
-export function mergePostBlocks(blocks, posts) {
+export function mergePostBlocks(blocks: PostOrderBlock[], posts: Dictionary<Post>) {
     let nextBlocks = [...blocks];
 
     // Remove any blocks that may have become empty by removing posts
@@ -733,7 +735,7 @@ export function mergePostBlocks(blocks, posts) {
     return nextBlocks;
 }
 
-export function mergePostOrder(left, right, posts) {
+export function mergePostOrder(left: string[], right: string[], posts: Dictionary<Post>) {
     const result = [...left];
 
     // Add without duplicates
@@ -757,7 +759,7 @@ export function mergePostOrder(left, right, posts) {
     return result;
 }
 
-export function postsInThread(state: Dictionary<string[]> = {}, action, prevPosts) {
+export function postsInThread(state: RelationOneToMany<Post, Post> = {}, action: GenericAction, prevPosts: Dictionary<Post>) {
     switch (action.type) {
     case PostTypes.RECEIVED_NEW_POST:
     case PostTypes.RECEIVED_POST: {
@@ -956,7 +958,7 @@ export function postsInThread(state: Dictionary<string[]> = {}, action, prevPost
     }
 }
 
-function selectedPostId(state = '', action) {
+function selectedPostId(state = '', action: GenericAction) {
     switch (action.type) {
     case PostTypes.RECEIVED_POST_SELECTED:
         return action.data;
@@ -967,7 +969,7 @@ function selectedPostId(state = '', action) {
     }
 }
 
-function currentFocusedPostId(state = '', action) {
+function currentFocusedPostId(state = '', action: GenericAction) {
     switch (action.type) {
     case PostTypes.RECEIVED_FOCUSED_POST:
         return action.data;
@@ -978,22 +980,22 @@ function currentFocusedPostId(state = '', action) {
     }
 }
 
-export function reactions(state = {}, action) {
+export function reactions(state: RelationOneToOne<Post, Dictionary<Reaction>> = {}, action: GenericAction) {
     switch (action.type) {
     case PostTypes.RECEIVED_REACTIONS: {
         const reactionsList = action.data;
-        const nextReactions = {};
-        reactionsList.forEach((reaction) => {
+        const nextReactions: Dictionary<Reaction> = {};
+        reactionsList.forEach((reaction: Reaction) => {
             nextReactions[reaction.user_id + '-' + reaction.emoji_name] = reaction;
         });
 
         return {
             ...state,
-            [action.postId]: nextReactions,
+            [action.postId!]: nextReactions,
         };
     }
     case PostTypes.RECEIVED_REACTION: {
-        const reaction = action.data;
+        const reaction = action.data as Reaction;
         const nextReactions = {...(state[reaction.post_id] || {})};
         nextReactions[reaction.user_id + '-' + reaction.emoji_name] = reaction;
 
@@ -1051,12 +1053,12 @@ export function reactions(state = {}, action) {
     }
 }
 
-function storeReactionsForPost(state, post) {
+function storeReactionsForPost(state: any, post: Post) {
     if (!post.metadata || !post.metadata.reactions || post.delete_at > 0) {
         return state;
     }
 
-    const reactionsForPost = {};
+    const reactionsForPost: Dictionary<Reaction> = {};
     if (post.metadata.reactions && post.metadata.reactions.length > 0) {
         for (const reaction of post.metadata.reactions) {
             reactionsForPost[reaction.user_id + '-' + reaction.emoji_name] = reaction;
@@ -1069,7 +1071,7 @@ function storeReactionsForPost(state, post) {
     };
 }
 
-export function openGraph(state = {}, action) {
+export function openGraph(state: RelationOneToOne<Post, any> = {}, action: GenericAction) {
     switch (action.type) {
     case PostTypes.RECEIVED_OPEN_GRAPH_METADATA: {
         const nextState = {...state};
@@ -1097,7 +1099,7 @@ export function openGraph(state = {}, action) {
     }
 }
 
-function storeOpenGraphForPost(state, post) {
+function storeOpenGraphForPost(state: any, post: Post) {
     if (!post.metadata || !post.metadata.embeds) {
         return state;
     }
@@ -1115,10 +1117,10 @@ function storeOpenGraphForPost(state, post) {
     }, state);
 }
 
-function messagesHistory(state: {messages?;index?} = {}, action) {
+function messagesHistory(state: Partial<MessageHistory> = {}, action: GenericAction) {
     switch (action.type) {
     case PostTypes.ADD_MESSAGE_INTO_HISTORY: {
-        const nextIndex = {};
+        const nextIndex: Dictionary<number> = {};
         let nextMessages = state.messages ? [...state.messages] : [];
         nextMessages.push(action.data);
         nextIndex[Posts.MESSAGE_TYPES.POST] = nextMessages.length;
@@ -1134,7 +1136,7 @@ function messagesHistory(state: {messages?;index?} = {}, action) {
         };
     }
     case PostTypes.RESET_HISTORY_INDEX: {
-        const index = {};
+        const index: Dictionary<number> = {};
         index[Posts.MESSAGE_TYPES.POST] = -1;
         index[Posts.MESSAGE_TYPES.COMMENT] = -1;
 
@@ -1147,7 +1149,7 @@ function messagesHistory(state: {messages?;index?} = {}, action) {
         };
     }
     case PostTypes.MOVE_HISTORY_INDEX_BACK: {
-        const index = {};
+        const index: Dictionary<number> = {};
         index[Posts.MESSAGE_TYPES.POST] = -1;
         index[Posts.MESSAGE_TYPES.COMMENT] = -1;
 
@@ -1161,7 +1163,7 @@ function messagesHistory(state: {messages?;index?} = {}, action) {
         };
     }
     case PostTypes.MOVE_HISTORY_INDEX_FORWARD: {
-        const index = {};
+        const index: Dictionary<number> = {};
         index[Posts.MESSAGE_TYPES.POST] = -1;
         index[Posts.MESSAGE_TYPES.COMMENT] = -1;
 
@@ -1176,7 +1178,7 @@ function messagesHistory(state: {messages?;index?} = {}, action) {
         };
     }
     case UserTypes.LOGOUT_SUCCESS: {
-        const index = {};
+        const index: Dictionary<number> = {};
         index[Posts.MESSAGE_TYPES.POST] = -1;
         index[Posts.MESSAGE_TYPES.COMMENT] = -1;
 
@@ -1190,7 +1192,7 @@ function messagesHistory(state: {messages?;index?} = {}, action) {
     }
 }
 
-export function expandedURLs(state = {}, action) {
+export function expandedURLs(state: Dictionary<string> = {}, action: GenericAction) {
     switch (action.type) {
     case GeneralTypes.REDIRECT_LOCATION_SUCCESS:
         return {
@@ -1207,9 +1209,9 @@ export function expandedURLs(state = {}, action) {
     }
 }
 
-export default function(state: Partial<PostsState> = {}, action) {
+export default function(state: Partial<PostsState> = {}, action: GenericAction) {
     const nextPosts = handlePosts(state.posts, action);
-    const nextPostsInChannel = postsInChannel(state.postsInChannel, action, state.posts, nextPosts);
+    const nextPostsInChannel = postsInChannel(state.postsInChannel, action, state.posts!, nextPosts);
 
     const nextState = {
 
@@ -1224,7 +1226,7 @@ export default function(state: Partial<PostsState> = {}, action) {
 
         // Object mapping post root ids to an array of posts ids of comments (but not the root post) in that thread
         // with no guaranteed order
-        postsInThread: postsInThread(state.postsInThread, action, state.posts),
+        postsInThread: postsInThread(state.postsInThread, action, state.posts!),
 
         // The current selected post
         selectedPostId: selectedPostId(state.selectedPostId, action),

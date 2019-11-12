@@ -8,7 +8,14 @@ import {PluginTypes} from 'action_types';
 
 import {ActionFunc} from 'types/actions';
 
-export function getMarketplacePlugins(filter): ActionFunc {
+export type MarketplacePluginFilter = {
+    Page: number;
+    PerPage: number;
+    Filter: string;
+    ServerVersion: string;
+}
+
+export function getMarketplacePlugins(filter: MarketplacePluginFilter): ActionFunc {
     return bindClientFunc({
         clientFunc: Client4.getMarketplacePlugins,
         onSuccess: PluginTypes.RECEIVED_MARKETPLACE_PLUGINS,

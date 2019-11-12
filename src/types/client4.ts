@@ -24,3 +24,10 @@ export type ErrorApi = {
     url: string;
 };
 export type Client4Error = ErrorOffline | ErrorInvalidResponse | ErrorApi;
+export type Options = {
+    headers?: { [x: string]: string };
+    method?: string;
+    url?: string;
+    credentials?: 'omit' | 'same-origin' | 'include';
+    body?: any;
+};
