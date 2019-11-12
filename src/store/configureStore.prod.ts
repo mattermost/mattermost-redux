@@ -2,8 +2,6 @@
 // See LICENSE.txt for license information.
 
 import * as redux from 'redux';
-import {createOfflineReducer, networkStatusChangedAction, offlineCompose} from 'redux-offline';
-import defaultOfflineConfig from 'redux-offline/lib/defaults';
 import reducerRegistry from './reducer_registry';
 
 import serviceReducer from '../reducers';
@@ -11,6 +9,9 @@ import serviceReducer from '../reducers';
 import {offlineConfig, createReducer} from './helpers';
 import initialState from './initial_state';
 import {createMiddleware} from './middleware';
+
+import {createOfflineReducer, networkStatusChangedAction, offlineCompose} from 'redux-offline';
+import defaultOfflineConfig from 'redux-offline/lib/defaults';
 
 /**
  * Configures and constructs the redux store. Accepts the following parameters:
@@ -23,13 +24,13 @@ import {createMiddleware} from './middleware';
  *     enableBuffer - bool - default = true - If true, the store will buffer all actions until offline state rehydration occurs.
  *     enableThunk - bool - default = true - If true, include the thunk middleware automatically. If false, thunk must be provided as part of additionalMiddleware.
  */
-export default function configureOfflineServiceStore(preloadedState, appReducer, userOfflineConfig, getAppReducer, clientOptions = {}) {
+export default function configureOfflineServiceStore(preloadedState: any, appReducer: any, userOfflineConfig: any, getAppReducer: any, clientOptions = {}) {
     const baseState = Object.assign({}, initialState, preloadedState);
 
     const baseOfflineConfig = Object.assign({}, defaultOfflineConfig, offlineConfig, userOfflineConfig);
 
     const store = redux.createStore(
-        createOfflineReducer(createReducer(baseState, serviceReducer, appReducer)),
+        createOfflineReducer(createReducer(baseState, serviceReducer as any, appReducer)),
         baseState,
         offlineCompose(baseOfflineConfig)(
             createMiddleware(clientOptions),
@@ -37,7 +38,7 @@ export default function configureOfflineServiceStore(preloadedState, appReducer,
         )
     );
 
-    reducerRegistry.setChangeListener((reducers) => {
+    reducerRegistry.setChangeListener((reducers: any) => {
         store.replaceReducer(createOfflineReducer(createReducer(baseState, reducers)));
     });
 
@@ -47,7 +48,7 @@ export default function configureOfflineServiceStore(preloadedState, appReducer,
     }
 
     if (baseOfflineConfig.detectNetwork) {
-        baseOfflineConfig.detectNetwork((online) => {
+        baseOfflineConfig.detectNetwork((online: boolean) => {
             store.dispatch(networkStatusChangedAction(online));
         });
     }

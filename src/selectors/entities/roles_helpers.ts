@@ -5,6 +5,12 @@ import {GlobalState} from 'types/store';
 import {getCurrentUser} from 'selectors/entities/common';
 import * as types from 'types';
 
+export type PermissionsOptions = {
+    channel?: string;
+    team?: string;
+    permission: string;
+};
+
 export function getRoles(state: GlobalState) {
     return state.entities.roles.roles;
 }
@@ -31,6 +37,6 @@ export const getMySystemPermissions = reselect.createSelector(getMySystemRoles, 
     return permissions;
 });
 
-export const haveISystemPermission = reselect.createSelector(getMySystemPermissions, (state, options) => options.permission, (permissions, permission) => {
+export const haveISystemPermission = reselect.createSelector(getMySystemPermissions, (state: GlobalState, options: PermissionsOptions) => options.permission, (permissions, permission) => {
     return permissions.has(permission);
 });

@@ -1,10 +1,11 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
 import {Team} from 'types/teams';
-import {IDMappedObjects} from 'types/utilities';
+import {IDMappedObjects, Dictionary} from 'types/utilities';
 import {General} from '../constants';
+
 export function teamListToMap(teamList: Array<Team>): IDMappedObjects<Team> {
-    const teams = {};
+    const teams: Dictionary<Team> = {};
     for (let i = 0; i < teamList.length; i++) {
         teams[teamList[i].id] = teamList[i];
     }

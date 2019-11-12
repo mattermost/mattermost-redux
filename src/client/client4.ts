@@ -8,7 +8,7 @@ import {General} from '../constants';
 import {isSystemAdmin} from 'utils/user_utils';
 
 import fetch from './fetch_etag';
-import {UserProfile} from 'types/users';
+import {UserProfile, UserStatus} from 'types/users';
 import {Team} from 'types/teams';
 import {Channel} from 'types/channels';
 import {Post} from 'types/posts';
@@ -16,6 +16,13 @@ import {Job} from 'types/jobs';
 import {Role} from 'types/roles';
 import {Scheme} from 'types/schemes';
 import {Options} from 'types/client4';
+import {PreferenceType} from 'types/preferences';
+import {IncomingWebhook, OutgoingWebhook, Command, OAuthApp, DialogSubmission} from 'types/integrations';
+import {CustomEmoji} from 'types/emojis';
+import {Config} from 'types/config';
+import {Bot, BotPatch} from 'types/bots';
+import {Dictionary} from 'types/utilities';
+import {SyncablePatch} from 'types/groups';
 
 const FormData = require('form-data');
 const HEADER_AUTH = 'Authorization';
@@ -238,7 +245,7 @@ export default class Client4 {
         return `${this.getBaseRoute()}/brand`;
     }
 
-    getBrandImageUrl(timestamp) {
+    getBrandImageUrl(timestamp: string) {
         return `${this.getBrandRoute()}/image?t=${timestamp}`;
     }
 
@@ -789,7 +796,7 @@ export default class Client4 {
         );
     };
 
-    searchUsers = (term: string, options) => {
+    searchUsers = (term: string, options: any) => {
         this.trackEvent('api', 'api_search_users');
 
         return this.doFetch(
@@ -812,7 +819,7 @@ export default class Client4 {
         );
     };
 
-    updateStatus = async (status) => {
+    updateStatus = async (status: UserStatus) => {
         return this.doFetch(
             `${this.getUserRoute(status.user_id)}/status`,
             {method: 'put', body: JSON.stringify(status)}
@@ -1158,7 +1165,7 @@ export default class Client4 {
         );
     };
 
-    updateTeamMemberRoles = async (teamId: string, userId: string, roles) => {
+    updateTeamMemberRoles = async (teamId: string, userId: string, roles: string[]) => {
         this.trackEvent('api', 'api_teams_update_member_roles', {team_id: teamId});
 
         return this.doFetch(
@@ -1185,7 +1192,7 @@ export default class Client4 {
         );
     };
 
-    importTeam = async (teamId: string, file, importFrom) => {
+    importTeam = async (teamId: string, file: File, importFrom: string) => {
         const formData = new FormData();
         formData.append('file', file, file.name);
         formData.append('filesize', file.size);
@@ -1327,7 +1334,7 @@ export default class Client4 {
         );
     };
 
-    updateChannelPrivacy = async (channelId: string, privacy) => {
+    updateChannelPrivacy = async (channelId: string, privacy: any) => {
         this.trackEvent('api', 'api_channels_update_privacy', {channel_id: channelId, privacy});
 
         return this.doFetch(
@@ -1345,7 +1352,7 @@ export default class Client4 {
         );
     };
 
-    updateChannelNotifyProps = async (props) => {
+    updateChannelNotifyProps = async (props: any) => {
         this.trackEvent('api', 'api_users_update_channel_notifcations', {channel_id: props.channel_id});
 
         return this.doFetch(
@@ -1465,7 +1472,7 @@ export default class Client4 {
         );
     };
 
-    updateChannelMemberRoles = async (channelId: string, userId: string, roles) => {
+    updateChannelMemberRoles = async (channelId: string, userId: string, roles: string) => {
         return this.doFetch(
             `${this.getChannelMemberRoute(channelId, userId)}/roles`,
             {method: 'put', body: JSON.stringify({roles})}
@@ -1697,7 +1704,7 @@ export default class Client4 {
         );
     };
 
-    searchPostsWithParams = async (teamId: string, params) => {
+    searchPostsWithParams = async (teamId: string, params: any) => {
         this.trackEvent('api', 'api_posts_search', {team_id: teamId});
 
         return this.doFetch(
@@ -1721,7 +1728,7 @@ export default class Client4 {
         return this.doPostActionWithCookie(postId, actionId, '', selectedOption);
     };
 
-    doPostActionWithCookie = async (postId: string, actionId: string, actionCookie, selectedOption = '') => {
+    doPostActionWithCookie = async (postId: string, actionId: string, actionCookie: string, selectedOption = '') => {
         if (selectedOption) {
             this.trackEvent('api', 'api_interactive_messages_menu_selected');
         } else {
@@ -1769,7 +1776,7 @@ export default class Client4 {
         return url;
     }
 
-    uploadFile = async (fileFormData, formBoundary) => {
+    uploadFile = async (fileFormData: any, formBoundary: string) => {
         this.trackEvent('api', 'api_files_upload');
         const request: any = {
             method: 'post',
@@ -1797,7 +1804,7 @@ export default class Client4 {
 
     // Preference Routes
 
-    savePreferences = async (userId: string, preferences) => {
+    savePreferences = async (userId: string, preferences: PreferenceType[]) => {
         return this.doFetch(
             `${this.getPreferencesRoute(userId)}`,
             {method: 'put', body: JSON.stringify(preferences)}
@@ -1811,7 +1818,7 @@ export default class Client4 {
         );
     };
 
-    deletePreferences = async (userId: string, preferences) => {
+    deletePreferences = async (userId: string, preferences: PreferenceType[]) => {
         return this.doFetch(
             `${this.getPreferencesRoute(userId)}/delete`,
             {method: 'post', body: JSON.stringify(preferences)}
@@ -1877,7 +1884,7 @@ export default class Client4 {
 
     // Integration Routes
 
-    createIncomingWebhook = async (hook) => {
+    createIncomingWebhook = async (hook: IncomingWebhook) => {
         this.trackEvent('api', 'api_integrations_created', {team_id: hook.team_id});
 
         return this.doFetch(
@@ -1918,7 +1925,7 @@ export default class Client4 {
         );
     };
 
-    updateIncomingWebhook = async (hook) => {
+    updateIncomingWebhook = async (hook: IncomingWebhook) => {
         this.trackEvent('api', 'api_integrations_updated', {team_id: hook.team_id});
 
         return this.doFetch(
@@ -1927,7 +1934,7 @@ export default class Client4 {
         );
     };
 
-    createOutgoingWebhook = async (hook) => {
+    createOutgoingWebhook = async (hook: OutgoingWebhook) => {
         this.trackEvent('api', 'api_integrations_created', {team_id: hook.team_id});
 
         return this.doFetch(
@@ -1972,7 +1979,7 @@ export default class Client4 {
         );
     };
 
-    updateOutgoingWebhook = async (hook) => {
+    updateOutgoingWebhook = async (hook: OutgoingWebhook) => {
         this.trackEvent('api', 'api_integrations_updated', {team_id: hook.team_id});
 
         return this.doFetch(
@@ -2009,7 +2016,7 @@ export default class Client4 {
         );
     };
 
-    executeCommand = async (command, commandArgs = {}) => {
+    executeCommand = async (command: Command, commandArgs = {}) => {
         this.trackEvent('api', 'api_integrations_used');
 
         return this.doFetch(
@@ -2018,7 +2025,7 @@ export default class Client4 {
         );
     };
 
-    addCommand = async (command) => {
+    addCommand = async (command: Command) => {
         this.trackEvent('api', 'api_integrations_created');
 
         return this.doFetch(
@@ -2027,7 +2034,7 @@ export default class Client4 {
         );
     };
 
-    editCommand = async (command) => {
+    editCommand = async (command: Command) => {
         this.trackEvent('api', 'api_integrations_created');
 
         return this.doFetch(
@@ -2052,7 +2059,7 @@ export default class Client4 {
         );
     };
 
-    createOAuthApp = async (app) => {
+    createOAuthApp = async (app: OAuthApp) => {
         this.trackEvent('api', 'api_apps_register');
 
         return this.doFetch(
@@ -2061,7 +2068,7 @@ export default class Client4 {
         );
     };
 
-    editOAuthApp = async (app) => {
+    editOAuthApp = async (app: OAuthApp) => {
         return this.doFetch(
             `${this.getOAuthAppsRoute()}/${app.id}`,
             {method: 'put', body: JSON.stringify(app)}
@@ -2105,7 +2112,7 @@ export default class Client4 {
         );
     };
 
-    submitInteractiveDialog = async (data) => {
+    submitInteractiveDialog = async (data: DialogSubmission) => {
         this.trackEvent('api', 'api_interactive_messages_dialog_submitted');
         return this.doFetch(
             `${this.getBaseRoute()}/actions/dialogs/submit`,
@@ -2115,7 +2122,7 @@ export default class Client4 {
 
     // Emoji Routes
 
-    createCustomEmoji = async (emoji, imageData: File) => {
+    createCustomEmoji = async (emoji: CustomEmoji, imageData: File) => {
         this.trackEvent('api', 'api_emoji_custom_add');
 
         const formData = new FormData();
@@ -2268,7 +2275,7 @@ export default class Client4 {
         );
     };
 
-    updateConfig = async (config) => {
+    updateConfig = async (config: Config) => {
         return this.doFetch(
             `${this.getBaseRoute()}/config`,
             {method: 'put', body: JSON.stringify(config)}
@@ -2289,7 +2296,7 @@ export default class Client4 {
         );
     };
 
-    testEmail = async (config) => {
+    testEmail = async (config: Config) => {
         return this.doFetch(
             `${this.getBaseRoute()}/email/test`,
             {method: 'post', body: JSON.stringify(config)}
@@ -2303,7 +2310,7 @@ export default class Client4 {
         );
     };
 
-    testS3Connection = async (config) => {
+    testS3Connection = async (config: Config) => {
         return this.doFetch(
             `${this.getBaseRoute()}/file/s3_test`,
             {method: 'post', body: JSON.stringify(config)}
@@ -2482,7 +2489,7 @@ export default class Client4 {
         );
     };
 
-    testElasticsearch = async (config) => {
+    testElasticsearch = async (config: Config) => {
         return this.doFetch(
             `${this.getBaseRoute()}/elasticsearch/test`,
             {method: 'post', body: JSON.stringify(config)}
@@ -2666,7 +2673,7 @@ export default class Client4 {
         );
     };
 
-    getMarketplacePlugins = async (filter) => {
+    getMarketplacePlugins = async (filter: string) => {
         return this.doFetch(
             `${this.getPluginsMarketplaceRoute()}${buildQueryString({filter: filter || ''})}`,
             {method: 'get'}
@@ -2710,7 +2717,7 @@ export default class Client4 {
 
     // Groups
 
-    linkGroupSyncable = async (groupID: string, syncableID: string, syncableType: string, patch) => {
+    linkGroupSyncable = async (groupID: string, syncableID: string, syncableType: string, patch: SyncablePatch) => {
         return this.doFetch(
             `${this.getBaseRoute()}/groups/${groupID}/${syncableType}s/${syncableID}/link`,
             {method: 'post', body: JSON.stringify(patch)}
@@ -2793,7 +2800,7 @@ export default class Client4 {
 
     // Redirect Location
 
-    getRedirectLocation = async (urlParam) => {
+    getRedirectLocation = async (urlParam: string) => {
         if (!urlParam.length) {
             return Promise.resolve();
         }
@@ -2803,14 +2810,14 @@ export default class Client4 {
 
     // Bot Routes
 
-    createBot = async (bot) => {
+    createBot = async (bot: Bot) => {
         return this.doFetch(
             `${this.getBotsRoute()}`,
             {method: 'post', body: JSON.stringify(bot)}
         );
     }
 
-    patchBot = async (botUserId: string, botPatch) => {
+    patchBot = async (botUserId: string, botPatch: BotPatch) => {
         return this.doFetch(
             `${this.getBotRoute(botUserId)}`,
             {method: 'put', body: JSON.stringify(botPatch)}
@@ -2884,13 +2891,13 @@ export default class Client4 {
 
     // Client Helpers
 
-    doFetch = async (url: string, options) => {
+    doFetch = async (url: string, options: Options) => {
         const {data} = await this.doFetchWithResponse(url, options);
 
         return data;
     };
 
-    doFetchWithResponse = async (url: string, options) => {
+    doFetchWithResponse = async (url: string, options: Options) => {
         const response = await fetch(url, this.getOptions(options));
         const headers = parseAndMergeNestedHeaders(response.headers);
 
@@ -2944,7 +2951,7 @@ export default class Client4 {
         });
     };
 
-    trackEvent(category: string, event: string, props?) {
+    trackEvent(category: string, event: string, props?: any) {
         // Temporary change to allow only certain events to reduce data rate - see MM-13062
         if (![
             'api_posts_create',
@@ -2995,7 +3002,7 @@ export default class Client4 {
     }
 }
 
-function parseAndMergeNestedHeaders(originalHeaders) {
+function parseAndMergeNestedHeaders(originalHeaders: any) {
     const headers = new Map();
     let nestedHeaders = new Map();
     originalHeaders.forEach((val: string, key: string) => {
@@ -3019,7 +3026,7 @@ export class ClientError extends Error {
     intl: { defaultMessage: string; id: string } | { defaultMessage: string; id: string } | { id: string; defaultMessage: string; values: any } | { id: string; defaultMessage: string };
     server_error_id: any;
     status_code: any;
-    constructor(baseUrl: string, data) {
+    constructor(baseUrl: string, data: any) {
         super(data.message + ': ' + cleanUrlForLogging(baseUrl, data.url));
 
         this.message = data.message;

@@ -27,13 +27,18 @@ import {
     savePreferences,
 } from './preferences';
 import {getProfilesByIds, getProfilesByUsernames, getStatusesByIds} from './users';
-import {Action, ActionFunc, ActionResult, batchActions, DispatchFunc, GetStateFunc} from 'types/actions';
+import {Action, ActionFunc, ActionResult, batchActions, DispatchFunc, GetStateFunc, GenericAction} from 'types/actions';
 import {GlobalState} from 'types/store';
 import {Post} from 'types/posts';
+import {Error} from 'types/errors';
+import {Reaction} from 'types/reactions';
+import {UserProfile} from 'types/users';
+import {Dictionary} from 'types/utilities';
+import {CustomEmoji} from 'types/emojis';
 
 // receivedPost should be dispatched after a single post from the server. This typically happens when an existing post
 // is updated.
-export function receivedPost(post) {
+export function receivedPost(post: Post) {
     return {
         type: PostTypes.RECEIVED_POST,
         data: post,
@@ -42,7 +47,7 @@ export function receivedPost(post) {
 
 // receivedNewPost should be dispatched when receiving a newly created post or when sending a request to the server
 // to make a new post.
-export function receivedNewPost(post) {
+export function receivedNewPost(post: Post) {
     return {
         type: PostTypes.RECEIVED_NEW_POST,
         data: post,
@@ -51,7 +56,7 @@ export function receivedNewPost(post) {
 
 // receivedPosts should be dispatched when receiving multiple posts from the server that may or may not be ordered.
 // This will typically be used alongside other actions like receivedPostsAfter which require the posts to be ordered.
-export function receivedPosts(posts) {
+export function receivedPosts(posts: CombinedPostList) {
     return {
         type: PostTypes.RECEIVED_POSTS,
         data: posts,
@@ -59,7 +64,7 @@ export function receivedPosts(posts) {
 }
 
 // receivedPostsAfter should be dispatched when receiving an ordered list of posts that come before a given post.
-export function receivedPostsAfter(posts, channelId, afterPostId, recent = false) {
+export function receivedPostsAfter(posts: Array<Post>, channelId: string, afterPostId: string, recent = false) {
     return {
         type: PostTypes.RECEIVED_POSTS_AFTER,
         channelId,
@@ -70,7 +75,7 @@ export function receivedPostsAfter(posts, channelId, afterPostId, recent = false
 }
 
 // receivedPostsBefore should be dispatched when receiving an ordered list of posts that come after a given post.
-export function receivedPostsBefore(posts, channelId, beforePostId, oldest = false) {
+export function receivedPostsBefore(posts: Array<Post>, channelId: string, beforePostId: string, oldest = false) {
     return {
         type: PostTypes.RECEIVED_POSTS_BEFORE,
         channelId,
@@ -83,7 +88,7 @@ export function receivedPostsBefore(posts, channelId, beforePostId, oldest = fal
 // receivedPostsSince should be dispatched when receiving a list of posts that have been updated since a certain time.
 // Due to how the API endpoint works, some of these posts will be ordered, but others will not, so this needs special
 // handling from the reducers.
-export function receivedPostsSince(posts, channelId) {
+export function receivedPostsSince(posts: Array<Post>, channelId: string) {
     return {
         type: PostTypes.RECEIVED_POSTS_SINCE,
         channelId,
@@ -93,7 +98,7 @@ export function receivedPostsSince(posts, channelId) {
 
 // receivedPostsInChannel should be dispatched when receiving a list of ordered posts within a channel when the
 // the adjacent posts are not known.
-export function receivedPostsInChannel(posts, channelId, recent = false, oldest = false) {
+export function receivedPostsInChannel(posts: CombinedPostList, channelId: string, recent = false, oldest = false) {
     return {
         type: PostTypes.RECEIVED_POSTS_IN_CHANNEL,
         channelId,
@@ -104,7 +109,7 @@ export function receivedPostsInChannel(posts, channelId, recent = false, oldest 
 }
 
 // receivedPostsInThread should be dispatched when receiving a list of unordered posts in a thread.
-export function receivedPostsInThread(posts, rootId) {
+export function receivedPostsInThread(posts: Array<Post>, rootId: string) {
     return {
         type: PostTypes.RECEIVED_POSTS_IN_THREAD,
         data: posts,
@@ -114,7 +119,7 @@ export function receivedPostsInThread(posts, rootId) {
 
 // postDeleted should be dispatched when a post has been deleted and should be replaced with a "message deleted"
 // placeholder. This typically happens when a post is deleted by another user.
-export function postDeleted(post) {
+export function postDeleted(post: Post) {
     return {
         type: PostTypes.POST_DELETED,
         data: post,
@@ -123,14 +128,14 @@ export function postDeleted(post) {
 
 // postRemoved should be dispatched when a post should be immediately removed. This typically happens when a post is
 // deleted by the current user.
-export function postRemoved(post) {
+export function postRemoved(post: Post) {
     return {
         type: PostTypes.POST_REMOVED,
         data: post,
     };
 }
 
-export function getPost(postId) {
+export function getPost(postId: string) {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         let post;
 
@@ -157,7 +162,7 @@ export function getPost(postId) {
     };
 }
 
-export function createPost(post, files: any[] = []) {
+export function createPost(post: Post, files: any[] = []) {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         const state = getState();
         const currentUserId = state.entities.users.currentUserId;
@@ -205,7 +210,7 @@ export function createPost(post, files: any[] = []) {
             meta: {
                 offline: {
                     effect: () => Client4.createPost({...newPost, create_at: 0}),
-                    commit: (success, payload) => {
+                    commit: (result: any, payload: any) => {
                         const actions: Action[] = [
                             receivedPost(payload),
                             {
@@ -239,7 +244,7 @@ export function createPost(post, files: any[] = []) {
                     },
                     maxRetry: 0,
                     offlineRollback: true,
-                    rollback: (success, error) => {
+                    rollback: (result: any, error: Error) => {
                         const data = {
                             ...newPost,
                             id: pendingPostId,
@@ -354,11 +359,11 @@ export function resetCreatePostRequest() {
     return {type: PostTypes.CREATE_POST_RESET_REQUEST};
 }
 
-export function deletePost(post) {
+export function deletePost(post: ExtendedPost) {
     return (dispatch: DispatchFunc, getState: GetStateFunc) => {
         const state = getState();
         const delPost = {...post};
-        if (delPost.type === Posts.POST_TYPES.COMBINED_USER_ACTIVITY) {
+        if (delPost.type === Posts.POST_TYPES.COMBINED_USER_ACTIVITY && delPost.system_post_ids) {
             delPost.system_post_ids.forEach((systemPostId) => {
                 const systemPost = Selectors.getPost(state, systemPostId);
                 if (systemPost) {
@@ -383,7 +388,7 @@ export function deletePost(post) {
     };
 }
 
-export function editPost(post) {
+export function editPost(post: Post) {
     return bindClientFunc({
         clientFunc: Client4.patchPost,
         onRequest: PostTypes.EDIT_POST_REQUEST,
@@ -395,7 +400,7 @@ export function editPost(post) {
     });
 }
 
-export function pinPost(postId) {
+export function pinPost(postId: string) {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         dispatch({type: PostTypes.EDIT_POST_REQUEST}, getState);
         let posts;
@@ -432,7 +437,7 @@ export function pinPost(postId) {
     };
 }
 
-export function unpinPost(postId) {
+export function unpinPost(postId: string) {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         dispatch({type: PostTypes.EDIT_POST_REQUEST}, getState);
         let posts;
@@ -469,7 +474,7 @@ export function unpinPost(postId) {
     };
 }
 
-export function addReaction(postId, emojiName) {
+export function addReaction(postId: string, emojiName: string) {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         const currentUserId = getState().entities.users.currentUserId;
 
@@ -491,7 +496,7 @@ export function addReaction(postId, emojiName) {
     };
 }
 
-export function removeReaction(postId, emojiName) {
+export function removeReaction(postId: string, emojiName: string) {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         const currentUserId = getState().entities.users.currentUserId;
 
@@ -512,7 +517,7 @@ export function removeReaction(postId, emojiName) {
     };
 }
 
-export function getCustomEmojiForReaction(name) {
+export function getCustomEmojiForReaction(name: string) {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         const nonExistentEmoji = getState().entities.emojis.nonExistentEmoji;
         const customEmojisByName = selectCustomEmojisByName(getState());
@@ -533,7 +538,7 @@ export function getCustomEmojiForReaction(name) {
     };
 }
 
-export function getReactionsForPost(postId) {
+export function getReactionsForPost(postId: string) {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         let reactions;
         try {
@@ -549,7 +554,7 @@ export function getReactionsForPost(postId) {
             const customEmojisByName = selectCustomEmojisByName(getState());
             const emojisToLoad = new Set<string>();
 
-            reactions.forEach((r) => {
+            reactions.forEach((r: Reaction) => {
                 const name = r.emoji_name;
 
                 if (systemEmojis.has(name)) {
@@ -585,7 +590,7 @@ export function getReactionsForPost(postId) {
     };
 }
 
-export function flagPost(postId) {
+export function flagPost(postId: string) {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         const {currentUserId} = getState().entities.users;
         const preference = {
@@ -601,7 +606,7 @@ export function flagPost(postId) {
     };
 }
 
-export function getPostThread(rootId, fetchThreads = true) {
+export function getPostThread(rootId: string, fetchThreads = true) {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         dispatch({type: PostTypes.GET_POST_THREAD_REQUEST}, getState);
 
@@ -630,7 +635,7 @@ export function getPostThread(rootId, fetchThreads = true) {
     };
 }
 
-export function getPosts(channelId, page = 0, perPage = Posts.POST_CHUNK_SIZE, fetchThreads = true) {
+export function getPosts(channelId: string, page = 0, perPage = Posts.POST_CHUNK_SIZE, fetchThreads = true) {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         let posts;
 
@@ -652,7 +657,7 @@ export function getPosts(channelId, page = 0, perPage = Posts.POST_CHUNK_SIZE, f
     };
 }
 
-export function getPostsUnread(channelId, fetchThreads = true) {
+export function getPostsUnread(channelId: string, fetchThreads = true) {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         const userId = getCurrentUserId(getState());
         let posts;
@@ -679,7 +684,7 @@ export function getPostsUnread(channelId, fetchThreads = true) {
     };
 }
 
-export function getPostsSince(channelId, since, fetchThreads = true) {
+export function getPostsSince(channelId: string, since: number, fetchThreads = true) {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         let posts;
         try {
@@ -703,7 +708,7 @@ export function getPostsSince(channelId, since, fetchThreads = true) {
     };
 }
 
-export function getPostsBefore(channelId, postId, page = 0, perPage = Posts.POST_CHUNK_SIZE, fetchThreads = true) {
+export function getPostsBefore(channelId: string, postId: string, page = 0, perPage = Posts.POST_CHUNK_SIZE, fetchThreads = true) {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         let posts;
         try {
@@ -724,7 +729,7 @@ export function getPostsBefore(channelId, postId, page = 0, perPage = Posts.POST
     };
 }
 
-export function getPostsAfter(channelId, postId, page = 0, perPage = Posts.POST_CHUNK_SIZE, fetchThreads = true) {
+export function getPostsAfter(channelId: string, postId: string, page = 0, perPage = Posts.POST_CHUNK_SIZE, fetchThreads = true) {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         let posts;
         try {
@@ -744,8 +749,14 @@ export function getPostsAfter(channelId, postId, page = 0, perPage = Posts.POST_
         return {data: posts};
     };
 }
+export type CombinedPostList = {
+    posts: Array<Post>;
+    order: Array<string>;
+    next_post_id: string;
+    prev_post_id: string;
+}
 
-export function getPostsAround(channelId, postId, perPage = Posts.POST_CHUNK_SIZE / 2, fetchThreads = true) {
+export function getPostsAround(channelId: string, postId: string, perPage = Posts.POST_CHUNK_SIZE / 2, fetchThreads = true) {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         let after;
         let thread;
@@ -764,7 +775,7 @@ export function getPostsAround(channelId, postId, perPage = Posts.POST_CHUNK_SIZ
         }
 
         // Dispatch a combined post list so that the order is correct for postsInChannel
-        const posts = {
+        const posts: CombinedPostList = {
             posts: {
                 ...after.posts,
                 ...thread.posts,
@@ -792,7 +803,7 @@ export function getPostsAround(channelId, postId, perPage = Posts.POST_CHUNK_SIZ
 
 // getThreadsForPosts is intended for an array of posts that have been batched
 // (see the actions/websocket_actions/handleNewPostEvents function in the webapp)
-export function getThreadsForPosts(posts, fetchThreads = true) {
+export function getThreadsForPosts(posts: Array<Post>, fetchThreads = true) {
     return (dispatch: DispatchFunc, getState: GetStateFunc) => {
         if (!Array.isArray(posts) || !posts.length) {
             return {data: true};
@@ -878,8 +889,8 @@ export function getProfilesAndStatusesForPosts(postsArrayOrMap: Array<Post>|Map<
     return Promise.all(promises);
 }
 
-export function getNeededAtMentionedUsernames(state, posts): Set<string> {
-    let usersByUsername; // Populate this lazily since it's relatively expensive
+export function getNeededAtMentionedUsernames(state: GlobalState, posts: Array<Post>): Set<string> {
+    let usersByUsername: Dictionary<UserProfile>; // Populate this lazily since it's relatively expensive
 
     const usernamesToLoad = new Set<string>();
 
@@ -916,12 +927,12 @@ export function getNeededAtMentionedUsernames(state, posts): Set<string> {
     return usernamesToLoad;
 }
 
-function buildPostAttachmentText(attachments) {
+function buildPostAttachmentText(attachments: Array<any>) {
     let attachmentText = '';
 
     attachments.forEach((a) => {
         if (a.fields && a.fields.length) {
-            a.fields.forEach((f) => {
+            a.fields.forEach((f: any) => {
                 attachmentText += ' ' + (f.value || '');
             });
         }
@@ -938,7 +949,7 @@ function buildPostAttachmentText(attachments) {
     return attachmentText;
 }
 
-export function getNeededCustomEmojis(state: GlobalState, posts): Set<string> {
+export function getNeededCustomEmojis(state: GlobalState, posts: Array<Post>): Set<string> {
     if (getConfig(state).EnableCustomEmoji !== 'true') {
         return new Set<string>();
     }
@@ -950,7 +961,7 @@ export function getNeededCustomEmojis(state: GlobalState, posts): Set<string> {
 
     let customEmojisToLoad = new Set<string>();
 
-    let customEmojisByName; // Populate this lazily since it's relatively expensive
+    let customEmojisByName: Map<string, CustomEmoji>; // Populate this lazily since it's relatively expensive
     const nonExistentEmoji = state.entities.emojis.nonExistentEmoji;
 
     posts.forEach((post) => {
@@ -986,17 +997,18 @@ export function getNeededCustomEmojis(state: GlobalState, posts): Set<string> {
 
     return customEmojisToLoad;
 }
+export type ExtendedPost = Post & { system_post_ids?: string[] };
 
-export function removePost(post) {
+export function removePost(post: ExtendedPost) {
     return (dispatch: DispatchFunc, getState: GetStateFunc) => {
-        if (post.type === Posts.POST_TYPES.COMBINED_USER_ACTIVITY) {
+        if (post.type === Posts.POST_TYPES.COMBINED_USER_ACTIVITY && post.system_post_ids) {
             const state = getState();
 
             for (const systemPostId of post.system_post_ids) {
                 const systemPost = Selectors.getPost(state, systemPostId);
 
                 if (systemPost) {
-                    dispatch(removePost(systemPost) as any);
+                    dispatch(removePost(systemPost as any) as any);
                 }
             }
         } else {
@@ -1005,7 +1017,7 @@ export function removePost(post) {
     };
 }
 
-export function selectPost(postId) {
+export function selectPost(postId: string) {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         dispatch({
             type: PostTypes.RECEIVED_POST_SELECTED,
@@ -1016,14 +1028,14 @@ export function selectPost(postId) {
     };
 }
 
-export function selectFocusedPostId(postId) {
+export function selectFocusedPostId(postId: string) {
     return {
         type: PostTypes.RECEIVED_FOCUSED_POST,
         data: postId,
     };
 }
 
-export function unflagPost(postId) {
+export function unflagPost(postId: string) {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         const {currentUserId} = getState().entities.users;
         const preference = {
@@ -1038,7 +1050,7 @@ export function unflagPost(postId) {
     };
 }
 
-export function getOpenGraphMetadata(url) {
+export function getOpenGraphMetadata(url: string) {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         let data;
         try {
@@ -1061,11 +1073,11 @@ export function getOpenGraphMetadata(url) {
     };
 }
 
-export function doPostAction(postId, actionId, selectedOption = '') {
+export function doPostAction(postId: string, actionId: string, selectedOption = '') {
     return doPostActionWithCookie(postId, actionId, '', selectedOption);
 }
 
-export function doPostActionWithCookie(postId, actionId, actionCookie, selectedOption = '') {
+export function doPostActionWithCookie(postId: string, actionId: string, actionCookie: string, selectedOption = '') {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         let data;
         try {
@@ -1087,7 +1099,7 @@ export function doPostActionWithCookie(postId, actionId, actionCookie, selectedO
     };
 }
 
-export function addMessageIntoHistory(message) {
+export function addMessageIntoHistory(message: string) {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         dispatch({
             type: PostTypes.ADD_MESSAGE_INTO_HISTORY,
@@ -1098,7 +1110,7 @@ export function addMessageIntoHistory(message) {
     };
 }
 
-export function resetHistoryIndex(index) {
+export function resetHistoryIndex(index: number) {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         dispatch({
             type: PostTypes.RESET_HISTORY_INDEX,
@@ -1109,7 +1121,7 @@ export function resetHistoryIndex(index) {
     };
 }
 
-export function moveHistoryIndexBack(index) {
+export function moveHistoryIndexBack(index: number) {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         dispatch({
             type: PostTypes.MOVE_HISTORY_INDEX_BACK,
@@ -1120,7 +1132,7 @@ export function moveHistoryIndexBack(index) {
     };
 }
 
-export function moveHistoryIndexForward(index) {
+export function moveHistoryIndexForward(index: number) {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         dispatch({
             type: PostTypes.MOVE_HISTORY_INDEX_FORWARD,
@@ -1131,7 +1143,7 @@ export function moveHistoryIndexForward(index) {
     };
 }
 
-export function handleNewPost(msg) {
+export function handleNewPost(msg: Omit<GenericAction, 'type'>) {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         const state = getState();
         const currentUserId = getCurrentUserId(state);
@@ -1156,7 +1168,7 @@ export function handleNewPost(msg) {
     };
 }
 
-function completePostReceive(post: Post, websocketMessageProps) {
+function completePostReceive(post: Post, websocketMessageProps: any) {
     return (dispatch: DispatchFunc, getState: GetStateFunc) => {
         const state = getState();
         const rootPost = Selectors.getPost(state, post.root_id);
@@ -1169,7 +1181,7 @@ function completePostReceive(post: Post, websocketMessageProps) {
     };
 }
 
-function lastPostActions(post, websocketMessageProps) {
+function lastPostActions(post: Post, websocketMessageProps: any) {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         const state = getState();
         const actions = [

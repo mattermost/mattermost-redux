@@ -1,5 +1,8 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
+
+import {Dictionary} from './utilities';
+
 export type TeamMembership = {
     mention_count: number;
     msg_count: number;
@@ -10,7 +13,9 @@ export type TeamMembership = {
     scheme_user: boolean;
     scheme_admin: boolean;
 };
+
 export type TeamType = 'O' | 'I';
+
 export type Team = {
     id: string;
     create_at: number;
@@ -28,14 +33,11 @@ export type Team = {
     scheme_id: string;
     group_constrained: boolean;
 };
+
 export type TeamsState = {
     currentTeamId: string;
-    teams: {
-        [x: string]: Team;
-    };
-    myMembers: {
-        [x: string]: TeamMembership;
-    };
+    teams: Dictionary<Team>;
+    myMembers: Dictionary<TeamMembership>;
     membersInTeam: any;
     stats: any;
     groupsAssociatedToTeam: any;

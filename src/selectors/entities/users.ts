@@ -11,7 +11,7 @@ import {UserProfile} from 'types/users';
 import {Reaction} from 'types/reactions';
 import {Team} from 'types/teams';
 import {Channel} from 'types/channels';
-import {RelationOneToOne, RelationOneToMany, IDMappedObjects, UsernameMappedObjects, EmailMappedObjects, $ID, $Username, $Email} from 'types/utilities';
+import {RelationOneToOne, RelationOneToMany, IDMappedObjects, UsernameMappedObjects, EmailMappedObjects, $ID, $Username, $Email, Dictionary} from 'types/utilities';
 type Filters = {
     role?: string;
     inactive?: boolean;
@@ -52,10 +52,10 @@ export function getUser(state: GlobalState, id: $ID<UserProfile>): UserProfile {
     return state.entities.users.profiles[id];
 }
 
-export const getUsersByUsername: (GlobalState) => UsernameMappedObjects<UserProfile> = createSelector(
+export const getUsersByUsername: (a: GlobalState) => UsernameMappedObjects<UserProfile> = createSelector(
     getUsers,
     (users) => {
-        const usersByUsername = {};
+        const usersByUsername: Dictionary<UserProfile> = {};
 
         for (const id in users) {
             if (users.hasOwnProperty(id)) {
@@ -72,10 +72,10 @@ export function getUserByUsername(state: GlobalState, username: $Username<UserPr
     return getUsersByUsername(state)[username];
 }
 
-export const getUsersByEmail: (GlobalState) => EmailMappedObjects<UserProfile> = createSelector(
+export const getUsersByEmail: (a: GlobalState) => EmailMappedObjects<UserProfile> = createSelector(
     getUsers,
     (users) => {
-        const usersByEmail = {};
+        const usersByEmail: Dictionary<UserProfile> = {};
 
         for (const user of Object.keys(users).map((key) => users[key])) {
             usersByEmail[user.email] = user;
@@ -89,7 +89,7 @@ export function getUserByEmail(state: GlobalState, email: $Email<UserProfile>): 
     return getUsersByEmail(state)[email];
 }
 
-export const isCurrentUserSystemAdmin: (GlobalState) => boolean = createSelector(
+export const isCurrentUserSystemAdmin: (a: GlobalState) => boolean = createSelector(
     getCurrentUser,
     (user) => {
         const roles = user.roles || '';
@@ -113,11 +113,14 @@ export const getCurrentUserRoles: (a: GlobalState) => UserProfile['roles'] = cre
     return roles.trim();
 }
 );
-export const getCurrentUserMentionKeys: (a: GlobalState) => Array<{
+
+export type UserMentionKey= {
     key: string;
     caseSensitive?: boolean;
-}> = createSelector(getCurrentUser, (user: UserProfile) => {
-    let keys: {key;caseSensitive?}[] = [];
+}
+
+export const getCurrentUserMentionKeys: (a: GlobalState) => Array<UserMentionKey> = createSelector(getCurrentUser, (user: UserProfile) => {
+    let keys: UserMentionKey[] = [];
 
     if (!user || !user.notify_props) {
         return keys;
@@ -203,7 +206,7 @@ function sortAndInjectProfiles(profiles: IDMappedObjects<UserProfile>, profileSe
 
 export const getProfiles: (a: GlobalState, b: Filters) => Array<UserProfile> = createSelector(
     getUsers,
-    (state, filters) => filters,
+    (state: GlobalState, filters: Filters) => filters,
     (profiles, filters) => {
         return sortAndInjectProfiles(filterProfiles(profiles, filters), PROFILE_SET_ALL);
     }
@@ -227,7 +230,7 @@ function filterProfiles(profiles: IDMappedObjects<UserProfile>, filters?: Filter
     return users.reduce((acc, user) => {
         acc[user.id] = user;
         return acc;
-    }, {});
+    }, {} as IDMappedObjects<UserProfile>);
 }
 
 export const getProfilesInCurrentChannel: (a: GlobalState) => Array<UserProfile> = createSelector(
@@ -257,8 +260,8 @@ export const getProfilesInCurrentTeam: (a: GlobalState) => Array<UserProfile> = 
 export const getProfilesInTeam: (a: GlobalState, b: $ID<Team>) => Array<UserProfile> = createSelector(
     getUsers,
     getUserIdsInTeams,
-    (state, teamId) => teamId,
-    (state, teamId, filters) => filters,
+    (state: GlobalState, teamId: string) => teamId,
+    (state: GlobalState, teamId, filters) => filters,
     (profiles, usersInTeams, teamId, filters) => {
         return sortAndInjectProfiles(filterProfiles(profiles, filters), usersInTeams[teamId] || new Set());
     }
@@ -275,7 +278,7 @@ export const getProfilesNotInCurrentTeam: (a: GlobalState) => Array<UserProfile>
 export const getProfilesWithoutTeam: (a: GlobalState, filters?: Filters) => Array<UserProfile> = createSelector(
     getUsers,
     getUserIdsWithoutTeam,
-    (state, filters) => filters,
+    (state: GlobalState, filters: Filters) => filters,
     (profiles, withoutTeamProfileSet, filters) => {
         return sortAndInjectProfiles(filterProfiles(profiles, filters), withoutTeamProfileSet);
     }
@@ -375,7 +378,7 @@ export const shouldShowTermsOfService: (a: GlobalState) => boolean = createSelec
         const acceptedAt = user ? user.terms_of_service_create_at : 0;
 
         const featureEnabled = license.IsLicensed === 'true' && config.EnableCustomTermsOfService === 'true';
-        const reacceptanceTime = config.CustomTermsOfServiceReAcceptancePeriod * 1000 * 60 * 60 * 24;
+        const reacceptanceTime = parseInt(config.CustomTermsOfServiceReAcceptancePeriod!, 10) * 1000 * 60 * 60 * 24;
         const timeElapsed = new Date().getTime() - acceptedAt;
         return Boolean(user && featureEnabled && (config.CustomTermsOfServiceId !== acceptedTermsId || timeElapsed > reacceptanceTime));
     }
@@ -398,7 +401,7 @@ export const getUsersInVisibleDMs: (a: GlobalState) => Array<UserProfile> = crea
 export function makeGetProfilesForReactions(): (a: GlobalState, b: Array<Reaction>) => Array<UserProfile> {
     return createSelector(
         getUsers,
-        (state, reactions) => reactions,
+        (state: GlobalState, reactions: Array<Reaction>) => reactions,
         (users, reactions) => {
             const profiles: UserProfile[] = [];
             reactions.forEach((r) => {
@@ -415,7 +418,7 @@ export function makeGetProfilesInChannel(): (a: GlobalState, b: $ID<Channel>, c:
     return createSelector(
         getUsers,
         getUserIdsInChannels,
-        (state, channelId) => channelId,
+        (state: GlobalState, channelId: string) => channelId,
         (state, channelId, skipInactive) => skipInactive,
         (users, userIds, channelId, skipInactive = false) => {
             const userIdsInChannel = userIds[channelId];
@@ -433,7 +436,7 @@ export function makeGetProfilesNotInChannel(): (a: GlobalState, b: $ID<Channel>,
     return createSelector(
         getUsers,
         getUserIdsNotInChannels,
-        (state, channelId) => channelId,
+        (state: GlobalState, channelId: string) => channelId,
         (state, channelId, skipInactive) => skipInactive,
         (users, userIds, channelId, skipInactive = false) => {
             const userIdsInChannel = userIds[channelId];
@@ -451,9 +454,9 @@ export function makeGetProfilesByIdsAndUsernames(): (a: GlobalState, b: {allUser
     return createSelector(
         getUsers,
         getUsersByUsername,
-        (state, props) => props.allUserIds,
+        (state: GlobalState, props: {allUserIds: Array<$ID<UserProfile>>; allUsernames: Array<$Username<UserProfile>>}) => props.allUserIds,
         (state, props) => props.allUsernames,
-        (allProfilesById, allProfilesByUsername, allUserIds, allUsernames) => {
+        (allProfilesById: Dictionary<UserProfile>, allProfilesByUsername: Dictionary<UserProfile>, allUserIds: Array<string>, allUsernames: Array<string>) => {
             const userProfiles: UserProfile[] = [];
 
             if (allUserIds && allUserIds.length > 0) {
@@ -483,11 +486,11 @@ export function makeGetProfilesByIdsAndUsernames(): (a: GlobalState, b: {allUser
 
 export function makeGetDisplayName(): (a: GlobalState, b: $ID<UserProfile>, c: boolean) => string {
     return createSelector(
-        (state, userId) => getUser(state, userId),
+        (state: GlobalState, userId: string) => getUser(state, userId),
         getTeammateNameDisplaySetting,
         (state, _, useFallbackUsername = true) => useFallbackUsername,
         (user, teammateNameDisplaySetting, useFallbackUsername) => {
-            return displayUsername(user, teammateNameDisplaySetting, useFallbackUsername);
+            return displayUsername(user, teammateNameDisplaySetting!, useFallbackUsername);
         }
     );
 }

@@ -8,6 +8,7 @@ import {getCurrentUserLocale} from 'selectors/entities/i18n';
 import {sortFileInfos} from 'utils/file_utils';
 
 import * as types from 'types';
+import {GlobalState} from 'types/store';
 
 function getAllFiles(state: types.store.GlobalState) {
     return state.entities.files.files;
@@ -21,7 +22,7 @@ function getFilesIdsForPost(state: types.store.GlobalState, postId: string) {
     return [];
 }
 
-export function getFilePublicLink(state) {
+export function getFilePublicLink(state: GlobalState) {
     return state.entities.files.filePublicLink;
 }
 
