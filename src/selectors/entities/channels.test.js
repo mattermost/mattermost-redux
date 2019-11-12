@@ -25,6 +25,7 @@ describe('Selectors.Channels', () => {
     channel1.display_name = 'Channel Name';
     channel1.name = 'Name';
     channel1.last_post_at = Date.now();
+    channel1.total_msg_count = 10;
 
     const channel2 = TestHelper.fakeChannelWithId(team1.id);
     channel2.total_msg_count = 2;
@@ -145,7 +146,7 @@ describe('Selectors.Channels', () => {
     membersInChannel[channel13.id][user2.id] = {channel_id: channel13.id, user_id: user2.id};
 
     const myMembers = {};
-    myMembers[channel1.id] = {channel_id: channel1.id, user_id: user.id};
+    myMembers[channel1.id] = {channel_id: channel1.id, user_id: user.id, msg_count: 10};
     myMembers[channel2.id] = {channel_id: channel2.id, user_id: user.id, msg_count: 1, mention_count: 1, notify_props: {}};
     myMembers[channel3.id] = {channel_id: channel3.id, user_id: user.id, msg_count: 1, mention_count: 1, notify_props: {}};
     myMembers[channel4.id] = {channel_id: channel4.id, user_id: user.id};
@@ -276,6 +277,32 @@ describe('Selectors.Channels', () => {
 
     it('get unreads', () => {
         assert.deepEqual(Selectors.getUnreads(testState), {messageCount: 4, mentionCount: 4});
+    });
+
+    it('get unreads for current read channel', () => {
+        assert.equal(Selectors.countCurrentChannelUnreadMessages(testState), 0);
+    });
+
+    it('get unreads for current unread channel', () => {
+        const testState2 = {...testState,
+            entities: {...testState.entities,
+                channels: {...testState.entities.channels,
+                    currentChannelId: channel2.id,
+                },
+            },
+        };
+        assert.equal(Selectors.countCurrentChannelUnreadMessages(testState2), 1);
+    });
+
+    it('get unreads for channel not on members', () => {
+        const testState2 = {...testState,
+            entities: {...testState.entities,
+                channels: {...testState.entities.channels,
+                    currentChannelId: 'some_other_id',
+                },
+            },
+        };
+        assert.equal(Selectors.countCurrentChannelUnreadMessages(testState2), 0);
     });
 
     it('get unreads with a missing profile entity', () => {
@@ -1751,3 +1778,7 @@ describe('getMyFirstChannelForTeams', () => {
         });
     });
 });
+
+describe('see how many unread items there are', () => {
+
+})
