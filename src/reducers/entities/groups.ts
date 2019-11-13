@@ -2,9 +2,13 @@
 // See LICENSE.txt for license information.
 import {combineReducers} from 'redux';
 import {GroupTypes} from 'action_types';
-import {GroupChannel, GroupSyncables, GroupTeam} from 'types/groups';
+import {GroupChannel, GroupSyncables, GroupTeam, Group} from 'types/groups';
+import {GenericAction} from 'types/actions';
+import {Team, TeamMembership} from 'types/teams';
+import {ChannelMembership} from 'types/channels';
+import {Dictionary} from 'types/utilities';
 
-function syncables(state = {}, action) {
+function syncables(state: Dictionary<GroupSyncables> = {}, action: GenericAction) {
     switch (action.type) {
     case GroupTypes.RECEIVED_GROUP_TEAMS: {
         return {
@@ -117,7 +121,7 @@ function syncables(state = {}, action) {
     }
 }
 
-function members(state = {}, action) {
+function members(state: any = {}, action: GenericAction) {
     switch (action.type) {
     case GroupTypes.RECEIVED_GROUP_MEMBERS: {
         return {
@@ -133,7 +137,7 @@ function members(state = {}, action) {
     }
 }
 
-function groups(state = {}, action) {
+function groups(state: Dictionary<Group> = {}, action: GenericAction) {
     switch (action.type) {
     case GroupTypes.RECEIVED_GROUP: {
         return {

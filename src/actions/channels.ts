@@ -573,7 +573,7 @@ export function getMyChannelMembers(teamId: string): ActionFunc {
 
 export function getChannelMembers(channelId: string, page = 0, perPage: number = General.CHANNELS_CHUNK_SIZE): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
-        let channelMembers;
+        let channelMembers: ChannelMembership[];
 
         try {
             const channelMembersRequest = Client4.getChannelMembers(channelId, page, perPage);

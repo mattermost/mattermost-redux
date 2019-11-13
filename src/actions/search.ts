@@ -12,6 +12,7 @@ import {getProfilesAndStatusesForPosts, receivedPosts} from './posts';
 import {ActionResult, batchActions, DispatchFunc, GetStateFunc, ActionFunc} from 'types/actions';
 import {RelationOneToOne} from 'types/utilities';
 import {Post} from 'types/posts';
+import {SearchParameter} from 'types/search';
 const WEBAPP_SEARCH_PER_PAGE = 20;
 export function getMissingChannelsFromPosts(posts: RelationOneToOne<Post, Post>): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
@@ -36,7 +37,7 @@ export function getMissingChannelsFromPosts(posts: RelationOneToOne<Post, Post>)
     };
 }
 
-export function searchPostsWithParams(teamId, params): ActionFunc {
+export function searchPostsWithParams(teamId: string, params: SearchParameter): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         const isGettingMore = params.page > 0;
         dispatch({
@@ -85,7 +86,7 @@ export function searchPostsWithParams(teamId, params): ActionFunc {
     };
 }
 
-export function searchPosts(teamId, terms, isOrSearch, includeDeletedChannels) {
+export function searchPosts(teamId: string, terms: string, isOrSearch: boolean, includeDeletedChannels: boolean) {
     return searchPostsWithParams(teamId, {terms, is_or_search: isOrSearch, include_deleted_channels: includeDeletedChannels, page: 0, per_page: WEBAPP_SEARCH_PER_PAGE});
 }
 
@@ -147,7 +148,7 @@ export function getFlaggedPosts(): ActionFunc {
     };
 }
 
-export function getPinnedPosts(channelId): ActionFunc {
+export function getPinnedPosts(channelId: string): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         dispatch({type: SearchTypes.SEARCH_PINNED_POSTS_REQUEST});
 
@@ -186,7 +187,7 @@ export function getPinnedPosts(channelId): ActionFunc {
     };
 }
 
-export function clearPinnedPosts(channelId): ActionFunc {
+export function clearPinnedPosts(channelId: string): ActionFunc {
     return async (dispatch) => {
         dispatch({
             type: SearchTypes.REMOVE_SEARCH_PINNED_POSTS,
@@ -245,7 +246,7 @@ export function getRecentMentions(): ActionFunc {
     };
 }
 
-export function removeSearchTerms(teamId, terms): ActionFunc {
+export function removeSearchTerms(teamId: string, terms: string): ActionFunc {
     return async (dispatch) => {
         dispatch({
             type: SearchTypes.REMOVE_SEARCH_TERM,

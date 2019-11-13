@@ -5,8 +5,9 @@ import {combineReducers} from 'redux';
 import {AdminTypes, UserTypes} from 'action_types';
 import {Stats, Plugins} from '../../constants';
 import PluginState from '../../constants/plugins';
+import {GenericAction} from 'types/actions';
 
-function logs(state = [], action) {
+function logs(state = [], action: GenericAction) {
     switch (action.type) {
     case AdminTypes.RECEIVED_LOGS: {
         return action.data;
@@ -19,7 +20,7 @@ function logs(state = [], action) {
     }
 }
 
-function audits(state = {}, action) {
+function audits(state: any = {}, action: GenericAction) {
     switch (action.type) {
     case AdminTypes.RECEIVED_AUDITS: {
         const nextState = {...state};
@@ -36,7 +37,7 @@ function audits(state = {}, action) {
     }
 }
 
-function config(state: any = {}, action) {
+function config(state: any = {}, action: GenericAction) {
     switch (action.type) {
     case AdminTypes.RECEIVED_CONFIG: {
         return action.data;
@@ -63,7 +64,7 @@ function config(state: any = {}, action) {
     }
 }
 
-function environmentConfig(state = {}, action) {
+function environmentConfig(state: any = {}, action: GenericAction) {
     switch (action.type) {
     case AdminTypes.RECEIVED_ENVIRONMENT_CONFIG: {
         return action.data;
@@ -76,7 +77,7 @@ function environmentConfig(state = {}, action) {
     }
 }
 
-function complianceReports(state = {}, action) {
+function complianceReports(state: any = {}, action: GenericAction) {
     switch (action.type) {
     case AdminTypes.RECEIVED_COMPLIANCE_REPORT: {
         const nextState = {...state};
@@ -98,7 +99,7 @@ function complianceReports(state = {}, action) {
     }
 }
 
-function clusterInfo(state = [], action) {
+function clusterInfo(state = [], action: GenericAction) {
     switch (action.type) {
     case AdminTypes.RECEIVED_CLUSTER_STATUS: {
         return action.data;
@@ -111,7 +112,7 @@ function clusterInfo(state = [], action) {
     }
 }
 
-function samlCertStatus(state = {}, action) {
+function samlCertStatus(state: any = {}, action: GenericAction) {
     switch (action.type) {
     case AdminTypes.RECEIVED_SAML_CERT_STATUS: {
         return action.data;
@@ -124,8 +125,8 @@ function samlCertStatus(state = {}, action) {
     }
 }
 
-export function convertAnalyticsRowsToStats(data, name) {
-    const stats = {};
+export function convertAnalyticsRowsToStats(data: any, name: string) {
+    const stats: any = {};
     const clonedData = [...data];
 
     if (name === 'post_counts_day') {
@@ -210,7 +211,7 @@ export function convertAnalyticsRowsToStats(data, name) {
     return stats;
 }
 
-function analytics(state = {}, action) {
+function analytics(state: any = {}, action: GenericAction) {
     switch (action.type) {
     case AdminTypes.RECEIVED_SYSTEM_ANALYTICS: {
         const stats = convertAnalyticsRowsToStats(action.data, action.name);
@@ -224,7 +225,7 @@ function analytics(state = {}, action) {
     }
 }
 
-function teamAnalytics(state = {}, action) {
+function teamAnalytics(state: any = {}, action: GenericAction) {
     switch (action.type) {
     case AdminTypes.RECEIVED_TEAM_ANALYTICS: {
         const nextState = {...state};
@@ -241,13 +242,13 @@ function teamAnalytics(state = {}, action) {
     }
 }
 
-function userAccessTokens(state = {}, action) {
+function userAccessTokens(state: any = {}, action: GenericAction) {
     switch (action.type) {
     case AdminTypes.RECEIVED_USER_ACCESS_TOKEN: {
         return {...state, [action.data.id]: action.data};
     }
     case AdminTypes.RECEIVED_USER_ACCESS_TOKENS_FOR_USER: {
-        const nextState = {};
+        const nextState: any = {};
 
         for (const uat of action.data) {
             nextState[uat.id] = uat;
@@ -256,7 +257,7 @@ function userAccessTokens(state = {}, action) {
         return {...state, ...nextState};
     }
     case AdminTypes.RECEIVED_USER_ACCESS_TOKENS: {
-        const nextState = {};
+        const nextState: any = {};
 
         for (const uat of action.data) {
             nextState[uat.id] = uat;
@@ -284,7 +285,7 @@ function userAccessTokens(state = {}, action) {
     }
 }
 
-function userAccessTokensForUser(state = {}, action) {
+function userAccessTokensForUser(state: any = {}, action: GenericAction) {
     switch (action.type) {
     case AdminTypes.RECEIVED_USER_ACCESS_TOKEN: {
         const nextUserState = {...(state[action.data.user_id] || {})};
@@ -302,7 +303,7 @@ function userAccessTokensForUser(state = {}, action) {
         return {...state, [action.userId]: nextUserState};
     }
     case AdminTypes.RECEIVED_USER_ACCESS_TOKENS: {
-        const nextUserState = {};
+        const nextUserState: any = {};
 
         for (const uat of action.data) {
             nextUserState[uat.user_id] = nextUserState[uat.user_id] || {};
@@ -360,7 +361,7 @@ function userAccessTokensForUser(state = {}, action) {
     }
 }
 
-function plugins(state = {}, action) {
+function plugins(state: any = {}, action: GenericAction) {
     switch (action.type) {
     case AdminTypes.RECEIVED_PLUGINS: {
         const nextState = {...state};
@@ -406,10 +407,10 @@ function plugins(state = {}, action) {
     }
 }
 
-function pluginStatuses(state = {}, action) {
+function pluginStatuses(state: any = {}, action: GenericAction) {
     switch (action.type) {
     case AdminTypes.RECEIVED_PLUGIN_STATUSES: {
-        const nextState = {};
+        const nextState: any = {};
 
         for (const plugin of (action.data || [])) {
             const id = plugin.plugin_id;
@@ -492,7 +493,7 @@ function pluginStatuses(state = {}, action) {
     }
 }
 
-function ldapGroupsCount(state = {}, action) {
+function ldapGroupsCount(state: any = {}, action: GenericAction) {
     switch (action.type) {
     case AdminTypes.RECEIVED_LDAP_GROUPS:
         return action.data.count;
@@ -503,10 +504,10 @@ function ldapGroupsCount(state = {}, action) {
     }
 }
 
-function ldapGroups(state = {}, action) {
+function ldapGroups(state: any = {}, action: GenericAction) {
     switch (action.type) {
     case AdminTypes.RECEIVED_LDAP_GROUPS: {
-        const nextState = {};
+        const nextState: any = {};
         for (const group of action.data.groups) {
             nextState[group.primary_key] = group;
         }

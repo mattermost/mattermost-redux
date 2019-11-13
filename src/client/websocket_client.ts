@@ -5,12 +5,12 @@ const MIN_WEBSOCKET_RETRY_TIME = 3000; // 3 sec
 
 const MAX_WEBSOCKET_RETRY_TIME = 300000; // 5 mins
 
-let Socket;
+let Socket: any;
 
 class WebSocketClient {
     conn?: WebSocket;
     connectionUrl: null;
-    token: null;
+    token: string|null;
     sequence: number;
     connectFailCount: number;
     eventCallback?: Function;
@@ -32,7 +32,7 @@ class WebSocketClient {
         this.platform = '';
     }
 
-    initialize(token, opts) {
+    initialize(token: string|null, opts: any) {
         const defaults = {
             forceConnection: true,
             connectionUrl: this.connectionUrl,
@@ -182,27 +182,27 @@ class WebSocketClient {
         });
     }
 
-    setConnectingCallback(callback) {
+    setConnectingCallback(callback: Function) {
         this.connectingCallback = callback;
     }
 
-    setEventCallback(callback) {
+    setEventCallback(callback: Function) {
         this.eventCallback = callback;
     }
 
-    setFirstConnectCallback(callback) {
+    setFirstConnectCallback(callback: Function) {
         this.firstConnectCallback = callback;
     }
 
-    setReconnectCallback(callback) {
+    setReconnectCallback(callback: Function) {
         this.reconnectCallback = callback;
     }
 
-    setErrorCallback(callback) {
+    setErrorCallback(callback: Function) {
         this.errorCallback = callback;
     }
 
-    setCloseCallback(callback) {
+    setCloseCallback(callback: Function) {
         this.closeCallback = callback;
     }
 
@@ -218,7 +218,7 @@ class WebSocketClient {
         }
     }
 
-    sendMessage(action, data) {
+    sendMessage(action: string, data: any) {
         const msg = {
             action,
             seq: this.sequence++,
@@ -233,7 +233,7 @@ class WebSocketClient {
         }
     }
 
-    userTyping(channelId, parentId) {
+    userTyping(channelId: string, parentId: string) {
         this.sendMessage('user_typing', {
             channel_id: channelId,
             parent_id: parentId,
@@ -244,7 +244,7 @@ class WebSocketClient {
         this.sendMessage('get_statuses', null);
     }
 
-    getStatusesByIds(userIds) {
+    getStatusesByIds(userIds: string[]) {
         this.sendMessage('get_statuses_by_ids', {
             user_ids: userIds,
         });

@@ -3,16 +3,20 @@
 
 import {combineReducers} from 'redux';
 import {FileTypes, PostTypes, UserTypes} from 'action_types';
+import {GenericAction} from 'types/actions';
+import {Post} from 'types/posts';
+import {FileInfo} from 'types/files';
+import {Dictionary} from 'types/utilities';
 
-export function files(state = {}, action) {
+export function files(state: Dictionary<FileInfo> = {}, action: GenericAction) {
     switch (action.type) {
     case FileTypes.RECEIVED_UPLOAD_FILES:
     case FileTypes.RECEIVED_FILES_FOR_POST: {
-        const filesById = action.data.reduce((filesMap, file) => {
+        const filesById = action.data.reduce((filesMap: any, file: any) => {
             return {...filesMap,
                 [file.id]: file,
             };
-        }, {});
+        }, {} as any);
         return {...state,
             ...filesById,
         };
@@ -35,7 +39,7 @@ export function files(state = {}, action) {
     case PostTypes.POST_REMOVED: {
         if (action.data && action.data.file_ids && action.data.file_ids.length) {
             const nextState = {...state};
-            const fileIds = action.data.file_ids;
+            const fileIds = action.data.file_ids as string[];
             fileIds.forEach((id) => {
                 Reflect.deleteProperty(nextState, id);
             });
@@ -53,7 +57,7 @@ export function files(state = {}, action) {
     }
 }
 
-function storeFilesForPost(state, post) {
+function storeFilesForPost(state: Dictionary<FileInfo>, post: Post) {
     if (!post.metadata || !post.metadata.files) {
         return state;
     }
@@ -71,13 +75,13 @@ function storeFilesForPost(state, post) {
     }, state);
 }
 
-export function fileIdsByPostId(state = {}, action) {
+export function fileIdsByPostId(state: Dictionary<Array<string>> = {}, action: GenericAction) {
     switch (action.type) {
     case FileTypes.RECEIVED_FILES_FOR_POST: {
         const {data, postId} = action;
-        const filesIdsForPost = data.map((file) => file.id);
+        const filesIdsForPost = data.map((file: FileInfo) => file.id);
         return {...state,
-            [postId]: filesIdsForPost,
+            [postId as string]: filesIdsForPost,
         };
     }
 
@@ -112,7 +116,7 @@ export function fileIdsByPostId(state = {}, action) {
     }
 }
 
-function storeFilesIdsForPost(state, post) {
+function storeFilesIdsForPost(state: Dictionary<string[]>, post: Post) {
     if (!post.metadata || !post.metadata.files) {
         return state;
     }
@@ -123,7 +127,7 @@ function storeFilesIdsForPost(state, post) {
     };
 }
 
-function filePublicLink(state = {}, action) {
+function filePublicLink(state: string | null = null, action: GenericAction) {
     switch (action.type) {
     case FileTypes.RECEIVED_FILE_PUBLIC_LINK: {
         return action.data;
