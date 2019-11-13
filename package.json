@@ -37,7 +37,7 @@
     "redux-thunk": "2.3.0",
     "remote-redux-devtools": "0.5.16",
     "reselect": "4.0.0",
-    "serialize-error": "5.0.0",
+    "serialize-error": "2.1.0",
     "shallow-equals": "1.0.0"
   },
   "husky": {
