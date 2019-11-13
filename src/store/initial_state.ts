@@ -94,9 +94,6 @@ const state: GlobalState = {
             systemCommands: {},
             commands: {},
         },
-        plugins: {
-            marketplacePlugins: [],
-        },
         files: {
             files: {},
             fileIdsByPostId: {},
