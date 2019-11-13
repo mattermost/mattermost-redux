@@ -3,10 +3,14 @@
 import {combineReducers} from 'redux';
 import {ChannelTypes, UserTypes, SchemeTypes, GroupTypes} from 'action_types';
 import {General} from '../../constants';
+import {GenericAction} from 'types/actions';
+import {Channel, ChannelMembership, ChannelStats} from 'types/channels';
+import {RelationOneToMany, RelationOneToOne, IDMappedObjects, UserIDMappedObjects} from 'types/utilities';
+import {Team} from 'types/teams';
 
-function channelListToSet(state, action) {
+function channelListToSet(state: any, action: GenericAction) {
     const nextState = {...state};
-    action.data.forEach((channel) => {
+    action.data.forEach((channel: Channel) => {
         const nextSet = new Set(nextState[channel.team_id]);
         nextSet.add(channel.id);
         nextState[channel.team_id] = nextSet;
@@ -15,7 +19,7 @@ function channelListToSet(state, action) {
     return nextState;
 }
 
-function removeChannelFromSet(state, action) {
+function removeChannelFromSet(state: any, action: GenericAction) {
     const id = action.data.team_id;
     const nextSet = new Set(state[id]);
     nextSet.delete(action.data.id);
@@ -25,7 +29,7 @@ function removeChannelFromSet(state, action) {
     };
 }
 
-function currentChannelId(state = '', action) {
+function currentChannelId(state = '', action: GenericAction) {
     switch (action.type) {
     case ChannelTypes.SELECT_CHANNEL:
         return action.data;
@@ -36,7 +40,7 @@ function currentChannelId(state = '', action) {
     }
 }
 
-function channels(state = {}, action) {
+function channels(state: IDMappedObjects<Channel> = {}, action: GenericAction) {
     switch (action.type) {
     case ChannelTypes.RECEIVED_CHANNEL:
         if (state[action.data.id] && action.data.type === General.DM_CHANNEL) {
@@ -145,7 +149,7 @@ function channels(state = {}, action) {
     }
 }
 
-function channelsInTeam(state = {}, action) {
+function channelsInTeam(state: RelationOneToMany<Team, Channel> = {}, action: GenericAction) {
     switch (action.type) {
     case ChannelTypes.RECEIVED_CHANNEL: {
         const nextSet = new Set(state[action.data.team_id]);
@@ -171,7 +175,7 @@ function channelsInTeam(state = {}, action) {
     }
 }
 
-function myMembers(state = {}, action) {
+function myMembers(state: RelationOneToOne<Channel, ChannelMembership> = {}, action: GenericAction) {
     switch (action.type) {
     case ChannelTypes.RECEIVED_MY_CHANNEL_MEMBER: {
         const channelMember = action.data;
@@ -181,10 +185,10 @@ function myMembers(state = {}, action) {
         };
     }
     case ChannelTypes.RECEIVED_MY_CHANNEL_MEMBERS: {
-        const nextState = {...state};
-        const remove = action.remove;
+        const nextState: any = {...state};
+        const remove = action.remove as string[];
         if (remove) {
-            remove.forEach((id) => {
+            remove.forEach((id: string) => {
                 Reflect.deleteProperty(nextState, id);
             });
         }
@@ -310,7 +314,7 @@ function myMembers(state = {}, action) {
     }
 }
 
-function membersInChannel(state = {}, action) {
+function membersInChannel(state: RelationOneToOne<Channel, UserIDMappedObjects<ChannelMembership>> = {}, action: GenericAction) {
     switch (action.type) {
     case ChannelTypes.RECEIVED_MY_CHANNEL_MEMBER:
     case ChannelTypes.RECEIVED_CHANNEL_MEMBER: {
@@ -325,7 +329,7 @@ function membersInChannel(state = {}, action) {
     case ChannelTypes.RECEIVED_MY_CHANNEL_MEMBERS:
     case ChannelTypes.RECEIVED_CHANNEL_MEMBERS: {
         const nextState = {...state};
-        const remove = action.remove;
+        const remove = action.remove as string[];
         const currentUserId = action.currentUserId;
         if (remove && currentUserId) {
             remove.forEach((id) => {
@@ -372,7 +376,7 @@ function membersInChannel(state = {}, action) {
     }
 }
 
-function stats(state = {}, action) {
+function stats(state: RelationOneToOne<Channel, ChannelStats> = {}, action: GenericAction) {
     switch (action.type) {
     case ChannelTypes.RECEIVED_CHANNEL_STATS: {
         const nextState = {...state};
@@ -422,7 +426,7 @@ function stats(state = {}, action) {
     }
 }
 
-function groupsAssociatedToChannel(state = {}, action) {
+function groupsAssociatedToChannel(state: any = {}, action: GenericAction) {
     switch (action.type) {
     case GroupTypes.RECEIVED_GROUPS_ASSOCIATED_TO_CHANNEL: {
         const {channelID, groups, totalGroupCount} = action.data;
@@ -460,7 +464,7 @@ function groupsAssociatedToChannel(state = {}, action) {
     }
 }
 
-function updateChannelMemberSchemeRoles(state, action) {
+function updateChannelMemberSchemeRoles(state: any, action: GenericAction) {
     const {channelId, userId, isSchemeUser, isSchemeAdmin} = action.data;
     const channel = state[channelId];
     if (channel) {
@@ -482,7 +486,7 @@ function updateChannelMemberSchemeRoles(state, action) {
     return state;
 }
 
-function totalCount(state = 0, action) {
+function totalCount(state = 0, action: GenericAction) {
     switch (action.type) {
     case ChannelTypes.RECEIVED_TOTAL_CHANNEL_COUNT: {
         return action.data;

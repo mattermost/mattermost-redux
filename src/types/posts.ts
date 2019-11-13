@@ -77,7 +77,7 @@ export type PostWithFormatData = Post & {
     isFirstReply: boolean;
     isLastReply: boolean;
     previousPostIsComment: boolean;
-    commentedOnPost: Post;
+    commentedOnPost?: Post;
     consecutivePostByUser: boolean;
     replyCount: number;
     isCommentMention: boolean;
@@ -86,32 +86,27 @@ export type PostWithFormatData = Post & {
 
 export type PostOrderBlock = {
     order: Array<string>;
-    recent: boolean;
-    oldest: boolean;
+    recent?: boolean;
+    oldest?: boolean;
+};
+
+export type MessageHistory = {
+    messages: Array<string>;
+    index: {
+        post: number;
+        comment: number;
+    };
 };
 
 export type PostsState = {
     posts: IDMappedObjects<Post>;
-    postsInChannel: {
-        [x: string]: Array<PostOrderBlock>;
-    };
+    postsInChannel: Dictionary<Array<PostOrderBlock>>;
     postsInThread: RelationOneToMany<Post, Post>;
-    reactions: RelationOneToOne<
-        Post,
-        {
-            [x: string]: Reaction;
-        }
-        >;
+    reactions: RelationOneToOne<Post, Dictionary<Reaction>>;
     openGraph: RelationOneToOne<Post, any>;
     pendingPostIds: Array<string>;
     selectedPostId: string;
     currentFocusedPostId: string;
-    messagesHistory: {
-        messages: Array<string>;
-        index: {
-            post: number;
-            comment: number;
-        };
-    };
-    expandedURLs: { [x: string]: string};
+    messagesHistory: MessageHistory;
+    expandedURLs: Dictionary<string>;
 };

@@ -30,7 +30,7 @@ function jobsByTypeList(state: JobsByType = {}, action: GenericAction): JobsByTy
     case JobTypes.RECEIVED_JOBS_BY_TYPE: {
         const nextState = {...state};
         if (action.data && action.data.length && action.data.length > 0) {
-            nextState[action.data[0].type] = action.data;
+            nextState[action.data[0].type as JobType] = action.data;
         }
         return nextState;
     }

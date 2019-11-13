@@ -1262,6 +1262,57 @@ describe('Actions.Channels', () => {
         assert.ifError(myMembers[channel.id]);
     });
 
+    it('getArchivedChannels', async () => {
+        const userClient = TestHelper.createClient4();
+
+        nock(Client4.getUsersRoute()).
+            post('').
+            query(true).
+            reply(201, TestHelper.fakeUserWithId());
+
+        const user = await TestHelper.basicClient4.createUser(
+            TestHelper.fakeUser(),
+            null,
+            null,
+            TestHelper.basicTeam.invite_id
+        );
+
+        nock(Client4.getUsersRoute()).
+            post('/login').
+            reply(200, user);
+
+        await userClient.login(user.email, 'password1');
+
+        nock(Client4.getChannelsRoute()).
+            post('').
+            reply(201, TestHelper.fakeChannelWithId(TestHelper.basicTeam.id));
+
+        const userChannel = await userClient.createChannel(
+            TestHelper.fakeChannel(TestHelper.basicTeam.id)
+        );
+
+        nock(Client4.getTeamsRoute()).
+            get(`/${TestHelper.basicTeam.id}/channels/deleted`).
+            query(true).
+            reply(200, [TestHelper.basicChannel, userChannel]);
+
+        await store.dispatch(Actions.getArchivedChannels(TestHelper.basicTeam.id, 0));
+
+        const moreRequest = store.getState().requests.channels.getChannels;
+        if (moreRequest.status === RequestStatus.FAILURE) {
+            throw new Error(JSON.stringify(moreRequest.error));
+        }
+
+        const {channels, channelsInTeam, myMembers} = store.getState().entities.channels;
+        const channel = channels[userChannel.id];
+        const team = channelsInTeam[userChannel.team_id];
+
+        assert.ok(channel);
+        assert.ok(team);
+        assert.ok(team.has(userChannel.id));
+        assert.ifError(myMembers[channel.id]);
+    });
+
     it('getAllChannels', async () => {
         const userClient = TestHelper.createClient4();
 
@@ -1392,6 +1443,49 @@ describe('Actions.Channels', () => {
         const {data} = await store.dispatch(Actions.searchAllChannels('test', 0));
 
         const moreRequest = store.getState().requests.channels.getAllChannels;
+        if (moreRequest.status === RequestStatus.FAILURE) {
+            throw new Error(JSON.stringify(moreRequest.error));
+        }
+
+        assert.ok(data.length === 2);
+    });
+
+    it('searchArchivedChannels', async () => {
+        const userClient = TestHelper.createClient4();
+
+        nock(Client4.getUsersRoute()).
+            post('').
+            query(true).
+            reply(201, TestHelper.fakeUserWithId());
+
+        const user = await TestHelper.basicClient4.createUser(
+            TestHelper.fakeUser(),
+            null,
+            null,
+            TestHelper.basicTeam.invite_id
+        );
+
+        nock(Client4.getUsersRoute()).
+            post('/login').
+            reply(200, user);
+
+        await userClient.login(user.email, 'password1');
+
+        nock(Client4.getChannelsRoute()).
+            post('').
+            reply(201, TestHelper.fakeChannelWithId(TestHelper.basicTeam.id));
+
+        const userChannel = await userClient.createChannel(
+            TestHelper.fakeChannel(TestHelper.basicTeam.id)
+        );
+
+        nock(Client4.getTeamsRoute()).
+            post(`/${TestHelper.basicTeam.id}/channels/search_archived`).
+            reply(200, [TestHelper.basicChannel, userChannel]);
+
+        const {data} = await store.dispatch(Actions.searchChannels(TestHelper.basicTeam.id, 'test', true));
+
+        const moreRequest = store.getState().requests.channels.getChannels;
         if (moreRequest.status === RequestStatus.FAILURE) {
             throw new Error(JSON.stringify(moreRequest.error));
         }

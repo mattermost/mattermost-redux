@@ -16,15 +16,23 @@ export const DATE_LINE = 'date-';
 export const START_OF_NEW_MESSAGES = 'start-of-new-messages';
 export const MAX_COMBINED_SYSTEM_POSTS = 100;
 
-function shouldShowJoinLeaveMessages(state) {
+import {GlobalState} from 'types/store';
+
+function shouldShowJoinLeaveMessages(state: GlobalState) {
     // This setting is true or not set if join/leave messages are to be displayed
     return getBool(state, Preferences.CATEGORY_ADVANCED_SETTINGS, Preferences.ADVANCED_FILTER_JOIN_LEAVE, true);
+}
+
+interface PostFilterOptions {
+    postIds: string[];
+    lastViewedAt: number;
+    indicateNewMessages: boolean;
 }
 
 export function makePreparePostIdsForPostList() {
     const filterPostsAndAddSeparators = makeFilterPostsAndAddSeparators();
     const combineUserActivityPosts = makeCombineUserActivityPosts();
-    return (state, options) => {
+    return (state: GlobalState, options: PostFilterOptions) => {
         let postIds = filterPostsAndAddSeparators(state, options);
         postIds = combineUserActivityPosts(state, postIds);
         return postIds;
@@ -38,9 +46,9 @@ export function makeFilterPostsAndAddSeparators() {
     const getPostsForIds = makeGetPostsForIds();
 
     return createIdsSelector(
-        (state, {postIds}) => getPostsForIds(state, postIds),
-        (state, {lastViewedAt}) => lastViewedAt,
-        (state, {indicateNewMessages}) => indicateNewMessages,
+        (state: GlobalState, {postIds}: PostFilterOptions) => getPostsForIds(state, postIds),
+        (state: GlobalState, {lastViewedAt}: PostFilterOptions) => lastViewedAt,
+        (state: GlobalState, {indicateNewMessages}: PostFilterOptions) => indicateNewMessages,
         (state) => state.entities.posts.selectedPostId,
         getCurrentUser,
         shouldShowJoinLeaveMessages,
@@ -114,7 +122,7 @@ export function makeFilterPostsAndAddSeparators() {
 
 export function makeCombineUserActivityPosts() {
     return createIdsSelector(
-        (state, postIds) => postIds,
+        (state: GlobalState, postIds: string[]) => postIds,
         (state) => state.entities.posts.posts,
         (postIds, posts) => {
             let lastPostIsUserActivity = false;
@@ -171,27 +179,27 @@ export function makeCombineUserActivityPosts() {
     );
 }
 
-export function isStartOfNewMessages(item) {
+export function isStartOfNewMessages(item: string) {
     return item === START_OF_NEW_MESSAGES;
 }
 
-export function isDateLine(item) {
+export function isDateLine(item: string) {
     return item.startsWith(DATE_LINE);
 }
 
-export function getDateForDateLine(item) {
+export function getDateForDateLine(item: string) {
     return parseInt(item.substring(DATE_LINE.length), 10);
 }
 
-export function isCombinedUserActivityPost(item) {
+export function isCombinedUserActivityPost(item: string) {
     return (/^user-activity-(?:[^_]+_)*[^_]+$/).test(item);
 }
 
-export function getPostIdsForCombinedUserActivityPost(item) {
+export function getPostIdsForCombinedUserActivityPost(item: string) {
     return item.substring(COMBINED_USER_ACTIVITY.length).split('_');
 }
 
-export function getFirstPostId(items) {
+export function getFirstPostId(items: string[]) {
     for (let i = 0; i < items.length; i++) {
         const item = items[i];
 
@@ -214,7 +222,7 @@ export function getFirstPostId(items) {
     return '';
 }
 
-export function getLastPostId(items) {
+export function getLastPostId(items: string[]) {
     for (let i = items.length - 1; i >= 0; i--) {
         const item = items[i];
 
@@ -237,7 +245,7 @@ export function getLastPostId(items) {
     return '';
 }
 
-export function getLastPostIndex(postIds) {
+export function getLastPostIndex(postIds: string[]) {
     let index = 0;
     for (let i = postIds.length - 1; i > 0; i--) {
         const item = postIds[i];
@@ -255,8 +263,8 @@ export function makeGenerateCombinedPost() {
     const getPostIds = memoizeResult(getPostIdsForCombinedUserActivityPost);
 
     return reselect.createSelector(
-        (state, combinedId) => combinedId,
-        (state, combinedId) => getPostsForIds(state, getPostIds(combinedId)),
+        (state: GlobalState, combinedId: string) => combinedId,
+        (state: GlobalState, combinedId: string) => getPostsForIds(state, getPostIds(combinedId)),
         (combinedId, posts) => {
             // All posts should be in the same channel
             const channelId = posts[0].channel_id;
@@ -307,7 +315,7 @@ export const postTypePriority = {
     [Posts.POST_TYPES.EPHEMERAL]: 15,
 };
 
-export function comparePostTypes(a, b) {
+export function comparePostTypes(a: typeof postTypePriority, b: typeof postTypePriority) {
     return postTypePriority[a.postType] - postTypePriority[b.postType];
 }
 
@@ -347,7 +355,7 @@ function extractUserActivityData(userActivities: any) {
 
     messageData.sort(comparePostTypes);
 
-    function reduceUsers(acc, curr) {
+    function reduceUsers(acc: string[], curr: string) {
         if (!acc.includes(curr)) {
             acc.push(curr);
         }
@@ -366,10 +374,10 @@ export function combineUserActivitySystemPost(systemPosts: Array<types.posts.Pos
         return null;
     }
 
-    const userActivities = systemPosts.reduce((acc, post) => {
+    const userActivities = systemPosts.reduce((acc: any, post: types.posts.Post) => {
         const postType = post.type;
         let userActivityProps = acc;
-        const combinedPostType = userActivityProps[postType];
+        const combinedPostType = userActivityProps[postType as string];
 
         if (
             postType === Posts.POST_TYPES.ADD_TO_TEAM ||

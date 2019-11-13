@@ -4,9 +4,10 @@ import Gfycat from 'gfycat-sdk';
 const defaultKey = '2_KtH_W5';
 const defaultSecret = '3wLVZPiswc3DnaiaFoLkDvB4X0IV6CpMkj4tf2inJRsBY6-FnkT08zGmppWFgeof';
 let activeKey: string|null = null;
-let activeSecret: string|null = null;
-let instance: Gfycat|null = null;
-export default function(key: string, secret: string): Gfycat {
+let activeSecret: string | null = null;
+
+let instance: any = null;
+export default function(key: string, secret: string): any {
     if (instance && activeKey === key && activeSecret === secret) {
         return instance;
     }
