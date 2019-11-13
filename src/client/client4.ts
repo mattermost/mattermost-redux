@@ -1403,6 +1403,12 @@ export default class Client4 {
             {method: 'get'}
         );
     };
+    getArchivedChannels = async (teamId: string, page = 0, perPage = PER_PAGE_DEFAULT) => {
+        return this.doFetch(
+            `${this.getTeamRoute(teamId)}/channels/deleted${buildQueryString({page, per_page: perPage})}`,
+            {method: 'get'}
+        );
+    };
 
     getMyChannels = async (teamId: string) => {
         return this.doFetch(
@@ -1511,6 +1517,13 @@ export default class Client4 {
     searchChannels = async (teamId: string, term: string) => {
         return this.doFetch(
             `${this.getTeamRoute(teamId)}/channels/search`,
+            {method: 'post', body: JSON.stringify({term})}
+        );
+    };
+
+    searchArchivedChannels = async (teamId: string, term: string) => {
+        return this.doFetch(
+            `${this.getTeamRoute(teamId)}/channels/search_archived`,
             {method: 'post', body: JSON.stringify({term})}
         );
     };
