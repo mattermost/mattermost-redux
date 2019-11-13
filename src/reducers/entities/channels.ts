@@ -66,10 +66,10 @@ function channels(state: IDMappedObjects<Channel> = {}, action: GenericAction) {
     case ChannelTypes.RECEIVED_ALL_CHANNELS:
     case SchemeTypes.RECEIVED_SCHEME_CHANNELS: {
         const nextState = {...state};
-        const channels = Object.values(nextState);
-        
+        const currentChannels = Object.values(nextState);
+
         // Remove existing channels that are no longer
-        channels.forEach((channel) => {
+        currentChannels.forEach((channel) => {
             if (channel.team_id === action.teamId) {
                 const id: string = channel.id;
                 if (!action.data.find((c: any) => c.id === id)) {
@@ -77,7 +77,7 @@ function channels(state: IDMappedObjects<Channel> = {}, action: GenericAction) {
                 }
             }
         });
-    
+
         for (const channel of action.data) {
             if (state[channel.id] && channel.type === General.DM_CHANNEL) {
                 channel.display_name = channel.display_name || state[channel.id].display_name;
