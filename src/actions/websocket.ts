@@ -1,5 +1,6 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
+
 import {Client4} from 'client';
 import websocketClient from '../client/websocket_client';
 
@@ -22,7 +23,7 @@ import {getTeam, getMyTeamUnreads, getMyTeams, getMyTeamMembers} from './teams';
 import {getPost, getPosts, getProfilesAndStatusesForPosts, getCustomEmojiForReaction, handleNewPost, postDeleted, receivedPost} from './posts';
 import {fetchMyChannelsAndMembers, getChannelAndMyMember, getChannelStats, markChannelAsRead} from './channels';
 import {checkForModifiedUsers, getMe, getProfilesByIds, getStatusesByIds, loadProfilesForDirect} from './users';
-import {ChannelMembership} from 'types/channels';
+import {Channel, ChannelMembership} from 'types/channels';
 import {Dictionary} from 'types/utilities';
 import {PreferenceType} from 'types/preferences';
 let doDispatch: DispatchFunc;
@@ -135,16 +136,18 @@ export function doReconnect(now: number) {
             await dispatch(getMyTeamMembers());
             const currentTeamMembership = getCurrentTeamMembership(getState());
             if (currentTeamMembership) {
-                dispatch(getPosts(currentChannelId));
                 const fethcResult = await dispatch(fetchMyChannelsAndMembers(currentTeamId));
                 const data = (fethcResult as any).data || null;
                 dispatch(loadProfilesForDirect());
 
-                if (data && data.members) {
+                if (data && data.channels && data.members) {
+                    const channelStillExists = data.channels.find((c: Channel) => c.id === currentChannelId);
                     const stillMemberOfCurrentChannel = data.members.find((m: ChannelMembership) => m.channel_id === currentChannelId);
 
-                    if (!stillMemberOfCurrentChannel) {
+                    if (!stillMemberOfCurrentChannel || !channelStillExists) {
                         EventEmitter.emit(General.SWITCH_TO_DEFAULT_CHANNEL, currentTeamId);
+                    } else {
+                        dispatch(getPosts(currentChannelId));
                     }
                 }
             } else {
