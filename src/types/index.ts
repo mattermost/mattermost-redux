@@ -25,11 +25,17 @@ import * as teams from './teams';
 import * as typing from './typing';
 import * as utilities from './utilities';
 import * as users from './users';
+import * as bots from './bots';
+import * as plugins from './plugins';
+import * as config from './config';
 
 export {
     admin,
+    config,
     actions,
     alerts,
+    bots,
+    plugins,
     store,
     channels,
     errors,

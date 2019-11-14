@@ -3,8 +3,9 @@
 
 import {combineReducers} from 'redux';
 import {PluginTypes} from 'action_types';
+import {GenericAction} from 'types/actions';
 
-function marketplacePlugins(state = [], action) {
+function marketplacePlugins(state = [], action: GenericAction) {
     switch (action.type) {
     case PluginTypes.RECEIVED_MARKETPLACE_PLUGINS: {
         return action.data ? action.data : [];

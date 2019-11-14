@@ -2,14 +2,15 @@
 // See LICENSE.txt for license information.
 
 import * as reselect from 'reselect';
+import {GlobalState} from 'types/store';
 
-export function getMarketplacePlugins(state) {
+export function getMarketplacePlugins(state: GlobalState) {
     return state.entities.plugins.marketplacePlugins;
 }
 
 export const getMarketplaceInstalledPlugins = reselect.createSelector(
     getMarketplacePlugins,
     (plugins) => {
-        return Object.values(plugins).filter((p: any) => p.installed_version !== '');
+        return Object.values(plugins).filter((p) => p.installed_version !== '');
     }
 );

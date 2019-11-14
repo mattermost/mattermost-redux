@@ -1,7 +1,7 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
 import {ErrorTypes} from 'action_types';
-import serializeError from 'serialize-error';
+import {serializeError, ErrorObject} from 'serialize-error';
 import {Client4} from 'client';
 import EventEmitter from 'utils/event_emitter';
 import {DispatchFunc, ActionFunc} from 'types/actions';
@@ -22,7 +22,7 @@ export function dismissError(index: number): ActionFunc {
     };
 }
 
-export function getLogErrorAction(error: serializeError.ErrorObject, displayable = false) {
+export function getLogErrorAction(error: ErrorObject, displayable = false) {
     return {
         type: ErrorTypes.LOG_ERROR,
         displayable,
