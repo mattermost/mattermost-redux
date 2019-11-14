@@ -1,5 +1,8 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
+
+import {Dictionary} from './utilities';
+
 export type FileInfo = {
     id: string;
     user_id: string;
@@ -16,10 +19,12 @@ export type FileInfo = {
     clientId: string;
 };
 export type FilesState = {
-    files: {
-        [x: string]: FileInfo;
-    };
-    fileIdsByPostId: {
-        [x: string]: Array<string>;
-    };
+    files: Dictionary<FileInfo>;
+    fileIdsByPostId: Dictionary<Array<string>>;
+    filePublicLink?: string;
 };
+
+export type FileUploadResponse = {
+    file_infos: FileInfo[];
+    client_ids: string[];
+}

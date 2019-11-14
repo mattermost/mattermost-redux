@@ -3,7 +3,7 @@
 import {General, Preferences} from '../constants';
 import {localizeMessage} from 'utils/i18n_utils';
 import {UserProfile} from 'types/users';
-import {IDMappedObjects, $ID} from 'types/utilities';
+import {IDMappedObjects, $ID, Dictionary} from 'types/utilities';
 export function getFullName(user: UserProfile): string {
     if (user.first_name && user.last_name) {
         return user.first_name + ' ' + user.last_name;
@@ -20,13 +20,15 @@ export function displayUsername(
     user: UserProfile,
     teammateNameDisplay: string,
     useFallbackUsername = true,
+    useAdminTemmateNameDisplaySetting = false,
+    adminTeammateNameDisplaySetting = '',
 ): string {
     let name = useFallbackUsername ? localizeMessage('channel_loader.someone', 'Someone') : '';
-
+    const nameDisplay = useAdminTemmateNameDisplaySetting ? adminTeammateNameDisplaySetting : teammateNameDisplay;
     if (user) {
-        if (teammateNameDisplay === Preferences.DISPLAY_PREFER_NICKNAME) {
+        if (nameDisplay === Preferences.DISPLAY_PREFER_NICKNAME) {
             name = user.nickname || getFullName(user);
-        } else if (teammateNameDisplay === Preferences.DISPLAY_PREFER_FULL_NAME) {
+        } else if (nameDisplay === Preferences.DISPLAY_PREFER_FULL_NAME) {
             name = getFullName(user);
         } else {
             name = user.username;
@@ -74,7 +76,7 @@ export function hasPostAllPublicRole(roles: string): boolean {
 }
 
 export function profileListToMap(profileList: Array<UserProfile>): IDMappedObjects<UserProfile> {
-    const profiles = {};
+    const profiles: Dictionary<UserProfile> = {};
     for (let i = 0; i < profileList.length; i++) {
         profiles[profileList[i].id] = profileList[i];
     }

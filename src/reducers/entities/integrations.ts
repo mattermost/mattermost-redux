@@ -3,8 +3,11 @@
 
 import {combineReducers} from 'redux';
 import {IntegrationTypes, UserTypes, ChannelTypes} from 'action_types';
+import {GenericAction} from 'types/actions';
+import {Command, IncomingWebhook, OutgoingWebhook, OAuthApp} from 'types/integrations';
+import {Dictionary, IDMappedObjects} from 'types/utilities';
 
-function incomingHooks(state = {}, action) {
+function incomingHooks(state: IDMappedObjects<IncomingWebhook> = {}, action: GenericAction) {
     switch (action.type) {
     case IntegrationTypes.RECEIVED_INCOMING_HOOK: {
         const nextState = {...state};
@@ -47,7 +50,7 @@ function incomingHooks(state = {}, action) {
     }
 }
 
-function outgoingHooks(state = {}, action) {
+function outgoingHooks(state: IDMappedObjects<OutgoingWebhook> = {}, action: GenericAction) {
     switch (action.type) {
     case IntegrationTypes.RECEIVED_OUTGOING_HOOK: {
         const nextState = {...state};
@@ -90,7 +93,7 @@ function outgoingHooks(state = {}, action) {
     }
 }
 
-function commands(state = {}, action) {
+function commands(state: IDMappedObjects<Command> = {}, action: GenericAction) {
     switch (action.type) {
     case IntegrationTypes.RECEIVED_COMMANDS:
     case IntegrationTypes.RECEIVED_CUSTOM_TEAM_COMMANDS: {
@@ -136,10 +139,10 @@ function commands(state = {}, action) {
     }
 }
 
-function systemCommands(state = {}, action) {
+function systemCommands(state: IDMappedObjects<Command> = {}, action: GenericAction) {
     switch (action.type) {
     case IntegrationTypes.RECEIVED_COMMANDS: {
-        const nextCommands = {};
+        const nextCommands: Dictionary<Command> = {};
         for (const command of action.data) {
             if (!command.id) {
                 nextCommands[command.trigger] = command;
@@ -164,7 +167,7 @@ function systemCommands(state = {}, action) {
     }
 }
 
-function oauthApps(state = {}, action) {
+function oauthApps(state: IDMappedObjects<OAuthApp> = {}, action: GenericAction) {
     switch (action.type) {
     case IntegrationTypes.RECEIVED_OAUTH_APPS: {
         const nextState = {...state};
@@ -191,7 +194,7 @@ function oauthApps(state = {}, action) {
     }
 }
 
-function dialogTriggerId(state = '', action) {
+function dialogTriggerId(state = '', action: GenericAction) {
     switch (action.type) {
     case IntegrationTypes.RECEIVED_DIALOG_TRIGGER_ID:
         return action.data;
@@ -200,7 +203,7 @@ function dialogTriggerId(state = '', action) {
     }
 }
 
-function dialog(state = '', action) {
+function dialog(state = '', action: GenericAction) {
     switch (action.type) {
     case IntegrationTypes.RECEIVED_DIALOG:
         return action.data;

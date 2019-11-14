@@ -1,6 +1,9 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
-export default {
+
+import {Dictionary} from 'types/utilities';
+
+const Preferences: Dictionary<any> = {
     CATEGORY_CHANNEL_OPEN_TIME: 'channel_open_time',
     CATEGORY_CHANNEL_APPROXIMATE_VIEW_TIME: 'channel_approximate_view_time',
     CATEGORY_DIRECT_CHANNEL_SHOW: 'direct_channel_show',
@@ -26,6 +29,7 @@ export default {
     NAME_NAME_FORMAT: 'name_format',
     DISPLAY_PREFER_NICKNAME: 'nickname_full_name',
     DISPLAY_PREFER_FULL_NAME: 'full_name',
+    DISPLAY_PREFER_USERNAME: 'username',
     MENTION_KEYS: 'mention_keys',
     USE_MILITARY_TIME: 'use_military_time',
     CATEGORY_SIDEBAR_SETTINGS: 'sidebar_settings',
@@ -145,3 +149,5 @@ export default {
         },
     },
 };
+
+export default Preferences;

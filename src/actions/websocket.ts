@@ -1,5 +1,6 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
+
 import {Client4} from 'client';
 import websocketClient from '../client/websocket_client';
 
@@ -22,7 +23,10 @@ import {getTeam, getMyTeamUnreads, getMyTeams, getMyTeamMembers} from './teams';
 import {getPost, getPosts, getProfilesAndStatusesForPosts, getCustomEmojiForReaction, handleNewPost, postDeleted, receivedPost} from './posts';
 import {fetchMyChannelsAndMembers, getChannelAndMyMember, getChannelStats, markChannelAsRead} from './channels';
 import {checkForModifiedUsers, getMe, getProfilesByIds, getStatusesByIds, loadProfilesForDirect} from './users';
-let doDispatch;
+import {Channel, ChannelMembership} from 'types/channels';
+import {Dictionary} from 'types/utilities';
+import {PreferenceType} from 'types/preferences';
+let doDispatch: DispatchFunc;
 export function init(platform: PlatformType, siteUrl: string | undefined | null, token: string | undefined | null, optionalWebSocket: any, additionalOptions: any = {}) {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         const config = getConfig(getState());
@@ -132,16 +136,18 @@ export function doReconnect(now: number) {
             await dispatch(getMyTeamMembers());
             const currentTeamMembership = getCurrentTeamMembership(getState());
             if (currentTeamMembership) {
-                dispatch(getPosts(currentChannelId));
                 const fethcResult = await dispatch(fetchMyChannelsAndMembers(currentTeamId));
                 const data = (fethcResult as any).data || null;
                 dispatch(loadProfilesForDirect());
 
-                if (data && data.members) {
-                    const stillMemberOfCurrentChannel = data.members.find((m) => m.channel_id === currentChannelId);
+                if (data && data.channels && data.members) {
+                    const channelStillExists = data.channels.find((c: Channel) => c.id === currentChannelId);
+                    const stillMemberOfCurrentChannel = data.members.find((m: ChannelMembership) => m.channel_id === currentChannelId);
 
-                    if (!stillMemberOfCurrentChannel) {
+                    if (!stillMemberOfCurrentChannel || !channelStillExists) {
                         EventEmitter.emit(General.SWITCH_TO_DEFAULT_CHANNEL, currentTeamId);
+                    } else {
+                        dispatch(getPosts(currentChannelId));
                     }
                 }
             } else {
@@ -186,7 +192,7 @@ function handleReconnect() {
     doDispatch(doReconnect(Date.now()));
 }
 
-function handleClose(connectFailCount) {
+function handleClose(connectFailCount: number) {
     doDispatch({
         type: GeneralTypes.WEBSOCKET_FAILURE,
         error: connectFailCount,
@@ -195,7 +201,21 @@ function handleClose(connectFailCount) {
     });
 }
 
-function handleEvent(msg) {
+export type WebsocketBroadcast = {
+    omit_users: Dictionary<boolean>;
+    user_id: string;
+    channel_id: string;
+    team_id: string;
+}
+
+export type WebSocketMessage = {
+    event: string;
+    data: any;
+    broadcast: WebsocketBroadcast;
+    seq: number;
+}
+
+function handleEvent(msg: WebSocketMessage) {
     switch (msg.event) {
     case WebsocketEvents.POSTED:
     case WebsocketEvents.EPHEMERAL_MESSAGE:
@@ -297,7 +317,7 @@ function handleEvent(msg) {
     }
 }
 
-function handleNewPostEvent(msg) {
+function handleNewPostEvent(msg: WebSocketMessage) {
     return (dispatch: DispatchFunc, getState: GetStateFunc) => {
         const post = JSON.parse(msg.data.post);
 
@@ -314,7 +334,7 @@ function handleNewPostEvent(msg) {
     };
 }
 
-function handlePostEdited(msg) {
+function handlePostEdited(msg: WebSocketMessage) {
     return (dispatch: DispatchFunc, getState: GetStateFunc) => {
         const data = JSON.parse(msg.data.post);
 
@@ -324,13 +344,13 @@ function handlePostEdited(msg) {
     };
 }
 
-function handlePostDeleted(msg) {
+function handlePostDeleted(msg: WebSocketMessage) {
     const data = JSON.parse(msg.data.post);
 
     return postDeleted(data);
 }
 
-function handleLeaveTeamEvent(msg) {
+function handleLeaveTeamEvent(msg: Partial<WebSocketMessage>) {
     return (dispatch: DispatchFunc, getState: GetStateFunc) => {
         const state = getState();
         const teams = getTeamsSelector(state);
@@ -349,15 +369,15 @@ function handleLeaveTeamEvent(msg) {
     };
 }
 
-function handleUpdateTeamEvent(msg) {
+function handleUpdateTeamEvent(msg: WebSocketMessage) {
     return {
         type: TeamTypes.UPDATED_TEAM,
         data: JSON.parse(msg.data.team),
     };
 }
 
-function handleTeamAddedEvent(msg) {
-    return async (dispatch) => {
+function handleTeamAddedEvent(msg: WebSocketMessage) {
+    return async (dispatch: DispatchFunc) => {
         await Promise.all([
             dispatch(getTeam(msg.data.team_id)),
             dispatch(getMyTeamUnreads()),
@@ -366,7 +386,7 @@ function handleTeamAddedEvent(msg) {
     };
 }
 
-function handleUserAddedEvent(msg) {
+function handleUserAddedEvent(msg: WebSocketMessage) {
     return (dispatch: DispatchFunc, getState: GetStateFunc) => {
         const state = getState();
         const currentChannelId = getCurrentChannelId(state);
@@ -393,7 +413,7 @@ function handleUserAddedEvent(msg) {
     };
 }
 
-function handleUserRemovedEvent(msg) {
+function handleUserRemovedEvent(msg: WebSocketMessage) {
     return (dispatch: DispatchFunc, getState: GetStateFunc) => {
         const state = getState();
         const channels = getAllChannels(state);
@@ -437,7 +457,7 @@ function handleUserRemovedEvent(msg) {
     };
 }
 
-function handleUserUpdatedEvent(msg) {
+function handleUserUpdatedEvent(msg: WebSocketMessage) {
     return (dispatch: DispatchFunc, getState: GetStateFunc) => {
         const currentUser = getCurrentUser(getState());
         const user = msg.data.user;
@@ -460,7 +480,7 @@ function handleUserUpdatedEvent(msg) {
     };
 }
 
-function handleRoleAddedEvent(msg) {
+function handleRoleAddedEvent(msg: WebSocketMessage) {
     const role = JSON.parse(msg.data.role);
 
     return {
@@ -469,7 +489,7 @@ function handleRoleAddedEvent(msg) {
     };
 }
 
-function handleRoleRemovedEvent(msg) {
+function handleRoleRemovedEvent(msg: WebSocketMessage) {
     const role = JSON.parse(msg.data.role);
 
     return {
@@ -478,7 +498,7 @@ function handleRoleRemovedEvent(msg) {
     };
 }
 
-function handleRoleUpdatedEvent(msg) {
+function handleRoleUpdatedEvent(msg: WebSocketMessage) {
     const role = JSON.parse(msg.data.role);
 
     return {
@@ -487,7 +507,7 @@ function handleRoleUpdatedEvent(msg) {
     };
 }
 
-function handleChannelCreatedEvent(msg) {
+function handleChannelCreatedEvent(msg: WebSocketMessage) {
     return (dispatch: DispatchFunc, getState: GetStateFunc) => {
         const {channel_id: channelId, team_id: teamId} = msg.data;
         const state = getState();
@@ -501,7 +521,7 @@ function handleChannelCreatedEvent(msg) {
     };
 }
 
-function handleChannelDeletedEvent(msg) {
+function handleChannelDeletedEvent(msg: WebSocketMessage) {
     return (dispatch: DispatchFunc, getState: GetStateFunc) => {
         const state = getState();
         const currentChannelId = getCurrentChannelId(state);
@@ -527,7 +547,7 @@ function handleChannelDeletedEvent(msg) {
     };
 }
 
-function handleChannelUpdatedEvent(msg) {
+function handleChannelUpdatedEvent(msg: WebSocketMessage) {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         let channel;
         try {
@@ -555,7 +575,7 @@ function handleChannelUpdatedEvent(msg) {
 
 // handleChannelConvertedEvent handles updating of channel which is converted from public to private
 
-function handleChannelConvertedEvent(msg) {
+function handleChannelConvertedEvent(msg: WebSocketMessage) {
     return (dispatch: DispatchFunc, getState: GetStateFunc) => {
         const channelId = msg.data.channel_id;
         if (channelId) {
@@ -571,7 +591,7 @@ function handleChannelConvertedEvent(msg) {
     };
 }
 
-function handleChannelViewedEvent(msg) {
+function handleChannelViewedEvent(msg: WebSocketMessage) {
     return (dispatch: DispatchFunc, getState: GetStateFunc) => {
         const state = getState();
         const {channel_id: channelId} = msg.data;
@@ -585,7 +605,7 @@ function handleChannelViewedEvent(msg) {
     };
 }
 
-function handleChannelMemberUpdatedEvent(msg) {
+function handleChannelMemberUpdatedEvent(msg: WebSocketMessage) {
     const channelMember = JSON.parse(msg.data.channelMember);
 
     return {
@@ -594,15 +614,15 @@ function handleChannelMemberUpdatedEvent(msg) {
     };
 }
 
-function handleDirectAddedEvent(msg) {
-    return (dispatch) => {
+function handleDirectAddedEvent(msg: WebSocketMessage) {
+    return (dispatch: DispatchFunc) => {
         dispatch(getChannelAndMyMember(msg.broadcast.channel_id));
         return {data: true};
     };
 }
 
-function handlePreferenceChangedEvent(msg) {
-    return (dispatch) => {
+function handlePreferenceChangedEvent(msg: WebSocketMessage) {
+    return (dispatch: DispatchFunc) => {
         const preference = JSON.parse(msg.data.preference);
         dispatch({type: PreferenceTypes.RECEIVED_PREFERENCES, data: [preference]});
 
@@ -611,9 +631,9 @@ function handlePreferenceChangedEvent(msg) {
     };
 }
 
-function handlePreferencesChangedEvent(msg) {
+function handlePreferencesChangedEvent(msg: WebSocketMessage) {
     return (dispatch: DispatchFunc, getState: GetStateFunc) => {
-        const preferences = JSON.parse(msg.data.preferences);
+        const preferences = JSON.parse(msg.data.preferences) as PreferenceType[];
         const posts = getAllPosts(getState());
 
         preferences.forEach((pref) => {
@@ -628,20 +648,20 @@ function handlePreferencesChangedEvent(msg) {
     };
 }
 
-function handlePreferencesDeletedEvent(msg) {
+function handlePreferencesDeletedEvent(msg: WebSocketMessage) {
     const preferences = JSON.parse(msg.data.preferences);
 
     return {type: PreferenceTypes.DELETED_PREFERENCES, data: preferences};
 }
 
-function handleStatusChangedEvent(msg) {
+function handleStatusChangedEvent(msg: WebSocketMessage) {
     return {
         type: UserTypes.RECEIVED_STATUSES,
         data: [{user_id: msg.data.user_id, status: msg.data.status}],
     };
 }
 
-function handleHelloEvent(msg) {
+function handleHelloEvent(msg: WebSocketMessage) {
     const serverVersion = msg.data.server_version;
     if (serverVersion && Client4.serverVersion !== serverVersion) {
         Client4.serverVersion = serverVersion;
@@ -649,7 +669,7 @@ function handleHelloEvent(msg) {
     }
 }
 
-function handleUserTypingEvent(msg) {
+function handleUserTypingEvent(msg: WebSocketMessage) {
     return (dispatch: DispatchFunc, getState: GetStateFunc) => {
         const state = getState();
         const profiles = getUsers(state);
@@ -674,7 +694,7 @@ function handleUserTypingEvent(msg) {
                 type: WebsocketEvents.STOP_TYPING,
                 data,
             });
-        }, parseInt(config.TimeBetweenUserTypingUpdatesMilliseconds, 10));
+        }, parseInt(config.TimeBetweenUserTypingUpdatesMilliseconds!, 10));
 
         if (!profiles[userId] && userId !== currentUserId) {
             dispatch(getProfilesByIds([userId]));
@@ -688,8 +708,8 @@ function handleUserTypingEvent(msg) {
     };
 }
 
-function handleReactionAddedEvent(msg) {
-    return (dispatch) => {
+function handleReactionAddedEvent(msg: WebSocketMessage) {
+    return (dispatch: DispatchFunc) => {
         const {data} = msg;
         const reaction = JSON.parse(data.reaction);
 
@@ -703,7 +723,7 @@ function handleReactionAddedEvent(msg) {
     };
 }
 
-function handleReactionRemovedEvent(msg) {
+function handleReactionRemovedEvent(msg: WebSocketMessage) {
     const {data} = msg;
     const reaction = JSON.parse(data.reaction);
 
@@ -713,7 +733,7 @@ function handleReactionRemovedEvent(msg) {
     };
 }
 
-function handleAddEmoji(msg) {
+function handleAddEmoji(msg: WebSocketMessage) {
     const data = JSON.parse(msg.data.emoji);
 
     return {
@@ -722,7 +742,7 @@ function handleAddEmoji(msg) {
     };
 }
 
-function handleLicenseChangedEvent(msg) {
+function handleLicenseChangedEvent(msg: WebSocketMessage) {
     const data = msg.data.license;
 
     return {
@@ -731,7 +751,7 @@ function handleLicenseChangedEvent(msg) {
     };
 }
 
-function handleConfigChangedEvent(msg) {
+function handleConfigChangedEvent(msg: WebSocketMessage) {
     const data = msg.data.config;
 
     EventEmitter.emit(General.CONFIG_CHANGED, data);
@@ -741,7 +761,7 @@ function handleConfigChangedEvent(msg) {
     };
 }
 
-function handlePluginStatusesChangedEvent(msg) {
+function handlePluginStatusesChangedEvent(msg: WebSocketMessage) {
     const data = msg.data;
 
     return {
@@ -750,8 +770,8 @@ function handlePluginStatusesChangedEvent(msg) {
     };
 }
 
-function handleOpenDialogEvent(msg) {
-    return (dispatch) => {
+function handleOpenDialogEvent(msg: WebSocketMessage) {
+    return (dispatch: DispatchFunc) => {
         const data = (msg.data && msg.data.dialog) || {};
         dispatch({type: IntegrationTypes.RECEIVED_DIALOG, data: JSON.parse(data)});
         return {data: true};
@@ -759,7 +779,7 @@ function handleOpenDialogEvent(msg) {
 }
 
 // Helpers
-function getAddedDmUsersIfNecessary(preferences) {
+function getAddedDmUsersIfNecessary(preferences: PreferenceType[]) {
     return (dispatch: DispatchFunc, getState: GetStateFunc) => {
         const userIds: string[] = [];
 
@@ -811,8 +831,8 @@ export function userTyping(channelId: string, parentPostId: string): ActionFunc 
         const stats = getCurrentChannelStats(state);
         const membersInChannel = stats ? stats.member_count : 0;
 
-        if (((t - lastTimeTypingSent) > config.TimeBetweenUserTypingUpdatesMilliseconds) &&
-            (membersInChannel < config.MaxNotificationsPerChannel) && (config.EnableUserTypingMessages === 'true')) {
+        if (((t - lastTimeTypingSent) > parseInt(config.TimeBetweenUserTypingUpdatesMilliseconds!, 10)) &&
+            (membersInChannel < parseInt(config.MaxNotificationsPerChannel!, 10)) && (config.EnableUserTypingMessages === 'true')) {
             websocketClient.userTyping(channelId, parentPostId);
             lastTimeTypingSent = t;
         }

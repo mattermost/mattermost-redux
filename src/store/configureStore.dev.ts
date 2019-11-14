@@ -3,10 +3,10 @@
 
 /* eslint-disable no-undefined */
 import * as redux from 'redux';
-import devTools from 'remote-redux-devtools';
 import {createOfflineReducer, networkStatusChangedAction, offlineCompose} from 'redux-offline';
 import defaultOfflineConfig from 'redux-offline/lib/defaults';
 import reducerRegistry from './reducer_registry';
+import devTools from 'remote-redux-devtools';
 
 const windowAny = window as any;
 
@@ -25,6 +25,8 @@ import deepFreezeAndThrowOnMutation from 'utils/deep_freeze';
 import initialState from './initial_state';
 import {offlineConfig, createReducer} from './helpers';
 import {createMiddleware} from './middleware';
+import {Reducer, Action} from 'types/actions';
+import {GlobalState} from 'types/store';
 
 /**
  * Configures and constructs the redux store. Accepts the following parameters:
@@ -37,7 +39,7 @@ import {createMiddleware} from './middleware';
  *     enableBuffer - bool - default = true - If true, the store will buffer all actions until offline state rehydration occurs.
  *     enableThunk - bool - default = true - If true, include the thunk middleware automatically. If false, thunk must be provided as part of additionalMiddleware.
  */
-export default function configureServiceStore(preloadedState, appReducer, userOfflineConfig, getAppReducer, clientOptions) {
+export default function configureServiceStore(preloadedState: any, appReducer: any, userOfflineConfig: any, getAppReducer: any, clientOptions: any) {
     const baseOfflineConfig = Object.assign({}, defaultOfflineConfig, offlineConfig, userOfflineConfig);
     const baseState = Object.assign({}, initialState, preloadedState);
 
@@ -52,7 +54,7 @@ export default function configureServiceStore(preloadedState, appReducer, userOf
         )
     );
 
-    reducerRegistry.setChangeListener((reducers) => {
+    reducerRegistry.setChangeListener((reducers: any) => {
         store.replaceReducer(createOfflineReducer(createDevReducer(baseState, reducers)));
     });
 
@@ -62,7 +64,7 @@ export default function configureServiceStore(preloadedState, appReducer, userOf
     }
 
     if (baseOfflineConfig.detectNetwork) {
-        baseOfflineConfig.detectNetwork((online) => {
+        baseOfflineConfig.detectNetwork((online: boolean) => {
             store.dispatch(networkStatusChangedAction(online));
         });
     }
@@ -82,12 +84,12 @@ export default function configureServiceStore(preloadedState, appReducer, userOf
     return store;
 }
 
-function createDevReducer(baseState, ...reducers) {
+function createDevReducer(baseState: any, ...reducers: any) {
     return enableFreezing(createReducer(baseState, ...reducers));
 }
 
-function enableFreezing(reducer) {
-    return (state, action) => {
+function enableFreezing(reducer: Reducer) {
+    return (state: GlobalState, action: Action) => {
         const nextState = reducer(state, action);
 
         if (nextState !== state) {

@@ -2,6 +2,7 @@
 // See LICENSE.txt for license information.
 
 import {GeneralTypes, UserTypes} from 'action_types';
+import {GenericAction} from 'types/actions';
 
 function getInitialState() {
     return {
@@ -11,7 +12,7 @@ function getInitialState() {
     };
 }
 
-export default function(state = getInitialState(), action) {
+export default function(state = getInitialState(), action: GenericAction) {
     if (!state.connected && action.type === GeneralTypes.WEBSOCKET_SUCCESS) {
         return {
             ...state,

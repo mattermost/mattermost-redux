@@ -44,7 +44,7 @@ export type UsersState = {
     profiles: IDMappedObjects<UserProfile>;
     profilesInTeam: RelationOneToMany<Team, UserProfile>;
     profilesNotInTeam: RelationOneToMany<Team, UserProfile>;
-    profilesWithoutTeam: Set<any>;
+    profilesWithoutTeam: Set<string>;
     profilesInChannel: RelationOneToMany<Channel, UserProfile>;
     profilesNotInChannel: RelationOneToMany<Channel, UserProfile>;
     statuses: RelationOneToOne<UserProfile, string>;
@@ -63,3 +63,11 @@ export type UserActivity = {
         } | Array<$ID<UserProfile>>;
     };
 };
+
+export type UserStatus = {
+	user_id: string;
+	status: string;
+	manual: boolean;
+	last_activity_at: number;
+	active_channel?: string;
+}
