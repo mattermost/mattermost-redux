@@ -4,7 +4,9 @@ import {createSelector} from 'reselect';
 import {isMinimumServerVersion} from 'utils/helpers';
 import {General} from '../../constants';
 import {GlobalState} from 'types/store';
-export function getConfig(state: GlobalState): any {
+import {Config} from 'types/config';
+
+export function getConfig(state: GlobalState): Partial<Config> {
     return state.entities.general.config;
 }
 
@@ -39,7 +41,7 @@ export function hasNewPermissions(state: GlobalState): boolean {
 export const canUploadFilesOnMobile: (a: GlobalState) => boolean = createSelector(
     getConfig,
     getLicense,
-    (config: any, license: any): boolean => {
+    (config: Config, license: any): boolean => {
         // Defaults to true if either setting doesn't exist
         return config.EnableFileAttachments !== 'false' &&
            (license.IsLicensed === 'false' || license.Compliance === 'false' || config.EnableMobileFileUpload !== 'false');
@@ -49,7 +51,7 @@ export const canUploadFilesOnMobile: (a: GlobalState) => boolean = createSelecto
 export const canDownloadFilesOnMobile: (a: GlobalState) => boolean = createSelector(
     getConfig,
     getLicense,
-    (config: any, license: any): boolean => {
+    (config: Config, license: any): boolean => {
         // Defaults to true if the setting doesn't exist
         return license.IsLicensed === 'false' || license.Compliance === 'false' || config.EnableMobileFileDownload !== 'false';
     }
@@ -57,7 +59,7 @@ export const canDownloadFilesOnMobile: (a: GlobalState) => boolean = createSelec
 
 export const getAutolinkedUrlSchemes: (a: GlobalState) => string[] = createSelector(
     getConfig,
-    (config: any): string[] => {
+    (config: Config): string[] => {
         if (!config.CustomUrlSchemes) {
             return General.DEFAULT_AUTOLINKED_URL_SCHEMES;
         }

@@ -23,7 +23,7 @@ clean: pre-run
 pre-run:
 	@echo Make sure no previous build are in the folder
 
-	@rm -rf build/* actions client constants reducers selectors store utils types mattermost.client4* index.* mattermost.websocket_client*
+	@rm -rf build/* action_types actions client constants reducers selectors store utils types mattermost.client4* index.* mattermost.websocket_client*
 
 test: check-style
 	npm test

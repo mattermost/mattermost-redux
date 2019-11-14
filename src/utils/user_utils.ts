@@ -3,7 +3,7 @@
 import {General, Preferences} from '../constants';
 import {localizeMessage} from 'utils/i18n_utils';
 import {UserProfile} from 'types/users';
-import {IDMappedObjects, $ID} from 'types/utilities';
+import {IDMappedObjects, $ID, Dictionary} from 'types/utilities';
 export function getFullName(user: UserProfile): string {
     if (user.first_name && user.last_name) {
         return user.first_name + ' ' + user.last_name;
@@ -74,7 +74,7 @@ export function hasPostAllPublicRole(roles: string): boolean {
 }
 
 export function profileListToMap(profileList: Array<UserProfile>): IDMappedObjects<UserProfile> {
-    const profiles = {};
+    const profiles: Dictionary<UserProfile> = {};
     for (let i = 0; i < profileList.length; i++) {
         profiles[profileList[i].id] = profileList[i];
     }
