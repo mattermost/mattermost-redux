@@ -10,6 +10,18 @@ import {Team} from 'types/teams';
 
 function channelListToSet(state: any, action: GenericAction) {
     const nextState = {...state};
+    const teamChannelIds = nextState[action.teamId];
+
+    // Remove existing channels that are no longer
+    if (teamChannelIds && teamChannelIds.size) {
+        teamChannelIds.forEach((id: string) => {
+            if (!action.data.find((c: any) => c.id === id)) {
+                teamChannelIds.delete(id);
+            }
+        });
+        nextState[action.teamId] = teamChannelIds;
+    }
+
     action.data.forEach((channel: Channel) => {
         const nextSet = new Set(nextState[channel.team_id]);
         nextSet.add(channel.id);
@@ -54,6 +66,18 @@ function channels(state: IDMappedObjects<Channel> = {}, action: GenericAction) {
     case ChannelTypes.RECEIVED_ALL_CHANNELS:
     case SchemeTypes.RECEIVED_SCHEME_CHANNELS: {
         const nextState = {...state};
+        const currentChannels = Object.values(nextState);
+
+        // Remove existing channels that are no longer
+        currentChannels.forEach((channel) => {
+            if (channel.team_id === action.teamId) {
+                const id: string = channel.id;
+                if (!action.data.find((c: any) => c.id === id)) {
+                    Reflect.deleteProperty(nextState, id);
+                }
+            }
+        });
+
         for (const channel of action.data) {
             if (state[channel.id] && channel.type === General.DM_CHANNEL) {
                 channel.display_name = channel.display_name || state[channel.id].display_name;

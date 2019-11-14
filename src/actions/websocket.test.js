@@ -513,6 +513,12 @@ describe('Actions.Websocket doReconnect', () => {
             },
             channels: {
                 currentChannelId,
+                channels: {
+                    currentChannelId: {
+                        id: currentChannelId,
+                        name: 'channel',
+                    },
+                },
             },
             users: {
                 currentUserId,
@@ -569,7 +575,7 @@ describe('Actions.Websocket doReconnect', () => {
             reply(200, []);
 
         ChannelActions.fetchMyChannelsAndMembers = jest.fn().mockReturnValue({
-            type: MOCK_CHANNELS_REQUEST,
+            type: MOCK_CHANNELS_REQUEST, data: [], teamId: currentTeamId,
         });
         nock(Client4.getBaseRoute()).
             get(`/users/me/teams/${currentTeamId}/channels`).
@@ -594,7 +600,8 @@ describe('Actions.Websocket doReconnect', () => {
     });
 
     it('handle doReconnect', async () => {
-        const testStore = await mockStore(initialState);
+        const state = {...initialState};
+        const testStore = await mockStore(state);
 
         const timestamp = 1000;
         const expectedActions = [
@@ -603,8 +610,7 @@ describe('Actions.Websocket doReconnect', () => {
             {type: MOCK_MY_TEAM_UNREADS},
             {type: MOCK_GET_MY_TEAMS},
             {type: MOCK_GET_MY_TEAM_MEMBERS},
-            {type: MOCK_GET_POSTS},
-            {type: MOCK_CHANNELS_REQUEST},
+            {type: MOCK_CHANNELS_REQUEST, data: [], teamId: currentTeamId},
             {type: MOCK_CHECK_FOR_MODIFIED_USERS},
             {type: GeneralTypes.WEBSOCKET_SUCCESS, timestamp, data: null},
         ];
@@ -612,6 +618,33 @@ describe('Actions.Websocket doReconnect', () => {
         await testStore.dispatch(Actions.doReconnect(timestamp));
 
         expect(testStore.getActions()).toEqual(expectedActions);
+    });
+
+    it('handle doReconnect after the current channel was archived or the user left it', async () => {
+        const state = {...initialState};
+        const testStore = await mockStore(state);
+
+        const timestamp = 1000;
+        const expectedActions = [
+            {type: MOCK_GET_PREFERENCES},
+            {type: MOCK_GET_STATUSES_BY_IDS},
+            {type: MOCK_MY_TEAM_UNREADS},
+            {type: MOCK_GET_MY_TEAMS},
+            {type: MOCK_GET_MY_TEAM_MEMBERS},
+            {type: MOCK_CHANNELS_REQUEST, data: [], teamId: currentTeamId},
+            {type: MOCK_CHECK_FOR_MODIFIED_USERS},
+            {type: GeneralTypes.WEBSOCKET_SUCCESS, timestamp, data: null},
+        ];
+
+        const expectedMissingActions = [
+            {type: MOCK_GET_POSTS},
+        ];
+
+        await testStore.dispatch(Actions.doReconnect(timestamp));
+
+        const actions = testStore.getActions();
+        expect(actions).toEqual(expect.arrayContaining(expectedActions));
+        expect(actions).not.toEqual(expect.arrayContaining(expectedMissingActions));
     });
 
     it('handle doReconnect after user left current team', async () => {
@@ -625,7 +658,7 @@ describe('Actions.Websocket doReconnect', () => {
             {type: MOCK_MY_TEAM_UNREADS},
             {type: MOCK_GET_MY_TEAMS},
             {type: MOCK_GET_MY_TEAM_MEMBERS},
-            {type: TeamTypes.LEAVE_TEAM, data: initialState.entities.teams.teams[currentTeamId]},
+            {type: TeamTypes.LEAVE_TEAM, data: state.entities.teams.teams[currentTeamId]},
             {type: MOCK_CHECK_FOR_MODIFIED_USERS},
             {type: GeneralTypes.WEBSOCKET_SUCCESS, timestamp, data: null},
         ];
