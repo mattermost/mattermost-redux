@@ -127,13 +127,13 @@ function storeFilesIdsForPost(state: Dictionary<string[]>, post: Post) {
     };
 }
 
-function filePublicLink(state: string | null = null, action: GenericAction) {
+function filePublicLink(state: {link: string} = {link: ''}, action: GenericAction) {
     switch (action.type) {
     case FileTypes.RECEIVED_FILE_PUBLIC_LINK: {
         return action.data;
     }
     case UserTypes.LOGOUT_SUCCESS:
-        return '';
+        return {link: ''};
 
     default:
         return state;
