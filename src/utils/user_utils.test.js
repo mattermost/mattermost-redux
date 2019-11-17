@@ -20,6 +20,19 @@ describe('user utils', () => {
             first_name: 'test',
             last_name: 'user',
         };
+        const testUser1 = {
+            id: 'test_user_id',
+            username: 'username',
+            first_name: 'First',
+            last_name: 'Last',
+        };
+        const testUser2 = {
+            id: 'test_user_id_2',
+            username: 'username2',
+            first_name: 'First2',
+            last_name: 'Last2',
+            nickname: 'nick2',
+        };
         it('should return username', () => {
             assert.equal(displayUsername(userObj, 'UNKNOWN_PREFERENCE'), 'testUser');
         });
@@ -53,6 +66,53 @@ describe('user utils', () => {
             let noUserObj;
             assert.equal(displayUsername(noUserObj, 'UNKNOWN_PREFERENCE', false), '');
         });
+
+        it('should show full name since nickname is not present and lock name display is false', () => {
+            assert.equal(displayUsername(testUser1, Preferences.DISPLAY_PREFER_NICKNAME, true, false, Preferences.DISPLAY_PREFER_FULL_NAME), 'First Last');
+        });
+
+        it('should show nickname since it is present and lock name display is false', () => {
+            assert.equal(displayUsername(testUser2, Preferences.DISPLAY_PREFER_NICKNAME, true, false, Preferences.DISPLAY_PREFER_FULL_NAME), 'nick2');
+        });
+
+        it('should show username since it is present and lock name display is false', () => {
+            assert.equal(displayUsername(testUser1, Preferences.DISPLAY_PREFER_USERNAME, true, false, Preferences.DISPLAY_PREFER_NICKNAME), 'username');
+            assert.equal(displayUsername(testUser2, Preferences.DISPLAY_PREFER_USERNAME, true, false, Preferences.DISPLAY_PREFER_NICKNAME), 'username2');
+        });
+
+        it('should show full name since it is present and lock name display is false', () => {
+            assert.equal(displayUsername(testUser1, Preferences.DISPLAY_PREFER_FULL_NAME, true, false, Preferences.DISPLAY_PREFER_NICKNAME), 'First Last');
+            assert.equal(displayUsername(testUser2, Preferences.DISPLAY_PREFER_FULL_NAME, true, false, Preferences.DISPLAY_PREFER_NICKNAME), 'First2 Last2');
+        });
+
+        it('should match default name Someone for not found user', () => {
+            assert.equal(displayUsername(null, Preferences.DISPLAY_PREFER_FULL_NAME, true, false, Preferences.DISPLAY_PREFER_NICKNAME), 'Someone');
+        });
+
+        it('should match empty string when not using default fallback', () => {
+            assert.equal(displayUsername(null, Preferences.DISPLAY_PREFER_FULL_NAME, false, false, Preferences.DISPLAY_PREFER_NICKNAME), '');
+        });
+
+        it('should match full name since nickname is not present and locking teammate name display is true', () => {
+            assert.equal(displayUsername(testUser1, Preferences.DISPLAY_PREFER_FULL_NAME, true, true, Preferences.DISPLAY_PREFER_NICKNAME), 'First Last');
+        });
+
+        it('should match nickname since it\'s present and locking teammate name display is true', () => {
+            assert.equal(displayUsername(testUser2, Preferences.DISPLAY_PREFER_FULL_NAME, true, true, Preferences.DISPLAY_PREFER_NICKNAME), 'nick2');
+        });
+
+        it('should match username since teammate name display is true', () => {
+            assert.equal(displayUsername(testUser1, Preferences.DISPLAY_PREFER_FULL_NAME, true, true, Preferences.DISPLAY_PREFER_USERNAME), 'username');
+            assert.equal(displayUsername(testUser2, Preferences.DISPLAY_PREFER_FULL_NAME, true, true, Preferences.DISPLAY_PREFER_USERNAME), 'username2');
+        });
+
+        it('should match full name since teammate name display is true', () => {
+            assert.equal(displayUsername(testUser1, Preferences.DISPLAY_PREFER_USERNAME, true, true, Preferences.DISPLAY_PREFER_FULL_NAME), 'First Last');
+            assert.equal(displayUsername(testUser2, Preferences.DISPLAY_PREFER_USERNAME, true, true, Preferences.DISPLAY_PREFER_FULL_NAME), 'First2 Last2');
+
+        });
+
+
     });
 
     describe('filterProfilesMatchingTerm', () => {
