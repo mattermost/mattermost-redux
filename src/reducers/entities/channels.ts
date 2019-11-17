@@ -13,7 +13,7 @@ function channelListToSet(state: any, action: GenericAction) {
     const teamChannelIds = nextState[action.teamId];
 
     // Remove existing channels that are no longer
-    if (teamChannelIds && teamChannelIds.size) {
+    if (action.sync && teamChannelIds && teamChannelIds.size) {
         teamChannelIds.forEach((id: string) => {
             if (!action.data.find((c: any) => c.id === id)) {
                 teamChannelIds.delete(id);
@@ -69,14 +69,16 @@ function channels(state: IDMappedObjects<Channel> = {}, action: GenericAction) {
         const currentChannels = Object.values(nextState);
 
         // Remove existing channels that are no longer
-        currentChannels.forEach((channel) => {
-            if (channel.team_id === action.teamId) {
-                const id: string = channel.id;
-                if (!action.data.find((c: any) => c.id === id)) {
-                    Reflect.deleteProperty(nextState, id);
+        if (action.sync) {
+            currentChannels.forEach((channel) => {
+                if (channel.team_id === action.teamId) {
+                    const id: string = channel.id;
+                    if (!action.data.find((c: any) => c.id === id)) {
+                        Reflect.deleteProperty(nextState, id);
+                    }
                 }
-            }
-        });
+            });
+        }
 
         for (const channel of action.data) {
             if (state[channel.id] && channel.type === General.DM_CHANNEL) {
