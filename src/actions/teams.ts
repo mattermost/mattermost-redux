@@ -13,7 +13,7 @@ import {getCurrentUserId} from 'selectors/entities/users';
 
 import {GetStateFunc, DispatchFunc, ActionFunc, ActionResult, batchActions, Action} from 'types/actions';
 
-import {Team} from 'types/teams';
+import {Team, TeamMembership} from 'types/teams';
 
 import {selectChannel} from './channels';
 import {logError} from './errors';
@@ -22,7 +22,7 @@ import {getProfilesByIds, getStatusesByIds} from './users';
 import {loadRolesIfNeeded} from './roles';
 import {UserProfile} from 'types/users';
 
-async function getProfilesAndStatusesForMembers(userIds, dispatch, getState) {
+async function getProfilesAndStatusesForMembers(userIds: string[], dispatch: DispatchFunc, getState: GetStateFunc) {
     const {
         currentUserId,
         profiles,
@@ -423,7 +423,7 @@ export function addUsersToTeam(teamId: string, userIds: Array<string>): ActionFu
         }
 
         const profiles: Partial<UserProfile>[] = [];
-        members.forEach((m) => profiles.push({id: m.user_id}));
+        members.forEach((m: TeamMembership) => profiles.push({id: m.user_id}));
 
         dispatch(batchActions([
             {
@@ -495,7 +495,7 @@ export function removeUserFromTeam(teamId: string, userId: string): ActionFunc {
     };
 }
 
-export function updateTeamMemberRoles(teamId: string, userId: string, roles: string): ActionFunc {
+export function updateTeamMemberRoles(teamId: string, userId: string, roles: string[]): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         try {
             await Client4.updateTeamMemberRoles(teamId, userId, roles);

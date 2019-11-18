@@ -37,7 +37,7 @@ export default function typing(state: Typing = {}, action: GenericAction): Typin
         } = data;
 
         if (state[id] && state[id][userId] <= now) {
-            const nextState = {
+            const nextState: Typing = {
                 ...state,
                 [id]: {...state[id]},
             };

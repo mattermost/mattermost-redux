@@ -510,6 +510,7 @@ export function fetchMyChannelsAndMembers(teamId: string): ActionFunc {
                 type: ChannelTypes.RECEIVED_CHANNELS,
                 teamId,
                 data: channels,
+                sync: true,
             },
             {
                 type: ChannelTypes.CHANNELS_SUCCESS,
@@ -573,7 +574,7 @@ export function getMyChannelMembers(teamId: string): ActionFunc {
 
 export function getChannelMembers(channelId: string, page = 0, perPage: number = General.CHANNELS_CHUNK_SIZE): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
-        let channelMembers;
+        let channelMembers: ChannelMembership[];
 
         try {
             const channelMembersRequest = Client4.getChannelMembers(channelId, page, perPage);
@@ -823,6 +824,26 @@ export function getChannels(teamId: string, page = 0, perPage: number = General.
     };
 }
 
+export function getArchivedChannels(teamId: string, page = 0, perPage: number = General.CHANNELS_CHUNK_SIZE): ActionFunc {
+    return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
+        let channels;
+        try {
+            channels = await Client4.getArchivedChannels(teamId, page, perPage);
+        } catch (error) {
+            forceLogoutIfNecessary(error, dispatch, getState);
+            return {error};
+        }
+
+        dispatch({
+            type: ChannelTypes.RECEIVED_CHANNELS,
+            teamId,
+            data: channels,
+        }, getState);
+
+        return {data: channels};
+    };
+}
+
 export function getAllChannelsWithCount(page = 0, perPage: number = General.CHANNELS_CHUNK_SIZE, notAssociatedToGroup = '', excludeDefaultChannels = false): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         dispatch({type: ChannelTypes.GET_ALL_CHANNELS_REQUEST, data: null}, getState);
@@ -949,13 +970,17 @@ export function autocompleteChannelsForSearch(teamId: string, term: string): Act
     };
 }
 
-export function searchChannels(teamId: string, term: string): ActionFunc {
+export function searchChannels(teamId: string, term: string, archived?: boolean): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         dispatch({type: ChannelTypes.GET_CHANNELS_REQUEST, data: null}, getState);
 
         let channels;
         try {
-            channels = await Client4.searchChannels(teamId, term);
+            if (archived) {
+                channels = await Client4.searchArchivedChannels(teamId, term);
+            } else {
+                channels = await Client4.searchChannels(teamId, term);
+            }
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch, getState);
             dispatch(batchActions([
