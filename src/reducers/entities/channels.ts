@@ -15,8 +15,10 @@ function channelListToSet(state: any, action: GenericAction) {
     // Remove existing channels that are no longer
     if (action.sync && teamChannelIds && teamChannelIds.size) {
         teamChannelIds.forEach((id: string) => {
-            if (!action.data.find((c: any) => c.id === id)) {
-                teamChannelIds.delete(id);
+            if (id !== action.currentChannelId) {
+                if (!action.data.find((c: any) => c.id === id)) {
+                    teamChannelIds.delete(id);
+                }
             }
         });
         nextState[action.teamId] = teamChannelIds;
@@ -73,8 +75,10 @@ function channels(state: IDMappedObjects<Channel> = {}, action: GenericAction) {
             currentChannels.forEach((channel) => {
                 if (channel.team_id === action.teamId) {
                     const id: string = channel.id;
-                    if (!action.data.find((c: any) => c.id === id)) {
-                        Reflect.deleteProperty(nextState, id);
+                    if (id !== action.currentChannelId) {
+                        if (!action.data.find((c: any) => c.id === id)) {
+                            Reflect.deleteProperty(nextState, id);
+                        }
                     }
                 }
             });
@@ -215,7 +219,9 @@ function myMembers(state: RelationOneToOne<Channel, ChannelMembership> = {}, act
         const remove = action.remove as string[];
         if (remove) {
             remove.forEach((id: string) => {
-                Reflect.deleteProperty(nextState, id);
+                if (id !== action.currentChannelId) {
+                    Reflect.deleteProperty(nextState, id);
+                }
             });
         }
 
@@ -360,7 +366,9 @@ function membersInChannel(state: RelationOneToOne<Channel, UserIDMappedObjects<C
         if (remove && currentUserId) {
             remove.forEach((id) => {
                 if (nextState[id]) {
-                    Reflect.deleteProperty(nextState[id], currentUserId);
+                    if (id !== action.currentChannelId) {
+                        Reflect.deleteProperty(nextState[id], currentUserId);
+                    }
                 }
             });
         }
