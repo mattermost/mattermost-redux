@@ -6,7 +6,7 @@ import websocketClient from '../client/websocket_client';
 
 import {ChannelTypes, GeneralTypes, EmojiTypes, PostTypes, PreferenceTypes, TeamTypes, UserTypes, RoleTypes, AdminTypes, IntegrationTypes} from 'action_types';
 import {General, WebsocketEvents, Preferences} from '../constants';
-import {getAllChannels, getChannel, getChannelsNameMapInTeam, getCurrentChannelId, getRedirectChannelNameForTeam, getCurrentChannelStats} from 'selectors/entities/channels';
+import {getAllChannels, getChannel, getChannelsNameMapInTeam, getCurrentChannelId, getMyChannelMember, getRedirectChannelNameForTeam, getCurrentChannelStats} from 'selectors/entities/channels';
 import {getConfig} from 'selectors/entities/general';
 import {getAllPosts} from 'selectors/entities/posts';
 import {getDirectShowPreferences} from 'selectors/entities/preferences';
@@ -20,7 +20,7 @@ import {getMyPreferences} from './preferences';
 import {ActionFunc, DispatchFunc, GetStateFunc, PlatformType} from 'types/actions';
 
 import {getTeam, getMyTeamUnreads, getMyTeams, getMyTeamMembers} from './teams';
-import {getPost, getPosts, getProfilesAndStatusesForPosts, getCustomEmojiForReaction, handleNewPost, postDeleted, receivedPost} from './posts';
+import {getPost, getPosts, getProfilesAndStatusesForPosts, getCustomEmojiForReaction, getUnreadPostData, handleNewPost, postDeleted, receivedPost} from './posts';
 import {fetchMyChannelsAndMembers, getChannelAndMyMember, getChannelStats, markChannelAsRead} from './channels';
 import {checkForModifiedUsers, getMe, getProfilesByIds, getStatusesByIds, loadProfilesForDirect} from './users';
 import {Channel, ChannelMembership} from 'types/channels';
@@ -227,6 +227,9 @@ function handleEvent(msg: WebSocketMessage) {
     case WebsocketEvents.POST_DELETED:
         doDispatch(handlePostDeleted(msg));
         break;
+    case WebsocketEvents.POST_UNREAD:
+        doDispatch(handlePostUnread(msg));
+        break;
     case WebsocketEvents.LEAVE_TEAM:
         doDispatch(handleLeaveTeamEvent(msg));
         break;
@@ -348,6 +351,28 @@ function handlePostDeleted(msg: WebSocketMessage) {
     const data = JSON.parse(msg.data.post);
 
     return postDeleted(data);
+}
+
+function handlePostUnread(msg: WebSocketMessage) {
+    return (dispatch: DispatchFunc, getState: GetStateFunc) => {
+        const state = getState();
+
+        const member = getMyChannelMember(state, msg.broadcast.channel_id);
+        const delta = member ? member.msg_count - msg.data.msg_count : msg.data.msg_count;
+        const info = {
+            ...msg.data,
+            user_id: msg.broadcast.user_id,
+            team_id: msg.broadcast.team_id,
+            channel_id: msg.broadcast.channel_id,
+            deltaMsgs: delta,
+        };
+        const data = getUnreadPostData(info, state);
+        dispatch({
+            type: ChannelTypes.POST_UNREAD_SUCCESS,
+            data,
+        });
+        return {data};
+    };
 }
 
 function handleLeaveTeamEvent(msg: Partial<WebSocketMessage>) {

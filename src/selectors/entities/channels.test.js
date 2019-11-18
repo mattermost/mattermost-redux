@@ -1751,3 +1751,21 @@ describe('getMyFirstChannelForTeams', () => {
         });
     });
 });
+
+test('isManuallyUnread', () => {
+    const state = {
+        entities: {
+            channels: {
+                manuallyUnread: {
+                    channel1: true,
+                    channel2: false,
+                },
+            },
+        },
+    };
+
+    assert.equal(Selectors.isManuallyUnread(state, 'channel1'), true);
+    assert.equal(Selectors.isManuallyUnread(state, undefined), false);
+    assert.equal(Selectors.isManuallyUnread(state, 'channel2'), false);
+    assert.equal(Selectors.isManuallyUnread(state, 'channel3'), false);
+});

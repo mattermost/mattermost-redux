@@ -489,36 +489,129 @@ describe('Actions.Channels', () => {
         assert.ifError(outgoingHooks[outgoingHook.id]);
     });
 
-    it('viewChannel', async () => {
-        nock(Client4.getChannelsRoute()).
-            post('').
-            reply(201, TestHelper.fakeChannelWithId(TestHelper.basicTeam.id));
+    describe('viewChannel', () => {
+        test('should contact server and update last_viewed_at of both channels', async () => {
+            const channelId = TestHelper.generateId();
+            const prevChannelId = TestHelper.generateId();
 
-        const userChannel = await Client4.createChannel(
-            TestHelper.fakeChannel(TestHelper.basicTeam.id)
-        );
+            const currentUserId = TestHelper.generateId();
 
-        nock(Client4.getUsersRoute()).
-            get(`/me/teams/${TestHelper.basicTeam.id}/channels`).
-            reply(200, [userChannel, TestHelper.basicChannel]);
+            store = await configureStore({
+                entities: {
+                    channels: {
+                        myMembers: {
+                            [channelId]: {
+                                channel_id: channelId,
+                                last_viewed_at: 1000,
+                                roles: '',
+                            },
+                            [prevChannelId]: {
+                                channel_id: prevChannelId,
+                                last_viewed_at: 1000,
+                                roles: '',
+                            },
+                        },
+                    },
+                    users: {
+                        currentUserId,
+                    },
+                },
+            });
 
-        nock(Client4.getUsersRoute()).
-            get(`/me/teams/${TestHelper.basicTeam.id}/channels/members`).
-            reply(200, [{user_id: TestHelper.basicUser.id, roles: 'channel_user', channel_id: userChannel.id}, TestHelper.basicChannelMember]);
+            nock(Client4.getChannelsRoute()).
+                post('/members/me/view', {channel_id: channelId, prev_channel_id: prevChannelId}).
+                reply(200, OK_RESPONSE);
 
-        await store.dispatch(Actions.fetchMyChannelsAndMembers(TestHelper.basicTeam.id));
+            const now = Date.now();
 
-        const members = store.getState().entities.channels.myMembers;
-        const member = members[TestHelper.basicChannel.id];
-        const otherMember = members[userChannel.id];
-        assert.ok(member);
-        assert.ok(otherMember);
+            const result = await store.dispatch(Actions.viewChannel(channelId, prevChannelId));
+            expect(result).toEqual({data: true});
 
-        nock(Client4.getChannelsRoute()).
-            post('/members/me/view').
-            reply(200, OK_RESPONSE);
+            const state = store.getState();
+            expect(state.entities.channels.myMembers[channelId].last_viewed_at).toBeGreaterThan(now);
+            expect(state.entities.channels.myMembers[prevChannelId].last_viewed_at).toBeGreaterThan(now);
+        });
 
-        await store.dispatch(Actions.viewChannel(TestHelper.basicChannel.id, userChannel.id));
+        test('should clear manually unread state from current channel', async () => {
+            const channelId = TestHelper.generateId();
+
+            const currentUserId = TestHelper.generateId();
+
+            store = await configureStore({
+                entities: {
+                    channels: {
+                        manuallyUnread: {
+                            [channelId]: true,
+                        },
+                        myMembers: {
+                            [channelId]: {
+                                channel_id: channelId,
+                                last_viewed_at: 1000,
+                                roles: '',
+                            },
+                        },
+                    },
+                    users: {
+                        currentUserId,
+                    },
+                },
+            });
+
+            nock(Client4.getChannelsRoute()).
+                post('/members/me/view', {channel_id: channelId, prev_channel_id: ''}).
+                reply(200, OK_RESPONSE);
+
+            const result = await store.dispatch(Actions.viewChannel(channelId));
+            expect(result).toEqual({data: true});
+
+            const state = store.getState();
+            expect(state.entities.channels.manuallyUnread[channelId]).not.toBe(true);
+        });
+
+        test('should not update last_viewed_at of previous channel if it is manually marked as unread', async () => {
+            const channelId = TestHelper.generateId();
+            const prevChannelId = TestHelper.generateId();
+
+            const currentUserId = TestHelper.generateId();
+
+            store = await configureStore({
+                entities: {
+                    channels: {
+                        manuallyUnread: {
+                            [prevChannelId]: true,
+                        },
+                        myMembers: {
+                            [channelId]: {
+                                channel_id: channelId,
+                                last_viewed_at: 1000,
+                                roles: '',
+                            },
+                            [prevChannelId]: {
+                                channel_id: prevChannelId,
+                                last_viewed_at: 1000,
+                                roles: '',
+                            },
+                        },
+                    },
+                    users: {
+                        currentUserId,
+                    },
+                },
+            });
+
+            nock(Client4.getChannelsRoute()).
+                post('/members/me/view', {channel_id: channelId, prev_channel_id: ''}).
+                reply(200, OK_RESPONSE);
+
+            const now = Date.now();
+
+            const result = await store.dispatch(Actions.viewChannel(channelId, prevChannelId));
+            expect(result).toEqual({data: true});
+
+            const state = store.getState();
+            expect(state.entities.channels.myMembers[channelId].last_viewed_at).toBeGreaterThan(now);
+            expect(state.entities.channels.myMembers[prevChannelId].last_viewed_at).toBe(1000);
+        });
     });
 
     it('markChannelAsViewed', async () => {

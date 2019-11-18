@@ -1674,6 +1674,15 @@ export default class Client4 {
         );
     };
 
+    markPostAsUnread = async (userId: string, postId: string) => {
+        this.trackEvent('api', 'api_post_set_unread_post');
+
+        return this.doFetch(
+            `${this.getUserRoute(userId)}/posts/${postId}/set_unread`,
+            {method: 'post'}
+        );
+    }
+
     pinPost = async (postId: string) => {
         this.trackEvent('api', 'api_posts_pin');
 

@@ -859,3 +859,12 @@ export const getRedirectChannelNameForTeam = (state: GlobalState, teamId: string
 
     return myFirstChannelForTeam && myFirstChannelForTeam.name || General.DEFAULT_CHANNEL;
 };
+
+// isManually unread looks into state if the provided channelId is marked as unread by the user.
+export function isManuallyUnread(state: GlobalState, channelId?: string): boolean {
+    if (!channelId) {
+        return false;
+    }
+
+    return Boolean(state.entities.channels.manuallyUnread[channelId]);
+}
