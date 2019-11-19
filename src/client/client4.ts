@@ -2702,6 +2702,15 @@ export default class Client4 {
         );
     }
 
+    installMarketplacePlugin = async (id: string, version: string) => {
+        this.trackEvent('api', 'api_install_marketplace_plugin');
+
+        return this.doFetch(
+            `${this.getPluginsMarketplaceRoute()}`,
+            {method: 'post', body: JSON.stringify({id, version})}
+        );
+    }
+
     getPluginStatuses = async () => {
         return this.doFetch(
             `${this.getPluginsRoute()}/statuses`,
@@ -2981,6 +2990,7 @@ export default class Client4 {
             'api_interactive_messages_menu_selected',
             'api_interactive_messages_dialog_submitted',
             'ui_marketplace_download',
+            'ui_marketplace_download_update',
             'ui_marketplace_configure',
             'ui_marketplace_opened',
             'ui_marketplace_closed',
