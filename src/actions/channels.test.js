@@ -1540,7 +1540,18 @@ describe('Actions.Channels', () => {
             throw new Error(JSON.stringify(moreRequest.error));
         }
 
-        assert.ok(data.length === 2);
+        nock(Client4.getChannelsRoute()).
+            post('/search').
+            reply(200, {channels: [TestHelper.basicChannel, userChannel], total_count: 2});
+
+        const response = await store.dispatch(Actions.searchAllChannels('test', '', false, 0, 100));
+
+        const paginatedRequest = store.getState().requests.channels.getAllChannels;
+        if (paginatedRequest.status === RequestStatus.FAILURE) {
+            throw new Error(JSON.stringify(paginatedRequest.error));
+        }
+
+        assert.ok(response.data.channels.length === 2);
     });
 
     it('searchArchivedChannels', async () => {
