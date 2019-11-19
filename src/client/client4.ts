@@ -1528,11 +1528,13 @@ export default class Client4 {
         );
     };
 
-    searchAllChannels = async (term: string, notAssociatedToGroup = '', excludeDefaultChannels = false) => {
+    searchAllChannels = async (term: string, notAssociatedToGroup = '', excludeDefaultChannels = false, page?: number, perPage?: number) => {
         const body = {
             term,
             not_associated_to_group: notAssociatedToGroup,
             exclude_default_channels: excludeDefaultChannels,
+            page,
+            per_page: perPage,
         };
         return this.doFetch(
             `${this.getChannelsRoute()}/search`,

@@ -1026,13 +1026,13 @@ export function searchChannels(teamId: string, term: string, archived?: boolean)
     };
 }
 
-export function searchAllChannels(term: string, notAssociatedToGroup = '', excludeDefaultChannels = false): ActionFunc {
+export function searchAllChannels(term: string, notAssociatedToGroup = '', excludeDefaultChannels = false, page?: number, perPage?: number): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         dispatch({type: ChannelTypes.GET_ALL_CHANNELS_REQUEST, data: null}, getState);
 
-        let channels;
+        let response;
         try {
-            channels = await Client4.searchAllChannels(term, notAssociatedToGroup, excludeDefaultChannels);
+            response = await Client4.searchAllChannels(term, notAssociatedToGroup, excludeDefaultChannels, page, perPage);
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch, getState);
             dispatch(batchActions([
@@ -1041,6 +1041,8 @@ export function searchAllChannels(term: string, notAssociatedToGroup = '', exclu
             ]), getState);
             return {error};
         }
+
+        const channels = response.channels || response;
 
         dispatch(batchActions([
             {
@@ -1052,7 +1054,7 @@ export function searchAllChannels(term: string, notAssociatedToGroup = '', exclu
             },
         ]), getState);
 
-        return {data: channels};
+        return {data: response};
     };
 }
 
