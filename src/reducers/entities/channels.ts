@@ -219,9 +219,7 @@ function myMembers(state: RelationOneToOne<Channel, ChannelMembership> = {}, act
         const remove = action.remove as string[];
         if (remove) {
             remove.forEach((id: string) => {
-                if (id !== action.currentChannelId) {
-                    Reflect.deleteProperty(nextState, id);
-                }
+                Reflect.deleteProperty(nextState, id);
             });
         }
 
@@ -366,9 +364,7 @@ function membersInChannel(state: RelationOneToOne<Channel, UserIDMappedObjects<C
         if (remove && currentUserId) {
             remove.forEach((id) => {
                 if (nextState[id]) {
-                    if (id !== action.currentChannelId) {
-                        Reflect.deleteProperty(nextState[id], currentUserId);
-                    }
+                    Reflect.deleteProperty(nextState[id], currentUserId);
                 }
             });
         }
