@@ -13,7 +13,6 @@ import * as groups from './groups';
 import * as i18n from './i18n';
 import * as integrations from './integrations';
 import * as jobs from './jobs';
-import * as plugins from './plugins';
 import * as posts from './posts';
 import * as preferences from './preferences';
 import * as roles_helpers from './roles_helpers';
@@ -38,7 +37,6 @@ export {
     i18n,
     integrations,
     jobs,
-    plugins,
     posts,
     preferences,
     roles_helpers,

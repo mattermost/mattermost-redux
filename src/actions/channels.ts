@@ -5,7 +5,12 @@ import {General, Preferences} from '../constants';
 import {ChannelTypes, PreferenceTypes, UserTypes} from 'action_types';
 import {savePreferences, deletePreferences} from './preferences';
 import {getChannelsIdForTeam, getChannelByName} from 'utils/channel_utils';
-import {getChannelsNameMapInTeam, getMyChannelMember as getMyChannelMemberSelector, getRedirectChannelNameForTeam} from 'selectors/entities/channels';
+import {
+    getChannelsNameMapInTeam,
+    getMyChannelMember as getMyChannelMemberSelector,
+    getRedirectChannelNameForTeam,
+    isManuallyUnread,
+} from 'selectors/entities/channels';
 import {getCurrentTeamId} from 'selectors/entities/teams';
 
 import {Action, ActionFunc, batchActions, DispatchFunc, GetStateFunc} from 'types/actions';
@@ -510,6 +515,7 @@ export function fetchMyChannelsAndMembers(teamId: string): ActionFunc {
                 type: ChannelTypes.RECEIVED_CHANNELS,
                 teamId,
                 data: channels,
+                sync: true,
             },
             {
                 type: ChannelTypes.CHANNELS_SUCCESS,
@@ -718,6 +724,8 @@ export function viewChannel(channelId: string, prevChannelId = ''): ActionFunc {
         const {myPreferences} = getState().entities.preferences;
         const viewTimePref = myPreferences[`${Preferences.CATEGORY_CHANNEL_APPROXIMATE_VIEW_TIME}--${channelId}`];
         const viewTime = viewTimePref ? parseInt(viewTimePref.value!, 10) : 0;
+        const prevChanManuallyUnread = isManuallyUnread(getState(), prevChannelId);
+
         if (viewTime < new Date().getTime() - (3 * 60 * 60 * 1000)) {
             const preferences = [
                 {user_id: currentUserId, category: Preferences.CATEGORY_CHANNEL_APPROXIMATE_VIEW_TIME, name: channelId, value: new Date().getTime().toString()},
@@ -726,7 +734,7 @@ export function viewChannel(channelId: string, prevChannelId = ''): ActionFunc {
         }
 
         try {
-            await Client4.viewMyChannel(channelId, prevChannelId);
+            await Client4.viewMyChannel(channelId, prevChanManuallyUnread ? '' : prevChannelId);
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch, getState);
             dispatch(logError(error));
@@ -739,6 +747,12 @@ export function viewChannel(channelId: string, prevChannelId = ''): ActionFunc {
         const {myMembers} = getState().entities.channels;
         const member = myMembers[channelId];
         if (member) {
+            if (isManuallyUnread(getState(), channelId)) {
+                actions.push({
+                    type: ChannelTypes.REMOVE_MANUALLY_UNREAD,
+                    data: {channelId},
+                });
+            }
             actions.push({
                 type: ChannelTypes.RECEIVED_MY_CHANNEL_MEMBER,
                 data: {...member, last_viewed_at: new Date().getTime()},
@@ -747,7 +761,7 @@ export function viewChannel(channelId: string, prevChannelId = ''): ActionFunc {
         }
 
         const prevMember = myMembers[prevChannelId];
-        if (prevMember) {
+        if (!prevChanManuallyUnread && prevMember) {
             actions.push({
                 type: ChannelTypes.RECEIVED_MY_CHANNEL_MEMBER,
                 data: {...prevMember, last_viewed_at: new Date().getTime()},
@@ -762,21 +776,29 @@ export function viewChannel(channelId: string, prevChannelId = ''): ActionFunc {
 }
 
 export function markChannelAsViewed(channelId: string, prevChannelId = ''): ActionFunc {
-    return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
+    return (dispatch: DispatchFunc, getState: GetStateFunc) => {
         const actions: Action[] = [];
 
         const {myMembers} = getState().entities.channels;
         const member = myMembers[channelId];
+        const state = getState();
         if (member) {
             actions.push({
                 type: ChannelTypes.RECEIVED_MY_CHANNEL_MEMBER,
                 data: {...member, last_viewed_at: Date.now()},
             });
+            if (isManuallyUnread(state, channelId)) {
+                actions.push({
+                    type: ChannelTypes.REMOVE_MANUALLY_UNREAD,
+                    data: {channelId},
+                });
+            }
+
             dispatch(loadRolesIfNeeded(member.roles.split(' ')));
         }
 
         const prevMember = myMembers[prevChannelId];
-        if (prevMember) {
+        if (prevMember && !isManuallyUnread(getState(), prevChannelId)) {
             actions.push({
                 type: ChannelTypes.RECEIVED_MY_CHANNEL_MEMBER,
                 data: {...prevMember, last_viewed_at: Date.now()},
@@ -785,7 +807,7 @@ export function markChannelAsViewed(channelId: string, prevChannelId = ''): Acti
         }
 
         if (actions.length) {
-            dispatch(batchActions(actions), getState);
+            dispatch(batchActions(actions));
         }
 
         return {data: true};
@@ -1004,13 +1026,13 @@ export function searchChannels(teamId: string, term: string, archived?: boolean)
     };
 }
 
-export function searchAllChannels(term: string, notAssociatedToGroup = '', excludeDefaultChannels = false): ActionFunc {
+export function searchAllChannels(term: string, notAssociatedToGroup = '', excludeDefaultChannels = false, page?: number, perPage?: number): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         dispatch({type: ChannelTypes.GET_ALL_CHANNELS_REQUEST, data: null}, getState);
 
-        let channels;
+        let response;
         try {
-            channels = await Client4.searchAllChannels(term, notAssociatedToGroup, excludeDefaultChannels);
+            response = await Client4.searchAllChannels(term, notAssociatedToGroup, excludeDefaultChannels, page, perPage);
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch, getState);
             dispatch(batchActions([
@@ -1019,6 +1041,8 @@ export function searchAllChannels(term: string, notAssociatedToGroup = '', exclu
             ]), getState);
             return {error};
         }
+
+        const channels = response.channels || response;
 
         dispatch(batchActions([
             {
@@ -1030,7 +1054,7 @@ export function searchAllChannels(term: string, notAssociatedToGroup = '', exclu
             },
         ]), getState);
 
-        return {data: channels};
+        return {data: response};
     };
 }
 
@@ -1176,9 +1200,11 @@ export function updateChannelPurpose(channelId: string, purpose: string): Action
 
 export function markChannelAsRead(channelId: string, prevChannelId?: string, updateLastViewedAt = true): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
+        const prevChanManuallyUnread = isManuallyUnread(getState(), prevChannelId);
+
         // Send channel last viewed at to the server
         if (updateLastViewedAt) {
-            Client4.viewMyChannel(channelId, prevChannelId).then().catch((error) => {
+            Client4.viewMyChannel(channelId, prevChanManuallyUnread ? '' : prevChannelId).then().catch((error) => {
                 forceLogoutIfNecessary(error, dispatch, getState);
                 dispatch(logError(error));
                 return {error};
@@ -1190,11 +1216,11 @@ export function markChannelAsRead(channelId: string, prevChannelId?: string, upd
 
         // Update channel member objects to set all mentions and posts as viewed
         const channel = channels[channelId];
-        const prevChannel = prevChannelId ? channels[prevChannelId] : null; // May be null since prevChannelId is optional
+        const prevChannel = (!prevChanManuallyUnread && prevChannelId) ? channels[prevChannelId] : null; // May be null since prevChannelId is optional
 
         // Update team member objects to set mentions and posts in channel as viewed
         const channelMember = myMembers[channelId];
-        const prevChannelMember = prevChannelId ? myMembers[prevChannelId] : null; // May also be null
+        const prevChannelMember = (!prevChanManuallyUnread && prevChannelId) ? myMembers[prevChannelId] : null; // May also be null
 
         const actions: Action[] = [];
 
@@ -1215,6 +1241,13 @@ export function markChannelAsRead(channelId: string, prevChannelId?: string, upd
                     channelId,
                     amount: channelMember.mention_count,
                 },
+            });
+        }
+
+        if (channel && isManuallyUnread(getState(), channelId)) {
+            actions.push({
+                type: ChannelTypes.REMOVE_MANUALLY_UNREAD,
+                data: {channelId},
             });
         }
 
