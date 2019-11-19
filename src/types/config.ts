@@ -10,6 +10,7 @@ export type Config = {
     AndroidLatestVersion: string;
     AndroidMinVersion: string;
     AppDownloadLink: string;
+    AsymmetricSigningPublicKey: string;
     AvailableLocales: string;
     BannerColor: string;
     BannerText: string;

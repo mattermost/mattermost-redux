@@ -10,7 +10,7 @@ import {login} from 'actions/users';
 import {setSystemEmojis, createCustomEmoji} from 'actions/emojis';
 import {Client4} from 'client';
 import {Preferences, Posts, RequestStatus} from '../constants';
-import {PostTypes} from 'action_types';
+import {ChannelTypes, PostTypes} from 'action_types';
 import TestHelper from 'test/test_helper';
 import configureStore from 'test/test_store';
 import {getPreferenceKey} from 'utils/preference_utils';
@@ -1147,6 +1147,52 @@ describe('Actions.Posts', () => {
         assert.ifError(unflagged);
     });
 
+    it('setUnreadPost', async () => {
+        const teamId = TestHelper.generateId();
+        const channelId = TestHelper.generateId();
+        const userId = TestHelper.generateId();
+        const postId = TestHelper.generateId();
+
+        store = await configureStore({
+            entities: {
+                channels: {
+                    channels: {
+                        [channelId]: {team_id: teamId, total_msg_count: 10},
+                    },
+                    myMembers: {
+                        [channelId]: {msg_count: 10, mention_count: 0, last_viewed_at: 0},
+                    },
+                },
+                teams: {
+                    myMembers: {
+                        [teamId]: {msg_count: 15, mention_count: 0},
+                    },
+                },
+                users: {
+                    currentUserId: userId,
+                },
+            },
+        });
+
+        nock(Client4.getUserRoute(userId)).post(`/posts/${postId}/set_unread`).reply(200, {
+            team_id: teamId,
+            channel_id: channelId,
+            msg_count: 3,
+            last_viewed_at: 1565605543,
+            mention_count: 1,
+        });
+
+        await store.dispatch(Actions.setUnreadPost(userId, postId));
+        const state = store.getState();
+
+        assert.equal(state.entities.channels.channels[channelId].total_msg_count, 10);
+        assert.equal(state.entities.channels.myMembers[channelId].msg_count, 3);
+        assert.equal(state.entities.channels.myMembers[channelId].mention_count, 1);
+        assert.equal(state.entities.channels.myMembers[channelId].last_viewed_at, 1565605543);
+        assert.equal(state.entities.teams.myMembers[teamId].msg_count, 8);
+        assert.equal(state.entities.teams.myMembers[teamId].mention_count, 1);
+    });
+
     it('pinPost', async () => {
         const {dispatch, getState} = store;
 
@@ -1729,6 +1775,148 @@ describe('Actions.Posts', () => {
                 recent: true,
                 oldest: true,
             });
+        });
+    });
+
+    describe('lastPostActions', () => {
+        test('should mark channel as read when viewing channel', async () => {
+            const channelId = TestHelper.generateId();
+
+            store = await configureStore({
+                entities: {
+                    channels: {
+                        currentChannelId: channelId,
+                        myMembers: {
+                            [channelId]: {channel_id: channelId, last_viewed_at: 0, roles: ''},
+                        },
+                    },
+                },
+            });
+
+            const post1 = {channel_id: channelId, create_at: 1000};
+            await store.dispatch(Actions.receivedPost(post1));
+
+            const post2 = {channel_id: channelId, create_at: 2000};
+            await store.dispatch(Actions.lastPostActions(post2, {}));
+
+            expect(store.getState().entities.channels.myMembers[channelId].last_viewed_at).toBeGreaterThan(post2.create_at);
+        });
+
+        test('should not mark channel as read when not viewing channel', async () => {
+            const channelId = TestHelper.generateId();
+            const otherChannelId = TestHelper.generateId();
+
+            store = await configureStore({
+                entities: {
+                    channels: {
+                        currentChannelId: otherChannelId,
+                        myMembers: {
+                            [channelId]: {channel_id: channelId, last_viewed_at: 500, roles: ''},
+                            [otherChannelId]: {channel_id: otherChannelId, last_viewed_at: 500, roles: ''},
+                        },
+                    },
+                },
+            });
+
+            const post1 = {channel_id: channelId, create_at: 1000};
+            await store.dispatch(Actions.receivedPost(post1));
+
+            const post2 = {channel_id: channelId, create_at: 2000};
+            await store.dispatch(Actions.lastPostActions(post2, {}));
+
+            expect(store.getState().entities.channels.myMembers[channelId].last_viewed_at).toBe(500);
+        });
+
+        test('should mark channel as read when not viewing channel and post is from current user', async () => {
+            const channelId = TestHelper.generateId();
+            const otherChannelId = TestHelper.generateId();
+            const currentUserId = TestHelper.generateId();
+
+            store = await configureStore({
+                entities: {
+                    channels: {
+                        currentChannelId: otherChannelId,
+                        myMembers: {
+                            [channelId]: {channel_id: channelId, last_viewed_at: 500, roles: ''},
+                            [otherChannelId]: {channel_id: otherChannelId, last_viewed_at: 500, roles: ''},
+                        },
+                    },
+                    users: {
+                        currentUserId,
+                    },
+                },
+            });
+
+            const post1 = {channel_id: channelId, create_at: 1000};
+            await store.dispatch(Actions.receivedPost(post1));
+
+            const post2 = {channel_id: channelId, create_at: 2000, user_id: currentUserId};
+            await store.dispatch(Actions.lastPostActions(post2, {}));
+
+            expect(store.getState().entities.channels.myMembers[channelId].last_viewed_at).toBeGreaterThan(post2.create_at);
+        });
+
+        test('should mark channel as unread when not viewing channel and post is from webhook owned by current user', async () => {
+            const channelId = TestHelper.generateId();
+            const otherChannelId = TestHelper.generateId();
+            const currentUserId = TestHelper.generateId();
+
+            store = await configureStore({
+                entities: {
+                    channels: {
+                        currentChannelId: otherChannelId,
+                        myMembers: {
+                            [channelId]: {channel_id: channelId, last_viewed_at: 500, roles: ''},
+                            [otherChannelId]: {channel_id: otherChannelId, last_viewed_at: 500, roles: ''},
+                        },
+                    },
+                    users: {
+                        currentUserId,
+                    },
+                },
+            });
+
+            const post1 = {channel_id: channelId, create_at: 1000};
+            await store.dispatch(Actions.receivedPost(post1));
+
+            const post2 = {channel_id: channelId, create_at: 2000, props: {from_webhook: 'true'}, user_id: currentUserId};
+            await store.dispatch(Actions.lastPostActions(post2, {}));
+
+            expect(store.getState().entities.channels.myMembers[channelId].last_viewed_at).toBe(500);
+        });
+
+        test('should not mark channel as read when viewing channel that was marked as unread', async () => {
+            const channelId = TestHelper.generateId();
+
+            store = await configureStore({
+                entities: {
+                    channels: {
+                        currentChannelId: channelId,
+                        myMembers: {
+                            [channelId]: {channel_id: channelId, last_viewed_at: 500, roles: ''},
+                        },
+                        manuallyUnread: {
+                            [channelId]: true,
+                        },
+                    },
+                },
+            });
+
+            const post1 = {id: 'post1', channel_id: channelId, create_at: 1000};
+            await store.dispatch(Actions.receivedPost(post1));
+
+            await store.dispatch({
+                type: ChannelTypes.POST_UNREAD_SUCCESS,
+                data: {
+                    channelId,
+                    lastViewedAt: post1.create_at - 1,
+                },
+            });
+
+            const post2 = {channel_id: channelId, create_at: 2000};
+            await store.dispatch(Actions.lastPostActions(post2, {}));
+
+            expect(store.getState().entities.channels.myMembers[channelId].last_viewed_at).toBe(post1.create_at - 1);
         });
     });
 });

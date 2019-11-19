@@ -99,6 +99,56 @@ describe('Actions.Websocket', () => {
         assert.strictEqual(posts[post.id].state, Posts.POST_DELETED);
     });
 
+    it('Websocket handle Post Unread', async () => {
+        const teamId = TestHelper.generateId();
+        const channelId = TestHelper.generateId();
+        const userId = TestHelper.generateId();
+
+        store = await configureStore({
+            entities: {
+                channels: {
+                    channels: {
+                        [channelId]: {id: channelId},
+                    },
+                    myMembers: {
+                        [channelId]: {msg_count: 10, mention_count: 0, last_viewed_at: 0},
+                    },
+                },
+                teams: {
+                    myMembers: {
+                        [teamId]: {msg_count: 10, mention_count: 0},
+                    },
+                },
+            },
+        });
+        await store.dispatch(Actions.init(
+            'web',
+            null,
+            null,
+            MockWebSocket
+        ));
+
+        mockServer.emit('message', JSON.stringify({
+            event: WebsocketEvents.POST_UNREAD,
+            data: {
+                last_viewed_at: 25,
+                msg_count: 3,
+                mention_count: 2,
+                delta_msg: 7,
+            },
+            broadcast: {omit_users: null, user_id: userId, channel_id: channelId, team_id: teamId},
+            seq: 7,
+        }));
+
+        const state = store.getState();
+        assert.equal(state.entities.channels.manuallyUnread[channelId], true);
+        assert.equal(state.entities.channels.myMembers[channelId].msg_count, 3);
+        assert.equal(state.entities.channels.myMembers[channelId].mention_count, 2);
+        assert.equal(state.entities.channels.myMembers[channelId].last_viewed_at, 25);
+        assert.equal(state.entities.teams.myMembers[teamId].msg_count, 3);
+        assert.equal(state.entities.teams.myMembers[teamId].mention_count, 2);
+    });
+
     it('Websocket Handle Reaction Added to Post', (done) => {
         async function test() {
             const emoji = '+1';
