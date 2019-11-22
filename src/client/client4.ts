@@ -23,6 +23,7 @@ import {Config} from 'types/config';
 import {Bot, BotPatch} from 'types/bots';
 import {Dictionary} from 'types/utilities';
 import {SyncablePatch} from 'types/groups';
+import {Theme} from 'types/themes';
 
 const FormData = require('form-data');
 const HEADER_AUTH = 'Authorization';
@@ -291,6 +292,10 @@ export default class Client4 {
 
     getBotRoute(botUserId: string) {
         return `${this.getBotsRoute()}/${botUserId}`;
+    }
+
+    getThemesRoute() {
+        return `${this.getBaseRoute()}/themes`;
     }
 
     getCSRFFromCookie() {
@@ -2919,6 +2924,36 @@ export default class Client4 {
         return this.doFetch(
             `${this.getChannelRoute(channelID)}/members_minus_group_members?${query}`,
             {method: 'get'},
+        );
+    }
+
+    // Theme Routes
+
+    getAllThemes = () => {
+        return this.doFetch(
+            this.getThemesRoute(),
+            {method: 'get'}
+        );
+    }
+
+    getThemeByName = (name: string) => {
+        return this.doFetch(
+            `${this.getThemesRoute()}/${name}`,
+            {method: 'get'}
+        );
+    }
+
+    saveTheme = (name: string, theme: Theme) => {
+        return this.doFetch(
+            `${this.getThemesRoute()}/${name}`,
+            {method: 'put', body: JSON.stringify(theme)}
+        );
+    }
+
+    deleteTheme = (name: string) => {
+        return this.doFetch(
+            `${this.getThemesRoute()}/${name}`,
+            {method: 'delete'}
         );
     }
 
