@@ -8,7 +8,7 @@ import {Action, ActionFunc, batchActions, DispatchFunc, GetStateFunc} from 'type
 import {SyncableType, SyncablePatch} from 'types/groups';
 
 import {bindClientFunc, forceLogoutIfNecessary} from './helpers';
-import {logError} from './errors';
+
 export function linkGroupSyncable(groupID: string, syncableID: string, syncableType: SyncableType, patch: SyncablePatch): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         let data;
@@ -42,7 +42,6 @@ export function linkGroupSyncable(groupID: string, syncableID: string, syncableT
 
 export function unlinkGroupSyncable(groupID: string, syncableID: string, syncableType: SyncableType): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
-
         try {
             await Client4.unlinkGroupSyncable(groupID, syncableID, syncableType);
         } catch (error) {
@@ -68,7 +67,6 @@ export function unlinkGroupSyncable(groupID: string, syncableID: string, syncabl
             console.warn(`unhandled syncable type ${syncableType}`); // eslint-disable-line no-console
         }
 
-
         dispatch(batchActions(dispatches));
 
         return {data: true};
@@ -77,7 +75,6 @@ export function unlinkGroupSyncable(groupID: string, syncableID: string, syncabl
 
 export function getGroupSyncables(groupID: string, syncableType: SyncableType): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
-
         let data;
         try {
             data = await Client4.getGroupSyncables(groupID, syncableType);
@@ -108,7 +105,6 @@ export function getGroupSyncables(groupID: string, syncableType: SyncableType): 
 
 export function getGroupMembers(groupID: string, page = 0, perPage: number = General.PAGE_SIZE_DEFAULT): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
-
         let data;
         try {
             data = await Client4.getGroupMembers(groupID, page, perPage);
