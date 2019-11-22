@@ -7,6 +7,7 @@ import {Client4} from 'client';
 import {Action, ActionFunc, batchActions, DispatchFunc, GetStateFunc} from 'types/actions';
 import {SyncableType, SyncablePatch} from 'types/groups';
 
+import {logError} from './errors';
 import {bindClientFunc, forceLogoutIfNecessary} from './helpers';
 
 export function linkGroupSyncable(groupID: string, syncableID: string, syncableType: SyncableType, patch: SyncablePatch): ActionFunc {
@@ -16,6 +17,7 @@ export function linkGroupSyncable(groupID: string, syncableID: string, syncableT
             data = await Client4.linkGroupSyncable(groupID, syncableID, syncableType, patch);
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch, getState);
+            dispatch(logError(error));
             return {error};
         }
 
@@ -46,6 +48,7 @@ export function unlinkGroupSyncable(groupID: string, syncableID: string, syncabl
             await Client4.unlinkGroupSyncable(groupID, syncableID, syncableType);
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch, getState);
+            dispatch(logError(error));
             return {error};
         }
 
@@ -80,6 +83,7 @@ export function getGroupSyncables(groupID: string, syncableType: SyncableType): 
             data = await Client4.getGroupSyncables(groupID, syncableType);
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch, getState);
+            dispatch(logError(error));
             return {error};
         }
 
@@ -110,7 +114,7 @@ export function getGroupMembers(groupID: string, page = 0, perPage: number = Gen
             data = await Client4.getGroupMembers(groupID, page, perPage);
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch, getState);
-
+            dispatch(logError(error));
             return {error};
         }
 
