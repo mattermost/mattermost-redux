@@ -11,4 +11,6 @@ export default keyMirror({
     RECEIVED_FILES_FOR_POST: null,
     RECEIVED_UPLOAD_FILES: null,
     RECEIVED_FILE_PUBLIC_LINK: null,
+
+    UPDATE_FILES_FOR_POST: null,
 });

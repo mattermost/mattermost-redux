@@ -22,6 +22,20 @@ export function files(state: Dictionary<FileInfo> = {}, action: GenericAction) {
         };
     }
 
+    case FileTypes.UPDATE_FILES_FOR_POST: {
+        const data = action.data;
+        const nextState: Dictionary<FileInfo> = {
+            ...state,
+            [data.id]: {
+                ...state[data.clientId],
+                id: data.id,
+                post_id: data.postId,
+            }
+        };
+        Reflect.deleteProperty(nextState, data.clientId);
+        return nextState;
+    }
+
     case PostTypes.RECEIVED_NEW_POST:
     case PostTypes.RECEIVED_POST: {
         const post = action.data;
@@ -85,6 +99,15 @@ export function fileIdsByPostId(state: Dictionary<Array<string>> = {}, action: G
         };
     }
 
+    case FileTypes.UPDATE_FILES_FOR_POST: {
+        const data = action.data;
+        const nextState: Dictionary<Array<string>> = {
+            ...state,
+            [data.postId as string]: [data.id],
+        };
+        Reflect.deleteProperty(nextState, data.pendingPostId);
+        return nextState;
+    };
     case PostTypes.RECEIVED_NEW_POST:
     case PostTypes.RECEIVED_POST: {
         const post = action.data;
