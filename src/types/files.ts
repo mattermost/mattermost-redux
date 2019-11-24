@@ -17,6 +17,7 @@ export type FileInfo = {
     height: number;
     has_preview_image: boolean;
     clientId: string;
+    failed: boolean;
 };
 export type FilesState = {
     files: Dictionary<FileInfo>;

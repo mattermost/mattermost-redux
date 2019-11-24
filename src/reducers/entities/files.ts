@@ -23,6 +23,7 @@ export function files(state: Dictionary<FileInfo> = {}, action: GenericAction) {
     }
 
     case FileTypes.UPDATE_FILES_FOR_POST: {
+        // Triggered when replacing a pending uploaded file once it was uploaded
         const data = action.data;
         const nextState: Dictionary<FileInfo> = {
             ...state,
@@ -30,10 +31,34 @@ export function files(state: Dictionary<FileInfo> = {}, action: GenericAction) {
                 ...state[data.clientId],
                 id: data.id,
                 post_id: data.postId,
+                failed: false,
             },
         };
         Reflect.deleteProperty(nextState, data.clientId);
         return nextState;
+    }
+
+    case FileTypes.UPLOAD_FILES_FAILURE: {
+        // Mark pending uploads as failed
+        const clientIds: Array<string> = action.clientIds;
+        const failed: Dictionary<FileInfo> = {};
+        clientIds.forEach((id: string) => {
+            if (state[id]) {
+                failed[id] = {
+                    ...state[id],
+                    failed: true,
+                };
+            }
+        });
+
+        if (Object.keys(failed).length) {
+            return {
+                ...state,
+                ...failed,
+            };
+        }
+
+        return state;
     }
 
     case PostTypes.RECEIVED_NEW_POST:
@@ -100,6 +125,7 @@ export function fileIdsByPostId(state: Dictionary<Array<string>> = {}, action: G
     }
 
     case FileTypes.UPDATE_FILES_FOR_POST: {
+        // Triggered when replacing a pending uploaded file once it was uploaded
         const data = action.data;
         const nextState: Dictionary<Array<string>> = {
             ...state,
