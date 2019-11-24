@@ -30,7 +30,7 @@ export function files(state: Dictionary<FileInfo> = {}, action: GenericAction) {
                 ...state[data.clientId],
                 id: data.id,
                 post_id: data.postId,
-            }
+            },
         };
         Reflect.deleteProperty(nextState, data.clientId);
         return nextState;
@@ -107,7 +107,8 @@ export function fileIdsByPostId(state: Dictionary<Array<string>> = {}, action: G
         };
         Reflect.deleteProperty(nextState, data.pendingPostId);
         return nextState;
-    };
+    }
+
     case PostTypes.RECEIVED_NEW_POST:
     case PostTypes.RECEIVED_POST: {
         const post = action.data;
