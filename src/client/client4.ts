@@ -2936,23 +2936,23 @@ export default class Client4 {
         );
     }
 
-    getThemeByName = (name: string) => {
+    getTheme = (id: string) => {
         return this.doFetch(
-            `${this.getThemesRoute()}/${name}`,
+            `${this.getThemesRoute()}/${id}`,
             {method: 'get'}
         );
     }
 
-    saveTheme = (name: string, theme: Theme) => {
+    saveTheme = (theme: Theme) => {
         return this.doFetch(
-            `${this.getThemesRoute()}/${name}`,
+            this.getThemesRoute(),
             {method: 'put', body: JSON.stringify(theme)}
         );
     }
 
-    deleteTheme = (name: string) => {
+    deleteTheme = (id: string) => {
         return this.doFetch(
-            `${this.getThemesRoute()}/${name}`,
+            `${this.getThemesRoute()}/${id}`,
             {method: 'delete'}
         );
     }

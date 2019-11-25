@@ -10,25 +10,24 @@ import {Theme} from 'types/themes';
 import {logError} from './errors';
 import {forceLogoutIfNecessary} from './helpers';
 
-export function receivedTheme(name: string, theme: Theme) {
+export function receivedTheme(theme: Theme) {
     return {
         type: ThemeTypes.RECEIVED_THEME,
-        name,
         theme,
     };
 }
 
-export function receivedThemes(themes: {[name: string]: Theme}) {
+export function receivedThemes(themes: {[id: string]: Theme}) {
     return {
         type: ThemeTypes.RECEIVED_THEMES,
         themes,
     };
 }
 
-export function themeDeleted(name: string) {
+export function themeDeleted(id: string) {
     return {
         type: ThemeTypes.RECEIVED_THEME_DELETED,
-        name,
+        id,
     };
 }
 
@@ -50,52 +49,52 @@ export function getAllThemes() {
     };
 }
 
-export function getThemeByName(name: string) {
+export function getTheme(id: string) {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         let theme;
         try {
-            theme = await Client4.getThemeByName(name);
+            theme = await Client4.getTheme(id);
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch, getState);
             dispatch(logError(error));
             return {error};
         }
 
-        dispatch(receivedTheme(name, theme));
+        dispatch(receivedTheme(theme));
 
         return {data: theme};
     };
 }
 
-export function saveTheme(name: string, theme: Theme) {
+export function saveTheme(theme: Theme) {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         let themes;
 
         try {
-            themes = await Client4.saveTheme(name, theme);
+            themes = await Client4.saveTheme(theme);
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch, getState);
             dispatch(logError(error));
             return {error};
         }
 
-        dispatch(receivedTheme(name, theme));
+        dispatch(receivedTheme(theme));
 
         return {data: themes};
     };
 }
 
-export function deleteTheme(name: string) {
+export function deleteTheme(id: string) {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         try {
-            await Client4.deleteTheme(name);
+            await Client4.deleteTheme(id);
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch, getState);
             dispatch(logError(error));
             return {error};
         }
 
-        dispatch(themeDeleted(name));
+        dispatch(themeDeleted(id));
 
         return {data: true};
     };

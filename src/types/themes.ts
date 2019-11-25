@@ -2,7 +2,10 @@
 // See LICENSE.txt for license information.
 
 export type Theme = {
-    type: string;
+    id: string;
+    create_at: string;
+    update_at: string;
+    display_name: string;
 
     sidebarBg: string;
     sidebarText: string;

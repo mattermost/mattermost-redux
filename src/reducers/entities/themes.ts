@@ -8,18 +8,18 @@ import {ThemeTypes, UserTypes} from 'action_types';
 import {GenericAction} from 'types/actions';
 import {Theme} from 'types/themes';
 
-function themes(state: {[name: string]: Theme} = {}, action: GenericAction) {
+function themes(state: {[id: string]: Theme} = {}, action: GenericAction) {
     switch (action.type) {
     case ThemeTypes.RECEIVED_THEME:
         return {
             ...state,
-            [action.name]: action.theme,
+            [action.theme.id]: action.theme,
         };
     case ThemeTypes.RECEIVED_THEMES: {
         const nextState = {...state};
 
-        for (const [name, theme] of Object.entries(action.themes)) {
-            nextState[name] = theme as Theme;
+        for (const [id, theme] of Object.entries(action.themes)) {
+            nextState[id] = theme as Theme;
         }
 
         return nextState;
@@ -27,7 +27,7 @@ function themes(state: {[name: string]: Theme} = {}, action: GenericAction) {
     case ThemeTypes.RECEIVED_THEME_DELETED: {
         const nextState = {...state};
 
-        Reflect.deleteProperty(nextState, action.name);
+        Reflect.deleteProperty(nextState, action.id);
 
         return nextState;
     }
