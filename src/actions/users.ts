@@ -1,27 +1,32 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
-import {Action, ActionFunc, ActionResult, batchActions, DispatchFunc, GetStateFunc} from 'types/actions';
-import {UserProfile, UserStatus} from 'types/users';
-import {TeamMembership} from 'types/teams';
+
+import {UserTypes, TeamTypes, AdminTypes} from 'action_types';
 import {Client4} from 'client';
 import {General} from '../constants';
-import {UserTypes, TeamTypes, AdminTypes} from 'action_types';
-import {getAllCustomEmojis} from './emojis';
-import {getClientConfig, setServerVersion} from './general';
-import {getMyTeams, getMyTeamMembers, getMyTeamUnreads} from './teams';
-import {loadRolesIfNeeded} from './roles';
-import {getUserIdFromChannelName, isDirectChannel, isDirectChannelVisible, isGroupChannel, isGroupChannelVisible} from 'utils/channel_utils';
-import {removeUserFromList} from 'utils/user_utils';
-import {isMinimumServerVersion} from 'utils/helpers';
 
 import {getConfig, getServerVersion} from 'selectors/entities/general';
-
 import {getCurrentUserId, getUsers} from 'selectors/entities/users';
 
+import {Action, ActionFunc, ActionResult, batchActions, DispatchFunc, GetStateFunc} from 'types/actions';
+
+import {UserProfile, UserStatus} from 'types/users';
+import {TeamMembership} from 'types/teams';
+import {Dictionary} from 'types/utilities';
+
+import {getUserIdFromChannelName, isDirectChannel, isDirectChannelVisible, isGroupChannel, isGroupChannelVisible} from 'utils/channel_utils';
+import {isMinimumServerVersion} from 'utils/helpers';
+import {removeUserFromList} from 'utils/user_utils';
+
+import {getAllCustomEmojis} from './emojis';
 import {logError} from './errors';
+import {getClientConfig, setServerVersion} from './general';
 import {bindClientFunc, forceLogoutIfNecessary, debounce} from './helpers';
 import {getMyPreferences, makeDirectChannelVisibleIfNecessary, makeGroupMessageVisibleIfNecessary} from './preferences';
-import {Dictionary} from 'types/utilities';
+import {loadRolesIfNeeded} from './roles';
+import {getMyTeams, getMyTeamMembers, getMyTeamUnreads} from './teams';
+import {loadMyThemes} from './themes';
+
 export function checkMfa(loginId: string): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         dispatch({type: UserTypes.CHECK_MFA_REQUEST, data: null}, getState);
@@ -238,6 +243,8 @@ export function loadMe(): ActionFunc {
         if (user) {
             Client4.setUserRoles(user.roles);
         }
+
+        await dispatch(loadMyThemes());
 
         return {data: true};
     };

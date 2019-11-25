@@ -139,6 +139,9 @@ const state: GlobalState = {
             syncables: {},
             members: {},
         },
+        themes: {
+            themes: {},
+        },
     },
     errors: [],
     requests: {

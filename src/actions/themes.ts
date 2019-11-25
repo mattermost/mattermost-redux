@@ -7,6 +7,8 @@ import {Client4} from 'client';
 import {GetStateFunc, DispatchFunc} from 'types/actions';
 import {Theme} from 'types/themes';
 
+import {getThemeIdForThemeType} from 'utils/theme_utils';
+
 import {logError} from './errors';
 import {forceLogoutIfNecessary} from './helpers';
 
@@ -97,5 +99,31 @@ export function deleteTheme(id: string) {
         dispatch(themeDeleted(id));
 
         return {data: true};
+    };
+}
+
+export function loadMyThemes() {
+    return (dispatch: DispatchFunc, getState: GetStateFunc) => {
+        const themeIds = [];
+        const themePreferences = Object.values(getState().entities.preferences.myPreferences).filter((preference) => preference.category === 'theme');
+
+        for (const preference of themePreferences) {
+            if (!preference.value) {
+                continue;
+            }
+
+            const theme = JSON.parse(preference.value);
+
+            let themeId = theme.id;
+            if (theme.type) {
+                themeId = getThemeIdForThemeType(theme.type);
+            }
+
+            if (themeId) {
+                themeIds.push(themeId);
+            }
+        }
+
+        return Promise.all(themeIds.map((themeId) => dispatch(getTheme(themeId))));
     };
 }

@@ -18,8 +18,8 @@ function themes(state: {[id: string]: Theme} = {}, action: GenericAction) {
     case ThemeTypes.RECEIVED_THEMES: {
         const nextState = {...state};
 
-        for (const [id, theme] of Object.entries(action.themes)) {
-            nextState[id] = theme as Theme;
+        for (const theme of action.themes) {
+            nextState[theme.id] = theme as Theme;
         }
 
         return nextState;

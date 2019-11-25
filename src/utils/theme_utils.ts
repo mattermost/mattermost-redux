@@ -94,3 +94,19 @@ export function blendColors(background: string, foreground: string, opacity: num
 
     return `rgba(${red},${green},${blue},${alpha})`;
 }
+
+// getThemeIdForThemeType returns the ID of the system theme that cor`responds to the old theme.type field.
+export function getThemeIdForThemeType(type: string): string {
+    const themeTypes: {[type: string]: string} = {
+        'Mattermost': 'default',
+        'Organization': 'organization',
+        'Mattermost Dark': 'mattermostDark',
+        'Windows Dark': 'windows10',
+    };
+
+    if (themeTypes[type]) {
+        return themeTypes[type];
+    }
+
+    return '';
+}

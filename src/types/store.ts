@@ -19,6 +19,7 @@ import {ChannelsRequestsStatuses, GeneralRequestsStatuses, PostsRequestsStatuses
 import {Role} from './roles';
 import {PreferenceType} from './preferences';
 import {Bot} from './bots';
+import {ThemesState} from './themes';
 import {Dictionary} from './utilities';
 
 export type GlobalState = {
@@ -55,6 +56,7 @@ export type GlobalState = {
         schemes: SchemesState;
         gifs: any;
         groups: GroupsState;
+        themes: ThemesState;
     };
     errors: Array<any>;
     requests: {

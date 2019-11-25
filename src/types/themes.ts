@@ -31,3 +31,7 @@ export type Theme = {
     mentionHighlightLink: string;
     codeTheme: string;
 };
+
+export type ThemesState = {
+    themes: {[id: string]: Theme};
+}
