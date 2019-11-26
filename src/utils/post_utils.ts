@@ -77,6 +77,30 @@ export function canDeletePost(state: GlobalState, config: any, license: any, tea
     return isOwner || isAdmin;
 }
 
+export function canMoveToChannelPost(state: GlobalState, config: any, license: any, teamId: $ID<Team>, channelId: $ID<Channel>, userId: $ID<UserProfile>, post: Post, isAdmin: boolean, isSystemAdmin: boolean): boolean {
+    if (!post) {
+        return false;
+    }
+
+    const isOwner = isPostOwner(userId, post);
+
+    if (hasNewPermissions(state)) {
+        const canMoveToChannelPostCheck = haveIChannelPermission(state, {team: teamId, channel: channelId, permission: Permissions.MOVE_TO_CHANNEL_POST});
+        if (!isOwner) {
+            return canMoveToChannelPost && haveIChannelPermission(state, {team: teamId, channel: channelId, permission: Permissions.MOVE_TO_CHANNEL_OTHERS_POSTS});
+        }
+        return canMoveToChannelPostCheck;
+    }
+
+    // Backwards compatibility with pre-advanced permissions config settings.
+    if (license.IsLicensed === 'true') {
+        return (config.RestrictPostDelete === General.PERMISSIONS_ALL && (isOwner || isAdmin)) ||
+            (config.RestrictPostDelete === General.PERMISSIONS_TEAM_ADMIN && isAdmin) ||
+            (config.RestrictPostDelete === General.PERMISSIONS_SYSTEM_ADMIN && isSystemAdmin);
+    }
+    return isOwner || isAdmin;
+}
+
 export function canEditPost(state: GlobalState, config: any, license: any, teamId: $ID<Team>, channelId: $ID<Channel>, userId: $ID<UserProfile>, post: Post): boolean {
     if (!post || isSystemMessage(post)) {
         return false;

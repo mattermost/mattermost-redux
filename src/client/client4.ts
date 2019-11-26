@@ -1685,6 +1685,15 @@ export default class Client4 {
         );
     }
 
+    moveToChannelPost = async (postId: string, channelId: string) => {
+        this.trackEvent('api', 'api_posts_move_to_channel');
+        const body = {post_id: postId, channel_id: channelId};
+        return this.doFetch(
+            `${this.getPostRoute(postId)}/movepost`,
+            {method: 'post', body: JSON.stringify(body)}
+        );
+    };
+
     pinPost = async (postId: string) => {
         this.trackEvent('api', 'api_posts_pin');
 

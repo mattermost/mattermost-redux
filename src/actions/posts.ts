@@ -475,6 +475,25 @@ export function pinPost(postId: string) {
     };
 }
 
+export function moveToChannelPost(postId: string, channelId: string) {
+    return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
+        dispatch({type: PostTypes.MOVE_TO_CHANNEL_POST_REQUEST}, getState);
+
+        try {
+            await Client4.moveToChannelPost(postId, channelId);
+        } catch (error) {
+            forceLogoutIfNecessary(error, dispatch, getState);
+            dispatch(batchActions([
+                {type: PostTypes.MOVE_TO_CHANNEL_POST_FAILURE, error},
+                logError(error),
+            ]), getState);
+            return {error};
+        }
+
+        return {data: true};
+    };
+}
+
 export function unpinPost(postId: string) {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         dispatch({type: PostTypes.EDIT_POST_REQUEST}, getState);
