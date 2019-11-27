@@ -438,7 +438,7 @@ describe('Actions.Posts', () => {
         };
 
         nock(Client4.getPostsRoute()).
-            get(`/${post.id}/thread?fetchThreads=true`).
+            get(`/${post.id}/thread`).
             reply(200, postList);
         await Actions.getPostThread(post.id)(store.dispatch, store.getState);
 
@@ -1207,7 +1207,7 @@ describe('Actions.Posts', () => {
         postList.posts[post1.id] = post1;
 
         nock(Client4.getPostsRoute()).
-            get(`/${post1.id}/thread?fetchThreads=true`).
+            get(`/${post1.id}/thread`).
             reply(200, postList);
         await Actions.getPostThread(post1.id)(dispatch, getState);
 
@@ -1236,7 +1236,7 @@ describe('Actions.Posts', () => {
         postList.posts[post1.id] = post1;
 
         nock(Client4.getPostsRoute()).
-            get(`/${post1.id}/thread?fetchThreads=true`).
+            get(`/${post1.id}/thread`).
             reply(200, postList);
         await Actions.getPostThread(post1.id)(dispatch, getState);
 
@@ -1671,7 +1671,7 @@ describe('Actions.Posts', () => {
             };
 
             nock(Client4.getPostsRoute()).
-                get(`/${post1.id}/thread?fetchThreads=true`).
+                get(`/${post1.id}/thread`).
                 reply(200, threadList);
         });
 
