@@ -508,7 +508,9 @@ export function fetchMyChannelsAndMembers(teamId: string): ActionFunc {
             return {error};
         }
 
-        const {currentUserId} = getState().entities.users;
+        const state = getState();
+        const {currentUserId} = state.entities.users;
+        const {currentChannelId} = state.entities.channels;
 
         dispatch(batchActions([
             {
@@ -516,6 +518,7 @@ export function fetchMyChannelsAndMembers(teamId: string): ActionFunc {
                 teamId,
                 data: channels,
                 sync: true,
+                currentChannelId,
             },
             {
                 type: ChannelTypes.CHANNELS_SUCCESS,
@@ -525,6 +528,7 @@ export function fetchMyChannelsAndMembers(teamId: string): ActionFunc {
                 data: channelMembers,
                 remove: getChannelsIdForTeam(getState(), teamId),
                 currentUserId,
+                currentChannelId,
             },
         ]), getState);
         const roles = new Set<string>();
@@ -554,13 +558,16 @@ export function getMyChannelMembers(teamId: string): ActionFunc {
             return {error};
         }
 
-        const {currentUserId} = getState().entities.users;
+        const state = getState();
+        const {currentUserId} = state.entities.users;
+        const {currentChannelId} = state.entities.channels;
 
         dispatch({
             type: ChannelTypes.RECEIVED_MY_CHANNEL_MEMBERS,
             data: channelMembers,
             remove: getChannelsIdForTeam(getState(), teamId),
             currentUserId,
+            currentChannelId,
         });
         const roles = new Set<string>();
 

@@ -313,7 +313,6 @@ describe('channels', () => {
             expect(nextState).toEqual(state);
         });
     });
-
     describe('MANUALLY_UNREAD', () => {
         test('should mark channel as manually unread', () => {
             const state = deepFreeze({
@@ -364,6 +363,55 @@ describe('channels', () => {
             });
             expect(nextState.channel1).toBe(undefined);
             expect(nextState.channel231).toBe(undefined);
+        });
+    });
+    describe('RECEIVED_CHANNELS', () => {
+        test('should not remove current channel', () => {
+            const state = deepFreeze({
+                channelsInTeam: {},
+                currentChannelId: '',
+                groupsAssociatedToChannel: {},
+                myMembers: {},
+                stats: {},
+                totalCount: 0,
+                membersInChannel: {},
+                channels: {
+                    channel1: {
+                        id: 'channel1',
+                        team_id: 'team',
+                    },
+                    channel2: {
+                        id: 'channel2',
+                        team_id: 'team',
+                    },
+                    channel3: {
+                        id: 'channel3',
+                        team_id: 'team',
+                    },
+                },
+            });
+
+            const nextState = channelsReducer(state, {
+                type: ChannelTypes.RECEIVED_CHANNELS,
+                sync: true,
+                currentChannelId: 'channel3',
+                teamId: 'team',
+                data: [{
+                    id: 'channel1',
+                    team_id: 'team',
+                }],
+            });
+
+            expect(nextState).not.toBe(state);
+            expect(nextState.channels.channel1).toEqual({
+                id: 'channel1',
+                team_id: 'team',
+            });
+            expect(nextState.channels.channel2).toBe(undefined);
+            expect(nextState.channels.channel3).toEqual({
+                id: 'channel3',
+                team_id: 'team',
+            });
         });
     });
 });
