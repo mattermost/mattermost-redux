@@ -69,16 +69,7 @@ export function handlePosts(state: RelationOneToOne<Post, Post> = {}, action: Ge
     switch (action.type) {
     case PostTypes.RECEIVED_POST:
     case PostTypes.RECEIVED_NEW_POST: {
-        const post = action.data;
-        const newState = {...state};
-
-        if (action.type === PostTypes.RECEIVED_NEW_POST && post.root_id && state[post.root_id] && post.pending_post_id && post.id !== post.pending_post_id) {
-            const rootPost = state[post.root_id];
-
-            newState[post.root_id] = {...rootPost, reply_count: (rootPost.reply_count || 0) + 1};
-        }
-
-        return handlePostReceived(newState, post);
+        return handlePostReceived({...state}, action.data);
     }
 
     case PostTypes.RECEIVED_POSTS: {
@@ -114,10 +105,6 @@ export function handlePosts(state: RelationOneToOne<Post, Post> = {}, action: Ge
                 has_reactions: false,
             },
         };
-        if (post.root_id && state[post.root_id]) {
-            const rootPost = state[post.root_id];
-            nextState[post.root_id] = {...rootPost, reply_count: (rootPost.reply_count || 0) - 1};
-        }
 
         // Remove any of its comments
         for (const otherPost of Object.values(state)) {
