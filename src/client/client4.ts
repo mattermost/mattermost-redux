@@ -1008,12 +1008,12 @@ export default class Client4 {
         );
     };
 
-    searchTeams = (term: string) => {
+    searchTeams = (term: string, page?: number, perPage?: number) => {
         this.trackEvent('api', 'api_search_teams');
 
         return this.doFetch(
             `${this.getTeamsRoute()}/search`,
-            {method: 'post', body: JSON.stringify({term})}
+            {method: 'post', body: JSON.stringify({term, page, per_page: perPage})}
         );
     };
 
