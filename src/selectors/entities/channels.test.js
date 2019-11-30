@@ -9,6 +9,209 @@ import {sortChannelsByDisplayName, getDirectChannelName} from 'utils/channel_uti
 import * as Selectors from 'selectors/entities/channels';
 import {General, Preferences} from '../../constants';
 
+const sortUsernames = (a, b) => a.localeCompare(b, General.DEFAULT_LOCALE, {numeric: true});
+
+describe('Selectors.Channels.getChannelsInCurrentTeam', () => {
+    const team1 = TestHelper.fakeTeamWithId();
+    const team2 = TestHelper.fakeTeamWithId();
+
+    it('should return channels in current team', () => {
+        const user = TestHelper.fakeUserWithId();
+
+        const profiles = {};
+        profiles[user.id] = user;
+
+        const channel1 = TestHelper.fakeChannelWithId(team1.id);
+        channel1.display_name = 'Channel Name';
+        const channel2 = TestHelper.fakeChannelWithId(team2.id);
+        channel2.display_name = 'Channel Name';
+        const channel3 = TestHelper.fakeChannelWithId(team1.id);
+        channel3.display_name = 'Channel Name';
+        const channel4 = TestHelper.fakeChannelWithId('');
+        channel4.display_name = 'Channel Name';
+
+        const channels = {};
+        channels[channel1.id] = channel1;
+        channels[channel2.id] = channel2;
+        channels[channel3.id] = channel3;
+        channels[channel4.id] = channel4;
+
+        const channelsInTeam = {};
+        channelsInTeam[team1.id] = [channel1.id, channel3.id];
+        channelsInTeam[team2.id] = [channel2.id];
+        channelsInTeam[''] = [channel4.id];
+
+        const testState = deepFreezeAndThrowOnMutation({
+            entities: {
+                users: {
+                    currentUserId: user.id,
+                    profiles,
+                },
+                teams: {
+                    currentTeamId: team1.id,
+                },
+                channels: {
+                    channels,
+                    channelsInTeam,
+                },
+            },
+        });
+
+        const channelsInCurrentTeam = [channel1, channel3].sort(sortChannelsByDisplayName.bind(null, []));
+        assert.deepEqual(Selectors.getChannelsInCurrentTeam(testState), channelsInCurrentTeam);
+    });
+
+    it('should order by user locale', () => {
+        const userDe = TestHelper.fakeUserWithId();
+        userDe.locale = 'de'
+
+        const userSv = TestHelper.fakeUserWithId();
+        userSv.locale = 'sv'
+
+        const profilesDe = {};
+        profilesDe[userDe.id] = userDe;
+
+        const profilesSv = {};
+        profilesSv[userSv.id] = userSv;
+
+        const channel1 = TestHelper.fakeChannelWithId(team1.id);
+        channel1.display_name = 'z';
+        const channel2 = TestHelper.fakeChannelWithId(team1.id);
+        channel2.display_name = 'ä';
+
+        const channels = {};
+        channels[channel1.id] = channel1;
+        channels[channel2.id] = channel2;
+
+        const channelsInTeam = {};
+        channelsInTeam[team1.id] = [channel1.id, channel2.id];
+
+        const testStateDe = deepFreezeAndThrowOnMutation({
+            entities: {
+                users: {
+                    currentUserId: userDe.id,
+                    profiles: profilesDe,
+                },
+                teams: {
+                    currentTeamId: team1.id,
+                },
+                channels: {
+                    channels,
+                    channelsInTeam,
+                },
+            },
+        });
+
+        const testStateSv = deepFreezeAndThrowOnMutation({
+            entities: {
+                users: {
+                    currentUserId: userSv.id,
+                    profiles: profilesSv,
+                },
+                teams: {
+                    currentTeamId: team1.id,
+                },
+                channels: {
+                    channels,
+                    channelsInTeam,
+                },
+            },
+        });
+
+        const channelsInCurrentTeamDe = [channel1, channel2].sort(sortChannelsByDisplayName.bind(null, userDe.locale));
+        const channelsInCurrentTeamSv = [channel1, channel2].sort(sortChannelsByDisplayName.bind(null, userSv.locale));
+
+        assert.deepEqual(Selectors.getChannelsInCurrentTeam(testStateDe), channelsInCurrentTeamDe);
+        assert.deepEqual(Selectors.getChannelsInCurrentTeam(testStateSv), channelsInCurrentTeamSv);
+    });
+});
+
+describe('Selectos.Channels.getMyChannels', () => {
+    const team1 = TestHelper.fakeTeamWithId();
+    const team2 = TestHelper.fakeTeamWithId();
+
+    const user = TestHelper.fakeUserWithId();
+    const user2 = TestHelper.fakeUserWithId();
+    const user3 = TestHelper.fakeUserWithId();
+
+    const profiles = {};
+    profiles[user.id] = user;
+    profiles[user2.id] = user2;
+    profiles[user3.id] = user3;
+
+    const channel1 = TestHelper.fakeChannelWithId(team1.id);
+    channel1.display_name = 'Channel Name';
+    const channel2 = TestHelper.fakeChannelWithId(team2.id);
+    channel2.display_name = 'Channel Name';
+    const channel3 = TestHelper.fakeChannelWithId(team1.id);
+    channel3.display_name = 'Channel Name';
+    const channel4 = TestHelper.fakeChannelWithId('');
+    channel4.display_name = 'Channel Name';
+    channel4.type = General.DM_CHANNEL;
+    channel4.name = getDirectChannelName(user.id, user2.id);
+    const channel5 = TestHelper.fakeChannelWithId('');
+    channel5.display_name = [user.username, user2.username, user3.username].join(', ');
+    channel5.type = General.GM_CHANNEL;
+    channel5.name = '';
+
+    const channels = {};
+    channels[channel1.id] = channel1;
+    channels[channel2.id] = channel2;
+    channels[channel3.id] = channel3;
+    channels[channel4.id] = channel4;
+    channels[channel5.id] = channel5;
+
+    const channelsInTeam = {};
+    channelsInTeam[team1.id] = [channel1.id, channel3.id];
+    channelsInTeam[team2.id] = [channel2.id];
+    channelsInTeam[''] = [channel4.id, channel5.id];
+
+    const myMembers = {};
+    myMembers[channel1.id] = {};
+    myMembers[channel3.id] = {};
+    myMembers[channel4.id] = {};
+    myMembers[channel5.id] = {};
+
+
+    const testState = deepFreezeAndThrowOnMutation({
+        entities: {
+            users: {
+                currentUserId: user.id,
+                profiles,
+                statuses: {},
+                profilesInChannel: {
+                    [channel4.id]: new Set([user.id, user2.id]),
+                    [channel5.id]: new Set([user.id, user2.id, user3.id]),
+                }
+            },
+            teams: {
+                currentTeamId: team1.id,
+            },
+            channels: {
+                channels,
+                channelsInTeam,
+                myMembers,
+            },
+            preferences: {
+                myPreferences: {}
+            },
+            general: {
+                config: {}
+            }
+        },
+    });
+
+    it('get my channels in current team and DMs', () => {
+        const channelsInCurrentTeam = [channel1, channel3].sort(sortChannelsByDisplayName.bind(null, []));
+        assert.deepEqual(Selectors.getMyChannels(testState), [
+            ...channelsInCurrentTeam,
+            {...channel4, display_name: user2.username, status: 'offline', teammate_id: user2.id},
+            {...channel5, display_name: [user2.username, user3.username].sort(sortUsernames).join(', ')}
+        ]);
+    });
+});
+
+
 describe('Selectors.Channels', () => {
     const team1 = TestHelper.fakeTeamWithId();
     const team2 = TestHelper.fakeTeamWithId();
@@ -229,22 +432,6 @@ describe('Selectors.Channels', () => {
     });
 
     const sortUsernames = (a, b) => a.localeCompare(b, General.DEFAULT_LOCALE, {numeric: true});
-
-    it('should return channels in current team', () => {
-        const channelsInCurrentTeam = [channel1, channel2, channel5, channel5Del, channel6, channel6Del, channel8, channel10, channel11].sort(sortChannelsByDisplayName.bind(null, []));
-        assert.deepEqual(Selectors.getChannelsInCurrentTeam(testState), channelsInCurrentTeam);
-    });
-
-    it('get my channels in current team and DMs', () => {
-        const channelsInCurrentTeam = [channel1, channel2, channel5, channel5Del, channel8, channel10, channel11].sort(sortChannelsByDisplayName.bind(null, []));
-        assert.deepEqual(Selectors.getMyChannels(testState), [
-            ...channelsInCurrentTeam,
-            channel4,
-            {...channel7, display_name: [user2.username, user3.username].sort(sortUsernames).join(', ')},
-            channel9,
-            {...channel13, display_name: profiles.fakeUserId.username},
-        ]);
-    });
 
     it('should return members in current channel', () => {
         assert.deepEqual(Selectors.getMembersInCurrentChannel(testState), membersInChannel[channel1.id]);
