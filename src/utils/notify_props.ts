@@ -20,6 +20,9 @@ export function getEmailInterval(enableEmailNotification: boolean, enableEmailBa
     } else if (!enableEmailBatching && validValuesWithoutEmailBatching.indexOf(emailIntervalPreference) === -1) {
         // When email batching is not enabled, the default interval is immediately
         return INTERVAL_IMMEDIATE;
+    } else if (enableEmailNotification && emailIntervalPreference === INTERVAL_NEVER) {
+        // When email notification is enabled, the default interval is immediately
+        return INTERVAL_IMMEDIATE;
     }
 
     return emailIntervalPreference;
