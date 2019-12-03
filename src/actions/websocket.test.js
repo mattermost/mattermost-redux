@@ -13,6 +13,7 @@ import * as PostActions from 'actions/posts';
 import * as PreferenceActions from 'actions/preferences';
 import * as TeamActions from 'actions/teams';
 import * as UserActions from 'actions/users';
+import EventEmitter from 'utils/event_emitter';
 
 import {Client4} from 'client';
 import {General, Posts, RequestStatus, WebsocketEvents} from '../constants';
@@ -72,6 +73,21 @@ describe('Actions.Websocket', () => {
         const postId = Object.keys(posts)[0];
 
         assert.ok(posts[postId].message.indexOf('Unit Test') > -1);
+    });
+
+    it('Websocket Handle New Post emits INCREASE_POST_VISIBILITY_BY_ONE for current channel', async () => {
+        const emit = jest.spyOn(EventEmitter, 'emit');
+        const currentChannelId = TestHelper.generateId();
+        const otherChannelId = TestHelper.generateId();
+
+        mockServer.emit('message', JSON.stringify({event: WebsocketEvents.POSTED, data: {channel_display_name: TestHelper.basicChannel.display_name, channel_name: TestHelper.basicChannel.name, channel_type: 'O', post: `{"id": "71k8gz5ompbpfkrzaxzodffj8w", "create_at": 1508245311774, "update_at": 1508245311774, "edit_at": 0, "delete_at": 0, "is_pinned": false, "user_id": "${TestHelper.basicUser.id}", "channel_id": "${otherChannelId}", "root_id": "", "parent_id": "", "original_id": "", "message": "Unit Test", "type": "", "props": {}, "hashtags": "", "pending_post_id": "t36kso9nwtdhbm8dbkd6g4eeby: 1508245311749"}`, sender_name: TestHelper.basicUser.username, team_id: TestHelper.basicTeam.id}, broadcast: {omit_users: null, user_id: '', channel_id: otherChannelId, team_id: ''}, seq: 2}));
+        expect(emit).not.toHaveBeenCalled();
+
+
+        await store.dispatch(ChannelActions.selectChannel(currentChannelId));
+        await TestHelper.wait(100);
+        mockServer.emit('message', JSON.stringify({event: WebsocketEvents.POSTED, data: {channel_display_name: TestHelper.basicChannel.display_name, channel_name: TestHelper.basicChannel.name, channel_type: 'O', post: `{"id": "71k8gz5ompbpfkrzaxzodffj8w", "create_at": 1508245311774, "update_at": 1508245311774, "edit_at": 0, "delete_at": 0, "is_pinned": false, "user_id": "${TestHelper.basicUser.id}", "channel_id": "${currentChannelId}", "root_id": "", "parent_id": "", "original_id": "", "message": "Unit Test", "type": "", "props": {}, "hashtags": "", "pending_post_id": "t36kso9nwtdhbm8dbkd6g4eeby: 1508245311749"}`, sender_name: TestHelper.basicUser.username, team_id: TestHelper.basicTeam.id}, broadcast: {omit_users: null, user_id: '', channel_id: currentChannelId, team_id: ''}, seq: 2}));
+        expect(emit).toHaveBeenCalledWith(WebsocketEvents.INCREASE_POST_VISIBILITY_BY_ONE);
     });
 
     it('Websocket Handle Post Edited', async () => {

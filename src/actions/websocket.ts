@@ -326,7 +326,12 @@ function handleEvent(msg: WebSocketMessage) {
 
 function handleNewPostEvent(msg: WebSocketMessage) {
     return (dispatch: DispatchFunc, getState: GetStateFunc) => {
+        const state = getState();
         const post = JSON.parse(msg.data.post);
+
+        if (getCurrentChannelId(state) === post.channel_id) {
+            EventEmitter.emit(WebsocketEvents.INCREASE_POST_VISIBILITY_BY_ONE);
+        }
 
         dispatch(handleNewPost(msg));
         getProfilesAndStatusesForPosts([post], dispatch, getState);
@@ -337,6 +342,7 @@ function handleNewPostEvent(msg: WebSocketMessage) {
                 data: [{user_id: post.user_id, status: General.ONLINE}],
             });
         }
+
         return {data: true};
     };
 }

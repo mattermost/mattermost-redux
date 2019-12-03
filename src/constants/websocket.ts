@@ -38,5 +38,6 @@ const WebsocketEvents = {
     CONFIG_CHANGED: 'config_changed',
     PLUGIN_STATUSES_CHANGED: 'plugin_statuses_changed',
     OPEN_DIALOG: 'open_dialog',
+    INCREASE_POST_VISIBILITY_BY_ONE: 'increase_post_visibility_by_one',
 };
 export default WebsocketEvents;
