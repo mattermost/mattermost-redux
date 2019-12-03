@@ -3,6 +3,13 @@
 1. If this is your first contribution, make sure you've read the Contribution Checklist https://developers.mattermost.com/contribute/getting-started/contribution-checklist/
 2. Read our blog post about "Submitting Great PRs" https://developers.mattermost.com/blog/2019-01-24-submitting-great-prs
 3. Take a look at other repository specific documentation at https://developers.mattermost.com/contribute
+
+REMEMBER TO:
+- Run `make check-style` to check for style errors (required for all pull requests)
+- Run `make test` to ensure unit tests passed
+- Run `make flow` to ensure type checking passed
+- Add or update unit tests (required for all new features)
+- All new/modified APIs include changes to the [JavaScript driver](https://github.com/mattermost/mattermost-redux/blob/master/src/client/client4.js)
 -->
 
 #### Summary
