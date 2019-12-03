@@ -13,6 +13,7 @@ import {
     isUserActivityPost,
     shouldFilterJoinLeavePost,
     isPostCommentMention,
+    getEmbedFromMetadata,
 } from 'utils/post_utils';
 
 describe('PostUtils', () => {
@@ -505,6 +506,29 @@ describe('PostUtils', () => {
                 const confirmation = isMeMessage(data.post);
                 assert.equal(confirmation, data.result, data.post);
             }
+        });
+    });
+
+    describe('getEmbedFromMetadata', () => {
+        it('should return null if no metadata is not passed as argument', () => {
+            const embedData = getEmbedFromMetadata();
+            assert.equal(embedData, null);
+        });
+
+        it('should return null if argument does not contain embed key', () => {
+            const embedData = getEmbedFromMetadata({});
+            assert.equal(embedData, null);
+        });
+
+        it('should return null if embed key in argument is empty', () => {
+            const embedData = getEmbedFromMetadata({embeds: []});
+            assert.equal(embedData, null);
+        });
+
+        it('should return first entry in embed key', () => {
+            const embedValue = {type: 'opengraph', url: 'url'};
+            const embedData = getEmbedFromMetadata({embeds: [embedValue, {type: 'image', url: 'url1'}]});
+            assert.equal(embedData, embedValue);
         });
     });
 });
