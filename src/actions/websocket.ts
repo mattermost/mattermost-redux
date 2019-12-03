@@ -329,12 +329,12 @@ function handleNewPostEvent(msg: WebSocketMessage) {
         const state = getState();
         const post = JSON.parse(msg.data.post);
 
-        if (getCurrentChannelId(state) === post.channel_id) {
-            EventEmitter.emit(WebsocketEvents.INCREASE_POST_VISIBILITY_BY_ONE);
-        }
-
         const exists = getPostSelector(state, post.pending_post_id);
         if (!exists) {
+            if (getCurrentChannelId(state) === post.channel_id) {
+                EventEmitter.emit(WebsocketEvents.INCREASE_POST_VISIBILITY_BY_ONE);
+            }
+
             dispatch(handleNewPost(msg));
             getProfilesAndStatusesForPosts([post], dispatch, getState);
 
