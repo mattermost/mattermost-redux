@@ -1325,7 +1325,6 @@ export default class Client4 {
         );
     };
 
-
     updateChannel = async (channel: Channel) => {
         this.trackEvent('api', 'api_channels_update', {channel_id: channel.id});
 

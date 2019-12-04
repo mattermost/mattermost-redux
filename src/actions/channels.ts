@@ -754,7 +754,6 @@ export function undeleteChannel(channelId: string): ActionFunc {
     };
 }
 
-
 export function viewChannel(channelId: string, prevChannelId = ''): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         const {currentUserId} = getState().entities.users;
