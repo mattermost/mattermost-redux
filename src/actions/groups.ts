@@ -17,6 +17,7 @@ export function linkGroupSyncable(groupID: string, syncableID: string, syncableT
             data = await Client4.linkGroupSyncable(groupID, syncableID, syncableType, patch);
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch, getState);
+            dispatch(logError(error));
             return {error};
         }
 
@@ -47,6 +48,7 @@ export function unlinkGroupSyncable(groupID: string, syncableID: string, syncabl
             await Client4.unlinkGroupSyncable(groupID, syncableID, syncableType);
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch, getState);
+            dispatch(logError(error));
             return {error};
         }
 
