@@ -86,6 +86,8 @@ export type AdminRequestsStatuses = {
     uploadPlugin: RequestStatusType;
     uploadPrivateSamlCertificate: RequestStatusType;
     uploadPublicSamlCertificate: RequestStatusType;
+    getSamlMetadataFromIdp: RequestStatusType;
+    setSamlIdpCertificateFromMetadata: RequestStatusType;
 };
 
 export type EmojisRequestsStatuses = {

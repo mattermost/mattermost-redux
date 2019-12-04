@@ -2922,6 +2922,22 @@ export default class Client4 {
         );
     }
 
+    getSamlMetadataFromIdp = async (samlMetadataURL: string) => {
+        return this.doFetch(
+            `${this.getBaseRoute()}/saml/metadatafromidp`, {method: 'post', body: JSON.stringify({saml_metadata_url: samlMetadataURL})}
+        );
+    };
+
+    setSamlIdpCertificateFromMetadata = async (certData: string) => {
+        return this.doFetch(
+            `${this.getBaseRoute()}/saml/certificate/idp/frommetadata`,
+            {
+                method: 'post',
+                body: certData,
+            }
+        );
+    };
+
     // Client Helpers
 
     doFetch = async (url: string, options: Options) => {

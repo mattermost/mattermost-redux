@@ -1176,4 +1176,18 @@ describe('Actions.Admin', () => {
         assert.ok(groups[key].mattermost_group_id === null);
         assert.ok(groups[key].has_syncables === null);
     });
+
+    it('getSamlMetadataFromIdp', async () => {
+        nock(Client4.getBaseRoute()).
+            post('/saml/metadafromidp').
+            reply(200, OK_RESPONSE);
+
+        await Actions.getSamlMetadataFromIdp('http://lo.cal')(store.dispatch, store.getState);
+
+        const state = store.getState();
+        const request = state.requests.admin.getSamlMetadata;
+        if (request.status === RequestStatus.FAILURE) {
+            throw new Error('getSamlMetadataFromIdp request failed');
+        }
+    });
 });

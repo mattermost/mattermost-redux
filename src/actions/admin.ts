@@ -10,6 +10,7 @@ import {GroupSearchOpts} from 'types/groups';
 
 import {bindClientFunc, forceLogoutIfNecessary} from './helpers';
 import {logError} from './errors';
+
 export function getLogs(page = 0, perPage: number = General.LOGS_PAGE_SIZE_DEFAULT): ActionFunc {
     return bindClientFunc({
         clientFunc: Client4.getLogs,
@@ -582,4 +583,28 @@ export function disablePlugin(pluginId: string): ActionFunc {
 
         return {data: true};
     };
+}
+
+export function getSamlMetadataFromIdp(samlMetadataURL: string): ActionFunc {
+    return bindClientFunc({
+        clientFunc: Client4.getSamlMetadataFromIdp,
+        onRequest: AdminTypes.SAML_GET_METADATA_REQUEST,
+        onSuccess: AdminTypes.SAML_GET_METADATA_SUCCESS,
+        onFailure: AdminTypes.SAML_GET_METADATA_FAILURE,
+        params: [
+            samlMetadataURL,
+        ],
+    });
+}
+
+export function setSamlIdpCertificateFromMetadata(certData: string): ActionFunc {
+    return bindClientFunc({
+        clientFunc: Client4.setSamlIdpCertificateFromMetadata,
+        onRequest: AdminTypes.SET_SAML_IDP_REQUEST,
+        onSuccess: AdminTypes.SET_SAML_IDP_SUCCESS,
+        onFailure: AdminTypes.SET_SAML_IDP_FAILURE,
+        params: [
+            certData,
+        ],
+    });
 }

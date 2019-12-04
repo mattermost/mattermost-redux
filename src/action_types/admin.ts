@@ -184,4 +184,12 @@ export default keyMirror({
     REMOVED_PLUGIN: null,
     ENABLED_PLUGIN: null,
     DISABLED_PLUGIN: null,
+
+    SAML_GET_METADATA_REQUEST: null,
+    SAML_GET_METADATA_SUCCESS: null,
+    SAML_GET_METADATA_FAILURE: null,
+
+    SET_SAML_IDP_REQUEST: null,
+    SET_SAML_IDP_SUCCESS: null,
+    SET_SAML_IDP_FAILURE: null,
 });
