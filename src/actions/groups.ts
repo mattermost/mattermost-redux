@@ -17,7 +17,6 @@ export function linkGroupSyncable(groupID: string, syncableID: string, syncableT
             data = await Client4.linkGroupSyncable(groupID, syncableID, syncableType, patch);
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch, getState);
-            dispatch(logError(error));
             return {error};
         }
 
@@ -48,7 +47,6 @@ export function unlinkGroupSyncable(groupID: string, syncableID: string, syncabl
             await Client4.unlinkGroupSyncable(groupID, syncableID, syncableType);
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch, getState);
-            dispatch(logError(error));
             return {error};
         }
 
@@ -129,6 +127,7 @@ export function getGroupMembers(groupID: string, page = 0, perPage: number = Gen
 export function getGroup(id: string): ActionFunc {
     return bindClientFunc({
         clientFunc: Client4.getGroup,
+        onSuccess: [GroupTypes.RECEIVED_GROUP],	
         params: [
             id,
         ],
@@ -138,6 +137,7 @@ export function getGroup(id: string): ActionFunc {
 export function getGroupsNotAssociatedToTeam(teamID: string, q = '', page = 0, perPage: number = General.PAGE_SIZE_DEFAULT): ActionFunc {
     return bindClientFunc({
         clientFunc: Client4.getGroupsNotAssociatedToTeam,
+        onSuccess: [GroupTypes.RECEIVED_GROUPS],	
         params: [
             teamID,
             q,
@@ -150,6 +150,7 @@ export function getGroupsNotAssociatedToTeam(teamID: string, q = '', page = 0, p
 export function getGroupsNotAssociatedToChannel(channelID: string, q = '', page = 0, perPage: number = General.PAGE_SIZE_DEFAULT): ActionFunc {
     return bindClientFunc({
         clientFunc: Client4.getGroupsNotAssociatedToChannel,
+        onSuccess: [GroupTypes.RECEIVED_GROUPS],	
         params: [
             channelID,
             q,
@@ -166,6 +167,7 @@ export function getAllGroupsAssociatedToTeam(teamID: string): ActionFunc {
             result.teamID = param1;
             return result;
         },
+        onSuccess: [GroupTypes.RECEIVED_ALL_GROUPS_ASSOCIATED_TO_TEAM],	
         params: [
             teamID,
         ],
@@ -179,6 +181,7 @@ export function getAllGroupsAssociatedToChannel(channelID: string): ActionFunc {
             result.channelID = param1;
             return result;
         },
+        onSuccess: [GroupTypes.RECEIVED_ALL_GROUPS_ASSOCIATED_TO_CHANNEL],	
         params: [
             channelID,
         ],
@@ -191,6 +194,7 @@ export function getGroupsAssociatedToTeam(teamID: string, q = '', page = 0, perP
             const result = await Client4.getGroupsAssociatedToTeam(param1, param2, param3, param4);
             return {groups: result.groups, totalGroupCount: result.total_group_count, teamID: param1};
         },
+        onSuccess: [GroupTypes.RECEIVED_GROUPS_ASSOCIATED_TO_TEAM],	
         params: [
             teamID,
             q,
@@ -206,6 +210,7 @@ export function getGroupsAssociatedToChannel(channelID: string, q = '', page = 0
             const result = await Client4.getGroupsAssociatedToChannel(param1, param2, param3, param4);
             return {groups: result.groups, totalGroupCount: result.total_group_count, channelID: param1};
         },
+        onSuccess: [GroupTypes.RECEIVED_GROUPS_ASSOCIATED_TO_CHANNEL],	
         params: [
             channelID,
             q,
