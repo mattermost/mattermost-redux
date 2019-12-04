@@ -20,6 +20,7 @@ export default keyMirror({
     UPDATE_CHANNEL_FAILURE: null,
 
     DELETE_CHANNEL_SUCCESS: null,
+    UNDELETE_CHANNEL_SUCCESS: null,
 
     GET_CHANNELS_REQUEST: null,
     GET_CHANNELS_SUCCESS: null,

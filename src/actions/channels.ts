@@ -724,6 +724,37 @@ export function deleteChannel(channelId: string): ActionFunc {
     };
 }
 
+export function undeleteChannel(channelId: string): ActionFunc {
+    return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
+        let state = getState();
+        const viewArchivedChannels = state.entities.general.config.ExperimentalViewArchivedChannels === 'true';
+
+        try {
+            await Client4.undeleteChannel(channelId);
+        } catch (error) {
+            forceLogoutIfNecessary(error, dispatch, getState);
+            dispatch(logError(error));
+            return {error};
+        }
+
+        state = getState();
+        const {currentChannelId} = state.entities.channels;
+        if (channelId === currentChannelId && !viewArchivedChannels) {
+            const teamId = getCurrentTeamId(state);
+            const channelsInTeam = getChannelsNameMapInTeam(state, teamId);
+            const channel = getChannelByName(channelsInTeam, getRedirectChannelNameForTeam(state, teamId));
+            if (channel && channel.id) {
+                dispatch({type: ChannelTypes.SELECT_CHANNEL, data: channel.id}, getState);
+            }
+        }
+
+        dispatch({type: ChannelTypes.UNDELETE_CHANNEL_SUCCESS, data: {id: channelId, viewArchivedChannels}}, getState);
+
+        return {data: true};
+    };
+}
+
+
 export function viewChannel(channelId: string, prevChannelId = ''): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         const {currentUserId} = getState().entities.users;
@@ -1440,6 +1471,7 @@ export default {
     leaveChannel,
     joinChannel,
     deleteChannel,
+    undeleteChannel,
     viewChannel,
     markChannelAsViewed,
     getChannels,
