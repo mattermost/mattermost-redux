@@ -15,8 +15,10 @@ function channelListToSet(state: any, action: GenericAction) {
     // Remove existing channels that are no longer
     if (action.sync && teamChannelIds && teamChannelIds.size) {
         teamChannelIds.forEach((id: string) => {
-            if (!action.data.find((c: any) => c.id === id)) {
-                teamChannelIds.delete(id);
+            if (id !== action.currentChannelId) {
+                if (!action.data.find((c: any) => c.id === id)) {
+                    teamChannelIds.delete(id);
+                }
             }
         });
         nextState[action.teamId] = teamChannelIds;
@@ -73,8 +75,10 @@ function channels(state: IDMappedObjects<Channel> = {}, action: GenericAction) {
             currentChannels.forEach((channel) => {
                 if (channel.team_id === action.teamId) {
                     const id: string = channel.id;
-                    if (!action.data.find((c: any) => c.id === id)) {
-                        Reflect.deleteProperty(nextState, id);
+                    if (id !== action.currentChannelId) {
+                        if (!action.data.find((c: any) => c.id === id)) {
+                            Reflect.deleteProperty(nextState, id);
+                        }
                     }
                 }
             });

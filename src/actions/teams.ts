@@ -138,16 +138,36 @@ export function getTeams(page = 0, perPage: number = General.TEAMS_CHUNK_SIZE, i
     };
 }
 
-export function searchTeams(term: string): ActionFunc {
-    return bindClientFunc({
-        clientFunc: Client4.searchTeams,
-        onRequest: TeamTypes.GET_TEAMS_REQUEST,
-        onSuccess: [TeamTypes.RECEIVED_TEAMS_LIST, TeamTypes.GET_TEAMS_SUCCESS],
-        onFailure: TeamTypes.GET_TEAMS_FAILURE,
-        params: [
-            term,
-        ],
-    });
+export function searchTeams(term: string, page?: number, perPage?: number): ActionFunc {
+    return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
+        dispatch({type: TeamTypes.GET_TEAMS_REQUEST, data: null}, getState);
+
+        let response;
+        try {
+            response = await Client4.searchTeams(term, page, perPage);
+        } catch (error) {
+            forceLogoutIfNecessary(error, dispatch, getState);
+            dispatch(batchActions([
+                {type: TeamTypes.GET_TEAMS_FAILURE, error},
+                logError(error),
+            ]), getState);
+            return {error};
+        }
+
+        const teams = response.teams || response;
+
+        dispatch(batchActions([
+            {
+                type: TeamTypes.RECEIVED_TEAMS_LIST,
+                data: teams,
+            },
+            {
+                type: TeamTypes.GET_TEAMS_SUCCESS,
+            },
+        ]), getState);
+
+        return {data: response};
+    };
 }
 
 export function createTeam(team: Team): ActionFunc {

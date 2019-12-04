@@ -713,4 +713,58 @@ describe('Actions.Teams', () => {
 
         assert.equal(error, null);
     });
+
+    it('searchTeams', async () => {
+        const userClient = TestHelper.createClient4();
+
+        nock(Client4.getUsersRoute()).
+            post('').
+            query(true).
+            reply(201, TestHelper.fakeUserWithId());
+
+        const user = await TestHelper.basicClient4.createUser(
+            TestHelper.fakeUser(),
+            null,
+            null,
+            TestHelper.basicTeam.invite_id
+        );
+
+        nock(Client4.getUsersRoute()).
+            post('/login').
+            reply(200, user);
+
+        await userClient.login(user.email, 'password1');
+
+        nock(Client4.getTeamsRoute()).
+            post('').
+            reply(201, TestHelper.fakeTeamWithId());
+
+        const userTeam = await userClient.createTeam(
+            TestHelper.fakeTeam()
+        );
+
+        nock(Client4.getTeamsRoute()).
+            post('/search').
+            reply(200, [TestHelper.basicTeam, userTeam]);
+
+        const {data} = await store.dispatch(Actions.searchTeams('test', 0));
+
+        const moreRequest = store.getState().requests.teams.getTeams;
+        if (moreRequest.status === RequestStatus.FAILURE) {
+            throw new Error(JSON.stringify(moreRequest.error));
+        }
+
+        nock(Client4.getTeamsRoute()).
+            post('/search').
+            reply(200, {teams: [TestHelper.basicTeam, userTeam], total_count: 2});
+
+        const response = await store.dispatch(Actions.searchTeams('test', '', false, true));
+
+        const paginatedRequest = store.getState().requests.teams.getTeams;
+        if (paginatedRequest.status === RequestStatus.FAILURE) {
+            throw new Error(JSON.stringify(paginatedRequest.error));
+        }
+
+        assert.ok(response.data.teams.length === 2);
+    });
 });

@@ -23,6 +23,7 @@ import {getTeam, getMyTeamUnreads, getMyTeams, getMyTeamMembers} from './teams';
 import {getPost, getPosts, getProfilesAndStatusesForPosts, getCustomEmojiForReaction, getUnreadPostData, handleNewPost, postDeleted, receivedPost} from './posts';
 import {fetchMyChannelsAndMembers, getChannelAndMyMember, getChannelStats, markChannelAsRead} from './channels';
 import {checkForModifiedUsers, getMe, getProfilesByIds, getStatusesByIds, loadProfilesForDirect} from './users';
+import {loadRolesIfNeeded} from './roles';
 import {Channel, ChannelMembership} from 'types/channels';
 import {Dictionary} from 'types/utilities';
 import {PreferenceType} from 'types/preferences';
@@ -257,6 +258,9 @@ function handleEvent(msg: WebSocketMessage) {
     case WebsocketEvents.ROLE_UPDATED:
         doDispatch(handleRoleUpdatedEvent(msg));
         break;
+    case WebsocketEvents.USER_ROLE_UPDATED:
+        doDispatch(handleUserRoleUpdated(msg));
+        break;
     case WebsocketEvents.CHANNEL_CREATED:
         doDispatch(handleChannelCreatedEvent(msg));
         break;
@@ -407,6 +411,14 @@ function handleTeamAddedEvent(msg: WebSocketMessage) {
             dispatch(getTeam(msg.data.team_id)),
             dispatch(getMyTeamUnreads()),
         ]);
+        return {data: true};
+    };
+}
+
+function handleUserRoleUpdated(msg: WebSocketMessage) {
+    return (dispatch: DispatchFunc) => {
+        const roles = msg.data.roles.split(' ');
+        dispatch(loadRolesIfNeeded(roles));
         return {data: true};
     };
 }

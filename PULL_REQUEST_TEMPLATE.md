@@ -1,20 +1,20 @@
-Please make sure you've read the [pull request](http://docs.mattermost.com/developer/contribution-guide.html#preparing-a-pull-request) section of our [code contribution guidelines](http://docs.mattermost.com/developer/contribution-guide.html).
+<!-- Thank you for contributing a pull request! Here are a few tips to help you:
 
-When filling in a section please remove the help text and the above text.
+1. If this is your first contribution, make sure you've read the Contribution Checklist https://developers.mattermost.com/contribute/getting-started/contribution-checklist/
+2. Read our blog post about "Submitting Great PRs" https://developers.mattermost.com/blog/2019-01-24-submitting-great-prs
+3. Take a look at other repository specific documentation at https://developers.mattermost.com/contribute
+-->
 
 #### Summary
-[A brief description of what this pull request does.]
+<!--
+A description of what this pull request does.
+-->
 
 #### Ticket Link
-[Please link the GitHub issue or Jira ticket this PR addresses.]
+<!--
+If this pull request addresses a Help Wanted ticket, please link the relevant GitHub issue, e.g.
 
-#### Checklist
-[Place an '[x]' (no spaces) in all applicable fields. Please remove unrelated fields.]
-- [ ] Ran `make check-style` to check for style errors (required for all pull requests)
-- [ ] Ran `make test` to ensure unit tests passed
-- [ ] Ran `make flow` to ensure type checking passed
-- [ ] Added or updated unit tests (required for all new features)
-- [ ] All new/modified APIs include changes to the [JavaScript driver](https://github.com/mattermost/mattermost-redux/blob/master/src/client/client4.js)
+  Fixes https://github.com/mattermost/mattermost-server/issues/XXXXX
 
-#### Test Information
-This PR was tested on: [Device name(s), OS version(s)] 
+Otherwise, link the JIRA ticket.
+-->
