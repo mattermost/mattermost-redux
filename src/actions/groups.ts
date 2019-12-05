@@ -36,6 +36,7 @@ export function linkGroupSyncable(groupID: string, syncableID: string, syncableT
             console.warn(`unhandled syncable type ${syncableType}`); // eslint-disable-line no-console
         }
 
+        dispatches.push({type, data});	
         dispatch(batchActions(dispatches));
 
         return {data: true};
@@ -70,6 +71,7 @@ export function unlinkGroupSyncable(groupID: string, syncableID: string, syncabl
             console.warn(`unhandled syncable type ${syncableType}`); // eslint-disable-line no-console
         }
 
+        dispatches.push({type, data});	
         dispatch(batchActions(dispatches));
 
         return {data: true};
