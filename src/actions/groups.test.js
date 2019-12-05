@@ -228,7 +228,7 @@ describe('Actions.Groups', () => {
 
         assert.ok(JSON.stringify(syncables[groupID].teams[0]) === JSON.stringify(groupTeamResponse));
         assert.ok(JSON.stringify(syncables[groupID].channels[0]) === JSON.stringify(groupChannelResponse));
-    });	
+    });
 
     it('unlinkGroupSyncable', async () => {
         const groupID = '5rgoajywb3nfbdtyafbod47rya';
