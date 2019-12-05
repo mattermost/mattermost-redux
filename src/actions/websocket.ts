@@ -579,7 +579,7 @@ function handleChannelDeletedEvent(msg: WebSocketMessage) {
                 EventEmitter.emit(General.DEFAULT_CHANNEL, '');
             }
 
-            dispatch({type: ChannelTypes.RECEIVED_CHANNEL_DELETED, data: {id: msg.data.channel_id, team_id: msg.data.team_id, deleteAt: msg.data.delete_at, viewArchivedChannels}}, getState);
+            dispatch({type: ChannelTypes.RECEIVED_CHANNEL_DELETED, data: {id: msg.data.channel_id, team_id: msg.data.team_id, viewArchivedChannels}}, getState);
 
             dispatch(fetchMyChannelsAndMembers(currentTeamId));
         }
@@ -605,7 +605,7 @@ function handleChannelUndeletedEvent(msg: WebSocketMessage) {
                 EventEmitter.emit(General.DEFAULT_CHANNEL, '');
             }
 
-            dispatch({type: ChannelTypes.RECEIVED_CHANNEL_UNDELETED, data: {id: msg.data.channel_id, team_id: msg.data.team_id, deleteAt: msg.data.delete_at, viewArchivedChannels}}, getState);
+            dispatch({type: ChannelTypes.RECEIVED_CHANNEL_UNDELETED, data: {id: msg.data.channel_id, team_id: msg.data.team_id, deleteAt: 0, viewArchivedChannels}}, getState);
 
             dispatch(fetchMyChannelsAndMembers(currentTeamId));
         }
