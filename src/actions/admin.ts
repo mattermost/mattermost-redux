@@ -589,7 +589,7 @@ export function getSamlMetadataFromIdp(samlMetadataURL: string): ActionFunc {
     return bindClientFunc({
         clientFunc: Client4.getSamlMetadataFromIdp,
         onRequest: AdminTypes.SAML_GET_METADATA_REQUEST,
-        onSuccess: AdminTypes.SAML_GET_METADATA_SUCCESS,
+        onSuccess: [AdminTypes.RECEIVED_SAML_METADATA_RESPONSE, AdminTypes.SAML_GET_METADATA_SUCCESS],
         onFailure: AdminTypes.SAML_GET_METADATA_FAILURE,
         params: [
             samlMetadataURL,
