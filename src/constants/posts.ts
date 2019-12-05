@@ -3,6 +3,7 @@
 
 export const PostTypes = {
     CHANNEL_DELETED: 'system_channel_deleted',
+    CHANNEL_UNDELETED: 'system_channel_undeleted',
     DISPLAYNAME_CHANGE: 'system_displayname_change',
     CONVERT_CHANNEL: 'system_convert_channel',
     EPHEMERAL: 'system_ephemeral',
@@ -45,6 +46,7 @@ export default {
         PostTypes.ADD_REMOVE,
         PostTypes.ADD_TO_CHANNEL,
         PostTypes.CHANNEL_DELETED,
+        PostTypes.CHANNEL_UNDELETED,
         PostTypes.JOIN_LEAVE,
         PostTypes.JOIN_CHANNEL,
         PostTypes.LEAVE_CHANNEL,

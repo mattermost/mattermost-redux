@@ -267,6 +267,9 @@ function handleEvent(msg: WebSocketMessage) {
     case WebsocketEvents.CHANNEL_DELETED:
         doDispatch(handleChannelDeletedEvent(msg));
         break;
+    case WebsocketEvents.CHANNEL_UNDELETED:
+        doDispatch(handleChannelUndeletedEvent(msg));
+        break;
     case WebsocketEvents.CHANNEL_UPDATED:
         doDispatch(handleChannelUpdatedEvent(msg));
         break;
@@ -577,6 +580,32 @@ function handleChannelDeletedEvent(msg: WebSocketMessage) {
             }
 
             dispatch({type: ChannelTypes.RECEIVED_CHANNEL_DELETED, data: {id: msg.data.channel_id, team_id: msg.data.team_id, deleteAt: msg.data.delete_at, viewArchivedChannels}}, getState);
+
+            dispatch(fetchMyChannelsAndMembers(currentTeamId));
+        }
+        return {data: true};
+    };
+}
+
+function handleChannelUndeletedEvent(msg: WebSocketMessage) {
+    return (dispatch: DispatchFunc, getState: GetStateFunc) => {
+        const state = getState();
+        const currentChannelId = getCurrentChannelId(state);
+        const currentTeamId = getCurrentTeamId(state);
+        const config = getConfig(state);
+        const viewArchivedChannels = config.ExperimentalViewArchivedChannels === 'true';
+
+        if (msg.broadcast.team_id === currentTeamId) {
+            if (msg.data.channel_id === currentChannelId && !viewArchivedChannels) {
+                const channelsInTeam = getChannelsNameMapInTeam(state, currentTeamId);
+                const channel = getChannelByName(channelsInTeam, getRedirectChannelNameForTeam(state, currentTeamId));
+                if (channel && channel.id) {
+                    dispatch({type: ChannelTypes.SELECT_CHANNEL, data: channel.id});
+                }
+                EventEmitter.emit(General.DEFAULT_CHANNEL, '');
+            }
+
+            dispatch({type: ChannelTypes.RECEIVED_CHANNEL_UNDELETED, data: {id: msg.data.channel_id, team_id: msg.data.team_id, deleteAt: msg.data.delete_at, viewArchivedChannels}}, getState);
 
             dispatch(fetchMyChannelsAndMembers(currentTeamId));
         }

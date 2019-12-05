@@ -152,7 +152,6 @@ export function handlePosts(state: RelationOneToOne<Post, Post> = {}, action: Ge
 
     case ChannelTypes.RECEIVED_CHANNEL_DELETED:
     case ChannelTypes.DELETE_CHANNEL_SUCCESS:
-    case ChannelTypes.UNDELETE_CHANNEL_SUCCESS:
     case ChannelTypes.LEAVE_CHANNEL: {
         if (action.data && action.data.viewArchivedChannels) {
             // Nothing to do since we still want to store posts in archived channels
@@ -648,7 +647,6 @@ export function postsInChannel(state: Dictionary<Array<PostOrderBlock>> = {}, ac
 
     case ChannelTypes.RECEIVED_CHANNEL_DELETED:
     case ChannelTypes.DELETE_CHANNEL_SUCCESS:
-    case ChannelTypes.UNDELETE_CHANNEL_SUCCESS:
     case ChannelTypes.LEAVE_CHANNEL: {
         if (action.data && action.data.viewArchivedChannels) {
             // Nothing to do since we still want to store posts in archived channels
@@ -926,7 +924,6 @@ export function postsInThread(state: RelationOneToMany<Post, Post> = {}, action:
 
     case ChannelTypes.RECEIVED_CHANNEL_DELETED:
     case ChannelTypes.DELETE_CHANNEL_SUCCESS:
-    case ChannelTypes.UNDELETE_CHANNEL_SUCCESS:
     case ChannelTypes.LEAVE_CHANNEL: {
         if (action.data && action.data.viewArchivedChannels) {
             // Nothing to do since we still want to store posts in archived channels
