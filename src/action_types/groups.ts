@@ -3,7 +3,6 @@
 import keyMirror from 'utils/key_mirror';
 
 export default keyMirror({
-
     LINKED_GROUP_TEAM: null,
     LINKED_GROUP_CHANNEL: null,
 
