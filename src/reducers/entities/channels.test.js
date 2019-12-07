@@ -87,10 +87,10 @@ describe('channels', () => {
                 totalCount: 0,
                 manuallyUnread: {},
                 membersInChannel: {},
-                delete_at: 123456,
                 channels: {
                     channel1: {
                         id: 'channel1',
+                        delete_at: 1000,
                     },
                     channel2: {
                         id: 'channel2',

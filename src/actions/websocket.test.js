@@ -365,6 +365,33 @@ describe('Actions.Websocket', () => {
         test();
     });
 
+    it('Websocket Handle Channel Undeleted', (done) => {
+        async function test() {
+            await store.dispatch(TeamActions.selectTeam(TestHelper.basicTeam));
+            await store.dispatch(ChannelActions.selectChannel(TestHelper.basicChannel.id));
+
+            store.dispatch({type: ChannelTypes.RECEIVED_CHANNEL, data: {id: TestHelper.generateId(), name: General.DEFAULT_CHANNEL, team_id: TestHelper.basicTeam.id, display_name: General.DEFAULT_CHANNEL}});
+            store.dispatch({type: ChannelTypes.RECEIVED_CHANNEL, data: TestHelper.basicChannel});
+
+            nock(Client4.getUserRoute('me')).
+                get(`/teams/${TestHelper.basicTeam.id}/channels/members`).
+                reply(201, [{user_id: TestHelper.basicUser.id, channel_id: TestHelper.basicChannel.id}]);
+
+            mockServer.emit('message', JSON.stringify({event: WebsocketEvents.CHANNEL_UNDELETED, data: {channel_id: TestHelper.basicChannel.id}, broadcast: {omit_users: null, user_id: '', channel_id: '', team_id: TestHelper.basicTeam.id}, seq: 68}));
+
+            setTimeout(() => {
+                const state = store.getState();
+                const entities = state.entities;
+                const {channels, currentChannelId} = entities.channels;
+
+                assert.ok(channels[currentChannelId].name === General.DEFAULT_CHANNEL);
+                done();
+            }, 500);
+        }
+
+        test();
+    });
+
     it('Websocket Handle Direct Channel', (done) => {
         async function test() {
             const channel = {id: TestHelper.generateId(), name: TestHelper.basicUser.id + '__' + TestHelper.generateId(), type: 'D'};
