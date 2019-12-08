@@ -8,7 +8,7 @@ import {ChannelTypes, GeneralTypes, EmojiTypes, PostTypes, PreferenceTypes, Team
 import {General, WebsocketEvents, Preferences} from '../constants';
 import {getAllChannels, getChannel, getChannelsNameMapInTeam, getCurrentChannelId, getMyChannelMember, getRedirectChannelNameForTeam, getCurrentChannelStats} from 'selectors/entities/channels';
 import {getConfig} from 'selectors/entities/general';
-import {getAllPosts} from 'selectors/entities/posts';
+import {getAllPosts, getPost as getPostSelector} from 'selectors/entities/posts';
 import {getDirectShowPreferences} from 'selectors/entities/preferences';
 import {getCurrentTeamId, getCurrentTeamMembership, getTeams as getTeamsSelector} from 'selectors/entities/teams';
 import {getCurrentUser, getCurrentUserId, getUsers, getUserStatuses} from 'selectors/entities/users';
@@ -326,17 +326,26 @@ function handleEvent(msg: WebSocketMessage) {
 
 function handleNewPostEvent(msg: WebSocketMessage) {
     return (dispatch: DispatchFunc, getState: GetStateFunc) => {
+        const state = getState();
         const post = JSON.parse(msg.data.post);
 
-        dispatch(handleNewPost(msg));
-        getProfilesAndStatusesForPosts([post], dispatch, getState);
+        const exists = getPostSelector(state, post.pending_post_id);
+        if (!exists) {
+            if (getCurrentChannelId(state) === post.channel_id) {
+                EventEmitter.emit(WebsocketEvents.INCREASE_POST_VISIBILITY_BY_ONE);
+            }
 
-        if (post.user_id !== getCurrentUserId(getState()) && !fromAutoResponder(post)) {
-            dispatch({
-                type: UserTypes.RECEIVED_STATUSES,
-                data: [{user_id: post.user_id, status: General.ONLINE}],
-            });
+            dispatch(handleNewPost(msg));
+            getProfilesAndStatusesForPosts([post], dispatch, getState);
+
+            if (post.user_id !== getCurrentUserId(getState()) && !fromAutoResponder(post)) {
+                dispatch({
+                    type: UserTypes.RECEIVED_STATUSES,
+                    data: [{user_id: post.user_id, status: General.ONLINE}],
+                });
+            }
         }
+
         return {data: true};
     };
 }
