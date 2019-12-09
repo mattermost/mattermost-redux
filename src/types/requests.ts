@@ -132,16 +132,6 @@ export type RolesRequestsStatuses = {
     editRole: RequestStatusType;
 };
 
-export type SchemesRequestsStatuses = {
-    getSchemes: RequestStatusType;
-    getScheme: RequestStatusType;
-    createScheme: RequestStatusType;
-    deleteScheme: RequestStatusType;
-    patchScheme: RequestStatusType;
-    getSchemeTeams: RequestStatusType;
-    getSchemeChannels: RequestStatusType;
-};
-
 export type GroupsRequestsStatuses = {
     linkGroupSyncable: RequestStatusType;
     unlinkGroupSyncable: RequestStatusType;
