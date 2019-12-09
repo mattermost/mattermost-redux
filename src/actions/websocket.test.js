@@ -7,12 +7,14 @@ import {Server, WebSocket as MockWebSocket} from 'mock-socket';
 import thunk from 'redux-thunk';
 import configureMockStore from 'redux-mock-store';
 
+import * as PostSelectors from 'selectors/entities/posts';
 import * as Actions from 'actions/websocket';
 import * as ChannelActions from 'actions/channels';
 import * as PostActions from 'actions/posts';
 import * as PreferenceActions from 'actions/preferences';
 import * as TeamActions from 'actions/teams';
 import * as UserActions from 'actions/users';
+import EventEmitter from 'utils/event_emitter';
 
 import {Client4} from 'client';
 import {General, Posts, RequestStatus, WebsocketEvents} from '../constants';
@@ -54,8 +56,10 @@ describe('Actions.Websocket', () => {
         assert.ok(ws.status === RequestStatus.SUCCESS);
     });
 
-    it('Websocket Handle New Post', async () => {
+    it('Websocket Handle New Post if post does not exist', async () => {
+        PostSelectors.getPost = jest.fn();
         const channelId = TestHelper.basicChannel.id;
+        const message = JSON.stringify({event: WebsocketEvents.POSTED, data: {channel_display_name: TestHelper.basicChannel.display_name, channel_name: TestHelper.basicChannel.name, channel_type: 'O', post: `{"id": "71k8gz5ompbpfkrzaxzodffj8w", "create_at": 1508245311774, "update_at": 1508245311774, "edit_at": 0, "delete_at": 0, "is_pinned": false, "user_id": "${TestHelper.basicUser.id}", "channel_id": "${channelId}", "root_id": "", "parent_id": "", "original_id": "", "message": "Unit Test", "type": "", "props": {}, "hashtags": "", "pending_post_id": "t36kso9nwtdhbm8dbkd6g4eeby: 1508245311749"}`, sender_name: TestHelper.basicUser.username, team_id: TestHelper.basicTeam.id}, broadcast: {omit_users: null, user_id: '', channel_id: channelId, team_id: ''}, seq: 2});
 
         nock(Client4.getBaseRoute()).
             post('/users/ids').
@@ -65,13 +69,52 @@ describe('Actions.Websocket', () => {
             post('/users/status/ids').
             reply(200, [{user_id: TestHelper.basicUser.id, status: 'online', manual: false, last_activity_at: 1507662212199}]);
 
-        mockServer.emit('message', JSON.stringify({event: WebsocketEvents.POSTED, data: {channel_display_name: TestHelper.basicChannel.display_name, channel_name: TestHelper.basicChannel.name, channel_type: 'O', post: `{"id": "71k8gz5ompbpfkrzaxzodffj8w", "create_at": 1508245311774, "update_at": 1508245311774, "edit_at": 0, "delete_at": 0, "is_pinned": false, "user_id": "${TestHelper.basicUser.id}", "channel_id": "${channelId}", "root_id": "", "parent_id": "", "original_id": "", "message": "Unit Test", "type": "", "props": {}, "hashtags": "", "pending_post_id": "t36kso9nwtdhbm8dbkd6g4eeby: 1508245311749"}`, sender_name: TestHelper.basicUser.username, team_id: TestHelper.basicTeam.id}, broadcast: {omit_users: null, user_id: '', channel_id: channelId, team_id: ''}, seq: 2}));
+        // Mock that post already exists and check it is not added
+        PostSelectors.getPost.mockReturnValueOnce(true);
+        mockServer.emit('message', message);
+        let entities = store.getState().entities;
+        let posts = entities.posts.posts;
+        assert.deepEqual(posts, {});
 
-        const entities = store.getState().entities;
-        const {posts} = entities.posts;
+        // Mock that post does not exist and check it is added
+        PostSelectors.getPost.mockReturnValueOnce(false);
+        mockServer.emit('message', message);
+        entities = store.getState().entities;
+        posts = entities.posts.posts;
         const postId = Object.keys(posts)[0];
-
         assert.ok(posts[postId].message.indexOf('Unit Test') > -1);
+    });
+
+    it('Websocket Handle New Post emits INCREASE_POST_VISIBILITY_BY_ONE for current channel when post does not exist', async () => {
+        PostSelectors.getPost = jest.fn();
+        const emit = jest.spyOn(EventEmitter, 'emit');
+        const currentChannelId = TestHelper.generateId();
+        const otherChannelId = TestHelper.generateId();
+        const messageFor = (channelId) => ({event: WebsocketEvents.POSTED, data: {channel_display_name: TestHelper.basicChannel.display_name, channel_name: TestHelper.basicChannel.name, channel_type: 'O', post: `{"id": "71k8gz5ompbpfkrzaxzodffj8w", "create_at": 1508245311774, "update_at": 1508245311774, "edit_at": 0, "delete_at": 0, "is_pinned": false, "user_id": "${TestHelper.basicUser.id}", "channel_id": "${channelId}", "root_id": "", "parent_id": "", "original_id": "", "message": "Unit Test", "type": "", "props": {}, "hashtags": "", "pending_post_id": "t36kso9nwtdhbm8dbkd6g4eeby: 1508245311749"}`, sender_name: TestHelper.basicUser.username, team_id: TestHelper.basicTeam.id}, broadcast: {omit_users: null, user_id: '', channel_id: channelId, team_id: ''}, seq: 2});
+
+        await store.dispatch(ChannelActions.selectChannel(currentChannelId));
+        await TestHelper.wait(100);
+
+        // Post does not exist and is not for current channel
+        PostSelectors.getPost.mockReturnValueOnce(false);
+        mockServer.emit('message', JSON.stringify(messageFor(otherChannelId)));
+        expect(emit).not.toHaveBeenCalled();
+
+        // Post exists and is not for current channel
+        PostSelectors.getPost.mockReturnValueOnce(true);
+        mockServer.emit('message', JSON.stringify(messageFor(otherChannelId)));
+        expect(emit).not.toHaveBeenCalled();
+
+
+        // Post exists and is for current channel
+        PostSelectors.getPost.mockReturnValueOnce(true);
+        mockServer.emit('message', JSON.stringify(messageFor(currentChannelId)));
+        expect(emit).not.toHaveBeenCalled();
+
+        // Post does not exist and is for current channel
+        PostSelectors.getPost.mockReturnValueOnce(false);
+        mockServer.emit('message', JSON.stringify(messageFor(currentChannelId)));
+        expect(emit).toHaveBeenCalledWith(WebsocketEvents.INCREASE_POST_VISIBILITY_BY_ONE);
     });
 
     it('Websocket Handle Post Edited', async () => {
