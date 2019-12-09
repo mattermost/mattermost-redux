@@ -18,28 +18,27 @@ describe('Selectors.Channels.getChannelsInCurrentTeam', () => {
     it('should return channels in current team', () => {
         const user = TestHelper.fakeUserWithId();
 
-        const profiles = {};
-        profiles[user.id] = user;
+        const profiles = {
+            [user.id]: user,
+        };
 
         const channel1 = TestHelper.fakeChannelWithId(team1.id);
-        channel1.display_name = 'Channel Name';
         const channel2 = TestHelper.fakeChannelWithId(team2.id);
-        channel2.display_name = 'Channel Name';
         const channel3 = TestHelper.fakeChannelWithId(team1.id);
-        channel3.display_name = 'Channel Name';
         const channel4 = TestHelper.fakeChannelWithId('');
-        channel4.display_name = 'Channel Name';
 
-        const channels = {};
-        channels[channel1.id] = channel1;
-        channels[channel2.id] = channel2;
-        channels[channel3.id] = channel3;
-        channels[channel4.id] = channel4;
+        const channels = {
+            [channel1.id]: channel1,
+            [channel2.id]: channel2,
+            [channel3.id]: channel3,
+            [channel4.id]: channel4,
+        };
 
-        const channelsInTeam = {};
-        channelsInTeam[team1.id] = [channel1.id, channel3.id];
-        channelsInTeam[team2.id] = [channel2.id];
-        channelsInTeam[''] = [channel4.id];
+        const channelsInTeam = {
+            [team1.id]: [channel1.id, channel3.id],
+            [team2.id]: [channel2.id],
+            ['']: [channel4.id],
+        };
 
         const testState = deepFreezeAndThrowOnMutation({
             entities: {
@@ -68,23 +67,27 @@ describe('Selectors.Channels.getChannelsInCurrentTeam', () => {
         const userSv = TestHelper.fakeUserWithId();
         userSv.locale = 'sv'
 
-        const profilesDe = {};
-        profilesDe[userDe.id] = userDe;
+        const profilesDe = {
+            [userDe.id]: userDe,
+        };
 
-        const profilesSv = {};
-        profilesSv[userSv.id] = userSv;
+        const profilesSv = {
+            [userSv.id]: userSv,
+        };
 
         const channel1 = TestHelper.fakeChannelWithId(team1.id);
         channel1.display_name = 'z';
         const channel2 = TestHelper.fakeChannelWithId(team1.id);
         channel2.display_name = 'ä';
 
-        const channels = {};
-        channels[channel1.id] = channel1;
-        channels[channel2.id] = channel2;
+        const channels = {
+            [channel1.id]: channel1,
+            [channel2.id]: channel2,
+        };
 
-        const channelsInTeam = {};
-        channelsInTeam[team1.id] = [channel1.id, channel2.id];
+        const channelsInTeam = {
+            [team1.id]: [channel1.id, channel2.id],
+        };
 
         const testStateDe = deepFreezeAndThrowOnMutation({
             entities: {
@@ -126,7 +129,7 @@ describe('Selectors.Channels.getChannelsInCurrentTeam', () => {
     });
 });
 
-describe('Selectos.Channels.getMyChannels', () => {
+describe('Selectors.Channels.getMyChannels', () => {
     const team1 = TestHelper.fakeTeamWithId();
     const team2 = TestHelper.fakeTeamWithId();
 
@@ -134,10 +137,11 @@ describe('Selectos.Channels.getMyChannels', () => {
     const user2 = TestHelper.fakeUserWithId();
     const user3 = TestHelper.fakeUserWithId();
 
-    const profiles = {};
-    profiles[user.id] = user;
-    profiles[user2.id] = user2;
-    profiles[user3.id] = user3;
+    const profiles = {
+        [user.id]: user,
+        [user2.id]: user2,
+        [user3.id]: user3,
+    };
 
     const channel1 = TestHelper.fakeChannelWithId(team1.id);
     channel1.display_name = 'Channel Name';
@@ -154,23 +158,26 @@ describe('Selectos.Channels.getMyChannels', () => {
     channel5.type = General.GM_CHANNEL;
     channel5.name = '';
 
-    const channels = {};
-    channels[channel1.id] = channel1;
-    channels[channel2.id] = channel2;
-    channels[channel3.id] = channel3;
-    channels[channel4.id] = channel4;
-    channels[channel5.id] = channel5;
+    const channels = {
+        [channel1.id]: channel1,
+        [channel2.id]: channel2,
+        [channel3.id]: channel3,
+        [channel4.id]: channel4,
+        [channel5.id]: channel5,
+    };
 
-    const channelsInTeam = {};
-    channelsInTeam[team1.id] = [channel1.id, channel3.id];
-    channelsInTeam[team2.id] = [channel2.id];
-    channelsInTeam[''] = [channel4.id, channel5.id];
+    const channelsInTeam = {
+        [team1.id]: [channel1.id, channel3.id],
+        [team2.id]: [channel2.id],
+        ['']: [channel4.id, channel5.id],
+    };
 
-    const myMembers = {};
-    myMembers[channel1.id] = {};
-    myMembers[channel3.id] = {};
-    myMembers[channel4.id] = {};
-    myMembers[channel5.id] = {};
+    const myMembers = {
+        [channel1.id]: {},
+        [channel3.id]: {},
+        [channel4.id]: {},
+        [channel5.id]: {},
+    };
 
 
     const testState = deepFreezeAndThrowOnMutation({
@@ -218,11 +225,13 @@ describe('Selectors.Channels.getMembersInCurrentChannel', () => {
     const user2 = TestHelper.fakeUserWithId();
     const user3 = TestHelper.fakeUserWithId();
 
-    const membersInChannel = {};
-    membersInChannel[channel1.id] = {};
-    membersInChannel[channel1.id][user.id] = {};
-    membersInChannel[channel1.id][user2.id] = {};
-    membersInChannel[channel1.id][user3.id] = {};
+    const membersInChannel = {
+        [channel1.id]: {
+            [user.id]: {},
+            [user2.id]: {},
+            [user3.id]: {},
+        },
+    };
 
     const testState = deepFreezeAndThrowOnMutation({
         entities: {
@@ -245,8 +254,9 @@ describe('Selectors.Channels.getOtherChannels', () => {
 
     const user = TestHelper.fakeUserWithId();
 
-    const profiles = {};
-    profiles[user.id] = user;
+    const profiles = {
+        [user.id]: user,
+    };
 
     const channel1 = TestHelper.fakeChannelWithId(team1.id);
     channel1.display_name = 'Channel Name';
@@ -268,22 +278,25 @@ describe('Selectors.Channels.getOtherChannels', () => {
     channel6.display_name = 'Channel Name';
     channel6.type = General.OPEN_CHANNEL;
 
-    const channels = {};
-    channels[channel1.id] = channel1;
-    channels[channel2.id] = channel2;
-    channels[channel3.id] = channel3;
-    channels[channel4.id] = channel4;
-    channels[channel5.id] = channel5;
-    channels[channel6.id] = channel6;
+    const channels = {
+        [channel1.id]: channel1,
+        [channel2.id]: channel2,
+        [channel3.id]: channel3,
+        [channel4.id]: channel4,
+        [channel5.id]: channel5,
+        [channel6.id]: channel6,
+    };
 
-    const channelsInTeam = {};
-    channelsInTeam[team1.id] = [channel1.id, channel3.id, channel5.id, channel6.id];
-    channelsInTeam[team2.id] = [channel2.id];
-    channelsInTeam[''] = [channel4.id];
+    const channelsInTeam = {
+        [team1.id]: [channel1.id, channel3.id, channel5.id, channel6.id],
+        [team2.id]: [channel2.id],
+        ['']: [channel4.id],
+    };
 
-    const myMembers = {};
-    myMembers[channel4.id] = {};
-    myMembers[channel6.id] = {};
+    const myMembers = {
+        [channel4.id]: {},
+        [channel6.id]: {},
+    };
 
     const testState = deepFreezeAndThrowOnMutation({
         entities: {
@@ -317,8 +330,9 @@ describe('Selectors.Channels.getArchivedChannels', () => {
 
     const user = TestHelper.fakeUserWithId();
 
-    const profiles = {};
-    profiles[user.id] = user;
+    const profiles = {
+        [user.id]: user,
+    };
 
     const channel1 = TestHelper.fakeChannelWithId(team1.id);
     channel1.display_name = 'Channel Name';
@@ -341,23 +355,26 @@ describe('Selectors.Channels.getArchivedChannels', () => {
     channel6.display_name = 'Channel Name';
     channel6.type = General.OPEN_CHANNEL;
 
-    const channels = {};
-    channels[channel1.id] = channel1;
-    channels[channel2.id] = channel2;
-    channels[channel3.id] = channel3;
-    channels[channel4.id] = channel4;
-    channels[channel5.id] = channel5;
-    channels[channel6.id] = channel6;
+    const channels = {
+        [channel1.id]: channel1,
+        [channel2.id]: channel2,
+        [channel3.id]: channel3,
+        [channel4.id]: channel4,
+        [channel5.id]: channel5,
+        [channel6.id]: channel6,
+    };
 
-    const channelsInTeam = {};
-    channelsInTeam[team1.id] = [channel1.id, channel3.id, channel5.id, channel6.id];
-    channelsInTeam[team2.id] = [channel2.id];
-    channelsInTeam[''] = [channel4.id];
+    const channelsInTeam = {
+        [team1.id]: [channel1.id, channel3.id, channel5.id, channel6.id],
+        [team2.id]: [channel2.id],
+        ['']: [channel4.id],
+    };
 
-    const myMembers = {};
-    myMembers[channel4.id] = {};
-    myMembers[channel5.id] = {};
-    myMembers[channel6.id] = {};
+    const myMembers = {
+        [channel4.id]: {},
+        [channel5.id]: {},
+        [channel6.id]: {},
+    };
 
     const testState = deepFreezeAndThrowOnMutation({
         entities: {
@@ -389,10 +406,11 @@ describe('Selectors.Channels.getChannel', () => {
     const user2 = TestHelper.fakeUserWithId();
     const user3 = TestHelper.fakeUserWithId();
 
-    const profiles = {};
-    profiles[user.id] = user;
-    profiles[user2.id] = user2;
-    profiles[user3.id] = user3;
+    const profiles = {
+        [user.id]: user,
+        [user2.id]: user2,
+        [user3.id]: user3,
+    };
 
     const channel1 = TestHelper.fakeChannelWithId(team1.id);
     channel1.type = General.OPEN_CHANNEL;
@@ -403,10 +421,11 @@ describe('Selectors.Channels.getChannel', () => {
     channel3.type = General.GM_CHANNEL;
     channel3.display_name = [user.username, user2.username, user3.username].join(', ');
 
-    const channels = {};
-    channels[channel1.id] = channel1;
-    channels[channel2.id] = channel2;
-    channels[channel3.id] = channel3;
+    const channels = {
+        [channel1.id]: channel1,
+        [channel2.id]: channel2,
+        [channel3.id]: channel3,
+    };
 
     const testState = deepFreezeAndThrowOnMutation({
         entities: {
@@ -453,10 +472,11 @@ describe('Selectors.Channels.getChannelByName', () => {
     const channel3 = TestHelper.fakeChannelWithId(team1.id);
     channel3.name = 'ch3';
 
-    const channels = {};
-    channels[channel1.id] = channel1;
-    channels[channel2.id] = channel2;
-    channels[channel3.id] = channel3;
+    const channels = {
+        [channel1.id]: channel1,
+        [channel2.id]: channel2,
+        [channel3.id]: channel3,
+    };
 
     const testState = deepFreezeAndThrowOnMutation({
         entities: {
@@ -487,15 +507,17 @@ describe('Selectors.Channels.getChannelsNameMapInCurrentTeam', () => {
     const channel4 = TestHelper.fakeChannelWithId(team1.id);
     channel4.name = "Ch4";
 
-    const channels = {};
-    channels[channel1.id] = channel1;
-    channels[channel2.id] = channel2;
-    channels[channel3.id] = channel3;
-    channels[channel4.id] = channel4;
+    const channels = {
+        [channel1.id]: channel1,
+        [channel2.id]: channel2,
+        [channel3.id]: channel3,
+        [channel4.id]: channel4,
+    };
 
-    const channelsInTeam = {};
-    channelsInTeam[team1.id] = [channel1.id, channel4.id];
-    channelsInTeam[team2.id] = [channel2.id, channel3.id];
+    const channelsInTeam = {
+        [team1.id]: [channel1.id, channel4.id],
+        [team2.id]: [channel2.id, channel3.id],
+    };
 
     const testState = deepFreezeAndThrowOnMutation({
         entities: {
@@ -531,15 +553,17 @@ describe('Selectors.Channels.getChannelsNameMapInTeam', () => {
     const channel4 = TestHelper.fakeChannelWithId(team1.id);
     channel4.name = "Ch4";
 
-    const channels = {};
-    channels[channel1.id] = channel1;
-    channels[channel2.id] = channel2;
-    channels[channel3.id] = channel3;
-    channels[channel4.id] = channel4;
+    const channels = {
+        [channel1.id]: channel1,
+        [channel2.id]: channel2,
+        [channel3.id]: channel3,
+        [channel4.id]: channel4,
+    };
 
-    const channelsInTeam = {};
-    channelsInTeam[team1.id] = [channel1.id, channel4.id];
-    channelsInTeam[team2.id] = [channel2.id, channel3.id];
+    const channelsInTeam = {
+        [team1.id]: [channel1.id, channel4.id],
+        [team2.id]: [channel2.id, channel3.id],
+    };
 
     const testState = deepFreezeAndThrowOnMutation({
         entities: {
@@ -569,10 +593,11 @@ describe('Selectors.Channels.getChannelsByCategory', () => {
     const user2 = TestHelper.fakeUserWithId();
     const user3 = TestHelper.fakeUserWithId();
 
-    const profiles = {};
-    profiles[user.id] = user;
-    profiles[user2.id] = user2;
-    profiles[user3.id] = user3;
+    const profiles = {
+        [user.id]: user,
+        [user2.id]: user2,
+        [user3.id]: user3,
+    };
 
     const channel1 = TestHelper.fakeChannelWithId(team1.id);
     channel1.display_name = 'Channel Name';
@@ -598,27 +623,30 @@ describe('Selectors.Channels.getChannelsByCategory', () => {
     channel7.display_name = 'Channel Name';
     channel7.type = General.PRIVATE_CHANNEL;
 
-    const channels = {};
-    channels[channel1.id] = channel1;
-    channels[channel2.id] = channel2;
-    channels[channel3.id] = channel3;
-    channels[channel4.id] = channel4;
-    channels[channel5.id] = channel5;
-    channels[channel6.id] = channel6;
-    channels[channel7.id] = channel7;
+    const channels = {
+        [channel1.id]: channel1,
+        [channel2.id]: channel2,
+        [channel3.id]: channel3,
+        [channel4.id]: channel4,
+        [channel5.id]: channel5,
+        [channel6.id]: channel6,
+        [channel7.id]: channel7,
+    };
 
-    const channelsInTeam = {};
-    channelsInTeam[team1.id] = [channel1.id, channel3.id, channel6.id, channel7.id];
-    channelsInTeam[team2.id] = [channel2.id];
-    channelsInTeam[''] = [channel4.id, channel5.id];
+    const channelsInTeam = {
+        [team1.id]: [channel1.id, channel3.id, channel6.id, channel7.id],
+        [team2.id]: [channel2.id],
+        ['']: [channel4.id, channel5.id],
+    };
 
-    const myMembers = {};
-    myMembers[channel1.id] = {};
-    myMembers[channel3.id] = {};
-    myMembers[channel4.id] = {};
-    myMembers[channel5.id] = {};
-    myMembers[channel6.id] = {};
-    myMembers[channel7.id] = {};
+    const myMembers = {
+        [channel1.id]: {},
+        [channel3.id]: {},
+        [channel4.id]: {},
+        [channel5.id]: {},
+        [channel6.id]: {},
+        [channel7.id]: {},
+    };
 
     const myPreferences = {
         [`${Preferences.CATEGORY_FAVORITE_CHANNEL}--${channel1.id}`]: {
@@ -695,10 +723,11 @@ describe('Selectors.Channels.getChannelsWithUnreadSection', () => {
     const user2 = TestHelper.fakeUserWithId();
     const user3 = TestHelper.fakeUserWithId();
 
-    const profiles = {};
-    profiles[user.id] = user;
-    profiles[user2.id] = user2;
-    profiles[user3.id] = user3;
+    const profiles = {
+        [user.id]: user,
+        [user2.id]: user2,
+        [user3.id]: user3,
+    };
 
     const channel1 = TestHelper.fakeChannelWithId(team1.id);
     channel1.display_name = 'Channel Name';
@@ -725,27 +754,30 @@ describe('Selectors.Channels.getChannelsWithUnreadSection', () => {
     channel7.display_name = 'Channel Name';
     channel7.type = General.PRIVATE_CHANNEL;
 
-    const channels = {};
-    channels[channel1.id] = channel1;
-    channels[channel2.id] = channel2;
-    channels[channel3.id] = channel3;
-    channels[channel4.id] = channel4;
-    channels[channel5.id] = channel5;
-    channels[channel6.id] = channel6;
-    channels[channel7.id] = channel7;
+    const channels = {
+        [channel1.id]: channel1,
+        [channel2.id]: channel2,
+        [channel3.id]: channel3,
+        [channel4.id]: channel4,
+        [channel5.id]: channel5,
+        [channel6.id]: channel6,
+        [channel7.id]: channel7,
+    };
 
-    const channelsInTeam = {};
-    channelsInTeam[team1.id] = [channel1.id, channel3.id, channel6.id, channel7.id];
-    channelsInTeam[team2.id] = [channel2.id];
-    channelsInTeam[''] = [channel4.id, channel5.id];
+    const channelsInTeam = {
+        [team1.id]: [channel1.id, channel3.id, channel6.id, channel7.id],
+        [team2.id]: [channel2.id],
+        ['']: [channel4.id, channel5.id],
+    };
 
-    const myMembers = {};
-    myMembers[channel1.id] = {msg_count: 1, mention_count: 1};
-    myMembers[channel3.id] = {msg_count: 0, mention_count: 0};
-    myMembers[channel4.id] = {msg_count: 0, mention_count: 1};
-    myMembers[channel5.id] = {msg_count: 1, mention_count: 0};
-    myMembers[channel6.id] = {msg_count: 0, mention_count: 0};
-    myMembers[channel7.id] = {msg_count: 0, mention_count: 0};
+    const myMembers = {
+        [channel1.id]: {msg_count: 1, mention_count: 1},
+        [channel3.id]: {msg_count: 0, mention_count: 0},
+        [channel4.id]: {msg_count: 0, mention_count: 1},
+        [channel5.id]: {msg_count: 1, mention_count: 0},
+        [channel6.id]: {msg_count: 0, mention_count: 0},
+        [channel7.id]: {msg_count: 0, mention_count: 0},
+    };
 
     const myPreferences = {
         [`${Preferences.CATEGORY_FAVORITE_CHANNEL}--${channel1.id}`]: {
@@ -820,10 +852,11 @@ describe('Selectors.Channels.getGroupChannels', () => {
     const user2 = TestHelper.fakeUserWithId();
     const user3 = TestHelper.fakeUserWithId();
 
-    const profiles = {};
-    profiles[user.id] = user;
-    profiles[user2.id] = user2;
-    profiles[user3.id] = user3;
+    const profiles = {
+        [user.id]: user,
+        [user2.id]: user2,
+        [user3.id]: user3,
+    };
 
     const channel1 = TestHelper.fakeChannelWithId(team1.id);
     channel1.display_name = 'Channel Name';
@@ -844,16 +877,18 @@ describe('Selectors.Channels.getGroupChannels', () => {
     channel5.type = General.GM_CHANNEL;
     channel5.name = '';
 
-    const channels = {};
-    channels[channel1.id] = channel1;
-    channels[channel2.id] = channel2;
-    channels[channel3.id] = channel3;
-    channels[channel4.id] = channel4;
-    channels[channel5.id] = channel5;
+    const channels = {
+        [channel1.id]: channel1,
+        [channel2.id]: channel2,
+        [channel3.id]: channel3,
+        [channel4.id]: channel4,
+        [channel5.id]: channel5,
+    };
 
-    const channelsInTeam = {};
-    channelsInTeam[team1.id] = [channel1.id, channel2.id];
-    channelsInTeam[''] = [channel3.id, channel4.id, channel5.id];
+    const channelsInTeam = {
+        [team1.id]: [channel1.id, channel2.id],
+        ['']: [channel3.id, channel4.id, channel5.id],
+    };
 
     const testState = deepFreezeAndThrowOnMutation({
         entities: {
@@ -879,6 +914,7 @@ describe('Selectors.Channels.getGroupChannels', () => {
             }
         },
     });
+
     it('get group channels', () => {
         assert.deepEqual(Selectors.getGroupChannels(testState), [
             {...channel3, display_name: [user3.username].sort(sortUsernames).join(', ')},
