@@ -1,10 +1,10 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
 
-import {ChannelTypes} from 'action_types';
+import {ChannelTypes, UserTypes} from 'action_types';
 import deepFreeze from 'utils/deep_freeze';
 
-import channelsReducer from './channels';
+import channelsReducer, * as Reducers from './channels';
 
 describe('channels', () => {
     describe('RECEIVED_CHANNEL_DELETED', () => {
@@ -16,6 +16,7 @@ describe('channels', () => {
                 myMembers: {},
                 stats: {},
                 totalCount: 0,
+                manuallyUnread: {},
                 membersInChannel: {},
                 channels: {
                     channel1: {
@@ -51,6 +52,7 @@ describe('channels', () => {
                 myMembers: {},
                 stats: {},
                 totalCount: 0,
+                manuallyUnread: {},
                 membersInChannel: {},
                 channels: {
                     channel1: {
@@ -83,6 +85,7 @@ describe('channels', () => {
                 myMembers: {},
                 stats: {},
                 totalCount: 0,
+                manuallyUnread: {},
                 membersInChannel: {},
                 channels: {
                     channel1: {
@@ -119,6 +122,7 @@ describe('channels', () => {
                 myMembers: {},
                 stats: {},
                 totalCount: 0,
+                manuallyUnread: {},
                 membersInChannel: {},
                 channels: {
                     channel1: {
@@ -152,6 +156,7 @@ describe('channels', () => {
                 myMembers: {},
                 stats: {},
                 totalCount: 0,
+                manuallyUnread: {},
                 membersInChannel: {},
                 channels: {
                     channel1: {
@@ -188,6 +193,7 @@ describe('channels', () => {
                 myMembers: {},
                 stats: {},
                 totalCount: 0,
+                manuallyUnread: {},
                 membersInChannel: {},
                 channels: {
                     channel1: {
@@ -222,6 +228,7 @@ describe('channels', () => {
                 myMembers: {},
                 stats: {},
                 totalCount: 0,
+                manuallyUnread: {},
                 membersInChannel: {
                     channel1: {
                         memberId1: 'member-data-1',
@@ -253,6 +260,7 @@ describe('channels', () => {
                 myMembers: {},
                 stats: {},
                 totalCount: 0,
+                manuallyUnread: {},
                 membersInChannel: {
                     channel1: {
                         memberId1: 'member-data-1',
@@ -283,6 +291,7 @@ describe('channels', () => {
                 myMembers: {},
                 stats: {},
                 totalCount: 0,
+                manuallyUnread: {},
                 membersInChannel: {
                     channel1: {
                         memberId1: 'member-data-1',
@@ -302,6 +311,107 @@ describe('channels', () => {
             });
 
             expect(nextState).toEqual(state);
+        });
+    });
+    describe('MANUALLY_UNREAD', () => {
+        test('should mark channel as manually unread', () => {
+            const state = deepFreeze({
+                channel1: false,
+            });
+            const nextState = Reducers.manuallyUnread(state, {
+                type: ChannelTypes.POST_UNREAD_SUCCESS,
+                data: {channelId: 'channel1'},
+            });
+            expect(nextState.channel1).toBe(true);
+        });
+        test('should mark channel as manually unread even if undefined', () => {
+            const state = deepFreeze({
+            });
+            const nextState = Reducers.manuallyUnread(state, {
+                type: ChannelTypes.POST_UNREAD_SUCCESS,
+                data: {channelId: 'channel1'},
+            });
+            expect(nextState.channel1).toBe(true);
+        });
+        test('should remove channel as manually unread', () => {
+            const state = deepFreeze({
+                channel1: true,
+            });
+            const nextState = Reducers.manuallyUnread(state, {
+                type: ChannelTypes.REMOVE_MANUALLY_UNREAD,
+                data: {channelId: 'channel1'},
+            });
+            expect(nextState.channel1).toBe(undefined);
+        });
+        test('shouldn\'t do nothing if channel was undefined', () => {
+            const state = deepFreeze({
+            });
+            const nextState = Reducers.manuallyUnread(state, {
+                type: ChannelTypes.REMOVE_MANUALLY_UNREAD,
+                data: {channelId: 'channel1'},
+            });
+            expect(nextState.channel1).toBe(undefined);
+        });
+        test('remove all marks if user logs out', () => {
+            const state = deepFreeze({
+                channel1: true,
+                channel231: false,
+            });
+            const nextState = Reducers.manuallyUnread(state, {
+                type: UserTypes.LOGOUT_SUCCESS,
+                data: {},
+            });
+            expect(nextState.channel1).toBe(undefined);
+            expect(nextState.channel231).toBe(undefined);
+        });
+    });
+    describe('RECEIVED_CHANNELS', () => {
+        test('should not remove current channel', () => {
+            const state = deepFreeze({
+                channelsInTeam: {},
+                currentChannelId: '',
+                groupsAssociatedToChannel: {},
+                myMembers: {},
+                stats: {},
+                totalCount: 0,
+                membersInChannel: {},
+                channels: {
+                    channel1: {
+                        id: 'channel1',
+                        team_id: 'team',
+                    },
+                    channel2: {
+                        id: 'channel2',
+                        team_id: 'team',
+                    },
+                    channel3: {
+                        id: 'channel3',
+                        team_id: 'team',
+                    },
+                },
+            });
+
+            const nextState = channelsReducer(state, {
+                type: ChannelTypes.RECEIVED_CHANNELS,
+                sync: true,
+                currentChannelId: 'channel3',
+                teamId: 'team',
+                data: [{
+                    id: 'channel1',
+                    team_id: 'team',
+                }],
+            });
+
+            expect(nextState).not.toBe(state);
+            expect(nextState.channels.channel1).toEqual({
+                id: 'channel1',
+                team_id: 'team',
+            });
+            expect(nextState.channels.channel2).toBe(undefined);
+            expect(nextState.channels.channel3).toEqual({
+                id: 'channel3',
+                team_id: 'team',
+            });
         });
     });
 });

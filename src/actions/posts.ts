@@ -5,7 +5,7 @@ import {Client4, DEFAULT_LIMIT_AFTER, DEFAULT_LIMIT_BEFORE} from 'client';
 import {General, Preferences, Posts, WebsocketEvents} from '../constants';
 import {PostTypes, ChannelTypes, FileTypes, IntegrationTypes} from 'action_types';
 
-import {getCurrentChannelId, getMyChannelMember as getMyChannelMemberSelector} from 'selectors/entities/channels';
+import {getCurrentChannelId, getMyChannelMember as getMyChannelMemberSelector, isManuallyUnread} from 'selectors/entities/channels';
 import {getCustomEmojisByName as selectCustomEmojisByName} from 'selectors/entities/emojis';
 import {getConfig} from 'selectors/entities/general';
 import * as Selectors from 'selectors/entities/posts';
@@ -28,6 +28,7 @@ import {
 } from './preferences';
 import {getProfilesByIds, getProfilesByUsernames, getStatusesByIds} from './users';
 import {Action, ActionFunc, ActionResult, batchActions, DispatchFunc, GetStateFunc, GenericAction} from 'types/actions';
+import {ChannelUnread} from 'types/channels';
 import {GlobalState} from 'types/store';
 import {Post} from 'types/posts';
 import {Error} from 'types/errors';
@@ -398,6 +399,43 @@ export function editPost(post: Post) {
             post,
         ],
     });
+}
+
+export function getUnreadPostData(unreadChan: ChannelUnread, state: GlobalState) {
+    const member = getMyChannelMemberSelector(state, unreadChan.channel_id);
+    const delta = member ? member.msg_count - unreadChan.msg_count : unreadChan.msg_count;
+
+    const data = {
+        teamId: unreadChan.team_id,
+        channelId: unreadChan.channel_id,
+        msgCount: unreadChan.msg_count,
+        mentionCount: unreadChan.mention_count,
+        lastViewedAt: unreadChan.last_viewed_at,
+        deltaMsgs: delta,
+    };
+
+    return data;
+}
+
+export function setUnreadPost(userId: string, postId: string) {
+    return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
+        let unreadChan;
+        try {
+            unreadChan = await Client4.markPostAsUnread(userId, postId);
+        } catch (error) {
+            forceLogoutIfNecessary(error, dispatch, getState);
+            dispatch(logError(error));
+            return {error};
+        }
+
+        const state = getState();
+        const data = getUnreadPostData(unreadChan, state);
+        dispatch({
+            type: ChannelTypes.POST_UNREAD_SUCCESS,
+            data,
+        });
+        return {data};
+    };
 }
 
 export function pinPost(postId: string) {
@@ -1181,7 +1219,7 @@ function completePostReceive(post: Post, websocketMessageProps: any) {
     };
 }
 
-function lastPostActions(post: Post, websocketMessageProps: any) {
+export function lastPostActions(post: Post, websocketMessageProps: any) {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         const state = getState();
         const actions = [
@@ -1196,7 +1234,7 @@ function lastPostActions(post: Post, websocketMessageProps: any) {
             },
         ];
 
-        dispatch(batchActions(actions));
+        await dispatch(batchActions(actions));
 
         if (shouldIgnorePost(post)) {
             return;
@@ -1204,23 +1242,25 @@ function lastPostActions(post: Post, websocketMessageProps: any) {
 
         let markAsRead = false;
         let markAsReadOnServer = false;
-        if (
-            post.user_id === getCurrentUserId(state) &&
-            !isSystemMessage(post) &&
-            !isFromWebhook(post)
-        ) {
-            markAsRead = true;
-            markAsReadOnServer = false;
-        } else if (post.channel_id === getCurrentChannelId(state)) {
-            markAsRead = true;
-            markAsReadOnServer = true;
+        if (!isManuallyUnread(getState(), post.channel_id)) {
+            if (
+                post.user_id === getCurrentUserId(state) &&
+                !isSystemMessage(post) &&
+                !isFromWebhook(post)
+            ) {
+                markAsRead = true;
+                markAsReadOnServer = false;
+            } else if (post.channel_id === getCurrentChannelId(state)) {
+                markAsRead = true;
+                markAsReadOnServer = true;
+            }
         }
 
         if (markAsRead) {
-            dispatch(markChannelAsRead(post.channel_id, undefined, markAsReadOnServer));
-            dispatch(markChannelAsViewed(post.channel_id));
+            await dispatch(markChannelAsRead(post.channel_id, undefined, markAsReadOnServer));
+            await dispatch(markChannelAsViewed(post.channel_id));
         } else {
-            dispatch(markChannelAsUnread(websocketMessageProps.team_id, post.channel_id, websocketMessageProps.mentions));
+            await dispatch(markChannelAsUnread(websocketMessageProps.team_id, post.channel_id, websocketMessageProps.mentions));
         }
     };
 }
