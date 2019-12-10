@@ -160,8 +160,8 @@ export const getTheme = createShallowSelector(
         // At this point, the theme should be a plain object
 
         // If this is a system theme, find it in case the user's theme is missing any fields
-        if (theme.type && theme.type !== 'custom') {
-            const themeId = getThemeIdForThemeType(theme.type);
+        if (theme.id !== 'custom') {
+            const themeId = theme.id || getThemeIdForThemeType(theme.type);
 
             if (themes[themeId]) {
                 return themes[themeId];

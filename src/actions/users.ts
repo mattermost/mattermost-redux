@@ -804,7 +804,7 @@ export function revokeSessionsForAllUsers(): ActionFunc {
     };
 }
 
-export function loadProfilesForDirect(): ActionFunc {
+export function loadProfilesForDirect(): ActionFunc { // This function's name doesn't match what it's doing at all
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         const state = getState();
         const config = state.entities.general.config;
