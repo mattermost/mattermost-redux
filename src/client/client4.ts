@@ -2698,8 +2698,6 @@ export default class Client4 {
     };
 
     getMarketplacePlugins = async (filter: string, localOnly = false) => {
-        console.log ("CLIENT4 GETMAKERPLACEPLUGINS - LocalOnly: " + localOnly)
-
         return this.doFetch(
             `${this.getPluginsMarketplaceRoute()}${buildQueryString({filter: filter || '', local_only: localOnly})}`,
             {method: 'get'}
