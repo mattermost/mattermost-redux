@@ -266,8 +266,8 @@ function membersInTeam(state: RelationOneToOne<Team, RelationOneToOne<UserProfil
         return state;
     }
     case TeamTypes.RECEIVED_MEMBERS_IN_TEAM: {
-        const data = action.data;
-        if (data && data.length) {
+        const data = action.data ? (action.data.length ? action.data : (action.data.added_members || [])) : undefined;
+        if (data.length > 0) {
             const teamId = data[0].team_id;
             const members = {...(state[teamId] || {})};
             for (const member of data) {
