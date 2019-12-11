@@ -6,7 +6,7 @@ import nock from 'nock';
 import {Server, WebSocket as MockWebSocket} from 'mock-socket';
 import thunk from 'redux-thunk';
 import configureMockStore from 'redux-mock-store';
-
+import {loadRolesIfNeeded as mockLoadRolesIfNeeded} from 'actions/roles';
 import * as Actions from 'actions/websocket';
 import * as ChannelActions from 'actions/channels';
 import * as PostActions from 'actions/posts';
@@ -25,6 +25,10 @@ import {
 } from 'action_types';
 import TestHelper from 'test/test_helper';
 import configureStore from 'test/test_store';
+
+jest.mock('actions/roles', () => ({
+    loadRolesIfNeeded: jest.fn((...args) => ({type: 'MOCK_LOAD_ROLES_IF_NEEDED', args})),
+}));
 
 describe('Actions.Websocket', () => {
     let store;
@@ -275,6 +279,23 @@ describe('Actions.Websocket', () => {
             const profiles = entities.users.profiles;
 
             assert.strictEqual(profiles[user.id].first_name, 'tester4');
+        });
+    });
+
+    it('Websocket Handle Channel Member Updated', async () => {
+        const channelMember = TestHelper.basicChannelMember;
+        channelMember.roles = "channel_user channel_admin"
+        mockServer.emit('message', JSON.stringify({
+            event: WebsocketEvents.CHANNEL_MEMBER_UPDATED, 
+            data: { 
+                channelMember: JSON.stringify(channelMember)
+            }
+        }));
+        expect(mockLoadRolesIfNeeded).toHaveBeenCalledTimes(1);
+        expect(mockLoadRolesIfNeeded).toHaveBeenCalledWith(channelMember.roles.split(' '));
+        store.subscribe(() => {
+            const state = store.getState();
+            expect(state.entities.channels.membersInChannel[channelMember.channel_id][channelMember.user_id].roles).toEqual("channel_user channel_admin");
         });
     });
 
