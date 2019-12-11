@@ -6,7 +6,7 @@ import {haveIChannelPermission} from 'selectors/entities/roles';
 
 import {GlobalState} from 'types/store';
 import {PreferenceType} from 'types/preferences';
-import {Post, PostType} from 'types/posts';
+import {Post, PostType, PostMetadata, PostEmbed} from 'types/posts';
 import {UserProfile} from 'types/users';
 import {Team} from 'types/teams';
 import {Channel} from 'types/channels';
@@ -216,4 +216,12 @@ export function isPostCommentMention({post, currentUser, threadRepliedToByCurren
 
 export function fromAutoResponder(post: Post): boolean {
     return Boolean(post.type && (post.type === Posts.SYSTEM_AUTO_RESPONDER));
+}
+
+export function getEmbedFromMetadata(metadata: PostMetadata): PostEmbed | null {
+    if (!metadata || !metadata.embeds || metadata.embeds.length === 0) {
+        return null;
+    }
+
+    return metadata.embeds[0];
 }
