@@ -429,49 +429,36 @@ describe('Selectors.Users', () => {
             first_name: 'First',
             last_name: 'Last',
         };
-        const testUser2 = {
-            ...user1,
-            id: 'test_user_id_2',
-            username: 'username2',
-            first_name: 'First2',
-            last_name: 'Last2',
-            nickname: 'nick2',
-        };
         const newProfiles = {
             ...profiles,
             [testUser1.id]: testUser1,
-            [testUser2.id]: testUser2,
         };
-
         const newTestState = {
             entities: {
                 users: {profiles: newProfiles},
-                preferences: {myPreferences: {}},
-                general: {config: {TeammateNameDisplay: General.TEAMMATE_NAME_DISPLAY.SHOW_NICKNAME_FULLNAME}},
+                preferences: {
+                    myPreferences: {
+                        [`${Preferences.CATEGORY_DISPLAY_SETTINGS}--${Preferences.NAME_NAME_FORMAT}`]: {
+                            value: General.TEAMMATE_NAME_DISPLAY.SHOW_FULLNAME,
+                        },
+                    },
+                },
+                general: {
+                    config: {
+                        TeammateNameDisplay: General.TEAMMATE_NAME_DISPLAY.SHOW_USERNAME, 
+                        LockTeammateNameDisplay: 'false', 
+                    }
+                },
             },
         };
 
-        // should match full name, since nickname is not present
+        // Should show full name since preferences is being used and LockTeammateNameDisplay is false
         assert.deepEqual(Selectors.makeGetDisplayName()(newTestState, testUser1.id), 'First Last');
 
-        // should match nickname since it's present
-        assert.deepEqual(Selectors.makeGetDisplayName()(newTestState, testUser2.id), 'nick2');
+        newTestState.entities.general.config.LockTeammateNameDisplay = 'true';
 
-        newTestState.entities.general = {config: {TeammateNameDisplay: General.TEAMMATE_NAME_DISPLAY.SHOW_USERNAME}};
-
-        // should match username
+        // Should show username since LockTeammateNameDisplay is true 
         assert.deepEqual(Selectors.makeGetDisplayName()(newTestState, testUser1.id), 'username');
-
-        newTestState.entities.general = {config: {TeammateNameDisplay: General.TEAMMATE_NAME_DISPLAY.SHOW_FULLNAME}};
-
-        // should match username
-        assert.deepEqual(Selectors.makeGetDisplayName()(newTestState, testUser2.id), 'First2 Last2');
-
-        // // should match default name "Someone" for not found user
-        assert.deepEqual(Selectors.makeGetDisplayName()(newTestState, 'not_exist_id'), 'Someone');
-
-        // // should match empty string when not using default fallback
-        assert.deepEqual(Selectors.makeGetDisplayName()(newTestState, 'not_exist_id', false), '');
     });
 
     it('shouldShowTermsOfService', () => {

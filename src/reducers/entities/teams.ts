@@ -200,6 +200,7 @@ function myMembers(state: RelationOneToOne<Team, TeamMembership> = {}, action: G
             },
         };
     }
+
     case TeamTypes.LEAVE_TEAM:
     case TeamTypes.RECEIVED_TEAM_DELETED: {
         const nextState = {...state};
@@ -210,6 +211,24 @@ function myMembers(state: RelationOneToOne<Team, TeamMembership> = {}, action: G
     case TeamTypes.UPDATED_TEAM_MEMBER_SCHEME_ROLES: {
         return updateMyTeamMemberSchemeRoles(state, action);
     }
+
+    case ChannelTypes.POST_UNREAD_SUCCESS: {
+        const {teamId, deltaMsgs, mentionCount, msgCount} = action.data;
+
+        const teamState = state[teamId];
+        if (!teamState) {
+            return state;
+        }
+
+        const newTeamState = {
+            ...teamState,
+            msg_count: (typeof teamState.msg_count === 'undefined' ? msgCount : teamState.msg_count - deltaMsgs),
+            mention_count: (typeof teamState.mention_count === 'undefined' ? mentionCount : teamState.mention_count + mentionCount),
+        };
+
+        return {...state, [teamId]: newTeamState};
+    }
+
     case UserTypes.LOGOUT_SUCCESS:
         return {};
     default:

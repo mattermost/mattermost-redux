@@ -44,6 +44,7 @@ const state: GlobalState = {
             stats: {},
             groupsAssociatedToChannel: {},
             totalCount: 0,
+            manuallyUnread: {},
         },
         posts: {
             expandedURLs: {},
@@ -93,9 +94,6 @@ const state: GlobalState = {
             oauthApps: {},
             systemCommands: {},
             commands: {},
-        },
-        plugins: {
-            marketplacePlugins: [],
         },
         files: {
             files: {},

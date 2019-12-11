@@ -10,6 +10,20 @@ import {Team} from 'types/teams';
 
 function channelListToSet(state: any, action: GenericAction) {
     const nextState = {...state};
+    const teamChannelIds = nextState[action.teamId];
+
+    // Remove existing channels that are no longer
+    if (action.sync && teamChannelIds && teamChannelIds.size) {
+        teamChannelIds.forEach((id: string) => {
+            if (id !== action.currentChannelId) {
+                if (!action.data.find((c: any) => c.id === id)) {
+                    teamChannelIds.delete(id);
+                }
+            }
+        });
+        nextState[action.teamId] = teamChannelIds;
+    }
+
     action.data.forEach((channel: Channel) => {
         const nextSet = new Set(nextState[channel.team_id]);
         nextSet.add(channel.id);
@@ -54,6 +68,22 @@ function channels(state: IDMappedObjects<Channel> = {}, action: GenericAction) {
     case ChannelTypes.RECEIVED_ALL_CHANNELS:
     case SchemeTypes.RECEIVED_SCHEME_CHANNELS: {
         const nextState = {...state};
+        const currentChannels = Object.values(nextState);
+
+        // Remove existing channels that are no longer
+        if (action.sync) {
+            currentChannels.forEach((channel) => {
+                if (channel.team_id === action.teamId) {
+                    const id: string = channel.id;
+                    if (id !== action.currentChannelId) {
+                        if (!action.data.find((c: any) => c.id === id)) {
+                            Reflect.deleteProperty(nextState, id);
+                        }
+                    }
+                }
+            });
+        }
+
         for (const channel of action.data) {
             if (state[channel.id] && channel.type === General.DM_CHANNEL) {
                 channel.display_name = channel.display_name || state[channel.id].display_name;
@@ -307,6 +337,15 @@ function myMembers(state: RelationOneToOne<Channel, ChannelMembership> = {}, act
     case ChannelTypes.UPDATED_CHANNEL_MEMBER_SCHEME_ROLES: {
         return updateChannelMemberSchemeRoles(state, action);
     }
+    case ChannelTypes.POST_UNREAD_SUCCESS: {
+        const data = action.data;
+        const channelState = state[data.channelId];
+
+        if (!channelState) {
+            return state;
+        }
+        return {...state, [data.channelId]: {...channelState, msg_count: data.msgCount, mention_count: data.mentionCount, last_viewed_at: data.lastViewedAt}};
+    }
     case UserTypes.LOGOUT_SUCCESS:
         return {};
     default:
@@ -496,6 +535,29 @@ function totalCount(state = 0, action: GenericAction) {
     }
 }
 
+export function manuallyUnread(state: RelationOneToOne<Channel, boolean> = {}, action: GenericAction) {
+    switch (action.type) {
+    case ChannelTypes.REMOVE_MANUALLY_UNREAD: {
+        if (state[action.data.channelId]) {
+            const newState = {...state};
+            delete newState[action.data.channelId];
+            return newState;
+        }
+        return state;
+    }
+    case UserTypes.LOGOUT_SUCCESS: {
+        // user is logging out, remove any reference
+        return {};
+    }
+
+    case ChannelTypes.POST_UNREAD_SUCCESS: {
+        return {...state, [action.data.channelId]: true};
+    }
+    default:
+        return state;
+    }
+}
+
 export default combineReducers({
 
     // the current selected channel
@@ -519,4 +581,7 @@ export default combineReducers({
     groupsAssociatedToChannel,
 
     totalCount,
+
+    // object where every key is the channel id, if present means a user requested to mark that channel as unread.
+    manuallyUnread,
 });

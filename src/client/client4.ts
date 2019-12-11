@@ -1008,12 +1008,12 @@ export default class Client4 {
         );
     };
 
-    searchTeams = (term: string) => {
+    searchTeams = (term: string, page?: number, perPage?: number) => {
         this.trackEvent('api', 'api_search_teams');
 
         return this.doFetch(
             `${this.getTeamsRoute()}/search`,
-            {method: 'post', body: JSON.stringify({term})}
+            {method: 'post', body: JSON.stringify({term, page, per_page: perPage})}
         );
     };
 
@@ -1403,6 +1403,12 @@ export default class Client4 {
             {method: 'get'}
         );
     };
+    getArchivedChannels = async (teamId: string, page = 0, perPage = PER_PAGE_DEFAULT) => {
+        return this.doFetch(
+            `${this.getTeamRoute(teamId)}/channels/deleted${buildQueryString({page, per_page: perPage})}`,
+            {method: 'get'}
+        );
+    };
 
     getMyChannels = async (teamId: string) => {
         return this.doFetch(
@@ -1515,11 +1521,20 @@ export default class Client4 {
         );
     };
 
-    searchAllChannels = async (term: string, notAssociatedToGroup = '', excludeDefaultChannels = false) => {
+    searchArchivedChannels = async (teamId: string, term: string) => {
+        return this.doFetch(
+            `${this.getTeamRoute(teamId)}/channels/search_archived`,
+            {method: 'post', body: JSON.stringify({term})}
+        );
+    };
+
+    searchAllChannels = async (term: string, notAssociatedToGroup = '', excludeDefaultChannels = false, page?: number, perPage?: number) => {
         const body = {
             term,
             not_associated_to_group: notAssociatedToGroup,
             exclude_default_channels: excludeDefaultChannels,
+            page,
+            per_page: perPage,
         };
         return this.doFetch(
             `${this.getChannelsRoute()}/search`,
@@ -1660,6 +1675,15 @@ export default class Client4 {
             {method: 'get'}
         );
     };
+
+    markPostAsUnread = async (userId: string, postId: string) => {
+        this.trackEvent('api', 'api_post_set_unread_post');
+
+        return this.doFetch(
+            `${this.getUserRoute(userId)}/posts/${postId}/set_unread`,
+            {method: 'post'}
+        );
+    }
 
     pinPost = async (postId: string) => {
         this.trackEvent('api', 'api_posts_pin');
@@ -2680,6 +2704,15 @@ export default class Client4 {
         );
     }
 
+    installMarketplacePlugin = async (id: string, version: string) => {
+        this.trackEvent('api', 'api_install_marketplace_plugin');
+
+        return this.doFetch(
+            `${this.getPluginsMarketplaceRoute()}`,
+            {method: 'post', body: JSON.stringify({id, version})}
+        );
+    }
+
     getPluginStatuses = async () => {
         return this.doFetch(
             `${this.getPluginsRoute()}/statuses`,
@@ -2959,6 +2992,7 @@ export default class Client4 {
             'api_interactive_messages_menu_selected',
             'api_interactive_messages_dialog_submitted',
             'ui_marketplace_download',
+            'ui_marketplace_download_update',
             'ui_marketplace_configure',
             'ui_marketplace_opened',
             'ui_marketplace_closed',
