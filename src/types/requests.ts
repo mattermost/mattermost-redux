@@ -154,6 +154,7 @@ export type GroupsRequestsStatuses = {
     getGroupsAssociatedToChannel: RequestStatusType;
     getGroupsNotAssociatedToTeam: RequestStatusType;
     getGroupsNotAssociatedToChannel: RequestStatusType;
+    patchGroupSyncable: RequestStatusType;
 };
 
 export type JobsRequestsStatuses = {

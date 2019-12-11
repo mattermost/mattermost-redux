@@ -621,6 +621,10 @@ const state: GlobalState = {
                 status: 'not_started',
                 error: null,
             },
+            patchGroupSyncable: {
+                status: 'not_started',
+                error: null,
+            },
         },
     },
     websocket: {

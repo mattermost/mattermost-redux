@@ -118,6 +118,16 @@ function getGroupsNotAssociatedToChannel(state: RequestStatusType = initialReque
     );
 }
 
+function patchGroupSyncable(state: RequestStatusType = initialRequestState(), action: GenericAction): RequestStatusType {
+    return handleRequest(
+        GroupTypes.PATCH_GROUP_SYNCABLE_REQUEST,
+        GroupTypes.PATCH_GROUP_SYNCABLE_SUCCESS,
+        GroupTypes.PATCH_GROUP_SYNCABLE_FAILURE,
+        state,
+        action
+    );
+}
+
 export default (combineReducers({
     linkGroupSyncable,
     unlinkGroupSyncable,
@@ -130,4 +140,5 @@ export default (combineReducers({
     getGroupsAssociatedToChannel,
     getGroupsNotAssociatedToTeam,
     getGroupsNotAssociatedToChannel,
+    patchGroupSyncable,
 }) as (b: GroupsRequestsStatuses, a: GenericAction) => GroupsRequestsStatuses);

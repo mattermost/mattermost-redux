@@ -2757,6 +2757,13 @@ export default class Client4 {
         );
     };
 
+    patchGroupSyncable = async (groupID: string, syncableID: string, syncableType: string, patch: SyncablePatch) => {
+        return this.doFetch(
+            `${this.getBaseRoute()}/groups/${groupID}/${syncableType}s/${syncableID}/patch`,
+            {method: 'put', body: JSON.stringify(patch)}
+        );
+    };
+
     unlinkGroupSyncable = async (groupID: string, syncableID: string, syncableType: string) => {
         return this.doFetch(
             `${this.getBaseRoute()}/groups/${groupID}/${syncableType}s/${syncableID}/link`,
@@ -2801,10 +2808,10 @@ export default class Client4 {
         );
     };
 
-    getGroupsAssociatedToTeam = async (teamID: string, q = '', page = 0, perPage = PER_PAGE_DEFAULT) => {
+    getGroupsAssociatedToTeam = async (teamID: string, q = '', page = 0, perPage = PER_PAGE_DEFAULT, includeSchemeAdmin = false) => {
         this.trackEvent('api', 'api_groups_get_associated_to_team', {team_id: teamID});
         return this.doFetch(
-            `${this.getBaseRoute()}/teams/${teamID}/groups${buildQueryString({page, per_page: perPage, q, include_member_count: true})}`,
+            `${this.getBaseRoute()}/teams/${teamID}/groups${buildQueryString({page, per_page: perPage, q, include_member_count: true, include_scheme_admin: includeSchemeAdmin})}`,
             {method: 'get'}
         );
     };
