@@ -15,6 +15,7 @@ import * as PreferenceActions from 'actions/preferences';
 import * as TeamActions from 'actions/teams';
 import * as UserActions from 'actions/users';
 import EventEmitter from 'utils/event_emitter';
+import {loadRolesIfNeeded as mockLoadRolesIfNeeded} from 'actions/roles';
 
 import {Client4} from 'client';
 import {General, Posts, RequestStatus, WebsocketEvents} from '../constants';
