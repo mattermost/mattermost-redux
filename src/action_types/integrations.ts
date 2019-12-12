@@ -3,6 +3,13 @@
 import keyMirror from 'utils/key_mirror';
 
 export default keyMirror({
+    DELETE_INCOMING_HOOK_FAILURE: null,
+    DELETE_OUTGOING_HOOK_FAILURE: null,
+    REGEN_COMMAND_TOKEN_FAILURE: null,
+    DELETE_COMMAND_FAILURE: null,
+    GET_AUTHORIZED_OAUTH_APPS_FAILURE: null,
+    DELETE_OAUTH_APP_FAILURE: null,
+    SUBMIT_INTERACTIVE_DIALOG_FAILURE: null,
 
     DEAUTHORIZE_OAUTH_APP_SUCCESS: null,
 
