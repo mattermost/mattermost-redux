@@ -482,7 +482,7 @@ export function addUsersToTeamGracefully(teamId: string, userIds: Array<string>)
             },
             {
                 type: TeamTypes.RECEIVED_MEMBERS_IN_TEAM,
-                data: result,
+                data: result.added_members || [],
             },
         ]), getState);
 
