@@ -23,7 +23,7 @@ jobs:
       - checkout
       - run: ls -la
       - *restore_cache
-      - run: npm install
+      - run: npm ci
       - run: ls -la
       - *save_cache
 

@@ -461,6 +461,35 @@ export function addUsersToTeam(teamId: string, userIds: Array<string>): ActionFu
     };
 }
 
+export function addUsersToTeamGracefully(teamId: string, userIds: Array<string>): ActionFunc {
+    return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
+        let result;
+        try {
+            result = await Client4.addUsersToTeamGracefully(teamId, userIds);
+        } catch (error) {
+            forceLogoutIfNecessary(error, dispatch, getState);
+            dispatch(logError(error));
+            return {error};
+        }
+
+        const profiles: Partial<UserProfile>[] = result.added_members ? result.added_members.map((m: TeamMembership) => ({id: m.user_id})) : [];
+
+        dispatch(batchActions([
+            {
+                type: UserTypes.RECEIVED_PROFILES_LIST_IN_TEAM,
+                data: profiles,
+                id: teamId,
+            },
+            {
+                type: TeamTypes.RECEIVED_MEMBERS_IN_TEAM,
+                data: result.added_members || [],
+            },
+        ]), getState);
+
+        return {data: result};
+    };
+}
+
 export function removeUserFromTeam(teamId: string, userId: string): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         try {
