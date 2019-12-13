@@ -150,17 +150,17 @@ describe('Selectors.Channels', () => {
     membersInChannel[channel13.id][user2.id] = {channel_id: channel13.id, user_id: user2.id};
 
     const myMembers = {};
-    myMembers[channel1.id] = {channel_id: channel1.id, user_id: user.id, msg_count: channel1.total_msg_count, mention_count: 0};
+    myMembers[channel1.id] = {channel_id: channel1.id, user_id: user.id, msg_count: channel1.total_msg_count, mention_count: 0, notify_props: {}};
     myMembers[channel2.id] = {channel_id: channel2.id, user_id: user.id, msg_count: 1, mention_count: 1, notify_props: {}};
     myMembers[channel3.id] = {channel_id: channel3.id, user_id: user.id, msg_count: 1, mention_count: 1, notify_props: {}};
-    myMembers[channel4.id] = {channel_id: channel4.id, user_id: user.id, msg_count: channel4.total_msg_count, mention_count: 0};
-    myMembers[channel5.id] = {channel_id: channel5.id, user_id: user.id, msg_count: channel5.total_msg_count, mention_count: 0};
-    myMembers[channel5Del.id] = {channel_id: channel5Del.id, user_id: user.id, msg_count: channel5Del.total_msg_count, mention_count: 0};
+    myMembers[channel4.id] = {channel_id: channel4.id, user_id: user.id, msg_count: channel4.total_msg_count, mention_count: 0, notify_props: {}};
+    myMembers[channel5.id] = {channel_id: channel5.id, user_id: user.id, msg_count: channel5.total_msg_count, mention_count: 0, notify_props: {}};
+    myMembers[channel5Del.id] = {channel_id: channel5Del.id, user_id: user.id, msg_count: channel5Del.total_msg_count, mention_count: 0, notify_props: {}};
     myMembers[channel7.id] = {channel_id: channel7.id, user_id: user.id, msg_count: 0, mention_count: 0, notify_props: {}};
     myMembers[channel8.id] = {channel_id: channel8.id, user_id: user.id, msg_count: 0, mention_count: 0, notify_props: {}};
-    myMembers[channel9.id] = {channel_id: channel9.id, user_id: user.id, msg_count: channel9.total_msg_count, mention_count: 0};
-    myMembers[channel10.id] = {channel_id: channel10.id, user_id: user.id, msg_count: channel10.total_msg_count, mention_count: 0};
-    myMembers[channel11.id] = {channel_id: channel11.id, user_id: user.id, msg_count: channel11.total_msg_count, mention_count: 0};
+    myMembers[channel9.id] = {channel_id: channel9.id, user_id: user.id, msg_count: channel9.total_msg_count, mention_count: 0, notify_props: {}};
+    myMembers[channel10.id] = {channel_id: channel10.id, user_id: user.id, msg_count: channel10.total_msg_count, mention_count: 0, notify_props: {}};
+    myMembers[channel11.id] = {channel_id: channel11.id, user_id: user.id, msg_count: channel11.total_msg_count, mention_count: 0, notify_props: {}};
     myMembers[channel12.id] = {channel_id: channel12.id, user_id: user.id, msg_count: 0, mention_count: 0, notifyProps: {}};
     myMembers[channel13.id] = {channel_id: channel13.id, user_id: user.id, msg_count: 1, mention_count: 2, notifyProps: {}};
 
@@ -696,8 +696,8 @@ describe('Selectors.Channels', () => {
             },
         };
 
-        const fromOriginalState = Selectors.getSortedFavoriteChannelIds(testState);
-        const fromModifiedState = Selectors.getSortedFavoriteChannelIds(modifiedState);
+        const fromOriginalState = Selectors.getSortedFavoriteChannelIds(testState, undefined, false);
+        const fromModifiedState = Selectors.getSortedFavoriteChannelIds(modifiedState, undefined, false);
 
         assert.ok(fromOriginalState === fromModifiedState);
         assert.ok(fromModifiedState[0] === channel1.id);
@@ -719,7 +719,7 @@ describe('Selectors.Channels', () => {
             },
         };
 
-        const fromUpdateState = Selectors.getSortedFavoriteChannelIds(updateState);
+        const fromUpdateState = Selectors.getSortedFavoriteChannelIds(updateState, undefined, false);
         assert.ok(fromModifiedState !== fromUpdateState);
         assert.ok(fromUpdateState[0] === channel9.id);
     });
