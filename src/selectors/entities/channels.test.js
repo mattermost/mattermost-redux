@@ -13,13 +13,19 @@ describe('Selectors.Channels', () => {
     const team1 = TestHelper.fakeTeamWithId();
     const team2 = TestHelper.fakeTeamWithId();
     const user = TestHelper.fakeUserWithId();
+    user.username = 'user';
     const user2 = TestHelper.fakeUserWithId();
+    user2.username = 'user2';
     const user3 = TestHelper.fakeUserWithId();
-    const profiles = {};
-    profiles[user.id] = user;
-    profiles[user2.id] = user2;
-    profiles[user3.id] = user3;
-    profiles.fakeUserId = TestHelper.fakeUserWithId('fakeUserId');
+    user3.username = 'user3';
+    const fakeUser = TestHelper.fakeUserWithId('fakeUserId');
+    fakeUser.username = 'fakeUser';
+    const profiles = {
+        [fakeUser.id]: fakeUser,
+        [user.id]: user,
+        [user2.id]: user2,
+        [user3.id]: user3,
+    };
 
     const channel1 = TestHelper.fakeChannelWithId(team1.id);
     channel1.display_name = 'Channel Name';
@@ -86,7 +92,6 @@ describe('Selectors.Channels', () => {
 
     const channel13 = TestHelper.fakeDmChannel(user.id, 'fakeUserId');
     channel13.total_msg_count = 3;
-    channel13.display_name = 'test';
 
     const channels = {};
     channels[channel1.id] = channel1;
@@ -145,19 +150,19 @@ describe('Selectors.Channels', () => {
     membersInChannel[channel13.id][user2.id] = {channel_id: channel13.id, user_id: user2.id};
 
     const myMembers = {};
-    myMembers[channel1.id] = {channel_id: channel1.id, user_id: user.id};
+    myMembers[channel1.id] = {channel_id: channel1.id, user_id: user.id, msg_count: channel1.total_msg_count, mention_count: 0};
     myMembers[channel2.id] = {channel_id: channel2.id, user_id: user.id, msg_count: 1, mention_count: 1, notify_props: {}};
     myMembers[channel3.id] = {channel_id: channel3.id, user_id: user.id, msg_count: 1, mention_count: 1, notify_props: {}};
-    myMembers[channel4.id] = {channel_id: channel4.id, user_id: user.id};
-    myMembers[channel5.id] = {channel_id: channel5.id, user_id: user.id};
-    myMembers[channel5Del.id] = {channel_id: channel5Del.id, user_id: user.id};
-    myMembers[channel7.id] = {channel_id: channel7.id, user_id: user.id, msg_count: 0, notify_props: {}};
-    myMembers[channel8.id] = {channel_id: channel8.id, user_id: user.id, msg_count: 0, notify_props: {}};
-    myMembers[channel9.id] = {channel_id: channel9.id, user_id: user.id};
-    myMembers[channel10.id] = {channel_id: channel10.id, user_id: user.id};
-    myMembers[channel11.id] = {channel_id: channel11.id, user_id: user.id};
-    myMembers[channel12.id] = {channel_id: channel12.id, user_id: user.id, msg_count: 0, notifyProps: {}};
-    myMembers[channel13.id] = {channel_id: channel13.id, user_id: user.id, msg_count: 1, notifyProps: {}};
+    myMembers[channel4.id] = {channel_id: channel4.id, user_id: user.id, msg_count: channel4.total_msg_count, mention_count: 0};
+    myMembers[channel5.id] = {channel_id: channel5.id, user_id: user.id, msg_count: channel5.total_msg_count, mention_count: 0};
+    myMembers[channel5Del.id] = {channel_id: channel5Del.id, user_id: user.id, msg_count: channel5Del.total_msg_count, mention_count: 0};
+    myMembers[channel7.id] = {channel_id: channel7.id, user_id: user.id, msg_count: 0, mention_count: 0, notify_props: {}};
+    myMembers[channel8.id] = {channel_id: channel8.id, user_id: user.id, msg_count: 0, mention_count: 0, notify_props: {}};
+    myMembers[channel9.id] = {channel_id: channel9.id, user_id: user.id, msg_count: channel9.total_msg_count, mention_count: 0};
+    myMembers[channel10.id] = {channel_id: channel10.id, user_id: user.id, msg_count: channel10.total_msg_count, mention_count: 0};
+    myMembers[channel11.id] = {channel_id: channel11.id, user_id: user.id, msg_count: channel11.total_msg_count, mention_count: 0};
+    myMembers[channel12.id] = {channel_id: channel12.id, user_id: user.id, msg_count: 0, mention_count: 0, notifyProps: {}};
+    myMembers[channel13.id] = {channel_id: channel13.id, user_id: user.id, msg_count: 1, mention_count: 2, notifyProps: {}};
 
     const myPreferences = {
         [`${Preferences.CATEGORY_FAVORITE_CHANNEL}--${channel1.id}`]: {
@@ -401,7 +406,8 @@ describe('Selectors.Channels', () => {
             directAndGroupChannels,
         } = categories;
 
-        assert.equal(unreadChannels.length, 1);
+        // channel2, channel7, channel8, and channel13 are unread
+        assert.equal(unreadChannels.length, 4);
         assert.equal(favoriteChannels.length, 2);
         assert.equal(publicChannels.length, 2);
         assert.equal(privateChannels.length, 2);
@@ -593,82 +599,83 @@ describe('Selectors.Channels', () => {
         assert.ok(fromModifiedState.includes(channel1.id));
     });
 
-    it('get sorted unread channel ids in current team strict equal', () => {
-        const chan2 = {...testState.entities.channels.channels[channel2.id]};
-        chan2.total_msg_count = 10;
+    describe('getSortedUnreadChannelIds', () => {
+        test('channels should be sorted alphabetically with mentions coming first', () => {
+            expect(Selectors.getSortedUnreadChannelIds(testState)).toEqual([
+                channel2.id, // has mentions and display name is "DEF"
+                channel13.id, // has mentions and display name is "fakeUser"
+                channel8.id, // display name is "ABC"
+                channel7.id, // display_name is "user, user2, user3"
+            ]);
 
-        const modifiedState = {
-            ...testState,
-            entities: {
-                ...testState.entities,
-                channels: {
-                    ...testState.entities.channels,
+            const modifiedState = {
+                ...testState,
+                entities: {
+                    ...testState.entities,
                     channels: {
-                        ...testState.entities.channels.channels,
-                        [channel2.id]: chan2,
-                    },
-                },
-            },
-        };
-
-        // When adding a mention to channel8 with display_name 'ABC' states are !== and channel8 is above all others
-        const mentionState = {
-            ...modifiedState,
-            entities: {
-                ...modifiedState.entities,
-                channels: {
-                    ...modifiedState.entities.channels,
-                    myMembers: {
-                        ...modifiedState.entities.channels.myMembers,
-                        [channel8.id]: {
-                            ...modifiedState.entities.channels.myMembers[channel8.id],
-                            mention_count: 1,
-                        },
-                    },
-                },
-            },
-        };
-
-        const fromOriginalState = Selectors.getSortedUnreadChannelIds(testState);
-        const fromModifiedState = Selectors.getSortedUnreadChannelIds(modifiedState);
-        const fromMentionState = Selectors.getSortedUnreadChannelIds(mentionState);
-
-        // mentions should be prioritized to the top
-        assert.ok(fromOriginalState === fromModifiedState);
-        assert.ok(fromMentionState !== fromModifiedState);
-
-        // channel8 and channel2 are above all others
-        // since default order is "alpha", channel8 with display_name "ABC" should come first
-        assert.ok(fromMentionState[0] === channel8.id);
-
-        // followed by channel2 with display_name "DEF"
-        assert.ok(fromMentionState[1] === channel2.id);
-
-        const hasMentionMutedChannelState = {
-            ...mentionState,
-            entities: {
-                ...mentionState.entities,
-                channels: {
-                    ...mentionState.entities.channels,
-                    myMembers: {
-                        ...mentionState.entities.channels.myMembers,
-                        [channel8.id]: {
-                            mention_count: 1,
-                            notify_props: {
-                                mark_unread: 'mention',
+                        ...testState.entities.channels,
+                        myMembers: {
+                            ...testState.entities.channels.myMembers,
+                            [channel8.id]: {
+                                ...testState.entities.channels.myMembers[channel8.id],
+                                mention_count: 1,
                             },
                         },
                     },
                 },
-            },
-        };
+            };
 
-        const fromHasMentionMutedChannelState = Selectors.getSortedUnreadChannelIds(hasMentionMutedChannelState);
+            expect(Selectors.getSortedUnreadChannelIds(modifiedState)).toEqual([
+                channel8.id, // has mentions and display name is "ABC"
+                channel2.id, // has mentions and display name is "DEF"
+                channel13.id, // has mentions and display name is "fakeUser"
+                channel7.id, // display_name is "user, user2, user3"
+            ]);
+        });
 
-        // For channels with mentions, non-muted channel2 should come first before muted channel8.
-        assert.ok(fromHasMentionMutedChannelState[0] === channel2.id);
-        assert.ok(fromHasMentionMutedChannelState[1] === channel8.id);
-        assert.ok(fromHasMentionMutedChannelState[2] === channel7.id);
+        test('selector should return the same array as long as the order stays the same', () => {
+            const fromOriginalState = Selectors.getSortedUnreadChannelIds(testState);
+
+            // Adding messages to an already unread channel shouldn't change the order
+            let modifiedState = {
+                ...testState,
+                entities: {
+                    ...testState.entities,
+                    channels: {
+                        ...testState.entities.channels,
+                        channels: {
+                            ...testState.entities.channels.channels,
+                            [channel2.id]: {
+                                ...testState.entities.channels.channels[channel2.id],
+                                total_msg_count: 10,
+                            },
+                        },
+                    },
+                },
+            };
+
+            expect(Selectors.getSortedUnreadChannelIds(modifiedState)).toBe(fromOriginalState);
+
+            // Adding a mention to a channel that didn't have mentions before should change the order
+            modifiedState = {
+                ...modifiedState,
+                entities: {
+                    ...modifiedState.entities,
+                    channels: {
+                        ...modifiedState.entities.channels,
+                        myMembers: {
+                            ...modifiedState.entities.channels.myMembers,
+                            [channel8.id]: {
+                                ...modifiedState.entities.channels.myMembers[channel8.id],
+                                mention_count: 1,
+                            },
+                        },
+                    },
+                },
+            };
+
+            expect(Selectors.getSortedUnreadChannelIds(modifiedState)).not.toBe(fromOriginalState);
+        });
     });
 
     it('get sorted favorite channel ids in current team strict equal', () => {
