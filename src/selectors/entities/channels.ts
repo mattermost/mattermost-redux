@@ -305,33 +305,48 @@ export const getMembersInCurrentChannel: (a: GlobalState) => UserIDMappedObjects
 export const getUnreads: (a: GlobalState) => {
     messageCount: number;
     mentionCount: number;
-} = createSelector(getAllChannels, getMyChannelMemberships, getUsers, getCurrentUserId, getCurrentTeamId, getMyTeams, getTeamMemberships, (channels: IDMappedObjects<Channel>, myMembers: RelationOneToOne<Channel, ChannelMembership>, users: IDMappedObjects<UserProfile>, currentUserId: string, currentTeamId: string, myTeams: Array<Team>, myTeamMemberships: RelationOneToOne<Team, TeamMembership>): {
-    messageCount: number;
-    mentionCount: number;
-} => {
-    let messageCountForCurrentTeam = 0; // Includes message count from channels of current team plus all GM'S and all DM's across teams
+} = createSelector(
+    getAllChannels,
+    getMyChannelMemberships,
+    getUsers,
+    getCurrentUserId,
+    getCurrentTeamId,
+    getMyTeams,
+    getTeamMemberships,
+    (channels: IDMappedObjects<Channel>, myMembers: RelationOneToOne<Channel, ChannelMembership>, users: IDMappedObjects<UserProfile>, currentUserId: string, currentTeamId: string, myTeams: Array<Team>, myTeamMemberships: RelationOneToOne<Team, TeamMembership>): {
+        messageCount: number;
+        mentionCount: number;
+    } => {
+        let messageCountForCurrentTeam = 0; // Includes message count from channels of current team plus all GM'S and all DM's across teams
+        let mentionCountForCurrentTeam = 0; // Includes mention count from channels of current team plus all GM'S and all DM's across teams
 
-    let mentionCountForCurrentTeam = 0; // Includes mention count from channels of current team plus all GM'S and all DM's across teams
+        Object.keys(myMembers).forEach((channelId) => {
+            const channel = channels[channelId];
+            const m = myMembers[channelId];
 
-    Object.keys(myMembers).forEach((channelId) => {
-        const channel = channels[channelId];
-        const m = myMembers[channelId];
+            if (!channel || !m) {
+                return;
+            }
 
-        if (channel && m && (channel.team_id === currentTeamId || channel.type === General.DM_CHANNEL || channel.type === General.GM_CHANNEL)) {
+            if (channel.team_id !== currentTeamId && channel.type !== General.DM_CHANNEL && channel.type !== General.GM_CHANNEL) {
+                return;
+            }
+
             let otherUserId = '';
 
-            if (channel.type === 'D') {
+            if (channel.type === General.DM_CHANNEL) {
                 otherUserId = getUserIdFromChannelName(currentUserId, channel.name);
 
                 if (users[otherUserId] && users[otherUserId].delete_at === 0) {
-                    mentionCountForCurrentTeam += channel.total_msg_count - m.msg_count;
+                    mentionCountForCurrentTeam += m.mention_count;
                 }
             } else if (m.mention_count > 0 && channel.delete_at === 0) {
                 mentionCountForCurrentTeam += m.mention_count;
             }
 
             if (m.notify_props && m.notify_props.mark_unread !== 'mention' && channel.total_msg_count - m.msg_count > 0) {
-                if (channel.type === 'D') {
+                if (channel.type === General.DM_CHANNEL) {
+                    // otherUserId is guaranteed to have been set above
                     if (users[otherUserId] && users[otherUserId].delete_at === 0) {
                         messageCountForCurrentTeam += 1;
                     }
@@ -339,28 +354,31 @@ export const getUnreads: (a: GlobalState) => {
                     messageCountForCurrentTeam += 1;
                 }
             }
-        }
-    }); // Includes mention count and message count from teams other than the current team
-    // This count does not include GM's and DM's
+        });
 
-    const otherTeamsUnreadCountForChannels = myTeams.reduce((acc, team) => {
-        if (currentTeamId !== team.id) {
-            const member = myTeamMemberships[team.id];
-            acc.messageCount += member.msg_count;
-            acc.mentionCount += member.mention_count;
-        }
+        // Includes mention count and message count from teams other than the current team
+        // This count does not include GM's and DM's
+        const otherTeamsUnreadCountForChannels = myTeams.reduce((acc, team) => {
+            if (currentTeamId !== team.id) {
+                const member = myTeamMemberships[team.id];
+                acc.messageCount += member.msg_count;
+                acc.mentionCount += member.mention_count;
+            }
 
-        return acc;
-    }, {
-        messageCount: 0,
-        mentionCount: 0,
-    });
-    const totalTeamsUnreadCount = {
-        messageCount: messageCountForCurrentTeam + otherTeamsUnreadCountForChannels.messageCount,
-        mentionCount: mentionCountForCurrentTeam + otherTeamsUnreadCountForChannels.mentionCount,
-    };
-    return totalTeamsUnreadCount;
-});
+            return acc;
+        }, {
+            messageCount: 0,
+            mentionCount: 0,
+        });
+
+        // messageCount is the number of unread channels, mention count is the total number of mentions
+        return {
+            messageCount: messageCountForCurrentTeam + otherTeamsUnreadCountForChannels.messageCount,
+            mentionCount: mentionCountForCurrentTeam + otherTeamsUnreadCountForChannels.mentionCount,
+        };
+    }
+);
+
 export const getUnreadsInCurrentTeam: (a: GlobalState) => {
     messageCount: number;
     mentionCount: number;
