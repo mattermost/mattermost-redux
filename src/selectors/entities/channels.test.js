@@ -1647,6 +1647,236 @@ describe('Selectors.Channels', () => {
     });
 });
 
+describe('getUnreads', () => {
+    const team1 = {id: 'team1', delete_at: 0};
+    const team2 = {id: 'team2', delete_at: 0};
+
+    const channelA = {id: 'channelA', name: 'channelA', team_id: 'team1', total_msg_count: 11, delete_at: 0};
+    const channelB = {id: 'channelB', name: 'channelB', team_id: 'team1', total_msg_count: 13, delete_at: 0};
+    const channelC = {id: 'channelB', name: 'channelB', team_id: 'team2', total_msg_count: 17, delete_at: 0};
+
+    const dmChannel = {id: 'dmChannel', name: 'user1__user2', team_id: '', total_msg_count: 11, delete_at: 0, type: General.DM_CHANNEL};
+    const gmChannel = {id: 'gmChannel', name: 'gmChannel', team_id: 'team1', total_msg_count: 11, delete_at: 0, type: General.GM_CHANNEL};
+
+    test('should return the correct number of messages and mentions from channels on the current team', () => {
+        const myMemberA = {mention_count: 2, msg_count: 3, notify_props: {mark_unread: 'all'}};
+        const myMemberB = {mention_count: 5, msg_count: 7, notify_props: {mark_unread: 'all'}};
+
+        const state = {
+            entities: {
+                channels: {
+                    channels: {
+                        channelA,
+                        channelB,
+                    },
+                    myMembers: {
+                        channelA: myMemberA,
+                        channelB: myMemberB,
+                    },
+                },
+                teams: {
+                    currentTeamId: 'team1',
+                    myMembers: {},
+                    teams: {
+                        team1,
+                    },
+                },
+                users: {
+                    currentUserId: 'user1',
+                    profiles: {},
+                },
+            },
+        };
+
+        const {messageCount, mentionCount} = Selectors.getUnreads(state);
+
+        expect(messageCount).toBe(2); // channelA and channelB are unread
+        expect(mentionCount).toBe(myMemberA.mention_count + myMemberB.mention_count);
+    });
+
+    test('should not count messages from channel with mark_unread set to "mention"', () => {
+        const myMemberA = {mention_count: 2, msg_count: 3, notify_props: {mark_unread: 'mention'}};
+        const myMemberB = {mention_count: 5, msg_count: 7, notify_props: {mark_unread: 'all'}};
+
+        const state = {
+            entities: {
+                channels: {
+                    channels: {
+                        channelA,
+                        channelB,
+                    },
+                    myMembers: {
+                        channelA: myMemberA,
+                        channelB: myMemberB,
+                    },
+                },
+                teams: {
+                    currentTeamId: 'team1',
+                    myMembers: {},
+                    teams: {
+                        team1,
+                    },
+                },
+                users: {
+                    currentUserId: 'user1',
+                    profiles: {},
+                },
+            },
+        };
+
+        const {messageCount, mentionCount} = Selectors.getUnreads(state);
+
+        expect(messageCount).toBe(1); // channelA and channelB are unread, but only channelB is counted because of its mark_unread
+        expect(mentionCount).toBe(myMemberA.mention_count + myMemberB.mention_count);
+    });
+
+    test('should count mentions from DM channels', () => {
+        const dmMember = {mention_count: 2, msg_count: 3, notify_props: {mark_unread: 'all'}};
+
+        const state = {
+            entities: {
+                channels: {
+                    channels: {
+                        dmChannel,
+                    },
+                    myMembers: {
+                        dmChannel: dmMember,
+                    },
+                },
+                teams: {
+                    currentTeamId: 'team1',
+                    myMembers: {},
+                    teams: {
+                        team1,
+                    },
+                },
+                users: {
+                    currentUserId: 'user1',
+                    profiles: {
+                        user2: {delete_at: 0},
+                    },
+                },
+            },
+        };
+
+        const {messageCount, mentionCount} = Selectors.getUnreads(state);
+
+        expect(messageCount).toBe(1); // dmChannel is unread
+        expect(mentionCount).toBe(dmMember.mention_count);
+    });
+
+    test('should not count mentions from DM channel with archived user', () => {
+        const dmMember = {mention_count: 2, msg_count: 3, notify_props: {mark_unread: 'all'}};
+
+        const state = {
+            entities: {
+                channels: {
+                    channels: {
+                        dmChannel,
+                    },
+                    myMembers: {
+                        dmChannel: dmMember,
+                    },
+                },
+                teams: {
+                    currentTeamId: 'team1',
+                    myMembers: {},
+                    teams: {
+                        team1,
+                    },
+                },
+                users: {
+                    currentUserId: 'user1',
+                    profiles: {
+                        user2: {delete_at: 1},
+                    },
+                },
+            },
+        };
+
+        const {messageCount, mentionCount} = Selectors.getUnreads(state);
+
+        expect(messageCount).toBe(0);
+        expect(mentionCount).toBe(0);
+    });
+
+    test('should count mentions from GM channels', () => {
+        const gmMember = {mention_count: 2, msg_count: 3, notify_props: {mark_unread: 'all'}};
+
+        const state = {
+            entities: {
+                channels: {
+                    channels: {
+                        gmChannel,
+                    },
+                    myMembers: {
+                        gmChannel: gmMember,
+                    },
+                },
+                teams: {
+                    currentTeamId: 'team1',
+                    myMembers: {},
+                    teams: {
+                        team1,
+                    },
+                },
+                users: {
+                    currentUserId: 'user1',
+                    profiles: {},
+                },
+            },
+        };
+
+        const {messageCount, mentionCount} = Selectors.getUnreads(state);
+
+        expect(messageCount).toBe(1); // gmChannel is unread
+        expect(mentionCount).toBe(gmMember.mention_count);
+    });
+
+    test('should count mentions and messages for other teams from team members', () => {
+        const myMemberA = {mention_count: 2, msg_count: 3, notify_props: {mark_unread: 'all'}};
+        const myMemberC = {mention_count: 5, msg_count: 7, notify_props: {mark_unread: 'all'}};
+
+        const teamMember1 = {msg_count: 1, mention_count: 2};
+        const teamMember2 = {msg_count: 3, mention_count: 6};
+
+        const state = {
+            entities: {
+                channels: {
+                    channels: {
+                        channelA,
+                        channelC,
+                    },
+                    myMembers: {
+                        channelA: myMemberA,
+                        channelC: myMemberC,
+                    },
+                },
+                teams: {
+                    currentTeamId: 'team1',
+                    myMembers: {
+                        team1: teamMember1,
+                        team2: teamMember2,
+                    },
+                    teams: {
+                        team1,
+                        team2,
+                    },
+                },
+                users: {
+                    currentUserId: 'user1',
+                    profiles: {},
+                },
+            },
+        };
+
+        const {messageCount, mentionCount} = Selectors.getUnreads(state);
+
+        expect(messageCount).toBe(4); // channelA and channelC are unread
+        expect(mentionCount).toBe(myMemberA.mention_count + teamMember2.mention_count);
+    });
+});
+
 describe('getMyFirstChannelForTeams', () => {
     test('should return the first channel in each team', () => {
         const state = {
