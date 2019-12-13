@@ -13,13 +13,19 @@ describe('Selectors.Channels', () => {
     const team1 = TestHelper.fakeTeamWithId();
     const team2 = TestHelper.fakeTeamWithId();
     const user = TestHelper.fakeUserWithId();
+    user.username = 'user';
     const user2 = TestHelper.fakeUserWithId();
+    user2.username = 'user2';
     const user3 = TestHelper.fakeUserWithId();
-    const profiles = {};
-    profiles[user.id] = user;
-    profiles[user2.id] = user2;
-    profiles[user3.id] = user3;
-    profiles.fakeUserId = TestHelper.fakeUserWithId('fakeUserId');
+    user3.username = 'user3';
+    const fakeUser = TestHelper.fakeUserWithId('fakeUserId');
+    fakeUser.username = 'fakeUser';
+    const profiles = {
+        [fakeUser.id]: fakeUser,
+        [user.id]: user,
+        [user2.id]: user2,
+        [user3.id]: user3,
+    };
 
     const channel1 = TestHelper.fakeChannelWithId(team1.id);
     channel1.display_name = 'Channel Name';
@@ -86,7 +92,6 @@ describe('Selectors.Channels', () => {
 
     const channel13 = TestHelper.fakeDmChannel(user.id, 'fakeUserId');
     channel13.total_msg_count = 3;
-    channel13.display_name = 'test';
 
     const channels = {};
     channels[channel1.id] = channel1;
@@ -145,19 +150,19 @@ describe('Selectors.Channels', () => {
     membersInChannel[channel13.id][user2.id] = {channel_id: channel13.id, user_id: user2.id};
 
     const myMembers = {};
-    myMembers[channel1.id] = {channel_id: channel1.id, user_id: user.id};
+    myMembers[channel1.id] = {channel_id: channel1.id, user_id: user.id, msg_count: channel1.total_msg_count, mention_count: 0, notify_props: {}};
     myMembers[channel2.id] = {channel_id: channel2.id, user_id: user.id, msg_count: 1, mention_count: 1, notify_props: {}};
     myMembers[channel3.id] = {channel_id: channel3.id, user_id: user.id, msg_count: 1, mention_count: 1, notify_props: {}};
-    myMembers[channel4.id] = {channel_id: channel4.id, user_id: user.id};
-    myMembers[channel5.id] = {channel_id: channel5.id, user_id: user.id};
-    myMembers[channel5Del.id] = {channel_id: channel5Del.id, user_id: user.id};
-    myMembers[channel7.id] = {channel_id: channel7.id, user_id: user.id, msg_count: 0, notify_props: {}};
-    myMembers[channel8.id] = {channel_id: channel8.id, user_id: user.id, msg_count: 0, notify_props: {}};
-    myMembers[channel9.id] = {channel_id: channel9.id, user_id: user.id};
-    myMembers[channel10.id] = {channel_id: channel10.id, user_id: user.id};
-    myMembers[channel11.id] = {channel_id: channel11.id, user_id: user.id};
-    myMembers[channel12.id] = {channel_id: channel12.id, user_id: user.id, msg_count: 0, notifyProps: {}};
-    myMembers[channel13.id] = {channel_id: channel13.id, user_id: user.id, msg_count: 1, notifyProps: {}};
+    myMembers[channel4.id] = {channel_id: channel4.id, user_id: user.id, msg_count: channel4.total_msg_count, mention_count: 0, notify_props: {}};
+    myMembers[channel5.id] = {channel_id: channel5.id, user_id: user.id, msg_count: channel5.total_msg_count, mention_count: 0, notify_props: {}};
+    myMembers[channel5Del.id] = {channel_id: channel5Del.id, user_id: user.id, msg_count: channel5Del.total_msg_count, mention_count: 0, notify_props: {}};
+    myMembers[channel7.id] = {channel_id: channel7.id, user_id: user.id, msg_count: 0, mention_count: 0, notify_props: {}};
+    myMembers[channel8.id] = {channel_id: channel8.id, user_id: user.id, msg_count: 0, mention_count: 0, notify_props: {}};
+    myMembers[channel9.id] = {channel_id: channel9.id, user_id: user.id, msg_count: channel9.total_msg_count, mention_count: 0, notify_props: {}};
+    myMembers[channel10.id] = {channel_id: channel10.id, user_id: user.id, msg_count: channel10.total_msg_count, mention_count: 0, notify_props: {}};
+    myMembers[channel11.id] = {channel_id: channel11.id, user_id: user.id, msg_count: channel11.total_msg_count, mention_count: 0, notify_props: {}};
+    myMembers[channel12.id] = {channel_id: channel12.id, user_id: user.id, msg_count: 0, mention_count: 0, notifyProps: {}};
+    myMembers[channel13.id] = {channel_id: channel13.id, user_id: user.id, msg_count: 1, mention_count: 2, notifyProps: {}};
 
     const myPreferences = {
         [`${Preferences.CATEGORY_FAVORITE_CHANNEL}--${channel1.id}`]: {
@@ -401,7 +406,8 @@ describe('Selectors.Channels', () => {
             directAndGroupChannels,
         } = categories;
 
-        assert.equal(unreadChannels.length, 1);
+        // channel2, channel7, channel8, and channel13 are unread
+        assert.equal(unreadChannels.length, 4);
         assert.equal(favoriteChannels.length, 2);
         assert.equal(publicChannels.length, 2);
         assert.equal(privateChannels.length, 2);
@@ -593,82 +599,83 @@ describe('Selectors.Channels', () => {
         assert.ok(fromModifiedState.includes(channel1.id));
     });
 
-    it('get sorted unread channel ids in current team strict equal', () => {
-        const chan2 = {...testState.entities.channels.channels[channel2.id]};
-        chan2.total_msg_count = 10;
+    describe('getSortedUnreadChannelIds', () => {
+        test('channels should be sorted alphabetically with mentions coming first', () => {
+            expect(Selectors.getSortedUnreadChannelIds(testState)).toEqual([
+                channel2.id, // has mentions and display name is "DEF"
+                channel13.id, // has mentions and display name is "fakeUser"
+                channel8.id, // display name is "ABC"
+                channel7.id, // display_name is "user, user2, user3"
+            ]);
 
-        const modifiedState = {
-            ...testState,
-            entities: {
-                ...testState.entities,
-                channels: {
-                    ...testState.entities.channels,
+            const modifiedState = {
+                ...testState,
+                entities: {
+                    ...testState.entities,
                     channels: {
-                        ...testState.entities.channels.channels,
-                        [channel2.id]: chan2,
-                    },
-                },
-            },
-        };
-
-        // When adding a mention to channel8 with display_name 'ABC' states are !== and channel8 is above all others
-        const mentionState = {
-            ...modifiedState,
-            entities: {
-                ...modifiedState.entities,
-                channels: {
-                    ...modifiedState.entities.channels,
-                    myMembers: {
-                        ...modifiedState.entities.channels.myMembers,
-                        [channel8.id]: {
-                            ...modifiedState.entities.channels.myMembers[channel8.id],
-                            mention_count: 1,
-                        },
-                    },
-                },
-            },
-        };
-
-        const fromOriginalState = Selectors.getSortedUnreadChannelIds(testState);
-        const fromModifiedState = Selectors.getSortedUnreadChannelIds(modifiedState);
-        const fromMentionState = Selectors.getSortedUnreadChannelIds(mentionState);
-
-        // mentions should be prioritized to the top
-        assert.ok(fromOriginalState === fromModifiedState);
-        assert.ok(fromMentionState !== fromModifiedState);
-
-        // channel8 and channel2 are above all others
-        // since default order is "alpha", channel8 with display_name "ABC" should come first
-        assert.ok(fromMentionState[0] === channel8.id);
-
-        // followed by channel2 with display_name "DEF"
-        assert.ok(fromMentionState[1] === channel2.id);
-
-        const hasMentionMutedChannelState = {
-            ...mentionState,
-            entities: {
-                ...mentionState.entities,
-                channels: {
-                    ...mentionState.entities.channels,
-                    myMembers: {
-                        ...mentionState.entities.channels.myMembers,
-                        [channel8.id]: {
-                            mention_count: 1,
-                            notify_props: {
-                                mark_unread: 'mention',
+                        ...testState.entities.channels,
+                        myMembers: {
+                            ...testState.entities.channels.myMembers,
+                            [channel8.id]: {
+                                ...testState.entities.channels.myMembers[channel8.id],
+                                mention_count: 1,
                             },
                         },
                     },
                 },
-            },
-        };
+            };
 
-        const fromHasMentionMutedChannelState = Selectors.getSortedUnreadChannelIds(hasMentionMutedChannelState);
+            expect(Selectors.getSortedUnreadChannelIds(modifiedState)).toEqual([
+                channel8.id, // has mentions and display name is "ABC"
+                channel2.id, // has mentions and display name is "DEF"
+                channel13.id, // has mentions and display name is "fakeUser"
+                channel7.id, // display_name is "user, user2, user3"
+            ]);
+        });
 
-        // For channels with mentions, non-muted channel2 should come first before muted channel8.
-        assert.ok(fromHasMentionMutedChannelState[0] === channel2.id);
-        assert.ok(fromHasMentionMutedChannelState[1] === channel8.id);
-        assert.ok(fromHasMentionMutedChannelState[2] === channel7.id);
+        test('selector should return the same array as long as the order stays the same', () => {
+            const fromOriginalState = Selectors.getSortedUnreadChannelIds(testState);
+
+            // Adding messages to an already unread channel shouldn't change the order
+            let modifiedState = {
+                ...testState,
+                entities: {
+                    ...testState.entities,
+                    channels: {
+                        ...testState.entities.channels,
+                        channels: {
+                            ...testState.entities.channels.channels,
+                            [channel2.id]: {
+                                ...testState.entities.channels.channels[channel2.id],
+                                total_msg_count: 10,
+                            },
+                        },
+                    },
+                },
+            };
+
+            expect(Selectors.getSortedUnreadChannelIds(modifiedState)).toBe(fromOriginalState);
+
+            // Adding a mention to a channel that didn't have mentions before should change the order
+            modifiedState = {
+                ...modifiedState,
+                entities: {
+                    ...modifiedState.entities,
+                    channels: {
+                        ...modifiedState.entities.channels,
+                        myMembers: {
+                            ...modifiedState.entities.channels.myMembers,
+                            [channel8.id]: {
+                                ...modifiedState.entities.channels.myMembers[channel8.id],
+                                mention_count: 1,
+                            },
+                        },
+                    },
+                },
+            };
+
+            expect(Selectors.getSortedUnreadChannelIds(modifiedState)).not.toBe(fromOriginalState);
+        });
     });
 
     it('get sorted favorite channel ids in current team strict equal', () => {
@@ -689,8 +696,8 @@ describe('Selectors.Channels', () => {
             },
         };
 
-        const fromOriginalState = Selectors.getSortedFavoriteChannelIds(testState);
-        const fromModifiedState = Selectors.getSortedFavoriteChannelIds(modifiedState);
+        const fromOriginalState = Selectors.getSortedFavoriteChannelIds(testState, undefined, false);
+        const fromModifiedState = Selectors.getSortedFavoriteChannelIds(modifiedState, undefined, false);
 
         assert.ok(fromOriginalState === fromModifiedState);
         assert.ok(fromModifiedState[0] === channel1.id);
@@ -712,7 +719,7 @@ describe('Selectors.Channels', () => {
             },
         };
 
-        const fromUpdateState = Selectors.getSortedFavoriteChannelIds(updateState);
+        const fromUpdateState = Selectors.getSortedFavoriteChannelIds(updateState, undefined, false);
         assert.ok(fromModifiedState !== fromUpdateState);
         assert.ok(fromUpdateState[0] === channel9.id);
     });
@@ -1637,6 +1644,236 @@ describe('Selectors.Channels', () => {
 
             assert.ok(Selectors.canManageAnyChannelMembersInCurrentTeam(newState) === true);
         });
+    });
+});
+
+describe('getUnreads', () => {
+    const team1 = {id: 'team1', delete_at: 0};
+    const team2 = {id: 'team2', delete_at: 0};
+
+    const channelA = {id: 'channelA', name: 'channelA', team_id: 'team1', total_msg_count: 11, delete_at: 0};
+    const channelB = {id: 'channelB', name: 'channelB', team_id: 'team1', total_msg_count: 13, delete_at: 0};
+    const channelC = {id: 'channelB', name: 'channelB', team_id: 'team2', total_msg_count: 17, delete_at: 0};
+
+    const dmChannel = {id: 'dmChannel', name: 'user1__user2', team_id: '', total_msg_count: 11, delete_at: 0, type: General.DM_CHANNEL};
+    const gmChannel = {id: 'gmChannel', name: 'gmChannel', team_id: 'team1', total_msg_count: 11, delete_at: 0, type: General.GM_CHANNEL};
+
+    test('should return the correct number of messages and mentions from channels on the current team', () => {
+        const myMemberA = {mention_count: 2, msg_count: 3, notify_props: {mark_unread: 'all'}};
+        const myMemberB = {mention_count: 5, msg_count: 7, notify_props: {mark_unread: 'all'}};
+
+        const state = {
+            entities: {
+                channels: {
+                    channels: {
+                        channelA,
+                        channelB,
+                    },
+                    myMembers: {
+                        channelA: myMemberA,
+                        channelB: myMemberB,
+                    },
+                },
+                teams: {
+                    currentTeamId: 'team1',
+                    myMembers: {},
+                    teams: {
+                        team1,
+                    },
+                },
+                users: {
+                    currentUserId: 'user1',
+                    profiles: {},
+                },
+            },
+        };
+
+        const {messageCount, mentionCount} = Selectors.getUnreads(state);
+
+        expect(messageCount).toBe(2); // channelA and channelB are unread
+        expect(mentionCount).toBe(myMemberA.mention_count + myMemberB.mention_count);
+    });
+
+    test('should not count messages from channel with mark_unread set to "mention"', () => {
+        const myMemberA = {mention_count: 2, msg_count: 3, notify_props: {mark_unread: 'mention'}};
+        const myMemberB = {mention_count: 5, msg_count: 7, notify_props: {mark_unread: 'all'}};
+
+        const state = {
+            entities: {
+                channels: {
+                    channels: {
+                        channelA,
+                        channelB,
+                    },
+                    myMembers: {
+                        channelA: myMemberA,
+                        channelB: myMemberB,
+                    },
+                },
+                teams: {
+                    currentTeamId: 'team1',
+                    myMembers: {},
+                    teams: {
+                        team1,
+                    },
+                },
+                users: {
+                    currentUserId: 'user1',
+                    profiles: {},
+                },
+            },
+        };
+
+        const {messageCount, mentionCount} = Selectors.getUnreads(state);
+
+        expect(messageCount).toBe(1); // channelA and channelB are unread, but only channelB is counted because of its mark_unread
+        expect(mentionCount).toBe(myMemberA.mention_count + myMemberB.mention_count);
+    });
+
+    test('should count mentions from DM channels', () => {
+        const dmMember = {mention_count: 2, msg_count: 3, notify_props: {mark_unread: 'all'}};
+
+        const state = {
+            entities: {
+                channels: {
+                    channels: {
+                        dmChannel,
+                    },
+                    myMembers: {
+                        dmChannel: dmMember,
+                    },
+                },
+                teams: {
+                    currentTeamId: 'team1',
+                    myMembers: {},
+                    teams: {
+                        team1,
+                    },
+                },
+                users: {
+                    currentUserId: 'user1',
+                    profiles: {
+                        user2: {delete_at: 0},
+                    },
+                },
+            },
+        };
+
+        const {messageCount, mentionCount} = Selectors.getUnreads(state);
+
+        expect(messageCount).toBe(1); // dmChannel is unread
+        expect(mentionCount).toBe(dmMember.mention_count);
+    });
+
+    test('should not count mentions from DM channel with archived user', () => {
+        const dmMember = {mention_count: 2, msg_count: 3, notify_props: {mark_unread: 'all'}};
+
+        const state = {
+            entities: {
+                channels: {
+                    channels: {
+                        dmChannel,
+                    },
+                    myMembers: {
+                        dmChannel: dmMember,
+                    },
+                },
+                teams: {
+                    currentTeamId: 'team1',
+                    myMembers: {},
+                    teams: {
+                        team1,
+                    },
+                },
+                users: {
+                    currentUserId: 'user1',
+                    profiles: {
+                        user2: {delete_at: 1},
+                    },
+                },
+            },
+        };
+
+        const {messageCount, mentionCount} = Selectors.getUnreads(state);
+
+        expect(messageCount).toBe(0);
+        expect(mentionCount).toBe(0);
+    });
+
+    test('should count mentions from GM channels', () => {
+        const gmMember = {mention_count: 2, msg_count: 3, notify_props: {mark_unread: 'all'}};
+
+        const state = {
+            entities: {
+                channels: {
+                    channels: {
+                        gmChannel,
+                    },
+                    myMembers: {
+                        gmChannel: gmMember,
+                    },
+                },
+                teams: {
+                    currentTeamId: 'team1',
+                    myMembers: {},
+                    teams: {
+                        team1,
+                    },
+                },
+                users: {
+                    currentUserId: 'user1',
+                    profiles: {},
+                },
+            },
+        };
+
+        const {messageCount, mentionCount} = Selectors.getUnreads(state);
+
+        expect(messageCount).toBe(1); // gmChannel is unread
+        expect(mentionCount).toBe(gmMember.mention_count);
+    });
+
+    test('should count mentions and messages for other teams from team members', () => {
+        const myMemberA = {mention_count: 2, msg_count: 3, notify_props: {mark_unread: 'all'}};
+        const myMemberC = {mention_count: 5, msg_count: 7, notify_props: {mark_unread: 'all'}};
+
+        const teamMember1 = {msg_count: 1, mention_count: 2};
+        const teamMember2 = {msg_count: 3, mention_count: 6};
+
+        const state = {
+            entities: {
+                channels: {
+                    channels: {
+                        channelA,
+                        channelC,
+                    },
+                    myMembers: {
+                        channelA: myMemberA,
+                        channelC: myMemberC,
+                    },
+                },
+                teams: {
+                    currentTeamId: 'team1',
+                    myMembers: {
+                        team1: teamMember1,
+                        team2: teamMember2,
+                    },
+                    teams: {
+                        team1,
+                        team2,
+                    },
+                },
+                users: {
+                    currentUserId: 'user1',
+                    profiles: {},
+                },
+            },
+        };
+
+        const {messageCount, mentionCount} = Selectors.getUnreads(state);
+
+        expect(messageCount).toBe(4); // channelA and channelC are unread
+        expect(mentionCount).toBe(myMemberA.mention_count + teamMember2.mention_count);
     });
 });
 
