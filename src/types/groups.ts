@@ -24,8 +24,8 @@ export type GroupTeam = {
     team_display_name: string;
     team_type: string;
     group_id: string;
-    scheme_admin: boolean;
     auto_add: boolean;
+    scheme_admin: boolean;
     create_at: number;
     delete_at: number;
     update_at: number;
@@ -38,8 +38,8 @@ export type GroupChannel = {
     team_display_name: string;
     team_type: string;
     group_id: string;
-    scheme_admin: boolean;
     auto_add: boolean;
+    scheme_admin: boolean;
     create_at: number;
     delete_at: number;
     update_at: number;
