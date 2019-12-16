@@ -419,16 +419,32 @@ export function getUnreadPostData(unreadChan: ChannelUnread, state: GlobalState)
 
 export function setUnreadPost(userId: string, postId: string) {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
+        let state = getState();
+        const post = Selectors.getPost(state, postId);
         let unreadChan;
+
+        dispatch({
+            type: ChannelTypes.ADD_MANUALLY_UNREAD,
+            data: {
+                channelId: post.channel_id,
+            },
+        });
+
         try {
             unreadChan = await Client4.markPostAsUnread(userId, postId);
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch, getState);
             dispatch(logError(error));
+            dispatch({
+                type: ChannelTypes.REMOVE_MANUALLY_UNREAD,
+                data: {
+                    channelId: post.channel_id,
+                },
+            });
             return {error};
         }
 
-        const state = getState();
+        state = getState();
         const data = getUnreadPostData(unreadChan, state);
         dispatch({
             type: ChannelTypes.POST_UNREAD_SUCCESS,
