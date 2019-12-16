@@ -5,10 +5,11 @@ import shallowEqual from 'shallow-equals';
 import {Dictionary} from 'types/utilities';
 export function memoizeResult<F extends Function>(func: F): any {
     let lastArgs: IArguments|null = null;
-    let lastResult: any = null; // we reference arguments instead of spreading them for performance reasons
+    let lastResult: any = null;
 
-    return function shallowCompare(...args: any[]) {
-        if (!shallowEqual(lastArgs, args)) {
+    // we reference arguments instead of spreading them for performance reasons
+    return function shallowCompare() {
+        if (!shallowEqual(lastArgs, arguments)) { //eslint-disable-line prefer-rest-params
             //eslint-disable-line prefer-rest-params
             // apply arguments instead of spreading for performance.
             const result = Reflect.apply(func, null, arguments); //eslint-disable-line prefer-rest-params
