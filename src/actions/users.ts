@@ -185,12 +185,11 @@ function completeLogin(data: UserProfile): ActionFunc {
             },
         ]));
         const roles = new Set<string>();
-
+        for (const role of data.roles.split(' ')) {
+            roles.add(role);
+        }
         for (const teamMember of teamMembers) {
             for (const role of teamMember.roles.split(' ')) {
-                roles.add(role);
-            }
-            for (const role of data.roles.split(' ')) {
                 roles.add(role);
             }
         }
