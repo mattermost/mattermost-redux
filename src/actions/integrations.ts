@@ -52,10 +52,7 @@ export function removeIncomingHook(hookId: string): ActionFunc {
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch, getState);
 
-            dispatch(batchActions([
-                {type: IntegrationTypes.DELETE_INCOMING_HOOK_FAILURE, error},
-                logError(error),
-            ]), getState);
+            dispatch(logError(error));
             return {error};
         }
 
@@ -120,10 +117,7 @@ export function removeOutgoingHook(hookId: string): ActionFunc {
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch, getState);
 
-            dispatch(batchActions([
-                {type: IntegrationTypes.DELETE_OUTGOING_HOOK_FAILURE, error},
-                logError(error),
-            ]), getState);
+            dispatch(logError(error));
             return {error};
         }
 
@@ -229,10 +223,7 @@ export function regenCommandToken(id: string): ActionFunc {
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch, getState);
 
-            dispatch(batchActions([
-                {type: IntegrationTypes.REGEN_COMMAND_TOKEN_FAILURE, error},
-                logError(error),
-            ]), getState);
+            dispatch(logError(error));
             return {error};
         }
 
@@ -257,10 +248,7 @@ export function deleteCommand(id: string): ActionFunc {
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch, getState);
 
-            dispatch(batchActions([
-                {type: IntegrationTypes.DELETE_COMMAND_FAILURE, error},
-                logError(error),
-            ]), getState);
+            dispatch(logError(error));
             return {error};
         }
 
@@ -327,10 +315,7 @@ export function getAuthorizedOAuthApps(): ActionFunc {
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch, getState);
 
-            dispatch(batchActions([
-                {type: IntegrationTypes.GET_AUTHORIZED_OAUTH_APPS_FAILURE, error},
-                logError(error),
-            ]), getState);
+            dispatch(logError(error));
 
             return {error};
         }
@@ -354,10 +339,7 @@ export function deleteOAuthApp(id: string): ActionFunc {
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch, getState);
 
-            dispatch(batchActions([
-                {type: IntegrationTypes.DELETE_OAUTH_APP_FAILURE, error},
-                logError(error),
-            ]), getState);
+            dispatch(logError(error));
             return {error};
         }
 
@@ -394,10 +376,7 @@ export function submitInteractiveDialog(submission: DialogSubmission): ActionFun
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch, getState);
 
-            dispatch(batchActions([
-                {type: IntegrationTypes.SUBMIT_INTERACTIVE_DIALOG_FAILURE, error},
-                logError(error),
-            ]), getState);
+            dispatch(logError(error));
             return {error};
         }
 
