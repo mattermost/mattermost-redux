@@ -49,6 +49,7 @@ export function deleteScheme(schemeId: string): ActionFunc {
             data = await Client4.deleteScheme(schemeId);
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch, getState);
+            dispatch(logError(error));
             return {error};
         }
 
