@@ -3,7 +3,7 @@
 
 export const PostTypes = {
     CHANNEL_DELETED: 'system_channel_deleted',
-    CHANNEL_UNDELETED: 'system_channel_undeleted',
+    CHANNEL_UNDELETED: 'system_channel_restored',
     DISPLAYNAME_CHANGE: 'system_displayname_change',
     CONVERT_CHANNEL: 'system_convert_channel',
     EPHEMERAL: 'system_ephemeral',
