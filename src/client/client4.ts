@@ -1120,6 +1120,17 @@ export default class Client4 {
         );
     };
 
+    addUsersToTeamGracefully = async (teamId: string, userIds: string[]) => {
+        this.trackEvent('api', 'api_teams_batch_add_members', {team_id: teamId, count: userIds.length});
+
+        const members: any = [];
+        userIds.forEach((id) => members.push({team_id: teamId, user_id: id}));
+        return this.doFetch(
+            `${this.getTeamMembersRoute(teamId)}/batch?graceful=true`,
+            {method: 'post', body: JSON.stringify(members)}
+        );
+    };
+
     joinTeam = async (inviteId: string) => {
         const query = buildQueryString({invite_id: inviteId});
         return this.doFetch(

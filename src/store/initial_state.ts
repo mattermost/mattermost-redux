@@ -576,52 +576,6 @@ const state: GlobalState = {
                 error: null,
             },
         },
-        groups: {
-            linkGroupSyncable: {
-                status: 'not_started',
-                error: null,
-            },
-            unlinkGroupSyncable: {
-                status: 'not_started',
-                error: null,
-            },
-            getGroupSyncables: {
-                status: 'not_started',
-                error: null,
-            },
-            getGroupMembers: {
-                status: 'not_started',
-                error: null,
-            },
-            getGroup: {
-                status: 'not_started',
-                error: null,
-            },
-            getAllGroupsAssociatedToTeam: {
-                status: 'not_started',
-                error: null,
-            },
-            getAllGroupsAssociatedToChannel: {
-                status: 'not_started',
-                error: null,
-            },
-            getGroupsAssociatedToTeam: {
-                status: 'not_started',
-                error: null,
-            },
-            getGroupsAssociatedToChannel: {
-                status: 'not_started',
-                error: null,
-            },
-            getGroupsNotAssociatedToTeam: {
-                status: 'not_started',
-                error: null,
-            },
-            getGroupsNotAssociatedToChannel: {
-                status: 'not_started',
-                error: null,
-            },
-        },
     },
     websocket: {
         connected: false,

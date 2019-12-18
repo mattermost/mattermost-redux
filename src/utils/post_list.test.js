@@ -3,7 +3,7 @@
 
 import assert from 'assert';
 
-import {Posts, Preferences} from 'constants';
+import {Posts, Preferences} from '../constants';
 import deepFreeze from 'utils/deep_freeze';
 import {getPreferenceKey} from 'utils/preference_utils';
 
@@ -35,6 +35,9 @@ describe('makeFilterPostsAndAddSeparators', () => {
 
         let state = {
             entities: {
+                general: {
+                    config: {},
+                },
                 posts: {
                     posts: {
                         1001: {id: '1001', create_at: time, type: ''},
@@ -147,6 +150,9 @@ describe('makeFilterPostsAndAddSeparators', () => {
 
         const state = {
             entities: {
+                general: {
+                    config: {},
+                },
                 posts: {
                     posts: {
                         1000: {id: '1000', create_at: time + 1000, type: ''},
@@ -251,6 +257,9 @@ describe('makeFilterPostsAndAddSeparators', () => {
         };
         let state = {
             entities: {
+                general: {
+                    config: {},
+                },
                 posts: {
                     posts: initialPosts,
                 },
@@ -903,19 +912,19 @@ describe('getLastPostId', () => {
 });
 
 describe('getLastPostIndex', () => {
-    test.only('should return index of last post for list of all regular posts', () => {
+    test('should return index of last post for list of all regular posts', () => {
         expect(getLastPostIndex(['post1', 'post2', 'post3'])).toBe(2);
     });
 
-    test.only('should return index of last combined post', () => {
+    test('should return index of last combined post', () => {
         expect(getLastPostIndex(['user-activity-post2_post3', 'post4', 'user-activity-post5_post6'])).toBe(2);
     });
 
-    test.only('should skip date separators and return index of last post', () => {
+    test('should skip date separators and return index of last post', () => {
         expect(getLastPostIndex(['date-1234', 'user-activity-post1_post2', 'post3', 'post4', 'date-1000'])).toBe(3);
     });
 
-    test.only('should skip the new message line and return index of last post', () => {
+    test('should skip the new message line and return index of last post', () => {
         expect(getLastPostIndex(['post2', 'post3', 'post4', START_OF_NEW_MESSAGES])).toBe(2);
     });
 });
