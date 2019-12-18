@@ -207,7 +207,6 @@ export function editCommand(command: Command): ActionFunc {
 export function executeCommand(command: Command, args: Array<string>): ActionFunc {
     return bindClientFunc({
         clientFunc: Client4.executeCommand,
-        onSuccess: IntegrationTypes.EXECUTE_COMMAND_SUCCESS,
         params: [
             command,
             args,
@@ -327,7 +326,6 @@ export function getAuthorizedOAuthApps(): ActionFunc {
 export function deauthorizeOAuthApp(clientId: string): ActionFunc {
     return bindClientFunc({
         clientFunc: Client4.deauthorizeOAuthApp,
-        onSuccess: IntegrationTypes.DEAUTHORIZE_OAUTH_APP_SUCCESS,
         params: [clientId],
     });
 }

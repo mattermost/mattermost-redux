@@ -4,10 +4,6 @@ import keyMirror from 'utils/key_mirror';
 
 export default keyMirror({
 
-    DEAUTHORIZE_OAUTH_APP_SUCCESS: null,
-
-    EXECUTE_COMMAND_SUCCESS: null,
-
     RECEIVED_INCOMING_HOOK: null,
     RECEIVED_INCOMING_HOOKS: null,
     DELETED_INCOMING_HOOK: null,
