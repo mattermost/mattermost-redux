@@ -680,11 +680,6 @@ describe('Actions.Groups', () => {
         await Actions.patchGroupSyncable(groupID, channelID, Groups.SYNCABLE_TYPE_CHANNEL, groupSyncablePatch)(store.dispatch, store.getState);
 
         const state = store.getState();
-        const request = state.requests.groups.patchGroupSyncable;
-        if (request.status === RequestStatus.FAILURE) {
-            throw new Error('patchGroupSyncable request failed err=' + request.error);
-        }
-
         const groupSyncables = state.entities.groups.syncables[groupID];
         assert.ok(groupSyncables);
 

@@ -2812,36 +2812,20 @@ export default class Client4 {
         );
     };
 
-    getGroupsAssociatedToTeam = async (teamID: string, q = '', page = 0, perPage = PER_PAGE_DEFAULT, includeSchemeAdmin = false) => {
+    getGroupsAssociatedToTeam = async (teamID: string, q = '', page = 0, perPage = PER_PAGE_DEFAULT) => {
         this.trackEvent('api', 'api_groups_get_associated_to_team', {team_id: teamID});
 
-        const queryString: any = {
-            page, per_page: perPage, q, include_member_count: true,
-        };
-
-        if (includeSchemeAdmin) {
-            queryString.include_scheme_admin = true;
-        }
-
         return this.doFetch(
-            `${this.getBaseRoute()}/teams/${teamID}/groups${buildQueryString(queryString)}`,
+            `${this.getBaseRoute()}/teams/${teamID}/groups${buildQueryString({page, per_page: perPage, q, include_member_count: true})}`,
             {method: 'get'}
         );
     };
 
-    getGroupsAssociatedToChannel = async (channelID: string, q = '', page = 0, perPage = PER_PAGE_DEFAULT, includeSchemeAdmin = false) => {
+    getGroupsAssociatedToChannel = async (channelID: string, q = '', page = 0, perPage = PER_PAGE_DEFAULT) => {
         this.trackEvent('api', 'api_groups_get_associated_to_channel', {channel_id: channelID});
 
-        const queryString: any = {
-            page, per_page: perPage, q, include_member_count: true,
-        };
-
-        if (includeSchemeAdmin) {
-            queryString.include_scheme_admin = true;
-        }
-
         return this.doFetch(
-            `${this.getBaseRoute()}/channels/${channelID}/groups${buildQueryString(queryString)}`,
+            `${this.getBaseRoute()}/channels/${channelID}/groups${buildQueryString({page, per_page: perPage, q, include_member_count: true})}`,
             {method: 'get'}
         );
     };

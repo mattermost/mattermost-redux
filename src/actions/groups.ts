@@ -111,17 +111,11 @@ export function getGroupSyncables(groupID: string, syncableType: SyncableType): 
 
 export function patchGroupSyncable(groupID: string, syncableID: string, syncableType: SyncableType, patch: SyncablePatch): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
-        dispatch({type: GroupTypes.PATCH_GROUP_SYNCABLE_REQUEST, data: {groupID, syncableID}});
-
         let data;
         try {
             data = await Client4.patchGroupSyncable(groupID, syncableID, syncableType, patch);
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch, getState);
-            dispatch(batchActions([
-                {type: GroupTypes.PATCH_GROUP_SYNCABLE_FAILURE, error, data: {groupID, syncableID}},
-                logError(error),
-            ]));
             return {error};
         }
 
@@ -140,7 +134,6 @@ export function patchGroupSyncable(groupID: string, syncableID: string, syncable
         }
 
         dispatches.push(
-            {type: GroupTypes.PATCH_GROUP_SYNCABLE_SUCCESS, data: null},
             {type, data},
         );
         dispatch(batchActions(dispatches));
@@ -232,10 +225,10 @@ export function getAllGroupsAssociatedToChannel(channelID: string): ActionFunc {
     });
 }
 
-export function getGroupsAssociatedToTeam(teamID: string, q = '', page = 0, perPage: number = General.PAGE_SIZE_DEFAULT, includeSchemeAdmin = false): ActionFunc {
+export function getGroupsAssociatedToTeam(teamID: string, q = '', page = 0, perPage: number = General.PAGE_SIZE_DEFAULT): ActionFunc {
     return bindClientFunc({
-        clientFunc: async (param1, param2, param3, param4, param5) => {
-            const result = await Client4.getGroupsAssociatedToTeam(param1, param2, param3, param4, param5);
+        clientFunc: async (param1, param2, param3, param4) => {
+            const result = await Client4.getGroupsAssociatedToTeam(param1, param2, param3, param4);
             return {groups: result.groups, totalGroupCount: result.total_group_count, teamID: param1};
         },
         onSuccess: [GroupTypes.RECEIVED_GROUPS_ASSOCIATED_TO_TEAM],
@@ -244,15 +237,14 @@ export function getGroupsAssociatedToTeam(teamID: string, q = '', page = 0, perP
             q,
             page,
             perPage,
-            includeSchemeAdmin,
         ],
     });
 }
 
-export function getGroupsAssociatedToChannel(channelID: string, q = '', page = 0, perPage: number = General.PAGE_SIZE_DEFAULT, includeSchemeAdmin = false): ActionFunc {
+export function getGroupsAssociatedToChannel(channelID: string, q = '', page = 0, perPage: number = General.PAGE_SIZE_DEFAULT): ActionFunc {
     return bindClientFunc({
-        clientFunc: async (param1, param2, param3, param4, param5) => {
-            const result = await Client4.getGroupsAssociatedToChannel(param1, param2, param3, param4, param5);
+        clientFunc: async (param1, param2, param3, param4) => {
+            const result = await Client4.getGroupsAssociatedToChannel(param1, param2, param3, param4);
             return {groups: result.groups, totalGroupCount: result.total_group_count, channelID: param1};
         },
         onSuccess: [GroupTypes.RECEIVED_GROUPS_ASSOCIATED_TO_CHANNEL],
@@ -261,7 +253,6 @@ export function getGroupsAssociatedToChannel(channelID: string, q = '', page = 0
             q,
             page,
             perPage,
-            includeSchemeAdmin,
         ],
     });
 }
