@@ -657,11 +657,15 @@ function handleChannelViewedEvent(msg: WebSocketMessage) {
 }
 
 function handleChannelMemberUpdatedEvent(msg: WebSocketMessage) {
-    const channelMember = JSON.parse(msg.data.channelMember);
-
-    return {
-        type: ChannelTypes.RECEIVED_MY_CHANNEL_MEMBER,
-        data: channelMember,
+    return (dispatch: DispatchFunc) => {
+        const channelMember = JSON.parse(msg.data.channelMember);
+        const roles = channelMember.roles.split(' ');
+        dispatch(loadRolesIfNeeded(roles));
+        dispatch({
+            type: ChannelTypes.RECEIVED_MY_CHANNEL_MEMBER,
+            data: channelMember,
+        });
+        return {data: true};
     };
 }
 
