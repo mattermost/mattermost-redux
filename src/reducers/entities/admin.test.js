@@ -31,7 +31,6 @@ describe('reducers.entities.admin', () => {
                         state: PluginState.PLUGIN_STATE_NOT_RUNNING,
                         name: 'Plugin 0',
                         description: 'The plugin 0.',
-                        is_prepackaged: false,
                     },
                     {
                         plugin_id: 'plugin_1',
@@ -40,7 +39,6 @@ describe('reducers.entities.admin', () => {
                         state: PluginState.PLUGIN_STATE_NOT_RUNNING,
                         name: 'Plugin 1',
                         description: 'The plugin.',
-                        is_prepackaged: false,
                     },
                     {
                         plugin_id: 'plugin_1',
@@ -49,7 +47,6 @@ describe('reducers.entities.admin', () => {
                         state: PluginState.PLUGIN_STATE_RUNNING,
                         name: 'Plugin 1',
                         description: 'The plugin, different description.',
-                        is_prepackaged: false,
                     },
                 ],
             };
@@ -60,7 +57,6 @@ describe('reducers.entities.admin', () => {
                     state: PluginState.PLUGIN_STATE_NOT_RUNNING,
                     name: 'Plugin 0',
                     description: 'The plugin 0.',
-                    is_prepackaged: false,
                     active: false,
                     instances: [
                         {
@@ -76,7 +72,6 @@ describe('reducers.entities.admin', () => {
                     state: PluginState.PLUGIN_STATE_RUNNING,
                     name: 'Plugin 1',
                     description: 'The plugin.',
-                    is_prepackaged: false,
                     active: true,
                     instances: [
                         {
@@ -105,7 +100,6 @@ describe('reducers.entities.admin', () => {
                     state: PluginState.PLUGIN_STATE_NOT_RUNNING,
                     name: 'Plugin 0 - old',
                     description: 'The plugin 0 - old.',
-                    is_prepackaged: true,
                     active: false,
                     instances: [
                         {
@@ -121,7 +115,6 @@ describe('reducers.entities.admin', () => {
                     state: PluginState.PLUGIN_STATE_NOT_RUNNING,
                     name: 'Plugin 1',
                     description: 'The plugin.',
-                    is_prepackaged: false,
                     active: false,
                     instances: [
                         {
@@ -142,7 +135,6 @@ describe('reducers.entities.admin', () => {
                         state: PluginState.PLUGIN_STATE_NOT_RUNNING,
                         name: 'Plugin 0',
                         description: 'The plugin 0.',
-                        is_prepackaged: false,
                     },
                     {
                         plugin_id: 'plugin_1',
@@ -151,7 +143,6 @@ describe('reducers.entities.admin', () => {
                         state: PluginState.PLUGIN_STATE_NOT_RUNNING,
                         name: 'Plugin 1',
                         description: 'The plugin.',
-                        is_prepackaged: false,
                     },
                     {
                         plugin_id: 'plugin_1',
@@ -160,7 +151,6 @@ describe('reducers.entities.admin', () => {
                         state: PluginState.PLUGIN_STATE_RUNNING,
                         name: 'Plugin 1',
                         description: 'The plugin, different description.',
-                        is_prepackaged: false,
                     },
                 ],
             };
@@ -171,7 +161,6 @@ describe('reducers.entities.admin', () => {
                     state: PluginState.PLUGIN_STATE_NOT_RUNNING,
                     name: 'Plugin 0',
                     description: 'The plugin 0.',
-                    is_prepackaged: false,
                     active: false,
                     instances: [
                         {
@@ -186,9 +175,7 @@ describe('reducers.entities.admin', () => {
                     version: '0.0.1',
                     state: PluginState.PLUGIN_STATE_RUNNING,
                     name: 'Plugin 1',
-                    description: 'The plugin.',
-                    is_prepackaged: false,
-                    active: true,
+                    description: 'The plugin.',                    active: true,
                     instances: [
                         {
                             cluster_id: 'cluster_id_1',
@@ -216,7 +203,6 @@ describe('reducers.entities.admin', () => {
                     state: PluginState.PLUGIN_STATE_NOT_RUNNING,
                     name: 'Plugin 0',
                     description: 'The plugin 0.',
-                    is_prepackaged: false,
                     active: false,
                     instances: [
                         {
@@ -232,7 +218,6 @@ describe('reducers.entities.admin', () => {
                     state: PluginState.PLUGIN_STATE_RUNNING,
                     name: 'Plugin 1',
                     description: 'The plugin.',
-                    is_prepackaged: false,
                     active: true,
                     instances: [
                         {
@@ -259,7 +244,6 @@ describe('reducers.entities.admin', () => {
                     state: PluginState.PLUGIN_STATE_STARTING,
                     name: 'Plugin 0',
                     description: 'The plugin 0.',
-                    is_prepackaged: false,
                     active: false,
                     instances: [
                         {
@@ -275,7 +259,6 @@ describe('reducers.entities.admin', () => {
                     state: PluginState.PLUGIN_STATE_RUNNING,
                     name: 'Plugin 1',
                     description: 'The plugin.',
-                    is_prepackaged: false,
                     active: true,
                     instances: [
                         {
@@ -304,7 +287,6 @@ describe('reducers.entities.admin', () => {
                     state: PluginState.PLUGIN_STATE_NOT_RUNNING,
                     name: 'Plugin 0',
                     description: 'The plugin 0.',
-                    is_prepackaged: false,
                     active: false,
                     instances: [
                         {
@@ -320,7 +302,6 @@ describe('reducers.entities.admin', () => {
                     state: PluginState.PLUGIN_STATE_RUNNING,
                     name: 'Plugin 1',
                     description: 'The plugin.',
-                    is_prepackaged: false,
                     active: true,
                     instances: [
                         {
@@ -347,7 +328,6 @@ describe('reducers.entities.admin', () => {
                     state: PluginState.PLUGIN_STATE_STOPPING,
                     name: 'Plugin 0',
                     description: 'The plugin 0.',
-                    is_prepackaged: false,
                     active: false,
                     instances: [
                         {
@@ -363,7 +343,6 @@ describe('reducers.entities.admin', () => {
                     state: PluginState.PLUGIN_STATE_RUNNING,
                     name: 'Plugin 1',
                     description: 'The plugin.',
-                    is_prepackaged: false,
                     active: true,
                     instances: [
                         {
@@ -392,7 +371,6 @@ describe('reducers.entities.admin', () => {
                     state: PluginState.PLUGIN_STATE_NOT_RUNNING,
                     name: 'Plugin 0',
                     description: 'The plugin 0.',
-                    is_prepackaged: false,
                     active: false,
                     instances: [
                         {
@@ -408,7 +386,6 @@ describe('reducers.entities.admin', () => {
                     state: PluginState.PLUGIN_STATE_RUNNING,
                     name: 'Plugin 1',
                     description: 'The plugin.',
-                    is_prepackaged: false,
                     active: true,
                     instances: [
                         {
@@ -435,7 +412,6 @@ describe('reducers.entities.admin', () => {
                     state: PluginState.PLUGIN_STATE_NOT_RUNNING,
                     name: 'Plugin 0',
                     description: 'The plugin 0.',
-                    is_prepackaged: false,
                     active: false,
                     instances: [
                         {
@@ -451,7 +427,6 @@ describe('reducers.entities.admin', () => {
                     state: PluginState.PLUGIN_STATE_STOPPING,
                     name: 'Plugin 1',
                     description: 'The plugin.',
-                    is_prepackaged: false,
                     active: true,
                     instances: [
                         {
@@ -480,7 +455,6 @@ describe('reducers.entities.admin', () => {
                     state: PluginState.PLUGIN_STATE_NOT_RUNNING,
                     name: 'Plugin 0 - old',
                     description: 'The plugin 0 - old.',
-                    is_prepackaged: true,
                     active: false,
                     instances: [
                         {
@@ -496,7 +470,6 @@ describe('reducers.entities.admin', () => {
                     state: PluginState.PLUGIN_STATE_NOT_RUNNING,
                     name: 'Plugin 1',
                     description: 'The plugin.',
-                    is_prepackaged: false,
                     active: false,
                     instances: [
                         {
@@ -518,7 +491,6 @@ describe('reducers.entities.admin', () => {
                     state: PluginState.PLUGIN_STATE_NOT_RUNNING,
                     name: 'Plugin 1',
                     description: 'The plugin.',
-                    is_prepackaged: false,
                     active: false,
                     instances: [
                         {
@@ -542,7 +514,6 @@ describe('reducers.entities.admin', () => {
                     state: PluginState.PLUGIN_STATE_NOT_RUNNING,
                     name: 'Plugin 1',
                     description: 'The plugin.',
-                    is_prepackaged: false,
                     active: false,
                     instances: [
                         {
@@ -571,7 +542,6 @@ describe('reducers.entities.admin', () => {
                     state: PluginState.PLUGIN_STATE_NOT_RUNNING,
                     name: 'Plugin 0 - old',
                     description: 'The plugin 0 - old.',
-                    is_prepackaged: true,
                     active: false,
                     instances: [
                         {
@@ -587,7 +557,6 @@ describe('reducers.entities.admin', () => {
                     state: PluginState.PLUGIN_STATE_NOT_RUNNING,
                     name: 'Plugin 1',
                     description: 'The plugin.',
-                    is_prepackaged: false,
                     active: false,
                     instances: [
                         {
