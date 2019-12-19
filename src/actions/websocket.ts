@@ -6,7 +6,7 @@ import websocketClient from '../client/websocket_client';
 
 import {ChannelTypes, GeneralTypes, EmojiTypes, PostTypes, PreferenceTypes, TeamTypes, UserTypes, RoleTypes, AdminTypes, IntegrationTypes} from 'action_types';
 import {General, WebsocketEvents, Preferences} from '../constants';
-import {getAllChannels, getChannel, getChannelsNameMapInTeam, getCurrentChannelId, getMyChannelMember, getRedirectChannelNameForTeam, getCurrentChannelStats} from 'selectors/entities/channels';
+import {getAllChannels, getChannel, getChannelsNameMapInTeam, getCurrentChannelId, getMyChannelMember, getRedirectChannelNameForTeam, getCurrentChannelStats, isManuallyUnread} from 'selectors/entities/channels';
 import {getConfig} from 'selectors/entities/general';
 import {getAllPosts, getPost as getPostSelector} from 'selectors/entities/posts';
 import {getDirectShowPreferences} from 'selectors/entities/preferences';
@@ -369,22 +369,27 @@ function handlePostDeleted(msg: WebSocketMessage) {
 function handlePostUnread(msg: WebSocketMessage) {
     return (dispatch: DispatchFunc, getState: GetStateFunc) => {
         const state = getState();
+        const manual = isManuallyUnread(state, msg.broadcast.channel_id);
 
-        const member = getMyChannelMember(state, msg.broadcast.channel_id);
-        const delta = member ? member.msg_count - msg.data.msg_count : msg.data.msg_count;
-        const info = {
-            ...msg.data,
-            user_id: msg.broadcast.user_id,
-            team_id: msg.broadcast.team_id,
-            channel_id: msg.broadcast.channel_id,
-            deltaMsgs: delta,
-        };
-        const data = getUnreadPostData(info, state);
-        dispatch({
-            type: ChannelTypes.POST_UNREAD_SUCCESS,
-            data,
-        });
-        return {data};
+        if (!manual) {
+            const member = getMyChannelMember(state, msg.broadcast.channel_id);
+            const delta = member ? member.msg_count - msg.data.msg_count : msg.data.msg_count;
+            const info = {
+                ...msg.data,
+                user_id: msg.broadcast.user_id,
+                team_id: msg.broadcast.team_id,
+                channel_id: msg.broadcast.channel_id,
+                deltaMsgs: delta,
+            };
+            const data = getUnreadPostData(info, state);
+            dispatch({
+                type: ChannelTypes.POST_UNREAD_SUCCESS,
+                data,
+            });
+            return {data};
+        }
+
+        return {data: null};
     };
 }
 
