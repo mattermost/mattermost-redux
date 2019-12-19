@@ -2940,12 +2940,18 @@ export default class Client4 {
     };
 
     setSamlIdpCertificateFromMetadata = async (certData: string) => {
+        const request: any = {
+            method: 'post',
+            body: certData,
+        };
+
+        request.headers = {
+            'Content-Type': 'application/x-pem-file',
+        };
+
         return this.doFetch(
-            `${this.getBaseRoute()}/saml/certificate/idp/frommetadata`,
-            {
-                method: 'post',
-                body: certData,
-            }
+            `${this.getBaseRoute()}/saml/certificate/idp`,
+            request
         );
     };
 

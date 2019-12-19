@@ -1193,11 +1193,6 @@ describe('Actions.Admin', () => {
         await Actions.getSamlMetadataFromIdp()(store.dispatch, store.getState);
 
         const state = store.getState();
-        const request = state.requests.admin.getSamlMetadataFromIdp;
-        if (request.status === RequestStatus.FAILURE) {
-            throw new Error('getSamlMetadataFromIdp request failed err=' + request.error);
-        }
-
         const metadataResponse = state.entities.admin.samlMetadataResponse;
         assert.ok(metadataResponse);
         assert.ok(metadataResponse.idp_url === samlIdpUrl);
@@ -1207,15 +1202,11 @@ describe('Actions.Admin', () => {
 
     it('setSamlIdpCertificateFromMetadata', async () => {
         nock(Client4.getBaseRoute()).
-            post('/saml/certificate/idp/frommetadata').
+            post('/saml/certificate/idp').
             reply(200, OK_RESPONSE);
 
         await Actions.setSamlIdpCertificateFromMetadata(samlIdpPublicCertificateText)(store.dispatch, store.getState);
 
         const state = store.getState();
-        const request = state.requests.admin.setSamlIdpCertificateFromMetadata;
-        if (request.status === RequestStatus.FAILURE) {
-            throw new Error('setSamlIdpCertificateFromMetadata request failed');
-        }
     });
 });

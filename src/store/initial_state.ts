@@ -395,14 +395,6 @@ const state: GlobalState = {
                 status: 'not_started',
                 error: null,
             },
-            getSamlMetadataFromIdp: {
-                status: 'not_started',
-                error: null,
-            },
-            setSamlIdpCertificateFromMetadata: {
-                status: 'not_started',
-                error: null,
-            },
         },
         files: {
             uploadFiles: {

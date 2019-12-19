@@ -588,9 +588,7 @@ export function disablePlugin(pluginId: string): ActionFunc {
 export function getSamlMetadataFromIdp(samlMetadataURL: string): ActionFunc {
     return bindClientFunc({
         clientFunc: Client4.getSamlMetadataFromIdp,
-        onRequest: AdminTypes.SAML_GET_METADATA_REQUEST,
-        onSuccess: [AdminTypes.RECEIVED_SAML_METADATA_RESPONSE, AdminTypes.SAML_GET_METADATA_SUCCESS],
-        onFailure: AdminTypes.SAML_GET_METADATA_FAILURE,
+        onSuccess: AdminTypes.RECEIVED_SAML_METADATA_RESPONSE,
         params: [
             samlMetadataURL,
         ],
@@ -600,9 +598,7 @@ export function getSamlMetadataFromIdp(samlMetadataURL: string): ActionFunc {
 export function setSamlIdpCertificateFromMetadata(certData: string): ActionFunc {
     return bindClientFunc({
         clientFunc: Client4.setSamlIdpCertificateFromMetadata,
-        onRequest: AdminTypes.SET_SAML_IDP_REQUEST,
         onSuccess: AdminTypes.SET_SAML_IDP_SUCCESS,
-        onFailure: AdminTypes.SET_SAML_IDP_FAILURE,
         params: [
             certData,
         ],

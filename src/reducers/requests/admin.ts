@@ -408,26 +408,6 @@ function disablePlugin(state: RequestStatusType = initialRequestState(), action:
     );
 }
 
-function getSamlMetadataFromIdp(state: RequestStatusType = initialRequestState(), action: GenericAction): RequestStatusType {
-    return handleRequest(
-        AdminTypes.SAML_GET_METADATA_REQUEST,
-        AdminTypes.SAML_GET_METADATA_SUCCESS,
-        AdminTypes.SAML_GET_METADATA_FAILURE,
-        state,
-        action
-    );
-}
-
-function setSamlIdpCertificateFromMetadata(state: RequestStatusType = initialRequestState(), action: GenericAction): RequestStatusType {
-    return handleRequest(
-        AdminTypes.SET_SAML_IDP_REQUEST,
-        AdminTypes.SET_SAML_IDP_SUCCESS,
-        AdminTypes.SET_SAML_IDP_FAILURE,
-        state,
-        action
-    );
-}
-
 export default (combineReducers({
     getLogs,
     getAudits,
@@ -469,6 +449,4 @@ export default (combineReducers({
     removePlugin,
     enablePlugin,
     disablePlugin,
-    getSamlMetadataFromIdp,
-    setSamlIdpCertificateFromMetadata,
 }) as (b: AdminRequestsStatuses, a: GenericAction) => AdminRequestsStatuses);
