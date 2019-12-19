@@ -77,5 +77,6 @@ export default keyMirror({
 
     POST_UNREAD_SUCCESS: null,
 
+    ADD_MANUALLY_UNREAD: null,
     REMOVE_MANUALLY_UNREAD: null,
 });

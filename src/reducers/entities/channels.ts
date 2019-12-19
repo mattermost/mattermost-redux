@@ -550,6 +550,7 @@ export function manuallyUnread(state: RelationOneToOne<Channel, boolean> = {}, a
         return {};
     }
 
+    case ChannelTypes.ADD_MANUALLY_UNREAD:
     case ChannelTypes.POST_UNREAD_SUCCESS: {
         return {...state, [action.data.channelId]: true};
     }
