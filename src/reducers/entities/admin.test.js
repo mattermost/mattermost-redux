@@ -175,7 +175,8 @@ describe('reducers.entities.admin', () => {
                     version: '0.0.1',
                     state: PluginState.PLUGIN_STATE_RUNNING,
                     name: 'Plugin 1',
-                    description: 'The plugin.',                    active: true,
+                    description: 'The plugin.',
+                    active: true,
                     instances: [
                         {
                             cluster_id: 'cluster_id_1',
