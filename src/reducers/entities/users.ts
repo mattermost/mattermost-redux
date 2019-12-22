@@ -67,6 +67,14 @@ function addProfileToSet(state: RelationOneToMany<Team, UserProfile>, action: Ge
     };
 }
 
+function removeProfileFromTeams(state: RelationOneToMany<Team, UserProfile>, action: GenericAction) {
+    const newState = {...state};
+    Object.keys(state).forEach((key) => {
+        delete newState[key][action.data.user_id];
+    });
+    return newState;
+}
+
 function removeProfileFromSet(state: RelationOneToMany<Team, UserProfile>, action: GenericAction) {
     const {id, user_id: userId} = action.data;
     const nextSet = new Set(state[id]);
@@ -178,7 +186,11 @@ function profiles(state: IDMappedObjects<UserProfile> = {}, action: GenericActio
             },
         };
     }
-
+    case UserTypes.PROFILE_NO_LONGER_VISIBLE: {
+        const newState = {...state};
+        delete newState[action.data.user_id];
+        return newState;
+    }
     default:
         return state;
     }
@@ -203,6 +215,9 @@ function profilesInTeam(state: RelationOneToMany<Team, UserProfile> = {}, action
 
     case UserTypes.LOGOUT_SUCCESS:
         return {};
+
+    case UserTypes.PROFILE_NO_LONGER_VISIBLE:
+        return removeProfileFromTeams(state, action);
 
     default:
         return state;
@@ -229,6 +244,9 @@ function profilesNotInTeam(state: RelationOneToMany<Team, UserProfile> = {}, act
     case UserTypes.LOGOUT_SUCCESS:
         return {};
 
+    case UserTypes.PROFILE_NO_LONGER_VISIBLE:
+        return removeProfileFromTeams(state, action);
+
     default:
         return state;
     }
@@ -246,6 +264,7 @@ function profilesWithoutTeam(state: Set<string> = new Set(), action: GenericActi
         action.data.forEach((user: UserProfile) => nextSet.add(user.id));
         return nextSet;
     }
+    case UserTypes.PROFILE_NO_LONGER_VISIBLE:
     case UserTypes.RECEIVED_PROFILE_IN_TEAM: {
         const nextSet = new Set(state);
         nextSet.delete(action.data.id);
@@ -284,6 +303,9 @@ function profilesInChannel(state: RelationOneToMany<Channel, UserProfile> = {}, 
     case UserTypes.LOGOUT_SUCCESS:
         return {};
 
+    case UserTypes.PROFILE_NO_LONGER_VISIBLE:
+        return removeProfileFromTeams(state, action);
+
     default:
         return state;
     }
@@ -317,6 +339,9 @@ function profilesNotInChannel(state: RelationOneToMany<Channel, UserProfile> = {
     case UserTypes.LOGOUT_SUCCESS:
         return {};
 
+    case UserTypes.PROFILE_NO_LONGER_VISIBLE:
+        return removeProfileFromTeams(state, action);
+
     default:
         return state;
     }
@@ -341,7 +366,11 @@ function statuses(state: RelationOneToOne<UserProfile, string> = {}, action: Gen
     }
     case UserTypes.LOGOUT_SUCCESS:
         return {};
-
+    case UserTypes.PROFILE_NO_LONGER_VISIBLE: {
+        const newState = {...state};
+        delete newState[action.data.user_id];
+        return newState;
+    }
     default:
         return state;
     }
