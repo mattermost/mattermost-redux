@@ -47,8 +47,9 @@ export function getOpenGraphMetadata(state: GlobalState): RelationOneToOne<Post,
     return state.entities.posts.openGraph;
 }
 
-export function getOpenGraphMetadataForUrl(state: GlobalState, url: string): object {
-    return state.entities.posts.openGraph[url];
+export function getOpenGraphMetadataForUrl(state: GlobalState, postId: string, url: string): object {
+    const openGraphForPost = state.entities.posts.openGraph[postId];
+    return openGraphForPost ? openGraphForPost[url] : undefined;
 }
 
 // getPostIdsInCurrentChannel returns the IDs of posts loaded at the bottom of the channel. It does not include older

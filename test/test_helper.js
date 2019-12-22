@@ -69,10 +69,10 @@ class TestHelper {
         };
     };
 
-    fakeUserWithId = () => {
+    fakeUserWithId = (id = this.generateId()) => {
         return {
             ...this.fakeUser(),
-            id: this.generateId(),
+            id,
             create_at: 1507840900004,
             update_at: 1507840900004,
             delete_at: 0,

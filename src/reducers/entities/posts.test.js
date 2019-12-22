@@ -3737,7 +3737,7 @@ describe('opengraph', () => {
 
                 assert.notEqual(nextState, state);
                 assert.deepEqual(nextState, {
-                    'https://example.com': action.data.metadata.embeds[0].data,
+                    post: {'https://example.com': action.data.metadata.embeds[0].data},
                 });
             });
         });
@@ -3834,7 +3834,7 @@ describe('opengraph', () => {
 
             assert.notEqual(nextState, state);
             assert.deepEqual(nextState, {
-                'https://example.com': action.data.posts.post1.metadata.embeds[0].data,
+                post1: {'https://example.com': action.data.posts.post1.metadata.embeds[0].data},
             });
         });
 
@@ -3878,8 +3878,8 @@ describe('opengraph', () => {
 
             assert.notEqual(nextState, state);
             assert.deepEqual(nextState, {
-                'https://example.com': action.data.posts.post1.metadata.embeds[0].data,
-                'https://google.ca': action.data.posts.post2.metadata.embeds[0].data,
+                post1: {'https://example.com': action.data.posts.post1.metadata.embeds[0].data},
+                post2: {'https://google.ca': action.data.posts.post2.metadata.embeds[0].data},
             });
         });
     });
