@@ -262,30 +262,6 @@ function current(state: any = {}, action: GenericAction) {
     }
 }
 
-function isSearchingTerm(state = false, action: GenericAction) {
-    switch (action.type) {
-    case SearchTypes.SEARCH_POSTS_REQUEST:
-        return !action.isGettingMore;
-    case SearchTypes.SEARCH_POSTS_FAILURE:
-    case SearchTypes.SEARCH_POSTS_SUCCESS:
-        return false;
-    default:
-        return state;
-    }
-}
-
-function isSearchGettingMore(state = false, action: GenericAction) {
-    switch (action.type) {
-    case SearchTypes.SEARCH_POSTS_REQUEST:
-        return action.isGettingMore;
-    case SearchTypes.SEARCH_POSTS_FAILURE:
-    case SearchTypes.SEARCH_POSTS_SUCCESS:
-        return false;
-    default:
-        return state;
-    }
-}
-
 export default combineReducers({
 
     // An ordered array with posts ids of flagged posts
@@ -306,10 +282,4 @@ export default combineReducers({
 
     // Object holding the current searches for every team
     current,
-
-    // Boolean true if we are are searching initally
-    isSearchingTerm,
-
-    // Boolean true if we are getting more search results
-    isSearchGettingMore,
 });

@@ -13,7 +13,6 @@ import preferences from './preferences';
 import integrations from './integrations';
 import admin from './admin';
 import jobs from './jobs';
-import search from './search';
 import roles from './roles';
 import schemes from './schemes';
 
@@ -28,7 +27,6 @@ export default combineReducers({
     integrations,
     admin,
     jobs,
-    search,
     roles,
     schemes,
 });

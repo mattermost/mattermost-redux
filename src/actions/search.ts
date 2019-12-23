@@ -40,10 +40,6 @@ export function getMissingChannelsFromPosts(posts: RelationOneToOne<Post, Post>)
 export function searchPostsWithParams(teamId: string, params: SearchParameter): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         const isGettingMore = params.page > 0;
-        dispatch({
-            type: SearchTypes.SEARCH_POSTS_REQUEST,
-            isGettingMore,
-        });
         let posts;
 
         try {
@@ -55,10 +51,7 @@ export function searchPostsWithParams(teamId: string, params: SearchParameter): 
             await Promise.all(arr);
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch, getState);
-            dispatch(batchActions([
-                {type: SearchTypes.SEARCH_POSTS_FAILURE, error},
-                logError(error),
-            ]));
+            dispatch(logError(error));
             return {error};
         }
 
@@ -76,9 +69,6 @@ export function searchPostsWithParams(teamId: string, params: SearchParameter): 
                     params,
                     isEnd: (posts.order.length < params.per_page),
                 },
-            },
-            {
-                type: SearchTypes.SEARCH_POSTS_SUCCESS,
             },
         ], 'SEARCH_POST_BATCH'));
 
@@ -117,8 +107,6 @@ export function getFlaggedPosts(): ActionFunc {
         const userId = getCurrentUserId(state);
         const teamId = getCurrentTeamId(state);
 
-        dispatch({type: SearchTypes.SEARCH_FLAGGED_POSTS_REQUEST});
-
         let posts;
         try {
             posts = await Client4.getFlaggedPosts(userId, '', teamId);
@@ -126,10 +114,7 @@ export function getFlaggedPosts(): ActionFunc {
             await Promise.all([getProfilesAndStatusesForPosts(posts.posts, dispatch, getState) as any, dispatch(getMissingChannelsFromPosts(posts.posts)) as any]);
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch, getState);
-            dispatch(batchActions([
-                {type: SearchTypes.SEARCH_FLAGGED_POSTS_FAILURE, error},
-                logError(error),
-            ]));
+            dispatch(logError(error));
             return {error};
         }
 
@@ -139,9 +124,6 @@ export function getFlaggedPosts(): ActionFunc {
                 data: posts,
             },
             receivedPosts(posts),
-            {
-                type: SearchTypes.SEARCH_FLAGGED_POSTS_SUCCESS,
-            },
         ], 'SEARCH_FLAGGED_POSTS_BATCH'));
 
         return {data: posts};
@@ -150,8 +132,6 @@ export function getFlaggedPosts(): ActionFunc {
 
 export function getPinnedPosts(channelId: string): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
-        dispatch({type: SearchTypes.SEARCH_PINNED_POSTS_REQUEST});
-
         let result;
         try {
             result = await Client4.getPinnedPosts(channelId);
@@ -162,10 +142,7 @@ export function getPinnedPosts(channelId: string): ActionFunc {
             await Promise.all(arr);
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch, getState);
-            dispatch(batchActions([
-                {type: SearchTypes.SEARCH_PINNED_POSTS_FAILURE, error},
-                logError(error),
-            ]));
+            dispatch(logError(error));
             return {error};
         }
 
@@ -178,9 +155,6 @@ export function getPinnedPosts(channelId: string): ActionFunc {
                 },
             },
             receivedPosts(result),
-            {
-                type: SearchTypes.SEARCH_PINNED_POSTS_SUCCESS,
-            },
         ], 'SEARCH_PINNED_POSTS_BATCH'));
 
         return {data: result};
@@ -205,8 +179,6 @@ export function getRecentMentions(): ActionFunc {
         const state = getState();
         const teamId = getCurrentTeamId(state);
 
-        dispatch({type: SearchTypes.SEARCH_RECENT_MENTIONS_REQUEST});
-
         let posts;
         try {
             const termKeys = getCurrentUserMentionKeys(state).filter(({key}) => {
@@ -224,10 +196,7 @@ export function getRecentMentions(): ActionFunc {
             await Promise.all(arr);
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch, getState);
-            dispatch(batchActions([
-                {type: SearchTypes.SEARCH_RECENT_MENTIONS_FAILURE, error},
-                logError(error),
-            ]));
+            dispatch(logError(error));
             return {error};
         }
 
@@ -237,9 +206,6 @@ export function getRecentMentions(): ActionFunc {
                 data: posts,
             },
             receivedPosts(posts),
-            {
-                type: SearchTypes.SEARCH_RECENT_MENTIONS_SUCCESS,
-            },
         ], 'SEARCH_RECENT_MENTIONS_BATCH'));
 
         return {data: posts};
