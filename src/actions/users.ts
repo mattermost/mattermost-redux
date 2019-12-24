@@ -73,6 +73,30 @@ export function createUser(user: UserProfile, token: string, inviteId: string, r
     };
 }
 
+export function casLogIn(queryString: string): ActionFunc {
+    return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
+        dispatch({type: UserTypes.LOGIN_REQUEST, data: null}, getState);
+
+        const deviceId = getState().entities.general.deviceToken;
+        let data;
+
+        try {
+            data = await Client4.casLogIn(queryString);
+        } catch (error) {
+            dispatch(batchActions([
+                {
+                    type: UserTypes.LOGIN_FAILURE,
+                    error,
+                },
+                logError(error),
+            ]), getState);
+            return {error};
+        }
+
+        return completeLogin(data)(dispatch, getState);
+    };
+}
+
 export function login(loginId: string, password: string, mfaToken = '', ldapOnly = false): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         dispatch({type: UserTypes.LOGIN_REQUEST, data: null});
@@ -121,7 +145,7 @@ export function loginById(id: string, password: string, mfaToken = ''): ActionFu
     };
 }
 
-function completeLogin(data: UserProfile): ActionFunc {
+export function completeLogin(data: UserProfile): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         dispatch({
             type: UserTypes.RECEIVED_ME,
