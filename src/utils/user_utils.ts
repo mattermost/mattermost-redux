@@ -51,6 +51,10 @@ export function isAdmin(roles: string): boolean {
     return isSystemAdmin(roles) || isTeamAdmin(roles);
 }
 
+export function isGuest(roles: string): boolean {
+    return rolesIncludePermission(roles, 'system_guest');
+}
+
 export function isTeamAdmin(roles: string): boolean {
     return rolesIncludePermission(roles, General.TEAM_ADMIN_ROLE);
 }

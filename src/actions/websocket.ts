@@ -21,13 +21,13 @@ import {ActionFunc, DispatchFunc, GetStateFunc, PlatformType, batchActions} from
 
 import {getTeam, getMyTeamUnreads, getMyTeams, getMyTeamMembers} from './teams';
 import {getPost, getPosts, getProfilesAndStatusesForPosts, getCustomEmojiForReaction, getUnreadPostData, handleNewPost, postDeleted, receivedPost} from './posts';
-import {fetchMyChannelsAndMembers, getChannelAndMyMember, getChannelStats, markChannelAsRead, getChannelMembers} from './channels';
+import {fetchMyChannelsAndMembers, getChannelAndMyMember, getChannelStats, markChannelAsRead} from './channels';
 import {checkForModifiedUsers, getMe, getProfilesByIds, getStatusesByIds, loadProfilesForDirect} from './users';
 import {loadRolesIfNeeded} from './roles';
 import {Channel, ChannelMembership} from 'types/channels';
 import {Dictionary} from 'types/utilities';
 import {PreferenceType} from 'types/preferences';
-import {rolesIncludePermission} from 'utils/user_utils';
+import {isGuest} from 'utils/user_utils';
 let doDispatch: DispatchFunc;
 export function init(platform: PlatformType, siteUrl: string | undefined | null, token: string | undefined | null, optionalWebSocket: any, additionalOptions: any = {}) {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
@@ -485,9 +485,8 @@ function handleUserRemovedEvent(msg: WebSocketMessage) {
 
         if (msg.data.user_id !== currentUser.id) {
             const members = getChannelMembersInChannels(state);
-            const currentUserIsGuest = rolesIncludePermission(currentUser.roles, 'system_guest');
             const isMember = Object.values(members).some((member) => member[msg.data.user_id]);
-            if (channel && currentUserIsGuest && !isMember) {
+            if (channel && isGuest(currentUser.roles) && !isMember) {
                 const actions = [
                     {
                         type: UserTypes.PROFILE_NO_LONGER_VISIBLE,
