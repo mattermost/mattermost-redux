@@ -100,31 +100,6 @@ export type FilesRequestsStatuses = {
     uploadFiles: RequestStatusType;
 };
 
-export type IntegrationsRequestsStatuses = {
-    createIncomingHook: RequestStatusType;
-    getIncomingHooks: RequestStatusType;
-    deleteIncomingHook: RequestStatusType;
-    updateIncomingHook: RequestStatusType;
-    createOutgoingHook: RequestStatusType;
-    getOutgoingHooks: RequestStatusType;
-    deleteOutgoingHook: RequestStatusType;
-    updateOutgoingHook: RequestStatusType;
-    getCommands: RequestStatusType;
-    getAutocompleteCommands: RequestStatusType;
-    getCustomTeamCommands: RequestStatusType;
-    addCommand: RequestStatusType;
-    regenCommandToken: RequestStatusType;
-    editCommand: RequestStatusType;
-    deleteCommand: RequestStatusType;
-    addOAuthApp: RequestStatusType;
-    updateOAuthApp: RequestStatusType;
-    getOAuthApp: RequestStatusType;
-    getOAuthApps: RequestStatusType;
-    deleteOAuthApp: RequestStatusType;
-    executeCommand: RequestStatusType;
-    submitInteractiveDialog: RequestStatusType;
-};
-
 export type RolesRequestsStatuses = {
     getRolesByNames: RequestStatusType;
     getRoleByName: RequestStatusType;
