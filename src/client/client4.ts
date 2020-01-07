@@ -1120,6 +1120,17 @@ export default class Client4 {
         );
     };
 
+    addUsersToTeamGracefully = async (teamId: string, userIds: string[]) => {
+        this.trackEvent('api', 'api_teams_batch_add_members', {team_id: teamId, count: userIds.length});
+
+        const members: any = [];
+        userIds.forEach((id) => members.push({team_id: teamId, user_id: id}));
+        return this.doFetch(
+            `${this.getTeamMembersRoute(teamId)}/batch?graceful=true`,
+            {method: 'post', body: JSON.stringify(members)}
+        );
+    };
+
     joinTeam = async (inviteId: string) => {
         const query = buildQueryString({invite_id: inviteId});
         return this.doFetch(
@@ -2921,6 +2932,28 @@ export default class Client4 {
             {method: 'get'},
         );
     }
+
+    getSamlMetadataFromIdp = async (samlMetadataURL: string) => {
+        return this.doFetch(
+            `${this.getBaseRoute()}/saml/metadatafromidp`, {method: 'post', body: JSON.stringify({saml_metadata_url: samlMetadataURL})}
+        );
+    };
+
+    setSamlIdpCertificateFromMetadata = async (certData: string) => {
+        const request: any = {
+            method: 'post',
+            body: certData,
+        };
+
+        request.headers = {
+            'Content-Type': 'application/x-pem-file',
+        };
+
+        return this.doFetch(
+            `${this.getBaseRoute()}/saml/certificate/idp`,
+            request
+        );
+    };
 
     // Client Helpers
 

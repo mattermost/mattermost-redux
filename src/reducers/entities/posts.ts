@@ -1110,9 +1110,10 @@ function storeOpenGraphForPost(state: any, post: Post) {
             return nextState;
         }
 
+        const postIdState = nextState[post.id] ? {...nextState[post.id], [embed.url]: embed.data} : {[embed.url]: embed.data};
         return {
             ...nextState,
-            [embed.url]: embed.data,
+            [post.id]: postIdState,
         };
     }, state);
 }

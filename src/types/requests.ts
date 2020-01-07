@@ -132,20 +132,6 @@ export type RolesRequestsStatuses = {
     editRole: RequestStatusType;
 };
 
-export type GroupsRequestsStatuses = {
-    linkGroupSyncable: RequestStatusType;
-    unlinkGroupSyncable: RequestStatusType;
-    getGroupSyncables: RequestStatusType;
-    getGroupMembers: RequestStatusType;
-    getGroup: RequestStatusType;
-    getAllGroupsAssociatedToTeam: RequestStatusType;
-    getAllGroupsAssociatedToChannel: RequestStatusType;
-    getGroupsAssociatedToTeam: RequestStatusType;
-    getGroupsAssociatedToChannel: RequestStatusType;
-    getGroupsNotAssociatedToTeam: RequestStatusType;
-    getGroupsNotAssociatedToChannel: RequestStatusType;
-};
-
 export type JobsRequestsStatuses = {
     createJob: RequestStatusType;
     getJob: RequestStatusType;

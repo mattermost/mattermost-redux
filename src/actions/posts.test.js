@@ -1171,6 +1171,11 @@ describe('Actions.Posts', () => {
                 users: {
                     currentUserId: userId,
                 },
+                posts: {
+                    posts: {
+                        [postId]: {id: postId, msg: 'test message', create_at: 123, delete_at: 0, channel_id: channelId},
+                    },
+                },
             },
         });
 

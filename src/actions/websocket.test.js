@@ -15,6 +15,7 @@ import * as PreferenceActions from 'actions/preferences';
 import * as TeamActions from 'actions/teams';
 import * as UserActions from 'actions/users';
 import EventEmitter from 'utils/event_emitter';
+import {loadRolesIfNeeded as mockLoadRolesIfNeeded} from 'actions/roles';
 
 import {Client4} from 'client';
 import {General, Posts, RequestStatus, WebsocketEvents} from '../constants';
@@ -27,6 +28,10 @@ import {
 } from 'action_types';
 import TestHelper from 'test/test_helper';
 import configureStore from 'test/test_store';
+
+jest.mock('actions/roles', () => ({
+    loadRolesIfNeeded: jest.fn((...args) => ({type: 'MOCK_LOAD_ROLES_IF_NEEDED', args})),
+}));
 
 describe('Actions.Websocket', () => {
     let store;
@@ -104,7 +109,6 @@ describe('Actions.Websocket', () => {
         PostSelectors.getPost.mockReturnValueOnce(true);
         mockServer.emit('message', JSON.stringify(messageFor(otherChannelId)));
         expect(emit).not.toHaveBeenCalled();
-
 
         // Post exists and is for current channel
         PostSelectors.getPost.mockReturnValueOnce(true);
@@ -190,6 +194,59 @@ describe('Actions.Websocket', () => {
         assert.equal(state.entities.channels.myMembers[channelId].last_viewed_at, 25);
         assert.equal(state.entities.teams.myMembers[teamId].msg_count, 3);
         assert.equal(state.entities.teams.myMembers[teamId].mention_count, 2);
+    });
+
+    it('Websocket handle Post Unread When marked on the same client', async () => {
+        const teamId = TestHelper.generateId();
+        const channelId = TestHelper.generateId();
+        const userId = TestHelper.generateId();
+
+        store = await configureStore({
+            entities: {
+                channels: {
+                    channels: {
+                        [channelId]: {id: channelId},
+                    },
+                    myMembers: {
+                        [channelId]: {msg_count: 5, mention_count: 4, last_viewed_at: 14},
+                    },
+                    manuallyUnread: {
+                        [channelId]: true,
+                    },
+                },
+                teams: {
+                    myMembers: {
+                        [teamId]: {msg_count: 5, mention_count: 4},
+                    },
+                },
+            },
+        });
+        await store.dispatch(Actions.init(
+            'web',
+            null,
+            null,
+            MockWebSocket
+        ));
+
+        mockServer.emit('message', JSON.stringify({
+            event: WebsocketEvents.POST_UNREAD,
+            data: {
+                last_viewed_at: 25,
+                msg_count: 5,
+                mention_count: 4,
+                delta_msg: 1,
+            },
+            broadcast: {omit_users: null, user_id: userId, channel_id: channelId, team_id: teamId},
+            seq: 17,
+        }));
+
+        const state = store.getState();
+        assert.equal(state.entities.channels.manuallyUnread[channelId], true);
+        assert.equal(state.entities.channels.myMembers[channelId].msg_count, 5);
+        assert.equal(state.entities.channels.myMembers[channelId].mention_count, 4);
+        assert.equal(state.entities.channels.myMembers[channelId].last_viewed_at, 14);
+        assert.equal(state.entities.teams.myMembers[teamId].msg_count, 5);
+        assert.equal(state.entities.teams.myMembers[teamId].mention_count, 4);
     });
 
     it('Websocket Handle Reaction Added to Post', (done) => {
@@ -318,6 +375,23 @@ describe('Actions.Websocket', () => {
             const profiles = entities.users.profiles;
 
             assert.strictEqual(profiles[user.id].first_name, 'tester4');
+        });
+    });
+
+    it('Websocket Handle Channel Member Updated', async () => {
+        const channelMember = TestHelper.basicChannelMember;
+        channelMember.roles = "channel_user channel_admin"
+        mockServer.emit('message', JSON.stringify({
+            event: WebsocketEvents.CHANNEL_MEMBER_UPDATED, 
+            data: { 
+                channelMember: JSON.stringify(channelMember)
+            }
+        }));
+        expect(mockLoadRolesIfNeeded).toHaveBeenCalledTimes(1);
+        expect(mockLoadRolesIfNeeded).toHaveBeenCalledWith(channelMember.roles.split(' '));
+        store.subscribe(() => {
+            const state = store.getState();
+            expect(state.entities.channels.membersInChannel[channelMember.channel_id][channelMember.user_id].roles).toEqual("channel_user channel_admin");
         });
     });
 
