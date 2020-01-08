@@ -69,10 +69,14 @@ function addProfileToSet(state: RelationOneToMany<Team, UserProfile>, action: Ge
 
 function removeProfileFromTeams(state: RelationOneToMany<Team, UserProfile>, action: GenericAction) {
     const newState = {...state};
+    let removed = false;
     Object.keys(state).forEach((key) => {
-        delete newState[key][action.data.user_id];
+        if (newState[key][action.data.user_id]) {
+            delete newState[key][action.data.user_id];
+            removed = true;
+        }
     });
-    return newState;
+    return removed ? newState : state;
 }
 
 function removeProfileFromSet(state: RelationOneToMany<Team, UserProfile>, action: GenericAction) {
@@ -187,9 +191,12 @@ function profiles(state: IDMappedObjects<UserProfile> = {}, action: GenericActio
         };
     }
     case UserTypes.PROFILE_NO_LONGER_VISIBLE: {
-        const newState = {...state};
-        delete newState[action.data.user_id];
-        return newState;
+        if (state[action.data.user_id]) {
+            const newState = {...state};
+            delete newState[action.data.user_id];
+            return newState;
+        }
+        return state;
     }
     default:
         return state;
@@ -367,9 +374,12 @@ function statuses(state: RelationOneToOne<UserProfile, string> = {}, action: Gen
     case UserTypes.LOGOUT_SUCCESS:
         return {};
     case UserTypes.PROFILE_NO_LONGER_VISIBLE: {
-        const newState = {...state};
-        delete newState[action.data.user_id];
-        return newState;
+        if (state[action.data.user_id]) {
+            const newState = {...state};
+            delete newState[action.data.user_id];
+            return newState;
+        }
+        return state;
     }
     default:
         return state;
