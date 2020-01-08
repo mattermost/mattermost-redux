@@ -2933,6 +2933,28 @@ export default class Client4 {
         );
     }
 
+    getSamlMetadataFromIdp = async (samlMetadataURL: string) => {
+        return this.doFetch(
+            `${this.getBaseRoute()}/saml/metadatafromidp`, {method: 'post', body: JSON.stringify({saml_metadata_url: samlMetadataURL})}
+        );
+    };
+
+    setSamlIdpCertificateFromMetadata = async (certData: string) => {
+        const request: any = {
+            method: 'post',
+            body: certData,
+        };
+
+        request.headers = {
+            'Content-Type': 'application/x-pem-file',
+        };
+
+        return this.doFetch(
+            `${this.getBaseRoute()}/saml/certificate/idp`,
+            request
+        );
+    };
+
     // Client Helpers
 
     doFetch = async (url: string, options: Options) => {

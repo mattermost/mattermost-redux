@@ -15,6 +15,7 @@ import * as PreferenceActions from 'actions/preferences';
 import * as TeamActions from 'actions/teams';
 import * as UserActions from 'actions/users';
 import EventEmitter from 'utils/event_emitter';
+import {loadRolesIfNeeded as mockLoadRolesIfNeeded} from 'actions/roles';
 
 import {Client4} from 'client';
 import {General, Posts, RequestStatus, WebsocketEvents} from '../constants';
@@ -27,6 +28,10 @@ import {
 } from 'action_types';
 import TestHelper from 'test/test_helper';
 import configureStore from 'test/test_store';
+
+jest.mock('actions/roles', () => ({
+    loadRolesIfNeeded: jest.fn((...args) => ({type: 'MOCK_LOAD_ROLES_IF_NEEDED', args})),
+}));
 
 describe('Actions.Websocket', () => {
     let store;
@@ -360,6 +365,25 @@ describe('Actions.Websocket', () => {
         assert.ok(profilesNotInChannel[TestHelper.basicChannel.id].has(user.id));
     });
 
+    it('Websocket Handle User Removed when Current is Guest', async () => {
+        const basicGuestUser = TestHelper.fakeUserWithId();
+        basicGuestUser.roles = 'system_guest';
+
+        const user = {...TestHelper.fakeUser(), id: TestHelper.generateId()};
+
+        // add user first
+        store.dispatch({type: UserTypes.RECEIVED_PROFILE_IN_CHANNEL, data: {id: TestHelper.basicChannel.id, user_id: user.id}});
+        mockServer.emit('message', JSON.stringify({event: WebsocketEvents.USER_ADDED, data: {team_id: TestHelper.basicTeam.id, user_id: user.id}, broadcast: {omit_users: null, user_id: '', channel_id: TestHelper.basicChannel.id, team_id: ''}, seq: 42}));
+
+        assert.ok(store.getState().entities.users.profilesInChannel[TestHelper.basicChannel.id].has(user.id));
+
+        // remove user
+        store.dispatch({type: UserTypes.RECEIVED_PROFILE_NOT_IN_CHANNEL, data: {id: TestHelper.basicChannel.id, user_id: user.id}});
+        mockServer.emit('message', JSON.stringify({event: WebsocketEvents.USER_REMOVED, data: {remover_id: basicGuestUser.id, user_id: user.id}, broadcast: {omit_users: null, user_id: '', channel_id: TestHelper.basicChannel.id, team_id: ''}, seq: 42}));
+
+        assert.ok(!store.getState().entities.users.profilesInChannel[TestHelper.basicChannel.id].has(user.id));
+    });
+
     it('Websocket Handle User Updated', async () => {
         const user = {...TestHelper.fakeUser(), id: TestHelper.generateId()};
         mockServer.emit('message', JSON.stringify({event: WebsocketEvents.USER_UPDATED, data: {user: {id: user.id, create_at: 1495570297229, update_at: 1508253268652, delete_at: 0, username: 'tim', auth_data: '', auth_service: '', email: 'tim@bladekick.com', nickname: '', first_name: 'tester4', last_name: '', position: '', roles: 'system_user', locale: 'en'}}, broadcast: {omit_users: null, user_id: '', channel_id: '', team_id: ''}, seq: 53}));
@@ -370,6 +394,23 @@ describe('Actions.Websocket', () => {
             const profiles = entities.users.profiles;
 
             assert.strictEqual(profiles[user.id].first_name, 'tester4');
+        });
+    });
+
+    it('Websocket Handle Channel Member Updated', async () => {
+        const channelMember = TestHelper.basicChannelMember;
+        channelMember.roles = 'channel_user channel_admin';
+        mockServer.emit('message', JSON.stringify({
+            event: WebsocketEvents.CHANNEL_MEMBER_UPDATED,
+            data: {
+                channelMember: JSON.stringify(channelMember),
+            },
+        }));
+        expect(mockLoadRolesIfNeeded).toHaveBeenCalledTimes(1);
+        expect(mockLoadRolesIfNeeded).toHaveBeenCalledWith(channelMember.roles.split(' '));
+        store.subscribe(() => {
+            const state = store.getState();
+            expect(state.entities.channels.membersInChannel[channelMember.channel_id][channelMember.user_id].roles).toEqual('channel_user channel_admin');
         });
     });
 

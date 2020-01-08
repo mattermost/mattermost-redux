@@ -447,7 +447,10 @@ describe('Selectors.Users', () => {
                     config: {
                         TeammateNameDisplay: General.TEAMMATE_NAME_DISPLAY.SHOW_USERNAME, 
                         LockTeammateNameDisplay: 'false', 
-                    }
+                    },
+                    license: {
+                        LockTeammateNameDisplay: 'true',
+                    },
                 },
             },
         };
