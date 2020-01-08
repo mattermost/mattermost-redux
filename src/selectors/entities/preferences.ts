@@ -225,3 +225,30 @@ export const getSidebarPreferences = reselect.createSelector(
         return sidebarPrefs;
     }
 );
+
+export const getNewSidebarPreference = reselect.createSelector(
+    (state: GlobalState) => {
+        const config = getConfig(state);
+        return config.ExperimentalChannelSidebarOrganization;
+    },
+    (state) => {
+        return get(
+            state,
+            Preferences.CATEGORY_SIDEBAR_SETTINGS,
+            Preferences.CHANNEL_SIDEBAR_ORGANIZATION,
+            null
+        );
+    },
+    (globalSetting, userSetting) => {
+        switch (globalSetting) {
+        case General.DISABLED:
+            return false;
+        case General.DEFAULT_ON:
+            return userSetting ? (userSetting === 'true') : true;
+        case General.DEFAULT_OFF:
+            return userSetting ? (userSetting === 'true') : false;
+        default:
+            return false;
+        }
+    }
+);

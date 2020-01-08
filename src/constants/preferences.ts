@@ -33,6 +33,7 @@ const Preferences: Dictionary<any> = {
     MENTION_KEYS: 'mention_keys',
     USE_MILITARY_TIME: 'use_military_time',
     CATEGORY_SIDEBAR_SETTINGS: 'sidebar_settings',
+    CHANNEL_SIDEBAR_ORGANIZATION: 'channel_sidebar_organization',
     CATEGORY_ADVANCED_SETTINGS: 'advanced_settings',
     ADVANCED_FILTER_JOIN_LEAVE: 'join_leave',
     ADVANCED_CODE_BLOCK_ON_CTRL_ENTER: 'code_block_ctrl_enter',
