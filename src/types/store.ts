@@ -15,7 +15,7 @@ import {EmojisState} from './emojis';
 import {SchemesState} from './schemes';
 import {Typing} from './typing';
 import {GroupsState} from './groups';
-import {ChannelsRequestsStatuses, GeneralRequestsStatuses, PostsRequestsStatuses, TeamsRequestsStatuses, UsersRequestsStatuses, AdminRequestsStatuses, FilesRequestsStatuses, IntegrationsRequestsStatuses, RolesRequestsStatuses, SchemesRequestsStatuses, JobsRequestsStatuses, SearchRequestsStatuses} from './requests';
+import {ChannelsRequestsStatuses, GeneralRequestsStatuses, PostsRequestsStatuses, TeamsRequestsStatuses, UsersRequestsStatuses, AdminRequestsStatuses, FilesRequestsStatuses, RolesRequestsStatuses, SchemesRequestsStatuses, JobsRequestsStatuses, SearchRequestsStatuses} from './requests';
 import {Role} from './roles';
 import {PreferenceType} from './preferences';
 import {Bot} from './bots';
@@ -65,7 +65,6 @@ export type GlobalState = {
         users: UsersRequestsStatuses;
         admin: AdminRequestsStatuses;
         files: FilesRequestsStatuses;
-        integrations: IntegrationsRequestsStatuses;
         roles: RolesRequestsStatuses;
         schemes: SchemesRequestsStatuses;
         jobs: JobsRequestsStatuses;

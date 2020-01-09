@@ -6,7 +6,7 @@ import websocketClient from '../client/websocket_client';
 
 import {ChannelTypes, GeneralTypes, EmojiTypes, PostTypes, PreferenceTypes, TeamTypes, UserTypes, RoleTypes, AdminTypes, IntegrationTypes} from 'action_types';
 import {General, WebsocketEvents, Preferences} from '../constants';
-import {getAllChannels, getChannel, getChannelsNameMapInTeam, getCurrentChannelId, getMyChannelMember, getRedirectChannelNameForTeam, getCurrentChannelStats, isManuallyUnread} from 'selectors/entities/channels';
+import {getAllChannels, getChannel, getChannelsNameMapInTeam, getCurrentChannelId, getMyChannelMember, getRedirectChannelNameForTeam, getCurrentChannelStats, getMyChannels, getChannelMembersInChannels, isManuallyUnread} from 'selectors/entities/channels';
 import {getConfig} from 'selectors/entities/general';
 import {getAllPosts, getPost as getPostSelector} from 'selectors/entities/posts';
 import {getDirectShowPreferences} from 'selectors/entities/preferences';
@@ -17,7 +17,7 @@ import {fromAutoResponder} from 'utils/post_utils';
 import EventEmitter from 'utils/event_emitter';
 import {getMyPreferences} from './preferences';
 
-import {ActionFunc, DispatchFunc, GetStateFunc, PlatformType} from 'types/actions';
+import {ActionFunc, DispatchFunc, GetStateFunc, PlatformType, batchActions} from 'types/actions';
 
 import {getTeam, getMyTeamUnreads, getMyTeams, getMyTeamMembers} from './teams';
 import {getPost, getPosts, getProfilesAndStatusesForPosts, getCustomEmojiForReaction, getUnreadPostData, handleNewPost, postDeleted, receivedPost} from './posts';
@@ -27,6 +27,7 @@ import {loadRolesIfNeeded} from './roles';
 import {Channel, ChannelMembership} from 'types/channels';
 import {Dictionary} from 'types/utilities';
 import {PreferenceType} from 'types/preferences';
+import {isGuest} from 'utils/user_utils';
 let doDispatch: DispatchFunc;
 export function init(platform: PlatformType, siteUrl: string | undefined | null, token: string | undefined | null, optionalWebSocket: any, additionalOptions: any = {}) {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
@@ -470,7 +471,7 @@ function handleUserRemovedEvent(msg: WebSocketMessage) {
         const channels = getAllChannels(state);
         const currentChannelId = getCurrentChannelId(state);
         const currentTeamId = getCurrentTeamId(state);
-        const currentUserId = getCurrentUserId(state);
+        const currentUser = getCurrentUser(state);
 
         dispatch({
             type: ChannelTypes.CHANNEL_MEMBER_REMOVED,
@@ -480,9 +481,27 @@ function handleUserRemovedEvent(msg: WebSocketMessage) {
             },
         }, getState);
 
-        if (msg.broadcast.user_id === currentUserId && currentTeamId) {
-            const channel = channels[currentChannelId];
+        const channel = channels[currentChannelId];
 
+        if (msg.data.user_id !== currentUser.id) {
+            const members = getChannelMembersInChannels(state);
+            const isMember = Object.values(members).some((member) => member[msg.data.user_id]);
+            if (channel && isGuest(currentUser.roles) && !isMember) {
+                const actions = [
+                    {
+                        type: UserTypes.PROFILE_NO_LONGER_VISIBLE,
+                        data: {user_id: msg.data.user_id},
+                    },
+                    {
+                        type: TeamTypes.REMOVE_MEMBER_FROM_TEAM,
+                        data: {team_id: channel.team_id, user_id: msg.data.user_id},
+                    },
+                ];
+                dispatch(batchActions(actions));
+            }
+        }
+
+        if (msg.broadcast.user_id === currentUser.id && currentTeamId) {
             dispatch(fetchMyChannelsAndMembers(currentTeamId));
 
             if (channel) {
@@ -490,7 +509,7 @@ function handleUserRemovedEvent(msg: WebSocketMessage) {
                     type: ChannelTypes.LEAVE_CHANNEL,
                     data: {
                         id: msg.data.channel_id,
-                        user_id: currentUserId,
+                        user_id: currentUser.id,
                         team_id: channel.team_id,
                         type: channel.type,
                     },
