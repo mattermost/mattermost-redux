@@ -8,7 +8,6 @@ import * as Actions from 'actions/integrations';
 import * as TeamsActions from 'actions/teams';
 import {Client4} from 'client';
 
-import {RequestStatus} from '../constants';
 import TestHelper from 'test/test_helper';
 import configureStore from 'test/test_store';
 
@@ -38,14 +37,10 @@ describe('Actions.Integrations', () => {
                 channel_id: TestHelper.basicChannel.id,
                 display_name: 'test',
                 description: 'test',
-            }
+            },
         )(store.dispatch, store.getState);
 
         const state = store.getState();
-        const request = state.requests.integrations.createIncomingHook;
-        if (request.status === RequestStatus.FAILURE) {
-            throw new Error(request.error);
-        }
 
         const hooks = state.entities.integrations.incomingHooks;
         assert.ok(hooks);
@@ -62,7 +57,7 @@ describe('Actions.Integrations', () => {
                 channel_id: TestHelper.basicChannel.id,
                 display_name: 'test',
                 description: 'test',
-            }
+            },
         )(store.dispatch, store.getState);
 
         nock(Client4.getIncomingHooksRoute()).
@@ -72,10 +67,6 @@ describe('Actions.Integrations', () => {
         await Actions.getIncomingHook(created.id)(store.dispatch, store.getState);
 
         const state = store.getState();
-        const request = state.requests.integrations.getIncomingHooks;
-        if (request.status === RequestStatus.FAILURE) {
-            throw new Error(request.error);
-        }
 
         const hooks = state.entities.integrations.incomingHooks;
         assert.ok(hooks);
@@ -92,7 +83,7 @@ describe('Actions.Integrations', () => {
                 channel_id: TestHelper.basicChannel.id,
                 display_name: 'test',
                 description: 'test',
-            }
+            },
         )(store.dispatch, store.getState);
 
         nock(Client4.getIncomingHooksRoute()).
@@ -103,10 +94,6 @@ describe('Actions.Integrations', () => {
         await Actions.getIncomingHooks(TestHelper.basicTeam.id)(store.dispatch, store.getState);
 
         const state = store.getState();
-        const request = state.requests.integrations.getIncomingHooks;
-        if (request.status === RequestStatus.FAILURE) {
-            throw new Error(request.error);
-        }
 
         const hooks = state.entities.integrations.incomingHooks;
         assert.ok(hooks);
@@ -123,7 +110,7 @@ describe('Actions.Integrations', () => {
                 channel_id: TestHelper.basicChannel.id,
                 display_name: 'test',
                 description: 'test',
-            }
+            },
         )(store.dispatch, store.getState);
 
         nock(Client4.getIncomingHooksRoute()).
@@ -133,10 +120,6 @@ describe('Actions.Integrations', () => {
         await Actions.removeIncomingHook(created.id)(store.dispatch, store.getState);
 
         const state = store.getState();
-        const request = state.requests.integrations.deleteIncomingHook;
-        if (request.status === RequestStatus.FAILURE) {
-            throw new Error('removeIncomingHook request failed');
-        }
 
         const hooks = state.entities.integrations.incomingHooks;
         assert.ok(!hooks[created.id]);
@@ -152,7 +135,7 @@ describe('Actions.Integrations', () => {
                 channel_id: TestHelper.basicChannel.id,
                 display_name: 'test',
                 description: 'test',
-            }
+            },
         )(store.dispatch, store.getState);
 
         const updated = {...created};
@@ -164,10 +147,6 @@ describe('Actions.Integrations', () => {
         await Actions.updateIncomingHook(updated)(store.dispatch, store.getState);
 
         const state = store.getState();
-        const request = state.requests.integrations.updateIncomingHook;
-        if (request.status === RequestStatus.FAILURE) {
-            throw new Error(request.error);
-        }
 
         const hooks = state.entities.integrations.incomingHooks;
         assert.ok(hooks[created.id]);
@@ -186,14 +165,10 @@ describe('Actions.Integrations', () => {
                 display_name: 'test',
                 trigger_words: [TestHelper.generateId()],
                 callback_urls: ['http://localhost/notarealendpoint'],
-            }
+            },
         )(store.dispatch, store.getState);
 
         const state = store.getState();
-        const request = state.requests.integrations.createOutgoingHook;
-        if (request.status === RequestStatus.FAILURE) {
-            throw new Error(request.error);
-        }
 
         const hooks = state.entities.integrations.outgoingHooks;
         assert.ok(hooks);
@@ -212,7 +187,7 @@ describe('Actions.Integrations', () => {
                 display_name: 'test',
                 trigger_words: [TestHelper.generateId()],
                 callback_urls: ['http://localhost/notarealendpoint'],
-            }
+            },
         )(store.dispatch, store.getState);
 
         nock(Client4.getOutgoingHooksRoute()).
@@ -222,10 +197,6 @@ describe('Actions.Integrations', () => {
         await Actions.getOutgoingHook(created.id)(store.dispatch, store.getState);
 
         const state = store.getState();
-        const request = state.requests.integrations.getOutgoingHooks;
-        if (request.status === RequestStatus.FAILURE) {
-            throw new Error(request.error);
-        }
 
         const hooks = state.entities.integrations.outgoingHooks;
         assert.ok(hooks);
@@ -244,7 +215,7 @@ describe('Actions.Integrations', () => {
                 display_name: 'test',
                 trigger_words: [TestHelper.generateId()],
                 callback_urls: ['http://localhost/notarealendpoint'],
-            }
+            },
         )(store.dispatch, store.getState);
 
         nock(Client4.getOutgoingHooksRoute()).
@@ -255,10 +226,6 @@ describe('Actions.Integrations', () => {
         await Actions.getOutgoingHooks(TestHelper.basicChannel.id)(store.dispatch, store.getState);
 
         const state = store.getState();
-        const request = state.requests.integrations.getOutgoingHooks;
-        if (request.status === RequestStatus.FAILURE) {
-            throw new Error(request.error);
-        }
 
         const hooks = state.entities.integrations.outgoingHooks;
         assert.ok(hooks);
@@ -277,7 +244,7 @@ describe('Actions.Integrations', () => {
                 display_name: 'test',
                 trigger_words: [TestHelper.generateId()],
                 callback_urls: ['http://localhost/notarealendpoint'],
-            }
+            },
         )(store.dispatch, store.getState);
 
         nock(Client4.getOutgoingHooksRoute()).
@@ -287,10 +254,6 @@ describe('Actions.Integrations', () => {
         await Actions.removeOutgoingHook(created.id)(store.dispatch, store.getState);
 
         const state = store.getState();
-        const request = state.requests.integrations.deleteOutgoingHook;
-        if (request.status === RequestStatus.FAILURE) {
-            throw new Error(request.error);
-        }
 
         const hooks = state.entities.integrations.outgoingHooks;
         assert.ok(!hooks[created.id]);
@@ -308,7 +271,7 @@ describe('Actions.Integrations', () => {
                 display_name: 'test',
                 trigger_words: [TestHelper.generateId()],
                 callback_urls: ['http://localhost/notarealendpoint'],
-            }
+            },
         )(store.dispatch, store.getState);
 
         const updated = {...created};
@@ -319,10 +282,6 @@ describe('Actions.Integrations', () => {
         await Actions.updateOutgoingHook(updated)(store.dispatch, store.getState);
 
         const state = store.getState();
-        const request = state.requests.integrations.updateOutgoingHook;
-        if (request.status === RequestStatus.FAILURE) {
-            throw new Error(request.error);
-        }
 
         const hooks = state.entities.integrations.outgoingHooks;
         assert.ok(hooks[created.id]);
@@ -341,7 +300,7 @@ describe('Actions.Integrations', () => {
                 display_name: 'test',
                 trigger_words: [TestHelper.generateId()],
                 callback_urls: ['http://localhost/notarealendpoint'],
-            }
+            },
         )(store.dispatch, store.getState);
 
         nock(Client4.getOutgoingHooksRoute()).
@@ -350,10 +309,6 @@ describe('Actions.Integrations', () => {
         await Actions.regenOutgoingHookToken(created.id)(store.dispatch, store.getState);
 
         const state = store.getState();
-        const request = state.requests.integrations.updateOutgoingHook;
-        if (request.status === RequestStatus.FAILURE) {
-            throw new Error(request.error);
-        }
 
         const hooks = state.entities.integrations.outgoingHooks;
         assert.ok(hooks[created.id]);
@@ -370,7 +325,7 @@ describe('Actions.Integrations', () => {
             reply(201, TestHelper.fakeTeamWithId());
 
         const {data: team} = await TeamsActions.createTeam(
-            TestHelper.fakeTeam()
+            TestHelper.fakeTeam(),
         )(store.dispatch, store.getState);
 
         const teamCommand = TestHelper.testCommand(team.id);
@@ -380,7 +335,7 @@ describe('Actions.Integrations', () => {
             reply(201, {...teamCommand, token: TestHelper.generateId(), id: TestHelper.generateId()});
 
         const {data: created} = await Actions.addCommand(
-            teamCommand
+            teamCommand,
         )(store.dispatch, store.getState);
 
         nock(Client4.getCommandsRoute()).
@@ -391,13 +346,8 @@ describe('Actions.Integrations', () => {
             }]);
 
         await Actions.getCommands(
-            team.id
+            team.id,
         )(store.dispatch, store.getState);
-
-        const request = store.getState().requests.integrations.getCommands;
-        if (request.status === RequestStatus.FAILURE) {
-            throw new Error(JSON.stringify(request.error));
-        }
 
         const teamCommands = store.getState().entities.integrations.commands;
         const executableCommands = store.getState().entities.integrations.executableCommands;
@@ -414,7 +364,7 @@ describe('Actions.Integrations', () => {
             reply(201, TestHelper.fakeTeamWithId());
 
         const {data: team} = await TeamsActions.createTeam(
-            TestHelper.fakeTeam()
+            TestHelper.fakeTeam(),
         )(store.dispatch, store.getState);
 
         const teamCommandWithAutocomplete = TestHelper.testCommand(team.id);
@@ -424,7 +374,7 @@ describe('Actions.Integrations', () => {
             reply(201, {...teamCommandWithAutocomplete, token: TestHelper.generateId(), id: TestHelper.generateId()});
 
         const {data: createdWithAutocomplete} = await Actions.addCommand(
-            teamCommandWithAutocomplete
+            teamCommandWithAutocomplete,
         )(store.dispatch, store.getState);
 
         nock(`${Client4.getTeamRoute(team.id)}/commands/autocomplete`).
@@ -435,13 +385,8 @@ describe('Actions.Integrations', () => {
             }]);
 
         await Actions.getAutocompleteCommands(
-            team.id
+            team.id,
         )(store.dispatch, store.getState);
-
-        const request = store.getState().requests.integrations.getAutocompleteCommands;
-        if (request.status === RequestStatus.FAILURE) {
-            throw new Error(JSON.stringify(request.error));
-        }
 
         const teamCommands = store.getState().entities.integrations.commands;
         const systemCommands = store.getState().entities.integrations.systemCommands;
@@ -454,7 +399,7 @@ describe('Actions.Integrations', () => {
             reply(201, TestHelper.fakeTeamWithId());
 
         const {data: team} = await TeamsActions.createTeam(
-            TestHelper.fakeTeam()
+            TestHelper.fakeTeam(),
         )(store.dispatch, store.getState);
 
         nock(Client4.getCommandsRoute()).
@@ -463,7 +408,7 @@ describe('Actions.Integrations', () => {
             reply(200, []);
 
         await Actions.getCustomTeamCommands(
-            team.id
+            team.id,
         )(store.dispatch, store.getState);
 
         const noCommands = store.getState().entities.integrations.commands;
@@ -476,7 +421,7 @@ describe('Actions.Integrations', () => {
             reply(201, {...command, token: TestHelper.generateId(), id: TestHelper.generateId()});
 
         const {data: created} = await Actions.addCommand(
-            command
+            command,
         )(store.dispatch, store.getState);
 
         nock(Client4.getCommandsRoute()).
@@ -485,13 +430,8 @@ describe('Actions.Integrations', () => {
             reply(200, []);
 
         await Actions.getCustomTeamCommands(
-            team.id
+            team.id,
         )(store.dispatch, store.getState);
-
-        const request = store.getState().requests.integrations.getCustomTeamCommands;
-        if (request.status === RequestStatus.FAILURE) {
-            throw new Error(JSON.stringify(request.error));
-        }
 
         const {commands} = store.getState().entities.integrations;
         assert.ok(commands[created.id]);
@@ -507,7 +447,7 @@ describe('Actions.Integrations', () => {
             reply(201, TestHelper.fakeTeamWithId());
 
         const {data: team} = await TeamsActions.createTeam(
-            TestHelper.fakeTeam()
+            TestHelper.fakeTeam(),
         )(store.dispatch, store.getState);
 
         const args = {
@@ -520,11 +460,6 @@ describe('Actions.Integrations', () => {
             reply(200, []);
 
         await Actions.executeCommand('/echo message 5', args);
-
-        const request = store.getState().requests.integrations.executeCommand;
-        if (request.status === RequestStatus.FAILURE) {
-            throw new Error(JSON.stringify(request.error));
-        }
     });
 
     it('addCommand', async () => {
@@ -533,7 +468,7 @@ describe('Actions.Integrations', () => {
             reply(201, TestHelper.fakeTeamWithId());
 
         const {data: team} = await TeamsActions.createTeam(
-            TestHelper.fakeTeam()
+            TestHelper.fakeTeam(),
         )(store.dispatch, store.getState);
 
         const expected = TestHelper.testCommand(team.id);
@@ -543,11 +478,6 @@ describe('Actions.Integrations', () => {
             reply(201, {...expected, token: TestHelper.generateId(), id: TestHelper.generateId()});
 
         const {data: created} = await Actions.addCommand(expected)(store.dispatch, store.getState);
-
-        const request = store.getState().requests.integrations.addCommand;
-        if (request.status === RequestStatus.FAILURE) {
-            throw new Error(JSON.stringify(request.error));
-        }
 
         const {commands} = store.getState().entities.integrations;
         assert.ok(commands[created.id]);
@@ -576,7 +506,7 @@ describe('Actions.Integrations', () => {
             reply(201, TestHelper.fakeTeamWithId());
 
         const {data: team} = await TeamsActions.createTeam(
-            TestHelper.fakeTeam()
+            TestHelper.fakeTeam(),
         )(store.dispatch, store.getState);
 
         const command = TestHelper.testCommand(team.id);
@@ -586,7 +516,7 @@ describe('Actions.Integrations', () => {
             reply(201, {...command, token: TestHelper.generateId(), id: TestHelper.generateId()});
 
         const {data: created} = await Actions.addCommand(
-            command
+            command,
         )(store.dispatch, store.getState);
 
         nock(Client4.getCommandsRoute()).
@@ -594,13 +524,8 @@ describe('Actions.Integrations', () => {
             reply(200, {...created, token: TestHelper.generateId()});
 
         await Actions.regenCommandToken(
-            created.id
+            created.id,
         )(store.dispatch, store.getState);
-
-        const request = store.getState().requests.integrations.regenCommandToken;
-        if (request.status === RequestStatus.FAILURE) {
-            throw new Error(JSON.stringify(request.error));
-        }
 
         const {commands} = store.getState().entities.integrations;
         assert.ok(commands[created.id]);
@@ -631,7 +556,7 @@ describe('Actions.Integrations', () => {
             reply(201, TestHelper.fakeTeamWithId());
 
         const {data: team} = await TeamsActions.createTeam(
-            TestHelper.fakeTeam()
+            TestHelper.fakeTeam(),
         )(store.dispatch, store.getState);
 
         const command = TestHelper.testCommand(team.id);
@@ -641,7 +566,7 @@ describe('Actions.Integrations', () => {
             reply(201, {...command, token: TestHelper.generateId(), id: TestHelper.generateId()});
 
         const {data: created} = await Actions.addCommand(
-            command
+            command,
         )(store.dispatch, store.getState);
 
         const expected = Object.assign({}, created);
@@ -655,13 +580,8 @@ describe('Actions.Integrations', () => {
             reply(200, {...expected, update_at: 123});
 
         await Actions.editCommand(
-            expected
+            expected,
         )(store.dispatch, store.getState);
-
-        const request = store.getState().requests.integrations.editCommand;
-        if (request.status === RequestStatus.FAILURE) {
-            throw new Error(JSON.stringify(request.error));
-        }
 
         const {commands} = store.getState().entities.integrations;
         assert.ok(commands[created.id]);
@@ -678,7 +598,7 @@ describe('Actions.Integrations', () => {
             reply(201, TestHelper.fakeTeamWithId());
 
         const {data: team} = await TeamsActions.createTeam(
-            TestHelper.fakeTeam()
+            TestHelper.fakeTeam(),
         )(store.dispatch, store.getState);
 
         const command = TestHelper.testCommand(team.id);
@@ -688,7 +608,7 @@ describe('Actions.Integrations', () => {
             reply(201, {...command, token: TestHelper.generateId(), id: TestHelper.generateId()});
 
         const {data: created} = await Actions.addCommand(
-            command
+            command,
         )(store.dispatch, store.getState);
 
         nock(Client4.getCommandsRoute()).
@@ -696,13 +616,8 @@ describe('Actions.Integrations', () => {
             reply(200, OK_RESPONSE);
 
         await Actions.deleteCommand(
-            created.id
+            created.id,
         )(store.dispatch, store.getState);
-
-        const request = store.getState().requests.integrations.deleteCommand;
-        if (request.status === RequestStatus.FAILURE) {
-            throw new Error(JSON.stringify(request.error));
-        }
 
         const {commands} = store.getState().entities.integrations;
         assert.ok(!commands[created.id]);
@@ -714,11 +629,6 @@ describe('Actions.Integrations', () => {
             reply(201, TestHelper.fakeOAuthAppWithId());
 
         const {data: created} = await Actions.addOAuthApp(TestHelper.fakeOAuthApp())(store.dispatch, store.getState);
-
-        const request = store.getState().requests.integrations.addOAuthApp;
-        if (request.status === RequestStatus.FAILURE) {
-            throw new Error(JSON.stringify(request.error));
-        }
 
         const {oauthApps} = store.getState().entities.integrations;
         assert.ok(oauthApps[created.id]);
@@ -736,11 +646,6 @@ describe('Actions.Integrations', () => {
             reply(200, created);
 
         await Actions.getOAuthApp(created.id)(store.dispatch, store.getState);
-
-        const request = store.getState().requests.integrations.getOAuthApp;
-        if (request.status === RequestStatus.FAILURE) {
-            throw new Error(JSON.stringify(request.error));
-        }
 
         const {oauthApps} = store.getState().entities.integrations;
         assert.ok(oauthApps[created.id]);
@@ -768,11 +673,6 @@ describe('Actions.Integrations', () => {
 
         await Actions.editOAuthApp(expected)(store.dispatch, store.getState);
 
-        const request = store.getState().requests.integrations.updateOAuthApp;
-        if (request.status === RequestStatus.FAILURE) {
-            throw new Error(JSON.stringify(request.error));
-        }
-
         const {oauthApps} = store.getState().entities.integrations;
         assert.ok(oauthApps[created.id]);
 
@@ -797,11 +697,6 @@ describe('Actions.Integrations', () => {
 
         await Actions.getOAuthApps()(store.dispatch, store.getState);
 
-        const request = store.getState().requests.integrations.getOAuthApps;
-        if (request.status === RequestStatus.FAILURE) {
-            throw new Error(JSON.stringify(request.error));
-        }
-
         const {oauthApps} = store.getState().entities.integrations;
         assert.ok(oauthApps);
     });
@@ -820,11 +715,6 @@ describe('Actions.Integrations', () => {
 
         await Actions.getAuthorizedOAuthApps()(store.dispatch, store.getState);
 
-        const request = store.getState().requests.integrations.getOAuthApps;
-        if (request.status === RequestStatus.FAILURE) {
-            throw new Error(JSON.stringify(request.error));
-        }
-
         const {oauthApps} = store.getState().entities.integrations;
         assert.ok(oauthApps);
     });
@@ -842,11 +732,6 @@ describe('Actions.Integrations', () => {
 
         await Actions.deleteOAuthApp(created.id)(store.dispatch, store.getState);
 
-        const request = store.getState().requests.integrations.deleteOAuthApp;
-        if (request.status === RequestStatus.FAILURE) {
-            throw new Error(JSON.stringify(request.error));
-        }
-
         const {oauthApps} = store.getState().entities.integrations;
         assert.ok(!oauthApps[created.id]);
     });
@@ -863,11 +748,6 @@ describe('Actions.Integrations', () => {
             reply(200, {...created, client_secret: TestHelper.generateId()});
 
         await Actions.regenOAuthAppSecret(created.id)(store.dispatch, store.getState);
-
-        const request = store.getState().requests.integrations.updateOAuthApp;
-        if (request.status === RequestStatus.FAILURE) {
-            throw new Error(JSON.stringify(request.error));
-        }
 
         const {oauthApps} = store.getState().entities.integrations;
         assert.ok(oauthApps[created.id].client_secret !== created.client_secret);
@@ -888,11 +768,6 @@ describe('Actions.Integrations', () => {
         };
 
         const {data} = await store.dispatch(Actions.submitInteractiveDialog(submit));
-
-        const request = store.getState().requests.integrations.submitInteractiveDialog;
-        if (request.status === RequestStatus.FAILURE) {
-            throw new Error(JSON.stringify(request.error));
-        }
 
         assert.ok(data.errors);
         assert.equal(data.errors.name, 'some error');
