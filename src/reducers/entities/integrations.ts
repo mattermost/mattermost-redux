@@ -42,7 +42,7 @@ function incomingHooks(state: IDMappedObjects<IncomingWebhook> = {}, action: Gen
 
         return state;
     }
-    case ChannelTypes.RECEIVED_CHANNEL_UNDELETED: {
+    case ChannelTypes.RECEIVED_CHANNEL_UNARCHIVED: {
         const nextState = {...state};
         let deleted = true;
         Object.keys(nextState).forEach((id) => {
@@ -101,7 +101,7 @@ function outgoingHooks(state: IDMappedObjects<OutgoingWebhook> = {}, action: Gen
 
         return state;
     }
-    case ChannelTypes.RECEIVED_CHANNEL_UNDELETED: {
+    case ChannelTypes.RECEIVED_CHANNEL_UNARCHIVED: {
         const nextState = {...state};
         let deleted = true;
         Object.keys(nextState).forEach((id) => {

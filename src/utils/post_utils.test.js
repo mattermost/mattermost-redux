@@ -313,7 +313,7 @@ describe('PostUtils', () => {
                 {input: {type: ''}, output: false},
 
                 {input: {type: PostTypes.CHANNEL_DELETED}, output: true},
-                {input: {type: PostTypes.CHANNEL_UNDELETED}, output: true},
+                {input: {type: PostTypes.CHANNEL_UNARCHIVED}, output: true},
                 {input: {type: PostTypes.DISPLAYNAME_CHANGE}, output: true},
                 {input: {type: PostTypes.CONVERT_CHANNEL}, output: true},
                 {input: {type: PostTypes.EPHEMERAL}, output: true},

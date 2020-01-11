@@ -365,7 +365,7 @@ describe('Actions.Websocket', () => {
         test();
     });
 
-    it('Websocket Handle Channel Undeleted', (done) => {
+    it('Websocket Handle Channel Unarchive', (done) => {
         async function test() {
             await store.dispatch(TeamActions.selectTeam(TestHelper.basicTeam));
             await store.dispatch(ChannelActions.selectChannel(TestHelper.basicChannel.id));
@@ -377,7 +377,7 @@ describe('Actions.Websocket', () => {
                 get(`/teams/${TestHelper.basicTeam.id}/channels/members`).
                 reply(201, [{user_id: TestHelper.basicUser.id, channel_id: TestHelper.basicChannel.id}]);
 
-            mockServer.emit('message', JSON.stringify({event: WebsocketEvents.CHANNEL_UNDELETED, data: {channel_id: TestHelper.basicChannel.id}, broadcast: {omit_users: null, user_id: '', channel_id: '', team_id: TestHelper.basicTeam.id}, seq: 68}));
+            mockServer.emit('message', JSON.stringify({event: WebsocketEvents.CHANNEL_UNARCHIVE, data: {channel_id: TestHelper.basicChannel.id}, broadcast: {omit_users: null, user_id: '', channel_id: '', team_id: TestHelper.basicTeam.id}, seq: 68}));
 
             setTimeout(() => {
                 const state = store.getState();

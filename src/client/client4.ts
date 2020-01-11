@@ -1316,8 +1316,8 @@ export default class Client4 {
         );
     };
 
-    undeleteChannel = async (channelId: string) => {
-        this.trackEvent('api', 'api_channels_undelete', {channel_id: channelId});
+    unarchiveChannel = async (channelId: string) => {
+        this.trackEvent('api', 'api_channels_unarchive', {channel_id: channelId});
 
         return this.doFetch(
             `${this.getChannelRoute(channelId)}/restore`,

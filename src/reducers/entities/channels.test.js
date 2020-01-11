@@ -76,7 +76,7 @@ describe('channels', () => {
         });
     });
 
-    describe('RECEIVED_CHANNEL_UNDELETED', () => {
+    describe('RECEIVED_CHANNEL_UNARCHIVED', () => {
         test('should mark channel as active', () => {
             const state = deepFreeze({
                 channelsInTeam: {},
@@ -99,7 +99,7 @@ describe('channels', () => {
             });
 
             const nextState = channelsReducer(state, {
-                type: ChannelTypes.RECEIVED_CHANNEL_UNDELETED,
+                type: ChannelTypes.RECEIVED_CHANNEL_UNARCHIVED,
                 data: {
                     id: 'channel1',
                 },
@@ -134,7 +134,7 @@ describe('channels', () => {
             });
 
             const nextState = channelsReducer(state, {
-                type: ChannelTypes.RECEIVED_CHANNEL_UNDELETED,
+                type: ChannelTypes.RECEIVED_CHANNEL_UNARCHIVED,
                 data: {
                     id: 'channel3',
                 },

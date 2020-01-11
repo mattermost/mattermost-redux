@@ -489,7 +489,7 @@ describe('Actions.Channels', () => {
         assert.ifError(outgoingHooks[outgoingHook.id]);
     });
     
-    it('undeleteChannel', async () => {
+    it('unarchiveChannel', async () => {
         const secondClient = TestHelper.createClient4();
 
         nock(Client4.getUsersRoute()).

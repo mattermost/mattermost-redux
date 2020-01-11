@@ -724,13 +724,13 @@ export function deleteChannel(channelId: string): ActionFunc {
     };
 }
 
-export function undeleteChannel(channelId: string): ActionFunc {
+export function unarchiveChannel(channelId: string): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         let state = getState();
         const viewArchivedChannels = state.entities.general.config.ExperimentalViewArchivedChannels === 'true';
 
         try {
-            await Client4.undeleteChannel(channelId);
+            await Client4.unarchiveChannel(channelId);
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch, getState);
             dispatch(logError(error));
@@ -748,7 +748,7 @@ export function undeleteChannel(channelId: string): ActionFunc {
             }
         }
 
-        dispatch({type: ChannelTypes.UNDELETE_CHANNEL_SUCCESS, data: {id: channelId, viewArchivedChannels}}, getState);
+        dispatch({type: ChannelTypes.UNARCHIVED_CHANNEL_SUCCESS, data: {id: channelId, viewArchivedChannels}}, getState);
 
         return {data: true};
     };
@@ -1470,7 +1470,7 @@ export default {
     leaveChannel,
     joinChannel,
     deleteChannel,
-    undeleteChannel,
+    unarchiveChannel,
     viewChannel,
     markChannelAsViewed,
     getChannels,
