@@ -384,7 +384,7 @@ describe('Actions.Websocket', () => {
                 const entities = state.entities;
                 const {channels, currentChannelId} = entities.channels;
 
-                assert.ok(channels[currentChannelId].name === General.DEFAULT_CHANNEL);
+                assert.ok(channels[currentChannelId].delete_at === 0);
                 done();
             }, 500);
         }

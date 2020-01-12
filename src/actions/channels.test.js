@@ -580,7 +580,7 @@ describe('Actions.Channels', () => {
             delete(`/${secondChannel.id}`).
             reply(200, OK_RESPONSE);
 
-        await store.dispatch(Actions.undeleteChannel(secondChannel.id));
+        await store.dispatch(Actions.unarchiveChannel(secondChannel.id));
 
         const {incomingHooks, outgoingHooks} = store.getState().entities.integrations;
 
