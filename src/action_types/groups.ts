@@ -29,4 +29,7 @@ export default keyMirror({
     RECEIVED_GROUPS_NOT_ASSOCIATED_TO_TEAM: null,
 
     RECEIVED_GROUPS_NOT_ASSOCIATED_TO_CHANNEL: null,
+
+    PATCHED_GROUP_TEAM: null,
+    PATCHED_GROUP_CHANNEL: null,
 });

@@ -637,5 +637,57 @@ describe('Actions.Groups', () => {
             assert.ok(expectedIDs.includes(id));
         });
     });
+
+    it('patchGroupSyncable', async () => {
+        const groupID = '5rgoajywb3nfbdtyafbod47rya';
+        const teamID = 'ge63nq31sbfy3duzq5f7yqn1kh';
+        const channelID = 'o3tdawqxot8kikzq8bk54zggbc';
+
+        const groupSyncablePatch = {
+            auto_add: true,
+            scheme_admin: true,
+        };
+
+        const groupTeamResponse = {
+            team_id: 'ge63nq31sbfy3duzq5f7yqn1kh',
+            group_id: '5rgoajywb3nfbdtyafbod47rya',
+            auto_add: true,
+            scheme_admin: true,
+            create_at: 1542643748412,
+            delete_at: 0,
+            update_at: 1542660566032,
+        };
+
+        const groupChannelResponse = {
+            channel_id: 'o3tdawqxot8kikzq8bk54zggbc',
+            group_id: '5rgoajywb3nfbdtyafbod47rya',
+            auto_add: true,
+            scheme_admin: true,
+            create_at: 1542644105041,
+            delete_at: 0,
+            update_at: 1542662607342,
+        };
+
+        nock(Client4.getBaseRoute()).
+            put(`/groups/${groupID}/teams/${teamID}/patch`).
+            reply(200, groupTeamResponse);
+
+        nock(Client4.getBaseRoute()).
+            put(`/groups/${groupID}/channels/${channelID}/patch`).
+            reply(200, groupChannelResponse);
+
+        await Actions.patchGroupSyncable(groupID, teamID, Groups.SYNCABLE_TYPE_TEAM, groupSyncablePatch)(store.dispatch, store.getState);
+        await Actions.patchGroupSyncable(groupID, channelID, Groups.SYNCABLE_TYPE_CHANNEL, groupSyncablePatch)(store.dispatch, store.getState);
+
+        const state = store.getState();
+        const groupSyncables = state.entities.groups.syncables[groupID];
+        assert.ok(groupSyncables);
+
+        assert.ok(groupSyncables.teams[0].auto_add === groupSyncablePatch.auto_add);
+        assert.ok(groupSyncables.channels[0].auto_add === groupSyncablePatch.auto_add);
+
+        assert.ok(groupSyncables.teams[0].scheme_admin === groupSyncablePatch.scheme_admin);
+        assert.ok(groupSyncables.channels[0].scheme_admin === groupSyncablePatch.scheme_admin);
+    });
 });
 
