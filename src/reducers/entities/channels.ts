@@ -8,6 +8,14 @@ import {Channel, ChannelMembership, ChannelStats} from 'types/channels';
 import {RelationOneToMany, RelationOneToOne, IDMappedObjects, UserIDMappedObjects} from 'types/utilities';
 import {Team} from 'types/teams';
 
+function removeMemberFromChannels(state: RelationOneToOne<Channel, UserIDMappedObjects<ChannelMembership>>, action: GenericAction) {
+    const nextState = {...state};
+    Object.keys(state).forEach((channel) => {
+        delete nextState[channel][action.data.user_id];
+    });
+    return nextState;
+}
+
 function channelListToSet(state: any, action: GenericAction) {
     const nextState = {...state};
     const teamChannelIds = nextState[action.teamId];
@@ -388,6 +396,10 @@ function membersInChannel(state: RelationOneToOne<Channel, UserIDMappedObjects<C
         }
         return nextState;
     }
+
+    case UserTypes.PROFILE_NO_LONGER_VISIBLE:
+        return removeMemberFromChannels(state, action);
+
     case ChannelTypes.LEAVE_CHANNEL:
     case ChannelTypes.REMOVE_MEMBER_FROM_CHANNEL:
     case UserTypes.RECEIVED_PROFILE_NOT_IN_CHANNEL: {

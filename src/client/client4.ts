@@ -2814,6 +2814,7 @@ export default class Client4 {
 
     getGroupsAssociatedToTeam = async (teamID: string, q = '', page = 0, perPage = PER_PAGE_DEFAULT) => {
         this.trackEvent('api', 'api_groups_get_associated_to_team', {team_id: teamID});
+
         return this.doFetch(
             `${this.getBaseRoute()}/teams/${teamID}/groups${buildQueryString({page, per_page: perPage, q, include_member_count: true})}`,
             {method: 'get'}
@@ -2822,6 +2823,7 @@ export default class Client4 {
 
     getGroupsAssociatedToChannel = async (channelID: string, q = '', page = 0, perPage = PER_PAGE_DEFAULT) => {
         this.trackEvent('api', 'api_groups_get_associated_to_channel', {channel_id: channelID});
+
         return this.doFetch(
             `${this.getBaseRoute()}/channels/${channelID}/groups${buildQueryString({page, per_page: perPage, q, include_member_count: true})}`,
             {method: 'get'}
@@ -2839,6 +2841,13 @@ export default class Client4 {
         return this.doFetch(
             `${this.getBaseRoute()}/channels/${channelID}/groups?paginate=false`,
             {method: 'get'}
+        );
+    };
+
+    patchGroupSyncable = async (groupID: string, syncableID: string, syncableType: string, patch: SyncablePatch) => {
+        return this.doFetch(
+            `${this.getBaseRoute()}/groups/${groupID}/${syncableType}s/${syncableID}/patch`,
+            {method: 'put', body: JSON.stringify(patch)}
         );
     };
 
@@ -2932,6 +2941,28 @@ export default class Client4 {
             {method: 'get'},
         );
     }
+
+    getSamlMetadataFromIdp = async (samlMetadataURL: string) => {
+        return this.doFetch(
+            `${this.getBaseRoute()}/saml/metadatafromidp`, {method: 'post', body: JSON.stringify({saml_metadata_url: samlMetadataURL})}
+        );
+    };
+
+    setSamlIdpCertificateFromMetadata = async (certData: string) => {
+        const request: any = {
+            method: 'post',
+            body: certData,
+        };
+
+        request.headers = {
+            'Content-Type': 'application/x-pem-file',
+        };
+
+        return this.doFetch(
+            `${this.getBaseRoute()}/saml/certificate/idp`,
+            request
+        );
+    };
 
     // Client Helpers
 
