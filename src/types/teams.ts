@@ -2,6 +2,7 @@
 // See LICENSE.txt for license information.
 
 import {Dictionary} from './utilities';
+import {Error} from './errors';
 
 export type TeamMembership = {
     mention_count: number;
@@ -13,6 +14,12 @@ export type TeamMembership = {
     scheme_user: boolean;
     scheme_admin: boolean;
 };
+
+export type TeamMemberWithError = {
+    member: TeamMembership;
+    user_id: string;
+    error: Error;
+}
 
 export type TeamType = 'O' | 'I';
 
