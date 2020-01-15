@@ -3307,15 +3307,21 @@ describe('Selectors.Channels.getUnreadsInCurrentTeam', () => {
         ...TestHelper.fakeChannelWithId(team1.id),
         total_msg_count: 8,
     };
+    const channel3 = {
+        ...TestHelper.fakeChannelWithId(team1.id),
+        total_msg_count: 5,
+    };
 
     const channels = {
         [channel1.id]: channel1,
         [channel2.id]: channel2,
+        [channel3.id]: channel3,
     };
 
     const myChannelMembers = {
         [channel1.id]: {notify_props: {}, mention_count: 1, msg_count: 0},
         [channel2.id]: {notify_props: {}, mention_count: 4, msg_count: 0},
+        [channel3.id]: {notify_props: {}, mention_count: 4, msg_count: 5},
     };
 
     const channelsInTeam = {
@@ -3347,6 +3353,32 @@ describe('Selectors.Channels.getUnreadsInCurrentTeam', () => {
 
     it('get unreads for current team', () => {
         assert.deepEqual(Selectors.getUnreadsInCurrentTeam(testState), {mentionCount: 4, messageCount: 1});
+    });
+
+    it('get unreads for current read channel', () => {
+        const testState2 = {...testState,
+            entities: {...testState.entities,
+                channels: {...testState.entities.channels,
+                    currentChannelId: channel3.id,
+                },
+            },
+        };
+        assert.equal(Selectors.countCurrentChannelUnreadMessages(testState2), 0);
+    });
+
+    it('get unreads for current unread channel', () => {
+        assert.equal(Selectors.countCurrentChannelUnreadMessages(testState), 2);
+    });
+
+    it('get unreads for channel not on members', () => {
+        const testState2 = {...testState,
+            entities: {...testState.entities,
+                channels: {...testState.entities.channels,
+                    currentChannelId: 'some_other_id',
+                },
+            },
+        };
+        assert.equal(Selectors.countCurrentChannelUnreadMessages(testState2), 0);
     });
 
     it('get unreads with a missing profile entity', () => {
