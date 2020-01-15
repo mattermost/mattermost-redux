@@ -6,7 +6,6 @@ import nock from 'nock';
 
 import * as Actions from 'actions/schemes';
 import {Client4} from 'client';
-import {RequestStatus} from '../constants';
 
 import TestHelper from 'test/test_helper';
 import configureStore from 'test/test_store';
@@ -35,11 +34,7 @@ describe('Actions.Schemes', () => {
             reply(200, [mockScheme]);
 
         await Actions.getSchemes()(store.dispatch, store.getState);
-        const request = store.getState().requests.schemes.getSchemes;
         const {schemes} = store.getState().entities.schemes;
-        if (request.status === RequestStatus.FAILURE) {
-            throw new Error(JSON.stringify(request.error));
-        }
 
         assert.ok(Object.keys(schemes).length > 0);
     });
@@ -52,12 +47,7 @@ describe('Actions.Schemes', () => {
             reply(201, mockScheme);
         await Actions.createScheme(TestHelper.mockScheme())(store.dispatch, store.getState);
 
-        const request = store.getState().requests.schemes.createScheme;
         const {schemes} = store.getState().entities.schemes;
-
-        if (request.status === RequestStatus.FAILURE) {
-            throw new Error(JSON.stringify(request.error));
-        }
 
         const schemeId = Object.keys(schemes)[0];
         assert.strictEqual(Object.keys(schemes).length, 1);
@@ -72,12 +62,7 @@ describe('Actions.Schemes', () => {
         await Actions.getScheme(TestHelper.basicScheme.id)(store.dispatch, store.getState);
 
         const state = store.getState();
-        const request = state.requests.schemes.getScheme;
         const {schemes} = state.entities.schemes;
-
-        if (request.status === RequestStatus.FAILURE) {
-            throw new Error(JSON.stringify(request.error));
-        }
 
         assert.equal(schemes[TestHelper.basicScheme.id].name, TestHelper.basicScheme.name);
     });
@@ -96,12 +81,7 @@ describe('Actions.Schemes', () => {
         await Actions.patchScheme(TestHelper.basicScheme.id, scheme)(store.dispatch, store.getState);
 
         const state = store.getState();
-        const request = state.requests.schemes.patchScheme;
         const {schemes} = state.entities.schemes;
-
-        if (request.status === RequestStatus.FAILURE) {
-            throw new Error(JSON.stringify(request.error));
-        }
 
         const updated = schemes[TestHelper.basicScheme.id];
         assert.ok(updated);
@@ -117,12 +97,7 @@ describe('Actions.Schemes', () => {
         await Actions.deleteScheme(TestHelper.basicScheme.id)(store.dispatch, store.getState);
 
         const state = store.getState();
-        const request = state.requests.schemes.deleteScheme;
         const {schemes} = state.entities.schemes;
-
-        if (request.state === RequestStatus.FAILURE) {
-            throw new Error(JSON.stringify(request.error));
-        }
 
         assert.notStrictEqual(schemes, {});
     });
