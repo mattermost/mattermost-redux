@@ -3,6 +3,7 @@
 
 import assert from 'assert';
 
+import {Preferences} from '../constants';
 import * as ThemeUtils from 'utils/theme_utils';
 
 describe('ThemeUtils', () => {
@@ -63,6 +64,26 @@ describe('ThemeUtils', () => {
             const expected = 'rgba(45,67,89,0.2)';
 
             assert.deepEqual(ThemeUtils.changeOpacity(input, 0.5), expected);
+        });
+    });
+
+    describe('setThemeDefaults', () => {
+        it('blank theme', () => {
+            const input = {};
+            const expected = {...Preferences.THEMES.default};
+            delete expected.type;
+
+            assert.deepEqual(ThemeUtils.setThemeDefaults(input), expected);
+        });
+
+        it('set defaults on unset properties only', () => {
+            const input = {buttonColor: 'green'};
+            assert.equal(ThemeUtils.setThemeDefaults(input).buttonColor, 'green');
+        });
+
+        it('ignore type', () => {
+            const input = {type: 'sometype'};
+            assert.equal(ThemeUtils.setThemeDefaults(input).type, 'sometype');
         });
     });
 });
