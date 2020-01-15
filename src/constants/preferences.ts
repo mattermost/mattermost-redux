@@ -1,6 +1,7 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
 
+import {Theme} from 'types/preferences';
 import {Dictionary} from 'types/utilities';
 
 const Preferences: Dictionary<any> = {
@@ -65,7 +66,7 @@ const Preferences: Dictionary<any> = {
             mentionHighlightBg: '#ffe577',
             mentionHighlightLink: '#166de0',
             codeTheme: 'github',
-        },
+        } as Theme,
         organization: {
             type: 'Organization',
             sidebarBg: '#2071a7',
@@ -92,7 +93,7 @@ const Preferences: Dictionary<any> = {
             mentionHighlightBg: '#f3e197',
             mentionHighlightLink: '#2f81b7',
             codeTheme: 'github',
-        },
+        } as Theme,
         mattermostDark: {
             type: 'Mattermost Dark',
             sidebarBg: '#1b2c3e',
@@ -119,7 +120,7 @@ const Preferences: Dictionary<any> = {
             mentionHighlightBg: '#984063',
             mentionHighlightLink: '#a4ffeb',
             codeTheme: 'solarized-dark',
-        },
+        } as Theme,
         windows10: {
             type: 'Windows Dark',
             sidebarBg: '#171717',
@@ -146,7 +147,7 @@ const Preferences: Dictionary<any> = {
             mentionHighlightBg: '#784098',
             mentionHighlightLink: '#a4ffeb',
             codeTheme: 'monokai',
-        },
+        } as Theme,
     },
 };
 
