@@ -174,6 +174,12 @@ export function isChannelReadOnly(state: GlobalState, channel: Channel): boolean
 export function shouldHideDefaultChannel(state: GlobalState, channel: Channel): boolean {
     return channel && channel.name === General.DEFAULT_CHANNEL && !isCurrentUserSystemAdmin(state) && getConfig(state).ExperimentalHideTownSquareinLHS === 'true';
 }
+export const countCurrentChannelUnreadMessages: (a: GlobalState) => number = createSelector(getCurrentChannel, getMyCurrentChannelMembership, (channel: Channel, membership?: ChannelMembership | null): number => {
+    if (!membership) {
+        return 0;
+    }
+    return channel.total_msg_count - membership.msg_count;
+});
 
 export function getChannelByName(state: GlobalState, channelName: string): Channel | undefined | null {
     return getChannelByNameHelper(getAllChannels(state), channelName);
