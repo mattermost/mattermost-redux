@@ -15,10 +15,9 @@ import {EmojisState} from './emojis';
 import {SchemesState} from './schemes';
 import {Typing} from './typing';
 import {GroupsState} from './groups';
-import {ChannelsRequestsStatuses, GeneralRequestsStatuses, PostsRequestsStatuses, TeamsRequestsStatuses, UsersRequestsStatuses, PreferencesRequestsStatuses, AdminRequestsStatuses, FilesRequestsStatuses, IntegrationsRequestsStatuses, RolesRequestsStatuses, SchemesRequestsStatuses, GroupsRequestsStatuses, JobsRequestsStatuses, SearchRequestsStatuses} from './requests';
+import {ChannelsRequestsStatuses, GeneralRequestsStatuses, PostsRequestsStatuses, TeamsRequestsStatuses, UsersRequestsStatuses, PreferencesRequestsStatuses, AdminRequestsStatuses, FilesRequestsStatuses, RolesRequestsStatuses, JobsRequestsStatuses, SearchRequestsStatuses} from './requests';
 import {Role} from './roles';
 import {PreferenceType} from './preferences';
-import {MarketplacePlugin} from './plugins';
 import {Bot} from './bots';
 import {Dictionary} from './utilities';
 
@@ -55,9 +54,6 @@ export type GlobalState = {
         };
         schemes: SchemesState;
         gifs: any;
-        plugins: {
-            marketplacePlugins: Array<MarketplacePlugin>;
-        };
         groups: GroupsState;
     };
     errors: Array<any>;
@@ -70,10 +66,7 @@ export type GlobalState = {
         preferences: PreferencesRequestsStatuses;
         admin: AdminRequestsStatuses;
         files: FilesRequestsStatuses;
-        integrations: IntegrationsRequestsStatuses;
         roles: RolesRequestsStatuses;
-        schemes: SchemesRequestsStatuses;
-        groups: GroupsRequestsStatuses;
         jobs: JobsRequestsStatuses;
         search: SearchRequestsStatuses;
     };

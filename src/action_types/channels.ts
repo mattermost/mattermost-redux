@@ -74,4 +74,9 @@ export default keyMirror({
     RECEIVED_CHANNEL_MEMBERS_MINUS_GROUP_MEMBERS: null,
 
     RECEIVED_TOTAL_CHANNEL_COUNT: null,
+
+    POST_UNREAD_SUCCESS: null,
+
+    ADD_MANUALLY_UNREAD: null,
+    REMOVE_MANUALLY_UNREAD: null,
 });

@@ -20,13 +20,15 @@ export function displayUsername(
     user: UserProfile,
     teammateNameDisplay: string,
     useFallbackUsername = true,
+    useAdminTemmateNameDisplaySetting = false,
+    adminTeammateNameDisplaySetting = '',
 ): string {
     let name = useFallbackUsername ? localizeMessage('channel_loader.someone', 'Someone') : '';
-
+    const nameDisplay = useAdminTemmateNameDisplaySetting ? adminTeammateNameDisplaySetting : teammateNameDisplay;
     if (user) {
-        if (teammateNameDisplay === Preferences.DISPLAY_PREFER_NICKNAME) {
+        if (nameDisplay === Preferences.DISPLAY_PREFER_NICKNAME) {
             name = user.nickname || getFullName(user);
-        } else if (teammateNameDisplay === Preferences.DISPLAY_PREFER_FULL_NAME) {
+        } else if (nameDisplay === Preferences.DISPLAY_PREFER_FULL_NAME) {
             name = getFullName(user);
         } else {
             name = user.username;
@@ -47,6 +49,10 @@ export function rolesIncludePermission(roles: string, permission: string): boole
 
 export function isAdmin(roles: string): boolean {
     return isSystemAdmin(roles) || isTeamAdmin(roles);
+}
+
+export function isGuest(roles: string): boolean {
+    return rolesIncludePermission(roles, 'system_guest');
 }
 
 export function isTeamAdmin(roles: string): boolean {

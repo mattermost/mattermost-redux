@@ -10,6 +10,7 @@ export type Config = {
     AndroidLatestVersion: string;
     AndroidMinVersion: string;
     AppDownloadLink: string;
+    AsymmetricSigningPublicKey: string;
     AvailableLocales: string;
     BannerColor: string;
     BannerText: string;
@@ -122,6 +123,7 @@ export type Config = {
     LdapLoginFieldName: string;
     LdapNicknameAttributeSet: string;
     LdapPositionAttributeSet: string;
+    LockTeammateNameDisplay: string;
     MaxFileSize: string;
     MaxNotificationsPerChannel: string;
     MinimumHashtagLength: string;
