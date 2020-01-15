@@ -588,6 +588,27 @@ export function sendEmailGuestInvitesToChannels(teamId: string, channelIds: Arra
         ],
     });
 }
+export function sendEmailInvitesToTeamGracefully(teamId: string, emails: Array<string>): ActionFunc {
+    return bindClientFunc({
+        clientFunc: Client4.sendEmailInvitesToTeamGracefully,
+        params: [
+            teamId,
+            emails,
+        ],
+    });
+}
+
+export function sendEmailGuestInvitesToChannelsGracefully(teamId: string, channelIds: Array<string>, emails: Array<string>, message: string): ActionFunc {
+    return bindClientFunc({
+        clientFunc: Client4.sendEmailGuestInvitesToChannelsGracefully,
+        params: [
+            teamId,
+            channelIds,
+            emails,
+            message,
+        ],
+    });
+}
 
 export function getTeamInviteInfo(inviteId: string): ActionFunc {
     return bindClientFunc({
