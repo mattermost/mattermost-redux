@@ -482,7 +482,7 @@ function groupsAssociatedToChannel(state: any = {}, action: GenericAction) {
     case GroupTypes.RECEIVED_GROUPS_ASSOCIATED_TO_CHANNEL: {
         const {channelID, groups, totalGroupCount} = action.data;
         const nextState = {...state};
-        const associatedGroupIDs = new Set(state[channelID] ? state[channelID].ids : []);
+        const associatedGroupIDs = new Set<string>([]);
         for (const group of groups) {
             associatedGroupIDs.add(group.id);
         }
