@@ -402,96 +402,6 @@ const state: GlobalState = {
                 error: null,
             },
         },
-        integrations: {
-            createIncomingHook: {
-                status: 'not_started',
-                error: null,
-            },
-            getIncomingHooks: {
-                status: 'not_started',
-                error: null,
-            },
-            deleteIncomingHook: {
-                status: 'not_started',
-                error: null,
-            },
-            updateIncomingHook: {
-                status: 'not_started',
-                error: null,
-            },
-            createOutgoingHook: {
-                status: 'not_started',
-                error: null,
-            },
-            getOutgoingHooks: {
-                status: 'not_started',
-                error: null,
-            },
-            deleteOutgoingHook: {
-                status: 'not_started',
-                error: null,
-            },
-            updateOutgoingHook: {
-                status: 'not_started',
-                error: null,
-            },
-            getCommands: {
-                status: 'not_started',
-                error: null,
-            },
-            getAutocompleteCommands: {
-                status: 'not_started',
-                error: null,
-            },
-            getCustomTeamCommands: {
-                status: 'not_started',
-                error: null,
-            },
-            addCommand: {
-                status: 'not_started',
-                error: null,
-            },
-            regenCommandToken: {
-                status: 'not_started',
-                error: null,
-            },
-            editCommand: {
-                status: 'not_started',
-                error: null,
-            },
-            deleteCommand: {
-                status: 'not_started',
-                error: null,
-            },
-            addOAuthApp: {
-                status: 'not_started',
-                error: null,
-            },
-            updateOAuthApp: {
-                status: 'not_started',
-                error: null,
-            },
-            getOAuthApp: {
-                status: 'not_started',
-                error: null,
-            },
-            getOAuthApps: {
-                status: 'not_started',
-                error: null,
-            },
-            deleteOAuthApp: {
-                status: 'not_started',
-                error: null,
-            },
-            executeCommand: {
-                status: 'not_started',
-                error: null,
-            },
-            submitInteractiveDialog: {
-                status: 'not_started',
-                error: null,
-            },
-        },
         roles: {
             getRolesByNames: {
                 status: 'not_started',
@@ -506,36 +416,6 @@ const state: GlobalState = {
                 error: null,
             },
             editRole: {
-                status: 'not_started',
-                error: null,
-            },
-        },
-        schemes: {
-            getSchemes: {
-                status: 'not_started',
-                error: null,
-            },
-            getScheme: {
-                status: 'not_started',
-                error: null,
-            },
-            createScheme: {
-                status: 'not_started',
-                error: null,
-            },
-            deleteScheme: {
-                status: 'not_started',
-                error: null,
-            },
-            patchScheme: {
-                status: 'not_started',
-                error: null,
-            },
-            getSchemeTeams: {
-                status: 'not_started',
-                error: null,
-            },
-            getSchemeChannels: {
                 status: 'not_started',
                 error: null,
             },
@@ -572,52 +452,6 @@ const state: GlobalState = {
                 error: null,
             },
             searchPosts: {
-                status: 'not_started',
-                error: null,
-            },
-        },
-        groups: {
-            linkGroupSyncable: {
-                status: 'not_started',
-                error: null,
-            },
-            unlinkGroupSyncable: {
-                status: 'not_started',
-                error: null,
-            },
-            getGroupSyncables: {
-                status: 'not_started',
-                error: null,
-            },
-            getGroupMembers: {
-                status: 'not_started',
-                error: null,
-            },
-            getGroup: {
-                status: 'not_started',
-                error: null,
-            },
-            getAllGroupsAssociatedToTeam: {
-                status: 'not_started',
-                error: null,
-            },
-            getAllGroupsAssociatedToChannel: {
-                status: 'not_started',
-                error: null,
-            },
-            getGroupsAssociatedToTeam: {
-                status: 'not_started',
-                error: null,
-            },
-            getGroupsAssociatedToChannel: {
-                status: 'not_started',
-                error: null,
-            },
-            getGroupsNotAssociatedToTeam: {
-                status: 'not_started',
-                error: null,
-            },
-            getGroupsNotAssociatedToChannel: {
                 status: 'not_started',
                 error: null,
             },

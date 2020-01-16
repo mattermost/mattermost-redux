@@ -90,10 +90,6 @@ describe('Actions.Groups', () => {
         await Actions.getGroupSyncables(groupID, Groups.SYNCABLE_TYPE_CHANNEL)(store.dispatch, store.getState);
 
         const state = store.getState();
-        const request = state.requests.groups.getGroupSyncables;
-        if (request.status === RequestStatus.FAILURE) {
-            throw new Error('getGroupSyncables request failed err=' + request.error);
-        }
 
         const groupSyncables = state.entities.groups.syncables[groupID];
         assert.ok(groupSyncables);
@@ -154,10 +150,6 @@ describe('Actions.Groups', () => {
         await Actions.getGroupMembers(groupID, 0, 100)(store.dispatch, store.getState);
 
         const state = store.getState();
-        const request = state.requests.groups.getGroupMembers;
-        if (request.status === RequestStatus.FAILURE) {
-            throw new Error('getGroupMembers request failed err=' + request.error);
-        }
 
         const groupMembers = state.entities.groups.members;
         assert.ok(groupMembers);
@@ -189,10 +181,6 @@ describe('Actions.Groups', () => {
         await Actions.getGroup(groupID)(store.dispatch, store.getState);
 
         const state = store.getState();
-        const request = state.requests.groups.getGroup;
-        if (request.status === RequestStatus.FAILURE) {
-            throw new Error('getGroup request failed err=' + request.error);
-        }
 
         const groups = state.entities.groups.groups;
         assert.ok(groups);
@@ -360,10 +348,6 @@ describe('Actions.Groups', () => {
         await Actions.getAllGroupsAssociatedToTeam(teamID)(store.dispatch, store.getState);
 
         const state = store.getState();
-        const request = state.requests.groups.getAllGroupsAssociatedToTeam;
-        if (request.status === RequestStatus.FAILURE) {
-            throw new Error('getGroup request failed err=' + request.error);
-        }
 
         const groupIDs = state.entities.teams.groupsAssociatedToTeam[teamID].ids;
         assert.strictEqual(groupIDs.length, response.groups.length);
@@ -424,10 +408,6 @@ describe('Actions.Groups', () => {
         await Actions.getGroupsAssociatedToTeam(teamID, 0, 100)(store.dispatch, store.getState);
 
         const state = store.getState();
-        const request = state.requests.groups.getGroupsAssociatedToTeam;
-        if (request.status === RequestStatus.FAILURE) {
-            throw new Error('getGroup request failed err=' + request.error);
-        }
 
         const groupIDs = state.entities.teams.groupsAssociatedToTeam[teamID].ids;
         const expectedIDs = ['tnd8zod9f3fdtqosxjmhwucbth', 'qhdp6g7aubbpiyja7c4sgpe7tc'];
@@ -477,11 +457,6 @@ describe('Actions.Groups', () => {
         await Actions.getGroupsNotAssociatedToTeam(teamID, 0, 100)(store.dispatch, store.getState);
 
         const state = store.getState();
-        const request = state.requests.groups.getGroupsNotAssociatedToTeam;
-        if (request.status === RequestStatus.FAILURE) {
-            throw new Error('getGroup request failed err=' + request.error);
-        }
-
         const groupIDs = state.entities.teams.groupsAssociatedToTeam[teamID].ids;
         const expectedIDs = ['existing2'].concat(response.map((group) => group.id));
         assert.strictEqual(groupIDs.length, expectedIDs.length);
@@ -545,10 +520,6 @@ describe('Actions.Groups', () => {
         await Actions.getAllGroupsAssociatedToChannel(channelID)(store.dispatch, store.getState);
 
         const state = store.getState();
-        const request = state.requests.groups.getAllGroupsAssociatedToChannel;
-        if (request.status === RequestStatus.FAILURE) {
-            throw new Error('getGroup request failed err=' + request.error);
-        }
 
         const groupIDs = state.entities.channels.groupsAssociatedToChannel[channelID].ids;
         assert.strictEqual(groupIDs.length, response.groups.length);
@@ -609,10 +580,6 @@ describe('Actions.Groups', () => {
         await Actions.getGroupsAssociatedToChannel(channelID, 0, 100)(store.dispatch, store.getState);
 
         const state = store.getState();
-        const request = state.requests.groups.getGroupsAssociatedToChannel;
-        if (request.status === RequestStatus.FAILURE) {
-            throw new Error('getGroup request failed err=' + request.error);
-        }
 
         const groupIDs = state.entities.channels.groupsAssociatedToChannel[channelID].ids;
         const expectedIDs = ['tnd8zod9f3fdtqosxjmhwucbth', 'qhdp6g7aubbpiyja7c4sgpe7tc'];
@@ -662,10 +629,6 @@ describe('Actions.Groups', () => {
         await Actions.getGroupsNotAssociatedToChannel(channelID, 0, 100)(store.dispatch, store.getState);
 
         const state = store.getState();
-        const request = state.requests.groups.getGroupsNotAssociatedToChannel;
-        if (request.status === RequestStatus.FAILURE) {
-            throw new Error('getGroup request failed err=' + request.error);
-        }
 
         const groupIDs = state.entities.channels.groupsAssociatedToChannel[channelID].ids;
         const expectedIDs = ['existing2'].concat(response.map((group) => group.id));
@@ -673,6 +636,58 @@ describe('Actions.Groups', () => {
         groupIDs.forEach((id) => {
             assert.ok(expectedIDs.includes(id));
         });
+    });
+
+    it('patchGroupSyncable', async () => {
+        const groupID = '5rgoajywb3nfbdtyafbod47rya';
+        const teamID = 'ge63nq31sbfy3duzq5f7yqn1kh';
+        const channelID = 'o3tdawqxot8kikzq8bk54zggbc';
+
+        const groupSyncablePatch = {
+            auto_add: true,
+            scheme_admin: true,
+        };
+
+        const groupTeamResponse = {
+            team_id: 'ge63nq31sbfy3duzq5f7yqn1kh',
+            group_id: '5rgoajywb3nfbdtyafbod47rya',
+            auto_add: true,
+            scheme_admin: true,
+            create_at: 1542643748412,
+            delete_at: 0,
+            update_at: 1542660566032,
+        };
+
+        const groupChannelResponse = {
+            channel_id: 'o3tdawqxot8kikzq8bk54zggbc',
+            group_id: '5rgoajywb3nfbdtyafbod47rya',
+            auto_add: true,
+            scheme_admin: true,
+            create_at: 1542644105041,
+            delete_at: 0,
+            update_at: 1542662607342,
+        };
+
+        nock(Client4.getBaseRoute()).
+            put(`/groups/${groupID}/teams/${teamID}/patch`).
+            reply(200, groupTeamResponse);
+
+        nock(Client4.getBaseRoute()).
+            put(`/groups/${groupID}/channels/${channelID}/patch`).
+            reply(200, groupChannelResponse);
+
+        await Actions.patchGroupSyncable(groupID, teamID, Groups.SYNCABLE_TYPE_TEAM, groupSyncablePatch)(store.dispatch, store.getState);
+        await Actions.patchGroupSyncable(groupID, channelID, Groups.SYNCABLE_TYPE_CHANNEL, groupSyncablePatch)(store.dispatch, store.getState);
+
+        const state = store.getState();
+        const groupSyncables = state.entities.groups.syncables[groupID];
+        assert.ok(groupSyncables);
+
+        assert.ok(groupSyncables.teams[0].auto_add === groupSyncablePatch.auto_add);
+        assert.ok(groupSyncables.channels[0].auto_add === groupSyncablePatch.auto_add);
+
+        assert.ok(groupSyncables.teams[0].scheme_admin === groupSyncablePatch.scheme_admin);
+        assert.ok(groupSyncables.channels[0].scheme_admin === groupSyncablePatch.scheme_admin);
     });
 });
 

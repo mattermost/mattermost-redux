@@ -13,7 +13,7 @@ import {getCurrentUserId} from 'selectors/entities/users';
 
 import {GetStateFunc, DispatchFunc, ActionFunc, ActionResult, batchActions, Action} from 'types/actions';
 
-import {Team, TeamMembership} from 'types/teams';
+import {Team, TeamMembership, TeamMemberWithError} from 'types/teams';
 
 import {selectChannel} from './channels';
 import {logError} from './errors';
@@ -458,6 +458,36 @@ export function addUsersToTeam(teamId: string, userIds: Array<string>): ActionFu
         ]), getState);
 
         return {data: members};
+    };
+}
+
+export function addUsersToTeamGracefully(teamId: string, userIds: Array<string>): ActionFunc {
+    return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
+        let result: Array<TeamMemberWithError>;
+        try {
+            result = await Client4.addUsersToTeamGracefully(teamId, userIds);
+        } catch (error) {
+            forceLogoutIfNecessary(error, dispatch, getState);
+            dispatch(logError(error));
+            return {error};
+        }
+
+        const added_members = result ? result.filter((m) => !m.error) : [];
+        const profiles: Partial<UserProfile>[] = added_members.map((m) => ({id: m.user_id}));
+        const members = added_members.map((m) => m.member);
+        dispatch(batchActions([
+            {
+                type: UserTypes.RECEIVED_PROFILES_LIST_IN_TEAM,
+                data: profiles,
+                id: teamId,
+            },
+            {
+                type: TeamTypes.RECEIVED_MEMBERS_IN_TEAM,
+                data: members,
+            },
+        ]), getState);
+
+        return {data: result};
     };
 }
 
