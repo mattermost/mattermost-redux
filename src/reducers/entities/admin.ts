@@ -433,7 +433,6 @@ function pluginStatuses(state: any = {}, action: GenericAction) {
                 name: (nextState[id] && nextState[id].name) || plugin.name,
                 description: (nextState[id] && nextState[id].description) || plugin.description,
                 version: (nextState[id] && nextState[id].version) || plugin.version,
-                is_prepackaged: (nextState[id] && nextState[id].is_prepackaged) || Plugins.PREPACKAGED_PLUGINS.includes(id),
                 active: pluginState > 0,
                 state: pluginState,
                 instances,
