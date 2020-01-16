@@ -623,21 +623,11 @@ function handleChannelDeletedEvent(msg: WebSocketMessage) {
 function handleChannelUnarchiveEvent(msg: WebSocketMessage) {
     return (dispatch: DispatchFunc, getState: GetStateFunc) => {
         const state = getState();
-        const currentChannelId = getCurrentChannelId(state);
         const currentTeamId = getCurrentTeamId(state);
         const config = getConfig(state);
         const viewArchivedChannels = config.ExperimentalViewArchivedChannels === 'true';
 
         if (msg.broadcast.team_id === currentTeamId) {
-            if (msg.data.channel_id === currentChannelId && !viewArchivedChannels) {
-                const channelsInTeam = getChannelsNameMapInTeam(state, currentTeamId);
-                const channel = getChannelByName(channelsInTeam, getRedirectChannelNameForTeam(state, currentTeamId));
-                if (channel && channel.id) {
-                    dispatch({type: ChannelTypes.SELECT_CHANNEL, data: channel.id});
-                }
-                EventEmitter.emit(General.DEFAULT_CHANNEL, '');
-            }
-
             dispatch({type: ChannelTypes.RECEIVED_CHANNEL_UNARCHIVED, data: {id: msg.data.channel_id, team_id: msg.data.team_id, deleteAt: 0, viewArchivedChannels}}, getState);
 
             dispatch(fetchMyChannelsAndMembers(currentTeamId));

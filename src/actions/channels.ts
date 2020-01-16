@@ -727,7 +727,6 @@ export function deleteChannel(channelId: string): ActionFunc {
 export function unarchiveChannel(channelId: string): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         let state = getState();
-        const viewArchivedChannels = state.entities.general.config.ExperimentalViewArchivedChannels === 'true';
 
         try {
             await Client4.unarchiveChannel(channelId);
@@ -738,17 +737,9 @@ export function unarchiveChannel(channelId: string): ActionFunc {
         }
 
         state = getState();
-        const {currentChannelId} = state.entities.channels;
-        if (channelId === currentChannelId && !viewArchivedChannels) {
-            const teamId = getCurrentTeamId(state);
-            const channelsInTeam = getChannelsNameMapInTeam(state, teamId);
-            const channel = getChannelByName(channelsInTeam, getRedirectChannelNameForTeam(state, teamId));
-            if (channel && channel.id) {
-                dispatch({type: ChannelTypes.SELECT_CHANNEL, data: channel.id}, getState);
-            }
-        }
+        const viewArchivedChannels = state.entities.general.config.ExperimentalViewArchivedChannels === 'true';
 
-        dispatch({type: ChannelTypes.UNARCHIVED_CHANNEL_SUCCESS, data: {id: channelId, viewArchivedChannels}}, getState);
+        dispatch({type: ChannelTypes.UNARCHIVED_CHANNEL_SUCCESS, data: {id: channelId, viewArchivedChannels}});
 
         return {data: true};
     };

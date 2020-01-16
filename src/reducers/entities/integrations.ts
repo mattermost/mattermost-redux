@@ -42,22 +42,6 @@ function incomingHooks(state: IDMappedObjects<IncomingWebhook> = {}, action: Gen
 
         return state;
     }
-    case ChannelTypes.RECEIVED_CHANNEL_UNARCHIVED: {
-        const nextState = {...state};
-        let deleted = true;
-        Object.keys(nextState).forEach((id) => {
-            if (nextState[id].channel_id === action.data.id) {
-                deleted = false;
-                Reflect.deleteProperty(nextState, id);
-            }
-        });
-
-        if (!deleted) {
-            return nextState;
-        }
-
-        return state;
-    }
     case UserTypes.LOGOUT_SUCCESS:
         return {};
 
@@ -96,22 +80,6 @@ function outgoingHooks(state: IDMappedObjects<OutgoingWebhook> = {}, action: Gen
         });
 
         if (deleted) {
-            return nextState;
-        }
-
-        return state;
-    }
-    case ChannelTypes.RECEIVED_CHANNEL_UNARCHIVED: {
-        const nextState = {...state};
-        let deleted = true;
-        Object.keys(nextState).forEach((id) => {
-            if (nextState[id].channel_id === action.data.id) {
-                deleted = false;
-                Reflect.deleteProperty(nextState, id);
-            }
-        });
-
-        if (!deleted) {
             return nextState;
         }
 
