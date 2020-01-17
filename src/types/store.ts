@@ -15,7 +15,7 @@ import {EmojisState} from './emojis';
 import {SchemesState} from './schemes';
 import {Typing} from './typing';
 import {GroupsState} from './groups';
-import {ChannelsRequestsStatuses, GeneralRequestsStatuses, PostsRequestsStatuses, TeamsRequestsStatuses, UsersRequestsStatuses, PreferencesRequestsStatuses, AdminRequestsStatuses, FilesRequestsStatuses, IntegrationsRequestsStatuses, RolesRequestsStatuses, SchemesRequestsStatuses, JobsRequestsStatuses} from './requests';
+import {ChannelsRequestsStatuses, GeneralRequestsStatuses, PostsRequestsStatuses, TeamsRequestsStatuses, UsersRequestsStatuses, PreferencesRequestsStatuses, AdminRequestsStatuses, FilesRequestsStatuses, RolesRequestsStatuses, JobsRequestsStatuses} from './requests';
 import {Role} from './roles';
 import {PreferenceType} from './preferences';
 import {Bot} from './bots';
@@ -66,9 +66,7 @@ export type GlobalState = {
         preferences: PreferencesRequestsStatuses;
         admin: AdminRequestsStatuses;
         files: FilesRequestsStatuses;
-        integrations: IntegrationsRequestsStatuses;
         roles: RolesRequestsStatuses;
-        schemes: SchemesRequestsStatuses;
         jobs: JobsRequestsStatuses;
     };
     websocket: {

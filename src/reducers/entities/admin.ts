@@ -433,7 +433,6 @@ function pluginStatuses(state: any = {}, action: GenericAction) {
                 name: (nextState[id] && nextState[id].name) || plugin.name,
                 description: (nextState[id] && nextState[id].description) || plugin.description,
                 version: (nextState[id] && nextState[id].version) || plugin.version,
-                is_prepackaged: (nextState[id] && nextState[id].is_prepackaged) || Plugins.PREPACKAGED_PLUGINS.includes(id),
                 active: pluginState > 0,
                 state: pluginState,
                 instances,
@@ -560,6 +559,16 @@ function ldapGroups(state: any = {}, action: GenericAction) {
     }
 }
 
+function samlMetadataResponse(state: any = {}, action: GenericAction) {
+    switch (action.type) {
+    case AdminTypes.RECEIVED_SAML_METADATA_RESPONSE: {
+        return action.data;
+    }
+    default:
+        return state;
+    }
+}
+
 export default combineReducers({
 
     // array of strings each representing a log entry
@@ -607,4 +616,7 @@ export default combineReducers({
 
     // total ldap groups
     ldapGroupsCount,
+
+    // object representing the metadata response obtained from the IdP
+    samlMetadataResponse,
 });

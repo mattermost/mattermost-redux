@@ -365,6 +365,25 @@ describe('Actions.Websocket', () => {
         assert.ok(profilesNotInChannel[TestHelper.basicChannel.id].has(user.id));
     });
 
+    it('Websocket Handle User Removed when Current is Guest', async () => {
+        const basicGuestUser = TestHelper.fakeUserWithId();
+        basicGuestUser.roles = 'system_guest';
+
+        const user = {...TestHelper.fakeUser(), id: TestHelper.generateId()};
+
+        // add user first
+        store.dispatch({type: UserTypes.RECEIVED_PROFILE_IN_CHANNEL, data: {id: TestHelper.basicChannel.id, user_id: user.id}});
+        mockServer.emit('message', JSON.stringify({event: WebsocketEvents.USER_ADDED, data: {team_id: TestHelper.basicTeam.id, user_id: user.id}, broadcast: {omit_users: null, user_id: '', channel_id: TestHelper.basicChannel.id, team_id: ''}, seq: 42}));
+
+        assert.ok(store.getState().entities.users.profilesInChannel[TestHelper.basicChannel.id].has(user.id));
+
+        // remove user
+        store.dispatch({type: UserTypes.RECEIVED_PROFILE_NOT_IN_CHANNEL, data: {id: TestHelper.basicChannel.id, user_id: user.id}});
+        mockServer.emit('message', JSON.stringify({event: WebsocketEvents.USER_REMOVED, data: {remover_id: basicGuestUser.id, user_id: user.id}, broadcast: {omit_users: null, user_id: '', channel_id: TestHelper.basicChannel.id, team_id: ''}, seq: 42}));
+
+        assert.ok(!store.getState().entities.users.profilesInChannel[TestHelper.basicChannel.id].has(user.id));
+    });
+
     it('Websocket Handle User Updated', async () => {
         const user = {...TestHelper.fakeUser(), id: TestHelper.generateId()};
         mockServer.emit('message', JSON.stringify({event: WebsocketEvents.USER_UPDATED, data: {user: {id: user.id, create_at: 1495570297229, update_at: 1508253268652, delete_at: 0, username: 'tim', auth_data: '', auth_service: '', email: 'tim@bladekick.com', nickname: '', first_name: 'tester4', last_name: '', position: '', roles: 'system_user', locale: 'en'}}, broadcast: {omit_users: null, user_id: '', channel_id: '', team_id: ''}, seq: 53}));
@@ -380,18 +399,18 @@ describe('Actions.Websocket', () => {
 
     it('Websocket Handle Channel Member Updated', async () => {
         const channelMember = TestHelper.basicChannelMember;
-        channelMember.roles = "channel_user channel_admin"
+        channelMember.roles = 'channel_user channel_admin';
         mockServer.emit('message', JSON.stringify({
-            event: WebsocketEvents.CHANNEL_MEMBER_UPDATED, 
-            data: { 
-                channelMember: JSON.stringify(channelMember)
-            }
+            event: WebsocketEvents.CHANNEL_MEMBER_UPDATED,
+            data: {
+                channelMember: JSON.stringify(channelMember),
+            },
         }));
         expect(mockLoadRolesIfNeeded).toHaveBeenCalledTimes(1);
         expect(mockLoadRolesIfNeeded).toHaveBeenCalledWith(channelMember.roles.split(' '));
         store.subscribe(() => {
             const state = store.getState();
-            expect(state.entities.channels.membersInChannel[channelMember.channel_id][channelMember.user_id].roles).toEqual("channel_user channel_admin");
+            expect(state.entities.channels.membersInChannel[channelMember.channel_id][channelMember.user_id].roles).toEqual('channel_user channel_admin');
         });
     });
 

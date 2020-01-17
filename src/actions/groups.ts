@@ -109,6 +109,39 @@ export function getGroupSyncables(groupID: string, syncableType: SyncableType): 
     };
 }
 
+export function patchGroupSyncable(groupID: string, syncableID: string, syncableType: SyncableType, patch: SyncablePatch): ActionFunc {
+    return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
+        let data;
+        try {
+            data = await Client4.patchGroupSyncable(groupID, syncableID, syncableType, patch);
+        } catch (error) {
+            forceLogoutIfNecessary(error, dispatch, getState);
+            return {error};
+        }
+
+        const dispatches: Action[] = [];
+
+        let type = '';
+        switch (syncableType) {
+        case Groups.SYNCABLE_TYPE_TEAM:
+            type = GroupTypes.PATCHED_GROUP_TEAM;
+            break;
+        case Groups.SYNCABLE_TYPE_CHANNEL:
+            type = GroupTypes.PATCHED_GROUP_CHANNEL;
+            break;
+        default:
+            console.warn(`unhandled syncable type ${syncableType}`); // eslint-disable-line no-console
+        }
+
+        dispatches.push(
+            {type, data},
+        );
+        dispatch(batchActions(dispatches));
+
+        return {data: true};
+    };
+}
+
 export function getGroupMembers(groupID: string, page = 0, perPage: number = General.PAGE_SIZE_DEFAULT): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         let data;

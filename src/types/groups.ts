@@ -2,6 +2,7 @@
 // See LICENSE.txt for license information.
 export type SyncableType = 'team' | 'channel';
 export type SyncablePatch = {
+    scheme_admin: boolean;
     auto_add: boolean;
 };
 export type Group = {
@@ -16,6 +17,7 @@ export type Group = {
     delete_at: number;
     has_syncables: boolean;
     member_count: number;
+    scheme_admin: boolean;
 };
 export type GroupTeam = {
     team_id: string;
@@ -23,6 +25,7 @@ export type GroupTeam = {
     team_type: string;
     group_id: string;
     auto_add: boolean;
+    scheme_admin: boolean;
     create_at: number;
     delete_at: number;
     update_at: number;
@@ -36,6 +39,7 @@ export type GroupChannel = {
     team_type: string;
     group_id: string;
     auto_add: boolean;
+    scheme_admin: boolean;
     create_at: number;
     delete_at: number;
     update_at: number;
