@@ -12,6 +12,7 @@ import {
     isManuallyUnread,
 } from 'selectors/entities/channels';
 import {getCurrentTeamId} from 'selectors/entities/teams';
+import {getConfig} from 'selectors/entities/general';
 
 import {Action, ActionFunc, batchActions, DispatchFunc, GetStateFunc} from 'types/actions';
 
@@ -735,7 +736,8 @@ export function unarchiveChannel(channelId: string): ActionFunc {
         }
 
         const state = getState();
-        const viewArchivedChannels = state.entities.general.config.ExperimentalViewArchivedChannels === 'true';
+        const config = getConfig(state);
+        const viewArchivedChannels = config.ExperimentalViewArchivedChannels === 'true';
         dispatch({type: ChannelTypes.UNARCHIVED_CHANNEL_SUCCESS, data: {id: channelId, viewArchivedChannels}});
 
         return {data: true};
