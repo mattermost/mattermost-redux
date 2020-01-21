@@ -39,12 +39,6 @@ export type UsersRequestsStatuses = {
     updateMe: RequestStatusType;
 };
 
-export type PreferencesRequestsStatuses = {
-    getMyPreferences: RequestStatusType;
-    savePreferences: RequestStatusType;
-    deletePreferences: RequestStatusType;
-};
-
 export type AdminRequestsStatuses = {
     getLogs: RequestStatusType;
     getAudits: RequestStatusType;

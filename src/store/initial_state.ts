@@ -220,20 +220,6 @@ const state: GlobalState = {
                 error: null,
             },
         },
-        preferences: {
-            getMyPreferences: {
-                status: 'not_started',
-                error: null,
-            },
-            savePreferences: {
-                status: 'not_started',
-                error: null,
-            },
-            deletePreferences: {
-                status: 'not_started',
-                error: null,
-            },
-        },
         admin: {
             getLogs: {
                 status: 'not_started',
