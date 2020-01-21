@@ -1,6 +1,9 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
 
+import {Theme} from 'types/preferences';
+import {Preferences} from '../constants';
+
 export function makeStyleFromTheme(getStyleFromTheme: (a: any) => any): (a: any) => any {
     let lastTheme: any;
     let style: any;
@@ -93,4 +96,20 @@ export function blendColors(background: string, foreground: string, opacity: num
     );
 
     return `rgba(${red},${green},${blue},${alpha})`;
+}
+
+// setThemeDefaults will set defaults on the theme for any unset properties.
+export function setThemeDefaults(theme: Theme): Theme {
+    const defaultTheme = Preferences.THEMES.default;
+
+    for (const property in defaultTheme) {
+        if (property === 'type') {
+            continue;
+        }
+        if (theme[property] == null) {
+            theme[property] = defaultTheme[property];
+        }
+    }
+
+    return theme;
 }
