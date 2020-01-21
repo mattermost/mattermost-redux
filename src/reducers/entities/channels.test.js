@@ -76,6 +76,74 @@ describe('channels', () => {
         });
     });
 
+    describe('RECEIVED_CHANNEL_UNARCHIVED', () => {
+        test('should mark channel as active', () => {
+            const state = deepFreeze({
+                channelsInTeam: {},
+                currentChannelId: '',
+                groupsAssociatedToChannel: {},
+                myMembers: {},
+                stats: {},
+                totalCount: 0,
+                manuallyUnread: {},
+                membersInChannel: {},
+                channels: {
+                    channel1: {
+                        id: 'channel1',
+                        delete_at: 1000,
+                    },
+                    channel2: {
+                        id: 'channel2',
+                    },
+                },
+            });
+
+            const nextState = channelsReducer(state, {
+                type: ChannelTypes.RECEIVED_CHANNEL_UNARCHIVED,
+                data: {
+                    id: 'channel1',
+                },
+            });
+
+            expect(nextState).not.toBe(state);
+            expect(nextState.channels.channel1).toEqual({
+                id: 'channel1',
+                delete_at: 0,
+            });
+            expect(nextState.channels.channel2).toBe(state.channels.channel2);
+        });
+
+        test('should do nothing for a channel that is not loaded', () => {
+            const state = deepFreeze({
+                channelsInTeam: {},
+                currentChannelId: '',
+                groupsAssociatedToChannel: {},
+                myMembers: {},
+                stats: {},
+                totalCount: 0,
+                manuallyUnread: {},
+                membersInChannel: {},
+                channels: {
+                    channel1: {
+                        id: 'channel1',
+                    },
+                    channel2: {
+                        id: 'channel2',
+                    },
+                },
+            });
+
+            const nextState = channelsReducer(state, {
+                type: ChannelTypes.RECEIVED_CHANNEL_UNARCHIVED,
+                data: {
+                    id: 'channel3',
+                },
+            });
+
+            expect(nextState).toBe(state);
+        });
+    });
+
     describe('UPDATE_CHANNEL_HEADER', () => {
         test('should update channel header', () => {
             const state = deepFreeze({

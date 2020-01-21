@@ -17,6 +17,7 @@ export type PostType = 'system_add_remove' |
                        'system_add_to_channel' |
                        'system_add_to_team' |
                        'system_channel_deleted' |
+                       'system_channel_restored' |
                        'system_displayname_change' |
                        'system_convert_channel' |
                        'system_ephemeral' |

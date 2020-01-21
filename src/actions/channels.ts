@@ -12,6 +12,7 @@ import {
     isManuallyUnread,
 } from 'selectors/entities/channels';
 import {getCurrentTeamId} from 'selectors/entities/teams';
+import {getConfig} from 'selectors/entities/general';
 
 import {Action, ActionFunc, batchActions, DispatchFunc, GetStateFunc} from 'types/actions';
 
@@ -719,6 +720,25 @@ export function deleteChannel(channelId: string): ActionFunc {
         }
 
         dispatch({type: ChannelTypes.DELETE_CHANNEL_SUCCESS, data: {id: channelId, viewArchivedChannels}}, getState);
+
+        return {data: true};
+    };
+}
+
+export function unarchiveChannel(channelId: string): ActionFunc {
+    return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
+        try {
+            await Client4.unarchiveChannel(channelId);
+        } catch (error) {
+            forceLogoutIfNecessary(error, dispatch, getState);
+            dispatch(logError(error));
+            return {error};
+        }
+
+        const state = getState();
+        const config = getConfig(state);
+        const viewArchivedChannels = config.ExperimentalViewArchivedChannels === 'true';
+        dispatch({type: ChannelTypes.UNARCHIVED_CHANNEL_SUCCESS, data: {id: channelId, viewArchivedChannels}});
 
         return {data: true};
     };
@@ -1440,6 +1460,7 @@ export default {
     leaveChannel,
     joinChannel,
     deleteChannel,
+    unarchiveChannel,
     viewChannel,
     markChannelAsViewed,
     getChannels,

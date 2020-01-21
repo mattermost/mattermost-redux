@@ -488,6 +488,105 @@ describe('Actions.Channels', () => {
         assert.ifError(incomingHooks[incomingHook.id]);
         assert.ifError(outgoingHooks[outgoingHook.id]);
     });
+    
+    it('unarchiveChannel', async () => {
+        const secondClient = TestHelper.createClient4();
+
+        nock(Client4.getUsersRoute()).
+            post('').
+            query(true).
+            reply(201, TestHelper.fakeUserWithId());
+
+        const user = await TestHelper.basicClient4.createUser(
+            TestHelper.fakeUser(),
+            null,
+            null,
+            TestHelper.basicTeam.invite_id
+        );
+
+        nock(Client4.getUsersRoute()).
+            post('/login').
+            reply(200, user);
+        await secondClient.login(user.email, 'password1');
+
+        nock(Client4.getChannelsRoute()).
+            post('').
+            reply(201, TestHelper.fakeChannelWithId(TestHelper.basicTeam.id));
+        const secondChannel = await secondClient.createChannel(
+            TestHelper.fakeChannel(TestHelper.basicTeam.id));
+
+        nock(Client4.getChannelsRoute()).
+            post(`/${secondChannel.id}/members`).
+            reply(201, {user_id: TestHelper.basicUser.id, roles: 'channel_user', channel_id: secondChannel.id});
+
+        await store.dispatch(Actions.joinChannel(
+            TestHelper.basicUser.id,
+            TestHelper.basicTeam.id,
+            secondChannel.id
+        ));
+
+        nock(Client4.getUsersRoute()).
+            get(`/me/teams/${TestHelper.basicTeam.id}/channels`).
+            reply(200, [secondChannel, TestHelper.basicChannel]);
+
+        nock(Client4.getUsersRoute()).
+            get(`/me/teams/${TestHelper.basicTeam.id}/channels/members`).
+            reply(200, [{user_id: TestHelper.basicUser.id, roles: 'channel_user', channel_id: secondChannel.id}, TestHelper.basicChannelMember]);
+
+        await store.dispatch(Actions.fetchMyChannelsAndMembers(TestHelper.basicTeam.id));
+
+        nock(Client4.getIncomingHooksRoute()).
+            post('').
+            reply(201, {
+                id: TestHelper.generateId(),
+                create_at: 1507840900004,
+                update_at: 1507840900004,
+                delete_at: 1609090954545,
+                user_id: TestHelper.basicUser.id,
+                channel_id: secondChannel.id,
+                team_id: TestHelper.basicTeam.id,
+                display_name: 'TestIncomingHook',
+                description: 'Some description.',
+            });
+        const incomingHook = await store.dispatch(createIncomingHook({channel_id: secondChannel.id, display_name: 'test', description: 'test'}));
+
+        nock(Client4.getOutgoingHooksRoute()).
+            post('').
+            reply(201, {
+                id: TestHelper.generateId(),
+                token: TestHelper.generateId(),
+                create_at: 1507841118796,
+                update_at: 1507841118796,
+                delete_at: 1609090954545,
+                creator_id: TestHelper.basicUser.id,
+                channel_id: secondChannel.id,
+                team_id: TestHelper.basicTeam.id,
+                trigger_words: ['testword'],
+                trigger_when: 0,
+                callback_urls: ['http://notarealurl'],
+                display_name: 'TestOutgoingHook',
+                description: '',
+                content_type: 'application/x-www-form-urlencoded',
+            });
+        const outgoingHook = await store.dispatch(createOutgoingHook({
+            channel_id: secondChannel.id,
+            team_id: TestHelper.basicTeam.id,
+            display_name: 'TestOutgoingHook',
+            trigger_words: [TestHelper.generateId()],
+            callback_urls: ['http://notarealurl']}
+        ));
+
+        nock(Client4.getChannelsRoute()).
+            delete(`/${secondChannel.id}`).
+            reply(200, OK_RESPONSE);
+
+        await store.dispatch(Actions.unarchiveChannel(secondChannel.id));
+
+        const {incomingHooks, outgoingHooks} = store.getState().entities.integrations;
+
+        assert.ifError(incomingHooks[incomingHook.id]);
+        assert.ifError(outgoingHooks[outgoingHook.id]);
+    });
 
     describe('viewChannel', () => {
         test('should contact server and update last_viewed_at of both channels', async () => {

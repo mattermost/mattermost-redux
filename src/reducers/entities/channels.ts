@@ -115,6 +115,21 @@ function channels(state: IDMappedObjects<Channel> = {}, action: GenericAction) {
             },
         };
     }
+    case ChannelTypes.RECEIVED_CHANNEL_UNARCHIVED: {
+        const {id} = action.data;
+
+        if (!state[id]) {
+            return state;
+        }
+
+        return {
+            ...state,
+            [id]: {
+                ...state[id],
+                delete_at: 0,
+            },
+        };
+    }
     case ChannelTypes.UPDATE_CHANNEL_HEADER: {
         const {channelId, header} = action.data;
 
