@@ -726,8 +726,6 @@ export function deleteChannel(channelId: string): ActionFunc {
 
 export function unarchiveChannel(channelId: string): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
-        let state = getState();
-
         try {
             await Client4.unarchiveChannel(channelId);
         } catch (error) {
@@ -736,9 +734,8 @@ export function unarchiveChannel(channelId: string): ActionFunc {
             return {error};
         }
 
-        state = getState();
+        const state = getState();
         const viewArchivedChannels = state.entities.general.config.ExperimentalViewArchivedChannels === 'true';
-
         dispatch({type: ChannelTypes.UNARCHIVED_CHANNEL_SUCCESS, data: {id: channelId, viewArchivedChannels}});
 
         return {data: true};
