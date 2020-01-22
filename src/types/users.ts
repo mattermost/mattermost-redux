@@ -39,6 +39,7 @@ export type UserProfile = {
 };
 export type UsersState = {
     currentUserId: string;
+    isManualStatus: RelationOneToOne<UserProfile, boolean>;
     mySessions: Array<any>;
     myAudits: Array<any>;
     profiles: IDMappedObjects<UserProfile>;
