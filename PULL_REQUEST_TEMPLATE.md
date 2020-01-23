@@ -7,7 +7,7 @@
 REMEMBER TO:
 - Run `make check-style` to check for style errors (required for all pull requests)
 - Run `make test` to ensure unit tests passed
-- Run `make flow` to ensure type checking passed
+- Run `make check-types` to ensure type checking passed
 - Add or update unit tests (required for all new features)
 - All new/modified APIs include changes to the [JavaScript driver](https://github.com/mattermost/mattermost-redux/blob/master/src/client/client4.js)
 -->
