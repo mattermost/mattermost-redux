@@ -9,12 +9,10 @@ import general from './general';
 import posts from './posts';
 import teams from './teams';
 import users from './users';
-import preferences from './preferences';
 import admin from './admin';
 import jobs from './jobs';
 import search from './search';
 import roles from './roles';
-import schemes from './schemes';
 
 export default combineReducers({
     channels,
@@ -23,10 +21,8 @@ export default combineReducers({
     posts,
     teams,
     users,
-    preferences,
     admin,
     jobs,
     search,
     roles,
-    schemes,
 });

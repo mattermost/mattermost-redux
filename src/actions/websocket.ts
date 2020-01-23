@@ -268,6 +268,9 @@ function handleEvent(msg: WebSocketMessage) {
     case WebsocketEvents.CHANNEL_DELETED:
         doDispatch(handleChannelDeletedEvent(msg));
         break;
+    case WebsocketEvents.CHANNEL_UNARCHIVED:
+        doDispatch(handleChannelUnarchiveEvent(msg));
+        break;
     case WebsocketEvents.CHANNEL_UPDATED:
         doDispatch(handleChannelUpdatedEvent(msg));
         break;
@@ -609,7 +612,23 @@ function handleChannelDeletedEvent(msg: WebSocketMessage) {
                 EventEmitter.emit(General.DEFAULT_CHANNEL, '');
             }
 
-            dispatch({type: ChannelTypes.RECEIVED_CHANNEL_DELETED, data: {id: msg.data.channel_id, team_id: msg.data.team_id, deleteAt: msg.data.delete_at, viewArchivedChannels}}, getState);
+            dispatch({type: ChannelTypes.RECEIVED_CHANNEL_DELETED, data: {id: msg.data.channel_id, team_id: msg.data.team_id, viewArchivedChannels}});
+
+            dispatch(fetchMyChannelsAndMembers(currentTeamId));
+        }
+        return {data: true};
+    };
+}
+
+function handleChannelUnarchiveEvent(msg: WebSocketMessage) {
+    return (dispatch: DispatchFunc, getState: GetStateFunc) => {
+        const state = getState();
+        const currentTeamId = getCurrentTeamId(state);
+        const config = getConfig(state);
+        const viewArchivedChannels = config.ExperimentalViewArchivedChannels === 'true';
+
+        if (msg.broadcast.team_id === currentTeamId) {
+            dispatch({type: ChannelTypes.RECEIVED_CHANNEL_UNARCHIVED, data: {id: msg.data.channel_id, team_id: msg.data.team_id, deleteAt: 0, viewArchivedChannels}});
 
             dispatch(fetchMyChannelsAndMembers(currentTeamId));
         }

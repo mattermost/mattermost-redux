@@ -39,12 +39,6 @@ export type UsersRequestsStatuses = {
     updateMe: RequestStatusType;
 };
 
-export type PreferencesRequestsStatuses = {
-    getMyPreferences: RequestStatusType;
-    savePreferences: RequestStatusType;
-    deletePreferences: RequestStatusType;
-};
-
 export type AdminRequestsStatuses = {
     getLogs: RequestStatusType;
     getAudits: RequestStatusType;
@@ -105,16 +99,6 @@ export type RolesRequestsStatuses = {
     getRoleByName: RequestStatusType;
     getRole: RequestStatusType;
     editRole: RequestStatusType;
-};
-
-export type SchemesRequestsStatuses = {
-    getSchemes: RequestStatusType;
-    getScheme: RequestStatusType;
-    createScheme: RequestStatusType;
-    deleteScheme: RequestStatusType;
-    patchScheme: RequestStatusType;
-    getSchemeTeams: RequestStatusType;
-    getSchemeChannels: RequestStatusType;
 };
 
 export type JobsRequestsStatuses = {
