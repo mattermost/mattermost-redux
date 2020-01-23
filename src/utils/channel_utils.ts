@@ -429,6 +429,7 @@ function createFakeChannel(userId: string, otherUserId: string): Channel {
         type: General.DM_CHANNEL as ChannelType,
         fake: true,
         team_id: '',
+        team_display_name: '',
         scheme_id: '',
         purpose: '',
         header: '',
