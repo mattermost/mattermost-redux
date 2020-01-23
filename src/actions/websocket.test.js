@@ -121,6 +121,54 @@ describe('Actions.Websocket', () => {
         expect(emit).toHaveBeenCalledWith(WebsocketEvents.INCREASE_POST_VISIBILITY_BY_ONE);
     });
 
+    it('Websocket Handle New Post if status is manually set do not set to online', async () => {
+        const userId = TestHelper.generateId();
+
+        store = await configureStore({
+            entities: {
+                users: {
+                    statuses: {
+                        [userId]: General.DND,
+                    },
+                    isManualStatus: {
+                        [userId]: true,
+                    },
+                },
+            },
+        });
+        await store.dispatch(Actions.init(
+            'web',
+            null,
+            null,
+            MockWebSocket
+        ));
+
+        const channelId = TestHelper.basicChannel.id;
+        const message = JSON.stringify({
+            event: WebsocketEvents.POSTED,
+            data: {
+                channel_display_name: TestHelper.basicChannel.display_name,
+                channel_name: TestHelper.basicChannel.name,
+                channel_type: 'O',
+                post: `{"id": "71k8gz5ompbpfkrzaxzodffj8w", "create_at": 1508245311774, "update_at": 1508245311774, "edit_at": 0, "delete_at": 0, "is_pinned": false, "user_id": "${userId}", "channel_id": "${channelId}", "root_id": "", "parent_id": "", "original_id": "", "message": "Unit Test", "type": "", "props": {}, "hashtags": "", "pending_post_id": "t36kso9nwtdhbm8dbkd6g4eeby: 1508245311749"}`,
+                sender_name: TestHelper.basicUser.username,
+                team_id: TestHelper.basicTeam.id,
+            },
+            broadcast: {
+                omit_users: null,
+                user_id: userId,
+                channel_id: channelId,
+                team_id: '',
+            },
+            seq: 2,
+        });
+
+        mockServer.emit('message', message);
+        const entities = store.getState().entities;
+        const statuses = entities.users.statuses;
+        assert.equal(statuses[userId], General.DND);
+    });
+
     it('Websocket Handle Post Edited', async () => {
         const post = {id: '71k8gz5ompbpfkrzaxzodffj8w'};
         mockServer.emit('message', JSON.stringify({event: WebsocketEvents.POST_EDITED, data: {post: `{"id": "71k8gz5ompbpfkrzaxzodffj8w","create_at": 1508245311774,"update_at": 1508247709215,"edit_at": 1508247709215,"delete_at": 0,"is_pinned": false,"user_id": "${TestHelper.basicUser.id}","channel_id": "${TestHelper.basicChannel.id}","root_id": "","parent_id": "","original_id": "","message": "Unit Test (edited)","type": "","props": {},"hashtags": "","pending_post_id": ""}`}, broadcast: {omit_users: null, user_id: '', channel_id: '18k9ffsuci8xxm7ak68zfdyrce', team_id: ''}, seq: 2}));
