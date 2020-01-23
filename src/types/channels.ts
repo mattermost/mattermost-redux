@@ -20,6 +20,7 @@ export type Channel = {
     update_at: number;
     delete_at: number;
     team_id: string;
+    team_display_name: string;
     type: ChannelType;
     display_name: string;
     name: string;
