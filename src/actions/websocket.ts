@@ -11,7 +11,7 @@ import {getConfig} from 'selectors/entities/general';
 import {getAllPosts, getPost as getPostSelector} from 'selectors/entities/posts';
 import {getDirectShowPreferences} from 'selectors/entities/preferences';
 import {getCurrentTeamId, getCurrentTeamMembership, getTeams as getTeamsSelector} from 'selectors/entities/teams';
-import {getCurrentUser, getCurrentUserId, getUsers, getUserStatuses} from 'selectors/entities/users';
+import {getCurrentUser, getCurrentUserId, getUsers, getUserStatuses, getIsManualStatusForUserId} from 'selectors/entities/users';
 import {getChannelByName} from 'utils/channel_utils';
 import {fromAutoResponder} from 'utils/post_utils';
 import EventEmitter from 'utils/event_emitter';
@@ -342,7 +342,7 @@ function handleNewPostEvent(msg: WebSocketMessage) {
             dispatch(handleNewPost(msg));
             getProfilesAndStatusesForPosts([post], dispatch, getState);
 
-            if (post.user_id !== getCurrentUserId(getState()) && !fromAutoResponder(post)) {
+            if (post.user_id !== getCurrentUserId(getState()) && !fromAutoResponder(post) && !getIsManualStatusForUserId(state, post.user_id)) {
                 dispatch({
                     type: UserTypes.RECEIVED_STATUSES,
                     data: [{user_id: post.user_id, status: General.ONLINE}],
