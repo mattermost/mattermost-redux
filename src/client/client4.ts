@@ -1204,6 +1204,24 @@ export default class Client4 {
         );
     };
 
+    sendEmailInvitesToTeamGracefully = async (teamId: string, emails: string[]) => {
+        this.trackEvent('api', 'api_teams_invite_members', {team_id: teamId});
+
+        return this.doFetch(
+            `${this.getTeamRoute(teamId)}/invite/email?graceful=true`,
+            {method: 'post', body: JSON.stringify(emails)}
+        );
+    };
+
+    sendEmailGuestInvitesToChannelsGracefully = async (teamId: string, channelIds: string[], emails: string[], message: string) => {
+        this.trackEvent('api', 'api_teams_invite_guests', {team_id: teamId, channel_ids: channelIds});
+
+        return this.doFetch(
+            `${this.getTeamRoute(teamId)}/invite-guests/email?graceful=true`,
+            {method: 'post', body: JSON.stringify({emails, channels: channelIds, message})}
+        );
+    };
+
     importTeam = async (teamId: string, file: File, importFrom: string) => {
         const formData = new FormData();
         formData.append('file', file, file.name);
