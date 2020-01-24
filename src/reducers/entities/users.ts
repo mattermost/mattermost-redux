@@ -386,6 +386,38 @@ function statuses(state: RelationOneToOne<UserProfile, string> = {}, action: Gen
     }
 }
 
+function isManualStatus(state: RelationOneToOne<UserProfile, boolean> = {}, action: GenericAction) {
+    switch (action.type) {
+    case UserTypes.RECEIVED_STATUS: {
+        const nextState = Object.assign({}, state);
+        nextState[action.data.user_id] = action.data.manual;
+
+        return nextState;
+    }
+    case UserTypes.RECEIVED_STATUSES: {
+        const nextState = Object.assign({}, state);
+
+        for (const s of action.data) {
+            nextState[s.user_id] = s.manual;
+        }
+
+        return nextState;
+    }
+    case UserTypes.LOGOUT_SUCCESS:
+        return {};
+    case UserTypes.PROFILE_NO_LONGER_VISIBLE: {
+        if (state[action.data.user_id]) {
+            const newState = {...state};
+            delete newState[action.data.user_id];
+            return newState;
+        }
+        return state;
+    }
+    default:
+        return state;
+    }
+}
+
 function myUserAccessTokens(state: any = {}, action: GenericAction) {
     switch (action.type) {
     case UserTypes.RECEIVED_MY_USER_ACCESS_TOKEN: {
@@ -485,6 +517,9 @@ export default combineReducers({
 
     // object where every key is the user id and has a value with the current status of each user
     statuses,
+
+    // object where every key is the user id and has a value with a flag determining if their status was set manually
+    isManualStatus,
 
     // Total user stats
     stats,
