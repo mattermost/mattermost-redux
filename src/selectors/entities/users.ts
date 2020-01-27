@@ -233,6 +233,10 @@ function filterProfiles(profiles: IDMappedObjects<UserProfile>, filters?: Filter
     }, {} as IDMappedObjects<UserProfile>);
 }
 
+export function getIsManualStatusForUserId(state: GlobalState, userId: $ID<UserProfile>): boolean {
+    return state.entities.users.isManualStatus[userId];
+}
+
 export const getProfilesInCurrentChannel: (a: GlobalState) => Array<UserProfile> = createSelector(
     getUsers,
     getProfileSetInCurrentChannel,

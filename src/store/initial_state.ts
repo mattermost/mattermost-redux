@@ -15,6 +15,7 @@ const state: GlobalState = {
         },
         users: {
             currentUserId: '',
+            isManualStatus: {},
             mySessions: [],
             myAudits: [],
             profiles: {},
