@@ -237,7 +237,6 @@ describe('ChannelUtils', () => {
         const channelA = {
             name: 'channelA',
             team_id: 'teamId',
-            team_display_name: "Team Display Name",
             display_name: 'Unit Test channelA',
             type: 'O',
             delete_at: 0,
@@ -247,7 +246,6 @@ describe('ChannelUtils', () => {
         const channelB = {
             name: 'channelB',
             team_id: 'teamId',
-            team_display_name: "Team Display Name",
             display_name: 'Unit Test channelB',
             type: 'O',
             delete_at: 0,
