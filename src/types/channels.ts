@@ -20,7 +20,6 @@ export type Channel = {
     update_at: number;
     delete_at: number;
     team_id: string;
-    team_display_name: string;
     type: ChannelType;
     display_name: string;
     name: string;
@@ -37,6 +36,11 @@ export type Channel = {
     fake?: boolean;
     group_constrained: boolean;
 };
+export type ChannelWithTeamData = Channel & {
+    team_display_name: string;
+    team_name: string;
+    team_update_at: number;
+}
 export type ChannelMembership = {
     channel_id: string;
     user_id: string;
