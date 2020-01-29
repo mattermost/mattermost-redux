@@ -35,8 +35,8 @@ describe('Actions.Posts', () => {
         const channelId = TestHelper.basicChannel.id;
         const post = TestHelper.fakePost(channelId);
 
-        nock(Client4.getPostsRoute()).
-            post('').
+        nock(Client4.getBaseRoute()).
+            post('/posts').
             reply(201, {...post, id: TestHelper.generateId()});
 
         await Actions.createPost(post)(store.dispatch, store.getState);
@@ -74,8 +74,8 @@ describe('Actions.Posts', () => {
             url: 'http://localhost:8065/api/v4/posts',
         };
 
-        nock(Client4.getPostsRoute()).
-            post('').
+        nock(Client4.getBaseRoute()).
+            post('/posts').
             reply(400, createPostError);
 
         await Actions.createPost(post)(store.dispatch, store.getState);
@@ -109,8 +109,8 @@ describe('Actions.Posts', () => {
         const post = TestHelper.fakePost(channelId);
         const files = TestHelper.fakeFiles(3);
 
-        nock(Client4.getPostsRoute()).
-            post('').
+        nock(Client4.getBaseRoute()).
+            post('/posts').
             reply(201, {...post, id: TestHelper.generateId(), file_ids: [files[0].id, files[1].id, files[2].id]});
 
         await Actions.createPost(
@@ -156,7 +156,7 @@ describe('Actions.Posts', () => {
     //         post('/posts').
     //         reply(400, {});
 
-    //     nock(Client4.getPostsRoute()).
+    //     nock(Client4.getBaseRoute()).
     //         post('').
     //         reply(201, {...post, id: TestHelper.generateId()});
 
@@ -204,8 +204,8 @@ describe('Actions.Posts', () => {
     it('editPost', async () => {
         const channelId = TestHelper.basicChannel.id;
 
-        nock(Client4.getPostsRoute()).
-            post('').
+        nock(Client4.getBaseRoute()).
+            post('/posts').
             reply(201, TestHelper.fakePostWithId(channelId));
 
         const post = await Client4.createPost(
@@ -215,8 +215,8 @@ describe('Actions.Posts', () => {
 
         post.message = `${message} (edited)`;
 
-        nock(Client4.getPostsRoute()).
-            put(`/${post.id}/patch`).
+        nock(Client4.getBaseRoute()).
+            put(`/posts/${post.id}/patch`).
             reply(200, post);
 
         await Actions.editPost(
@@ -243,8 +243,8 @@ describe('Actions.Posts', () => {
     it('deletePost', async () => {
         const channelId = TestHelper.basicChannel.id;
 
-        nock(Client4.getPostsRoute()).
-            post('').
+        nock(Client4.getBaseRoute()).
+            post('/posts').
             reply(201, TestHelper.fakePostWithId(channelId));
         await Actions.createPost(TestHelper.fakePost(channelId))(store.dispatch, store.getState);
         const initialPosts = store.getState().entities.posts;
@@ -266,8 +266,8 @@ describe('Actions.Posts', () => {
         TestHelper.mockLogin();
         await login(TestHelper.basicUser.email, 'password1')(store.dispatch, store.getState);
 
-        nock(Client4.getPostsRoute()).
-            post('').
+        nock(Client4.getBaseRoute()).
+            post('/posts').
             reply(201, TestHelper.fakePostWithId(TestHelper.basicChannel.id));
 
         const post1 = await Client4.createPost(
@@ -276,8 +276,8 @@ describe('Actions.Posts', () => {
 
         const emojiName = '+1';
 
-        nock(Client4.getReactionsRoute()).
-            post('').
+        nock(Client4.getBaseRoute()).
+            post('/reactions').
             reply(201, {user_id: TestHelper.basicUser.id, post_id: post1.id, emoji_name: emojiName, create_at: 1508168444721});
         await Actions.addReaction(post1.id, emojiName)(store.dispatch, store.getState);
 
@@ -343,8 +343,8 @@ describe('Actions.Posts', () => {
         TestHelper.mockLogin();
         await login(TestHelper.basicUser.email, 'password1')(store.dispatch, store.getState);
 
-        nock(Client4.getPostsRoute()).
-            post('').
+        nock(Client4.getBaseRoute()).
+            post('/posts').
             reply(201, TestHelper.fakePostWithId(TestHelper.basicChannel.id));
         const post1 = await Client4.createPost(
             TestHelper.fakePost(TestHelper.basicChannel.id)
@@ -352,8 +352,8 @@ describe('Actions.Posts', () => {
 
         const emojiName = '+1';
 
-        nock(Client4.getReactionsRoute()).
-            post('').
+        nock(Client4.getBaseRoute()).
+            post('/reactions').
             reply(201, {user_id: TestHelper.basicUser.id, post_id: post1.id, emoji_name: emojiName, create_at: 1508168444721});
         await Actions.addReaction(post1.id, emojiName)(store.dispatch, store.getState);
 
@@ -409,8 +409,8 @@ describe('Actions.Posts', () => {
             },
         };
 
-        nock(Client4.getPostsRoute()).
-            get(`/${post.id}/thread`).
+        nock(Client4.getBaseRoute()).
+            get(`/posts/${post.id}/thread`).
             reply(200, postList);
         await Actions.getPostThread(post.id)(store.dispatch, store.getState);
 
@@ -1012,8 +1012,8 @@ describe('Actions.Posts', () => {
             get(`/${channelId}/posts`).
             query((params) => Boolean(params.before)).
             reply(200, postsBefore);
-        nock(Client4.getPostsRoute()).
-            get(`/${postId}/thread`).
+        nock(Client4.getBaseRoute()).
+            get(`/posts/${postId}/thread`).
             query(true).
             reply(200, postsThread);
 
@@ -1064,8 +1064,8 @@ describe('Actions.Posts', () => {
         TestHelper.mockLogin();
         await login(TestHelper.basicUser.email, 'password1')(store.dispatch, store.getState);
 
-        nock(Client4.getPostsRoute()).
-            post('').
+        nock(Client4.getBaseRoute()).
+            post('/posts').
             reply(201, TestHelper.fakePostWithId(TestHelper.basicChannel.id));
 
         const post1 = await Client4.createPost(
@@ -1094,8 +1094,8 @@ describe('Actions.Posts', () => {
         TestHelper.mockLogin();
         await login(TestHelper.basicUser.email, 'password1')(store.dispatch, store.getState);
 
-        nock(Client4.getPostsRoute()).
-            post('').
+        nock(Client4.getBaseRoute()).
+            post('/posts').
             reply(201, TestHelper.fakePostWithId(TestHelper.basicChannel.id));
         const post1 = await Client4.createPost(
             TestHelper.fakePost(channelId)
@@ -1173,8 +1173,8 @@ describe('Actions.Posts', () => {
     it('pinPost', async () => {
         const {dispatch, getState} = store;
 
-        nock(Client4.getPostsRoute()).
-            post('').
+        nock(Client4.getBaseRoute()).
+            post('/posts').
             reply(201, TestHelper.fakePostWithId(TestHelper.basicChannel.id));
         const post1 = await Client4.createPost(
             TestHelper.fakePost(TestHelper.basicChannel.id)
@@ -1183,13 +1183,13 @@ describe('Actions.Posts', () => {
         const postList = {order: [post1.id], posts: {}};
         postList.posts[post1.id] = post1;
 
-        nock(Client4.getPostsRoute()).
-            get(`/${post1.id}/thread`).
+        nock(Client4.getBaseRoute()).
+            get(`/posts/${post1.id}/thread`).
             reply(200, postList);
         await Actions.getPostThread(post1.id)(dispatch, getState);
 
-        nock(Client4.getPostsRoute()).
-            post(`/${post1.id}/pin`).
+        nock(Client4.getBaseRoute()).
+            post(`/posts/${post1.id}/pin`).
             reply(200, OK_RESPONSE);
         await Actions.pinPost(post1.id)(dispatch, getState);
 
@@ -1202,8 +1202,8 @@ describe('Actions.Posts', () => {
     it('unpinPost', async () => {
         const {dispatch, getState} = store;
 
-        nock(Client4.getPostsRoute()).
-            post('').
+        nock(Client4.getBaseRoute()).
+            post('/posts').
             reply(201, TestHelper.fakePostWithId(TestHelper.basicChannel.id));
         const post1 = await Client4.createPost(
             TestHelper.fakePost(TestHelper.basicChannel.id)
@@ -1212,18 +1212,18 @@ describe('Actions.Posts', () => {
         const postList = {order: [post1.id], posts: {}};
         postList.posts[post1.id] = post1;
 
-        nock(Client4.getPostsRoute()).
-            get(`/${post1.id}/thread`).
+        nock(Client4.getBaseRoute()).
+            get(`/posts/${post1.id}/thread`).
             reply(200, postList);
         await Actions.getPostThread(post1.id)(dispatch, getState);
 
-        nock(Client4.getPostsRoute()).
-            post(`/${post1.id}/pin`).
+        nock(Client4.getBaseRoute()).
+            post(`/posts/${post1.id}/pin`).
             reply(200, OK_RESPONSE);
         await Actions.pinPost(post1.id)(dispatch, getState);
 
-        nock(Client4.getPostsRoute()).
-            post(`/${post1.id}/unpin`).
+        nock(Client4.getBaseRoute()).
+            post(`/posts/${post1.id}/unpin`).
             reply(200, OK_RESPONSE);
         await Actions.unpinPost(post1.id)(dispatch, getState);
 
@@ -1239,8 +1239,8 @@ describe('Actions.Posts', () => {
         TestHelper.mockLogin();
         await login(TestHelper.basicUser.email, 'password1')(dispatch, getState);
 
-        nock(Client4.getPostsRoute()).
-            post('').
+        nock(Client4.getBaseRoute()).
+            post('/posts').
             reply(201, TestHelper.fakePostWithId(TestHelper.basicChannel.id));
         const post1 = await Client4.createPost(
             TestHelper.fakePost(TestHelper.basicChannel.id)
@@ -1248,8 +1248,8 @@ describe('Actions.Posts', () => {
 
         const emojiName = '+1';
 
-        nock(Client4.getReactionsRoute()).
-            post('').
+        nock(Client4.getBaseRoute()).
+            post('/reactions').
             reply(201, {user_id: TestHelper.basicUser.id, post_id: post1.id, emoji_name: emojiName, create_at: 1508168444721});
         await Actions.addReaction(post1.id, emojiName)(dispatch, getState);
 
@@ -1265,8 +1265,8 @@ describe('Actions.Posts', () => {
         TestHelper.mockLogin();
         await login(TestHelper.basicUser.email, 'password1')(dispatch, getState);
 
-        nock(Client4.getPostsRoute()).
-            post('').
+        nock(Client4.getBaseRoute()).
+            post('/posts').
             reply(201, TestHelper.fakePostWithId(TestHelper.basicChannel.id));
         const post1 = await Client4.createPost(
             TestHelper.fakePost(TestHelper.basicChannel.id)
@@ -1274,8 +1274,8 @@ describe('Actions.Posts', () => {
 
         const emojiName = '+1';
 
-        nock(Client4.getReactionsRoute()).
-            post('').
+        nock(Client4.getBaseRoute()).
+            post('/reactions').
             reply(201, {user_id: TestHelper.basicUser.id, post_id: post1.id, emoji_name: emojiName, create_at: 1508168444721});
         await Actions.addReaction(post1.id, emojiName)(dispatch, getState);
 
@@ -1296,8 +1296,8 @@ describe('Actions.Posts', () => {
         TestHelper.mockLogin();
         await login(TestHelper.basicUser.email, 'password1')(dispatch, getState);
 
-        nock(Client4.getPostsRoute()).
-            post('').
+        nock(Client4.getBaseRoute()).
+            post('/posts').
             reply(201, TestHelper.fakePostWithId(TestHelper.basicChannel.id));
         const post1 = await Client4.createPost(
             TestHelper.fakePost(TestHelper.basicChannel.id)
@@ -1305,8 +1305,8 @@ describe('Actions.Posts', () => {
 
         const emojiName = '+1';
 
-        nock(Client4.getReactionsRoute()).
-            post('').
+        nock(Client4.getBaseRoute()).
+            post('/reactions').
             reply(201, {user_id: TestHelper.basicUser.id, post_id: post1.id, emoji_name: emojiName, create_at: 1508168444721});
         await Actions.addReaction(post1.id, emojiName)(dispatch, getState);
 
@@ -1315,8 +1315,8 @@ describe('Actions.Posts', () => {
             data: {user_id: TestHelper.basicUser.id, post_id: post1.id, emoji_name: emojiName},
         });
 
-        nock(Client4.getPostsRoute()).
-            get(`/${post1.id}/reactions`).
+        nock(Client4.getBaseRoute()).
+            get(`/posts/${post1.id}/reactions`).
             reply(200, [{user_id: TestHelper.basicUser.id, post_id: post1.id, emoji_name: emojiName, create_at: 1508168444721}]);
         await Actions.getReactionsForPost(post1.id)(dispatch, getState);
 
@@ -1331,8 +1331,8 @@ describe('Actions.Posts', () => {
         const testImageData = fs.createReadStream('test/assets/images/test.png');
         const {dispatch, getState} = store;
 
-        nock(Client4.getEmojisRoute()).
-            post('').
+        nock(Client4.getBaseRoute()).
+            post('/emoji').
             reply(201, {id: TestHelper.generateId(), create_at: 1507918415696, update_at: 1507918415696, delete_at: 0, creator_id: TestHelper.basicUser.id, name: TestHelper.generateId()});
 
         const {data: created} = await createCustomEmoji(
@@ -1647,8 +1647,8 @@ describe('Actions.Posts', () => {
                 },
             };
 
-            nock(Client4.getPostsRoute()).
-                get(`/${post1.id}/thread`).
+            nock(Client4.getBaseRoute()).
+                get(`/posts/${post1.id}/thread`).
                 reply(200, threadList);
         });
 

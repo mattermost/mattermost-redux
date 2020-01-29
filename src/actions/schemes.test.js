@@ -28,8 +28,8 @@ describe('Actions.Schemes', () => {
     it('getSchemes', async () => {
         const mockScheme = TestHelper.basicScheme;
 
-        nock(Client4.getSchemesRoute()).
-            get('').
+        nock(Client4.getBaseRoute()).
+            get('/schemes').
             query(true).
             reply(200, [mockScheme]);
 
@@ -42,8 +42,8 @@ describe('Actions.Schemes', () => {
     it('createScheme', async () => {
         const mockScheme = TestHelper.basicScheme;
 
-        nock(Client4.getSchemesRoute()).
-            post('').
+        nock(Client4.getBaseRoute()).
+            post('/schemes').
             reply(201, mockScheme);
         await Actions.createScheme(TestHelper.mockScheme())(store.dispatch, store.getState);
 
@@ -55,8 +55,8 @@ describe('Actions.Schemes', () => {
     });
 
     it('getScheme', async () => {
-        nock(Client4.getSchemesRoute()).
-            get('/' + TestHelper.basicScheme.id).
+        nock(Client4.getBaseRoute()).
+            get('/schemes/' + TestHelper.basicScheme.id).
             reply(200, TestHelper.basicScheme);
 
         await Actions.getScheme(TestHelper.basicScheme.id)(store.dispatch, store.getState);
@@ -74,8 +74,8 @@ describe('Actions.Schemes', () => {
             ...patchData,
         };
 
-        nock(Client4.getSchemesRoute()).
-            put('/' + TestHelper.basicScheme.id + '/patch').
+        nock(Client4.getBaseRoute()).
+            put('/schemes/' + TestHelper.basicScheme.id + '/patch').
             reply(200, scheme);
 
         await Actions.patchScheme(TestHelper.basicScheme.id, scheme)(store.dispatch, store.getState);
@@ -90,8 +90,8 @@ describe('Actions.Schemes', () => {
     });
 
     it('deleteScheme', async () => {
-        nock(Client4.getSchemesRoute()).
-            delete('/' + TestHelper.basicScheme.id).
+        nock(Client4.getBaseRoute()).
+            delete('/schemes/' + TestHelper.basicScheme.id).
             reply(200, {status: 'OK'});
 
         await Actions.deleteScheme(TestHelper.basicScheme.id)(store.dispatch, store.getState);

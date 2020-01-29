@@ -37,13 +37,13 @@ describe('Actions.Search', () => {
             message: 'return this message in second attempt',
         };
 
-        nock(Client4.getPostsRoute()).
-            post('').
+        nock(Client4.getBaseRoute()).
+            post('/posts').
             reply(201, {...post1, id: TestHelper.generateId()});
         post1 = await Client4.createPost(post1);
 
-        nock(Client4.getPostsRoute()).
-            post('').
+        nock(Client4.getBaseRoute()).
+            post('/posts').
             reply(201, {...post2, id: TestHelper.generateId()});
         post2 = await Client4.createPost(post2);
 

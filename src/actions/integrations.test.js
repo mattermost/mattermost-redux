@@ -28,8 +28,8 @@ describe('Actions.Integrations', () => {
     });
 
     it('createIncomingHook', async () => {
-        nock(Client4.getIncomingHooksRoute()).
-            post('').
+        nock(Client4.getBaseRoute()).
+            post('/hooks/incoming').
             reply(201, TestHelper.testIncomingHook());
 
         const {data: created} = await Actions.createIncomingHook(
@@ -48,8 +48,8 @@ describe('Actions.Integrations', () => {
     });
 
     it('getIncomingWebhook', async () => {
-        nock(Client4.getIncomingHooksRoute()).
-            post('').
+        nock(Client4.getBaseRoute()).
+            post('/hooks/incoming').
             reply(201, TestHelper.testIncomingHook());
 
         const {data: created} = await Actions.createIncomingHook(
@@ -60,8 +60,8 @@ describe('Actions.Integrations', () => {
             },
         )(store.dispatch, store.getState);
 
-        nock(Client4.getIncomingHooksRoute()).
-            get(`/${created.id}`).
+        nock(Client4.getBaseRoute()).
+            get(`/hooks/incoming/${created.id}`).
             reply(200, created);
 
         await Actions.getIncomingHook(created.id)(store.dispatch, store.getState);
@@ -74,8 +74,8 @@ describe('Actions.Integrations', () => {
     });
 
     it('getIncomingWebhooks', async () => {
-        nock(Client4.getIncomingHooksRoute()).
-            post('').
+        nock(Client4.getBaseRoute()).
+            post('/hooks/incoming').
             reply(201, TestHelper.testIncomingHook());
 
         const {data: created} = await Actions.createIncomingHook(
@@ -86,8 +86,8 @@ describe('Actions.Integrations', () => {
             },
         )(store.dispatch, store.getState);
 
-        nock(Client4.getIncomingHooksRoute()).
-            get('').
+        nock(Client4.getBaseRoute()).
+            get('/hooks/incoming').
             query(true).
             reply(200, [created]);
 
@@ -101,8 +101,8 @@ describe('Actions.Integrations', () => {
     });
 
     it('removeIncomingHook', async () => {
-        nock(Client4.getIncomingHooksRoute()).
-            post('').
+        nock(Client4.getBaseRoute()).
+            post('/hooks/incoming').
             reply(201, TestHelper.testIncomingHook());
 
         const {data: created} = await Actions.createIncomingHook(
@@ -113,8 +113,8 @@ describe('Actions.Integrations', () => {
             },
         )(store.dispatch, store.getState);
 
-        nock(Client4.getIncomingHooksRoute()).
-            delete(`/${created.id}`).
+        nock(Client4.getBaseRoute()).
+            delete(`/hooks/incoming/${created.id}`).
             reply(200, OK_RESPONSE);
 
         await Actions.removeIncomingHook(created.id)(store.dispatch, store.getState);
@@ -126,8 +126,8 @@ describe('Actions.Integrations', () => {
     });
 
     it('updateIncomingHook', async () => {
-        nock(Client4.getIncomingHooksRoute()).
-            post('').
+        nock(Client4.getBaseRoute()).
+            post('/hooks/incoming').
             reply(201, TestHelper.testIncomingHook());
 
         const {data: created} = await Actions.createIncomingHook(
@@ -141,8 +141,8 @@ describe('Actions.Integrations', () => {
         const updated = {...created};
         updated.display_name = 'test2';
 
-        nock(Client4.getIncomingHooksRoute()).
-            put(`/${created.id}`).
+        nock(Client4.getBaseRoute()).
+            put(`/hooks/incoming/${created.id}`).
             reply(200, updated);
         await Actions.updateIncomingHook(updated)(store.dispatch, store.getState);
 
@@ -154,8 +154,8 @@ describe('Actions.Integrations', () => {
     });
 
     it('createOutgoingHook', async () => {
-        nock(Client4.getOutgoingHooksRoute()).
-            post('').
+        nock(Client4.getBaseRoute()).
+            post('/hooks/outgoing').
             reply(201, TestHelper.testOutgoingHook());
 
         const {data: created} = await Actions.createOutgoingHook(
@@ -176,8 +176,8 @@ describe('Actions.Integrations', () => {
     });
 
     it('getOutgoingWebhook', async () => {
-        nock(Client4.getOutgoingHooksRoute()).
-            post('').
+        nock(Client4.getBaseRoute()).
+            post('/hooks/outgoing').
             reply(201, TestHelper.testOutgoingHook());
 
         const {data: created} = await Actions.createOutgoingHook(
@@ -190,8 +190,8 @@ describe('Actions.Integrations', () => {
             },
         )(store.dispatch, store.getState);
 
-        nock(Client4.getOutgoingHooksRoute()).
-            get(`/${created.id}`).
+        nock(Client4.getBaseRoute()).
+            get(`/hooks/outgoing/${created.id}`).
             reply(200, TestHelper.testOutgoingHook());
 
         await Actions.getOutgoingHook(created.id)(store.dispatch, store.getState);
@@ -204,8 +204,8 @@ describe('Actions.Integrations', () => {
     });
 
     it('getOutgoingWebhooks', async () => {
-        nock(Client4.getOutgoingHooksRoute()).
-            post('').
+        nock(Client4.getBaseRoute()).
+            post('/hooks/outgoing').
             reply(201, TestHelper.testOutgoingHook());
 
         const {data: created} = await Actions.createOutgoingHook(
@@ -218,8 +218,8 @@ describe('Actions.Integrations', () => {
             },
         )(store.dispatch, store.getState);
 
-        nock(Client4.getOutgoingHooksRoute()).
-            get('').
+        nock(Client4.getBaseRoute()).
+            get('/hooks/outgoing').
             query(true).
             reply(200, [TestHelper.testOutgoingHook()]);
 
@@ -233,8 +233,8 @@ describe('Actions.Integrations', () => {
     });
 
     it('removeOutgoingHook', async () => {
-        nock(Client4.getOutgoingHooksRoute()).
-            post('').
+        nock(Client4.getBaseRoute()).
+            post('/hooks/outgoing').
             reply(201, TestHelper.testOutgoingHook());
 
         const {data: created} = await Actions.createOutgoingHook(
@@ -247,8 +247,8 @@ describe('Actions.Integrations', () => {
             },
         )(store.dispatch, store.getState);
 
-        nock(Client4.getOutgoingHooksRoute()).
-            delete(`/${created.id}`).
+        nock(Client4.getBaseRoute()).
+            delete(`/hooks/outgoing/${created.id}`).
             reply(200, OK_RESPONSE);
 
         await Actions.removeOutgoingHook(created.id)(store.dispatch, store.getState);
@@ -260,8 +260,8 @@ describe('Actions.Integrations', () => {
     });
 
     it('updateOutgoingHook', async () => {
-        nock(Client4.getOutgoingHooksRoute()).
-            post('').
+        nock(Client4.getBaseRoute()).
+            post('/hooks/outgoing').
             reply(201, TestHelper.testOutgoingHook());
 
         const {data: created} = await Actions.createOutgoingHook(
@@ -276,8 +276,8 @@ describe('Actions.Integrations', () => {
 
         const updated = {...created};
         updated.display_name = 'test2';
-        nock(Client4.getOutgoingHooksRoute()).
-            put(`/${created.id}`).
+        nock(Client4.getBaseRoute()).
+            put(`/hooks/outgoing/${created.id}`).
             reply(200, updated);
         await Actions.updateOutgoingHook(updated)(store.dispatch, store.getState);
 
@@ -289,8 +289,8 @@ describe('Actions.Integrations', () => {
     });
 
     it('regenOutgoingHookToken', async () => {
-        nock(Client4.getOutgoingHooksRoute()).
-            post('').
+        nock(Client4.getBaseRoute()).
+            post('/hooks/outgoing').
             reply(201, TestHelper.testOutgoingHook());
 
         const {data: created} = await Actions.createOutgoingHook(
@@ -303,8 +303,8 @@ describe('Actions.Integrations', () => {
             },
         )(store.dispatch, store.getState);
 
-        nock(Client4.getOutgoingHooksRoute()).
-            post(`/${created.id}/regen_token`).
+        nock(Client4.getBaseRoute()).
+            post(`/hooks/outgoing/${created.id}/regen_token`).
             reply(200, {...created, token: TestHelper.generateId()});
         await Actions.regenOutgoingHookToken(created.id)(store.dispatch, store.getState);
 
@@ -320,8 +320,8 @@ describe('Actions.Integrations', () => {
         const noSystemCommands = store.getState().entities.integrations.systemCommands;
         assert.equal(Object.keys({...noTeamCommands, ...noSystemCommands}).length, 0);
 
-        nock(Client4.getTeamsRoute()).
-            post('').
+        nock(Client4.getBaseRoute()).
+            post('/teams').
             reply(201, TestHelper.fakeTeamWithId());
 
         const {data: team} = await TeamsActions.createTeam(
@@ -330,16 +330,16 @@ describe('Actions.Integrations', () => {
 
         const teamCommand = TestHelper.testCommand(team.id);
 
-        nock(Client4.getCommandsRoute()).
-            post('').
+        nock(Client4.getBaseRoute()).
+            post('/commands').
             reply(201, {...teamCommand, token: TestHelper.generateId(), id: TestHelper.generateId()});
 
         const {data: created} = await Actions.addCommand(
             teamCommand,
         )(store.dispatch, store.getState);
 
-        nock(Client4.getCommandsRoute()).
-            get('').
+        nock(Client4.getBaseRoute()).
+            get('/commands').
             query(true).
             reply(200, [created, {
                 trigger: 'system-command',
@@ -359,8 +359,8 @@ describe('Actions.Integrations', () => {
         const noSystemCommands = store.getState().entities.integrations.systemCommands;
         assert.equal(Object.keys({...noTeamCommands, ...noSystemCommands}).length, 0);
 
-        nock(Client4.getTeamsRoute()).
-            post('').
+        nock(Client4.getBaseRoute()).
+            post('/teams').
             reply(201, TestHelper.fakeTeamWithId());
 
         const {data: team} = await TeamsActions.createTeam(
@@ -369,16 +369,16 @@ describe('Actions.Integrations', () => {
 
         const teamCommandWithAutocomplete = TestHelper.testCommand(team.id);
 
-        nock(Client4.getCommandsRoute()).
-            post('').
+        nock(Client4.getBaseRoute()).
+            post('/commands').
             reply(201, {...teamCommandWithAutocomplete, token: TestHelper.generateId(), id: TestHelper.generateId()});
 
         const {data: createdWithAutocomplete} = await Actions.addCommand(
             teamCommandWithAutocomplete,
         )(store.dispatch, store.getState);
 
-        nock(`${Client4.getTeamRoute(team.id)}/commands/autocomplete`).
-            get('').
+        nock(Client4.getBaseRoute()).
+            get(`/teams/${team.id}/commands/autocomplete`).
             query(true).
             reply(200, [createdWithAutocomplete, {
                 trigger: 'system-command',
@@ -394,16 +394,16 @@ describe('Actions.Integrations', () => {
     });
 
     it('getCustomTeamCommands', async () => {
-        nock(Client4.getTeamsRoute()).
-            post('').
+        nock(Client4.getBaseRoute()).
+            post('/teams').
             reply(201, TestHelper.fakeTeamWithId());
 
         const {data: team} = await TeamsActions.createTeam(
             TestHelper.fakeTeam(),
         )(store.dispatch, store.getState);
 
-        nock(Client4.getCommandsRoute()).
-            get('').
+        nock(Client4.getBaseRoute()).
+            get('/commands').
             query(true).
             reply(200, []);
 
@@ -416,16 +416,16 @@ describe('Actions.Integrations', () => {
 
         const command = TestHelper.testCommand(team.id);
 
-        nock(Client4.getCommandsRoute()).
-            post('').
+        nock(Client4.getBaseRoute()).
+            post('/commands').
             reply(201, {...command, token: TestHelper.generateId(), id: TestHelper.generateId()});
 
         const {data: created} = await Actions.addCommand(
             command,
         )(store.dispatch, store.getState);
 
-        nock(Client4.getCommandsRoute()).
-            get('').
+        nock(Client4.getBaseRoute()).
+            get('/commands').
             query(true).
             reply(200, []);
 
@@ -442,8 +442,8 @@ describe('Actions.Integrations', () => {
     });
 
     it('executeCommand', async () => {
-        nock(Client4.getTeamsRoute()).
-            post('').
+        nock(Client4.getBaseRoute()).
+            post('/teams').
             reply(201, TestHelper.fakeTeamWithId());
 
         const {data: team} = await TeamsActions.createTeam(
@@ -455,16 +455,16 @@ describe('Actions.Integrations', () => {
             team_id: team.id,
         };
 
-        nock(`${Client4.getCommandsRoute()}/execute`).
-            post('').
+        nock(Client4.getBaseRoute()).
+            post('/commands/execute').
             reply(200, []);
 
         await Actions.executeCommand('/echo message 5', args);
     });
 
     it('addCommand', async () => {
-        nock(Client4.getTeamsRoute()).
-            post('').
+        nock(Client4.getBaseRoute()).
+            post('/teams').
             reply(201, TestHelper.fakeTeamWithId());
 
         const {data: team} = await TeamsActions.createTeam(
@@ -473,8 +473,8 @@ describe('Actions.Integrations', () => {
 
         const expected = TestHelper.testCommand(team.id);
 
-        nock(Client4.getCommandsRoute()).
-            post('').
+        nock(Client4.getBaseRoute()).
+            post('/commands').
             reply(201, {...expected, token: TestHelper.generateId(), id: TestHelper.generateId()});
 
         const {data: created} = await Actions.addCommand(expected)(store.dispatch, store.getState);
@@ -501,8 +501,8 @@ describe('Actions.Integrations', () => {
     });
 
     it('regenCommandToken', async () => {
-        nock(Client4.getTeamsRoute()).
-            post('').
+        nock(Client4.getBaseRoute()).
+            post('/teams').
             reply(201, TestHelper.fakeTeamWithId());
 
         const {data: team} = await TeamsActions.createTeam(
@@ -511,16 +511,16 @@ describe('Actions.Integrations', () => {
 
         const command = TestHelper.testCommand(team.id);
 
-        nock(Client4.getCommandsRoute()).
-            post('').
+        nock(Client4.getBaseRoute()).
+            post('/commands').
             reply(201, {...command, token: TestHelper.generateId(), id: TestHelper.generateId()});
 
         const {data: created} = await Actions.addCommand(
             command,
         )(store.dispatch, store.getState);
 
-        nock(Client4.getCommandsRoute()).
-            put(`/${created.id}/regen_token`).
+        nock(Client4.getBaseRoute()).
+            put(`/commands/${created.id}/regen_token`).
             reply(200, {...created, token: TestHelper.generateId()});
 
         await Actions.regenCommandToken(
@@ -551,8 +551,8 @@ describe('Actions.Integrations', () => {
     });
 
     it('editCommand', async () => {
-        nock(Client4.getTeamsRoute()).
-            post('').
+        nock(Client4.getBaseRoute()).
+            post('/teams').
             reply(201, TestHelper.fakeTeamWithId());
 
         const {data: team} = await TeamsActions.createTeam(
@@ -561,8 +561,8 @@ describe('Actions.Integrations', () => {
 
         const command = TestHelper.testCommand(team.id);
 
-        nock(Client4.getCommandsRoute()).
-            post('').
+        nock(Client4.getBaseRoute()).
+            post('/commands').
             reply(201, {...command, token: TestHelper.generateId(), id: TestHelper.generateId()});
 
         const {data: created} = await Actions.addCommand(
@@ -575,8 +575,8 @@ describe('Actions.Integrations', () => {
         expected.username = 'modified';
         expected.auto_complete = false;
 
-        nock(Client4.getCommandsRoute()).
-            put(`/${expected.id}`).
+        nock(Client4.getBaseRoute()).
+            put(`/commands/${expected.id}`).
             reply(200, {...expected, update_at: 123});
 
         await Actions.editCommand(
@@ -593,8 +593,8 @@ describe('Actions.Integrations', () => {
     });
 
     it('deleteCommand', async () => {
-        nock(Client4.getTeamsRoute()).
-            post('').
+        nock(Client4.getBaseRoute()).
+            post('/teams').
             reply(201, TestHelper.fakeTeamWithId());
 
         const {data: team} = await TeamsActions.createTeam(
@@ -603,16 +603,16 @@ describe('Actions.Integrations', () => {
 
         const command = TestHelper.testCommand(team.id);
 
-        nock(Client4.getCommandsRoute()).
-            post('').
+        nock(Client4.getBaseRoute()).
+            post('/commands').
             reply(201, {...command, token: TestHelper.generateId(), id: TestHelper.generateId()});
 
         const {data: created} = await Actions.addCommand(
             command,
         )(store.dispatch, store.getState);
 
-        nock(Client4.getCommandsRoute()).
-            delete(`/${created.id}`).
+        nock(Client4.getBaseRoute()).
+            delete(`/commands/${created.id}`).
             reply(200, OK_RESPONSE);
 
         await Actions.deleteCommand(
@@ -624,8 +624,8 @@ describe('Actions.Integrations', () => {
     });
 
     it('addOAuthApp', async () => {
-        nock(Client4.getOAuthAppsRoute()).
-            post('').
+        nock(Client4.getBaseRoute()).
+            post('/oauth/apps').
             reply(201, TestHelper.fakeOAuthAppWithId());
 
         const {data: created} = await Actions.addOAuthApp(TestHelper.fakeOAuthApp())(store.dispatch, store.getState);
@@ -635,14 +635,14 @@ describe('Actions.Integrations', () => {
     });
 
     it('getOAuthApp', async () => {
-        nock(Client4.getOAuthAppsRoute()).
-            post('').
+        nock(Client4.getBaseRoute()).
+            post('/oauth/apps').
             reply(201, TestHelper.fakeOAuthAppWithId());
 
         const {data: created} = await Actions.addOAuthApp(TestHelper.fakeOAuthApp())(store.dispatch, store.getState);
 
-        nock(Client4.getOAuthAppsRoute()).
-            get(`/${created.id}`).
+        nock(Client4.getBaseRoute()).
+            get(`/oauth/apps/${created.id}`).
             reply(200, created);
 
         await Actions.getOAuthApp(created.id)(store.dispatch, store.getState);
@@ -652,8 +652,8 @@ describe('Actions.Integrations', () => {
     });
 
     it('editOAuthApp', async () => {
-        nock(Client4.getOAuthAppsRoute()).
-            post('').
+        nock(Client4.getBaseRoute()).
+            post('/oauth/apps').
             reply(201, TestHelper.fakeOAuthAppWithId());
 
         const {data: created} = await Actions.addOAuthApp(TestHelper.fakeOAuthApp())(store.dispatch, store.getState);
@@ -684,14 +684,14 @@ describe('Actions.Integrations', () => {
     });
 
     it('getOAuthApps', async () => {
-        nock(Client4.getOAuthAppsRoute()).
-            post('').
+        nock(Client4.getBaseRoute()).
+            post('/oauth/apps').
             reply(201, TestHelper.fakeOAuthAppWithId());
 
         const {data: created} = await Actions.addOAuthApp(TestHelper.fakeOAuthApp())(store.dispatch, store.getState);
 
-        nock(Client4.getOAuthAppsRoute()).
-            get('').
+        nock(Client4.getBaseRoute()).
+            get('/oauth/apps').
             query(true).
             reply(200, [created]);
 
@@ -702,15 +702,15 @@ describe('Actions.Integrations', () => {
     });
 
     it('getAuthorizedOAuthApps', async () => {
-        nock(Client4.getOAuthAppsRoute()).
-            post('').
+        nock(Client4.getBaseRoute()).
+            post('/oauth/apps').
             reply(201, TestHelper.fakeOAuthAppWithId());
 
         const {data: created} = await Actions.addOAuthApp(TestHelper.fakeOAuthApp())(store.dispatch, store.getState);
 
         const user = TestHelper.basicUser;
-        nock(`${Client4.getUserRoute(user.id)}/oauth/apps/authorized`).
-            get('').
+        nock(Client4.getBaseRoute()).
+            get(`/users/${user.id}/oauth/apps/authorized`).
             reply(200, [created]);
 
         await Actions.getAuthorizedOAuthApps()(store.dispatch, store.getState);
@@ -720,14 +720,14 @@ describe('Actions.Integrations', () => {
     });
 
     it('deleteOAuthApp', async () => {
-        nock(Client4.getOAuthAppsRoute()).
-            post('').
+        nock(Client4.getBaseRoute()).
+            post('/oauth/apps').
             reply(201, TestHelper.fakeOAuthAppWithId());
 
         const {data: created} = await Actions.addOAuthApp(TestHelper.fakeOAuthApp())(store.dispatch, store.getState);
 
-        nock(Client4.getOAuthAppsRoute()).
-            delete(`/${created.id}`).
+        nock(Client4.getBaseRoute()).
+            delete(`/oauth/apps/${created.id}`).
             reply(200, OK_RESPONSE);
 
         await Actions.deleteOAuthApp(created.id)(store.dispatch, store.getState);
@@ -737,14 +737,14 @@ describe('Actions.Integrations', () => {
     });
 
     it('regenOAuthAppSecret', async () => {
-        nock(Client4.getOAuthAppsRoute()).
-            post('').
+        nock(Client4.getBaseRoute()).
+            post('/oauth/apps').
             reply(201, TestHelper.fakeOAuthAppWithId());
 
         const {data: created} = await Actions.addOAuthApp(TestHelper.fakeOAuthApp())(store.dispatch, store.getState);
 
-        nock(Client4.getOAuthAppsRoute()).
-            post(`/${created.id}/regen_secret`).
+        nock(Client4.getBaseRoute()).
+            post(`/oauth/apps/${created.id}/regen_secret`).
             reply(200, {...created, client_secret: TestHelper.generateId()});
 
         await Actions.regenOAuthAppSecret(created.id)(store.dispatch, store.getState);
