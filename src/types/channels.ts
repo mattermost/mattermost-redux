@@ -36,6 +36,11 @@ export type Channel = {
     fake?: boolean;
     group_constrained: boolean;
 };
+export type ChannelWithTeamData = Channel & {
+    team_display_name: string;
+    team_name: string;
+    team_update_at: number;
+}
 export type ChannelMembership = {
     channel_id: string;
     user_id: string;
