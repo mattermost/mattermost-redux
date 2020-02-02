@@ -40,6 +40,10 @@ export function getMissingChannelsFromPosts(posts: RelationOneToOne<Post, Post>)
 export function searchPostsWithParams(teamId: string, params: SearchParameter): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         const isGettingMore = params.page > 0;
+        dispatch({
+            type: SearchTypes.SEARCH_POSTS_REQUEST,
+            isGettingMore,
+        });
         let posts;
 
         try {
@@ -69,6 +73,9 @@ export function searchPostsWithParams(teamId: string, params: SearchParameter): 
                     params,
                     isEnd: (posts.order.length < params.per_page),
                 },
+            },
+            {
+                type: SearchTypes.SEARCH_POSTS_SUCCESS,
             },
         ], 'SEARCH_POST_BATCH'));
 
