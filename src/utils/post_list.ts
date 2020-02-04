@@ -311,8 +311,9 @@ export const postTypePriority = {
     [Posts.POST_TYPES.DISPLAYNAME_CHANGE]: 11,
     [Posts.POST_TYPES.CONVERT_CHANNEL]: 12,
     [Posts.POST_TYPES.CHANNEL_DELETED]: 13,
-    [Posts.POST_TYPES.ADD_REMOVE]: 14,
-    [Posts.POST_TYPES.EPHEMERAL]: 15,
+    [Posts.POST_TYPES.CHANNEL_UNARCHIVED]: 14,
+    [Posts.POST_TYPES.ADD_REMOVE]: 15,
+    [Posts.POST_TYPES.EPHEMERAL]: 16,
 };
 
 export function comparePostTypes(a: typeof postTypePriority, b: typeof postTypePriority) {

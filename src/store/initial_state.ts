@@ -15,6 +15,7 @@ const state: GlobalState = {
         },
         users: {
             currentUserId: '',
+            isManualStatus: {},
             mySessions: [],
             myAudits: [],
             profiles: {},
@@ -216,20 +217,6 @@ const state: GlobalState = {
                 error: null,
             },
             updateMe: {
-                status: 'not_started',
-                error: null,
-            },
-        },
-        preferences: {
-            getMyPreferences: {
-                status: 'not_started',
-                error: null,
-            },
-            savePreferences: {
-                status: 'not_started',
-                error: null,
-            },
-            deletePreferences: {
                 status: 'not_started',
                 error: null,
             },

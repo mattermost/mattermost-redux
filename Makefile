@@ -28,6 +28,8 @@ pre-run:
 test: check-style
 	npm test
 
+check-types: | pre-run node_modules
+	npm run tsc
 
 install: node_modules
 

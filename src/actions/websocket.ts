@@ -11,7 +11,7 @@ import {getConfig} from 'selectors/entities/general';
 import {getAllPosts, getPost as getPostSelector} from 'selectors/entities/posts';
 import {getDirectShowPreferences} from 'selectors/entities/preferences';
 import {getCurrentTeamId, getCurrentTeamMembership, getTeams as getTeamsSelector} from 'selectors/entities/teams';
-import {getCurrentUser, getCurrentUserId, getUsers, getUserStatuses} from 'selectors/entities/users';
+import {getCurrentUser, getCurrentUserId, getUsers, getUserStatuses, getIsManualStatusForUserId} from 'selectors/entities/users';
 import {getChannelByName} from 'utils/channel_utils';
 import {fromAutoResponder} from 'utils/post_utils';
 import EventEmitter from 'utils/event_emitter';
@@ -268,6 +268,9 @@ function handleEvent(msg: WebSocketMessage) {
     case WebsocketEvents.CHANNEL_DELETED:
         doDispatch(handleChannelDeletedEvent(msg));
         break;
+    case WebsocketEvents.CHANNEL_UNARCHIVED:
+        doDispatch(handleChannelUnarchiveEvent(msg));
+        break;
     case WebsocketEvents.CHANNEL_UPDATED:
         doDispatch(handleChannelUpdatedEvent(msg));
         break;
@@ -339,7 +342,7 @@ function handleNewPostEvent(msg: WebSocketMessage) {
             dispatch(handleNewPost(msg));
             getProfilesAndStatusesForPosts([post], dispatch, getState);
 
-            if (post.user_id !== getCurrentUserId(getState()) && !fromAutoResponder(post)) {
+            if (post.user_id !== getCurrentUserId(getState()) && !fromAutoResponder(post) && !getIsManualStatusForUserId(state, post.user_id)) {
                 dispatch({
                     type: UserTypes.RECEIVED_STATUSES,
                     data: [{user_id: post.user_id, status: General.ONLINE}],
@@ -609,7 +612,23 @@ function handleChannelDeletedEvent(msg: WebSocketMessage) {
                 EventEmitter.emit(General.DEFAULT_CHANNEL, '');
             }
 
-            dispatch({type: ChannelTypes.RECEIVED_CHANNEL_DELETED, data: {id: msg.data.channel_id, team_id: msg.data.team_id, deleteAt: msg.data.delete_at, viewArchivedChannels}}, getState);
+            dispatch({type: ChannelTypes.RECEIVED_CHANNEL_DELETED, data: {id: msg.data.channel_id, team_id: msg.data.team_id, viewArchivedChannels}});
+
+            dispatch(fetchMyChannelsAndMembers(currentTeamId));
+        }
+        return {data: true};
+    };
+}
+
+function handleChannelUnarchiveEvent(msg: WebSocketMessage) {
+    return (dispatch: DispatchFunc, getState: GetStateFunc) => {
+        const state = getState();
+        const currentTeamId = getCurrentTeamId(state);
+        const config = getConfig(state);
+        const viewArchivedChannels = config.ExperimentalViewArchivedChannels === 'true';
+
+        if (msg.broadcast.team_id === currentTeamId) {
+            dispatch({type: ChannelTypes.RECEIVED_CHANNEL_UNARCHIVED, data: {id: msg.data.channel_id, team_id: msg.data.team_id, deleteAt: 0, viewArchivedChannels}});
 
             dispatch(fetchMyChannelsAndMembers(currentTeamId));
         }
