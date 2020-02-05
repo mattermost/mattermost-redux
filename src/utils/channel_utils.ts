@@ -160,6 +160,7 @@ export function isAutoClosed(config: any, myPreferences: {
     const viewTime = viewTimePref ? parseInt(viewTimePref.value!, 10) : 0;
 
     if (viewTime > cutoff) {
+        console.log('MM-DEBUG isAutoClosed false - viewTime > cutoff'); // eslint-disable-line no-console
         return false;
     }
 
@@ -172,19 +173,29 @@ export function isAutoClosed(config: any, myPreferences: {
     }
 
     if (config.CloseUnusedDirectMessages !== 'true' || isFavoriteChannel(myPreferences, channel.id)) {
+        console.log(`MM-DEBUG isAutoClosed false - config.CloseUnusedDirectMessages = ${config.CloseUnusedDirectMessages} || isFavoriteChannel = ${isFavoriteChannel(myPreferences, channel.id)}`); // eslint-disable-line no-console
         return false;
     }
     const autoClose = myPreferences[`${Preferences.CATEGORY_SIDEBAR_SETTINGS}--close_unused_direct_messages`];
     if (!autoClose || autoClose.value === 'after_seven_days') {
         if (channelActivity && channelActivity > cutoff) {
+            console.log('MM-DEBUG isAutoClosed false - channelActivity && channelActivity > cutoff'); // eslint-disable-line no-console
             return false;
         }
         if (openTime > cutoff) {
+            console.log('MM-DEBUG isAutoClosed false - openTime > cutoff'); // eslint-disable-line no-console
             return false;
         }
         const lastActivity = channel.last_post_at;
-        return !lastActivity || lastActivity < cutoff;
+        const retVal = !lastActivity || lastActivity < cutoff;
+
+        if (!retVal) {
+            console.log('MM-DEBUG isAutoClosed false - lastActivity < cutoff'); // eslint-disable-line no-console
+        }
+        return retVal;
     }
+
+    console.log('MM-DEBUG isAutoClosed false - default'); // eslint-disable-line no-console
     return false;
 }
 
@@ -201,6 +212,10 @@ export function isDirectChannelVisible(otherUserOrOtherUserId: UserProfile | str
     if (!dm || dm.value !== 'true') {
         return false;
     }
+
+    if (isUnread) {
+        console.log(`MM-DEBUG isDirectChannelVisible - channelId: ${channel.id}, dm?.value: ${dm && dm.value}, isUnread: ${isUnread}`);// eslint-disable-line no-console
+    }
     return isUnread || !isAutoClosed(config, myPreferences, channel, lastPost ? lastPost.create_at : 0, otherUser ? otherUser.delete_at : 0, currentChannelId);
 }
 
@@ -214,6 +229,10 @@ export function isGroupChannelVisible(config: any, myPreferences: {
     const gm = myPreferences[`${Preferences.CATEGORY_GROUP_CHANNEL_SHOW}--${channel.id}`];
     if (!gm || gm.value !== 'true') {
         return false;
+    }
+
+    if (isUnread) {
+        console.log(`MM-DEBUG isGroupChannelVisible - channelId: ${channel.id}, gm?.value: ${gm && gm.value}, isUnread: ${isUnread}`);// eslint-disable-line no-console
     }
     return isUnread || !isAutoClosed(config, myPreferences, channel, lastPost ? lastPost.create_at : 0, 0);
 }
@@ -549,7 +568,7 @@ export function sortChannelsByTypeAndDisplayName(locale: string, a: Channel, b: 
 }
 
 function filterName(name: string): string {
-    return name.replace(/[.,'"\/#!$%\^&\*;:{}=\-_`~()]/g, ''); // eslint-disable-line no-useless-escape
+    return name.replace(/[.,'"\/#!$%\^&\*;:{}=\-_`~()]/g, '');// eslint-disable-line no-useless-escape
 }
 
 export function sortChannelsByDisplayName(locale: string, a: Channel, b: Channel): number {

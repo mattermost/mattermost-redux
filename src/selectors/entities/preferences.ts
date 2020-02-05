@@ -75,7 +75,9 @@ export function getFavoritesPreferences(state: GlobalState) {
 export const getVisibleTeammate = reselect.createSelector(
     getDirectShowPreferences,
     (direct) => {
-        return direct.filter((dm) => dm.value === 'true' && dm.name).map((dm) => dm.name);
+        const visibleTeammate = direct.filter((dm) => dm.value === 'true' && dm.name).map((dm) => dm.name);
+        console.log('MM-DEBUG getVisibleTeammate', visibleTeammate.length); // eslint-disable-line no-console
+        return visibleTeammate;
     }
 );
 

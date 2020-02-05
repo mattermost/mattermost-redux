@@ -633,45 +633,73 @@ export const getPrivateChannelIds: (e: GlobalState, d: Channel, c: boolean, b: b
 
 export const getSortedPrivateChannelIds: (e: GlobalState, d: Channel | null, c: boolean, b: boolean, a: SortingType) => Array<string> = createIdsSelector(getUnreadChannelIds, getFavoritesPreferences, (state: GlobalState, lastUnreadChannel: Channel, unreadsAtTop: boolean, favoritesAtTop: boolean, sorting: SortingType = 'alpha') => getPrivateChannelIds(state, lastUnreadChannel, unreadsAtTop, favoritesAtTop, sorting), (state, lastUnreadChannel, unreadsAtTop = true) => unreadsAtTop, (state, lastUnreadChannel, unreadsAtTop, favoritesAtTop = true) => favoritesAtTop, filterChannels); // Direct Messages
 
-export const getDirectChannels: (a: GlobalState) => Array<Channel> = createSelector(getCurrentUser, getUsers, getUserIdsInChannels, getAllChannels, getVisibleTeammate, getVisibleGroupIds, getTeammateNameDisplaySetting, getConfig, getMyPreferences, getLastPostPerChannel, getCurrentChannelId, (currentUser: UserProfile, profiles: IDMappedObjects<UserProfile>, userIdsInChannels: any, channels: IDMappedObjects<Channel>, teammates: Array<string>, groupIds: Array<string>, settings, config, preferences: {
-    [x: string]: PreferenceType;
-}, lastPosts: RelationOneToOne<Channel, Post>, currentChannelId: string): Array<Channel> => {
-    if (!currentUser) {
-        return [];
-    }
+export const getDirectChannels: (a: GlobalState) => Array<Channel> = createSelector(
+    getCurrentUser,
+    getUsers,
+    getUserIdsInChannels,
+    getAllChannels,
+    getVisibleTeammate,
+    getVisibleGroupIds,
+    getTeammateNameDisplaySetting,
+    getConfig,
+    getMyPreferences,
+    getLastPostPerChannel,
+    getCurrentChannelId,
+    (
+        currentUser: UserProfile,
+        profiles: IDMappedObjects<UserProfile>,
+        userIdsInChannels: any,
+        channels: IDMappedObjects<Channel>,
+        teammates: Array<string>,
+        groupIds: Array<string>,
+        settings,
+        config,
+        preferences: {
+            [x: string]: PreferenceType;
+        },
+        lastPosts: RelationOneToOne<Channel, Post>,
+        currentChannelId: string
+    ): Array<Channel> => {
+        if (!currentUser) {
+            return [];
+        }
 
-    const channelValues = Object.keys(channels).map((key) => channels[key]);
-    const directChannelsIds: string[] = [];
-    teammates.reduce((result, teammateId) => {
-        const name = getDirectChannelName(currentUser.id, teammateId);
-        const channel = channelValues.find((c: Channel) => c && c.name === name); //eslint-disable-line max-nested-callbacks
+        let i = 1;
+        const channelValues = Object.keys(channels).map((key) => channels[key]);
+        const directChannelsIds: string[] = [];
+        teammates.reduce((result, teammateId) => {
+            const name = getDirectChannelName(currentUser.id, teammateId);
+            const channel = channelValues.find((c: Channel) => c && c.name === name); //eslint-disable-line max-nested-callbacks
+            if (channel) {
+                i++;
+                const lastPost = lastPosts[channel.id];
+                const otherUser = profiles[getUserIdFromChannelName(currentUser.id, channel.name)];
 
-        if (channel) {
-            const lastPost = lastPosts[channel.id];
-            const otherUser = profiles[getUserIdFromChannelName(currentUser.id, channel.name)];
-
-            if (!isAutoClosed(config, preferences, channel, lastPost ? lastPost.create_at : 0, otherUser ? otherUser.delete_at : 0, currentChannelId)) {
-                result.push(channel.id);
+                if (!isAutoClosed(config, preferences, channel, lastPost ? lastPost.create_at : 0, otherUser ? otherUser.delete_at : 0, currentChannelId)) {
+                    result.push(channel.id);
+                }
             }
-        }
 
-        return result;
-    }, directChannelsIds);
-    const directChannels = groupIds.filter((id) => {
-        const channel = channels[id];
+            return result;
+        }, directChannelsIds);
+        const directChannels = groupIds.filter((id) => {
+            const channel = channels[id];
 
-        if (channel) {
-            const lastPost = lastPosts[channel.id];
-            return !isAutoClosed(config, preferences, channels[id], lastPost ? lastPost.create_at : 0, 0, currentChannelId);
-        }
+            if (channel) {
+                i++;
+                const lastPost = lastPosts[channel.id];
+                return !isAutoClosed(config, preferences, channels[id], lastPost ? lastPost.create_at : 0, 0, currentChannelId);
+            }
 
-        return false;
-    }).concat(directChannelsIds).map((id) => {
-        const channel = channels[id];
-        return completeDirectChannelDisplayName(currentUser.id, profiles, userIdsInChannels[id], settings!, channel);
-    });
-    return directChannels;
-}); // getDirectAndGroupChannels returns all direct and group channels, even if they have been manually
+            return false;
+        }).concat(directChannelsIds).map((id) => {
+            const channel = channels[id];
+            return completeDirectChannelDisplayName(currentUser.id, profiles, userIdsInChannels[id], settings!, channel);
+        });
+
+        return directChannels;
+    }
+); // getDirectAndGroupChannels returns all direct and group channels, even if they have been manually
 // or automatically closed.
 //
 // This is similar to the getDirectChannels above (which actually also returns group channels,
