@@ -37,6 +37,7 @@ export type UserProfile = {
     terms_of_service_create_at: number;
     timezone?: UserTimezone;
     is_bot: boolean;
+    last_picture_update: number;
 };
 export type UsersState = {
     currentUserId: string;
