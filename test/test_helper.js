@@ -331,24 +331,24 @@ class TestHelper {
     }
 
     mockLogin = () => {
-        nock(this.basicClient4.getUsersRoute()).
-            post('/login').
+        nock(this.basicClient4.getBaseRoute()).
+            post('/users/login').
             reply(200, this.basicUser, {'X-Version-Id': 'Server Version'});
 
-        nock(this.basicClient4.getUserRoute('me')).
-            get('/teams/members').
+        nock(this.basicClient4.getBaseRoute()).
+            get('/users/me/teams/members').
             reply(200, [this.basicTeamMember]);
 
-        nock(this.basicClient4.getUserRoute('me')).
-            get('/teams/unread').
+        nock(this.basicClient4.getBaseRoute()).
+            get('/users/me/teams/unread').
             reply(200, [{team_id: this.basicTeam.id, msg_count: 0, mention_count: 0}]);
 
-        nock(this.basicClient4.getUserRoute('me')).
-            get('/teams').
+        nock(this.basicClient4.getBaseRoute()).
+            get('/users/me/teams').
             reply(200, [this.basicTeam]);
 
-        nock(this.basicClient4.getPreferencesRoute('me')).
-            get('').
+        nock(this.basicClient4.getBaseRoute()).
+            get('/users/me/preferences').
             reply(200, [{user_id: this.basicUser.id, category: 'tutorial_step', name: this.basicUser.id, value: '999'}]);
     }
 

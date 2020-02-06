@@ -597,16 +597,16 @@ describe('Actions.Websocket', () => {
         async function test() {
             const team = {id: TestHelper.generateId()};
 
-            nock(Client4.getTeamRoute(team.id)).
-                get('').
+            nock(Client4.getBaseRoute()).
+                get(`/teams/${team.id}`).
                 reply(200, team);
 
-            nock(Client4.getUserRoute('me')).
-                get('/teams/members').
+            nock(Client4.getBaseRoute()).
+                get('/users/me/teams/members').
                 reply(200, [{team_id: team.id, user_id: TestHelper.basicUser.id}]);
 
-            nock(Client4.getUserRoute('me')).
-                get('/teams/unread').
+            nock(Client4.getBaseRoute()).
+                get('/users/me/teams/unread').
                 reply(200, [{team_id: team.id, msg_count: 0, mention_count: 0}]);
 
             mockServer.emit('message', JSON.stringify({event: WebsocketEvents.ADDED_TO_TEAM, data: {team_id: team.id, user_id: TestHelper.basicUser.id}, broadcast: {omit_users: null, user_id: TestHelper.basicUser.id, channel_id: '', team_id: ''}, seq: 2}));

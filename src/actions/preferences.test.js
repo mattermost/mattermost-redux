@@ -169,8 +169,8 @@ describe('Actions.Preferences', () => {
     it('makeDirectChannelVisibleIfNecessary', async () => {
         const user = TestHelper.basicUser;
 
-        nock(Client4.getUsersRoute()).
-            post('').
+        nock(Client4.getBaseRoute()).
+            post('/users').
             reply(201, TestHelper.fakeUserWithId());
         const user2 = await TestHelper.createClient4().createUser(TestHelper.fakeUser());
 
