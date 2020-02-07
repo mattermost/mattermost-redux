@@ -180,6 +180,36 @@ function channels(state: IDMappedObjects<Channel> = {}, action: GenericAction) {
         return {...state, [channelId]: {...channel, scheme_id: schemeId}};
     }
 
+    case ChannelTypes.RECEIVED_MY_CHANNELS_WITH_MEMBERS: { // Used by the mobile app
+        const nextState = {...state};
+        const current = Object.values(nextState);
+        const myChannels: Array<Channel> = action.data.channels;
+        const {teamId, sync} = action.data;
+        let hasNewValues = false;
+
+        // Remove existing channels that are no longer
+        if (sync) {
+            current.forEach((channel) => {
+                const id = channel.id;
+                if (channel.team_id === teamId) {
+                    if (!myChannels.find((c: Channel) => c.id === id)) {
+                        delete nextState[id];
+                        hasNewValues = true;
+                    }
+                }
+            });
+        }
+
+        if (myChannels && myChannels.length) {
+            hasNewValues = true;
+            myChannels.forEach((c: Channel) => {
+                nextState[c.id] = c;
+            });
+        }
+
+        return hasNewValues ? nextState : state;
+    }
+
     case UserTypes.LOGOUT_SUCCESS:
         return {};
     default:
@@ -205,6 +235,15 @@ function channelsInTeam(state: RelationOneToMany<Team, Channel> = {}, action: Ge
             return removeChannelFromSet(state, action);
         }
         return state;
+    }
+    case ChannelTypes.RECEIVED_MY_CHANNELS_WITH_MEMBERS: { // Used by the mobile app
+        const values: GenericAction = {
+            type: action.type,
+            teamId: action.data.teamId,
+            sync: action.data.sync,
+            data: action.data.channels,
+        };
+        return channelListToSet(state, values);
     }
     case UserTypes.LOGOUT_SUCCESS:
         return {};
@@ -354,6 +393,24 @@ function myMembers(state: RelationOneToOne<Channel, ChannelMembership> = {}, act
         }
         return {...state, [data.channelId]: {...channelState, msg_count: data.msgCount, mention_count: data.mentionCount, last_viewed_at: data.lastViewedAt}};
     }
+
+    case ChannelTypes.RECEIVED_MY_CHANNELS_WITH_MEMBERS: { // Used by the mobile app
+        const nextState: any = {...state};
+        const {channelMembers} = action.data;
+        const hasNewValues = channelMembers && channelMembers.length > 0;
+
+        if (hasNewValues) {
+            channelMembers.forEach((cm: ChannelMembership) => {
+                const id: string = cm.channel_id;
+                nextState[id] = cm;
+            });
+
+            return nextState;
+        }
+
+        return state;
+    }
+
     case UserTypes.LOGOUT_SUCCESS:
         return {};
     default:
