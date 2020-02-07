@@ -58,6 +58,7 @@ export function makeFilterPostsAndAddSeparators() {
                 return [];
             }
 
+            const dt = Date.now();
             const out: string[] = [];
             let lastDate;
             let addedNewMessagesIndicator = false;
@@ -91,8 +92,6 @@ export function makeFilterPostsAndAddSeparators() {
                         }
                     }
                 }
-
-                postDate.setHours(0, 0, 0, 0);
 
                 if (!lastDate || lastDate.toDateString() !== postDate.toDateString()) {
                     out.push(DATE_LINE + postDate.getTime());

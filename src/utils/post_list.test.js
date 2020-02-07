@@ -30,8 +30,7 @@ describe('makeFilterPostsAndAddSeparators', () => {
     it('filter join/leave posts', () => {
         const filterPostsAndAddSeparators = makeFilterPostsAndAddSeparators();
         const time = Date.now();
-        const today = new Date();
-        today.setHours(0, 0, 0, 0);
+        const today = new Date(time);
 
         let state = {
             entities: {
@@ -145,8 +144,7 @@ describe('makeFilterPostsAndAddSeparators', () => {
     it('new messages indicator', () => {
         const filterPostsAndAddSeparators = makeFilterPostsAndAddSeparators();
         const time = Date.now();
-        const today = new Date();
-        today.setHours(0, 0, 0, 0);
+        const today = new Date(time);
 
         const state = {
             entities: {
@@ -180,7 +178,7 @@ describe('makeFilterPostsAndAddSeparators', () => {
             '1010',
             '1005',
             '1000',
-            'date-' + today.getTime(),
+            'date-' + (today.getTime() + 1000),
         ]);
 
         now = filterPostsAndAddSeparators(state, {postIds, indicateNewMessages: true});
@@ -188,7 +186,7 @@ describe('makeFilterPostsAndAddSeparators', () => {
             '1010',
             '1005',
             '1000',
-            'date-' + today.getTime(),
+            'date-' + (today.getTime() + 1000),
         ]);
 
         now = filterPostsAndAddSeparators(state, {postIds, lastViewedAt: time + 999, indicateNewMessages: false});
@@ -196,7 +194,7 @@ describe('makeFilterPostsAndAddSeparators', () => {
             '1010',
             '1005',
             '1000',
-            'date-' + today.getTime(),
+            'date-' + (today.getTime() + 1000),
         ]);
 
         // Show new messages indicator before all posts
@@ -206,7 +204,7 @@ describe('makeFilterPostsAndAddSeparators', () => {
             '1005',
             '1000',
             START_OF_NEW_MESSAGES,
-            'date-' + today.getTime(),
+            'date-' + (today.getTime() + 1000),
         ]);
 
         // Show indicator between posts
@@ -216,7 +214,7 @@ describe('makeFilterPostsAndAddSeparators', () => {
             '1005',
             START_OF_NEW_MESSAGES,
             '1000',
-            'date-' + today.getTime(),
+            'date-' + (today.getTime() + 1000),
         ]);
 
         now = filterPostsAndAddSeparators(state, {postIds, lastViewedAt: time + 1006, indicateNewMessages: true});
@@ -225,7 +223,7 @@ describe('makeFilterPostsAndAddSeparators', () => {
             START_OF_NEW_MESSAGES,
             '1005',
             '1000',
-            'date-' + today.getTime(),
+            'date-' + (today.getTime() + 1000),
         ]);
 
         // Don't show indicator when all posts are read
@@ -234,17 +232,15 @@ describe('makeFilterPostsAndAddSeparators', () => {
             '1010',
             '1005',
             '1000',
-            'date-' + today.getTime(),
+            'date-' + (today.getTime() + 1000),
         ]);
     });
 
     it('memoization', () => {
         const filterPostsAndAddSeparators = makeFilterPostsAndAddSeparators();
         const time = Date.now();
-        const today = new Date();
+        const today = new Date(time);
         const tomorrow = new Date((24 * 60 * 60 * 1000) + today.getTime());
-        today.setHours(0, 0, 0, 0);
-        tomorrow.setHours(0, 0, 0, 0);
 
         // Posts 7 hours apart so they should appear on multiple days
         const initialPosts = {
