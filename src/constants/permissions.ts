@@ -69,4 +69,5 @@ export default {
     INVITE_GUEST: 'invite_guest',
     PROMOTE_GUEST: 'promote_guest',
     DEMOTE_TO_GUEST: 'demote_to_guest',
+    USE_CHANNEL_MENTIONS: 'use_channel_mentions',
 };

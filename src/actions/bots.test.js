@@ -27,8 +27,8 @@ describe('Actions.Bots', () => {
 
     it('loadBots', async () => {
         const bots = [TestHelper.fakeBot(), TestHelper.fakeBot()];
-        nock(Client4.getBotsRoute()).
-            get('').
+        nock(Client4.getBaseRoute()).
+            get('/bots').
             query(true).
             reply(201, bots);
 
@@ -41,8 +41,8 @@ describe('Actions.Bots', () => {
 
     it('loadBot', async () => {
         const bot = TestHelper.fakeBot();
-        nock(Client4.getBotRoute(bot.user_id)).
-            get('').
+        nock(Client4.getBaseRoute()).
+            get(`/bots/${bot.user_id}`).
             query(true).
             reply(201, bot);
 
@@ -55,8 +55,8 @@ describe('Actions.Bots', () => {
 
     it('createBot', async () => {
         const bot = TestHelper.fakeBot();
-        nock(Client4.getBotsRoute()).
-            post('').
+        nock(Client4.getBaseRoute()).
+            post('/bots').
             reply(200, bot);
         await store.dispatch(BotActions.createBot(bot));
 
@@ -67,15 +67,15 @@ describe('Actions.Bots', () => {
 
     it('patchBot', async () => {
         const bot = TestHelper.fakeBot();
-        nock(Client4.getBotRoute()).
-            post('').
+        nock(Client4.getBaseRoute()).
+            post('/bots').
             reply(200, bot);
         await store.dispatch(BotActions.createBot(bot));
 
         bot.username = 'mynewusername';
 
-        nock(Client4.getBotRoute(bot.user_id)).
-            put('').
+        nock(Client4.getBaseRoute()).
+            put(`/bots/${bot.user_id}`).
             reply(200, bot);
         await store.dispatch(BotActions.patchBot(bot.user_id, bot));
 
@@ -86,8 +86,8 @@ describe('Actions.Bots', () => {
 
     it('disableBot', async () => {
         const bot = TestHelper.fakeBot();
-        nock(Client4.getBotRoute()).
-            post('').
+        nock(Client4.getBaseRoute()).
+            post('/bots').
             reply(200, bot);
         await store.dispatch(BotActions.createBot(bot));
 
@@ -115,8 +115,8 @@ describe('Actions.Bots', () => {
 
     it('assignBot', async () => {
         const bot = TestHelper.fakeBot();
-        nock(Client4.getBotRoute()).
-            post('').
+        nock(Client4.getBaseRoute()).
+            post('/bots').
             reply(200, bot);
         await store.dispatch(BotActions.createBot(bot));
 
@@ -134,8 +134,8 @@ describe('Actions.Bots', () => {
     it('logout', async () => {
         // Fill redux store with somthing
         const bot = TestHelper.fakeBot();
-        nock(Client4.getBotRoute()).
-            post('').
+        nock(Client4.getBaseRoute()).
+            post('/bots').
             reply(200, bot);
         await store.dispatch(BotActions.createBot(bot));
 
