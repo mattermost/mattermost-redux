@@ -893,10 +893,6 @@ export function isManuallyUnread(state: GlobalState, channelId?: string): boolea
     return Boolean(state.entities.channels.manuallyUnread[channelId]);
 }
 
-export function getChannelModerations(state: GlobalState, channelId: string): Array<ChannelModeration> | object {
-    if (!channelId) {
-        return {};
-    }
-
-    return state.entities.channels.channelModerations[channelId];
+export function getChannelModerations(state: GlobalState, channelId: string): Array<ChannelModeration> {
+    return state.entities.channels.channelModerations[channelId] || [];
 }

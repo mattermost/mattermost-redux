@@ -3924,3 +3924,26 @@ test('Selectors.Channels.isManuallyUnread', () => {
     assert.equal(Selectors.isManuallyUnread(state, 'channel2'), false);
     assert.equal(Selectors.isManuallyUnread(state, 'channel3'), false);
 });
+
+test('Selectors.Channels.getChannelModerations', () => {
+    const moderations = [{
+        "name": "create_posts",
+        "roles": {
+            "members": true,
+        },
+    }];
+
+    const state = {
+        entities: {
+            channels: {
+                channelModerations: {
+                    'channel1': moderations,
+                },
+            },
+        },
+    };
+
+    assert.equal(Selectors.getChannelModerations(state, 'channel1'), moderations);
+    assert.equal(Selectors.getChannelModerations(state, undefined).length, 0);
+    assert.equal(Selectors.getChannelModerations(state, 'undefined').length, 0);
+});

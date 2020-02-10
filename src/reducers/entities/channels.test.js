@@ -551,12 +551,12 @@ describe('channels', () => {
                     },
                 },
                 channelModerations: {
-                    'channel1': {
+                    'channel1': [{
                         "name": "create_posts",
                         "roles": {
                             "members": true,
                         },
-                    },
+                    }],
                 },
             });
 
