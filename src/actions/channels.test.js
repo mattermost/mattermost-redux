@@ -488,7 +488,7 @@ describe('Actions.Channels', () => {
         assert.ifError(incomingHooks[incomingHook.id]);
         assert.ifError(outgoingHooks[outgoingHook.id]);
     });
-    
+
     it('unarchiveChannel', async () => {
         const secondClient = TestHelper.createClient4();
 
@@ -2277,5 +2277,53 @@ describe('Actions.Channels', () => {
         const {error} = await Actions.membersMinusGroupMembers(channelID, groupIDs, page, perPage)(store.dispatch, store.getState);
 
         assert.equal(error, null);
+    });
+
+    it('getChannelModerations', async () => {
+        const channelID = 'cid10000000000000000000000';
+
+        nock(Client4.getBaseRoute())
+        .get(`/channels/${channelID}/moderations`).
+        reply(200,  [{
+                "name": "create_posts",
+                "roles": {
+                    "members": true,
+                    "guests": false,
+                },
+            }]
+        );
+
+        const {error} = await Actions.getChannelModerations(channelID)(store.dispatch, store.getState);
+        const moderations = store.getState().entities.channels.channelModerations[channelID];
+
+        assert.equal(error, null);
+        assert.equal(moderations[0].name, "create_posts");
+        assert.equal(moderations[0].roles.members, true);
+        assert.equal(moderations[0].roles.guests, false);
+    });
+
+    it('patchChannelModerations', async () => {
+        const channelID = 'cid10000000000000000000000';
+
+        nock(Client4.getBaseRoute())
+        .put(`/channels/${channelID}/moderations/patch`).
+        reply(200,  [
+                {
+                    "name": "create_reactions",
+                    "roles": {
+                        "members": true,
+                        "guests": false,
+                    },
+                },
+            ]
+        );
+
+        const {error} = await Actions.patchChannelModerations(channelID, {})(store.dispatch, store.getState);
+        const moderations = store.getState().entities.channels.channelModerations[channelID];
+
+        assert.equal(error, null);
+        assert.equal(moderations[0].name, "create_reactions");
+        assert.equal(moderations[0].roles.members, true);
+        assert.equal(moderations[0].roles.guests, false);
     });
 });

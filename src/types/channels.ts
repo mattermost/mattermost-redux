@@ -73,4 +73,27 @@ export type ChannelsState = {
     groupsAssociatedToChannel: any;
     totalCount: number;
     manuallyUnread: RelationOneToOne<Channel, boolean>;
+    channelModerations: RelationOneToOne<Channel, Array<ChannelModeration>>;
+};
+
+export type ChannelModeration = {
+    name: string;
+    roles: {
+        guests?: {
+            value: boolean;
+            enabled: boolean;
+        };
+        members: {
+            value: boolean;
+            enabled: boolean;
+        };
+    };
+};
+
+export type ChannelModerationPatch = {
+    name: string;
+    roles: {
+        guests?: boolean;
+        members?: boolean;
+    };
 };

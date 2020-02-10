@@ -586,6 +586,20 @@ export function manuallyUnread(state: RelationOneToOne<Channel, boolean> = {}, a
     }
 }
 
+export function channelModerations(state: any = {}, action: GenericAction) {
+    switch (action.type) {
+    case ChannelTypes.RECEIVED_CHANNEL_MODERATIONS: {
+        const {channelId, moderations} = action.data;
+        return {
+            ...state,
+            [channelId]: moderations,
+        };
+    }
+    default:
+        return state;
+    }
+}
+
 export default combineReducers({
 
     // the current selected channel
@@ -612,4 +626,7 @@ export default combineReducers({
 
     // object where every key is the channel id, if present means a user requested to mark that channel as unread.
     manuallyUnread,
+
+    // object where every key is the channel id and has an object with the channel moderations
+    channelModerations,
 });
