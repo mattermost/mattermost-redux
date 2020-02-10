@@ -97,9 +97,11 @@ function currentUserId(state = '', action: GenericAction) {
         return data.id;
     }
 
-    case UserTypes.LOGIN: // Used by the mobile app
-        return action.data.user.id;
+    case UserTypes.LOGIN: { // Used by the mobile app
+        const {user} = action.data;
 
+        return user ? user.id : state;
+    }
     case UserTypes.LOGOUT_SUCCESS:
         return '';
     }
@@ -181,11 +183,15 @@ function profiles(state: IDMappedObjects<UserProfile> = {}, action: GenericActio
         return Object.assign({}, state, action.data);
 
     case UserTypes.LOGIN: { // Used by the mobile app
-        const nextState = {...state};
         const {user} = action.data;
 
-        nextState[user.id] = user;
-        return nextState;
+        if (user) {
+            const nextState = {...state};
+            nextState[user.id] = user;
+            return nextState;
+        }
+
+        return state;
     }
     case UserTypes.RECEIVED_BATCHED_PROFILES_IN_CHANNEL: {
         const {data} = action;
