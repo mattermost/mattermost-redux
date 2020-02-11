@@ -266,7 +266,6 @@ function isSearchingTerm(state = false, action: GenericAction) {
     switch (action.type) {
     case SearchTypes.SEARCH_POSTS_REQUEST:
         return !action.isGettingMore;
-    case SearchTypes.SEARCH_POSTS_FAILURE:
     case SearchTypes.SEARCH_POSTS_SUCCESS:
         return false;
     default:
@@ -278,7 +277,6 @@ function isSearchGettingMore(state = false, action: GenericAction) {
     switch (action.type) {
     case SearchTypes.SEARCH_POSTS_REQUEST:
         return action.isGettingMore;
-    case SearchTypes.SEARCH_POSTS_FAILURE:
     case SearchTypes.SEARCH_POSTS_SUCCESS:
         return false;
     default:
