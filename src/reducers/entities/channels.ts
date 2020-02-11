@@ -197,23 +197,8 @@ function channels(state: IDMappedObjects<Channel> = {}, action: GenericAction) {
 
     case ChannelTypes.RECEIVED_MY_CHANNELS_WITH_MEMBERS: { // Used by the mobile app
         const nextState = {...state};
-        const current = Object.values(nextState);
         const myChannels: Array<Channel> = action.data.channels;
-        const {teamId, sync} = action.data;
         let hasNewValues = false;
-
-        // Remove existing channels that are no longer
-        if (sync) {
-            current.forEach((channel) => {
-                const id = channel.id;
-                if (channel.team_id === teamId) {
-                    if (!myChannels.find((c: Channel) => c.id === id)) {
-                        delete nextState[id];
-                        hasNewValues = true;
-                    }
-                }
-            });
-        }
 
         if (myChannels && myChannels.length) {
             hasNewValues = true;
@@ -411,8 +396,20 @@ function myMembers(state: RelationOneToOne<Channel, ChannelMembership> = {}, act
 
     case ChannelTypes.RECEIVED_MY_CHANNELS_WITH_MEMBERS: { // Used by the mobile app
         const nextState: any = {...state};
-        const {channelMembers} = action.data;
-        const hasNewValues = channelMembers && channelMembers.length > 0;
+        const current = Object.values(nextState);
+        const {sync, channelMembers} = action.data;
+        let hasNewValues = channelMembers && channelMembers.length > 0;
+
+        // Remove existing channel memberships that are no longer
+        if (sync) {
+            current.forEach((member: ChannelMembership) => {
+                const id = member.channel_id;
+                if (!channelMembers.find((cm: ChannelMembership) => cm.channel_id === id)) {
+                    delete nextState[id];
+                    hasNewValues = true;
+                }
+            });
+        }
 
         if (hasNewValues) {
             channelMembers.forEach((cm: ChannelMembership) => {
