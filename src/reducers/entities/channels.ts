@@ -400,7 +400,7 @@ function myMembers(state: RelationOneToOne<Channel, ChannelMembership> = {}, act
         const {sync, channelMembers} = action.data;
         let hasNewValues = channelMembers && channelMembers.length > 0;
 
-        // Remove existing channel memberships that are no longer
+        // Remove existing channel memberships when the user is no longer a member
         if (sync) {
             current.forEach((member: ChannelMembership) => {
                 const id = member.channel_id;
