@@ -496,7 +496,7 @@ export function fetchMyChannelsAndMembers(teamId: string): ActionFunc {
         let channels;
         let channelMembers;
         try {
-            const channelRequest = Client4.getMyChannels(teamId);
+            const channelRequest = Client4.getMyChannels(teamId, true);
             const memberRequest = Client4.getMyChannelMembers(teamId);
             channels = await channelRequest;
             channelMembers = await memberRequest;
