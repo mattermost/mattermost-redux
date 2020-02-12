@@ -518,7 +518,6 @@ export function fetchMyChannelsAndMembers(teamId: string): ActionFunc {
                 type: ChannelTypes.RECEIVED_CHANNELS,
                 teamId,
                 data: channels,
-                sync: true,
                 currentChannelId,
             },
             {
