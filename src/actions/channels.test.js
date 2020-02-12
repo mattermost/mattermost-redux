@@ -488,7 +488,7 @@ describe('Actions.Channels', () => {
         assert.ifError(incomingHooks[incomingHook.id]);
         assert.ifError(outgoingHooks[outgoingHook.id]);
     });
-    
+
     it('unarchiveChannel', async () => {
         const secondClient = TestHelper.createClient4();
 
@@ -724,6 +724,7 @@ describe('Actions.Channels', () => {
 
         nock(Client4.getBaseRoute()).
             get(`/users/me/teams/${TestHelper.basicTeam.id}/channels`).
+            query({include_deleted: true}).
             reply(200, [userChannel, TestHelper.basicChannel]);
 
         nock(Client4.getBaseRoute()).
