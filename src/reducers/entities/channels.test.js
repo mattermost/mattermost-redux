@@ -6,6 +6,8 @@ import deepFreeze from 'utils/deep_freeze';
 
 import channelsReducer, * as Reducers from './channels';
 
+import {Permissions} from '../../constants';
+
 describe('channels', () => {
     describe('RECEIVED_CHANNEL_DELETED', () => {
         test('should mark channel as deleted', () => {
@@ -523,17 +525,17 @@ describe('channels', () => {
                     channelId: 'channel1',
                     moderations: [
                         {
-                            "name": "create_posts",
-                            "roles": {
-                                "members": true,
+                            name: Permissions.CHANNEL_MODERATED_PERMISSIONS.CREATE_POST,
+                            roles: {
+                                members: true,
                             },
                         },
                     ],
                 },
             });
 
-            expect(nextState.channelModerations['channel1'][0].name).toEqual("create_posts");
-            expect(nextState.channelModerations['channel1'][0].roles.members).toEqual(true);
+            expect(nextState.channelModerations.channel1[0].name).toEqual(Permissions.CHANNEL_MODERATED_PERMISSIONS.CREATE_POST);
+            expect(nextState.channelModerations.channel1[0].roles.members).toEqual(true);
         });
         test('Should replace existing channel moderations', () => {
             const state = deepFreeze({
@@ -551,10 +553,10 @@ describe('channels', () => {
                     },
                 },
                 channelModerations: {
-                    'channel1': [{
-                        "name": "create_posts",
-                        "roles": {
-                            "members": true,
+                    channel1: [{
+                        name: Permissions.CHANNEL_MODERATED_PERMISSIONS.CREATE_POST,
+                        roles: {
+                            members: true,
                         },
                     }],
                 },
@@ -569,19 +571,19 @@ describe('channels', () => {
                     channelId: 'channel1',
                     moderations: [
                         {
-                            "name": "create_reactions",
-                            "roles": {
-                                "members": true,
-                                "guests": false,
+                            name: Permissions.CHANNEL_MODERATED_PERMISSIONS.CREATE_REACTIONS,
+                            roles: {
+                                members: true,
+                                guests: false,
                             },
                         },
                     ],
                 },
             });
 
-            expect(nextState.channelModerations['channel1'][0].name).toEqual("create_reactions");
-            expect(nextState.channelModerations['channel1'][0].roles.members).toEqual(true);
-            expect(nextState.channelModerations['channel1'][0].roles.guests).toEqual(false);
+            expect(nextState.channelModerations.channel1[0].name).toEqual(Permissions.CHANNEL_MODERATED_PERMISSIONS.CREATE_REACTIONS);
+            expect(nextState.channelModerations.channel1[0].roles.members).toEqual(true);
+            expect(nextState.channelModerations.channel1[0].roles.guests).toEqual(false);
         });
     });
 });

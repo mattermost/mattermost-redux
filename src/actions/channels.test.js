@@ -9,7 +9,7 @@ import {addUserToTeam} from 'actions/teams';
 import {getProfilesByIds, login} from 'actions/users';
 import {createIncomingHook, createOutgoingHook} from 'actions/integrations';
 import {Client4} from 'client';
-import {General, RequestStatus, Preferences} from '../constants';
+import {General, RequestStatus, Preferences, Permissions} from '../constants';
 import {getPreferenceKey} from 'utils/preference_utils';
 import TestHelper from 'test/test_helper';
 import configureStore from 'test/test_store';
@@ -2282,22 +2282,21 @@ describe('Actions.Channels', () => {
     it('getChannelModerations', async () => {
         const channelID = 'cid10000000000000000000000';
 
-        nock(Client4.getBaseRoute())
-        .get(`/channels/${channelID}/moderations`).
-        reply(200,  [{
-                "name": "create_posts",
-                "roles": {
-                    "members": true,
-                    "guests": false,
+        nock(Client4.getBaseRoute()).get(
+            `/channels/${channelID}/moderations`).
+            reply(200, [{
+                name: Permissions.CHANNEL_MODERATED_PERMISSIONS.CREATE_POST,
+                roles: {
+                    members: true,
+                    guests: false,
                 },
-            }]
-        );
+            }]);
 
         const {error} = await Actions.getChannelModerations(channelID)(store.dispatch, store.getState);
         const moderations = store.getState().entities.channels.channelModerations[channelID];
 
         assert.equal(error, null);
-        assert.equal(moderations[0].name, "create_posts");
+        assert.equal(moderations[0].name, Permissions.CHANNEL_MODERATED_PERMISSIONS.CREATE_POST);
         assert.equal(moderations[0].roles.members, true);
         assert.equal(moderations[0].roles.guests, false);
     });
@@ -2305,24 +2304,21 @@ describe('Actions.Channels', () => {
     it('patchChannelModerations', async () => {
         const channelID = 'cid10000000000000000000000';
 
-        nock(Client4.getBaseRoute())
-        .put(`/channels/${channelID}/moderations/patch`).
-        reply(200,  [
-                {
-                    "name": "create_reactions",
-                    "roles": {
-                        "members": true,
-                        "guests": false,
-                    },
+        nock(Client4.getBaseRoute()).put(
+            `/channels/${channelID}/moderations/patch`).
+            reply(200, [{
+                name: Permissions.CHANNEL_MODERATED_PERMISSIONS.CREATE_REACTIONS,
+                roles: {
+                    members: true,
+                    guests: false,
                 },
-            ]
-        );
+            }]);
 
-        const {error} = await Actions.patchChannelModerations(channelID, {})(store.dispatch, store.getState);
+        const {error} = await store.dispatch(Actions.patchChannelModerations(channelID, {}));
         const moderations = store.getState().entities.channels.channelModerations[channelID];
 
         assert.equal(error, null);
-        assert.equal(moderations[0].name, "create_reactions");
+        assert.equal(moderations[0].name, Permissions.CHANNEL_MODERATED_PERMISSIONS.CREATE_REACTIONS);
         assert.equal(moderations[0].roles.members, true);
         assert.equal(moderations[0].roles.guests, false);
     });
