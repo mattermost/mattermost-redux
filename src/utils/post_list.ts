@@ -58,7 +58,6 @@ export function makeFilterPostsAndAddSeparators() {
                 return [];
             }
 
-            const dt = Date.now();
             const out: string[] = [];
             let lastDate;
             let addedNewMessagesIndicator = false;
