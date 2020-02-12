@@ -2292,7 +2292,7 @@ describe('Actions.Channels', () => {
                 },
             }]);
 
-        const {error} = await Actions.getChannelModerations(channelID)(store.dispatch, store.getState);
+        const {error} = await store.dispatch(Actions.getChannelModerations(channelID));
         const moderations = store.getState().entities.channels.channelModerations[channelID];
 
         assert.equal(error, null);
