@@ -488,7 +488,7 @@ describe('Actions.Channels', () => {
         assert.ifError(incomingHooks[incomingHook.id]);
         assert.ifError(outgoingHooks[outgoingHook.id]);
     });
-    
+
     it('unarchiveChannel', async () => {
         const secondClient = TestHelper.createClient4();
 
