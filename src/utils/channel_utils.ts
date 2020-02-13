@@ -1,5 +1,6 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
+
 import {General, Preferences, Permissions, Users} from '../constants';
 
 import {hasNewPermissions} from 'selectors/entities/general';
@@ -12,8 +13,9 @@ import {TeamMembership} from 'types/teams';
 import {PreferenceType} from 'types/preferences';
 import {RelationOneToOne, IDMappedObjects} from 'types/utilities';
 
-import {getPreferencesByCategory} from './preference_utils';
+import {getPreferenceKey, getPreferencesByCategory} from './preference_utils';
 import {displayUsername} from './user_utils';
+
 const channelTypeOrder = {
     [General.OPEN_CHANNEL]: 0,
     [General.PRIVATE_CHANNEL]: 1,
@@ -174,8 +176,8 @@ export function isAutoClosed(config: any, myPreferences: {
     if (config.CloseUnusedDirectMessages !== 'true' || isFavoriteChannel(myPreferences, channel.id)) {
         return false;
     }
-    const autoClose = myPreferences[`${Preferences.CATEGORY_SIDEBAR_SETTINGS}--close_unused_direct_messages`];
-    if (!autoClose || autoClose.value === 'after_seven_days') {
+    const autoClose = myPreferences[getPreferenceKey(Preferences.CATEGORY_SIDEBAR_SETTINGS, Preferences.CHANNEL_SIDEBAR_AUTOCLOSE_DMS)];
+    if (!autoClose || autoClose.value === Preferences.AUTOCLOSE_DMS_ENABLED) {
         if (channelActivity && channelActivity > cutoff) {
             return false;
         }

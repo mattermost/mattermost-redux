@@ -1,5 +1,6 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
+
 import * as reselect from 'reselect';
 import {General, Preferences} from '../../constants';
 import {getConfig} from 'selectors/entities/general';
@@ -252,3 +253,14 @@ export const getNewSidebarPreference = reselect.createSelector(
         }
     }
 );
+
+export function shouldAutocloseDMs(state: GlobalState) {
+    const config = getConfig(state);
+    if (config.CloseUnusedDirectMessages === 'false') {
+        return false;
+    }
+
+    const preference = get(state, Preferences.CATEGORY_SIDEBAR_SETTINGS, Preferences.CHANNELS_SIDEBAR_AUTOCLOSE_DMS, '');
+
+    return preference.value === Preferences.AUTOCLOSE_DMS_ENABLED;
+}
