@@ -496,7 +496,8 @@ export function fetchMyChannelsAndMembers(teamId: string): ActionFunc {
 
         let channels;
         let channelMembers;
-        const shouldFetchArchived = (isMinimumServerVersion(getServerVersion(getState()), 5, 21));
+        const state = getState();
+        const shouldFetchArchived = isMinimumServerVersion(getServerVersion(state), 5, 21);
         try {
             const channelRequest = Client4.getMyChannels(teamId, shouldFetchArchived);
             const memberRequest = Client4.getMyChannelMembers(teamId);
@@ -511,7 +512,6 @@ export function fetchMyChannelsAndMembers(teamId: string): ActionFunc {
             return {error};
         }
 
-        const state = getState();
         const {currentUserId} = state.entities.users;
         const {currentChannelId} = state.entities.channels;
 
@@ -530,8 +530,7 @@ export function fetchMyChannelsAndMembers(teamId: string): ActionFunc {
                 data: channelMembers,
                 sync: !shouldFetchArchived,
                 channels,
-                serverVersion: getServerVersion(getState()),
-                remove: getChannelsIdForTeam(getState(), teamId),
+                remove: getChannelsIdForTeam(state, teamId),
                 currentUserId,
                 currentChannelId,
             },
