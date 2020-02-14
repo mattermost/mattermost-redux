@@ -732,6 +732,10 @@ describe('Actions.Channels', () => {
             reply(200, [userChannel, TestHelper.basicChannel]);
 
         nock(Client4.getBaseRoute()).
+            get(`/users/me/teams/${TestHelper.basicTeam.id}/channels`).
+            reply(200, [userChannel, TestHelper.basicChannel]);
+
+        nock(Client4.getBaseRoute()).
             get(`/users/me/teams/${TestHelper.basicTeam.id}/channels/members`).
             reply(200, [{user_id: TestHelper.basicUser.id, roles: 'channel_user', channel_id: userChannel.id}, TestHelper.basicChannelMember]);
 

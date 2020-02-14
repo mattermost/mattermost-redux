@@ -12,7 +12,8 @@ import {
     isManuallyUnread,
 } from 'selectors/entities/channels';
 import {getCurrentTeamId} from 'selectors/entities/teams';
-import {getConfig} from 'selectors/entities/general';
+import {getConfig, getServerVersion} from 'selectors/entities/general';
+import {isMinimumServerVersion} from 'utils/helpers';
 
 import {Action, ActionFunc, batchActions, DispatchFunc, GetStateFunc} from 'types/actions';
 
@@ -496,7 +497,12 @@ export function fetchMyChannelsAndMembers(teamId: string): ActionFunc {
         let channels;
         let channelMembers;
         try {
-            const channelRequest = Client4.getMyChannels(teamId, true);
+            let channelRequest;
+            if (isMinimumServerVersion(getServerVersion(getState()), 5, 21)) {
+                channelRequest = Client4.getMyChannels(teamId, true);
+            } else {
+                channelRequest = Client4.getMyChannels(teamId);
+            }
             const memberRequest = Client4.getMyChannelMembers(teamId);
             channels = await channelRequest;
             channelMembers = await memberRequest;
@@ -526,6 +532,9 @@ export function fetchMyChannelsAndMembers(teamId: string): ActionFunc {
             {
                 type: ChannelTypes.RECEIVED_MY_CHANNEL_MEMBERS,
                 data: channelMembers,
+                sync: true,
+                channels,
+                serverVersion: getServerVersion(getState()),
                 remove: getChannelsIdForTeam(getState(), teamId),
                 currentUserId,
                 currentChannelId,

@@ -1450,8 +1450,15 @@ export default class Client4 {
     };
 
     getMyChannels = async (teamId: string, includeDeleted = false) => {
+        const serverVersion = this.getServerVersion();
+        if (isMinimumServerVersion(serverVersion, 5, 21)) {
+            return this.doFetch(
+                `${this.getUserRoute('me')}/teams/${teamId}/channels${buildQueryString({include_deleted: includeDeleted})}`,
+                {method: 'get'}
+            );
+        }
         return this.doFetch(
-            `${this.getUserRoute('me')}/teams/${teamId}/channels${buildQueryString({include_deleted: includeDeleted})}`,
+            `${this.getUserRoute('me')}/teams/${teamId}/channels`,
             {method: 'get'}
         );
     };
