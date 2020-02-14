@@ -345,6 +345,10 @@ describe('Actions.Channels', () => {
             reply(200, [directChannel, TestHelper.basicChannel]);
 
         nock(Client4.getBaseRoute()).
+            get(`/users/me/teams/${TestHelper.basicTeam.id}/channels`).
+            reply(200, [directChannel, TestHelper.basicChannel]);
+
+        nock(Client4.getBaseRoute()).
             get(`/users/me/teams/${TestHelper.basicTeam.id}/channels/members`).
             reply(200, [{user_id: TestHelper.basicUser.id, roles: 'channel_user', channel_id: directChannel.id}, TestHelper.basicChannelMember]);
 
@@ -368,6 +372,10 @@ describe('Actions.Channels', () => {
         nock(Client4.getBaseRoute()).
             get(`/users/me/teams/${TestHelper.basicTeam.id}/channels`).
             query({include_deleted: true}).
+            reply(200, [TestHelper.basicChannel]);
+
+        nock(Client4.getBaseRoute()).
+            get(`/users/me/teams/${TestHelper.basicTeam.id}/channels`).
             reply(200, [TestHelper.basicChannel]);
 
         nock(Client4.getBaseRoute()).
@@ -431,6 +439,10 @@ describe('Actions.Channels', () => {
         nock(Client4.getBaseRoute()).
             get(`/users/me/teams/${TestHelper.basicTeam.id}/channels`).
             query({include_deleted: true}).
+            reply(200, [secondChannel, TestHelper.basicChannel]);
+
+        nock(Client4.getBaseRoute()).
+            get(`/users/me/teams/${TestHelper.basicTeam.id}/channels`).
             reply(200, [secondChannel, TestHelper.basicChannel]);
 
         nock(Client4.getBaseRoute()).
@@ -531,6 +543,10 @@ describe('Actions.Channels', () => {
         nock(Client4.getBaseRoute()).
             get(`/users/me/teams/${TestHelper.basicTeam.id}/channels`).
             query({include_deleted: true}).
+            reply(200, [secondChannel, TestHelper.basicChannel]);
+
+        nock(Client4.getBaseRoute()).
+            get(`/users/me/teams/${TestHelper.basicTeam.id}/channels`).
             reply(200, [secondChannel, TestHelper.basicChannel]);
 
         nock(Client4.getBaseRoute()).
