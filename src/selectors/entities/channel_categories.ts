@@ -21,10 +21,6 @@ import {getUserIdFromChannelName, isFavoriteChannel} from 'utils/channel_utils';
 import {getPreferenceKey} from 'utils/preference_utils';
 import {displayUsername} from 'utils/user_utils';
 
-export function isCategoryCollapsed(state: GlobalState, categoryId: string) {
-    return Boolean(state.entities.channelCategories.collapsedById[categoryId]);
-}
-
 export function getCategoryIdsForTeam(state: GlobalState, teamId: string): string[] | undefined {
     return state.entities.channelCategories.orderByTeam[teamId];
 }

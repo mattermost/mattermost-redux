@@ -8,36 +8,6 @@ import {getPreferenceKey} from 'utils/preference_utils';
 
 import * as Selectors from './channel_categories';
 
-describe('isCategoryCollapsed', () => {
-    test('should return false by default', () => {
-        const state = {
-            entities: {
-                channelCategories: {
-                    collapsedById: {},
-                },
-            },
-        };
-
-        expect(Selectors.isCategoryCollapsed(state, 'category1')).toBe(false);
-    });
-
-    test('should return the correct values', () => {
-        const state = {
-            entities: {
-                channelCategories: {
-                    collapsedById: {
-                        category1: true,
-                        category2: false,
-                    },
-                },
-            },
-        };
-
-        expect(Selectors.isCategoryCollapsed(state, 'category1')).toBe(true);
-        expect(Selectors.isCategoryCollapsed(state, 'category2')).toBe(false);
-    });
-});
-
 describe('makeGetCategoriesForTeam', () => {
     const category1 = {id: 'category1', display_name: 'Category One', type: CategoryTypes.CUSTOM};
     const category2 = {id: 'category2', display_name: 'Category Two', type: CategoryTypes.CUSTOM};

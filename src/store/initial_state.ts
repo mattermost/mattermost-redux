@@ -144,7 +144,6 @@ const state: GlobalState = {
         },
         channelCategories: {
             byId: {},
-            collapsedById: {},
             orderByTeam: {},
         },
     },

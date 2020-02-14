@@ -17,6 +17,5 @@ export type ChannelCategory = {
 
 export type ChannelCategoriesState = {
     byId: IDMappedObjects<ChannelCategory>;
-    collapsedById: RelationOneToOne<ChannelCategory, boolean>;
     orderByTeam: RelationOneToOne<Team, $ID<ChannelCategory>[]>;
 };

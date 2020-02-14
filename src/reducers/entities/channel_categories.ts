@@ -85,41 +85,6 @@ export function byId(state: IDMappedObjects<ChannelCategory> = {}, action: Gener
     }
 }
 
-export function collapsedById(state: RelationOneToOne<ChannelCategory, boolean> = {}, action: GenericAction) {
-    switch (action.type) {
-    case ChannelCategoryTypes.CATEGORY_COLLAPSED: {
-        const categoryId: string = action.data;
-
-        return {
-            ...state,
-            [categoryId]: true,
-        };
-    }
-    case ChannelCategoryTypes.CATEGORY_EXPANDED: {
-        const categoryId: string = action.data;
-
-        return {
-            ...state,
-            [categoryId]: false,
-        };
-    }
-
-    case ChannelCategoryTypes.CATEGORY_DELETED: {
-        const category: ChannelCategory = action.data;
-
-        const nextState = {...state};
-        Reflect.deleteProperty(nextState, category.id);
-
-        return nextState;
-    }
-
-    case UserTypes.LOGOUT_SUCCESS:
-        return {};
-    default:
-        return state;
-    }
-}
-
 export function orderByTeam(state: RelationOneToOne<Team, $ID<ChannelCategory>[]> = {}, action: GenericAction) {
     switch (action.type) {
     case TeamTypes.RECEIVED_MY_TEAM_MEMBER: {
@@ -216,6 +181,5 @@ function makeDefaultCategories(teamId: string): IDMappedObjects<ChannelCategory>
 
 export default combineReducers({
     byId,
-    collapsedById,
     orderByTeam,
 });
