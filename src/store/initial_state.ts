@@ -46,6 +46,7 @@ const state: GlobalState = {
             groupsAssociatedToChannel: {},
             totalCount: 0,
             manuallyUnread: {},
+            channelModerations: {},
         },
         posts: {
             expandedURLs: {},
@@ -421,24 +422,6 @@ const state: GlobalState = {
                 error: null,
             },
             cancelJob: {
-                status: 'not_started',
-                error: null,
-            },
-        },
-        search: {
-            flaggedPosts: {
-                status: 'not_started',
-                error: null,
-            },
-            pinnedPosts: {
-                status: 'not_started',
-                error: null,
-            },
-            recentMentions: {
-                status: 'not_started',
-                error: null,
-            },
-            searchPosts: {
                 status: 'not_started',
                 error: null,
             },
