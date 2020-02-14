@@ -496,13 +496,9 @@ export function fetchMyChannelsAndMembers(teamId: string): ActionFunc {
 
         let channels;
         let channelMembers;
+        const shouldFetchArchived = (isMinimumServerVersion(getServerVersion(getState()), 5, 21));
         try {
-            let channelRequest;
-            if (isMinimumServerVersion(getServerVersion(getState()), 5, 21)) {
-                channelRequest = Client4.getMyChannels(teamId, true);
-            } else {
-                channelRequest = Client4.getMyChannels(teamId);
-            }
+            const channelRequest = Client4.getMyChannels(teamId, shouldFetchArchived);
             const memberRequest = Client4.getMyChannelMembers(teamId);
             channels = await channelRequest;
             channelMembers = await memberRequest;
@@ -532,7 +528,7 @@ export function fetchMyChannelsAndMembers(teamId: string): ActionFunc {
             {
                 type: ChannelTypes.RECEIVED_MY_CHANNEL_MEMBERS,
                 data: channelMembers,
-                sync: true,
+                sync: !shouldFetchArchived,
                 channels,
                 serverVersion: getServerVersion(getState()),
                 remove: getChannelsIdForTeam(getState(), teamId),
