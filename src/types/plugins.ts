@@ -3,7 +3,7 @@
 
 export type ClientPluginManifest = {
     id: string;
-    min_server_version: string?;
+    min_server_version?: string;
     version: string;
     webapp: {
         bundle_path: string;
