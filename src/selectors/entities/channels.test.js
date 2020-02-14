@@ -9,7 +9,7 @@ import {sortChannelsByDisplayName, getDirectChannelName} from 'utils/channel_uti
 import * as Selectors from 'selectors/entities/channels';
 import * as TeamSelectors from 'selectors/entities/teams';
 import * as PreferencesSelectors from 'selectors/entities/preferences';
-import {General, Preferences} from '../../constants';
+import {General, Preferences, Permissions} from '../../constants';
 
 const sortUsernames = (a, b) => a.localeCompare(b, General.DEFAULT_LOCALE, {numeric: true});
 
@@ -3923,4 +3923,27 @@ test('Selectors.Channels.isManuallyUnread', () => {
     assert.equal(Selectors.isManuallyUnread(state, undefined), false);
     assert.equal(Selectors.isManuallyUnread(state, 'channel2'), false);
     assert.equal(Selectors.isManuallyUnread(state, 'channel3'), false);
+});
+
+test('Selectors.Channels.getChannelModerations', () => {
+    const moderations = [{
+        name: Permissions.CHANNEL_MODERATED_PERMISSIONS.CREATE_POST,
+        roles: {
+            members: true,
+        },
+    }];
+
+    const state = {
+        entities: {
+            channels: {
+                channelModerations: {
+                    channel1: moderations,
+                },
+            },
+        },
+    };
+
+    assert.equal(Selectors.getChannelModerations(state, 'channel1'), moderations);
+    assert.equal(Selectors.getChannelModerations(state, undefined), undefined);
+    assert.equal(Selectors.getChannelModerations(state, 'undefined'), undefined);
 });
