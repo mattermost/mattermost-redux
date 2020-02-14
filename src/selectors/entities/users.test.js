@@ -445,8 +445,8 @@ describe('Selectors.Users', () => {
                 },
                 general: {
                     config: {
-                        TeammateNameDisplay: General.TEAMMATE_NAME_DISPLAY.SHOW_USERNAME, 
-                        LockTeammateNameDisplay: 'false', 
+                        TeammateNameDisplay: General.TEAMMATE_NAME_DISPLAY.SHOW_USERNAME,
+                        LockTeammateNameDisplay: 'false',
                     },
                     license: {
                         LockTeammateNameDisplay: 'true',
@@ -460,7 +460,7 @@ describe('Selectors.Users', () => {
 
         newTestState.entities.general.config.LockTeammateNameDisplay = 'true';
 
-        // Should show username since LockTeammateNameDisplay is true 
+        // Should show username since LockTeammateNameDisplay is true
         assert.deepEqual(Selectors.makeGetDisplayName()(newTestState, testUser1.id), 'username');
     });
 

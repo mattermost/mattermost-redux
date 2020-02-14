@@ -5,6 +5,7 @@ export type Scheme = {
     id: string;
     name: string;
     description: string;
+    display_name: string;
     create_at: number;
     update_at: number;
     delete_at: number;

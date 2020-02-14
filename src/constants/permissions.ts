@@ -70,4 +70,11 @@ export default {
     PROMOTE_GUEST: 'promote_guest',
     DEMOTE_TO_GUEST: 'demote_to_guest',
     USE_CHANNEL_MENTIONS: 'use_channel_mentions',
+
+    CHANNEL_MODERATED_PERMISSIONS: {
+        CREATE_POST: 'create_post',
+        CREATE_REACTIONS: 'create_reactions',
+        MANAGE_MEMBERS: 'manage_members',
+        USE_CHANNEL_MENTIONS: 'use_channel_mentions',
+    },
 };

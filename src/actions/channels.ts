@@ -16,7 +16,7 @@ import {getConfig} from 'selectors/entities/general';
 
 import {Action, ActionFunc, batchActions, DispatchFunc, GetStateFunc} from 'types/actions';
 
-import {Channel, ChannelNotifyProps, ChannelMembership} from 'types/channels';
+import {Channel, ChannelNotifyProps, ChannelMembership, ChannelModerationPatch} from 'types/channels';
 
 import {PreferenceType} from 'types/preferences';
 
@@ -24,7 +24,7 @@ import {logError} from './errors';
 import {bindClientFunc, forceLogoutIfNecessary} from './helpers';
 import {getMissingProfilesByIds} from './users';
 import {loadRolesIfNeeded} from './roles';
-import {UserProfile} from 'types/users';
+
 export function selectChannel(channelId: string) {
     return {
         type: ChannelTypes.SELECT_CHANNEL,
@@ -1445,6 +1445,32 @@ export function membersMinusGroupMembers(channelID: string, groupIDs: Array<stri
     });
 }
 
+export function getChannelModerations(channelId: string): ActionFunc {
+    return bindClientFunc({
+        clientFunc: async () => {
+            const moderations = await Client4.getChannelModerations(channelId);
+            return {channelId, moderations};
+        },
+        onSuccess: ChannelTypes.RECEIVED_CHANNEL_MODERATIONS,
+        params: [
+            channelId,
+        ],
+    });
+}
+
+export function patchChannelModerations(channelId: string, patch: Array<ChannelModerationPatch>): ActionFunc {
+    return bindClientFunc({
+        clientFunc: async () => {
+            const moderations = await Client4.patchChannelModerations(channelId, patch);
+            return {channelId, moderations};
+        },
+        onSuccess: ChannelTypes.RECEIVED_CHANNEL_MODERATIONS,
+        params: [
+            channelId,
+        ],
+    });
+}
+
 export default {
     selectChannel,
     createChannel,
@@ -1478,4 +1504,5 @@ export default {
     favoriteChannel,
     unfavoriteChannel,
     membersMinusGroupMembers,
+    getChannelModerations,
 };

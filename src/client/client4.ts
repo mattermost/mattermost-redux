@@ -10,7 +10,7 @@ import {isSystemAdmin} from 'utils/user_utils';
 import fetch from './fetch_etag';
 import {UserProfile, UserStatus} from 'types/users';
 import {Team} from 'types/teams';
-import {Channel} from 'types/channels';
+import {Channel, ChannelModerationPatch} from 'types/channels';
 import {Post} from 'types/posts';
 import {Job} from 'types/jobs';
 import {Role} from 'types/roles';
@@ -1528,6 +1528,20 @@ export default class Client4 {
         return this.doFetch(
             `${this.getChannelRoute(channelId)}/stats`,
             {method: 'get'}
+        );
+    };
+
+    getChannelModerations = async (channelId: string) => {
+        return this.doFetch(
+            `${this.getChannelRoute(channelId)}/moderations`,
+            {method: 'get'}
+        );
+    };
+
+    patchChannelModerations = async (channelId: string, channelModerationsPatch: Array<ChannelModerationPatch>) => {
+        return this.doFetch(
+            `${this.getChannelRoute(channelId)}/moderations/patch`,
+            {method: 'put', body: JSON.stringify(channelModerationsPatch)}
         );
     };
 
