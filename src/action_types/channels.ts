@@ -83,4 +83,5 @@ export default keyMirror({
 
     ADD_MANUALLY_UNREAD: null,
     REMOVE_MANUALLY_UNREAD: null,
+    RECEIVED_MY_CHANNELS_WITH_MEMBERS: null,
 });

@@ -3,7 +3,7 @@
 import {combineReducers} from 'redux';
 import {ChannelTypes, TeamTypes, UserTypes, SchemeTypes, GroupTypes} from 'action_types';
 import {teamListToMap} from 'utils/team_utils';
-import {Team, TeamMembership} from 'types/teams';
+import {Team, TeamMembership, TeamUnread} from 'types/teams';
 import {UserProfile} from 'types/users';
 import {RelationOneToOne, IDMappedObjects} from 'types/utilities';
 import {GenericAction} from 'types/actions';
@@ -25,6 +25,8 @@ function teams(state: IDMappedObjects<Team> = {}, action: GenericAction) {
     case TeamTypes.RECEIVED_TEAMS_LIST:
     case SchemeTypes.RECEIVED_SCHEME_TEAMS:
         return Object.assign({}, state, teamListToMap(action.data));
+    case UserTypes.LOGIN: // Used by the mobile app
+        return Object.assign({}, state, teamListToMap(action.data.teams));
     case TeamTypes.RECEIVED_TEAMS:
         return Object.assign({}, state, action.data);
 
@@ -229,6 +231,23 @@ function myMembers(state: RelationOneToOne<Team, TeamMembership> = {}, action: G
         return {...state, [teamId]: newTeamState};
     }
 
+    case UserTypes.LOGIN: {// Used by the mobile app
+        const {teamMembers, teamUnreads} = action.data;
+        const nextState = {...state};
+
+        for (const m of teamMembers) {
+            if (m.delete_at == null || m.delete_at === 0) {
+                const unread = teamUnreads.find((u: TeamUnread) => u.team_id === m.team_id);
+                if (unread) {
+                    m.mention_count = unread.mention_count;
+                    m.msg_count = unread.msg_count;
+                }
+                nextState[m.team_id] = m;
+            }
+        }
+
+        return nextState;
+    }
     case UserTypes.LOGOUT_SUCCESS:
         return {};
     default:
