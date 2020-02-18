@@ -50,3 +50,9 @@ export type TeamsState = {
     groupsAssociatedToTeam: any;
     totalCount: number;
 };
+
+export type TeamUnread = {
+    team_id: string;
+    mention_count: number;
+    msg_count: number;
+};

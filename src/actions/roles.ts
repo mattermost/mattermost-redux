@@ -72,7 +72,7 @@ export function loadRolesIfNeeded(roles: Iterable<string>): ActionFunc {
 
         try {
             pendingRoles = new Set<string>(state.entities.roles.pending);
-    } catch (e) {// eslint-disable-line
+        } catch (e) {// eslint-disable-line
         }
 
         for (const role of roles) {
