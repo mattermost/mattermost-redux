@@ -393,7 +393,6 @@ describe('channels', () => {
 
             const nextState = channelsReducer(state, {
                 type: ChannelTypes.RECEIVED_CHANNELS,
-                sync: true,
                 currentChannelId: 'channel3',
                 teamId: 'team',
                 data: [{
@@ -407,7 +406,10 @@ describe('channels', () => {
                 id: 'channel1',
                 team_id: 'team',
             });
-            expect(nextState.channels.channel2).toBe(undefined);
+            expect(nextState.channels.channel2).toEqual({
+                id: 'channel2',
+                team_id: 'team',
+            });
             expect(nextState.channels.channel3).toEqual({
                 id: 'channel3',
                 team_id: 'team',
