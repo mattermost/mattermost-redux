@@ -341,6 +341,7 @@ describe('Actions.Channels', () => {
 
         nock(Client4.getBaseRoute()).
             get(`/users/me/teams/${TestHelper.basicTeam.id}/channels`).
+            query(true).
             reply(200, [directChannel, TestHelper.basicChannel]);
 
         nock(Client4.getBaseRoute()).
@@ -366,6 +367,7 @@ describe('Actions.Channels', () => {
 
         nock(Client4.getBaseRoute()).
             get(`/users/me/teams/${TestHelper.basicTeam.id}/channels`).
+            query(true).
             reply(200, [TestHelper.basicChannel]);
 
         nock(Client4.getBaseRoute()).
@@ -428,6 +430,7 @@ describe('Actions.Channels', () => {
 
         nock(Client4.getBaseRoute()).
             get(`/users/me/teams/${TestHelper.basicTeam.id}/channels`).
+            query(true).
             reply(200, [secondChannel, TestHelper.basicChannel]);
 
         nock(Client4.getBaseRoute()).
@@ -527,6 +530,7 @@ describe('Actions.Channels', () => {
 
         nock(Client4.getBaseRoute()).
             get(`/users/me/teams/${TestHelper.basicTeam.id}/channels`).
+            query(true).
             reply(200, [secondChannel, TestHelper.basicChannel]);
 
         nock(Client4.getBaseRoute()).
@@ -724,6 +728,7 @@ describe('Actions.Channels', () => {
 
         nock(Client4.getBaseRoute()).
             get(`/users/me/teams/${TestHelper.basicTeam.id}/channels`).
+            query(true).
             reply(200, [userChannel, TestHelper.basicChannel]);
 
         nock(Client4.getBaseRoute()).
