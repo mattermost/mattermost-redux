@@ -12,6 +12,8 @@ import {
     isManuallyUnread,
 } from 'selectors/entities/channels';
 import {getCurrentTeamId} from 'selectors/entities/teams';
+import {getConfig, getServerVersion} from 'selectors/entities/general';
+import {isMinimumServerVersion} from 'utils/helpers';
 
 import {Action, ActionFunc, batchActions, DispatchFunc, GetStateFunc} from 'types/actions';
 
@@ -494,8 +496,10 @@ export function fetchMyChannelsAndMembers(teamId: string): ActionFunc {
 
         let channels;
         let channelMembers;
+        const state = getState();
+        const shouldFetchArchived = isMinimumServerVersion(getServerVersion(state), 5, 21);
         try {
-            const channelRequest = Client4.getMyChannels(teamId);
+            const channelRequest = Client4.getMyChannels(teamId, shouldFetchArchived);
             const memberRequest = Client4.getMyChannelMembers(teamId);
             channels = await channelRequest;
             channelMembers = await memberRequest;
@@ -508,7 +512,6 @@ export function fetchMyChannelsAndMembers(teamId: string): ActionFunc {
             return {error};
         }
 
-        const state = getState();
         const {currentUserId} = state.entities.users;
         const {currentChannelId} = state.entities.channels;
 
@@ -517,7 +520,6 @@ export function fetchMyChannelsAndMembers(teamId: string): ActionFunc {
                 type: ChannelTypes.RECEIVED_CHANNELS,
                 teamId,
                 data: channels,
-                sync: true,
                 currentChannelId,
             },
             {
@@ -526,7 +528,9 @@ export function fetchMyChannelsAndMembers(teamId: string): ActionFunc {
             {
                 type: ChannelTypes.RECEIVED_MY_CHANNEL_MEMBERS,
                 data: channelMembers,
-                remove: getChannelsIdForTeam(getState(), teamId),
+                sync: !shouldFetchArchived,
+                channels,
+                remove: getChannelsIdForTeam(state, teamId),
                 currentUserId,
                 currentChannelId,
             },
