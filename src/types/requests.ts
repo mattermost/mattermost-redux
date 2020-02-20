@@ -108,3 +108,7 @@ export type JobsRequestsStatuses = {
     cancelJob: RequestStatusType;
 };
 
+export type SearchRequestsStatuses = {
+    flaggedPosts: RequestStatusType;
+    pinnedPosts: RequestStatusType;
+};

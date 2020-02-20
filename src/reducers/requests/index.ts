@@ -11,6 +11,7 @@ import teams from './teams';
 import users from './users';
 import admin from './admin';
 import jobs from './jobs';
+import search from './search';
 import roles from './roles';
 
 export default combineReducers({
@@ -22,5 +23,6 @@ export default combineReducers({
     users,
     admin,
     jobs,
+    search,
     roles,
 });
