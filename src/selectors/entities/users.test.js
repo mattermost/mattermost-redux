@@ -433,7 +433,7 @@ describe('Selectors.Users', () => {
             ...profiles,
             [testUser1.id]: testUser1,
         };
-        const newTestState = {
+        let newTestState = {
             entities: {
                 users: {profiles: newProfiles},
                 preferences: {
@@ -458,7 +458,19 @@ describe('Selectors.Users', () => {
         // Should show full name since preferences is being used and LockTeammateNameDisplay is false
         assert.deepEqual(Selectors.makeGetDisplayName()(newTestState, testUser1.id), 'First Last');
 
-        newTestState.entities.general.config.LockTeammateNameDisplay = 'true';
+        newTestState = {
+            ...newTestState,
+            entities: {
+                ...newTestState.entities,
+                general: {
+                    ...newTestState.entities.general,
+                    config: {
+                        ...newTestState.entities.general.config,
+                        LockTeammateNameDisplay: 'true',
+                    },
+                },
+            },
+        };
 
         // Should show username since LockTeammateNameDisplay is true
         assert.deepEqual(Selectors.makeGetDisplayName()(newTestState, testUser1.id), 'username');
