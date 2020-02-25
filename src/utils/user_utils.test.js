@@ -61,6 +61,11 @@ describe('user utils', () => {
             let noUserObj;
             assert.equal(displayUsername(noUserObj, 'UNKNOWN_PREFERENCE'), 'Someone');
         });
+
+        it('should return empty string when user does not exist and useDefaultUserName param is false', () => {
+            let noUserObj;
+            assert.equal(displayUsername(noUserObj, 'UNKNOWN_PREFERENCE', false), '');
+        });
     });
 
     describe('filterProfilesMatchingTerm', () => {
