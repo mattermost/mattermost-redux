@@ -1449,9 +1449,9 @@ export default class Client4 {
         );
     };
 
-    getMyChannels = async (teamId: string) => {
+    getMyChannels = async (teamId: string, includeDeleted = false) => {
         return this.doFetch(
-            `${this.getUserRoute('me')}/teams/${teamId}/channels`,
+            `${this.getUserRoute('me')}/teams/${teamId}/channels${buildQueryString({include_deleted: includeDeleted})}`,
             {method: 'get'}
         );
     };
