@@ -91,12 +91,14 @@ export const getTeammateNameDisplaySetting = reselect.createSelector(
     getMyPreferences,
     getLicense,
     (config, preferences, license) => {
-        const useAdminTemmateNameDisplaySetting = (license && license.LockTeammateNameDisplay === 'true') && config.LockTeammateNameDisplay === 'true';
+        const useAdminTeammateNameDisplaySetting = (license && license.LockTeammateNameDisplay === 'true') && config.LockTeammateNameDisplay === 'true';
         const key = getPreferenceKey(Preferences.CATEGORY_DISPLAY_SETTINGS, Preferences.NAME_NAME_FORMAT);
-        if (preferences[key] && !useAdminTemmateNameDisplaySetting) {
+        if (preferences[key] && !useAdminTeammateNameDisplaySetting) {
             return preferences[key].value;
+        } else if (config.TeammateNameDisplay) {
+            return config.TeammateNameDisplay;
         }
-        return config.TeammateNameDisplay;
+        return General.TEAMMATE_NAME_DISPLAY.SHOW_USERNAME;
     }
 );
 
