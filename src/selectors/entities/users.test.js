@@ -457,7 +457,7 @@ describe('Selectors.Users', () => {
             };
             assert.deepEqual(Selectors.makeGetDisplayName()(newTestState, testUser1.id), 'First Last');
         });
-        it('Should show username since LockTeammateNameDisplay is true', () => {
+        it('Should show show username since LockTeammateNameDisplay is true', () => {
             const newTestState = {
                 entities: {
                     users: {profiles: newProfiles},
@@ -481,7 +481,7 @@ describe('Selectors.Users', () => {
             };
             assert.deepEqual(Selectors.makeGetDisplayName()(newTestState, testUser1.id), 'username');
         });
-        it('Should full name since license is false', () => {
+        it('Should show full name since license is false', () => {
             const newTestState = {
                 entities: {
                     users: {profiles: newProfiles},
@@ -505,7 +505,7 @@ describe('Selectors.Users', () => {
             };
             assert.deepEqual(Selectors.makeGetDisplayName()(newTestState, testUser1.id), 'First Last');
         });
-        it('Should full name since license is not available', () => {
+        it('Should show full name since license is not available', () => {
             const newTestState = {
                 entities: {
                     users: {profiles: newProfiles},
@@ -526,7 +526,7 @@ describe('Selectors.Users', () => {
             };
             assert.deepEqual(Selectors.makeGetDisplayName()(newTestState, testUser1.id), 'First Last');
         });
-        it('Should Full name since license is not available and lock teammate name display is false', () => {
+        it('Should show Full name since license is not available and lock teammate name display is false', () => {
             const newTestState = {
                 entities: {
                     users: {profiles: newProfiles},
@@ -547,7 +547,7 @@ describe('Selectors.Users', () => {
             };
             assert.deepEqual(Selectors.makeGetDisplayName()(newTestState, testUser1.id), 'First Last');
         });
-        it('Should username since no settings are available (falls back to default)', () => {
+        it('Should show username since no settings are available (falls back to default)', () => {
             const newTestState = {
                 entities: {
                     users: {profiles: newProfiles},
