@@ -14,4 +14,5 @@ import Emoji from './emoji';
 import Plugins from './plugins';
 import Groups from './groups';
 import Users from './users';
-export {General, Preferences, Posts, Files, RequestStatus, WebsocketEvents, Alerts, Teams, Stats, Permissions, Emoji, Plugins, Groups, Users};
+import Roles from './roles';
+export {General, Preferences, Posts, Files, RequestStatus, WebsocketEvents, Alerts, Teams, Stats, Permissions, Emoji, Plugins, Groups, Users, Roles};
