@@ -458,19 +458,8 @@ describe('Selectors.Users', () => {
         // Should show full name since preferences is being used and LockTeammateNameDisplay is false
         assert.deepEqual(Selectors.makeGetDisplayName()(newTestState, testUser1.id), 'First Last');
 
-        newTestState = {
-            ...newTestState,
-            entities: {
-                ...newTestState.entities,
-                general: {
-                    ...newTestState.entities.general,
-                    config: {
-                        ...newTestState.entities.general.config,
-                        LockTeammateNameDisplay: 'true',
-                    },
-                },
-            },
-        };
+        newTestState = JSON.parse(JSON.stringify(newTestState));
+        newTestState.entities.general.config.LockTeammateNameDisplay = 'true';
 
         // Should show username since LockTeammateNameDisplay is true
         assert.deepEqual(Selectors.makeGetDisplayName()(newTestState, testUser1.id), 'username');
