@@ -1175,8 +1175,8 @@ describe('Actions.Posts', () => {
         const {dispatch, getState} = store;
 
         nock(Client4.getBaseRoute()).
-        get(`/channels/${TestHelper.basicChannel.id}/stats`).
-        reply(200, {channel_id: TestHelper.basicChannel.id, member_count: 1, pinnedpost_count: 0});
+            get(`/channels/${TestHelper.basicChannel.id}/stats`).
+            reply(200, {channel_id: TestHelper.basicChannel.id, member_count: 1, pinnedpost_count: 0});
 
         await dispatch(getChannelStats(TestHelper.basicChannel.id));
 
@@ -1201,21 +1201,21 @@ describe('Actions.Posts', () => {
         await Actions.pinPost(post1.id)(dispatch, getState);
 
         const state = getState();
-        const {stats} = state.entities.channels
+        const {stats} = state.entities.channels;
         const post = state.entities.posts.posts[post1.id];
         const pinned_post_count = stats[TestHelper.basicChannel.id].pinnedpost_count;
 
         assert.ok(post);
         assert.ok(post.is_pinned === true);
-        assert.ok(pinned_post_count===1);
+        assert.ok(pinned_post_count === 1);
     });
 
-    it.only('unpinPost', async () => {
+    it('unpinPost', async () => {
         const {dispatch, getState} = store;
 
         nock(Client4.getBaseRoute()).
-        get(`/channels/${TestHelper.basicChannel.id}/stats`).
-        reply(200, {channel_id: TestHelper.basicChannel.id, member_count: 1, pinnedpost_count: 0});
+            get(`/channels/${TestHelper.basicChannel.id}/stats`).
+            reply(200, {channel_id: TestHelper.basicChannel.id, member_count: 1, pinnedpost_count: 0});
 
         await dispatch(getChannelStats(TestHelper.basicChannel.id));
 
@@ -1245,13 +1245,13 @@ describe('Actions.Posts', () => {
         await Actions.unpinPost(post1.id)(dispatch, getState);
 
         const state = getState();
-        const {stats} = state.entities.channels
+        const {stats} = state.entities.channels;
         const post = state.entities.posts.posts[post1.id];
         const pinned_post_count = stats[TestHelper.basicChannel.id].pinnedpost_count;
 
         assert.ok(post);
         assert.ok(post.is_pinned === false);
-        assert.ok(pinned_post_count===0);
+        assert.ok(pinned_post_count === 0);
     });
 
     it('addReaction', async () => {
