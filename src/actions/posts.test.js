@@ -6,6 +6,7 @@ import assert from 'assert';
 import nock from 'nock';
 
 import * as Actions from 'actions/posts';
+import {getChannelStats} from 'actions/channels';
 import {login} from 'actions/users';
 import {setSystemEmojis, createCustomEmoji} from 'actions/emojis';
 import {Client4} from 'client';
@@ -1174,6 +1175,12 @@ describe('Actions.Posts', () => {
         const {dispatch, getState} = store;
 
         nock(Client4.getBaseRoute()).
+        get(`/channels/${TestHelper.basicChannel.id}/stats`).
+        reply(200, {channel_id: TestHelper.basicChannel.id, member_count: 1, pinnedpost_count: 0});
+
+        await dispatch(getChannelStats(TestHelper.basicChannel.id));
+
+        nock(Client4.getBaseRoute()).
             post('/posts').
             reply(201, TestHelper.fakePostWithId(TestHelper.basicChannel.id));
         const post1 = await Client4.createPost(
@@ -1194,13 +1201,23 @@ describe('Actions.Posts', () => {
         await Actions.pinPost(post1.id)(dispatch, getState);
 
         const state = getState();
+        const {stats} = state.entities.channels
         const post = state.entities.posts.posts[post1.id];
+        const pinned_post_count = stats[TestHelper.basicChannel.id].pinnedpost_count;
+
         assert.ok(post);
         assert.ok(post.is_pinned === true);
+        assert.ok(pinned_post_count===1);
     });
 
-    it('unpinPost', async () => {
+    it.only('unpinPost', async () => {
         const {dispatch, getState} = store;
+
+        nock(Client4.getBaseRoute()).
+        get(`/channels/${TestHelper.basicChannel.id}/stats`).
+        reply(200, {channel_id: TestHelper.basicChannel.id, member_count: 1, pinnedpost_count: 0});
+
+        await dispatch(getChannelStats(TestHelper.basicChannel.id));
 
         nock(Client4.getBaseRoute()).
             post('/posts').
@@ -1228,9 +1245,13 @@ describe('Actions.Posts', () => {
         await Actions.unpinPost(post1.id)(dispatch, getState);
 
         const state = getState();
+        const {stats} = state.entities.channels
         const post = state.entities.posts.posts[post1.id];
+        const pinned_post_count = stats[TestHelper.basicChannel.id].pinnedpost_count;
+
         assert.ok(post);
         assert.ok(post.is_pinned === false);
+        assert.ok(pinned_post_count===0);
     });
 
     it('addReaction', async () => {
