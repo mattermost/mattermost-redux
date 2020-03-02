@@ -246,18 +246,6 @@ function myMembers(state: RelationOneToOne<Channel, ChannelMembership> = {}, act
             nextState[cm.channel_id] = cm;
         }
 
-        // We remove membership from archived channels. In version 5.21 we are
-        // sending the archived channels so we have those channel synchronized
-        // and we don't need this code (MM-22201)
-        if (action.sync && action.channels) {
-            const channelsId = action.channels.map((c: any) => c.id);
-            Object.keys(nextState).forEach((channelId) => {
-                if (!channelsId.includes(channelId)) {
-                    Reflect.deleteProperty(nextState, channelId);
-                }
-            });
-        }
-
         return nextState;
     }
     case ChannelTypes.RECEIVED_CHANNEL_PROPS: {
@@ -389,7 +377,7 @@ function myMembers(state: RelationOneToOne<Channel, ChannelMembership> = {}, act
         if (sync) {
             current.forEach((member: ChannelMembership) => {
                 const id = member.channel_id;
-                if (!channelMembers.find((cm: ChannelMembership) => cm.channel_id === id)) {
+                if (channelMembers.find((cm: ChannelMembership) => cm.channel_id === id)) {
                     delete nextState[id];
                     hasNewValues = true;
                 }
