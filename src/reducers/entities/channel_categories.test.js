@@ -51,7 +51,7 @@ describe('byId', () => {
         expect(state['team2-direct_messages']).toBeDefined();
     });
 
-    test('should remove correspoding categories when leaving a team', () => {
+    test('should remove corresponding categories when leaving a team', () => {
         const initialState = {
             category1: {id: 'category1', team_id: 'team1', type: CategoryTypes.CUSTOM},
             category2: {id: 'category2', team_id: 'team1', type: CategoryTypes.CUSTOM},
