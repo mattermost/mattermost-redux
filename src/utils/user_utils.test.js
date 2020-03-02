@@ -109,10 +109,7 @@ describe('user utils', () => {
         it('should match full name since teammate name display is true', () => {
             assert.equal(displayUsername(testUser1, Preferences.DISPLAY_PREFER_USERNAME, true, true, Preferences.DISPLAY_PREFER_FULL_NAME), 'First Last');
             assert.equal(displayUsername(testUser2, Preferences.DISPLAY_PREFER_USERNAME, true, true, Preferences.DISPLAY_PREFER_FULL_NAME), 'First2 Last2');
-
         });
-
-
     });
 
     describe('filterProfilesMatchingTerm', () => {

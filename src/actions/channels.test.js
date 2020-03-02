@@ -9,7 +9,7 @@ import {addUserToTeam} from 'actions/teams';
 import {getProfilesByIds, login} from 'actions/users';
 import {createIncomingHook, createOutgoingHook} from 'actions/integrations';
 import {Client4} from 'client';
-import {General, RequestStatus, Preferences} from '../constants';
+import {General, RequestStatus, Preferences, Permissions} from '../constants';
 import {getPreferenceKey} from 'utils/preference_utils';
 import TestHelper from 'test/test_helper';
 import configureStore from 'test/test_store';
@@ -341,6 +341,7 @@ describe('Actions.Channels', () => {
 
         nock(Client4.getBaseRoute()).
             get(`/users/me/teams/${TestHelper.basicTeam.id}/channels`).
+            query(true).
             reply(200, [directChannel, TestHelper.basicChannel]);
 
         nock(Client4.getBaseRoute()).
@@ -366,6 +367,7 @@ describe('Actions.Channels', () => {
 
         nock(Client4.getBaseRoute()).
             get(`/users/me/teams/${TestHelper.basicTeam.id}/channels`).
+            query(true).
             reply(200, [TestHelper.basicChannel]);
 
         nock(Client4.getBaseRoute()).
@@ -428,6 +430,7 @@ describe('Actions.Channels', () => {
 
         nock(Client4.getBaseRoute()).
             get(`/users/me/teams/${TestHelper.basicTeam.id}/channels`).
+            query(true).
             reply(200, [secondChannel, TestHelper.basicChannel]);
 
         nock(Client4.getBaseRoute()).
@@ -488,7 +491,7 @@ describe('Actions.Channels', () => {
         assert.ifError(incomingHooks[incomingHook.id]);
         assert.ifError(outgoingHooks[outgoingHook.id]);
     });
-    
+
     it('unarchiveChannel', async () => {
         const secondClient = TestHelper.createClient4();
 
@@ -527,6 +530,7 @@ describe('Actions.Channels', () => {
 
         nock(Client4.getBaseRoute()).
             get(`/users/me/teams/${TestHelper.basicTeam.id}/channels`).
+            query(true).
             reply(200, [secondChannel, TestHelper.basicChannel]);
 
         nock(Client4.getBaseRoute()).
@@ -724,6 +728,7 @@ describe('Actions.Channels', () => {
 
         nock(Client4.getBaseRoute()).
             get(`/users/me/teams/${TestHelper.basicTeam.id}/channels`).
+            query(true).
             reply(200, [userChannel, TestHelper.basicChannel]);
 
         nock(Client4.getBaseRoute()).
@@ -2277,5 +2282,49 @@ describe('Actions.Channels', () => {
         const {error} = await Actions.membersMinusGroupMembers(channelID, groupIDs, page, perPage)(store.dispatch, store.getState);
 
         assert.equal(error, null);
+    });
+
+    it('getChannelModerations', async () => {
+        const channelID = 'cid10000000000000000000000';
+
+        nock(Client4.getBaseRoute()).get(
+            `/channels/${channelID}/moderations`).
+            reply(200, [{
+                name: Permissions.CHANNEL_MODERATED_PERMISSIONS.CREATE_POST,
+                roles: {
+                    members: true,
+                    guests: false,
+                },
+            }]);
+
+        const {error} = await store.dispatch(Actions.getChannelModerations(channelID));
+        const moderations = store.getState().entities.channels.channelModerations[channelID];
+
+        assert.equal(error, null);
+        assert.equal(moderations[0].name, Permissions.CHANNEL_MODERATED_PERMISSIONS.CREATE_POST);
+        assert.equal(moderations[0].roles.members, true);
+        assert.equal(moderations[0].roles.guests, false);
+    });
+
+    it('patchChannelModerations', async () => {
+        const channelID = 'cid10000000000000000000000';
+
+        nock(Client4.getBaseRoute()).put(
+            `/channels/${channelID}/moderations/patch`).
+            reply(200, [{
+                name: Permissions.CHANNEL_MODERATED_PERMISSIONS.CREATE_REACTIONS,
+                roles: {
+                    members: true,
+                    guests: false,
+                },
+            }]);
+
+        const {error} = await store.dispatch(Actions.patchChannelModerations(channelID, {}));
+        const moderations = store.getState().entities.channels.channelModerations[channelID];
+
+        assert.equal(error, null);
+        assert.equal(moderations[0].name, Permissions.CHANNEL_MODERATED_PERMISSIONS.CREATE_REACTIONS);
+        assert.equal(moderations[0].roles.members, true);
+        assert.equal(moderations[0].roles.guests, false);
     });
 });

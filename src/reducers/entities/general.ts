@@ -10,6 +10,9 @@ function config(state: Partial<Config> = {}, action: GenericAction) {
     switch (action.type) {
     case GeneralTypes.CLIENT_CONFIG_RECEIVED:
         return Object.assign({}, state, action.data);
+    case UserTypes.LOGIN: // Used by the mobile app
+    case GeneralTypes.SET_CONFIG_AND_LICENSE:
+        return Object.assign({}, state, action.data.config);
     case GeneralTypes.CLIENT_CONFIG_RESET:
     case UserTypes.LOGOUT_SUCCESS:
         return {};
@@ -33,6 +36,10 @@ function credentials(state: any = {}, action: GenericAction) {
     case GeneralTypes.RECEIVED_APP_CREDENTIALS:
         return Object.assign({}, state, action.data);
 
+    case UserTypes.LOGIN: // Used by the mobile app
+        return {
+            url: action.data.url,
+        };
     case UserTypes.LOGOUT_SUCCESS:
         return {};
     default:
@@ -64,6 +71,8 @@ function license(state: any = {}, action: GenericAction) {
     switch (action.type) {
     case GeneralTypes.CLIENT_LICENSE_RECEIVED:
         return action.data;
+    case GeneralTypes.SET_CONFIG_AND_LICENSE:
+        return Object.assign({}, state, action.data.license);
     case GeneralTypes.CLIENT_LICENSE_RESET:
     case UserTypes.LOGOUT_SUCCESS:
         return {};

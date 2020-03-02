@@ -111,6 +111,4 @@ export type JobsRequestsStatuses = {
 export type SearchRequestsStatuses = {
     flaggedPosts: RequestStatusType;
     pinnedPosts: RequestStatusType;
-    recentMentions: RequestStatusType;
-    searchPosts: RequestStatusType;
 };

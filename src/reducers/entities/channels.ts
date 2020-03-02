@@ -18,19 +18,6 @@ function removeMemberFromChannels(state: RelationOneToOne<Channel, UserIDMappedO
 
 function channelListToSet(state: any, action: GenericAction) {
     const nextState = {...state};
-    const teamChannelIds = nextState[action.teamId];
-
-    // Remove existing channels that are no longer
-    if (action.sync && teamChannelIds && teamChannelIds.size) {
-        teamChannelIds.forEach((id: string) => {
-            if (id !== action.currentChannelId) {
-                if (!action.data.find((c: any) => c.id === id)) {
-                    teamChannelIds.delete(id);
-                }
-            }
-        });
-        nextState[action.teamId] = teamChannelIds;
-    }
 
     action.data.forEach((channel: Channel) => {
         const nextSet = new Set(nextState[channel.team_id]);
@@ -76,21 +63,6 @@ function channels(state: IDMappedObjects<Channel> = {}, action: GenericAction) {
     case ChannelTypes.RECEIVED_ALL_CHANNELS:
     case SchemeTypes.RECEIVED_SCHEME_CHANNELS: {
         const nextState = {...state};
-        const currentChannels = Object.values(nextState);
-
-        // Remove existing channels that are no longer
-        if (action.sync) {
-            currentChannels.forEach((channel) => {
-                if (channel.team_id === action.teamId) {
-                    const id: string = channel.id;
-                    if (id !== action.currentChannelId) {
-                        if (!action.data.find((c: any) => c.id === id)) {
-                            Reflect.deleteProperty(nextState, id);
-                        }
-                    }
-                }
-            });
-        }
 
         for (const channel of action.data) {
             if (state[channel.id] && channel.type === General.DM_CHANNEL) {
@@ -195,6 +167,21 @@ function channels(state: IDMappedObjects<Channel> = {}, action: GenericAction) {
         return {...state, [channelId]: {...channel, scheme_id: schemeId}};
     }
 
+    case ChannelTypes.RECEIVED_MY_CHANNELS_WITH_MEMBERS: { // Used by the mobile app
+        const nextState = {...state};
+        const myChannels: Array<Channel> = action.data.channels;
+        let hasNewValues = false;
+
+        if (myChannels && myChannels.length) {
+            hasNewValues = true;
+            myChannels.forEach((c: Channel) => {
+                nextState[c.id] = c;
+            });
+        }
+
+        return hasNewValues ? nextState : state;
+    }
+
     case UserTypes.LOGOUT_SUCCESS:
         return {};
     default:
@@ -220,6 +207,15 @@ function channelsInTeam(state: RelationOneToMany<Team, Channel> = {}, action: Ge
             return removeChannelFromSet(state, action);
         }
         return state;
+    }
+    case ChannelTypes.RECEIVED_MY_CHANNELS_WITH_MEMBERS: { // Used by the mobile app
+        const values: GenericAction = {
+            type: action.type,
+            teamId: action.data.teamId,
+            sync: action.data.sync,
+            data: action.data.channels,
+        };
+        return channelListToSet(state, values);
     }
     case UserTypes.LOGOUT_SUCCESS:
         return {};
@@ -249,6 +245,19 @@ function myMembers(state: RelationOneToOne<Channel, ChannelMembership> = {}, act
         for (const cm of action.data) {
             nextState[cm.channel_id] = cm;
         }
+
+        // We remove membership from archived channels. In version 5.21 we are
+        // sending the archived channels so we have those channel synchronized
+        // and we don't need this code (MM-22201)
+        if (action.sync && action.channels) {
+            const channelsId = action.channels.map((c: any) => c.id);
+            Object.keys(nextState).forEach((channelId) => {
+                if (!channelsId.includes(channelId)) {
+                    Reflect.deleteProperty(nextState, channelId);
+                }
+            });
+        }
+
         return nextState;
     }
     case ChannelTypes.RECEIVED_CHANNEL_PROPS: {
@@ -369,6 +378,36 @@ function myMembers(state: RelationOneToOne<Channel, ChannelMembership> = {}, act
         }
         return {...state, [data.channelId]: {...channelState, msg_count: data.msgCount, mention_count: data.mentionCount, last_viewed_at: data.lastViewedAt}};
     }
+
+    case ChannelTypes.RECEIVED_MY_CHANNELS_WITH_MEMBERS: { // Used by the mobile app
+        const nextState: any = {...state};
+        const current = Object.values(nextState);
+        const {sync, channelMembers} = action.data;
+        let hasNewValues = channelMembers && channelMembers.length > 0;
+
+        // Remove existing channel memberships when the user is no longer a member
+        if (sync) {
+            current.forEach((member: ChannelMembership) => {
+                const id = member.channel_id;
+                if (!channelMembers.find((cm: ChannelMembership) => cm.channel_id === id)) {
+                    delete nextState[id];
+                    hasNewValues = true;
+                }
+            });
+        }
+
+        if (hasNewValues) {
+            channelMembers.forEach((cm: ChannelMembership) => {
+                const id: string = cm.channel_id;
+                nextState[id] = cm;
+            });
+
+            return nextState;
+        }
+
+        return state;
+    }
+
     case UserTypes.LOGOUT_SUCCESS:
         return {};
     default:
@@ -586,6 +625,20 @@ export function manuallyUnread(state: RelationOneToOne<Channel, boolean> = {}, a
     }
 }
 
+export function channelModerations(state: any = {}, action: GenericAction) {
+    switch (action.type) {
+    case ChannelTypes.RECEIVED_CHANNEL_MODERATIONS: {
+        const {channelId, moderations} = action.data;
+        return {
+            ...state,
+            [channelId]: moderations,
+        };
+    }
+    default:
+        return state;
+    }
+}
+
 export default combineReducers({
 
     // the current selected channel
@@ -612,4 +665,7 @@ export default combineReducers({
 
     // object where every key is the channel id, if present means a user requested to mark that channel as unread.
     manuallyUnread,
+
+    // object where every key is the channel id and has an object with the channel moderations
+    channelModerations,
 });

@@ -12,11 +12,12 @@ import {
     isManuallyUnread,
 } from 'selectors/entities/channels';
 import {getCurrentTeamId} from 'selectors/entities/teams';
-import {getConfig} from 'selectors/entities/general';
+import {getConfig, getServerVersion} from 'selectors/entities/general';
+import {isMinimumServerVersion} from 'utils/helpers';
 
 import {Action, ActionFunc, batchActions, DispatchFunc, GetStateFunc} from 'types/actions';
 
-import {Channel, ChannelNotifyProps, ChannelMembership} from 'types/channels';
+import {Channel, ChannelNotifyProps, ChannelMembership, ChannelModerationPatch} from 'types/channels';
 
 import {PreferenceType} from 'types/preferences';
 
@@ -24,7 +25,7 @@ import {logError} from './errors';
 import {bindClientFunc, forceLogoutIfNecessary} from './helpers';
 import {getMissingProfilesByIds} from './users';
 import {loadRolesIfNeeded} from './roles';
-import {UserProfile} from 'types/users';
+
 export function selectChannel(channelId: string) {
     return {
         type: ChannelTypes.SELECT_CHANNEL,
@@ -495,8 +496,10 @@ export function fetchMyChannelsAndMembers(teamId: string): ActionFunc {
 
         let channels;
         let channelMembers;
+        const state = getState();
+        const shouldFetchArchived = isMinimumServerVersion(getServerVersion(state), 5, 21);
         try {
-            const channelRequest = Client4.getMyChannels(teamId);
+            const channelRequest = Client4.getMyChannels(teamId, shouldFetchArchived);
             const memberRequest = Client4.getMyChannelMembers(teamId);
             channels = await channelRequest;
             channelMembers = await memberRequest;
@@ -509,7 +512,6 @@ export function fetchMyChannelsAndMembers(teamId: string): ActionFunc {
             return {error};
         }
 
-        const state = getState();
         const {currentUserId} = state.entities.users;
         const {currentChannelId} = state.entities.channels;
 
@@ -518,7 +520,6 @@ export function fetchMyChannelsAndMembers(teamId: string): ActionFunc {
                 type: ChannelTypes.RECEIVED_CHANNELS,
                 teamId,
                 data: channels,
-                sync: true,
                 currentChannelId,
             },
             {
@@ -527,7 +528,9 @@ export function fetchMyChannelsAndMembers(teamId: string): ActionFunc {
             {
                 type: ChannelTypes.RECEIVED_MY_CHANNEL_MEMBERS,
                 data: channelMembers,
-                remove: getChannelsIdForTeam(getState(), teamId),
+                sync: !shouldFetchArchived,
+                channels,
+                remove: getChannelsIdForTeam(state, teamId),
                 currentUserId,
                 currentChannelId,
             },
@@ -1445,6 +1448,32 @@ export function membersMinusGroupMembers(channelID: string, groupIDs: Array<stri
     });
 }
 
+export function getChannelModerations(channelId: string): ActionFunc {
+    return bindClientFunc({
+        clientFunc: async () => {
+            const moderations = await Client4.getChannelModerations(channelId);
+            return {channelId, moderations};
+        },
+        onSuccess: ChannelTypes.RECEIVED_CHANNEL_MODERATIONS,
+        params: [
+            channelId,
+        ],
+    });
+}
+
+export function patchChannelModerations(channelId: string, patch: Array<ChannelModerationPatch>): ActionFunc {
+    return bindClientFunc({
+        clientFunc: async () => {
+            const moderations = await Client4.patchChannelModerations(channelId, patch);
+            return {channelId, moderations};
+        },
+        onSuccess: ChannelTypes.RECEIVED_CHANNEL_MODERATIONS,
+        params: [
+            channelId,
+        ],
+    });
+}
+
 export default {
     selectChannel,
     createChannel,
@@ -1478,4 +1507,5 @@ export default {
     favoriteChannel,
     unfavoriteChannel,
     membersMinusGroupMembers,
+    getChannelModerations,
 };
