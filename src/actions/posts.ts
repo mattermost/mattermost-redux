@@ -478,15 +478,17 @@ export function pinPost(postId: string) {
 
         const post = Selectors.getPost(getState(), postId);
         if (post) {
-            actions.push(receivedPost({
-                ...post,
-                is_pinned: true,
-                update_at: Date.now(),
-            }),
-            {
-                type: ChannelTypes.INCREMENT_PINNED_POST_COUNT,
-                id: post.channel_id,
-            });
+            actions.push(
+                receivedPost({
+                    ...post,
+                    is_pinned: true,
+                    update_at: Date.now(),
+                }),
+                {
+                    type: ChannelTypes.INCREMENT_PINNED_POST_COUNT,
+                    id: post.channel_id,
+                }
+            );
         }
 
         dispatch(batchActions(actions), getState);
@@ -519,15 +521,16 @@ export function unpinPost(postId: string) {
 
         const post = Selectors.getPost(getState(), postId);
         if (post) {
-            actions.push(receivedPost({
-                ...post,
-                is_pinned: false,
-                update_at: Date.now(),
-            }),
-            {
-                type: ChannelTypes.DECREMENT_PINNED_POST_COUNT,
-                id: post.channel_id,
-            },
+            actions.push(
+                receivedPost({
+                    ...post,
+                    is_pinned: false,
+                    update_at: Date.now(),
+                }),
+                {
+                    type: ChannelTypes.DECREMENT_PINNED_POST_COUNT,
+                    id: post.channel_id,
+                },
             );
         }
 
