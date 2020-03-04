@@ -5,7 +5,7 @@ import {General, Groups} from '../constants';
 import {Client4} from 'client';
 
 import {Action, ActionFunc, batchActions, DispatchFunc, GetStateFunc} from 'types/actions';
-import {SyncableType, SyncablePatch} from 'types/groups';
+import {GroupPatch, SyncableType, SyncablePatch} from 'types/groups';
 
 import {logError} from './errors';
 import {bindClientFunc, forceLogoutIfNecessary} from './helpers';
@@ -171,6 +171,16 @@ export function getGroup(id: string): ActionFunc {
     });
 }
 
+export function getGroups(id: string): ActionFunc {
+    return bindClientFunc({
+        clientFunc: Client4.getGroups,
+        onSuccess: [GroupTypes.RECEIVED_GROUPS],
+        params: [
+            id,
+        ],
+    });
+}
+
 export function getGroupsNotAssociatedToTeam(teamID: string, q = '', page = 0, perPage: number = General.PAGE_SIZE_DEFAULT): ActionFunc {
     return bindClientFunc({
         clientFunc: Client4.getGroupsNotAssociatedToTeam,
@@ -225,10 +235,10 @@ export function getAllGroupsAssociatedToChannel(channelID: string): ActionFunc {
     });
 }
 
-export function getGroupsAssociatedToTeam(teamID: string, q = '', page = 0, perPage: number = General.PAGE_SIZE_DEFAULT): ActionFunc {
+export function getGroupsAssociatedToTeam(teamID: string, q = '', page = 0, perPage: number = General.PAGE_SIZE_DEFAULT, filterAllowReferences: false): ActionFunc {
     return bindClientFunc({
-        clientFunc: async (param1, param2, param3, param4) => {
-            const result = await Client4.getGroupsAssociatedToTeam(param1, param2, param3, param4);
+        clientFunc: async (param1, param2, param3, param4, param5) => {
+            const result = await Client4.getGroupsAssociatedToTeam(param1, param2, param3, param4, param5);
             return {groups: result.groups, totalGroupCount: result.total_group_count, teamID: param1};
         },
         onSuccess: [GroupTypes.RECEIVED_GROUPS_ASSOCIATED_TO_TEAM],
@@ -237,14 +247,15 @@ export function getGroupsAssociatedToTeam(teamID: string, q = '', page = 0, perP
             q,
             page,
             perPage,
+            filterAllowReferences,
         ],
     });
 }
 
-export function getGroupsAssociatedToChannel(channelID: string, q = '', page = 0, perPage: number = General.PAGE_SIZE_DEFAULT): ActionFunc {
+export function getGroupsAssociatedToChannel(channelID: string, q = '', page = 0, perPage: number = General.PAGE_SIZE_DEFAULT, filterAllowReferences: false): ActionFunc {
     return bindClientFunc({
-        clientFunc: async (param1, param2, param3, param4) => {
-            const result = await Client4.getGroupsAssociatedToChannel(param1, param2, param3, param4);
+        clientFunc: async (param1, param2, param3, param4, param5) => {
+            const result = await Client4.getGroupsAssociatedToChannel(param1, param2, param3, param4, param5);
             return {groups: result.groups, totalGroupCount: result.total_group_count, channelID: param1};
         },
         onSuccess: [GroupTypes.RECEIVED_GROUPS_ASSOCIATED_TO_CHANNEL],
@@ -253,6 +264,25 @@ export function getGroupsAssociatedToChannel(channelID: string, q = '', page = 0
             q,
             page,
             perPage,
+            filterAllowReferences,
         ],
     });
+}
+
+export function patchGroup(groupID: string, patch: GroupPatch): ActionFunc {
+    return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
+        let data;
+        try {
+            data = await Client4.patchGroup(groupID, patch);
+        } catch (error) {
+            forceLogoutIfNecessary(error, dispatch, getState);
+            return {error};
+        }
+
+        dispatch(batchActions([
+            {type: GroupTypes.PATCHED_GROUP, data},
+        ]));
+
+        return {data: true};
+    };
 }

@@ -22,7 +22,7 @@ import {CustomEmoji} from 'types/emojis';
 import {Config} from 'types/config';
 import {Bot, BotPatch} from 'types/bots';
 import {Dictionary} from 'types/utilities';
-import {SyncablePatch} from 'types/groups';
+import {GroupPatch, SyncablePatch} from 'types/groups';
 
 const FormData = require('form-data');
 const HEADER_AUTH = 'Authorization';
@@ -2838,6 +2838,13 @@ export default class Client4 {
         );
     };
 
+    getGroups = async (groupID: string) => {
+        return this.doFetch(
+            `${this.getBaseRoute()}/groups`,
+            {method: 'get'}
+        );
+    };
+
     getGroupsNotAssociatedToTeam = async (teamID: string, q = '', page = 0, perPage = PER_PAGE_DEFAULT) => {
         this.trackEvent('api', 'api_groups_get_not_associated_to_team', {team_id: teamID});
         return this.doFetch(
@@ -2854,20 +2861,20 @@ export default class Client4 {
         );
     };
 
-    getGroupsAssociatedToTeam = async (teamID: string, q = '', page = 0, perPage = PER_PAGE_DEFAULT) => {
+    getGroupsAssociatedToTeam = async (teamID: string, q = '', page = 0, perPage = PER_PAGE_DEFAULT, filterAllowReferences: boolean) => {
         this.trackEvent('api', 'api_groups_get_associated_to_team', {team_id: teamID});
 
         return this.doFetch(
-            `${this.getBaseRoute()}/teams/${teamID}/groups${buildQueryString({page, per_page: perPage, q, include_member_count: true})}`,
+            `${this.getBaseRoute()}/teams/${teamID}/groups${buildQueryString({page, per_page: perPage, q, include_member_count: true, filter_allow_references: filterAllowReferences})}`,
             {method: 'get'}
         );
     };
 
-    getGroupsAssociatedToChannel = async (channelID: string, q = '', page = 0, perPage = PER_PAGE_DEFAULT) => {
+    getGroupsAssociatedToChannel = async (channelID: string, q = '', page = 0, perPage = PER_PAGE_DEFAULT, filterAllowReferences: boolean) => {
         this.trackEvent('api', 'api_groups_get_associated_to_channel', {channel_id: channelID});
 
         return this.doFetch(
-            `${this.getBaseRoute()}/channels/${channelID}/groups${buildQueryString({page, per_page: perPage, q, include_member_count: true})}`,
+            `${this.getBaseRoute()}/channels/${channelID}/groups${buildQueryString({page, per_page: perPage, q, include_member_count: true, filter_allow_references: filterAllowReferences})}`,
             {method: 'get'}
         );
     };
@@ -2893,8 +2900,14 @@ export default class Client4 {
         );
     };
 
-    // Redirect Location
+    patchGroup = async (groupID: string, patch: GroupPatch) => {
+        return this.doFetch(
+            `${this.getBaseRoute()}/groups/${groupID}/patch`,
+            {method: 'put', body: JSON.stringify(patch)}
+        );
+    };
 
+    // Redirect Location
     getRedirectLocation = async (urlParam: string) => {
         if (!urlParam.length) {
             return Promise.resolve();

@@ -90,3 +90,26 @@ export const getGroupsAssociatedToChannel = reselect.createSelector(
         return Object.entries(allGroups).filter(([groupID]) => channelGroupIDSet.has(groupID)).map((entry) => entry[1]);
     }
 );
+
+export const getGroupsAssociatedToTeamForReference = reselect.createSelector(
+    getAllGroups,
+    (state: GlobalState, teamID: string) => getTeamGroupIDSet(state, teamID),
+    (allGroups, teamGroupIDSet) => {
+        return Object.entries(allGroups).filter(([groupID]) => teamGroupIDSet.has(groupID)).filter((entry) => entry[1].allow_reference).map((entry) => entry[1]);
+    }
+);
+
+export const getGroupsAssociatedToChannelForReference = reselect.createSelector(
+    getAllGroups,
+    (state: GlobalState, channelID: string) => getChannelGroupIDSet(state, channelID),
+    (allGroups, channelGroupIDSet) => {
+        return Object.entries(allGroups).filter(([groupID]) => channelGroupIDSet.has(groupID)).filter((entry) => entry[1].allow_reference).map((entry) => entry[1]);
+    }
+);
+
+export const getGroupsForReference = reselect.createSelector(
+    getAllGroups,
+    (allGroups) => {
+        return Object.entries(allGroups).filter((entry) => entry[1].allow_reference).map((entry) => entry[1]);
+    }
+);
