@@ -183,6 +183,7 @@ function members(state: any = {}, action: GenericAction) {
 
 function groups(state: Dictionary<Group> = {}, action: GenericAction) {
     switch (action.type) {
+    case GroupTypes.PATCHED_GROUP:
     case GroupTypes.RECEIVED_GROUP: {
         return {
             ...state,
@@ -196,7 +197,22 @@ function groups(state: Dictionary<Group> = {}, action: GenericAction) {
         }
         return nextState;
     }
+    case GroupTypes.RECEIVED_ALL_GROUPS_ASSOCIATED_TO_CHANNELS_IN_TEAM: {
+        const nextState = {...state};
+        const {groupsByChannelId} = action.data;
+
+        for (const channelID of Object.keys(groupsByChannelId)) {
+            if (groupsByChannelId[channelID]) {
+                for (const group of groupsByChannelId[channelID]) {
+                    nextState[group.id] = group;
+                }
+            }
+        }
+        return nextState;
+    }
     case GroupTypes.RECEIVED_GROUPS_ASSOCIATED_TO_TEAM:
+    case GroupTypes.RECEIVED_ALL_GROUPS_ASSOCIATED_TO_TEAM:
+    case GroupTypes.RECEIVED_ALL_GROUPS_ASSOCIATED_TO_CHANNEL:
     case GroupTypes.RECEIVED_GROUPS_ASSOCIATED_TO_CHANNEL: {
         const nextState = {...state};
         for (const group of action.data.groups) {
