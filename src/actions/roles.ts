@@ -60,7 +60,7 @@ export function editRole(role: Role) {
 
 export function setPendingRoles(roles: Array<string>) {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
-        dispatch({type: RoleTypes.SET_PENDING_ROLES, data: roles}, getState);
+        dispatch({type: RoleTypes.SET_PENDING_ROLES, data: roles});
         return {data: roles};
     };
 }
