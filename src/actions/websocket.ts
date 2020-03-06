@@ -455,7 +455,7 @@ function handleUserAddedEvent(msg: WebSocketMessage) {
                 channel_id: msg.broadcast.channel_id,
                 user_id: msg.data.user_id,
             },
-        }, getState);
+        });
 
         if (msg.broadcast.channel_id === currentChannelId) {
             dispatch(getChannelStats(currentChannelId));
@@ -482,7 +482,7 @@ function handleUserRemovedEvent(msg: WebSocketMessage) {
                 channel_id: msg.broadcast.channel_id,
                 user_id: msg.data.user_id,
             },
-        }, getState);
+        });
 
         const channel = channels[currentChannelId];
 

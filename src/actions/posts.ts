@@ -148,7 +148,7 @@ export function getPost(postId: string) {
             dispatch(batchActions([
                 {type: PostTypes.GET_POSTS_FAILURE, error},
                 logError(error),
-            ]), getState);
+            ]));
             return {error};
         }
 
@@ -317,7 +317,7 @@ export function createPostImmediately(post: Post, files: any[] = []) {
                 {type: PostTypes.CREATE_POST_FAILURE, error},
                 removePost({id: pendingPostId, ...newPost}) as any,
                 logError(error),
-            ]), getState);
+            ]));
             return {error};
         }
 
@@ -350,7 +350,7 @@ export function createPostImmediately(post: Post, files: any[] = []) {
             });
         }
 
-        dispatch(batchActions(actions), getState);
+        dispatch(batchActions(actions));
 
         return {data: newPost};
     };
@@ -456,7 +456,7 @@ export function setUnreadPost(userId: string, postId: string) {
 
 export function pinPost(postId: string) {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
-        dispatch({type: PostTypes.EDIT_POST_REQUEST}, getState);
+        dispatch({type: PostTypes.EDIT_POST_REQUEST});
         let posts;
 
         try {
@@ -466,7 +466,7 @@ export function pinPost(postId: string) {
             dispatch(batchActions([
                 {type: PostTypes.EDIT_POST_FAILURE, error},
                 logError(error),
-            ]), getState);
+            ]));
             return {error};
         }
 
@@ -485,7 +485,7 @@ export function pinPost(postId: string) {
             }));
         }
 
-        dispatch(batchActions(actions), getState);
+        dispatch(batchActions(actions));
 
         return {data: posts};
     };
@@ -493,7 +493,7 @@ export function pinPost(postId: string) {
 
 export function unpinPost(postId: string) {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
-        dispatch({type: PostTypes.EDIT_POST_REQUEST}, getState);
+        dispatch({type: PostTypes.EDIT_POST_REQUEST});
         let posts;
 
         try {
@@ -503,7 +503,7 @@ export function unpinPost(postId: string) {
             dispatch(batchActions([
                 {type: PostTypes.EDIT_POST_FAILURE, error},
                 logError(error),
-            ]), getState);
+            ]));
             return {error};
         }
 
@@ -522,7 +522,7 @@ export function unpinPost(postId: string) {
             }));
         }
 
-        dispatch(batchActions(actions), getState);
+        dispatch(batchActions(actions));
 
         return {data: posts};
     };
@@ -662,7 +662,7 @@ export function flagPost(postId: string) {
 
 export function getPostThread(rootId: string) {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
-        dispatch({type: PostTypes.GET_POST_THREAD_REQUEST}, getState);
+        dispatch({type: PostTypes.GET_POST_THREAD_REQUEST});
 
         let posts;
         try {
@@ -673,7 +673,7 @@ export function getPostThread(rootId: string) {
             dispatch(batchActions([
                 {type: PostTypes.GET_POST_THREAD_FAILURE, error},
                 logError(error),
-            ]), getState);
+            ]));
             return {error};
         }
 
@@ -1076,7 +1076,7 @@ export function selectPost(postId: string) {
         dispatch({
             type: PostTypes.RECEIVED_POST_SELECTED,
             data: postId,
-        }, getState);
+        });
 
         return {data: true};
     };
@@ -1158,7 +1158,7 @@ export function addMessageIntoHistory(message: string) {
         dispatch({
             type: PostTypes.ADD_MESSAGE_INTO_HISTORY,
             data: message,
-        }, getState);
+        });
 
         return {data: true};
     };
@@ -1169,7 +1169,7 @@ export function resetHistoryIndex(index: number) {
         dispatch({
             type: PostTypes.RESET_HISTORY_INDEX,
             data: index,
-        }, getState);
+        });
 
         return {data: true};
     };
@@ -1180,7 +1180,7 @@ export function moveHistoryIndexBack(index: number) {
         dispatch({
             type: PostTypes.MOVE_HISTORY_INDEX_BACK,
             data: index,
-        }, getState);
+        });
 
         return {data: true};
     };
@@ -1191,7 +1191,7 @@ export function moveHistoryIndexForward(index: number) {
         dispatch({
             type: PostTypes.MOVE_HISTORY_INDEX_FORWARD,
             data: index,
-        }, getState);
+        });
 
         return {data: true};
     };
