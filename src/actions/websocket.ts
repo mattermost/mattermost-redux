@@ -4,7 +4,7 @@
 import {Client4} from 'client';
 import websocketClient from '../client/websocket_client';
 
-import {ChannelTypes, GeneralTypes, EmojiTypes, PostTypes, PreferenceTypes, TeamTypes, UserTypes, RoleTypes, AdminTypes, IntegrationTypes} from 'action_types';
+import {ChannelTypes, GeneralTypes, EmojiTypes, PostTypes, PreferenceTypes, TeamTypes, UserTypes, RoleTypes, IntegrationTypes} from 'action_types';
 import {General, WebsocketEvents, Preferences} from '../constants';
 import {getAllChannels, getChannel, getChannelsNameMapInTeam, getCurrentChannelId, getCurrentChannel, getMyChannelMember, getRedirectChannelNameForTeam, getCurrentChannelStats, getMyChannels, getChannelMembersInChannels, isManuallyUnread} from 'selectors/entities/channels';
 import {getConfig} from 'selectors/entities/general';
@@ -321,9 +321,6 @@ function handleEvent(msg: WebSocketMessage) {
         break;
     case WebsocketEvents.CONFIG_CHANGED:
         doDispatch(handleConfigChangedEvent(msg));
-        break;
-    case WebsocketEvents.PLUGIN_STATUSES_CHANGED:
-        doDispatch(handlePluginStatusesChangedEvent(msg));
         break;
     case WebsocketEvents.OPEN_DIALOG:
         doDispatch(handleOpenDialogEvent(msg));
@@ -858,15 +855,6 @@ function handleConfigChangedEvent(msg: WebSocketMessage) {
     return {
         type: GeneralTypes.CLIENT_CONFIG_RECEIVED,
         data,
-    };
-}
-
-function handlePluginStatusesChangedEvent(msg: WebSocketMessage) {
-    const data = msg.data;
-
-    return {
-        type: AdminTypes.RECEIVED_PLUGIN_STATUSES,
-        data: data.plugin_statuses,
     };
 }
 

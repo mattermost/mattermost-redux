@@ -6,7 +6,6 @@ import {UsersState} from './users';
 import {TeamsState} from './teams';
 import {ChannelsState} from './channels';
 import {PostsState} from './posts';
-import {AdminState} from './admin';
 import {JobsState} from './jobs';
 import {SearchState} from './search';
 import {IntegrationsState} from './integrations';
@@ -15,7 +14,7 @@ import {EmojisState} from './emojis';
 import {SchemesState} from './schemes';
 import {Typing} from './typing';
 import {GroupsState} from './groups';
-import {ChannelsRequestsStatuses, GeneralRequestsStatuses, PostsRequestsStatuses, TeamsRequestsStatuses, UsersRequestsStatuses, AdminRequestsStatuses, FilesRequestsStatuses, RolesRequestsStatuses, JobsRequestsStatuses} from './requests';
+import {ChannelsRequestsStatuses, GeneralRequestsStatuses, PostsRequestsStatuses, TeamsRequestsStatuses, UsersRequestsStatuses, FilesRequestsStatuses, RolesRequestsStatuses, JobsRequestsStatuses} from './requests';
 import {Role} from './roles';
 import {PreferenceType} from './preferences';
 import {Bot} from './bots';
@@ -36,7 +35,6 @@ export type GlobalState = {
                 [x: string]: PreferenceType;
             };
         };
-        admin: AdminState;
         jobs: JobsState;
         alerts: {
             alertStack: Array<AlertType>;
@@ -63,7 +61,6 @@ export type GlobalState = {
         posts: PostsRequestsStatuses;
         teams: TeamsRequestsStatuses;
         users: UsersRequestsStatuses;
-        admin: AdminRequestsStatuses;
         files: FilesRequestsStatuses;
         roles: RolesRequestsStatuses;
         jobs: JobsRequestsStatuses;

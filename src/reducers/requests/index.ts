@@ -9,7 +9,6 @@ import general from './general';
 import posts from './posts';
 import teams from './teams';
 import users from './users';
-import admin from './admin';
 import jobs from './jobs';
 import search from './search';
 import roles from './roles';
@@ -21,7 +20,6 @@ export default combineReducers({
     posts,
     teams,
     users,
-    admin,
     jobs,
     search,
     roles,

@@ -5,7 +5,7 @@ import {UserProfile, UserStatus} from 'types/users';
 import {TeamMembership} from 'types/teams';
 import {Client4} from 'client';
 import {General} from '../constants';
-import {UserTypes, TeamTypes, AdminTypes} from 'action_types';
+import {UserTypes, TeamTypes} from 'action_types';
 import {getAllCustomEmojis} from './emojis';
 import {getClientConfig, setServerVersion} from './general';
 import {getMyTeams, getMyTeamMembers, getMyTeamUnreads} from './teams';
@@ -1245,12 +1245,7 @@ export function createUserAccessToken(userId: string, description: string): Acti
             return {error};
         }
 
-        const actions: Action[] = [{
-            type: AdminTypes.RECEIVED_USER_ACCESS_TOKEN,
-            data: {...data,
-                token: '',
-            },
-        }];
+        const actions: Action[] = [];
 
         const {currentUserId} = getState().entities.users;
         if (userId === currentUserId) {
@@ -1279,10 +1274,7 @@ export function getUserAccessToken(tokenId: string): ActionFunc {
             return {error};
         }
 
-        const actions: Action[] = [{
-            type: AdminTypes.RECEIVED_USER_ACCESS_TOKEN,
-            data,
-        }];
+        const actions: Action[] = [];
 
         const {currentUserId} = getState().entities.users;
         if (data.user_id === currentUserId) {
@@ -1312,15 +1304,6 @@ export function getUserAccessTokens(page = 0, perPage: number = General.PROFILE_
             return {error};
         }
 
-        const actions = [
-            {
-                type: AdminTypes.RECEIVED_USER_ACCESS_TOKENS,
-                data,
-            },
-        ];
-
-        dispatch(batchActions(actions));
-
         return {data};
     };
 }
@@ -1336,11 +1319,7 @@ export function getUserAccessTokensForUser(userId: string, page = 0, perPage: nu
             return {error};
         }
 
-        const actions: Action[] = [{
-            type: AdminTypes.RECEIVED_USER_ACCESS_TOKENS_FOR_USER,
-            data,
-            userId,
-        }];
+        const actions: Action[] = [];
 
         const {currentUserId} = getState().entities.users;
         if (userId === currentUserId) {
