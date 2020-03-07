@@ -342,7 +342,7 @@ describe('Actions.Groups', () => {
         };
 
         nock(Client4.getBaseRoute()).
-            get(`/teams/${teamID}/groups?paginate=false`).
+            get(`/teams/${teamID}/groups?paginate=false&filter_allow_reference=false`).
             reply(200, response);
 
         await Actions.getAllGroupsAssociatedToTeam(teamID)(store.dispatch, store.getState);
@@ -402,7 +402,7 @@ describe('Actions.Groups', () => {
         };
 
         nock(Client4.getBaseRoute()).
-            get(`/teams/${teamID}/groups?page=100&per_page=60&q=0&include_member_count=true`).
+            get(`/teams/${teamID}/groups?page=100&per_page=60&q=0&include_member_count=true&filter_allow_reference=false`).
             reply(200, response);
 
         await Actions.getGroupsAssociatedToTeam(teamID, 0, 100)(store.dispatch, store.getState);
@@ -514,7 +514,7 @@ describe('Actions.Groups', () => {
         };
 
         nock(Client4.getBaseRoute()).
-            get(`/channels/${channelID}/groups?paginate=false`).
+            get(`/channels/${channelID}/groups?paginate=false&filter_allow_reference=false`).
             reply(200, response);
 
         await Actions.getAllGroupsAssociatedToChannel(channelID)(store.dispatch, store.getState);
@@ -574,7 +574,7 @@ describe('Actions.Groups', () => {
         };
 
         nock(Client4.getBaseRoute()).
-            get(`/channels/${channelID}/groups?page=100&per_page=60&q=0&include_member_count=true`).
+            get(`/channels/${channelID}/groups?page=100&per_page=60&q=0&include_member_count=true&filter_allow_reference=false`).
             reply(200, response);
 
         await Actions.getGroupsAssociatedToChannel(channelID, 0, 100)(store.dispatch, store.getState);
@@ -688,6 +688,42 @@ describe('Actions.Groups', () => {
 
         assert.ok(groupSyncables.teams[0].scheme_admin === groupSyncablePatch.scheme_admin);
         assert.ok(groupSyncables.channels[0].scheme_admin === groupSyncablePatch.scheme_admin);
+    });
+
+    it('patchGroup', async () => {
+        const groupID = '5rgoajywb3nfbdtyafbod47rya';
+
+        const groupPatch = {
+            allow_reference: true,
+        };
+
+        const response = {
+            id: '5rgoajywb3nfbdtyafbod47rya',
+            name: '8b7ks7ngqbgndqutka48gfzaqh',
+            display_name: 'Test Group 0',
+            description: '',
+            type: 'ldap',
+            remote_id: '\\eb\\80\\94\\cd\\d4\\32\\7c\\45\\87\\79\\1b\\fe\\45\\d9\\ac\\7b',
+            create_at: 1542399032816,
+            update_at: 1542399032816,
+            delete_at: 0,
+            has_syncables: false,
+            allow_reference: true,
+        };
+
+        nock(Client4.getBaseRoute()).
+            put(`/groups/${groupID}/patch`).
+            reply(200, response);
+
+        await Actions.patchGroup(groupID, groupPatch)(store.dispatch, store.getState);
+
+        const state = store.getState();
+
+        const groups = state.entities.groups.groups;
+        assert.ok(groups);
+        assert.ok(groups[groupID]);
+        assert.ok(groups[groupID].allow_reference === groupPatch.allow_reference);
+        assert.ok(JSON.stringify(response) === JSON.stringify(groups[groupID]));
     });
 });
 

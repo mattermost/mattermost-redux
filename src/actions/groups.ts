@@ -207,43 +207,46 @@ export function getGroupsNotAssociatedToChannel(channelID: string, q = '', page 
     });
 }
 
-export function getAllGroupsAssociatedToTeam(teamID: string): ActionFunc {
+export function getAllGroupsAssociatedToTeam(teamID: string, filterAllowReferences: false): ActionFunc {
     return bindClientFunc({
-        clientFunc: async (param1) => {
-            const result = await Client4.getAllGroupsAssociatedToTeam(param1);
+        clientFunc: async (param1, param2) => {
+            const result = await Client4.getAllGroupsAssociatedToTeam(param1, param2);
             result.teamID = param1;
             return result;
         },
         onSuccess: [GroupTypes.RECEIVED_ALL_GROUPS_ASSOCIATED_TO_TEAM],
         params: [
             teamID,
+            filterAllowReferences,
         ],
     });
 }
 
-export function getAllGroupsAssociatedToChannelsInTeam(teamID: string): ActionFunc {
+export function getAllGroupsAssociatedToChannelsInTeam(teamID: string, filterAllowReferences: false): ActionFunc {
     return bindClientFunc({
-        clientFunc: async (param1) => {
-            const result = await Client4.getAllGroupsAssociatedToChannelsInTeam(param1);
+        clientFunc: async (param1, param2) => {
+            const result = await Client4.getAllGroupsAssociatedToChannelsInTeam(param1, param2);
             return {groupsByChannelId: result.groups};
         },
         onSuccess: [GroupTypes.RECEIVED_ALL_GROUPS_ASSOCIATED_TO_CHANNELS_IN_TEAM],
         params: [
             teamID,
+            filterAllowReferences,
         ],
     });
 }
 
-export function getAllGroupsAssociatedToChannel(channelID: string): ActionFunc {
+export function getAllGroupsAssociatedToChannel(channelID: string, filterAllowReferences: false): ActionFunc {
     return bindClientFunc({
-        clientFunc: async (param1) => {
-            const result = await Client4.getAllGroupsAssociatedToChannel(param1);
+        clientFunc: async (param1, param2) => {
+            const result = await Client4.getAllGroupsAssociatedToChannel(param1, param2);
             result.channelID = param1;
             return result;
         },
         onSuccess: [GroupTypes.RECEIVED_ALL_GROUPS_ASSOCIATED_TO_CHANNEL],
         params: [
             channelID,
+            filterAllowReferences,
         ],
     });
 }
