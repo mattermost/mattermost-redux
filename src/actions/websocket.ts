@@ -6,7 +6,7 @@ import websocketClient from '../client/websocket_client';
 
 import {ChannelTypes, GeneralTypes, EmojiTypes, PostTypes, PreferenceTypes, TeamTypes, UserTypes, RoleTypes, AdminTypes, IntegrationTypes} from 'action_types';
 import {General, WebsocketEvents, Preferences} from '../constants';
-import {getAllChannels, getChannel, getChannelsNameMapInTeam, getCurrentChannelId, getMyChannelMember, getRedirectChannelNameForTeam, getCurrentChannelStats, getMyChannels, getChannelMembersInChannels, isManuallyUnread} from 'selectors/entities/channels';
+import {getAllChannels, getChannel, getChannelsNameMapInTeam, getCurrentChannelId, getCurrentChannel, getMyChannelMember, getRedirectChannelNameForTeam, getCurrentChannelStats, getMyChannels, getChannelMembersInChannels, isManuallyUnread} from 'selectors/entities/channels';
 import {getConfig} from 'selectors/entities/general';
 import {getAllPosts, getPost as getPostSelector} from 'selectors/entities/posts';
 import {getDirectShowPreferences} from 'selectors/entities/preferences';
@@ -138,6 +138,7 @@ export function doReconnect(now: number) {
             await dispatch(getMyTeamMembers());
             const currentTeamMembership = getCurrentTeamMembership(getState());
             if (currentTeamMembership) {
+                const currentChannel = getCurrentChannel(state);
                 const fethcResult = await dispatch(fetchMyChannelsAndMembers(currentTeamId));
                 const data = (fethcResult as any).data || null;
                 dispatch(loadProfilesForDirect());
@@ -145,8 +146,10 @@ export function doReconnect(now: number) {
                 if (data && data.channels && data.members) {
                     const channelStillExists = data.channels.find((c: Channel) => c.id === currentChannelId);
                     const stillMemberOfCurrentChannel = data.members.find((m: ChannelMembership) => m.channel_id === currentChannelId);
+                    const config = getConfig(getState());
+                    const viewArchivedChannels = config.ExperimentalViewArchivedChannels === 'true';
 
-                    if (!stillMemberOfCurrentChannel || !channelStillExists) {
+                    if (!stillMemberOfCurrentChannel || !channelStillExists || (!viewArchivedChannels && currentChannel.delete_at !== 0)) {
                         EventEmitter.emit(General.SWITCH_TO_DEFAULT_CHANNEL, currentTeamId);
                     } else {
                         dispatch(getPosts(currentChannelId));
@@ -602,6 +605,8 @@ function handleChannelDeletedEvent(msg: WebSocketMessage) {
         const config = getConfig(state);
         const viewArchivedChannels = config.ExperimentalViewArchivedChannels === 'true';
 
+        dispatch({type: ChannelTypes.RECEIVED_CHANNEL_DELETED, data: {id: msg.data.channel_id, deleteAt: msg.data.delete_at, team_id: msg.broadcast.team_id, viewArchivedChannels}});
+
         if (msg.broadcast.team_id === currentTeamId) {
             if (msg.data.channel_id === currentChannelId && !viewArchivedChannels) {
                 const channelsInTeam = getChannelsNameMapInTeam(state, currentTeamId);
@@ -611,11 +616,8 @@ function handleChannelDeletedEvent(msg: WebSocketMessage) {
                 }
                 EventEmitter.emit(General.DEFAULT_CHANNEL, '');
             }
-
-            dispatch({type: ChannelTypes.RECEIVED_CHANNEL_DELETED, data: {id: msg.data.channel_id, team_id: msg.data.team_id, viewArchivedChannels}});
-
-            dispatch(fetchMyChannelsAndMembers(currentTeamId));
         }
+
         return {data: true};
     };
 }
