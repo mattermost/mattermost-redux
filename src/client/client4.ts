@@ -2886,6 +2886,13 @@ export default class Client4 {
         );
     };
 
+    getAllGroupsAssociatedToChannelsInTeam = async (teamID: string) => {
+        return this.doFetch(
+            `${this.getBaseRoute()}/teams/${teamID}/groupsforchannels?paginate=false`,
+            {method: 'get'}
+        );
+    };
+
     getAllGroupsAssociatedToChannel = async (channelID: string) => {
         return this.doFetch(
             `${this.getBaseRoute()}/channels/${channelID}/groups?paginate=false`,

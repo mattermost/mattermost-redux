@@ -221,6 +221,19 @@ export function getAllGroupsAssociatedToTeam(teamID: string): ActionFunc {
     });
 }
 
+export function getAllGroupsAssociatedToChannelsInTeam(teamID: string): ActionFunc {
+    return bindClientFunc({
+        clientFunc: async (param1) => {
+            const result = await Client4.getAllGroupsAssociatedToChannelsInTeam(param1);
+            return {groupsByChannelId: result.groups};
+        },
+        onSuccess: [GroupTypes.RECEIVED_ALL_GROUPS_ASSOCIATED_TO_CHANNELS_IN_TEAM],
+        params: [
+            teamID,
+        ],
+    });
+}
+
 export function getAllGroupsAssociatedToChannel(channelID: string): ActionFunc {
     return bindClientFunc({
         clientFunc: async (param1) => {
