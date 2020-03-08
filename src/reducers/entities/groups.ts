@@ -183,6 +183,7 @@ function members(state: any = {}, action: GenericAction) {
 
 function groups(state: Dictionary<Group> = {}, action: GenericAction) {
     switch (action.type) {
+    case GroupTypes.PATCHED_GROUP:
     case GroupTypes.RECEIVED_GROUP: {
         return {
             ...state,

@@ -359,16 +359,6 @@ describe('Actions.Groups', () => {
     it('getGroupsAssociatedToTeam', async () => {
         const teamID = '5rgoajywb3nfbdtyafbod47ryb';
 
-        store = await configureStore({
-            entities: {
-                teams: {
-                    groupsAssociatedToTeam: {
-                        [teamID]: ['tnd8zod9f3fdtqosxjmhwucbth', 'qhdp6g7aubbpiyja7c4sgpe7tc'],
-                    },
-                },
-            },
-        });
-
         const response = {
             groups: [
                 {
@@ -528,18 +518,84 @@ describe('Actions.Groups', () => {
         });
     });
 
+    it('getAllGroupsAssociatedToChannelsInTeam', async () => {
+        const teamID = 'ge63nq31sbfy3duzq5f7yqn1kh';
+        const channelID1 = '5rgoajywb3nfbdtyafbod47ryb';
+        const channelID2 = 'o3tdawqxot8kikzq8bk54zggbc';
+
+        const response = {
+            groups: {
+                '5rgoajywb3nfbdtyafbod47ryb':
+                [
+                    {
+                        id: 'xh585kyz3tn55q6ipfo57btwnc',
+                        name: '9uobsi3xb3y5tfjb3ze7umnh1o',
+                        display_name: 'abc',
+                        description: '',
+                        source: 'ldap',
+                        remote_id: 'abc',
+                        create_at: 1553808969975,
+                        update_at: 1553808969975,
+                        delete_at: 0,
+                        has_syncables: false,
+                        member_count: 2,
+                        allow_reference: false,
+                    },
+                    {
+                        id: 'tnd8zod9f3fdtqosxjmhwucbth',
+                        name: 'nobctj4brfgtpj3a1peiyq47tc',
+                        display_name: 'engineering',
+                        description: '',
+                        source: 'ldap',
+                        remote_id: 'engineering',
+                        create_at: 1553808971099,
+                        update_at: 1553808971099,
+                        delete_at: 0,
+                        has_syncables: false,
+                        member_count: 8,
+                        allow_reference: false,
+                    },
+                ],
+                o3tdawqxot8kikzq8bk54zggbc:
+                [
+                    {
+                        id: 'qhdp6g7aubbpiyja7c4sgpe7tc',
+                        name: 'x5bjwa4kwirpmqudhp5dterine',
+                        display_name: 'qa',
+                        description: '',
+                        source: 'ldap',
+                        remote_id: 'qa',
+                        create_at: 1553808971548,
+                        update_at: 1553808971548,
+                        delete_at: 0,
+                        has_syncables: false,
+                        member_count: 2,
+                        allow_reference: false,
+                    },
+                ],
+            },
+            total_group_count: 3,
+        };
+
+        nock(Client4.getBaseRoute()).
+            get(`/teams/${teamID}/groupsforchannels?paginate=false&filter_allow_reference=false`).
+            reply(200, response);
+
+        await Actions.getAllGroupsAssociatedToChannelsInTeam(teamID)(store.dispatch, store.getState);
+
+        const state = store.getState();
+
+        console.log(state.entities.channels.groupsAssociatedToChannel);
+
+        const groupIDs = state.entities.channels.groupsAssociatedToChannel[channelID1].ids;
+        assert.strictEqual(groupIDs.length, response.groups[channelID1].length);
+        groupIDs.forEach((id) => {
+            assert.ok(response.groups[channelID1].map((group) => group.id).includes(id));
+        });
+    });
+
     it('getGroupsAssociatedToChannel', async () => {
         const channelID = '5rgoajywb3nfbdtyafbod47ryb';
-
-        store = await configureStore({
-            entities: {
-                channels: {
-                    groupsAssociatedToChannel: {
-                        [channelID]: ['tnd8zod9f3fdtqosxjmhwucbth', 'qhdp6g7aubbpiyja7c4sgpe7tc'],
-                    },
-                },
-            },
-        });
 
         const response = {
             groups: [
@@ -717,9 +773,27 @@ describe('Actions.Groups', () => {
 
         await Actions.patchGroup(groupID, groupPatch)(store.dispatch, store.getState);
 
-        const state = store.getState();
+        let state = store.getState();
 
-        const groups = state.entities.groups.groups;
+        let groups = state.entities.groups.groups;
+        assert.ok(groups);
+        assert.ok(groups[groupID]);
+        assert.ok(groups[groupID].allow_reference === groupPatch.allow_reference);
+        assert.ok(JSON.stringify(response) === JSON.stringify(groups[groupID]));
+
+        //with allow_reference=false
+        groupPatch.allow_reference = false;
+        response.allow_reference = false;
+
+        nock(Client4.getBaseRoute()).
+            put(`/groups/${groupID}/patch`).
+            reply(200, response);
+
+        await Actions.patchGroup(groupID, groupPatch)(store.dispatch, store.getState);
+
+        state = store.getState();
+
+        groups = state.entities.groups.groups;
         assert.ok(groups);
         assert.ok(groups[groupID]);
         assert.ok(groups[groupID].allow_reference === groupPatch.allow_reference);
