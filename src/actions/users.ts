@@ -24,16 +24,16 @@ import {getMyPreferences, makeDirectChannelVisibleIfNecessary, makeGroupMessageV
 import {Dictionary} from 'types/utilities';
 export function checkMfa(loginId: string): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
-        dispatch({type: UserTypes.CHECK_MFA_REQUEST, data: null}, getState);
+        dispatch({type: UserTypes.CHECK_MFA_REQUEST, data: null});
         try {
             const data = await Client4.checkUserMfa(loginId);
-            dispatch({type: UserTypes.CHECK_MFA_SUCCESS, data: null}, getState);
+            dispatch({type: UserTypes.CHECK_MFA_SUCCESS, data: null});
             return {data: data.mfa_required};
         } catch (error) {
             dispatch(batchActions([
                 {type: UserTypes.CHECK_MFA_FAILURE, error},
                 logError(error),
-            ]), getState);
+            ]));
             return {error};
         }
     };
@@ -73,7 +73,7 @@ export function createUser(user: UserProfile, token: string, inviteId: string): 
 
 export function login(loginId: string, password: string, mfaToken = '', ldapOnly = false): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
-        dispatch({type: UserTypes.LOGIN_REQUEST, data: null}, getState);
+        dispatch({type: UserTypes.LOGIN_REQUEST, data: null});
 
         const deviceId = getState().entities.general.deviceToken;
         let data;
@@ -87,7 +87,7 @@ export function login(loginId: string, password: string, mfaToken = '', ldapOnly
                     error,
                 },
                 logError(error),
-            ]), getState);
+            ]));
             return {error};
         }
 
@@ -97,7 +97,7 @@ export function login(loginId: string, password: string, mfaToken = '', ldapOnly
 
 export function loginById(id: string, password: string, mfaToken = ''): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
-        dispatch({type: UserTypes.LOGIN_REQUEST, data: null}, getState);
+        dispatch({type: UserTypes.LOGIN_REQUEST, data: null});
 
         const deviceId = getState().entities.general.deviceToken;
         let data;
@@ -111,7 +111,7 @@ export function loginById(id: string, password: string, mfaToken = ''): ActionFu
                     error,
                 },
                 logError(error),
-            ]), getState);
+            ]));
             return {error};
         }
 
@@ -149,7 +149,7 @@ function completeLogin(data: UserProfile): ActionFunc {
             dispatch(batchActions([
                 {type: UserTypes.LOGIN_FAILURE, error},
                 logError(error),
-            ]), getState);
+            ]));
             return {error};
         }
 
@@ -244,7 +244,7 @@ export function loadMe(): ActionFunc {
 
 export function logout(): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
-        dispatch({type: UserTypes.LOGOUT_REQUEST, data: null}, getState);
+        dispatch({type: UserTypes.LOGOUT_REQUEST, data: null});
 
         try {
             await Client4.logout();
@@ -252,7 +252,7 @@ export function logout(): ActionFunc {
             // nothing to do here
         }
 
-        dispatch({type: UserTypes.LOGOUT_SUCCESS, data: null}, getState);
+        dispatch({type: UserTypes.LOGOUT_SUCCESS, data: null});
 
         return {data: true};
     };
@@ -399,7 +399,7 @@ export function getProfilesInTeam(teamId: string, page: number, perPage: number 
                 type: UserTypes.RECEIVED_PROFILES_LIST,
                 data: removeUserFromList(currentUserId, [...profiles]),
             },
-        ]), getState);
+        ]));
 
         return {data: profiles};
     };
@@ -430,7 +430,7 @@ export function getProfilesNotInTeam(teamId: string, groupConstrained: boolean, 
                 type: UserTypes.RECEIVED_PROFILES_LIST,
                 data: profiles,
             },
-        ]), getState);
+        ]));
 
         return {data: profiles};
     };
@@ -456,7 +456,7 @@ export function getProfilesWithoutTeam(page: number, perPage: number = General.P
                 type: UserTypes.RECEIVED_PROFILES_LIST,
                 data: profiles,
             },
-        ]), getState);
+        ]));
 
         return {data: profiles};
     };
@@ -485,7 +485,7 @@ export function getProfilesInChannel(channelId: string, page: number, perPage: n
                 type: UserTypes.RECEIVED_PROFILES_LIST,
                 data: removeUserFromList(currentUserId, [...profiles]),
             },
-        ]), getState);
+        ]));
 
         return {data: profiles};
     };
@@ -556,7 +556,7 @@ export function getProfilesNotInChannel(teamId: string, channelId: string, group
                 type: UserTypes.RECEIVED_PROFILES_LIST,
                 data: removeUserFromList(currentUserId, [...profiles]),
             },
-        ]), getState);
+        ]));
 
         return {data: profiles};
     };
@@ -773,7 +773,7 @@ export function revokeAllSessionsForUser(userId: string): ActionFunc {
                 type: UserTypes.REVOKE_ALL_USER_SESSIONS_SUCCESS,
                 data,
             },
-        ]), getState);
+        ]));
 
         return {data: true};
     };
@@ -847,7 +847,7 @@ export function autocompleteUsers(term: string, teamId = '', channelId = '', opt
     limit: General.AUTOCOMPLETE_LIMIT_DEFAULT,
 }): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
-        dispatch({type: UserTypes.AUTOCOMPLETE_USERS_REQUEST, data: null}, getState);
+        dispatch({type: UserTypes.AUTOCOMPLETE_USERS_REQUEST, data: null});
 
         const {currentUserId} = getState().entities.users;
 
@@ -859,7 +859,7 @@ export function autocompleteUsers(term: string, teamId = '', channelId = '', opt
             dispatch(batchActions([
                 {type: UserTypes.AUTOCOMPLETE_USERS_FAILURE, error},
                 logError(error),
-            ]), getState);
+            ]));
             return {error};
         }
 
@@ -902,7 +902,7 @@ export function autocompleteUsers(term: string, teamId = '', channelId = '', opt
             );
         }
 
-        dispatch(batchActions(actions), getState);
+        dispatch(batchActions(actions));
 
         return {data};
     };
@@ -1002,7 +1002,7 @@ export function stopPeriodicStatusUpdates(): ActionFunc {
 
 export function updateMe(user: UserProfile): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
-        dispatch({type: UserTypes.UPDATE_ME_REQUEST, data: null}, getState);
+        dispatch({type: UserTypes.UPDATE_ME_REQUEST, data: null});
 
         let data;
         try {
@@ -1011,14 +1011,14 @@ export function updateMe(user: UserProfile): ActionFunc {
             dispatch(batchActions([
                 {type: UserTypes.UPDATE_ME_FAILURE, error},
                 logError(error),
-            ]), getState);
+            ]));
             return {error};
         }
 
         dispatch(batchActions([
             {type: UserTypes.RECEIVED_ME, data},
             {type: UserTypes.UPDATE_ME_SUCCESS},
-        ]), getState);
+        ]));
         dispatch(loadRolesIfNeeded(data.roles.split(' ')));
 
         return {data};

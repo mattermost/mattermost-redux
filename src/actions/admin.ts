@@ -402,7 +402,7 @@ export function removeLicense(): ActionFunc {
 
 export function getAnalytics(name: string, teamId = ''): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
-        dispatch({type: AdminTypes.GET_ANALYTICS_REQUEST, data: null}, getState);
+        dispatch({type: AdminTypes.GET_ANALYTICS_REQUEST, data: null});
 
         let data;
         try {
@@ -412,7 +412,7 @@ export function getAnalytics(name: string, teamId = ''): ActionFunc {
             dispatch(batchActions([
                 {type: AdminTypes.GET_ANALYTICS_FAILURE, error},
                 logError(error),
-            ]), getState);
+            ]));
             return {error};
         }
 
@@ -423,7 +423,7 @@ export function getAnalytics(name: string, teamId = ''): ActionFunc {
             actions.push({type: AdminTypes.RECEIVED_TEAM_ANALYTICS, data, name, teamId});
         }
 
-        dispatch(batchActions(actions), getState);
+        dispatch(batchActions(actions));
 
         return {data};
     };
