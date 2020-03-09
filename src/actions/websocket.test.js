@@ -524,6 +524,7 @@ describe('Actions.Websocket', () => {
 
     it('Websocket Handle Channel Deleted', (done) => {
         async function test() {
+            const time = Date.now();
             await store.dispatch(TeamActions.selectTeam(TestHelper.basicTeam));
             await store.dispatch(ChannelActions.selectChannel(TestHelper.basicChannel.id));
 
@@ -534,7 +535,20 @@ describe('Actions.Websocket', () => {
                 get(`/teams/${TestHelper.basicTeam.id}/channels/members`).
                 reply(201, [{user_id: TestHelper.basicUser.id, channel_id: TestHelper.basicChannel.id}]);
 
-            mockServer.emit('message', JSON.stringify({event: WebsocketEvents.CHANNEL_DELETED, data: {channel_id: TestHelper.basicChannel.id}, broadcast: {omit_users: null, user_id: '', channel_id: '', team_id: TestHelper.basicTeam.id}, seq: 68}));
+            mockServer.emit('message', JSON.stringify({
+                event: WebsocketEvents.CHANNEL_DELETED,
+                data: {
+                    channel_id: TestHelper.basicChannel.id,
+                    delete_at: time,
+                },
+                broadcast: {
+                    omit_users: null,
+                    user_id: '',
+                    channel_id: '',
+                    team_id: TestHelper.basicTeam.id,
+                },
+                seq: 68,
+            }));
 
             setTimeout(() => {
                 const state = store.getState();
@@ -707,6 +721,9 @@ describe('Actions.Websocket doReconnect', () => {
 
     const initialState = {
         entities: {
+            general: {
+                config: {},
+            },
             teams: {
                 currentTeamId,
                 myMembers: {
@@ -829,6 +846,50 @@ describe('Actions.Websocket doReconnect', () => {
 
     it('handle doReconnect after the current channel was archived or the user left it', async () => {
         const state = {...initialState};
+        const testStore = await mockStore(state);
+
+        const timestamp = 1000;
+        const expectedActions = [
+            {type: MOCK_GET_PREFERENCES},
+            {type: MOCK_GET_STATUSES_BY_IDS},
+            {type: MOCK_MY_TEAM_UNREADS},
+            {type: MOCK_GET_MY_TEAMS},
+            {type: MOCK_GET_MY_TEAM_MEMBERS},
+            {type: MOCK_CHANNELS_REQUEST, data: [], teamId: currentTeamId, sync: true},
+            {type: MOCK_CHECK_FOR_MODIFIED_USERS},
+            {type: GeneralTypes.WEBSOCKET_SUCCESS, timestamp, data: null},
+        ];
+
+        const expectedMissingActions = [
+            {type: MOCK_GET_POSTS},
+        ];
+
+        await testStore.dispatch(Actions.doReconnect(timestamp));
+
+        const actions = testStore.getActions();
+        expect(actions).toEqual(expect.arrayContaining(expectedActions));
+        expect(actions).not.toEqual(expect.arrayContaining(expectedMissingActions));
+    });
+
+    it('handle doReconnect after the current channel was archived and setting is on', async () => {
+        const state = {
+            ...initialState,
+            general: {
+                config: {
+                    ExperimentalViewArchivedChannels: 'true',
+                },
+            },
+            channels: {
+                currentChannelId,
+                channels: {
+                    currentChannelId: {
+                        id: currentChannelId,
+                        name: 'channel',
+                        delete_at: 123,
+                    },
+                },
+            },
+        };
         const testStore = await mockStore(state);
 
         const timestamp = 1000;
