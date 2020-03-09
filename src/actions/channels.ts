@@ -33,6 +33,12 @@ export function selectChannel(channelId: string) {
     };
 }
 
+export function resetCurrentChannelId() {
+    return {
+        type: ChannelTypes.RESET_CURRENT_CHANNEL_ID,
+    };
+}
+
 export function createChannel(channel: Channel, userId: string): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         let created;
