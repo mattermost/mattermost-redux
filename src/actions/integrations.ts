@@ -61,7 +61,7 @@ export function removeIncomingHook(hookId: string): ActionFunc {
                 type: IntegrationTypes.DELETED_INCOMING_HOOK,
                 data: {id: hookId},
             },
-        ]), getState);
+        ]));
 
         return {data: true};
     };
@@ -126,7 +126,7 @@ export function removeOutgoingHook(hookId: string): ActionFunc {
                 type: IntegrationTypes.DELETED_OUTGOING_HOOK,
                 data: {id: hookId},
             },
-        ]), getState);
+        ]));
 
         return {data: true};
     };
@@ -234,7 +234,7 @@ export function regenCommandToken(id: string): ActionFunc {
                     token: res.token,
                 },
             },
-        ]), getState);
+        ]));
 
         return {data: true};
     };
@@ -256,7 +256,7 @@ export function deleteCommand(id: string): ActionFunc {
                 type: IntegrationTypes.DELETED_COMMAND,
                 data: {id},
             },
-        ]), getState);
+        ]));
 
         return {data: true};
     };
@@ -346,7 +346,7 @@ export function deleteOAuthApp(id: string): ActionFunc {
                 type: IntegrationTypes.DELETED_OAUTH_APP,
                 data: {id},
             },
-        ]), getState);
+        ]));
 
         return {data: true};
     };

@@ -20,9 +20,9 @@ export function forceLogoutIfNecessary(err: Client4Error, dispatch: DispatchFunc
 
 function dispatcher(type: ActionType, data: any, dispatch: DispatchFunc, getState: GetStateFunc) {
     if (type.indexOf('SUCCESS') === -1) { // we don't want to pass the data for the request types
-        dispatch(requestSuccess(type, data), getState);
+        dispatch(requestSuccess(type, data));
     } else {
-        dispatch(requestData(type), getState);
+        dispatch(requestData(type));
     }
 }
 
@@ -76,7 +76,7 @@ export function bindClientFunc({
 }): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         if (onRequest) {
-            dispatch(requestData(onRequest), getState);
+            dispatch(requestData(onRequest));
         }
 
         let data: any = null;

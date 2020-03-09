@@ -42,7 +42,7 @@ export function getPing(): ActionFunc {
 
 export function resetPing(): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
-        dispatch({type: GeneralTypes.PING_RESET, data: {}}, getState);
+        dispatch({type: GeneralTypes.PING_RESET, data: {}});
 
         return {data: true};
     };
@@ -82,7 +82,7 @@ export function getDataRetentionPolicy(): ActionFunc {
                     error,
                 },
                 logError(error),
-            ]), getState);
+            ]));
             return {error};
         }
 
@@ -116,7 +116,7 @@ export function logClientError(message: string, level: logLevel = 'ERROR') {
 
 export function setAppState(state: GeneralState['appState']): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
-        dispatch({type: GeneralTypes.RECEIVED_APP_STATE, data: state}, getState);
+        dispatch({type: GeneralTypes.RECEIVED_APP_STATE, data: state});
 
         return {data: true};
     };
@@ -124,7 +124,7 @@ export function setAppState(state: GeneralState['appState']): ActionFunc {
 
 export function setDeviceToken(token: GeneralState['deviceToken']): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
-        dispatch({type: GeneralTypes.RECEIVED_APP_DEVICE_TOKEN, data: token}, getState);
+        dispatch({type: GeneralTypes.RECEIVED_APP_DEVICE_TOKEN, data: token});
 
         return {data: true};
     };
@@ -132,7 +132,7 @@ export function setDeviceToken(token: GeneralState['deviceToken']): ActionFunc {
 
 export function setServerVersion(serverVersion: string): ActionFunc {
     return async (dispatch, getState: GetStateFunc) => {
-        dispatch({type: GeneralTypes.RECEIVED_SERVER_VERSION, data: serverVersion}, getState);
+        dispatch({type: GeneralTypes.RECEIVED_SERVER_VERSION, data: serverVersion});
         dispatch(loadRolesIfNeeded([]));
 
         return {data: true};
@@ -176,11 +176,11 @@ export function getRedirectLocation(url: string): ActionFunc {
             data = await pendingData;
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch, getState);
-            dispatch({type: GeneralTypes.REDIRECT_LOCATION_FAILURE, data: {error, url}}, getState);
+            dispatch({type: GeneralTypes.REDIRECT_LOCATION_FAILURE, data: {error, url}});
             return {error};
         }
 
-        dispatch({type: GeneralTypes.REDIRECT_LOCATION_SUCCESS, data: {...data, url}}, getState);
+        dispatch({type: GeneralTypes.REDIRECT_LOCATION_SUCCESS, data: {...data, url}});
         return {data};
     };
 }
