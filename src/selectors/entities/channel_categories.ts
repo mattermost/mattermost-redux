@@ -25,7 +25,7 @@ export function getCategoryIdsForTeam(state: GlobalState, teamId: string): strin
     return state.entities.channelCategories.orderByTeam[teamId];
 }
 
-export function makeGetCategoriesForTeam() {
+export function makeGetCategoriesForTeam(): (state: GlobalState, teamId: string) => ChannelCategory[] {
     return createSelector(
         getCategoryIdsForTeam,
         (state: GlobalState) => state.entities.channelCategories.byId,
@@ -39,7 +39,7 @@ export function makeGetCategoriesForTeam() {
     );
 }
 
-export function makeGetChannelsForAllCategories() {
+export function makeGetChannelsForAllCategories(): (state: GlobalState, teamId: string) => Channel[] {
     return createSelector(
         (state: GlobalState) => state.entities.channels.channels,
         (state: GlobalState, teamId: string) => teamId,
@@ -49,7 +49,7 @@ export function makeGetChannelsForAllCategories() {
     );
 }
 
-export function makeFilterChannelsByFavorites() {
+export function makeFilterChannelsByFavorites(): (state: GlobalState, channels: Channel[], categoryType: string) => Channel[] {
     return createSelector(
         (state: GlobalState, channels: Channel[]) => channels,
         (state: GlobalState, channels: Channel[], categoryType: string) => categoryType,
@@ -68,7 +68,7 @@ export function makeFilterChannelsByFavorites() {
     );
 }
 
-export function makeFilterChannelsByType() {
+export function makeFilterChannelsByType(): (state: GlobalState, channels: Channel[], categoryType: string) => Channel[] {
     // This doesn't need to be a selector, but make it as one to keep it consistent
     return createSelector(
         (state: GlobalState, channels: Channel[]) => channels,
@@ -91,7 +91,7 @@ export function makeFilterChannelsByType() {
     );
 }
 
-export function makeFilterAutoclosedDMs() {
+export function makeFilterAutoclosedDMs(): (state: GlobalState, channels: Channel[], categoryType: string) => Channel[] {
     return createSelector(
         (state: GlobalState, channels: Channel[]) => channels,
         (state: GlobalState, channels: Channel[], categoryType: string) => categoryType,
@@ -117,7 +117,7 @@ export function makeFilterAutoclosedDMs() {
     );
 }
 
-export function makeFilterManuallyClosedDMs() {
+export function makeFilterManuallyClosedDMs(): (state: GlobalState, channels: Channel[]) => Channel[] {
     return createSelector(
         (state: GlobalState, channels: Channel[]) => channels,
         (state: GlobalState) => state.entities.preferences.myPreferences,
