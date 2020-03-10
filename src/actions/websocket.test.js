@@ -692,9 +692,10 @@ describe('Actions.Websocket', () => {
 
 describe('Actions.Websocket doReconnect', () => {
     const mockStore = configureMockStore([thunk]);
+    const me = TestHelper.fakeUserWithId();
 
     const currentTeamId = 'team-id';
-    const currentUserId = 'user-id';
+    const currentUserId = me.id;
     const currentChannelId = 'channel-id';
 
     const initialState = {
@@ -724,6 +725,9 @@ describe('Actions.Websocket doReconnect', () => {
             },
             users: {
                 currentUserId,
+                profiles: {
+                    [me.id]: me,
+                },
             },
             preferences: {
                 myPreferences: {},
