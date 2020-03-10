@@ -210,7 +210,7 @@ export function isDirectChannelVisible(
     config: any,
     myPreferences: {
         [x: string]: PreferenceType;
-    }, 
+    },
     channel: Channel,
     lastPost?: Post | null,
     isUnread?: boolean,
