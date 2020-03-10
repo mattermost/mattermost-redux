@@ -3959,3 +3959,126 @@ describe('removeNonRecentEmptyPostBlocks', () => {
         }]);
     });
 });
+
+describe('postsReplies', () => {
+    const initialState = {
+        123: 3,
+        456: 6,
+        789: 9,
+    };
+
+    describe('received post', () => {
+        const testTable = [
+            {name: 'pending post (no id)', action: PostTypes.RECEIVED_POST, state: {...initialState}, post: {root_id: '123'}, nextState: {...initialState}},
+            {name: 'root post (no root_id)', action: PostTypes.RECEIVED_POST, state: {...initialState}, post: {id: '123'}, nextState: {...initialState}},
+            {name: 'new reply without reply count', action: PostTypes.RECEIVED_POST, state: {...initialState}, post: {id: '123', root_id: '123'}, nextState: {...initialState, 123: 4}},
+            {name: 'new reply with reply count', action: PostTypes.RECEIVED_POST, state: {...initialState}, post: {id: '123', root_id: '123', reply_count: 7}, nextState: {...initialState, 123: 7}},
+            {name: 'pending post (no id) (new post action)', action: PostTypes.RECEIVED_NEW_POST, state: {...initialState}, post: {root_id: '123'}, nextState: {...initialState}},
+            {name: 'root post (no root_id) (new post action)', action: PostTypes.RECEIVED_NEW_POST, state: {...initialState}, post: {id: '123'}, nextState: {...initialState}},
+            {name: 'new reply without reply count (new post action)', action: PostTypes.RECEIVED_NEW_POST, state: {...initialState}, post: {id: '123', root_id: '123'}, nextState: {...initialState, 123: 4}},
+            {name: 'new reply with reply count (new post action)', action: PostTypes.RECEIVED_NEW_POST, state: {...initialState}, post: {id: '123', root_id: '123', reply_count: 7}, nextState: {...initialState, 123: 7}},
+        ];
+        for (const testCase of testTable) {
+            it(testCase.name, () => {
+                const state = deepFreeze(testCase.state);
+
+                const nextState = reducers.nextPostsReplies(state, {
+                    type: testCase.action,
+                    data: testCase.post,
+                });
+
+                expect(nextState).toEqual(testCase.nextState);
+            });
+        }
+    });
+
+    describe('received posts', () => {
+        const testTable = [
+            {name: 'received empty posts list', action: PostTypes.RECEIVED_POSTS, state: {...initialState}, posts: [], nextState: {...initialState}},
+            {
+                name: 'received posts to existing counters',
+                action: PostTypes.RECEIVED_POSTS,
+                state: {...initialState},
+                posts: [
+                    {id: '123', reply_count: 1},
+                    {id: '456', reply_count: 8},
+                ],
+                nextState: {...initialState, 123: 1, 456: 8},
+            },
+            {
+                name: 'received replies to existing counters',
+                action: PostTypes.RECEIVED_POSTS,
+                state: {...initialState},
+                posts: [
+                    {id: '000', root_id: '123', reply_count: 1},
+                    {id: '111', root_id: '456', reply_count: 8},
+                ],
+                nextState: {...initialState, 123: 1, 456: 8},
+            },
+            {
+                name: 'received posts to new counters',
+                action: PostTypes.RECEIVED_POSTS,
+                state: {...initialState},
+                posts: [
+                    {id: '321', reply_count: 1},
+                    {id: '654', reply_count: 8},
+                ],
+                nextState: {...initialState, 321: 1, 654: 8},
+            },
+            {
+                name: 'received replies to new counters',
+                action: PostTypes.RECEIVED_POSTS,
+                state: {...initialState},
+                posts: [
+                    {id: '000', root_id: '321', reply_count: 1},
+                    {id: '111', root_id: '654', reply_count: 8},
+                ],
+                nextState: {...initialState, 321: 1, 654: 8},
+            },
+            {
+                name: 'received posts and replies to new and existing counters',
+                action: PostTypes.RECEIVED_POSTS,
+                state: {...initialState},
+                posts: [
+                    {id: '000', root_id: '123', reply_count: 4},
+                    {id: '111', root_id: '456', reply_count: 7},
+                    {id: '000', root_id: '321', reply_count: 1},
+                    {id: '111', root_id: '654', reply_count: 8},
+                ],
+                nextState: {...initialState, 123: 4, 456: 7, 321: 1, 654: 8},
+            },
+        ];
+        for (const testCase of testTable) {
+            it(testCase.name, () => {
+                const state = deepFreeze(testCase.state);
+
+                const nextState = reducers.nextPostsReplies(state, {
+                    type: testCase.action,
+                    data: {posts: testCase.posts},
+                });
+
+                expect(nextState).toEqual(testCase.nextState);
+            });
+        }
+    });
+
+    describe('deleted posts', () => {
+        const testTable = [
+            {name: 'deleted not tracked post', action: PostTypes.POST_DELETED, state: {...initialState}, post: {id: '000', root_id: '111'}, nextState: {...initialState}},
+            {name: 'deleted reply', action: PostTypes.POST_DELETED, state: {...initialState}, post: {id: '000', root_id: '123'}, nextState: {...initialState, 123: 2}},
+            {name: 'deleted root post', action: PostTypes.POST_DELETED, state: {...initialState}, post: {id: '123'}, nextState: {456: 6, 789: 9}},
+        ];
+        for (const testCase of testTable) {
+            it(testCase.name, () => {
+                const state = deepFreeze(testCase.state);
+
+                const nextState = reducers.nextPostsReplies(state, {
+                    type: testCase.action,
+                    data: testCase.post,
+                });
+
+                expect(nextState).toEqual(testCase.nextState);
+            });
+        }
+    });
+});
