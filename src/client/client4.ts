@@ -2838,7 +2838,7 @@ export default class Client4 {
         );
     };
 
-    getGroups = async (groupID: string, filterAllowReference = false) => {
+    getGroups = async (filterAllowReference = false) => {
         return this.doFetch(
             `${this.getBaseRoute()}/groups${buildQueryString({filter_allow_reference: filterAllowReference})}`,
             {method: 'get'}
