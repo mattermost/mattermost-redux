@@ -578,7 +578,7 @@ describe('Actions.Groups', () => {
         };
 
         nock(Client4.getBaseRoute()).
-            get(`/teams/${teamID}/groupsforchannels?paginate=false&filter_allow_reference=false`).
+            get(`/teams/${teamID}/groupsbychannels?paginate=false&filter_allow_reference=false`).
             reply(200, response);
 
         await Actions.getAllGroupsAssociatedToChannelsInTeam(teamID)(store.dispatch, store.getState);

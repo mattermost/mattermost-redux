@@ -2838,9 +2838,9 @@ export default class Client4 {
         );
     };
 
-    getGroups = async (groupID: string) => {
+    getGroups = async (groupID: string, filterAllowReference = false) => {
         return this.doFetch(
-            `${this.getBaseRoute()}/groups`,
+            `${this.getBaseRoute()}/groups${buildQueryString({filter_allow_reference: filterAllowReference})}`,
             {method: 'get'}
         );
     };
@@ -2861,41 +2861,41 @@ export default class Client4 {
         );
     };
 
-    getGroupsAssociatedToTeam = async (teamID: string, q = '', page = 0, perPage = PER_PAGE_DEFAULT, filterAllowReferences = false) => {
+    getGroupsAssociatedToTeam = async (teamID: string, q = '', page = 0, perPage = PER_PAGE_DEFAULT, filterAllowReference = false) => {
         this.trackEvent('api', 'api_groups_get_associated_to_team', {team_id: teamID});
 
         return this.doFetch(
-            `${this.getBaseRoute()}/teams/${teamID}/groups${buildQueryString({page, per_page: perPage, q, include_member_count: true, filter_allow_reference: filterAllowReferences})}`,
+            `${this.getBaseRoute()}/teams/${teamID}/groups${buildQueryString({page, per_page: perPage, q, include_member_count: true, filter_allow_reference: filterAllowReference})}`,
             {method: 'get'}
         );
     };
 
-    getGroupsAssociatedToChannel = async (channelID: string, q = '', page = 0, perPage = PER_PAGE_DEFAULT, filterAllowReferences = false) => {
+    getGroupsAssociatedToChannel = async (channelID: string, q = '', page = 0, perPage = PER_PAGE_DEFAULT, filterAllowReference = false) => {
         this.trackEvent('api', 'api_groups_get_associated_to_channel', {channel_id: channelID});
 
         return this.doFetch(
-            `${this.getBaseRoute()}/channels/${channelID}/groups${buildQueryString({page, per_page: perPage, q, include_member_count: true, filter_allow_reference: filterAllowReferences})}`,
+            `${this.getBaseRoute()}/channels/${channelID}/groups${buildQueryString({page, per_page: perPage, q, include_member_count: true, filter_allow_reference: filterAllowReference})}`,
             {method: 'get'}
         );
     };
 
-    getAllGroupsAssociatedToTeam = async (teamID: string, filterAllowReferences = false) => {
+    getAllGroupsAssociatedToTeam = async (teamID: string, filterAllowReference = false) => {
         return this.doFetch(
-            `${this.getBaseRoute()}/teams/${teamID}/groups${buildQueryString({paginate: false, filter_allow_reference: filterAllowReferences})}`,
+            `${this.getBaseRoute()}/teams/${teamID}/groups${buildQueryString({paginate: false, filter_allow_reference: filterAllowReference})}`,
             {method: 'get'}
         );
     };
 
-    getAllGroupsAssociatedToChannelsInTeam = async (teamID: string, filterAllowReferences = false) => {
+    getAllGroupsAssociatedToChannelsInTeam = async (teamID: string, filterAllowReference = false) => {
         return this.doFetch(
-            `${this.getBaseRoute()}/teams/${teamID}/groupsforchannels${buildQueryString({paginate: false, filter_allow_reference: filterAllowReferences})}`,
+            `${this.getBaseRoute()}/teams/${teamID}/groupsbychannels${buildQueryString({paginate: false, filter_allow_reference: filterAllowReference})}`,
             {method: 'get'}
         );
     };
 
-    getAllGroupsAssociatedToChannel = async (channelID: string, filterAllowReferences = false) => {
+    getAllGroupsAssociatedToChannel = async (channelID: string, filterAllowReference = false) => {
         return this.doFetch(
-            `${this.getBaseRoute()}/channels/${channelID}/groups${buildQueryString({paginate: false, filter_allow_reference: filterAllowReferences})}`,
+            `${this.getBaseRoute()}/channels/${channelID}/groups${buildQueryString({paginate: false, filter_allow_reference: filterAllowReference})}`,
             {method: 'get'}
         );
     };

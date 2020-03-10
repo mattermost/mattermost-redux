@@ -171,12 +171,15 @@ export function getGroup(id: string): ActionFunc {
     });
 }
 
-export function getGroups(id: string): ActionFunc {
+export function getGroups(id: string, filterAllowReference: false): ActionFunc {
     return bindClientFunc({
-        clientFunc: Client4.getGroups,
+        clientFunc: async (param1, param2) => {
+            await Client4.getGroups(param1, param2);
+        },
         onSuccess: [GroupTypes.RECEIVED_GROUPS],
         params: [
             id,
+            filterAllowReference,
         ],
     });
 }
@@ -207,7 +210,7 @@ export function getGroupsNotAssociatedToChannel(channelID: string, q = '', page 
     });
 }
 
-export function getAllGroupsAssociatedToTeam(teamID: string, filterAllowReferences: false): ActionFunc {
+export function getAllGroupsAssociatedToTeam(teamID: string, filterAllowReference: false): ActionFunc {
     return bindClientFunc({
         clientFunc: async (param1, param2) => {
             const result = await Client4.getAllGroupsAssociatedToTeam(param1, param2);
@@ -217,12 +220,12 @@ export function getAllGroupsAssociatedToTeam(teamID: string, filterAllowReferenc
         onSuccess: [GroupTypes.RECEIVED_ALL_GROUPS_ASSOCIATED_TO_TEAM],
         params: [
             teamID,
-            filterAllowReferences,
+            filterAllowReference,
         ],
     });
 }
 
-export function getAllGroupsAssociatedToChannelsInTeam(teamID: string, filterAllowReferences: false): ActionFunc {
+export function getAllGroupsAssociatedToChannelsInTeam(teamID: string, filterAllowReference: false): ActionFunc {
     return bindClientFunc({
         clientFunc: async (param1, param2) => {
             const result = await Client4.getAllGroupsAssociatedToChannelsInTeam(param1, param2);
@@ -231,12 +234,12 @@ export function getAllGroupsAssociatedToChannelsInTeam(teamID: string, filterAll
         onSuccess: [GroupTypes.RECEIVED_ALL_GROUPS_ASSOCIATED_TO_CHANNELS_IN_TEAM],
         params: [
             teamID,
-            filterAllowReferences,
+            filterAllowReference,
         ],
     });
 }
 
-export function getAllGroupsAssociatedToChannel(channelID: string, filterAllowReferences: false): ActionFunc {
+export function getAllGroupsAssociatedToChannel(channelID: string, filterAllowReference: false): ActionFunc {
     return bindClientFunc({
         clientFunc: async (param1, param2) => {
             const result = await Client4.getAllGroupsAssociatedToChannel(param1, param2);
@@ -246,12 +249,12 @@ export function getAllGroupsAssociatedToChannel(channelID: string, filterAllowRe
         onSuccess: [GroupTypes.RECEIVED_ALL_GROUPS_ASSOCIATED_TO_CHANNEL],
         params: [
             channelID,
-            filterAllowReferences,
+            filterAllowReference,
         ],
     });
 }
 
-export function getGroupsAssociatedToTeam(teamID: string, q = '', page = 0, perPage: number = General.PAGE_SIZE_DEFAULT, filterAllowReferences: false): ActionFunc {
+export function getGroupsAssociatedToTeam(teamID: string, q = '', page = 0, perPage: number = General.PAGE_SIZE_DEFAULT, filterAllowReference: false): ActionFunc {
     return bindClientFunc({
         clientFunc: async (param1, param2, param3, param4, param5) => {
             const result = await Client4.getGroupsAssociatedToTeam(param1, param2, param3, param4, param5);
@@ -263,12 +266,12 @@ export function getGroupsAssociatedToTeam(teamID: string, q = '', page = 0, perP
             q,
             page,
             perPage,
-            filterAllowReferences,
+            filterAllowReference,
         ],
     });
 }
 
-export function getGroupsAssociatedToChannel(channelID: string, q = '', page = 0, perPage: number = General.PAGE_SIZE_DEFAULT, filterAllowReferences: false): ActionFunc {
+export function getGroupsAssociatedToChannel(channelID: string, q = '', page = 0, perPage: number = General.PAGE_SIZE_DEFAULT, filterAllowReference: false): ActionFunc {
     return bindClientFunc({
         clientFunc: async (param1, param2, param3, param4, param5) => {
             const result = await Client4.getGroupsAssociatedToChannel(param1, param2, param3, param4, param5);
@@ -280,7 +283,7 @@ export function getGroupsAssociatedToChannel(channelID: string, q = '', page = 0
             q,
             page,
             perPage,
-            filterAllowReferences,
+            filterAllowReference,
         ],
     });
 }
