@@ -46,8 +46,9 @@ export function getChannelMembersInChannels(state: GlobalState): RelationOneToOn
 
 export const getKnownUsers: (a: GlobalState) => Set<string> = createSelector(
     getChannelMembersInChannels,
-    (channelsMemberships: RelationOneToOne<Channel, UserIDMappedObjects<ChannelMembership>>): Set<string> => {
-        const knownUsers: Set<string> = new Set();
+    getCurrentUserId,
+    (channelsMemberships: RelationOneToOne<Channel, UserIDMappedObjects<ChannelMembership>>, currentUserId: string): Set<string> => {
+        const knownUsers: Set<string> = new Set([currentUserId]);
         for (const membersInChannel of Object.values(channelsMemberships)) {
             for (const member of Object.values(membersInChannel)) {
                 knownUsers.add(member.user_id);
