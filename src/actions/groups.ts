@@ -286,19 +286,12 @@ export function getGroupsAssociatedToChannel(channelID: string, q = '', page = 0
 }
 
 export function patchGroup(groupID: string, patch: GroupPatch): ActionFunc {
-    return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
-        let data;
-        try {
-            data = await Client4.patchGroup(groupID, patch);
-        } catch (error) {
-            forceLogoutIfNecessary(error, dispatch, getState);
-            return {error};
-        }
-
-        dispatch(batchActions([
-            {type: GroupTypes.PATCHED_GROUP, data},
-        ]));
-
-        return {data: true};
-    };
+    return bindClientFunc({
+        clientFunc: Client4.patchGroup,
+        onSuccess: [GroupTypes.PATCHED_GROUP],
+        params: [
+            groupID,
+            patch,
+        ],
+    });
 }

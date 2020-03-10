@@ -531,7 +531,8 @@ function groupsAssociatedToChannel(state: any = {}, action: GenericAction) {
                 for (const group of groupsByChannelId[channelID]) {
                     associatedGroupIDs.add(group.id);
                 }
-                nextState[channelID] = {ids: Array.from(associatedGroupIDs), totalCount: groupsByChannelId[channelID].length};
+                const ids = Array.from(associatedGroupIDs);
+                nextState[channelID] = {ids, totalCount: ids.length};
             }
         }
         return nextState;
