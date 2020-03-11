@@ -52,11 +52,11 @@ async function getProfilesAndStatusesForMembers(userIds: string[], dispatch: Dis
     await Promise.all(requests);
 }
 
-export function selectTeam(team: Team): ActionFunc {
+export function selectTeam(teamId: string): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         dispatch({
             type: TeamTypes.SELECT_TEAM,
-            data: team.id,
+            data: teamId,
         });
 
         return {data: true};
