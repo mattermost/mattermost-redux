@@ -42,7 +42,6 @@ function currentChannelId(state = '', action: GenericAction) {
     switch (action.type) {
     case ChannelTypes.SELECT_CHANNEL:
         return action.data;
-    case ChannelTypes.RESET_CURRENT_CHANNEL_ID:
     case UserTypes.LOGOUT_SUCCESS:
         return '';
     default:
@@ -52,7 +51,7 @@ function currentChannelId(state = '', action: GenericAction) {
 
 function channels(state: IDMappedObjects<Channel> = {}, action: GenericAction) {
     switch (action.type) {
-    case ChannelTypes.RECEIVED_CHANNEL: {
+    case ChannelTypes.RECEIVED_CHANNEL:
         if (state[action.data.id] && action.data.type === General.DM_CHANNEL) {
             action.data.display_name = action.data.display_name || state[action.data.id].display_name;
         }
@@ -60,7 +59,6 @@ function channels(state: IDMappedObjects<Channel> = {}, action: GenericAction) {
             ...state,
             [action.data.id]: action.data,
         };
-    }
     case ChannelTypes.RECEIVED_CHANNELS:
     case ChannelTypes.RECEIVED_ALL_CHANNELS:
     case SchemeTypes.RECEIVED_SCHEME_CHANNELS: {

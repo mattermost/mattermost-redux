@@ -63,7 +63,6 @@ export default keyMirror({
     UPDATE_CHANNEL_PURPOSE: null,
     CHANNEL_MEMBER_ADDED: null,
     CHANNEL_MEMBER_REMOVED: null,
-    RESET_CURRENT_CHANNEL_ID: null,
 
     INCREMENT_TOTAL_MSG_COUNT: null,
     INCREMENT_UNREAD_MSG_COUNT: null,
