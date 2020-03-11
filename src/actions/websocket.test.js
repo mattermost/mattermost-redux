@@ -525,7 +525,7 @@ describe('Actions.Websocket', () => {
     it('Websocket Handle Channel Deleted', (done) => {
         async function test() {
             const time = Date.now();
-            await store.dispatch(TeamActions.selectTeam(TestHelper.basicTeam.id));
+            await store.dispatch(TeamActions.selectTeam(TestHelper.basicTeam));
             await store.dispatch(ChannelActions.selectChannel(TestHelper.basicChannel.id));
 
             store.dispatch({type: ChannelTypes.RECEIVED_CHANNEL, data: {id: TestHelper.generateId(), name: General.DEFAULT_CHANNEL, team_id: TestHelper.basicTeam.id, display_name: General.DEFAULT_CHANNEL}});
@@ -564,7 +564,7 @@ describe('Actions.Websocket', () => {
     });
 
     it('Websocket Handle Channel Unarchive', async (done) => {
-        await store.dispatch(TeamActions.selectTeam(TestHelper.basicTeam.id));
+        await store.dispatch(TeamActions.selectTeam(TestHelper.basicTeam));
         await store.dispatch(ChannelActions.selectChannel(TestHelper.basicChannel.id));
 
         store.dispatch({type: ChannelTypes.RECEIVED_CHANNEL, data: {id: TestHelper.generateId(), name: General.DEFAULT_CHANNEL, team_id: TestHelper.basicTeam.id, display_name: General.DEFAULT_CHANNEL}});
