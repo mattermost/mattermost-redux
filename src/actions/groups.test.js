@@ -521,7 +521,6 @@ describe('Actions.Groups', () => {
     it('getAllGroupsAssociatedToChannelsInTeam', async () => {
         const teamID = 'ge63nq31sbfy3duzq5f7yqn1kh';
         const channelID1 = '5rgoajywb3nfbdtyafbod47ryb';
-        const channelID2 = 'o3tdawqxot8kikzq8bk54zggbc';
 
         const response = {
             groups: {
@@ -578,14 +577,12 @@ describe('Actions.Groups', () => {
         };
 
         nock(Client4.getBaseRoute()).
-            get(`/teams/${teamID}/groupsbychannels?paginate=false&filter_allow_reference=false`).
+            get(`/teams/${teamID}/groups_by_channels?paginate=false&filter_allow_reference=false`).
             reply(200, response);
 
         await Actions.getAllGroupsAssociatedToChannelsInTeam(teamID)(store.dispatch, store.getState);
 
         const state = store.getState();
-
-        console.log(state.entities.channels.groupsAssociatedToChannel);
 
         const groupIDs = state.entities.channels.groupsAssociatedToChannel[channelID1].ids;
         assert.strictEqual(groupIDs.length, response.groups[channelID1].length);

@@ -2888,7 +2888,7 @@ export default class Client4 {
 
     getAllGroupsAssociatedToChannelsInTeam = async (teamID: string, filterAllowReference = false) => {
         return this.doFetch(
-            `${this.getBaseRoute()}/teams/${teamID}/groupsbychannels${buildQueryString({paginate: false, filter_allow_reference: filterAllowReference})}`,
+            `${this.getBaseRoute()}/teams/${teamID}/groups_by_channels${buildQueryString({paginate: false, filter_allow_reference: filterAllowReference})}`,
             {method: 'get'}
         );
     };

@@ -201,11 +201,9 @@ function groups(state: Dictionary<Group> = {}, action: GenericAction) {
         const nextState = {...state};
 
         const {groupsByChannelId} = action.data;
-        for (const channelID in groupsByChannelId) {
-            if (groupsByChannelId.hasOwnProperty(channelID) && groupsByChannelId[channelID]) {
-                for (const group of groupsByChannelId[channelID]) {
-                    nextState[group.id] = group;
-                }
+        for (const channelID of groupsByChannelId) {
+            for (const group of groupsByChannelId[channelID]) {
+                nextState[group.id] = group;
             }
         }
         return nextState;
