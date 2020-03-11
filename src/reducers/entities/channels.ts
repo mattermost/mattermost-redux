@@ -525,13 +525,15 @@ function groupsAssociatedToChannel(state: any = {}, action: GenericAction) {
         const {groupsByChannelId} = action.data;
         const nextState = {...state};
 
-        for (const channelID of groupsByChannelId) {
-            const associatedGroupIDs = new Set<string>([]);
-            for (const group of groupsByChannelId[channelID]) {
-                associatedGroupIDs.add(group.id);
+        for (const channelID of Object.keys(groupsByChannelId)) {
+            if (groupsByChannelId[channelID]) {
+                const associatedGroupIDs = new Set<string>([]);
+                for (const group of groupsByChannelId[channelID]) {
+                    associatedGroupIDs.add(group.id);
+                }
+                const ids = Array.from(associatedGroupIDs);
+                nextState[channelID] = {ids, totalCount: ids.length};
             }
-            const ids = Array.from(associatedGroupIDs);
-            nextState[channelID] = {ids, totalCount: ids.length};
         }
         return nextState;
     }

@@ -521,6 +521,7 @@ describe('Actions.Groups', () => {
     it('getAllGroupsAssociatedToChannelsInTeam', async () => {
         const teamID = 'ge63nq31sbfy3duzq5f7yqn1kh';
         const channelID1 = '5rgoajywb3nfbdtyafbod47ryb';
+        const channelID2 = 'o3tdawqxot8kikzq8bk54zggbc';
 
         const response = {
             groups: {

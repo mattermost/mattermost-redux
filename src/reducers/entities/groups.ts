@@ -199,11 +199,13 @@ function groups(state: Dictionary<Group> = {}, action: GenericAction) {
     }
     case GroupTypes.RECEIVED_ALL_GROUPS_ASSOCIATED_TO_CHANNELS_IN_TEAM: {
         const nextState = {...state};
-
         const {groupsByChannelId} = action.data;
-        for (const channelID of groupsByChannelId) {
-            for (const group of groupsByChannelId[channelID]) {
-                nextState[group.id] = group;
+
+        for (const channelID of Object.keys(groupsByChannelId)) {
+            if (groupsByChannelId[channelID]) {
+                for (const group of groupsByChannelId[channelID]) {
+                    nextState[group.id] = group;
+                }
             }
         }
         return nextState;
