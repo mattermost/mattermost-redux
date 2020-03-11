@@ -14,7 +14,7 @@ export function pushNotificationAlert(message: string): ActionFunc {
             message,
         };
 
-        dispatch({type: AlertTypes.PUSH_ALERT, data: notificationAlert}, getState);
+        dispatch({type: AlertTypes.PUSH_ALERT, data: notificationAlert});
 
         return {data: true};
     };
@@ -27,7 +27,7 @@ export function pushDeveloperAlert(message: string): ActionFunc {
             message,
         };
 
-        dispatch({type: AlertTypes.PUSH_ALERT, data: developerAlert}, getState);
+        dispatch({type: AlertTypes.PUSH_ALERT, data: developerAlert});
 
         return {data: true};
     };
@@ -40,7 +40,7 @@ export function pushErrorAlert(message: string): ActionFunc {
             message,
         };
 
-        dispatch({type: AlertTypes.PUSH_ALERT, data: errorAlert}, getState);
+        dispatch({type: AlertTypes.PUSH_ALERT, data: errorAlert});
 
         return {data: true};
     };
@@ -48,7 +48,7 @@ export function pushErrorAlert(message: string): ActionFunc {
 
 export function clearLatestAlert(): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
-        dispatch({type: AlertTypes.CLEAR_ALERT, data: null}, getState);
+        dispatch({type: AlertTypes.CLEAR_ALERT, data: null});
 
         return {data: true};
     };

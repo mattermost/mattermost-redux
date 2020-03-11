@@ -1,11 +1,12 @@
 {
     "extends": [
-        "./node_modules/eslint-config-mattermost/.eslintrc.json",
+        "plugin:mattermost/base",
         "plugin:@typescript-eslint/eslint-recommended",
         "plugin:@typescript-eslint/recommended"
     ],
     "parser": "@typescript-eslint/parser",
     "plugins": [
+        "mattermost",
         "@typescript-eslint"
     ],
     "env": {
