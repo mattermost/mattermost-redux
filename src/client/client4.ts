@@ -3070,7 +3070,8 @@ export default class Client4 {
 
     trackEvent(category: string, event: string, props?: any) {
         // Temporary change to allow only certain events to reduce data rate - see MM-13062
-        if (![
+        // All events in 'admin' category are allowed, since they are low-volume
+        if (category !== 'admin' && ![
             'api_posts_create',
             'api_interactive_messages_button_clicked',
             'api_interactive_messages_menu_selected',
