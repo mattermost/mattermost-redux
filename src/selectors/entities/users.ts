@@ -119,36 +119,38 @@ export type UserMentionKey= {
     caseSensitive?: boolean;
 }
 
-export const getCurrentUserMentionKeys: (a: GlobalState) => Array<UserMentionKey> = createSelector(getCurrentUser, (user: UserProfile) => {
-    let keys: UserMentionKey[] = [];
+export const getCurrentUserMentionKeys: (a: GlobalState) => Array<UserMentionKey> = createSelector(
+    getCurrentUser,
+    (user: UserProfile) => {
+        let keys: UserMentionKey[] = [];
 
-    if (!user || !user.notify_props) {
+        if (!user || !user.notify_props) {
+            return keys;
+        }
+
+        if (user.notify_props.mention_keys) {
+            keys = keys.concat(user.notify_props.mention_keys.split(',').map((key) => {
+                return {key};
+            }));
+        }
+
+        if (user.notify_props.first_name === 'true' && user.first_name) {
+            keys.push({key: user.first_name, caseSensitive: true});
+        }
+
+        if (user.notify_props.channel === 'true') {
+            keys.push({key: '@channel'});
+            keys.push({key: '@all'});
+            keys.push({key: '@here'});
+        }
+
+        const usernameKey = '@' + user.username;
+        if (keys.findIndex((key) => key.key === usernameKey) === -1) {
+            keys.push({key: usernameKey});
+        }
+
         return keys;
     }
-
-    if (user.notify_props.mention_keys) {
-        keys = keys.concat(user.notify_props.mention_keys.split(',').map((key) => {
-            return {key};
-        }));
-    }
-
-    if (user.notify_props.first_name === 'true' && user.first_name) {
-        keys.push({key: user.first_name, caseSensitive: true});
-    }
-
-    if (user.notify_props.channel === 'true') {
-        keys.push({key: '@channel'});
-        keys.push({key: '@all'});
-        keys.push({key: '@here'});
-    }
-
-    const usernameKey = '@' + user.username;
-    if (keys.findIndex((key) => key.key === usernameKey) === -1) {
-        keys.push({key: usernameKey});
-    }
-
-    return keys;
-}
 );
 
 export const getProfileSetInCurrentChannel: (a: GlobalState) => Array<$ID<UserProfile>> = createSelector(

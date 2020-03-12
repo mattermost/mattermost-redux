@@ -6,6 +6,7 @@ import {Group} from 'types/groups';
 import {filterGroupsMatchingTerm} from 'utils/group_utils';
 import {getChannel} from 'selectors/entities/channels';
 import {getTeam} from 'selectors/entities/teams';
+import {UserMentionKey} from 'selectors/entities/users';
 
 const emptyList: any[] = [];
 const emptySyncables = {
@@ -145,6 +146,15 @@ export const getAllAssociatedGroupsForReference = reselect.createSelector(
     getAllGroups,
     (allGroups) => {
         return Object.entries(allGroups).filter((entry) => entry[1].allow_reference).map((entry) => entry[1]);
+    }
+);
+
+export const getCurrentUserGroupMentionKeys = reselect.createSelector(
+    getAllAssociatedGroupsForReference,
+    (groups: Array<Group>) => {
+        const keys: UserMentionKey[] = [];
+        groups.forEach((group) => keys.push({key: `@${group.name}`}));
+        return keys;
     }
 );
 

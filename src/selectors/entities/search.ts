@@ -4,6 +4,8 @@
 import * as reselect from 'reselect';
 
 import {getCurrentTeamId} from 'selectors/entities/teams';
+import {getCurrentUserMentionKeys} from 'selectors/entities/users';
+import {getCurrentUserGroupMentionKeys} from 'selectors/entities/groups';
 
 import * as types from 'types';
 
@@ -12,5 +14,13 @@ export const getCurrentSearchForCurrentTeam = reselect.createSelector(
     getCurrentTeamId,
     (current, teamId) => {
         return current[teamId];
+    }
+);
+
+export const getAllUserMentionKeys = reselect.createSelector(
+    getCurrentUserMentionKeys,
+    getCurrentUserGroupMentionKeys,
+    (userMentionKeys, groupMentionKeys) => {
+        return userMentionKeys.concat(groupMentionKeys);
     }
 );
