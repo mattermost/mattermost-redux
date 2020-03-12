@@ -3094,6 +3094,7 @@ export default class Client4 {
             'click_next',
             'click_finish',
             'click_dismiss_bar',
+            'diagnostics_disabled',
         ].includes(event)) {
             return;
         }
