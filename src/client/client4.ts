@@ -3081,6 +3081,7 @@ export default class Client4 {
             'ui_marketplace_opened',
             'ui_marketplace_closed',
             'ui_marketplace_search',
+            'diagnostics_disabled',
         ].includes(event)) {
             return;
         }
