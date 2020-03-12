@@ -64,7 +64,7 @@ describe('Actions.Posts', () => {
         assert.ok(!postsInChannel[channelId], 'postIds in channel do not exist');
     });
 
-    it('maintain reply_count', async () => {
+    it('maintain postReplies', async () => {
         const channelId = TestHelper.basicChannel.id;
         const post = TestHelper.fakePostWithId(channelId);
         const post2 = TestHelper.fakePostWithId(channelId);
@@ -83,12 +83,12 @@ describe('Actions.Posts', () => {
 
         await Actions.createPost(post2)(store.dispatch, store.getState);
 
-        assert.equal(store.getState().entities.posts.posts[post.id].reply_count, 1);
+        assert.equal(store.getState().entities.posts.postsReplies[post.id], 1);
 
         await Actions.deletePost(post2)(store.dispatch, store.getState);
         await Actions.removePost(post2)(store.dispatch, store.getState);
 
-        assert.equal(store.getState().entities.posts.posts[post.id].reply_count, 0);
+        assert.equal(store.getState().entities.posts.postsReplies[post.id], 0);
         nock.cleanAll();
     });
 
@@ -438,7 +438,7 @@ describe('Actions.Posts', () => {
         };
 
         nock(Client4.getBaseRoute()).
-            get(`/posts/${post.id}/thread?fetchThreads=true`).
+            get(`/posts/${post.id}/thread?skipFetchThreads=false`).
             reply(200, postList);
         await Actions.getPostThread(post.id)(store.dispatch, store.getState);
 
@@ -1212,7 +1212,7 @@ describe('Actions.Posts', () => {
         postList.posts[post1.id] = post1;
 
         nock(Client4.getBaseRoute()).
-            get(`/posts/${post1.id}/thread?fetchThreads=true`).
+            get(`/posts/${post1.id}/thread?skipFetchThreads=false`).
             reply(200, postList);
         await Actions.getPostThread(post1.id)(dispatch, getState);
 
@@ -1241,7 +1241,7 @@ describe('Actions.Posts', () => {
         postList.posts[post1.id] = post1;
 
         nock(Client4.getBaseRoute()).
-            get(`/posts/${post1.id}/thread?fetchThreads=true`).
+            get(`/posts/${post1.id}/thread?skipFetchThreads=false`).
             reply(200, postList);
         await Actions.getPostThread(post1.id)(dispatch, getState);
 
@@ -1676,7 +1676,7 @@ describe('Actions.Posts', () => {
             };
 
             nock(Client4.getBaseRoute()).
-                get(`/posts/${post1.id}/thread?fetchThreads=true`).
+                get(`/posts/${post1.id}/thread?skipFetchThreads=false`).
                 reply(200, threadList);
         });
 
