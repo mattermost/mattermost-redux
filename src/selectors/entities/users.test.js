@@ -148,6 +148,9 @@ describe('Selectors.Users', () => {
                             [userId]: {id: userId, username: 'user', first_name: 'First', last_name: 'Last', notify_props: notifyProps},
                         },
                     },
+                    groups: {
+                        groups: {},
+                    },
                 },
             };
 
@@ -166,6 +169,9 @@ describe('Selectors.Users', () => {
                         profiles: {
                             [userId]: {id: userId, username: 'user', first_name: 'First', last_name: 'Last', notify_props: notifyProps},
                         },
+                    },
+                    groups: {
+                        groups: {},
                     },
                 },
             };
@@ -186,6 +192,9 @@ describe('Selectors.Users', () => {
                             [userId]: {id: userId, username: 'user', first_name: 'First', last_name: 'Last', notify_props: notifyProps},
                         },
                     },
+                    groups: {
+                        groups: {},
+                    },
                 },
             };
 
@@ -204,6 +213,9 @@ describe('Selectors.Users', () => {
                         profiles: {
                             [userId]: {id: userId, username: 'user', first_name: 'First', last_name: 'Last', notify_props: notifyProps},
                         },
+                    },
+                    groups: {
+                        groups: {},
                     },
                 },
             };
