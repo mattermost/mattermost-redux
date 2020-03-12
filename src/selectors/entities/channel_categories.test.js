@@ -61,7 +61,7 @@ describe('makeGetChannelsForAllCategories', () => {
     const dmChannel1 = {id: 'dmChannel1', team_id: ''};
     const gmChannel1 = {id: 'gmChannel1', team_id: ''};
 
-    const state = {
+    const baseState = {
         entities: {
             channels: {
                 channels: {
@@ -71,6 +71,13 @@ describe('makeGetChannelsForAllCategories', () => {
                     dmChannel1,
                     gmChannel1,
                 },
+                myMembers: {
+                    [channel1.id]: {},
+                    [channel2.id]: {},
+                    [channel3.id]: {},
+                    [dmChannel1.id]: {},
+                    [gmChannel1.id]: {},
+                },
             },
         },
     };
@@ -78,27 +85,61 @@ describe('makeGetChannelsForAllCategories', () => {
     test('should return channels on the team and DMs/GMs', () => {
         const getChannelsForAllCategories = Selectors.makeGetChannelsForAllCategories();
 
-        expect(getChannelsForAllCategories(state, 'team1')).toMatchObject([channel1, channel2, dmChannel1, gmChannel1]);
+        expect(getChannelsForAllCategories(baseState, 'team1')).toMatchObject([channel1, channel2, dmChannel1, gmChannel1]);
 
-        expect(getChannelsForAllCategories(state, 'team2')).toMatchObject([channel3, dmChannel1, gmChannel1]);
+        expect(getChannelsForAllCategories(baseState, 'team2')).toMatchObject([channel3, dmChannel1, gmChannel1]);
+    });
+
+    test('should not return channels which the user is not a member of', () => {
+        const channel4 = {id: 'channel4', team_id: 'team1'};
+
+        const getChannelsForAllCategories = Selectors.makeGetChannelsForAllCategories();
+
+        let state = {
+            entities: {
+                channels: {
+                    channels: {
+                        channel4,
+                    },
+                    myMembers: {},
+                },
+            },
+        };
+
+        expect(getChannelsForAllCategories(state, 'team1')).not.toContain(channel4);
+
+        state = {
+            entities: {
+                channels: {
+                    channels: {
+                        channel4,
+                    },
+                    myMembers: {
+                        [channel4.id]: {},
+                    },
+                },
+            },
+        };
+
+        expect(getChannelsForAllCategories(state, 'team1')).toContain(channel4);
     });
 
     test('should memoize properly', () => {
         const getChannelsForAllCategories = Selectors.makeGetChannelsForAllCategories();
 
-        const result = getChannelsForAllCategories(state, 'team1');
+        const result = getChannelsForAllCategories(baseState, 'team1');
 
         // Repeat calls should return the same array
-        expect(getChannelsForAllCategories(state, 'team1')).toBe(result);
+        expect(getChannelsForAllCategories(baseState, 'team1')).toBe(result);
 
         // Calls to a difference instance of the selector won't return the same array
-        expect(result).not.toBe(Selectors.makeGetChannelsForAllCategories()(state, 'team1'));
+        expect(result).not.toBe(Selectors.makeGetChannelsForAllCategories()(baseState, 'team1'));
 
         // Calls with different arguments won't return the same array
-        expect(getChannelsForAllCategories(state, 'team2')).not.toBe(result);
+        expect(getChannelsForAllCategories(baseState, 'team2')).not.toBe(result);
 
         // Calls after different argumetns won't return the same array
-        expect(getChannelsForAllCategories(state, 'team1')).not.toBe(result);
+        expect(getChannelsForAllCategories(baseState, 'team1')).not.toBe(result);
     });
 });
 
@@ -444,6 +485,14 @@ describe('makeGetChannelsForCategory', () => {
                     dmChannel1,
                     dmChannel2,
                     gmChannel1,
+                },
+                myMembers: {
+                    [channel1.id]: {},
+                    [channel2.id]: {},
+                    [channel3.id]: {},
+                    [dmChannel1.id]: {},
+                    [dmChannel2.id]: {},
+                    [gmChannel1.id]: {},
                 },
             },
             general: {
