@@ -174,7 +174,8 @@ export function getGroup(id: string): ActionFunc {
 export function getGroups(filterAllowReference: false): ActionFunc {
     return bindClientFunc({
         clientFunc: async (param1) => {
-            await Client4.getGroups(param1);
+            const result = await Client4.getGroups(param1);
+            return result;
         },
         onSuccess: [GroupTypes.RECEIVED_GROUPS],
         params: [

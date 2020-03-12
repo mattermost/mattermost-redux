@@ -293,6 +293,58 @@ describe('Actions.Groups', () => {
         assert.ok(syncables[groupID].channels.length === beforeChannelsLength - 1);
     });
 
+    it('getGroups', async () => {
+        const response1 = {
+            groups: [
+                {
+                    id: 'xh585kyz3tn55q6ipfo57btwnc',
+                    name: '9uobsi3xb3y5tfjb3ze7umnh1o',
+                    display_name: 'abc',
+                    description: '',
+                    source: 'ldap',
+                    remote_id: 'abc',
+                    create_at: 1553808969975,
+                    update_at: 1553808969975,
+                    delete_at: 0,
+                    has_syncables: false,
+                    member_count: 2,
+                    allow_reference: true,
+                },
+                {
+                    id: 'qhdp6g7aubbpiyja7c4sgpe7tc',
+                    name: 'x5bjwa4kwirpmqudhp5dterine',
+                    display_name: 'qa',
+                    description: '',
+                    source: 'ldap',
+                    remote_id: 'qa',
+                    create_at: 1553808971548,
+                    update_at: 1553808971548,
+                    delete_at: 0,
+                    has_syncables: false,
+                    member_count: 2,
+                    allow_reference: true,
+                },
+            ],
+            total_group_count: 2,
+        };
+
+        nock(Client4.getBaseRoute()).
+            get('/groups?filter_allow_reference=true').
+            reply(200, response1.groups);
+
+        await Actions.getGroups(true)(store.dispatch, store.getState);
+
+        const state = store.getState();
+
+        const groups = state.entities.groups.groups;
+        assert.ok(groups);
+        assert.strictEqual(response1.length, groups.length);
+        for (const id of Object.keys(groups)) {
+            const index = Object.keys(groups).indexOf(id);
+            assert.ok(JSON.stringify(groups[id]) === JSON.stringify(response1.groups[index]));
+        }
+    });
+
     it('getAllGroupsAssociatedToTeam', async () => {
         const teamID = '5rgoajywb3nfbdtyafbod47ryb';
 
@@ -310,6 +362,7 @@ describe('Actions.Groups', () => {
                     delete_at: 0,
                     has_syncables: false,
                     member_count: 2,
+                    allow_reference: false,
                 },
                 {
                     id: 'tnd8zod9f3fdtqosxjmhwucbth',
@@ -323,6 +376,7 @@ describe('Actions.Groups', () => {
                     delete_at: 0,
                     has_syncables: false,
                     member_count: 8,
+                    allow_reference: false,
                 },
                 {
                     id: 'qhdp6g7aubbpiyja7c4sgpe7tc',
@@ -336,6 +390,7 @@ describe('Actions.Groups', () => {
                     delete_at: 0,
                     has_syncables: false,
                     member_count: 2,
+                    allow_reference: false,
                 },
             ],
             total_group_count: 3,
@@ -373,6 +428,7 @@ describe('Actions.Groups', () => {
                     delete_at: 0,
                     has_syncables: false,
                     member_count: 8,
+                    allow_reference: true,
                 },
                 {
                     id: 'qhdp6g7aubbpiyja7c4sgpe7tc',
@@ -386,6 +442,7 @@ describe('Actions.Groups', () => {
                     delete_at: 0,
                     has_syncables: false,
                     member_count: 2,
+                    allow_reference: false,
                 },
             ],
             total_group_count: 3,
@@ -523,7 +580,7 @@ describe('Actions.Groups', () => {
         const channelID1 = '5rgoajywb3nfbdtyafbod47ryb';
         const channelID2 = 'o3tdawqxot8kikzq8bk54zggbc';
 
-        const response = {
+        const response1 = {
             groups: {
                 '5rgoajywb3nfbdtyafbod47ryb':
                 [
@@ -539,7 +596,7 @@ describe('Actions.Groups', () => {
                         delete_at: 0,
                         has_syncables: false,
                         member_count: 2,
-                        allow_reference: false,
+                        allow_reference: true,
                     },
                     {
                         id: 'tnd8zod9f3fdtqosxjmhwucbth',
@@ -577,18 +634,55 @@ describe('Actions.Groups', () => {
             total_group_count: 3,
         };
 
+        const response2 = {
+            groups: {
+                '5rgoajywb3nfbdtyafbod47ryb':
+                [
+                    {
+                        id: 'xh585kyz3tn55q6ipfo57btwnc',
+                        name: '9uobsi3xb3y5tfjb3ze7umnh1o',
+                        display_name: 'abc',
+                        description: '',
+                        source: 'ldap',
+                        remote_id: 'abc',
+                        create_at: 1553808969975,
+                        update_at: 1553808969975,
+                        delete_at: 0,
+                        has_syncables: false,
+                        member_count: 2,
+                        allow_reference: true,
+                    },
+                ],
+            },
+            total_group_count: 1,
+        };
+
         nock(Client4.getBaseRoute()).
             get(`/teams/${teamID}/groups_by_channels?paginate=false&filter_allow_reference=false`).
-            reply(200, response);
+            reply(200, response1);
 
-        await Actions.getAllGroupsAssociatedToChannelsInTeam(teamID)(store.dispatch, store.getState);
+        nock(Client4.getBaseRoute()).
+            get(`/teams/${teamID}/groups_by_channels?paginate=false&filter_allow_reference=true`).
+            reply(200, response2);
 
-        const state = store.getState();
+        await Actions.getAllGroupsAssociatedToChannelsInTeam(teamID, false)(store.dispatch, store.getState);
 
-        const groupIDs = state.entities.channels.groupsAssociatedToChannel[channelID1].ids;
-        assert.strictEqual(groupIDs.length, response.groups[channelID1].length);
+        let state = store.getState();
+
+        let groupIDs = state.entities.channels.groupsAssociatedToChannel[channelID1].ids;
+        assert.strictEqual(groupIDs.length, response1.groups[channelID1].length);
         groupIDs.forEach((id) => {
-            assert.ok(response.groups[channelID1].map((group) => group.id).includes(id));
+            assert.ok(response1.groups[channelID1].map((group) => group.id).includes(id));
+        });
+
+        await Actions.getAllGroupsAssociatedToChannelsInTeam(teamID, true)(store.dispatch, store.getState);
+
+        state = store.getState();
+
+        groupIDs = state.entities.channels.groupsAssociatedToChannel[channelID1].ids;
+        assert.strictEqual(groupIDs.length, response2.groups[channelID1].length);
+        groupIDs.forEach((id) => {
+            assert.ok(response2.groups[channelID1].map((group) => group.id).includes(id));
         });
     });
 
@@ -609,6 +703,7 @@ describe('Actions.Groups', () => {
                     delete_at: 0,
                     has_syncables: false,
                     member_count: 8,
+                    allow_reference: false,
                 },
                 {
                     id: 'qhdp6g7aubbpiyja7c4sgpe7tc',
@@ -622,6 +717,7 @@ describe('Actions.Groups', () => {
                     delete_at: 0,
                     has_syncables: false,
                     member_count: 2,
+                    allow_reference: true,
                 },
             ],
             total_group_count: 3,
