@@ -46,6 +46,7 @@ export function makeGetChannelsForAllCategories(): (state: GlobalState, teamId: 
         (state: GlobalState, teamId: string) => teamId,
         (allChannels: IDMappedObjects<Channel>, myMembers: RelationOneToOne<Channel, ChannelMembership>, teamId: string) => {
             return Object.values(allChannels).
+                filter((channel) => channel.delete_at === 0).
                 filter((channel) => channel.team_id === teamId || channel.team_id === '').
                 filter((channel) => myMembers.hasOwnProperty(channel.id));
         }
