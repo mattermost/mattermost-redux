@@ -294,9 +294,9 @@ describe('Actions.Posts', () => {
         assert.ok(!reactions[post1.id]);
     });
 
-    it('removePost', async () => {
+    it.only('removePost', async () => {
         const post1 = {id: 'post1', channel_id: 'channel1', create_at: 1001, message: ''};
-        const post2 = {id: 'post2', channel_id: 'channel1', create_at: 1002, message: ''};
+        const post2 = {id: 'post2', channel_id: 'channel1', create_at: 1002, message: '', is_pinned: true};
         const post3 = {id: 'post3', channel_id: 'channel1', root_id: 'post2', create_at: 1003, message: ''};
         const post4 = {id: 'post4', channel_id: 'channel1', root_id: 'post1', create_at: 1004, message: ''};
 
@@ -319,12 +319,21 @@ describe('Actions.Posts', () => {
                         post2: ['post3'],
                     },
                 },
+                channels: {
+                    stats: {
+                        channel1: {
+                            pinnedpost_count: 2,
+                        },
+                    },
+                },
             },
         });
 
         await store.dispatch(Actions.removePost(post2));
 
         const state = store.getState();
+        const {stats} = state.entities.channels;
+        const pinned_post_count = stats.channel1.pinnedpost_count;
 
         expect(state.entities.posts.posts).toEqual({
             post1,
@@ -338,6 +347,7 @@ describe('Actions.Posts', () => {
         expect(state.entities.posts.postsInThread).toEqual({
             post1: ['post4'],
         });
+        expect(pinned_post_count).toEqual(1);
     });
 
     it('removePostWithReaction', async () => {

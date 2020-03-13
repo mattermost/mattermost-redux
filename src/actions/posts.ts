@@ -1079,6 +1079,14 @@ export function removePost(post: ExtendedPost) {
             }
         } else {
             dispatch(postRemoved(post));
+            if (post.is_pinned) {
+                dispatch(
+                    {
+                        type: ChannelTypes.DECREMENT_PINNED_POST_COUNT,
+                        id: post.channel_id,
+                    }
+                );
+            }
         }
     };
 }
