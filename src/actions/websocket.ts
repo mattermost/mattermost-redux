@@ -764,41 +764,46 @@ function handleHelloEvent(msg: WebSocketMessage) {
     }
 }
 
-function handleUserTypingEvent(msg: WebSocketMessage) {
+export function handleUserTypingEvent(msg: WebSocketMessage) {
     return (dispatch: DispatchFunc, getState: GetStateFunc) => {
         const state = getState();
-        const profiles = getUsers(state);
-        const statuses = getUserStatuses(state);
-        const currentUserId = getCurrentUserId(state);
-        const config = getConfig(state);
-        const userId = msg.data.user_id;
+        const currentChannelId = getCurrentChannelId(state);
 
-        const data = {
-            id: msg.broadcast.channel_id + msg.data.parent_id,
-            userId,
-            now: Date.now(),
-        };
+        if (currentChannelId === msg.broadcast.channel_id) {
+            const profiles = getUsers(state);
+            const statuses = getUserStatuses(state);
+            const currentUserId = getCurrentUserId(state);
+            const config = getConfig(state);
+            const userId = msg.data.user_id;
 
-        dispatch({
-            type: WebsocketEvents.TYPING,
-            data,
-        });
+            const data = {
+                id: msg.broadcast.channel_id + msg.data.parent_id,
+                userId,
+                now: Date.now(),
+            };
 
-        setTimeout(() => {
             dispatch({
-                type: WebsocketEvents.STOP_TYPING,
+                type: WebsocketEvents.TYPING,
                 data,
             });
-        }, parseInt(config.TimeBetweenUserTypingUpdatesMilliseconds!, 10));
 
-        if (!profiles[userId] && userId !== currentUserId) {
-            dispatch(getProfilesByIds([userId]));
+            setTimeout(() => {
+                dispatch({
+                    type: WebsocketEvents.STOP_TYPING,
+                    data,
+                });
+            }, parseInt(config.TimeBetweenUserTypingUpdatesMilliseconds!, 10));
+
+            if (!profiles[userId] && userId !== currentUserId) {
+                dispatch(getProfilesByIds([userId]));
+            }
+
+            const status = statuses[userId];
+            if (status !== General.ONLINE) {
+                dispatch(getStatusesByIds([userId]));
+            }
         }
 
-        const status = statuses[userId];
-        if (status !== General.ONLINE) {
-            dispatch(getStatusesByIds([userId]));
-        }
         return {data: true};
     };
 }
