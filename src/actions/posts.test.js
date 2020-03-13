@@ -1159,7 +1159,9 @@ describe('Actions.Posts', () => {
             mention_count: 1,
         });
 
-        await store.dispatch(Actions.setUnreadPost(userId, postId));
+        const post = {id: postId};
+
+        await store.dispatch(Actions.setUnreadPost(userId, post));
         const state = store.getState();
 
         assert.equal(state.entities.channels.channels[channelId].total_msg_count, 10);
