@@ -417,10 +417,9 @@ export function getUnreadPostData(unreadChan: ChannelUnread, state: GlobalState)
     return data;
 }
 
-export function setUnreadPost(userId: string, postId: string) {
+export function setUnreadPost(userId: string, post: ExtendedPost) {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         let state = getState();
-        const post = Selectors.getPost(state, postId);
         let unreadChan;
 
         dispatch({
@@ -429,9 +428,11 @@ export function setUnreadPost(userId: string, postId: string) {
                 channelId: post.channel_id,
             },
         });
-
         try {
-            unreadChan = await Client4.markPostAsUnread(userId, postId);
+            if (post.system_post_ids) {
+                return {};
+            }
+            unreadChan = await Client4.markPostAsUnread(userId, post.id);
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch, getState);
             dispatch(logError(error));
