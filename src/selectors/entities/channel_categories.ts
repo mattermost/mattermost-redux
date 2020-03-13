@@ -2,6 +2,7 @@
 // See LICENSE.txt for license information.
 
 import {createSelector} from 'reselect';
+import shallowEquals from 'shallow-equals';
 
 import {General, Preferences} from '../../constants';
 import {CategoryTypes} from '../../constants/channel_categories';
@@ -40,7 +41,7 @@ export function makeGetCategoriesForTeam(): (state: GlobalState, teamId: string)
     );
 }
 
-export function makeGetChannelsForAllCategories(): (state: GlobalState, teamId: string) => Channel[] {
+export function makeGetUnsortedUnfilteredChannels(): (state: GlobalState, teamId: string) => Channel[] {
     return createSelector(
         (state: GlobalState) => state.entities.channels.channels,
         getMyChannelMemberships,
@@ -285,25 +286,33 @@ export function makeSortChannelsByNameWithDMs(): (state: GlobalState, channels: 
 }
 
 export function makeGetChannelsForCategory() {
-    const getChannelsForAllCategories = makeGetChannelsForAllCategories();
-    const filterChannelsByFavorites = makeFilterChannelsByFavorites();
+    const getUnsortedUnfilteredChannels = makeGetUnsortedUnfilteredChannels();
+    const filterAndSortChannelsForCategory = makeFilterAndSortChannelsForCategory();
 
+    return (state: GlobalState, category: ChannelCategory) => {
+        const channels = getUnsortedUnfilteredChannels(state, category.team_id);
+
+        return filterAndSortChannelsForCategory(state, channels, category);
+    };
+}
+
+export function makeFilterAndSortChannelsForCategory() {
+    const filterChannelsByFavorites = makeFilterChannelsByFavorites();
     const filterChannelsByType = makeFilterChannelsByType();
+
     const filterAutoclosedDMs = makeFilterAutoclosedDMs();
     const filterManuallyClosedDMs = makeFilterManuallyClosedDMs();
 
     const sortChannelsByName = makeSortChannelsByName();
     const sortChannelsByNameWithDMs = makeSortChannelsByNameWithDMs();
 
-    return (state: GlobalState, category: ChannelCategory) => {
-        let channels = getChannelsForAllCategories(state, category.team_id);
+    return (state: GlobalState, originalChannels: Channel[], category: ChannelCategory) => {
+        let channels = originalChannels;
 
         channels = filterChannelsByFavorites(state, channels, category.type);
-
         channels = filterChannelsByType(state, channels, category.type);
 
         channels = filterAutoclosedDMs(state, channels, category.type);
-
         channels = filterManuallyClosedDMs(state, channels);
 
         if (channels.some((channel) => channel.type === General.DM_CHANNEL || channel.type === General.GM_CHANNEL)) {
@@ -313,5 +322,54 @@ export function makeGetChannelsForCategory() {
         }
 
         return channels;
+    };
+}
+
+export function makeGetChannelsByCategory() {
+    const getCategoriesForTeam = makeGetCategoriesForTeam();
+    const getUnsortedUnfilteredChannels = makeGetUnsortedUnfilteredChannels();
+
+    // Memoize filterAndSortChannels by category. As long as the categories don't change, we can keep using the same
+    // selector for each category.
+    let filterAndSortChannels: RelationOneToOne<ChannelCategory, ReturnType<typeof makeFilterAndSortChannelsForCategory>>;
+
+    let lastCategoryIds: ReturnType<typeof getCategoryIdsForTeam> = [];
+    let lastChannelsByCategory: RelationOneToOne<ChannelCategory, Channel[]> = {};
+
+    return (state: GlobalState, teamId: string) => {
+        const categoryIds = getCategoryIdsForTeam(state, teamId);
+
+        // Create an instance of filterAndSortChannels for each category. As long as we don't add or remove new categories,
+        // we can reuse these selectors to memoize the results of each category. This will also create new selectors when
+        // categories are reordered, but that should be rare enough that it won't meaningfully affect performance.
+        if (categoryIds !== lastCategoryIds) {
+            lastCategoryIds = categoryIds;
+            lastChannelsByCategory = {};
+
+            filterAndSortChannels = {};
+
+            if (categoryIds) {
+                for (const categoryId of categoryIds) {
+                    filterAndSortChannels[categoryId] = makeFilterAndSortChannelsForCategory();
+                }
+            }
+        }
+
+        const categories = getCategoriesForTeam(state, teamId);
+        const channels = getUnsortedUnfilteredChannels(state, teamId);
+
+        const channelsByCategory: RelationOneToOne<ChannelCategory, Channel[]> = {};
+
+        for (const category of categories) {
+            channelsByCategory[category.id] = filterAndSortChannels[category.id](state, channels, category);
+        }
+
+        // Do a shallow equality check of channelsByCategory to avoid returning a new object containing the same data
+        if (shallowEquals(channelsByCategory, lastChannelsByCategory)) {
+            return lastChannelsByCategory;
+        }
+
+        lastChannelsByCategory = channelsByCategory;
+        return channelsByCategory;
     };
 }

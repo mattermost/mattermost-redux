@@ -63,7 +63,7 @@ describe('makeGetCategoriesForTeam', () => {
     });
 });
 
-describe('makeGetChannelsForAllCategories', () => {
+describe('makeGetUnsortedUnfilteredChannels', () => {
     const channel1 = {id: 'channel1', team_id: 'team1', delete_at: 0};
     const channel2 = {id: 'channel2', team_id: 'team1', delete_at: 0};
     const channel3 = {id: 'channel3', team_id: 'team2', delete_at: 0};
@@ -92,17 +92,17 @@ describe('makeGetChannelsForAllCategories', () => {
     };
 
     test('should return channels on the team and DMs/GMs', () => {
-        const getChannelsForAllCategories = Selectors.makeGetChannelsForAllCategories();
+        const getUnsortedUnfilteredChannels = Selectors.makeGetUnsortedUnfilteredChannels();
 
-        expect(getChannelsForAllCategories(baseState, 'team1')).toMatchObject([channel1, channel2, dmChannel1, gmChannel1]);
+        expect(getUnsortedUnfilteredChannels(baseState, 'team1')).toMatchObject([channel1, channel2, dmChannel1, gmChannel1]);
 
-        expect(getChannelsForAllCategories(baseState, 'team2')).toMatchObject([channel3, dmChannel1, gmChannel1]);
+        expect(getUnsortedUnfilteredChannels(baseState, 'team2')).toMatchObject([channel3, dmChannel1, gmChannel1]);
     });
 
     test('should not return channels which the user is not a member of', () => {
         const channel4 = {id: 'channel4', team_id: 'team1', delete_at: 0};
 
-        const getChannelsForAllCategories = Selectors.makeGetChannelsForAllCategories();
+        const getUnsortedUnfilteredChannels = Selectors.makeGetUnsortedUnfilteredChannels();
 
         let state = {
             entities: {
@@ -115,7 +115,7 @@ describe('makeGetChannelsForAllCategories', () => {
             },
         };
 
-        expect(getChannelsForAllCategories(state, 'team1')).not.toContain(channel4);
+        expect(getUnsortedUnfilteredChannels(state, 'team1')).not.toContain(channel4);
 
         state = {
             entities: {
@@ -130,14 +130,14 @@ describe('makeGetChannelsForAllCategories', () => {
             },
         };
 
-        expect(getChannelsForAllCategories(state, 'team1')).toContain(channel4);
+        expect(getUnsortedUnfilteredChannels(state, 'team1')).toContain(channel4);
     });
 
     test('should not return deleted channels', () => {
         const channel = {id: 'channel', team_id: 'team1', delete_at: 0};
         const deletedChannel = {id: 'deletedChannel', team_id: 'team1', delete_at: 1000};
 
-        const getChannelsForAllCategories = Selectors.makeGetChannelsForAllCategories();
+        const getUnsortedUnfilteredChannels = Selectors.makeGetUnsortedUnfilteredChannels();
 
         const state = {
             entities: {
@@ -152,26 +152,26 @@ describe('makeGetChannelsForAllCategories', () => {
             },
         };
 
-        expect(getChannelsForAllCategories(state, 'team1')).toContain(channel);
-        expect(getChannelsForAllCategories(state, 'team1')).not.toContain(deletedChannel);
+        expect(getUnsortedUnfilteredChannels(state, 'team1')).toContain(channel);
+        expect(getUnsortedUnfilteredChannels(state, 'team1')).not.toContain(deletedChannel);
     });
 
     test('should memoize properly', () => {
-        const getChannelsForAllCategories = Selectors.makeGetChannelsForAllCategories();
+        const getUnsortedUnfilteredChannels = Selectors.makeGetUnsortedUnfilteredChannels();
 
-        const result = getChannelsForAllCategories(baseState, 'team1');
+        const result = getUnsortedUnfilteredChannels(baseState, 'team1');
 
         // Repeat calls should return the same array
-        expect(getChannelsForAllCategories(baseState, 'team1')).toBe(result);
+        expect(getUnsortedUnfilteredChannels(baseState, 'team1')).toBe(result);
 
         // Calls to a difference instance of the selector won't return the same array
-        expect(result).not.toBe(Selectors.makeGetChannelsForAllCategories()(baseState, 'team1'));
+        expect(result).not.toBe(Selectors.makeGetUnsortedUnfilteredChannels()(baseState, 'team1'));
 
         // Calls with different arguments won't return the same array
-        expect(getChannelsForAllCategories(baseState, 'team2')).not.toBe(result);
+        expect(getUnsortedUnfilteredChannels(baseState, 'team2')).not.toBe(result);
 
         // Calls after different argumetns won't return the same array
-        expect(getChannelsForAllCategories(baseState, 'team1')).not.toBe(result);
+        expect(getUnsortedUnfilteredChannels(baseState, 'team1')).not.toBe(result);
     });
 });
 
@@ -989,5 +989,213 @@ describe('makeGetChannelsForCategory', () => {
         const getChannelsForCategory = Selectors.makeGetChannelsForCategory();
 
         expect(getChannelsForCategory(state, directMessagesCategory)).toMatchObject([gmChannel1, dmChannel1]);
+    });
+});
+
+describe('makeGetChannelsByCategory', () => {
+    const currentUser = {id: 'currentUser', username: 'currentUser', first_name: 'Current', last_name: 'User', locale: 'en'};
+    const otherUser1 = {id: 'otherUser1', username: 'otherUser1', first_name: 'Other', last_name: 'User', locale: 'en'};
+    const otherUser2 = {id: 'otherUser2', username: 'otherUser2', first_name: 'Another', last_name: 'User', locale: 'en'};
+
+    const channel1 = {id: 'channel1', type: General.OPEN_CHANNEL, team_id: 'team1', display_name: 'Zebra', delete_at: 0};
+    const channel2 = {id: 'channel2', type: General.PRIVATE_CHANNEL, team_id: 'team1', display_name: 'Aardvark', delete_at: 0};
+    const channel3 = {id: 'channel3', type: General.OPEN_CHANNEL, team_id: 'team1', display_name: 'Bear', delete_at: 0};
+    const dmChannel1 = {id: 'dmChannel1', type: General.DM_CHANNEL, team_id: '', display_name: '', name: `${currentUser.id}__${otherUser1.id}`, delete_at: 0};
+    const dmChannel2 = {id: 'dmChannel2', type: General.DM_CHANNEL, team_id: '', display_name: '', name: `${otherUser2.id}__${currentUser.id}`, delete_at: 0};
+    const gmChannel1 = {id: 'gmChannel1', type: General.GM_CHANNEL, team_id: '', display_name: `${currentUser.username}, ${otherUser1.username}, ${otherUser2.username}`, name: 'gmChannel1', delete_at: 0};
+
+    const favoritesCategory = {id: 'favoritesCategory', team_id: 'team1', display_name: CategoryTypes.FAVORITES, type: CategoryTypes.FAVORITES};
+    const publicCategory = {id: 'publicCategory', team_id: 'team1', display_name: 'Public Channels', type: CategoryTypes.PUBLIC};
+    const privateCategory = {id: 'privateCategory', team_id: 'team1', display_name: 'Private Channels', type: CategoryTypes.PRIVATE};
+    const directMessagesCategory = {id: 'directMessagesCategory', team_id: 'team1', display_name: 'Direct Messages', type: CategoryTypes.DIRECT_MESSAGES};
+
+    const baseState = {
+        entities: {
+            channelCategories: {
+                byId: {
+                    favoritesCategory,
+                    publicCategory,
+                    privateCategory,
+                    directMessagesCategory,
+                },
+                orderByTeam: {
+                    team1: [
+                        favoritesCategory.id,
+                        publicCategory.id,
+                        privateCategory.id,
+                        directMessagesCategory.id,
+                    ],
+                },
+            },
+            channels: {
+                channels: {
+                    channel1,
+                    channel2,
+                    channel3,
+                    dmChannel1,
+                    dmChannel2,
+                    gmChannel1,
+                },
+                myMembers: {
+                    [channel1.id]: {},
+                    [channel2.id]: {},
+                    [channel3.id]: {},
+                    [dmChannel1.id]: {},
+                    [dmChannel2.id]: {},
+                    [gmChannel1.id]: {},
+                },
+            },
+            general: {
+                config: {},
+            },
+            posts: {
+                posts: {},
+                postsInChannel: {},
+            },
+            preferences: {
+                myPreferences: {
+                    [getPreferenceKey(Preferences.CATEGORY_DISPLAY_SETTINGS, Preferences.NAME_NAME_FORMAT)]: {value: Preferences.DISPLAY_PREFER_FULL_NAME},
+                    [getPreferenceKey(Preferences.CATEGORY_DIRECT_CHANNEL_SHOW, otherUser1.id)]: {value: 'true'},
+                    [getPreferenceKey(Preferences.CATEGORY_DIRECT_CHANNEL_SHOW, otherUser2.id)]: {value: 'true'},
+                    [getPreferenceKey(Preferences.CATEGORY_FAVORITE_CHANNEL, channel1.id)]: {value: 'true'},
+                    [getPreferenceKey(Preferences.CATEGORY_FAVORITE_CHANNEL, dmChannel2.id)]: {value: 'true'},
+                    [getPreferenceKey(Preferences.CATEGORY_GROUP_CHANNEL_SHOW, gmChannel1.id)]: {value: 'true'},
+                },
+            },
+            users: {
+                currentUserId: currentUser.id,
+                profiles: {
+                    currentUser,
+                    otherUser1,
+                    otherUser2,
+                },
+            },
+        },
+    };
+
+    test('should return channels for all categories', () => {
+        const getChannelsByCategory = Selectors.makeGetChannelsByCategory();
+
+        expect(getChannelsByCategory(baseState, 'team1')).toEqual({
+            favoritesCategory: [dmChannel2, channel1],
+            publicCategory: [channel3],
+            privateCategory: [channel2],
+            directMessagesCategory: [gmChannel1, dmChannel1],
+        });
+    });
+
+    describe('memoization', () => {
+        test('should return the same object when called with the same state', () => {
+            const getChannelsByCategory = Selectors.makeGetChannelsByCategory();
+
+            expect(getChannelsByCategory(baseState, 'team1')).toBe(getChannelsByCategory(baseState, 'team1'));
+        });
+
+        test('should return the same object when unrelated state changes', () => {
+            const getChannelsByCategory = Selectors.makeGetChannelsByCategory();
+
+            const state = mergeObjects(baseState, {
+                views: {
+                    something: 7,
+                },
+            });
+
+            const previousResult = getChannelsByCategory(baseState, 'team1');
+            const result = getChannelsByCategory(state, 'team1');
+
+            expect(result).toBe(previousResult);
+        });
+
+        test('should return a new object when user profiles change', () => {
+            // This behaviour isn't ideal, but it's better than the previous version which returns a new object
+            // whenever anything user-related changes
+            const getChannelsByCategory = Selectors.makeGetChannelsByCategory();
+
+            const state = mergeObjects(baseState, {
+                entities: {
+                    users: {
+                        profiles: {
+                            newUser: {id: 'newUser'},
+                        },
+                    },
+                },
+            });
+
+            const previousResult = getChannelsByCategory(baseState, 'team1');
+            const result = getChannelsByCategory(state, 'team1');
+
+            expect(result).not.toBe(previousResult);
+            expect(result).toEqual(previousResult);
+
+            // Categories not containing DMs/GMs should still remain the same
+            expect(result.favoritesCategory).not.toBe(previousResult.favoritesCategory);
+            expect(result.favoritesCategory).toEqual(previousResult.favoritesCategory);
+            expect(result.publicCategory).toBe(previousResult.publicCategory);
+            expect(result.privateCategory).toBe(previousResult.privateCategory);
+            expect(result.directMessagesCategory).not.toBe(previousResult.directMessagesCategory);
+            expect(result.directMessagesCategory).toEqual(previousResult.directMessagesCategory);
+        });
+
+        test('should return the same object when other user state changes', () => {
+            const getChannelsByCategory = Selectors.makeGetChannelsByCategory();
+
+            const state = mergeObjects(baseState, {
+                entities: {
+                    users: {
+                        statuses: {
+                            otherUser1: 'offline',
+                        },
+                    },
+                },
+            });
+
+            const previousResult = getChannelsByCategory(baseState, 'team1');
+            const result = getChannelsByCategory(state, 'team1');
+
+            expect(result).toBe(previousResult);
+        });
+
+        test('should return a new object when preferences change', () => {
+            const getChannelsByCategory = Selectors.makeGetChannelsByCategory();
+
+            const state = mergeObjects(baseState, {
+                entities: {
+                    preferences: {
+                        myPreferences: {
+                            [getPreferenceKey('abc', '123')]: {value: 'true'},
+                        },
+                    },
+                },
+            });
+
+            const previousResult = getChannelsByCategory(baseState, 'team1');
+            const result = getChannelsByCategory(state, 'team1');
+
+            expect(result).not.toBe(previousResult);
+            expect(result).toEqual(previousResult);
+        });
+
+        test('should return a new object when a DM is closed', () => {
+            const getChannelsByCategory = Selectors.makeGetChannelsByCategory();
+
+            const state = mergeObjects(baseState, {
+                entities: {
+                    preferences: {
+                        myPreferences: {
+                            [getPreferenceKey(Preferences.CATEGORY_DIRECT_CHANNEL_SHOW, otherUser1.id)]: {value: 'false'},
+                        },
+                    },
+                },
+            });
+
+            const previousResult = getChannelsByCategory(baseState, 'team1');
+            const result = getChannelsByCategory(state, 'team1');
+
+            expect(result).not.toBe(previousResult);
+            expect(result.favoritesCategory).toEqual(previousResult.favoritesCategory);
+            expect(result.publicCategory).toEqual(previousResult.publicCategory);
+            expect(result.privateCategory).toEqual(previousResult.privateCategory);
+            expect(result.directMessagesCategory).not.toEqual(previousResult.directMessagesCategory);
+        });
     });
 });
