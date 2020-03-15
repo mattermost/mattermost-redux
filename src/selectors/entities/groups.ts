@@ -2,6 +2,11 @@
 // See LICENSE.txt for license information.
 import * as reselect from 'reselect';
 import {GlobalState} from 'types/store';
+import {Group} from 'types/groups';
+import {filterGroupsMatchingTerm} from 'utils/group_utils';
+import {getChannel} from 'selectors/entities/channels';
+import {getTeam} from 'selectors/entities/teams';
+
 const emptyList: any[] = [];
 const emptySyncables = {
     teams: [],
@@ -43,6 +48,35 @@ export function getGroupMembers(state: GlobalState, id: string) {
         return emptyList;
     }
     return groupMemberData.members;
+}
+
+export function searchAssociatedGroupsForReferenceLocal(state: GlobalState, term: string, teamId: string, channelId: string): Array<Group> {
+    const groups = getAssociatedGroupsForReference(state, teamId, channelId);
+    if (!groups) {
+        return emptyList;
+    }
+    const filteredGroups = filterGroupsMatchingTerm(groups, term);
+    return filteredGroups;
+    return groups;
+}
+
+export function getAssociatedGroupsForReference(state: GlobalState, teamId: string, channelId: string): Array<Group> {
+    const team = getTeam(state, teamId);
+    const channel = getChannel(state, channelId);
+
+    let groupsForReference = [];
+    if (team && team.group_constrained && channel && channel.group_constrained) {
+        const groupsFromChannel = getGroupsAssociatedToChannelForReference(state, channelId);
+        const groupsFromTeam = getGroupsAssociatedToTeamForReference(state, teamId);
+        groupsForReference = groupsFromChannel.concat(groupsFromTeam.filter((item) => groupsFromChannel.indexOf(item) < 0));
+    } else if (team && team.group_constrained) {
+        groupsForReference = getGroupsAssociatedToTeamForReference(state, teamId);
+    } else if (channel && channel.group_constrained) {
+        groupsForReference = getGroupsAssociatedToChannelForReference(state, channelId);
+    } else {
+        groupsForReference = getAllAssociatedGroupsForReference(state);
+    }
+    return groupsForReference;
 }
 
 const teamGroupIDs = (state: GlobalState, teamID: string) => (state.entities.teams.groupsAssociatedToTeam[teamID] == null ? undefined : state.entities.teams.groupsAssociatedToTeam[teamID].ids == null ? undefined : state.entities.teams.groupsAssociatedToTeam[teamID].ids) || [];
@@ -107,9 +141,10 @@ export const getGroupsAssociatedToChannelForReference = reselect.createSelector(
     }
 );
 
-export const getGroupsForReference = reselect.createSelector(
+export const getAllAssociatedGroupsForReference = reselect.createSelector(
     getAllGroups,
     (allGroups) => {
         return Object.entries(allGroups).filter((entry) => entry[1].allow_reference).map((entry) => entry[1]);
     }
 );
+

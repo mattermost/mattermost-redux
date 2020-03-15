@@ -22,7 +22,6 @@ export function linkGroupSyncable(groupID: string, syncableID: string, syncableT
         }
 
         const dispatches: Action[] = [];
-
         let type = '';
         switch (syncableType) {
         case Groups.SYNCABLE_TYPE_TEAM:

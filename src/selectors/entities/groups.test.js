@@ -133,11 +133,11 @@ describe('Selectors.Groups', () => {
         assert.deepEqual(Selectors.getGroupsAssociatedToChannelForReference(testState, channelID), expected);
     });
 
-    it('getGroupsForReference', () => {
+    it('getAllAssociatedGroupsForReference', () => {
         const expected = [
             testState.entities.groups.groups[expectedAssociatedGroupID1],
             testState.entities.groups.groups[expectedAssociatedGroupID4],
         ];
-        assert.deepEqual(Selectors.getGroupsForReference(testState, channelID), expected);
+        assert.deepEqual(Selectors.getAllAssociatedGroupsForReference(testState, channelID), expected);
     });
 });
