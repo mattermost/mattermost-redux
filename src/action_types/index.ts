@@ -11,7 +11,6 @@ import PreferenceTypes from './preferences';
 import IntegrationTypes from './integrations';
 import EmojiTypes from './emojis';
 import GifTypes from './gifs';
-import AlertTypes from './alerts';
 import JobTypes from './jobs';
 import SearchTypes from './search';
 import RoleTypes from './roles';
@@ -32,7 +31,6 @@ export {
     IntegrationTypes,
     EmojiTypes,
     GifTypes,
-    AlertTypes,
     JobTypes,
     SearchTypes,
     RoleTypes,
