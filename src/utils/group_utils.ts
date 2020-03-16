@@ -29,10 +29,3 @@ export function filterGroupsMatchingTerm(groups: Array<Group>, term: string): Ar
             some((suggestion) => suggestion.startsWith(trimmedTerm));
     });
 }
-
-export function sortByDisplayName(a: Group, b: Group): number {
-    const nameA = a.display_name;
-    const nameB = b.display_name;
-
-    return nameA.localeCompare(nameB);
-}
