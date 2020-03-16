@@ -23,7 +23,6 @@ export type Group = {
     member_count: number;
     scheme_admin: boolean;
     allow_reference: boolean;
-    groupname: string;
 };
 
 export type GroupTeam = {

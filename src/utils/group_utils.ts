@@ -18,7 +18,7 @@ export function filterGroupsMatchingTerm(groups: Array<Group>, term: string): Ar
 
         const groupSuggestions: string[] = [];
 
-        const groupnameSuggestions = getSuggestionsSplitByMultiple((group.groupname || '').toLowerCase(), General.AUTOCOMPLETE_SPLIT_CHARACTERS);
+        const groupnameSuggestions = getSuggestionsSplitByMultiple((group.name || '').toLowerCase(), General.AUTOCOMPLETE_SPLIT_CHARACTERS);
 
         groupSuggestions.push(...groupnameSuggestions);
         const displayname = (group.display_name || '').toLowerCase();

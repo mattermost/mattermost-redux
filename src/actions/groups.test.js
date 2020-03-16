@@ -298,8 +298,7 @@ describe('Actions.Groups', () => {
             groups: [
                 {
                     id: 'xh585kyz3tn55q6ipfo57btwnc',
-                    name: '9uobsi3xb3y5tfjb3ze7umnh1o',
-                    groupname: 'abc',
+                    name: 'abc',
                     display_name: 'abc',
                     description: '',
                     source: 'ldap',
@@ -313,8 +312,7 @@ describe('Actions.Groups', () => {
                 },
                 {
                     id: 'qhdp6g7aubbpiyja7c4sgpe7tc',
-                    name: 'x5bjwa4kwirpmqudhp5dterine',
-                    groupname: 'qa',
+                    name: 'qa',
                     display_name: 'qa',
                     description: '',
                     source: 'ldap',
@@ -354,8 +352,7 @@ describe('Actions.Groups', () => {
             groups: [
                 {
                     id: 'xh585kyz3tn55q6ipfo57btwnc',
-                    name: '9uobsi3xb3y5tfjb3ze7umnh1o',
-                    groupname: 'abc',
+                    name: 'abc',
                     display_name: 'abc',
                     description: '',
                     source: 'ldap',
@@ -369,8 +366,7 @@ describe('Actions.Groups', () => {
                 },
                 {
                     id: 'tnd8zod9f3fdtqosxjmhwucbth',
-                    name: 'nobctj4brfgtpj3a1peiyq47tc',
-                    groupname: 'software-engineering',
+                    name: 'software-engineering',
                     display_name: 'software engineering',
                     description: '',
                     source: 'ldap',
@@ -384,8 +380,7 @@ describe('Actions.Groups', () => {
                 },
                 {
                     id: 'qhdp6g7aubbpiyja7c4sgpe7tc',
-                    name: 'x5bjwa4kwirpmqudhp5dterine',
-                    groupname: 'qa',
+                    name: 'qa',
                     display_name: 'qa',
                     description: '',
                     source: 'ldap',
@@ -423,8 +418,7 @@ describe('Actions.Groups', () => {
             groups: [
                 {
                     id: 'tnd8zod9f3fdtqosxjmhwucbth',
-                    name: 'nobctj4brfgtpj3a1peiyq47tc',
-                    groupname: 'software-engineering',
+                    name: 'software-engineering',
                     display_name: 'software engineering',
                     description: '',
                     source: 'ldap',
@@ -438,8 +432,7 @@ describe('Actions.Groups', () => {
                 },
                 {
                     id: 'qhdp6g7aubbpiyja7c4sgpe7tc',
-                    name: 'x5bjwa4kwirpmqudhp5dterine',
-                    groupname: 'qa',
+                    name: 'qa',
                     display_name: 'qa',
                     description: '',
                     source: 'ldap',
@@ -491,8 +484,7 @@ describe('Actions.Groups', () => {
         const response = [
             {
                 id: 'existing1',
-                name: 'nobctj4brfgtpj3a1peiyq47tc',
-                groupname: 'software-engineering',
+                name: 'software-engineering',
                 display_name: 'software engineering',
                 description: '',
                 source: 'ldap',
@@ -527,8 +519,7 @@ describe('Actions.Groups', () => {
             groups: [
                 {
                     id: 'xh585kyz3tn55q6ipfo57btwnc',
-                    name: '9uobsi3xb3y5tfjb3ze7umnh1o',
-                    groupname: 'abc',
+                    name: 'abc',
                     display_name: 'abc',
                     description: '',
                     source: 'ldap',
@@ -541,8 +532,7 @@ describe('Actions.Groups', () => {
                 },
                 {
                     id: 'tnd8zod9f3fdtqosxjmhwucbth',
-                    name: 'nobctj4brfgtpj3a1peiyq47tc',
-                    groupname: 'software-engineering',
+                    name: 'software-engineering',
                     display_name: 'software engineering',
                     description: '',
                     source: 'ldap',
@@ -555,8 +545,7 @@ describe('Actions.Groups', () => {
                 },
                 {
                     id: 'qhdp6g7aubbpiyja7c4sgpe7tc',
-                    name: 'x5bjwa4kwirpmqudhp5dterine',
-                    groupname: 'qa',
+                    name: 'qa',
                     display_name: 'qa',
                     description: '',
                     source: 'ldap',
@@ -597,8 +586,7 @@ describe('Actions.Groups', () => {
                 [
                     {
                         id: 'xh585kyz3tn55q6ipfo57btwnc',
-                        name: '9uobsi3xb3y5tfjb3ze7umnh1o',
-                        groupname: 'abc',
+                        name: 'abc',
                         display_name: 'abc',
                         description: '',
                         source: 'ldap',
@@ -612,8 +600,7 @@ describe('Actions.Groups', () => {
                     },
                     {
                         id: 'tnd8zod9f3fdtqosxjmhwucbth',
-                        name: 'nobctj4brfgtpj3a1peiyq47tc',
-                        groupname: 'software-engineering',
+                        name: 'abc',
                         display_name: 'software engineering',
                         description: '',
                         source: 'ldap',
@@ -630,8 +617,7 @@ describe('Actions.Groups', () => {
                 [
                     {
                         id: 'qhdp6g7aubbpiyja7c4sgpe7tc',
-                        name: 'x5bjwa4kwirpmqudhp5dterine',
-                        groupname: 'qa',
+                        name: 'qa',
                         display_name: 'qa',
                         description: '',
                         source: 'ldap',
@@ -654,8 +640,7 @@ describe('Actions.Groups', () => {
                 [
                     {
                         id: 'xh585kyz3tn55q6ipfo57btwnc',
-                        name: '9uobsi3xb3y5tfjb3ze7umnh1o',
-                        groupname: 'abc',
+                        name: 'abc',
                         display_name: 'abc',
                         description: '',
                         source: 'ldap',
@@ -708,8 +693,7 @@ describe('Actions.Groups', () => {
             groups: [
                 {
                     id: 'tnd8zod9f3fdtqosxjmhwucbth',
-                    name: 'nobctj4brfgtpj3a1peiyq47tc',
-                    groupname: 'software-engineering',
+                    name: 'software-engineering',
                     display_name: 'software engineering',
                     description: '',
                     source: 'ldap',
@@ -723,8 +707,7 @@ describe('Actions.Groups', () => {
                 },
                 {
                     id: 'qhdp6g7aubbpiyja7c4sgpe7tc',
-                    name: 'x5bjwa4kwirpmqudhp5dterine',
-                    groupname: 'qa',
+                    name: 'qa',
                     display_name: 'qa',
                     description: '',
                     source: 'ldap',
@@ -776,8 +759,7 @@ describe('Actions.Groups', () => {
         const response = [
             {
                 id: 'existing1',
-                name: 'nobctj4brfgtpj3a1peiyq47tc',
-                groupname: 'software-engineering',
+                name: 'software-engineering',
                 display_name: 'software engineering',
                 description: '',
                 source: 'ldap',
@@ -867,8 +849,7 @@ describe('Actions.Groups', () => {
 
         const response = {
             id: '5rgoajywb3nfbdtyafbod47rya',
-            name: '8b7ks7ngqbgndqutka48gfzaqh',
-            groupname: 'Test-Group-0',
+            name: 'Test-Group-0',
             display_name: 'Test Group 0',
             description: '',
             type: 'ldap',

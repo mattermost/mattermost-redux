@@ -11,7 +11,7 @@ describe('group utils', () => {
     describe('filterGroupsMatchingTerm', () => {
         const groupA = {
             id: 'groupid1',
-            name: 'group1',
+            name: 'board-group',
             description: 'group1 description',
             display_name: 'board-group',
             type: 'ldap',
@@ -23,11 +23,10 @@ describe('group utils', () => {
             member_count: 3,
             scheme_admin: false,
             allow_reference: true,
-            groupname: 'board-group',
         };
         const groupB = {
             id: 'groupid2',
-            name: 'group2',
+            name: 'developers-group',
             description: 'group2 description',
             display_name: 'developers-group',
             type: 'ldap',
@@ -39,11 +38,10 @@ describe('group utils', () => {
             member_count: 3,
             scheme_admin: false,
             allow_reference: true,
-            groupname: 'developers-group',
         };
         const groupC = {
             id: 'groupid3',
-            name: 'group3',
+            name: 'software-engineers',
             description: 'group3 description',
             display_name: 'software engineers',
             type: 'ldap',
@@ -55,7 +53,6 @@ describe('group utils', () => {
             member_count: 3,
             scheme_admin: false,
             allow_reference: true,
-            groupname: 'software-engineers',
         };
         const groups = [groupA, groupB, groupC];
 
@@ -67,11 +64,11 @@ describe('group utils', () => {
             assert.deepEqual(filterGroupsMatchingTerm(groups, 'testBad'), []);
         });
 
-        it('should match by groupname', () => {
+        it('should match by name', () => {
             assert.deepEqual(filterGroupsMatchingTerm(groups, 'software-engineers'), [groupC]);
         });
 
-        it('should match by split part of the groupname', () => {
+        it('should match by split part of the name', () => {
             assert.deepEqual(filterGroupsMatchingTerm(groups, 'group'), [groupA, groupB]);
             assert.deepEqual(filterGroupsMatchingTerm(groups, 'board'), [groupA]);
         });
@@ -84,7 +81,7 @@ describe('group utils', () => {
             assert.deepEqual(filterGroupsMatchingTerm(groups, 'software ENGINEERS'), [groupC]);
         });
 
-        it('should ignore leading @ for groupname', () => {
+        it('should ignore leading @ for name', () => {
             assert.deepEqual(filterGroupsMatchingTerm(groups, '@developers'), [groupB]);
         });
 
