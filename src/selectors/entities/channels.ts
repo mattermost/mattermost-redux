@@ -14,7 +14,7 @@ import {createIdsSelector} from 'utils/helpers';
 
 export {getCurrentChannelId, getMyChannelMemberships, getMyCurrentChannelMembership};
 import {GlobalState} from 'types/store';
-import {Channel, ChannelStats, ChannelMembership, ChannelModeration} from 'types/channels';
+import {Channel, ChannelStats, ChannelMembership, ChannelModeration, ChannelMemberCountsByGroup} from 'types/channels';
 import {UsersState, UserProfile} from 'types/users';
 import {PreferenceType} from 'types/preferences';
 import {Post} from 'types/posts';
@@ -895,4 +895,8 @@ export function isManuallyUnread(state: GlobalState, channelId?: string): boolea
 
 export function getChannelModerations(state: GlobalState, channelId: string): Array<ChannelModeration> {
     return state.entities.channels.channelModerations[channelId];
+}
+
+export function getChannelMemberCountsByGroup(state: GlobalState, channelId: string): ChannelMemberCountsByGroup {
+    return state.entities.channels.channelMemberCountsByGroup[channelId] || {};
 }
