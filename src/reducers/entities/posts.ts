@@ -74,15 +74,19 @@ export function handlePosts(state: RelationOneToOne<Post, Post> = {}, action: Ge
 
     case PostTypes.RECEIVED_POSTS: {
         const posts = Object.values(action.data.posts) as Post[];
-
         if (posts.length === 0) {
             return state;
         }
 
-        const nextState = {...state};
+        let nextState = {};
+        const statePost = Object.values(state)[0];
+        const currentChannelId = posts[0].channel_id;
+        if (statePost && statePost.channel_id === currentChannelId) {
+            nextState = {...state};
+        }
 
         for (const post of posts) {
-            handlePostReceived(nextState, post);
+            nextState = handlePostReceived(nextState, post);
         }
 
         return nextState;
@@ -424,7 +428,6 @@ export function postsInChannel(state: Dictionary<Array<PostOrderBlock>> = {}, ac
         nextPostsForChannel = mergePostBlocks(nextPostsForChannel, nextPosts);
 
         return {
-            ...state,
             [action.channelId]: nextPostsForChannel,
         };
     }
@@ -1199,7 +1202,7 @@ export function expandedURLs(state: Dictionary<string> = {}, action: GenericActi
 
 export default function(state: Partial<PostsState> = {}, action: GenericAction) {
     const nextPosts = handlePosts(state.posts, action);
-    const nextPostsInChannel = postsInChannel(state.postsInChannel, action, state.posts!, nextPosts);
+    const nextPostsInChannel = {}; //postsInChannel(state.postsInChannel, action, state.posts!, nextPosts);
 
     const nextState = {
 
