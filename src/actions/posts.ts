@@ -14,6 +14,7 @@ import {getCurrentUserId, getUsersByUsername} from 'selectors/entities/users';
 import {getUserIdFromChannelName} from 'utils/channel_utils';
 import {parseNeededCustomEmojisFromText} from 'utils/emoji_utils';
 import {isFromWebhook, isSystemMessage, shouldIgnorePost} from 'utils/post_utils';
+import {isCombinedUserActivityPost} from 'utils/post_list';
 
 import {getMyChannelMember, markChannelAsUnread, markChannelAsRead, markChannelAsViewed} from './channels';
 import {systemEmojis, getCustomEmojiByName, getCustomEmojisByName} from './emojis';
@@ -417,22 +418,23 @@ export function getUnreadPostData(unreadChan: ChannelUnread, state: GlobalState)
     return data;
 }
 
-export function setUnreadPost(userId: string, post: ExtendedPost) {
+export function setUnreadPost(userId: string, postId: string) {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         let state = getState();
+        const post = Selectors.getPost(state, postId);
         let unreadChan;
 
-        dispatch({
-            type: ChannelTypes.ADD_MANUALLY_UNREAD,
-            data: {
-                channelId: post.channel_id,
-            },
-        });
         try {
-            if (post.system_post_ids) {
+            if (isCombinedUserActivityPost(postId)) {
                 return {};
             }
-            unreadChan = await Client4.markPostAsUnread(userId, post.id);
+            unreadChan = await Client4.markPostAsUnread(userId, postId);
+            dispatch({
+                type: ChannelTypes.ADD_MANUALLY_UNREAD,
+                data: {
+                    channelId: post.channel_id,
+                },
+            });
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch, getState);
             dispatch(logError(error));
