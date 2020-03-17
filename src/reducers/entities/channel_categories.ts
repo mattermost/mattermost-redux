@@ -37,6 +37,7 @@ export function byId(state: IDMappedObjects<ChannelCategory> = {}, action: Gener
         }, state);
     }
 
+    // This will be added in phase 2 of Channel Sidebar Organization once the server provides the categories
     // case ChannelCategoryTypes.RECEIVED_CATEGORIES: {
     //     const categories: ChannelCategory[] = action.data;
 
@@ -116,6 +117,7 @@ export function orderByTeam(state: RelationOneToOne<Team, $ID<ChannelCategory>[]
         }, state);
     }
 
+    // This will be added in phase 2 of Channel Sidebar Organization once the server provides the categories
     // case ChannelCategoryTypes.RECEIVED_CATEGORY_ORDER: {
     //     const teamId: string = action.data.teamId;
     //     const categoryIds: string[] = action.data.categoryIds;
