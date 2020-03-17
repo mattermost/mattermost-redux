@@ -943,3 +943,71 @@ describe('Actions.Websocket doReconnect', () => {
         expect(actions).not.toEqual(expect.arrayContaining(expectedMissingActions));
     });
 });
+
+describe('Actions.Websocket handleUserTypingEvent', () => {
+    const mockStore = configureMockStore([thunk]);
+
+    const MOCK_GET_STATUSES_BY_IDS = 'MOCK_GET_STATUSES_BY_IDS';
+    const currentUserId = 'user-id';
+    const otherUserId = 'other-user-id';
+    const currentChannelId = 'channel-id';
+    const otherChannelId = 'other-channel-id';
+
+    const initialState = {
+        entities: {
+            general: {
+                config: {},
+            },
+            channels: {
+                currentChannelId,
+                channels: {
+                    currentChannelId: {
+                        id: currentChannelId,
+                        name: 'channel',
+                    },
+                },
+            },
+            users: {
+                currentUserId,
+                profiles: {
+                    [currentUserId]: {},
+                    [otherUserId]: {},
+                },
+                statuses: {
+                    [currentUserId]: {},
+                    [otherUserId]: {},
+                },
+            },
+            preferences: {
+                myPreferences: {},
+            },
+        },
+    };
+
+    it('dispatches actions for current channel if other user is typing', async () => {
+        const state = {...initialState};
+        const testStore = await mockStore(state);
+        const msg = {broadcast: {channel_id: currentChannelId}, data: {parent_id: 'parent-id', user_id: otherUserId}};
+
+        const expectedActionsTypes = [
+            WebsocketEvents.TYPING,
+            MOCK_GET_STATUSES_BY_IDS,
+        ];
+
+        await testStore.dispatch(Actions.handleUserTypingEvent(msg));
+        const actionTypes = testStore.getActions().map((action) => action.type);
+        expect(actionTypes).toEqual(expectedActionsTypes);
+    });
+
+    it('does not dispatch actions for non current channel', async () => {
+        const state = {...initialState};
+        const testStore = await mockStore(state);
+        const msg = {broadcast: {channel_id: otherChannelId}, data: {parent_id: 'parent-id', user_id: otherUserId}};
+
+        const expectedActionsTypes = [];
+
+        await testStore.dispatch(Actions.handleUserTypingEvent(msg));
+        const actionTypes = testStore.getActions().map((action) => action.type);
+        expect(actionTypes).toEqual(expectedActionsTypes);
+    });
+});
