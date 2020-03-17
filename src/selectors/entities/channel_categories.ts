@@ -6,9 +6,10 @@ import {createSelector} from 'reselect';
 import {General, Preferences} from '../../constants';
 import {CategoryTypes} from '../../constants/channel_categories';
 
-import {getCurrentChannelId} from 'selectors/entities/channels';
+import {getCurrentChannelId, getMyChannelMemberships} from 'selectors/entities/channels';
 import {getCurrentUserLocale} from 'selectors/entities/i18n';
-import {getTeammateNameDisplaySetting, shouldAutocloseDMs} from 'selectors/entities/preferences';
+import {getLastPostPerChannel} from 'selectors/entities/posts';
+import {getMyPreferences, getTeammateNameDisplaySetting, shouldAutocloseDMs} from 'selectors/entities/preferences';
 import {getCurrentUserId} from 'selectors/entities/users';
 
 import {Channel} from 'types/channels';
@@ -17,7 +18,7 @@ import {GlobalState} from 'types/store';
 import {UserProfile} from 'types/users';
 import {IDMappedObjects, RelationOneToOne} from 'types/utilities';
 
-import {getUserIdFromChannelName, isFavoriteChannel} from 'utils/channel_utils';
+import {getUserIdFromChannelName, isFavoriteChannel, isUnreadChannel} from 'utils/channel_utils';
 import {getPreferenceKey} from 'utils/preference_utils';
 import {displayUsername} from 'utils/user_utils';
 
@@ -53,7 +54,7 @@ export function makeFilterChannelsByFavorites(): (state: GlobalState, channels: 
     return createSelector(
         (state: GlobalState, channels: Channel[]) => channels,
         (state: GlobalState, channels: Channel[], categoryType: string) => categoryType,
-        (state: GlobalState) => state.entities.preferences.myPreferences,
+        getMyPreferences,
         (channels, categoryType, myPreferences) => {
             const filtered = channels.filter((channel) => {
                 if (categoryType === CategoryTypes.FAVORITES) {
@@ -91,28 +92,90 @@ export function makeFilterChannelsByType(): (state: GlobalState, channels: Chann
     );
 }
 
-export function makeFilterAutoclosedDMs(): (state: GlobalState, channels: Channel[], categoryType: string) => Channel[] {
+function getDefaultAutocloseCutoff() {
+    return Date.now() - 7 * 24 * 60 * 60 * 1000;
+}
+
+export function makeFilterAutoclosedDMs(getAutocloseCutoff = getDefaultAutocloseCutoff): (state: GlobalState, channels: Channel[], categoryType: string) => Channel[] {
     return createSelector(
         (state: GlobalState, channels: Channel[]) => channels,
         (state: GlobalState, channels: Channel[], categoryType: string) => categoryType,
-        (state: GlobalState) => state.entities.preferences.myPreferences,
+        getMyPreferences,
         shouldAutocloseDMs,
         getCurrentChannelId,
-        (channels, categoryType, myPreferences, autocloseDMs, currentChannelId) => {
+        (state: GlobalState) => state.entities.users.profiles,
+        getCurrentUserId,
+        getMyChannelMemberships,
+        getLastPostPerChannel,
+        (channels, categoryType, myPreferences, autocloseDMs, currentChannelId, profiles, currentUserId, myChannelMembers, lastPosts) => {
             if (categoryType !== CategoryTypes.DIRECT_MESSAGES) {
                 // Only autoclose DMs that haven't been assigned to a category
                 return channels;
             }
 
-            // TODO check if Preferences.CATEGORY_CHANNEL_APPROXIMATE_VIEW_TIME > now - 7 days to keep open
-            // TODO check if Preferences.CATEGORY_CHANNEL_OPEN_TIME > now - 7 days to keep open
-            // TODO check if teammate.delete_at > Preferences.CATEGORY_CHANNEL_OPEN_TIME to auto close if not current channel
-            // TODO check if lastPost.create_at > now - 7 days to keep open
-            // TODO check if channel.last_post_at > now - 7 days to keep open
-            // TODO don't autoclose favorited channel, except if teammate was deleted since last opened and not current channel
-            // TODO don't autoclose if autocloseDMs is false, except if teammate was deleted since last opened and not current channel
+            // Ideally, this would come from a selector, but that would cause the filter to recompute too often
+            const cutoff = getAutocloseCutoff();
 
-            return channels;
+            const filtered = channels.filter((channel) => {
+                if (channel.type !== General.DM_CHANNEL && channel.type !== General.GM_CHANNEL) {
+                    return true;
+                }
+
+                // Unread channels will never be hidden
+                if (isUnreadChannel(myChannelMembers, channel)) {
+                    return true;
+                }
+
+                // viewTime is the time the channel was last viewed by the user
+                const viewTimePref = myPreferences[getPreferenceKey(Preferences.CATEGORY_CHANNEL_APPROXIMATE_VIEW_TIME, channel.id)];
+                const viewTime = parseInt(viewTimePref ? viewTimePref.value! : '0', 10);
+
+                // Recently viewed channels will never be hidden. Note that viewTime is not set correctly at the time of writing.
+                if (viewTime > cutoff) {
+                    return true;
+                }
+
+                // openTime is the time the channel was last opened (like from the More DMs list) after having been closed
+                const openTimePref = myPreferences[getPreferenceKey(Preferences.CATEGORY_CHANNEL_OPEN_TIME, channel.id)];
+                const openTime = parseInt(openTimePref ? openTimePref.value! : '0', 10);
+
+                // DMs with deactivated users will be visible if you're currently viewing them and they were opened
+                // since the user was deactivated
+                if (channel.type === General.DM_CHANNEL && channel.id !== currentChannelId) {
+                    const teammateId = getUserIdFromChannelName(currentUserId, channel.name);
+                    const teammate = profiles[teammateId];
+
+                    if (!teammate || teammate.delete_at > openTime) {
+                        return false;
+                    }
+                }
+
+                // Skip the rest of the checks if autoclosing inactive DMs is disabled
+                if (!autocloseDMs) {
+                    return true;
+                }
+
+                // Keep the channel open if it had a recent post. If we have posts loaded for the channel, use the create_at
+                // of the last post in the channel since channel.last_post_at isn't kept up to date on the client. If we don't
+                // have posts loaded, then fall back to the last_post_at.
+                const lastPost = lastPosts[channel.id];
+
+                if (lastPost && lastPost.create_at > cutoff) {
+                    return true;
+                }
+
+                if (openTime > cutoff) {
+                    return true;
+                }
+
+                if (channel.last_post_at && channel.last_post_at > cutoff) {
+                    return true;
+                }
+
+                return false;
+            });
+
+            return filtered.length === channels.length ? channels : filtered;
         }
     );
 }
@@ -120,7 +183,7 @@ export function makeFilterAutoclosedDMs(): (state: GlobalState, channels: Channe
 export function makeFilterManuallyClosedDMs(): (state: GlobalState, channels: Channel[]) => Channel[] {
     return createSelector(
         (state: GlobalState, channels: Channel[]) => channels,
-        (state: GlobalState) => state.entities.preferences.myPreferences,
+        getMyPreferences,
         getCurrentUserId,
         (channels, myPreferences, currentUserId) => {
             const filtered = channels.filter((channel) => {

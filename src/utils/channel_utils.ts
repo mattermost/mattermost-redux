@@ -154,13 +154,22 @@ export function getUserIdFromChannelName(userId: string, channelName: string): s
     return otherUserId;
 }
 
-export function isAutoClosed(config: any, myPreferences: {
-    [x: string]: PreferenceType;
-}, channel: Channel, channelActivity: number, channelArchiveTime: number, currentChannelId = ''): boolean {
-    const cutoff = new Date().getTime() - 7 * 24 * 60 * 60 * 1000;
+export function isAutoClosed(
+    config: any,
+    myPreferences: {
+        [x: string]: PreferenceType;
+    },
+    channel: Channel,
+    channelActivity: number,
+    channelArchiveTime: number,
+    currentChannelId = '',
+    now = Date.now()
+): boolean {
+    const cutoff = now - 7 * 24 * 60 * 60 * 1000;
     const viewTimePref = myPreferences[`${Preferences.CATEGORY_CHANNEL_APPROXIMATE_VIEW_TIME}--${channel.id}`];
     const viewTime = viewTimePref ? parseInt(viewTimePref.value!, 10) : 0;
 
+    // Note that viewTime is not set correctly at the time of writing
     if (viewTime > cutoff) {
         return false;
     }
@@ -176,6 +185,7 @@ export function isAutoClosed(config: any, myPreferences: {
     if (config.CloseUnusedDirectMessages !== 'true' || isFavoriteChannel(myPreferences, channel.id)) {
         return false;
     }
+
     const autoClose = myPreferences[getPreferenceKey(Preferences.CATEGORY_SIDEBAR_SETTINGS, Preferences.CHANNEL_SIDEBAR_AUTOCLOSE_DMS)];
     if (!autoClose || autoClose.value === Preferences.AUTOCLOSE_DMS_ENABLED) {
         if (channelActivity && channelActivity > cutoff) {
@@ -187,6 +197,7 @@ export function isAutoClosed(config: any, myPreferences: {
         const lastActivity = channel.last_post_at;
         return !lastActivity || lastActivity < cutoff;
     }
+
     return false;
 }
 
@@ -194,44 +205,103 @@ export function isDirectChannel(channel: Channel): boolean {
     return channel.type === General.DM_CHANNEL;
 }
 
-export function isDirectChannelVisible(otherUserOrOtherUserId: UserProfile | string, config: any, myPreferences: {
-    [x: string]: PreferenceType;
-}, channel: Channel, lastPost?: Post | null, isUnread?: boolean, currentChannelId = ''): boolean {
+export function isDirectChannelVisible(
+    otherUserOrOtherUserId: UserProfile | string,
+    config: any,
+    myPreferences: {
+        [x: string]: PreferenceType;
+    },
+    channel: Channel,
+    lastPost?: Post | null,
+    isUnread?: boolean,
+    currentChannelId = '',
+    now?: number
+): boolean {
     const otherUser = typeof otherUserOrOtherUserId === 'object' ? otherUserOrOtherUserId : null;
     const otherUserId = typeof otherUserOrOtherUserId === 'object' ? otherUserOrOtherUserId.id : otherUserOrOtherUserId;
     const dm = myPreferences[`${Preferences.CATEGORY_DIRECT_CHANNEL_SHOW}--${otherUserId}`];
+
     if (!dm || dm.value !== 'true') {
         return false;
     }
-    return isUnread || !isAutoClosed(config, myPreferences, channel, lastPost ? lastPost.create_at : 0, otherUser ? otherUser.delete_at : 0, currentChannelId);
+
+    return isUnread || !isAutoClosed(
+        config,
+        myPreferences,
+        channel,
+        lastPost ? lastPost.create_at : 0,
+        otherUser ? otherUser.delete_at : 0,
+        currentChannelId,
+        now
+    );
 }
 
 export function isGroupChannel(channel: Channel): boolean {
     return channel.type === General.GM_CHANNEL;
 }
 
-export function isGroupChannelVisible(config: any, myPreferences: {
-    [x: string]: PreferenceType;
-}, channel: Channel, lastPost?: Post, isUnread?: boolean): boolean {
+export function isGroupChannelVisible(
+    config: any,
+    myPreferences: {
+        [x: string]: PreferenceType;
+    },
+    channel: Channel,
+    lastPost?: Post,
+    isUnread?: boolean,
+    now?: number
+): boolean {
     const gm = myPreferences[`${Preferences.CATEGORY_GROUP_CHANNEL_SHOW}--${channel.id}`];
+
     if (!gm || gm.value !== 'true') {
         return false;
     }
-    return isUnread || !isAutoClosed(config, myPreferences, channel, lastPost ? lastPost.create_at : 0, 0);
+
+    return isUnread || !isAutoClosed(
+        config,
+        myPreferences,
+        channel,
+        lastPost ? lastPost.create_at : 0,
+        0,
+        '',
+        now
+    );
 }
 
-export function isGroupOrDirectChannelVisible(channel: Channel, memberships: RelationOneToOne<Channel, ChannelMembership>, config: any, myPreferences: {
-    [x: string]: PreferenceType;
-}, currentUserId: string, users: IDMappedObjects<UserProfile>, lastPosts: RelationOneToOne<Channel, Post>): boolean {
+export function isGroupOrDirectChannelVisible(
+    channel: Channel,
+    memberships: RelationOneToOne<Channel, ChannelMembership>,
+    config: any,
+    myPreferences: {
+        [x: string]: PreferenceType;
+    },
+    currentUserId: string,
+    users: IDMappedObjects<UserProfile>,
+    lastPosts: RelationOneToOne<Channel, Post>,
+    currentChannelId?: string,
+    now?: number
+): boolean {
     const lastPost = lastPosts[channel.id];
-    if (isGroupChannel(channel) && isGroupChannelVisible(config, myPreferences, channel, lastPost, isUnreadChannel(memberships, channel))) {
+
+    if (isGroupChannel(channel) && isGroupChannelVisible(config, myPreferences, channel, lastPost, isUnreadChannel(memberships, channel), now)) {
         return true;
     }
+
     if (!isDirectChannel(channel)) {
         return false;
     }
+
     const otherUserId = getUserIdFromChannelName(currentUserId, channel.name);
-    return isDirectChannelVisible(users[otherUserId] || otherUserId, config, myPreferences, channel, lastPost, isUnreadChannel(memberships, channel));
+
+    return isDirectChannelVisible(
+        users[otherUserId] || otherUserId,
+        config,
+        myPreferences,
+        channel,
+        lastPost,
+        isUnreadChannel(memberships, channel),
+        currentChannelId,
+        now
+    );
 }
 
 export function showCreateOption(state: GlobalState, config: any, license: any, teamId: string, channelType: ChannelType, isAdmin: boolean, isSystemAdmin: boolean): boolean {

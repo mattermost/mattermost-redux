@@ -4,6 +4,15 @@
 import {General, Preferences} from '../../constants';
 import {CategoryTypes} from '../../constants/channel_categories';
 
+import {getCurrentChannelId, getMyChannelMemberships} from 'selectors/entities/channels';
+import {getConfig} from 'selectors/entities/general';
+import {getLastPostPerChannel} from 'selectors/entities/posts';
+import {getMyPreferences} from 'selectors/entities/preferences';
+import {getCurrentUserId} from 'selectors/entities/users';
+
+import mergeObjects from 'test/merge_objects';
+
+import {isGroupOrDirectChannelVisible} from 'utils/channel_utils';
 import {getPreferenceKey} from 'utils/preference_utils';
 
 import * as Selectors from './channel_categories';
@@ -188,6 +197,418 @@ describe('makeFilterChannelsByType', () => {
         const filterChannelsByType = Selectors.makeFilterChannelsByType();
 
         expect(filterChannelsByType(state, channels, CategoryTypes.FAVORITES)).toBe(channels);
+    });
+});
+
+describe('makeFilterAutoclosedDMs', () => {
+    const currentUser = {id: 'currentUser'};
+
+    const baseState = {
+        entities: {
+            channels: {
+                currentChannelId: 'channel1',
+                myMembers: {
+                    channel1: {},
+                },
+            },
+            general: {
+                config: {
+                    CloseUnusedDirectMessages: 'true',
+                },
+            },
+            posts: {
+                posts: {},
+                postsInChannel: {
+                    channel1: [],
+                },
+            },
+            preferences: {
+                myPreferences: {
+                    [getPreferenceKey(Preferences.CATEGORY_SIDEBAR_SETTINGS, Preferences.CHANNEL_SIDEBAR_AUTOCLOSE_DMS)]: {value: Preferences.AUTOCLOSE_DMS_ENABLED},
+                },
+            },
+            users: {
+                currentUserId: currentUser.id,
+                profiles: {
+                    currentUser,
+                },
+            },
+        },
+    };
+
+    const now = Date.now();
+    const cutoff = now - 7 * 24 * 60 * 60 * 1000;
+
+    function isChannelVisiblePrecondition(state, channel) {
+        return isGroupOrDirectChannelVisible(
+            channel,
+            getMyChannelMemberships(state),
+            getConfig(state),
+            getMyPreferences(state),
+            getCurrentUserId(state),
+            state.entities.users.profiles,
+            getLastPostPerChannel(state),
+            getCurrentChannelId(state),
+            now,
+        );
+    }
+
+    test('should hide an inactive GM channel', () => {
+        const filterAutoclosedDMs = Selectors.makeFilterAutoclosedDMs(() => cutoff);
+
+        const channel1 = {id: 'channel1', type: General.GM_CHANNEL};
+
+        const state = mergeObjects(baseState, {
+            entities: {
+                preferences: {
+                    myPreferences: {
+                        [getPreferenceKey(Preferences.CATEGORY_GROUP_CHANNEL_SHOW, channel1.id)]: {value: 'true'},
+                        [getPreferenceKey(Preferences.CATEGORY_CHANNEL_OPEN_TIME, channel1.id)]: {value: `${cutoff - 1}`},
+                        [getPreferenceKey(Preferences.CATEGORY_CHANNEL_APPROXIMATE_VIEW_TIME, channel1.id)]: {value: `${cutoff - 1}`},
+                    },
+                },
+            },
+        });
+
+        expect(isChannelVisiblePrecondition(state, channel1)).toBe(false);
+
+        expect(filterAutoclosedDMs(state, [channel1], CategoryTypes.DIRECT_MESSAGES)).toEqual([]);
+    });
+
+    test('should show a GM channel if it was opened recently', () => {
+        const filterAutoclosedDMs = Selectors.makeFilterAutoclosedDMs(() => cutoff);
+
+        const channel1 = {id: 'channel1', type: General.GM_CHANNEL};
+
+        const state = mergeObjects(baseState, {
+            entities: {
+                preferences: {
+                    myPreferences: {
+                        [getPreferenceKey(Preferences.CATEGORY_GROUP_CHANNEL_SHOW, channel1.id)]: {value: 'true'},
+                        [getPreferenceKey(Preferences.CATEGORY_CHANNEL_OPEN_TIME, channel1.id)]: {value: `${cutoff + 1}`},
+                        [getPreferenceKey(Preferences.CATEGORY_CHANNEL_APPROXIMATE_VIEW_TIME, channel1.id)]: {value: `${cutoff - 1}`},
+                    },
+                },
+            },
+        });
+
+        expect(isChannelVisiblePrecondition(state, channel1)).toBe(true);
+
+        expect(filterAutoclosedDMs(state, [channel1], CategoryTypes.DIRECT_MESSAGES)).toEqual([channel1]);
+    });
+
+    test('should show a GM channel if it was viewed recently', () => {
+        const filterAutoclosedDMs = Selectors.makeFilterAutoclosedDMs(() => cutoff);
+
+        const channel1 = {id: 'channel1', type: General.GM_CHANNEL};
+
+        const state = mergeObjects(baseState, {
+            entities: {
+                preferences: {
+                    myPreferences: {
+                        [getPreferenceKey(Preferences.CATEGORY_GROUP_CHANNEL_SHOW, channel1.id)]: {value: 'true'},
+                        [getPreferenceKey(Preferences.CATEGORY_CHANNEL_OPEN_TIME, channel1.id)]: {value: `${cutoff - 1}`},
+                        [getPreferenceKey(Preferences.CATEGORY_CHANNEL_APPROXIMATE_VIEW_TIME, channel1.id)]: {value: `${cutoff + 1}`},
+                    },
+                },
+            },
+        });
+
+        expect(isChannelVisiblePrecondition(state, channel1)).toBe(true);
+
+        expect(filterAutoclosedDMs(state, [channel1], CategoryTypes.DIRECT_MESSAGES)).toEqual([channel1]);
+    });
+
+    test('should show a GM channel if it had an unloaded post made recently', () => {
+        const filterAutoclosedDMs = Selectors.makeFilterAutoclosedDMs(() => cutoff);
+
+        const channel1 = {id: 'channel1', type: General.GM_CHANNEL, last_post_at: cutoff + 1};
+
+        const state = mergeObjects(baseState, {
+            entities: {
+                preferences: {
+                    myPreferences: {
+                        [getPreferenceKey(Preferences.CATEGORY_GROUP_CHANNEL_SHOW, channel1.id)]: {value: 'true'},
+                        [getPreferenceKey(Preferences.CATEGORY_CHANNEL_OPEN_TIME, channel1.id)]: {value: `${cutoff - 1}`},
+                        [getPreferenceKey(Preferences.CATEGORY_CHANNEL_APPROXIMATE_VIEW_TIME, channel1.id)]: {value: `${cutoff - 1}`},
+                    },
+                },
+            },
+        });
+
+        expect(isChannelVisiblePrecondition(state, channel1)).toBe(true);
+
+        expect(filterAutoclosedDMs(state, [channel1], CategoryTypes.DIRECT_MESSAGES)).toEqual([channel1]);
+    });
+
+    test('should show a GM channel if it had a loaded post made recently', () => {
+        const filterAutoclosedDMs = Selectors.makeFilterAutoclosedDMs(() => cutoff);
+
+        const channel1 = {id: 'channel1', type: General.GM_CHANNEL};
+
+        const state = mergeObjects(baseState, {
+            entities: {
+                posts: {
+                    posts: {
+                        post1: {id: 'post1', channel_id: channel1, create_at: cutoff + 1},
+                    },
+                    postsInChannel: {
+                        channel1: [{order: ['post1'], recent: true}],
+                    },
+                },
+                preferences: {
+                    myPreferences: {
+                        [getPreferenceKey(Preferences.CATEGORY_GROUP_CHANNEL_SHOW, channel1.id)]: {value: 'true'},
+                        [getPreferenceKey(Preferences.CATEGORY_CHANNEL_OPEN_TIME, channel1.id)]: {value: `${cutoff - 1}`},
+                        [getPreferenceKey(Preferences.CATEGORY_CHANNEL_APPROXIMATE_VIEW_TIME, channel1.id)]: {value: `${cutoff - 1}`},
+                    },
+                },
+            },
+        });
+
+        expect(isChannelVisiblePrecondition(state, channel1)).toBe(true);
+
+        expect(filterAutoclosedDMs(state, [channel1], CategoryTypes.DIRECT_MESSAGES)).toEqual([channel1]);
+    });
+
+    test('should show an inactive GM channel if autoclosing DMs is disabled for the user', () => {
+        const filterAutoclosedDMs = Selectors.makeFilterAutoclosedDMs(() => cutoff);
+
+        const channel1 = {id: 'channel1', type: General.GM_CHANNEL};
+
+        const state = mergeObjects(baseState, {
+            entities: {
+                preferences: {
+                    myPreferences: {
+                        [getPreferenceKey(Preferences.CATEGORY_SIDEBAR_SETTINGS, Preferences.CHANNEL_SIDEBAR_AUTOCLOSE_DMS)]: {value: ''},
+                        [getPreferenceKey(Preferences.CATEGORY_GROUP_CHANNEL_SHOW, channel1.id)]: {value: 'true'},
+                        [getPreferenceKey(Preferences.CATEGORY_CHANNEL_OPEN_TIME, channel1.id)]: {value: `${cutoff - 1}`},
+                        [getPreferenceKey(Preferences.CATEGORY_CHANNEL_APPROXIMATE_VIEW_TIME, channel1.id)]: {value: `${cutoff - 1}`},
+                    },
+                },
+            },
+        });
+
+        expect(isChannelVisiblePrecondition(state, channel1)).toBe(true);
+
+        expect(filterAutoclosedDMs(state, [channel1], CategoryTypes.DIRECT_MESSAGES)).toEqual([channel1]);
+    });
+
+    test('should show an inactive GM channel if autoclosing DMs is disabled for the server', () => {
+        const filterAutoclosedDMs = Selectors.makeFilterAutoclosedDMs(() => cutoff);
+
+        const channel1 = {id: 'channel1', type: General.GM_CHANNEL};
+
+        const state = mergeObjects(baseState, {
+            entities: {
+                general: {
+                    config: {
+                        CloseUnusedDirectMessages: 'false',
+                    },
+                },
+                preferences: {
+                    myPreferences: {
+                        [getPreferenceKey(Preferences.CATEGORY_SIDEBAR_SETTINGS, Preferences.CHANNEL_SIDEBAR_AUTOCLOSE_DMS)]: {value: Preferences.AUTOCLOSE_DMS_ENABLED},
+                        [getPreferenceKey(Preferences.CATEGORY_GROUP_CHANNEL_SHOW, channel1.id)]: {value: 'true'},
+                        [getPreferenceKey(Preferences.CATEGORY_CHANNEL_OPEN_TIME, channel1.id)]: {value: `${cutoff - 1}`},
+                        [getPreferenceKey(Preferences.CATEGORY_CHANNEL_APPROXIMATE_VIEW_TIME, channel1.id)]: {value: `${cutoff - 1}`},
+                    },
+                },
+            },
+        });
+
+        expect(isChannelVisiblePrecondition(state, channel1)).toBe(true);
+
+        expect(filterAutoclosedDMs(state, [channel1], CategoryTypes.DIRECT_MESSAGES)).toEqual([channel1]);
+    });
+
+    test('should show a GM channel if it has unread messages', () => {
+        const filterAutoclosedDMs = Selectors.makeFilterAutoclosedDMs(() => cutoff);
+
+        const channel1 = {id: 'channel1', type: General.GM_CHANNEL, total_msg_count: 1};
+
+        const state = mergeObjects(baseState, {
+            entities: {
+                channels: {
+                    currentChannelId: 'channel1',
+                    myMembers: {
+                        channel1: {msg_count: 0},
+                    },
+                },
+                preferences: {
+                    myPreferences: {
+                        [getPreferenceKey(Preferences.CATEGORY_GROUP_CHANNEL_SHOW, channel1.id)]: {value: 'true'},
+                        [getPreferenceKey(Preferences.CATEGORY_CHANNEL_OPEN_TIME, channel1.id)]: {value: `${cutoff - 1}`},
+                        [getPreferenceKey(Preferences.CATEGORY_CHANNEL_APPROXIMATE_VIEW_TIME, channel1.id)]: {value: `${cutoff - 1}`},
+                    },
+                },
+            },
+        });
+
+        expect(isChannelVisiblePrecondition(state, channel1)).toBe(true);
+
+        expect(filterAutoclosedDMs(state, [channel1], CategoryTypes.DIRECT_MESSAGES)).toEqual([channel1]);
+    });
+
+    test('should hide an inactive DM channel', () => {
+        const filterAutoclosedDMs = Selectors.makeFilterAutoclosedDMs(() => cutoff);
+
+        const otherUser = {id: 'otherUser', delete_at: 0};
+        const channel1 = {id: 'channel1', name: `${currentUser.id}__${otherUser.id}`, type: General.DM_CHANNEL};
+
+        const state = mergeObjects(baseState, {
+            entities: {
+                preferences: {
+                    myPreferences: {
+                        [getPreferenceKey(Preferences.CATEGORY_DIRECT_CHANNEL_SHOW, otherUser.id)]: {value: 'true'},
+                        [getPreferenceKey(Preferences.CATEGORY_CHANNEL_OPEN_TIME, channel1.id)]: {value: `${cutoff - 1}`},
+                        [getPreferenceKey(Preferences.CATEGORY_CHANNEL_APPROXIMATE_VIEW_TIME, channel1.id)]: {value: `${cutoff - 1}`},
+                    },
+                },
+                users: {
+                    profiles: {
+                        otherUser,
+                    },
+                },
+            },
+        });
+
+        expect(isChannelVisiblePrecondition(state, channel1)).toBe(false);
+
+        expect(filterAutoclosedDMs(state, [channel1], CategoryTypes.DIRECT_MESSAGES)).toEqual([]);
+    });
+
+    test('should show a DM channel if it was opened recently', () => {
+        const filterAutoclosedDMs = Selectors.makeFilterAutoclosedDMs(() => cutoff);
+
+        const otherUser = {id: 'otherUser', delete_at: 0};
+        const channel1 = {id: 'channel1', name: `${currentUser.id}__${otherUser.id}`, type: General.DM_CHANNEL};
+
+        const state = mergeObjects(baseState, {
+            entities: {
+                preferences: {
+                    myPreferences: {
+                        [getPreferenceKey(Preferences.CATEGORY_DIRECT_CHANNEL_SHOW, otherUser.id)]: {value: 'true'},
+                        [getPreferenceKey(Preferences.CATEGORY_CHANNEL_OPEN_TIME, channel1.id)]: {value: `${cutoff + 1}`},
+                        [getPreferenceKey(Preferences.CATEGORY_CHANNEL_APPROXIMATE_VIEW_TIME, channel1.id)]: {value: `${cutoff - 1}`},
+                    },
+                },
+                users: {
+                    profiles: {
+                        otherUser,
+                    },
+                },
+            },
+        });
+
+        expect(isChannelVisiblePrecondition(state, channel1)).toBe(true);
+
+        expect(filterAutoclosedDMs(state, [channel1], CategoryTypes.DIRECT_MESSAGES)).toEqual([channel1]);
+    });
+
+    test('should show a DM channel with a deactivated user if its the current channel', () => {
+        const filterAutoclosedDMs = Selectors.makeFilterAutoclosedDMs(() => cutoff);
+
+        const otherUser = {id: 'otherUser', delete_at: cutoff + 2};
+        const channel1 = {id: 'channel1', name: `${currentUser.id}__${otherUser.id}`, type: General.DM_CHANNEL};
+
+        const state = mergeObjects(baseState, {
+            entities: {
+                channels: {
+                    currentChannelId: 'channel1',
+                },
+                preferences: {
+                    myPreferences: {
+                        [getPreferenceKey(Preferences.CATEGORY_DIRECT_CHANNEL_SHOW, otherUser.id)]: {value: 'true'},
+                        [getPreferenceKey(Preferences.CATEGORY_CHANNEL_OPEN_TIME, channel1.id)]: {value: `${cutoff + 1}`},
+                        [getPreferenceKey(Preferences.CATEGORY_CHANNEL_APPROXIMATE_VIEW_TIME, channel1.id)]: {value: `${cutoff - 1}`},
+                    },
+                },
+                users: {
+                    profiles: {
+                        otherUser,
+                    },
+                },
+            },
+        });
+
+        expect(isChannelVisiblePrecondition(state, channel1)).toBe(true);
+
+        expect(filterAutoclosedDMs(state, [channel1], CategoryTypes.DIRECT_MESSAGES)).toEqual([channel1]);
+    });
+
+    test('should hide a DM channel with a deactivated user if it is not the current channel', () => {
+        const filterAutoclosedDMs = Selectors.makeFilterAutoclosedDMs(() => cutoff);
+
+        const otherUser = {id: 'otherUser', delete_at: cutoff + 2};
+        const channel1 = {id: 'channel1', name: `${currentUser.id}__${otherUser.id}`, type: General.DM_CHANNEL};
+
+        const state = mergeObjects(baseState, {
+            entities: {
+                channels: {
+                    currentChannelId: 'channel2',
+                },
+                preferences: {
+                    myPreferences: {
+                        [getPreferenceKey(Preferences.CATEGORY_DIRECT_CHANNEL_SHOW, otherUser.id)]: {value: 'true'},
+                        [getPreferenceKey(Preferences.CATEGORY_CHANNEL_OPEN_TIME, channel1.id)]: {value: `${cutoff + 1}`},
+                        [getPreferenceKey(Preferences.CATEGORY_CHANNEL_APPROXIMATE_VIEW_TIME, channel1.id)]: {value: `${cutoff - 1}`},
+                    },
+                },
+                users: {
+                    profiles: {
+                        otherUser,
+                    },
+                },
+            },
+        });
+
+        expect(isChannelVisiblePrecondition(state, channel1)).toBe(false);
+
+        expect(filterAutoclosedDMs(state, [channel1], CategoryTypes.DIRECT_MESSAGES)).toEqual([]);
+    });
+
+    test('should show a DM channel with a deactivated user if it is not the current channel but it has been opened since the user was deactivated', () => {
+        const filterAutoclosedDMs = Selectors.makeFilterAutoclosedDMs(() => cutoff);
+
+        const otherUser = {id: 'otherUser', delete_at: cutoff + 2};
+        const channel1 = {id: 'channel1', name: `${currentUser.id}__${otherUser.id}`, type: General.DM_CHANNEL};
+
+        const state = mergeObjects(baseState, {
+            entities: {
+                channels: {
+                    currentChannelId: 'channel1',
+                },
+                preferences: {
+                    myPreferences: {
+                        [getPreferenceKey(Preferences.CATEGORY_DIRECT_CHANNEL_SHOW, otherUser.id)]: {value: 'true'},
+                        [getPreferenceKey(Preferences.CATEGORY_CHANNEL_OPEN_TIME, channel1.id)]: {value: `${cutoff + 3}`},
+                        [getPreferenceKey(Preferences.CATEGORY_CHANNEL_APPROXIMATE_VIEW_TIME, channel1.id)]: {value: `${cutoff - 1}`},
+                    },
+                },
+                users: {
+                    profiles: {
+                        otherUser,
+                    },
+                },
+            },
+        });
+
+        expect(isChannelVisiblePrecondition(state, channel1)).toBe(true);
+
+        expect(filterAutoclosedDMs(state, [channel1], CategoryTypes.DIRECT_MESSAGES)).toEqual([channel1]);
+    });
+
+    test('should return the original array when no items are removed', () => {
+        const filterAutoclosedDMs = Selectors.makeFilterAutoclosedDMs(() => cutoff);
+
+        const channel1 = {id: 'channel1', type: General.PUBLIC_CHANNEL};
+
+        const state = baseState;
+
+        const channels = [channel1];
+
+        expect(filterAutoclosedDMs(state, channels, CategoryTypes.DIRECT_MESSAGES)).toBe(channels);
     });
 });
 
@@ -445,9 +866,14 @@ describe('makeGetChannelsForCategory', () => {
                     dmChannel2,
                     gmChannel1,
                 },
+                myMembers: {},
             },
             general: {
                 config: {},
+            },
+            posts: {
+                posts: {},
+                postsInChannel: {},
             },
             preferences: {
                 myPreferences: {

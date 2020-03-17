@@ -260,7 +260,6 @@ export function shouldAutocloseDMs(state: GlobalState) {
         return false;
     }
 
-    const preference = get(state, Preferences.CATEGORY_SIDEBAR_SETTINGS, Preferences.CHANNELS_SIDEBAR_AUTOCLOSE_DMS, '');
-
-    return preference.value === Preferences.AUTOCLOSE_DMS_ENABLED;
+    const preference = get(state, Preferences.CATEGORY_SIDEBAR_SETTINGS, Preferences.CHANNEL_SIDEBAR_AUTOCLOSE_DMS, '');
+    return preference === Preferences.AUTOCLOSE_DMS_ENABLED;
 }
