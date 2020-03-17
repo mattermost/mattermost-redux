@@ -12,6 +12,7 @@ export type ChannelCategory = {
     type: ChannelCategoryType;
     display_name: string;
 
+    // This will be added in phase 2 of Channel Sidebar Organization once the server provides the categories
     // channel_ids: $ID<Channel>;
 };
 
