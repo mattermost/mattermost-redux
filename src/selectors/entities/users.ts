@@ -9,7 +9,6 @@ export {getCurrentUserId, getCurrentUser, getUsers};
 import {GlobalState} from 'types/store';
 import {UserProfile} from 'types/users';
 import {Reaction} from 'types/reactions';
-import {Group} from 'types/groups';
 import {Team} from 'types/teams';
 import {Channel} from 'types/channels';
 import {RelationOneToOne, RelationOneToMany, IDMappedObjects, UsernameMappedObjects, EmailMappedObjects, $ID, $Username, $Email, Dictionary} from 'types/utilities';
