@@ -758,3 +758,76 @@ describe('Selectors.Preferences', () => {
     });
 });
 
+describe('shouldAutocloseDMs', () => {
+    test('should return false by default', () => {
+        const state = {
+            entities: {
+                general: {
+                    config: {},
+                },
+                preferences: {
+                    myPreferences: {},
+                },
+            },
+        };
+
+        expect(Selectors.shouldAutocloseDMs(state)).toBe(false);
+    });
+
+    test('should return true when enabled by both server and user', () => {
+        const state = {
+            entities: {
+                general: {
+                    config: {
+                        CloseUnusedDirectMessages: 'true',
+                    },
+                },
+                preferences: {
+                    myPreferences: {
+                        [getPreferenceKey(Preferences.CATEGORY_SIDEBAR_SETTINGS, Preferences.CHANNEL_SIDEBAR_AUTOCLOSE_DMS)]: {value: Preferences.AUTOCLOSE_DMS_ENABLED},
+                    },
+                },
+            },
+        };
+
+        expect(Selectors.shouldAutocloseDMs(state)).toBe(true);
+    });
+
+    test('should return false when enabled by server but disabled by user', () => {
+        const state = {
+            entities: {
+                general: {
+                    config: {
+                        CloseUnusedDirectMessages: 'true',
+                    },
+                },
+                preferences: {
+                    myPreferences: {
+                        [getPreferenceKey(Preferences.CATEGORY_SIDEBAR_SETTINGS, Preferences.CHANNEL_SIDEBAR_AUTOCLOSE_DMS)]: {value: ''},
+                    },
+                },
+            },
+        };
+
+        expect(Selectors.shouldAutocloseDMs(state)).toBe(false);
+    });
+
+    test('should return false when enabled by user but disabled by server', () => {
+        const state = {
+            entities: {
+                general: {
+                    config: {
+                        CloseUnusedDirectMessages: 'false',
+                    },
+                },
+                preferences: {
+                    myPreferences: {
+                        [getPreferenceKey(Preferences.CATEGORY_SIDEBAR_SETTINGS, Preferences.CHANNEL_SIDEBAR_AUTOCLOSE_DMS)]: {value: Preferences.AUTOCLOSE_DMS_ENABLED},
+                    },
+                },
+            },
+        };
+
+        expect(Selectors.shouldAutocloseDMs(state)).toBe(false);
+    });
+});
