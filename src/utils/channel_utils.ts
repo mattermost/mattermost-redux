@@ -33,28 +33,6 @@ const channelTypeOrder = {
  *  favoriteChannels: [...]
  * }
  */
-
-export function buildDisplayableChannelList(usersState: UsersState, allChannels: Array<Channel>, myMembers: RelationOneToOne<Channel, ChannelMembership>, config: any, myPreferences: {
-    [x: string]: PreferenceType;
-}, teammateNameDisplay: string, lastPosts: RelationOneToOne<Channel, Post>) {
-    const missingDirectChannels = createMissingDirectChannels(usersState.currentUserId, allChannels, myPreferences);
-    const {
-        currentUserId,
-        profiles,
-    } = usersState;
-    const locale = getUserLocale(currentUserId, profiles);
-    const channels = buildChannels(usersState, allChannels, missingDirectChannels, teammateNameDisplay, locale);
-    const favoriteChannels = buildFavoriteChannels(channels, myPreferences, locale);
-    const notFavoriteChannels = buildNotFavoriteChannels(channels, myPreferences);
-    const directAndGroupChannels = buildDirectAndGroupChannels(notFavoriteChannels, myMembers, config, myPreferences, currentUserId, profiles, lastPosts);
-    return {
-        favoriteChannels,
-        publicChannels: (notFavoriteChannels.filter(isOpenChannel) as Array<Channel>),
-        privateChannels: (notFavoriteChannels.filter(isPrivateChannel) as Array<Channel>),
-        directAndGroupChannels,
-    };
-}
-
 export function buildDisplayableChannelListWithUnreadSection(usersState: UsersState, myChannels: Array<Channel>, myMembers: RelationOneToOne<Channel, ChannelMembership>, config: any, myPreferences: {
     [x: string]: PreferenceType;
 }, teammateNameDisplay: string, lastPosts: RelationOneToOne<Channel, Post>) {
