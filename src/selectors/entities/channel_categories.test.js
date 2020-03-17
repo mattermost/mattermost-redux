@@ -64,13 +64,13 @@ describe('makeGetCategoriesForTeam', () => {
 });
 
 describe('makeGetChannelsForAllCategories', () => {
-    const channel1 = {id: 'channel1', team_id: 'team1'};
-    const channel2 = {id: 'channel2', team_id: 'team1'};
-    const channel3 = {id: 'channel3', team_id: 'team2'};
-    const dmChannel1 = {id: 'dmChannel1', team_id: ''};
-    const gmChannel1 = {id: 'gmChannel1', team_id: ''};
+    const channel1 = {id: 'channel1', team_id: 'team1', delete_at: 0};
+    const channel2 = {id: 'channel2', team_id: 'team1', delete_at: 0};
+    const channel3 = {id: 'channel3', team_id: 'team2', delete_at: 0};
+    const dmChannel1 = {id: 'dmChannel1', team_id: '', delete_at: 0};
+    const gmChannel1 = {id: 'gmChannel1', team_id: '', delete_at: 0};
 
-    const state = {
+    const baseState = {
         entities: {
             channels: {
                 channels: {
@@ -80,6 +80,13 @@ describe('makeGetChannelsForAllCategories', () => {
                     dmChannel1,
                     gmChannel1,
                 },
+                myMembers: {
+                    [channel1.id]: {},
+                    [channel2.id]: {},
+                    [channel3.id]: {},
+                    [dmChannel1.id]: {},
+                    [gmChannel1.id]: {},
+                },
             },
         },
     };
@@ -87,27 +94,84 @@ describe('makeGetChannelsForAllCategories', () => {
     test('should return channels on the team and DMs/GMs', () => {
         const getChannelsForAllCategories = Selectors.makeGetChannelsForAllCategories();
 
-        expect(getChannelsForAllCategories(state, 'team1')).toMatchObject([channel1, channel2, dmChannel1, gmChannel1]);
+        expect(getChannelsForAllCategories(baseState, 'team1')).toMatchObject([channel1, channel2, dmChannel1, gmChannel1]);
 
-        expect(getChannelsForAllCategories(state, 'team2')).toMatchObject([channel3, dmChannel1, gmChannel1]);
+        expect(getChannelsForAllCategories(baseState, 'team2')).toMatchObject([channel3, dmChannel1, gmChannel1]);
+    });
+
+    test('should not return channels which the user is not a member of', () => {
+        const channel4 = {id: 'channel4', team_id: 'team1', delete_at: 0};
+
+        const getChannelsForAllCategories = Selectors.makeGetChannelsForAllCategories();
+
+        let state = {
+            entities: {
+                channels: {
+                    channels: {
+                        channel4,
+                    },
+                    myMembers: {},
+                },
+            },
+        };
+
+        expect(getChannelsForAllCategories(state, 'team1')).not.toContain(channel4);
+
+        state = {
+            entities: {
+                channels: {
+                    channels: {
+                        channel4,
+                    },
+                    myMembers: {
+                        [channel4.id]: {},
+                    },
+                },
+            },
+        };
+
+        expect(getChannelsForAllCategories(state, 'team1')).toContain(channel4);
+    });
+
+    test('should not return deleted channels', () => {
+        const channel = {id: 'channel', team_id: 'team1', delete_at: 0};
+        const deletedChannel = {id: 'deletedChannel', team_id: 'team1', delete_at: 1000};
+
+        const getChannelsForAllCategories = Selectors.makeGetChannelsForAllCategories();
+
+        const state = {
+            entities: {
+                channels: {
+                    channels: {
+                        channel,
+                    },
+                    myMembers: {
+                        [channel.id]: {},
+                    },
+                },
+            },
+        };
+
+        expect(getChannelsForAllCategories(state, 'team1')).toContain(channel);
+        expect(getChannelsForAllCategories(state, 'team1')).not.toContain(deletedChannel);
     });
 
     test('should memoize properly', () => {
         const getChannelsForAllCategories = Selectors.makeGetChannelsForAllCategories();
 
-        const result = getChannelsForAllCategories(state, 'team1');
+        const result = getChannelsForAllCategories(baseState, 'team1');
 
         // Repeat calls should return the same array
-        expect(getChannelsForAllCategories(state, 'team1')).toBe(result);
+        expect(getChannelsForAllCategories(baseState, 'team1')).toBe(result);
 
         // Calls to a difference instance of the selector won't return the same array
-        expect(result).not.toBe(Selectors.makeGetChannelsForAllCategories()(state, 'team1'));
+        expect(result).not.toBe(Selectors.makeGetChannelsForAllCategories()(baseState, 'team1'));
 
         // Calls with different arguments won't return the same array
-        expect(getChannelsForAllCategories(state, 'team2')).not.toBe(result);
+        expect(getChannelsForAllCategories(baseState, 'team2')).not.toBe(result);
 
         // Calls after different argumetns won't return the same array
-        expect(getChannelsForAllCategories(state, 'team1')).not.toBe(result);
+        expect(getChannelsForAllCategories(baseState, 'team1')).not.toBe(result);
     });
 });
 
@@ -835,12 +899,12 @@ describe('makeGetChannelsForCategory', () => {
     const otherUser1 = {id: 'otherUser1', username: 'otherUser1', first_name: 'Other', last_name: 'User', locale: 'en'};
     const otherUser2 = {id: 'otherUser2', username: 'otherUser2', first_name: 'Another', last_name: 'User', locale: 'en'};
 
-    const channel1 = {id: 'channel1', type: General.OPEN_CHANNEL, team_id: 'team1', display_name: 'Zebra'};
-    const channel2 = {id: 'channel2', type: General.PRIVATE_CHANNEL, team_id: 'team1', display_name: 'Aardvark'};
-    const channel3 = {id: 'channel3', type: General.OPEN_CHANNEL, team_id: 'team1', display_name: 'Bear'};
-    const dmChannel1 = {id: 'dmChannel1', type: General.DM_CHANNEL, team_id: '', display_name: '', name: `${currentUser.id}__${otherUser1.id}`};
-    const dmChannel2 = {id: 'dmChannel2', type: General.DM_CHANNEL, team_id: '', display_name: '', name: `${otherUser2.id}__${currentUser.id}`};
-    const gmChannel1 = {id: 'gmChannel1', type: General.GM_CHANNEL, team_id: '', display_name: `${currentUser.username}, ${otherUser1.username}, ${otherUser2.username}`, name: 'gmChannel1'};
+    const channel1 = {id: 'channel1', type: General.OPEN_CHANNEL, team_id: 'team1', display_name: 'Zebra', delete_at: 0};
+    const channel2 = {id: 'channel2', type: General.PRIVATE_CHANNEL, team_id: 'team1', display_name: 'Aardvark', delete_at: 0};
+    const channel3 = {id: 'channel3', type: General.OPEN_CHANNEL, team_id: 'team1', display_name: 'Bear', delete_at: 0};
+    const dmChannel1 = {id: 'dmChannel1', type: General.DM_CHANNEL, team_id: '', display_name: '', name: `${currentUser.id}__${otherUser1.id}`, delete_at: 0};
+    const dmChannel2 = {id: 'dmChannel2', type: General.DM_CHANNEL, team_id: '', display_name: '', name: `${otherUser2.id}__${currentUser.id}`, delete_at: 0};
+    const gmChannel1 = {id: 'gmChannel1', type: General.GM_CHANNEL, team_id: '', display_name: `${currentUser.username}, ${otherUser1.username}, ${otherUser2.username}`, name: 'gmChannel1', delete_at: 0};
 
     const favoritesCategory = {id: 'favoritesCategory', team_id: 'team1', display_name: CategoryTypes.FAVORITES, type: CategoryTypes.FAVORITES};
     const publicCategory = {id: 'publicCategory', team_id: 'team1', display_name: 'Public Channels', type: CategoryTypes.PUBLIC};
@@ -866,7 +930,14 @@ describe('makeGetChannelsForCategory', () => {
                     dmChannel2,
                     gmChannel1,
                 },
-                myMembers: {},
+                myMembers: {
+                    [channel1.id]: {},
+                    [channel2.id]: {},
+                    [channel3.id]: {},
+                    [dmChannel1.id]: {},
+                    [dmChannel2.id]: {},
+                    [gmChannel1.id]: {},
+                },
             },
             general: {
                 config: {},

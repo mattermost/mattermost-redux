@@ -12,7 +12,7 @@ import {getLastPostPerChannel} from 'selectors/entities/posts';
 import {getMyPreferences, getTeammateNameDisplaySetting, shouldAutocloseDMs} from 'selectors/entities/preferences';
 import {getCurrentUserId} from 'selectors/entities/users';
 
-import {Channel} from 'types/channels';
+import {Channel, ChannelMembership} from 'types/channels';
 import {ChannelCategory} from 'types/channel_categories';
 import {GlobalState} from 'types/store';
 import {UserProfile} from 'types/users';
@@ -43,9 +43,13 @@ export function makeGetCategoriesForTeam(): (state: GlobalState, teamId: string)
 export function makeGetChannelsForAllCategories(): (state: GlobalState, teamId: string) => Channel[] {
     return createSelector(
         (state: GlobalState) => state.entities.channels.channels,
+        getMyChannelMemberships,
         (state: GlobalState, teamId: string) => teamId,
-        (allChannels: IDMappedObjects<Channel>, teamId: string) => {
-            return Object.values(allChannels).filter((channel) => channel.team_id === teamId || channel.team_id === '');
+        (allChannels: IDMappedObjects<Channel>, myMembers: RelationOneToOne<Channel, ChannelMembership>, teamId: string) => {
+            return Object.values(allChannels).
+                filter((channel) => channel.delete_at === 0).
+                filter((channel) => channel.team_id === teamId || channel.team_id === '').
+                filter((channel) => myMembers.hasOwnProperty(channel.id));
         }
     );
 }
