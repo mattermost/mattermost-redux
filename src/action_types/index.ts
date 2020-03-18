@@ -1,5 +1,6 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
+
 import ChannelTypes from './channels';
 import ErrorTypes from './errors';
 import GeneralTypes from './general';
@@ -20,6 +21,7 @@ import SchemeTypes from './schemes';
 import GroupTypes from './groups';
 import BotTypes from './bots';
 import PluginTypes from './plugins';
+import ChannelCategoryTypes from './channel_categories';
 
 export {
     ErrorTypes,
@@ -42,4 +44,5 @@ export {
     GroupTypes,
     BotTypes,
     PluginTypes,
+    ChannelCategoryTypes,
 };
