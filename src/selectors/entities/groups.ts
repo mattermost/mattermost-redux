@@ -54,7 +54,6 @@ export function getGroupMembers(state: GlobalState, id: string) {
 }
 
 export function searchAssociatedGroupsForReferenceLocal(state: GlobalState, term: string, teamId: string, channelId: string): Array<Group> {
-
     if (!haveIChannelPermission(state, {
         permission: Permissions.USE_GROUP_MENTIONS,
         channel: channelId,
