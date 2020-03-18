@@ -58,51 +58,19 @@ export function editRole(role: Role) {
     });
 }
 
-export function setPendingRoles(roles: Array<string>) {
-    return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
-        dispatch({type: RoleTypes.SET_PENDING_ROLES, data: roles});
-        return {data: roles};
-    };
-}
-
 export function loadRolesIfNeeded(roles: Iterable<string>): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         const state = getState();
-        let pendingRoles = new Set<string>();
-
-        try {
-            pendingRoles = new Set<string>(state.entities.roles.pending);
-        } catch (e) {// eslint-disable-line
-        }
+        const currentRoles = getRoles(state);
+        const newRoles = [];
 
         for (const role of roles) {
-            pendingRoles.add(role);
-        }
-        if (!state.entities.general.serverVersion) {
-            setPendingRoles(Array.from(pendingRoles))(dispatch, getState);
-            setTimeout(() => dispatch(loadRolesIfNeeded([])), 500);
-            return {data: []};
-        }
-        if (!hasNewPermissions(state)) {
-            if (state.entities.roles.pending) {
-                await setPendingRoles([])(dispatch, getState);
-            }
-            return {data: []};
-        }
-        const loadedRoles = getRoles(state);
-        const newRoles = new Set<string>();
-
-        for (const role of pendingRoles) {
-            if (!loadedRoles[role] && role.trim() !== '') {
-                newRoles.add(role);
+            if (!currentRoles[role] && role.trim() !== '') {
+                newRoles.push(role);
             }
         }
-
-        if (state.entities.roles.pending) {
-            await setPendingRoles([])(dispatch, getState);
-        }
-        if (newRoles.size > 0) {
-            return getRolesByNames(Array.from(newRoles))(dispatch, getState);
+        if (newRoles.length > 0) {
+            return dispatch(getRolesByNames(newRoles));
         }
         return {data: state.entities.roles.roles};
     };
