@@ -2,7 +2,7 @@
 // See LICENSE.txt for license information.
 import * as reselect from 'reselect';
 import {General, Preferences} from '../../constants';
-import {getConfig} from 'selectors/entities/general';
+import {getConfig, getLicense} from 'selectors/entities/general';
 import {getCurrentTeamId} from 'selectors/entities/teams';
 import {createShallowSelector} from 'utils/helpers';
 import {getPreferenceKey} from 'utils/preference_utils';
@@ -89,9 +89,11 @@ export const getVisibleGroupIds = reselect.createSelector(
 export const getTeammateNameDisplaySetting = reselect.createSelector(
     getConfig,
     getMyPreferences,
-    (config, preferences) => {
+    getLicense,
+    (config, preferences, license) => {
+        const useAdminTeammateNameDisplaySetting = (license && license.LockTeammateNameDisplay === 'true') && config.LockTeammateNameDisplay === 'true';
         const key = getPreferenceKey(Preferences.CATEGORY_DISPLAY_SETTINGS, Preferences.NAME_NAME_FORMAT);
-        if (preferences[key]) {
+        if (preferences[key] && !useAdminTeammateNameDisplaySetting) {
             return preferences[key].value;
         } else if (config.TeammateNameDisplay) {
             return config.TeammateNameDisplay;

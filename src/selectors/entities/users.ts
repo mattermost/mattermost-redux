@@ -493,12 +493,8 @@ export function makeGetDisplayName(): (a: GlobalState, b: $ID<UserProfile>, c: b
         (state: GlobalState, userId: string) => getUser(state, userId),
         getTeammateNameDisplaySetting,
         (state, _, useFallbackUsername = true) => useFallbackUsername,
-        getConfig,
-        getLicense,
-        (user, teammateNameDisplaySetting, useFallbackUsername, config, license) => {
-            const useAdminTemmateNameDisplaySetting = license.LockTeammateNameDisplay === 'true' && config.LockTeammateNameDisplay === 'true';
-            const adminTeammateNameDisplaySetting = config.TeammateNameDisplay;
-            return displayUsername(user, teammateNameDisplaySetting!, useFallbackUsername, useAdminTemmateNameDisplaySetting, adminTeammateNameDisplaySetting);
+        (user, teammateNameDisplaySetting, useFallbackUsername) => {
+            return displayUsername(user, teammateNameDisplaySetting!, useFallbackUsername);
         }
     );
 }
