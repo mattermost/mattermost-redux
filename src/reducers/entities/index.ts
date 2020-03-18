@@ -22,6 +22,7 @@ import roles from './roles';
 import schemes from './schemes';
 import groups from './groups';
 import bots from './bots';
+import channelCategories from './channel_categories';
 
 export default combineReducers({
     general,
@@ -43,4 +44,5 @@ export default combineReducers({
     schemes,
     groups,
     bots,
+    channelCategories,
 });

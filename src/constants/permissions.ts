@@ -70,6 +70,7 @@ export default {
     PROMOTE_GUEST: 'promote_guest',
     DEMOTE_TO_GUEST: 'demote_to_guest',
     USE_CHANNEL_MENTIONS: 'use_channel_mentions',
+    USE_GROUP_MENTIONS: 'use_group_mentions',
 
     CHANNEL_MODERATED_PERMISSIONS: {
         CREATE_POST: 'create_post',
