@@ -1,6 +1,7 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
 import * as reselect from 'reselect';
+import {Permissions} from '../../constants';
 import {GlobalState} from 'types/store';
 import {Group} from 'types/groups';
 import {filterGroupsMatchingTerm} from 'utils/group_utils';
@@ -53,14 +54,14 @@ export function getGroupMembers(state: GlobalState, id: string) {
 }
 
 export function searchAssociatedGroupsForReferenceLocal(state: GlobalState, term: string, teamId: string, channelId: string): Array<Group> {
-    // uncomment when USE_GROUP_MENTIONS is checked-in
-    // if (!haveIChannelPermission(state, {
-    //     permission: Permissions.USE_GROUP_MENTIONS,
-    //     channel: channelId,
-    //     team: teamId,
-    // })) {
-    //     return emptyList;
-    // }
+
+    if (!haveIChannelPermission(state, {
+        permission: Permissions.USE_GROUP_MENTIONS,
+        channel: channelId,
+        team: teamId,
+    })) {
+        return emptyList;
+    }
 
     const groups = getAssociatedGroupsForReference(state, teamId, channelId);
     if (!groups) {
@@ -74,14 +75,13 @@ export function getAssociatedGroupsForReference(state: GlobalState, teamId: stri
     const team = getTeam(state, teamId);
     const channel = getChannel(state, channelId);
 
-    // uncomment when USE_GROUP_MENTIONS is checked-in
-    // if (!haveIChannelPermission(state, {
-    //     permission: Permissions.USE_GROUP_MENTIONS,
-    //     channel: channelId,
-    //     team: teamId,
-    // })) {
-    //     return emptyList;
-    // }
+    if (!haveIChannelPermission(state, {
+        permission: Permissions.USE_GROUP_MENTIONS,
+        channel: channelId,
+        team: teamId,
+    })) {
+        return emptyList;
+    }
 
     let groupsForReference = [];
     if (team && team.group_constrained && channel && channel.group_constrained) {
