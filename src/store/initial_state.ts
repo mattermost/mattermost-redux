@@ -76,9 +76,6 @@ const state: GlobalState = {
             jobs: {},
             jobsByTypeList: {},
         },
-        alerts: {
-            alertStack: [],
-        },
         integrations: {
             incomingHooks: {},
             outgoingHooks: {},

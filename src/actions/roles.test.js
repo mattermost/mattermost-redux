@@ -83,42 +83,26 @@ describe('Actions.Roles', () => {
 
     it('loadRolesIfNeeded', async () => {
         const mock1 = nock(Client4.getRolesRoute()).
-            post('/names', JSON.stringify(['test'])).
+            post('/names', JSON.stringify(['existing_role'])).
             reply(200, []);
         const mock2 = nock(Client4.getRolesRoute()).
-            post('/names', JSON.stringify(['test2'])).
+            post('/names', JSON.stringify(['new_role'])).
             reply(200, []);
+
         const fakeState = {
             entities: {
-                general: {
-                    serverVersion: '4.3',
-                },
                 roles: {
                     roles: {
-                        test: {},
+                        existing_role: {},
                     },
                 },
             },
         };
-        await Actions.loadRolesIfNeeded(['test'])(store.dispatch, () => fakeState);
+        await Actions.loadRolesIfNeeded(['existing_role'])(store.dispatch, () => fakeState);
         assert(!mock1.isDone());
         assert(!mock2.isDone());
 
-        fakeState.entities.roles.pending = new Set();
-        fakeState.entities.general.serverVersion = '4.3';
-        await Actions.loadRolesIfNeeded(['test', 'test2'])(store.dispatch, () => fakeState);
-        assert(!mock1.isDone());
-        assert(!mock2.isDone());
-
-        fakeState.entities.roles.pending = new Set();
-        fakeState.entities.general.serverVersion = null;
-        await Actions.loadRolesIfNeeded(['test', 'test2'])(store.dispatch, () => fakeState);
-        assert(!mock1.isDone());
-        assert(!mock2.isDone());
-
-        fakeState.entities.roles.pending = new Set();
-        fakeState.entities.general.serverVersion = '4.9';
-        await Actions.loadRolesIfNeeded(['test', 'test2', ''])(store.dispatch, () => fakeState);
+        await Actions.loadRolesIfNeeded(['existing_role', 'new_role', ''])(store.dispatch, () => fakeState);
         assert(!mock1.isDone());
         assert(mock2.isDone());
     });
