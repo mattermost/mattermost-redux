@@ -6,7 +6,7 @@ import websocketClient from '../client/websocket_client';
 
 import {ChannelTypes, GeneralTypes, EmojiTypes, PostTypes, PreferenceTypes, TeamTypes, UserTypes, RoleTypes, AdminTypes, IntegrationTypes} from 'action_types';
 import {General, WebsocketEvents, Preferences} from '../constants';
-import {getAllChannels, getChannel, getChannelsNameMapInTeam, getCurrentChannelId, getCurrentChannel, getMyChannelMember as getMyChannelMemberSelector, getRedirectChannelNameForTeam, getCurrentChannelStats, getChannelMembersInChannels, isManuallyUnread} from 'selectors/entities/channels';
+import {getAllChannels, getChannel, getChannelsNameMapInTeam, getCurrentChannelId, getCurrentChannel, getMyChannelMember as getMyChannelMemberSelector, getRedirectChannelNameForTeam, getCurrentChannelStats, getMyChannels, getChannelMembersInChannels, isManuallyUnread, getKnownUsers} from 'selectors/entities/channels';
 import {getConfig} from 'selectors/entities/general';
 import {getAllPosts, getPost as getPostSelector} from 'selectors/entities/posts';
 import {getDirectShowPreferences} from 'selectors/entities/preferences';
@@ -408,9 +408,12 @@ function handleLeaveTeamEvent(msg: Partial<WebSocketMessage>) {
         const state = getState();
         const teams = getTeamsSelector(state);
         const currentTeamId = getCurrentTeamId(state);
-        const currentUserId = getCurrentUserId(state);
+        const currentUser = getCurrentUser(state);
 
-        if (currentUserId === msg.data.user_id) {
+        if (currentUser.id === msg.data.user_id) {
+            if (isGuest(currentUser.roles)) {
+                dispatch(removeNotVisibleUsers());
+            }
             dispatch({type: TeamTypes.LEAVE_TEAM, data: teams[msg.data.team_id]});
 
             // if they are on the team being removed deselect the current team and channel
@@ -528,6 +531,9 @@ function handleUserRemovedEvent(msg: WebSocketMessage) {
             if (msg.data.channel_id === currentChannelId) {
                 // emit the event so the client can change his own state
                 EventEmitter.emit(General.SWITCH_TO_DEFAULT_CHANNEL, currentTeamId);
+            }
+            if (isGuest(currentUser.roles)) {
+                dispatch(removeNotVisibleUsers());
             }
         } else if (msg.data.channel_id === currentChannelId) {
             dispatch(getChannelStats(currentChannelId));
@@ -945,6 +951,25 @@ export function userTyping(channelId: string, parentPostId: string): ActionFunc 
             (membersInChannel < parseInt(config.MaxNotificationsPerChannel!, 10)) && (config.EnableUserTypingMessages === 'true')) {
             websocketClient.userTyping(channelId, parentPostId);
             lastTimeTypingSent = t;
+        }
+
+        return {data: true};
+    };
+}
+
+export function removeNotVisibleUsers(): ActionFunc {
+    return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
+        const state = getState();
+        const knownUsers = getKnownUsers(state);
+        const allUsers = Object.keys(getUsers(state));
+        const usersToRemove = new Set(allUsers.filter((x) => !knownUsers.has(x)));
+
+        const actions = [];
+        for (const userToRemove of usersToRemove.values()) {
+            actions.push({type: UserTypes.PROFILE_NO_LONGER_VISIBLE, data: {user_id: userToRemove}});
+        }
+        if (actions.length > 0) {
+            dispatch(batchActions(actions));
         }
 
         return {data: true};
