@@ -5,6 +5,7 @@ import {GlobalState} from 'types/store';
 import {Group} from 'types/groups';
 import {filterGroupsMatchingTerm} from 'utils/group_utils';
 import {getChannel} from 'selectors/entities/channels';
+import {haveIChannelPermission} from 'selectors/entities/roles';
 import {getTeam} from 'selectors/entities/teams';
 import {UserMentionKey} from 'selectors/entities/users';
 
@@ -52,18 +53,35 @@ export function getGroupMembers(state: GlobalState, id: string) {
 }
 
 export function searchAssociatedGroupsForReferenceLocal(state: GlobalState, term: string, teamId: string, channelId: string): Array<Group> {
+    // uncomment when USE_GROUP_MENTIONS is checked-in
+    // if (!haveIChannelPermission(state, {
+    //     permission: Permissions.USE_GROUP_MENTIONS,
+    //     channel: channelId,
+    //     team: teamId,
+    // })) {
+    //     return emptyList;
+    // }
+
     const groups = getAssociatedGroupsForReference(state, teamId, channelId);
     if (!groups) {
         return emptyList;
     }
     const filteredGroups = filterGroupsMatchingTerm(groups, term);
     return filteredGroups;
-    return groups;
 }
 
 export function getAssociatedGroupsForReference(state: GlobalState, teamId: string, channelId: string): Array<Group> {
     const team = getTeam(state, teamId);
     const channel = getChannel(state, channelId);
+
+    // uncomment when USE_GROUP_MENTIONS is checked-in
+    // if (!haveIChannelPermission(state, {
+    //     permission: Permissions.USE_GROUP_MENTIONS,
+    //     channel: channelId,
+    //     team: teamId,
+    // })) {
+    //     return emptyList;
+    // }
 
     let groupsForReference = [];
     if (team && team.group_constrained && channel && channel.group_constrained) {
