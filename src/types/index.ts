@@ -2,7 +2,6 @@
 // See LICENSE.txt for license information.
 
 import * as actions from './actions';
-import * as alerts from './alerts';
 import * as channels from './channels';
 import * as client4 from './client4';
 import * as errors from './errors';
@@ -31,7 +30,6 @@ import * as config from './config';
 export {
     config,
     actions,
-    alerts,
     bots,
     plugins,
     store,

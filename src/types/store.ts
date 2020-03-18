@@ -1,6 +1,5 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
-import {AlertType} from './alerts';
 import {GeneralState} from './general';
 import {UsersState} from './users';
 import {TeamsState} from './teams';
@@ -36,9 +35,6 @@ export type GlobalState = {
             };
         };
         jobs: JobsState;
-        alerts: {
-            alertStack: Array<AlertType>;
-        };
         search: SearchState;
         integrations: IntegrationsState;
         files: FilesState;

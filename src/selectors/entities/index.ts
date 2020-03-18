@@ -1,7 +1,6 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
 
-import * as alerts from './alerts';
 import * as bots from './bots';
 import * as channels from './channels';
 import * as common from './common';
@@ -24,7 +23,6 @@ import * as typing from './typing';
 import * as users from './users';
 
 export {
-    alerts,
     bots,
     channels,
     common,
