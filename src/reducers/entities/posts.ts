@@ -333,8 +333,11 @@ export function postsInChannel(state: Dictionary<Array<PostOrderBlock>> = {}, ac
             nextPostsForChannel[recentBlockIndex] = nextRecentBlock;
         }
 
+        // This actions should only be dispatched for the current channel
+        // so we only store next posts for that channel.
         return {
-            ...state,
+
+            // ...state,
             [post.channel_id]: nextPostsForChannel,
         };
     }
@@ -376,8 +379,11 @@ export function postsInChannel(state: Dictionary<Array<PostOrderBlock>> = {}, ac
         const nextPostsForChannel = [...postsForChannel];
         nextPostsForChannel[recentBlockIndex] = nextRecentBlock;
 
+        // This actions should only be dispatched for the current channel
+        // so we only store next posts for that channel.
         return {
-            ...state,
+
+            // ...state,
             [post.channel_id]: nextPostsForChannel,
         };
     }
@@ -427,7 +433,11 @@ export function postsInChannel(state: Dictionary<Array<PostOrderBlock>> = {}, ac
         // Merge overlapping blocks
         nextPostsForChannel = mergePostBlocks(nextPostsForChannel, nextPosts);
 
+        // This actions should only be dispatched for the current channel
+        // so we only store next posts for that channel.
         return {
+
+            // ...state,
             [action.channelId]: nextPostsForChannel,
         };
     }
@@ -452,8 +462,11 @@ export function postsInChannel(state: Dictionary<Array<PostOrderBlock>> = {}, ac
         let nextPostsForChannel = [...postsForChannel, newBlock];
         nextPostsForChannel = mergePostBlocks(nextPostsForChannel, nextPosts);
 
+        // This actions should only be dispatched for the current channel
+        // so we only store next posts for that channel.
         return {
-            ...state,
+
+            // ...state,
             [action.channelId]: nextPostsForChannel,
         };
     }
@@ -479,8 +492,11 @@ export function postsInChannel(state: Dictionary<Array<PostOrderBlock>> = {}, ac
         let nextPostsForChannel = [...postsForChannel, newBlock];
         nextPostsForChannel = mergePostBlocks(nextPostsForChannel, nextPosts);
 
+        // This actions should only be dispatched for the current channel
+        // so we only store next posts for that channel.
         return {
-            ...state,
+
+            // ...state,
             [action.channelId]: nextPostsForChannel,
         };
     }
@@ -545,8 +561,11 @@ export function postsInChannel(state: Dictionary<Array<PostOrderBlock>> = {}, ac
         const nextPostsForChannel = [...postsForChannel];
         nextPostsForChannel[recentBlockIndex] = nextRecentBlock;
 
+        // This actions should only be dispatched for the current channel
+        // so we only store next posts for that channel.
         return {
-            ...state,
+
+            // ...state,
             [action.channelId]: nextPostsForChannel,
         };
     }
@@ -587,8 +606,11 @@ export function postsInChannel(state: Dictionary<Array<PostOrderBlock>> = {}, ac
 
         nextPostsForChannel = removeNonRecentEmptyPostBlocks(nextPostsForChannel);
 
+        // This actions should only be dispatched for the current channel
+        // so we only store next posts for that channel.
         return {
-            ...state,
+
+            // ...state,
             [post.channel_id]: nextPostsForChannel,
         };
     }
@@ -629,8 +651,11 @@ export function postsInChannel(state: Dictionary<Array<PostOrderBlock>> = {}, ac
 
         nextPostsForChannel = removeNonRecentEmptyPostBlocks(nextPostsForChannel);
 
+        // This actions should only be dispatched for the current channel
+        // so we only store next posts for that channel.
         return {
-            ...state,
+
+            // ...state,
             [post.channel_id]: nextPostsForChannel,
         };
     }
