@@ -1227,7 +1227,7 @@ export function expandedURLs(state: Dictionary<string> = {}, action: GenericActi
 
 export default function(state: Partial<PostsState> = {}, action: GenericAction) {
     const nextPosts = handlePosts(state.posts, action);
-    const nextPostsInChannel = {}; //postsInChannel(state.postsInChannel, action, state.posts!, nextPosts);
+    const nextPostsInChannel = postsInChannel(state.postsInChannel, action, state.posts!, nextPosts);
 
     const nextState = {
 
