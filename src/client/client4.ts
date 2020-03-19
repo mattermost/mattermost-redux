@@ -1062,9 +1062,9 @@ export default class Client4 {
         );
     };
 
-    getTeamMembers = async (teamId: string, page = 0, perPage = PER_PAGE_DEFAULT) => {
+    getTeamMembers = async (teamId: string, page = 0, perPage = PER_PAGE_DEFAULT, options = {}) => {
         return this.doFetch(
-            `${this.getTeamMembersRoute(teamId)}${buildQueryString({page, per_page: perPage})}`,
+            `${this.getTeamMembersRoute(teamId)}${buildQueryString({page, per_page: perPage, ...options})}`,
             {method: 'get'}
         );
     };

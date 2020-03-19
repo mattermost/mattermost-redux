@@ -299,7 +299,7 @@ export function getMyTeamMembers(): ActionFunc {
     };
 }
 
-export function getTeamMembers(teamId: string, page = 0, perPage: number = General.TEAMS_CHUNK_SIZE): ActionFunc {
+export function getTeamMembers(teamId: string, page = 0, perPage: number = General.TEAMS_CHUNK_SIZE, options = {}): ActionFunc {
     return bindClientFunc({
         clientFunc: Client4.getTeamMembers,
         onRequest: TeamTypes.GET_TEAM_MEMBERS_REQUEST,
@@ -309,6 +309,7 @@ export function getTeamMembers(teamId: string, page = 0, perPage: number = Gener
             teamId,
             page,
             perPage,
+            options,
         ],
     });
 }
