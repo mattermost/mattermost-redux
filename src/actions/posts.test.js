@@ -294,7 +294,7 @@ describe('Actions.Posts', () => {
         assert.ok(!reactions[post1.id]);
     });
 
-    it.only('removePost', async () => {
+    it('removePost', async () => {
         const post1 = {id: 'post1', channel_id: 'channel1', create_at: 1001, message: ''};
         const post2 = {id: 'post2', channel_id: 'channel1', create_at: 1002, message: '', is_pinned: true};
         const post3 = {id: 'post3', channel_id: 'channel1', root_id: 'post2', create_at: 1003, message: ''};
