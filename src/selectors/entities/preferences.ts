@@ -258,7 +258,7 @@ export const getNewSidebarPreference = reselect.createSelector(
 
 export function shouldAutocloseDMs(state: GlobalState) {
     const config = getConfig(state);
-    if (config.CloseUnusedDirectMessages === 'false') {
+    if (!config.CloseUnusedDirectMessages || config.CloseUnusedDirectMessages === 'false') {
         return false;
     }
 
