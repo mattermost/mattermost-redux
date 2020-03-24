@@ -379,6 +379,15 @@ export function purgeElasticsearchIndexes(): ActionFunc {
     });
 }
 
+export function purgeBleveIndexes(): ActionFunc {
+    return bindClientFunc({
+        clientFunc: Client4.purgeBleveIndexes,
+        onRequest: AdminTypes.PURGE_BLEVE_INDEXES_REQUEST,
+        onSuccess: AdminTypes.PURGE_BLEVE_INDEXES_SUCCESS,
+        onFailure: AdminTypes.PURGE_BLEVE_INDEXES_FAILURE,
+    });
+}
+
 export function uploadLicense(fileData: File): ActionFunc {
     return bindClientFunc({
         clientFunc: Client4.uploadLicense,
