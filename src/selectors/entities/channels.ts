@@ -708,7 +708,7 @@ export const getDirectChannels: (a: GlobalState) => Array<Channel> = createSelec
     const directChannels = groupIds.filter((id) => {
         const channel = channels[id];
 
-        if (channel) {
+        if (channel && (channel.type === General.DM_CHANNEL || channel.type === General.GM_CHANNEL)) {
             const lastPost = lastPosts[channel.id];
             return !isAutoClosed(config, preferences, channels[id], lastPost ? lastPost.create_at : 0, 0, currentChannelId);
         }
