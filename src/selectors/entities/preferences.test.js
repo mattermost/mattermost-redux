@@ -763,7 +763,9 @@ describe('shouldAutocloseDMs', () => {
         const state = {
             entities: {
                 general: {
-                    config: {},
+                    config: {
+                        CloseUnusedDirectMessages: 'false',
+                    },
                 },
                 preferences: {
                     myPreferences: {},
@@ -772,6 +774,23 @@ describe('shouldAutocloseDMs', () => {
         };
 
         expect(Selectors.shouldAutocloseDMs(state)).toBe(false);
+    });
+
+    test('should return true when enabled by server but not set by user', () => {
+        const state = {
+            entities: {
+                general: {
+                    config: {
+                        CloseUnusedDirectMessages: 'true',
+                    },
+                },
+                preferences: {
+                    myPreferences: {},
+                },
+            },
+        };
+
+        expect(Selectors.shouldAutocloseDMs(state)).toBe(true);
     });
 
     test('should return true when enabled by both server and user', () => {
