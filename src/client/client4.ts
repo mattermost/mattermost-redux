@@ -1904,10 +1904,12 @@ export default class Client4 {
 
     // General Routes
 
-    ping = async () => {
+    ping = async (cookies: any) => {
+        // console.log('cookiescookiescookies', cookies);
+        
         return this.doFetch(
             `${this.getBaseRoute()}/system/ping?time=${Date.now()}`,
-            {method: 'get'}
+            {method: 'get', redirect: 'error', headers: { Cookie: cookies }}
         );
     };
 
@@ -1927,17 +1929,17 @@ export default class Client4 {
         );
     };
 
-    getClientConfigOld = async () => {
+    getClientConfigOld = async (cookies?: any) => {
         return this.doFetch(
             `${this.getBaseRoute()}/config/client?format=old`,
-            {method: 'get'}
+            {method: 'get', headers: { Cookie: cookies }}
         );
     };
 
-    getClientLicenseOld = async () => {
+    getClientLicenseOld = async (cookies?: any) => {
         return this.doFetch(
             `${this.getBaseRoute()}/license/client?format=old`,
-            {method: 'get'}
+            {method: 'get', headers: { Cookie: cookies }}
         );
     };
 
@@ -3008,10 +3010,92 @@ export default class Client4 {
 
     // Client Helpers
 
-    doFetch = async (url: string, options: Options) => {
-        const {data} = await this.doFetchWithResponse(url, options);
+    doFetch = async (url: string, options: any) => {
+        // console.log('doFetchdoFetchdoFetchdoFetch!!!!!!');
+        options.headers = options.headers || {}
+        options.headers.credentials = 'same-origin'
+        // options.headers.Cookie = 
+        // console.log('options.headers.Cookie', options.headers.Cookie);
+        
+        
+        const {data} = await this.doFetchWithResponsee(url, options);
+        // console.log('OIOIOIOIOI', options);
 
         return data;
+    };
+
+    doFetchWithResponsee = async (url: string, options: Options) => {
+        let response
+        let headers
+        
+        try {
+            // console.log('doFetchWithResponsedoFetchWithResponsedoFetchWithResponse111', this.getOptions(options));
+            
+            response = await fetch(url, this.getOptions(options));
+            // console.log('redirected', response.redirected);
+            
+            // console.log('2222', JSON.stringify(response, null, 2));
+        } catch (e) {
+            // console.log('eeeee', e);
+        }
+        if (response && response.headers) {
+            // console.log('dddd');
+            // console.log(response.headers);
+            headers = parseAndMergeNestedHeaders(response.headers);
+        }
+
+        let data;
+        try {
+            data = await response.json();
+        } catch (err) {
+            // console.log('errerrerr111', err);
+            
+            throw new ClientError(this.getUrl(), {
+                message: 'Received invalid response from the server.',
+                intl: {
+                    id: 'mobile.request.invalid_response',
+                    defaultMessage: 'Received invalid response from the server.',
+                },
+                url,
+            });
+        }
+
+        if (headers && headers.has(HEADER_X_VERSION_ID) && !headers.get('Cache-Control')) {
+            const serverVersion = headers.get(HEADER_X_VERSION_ID);
+            if (serverVersion && this.serverVersion !== serverVersion) {
+                // console.log('sv', serverVersion);
+                
+                this.serverVersion = serverVersion;
+            }
+        }
+
+        if (headers && headers.has(HEADER_X_CLUSTER_ID)) {
+            const clusterId = headers.get(HEADER_X_CLUSTER_ID);
+            if (clusterId && this.clusterId !== clusterId) {
+                this.clusterId = clusterId;
+            }
+        }
+
+        if (response.ok) {
+            return {
+                response,
+                headers,
+                data,
+            };
+        }
+
+        const msg = data.message || '';
+
+        if (this.logToConsole) {
+            console.error(msg); // eslint-disable-line no-console
+        }
+
+        throw new ClientError(this.getUrl(), {
+            message: msg,
+            server_error_id: data.id,
+            status_code: data.status_code,
+            url,
+        });
     };
 
     doFetchWithResponse = async (url: string, options: Options) => {
@@ -3032,7 +3116,7 @@ export default class Client4 {
             });
         }
 
-        if (headers.has(HEADER_X_VERSION_ID) && !headers.get('Cache-Control')) {
+        if (headers && headers.has(HEADER_X_VERSION_ID) && !headers.get('Cache-Control')) {
             const serverVersion = headers.get(HEADER_X_VERSION_ID);
             if (serverVersion && this.serverVersion !== serverVersion) {
                 this.serverVersion = serverVersion;
@@ -3138,7 +3222,12 @@ export default class Client4 {
 function parseAndMergeNestedHeaders(originalHeaders: any) {
     const headers = new Map();
     let nestedHeaders = new Map();
-    originalHeaders.forEach((val: string, key: string) => {
+    let originalHeadersTmp = originalHeaders;
+    if (!(originalHeaders.__proto__.set)) {
+        originalHeadersTmp = new Map(Object.entries(originalHeaders))
+    }
+    
+    originalHeadersTmp.forEach((val: string, key: string) => {
         const capitalizedKey = key.replace(/\b[a-z]/g, (l) => l.toUpperCase());
         let realVal = val;
         if (val && val.match(/\n\S+:\s\S+/)) {

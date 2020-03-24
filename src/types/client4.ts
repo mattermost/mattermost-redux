@@ -30,4 +30,5 @@ export type Options = {
     url?: string;
     credentials?: 'omit' | 'same-origin' | 'include';
     body?: any;
+    redirect?: any;
 };
