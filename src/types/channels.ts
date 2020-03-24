@@ -6,6 +6,7 @@ export type ChannelType = 'O' | 'P' | 'D' | 'G';
 export type ChannelStats = {
     channel_id: string;
     member_count: number;
+    pinnedpost_count: number;
 };
 export type ChannelNotifyProps = {
     desktop: 'default' | 'all' | 'mention' | 'none';

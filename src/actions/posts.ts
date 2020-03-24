@@ -14,6 +14,7 @@ import {getCurrentUserId, getUsersByUsername} from 'selectors/entities/users';
 import {getUserIdFromChannelName} from 'utils/channel_utils';
 import {parseNeededCustomEmojisFromText} from 'utils/emoji_utils';
 import {isFromWebhook, isSystemMessage, shouldIgnorePost} from 'utils/post_utils';
+import {isCombinedUserActivityPost} from 'utils/post_list';
 
 import {getMyChannelMember, markChannelAsUnread, markChannelAsRead, markChannelAsViewed} from './channels';
 import {systemEmojis, getCustomEmojiByName, getCustomEmojisByName} from './emojis';
@@ -423,15 +424,17 @@ export function setUnreadPost(userId: string, postId: string) {
         const post = Selectors.getPost(state, postId);
         let unreadChan;
 
-        dispatch({
-            type: ChannelTypes.ADD_MANUALLY_UNREAD,
-            data: {
-                channelId: post.channel_id,
-            },
-        });
-
         try {
+            if (isCombinedUserActivityPost(postId)) {
+                return {};
+            }
             unreadChan = await Client4.markPostAsUnread(userId, postId);
+            dispatch({
+                type: ChannelTypes.ADD_MANUALLY_UNREAD,
+                data: {
+                    channelId: post.channel_id,
+                },
+            });
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch, getState);
             dispatch(logError(error));
@@ -478,11 +481,17 @@ export function pinPost(postId: string) {
 
         const post = Selectors.getPost(getState(), postId);
         if (post) {
-            actions.push(receivedPost({
-                ...post,
-                is_pinned: true,
-                update_at: Date.now(),
-            }));
+            actions.push(
+                receivedPost({
+                    ...post,
+                    is_pinned: true,
+                    update_at: Date.now(),
+                }),
+                {
+                    type: ChannelTypes.INCREMENT_PINNED_POST_COUNT,
+                    id: post.channel_id,
+                }
+            );
         }
 
         dispatch(batchActions(actions));
@@ -515,11 +524,17 @@ export function unpinPost(postId: string) {
 
         const post = Selectors.getPost(getState(), postId);
         if (post) {
-            actions.push(receivedPost({
-                ...post,
-                is_pinned: false,
-                update_at: Date.now(),
-            }));
+            actions.push(
+                receivedPost({
+                    ...post,
+                    is_pinned: false,
+                    update_at: Date.now(),
+                }),
+                {
+                    type: ChannelTypes.DECREMENT_PINNED_POST_COUNT,
+                    id: post.channel_id,
+                },
+            );
         }
 
         dispatch(batchActions(actions));
@@ -1067,6 +1082,14 @@ export function removePost(post: ExtendedPost) {
             }
         } else {
             dispatch(postRemoved(post));
+            if (post.is_pinned) {
+                dispatch(
+                    {
+                        type: ChannelTypes.DECREMENT_PINNED_POST_COUNT,
+                        id: post.channel_id,
+                    }
+                );
+            }
         }
     };
 }

@@ -421,7 +421,7 @@ describe('Selectors.Users', () => {
         });
     });
 
-    it('makeGetDisplayName', () => {
+    describe('makeGetDisplayName', () => {
         const testUser1 = {
             ...user1,
             id: 'test_user_id',
@@ -433,35 +433,138 @@ describe('Selectors.Users', () => {
             ...profiles,
             [testUser1.id]: testUser1,
         };
-        const newTestState = {
-            entities: {
-                users: {profiles: newProfiles},
-                preferences: {
-                    myPreferences: {
-                        [`${Preferences.CATEGORY_DISPLAY_SETTINGS}--${Preferences.NAME_NAME_FORMAT}`]: {
-                            value: General.TEAMMATE_NAME_DISPLAY.SHOW_FULLNAME,
+        it('Should show full name since preferences is being used and LockTeammateNameDisplay is false', () => {
+            const newTestState = {
+                entities: {
+                    users: {profiles: newProfiles},
+                    preferences: {
+                        myPreferences: {
+                            [`${Preferences.CATEGORY_DISPLAY_SETTINGS}--${Preferences.NAME_NAME_FORMAT}`]: {
+                                value: General.TEAMMATE_NAME_DISPLAY.SHOW_FULLNAME,
+                            },
+                        },
+                    },
+                    general: {
+                        config: {
+                            TeammateNameDisplay: General.TEAMMATE_NAME_DISPLAY.SHOW_USERNAME,
+                            LockTeammateNameDisplay: 'false',
+                        },
+                        license: {
+                            LockTeammateNameDisplay: 'true',
                         },
                     },
                 },
-                general: {
-                    config: {
-                        TeammateNameDisplay: General.TEAMMATE_NAME_DISPLAY.SHOW_USERNAME,
-                        LockTeammateNameDisplay: 'false',
+            };
+            assert.deepEqual(Selectors.makeGetDisplayName()(newTestState, testUser1.id), 'First Last');
+        });
+        it('Should show show username since LockTeammateNameDisplay is true', () => {
+            const newTestState = {
+                entities: {
+                    users: {profiles: newProfiles},
+                    preferences: {
+                        myPreferences: {
+                            [`${Preferences.CATEGORY_DISPLAY_SETTINGS}--${Preferences.NAME_NAME_FORMAT}`]: {
+                                value: General.TEAMMATE_NAME_DISPLAY.SHOW_FULLNAME,
+                            },
+                        },
                     },
-                    license: {
-                        LockTeammateNameDisplay: 'true',
+                    general: {
+                        config: {
+                            TeammateNameDisplay: General.TEAMMATE_NAME_DISPLAY.SHOW_USERNAME,
+                            LockTeammateNameDisplay: 'true',
+                        },
+                        license: {
+                            LockTeammateNameDisplay: 'true',
+                        },
                     },
                 },
-            },
-        };
-
-        // Should show full name since preferences is being used and LockTeammateNameDisplay is false
-        assert.deepEqual(Selectors.makeGetDisplayName()(newTestState, testUser1.id), 'First Last');
-
-        newTestState.entities.general.config.LockTeammateNameDisplay = 'true';
-
-        // Should show username since LockTeammateNameDisplay is true
-        assert.deepEqual(Selectors.makeGetDisplayName()(newTestState, testUser1.id), 'username');
+            };
+            assert.deepEqual(Selectors.makeGetDisplayName()(newTestState, testUser1.id), 'username');
+        });
+        it('Should show full name since license is false', () => {
+            const newTestState = {
+                entities: {
+                    users: {profiles: newProfiles},
+                    preferences: {
+                        myPreferences: {
+                            [`${Preferences.CATEGORY_DISPLAY_SETTINGS}--${Preferences.NAME_NAME_FORMAT}`]: {
+                                value: General.TEAMMATE_NAME_DISPLAY.SHOW_FULLNAME,
+                            },
+                        },
+                    },
+                    general: {
+                        config: {
+                            TeammateNameDisplay: General.TEAMMATE_NAME_DISPLAY.SHOW_USERNAME,
+                            LockTeammateNameDisplay: 'true',
+                        },
+                        license: {
+                            LockTeammateNameDisplay: 'false',
+                        },
+                    },
+                },
+            };
+            assert.deepEqual(Selectors.makeGetDisplayName()(newTestState, testUser1.id), 'First Last');
+        });
+        it('Should show full name since license is not available', () => {
+            const newTestState = {
+                entities: {
+                    users: {profiles: newProfiles},
+                    preferences: {
+                        myPreferences: {
+                            [`${Preferences.CATEGORY_DISPLAY_SETTINGS}--${Preferences.NAME_NAME_FORMAT}`]: {
+                                value: General.TEAMMATE_NAME_DISPLAY.SHOW_FULLNAME,
+                            },
+                        },
+                    },
+                    general: {
+                        config: {
+                            TeammateNameDisplay: General.TEAMMATE_NAME_DISPLAY.SHOW_USERNAME,
+                            LockTeammateNameDisplay: 'true',
+                        },
+                    },
+                },
+            };
+            assert.deepEqual(Selectors.makeGetDisplayName()(newTestState, testUser1.id), 'First Last');
+        });
+        it('Should show Full name since license is not available and lock teammate name display is false', () => {
+            const newTestState = {
+                entities: {
+                    users: {profiles: newProfiles},
+                    preferences: {
+                        myPreferences: {
+                            [`${Preferences.CATEGORY_DISPLAY_SETTINGS}--${Preferences.NAME_NAME_FORMAT}`]: {
+                                value: General.TEAMMATE_NAME_DISPLAY.SHOW_FULLNAME,
+                            },
+                        },
+                    },
+                    general: {
+                        config: {
+                            TeammateNameDisplay: General.TEAMMATE_NAME_DISPLAY.SHOW_USERNAME,
+                            LockTeammateNameDisplay: 'false',
+                        },
+                    },
+                },
+            };
+            assert.deepEqual(Selectors.makeGetDisplayName()(newTestState, testUser1.id), 'First Last');
+        });
+        it('Should show username since no settings are available (falls back to default)', () => {
+            const newTestState = {
+                entities: {
+                    users: {profiles: newProfiles},
+                    preferences: {
+                        myPreferences: {
+                            [`${Preferences.CATEGORY_DISPLAY_SETTINGS}--${Preferences.NAME_NAME_FORMAT}`]: {
+                            },
+                        },
+                    },
+                    general: {
+                        config: {
+                        },
+                    },
+                },
+            };
+            assert.deepEqual(Selectors.makeGetDisplayName()(newTestState, testUser1.id), 'username');
+        });
     });
 
     it('shouldShowTermsOfService', () => {
