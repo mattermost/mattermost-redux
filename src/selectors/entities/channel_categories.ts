@@ -19,7 +19,12 @@ import {GlobalState} from 'types/store';
 import {UserProfile} from 'types/users';
 import {IDMappedObjects, RelationOneToOne} from 'types/utilities';
 
-import {getUserIdFromChannelName, isFavoriteChannel, isUnreadChannel} from 'utils/channel_utils';
+import {
+    getUserIdFromChannelName,
+    isChannelMuted,
+    isFavoriteChannel,
+    isUnreadChannel,
+} from 'utils/channel_utils';
 import {getPreferenceKey} from 'utils/preference_utils';
 import {displayUsername} from 'utils/user_utils';
 
@@ -215,14 +220,32 @@ export function makeFilterManuallyClosedDMs(): (state: GlobalState, channels: Ch
     );
 }
 
+export function makeCompareChannels(getDisplayName: (channel: Channel) => string, locale: string, myMembers: RelationOneToOne<Channel, ChannelMembership>) {
+    return (a: Channel, b: Channel) => {
+        // Sort muted channels last
+        const aMuted = isChannelMuted(myMembers[a.id]);
+        const bMuted = isChannelMuted(myMembers[b.id]);
+
+        if (aMuted && !bMuted) {
+            return 1;
+        } else if (!aMuted && bMuted) {
+            return -1;
+        }
+
+        // And then sort alphabetically
+        return getDisplayName(a).localeCompare(getDisplayName(b), locale, {numeric: true});
+    };
+}
+
 export function makeSortChannelsByName(): (state: GlobalState, channels: Channel[]) => Channel[] {
     return createSelector(
         (state: GlobalState, channels: Channel[]) => channels,
         getCurrentUserLocale,
-        (channels: Channel[], locale: string) => {
-            const sorted = [...channels];
-            sorted.sort((a, b) => a.display_name.localeCompare(b.display_name, locale, {numeric: true}));
-            return sorted;
+        getMyChannelMemberships,
+        (channels: Channel[], locale: string, myMembers: RelationOneToOne<Channel, ChannelMembership>) => {
+            const getDisplayName = (channel: Channel) => channel.display_name;
+
+            return [...channels].sort(makeCompareChannels(getDisplayName, locale, myMembers));
         }
     );
 }
@@ -234,7 +257,8 @@ export function makeSortChannelsByNameWithDMs(): (state: GlobalState, channels: 
         (state: GlobalState) => state.entities.users.profiles,
         getTeammateNameDisplaySetting,
         getCurrentUserLocale,
-        (channels: Channel[], currentUserId: string, profiles: IDMappedObjects<UserProfile>, teammateNameDisplay: string, locale: string) => {
+        getMyChannelMemberships,
+        (channels: Channel[], currentUserId: string, profiles: IDMappedObjects<UserProfile>, teammateNameDisplay: string, locale: string, myMembers: RelationOneToOne<Channel, ChannelMembership>) => {
             const cachedNames: RelationOneToOne<Channel, string> = {};
 
             const getDisplayName = (channel: Channel): string => {
@@ -278,9 +302,7 @@ export function makeSortChannelsByNameWithDMs(): (state: GlobalState, channels: 
                 return displayName;
             };
 
-            const sorted = [...channels];
-            sorted.sort((a, b) => getDisplayName(a).localeCompare(getDisplayName(b), locale, {numeric: true}));
-            return sorted;
+            return [...channels].sort(makeCompareChannels(getDisplayName, locale, myMembers));
         }
     );
 }
