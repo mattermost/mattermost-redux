@@ -69,7 +69,14 @@ export function handlePosts(state: RelationOneToOne<Post, Post> = {}, action: Ge
     switch (action.type) {
     case PostTypes.RECEIVED_POST:
     case PostTypes.RECEIVED_NEW_POST: {
-        return handlePostReceived({...state}, action.data);
+        const statePost = Object.values(state)[0];
+        const currentChannelId = action.data.channel_id;
+
+        if (statePost && statePost.channel_id === currentChannelId) {
+            return handlePostReceived({...state}, action.data);
+        }
+
+        return state;
     }
 
     case PostTypes.RECEIVED_POSTS: {
