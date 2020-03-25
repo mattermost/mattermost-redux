@@ -16,6 +16,7 @@ import * as TeamActions from 'actions/teams';
 import * as UserActions from 'actions/users';
 import EventEmitter from 'utils/event_emitter';
 import {loadRolesIfNeeded as mockLoadRolesIfNeeded} from 'actions/roles';
+import {batchActions} from 'types/actions';
 
 import {Client4} from 'client';
 import {General, Posts, RequestStatus, WebsocketEvents} from '../constants';
@@ -714,9 +715,10 @@ describe('Actions.Websocket', () => {
 
 describe('Actions.Websocket doReconnect', () => {
     const mockStore = configureMockStore([thunk]);
+    const me = TestHelper.fakeUserWithId();
 
     const currentTeamId = 'team-id';
-    const currentUserId = 'user-id';
+    const currentUserId = me.id;
     const currentChannelId = 'channel-id';
 
     const initialState = {
@@ -746,6 +748,9 @@ describe('Actions.Websocket doReconnect', () => {
             },
             users: {
                 currentUserId,
+                profiles: {
+                    [me.id]: me,
+                },
             },
             preferences: {
                 myPreferences: {},
@@ -941,6 +946,131 @@ describe('Actions.Websocket doReconnect', () => {
         const actions = testStore.getActions();
         expect(actions).toEqual(expect.arrayContaining(expectedActions));
         expect(actions).not.toEqual(expect.arrayContaining(expectedMissingActions));
+    });
+});
+
+describe('Actions.Websocket removeNotVisibleUsers', () => {
+    const mockStore = configureMockStore([thunk]);
+
+    const channel1 = TestHelper.fakeChannelWithId('');
+    const channel2 = TestHelper.fakeChannelWithId('');
+
+    const me = TestHelper.fakeUserWithId();
+    const user = TestHelper.fakeUserWithId();
+    const user2 = TestHelper.fakeUserWithId();
+    const user3 = TestHelper.fakeUserWithId();
+    const user4 = TestHelper.fakeUserWithId();
+    const user5 = TestHelper.fakeUserWithId();
+
+    it('should do nothing if the known users and the profiles list are the same', async () => {
+        const membersInChannel = {
+            [channel1.id]: {
+                [user.id]: {channel_id: channel1.id, user_id: user.id},
+                [user2.id]: {channel_id: channel1.id, user_id: user2.id},
+            },
+            [channel2.id]: {
+                [user3.id]: {channel_id: channel2.id, user_id: user3.id},
+            },
+        };
+
+        const profiles = {
+            [me.id]: me,
+            [user.id]: user,
+            [user2.id]: user2,
+            [user3.id]: user3,
+        };
+
+        const state = {
+            entities: {
+                channels: {
+                    membersInChannel,
+                },
+                users: {
+                    currentUserId: me.id,
+                    profiles,
+                },
+            },
+        };
+        const testStore = await mockStore(state);
+        await testStore.dispatch(Actions.removeNotVisibleUsers());
+        const actions = testStore.getActions();
+        expect(actions.length).toEqual(0);
+    });
+
+    it('should do nothing if there are known users in my memberships but not in the profiles list', async () => {
+        const membersInChannel = {
+            [channel1.id]: {
+                [user.id]: {channel_id: channel1.id, user_id: user.id},
+                [user2.id]: {channel_id: channel1.id, user_id: user2.id},
+            },
+            [channel2.id]: {
+                [user3.id]: {channel_id: channel2.id, user_id: user3.id},
+            },
+        };
+
+        const profiles = {
+            [me.id]: me,
+            [user3.id]: user3,
+        };
+
+        const state = {
+            entities: {
+                channels: {
+                    membersInChannel,
+                },
+                users: {
+                    currentUserId: me.id,
+                    profiles,
+                },
+            },
+        };
+        const testStore = await mockStore(state);
+        await testStore.dispatch(Actions.removeNotVisibleUsers());
+        const actions = testStore.getActions();
+        expect(actions.length).toEqual(0);
+    });
+
+    it('should remove the users if there are unknown users in the profiles list', async () => {
+        const membersInChannel = {
+            [channel1.id]: {
+                [user.id]: {channel_id: channel1.id, user_id: user.id},
+            },
+            [channel2.id]: {
+                [user3.id]: {channel_id: channel2.id, user_id: user3.id},
+            },
+        };
+
+        const profiles = {
+            [me.id]: me,
+            [user.id]: user,
+            [user2.id]: user2,
+            [user3.id]: user3,
+            [user4.id]: user4,
+            [user5.id]: user5,
+        };
+
+        const state = {
+            entities: {
+                channels: {
+                    membersInChannel,
+                },
+                users: {
+                    currentUserId: me.id,
+                    profiles,
+                },
+            },
+        };
+        const testStore = await mockStore(state);
+        await testStore.dispatch(Actions.removeNotVisibleUsers());
+
+        const expectedAction = batchActions([
+            {type: UserTypes.PROFILE_NO_LONGER_VISIBLE, data: {user_id: user2.id}},
+            {type: UserTypes.PROFILE_NO_LONGER_VISIBLE, data: {user_id: user4.id}},
+            {type: UserTypes.PROFILE_NO_LONGER_VISIBLE, data: {user_id: user5.id}},
+        ]);
+        const actions = testStore.getActions();
+        expect(actions.length).toEqual(1);
+        expect(actions[0]).toEqual(expectedAction);
     });
 });
 

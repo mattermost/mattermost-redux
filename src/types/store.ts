@@ -1,5 +1,6 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
+
 import {GeneralState} from './general';
 import {UsersState} from './users';
 import {TeamsState} from './teams';
@@ -17,6 +18,7 @@ import {ChannelsRequestsStatuses, GeneralRequestsStatuses, PostsRequestsStatuses
 import {Role} from './roles';
 import {PreferenceType} from './preferences';
 import {Bot} from './bots';
+import {ChannelCategoriesState} from './channel_categories';
 import {Dictionary} from './utilities';
 
 export type GlobalState = {
@@ -49,6 +51,7 @@ export type GlobalState = {
         schemes: SchemesState;
         gifs: any;
         groups: GroupsState;
+        channelCategories: ChannelCategoriesState;
     };
     errors: Array<any>;
     requests: {

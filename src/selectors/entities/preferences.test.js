@@ -590,5 +590,263 @@ describe('Selectors.Preferences', () => {
     it('get visible groups', () => {
         assert.deepEqual(Selectors.getVisibleGroupIds(testState), [gp1]);
     });
+
+    describe('get new sidebar preference', () => {
+        it('setting disabled, no user setting', () => {
+            assert.equal(
+                Selectors.getNewSidebarPreference({
+                    entities: {
+                        general: {
+                            config: {
+                                ExperimentalChannelSidebarOrganization: General.DISABLED,
+                            },
+                        },
+                        preferences: {
+                            myPreferences: {},
+                        },
+                    },
+                }),
+                false
+            );
+        });
+
+        it('setting disabled, user set to on', () => {
+            assert.equal(
+                Selectors.getNewSidebarPreference({
+                    entities: {
+                        general: {
+                            config: {
+                                ExperimentalChannelSidebarOrganization: General.DISABLED,
+                            },
+                        },
+                        preferences: {
+                            myPreferences: {
+                                [getPreferenceKey(Preferences.CATEGORY_SIDEBAR_SETTINGS, Preferences.CHANNEL_SIDEBAR_ORGANIZATION)]: {
+                                    category: Preferences.CATEGORY_SIDEBAR_SETTINGS, name: Preferences.CHANNEL_SIDEBAR_ORGANIZATION, value: 'true',
+                                },
+                            },
+                        },
+                    },
+                }),
+                false
+            );
+        });
+
+        it('setting default_off, no user setting', () => {
+            assert.equal(
+                Selectors.getNewSidebarPreference({
+                    entities: {
+                        general: {
+                            config: {
+                                ExperimentalChannelSidebarOrganization: General.DEFAULT_OFF,
+                            },
+                        },
+                        preferences: {
+                            myPreferences: {},
+                        },
+                    },
+                }),
+                false
+            );
+        });
+
+        it('setting default_off, user set to off', () => {
+            assert.equal(
+                Selectors.getNewSidebarPreference({
+                    entities: {
+                        general: {
+                            config: {
+                                ExperimentalChannelSidebarOrganization: General.DEFAULT_OFF,
+                            },
+                        },
+                        preferences: {
+                            myPreferences: {
+                                [getPreferenceKey(Preferences.CATEGORY_SIDEBAR_SETTINGS, Preferences.CHANNEL_SIDEBAR_ORGANIZATION)]: {
+                                    category: Preferences.CATEGORY_SIDEBAR_SETTINGS, name: Preferences.CHANNEL_SIDEBAR_ORGANIZATION, value: 'false',
+                                },
+                            },
+                        },
+                    },
+                }),
+                false
+            );
+        });
+
+        it('setting default_off, user set to on', () => {
+            assert.equal(
+                Selectors.getNewSidebarPreference({
+                    entities: {
+                        general: {
+                            config: {
+                                ExperimentalChannelSidebarOrganization: General.DEFAULT_OFF,
+                            },
+                        },
+                        preferences: {
+                            myPreferences: {
+                                [getPreferenceKey(Preferences.CATEGORY_SIDEBAR_SETTINGS, Preferences.CHANNEL_SIDEBAR_ORGANIZATION)]: {
+                                    category: Preferences.CATEGORY_SIDEBAR_SETTINGS, name: Preferences.CHANNEL_SIDEBAR_ORGANIZATION, value: 'true',
+                                },
+                            },
+                        },
+                    },
+                }),
+                true
+            );
+        });
+
+        it('setting default_on, no user setting', () => {
+            assert.equal(
+                Selectors.getNewSidebarPreference({
+                    entities: {
+                        general: {
+                            config: {
+                                ExperimentalChannelSidebarOrganization: General.DEFAULT_ON,
+                            },
+                        },
+                        preferences: {
+                            myPreferences: {},
+                        },
+                    },
+                }),
+                true
+            );
+        });
+
+        it('setting default_on, user set to off', () => {
+            assert.equal(
+                Selectors.getNewSidebarPreference({
+                    entities: {
+                        general: {
+                            config: {
+                                ExperimentalChannelSidebarOrganization: General.DEFAULT_ON,
+                            },
+                        },
+                        preferences: {
+                            myPreferences: {
+                                [getPreferenceKey(Preferences.CATEGORY_SIDEBAR_SETTINGS, Preferences.CHANNEL_SIDEBAR_ORGANIZATION)]: {
+                                    category: Preferences.CATEGORY_SIDEBAR_SETTINGS, name: Preferences.CHANNEL_SIDEBAR_ORGANIZATION, value: 'false',
+                                },
+                            },
+                        },
+                    },
+                }),
+                false
+            );
+        });
+
+        it('setting default_on, user set to on', () => {
+            assert.equal(
+                Selectors.getNewSidebarPreference({
+                    entities: {
+                        general: {
+                            config: {
+                                ExperimentalChannelSidebarOrganization: General.DEFAULT_ON,
+                            },
+                        },
+                        preferences: {
+                            myPreferences: {
+                                [getPreferenceKey(Preferences.CATEGORY_SIDEBAR_SETTINGS, Preferences.CHANNEL_SIDEBAR_ORGANIZATION)]: {
+                                    category: Preferences.CATEGORY_SIDEBAR_SETTINGS, name: Preferences.CHANNEL_SIDEBAR_ORGANIZATION, value: 'true',
+                                },
+                            },
+                        },
+                    },
+                }),
+                true
+            );
+        });
+    });
 });
 
+describe('shouldAutocloseDMs', () => {
+    test('should return false by default', () => {
+        const state = {
+            entities: {
+                general: {
+                    config: {
+                        CloseUnusedDirectMessages: 'false',
+                    },
+                },
+                preferences: {
+                    myPreferences: {},
+                },
+            },
+        };
+
+        expect(Selectors.shouldAutocloseDMs(state)).toBe(false);
+    });
+
+    test('should return true when enabled by server but not set by user', () => {
+        const state = {
+            entities: {
+                general: {
+                    config: {
+                        CloseUnusedDirectMessages: 'true',
+                    },
+                },
+                preferences: {
+                    myPreferences: {},
+                },
+            },
+        };
+
+        expect(Selectors.shouldAutocloseDMs(state)).toBe(true);
+    });
+
+    test('should return true when enabled by both server and user', () => {
+        const state = {
+            entities: {
+                general: {
+                    config: {
+                        CloseUnusedDirectMessages: 'true',
+                    },
+                },
+                preferences: {
+                    myPreferences: {
+                        [getPreferenceKey(Preferences.CATEGORY_SIDEBAR_SETTINGS, Preferences.CHANNEL_SIDEBAR_AUTOCLOSE_DMS)]: {value: Preferences.AUTOCLOSE_DMS_ENABLED},
+                    },
+                },
+            },
+        };
+
+        expect(Selectors.shouldAutocloseDMs(state)).toBe(true);
+    });
+
+    test('should return false when enabled by server but disabled by user', () => {
+        const state = {
+            entities: {
+                general: {
+                    config: {
+                        CloseUnusedDirectMessages: 'true',
+                    },
+                },
+                preferences: {
+                    myPreferences: {
+                        [getPreferenceKey(Preferences.CATEGORY_SIDEBAR_SETTINGS, Preferences.CHANNEL_SIDEBAR_AUTOCLOSE_DMS)]: {value: ''},
+                    },
+                },
+            },
+        };
+
+        expect(Selectors.shouldAutocloseDMs(state)).toBe(false);
+    });
+
+    test('should return false when enabled by user but disabled by server', () => {
+        const state = {
+            entities: {
+                general: {
+                    config: {
+                        CloseUnusedDirectMessages: 'false',
+                    },
+                },
+                preferences: {
+                    myPreferences: {
+                        [getPreferenceKey(Preferences.CATEGORY_SIDEBAR_SETTINGS, Preferences.CHANNEL_SIDEBAR_AUTOCLOSE_DMS)]: {value: Preferences.AUTOCLOSE_DMS_ENABLED},
+                    },
+                },
+            },
+        };
+
+        expect(Selectors.shouldAutocloseDMs(state)).toBe(false);
+    });
+});

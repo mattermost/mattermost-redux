@@ -12,6 +12,7 @@ const WebsocketEvents = {
     CHANNEL_UPDATED: 'channel_updated',
     CHANNEL_VIEWED: 'channel_viewed',
     CHANNEL_MEMBER_UPDATED: 'channel_member_updated',
+    CHANNEL_SCHEME_UPDATED: 'channel_scheme_updated',
     DIRECT_ADDED: 'direct_added',
     ADDED_TO_TEAM: 'added_to_team',
     LEAVE_TEAM: 'leave_team',
