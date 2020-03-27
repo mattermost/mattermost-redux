@@ -756,6 +756,9 @@ describe('makeSortChannelsByName', () => {
 
     const baseState = {
         entities: {
+            channels: {
+                myMembers: {},
+            },
             users: {
                 currentUserId: currentUser.id,
                 profiles: {
@@ -787,6 +790,30 @@ describe('makeSortChannelsByName', () => {
 
         expect(sortChannelsByName(baseState, channels)).toEqual([channel2, channel4, channel1, channel3]);
     });
+
+    test('should sort muted channels last', () => {
+        const sortChannelsByName = Selectors.makeSortChannelsByName();
+
+        const state = mergeObjects(baseState, {
+            entities: {
+                channels: {
+                    myMembers: {
+                        channel1: {notify_props: {mark_unread: General.MENTION}},
+                        channel3: {notify_props: {mark_unread: General.MENTION}},
+                        channel4: {notify_props: {mark_unread: 'all'}},
+                    },
+                },
+            },
+        });
+
+        const channel1 = {id: 'channel1', display_name: 'Carrot'};
+        const channel2 = {id: 'channel2', display_name: 'Apple'};
+        const channel3 = {id: 'channel3', display_name: 'Banana'};
+        const channel4 = {id: 'channel4', display_name: 'Dragonfruit'};
+        const channels = [channel1, channel2, channel3, channel4];
+
+        expect(sortChannelsByName(state, channels)).toEqual([channel2, channel4, channel3, channel1]);
+    });
 });
 
 describe('makeSortChannelsByNameWithDMs', () => {
@@ -803,6 +830,9 @@ describe('makeSortChannelsByNameWithDMs', () => {
 
     const baseState = {
         entities: {
+            channels: {
+                myMembers: {},
+            },
             general: {
                 config: {},
             },
@@ -857,7 +887,9 @@ describe('makeSortChannelsByNameWithDMs', () => {
     test('should sort GM channels by the display name of the other users', () => {
         const sortChannelsByNameWithDMs = Selectors.makeSortChannelsByNameWithDMs();
 
-        expect(sortChannelsByNameWithDMs(baseState, [
+        let state = baseState;
+
+        expect(sortChannelsByNameWithDMs(state, [
             channel1,
             channel2,
             channel3,
@@ -869,16 +901,13 @@ describe('makeSortChannelsByNameWithDMs', () => {
             channel1, // Zebra
         ]);
 
-        const state = {
-            ...baseState,
+        state = mergeObjects(state, {
             entities: {
-                ...baseState.entities,
                 users: {
-                    ...baseState.entities.users,
                     currentUserId: otherUser2.id,
                 },
             },
-        };
+        });
 
         expect(sortChannelsByNameWithDMs(state, [
             channel1,
@@ -890,6 +919,39 @@ describe('makeSortChannelsByNameWithDMs', () => {
             channel3, // Bear
             gmChannel1, // Current User, Other User
             channel1, // Zebra
+        ]);
+    });
+
+    test('should sort muted channels last', () => {
+        const sortChannelsByNameWithDMs = Selectors.makeSortChannelsByNameWithDMs();
+
+        const state = mergeObjects(baseState, {
+            entities: {
+                channels: {
+                    myMembers: {
+                        channel3: {notify_props: {mark_unread: General.MENTION}},
+                        dmChannel1: {notify_props: {mark_unread: General.MENTION}},
+                        dmChannel2: {notify_props: {mark_unread: 'all'}},
+                        gmChannel1: {notify_props: {mark_unread: General.MENTION}},
+                    },
+                },
+            },
+        });
+
+        expect(sortChannelsByNameWithDMs(state, [
+            channel1,
+            channel2,
+            channel3,
+            dmChannel1,
+            dmChannel2,
+            gmChannel1,
+        ])).toMatchObject([
+            channel2, // Aardvark
+            dmChannel2, // Another User
+            channel1, // Zebra
+            gmChannel1, // Another User, Other User (Muted)
+            channel3, // Bear (Muted)
+            dmChannel1, // Other User (Muted)
         ]);
     });
 });

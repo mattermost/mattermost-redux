@@ -512,6 +512,40 @@ function stats(state: RelationOneToOne<Channel, ChannelStats> = {}, action: Gene
 
         return state;
     }
+    case ChannelTypes.INCREMENT_PINNED_POST_COUNT: {
+        const nextState = {...state};
+        const id = action.id;
+        const nextStat = nextState[id];
+        if (nextStat) {
+            const count = nextStat.pinnedpost_count + 1;
+            return {
+                ...nextState,
+                [id]: {
+                    ...nextStat,
+                    pinnedpost_count: count,
+                },
+            };
+        }
+
+        return state;
+    }
+    case ChannelTypes.DECREMENT_PINNED_POST_COUNT: {
+        const nextState = {...state};
+        const id = action.id;
+        const nextStat = nextState[id];
+        if (nextStat) {
+            const count = nextStat.pinnedpost_count - 1;
+            return {
+                ...nextState,
+                [id]: {
+                    ...nextStat,
+                    pinnedpost_count: count,
+                },
+            };
+        }
+
+        return state;
+    }
     case UserTypes.LOGOUT_SUCCESS:
         return {};
     default:
