@@ -58,6 +58,6 @@ export type TeamUnread = {
 };
 
 export type GetTeamMembersOpts = {
-    sort?: 'Username' | 'UserId';
+    sort?: 'Username';
     exclude_deleted_users?: boolean;
 }
