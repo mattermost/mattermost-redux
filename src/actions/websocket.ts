@@ -6,7 +6,7 @@ import websocketClient from '../client/websocket_client';
 
 import {ChannelTypes, GeneralTypes, EmojiTypes, PostTypes, PreferenceTypes, TeamTypes, UserTypes, RoleTypes, AdminTypes, IntegrationTypes} from 'action_types';
 import {General, WebsocketEvents, Preferences} from '../constants';
-import {getAllChannels, getChannel, getChannelsNameMapInTeam, getCurrentChannelId, getCurrentChannel, getMyChannelMember, getRedirectChannelNameForTeam, getCurrentChannelStats, getMyChannels, getChannelMembersInChannels, isManuallyUnread} from 'selectors/entities/channels';
+import {getAllChannels, getChannel, getChannelsNameMapInTeam, getCurrentChannelId, getCurrentChannel, getMyChannelMember as getMyChannelMemberSelector, getRedirectChannelNameForTeam, getCurrentChannelStats, getMyChannels, getChannelMembersInChannels, isManuallyUnread, getKnownUsers} from 'selectors/entities/channels';
 import {getConfig} from 'selectors/entities/general';
 import {getAllPosts, getPost as getPostSelector} from 'selectors/entities/posts';
 import {getDirectShowPreferences} from 'selectors/entities/preferences';
@@ -21,7 +21,7 @@ import {ActionFunc, DispatchFunc, GetStateFunc, PlatformType, batchActions} from
 
 import {getTeam, getMyTeamUnreads, getMyTeams, getMyTeamMembers} from './teams';
 import {getPost, getPosts, getProfilesAndStatusesForPosts, getCustomEmojiForReaction, getUnreadPostData, handleNewPost, postDeleted, receivedPost} from './posts';
-import {fetchMyChannelsAndMembers, getChannelAndMyMember, getChannelStats, markChannelAsRead} from './channels';
+import {fetchMyChannelsAndMembers, getChannelAndMyMember, getChannelStats, markChannelAsRead, getMyChannelMember} from './channels';
 import {checkForModifiedUsers, getMe, getProfilesByIds, getStatusesByIds, loadProfilesForDirect} from './users';
 import {loadRolesIfNeeded} from './roles';
 import {Channel, ChannelMembership} from 'types/channels';
@@ -286,6 +286,9 @@ function handleEvent(msg: WebSocketMessage) {
     case WebsocketEvents.CHANNEL_MEMBER_UPDATED:
         doDispatch(handleChannelMemberUpdatedEvent(msg));
         break;
+    case WebsocketEvents.CHANNEL_SCHEME_UPDATED:
+        doDispatch(handleChannelSchemeUpdatedEvent(msg));
+        break;
     case WebsocketEvents.DIRECT_ADDED:
         doDispatch(handleDirectAddedEvent(msg));
         break;
@@ -379,7 +382,7 @@ function handlePostUnread(msg: WebSocketMessage) {
         const manual = isManuallyUnread(state, msg.broadcast.channel_id);
 
         if (!manual) {
-            const member = getMyChannelMember(state, msg.broadcast.channel_id);
+            const member = getMyChannelMemberSelector(state, msg.broadcast.channel_id);
             const delta = member ? member.msg_count - msg.data.msg_count : msg.data.msg_count;
             const info = {
                 ...msg.data,
@@ -405,9 +408,12 @@ function handleLeaveTeamEvent(msg: Partial<WebSocketMessage>) {
         const state = getState();
         const teams = getTeamsSelector(state);
         const currentTeamId = getCurrentTeamId(state);
-        const currentUserId = getCurrentUserId(state);
+        const currentUser = getCurrentUser(state);
 
-        if (currentUserId === msg.data.user_id) {
+        if (currentUser.id === msg.data.user_id) {
+            if (isGuest(currentUser.roles)) {
+                dispatch(removeNotVisibleUsers());
+            }
             dispatch({type: TeamTypes.LEAVE_TEAM, data: teams[msg.data.team_id]});
 
             // if they are on the team being removed deselect the current team and channel
@@ -525,6 +531,9 @@ function handleUserRemovedEvent(msg: WebSocketMessage) {
             if (msg.data.channel_id === currentChannelId) {
                 // emit the event so the client can change his own state
                 EventEmitter.emit(General.SWITCH_TO_DEFAULT_CHANNEL, currentTeamId);
+            }
+            if (isGuest(currentUser.roles)) {
+                dispatch(removeNotVisibleUsers());
             }
         } else if (msg.data.channel_id === currentChannelId) {
             dispatch(getChannelStats(currentChannelId));
@@ -705,6 +714,13 @@ function handleChannelMemberUpdatedEvent(msg: WebSocketMessage) {
             type: ChannelTypes.RECEIVED_MY_CHANNEL_MEMBER,
             data: channelMember,
         });
+        return {data: true};
+    };
+}
+
+function handleChannelSchemeUpdatedEvent(msg: WebSocketMessage) {
+    return (dispatch: DispatchFunc) => {
+        dispatch(getMyChannelMember(msg.broadcast.channel_id));
         return {data: true};
     };
 }
@@ -935,6 +951,25 @@ export function userTyping(channelId: string, parentPostId: string): ActionFunc 
             (membersInChannel < parseInt(config.MaxNotificationsPerChannel!, 10)) && (config.EnableUserTypingMessages === 'true')) {
             websocketClient.userTyping(channelId, parentPostId);
             lastTimeTypingSent = t;
+        }
+
+        return {data: true};
+    };
+}
+
+export function removeNotVisibleUsers(): ActionFunc {
+    return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
+        const state = getState();
+        const knownUsers = getKnownUsers(state);
+        const allUsers = Object.keys(getUsers(state));
+        const usersToRemove = new Set(allUsers.filter((x) => !knownUsers.has(x)));
+
+        const actions = [];
+        for (const userToRemove of usersToRemove.values()) {
+            actions.push({type: UserTypes.PROFILE_NO_LONGER_VISIBLE, data: {user_id: userToRemove}});
+        }
+        if (actions.length > 0) {
+            dispatch(batchActions(actions));
         }
 
         return {data: true};
