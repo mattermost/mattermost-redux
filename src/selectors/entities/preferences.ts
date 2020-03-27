@@ -1,8 +1,9 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
+
 import * as reselect from 'reselect';
 import {General, Preferences} from '../../constants';
-import {getConfig} from 'selectors/entities/general';
+import {getConfig, getLicense} from 'selectors/entities/general';
 import {getCurrentTeamId} from 'selectors/entities/teams';
 import {createShallowSelector} from 'utils/helpers';
 import {getPreferenceKey} from 'utils/preference_utils';
@@ -89,9 +90,11 @@ export const getVisibleGroupIds = reselect.createSelector(
 export const getTeammateNameDisplaySetting = reselect.createSelector(
     getConfig,
     getMyPreferences,
-    (config, preferences) => {
+    getLicense,
+    (config, preferences, license) => {
+        const useAdminTeammateNameDisplaySetting = (license && license.LockTeammateNameDisplay === 'true') && config.LockTeammateNameDisplay === 'true';
         const key = getPreferenceKey(Preferences.CATEGORY_DISPLAY_SETTINGS, Preferences.NAME_NAME_FORMAT);
-        if (preferences[key]) {
+        if (preferences[key] && !useAdminTeammateNameDisplaySetting) {
             return preferences[key].value;
         } else if (config.TeammateNameDisplay) {
             return config.TeammateNameDisplay;
@@ -225,3 +228,40 @@ export const getSidebarPreferences = reselect.createSelector(
         return sidebarPrefs;
     }
 );
+
+export const getNewSidebarPreference = reselect.createSelector(
+    (state: GlobalState) => {
+        const config = getConfig(state);
+        return config.ExperimentalChannelSidebarOrganization;
+    },
+    (state) => {
+        return get(
+            state,
+            Preferences.CATEGORY_SIDEBAR_SETTINGS,
+            Preferences.CHANNEL_SIDEBAR_ORGANIZATION,
+            null
+        );
+    },
+    (globalSetting, userSetting) => {
+        switch (globalSetting) {
+        case General.DISABLED:
+            return false;
+        case General.DEFAULT_ON:
+            return userSetting ? (userSetting === 'true') : true;
+        case General.DEFAULT_OFF:
+            return userSetting ? (userSetting === 'true') : false;
+        default:
+            return false;
+        }
+    }
+);
+
+export function shouldAutocloseDMs(state: GlobalState) {
+    const config = getConfig(state);
+    if (!config.CloseUnusedDirectMessages || config.CloseUnusedDirectMessages === 'false') {
+        return false;
+    }
+
+    const preference = get(state, Preferences.CATEGORY_SIDEBAR_SETTINGS, Preferences.CHANNEL_SIDEBAR_AUTOCLOSE_DMS, Preferences.AUTOCLOSE_DMS_ENABLED);
+    return preference === Preferences.AUTOCLOSE_DMS_ENABLED;
+}
