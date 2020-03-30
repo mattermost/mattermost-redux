@@ -56,3 +56,8 @@ export type TeamUnread = {
     mention_count: number;
     msg_count: number;
 };
+
+export type GetTeamMembersOpts = {
+    sort?: 'Username';
+    exclude_deleted_users?: boolean;
+}
