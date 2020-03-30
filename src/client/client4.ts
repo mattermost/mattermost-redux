@@ -9,7 +9,7 @@ import {isSystemAdmin} from 'utils/user_utils';
 
 import fetch from './fetch_etag';
 import {UserProfile, UserStatus} from 'types/users';
-import {Team} from 'types/teams';
+import {Team, GetTeamMembersOpts} from 'types/teams';
 import {Channel, ChannelModerationPatch} from 'types/channels';
 import {Post} from 'types/posts';
 import {Job} from 'types/jobs';
@@ -21,7 +21,6 @@ import {IncomingWebhook, OutgoingWebhook, Command, OAuthApp, DialogSubmission} f
 import {CustomEmoji} from 'types/emojis';
 import {Config} from 'types/config';
 import {Bot, BotPatch} from 'types/bots';
-import {Dictionary} from 'types/utilities';
 import {SyncablePatch} from 'types/groups';
 
 const FormData = require('form-data');
@@ -1062,9 +1061,9 @@ export default class Client4 {
         );
     };
 
-    getTeamMembers = async (teamId: string, page = 0, perPage = PER_PAGE_DEFAULT) => {
+    getTeamMembers = async (teamId: string, page = 0, perPage = PER_PAGE_DEFAULT, options: GetTeamMembersOpts) => {
         return this.doFetch(
-            `${this.getTeamMembersRoute(teamId)}${buildQueryString({page, per_page: perPage})}`,
+            `${this.getTeamMembersRoute(teamId)}${buildQueryString({page, per_page: perPage, ...options})}`,
             {method: 'get'}
         );
     };
