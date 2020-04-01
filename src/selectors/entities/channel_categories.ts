@@ -339,7 +339,7 @@ export function makeFilterAndSortChannelsForCategory() {
 
         // TODO: mocking for channel order
         if (category.channel_ids) {
-            channels = channels.sort((a, b) => category.channel_ids!.indexOf(a.id) - category.channel_ids!.indexOf(b.id));
+            channels = category.channel_ids.map((id) => originalChannels.find((channel) => channel.id === id)!);
         } else if (channels.some((channel) => channel.type === General.DM_CHANNEL || channel.type === General.GM_CHANNEL)) {
             channels = sortChannelsByNameWithDMs(state, channels);
         } else {
