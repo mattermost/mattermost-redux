@@ -3,6 +3,7 @@
 
 import {$ID, IDMappedObjects, RelationOneToOne} from './utilities';
 import {Team} from './teams';
+import {Channel} from './channels';
 
 export type ChannelCategoryType = 'favorites' | 'public' | 'private' | 'direct_messages' | 'custom';
 
@@ -13,7 +14,8 @@ export type ChannelCategory = {
     display_name: string;
 
     // This will be added in phase 2 of Channel Sidebar Organization once the server provides the categories
-    // channel_ids: $ID<Channel>;
+    // TODO: Remove the optional param, only for mock
+    channel_ids?: $ID<Channel>[];
 };
 
 export type ChannelCategoriesState = {

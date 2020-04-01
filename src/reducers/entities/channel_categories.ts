@@ -38,24 +38,24 @@ export function byId(state: IDMappedObjects<ChannelCategory> = {}, action: Gener
     }
 
     // This will be added in phase 2 of Channel Sidebar Organization once the server provides the categories
-    // case ChannelCategoryTypes.RECEIVED_CATEGORIES: {
-    //     const categories: ChannelCategory[] = action.data;
+    case ChannelCategoryTypes.RECEIVED_CATEGORIES: {
+        const categories: ChannelCategory[] = action.data;
 
-    //     return categories.reduce((nextState, category) => {
-    //         return {
-    //             ...nextState,
-    //             [category.id]: category,
-    //         };
-    //     }, state);
-    // }
-    // case ChannelCategoryTypes.RECEIVED_CATEGORY: {
-    //     const category: ChannelCategory = action.data;
+        return categories.reduce((nextState, category) => {
+            return {
+                ...nextState,
+                [category.id]: category,
+            };
+        }, state);
+    }
+    case ChannelCategoryTypes.RECEIVED_CATEGORY: {
+        const category: ChannelCategory = action.data;
 
-    //     return {
-    //         ...state,
-    //         [category.id]: category,
-    //     };
-    // }
+        return {
+            ...state,
+            [category.id]: category,
+        };
+    }
 
     case TeamTypes.LEAVE_TEAM: {
         const team: Team = action.data;
@@ -118,15 +118,15 @@ export function orderByTeam(state: RelationOneToOne<Team, $ID<ChannelCategory>[]
     }
 
     // This will be added in phase 2 of Channel Sidebar Organization once the server provides the categories
-    // case ChannelCategoryTypes.RECEIVED_CATEGORY_ORDER: {
-    //     const teamId: string = action.data.teamId;
-    //     const categoryIds: string[] = action.data.categoryIds;
+    case ChannelCategoryTypes.RECEIVED_CATEGORY_ORDER: {
+        const teamId: string = action.data.teamId;
+        const categoryIds: string[] = action.data.categoryIds;
 
-    //     return {
-    //         ...state,
-    //         [teamId]: categoryIds,
-    //     };
-    // }
+        return {
+            ...state,
+            [teamId]: categoryIds,
+        };
+    }
 
     case TeamTypes.LEAVE_TEAM: {
         const team: Team = action.data;
