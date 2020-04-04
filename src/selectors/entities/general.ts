@@ -1,10 +1,14 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
+
 import {createSelector} from 'reselect';
-import {isMinimumServerVersion} from 'utils/helpers';
+
 import {General} from '../../constants';
+
 import {GlobalState} from 'types/store';
 import {Config} from 'types/config';
+
+import {isMinimumServerVersion} from 'utils/helpers';
 
 export function getConfig(state: GlobalState): Partial<Config> {
     return state.entities.general.config;
