@@ -353,7 +353,7 @@ describe('Actions.Users', () => {
 
         await Actions.getProfilesInChannel(
             TestHelper.basicChannel.id,
-            0
+            0,
         )(store.dispatch, store.getState);
 
         const {profiles, profilesInChannel} = store.getState().entities.users;
@@ -373,7 +373,7 @@ describe('Actions.Users', () => {
             TestHelper.fakeUser(),
             null,
             null,
-            TestHelper.basicTeam.invite_id
+            TestHelper.basicTeam.invite_id,
         );
 
         nock(Client4.getBaseRoute()).
@@ -384,7 +384,7 @@ describe('Actions.Users', () => {
         await Actions.getProfilesNotInChannel(
             TestHelper.basicTeam.id,
             TestHelper.basicChannel.id,
-            0
+            0,
         )(store.dispatch, store.getState);
 
         const {profiles, profilesNotInChannel} = store.getState().entities.users;
@@ -406,7 +406,7 @@ describe('Actions.Users', () => {
             reply(200, user);
 
         await Actions.getUser(
-            user.id
+            user.id,
         )(store.dispatch, store.getState);
 
         const state = store.getState();
@@ -442,7 +442,7 @@ describe('Actions.Users', () => {
             reply(200, user);
 
         await Actions.getUserByUsername(
-            user.username
+            user.username,
         )(store.dispatch, store.getState);
 
         const state = store.getState();
@@ -464,7 +464,7 @@ describe('Actions.Users', () => {
             reply(200, user);
 
         await Actions.getUserByEmail(
-            user.email
+            user.email,
         )(store.dispatch, store.getState);
 
         const state = store.getState();
@@ -482,7 +482,7 @@ describe('Actions.Users', () => {
             reply(200, [user]);
 
         await Actions.searchProfiles(
-            user.username
+            user.username,
         )(store.dispatch, store.getState);
 
         const state = store.getState();
@@ -498,7 +498,7 @@ describe('Actions.Users', () => {
             reply(200, [{user_id: TestHelper.basicUser.id, status: 'online', manual: false, last_activity_at: 1507662212199}]);
 
         await Actions.getStatusesByIds(
-            [TestHelper.basicUser.id]
+            [TestHelper.basicUser.id],
         )(store.dispatch, store.getState);
 
         const statuses = store.getState().entities.users.statuses;
@@ -526,7 +526,7 @@ describe('Actions.Users', () => {
             reply(200, {user_id: user.id, status: 'online', manual: false, last_activity_at: 1507662212199});
 
         await Actions.getStatus(
-            user.id
+            user.id,
         )(store.dispatch, store.getState);
 
         const statuses = store.getState().entities.users.statuses;
@@ -539,7 +539,7 @@ describe('Actions.Users', () => {
             reply(200, OK_RESPONSE);
 
         await Actions.setStatus(
-            {user_id: TestHelper.basicUser.id, status: 'away'}
+            {user_id: TestHelper.basicUser.id, status: 'away'},
         )(store.dispatch, store.getState);
 
         const statuses = store.getState().entities.users.statuses;
@@ -744,7 +744,7 @@ describe('Actions.Users', () => {
             TestHelper.fakeUser(),
             null,
             null,
-            TestHelper.basicTeam.invite_id
+            TestHelper.basicTeam.invite_id,
         );
 
         nock(Client4.getBaseRoute()).
@@ -755,7 +755,7 @@ describe('Actions.Users', () => {
         await Actions.autocompleteUsers(
             '',
             TestHelper.basicTeam.id,
-            TestHelper.basicChannel.id
+            TestHelper.basicChannel.id,
         )(store.dispatch, store.getState);
 
         const autocompleteRequest = store.getState().requests.users.autocompleteUsers;

@@ -114,7 +114,7 @@ export function makeFilterPostsAndAddSeparators() {
 
             // Flip it back to newest to oldest
             return out.reverse();
-        }
+        },
     );
 }
 
@@ -290,7 +290,7 @@ export function makeGenerateCombinedPost() {
                 user_id: '',
                 metadata: {},
             };
-        }
+        },
     );
 }
 

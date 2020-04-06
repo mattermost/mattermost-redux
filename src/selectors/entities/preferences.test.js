@@ -168,7 +168,7 @@ describe('Selectors.Preferences', () => {
                     },
                 },
             }),
-            General.TEAMMATE_NAME_DISPLAY.SHOW_NICKNAME_FULLNAME
+            General.TEAMMATE_NAME_DISPLAY.SHOW_NICKNAME_FULLNAME,
         );
     });
 
@@ -606,7 +606,7 @@ describe('Selectors.Preferences', () => {
                         },
                     },
                 }),
-                false
+                false,
             );
         });
 
@@ -628,7 +628,7 @@ describe('Selectors.Preferences', () => {
                         },
                     },
                 }),
-                false
+                false,
             );
         });
 
@@ -646,7 +646,7 @@ describe('Selectors.Preferences', () => {
                         },
                     },
                 }),
-                false
+                false,
             );
         });
 
@@ -668,7 +668,7 @@ describe('Selectors.Preferences', () => {
                         },
                     },
                 }),
-                false
+                false,
             );
         });
 
@@ -690,7 +690,7 @@ describe('Selectors.Preferences', () => {
                         },
                     },
                 }),
-                true
+                true,
             );
         });
 
@@ -708,7 +708,7 @@ describe('Selectors.Preferences', () => {
                         },
                     },
                 }),
-                true
+                true,
             );
         });
 
@@ -730,7 +730,7 @@ describe('Selectors.Preferences', () => {
                         },
                     },
                 }),
-                false
+                false,
             );
         });
 
@@ -752,7 +752,7 @@ describe('Selectors.Preferences', () => {
                         },
                     },
                 }),
-                true
+                true,
             );
         });
     });
