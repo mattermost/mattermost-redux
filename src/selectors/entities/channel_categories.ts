@@ -195,11 +195,17 @@ export function makeFilterManuallyClosedDMs(): (state: GlobalState, channels: Ch
         (state: GlobalState, channels: Channel[]) => channels,
         getMyPreferences,
         getCurrentUserId,
-        (channels, myPreferences, currentUserId) => {
+        getMyChannelMemberships,
+        (channels, myPreferences, currentUserId, myMembers) => {
             const filtered = channels.filter((channel) => {
                 let preference;
 
                 if (channel.type !== General.DM_CHANNEL && channel.type !== General.GM_CHANNEL) {
+                    return true;
+                }
+
+                if (isUnreadChannel(myMembers, channel)) {
+                    // Unread DMs/GMs are always visible
                     return true;
                 }
 
