@@ -21,6 +21,10 @@ export function getPost(state: GlobalState, postId: $ID<Post>): Post {
     return getAllPosts(state)[postId];
 }
 
+export function getPostRepliesCount(state: GlobalState, postId: $ID<Post>): number {
+    return state.entities.posts.postsReplies[postId];
+}
+
 export function getPostsInThread(state: GlobalState): RelationOneToMany<Post, Post> {
     return state.entities.posts.postsInThread;
 }

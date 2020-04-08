@@ -682,13 +682,27 @@ describe('makeFilterManuallyClosedDMs', () => {
     const otherUser2 = {id: 'otherUser2'};
     const otherUser3 = {id: 'otherUser3'};
 
+    const baseState = {
+        entities: {
+            channels: {
+                myMembers: {},
+            },
+            preferences: {
+                myPreferences: {},
+            },
+            users: {
+                currentUserId: currentUser.id,
+            },
+        },
+    };
+
     test('should filter DMs based on preferences', () => {
         const filterManuallyClosedDMs = Selectors.makeFilterManuallyClosedDMs();
 
         const dmChannel1 = {id: 'dmChannel1', type: General.DM_CHANNEL, name: `${currentUser.id}__${otherUser1.id}`};
         const dmChannel2 = {id: 'dmChannel2', type: General.DM_CHANNEL, name: `${currentUser.id}__${otherUser2.id}`};
 
-        const state = {
+        const state = mergeObjects(baseState, {
             entities: {
                 preferences: {
                     myPreferences: {
@@ -696,22 +710,19 @@ describe('makeFilterManuallyClosedDMs', () => {
                         [getPreferenceKey(Preferences.CATEGORY_DIRECT_CHANNEL_SHOW, otherUser2.id)]: {value: 'true'},
                     },
                 },
-                users: {
-                    currentUserId: currentUser.id,
-                },
             },
-        };
+        });
 
         expect(filterManuallyClosedDMs(state, [dmChannel1, dmChannel2])).toMatchObject([dmChannel2]);
     });
 
-    test('should filter DMs based on preferences', () => {
+    test('should filter GMs based on preferences', () => {
         const filterManuallyClosedDMs = Selectors.makeFilterManuallyClosedDMs();
 
         const gmChannel1 = {id: 'gmChannel1', type: General.GM_CHANNEL};
         const gmChannel2 = {id: 'gmChannel2', type: General.GM_CHANNEL};
 
-        const state = {
+        const state = mergeObjects(baseState, {
             entities: {
                 preferences: {
                     myPreferences: {
@@ -719,13 +730,42 @@ describe('makeFilterManuallyClosedDMs', () => {
                         [getPreferenceKey(Preferences.CATEGORY_GROUP_CHANNEL_SHOW, gmChannel2.id)]: {value: 'false'},
                     },
                 },
-                users: {
-                    currentUserId: currentUser.id,
-                },
             },
-        };
+        });
 
         expect(filterManuallyClosedDMs(state, [gmChannel1, gmChannel2])).toMatchObject([gmChannel1]);
+    });
+
+    test('should show unread DMs and GMs, regardless of preferences', () => {
+        const filterManuallyClosedDMs = Selectors.makeFilterManuallyClosedDMs();
+
+        const dmChannel1 = {id: 'dmChannel1', type: General.DM_CHANNEL, name: `${currentUser.id}__${otherUser1.id}`, total_msg_count: 1};
+        const dmChannel2 = {id: 'dmChannel2', type: General.DM_CHANNEL, name: `${currentUser.id}__${otherUser2.id}`, total_msg_count: 0};
+        const gmChannel1 = {id: 'gmChannel1', type: General.GM_CHANNEL, total_msg_count: 1};
+        const gmChannel2 = {id: 'gmChannel2', type: General.GM_CHANNEL, total_msg_count: 0};
+
+        const state = mergeObjects(baseState, {
+            entities: {
+                channels: {
+                    myMembers: {
+                        dmChannel1: {msg_count: 0},
+                        dmChannel2: {msg_count: 0},
+                        gmChannel1: {msg_count: 0},
+                        gmChannel2: {msg_count: 0},
+                    },
+                },
+                preferences: {
+                    myPreferences: {
+                        [getPreferenceKey(Preferences.CATEGORY_DIRECT_CHANNEL_SHOW, otherUser1.id)]: {value: 'false'},
+                        [getPreferenceKey(Preferences.CATEGORY_DIRECT_CHANNEL_SHOW, otherUser2.id)]: {value: 'false'},
+                        [getPreferenceKey(Preferences.CATEGORY_GROUP_CHANNEL_SHOW, gmChannel1.id)]: {value: 'false'},
+                        [getPreferenceKey(Preferences.CATEGORY_GROUP_CHANNEL_SHOW, gmChannel2.id)]: {value: 'false'},
+                    },
+                },
+            },
+        });
+
+        expect(filterManuallyClosedDMs(state, [dmChannel1, dmChannel2, gmChannel1, gmChannel2])).toEqual([dmChannel1, gmChannel1]);
     });
 
     test('should not filter other channels', () => {
@@ -734,16 +774,7 @@ describe('makeFilterManuallyClosedDMs', () => {
         const channel1 = {id: 'channel1', type: General.OPEN_CHANNEL};
         const channel2 = {id: 'channel2', type: General.PRIVATE_CHANNEL};
 
-        const state = {
-            entities: {
-                preferences: {
-                    myPreferences: {},
-                },
-                users: {
-                    currentUserId: currentUser.id,
-                },
-            },
-        };
+        const state = baseState;
 
         const channels = [channel1, channel2];
 
