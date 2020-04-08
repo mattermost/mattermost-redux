@@ -53,6 +53,7 @@ const state: GlobalState = {
         posts: {
             expandedURLs: {},
             posts: {},
+            postsReplies: {},
             postsInChannel: {},
             postsInThread: {},
             pendingPostIds: [],
