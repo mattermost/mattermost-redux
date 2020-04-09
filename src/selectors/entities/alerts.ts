@@ -20,19 +20,19 @@ export const getLatestNotificationAlert: (state: GlobalState) => AlertType | und
     getAlerts,
     (alerts) => {
         return alerts.find((a) => a.type === Alerts.ALERT_NOTIFICATION);
-    }
+    },
 );
 
 export const getLatestDeveloperAlert: (state: GlobalState) => AlertType | undefined | null = createSelector(
     getAlerts,
     (alerts) => {
         return alerts.find((a) => a.type === Alerts.ALERT_DEVELOPER);
-    }
+    },
 );
 
 export const getLatestErrorAlert: (state: GlobalState) => AlertType | undefined | null = createSelector(
     getAlerts,
     (alerts) => {
         return alerts.find((a) => a.type === Alerts.ALERT_ERROR);
-    }
+    },
 );

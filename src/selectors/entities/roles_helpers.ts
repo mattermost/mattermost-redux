@@ -26,7 +26,7 @@ export const getMySystemRoles = createSelector(
         }
 
         return new Set<string>();
-    }
+    },
 );
 
 export const getMySystemPermissions = createSelector(
@@ -44,7 +44,7 @@ export const getMySystemPermissions = createSelector(
         }
 
         return permissions;
-    }
+    },
 );
 
 export const haveISystemPermission = createSelector(
@@ -52,5 +52,5 @@ export const haveISystemPermission = createSelector(
     (state: GlobalState, options: PermissionsOptions) => options.permission,
     (permissions, permission) => {
         return permissions.has(permission);
-    }
+    },
 );

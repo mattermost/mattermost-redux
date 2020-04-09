@@ -672,7 +672,7 @@ function buildFavoriteChannels(
     myPreferences: {
         [x: string]: PreferenceType;
     },
-    locale: string
+    locale: string,
 ): Array<Channel> {
     return channels.filter((channel) => isFavoriteChannel(myPreferences, channel.id)).sort(sortChannelsByDisplayName.bind(null, locale));
 }

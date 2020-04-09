@@ -23,7 +23,7 @@ export const getMyCurrentChannelMembership: (a: GlobalState) => ChannelMembershi
     getMyChannelMemberships,
     (currentChannelId, channelMemberships) => {
         return channelMemberships[currentChannelId] || null;
-    }
+    },
 );
 
 // Users

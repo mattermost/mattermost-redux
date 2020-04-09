@@ -362,7 +362,7 @@ export function makeGetPostsForThread(): (state: GlobalState, props: {rootId: $I
             });
             thread.sort(comparePosts);
             return thread;
-        }
+        },
     );
 }
 
@@ -526,7 +526,7 @@ export const getCurrentUsersLatestPost: (state: GlobalState, postId: $ID<Post>) 
         });
 
         return lastPost;
-    }
+    },
 );
 
 export function getRecentPostsChunkInChannel(state: GlobalState, channelId: $ID<Channel>): PostOrderBlock | null | undefined {

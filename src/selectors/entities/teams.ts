@@ -25,7 +25,7 @@ export const getTeamByName = createSelector(
     (state: GlobalState, name: string) => name,
     (teams: IDMappedObjects<Team>, name: string): Team | undefined => {
         return Object.values(teams).find((team: Team) => team.name === name);
-    }
+    },
 );
 
 export function getTeams(state: GlobalState): IDMappedObjects<Team> {
