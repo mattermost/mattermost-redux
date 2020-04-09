@@ -12,7 +12,7 @@ describe('EmojiUtils', () => {
                 'This has no emojis',
                 new Map(),
                 new Map(),
-                new Map()
+                new Map(),
             );
             const expected = new Set([]);
 
@@ -24,7 +24,7 @@ describe('EmojiUtils', () => {
                 ':this: :is_all: :emo-jis: :123:',
                 new Map(),
                 new Map(),
-                new Map()
+                new Map(),
             );
             const expected = new Set(['this', 'is_all', 'emo-jis', '123']);
 
@@ -36,7 +36,7 @@ describe('EmojiUtils', () => {
                 ':this:/:is_all: (:emo-jis:) surrounding:123:text:456:asdf',
                 new Map(),
                 new Map(),
-                new Map()
+                new Map(),
             );
             const expected = new Set(['this', 'is_all', 'emo-jis', '123', '456']);
 
@@ -48,7 +48,7 @@ describe('EmojiUtils', () => {
                 ':this: :is_all: :emo-jis: :123:',
                 new Map([['this', {name: 'this'}], ['123', {name: '123'}]]),
                 new Map(),
-                new Map()
+                new Map(),
             );
             const expected = new Set(['is_all', 'emo-jis']);
 
@@ -60,7 +60,7 @@ describe('EmojiUtils', () => {
                 ':this: :is_all: :emo-jis: :123:',
                 new Map(),
                 new Map([['is_all', {name: 'is_all'}], ['emo-jis', {name: 'emo-jis'}]]),
-                new Map()
+                new Map(),
             );
             const expected = new Set(['this', '123']);
 
@@ -72,7 +72,7 @@ describe('EmojiUtils', () => {
                 ':this: :is_all: :emo-jis: :123:',
                 new Map(),
                 new Map(),
-                new Map([['this', {name: 'this'}], ['emo-jis', {name: 'emo-jis'}]])
+                new Map([['this', {name: 'this'}], ['emo-jis', {name: 'emo-jis'}]]),
             );
             const expected = new Set(['is_all', '123']);
 

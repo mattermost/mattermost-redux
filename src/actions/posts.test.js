@@ -144,7 +144,7 @@ describe('Actions.Posts', () => {
 
         await Actions.createPost(
             post,
-            files
+            files,
         )(store.dispatch, store.getState);
 
         const state = store.getState();
@@ -238,7 +238,7 @@ describe('Actions.Posts', () => {
             reply(201, TestHelper.fakePostWithId(channelId));
 
         const post = await Client4.createPost(
-            TestHelper.fakePost(channelId)
+            TestHelper.fakePost(channelId),
         );
         const message = post.message;
 
@@ -249,7 +249,7 @@ describe('Actions.Posts', () => {
             reply(200, post);
 
         await Actions.editPost(
-            post
+            post,
         )(store.dispatch, store.getState);
 
         const state = store.getState();
@@ -265,7 +265,7 @@ describe('Actions.Posts', () => {
 
         assert.strictEqual(
             posts[post.id].message,
-            `${message} (edited)`
+            `${message} (edited)`,
         );
     });
 
@@ -287,7 +287,7 @@ describe('Actions.Posts', () => {
         assert.ok(posts[postId]);
         assert.strictEqual(
             posts[postId].state,
-            Posts.POST_DELETED
+            Posts.POST_DELETED,
         );
     });
 
@@ -300,7 +300,7 @@ describe('Actions.Posts', () => {
             reply(201, TestHelper.fakePostWithId(TestHelper.basicChannel.id));
 
         const post1 = await Client4.createPost(
-            TestHelper.fakePost(TestHelper.basicChannel.id)
+            TestHelper.fakePost(TestHelper.basicChannel.id),
         );
 
         const emojiName = '+1';
@@ -386,7 +386,7 @@ describe('Actions.Posts', () => {
             post('/posts').
             reply(201, TestHelper.fakePostWithId(TestHelper.basicChannel.id));
         const post1 = await Client4.createPost(
-            TestHelper.fakePost(TestHelper.basicChannel.id)
+            TestHelper.fakePost(TestHelper.basicChannel.id),
         );
 
         const emojiName = '+1';
@@ -540,49 +540,49 @@ describe('Actions.Posts', () => {
             Actions.getNeededAtMentionedUsernames(state, [
                 {message: 'aaa'},
             ]),
-            new Set()
+            new Set(),
         );
 
         assert.deepEqual(
             Actions.getNeededAtMentionedUsernames(state, [
                 {message: '@aaa'},
             ]),
-            new Set()
+            new Set(),
         );
 
         assert.deepEqual(
             Actions.getNeededAtMentionedUsernames(state, [
                 {message: '@aaa @bbb @ccc'},
             ]),
-            new Set(['bbb', 'ccc'])
+            new Set(['bbb', 'ccc']),
         );
 
         assert.deepEqual(
             Actions.getNeededAtMentionedUsernames(state, [
                 {message: '@bbb. @ccc.ddd'},
             ]),
-            new Set(['bbb.', 'bbb', 'ccc.ddd'])
+            new Set(['bbb.', 'bbb', 'ccc.ddd']),
         );
 
         assert.deepEqual(
             Actions.getNeededAtMentionedUsernames(state, [
                 {message: '@bbb- @ccc-ddd'},
             ]),
-            new Set(['bbb-', 'bbb', 'ccc-ddd'])
+            new Set(['bbb-', 'bbb', 'ccc-ddd']),
         );
 
         assert.deepEqual(
             Actions.getNeededAtMentionedUsernames(state, [
                 {message: '@bbb_ @ccc_ddd'},
             ]),
-            new Set(['bbb_', 'ccc_ddd'])
+            new Set(['bbb_', 'ccc_ddd']),
         );
 
         assert.deepEqual(
             Actions.getNeededAtMentionedUsernames(state, [
                 {message: '(@bbb/@ccc) ddd@eee'},
             ]),
-            new Set(['bbb', 'ccc'])
+            new Set(['bbb', 'ccc']),
         );
 
         assert.deepEqual(
@@ -595,7 +595,7 @@ describe('Actions.Posts', () => {
                 {message: '@channel.'},
             ]),
             new Set(),
-            'should never try to request usernames matching special mentions'
+            'should never try to request usernames matching special mentions',
         );
     });
 
@@ -627,7 +627,7 @@ describe('Actions.Posts', () => {
                 Actions.getNeededCustomEmojis(state, [
                     {message: 'aaa'},
                 ]),
-                new Set()
+                new Set(),
             );
         });
 
@@ -636,7 +636,7 @@ describe('Actions.Posts', () => {
                 Actions.getNeededCustomEmojis(state, [
                     {message: ':name1:'},
                 ]),
-                new Set()
+                new Set(),
             );
         });
 
@@ -645,7 +645,7 @@ describe('Actions.Posts', () => {
                 Actions.getNeededCustomEmojis(state, [
                     {message: ':systemEmoji1:'},
                 ]),
-                new Set()
+                new Set(),
             );
         });
 
@@ -654,7 +654,7 @@ describe('Actions.Posts', () => {
                 Actions.getNeededCustomEmojis(state, [
                     {message: ':systemEmoji1: :name1: :name2: :name3:'},
                 ]),
-                new Set(['name3'])
+                new Set(['name3']),
             );
         });
 
@@ -663,7 +663,7 @@ describe('Actions.Posts', () => {
                 Actions.getNeededCustomEmojis(state, [
                     {message: 'aaa :name3: :name4:'},
                 ]),
-                new Set(['name3', 'name4'])
+                new Set(['name3', 'name4']),
             );
         });
 
@@ -672,7 +672,7 @@ describe('Actions.Posts', () => {
                 Actions.getNeededCustomEmojis(state, [
                     {message: ':name3:!'},
                 ]),
-                new Set(['name3'])
+                new Set(['name3']),
             );
         });
 
@@ -681,7 +681,7 @@ describe('Actions.Posts', () => {
                 Actions.getNeededCustomEmojis(state, [
                     {message: ':name-3:'},
                 ]),
-                new Set(['name-3'])
+                new Set(['name-3']),
             );
         });
 
@@ -690,7 +690,7 @@ describe('Actions.Posts', () => {
                 Actions.getNeededCustomEmojis(state, [
                     {message: ':name_3:'},
                 ]),
-                new Set(['name_3'])
+                new Set(['name_3']),
             );
         });
 
@@ -699,7 +699,7 @@ describe('Actions.Posts', () => {
                 Actions.getNeededCustomEmojis(state, [
                     {message: '', props: {attachments: [{text: ':name3:'}]}},
                 ]),
-                new Set(['name3'])
+                new Set(['name3']),
             );
         });
 
@@ -708,7 +708,7 @@ describe('Actions.Posts', () => {
                 Actions.getNeededCustomEmojis(state, [
                     {message: '', props: {attachments: [{pretext: ':name3:'}]}},
                 ]),
-                new Set(['name3'])
+                new Set(['name3']),
             );
         });
 
@@ -717,7 +717,7 @@ describe('Actions.Posts', () => {
                 Actions.getNeededCustomEmojis(state, [
                     {message: '', props: {attachments: [{fields: [{value: ':name3:'}]}]}},
                 ]),
-                new Set(['name3'])
+                new Set(['name3']),
             );
         });
 
@@ -726,7 +726,7 @@ describe('Actions.Posts', () => {
                 Actions.getNeededCustomEmojis(state, [
                     {message: '', props: {attachments: [{text: ':name4: :name1:', pretext: ':name3: :systemEmoji1:', fields: [{value: ':name3:'}]}]}},
                 ]),
-                new Set(['name3', 'name4'])
+                new Set(['name3', 'name4']),
             );
         });
 
@@ -735,7 +735,7 @@ describe('Actions.Posts', () => {
                 Actions.getNeededCustomEmojis(state, [
                     {message: '', props: {attachments: [{fields: [{}]}]}},
                 ]),
-                new Set([])
+                new Set([]),
             );
         });
 
@@ -744,7 +744,7 @@ describe('Actions.Posts', () => {
                 Actions.getNeededCustomEmojis(state, [
                     {message: '', props: {attachments: [{text: null, pretext: null, fields: null}]}},
                 ]),
-                new Set([])
+                new Set([]),
             );
         });
 
@@ -753,7 +753,7 @@ describe('Actions.Posts', () => {
                 Actions.getNeededCustomEmojis(state, [
                     {message: '', props: {attachments: null}},
                 ]),
-                new Set([])
+                new Set([]),
             );
         });
 
@@ -763,7 +763,7 @@ describe('Actions.Posts', () => {
                     {message: ':emoji3:'},
                     {message: ':emoji4:'},
                 ]),
-                new Set(['emoji3', 'emoji4'])
+                new Set(['emoji3', 'emoji4']),
             );
         });
 
@@ -781,7 +781,7 @@ describe('Actions.Posts', () => {
                 }, [
                     {message: ':emoji3:'},
                 ]),
-                new Set([])
+                new Set([]),
             );
         });
 
@@ -795,7 +795,7 @@ describe('Actions.Posts', () => {
                         },
                     },
                 ]),
-                new Set([])
+                new Set([]),
             );
         });
     });
@@ -1108,7 +1108,7 @@ describe('Actions.Posts', () => {
             reply(201, TestHelper.fakePostWithId(TestHelper.basicChannel.id));
 
         const post1 = await Client4.createPost(
-            TestHelper.fakePost(channelId)
+            TestHelper.fakePost(channelId),
         );
 
         nock(Client4.getUsersRoute()).
@@ -1137,7 +1137,7 @@ describe('Actions.Posts', () => {
             post('/posts').
             reply(201, TestHelper.fakePostWithId(TestHelper.basicChannel.id));
         const post1 = await Client4.createPost(
-            TestHelper.fakePost(channelId)
+            TestHelper.fakePost(channelId),
         );
 
         nock(Client4.getUsersRoute()).
@@ -1222,7 +1222,7 @@ describe('Actions.Posts', () => {
             post('/posts').
             reply(201, TestHelper.fakePostWithId(TestHelper.basicChannel.id));
         const post1 = await Client4.createPost(
-            TestHelper.fakePost(TestHelper.basicChannel.id)
+            TestHelper.fakePost(TestHelper.basicChannel.id),
         );
 
         const postList = {order: [post1.id], posts: {}};
@@ -1261,7 +1261,7 @@ describe('Actions.Posts', () => {
             post('/posts').
             reply(201, TestHelper.fakePostWithId(TestHelper.basicChannel.id));
         const post1 = await Client4.createPost(
-            TestHelper.fakePost(TestHelper.basicChannel.id)
+            TestHelper.fakePost(TestHelper.basicChannel.id),
         );
 
         const postList = {order: [post1.id], posts: {}};
@@ -1302,7 +1302,7 @@ describe('Actions.Posts', () => {
             post('/posts').
             reply(201, TestHelper.fakePostWithId(TestHelper.basicChannel.id));
         const post1 = await Client4.createPost(
-            TestHelper.fakePost(TestHelper.basicChannel.id)
+            TestHelper.fakePost(TestHelper.basicChannel.id),
         );
 
         const emojiName = '+1';
@@ -1328,7 +1328,7 @@ describe('Actions.Posts', () => {
             post('/posts').
             reply(201, TestHelper.fakePostWithId(TestHelper.basicChannel.id));
         const post1 = await Client4.createPost(
-            TestHelper.fakePost(TestHelper.basicChannel.id)
+            TestHelper.fakePost(TestHelper.basicChannel.id),
         );
 
         const emojiName = '+1';
@@ -1359,7 +1359,7 @@ describe('Actions.Posts', () => {
             post('/posts').
             reply(201, TestHelper.fakePostWithId(TestHelper.basicChannel.id));
         const post1 = await Client4.createPost(
-            TestHelper.fakePost(TestHelper.basicChannel.id)
+            TestHelper.fakePost(TestHelper.basicChannel.id),
         );
 
         const emojiName = '+1';
@@ -1399,7 +1399,7 @@ describe('Actions.Posts', () => {
                 name: TestHelper.generateId(),
                 creator_id: TestHelper.basicUser.id,
             },
-            testImageData
+            testImageData,
         )(store.dispatch, store.getState);
 
         nock(Client4.getEmojisRoute()).
