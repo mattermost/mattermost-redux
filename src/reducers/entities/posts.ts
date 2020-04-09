@@ -4,7 +4,7 @@ import {ChannelTypes, GeneralTypes, PostTypes, UserTypes} from 'action_types';
 import {Posts} from '../../constants';
 import {comparePosts} from 'utils/post_utils';
 import {Post, PostsState, PostOrderBlock, MessageHistory} from 'types/posts';
-import {RelationOneToOne, Dictionary, IDMappedObjects, RelationOneToMany} from 'types/utilities';
+import {$ID, RelationOneToOne, Dictionary, IDMappedObjects, RelationOneToMany} from 'types/utilities';
 import {GenericAction} from 'types/actions';
 import {Reaction} from 'types/reactions';
 
@@ -63,6 +63,69 @@ export function removeUnneededMetadata(post: Post) {
         ...post,
         metadata,
     };
+}
+
+export function nextPostsReplies(state: {[x in $ID<Post>]: number} = {}, action: GenericAction) {
+    switch (action.type) {
+    case PostTypes.RECEIVED_POST:
+    case PostTypes.RECEIVED_NEW_POST: {
+        const post = action.data;
+        if (!post.id || !post.root_id) {
+            // Ignoring pending posts and root posts
+            return state;
+        }
+
+        const newState = {...state};
+        if (post.reply_count) {
+            newState[post.root_id] = post.reply_count;
+        } else {
+            newState[post.root_id] = (newState[post.root_id] || 0) + 1;
+        }
+        return newState;
+    }
+
+    case PostTypes.RECEIVED_POSTS: {
+        const posts = Object.values(action.data.posts) as Post[];
+
+        if (posts.length === 0) {
+            return state;
+        }
+
+        const nextState = {...state};
+
+        for (const post of posts) {
+            if (post.root_id) {
+                nextState[post.root_id] = post.reply_count;
+            } else {
+                nextState[post.id] = post.reply_count;
+            }
+        }
+
+        return nextState;
+    }
+
+    case PostTypes.POST_DELETED: {
+        const post: Post = action.data;
+
+        if (!state[post.root_id] && !state[post.id]) {
+            return state;
+        }
+
+        const nextState = {...state};
+        if (post.root_id && state[post.root_id]) {
+            nextState[post.root_id] -= 1;
+        }
+        if (!post.root_id && state[post.id]) {
+            Reflect.deleteProperty(nextState, post.id);
+        }
+
+        return nextState;
+    }
+    case UserTypes.LOGOUT_SUCCESS:
+        return {};
+    default:
+        return state;
+    }
 }
 
 export function handlePosts(state: RelationOneToOne<Post, Post> = {}, action: GenericAction) {
@@ -1205,6 +1268,9 @@ export default function(state: Partial<PostsState> = {}, action: GenericAction) 
 
         // Object mapping post ids to post objects
         posts: nextPosts,
+
+        // Object mapping post ids to replies count
+        postsReplies: nextPostsReplies(state.postsReplies, action),
 
         // Array that contains the pending post ids for those messages that are in transition to being created
         pendingPostIds: handlePendingPosts(state.pendingPostIds, action),

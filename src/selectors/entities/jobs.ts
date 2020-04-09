@@ -20,6 +20,6 @@ export function makeGetJobsByType(type: JobType): (state: GlobalState) => Array<
         getJobsByType,
         (jobsByType) => {
             return jobsByType[type] || [];
-        }
+        },
     );
 }

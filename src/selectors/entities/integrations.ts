@@ -35,7 +35,7 @@ export const getOutgoingHooksInCurrentTeam = createSelector(
     getOutgoingHooks,
     (teamId, hooks) => {
         return Object.values(hooks).filter((o) => o.team_id === teamId);
-    }
+    },
 );
 
 export const getAllCommands = createSelector(
@@ -46,7 +46,7 @@ export const getAllCommands = createSelector(
             ...commands,
             ...systemCommands,
         };
-    }
+    },
 );
 
 export const getAutocompleteCommandsList = createSelector(
@@ -56,5 +56,5 @@ export const getAutocompleteCommandsList = createSelector(
         return Object.values(commands).filter((command) => {
             return command && (!command.team_id || command.team_id === currentTeamId) && command.auto_complete;
         }).sort((a, b) => a.display_name.localeCompare(b.display_name));
-    }
+    },
 );

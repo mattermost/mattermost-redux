@@ -32,7 +32,7 @@ export const getMyTeamRoles = createSelector(
             }
         }
         return roles;
-    }
+    },
 );
 
 export const getMyChannelRoles = createSelector(
@@ -47,7 +47,7 @@ export const getMyChannelRoles = createSelector(
             }
         }
         return roles;
-    }
+    },
 );
 
 export const getMyRoles = createSelector(
@@ -60,7 +60,7 @@ export const getMyRoles = createSelector(
             team: teamRoles,
             channel: channelRoles,
         };
-    }
+    },
 );
 
 export const getRolesById = createSelector(
@@ -71,7 +71,7 @@ export const getRolesById = createSelector(
             rolesById[role.id] = role;
         }
         return rolesById;
-    }
+    },
 );
 
 export const getMyCurrentTeamPermissions = createSelector(
@@ -94,7 +94,7 @@ export const getMyCurrentTeamPermissions = createSelector(
             permissions.add(permission);
         }
         return permissions;
-    }
+    },
 );
 
 export const getMyCurrentChannelPermissions = createSelector(
@@ -117,7 +117,7 @@ export const getMyCurrentChannelPermissions = createSelector(
             permissions.add(permission);
         }
         return permissions;
-    }
+    },
 );
 
 export const getMyTeamPermissions = createSelector(
@@ -140,7 +140,7 @@ export const getMyTeamPermissions = createSelector(
             permissions.add(permission);
         }
         return permissions;
-    }
+    },
 );
 
 export const getMyChannelPermissions = createSelector(
@@ -163,7 +163,7 @@ export const getMyChannelPermissions = createSelector(
             permissions.add(permission);
         }
         return permissions;
-    }
+    },
 );
 
 export const haveISystemPermission = createSelector(
@@ -171,7 +171,7 @@ export const haveISystemPermission = createSelector(
     (state: GlobalState, options: PermissionsOptions) => options.permission,
     (permissions, permission) => {
         return permissions.has(permission);
-    }
+    },
 );
 
 export const haveITeamPermission = createSelector(
@@ -179,7 +179,7 @@ export const haveITeamPermission = createSelector(
     (state, options) => options.permission,
     (permissions, permission) => {
         return permissions.has(permission);
-    }
+    },
 );
 
 export const haveIChannelPermission = createSelector(
@@ -187,7 +187,7 @@ export const haveIChannelPermission = createSelector(
     (state, options) => options.permission,
     (permissions, permission) => {
         return permissions.has(permission);
-    }
+    },
 );
 
 export const haveICurrentTeamPermission = createSelector(
@@ -195,7 +195,7 @@ export const haveICurrentTeamPermission = createSelector(
     (state: GlobalState, options: PermissionsOptions) => options.permission,
     (permissions, permission) => {
         return permissions.has(permission);
-    }
+    },
 );
 
 export const haveICurrentChannelPermission = createSelector(
@@ -203,5 +203,5 @@ export const haveICurrentChannelPermission = createSelector(
     (state: GlobalState, options: PermissionsOptions) => options.permission,
     (permissions, permission) => {
         return permissions.has(permission);
-    }
+    },
 );

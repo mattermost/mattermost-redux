@@ -48,7 +48,7 @@ export const getTeamsList = createSelector(
     getTeams,
     (teams) => {
         return Object.values(teams);
-    }
+    },
 );
 
 export const getCurrentTeam = createSelector(
@@ -56,7 +56,7 @@ export const getCurrentTeam = createSelector(
     getCurrentTeamId,
     (teams, currentTeamId) => {
         return teams[currentTeamId];
-    }
+    },
 );
 
 export function getTeam(state: GlobalState, id: string): Team {
@@ -69,7 +69,7 @@ export const getCurrentTeamMembership = createSelector(
     getTeamMemberships,
     (currentTeamId: string, teamMemberships: {[teamId: string]: TeamMembership}): TeamMembership => {
         return teamMemberships[currentTeamId];
-    }
+    },
 );
 
 export const isCurrentUserCurrentTeamAdmin = createSelector(
@@ -80,7 +80,7 @@ export const isCurrentUserCurrentTeamAdmin = createSelector(
             return isTeamAdmin(roles);
         }
         return false;
-    }
+    },
 );
 
 export const getCurrentTeamUrl = createSelector(
@@ -94,7 +94,7 @@ export const getCurrentTeamUrl = createSelector(
         }
 
         return `${rootURL}/${currentTeam.name}`;
-    }
+    },
 );
 
 export const getCurrentRelativeTeamUrl = createSelector(
@@ -104,7 +104,7 @@ export const getCurrentRelativeTeamUrl = createSelector(
             return '/';
         }
         return `/${currentTeam.name}`;
-    }
+    },
 );
 
 export const getCurrentTeamStats = createSelector(
@@ -112,7 +112,7 @@ export const getCurrentTeamStats = createSelector(
     getTeamStats,
     (currentTeamId, teamStats) => {
         return teamStats[currentTeamId];
-    }
+    },
 );
 
 export const getMyTeams = createSelector(
@@ -120,7 +120,7 @@ export const getMyTeams = createSelector(
     getTeamMemberships,
     (teams, members) => {
         return Object.values(teams).filter((t) => members[t.id] && t.delete_at === 0);
-    }
+    },
 );
 
 export const getMyTeamMember = createSelector(
@@ -128,7 +128,7 @@ export const getMyTeamMember = createSelector(
     (state: GlobalState, teamId: string) => teamId,
     (teamMemberships, teamId) => {
         return teamMemberships[teamId] || {};
-    }
+    },
 );
 
 export const getMembersInCurrentTeam = createSelector(
@@ -136,7 +136,7 @@ export const getMembersInCurrentTeam = createSelector(
     getMembersInTeams,
     (currentTeamId, teamMembers) => {
         return teamMembers[currentTeamId];
-    }
+    },
 );
 
 export function getTeamMember(state: GlobalState, teamId: string, userId: string) {
@@ -164,7 +164,7 @@ export const getListableTeamIds = createIdsSelector(
             }
             return team.delete_at === 0 && canList && !member;
         });
-    }
+    },
 );
 
 export const getListableTeams = createSelector(
@@ -172,7 +172,7 @@ export const getListableTeams = createSelector(
     getListableTeamIds,
     (teams, listableTeamIds) => {
         return listableTeamIds.map((id) => teams[id]);
-    }
+    },
 );
 
 export const getSortedListableTeams = createSelector(
@@ -187,7 +187,7 @@ export const getSortedListableTeams = createSelector(
         }
 
         return Object.values(listableTeams).sort(sortTeamsWithLocale(locale));
-    }
+    },
 );
 
 export const getJoinableTeamIds = createIdsSelector(
@@ -206,7 +206,7 @@ export const getJoinableTeamIds = createIdsSelector(
             }
             return team.delete_at === 0 && canJoin && !member;
         });
-    }
+    },
 );
 
 export const getJoinableTeams = createSelector(
@@ -214,7 +214,7 @@ export const getJoinableTeams = createSelector(
     getJoinableTeamIds,
     (teams, joinableTeamIds) => {
         return joinableTeamIds.map((id) => teams[id]);
-    }
+    },
 );
 
 export const getSortedJoinableTeams = createSelector(
@@ -229,7 +229,7 @@ export const getSortedJoinableTeams = createSelector(
         }
 
         return Object.values(joinableTeams).sort(sortTeamsWithLocale(locale));
-    }
+    },
 );
 
 export const getMySortedTeamIds = createIdsSelector(
@@ -237,14 +237,14 @@ export const getMySortedTeamIds = createIdsSelector(
     (state: GlobalState, locale: string) => locale,
     (teams, locale) => {
         return teams.sort(sortTeamsWithLocale(locale)).map((t) => t.id);
-    }
+    },
 );
 
 export const getMyTeamsCount = createSelector(
     getMyTeams,
     (teams) => {
         return teams.length;
-    }
+    },
 );
 
 // returns the badge number to show (excluding the current team)
@@ -272,7 +272,7 @@ export const getChannelDrawerBadgeCount = createSelector(
         }
 
         return badgeCount;
-    }
+    },
 );
 
 // returns the badge for a team
@@ -296,6 +296,6 @@ export function makeGetBadgeCountForTeamId() {
             }
 
             return badgeCount;
-        }
+        },
     );
 }

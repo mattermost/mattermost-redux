@@ -94,7 +94,7 @@ export const getUsersByUsername: (a: GlobalState) => UsernameMappedObjects<UserP
         }
 
         return usersByUsername;
-    }
+    },
 );
 
 export function getUserByUsername(state: GlobalState, username: $Username<UserProfile>): UserProfile {
@@ -111,7 +111,7 @@ export const getUsersByEmail: (a: GlobalState) => EmailMappedObjects<UserProfile
         }
 
         return usersByEmail;
-    }
+    },
 );
 
 export function getUserByEmail(state: GlobalState, email: $Email<UserProfile>): UserProfile {
@@ -123,7 +123,7 @@ export const isCurrentUserSystemAdmin: (state: GlobalState) => boolean = createS
     (user) => {
         const roles = user.roles || '';
         return isSystemAdmin(roles);
-    }
+    },
 );
 
 export const getCurrentUserRoles: (state: GlobalState) => UserProfile['roles'] = createSelector(
@@ -144,7 +144,7 @@ export const getCurrentUserRoles: (state: GlobalState) => UserProfile['roles'] =
             roles += currentUser.roles;
         }
         return roles.trim();
-    }
+    },
 );
 
 export type UserMentionKey= {
@@ -183,7 +183,7 @@ export const getCurrentUserMentionKeys: (state: GlobalState) => Array<UserMentio
         }
 
         return keys;
-    }
+    },
 );
 
 export const getProfileSetInCurrentChannel: (state: GlobalState) => Array<$ID<UserProfile>> = createSelector(
@@ -191,7 +191,7 @@ export const getProfileSetInCurrentChannel: (state: GlobalState) => Array<$ID<Us
     getUserIdsInChannels,
     (currentChannel, channelProfiles) => {
         return channelProfiles[currentChannel];
-    }
+    },
 );
 
 export const getProfileSetNotInCurrentChannel: (state: GlobalState) => Array<$ID<UserProfile>> = createSelector(
@@ -199,7 +199,7 @@ export const getProfileSetNotInCurrentChannel: (state: GlobalState) => Array<$ID
     getUserIdsNotInChannels,
     (currentChannel, channelProfiles) => {
         return channelProfiles[currentChannel];
-    }
+    },
 );
 
 export const getProfileSetInCurrentTeam: (state: GlobalState) => Array<$ID<UserProfile>> = createSelector(
@@ -207,7 +207,7 @@ export const getProfileSetInCurrentTeam: (state: GlobalState) => Array<$ID<UserP
     getUserIdsInTeams,
     (currentTeam, teamProfiles) => {
         return teamProfiles[currentTeam];
-    }
+    },
 );
 
 export const getProfileSetNotInCurrentTeam: (state: GlobalState) => Array<$ID<UserProfile>> = createSelector(
@@ -215,7 +215,7 @@ export const getProfileSetNotInCurrentTeam: (state: GlobalState) => Array<$ID<Us
     getUserIdsNotInTeams,
     (currentTeam, teamProfiles) => {
         return teamProfiles[currentTeam];
-    }
+    },
 );
 
 const PROFILE_SET_ALL = 'all';
@@ -244,7 +244,7 @@ export const getProfiles: (state: GlobalState, filters: Filters) => Array<UserPr
     (state: GlobalState, filters: Filters) => filters,
     (profiles, filters) => {
         return sortAndInjectProfiles(filterProfiles(profiles, filters), PROFILE_SET_ALL);
-    }
+    },
 );
 
 function filterProfiles(profiles: IDMappedObjects<UserProfile>, filters?: Filters): IDMappedObjects<UserProfile> {
@@ -277,7 +277,7 @@ export const getProfilesInCurrentChannel: (state: GlobalState) => Array<UserProf
     getProfileSetInCurrentChannel,
     (profiles, currentChannelProfileSet) => {
         return sortAndInjectProfiles(profiles, currentChannelProfileSet);
-    }
+    },
 );
 
 export const getProfilesNotInCurrentChannel: (state: GlobalState) => Array<UserProfile> = createSelector(
@@ -285,7 +285,7 @@ export const getProfilesNotInCurrentChannel: (state: GlobalState) => Array<UserP
     getProfileSetNotInCurrentChannel,
     (profiles, notInCurrentChannelProfileSet) => {
         return sortAndInjectProfiles(profiles, notInCurrentChannelProfileSet);
-    }
+    },
 );
 
 export const getProfilesInCurrentTeam: (state: GlobalState) => Array<UserProfile> = createSelector(
@@ -293,7 +293,7 @@ export const getProfilesInCurrentTeam: (state: GlobalState) => Array<UserProfile
     getProfileSetInCurrentTeam,
     (profiles, currentTeamProfileSet) => {
         return sortAndInjectProfiles(profiles, currentTeamProfileSet);
-    }
+    },
 );
 
 export const getProfilesInTeam: (state: GlobalState, teamId: $ID<Team>) => Array<UserProfile> = createSelector(
@@ -303,7 +303,7 @@ export const getProfilesInTeam: (state: GlobalState, teamId: $ID<Team>) => Array
     (state: GlobalState, teamId, filters) => filters,
     (profiles, usersInTeams, teamId, filters) => {
         return sortAndInjectProfiles(filterProfiles(profiles, filters), usersInTeams[teamId] || new Set());
-    }
+    },
 );
 
 export const getProfilesNotInCurrentTeam: (state: GlobalState) => Array<UserProfile> = createSelector(
@@ -311,7 +311,7 @@ export const getProfilesNotInCurrentTeam: (state: GlobalState) => Array<UserProf
     getProfileSetNotInCurrentTeam,
     (profiles, notInCurrentTeamProfileSet) => {
         return sortAndInjectProfiles(profiles, notInCurrentTeamProfileSet);
-    }
+    },
 );
 
 export const getProfilesWithoutTeam: (state: GlobalState, filters?: Filters) => Array<UserProfile> = createSelector(
@@ -320,7 +320,7 @@ export const getProfilesWithoutTeam: (state: GlobalState, filters?: Filters) => 
     (state: GlobalState, filters: Filters) => filters,
     (profiles, withoutTeamProfileSet, filters) => {
         return sortAndInjectProfiles(filterProfiles(profiles, filters), withoutTeamProfileSet);
-    }
+    },
 );
 
 export function getStatusForUserId(state: GlobalState, userId: $ID<UserProfile>): string {
@@ -421,7 +421,7 @@ export const shouldShowTermsOfService: (state: GlobalState) => boolean = createS
         const reacceptanceTime = parseInt(config.CustomTermsOfServiceReAcceptancePeriod!, 10) * 1000 * 60 * 60 * 24;
         const timeElapsed = new Date().getTime() - acceptedAt;
         return Boolean(user && featureEnabled && (config.CustomTermsOfServiceId !== acceptedTermsId || timeElapsed > reacceptanceTime));
-    }
+    },
 );
 
 export const getUsersInVisibleDMs: (state: GlobalState) => Array<UserProfile> = createSelector(
@@ -435,7 +435,7 @@ export const getUsersInVisibleDMs: (state: GlobalState) => Array<UserProfile> = 
             }
         });
         return dmUsers;
-    }
+    },
 );
 
 export function makeGetProfilesForReactions(): (state: GlobalState, reactions: Array<Reaction>) => Array<UserProfile> {
@@ -450,7 +450,7 @@ export function makeGetProfilesForReactions(): (state: GlobalState, reactions: A
                 }
             });
             return profiles;
-        }
+        },
     );
 }
 
@@ -468,7 +468,7 @@ export function makeGetProfilesInChannel(): (state: GlobalState, channelId: $ID<
             }
 
             return sortAndInjectProfiles(users, userIdsInChannel, skipInactive);
-        }
+        },
     );
 }
 
@@ -486,7 +486,7 @@ export function makeGetProfilesNotInChannel(): (state: GlobalState, channelId: $
             }
 
             return sortAndInjectProfiles(users, userIdsInChannel, skipInactive);
-        }
+        },
     );
 }
 
@@ -526,7 +526,7 @@ export function makeGetProfilesByIdsAndUsernames(): (
             }
 
             return userProfiles;
-        }
+        },
     );
 }
 
@@ -537,6 +537,6 @@ export function makeGetDisplayName(): (state: GlobalState, userId: $ID<UserProfi
         (state, userId, useFallbackUsername = true) => useFallbackUsername,
         (user, teammateNameDisplaySetting, useFallbackUsername) => {
             return displayUsername(user, teammateNameDisplaySetting!, useFallbackUsername);
-        }
+        },
     );
 }

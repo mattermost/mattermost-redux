@@ -15,12 +15,12 @@ describe('Reducers.Typing', () => {
 
         state = typingReducer(
             state,
-            {}
+            {},
         );
         assert.deepEqual(
             state,
             {},
-            'initial state'
+            'initial state',
         );
     });
 
@@ -40,7 +40,7 @@ describe('Reducers.Typing', () => {
                     userId: userId1,
                     now: now1,
                 },
-            }
+            },
         );
         assert.deepEqual(
             state,
@@ -49,7 +49,7 @@ describe('Reducers.Typing', () => {
                     [userId1]: now1,
                 },
             },
-            'first user typing'
+            'first user typing',
         );
 
         const id2 = TestHelper.generateId();
@@ -64,7 +64,7 @@ describe('Reducers.Typing', () => {
                     userId: userId1,
                     now: now2,
                 },
-            }
+            },
         );
         assert.deepEqual(
             state,
@@ -76,7 +76,7 @@ describe('Reducers.Typing', () => {
                     [userId1]: now2,
                 },
             },
-            'user typing in second channel'
+            'user typing in second channel',
         );
 
         const userId2 = TestHelper.generateId();
@@ -91,7 +91,7 @@ describe('Reducers.Typing', () => {
                     userId: userId2,
                     now: now3,
                 },
-            }
+            },
         );
         assert.deepEqual(
             state,
@@ -104,7 +104,7 @@ describe('Reducers.Typing', () => {
                     [userId1]: now2,
                 },
             },
-            'second user typing in channel'
+            'second user typing in channel',
         );
 
         const now4 = 1238;
@@ -118,7 +118,7 @@ describe('Reducers.Typing', () => {
                     userId: userId2,
                     now: now4,
                 },
-            }
+            },
         );
         assert.deepEqual(
             state,
@@ -132,7 +132,7 @@ describe('Reducers.Typing', () => {
                     [userId2]: now4,
                 },
             },
-            'second user typing in second channel'
+            'second user typing in second channel',
         );
     });
 
@@ -168,7 +168,7 @@ describe('Reducers.Typing', () => {
                     userId: userId1,
                     now: now1,
                 },
-            }
+            },
         );
         assert.deepEqual(
             state,
@@ -181,7 +181,7 @@ describe('Reducers.Typing', () => {
                     [userId2]: now4,
                 },
             },
-            'deleting first user from first channel'
+            'deleting first user from first channel',
         );
 
         state = typingReducer(
@@ -193,7 +193,7 @@ describe('Reducers.Typing', () => {
                     userId: userId1,
                     now: now2,
                 },
-            }
+            },
         );
         assert.deepEqual(
             state,
@@ -205,7 +205,7 @@ describe('Reducers.Typing', () => {
                     [userId2]: now4,
                 },
             },
-            'deleting first user from second channel'
+            'deleting first user from second channel',
         );
 
         state = typingReducer(
@@ -217,7 +217,7 @@ describe('Reducers.Typing', () => {
                     userId: userId2,
                     now: now3,
                 },
-            }
+            },
         );
         assert.deepEqual(
             state,
@@ -226,7 +226,7 @@ describe('Reducers.Typing', () => {
                     [userId2]: now4,
                 },
             },
-            'deleting second user from first channel'
+            'deleting second user from first channel',
         );
 
         state = typingReducer(
@@ -238,12 +238,12 @@ describe('Reducers.Typing', () => {
                     userId: userId2,
                     now: now4,
                 },
-            }
+            },
         );
         assert.deepEqual(
             state,
             {},
-            'deleting second user from second channel'
+            'deleting second user from second channel',
         );
 
         state = {
@@ -260,7 +260,7 @@ describe('Reducers.Typing', () => {
                     userId: userId1,
                     now: now1,
                 },
-            }
+            },
         );
         assert.deepEqual(
             state,
@@ -269,7 +269,7 @@ describe('Reducers.Typing', () => {
                     [userId1]: now2,
                 },
             },
-            'shouldn\'t delete when the timestamp is older'
+            'shouldn\'t delete when the timestamp is older',
         );
 
         state = typingReducer(
@@ -281,12 +281,12 @@ describe('Reducers.Typing', () => {
                     userId: userId1,
                     now: now3,
                 },
-            }
+            },
         );
         assert.deepEqual(
             state,
             {},
-            'should delete when the timestamp is newer'
+            'should delete when the timestamp is newer',
         );
     });
 });

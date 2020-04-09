@@ -54,7 +54,7 @@ export function makeGetCategory() {
             }
 
             return prefsInCategory;
-        }
+        },
     );
 }
 
@@ -81,14 +81,14 @@ export const getVisibleTeammate = createSelector(
     getDirectShowPreferences,
     (direct) => {
         return direct.filter((dm) => dm.value === 'true' && dm.name).map((dm) => dm.name);
-    }
+    },
 );
 
 export const getVisibleGroupIds = createSelector(
     getGroupShowPreferences,
     (groups) => {
         return groups.filter((dm) => dm.value === 'true' && dm.name).map((dm) => dm.name);
-    }
+    },
 );
 
 export const getTeammateNameDisplaySetting = createSelector(
@@ -104,7 +104,7 @@ export const getTeammateNameDisplaySetting = createSelector(
             return config.TeammateNameDisplay;
         }
         return General.TEAMMATE_NAME_DISPLAY.SHOW_USERNAME;
-    }
+    },
 );
 
 const getThemePreference = createSelector(
@@ -123,7 +123,7 @@ const getThemePreference = createSelector(
         }
 
         return themePreference;
-    }
+    },
 );
 
 const getDefaultTheme = createSelector(getConfig, (config) => {
@@ -181,7 +181,7 @@ export const getTheme = createShallowSelector(
         }
 
         return Object.assign({}, defaultTheme, theme);
-    }
+    },
 );
 
 export function makeGetStyleFromTheme() {
@@ -190,7 +190,7 @@ export function makeGetStyleFromTheme() {
         (state: GlobalState, getStyleFromTheme: Function) => getStyleFromTheme,
         (theme, getStyleFromTheme) => {
             return getStyleFromTheme(theme);
-        }
+        },
     );
 }
 
@@ -208,7 +208,7 @@ export const getSidebarPreferences = createSelector(
             state,
             Preferences.CATEGORY_SIDEBAR_SETTINGS,
             'show_unread_section',
-            config.ExperimentalGroupUnreadChannels === General.DEFAULT_ON
+            config.ExperimentalGroupUnreadChannels === General.DEFAULT_ON,
         );
     },
     (state) => {
@@ -216,7 +216,7 @@ export const getSidebarPreferences = createSelector(
             state,
             Preferences.CATEGORY_SIDEBAR_SETTINGS,
             '',
-            null
+            null,
         );
     },
     (showUnreadSection, sidebarPreference) => {
@@ -230,7 +230,7 @@ export const getSidebarPreferences = createSelector(
         }
 
         return sidebarPrefs;
-    }
+    },
 );
 
 export const getNewSidebarPreference = createSelector(
@@ -243,7 +243,7 @@ export const getNewSidebarPreference = createSelector(
             state,
             Preferences.CATEGORY_SIDEBAR_SETTINGS,
             Preferences.CHANNEL_SIDEBAR_ORGANIZATION,
-            null
+            null,
         );
     },
     (globalSetting, userSetting) => {
@@ -257,7 +257,7 @@ export const getNewSidebarPreference = createSelector(
         default:
             return false;
         }
-    }
+    },
 );
 
 export function shouldAutocloseDMs(state: GlobalState) {
