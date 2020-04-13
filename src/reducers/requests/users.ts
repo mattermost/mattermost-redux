@@ -72,7 +72,7 @@ function autocompleteUsers(state: RequestStatusType = initialRequestState(), act
         UserTypes.AUTOCOMPLETE_USERS_SUCCESS,
         UserTypes.AUTOCOMPLETE_USERS_FAILURE,
         state,
-        action
+        action,
     );
 }
 
@@ -82,7 +82,7 @@ function updateMe(state: RequestStatusType = initialRequestState(), action: Gene
         UserTypes.UPDATE_ME_SUCCESS,
         UserTypes.UPDATE_ME_FAILURE,
         state,
-        action
+        action,
     );
 }
 

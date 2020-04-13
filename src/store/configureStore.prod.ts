@@ -34,8 +34,8 @@ export default function configureOfflineServiceStore(preloadedState: any, appRed
         baseState,
         offlineCompose(baseOfflineConfig)(
             createMiddleware(clientOptions),
-            []
-        )
+            [],
+        ),
     );
 
     reducerRegistry.setChangeListener((reducers: any) => {

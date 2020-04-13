@@ -92,7 +92,7 @@ export function makeGetPostIdsForThread(): (b: GlobalState, a: $ID<Post>) => Arr
             thread.sort(comparePosts);
 
             return thread.map((post) => post.id);
-        }
+        },
     );
 }
 
@@ -118,7 +118,7 @@ export function makeGetPostsChunkAroundPost(): (c: GlobalState, b: $ID<Post>, a:
             }
 
             return postChunk;
-        }
+        },
     );
 }
 
@@ -145,7 +145,7 @@ export function makeGetPostIdsAroundPost(): (d: GlobalState, c: $ID<Post>, b: $I
             const maxPostIndex = postsBeforeCount === -1 ? postIds.length : Math.min(index + postsBeforeCount + 1, postIds.length); // Needs the extra 1 to include the focused post
 
             return postIds.slice(minPostIndex, maxPostIndex);
-        }
+        },
     );
 }
 
@@ -269,7 +269,7 @@ export function makeGetPostsInChannel(): (c: GlobalState, b: $ID<Channel>, a: nu
             }
 
             return posts;
-        }
+        },
     );
 }
 
@@ -310,7 +310,7 @@ export function makeGetPostsAroundPost(): (c: GlobalState, b: $ID<Post>, a: $ID<
             }
 
             return posts;
-        }
+        },
     );
 }
 
@@ -364,7 +364,7 @@ export function makeGetCommentCountForPost(): (b: GlobalState, a: {
                 }
             });
             return count;
-        }
+        },
     );
 }
 
@@ -377,7 +377,7 @@ export const getSearchResults: (a: GlobalState) => Array<Post> = createSelector(
         }
 
         return postIds.map((id) => posts[id]);
-    }
+    },
 );
 
 // Returns the matched text from the search results, if the server has provided them.
@@ -400,7 +400,7 @@ export function makeGetMessageInHistoryItem(type: 'post'|'comment'): (a: GlobalS
                 return messages[idx];
             }
             return '';
-        }
+        },
     );
 }
 
@@ -414,7 +414,7 @@ export function makeGetPostsForIds(): (b: GlobalState, a: Array<$ID<Post>>) => A
             }
 
             return postIds.map((id) => allPosts[id]);
-        }
+        },
     );
 }
 
@@ -437,7 +437,7 @@ export const getLastPostPerChannel: (a: GlobalState) => RelationOneToOne<Channel
         }
 
         return ret;
-    }
+    },
 );
 export const getMostRecentPostIdInChannel: (b: GlobalState, a: $ID<Channel>) => $ID<Post> | undefined | null = createSelector(getAllPosts, (state: GlobalState, channelId: string) => getPostIdsInChannel(state, channelId), getMyPreferences, (posts, postIdsInChannel, preferences) => {
     if (!postIdsInChannel) {
@@ -461,7 +461,7 @@ export const getMostRecentPostIdInChannel: (b: GlobalState, a: $ID<Channel>) => 
 
     // return the most recent message in the channel
     return postIdsInChannel[0];
-}
+},
 );
 
 export const getLatestReplyablePostId: (a: GlobalState) => $ID<Post> = createSelector(
@@ -477,7 +477,7 @@ export const getLatestReplyablePostId: (a: GlobalState) => $ID<Post> = createSel
         }
 
         return latestReplyablePost.id;
-    }
+    },
 );
 
 export const getCurrentUsersLatestPost: (b: GlobalState, a: $ID<Post>) => PostWithFormatData | undefined | null = createSelector(getPostsInCurrentChannel, getCurrentUser, (_: any, rootId: string) => rootId, (posts, currentUser, rootId) => {
@@ -642,7 +642,7 @@ export const makeIsPostCommentMention = (): ((b: GlobalState, a: $ID<Post>) => b
             }
 
             return isCommentMention;
-        }
+        },
     );
 };
 

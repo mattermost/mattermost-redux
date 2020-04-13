@@ -166,7 +166,7 @@ describe('Actions.Teams', () => {
             post('/teams').
             reply(201, TestHelper.fakeTeamWithId());
         await Actions.createTeam(
-            TestHelper.fakeTeam()
+            TestHelper.fakeTeam(),
         )(store.dispatch, store.getState);
 
         const {teams, myMembers, currentTeamId} = store.getState().entities.teams;
@@ -189,7 +189,7 @@ describe('Actions.Teams', () => {
             TestHelper.fakeUser(),
             null,
             null,
-            TestHelper.basicTeam.invite_id
+            TestHelper.basicTeam.invite_id,
         );
 
         nock(Client4.getBaseRoute()).
@@ -208,7 +208,7 @@ describe('Actions.Teams', () => {
             reply(200, OK_RESPONSE);
 
         await Actions.deleteTeam(
-            secondTeam.id
+            secondTeam.id,
         )(store.dispatch, store.getState);
 
         const {teams, myMembers} = store.getState().entities.teams;
@@ -271,7 +271,7 @@ describe('Actions.Teams', () => {
             TestHelper.fakeUser(),
             null,
             null,
-            TestHelper.basicTeam.invite_id
+            TestHelper.basicTeam.invite_id,
         );
 
         nock(Client4.getBaseRoute()).
@@ -358,7 +358,7 @@ describe('Actions.Teams', () => {
             TestHelper.fakeUser(),
             null,
             null,
-            TestHelper.basicTeam.invite_id
+            TestHelper.basicTeam.invite_id,
         );
 
         nock(Client4.getBaseRoute()).
@@ -415,7 +415,7 @@ describe('Actions.Teams', () => {
             TestHelper.fakeUser(),
             null,
             null,
-            TestHelper.basicTeam.invite_id
+            TestHelper.basicTeam.invite_id,
         );
 
         nock(Client4.getBaseRoute()).
@@ -426,7 +426,7 @@ describe('Actions.Teams', () => {
             TestHelper.fakeUser(),
             null,
             null,
-            TestHelper.basicTeam.invite_id
+            TestHelper.basicTeam.invite_id,
         );
 
         nock(Client4.getBaseRoute()).
@@ -434,7 +434,7 @@ describe('Actions.Teams', () => {
             reply(200, [{user_id: user1.id, team_id: TestHelper.basicTeam.id}, {user_id: user2.id, team_id: TestHelper.basicTeam.id}]);
         await Actions.getTeamMembersByIds(
             TestHelper.basicTeam.id,
-            [user1.id, user2.id]
+            [user1.id, user2.id],
         )(store.dispatch, store.getState);
 
         const members = store.getState().entities.teams.membersInTeam;
@@ -726,7 +726,7 @@ describe('Actions.Teams', () => {
             TestHelper.fakeUser(),
             null,
             null,
-            TestHelper.basicTeam.invite_id
+            TestHelper.basicTeam.invite_id,
         );
 
         nock(Client4.getBaseRoute()).
@@ -740,7 +740,7 @@ describe('Actions.Teams', () => {
             reply(201, TestHelper.fakeTeamWithId());
 
         const userTeam = await userClient.createTeam(
-            TestHelper.fakeTeam()
+            TestHelper.fakeTeam(),
         );
 
         nock(Client4.getBaseRoute()).
