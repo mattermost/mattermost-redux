@@ -232,13 +232,13 @@ export const getSidebarPreferences = reselect.createSelector(
 export const getNewSidebarPreference = reselect.createSelector(
     (state: GlobalState) => {
         const config = getConfig(state);
-        return config.ExperimentalChannelSidebarOrganization;
+        return config.ExperimentalSidebarFeatures;
     },
     (state) => {
         return get(
             state,
             Preferences.CATEGORY_SIDEBAR_SETTINGS,
-            Preferences.CHANNEL_SIDEBAR_ORGANIZATION,
+            Preferences.EXPERIMENTAL_SIDEBAR_FEATURES,
             null,
         );
     },

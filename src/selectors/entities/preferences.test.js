@@ -598,7 +598,7 @@ describe('Selectors.Preferences', () => {
                     entities: {
                         general: {
                             config: {
-                                ExperimentalChannelSidebarOrganization: General.DISABLED,
+                                ExperimentalSidebarFeatures: General.DISABLED,
                             },
                         },
                         preferences: {
@@ -616,13 +616,13 @@ describe('Selectors.Preferences', () => {
                     entities: {
                         general: {
                             config: {
-                                ExperimentalChannelSidebarOrganization: General.DISABLED,
+                                ExperimentalSidebarFeatures: General.DISABLED,
                             },
                         },
                         preferences: {
                             myPreferences: {
-                                [getPreferenceKey(Preferences.CATEGORY_SIDEBAR_SETTINGS, Preferences.CHANNEL_SIDEBAR_ORGANIZATION)]: {
-                                    category: Preferences.CATEGORY_SIDEBAR_SETTINGS, name: Preferences.CHANNEL_SIDEBAR_ORGANIZATION, value: 'true',
+                                [getPreferenceKey(Preferences.CATEGORY_SIDEBAR_SETTINGS, Preferences.EXPERIMENTAL_SIDEBAR_FEATURES)]: {
+                                    category: Preferences.CATEGORY_SIDEBAR_SETTINGS, name: Preferences.EXPERIMENTAL_SIDEBAR_FEATURES, value: 'true',
                                 },
                             },
                         },
@@ -638,7 +638,7 @@ describe('Selectors.Preferences', () => {
                     entities: {
                         general: {
                             config: {
-                                ExperimentalChannelSidebarOrganization: General.DEFAULT_OFF,
+                                ExperimentalSidebarFeatures: General.DEFAULT_OFF,
                             },
                         },
                         preferences: {
@@ -656,13 +656,13 @@ describe('Selectors.Preferences', () => {
                     entities: {
                         general: {
                             config: {
-                                ExperimentalChannelSidebarOrganization: General.DEFAULT_OFF,
+                                ExperimentalSidebarFeatures: General.DEFAULT_OFF,
                             },
                         },
                         preferences: {
                             myPreferences: {
-                                [getPreferenceKey(Preferences.CATEGORY_SIDEBAR_SETTINGS, Preferences.CHANNEL_SIDEBAR_ORGANIZATION)]: {
-                                    category: Preferences.CATEGORY_SIDEBAR_SETTINGS, name: Preferences.CHANNEL_SIDEBAR_ORGANIZATION, value: 'false',
+                                [getPreferenceKey(Preferences.CATEGORY_SIDEBAR_SETTINGS, Preferences.EXPERIMENTAL_SIDEBAR_FEATURES)]: {
+                                    category: Preferences.CATEGORY_SIDEBAR_SETTINGS, name: Preferences.EXPERIMENTAL_SIDEBAR_FEATURES, value: 'false',
                                 },
                             },
                         },
@@ -678,13 +678,13 @@ describe('Selectors.Preferences', () => {
                     entities: {
                         general: {
                             config: {
-                                ExperimentalChannelSidebarOrganization: General.DEFAULT_OFF,
+                                ExperimentalSidebarFeatures: General.DEFAULT_OFF,
                             },
                         },
                         preferences: {
                             myPreferences: {
-                                [getPreferenceKey(Preferences.CATEGORY_SIDEBAR_SETTINGS, Preferences.CHANNEL_SIDEBAR_ORGANIZATION)]: {
-                                    category: Preferences.CATEGORY_SIDEBAR_SETTINGS, name: Preferences.CHANNEL_SIDEBAR_ORGANIZATION, value: 'true',
+                                [getPreferenceKey(Preferences.CATEGORY_SIDEBAR_SETTINGS, Preferences.EXPERIMENTAL_SIDEBAR_FEATURES)]: {
+                                    category: Preferences.CATEGORY_SIDEBAR_SETTINGS, name: Preferences.EXPERIMENTAL_SIDEBAR_FEATURES, value: 'true',
                                 },
                             },
                         },
@@ -700,7 +700,7 @@ describe('Selectors.Preferences', () => {
                     entities: {
                         general: {
                             config: {
-                                ExperimentalChannelSidebarOrganization: General.DEFAULT_ON,
+                                ExperimentalSidebarFeatures: General.DEFAULT_ON,
                             },
                         },
                         preferences: {
@@ -718,13 +718,13 @@ describe('Selectors.Preferences', () => {
                     entities: {
                         general: {
                             config: {
-                                ExperimentalChannelSidebarOrganization: General.DEFAULT_ON,
+                                ExperimentalSidebarFeatures: General.DEFAULT_ON,
                             },
                         },
                         preferences: {
                             myPreferences: {
-                                [getPreferenceKey(Preferences.CATEGORY_SIDEBAR_SETTINGS, Preferences.CHANNEL_SIDEBAR_ORGANIZATION)]: {
-                                    category: Preferences.CATEGORY_SIDEBAR_SETTINGS, name: Preferences.CHANNEL_SIDEBAR_ORGANIZATION, value: 'false',
+                                [getPreferenceKey(Preferences.CATEGORY_SIDEBAR_SETTINGS, Preferences.EXPERIMENTAL_SIDEBAR_FEATURES)]: {
+                                    category: Preferences.CATEGORY_SIDEBAR_SETTINGS, name: Preferences.EXPERIMENTAL_SIDEBAR_FEATURES, value: 'false',
                                 },
                             },
                         },
@@ -740,13 +740,13 @@ describe('Selectors.Preferences', () => {
                     entities: {
                         general: {
                             config: {
-                                ExperimentalChannelSidebarOrganization: General.DEFAULT_ON,
+                                ExperimentalSidebarFeatures: General.DEFAULT_ON,
                             },
                         },
                         preferences: {
                             myPreferences: {
-                                [getPreferenceKey(Preferences.CATEGORY_SIDEBAR_SETTINGS, Preferences.CHANNEL_SIDEBAR_ORGANIZATION)]: {
-                                    category: Preferences.CATEGORY_SIDEBAR_SETTINGS, name: Preferences.CHANNEL_SIDEBAR_ORGANIZATION, value: 'true',
+                                [getPreferenceKey(Preferences.CATEGORY_SIDEBAR_SETTINGS, Preferences.EXPERIMENTAL_SIDEBAR_FEATURES)]: {
+                                    category: Preferences.CATEGORY_SIDEBAR_SETTINGS, name: Preferences.EXPERIMENTAL_SIDEBAR_FEATURES, value: 'true',
                                 },
                             },
                         },

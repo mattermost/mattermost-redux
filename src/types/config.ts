@@ -93,7 +93,7 @@ export type Config = {
     EnableXToLeaveChannelsFromLHS: string;
     EnforceMultifactorAuthentication: string;
     ExperimentalChannelOrganization: string;
-    ExperimentalChannelSidebarOrganization: string;
+    ExperimentalSidebarFeatures: string;
     ExperimentalClientSideCertCheck: string;
     ExperimentalClientSideCertEnable: string;
     ExperimentalEnableAuthenticationTransfer: string;
