@@ -1,35 +1,36 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
 
-import * as reselect from 'reselect';
+import {createSelector} from 'reselect';
 
 import {getCurrentTeamId} from 'selectors/entities/teams';
-import * as types from 'types';
 
-export function getIncomingHooks(state: types.store.GlobalState) {
+import {GlobalState} from 'types/store';
+
+export function getIncomingHooks(state: GlobalState) {
     return state.entities.integrations.incomingHooks;
 }
 
-export function getOutgoingHooks(state: types.store.GlobalState) {
+export function getOutgoingHooks(state: GlobalState) {
     return state.entities.integrations.outgoingHooks;
 }
 
-export function getCommands(state: types.store.GlobalState) {
+export function getCommands(state: GlobalState) {
     return state.entities.integrations.commands;
 }
 
-export function getOAuthApps(state: types.store.GlobalState) {
+export function getOAuthApps(state: GlobalState) {
     return state.entities.integrations.oauthApps;
 }
 
-export function getSystemCommands(state: types.store.GlobalState) {
+export function getSystemCommands(state: GlobalState) {
     return state.entities.integrations.systemCommands;
 }
 
 /**
  * get outgoing hooks in current team
  */
-export const getOutgoingHooksInCurrentTeam = reselect.createSelector(
+export const getOutgoingHooksInCurrentTeam = createSelector(
     getCurrentTeamId,
     getOutgoingHooks,
     (teamId, hooks) => {
@@ -37,7 +38,7 @@ export const getOutgoingHooksInCurrentTeam = reselect.createSelector(
     },
 );
 
-export const getAllCommands = reselect.createSelector(
+export const getAllCommands = createSelector(
     getCommands,
     getSystemCommands,
     (commands, systemCommands) => {
@@ -48,7 +49,7 @@ export const getAllCommands = reselect.createSelector(
     },
 );
 
-export const getAutocompleteCommandsList = reselect.createSelector(
+export const getAutocompleteCommandsList = createSelector(
     getAllCommands,
     getCurrentTeamId,
     (commands, currentTeamId) => {

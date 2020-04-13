@@ -1,20 +1,19 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
 
-import * as reselect from 'reselect';
+import {createSelector} from 'reselect';
 
 import {getCurrentUserLocale} from 'selectors/entities/i18n';
 
-import {sortFileInfos} from 'utils/file_utils';
-
-import * as types from 'types';
 import {GlobalState} from 'types/store';
 
-function getAllFiles(state: types.store.GlobalState) {
+import {sortFileInfos} from 'utils/file_utils';
+
+function getAllFiles(state: GlobalState) {
     return state.entities.files.files;
 }
 
-function getFilesIdsForPost(state: types.store.GlobalState, postId: string) {
+function getFilesIdsForPost(state: GlobalState, postId: string) {
     if (postId) {
         return state.entities.files.fileIdsByPostId[postId] || [];
     }
@@ -27,8 +26,10 @@ export function getFilePublicLink(state: GlobalState) {
 }
 
 export function makeGetFilesForPost() {
-    return reselect.createSelector(
-        [getAllFiles, getFilesIdsForPost, getCurrentUserLocale],
+    return createSelector(
+        getAllFiles,
+        getFilesIdsForPost,
+        getCurrentUserLocale,
         (allFiles, fileIdsForPost, locale) => {
             const fileInfos = fileIdsForPost.map((id) => allFiles[id]).filter((id) => Boolean(id));
 

@@ -667,9 +667,13 @@ function buildChannels(usersState: UsersState, channels: Array<Channel>, missing
         sort(sortChannelsByTypeAndDisplayName.bind(null, locale));
 }
 
-function buildFavoriteChannels(channels: Array<Channel>, myPreferences: {
-    [x: string]: PreferenceType;
-}, locale: string): Array<Channel> {
+function buildFavoriteChannels(
+    channels: Array<Channel>,
+    myPreferences: {
+        [x: string]: PreferenceType;
+    },
+    locale: string,
+): Array<Channel> {
     return channels.filter((channel) => isFavoriteChannel(myPreferences, channel.id)).sort(sortChannelsByDisplayName.bind(null, locale));
 }
 
