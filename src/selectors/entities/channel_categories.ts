@@ -42,7 +42,7 @@ export function makeGetCategoriesForTeam(): (state: GlobalState, teamId: string)
             }
 
             return categoryIds.map((id) => categoriesById[id]);
-        }
+        },
     );
 }
 
@@ -57,7 +57,7 @@ export function makeGetUnsortedUnfilteredChannels(): (state: GlobalState, teamId
                 filter((channel) => channel.delete_at === 0 || channel.id === currentChannelId).
                 filter((channel) => channel.team_id === teamId || channel.team_id === '').
                 filter((channel) => myMembers.hasOwnProperty(channel.id));
-        }
+        },
     );
 }
 
@@ -76,7 +76,7 @@ export function makeFilterChannelsByFavorites(): (state: GlobalState, channels: 
             });
 
             return filtered.length === channels.length ? channels : filtered;
-        }
+        },
     );
 }
 
@@ -99,7 +99,7 @@ export function makeFilterChannelsByType(): (state: GlobalState, channels: Chann
             });
 
             return filtered.length === channels.length ? channels : filtered;
-        }
+        },
     );
 }
 
@@ -192,7 +192,7 @@ export function makeFilterAutoclosedDMs(getAutocloseCutoff = getDefaultAutoclose
             });
 
             return filtered.length === channels.length ? channels : filtered;
-        }
+        },
     );
 }
 
@@ -234,7 +234,7 @@ export function makeFilterManuallyClosedDMs(): (state: GlobalState, channels: Ch
 
             // Only return a new array if anything was removed
             return filtered.length === channels.length ? channels : filtered;
-        }
+        },
     );
 }
 
@@ -264,7 +264,7 @@ export function makeSortChannelsByName(): (state: GlobalState, channels: Channel
             const getDisplayName = (channel: Channel) => channel.display_name;
 
             return [...channels].sort(makeCompareChannels(getDisplayName, locale, myMembers));
-        }
+        },
     );
 }
 
@@ -321,7 +321,7 @@ export function makeSortChannelsByNameWithDMs(): (state: GlobalState, channels: 
             };
 
             return [...channels].sort(makeCompareChannels(getDisplayName, locale, myMembers));
-        }
+        },
     );
 }
 

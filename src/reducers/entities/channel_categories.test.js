@@ -18,7 +18,7 @@ describe('byId', () => {
                 data: {
                     team_id: 'team1',
                 },
-            }
+            },
         );
 
         expect(state['team1-favorites']).toBeDefined();
@@ -38,7 +38,7 @@ describe('byId', () => {
                     {team_id: 'team1'},
                     {team_id: 'team2'},
                 ],
-            }
+            },
         );
 
         expect(state['team1-favorites']).toBeDefined();
@@ -68,7 +68,7 @@ describe('byId', () => {
                 data: {
                     id: 'team1',
                 },
-            }
+            },
         );
 
         expect(state).toEqual({
@@ -90,7 +90,7 @@ describe('orderByTeam', () => {
                 data: {
                     team_id: 'team1',
                 },
-            }
+            },
         );
 
         expect(state).toEqual({
@@ -114,7 +114,7 @@ describe('orderByTeam', () => {
                     {team_id: 'team1'},
                     {team_id: 'team2'},
                 ],
-            }
+            },
         );
 
         expect(state).toEqual({
@@ -146,7 +146,7 @@ describe('orderByTeam', () => {
                 data: {
                     id: 'team1',
                 },
-            }
+            },
         );
 
         expect(state).toEqual({
