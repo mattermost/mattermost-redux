@@ -2080,7 +2080,7 @@ export default class Client4 {
     getCommandAutocompleteSuggestionsList = async (userInput: string, teamId: string) => {
         return this.doFetch(
             `${this.getTeamRoute(teamId)}/commands/autocomplete_suggestions${buildQueryString({user_input: userInput})}`,
-            {method: 'get'}
+            {method: 'get'},
         );
     };
 
