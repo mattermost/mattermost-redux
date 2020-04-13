@@ -1,11 +1,12 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
-import {GlobalState} from 'types/store';
-import {UserProfile} from 'types/users';
-import {ChannelMembership, Channel} from 'types/channels';
-import {RelationOneToOne, IDMappedObjects} from 'types/utilities';
 
 import {createSelector} from 'reselect';
+
+import {ChannelMembership, Channel} from 'types/channels';
+import {GlobalState} from 'types/store';
+import {UserProfile} from 'types/users';
+import {RelationOneToOne, IDMappedObjects} from 'types/utilities';
 
 // Channels
 
@@ -17,9 +18,13 @@ export function getMyChannelMemberships(state: GlobalState): RelationOneToOne<Ch
     return state.entities.channels.myMembers;
 }
 
-export const getMyCurrentChannelMembership: (a: GlobalState) => ChannelMembership | undefined | null = createSelector(getCurrentChannelId, getMyChannelMemberships, (currentChannelId, channelMemberships) => {
-    return channelMemberships[currentChannelId] || null;
-});
+export const getMyCurrentChannelMembership: (a: GlobalState) => ChannelMembership | undefined | null = createSelector(
+    getCurrentChannelId,
+    getMyChannelMemberships,
+    (currentChannelId, channelMemberships) => {
+        return channelMemberships[currentChannelId] || null;
+    },
+);
 
 // Users
 
