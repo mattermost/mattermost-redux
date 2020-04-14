@@ -174,5 +174,5 @@ export const getCurrentUserGroupMentionKeys = createSelector(
         const keys: UserMentionKey[] = [];
         groups.forEach((group) => keys.push({key: `@${group.name}`}));
         return keys;
-    }
+    },
 );

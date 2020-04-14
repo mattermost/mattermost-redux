@@ -22,5 +22,5 @@ export const getAllUserMentionKeys = createSelector(
     getCurrentUserGroupMentionKeys,
     (userMentionKeys, groupMentionKeys) => {
         return userMentionKeys.concat(groupMentionKeys);
-    }
+    },
 );
