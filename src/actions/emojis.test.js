@@ -40,7 +40,7 @@ describe('Actions.Emojis', () => {
                 name: TestHelper.generateId(),
                 creator_id: TestHelper.basicUser.id,
             },
-            testImageData
+            testImageData,
         )(store.dispatch, store.getState);
 
         const state = store.getState();
@@ -62,7 +62,7 @@ describe('Actions.Emojis', () => {
                 name: TestHelper.generateId(),
                 creator_id: TestHelper.basicUser.id,
             },
-            testImageData
+            testImageData,
         )(store.dispatch, store.getState);
 
         nock(Client4.getBaseRoute()).
@@ -90,7 +90,7 @@ describe('Actions.Emojis', () => {
                 name: TestHelper.generateId(),
                 creator_id: TestHelper.basicUser.id,
             },
-            fs.createReadStream('test/assets/images/test.png')
+            fs.createReadStream('test/assets/images/test.png'),
         )(store.dispatch, store.getState);
 
         nock(Client4.getBaseRoute()).
@@ -101,7 +101,7 @@ describe('Actions.Emojis', () => {
                 name: TestHelper.generateId(),
                 creator_id: TestHelper.basicUser.id,
             },
-            fs.createReadStream('test/assets/images/test.png')
+            fs.createReadStream('test/assets/images/test.png'),
         )(store.dispatch, store.getState);
 
         nock(Client4.getBaseRoute()).
@@ -171,7 +171,7 @@ describe('Actions.Emojis', () => {
                 name: TestHelper.generateId(),
                 creator_id: TestHelper.basicUser.id,
             },
-            testImageData
+            testImageData,
         )(store.dispatch, store.getState);
 
         nock(Client4.getBaseRoute()).
@@ -233,7 +233,7 @@ describe('Actions.Emojis', () => {
                 name: TestHelper.generateId(),
                 creator_id: TestHelper.basicUser.id,
             },
-            testImageData
+            testImageData,
         )(store.dispatch, store.getState);
 
         nock(Client4.getBaseRoute()).
@@ -261,7 +261,7 @@ describe('Actions.Emojis', () => {
                 name: TestHelper.generateId(),
                 creator_id: TestHelper.basicUser.id,
             },
-            testImageData
+            testImageData,
         )(store.dispatch, store.getState);
 
         nock(Client4.getBaseRoute()).
@@ -290,7 +290,7 @@ describe('Actions.Emojis', () => {
                 name: TestHelper.generateId(),
                 creator_id: TestHelper.basicUser.id,
             },
-            testImageData
+            testImageData,
         )(store.dispatch, store.getState);
 
         nock(Client4.getBaseRoute()).
@@ -318,7 +318,7 @@ describe('Actions.Emojis', () => {
                 name: TestHelper.generateId(),
                 creator_id: TestHelper.basicUser.id,
             },
-            testImageData
+            testImageData,
         )(store.dispatch, store.getState);
 
         nock(Client4.getBaseRoute()).
@@ -357,7 +357,7 @@ describe('Actions.Emojis', () => {
                 name: TestHelper.generateId(),
                 creator_id: TestHelper.basicUser.id,
             },
-            testImageData
+            testImageData,
         )(store.dispatch, store.getState);
 
         nock(Client4.getBaseRoute()).
@@ -389,7 +389,7 @@ describe('Actions.Emojis', () => {
                 name: TestHelper.generateId(),
                 creator_id: TestHelper.basicUser.id,
             },
-            testImageData
+            testImageData,
         )(store.dispatch, store.getState);
 
         nock(Client4.getBaseRoute()).

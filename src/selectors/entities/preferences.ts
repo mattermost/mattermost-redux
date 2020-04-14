@@ -1,14 +1,18 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
 
-import * as reselect from 'reselect';
+import {createSelector} from 'reselect';
+
 import {General, Preferences} from '../../constants';
+
 import {getConfig, getLicense} from 'selectors/entities/general';
 import {getCurrentTeamId} from 'selectors/entities/teams';
+
+import {PreferencesType, PreferenceType} from 'types/preferences';
+import {GlobalState} from 'types/store';
+
 import {createShallowSelector} from 'utils/helpers';
 import {getPreferenceKey} from 'utils/preference_utils';
-import {GlobalState} from 'types/store';
-import {PreferencesType, PreferenceType} from 'types/preferences';
 
 export function getMyPreferences(state: GlobalState) {
     return state.entities.preferences.myPreferences;
@@ -36,7 +40,7 @@ export function getInt(state: GlobalState, category: string, name: string, defau
 }
 
 export function makeGetCategory() {
-    return reselect.createSelector(
+    return createSelector(
         getMyPreferences,
         (state: GlobalState, category: string) => category,
         (preferences, category) => {
@@ -50,7 +54,7 @@ export function makeGetCategory() {
             }
 
             return prefsInCategory;
-        }
+        },
     );
 }
 
@@ -73,21 +77,21 @@ export function getFavoritesPreferences(state: GlobalState) {
     return favorites.filter((f) => f.value === 'true').map((f) => f.name);
 }
 
-export const getVisibleTeammate = reselect.createSelector(
+export const getVisibleTeammate = createSelector(
     getDirectShowPreferences,
     (direct) => {
         return direct.filter((dm) => dm.value === 'true' && dm.name).map((dm) => dm.name);
-    }
+    },
 );
 
-export const getVisibleGroupIds = reselect.createSelector(
+export const getVisibleGroupIds = createSelector(
     getGroupShowPreferences,
     (groups) => {
         return groups.filter((dm) => dm.value === 'true' && dm.name).map((dm) => dm.name);
-    }
+    },
 );
 
-export const getTeammateNameDisplaySetting = reselect.createSelector(
+export const getTeammateNameDisplaySetting = createSelector(
     getConfig,
     getMyPreferences,
     getLicense,
@@ -100,10 +104,10 @@ export const getTeammateNameDisplaySetting = reselect.createSelector(
             return config.TeammateNameDisplay;
         }
         return General.TEAMMATE_NAME_DISPLAY.SHOW_USERNAME;
-    }
+    },
 );
 
-const getThemePreference = reselect.createSelector(
+const getThemePreference = createSelector(
     getMyPreferences,
     getCurrentTeamId,
     (myPreferences, currentTeamId) => {
@@ -119,10 +123,10 @@ const getThemePreference = reselect.createSelector(
         }
 
         return themePreference;
-    }
+    },
 );
 
-const getDefaultTheme = reselect.createSelector(getConfig, (config) => {
+const getDefaultTheme = createSelector(getConfig, (config) => {
     if (config.DefaultTheme) {
         const theme = Preferences.THEMES[config.DefaultTheme];
         if (theme) {
@@ -177,16 +181,16 @@ export const getTheme = createShallowSelector(
         }
 
         return Object.assign({}, defaultTheme, theme);
-    }
+    },
 );
 
 export function makeGetStyleFromTheme() {
-    return reselect.createSelector(
+    return createSelector(
         getTheme,
         (state: GlobalState, getStyleFromTheme: Function) => getStyleFromTheme,
         (theme, getStyleFromTheme) => {
             return getStyleFromTheme(theme);
-        }
+        },
     );
 }
 
@@ -197,14 +201,14 @@ const defaultSidebarPrefs = {
     sorting: 'alpha',
 };
 
-export const getSidebarPreferences = reselect.createSelector(
+export const getSidebarPreferences = createSelector(
     (state: GlobalState) => {
         const config = getConfig(state);
         return config.ExperimentalGroupUnreadChannels !== General.DISABLED && getBool(
             state,
             Preferences.CATEGORY_SIDEBAR_SETTINGS,
             'show_unread_section',
-            config.ExperimentalGroupUnreadChannels === General.DEFAULT_ON
+            config.ExperimentalGroupUnreadChannels === General.DEFAULT_ON,
         );
     },
     (state) => {
@@ -212,7 +216,7 @@ export const getSidebarPreferences = reselect.createSelector(
             state,
             Preferences.CATEGORY_SIDEBAR_SETTINGS,
             '',
-            null
+            null,
         );
     },
     (showUnreadSection, sidebarPreference) => {
@@ -226,10 +230,10 @@ export const getSidebarPreferences = reselect.createSelector(
         }
 
         return sidebarPrefs;
-    }
+    },
 );
 
-export const getNewSidebarPreference = reselect.createSelector(
+export const getNewSidebarPreference = createSelector(
     (state: GlobalState) => {
         const config = getConfig(state);
         return config.ExperimentalChannelSidebarOrganization;
@@ -239,7 +243,7 @@ export const getNewSidebarPreference = reselect.createSelector(
             state,
             Preferences.CATEGORY_SIDEBAR_SETTINGS,
             Preferences.CHANNEL_SIDEBAR_ORGANIZATION,
-            null
+            null,
         );
     },
     (globalSetting, userSetting) => {
@@ -253,7 +257,7 @@ export const getNewSidebarPreference = reselect.createSelector(
         default:
             return false;
         }
-    }
+    },
 );
 
 export function shouldAutocloseDMs(state: GlobalState) {

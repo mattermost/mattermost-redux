@@ -152,7 +152,6 @@ export function filterProfilesMatchingTerm(users: Array<UserProfile>, term: stri
         profileSuggestions.push((user.nickname || '').toLowerCase());
         const email = (user.email || '').toLowerCase();
         profileSuggestions.push(email);
-        profileSuggestions.push((user.nickname || '').toLowerCase());
 
         const split = email.split('@');
         if (split.length > 1) {
