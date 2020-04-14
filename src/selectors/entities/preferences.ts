@@ -9,7 +9,9 @@ import {getConfig, getLicense} from 'selectors/entities/general';
 import {getCurrentTeamId} from 'selectors/entities/teams';
 
 import {PreferencesType, PreferenceType} from 'types/preferences';
+import {UserProfile} from 'types/users';
 import {GlobalState} from 'types/store';
+import {$ID} from 'types/utilities';
 
 import {createShallowSelector} from 'utils/helpers';
 import {getPreferenceKey} from 'utils/preference_utils';
@@ -39,7 +41,7 @@ export function getInt(state: GlobalState, category: string, name: string, defau
     return parseInt(value, 10);
 }
 
-export function makeGetCategory() {
+export function makeGetCategory(): (state: GlobalState, category: string) => PreferenceType[] {
     return createSelector(
         getMyPreferences,
         (state: GlobalState, category: string) => category,
@@ -77,21 +79,21 @@ export function getFavoritesPreferences(state: GlobalState) {
     return favorites.filter((f) => f.value === 'true').map((f) => f.name);
 }
 
-export const getVisibleTeammate = createSelector(
+export const getVisibleTeammate: (state: GlobalState) => $ID<UserProfile>[] = createSelector(
     getDirectShowPreferences,
     (direct) => {
         return direct.filter((dm) => dm.value === 'true' && dm.name).map((dm) => dm.name);
     },
 );
 
-export const getVisibleGroupIds = createSelector(
+export const getVisibleGroupIds: (state: GlobalState) => string[] = createSelector(
     getGroupShowPreferences,
     (groups) => {
         return groups.filter((dm) => dm.value === 'true' && dm.name).map((dm) => dm.name);
     },
 );
 
-export const getTeammateNameDisplaySetting = createSelector(
+export const getTeammateNameDisplaySetting: (state: GlobalState) => string | undefined = createSelector(
     getConfig,
     getMyPreferences,
     getLicense,
@@ -138,7 +140,7 @@ const getDefaultTheme = createSelector(getConfig, (config) => {
     return Preferences.THEMES.default;
 });
 
-export const getTheme = createShallowSelector(
+export const getTheme: (state: GlobalState) => any = createShallowSelector(
     getThemePreference,
     getDefaultTheme,
     (themePreference, defaultTheme) => {
@@ -184,24 +186,31 @@ export const getTheme = createShallowSelector(
     },
 );
 
-export function makeGetStyleFromTheme() {
+export function makeGetStyleFromTheme<Style>(): (state: GlobalState, getStyleFromTheme: (theme: any) => Style) => Style {
     return createSelector(
         getTheme,
-        (state: GlobalState, getStyleFromTheme: Function) => getStyleFromTheme,
+        (state: GlobalState, getStyleFromTheme: (theme: any) => Style) => getStyleFromTheme,
         (theme, getStyleFromTheme) => {
             return getStyleFromTheme(theme);
         },
     );
 }
 
-const defaultSidebarPrefs = {
+export type SidebarPreferences = {
+    grouping: 'by_type' | 'none';
+    unreads_at_top: 'true' | 'false';
+    favorite_at_top: 'true' | 'false';
+    sorting: 'alpha' | 'recent';
+}
+
+const defaultSidebarPrefs: SidebarPreferences = {
     grouping: 'by_type',
     unreads_at_top: 'true',
     favorite_at_top: 'true',
     sorting: 'alpha',
 };
 
-export const getSidebarPreferences = createSelector(
+export const getSidebarPreferences: (state: GlobalState) => SidebarPreferences = createSelector(
     (state: GlobalState) => {
         const config = getConfig(state);
         return config.ExperimentalGroupUnreadChannels !== General.DISABLED && getBool(
@@ -233,7 +242,7 @@ export const getSidebarPreferences = createSelector(
     },
 );
 
-export const getNewSidebarPreference = createSelector(
+export const getNewSidebarPreference: (state: GlobalState) => boolean = createSelector(
     (state: GlobalState) => {
         const config = getConfig(state);
         return config.ExperimentalChannelSidebarOrganization;

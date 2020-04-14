@@ -5,7 +5,9 @@ import {createSelector} from 'reselect';
 
 import {getCurrentTeamId} from 'selectors/entities/teams';
 
+import {OutgoingWebhook, Command} from 'types/integrations';
 import {GlobalState} from 'types/store';
+import {IDMappedObjects} from 'types/utilities';
 
 export function getIncomingHooks(state: GlobalState) {
     return state.entities.integrations.incomingHooks;
@@ -30,7 +32,7 @@ export function getSystemCommands(state: GlobalState) {
 /**
  * get outgoing hooks in current team
  */
-export const getOutgoingHooksInCurrentTeam = createSelector(
+export const getOutgoingHooksInCurrentTeam: (state: GlobalState) => OutgoingWebhook[] = createSelector(
     getCurrentTeamId,
     getOutgoingHooks,
     (teamId, hooks) => {
@@ -38,7 +40,7 @@ export const getOutgoingHooksInCurrentTeam = createSelector(
     },
 );
 
-export const getAllCommands = createSelector(
+export const getAllCommands: (state: GlobalState) => IDMappedObjects<Command> = createSelector(
     getCommands,
     getSystemCommands,
     (commands, systemCommands) => {
@@ -49,7 +51,7 @@ export const getAllCommands = createSelector(
     },
 );
 
-export const getAutocompleteCommandsList = createSelector(
+export const getAutocompleteCommandsList: (state: GlobalState) => Command[] = createSelector(
     getAllCommands,
     getCurrentTeamId,
     (commands, currentTeamId) => {

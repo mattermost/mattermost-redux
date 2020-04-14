@@ -113,7 +113,7 @@ const getChannelGroupIDSet = createSelector(
     (channelIDs) => new Set(channelIDs),
 );
 
-export const getGroupsNotAssociatedToTeam = createSelector(
+export const getGroupsNotAssociatedToTeam: (state: GlobalState, teamID: string) => Group[] = createSelector(
     getAllGroups,
     (state: GlobalState, teamID: string) => getTeamGroupIDSet(state, teamID),
     (allGroups, teamGroupIDSet) => {
@@ -121,7 +121,7 @@ export const getGroupsNotAssociatedToTeam = createSelector(
     },
 );
 
-export const getGroupsAssociatedToTeam = createSelector(
+export const getGroupsAssociatedToTeam: (state: GlobalState, teamID: string) => Group[] = createSelector(
     getAllGroups,
     (state: GlobalState, teamID: string) => getTeamGroupIDSet(state, teamID),
     (allGroups, teamGroupIDSet) => {
@@ -129,7 +129,7 @@ export const getGroupsAssociatedToTeam = createSelector(
     },
 );
 
-export const getGroupsNotAssociatedToChannel = createSelector(
+export const getGroupsNotAssociatedToChannel: (state: GlobalState, channelID: string) => Group[] = createSelector(
     getAllGroups,
     (state: GlobalState, channelID: string) => getChannelGroupIDSet(state, channelID),
     (allGroups, channelGroupIDSet) => {
@@ -137,7 +137,7 @@ export const getGroupsNotAssociatedToChannel = createSelector(
     },
 );
 
-export const getGroupsAssociatedToChannel = createSelector(
+export const getGroupsAssociatedToChannel: (state: GlobalState, channelID: string) => Group[] = createSelector(
     getAllGroups,
     (state: GlobalState, channelID: string) => getChannelGroupIDSet(state, channelID),
     (allGroups, channelGroupIDSet) => {
@@ -145,7 +145,7 @@ export const getGroupsAssociatedToChannel = createSelector(
     },
 );
 
-export const getGroupsAssociatedToTeamForReference = createSelector(
+export const getGroupsAssociatedToTeamForReference: (state: GlobalState, teamID: string) => Group[] = createSelector(
     getAllGroups,
     (state: GlobalState, teamID: string) => getTeamGroupIDSet(state, teamID),
     (allGroups, teamGroupIDSet) => {
@@ -153,7 +153,7 @@ export const getGroupsAssociatedToTeamForReference = createSelector(
     },
 );
 
-export const getGroupsAssociatedToChannelForReference = createSelector(
+export const getGroupsAssociatedToChannelForReference: (state: GlobalState, channelID: string) => Group[] = createSelector(
     getAllGroups,
     (state: GlobalState, channelID: string) => getChannelGroupIDSet(state, channelID),
     (allGroups, channelGroupIDSet) => {
@@ -161,14 +161,14 @@ export const getGroupsAssociatedToChannelForReference = createSelector(
     },
 );
 
-export const getAllAssociatedGroupsForReference = createSelector(
+export const getAllAssociatedGroupsForReference: (state: GlobalState) => Group[] = createSelector(
     getAllGroups,
     (allGroups) => {
         return Object.entries(allGroups).filter((entry) => (entry[1].allow_reference && entry[1].delete_at === 0)).map((entry) => entry[1]);
     },
 );
 
-export const getCurrentUserGroupMentionKeys = createSelector(
+export const getCurrentUserGroupMentionKeys: (state: GlobalState) => UserMentionKey[]  = createSelector(
     getAllAssociatedGroupsForReference,
     (groups: Array<Group>) => {
         const keys: UserMentionKey[] = [];
