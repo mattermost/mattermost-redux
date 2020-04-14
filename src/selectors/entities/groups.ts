@@ -168,7 +168,7 @@ export const getAllAssociatedGroupsForReference: (state: GlobalState) => Group[]
     },
 );
 
-export const getCurrentUserGroupMentionKeys: (state: GlobalState) => UserMentionKey[]  = createSelector(
+export const getCurrentUserGroupMentionKeys: (state: GlobalState) => UserMentionKey[] = createSelector(
     getAllAssociatedGroupsForReference,
     (groups: Array<Group>) => {
         const keys: UserMentionKey[] = [];
