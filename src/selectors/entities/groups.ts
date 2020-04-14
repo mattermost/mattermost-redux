@@ -112,7 +112,7 @@ const getChannelGroupIDSet = createSelector(
     (channelIDs) => new Set(channelIDs),
 );
 
-export const getGroupsNotAssociatedToTeam = createSelector(
+export const getGroupsNotAssociatedToTeam: (state: GlobalState, teamID: string) => Group[] = createSelector(
     getAllGroups,
     (state: GlobalState, teamID: string) => getTeamGroupIDSet(state, teamID),
     (allGroups, teamGroupIDSet) => {
