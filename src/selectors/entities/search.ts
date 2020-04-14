@@ -2,7 +2,7 @@
 // See LICENSE.txt for license information.
 
 import {createSelector} from 'reselect';
-import { UserMentionKey } from './users';
+import {UserMentionKey} from './users';
 
 import {getCurrentTeamId} from 'selectors/entities/teams';
 import {getCurrentUserMentionKeys} from 'selectors/entities/users';
