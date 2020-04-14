@@ -10,7 +10,8 @@ import {haveISystemPermission} from 'selectors/entities/roles_helpers';
 
 import {GlobalState} from 'types/store';
 import {Team, TeamMembership} from 'types/teams';
-import {$ID, IDMappedObjects} from 'types/utilities';
+import {UserProfile} from 'types/users';
+import {$ID, IDMappedObjects, RelationOneToOne} from 'types/utilities';
 
 import {createIdsSelector} from 'utils/helpers';
 import {isTeamAdmin} from 'utils/user_utils';
@@ -129,7 +130,7 @@ export const getMyTeamMember: (state: GlobalState, teamId: string) => TeamMember
     },
 );
 
-export const getMembersInCurrentTeam: (state: GlobalState) => TeamMembership[] = createSelector(
+export const getMembersInCurrentTeam: (state: GlobalState) => RelationOneToOne<UserProfile, TeamMembership> = createSelector(
     getCurrentTeamId,
     getMembersInTeams,
     (currentTeamId, teamMembers) => {
