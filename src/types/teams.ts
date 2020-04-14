@@ -1,8 +1,9 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
 
-import {Dictionary} from './utilities';
 import {Error} from './errors';
+import {UserProfile} from './users';
+import {Dictionary, RelationOneToOne} from './utilities';
 
 export type TeamMembership = {
     mention_count: number;
@@ -45,7 +46,7 @@ export type TeamsState = {
     currentTeamId: string;
     teams: Dictionary<Team>;
     myMembers: Dictionary<TeamMembership>;
-    membersInTeam: any;
+    membersInTeam: RelationOneToOne<Team, RelationOneToOne<UserProfile, TeamMembership>>;
     stats: any;
     groupsAssociatedToTeam: any;
     totalCount: number;
