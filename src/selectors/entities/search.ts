@@ -2,6 +2,7 @@
 // See LICENSE.txt for license information.
 
 import {createSelector} from 'reselect';
+import { UserMentionKey } from './users';
 
 import {getCurrentTeamId} from 'selectors/entities/teams';
 import {getCurrentUserMentionKeys} from 'selectors/entities/users';
@@ -17,7 +18,7 @@ export const getCurrentSearchForCurrentTeam: (state: GlobalState) => string = cr
     },
 );
 
-export const getAllUserMentionKeys = createSelector(
+export const getAllUserMentionKeys: (state: GlobalState) => UserMentionKey[] = createSelector(
     getCurrentUserMentionKeys,
     getCurrentUserGroupMentionKeys,
     (userMentionKeys, groupMentionKeys) => {
