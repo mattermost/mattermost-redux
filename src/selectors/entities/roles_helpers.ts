@@ -18,7 +18,7 @@ export function getRoles(state: GlobalState) {
     return state.entities.roles.roles;
 }
 
-export const getMySystemRoles = createSelector(
+export const getMySystemRoles: (state: GlobalState) => Set<string> = createSelector(
     getCurrentUser,
     (user: UserProfile) => {
         if (user) {
@@ -29,7 +29,7 @@ export const getMySystemRoles = createSelector(
     },
 );
 
-export const getMySystemPermissions = createSelector(
+export const getMySystemPermissions: (state: GlobalState) => Set<string> = createSelector(
     getMySystemRoles,
     getRoles,
     (mySystemRoles: Set<string>, roles) => {
@@ -47,7 +47,7 @@ export const getMySystemPermissions = createSelector(
     },
 );
 
-export const haveISystemPermission = createSelector(
+export const haveISystemPermission: (state: GlobalState, options: PermissionsOptions) => boolean = createSelector(
     getMySystemPermissions,
     (state: GlobalState, options: PermissionsOptions) => options.permission,
     (permissions, permission) => {
