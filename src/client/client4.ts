@@ -1546,7 +1546,7 @@ export default class Client4 {
     getChannelMemberCountsByGroup = async (channelId: string, includeTimezones: boolean) => {
         return this.doFetch(
             `${this.getChannelRoute(channelId)}/member_counts_by_group?include_timezones=${includeTimezones}`,
-            {method: 'get'}
+            {method: 'get'},
         );
     };
 
