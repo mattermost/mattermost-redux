@@ -44,14 +44,17 @@ describe('Selectors.Search', () => {
                     groups: {
                         test1: {
                             name: 'I-AM-THE-BEST!',
+                            delete_at: 0,
                             allow_reference: true,
                         },
                         test2: {
                             name: 'Do-you-love-me?',
+                            delete_at: 0,
                             allow_reference: true,
                         },
                         test3: {
                             name: 'Maybe?-A-little-bit-I-guess....',
+                            delete_at: 0,
                             allow_reference: false,
                         },
                     },
