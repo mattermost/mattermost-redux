@@ -18,9 +18,9 @@ export const getCurrentSearchForCurrentTeam: (state: GlobalState) => string = cr
     },
 );
 
-export const getAllUserMentionKeys: (state: GlobalState) => UserMentionKey[] = createSelector(
-    getCurrentUserMentionKeys,
-    getCurrentUserGroupMentionKeys,
+export const getAllUserMentionKeys: (state: GlobalState, channelMentionHighlightDisabled: boolean, groupMentionHighlightDisabled: boolean) => UserMentionKey[] = createSelector(
+    (state: GlobalState, channelMentionHighlightDisabled: boolean, groupMentionHighlightDisabled: boolean) => getCurrentUserMentionKeys(state, channelMentionHighlightDisabled),
+    (state: GlobalState, channelMentionHighlightDisabled: boolean, groupMentionHighlightDisabled: boolean) => getCurrentUserGroupMentionKeys(state, groupMentionHighlightDisabled),
     (userMentionKeys, groupMentionKeys) => {
         return userMentionKeys.concat(groupMentionKeys);
     },

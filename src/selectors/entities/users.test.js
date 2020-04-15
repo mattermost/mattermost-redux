@@ -171,6 +171,7 @@ describe('Selectors.Users', () => {
             };
 
             assert.deepEqual(Selectors.getCurrentUserMentionKeys(state), [{key: '@channel'}, {key: '@all'}, {key: '@here'}, {key: '@user'}]);
+            assert.deepEqual(Selectors.getCurrentUserMentionKeys(state, true), [{key: '@user'}]);
         });
 
         it('first name', () => {

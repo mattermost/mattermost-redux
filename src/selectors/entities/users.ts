@@ -152,9 +152,10 @@ export type UserMentionKey= {
     caseSensitive?: boolean;
 }
 
-export const getCurrentUserMentionKeys: (state: GlobalState) => Array<UserMentionKey> = createSelector(
+export const getCurrentUserMentionKeys: (state: GlobalState, channelMentionHighlightDisabled: boolean) => Array<UserMentionKey> = createSelector(
     getCurrentUser,
-    (user: UserProfile) => {
+    (state: GlobalState, channelMentionHighlightDisabled: boolean) => channelMentionHighlightDisabled,
+    (user: UserProfile, channelMentionHighlightDisabled = false) => {
         let keys: UserMentionKey[] = [];
 
         if (!user || !user.notify_props) {
@@ -171,7 +172,7 @@ export const getCurrentUserMentionKeys: (state: GlobalState) => Array<UserMentio
             keys.push({key: user.first_name, caseSensitive: true});
         }
 
-        if (user.notify_props.channel === 'true') {
+        if (user.notify_props.channel === 'true' && !channelMentionHighlightDisabled) {
             keys.push({key: '@channel'});
             keys.push({key: '@all'});
             keys.push({key: '@here'});
