@@ -7,7 +7,7 @@ import {getCurrentTeamId} from 'selectors/entities/teams';
 
 import {GlobalState} from 'types/store';
 
-export const getCurrentSearchForCurrentTeam = createSelector(
+export const getCurrentSearchForCurrentTeam: (state: GlobalState) => string = createSelector(
     (state: GlobalState) => state.entities.search.current,
     getCurrentTeamId,
     (current, teamId) => {

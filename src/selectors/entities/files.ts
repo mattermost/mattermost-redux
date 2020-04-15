@@ -5,6 +5,7 @@ import {createSelector} from 'reselect';
 
 import {getCurrentUserLocale} from 'selectors/entities/i18n';
 
+import {FileInfo} from 'types/files';
 import {GlobalState} from 'types/store';
 
 import {sortFileInfos} from 'utils/file_utils';
@@ -25,7 +26,7 @@ export function getFilePublicLink(state: GlobalState) {
     return state.entities.files.filePublicLink;
 }
 
-export function makeGetFilesForPost() {
+export function makeGetFilesForPost(): (state: GlobalState, postId: string) => FileInfo[] {
     return createSelector(
         getAllFiles,
         getFilesIdsForPost,

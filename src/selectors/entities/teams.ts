@@ -10,7 +10,8 @@ import {haveISystemPermission} from 'selectors/entities/roles_helpers';
 
 import {GlobalState} from 'types/store';
 import {Team, TeamMembership} from 'types/teams';
-import {IDMappedObjects} from 'types/utilities';
+import {UserProfile} from 'types/users';
+import {$ID, IDMappedObjects, RelationOneToOne} from 'types/utilities';
 
 import {createIdsSelector} from 'utils/helpers';
 import {isTeamAdmin} from 'utils/user_utils';
@@ -20,13 +21,11 @@ export function getCurrentTeamId(state: GlobalState) {
     return state.entities.teams.currentTeamId;
 }
 
-export const getTeamByName = createSelector(
-    getTeams,
-    (state: GlobalState, name: string) => name,
-    (teams: IDMappedObjects<Team>, name: string): Team | undefined => {
-        return Object.values(teams).find((team: Team) => team.name === name);
-    },
-);
+export function getTeamByName(state: GlobalState, name: string) {
+    const teams = getTeams(state);
+
+    return Object.values(teams).find((team) => team.name === name);
+}
 
 export function getTeams(state: GlobalState): IDMappedObjects<Team> {
     return state.entities.teams.teams;
@@ -44,14 +43,14 @@ export function getMembersInTeams(state: GlobalState) {
     return state.entities.teams.membersInTeam;
 }
 
-export const getTeamsList = createSelector(
+export const getTeamsList: (state: GlobalState) => Team[] = createSelector(
     getTeams,
     (teams) => {
         return Object.values(teams);
     },
 );
 
-export const getCurrentTeam = createSelector(
+export const getCurrentTeam: (state: GlobalState) => Team = createSelector(
     getTeams,
     getCurrentTeamId,
     (teams, currentTeamId) => {
@@ -64,7 +63,7 @@ export function getTeam(state: GlobalState, id: string): Team {
     return teams[id];
 }
 
-export const getCurrentTeamMembership = createSelector(
+export const getCurrentTeamMembership: (state: GlobalState) => TeamMembership = createSelector(
     getCurrentTeamId,
     getTeamMemberships,
     (currentTeamId: string, teamMemberships: {[teamId: string]: TeamMembership}): TeamMembership => {
@@ -72,7 +71,7 @@ export const getCurrentTeamMembership = createSelector(
     },
 );
 
-export const isCurrentUserCurrentTeamAdmin = createSelector(
+export const isCurrentUserCurrentTeamAdmin: (state: GlobalState) => boolean = createSelector(
     getCurrentTeamMembership,
     (member) => {
         if (member) {
@@ -83,7 +82,7 @@ export const isCurrentUserCurrentTeamAdmin = createSelector(
     },
 );
 
-export const getCurrentTeamUrl = createSelector(
+export const getCurrentTeamUrl: (state: GlobalState) => string = createSelector(
     getCurrentUrl,
     getCurrentTeam,
     (state) => getConfig(state).SiteURL,
@@ -97,7 +96,7 @@ export const getCurrentTeamUrl = createSelector(
     },
 );
 
-export const getCurrentRelativeTeamUrl = createSelector(
+export const getCurrentRelativeTeamUrl: (state: GlobalState) => string = createSelector(
     getCurrentTeam,
     (currentTeam) => {
         if (!currentTeam) {
@@ -107,7 +106,7 @@ export const getCurrentRelativeTeamUrl = createSelector(
     },
 );
 
-export const getCurrentTeamStats = createSelector(
+export const getCurrentTeamStats: (state: GlobalState) => any = createSelector(
     getCurrentTeamId,
     getTeamStats,
     (currentTeamId, teamStats) => {
@@ -115,7 +114,7 @@ export const getCurrentTeamStats = createSelector(
     },
 );
 
-export const getMyTeams = createSelector(
+export const getMyTeams: (state: GlobalState) => Team[] = createSelector(
     getTeams,
     getTeamMemberships,
     (teams, members) => {
@@ -123,7 +122,7 @@ export const getMyTeams = createSelector(
     },
 );
 
-export const getMyTeamMember = createSelector(
+export const getMyTeamMember: (state: GlobalState, teamId: string) => TeamMembership = createSelector(
     getTeamMemberships,
     (state: GlobalState, teamId: string) => teamId,
     (teamMemberships, teamId) => {
@@ -131,7 +130,7 @@ export const getMyTeamMember = createSelector(
     },
 );
 
-export const getMembersInCurrentTeam = createSelector(
+export const getMembersInCurrentTeam: (state: GlobalState) => RelationOneToOne<UserProfile, TeamMembership> = createSelector(
     getCurrentTeamId,
     getMembersInTeams,
     (currentTeamId, teamMembers) => {
@@ -148,7 +147,7 @@ export function getTeamMember(state: GlobalState, teamId: string, userId: string
     return null;
 }
 
-export const getListableTeamIds = createIdsSelector(
+export const getListableTeamIds: (state: GlobalState) => $ID<Team>[] = createIdsSelector(
     getTeams,
     getTeamMemberships,
     (state) => haveISystemPermission(state, {permission: Permissions.LIST_PUBLIC_TEAMS}),
@@ -167,7 +166,7 @@ export const getListableTeamIds = createIdsSelector(
     },
 );
 
-export const getListableTeams = createSelector(
+export const getListableTeams: (state: GlobalState) => Team[] = createSelector(
     getTeams,
     getListableTeamIds,
     (teams, listableTeamIds) => {
@@ -175,7 +174,7 @@ export const getListableTeams = createSelector(
     },
 );
 
-export const getSortedListableTeams = createSelector(
+export const getSortedListableTeams: (state: GlobalState, locale: string) => Team[] = createSelector(
     getTeams,
     getListableTeamIds,
     (state: GlobalState, locale: string) => locale,
@@ -190,7 +189,7 @@ export const getSortedListableTeams = createSelector(
     },
 );
 
-export const getJoinableTeamIds = createIdsSelector(
+export const getJoinableTeamIds: (state: GlobalState) => $ID<Team>[] = createIdsSelector(
     getTeams,
     getTeamMemberships,
     (state: GlobalState) => haveISystemPermission(state, {permission: Permissions.JOIN_PUBLIC_TEAMS}),
@@ -209,7 +208,7 @@ export const getJoinableTeamIds = createIdsSelector(
     },
 );
 
-export const getJoinableTeams = createSelector(
+export const getJoinableTeams: (state: GlobalState) => Team[] = createSelector(
     getTeams,
     getJoinableTeamIds,
     (teams, joinableTeamIds) => {
@@ -217,7 +216,7 @@ export const getJoinableTeams = createSelector(
     },
 );
 
-export const getSortedJoinableTeams = createSelector(
+export const getSortedJoinableTeams: (state: GlobalState, locale: string) => Team[] = createSelector(
     getTeams,
     getJoinableTeamIds,
     (state: GlobalState, locale: string) => locale,
@@ -232,7 +231,7 @@ export const getSortedJoinableTeams = createSelector(
     },
 );
 
-export const getMySortedTeamIds = createIdsSelector(
+export const getMySortedTeamIds: (state: GlobalState, locale: string) => $ID<Team>[] = createIdsSelector(
     getMyTeams,
     (state: GlobalState, locale: string) => locale,
     (teams, locale) => {
@@ -240,18 +239,15 @@ export const getMySortedTeamIds = createIdsSelector(
     },
 );
 
-export const getMyTeamsCount = createSelector(
-    getMyTeams,
-    (teams) => {
-        return teams.length;
-    },
-);
+export function getMyTeamsCount(state: GlobalState) {
+    return getMyTeams(state).length;
+}
 
 // returns the badge number to show (excluding the current team)
 // > 0 means is returning the mention count
 // 0 means that there are no unread messages
 // -1 means that there are unread messages but no mentions
-export const getChannelDrawerBadgeCount = createSelector(
+export const getChannelDrawerBadgeCount: (state: GlobalState) => number = createSelector(
     getCurrentTeamId,
     getTeamMemberships,
     (currentTeamId, teamMembers) => {
@@ -279,7 +275,7 @@ export const getChannelDrawerBadgeCount = createSelector(
 // > 0 means is returning the mention count
 // 0 means that there are no unread messages
 // -1 means that there are unread messages but no mentions
-export function makeGetBadgeCountForTeamId() {
+export function makeGetBadgeCountForTeamId(): (state: GlobalState, id: string) => number {
     return createSelector(
         getTeamMemberships,
         (state: GlobalState, id: string) => id,
