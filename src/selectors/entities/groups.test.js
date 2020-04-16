@@ -151,6 +151,5 @@ describe('Selectors.Groups', () => {
             },
         ];
         assert.deepEqual(Selectors.getCurrentUserGroupMentionKeys(testState), expected);
-        assert.deepEqual(Selectors.getCurrentUserGroupMentionKeys(testState, true), []);
     });
 });

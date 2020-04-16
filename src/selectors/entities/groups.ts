@@ -168,16 +168,11 @@ export const getAllAssociatedGroupsForReference: (state: GlobalState) => Group[]
     },
 );
 
-export const getCurrentUserGroupMentionKeys: (state: GlobalState, groupMentionHighlightDisabled: boolean) => UserMentionKey[] = createSelector(
+export const getCurrentUserGroupMentionKeys: (state: GlobalState) => UserMentionKey[] = createSelector(
     getAllAssociatedGroupsForReference,
-    (state: GlobalState, groupMentionHighlightDisabled = false) => groupMentionHighlightDisabled,
-    (groups: Array<Group>, groupMentionHighlightDisabled) => {
+    (groups: Array<Group>) => {
         const keys: UserMentionKey[] = [];
-
-        if (!groupMentionHighlightDisabled) {
-            groups.forEach((group) => keys.push({key: `@${group.name}`}));
-        }
-
+        groups.forEach((group) => keys.push({key: `@${group.name}`}));
         return keys;
     },
 );
