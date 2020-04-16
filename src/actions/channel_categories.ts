@@ -2,6 +2,7 @@
 // See LICENSE.txt for license information.
 
 import {ChannelCategoryTypes} from 'action_types';
+import {CategorySorting} from 'types/channel_categories';
 
 export function expandCategory(categoryId: string) {
     return {
@@ -14,5 +15,15 @@ export function collapseCategory(categoryId: string) {
     return {
         type: ChannelCategoryTypes.CATEGORY_COLLAPSED,
         data: categoryId,
+    };
+}
+
+export function setCategorySorting(categoryId: string, sorting: CategorySorting) {
+    return {
+        type: ChannelCategoryTypes.RECEIVED_CATEGORY,
+        data: {
+            id: categoryId,
+            sorting,
+        },
     };
 }
