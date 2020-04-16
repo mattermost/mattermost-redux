@@ -6,6 +6,7 @@ import {filterGroupsMatchingTerm} from 'utils/group_utils';
 import {getChannel} from 'selectors/entities/channels';
 import {haveIChannelPermission} from 'selectors/entities/roles';
 import {getTeam} from 'selectors/entities/teams';
+import {UserMentionKey} from 'selectors/entities/users';
 
 import {createSelector} from 'reselect';
 
@@ -164,5 +165,14 @@ export const getAllAssociatedGroupsForReference: (state: GlobalState) => Group[]
     getAllGroups,
     (allGroups) => {
         return Object.entries(allGroups).filter((entry) => (entry[1].allow_reference && entry[1].delete_at === 0)).map((entry) => entry[1]);
+    },
+);
+
+export const getCurrentUserGroupMentionKeys: (state: GlobalState) => UserMentionKey[] = createSelector(
+    getAllAssociatedGroupsForReference,
+    (groups: Array<Group>) => {
+        const keys: UserMentionKey[] = [];
+        groups.forEach((group) => keys.push({key: `@${group.name}`}));
+        return keys;
     },
 );
