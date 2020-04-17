@@ -76,11 +76,7 @@ export function nextPostsReplies(state: {[x in $ID<Post>]: number} = {}, action:
         }
 
         const newState = {...state};
-        if (post.reply_count) {
-            newState[post.root_id] = post.reply_count;
-        } else {
-            newState[post.root_id] = (newState[post.root_id] || 0) + 1;
-        }
+        newState[post.root_id] = post.reply_count;
         return newState;
     }
 
