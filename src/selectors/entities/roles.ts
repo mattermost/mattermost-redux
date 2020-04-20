@@ -9,14 +9,15 @@ import {
     getMySystemRoles,
     getRoles,
     PermissionsOptions,
+    SysConsoleItemOptions,
 } from 'selectors/entities/roles_helpers';
 import {getTeamMemberships, getCurrentTeamId} from 'selectors/entities/teams';
 
-import {Channel} from 'types/channels';
 import {Role} from 'types/roles';
 import {GlobalState} from 'types/store';
-import {Team} from 'types/teams';
 import {Dictionary} from 'types/utilities';
+
+import {ResourceToSysConsolePermissionsTable} from '../../constants/permissions_sysconsole';
 
 export {getMySystemPermissions, getMySystemRoles, getRoles};
 
@@ -207,5 +208,44 @@ export const haveICurrentChannelPermission: (state: GlobalState, options: Permis
     (state: GlobalState, options: PermissionsOptions) => options.permission,
     (permissions, permission) => {
         return permissions.has(permission);
+    },
+);
+
+export function getAllResourceToSysConsolePermissions(state: GlobalState) {
+    return ResourceToSysConsolePermissionsTable;
+}
+
+//gets the permissions for the current resource id
+export const getPermissionsOnResource = createSelector(
+    getAllResourceToSysConsolePermissions,
+    (state: GlobalState, options: SysConsoleItemOptions) => options.resourceId,
+    (permissionsOnResources, resourceId) => {
+        const permissions = Object.entries(permissionsOnResources).filter(([resourceID]) => resourceID === resourceId).map((entry) => entry[1]);
+        return new Set(permissions[0]);
+    },
+);
+
+export const haveINoPermissionOnSysConsoleItem = createSelector(
+    getMySystemPermissions,
+    getPermissionsOnResource,
+    (mySystemPermissions, permissionsOnResource) => {
+        const commonPermissions = Array.from(permissionsOnResource).filter((x) => mySystemPermissions.has(x));
+        return (commonPermissions.length === 0);
+    },
+);
+
+//return true if we have at least one permission on the resource, and it is not write
+export const haveINoWritePermissionOnSysConsoleItem = createSelector(
+    getMySystemPermissions,
+    getPermissionsOnResource,
+    (mySystemPermissions, permissionsOnResource) => {
+        const commonPermissions = Array.from(permissionsOnResource).filter((x) => mySystemPermissions.has(x));
+        const noHaveRWPermission = commonPermissions.length === 0;
+
+        //go over the permissions and check if we have a write permission, if yes, return true
+        const haveWPermission = Array.from(commonPermissions).some((permission) => permission.startsWith('write'));
+
+        //we have atleast one r/w permission and it is a write
+        return (noHaveRWPermission || !haveWPermission);
     },
 );

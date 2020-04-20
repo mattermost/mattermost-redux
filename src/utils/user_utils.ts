@@ -44,6 +44,11 @@ export function rolesIncludePermission(roles: string, permission: string): boole
     return rolesArray.includes(permission);
 }
 
+export function rolesIncludeSomePermissions(roles: string, permissions: string[]): boolean {
+    const rolesArray = roles.split(' ');
+    return permissions.some((el) => rolesArray.includes(el));
+}
+
 export function isAdmin(roles: string): boolean {
     return isSystemAdmin(roles) || isTeamAdmin(roles);
 }
@@ -58,6 +63,10 @@ export function isTeamAdmin(roles: string): boolean {
 
 export function isSystemAdmin(roles: string): boolean {
     return rolesIncludePermission(roles, General.SYSTEM_ADMIN_ROLE);
+}
+
+export function isSystemAdminsRole(roles: string): boolean {
+    return rolesIncludeSomePermissions(roles, [General.SYSTEM_ADMIN_ROLE, General.SYSTEM_USER_MANAGER_ROLE, General.SYSTEM_CONSOLE_VIEWER_ROLE, General.SYSTEM_JUNIOR_ADMIN_ROLE]);
 }
 
 export function isChannelAdmin(roles: string): boolean {
