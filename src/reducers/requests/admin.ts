@@ -14,7 +14,7 @@ function getLogs(state: RequestStatusType = initialRequestState(), action: Gener
         AdminTypes.GET_LOGS_SUCCESS,
         AdminTypes.GET_LOGS_FAILURE,
         state,
-        action
+        action,
     );
 }
 
@@ -24,7 +24,7 @@ function getAudits(state: RequestStatusType = initialRequestState(), action: Gen
         AdminTypes.GET_AUDITS_SUCCESS,
         AdminTypes.GET_AUDITS_FAILURE,
         state,
-        action
+        action,
     );
 }
 
@@ -34,7 +34,7 @@ function getConfig(state: RequestStatusType = initialRequestState(), action: Gen
         AdminTypes.GET_CONFIG_SUCCESS,
         AdminTypes.GET_CONFIG_FAILURE,
         state,
-        action
+        action,
     );
 }
 
@@ -44,7 +44,7 @@ function updateConfig(state: RequestStatusType = initialRequestState(), action: 
         AdminTypes.UPDATE_CONFIG_SUCCESS,
         AdminTypes.UPDATE_CONFIG_FAILURE,
         state,
-        action
+        action,
     );
 }
 
@@ -54,7 +54,7 @@ function reloadConfig(state: RequestStatusType = initialRequestState(), action: 
         AdminTypes.RELOAD_CONFIG_SUCCESS,
         AdminTypes.RELOAD_CONFIG_FAILURE,
         state,
-        action
+        action,
     );
 }
 
@@ -64,7 +64,7 @@ function getEnvironmentConfig(state: RequestStatusType = initialRequestState(), 
         AdminTypes.GET_ENVIRONMENT_CONFIG_SUCCESS,
         AdminTypes.GET_ENVIRONMENT_CONFIG_FAILURE,
         state,
-        action
+        action,
     );
 }
 
@@ -74,7 +74,7 @@ function testEmail(state: RequestStatusType = initialRequestState(), action: Gen
         AdminTypes.TEST_EMAIL_SUCCESS,
         AdminTypes.TEST_EMAIL_FAILURE,
         state,
-        action
+        action,
     );
 }
 
@@ -84,7 +84,7 @@ function testSiteURL(state: RequestStatusType = initialRequestState(), action: G
         AdminTypes.TEST_SITE_URL_SUCCESS,
         AdminTypes.TEST_SITE_URL_FAILURE,
         state,
-        action
+        action,
     );
 }
 
@@ -94,7 +94,7 @@ function testS3Connection(state: RequestStatusType = initialRequestState(), acti
         AdminTypes.TEST_S3_SUCCESS,
         AdminTypes.TEST_S3_FAILURE,
         state,
-        action
+        action,
     );
 }
 
@@ -104,7 +104,7 @@ function invalidateCaches(state: RequestStatusType = initialRequestState(), acti
         AdminTypes.INVALIDATE_CACHES_SUCCESS,
         AdminTypes.INVALIDATE_CACHES_FAILURE,
         state,
-        action
+        action,
     );
 }
 
@@ -114,7 +114,7 @@ function recycleDatabase(state: RequestStatusType = initialRequestState(), actio
         AdminTypes.RECYCLE_DATABASE_SUCCESS,
         AdminTypes.RECYCLE_DATABASE_FAILURE,
         state,
-        action
+        action,
     );
 }
 
@@ -124,7 +124,7 @@ function createCompliance(state: RequestStatusType = initialRequestState(), acti
         AdminTypes.CREATE_COMPLIANCE_SUCCESS,
         AdminTypes.CREATE_COMPLIANCE_FAILURE,
         state,
-        action
+        action,
     );
 }
 
@@ -134,7 +134,7 @@ function getCompliance(state: RequestStatusType = initialRequestState(), action:
         AdminTypes.GET_COMPLIANCE_SUCCESS,
         AdminTypes.GET_COMPLIANCE_FAILURE,
         state,
-        action
+        action,
     );
 }
 
@@ -144,7 +144,7 @@ function uploadBrandImage(state: RequestStatusType = initialRequestState(), acti
         AdminTypes.UPLOAD_BRAND_IMAGE_SUCCESS,
         AdminTypes.UPLOAD_BRAND_IMAGE_FAILURE,
         state,
-        action
+        action,
     );
 }
 
@@ -154,7 +154,7 @@ function deleteBrandImage(state: RequestStatusType = initialRequestState(), acti
         AdminTypes.DELETE_BRAND_IMAGE_SUCCESS,
         AdminTypes.DELETE_BRAND_IMAGE_FAILURE,
         state,
-        action
+        action,
     );
 }
 
@@ -164,7 +164,7 @@ function getClusterStatus(state: RequestStatusType = initialRequestState(), acti
         AdminTypes.GET_CLUSTER_STATUS_SUCCESS,
         AdminTypes.GET_CLUSTER_STATUS_FAILURE,
         state,
-        action
+        action,
     );
 }
 
@@ -174,7 +174,7 @@ function testLdap(state: RequestStatusType = initialRequestState(), action: Gene
         AdminTypes.TEST_LDAP_SUCCESS,
         AdminTypes.TEST_LDAP_FAILURE,
         state,
-        action
+        action,
     );
 }
 
@@ -184,7 +184,7 @@ function syncLdap(state: RequestStatusType = initialRequestState(), action: Gene
         AdminTypes.SYNC_LDAP_SUCCESS,
         AdminTypes.SYNC_LDAP_FAILURE,
         state,
-        action
+        action,
     );
 }
 
@@ -194,7 +194,7 @@ function getLdapGroups(state: RequestStatusType = initialRequestState(), action:
         AdminTypes.GET_LDAP_GROUPS_SUCCESS,
         AdminTypes.GET_LDAP_GROUPS_FAILURE,
         state,
-        action
+        action,
     );
 }
 
@@ -204,7 +204,7 @@ function linkLdapGroup(state: RequestStatusType = initialRequestState(), action:
         AdminTypes.LINK_LDAP_GROUP_SUCCESS,
         AdminTypes.LINK_LDAP_GROUP_FAILURE,
         state,
-        action
+        action,
     );
 }
 
@@ -214,7 +214,7 @@ function unlinkLdapGroup(state: RequestStatusType = initialRequestState(), actio
         AdminTypes.UNLINK_LDAP_GROUP_SUCCESS,
         AdminTypes.UNLINK_LDAP_GROUP_FAILURE,
         state,
-        action
+        action,
     );
 }
 
@@ -224,7 +224,7 @@ function getSamlCertificateStatus(state: RequestStatusType = initialRequestState
         AdminTypes.SAML_CERT_STATUS_SUCCESS,
         AdminTypes.SAML_CERT_STATUS_FAILURE,
         state,
-        action
+        action,
     );
 }
 
@@ -234,7 +234,7 @@ function uploadPublicSamlCertificate(state: RequestStatusType = initialRequestSt
         AdminTypes.UPLOAD_SAML_PUBLIC_SUCCESS,
         AdminTypes.UPLOAD_SAML_PUBLIC_FAILURE,
         state,
-        action
+        action,
     );
 }
 
@@ -244,7 +244,7 @@ function uploadPrivateSamlCertificate(state: RequestStatusType = initialRequestS
         AdminTypes.UPLOAD_SAML_PRIVATE_SUCCESS,
         AdminTypes.UPLOAD_SAML_PRIVATE_FAILURE,
         state,
-        action
+        action,
     );
 }
 
@@ -254,7 +254,7 @@ function uploadIdpSamlCertificate(state: RequestStatusType = initialRequestState
         AdminTypes.UPLOAD_SAML_IDP_SUCCESS,
         AdminTypes.UPLOAD_SAML_IDP_FAILURE,
         state,
-        action
+        action,
     );
 }
 
@@ -264,7 +264,7 @@ function removePublicSamlCertificate(state: RequestStatusType = initialRequestSt
         AdminTypes.DELETE_SAML_PUBLIC_SUCCESS,
         AdminTypes.DELETE_SAML_PUBLIC_FAILURE,
         state,
-        action
+        action,
     );
 }
 
@@ -274,7 +274,7 @@ function removePrivateSamlCertificate(state: RequestStatusType = initialRequestS
         AdminTypes.DELETE_SAML_PRIVATE_SUCCESS,
         AdminTypes.DELETE_SAML_PRIVATE_FAILURE,
         state,
-        action
+        action,
     );
 }
 
@@ -284,7 +284,7 @@ function removeIdpSamlCertificate(state: RequestStatusType = initialRequestState
         AdminTypes.DELETE_SAML_IDP_SUCCESS,
         AdminTypes.DELETE_SAML_IDP_FAILURE,
         state,
-        action
+        action,
     );
 }
 
@@ -294,7 +294,7 @@ function testElasticsearch(state: RequestStatusType = initialRequestState(), act
         AdminTypes.TEST_ELASTICSEARCH_SUCCESS,
         AdminTypes.TEST_ELASTICSEARCH_FAILURE,
         state,
-        action
+        action,
     );
 }
 
@@ -304,7 +304,7 @@ function purgeElasticsearchIndexes(state: RequestStatusType = initialRequestStat
         AdminTypes.PURGE_ELASTICSEARCH_INDEXES_SUCCESS,
         AdminTypes.PURGE_ELASTICSEARCH_INDEXES_FAILURE,
         state,
-        action
+        action,
     );
 }
 
@@ -314,7 +314,7 @@ function uploadLicense(state: RequestStatusType = initialRequestState(), action:
         AdminTypes.UPLOAD_LICENSE_SUCCESS,
         AdminTypes.UPLOAD_LICENSE_FAILURE,
         state,
-        action
+        action,
     );
 }
 
@@ -324,7 +324,7 @@ function removeLicense(state: RequestStatusType = initialRequestState(), action:
         AdminTypes.REMOVE_LICENSE_SUCCESS,
         AdminTypes.REMOVE_LICENSE_FAILURE,
         state,
-        action
+        action,
     );
 }
 
@@ -334,7 +334,7 @@ function getAnalytics(state: RequestStatusType = initialRequestState(), action: 
         AdminTypes.GET_ANALYTICS_SUCCESS,
         AdminTypes.GET_ANALYTICS_FAILURE,
         state,
-        action
+        action,
     );
 }
 
@@ -344,7 +344,7 @@ function uploadPlugin(state: RequestStatusType = initialRequestState(), action: 
         AdminTypes.UPLOAD_PLUGIN_SUCCESS,
         AdminTypes.UPLOAD_PLUGIN_FAILURE,
         state,
-        action
+        action,
     );
 }
 
@@ -354,7 +354,7 @@ function installPluginFromUrl(state: RequestStatusType = initialRequestState(), 
         AdminTypes.INSTALL_PLUGIN_FROM_URL_SUCCESS,
         AdminTypes.INSTALL_PLUGIN_FROM_URL_FAILURE,
         state,
-        action
+        action,
     );
 }
 
@@ -364,7 +364,7 @@ function getPlugins(state: RequestStatusType = initialRequestState(), action: Ge
         AdminTypes.GET_PLUGIN_SUCCESS,
         AdminTypes.GET_PLUGIN_FAILURE,
         state,
-        action
+        action,
     );
 }
 
@@ -374,7 +374,7 @@ function getPluginStatuses(state: RequestStatusType = initialRequestState(), act
         AdminTypes.GET_PLUGIN_STATUSES_SUCCESS,
         AdminTypes.GET_PLUGIN_STATUSES_FAILURE,
         state,
-        action
+        action,
     );
 }
 
@@ -384,7 +384,7 @@ function removePlugin(state: RequestStatusType = initialRequestState(), action: 
         AdminTypes.REMOVE_PLUGIN_SUCCESS,
         AdminTypes.REMOVE_PLUGIN_FAILURE,
         state,
-        action
+        action,
     );
 }
 
@@ -394,7 +394,7 @@ function enablePlugin(state: RequestStatusType = initialRequestState(), action: 
         AdminTypes.ENABLE_PLUGIN_SUCCESS,
         AdminTypes.ENABLE_PLUGIN_FAILURE,
         state,
-        action
+        action,
     );
 }
 
@@ -404,7 +404,7 @@ function disablePlugin(state: RequestStatusType = initialRequestState(), action:
         AdminTypes.DISABLE_PLUGIN_SUCCESS,
         AdminTypes.DISABLE_PLUGIN_FAILURE,
         state,
-        action
+        action,
     );
 }
 

@@ -50,8 +50,8 @@ export default function configureServiceStore(preloadedState: any, appReducer: a
         baseState,
         offlineCompose(baseOfflineConfig)(
             createMiddleware(clientOptions),
-            loadReduxDevtools ? [devToolsEnhancer()] : []
-        )
+            loadReduxDevtools ? [devToolsEnhancer()] : [],
+        ),
     );
 
     reducerRegistry.setChangeListener((reducers: any) => {

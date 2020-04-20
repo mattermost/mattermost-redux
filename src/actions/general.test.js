@@ -32,7 +32,7 @@ describe('Actions.General', () => {
 
         const pingError = new FormattedError(
             'mobile.server_ping_failed',
-            'Cannot connect to the server. Please check your server URL and internet connection.'
+            'Cannot connect to the server. Please check your server URL and internet connection.',
         );
 
         nock(Client4.getBaseRoute()).

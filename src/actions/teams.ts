@@ -13,7 +13,7 @@ import {getCurrentUserId} from 'selectors/entities/users';
 
 import {GetStateFunc, DispatchFunc, ActionFunc, ActionResult, batchActions, Action} from 'types/actions';
 
-import {Team, TeamMembership, TeamMemberWithError} from 'types/teams';
+import {Team, TeamMembership, TeamMemberWithError, GetTeamMembersOpts} from 'types/teams';
 
 import {selectChannel} from './channels';
 import {logError} from './errors';
@@ -235,7 +235,7 @@ export function deleteTeam(teamId: string): ActionFunc {
             {
                 type: TeamTypes.RECEIVED_TEAM_DELETED,
                 data: {id: teamId},
-            }
+            },
         );
 
         dispatch(batchActions(actions));
@@ -299,7 +299,7 @@ export function getMyTeamMembers(): ActionFunc {
     };
 }
 
-export function getTeamMembers(teamId: string, page = 0, perPage: number = General.TEAMS_CHUNK_SIZE): ActionFunc {
+export function getTeamMembers(teamId: string, page = 0, perPage: number = General.TEAMS_CHUNK_SIZE, options: GetTeamMembersOpts): ActionFunc {
     return bindClientFunc({
         clientFunc: Client4.getTeamMembers,
         onRequest: TeamTypes.GET_TEAM_MEMBERS_REQUEST,
@@ -309,6 +309,7 @@ export function getTeamMembers(teamId: string, page = 0, perPage: number = Gener
             teamId,
             page,
             perPage,
+            options,
         ],
     });
 }
@@ -704,7 +705,7 @@ export function updateTeamMemberSchemeRoles(
     teamId: string,
     userId: string,
     isSchemeUser: boolean,
-    isSchemeAdmin: boolean
+    isSchemeAdmin: boolean,
 ): ActionFunc {
     return bindClientFunc({
         clientFunc: async () => {

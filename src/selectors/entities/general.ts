@@ -1,10 +1,14 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
+
 import {createSelector} from 'reselect';
-import {isMinimumServerVersion} from 'utils/helpers';
+
 import {General} from '../../constants';
+
 import {GlobalState} from 'types/store';
 import {Config} from 'types/config';
+
+import {isMinimumServerVersion} from 'utils/helpers';
 
 export function getConfig(state: GlobalState): Partial<Config> {
     return state.entities.general.config;
@@ -45,7 +49,7 @@ export const canUploadFilesOnMobile: (a: GlobalState) => boolean = createSelecto
         // Defaults to true if either setting doesn't exist
         return config.EnableFileAttachments !== 'false' &&
            (license.IsLicensed === 'false' || license.Compliance === 'false' || config.EnableMobileFileUpload !== 'false');
-    }
+    },
 );
 
 export const canDownloadFilesOnMobile: (a: GlobalState) => boolean = createSelector(
@@ -54,7 +58,7 @@ export const canDownloadFilesOnMobile: (a: GlobalState) => boolean = createSelec
     (config: Config, license: any): boolean => {
         // Defaults to true if the setting doesn't exist
         return license.IsLicensed === 'false' || license.Compliance === 'false' || config.EnableMobileFileDownload !== 'false';
-    }
+    },
 );
 
 export const getAutolinkedUrlSchemes: (a: GlobalState) => string[] = createSelector(
@@ -68,7 +72,7 @@ export const getAutolinkedUrlSchemes: (a: GlobalState) => string[] = createSelec
             ...General.DEFAULT_AUTOLINKED_URL_SCHEMES,
             ...config.CustomUrlSchemes.split(','),
         ];
-    }
+    },
 );
 
 export const getServerVersion = (state: GlobalState): string => {

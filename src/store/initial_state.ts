@@ -53,6 +53,7 @@ const state: GlobalState = {
         posts: {
             expandedURLs: {},
             posts: {},
+            postsReplies: {},
             postsInChannel: {},
             postsInThread: {},
             pendingPostIds: [],
@@ -89,9 +90,6 @@ const state: GlobalState = {
             jobs: {},
             jobsByTypeList: {},
         },
-        alerts: {
-            alertStack: [],
-        },
         integrations: {
             incomingHooks: {},
             outgoingHooks: {},
@@ -112,6 +110,10 @@ const state: GlobalState = {
             current: {},
             recent: {},
             matches: {},
+            flagged: [],
+            pinned: {},
+            isSearchingTerm: false,
+            isSearchGettingMore: false,
         },
         typing: {},
         roles: {

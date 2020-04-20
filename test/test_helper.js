@@ -246,7 +246,7 @@ class TestHelper {
 
     fakeDmChannel = (userId, otherUserId) => {
         return {
-            name: `${userId}__${otherUserId}`,
+            name: userId > otherUserId ? otherUserId + '__' + userId : userId + '__' + otherUserId,
             team_id: '',
             display_name: `${otherUserId}`,
             type: 'D',

@@ -1,14 +1,20 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
 
-import * as reselect from 'reselect';
+import {createSelector} from 'reselect';
+
 import {General, Preferences} from '../../constants';
+
 import {getConfig, getLicense} from 'selectors/entities/general';
 import {getCurrentTeamId} from 'selectors/entities/teams';
+
+import {PreferencesType, PreferenceType} from 'types/preferences';
+import {UserProfile} from 'types/users';
+import {GlobalState} from 'types/store';
+import {$ID} from 'types/utilities';
+
 import {createShallowSelector} from 'utils/helpers';
 import {getPreferenceKey} from 'utils/preference_utils';
-import {GlobalState} from 'types/store';
-import {PreferencesType, PreferenceType} from 'types/preferences';
 
 export function getMyPreferences(state: GlobalState) {
     return state.entities.preferences.myPreferences;
@@ -35,8 +41,8 @@ export function getInt(state: GlobalState, category: string, name: string, defau
     return parseInt(value, 10);
 }
 
-export function makeGetCategory() {
-    return reselect.createSelector(
+export function makeGetCategory(): (state: GlobalState, category: string) => PreferenceType[] {
+    return createSelector(
         getMyPreferences,
         (state: GlobalState, category: string) => category,
         (preferences, category) => {
@@ -50,7 +56,7 @@ export function makeGetCategory() {
             }
 
             return prefsInCategory;
-        }
+        },
     );
 }
 
@@ -73,21 +79,21 @@ export function getFavoritesPreferences(state: GlobalState) {
     return favorites.filter((f) => f.value === 'true').map((f) => f.name);
 }
 
-export const getVisibleTeammate = reselect.createSelector(
+export const getVisibleTeammate: (state: GlobalState) => $ID<UserProfile>[] = createSelector(
     getDirectShowPreferences,
     (direct) => {
         return direct.filter((dm) => dm.value === 'true' && dm.name).map((dm) => dm.name);
-    }
+    },
 );
 
-export const getVisibleGroupIds = reselect.createSelector(
+export const getVisibleGroupIds: (state: GlobalState) => string[] = createSelector(
     getGroupShowPreferences,
     (groups) => {
         return groups.filter((dm) => dm.value === 'true' && dm.name).map((dm) => dm.name);
-    }
+    },
 );
 
-export const getTeammateNameDisplaySetting = reselect.createSelector(
+export const getTeammateNameDisplaySetting: (state: GlobalState) => string | undefined = createSelector(
     getConfig,
     getMyPreferences,
     getLicense,
@@ -100,10 +106,10 @@ export const getTeammateNameDisplaySetting = reselect.createSelector(
             return config.TeammateNameDisplay;
         }
         return General.TEAMMATE_NAME_DISPLAY.SHOW_USERNAME;
-    }
+    },
 );
 
-const getThemePreference = reselect.createSelector(
+const getThemePreference = createSelector(
     getMyPreferences,
     getCurrentTeamId,
     (myPreferences, currentTeamId) => {
@@ -119,10 +125,10 @@ const getThemePreference = reselect.createSelector(
         }
 
         return themePreference;
-    }
+    },
 );
 
-const getDefaultTheme = reselect.createSelector(getConfig, (config) => {
+const getDefaultTheme = createSelector(getConfig, (config) => {
     if (config.DefaultTheme) {
         const theme = Preferences.THEMES[config.DefaultTheme];
         if (theme) {
@@ -134,7 +140,7 @@ const getDefaultTheme = reselect.createSelector(getConfig, (config) => {
     return Preferences.THEMES.default;
 });
 
-export const getTheme = createShallowSelector(
+export const getTheme: (state: GlobalState) => any = createShallowSelector(
     getThemePreference,
     getDefaultTheme,
     (themePreference, defaultTheme) => {
@@ -177,34 +183,41 @@ export const getTheme = createShallowSelector(
         }
 
         return Object.assign({}, defaultTheme, theme);
-    }
+    },
 );
 
-export function makeGetStyleFromTheme() {
-    return reselect.createSelector(
+export function makeGetStyleFromTheme<Style>(): (state: GlobalState, getStyleFromTheme: (theme: any) => Style) => Style {
+    return createSelector(
         getTheme,
-        (state: GlobalState, getStyleFromTheme: Function) => getStyleFromTheme,
+        (state: GlobalState, getStyleFromTheme: (theme: any) => Style) => getStyleFromTheme,
         (theme, getStyleFromTheme) => {
             return getStyleFromTheme(theme);
-        }
+        },
     );
 }
 
-const defaultSidebarPrefs = {
+export type SidebarPreferences = {
+    grouping: 'by_type' | 'none';
+    unreads_at_top: 'true' | 'false';
+    favorite_at_top: 'true' | 'false';
+    sorting: 'alpha' | 'recent';
+}
+
+const defaultSidebarPrefs: SidebarPreferences = {
     grouping: 'by_type',
     unreads_at_top: 'true',
     favorite_at_top: 'true',
     sorting: 'alpha',
 };
 
-export const getSidebarPreferences = reselect.createSelector(
+export const getSidebarPreferences: (state: GlobalState) => SidebarPreferences = createSelector(
     (state: GlobalState) => {
         const config = getConfig(state);
         return config.ExperimentalGroupUnreadChannels !== General.DISABLED && getBool(
             state,
             Preferences.CATEGORY_SIDEBAR_SETTINGS,
             'show_unread_section',
-            config.ExperimentalGroupUnreadChannels === General.DEFAULT_ON
+            config.ExperimentalGroupUnreadChannels === General.DEFAULT_ON,
         );
     },
     (state) => {
@@ -212,7 +225,7 @@ export const getSidebarPreferences = reselect.createSelector(
             state,
             Preferences.CATEGORY_SIDEBAR_SETTINGS,
             '',
-            null
+            null,
         );
     },
     (showUnreadSection, sidebarPreference) => {
@@ -226,10 +239,10 @@ export const getSidebarPreferences = reselect.createSelector(
         }
 
         return sidebarPrefs;
-    }
+    },
 );
 
-export const getNewSidebarPreference = reselect.createSelector(
+export const getNewSidebarPreference: (state: GlobalState) => boolean = createSelector(
     (state: GlobalState) => {
         const config = getConfig(state);
         return config.ExperimentalChannelSidebarOrganization;
@@ -239,7 +252,7 @@ export const getNewSidebarPreference = reselect.createSelector(
             state,
             Preferences.CATEGORY_SIDEBAR_SETTINGS,
             Preferences.CHANNEL_SIDEBAR_ORGANIZATION,
-            null
+            null,
         );
     },
     (globalSetting, userSetting) => {
@@ -253,7 +266,7 @@ export const getNewSidebarPreference = reselect.createSelector(
         default:
             return false;
         }
-    }
+    },
 );
 
 export function shouldAutocloseDMs(state: GlobalState) {
