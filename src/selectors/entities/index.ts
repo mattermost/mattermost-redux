@@ -2,7 +2,6 @@
 // See LICENSE.txt for license information.
 
 import * as admin from './admin';
-import * as alerts from './alerts';
 import * as bots from './bots';
 import * as channels from './channels';
 import * as common from './common';
@@ -26,7 +25,6 @@ import * as users from './users';
 
 export {
     admin,
-    alerts,
     bots,
     channels,
     common,
