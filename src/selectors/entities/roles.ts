@@ -230,8 +230,8 @@ export const haveINoPermissionOnSysConsoleItem = createSelector(
     getMySystemPermissions,
     getPermissionsOnResource,
     (mySystemPermissions, permissionsOnResource) => {
-        const commonPermissions = Array.from(permissionsOnResource).filter((x) => mySystemPermissions.has(x));
         //go over the current user permissions on the resource and check if he has any permission
+        const commonPermissions = Array.from(permissionsOnResource).filter((x) => mySystemPermissions.has(x));
         return (commonPermissions.length === 0);
     },
 );
