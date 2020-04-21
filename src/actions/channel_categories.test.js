@@ -7,7 +7,7 @@ import {Sorting} from '../constants/channel_categories';
 
 import * as Actions from './channel_categories';
 
-describe('setChannelSorting', () => {
+describe('setCategorySorting', () => {
     test('should set sorting method correctly', async () => {
         const store = await configureStore({
             entities: {
