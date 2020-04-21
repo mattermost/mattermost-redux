@@ -7,6 +7,7 @@ export type SyncablePatch = {
 };
 export type GroupPatch = {
     allow_reference: boolean;
+    name: string;
 };
 
 export type Group = {
