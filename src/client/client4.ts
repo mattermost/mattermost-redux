@@ -3094,7 +3094,42 @@ export default class Client4 {
     };
 
     trackEvent(category: string, event: string, props?: any) {
-        // Temporary change to allow only certain events to reduce data rate - see MM-13062
+        const properties = Object.assign({
+            category,
+            type: event,
+            user_actual_role: this.userRoles && isSystemAdmin(this.userRoles) ? 'system_admin, system_user' : 'system_user',
+            user_actual_id: this.userId,
+        }, props);
+        const options = {
+            context: {
+                ip: '0.0.0.0',
+            },
+            page: {
+                path: '',
+                referrer: '',
+                search: '',
+                title: '',
+                url: '',
+            },
+            anonymousId: '00000000000000000000000000',
+        };
+
+        const globalAny: any = global;
+
+        if (globalAny && globalAny.window && globalAny.window.rudderanalytics) {
+            globalAny.window.rudderanalytics.track('event', properties, options);
+        } else if (globalAny && globalAny.rudderanalytics) {
+            if (globalAny.analytics_context) {
+                options.context = globalAny.analytics_context;
+            }
+
+            globalAny.rudderanalytics.track(Object.assign({
+                event: 'event',
+                userId: this.diagnosticId,
+            }, {properties}, options));
+        }
+
+        // Temporary change to allow only certain events to go to Segment to reduce data rate - see MM-13062
         // All events in 'admin' category are allowed, since they are low-volume
         if (category !== 'admin' && ![
             'api_posts_create',
@@ -3125,26 +3160,6 @@ export default class Client4 {
             return;
         }
 
-        const properties = Object.assign({
-            category,
-            type: event,
-            user_actual_role: this.userRoles && isSystemAdmin(this.userRoles) ? 'system_admin, system_user' : 'system_user',
-            user_actual_id: this.userId,
-        }, props);
-        const options = {
-            context: {
-                ip: '0.0.0.0',
-            },
-            page: {
-                path: '',
-                referrer: '',
-                search: '',
-                title: '',
-                url: '',
-            },
-            anonymousId: '00000000000000000000000000',
-        };
-        const globalAny: any = global;
         if (globalAny && globalAny.window && globalAny.window.analytics && globalAny.window.analytics.initialized) {
             globalAny.window.analytics.track('event', properties, options);
         } else if (globalAny && globalAny.analytics) {

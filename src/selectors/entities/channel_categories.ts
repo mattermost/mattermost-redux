@@ -49,11 +49,12 @@ export function makeGetCategoriesForTeam(): (state: GlobalState, teamId: string)
 export function makeGetUnsortedUnfilteredChannels(): (state: GlobalState, teamId: string) => Channel[] {
     return createSelector(
         (state: GlobalState) => state.entities.channels.channels,
+        getCurrentChannelId,
         getMyChannelMemberships,
         (state: GlobalState, teamId: string) => teamId,
-        (allChannels: IDMappedObjects<Channel>, myMembers: RelationOneToOne<Channel, ChannelMembership>, teamId: string) => {
+        (allChannels: IDMappedObjects<Channel>, currentChannelId: string, myMembers: RelationOneToOne<Channel, ChannelMembership>, teamId: string) => {
             return Object.values(allChannels).
-                filter((channel) => channel.delete_at === 0).
+                filter((channel) => channel.delete_at === 0 || channel.id === currentChannelId).
                 filter((channel) => channel.team_id === teamId || channel.team_id === '').
                 filter((channel) => myMembers.hasOwnProperty(channel.id));
         },
@@ -117,7 +118,7 @@ export function makeFilterAutoclosedDMs(getAutocloseCutoff = getDefaultAutoclose
         getCurrentUserId,
         getMyChannelMemberships,
         getLastPostPerChannel,
-        (channels, categoryType, myPreferences, autocloseDMs, currentChannelId, profiles, currentUserId, myChannelMembers, lastPosts) => {
+        (channels, categoryType, myPreferences, autocloseDMs, currentChannelId, profiles, currentUserId, myMembers, lastPosts) => {
             if (categoryType !== CategoryTypes.DIRECT_MESSAGES) {
                 // Only autoclose DMs that haven't been assigned to a category
                 return channels;
@@ -131,8 +132,13 @@ export function makeFilterAutoclosedDMs(getAutocloseCutoff = getDefaultAutoclose
                     return true;
                 }
 
-                // Unread channels will never be hidden
-                if (isUnreadChannel(myChannelMembers, channel)) {
+                if (isUnreadChannel(myMembers, channel)) {
+                    // Unread DMs/GMs are always visible
+                    return true;
+                }
+
+                if (currentChannelId === channel.id) {
+                    // The current channel is always visible
                     return true;
                 }
 
@@ -151,7 +157,7 @@ export function makeFilterAutoclosedDMs(getAutocloseCutoff = getDefaultAutoclose
 
                 // DMs with deactivated users will be visible if you're currently viewing them and they were opened
                 // since the user was deactivated
-                if (channel.type === General.DM_CHANNEL && channel.id !== currentChannelId) {
+                if (channel.type === General.DM_CHANNEL) {
                     const teammateId = getUserIdFromChannelName(currentUserId, channel.name);
                     const teammate = profiles[teammateId];
 
@@ -194,9 +200,10 @@ export function makeFilterManuallyClosedDMs(): (state: GlobalState, channels: Ch
     return createSelector(
         (state: GlobalState, channels: Channel[]) => channels,
         getMyPreferences,
+        getCurrentChannelId,
         getCurrentUserId,
         getMyChannelMemberships,
-        (channels, myPreferences, currentUserId, myMembers) => {
+        (channels, myPreferences, currentChannelId, currentUserId, myMembers) => {
             const filtered = channels.filter((channel) => {
                 let preference;
 
@@ -206,6 +213,11 @@ export function makeFilterManuallyClosedDMs(): (state: GlobalState, channels: Ch
 
                 if (isUnreadChannel(myMembers, channel)) {
                     // Unread DMs/GMs are always visible
+                    return true;
+                }
+
+                if (currentChannelId === channel.id) {
+                    // The current channel is always visible
                     return true;
                 }
 

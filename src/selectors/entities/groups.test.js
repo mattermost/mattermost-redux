@@ -140,4 +140,16 @@ describe('Selectors.Groups', () => {
         ];
         assert.deepEqual(Selectors.getAllAssociatedGroupsForReference(testState, channelID), expected);
     });
+
+    it('getCurrentUserGroupMentionKeys', () => {
+        const expected = [
+            {
+                key: `@${testState.entities.groups.groups[expectedAssociatedGroupID1].name}`,
+            },
+            {
+                key: `@${testState.entities.groups.groups[expectedAssociatedGroupID4].name}`,
+            },
+        ];
+        assert.deepEqual(Selectors.getCurrentUserGroupMentionKeys(testState), expected);
+    });
 });
