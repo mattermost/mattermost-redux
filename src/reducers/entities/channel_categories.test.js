@@ -22,8 +22,7 @@ describe('byId', () => {
         );
 
         expect(state['team1-favorites']).toBeDefined();
-        expect(state['team1-public']).toBeDefined();
-        expect(state['team1-private']).toBeDefined();
+        expect(state['team1-channels']).toBeDefined();
         expect(state['team1-direct_messages']).toBeDefined();
     });
 
@@ -42,12 +41,10 @@ describe('byId', () => {
         );
 
         expect(state['team1-favorites']).toBeDefined();
-        expect(state['team1-public']).toBeDefined();
-        expect(state['team1-private']).toBeDefined();
+        expect(state['team1-channels']).toBeDefined();
         expect(state['team1-direct_messages']).toBeDefined();
         expect(state['team2-favorites']).toBeDefined();
-        expect(state['team2-public']).toBeDefined();
-        expect(state['team2-private']).toBeDefined();
+        expect(state['team2-channels']).toBeDefined();
         expect(state['team2-direct_messages']).toBeDefined();
     });
 
@@ -96,8 +93,7 @@ describe('orderByTeam', () => {
         expect(state).toEqual({
             team1: [
                 'team1-favorites',
-                'team1-public',
-                'team1-private',
+                'team1-channels',
                 'team1-direct_messages',
             ],
         });
@@ -120,14 +116,12 @@ describe('orderByTeam', () => {
         expect(state).toEqual({
             team1: [
                 'team1-favorites',
-                'team1-public',
-                'team1-private',
+                'team1-channels',
                 'team1-direct_messages',
             ],
             team2: [
                 'team2-favorites',
-                'team2-public',
-                'team2-private',
+                'team2-channels',
                 'team2-direct_messages',
             ],
         });

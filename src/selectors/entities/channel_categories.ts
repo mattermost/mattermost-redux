@@ -7,7 +7,7 @@ import shallowEquals from 'shallow-equals';
 import {General, Preferences} from '../../constants';
 import {CategoryTypes, Sorting} from '../../constants/channel_categories';
 
-import {getCurrentChannelId, getMyChannelMemberships, canManageAnyChannelMembersInCurrentTeam} from 'selectors/entities/channels';
+import {getCurrentChannelId, getMyChannelMemberships, makeGetChannelsForIds} from 'selectors/entities/channels';
 import {getCurrentUserLocale} from 'selectors/entities/i18n';
 import {getLastPostPerChannel} from 'selectors/entities/posts';
 import {getMyPreferences, getTeammateNameDisplaySetting, shouldAutocloseDMs} from 'selectors/entities/preferences';
@@ -22,11 +22,14 @@ import {IDMappedObjects, RelationOneToOne} from 'types/utilities';
 import {
     getUserIdFromChannelName,
     isChannelMuted,
-    isFavoriteChannel,
     isUnreadChannel,
 } from 'utils/channel_utils';
 import {getPreferenceKey} from 'utils/preference_utils';
 import {displayUsername} from 'utils/user_utils';
+
+export function getCategory(state: GlobalState, categoryId: string) {
+    return state.entities.channelCategories.byId[categoryId];
+}
 
 export function getCategoryIdsForTeam(state: GlobalState, teamId: string): string[] | undefined {
     return state.entities.channelCategories.orderByTeam[teamId];
@@ -46,57 +49,14 @@ export function makeGetCategoriesForTeam(): (state: GlobalState, teamId: string)
     );
 }
 
-export function makeGetUnsortedUnfilteredChannels(): (state: GlobalState, teamId: string) => Channel[] {
+// makeFilterArchivedChannels returns a selector that filters a given list of channels based on whether or not the channel
+// is archived or is currently being viewed. The selector returns the original array if no channels are filtered out.
+export function makeFilterArchivedChannels(): (state: GlobalState, channels: Channel[]) => Channel[] {
     return createSelector(
-        (state: GlobalState) => state.entities.channels.channels,
+        (state: GlobalState, channels: Channel[]) => channels,
         getCurrentChannelId,
-        getMyChannelMemberships,
-        (state: GlobalState, teamId: string) => teamId,
-        (allChannels: IDMappedObjects<Channel>, currentChannelId: string, myMembers: RelationOneToOne<Channel, ChannelMembership>, teamId: string) => {
-            return Object.values(allChannels).
-                filter((channel) => channel.delete_at === 0 || channel.id === currentChannelId).
-                filter((channel) => channel.team_id === teamId || channel.team_id === '').
-                filter((channel) => myMembers.hasOwnProperty(channel.id));
-        },
-    );
-}
-
-export function makeFilterChannelsByFavorites(): (state: GlobalState, channels: Channel[], categoryType: string) => Channel[] {
-    return createSelector(
-        (state: GlobalState, channels: Channel[]) => channels,
-        (state: GlobalState, channels: Channel[], categoryType: string) => categoryType,
-        getMyPreferences,
-        (channels, categoryType, myPreferences) => {
-            const filtered = channels.filter((channel) => {
-                if (categoryType === CategoryTypes.FAVORITES) {
-                    return isFavoriteChannel(myPreferences, channel.id);
-                }
-
-                return !isFavoriteChannel(myPreferences, channel.id);
-            });
-
-            return filtered.length === channels.length ? channels : filtered;
-        },
-    );
-}
-
-export function makeFilterChannelsByType(): (state: GlobalState, channels: Channel[], categoryType: string) => Channel[] {
-    // This doesn't need to be a selector, but make it as one to keep it consistent
-    return createSelector(
-        (state: GlobalState, channels: Channel[]) => channels,
-        (state: GlobalState, channels: Channel[], categoryType: string) => categoryType,
-        (channels, categoryType) => {
-            const filtered = channels.filter((channel) => {
-                if (categoryType === CategoryTypes.PUBLIC) {
-                    return channel.type === General.OPEN_CHANNEL;
-                } else if (categoryType === CategoryTypes.PRIVATE) {
-                    return channel.type === General.PRIVATE_CHANNEL;
-                } else if (categoryType === CategoryTypes.DIRECT_MESSAGES) {
-                    return channel.type === General.DM_CHANNEL || channel.type === General.GM_CHANNEL;
-                }
-
-                return true;
-            });
+        (channels: Channel[], currentChannelId: string) => {
+            const filtered = channels.filter((channel) => channel.id === currentChannelId || channel.delete_at === 0);
 
             return filtered.length === channels.length ? channels : filtered;
         },
@@ -107,6 +67,10 @@ function getDefaultAutocloseCutoff() {
     return Date.now() - 7 * 24 * 60 * 60 * 1000;
 }
 
+// makeFilterAutoclosedDMs returns a selector that filters a given list of channels based on whether or not the channel has
+// been autoclosed by either being an inactive DM/GM or a DM with a deactivated user. The exact requirements for being
+// inactive are complicated, but they are intended to include the channel not having been opened, posted in, or viewed
+// recently. The selector returns the original array if no channels are filtered out.
 export function makeFilterAutoclosedDMs(getAutocloseCutoff = getDefaultAutocloseCutoff): (state: GlobalState, channels: Channel[], categoryType: string) => Channel[] {
     return createSelector(
         (state: GlobalState, channels: Channel[]) => channels,
@@ -359,14 +323,17 @@ export function makeSortChannels() {
     return (state: GlobalState, originalChannels: Channel[], category: ChannelCategory) => {
         let channels = originalChannels;
 
-        // This doesn't support manually sorting channels yet and defaults that to alphabetical sorting
+        // While this function isn't memoized, sortChannelsByX should be since they know what parts of state
+        // will affect sort order.
 
         if (category.sorting === Sorting.RECENCY) {
             channels = sortChannelsByRecency(state, channels);
-        } else if (channels.some((channel) => channel.type === General.DM_CHANNEL || channel.type === General.GM_CHANNEL)) {
-            channels = sortChannelsByNameWithDMs(state, channels);
-        } else {
-            channels = sortChannelsByName(state, channels);
+        } else if (category.sorting === Sorting.ALPHABETICAL) {
+            if (channels.some((channel) => channel.type === General.DM_CHANNEL || channel.type === General.GM_CHANNEL)) {
+                channels = sortChannelsByNameWithDMs(state, channels);
+            } else {
+                channels = sortChannelsByName(state, channels);
+            }
         }
 
         return channels;
@@ -374,19 +341,20 @@ export function makeSortChannels() {
 }
 
 export function makeGetChannelsForCategory() {
-    const getUnsortedUnfilteredChannels = makeGetUnsortedUnfilteredChannels();
+    const getChannels = makeGetChannelsForIds();
     const filterAndSortChannelsForCategory = makeFilterAndSortChannelsForCategory();
 
     return (state: GlobalState, category: ChannelCategory) => {
-        const channels = getUnsortedUnfilteredChannels(state, category.team_id);
+        const channels = getChannels(state, category.channel_ids);
 
         return filterAndSortChannelsForCategory(state, channels, category);
     };
 }
 
+// Returns a selector that takes an array of channels and the category they belong to and returns the array sorted and
+// with inactive DMs/GMs and archived channels filtered out.
 export function makeFilterAndSortChannelsForCategory() {
-    const filterChannelsByFavorites = makeFilterChannelsByFavorites();
-    const filterChannelsByType = makeFilterChannelsByType();
+    const filterArchivedChannels = makeFilterArchivedChannels();
 
     const filterAutoclosedDMs = makeFilterAutoclosedDMs();
     const filterManuallyClosedDMs = makeFilterManuallyClosedDMs();
@@ -396,8 +364,7 @@ export function makeFilterAndSortChannelsForCategory() {
     return (state: GlobalState, originalChannels: Channel[], category: ChannelCategory) => {
         let channels = originalChannels;
 
-        channels = filterChannelsByFavorites(state, channels, category.type);
-        channels = filterChannelsByType(state, channels, category.type);
+        channels = filterArchivedChannels(state, channels);
 
         channels = filterAutoclosedDMs(state, channels, category.type);
         channels = filterManuallyClosedDMs(state, channels);
@@ -410,10 +377,9 @@ export function makeFilterAndSortChannelsForCategory() {
 
 export function makeGetChannelsByCategory() {
     const getCategoriesForTeam = makeGetCategoriesForTeam();
-    const getUnsortedUnfilteredChannels = makeGetUnsortedUnfilteredChannels();
 
-    // Memoize filterAndSortChannels by category. As long as the categories don't change, we can keep using the same
-    // selector for each category.
+    // Memoize by category. As long as the categories don't change, we can keep using the same selectors for each category.
+    let getChannels: RelationOneToOne<ChannelCategory, ReturnType<typeof makeGetChannelsForIds>>;
     let filterAndSortChannels: RelationOneToOne<ChannelCategory, ReturnType<typeof makeFilterAndSortChannelsForCategory>>;
 
     let lastCategoryIds: ReturnType<typeof getCategoryIdsForTeam> = [];
@@ -429,21 +395,23 @@ export function makeGetChannelsByCategory() {
             lastCategoryIds = categoryIds;
             lastChannelsByCategory = {};
 
+            getChannels = {};
             filterAndSortChannels = {};
 
             if (categoryIds) {
                 for (const categoryId of categoryIds) {
+                    getChannels[categoryId] = makeGetChannelsForIds();
                     filterAndSortChannels[categoryId] = makeFilterAndSortChannelsForCategory();
                 }
             }
         }
 
         const categories = getCategoriesForTeam(state, teamId);
-        const channels = getUnsortedUnfilteredChannels(state, teamId);
 
         const channelsByCategory: RelationOneToOne<ChannelCategory, Channel[]> = {};
 
         for (const category of categories) {
+            const channels = getChannels[category.id](state, category.channel_ids);
             channelsByCategory[category.id] = filterAndSortChannels[category.id](state, channels, category);
         }
 

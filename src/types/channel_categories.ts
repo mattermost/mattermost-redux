@@ -1,10 +1,12 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
 
-import {$ID, IDMappedObjects, RelationOneToOne} from './utilities';
+import {Channel} from './channels';
 import {Team} from './teams';
+import {$ID, IDMappedObjects, RelationOneToOne} from './utilities';
 
-export type ChannelCategoryType = 'favorites' | 'public' | 'private' | 'direct_messages' | 'custom';
+// TODO update values to match the ones used by the server code
+export type ChannelCategoryType = 'favorites' | 'channels' | 'direct_messages' | 'custom';
 
 export type CategorySorting = 'alphabetical' | 'recency' | '';
 
@@ -14,9 +16,7 @@ export type ChannelCategory = {
     type: ChannelCategoryType;
     display_name: string;
     sorting: CategorySorting;
-
-    // This will be added in phase 2 of Channel Sidebar Organization once the server provides the categories
-    // channel_ids: $ID<Channel>;
+    channel_ids: $ID<Channel>[];
 };
 
 export type ChannelCategoriesState = {

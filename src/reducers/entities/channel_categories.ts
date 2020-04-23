@@ -163,20 +163,15 @@ function makeDefaultCategories(teamId: string): IDMappedObjects<ChannelCategory>
             type: CategoryTypes.FAVORITES,
             display_name: 'Favorites',
             sorting: Sorting.NONE,
+            channel_ids: [],
         },
-        [`${teamId}-public`]: {
-            id: `${teamId}-public`,
+        [`${teamId}-channels`]: {
+            id: `${teamId}-channels`,
             team_id: teamId,
-            type: CategoryTypes.PUBLIC,
-            display_name: 'Public',
+            type: CategoryTypes.CHANNELS,
+            display_name: 'Channels',
             sorting: Sorting.NONE,
-        },
-        [`${teamId}-private`]: {
-            id: `${teamId}-private`,
-            team_id: teamId,
-            type: CategoryTypes.PRIVATE,
-            display_name: 'Private',
-            sorting: Sorting.NONE,
+            channel_ids: [],
         },
         [`${teamId}-direct_messages`]: {
             id: `${teamId}-direct_messages`,
@@ -184,6 +179,7 @@ function makeDefaultCategories(teamId: string): IDMappedObjects<ChannelCategory>
             type: CategoryTypes.DIRECT_MESSAGES,
             display_name: 'Direct Messages',
             sorting: Sorting.ALPHABETICAL,
+            channel_ids: [],
         },
     };
 }
