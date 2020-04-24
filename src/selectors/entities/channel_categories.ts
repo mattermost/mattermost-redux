@@ -5,9 +5,9 @@ import {createSelector} from 'reselect';
 import shallowEquals from 'shallow-equals';
 
 import {General, Preferences} from '../../constants';
-import {CategoryTypes} from '../../constants/channel_categories';
+import {CategoryTypes, Sorting} from '../../constants/channel_categories';
 
-import {getCurrentChannelId, getMyChannelMemberships} from 'selectors/entities/channels';
+import {getCurrentChannelId, getMyChannelMemberships, canManageAnyChannelMembersInCurrentTeam} from 'selectors/entities/channels';
 import {getCurrentUserLocale} from 'selectors/entities/i18n';
 import {getLastPostPerChannel} from 'selectors/entities/posts';
 import {getMyPreferences, getTeammateNameDisplaySetting, shouldAutocloseDMs} from 'selectors/entities/preferences';
@@ -325,6 +325,54 @@ export function makeSortChannelsByNameWithDMs(): (state: GlobalState, channels: 
     );
 }
 
+export function makeSortChannelsByRecency(): (state: GlobalState, channels: Channel[]) => Channel[] {
+    return createSelector(
+        (state: GlobalState, channels: Channel[]) => channels,
+        getLastPostPerChannel,
+        (channels, lastPosts) => {
+            return [...channels].sort((a, b) => {
+                // If available, get the last post time from the loaded posts for the channel, but fall back to the
+                // channel's last_post_at if that's not available. The last post time from the loaded posts is more
+                // accurate because channel.last_post_at is not updated on the client as new messages come in.
+
+                let aLastPostAt = a.last_post_at;
+                if (lastPosts[a.id] && lastPosts[a.id].create_at > a.last_post_at) {
+                    aLastPostAt = lastPosts[a.id].create_at;
+                }
+
+                let bLastPostAt = b.last_post_at;
+                if (lastPosts[b.id] && lastPosts[b.id].create_at > b.last_post_at) {
+                    bLastPostAt = lastPosts[b.id].create_at;
+                }
+
+                return bLastPostAt - aLastPostAt;
+            });
+        },
+    );
+}
+
+export function makeSortChannels() {
+    const sortChannelsByName = makeSortChannelsByName();
+    const sortChannelsByNameWithDMs = makeSortChannelsByNameWithDMs();
+    const sortChannelsByRecency = makeSortChannelsByRecency();
+
+    return (state: GlobalState, originalChannels: Channel[], category: ChannelCategory) => {
+        let channels = originalChannels;
+
+        // This doesn't support manually sorting channels yet and defaults that to alphabetical sorting
+
+        if (category.sorting === Sorting.RECENCY) {
+            channels = sortChannelsByRecency(state, channels);
+        } else if (channels.some((channel) => channel.type === General.DM_CHANNEL || channel.type === General.GM_CHANNEL)) {
+            channels = sortChannelsByNameWithDMs(state, channels);
+        } else {
+            channels = sortChannelsByName(state, channels);
+        }
+
+        return channels;
+    };
+}
+
 export function makeGetChannelsForCategory() {
     const getUnsortedUnfilteredChannels = makeGetUnsortedUnfilteredChannels();
     const filterAndSortChannelsForCategory = makeFilterAndSortChannelsForCategory();
@@ -343,8 +391,7 @@ export function makeFilterAndSortChannelsForCategory() {
     const filterAutoclosedDMs = makeFilterAutoclosedDMs();
     const filterManuallyClosedDMs = makeFilterManuallyClosedDMs();
 
-    const sortChannelsByName = makeSortChannelsByName();
-    const sortChannelsByNameWithDMs = makeSortChannelsByNameWithDMs();
+    const sortChannels = makeSortChannels();
 
     return (state: GlobalState, originalChannels: Channel[], category: ChannelCategory) => {
         let channels = originalChannels;
@@ -355,11 +402,7 @@ export function makeFilterAndSortChannelsForCategory() {
         channels = filterAutoclosedDMs(state, channels, category.type);
         channels = filterManuallyClosedDMs(state, channels);
 
-        if (channels.some((channel) => channel.type === General.DM_CHANNEL || channel.type === General.GM_CHANNEL)) {
-            channels = sortChannelsByNameWithDMs(state, channels);
-        } else {
-            channels = sortChannelsByName(state, channels);
-        }
+        channels = sortChannels(state, channels, category);
 
         return channels;
     };

@@ -3,7 +3,7 @@
 
 import {combineReducers} from 'redux';
 
-import {CategoryTypes} from '../../constants/channel_categories';
+import {CategoryTypes, Sorting} from '../../constants/channel_categories';
 
 import {ChannelCategoryTypes, TeamTypes, UserTypes} from 'action_types';
 
@@ -48,14 +48,17 @@ export function byId(state: IDMappedObjects<ChannelCategory> = {}, action: Gener
     //         };
     //     }, state);
     // }
-    // case ChannelCategoryTypes.RECEIVED_CATEGORY: {
-    //     const category: ChannelCategory = action.data;
+    case ChannelCategoryTypes.RECEIVED_CATEGORY: {
+        const category: ChannelCategory = action.data;
 
-    //     return {
-    //         ...state,
-    //         [category.id]: category,
-    //     };
-    // }
+        return {
+            ...state,
+            [category.id]: {
+                ...state[category.id],
+                ...category,
+            },
+        };
+    }
 
     case TeamTypes.LEAVE_TEAM: {
         const team: Team = action.data;
@@ -159,24 +162,28 @@ function makeDefaultCategories(teamId: string): IDMappedObjects<ChannelCategory>
             team_id: teamId,
             type: CategoryTypes.FAVORITES,
             display_name: 'Favorites',
+            sorting: Sorting.NONE,
         },
         [`${teamId}-public`]: {
             id: `${teamId}-public`,
             team_id: teamId,
             type: CategoryTypes.PUBLIC,
             display_name: 'Public',
+            sorting: Sorting.NONE,
         },
         [`${teamId}-private`]: {
             id: `${teamId}-private`,
             team_id: teamId,
             type: CategoryTypes.PRIVATE,
             display_name: 'Private',
+            sorting: Sorting.NONE,
         },
         [`${teamId}-direct_messages`]: {
             id: `${teamId}-direct_messages`,
             team_id: teamId,
             type: CategoryTypes.DIRECT_MESSAGES,
             display_name: 'Direct Messages',
+            sorting: Sorting.ALPHABETICAL,
         },
     };
 }

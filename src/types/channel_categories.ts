@@ -6,11 +6,14 @@ import {Team} from './teams';
 
 export type ChannelCategoryType = 'favorites' | 'public' | 'private' | 'direct_messages' | 'custom';
 
+export type CategorySorting = 'alphabetical' | 'recency' | '';
+
 export type ChannelCategory = {
     id: string;
     team_id: $ID<Team>;
     type: ChannelCategoryType;
     display_name: string;
+    sorting: CategorySorting;
 
     // This will be added in phase 2 of Channel Sidebar Organization once the server provides the categories
     // channel_ids: $ID<Channel>;

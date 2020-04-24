@@ -2,7 +2,7 @@
 // See LICENSE.txt for license information.
 
 import {General, Preferences} from '../../constants';
-import {CategoryTypes} from '../../constants/channel_categories';
+import {CategoryTypes, Sorting} from '../../constants/channel_categories';
 
 import {getCurrentChannelId, getMyChannelMemberships} from 'selectors/entities/channels';
 import {getConfig} from 'selectors/entities/general';
@@ -1065,6 +1065,52 @@ describe('makeSortChannelsByNameWithDMs', () => {
     });
 });
 
+describe('makeSortChannelsByRecency', () => {
+    const channel1 = {id: 'channel1', display_name: 'Apple', last_post_at: 1000};
+    const channel2 = {id: 'channel2', display_name: 'Banana', last_post_at: 2000};
+    const channel3 = {id: 'channel3', display_name: 'Zucchini', last_post_at: 3000};
+
+    const baseState = {
+        entities: {
+            posts: {
+                posts: {},
+                postsInChannel: {},
+            },
+        },
+    };
+
+    test('should sort channels by their last_post_at when no posts are loaded', () => {
+        const sortChannelsByRecency = Selectors.makeSortChannelsByRecency();
+
+        const state = baseState;
+
+        expect(sortChannelsByRecency(state, [channel1, channel2, channel3])).toMatchObject([channel3, channel2, channel1]);
+        expect(sortChannelsByRecency(state, [channel3, channel2, channel1])).toMatchObject([channel3, channel2, channel1]);
+    });
+
+    test('should sort channels by their latest post when possible', () => {
+        const sortChannelsByRecency = Selectors.makeSortChannelsByRecency();
+
+        const state = mergeObjects(baseState, {
+            entities: {
+                posts: {
+                    posts: {
+                        post1: {id: 'post1', channel_id: 'channel1', create_at: 2500},
+                    },
+                    postsInChannel: {
+                        channel1: [
+                            {order: ['post1'], recent: true},
+                        ],
+                    },
+                },
+            },
+        });
+
+        expect(sortChannelsByRecency(state, [channel1, channel2, channel3])).toMatchObject([channel3, channel1, channel2]);
+        expect(sortChannelsByRecency(state, [channel3, channel2, channel1])).toMatchObject([channel3, channel1, channel2]);
+    });
+});
+
 describe('makeGetChannelsForCategory', () => {
     const currentUser = {id: 'currentUser', username: 'currentUser', first_name: 'Current', last_name: 'User', locale: 'en'};
     const otherUser1 = {id: 'otherUser1', username: 'otherUser1', first_name: 'Other', last_name: 'User', locale: 'en'};
@@ -1073,25 +1119,12 @@ describe('makeGetChannelsForCategory', () => {
     const channel1 = {id: 'channel1', type: General.OPEN_CHANNEL, team_id: 'team1', display_name: 'Zebra', delete_at: 0};
     const channel2 = {id: 'channel2', type: General.PRIVATE_CHANNEL, team_id: 'team1', display_name: 'Aardvark', delete_at: 0};
     const channel3 = {id: 'channel3', type: General.OPEN_CHANNEL, team_id: 'team1', display_name: 'Bear', delete_at: 0};
-    const dmChannel1 = {id: 'dmChannel1', type: General.DM_CHANNEL, team_id: '', display_name: '', name: `${currentUser.id}__${otherUser1.id}`, delete_at: 0};
+    const dmChannel1 = {id: 'dmChannel1', type: General.DM_CHANNEL, team_id: '', display_name: '', name: `${currentUser.id}__${otherUser1.id}`, delete_at: 0, last_post_at: 2000};
     const dmChannel2 = {id: 'dmChannel2', type: General.DM_CHANNEL, team_id: '', display_name: '', name: `${otherUser2.id}__${currentUser.id}`, delete_at: 0};
     const gmChannel1 = {id: 'gmChannel1', type: General.GM_CHANNEL, team_id: '', display_name: `${currentUser.username}, ${otherUser1.username}, ${otherUser2.username}`, name: 'gmChannel1', delete_at: 0};
 
-    const favoritesCategory = {id: 'favoritesCategory', team_id: 'team1', display_name: CategoryTypes.FAVORITES, type: CategoryTypes.FAVORITES};
-    const publicCategory = {id: 'publicCategory', team_id: 'team1', display_name: 'Public Channels', type: CategoryTypes.PUBLIC};
-    const privateCategory = {id: 'privateCategory', team_id: 'team1', display_name: 'Private Channels', type: CategoryTypes.PRIVATE};
-    const directMessagesCategory = {id: 'directMessagesCategory', team_id: 'team1', display_name: 'Direct Messages', type: CategoryTypes.DIRECT_MESSAGES};
-
-    const state = {
+    const baseState = {
         entities: {
-            channelCategories: {
-                byId: {
-                    favoritesCategory,
-                    publicCategory,
-                    privateCategory,
-                    directMessagesCategory,
-                },
-            },
             channels: {
                 channels: {
                     channel1,
@@ -1141,25 +1174,69 @@ describe('makeGetChannelsForCategory', () => {
     test('should return sorted and filtered channels for favorites category', () => {
         const getChannelsForCategory = Selectors.makeGetChannelsForCategory();
 
-        expect(getChannelsForCategory(state, favoritesCategory)).toMatchObject([dmChannel2, channel1]);
+        const favoritesCategory = {id: 'favoritesCategory', team_id: 'team1', display_name: CategoryTypes.FAVORITES, type: CategoryTypes.FAVORITES};
+
+        expect(getChannelsForCategory(baseState, favoritesCategory)).toMatchObject([dmChannel2, channel1]);
     });
 
     test('should return sorted and filtered channels for public category', () => {
         const getChannelsForCategory = Selectors.makeGetChannelsForCategory();
 
-        expect(getChannelsForCategory(state, publicCategory)).toMatchObject([channel3]);
+        const publicCategory = {id: 'publicCategory', team_id: 'team1', display_name: 'Public Channels', type: CategoryTypes.PUBLIC};
+
+        expect(getChannelsForCategory(baseState, publicCategory)).toMatchObject([channel3]);
     });
 
     test('should return sorted and filtered channels for private category', () => {
         const getChannelsForCategory = Selectors.makeGetChannelsForCategory();
 
-        expect(getChannelsForCategory(state, privateCategory)).toMatchObject([channel2]);
+        const privateCategory = {id: 'privateCategory', team_id: 'team1', display_name: 'Private Channels', type: CategoryTypes.PRIVATE};
+
+        expect(getChannelsForCategory(baseState, privateCategory)).toMatchObject([channel2]);
     });
 
     test('should return sorted and filtered channels for direct messages category', () => {
         const getChannelsForCategory = Selectors.makeGetChannelsForCategory();
 
-        expect(getChannelsForCategory(state, directMessagesCategory)).toMatchObject([gmChannel1, dmChannel1]);
+        const directMessagesCategory = {id: 'directMessagesCategory', team_id: 'team1', display_name: 'Direct Messages', type: CategoryTypes.DIRECT_MESSAGES};
+
+        expect(getChannelsForCategory(baseState, directMessagesCategory)).toMatchObject([gmChannel1, dmChannel1]);
+    });
+
+    test.only('should return sorted and filtered channels for direct messages category with recency sorting', () => {
+        const getChannelsForCategory = Selectors.makeGetChannelsForCategory();
+
+        const directMessagesCategory = {id: 'directMessagesCategory', team_id: 'team1', display_name: 'Direct Messages', type: CategoryTypes.DIRECT_MESSAGES, sorting: Sorting.RECENCY};
+
+        const otherUser3 = {id: 'otherUser3', username: 'otherUser3', first_name: 'Third', last_name: 'User', locale: 'en'};
+        const gmChannel2 = {id: 'gmChannel2', type: General.GM_CHANNEL, team_id: '', display_name: `${currentUser.username}, ${otherUser1.username}, ${otherUser3.username}`, name: 'gmChannel2', delete_at: 0, last_post_at: 2000};
+
+        const state = mergeObjects(baseState, {
+            entities: {
+                channels: {
+                    channels: {
+                        dmChannel1: {last_post_at: 3000},
+                        gmChannel1: {last_post_at: 1000},
+                        gmChannel2,
+                    },
+                    myMembers: {
+                        [gmChannel2.id]: {},
+                    },
+                },
+                preferences: {
+                    myPreferences: {
+                        [getPreferenceKey(Preferences.CATEGORY_GROUP_CHANNEL_SHOW, gmChannel2.id)]: {value: 'true'},
+                    },
+                },
+                users: {
+                    profiles: {
+                        otherUser3,
+                    },
+                },
+            },
+        });
+
+        expect(getChannelsForCategory(state, directMessagesCategory)).toMatchObject([{id: 'dmChannel1'}, {id: 'gmChannel2'}, {id: 'gmChannel1'}]);
     });
 });
 
