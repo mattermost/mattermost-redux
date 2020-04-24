@@ -30,7 +30,7 @@ import {
 } from 'selectors/entities/teams';
 import {isCurrentUserSystemAdmin, getCurrentUserId, getUserIdsInChannels} from 'selectors/entities/users';
 
-import {Channel, ChannelStats, ChannelMembership, ChannelModeration} from 'types/channels';
+import {Channel, ChannelStats, ChannelMembership, ChannelModeration, ChannelMemberCountsByGroup} from 'types/channels';
 import {Config} from 'types/config';
 import {Post} from 'types/posts';
 import {PreferenceType} from 'types/preferences';
@@ -1293,4 +1293,8 @@ export function isManuallyUnread(state: GlobalState, channelId?: string): boolea
 
 export function getChannelModerations(state: GlobalState, channelId: string): Array<ChannelModeration> {
     return state.entities.channels.channelModerations[channelId];
+}
+
+export function getChannelMemberCountsByGroup(state: GlobalState, channelId: string): ChannelMemberCountsByGroup {
+    return state.entities.channels.channelMemberCountsByGroup[channelId] || {};
 }

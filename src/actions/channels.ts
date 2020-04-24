@@ -1474,6 +1474,19 @@ export function patchChannelModerations(channelId: string, patch: Array<ChannelM
     });
 }
 
+export function getChannelMemberCountsByGroup(channelId: string, includeTimezones: boolean): ActionFunc {
+    return bindClientFunc({
+        clientFunc: async () => {
+            const channelMemberCountsByGroup = await Client4.getChannelMemberCountsByGroup(channelId, includeTimezones);
+            return {channelId, memberCounts: channelMemberCountsByGroup};
+        },
+        onSuccess: ChannelTypes.RECEIVED_CHANNEL_MEMBER_COUNTS_BY_GROUP,
+        params: [
+            channelId,
+        ],
+    });
+}
+
 export default {
     selectChannel,
     createChannel,
@@ -1508,4 +1521,5 @@ export default {
     unfavoriteChannel,
     membersMinusGroupMembers,
     getChannelModerations,
+    getChannelMemberCountsByGroup,
 };
