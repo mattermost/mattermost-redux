@@ -72,6 +72,8 @@ export default {
     USE_CHANNEL_MENTIONS: 'use_channel_mentions',
     USE_GROUP_MENTIONS: 'use_group_mentions',
 
+    READ_SETTINGS: 'read_settings',
+    WRITE_SETTINGS: 'write_settings',
     PERMISSION_READ_SYSCONSOLE_ABOUT: 'read_sysconsole_about',
     PERMISSION_WRITE_SYSCONSOLE_ABOUT: 'write_sysconsole_about',
     PERMISSION_READ_SYSCONSOLE_REPORTING: 'read_sysconsole_reporting',
