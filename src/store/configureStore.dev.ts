@@ -6,20 +6,7 @@ import * as redux from 'redux';
 import {createOfflineReducer, networkStatusChangedAction, offlineCompose} from 'redux-offline';
 import defaultOfflineConfig from 'redux-offline/lib/defaults';
 import reducerRegistry from './reducer_registry';
-import devTools from 'remote-redux-devtools';
 
-const windowAny = window as any;
-
-const devToolsEnhancer = typeof windowAny !== 'undefined' && windowAny.__REDUX_DEVTOOLS_EXTENSION__ ? // eslint-disable-line no-underscore-dangle
-    windowAny.__REDUX_DEVTOOLS_EXTENSION__ : // eslint-disable-line no-underscore-dangle
-    () => {
-        return devTools({
-            name: 'Mattermost',
-            hostname: 'localhost',
-            port: 5678,
-            realtime: true,
-        });
-    };
 import serviceReducer from '../reducers';
 import deepFreezeAndThrowOnMutation from 'utils/deep_freeze';
 import initialState from './initial_state';
@@ -43,14 +30,11 @@ export default function configureServiceStore(preloadedState: any, appReducer: a
     const baseOfflineConfig = Object.assign({}, defaultOfflineConfig, offlineConfig, userOfflineConfig);
     const baseState = Object.assign({}, initialState, preloadedState);
 
-    const loadReduxDevtools = process.env.NODE_ENV !== 'test'; //eslint-disable-line no-process-env
-
     const store = redux.createStore(
         createOfflineReducer(createDevReducer(baseState, serviceReducer, appReducer)),
         baseState,
         offlineCompose(baseOfflineConfig)(
             createMiddleware(clientOptions),
-            loadReduxDevtools ? [devToolsEnhancer()] : [],
         ),
     );
 

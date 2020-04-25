@@ -36,7 +36,6 @@
     "redux-persist": "4.9.1",
     "redux-persist-node-storage": "2.0.0",
     "redux-thunk": "2.3.0",
-    "remote-redux-devtools": "0.5.16",
     "reselect": "4.0.0",
     "serialize-error": "6.0.0",
     "shallow-equals": "1.0.0"
