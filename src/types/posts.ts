@@ -101,6 +101,7 @@ export type MessageHistory = {
 
 export type PostsState = {
     posts: IDMappedObjects<Post>;
+    postsReplies: {[x in $ID<Post>]: number};
     postsInChannel: Dictionary<Array<PostOrderBlock>>;
     postsInThread: RelationOneToMany<Post, Post>;
     reactions: RelationOneToOne<Post, Dictionary<Reaction>>;

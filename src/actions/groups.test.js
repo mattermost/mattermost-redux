@@ -293,14 +293,12 @@ describe('Actions.Groups', () => {
         assert.ok(syncables[groupID].channels.length === beforeChannelsLength - 1);
     });
 
-    it('getAllGroupsAssociatedToTeam', async () => {
-        const teamID = '5rgoajywb3nfbdtyafbod47ryb';
-
-        const response = {
+    it('getGroups', async () => {
+        const response1 = {
             groups: [
                 {
                     id: 'xh585kyz3tn55q6ipfo57btwnc',
-                    name: '9uobsi3xb3y5tfjb3ze7umnh1o',
+                    name: 'abc',
                     display_name: 'abc',
                     description: '',
                     source: 'ldap',
@@ -310,23 +308,11 @@ describe('Actions.Groups', () => {
                     delete_at: 0,
                     has_syncables: false,
                     member_count: 2,
-                },
-                {
-                    id: 'tnd8zod9f3fdtqosxjmhwucbth',
-                    name: 'nobctj4brfgtpj3a1peiyq47tc',
-                    display_name: 'engineering',
-                    description: '',
-                    source: 'ldap',
-                    remote_id: 'engineering',
-                    create_at: 1553808971099,
-                    update_at: 1553808971099,
-                    delete_at: 0,
-                    has_syncables: false,
-                    member_count: 8,
+                    allow_reference: true,
                 },
                 {
                     id: 'qhdp6g7aubbpiyja7c4sgpe7tc',
-                    name: 'x5bjwa4kwirpmqudhp5dterine',
+                    name: 'qa',
                     display_name: 'qa',
                     description: '',
                     source: 'ldap',
@@ -336,13 +322,82 @@ describe('Actions.Groups', () => {
                     delete_at: 0,
                     has_syncables: false,
                     member_count: 2,
+                    allow_reference: true,
+                },
+            ],
+            total_group_count: 2,
+        };
+
+        nock(Client4.getBaseRoute()).
+            get('/groups?filter_allow_reference=true').
+            reply(200, response1.groups);
+
+        await Actions.getGroups(true)(store.dispatch, store.getState);
+
+        const state = store.getState();
+
+        const groups = state.entities.groups.groups;
+        assert.ok(groups);
+        assert.strictEqual(response1.length, groups.length);
+        for (const id of Object.keys(groups)) {
+            const index = Object.keys(groups).indexOf(id);
+            assert.ok(JSON.stringify(groups[id]) === JSON.stringify(response1.groups[index]));
+        }
+    });
+
+    it('getAllGroupsAssociatedToTeam', async () => {
+        const teamID = '5rgoajywb3nfbdtyafbod47ryb';
+
+        const response = {
+            groups: [
+                {
+                    id: 'xh585kyz3tn55q6ipfo57btwnc',
+                    name: 'abc',
+                    display_name: 'abc',
+                    description: '',
+                    source: 'ldap',
+                    remote_id: 'abc',
+                    create_at: 1553808969975,
+                    update_at: 1553808969975,
+                    delete_at: 0,
+                    has_syncables: false,
+                    member_count: 2,
+                    allow_reference: false,
+                },
+                {
+                    id: 'tnd8zod9f3fdtqosxjmhwucbth',
+                    name: 'software-engineering',
+                    display_name: 'software engineering',
+                    description: '',
+                    source: 'ldap',
+                    remote_id: 'engineering',
+                    create_at: 1553808971099,
+                    update_at: 1553808971099,
+                    delete_at: 0,
+                    has_syncables: false,
+                    member_count: 8,
+                    allow_reference: false,
+                },
+                {
+                    id: 'qhdp6g7aubbpiyja7c4sgpe7tc',
+                    name: 'qa',
+                    display_name: 'qa',
+                    description: '',
+                    source: 'ldap',
+                    remote_id: 'qa',
+                    create_at: 1553808971548,
+                    update_at: 1553808971548,
+                    delete_at: 0,
+                    has_syncables: false,
+                    member_count: 2,
+                    allow_reference: false,
                 },
             ],
             total_group_count: 3,
         };
 
         nock(Client4.getBaseRoute()).
-            get(`/teams/${teamID}/groups?paginate=false`).
+            get(`/teams/${teamID}/groups?paginate=false&filter_allow_reference=false`).
             reply(200, response);
 
         await Actions.getAllGroupsAssociatedToTeam(teamID)(store.dispatch, store.getState);
@@ -359,22 +414,12 @@ describe('Actions.Groups', () => {
     it('getGroupsAssociatedToTeam', async () => {
         const teamID = '5rgoajywb3nfbdtyafbod47ryb';
 
-        store = await configureStore({
-            entities: {
-                teams: {
-                    groupsAssociatedToTeam: {
-                        [teamID]: ['tnd8zod9f3fdtqosxjmhwucbth', 'qhdp6g7aubbpiyja7c4sgpe7tc'],
-                    },
-                },
-            },
-        });
-
         const response = {
             groups: [
                 {
                     id: 'tnd8zod9f3fdtqosxjmhwucbth',
-                    name: 'nobctj4brfgtpj3a1peiyq47tc',
-                    display_name: 'engineering',
+                    name: 'software-engineering',
+                    display_name: 'software engineering',
                     description: '',
                     source: 'ldap',
                     remote_id: 'engineering',
@@ -383,10 +428,11 @@ describe('Actions.Groups', () => {
                     delete_at: 0,
                     has_syncables: false,
                     member_count: 8,
+                    allow_reference: true,
                 },
                 {
                     id: 'qhdp6g7aubbpiyja7c4sgpe7tc',
-                    name: 'x5bjwa4kwirpmqudhp5dterine',
+                    name: 'qa',
                     display_name: 'qa',
                     description: '',
                     source: 'ldap',
@@ -396,13 +442,14 @@ describe('Actions.Groups', () => {
                     delete_at: 0,
                     has_syncables: false,
                     member_count: 2,
+                    allow_reference: false,
                 },
             ],
             total_group_count: 3,
         };
 
         nock(Client4.getBaseRoute()).
-            get(`/teams/${teamID}/groups?page=100&per_page=60&q=0&include_member_count=true`).
+            get(`/teams/${teamID}/groups?page=100&per_page=60&q=0&include_member_count=true&filter_allow_reference=false`).
             reply(200, response);
 
         await Actions.getGroupsAssociatedToTeam(teamID, 0, 100)(store.dispatch, store.getState);
@@ -437,8 +484,8 @@ describe('Actions.Groups', () => {
         const response = [
             {
                 id: 'existing1',
-                name: 'nobctj4brfgtpj3a1peiyq47tc',
-                display_name: 'engineering',
+                name: 'software-engineering',
+                display_name: 'software engineering',
                 description: '',
                 source: 'ldap',
                 remote_id: 'engineering',
@@ -472,7 +519,7 @@ describe('Actions.Groups', () => {
             groups: [
                 {
                     id: 'xh585kyz3tn55q6ipfo57btwnc',
-                    name: '9uobsi3xb3y5tfjb3ze7umnh1o',
+                    name: 'abc',
                     display_name: 'abc',
                     description: '',
                     source: 'ldap',
@@ -485,8 +532,8 @@ describe('Actions.Groups', () => {
                 },
                 {
                     id: 'tnd8zod9f3fdtqosxjmhwucbth',
-                    name: 'nobctj4brfgtpj3a1peiyq47tc',
-                    display_name: 'engineering',
+                    name: 'software-engineering',
+                    display_name: 'software engineering',
                     description: '',
                     source: 'ldap',
                     remote_id: 'engineering',
@@ -498,7 +545,7 @@ describe('Actions.Groups', () => {
                 },
                 {
                     id: 'qhdp6g7aubbpiyja7c4sgpe7tc',
-                    name: 'x5bjwa4kwirpmqudhp5dterine',
+                    name: 'qa',
                     display_name: 'qa',
                     description: '',
                     source: 'ldap',
@@ -514,7 +561,7 @@ describe('Actions.Groups', () => {
         };
 
         nock(Client4.getBaseRoute()).
-            get(`/channels/${channelID}/groups?paginate=false`).
+            get(`/channels/${channelID}/groups?paginate=false&filter_allow_reference=false`).
             reply(200, response);
 
         await Actions.getAllGroupsAssociatedToChannel(channelID)(store.dispatch, store.getState);
@@ -528,25 +575,126 @@ describe('Actions.Groups', () => {
         });
     });
 
+    it('getAllGroupsAssociatedToChannelsInTeam', async () => {
+        const teamID = 'ge63nq31sbfy3duzq5f7yqn1kh';
+        const channelID1 = '5rgoajywb3nfbdtyafbod47ryb';
+        const channelID2 = 'o3tdawqxot8kikzq8bk54zggbc';
+
+        const response1 = {
+            groups: {
+                '5rgoajywb3nfbdtyafbod47ryb':
+                [
+                    {
+                        id: 'xh585kyz3tn55q6ipfo57btwnc',
+                        name: 'abc',
+                        display_name: 'abc',
+                        description: '',
+                        source: 'ldap',
+                        remote_id: 'abc',
+                        create_at: 1553808969975,
+                        update_at: 1553808969975,
+                        delete_at: 0,
+                        has_syncables: false,
+                        member_count: 2,
+                        allow_reference: true,
+                    },
+                    {
+                        id: 'tnd8zod9f3fdtqosxjmhwucbth',
+                        name: 'abc',
+                        display_name: 'software engineering',
+                        description: '',
+                        source: 'ldap',
+                        remote_id: 'engineering',
+                        create_at: 1553808971099,
+                        update_at: 1553808971099,
+                        delete_at: 0,
+                        has_syncables: false,
+                        member_count: 8,
+                        allow_reference: false,
+                    },
+                ],
+                o3tdawqxot8kikzq8bk54zggbc:
+                [
+                    {
+                        id: 'qhdp6g7aubbpiyja7c4sgpe7tc',
+                        name: 'qa',
+                        display_name: 'qa',
+                        description: '',
+                        source: 'ldap',
+                        remote_id: 'qa',
+                        create_at: 1553808971548,
+                        update_at: 1553808971548,
+                        delete_at: 0,
+                        has_syncables: false,
+                        member_count: 2,
+                        allow_reference: false,
+                    },
+                ],
+            },
+            total_group_count: 3,
+        };
+
+        const response2 = {
+            groups: {
+                '5rgoajywb3nfbdtyafbod47ryb':
+                [
+                    {
+                        id: 'xh585kyz3tn55q6ipfo57btwnc',
+                        name: 'abc',
+                        display_name: 'abc',
+                        description: '',
+                        source: 'ldap',
+                        remote_id: 'abc',
+                        create_at: 1553808969975,
+                        update_at: 1553808969975,
+                        delete_at: 0,
+                        has_syncables: false,
+                        member_count: 2,
+                        allow_reference: true,
+                    },
+                ],
+            },
+            total_group_count: 1,
+        };
+
+        nock(Client4.getBaseRoute()).
+            get(`/teams/${teamID}/groups_by_channels?paginate=false&filter_allow_reference=false`).
+            reply(200, response1);
+
+        nock(Client4.getBaseRoute()).
+            get(`/teams/${teamID}/groups_by_channels?paginate=false&filter_allow_reference=true`).
+            reply(200, response2);
+
+        await Actions.getAllGroupsAssociatedToChannelsInTeam(teamID, false)(store.dispatch, store.getState);
+
+        let state = store.getState();
+
+        let groupIDs = state.entities.channels.groupsAssociatedToChannel[channelID1].ids;
+        assert.strictEqual(groupIDs.length, response1.groups[channelID1].length);
+        groupIDs.forEach((id) => {
+            assert.ok(response1.groups[channelID1].map((group) => group.id).includes(id));
+        });
+
+        await Actions.getAllGroupsAssociatedToChannelsInTeam(teamID, true)(store.dispatch, store.getState);
+
+        state = store.getState();
+
+        groupIDs = state.entities.channels.groupsAssociatedToChannel[channelID1].ids;
+        assert.strictEqual(groupIDs.length, response2.groups[channelID1].length);
+        groupIDs.forEach((id) => {
+            assert.ok(response2.groups[channelID1].map((group) => group.id).includes(id));
+        });
+    });
+
     it('getGroupsAssociatedToChannel', async () => {
         const channelID = '5rgoajywb3nfbdtyafbod47ryb';
-
-        store = await configureStore({
-            entities: {
-                channels: {
-                    groupsAssociatedToChannel: {
-                        [channelID]: ['tnd8zod9f3fdtqosxjmhwucbth', 'qhdp6g7aubbpiyja7c4sgpe7tc'],
-                    },
-                },
-            },
-        });
 
         const response = {
             groups: [
                 {
                     id: 'tnd8zod9f3fdtqosxjmhwucbth',
-                    name: 'nobctj4brfgtpj3a1peiyq47tc',
-                    display_name: 'engineering',
+                    name: 'software-engineering',
+                    display_name: 'software engineering',
                     description: '',
                     source: 'ldap',
                     remote_id: 'engineering',
@@ -555,10 +703,11 @@ describe('Actions.Groups', () => {
                     delete_at: 0,
                     has_syncables: false,
                     member_count: 8,
+                    allow_reference: false,
                 },
                 {
                     id: 'qhdp6g7aubbpiyja7c4sgpe7tc',
-                    name: 'x5bjwa4kwirpmqudhp5dterine',
+                    name: 'qa',
                     display_name: 'qa',
                     description: '',
                     source: 'ldap',
@@ -568,13 +717,14 @@ describe('Actions.Groups', () => {
                     delete_at: 0,
                     has_syncables: false,
                     member_count: 2,
+                    allow_reference: true,
                 },
             ],
             total_group_count: 3,
         };
 
         nock(Client4.getBaseRoute()).
-            get(`/channels/${channelID}/groups?page=100&per_page=60&q=0&include_member_count=true`).
+            get(`/channels/${channelID}/groups?page=100&per_page=60&q=0&include_member_count=true&filter_allow_reference=false`).
             reply(200, response);
 
         await Actions.getGroupsAssociatedToChannel(channelID, 0, 100)(store.dispatch, store.getState);
@@ -609,8 +759,8 @@ describe('Actions.Groups', () => {
         const response = [
             {
                 id: 'existing1',
-                name: 'nobctj4brfgtpj3a1peiyq47tc',
-                display_name: 'engineering',
+                name: 'software-engineering',
+                display_name: 'software engineering',
                 description: '',
                 source: 'ldap',
                 remote_id: 'engineering',
@@ -688,6 +838,60 @@ describe('Actions.Groups', () => {
 
         assert.ok(groupSyncables.teams[0].scheme_admin === groupSyncablePatch.scheme_admin);
         assert.ok(groupSyncables.channels[0].scheme_admin === groupSyncablePatch.scheme_admin);
+    });
+
+    it('patchGroup', async () => {
+        const groupID = '5rgoajywb3nfbdtyafbod47rya';
+
+        const groupPatch = {
+            allow_reference: true,
+        };
+
+        const response = {
+            id: '5rgoajywb3nfbdtyafbod47rya',
+            name: 'Test-Group-0',
+            display_name: 'Test Group 0',
+            description: '',
+            type: 'ldap',
+            remote_id: '\\eb\\80\\94\\cd\\d4\\32\\7c\\45\\87\\79\\1b\\fe\\45\\d9\\ac\\7b',
+            create_at: 1542399032816,
+            update_at: 1542399032816,
+            delete_at: 0,
+            has_syncables: false,
+            allow_reference: true,
+        };
+
+        nock(Client4.getBaseRoute()).
+            put(`/groups/${groupID}/patch`).
+            reply(200, response);
+
+        await Actions.patchGroup(groupID, groupPatch)(store.dispatch, store.getState);
+
+        let state = store.getState();
+
+        let groups = state.entities.groups.groups;
+        assert.ok(groups);
+        assert.ok(groups[groupID]);
+        assert.ok(groups[groupID].allow_reference === groupPatch.allow_reference);
+        assert.ok(JSON.stringify(response) === JSON.stringify(groups[groupID]));
+
+        //with allow_reference=false
+        groupPatch.allow_reference = false;
+        response.allow_reference = false;
+
+        nock(Client4.getBaseRoute()).
+            put(`/groups/${groupID}/patch`).
+            reply(200, response);
+
+        await Actions.patchGroup(groupID, groupPatch)(store.dispatch, store.getState);
+
+        state = store.getState();
+
+        groups = state.entities.groups.groups;
+        assert.ok(groups);
+        assert.ok(groups[groupID]);
+        assert.ok(groups[groupID].allow_reference === groupPatch.allow_reference);
+        assert.ok(JSON.stringify(response) === JSON.stringify(groups[groupID]));
     });
 });
 

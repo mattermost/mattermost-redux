@@ -1,43 +1,46 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
 
-import * as reselect from 'reselect';
+import {createSelector} from 'reselect';
 
 import {getCurrentTeamId} from 'selectors/entities/teams';
-import * as types from 'types';
 
-export function getIncomingHooks(state: types.store.GlobalState) {
+import {OutgoingWebhook, Command} from 'types/integrations';
+import {GlobalState} from 'types/store';
+import {IDMappedObjects} from 'types/utilities';
+
+export function getIncomingHooks(state: GlobalState) {
     return state.entities.integrations.incomingHooks;
 }
 
-export function getOutgoingHooks(state: types.store.GlobalState) {
+export function getOutgoingHooks(state: GlobalState) {
     return state.entities.integrations.outgoingHooks;
 }
 
-export function getCommands(state: types.store.GlobalState) {
+export function getCommands(state: GlobalState) {
     return state.entities.integrations.commands;
 }
 
-export function getOAuthApps(state: types.store.GlobalState) {
+export function getOAuthApps(state: GlobalState) {
     return state.entities.integrations.oauthApps;
 }
 
-export function getSystemCommands(state: types.store.GlobalState) {
+export function getSystemCommands(state: GlobalState) {
     return state.entities.integrations.systemCommands;
 }
 
 /**
  * get outgoing hooks in current team
  */
-export const getOutgoingHooksInCurrentTeam = reselect.createSelector(
+export const getOutgoingHooksInCurrentTeam: (state: GlobalState) => OutgoingWebhook[] = createSelector(
     getCurrentTeamId,
     getOutgoingHooks,
     (teamId, hooks) => {
         return Object.values(hooks).filter((o) => o.team_id === teamId);
-    }
+    },
 );
 
-export const getAllCommands = reselect.createSelector(
+export const getAllCommands: (state: GlobalState) => IDMappedObjects<Command> = createSelector(
     getCommands,
     getSystemCommands,
     (commands, systemCommands) => {
@@ -45,15 +48,15 @@ export const getAllCommands = reselect.createSelector(
             ...commands,
             ...systemCommands,
         };
-    }
+    },
 );
 
-export const getAutocompleteCommandsList = reselect.createSelector(
+export const getAutocompleteCommandsList: (state: GlobalState) => Command[] = createSelector(
     getAllCommands,
     getCurrentTeamId,
     (commands, currentTeamId) => {
         return Object.values(commands).filter((command) => {
             return command && (!command.team_id || command.team_id === currentTeamId) && command.auto_complete;
         }).sort((a, b) => a.display_name.localeCompare(b.display_name));
-    }
+    },
 );

@@ -48,7 +48,7 @@ describe('Actions.Websocket', () => {
             'web',
             null,
             null,
-            MockWebSocket
+            MockWebSocket,
         ));
     });
 
@@ -142,7 +142,7 @@ describe('Actions.Websocket', () => {
             'web',
             null,
             null,
-            MockWebSocket
+            MockWebSocket,
         ));
 
         const channelId = TestHelper.basicChannel.id;
@@ -222,7 +222,7 @@ describe('Actions.Websocket', () => {
             'web',
             null,
             null,
-            MockWebSocket
+            MockWebSocket,
         ));
 
         mockServer.emit('message', JSON.stringify({
@@ -275,7 +275,7 @@ describe('Actions.Websocket', () => {
             'web',
             null,
             null,
-            MockWebSocket
+            MockWebSocket,
         ));
 
         mockServer.emit('message', JSON.stringify({
