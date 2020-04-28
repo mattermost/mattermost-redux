@@ -15,7 +15,6 @@ import integrations from './integrations';
 import emojis from './emojis';
 import gifs from './gifs';
 import admin from './admin';
-import alerts from './alerts';
 import jobs from './jobs';
 import search from './search';
 import roles from './roles';
@@ -37,7 +36,6 @@ export default combineReducers({
     emojis,
     gifs,
     admin,
-    alerts,
     jobs,
     search,
     roles,

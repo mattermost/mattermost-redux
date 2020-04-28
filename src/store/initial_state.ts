@@ -49,6 +49,7 @@ const state: GlobalState = {
             totalCount: 0,
             manuallyUnread: {},
             channelModerations: {},
+            channelMemberCountsByGroup: {},
         },
         posts: {
             expandedURLs: {},
@@ -89,9 +90,6 @@ const state: GlobalState = {
         jobs: {
             jobs: {},
             jobsByTypeList: {},
-        },
-        alerts: {
-            alertStack: [],
         },
         integrations: {
             incomingHooks: {},
