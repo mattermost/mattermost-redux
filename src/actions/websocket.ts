@@ -6,7 +6,7 @@ import websocketClient from '../client/websocket_client';
 
 import {ChannelTypes, GeneralTypes, EmojiTypes, PostTypes, PreferenceTypes, TeamTypes, UserTypes, RoleTypes, AdminTypes, IntegrationTypes} from 'action_types';
 import {General, WebsocketEvents, Preferences} from '../constants';
-import {getAllChannels, getChannel, getChannelsNameMapInTeam, getCurrentChannelId, getCurrentChannel, getMyChannelMember as getMyChannelMemberSelector, getRedirectChannelNameForTeam, getCurrentChannelStats, getMyChannels, getChannelMembersInChannels, isManuallyUnread, getKnownUsers} from 'selectors/entities/channels';
+import {getAllChannels, getChannel, getChannelsNameMapInTeam, getCurrentChannelId, getCurrentChannel, getMyChannelMember as getMyChannelMemberSelector, getRedirectChannelNameForTeam, getCurrentChannelStats, getMyChannels, getChannelMembersInChannels, isManuallyUnread} from 'selectors/entities/channels';
 import {getConfig} from 'selectors/entities/general';
 import {getAllPosts, getPost as getPostSelector} from 'selectors/entities/posts';
 import {getDirectShowPreferences} from 'selectors/entities/preferences';
@@ -22,7 +22,7 @@ import {ActionFunc, DispatchFunc, GetStateFunc, PlatformType, batchActions} from
 import {getTeam, getMyTeamUnreads, getMyTeams, getMyTeamMembers} from './teams';
 import {getPost, getPosts, getProfilesAndStatusesForPosts, getCustomEmojiForReaction, getUnreadPostData, handleNewPost, postDeleted, receivedPost} from './posts';
 import {fetchMyChannelsAndMembers, getChannelAndMyMember, getChannelStats, markChannelAsRead, getMyChannelMember} from './channels';
-import {checkForModifiedUsers, getMe, getProfilesByIds, getStatusesByIds, loadProfilesForDirect} from './users';
+import {checkForModifiedUsers, getMe, getProfilesByIds, getStatusesByIds, loadProfilesForDirect, getKnownUsers} from './users';
 import {loadRolesIfNeeded} from './roles';
 import {Channel, ChannelMembership} from 'types/channels';
 import {Dictionary} from 'types/utilities';
@@ -960,7 +960,15 @@ export function userTyping(channelId: string, parentPostId: string): ActionFunc 
 export function removeNotVisibleUsers(): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         const state = getState();
-        const knownUsers = getKnownUsers(state);
+        let knownUsers: Set<string>;
+        try {
+            const fetchResult = await dispatch(getKnownUsers());
+            knownUsers = new Set((fetchResult as any).data);
+        } catch (err) {
+            return {error: err};
+        }
+        knownUsers.add(getCurrentUserId(state));
+
         const allUsers = Object.keys(getUsers(state));
         const usersToRemove = new Set(allUsers.filter((x) => !knownUsers.has(x)));
 
