@@ -150,6 +150,7 @@ export function filterProfilesMatchingTerm(users: Array<UserProfile>, term: stri
         const full = first + ' ' + last;
         profileSuggestions.push(first, last, full);
         profileSuggestions.push((user.nickname || '').toLowerCase());
+        profileSuggestions.push((user.position || '').toLowerCase());
         const email = (user.email || '').toLowerCase();
         profileSuggestions.push(email);
 

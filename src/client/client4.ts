@@ -1552,6 +1552,13 @@ export default class Client4 {
         );
     };
 
+    getChannelMemberCountsByGroup = async (channelId: string, includeTimezones: boolean) => {
+        return this.doFetch(
+            `${this.getChannelRoute(channelId)}/member_counts_by_group?include_timezones=${includeTimezones}`,
+            {method: 'get'},
+        );
+    };
+
     viewMyChannel = async (channelId: string, prevChannelId?: string) => {
         const data = {channel_id: channelId, prev_channel_id: prevChannelId};
         return this.doFetch(
@@ -1620,10 +1627,11 @@ export default class Client4 {
     // Post Routes
 
     createPost = async (post: Post) => {
-        this.trackEvent('api', 'api_posts_create', {channel_id: post.channel_id});
+        const analyticsData = {channel_id: post.channel_id, post_id: post.id, user_actual_id: post.user_id, root_id: post.root_id};
+        this.trackEvent('api', 'api_posts_create', analyticsData);
 
         if (post.root_id != null && post.root_id !== '') {
-            this.trackEvent('api', 'api_posts_replied', {channel_id: post.channel_id});
+            this.trackEvent('api', 'api_posts_replied', analyticsData);
         }
 
         return this.doFetch(
@@ -1633,7 +1641,7 @@ export default class Client4 {
     };
 
     updatePost = async (post: Post) => {
-        this.trackEvent('api', 'api_posts_update', {channel_id: post.channel_id});
+        this.trackEvent('api', 'api_posts_update', {channel_id: post.channel_id, post_id: post.id});
 
         return this.doFetch(
             `${this.getPostRoute(post.id)}`,
@@ -1649,7 +1657,7 @@ export default class Client4 {
     };
 
     patchPost = async (postPatch: Partial<Post> & {id: string}) => {
-        this.trackEvent('api', 'api_posts_patch', {channel_id: postPatch.channel_id});
+        this.trackEvent('api', 'api_posts_patch', {channel_id: postPatch.channel_id, post_id: postPatch.id});
 
         return this.doFetch(
             `${this.getPostRoute(postPatch.id)}/patch`,
@@ -3103,7 +3111,42 @@ export default class Client4 {
     };
 
     trackEvent(category: string, event: string, props?: any) {
-        // Temporary change to allow only certain events to reduce data rate - see MM-13062
+        const properties = Object.assign({
+            category,
+            type: event,
+            user_actual_role: this.userRoles && isSystemAdmin(this.userRoles) ? 'system_admin, system_user' : 'system_user',
+            user_actual_id: this.userId,
+        }, props);
+        const options = {
+            context: {
+                ip: '0.0.0.0',
+            },
+            page: {
+                path: '',
+                referrer: '',
+                search: '',
+                title: '',
+                url: '',
+            },
+            anonymousId: '00000000000000000000000000',
+        };
+
+        const globalAny: any = global;
+
+        if (globalAny && globalAny.window && globalAny.window.rudderanalytics) {
+            globalAny.window.rudderanalytics.track('event', properties, options);
+        } else if (globalAny && globalAny.rudderanalytics) {
+            if (globalAny.analytics_context) {
+                options.context = globalAny.analytics_context;
+            }
+
+            globalAny.rudderanalytics.track(Object.assign({
+                event: 'event',
+                userId: this.diagnosticId,
+            }, {properties}, options));
+        }
+
+        // Temporary change to allow only certain events to go to Segment to reduce data rate - see MM-13062
         // All events in 'admin' category are allowed, since they are low-volume
         if (category !== 'admin' && ![
             'api_posts_create',
@@ -3134,26 +3177,6 @@ export default class Client4 {
             return;
         }
 
-        const properties = Object.assign({
-            category,
-            type: event,
-            user_actual_role: this.userRoles && isSystemAdmin(this.userRoles) ? 'system_admin, system_user' : 'system_user',
-            user_actual_id: this.userId,
-        }, props);
-        const options = {
-            context: {
-                ip: '0.0.0.0',
-            },
-            page: {
-                path: '',
-                referrer: '',
-                search: '',
-                title: '',
-                url: '',
-            },
-            anonymousId: '00000000000000000000000000',
-        };
-        const globalAny: any = global;
         if (globalAny && globalAny.window && globalAny.window.analytics && globalAny.window.analytics.initialized) {
             globalAny.window.analytics.track('event', properties, options);
         } else if (globalAny && globalAny.analytics) {
