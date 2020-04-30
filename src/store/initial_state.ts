@@ -49,6 +49,7 @@ const state: GlobalState = {
             totalCount: 0,
             manuallyUnread: {},
             channelModerations: {},
+            channelMemberCountsByGroup: {},
         },
         posts: {
             expandedURLs: {},
