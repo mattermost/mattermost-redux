@@ -3,11 +3,17 @@
 
 import {ChannelCategoryTypes} from 'action_types';
 
-import {fetchMyChannelsAndMembers} from 'actions/channels';
+import {fetchMyChannelsAndMembers, unfavoriteChannel, favoriteChannel} from 'actions/channels';
 
 import {General} from '../constants';
+import {CategoryTypes} from 'constants/channel_categories';
 
 import {
+    getAllCategoriesByIds,
+    getCategory,
+    getCategoryIdsForTeam,
+    getCategoryInTeamByType,
+    getCategoryInTeamWithChannel,
     makeGetCategoriesForTeam,
     makeSortChannelsByNameWithDMs,
     makeSortChannelsByName,
@@ -15,7 +21,7 @@ import {
 import {getAllChannels, getMyChannelMemberships} from 'selectors/entities/channels';
 import {getMyPreferences} from 'selectors/entities/preferences';
 
-import {DispatchFunc, GetStateFunc} from 'types/actions';
+import {ActionFunc, DispatchFunc, GetStateFunc} from 'types/actions';
 import {CategorySorting} from 'types/channel_categories';
 import {Channel} from 'types/channels';
 
@@ -60,7 +66,7 @@ export function fetchMyCategories(teamId: string) {
         if (categories.some((category) => category.channel_ids.length > 0)) {
             // Only attempt to generate channels for categories once to avoid messing up the clientside state during
             // early testing.
-            return;
+            return {data: true};
         }
 
         const allChannels = getAllChannels(state);
@@ -115,5 +121,126 @@ export function fetchMyCategories(teamId: string) {
                 },
             });
         }
+
+        return {data: true};
     };
+}
+
+// addChannelToInitialCategory returns an action that can be dispatched to add a newly-joined or newly-created channel
+// to its either the Channels or Direct Messages category based on the type of channel. New DM and GM channels are
+// added to the Direct Messages category on each team.
+export function addChannelToInitialCategory(channel: Channel): ActionFunc {
+    return (dispatch: DispatchFunc, getState: GetStateFunc) => {
+        const state = getState();
+
+        if (channel.type === General.DM_CHANNEL || channel.type === General.GM_CHANNEL) {
+            // Add the new channel to the DM category on each team
+            const categories = Object.values(getAllCategoriesByIds(state));
+            const dmCategories = categories.filter((category) => category.type === CategoryTypes.DIRECT_MESSAGES);
+
+            return dispatch({
+                type: ChannelCategoryTypes.RECEIVED_CATEGORIES,
+                data: dmCategories.map((category) => ({
+                    ...category,
+                    channel_ids: insertWithoutDuplicates(category.channel_ids, channel.id, 0),
+                })),
+            });
+        }
+
+        // Add the new channel to the Channels category on the channel's team
+        const channelsCategory = getCategoryInTeamByType(state, channel.team_id, CategoryTypes.CHANNELS);
+
+        if (!channelsCategory) {
+            // No categories were found for this team, so the categories for this team haven't been loaded yet.
+            // The channel will have been added to the category by the server, so we'll get it once the categories
+            // are actually loaded.
+            return {data: false};
+        }
+
+        return dispatch(addChannelToCategory(channelsCategory.id, channel.id));
+    };
+}
+
+// addChannelToCategory returns an action that can be dispatched to add a channel to a given category without specifying
+// its order. The channel will be removed from its previous category (if any) on the given category's team and it will be
+// placed first in its new category.
+export function addChannelToCategory(categoryId: string, channelId: string): ActionFunc {
+    return moveChannelToCategory(categoryId, channelId, 0);
+}
+
+export function moveChannelToCategory(categoryId: string, channelId: string, newIndex: number) {
+    return (dispatch: DispatchFunc, getState: GetStateFunc) => {
+        const category = getCategory(getState(), categoryId);
+
+        // Add the channel to the new category
+        const categories = [{
+            ...category,
+            channel_ids: insertWithoutDuplicates(category.channel_ids, channelId, newIndex),
+        }];
+
+        // And remove it from the old category
+        const originalCategory = getCategoryInTeamWithChannel(getState(), category.team_id, channelId);
+        if (originalCategory && originalCategory.id !== category.id) {
+            categories.push({
+                ...originalCategory,
+                channel_ids: removeItem(originalCategory.channel_ids, channelId),
+            });
+        }
+
+        // And update the favorite preferences if we're adding or removing the channel from favorites
+        if (category.type === CategoryTypes.FAVORITES) {
+            dispatch(favoriteChannel(channelId, false));
+        } else if (originalCategory && originalCategory.type === CategoryTypes.FAVORITES) {
+            dispatch(unfavoriteChannel(channelId, false));
+        }
+
+        return dispatch({
+            type: ChannelCategoryTypes.RECEIVED_CATEGORIES,
+            data: categories,
+        });
+    };
+}
+
+export function moveCategory(categoryId: string, newIndex: number) {
+    return (dispatch: DispatchFunc, getState: GetStateFunc) => {
+        const category = getCategory(getState(), categoryId);
+
+        const order = getCategoryIdsForTeam(getState(), category.team_id)!;
+
+        return dispatch({
+            type: ChannelCategoryTypes.RECEIVED_CATEGORY_ORDER,
+            data: insertWithoutDuplicates(order, category.id, newIndex),
+        });
+    };
+}
+
+function insertWithoutDuplicates<T>(array: T[], item: T, newIndex: number) {
+    const index = array.indexOf(item);
+    if (newIndex === index) {
+        // The item doesn't need to be moved since its location hasn't changed
+        return array;
+    }
+
+    const newArray = [...array];
+
+    // Remove the item from its old location if it already exists in the array
+    if (index !== -1) {
+        newArray.splice(index, 1);
+    }
+
+    // And re-add it in its new location
+    newArray.splice(newIndex, 0, item);
+
+    return newArray;
+}
+
+function removeItem<T>(array: T[], item: T) {
+    const index = array.indexOf(item);
+    if (index === -1) {
+        return array;
+    }
+
+    const result = [...array];
+    result.splice(index, 1);
+    return result;
 }

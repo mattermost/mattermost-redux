@@ -17,6 +17,70 @@ import {getPreferenceKey} from 'utils/preference_utils';
 
 import * as Selectors from './channel_categories';
 
+describe('getCategoryInTeamByType', () => {
+    const favoritesCategory1 = {id: 'favoritesCategory1', team_id: 'team1', type: CategoryTypes.FAVORITES};
+    const channelsCategory1 = {id: 'channelsCategory1', team_id: 'team1', type: CategoryTypes.CHANNELS};
+    const directMessagesCategory1 = {id: 'directMessagesCategory1', team_id: 'team1', type: CategoryTypes.DIRECT_MESSAGES};
+    const channelsCategory2 = {id: 'channelsCategory2', team_id: 'team2', type: CategoryTypes.CHANNELS};
+
+    const state = {
+        entities: {
+            channelCategories: {
+                byId: {
+                    channelsCategory1,
+                    channelsCategory2,
+                    directMessagesCategory1,
+                    favoritesCategory1,
+                },
+            },
+        },
+    };
+
+    test('should return categories from each team', () => {
+        expect(Selectors.getCategoryInTeamByType(state, 'team1', CategoryTypes.FAVORITES)).toBe(favoritesCategory1);
+        expect(Selectors.getCategoryInTeamByType(state, 'team1', CategoryTypes.CHANNELS)).toBe(channelsCategory1);
+        expect(Selectors.getCategoryInTeamByType(state, 'team1', CategoryTypes.DIRECT_MESSAGES)).toBe(directMessagesCategory1);
+
+        expect(Selectors.getCategoryInTeamByType(state, 'team2', CategoryTypes.CHANNELS)).toBe(channelsCategory2);
+    });
+
+    test('should return null for a team that does not exist', () => {
+        expect(Selectors.getCategoryInTeamByType(state, 'team3', CategoryTypes.CHANNELS)).toBeUndefined();
+    });
+
+    test('should return null for a category that does not exist', () => {
+        expect(Selectors.getCategoryInTeamByType(state, 'team2', CategoryTypes.FAVORITES)).toBeUndefined();
+    });
+});
+
+describe('getCategoryInTeamWithChannel', () => {
+    const category1 = {id: 'category1', team_id: 'team1', channel_ids: ['channel1', 'channel2']};
+    const category2 = {id: 'category2', team_id: 'team1', channel_ids: ['dmChannel1']};
+    const category3 = {id: 'category3', team_id: 'team2', channel_ids: ['dmChannel1']};
+
+    const state = {
+        entities: {
+            channelCategories: {
+                byId: {
+                    category1,
+                    category2,
+                    category3,
+                },
+            },
+        },
+    };
+
+    test('should return the category containing a given channel', () => {
+        expect(Selectors.getCategoryInTeamWithChannel(state, 'team1', 'channel1')).toBe(category1);
+        expect(Selectors.getCategoryInTeamWithChannel(state, 'team1', 'channel2')).toBe(category1);
+    });
+
+    test('should return the category on the correct team for a cross-team channel', () => {
+        expect(Selectors.getCategoryInTeamWithChannel(state, 'team1', 'dmChannel1')).toBe(category2);
+        expect(Selectors.getCategoryInTeamWithChannel(state, 'team2', 'dmChannel1')).toBe(category3);
+    });
+});
+
 describe('makeGetCategoriesForTeam', () => {
     const category1 = {id: 'category1', display_name: 'Category One', type: CategoryTypes.CUSTOM};
     const category2 = {id: 'category2', display_name: 'Category Two', type: CategoryTypes.CUSTOM};

@@ -14,7 +14,7 @@ import {getMyPreferences, getTeammateNameDisplaySetting, shouldAutocloseDMs} fro
 import {getCurrentUserId} from 'selectors/entities/users';
 
 import {Channel, ChannelMembership} from 'types/channels';
-import {ChannelCategory} from 'types/channel_categories';
+import {ChannelCategory, ChannelCategoryType} from 'types/channel_categories';
 import {GlobalState} from 'types/store';
 import {UserProfile} from 'types/users';
 import {IDMappedObjects, RelationOneToOne} from 'types/utilities';
@@ -27,8 +27,37 @@ import {
 import {getPreferenceKey} from 'utils/preference_utils';
 import {displayUsername} from 'utils/user_utils';
 
+export function getAllCategoriesByIds(state: GlobalState) {
+    return state.entities.channelCategories.byId;
+}
+
 export function getCategory(state: GlobalState, categoryId: string) {
-    return state.entities.channelCategories.byId[categoryId];
+    return getAllCategoriesByIds(state)[categoryId];
+}
+
+// getCategoryInTeamByType returns the first category found of the given type on the given team. This is intended for use
+// with only non-custom types of categories.
+export function getCategoryInTeamByType(state: GlobalState, teamId: string, categoryType: ChannelCategoryType) {
+    return getCategoryWhere(
+        state,
+        (category) => category.type === categoryType && category.team_id === teamId,
+    );
+}
+
+// getCategoryInTeamWithChannel returns the category on a given team containing the given channel ID.
+export function getCategoryInTeamWithChannel(state: GlobalState, teamId: string, channelId: string) {
+    return getCategoryWhere(
+        state,
+        (category) => category.team_id === teamId && category.channel_ids.includes(channelId),
+    );
+}
+
+// getCategoryWhere returns the first category meeting the given condition. This should not be used with a condition
+// that matches multiple categories.
+export function getCategoryWhere(state: GlobalState, condition: (category: ChannelCategory) => boolean) {
+    const categoriesByIds = getAllCategoriesByIds(state);
+
+    return Object.values(categoriesByIds).find(condition);
 }
 
 export function getCategoryIdsForTeam(state: GlobalState, teamId: string): string[] | undefined {

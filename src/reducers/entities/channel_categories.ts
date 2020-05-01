@@ -5,7 +5,7 @@ import {combineReducers} from 'redux';
 
 import {CategoryTypes, Sorting} from '../../constants/channel_categories';
 
-import {ChannelCategoryTypes, TeamTypes, UserTypes} from 'action_types';
+import {ChannelCategoryTypes, TeamTypes, UserTypes, ChannelTypes} from 'action_types';
 
 import {GenericAction} from 'types/actions';
 import {ChannelCategory} from 'types/channel_categories';
@@ -37,17 +37,19 @@ export function byId(state: IDMappedObjects<ChannelCategory> = {}, action: Gener
         }, state);
     }
 
-    // This will be added in phase 2 of Channel Sidebar Organization once the server provides the categories
-    // case ChannelCategoryTypes.RECEIVED_CATEGORIES: {
-    //     const categories: ChannelCategory[] = action.data;
+    case ChannelCategoryTypes.RECEIVED_CATEGORIES: {
+        const categories: ChannelCategory[] = action.data;
 
-    //     return categories.reduce((nextState, category) => {
-    //         return {
-    //             ...nextState,
-    //             [category.id]: category,
-    //         };
-    //     }, state);
-    // }
+        return categories.reduce((nextState, category) => {
+            return {
+                ...nextState,
+                [category.id]: {
+                    ...nextState[category.id],
+                    ...category,
+                },
+            };
+        }, state);
+    }
     case ChannelCategoryTypes.RECEIVED_CATEGORY: {
         const category: ChannelCategory = action.data;
 
@@ -60,6 +62,32 @@ export function byId(state: IDMappedObjects<ChannelCategory> = {}, action: Gener
         };
     }
 
+    case ChannelTypes.LEAVE_CHANNEL: {
+        const channelId: string = action.data.id;
+
+        const nextState = {...state};
+        let changed = false;
+
+        for (const category of Object.values(state)) {
+            const index = category.channel_ids.indexOf(channelId);
+
+            if (index === -1) {
+                continue;
+            }
+
+            const nextChannelIds = [...category.channel_ids];
+            nextChannelIds.splice(index, 1);
+
+            nextState[category.id] = {
+                ...category,
+                channel_ids: nextChannelIds,
+            };
+
+            changed = true;
+        }
+
+        return changed ? nextState : state;
+    }
     case TeamTypes.LEAVE_TEAM: {
         const team: Team = action.data;
 
@@ -75,11 +103,7 @@ export function byId(state: IDMappedObjects<ChannelCategory> = {}, action: Gener
             changed = true;
         }
 
-        if (!changed) {
-            return state;
-        }
-
-        return nextState;
+        return changed ? nextState : state;
     }
 
     case UserTypes.LOGOUT_SUCCESS:
@@ -120,16 +144,15 @@ export function orderByTeam(state: RelationOneToOne<Team, $ID<ChannelCategory>[]
         }, state);
     }
 
-    // This will be added in phase 2 of Channel Sidebar Organization once the server provides the categories
-    // case ChannelCategoryTypes.RECEIVED_CATEGORY_ORDER: {
-    //     const teamId: string = action.data.teamId;
-    //     const categoryIds: string[] = action.data.categoryIds;
+    case ChannelCategoryTypes.RECEIVED_CATEGORY_ORDER: {
+        const teamId: string = action.data.teamId;
+        const categoryIds: string[] = action.data.categoryIds;
 
-    //     return {
-    //         ...state,
-    //         [teamId]: categoryIds,
-    //     };
-    // }
+        return {
+            ...state,
+            [teamId]: categoryIds,
+        };
+    }
 
     case TeamTypes.LEAVE_TEAM: {
         const team: Team = action.data;

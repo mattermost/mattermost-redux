@@ -3,7 +3,7 @@
 
 import {CategoryTypes} from '../../constants/channel_categories';
 
-import {ChannelCategoryTypes, TeamTypes} from 'action_types';
+import {ChannelTypes, TeamTypes} from 'action_types';
 
 import * as Reducers from './channel_categories';
 
@@ -46,6 +46,26 @@ describe('byId', () => {
         expect(state['team2-favorites']).toBeDefined();
         expect(state['team2-channels']).toBeDefined();
         expect(state['team2-direct_messages']).toBeDefined();
+    });
+
+    test('should remove references to a channel when leaving it', () => {
+        const initialState = {
+            category1: {id: 'category1', channel_ids: ['channel1', 'channel2']},
+            category2: {id: 'category2', channel_ids: ['channel3', 'channel4']},
+        };
+
+        const state = Reducers.byId(
+            initialState,
+            {
+                type: ChannelTypes.LEAVE_CHANNEL,
+                data: {
+                    id: 'channel3',
+                },
+            },
+        );
+
+        expect(state.category1).toBe(initialState.category1);
+        expect(state.category2.channel_ids).toEqual(['channel4']);
     });
 
     test('should remove corresponding categories when leaving a team', () => {
