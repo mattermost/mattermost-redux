@@ -305,3 +305,39 @@ describe('moveChannelToCategory', () => {
         expect(isFavoriteChannel(state, 'channel1')).toBe(false);
     });
 });
+
+describe('moveCategory', () => {
+    test('should move the category to the correct index', async () => {
+        const store = await configureStore({
+            entities: {
+                channelCategories: {
+                    orderByTeam: {
+                        team1: ['category1', 'category2', 'category3', 'category4'],
+                        team2: ['category5', 'category6'],
+                    },
+                },
+            },
+        });
+
+        const initialState = store.getState();
+
+        store.dispatch(Actions.moveCategory('team1', 'category1', 3));
+
+        let state = store.getState();
+
+        expect(state.entities.channelCategories.orderByTeam.team1).toEqual(['category2', 'category3', 'category4', 'category1']);
+        expect(state.entities.channelCategories.orderByTeam.team2).toBe(initialState.entities.channelCategories.orderByTeam.team2);
+
+        store.dispatch(Actions.moveCategory('team1', 'category3', 0));
+
+        state = store.getState();
+
+        expect(state.entities.channelCategories.orderByTeam.team1).toEqual(['category3', 'category2', 'category4', 'category1']);
+
+        store.dispatch(Actions.moveCategory('team1', 'category4', 1));
+
+        state = store.getState();
+
+        expect(state.entities.channelCategories.orderByTeam.team1).toEqual(['category3', 'category4', 'category2', 'category1']);
+    });
+});

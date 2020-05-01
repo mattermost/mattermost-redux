@@ -201,15 +201,16 @@ export function moveChannelToCategory(categoryId: string, channelId: string, new
     };
 }
 
-export function moveCategory(categoryId: string, newIndex: number) {
+export function moveCategory(teamId: string, categoryId: string, newIndex: number) {
     return (dispatch: DispatchFunc, getState: GetStateFunc) => {
-        const category = getCategory(getState(), categoryId);
-
-        const order = getCategoryIdsForTeam(getState(), category.team_id)!;
+        const order = getCategoryIdsForTeam(getState(), teamId)!;
 
         return dispatch({
             type: ChannelCategoryTypes.RECEIVED_CATEGORY_ORDER,
-            data: insertWithoutDuplicates(order, category.id, newIndex),
+            data: {
+                teamId,
+                categoryIds: insertWithoutDuplicates(order, categoryId, newIndex),
+            },
         });
     };
 }
