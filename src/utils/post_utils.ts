@@ -25,6 +25,10 @@ export function isSystemMessage(post: Post): boolean {
     return Boolean(post.type && post.type.startsWith(Posts.SYSTEM_MESSAGE_PREFIX));
 }
 
+export function isSystemMessageAddToChannel(post: Post, userId: $ID<UserProfile>): boolean {
+    return Boolean(post.type && post.type === Posts.POST_TYPES.ADD_TO_CHANNEL && post.props.addedUserId === userId);
+}
+
 export function isMeMessage(post: Post): boolean {
     return Boolean(post.type && post.type === Posts.POST_TYPES.ME);
 }
