@@ -137,56 +137,6 @@ describe('Selectors.Channels.getChannelsInCurrentTeam', () => {
     });
 });
 
-describe('Selectors.Channels.getKnownUsers', () => {
-    const channel1 = TestHelper.fakeChannelWithId('');
-    const channel2 = TestHelper.fakeChannelWithId('');
-
-    const me = TestHelper.fakeUserWithId();
-    const user = TestHelper.fakeUserWithId();
-    const user2 = TestHelper.fakeUserWithId();
-    const user3 = TestHelper.fakeUserWithId();
-
-    const membersInChannel = {
-        [channel1.id]: {
-            [user.id]: {channel_id: channel1.id, user_id: user.id},
-            [user2.id]: {channel_id: channel1.id, user_id: user2.id},
-        },
-        [channel2.id]: {
-            [user3.id]: {channel_id: channel2.id, user_id: user3.id},
-        },
-    };
-
-    it('should return all members of all my channels', () => {
-        const testState = deepFreezeAndThrowOnMutation({
-            entities: {
-                users: {
-                    currentUserId: me.id,
-                },
-                channels: {
-                    membersInChannel,
-                },
-            },
-        });
-
-        assert.deepEqual(Selectors.getKnownUsers(testState), new Set([me.id, user.id, user2.id, user3.id]));
-    });
-
-    it('should return only me if I have no channels', () => {
-        const testState = deepFreezeAndThrowOnMutation({
-            entities: {
-                users: {
-                    currentUserId: me.id,
-                },
-                channels: {
-                    membersInChannel: {},
-                },
-            },
-        });
-
-        assert.deepEqual(Selectors.getKnownUsers(testState), new Set([me.id]));
-    });
-});
-
 describe('Selectors.Channels.getMyChannels', () => {
     const team1 = TestHelper.fakeTeamWithId();
     const team2 = TestHelper.fakeTeamWithId();
@@ -3680,4 +3630,33 @@ test('Selectors.Channels.getChannelModerations', () => {
     assert.equal(Selectors.getChannelModerations(state, 'channel1'), moderations);
     assert.equal(Selectors.getChannelModerations(state, undefined), undefined);
     assert.equal(Selectors.getChannelModerations(state, 'undefined'), undefined);
+});
+
+test('Selectors.Channels.getChannelMemberCountsByGroup', () => {
+    const memberCounts = {
+        'group-1': {
+            group_id: 'group-1',
+            channel_member_count: 1,
+            channel_member_timezones_count: 1,
+        },
+        'group-2': {
+            group_id: 'group-2',
+            channel_member_count: 999,
+            channel_member_timezones_count: 131,
+        },
+    };
+
+    const state = {
+        entities: {
+            channels: {
+                channelMemberCountsByGroup: {
+                    channel1: memberCounts,
+                },
+            },
+        },
+    };
+
+    assert.deepEqual(Selectors.getChannelMemberCountsByGroup(state, 'channel1'), memberCounts);
+    assert.deepEqual(Selectors.getChannelMemberCountsByGroup(state, undefined), {});
+    assert.deepEqual(Selectors.getChannelMemberCountsByGroup(state, 'undefined'), {});
 });

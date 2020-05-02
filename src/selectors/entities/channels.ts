@@ -30,7 +30,7 @@ import {
 } from 'selectors/entities/teams';
 import {isCurrentUserSystemAdmin, getCurrentUserId, getUserIdsInChannels} from 'selectors/entities/users';
 
-import {Channel, ChannelStats, ChannelMembership, ChannelModeration} from 'types/channels';
+import {Channel, ChannelStats, ChannelMembership, ChannelModeration, ChannelMemberCountsByGroup} from 'types/channels';
 import {Config} from 'types/config';
 import {Post} from 'types/posts';
 import {PreferenceType} from 'types/preferences';
@@ -96,20 +96,6 @@ export const getDirectChannelsSet: (state: GlobalState) => Set<string> = createS
 export function getChannelMembersInChannels(state: GlobalState): RelationOneToOne<Channel, UserIDMappedObjects<ChannelMembership>> {
     return state.entities.channels.membersInChannel;
 }
-
-export const getKnownUsers: (state: GlobalState) => Set<string> = createSelector(
-    getChannelMembersInChannels,
-    getCurrentUserId,
-    (channelsMemberships: RelationOneToOne<Channel, UserIDMappedObjects<ChannelMembership>>, currentUserId: string): Set<string> => {
-        const knownUsers: Set<string> = new Set([currentUserId]);
-        for (const membersInChannel of Object.values(channelsMemberships)) {
-            for (const member of Object.values(membersInChannel)) {
-                knownUsers.add(member.user_id);
-            }
-        }
-        return knownUsers;
-    },
-);
 
 function sortChannelsByRecencyOrAlpha(locale: string, lastPosts: RelationOneToOne<Channel, Post>, sorting: SortingType, a: Channel, b: Channel) {
     if (sorting === 'recent') {
@@ -1293,4 +1279,8 @@ export function isManuallyUnread(state: GlobalState, channelId?: string): boolea
 
 export function getChannelModerations(state: GlobalState, channelId: string): Array<ChannelModeration> {
     return state.entities.channels.channelModerations[channelId];
+}
+
+export function getChannelMemberCountsByGroup(state: GlobalState, channelId: string): ChannelMemberCountsByGroup {
+    return state.entities.channels.channelMemberCountsByGroup[channelId] || {};
 }
