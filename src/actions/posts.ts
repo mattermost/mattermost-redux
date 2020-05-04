@@ -185,7 +185,7 @@ export function createPost(post: Post, files: any[] = []) {
         };
 
         if (post.root_id) {
-            newPost.reply_count = (Selectors.getPostRepliesCount(state, post.root_id) || 0) + 1;
+            newPost.reply_count = Selectors.getPostRepliesCount(state, post.root_id) + 1;
         }
 
         // We are retrying a pending post that had files

@@ -46,7 +46,7 @@ export function getPost(state: GlobalState, postId: $ID<Post>): Post {
 }
 
 export function getPostRepliesCount(state: GlobalState, postId: $ID<Post>): number {
-    return state.entities.posts.postsReplies[postId];
+    return state.entities.posts.postsReplies[postId] || 0;
 }
 
 export function getPostsInThread(state: GlobalState): RelationOneToMany<Post, Post> {
