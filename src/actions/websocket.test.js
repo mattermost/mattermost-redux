@@ -713,6 +713,107 @@ describe('Actions.Websocket', () => {
         test();
     });
 
+    describe('Actions.Websocket removeNotVisibleUsers', () => {
+        const mockStore = configureMockStore([thunk]);
+        const channel1 = TestHelper.fakeChannelWithId('');
+        const channel2 = TestHelper.fakeChannelWithId('');
+
+        const me = TestHelper.fakeUserWithId();
+        const user = TestHelper.fakeUserWithId();
+        const user2 = TestHelper.fakeUserWithId();
+        const user3 = TestHelper.fakeUserWithId();
+        const user4 = TestHelper.fakeUserWithId();
+        const user5 = TestHelper.fakeUserWithId();
+
+        it('should do nothing if the known users and the profiles list are the same', async () => {
+            const profiles = {
+                [me.id]: me,
+                [user.id]: user,
+                [user2.id]: user2,
+                [user3.id]: user3,
+            };
+
+            const state = {
+                entities: {
+                    users: {
+                        currentUserId: me.id,
+                        profiles,
+                    },
+                },
+            };
+
+            nock(Client4.getBaseRoute()).
+                get('/users/known').
+                reply(200, [user.id, user2.id, user3.id]);
+
+            const testStore = await mockStore(state);
+            await testStore.dispatch(Actions.removeNotVisibleUsers());
+            const actions = testStore.getActions();
+            expect(actions.length).toEqual(0);
+        });
+
+        it('should do nothing if there are known users but are not in the profiles list', async () => {
+            const profiles = {
+                [me.id]: me,
+                [user3.id]: user3,
+            };
+
+            const state = {
+                entities: {
+                    users: {
+                        currentUserId: me.id,
+                        profiles,
+                    },
+                },
+            };
+
+            nock(Client4.getBaseRoute()).
+                get('/users/known').
+                reply(200, [user.id, user2.id, user3.id]);
+
+            const testStore = await mockStore(state);
+            await testStore.dispatch(Actions.removeNotVisibleUsers());
+            const actions = testStore.getActions();
+            expect(actions.length).toEqual(0);
+        });
+
+        it('should remove the users if there are unknown users in the profiles list', async () => {
+            const profiles = {
+                [me.id]: me,
+                [user.id]: user,
+                [user2.id]: user2,
+                [user3.id]: user3,
+                [user4.id]: user4,
+                [user5.id]: user5,
+            };
+
+            const state = {
+                entities: {
+                    users: {
+                        currentUserId: me.id,
+                        profiles,
+                    },
+                },
+            };
+
+            nock(Client4.getBaseRoute()).
+                get('/users/known').
+                reply(200, [user.id, user3.id]);
+
+            const testStore = await mockStore(state);
+            await testStore.dispatch(Actions.removeNotVisibleUsers());
+
+            const expectedAction = batchActions([
+                {type: UserTypes.PROFILE_NO_LONGER_VISIBLE, data: {user_id: user2.id}},
+                {type: UserTypes.PROFILE_NO_LONGER_VISIBLE, data: {user_id: user4.id}},
+                {type: UserTypes.PROFILE_NO_LONGER_VISIBLE, data: {user_id: user5.id}},
+            ]);
+            const actions = testStore.getActions();
+            expect(actions.length).toEqual(1);
+            expect(actions[0]).toEqual(expectedAction);
+        });
+    });
+
     it('Websocket handle group updated', (done) => {
         async function test() {
             mockServer.emit('message', JSON.stringify({event: WebsocketEvents.RECEIVED_GROUP, data: {group: `{"id":"${TestHelper.basicGroup.id}","name":"${TestHelper.basicGroup.name}","display_name":"${TestHelper.basicGroup.display_name}","description":"","source":"ldap","remote_id":"12264aae-0279-103a-8a56-1dc005bf4d9c","create_at":1585096089656,"update_at":1585196227880,"delete_at":0,"has_syncables":false,"member_count":2}`}, broadcast: {user_id: '', channel_id: '', team_id: ''}, seq: 26}));
