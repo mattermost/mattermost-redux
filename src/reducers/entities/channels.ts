@@ -4,13 +4,14 @@ import {combineReducers} from 'redux';
 import {ChannelTypes, UserTypes, SchemeTypes, GroupTypes} from 'action_types';
 import {General} from '../../constants';
 import {GenericAction} from 'types/actions';
-import {Channel, ChannelMembership, ChannelStats} from 'types/channels';
+import {Channel, ChannelMembership, ChannelStats, ChannelMemberCountByGroup, ChannelMemberCountsByGroup} from 'types/channels';
 import {RelationOneToMany, RelationOneToOne, IDMappedObjects, UserIDMappedObjects} from 'types/utilities';
 import {Team} from 'types/teams';
 
 function removeMemberFromChannels(state: RelationOneToOne<Channel, UserIDMappedObjects<ChannelMembership>>, action: GenericAction) {
     const nextState = {...state};
     Object.keys(state).forEach((channel) => {
+        nextState[channel] = {...nextState[channel]};
         delete nextState[channel][action.data.user_id];
     });
     return nextState;
@@ -677,6 +678,25 @@ export function channelModerations(state: any = {}, action: GenericAction) {
     }
 }
 
+export function channelMemberCountsByGroup(state: any = {}, action: GenericAction) {
+    switch (action.type) {
+    case ChannelTypes.RECEIVED_CHANNEL_MEMBER_COUNTS_BY_GROUP: {
+        const {channelId, memberCounts} = action.data;
+        const memberCountsByGroup: ChannelMemberCountsByGroup = {};
+        memberCounts.forEach((channelMemberCount: ChannelMemberCountByGroup) => {
+            memberCountsByGroup[channelMemberCount.group_id] = channelMemberCount;
+        });
+
+        return {
+            ...state,
+            [channelId]: memberCountsByGroup,
+        };
+    }
+    default:
+        return state;
+    }
+}
+
 export default combineReducers({
 
     // the current selected channel
@@ -706,4 +726,7 @@ export default combineReducers({
 
     // object where every key is the channel id and has an object with the channel moderations
     channelModerations,
+
+    // object where every key is the channel id containing map of <group_id: ChannelMemberCountByGroup>
+    channelMemberCountsByGroup,
 });
