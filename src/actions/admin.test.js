@@ -1209,4 +1209,18 @@ describe('Actions.Admin', () => {
 
         const state = store.getState();
     });
+
+    it('sendAdminAck', async () => {
+        nock(Client4.getBaseRoute()).
+            get('/email/admin_ack/send').
+            reply(200, OK_RESPONSE);
+
+        await Actions.sendAdminAck()(store.dispatch, store.getState);
+
+        const state = store.getState();
+        const request = state.requests.admin.sendAdminAck;
+        if (request.status === RequestStatus.FAILURE) {
+            throw new Error('sendAdminAck request failed');
+        }
+    });
 });

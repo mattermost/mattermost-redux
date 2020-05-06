@@ -132,6 +132,22 @@ describe('Actions.General', () => {
         assert.equal(timezones.length === 0, false);
     });
 
+    it('getNumberOfActiveUsersMetricStatus', async () => {
+        const responseData = {
+            numberOfActiveUsersMetricStatus: false,
+        };
+
+        nock(Client4.getBaseRoute()).
+            get('/analytics/number_of_active_users').
+            query(true).
+            reply(200, responseData);
+
+        await Actions.getNumberOfActiveUsersMetricStatus()(store.dispatch, store.getState);
+        await TestHelper.wait(100);
+        const {numberOfActiveUsersMetricStatus} = store.getState().entities.general;
+        assert.deepEqual(numberOfActiveUsersMetricStatus, false);
+    });
+
     describe('getRedirectLocation', () => {
         it('old server', async () => {
             store.dispatch({type: GeneralTypes.RECEIVED_SERVER_VERSION, data: '5.0.0'});

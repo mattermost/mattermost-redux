@@ -12,4 +12,5 @@ export type GeneralState = {
     license: any;
     serverVersion: string;
     timezones: Array<string>;
+    numberOfActiveUsersMetricStatus: boolean;
 };

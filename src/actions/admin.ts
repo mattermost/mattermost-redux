@@ -604,3 +604,11 @@ export function setSamlIdpCertificateFromMetadata(certData: string): ActionFunc 
         ],
     });
 }
+
+export function sendAdminAck() {
+    return bindClientFunc({
+        clientFunc: Client4.sendAdminAck,
+        params: [
+        ],
+    });
+}

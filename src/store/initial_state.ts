@@ -14,6 +14,7 @@ const state: GlobalState = {
             license: {},
             serverVersion: '',
             timezones: [],
+            numberOfActiveUsersMetricStatus: false,
         },
         users: {
             currentUserId: '',
@@ -389,6 +390,10 @@ const state: GlobalState = {
                 error: null,
             },
             linkLdapGroup: {
+                status: 'not_started',
+                error: null,
+            },
+            sendAdminAck: {
                 status: 'not_started',
                 error: null,
             },

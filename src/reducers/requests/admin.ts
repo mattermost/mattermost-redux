@@ -408,6 +408,16 @@ function disablePlugin(state: RequestStatusType = initialRequestState(), action:
     );
 }
 
+function sendAdminAck(state: RequestStatusType = initialRequestState(), action: GenericAction): RequestStatusType {
+    return handleRequest(
+        AdminTypes.SEND_ADMIN_ACK_REQUEST,
+        AdminTypes.SEND_ADMIN_ACK_SUCCESS,
+        AdminTypes.SEND_ADMIN_ACK_FAILURE,
+        state,
+        action,
+    );
+}
+
 export default (combineReducers({
     getLogs,
     getAudits,
@@ -449,4 +459,5 @@ export default (combineReducers({
     removePlugin,
     enablePlugin,
     disablePlugin,
+    sendAdminAck,
 }) as (b: AdminRequestsStatuses, a: GenericAction) => AdminRequestsStatuses);

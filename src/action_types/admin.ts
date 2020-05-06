@@ -187,4 +187,8 @@ export default keyMirror({
 
     RECEIVED_SAML_METADATA_RESPONSE: null,
     SET_SAML_IDP_SUCCESS: null,
+
+    SEND_ADMIN_ACK_REQUEST: null,
+    SEND_ADMIN_ACK_SUCCESS: null,
+    SEND_ADMIN_ACK_FAILURE: null,
 });

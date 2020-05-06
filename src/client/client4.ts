@@ -1956,6 +1956,20 @@ export default class Client4 {
         );
     };
 
+    getNumberOfActiveUsersMetricStatus = async () => {
+        return this.doFetch(
+            `${this.getBaseRoute()}/analytics/number_of_active_users`,
+            {method: 'get'},
+        );
+    };
+
+    sendAdminAck = async () => {
+        return this.doFetch(
+            `${this.getBaseRoute()}/email/admin_ack/send`,
+            {method: 'post'},
+        );
+    }
+
     getTranslations = async (url: string) => {
         return this.doFetch(
             url,
@@ -3173,6 +3187,8 @@ export default class Client4 {
             'click_finish',
             'click_dismiss_bar',
             'diagnostics_disabled',
+            'click_admin_ack_button',
+            'click_admin_ack_submit',
         ].includes(event)) {
             return;
         }

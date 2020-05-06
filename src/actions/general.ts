@@ -185,6 +185,25 @@ export function getRedirectLocation(url: string): ActionFunc {
     };
 }
 
+export function getNumberOfActiveUsersMetricStatus(): ActionFunc {
+    return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
+        let data;
+        try {
+            data = await Client4.getNumberOfActiveUsersMetricStatus();
+        } catch (error) {
+            forceLogoutIfNecessary(error, dispatch, getState);
+            return {error};
+        }
+
+        data = JSON.parse(JSON.stringify(data)).numberOfActiveUsersMetricStatus;
+        dispatch(batchActions([
+            {type: GeneralTypes.RECEIVED_NUMBER_OF_ACTIVE_USERS_METRIC_STATUS, data},
+        ]));
+
+        return {data};
+    };
+}
+
 export default {
     getPing,
     getClientConfig,
@@ -198,4 +217,5 @@ export default {
     setStoreFromLocalData,
     setUrl,
     getRedirectLocation,
+    getNumberOfActiveUsersMetricStatus,
 };
