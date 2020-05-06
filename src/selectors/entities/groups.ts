@@ -12,6 +12,8 @@ import {createSelector} from 'reselect';
 
 import {GlobalState} from 'types/store';
 
+import {Dictionary, NameMappedObjects} from 'types/utilities';
+
 const emptyList: any[] = [];
 const emptySyncables = {
     teams: [],
@@ -54,6 +56,22 @@ export function getGroupMembers(state: GlobalState, id: string) {
     }
     return groupMemberData.members;
 }
+
+export const getGroupsByName: (state: GlobalState) => NameMappedObjects<Group> = createSelector(
+    getAllGroups,
+    (groups) => {
+        const groupsByName: Dictionary<Group> = {};
+
+        for (const id in groups) {
+            if (groups.hasOwnProperty(id)) {
+                const group = groups[id];
+                groupsByName[group.name] = group;
+            }
+        }
+
+        return groupsByName;
+    },
+);
 
 export function searchAssociatedGroupsForReferenceLocal(state: GlobalState, term: string, teamId: string, channelId: string): Array<Group> {
     if (!haveIChannelPermission(state, {

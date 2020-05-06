@@ -445,6 +445,15 @@ export default class Client4 {
         );
     }
 
+    getKnownUsers = async () => {
+        this.trackEvent('api', 'api_get_known_users');
+
+        return this.doFetch(
+            `${this.getUsersRoute()}/known`,
+            {method: 'get'},
+        );
+    }
+
     sendPasswordResetEmail = async (email: string) => {
         this.trackEvent('api', 'api_users_send_password_reset');
 
@@ -1543,6 +1552,13 @@ export default class Client4 {
         );
     };
 
+    getChannelMemberCountsByGroup = async (channelId: string, includeTimezones: boolean) => {
+        return this.doFetch(
+            `${this.getChannelRoute(channelId)}/member_counts_by_group?include_timezones=${includeTimezones}`,
+            {method: 'get'},
+        );
+    };
+
     viewMyChannel = async (channelId: string, prevChannelId?: string) => {
         const data = {channel_id: channelId, prev_channel_id: prevChannelId};
         return this.doFetch(
@@ -1611,10 +1627,11 @@ export default class Client4 {
     // Post Routes
 
     createPost = async (post: Post) => {
-        this.trackEvent('api', 'api_posts_create', {channel_id: post.channel_id});
+        const analyticsData = {channel_id: post.channel_id, post_id: post.id, user_actual_id: post.user_id, root_id: post.root_id};
+        this.trackEvent('api', 'api_posts_create', analyticsData);
 
         if (post.root_id != null && post.root_id !== '') {
-            this.trackEvent('api', 'api_posts_replied', {channel_id: post.channel_id});
+            this.trackEvent('api', 'api_posts_replied', analyticsData);
         }
 
         return this.doFetch(
@@ -1624,7 +1641,7 @@ export default class Client4 {
     };
 
     updatePost = async (post: Post) => {
-        this.trackEvent('api', 'api_posts_update', {channel_id: post.channel_id});
+        this.trackEvent('api', 'api_posts_update', {channel_id: post.channel_id, post_id: post.id});
 
         return this.doFetch(
             `${this.getPostRoute(post.id)}`,
@@ -1640,7 +1657,7 @@ export default class Client4 {
     };
 
     patchPost = async (postPatch: Partial<Post> & {id: string}) => {
-        this.trackEvent('api', 'api_posts_patch', {channel_id: postPatch.channel_id});
+        this.trackEvent('api', 'api_posts_patch', {channel_id: postPatch.channel_id, post_id: postPatch.id});
 
         return this.doFetch(
             `${this.getPostRoute(postPatch.id)}/patch`,
