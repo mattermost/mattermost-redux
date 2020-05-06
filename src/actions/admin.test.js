@@ -1216,11 +1216,5 @@ describe('Actions.Admin', () => {
             reply(200, OK_RESPONSE);
 
         await Actions.sendAdminAck()(store.dispatch, store.getState);
-
-        const state = store.getState();
-        const request = state.requests.admin.sendAdminAck;
-        if (request.status === RequestStatus.FAILURE) {
-            throw new Error('sendAdminAck request failed');
-        }
     });
 });

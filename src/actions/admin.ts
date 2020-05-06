@@ -606,9 +606,21 @@ export function setSamlIdpCertificateFromMetadata(certData: string): ActionFunc 
 }
 
 export function sendAdminAck() {
-    return bindClientFunc({
-        clientFunc: Client4.sendAdminAck,
-        params: [
-        ],
-    });
+    return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
+        dispatch({type: AdminTypes.SEND_ADMIN_ACK_REQUEST});
+
+        try {
+            await Client4.sendAdminAck();
+        } catch (error) {
+            dispatch(batchActions([
+                {type: AdminTypes.SEND_ADMIN_ACK_FAILURE, error},
+                logError(error),
+            ]));
+            return {error};
+        }
+
+        dispatch({type: AdminTypes.SEND_ADMIN_ACK_SUCCESS});
+
+        return {data: true};
+    };
 }
