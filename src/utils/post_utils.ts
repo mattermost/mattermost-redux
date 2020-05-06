@@ -25,10 +25,6 @@ export function isSystemMessage(post: Post): boolean {
     return Boolean(post.type && post.type.startsWith(Posts.SYSTEM_MESSAGE_PREFIX));
 }
 
-export function isSystemMessageAddToChannel(post: Post, userId: $ID<UserProfile>): boolean {
-    return Boolean(post.type && post.type === Posts.POST_TYPES.ADD_TO_CHANNEL && post.props.addedUserId === userId);
-}
-
 export function isMeMessage(post: Post): boolean {
     return Boolean(post.type && post.type === Posts.POST_TYPES.ME);
 }
@@ -41,7 +37,10 @@ export function isPostEphemeral(post: Post): boolean {
     return post.type === Posts.POST_TYPES.EPHEMERAL || post.type === Posts.POST_TYPES.EPHEMERAL_ADD_TO_CHANNEL || post.state === Posts.POST_DELETED;
 }
 
-export function shouldIgnorePost(post: Post): boolean {
+export function shouldIgnorePost(post: Post, userId?: $ID<UserProfile>): boolean {
+    if ((post.type && post.type === Posts.POST_TYPES.ADD_TO_CHANNEL) && (post.props.addedUserId && post.props.addedUserId === userId)) {
+        return false;
+    }
     return Posts.IGNORE_POST_TYPES.includes(post.type);
 }
 
