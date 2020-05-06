@@ -6,7 +6,7 @@ import {ChannelCategoryTypes} from 'action_types';
 import {fetchMyChannelsAndMembers, unfavoriteChannel, favoriteChannel} from 'actions/channels';
 
 import {General} from '../constants';
-import {CategoryTypes} from 'constants/channel_categories';
+import {CategoryTypes, Sorting} from 'constants/channel_categories';
 
 import {
     getAllCategoriesByIds,
@@ -21,11 +21,13 @@ import {
 import {getAllChannels, getMyChannelMemberships} from 'selectors/entities/channels';
 import {getMyPreferences} from 'selectors/entities/preferences';
 
-import {ActionFunc, DispatchFunc, GetStateFunc} from 'types/actions';
-import {CategorySorting} from 'types/channel_categories';
+import {ActionFunc, DispatchFunc, GetStateFunc, batchActions} from 'types/actions';
+import {CategorySorting, ChannelCategory} from 'types/channel_categories';
 import {Channel} from 'types/channels';
+import {$ID} from 'types/utilities';
 
 import {isFavoriteChannel} from 'utils/channel_utils';
+import {generateId} from 'utils/helpers';
 
 export function expandCategory(categoryId: string) {
     return {
@@ -244,4 +246,87 @@ function removeItem<T>(array: T[], item: T) {
     const result = [...array];
     result.splice(index, 1);
     return result;
+}
+
+(global as any).createCategory = createCategory;
+
+export function createCategory(teamId: string, displayName: string, channelIds: $ID<Channel>[] = []): ActionFunc {
+    return (dispatch: DispatchFunc, getState: GetStateFunc) => {
+        // TODO contact the server to do this
+
+        const newCategory: ChannelCategory = {
+            id: generateId(),
+            team_id: teamId,
+            type: CategoryTypes.CUSTOM,
+            display_name: displayName,
+            sorting: Sorting.NONE,
+            channel_ids: channelIds,
+        };
+
+        const state = getState();
+
+        const categoryIds = getCategoryIdsForTeam(state, teamId);
+        const favoritesIsFirst = categoryIds.length > 0 && getCategory(state, categoryIds[0]).type === CategoryTypes.FAVORITES;
+
+        const newCategoryIds = [...categoryIds];
+
+        // Place the new category relative to other categories
+        if (favoritesIsFirst) {
+            // Place the new category after the favorites category if it comes first
+            newCategoryIds.splice(1, 0, newCategory.id);
+        } else {
+            // Place the new category first
+            newCategoryIds.unshift(newCategory.id);
+        }
+
+        const categoriesToUpdate = [newCategory];
+
+        // Remove the provided channels from any existing categories they may have existed in
+        if (channelIds.length > 0) {
+            for (const categoryId of categoryIds) {
+                const category = getCategory(state, categoryId);
+
+                if (!category.channel_ids.some((channelId) => channelIds.includes(channelId))) {
+                    continue;
+                }
+
+                categoriesToUpdate.push({
+                    ...category,
+                    channel_ids: category.channel_ids.filter((channelId) => !channelIds.includes(channelId)),
+                });
+            }
+        }
+
+        dispatch(batchActions([
+            {
+                type: ChannelCategoryTypes.RECEIVED_CATEGORIES,
+                data: categoriesToUpdate,
+            },
+            {
+                type: ChannelCategoryTypes.RECEIVED_CATEGORY_ORDER,
+                data: {
+                    teamId,
+                    categoryIds: newCategoryIds,
+                },
+            },
+        ]));
+
+        return {data: newCategory};
+    };
+}
+
+export function renameCategory(categoryId: string, displayName: string): ActionFunc {
+    return (dispatch: DispatchFunc, getState: GetStateFunc) => {
+        // TODO actually talk to the server
+
+        const newCategory = {
+            ...getCategory(getState(), categoryId),
+            display_name: displayName,
+        };
+
+        return dispatch({
+            type: ChannelCategoryTypes.RECEIVED_CATEGORY,
+            data: newCategory,
+        });
+    };
 }

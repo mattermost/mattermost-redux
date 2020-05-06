@@ -60,7 +60,7 @@ export function getCategoryWhere(state: GlobalState, condition: (category: Chann
     return Object.values(categoriesByIds).find(condition);
 }
 
-export function getCategoryIdsForTeam(state: GlobalState, teamId: string): string[] | undefined {
+export function getCategoryIdsForTeam(state: GlobalState, teamId: string): string[] {
     return state.entities.channelCategories.orderByTeam[teamId];
 }
 
