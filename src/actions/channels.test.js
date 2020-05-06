@@ -8,11 +8,16 @@ import * as Actions from 'actions/channels';
 import {addUserToTeam} from 'actions/teams';
 import {getProfilesByIds, login} from 'actions/users';
 import {createIncomingHook, createOutgoingHook} from 'actions/integrations';
+
 import {Client4} from 'client';
+
 import {General, RequestStatus, Preferences, Permissions} from '../constants';
-import {getPreferenceKey} from 'utils/preference_utils';
+import {CategoryTypes} from '../constants/channel_categories';
+
 import TestHelper from 'test/test_helper';
 import configureStore from 'test/test_store';
+
+import {getPreferenceKey} from 'utils/preference_utils';
 
 const OK_RESPONSE = {status: 'OK'};
 
@@ -2091,42 +2096,90 @@ describe('Actions.Channels', () => {
         assert.ok(myMembers[secondChannel.id]);
     });
 
-    it('favoriteChannel', async () => {
+    test('favoriteChannel', async () => {
+        const channel = TestHelper.basicChannel;
+        const team = TestHelper.basicTeam;
+
+        store = await configureStore({
+            entities: {
+                channels: {
+                    channels: {
+                        [channel.id]: channel,
+                    },
+                },
+                channelCategories: {
+                    byId: {
+                        favoritesCategory: {id: 'favoritesCategory', team_id: team.id, type: CategoryTypes.FAVORITES, channel_ids: []},
+                        channelsCategory: {id: 'channelsCategory', team_id: team.id, type: CategoryTypes.CHANNELS, channel_ids: [channel.id]},
+                    },
+                    orderByTeam: {
+                        [team.id]: ['favoritesCategory', 'channelsCategory'],
+                    },
+                },
+            },
+        });
+
         nock(Client4.getBaseRoute()).
             put(`/users/${TestHelper.basicUser.id}/preferences`).
             reply(200, OK_RESPONSE);
 
-        await store.dispatch(Actions.favoriteChannel(TestHelper.basicChannel.id));
+        await store.dispatch(Actions.favoriteChannel(channel.id));
 
         const state = store.getState();
-        const prefKey = getPreferenceKey(Preferences.CATEGORY_FAVORITE_CHANNEL, TestHelper.basicChannel.id);
-        const preference = state.entities.preferences.myPreferences[prefKey];
-        assert.ok(preference);
-        assert.ok(preference.value === 'true');
+
+        // Should favorite the channel in preferences
+        const prefKey = getPreferenceKey(Preferences.CATEGORY_FAVORITE_CHANNEL, channel.id);
+        expect(state.entities.preferences.myPreferences[prefKey]).toMatchObject({value: 'true'});
+
+        // And in channel categories
+        expect(state.entities.channelCategories.byId.favoritesCategory.channel_ids).toEqual([channel.id]);
+        expect(state.entities.channelCategories.byId.channelsCategory.channel_ids).toEqual([]);
     });
 
     it('unfavoriteChannel', async () => {
+        const channel = TestHelper.basicChannel;
+        const team = TestHelper.basicTeam;
+
+        const prefKey = getPreferenceKey(Preferences.CATEGORY_FAVORITE_CHANNEL, channel.id);
+
+        store = await configureStore({
+            entities: {
+                channels: {
+                    channels: {
+                        [channel.id]: channel,
+                    },
+                },
+                channelCategories: {
+                    byId: {
+                        favoritesCategory: {id: 'favoritesCategory', team_id: team.id, type: CategoryTypes.FAVORITES, channel_ids: [channel.id]},
+                        channelsCategory: {id: 'channelsCategory', team_id: team.id, type: CategoryTypes.CHANNELS, channel_ids: []},
+                    },
+                    orderByTeam: {
+                        [team.id]: ['favoritesCategory', 'channelsCategory'],
+                    },
+                },
+                preferences: {
+                    myPreferences: {
+                        [prefKey]: {value: 'true'},
+                    },
+                },
+            },
+        });
+
         nock(Client4.getBaseRoute()).
             put(`/users/${TestHelper.basicUser.id}/preferences`).
             reply(200, OK_RESPONSE);
 
-        await store.dispatch(Actions.favoriteChannel(TestHelper.basicChannel.id));
+        await store.dispatch(Actions.unfavoriteChannel(channel.id));
 
-        let state = store.getState();
-        let prefKey = getPreferenceKey(Preferences.CATEGORY_FAVORITE_CHANNEL, TestHelper.basicChannel.id);
-        let preference = state.entities.preferences.myPreferences[prefKey];
-        assert.ok(preference);
-        assert.ok(preference.value === 'true');
+        const state = store.getState();
 
-        nock(Client4.getBaseRoute()).
-            delete(`/users/${TestHelper.basicUser.id}/preferences`).
-            reply(200, OK_RESPONSE);
-        store.dispatch(Actions.unfavoriteChannel(TestHelper.basicChannel.id));
+        // Should unfavorite the channel in preferences
+        expect(state.entities.preferences.myPreferences[prefKey]).toBeUndefined();
 
-        state = store.getState();
-        prefKey = getPreferenceKey(Preferences.CATEGORY_FAVORITE_CHANNEL, TestHelper.basicChannel.id);
-        preference = state.entities.preferences.myPreferences[prefKey];
-        assert.ok(!preference);
+        // And in channel categories
+        expect(state.entities.channelCategories.byId.favoritesCategory.channel_ids).toEqual([]);
+        expect(state.entities.channelCategories.byId.channelsCategory.channel_ids).toEqual([channel.id]);
     });
 
     it('autocompleteChannels', async () => {
