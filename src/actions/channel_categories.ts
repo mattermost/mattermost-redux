@@ -262,14 +262,13 @@ export function createCategory(teamId: string, displayName: string, channelIds: 
             for (const categoryId of categoryIds) {
                 const category = getCategory(state, categoryId);
 
-                if (!category.channel_ids.some((channelId) => channelIds.includes(channelId))) {
-                    continue;
+                // Only modify categories that have to be changed
+                if (category.channel_ids.some((channelId) => channelIds.includes(channelId))) {
+                    categoriesToUpdate.push({
+                        ...category,
+                        channel_ids: category.channel_ids.filter((channelId) => !channelIds.includes(channelId)),
+                    });
                 }
-
-                categoriesToUpdate.push({
-                    ...category,
-                    channel_ids: category.channel_ids.filter((channelId) => !channelIds.includes(channelId)),
-                });
             }
         }
 
