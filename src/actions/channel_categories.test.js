@@ -10,6 +10,7 @@ import {getAllCategoriesByIds} from 'selectors/entities/channel_categories';
 import {isFavoriteChannel} from 'selectors/entities/preferences';
 
 import * as Actions from './channel_categories';
+import {getCategory, getCategoryIdsForTeam} from '../selectors/entities/channel_categories';
 
 describe('setCategorySorting', () => {
     test('should set sorting method correctly', async () => {
@@ -519,5 +520,84 @@ describe('renameCategory', () => {
         state = store.getState();
 
         expect(state.entities.channelCategories.byId[category.id].display_name).toBe('new name');
+    });
+});
+
+describe('deleteCategory', () => {
+    const teamId = 'team1';
+
+    test('should remove empty categories', async () => {
+        const store = await configureStore({
+            entities: {
+                channelCategories: {
+                    byId: {
+                        category1: {id: 'category1', team_id: teamId, channel_ids: []},
+                        category2: {id: 'category2', team_id: teamId, channel_ids: []},
+                        category3: {id: 'category3', team_id: teamId, channel_ids: []},
+                        category4: {id: 'category4', team_id: teamId, channel_ids: []},
+                    },
+                    orderByTeam: {
+                        [teamId]: ['category1', 'category2', 'category3', 'category4'],
+                    },
+                },
+            },
+        });
+
+        store.dispatch(Actions.deleteCategory('category3'));
+
+        let state = store.getState();
+
+        expect(state.entities.channelCategories.byId.category3).toBeUndefined();
+        expect(state.entities.channelCategories.orderByTeam[teamId]).toEqual(['category1', 'category2', 'category4']);
+        expect(getCategory(state, 'category3')).toBeUndefined();
+        expect(getCategoryIdsForTeam(state, 'team1')).toEqual(['category1', 'category2', 'category4']);
+
+        store.dispatch(Actions.deleteCategory('category1'));
+
+        state = store.getState();
+
+        expect(state.entities.channelCategories.byId.category3).toBeUndefined();
+        expect(state.entities.channelCategories.orderByTeam[teamId]).toEqual(['category2', 'category4']);
+        expect(getCategory(state, 'category1')).toBeUndefined();
+        expect(getCategoryIdsForTeam(state, 'team1')).toEqual(['category2', 'category4']);
+    });
+
+    test('should move any channels from the deleted category to their default categories', async () => {
+        const category1 = {id: 'category1', team_id: teamId, type: CategoryTypes.CUSTOM, channel_ids: ['channel1', 'channel2', 'dmChannel1', 'gmChannel1']};
+        const channelsCategory = {id: 'channelsCategory', team_id: teamId, type: CategoryTypes.CHANNELS, channel_ids: ['channel3']};
+        const dmsCategory = {id: 'dmsCategory', team_id: teamId, type: CategoryTypes.DIRECT_MESSAGES, channel_ids: ['dmChannel2']};
+
+        const store = await configureStore({
+            entities: {
+                channelCategories: {
+                    byId: {
+                        category1,
+                        channelsCategory,
+                        dmsCategory,
+                    },
+                    orderByTeam: {
+                        [teamId]: [category1.id, channelsCategory.id, dmsCategory.id],
+                    },
+                },
+                channels: {
+                    channels: {
+                        channel1: {id: 'channel1', type: General.OPEN_CHANNEL, delete_at: 0},
+                        channel2: {id: 'channel2', type: General.PRIVATE_CHANNEL, delete_at: 0},
+                        channel3: {id: 'channel3', type: General.PRIVATE_CHANNEL, delete_at: 0},
+                        dmChannel1: {id: 'dmChannel1', type: General.DM_CHANNEL, delete_at: 0},
+                        dmChannel2: {id: 'dmChannel2', type: General.DM_CHANNEL, delete_at: 0},
+                        gmChannel1: {id: 'gmChannel1', type: General.GM_CHANNEL, delete_at: 0},
+                    },
+                },
+            },
+        });
+
+        store.dispatch(Actions.deleteCategory(category1.id));
+
+        const state = store.getState();
+
+        expect(state.entities.channelCategories.byId.category1).toBeUndefined();
+        expect(getCategory(state, channelsCategory.id)).toMatchObject({channel_ids: ['channel2', 'channel1', 'channel3']});
+        expect(getCategory(state, dmsCategory.id)).toMatchObject({channel_ids: ['gmChannel1', 'dmChannel1', 'dmChannel2']});
     });
 });

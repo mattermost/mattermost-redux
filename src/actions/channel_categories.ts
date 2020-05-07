@@ -18,14 +18,21 @@ import {
     makeSortChannelsByNameWithDMs,
     makeSortChannelsByName,
 } from 'selectors/entities/channel_categories';
-import {getAllChannels, getMyChannelMemberships} from 'selectors/entities/channels';
+import {getAllChannels, getMyChannelMemberships, makeGetChannelsForIds} from 'selectors/entities/channels';
 import {getMyPreferences} from 'selectors/entities/preferences';
 
-import {ActionFunc, DispatchFunc, GetStateFunc, batchActions} from 'types/actions';
+import {
+    ActionFunc,
+    Action,
+    batchActions,
+    DispatchFunc,
+    GetStateFunc,
+} from 'types/actions';
 import {CategorySorting, ChannelCategory} from 'types/channel_categories';
 import {Channel} from 'types/channels';
 import {$ID} from 'types/utilities';
 
+import {insertWithoutDuplicates, removeItem} from 'utils/array_utils';
 import {isFavoriteChannel} from 'utils/channel_utils';
 import {generateId} from 'utils/helpers';
 
@@ -217,37 +224,6 @@ export function moveCategory(teamId: string, categoryId: string, newIndex: numbe
     };
 }
 
-function insertWithoutDuplicates<T>(array: T[], item: T, newIndex: number) {
-    const index = array.indexOf(item);
-    if (newIndex === index) {
-        // The item doesn't need to be moved since its location hasn't changed
-        return array;
-    }
-
-    const newArray = [...array];
-
-    // Remove the item from its old location if it already exists in the array
-    if (index !== -1) {
-        newArray.splice(index, 1);
-    }
-
-    // And re-add it in its new location
-    newArray.splice(newIndex, 0, item);
-
-    return newArray;
-}
-
-function removeItem<T>(array: T[], item: T) {
-    const index = array.indexOf(item);
-    if (index === -1) {
-        return array;
-    }
-
-    const result = [...array];
-    result.splice(index, 1);
-    return result;
-}
-
 (global as any).createCategory = createCategory;
 
 export function createCategory(teamId: string, displayName: string, channelIds: $ID<Channel>[] = []): ActionFunc {
@@ -328,5 +304,54 @@ export function renameCategory(categoryId: string, displayName: string): ActionF
             type: ChannelCategoryTypes.RECEIVED_CATEGORY,
             data: newCategory,
         });
+    };
+}
+
+export function deleteCategory(categoryId: string): ActionFunc {
+    return (dispatch: DispatchFunc, getState: GetStateFunc) => {
+        // TODO actually talk to the server
+
+        const actions: Action[] = [{
+            type: ChannelCategoryTypes.CATEGORY_DELETED,
+            data: categoryId,
+        }];
+
+        const state = getState();
+        const category = getCategory(state, categoryId);
+
+        // Remove the channels from this category and add them to their default Channels/Direct Messages categories
+        if (category.channel_ids.length > 0) {
+            const channels = makeGetChannelsForIds()(state, category.channel_ids);
+
+            const channelsCategory = getCategoryInTeamByType(state, category.team_id, CategoryTypes.CHANNELS);
+            const dmsCategory = getCategoryInTeamByType(state, category.team_id, CategoryTypes.DIRECT_MESSAGES);
+
+            const nextChannelsCategory = {
+                ...channelsCategory,
+                channel_ids: [...channelsCategory?.channel_ids],
+            };
+            const nextDmsCategory = {
+                ...dmsCategory,
+                channel_ids: [...dmsCategory?.channel_ids],
+            };
+
+            for (const channel of channels) {
+                if (channel.type === General.DM_CHANNEL || channel.type === General.GM_CHANNEL) {
+                    nextDmsCategory.channel_ids = insertWithoutDuplicates(nextDmsCategory.channel_ids, channel.id, 0);
+                } else {
+                    nextChannelsCategory.channel_ids = insertWithoutDuplicates(nextChannelsCategory.channel_ids, channel.id, 0);
+                }
+            }
+
+            actions.push({
+                type: ChannelCategoryTypes.RECEIVED_CATEGORIES,
+                data: [
+                    nextDmsCategory,
+                    nextChannelsCategory,
+                ],
+            });
+        }
+
+        return dispatch(batchActions(actions));
     };
 }
