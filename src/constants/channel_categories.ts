@@ -4,10 +4,9 @@
 import {CategorySorting, ChannelCategoryType} from 'types/channel_categories';
 import {Dictionary} from 'types/utilities';
 
-export const CategoryTypes: {[name: string]: ChannelCategoryType} = {
+export const CategoryTypes: {[name: string]: ChannelCategoryType} = { // TODO update values to match the ones provided by the server
     FAVORITES: 'favorites',
-    PUBLIC: 'public',
-    PRIVATE: 'private',
+    CHANNELS: 'channels',
     DIRECT_MESSAGES: 'direct_messages',
     CUSTOM: 'custom',
 };
