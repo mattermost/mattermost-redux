@@ -224,8 +224,6 @@ export function moveCategory(teamId: string, categoryId: string, newIndex: numbe
     };
 }
 
-(global as any).createCategory = createCategory;
-
 export function createCategory(teamId: string, displayName: string, channelIds: $ID<Channel>[] = []): ActionFunc {
     return (dispatch: DispatchFunc, getState: GetStateFunc) => {
         // TODO contact the server to do this
