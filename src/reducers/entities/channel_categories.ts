@@ -12,6 +12,8 @@ import {ChannelCategory} from 'types/channel_categories';
 import {Team, TeamMembership} from 'types/teams';
 import {$ID, IDMappedObjects, RelationOneToOne} from 'types/utilities';
 
+import {removeItem} from 'utils/array_utils';
+
 export function byId(state: IDMappedObjects<ChannelCategory> = {}, action: GenericAction) {
     switch (action.type) {
     case TeamTypes.RECEIVED_MY_TEAM_MEMBER: {
@@ -60,6 +62,16 @@ export function byId(state: IDMappedObjects<ChannelCategory> = {}, action: Gener
                 ...category,
             },
         };
+    }
+
+    case ChannelCategoryTypes.CATEGORY_DELETED: {
+        const categoryId: $ID<ChannelCategory> = action.data;
+
+        const nextState = {...state};
+
+        Reflect.deleteProperty(nextState, categoryId);
+
+        return nextState;
     }
 
     case ChannelTypes.LEAVE_CHANNEL: {
@@ -152,6 +164,19 @@ export function orderByTeam(state: RelationOneToOne<Team, $ID<ChannelCategory>[]
             ...state,
             [teamId]: categoryIds,
         };
+    }
+
+    case ChannelCategoryTypes.CATEGORY_DELETED: {
+        const categoryId: $ID<ChannelCategory> = action.data;
+
+        const nextState = {...state};
+
+        for (const teamId of Object.keys(nextState)) {
+            // removeItem only modifies the array if it contains the category ID, so other teams' state won't be modified
+            nextState[teamId] = removeItem(state[teamId], categoryId);
+        }
+
+        return nextState;
     }
 
     case TeamTypes.LEAVE_TEAM: {

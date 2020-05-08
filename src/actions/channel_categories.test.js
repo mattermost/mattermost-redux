@@ -10,6 +10,7 @@ import {getAllCategoriesByIds} from 'selectors/entities/channel_categories';
 import {isFavoriteChannel} from 'selectors/entities/preferences';
 
 import * as Actions from './channel_categories';
+import {getCategory, getCategoryIdsForTeam} from '../selectors/entities/channel_categories';
 
 describe('setCategorySorting', () => {
     test('should set sorting method correctly', async () => {
@@ -339,5 +340,264 @@ describe('moveCategory', () => {
         state = store.getState();
 
         expect(state.entities.channelCategories.orderByTeam.team1).toEqual(['category3', 'category4', 'category2', 'category1']);
+    });
+});
+
+describe('createCategory', () => {
+    const teamId = 'team1';
+
+    test('should add the new category to a team which never had any to begin with', async () => {
+        const store = await configureStore({
+            entities: {
+                channelCategories: {
+                    orderByTeam: {
+                        [teamId]: [],
+                    },
+                },
+            },
+        });
+
+        const result = store.dispatch(Actions.createCategory(teamId, 'new category'));
+
+        const state = store.getState();
+
+        // The category and its order should be saved
+        expect(state.entities.channelCategories.orderByTeam[teamId]).toEqual([result.data.id]);
+        expect(state.entities.channelCategories.byId[result.data.id]).toEqual(result.data);
+    });
+
+    test('should add a new category as the first category', async () => {
+        const channelsCategory = {id: 'channelsCategory', team_id: teamId, type: CategoryTypes.CHANNELS};
+
+        const store = await configureStore({
+            entities: {
+                channelCategories: {
+                    byId: {
+                        channelsCategory,
+                    },
+                    orderByTeam: {
+                        [teamId]: [channelsCategory.id],
+                    },
+                },
+            },
+        });
+
+        const result = store.dispatch(Actions.createCategory(teamId, 'new category'));
+
+        const state = store.getState();
+
+        // The new category should come first
+        expect(state.entities.channelCategories.orderByTeam[teamId]).toEqual([result.data.id, channelsCategory.id]);
+    });
+
+    test('should add a new category after the favorites category if the favorites were first', async () => {
+        const channelsCategory = {id: 'channelsCategory', team_id: teamId, type: CategoryTypes.CHANNELS};
+        const favoritesCategory = {id: 'favoritesCategory', team_id: teamId, type: CategoryTypes.FAVORITES};
+
+        const store = await configureStore({
+            entities: {
+                channelCategories: {
+                    byId: {
+                        channelsCategory,
+                        favoritesCategory,
+                    },
+                    orderByTeam: {
+                        [teamId]: [favoritesCategory.id, channelsCategory.id],
+                    },
+                },
+            },
+        });
+
+        const result = store.dispatch(Actions.createCategory(teamId, 'new category'));
+
+        const state = store.getState();
+
+        // The new category should come after the favorites category
+        expect(state.entities.channelCategories.orderByTeam[teamId]).toEqual([favoritesCategory.id, result.data.id, channelsCategory.id]);
+    });
+
+    test('should add a new category as the first category if favorites exists and it is not first', async () => {
+        const channelsCategory = {id: 'channelsCategory', team_id: teamId, type: CategoryTypes.CHANNELS};
+        const favoritesCategory = {id: 'favoritesCategory', team_id: teamId, type: CategoryTypes.FAVORITES};
+
+        const store = await configureStore({
+            entities: {
+                channelCategories: {
+                    byId: {
+                        channelsCategory,
+                        favoritesCategory,
+                    },
+                    orderByTeam: {
+                        [teamId]: [channelsCategory.id, favoritesCategory.id],
+                    },
+                },
+            },
+        });
+
+        const result = store.dispatch(Actions.createCategory(teamId, 'new category'));
+
+        const state = store.getState();
+
+        // The new category should come first
+        expect(state.entities.channelCategories.orderByTeam[teamId]).toEqual([result.data.id, channelsCategory.id, favoritesCategory.id]);
+    });
+
+    test('should add new channels to the category', async () => {
+        const store = await configureStore({
+            entities: {
+                channelCategories: {
+                    orderByTeam: {
+                        [teamId]: [],
+                    },
+                },
+            },
+        });
+
+        const result = store.dispatch(Actions.createCategory(teamId, 'new category', ['channel1', 'channel2']));
+
+        const state = store.getState();
+
+        // Should save the category with the specified channels
+        expect(result.data.channel_ids).toEqual(['channel1', 'channel2']);
+        expect(state.entities.channelCategories.byId[result.data.id]).toEqual(result.data);
+    });
+
+    test('should add new channels to the category', async () => {
+        const channelsCategory = {id: 'channelsCategory', team_id: teamId, type: CategoryTypes.CHANNELS, channel_ids: ['channel1', 'channel3']};
+        const favoritesCategory = {id: 'favoritesCategory', team_id: teamId, type: CategoryTypes.FAVORITES, channel_ids: ['channel2', 'channel4']};
+
+        const store = await configureStore({
+            entities: {
+                channelCategories: {
+                    byId: {
+                        channelsCategory,
+                        favoritesCategory,
+                    },
+                    orderByTeam: {
+                        [teamId]: [favoritesCategory.id, channelsCategory.id],
+                    },
+                },
+            },
+        });
+
+        const result = store.dispatch(Actions.createCategory(teamId, 'new category', ['channel1', 'channel2']));
+
+        const state = store.getState();
+
+        // Should save the category with the specified channels
+        expect(result.data.channel_ids).toEqual(['channel1', 'channel2']);
+        expect(state.entities.channelCategories.byId[result.data.id]).toEqual(result.data);
+
+        // And should remove the channels from their previous categories
+        expect(state.entities.channelCategories.byId[channelsCategory.id].channel_ids).toEqual(['channel3']);
+        expect(state.entities.channelCategories.byId[favoritesCategory.id].channel_ids).toEqual(['channel4']);
+    });
+});
+
+describe('renameCategory', () => {
+    const teamId = 'team1';
+
+    test('should rename the given category', async () => {
+        const store = await configureStore({
+            entities: {
+                channelCategories: {
+                    orderByTeam: {
+                        [teamId]: [],
+                    },
+                },
+            },
+        });
+
+        const category = store.dispatch(Actions.createCategory(teamId, 'original name')).data;
+
+        let state = store.getState();
+
+        expect(category.display_name).toBe('original name');
+        expect(state.entities.channelCategories.byId[category.id].display_name).toBe('original name');
+
+        store.dispatch(Actions.renameCategory(category.id, 'new name'));
+
+        state = store.getState();
+
+        expect(state.entities.channelCategories.byId[category.id].display_name).toBe('new name');
+    });
+});
+
+describe('deleteCategory', () => {
+    const teamId = 'team1';
+
+    test('should remove empty categories', async () => {
+        const store = await configureStore({
+            entities: {
+                channelCategories: {
+                    byId: {
+                        category1: {id: 'category1', team_id: teamId, channel_ids: []},
+                        category2: {id: 'category2', team_id: teamId, channel_ids: []},
+                        category3: {id: 'category3', team_id: teamId, channel_ids: []},
+                        category4: {id: 'category4', team_id: teamId, channel_ids: []},
+                    },
+                    orderByTeam: {
+                        [teamId]: ['category1', 'category2', 'category3', 'category4'],
+                    },
+                },
+            },
+        });
+
+        store.dispatch(Actions.deleteCategory('category3'));
+
+        let state = store.getState();
+
+        expect(state.entities.channelCategories.byId.category3).toBeUndefined();
+        expect(state.entities.channelCategories.orderByTeam[teamId]).toEqual(['category1', 'category2', 'category4']);
+        expect(getCategory(state, 'category3')).toBeUndefined();
+        expect(getCategoryIdsForTeam(state, 'team1')).toEqual(['category1', 'category2', 'category4']);
+
+        store.dispatch(Actions.deleteCategory('category1'));
+
+        state = store.getState();
+
+        expect(state.entities.channelCategories.byId.category3).toBeUndefined();
+        expect(state.entities.channelCategories.orderByTeam[teamId]).toEqual(['category2', 'category4']);
+        expect(getCategory(state, 'category1')).toBeUndefined();
+        expect(getCategoryIdsForTeam(state, 'team1')).toEqual(['category2', 'category4']);
+    });
+
+    test('should move any channels from the deleted category to their default categories', async () => {
+        const category1 = {id: 'category1', team_id: teamId, type: CategoryTypes.CUSTOM, channel_ids: ['channel1', 'channel2', 'dmChannel1', 'gmChannel1']};
+        const channelsCategory = {id: 'channelsCategory', team_id: teamId, type: CategoryTypes.CHANNELS, channel_ids: ['channel3']};
+        const dmsCategory = {id: 'dmsCategory', team_id: teamId, type: CategoryTypes.DIRECT_MESSAGES, channel_ids: ['dmChannel2']};
+
+        const store = await configureStore({
+            entities: {
+                channelCategories: {
+                    byId: {
+                        category1,
+                        channelsCategory,
+                        dmsCategory,
+                    },
+                    orderByTeam: {
+                        [teamId]: [category1.id, channelsCategory.id, dmsCategory.id],
+                    },
+                },
+                channels: {
+                    channels: {
+                        channel1: {id: 'channel1', type: General.OPEN_CHANNEL, delete_at: 0},
+                        channel2: {id: 'channel2', type: General.PRIVATE_CHANNEL, delete_at: 0},
+                        channel3: {id: 'channel3', type: General.PRIVATE_CHANNEL, delete_at: 0},
+                        dmChannel1: {id: 'dmChannel1', type: General.DM_CHANNEL, delete_at: 0},
+                        dmChannel2: {id: 'dmChannel2', type: General.DM_CHANNEL, delete_at: 0},
+                        gmChannel1: {id: 'gmChannel1', type: General.GM_CHANNEL, delete_at: 0},
+                    },
+                },
+            },
+        });
+
+        store.dispatch(Actions.deleteCategory(category1.id));
+
+        const state = store.getState();
+
+        expect(state.entities.channelCategories.byId.category1).toBeUndefined();
+        expect(getCategory(state, channelsCategory.id)).toMatchObject({channel_ids: ['channel2', 'channel1', 'channel3']});
+        expect(getCategory(state, dmsCategory.id)).toMatchObject({channel_ids: ['gmChannel1', 'dmChannel1', 'dmChannel2']});
     });
 });
