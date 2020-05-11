@@ -306,6 +306,16 @@ export const getProfilesInTeam: (state: GlobalState, teamId: $ID<Team>) => Array
     },
 );
 
+export const getProfilesNotInTeam: (state: GlobalState, teamId: $ID<Team>) => Array<UserProfile> = createSelector(
+    getUsers,
+    getUserIdsNotInTeams,
+    (state: GlobalState, teamId: string) => teamId,
+    (state: GlobalState, teamId, filters) => filters,
+    (profiles, usersNotInTeams, teamId, filters) => {
+        return sortAndInjectProfiles(filterProfiles(profiles, filters), usersNotInTeams[teamId] || new Set());
+    },
+);
+
 export const getProfilesNotInCurrentTeam: (state: GlobalState) => Array<UserProfile> = createSelector(
     getUsers,
     getProfileSetNotInCurrentTeam,

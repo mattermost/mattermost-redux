@@ -246,6 +246,9 @@ function profilesInTeam(state: RelationOneToMany<Team, UserProfile> = {}, action
     case UserTypes.RECEIVED_PROFILES_LIST_IN_TEAM:
         return profileListToSet(state, action);
 
+    case UserTypes.RECEIVED_PROFILES_LIST_IN_TEAM_AND_REPLACE:
+        return profileListToSet(state, action, true);
+
     case UserTypes.RECEIVED_PROFILES_IN_TEAM:
         return profilesToSet(state, action);
 
