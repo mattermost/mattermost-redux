@@ -258,6 +258,11 @@ describe('Selectors.Users', () => {
         });
     });
 
+    describe('getProfilesNotInTeam', () => {
+        const users = [user3, user4].sort(sortByUsername);
+        assert.deepEqual(Selectors.getProfilesNotInCurrentTeam(testState, team1.id), users);
+    });
+
     it('getProfilesNotInCurrentTeam', () => {
         const users = [user3, user4].sort(sortByUsername);
         assert.deepEqual(Selectors.getProfilesNotInCurrentTeam(testState), users);
