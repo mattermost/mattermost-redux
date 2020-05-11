@@ -87,7 +87,7 @@ describe('Selectors.Groups', () => {
                     [expectedAssociatedGroupID1]: group1,
                     [expectedAssociatedGroupID4]: group4,
                     [expectedAssociatedGroupID2]: group2,
-                }
+                },
             },
             teams: {
                 groupsAssociatedToTeam: {
