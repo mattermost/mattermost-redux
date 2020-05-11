@@ -297,3 +297,13 @@ export function patchGroup(groupID: string, patch: GroupPatch): ActionFunc {
         ],
     });
 }
+
+export function getGroupsByUserId(userID: string): ActionFunc {
+    return bindClientFunc({
+        clientFunc: Client4.getGroupsByUserId,
+        onSuccess: [GroupTypes.RECEIVED_MY_GROUPS],
+        params: [
+            userID,
+        ],
+    });
+}

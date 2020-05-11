@@ -62,6 +62,9 @@ export type GroupsState = {
     groups: {
         [x: string]: Group;
     };
+    myGroups: {
+        [x: string]: Group;
+    };
 };
 export type GroupSearchOpts = {
     q: string;
