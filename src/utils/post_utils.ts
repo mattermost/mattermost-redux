@@ -34,7 +34,7 @@ export function isFromWebhook(post: Post): boolean {
 }
 
 export function isPostEphemeral(post: Post): boolean {
-    return post.type === Posts.POST_TYPES.EPHEMERAL || post.type === Posts.POST_TYPES.EPHEMERAL_ADD_TO_CHANNEL || post.type === Posts.POST_TYPES.EPHEMERAL_WARN_METRIC_STATUS || post.state === Posts.POST_DELETED;
+    return post.type === Posts.POST_TYPES.EPHEMERAL || post.type === Posts.POST_TYPES.EPHEMERAL_ADD_TO_CHANNEL || post.state === Posts.POST_DELETED;
 }
 
 export function shouldIgnorePost(post: Post): boolean {

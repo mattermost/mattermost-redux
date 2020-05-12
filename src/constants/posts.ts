@@ -28,7 +28,7 @@ export const PostTypes = {
     COMBINED_USER_ACTIVITY: 'system_combined_user_activity',
     ME: 'me',
     ADD_BOT_TEAMS_CHANNELS: 'add_bot_teams_channels',
-    EPHEMERAL_WARN_METRIC_STATUS: 'system_ephemeral_warn_metric_status',
+    SYSTEM_WARN_METRIC_STATUS: 'system_warn_metric_status',
 };
 
 export default {
