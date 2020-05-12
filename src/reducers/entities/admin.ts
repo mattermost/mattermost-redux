@@ -201,6 +201,9 @@ export function convertAnalyticsRowsToStats(data: any, name: string) {
         case 'session_count':
             key = Stats.TOTAL_SESSIONS;
             break;
+        case 'registered_users':
+            key = Stats.REGISTERED_USERS;
+            break;
         }
 
         if (key) {

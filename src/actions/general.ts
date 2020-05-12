@@ -185,19 +185,20 @@ export function getRedirectLocation(url: string): ActionFunc {
     };
 }
 
-export function getNumberOfActiveUsersMetricStatus(): ActionFunc {
+export function getWarnMetricsStatus(): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         let data;
         try {
-            data = await Client4.getNumberOfActiveUsersMetricStatus();
+            data = await Client4.getWarnMetricsStatus();
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch, getState);
             return {error};
         }
 
-        data = JSON.parse(JSON.stringify(data)).numberOfActiveUsersMetricStatus;
+        data = JSON.parse(JSON.stringify(data));
+
         dispatch(batchActions([
-            {type: GeneralTypes.RECEIVED_NUMBER_OF_ACTIVE_USERS_METRIC_STATUS, data},
+            {type: GeneralTypes.RECEIVED_WARN_METRICS_STATUS, data},
         ]));
 
         return {data};
@@ -217,5 +218,5 @@ export default {
     setStoreFromLocalData,
     setUrl,
     getRedirectLocation,
-    getNumberOfActiveUsersMetricStatus,
+    getWarnMetricsStatus,
 };

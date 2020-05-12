@@ -1956,17 +1956,17 @@ export default class Client4 {
         );
     };
 
-    getNumberOfActiveUsersMetricStatus = async () => {
+    getWarnMetricsStatus = async () => {
         return this.doFetch(
-            `${this.getBaseRoute()}/analytics/number_of_active_users`,
+            `${this.getBaseRoute()}/analytics/warn_metrics_status`,
             {method: 'get'},
         );
     };
 
-    sendAdminAck = async () => {
+    sendWarnMetricAck = async (warnMetricId: string) => {
         return this.doFetch(
-            `${this.getBaseRoute()}/email/admin_ack/send`,
-            {method: 'post'},
+            `${this.getBaseRoute()}/email/warn_metric_ack/send`,
+            {method: 'post', body: JSON.stringify({warnMetricId})},
         );
     }
 
@@ -3187,8 +3187,8 @@ export default class Client4 {
             'click_finish',
             'click_dismiss_bar',
             'diagnostics_disabled',
-            'click_admin_ack_button',
-            'click_admin_ack_submit',
+            'click_warn_metric_ack_button',
+            'click_warn_metric_ack_acknowledge',
         ].includes(event)) {
             return;
         }

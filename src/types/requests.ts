@@ -80,7 +80,7 @@ export type AdminRequestsStatuses = {
     uploadPlugin: RequestStatusType;
     uploadPrivateSamlCertificate: RequestStatusType;
     uploadPublicSamlCertificate: RequestStatusType;
-    sendAdminAck: RequestStatusType;
+    sendWarnMetricAck: RequestStatusType;
 };
 
 export type EmojisRequestsStatuses = {

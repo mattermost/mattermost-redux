@@ -132,20 +132,22 @@ describe('Actions.General', () => {
         assert.equal(timezones.length === 0, false);
     });
 
-    it('getNumberOfActiveUsersMetricStatus', async () => {
+    it('getWarnMetricsStatus', async () => {
         const responseData = {
-            numberOfActiveUsersMetricStatus: false,
+            metric1: true,
+            metric2: false,
         };
 
         nock(Client4.getBaseRoute()).
-            get('/analytics/number_of_active_users').
+            get('/analytics/warn_metrics_status').
             query(true).
             reply(200, responseData);
 
-        await Actions.getNumberOfActiveUsersMetricStatus()(store.dispatch, store.getState);
+        await Actions.getWarnMetricsStatus()(store.dispatch, store.getState);
         await TestHelper.wait(100);
-        const {numberOfActiveUsersMetricStatus} = store.getState().entities.general;
-        assert.deepEqual(numberOfActiveUsersMetricStatus, false);
+        const {warnMetricsStatus} = store.getState().entities.general;
+        assert.deepEqual(warnMetricsStatus.metric1, true);
+        assert.deepEqual(warnMetricsStatus.metric2, false);
     });
 
     describe('getRedirectLocation', () => {

@@ -10,4 +10,5 @@ export type AdminState = {
     ldapGroupsCount: number;
     userAccessTokens: any[];
     clusterInfo: any;
+    analytics: any;
 };

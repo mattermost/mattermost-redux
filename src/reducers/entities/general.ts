@@ -103,9 +103,9 @@ function serverVersion(state = '', action: GenericAction) {
     }
 }
 
-function numberOfActiveUsersMetricStatus(state: any = {}, action: GenericAction) {
+function warnMetricsStatus(state: any = {}, action: GenericAction) {
     switch (action.type) {
-    case GeneralTypes.RECEIVED_NUMBER_OF_ACTIVE_USERS_METRIC_STATUS:
+    case GeneralTypes.RECEIVED_WARN_METRICS_STATUS:
         return action.data;
     default:
         return state;
@@ -121,5 +121,5 @@ export default combineReducers({
     license,
     serverVersion,
     timezones,
-    numberOfActiveUsersMetricStatus,
+    warnMetricsStatus,
 });

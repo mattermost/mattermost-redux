@@ -159,7 +159,6 @@ export function getPost(postId: string) {
                 type: PostTypes.GET_POSTS_SUCCESS,
             },
         ]));
-
         return {data: post};
     };
 }

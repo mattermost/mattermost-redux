@@ -678,7 +678,7 @@ describe('Actions.Admin', () => {
             get('/analytics/old').
             query(true).
             times(2).
-            reply(200, [{name: 'channel_open_count', value: 495}, {name: 'channel_private_count', value: 19}, {name: 'post_count', value: 2763}, {name: 'unique_user_count', value: 316}, {name: 'team_count', value: 159}, {name: 'total_websocket_connections', value: 1}, {name: 'total_master_db_connections', value: 8}, {name: 'total_read_db_connections', value: 0}, {name: 'daily_active_users', value: 22}, {name: 'monthly_active_users', value: 114}]);
+            reply(200, [{name: 'channel_open_count', value: 495}, {name: 'channel_private_count', value: 19}, {name: 'post_count', value: 2763}, {name: 'unique_user_count', value: 316}, {name: 'team_count', value: 159}, {name: 'total_websocket_connections', value: 1}, {name: 'total_master_db_connections', value: 8}, {name: 'total_read_db_connections', value: 0}, {name: 'daily_active_users', value: 22}, {name: 'monthly_active_users', value: 114}, {name: 'registered_users', value: 500}]);
 
         await Actions.getStandardAnalytics()(store.dispatch, store.getState);
         await Actions.getStandardAnalytics(TestHelper.basicTeam.id)(store.dispatch, store.getState);
@@ -1210,11 +1210,14 @@ describe('Actions.Admin', () => {
         const state = store.getState();
     });
 
-    it('sendAdminAck', async () => {
+    it('sendWarnMetricAck', async () => {
+        const warnMetricAck = {
+            metric1: true,
+        };
         nock(Client4.getBaseRoute()).
-            get('/email/admin_ack/send').
+            get('/email/warn_metric_ack/send').
             reply(200, OK_RESPONSE);
 
-        await Actions.sendAdminAck()(store.dispatch, store.getState);
+        await Actions.sendWarnMetricAck(warnMetricAck)(store.dispatch, store.getState);
     });
 });

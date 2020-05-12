@@ -605,21 +605,21 @@ export function setSamlIdpCertificateFromMetadata(certData: string): ActionFunc 
     });
 }
 
-export function sendAdminAck() {
+export function sendWarnMetricAck(warnMetricId: string) {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
-        dispatch({type: AdminTypes.SEND_ADMIN_ACK_REQUEST});
+        dispatch({type: AdminTypes.SEND_WARN_METRIC_ACK_REQUEST});
 
         try {
-            await Client4.sendAdminAck();
+            await Client4.sendWarnMetricAck(warnMetricId);
         } catch (error) {
             dispatch(batchActions([
-                {type: AdminTypes.SEND_ADMIN_ACK_FAILURE, error},
+                {type: AdminTypes.SEND_WARN_METRIC_ACK_FAILURE, error},
                 logError(error),
             ]));
             return {error};
         }
 
-        dispatch({type: AdminTypes.SEND_ADMIN_ACK_SUCCESS});
+        dispatch({type: AdminTypes.SEND_WARN_METRIC_ACK_SUCCESS});
 
         return {data: true};
     };

@@ -26,8 +26,8 @@ export function getCurrentUrl(state: GlobalState): string {
     return state.entities.general.credentials.url;
 }
 
-export function numberOfActiveUsersMetricStatus(state: GlobalState): boolean {
-    return state.entities.general.numberOfActiveUsersMetricStatus;
+export function warnMetricsStatus(state: GlobalState): any {
+    return state.entities.general.warnMetricsStatus;
 }
 
 export function isCompatibleWithJoinViewTeamPermissions(state: GlobalState): boolean {

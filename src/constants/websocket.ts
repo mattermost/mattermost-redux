@@ -41,6 +41,6 @@ const WebsocketEvents = {
     PLUGIN_STATUSES_CHANGED: 'plugin_statuses_changed',
     OPEN_DIALOG: 'open_dialog',
     INCREASE_POST_VISIBILITY_BY_ONE: 'increase_post_visibility_by_one',
-    NUMBER_OF_ACTIVE_USERS_METRIC_STATUS: 'number_of_active_users_metric_status',
+    WARN_METRICS_STATUS: 'warn_metrics_status',
 };
 export default WebsocketEvents;

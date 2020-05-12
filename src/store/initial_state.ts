@@ -14,7 +14,7 @@ const state: GlobalState = {
             license: {},
             serverVersion: '',
             timezones: [],
-            numberOfActiveUsersMetricStatus: false,
+            warnMetricsStatus: {},
         },
         users: {
             currentUserId: '',
@@ -87,6 +87,7 @@ const state: GlobalState = {
             ldapGroupsCount: 0,
             userAccessTokens: [],
             clusterInfo: {},
+            analytics: {},
         },
         jobs: {
             jobs: {},
@@ -393,7 +394,7 @@ const state: GlobalState = {
                 status: 'not_started',
                 error: null,
             },
-            sendAdminAck: {
+            sendWarnMetricAck: {
                 status: 'not_started',
                 error: null,
             },
