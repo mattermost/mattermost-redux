@@ -892,6 +892,24 @@ describe('Actions.Groups', () => {
         assert.ok(groups[groupID]);
         assert.ok(groups[groupID].allow_reference === groupPatch.allow_reference);
         assert.ok(JSON.stringify(response) === JSON.stringify(groups[groupID]));
+
+        //with name="newname"
+        groupPatch.name = 'newname';
+        response.name = 'newname';
+
+        nock(Client4.getBaseRoute()).
+            put(`/groups/${groupID}/patch`).
+            reply(200, response);
+
+        await Actions.patchGroup(groupID, groupPatch)(store.dispatch, store.getState);
+
+        state = store.getState();
+
+        groups = state.entities.groups.groups;
+        assert.ok(groups);
+        assert.ok(groups[groupID]);
+        assert.ok(groups[groupID].name === groupPatch.name);
+        assert.ok(JSON.stringify(response) === JSON.stringify(groups[groupID]));
     });
 });
 
