@@ -310,9 +310,8 @@ export const getProfilesNotInTeam: (state: GlobalState, teamId: $ID<Team>) => Ar
     getUsers,
     getUserIdsNotInTeams,
     (state: GlobalState, teamId: string) => teamId,
-    (state: GlobalState, teamId, filters) => filters,
-    (profiles, usersNotInTeams, teamId, filters) => {
-        return sortAndInjectProfiles(filterProfiles(profiles, filters), usersNotInTeams[teamId] || new Set());
+    (profiles, usersNotInTeams, teamId) => {
+        return sortAndInjectProfiles(profiles, usersNotInTeams[teamId] || new Set());
     },
 );
 
