@@ -354,6 +354,17 @@ export function searchProfiles(state: GlobalState, term: string, skipCurrent = f
     return filteredProfiles;
 }
 
+export function searchProfilesInChannel(state: GlobalState, channelId: $ID<Channel>, term: string, skipCurrent = false): Array<UserProfile> {
+    const doGetProfilesInChannel = makeGetProfilesInChannel();
+    const profiles = filterProfilesMatchingTerm(doGetProfilesInChannel(state, channelId, false), term);
+
+    if (skipCurrent) {
+        removeCurrentUserFromList(profiles, getCurrentUserId(state));
+    }
+
+    return profiles;
+}
+
 export function searchProfilesInCurrentChannel(state: GlobalState, term: string, skipCurrent = false): Array<UserProfile> {
     const profiles = filterProfilesMatchingTerm(getProfilesInCurrentChannel(state), term);
 
