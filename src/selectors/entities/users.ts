@@ -354,7 +354,8 @@ export function searchProfiles(state: GlobalState, term: string, skipCurrent = f
 }
 
 export function searchProfilesInChannel(state: GlobalState, channelId: $ID<Channel>, term: string, skipCurrent = false): Array<UserProfile> {
-    const profiles = filterProfilesMatchingTerm(getProfilesInChannel(state, channelId, false), term);
+    const doGetProfilesInChannel = makeGetProfilesInChannel();
+    const profiles = filterProfilesMatchingTerm(doGetProfilesInChannel(state, channelId, false), term);
 
     if (skipCurrent) {
         removeCurrentUserFromList(profiles, getCurrentUserId(state));
@@ -472,38 +473,6 @@ export function makeGetProfilesForReactions(): (state: GlobalState, reactions: A
         },
     );
 }
-
-export const getProfilesInChannel: (state: GlobalState, channelId: $ID<Channel>, skipInactive: boolean) => Array<UserProfile> = createSelector(
-    getUsers,
-    getUserIdsInChannels,
-    (state: GlobalState, channelId: string) => channelId,
-    (state, channelId, skipInactive) => skipInactive,
-    (users, userIds, channelId, skipInactive = false) => {
-        const userIdsInChannel = userIds[channelId];
-
-        if (!userIdsInChannel) {
-            return [];
-        }
-
-        return sortAndInjectProfiles(users, userIdsInChannel, skipInactive);
-    },
-);
-
-export const getProfilesNotInChannel: (state: GlobalState, channelId: $ID<Channel>, skipInactive: boolean) => Array<UserProfile> = createSelector(
-    getUsers,
-    getUserIdsNotInChannels,
-    (state: GlobalState, channelId: string) => channelId,
-    (state, channelId, skipInactive) => skipInactive,
-    (users, userIds, channelId, skipInactive = false) => {
-        const userIdsNotInChannel = userIds[channelId];
-
-        if (!userIdsNotInChannel) {
-            return [];
-        }
-
-        return sortAndInjectProfiles(users, userIdsNotInChannel, skipInactive);
-    },
-);
 
 export function makeGetProfilesInChannel(): (state: GlobalState, channelId: $ID<Channel>, skipInactive: boolean) => Array<UserProfile> {
     return createSelector(
