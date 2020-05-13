@@ -38,7 +38,9 @@ export function isPostEphemeral(post: Post): boolean {
 }
 
 export function shouldIgnorePost(post: Post, userId?: $ID<UserProfile>): boolean {
-    if ((post.type && post.type === Posts.POST_TYPES.ADD_TO_CHANNEL) && (post.props.addedUserId && post.props.addedUserId === userId)) {
+    const postTypeCheck = post.type && (post.type === Posts.POST_TYPES.ADD_TO_CHANNEL);
+    const userIdCheck = post.props && post.props.addedUserId && (post.props.addedUserId === userId);
+    if (postTypeCheck && userIdCheck) {
         return false;
     }
     return Posts.IGNORE_POST_TYPES.includes(post.type);
