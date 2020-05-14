@@ -24,6 +24,10 @@ export function getAllGroups(state: GlobalState) {
     return state.entities.groups.groups;
 }
 
+export function getMyGroups(state: GlobalState) {
+    return state.entities.groups.myGroups;
+}
+
 export function getGroup(state: GlobalState, id: string) {
     return getAllGroups(state)[id];
 }
@@ -186,8 +190,15 @@ export const getAllAssociatedGroupsForReference: (state: GlobalState) => Group[]
     },
 );
 
+export const getMyAllowReferencedGroups: (state: GlobalState) => Group[] = createSelector(
+    getMyGroups,
+    (myGroups) => {
+        return Object.values(myGroups).filter((group) => group.allow_reference && group.delete_at === 0);
+    },
+);
+
 export const getCurrentUserGroupMentionKeys: (state: GlobalState) => UserMentionKey[] = createSelector(
-    getAllAssociatedGroupsForReference,
+    getMyAllowReferencedGroups,
     (groups: Array<Group>) => {
         const keys: UserMentionKey[] = [];
         groups.forEach((group) => keys.push({key: `@${group.name}`}));
