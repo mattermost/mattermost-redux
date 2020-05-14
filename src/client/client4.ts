@@ -3173,6 +3173,7 @@ export default class Client4 {
             'survey_short_term',
             'survey_long_term',
             'survey_unsure',
+            'survey_no_response',
             'click_back',
             'click_signin_account',
             'click_create_account',
