@@ -334,6 +334,18 @@ function handleEvent(msg: WebSocketMessage) {
     case WebsocketEvents.RECEIVED_GROUP:
         doDispatch(handleGroupUpdatedEvent(msg));
         break;
+    case WebsocketEvents.RECEIVED_GROUP_ASSOCIATED_TO_TEAM:
+        doDispatch(handleReceivedGroupAssociatedToTeamEvent(msg));
+        break;
+    case WebsocketEvents.RECEIVED_GROUP_NOT_ASSOCIATED_TO_TEAM:
+        doDispatch(handleReceivedGroupNotAssociatedToTeamEvent(msg));
+        break;
+    case WebsocketEvents.RECEIVED_GROUP_ASSOCIATED_TO_CHANNEL:
+        doDispatch(handleReceivedGroupAssociatedToChannelEvent(msg));
+        break;
+    case WebsocketEvents.RECEIVED_GROUP_NOT_ASSOCIATED_TO_CHANNEL:
+        doDispatch(handleReceivedGroupNotAssociatedToChannelEvent(msg));
+        break;
     }
 }
 
@@ -1003,6 +1015,46 @@ function handleGroupUpdatedEvent(msg: WebSocketMessage) {
                 data,
             });
         }
+        return {data: true};
+    };
+}
+
+function handleReceivedGroupAssociatedToTeamEvent(msg: WebSocketMessage) {
+    return (dispatch: DispatchFunc, getState: GetStateFunc) => {
+        dispatch({
+            type: GroupTypes.RECEIVED_GROUP_ASSOCIATED_TO_TEAM,
+            data: {teamID: msg.broadcast.team_id, groups: [{id: msg.data.group_id}]}});
+
+        return {data: true};
+    };
+}
+
+function handleReceivedGroupNotAssociatedToTeamEvent(msg: WebSocketMessage) {
+    return (dispatch: DispatchFunc, getState: GetStateFunc) => {
+        dispatch({
+            type: GroupTypes.RECEIVED_GROUP_NOT_ASSOCIATED_TO_TEAM,
+            data: {teamID: msg.broadcast.team_id, groups: [{id: msg.data.group_id}]}});
+
+        return {data: true};
+    };
+}
+
+function handleReceivedGroupAssociatedToChannelEvent(msg: WebSocketMessage) {
+    return (dispatch: DispatchFunc, getState: GetStateFunc) => {
+        dispatch({
+            type: GroupTypes.RECEIVED_GROUP_ASSOCIATED_TO_CHANNEL,
+            data: {channelID: msg.broadcast.channel_id, groups: [{id: msg.data.group_id}]}});
+
+        return {data: true};
+    };
+}
+
+function handleReceivedGroupNotAssociatedToChannelEvent(msg: WebSocketMessage) {
+    return (dispatch: DispatchFunc, getState: GetStateFunc) => {
+        dispatch({
+            type: GroupTypes.RECEIVED_GROUP_NOT_ASSOCIATED_TO_CHANNEL,
+            data: {channelID: msg.broadcast.channel_id, groups: [{id: msg.data.group_id}]}});
+
         return {data: true};
     };
 }

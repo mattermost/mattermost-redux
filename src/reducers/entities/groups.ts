@@ -190,6 +190,7 @@ function groups(state: Dictionary<Group> = {}, action: GenericAction) {
         for (const group of action.data.groups) {
             nextState[group.id] = group;
         }
+
         return nextState;
     }
     default:
