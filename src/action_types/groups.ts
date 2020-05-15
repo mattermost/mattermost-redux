@@ -37,5 +37,7 @@ export default keyMirror({
     PATCHED_GROUP_TEAM: null,
     PATCHED_GROUP_CHANNEL: null,
 
+    RECEIVED_MY_GROUPS: null,
+
     PATCHED_GROUP: null,
 });

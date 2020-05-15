@@ -147,6 +147,7 @@ const state: GlobalState = {
             groups: {},
             syncables: {},
             members: {},
+            myGroups: {},
         },
         channelCategories: {
             byId: {},

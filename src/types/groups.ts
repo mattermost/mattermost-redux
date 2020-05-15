@@ -7,6 +7,7 @@ export type SyncablePatch = {
 };
 export type GroupPatch = {
     allow_reference: boolean;
+    name: string;
 };
 
 export type Group = {
@@ -60,6 +61,9 @@ export type GroupsState = {
     };
     members: any;
     groups: {
+        [x: string]: Group;
+    };
+    myGroups: {
         [x: string]: Group;
     };
 };

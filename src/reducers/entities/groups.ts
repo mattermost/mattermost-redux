@@ -165,6 +165,20 @@ function syncables(state: Dictionary<GroupSyncables> = {}, action: GenericAction
     }
 }
 
+function myGroups(state: any = {}, action: GenericAction) {
+    switch (action.type) {
+    case GroupTypes.RECEIVED_MY_GROUPS: {
+        const nextState = {...state};
+        for (const group of action.data) {
+            nextState[group.id] = group;
+        }
+        return nextState;
+    }
+    default:
+        return state;
+    }
+}
+
 function members(state: any = {}, action: GenericAction) {
     switch (action.type) {
     case GroupTypes.RECEIVED_GROUP_MEMBERS: {
@@ -229,4 +243,5 @@ export default combineReducers({
     syncables,
     members,
     groups,
+    myGroups,
 });
