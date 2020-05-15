@@ -2,7 +2,7 @@
 // See LICENSE.txt for license information.
 
 import {General, Preferences} from '../../constants';
-import {CategoryTypes, Sorting} from '../../constants/channel_categories';
+import {CategoryTypes} from '../../constants/channel_categories';
 
 import {getCurrentChannelId, getMyChannelMemberships} from 'selectors/entities/channels';
 import {getConfig} from 'selectors/entities/general';
@@ -11,6 +11,8 @@ import {getMyPreferences} from 'selectors/entities/preferences';
 import {getCurrentUserId} from 'selectors/entities/users';
 
 import mergeObjects from 'test/merge_objects';
+
+import {CategorySorting} from 'types/channel_categories';
 
 import {isGroupOrDirectChannelVisible} from 'utils/channel_utils';
 import {getPreferenceKey} from 'utils/preference_utils';
@@ -1001,7 +1003,7 @@ describe('makeGetChannelsForCategory', () => {
             team_id: 'team1',
             display_name: CategoryTypes.FAVORITES,
             type: CategoryTypes.FAVORITES,
-            sorting: Sorting.NONE,
+            sorting: CategorySorting.Default,
             channel_ids: [dmChannel2.id, channel1.id],
         };
 
@@ -1016,7 +1018,7 @@ describe('makeGetChannelsForCategory', () => {
             team_id: 'team1',
             display_name: 'Public Channels',
             type: CategoryTypes.PUBLIC,
-            sorting: Sorting.NONE,
+            sorting: CategorySorting.Default,
             channel_ids: [channel3.id, channel2.id],
         };
 
@@ -1031,7 +1033,7 @@ describe('makeGetChannelsForCategory', () => {
             team_id: 'team1',
             display_name: 'Public Channels',
             type: CategoryTypes.PUBLIC,
-            sorting: Sorting.ALPHABETICAL,
+            sorting: CategorySorting.Alphabetical,
             channel_ids: [channel3.id, channel2.id],
         };
 
@@ -1046,7 +1048,7 @@ describe('makeGetChannelsForCategory', () => {
             team_id: 'team1',
             display_name: 'Direct Messages',
             type: CategoryTypes.DIRECT_MESSAGES,
-            sorting: Sorting.ALPHABETICAL,
+            sorting: CategorySorting.Alphabetical,
             channel_ids: [gmChannel1.id, dmChannel1.id],
         };
 
@@ -1064,7 +1066,7 @@ describe('makeGetChannelsForCategory', () => {
             team_id: 'team1',
             display_name: 'Direct Messages',
             type: CategoryTypes.DIRECT_MESSAGES,
-            sorting: Sorting.RECENCY,
+            sorting: CategorySorting.Recency,
             channel_ids: [gmChannel1.id, dmChannel1.id, gmChannel2.id],
         };
 
@@ -1114,7 +1116,7 @@ describe('makeGetChannelsByCategory', () => {
         team_id: 'team1',
         display_name: CategoryTypes.FAVORITES,
         type: CategoryTypes.FAVORITES,
-        sorting: Sorting.ALPHABETICAL,
+        sorting: CategorySorting.Alphabetical,
         channel_ids: [channel1.id, dmChannel2.id],
     };
     const channelsCategory = {
@@ -1122,7 +1124,7 @@ describe('makeGetChannelsByCategory', () => {
         team_id: 'team1',
         display_name: 'Channels',
         type: CategoryTypes.CHANNELS,
-        sorting: Sorting.NONE,
+        sorting: CategorySorting.Default,
         channel_ids: [channel2.id, channel3.id],
     };
     const directMessagesCategory = {
@@ -1130,7 +1132,7 @@ describe('makeGetChannelsByCategory', () => {
         team_id: 'team1',
         display_name: 'Direct Messages',
         type: CategoryTypes.DIRECT_MESSAGES,
-        sorting: Sorting.RECENCY,
+        sorting: CategorySorting.Recency,
         channel_ids: [dmChannel1.id, gmChannel1.id],
     };
 

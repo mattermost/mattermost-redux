@@ -4,10 +4,12 @@
 import configureStore from 'test/test_store';
 
 import {General} from '../constants';
-import {Sorting, CategoryTypes} from '../constants/channel_categories';
+import {CategoryTypes} from '../constants/channel_categories';
 
 import {getAllCategoriesByIds} from 'selectors/entities/channel_categories';
 import {isFavoriteChannel} from 'selectors/entities/preferences';
+
+import {CategorySorting} from 'types/channel_categories';
 
 import * as Actions from './channel_categories';
 import {getCategory, getCategoryIdsForTeam} from '../selectors/entities/channel_categories';
@@ -24,13 +26,13 @@ describe('setCategorySorting', () => {
             },
         });
 
-        store.dispatch(Actions.setCategorySorting('category1', Sorting.RECENCY));
+        store.dispatch(Actions.setCategorySorting('category1', CategorySorting.Recency));
 
-        expect(store.getState().entities.channelCategories.byId.category1).toMatchObject({sorting: Sorting.RECENCY});
+        expect(store.getState().entities.channelCategories.byId.category1).toMatchObject({sorting: CategorySorting.Recency});
 
-        store.dispatch(Actions.setCategorySorting('category1', Sorting.ALPHABETICAL));
+        store.dispatch(Actions.setCategorySorting('category1', CategorySorting.Alphabetical));
 
-        expect(store.getState().entities.channelCategories.byId.category1).toMatchObject({sorting: Sorting.ALPHABETICAL});
+        expect(store.getState().entities.channelCategories.byId.category1).toMatchObject({sorting: CategorySorting.Alphabetical});
     });
 });
 

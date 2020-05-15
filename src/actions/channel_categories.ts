@@ -6,7 +6,7 @@ import {ChannelCategoryTypes} from 'action_types';
 import {fetchMyChannelsAndMembers, unfavoriteChannel, favoriteChannel} from 'actions/channels';
 
 import {General} from '../constants';
-import {CategoryTypes, Sorting} from 'constants/channel_categories';
+import {CategoryTypes} from 'constants/channel_categories';
 
 import {
     getAllCategoriesByIds,
@@ -233,7 +233,7 @@ export function createCategory(teamId: string, displayName: string, channelIds: 
             team_id: teamId,
             type: CategoryTypes.CUSTOM,
             display_name: displayName,
-            sorting: Sorting.NONE,
+            sorting: CategorySorting.Default,
             channel_ids: channelIds,
         };
 

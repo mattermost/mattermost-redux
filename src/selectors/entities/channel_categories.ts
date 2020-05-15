@@ -5,7 +5,7 @@ import {createSelector} from 'reselect';
 import shallowEquals from 'shallow-equals';
 
 import {General, Preferences} from '../../constants';
-import {CategoryTypes, Sorting} from '../../constants/channel_categories';
+import {CategoryTypes} from '../../constants/channel_categories';
 
 import {getCurrentChannelId, getMyChannelMemberships, makeGetChannelsForIds} from 'selectors/entities/channels';
 import {getCurrentUserLocale} from 'selectors/entities/i18n';
@@ -14,7 +14,7 @@ import {getMyPreferences, getTeammateNameDisplaySetting, shouldAutocloseDMs} fro
 import {getCurrentUserId} from 'selectors/entities/users';
 
 import {Channel, ChannelMembership} from 'types/channels';
-import {ChannelCategory, ChannelCategoryType} from 'types/channel_categories';
+import {ChannelCategory, ChannelCategoryType, CategorySorting} from 'types/channel_categories';
 import {GlobalState} from 'types/store';
 import {UserProfile} from 'types/users';
 import {IDMappedObjects, RelationOneToOne} from 'types/utilities';
@@ -355,9 +355,9 @@ export function makeSortChannels() {
         // While this function isn't memoized, sortChannelsByX should be since they know what parts of state
         // will affect sort order.
 
-        if (category.sorting === Sorting.RECENCY) {
+        if (category.sorting === CategorySorting.Recency) {
             channels = sortChannelsByRecency(state, channels);
-        } else if (category.sorting === Sorting.ALPHABETICAL) {
+        } else if (category.sorting === CategorySorting.Alphabetical) {
             if (channels.some((channel) => channel.type === General.DM_CHANNEL || channel.type === General.GM_CHANNEL)) {
                 channels = sortChannelsByNameWithDMs(state, channels);
             } else {
