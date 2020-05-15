@@ -134,8 +134,8 @@ describe('addChannelToInitialCategory', () => {
 
 describe('addChannelToCategory', () => {
     test('should add the channel to the given category', async () => {
-        const category1 = {id: 'category1', channel_ids: ['channel1', 'channel2']};
-        const category2 = {id: 'category2', channel_ids: ['channel3', 'channel4']};
+        const category1 = {id: 'category1', channel_ids: ['channel1', 'channel2'], sorting: CategorySorting.Default};
+        const category2 = {id: 'category2', channel_ids: ['channel3', 'channel4'], sorting: CategorySorting.Default};
 
         const store = await configureStore({
             entities: {
@@ -154,11 +154,14 @@ describe('addChannelToCategory', () => {
 
         expect(state.entities.channelCategories.byId.category1.channel_ids).toEqual(['channel5', 'channel1', 'channel2']);
         expect(state.entities.channelCategories.byId.category2).toBe(category2);
+
+        // Also should not change the sort order of the category
+        expect(state.entities.channelCategories.byId.category1.sorting).toBe(CategorySorting.Default);
     });
 
     test('should remove the channel from its previous category', async () => {
-        const category1 = {id: 'category1', channel_ids: ['channel1', 'channel2']};
-        const category2 = {id: 'category2', channel_ids: ['channel3', 'channel4']};
+        const category1 = {id: 'category1', channel_ids: ['channel1', 'channel2'], sorting: CategorySorting.Default};
+        const category2 = {id: 'category2', channel_ids: ['channel3', 'channel4'], sorting: CategorySorting.Default};
 
         const store = await configureStore({
             entities: {
@@ -177,6 +180,10 @@ describe('addChannelToCategory', () => {
 
         expect(state.entities.channelCategories.byId.category1.channel_ids).toEqual(['channel3', 'channel1', 'channel2']);
         expect(state.entities.channelCategories.byId.category2.channel_ids).toEqual(['channel4']);
+
+        // Also should not change the sort order of either category
+        expect(state.entities.channelCategories.byId.category1.sorting).toBe(CategorySorting.Default);
+        expect(state.entities.channelCategories.byId.category2.sorting).toBe(CategorySorting.Default);
     });
 });
 
@@ -306,6 +313,34 @@ describe('moveChannelToCategory', () => {
         expect(state.entities.channelCategories.byId.favoritesCategory.channel_ids).toEqual([]);
         expect(state.entities.channelCategories.byId.otherCategory.channel_ids).toEqual(['channel1']);
         expect(isFavoriteChannel(state, 'channel1')).toBe(false);
+    });
+
+    test('should set the destination category to manual sorting', async () => {
+        const category1 = {id: 'category1', channel_ids: ['channel1', 'channel2'], sorting: CategorySorting.Default};
+        const category2 = {id: 'category2', channel_ids: ['channel3', 'channel4'], sorting: CategorySorting.Default};
+
+        const store = await configureStore({
+            entities: {
+                channelCategories: {
+                    byId: {
+                        category1,
+                        category2,
+                    },
+                },
+            },
+        });
+
+        store.dispatch(Actions.moveChannelToCategory(category2.id, 'channel1', 0));
+
+        let state = store.getState();
+        expect(state.entities.channelCategories.byId.category1.sorting).toBe(CategorySorting.Default);
+        expect(state.entities.channelCategories.byId.category2.sorting).toBe(CategorySorting.Manual);
+
+        store.dispatch(Actions.moveChannelToCategory(category1.id, 'channel1', 2));
+
+        state = store.getState();
+        expect(state.entities.channelCategories.byId.category1.sorting).toBe(CategorySorting.Manual);
+        expect(state.entities.channelCategories.byId.category2.sorting).toBe(CategorySorting.Manual);
     });
 });
 
