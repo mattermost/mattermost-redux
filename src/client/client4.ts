@@ -1627,17 +1627,17 @@ export default class Client4 {
     // Post Routes
 
     createPost = async (post: Post) => {
-        const analyticsData = {channel_id: post.channel_id, post_id: post.id, user_actual_id: post.user_id, root_id: post.root_id};
-        this.trackEvent('api', 'api_posts_create', analyticsData);
-
-        if (post.root_id != null && post.root_id !== '') {
-            this.trackEvent('api', 'api_posts_replied', analyticsData);
-        }
-
-        return this.doFetch(
+        const result = await this.doFetch(
             `${this.getPostsRoute()}`,
             {method: 'post', body: JSON.stringify(post)},
         );
+        const analyticsData = {channel_id: result.channel_id, post_id: result.id, user_actual_id: result.user_id, root_id: result.root_id};
+        this.trackEvent('api', 'api_posts_create', analyticsData);
+
+        if (result.root_id != null && result.root_id !== '') {
+            this.trackEvent('api', 'api_posts_replied', analyticsData);
+        }
+        return result;
     };
 
     updatePost = async (post: Post) => {
@@ -2866,6 +2866,13 @@ export default class Client4 {
             {method: 'get'},
         );
     };
+
+    getGroupsByUserId = async (userID: string) => {
+        return this.doFetch(
+            `${this.getUsersRoute()}/${userID}/groups`,
+            {method: 'get'},
+        );
+    }
 
     getGroupsNotAssociatedToTeam = async (teamID: string, q = '', page = 0, perPage = PER_PAGE_DEFAULT) => {
         this.trackEvent('api', 'api_groups_get_not_associated_to_team', {team_id: teamID});
