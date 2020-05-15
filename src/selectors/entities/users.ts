@@ -247,7 +247,7 @@ export const getProfiles: (state: GlobalState, filters: Filters) => Array<UserPr
     },
 );
 
-function filterProfiles(profiles: IDMappedObjects<UserProfile>, filters?: Filters): IDMappedObjects<UserProfile> {
+export function filterProfiles(profiles: IDMappedObjects<UserProfile>, filters?: Filters): IDMappedObjects<UserProfile> {
     if (!filters) {
         return profiles;
     }
