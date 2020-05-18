@@ -195,8 +195,6 @@ export function getWarnMetricsStatus(): ActionFunc {
             return {error};
         }
 
-        data = JSON.parse(JSON.stringify(data));
-
         dispatch(batchActions([
             {type: GeneralTypes.RECEIVED_WARN_METRICS_STATUS, data},
         ]));

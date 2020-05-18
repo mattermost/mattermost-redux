@@ -1958,15 +1958,15 @@ export default class Client4 {
 
     getWarnMetricsStatus = async () => {
         return this.doFetch(
-            `${this.getBaseRoute()}/analytics/warn_metrics_status`,
+            `${this.getBaseRoute()}/warn_metrics/status`,
             {method: 'get'},
         );
     };
 
     sendWarnMetricAck = async (warnMetricId: string) => {
         return this.doFetch(
-            `${this.getBaseRoute()}/email/warn_metric_ack/send`,
-            {method: 'post', body: JSON.stringify({warnMetricId})},
+            `${this.getBaseRoute()}/warn_metrics/ack/${encodeURI(warnMetricId)}`,
+            {method: 'post'},
         );
     }
 

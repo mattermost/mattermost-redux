@@ -139,7 +139,7 @@ describe('Actions.General', () => {
         };
 
         nock(Client4.getBaseRoute()).
-            get('/analytics/warn_metrics_status').
+            get('/warn_metrics/status').
             query(true).
             reply(200, responseData);
 
