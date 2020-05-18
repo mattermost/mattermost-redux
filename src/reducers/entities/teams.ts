@@ -363,7 +363,17 @@ function stats(state: any = {}, action: GenericAction) {
 
 function groupsAssociatedToTeam(state: RelationOneToOne<Team, {ids: string[]; totalCount: number}> = {}, action: GenericAction) {
     switch (action.type) {
-    case GroupTypes.RECEIVED_GROUP_ASSOCIATED_TO_TEAM:
+    case GroupTypes.RECEIVED_GROUP_ASSOCIATED_TO_TEAM: {
+        const {teamID, groups} = action.data;
+        const nextState = {...state};
+        const associatedGroupIDs = new Set(state[teamID] ? state[teamID].ids : []);
+        for (const group of groups) {
+            associatedGroupIDs.add(group.id);
+        }
+        nextState[teamID] = {ids: Array.from(associatedGroupIDs), totalCount: associatedGroupIDs.size};
+
+        return nextState;
+    }
     case GroupTypes.RECEIVED_GROUPS_ASSOCIATED_TO_TEAM: {
         const {teamID, groups, totalGroupCount} = action.data;
         const nextState = {...state};
@@ -385,6 +395,7 @@ function groupsAssociatedToTeam(state: RelationOneToOne<Team, {ids: string[]; to
         nextState[teamID] = {ids, totalCount: ids.length};
         return nextState;
     }
+    case GroupTypes.RECEIVED_GROUP_NOT_ASSOCIATED_TO_TEAM:
     case GroupTypes.RECEIVED_GROUPS_NOT_ASSOCIATED_TO_TEAM: {
         const {teamID, groups} = action.data;
         const nextState = {...state};

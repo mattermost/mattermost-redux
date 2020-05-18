@@ -330,6 +330,27 @@ class TestHelper {
         };
     }
 
+    fakeGroup = (groupId) => {
+        const name = 'software-engineers';
+
+        return {
+            name,
+            id: groupId,
+            display_name: 'software engineers',
+            delete_at: 0,
+        };
+    };
+
+    fakeGroupWithId = (groupId) => {
+        return {
+            ...this.fakeGroup(groupId),
+            id: this.generateId(),
+            create_at: 1507840900004,
+            update_at: 1507840900004,
+            delete_at: 0,
+        };
+    };
+
     mockLogin = () => {
         nock(this.basicClient4.getBaseRoute()).
             post('/users/login').
@@ -429,6 +450,7 @@ class TestHelper {
             },
         };
         this.basicScheme = this.mockSchemeWithId();
+        this.basicGroup = this.fakeGroupWithId();
     }
 
     initBasic = async (client4 = this.createClient4()) => {
