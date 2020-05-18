@@ -2602,6 +2602,13 @@ export default class Client4 {
         );
     };
 
+    purgeBleveIndexes = async () => {
+        return this.doFetch(
+            `${this.getBaseRoute()}/bleve/purge_indexes`,
+            {method: 'post'}
+        );
+    };
+
     uploadLicense = async (fileData: File) => {
         this.trackEvent('api', 'api_license_upload');
 
