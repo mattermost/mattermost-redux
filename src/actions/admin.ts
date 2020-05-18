@@ -607,19 +607,12 @@ export function setSamlIdpCertificateFromMetadata(certData: string): ActionFunc 
 
 export function sendWarnMetricAck(warnMetricId: string) {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
-        dispatch({type: AdminTypes.SEND_WARN_METRIC_ACK_REQUEST});
-
         try {
             await Client4.sendWarnMetricAck(warnMetricId);
         } catch (error) {
-            dispatch(batchActions([
-                {type: AdminTypes.SEND_WARN_METRIC_ACK_FAILURE, error},
-                logError(error),
-            ]));
+            dispatch(logError(error));
             return {error};
         }
-
-        dispatch({type: AdminTypes.SEND_WARN_METRIC_ACK_SUCCESS});
 
         return {data: true};
     };

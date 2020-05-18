@@ -195,9 +195,7 @@ export function getWarnMetricsStatus(): ActionFunc {
             return {error};
         }
 
-        dispatch(batchActions([
-            {type: GeneralTypes.RECEIVED_WARN_METRICS_STATUS, data},
-        ]));
+        dispatch({type: GeneralTypes.RECEIVED_WARN_METRICS_STATUS, data});
 
         return {data};
     };

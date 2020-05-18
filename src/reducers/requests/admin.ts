@@ -408,16 +408,6 @@ function disablePlugin(state: RequestStatusType = initialRequestState(), action:
     );
 }
 
-function sendWarnMetricAck(state: RequestStatusType = initialRequestState(), action: GenericAction): RequestStatusType {
-    return handleRequest(
-        AdminTypes.SEND_WARN_METRIC_ACK_REQUEST,
-        AdminTypes.SEND_WARN_METRIC_ACK_SUCCESS,
-        AdminTypes.SEND_WARN_METRIC_ACK_FAILURE,
-        state,
-        action,
-    );
-}
-
 export default (combineReducers({
     getLogs,
     getAudits,
@@ -459,5 +449,4 @@ export default (combineReducers({
     removePlugin,
     enablePlugin,
     disablePlugin,
-    sendWarnMetricAck,
 }) as (b: AdminRequestsStatuses, a: GenericAction) => AdminRequestsStatuses);

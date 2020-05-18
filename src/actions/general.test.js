@@ -144,7 +144,6 @@ describe('Actions.General', () => {
             reply(200, responseData);
 
         await Actions.getWarnMetricsStatus()(store.dispatch, store.getState);
-        await TestHelper.wait(100);
         const {warnMetricsStatus} = store.getState().entities.general;
         assert.deepEqual(warnMetricsStatus.metric1, true);
         assert.deepEqual(warnMetricsStatus.metric2, false);

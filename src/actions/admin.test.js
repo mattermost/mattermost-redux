@@ -1215,7 +1215,7 @@ describe('Actions.Admin', () => {
             metric1: true,
         };
         nock(Client4.getBaseRoute()).
-            get('/warn_metrics/ack').
+            post('/warn_metrics/ack').
             reply(200, OK_RESPONSE);
 
         await Actions.sendWarnMetricAck(warnMetricAck)(store.dispatch, store.getState);
