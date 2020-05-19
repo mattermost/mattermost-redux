@@ -13,12 +13,11 @@
         "jest": true
     },
     "rules": {
+        "no-undefined": 0,
         "@typescript-eslint/camelcase": 0,
-        "@typescript-eslint/no-undefined": 0,
         "@typescript-eslint/no-non-null-assertion": 0,
         "no-prototype-builtins": 0,
         "no-mixed-operators": 0,
-        "no-undefined": 0,
         "padding-line-between-statements": [
             "error",
             {
