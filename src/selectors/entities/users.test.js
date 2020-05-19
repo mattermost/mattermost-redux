@@ -261,6 +261,8 @@ describe('Selectors.Users', () => {
     describe('getProfilesNotInTeam', () => {
         const users = [user3, user4].sort(sortByUsername);
         assert.deepEqual(Selectors.getProfilesNotInTeam(testState, team1.id), users);
+        assert.deepEqual(Selectors.getProfilesNotInTeam(testState, team1.id, {role: 'system_user'}), users);
+        assert.deepEqual(Selectors.getProfilesNotInTeam(testState, team1.id, {role: 'system_guest'}), []);
     });
 
     it('getProfilesNotInCurrentTeam', () => {
@@ -400,6 +402,9 @@ describe('Selectors.Users', () => {
 
         assert.deepEqual(getProfilesNotInChannel(testState, channel2.id, true), [user4, user5].sort(sortByUsername));
         assert.deepEqual(getProfilesNotInChannel(testState, channel2.id), [user4, user5].sort(sortByUsername));
+
+        assert.deepEqual(getProfilesNotInChannel(testState, channel1.id, false, {role: 'system_guest'}), []);
+        assert.deepEqual(getProfilesNotInChannel(testState, channel2.id, false, {role: 'system_user'}), [user4, user5].sort(sortByUsername));
 
         assert.deepEqual(getProfilesNotInChannel(testState, 'nonexistentid'), []);
         assert.deepEqual(getProfilesNotInChannel(testState, 'nonexistentid'), []);
