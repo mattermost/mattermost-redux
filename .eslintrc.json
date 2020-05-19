@@ -14,7 +14,12 @@
     },
     "rules": {
         "no-undefined": 0,
-        "@typescript-eslint/camelcase": 0,
+        "@typescript-eslint/camelcase": [
+          2,
+          {
+            "properties": "never"
+          }
+        ],
         "@typescript-eslint/no-non-null-assertion": 0,
         "no-prototype-builtins": 0,
         "no-mixed-operators": 0,
