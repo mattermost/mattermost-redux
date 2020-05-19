@@ -514,7 +514,7 @@ export const getCurrentUsersLatestPost: (state: GlobalState, postId: $ID<Post>) 
 
         const lastPost = posts.find((post) => {
             // don't edit webhook posts, deleted posts, or system messages
-            if (post.user_id !== currentUser.id || post.props && post.props.from_webhook || post.state === Posts.POST_DELETED || isSystemMessage(post) || isPostEphemeral(post) || isPostPendingOrFailed(post)) {
+            if (post.user_id !== currentUser.id || (post.props && post.props.from_webhook) || post.state === Posts.POST_DELETED || isSystemMessage(post) || isPostEphemeral(post) || isPostPendingOrFailed(post)) {
                 return false;
             }
 

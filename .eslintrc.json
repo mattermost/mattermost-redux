@@ -21,7 +21,6 @@
           }
         ],
         "@typescript-eslint/no-non-null-assertion": 0,
-        "no-mixed-operators": 0,
         "padding-line-between-statements": [
             "error",
             {

@@ -340,7 +340,7 @@ describe('makeFilterAutoclosedDMs', () => {
     };
 
     const now = Date.now();
-    const cutoff = now - 7 * 24 * 60 * 60 * 1000;
+    const cutoff = now - (7 * 24 * 60 * 60 * 1000);
 
     function isChannelVisiblePrecondition(state, channel) {
         return isGroupOrDirectChannelVisible(

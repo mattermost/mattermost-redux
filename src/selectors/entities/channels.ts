@@ -304,7 +304,7 @@ export const getChannelSetInCurrentTeam: (state: GlobalState) => Array<string> =
     getCurrentTeamId,
     getChannelsInTeam,
     (currentTeamId: string, channelsInTeam: RelationOneToMany<Team, Channel>): Array<string> => {
-        return channelsInTeam && channelsInTeam[currentTeamId] || [];
+        return (channelsInTeam && channelsInTeam[currentTeamId]) || [];
     },
 );
 
@@ -721,7 +721,7 @@ export const getUnreadChannelIds: (state: GlobalState, lastUnreadChannel?: Chann
                 const chHasUnread = c.total_msg_count - m.msg_count > 0;
                 const chHasMention = m.mention_count > 0;
 
-                if (m.notify_props && m.notify_props.mark_unread !== 'mention' && chHasUnread || chHasMention) {
+                if ((m.notify_props && m.notify_props.mark_unread !== 'mention' && chHasUnread) || chHasMention) {
                     return true;
                 }
             }
@@ -1265,7 +1265,7 @@ export const getRedirectChannelNameForTeam = (state: GlobalState, teamId: string
         return General.DEFAULT_CHANNEL;
     }
 
-    return myFirstChannelForTeam && myFirstChannelForTeam.name || General.DEFAULT_CHANNEL;
+    return (myFirstChannelForTeam && myFirstChannelForTeam.name) || General.DEFAULT_CHANNEL;
 };
 
 // isManually unread looks into state if the provided channelId is marked as unread by the user.
