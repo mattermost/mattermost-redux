@@ -4,7 +4,6 @@
 import {CustomEmoji} from './emojis';
 import {FileInfo} from './files';
 import {Reaction} from './reactions';
-import {Channel} from './channels';
 import {
     $ID,
     RelationOneToOne,

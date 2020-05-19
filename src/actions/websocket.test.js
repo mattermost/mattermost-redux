@@ -715,8 +715,6 @@ describe('Actions.Websocket', () => {
 
     describe('Actions.Websocket removeNotVisibleUsers', () => {
         const mockStore = configureMockStore([thunk]);
-        const channel1 = TestHelper.fakeChannelWithId('');
-        const channel2 = TestHelper.fakeChannelWithId('');
 
         const me = TestHelper.fakeUserWithId();
         const user = TestHelper.fakeUserWithId();

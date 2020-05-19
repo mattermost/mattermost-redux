@@ -718,7 +718,6 @@ describe('makeFilterManuallyClosedDMs', () => {
     const currentUser = {id: 'currentUser'};
     const otherUser1 = {id: 'otherUser1'};
     const otherUser2 = {id: 'otherUser2'};
-    const otherUser3 = {id: 'otherUser3'};
 
     const baseState = {
         entities: {

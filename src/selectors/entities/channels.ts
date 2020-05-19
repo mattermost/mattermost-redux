@@ -13,7 +13,7 @@ import {
     getMyCurrentChannelMembership,
 } from 'selectors/entities/common';
 import {getConfig, getLicense, hasNewPermissions} from 'selectors/entities/general';
-import {getLastPostPerChannel, getAllPosts} from 'selectors/entities/posts';
+import {getLastPostPerChannel} from 'selectors/entities/posts';
 import {
     getFavoritesPreferences,
     getMyPreferences,
@@ -58,7 +58,6 @@ import {
     isAutoClosed,
     isDirectChannelVisible,
     isGroupChannelVisible,
-    isGroupOrDirectChannelVisible,
     sortChannelsByDisplayName,
     isFavoriteChannel,
     isDefault,
