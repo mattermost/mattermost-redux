@@ -21,6 +21,7 @@ import {batchActions} from 'types/actions';
 import {Client4} from 'client';
 import {General, Posts, RequestStatus, WebsocketEvents} from '../constants';
 import {
+    GroupTypes,
     PostTypes,
     TeamTypes,
     UserTypes,
@@ -811,6 +812,127 @@ describe('Actions.Websocket', () => {
             expect(actions.length).toEqual(1);
             expect(actions[0]).toEqual(expectedAction);
         });
+    });
+
+    it('Websocket handle group updated', (done) => {
+        async function test() {
+            mockServer.emit('message', JSON.stringify({event: WebsocketEvents.RECEIVED_GROUP, data: {group: `{"id":"${TestHelper.basicGroup.id}","name":"${TestHelper.basicGroup.name}","display_name":"${TestHelper.basicGroup.display_name}","description":"","source":"ldap","remote_id":"12264aae-0279-103a-8a56-1dc005bf4d9c","create_at":1585096089656,"update_at":1585196227880,"delete_at":0,"has_syncables":false,"member_count":2}`}, broadcast: {user_id: '', channel_id: '', team_id: ''}, seq: 26}));
+
+            setTimeout(() => {
+                const state = store.getState();
+                const {groups} = state.entities.groups;
+                assert.strictEqual(Object.keys(groups).length, 1);
+                const updated = groups[TestHelper.basicGroup.id];
+                assert.ok(updated);
+                assert.strictEqual(updated.member_count, 2);
+                done();
+            }, 500);
+        }
+
+        test();
+    });
+
+    it('Websocket handle group deleted', (done) => {
+        async function test() {
+            const tempGroupId = TestHelper.generateId();
+            store.dispatch({type: GroupTypes.RECEIVED_GROUP, data: {id: tempGroupId, name: General.DEFAULT_GROUP, display_name: General.DEFAULT_GROUP}});
+            store.dispatch({type: GroupTypes.RECEIVED_GROUP, data: TestHelper.basicGroup});
+
+            mockServer.emit('message', JSON.stringify({event: WebsocketEvents.RECEIVED_GROUP, data: {group: `{"id":"${TestHelper.basicGroup.id}","name":"${TestHelper.basicGroup.name}","display_name":"${TestHelper.basicGroup.display_name}","description":"","source":"ldap","remote_id":"12264aae-0279-103a-8a56-1dc005bf4d9c","create_at":1585096089656,"update_at":1585196227880,"delete_at":123,"has_syncables":false,"member_count":2}`}, broadcast: {user_id: '', channel_id: '', team_id: ''}, seq: 26}));
+
+            setTimeout(() => {
+                const state = store.getState();
+                const {groups} = state.entities.groups;
+                assert.ok(groups[TestHelper.basicGroup.id].delete_at === 123);
+                done();
+            }, 500);
+        }
+
+        test();
+    });
+    it('Websocket handle group linked to channel', (done) => {
+        async function test() {
+            store.dispatch({type: ChannelTypes.RECEIVED_CHANNEL, data: TestHelper.basicChannel});
+            store.dispatch({type: GroupTypes.RECEIVED_GROUP, data: TestHelper.basicGroup});
+
+            mockServer.emit('message', JSON.stringify({event: WebsocketEvents.RECEIVED_GROUP_ASSOCIATED_TO_CHANNEL, data: {group_id: TestHelper.basicGroup.id}, broadcast: {user_id: '', channel_id: TestHelper.basicChannel.id, team_id: ''}, seq: 31}));
+
+            setTimeout(() => {
+                const state = store.getState();
+                const groupsAssociatedToChannel = state.entities.channels.groupsAssociatedToChannel[TestHelper.basicChannel.id];
+                assert.ok(groupsAssociatedToChannel);
+                const groupIDs = groupsAssociatedToChannel.ids;
+                assert.strictEqual(groupIDs.length, 1);
+                assert.strictEqual(groupIDs[0], TestHelper.basicGroup.id);
+                done();
+            }, 500);
+        }
+        test();
+    });
+
+    it('Websocket handle group unlinked from channel', (done) => {
+        async function test() {
+            store.dispatch({type: ChannelTypes.RECEIVED_CHANNEL, data: TestHelper.basicChannel});
+            store.dispatch({type: GroupTypes.RECEIVED_GROUP, data: TestHelper.basicGroup});
+
+            //link the channel and group
+            mockServer.emit('message', JSON.stringify({event: WebsocketEvents.RECEIVED_GROUP_ASSOCIATED_TO_CHANNEL, data: {group_id: TestHelper.basicGroup.id}, broadcast: {user_id: '', channel_id: TestHelper.basicChannel.id, team_id: ''}, seq: 32}));
+
+            //unlink them
+            mockServer.emit('message', JSON.stringify({event: WebsocketEvents.RECEIVED_GROUP_NOT_ASSOCIATED_TO_CHANNEL, data: {group_id: TestHelper.basicGroup.id}, broadcast: {user_id: '', channel_id: TestHelper.basicChannel.id, team_id: ''}, seq: 33}));
+
+            setTimeout(() => {
+                const state = store.getState();
+                const groupsAssociatedToChannel = state.entities.channels.groupsAssociatedToChannel[TestHelper.basicChannel.id];
+                assert.ok(groupsAssociatedToChannel);
+                const groupIDs = groupsAssociatedToChannel.ids;
+                assert.strictEqual(groupIDs.length, 0);
+                done();
+            }, 500);
+        }
+        test();
+    });
+    it('Websocket handle group linked to team', (done) => {
+        async function test() {
+            store.dispatch({type: TeamTypes.RECEIVED_TEAM, data: TestHelper.basicTeam});
+            store.dispatch({type: GroupTypes.RECEIVED_GROUP, data: TestHelper.basicGroup});
+
+            mockServer.emit('message', JSON.stringify({event: WebsocketEvents.RECEIVED_GROUP_ASSOCIATED_TO_TEAM, data: {group_id: TestHelper.basicGroup.id}, broadcast: {user_id: '', channel_id: '', team_id: TestHelper.basicTeam.id}, seq: 31}));
+
+            setTimeout(() => {
+                const state = store.getState();
+                const groupsAssociatedToTeam = state.entities.teams.groupsAssociatedToTeam[TestHelper.basicTeam.id];
+                assert.ok(groupsAssociatedToTeam);
+                const groupIDs = groupsAssociatedToTeam.ids;
+                assert.strictEqual(groupIDs.length, 1);
+                assert.strictEqual(groupIDs[0], TestHelper.basicGroup.id);
+                done();
+            }, 500);
+        }
+        test();
+    });
+
+    it('Websocket handle group unlinked from team', (done) => {
+        async function test() {
+            store.dispatch({type: TeamTypes.RECEIVED_TEAM, data: TestHelper.basicTeam});
+            store.dispatch({type: GroupTypes.RECEIVED_GROUP, data: TestHelper.basicGroup});
+
+            //link the channel and group
+            mockServer.emit('message', JSON.stringify({event: WebsocketEvents.RECEIVED_GROUP_ASSOCIATED_TO_TEAM, data: {group_id: TestHelper.basicGroup.id}, broadcast: {user_id: '', channel_id: '', team_id: TestHelper.basicChannel.id}, seq: 32}));
+
+            //unlink them
+            mockServer.emit('message', JSON.stringify({event: WebsocketEvents.RECEIVED_GROUP_NOT_ASSOCIATED_TO_TEAM, data: {group_id: TestHelper.basicGroup.id}, broadcast: {user_id: '', channel_id: '', team_id: TestHelper.basicTeam.id}, seq: 33}));
+
+            setTimeout(() => {
+                const state = store.getState();
+                const groupsAssociatedToTeam = state.entities.teams.groupsAssociatedToTeam[TestHelper.basicTeam.id];
+                assert.ok(groupsAssociatedToTeam);
+                const groupIDs = groupsAssociatedToTeam.ids;
+                assert.strictEqual(groupIDs.length, 0);
+                done();
+            }, 500);
+        }
+        test();
     });
 });
 

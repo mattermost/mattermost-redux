@@ -264,7 +264,6 @@ export function patchChannel(channelId: string, patch: Channel): ActionFunc {
             ]));
             return {error};
         }
-
         dispatch(batchActions([
             {
                 type: ChannelTypes.RECEIVED_CHANNEL,

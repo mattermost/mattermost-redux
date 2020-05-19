@@ -41,5 +41,10 @@ const WebsocketEvents = {
     PLUGIN_STATUSES_CHANGED: 'plugin_statuses_changed',
     OPEN_DIALOG: 'open_dialog',
     INCREASE_POST_VISIBILITY_BY_ONE: 'increase_post_visibility_by_one',
+    RECEIVED_GROUP: 'received_group',
+    RECEIVED_GROUP_ASSOCIATED_TO_TEAM: 'group_associated_to_team',
+    RECEIVED_GROUP_NOT_ASSOCIATED_TO_TEAM: 'group_not_associated_to_team',
+    RECEIVED_GROUP_ASSOCIATED_TO_CHANNEL: 'group_associated_to_channel',
+    RECEIVED_GROUP_NOT_ASSOCIATED_TO_CHANNEL: 'group_not_associated_to_channel',
 };
 export default WebsocketEvents;
