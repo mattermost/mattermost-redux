@@ -258,6 +258,13 @@ describe('Selectors.Users', () => {
         });
     });
 
+    describe('getProfilesNotInTeam', () => {
+        const users = [user3, user4].sort(sortByUsername);
+        assert.deepEqual(Selectors.getProfilesNotInTeam(testState, team1.id), users);
+        assert.deepEqual(Selectors.getProfilesNotInTeam(testState, team1.id, {role: 'system_user'}), users);
+        assert.deepEqual(Selectors.getProfilesNotInTeam(testState, team1.id, {role: 'system_guest'}), []);
+    });
+
     it('getProfilesNotInCurrentTeam', () => {
         const users = [user3, user4].sort(sortByUsername);
         assert.deepEqual(Selectors.getProfilesNotInCurrentTeam(testState), users);
@@ -286,6 +293,11 @@ describe('Selectors.Users', () => {
             assert.deepEqual(Selectors.searchProfiles(testState, user3.username, false, {inactive: true}), []);
             assert.deepEqual(Selectors.searchProfiles(testState, user2.username, false, {inactive: true}), [user2]);
         });
+    });
+
+    it('searchProfilesInChannel', () => {
+        assert.deepEqual(Selectors.searchProfilesInChannel(testState, channel1.id, user1.username), [user1]);
+        assert.deepEqual(Selectors.searchProfilesInChannel(testState, channel1.id, user1.username, true), []);
     });
 
     it('searchProfilesInCurrentChannel', () => {
@@ -390,6 +402,9 @@ describe('Selectors.Users', () => {
 
         assert.deepEqual(getProfilesNotInChannel(testState, channel2.id, true), [user4, user5].sort(sortByUsername));
         assert.deepEqual(getProfilesNotInChannel(testState, channel2.id), [user4, user5].sort(sortByUsername));
+
+        assert.deepEqual(getProfilesNotInChannel(testState, channel1.id, false, {role: 'system_guest'}), []);
+        assert.deepEqual(getProfilesNotInChannel(testState, channel2.id, false, {role: 'system_user'}), [user4, user5].sort(sortByUsername));
 
         assert.deepEqual(getProfilesNotInChannel(testState, 'nonexistentid'), []);
         assert.deepEqual(getProfilesNotInChannel(testState, 'nonexistentid'), []);
