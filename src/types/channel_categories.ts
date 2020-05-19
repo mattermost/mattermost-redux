@@ -8,7 +8,12 @@ import {$ID, IDMappedObjects, RelationOneToOne} from './utilities';
 // TODO update values to match the ones used by the server code
 export type ChannelCategoryType = 'favorites' | 'channels' | 'direct_messages' | 'custom';
 
-export type CategorySorting = 'alphabetical' | 'recency' | '';
+export enum CategorySorting {
+    Alphabetical = 'alpha',
+    Default = '', // behaves the same as manual
+    Recency = 'recent',
+    Manual = 'manual',
+}
 
 export type ChannelCategory = {
     id: string;

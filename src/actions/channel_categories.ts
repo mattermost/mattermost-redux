@@ -6,7 +6,7 @@ import {ChannelCategoryTypes} from 'action_types';
 import {fetchMyChannelsAndMembers, unfavoriteChannel, favoriteChannel} from 'actions/channels';
 
 import {General} from '../constants';
-import {CategoryTypes, Sorting} from 'constants/channel_categories';
+import {CategoryTypes} from 'constants/channel_categories';
 
 import {
     getAllCategoriesByIds,
@@ -174,16 +174,20 @@ export function addChannelToInitialCategory(channel: Channel): ActionFunc {
 // its order. The channel will be removed from its previous category (if any) on the given category's team and it will be
 // placed first in its new category.
 export function addChannelToCategory(categoryId: string, channelId: string): ActionFunc {
-    return moveChannelToCategory(categoryId, channelId, 0);
+    return moveChannelToCategory(categoryId, channelId, 0, false);
 }
 
-export function moveChannelToCategory(categoryId: string, channelId: string, newIndex: number) {
+// moveChannelToCategory returns an action that moves a channel into a category and puts it at the given index at the
+// category. The channel will also be removed from its previous category (if any) on that category's team. The category's
+// order will also be set to manual by default.
+export function moveChannelToCategory(categoryId: string, channelId: string, newIndex: number, setManualSorting = true) {
     return (dispatch: DispatchFunc, getState: GetStateFunc) => {
         const category = getCategory(getState(), categoryId);
 
         // Add the channel to the new category
         const categories = [{
             ...category,
+            sorting: setManualSorting ? CategorySorting.Manual : category.sorting,
             channel_ids: insertWithoutDuplicates(category.channel_ids, channelId, newIndex),
         }];
 
@@ -233,7 +237,7 @@ export function createCategory(teamId: string, displayName: string, channelIds: 
             team_id: teamId,
             type: CategoryTypes.CUSTOM,
             display_name: displayName,
-            sorting: Sorting.NONE,
+            sorting: CategorySorting.Default,
             channel_ids: channelIds,
         };
 

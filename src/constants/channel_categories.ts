@@ -10,9 +10,3 @@ export const CategoryTypes: {[name: string]: ChannelCategoryType} = { // TODO up
     DIRECT_MESSAGES: 'direct_messages',
     CUSTOM: 'custom',
 };
-
-export const Sorting: Dictionary<CategorySorting> = {
-    ALPHABETICAL: 'alphabetical',
-    NONE: '',
-    RECENCY: 'recency',
-};

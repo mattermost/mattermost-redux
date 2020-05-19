@@ -3,12 +3,12 @@
 
 import {combineReducers} from 'redux';
 
-import {CategoryTypes, Sorting} from '../../constants/channel_categories';
+import {CategoryTypes} from '../../constants/channel_categories';
 
 import {ChannelCategoryTypes, TeamTypes, UserTypes, ChannelTypes} from 'action_types';
 
 import {GenericAction} from 'types/actions';
-import {ChannelCategory} from 'types/channel_categories';
+import {ChannelCategory, CategorySorting} from 'types/channel_categories';
 import {Team, TeamMembership} from 'types/teams';
 import {$ID, IDMappedObjects, RelationOneToOne} from 'types/utilities';
 
@@ -210,7 +210,7 @@ function makeDefaultCategories(teamId: string): IDMappedObjects<ChannelCategory>
             team_id: teamId,
             type: CategoryTypes.FAVORITES,
             display_name: 'Favorites',
-            sorting: Sorting.NONE,
+            sorting: CategorySorting.Default,
             channel_ids: [],
         },
         [`${teamId}-channels`]: {
@@ -218,7 +218,7 @@ function makeDefaultCategories(teamId: string): IDMappedObjects<ChannelCategory>
             team_id: teamId,
             type: CategoryTypes.CHANNELS,
             display_name: 'Channels',
-            sorting: Sorting.NONE,
+            sorting: CategorySorting.Default,
             channel_ids: [],
         },
         [`${teamId}-direct_messages`]: {
@@ -226,7 +226,7 @@ function makeDefaultCategories(teamId: string): IDMappedObjects<ChannelCategory>
             team_id: teamId,
             type: CategoryTypes.DIRECT_MESSAGES,
             display_name: 'Direct Messages',
-            sorting: Sorting.ALPHABETICAL,
+            sorting: CategorySorting.Alphabetical,
             channel_ids: [],
         },
     };
