@@ -1212,12 +1212,12 @@ describe('Actions.Admin', () => {
 
     it('sendWarnMetricAck', async () => {
         const warnMetricAck = {
-            metric1: true,
+            id: 'metric1',
         };
         nock(Client4.getBaseRoute()).
             post('/warn_metrics/ack').
             reply(200, OK_RESPONSE);
 
-        await Actions.sendWarnMetricAck(warnMetricAck)(store.dispatch, store.getState);
+        await Actions.sendWarnMetricAck(warnMetricAck.id, false)(store.dispatch, store.getState);
     });
 });
