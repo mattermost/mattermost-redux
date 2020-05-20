@@ -395,10 +395,6 @@ const state: GlobalState = {
                 status: 'not_started',
                 error: null,
             },
-            sendWarnMetricAck: {
-                status: 'not_started',
-                error: null,
-            },
         },
         files: {
             uploadFiles: {

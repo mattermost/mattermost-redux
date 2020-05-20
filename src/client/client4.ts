@@ -1963,10 +1963,10 @@ export default class Client4 {
         );
     };
 
-    sendWarnMetricAck = async (warnMetricId: string) => {
+    sendWarnMetricAck = async (warnMetricId: string, forceAckVal: boolean) => {
         return this.doFetch(
             `${this.getBaseRoute()}/warn_metrics/ack/${encodeURI(warnMetricId)}`,
-            {method: 'post'},
+            {method: 'post', body: JSON.stringify({forceAck: forceAckVal})},
         );
     }
 
