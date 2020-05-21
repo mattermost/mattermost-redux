@@ -1,7 +1,7 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
 
-import {Error} from './errors';
+import {ServerError} from './errors';
 import {UserProfile} from './users';
 import {Dictionary, RelationOneToOne} from './utilities';
 
@@ -19,7 +19,7 @@ export type TeamMembership = {
 export type TeamMemberWithError = {
     member: TeamMembership;
     user_id: string;
-    error: Error;
+    error: ServerError;
 }
 
 export type TeamType = 'O' | 'I';
@@ -47,7 +47,7 @@ export type TeamsState = {
     teams: Dictionary<Team>;
     myMembers: Dictionary<TeamMembership>;
     membersInTeam: RelationOneToOne<Team, RelationOneToOne<UserProfile, TeamMembership>>;
-    stats: any;
+    stats: RelationOneToOne<Team, TeamStats>;
     groupsAssociatedToTeam: any;
     totalCount: number;
 };
@@ -61,4 +61,20 @@ export type TeamUnread = {
 export type GetTeamMembersOpts = {
     sort?: 'Username';
     exclude_deleted_users?: boolean;
-}
+};
+
+export type TeamsWithCount = {
+    teams: Team[];
+    total_count: number;
+};
+
+export type TeamStats = {
+    team_id: string;
+    total_member_count: number;
+    active_member_count: number;
+};
+
+export type TeamInviteWithError = {
+    email: string;
+    error: ServerError;
+};

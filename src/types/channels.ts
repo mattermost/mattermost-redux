@@ -1,13 +1,18 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
+
 import {IDMappedObjects, UserIDMappedObjects, RelationOneToMany, RelationOneToOne} from './utilities';
 import {Team} from './teams';
+
 export type ChannelType = 'O' | 'P' | 'D' | 'G';
+
 export type ChannelStats = {
     channel_id: string;
     member_count: number;
+    guest_count: number;
     pinnedpost_count: number;
 };
+
 export type ChannelNotifyProps = {
     desktop: 'default' | 'all' | 'mention' | 'none';
     email: 'default' | 'all' | 'mention' | 'none';
@@ -15,6 +20,7 @@ export type ChannelNotifyProps = {
     push: 'default' | 'all' | 'mention' | 'none';
     ignore_channel_mentions: 'default' | 'off' | 'on';
 };
+
 export type Channel = {
     id: string;
     create_at: number;
@@ -37,11 +43,18 @@ export type Channel = {
     fake?: boolean;
     group_constrained: boolean;
 };
+
 export type ChannelWithTeamData = Channel & {
     team_display_name: string;
     team_name: string;
     team_update_at: number;
-}
+};
+
+export type ChannelsWithTotalCount = {
+    channels: ChannelWithTeamData[];
+    total_count: number;
+};
+
 export type ChannelMembership = {
     channel_id: string;
     user_id: string;
@@ -55,6 +68,7 @@ export type ChannelMembership = {
     scheme_admin: boolean;
     post_root_id?: string;
 };
+
 export type ChannelUnread = {
     channel_id: string;
     user_id: string;
@@ -64,6 +78,7 @@ export type ChannelUnread = {
     last_viewed_at: number;
     deltaMsgs: number;
 };
+
 export type ChannelsState = {
     currentChannelId: string;
     channels: IDMappedObjects<Channel>;
@@ -107,3 +122,8 @@ export type ChannelMemberCountByGroup = {
 };
 
 export type ChannelMemberCountsByGroup = Record<string, ChannelMemberCountByGroup>;
+
+export type ChannelViewResponse = {
+    status: string;
+    last_viewed_at_times: RelationOneToOne<Channel, number>;
+};

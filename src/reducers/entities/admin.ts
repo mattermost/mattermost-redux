@@ -5,7 +5,10 @@ import {combineReducers} from 'redux';
 import {AdminTypes, UserTypes} from 'action_types';
 import {Stats, Plugins} from '../../constants';
 import PluginState from '../../constants/plugins';
+
 import {GenericAction} from 'types/actions';
+import {ClusterInfo} from 'types/admin';
+import {Config} from 'types/config';
 
 function logs(state = [], action: GenericAction) {
     switch (action.type) {
@@ -37,7 +40,7 @@ function audits(state: any = {}, action: GenericAction) {
     }
 }
 
-function config(state: any = {}, action: GenericAction) {
+function config(state: Config = {}, action: GenericAction) {
     switch (action.type) {
     case AdminTypes.RECEIVED_CONFIG: {
         return action.data;
@@ -99,7 +102,7 @@ function complianceReports(state: any = {}, action: GenericAction) {
     }
 }
 
-function clusterInfo(state = [], action: GenericAction) {
+function clusterInfo(state: ClusterInfo[] = [], action: GenericAction) {
     switch (action.type) {
     case AdminTypes.RECEIVED_CLUSTER_STATUS: {
         return action.data;

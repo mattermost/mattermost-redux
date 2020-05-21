@@ -9,7 +9,7 @@ import {getConfig, getCurrentUrl, isCompatibleWithJoinViewTeamPermissions} from 
 import {haveISystemPermission} from 'selectors/entities/roles_helpers';
 
 import {GlobalState} from 'types/store';
-import {Team, TeamMembership} from 'types/teams';
+import {Team, TeamMembership, TeamStats} from 'types/teams';
 import {UserProfile} from 'types/users';
 import {$ID, IDMappedObjects, RelationOneToOne} from 'types/utilities';
 
@@ -106,7 +106,7 @@ export const getCurrentRelativeTeamUrl: (state: GlobalState) => string = createS
     },
 );
 
-export const getCurrentTeamStats: (state: GlobalState) => any = createSelector(
+export const getCurrentTeamStats: (state: GlobalState) => TeamStats = createSelector(
     getCurrentTeamId,
     getTeamStats,
     (currentTeamId, teamStats) => {
