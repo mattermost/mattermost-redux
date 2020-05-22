@@ -3,11 +3,11 @@
 
 import {combineReducers} from 'redux';
 import {GroupTypes} from 'action_types';
-import {GroupChannel, GroupSyncables, GroupTeam, Group} from 'types/groups';
+import {GroupChannel, GroupSyncablesState, GroupTeam, Group} from 'types/groups';
 import {GenericAction} from 'types/actions';
 import {Dictionary} from 'types/utilities';
 
-function syncables(state: Dictionary<GroupSyncables> = {}, action: GenericAction) {
+function syncables(state: Dictionary<GroupSyncablesState> = {}, action: GenericAction) {
     switch (action.type) {
     case GroupTypes.RECEIVED_GROUP_TEAMS: {
         return {
