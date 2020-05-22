@@ -36,5 +36,5 @@ export default ((url: string, options: Options = {headers: {}}): Promise<Respons
     }
 
     // all other requests go straight to fetch
-    return Reflect.apply(fetch, undefined, [url, options]); //eslint-disable-line no-undefined
+    return Reflect.apply(fetch, undefined, [url, options]);
 });

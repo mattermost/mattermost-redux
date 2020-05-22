@@ -1637,7 +1637,7 @@ describe('Actions.Channels', () => {
             post('/channels/search').
             reply(200, [TestHelper.basicChannel, userChannel]);
 
-        const {data} = await store.dispatch(Actions.searchAllChannels('test', 0));
+        await store.dispatch(Actions.searchAllChannels('test', 0));
 
         const moreRequest = store.getState().requests.channels.getAllChannels;
         if (moreRequest.status === RequestStatus.FAILURE) {
@@ -2346,7 +2346,7 @@ describe('Actions.Channels', () => {
                 },
             ]);
 
-        const {error} = await store.dispatch(Actions.getChannelMemberCountsByGroup(channelID, true));
+        await store.dispatch(Actions.getChannelMemberCountsByGroup(channelID, true));
 
         const channelMemberCounts = store.getState().entities.channels.channelMemberCountsByGroup[channelID];
         assert.equal(channelMemberCounts['group-1'].group_id, 'group-1');

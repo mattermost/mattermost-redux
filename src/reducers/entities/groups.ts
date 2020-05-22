@@ -5,8 +5,6 @@ import {combineReducers} from 'redux';
 import {GroupTypes} from 'action_types';
 import {GroupChannel, GroupSyncablesState, GroupTeam, Group} from 'types/groups';
 import {GenericAction} from 'types/actions';
-import {Team, TeamMembership} from 'types/teams';
-import {ChannelMembership} from 'types/channels';
 import {Dictionary} from 'types/utilities';
 
 function syncables(state: Dictionary<GroupSyncablesState> = {}, action: GenericAction) {

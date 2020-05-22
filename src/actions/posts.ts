@@ -28,7 +28,7 @@ import {
     savePreferences,
 } from './preferences';
 import {getProfilesByIds, getProfilesByUsernames, getStatusesByIds} from './users';
-import {Action, ActionFunc, ActionResult, batchActions, DispatchFunc, GetStateFunc, GenericAction} from 'types/actions';
+import {Action, ActionResult, batchActions, DispatchFunc, GetStateFunc, GenericAction} from 'types/actions';
 import {ChannelUnread} from 'types/channels';
 import {GlobalState} from 'types/store';
 import {Post, PostList} from 'types/posts';
@@ -1089,7 +1089,7 @@ export function removePost(post: ExtendedPost) {
 }
 
 export function selectPost(postId: string) {
-    return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
+    return async (dispatch: DispatchFunc) => {
         dispatch({
             type: PostTypes.RECEIVED_POST_SELECTED,
             data: postId,
@@ -1171,7 +1171,7 @@ export function doPostActionWithCookie(postId: string, actionId: string, actionC
 }
 
 export function addMessageIntoHistory(message: string) {
-    return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
+    return async (dispatch: DispatchFunc) => {
         dispatch({
             type: PostTypes.ADD_MESSAGE_INTO_HISTORY,
             data: message,
@@ -1182,7 +1182,7 @@ export function addMessageIntoHistory(message: string) {
 }
 
 export function resetHistoryIndex(index: number) {
-    return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
+    return async (dispatch: DispatchFunc) => {
         dispatch({
             type: PostTypes.RESET_HISTORY_INDEX,
             data: index,
@@ -1193,7 +1193,7 @@ export function resetHistoryIndex(index: number) {
 }
 
 export function moveHistoryIndexBack(index: number) {
-    return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
+    return async (dispatch: DispatchFunc) => {
         dispatch({
             type: PostTypes.MOVE_HISTORY_INDEX_BACK,
             data: index,
@@ -1204,7 +1204,7 @@ export function moveHistoryIndexBack(index: number) {
 }
 
 export function moveHistoryIndexForward(index: number) {
-    return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
+    return async (dispatch: DispatchFunc) => {
         dispatch({
             type: PostTypes.MOVE_HISTORY_INDEX_FORWARD,
             data: index,

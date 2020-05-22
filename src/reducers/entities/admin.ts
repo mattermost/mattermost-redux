@@ -3,7 +3,7 @@
 
 import {combineReducers} from 'redux';
 import {AdminTypes, UserTypes} from 'action_types';
-import {Stats, Plugins} from '../../constants';
+import {Stats} from '../../constants';
 import PluginState from '../../constants/plugins';
 
 import {GenericAction} from 'types/actions';
