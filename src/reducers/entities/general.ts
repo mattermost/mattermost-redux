@@ -4,7 +4,7 @@
 import {combineReducers} from 'redux';
 import {GeneralTypes, UserTypes} from 'action_types';
 import {GenericAction} from 'types/actions';
-import {Config} from 'types/config';
+import {ClientLicense, Config} from 'types/config';
 
 function config(state: Partial<Config> = {}, action: GenericAction) {
     switch (action.type) {
@@ -67,7 +67,7 @@ function deviceToken(state = '', action: GenericAction) {
     }
 }
 
-function license(state: any = {}, action: GenericAction) {
+function license(state: ClientLicense = {}, action: GenericAction) {
     switch (action.type) {
     case GeneralTypes.CLIENT_LICENSE_RECEIVED:
         return action.data;

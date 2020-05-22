@@ -1207,7 +1207,7 @@ describe('Actions.Admin', () => {
 
         await Actions.setSamlIdpCertificateFromMetadata(samlIdpPublicCertificateText)(store.dispatch, store.getState);
 
-        const state = store.getState();
+        // This test doesn't appear to actually check anything?
     });
 
     it('sendWarnMetricAck', async () => {

@@ -1,9 +1,13 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
+
+import {Audit} from './audits';
 import {Channel} from './channels';
 import {Team} from './teams';
 import {PostType} from './posts';
+import {Session} from './sessions';
 import {$ID, IDMappedObjects, RelationOneToMany, RelationOneToOne} from './utilities';
+
 export type UserNotifyProps = {
     desktop: 'default' | 'all' | 'mention' | 'none';
     desktop_sound: 'true' | 'false';
@@ -16,6 +20,7 @@ export type UserNotifyProps = {
     channel: 'true' | 'false';
     mention_keys: string;
 };
+
 export type UserProfile = {
     id: string;
     create_at: number;
@@ -39,11 +44,12 @@ export type UserProfile = {
     is_bot: boolean;
     last_picture_update: number;
 };
+
 export type UsersState = {
     currentUserId: string;
     isManualStatus: RelationOneToOne<UserProfile, boolean>;
-    mySessions: Array<any>;
-    myAudits: Array<any>;
+    mySessions: Array<Session>;
+    myAudits: Array<Audit>;
     profiles: IDMappedObjects<UserProfile>;
     profilesInTeam: RelationOneToMany<Team, UserProfile>;
     profilesNotInTeam: RelationOneToMany<Team, UserProfile>;
@@ -51,13 +57,15 @@ export type UsersState = {
     profilesInChannel: RelationOneToMany<Channel, UserProfile>;
     profilesNotInChannel: RelationOneToMany<Channel, UserProfile>;
     statuses: RelationOneToOne<UserProfile, string>;
-    stats: any;
+    stats: RelationOneToOne<UserProfile, UsersStats>;
 };
+
 export type UserTimezone = {
     useAutomaticTimezone: boolean | string;
     automaticTimezone: string;
     manualTimezone: string;
 };
+
 export type UserActivity = {
     [x in PostType]: {
         [x in $ID<UserProfile>]: | {
@@ -73,4 +81,20 @@ export type UserStatus = {
 	manual: boolean;
 	last_activity_at: number;
 	active_channel?: string;
-}
+};
+
+export type UserAccessToken = {
+    id: string;
+    token?: string;
+    user_id: string;
+    description: string;
+    is_active: boolean;
+};
+
+export type UsersStats = {
+    total_user_count: number;
+};
+
+export type AuthChangeResponse = {
+    follow_link: string;
+};

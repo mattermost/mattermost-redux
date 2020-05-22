@@ -1,12 +1,13 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
+
 import {Client4} from 'client';
 import {SchemeTypes} from 'action_types';
 import {General} from '../constants';
 
 import {Scheme, SchemeScope, SchemePatch} from 'types/schemes';
 
-import {ActionFunc, batchActions, DispatchFunc, GetStateFunc} from 'types/actions';
+import {ActionFunc, DispatchFunc, GetStateFunc} from 'types/actions';
 
 import {bindClientFunc, forceLogoutIfNecessary} from './helpers';
 import {logError} from './errors';
