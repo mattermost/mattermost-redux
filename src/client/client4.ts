@@ -79,6 +79,7 @@ import {
 } from 'types/teams';
 import {TermsOfService} from 'types/terms_of_service';
 import {
+    AuthChangeResponse,
     UserAccessToken,
     UserProfile,
     UsersStats,
@@ -518,7 +519,7 @@ export default class Client4 {
     getKnownUsers = () => {
         this.trackEvent('api', 'api_get_known_users');
 
-        return this.doFetch<$ID<UserProfile>>(
+        return this.doFetch<$ID<UserProfile>[]>(
             `${this.getUsersRoute()}/known`,
             {method: 'get'},
         );
@@ -742,7 +743,7 @@ export default class Client4 {
     getProfilesInGroupChannels = (channelsIds: string[]) => {
         this.trackEvent('api', 'api_profiles_get_in_group_channels', {channelsIds});
 
-        return this.doFetch<{[channelId: string]: UserProfile[]}>(
+        return this.doFetch<Record<string, UserProfile[]>>(
             `${this.getUsersRoute()}/group_channels`,
             {method: 'post', body: JSON.stringify(channelsIds)},
         );
@@ -906,7 +907,7 @@ export default class Client4 {
     switchEmailToOAuth = (service: string, email: string, password: string, mfaCode = '') => {
         this.trackEvent('api', 'api_users_email_to_oauth');
 
-        return this.doFetch<{follow_link: string}>(
+        return this.doFetch<AuthChangeResponse>(
             `${this.getUsersRoute()}/login/switch`,
             {method: 'post', body: JSON.stringify({current_service: 'email', new_service: service, email, password, mfa_code: mfaCode})},
         );
@@ -915,7 +916,7 @@ export default class Client4 {
     switchOAuthToEmail = (currentService: string, email: string, password: string) => {
         this.trackEvent('api', 'api_users_oauth_to_email');
 
-        return this.doFetch<{follow_link: string}>(
+        return this.doFetch<AuthChangeResponse>(
             `${this.getUsersRoute()}/login/switch`,
             {method: 'post', body: JSON.stringify({current_service: currentService, new_service: 'email', email, new_password: password})},
         );
@@ -924,7 +925,7 @@ export default class Client4 {
     switchEmailToLdap = (email: string, emailPassword: string, ldapId: string, ldapPassword: string, mfaCode = '') => {
         this.trackEvent('api', 'api_users_email_to_ldap');
 
-        return this.doFetch<{follow_link: string}>(
+        return this.doFetch<AuthChangeResponse>(
             `${this.getUsersRoute()}/login/switch`,
             {method: 'post', body: JSON.stringify({current_service: 'email', new_service: 'ldap', email, password: emailPassword, ldap_id: ldapId, new_password: ldapPassword, mfa_code: mfaCode})},
         );
@@ -933,7 +934,7 @@ export default class Client4 {
     switchLdapToEmail = (ldapPassword: string, email: string, emailPassword: string, mfaCode = '') => {
         this.trackEvent('api', 'api_users_ldap_to_email');
 
-        return this.doFetch<{follow_link: string}>(
+        return this.doFetch<AuthChangeResponse>(
             `${this.getUsersRoute()}/login/switch`,
             {method: 'post', body: JSON.stringify({current_service: 'ldap', new_service: 'email', email, password: ldapPassword, new_password: emailPassword, mfa_code: mfaCode})},
         );
@@ -2388,7 +2389,7 @@ export default class Client4 {
     // Jobs Routes
 
     getJob = (id: string) => {
-        return this.doFetch<Job[]>(
+        return this.doFetch<Job>(
             `${this.getJobsRoute()}/${id}`,
             {method: 'get'},
         );

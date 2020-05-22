@@ -94,3 +94,7 @@ export type UserAccessToken = {
 export type UsersStats = {
     total_user_count: number;
 };
+
+export type AuthChangeResponse = {
+    follow_link: string;
+};
