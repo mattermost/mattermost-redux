@@ -13,7 +13,7 @@ import {getCurrentUserId} from 'selectors/entities/users';
 
 import {GetStateFunc, DispatchFunc, ActionFunc, ActionResult, batchActions, Action} from 'types/actions';
 
-import {Team, TeamMembership, TeamMemberWithError, GetTeamMembersOpts} from 'types/teams';
+import {Team, TeamMembership, TeamMemberWithError, GetTeamMembersOpts, TeamsWithCount} from 'types/teams';
 
 import {selectChannel} from './channels';
 import {logError} from './errors';
@@ -107,7 +107,7 @@ export function getTeams(page = 0, perPage: number = General.TEAMS_CHUNK_SIZE, i
         dispatch({type: TeamTypes.GET_TEAMS_REQUEST, data});
 
         try {
-            data = await Client4.getTeams(page, perPage, includeTotalCount);
+            data = await Client4.getTeams(page, perPage, includeTotalCount) as TeamsWithCount;
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch, getState);
             dispatch({type: TeamTypes.GET_TEAMS_FAILURE, data});
@@ -155,7 +155,13 @@ export function searchTeams(term: string, page?: number, perPage?: number): Acti
             return {error};
         }
 
-        const teams = response.teams || response;
+        // The type of the response is determined by whether or not page/perPage were set
+        let teams;
+        if (page == null || perPage == null) {
+            teams = response as Team[];
+        } else {
+            teams = (response as TeamsWithCount).teams;
+        }
 
         dispatch(batchActions([
             {
