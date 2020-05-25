@@ -139,9 +139,10 @@ describe('Selectors.Groups', () => {
         const expected = Object.entries(testState.entities.groups.groups).filter(([groupID]) => !channelAssociatedGroupIDs.includes(groupID)).map(([, group]) => group);
         assert.deepEqual(Selectors.getGroupsNotAssociatedToChannel(testState, channelID, teamID), expected);
 
-        const cloneState = JSON.parse(JSON.stringify(testState));
+        let cloneState = JSON.parse(JSON.stringify(testState));
         cloneState.entities.teams.teams[teamID].group_constrained = true;
         cloneState.entities.teams.groupsAssociatedToTeam[teamID].ids = [expectedAssociatedGroupID1];
+        cloneState = deepFreezeAndThrowOnMutation(cloneState);
         assert.equal(Selectors.getGroupsNotAssociatedToChannel(cloneState, channelID, teamID).length, expected.length - 1);
     });
 
