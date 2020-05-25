@@ -157,12 +157,12 @@ export const getGroupsNotAssociatedToChannel: (state: GlobalState, channelID: st
     (state: GlobalState, _: string, teamID: string) => getTeam(state, teamID),
     (state: GlobalState, _: string, teamID: string) => getGroupsAssociatedToTeam(state, teamID),
     (allGroups, channelGroupIDSet, team, teamGroups) => {
-        let result = Object.entries(allGroups).filter(([groupID]) => !channelGroupIDSet.has(groupID));
+        let result = Object.values(allGroups).filter((group) => !channelGroupIDSet.has(group.id));
         if (team.group_constrained) {
             const gids = teamGroups.map((group) => group.id);
-            result = result.filter(([groupID]) => gids?.includes(groupID));
+            result = result.filter((group) => gids?.includes(group.id));
         }
-        return result.map((entry) => entry[1]);
+        return result;
     },
 );
 
