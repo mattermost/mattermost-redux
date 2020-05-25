@@ -93,7 +93,7 @@ export function makeFilterArchivedChannels(): (state: GlobalState, channels: Cha
 }
 
 function getDefaultAutocloseCutoff() {
-    return Date.now() - 7 * 24 * 60 * 60 * 1000;
+    return Date.now() - (7 * 24 * 60 * 60 * 1000);
 }
 
 // makeFilterAutoclosedDMs returns a selector that filters a given list of channels based on whether or not the channel has

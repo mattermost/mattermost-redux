@@ -1,12 +1,15 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
+
 // I assume these are the loglevels
 export type logLevel = 'ERROR' | 'WARNING' | 'INFO';
-export type GenericClientResponse = {
-    response: any;
+
+export type ClientResponse<T> = {
+    response: Response;
     headers: Map<string, string>;
-    data: any;
+    data: T;
 };
+
 type ErrorOffline = {
     message: string;
     url: string;
@@ -24,10 +27,15 @@ export type ErrorApi = {
     url: string;
 };
 export type Client4Error = ErrorOffline | ErrorInvalidResponse | ErrorApi;
+
 export type Options = {
     headers?: { [x: string]: string };
     method?: string;
     url?: string;
     credentials?: 'omit' | 'same-origin' | 'include';
     body?: any;
+};
+
+export type StatusOK = {
+    status: 'OK';
 };

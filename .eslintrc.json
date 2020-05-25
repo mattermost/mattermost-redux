@@ -13,25 +13,23 @@
         "jest": true
     },
     "rules": {
-        "@typescript-eslint/camelcase": 0,
-        "@typescript-eslint/no-undefined": 0,
-        "@typescript-eslint/no-non-null-assertion": 0,
-        "no-prototype-builtins": 0,
-        "no-mixed-operators": 0,
         "no-undefined": 0,
-        "padding-line-between-statements": [
-            "error",
-            {
-                "blankLine": "always",
-                "prev": "function",
-                "next": "function"
-            }
+        "@typescript-eslint/camelcase": [
+          2,
+          {
+            "properties": "never"
+          }
         ],
-        "no-nested-ternary": 0,
-        "@typescript-eslint/no-unused-vars": 0,
+        "@typescript-eslint/no-non-null-assertion": 0,
+        "@typescript-eslint/no-unused-vars": [
+          2,
+          {
+            "vars": "all",
+            "args": "after-used"
+          }
+        ],
         "@typescript-eslint/no-explicit-any": "warn",
         "@typescript-eslint/no-use-before-define": 0,
-        "max-lines": 0,
         "@typescript-eslint/no-var-requires": 0,
         "@typescript-eslint/explicit-function-return-type": 0
     },

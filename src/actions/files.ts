@@ -3,7 +3,7 @@
 import {Client4} from 'client';
 import {FileTypes} from 'action_types';
 
-import {Action, batchActions, DispatchFunc, GetStateFunc, ActionFunc} from 'types/actions';
+import {batchActions, DispatchFunc, GetStateFunc, ActionFunc} from 'types/actions';
 
 import {logError} from './errors';
 import {bindClientFunc, forceLogoutIfNecessary} from './helpers';

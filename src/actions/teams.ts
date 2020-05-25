@@ -13,7 +13,7 @@ import {getCurrentUserId} from 'selectors/entities/users';
 
 import {GetStateFunc, DispatchFunc, ActionFunc, ActionResult, batchActions, Action} from 'types/actions';
 
-import {Team, TeamMembership, TeamMemberWithError, GetTeamMembersOpts} from 'types/teams';
+import {Team, TeamMembership, TeamMemberWithError, GetTeamMembersOpts, TeamsWithCount} from 'types/teams';
 
 import {selectChannel} from './channels';
 import {logError} from './errors';
@@ -53,7 +53,7 @@ async function getProfilesAndStatusesForMembers(userIds: string[], dispatch: Dis
 }
 
 export function selectTeam(team: Team | string): ActionFunc {
-    return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
+    return async (dispatch: DispatchFunc) => {
         const teamId = (typeof team === 'string') ? team : team.id;
         dispatch({
             type: TeamTypes.SELECT_TEAM,
@@ -107,7 +107,7 @@ export function getTeams(page = 0, perPage: number = General.TEAMS_CHUNK_SIZE, i
         dispatch({type: TeamTypes.GET_TEAMS_REQUEST, data});
 
         try {
-            data = await Client4.getTeams(page, perPage, includeTotalCount);
+            data = await Client4.getTeams(page, perPage, includeTotalCount) as TeamsWithCount;
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch, getState);
             dispatch({type: TeamTypes.GET_TEAMS_FAILURE, data});
@@ -155,7 +155,13 @@ export function searchTeams(term: string, page?: number, perPage?: number): Acti
             return {error};
         }
 
-        const teams = response.teams || response;
+        // The type of the response is determined by whether or not page/perPage were set
+        let teams;
+        if (page == null || perPage == null) {
+            teams = response as Team[];
+        } else {
+            teams = (response as TeamsWithCount).teams;
+        }
 
         dispatch(batchActions([
             {
@@ -474,9 +480,9 @@ export function addUsersToTeamGracefully(teamId: string, userIds: Array<string>)
             return {error};
         }
 
-        const added_members = result ? result.filter((m) => !m.error) : [];
-        const profiles: Partial<UserProfile>[] = added_members.map((m) => ({id: m.user_id}));
-        const members = added_members.map((m) => m.member);
+        const addedMembers = result ? result.filter((m) => !m.error) : [];
+        const profiles: Partial<UserProfile>[] = addedMembers.map((m) => ({id: m.user_id}));
+        const members = addedMembers.map((m) => m.member);
         dispatch(batchActions([
             {
                 type: UserTypes.RECEIVED_PROFILES_LIST_IN_TEAM,

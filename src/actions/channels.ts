@@ -1,7 +1,7 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
 
-import {ChannelTypes, PreferenceTypes, UserTypes, ChannelCategoryTypes} from 'action_types';
+import {ChannelTypes, PreferenceTypes, UserTypes} from 'action_types';
 
 import {Client4} from 'client';
 
@@ -20,7 +20,9 @@ import {getConfig, getServerVersion} from 'selectors/entities/general';
 import {getCurrentTeamId} from 'selectors/entities/teams';
 
 import {Action, ActionFunc, batchActions, DispatchFunc, GetStateFunc} from 'types/actions';
-import {Channel, ChannelNotifyProps, ChannelMembership, ChannelModerationPatch} from 'types/channels';
+
+import {Channel, ChannelNotifyProps, ChannelMembership, ChannelModerationPatch, ChannelsWithTotalCount} from 'types/channels';
+
 import {PreferenceType} from 'types/preferences';
 
 import {getChannelsIdForTeam, getChannelByName} from 'utils/channel_utils';
@@ -672,13 +674,17 @@ export function leaveChannel(channelId: string): ActionFunc {
 
 export function joinChannel(userId: string, teamId: string, channelId: string, channelName: string): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
+        if (!channelId || !channelName) {
+            return {data: null};
+        }
+
         let member: ChannelMembership | undefined | null;
-        let channel;
+        let channel: Channel;
         try {
             if (channelId) {
                 member = await Client4.addToChannel(userId, channelId);
                 channel = await Client4.getChannel(channelId);
-            } else if (channelName) {
+            } else {
                 channel = await Client4.getChannelByName(teamId, channelName, true);
                 if ((channel.type === General.GM_CHANNEL) || (channel.type === General.DM_CHANNEL)) {
                     member = await Client4.getChannelMember(channel.id, userId);
@@ -918,7 +924,7 @@ export function getAllChannelsWithCount(page = 0, perPage: number = General.CHAN
 
         let payload;
         try {
-            payload = await Client4.getAllChannels(page, perPage, notAssociatedToGroup, excludeDefaultChannels, true);
+            payload = await Client4.getAllChannels(page, perPage, notAssociatedToGroup, excludeDefaultChannels, true) as ChannelsWithTotalCount;
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch, getState);
             dispatch(batchActions([
@@ -1079,7 +1085,7 @@ export function searchAllChannels(term: string, notAssociatedToGroup = '', exclu
 
         let response;
         try {
-            response = await Client4.searchAllChannels(term, notAssociatedToGroup, excludeDefaultChannels, page, perPage);
+            response = await Client4.searchAllChannels(term, notAssociatedToGroup, excludeDefaultChannels, page, perPage) as ChannelsWithTotalCount;
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch, getState);
             dispatch(batchActions([
@@ -1214,7 +1220,7 @@ export function updateChannelMemberRoles(channelId: string, userId: string, role
 }
 
 export function updateChannelHeader(channelId: string, header: string): ActionFunc {
-    return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
+    return async (dispatch: DispatchFunc) => {
         Client4.trackEvent('action', 'action_channels_update_header', {channel_id: channelId});
 
         dispatch({
@@ -1230,7 +1236,7 @@ export function updateChannelHeader(channelId: string, header: string): ActionFu
 }
 
 export function updateChannelPurpose(channelId: string, purpose: string): ActionFunc {
-    return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
+    return async (dispatch: DispatchFunc) => {
         Client4.trackEvent('action', 'action_channels_update_purpose', {channel_id: channelId});
 
         dispatch({
