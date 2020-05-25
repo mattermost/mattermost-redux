@@ -1,11 +1,13 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
+
 import {ErrorTypes} from 'action_types';
 import {serializeError, ErrorObject} from 'serialize-error';
 import {Client4} from 'client';
 import EventEmitter from 'utils/event_emitter';
 import {DispatchFunc, ActionFunc} from 'types/actions';
-import {Error} from 'types/errors';
+import {ServerError} from 'types/errors';
+
 export function dismissErrorObject(index: number) {
     return {
         type: ErrorTypes.DISMISS_ERROR,
@@ -31,7 +33,7 @@ export function getLogErrorAction(error: ErrorObject, displayable = false) {
     };
 }
 
-export function logError(error: Error, displayable = false): ActionFunc {
+export function logError(error: ServerError, displayable = false): ActionFunc {
     return async (dispatch: DispatchFunc) => {
         if (error.server_error_id === 'api.context.session_expired.app_error') {
             return {data: true};

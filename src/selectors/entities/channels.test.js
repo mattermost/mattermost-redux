@@ -7,8 +7,6 @@ import deepFreezeAndThrowOnMutation from 'utils/deep_freeze';
 import TestHelper from 'test/test_helper';
 import {sortChannelsByDisplayName, getDirectChannelName} from 'utils/channel_utils';
 import * as Selectors from 'selectors/entities/channels';
-import * as TeamSelectors from 'selectors/entities/teams';
-import * as PreferencesSelectors from 'selectors/entities/preferences';
 import {General, Preferences, Permissions} from '../../constants';
 
 const sortUsernames = (a, b) => a.localeCompare(b, General.DEFAULT_LOCALE, {numeric: true});
