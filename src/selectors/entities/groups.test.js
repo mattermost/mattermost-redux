@@ -136,14 +136,16 @@ describe('Selectors.Groups', () => {
     });
 
     it('getGroupsNotAssociatedToChannel', () => {
-        const expected = Object.entries(testState.entities.groups.groups).filter(([groupID]) => !channelAssociatedGroupIDs.includes(groupID)).map(([, group]) => group);
+        let expected = Object.entries(testState.entities.groups.groups).filter(([groupID]) => !channelAssociatedGroupIDs.includes(groupID)).map(([, group]) => group);
         assert.deepEqual(Selectors.getGroupsNotAssociatedToChannel(testState, channelID, teamID), expected);
 
         let cloneState = JSON.parse(JSON.stringify(testState));
         cloneState.entities.teams.teams[teamID].group_constrained = true;
         cloneState.entities.teams.groupsAssociatedToTeam[teamID].ids = [expectedAssociatedGroupID1];
         cloneState = deepFreezeAndThrowOnMutation(cloneState);
-        assert.equal(Selectors.getGroupsNotAssociatedToChannel(cloneState, channelID, teamID).length, expected.length - 1);
+
+        expected = Object.entries(cloneState.entities.groups.groups).filter(([groupID]) => !channelAssociatedGroupIDs.includes(groupID) && cloneState.entities.teams.groupsAssociatedToTeam[teamID].ids.includes(groupID)).map(([, group]) => group);
+        assert.deepEqual(Selectors.getGroupsNotAssociatedToChannel(cloneState, channelID, teamID), expected);
     });
 
     it('getGroupsAssociatedToTeamForReference', () => {
