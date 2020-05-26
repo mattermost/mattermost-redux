@@ -143,7 +143,7 @@ export function isAutoClosed(
     currentChannelId = '',
     now = Date.now(),
 ): boolean {
-    const cutoff = now - 7 * 24 * 60 * 60 * 1000;
+    const cutoff = now - (7 * 24 * 60 * 60 * 1000);
     const viewTimePref = myPreferences[`${Preferences.CATEGORY_CHANNEL_APPROXIMATE_VIEW_TIME}--${channel.id}`];
     const viewTime = viewTimePref ? parseInt(viewTimePref.value!, 10) : 0;
 

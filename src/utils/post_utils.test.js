@@ -9,6 +9,7 @@ import {Permissions} from '../constants';
 import {
     canEditPost,
     isSystemMessage,
+    shouldIgnorePost,
     isMeMessage,
     isUserActivityPost,
     shouldFilterJoinLeavePost,
@@ -343,6 +344,32 @@ describe('PostUtils', () => {
                     `isSystemMessage('${testCase.input}') should return ${testCase.output}`,
                 );
             });
+        });
+    });
+
+    describe('shouldIgnorePost', () => {
+        it('should return false if system message is adding current user', () => {
+            const currentUserId = 'czduet3upjfupy9xnqswrxaqea';
+            const post = {
+                type: PostTypes.ADD_TO_CHANNEL,
+                user_id: 'anotherUserId',
+                props: {
+                    addedUserId: 'czduet3upjfupy9xnqswrxaqea',
+                },
+            };
+            const evalShouldIgnorePost = shouldIgnorePost(post, currentUserId);
+            assert.equal(evalShouldIgnorePost, false);
+        });
+        it('should return true if system message is adding a different user', () => {
+            const currentUserId = 'czduet3upjfupy9xnqswrxaqea';
+            const post = {
+                type: PostTypes.ADD_TO_CHANNEL,
+                props: {
+                    addedUserId: 'mrbijaq9mjr3ue569kake9m6do',
+                },
+            };
+            const evalShouldIgnorePost = shouldIgnorePost(post, currentUserId);
+            assert.equal(evalShouldIgnorePost, true);
         });
     });
 

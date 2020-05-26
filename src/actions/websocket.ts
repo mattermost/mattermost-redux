@@ -4,9 +4,9 @@
 import {Client4} from 'client';
 import websocketClient from '../client/websocket_client';
 
-import {ChannelTypes, GeneralTypes, EmojiTypes, PostTypes, PreferenceTypes, TeamTypes, UserTypes, RoleTypes, AdminTypes, IntegrationTypes} from 'action_types';
+import {ChannelTypes, GeneralTypes, GroupTypes, EmojiTypes, PostTypes, PreferenceTypes, TeamTypes, UserTypes, RoleTypes, AdminTypes, IntegrationTypes} from 'action_types';
 import {General, WebsocketEvents, Preferences} from '../constants';
-import {getAllChannels, getChannel, getChannelsNameMapInTeam, getCurrentChannelId, getCurrentChannel, getMyChannelMember as getMyChannelMemberSelector, getRedirectChannelNameForTeam, getCurrentChannelStats, getMyChannels, getChannelMembersInChannels, isManuallyUnread} from 'selectors/entities/channels';
+import {getAllChannels, getChannel, getChannelsNameMapInTeam, getCurrentChannelId, getCurrentChannel, getMyChannelMember as getMyChannelMemberSelector, getRedirectChannelNameForTeam, getCurrentChannelStats, getChannelMembersInChannels, isManuallyUnread} from 'selectors/entities/channels';
 import {getConfig} from 'selectors/entities/general';
 import {getAllPosts, getPost as getPostSelector} from 'selectors/entities/posts';
 import {getDirectShowPreferences} from 'selectors/entities/preferences';
@@ -28,7 +28,9 @@ import {Channel, ChannelMembership} from 'types/channels';
 import {Dictionary} from 'types/utilities';
 import {PreferenceType} from 'types/preferences';
 import {isGuest} from 'utils/user_utils';
+
 let doDispatch: DispatchFunc;
+
 export function init(platform: PlatformType, siteUrl: string | undefined | null, token: string | undefined | null, optionalWebSocket: any, additionalOptions: any = {}) {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         const config = getConfig(getState());
@@ -330,6 +332,21 @@ function handleEvent(msg: WebSocketMessage) {
         break;
     case WebsocketEvents.OPEN_DIALOG:
         doDispatch(handleOpenDialogEvent(msg));
+        break;
+    case WebsocketEvents.RECEIVED_GROUP:
+        doDispatch(handleGroupUpdatedEvent(msg));
+        break;
+    case WebsocketEvents.RECEIVED_GROUP_ASSOCIATED_TO_TEAM:
+        doDispatch(handleReceivedGroupAssociatedToTeamEvent(msg));
+        break;
+    case WebsocketEvents.RECEIVED_GROUP_NOT_ASSOCIATED_TO_TEAM:
+        doDispatch(handleReceivedGroupNotAssociatedToTeamEvent(msg));
+        break;
+    case WebsocketEvents.RECEIVED_GROUP_ASSOCIATED_TO_CHANNEL:
+        doDispatch(handleReceivedGroupAssociatedToChannelEvent(msg));
+        break;
+    case WebsocketEvents.RECEIVED_GROUP_NOT_ASSOCIATED_TO_CHANNEL:
+        doDispatch(handleReceivedGroupNotAssociatedToChannelEvent(msg));
         break;
     }
 }
@@ -979,6 +996,66 @@ export function removeNotVisibleUsers(): ActionFunc {
         if (actions.length > 0) {
             dispatch(batchActions(actions));
         }
+
+        return {data: true};
+    };
+}
+
+function handleGroupUpdatedEvent(msg: WebSocketMessage) {
+    return async (dispatch: DispatchFunc) => {
+        let data;
+
+        try {
+            data = msg.data ? JSON.parse(msg.data.group) : null;
+        } catch (err) {
+            return {error: err};
+        }
+
+        if (data) {
+            dispatch({
+                type: GroupTypes.RECEIVED_GROUP,
+                data,
+            });
+        }
+        return {data: true};
+    };
+}
+
+function handleReceivedGroupAssociatedToTeamEvent(msg: WebSocketMessage) {
+    return (dispatch: DispatchFunc) => {
+        dispatch({
+            type: GroupTypes.RECEIVED_GROUP_ASSOCIATED_TO_TEAM,
+            data: {teamID: msg.broadcast.team_id, groups: [{id: msg.data.group_id}]}});
+
+        return {data: true};
+    };
+}
+
+function handleReceivedGroupNotAssociatedToTeamEvent(msg: WebSocketMessage) {
+    return (dispatch: DispatchFunc) => {
+        dispatch({
+            type: GroupTypes.RECEIVED_GROUP_NOT_ASSOCIATED_TO_TEAM,
+            data: {teamID: msg.broadcast.team_id, groups: [{id: msg.data.group_id}]}});
+
+        return {data: true};
+    };
+}
+
+function handleReceivedGroupAssociatedToChannelEvent(msg: WebSocketMessage) {
+    return (dispatch: DispatchFunc) => {
+        dispatch({
+            type: GroupTypes.RECEIVED_GROUP_ASSOCIATED_TO_CHANNEL,
+            data: {channelID: msg.broadcast.channel_id, groups: [{id: msg.data.group_id}]}});
+
+        return {data: true};
+    };
+}
+
+function handleReceivedGroupNotAssociatedToChannelEvent(msg: WebSocketMessage) {
+    return (dispatch: DispatchFunc) => {
+        dispatch({
+            type: GroupTypes.RECEIVED_GROUP_NOT_ASSOCIATED_TO_CHANNEL,
+            data: {channelID: msg.broadcast.channel_id, groups: [{id: msg.data.group_id}]}});
 
         return {data: true};
     };

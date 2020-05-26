@@ -1,7 +1,10 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
 
-export type Config = {
+export type Config = any;
+export type EnvironmentConfig = any;
+
+export type ClientConfig = {
     AboutLink: string;
     AllowBannerDismissal: string;
     AllowCustomThemes: string;
@@ -162,4 +165,58 @@ export type Config = {
     WebsocketPort: string;
     WebsocketSecurePort: string;
     WebsocketURL: string;
+};
+
+export type License = {
+    id: string;
+    issued_at: number;
+    starts_at: number;
+    expires_at: string;
+    customer: LicenseCustomer;
+    features: LicenseFeatures;
+    sku_name: string;
+    short_sku_name: string;
+};
+
+export type LicenseCustomer = {
+    id: string;
+    name: string;
+    email: string;
+    company: string;
+};
+
+export type LicenseFeatures = {
+    users?: number;
+    ldap?: boolean;
+    ldap_groups?: boolean;
+    mfa?: boolean;
+    google_oauth?: boolean;
+    office365_oauth?: boolean;
+    compliance?: boolean;
+    cluster?: boolean;
+    metrics?: boolean;
+    mhpns?: boolean;
+    saml?: boolean;
+    elastic_search?: boolean;
+    announcement?: boolean;
+    theme_management?: boolean;
+    email_notification_contents?: boolean;
+    data_retention?: boolean;
+    message_export?: boolean;
+    custom_permissions_schemes?: boolean;
+    custom_terms_of_service?: boolean;
+    guest_accounts?: boolean;
+    guest_accounts_permissions?: boolean;
+    id_loaded?: boolean;
+    lock_teammate_name_display?: boolean;
+    future_features?: boolean;
+};
+
+export type ClientLicense = Record<string, string>;
+
+export type DataRetentionPolicy = {
+    message_deletion_enabled: boolean;
+    file_deletion_enabled: boolean;
+    message_retention_cutoff: number;
+    file_retention_cutoff: number;
 };

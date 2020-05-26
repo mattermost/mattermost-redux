@@ -10,11 +10,10 @@ import {forceLogoutIfNecessary} from './helpers';
 import {logError} from './errors';
 import {getProfilesAndStatusesForPosts, receivedPosts} from './posts';
 import {ActionResult, batchActions, DispatchFunc, GetStateFunc, ActionFunc} from 'types/actions';
-import {RelationOneToOne} from 'types/utilities';
 import {Post} from 'types/posts';
 import {SearchParameter} from 'types/search';
 const WEBAPP_SEARCH_PER_PAGE = 20;
-export function getMissingChannelsFromPosts(posts: RelationOneToOne<Post, Post>): ActionFunc {
+export function getMissingChannelsFromPosts(posts: Map<string, Post>): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         const {
             channels,
