@@ -4,7 +4,7 @@ The project purpose is consolidating the storage, web utilities and logic of the
 
 [Redux](http://redux.js.org/docs/introduction/) is the backbone for this project and many of the design decisions and patterns stem from it.
 
-Mattermost is an open source Slack-alternative used by thousands of companies around the world in more than 12 languages. Learn more at https://mattermost.com.
+Mattermost is an open source Slack-alternative used by thousands of companies around the world in more than 16 languages. Learn more at https://mattermost.com.
 
 # Usage
 
