@@ -894,13 +894,13 @@ export function getArchivedChannels(teamId: string, page = 0, perPage: number = 
     };
 }
 
-export function getAllChannelsWithCount(page = 0, perPage: number = General.CHANNELS_CHUNK_SIZE, notAssociatedToGroup = '', excludeDefaultChannels = false): ActionFunc {
+export function getAllChannelsWithCount(page = 0, perPage: number = General.CHANNELS_CHUNK_SIZE, notAssociatedToGroup = '', excludeDefaultChannels = false, includeDeleted = false): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         dispatch({type: ChannelTypes.GET_ALL_CHANNELS_REQUEST, data: null});
 
         let payload;
         try {
-            payload = await Client4.getAllChannels(page, perPage, notAssociatedToGroup, excludeDefaultChannels, true) as ChannelsWithTotalCount;
+            payload = await Client4.getAllChannels(page, perPage, notAssociatedToGroup, excludeDefaultChannels, true, includeDeleted) as ChannelsWithTotalCount;
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch, getState);
             dispatch(batchActions([
@@ -1055,13 +1055,13 @@ export function searchChannels(teamId: string, term: string, archived?: boolean)
     };
 }
 
-export function searchAllChannels(term: string, notAssociatedToGroup = '', excludeDefaultChannels = false, page?: number, perPage?: number): ActionFunc {
+export function searchAllChannels(term: string, notAssociatedToGroup = '', excludeDefaultChannels = false, page?: number, perPage?: number, includeDeleted = false): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         dispatch({type: ChannelTypes.GET_ALL_CHANNELS_REQUEST, data: null});
 
         let response;
         try {
-            response = await Client4.searchAllChannels(term, notAssociatedToGroup, excludeDefaultChannels, page, perPage) as ChannelsWithTotalCount;
+            response = await Client4.searchAllChannels(term, notAssociatedToGroup, excludeDefaultChannels, page, perPage, includeDeleted) as ChannelsWithTotalCount;
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch, getState);
             dispatch(batchActions([
