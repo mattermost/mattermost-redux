@@ -2040,6 +2040,13 @@ export default class Client4 {
         );
     };
 
+    getTranslations = (url: string) => {
+        return this.doFetch<Record<string, string>>(
+            url,
+            {method: 'get'},
+        );
+    };
+
     getWebSocketUrl = () => {
         return `${this.getBaseRoute()}/websocket`;
     }
