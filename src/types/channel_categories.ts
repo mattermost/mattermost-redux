@@ -24,6 +24,11 @@ export type ChannelCategory = {
     channel_ids: $ID<Channel>[];
 };
 
+export type OrderedChannelCategories = {
+    categories: ChannelCategory[];
+    order: string[];
+};
+
 export type ChannelCategoriesState = {
     byId: IDMappedObjects<ChannelCategory>;
     orderByTeam: RelationOneToOne<Team, $ID<ChannelCategory>[]>;
