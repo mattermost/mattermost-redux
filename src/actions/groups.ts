@@ -196,7 +196,7 @@ export function getGroupsNotAssociatedToTeam(teamID: string, q = '', page = 0, p
     });
 }
 
-export function getGroupsNotAssociatedToChannel(channelID: string, q = '', page = 0, perPage: number = General.PAGE_SIZE_DEFAULT): ActionFunc {
+export function getGroupsNotAssociatedToChannel(channelID: string, q = '', page = 0, perPage: number = General.PAGE_SIZE_DEFAULT, filterParentTeamPermitted = false): ActionFunc {
     return bindClientFunc({
         clientFunc: Client4.getGroupsNotAssociatedToChannel,
         onSuccess: [GroupTypes.RECEIVED_GROUPS],
@@ -205,6 +205,7 @@ export function getGroupsNotAssociatedToChannel(channelID: string, q = '', page 
             q,
             page,
             perPage,
+            filterParentTeamPermitted,
         ],
     });
 }
