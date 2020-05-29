@@ -220,3 +220,9 @@ export type DataRetentionPolicy = {
     message_retention_cutoff: number;
     file_retention_cutoff: number;
 };
+
+export type WarnMetricStatus = {
+    id: string;
+    aae_id: string;
+    limit: number;
+};

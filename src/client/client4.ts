@@ -3297,7 +3297,7 @@ export default class Client4 {
             'click_dismiss_bar',
             'diagnostics_disabled',
             'click_warn_metric_ack_button',
-            'click_warn_metric_ack_acknowledge',
+            'click_warn_metric_ack_contact_support',
         ].includes(event)) {
             return;
         }
