@@ -2889,10 +2889,18 @@ export default class Client4 {
         );
     };
 
-    getGroupsNotAssociatedToChannel = async (channelID: string, q = '', page = 0, perPage = PER_PAGE_DEFAULT) => {
+    getGroupsNotAssociatedToChannel = (channelID: string, q = '', page = 0, perPage = PER_PAGE_DEFAULT, filterParentTeamPermitted = false) => {
         this.trackEvent('api', 'api_groups_get_not_associated_to_channel', {channel_id: channelID});
+        const query = {
+            not_associated_to_channel: channelID,
+            page,
+            per_page: perPage,
+            q,
+            include_member_count: true,
+            filter_parent_team_permitted: filterParentTeamPermitted,
+        };
         return this.doFetch(
-            `${this.getBaseRoute()}/groups${buildQueryString({not_associated_to_channel: channelID, page, per_page: perPage, q, include_member_count: true})}`,
+            `${this.getBaseRoute()}/groups${buildQueryString(query)}`,
             {method: 'get'},
         );
     };

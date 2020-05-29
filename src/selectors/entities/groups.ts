@@ -151,11 +151,18 @@ export const getGroupsAssociatedToTeam: (state: GlobalState, teamID: string) => 
     },
 );
 
-export const getGroupsNotAssociatedToChannel: (state: GlobalState, channelID: string) => Group[] = createSelector(
+export const getGroupsNotAssociatedToChannel: (state: GlobalState, channelID: string, teamID: string) => Group[] = createSelector(
     getAllGroups,
     (state: GlobalState, channelID: string) => getChannelGroupIDSet(state, channelID),
-    (allGroups, channelGroupIDSet) => {
-        return Object.entries(allGroups).filter(([groupID]) => !channelGroupIDSet.has(groupID)).map((entry) => entry[1]);
+    (state: GlobalState, _: string, teamID: string) => getTeam(state, teamID),
+    (state: GlobalState, _: string, teamID: string) => getGroupsAssociatedToTeam(state, teamID),
+    (allGroups, channelGroupIDSet, team, teamGroups) => {
+        let result = Object.values(allGroups).filter((group) => !channelGroupIDSet.has(group.id));
+        if (team.group_constrained) {
+            const gids = teamGroups.map((group) => group.id);
+            result = result.filter((group) => gids?.includes(group.id));
+        }
+        return result;
     },
 );
 
