@@ -1423,7 +1423,7 @@ export function favoriteChannel(channelId: string, updateCategories = true): Act
             const channel = getChannelSelector(getState(), channelId);
             const category = getCategoryInTeamByType(getState(), channel.team_id || getCurrentTeamId(getState()), CategoryTypes.FAVORITES);
             if (category) {
-                dispatch(addChannelToCategory(category.id, channel.id));
+                await dispatch(addChannelToCategory(category.id, channel.id));
             }
         }
 
@@ -1454,7 +1454,7 @@ export function unfavoriteChannel(channelId: string, updateCategories = true): A
                 channel.type === General.DM_CHANNEL || channel.type === General.GM_CHANNEL ? CategoryTypes.DIRECT_MESSAGES : CategoryTypes.CHANNELS,
             );
             if (category) {
-                dispatch(addChannelToCategory(category.id, channel.id));
+                await dispatch(addChannelToCategory(category.id, channel.id));
             }
         }
 

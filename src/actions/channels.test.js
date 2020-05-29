@@ -2099,6 +2099,10 @@ describe('Actions.Channels', () => {
     test('favoriteChannel', async () => {
         const channel = TestHelper.basicChannel;
         const team = TestHelper.basicTeam;
+        const currentUserId = TestHelper.generateId();
+
+        const favoritesCategory = {id: 'favoritesCategory', team_id: team.id, type: CategoryTypes.FAVORITES, channel_ids: []};
+        const channelsCategory = {id: 'channelsCategory', team_id: team.id, type: CategoryTypes.CHANNELS, channel_ids: [channel.id]};
 
         store = await configureStore({
             entities: {
@@ -2109,15 +2113,25 @@ describe('Actions.Channels', () => {
                 },
                 channelCategories: {
                     byId: {
-                        favoritesCategory: {id: 'favoritesCategory', team_id: team.id, type: CategoryTypes.FAVORITES, channel_ids: []},
-                        channelsCategory: {id: 'channelsCategory', team_id: team.id, type: CategoryTypes.CHANNELS, channel_ids: [channel.id]},
+                        favoritesCategory,
+                        channelsCategory,
                     },
                     orderByTeam: {
                         [team.id]: ['favoritesCategory', 'channelsCategory'],
                     },
                 },
+                users: {
+                    currentUserId,
+                },
             },
         });
+
+        nock(Client4.getBaseRoute()).
+            put(`/users/${currentUserId}/teams/${team.id}/channels/categories`).
+            reply(200, [
+                {...favoritesCategory, channel_ids: [channel.id]},
+                {...channelsCategory, channel_ids: []},
+            ]);
 
         nock(Client4.getBaseRoute()).
             put(`/users/${TestHelper.basicUser.id}/preferences`).
@@ -2139,8 +2153,12 @@ describe('Actions.Channels', () => {
     it('unfavoriteChannel', async () => {
         const channel = TestHelper.basicChannel;
         const team = TestHelper.basicTeam;
+        const currentUserId = TestHelper.generateId();
 
         const prefKey = getPreferenceKey(Preferences.CATEGORY_FAVORITE_CHANNEL, channel.id);
+
+        const favoritesCategory = {id: 'favoritesCategory', team_id: team.id, type: CategoryTypes.FAVORITES, channel_ids: [channel.id]};
+        const channelsCategory = {id: 'channelsCategory', team_id: team.id, type: CategoryTypes.CHANNELS, channel_ids: []};
 
         store = await configureStore({
             entities: {
@@ -2151,8 +2169,8 @@ describe('Actions.Channels', () => {
                 },
                 channelCategories: {
                     byId: {
-                        favoritesCategory: {id: 'favoritesCategory', team_id: team.id, type: CategoryTypes.FAVORITES, channel_ids: [channel.id]},
-                        channelsCategory: {id: 'channelsCategory', team_id: team.id, type: CategoryTypes.CHANNELS, channel_ids: []},
+                        favoritesCategory,
+                        channelsCategory,
                     },
                     orderByTeam: {
                         [team.id]: ['favoritesCategory', 'channelsCategory'],
@@ -2163,8 +2181,18 @@ describe('Actions.Channels', () => {
                         [prefKey]: {value: 'true'},
                     },
                 },
+                users: {
+                    currentUserId,
+                },
             },
         });
+
+        nock(Client4.getBaseRoute()).
+            put(`/users/${currentUserId}/teams/${team.id}/channels/categories`).
+            reply(200, [
+                {...favoritesCategory, channel_ids: []},
+                {...channelsCategory, channel_ids: [channel.id]},
+            ]);
 
         nock(Client4.getBaseRoute()).
             put(`/users/${TestHelper.basicUser.id}/preferences`).

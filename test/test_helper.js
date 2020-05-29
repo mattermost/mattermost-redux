@@ -9,7 +9,7 @@ import Client4 from 'client/client4';
 import {DEFAULT_LOCALE} from 'constants/general';
 import {generateId} from 'utils/helpers';
 
-const DEFAULT_SERVER = 'http://localhost:8065';
+export const DEFAULT_SERVER = 'http://localhost:8065';
 const PASSWORD = 'password1';
 
 class TestHelper {

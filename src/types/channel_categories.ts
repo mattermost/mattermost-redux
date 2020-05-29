@@ -3,6 +3,7 @@
 
 import {Channel} from './channels';
 import {Team} from './teams';
+import {UserProfile} from './users';
 import {$ID, IDMappedObjects, RelationOneToOne} from './utilities';
 
 // TODO update values to match the ones used by the server code
@@ -17,6 +18,7 @@ export enum CategorySorting {
 
 export type ChannelCategory = {
     id: string;
+    user_id: $ID<UserProfile>;
     team_id: $ID<Team>;
     type: ChannelCategoryType;
     display_name: string;
