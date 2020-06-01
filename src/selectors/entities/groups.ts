@@ -28,17 +28,20 @@ export function getMyGroups(state: GlobalState) {
     return state.entities.groups.myGroups;
 }
 
+export function getAllGroupStats(state: GlobalState) {
+    return state.entities.groups.stats;
+}
+
+export function getGroupStats(state: GlobalState, id: string) {
+    return getAllGroupStats(state)[id] || {};
+}
+
 export function getGroup(state: GlobalState, id: string) {
     return getAllGroups(state)[id];
 }
 
 export function getGroupMemberCount(state: GlobalState, id: string) {
-    const memberData = state.entities.groups.members;
-    const groupMemberData = memberData[id];
-    if (!groupMemberData) {
-        return 0;
-    }
-    return memberData[id].totalMemberCount;
+    return getGroupStats(state, id).total_member_count;
 }
 
 function getGroupSyncables(state: GlobalState, id: string) {
@@ -51,14 +54,6 @@ export function getGroupTeams(state: GlobalState, id: string) {
 
 export function getGroupChannels(state: GlobalState, id: string) {
     return getGroupSyncables(state, id).channels;
-}
-
-export function getGroupMembers(state: GlobalState, id: string) {
-    const groupMemberData = state.entities.groups.members[id];
-    if (!groupMemberData) {
-        return emptyList;
-    }
-    return groupMemberData.members;
 }
 
 export const getGroupsByName: (state: GlobalState) => NameMappedObjects<Group> = createSelector(

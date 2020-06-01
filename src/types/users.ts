@@ -6,6 +6,7 @@ import {Channel} from './channels';
 import {Team} from './teams';
 import {PostType} from './posts';
 import {Session} from './sessions';
+import {Group} from './groups';
 import {$ID, IDMappedObjects, RelationOneToMany, RelationOneToOne} from './utilities';
 
 export type UserNotifyProps = {
@@ -56,6 +57,7 @@ export type UsersState = {
     profilesWithoutTeam: Set<string>;
     profilesInChannel: RelationOneToMany<Channel, UserProfile>;
     profilesNotInChannel: RelationOneToMany<Channel, UserProfile>;
+    profilesInGroup: RelationOneToMany<Group, UserProfile>;
     statuses: RelationOneToOne<UserProfile, string>;
     stats: RelationOneToOne<UserProfile, UsersStats>;
 };

@@ -615,6 +615,35 @@ export function updateMyTermsOfServiceStatus(termsOfServiceId: string, accepted:
     };
 }
 
+export function getProfilesInGroup(groupId: string, page: number, perPage: number = General.PROFILE_CHUNK_SIZE): ActionFunc {
+    return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
+        const {currentUserId} = getState().entities.users;
+        let profiles;
+
+        try {
+            profiles = await Client4.getProfilesInGroup(groupId, page, perPage);
+        } catch (error) {
+            forceLogoutIfNecessary(error, dispatch, getState);
+            dispatch(logError(error));
+            return {error};
+        }
+
+        dispatch(batchActions([
+            {
+                type: UserTypes.RECEIVED_PROFILES_LIST_IN_GROUP,
+                data: profiles,
+                id: groupId,
+            },
+            {
+                type: UserTypes.RECEIVED_PROFILES_LIST,
+                data: removeUserFromList(currentUserId, [...profiles]),
+            },
+        ]));
+
+        return {data: profiles};
+    };
+}
+
 export function getTermsOfService(): ActionFunc {
     return bindClientFunc({
         clientFunc: Client4.getTermsOfService,
