@@ -3262,50 +3262,6 @@ export default class Client4 {
                 userId: this.diagnosticId,
             }, {properties}, options));
         }
-
-        // Temporary change to allow only certain events to go to Segment to reduce data rate - see MM-13062
-        // All events in 'admin' category are allowed, since they are low-volume
-        if (category !== 'admin' && ![
-            'api_posts_create',
-            'api_interactive_messages_button_clicked',
-            'api_interactive_messages_menu_selected',
-            'api_interactive_messages_dialog_submitted',
-            'ui_marketplace_download',
-            'ui_marketplace_download_update',
-            'ui_marketplace_configure',
-            'ui_marketplace_opened',
-            'ui_marketplace_closed',
-            'ui_marketplace_search',
-            'signup_user_01_welcome',
-            'signup_select_team',
-            'signup_team_01_name',
-            'signup_team_02_url',
-            'click_back',
-            'click_signin_account',
-            'click_create_account',
-            'click_create_team',
-            'click_system_console',
-            'click_logout',
-            'click_next',
-            'click_finish',
-            'click_dismiss_bar',
-            'diagnostics_disabled',
-        ].includes(event)) {
-            return;
-        }
-
-        if (globalAny && globalAny.window && globalAny.window.analytics && globalAny.window.analytics.initialized) {
-            globalAny.window.analytics.track('event', properties, options);
-        } else if (globalAny && globalAny.analytics) {
-            if (globalAny.analytics_context) {
-                options.context = globalAny.analytics_context;
-            }
-
-            globalAny.analytics.track(Object.assign({
-                event: 'event',
-                userId: this.diagnosticId,
-            }, {properties}, options));
-        }
     }
 }
 
