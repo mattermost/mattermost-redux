@@ -3,7 +3,7 @@
 
 import {UserProfile} from './users';
 
-import {Dictionary, RelationOneToOne} from 'types/utilities';
+import {Dictionary, RelationOneToOne} from './utilities';
 
 export type SyncableType = 'team' | 'channel';
 
