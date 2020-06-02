@@ -1,6 +1,9 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
+
+import {MessageAttachment} from './message_attachments';
 import {IDMappedObjects} from './utilities';
+
 export type IncomingWebhook = {
     id: string;
     create_at: number;
@@ -15,6 +18,7 @@ export type IncomingWebhook = {
     icon_url: string;
     channel_locked: boolean;
 };
+
 export type OutgoingWebhook = {
     id: string;
     token: string;
@@ -33,6 +37,7 @@ export type OutgoingWebhook = {
     username: string;
     icon_url: string;
 };
+
 export type Command = {
     'id': string;
     'token': string;
@@ -52,6 +57,22 @@ export type Command = {
     'description': string;
     'url': string;
 };
+
+export type CommandResponse = {
+    response_type: string;
+    text: string;
+    username: string;
+    channel_id: SVGAnimatedString;
+    icon_url: string;
+    type: string;
+    props: Record<string, any>;
+    goto_location: string;
+    trigger_id: string;
+    skip_slack_parsing: boolean;
+    attachments: MessageAttachment[];
+    extra_responses: CommandResponse[];
+};
+
 export type OAuthApp = {
     'id': string;
     'creator_id': string;
@@ -65,6 +86,7 @@ export type OAuthApp = {
     'homepage': string;
     'is_trusted': boolean;
 };
+
 export type IntegrationsState = {
     incomingHooks: IDMappedObjects<IncomingWebhook>;
     outgoingHooks: IDMappedObjects<OutgoingWebhook>;
@@ -72,6 +94,7 @@ export type IntegrationsState = {
     systemCommands: IDMappedObjects<Command>;
     commands: IDMappedObjects<Command>;
 };
+
 export type DialogSubmission = {
     url: string;
     callback_id: string;
@@ -84,6 +107,7 @@ export type DialogSubmission = {
     };
     cancelled: boolean;
 };
+
 export type DialogElement = {
     display_name: string;
     name: string;
@@ -100,4 +124,9 @@ export type DialogElement = {
         text: string;
         value: any;
     }>;
+};
+
+export type SubmitDialogResponse = {
+    error?: string;
+    errors?: Record<string, string>;
 };
