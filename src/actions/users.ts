@@ -986,6 +986,14 @@ export function searchProfiles(term: string, options: any = {}): ActionFunc {
             });
         }
 
+        if (options.in_group_id) {
+            actions.push({
+                type: UserTypes.RECEIVED_PROFILES_LIST_IN_GROUP,
+                data: profiles,
+                id: options.in_group_id,
+            });
+        }
+
         dispatch(batchActions(actions));
 
         return {data: profiles};
