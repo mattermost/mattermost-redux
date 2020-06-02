@@ -3,7 +3,7 @@
 
 import {createSelector} from 'reselect';
 
-import {getCurrentUser, getCurrentChannelId} from 'selectors/entities/common';
+import {getCurrentChannelId} from 'selectors/entities/common';
 import {
     getMySystemPermissions,
     getMySystemRoles,
@@ -12,10 +12,8 @@ import {
 } from 'selectors/entities/roles_helpers';
 import {getTeamMemberships, getCurrentTeamId} from 'selectors/entities/teams';
 
-import {Channel} from 'types/channels';
 import {Role} from 'types/roles';
 import {GlobalState} from 'types/store';
-import {Team} from 'types/teams';
 import {Dictionary} from 'types/utilities';
 
 export {getMySystemPermissions, getMySystemRoles, getRoles};

@@ -104,7 +104,7 @@ export function makeFilterChannelsByType(): (state: GlobalState, channels: Chann
 }
 
 function getDefaultAutocloseCutoff() {
-    return Date.now() - 7 * 24 * 60 * 60 * 1000;
+    return Date.now() - (7 * 24 * 60 * 60 * 1000);
 }
 
 export function makeFilterAutoclosedDMs(getAutocloseCutoff = getDefaultAutocloseCutoff): (state: GlobalState, channels: Channel[], categoryType: string) => Channel[] {

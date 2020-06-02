@@ -7,7 +7,7 @@ import nock from 'nock';
 import * as Actions from 'actions/groups';
 import {Client4} from 'client';
 
-import {RequestStatus, Groups} from '../constants';
+import {Groups} from '../constants';
 import TestHelper from 'test/test_helper';
 import configureStore from 'test/test_store';
 
@@ -578,7 +578,6 @@ describe('Actions.Groups', () => {
     it('getAllGroupsAssociatedToChannelsInTeam', async () => {
         const teamID = 'ge63nq31sbfy3duzq5f7yqn1kh';
         const channelID1 = '5rgoajywb3nfbdtyafbod47ryb';
-        const channelID2 = 'o3tdawqxot8kikzq8bk54zggbc';
 
         const response1 = {
             groups: {
@@ -891,6 +890,24 @@ describe('Actions.Groups', () => {
         assert.ok(groups);
         assert.ok(groups[groupID]);
         assert.ok(groups[groupID].allow_reference === groupPatch.allow_reference);
+        assert.ok(JSON.stringify(response) === JSON.stringify(groups[groupID]));
+
+        //with name="newname"
+        groupPatch.name = 'newname';
+        response.name = 'newname';
+
+        nock(Client4.getBaseRoute()).
+            put(`/groups/${groupID}/patch`).
+            reply(200, response);
+
+        await Actions.patchGroup(groupID, groupPatch)(store.dispatch, store.getState);
+
+        state = store.getState();
+
+        groups = state.entities.groups.groups;
+        assert.ok(groups);
+        assert.ok(groups[groupID]);
+        assert.ok(groups[groupID].name === groupPatch.name);
         assert.ok(JSON.stringify(response) === JSON.stringify(groups[groupID]));
     });
 });

@@ -340,7 +340,7 @@ describe('makeFilterAutoclosedDMs', () => {
     };
 
     const now = Date.now();
-    const cutoff = now - 7 * 24 * 60 * 60 * 1000;
+    const cutoff = now - (7 * 24 * 60 * 60 * 1000);
 
     function isChannelVisiblePrecondition(state, channel) {
         return isGroupOrDirectChannelVisible(
@@ -718,7 +718,6 @@ describe('makeFilterManuallyClosedDMs', () => {
     const currentUser = {id: 'currentUser'};
     const otherUser1 = {id: 'otherUser1'};
     const otherUser2 = {id: 'otherUser2'};
-    const otherUser3 = {id: 'otherUser3'};
 
     const baseState = {
         entities: {

@@ -1,5 +1,6 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
+
 import {Action, ActionFunc, ActionResult, batchActions, DispatchFunc, GetStateFunc} from 'types/actions';
 import {UserProfile, UserStatus} from 'types/users';
 import {TeamMembership} from 'types/teams';
@@ -22,8 +23,9 @@ import {logError} from './errors';
 import {bindClientFunc, forceLogoutIfNecessary, debounce} from './helpers';
 import {getMyPreferences, makeDirectChannelVisibleIfNecessary, makeGroupMessageVisibleIfNecessary} from './preferences';
 import {Dictionary} from 'types/utilities';
+
 export function checkMfa(loginId: string): ActionFunc {
-    return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
+    return async (dispatch: DispatchFunc) => {
         dispatch({type: UserTypes.CHECK_MFA_REQUEST, data: null});
         try {
             const data = await Client4.checkUserMfa(loginId);
@@ -243,7 +245,7 @@ export function loadMe(): ActionFunc {
 }
 
 export function logout(): ActionFunc {
-    return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
+    return async (dispatch: DispatchFunc) => {
         dispatch({type: UserTypes.LOGOUT_REQUEST, data: null});
 
         try {
@@ -1001,7 +1003,7 @@ export function stopPeriodicStatusUpdates(): ActionFunc {
 }
 
 export function updateMe(user: UserProfile): ActionFunc {
-    return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
+    return async (dispatch: DispatchFunc) => {
         dispatch({type: UserTypes.UPDATE_ME_REQUEST, data: null});
 
         let data;

@@ -41,7 +41,8 @@ describe('Selectors.Search', () => {
                     },
                 },
                 groups: {
-                    groups: {
+                    groups: {},
+                    myGroups: {
                         test1: {
                             name: 'I-AM-THE-BEST!',
                             delete_at: 0,

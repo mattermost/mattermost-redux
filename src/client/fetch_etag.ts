@@ -1,11 +1,13 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
+
 import {Options} from 'types/client4';
 
 const data: {[x: string]: any} = {};
 const etags: {[x: string]: string} = {};
-export default ((url?: string, options: Options = {headers: {}}) => {
-    url = url || options.url; // eslint-disable-line no-param-reassign
+
+export default ((url: string, options: Options = {headers: {}}): Promise<Response> => {
+    url = url || options.url || ''; // eslint-disable-line no-param-reassign
 
     if (options.method === 'GET' || !options.method) {
         const etag = etags[url!];
@@ -34,5 +36,5 @@ export default ((url?: string, options: Options = {headers: {}}) => {
     }
 
     // all other requests go straight to fetch
-    return Reflect.apply(fetch, undefined, [url, options]); //eslint-disable-line no-undefined
+    return Reflect.apply(fetch, undefined, [url, options]);
 });
