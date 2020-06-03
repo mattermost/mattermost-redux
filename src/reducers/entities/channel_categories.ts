@@ -104,11 +104,11 @@ export function orderByTeam(state: RelationOneToOne<Team, $ID<ChannelCategory>[]
     switch (action.type) {
     case ChannelCategoryTypes.RECEIVED_CATEGORY_ORDER: {
         const teamId: string = action.data.teamId;
-        const categoryIds: string[] = action.data.categoryIds;
+        const order: string[] = action.data.order;
 
         return {
             ...state,
-            [teamId]: categoryIds,
+            [teamId]: order,
         };
     }
 

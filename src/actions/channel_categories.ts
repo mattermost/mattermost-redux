@@ -94,7 +94,10 @@ export function fetchMyCategories(teamId: string) {
             },
             {
                 type: ChannelCategoryTypes.RECEIVED_CATEGORY_ORDER,
-                data: data.order,
+                data: {
+                    teamId,
+                    order: data.order,
+                },
             },
         ]));
     };
@@ -217,7 +220,7 @@ export function moveCategory(teamId: string, categoryId: string, newIndex: numbe
             type: ChannelCategoryTypes.RECEIVED_CATEGORY_ORDER,
             data: {
                 teamId,
-                categoryIds: updatedOrder,
+                order: updatedOrder,
             },
         });
     };

@@ -3,7 +3,7 @@
 
 import {ChannelCategoryType} from 'types/channel_categories';
 
-export const CategoryTypes: {[name: string]: ChannelCategoryType} = { // TODO update values to match the ones provided by the server
+export const CategoryTypes: {[name: string]: ChannelCategoryType} = {
     FAVORITES: 'favorites',
     CHANNELS: 'channels',
     DIRECT_MESSAGES: 'direct_messages',

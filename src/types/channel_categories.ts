@@ -6,7 +6,6 @@ import {Team} from './teams';
 import {UserProfile} from './users';
 import {$ID, IDMappedObjects, RelationOneToOne} from './utilities';
 
-// TODO update values to match the ones used by the server code
 export type ChannelCategoryType = 'favorites' | 'channels' | 'direct_messages' | 'custom';
 
 export enum CategorySorting {
