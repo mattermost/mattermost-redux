@@ -180,7 +180,12 @@ export function createPost(post: Post, files: any[] = []) {
             pending_post_id: pendingPostId,
             create_at: timestamp,
             update_at: timestamp,
+            reply_count: 0,
         };
+
+        if (post.root_id) {
+            newPost.reply_count = Selectors.getPostRepliesCount(state, post.root_id) + 1;
+        }
 
         // We are retrying a pending post that had files
         if (newPost.file_ids && !files.length) {
@@ -277,7 +282,6 @@ export function createPostImmediately(post: Post, files: any[] = []) {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         const state = getState();
         const currentUserId = state.entities.users.currentUserId;
-
         const timestamp = Date.now();
         const pendingPostId = `${currentUserId}:${timestamp}`;
 
@@ -286,7 +290,12 @@ export function createPostImmediately(post: Post, files: any[] = []) {
             pending_post_id: pendingPostId,
             create_at: timestamp,
             update_at: timestamp,
+            reply_count: 0,
         };
+
+        if (post.root_id) {
+            newPost.reply_count = Selectors.getPostRepliesCount(state, post.root_id) + 1;
+        }
 
         if (files.length) {
             const fileIds = files.map((file) => file.id);
@@ -311,10 +320,11 @@ export function createPostImmediately(post: Post, files: any[] = []) {
         try {
             const created = await Client4.createPost({...newPost, create_at: 0});
             newPost.id = created.id;
+            newPost.reply_count = created.reply_count;
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch, getState);
             dispatch(batchActions([
-                {type: PostTypes.CREATE_POST_FAILURE, error},
+                {type: PostTypes.CREATE_POST_FAILURE, data: newPost, error},
                 removePost({id: pendingPostId, ...newPost}) as any,
                 logError(error),
             ]));
