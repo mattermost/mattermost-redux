@@ -105,8 +105,18 @@ function serverVersion(state = '', action: GenericAction) {
 
 function warnMetricsStatus(state: any = {}, action: GenericAction) {
     switch (action.type) {
-    case GeneralTypes.RECEIVED_WARN_METRICS_STATUS:
+    case GeneralTypes.WARN_METRICS_STATUS_RECEIVED:
         return action.data;
+    case GeneralTypes.WARN_METRIC_STATUS_RECEIVED: {
+        const nextState = {...state};
+        nextState[action.data.id] = action.data;
+        return nextState;
+    }
+    case GeneralTypes.WARN_METRIC_STATUS_REMOVED: {
+        const nextState = {...state};
+        Reflect.deleteProperty(nextState, action.data.id);
+        return nextState;
+    }
     default:
         return state;
     }

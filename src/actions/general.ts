@@ -194,7 +194,7 @@ export function getWarnMetricsStatus(): ActionFunc {
             forceLogoutIfNecessary(error, dispatch, getState);
             return {error};
         }
-        dispatch({type: GeneralTypes.RECEIVED_WARN_METRICS_STATUS, data});
+        dispatch({type: GeneralTypes.WARN_METRICS_STATUS_RECEIVED, data});
 
         return {data};
     };
