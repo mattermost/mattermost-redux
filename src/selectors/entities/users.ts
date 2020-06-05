@@ -43,6 +43,7 @@ export {getCurrentUser, getCurrentUserId, getUsers};
 type Filters = {
     role?: string;
     inactive?: boolean;
+    skipInactive?: boolean;
 };
 
 export function getUserIdsInChannels(state: GlobalState): RelationOneToMany<Channel, UserProfile> {
@@ -260,6 +261,8 @@ export function filterProfiles(profiles: IDMappedObjects<UserProfile>, filters?:
 
     if (filters.inactive) {
         users = users.filter((user) => user.delete_at !== 0);
+    } else if (filters.skipInactive) {
+        users = users.filter((user) => user.delete_at === 0);
     }
 
     return users.reduce((acc, user) => {
