@@ -357,9 +357,9 @@ export function searchProfiles(state: GlobalState, term: string, skipCurrent = f
     return filteredProfiles;
 }
 
-export function searchProfilesInChannel(state: GlobalState, channelId: $ID<Channel>, term: string, skipCurrent = false): Array<UserProfile> {
+export function searchProfilesInChannel(state: GlobalState, channelId: $ID<Channel>, term: string, skipCurrent = false, skipInactive = false): Array<UserProfile> {
     const doGetProfilesInChannel = makeGetProfilesInChannel();
-    const profiles = filterProfilesMatchingTerm(doGetProfilesInChannel(state, channelId, false), term);
+    const profiles = filterProfilesMatchingTerm(doGetProfilesInChannel(state, channelId, skipInactive), term);
 
     if (skipCurrent) {
         removeCurrentUserFromList(profiles, getCurrentUserId(state));

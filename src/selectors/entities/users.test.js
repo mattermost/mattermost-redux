@@ -309,6 +309,8 @@ describe('Selectors.Users', () => {
     it('searchProfilesInChannel', () => {
         assert.deepEqual(Selectors.searchProfilesInChannel(testState, channel1.id, user1.username), [user1]);
         assert.deepEqual(Selectors.searchProfilesInChannel(testState, channel1.id, user1.username, true), []);
+        assert.deepEqual(Selectors.searchProfilesInChannel(testState, channel2.id, user2.username), [user2]);
+        assert.deepEqual(Selectors.searchProfilesInChannel(testState, channel2.id, user2.username, false, true), []);
     });
 
     it('searchProfilesInCurrentChannel', () => {
