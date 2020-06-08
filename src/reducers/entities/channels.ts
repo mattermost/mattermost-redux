@@ -170,7 +170,7 @@ function channels(state: IDMappedObjects<Channel> = {}, action: GenericAction) {
             ...state,
             [channel_id]: {
                 ...channel,
-                last_post_at: create_at,
+                last_post_at: Math.max(create_at, channel.last_post_at),
             },
         };
     }

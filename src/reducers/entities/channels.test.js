@@ -477,6 +477,45 @@ describe('channels', () => {
 
             expect(nextState).toBe(state);
         });
+
+        test('should not update channel last_post_at if existing value is greater than new post timestamp', () => {
+            const state = deepFreeze({
+                channelsInTeam: {},
+                currentChannelId: '',
+                groupsAssociatedToChannel: {},
+                myMembers: {},
+                stats: {},
+                totalCount: 0,
+                manuallyUnread: {},
+                membersInChannel: {},
+                channels: {
+                    channel1: {
+                        id: 'channel1',
+                        last_post_at: 1236,
+                    },
+                    channel2: {
+                        id: 'channel2',
+                    },
+                },
+                channelModerations: {},
+                channelMemberCountsByGroup: {},
+            });
+
+            const nextState = channelsReducer(state, {
+                type: PostTypes.RECEIVED_NEW_POST,
+                data: {
+                    channel_id: 'channel1',
+                    create_at: 1235,
+                },
+            });
+
+            expect(nextState).not.toBe(state);
+            expect(nextState.channels.channel1).toEqual({
+                id: 'channel1',
+                last_post_at: 1236,
+            });
+            expect(nextState.channels.channel2).toBe(state.channels.channel2);
+        });
     });
 
     describe('MANUALLY_UNREAD', () => {
