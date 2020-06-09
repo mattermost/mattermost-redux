@@ -99,6 +99,7 @@ export type ClientConfig = {
     ExperimentalChannelSidebarOrganization: string;
     ExperimentalClientSideCertCheck: string;
     ExperimentalClientSideCertEnable: string;
+    ExperimentalDataPrefetch: string;
     ExperimentalEnableAuthenticationTransfer: string;
     ExperimentalEnableAutomaticReplies: string;
     ExperimentalEnableClickToReply: string;
