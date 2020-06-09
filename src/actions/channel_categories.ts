@@ -292,7 +292,7 @@ export function createCategory(teamId: string, displayName: string, channelIds: 
                 type: ChannelCategoryTypes.RECEIVED_CATEGORY_ORDER,
                 data: {
                     teamId,
-                    categoryIds: newCategoryIds,
+                    order: newCategoryIds,
                 },
             },
         ]));
