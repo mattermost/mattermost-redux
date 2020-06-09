@@ -89,7 +89,7 @@ export function createChannel(channel: Channel, userId: string): ActionFunc {
             },
         ]));
 
-        dispatch(addChannelToInitialCategory(channel));
+        dispatch(addChannelToInitialCategory(created, true));
 
         return {data: created};
     };

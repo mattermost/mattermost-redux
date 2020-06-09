@@ -106,7 +106,10 @@ export function fetchMyCategories(teamId: string) {
 // addChannelToInitialCategory returns an action that can be dispatched to add a newly-joined or newly-created channel
 // to its either the Channels or Direct Messages category based on the type of channel. New DM and GM channels are
 // added to the Direct Messages category on each team.
-export function addChannelToInitialCategory(channel: Channel): ActionFunc {
+//
+// Unless setOnServer is true, this only affects the categories on this client. If it is set to true, this updates
+// categories on the server too.
+export function addChannelToInitialCategory(channel: Channel, setOnServer = false): ActionFunc {
     return (dispatch: DispatchFunc, getState: GetStateFunc) => {
         const state = getState();
 
@@ -132,6 +135,10 @@ export function addChannelToInitialCategory(channel: Channel): ActionFunc {
             // The channel will have been added to the category by the server, so we'll get it once the categories
             // are actually loaded.
             return {data: false};
+        }
+
+        if (setOnServer) {
+            return dispatch(addChannelToCategory(channelsCategory.id, channel.id));
         }
 
         return dispatch({
