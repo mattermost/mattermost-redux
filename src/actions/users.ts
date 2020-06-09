@@ -615,7 +615,7 @@ export function updateMyTermsOfServiceStatus(termsOfServiceId: string, accepted:
     };
 }
 
-export function getProfilesInGroup(groupId: string, page: number, perPage: number = General.PROFILE_CHUNK_SIZE): ActionFunc {
+export function getProfilesInGroup(groupId: string, page = 0, perPage: number = General.PROFILE_CHUNK_SIZE): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         const {currentUserId} = getState().entities.users;
         let profiles;
