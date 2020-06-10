@@ -43,6 +43,7 @@ export {getCurrentUser, getCurrentUserId, getUsers};
 type Filters = {
     role?: string;
     inactive?: boolean;
+    skipInactive?: boolean;
 };
 
 export function getUserIdsInChannels(state: GlobalState): RelationOneToMany<Channel, UserProfile> {
@@ -260,6 +261,8 @@ export function filterProfiles(profiles: IDMappedObjects<UserProfile>, filters?:
 
     if (filters.inactive) {
         users = users.filter((user) => user.delete_at !== 0);
+    } else if (filters.skipInactive) {
+        users = users.filter((user) => user.delete_at === 0);
     }
 
     return users.reduce((acc, user) => {
@@ -354,9 +357,9 @@ export function searchProfiles(state: GlobalState, term: string, skipCurrent = f
     return filteredProfiles;
 }
 
-export function searchProfilesInChannel(state: GlobalState, channelId: $ID<Channel>, term: string, skipCurrent = false): Array<UserProfile> {
+export function searchProfilesInChannel(state: GlobalState, channelId: $ID<Channel>, term: string, skipCurrent = false, skipInactive = false): Array<UserProfile> {
     const doGetProfilesInChannel = makeGetProfilesInChannel();
-    const profiles = filterProfilesMatchingTerm(doGetProfilesInChannel(state, channelId, false), term);
+    const profiles = filterProfilesMatchingTerm(doGetProfilesInChannel(state, channelId, skipInactive), term);
 
     if (skipCurrent) {
         removeCurrentUserFromList(profiles, getCurrentUserId(state));

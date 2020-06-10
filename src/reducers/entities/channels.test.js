@@ -1,7 +1,7 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
 
-import {ChannelTypes, UserTypes} from 'action_types';
+import {ChannelTypes, UserTypes, PostTypes} from 'action_types';
 import deepFreeze from 'utils/deep_freeze';
 
 import channelsReducer, * as Reducers from './channels';
@@ -405,6 +405,119 @@ describe('channels', () => {
             expect(nextState).toEqual(state);
         });
     });
+
+    describe('RECEIVED_NEW_POST', () => {
+        test('should update channel last_post_at', () => {
+            const state = deepFreeze({
+                channelsInTeam: {},
+                currentChannelId: '',
+                groupsAssociatedToChannel: {},
+                myMembers: {},
+                stats: {},
+                totalCount: 0,
+                manuallyUnread: {},
+                membersInChannel: {},
+                channels: {
+                    channel1: {
+                        id: 'channel1',
+                        last_post_at: 1234,
+                    },
+                    channel2: {
+                        id: 'channel2',
+                    },
+                },
+                channelModerations: {},
+                channelMemberCountsByGroup: {},
+            });
+
+            const nextState = channelsReducer(state, {
+                type: PostTypes.RECEIVED_NEW_POST,
+                data: {
+                    channel_id: 'channel1',
+                    create_at: 1235,
+                },
+            });
+
+            expect(nextState).not.toBe(state);
+            expect(nextState.channels.channel1).toEqual({
+                id: 'channel1',
+                last_post_at: 1235,
+            });
+            expect(nextState.channels.channel2).toBe(state.channels.channel2);
+        });
+
+        test('should do nothing for a channel that is not loaded', () => {
+            const state = deepFreeze({
+                channelsInTeam: {},
+                currentChannelId: '',
+                groupsAssociatedToChannel: {},
+                myMembers: {},
+                stats: {},
+                totalCount: 0,
+                manuallyUnread: {},
+                membersInChannel: {},
+                channels: {
+                    channel1: {
+                        id: 'channel1',
+                    },
+                    channel2: {
+                        id: 'channel2',
+                    },
+                },
+                channelModerations: {},
+                channelMemberCountsByGroup: {},
+            });
+
+            const nextState = channelsReducer(state, {
+                type: PostTypes.RECEIVED_NEW_POST,
+                data: {
+                    id: 'channel3',
+                },
+            });
+
+            expect(nextState).toBe(state);
+        });
+
+        test('should not update channel last_post_at if existing value is greater than new post timestamp', () => {
+            const state = deepFreeze({
+                channelsInTeam: {},
+                currentChannelId: '',
+                groupsAssociatedToChannel: {},
+                myMembers: {},
+                stats: {},
+                totalCount: 0,
+                manuallyUnread: {},
+                membersInChannel: {},
+                channels: {
+                    channel1: {
+                        id: 'channel1',
+                        last_post_at: 1236,
+                    },
+                    channel2: {
+                        id: 'channel2',
+                    },
+                },
+                channelModerations: {},
+                channelMemberCountsByGroup: {},
+            });
+
+            const nextState = channelsReducer(state, {
+                type: PostTypes.RECEIVED_NEW_POST,
+                data: {
+                    channel_id: 'channel1',
+                    create_at: 1235,
+                },
+            });
+
+            expect(nextState).not.toBe(state);
+            expect(nextState.channels.channel1).toEqual({
+                id: 'channel1',
+                last_post_at: 1236,
+            });
+            expect(nextState.channels.channel2).toBe(state.channels.channel2);
+        });
+    });
+
     describe('MANUALLY_UNREAD', () => {
         test('should mark channel as manually unread', () => {
             const state = deepFreeze({

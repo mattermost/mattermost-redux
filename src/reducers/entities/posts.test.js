@@ -3971,11 +3971,11 @@ describe('postsReplies', () => {
         const testTable = [
             {name: 'pending post (no id)', action: PostTypes.RECEIVED_POST, state: {...initialState}, post: {root_id: '123'}, nextState: {...initialState}},
             {name: 'root post (no root_id)', action: PostTypes.RECEIVED_POST, state: {...initialState}, post: {id: '123'}, nextState: {...initialState}},
-            {name: 'new reply without reply count', action: PostTypes.RECEIVED_POST, state: {...initialState}, post: {id: '123', root_id: '123'}, nextState: {...initialState, 123: 4}},
+            {name: 'new reply without reply count', action: PostTypes.RECEIVED_POST, state: {...initialState}, post: {id: '123', root_id: '123'}, nextState: {...initialState, 123: 3}},
             {name: 'new reply with reply count', action: PostTypes.RECEIVED_POST, state: {...initialState}, post: {id: '123', root_id: '123', reply_count: 7}, nextState: {...initialState, 123: 7}},
             {name: 'pending post (no id) (new post action)', action: PostTypes.RECEIVED_NEW_POST, state: {...initialState}, post: {root_id: '123'}, nextState: {...initialState}},
             {name: 'root post (no root_id) (new post action)', action: PostTypes.RECEIVED_NEW_POST, state: {...initialState}, post: {id: '123'}, nextState: {...initialState}},
-            {name: 'new reply without reply count (new post action)', action: PostTypes.RECEIVED_NEW_POST, state: {...initialState}, post: {id: '123', root_id: '123'}, nextState: {...initialState, 123: 4}},
+            {name: 'new reply without reply count (new post action)', action: PostTypes.RECEIVED_NEW_POST, state: {...initialState}, post: {id: '123', root_id: '123'}, nextState: {...initialState, 123: 3}},
             {name: 'new reply with reply count (new post action)', action: PostTypes.RECEIVED_NEW_POST, state: {...initialState}, post: {id: '123', root_id: '123', reply_count: 7}, nextState: {...initialState, 123: 7}},
         ];
         for (const testCase of testTable) {
