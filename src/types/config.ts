@@ -516,17 +516,7 @@ export type ThemeSettings = {
     AllowedThemes: string[];
 };
 
-export type GitLabSettings = {
-    Enable: boolean;
-    Secret: string;
-    Id: string;
-    Scope: string;
-    AuthEndpoint: string;
-    TokenEndpoint: string;
-    UserApiEndpoint: string;
-};
-
-export type GoogleSettings = {
+export type SSOSettings = {
     Enable: boolean;
     Secret: string;
     Id: string;
@@ -784,8 +774,8 @@ export type AdminConfig = {
     SupportSettings?: SupportSettings;
     AnnouncementSettings?: AnnouncementSettings;
     ThemeSettings?: ThemeSettings;
-    GitLabSettings?: GitLabSettings;
-    GoogleSettings?: GoogleSettings;
+    GitLabSettings?: SSOSettings;
+    GoogleSettings?: SSOSettings;
     Office365Settings?: Office365Settings;
     LdapSettings?: LdapSettings;
     ComplianceSettings?: ComplianceSettings;
