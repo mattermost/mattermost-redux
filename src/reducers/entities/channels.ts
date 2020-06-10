@@ -1,7 +1,7 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
 import {combineReducers} from 'redux';
-import {ChannelTypes, UserTypes, SchemeTypes, GroupTypes} from 'action_types';
+import {ChannelTypes, UserTypes, SchemeTypes, GroupTypes, PostTypes} from 'action_types';
 import {General} from '../../constants';
 import {GenericAction} from 'types/actions';
 import {Channel, ChannelMembership, ChannelStats, ChannelMemberCountByGroup, ChannelMemberCountsByGroup} from 'types/channels';
@@ -157,6 +157,24 @@ function channels(state: IDMappedObjects<Channel> = {}, action: GenericAction) {
             },
         };
     }
+
+    case PostTypes.RECEIVED_NEW_POST: {
+        const {channel_id, create_at} = action.data; //eslint-disable-line @typescript-eslint/camelcase
+        const channel = state[channel_id];
+
+        if (!channel) {
+            return state;
+        }
+
+        return {
+            ...state,
+            [channel_id]: {
+                ...channel,
+                last_post_at: Math.max(create_at, channel.last_post_at),
+            },
+        };
+    }
+
     case ChannelTypes.UPDATED_CHANNEL_SCHEME: {
         const {channelId, schemeId} = action.data;
         const channel = state[channelId];
