@@ -35,13 +35,14 @@ const Preferences: Dictionary<any> = {
     USE_MILITARY_TIME: 'use_military_time',
     CATEGORY_SIDEBAR_SETTINGS: 'sidebar_settings',
     CHANNEL_SIDEBAR_ORGANIZATION: 'channel_sidebar_organization',
-    HAS_SEEN_WHATS_NEW_MODAL: 'has_seen_whats_new_modal',
     CHANNEL_SIDEBAR_AUTOCLOSE_DMS: 'close_unused_direct_messages',
     AUTOCLOSE_DMS_ENABLED: 'after_seven_days',
     CATEGORY_ADVANCED_SETTINGS: 'advanced_settings',
     ADVANCED_FILTER_JOIN_LEAVE: 'join_leave',
     ADVANCED_CODE_BLOCK_ON_CTRL_ENTER: 'code_block_ctrl_enter',
     ADVANCED_SEND_ON_CTRL_ENTER: 'send_on_ctrl_enter',
+    CATEGORY_WHATS_NEW_MODAL: 'whats_new_modal',
+    HAS_SEEN_SIDEBAR_WHATS_NEW_MODAL: 'has_seen_whats_new_modal',
     CATEGORY_THEME: 'theme',
     THEMES: {
         default: {
