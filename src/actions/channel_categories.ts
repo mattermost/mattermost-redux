@@ -170,7 +170,7 @@ export function moveChannelToCategory(categoryId: string, channelId: string, new
         // Add the channel to the new category
         const categories = [{
             ...category,
-            sorting: setManualSorting ? CategorySorting.Manual : category.sorting,
+            sorting: (setManualSorting && category.type !== CategoryTypes.DIRECT_MESSAGES) ? CategorySorting.Manual : category.sorting,
             channel_ids: insertWithoutDuplicates(category.channel_ids, channelId, newIndex),
         }];
 
