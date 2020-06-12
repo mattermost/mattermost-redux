@@ -7,10 +7,17 @@ import {Stats} from '../../constants';
 import PluginState from '../../constants/plugins';
 
 import {GenericAction} from 'types/actions';
-import {ClusterInfo} from 'types/admin';
-import {Config} from 'types/config';
+import {ClusterInfo, AnalyticsRow} from 'types/admin';
+import {Audit} from 'types/audits';
+import {Compliance} from 'types/compliance';
+import {AdminConfig} from 'types/config';
+import {PluginRedux, PluginStatusRedux} from 'types/plugins';
+import {SamlCertificateStatus, SamlMetadataResponse} from 'types/saml';
+import {Team} from 'types/teams';
+import {UserAccessToken, UserProfile} from 'types/users';
+import {Dictionary, RelationOneToOne} from 'types/utilities';
 
-function logs(state = [], action: GenericAction) {
+function logs(state: string[] = [], action: GenericAction) {
     switch (action.type) {
     case AdminTypes.RECEIVED_LOGS: {
         return action.data;
@@ -23,7 +30,7 @@ function logs(state = [], action: GenericAction) {
     }
 }
 
-function audits(state: any = {}, action: GenericAction) {
+function audits(state: Dictionary<Audit> = {}, action: GenericAction) {
     switch (action.type) {
     case AdminTypes.RECEIVED_AUDITS: {
         const nextState = {...state};
@@ -40,20 +47,20 @@ function audits(state: any = {}, action: GenericAction) {
     }
 }
 
-function config(state: Config = {}, action: GenericAction) {
+function config(state: Partial<AdminConfig> = {}, action: GenericAction) {
     switch (action.type) {
     case AdminTypes.RECEIVED_CONFIG: {
         return action.data;
     }
     case AdminTypes.ENABLED_PLUGIN: {
-        const nextPluginSettings = {...state.PluginSettings};
+        const nextPluginSettings = {...state.PluginSettings!};
         const nextPluginStates = {...nextPluginSettings.PluginStates};
         nextPluginStates[action.data] = {Enable: true};
         nextPluginSettings.PluginStates = nextPluginStates;
         return {...state, PluginSettings: nextPluginSettings};
     }
     case AdminTypes.DISABLED_PLUGIN: {
-        const nextPluginSettings = {...state.PluginSettings};
+        const nextPluginSettings = {...state.PluginSettings!};
         const nextPluginStates = {...nextPluginSettings.PluginStates};
         nextPluginStates[action.data] = {Enable: false};
         nextPluginSettings.PluginStates = nextPluginStates;
@@ -67,7 +74,7 @@ function config(state: Config = {}, action: GenericAction) {
     }
 }
 
-function environmentConfig(state: any = {}, action: GenericAction) {
+function environmentConfig(state: Dictionary<any> = {}, action: GenericAction) {
     switch (action.type) {
     case AdminTypes.RECEIVED_ENVIRONMENT_CONFIG: {
         return action.data;
@@ -80,7 +87,7 @@ function environmentConfig(state: any = {}, action: GenericAction) {
     }
 }
 
-function complianceReports(state: any = {}, action: GenericAction) {
+function complianceReports(state: Dictionary<Compliance> = {}, action: GenericAction) {
     switch (action.type) {
     case AdminTypes.RECEIVED_COMPLIANCE_REPORT: {
         const nextState = {...state};
@@ -115,7 +122,7 @@ function clusterInfo(state: ClusterInfo[] = [], action: GenericAction) {
     }
 }
 
-function samlCertStatus(state: any = {}, action: GenericAction) {
+function samlCertStatus(state: Partial<SamlCertificateStatus> = {}, action: GenericAction) {
     switch (action.type) {
     case AdminTypes.RECEIVED_SAML_CERT_STATUS: {
         return action.data;
@@ -128,7 +135,7 @@ function samlCertStatus(state: any = {}, action: GenericAction) {
     }
 }
 
-export function convertAnalyticsRowsToStats(data: any, name: string) {
+export function convertAnalyticsRowsToStats(data: AnalyticsRow[], name: string): Dictionary<number | AnalyticsRow[]> {
     const stats: any = {};
     const clonedData = [...data];
 
@@ -214,7 +221,7 @@ export function convertAnalyticsRowsToStats(data: any, name: string) {
     return stats;
 }
 
-function analytics(state: any = {}, action: GenericAction) {
+function analytics(state: Dictionary<number | AnalyticsRow[]> = {}, action: GenericAction) {
     switch (action.type) {
     case AdminTypes.RECEIVED_SYSTEM_ANALYTICS: {
         const stats = convertAnalyticsRowsToStats(action.data, action.name);
@@ -228,7 +235,7 @@ function analytics(state: any = {}, action: GenericAction) {
     }
 }
 
-function teamAnalytics(state: any = {}, action: GenericAction) {
+function teamAnalytics(state: RelationOneToOne<Team, Dictionary<number | AnalyticsRow[]>> = {}, action: GenericAction) {
     switch (action.type) {
     case AdminTypes.RECEIVED_TEAM_ANALYTICS: {
         const nextState = {...state};
@@ -245,7 +252,7 @@ function teamAnalytics(state: any = {}, action: GenericAction) {
     }
 }
 
-function userAccessTokens(state: any = {}, action: GenericAction) {
+function userAccessTokens(state: Dictionary<UserAccessToken> = {}, action: GenericAction) {
     switch (action.type) {
     case AdminTypes.RECEIVED_USER_ACCESS_TOKEN: {
         return {...state, [action.data.id]: action.data};
@@ -288,15 +295,15 @@ function userAccessTokens(state: any = {}, action: GenericAction) {
     }
 }
 
-function userAccessTokensForUser(state: any = {}, action: GenericAction) {
+function userAccessTokensForUser(state: RelationOneToOne<UserProfile, Dictionary<UserAccessToken>> = {}, action: GenericAction) {
     switch (action.type) {
-    case AdminTypes.RECEIVED_USER_ACCESS_TOKEN: {
-        const nextUserState = {...(state[action.data.user_id] || {})};
+    case AdminTypes.RECEIVED_USER_ACCESS_TOKEN: { // UserAccessToken
+        const nextUserState: UserAccessToken | Dictionary<UserAccessToken> = {...(state[action.data.user_id] || {})};
         nextUserState[action.data.id] = action.data;
 
         return {...state, [action.data.user_id]: nextUserState};
     }
-    case AdminTypes.RECEIVED_USER_ACCESS_TOKENS_FOR_USER: {
+    case AdminTypes.RECEIVED_USER_ACCESS_TOKENS_FOR_USER: { // UserAccessToken[]
         const nextUserState = {...(state[action.userId] || {})};
 
         for (const uat of action.data) {
@@ -305,7 +312,7 @@ function userAccessTokensForUser(state: any = {}, action: GenericAction) {
 
         return {...state, [action.userId]: nextUserState};
     }
-    case AdminTypes.RECEIVED_USER_ACCESS_TOKENS: {
+    case AdminTypes.RECEIVED_USER_ACCESS_TOKENS: { // UserAccessToken[]
         const nextUserState: any = {};
 
         for (const uat of action.data) {
@@ -364,7 +371,7 @@ function userAccessTokensForUser(state: any = {}, action: GenericAction) {
     }
 }
 
-function plugins(state: any = {}, action: GenericAction) {
+function plugins(state: Dictionary<PluginRedux> = {}, action: GenericAction) {
     switch (action.type) {
     case AdminTypes.RECEIVED_PLUGINS: {
         const nextState = {...state};
@@ -410,7 +417,7 @@ function plugins(state: any = {}, action: GenericAction) {
     }
 }
 
-function pluginStatuses(state: any = {}, action: GenericAction) {
+function pluginStatuses(state: Dictionary<PluginStatusRedux> = {}, action: GenericAction) {
     switch (action.type) {
     case AdminTypes.RECEIVED_PLUGIN_STATUSES: {
         const nextState: any = {};
@@ -562,7 +569,7 @@ function ldapGroups(state: any = {}, action: GenericAction) {
     }
 }
 
-function samlMetadataResponse(state: any = {}, action: GenericAction) {
+function samlMetadataResponse(state: Partial<SamlMetadataResponse> = {}, action: GenericAction) {
     switch (action.type) {
     case AdminTypes.RECEIVED_SAML_METADATA_RESPONSE: {
         return action.data;
