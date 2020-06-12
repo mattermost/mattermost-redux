@@ -85,7 +85,7 @@ export function makeFilterArchivedChannels(): (state: GlobalState, channels: Cha
         (state: GlobalState, channels: Channel[]) => channels,
         getCurrentChannelId,
         (channels: Channel[], currentChannelId: string) => {
-            const filtered = channels.filter((channel) => channel.id === currentChannelId || channel.delete_at === 0);
+            const filtered = channels.filter((channel) => channel && (channel.id === currentChannelId || channel.delete_at === 0));
 
             return filtered.length === channels.length ? channels : filtered;
         },
