@@ -10,6 +10,7 @@ import {GenericAction} from 'types/actions';
 import {ClusterInfo, AnalyticsRow} from 'types/admin';
 import {Audit} from 'types/audits';
 import {Compliance} from 'types/compliance';
+import {AdminConfig} from 'types/config';
 import {PluginRedux, PluginStatusRedux} from 'types/plugins';
 import {SamlCertificateStatus, SamlMetadataResponse} from 'types/saml';
 import {Team} from 'types/teams';
@@ -46,20 +47,20 @@ function audits(state: Dictionary<Audit> = {}, action: GenericAction) {
     }
 }
 
-function config(state: any = {}, action: GenericAction) {
+function config(state: Partial<AdminConfig> = {}, action: GenericAction) {
     switch (action.type) {
     case AdminTypes.RECEIVED_CONFIG: {
         return action.data;
     }
     case AdminTypes.ENABLED_PLUGIN: {
-        const nextPluginSettings = {...state.PluginSettings};
+        const nextPluginSettings = {...state.PluginSettings!};
         const nextPluginStates = {...nextPluginSettings.PluginStates};
         nextPluginStates[action.data] = {Enable: true};
         nextPluginSettings.PluginStates = nextPluginStates;
         return {...state, PluginSettings: nextPluginSettings};
     }
     case AdminTypes.DISABLED_PLUGIN: {
-        const nextPluginSettings = {...state.PluginSettings};
+        const nextPluginSettings = {...state.PluginSettings!};
         const nextPluginStates = {...nextPluginSettings.PluginStates};
         nextPluginStates[action.data] = {Enable: false};
         nextPluginSettings.PluginStates = nextPluginStates;

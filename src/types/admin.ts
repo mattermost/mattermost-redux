@@ -14,7 +14,7 @@ import {Dictionary, RelationOneToOne} from './utilities';
 export type AdminState = {
     logs: Array<string>;
     audits: Dictionary<Audit>;
-    config: AdminConfig;
+    config: Partial<AdminConfig>;
     environmentConfig: Dictionary<any>;
     complianceReports: Dictionary<Compliance>;
     ldapGroups: Dictionary<MixedUnlinkedGroup>;

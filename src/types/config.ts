@@ -3,8 +3,6 @@
 
 import {Dictionary} from './utilities';
 
-export type EnvironmentConfig = any;
-
 export type ClientConfig = {
     AboutLink: string;
     AllowBannerDismissal: string;
@@ -759,40 +757,48 @@ export type ImageProxySettings = {
 };
 
 export type AdminConfig = {
-    ServiceSettings?: ServiceSettings;
-    TeamSettings?: TeamSettings;
-    ClientRequirements?: ClientRequirements;
-    SqlSettings?: SqlSettings;
-    LogSettings?: LogSettings;
-    ExperimentalAuditSettings?: ExperimentalAuditSettings;
-    NotificationLogSettings?: NotificationLogSettings;
-    PasswordSettings?: PasswordSettings;
-    FileSettings?: FileSettings;
-    EmailSettings?: EmailSettings;
-    RateLimitSettings?: RateLimitSettings;
-    PrivacySettings?: PrivacySettings;
-    SupportSettings?: SupportSettings;
-    AnnouncementSettings?: AnnouncementSettings;
-    ThemeSettings?: ThemeSettings;
-    GitLabSettings?: SSOSettings;
-    GoogleSettings?: SSOSettings;
-    Office365Settings?: Office365Settings;
-    LdapSettings?: LdapSettings;
-    ComplianceSettings?: ComplianceSettings;
-    LocalizationSettings?: LocalizationSettings;
-    SamlSettings?: SamlSettings;
-    NativeAppSettings?: NativeAppSettings;
-    ClusterSettings?: ClusterSettings;
-    MetricsSettings?: MetricsSettings;
-    ExperimentalSettings?: ExperimentalSettings;
-    AnalyticsSettings?: AnalyticsSettings;
-    ElasticsearchSettings?: ElasticsearchSettings;
-    BleveSettings?: BleveSettings;
-    DataRetentionSettings?: DataRetentionSettings;
-    MessageExportSettings?: MessageExportSettings;
-    JobSettings?: JobSettings;
-    PluginSettings?: PluginSettings;
-    DisplaySettings?: DisplaySettings;
-    GuestAccountsSettings?: GuestAccountsSettings;
-    ImageProxySettings?: ImageProxySettings;
+    ServiceSettings: ServiceSettings;
+    TeamSettings: TeamSettings;
+    ClientRequirements: ClientRequirements;
+    SqlSettings: SqlSettings;
+    LogSettings: LogSettings;
+    ExperimentalAuditSettings: ExperimentalAuditSettings;
+    NotificationLogSettings: NotificationLogSettings;
+    PasswordSettings: PasswordSettings;
+    FileSettings: FileSettings;
+    EmailSettings: EmailSettings;
+    RateLimitSettings: RateLimitSettings;
+    PrivacySettings: PrivacySettings;
+    SupportSettings: SupportSettings;
+    AnnouncementSettings: AnnouncementSettings;
+    ThemeSettings: ThemeSettings;
+    GitLabSettings: SSOSettings;
+    GoogleSettings: SSOSettings;
+    Office365Settings: Office365Settings;
+    LdapSettings: LdapSettings;
+    ComplianceSettings: ComplianceSettings;
+    LocalizationSettings: LocalizationSettings;
+    SamlSettings: SamlSettings;
+    NativeAppSettings: NativeAppSettings;
+    ClusterSettings: ClusterSettings;
+    MetricsSettings: MetricsSettings;
+    ExperimentalSettings: ExperimentalSettings;
+    AnalyticsSettings: AnalyticsSettings;
+    ElasticsearchSettings: ElasticsearchSettings;
+    BleveSettings: BleveSettings;
+    DataRetentionSettings: DataRetentionSettings;
+    MessageExportSettings: MessageExportSettings;
+    JobSettings: JobSettings;
+    PluginSettings: PluginSettings;
+    DisplaySettings: DisplaySettings;
+    GuestAccountsSettings: GuestAccountsSettings;
+    ImageProxySettings: ImageProxySettings;
 };
+
+export type EnvironmentConfigSettings<T> = {
+    [P in keyof T]: boolean;
+}
+
+export type EnvironmentConfig = {
+    [P in keyof AdminConfig]: EnvironmentConfigSettings<AdminConfig[P]>;
+}
