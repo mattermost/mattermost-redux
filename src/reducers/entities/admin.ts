@@ -10,7 +10,7 @@ import {GenericAction} from 'types/actions';
 import {ClusterInfo, AnalyticsRow} from 'types/admin';
 import {Audit} from 'types/audits';
 import {Compliance} from 'types/compliance';
-import {AdminConfig} from 'types/config';
+import {AdminConfig, EnvironmentConfig} from 'types/config';
 import {PluginRedux, PluginStatusRedux} from 'types/plugins';
 import {SamlCertificateStatus, SamlMetadataResponse} from 'types/saml';
 import {Team} from 'types/teams';
@@ -74,7 +74,7 @@ function config(state: Partial<AdminConfig> = {}, action: GenericAction) {
     }
 }
 
-function environmentConfig(state: Dictionary<any> = {}, action: GenericAction) {
+function environmentConfig(state: Partial<EnvironmentConfig> = {}, action: GenericAction) {
     switch (action.type) {
     case AdminTypes.RECEIVED_ENVIRONMENT_CONFIG: {
         return action.data;
