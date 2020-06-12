@@ -24,10 +24,10 @@ import {Compliance} from 'types/compliance';
 import {
     ClientConfig,
     ClientLicense,
-    Config,
     DataRetentionPolicy,
-    EnvironmentConfig,
     License,
+    AdminConfig,
+    EnvironmentConfig,
 } from 'types/config';
 import {CustomEmoji} from 'types/emojis';
 import {ServerError} from 'types/errors';
@@ -2447,14 +2447,14 @@ export default class Client4 {
     };
 
     getConfig = () => {
-        return this.doFetch<Config>(
+        return this.doFetch<AdminConfig>(
             `${this.getBaseRoute()}/config`,
             {method: 'get'},
         );
     };
 
-    updateConfig = (config: Config) => {
-        return this.doFetch<Config>(
+    updateConfig = (config: AdminConfig) => {
+        return this.doFetch<AdminConfig>(
             `${this.getBaseRoute()}/config`,
             {method: 'put', body: JSON.stringify(config)},
         );
@@ -2474,7 +2474,7 @@ export default class Client4 {
         );
     };
 
-    testEmail = (config: Config) => {
+    testEmail = (config: AdminConfig) => {
         return this.doFetch<StatusOK>(
             `${this.getBaseRoute()}/email/test`,
             {method: 'post', body: JSON.stringify(config)},

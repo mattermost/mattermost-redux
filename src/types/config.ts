@@ -1,8 +1,7 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
 
-export type Config = any;
-export type EnvironmentConfig = any;
+import {Dictionary} from './utilities';
 
 export type ClientConfig = {
     AboutLink: string;
@@ -221,3 +220,586 @@ export type DataRetentionPolicy = {
     message_retention_cutoff: number;
     file_retention_cutoff: number;
 };
+
+export type ServiceSettings = {
+    SiteURL: string;
+    WebsocketURL: string;
+    LicenseFileLocation: string;
+    ListenAddress: string;
+    ConnectionSecurity: string;
+    TLSCertFile: string;
+    TLSKeyFile: string;
+    TLSMinVer: string;
+    TLSStrictTransport: boolean;
+    TLSStrictTransportMaxAge: number;
+    TLSOverwriteCiphers: string[];
+    UseLetsEncrypt: boolean;
+    LetsEncryptCertificateCacheFile: string;
+    Forward80To443: boolean;
+    TrustedProxyIPHeader: string[];
+    ReadTimeout: number;
+    WriteTimeout: number;
+    IdleTimeout: number;
+    MaximumLoginAttempts: number;
+    GoroutineHealthThreshold: number;
+    GoogleDeveloperKey: string;
+    EnableOAuthServiceProvider: boolean;
+    EnableIncomingWebhooks: boolean;
+    EnableOutgoingWebhooks: boolean;
+    EnableCommands: boolean;
+    EnableOnlyAdminIntegrations: boolean;
+    EnablePostUsernameOverride: boolean;
+    EnablePostIconOverride: boolean;
+    EnableLinkPreviews: boolean;
+    EnableTesting: boolean;
+    EnableDeveloper: boolean;
+    EnableOpenTracing: boolean;
+    EnableSecurityFixAlert: boolean;
+    EnableInsecureOutgoingConnections: boolean;
+    AllowedUntrustedInternalConnections: string;
+    EnableMultifactorAuthentication: boolean;
+    EnforceMultifactorAuthentication: boolean;
+    EnableUserAccessTokens: boolean;
+    AllowCorsFrom: string;
+    CorsExposedHeaders: string;
+    CorsAllowCredentials: boolean;
+    CorsDebug: boolean;
+    AllowCookiesForSubdomains: boolean;
+    ExtendSessionLengthWithActivity: boolean;
+    SessionLengthWebInDays: number;
+    SessionLengthMobileInDays: number;
+    SessionLengthSSOInDays: number;
+    SessionCacheInMinutes: number;
+    SessionIdleTimeoutInMinutes: number;
+    WebsocketSecurePort: number;
+    WebsocketPort: number;
+    WebserverMode: string;
+    EnableCustomEmoji: boolean;
+    EnableEmojiPicker: boolean;
+    EnableGifPicker: boolean;
+    GfycatApiKey: string;
+    GfycatApiSecret: string;
+    RestrictCustomEmojiCreation: string;
+    RestrictPostDelete: string;
+    AllowEditPost: string;
+    PostEditTimeLimit: number;
+    TimeBetweenUserTypingUpdatesMilliseconds: number;
+    EnablePostSearch: boolean;
+    MinimumHashtagLength: number;
+    EnableUserTypingMessages: boolean;
+    EnableChannelViewedMessages: boolean;
+    EnableUserStatuses: boolean;
+    ExperimentalEnableAuthenticationTransfer: boolean;
+    ClusterLogTimeoutMilliseconds: number;
+    CloseUnusedDirectMessages: boolean;
+    EnablePreviewFeatures: boolean;
+    EnableTutorial: boolean;
+    ExperimentalEnableDefaultChannelLeaveJoinMessages: boolean;
+    ExperimentalGroupUnreadChannels: string;
+    ExperimentalChannelOrganization: boolean;
+    ExperimentalChannelSidebarOrganization: string;
+    ExperimentalDataPrefetch: boolean;
+    ImageProxyType: string;
+    ImageProxyURL: string;
+    ImageProxyOptions: string;
+    EnableAPITeamDeletion: boolean;
+    ExperimentalEnableHardenedMode: boolean;
+    DisableLegacyMFA: boolean;
+    ExperimentalStrictCSRFEnforcement: boolean;
+    EnableEmailInvitations: boolean;
+    DisableBotsWhenOwnerIsDeactivated: boolean;
+    EnableBotAccountCreation: boolean;
+    EnableSVGs: boolean;
+    EnableLatex: boolean;
+    EnableLocalMode: boolean;
+    LocalModeSocketLocation: string;
+};
+
+export type TeamSettings = {
+    SiteName: string;
+    MaxUsersPerTeam: number;
+    EnableTeamCreation: boolean;
+    EnableUserCreation: boolean;
+    EnableOpenServer: boolean;
+    EnableUserDeactivation: boolean;
+    RestrictCreationToDomains: string;
+    EnableCustomBrand: boolean;
+    CustomBrandText: string;
+    CustomDescriptionText: string;
+    RestrictDirectMessage: string;
+    RestrictTeamInvite: string;
+    RestrictPublicChannelManagement: string;
+    RestrictPrivateChannelManagement: string;
+    RestrictPublicChannelCreation: string;
+    RestrictPrivateChannelCreation: string;
+    RestrictPublicChannelDeletion: string;
+    RestrictPrivateChannelDeletion: string;
+    RestrictPrivateChannelManageMembers: string;
+    EnableXToLeaveChannelsFromLHS: boolean;
+    UserStatusAwayTimeout: number;
+    MaxChannelsPerTeam: number;
+    MaxNotificationsPerChannel: number;
+    EnableConfirmNotificationsToChannel: boolean;
+    TeammateNameDisplay: string;
+    ExperimentalViewArchivedChannels: boolean;
+    ExperimentalEnableAutomaticReplies: boolean;
+    ExperimentalHideTownSquareinLHS: boolean;
+    ExperimentalTownSquareIsReadOnly: boolean;
+    LockTeammateNameDisplay: boolean;
+    ExperimentalPrimaryTeam: string;
+    ExperimentalDefaultChannels: string[];
+};
+
+export type ClientRequirements = {
+    AndroidLatestVersion: string;
+    AndroidMinVersion: string;
+    DesktopLatestVersion: string;
+    DesktopMinVersion: string;
+    IosLatestVersion: string;
+    IosMinVersion: string;
+};
+
+export type SqlSettings = {
+    DriverName: string;
+    DataSource: string;
+    DataSourceReplicas: string[];
+    DataSourceSearchReplicas: string[];
+    MaxIdleConns: number;
+    ConnMaxLifetimeMilliseconds: number;
+    MaxOpenConns: number;
+    Trace: boolean;
+    AtRestEncryptKey: string;
+    QueryTimeout: number;
+    DisableDatabaseSearch: boolean;
+};
+
+export type LogSettings = {
+    EnableConsole: boolean;
+    ConsoleLevel: string;
+    ConsoleJson: boolean;
+    EnableFile: boolean;
+    FileLevel: string;
+    FileJson: boolean;
+    FileLocation: string;
+    EnableWebhookDebugging: boolean;
+    EnableDiagnostics: boolean;
+    EnableSentry: boolean;
+};
+
+export type ExperimentalAuditSettings = {
+    SysLogEnabled: boolean;
+    SysLogIP: string;
+    SysLogPort: number;
+    SysLogTag: string;
+    SysLogCert: string;
+    SysLogInsecure: boolean;
+    SysLogMaxQueueSize: number;
+    FileEnabled: boolean;
+    FileName: string;
+    FileMaxSizeMB: number;
+    FileMaxAgeDays: number;
+    FileMaxBackups: number;
+    FileCompress: boolean;
+    FileMaxQueueSize: number;
+};
+
+export type NotificationLogSettings = {
+    EnableConsole: boolean;
+    ConsoleLevel: string;
+    ConsoleJson: boolean;
+    EnableFile: boolean;
+    FileLevel: string;
+    FileJson: boolean;
+    FileLocation: string;
+};
+
+export type PasswordSettings = {
+    MinimumLength: number;
+    Lowercase: boolean;
+    Number: boolean;
+    Uppercase: boolean;
+    Symbol: boolean;
+};
+
+export type FileSettings = {
+    EnableFileAttachments: boolean;
+    EnableMobileUpload: boolean;
+    EnableMobileDownload: boolean;
+    MaxFileSize: number;
+    DriverName: string;
+    Directory: string;
+    EnablePublicLink: boolean;
+    PublicLinkSalt: string;
+    InitialFont: string;
+    AmazonS3AccessKeyId: string;
+    AmazonS3SecretAccessKey: string;
+    AmazonS3Bucket: string;
+    AmazonS3Region: string;
+    AmazonS3Endpoint: string;
+    AmazonS3SSL: boolean;
+    AmazonS3SignV2: boolean;
+    AmazonS3SSE: boolean;
+    AmazonS3Trace: boolean;
+};
+
+export type EmailSettings = {
+    EnableSignUpWithEmail: boolean;
+    EnableSignInWithEmail: boolean;
+    EnableSignInWithUsername: boolean;
+    SendEmailNotifications: boolean;
+    UseChannelInEmailNotifications: boolean;
+    RequireEmailVerification: boolean;
+    FeedbackName: string;
+    FeedbackEmail: string;
+    ReplyToAddress: string;
+    FeedbackOrganization: string;
+    EnableSMTPAuth: boolean;
+    SMTPUsername: string;
+    SMTPPassword: string;
+    SMTPServer: string;
+    SMTPPort: string;
+    SMTPServerTimeout: number;
+    ConnectionSecurity: string;
+    SendPushNotifications: boolean;
+    PushNotificationServer: string;
+    PushNotificationContents: string;
+    EnableEmailBatching: boolean;
+    EmailBatchingBufferSize: number;
+    EmailBatchingInterval: number;
+    EnablePreviewModeBanner: boolean;
+    SkipServerCertificateVerification: boolean;
+    EmailNotificationContentsType: string;
+    LoginButtonColor: string;
+    LoginButtonBorderColor: string;
+    LoginButtonTextColor: string;
+};
+
+export type RateLimitSettings = {
+    Enable: boolean;
+    PerSec: number;
+    MaxBurst: number;
+    MemoryStoreSize: number;
+    VaryByRemoteAddr: boolean;
+    VaryByUser: boolean;
+    VaryByHeader: string;
+};
+
+export type PrivacySettings = {
+    ShowEmailAddress: boolean;
+    ShowFullName: boolean;
+};
+
+export type SupportSettings = {
+    TermsOfServiceLink: string;
+    PrivacyPolicyLink: string;
+    AboutLink: string;
+    HelpLink: string;
+    ReportAProblemLink: string;
+    SupportEmail: string;
+    CustomTermsOfServiceEnabled: boolean;
+    CustomTermsOfServiceReAcceptancePeriod: number;
+};
+
+export type AnnouncementSettings = {
+    EnableBanner: boolean;
+    BannerText: string;
+    BannerColor: string;
+    BannerTextColor: string;
+    AllowBannerDismissal: boolean;
+};
+
+export type ThemeSettings = {
+    EnableThemeSelection: boolean;
+    DefaultTheme: string;
+    AllowCustomThemes: boolean;
+    AllowedThemes: string[];
+};
+
+export type SSOSettings = {
+    Enable: boolean;
+    Secret: string;
+    Id: string;
+    Scope: string;
+    AuthEndpoint: string;
+    TokenEndpoint: string;
+    UserApiEndpoint: string;
+};
+
+export type Office365Settings = {
+    Enable: boolean;
+    Secret: string;
+    Id: string;
+    Scope: string;
+    AuthEndpoint: string;
+    TokenEndpoint: string;
+    UserApiEndpoint: string;
+    DirectoryId: string;
+};
+
+export type LdapSettings = {
+    Enable: boolean;
+    EnableSync: boolean;
+    LdapServer: string;
+    LdapPort: number;
+    ConnectionSecurity: string;
+    BaseDN: string;
+    BindUsername: string;
+    BindPassword: string;
+    UserFilter: string;
+    GroupFilter: string;
+    GuestFilter: string;
+    EnableAdminFilter: boolean;
+    AdminFilter: string;
+    GroupDisplayNameAttribute: string;
+    GroupIdAttribute: string;
+    FirstNameAttribute: string;
+    LastNameAttribute: string;
+    EmailAttribute: string;
+    UsernameAttribute: string;
+    NicknameAttribute: string;
+    IdAttribute: string;
+    PositionAttribute: string;
+    LoginIdAttribute: string;
+    PictureAttribute: string;
+    SyncIntervalMinutes: number;
+    SkipCertificateVerification: boolean;
+    QueryTimeout: number;
+    MaxPageSize: number;
+    LoginFieldName: string;
+    LoginButtonColor: string;
+    LoginButtonBorderColor: string;
+    LoginButtonTextColor: string;
+    Trace: boolean;
+};
+
+export type ComplianceSettings = {
+    Enable: boolean;
+    Directory: string;
+    EnableDaily: boolean;
+};
+
+export type LocalizationSettings = {
+    DefaultServerLocale: string;
+    DefaultClientLocale: string;
+    AvailableLocales: string;
+};
+
+export type SamlSettings = {
+    Enable: boolean;
+    EnableSyncWithLdap: boolean;
+    EnableSyncWithLdapIncludeAuth: boolean;
+    Verify: boolean;
+    Encrypt: boolean;
+    SignRequest: boolean;
+    IdpUrl: string;
+    IdpDescriptorUrl: string;
+    IdpMetadataUrl: string;
+    AssertionConsumerServiceURL: string;
+    SignatureAlgorithm: string;
+    CanonicalAlgorithm: string;
+    ScopingIDPProviderId: string;
+    ScopingIDPName: string;
+    IdpCertificateFile: string;
+    PublicCertificateFile: string;
+    PrivateKeyFile: string;
+    IdAttribute: string;
+    GuestAttribute: string;
+    EnableAdminAttribute: boolean;
+    AdminAttribute: string;
+    FirstNameAttribute: string;
+    LastNameAttribute: string;
+    EmailAttribute: string;
+    UsernameAttribute: string;
+    NicknameAttribute: string;
+    LocaleAttribute: string;
+    PositionAttribute: string;
+    LoginButtonText: string;
+    LoginButtonColor: string;
+    LoginButtonBorderColor: string;
+    LoginButtonTextColor: string;
+};
+
+export type NativeAppSettings = {
+    AppDownloadLink: string;
+    AndroidAppDownloadLink: string;
+    IosAppDownloadLink: string;
+};
+
+export type ClusterSettings = {
+    Enable: boolean;
+    ClusterName: string;
+    OverrideHostname: string;
+    NetworkInterface: string;
+    BindAddress: string;
+    AdvertiseAddress: string;
+    UseIpAddress: boolean;
+    UseExperimentalGossip: boolean;
+    EnableExperimentalGossipEncryption: boolean;
+    ReadOnlyConfig: boolean;
+    GossipPort: number;
+    StreamingPort: number;
+    MaxIdleConns: number;
+    MaxIdleConnsPerHost: number;
+    IdleConnTimeoutMilliseconds: number;
+};
+
+export type MetricsSettings = {
+    Enable: boolean;
+    BlockProfileRate: number;
+    ListenAddress: string;
+};
+
+export type ExperimentalSettings = {
+    ClientSideCertEnable: boolean;
+    ClientSideCertCheck: string;
+    EnableClickToReply: boolean;
+    LinkMetadataTimeoutMilliseconds: number;
+    RestrictSystemAdmin: boolean;
+    UseNewSAMLLibrary: boolean;
+};
+
+export type AnalyticsSettings = {
+    MaxUsersForStatistics: number;
+};
+
+export type ElasticsearchSettings = {
+    ConnectionUrl: string;
+    Username: string;
+    Password: string;
+    EnableIndexing: boolean;
+    EnableSearching: boolean;
+    EnableAutocomplete: boolean;
+    Sniff: boolean;
+    PostIndexReplicas: number;
+    PostIndexShards: number;
+    ChannelIndexReplicas: number;
+    ChannelIndexShards: number;
+    UserIndexReplicas: number;
+    UserIndexShards: number;
+    AggregatePostsAfterDays: number;
+    PostsAggregatorJobStartTime: string;
+    IndexPrefix: string;
+    LiveIndexingBatchSize: number;
+    BulkIndexingTimeWindowSeconds: number;
+    RequestTimeoutSeconds: number;
+    SkipTLSVerification: boolean;
+    Trace: string;
+};
+
+export type BleveSettings = {
+    IndexDir: string;
+    EnableIndexing: boolean;
+    EnableSearching: boolean;
+    EnableAutocomplete: boolean;
+    BulkIndexingTimeWindowSeconds: number;
+};
+
+export type DataRetentionSettings = {
+    EnableMessageDeletion: boolean;
+    EnableFileDeletion: boolean;
+    MessageRetentionDays: number;
+    FileRetentionDays: number;
+    DeletionJobStartTime: string;
+};
+
+export type MessageExportSettings = {
+    EnableExport: boolean;
+    ExportFormat: string;
+    DailyRunTime: string;
+    ExportFromTimestamp: number;
+    BatchSize: number;
+    GlobalRelaySettings: {
+        CustomerType: string;
+        SmtpUsername: string;
+        SmtpPassword: string;
+        EmailAddress: string;
+    };
+};
+
+export type JobSettings = {
+    RunJobs: boolean;
+    RunScheduler: boolean;
+};
+
+export type PluginSettings = {
+    Enable: boolean;
+    EnableUploads: boolean;
+    AllowInsecureDownloadUrl: boolean;
+    EnableHealthCheck: boolean;
+    Directory: string;
+    ClientDirectory: string;
+    Plugins: Dictionary<any>;
+    PluginStates: Dictionary<{Enable: boolean}>;
+    EnableMarketplace: boolean;
+    EnableRemoteMarketplace: boolean;
+    AutomaticPrepackagedPlugins: boolean;
+    RequirePluginSignature: boolean;
+    MarketplaceUrl: string;
+    SignaturePublicKeyFiles: string[];
+};
+
+export type DisplaySettings = {
+    CustomUrlSchemes: string[];
+    ExperimentalTimezone: boolean;
+};
+
+export type GuestAccountsSettings = {
+    Enable: boolean;
+    AllowEmailAccounts: boolean;
+    EnforceMultifactorAuthentication: boolean;
+    RestrictCreationToDomains: string;
+};
+
+export type ImageProxySettings = {
+    Enable: boolean;
+    ImageProxyType: string;
+    RemoteImageProxyURL: string;
+    RemoteImageProxyOptions: string;
+};
+
+export type AdminConfig = {
+    ServiceSettings: ServiceSettings;
+    TeamSettings: TeamSettings;
+    ClientRequirements: ClientRequirements;
+    SqlSettings: SqlSettings;
+    LogSettings: LogSettings;
+    ExperimentalAuditSettings: ExperimentalAuditSettings;
+    NotificationLogSettings: NotificationLogSettings;
+    PasswordSettings: PasswordSettings;
+    FileSettings: FileSettings;
+    EmailSettings: EmailSettings;
+    RateLimitSettings: RateLimitSettings;
+    PrivacySettings: PrivacySettings;
+    SupportSettings: SupportSettings;
+    AnnouncementSettings: AnnouncementSettings;
+    ThemeSettings: ThemeSettings;
+    GitLabSettings: SSOSettings;
+    GoogleSettings: SSOSettings;
+    Office365Settings: Office365Settings;
+    LdapSettings: LdapSettings;
+    ComplianceSettings: ComplianceSettings;
+    LocalizationSettings: LocalizationSettings;
+    SamlSettings: SamlSettings;
+    NativeAppSettings: NativeAppSettings;
+    ClusterSettings: ClusterSettings;
+    MetricsSettings: MetricsSettings;
+    ExperimentalSettings: ExperimentalSettings;
+    AnalyticsSettings: AnalyticsSettings;
+    ElasticsearchSettings: ElasticsearchSettings;
+    BleveSettings: BleveSettings;
+    DataRetentionSettings: DataRetentionSettings;
+    MessageExportSettings: MessageExportSettings;
+    JobSettings: JobSettings;
+    PluginSettings: PluginSettings;
+    DisplaySettings: DisplaySettings;
+    GuestAccountsSettings: GuestAccountsSettings;
+    ImageProxySettings: ImageProxySettings;
+};
+
+export type EnvironmentConfigSettings<T> = {
+    [P in keyof T]: boolean;
+}
+
+export type EnvironmentConfig = {
+    [P in keyof AdminConfig]: EnvironmentConfigSettings<AdminConfig[P]>;
+}
