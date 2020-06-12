@@ -4,7 +4,7 @@
 import {Audit} from './audits';
 import {Compliance} from './compliance';
 import {AdminConfig, EnvironmentConfig} from './config';
-import {MixedUnlinkedGroup} from './groups';
+import {MixedUnlinkedGroupRedux} from './groups';
 import {PluginRedux, PluginStatusRedux} from './plugins';
 import {SamlCertificateStatus, SamlMetadataResponse} from './saml';
 import {Team} from './teams';
@@ -17,7 +17,7 @@ export type AdminState = {
     config: Partial<AdminConfig>;
     environmentConfig: Partial<EnvironmentConfig>;
     complianceReports: Dictionary<Compliance>;
-    ldapGroups: Dictionary<MixedUnlinkedGroup>;
+    ldapGroups: Dictionary<MixedUnlinkedGroupRedux>;
     ldapGroupsCount: number;
     userAccessTokens: Dictionary<UserAccessToken>;
     clusterInfo: ClusterInfo[];

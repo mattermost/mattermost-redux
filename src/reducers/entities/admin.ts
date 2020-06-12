@@ -11,6 +11,7 @@ import {ClusterInfo, AnalyticsRow} from 'types/admin';
 import {Audit} from 'types/audits';
 import {Compliance} from 'types/compliance';
 import {AdminConfig, EnvironmentConfig} from 'types/config';
+import {MixedUnlinkedGroupRedux} from 'types/groups';
 import {PluginRedux, PluginStatusRedux} from 'types/plugins';
 import {SamlCertificateStatus, SamlMetadataResponse} from 'types/saml';
 import {Team} from 'types/teams';
@@ -502,7 +503,7 @@ function pluginStatuses(state: Dictionary<PluginStatusRedux> = {}, action: Gener
     }
 }
 
-function ldapGroupsCount(state: any = {}, action: GenericAction) {
+function ldapGroupsCount(state = 0, action: GenericAction) {
     switch (action.type) {
     case AdminTypes.RECEIVED_LDAP_GROUPS:
         return action.data.count;
@@ -513,7 +514,7 @@ function ldapGroupsCount(state: any = {}, action: GenericAction) {
     }
 }
 
-function ldapGroups(state: any = {}, action: GenericAction) {
+function ldapGroups(state: Dictionary<MixedUnlinkedGroupRedux> = {}, action: GenericAction) {
     switch (action.type) {
     case AdminTypes.RECEIVED_LDAP_GROUPS: {
         const nextState: any = {};
@@ -534,8 +535,8 @@ function ldapGroups(state: any = {}, action: GenericAction) {
         if (nextState[action.data]) {
             nextState[action.data] = {
                 ...nextState[action.data],
-                mattermost_group_id: null,
-                has_syncables: null,
+                mattermost_group_id: undefined,
+                has_syncables: undefined,
                 failed: false,
             };
         }
