@@ -65,9 +65,9 @@ function channels(state: IDMappedObjects<Channel> = {}, action: GenericAction) {
     case SchemeTypes.RECEIVED_SCHEME_CHANNELS: {
         const nextState = {...state};
 
-        for (const channel of action.data) {
-            if (state[channel.id] && channel.type === General.DM_CHANNEL) {
-                channel.display_name = channel.display_name || state[channel.id].display_name;
+        for (let channel of action.data) {
+            if (state[channel.id] && channel.type === General.DM_CHANNEL && !channel.display_name) {
+                channel = {...channel, display_name: state[channel.id].display_name};
             }
             nextState[channel.id] = channel;
         }
