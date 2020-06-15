@@ -6,7 +6,7 @@ import deepFreeze from 'utils/deep_freeze';
 
 import channelsReducer, * as Reducers from './channels';
 
-import {Permissions} from '../../constants';
+import {General, Permissions} from '../../constants';
 
 describe('channels', () => {
     describe('RECEIVED_CHANNEL_DELETED', () => {
@@ -620,6 +620,120 @@ describe('channels', () => {
             expect(nextState.channels.channel3).toEqual({
                 id: 'channel3',
                 team_id: 'team',
+            });
+        });
+
+        test('should preserve existing display_name if none incoming on DMs', () => {
+            const state = deepFreeze({
+                channelsInTeam: {},
+                currentChannelId: '',
+                groupsAssociatedToChannel: {},
+                myMembers: {},
+                stats: {},
+                totalCount: 0,
+                membersInChannel: {},
+                channels: {
+                    no_display_name: {
+                        id: 'no_display_name',
+                        team_id: 'team',
+                        type: General.DM_CHANNEL,
+                    },
+                    empty_display_name: {
+                        id: 'empty_display_name',
+                        team_id: 'team',
+                        display_name: '', // empty display name
+                        type: General.DM_CHANNEL,
+                    },
+                    existing_display_name: {
+                        id: 'existing_display_name',
+                        team_id: 'team',
+                        display_name: 'existing',
+                        type: General.DM_CHANNEL,
+                    },
+                    replaced_display_name: {
+                        id: 'new_display_name',
+                        team_id: 'team',
+                        display_name: 'existing',
+                        type: General.DM_CHANNEL,
+                    },
+                    not_a_dm: {
+                        id: 'not_a_dm',
+                        team_id: 'team',
+                        display_name: 'not a dm, replaced',
+                        type: General.GM_CHANNEL,
+                    },
+                },
+                channelModerations: {},
+                channelMemberCountsByGroup: {},
+            });
+
+            const nextState = channelsReducer(state, deepFreeze({
+                type: ChannelTypes.RECEIVED_CHANNELS,
+                currentChannelId: 'existing_display_name',
+                teamId: 'team',
+                data: [
+                    {
+                        id: 'no_display_name',
+                        team_id: 'team',
+                        display_name: 'new for no_display_name',
+                        type: General.DM_CHANNEL,
+                    },
+                    {
+                        id: 'empty_display_name',
+                        team_id: 'team',
+                        display_name: 'new for empty_display_name',
+                        type: General.DM_CHANNEL,
+                    },
+                    {
+                        id: 'existing_display_name',
+                        team_id: 'team',
+                        type: General.DM_CHANNEL,
+                    },
+                    {
+                        id: 'new_display_name',
+                        team_id: 'team',
+                        display_name: 'new for new_display_name',
+                        type: General.DM_CHANNEL,
+                    },
+                    {
+                        id: 'not_a_dm',
+                        team_id: 'team',
+                        display_name: 'new for not_a_dm',
+                        type: General.GM_CHANNEL,
+                    },
+                ],
+            }));
+
+            expect(nextState).not.toBe(state);
+            expect(nextState.channels.no_display_name).toEqual({
+                id: 'no_display_name',
+                team_id: 'team',
+                display_name: 'new for no_display_name',
+                type: General.DM_CHANNEL,
+            });
+            expect(nextState.channels.empty_display_name).toEqual({
+                id: 'empty_display_name',
+                team_id: 'team',
+                display_name: 'new for empty_display_name',
+                type: General.DM_CHANNEL,
+            });
+            expect(nextState.channels.existing_display_name).toEqual({
+                id: 'existing_display_name',
+                team_id: 'team',
+                display_name: 'existing',
+                type: General.DM_CHANNEL,
+            });
+            expect(nextState.channels.new_display_name).toEqual({
+                id: 'new_display_name',
+                team_id: 'team',
+                display_name: 'new for new_display_name',
+                type: General.DM_CHANNEL,
+            });
+            expect(nextState.channels.not_a_dm).toEqual({
+                id: 'not_a_dm',
+                team_id: 'team',
+                display_name: 'new for not_a_dm',
+                type: General.GM_CHANNEL,
             });
         });
     });
