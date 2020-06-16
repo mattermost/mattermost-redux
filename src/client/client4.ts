@@ -1,6 +1,7 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
 
+import * as rudderanalytics from 'rudder-sdk-js';
 import {General} from '../constants';
 
 import {ClusterInfo, AnalyticsRow} from 'types/admin';
@@ -3248,20 +3249,7 @@ export default class Client4 {
             anonymousId: '00000000000000000000000000',
         };
 
-        const globalAny: any = global;
-
-        if (globalAny && globalAny.window && globalAny.window.rudderanalytics) {
-            globalAny.window.rudderanalytics.track('event', properties, options);
-        } else if (globalAny && globalAny.rudderanalytics) {
-            if (globalAny.analytics_context) {
-                options.context = globalAny.analytics_context;
-            }
-
-            globalAny.rudderanalytics.track(Object.assign({
-                event: 'event',
-                userId: this.diagnosticId,
-            }, {properties}, options));
-        }
+        rudderanalytics.track('event', properties, options);
 
         // Temporary change to allow only certain events to go to Segment to reduce data rate - see MM-13062
         // All events in 'admin' category are allowed, since they are low-volume
@@ -3293,6 +3281,8 @@ export default class Client4 {
         ].includes(event)) {
             return;
         }
+
+        const globalAny: any = global;
 
         if (globalAny && globalAny.window && globalAny.window.analytics && globalAny.window.analytics.initialized) {
             globalAny.window.analytics.track('event', properties, options);
@@ -3352,3 +3342,5 @@ export class ClientError extends Error implements ServerError {
         Object.defineProperty(this, 'message', {enumerable: true});
     }
 }
+
+export {rudderanalytics};
