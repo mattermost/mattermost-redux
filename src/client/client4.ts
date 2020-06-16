@@ -1,7 +1,5 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
-
-import * as rudderAnalytics from 'rudder-sdk-js';
 import {General} from '../constants';
 
 import {ClusterInfo, AnalyticsRow} from 'types/admin';
@@ -93,6 +91,7 @@ import {cleanUrlForLogging} from 'utils/sentry';
 import {isSystemAdmin} from 'utils/user_utils';
 
 import fetch from './fetch_etag';
+import {rudderAnalytics} from './rudder';
 
 const FormData = require('form-data');
 const HEADER_AUTH = 'Authorization';
@@ -3296,5 +3295,3 @@ export class ClientError extends Error implements ServerError {
         Object.defineProperty(this, 'message', {enumerable: true});
     }
 }
-
-export {rudderAnalytics};
