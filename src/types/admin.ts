@@ -1,17 +1,33 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
 
+import {Audit} from './audits';
+import {Compliance} from './compliance';
+import {AdminConfig, EnvironmentConfig} from './config';
+import {MixedUnlinkedGroupRedux} from './groups';
+import {PluginRedux, PluginStatusRedux} from './plugins';
+import {SamlCertificateStatus, SamlMetadataResponse} from './saml';
+import {Team} from './teams';
+import {UserAccessToken, UserProfile} from './users';
+import {Dictionary, RelationOneToOne} from './utilities';
+
 export type AdminState = {
-    logs: Array<any>;
-    audits: any;
-    config: any;
-    environmentConfig: any;
-    complianceReports: any;
-    ldapGroups: any;
+    logs: Array<string>;
+    audits: Dictionary<Audit>;
+    config: Partial<AdminConfig>;
+    environmentConfig: Partial<EnvironmentConfig>;
+    complianceReports: Dictionary<Compliance>;
+    ldapGroups: Dictionary<MixedUnlinkedGroupRedux>;
     ldapGroupsCount: number;
-    userAccessTokens: any[];
+    userAccessTokens: Dictionary<UserAccessToken>;
     clusterInfo: ClusterInfo[];
-    analytics: any;
+    samlCertStatus?: SamlCertificateStatus;
+    analytics?: Dictionary<number | AnalyticsRow[]>;
+    teamAnalytics?: RelationOneToOne<Team, Dictionary<number | AnalyticsRow[]>>;
+    userAccessTokensForUser?: RelationOneToOne<UserProfile, Dictionary<UserAccessToken>>;
+    plugins?: Dictionary<PluginRedux>;
+    pluginStatuses?: Dictionary<PluginStatusRedux>;
+    samlMetadataResponse?: SamlMetadataResponse;
 };
 
 export type ClusterInfo = {

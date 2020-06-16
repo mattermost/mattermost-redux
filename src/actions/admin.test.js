@@ -1177,8 +1177,8 @@ describe('Actions.Admin', () => {
         const state = store.getState();
         const groups = state.entities.admin.ldapGroups;
         assert.ok(groups[key]);
-        assert.ok(groups[key].mattermost_group_id === null);
-        assert.ok(groups[key].has_syncables === null);
+        assert.ok(groups[key].mattermost_group_id === undefined);
+        assert.ok(groups[key].has_syncables === undefined);
     });
 
     it('getSamlMetadataFromIdp', async () => {

@@ -85,7 +85,7 @@ const state: GlobalState = {
             complianceReports: {},
             ldapGroups: {},
             ldapGroupsCount: 0,
-            userAccessTokens: [],
+            userAccessTokens: {},
             clusterInfo: [],
             analytics: {},
         },
