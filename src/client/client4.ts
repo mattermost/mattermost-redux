@@ -1,7 +1,7 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
 
-import * as rudderanalytics from 'rudder-sdk-js';
+import * as rudderAnalytics from 'rudder-sdk-js';
 import {General} from '../constants';
 
 import {ClusterInfo, AnalyticsRow} from 'types/admin';
@@ -3249,7 +3249,7 @@ export default class Client4 {
             anonymousId: '00000000000000000000000000',
         };
 
-        rudderanalytics.track('event', properties, options);
+        rudderAnalytics.track('event', properties, options);
 
         // Temporary change to allow only certain events to go to Segment to reduce data rate - see MM-13062
         // All events in 'admin' category are allowed, since they are low-volume
@@ -3343,4 +3343,4 @@ export class ClientError extends Error implements ServerError {
     }
 }
 
-export {rudderanalytics};
+export {rudderAnalytics};
