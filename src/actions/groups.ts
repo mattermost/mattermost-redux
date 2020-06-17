@@ -141,25 +141,6 @@ export function patchGroupSyncable(groupID: string, syncableID: string, syncable
     };
 }
 
-export function getGroupMembers(groupID: string, page = 0, perPage: number = General.PAGE_SIZE_DEFAULT): ActionFunc {
-    return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
-        let data;
-        try {
-            data = await Client4.getGroupMembers(groupID, page, perPage);
-        } catch (error) {
-            forceLogoutIfNecessary(error, dispatch, getState);
-            dispatch(logError(error));
-            return {error};
-        }
-
-        dispatch(batchActions([
-            {type: GroupTypes.RECEIVED_GROUP_MEMBERS, group_id: groupID, data},
-        ]));
-
-        return {data: true};
-    };
-}
-
 export function getGroup(id: string): ActionFunc {
     return bindClientFunc({
         clientFunc: Client4.getGroup,
@@ -305,6 +286,16 @@ export function getGroupsByUserId(userID: string): ActionFunc {
         onSuccess: [GroupTypes.RECEIVED_MY_GROUPS],
         params: [
             userID,
+        ],
+    });
+}
+
+export function getGroupStats(groupID: string): ActionFunc {
+    return bindClientFunc({
+        clientFunc: Client4.getGroupStats,
+        onSuccess: [GroupTypes.RECEIVED_GROUP_STATS],
+        params: [
+            groupID,
         ],
     });
 }
