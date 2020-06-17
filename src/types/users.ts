@@ -6,7 +6,7 @@ import {Channel} from './channels';
 import {Team} from './teams';
 import {PostType} from './posts';
 import {Session} from './sessions';
-import {$ID, IDMappedObjects, RelationOneToMany, RelationOneToOne} from './utilities';
+import {$ID, IDMappedObjects, RelationOneToMany, RelationOneToOne, Dictionary} from './utilities';
 
 export type UserNotifyProps = {
     desktop: 'default' | 'all' | 'mention' | 'none';
@@ -27,6 +27,7 @@ export type UserProfile = {
     update_at: number;
     delete_at: number;
     username: string;
+    password: string;
     auth_data: string;
     auth_service: string;
     email: string;
@@ -36,13 +37,22 @@ export type UserProfile = {
     last_name: string;
     position: string;
     roles: string;
-    locale: string;
+    allow_marketing: boolean;
+    props: Dictionary<string>;
     notify_props: UserNotifyProps;
+    last_password_update: number;
+    last_picture_update: number;
+    failed_attempts: number;
+    locale: string;
+    timezone?: UserTimezone;
+    mfa_active: boolean;
+    mfa_secret: string;
+    last_activity_at: number;
+    is_bot: boolean;
+    bot_description: string;
+    bot_last_icon_update: number;
     terms_of_service_id: string;
     terms_of_service_create_at: number;
-    timezone?: UserTimezone;
-    is_bot: boolean;
-    last_picture_update: number;
 };
 
 export type UsersState = {

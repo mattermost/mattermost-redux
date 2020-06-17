@@ -1,7 +1,7 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
 
-export type PluginManifest = {
+type Plugin = {
     id: string;
     name?: string;
     description?: string;
@@ -17,6 +17,10 @@ export type PluginManifest = {
     settings_schema?: PluginSettingsSchema;
     props?: Record<string, any>;
 };
+
+export type PluginManifest = Plugin;
+
+export type PluginRedux = PluginManifest & {active: boolean};
 
 export type PluginManifestServer = {
     executables?: {
@@ -67,6 +71,22 @@ export type PluginStatus = {
     description: string;
     version: string;
 };
+
+type PluginInstance = {
+    cluster_id: string;
+    version: string;
+    state: number;
+}
+
+export type PluginStatusRedux = {
+    id: string;
+    name: string;
+    description: string;
+    version: string;
+    active: boolean;
+    state: number;
+    instances: PluginInstance[];
+}
 
 export type ClientPluginManifest = {
     id: string;
