@@ -101,6 +101,10 @@ export type MixedUnlinkedGroup = {
     has_syncables?: boolean;
 };
 
+export type MixedUnlinkedGroupRedux = MixedUnlinkedGroup & {
+    failed?: boolean;
+};
+
 export type UserWithGroup = UserProfile & {
     groups: Group[];
     scheme_guest: boolean;

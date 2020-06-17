@@ -31,7 +31,7 @@ import {
 import {isCurrentUserSystemAdmin, getCurrentUserId, getUserIdsInChannels} from 'selectors/entities/users';
 
 import {Channel, ChannelStats, ChannelMembership, ChannelModeration, ChannelMemberCountsByGroup} from 'types/channels';
-import {Config} from 'types/config';
+import {ClientConfig} from 'types/config';
 import {Post} from 'types/posts';
 import {PreferenceType} from 'types/preferences';
 import {GlobalState} from 'types/store';
@@ -443,7 +443,7 @@ export const getChannelsWithUnreadSection: (state: GlobalState) => {
         currentChannelId: string,
         channels: Array<Channel>,
         myMembers: RelationOneToOne<Channel, ChannelMembership>,
-        config: Config,
+        config: ClientConfig,
         myPreferences: {
             [x: string]: PreferenceType;
         },
@@ -615,7 +615,7 @@ export const canManageChannelMembers: (state: GlobalState) => boolean = createSe
         user: UserProfile,
         teamMembership: TeamMembership,
         channelMembership: ChannelMembership | undefined | null,
-        config: Config,
+        config: ClientConfig,
         license: any,
         newPermissions: boolean,
         managePrivateMembers: boolean,
@@ -805,7 +805,7 @@ export const getFavoriteChannels: (state: GlobalState) => Array<Channel> = creat
         favoriteIds: Array<string>,
         teamChannelIds: Array<string>,
         settings: string,
-        config: Config,
+        config: ClientConfig,
         prefs: {
             [x: string]: PreferenceType;
         },
