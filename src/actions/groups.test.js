@@ -100,64 +100,6 @@ describe('Actions.Groups', () => {
         }
     });
 
-    it('getGroupMembers', async () => {
-        const groupID = '5rgoajywb3nfbdtyafbod47rya';
-
-        const response = {
-            members: [
-                {
-                    id: 'ok1mtgwrn7gbzetzfdgircykir',
-                    create_at: 1542658437708,
-                    update_at: 1542658441412,
-                    delete_at: 0,
-                    username: 'test.161927',
-                    auth_data: 'test.161927',
-                    auth_service: 'ldap',
-                    email: 'success+test.161927@simulator.amazonses.com',
-                    email_verified: true,
-                    nickname: '',
-                    first_name: 'test',
-                    last_name: 'test.161927',
-                    position: '',
-                    roles: 'system_user',
-                    notify_props: {
-                        channel: 'true',
-                        comments: 'never',
-                        desktop: 'mention',
-                        desktop_sound: 'true',
-                        email: 'true',
-                        first_name: 'false',
-                        mention_keys: 'test.161927,@test.161927',
-                        push: 'mention',
-                        push_status: 'away',
-                    },
-                    last_password_update: 1542658437708,
-                    locale: 'en',
-                    timezone: {
-                        automaticTimezone: '',
-                        manualTimezone: '',
-                        useAutomaticTimezone: 'true',
-                    },
-                },
-            ],
-            total_member_count: 1,
-        };
-
-        nock(Client4.getBaseRoute()).
-            get(`/groups/${groupID}/members?page=0&per_page=100`).
-            reply(200, response);
-
-        await Actions.getGroupMembers(groupID, 0, 100)(store.dispatch, store.getState);
-
-        const state = store.getState();
-
-        const groupMembers = state.entities.groups.members;
-        assert.ok(groupMembers);
-        assert.ok(groupMembers[groupID].totalMemberCount === response.total_member_count);
-
-        assert.ok(JSON.stringify(response.members[0]) === JSON.stringify(groupMembers[groupID].members[0]));
-    });
-
     it('getGroup', async () => {
         const groupID = '5rgoajywb3nfbdtyafbod47rya';
 
@@ -909,6 +851,28 @@ describe('Actions.Groups', () => {
         assert.ok(groups[groupID]);
         assert.ok(groups[groupID].name === groupPatch.name);
         assert.ok(JSON.stringify(response) === JSON.stringify(groups[groupID]));
+    });
+
+    it('getGroupStats', async () => {
+        const groupID = '5rgoajywb3nfbdtyafbod47rya';
+
+        const response = {
+            group_id: '5rgoajywb3nfbdtyafbod47rya',
+            total_member_count: 55,
+        };
+
+        nock(Client4.getBaseRoute()).
+            get(`/groups/${groupID}/stats`).
+            reply(200, response);
+
+        await Actions.getGroupStats(groupID)(store.dispatch, store.getState);
+
+        const state = store.getState();
+
+        const stats = state.entities.groups.stats;
+        assert.ok(stats);
+        assert.ok(stats[groupID]);
+        assert.ok(JSON.stringify(response) === JSON.stringify(stats[groupID]));
     });
 });
 

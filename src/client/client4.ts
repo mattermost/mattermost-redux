@@ -24,10 +24,10 @@ import {Compliance} from 'types/compliance';
 import {
     ClientConfig,
     ClientLicense,
-    Config,
     DataRetentionPolicy,
-    EnvironmentConfig,
     License,
+    AdminConfig,
+    EnvironmentConfig,
 } from 'types/config';
 import {CustomEmoji} from 'types/emojis';
 import {ServerError} from 'types/errors';
@@ -360,6 +360,14 @@ export default class Client4 {
 
     getBotRoute(botUserId: string) {
         return `${this.getBotsRoute()}/${botUserId}`;
+    }
+
+    getGroupsRoute() {
+        return `${this.getBaseRoute()}/groups`;
+    }
+
+    getGroupRoute(groupID: string) {
+        return `${this.getGroupsRoute()}/${groupID}`;
     }
 
     getCSRFFromCookie() {
@@ -759,6 +767,13 @@ export default class Client4 {
 
         return this.doFetch<UserProfile[]>(
             `${this.getUsersRoute()}${buildQueryString(queryStringObj)}`,
+            {method: 'get'},
+        );
+    };
+
+    getProfilesInGroup = (groupId: string, page = 0, perPage = PER_PAGE_DEFAULT) => {
+        return this.doFetch<UserProfile[]>(
+            `${this.getUsersRoute()}${buildQueryString({in_group: groupId, page, per_page: perPage})}`,
             {method: 'get'},
         );
     };
@@ -2471,14 +2486,14 @@ export default class Client4 {
     };
 
     getConfig = () => {
-        return this.doFetch<Config>(
+        return this.doFetch<AdminConfig>(
             `${this.getBaseRoute()}/config`,
             {method: 'get'},
         );
     };
 
-    updateConfig = (config: Config) => {
-        return this.doFetch<Config>(
+    updateConfig = (config: AdminConfig) => {
+        return this.doFetch<AdminConfig>(
             `${this.getBaseRoute()}/config`,
             {method: 'put', body: JSON.stringify(config)},
         );
@@ -2498,7 +2513,7 @@ export default class Client4 {
         );
     };
 
-    testEmail = (config: Config) => {
+    testEmail = (config: AdminConfig) => {
         return this.doFetch<StatusOK>(
             `${this.getBaseRoute()}/email/test`,
             {method: 'post', body: JSON.stringify(config)},
@@ -2940,45 +2955,42 @@ export default class Client4 {
 
     linkGroupSyncable = (groupID: string, syncableID: string, syncableType: string, patch: SyncablePatch) => {
         return this.doFetch<GroupSyncable>(
-            `${this.getBaseRoute()}/groups/${groupID}/${syncableType}s/${syncableID}/link`,
+            `${this.getGroupRoute(groupID)}/${syncableType}s/${syncableID}/link`,
             {method: 'post', body: JSON.stringify(patch)},
         );
     };
 
     unlinkGroupSyncable = (groupID: string, syncableID: string, syncableType: string) => {
         return this.doFetch<StatusOK>(
-            `${this.getBaseRoute()}/groups/${groupID}/${syncableType}s/${syncableID}/link`,
+            `${this.getGroupRoute(groupID)}/${syncableType}s/${syncableID}/link`,
             {method: 'delete'},
         );
     };
 
     getGroupSyncables = (groupID: string, syncableType: string) => {
         return this.doFetch<GroupSyncable[]>(
-            `${this.getBaseRoute()}/groups/${groupID}/${syncableType}s`,
-            {method: 'get'},
-        );
-    };
-
-    getGroupMembers = (groupID: string, page = 0, perPage = PER_PAGE_DEFAULT) => {
-        return this.doFetch<{
-            members: UserProfile[];
-            total_member_count: number;
-        }>(
-            `${this.getBaseRoute()}/groups/${groupID}/members${buildQueryString({page, per_page: perPage})}`,
+            `${this.getGroupRoute(groupID)}/${syncableType}s`,
             {method: 'get'},
         );
     };
 
     getGroup = (groupID: string) => {
         return this.doFetch<Group>(
-            `${this.getBaseRoute()}/groups/${groupID}`,
+            this.getGroupRoute(groupID),
+            {method: 'get'},
+        );
+    };
+
+    getGroupStats = (groupID: string) => {
+        return this.doFetch<Group>(
+            `${this.getGroupRoute(groupID)}/stats`,
             {method: 'get'},
         );
     };
 
     getGroups = (filterAllowReference = false) => {
         return this.doFetch<Group[]>(
-            `${this.getBaseRoute()}/groups${buildQueryString({filter_allow_reference: filterAllowReference})}`,
+            `${this.getGroupsRoute()}${buildQueryString({filter_allow_reference: filterAllowReference})}`,
             {method: 'get'},
         );
     };
@@ -2988,12 +3000,12 @@ export default class Client4 {
             `${this.getUsersRoute()}/${userID}/groups`,
             {method: 'get'},
         );
-    }
+    };
 
     getGroupsNotAssociatedToTeam = (teamID: string, q = '', page = 0, perPage = PER_PAGE_DEFAULT) => {
         this.trackEvent('api', 'api_groups_get_not_associated_to_team', {team_id: teamID});
         return this.doFetch<Group[]>(
-            `${this.getBaseRoute()}/groups${buildQueryString({not_associated_to_team: teamID, page, per_page: perPage, q, include_member_count: true})}`,
+            `${this.getGroupsRoute()}${buildQueryString({not_associated_to_team: teamID, page, per_page: perPage, q, include_member_count: true})}`,
             {method: 'get'},
         );
     };
@@ -3009,7 +3021,7 @@ export default class Client4 {
             filter_parent_team_permitted: filterParentTeamPermitted,
         };
         return this.doFetch<Group[]>(
-            `${this.getBaseRoute()}/groups${buildQueryString(query)}`,
+            `${this.getGroupsRoute()}${buildQueryString(query)}`,
             {method: 'get'},
         );
     };
@@ -3063,14 +3075,14 @@ export default class Client4 {
 
     patchGroupSyncable = (groupID: string, syncableID: string, syncableType: string, patch: SyncablePatch) => {
         return this.doFetch<GroupSyncable>(
-            `${this.getBaseRoute()}/groups/${groupID}/${syncableType}s/${syncableID}/patch`,
+            `${this.getGroupRoute(groupID)}/${syncableType}s/${syncableID}/patch`,
             {method: 'put', body: JSON.stringify(patch)},
         );
     };
 
     patchGroup = (groupID: string, patch: GroupPatch) => {
         return this.doFetch<Group>(
-            `${this.getBaseRoute()}/groups/${groupID}/patch`,
+            `${this.getGroupRoute(groupID)}/patch`,
             {method: 'put', body: JSON.stringify(patch)},
         );
     };

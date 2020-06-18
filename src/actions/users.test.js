@@ -394,6 +394,22 @@ describe('Actions.Users', () => {
         assert.equal(Object.keys(profiles).length, channel.size, 'profiles != profiles in channel');
     });
 
+    it('getProfilesInGroup', async () => {
+        nock(Client4.getBaseRoute()).
+            get('/users').
+            query(true).
+            reply(200, [TestHelper.basicUser]);
+
+        await Actions.getProfilesInGroup(TestHelper.basicGroup.id, 0)(store.dispatch, store.getState);
+
+        const {profilesInGroup, profiles} = store.getState().entities.users;
+        const group = profilesInGroup[TestHelper.basicGroup.id];
+
+        assert.ok(group);
+        assert.ok(group.has(TestHelper.basicUser.id));
+        assert.equal(Object.keys(profiles).length, group.size, 'profiles != profiles in group');
+    });
+
     it('getUser', async () => {
         nock(Client4.getBaseRoute()).
             post('/users').

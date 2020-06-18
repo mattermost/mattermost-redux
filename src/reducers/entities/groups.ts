@@ -136,15 +136,13 @@ function myGroups(state: any = {}, action: GenericAction) {
     }
 }
 
-function members(state: any = {}, action: GenericAction) {
+function stats(state: any = {}, action: GenericAction) {
     switch (action.type) {
-    case GroupTypes.RECEIVED_GROUP_MEMBERS: {
+    case GroupTypes.RECEIVED_GROUP_STATS: {
+        const stat = action.data;
         return {
             ...state,
-            [action.group_id]: {
-                members: action.data.members,
-                totalMemberCount: action.data.total_member_count,
-            },
+            [stat.group_id]: stat,
         };
     }
     default:
@@ -199,7 +197,7 @@ function groups(state: Dictionary<Group> = {}, action: GenericAction) {
 
 export default combineReducers({
     syncables,
-    members,
     groups,
+    stats,
     myGroups,
 });

@@ -26,6 +26,7 @@ const state: GlobalState = {
             profilesWithoutTeam: new Set(),
             profilesInChannel: {},
             profilesNotInChannel: {},
+            profilesInGroup: {},
             statuses: {},
             stats: {},
         },
@@ -84,7 +85,7 @@ const state: GlobalState = {
             complianceReports: {},
             ldapGroups: {},
             ldapGroupsCount: 0,
-            userAccessTokens: [],
+            userAccessTokens: {},
             clusterInfo: [],
         },
         jobs: {
@@ -144,8 +145,8 @@ const state: GlobalState = {
         groups: {
             groups: {},
             syncables: {},
-            members: {},
             myGroups: {},
+            stats: {},
         },
         channelCategories: {
             byId: {},

@@ -25,6 +25,7 @@ import {Channel} from 'types/channels';
 import {Reaction} from 'types/reactions';
 import {GlobalState} from 'types/store';
 import {Team} from 'types/teams';
+import {Group} from 'types/groups';
 import {UserProfile} from 'types/users';
 import {
     $Email,
@@ -43,6 +44,7 @@ export {getCurrentUser, getCurrentUserId, getUsers};
 type Filters = {
     role?: string;
     inactive?: boolean;
+    skipInactive?: boolean;
 };
 
 export function getUserIdsInChannels(state: GlobalState): RelationOneToMany<Channel, UserProfile> {
@@ -63,6 +65,10 @@ export function getUserIdsNotInTeams(state: GlobalState): RelationOneToMany<Team
 
 export function getUserIdsWithoutTeam(state: GlobalState): Set<$ID<UserProfile>> {
     return state.entities.users.profilesWithoutTeam;
+}
+
+export function getUserIdsInGroups(state: GlobalState): RelationOneToMany<Group, UserProfile> {
+    return state.entities.users.profilesInGroup;
 }
 
 export function getUserStatuses(state: GlobalState): RelationOneToOne<UserProfile, string> {
@@ -260,6 +266,8 @@ export function filterProfiles(profiles: IDMappedObjects<UserProfile>, filters?:
 
     if (filters.inactive) {
         users = users.filter((user) => user.delete_at !== 0);
+    } else if (filters.skipInactive) {
+        users = users.filter((user) => user.delete_at === 0);
     }
 
     return users.reduce((acc, user) => {
@@ -354,9 +362,9 @@ export function searchProfiles(state: GlobalState, term: string, skipCurrent = f
     return filteredProfiles;
 }
 
-export function searchProfilesInChannel(state: GlobalState, channelId: $ID<Channel>, term: string, skipCurrent = false): Array<UserProfile> {
+export function searchProfilesInChannel(state: GlobalState, channelId: $ID<Channel>, term: string, skipCurrent = false, skipInactive = false): Array<UserProfile> {
     const doGetProfilesInChannel = makeGetProfilesInChannel();
-    const profiles = filterProfilesMatchingTerm(doGetProfilesInChannel(state, channelId, false), term);
+    const profiles = filterProfilesMatchingTerm(doGetProfilesInChannel(state, channelId, skipInactive), term);
 
     if (skipCurrent) {
         removeCurrentUserFromList(profiles, getCurrentUserId(state));
@@ -561,4 +569,23 @@ export function makeGetDisplayName(): (state: GlobalState, userId: $ID<UserProfi
             return displayUsername(user, teammateNameDisplaySetting!, useFallbackUsername);
         },
     );
+}
+
+export const getProfilesInGroup: (state: GlobalState, groupId: $ID<Group>, filters?: Filters) => Array<UserProfile> = createSelector(
+    getUsers,
+    getUserIdsInGroups,
+    (state: GlobalState, groupId: string) => groupId,
+    (state: GlobalState, groupId: string, filters: Filters) => filters,
+    (profiles, usersInGroups, groupId, filters) => {
+        return sortAndInjectProfiles(filterProfiles(profiles, filters), usersInGroups[groupId] || new Set());
+    },
+);
+
+export function searchProfilesInGroup(state: GlobalState, groupId: $ID<Group>, term: string, skipCurrent = false, filters?: Filters): Array<UserProfile> {
+    const profiles = filterProfilesMatchingTerm(getProfilesInGroup(state, groupId, filters), term);
+    if (skipCurrent) {
+        removeCurrentUserFromList(profiles, getCurrentUserId(state));
+    }
+
+    return profiles;
 }

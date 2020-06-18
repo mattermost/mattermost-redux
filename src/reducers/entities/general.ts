@@ -4,9 +4,9 @@
 import {combineReducers} from 'redux';
 import {GeneralTypes, UserTypes} from 'action_types';
 import {GenericAction} from 'types/actions';
-import {ClientLicense, Config} from 'types/config';
+import {ClientLicense, ClientConfig} from 'types/config';
 
-function config(state: Partial<Config> = {}, action: GenericAction) {
+function config(state: Partial<ClientConfig> = {}, action: GenericAction) {
     switch (action.type) {
     case GeneralTypes.CLIENT_CONFIG_RECEIVED:
         return Object.assign({}, state, action.data);
