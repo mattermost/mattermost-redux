@@ -15,6 +15,9 @@ describe('Selectors.Users', () => {
     const channel1 = TestHelper.fakeChannelWithId(team1.id);
     const channel2 = TestHelper.fakeChannelWithId(team1.id);
 
+    const group1 = TestHelper.fakeGroupWithId();
+    const group2 = TestHelper.fakeGroupWithId();
+
     const user1 = TestHelper.fakeUserWithId();
     user1.notify_props = {mention_keys: 'testkey1,testkey2'};
     user1.roles = 'system_admin system_user';
@@ -53,6 +56,10 @@ describe('Selectors.Users', () => {
     profilesNotInChannel[channel1.id] = new Set([user2.id, user3.id]);
     profilesNotInChannel[channel2.id] = new Set([user4.id, user5.id]);
 
+    const profilesInGroup = {};
+    profilesInGroup[group1.id] = new Set([user1.id]);
+    profilesInGroup[group2.id] = new Set([user2.id, user3.id]);
+
     const userSessions = [{
         create_at: 1,
         expires_at: 2,
@@ -85,6 +92,7 @@ describe('Selectors.Users', () => {
                 profilesWithoutTeam,
                 profilesInChannel,
                 profilesNotInChannel,
+                profilesInGroup,
                 mySessions: userSessions,
                 myAudits: userAudits,
             },
@@ -289,6 +297,12 @@ describe('Selectors.Users', () => {
         });
     });
 
+    it('getProfilesInGroup', () => {
+        assert.deepEqual(Selectors.getProfilesInGroup(testState, group1.id), [user1]);
+        const users = [user2, user3].sort(sortByUsername);
+        assert.deepEqual(Selectors.getProfilesInGroup(testState, group2.id), users);
+    });
+
     describe('searchProfiles', () => {
         it('searchProfiles without filter', () => {
             assert.deepEqual(Selectors.searchProfiles(testState, user1.username), [user1]);
@@ -360,6 +374,13 @@ describe('Selectors.Users', () => {
             assert.deepEqual(Selectors.searchProfilesWithoutTeam(testState, user5.username, false, {inactive: true}), []);
         });
     });
+    it('searchProfilesInGroup', () => {
+        assert.deepEqual(Selectors.searchProfilesInGroup(testState, group1.id, user5.username), []);
+        assert.deepEqual(Selectors.searchProfilesInGroup(testState, group1.id, user1.username), [user1]);
+        assert.deepEqual(Selectors.searchProfilesInGroup(testState, group2.id, user2.username), [user2]);
+        assert.deepEqual(Selectors.searchProfilesInGroup(testState, group2.id, user3.username), [user3]);
+    });
+
     it('isCurrentUserSystemAdmin', () => {
         assert.deepEqual(Selectors.isCurrentUserSystemAdmin(testState), true);
     });

@@ -9,6 +9,7 @@ import {UserProfile, UserStatus} from 'types/users';
 import {RelationOneToMany, IDMappedObjects, RelationOneToOne} from 'types/utilities';
 import {Team} from 'types/teams';
 import {Channel} from 'types/channels';
+import {Group} from 'types/groups';
 
 function profilesToSet(state: RelationOneToMany<Team, UserProfile>, action: GenericAction) {
     const id = action.id;
@@ -407,6 +408,16 @@ function profilesNotInChannel(state: RelationOneToMany<Channel, UserProfile> = {
     }
 }
 
+function profilesInGroup(state: RelationOneToMany<Group, UserProfile> = {}, action: GenericAction) {
+    switch (action.type) {
+    case UserTypes.RECEIVED_PROFILES_LIST_IN_GROUP: {
+        return profileListToSet(state, action);
+    }
+    default:
+        return state;
+    }
+}
+
 function statuses(state: RelationOneToOne<UserProfile, string> = {}, action: GenericAction) {
     switch (action.type) {
     case UserTypes.RECEIVED_STATUS: {
@@ -594,6 +605,9 @@ export default combineReducers({
 
     // object where every key is a channel id and has a Set with the users id that are not members of the channel
     profilesNotInChannel,
+
+    // object where every key is a group id and has a Set with the users id that are members of the group
+    profilesInGroup,
 
     // object where every key is the user id and has a value with the current status of each user
     statuses,
