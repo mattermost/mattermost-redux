@@ -1395,13 +1395,14 @@ export default class Client4 {
 
     // Channel Routes
 
-    getAllChannels = (page = 0, perPage = PER_PAGE_DEFAULT, notAssociatedToGroup = '', excludeDefaultChannels = false, includeTotalCount = false) => {
+    getAllChannels = (page = 0, perPage = PER_PAGE_DEFAULT, notAssociatedToGroup = '', excludeDefaultChannels = false, includeTotalCount = false, includeDeleted = false) => {
         const queryData = {
             page,
             per_page: perPage,
             not_associated_to_group: notAssociatedToGroup,
             exclude_default_channels: excludeDefaultChannels,
             include_total_count: includeTotalCount,
+            include_deleted: includeDeleted,
         };
         return this.doFetch<ChannelWithTeamData[] | ChannelsWithTotalCount>(
             `${this.getChannelsRoute()}${buildQueryString(queryData)}`,
@@ -1688,7 +1689,7 @@ export default class Client4 {
         );
     };
 
-    searchAllChannels = (term: string, notAssociatedToGroup = '', excludeDefaultChannels = false, page?: number, perPage?: number) => {
+    searchAllChannels = (term: string, notAssociatedToGroup = '', excludeDefaultChannels = false, page?: number, perPage?: number, includeDeleted = false) => {
         const body = {
             term,
             not_associated_to_group: notAssociatedToGroup,
@@ -1697,7 +1698,7 @@ export default class Client4 {
             per_page: perPage,
         };
         return this.doFetch<Channel[] | ChannelsWithTotalCount>(
-            `${this.getChannelsRoute()}/search`,
+            `${this.getChannelsRoute()}/search?include_deleted=${includeDeleted}`,
             {method: 'post', body: JSON.stringify(body)},
         );
     };
