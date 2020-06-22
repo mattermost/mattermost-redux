@@ -3,6 +3,8 @@
 
 import {UserProfile} from './users';
 
+import {Dictionary, RelationOneToOne} from './utilities';
+
 export type SyncableType = 'team' | 'channel';
 
 export type SyncablePatch = {
@@ -75,16 +77,15 @@ export type GroupSyncablesState = {
 };
 
 export type GroupsState = {
-    syncables: {
-        [x: string]: GroupSyncablesState;
-    };
-    members: any;
-    groups: {
-        [x: string]: Group;
-    };
-    myGroups: {
-        [x: string]: Group;
-    };
+    syncables: Dictionary<GroupSyncablesState>;
+    stats: RelationOneToOne<Group, GroupStats>;
+    groups: Dictionary<Group>;
+    myGroups: Dictionary<Group>;
+};
+
+export type GroupStats = {
+    group_id: string;
+    total_member_count: number;
 };
 
 export type GroupSearchOpts = {
