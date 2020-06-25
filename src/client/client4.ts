@@ -1,6 +1,5 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
-
 import {General} from '../constants';
 
 import {ClusterInfo, AnalyticsRow} from 'types/admin';
@@ -92,6 +91,7 @@ import {cleanUrlForLogging} from 'utils/sentry';
 import {isSystemAdmin} from 'utils/user_utils';
 
 import fetch from './fetch_etag';
+import {rudderAnalytics} from './rudder';
 
 const FormData = require('form-data');
 const HEADER_AUTH = 'Authorization';
@@ -3261,20 +3261,7 @@ export default class Client4 {
             anonymousId: '00000000000000000000000000',
         };
 
-        const globalAny: any = global;
-
-        if (globalAny && globalAny.window && globalAny.window.rudderanalytics) {
-            globalAny.window.rudderanalytics.track('event', properties, options);
-        } else if (globalAny && globalAny.rudderanalytics) {
-            if (globalAny.analytics_context) {
-                options.context = globalAny.analytics_context;
-            }
-
-            globalAny.rudderanalytics.track(Object.assign({
-                event: 'event',
-                userId: this.diagnosticId,
-            }, {properties}, options));
-        }
+        rudderAnalytics.track('event', properties, options);
     }
 }
 
