@@ -1589,9 +1589,17 @@ describe('Actions.Channels', () => {
         );
 
         const mockTotalCount = 84;
+        const mockQuery = {
+            page: 0,
+            per_page: 50,
+            not_associated_to_group: '',
+            exclude_default_channels: false,
+            include_total_count: true,
+            include_deleted: false,
+        };
         nock(Client4.getBaseRoute()).
             get('/channels').
-            query(true).
+            query(mockQuery).
             reply(200, {channels: [TestHelper.basicChannel, userChannel], total_count: mockTotalCount});
 
         assert.ok(store.getState().entities.channels.totalCount === 0);
@@ -1607,6 +1615,19 @@ describe('Actions.Channels', () => {
         assert.ok(data.total_count === mockTotalCount);
 
         assert.ok(store.getState().entities.channels.totalCount === mockTotalCount);
+
+        mockQuery.include_deleted = true;
+        nock(Client4.getBaseRoute()).
+            get('/channels').
+            query(mockQuery).
+            reply(200, {channels: [TestHelper.basicChannel, userChannel], total_count: mockTotalCount});
+
+        await store.dispatch(Actions.getAllChannelsWithCount(0, 50, '', false, true));
+
+        const request = store.getState().requests.channels.getAllChannels;
+        if (request.status === RequestStatus.FAILURE) {
+            throw new Error(JSON.stringify(request.error));
+        }
     });
 
     it('searchAllChannels', async () => {
@@ -1639,7 +1660,7 @@ describe('Actions.Channels', () => {
         );
 
         nock(Client4.getBaseRoute()).
-            post('/channels/search').
+            post('/channels/search?include_deleted=false').
             reply(200, [TestHelper.basicChannel, userChannel]);
 
         await store.dispatch(Actions.searchAllChannels('test', 0));
@@ -1650,15 +1671,23 @@ describe('Actions.Channels', () => {
         }
 
         nock(Client4.getBaseRoute()).
-            post('/channels/search').
+            post('/channels/search?include_deleted=false').
             reply(200, {channels: [TestHelper.basicChannel, userChannel], total_count: 2});
 
-        const response = await store.dispatch(Actions.searchAllChannels('test', '', false, 0, 100));
+        let response = await store.dispatch(Actions.searchAllChannels('test', '', false, 0, 100));
 
         const paginatedRequest = store.getState().requests.channels.getAllChannels;
         if (paginatedRequest.status === RequestStatus.FAILURE) {
             throw new Error(JSON.stringify(paginatedRequest.error));
         }
+
+        assert.ok(response.data.channels.length === 2);
+
+        nock(Client4.getBaseRoute()).
+            post('/channels/search?include_deleted=true').
+            reply(200, {channels: [TestHelper.basicChannel, userChannel], total_count: 2});
+
+        response = await store.dispatch(Actions.searchAllChannels('test', '', false, 0, 100, true));
 
         assert.ok(response.data.channels.length === 2);
     });
