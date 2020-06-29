@@ -18,7 +18,7 @@ import {
     ChannelViewResponse,
     ChannelWithTeamData,
 } from 'types/channels';
-import {Options, StatusOK, ClientResponse, CommandArgs} from 'types/client4';
+import {Options, StatusOK, ClientResponse} from 'types/client4';
 import {Compliance} from 'types/compliance';
 import {
     ClientConfig,
@@ -2187,7 +2187,7 @@ export default class Client4 {
         );
     };
 
-    getCommandAutocompleteSuggestionsList = (userInput: string, teamId: string, commandArgs: CommandArgs) => {
+    getCommandAutocompleteSuggestionsList = (userInput: string, teamId: string, commandArgs: {}) => {
         return this.doFetch<AutocompleteSuggestion[]>(
             `${this.getTeamRoute(teamId)}/commands/autocomplete_suggestions${buildQueryString({...commandArgs, user_input: userInput})}`,
             {method: 'get'},
