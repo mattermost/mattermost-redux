@@ -1,6 +1,5 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
-
 import {General} from '../constants';
 
 import {ClusterInfo, AnalyticsRow} from 'types/admin';
@@ -92,6 +91,7 @@ import {cleanUrlForLogging} from 'utils/sentry';
 import {isSystemAdmin} from 'utils/user_utils';
 
 import fetch from './fetch_etag';
+import {rudderAnalytics} from './rudder';
 
 const FormData = require('form-data');
 const HEADER_AUTH = 'Authorization';
@@ -1395,13 +1395,14 @@ export default class Client4 {
 
     // Channel Routes
 
-    getAllChannels = (page = 0, perPage = PER_PAGE_DEFAULT, notAssociatedToGroup = '', excludeDefaultChannels = false, includeTotalCount = false) => {
+    getAllChannels = (page = 0, perPage = PER_PAGE_DEFAULT, notAssociatedToGroup = '', excludeDefaultChannels = false, includeTotalCount = false, includeDeleted = false) => {
         const queryData = {
             page,
             per_page: perPage,
             not_associated_to_group: notAssociatedToGroup,
             exclude_default_channels: excludeDefaultChannels,
             include_total_count: includeTotalCount,
+            include_deleted: includeDeleted,
         };
         return this.doFetch<ChannelWithTeamData[] | ChannelsWithTotalCount>(
             `${this.getChannelsRoute()}${buildQueryString(queryData)}`,
@@ -1688,7 +1689,7 @@ export default class Client4 {
         );
     };
 
-    searchAllChannels = (term: string, notAssociatedToGroup = '', excludeDefaultChannels = false, page?: number, perPage?: number) => {
+    searchAllChannels = (term: string, notAssociatedToGroup = '', excludeDefaultChannels = false, page?: number, perPage?: number, includeDeleted = false) => {
         const body = {
             term,
             not_associated_to_group: notAssociatedToGroup,
@@ -1697,7 +1698,7 @@ export default class Client4 {
             per_page: perPage,
         };
         return this.doFetch<Channel[] | ChannelsWithTotalCount>(
-            `${this.getChannelsRoute()}/search`,
+            `${this.getChannelsRoute()}/search?include_deleted=${includeDeleted}`,
             {method: 'post', body: JSON.stringify(body)},
         );
     };
@@ -2210,9 +2211,9 @@ export default class Client4 {
         );
     };
 
-    getCommandAutocompleteSuggestionsList = (userInput: string, teamId: string) => {
+    getCommandAutocompleteSuggestionsList = (userInput: string, teamId: string, commandArgs: {}) => {
         return this.doFetch<AutocompleteSuggestion[]>(
-            `${this.getTeamRoute(teamId)}/commands/autocomplete_suggestions${buildQueryString({user_input: userInput})}`,
+            `${this.getTeamRoute(teamId)}/commands/autocomplete_suggestions${buildQueryString({...commandArgs, user_input: userInput})}`,
             {method: 'get'},
         );
     };
@@ -3284,20 +3285,7 @@ export default class Client4 {
             anonymousId: '00000000000000000000000000',
         };
 
-        const globalAny: any = global;
-
-        if (globalAny && globalAny.window && globalAny.window.rudderanalytics) {
-            globalAny.window.rudderanalytics.track('event', properties, options);
-        } else if (globalAny && globalAny.rudderanalytics) {
-            if (globalAny.analytics_context) {
-                options.context = globalAny.analytics_context;
-            }
-
-            globalAny.rudderanalytics.track(Object.assign({
-                event: 'event',
-                userId: this.diagnosticId,
-            }, {properties}, options));
-        }
+        rudderAnalytics.track('event', properties, options);
     }
 }
 
