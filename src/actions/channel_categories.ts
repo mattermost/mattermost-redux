@@ -29,7 +29,7 @@ import {
     DispatchFunc,
     GetStateFunc,
 } from 'types/actions';
-import {CategorySorting, OrderedChannelCategories} from 'types/channel_categories';
+import {CategorySorting, OrderedChannelCategories, ChannelCategory} from 'types/channel_categories';
 import {Channel} from 'types/channels';
 import {$ID} from 'types/utilities';
 
@@ -112,10 +112,10 @@ export function fetchMyCategories(teamId: string) {
 export function addChannelToInitialCategory(channel: Channel, setOnServer = false): ActionFunc {
     return (dispatch: DispatchFunc, getState: GetStateFunc) => {
         const state = getState();
+        const categories = Object.values(getAllCategoriesByIds(state));
 
         if (channel.type === General.DM_CHANNEL || channel.type === General.GM_CHANNEL) {
             // Add the new channel to the DM category on each team
-            const categories = Object.values(getAllCategoriesByIds(state));
             const dmCategories = categories.filter((category) => category.type === CategoryTypes.DIRECT_MESSAGES);
 
             return dispatch({
@@ -128,7 +128,10 @@ export function addChannelToInitialCategory(channel: Channel, setOnServer = fals
         }
 
         // Add the new channel to the Channels category on the channel's team
-        const channelsCategory = getCategoryInTeamByType(state, channel.team_id, CategoryTypes.CHANNELS);
+        let channelsCategory: ChannelCategory | undefined;
+        if (!categories.some((category) => category.channel_ids.some((channelId) => channelId === channel.id))) {
+            getCategoryInTeamByType(state, channel.team_id, CategoryTypes.CHANNELS);
+        }
 
         if (!channelsCategory) {
             // No categories were found for this team, so the categories for this team haven't been loaded yet.
