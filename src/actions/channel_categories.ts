@@ -130,7 +130,7 @@ export function addChannelToInitialCategory(channel: Channel, setOnServer = fals
         // Add the new channel to the Channels category on the channel's team
         let channelsCategory: ChannelCategory | undefined;
         if (!categories.some((category) => category.channel_ids.some((channelId) => channelId === channel.id))) {
-            getCategoryInTeamByType(state, channel.team_id, CategoryTypes.CHANNELS);
+            channelsCategory = getCategoryInTeamByType(state, channel.team_id, CategoryTypes.CHANNELS);
         }
 
         if (!channelsCategory) {
