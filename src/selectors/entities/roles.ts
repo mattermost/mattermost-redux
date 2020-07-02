@@ -211,7 +211,7 @@ export const haveICurrentChannelPermission: (state: GlobalState, options: Permis
     },
 );
 
-export function getAllResourceToSysConsolePermissions(state: GlobalState) {
+export function getAllResourceToSysConsolePermissions() {
     return ResourceToSysConsolePermissionsTable;
 }
 
