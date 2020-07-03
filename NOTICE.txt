@@ -327,7 +327,7 @@ Storage adaptor to use node-localstorage with redux-persist
 * HOMEPAGE:
   * https://github.com/pellejacobs/redux-persist-node-storage
 
-* LICENSE: 
+* LICENSE: MIT
 
 ---
 
