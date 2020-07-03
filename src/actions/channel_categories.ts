@@ -29,7 +29,7 @@ import {
     DispatchFunc,
     GetStateFunc,
 } from 'types/actions';
-import {CategorySorting, OrderedChannelCategories, ChannelCategory} from 'types/channel_categories';
+import {CategorySorting, OrderedChannelCategories} from 'types/channel_categories';
 import {Channel} from 'types/channels';
 import {$ID} from 'types/utilities';
 
