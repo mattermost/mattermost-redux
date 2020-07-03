@@ -29,7 +29,7 @@ import {
     DispatchFunc,
     GetStateFunc,
 } from 'types/actions';
-import {CategorySorting, OrderedChannelCategories, ChannelCategory} from 'types/channel_categories';
+import {CategorySorting, OrderedChannelCategories} from 'types/channel_categories';
 import {Channel} from 'types/channels';
 import {$ID} from 'types/utilities';
 
@@ -128,10 +128,10 @@ export function addChannelToInitialCategory(channel: Channel, setOnServer = fals
         }
 
         // Add the new channel to the Channels category on the channel's team
-        let channelsCategory: ChannelCategory | undefined;
-        if (!categories.some((category) => category.channel_ids.some((channelId) => channelId === channel.id))) {
-            channelsCategory = getCategoryInTeamByType(state, channel.team_id, CategoryTypes.CHANNELS);
+        if (categories.some((category) => category.channel_ids.some((channelId) => channelId === channel.id))) {
+            return {data: false};
         }
+        const channelsCategory = getCategoryInTeamByType(state, channel.team_id, CategoryTypes.CHANNELS);
 
         if (!channelsCategory) {
             // No categories were found for this team, so the categories for this team haven't been loaded yet.
