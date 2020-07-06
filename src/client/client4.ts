@@ -121,6 +121,7 @@ export default class Client4 {
     userId = '';
     diagnosticId = '';
     includeCookies = true;
+    isRudderKeySet = false;
     translations = {
         connectionError: 'There appears to be a problem with your internet connection.',
         unknownError: 'We received an unexpected status code from the server.',
@@ -180,6 +181,10 @@ export default class Client4 {
 
     setDiagnosticId(diagnosticId: string) {
         this.diagnosticId = diagnosticId;
+    }
+
+    enableRudderEvents() {
+        this.isRudderKeySet = true;
     }
 
     getServerVersion() {
@@ -3241,6 +3246,10 @@ export default class Client4 {
     };
 
     trackEvent(category: string, event: string, props?: any) {
+        if (!this.isRudderKeySet) {
+            return;
+        }
+
         const properties = Object.assign({
             category,
             type: event,

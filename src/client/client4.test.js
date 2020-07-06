@@ -7,6 +7,18 @@ import nock from 'nock';
 import {ClientError, HEADER_X_VERSION_ID} from 'client/client4';
 import TestHelper from 'test/test_helper';
 import {isMinimumServerVersion} from 'utils/helpers';
+import {rudderAnalytics} from './rudder';
+
+jest.mock('./rudder', () => {
+    const original = require.requireActual('./rudder');
+
+    return {
+        rudderAnalytics: {
+            ...original.rudderAnalytics,
+            track: jest.fn(),
+        },
+    };
+});
 
 describe('Client4', () => {
     beforeAll(() => {
@@ -68,5 +80,16 @@ describe('ClientError', () => {
         assert.strictEqual(copy.server_error_id, error.server_error_id);
         assert.strictEqual(copy.status_code, error.status_code);
         assert.strictEqual(copy.url, error.url);
+    });
+});
+
+describe('trackEvent', () => {
+    it('should call for analytics track event based on isRudderKeySet', () => {
+        const client = TestHelper.createClient4();
+        client.trackEvent('test', 'onClick');
+        expect(rudderAnalytics.track).not.toHaveBeenCalled();
+        client.enableRudderEvents();
+        client.trackEvent('test', 'onClick');
+        expect(rudderAnalytics.track).toHaveBeenCalledTimes(1);
     });
 });
