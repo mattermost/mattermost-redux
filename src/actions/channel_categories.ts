@@ -186,6 +186,11 @@ export function moveChannelToCategory(categoryId: string, channelId: string, new
             });
         }
 
+        dispatch({
+            type: ChannelCategoryTypes.RECEIVED_CATEGORIES,
+            data: categories,
+        });
+
         let data;
         try {
             data = await Client4.updateChannelCategories(currentUserId, category.team_id, categories);
