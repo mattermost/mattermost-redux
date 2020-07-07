@@ -17,7 +17,7 @@ import {
     displayUsername,
     filterProfilesMatchingTerm,
     isSystemAdmin,
-    isSystemAdminsRole,
+    includesAnAdminRole,
     profileListToMap,
     sortByUsername,
 } from 'utils/user_utils';
@@ -133,11 +133,11 @@ export const isCurrentUserSystemAdmin: (state: GlobalState) => boolean = createS
     },
 );
 
-export const isCurrentUserInSystemAdminsRole: (a: GlobalState) => boolean = createSelector(
+export const isCurrentUserInSystemAdminsRole: (state: GlobalState) => boolean = createSelector(
     getCurrentUser,
     (user) => {
         const roles = user.roles || '';
-        return isSystemAdminsRole(roles);
+        return includesAnAdminRole(roles);
     },
 );
 
