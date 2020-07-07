@@ -212,7 +212,7 @@ export const haveICurrentChannelPermission: (state: GlobalState, options: Permis
 );
 
 //gets the permission set mapped to the current resource
-export const getPermissionsOnResource = createSelector(
+export const getPermissionsOnSystemConsoleResource = createSelector(
     (state: GlobalState, options: SysConsoleItemOptions) => options.resourceId,
     (resourceId) => {
         const permissions = Object.entries(ResourceToSysConsolePermissionsTable).filter(([mappedResourceId]) => resourceId.startsWith(mappedResourceId)).map((entry) => entry[1]).flat();
@@ -223,18 +223,18 @@ export const getPermissionsOnResource = createSelector(
 //return true if the current user has no permission on the resource
 export const haveIPermissionOnSysConsoleItem: (state: GlobalState, options: SysConsoleItemOptions) => boolean = createSelector(
     getMySystemPermissions,
-    getPermissionsOnResource,
+    getPermissionsOnSystemConsoleResource,
     (mySystemPermissions: Set<string>, permissionsOnResource: Array<string>) => {
         //go over the permissions mapped to the resource and check if the current user has any permission matching
         const commonPermissions = permissionsOnResource.filter((x) => mySystemPermissions.has(x));
-        return (commonPermissions.length > 0);
+        return commonPermissions.length > 0;
     },
 );
 
 //return true if current user has read-write or write-only permission on the resource
 export const haveIWritePermissionOnSysConsoleItem: (state: GlobalState, options: SysConsoleItemOptions) => boolean = createSelector(
     getMySystemPermissions,
-    getPermissionsOnResource,
+    getPermissionsOnSystemConsoleResource,
     (mySystemPermissions: Set<string>, permissionsOnResource: Array<string>) => {
         //go over the permissions mapped to the resource and check if the current user has any permission matching
         const commonPermissions = permissionsOnResource.filter((x) => mySystemPermissions.has(x));
