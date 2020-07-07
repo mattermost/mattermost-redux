@@ -214,9 +214,8 @@ export const haveICurrentChannelPermission: (state: GlobalState, options: Permis
 //gets the permission set mapped to the current resource
 export const getPermissionsOnSystemConsoleResource = createSelector(
     (state: GlobalState, options: SysConsoleItemOptions) => options.resourceId,
-    (resourceId) => {
-        const permissions = Object.entries(ResourceToSysConsolePermissionsTable).filter(([mappedResourceId]) => resourceId.startsWith(mappedResourceId)).map((entry) => entry[1]).flat();
-        return permissions;
+    (resourceId: string) => {
+        return ResourceToSysConsolePermissionsTable[resourceId];
     },
 );
 

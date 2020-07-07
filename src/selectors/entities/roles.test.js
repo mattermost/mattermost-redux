@@ -6,7 +6,7 @@ import assert from 'assert';
 import deepFreezeAndThrowOnMutation from 'utils/deep_freeze';
 import TestHelper from 'test/test_helper';
 import * as Selectors from 'selectors/entities/roles';
-import {General} from '../../constants';
+import {General, Permissions} from '../../constants';
 import {getMySystemPermissions, getMySystemRoles, getRoles} from 'selectors/entities/roles_helpers';
 
 describe('Selectors.Roles', () => {
@@ -224,5 +224,9 @@ describe('Selectors.Roles', () => {
         assert.equal(Selectors.haveICurrentChannelPermission(testState, {permission: 'team2_role2'}), false);
         assert.equal(Selectors.haveICurrentChannelPermission(testState, {permission: 'channel_a_role1'}), true);
         assert.equal(Selectors.haveICurrentChannelPermission(testState, {permission: 'channel_b_role1'}), false);
+    });
+
+    it('should return the expected permissions for a system console resource', () => {
+        assert.deepEqual(Selectors.getPermissionsOnSystemConsoleResource(testState, {resourceId: 'reporting'}), [Permissions.PERMISSION_READ_SYSCONSOLE_REPORTING, Permissions.PERMISSION_WRITE_SYSCONSOLE_REPORTING]);
     });
 });
