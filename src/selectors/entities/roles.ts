@@ -229,7 +229,7 @@ export const getPermissionsOnResource = createSelector(
 export const haveINoPermissionOnSysConsoleItem: (state: GlobalState, options: SysConsoleItemOptions) => boolean = createSelector(
     getMySystemPermissions,
     getPermissionsOnResource,
-    (mySystemPermissions, permissionsOnResource) => {
+    (mySystemPermissions: Set<string>, permissionsOnResource: Array<string>) => {
         //go over the permissions mapped to the resource and check if the current user has any permission matching
         const commonPermissions = permissionsOnResource.filter((x) => mySystemPermissions.has(x));
         return (commonPermissions.length === 0);
@@ -240,7 +240,7 @@ export const haveINoPermissionOnSysConsoleItem: (state: GlobalState, options: Sy
 export const haveINoWritePermissionOnSysConsoleItem: (state: GlobalState, options: SysConsoleItemOptions) => boolean = createSelector(
     getMySystemPermissions,
     getPermissionsOnResource,
-    (mySystemPermissions, permissionsOnResource) => {
+    (mySystemPermissions: Set<string>, permissionsOnResource: Array<string>) => {
         //go over the permissions mapped to the resource and check if the current user has any permission matching
         const commonPermissions = permissionsOnResource.filter((x) => mySystemPermissions.has(x));
 
