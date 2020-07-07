@@ -3,12 +3,13 @@
 
 import assert from 'assert';
 
-import {Preferences} from '../constants';
+import {Preferences, General} from '../constants';
 import {
     displayUsername,
     filterProfilesMatchingTerm,
     getSuggestionsSplitBy,
     getSuggestionsSplitByMultiple,
+    includesAnAdminRole,
 } from 'utils/user_utils';
 
 describe('user utils', () => {
@@ -159,6 +160,24 @@ describe('user utils', () => {
             const expectedSuggestions = ['one.two-three', '.two-three', 'two-three', '-three', 'three'];
 
             expect(getSuggestionsSplitByMultiple(term, ['.', '-'])).toEqual(expectedSuggestions);
+        });
+    });
+
+    describe('includesAnAdminRole', () => {
+        test('returns expected result', () => {
+            [
+                [General.SYSTEM_ADMIN_ROLE, true],
+                [General.SYSTEM_USER_MANAGER_ROLE, true],
+                [General.SYSTEM_READ_ONLY_ADMIN_ROLE, true],
+                [General.SYSTEM_RESTRICTED_ADMIN_ROLE, true],
+                ['non_existent', false],
+                ['foo', false],
+                ['bar', false],
+            ].forEach(([role, expected]) => {
+                const mockRoles = `foo ${role} bar`;
+                const actual = includesAnAdminRole(mockRoles);
+                assert.equal(actual, expected);
+            });
         });
     });
 });
