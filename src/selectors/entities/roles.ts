@@ -226,7 +226,7 @@ export const getPermissionsOnResource = createSelector(
 );
 
 //return true if the current user has no permission on the resource
-export const haveINoPermissionOnSysConsoleItem = createSelector(
+export const haveINoPermissionOnSysConsoleItem: (state: GlobalState, options: SysConsoleItemOptions) => boolean = createSelector(
     getMySystemPermissions,
     getPermissionsOnResource,
     (mySystemPermissions, permissionsOnResource) => {
@@ -237,7 +237,7 @@ export const haveINoPermissionOnSysConsoleItem = createSelector(
 );
 
 //return true if current user has no permission on the resource or only read permission
-export const haveINoWritePermissionOnSysConsoleItem = createSelector(
+export const haveINoWritePermissionOnSysConsoleItem: (state: GlobalState, options: SysConsoleItemOptions) => boolean = createSelector(
     getMySystemPermissions,
     getPermissionsOnResource,
     (mySystemPermissions, permissionsOnResource) => {
