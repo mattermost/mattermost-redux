@@ -230,7 +230,7 @@ export const haveIPermissionOnSysConsoleItem: (state: GlobalState, options: SysC
     },
 );
 
-//return true if current user has read-write or write-only permission on the resource
+//return true if current user has write permission on the resource
 export const haveIWritePermissionOnSysConsoleItem: (state: GlobalState, options: SysConsoleItemOptions) => boolean = createSelector(
     getMySystemPermissions,
     getPermissionsOnSystemConsoleResource,
@@ -238,12 +238,9 @@ export const haveIWritePermissionOnSysConsoleItem: (state: GlobalState, options:
         //go over the permissions mapped to the resource and check if the current user has any permission matching
         const commonPermissions = permissionsOnResource.filter((x) => mySystemPermissions.has(x));
 
-        const haveRWPermission = commonPermissions.length > 0;
-
         //go over the result permissions set and check if it contains a write permission
         const haveWPermission = commonPermissions.some((permission) => permission.startsWith('write'));
 
-        //return true if current user has no permission or he has a permission which is not write(hence read)
-        return (haveRWPermission || haveWPermission);
+        return haveWPermission;
     },
 );

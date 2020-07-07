@@ -229,4 +229,61 @@ describe('Selectors.Roles', () => {
     it('should return the expected permissions for a system console resource', () => {
         assert.deepEqual(Selectors.getPermissionsOnSystemConsoleResource(testState, {resourceId: 'reporting'}), [Permissions.PERMISSION_READ_SYSCONSOLE_REPORTING, Permissions.PERMISSION_WRITE_SYSCONSOLE_REPORTING]);
     });
+
+    describe('haveIPermissionOnSysConsoleItem', () => {
+        it('correctly identifies permission is absent', () => {
+            assert.equal(Selectors.haveIPermissionOnSysConsoleItem(testState, {resourceId: 'reporting'}), false);
+        });
+
+        it('correctly identifies permission is present', () => {
+            const state = {
+                ...testState,
+                entities: {
+                    ...testState.entities,
+                    roles: {
+                        roles: {
+                            test_user_role: {permissions: [Permissions.PERMISSION_READ_SYSCONSOLE_REPORTING, Permissions.PERMISSION_WRITE_SYSCONSOLE_REPORTING]},
+                            test_user_role2: {permissions: []},
+                        },
+                    },
+                },
+            };
+            assert.equal(Selectors.haveIPermissionOnSysConsoleItem(state, {resourceId: 'reporting'}), true);
+        });
+    });
+
+    describe('haveIWritePermissionOnSysConsoleItem', () => {
+        it('correctly identifies permission is absent', () => {
+            // assert.equal(Selectors.haveIWritePermissionOnSysConsoleItem(testState, {resourceId: 'reporting'}), false);
+            const state = {
+                ...testState,
+                entities: {
+                    ...testState.entities,
+                    roles: {
+                        roles: {
+                            test_user_role: {permissions: [Permissions.PERMISSION_READ_SYSCONSOLE_REPORTING]},
+                            test_user_role2: {permissions: []},
+                        },
+                    },
+                },
+            };
+            assert.equal(Selectors.haveIWritePermissionOnSysConsoleItem(state, {resourceId: 'reporting'}), false);
+        });
+
+        it('correctly identifies permission is present', () => {
+            const state = {
+                ...testState,
+                entities: {
+                    ...testState.entities,
+                    roles: {
+                        roles: {
+                            test_user_role: {permissions: [Permissions.PERMISSION_WRITE_SYSCONSOLE_REPORTING]},
+                            test_user_role2: {permissions: []},
+                        },
+                    },
+                },
+            };
+            assert.equal(Selectors.haveIWritePermissionOnSysConsoleItem(state, {resourceId: 'reporting'}), true);
+        });
+    });
 });
