@@ -1,19 +1,23 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
-import {Client4} from 'client';
-import {General, Preferences} from '../constants';
+
 import {ChannelTypes, PreferenceTypes, UserTypes} from 'action_types';
-import {savePreferences, deletePreferences} from './preferences';
-import {getChannelsIdForTeam, getChannelByName} from 'utils/channel_utils';
+
+import {Client4} from 'client';
+
+import {General, Preferences} from '../constants';
+import {CategoryTypes} from 'constants/channel_categories';
+
+import {getCategoryInTeamByType} from 'selectors/entities/channel_categories';
 import {
+    getChannel as getChannelSelector,
     getChannelsNameMapInTeam,
     getMyChannelMember as getMyChannelMemberSelector,
     getRedirectChannelNameForTeam,
     isManuallyUnread,
 } from 'selectors/entities/channels';
-import {getCurrentTeamId} from 'selectors/entities/teams';
 import {getConfig, getServerVersion} from 'selectors/entities/general';
-import {isMinimumServerVersion} from 'utils/helpers';
+import {getCurrentTeamId} from 'selectors/entities/teams';
 
 import {Action, ActionFunc, batchActions, DispatchFunc, GetStateFunc} from 'types/actions';
 
@@ -21,10 +25,15 @@ import {Channel, ChannelNotifyProps, ChannelMembership, ChannelModerationPatch, 
 
 import {PreferenceType} from 'types/preferences';
 
+import {getChannelsIdForTeam, getChannelByName} from 'utils/channel_utils';
+import {isMinimumServerVersion} from 'utils/helpers';
+
+import {addChannelToInitialCategory, addChannelToCategory} from './channel_categories';
 import {logError} from './errors';
 import {bindClientFunc, forceLogoutIfNecessary} from './helpers';
-import {getMissingProfilesByIds} from './users';
+import {savePreferences, deletePreferences} from './preferences';
 import {loadRolesIfNeeded} from './roles';
+import {getMissingProfilesByIds} from './users';
 
 export function selectChannel(channelId: string) {
     return {
@@ -79,6 +88,8 @@ export function createChannel(channel: Channel, userId: string): ActionFunc {
                 type: ChannelTypes.CREATE_CHANNEL_SUCCESS,
             },
         ]));
+
+        dispatch(addChannelToInitialCategory(created, true));
 
         return {data: created};
     };
@@ -140,6 +151,9 @@ export function createDirectChannel(userId: string, otherUserId: string): Action
                 data: [{id: userId}, {id: otherUserId}],
             },
         ]));
+
+        dispatch(addChannelToInitialCategory(created));
+
         dispatch(loadRolesIfNeeded(member.roles.split(' ')));
 
         return {data: created};
@@ -227,6 +241,9 @@ export function createGroupChannel(userIds: Array<string>): ActionFunc {
                 data: profilesInChannel,
             },
         ]));
+
+        dispatch(addChannelToInitialCategory(created));
+
         dispatch(loadRolesIfNeeded((member && member.roles && member.roles.split(' ')) || []));
 
         return {data: created};
@@ -657,13 +674,17 @@ export function leaveChannel(channelId: string): ActionFunc {
 
 export function joinChannel(userId: string, teamId: string, channelId: string, channelName: string): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
+        if (!channelId && !channelName) {
+            return {data: null};
+        }
+
         let member: ChannelMembership | undefined | null;
-        let channel;
+        let channel: Channel;
         try {
             if (channelId) {
                 member = await Client4.addToChannel(userId, channelId);
                 channel = await Client4.getChannel(channelId);
-            } else if (channelName) {
+            } else {
                 channel = await Client4.getChannelByName(teamId, channelName, true);
                 if ((channel.type === General.GM_CHANNEL) || (channel.type === General.DM_CHANNEL)) {
                     member = await Client4.getChannelMember(channel.id, userId);
@@ -689,6 +710,9 @@ export function joinChannel(userId: string, teamId: string, channelId: string, c
                 data: member,
             },
         ]));
+
+        dispatch(addChannelToInitialCategory(channel));
+
         if (member) {
             dispatch(loadRolesIfNeeded(member.roles.split(' ')));
         }
@@ -1382,7 +1406,7 @@ export function getMyChannelMember(channelId: string) {
     });
 }
 
-export function favoriteChannel(channelId: string): ActionFunc {
+export function favoriteChannel(channelId: string, updateCategories = true): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         const {currentUserId} = getState().entities.users;
         const preference: PreferenceType = {
@@ -1394,11 +1418,21 @@ export function favoriteChannel(channelId: string): ActionFunc {
 
         Client4.trackEvent('action', 'action_channels_favorite');
 
-        return savePreferences(currentUserId, [preference])(dispatch);
+        // Add the channel to the Favorites category, unless this has been called from the categories update logic
+        if (updateCategories) {
+            const channel = getChannelSelector(getState(), channelId);
+            const category = getCategoryInTeamByType(getState(), channel.team_id || getCurrentTeamId(getState()), CategoryTypes.FAVORITES);
+            if (category) {
+                await dispatch(addChannelToCategory(category.id, channel.id));
+            }
+        }
+
+        // And favorite it using the old preferences method.
+        return dispatch(savePreferences(currentUserId, [preference]));
     };
 }
 
-export function unfavoriteChannel(channelId: string): ActionFunc {
+export function unfavoriteChannel(channelId: string, updateCategories = true): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         const {currentUserId} = getState().entities.users;
         const preference: PreferenceType = {
@@ -1410,6 +1444,22 @@ export function unfavoriteChannel(channelId: string): ActionFunc {
 
         Client4.trackEvent('action', 'action_channels_unfavorite');
 
+        // Remove the channel from the Favorites category by adding it to its initial category, unless this has been
+        // called from the categories update logic
+        if (updateCategories) {
+            const channel = getChannelSelector(getState(), channelId);
+            const category = getCategoryInTeamByType(
+                getState(),
+                channel.team_id || getCurrentTeamId(getState()),
+                channel.type === General.DM_CHANNEL || channel.type === General.GM_CHANNEL ? CategoryTypes.DIRECT_MESSAGES : CategoryTypes.CHANNELS,
+            );
+            if (category) {
+                await dispatch(addChannelToCategory(category.id, channel.id));
+            }
+        }
+
+        // And unfavorite using the old preferences method. Note that this is inconsistent for DMs since the channel is
+        // unfavorited on all teams using the preferences method and on the the current team using the new method.
         return deletePreferences(currentUserId, [preference])(dispatch, getState);
     };
 }
