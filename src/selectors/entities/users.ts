@@ -133,7 +133,7 @@ export const isCurrentUserSystemAdmin: (state: GlobalState) => boolean = createS
     },
 );
 
-export const isCurrentUserInSystemAdminsRole: (state: GlobalState) => boolean = createSelector(
+export const currentUserHasAnAdminRole: (state: GlobalState) => boolean = createSelector(
     getCurrentUser,
     (user) => {
         const roles = user.roles || '';
