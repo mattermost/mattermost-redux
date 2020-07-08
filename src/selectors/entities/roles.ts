@@ -220,27 +220,30 @@ export const getPermissionsOnSystemConsoleResource = createSelector(
 );
 
 //return true if the current user has no permission on the resource
-export const haveIPermissionOnSysConsoleItem: (state: GlobalState, options: SysConsoleItemOptions) => boolean = createSelector(
+export const haveINoPermissionOnSysConsoleItem = createSelector(
     getMySystemPermissions,
     getPermissionsOnSystemConsoleResource,
-    (mySystemPermissions: Set<string>, permissionsOnResource: Array<string>) => {
+    (mySystemPermissions, permissionsOnResource) => {
         //go over the permissions mapped to the resource and check if the current user has any permission matching
         const commonPermissions = permissionsOnResource.filter((x) => mySystemPermissions.has(x));
-        return commonPermissions.length > 0;
+        return (commonPermissions.length === 0);
     },
 );
 
-//return true if current user has write permission on the resource
-export const haveIWritePermissionOnSysConsoleItem: (state: GlobalState, options: SysConsoleItemOptions) => boolean = createSelector(
+//return true if current user has no permission on the resource or only read permission
+export const haveINoWritePermissionOnSysConsoleItem = createSelector(
     getMySystemPermissions,
     getPermissionsOnSystemConsoleResource,
-    (mySystemPermissions: Set<string>, permissionsOnResource: Array<string>) => {
+    (mySystemPermissions, permissionsOnResource) => {
         //go over the permissions mapped to the resource and check if the current user has any permission matching
         const commonPermissions = permissionsOnResource.filter((x) => mySystemPermissions.has(x));
+
+        const noHaveRWPermission = commonPermissions.length === 0;
 
         //go over the result permissions set and check if it contains a write permission
         const haveWPermission = commonPermissions.some((permission) => permission.startsWith('write'));
 
-        return haveWPermission;
+        //return true if current user has no permission or he has a permission which is not write(hence read)
+        return (noHaveRWPermission || !haveWPermission);
     },
 );

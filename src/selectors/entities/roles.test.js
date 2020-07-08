@@ -230,9 +230,9 @@ describe('Selectors.Roles', () => {
         assert.deepEqual(Selectors.getPermissionsOnSystemConsoleResource(testState, {resourceId: 'reporting'}), [Permissions.PERMISSION_READ_SYSCONSOLE_REPORTING, Permissions.PERMISSION_WRITE_SYSCONSOLE_REPORTING]);
     });
 
-    describe('haveIPermissionOnSysConsoleItem', () => {
+    describe('haveINoPermissionOnSysConsoleItem', () => {
         it('correctly identifies permission is absent', () => {
-            assert.equal(Selectors.haveIPermissionOnSysConsoleItem(testState, {resourceId: 'reporting'}), false);
+            assert.equal(Selectors.haveINoPermissionOnSysConsoleItem(testState, {resourceId: 'reporting'}), true);
         });
 
         it('correctly identifies permission is present', () => {
@@ -248,13 +248,13 @@ describe('Selectors.Roles', () => {
                     },
                 },
             };
-            assert.equal(Selectors.haveIPermissionOnSysConsoleItem(state, {resourceId: 'reporting'}), true);
+            assert.equal(Selectors.haveINoPermissionOnSysConsoleItem(state, {resourceId: 'reporting'}), false);
         });
     });
 
-    describe('haveIWritePermissionOnSysConsoleItem', () => {
+    describe('haveINoWritePermissionOnSysConsoleItem', () => {
         it('correctly identifies permission is absent', () => {
-            // assert.equal(Selectors.haveIWritePermissionOnSysConsoleItem(testState, {resourceId: 'reporting'}), false);
+            assert.equal(Selectors.haveINoWritePermissionOnSysConsoleItem(testState, {resourceId: 'reporting'}), true);
             const state = {
                 ...testState,
                 entities: {
@@ -267,7 +267,7 @@ describe('Selectors.Roles', () => {
                     },
                 },
             };
-            assert.equal(Selectors.haveIWritePermissionOnSysConsoleItem(state, {resourceId: 'reporting'}), false);
+            assert.equal(Selectors.haveINoWritePermissionOnSysConsoleItem(state, {resourceId: 'reporting'}), true);
         });
 
         it('correctly identifies permission is present', () => {
@@ -283,7 +283,7 @@ describe('Selectors.Roles', () => {
                     },
                 },
             };
-            assert.equal(Selectors.haveIWritePermissionOnSysConsoleItem(state, {resourceId: 'reporting'}), true);
+            assert.equal(Selectors.haveINoWritePermissionOnSysConsoleItem(state, {resourceId: 'reporting'}), false);
         });
     });
 });
