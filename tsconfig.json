@@ -60,7 +60,7 @@
                 "src/action_types"
             ],
             "actions/*": [
-                "src/action_types/*"
+                "src/actions/*"
             ],
             "test/*": [
                 "test/*"
