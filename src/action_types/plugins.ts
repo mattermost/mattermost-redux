@@ -5,4 +5,5 @@ import keyMirror from 'utils/key_mirror';
 export default keyMirror({
     RECEIVED_MARKETPLACE_PLUGINS: null,
     GET_MARKETPLACE_PLUGINS_FAILURE: null,
+    RECEIVED_PLUGIN_INTEGRATIONS: null,
 });

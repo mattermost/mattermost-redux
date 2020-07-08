@@ -152,6 +152,9 @@ const state: GlobalState = {
             byId: {},
             orderByTeam: {},
         },
+        plugins: {
+            mobilePluginIntegrations: [],
+        },
     },
     errors: [],
     requests: {

@@ -3066,6 +3066,20 @@ export default class Client4 {
         );
     };
 
+    executePluginIntegration = async (pluginId: string, requestURL: string, body?: any) => {
+        return this.doFetch(
+            requestURL,
+            {method: 'post', body: JSON.stringify(body)},
+        );
+    }
+
+    getMobilePluginIntegrations = async () => {
+        return this.doFetch(
+            this.getBaseRoute() + '/pluginIntegrations?scope=webapp',
+            {method: 'get'},
+        );
+    }
+
     getGroupsAssociatedToTeam = (teamID: string, q = '', page = 0, perPage = PER_PAGE_DEFAULT, filterAllowReference = false) => {
         this.trackEvent('api', 'api_groups_get_associated_to_team', {team_id: teamID});
 
