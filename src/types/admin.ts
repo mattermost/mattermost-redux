@@ -11,6 +11,11 @@ import {Team} from './teams';
 import {UserAccessToken, UserProfile} from './users';
 import {Dictionary, RelationOneToOne} from './utilities';
 
+export type ConsoleAccess = {
+    read: Record<string, boolean>;
+    write: Record<string, boolean>;
+}
+
 export type AdminState = {
     logs: Array<string>;
     audits: Dictionary<Audit>;
