@@ -21,6 +21,7 @@ import {
     isSystemAdmin,
     profileListToMap,
     sortByUsername,
+    applyRolesFilters,
 } from 'utils/user_utils';
 
 import {Channel, ChannelMembership} from 'types/channels';
@@ -40,8 +41,6 @@ import {
     RelationOneToOne,
     UsernameMappedObjects,
 } from 'types/utilities';
-
-import {General} from '../../constants';
 
 export {getCurrentUser, getCurrentUserId, getUsers};
 
@@ -263,36 +262,11 @@ export function filterProfiles(profiles: IDMappedObjects<UserProfile>, filters?:
 
     let users = Object.keys(profiles).map((key) => profiles[key]);
 
-    const shouldFilterMemberships = Boolean(memberships) && Boolean(filters?.team_roles?.length || filters?.channel_roles?.length);
-    const shouldFilterSystemRoles = Boolean(filters.role && filters.role !== '') || Boolean(filters?.roles?.length);
-    if (shouldFilterSystemRoles || shouldFilterMemberships) {
-        const filterRole = (filters.role && filters.role !== '') ? [filters.role] : [];
-        const filterRoles = filterRole.concat(filters?.roles || []).concat(filters?.team_roles || []).concat(filters?.channel_roles || []);
-        const applyRolesFilters = (roles: string, membership?: TeamMembership | ChannelMembership) => {
-            return filterRoles.some((role: string) => {
-                return (
-                    (shouldFilterSystemRoles && (
-
-                        // If role is system user then user cannot have system admin or system guest roles
-                        (role === General.SYSTEM_USER_ROLE && !roles.includes(General.SYSTEM_ADMIN_ROLE) && !roles.includes(General.SYSTEM_GUEST_ROLE) && roles.includes(role)) ||
-                        (role !== General.SYSTEM_USER_ROLE && roles.includes(role))
-                    )) ||
-                    (
-
-                        // If user is a system admin or a system guest then ignore team and channel memberships
-                        shouldFilterMemberships && !roles.includes(General.SYSTEM_ADMIN_ROLE) && !roles.includes(General.SYSTEM_GUEST_ROLE) && (
-                            (role === General.TEAM_ADMIN_ROLE && membership?.scheme_admin) ||
-                            (role === General.CHANNEL_ADMIN_ROLE && membership?.scheme_admin) ||
-                            (role === General.TEAM_USER_ROLE && membership?.scheme_user && !membership?.scheme_admin) ||
-                            (role === General.CHANNEL_USER_ROLE && membership?.scheme_user && !membership?.scheme_admin)
-                        )
-                    )
-                );
-            });
-        };
-
+    const filterRole = (filters.role && filters.role !== '') ? [filters.role] : [];
+    const filterRoles = filterRole.concat(filters?.roles || []).concat(filters?.team_roles || []).concat(filters?.channel_roles || []);
+    if (filterRoles.length > 0) {
         users = users.filter((user) => {
-            return user.roles && applyRolesFilters(user.roles, ((memberships && memberships[user.id]) || undefined));
+            return user.roles && applyRolesFilters(user, filterRoles, ((memberships && memberships[user.id]) || undefined));
         });
     }
 
