@@ -111,6 +111,7 @@ export type GetFilteredUsersStatsOpts = {
     in_team?: string;
     in_channel?: string;
     include_deleted?: boolean;
+    include_bots?: boolean;
     roles?: string[];
     channel_roles?: string[];
     team_roles?: string[];
