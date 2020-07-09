@@ -1265,6 +1265,13 @@ export default class Client4 {
         );
     };
 
+    getFilteredUsersStats = (options: any) => {
+        return this.doFetch<UsersStats>(
+            `${this.getUsersRoute()}/stats/filtered${buildQueryString(options)}`,
+            {method: 'get'},
+        );
+    };
+
     invalidateAllEmailInvites = () => {
         return this.doFetch<StatusOK>(
             `${this.getTeamsRoute()}/invites/email`,

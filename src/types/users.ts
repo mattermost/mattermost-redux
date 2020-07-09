@@ -104,7 +104,16 @@ export type UserAccessToken = {
 };
 
 export type UsersStats = {
-    total_user_count: number;
+    total_users_count: number;
+};
+
+export type GetFilteredUsersStatsOpts = {
+    in_team?: string;
+    in_channel?: string;
+    include_deleted?: boolean;
+    roles?: string[];
+    channel_roles?: string[];
+    team_roles?: string[];
 };
 
 export type AuthChangeResponse = {
