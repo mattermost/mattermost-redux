@@ -84,6 +84,7 @@ import {
     UserProfile,
     UsersStats,
     UserStatus,
+    GetFilteredUsersStatsOpts,
 } from 'types/users';
 import {$ID, RelationOneToOne} from 'types/utilities';
 
@@ -1265,7 +1266,7 @@ export default class Client4 {
         );
     };
 
-    getFilteredUsersStats = (options: any) => {
+    getFilteredUsersStats = (options: GetFilteredUsersStatsOpts) => {
         return this.doFetch<UsersStats>(
             `${this.getUsersRoute()}/stats/filtered${buildQueryString(options)}`,
             {method: 'get'},

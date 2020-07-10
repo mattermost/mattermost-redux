@@ -175,15 +175,14 @@ export function sortByUsername(a: UserProfile, b: UserProfile): number {
 }
 
 export function applyRolesFilters(user: UserProfile, filterRoles: string[], membership?: TeamMembership | ChannelMembership): boolean {
-    const roles = user.roles;
-    const userIsNotAdminOrGuest = !roles.includes(General.SYSTEM_ADMIN_ROLE) && !roles.includes(General.SYSTEM_GUEST_ROLE);
+    const userIsNotAdminOrGuest = !user.roles.includes(General.SYSTEM_ADMIN_ROLE) && !user.roles.includes(General.SYSTEM_GUEST_ROLE);
     return filterRoles.some((role: string) => {
         const isSystemRole = role.includes('system');
         return (
             (
 
                 // If role is system user then user cannot have system admin or system guest roles
-                isSystemRole && roles.includes(role) && (
+                isSystemRole && user.roles.includes(role) && (
                     (role === General.SYSTEM_USER_ROLE && userIsNotAdminOrGuest) ||
                     role !== General.SYSTEM_USER_ROLE
                 )

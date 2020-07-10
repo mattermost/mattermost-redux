@@ -266,7 +266,7 @@ export function filterProfiles(profiles: IDMappedObjects<UserProfile>, filters?:
     const filterRoles = filterRole.concat(filters?.roles || []).concat(filters?.team_roles || []).concat(filters?.channel_roles || []);
     if (filterRoles.length > 0) {
         users = users.filter((user) => {
-            return user.roles && applyRolesFilters(user, filterRoles, ((memberships && memberships[user.id]) || undefined));
+            return user.roles.length > 0 && applyRolesFilters(user, filterRoles, memberships?.[user.id]);
         });
     }
 
@@ -354,6 +354,10 @@ export function getStatusForUserId(state: GlobalState, userId: $ID<UserProfile>)
 
 export function getTotalUsersStats(state: GlobalState): any {
     return state.entities.users.stats;
+}
+
+export function getFilteredUsersStats(state: GlobalState): any {
+    return state.entities.users.filteredStats;
 }
 
 export function searchProfiles(state: GlobalState, term: string, skipCurrent = false, filters?: Filters): Array<UserProfile> {

@@ -563,5 +563,21 @@ describe('Reducers.users', () => {
             const newState = reducer(state, action);
             assert.deepEqual(newState.profilesNotInChannel, expectedState.profilesNotInChannel);
         });
+
+        it('UserTypes.RECEIVED_FILTERED_USER_STATS', () => {
+            const state = {
+                filteredStats: {},
+            };
+            const action = {
+                type: UserTypes.RECEIVED_FILTERED_USER_STATS,
+                data: {total_users_count: 1},
+            };
+            const expectedState = {
+                filteredStats: {total_users_count: 1},
+            };
+
+            const newState = reducer(state, action);
+            assert.deepEqual(newState.filteredStats, expectedState.filteredStats);
+        });
     });
 });

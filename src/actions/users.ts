@@ -2,7 +2,7 @@
 // See LICENSE.txt for license information.
 
 import {Action, ActionFunc, ActionResult, batchActions, DispatchFunc, GetStateFunc} from 'types/actions';
-import {UserProfile, UserStatus, GetFilteredUsersStatsOpts} from 'types/users';
+import {UserProfile, UserStatus, GetFilteredUsersStatsOpts, UsersStats} from 'types/users';
 import {TeamMembership} from 'types/teams';
 import {Client4} from 'client';
 import {General} from '../constants';
@@ -269,14 +269,21 @@ export function getTotalUsersStats(): ActionFunc {
 
 export function getFilteredUsersStats(options: GetFilteredUsersStatsOpts = {}): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
+        let stats: UsersStats;
         try {
-            const stats = await Client4.getFilteredUsersStats(options);
-            return {data: stats};
+            stats = await Client4.getFilteredUsersStats(options);
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch, getState);
             dispatch(logError(error));
             return {error};
         }
+
+        dispatch({
+            type: UserTypes.RECEIVED_FILTERED_USER_STATS,
+            data: stats,
+        });
+
+        return {data: stats};
     };
 }
 
