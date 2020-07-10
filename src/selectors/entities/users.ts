@@ -263,7 +263,7 @@ export function filterProfiles(profiles: IDMappedObjects<UserProfile>, filters?:
     let users = Object.keys(profiles).map((key) => profiles[key]);
 
     const filterRole = (filters.role && filters.role !== '') ? [filters.role] : [];
-    const filterRoles = filterRole.concat(filters?.roles || []).concat(filters?.team_roles || []).concat(filters?.channel_roles || []);
+    const filterRoles = [...filterRole, ...(filters.roles || []), ...(filters.team_roles || []), ...(filters.channel_roles || [])];
     if (filterRoles.length > 0) {
         users = users.filter((user) => {
             return user.roles.length > 0 && applyRolesFilters(user, filterRoles, memberships?.[user.id]);
