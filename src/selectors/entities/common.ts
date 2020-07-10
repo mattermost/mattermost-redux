@@ -28,13 +28,13 @@ export const getMyCurrentChannelMembership: (a: GlobalState) => ChannelMembershi
 );
 
 export function getMembersInChannel(state: GlobalState, channelId: string): UserIDMappedObjects<ChannelMembership> {
-    return state.entities.channels.membersInChannel[channelId];
+    return state.entities.channels?.membersInChannel?.[channelId] || {};
 }
 
 // Teams
 
 export function getMembersInTeam(state: GlobalState, teamId: string): RelationOneToOne<UserProfile, TeamMembership> {
-    return state.entities.teams.membersInTeam[teamId];
+    return state.entities.teams?.membersInTeam?.[teamId] || {};
 }
 
 // Users
