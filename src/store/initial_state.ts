@@ -29,7 +29,6 @@ const state: GlobalState = {
             profilesInGroup: {},
             statuses: {},
             stats: {},
-            filteredStats: {},
         },
         teams: {
             currentTeamId: '',

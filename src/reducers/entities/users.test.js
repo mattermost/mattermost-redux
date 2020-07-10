@@ -565,9 +565,7 @@ describe('Reducers.users', () => {
         });
 
         it('UserTypes.RECEIVED_FILTERED_USER_STATS', () => {
-            const state = {
-                filteredStats: {},
-            };
+            const state = {};
             const action = {
                 type: UserTypes.RECEIVED_FILTERED_USER_STATS,
                 data: {total_users_count: 1},

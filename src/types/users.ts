@@ -70,7 +70,7 @@ export type UsersState = {
     profilesInGroup: RelationOneToMany<Group, UserProfile>;
     statuses: RelationOneToOne<UserProfile, string>;
     stats: RelationOneToOne<UserProfile, UsersStats>;
-    filteredStats: UsersStats | {};
+    filteredStats?: UsersStats;
 };
 
 export type UserTimezone = {
