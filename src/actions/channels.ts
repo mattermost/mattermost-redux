@@ -21,7 +21,7 @@ import {getCurrentTeamId} from 'selectors/entities/teams';
 
 import {Action, ActionFunc, batchActions, DispatchFunc, GetStateFunc} from 'types/actions';
 
-import {Channel, ChannelNotifyProps, ChannelMembership, ChannelModerationPatch, ChannelsWithTotalCount} from 'types/channels';
+import {Channel, ChannelNotifyProps, ChannelMembership, ChannelModerationPatch, ChannelsWithTotalCount, ChannelSearchOpts} from 'types/channels';
 
 import {PreferenceType} from 'types/preferences';
 
@@ -1079,13 +1079,13 @@ export function searchChannels(teamId: string, term: string, archived?: boolean)
     };
 }
 
-export function searchAllChannels(term: string, notAssociatedToGroup = '', excludeDefaultChannels = false, page?: number, perPage?: number, includeDeleted = false): ActionFunc {
+export function searchAllChannels(term: string, opts: ChannelSearchOpts = {}): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         dispatch({type: ChannelTypes.GET_ALL_CHANNELS_REQUEST, data: null});
 
         let response;
         try {
-            response = await Client4.searchAllChannels(term, notAssociatedToGroup, excludeDefaultChannels, page, perPage, includeDeleted) as ChannelsWithTotalCount;
+            response = await Client4.searchAllChannels(term, opts) as ChannelsWithTotalCount;
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch, getState);
             dispatch(batchActions([
