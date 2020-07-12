@@ -5,8 +5,7 @@ import {ChannelCategoryType} from 'types/channel_categories';
 
 export const CategoryTypes: {[name: string]: ChannelCategoryType} = {
     FAVORITES: 'favorites',
-    PUBLIC: 'public',
-    PRIVATE: 'private',
+    CHANNELS: 'channels',
     DIRECT_MESSAGES: 'direct_messages',
     CUSTOM: 'custom',
 };

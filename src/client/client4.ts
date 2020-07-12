@@ -6,6 +6,7 @@ import {ClusterInfo, AnalyticsRow} from 'types/admin';
 import {Audit} from 'types/audits';
 import {UserAutocomplete, AutocompleteSuggestion} from 'types/autocomplete';
 import {Bot, BotPatch} from 'types/bots';
+import {ChannelCategory, OrderedChannelCategories} from 'types/channel_categories';
 import {
     Channel,
     ChannelMemberCountsByGroup,
@@ -121,6 +122,7 @@ export default class Client4 {
     userId = '';
     diagnosticId = '';
     includeCookies = true;
+    isRudderKeySet = false;
     translations = {
         connectionError: 'There appears to be a problem with your internet connection.',
         unknownError: 'We received an unexpected status code from the server.',
@@ -180,6 +182,10 @@ export default class Client4 {
 
     setDiagnosticId(diagnosticId: string) {
         this.diagnosticId = diagnosticId;
+    }
+
+    enableRudderEvents() {
+        this.isRudderKeySet = true;
     }
 
     getServerVersion() {
@@ -244,6 +250,10 @@ export default class Client4 {
 
     getChannelSchemeRoute(channelId: string) {
         return `${this.getChannelRoute(channelId)}/scheme`;
+    }
+
+    getChannelCategoriesRoute(userId: string, teamId: string) {
+        return `${this.getBaseRoute()}/users/${userId}/teams/${teamId}/channels/categories`;
     }
 
     getPostsRoute() {
@@ -1718,6 +1728,64 @@ export default class Client4 {
         );
     };
 
+    // Channel Category Routes
+
+    getChannelCategories = (userId: string, teamId: string) => {
+        return this.doFetch<OrderedChannelCategories>(
+            `${this.getChannelCategoriesRoute(userId, teamId)}`,
+            {method: 'get'},
+        );
+    };
+
+    createChannelCategory = (userId: string, teamId: string, category: Partial<ChannelCategory>) => {
+        return this.doFetch<ChannelCategory>(
+            `${this.getChannelCategoriesRoute(userId, teamId)}`,
+            {method: 'post', body: JSON.stringify(category)},
+        );
+    };
+
+    updateChannelCategories = (userId: string, teamId: string, categories: ChannelCategory[]) => {
+        return this.doFetch<ChannelCategory[]>(
+            `${this.getChannelCategoriesRoute(userId, teamId)}`,
+            {method: 'put', body: JSON.stringify(categories)},
+        );
+    };
+
+    getChannelCategoryOrder = (userId: string, teamId: string) => {
+        return this.doFetch<string[]>(
+            `${this.getChannelCategoriesRoute(userId, teamId)}/order`,
+            {method: 'get'},
+        );
+    };
+
+    updateChannelCategoryOrder = (userId: string, teamId: string, categoryOrder: string[]) => {
+        return this.doFetch<string[]>(
+            `${this.getChannelCategoriesRoute(userId, teamId)}/order`,
+            {method: 'put', body: JSON.stringify(categoryOrder)},
+        );
+    };
+
+    getChannelCategory = (userId: string, teamId: string, categoryId: string) => {
+        return this.doFetch<ChannelCategory>(
+            `${this.getChannelCategoriesRoute(userId, teamId)}/${categoryId}`,
+            {method: 'get'},
+        );
+    };
+
+    updateChannelCategory = (userId: string, teamId: string, category: ChannelCategory) => {
+        return this.doFetch<ChannelCategory>(
+            `${this.getChannelCategoriesRoute(userId, teamId)}/${category.id}`,
+            {method: 'put', body: JSON.stringify(category)},
+        );
+    };
+
+    deleteChannelCategory = (userId: string, teamId: string, categoryId: string) => {
+        return this.doFetch<ChannelCategory>(
+            `${this.getChannelCategoriesRoute(userId, teamId)}/${categoryId}`,
+            {method: 'delete'},
+        );
+    }
+
     // Post Routes
 
     createPost = async (post: Post) => {
@@ -2201,9 +2269,9 @@ export default class Client4 {
         );
     };
 
-    getCommandAutocompleteSuggestionsList = (userInput: string, teamId: string) => {
+    getCommandAutocompleteSuggestionsList = (userInput: string, teamId: string, commandArgs: {}) => {
         return this.doFetch<AutocompleteSuggestion[]>(
-            `${this.getTeamRoute(teamId)}/commands/autocomplete_suggestions${buildQueryString({user_input: userInput})}`,
+            `${this.getTeamRoute(teamId)}/commands/autocomplete_suggestions${buildQueryString({...commandArgs, user_input: userInput})}`,
             {method: 'get'},
         );
     };
@@ -3255,6 +3323,10 @@ export default class Client4 {
     };
 
     trackEvent(category: string, event: string, props?: any) {
+        if (!this.isRudderKeySet) {
+            return;
+        }
+
         const properties = Object.assign({
             category,
             type: event,
