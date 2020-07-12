@@ -170,6 +170,10 @@ export function moveChannelToCategory(categoryId: string, channelId: string, new
         const category = getCategory(state, categoryId);
         const currentUserId = getCurrentUserId(state);
 
+        const originalCategories = [{
+            ...category,
+        }];
+
         // Add the channel to the new category
         const categories = [{
             ...category,
@@ -186,17 +190,21 @@ export function moveChannelToCategory(categoryId: string, channelId: string, new
             });
         }
 
-        dispatch({
+        const result = dispatch({
             type: ChannelCategoryTypes.RECEIVED_CATEGORIES,
             data: categories,
         });
 
-        let data;
         try {
-            data = await Client4.updateChannelCategories(currentUserId, category.team_id, categories);
+            await Client4.updateChannelCategories(currentUserId, category.team_id, categories);
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch, getState);
             dispatch(logError(error));
+
+            dispatch({
+                type: ChannelCategoryTypes.RECEIVED_CATEGORIES,
+                data: originalCategories,
+            });
             return {error};
         }
 
@@ -206,11 +214,7 @@ export function moveChannelToCategory(categoryId: string, channelId: string, new
         } else if (originalCategory && originalCategory.type === CategoryTypes.FAVORITES) {
             await dispatch(unfavoriteChannel(channelId, false));
         }
-
-        return dispatch({
-            type: ChannelCategoryTypes.RECEIVED_CATEGORIES,
-            data,
-        });
+        return result;
     };
 }
 
