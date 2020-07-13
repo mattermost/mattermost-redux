@@ -50,12 +50,12 @@ export function generateMfaSecret(userId: string): ActionFunc {
     });
 }
 
-export function createUser(user: UserProfile, token: string, inviteId: string): ActionFunc {
+export function createUser(user: UserProfile, token: string, inviteId: string, redirect: string): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         let created;
 
         try {
-            created = await Client4.createUser(user, token, inviteId);
+            created = await Client4.createUser(user, token, inviteId, redirect);
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch, getState);
             dispatch(logError(error));
