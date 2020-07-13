@@ -169,7 +169,7 @@ describe('user utils', () => {
                 [General.SYSTEM_ADMIN_ROLE, true],
                 [General.SYSTEM_USER_MANAGER_ROLE, true],
                 [General.SYSTEM_READ_ONLY_ADMIN_ROLE, true],
-                [General.SYSTEM_RESTRICTED_ADMIN_ROLE, true],
+                [General.SYSTEM_MANAGER_ROLE, true],
                 ['non_existent', false],
                 ['foo', false],
                 ['bar', false],

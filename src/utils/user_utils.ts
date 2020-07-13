@@ -66,7 +66,7 @@ export function includesAnAdminRole(roles: string): boolean {
         General.SYSTEM_ADMIN_ROLE,
         General.SYSTEM_USER_MANAGER_ROLE,
         General.SYSTEM_READ_ONLY_ADMIN_ROLE,
-        General.SYSTEM_RESTRICTED_ADMIN_ROLE,
+        General.SYSTEM_MANAGER_ROLE,
     ].some((el) => rolesArray.includes(el));
 }
 
