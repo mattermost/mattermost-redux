@@ -392,6 +392,21 @@ export const getAllDirectChannels: (state: GlobalState) => Array<Channel> = crea
     },
 );
 
+export const getAllDirectChannelsNameMapInCurrentTeam: (state: GlobalState) => NameMappedObjects<Channel> = createSelector(
+    getAllChannels,
+    getDirectChannelsSet,
+    (state: GlobalState): UsersState => state.entities.users,
+    getTeammateNameDisplaySetting,
+    (channels: IDMappedObjects<Channel>, channelSet: Set<string>, users: UsersState, teammateNameDisplay: string): NameMappedObjects<Channel> => {
+        const channelMap: NameMappedObjects<Channel> = {};
+        channelSet.forEach((id) => {
+            const channel = channels[id];
+            channelMap[channel.name] = completeDirectChannelInfo(users, teammateNameDisplay, channel);
+        });
+        return channelMap;
+    },
+);
+
 // Returns only GMs
 export const getGroupChannels: (state: GlobalState) => Array<Channel> = createSelector(
     getAllChannels,
