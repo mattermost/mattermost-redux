@@ -212,7 +212,7 @@ export const haveICurrentChannelPermission: (state: GlobalState, options: Permis
 );
 
 //gets the permission set mapped to the current resource
-export const getPermissionsOnSystemConsoleResource = createSelector(
+export const getPermissionsOnSystemConsoleResource: (state: GlobalState, options: SysConsoleItemOptions) => string[] = createSelector(
     (state: GlobalState, options: SysConsoleItemOptions) => options.resourceId,
     (resourceId: string) => {
         return ResourceToSysConsolePermissionsTable[resourceId];
@@ -220,7 +220,7 @@ export const getPermissionsOnSystemConsoleResource = createSelector(
 );
 
 //return true if the current user has no permission on the resource
-export const haveINoPermissionOnSysConsoleItem = createSelector(
+export const haveINoPermissionOnSysConsoleItem: (state: GlobalState, options: SysConsoleItemOptions) => boolean = createSelector(
     getMySystemPermissions,
     getPermissionsOnSystemConsoleResource,
     (mySystemPermissions, permissionsOnResource) => {
@@ -231,7 +231,7 @@ export const haveINoPermissionOnSysConsoleItem = createSelector(
 );
 
 //return true if current user has no permission on the resource or only read permission
-export const haveINoWritePermissionOnSysConsoleItem = createSelector(
+export const haveINoWritePermissionOnSysConsoleItem: (state: GlobalState, options: SysConsoleItemOptions) => boolean = createSelector(
     getMySystemPermissions,
     getPermissionsOnSystemConsoleResource,
     (mySystemPermissions, permissionsOnResource) => {
