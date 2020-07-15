@@ -170,7 +170,7 @@ export function moveChannelToCategory(categoryId: string, channelId: string, new
         const category = getCategory(state, categoryId);
         const currentUserId = getCurrentUserId(state);
 
-        const originalCategories = [{
+        const sourceCategories = [{
             ...category,
         }];
 
@@ -203,7 +203,7 @@ export function moveChannelToCategory(categoryId: string, channelId: string, new
 
             dispatch({
                 type: ChannelCategoryTypes.RECEIVED_CATEGORIES,
-                data: originalCategories,
+                data: sourceCategories,
             });
             return {error};
         }
