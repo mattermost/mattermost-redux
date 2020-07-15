@@ -342,7 +342,7 @@ describe('Actions.Groups', () => {
             get(`/teams/${teamID}/groups?paginate=false&filter_allow_reference=false&include_member_count=true`).
             reply(200, response);
 
-        await Actions.getAllGroupsAssociatedToTeam(teamID)(store.dispatch, store.getState);
+        await Actions.getAllGroupsAssociatedToTeam(teamID, false, true)(store.dispatch, store.getState);
 
         const state = store.getState();
 
@@ -506,7 +506,7 @@ describe('Actions.Groups', () => {
             get(`/channels/${channelID}/groups?paginate=false&filter_allow_reference=false&include_member_count=true`).
             reply(200, response);
 
-        await Actions.getAllGroupsAssociatedToChannel(channelID)(store.dispatch, store.getState);
+        await Actions.getAllGroupsAssociatedToChannel(channelID, false, true)(store.dispatch, store.getState);
 
         const state = store.getState();
 
