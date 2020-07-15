@@ -42,6 +42,7 @@ export type ClientConfig = {
     EmailLoginButtonColor: string;
     EmailLoginButtonTextColor: string;
     EmailNotificationContentsType: string;
+    EnableAskCommunityLink: string;
     EnableBanner: string;
     EnableBotAccountCreation: string;
     EnableChannelViewedMessages: string;
