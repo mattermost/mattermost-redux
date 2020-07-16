@@ -70,6 +70,7 @@ export type UsersState = {
     profilesInGroup: RelationOneToMany<Group, UserProfile>;
     statuses: RelationOneToOne<UserProfile, string>;
     stats: RelationOneToOne<UserProfile, UsersStats>;
+    filteredStats?: UsersStats;
 };
 
 export type UserTimezone = {
@@ -104,7 +105,17 @@ export type UserAccessToken = {
 };
 
 export type UsersStats = {
-    total_user_count: number;
+    total_users_count: number;
+};
+
+export type GetFilteredUsersStatsOpts = {
+    in_team?: string;
+    in_channel?: string;
+    include_deleted?: boolean;
+    include_bots?: boolean;
+    roles?: string[];
+    channel_roles?: string[];
+    team_roles?: string[];
 };
 
 export type AuthChangeResponse = {
