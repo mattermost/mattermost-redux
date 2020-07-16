@@ -1210,14 +1210,14 @@ describe('Actions.Admin', () => {
         // This test doesn't appear to actually check anything?
     });
 
-    it('sendWarnMetricAck', async () => {
+    it('requestTrialLicenseAndAckWarnMetric', async () => {
         const warnMetricAck = {
             id: 'metric1',
         };
         nock(Client4.getBaseRoute()).
-            post('/warn_metrics/ack').
+            post('/warn_metrics/trial-license-ack').
             reply(200, OK_RESPONSE);
 
-        await Actions.sendWarnMetricAck(warnMetricAck.id, false)(store.dispatch, store.getState);
+        await Actions.requestTrialLicenseAndAckWarnMetric(warnMetricAck.id, false)(store.dispatch, store.getState);
     });
 });

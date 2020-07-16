@@ -808,4 +808,5 @@ export type WarnMetricStatus = {
     id: string;
     aae_id: string;
     limit: number;
+    acked: boolean;
 };

@@ -605,15 +605,15 @@ export function setSamlIdpCertificateFromMetadata(certData: string): ActionFunc 
     });
 }
 
-export function sendWarnMetricAck(warnMetricId: string, forceAck: boolean) {
+export function requestTrialLicenseAndAckWarnMetric(warnMetricId: string) {
     return async (dispatch: DispatchFunc) => {
         try {
-            await Client4.sendWarnMetricAck(warnMetricId, forceAck);
-        } catch (error) {
-            dispatch(logError(error));
-            return {error};
+            Client4.trackEvent('api', 'api_request_send_metric_ack', {warnMetricId});
+            await Client4.requestTrialLicenseAndAckWarnMetric(warnMetricId);
+            return {data: true};
+        } catch (e) {
+            dispatch(logError(e));
+            return {error: e.message};
         }
-
-        return {data: true};
     };
 }

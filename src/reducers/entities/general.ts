@@ -114,7 +114,9 @@ function warnMetricsStatus(state: any = {}, action: GenericAction) {
     }
     case GeneralTypes.WARN_METRIC_STATUS_REMOVED: {
         const nextState = {...state};
-        Reflect.deleteProperty(nextState, action.data.id);
+        const newParams = Object.assign({}, nextState[action.data.id]);
+        newParams.acked = true;
+        nextState[action.data.id] = newParams;
         return nextState;
     }
     default:
