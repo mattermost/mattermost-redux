@@ -84,6 +84,7 @@ import {
     UserProfile,
     UsersStats,
     UserStatus,
+    GetFilteredUsersStatsOpts,
 } from 'types/users';
 import {$ID, RelationOneToOne} from 'types/utilities';
 
@@ -430,7 +431,7 @@ export default class Client4 {
 
     // User Routes
 
-    createUser = (user: UserProfile, token: string, inviteId: string) => {
+    createUser = (user: UserProfile, token: string, inviteId: string, redirect: string) => {
         this.trackEvent('api', 'api_users_create');
 
         const queryParams: any = {};
@@ -441,6 +442,10 @@ export default class Client4 {
 
         if (inviteId) {
             queryParams.iid = inviteId;
+        }
+
+        if (redirect) {
+            queryParams.r = redirect;
         }
 
         return this.doFetch<UserProfile>(
@@ -1261,6 +1266,13 @@ export default class Client4 {
     getTotalUsersStats = () => {
         return this.doFetch<UsersStats>(
             `${this.getUsersRoute()}/stats`,
+            {method: 'get'},
+        );
+    };
+
+    getFilteredUsersStats = (options: GetFilteredUsersStatsOpts) => {
+        return this.doFetch<UsersStats>(
+            `${this.getUsersRoute()}/stats/filtered${buildQueryString(options)}`,
             {method: 'get'},
         );
     };

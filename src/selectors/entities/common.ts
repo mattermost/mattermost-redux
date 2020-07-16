@@ -4,9 +4,10 @@
 import {createSelector} from 'reselect';
 
 import {ChannelMembership, Channel} from 'types/channels';
+import {TeamMembership} from 'types/teams';
 import {GlobalState} from 'types/store';
 import {UserProfile} from 'types/users';
-import {RelationOneToOne, IDMappedObjects} from 'types/utilities';
+import {RelationOneToOne, IDMappedObjects, UserIDMappedObjects} from 'types/utilities';
 
 // Channels
 
@@ -25,6 +26,16 @@ export const getMyCurrentChannelMembership: (a: GlobalState) => ChannelMembershi
         return channelMemberships[currentChannelId] || null;
     },
 );
+
+export function getMembersInChannel(state: GlobalState, channelId: string): UserIDMappedObjects<ChannelMembership> {
+    return state.entities.channels?.membersInChannel?.[channelId] || {};
+}
+
+// Teams
+
+export function getMembersInTeam(state: GlobalState, teamId: string): RelationOneToOne<UserProfile, TeamMembership> {
+    return state.entities.teams?.membersInTeam?.[teamId] || {};
+}
 
 // Users
 
