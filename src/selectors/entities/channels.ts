@@ -50,7 +50,6 @@ import {
 } from 'types/utilities';
 
 import {
-    buildDisplayableChannelListWithUnreadSection,
     canManageMembersOldPermissions,
     completeDirectChannelInfo,
     completeDirectChannelDisplayName,
@@ -427,51 +426,6 @@ export const getOtherChannels: (state: GlobalState, archived?: boolean | null) =
     (state: GlobalState, archived: boolean | undefined | null = true) => archived,
     (channels: Array<Channel>, myMembers: RelationOneToOne<Channel, ChannelMembership>, archived?: boolean | null): Array<Channel> => {
         return channels.filter((c) => !myMembers.hasOwnProperty(c.id) && c.type === General.OPEN_CHANNEL && (archived ? true : c.delete_at === 0));
-    },
-);
-
-export const getArchivedChannels: (state: GlobalState) => Array<Channel> = createSelector(
-    getChannelsInCurrentTeam,
-    getMyChannelMemberships,
-    (channels: Array<Channel>, myMembers: RelationOneToOne<Channel, ChannelMembership>): Array<Channel> => {
-        return channels.filter((c) => myMembers.hasOwnProperty(c.id) && c.delete_at !== 0);
-    },
-);
-
-export const getChannelsWithUnreadSection: (state: GlobalState) => {
-    unreadChannels: Array<Channel>;
-    favoriteChannels: Array<Channel>;
-    publicChannels: Array<Channel>;
-    privateChannels: Array<Channel>;
-    directAndGroupChannels: Array<Channel>;
-} = createSelector(
-    getCurrentChannelId,
-    getMyChannels,
-    getMyChannelMemberships,
-    getConfig,
-    getMyPreferences,
-    getTeammateNameDisplaySetting,
-    (state: GlobalState): UsersState => state.entities.users,
-    getLastPostPerChannel,
-    (
-        currentChannelId: string,
-        channels: Array<Channel>,
-        myMembers: RelationOneToOne<Channel, ChannelMembership>,
-        config: ClientConfig,
-        myPreferences: {
-            [x: string]: PreferenceType;
-        },
-        teammateNameDisplay: string,
-        usersState: UsersState,
-        lastPosts: RelationOneToOne<Channel, Post>,
-    ) => {
-        const allChannels = channels.map((c) => {
-            const channel = {...c,
-            };
-            channel.isCurrent = c.id === currentChannelId;
-            return channel;
-        });
-        return buildDisplayableChannelListWithUnreadSection(usersState, allChannels, myMembers, config, myPreferences, teammateNameDisplay, lastPosts);
     },
 );
 
