@@ -2143,10 +2143,10 @@ export default class Client4 {
         );
     };
 
-    requestTrialLicenseAndAckWarnMetric = async (warnMetricId: string) => {
+    sendWarnMetricAck = async (warnMetricId: string, forceAckVal: boolean) => {
         return this.doFetch(
-            `${this.getBaseRoute()}/warn_metrics/trial-license-ack/${encodeURI(warnMetricId)}`,
-            {method: 'post'},
+            `${this.getBaseRoute()}/warn_metrics/ack/${encodeURI(warnMetricId)}`,
+            {method: 'post', body: JSON.stringify({forceAck: forceAckVal})},
         );
     }
 
