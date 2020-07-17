@@ -215,10 +215,6 @@ export const haveICurrentChannelPermission: (state: GlobalState, options: Permis
 export const getPermissionsOnSystemConsoleResource: (state: GlobalState, options: SysConsoleItemOptions) => string[] = createSelector(
     (state: GlobalState, options: SysConsoleItemOptions) => options.resourceId,
     (resourceId: string) => {
-        const resourceIDParts = resourceId.split('.');
-        if (resourceIDParts.length > 1) {
-            return ResourceToSysConsolePermissionsTable[resourceIDParts[0]] || ResourceToSysConsolePermissionsTable[resourceId];
-        }
         return ResourceToSysConsolePermissionsTable[resourceId];
     },
 );
