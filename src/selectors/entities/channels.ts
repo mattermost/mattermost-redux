@@ -4,7 +4,9 @@
 import {createSelector} from 'reselect';
 
 import {General, Permissions} from '../../constants';
+import {CategoryTypes} from 'constants/channel_categories';
 
+import {getCategoryInTeamByType} from 'selectors/entities/channel_categories';
 import {
     getCurrentChannelId,
     getCurrentUser,
@@ -20,6 +22,7 @@ import {
     getTeammateNameDisplaySetting,
     getVisibleTeammate,
     getVisibleGroupIds,
+    getNewSidebarPreference,
 } from 'selectors/entities/preferences';
 import {haveICurrentChannelPermission, haveIChannelPermission, haveITeamPermission} from 'selectors/entities/roles';
 import {
@@ -59,7 +62,7 @@ import {
     isDirectChannelVisible,
     isGroupChannelVisible,
     sortChannelsByDisplayName,
-    isFavoriteChannel,
+    isFavoriteChannelOld,
     isDefault,
     sortChannelsByRecency,
 } from 'utils/channel_utils';
@@ -252,13 +255,11 @@ export const getCurrentChannelStats: (state: GlobalState) => ChannelStats = crea
     },
 );
 
-export const isCurrentChannelFavorite: (state: GlobalState) => boolean = createSelector(
-    getMyPreferences,
-    getCurrentChannelId,
-    (preferences: {[x: string]: PreferenceType}, channelId: string): boolean => {
-        return isFavoriteChannel(preferences, channelId);
-    },
-);
+export function isCurrentChannelFavorite(state: GlobalState): boolean {
+    const currentChannelId = getCurrentChannelId(state);
+
+    return isFavoriteChannel(state, currentChannelId);
+}
 
 export const isCurrentChannelMuted: (state: GlobalState) => boolean = createSelector(
     getMyCurrentChannelMembership,
@@ -1295,4 +1296,23 @@ export function getChannelModerations(state: GlobalState, channelId: string): Ar
 
 export function getChannelMemberCountsByGroup(state: GlobalState, channelId: string): ChannelMemberCountsByGroup {
     return state.entities.channels.channelMemberCountsByGroup[channelId] || {};
+}
+
+export function isFavoriteChannel(state: GlobalState, channelId: string): boolean {
+    if (getNewSidebarPreference(state)) {
+        const channel = getChannel(state, channelId);
+        if (!channel) {
+            return false;
+        }
+
+        const category = getCategoryInTeamByType(state, channel.team_id || getCurrentTeamId(state), CategoryTypes.FAVORITES);
+
+        if (!category) {
+            return false;
+        }
+
+        return category.channel_ids.includes(channel.id);
+    }
+
+    return isFavoriteChannelOld(getMyPreferences(state), channelId);
 }
