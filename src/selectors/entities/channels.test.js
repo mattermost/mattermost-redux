@@ -3,11 +3,16 @@
 
 import assert from 'assert';
 
-import deepFreezeAndThrowOnMutation from 'utils/deep_freeze';
-import TestHelper from 'test/test_helper';
-import {sortChannelsByDisplayName, getDirectChannelName} from 'utils/channel_utils';
-import * as Selectors from 'selectors/entities/channels';
 import {General, Preferences, Permissions} from '../../constants';
+import {CategoryTypes} from 'constants/channel_categories';
+
+import mergeObjects from 'test/merge_objects';
+import TestHelper from 'test/test_helper';
+
+import {sortChannelsByDisplayName, getDirectChannelName} from 'utils/channel_utils';
+import deepFreezeAndThrowOnMutation from 'utils/deep_freeze';
+
+import * as Selectors from './channels';
 
 const sortUsernames = (a, b) => a.localeCompare(b, General.DEFAULT_LOCALE, {numeric: true});
 
@@ -1016,6 +1021,9 @@ describe('Selectors.Channels.isCurrentChannelFavorite', () => {
             channels: {
                 currentChannelId: channel1.id,
             },
+            general: {
+                config: {},
+            },
             preferences: {
                 myPreferences,
             },
@@ -1029,6 +1037,9 @@ describe('Selectors.Channels.isCurrentChannelFavorite', () => {
             entities: {
                 channels: {
                     currentChannelId: channel2.id,
+                },
+                general: {
+                    config: {},
                 },
                 preferences: {
                     myPreferences,
@@ -3657,4 +3668,110 @@ test('Selectors.Channels.getChannelMemberCountsByGroup', () => {
     assert.deepEqual(Selectors.getChannelMemberCountsByGroup(state, 'channel1'), memberCounts);
     assert.deepEqual(Selectors.getChannelMemberCountsByGroup(state, undefined), {});
     assert.deepEqual(Selectors.getChannelMemberCountsByGroup(state, 'undefined'), {});
+});
+
+describe('isFavoriteChannel', () => {
+    test('should use preferences if old sidebar is enabled', () => {
+        const channelId = 'channelId';
+        const preferenceKey = `${Preferences.CATEGORY_FAVORITE_CHANNEL}--${channelId}`;
+
+        let state = {
+            entities: {
+                general: {
+                    config: {},
+                },
+                preferences: {
+                    myPreferences: {},
+                },
+            },
+        };
+
+        expect(Selectors.isFavoriteChannel(state, channelId)).toBe(false);
+
+        state = mergeObjects(state, {
+            entities: {
+                preferences: {
+                    myPreferences: {
+                        [preferenceKey]: {
+                            value: 'false',
+                        },
+                    },
+                },
+            },
+        });
+
+        expect(Selectors.isFavoriteChannel(state, channelId)).toBe(false);
+
+        state = mergeObjects(state, {
+            entities: {
+                preferences: {
+                    myPreferences: {
+                        [preferenceKey]: {
+                            value: 'true',
+                        },
+                    },
+                },
+            },
+        });
+
+        expect(Selectors.isFavoriteChannel(state, channelId)).toBe(true);
+    });
+
+    test('should use channel categories if new sidebar is enabled', () => {
+        const currentTeamId = 'currentTeamId';
+        const channel = {id: 'channel'};
+
+        const favoritesCategory = {
+            id: 'favoritesCategory',
+            team_id: currentTeamId,
+            type: CategoryTypes.FAVORITES,
+            channel_ids: [],
+        };
+
+        let state = {
+            entities: {
+                channels: {
+                    channels: {
+                        channel,
+                    },
+                },
+                channelCategories: {
+                    byId: {
+                        favoritesCategory,
+                    },
+                    orderByTeam: {
+                        [currentTeamId]: [favoritesCategory.id],
+                    },
+                },
+                general: {
+                    config: {
+                        ExperimentalChannelSidebarOrganization: 'default_on',
+                    },
+                },
+                preferences: {
+                    myPreferences: {},
+                },
+                teams: {
+                    currentTeamId,
+                },
+            },
+        };
+
+        expect(Selectors.isFavoriteChannel(state, channel.id)).toBe(false);
+
+        state = mergeObjects(state, {
+            entities: {
+                channelCategories: {
+                    byId: {
+                        [favoritesCategory.id]: {
+                            ...favoritesCategory,
+                            channel_ids: [channel.id],
+                        },
+                    },
+                },
+            },
+        });
+
+        expect(Selectors.isFavoriteChannel(state, channel.id)).toBe(true);
+    });
 });

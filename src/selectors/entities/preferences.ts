@@ -13,7 +13,6 @@ import {UserProfile} from 'types/users';
 import {GlobalState} from 'types/store';
 import {$ID} from 'types/utilities';
 
-import * as ChannelUtils from 'utils/channel_utils';
 import {createShallowSelector} from 'utils/helpers';
 import {getPreferenceKey} from 'utils/preference_utils';
 
@@ -78,10 +77,6 @@ const getFavoritesCategory = makeGetCategory();
 export function getFavoritesPreferences(state: GlobalState) {
     const favorites = getFavoritesCategory(state, Preferences.CATEGORY_FAVORITE_CHANNEL);
     return favorites.filter((f) => f.value === 'true').map((f) => f.name);
-}
-
-export function isFavoriteChannel(state: GlobalState, channelId: string) {
-    return ChannelUtils.isFavoriteChannel(getMyPreferences(state), channelId);
 }
 
 export const getVisibleTeammate: (state: GlobalState) => $ID<UserProfile>[] = createSelector(

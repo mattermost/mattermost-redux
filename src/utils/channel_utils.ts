@@ -160,7 +160,7 @@ export function isAutoClosed(
         return true;
     }
 
-    if (config.CloseUnusedDirectMessages !== 'true' || isFavoriteChannel(myPreferences, channel.id)) {
+    if (config.CloseUnusedDirectMessages !== 'true' || isFavoriteChannelOld(myPreferences, channel.id)) {
         return false;
     }
 
@@ -454,7 +454,7 @@ export function getGroupDisplayNameFromUserIds(userIds: Array<string>, profiles:
     return names.sort(sortUsernames).join(', ');
 }
 
-export function isFavoriteChannel(myPreferences: {
+export function isFavoriteChannelOld(myPreferences: {
     [x: string]: PreferenceType;
 }, id: string) {
     const fav = myPreferences[`${Preferences.CATEGORY_FAVORITE_CHANNEL}--${id}`];
@@ -674,13 +674,13 @@ function buildFavoriteChannels(
     },
     locale: string,
 ): Array<Channel> {
-    return channels.filter((channel) => isFavoriteChannel(myPreferences, channel.id)).sort(sortChannelsByDisplayName.bind(null, locale));
+    return channels.filter((channel) => isFavoriteChannelOld(myPreferences, channel.id)).sort(sortChannelsByDisplayName.bind(null, locale));
 }
 
 function buildNotFavoriteChannels(channels: Array<Channel>, myPreferences: {
     [x: string]: PreferenceType;
 }): Array<Channel> {
-    return channels.filter((channel) => !isFavoriteChannel(myPreferences, channel.id));
+    return channels.filter((channel) => !isFavoriteChannelOld(myPreferences, channel.id));
 }
 
 function buildDirectAndGroupChannels(channels: Array<Channel>, memberships: RelationOneToOne<Channel, ChannelMembership>, config: any, myPreferences: {
