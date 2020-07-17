@@ -170,10 +170,6 @@ export function moveChannelToCategory(categoryId: string, channelId: string, new
         const category = getCategory(state, categoryId);
         const currentUserId = getCurrentUserId(state);
 
-        const sourceCategories = [{
-            ...category,
-        }];
-
         // Add the channel to the new category
         const categories = [{
             ...category,
@@ -183,6 +179,10 @@ export function moveChannelToCategory(categoryId: string, channelId: string, new
 
         // And remove it from the old category
         const originalCategory = getCategoryInTeamWithChannel(getState(), category.team_id, channelId);
+        const sourceCategories = [{
+            ...category,
+        }, originalCategory];
+
         if (originalCategory && originalCategory.id !== category.id) {
             categories.push({
                 ...originalCategory,
