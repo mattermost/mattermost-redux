@@ -1181,11 +1181,12 @@ export function verifyUserEmail(token: string): ActionFunc {
     });
 }
 
-export function sendVerificationEmail(email: string): ActionFunc {
+export function sendVerificationEmail(email: string, redirect: string): ActionFunc {
     return bindClientFunc({
         clientFunc: Client4.sendVerificationEmail,
         params: [
             email,
+            redirect,
         ],
     });
 }

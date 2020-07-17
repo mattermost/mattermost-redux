@@ -625,9 +625,15 @@ export default class Client4 {
         );
     }
 
-    sendVerificationEmail = (email: string) => {
+    sendVerificationEmail = (email: string, redirect: string) => {
+        const queryParams: any = {};
+
+        if (redirect) {
+            queryParams.r = redirect;
+        }
+
         return this.doFetch<StatusOK>(
-            `${this.getUsersRoute()}/email/verify/send`,
+            `${this.getUsersRoute()}/email/verify/send${buildQueryString(queryParams)}`,
             {method: 'post', body: JSON.stringify({email})},
         );
     }
