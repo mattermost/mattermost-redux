@@ -574,6 +574,20 @@ function stats(state = {}, action: GenericAction) {
     }
 }
 
+function filteredStats(state = {}, action: GenericAction) {
+    switch (action.type) {
+    case UserTypes.RECEIVED_FILTERED_USER_STATS: {
+        const stat = action.data;
+        return {
+            ...state,
+            ...stat,
+        };
+    }
+    default:
+        return state;
+    }
+}
+
 export default combineReducers({
 
     // the current selected user
@@ -617,4 +631,7 @@ export default combineReducers({
 
     // Total user stats
     stats,
+
+    // Total user stats after filters have been applied
+    filteredStats,
 });
