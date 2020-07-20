@@ -11,7 +11,7 @@ import {General} from '../constants';
 import {CategoryTypes} from '../constants/channel_categories';
 
 import {getAllCategoriesByIds} from 'selectors/entities/channel_categories';
-import {isFavoriteChannel} from 'selectors/entities/preferences';
+import {isFavoriteChannel} from 'selectors/entities/channels';
 
 import TestHelper, {DEFAULT_SERVER} from 'test/test_helper';
 
