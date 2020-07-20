@@ -311,7 +311,7 @@ describe('ChannelUtils', () => {
         let sortfn = sortChannelsByTypeListAndDisplayName.bind(null, 'en', [General.OPEN_CHANNEL, General.PRIVATE_CHANNEL, General.DM_CHANNEL, General.GM_CHANNEL]);
         let actual = [channelOpen1, channelPrivate, channelDM, channelGM, channelOpen2].sort(sortfn);
         let expected = [channelOpen1, channelOpen2, channelPrivate, channelDM, channelGM];
-        expect(actual).toEqual(expected)
+        expect(actual).toEqual(expected);
 
         // Skipped Open Channel type should sort last but open channels should still sort in alphabetical order
         sortfn = sortChannelsByTypeListAndDisplayName.bind(null, 'en', [General.DM_CHANNEL, General.GM_CHANNEL, General.PRIVATE_CHANNEL]);
