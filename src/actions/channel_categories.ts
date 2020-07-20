@@ -179,10 +179,6 @@ export function moveChannelToCategory(categoryId: string, channelId: string, new
 
         // And remove it from the old category
         const sourceCategory = getCategoryInTeamWithChannel(getState(), targetCategory.team_id, channelId);
-        const originalCategories = [{
-            targetCategory,
-        }, sourceCategory];
-
         if (sourceCategory && sourceCategory.id !== targetCategory.id) {
             categories.push({
                 ...sourceCategory,
@@ -200,6 +196,11 @@ export function moveChannelToCategory(categoryId: string, channelId: string, new
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch, getState);
             dispatch(logError(error));
+
+            const originalCategories = [targetCategory];
+            if (sourceCategory && sourceCategory.id !== targetCategory.id) {
+                originalCategories.push(sourceCategory);
+            }
 
             dispatch({
                 type: ChannelCategoryTypes.RECEIVED_CATEGORIES,
