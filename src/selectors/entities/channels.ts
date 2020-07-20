@@ -765,6 +765,80 @@ export const getSortedUnreadChannelIds: (state: GlobalState, lastUnreadChannel: 
     (unreadChannelIds, mappedAndSortedUnreadChannelIds) => mappedAndSortedUnreadChannelIds,
 );
 
+//recent channels
+
+export const getRecentChannelIds: (state: GlobalState) => Array<string> = createIdsSelector(
+    getAllChannels,
+    getMyChannelMemberships,
+    getChannelIdsForCurrentTeam,
+    (channels: IDMappedObjects<Channel>, members: RelationOneToOne<Channel, ChannelMembership>, teamChannelIds: Array<string>): Array<string> => {
+        const recentIds = teamChannelIds.filter((id) => {
+            const c = channels[id];
+            const m = members[id];
+
+            if (c && m) {
+                return true;
+            }
+
+            return false;
+        });
+
+        return recentIds;
+    },
+);
+
+export const getRecentChannels: (state: GlobalState) => Array<Channel> = createIdsSelector(
+    getCurrentUser,
+    getUsers,
+    getUserIdsInChannels,
+    getAllChannels,
+    getRecentChannelIds,
+    getTeammateNameDisplaySetting,
+    (currentUser, profiles, userIdsInChannels: any, channels, recentIds, settings) => {
+        // If we receive an unread for a channel and then a mention the channel
+        // won't be sorted correctly until we receive a message in another channel
+        if (!currentUser) {
+            return [];
+        }
+
+        const allRecentChannels = recentIds.filter((id) => channels[id] && channels[id].delete_at === 0).map((id) => {
+            const c = channels[id];
+
+            if (c.type === General.DM_CHANNEL || c.type === General.GM_CHANNEL) {
+                return completeDirectChannelDisplayName(currentUser.id, profiles, userIdsInChannels[id], settings!, c);
+            }
+
+            return c;
+        });
+        return allRecentChannels;
+    },
+);
+
+export const mapAndSortRecentChannelIds = (
+    channels: Array<Channel>,
+    currentUser: UserProfile,
+    lastPosts: RelationOneToOne<Channel, Post>,
+    sorting: SortingType,
+): Array<string> => {
+    const locale = currentUser.locale || General.DEFAULT_LOCALE;
+
+    const recentChannelIds = channels.
+        sort(sortChannelsByRecencyOrAlpha.bind(null, locale, lastPosts, sorting)).
+        map((channel) => channel.id);
+
+    return recentChannelIds;
+};
+
+export const getAllRecentChannelIds: (state: GlobalState, sorting: SortingType) => Array<string> = createIdsSelector(
+    getRecentChannels,
+    getCurrentUser,
+    getLastPostPerChannel,
+    (state: GlobalState, sorting: SortingType = 'recent') => sorting,
+    (channels, currentUser, lastPosts: RelationOneToOne<Channel, Post>, sorting: SortingType) => {
+        return mapAndSortRecentChannelIds(channels, currentUser, lastPosts, sorting);
+    },
+);
+
 // Favorites
 
 export const getFavoriteChannels: (state: GlobalState) => Array<Channel> = createIdsSelector(
