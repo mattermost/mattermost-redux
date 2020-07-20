@@ -208,7 +208,7 @@ export function moveChannelToCategory(categoryId: string, channelId: string, new
             return {error};
         }
 
-        // And update the favorite preferences on the client in case we have any logic relying on that
+        // And update the favorite preferences locally on the client in case we have any logic relying on that
         if (targetCategory.type === CategoryTypes.FAVORITES) {
             await dispatch(favoriteChannel(channelId, false));
         } else if (sourceCategory && sourceCategory.type === CategoryTypes.FAVORITES) {

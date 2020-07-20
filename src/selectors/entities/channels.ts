@@ -4,7 +4,9 @@
 import {createSelector} from 'reselect';
 
 import {General, Permissions} from '../../constants';
+import {CategoryTypes} from 'constants/channel_categories';
 
+import {getCategoryInTeamByType} from 'selectors/entities/channel_categories';
 import {
     getCurrentChannelId,
     getCurrentUser,
@@ -20,6 +22,7 @@ import {
     getTeammateNameDisplaySetting,
     getVisibleTeammate,
     getVisibleGroupIds,
+    getNewSidebarPreference,
 } from 'selectors/entities/preferences';
 import {haveICurrentChannelPermission, haveIChannelPermission, haveITeamPermission} from 'selectors/entities/roles';
 import {
@@ -47,7 +50,6 @@ import {
 } from 'types/utilities';
 
 import {
-    buildDisplayableChannelListWithUnreadSection,
     canManageMembersOldPermissions,
     completeDirectChannelInfo,
     completeDirectChannelDisplayName,
@@ -59,7 +61,7 @@ import {
     isDirectChannelVisible,
     isGroupChannelVisible,
     sortChannelsByDisplayName,
-    isFavoriteChannel,
+    isFavoriteChannelOld,
     isDefault,
     sortChannelsByRecency,
 } from 'utils/channel_utils';
@@ -252,13 +254,11 @@ export const getCurrentChannelStats: (state: GlobalState) => ChannelStats = crea
     },
 );
 
-export const isCurrentChannelFavorite: (state: GlobalState) => boolean = createSelector(
-    getMyPreferences,
-    getCurrentChannelId,
-    (preferences: {[x: string]: PreferenceType}, channelId: string): boolean => {
-        return isFavoriteChannel(preferences, channelId);
-    },
-);
+export function isCurrentChannelFavorite(state: GlobalState): boolean {
+    const currentChannelId = getCurrentChannelId(state);
+
+    return isFavoriteChannel(state, currentChannelId);
+}
 
 export const isCurrentChannelMuted: (state: GlobalState) => boolean = createSelector(
     getMyCurrentChannelMembership,
@@ -426,51 +426,6 @@ export const getOtherChannels: (state: GlobalState, archived?: boolean | null) =
     (state: GlobalState, archived: boolean | undefined | null = true) => archived,
     (channels: Array<Channel>, myMembers: RelationOneToOne<Channel, ChannelMembership>, archived?: boolean | null): Array<Channel> => {
         return channels.filter((c) => !myMembers.hasOwnProperty(c.id) && c.type === General.OPEN_CHANNEL && (archived ? true : c.delete_at === 0));
-    },
-);
-
-export const getArchivedChannels: (state: GlobalState) => Array<Channel> = createSelector(
-    getChannelsInCurrentTeam,
-    getMyChannelMemberships,
-    (channels: Array<Channel>, myMembers: RelationOneToOne<Channel, ChannelMembership>): Array<Channel> => {
-        return channels.filter((c) => myMembers.hasOwnProperty(c.id) && c.delete_at !== 0);
-    },
-);
-
-export const getChannelsWithUnreadSection: (state: GlobalState) => {
-    unreadChannels: Array<Channel>;
-    favoriteChannels: Array<Channel>;
-    publicChannels: Array<Channel>;
-    privateChannels: Array<Channel>;
-    directAndGroupChannels: Array<Channel>;
-} = createSelector(
-    getCurrentChannelId,
-    getMyChannels,
-    getMyChannelMemberships,
-    getConfig,
-    getMyPreferences,
-    getTeammateNameDisplaySetting,
-    (state: GlobalState): UsersState => state.entities.users,
-    getLastPostPerChannel,
-    (
-        currentChannelId: string,
-        channels: Array<Channel>,
-        myMembers: RelationOneToOne<Channel, ChannelMembership>,
-        config: ClientConfig,
-        myPreferences: {
-            [x: string]: PreferenceType;
-        },
-        teammateNameDisplay: string,
-        usersState: UsersState,
-        lastPosts: RelationOneToOne<Channel, Post>,
-    ) => {
-        const allChannels = channels.map((c) => {
-            const channel = {...c,
-            };
-            channel.isCurrent = c.id === currentChannelId;
-            return channel;
-        });
-        return buildDisplayableChannelListWithUnreadSection(usersState, allChannels, myMembers, config, myPreferences, teammateNameDisplay, lastPosts);
     },
 );
 
@@ -1295,4 +1250,23 @@ export function getChannelModerations(state: GlobalState, channelId: string): Ar
 
 export function getChannelMemberCountsByGroup(state: GlobalState, channelId: string): ChannelMemberCountsByGroup {
     return state.entities.channels.channelMemberCountsByGroup[channelId] || {};
+}
+
+export function isFavoriteChannel(state: GlobalState, channelId: string): boolean {
+    if (getNewSidebarPreference(state)) {
+        const channel = getChannel(state, channelId);
+        if (!channel) {
+            return false;
+        }
+
+        const category = getCategoryInTeamByType(state, channel.team_id || getCurrentTeamId(state), CategoryTypes.FAVORITES);
+
+        if (!category) {
+            return false;
+        }
+
+        return category.channel_ids.includes(channel.id);
+    }
+
+    return isFavoriteChannelOld(getMyPreferences(state), channelId);
 }
