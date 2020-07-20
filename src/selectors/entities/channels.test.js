@@ -3,11 +3,16 @@
 
 import assert from 'assert';
 
-import deepFreezeAndThrowOnMutation from 'utils/deep_freeze';
-import TestHelper from 'test/test_helper';
-import {sortChannelsByDisplayName, getDirectChannelName} from 'utils/channel_utils';
-import * as Selectors from 'selectors/entities/channels';
 import {General, Preferences, Permissions} from '../../constants';
+import {CategoryTypes} from 'constants/channel_categories';
+
+import mergeObjects from 'test/merge_objects';
+import TestHelper from 'test/test_helper';
+
+import {sortChannelsByDisplayName, getDirectChannelName} from 'utils/channel_utils';
+import deepFreezeAndThrowOnMutation from 'utils/deep_freeze';
+
+import * as Selectors from './channels';
 
 const sortUsernames = (a, b) => a.localeCompare(b, General.DEFAULT_LOCALE, {numeric: true});
 
@@ -350,92 +355,6 @@ describe('Selectors.Channels.getOtherChannels', () => {
     });
 });
 
-describe('Selectors.Channels.getArchivedChannels', () => {
-    const team1 = TestHelper.fakeTeamWithId();
-    const team2 = TestHelper.fakeTeamWithId();
-
-    const user = TestHelper.fakeUserWithId();
-
-    const profiles = {
-        [user.id]: user,
-    };
-
-    const channel1 = {
-        ...TestHelper.fakeChannelWithId(team1.id),
-        display_name: 'Channel Name',
-        type: General.OPEN_CHANNEL,
-    };
-    const channel2 = {
-        ...TestHelper.fakeChannelWithId(team2.id),
-        display_name: 'Channel Name',
-        type: General.OPEN_CHANNEL,
-        delete_at: 222,
-    };
-    const channel3 = {
-        ...TestHelper.fakeChannelWithId(team1.id),
-        display_name: 'Channel Name',
-        type: General.PRIVATE_CHANNEL,
-    };
-    const channel4 = {
-        ...TestHelper.fakeChannelWithId(''),
-        display_name: 'Channel Name',
-        type: General.DM_CHANNEL,
-    };
-    const channel5 = {
-        ...TestHelper.fakeChannelWithId(''),
-        display_name: 'Channel Name',
-        type: General.OPEN_CHANNEL,
-        delete_at: 555,
-    };
-    const channel6 = {
-        ...TestHelper.fakeChannelWithId(team1.id),
-        display_name: 'Channel Name',
-        type: General.OPEN_CHANNEL,
-    };
-
-    const channels = {
-        [channel1.id]: channel1,
-        [channel2.id]: channel2,
-        [channel3.id]: channel3,
-        [channel4.id]: channel4,
-        [channel5.id]: channel5,
-        [channel6.id]: channel6,
-    };
-
-    const channelsInTeam = {
-        [team1.id]: [channel1.id, channel3.id, channel5.id, channel6.id],
-        [team2.id]: [channel2.id],
-        '': [channel4.id],
-    };
-
-    const myMembers = {
-        [channel4.id]: {},
-        [channel5.id]: {},
-        [channel6.id]: {},
-    };
-
-    const testState = deepFreezeAndThrowOnMutation({
-        entities: {
-            users: {
-                currentUserId: user.id,
-                profiles,
-            },
-            teams: {
-                currentTeamId: team1.id,
-            },
-            channels: {
-                channels,
-                channelsInTeam,
-                myMembers,
-            },
-        },
-    });
-
-    it('get archived channels that user is member of', () => {
-        assert.deepEqual(Selectors.getArchivedChannels(testState), [channel5]);
-    });
-});
-
 describe('Selectors.Channels.getChannel', () => {
     const team1 = TestHelper.fakeTeamWithId();
     const team2 = TestHelper.fakeTeamWithId();
@@ -648,150 +567,6 @@ describe('Selectors.Channels.getChannelsNameMapInTeam', () => {
     });
     it('get empty map for non-existing team', () => {
         assert.deepEqual(Selectors.getChannelsNameMapInTeam(testState, 'junk'), {});
-    });
-});
-
-describe('Selectors.Channels.getChannelsWithUnreadSection', () => {
-    const team1 = TestHelper.fakeTeamWithId();
-    const team2 = TestHelper.fakeTeamWithId();
-
-    const user = TestHelper.fakeUserWithId();
-    const user2 = TestHelper.fakeUserWithId();
-    const user3 = TestHelper.fakeUserWithId();
-
-    const profiles = {
-        [user.id]: user,
-        [user2.id]: user2,
-        [user3.id]: user3,
-    };
-
-    const channel1 = {
-        ...TestHelper.fakeChannelWithId(team1.id),
-        type: General.OPEN_CHANNEL,
-        display_name: 'Channel Name',
-    };
-    const channel2 = {
-        ...TestHelper.fakeChannelWithId(team2.id),
-        type: General.PRIVATE_CHANNEL,
-        display_name: 'Channel Name',
-    };
-    const channel3 = {
-        ...TestHelper.fakeChannelWithId(team1.id),
-        type: General.OPEN_CHANNEL,
-        display_name: 'Channel Name',
-    };
-    const channel4 = {
-        ...TestHelper.fakeChannelWithId(''),
-        type: General.DM_CHANNEL,
-        display_name: 'Channel Name',
-        name: getDirectChannelName(user.id, user2.id),
-    };
-    const channel5 = {
-        ...TestHelper.fakeChannelWithId(''),
-        type: General.GM_CHANNEL,
-        display_name: [user.username, user2.username, user3.username].join(', '),
-        name: '',
-        total_msg_count: 2,
-    };
-    const channel6 = {
-        ...TestHelper.fakeChannelWithId(team1.id),
-        type: General.OPEN_CHANNEL,
-        display_name: 'Channel Name',
-    };
-    const channel7 = {
-        ...TestHelper.fakeChannelWithId(team1.id),
-        type: General.PRIVATE_CHANNEL,
-        display_name: 'Channel Name',
-    };
-
-    const channels = {
-        [channel1.id]: channel1,
-        [channel2.id]: channel2,
-        [channel3.id]: channel3,
-        [channel4.id]: channel4,
-        [channel5.id]: channel5,
-        [channel6.id]: channel6,
-        [channel7.id]: channel7,
-    };
-
-    const channelsInTeam = {
-        [team1.id]: [channel1.id, channel3.id, channel6.id, channel7.id],
-        [team2.id]: [channel2.id],
-        '': [channel4.id, channel5.id],
-    };
-
-    const myMembers = {
-        [channel1.id]: {msg_count: 1, mention_count: 1},
-        [channel3.id]: {msg_count: 0, mention_count: 0},
-        [channel4.id]: {msg_count: 0, mention_count: 1},
-        [channel5.id]: {msg_count: 1, mention_count: 0},
-        [channel6.id]: {msg_count: 0, mention_count: 0},
-        [channel7.id]: {msg_count: 0, mention_count: 0},
-    };
-
-    const myPreferences = {
-        [`${Preferences.CATEGORY_FAVORITE_CHANNEL}--${channel1.id}`]: {
-            value: 'true',
-        },
-        [`${Preferences.CATEGORY_FAVORITE_CHANNEL}--${channel3.id}`]: {
-            value: 'true',
-        },
-        [`${Preferences.CATEGORY_FAVORITE_CHANNEL}--${channel4.id}`]: {
-            value: 'false',
-        },
-        [`${Preferences.CATEGORY_FAVORITE_CHANNEL}--${channel5.id}`]: {
-            value: 'true',
-        },
-    };
-
-    const testState = deepFreezeAndThrowOnMutation({
-        entities: {
-            users: {
-                currentUserId: user.id,
-                profiles,
-                statuses: {},
-                profilesInChannel: {
-                    [channel4.id]: new Set([user.id, user2.id]),
-                    [channel5.id]: new Set([user.id, user2.id, user3.id]),
-                },
-            },
-            teams: {
-                currentTeamId: team1.id,
-            },
-            posts: {
-                posts: {},
-                postsInChannel: {},
-            },
-            channels: {
-                currentChannelId: channel1.id,
-                channels,
-                channelsInTeam,
-                myMembers,
-            },
-            preferences: {
-                myPreferences,
-            },
-            general: {
-                config: {},
-            },
-        },
-    });
-
-    it('get channels by category including unreads', () => {
-        const categories = Selectors.getChannelsWithUnreadSection(testState);
-        const {
-            unreadChannels,
-            favoriteChannels,
-            publicChannels,
-            privateChannels,
-            directAndGroupChannels,
-        } = categories;
-
-        assert.equal(unreadChannels.length, 3);
-        assert.equal(favoriteChannels.length, 1);
-        assert.equal(publicChannels.length, 1);
-        assert.equal(privateChannels.length, 1);
-        assert.equal(directAndGroupChannels.length, 0);
     });
 });
 
@@ -1016,6 +791,9 @@ describe('Selectors.Channels.isCurrentChannelFavorite', () => {
             channels: {
                 currentChannelId: channel1.id,
             },
+            general: {
+                config: {},
+            },
             preferences: {
                 myPreferences,
             },
@@ -1029,6 +807,9 @@ describe('Selectors.Channels.isCurrentChannelFavorite', () => {
             entities: {
                 channels: {
                     currentChannelId: channel2.id,
+                },
+                general: {
+                    config: {},
                 },
                 preferences: {
                     myPreferences,
@@ -3657,4 +3438,110 @@ test('Selectors.Channels.getChannelMemberCountsByGroup', () => {
     assert.deepEqual(Selectors.getChannelMemberCountsByGroup(state, 'channel1'), memberCounts);
     assert.deepEqual(Selectors.getChannelMemberCountsByGroup(state, undefined), {});
     assert.deepEqual(Selectors.getChannelMemberCountsByGroup(state, 'undefined'), {});
+});
+
+describe('isFavoriteChannel', () => {
+    test('should use preferences if old sidebar is enabled', () => {
+        const channelId = 'channelId';
+        const preferenceKey = `${Preferences.CATEGORY_FAVORITE_CHANNEL}--${channelId}`;
+
+        let state = {
+            entities: {
+                general: {
+                    config: {},
+                },
+                preferences: {
+                    myPreferences: {},
+                },
+            },
+        };
+
+        expect(Selectors.isFavoriteChannel(state, channelId)).toBe(false);
+
+        state = mergeObjects(state, {
+            entities: {
+                preferences: {
+                    myPreferences: {
+                        [preferenceKey]: {
+                            value: 'false',
+                        },
+                    },
+                },
+            },
+        });
+
+        expect(Selectors.isFavoriteChannel(state, channelId)).toBe(false);
+
+        state = mergeObjects(state, {
+            entities: {
+                preferences: {
+                    myPreferences: {
+                        [preferenceKey]: {
+                            value: 'true',
+                        },
+                    },
+                },
+            },
+        });
+
+        expect(Selectors.isFavoriteChannel(state, channelId)).toBe(true);
+    });
+
+    test('should use channel categories if new sidebar is enabled', () => {
+        const currentTeamId = 'currentTeamId';
+        const channel = {id: 'channel'};
+
+        const favoritesCategory = {
+            id: 'favoritesCategory',
+            team_id: currentTeamId,
+            type: CategoryTypes.FAVORITES,
+            channel_ids: [],
+        };
+
+        let state = {
+            entities: {
+                channels: {
+                    channels: {
+                        channel,
+                    },
+                },
+                channelCategories: {
+                    byId: {
+                        favoritesCategory,
+                    },
+                    orderByTeam: {
+                        [currentTeamId]: [favoritesCategory.id],
+                    },
+                },
+                general: {
+                    config: {
+                        ExperimentalChannelSidebarOrganization: 'default_on',
+                    },
+                },
+                preferences: {
+                    myPreferences: {},
+                },
+                teams: {
+                    currentTeamId,
+                },
+            },
+        };
+
+        expect(Selectors.isFavoriteChannel(state, channel.id)).toBe(false);
+
+        state = mergeObjects(state, {
+            entities: {
+                channelCategories: {
+                    byId: {
+                        [favoritesCategory.id]: {
+                            ...favoritesCategory,
+                            channel_ids: [channel.id],
+                        },
+                    },
+                },
+            },
+        });
+
+        expect(Selectors.isFavoriteChannel(state, channel.id)).toBe(true);
+    });
 });
