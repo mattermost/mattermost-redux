@@ -12,10 +12,13 @@ import {CategoryTypes} from '../constants/channel_categories';
 
 import {getAllCategoriesByIds} from 'selectors/entities/channel_categories';
 import {isFavoriteChannel} from 'selectors/entities/channels';
+import {getMyPreferences} from 'selectors/entities/preferences';
 
 import TestHelper, {DEFAULT_SERVER} from 'test/test_helper';
 
 import {CategorySorting} from 'types/channel_categories';
+
+import {isFavoriteChannelOld} from 'utils/channel_utils';
 
 import * as Actions from './channel_categories';
 import {getCategory, getCategoryIdsForTeam} from '../selectors/entities/channel_categories';
@@ -460,6 +463,88 @@ describe('moveChannelToCategory', () => {
         state = store.getState();
         expect(state.entities.channelCategories.byId.category1.sorting).toBe(CategorySorting.Manual);
         expect(state.entities.channelCategories.byId.category2.sorting).toBe(CategorySorting.Manual);
+    });
+
+    test('should optimistically update the modified categories', async () => {
+        const category1 = {id: 'category1', team_id: teamId, channel_ids: ['channel1', 'channel2'], sorting: CategorySorting.Default};
+        const favoritesCategory = {id: 'favoritesCategory', type: CategoryTypes.FAVORITES, team_id: teamId, channel_ids: [], sorting: CategorySorting.Default};
+
+        const store = await configureStore({
+            entities: {
+                channelCategories: {
+                    byId: {
+                        category1,
+                        favoritesCategory,
+                    },
+                },
+                users: {
+                    currentUserId,
+                },
+            },
+        });
+
+        nock(Client4.getBaseRoute()).
+            put(`/users/${currentUserId}/teams/${teamId}/channels/categories`).
+            delayBody(100).
+            reply(200, [
+                {...category1, channel_ids: ['channel2']},
+                {...favoritesCategory, channel_ids: ['channel1'], sorting: CategorySorting.Manual},
+            ]);
+
+        const moveRequest = store.dispatch(Actions.moveChannelToCategory(favoritesCategory.id, 'channel1', 0));
+
+        // At this point, the category should have already been optimistically updated, but the favorites preferences
+        // won't be updated until after the request completes
+        let state = store.getState();
+        expect(state.entities.channelCategories.byId.category1.channel_ids).toEqual(['channel2']);
+        expect(state.entities.channelCategories.byId.favoritesCategory.channel_ids).toEqual(['channel1']);
+        expect(isFavoriteChannelOld(getMyPreferences(state), 'channel1')).toBe(false);
+
+        await moveRequest;
+
+        // And now that the request has finished, the favorites should have been updated
+        state = store.getState();
+        expect(state.entities.channelCategories.byId.category1.channel_ids).toEqual(['channel2']);
+        expect(state.entities.channelCategories.byId.favoritesCategory.channel_ids).toEqual(['channel1']);
+        expect(isFavoriteChannelOld(getMyPreferences(state), 'channel1')).toBe(true);
+    });
+
+    test('should optimistically update the modified categories', async () => {
+        const category1 = {id: 'category1', team_id: teamId, channel_ids: ['channel1', 'channel2'], sorting: CategorySorting.Default};
+        const favoritesCategory = {id: 'favoritesCategory', type: CategoryTypes.FAVORITES, team_id: teamId, channel_ids: [], sorting: CategorySorting.Default};
+
+        const store = await configureStore({
+            entities: {
+                channelCategories: {
+                    byId: {
+                        category1,
+                        favoritesCategory,
+                    },
+                },
+                users: {
+                    currentUserId,
+                },
+            },
+        });
+
+        nock(Client4.getBaseRoute()).
+            put(`/users/${currentUserId}/teams/${teamId}/channels/categories`).
+            delayBody(100).
+            reply(400);
+
+        const moveRequest = store.dispatch(Actions.moveChannelToCategory(favoritesCategory.id, 'channel1', 0));
+
+        // At this point, the category should have already been optimistically updated, even though it will fail
+        let state = store.getState();
+        expect(state.entities.channelCategories.byId.category1.channel_ids).toEqual(['channel2']);
+        expect(state.entities.channelCategories.byId.favoritesCategory.channel_ids).toEqual(['channel1']);
+
+        await moveRequest;
+
+        // And now that the request has finished, the changes should've been rolled back
+        state = store.getState();
+        expect(state.entities.channelCategories.byId.category1.channel_ids).toEqual(['channel1', 'channel2']);
+        expect(state.entities.channelCategories.byId.favoritesCategory.channel_ids).toEqual([]);
     });
 });
 
