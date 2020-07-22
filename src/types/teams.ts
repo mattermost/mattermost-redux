@@ -78,10 +78,7 @@ export type TeamSearchOpts = {
     page?: number;
     per_page?: number;
     allow_open_invite?: boolean;
-    exclude_allow_open_invite?: boolean;
     group_constrained?: boolean;
-    exclude_group_constrained?: boolean;
-    include_group_constrained?: boolean;
 }
 
 export type TeamInviteWithError = {
