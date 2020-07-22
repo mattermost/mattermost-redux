@@ -15,13 +15,13 @@ import integrations from './integrations';
 import emojis from './emojis';
 import gifs from './gifs';
 import admin from './admin';
-import alerts from './alerts';
 import jobs from './jobs';
 import search from './search';
 import roles from './roles';
 import schemes from './schemes';
 import groups from './groups';
 import bots from './bots';
+import channelCategories from './channel_categories';
 import themes from './themes';
 
 export default combineReducers({
@@ -37,12 +37,12 @@ export default combineReducers({
     emojis,
     gifs,
     admin,
-    alerts,
     jobs,
     search,
     roles,
     schemes,
     groups,
     bots,
+    channelCategories,
     themes,
 });

@@ -6,6 +6,7 @@ import assert from 'assert';
 import nock from 'nock';
 
 import * as Actions from 'actions/posts';
+import {getChannelStats} from 'actions/channels';
 import {login} from 'actions/users';
 import {setSystemEmojis, createCustomEmoji} from 'actions/emojis';
 import {Client4} from 'client';
@@ -35,8 +36,8 @@ describe('Actions.Posts', () => {
         const channelId = TestHelper.basicChannel.id;
         const post = TestHelper.fakePost(channelId);
 
-        nock(Client4.getPostsRoute()).
-            post('').
+        nock(Client4.getBaseRoute()).
+            post('/posts').
             reply(201, {...post, id: TestHelper.generateId()});
 
         await Actions.createPost(post)(store.dispatch, store.getState);
@@ -64,31 +65,31 @@ describe('Actions.Posts', () => {
         assert.ok(!postsInChannel[channelId], 'postIds in channel do not exist');
     });
 
-    it('maintain reply_count', async () => {
+    it('maintain postReplies', async () => {
         const channelId = TestHelper.basicChannel.id;
         const post = TestHelper.fakePostWithId(channelId);
         const post2 = TestHelper.fakePostWithId(channelId);
 
         post2.root_id = post.id;
 
-        nock(Client4.getPostsRoute()).
-            post('').
+        nock(Client4.getBaseRoute()).
+            post('/posts').
             reply(201, post);
 
         await Actions.createPost(post)(store.dispatch, store.getState);
 
-        nock(Client4.getPostsRoute()).
-            post('').
+        nock(Client4.getBaseRoute()).
+            post('/posts').
             reply(201, post2);
 
         await Actions.createPost(post2)(store.dispatch, store.getState);
 
-        assert.equal(store.getState().entities.posts.posts[post.id].reply_count, 1);
+        assert.equal(store.getState().entities.posts.postsReplies[post.id], 1);
 
         await Actions.deletePost(post2)(store.dispatch, store.getState);
         await Actions.removePost(post2)(store.dispatch, store.getState);
 
-        assert.equal(store.getState().entities.posts.posts[post.id].reply_count, 0);
+        assert.equal(store.getState().entities.posts.postsReplies[post.id], 0);
         nock.cleanAll();
     });
 
@@ -102,8 +103,8 @@ describe('Actions.Posts', () => {
             url: 'http://localhost:8065/api/v4/posts',
         };
 
-        nock(Client4.getPostsRoute()).
-            post('').
+        nock(Client4.getBaseRoute()).
+            post('/posts').
             reply(400, createPostError);
 
         await Actions.createPost(post)(store.dispatch, store.getState);
@@ -137,13 +138,13 @@ describe('Actions.Posts', () => {
         const post = TestHelper.fakePost(channelId);
         const files = TestHelper.fakeFiles(3);
 
-        nock(Client4.getPostsRoute()).
-            post('').
+        nock(Client4.getBaseRoute()).
+            post('/posts').
             reply(201, {...post, id: TestHelper.generateId(), file_ids: [files[0].id, files[1].id, files[2].id]});
 
         await Actions.createPost(
             post,
-            files
+            files,
         )(store.dispatch, store.getState);
 
         const state = store.getState();
@@ -184,7 +185,7 @@ describe('Actions.Posts', () => {
     //         post('/posts').
     //         reply(400, {});
 
-    //     nock(Client4.getPostsRoute()).
+    //     nock(Client4.getBaseRoute()).
     //         post('').
     //         reply(201, {...post, id: TestHelper.generateId()});
 
@@ -232,23 +233,23 @@ describe('Actions.Posts', () => {
     it('editPost', async () => {
         const channelId = TestHelper.basicChannel.id;
 
-        nock(Client4.getPostsRoute()).
-            post('').
+        nock(Client4.getBaseRoute()).
+            post('/posts').
             reply(201, TestHelper.fakePostWithId(channelId));
 
         const post = await Client4.createPost(
-            TestHelper.fakePost(channelId)
+            TestHelper.fakePost(channelId),
         );
         const message = post.message;
 
         post.message = `${message} (edited)`;
 
-        nock(Client4.getPostsRoute()).
-            put(`/${post.id}/patch`).
+        nock(Client4.getBaseRoute()).
+            put(`/posts/${post.id}/patch`).
             reply(200, post);
 
         await Actions.editPost(
-            post
+            post,
         )(store.dispatch, store.getState);
 
         const state = store.getState();
@@ -264,15 +265,15 @@ describe('Actions.Posts', () => {
 
         assert.strictEqual(
             posts[post.id].message,
-            `${message} (edited)`
+            `${message} (edited)`,
         );
     });
 
     it('deletePost', async () => {
         const channelId = TestHelper.basicChannel.id;
 
-        nock(Client4.getPostsRoute()).
-            post('').
+        nock(Client4.getBaseRoute()).
+            post('/posts').
             reply(201, TestHelper.fakePostWithId(channelId));
         await Actions.createPost(TestHelper.fakePost(channelId))(store.dispatch, store.getState);
         const initialPosts = store.getState().entities.posts;
@@ -286,7 +287,7 @@ describe('Actions.Posts', () => {
         assert.ok(posts[postId]);
         assert.strictEqual(
             posts[postId].state,
-            Posts.POST_DELETED
+            Posts.POST_DELETED,
         );
     });
 
@@ -294,18 +295,18 @@ describe('Actions.Posts', () => {
         TestHelper.mockLogin();
         await login(TestHelper.basicUser.email, 'password1')(store.dispatch, store.getState);
 
-        nock(Client4.getPostsRoute()).
-            post('').
+        nock(Client4.getBaseRoute()).
+            post('/posts').
             reply(201, TestHelper.fakePostWithId(TestHelper.basicChannel.id));
 
         const post1 = await Client4.createPost(
-            TestHelper.fakePost(TestHelper.basicChannel.id)
+            TestHelper.fakePost(TestHelper.basicChannel.id),
         );
 
         const emojiName = '+1';
 
-        nock(Client4.getReactionsRoute()).
-            post('').
+        nock(Client4.getBaseRoute()).
+            post('/reactions').
             reply(201, {user_id: TestHelper.basicUser.id, post_id: post1.id, emoji_name: emojiName, create_at: 1508168444721});
         await Actions.addReaction(post1.id, emojiName)(store.dispatch, store.getState);
 
@@ -323,7 +324,7 @@ describe('Actions.Posts', () => {
 
     it('removePost', async () => {
         const post1 = {id: 'post1', channel_id: 'channel1', create_at: 1001, message: ''};
-        const post2 = {id: 'post2', channel_id: 'channel1', create_at: 1002, message: ''};
+        const post2 = {id: 'post2', channel_id: 'channel1', create_at: 1002, message: '', is_pinned: true};
         const post3 = {id: 'post3', channel_id: 'channel1', root_id: 'post2', create_at: 1003, message: ''};
         const post4 = {id: 'post4', channel_id: 'channel1', root_id: 'post1', create_at: 1004, message: ''};
 
@@ -346,12 +347,21 @@ describe('Actions.Posts', () => {
                         post2: ['post3'],
                     },
                 },
+                channels: {
+                    stats: {
+                        channel1: {
+                            pinnedpost_count: 2,
+                        },
+                    },
+                },
             },
         });
 
         await store.dispatch(Actions.removePost(post2));
 
         const state = store.getState();
+        const {stats} = state.entities.channels;
+        const pinnedPostCount = stats.channel1.pinnedpost_count;
 
         expect(state.entities.posts.posts).toEqual({
             post1,
@@ -365,23 +375,24 @@ describe('Actions.Posts', () => {
         expect(state.entities.posts.postsInThread).toEqual({
             post1: ['post4'],
         });
+        expect(pinnedPostCount).toEqual(1);
     });
 
     it('removePostWithReaction', async () => {
         TestHelper.mockLogin();
         await login(TestHelper.basicUser.email, 'password1')(store.dispatch, store.getState);
 
-        nock(Client4.getPostsRoute()).
-            post('').
+        nock(Client4.getBaseRoute()).
+            post('/posts').
             reply(201, TestHelper.fakePostWithId(TestHelper.basicChannel.id));
         const post1 = await Client4.createPost(
-            TestHelper.fakePost(TestHelper.basicChannel.id)
+            TestHelper.fakePost(TestHelper.basicChannel.id),
         );
 
         const emojiName = '+1';
 
-        nock(Client4.getReactionsRoute()).
-            post('').
+        nock(Client4.getBaseRoute()).
+            post('/reactions').
             reply(201, {user_id: TestHelper.basicUser.id, post_id: post1.id, emoji_name: emojiName, create_at: 1508168444721});
         await Actions.addReaction(post1.id, emojiName)(store.dispatch, store.getState);
 
@@ -437,8 +448,8 @@ describe('Actions.Posts', () => {
             },
         };
 
-        nock(Client4.getPostsRoute()).
-            get(`/${post.id}/thread?fetchThreads=true`).
+        nock(Client4.getBaseRoute()).
+            get(`/posts/${post.id}/thread?skipFetchThreads=false`).
             reply(200, postList);
         await Actions.getPostThread(post.id)(store.dispatch, store.getState);
 
@@ -529,49 +540,49 @@ describe('Actions.Posts', () => {
             Actions.getNeededAtMentionedUsernames(state, [
                 {message: 'aaa'},
             ]),
-            new Set()
+            new Set(),
         );
 
         assert.deepEqual(
             Actions.getNeededAtMentionedUsernames(state, [
                 {message: '@aaa'},
             ]),
-            new Set()
+            new Set(),
         );
 
         assert.deepEqual(
             Actions.getNeededAtMentionedUsernames(state, [
                 {message: '@aaa @bbb @ccc'},
             ]),
-            new Set(['bbb', 'ccc'])
+            new Set(['bbb', 'ccc']),
         );
 
         assert.deepEqual(
             Actions.getNeededAtMentionedUsernames(state, [
                 {message: '@bbb. @ccc.ddd'},
             ]),
-            new Set(['bbb.', 'bbb', 'ccc.ddd'])
+            new Set(['bbb.', 'bbb', 'ccc.ddd']),
         );
 
         assert.deepEqual(
             Actions.getNeededAtMentionedUsernames(state, [
                 {message: '@bbb- @ccc-ddd'},
             ]),
-            new Set(['bbb-', 'bbb', 'ccc-ddd'])
+            new Set(['bbb-', 'bbb', 'ccc-ddd']),
         );
 
         assert.deepEqual(
             Actions.getNeededAtMentionedUsernames(state, [
                 {message: '@bbb_ @ccc_ddd'},
             ]),
-            new Set(['bbb_', 'ccc_ddd'])
+            new Set(['bbb_', 'ccc_ddd']),
         );
 
         assert.deepEqual(
             Actions.getNeededAtMentionedUsernames(state, [
                 {message: '(@bbb/@ccc) ddd@eee'},
             ]),
-            new Set(['bbb', 'ccc'])
+            new Set(['bbb', 'ccc']),
         );
 
         assert.deepEqual(
@@ -584,7 +595,7 @@ describe('Actions.Posts', () => {
                 {message: '@channel.'},
             ]),
             new Set(),
-            'should never try to request usernames matching special mentions'
+            'should never try to request usernames matching special mentions',
         );
     });
 
@@ -616,7 +627,7 @@ describe('Actions.Posts', () => {
                 Actions.getNeededCustomEmojis(state, [
                     {message: 'aaa'},
                 ]),
-                new Set()
+                new Set(),
             );
         });
 
@@ -625,7 +636,7 @@ describe('Actions.Posts', () => {
                 Actions.getNeededCustomEmojis(state, [
                     {message: ':name1:'},
                 ]),
-                new Set()
+                new Set(),
             );
         });
 
@@ -634,7 +645,7 @@ describe('Actions.Posts', () => {
                 Actions.getNeededCustomEmojis(state, [
                     {message: ':systemEmoji1:'},
                 ]),
-                new Set()
+                new Set(),
             );
         });
 
@@ -643,7 +654,7 @@ describe('Actions.Posts', () => {
                 Actions.getNeededCustomEmojis(state, [
                     {message: ':systemEmoji1: :name1: :name2: :name3:'},
                 ]),
-                new Set(['name3'])
+                new Set(['name3']),
             );
         });
 
@@ -652,7 +663,7 @@ describe('Actions.Posts', () => {
                 Actions.getNeededCustomEmojis(state, [
                     {message: 'aaa :name3: :name4:'},
                 ]),
-                new Set(['name3', 'name4'])
+                new Set(['name3', 'name4']),
             );
         });
 
@@ -661,7 +672,7 @@ describe('Actions.Posts', () => {
                 Actions.getNeededCustomEmojis(state, [
                     {message: ':name3:!'},
                 ]),
-                new Set(['name3'])
+                new Set(['name3']),
             );
         });
 
@@ -670,7 +681,7 @@ describe('Actions.Posts', () => {
                 Actions.getNeededCustomEmojis(state, [
                     {message: ':name-3:'},
                 ]),
-                new Set(['name-3'])
+                new Set(['name-3']),
             );
         });
 
@@ -679,7 +690,7 @@ describe('Actions.Posts', () => {
                 Actions.getNeededCustomEmojis(state, [
                     {message: ':name_3:'},
                 ]),
-                new Set(['name_3'])
+                new Set(['name_3']),
             );
         });
 
@@ -688,7 +699,7 @@ describe('Actions.Posts', () => {
                 Actions.getNeededCustomEmojis(state, [
                     {message: '', props: {attachments: [{text: ':name3:'}]}},
                 ]),
-                new Set(['name3'])
+                new Set(['name3']),
             );
         });
 
@@ -697,7 +708,7 @@ describe('Actions.Posts', () => {
                 Actions.getNeededCustomEmojis(state, [
                     {message: '', props: {attachments: [{pretext: ':name3:'}]}},
                 ]),
-                new Set(['name3'])
+                new Set(['name3']),
             );
         });
 
@@ -706,7 +717,7 @@ describe('Actions.Posts', () => {
                 Actions.getNeededCustomEmojis(state, [
                     {message: '', props: {attachments: [{fields: [{value: ':name3:'}]}]}},
                 ]),
-                new Set(['name3'])
+                new Set(['name3']),
             );
         });
 
@@ -715,7 +726,7 @@ describe('Actions.Posts', () => {
                 Actions.getNeededCustomEmojis(state, [
                     {message: '', props: {attachments: [{text: ':name4: :name1:', pretext: ':name3: :systemEmoji1:', fields: [{value: ':name3:'}]}]}},
                 ]),
-                new Set(['name3', 'name4'])
+                new Set(['name3', 'name4']),
             );
         });
 
@@ -724,7 +735,7 @@ describe('Actions.Posts', () => {
                 Actions.getNeededCustomEmojis(state, [
                     {message: '', props: {attachments: [{fields: [{}]}]}},
                 ]),
-                new Set([])
+                new Set([]),
             );
         });
 
@@ -733,7 +744,7 @@ describe('Actions.Posts', () => {
                 Actions.getNeededCustomEmojis(state, [
                     {message: '', props: {attachments: [{text: null, pretext: null, fields: null}]}},
                 ]),
-                new Set([])
+                new Set([]),
             );
         });
 
@@ -742,7 +753,7 @@ describe('Actions.Posts', () => {
                 Actions.getNeededCustomEmojis(state, [
                     {message: '', props: {attachments: null}},
                 ]),
-                new Set([])
+                new Set([]),
             );
         });
 
@@ -752,7 +763,7 @@ describe('Actions.Posts', () => {
                     {message: ':emoji3:'},
                     {message: ':emoji4:'},
                 ]),
-                new Set(['emoji3', 'emoji4'])
+                new Set(['emoji3', 'emoji4']),
             );
         });
 
@@ -770,7 +781,7 @@ describe('Actions.Posts', () => {
                 }, [
                     {message: ':emoji3:'},
                 ]),
-                new Set([])
+                new Set([]),
             );
         });
 
@@ -784,7 +795,7 @@ describe('Actions.Posts', () => {
                         },
                     },
                 ]),
-                new Set([])
+                new Set([]),
             );
         });
     });
@@ -1040,8 +1051,8 @@ describe('Actions.Posts', () => {
             get(`/${channelId}/posts`).
             query((params) => Boolean(params.before)).
             reply(200, postsBefore);
-        nock(Client4.getPostsRoute()).
-            get(`/${postId}/thread`).
+        nock(Client4.getBaseRoute()).
+            get(`/posts/${postId}/thread`).
             query(true).
             reply(200, postsThread);
 
@@ -1092,12 +1103,12 @@ describe('Actions.Posts', () => {
         TestHelper.mockLogin();
         await login(TestHelper.basicUser.email, 'password1')(store.dispatch, store.getState);
 
-        nock(Client4.getPostsRoute()).
-            post('').
+        nock(Client4.getBaseRoute()).
+            post('/posts').
             reply(201, TestHelper.fakePostWithId(TestHelper.basicChannel.id));
 
         const post1 = await Client4.createPost(
-            TestHelper.fakePost(channelId)
+            TestHelper.fakePost(channelId),
         );
 
         nock(Client4.getUsersRoute()).
@@ -1122,11 +1133,11 @@ describe('Actions.Posts', () => {
         TestHelper.mockLogin();
         await login(TestHelper.basicUser.email, 'password1')(store.dispatch, store.getState);
 
-        nock(Client4.getPostsRoute()).
-            post('').
+        nock(Client4.getBaseRoute()).
+            post('/posts').
             reply(201, TestHelper.fakePostWithId(TestHelper.basicChannel.id));
         const post1 = await Client4.createPost(
-            TestHelper.fakePost(channelId)
+            TestHelper.fakePost(channelId),
         );
 
         nock(Client4.getUsersRoute()).
@@ -1171,6 +1182,11 @@ describe('Actions.Posts', () => {
                 users: {
                     currentUserId: userId,
                 },
+                posts: {
+                    posts: {
+                        [postId]: {id: postId, msg: 'test message', create_at: 123, delete_at: 0, channel_id: channelId},
+                    },
+                },
             },
         });
 
@@ -1196,64 +1212,84 @@ describe('Actions.Posts', () => {
     it('pinPost', async () => {
         const {dispatch, getState} = store;
 
-        nock(Client4.getPostsRoute()).
-            post('').
+        nock(Client4.getBaseRoute()).
+            get(`/channels/${TestHelper.basicChannel.id}/stats`).
+            reply(200, {channel_id: TestHelper.basicChannel.id, member_count: 1, pinnedpost_count: 0});
+
+        await dispatch(getChannelStats(TestHelper.basicChannel.id));
+
+        nock(Client4.getBaseRoute()).
+            post('/posts').
             reply(201, TestHelper.fakePostWithId(TestHelper.basicChannel.id));
         const post1 = await Client4.createPost(
-            TestHelper.fakePost(TestHelper.basicChannel.id)
+            TestHelper.fakePost(TestHelper.basicChannel.id),
         );
 
         const postList = {order: [post1.id], posts: {}};
         postList.posts[post1.id] = post1;
 
-        nock(Client4.getPostsRoute()).
-            get(`/${post1.id}/thread?fetchThreads=true`).
+        nock(Client4.getBaseRoute()).
+            get(`/posts/${post1.id}/thread?skipFetchThreads=false`).
             reply(200, postList);
         await Actions.getPostThread(post1.id)(dispatch, getState);
 
-        nock(Client4.getPostsRoute()).
-            post(`/${post1.id}/pin`).
+        nock(Client4.getBaseRoute()).
+            post(`/posts/${post1.id}/pin`).
             reply(200, OK_RESPONSE);
         await Actions.pinPost(post1.id)(dispatch, getState);
 
         const state = getState();
+        const {stats} = state.entities.channels;
         const post = state.entities.posts.posts[post1.id];
+        const pinnedPostCount = stats[TestHelper.basicChannel.id].pinnedpost_count;
+
         assert.ok(post);
         assert.ok(post.is_pinned === true);
+        assert.ok(pinnedPostCount === 1);
     });
 
     it('unpinPost', async () => {
         const {dispatch, getState} = store;
 
-        nock(Client4.getPostsRoute()).
-            post('').
+        nock(Client4.getBaseRoute()).
+            get(`/channels/${TestHelper.basicChannel.id}/stats`).
+            reply(200, {channel_id: TestHelper.basicChannel.id, member_count: 1, pinnedpost_count: 0});
+
+        await dispatch(getChannelStats(TestHelper.basicChannel.id));
+
+        nock(Client4.getBaseRoute()).
+            post('/posts').
             reply(201, TestHelper.fakePostWithId(TestHelper.basicChannel.id));
         const post1 = await Client4.createPost(
-            TestHelper.fakePost(TestHelper.basicChannel.id)
+            TestHelper.fakePost(TestHelper.basicChannel.id),
         );
 
         const postList = {order: [post1.id], posts: {}};
         postList.posts[post1.id] = post1;
 
-        nock(Client4.getPostsRoute()).
-            get(`/${post1.id}/thread?fetchThreads=true`).
+        nock(Client4.getBaseRoute()).
+            get(`/posts/${post1.id}/thread?skipFetchThreads=false`).
             reply(200, postList);
         await Actions.getPostThread(post1.id)(dispatch, getState);
 
-        nock(Client4.getPostsRoute()).
-            post(`/${post1.id}/pin`).
+        nock(Client4.getBaseRoute()).
+            post(`/posts/${post1.id}/pin`).
             reply(200, OK_RESPONSE);
         await Actions.pinPost(post1.id)(dispatch, getState);
 
-        nock(Client4.getPostsRoute()).
-            post(`/${post1.id}/unpin`).
+        nock(Client4.getBaseRoute()).
+            post(`/posts/${post1.id}/unpin`).
             reply(200, OK_RESPONSE);
         await Actions.unpinPost(post1.id)(dispatch, getState);
 
         const state = getState();
+        const {stats} = state.entities.channels;
         const post = state.entities.posts.posts[post1.id];
+        const pinnedPostCount = stats[TestHelper.basicChannel.id].pinnedpost_count;
+
         assert.ok(post);
         assert.ok(post.is_pinned === false);
+        assert.ok(pinnedPostCount === 0);
     });
 
     it('addReaction', async () => {
@@ -1262,17 +1298,17 @@ describe('Actions.Posts', () => {
         TestHelper.mockLogin();
         await login(TestHelper.basicUser.email, 'password1')(dispatch, getState);
 
-        nock(Client4.getPostsRoute()).
-            post('').
+        nock(Client4.getBaseRoute()).
+            post('/posts').
             reply(201, TestHelper.fakePostWithId(TestHelper.basicChannel.id));
         const post1 = await Client4.createPost(
-            TestHelper.fakePost(TestHelper.basicChannel.id)
+            TestHelper.fakePost(TestHelper.basicChannel.id),
         );
 
         const emojiName = '+1';
 
-        nock(Client4.getReactionsRoute()).
-            post('').
+        nock(Client4.getBaseRoute()).
+            post('/reactions').
             reply(201, {user_id: TestHelper.basicUser.id, post_id: post1.id, emoji_name: emojiName, create_at: 1508168444721});
         await Actions.addReaction(post1.id, emojiName)(dispatch, getState);
 
@@ -1288,17 +1324,17 @@ describe('Actions.Posts', () => {
         TestHelper.mockLogin();
         await login(TestHelper.basicUser.email, 'password1')(dispatch, getState);
 
-        nock(Client4.getPostsRoute()).
-            post('').
+        nock(Client4.getBaseRoute()).
+            post('/posts').
             reply(201, TestHelper.fakePostWithId(TestHelper.basicChannel.id));
         const post1 = await Client4.createPost(
-            TestHelper.fakePost(TestHelper.basicChannel.id)
+            TestHelper.fakePost(TestHelper.basicChannel.id),
         );
 
         const emojiName = '+1';
 
-        nock(Client4.getReactionsRoute()).
-            post('').
+        nock(Client4.getBaseRoute()).
+            post('/reactions').
             reply(201, {user_id: TestHelper.basicUser.id, post_id: post1.id, emoji_name: emojiName, create_at: 1508168444721});
         await Actions.addReaction(post1.id, emojiName)(dispatch, getState);
 
@@ -1319,17 +1355,17 @@ describe('Actions.Posts', () => {
         TestHelper.mockLogin();
         await login(TestHelper.basicUser.email, 'password1')(dispatch, getState);
 
-        nock(Client4.getPostsRoute()).
-            post('').
+        nock(Client4.getBaseRoute()).
+            post('/posts').
             reply(201, TestHelper.fakePostWithId(TestHelper.basicChannel.id));
         const post1 = await Client4.createPost(
-            TestHelper.fakePost(TestHelper.basicChannel.id)
+            TestHelper.fakePost(TestHelper.basicChannel.id),
         );
 
         const emojiName = '+1';
 
-        nock(Client4.getReactionsRoute()).
-            post('').
+        nock(Client4.getBaseRoute()).
+            post('/reactions').
             reply(201, {user_id: TestHelper.basicUser.id, post_id: post1.id, emoji_name: emojiName, create_at: 1508168444721});
         await Actions.addReaction(post1.id, emojiName)(dispatch, getState);
 
@@ -1338,8 +1374,8 @@ describe('Actions.Posts', () => {
             data: {user_id: TestHelper.basicUser.id, post_id: post1.id, emoji_name: emojiName},
         });
 
-        nock(Client4.getPostsRoute()).
-            get(`/${post1.id}/reactions`).
+        nock(Client4.getBaseRoute()).
+            get(`/posts/${post1.id}/reactions`).
             reply(200, [{user_id: TestHelper.basicUser.id, post_id: post1.id, emoji_name: emojiName, create_at: 1508168444721}]);
         await Actions.getReactionsForPost(post1.id)(dispatch, getState);
 
@@ -1354,8 +1390,8 @@ describe('Actions.Posts', () => {
         const testImageData = fs.createReadStream('test/assets/images/test.png');
         const {dispatch, getState} = store;
 
-        nock(Client4.getEmojisRoute()).
-            post('').
+        nock(Client4.getBaseRoute()).
+            post('/emoji').
             reply(201, {id: TestHelper.generateId(), create_at: 1507918415696, update_at: 1507918415696, delete_at: 0, creator_id: TestHelper.basicUser.id, name: TestHelper.generateId()});
 
         const {data: created} = await createCustomEmoji(
@@ -1363,7 +1399,7 @@ describe('Actions.Posts', () => {
                 name: TestHelper.generateId(),
                 creator_id: TestHelper.basicUser.id,
             },
-            testImageData
+            testImageData,
         )(store.dispatch, store.getState);
 
         nock(Client4.getEmojisRoute()).
@@ -1670,8 +1706,8 @@ describe('Actions.Posts', () => {
                 },
             };
 
-            nock(Client4.getPostsRoute()).
-                get(`/${post1.id}/thread?fetchThreads=true`).
+            nock(Client4.getBaseRoute()).
+                get(`/posts/${post1.id}/thread?skipFetchThreads=false`).
                 reply(200, threadList);
         });
 

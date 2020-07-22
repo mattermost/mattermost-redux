@@ -39,8 +39,8 @@ describe('Actions.Files', () => {
         imageFormData.append('client_ids', clientId);
         const formBoundary = imageFormData.getBoundary();
 
-        nock(Client4.getFilesRoute()).
-            post('').
+        nock(Client4.getBaseRoute()).
+            post('/files').
             reply(201, {file_infos: [{id: TestHelper.generateId(), user_id: TestHelper.basicUser.id, create_at: 1507921547541, update_at: 1507921547541, delete_at: 0, name: 'test.png', extension: 'png', size: 258428, mime_type: 'image/png', width: 600, height: 600, has_preview_image: true}], client_ids: [TestHelper.generateId()]});
 
         await Actions.uploadFile(basicChannel.id, null, [clientId], imageFormData, formBoundary)(store.dispatch, store.getState);
@@ -68,8 +68,8 @@ describe('Actions.Files', () => {
         imageFormData.append('client_ids', clientId);
         const formBoundary = imageFormData.getBoundary();
 
-        nock(Client4.getFilesRoute()).
-            post('').
+        nock(Client4.getBaseRoute()).
+            post('/files').
             reply(201, {file_infos: [{id: TestHelper.generateId(), user_id: TestHelper.basicUser.id, create_at: 1507921547541, update_at: 1507921547541, delete_at: 0, name: 'test.png', extension: 'png', size: 258428, mime_type: 'image/png', width: 600, height: 600, has_preview_image: true}], client_ids: [TestHelper.generateId()]});
 
         const fileUploadResp = await basicClient4.
@@ -79,13 +79,13 @@ describe('Actions.Files', () => {
         const fakePostForFile = TestHelper.fakePost(basicChannel.id);
         fakePostForFile.file_ids = [fileId];
 
-        nock(Client4.getPostsRoute()).
-            post('').
+        nock(Client4.getBaseRoute()).
+            post('/posts').
             reply(201, {...TestHelper.fakePostWithId(), ...fakePostForFile});
         const postForFile = await basicClient4.createPost(fakePostForFile);
 
-        nock(Client4.getPostsRoute()).
-            get(`/${postForFile.id}/files/info`).
+        nock(Client4.getBaseRoute()).
+            get(`/posts/${postForFile.id}/files/info`).
             reply(200, [{id: fileId, user_id: TestHelper.basicUser.id, create_at: 1507921547541, update_at: 1507921547541, delete_at: 0, name: 'test.png', extension: 'png', size: 258428, mime_type: 'image/png', width: 600, height: 600, has_preview_image: true}]);
 
         await Actions.getFilesForPost(postForFile.id)(store.dispatch, store.getState);

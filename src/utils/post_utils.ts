@@ -6,7 +6,7 @@ import {haveIChannelPermission} from 'selectors/entities/roles';
 
 import {GlobalState} from 'types/store';
 import {PreferenceType} from 'types/preferences';
-import {Post, PostType} from 'types/posts';
+import {Post, PostType, PostMetadata, PostEmbed} from 'types/posts';
 import {UserProfile} from 'types/users';
 import {Team} from 'types/teams';
 import {Channel} from 'types/channels';
@@ -37,7 +37,12 @@ export function isPostEphemeral(post: Post): boolean {
     return post.type === Posts.POST_TYPES.EPHEMERAL || post.type === Posts.POST_TYPES.EPHEMERAL_ADD_TO_CHANNEL || post.state === Posts.POST_DELETED;
 }
 
-export function shouldIgnorePost(post: Post): boolean {
+export function shouldIgnorePost(post: Post, userId?: $ID<UserProfile>): boolean {
+    const postTypeCheck = post.type && (post.type === Posts.POST_TYPES.ADD_TO_CHANNEL);
+    const userIdCheck = post.props && post.props.addedUserId && (post.props.addedUserId === userId);
+    if (postTypeCheck && userIdCheck) {
+        return false;
+    }
     return Posts.IGNORE_POST_TYPES.includes(post.type);
 }
 
@@ -86,10 +91,8 @@ export function canEditPost(state: GlobalState, config: any, license: any, teamI
     let canEdit = true;
 
     if (hasNewPermissions(state)) {
-        canEdit = canEdit && haveIChannelPermission(state, {team: teamId, channel: channelId, permission: Permissions.EDIT_POST});
-        if (!isOwner) {
-            canEdit = canEdit && haveIChannelPermission(state, {team: teamId, channel: channelId, permission: Permissions.EDIT_OTHERS_POSTS});
-        }
+        const permission = isOwner ? Permissions.EDIT_POST : Permissions.EDIT_OTHERS_POSTS;
+        canEdit = haveIChannelPermission(state, {team: teamId, channel: channelId, permission});
         if (license.IsLicensed === 'true' && config.PostEditTimeLimit !== '-1' && config.PostEditTimeLimit !== -1) {
             const timeLeft = (post.create_at + (config.PostEditTimeLimit * 1000)) - Date.now();
             if (timeLeft <= 0) {
@@ -216,4 +219,12 @@ export function isPostCommentMention({post, currentUser, threadRepliedToByCurren
 
 export function fromAutoResponder(post: Post): boolean {
     return Boolean(post.type && (post.type === Posts.SYSTEM_AUTO_RESPONDER));
+}
+
+export function getEmbedFromMetadata(metadata: PostMetadata): PostEmbed | null {
+    if (!metadata || !metadata.embeds || metadata.embeds.length === 0) {
+        return null;
+    }
+
+    return metadata.embeds[0];
 }

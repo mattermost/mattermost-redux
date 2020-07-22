@@ -1,6 +1,9 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
 
+import {Theme} from 'types/preferences';
+import {Preferences} from '../constants';
+
 export function makeStyleFromTheme(getStyleFromTheme: (a: any) => any): (a: any) => any {
     let lastTheme: any;
     let style: any;
@@ -74,32 +77,48 @@ export function blendColors(background: string, foreground: string, opacity: num
     const red = Math.floor(blendComponent(
         backgroundComponents.red,
         foregroundComponents.red,
-        opacity
+        opacity,
     ));
     const green = Math.floor(blendComponent(
         backgroundComponents.green,
         foregroundComponents.green,
-        opacity
+        opacity,
     ));
     const blue = Math.floor(blendComponent(
         backgroundComponents.blue,
         foregroundComponents.blue,
-        opacity
+        opacity,
     ));
     const alpha = blendComponent(
         backgroundComponents.alpha,
         foregroundComponents.alpha,
-        opacity
+        opacity,
     );
 
     return `rgba(${red},${green},${blue},${alpha})`;
 }
 
+// setThemeDefaults will set defaults on the theme for any unset properties.
+export function setThemeDefaults(theme: Theme): Theme {
+    const defaultTheme = Preferences.THEMES.default;
+
+    for (const property in defaultTheme) {
+        if (property === 'type') {
+            continue;
+        }
+        if (theme[property] == null) {
+            theme[property] = defaultTheme[property];
+        }
+    }
+
+    return theme;
+}
+
 // getThemeIdForThemeType returns the ID of the system theme that cor`responds to the old theme.type field.
 export function getThemeIdForThemeType(type: string): string {
     const themeTypes: {[type: string]: string} = {
-        'Mattermost': 'default',
-        'Organization': 'organization',
+        Mattermost: 'default',
+        Organization: 'organization',
         'Mattermost Dark': 'mattermostDark',
         'Windows Dark': 'windows10',
     };

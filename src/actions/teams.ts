@@ -13,7 +13,7 @@ import {getCurrentUserId} from 'selectors/entities/users';
 
 import {GetStateFunc, DispatchFunc, ActionFunc, ActionResult, batchActions, Action} from 'types/actions';
 
-import {Team, TeamMembership} from 'types/teams';
+import {Team, TeamMembership, TeamMemberWithError, GetTeamMembersOpts, TeamsWithCount} from 'types/teams';
 
 import {selectChannel} from './channels';
 import {logError} from './errors';
@@ -52,12 +52,13 @@ async function getProfilesAndStatusesForMembers(userIds: string[], dispatch: Dis
     await Promise.all(requests);
 }
 
-export function selectTeam(team: Team): ActionFunc {
-    return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
+export function selectTeam(team: Team | string): ActionFunc {
+    return async (dispatch: DispatchFunc) => {
+        const teamId = (typeof team === 'string') ? team : team.id;
         dispatch({
             type: TeamTypes.SELECT_TEAM,
-            data: team.id,
-        }, getState);
+            data: teamId,
+        });
 
         return {data: true};
     };
@@ -103,13 +104,13 @@ export function getTeams(page = 0, perPage: number = General.TEAMS_CHUNK_SIZE, i
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         let data;
 
-        dispatch({type: TeamTypes.GET_TEAMS_REQUEST, data}, getState);
+        dispatch({type: TeamTypes.GET_TEAMS_REQUEST, data});
 
         try {
-            data = await Client4.getTeams(page, perPage, includeTotalCount);
+            data = await Client4.getTeams(page, perPage, includeTotalCount) as TeamsWithCount;
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch, getState);
-            dispatch({type: TeamTypes.GET_TEAMS_FAILURE, data}, getState);
+            dispatch({type: TeamTypes.GET_TEAMS_FAILURE, data});
             dispatch(logError(error));
             return {error};
         }
@@ -132,22 +133,48 @@ export function getTeams(page = 0, perPage: number = General.TEAMS_CHUNK_SIZE, i
             });
         }
 
-        dispatch(batchActions(actions), getState);
+        dispatch(batchActions(actions));
 
         return {data};
     };
 }
 
-export function searchTeams(term: string): ActionFunc {
-    return bindClientFunc({
-        clientFunc: Client4.searchTeams,
-        onRequest: TeamTypes.GET_TEAMS_REQUEST,
-        onSuccess: [TeamTypes.RECEIVED_TEAMS_LIST, TeamTypes.GET_TEAMS_SUCCESS],
-        onFailure: TeamTypes.GET_TEAMS_FAILURE,
-        params: [
-            term,
-        ],
-    });
+export function searchTeams(term: string, page?: number, perPage?: number): ActionFunc {
+    return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
+        dispatch({type: TeamTypes.GET_TEAMS_REQUEST, data: null});
+
+        let response;
+        try {
+            response = await Client4.searchTeams(term, page, perPage);
+        } catch (error) {
+            forceLogoutIfNecessary(error, dispatch, getState);
+            dispatch(batchActions([
+                {type: TeamTypes.GET_TEAMS_FAILURE, error},
+                logError(error),
+            ]));
+            return {error};
+        }
+
+        // The type of the response is determined by whether or not page/perPage were set
+        let teams;
+        if (page == null || perPage == null) {
+            teams = response as Team[];
+        } else {
+            teams = (response as TeamsWithCount).teams;
+        }
+
+        dispatch(batchActions([
+            {
+                type: TeamTypes.RECEIVED_TEAMS_LIST,
+                data: teams,
+            },
+            {
+                type: TeamTypes.GET_TEAMS_SUCCESS,
+            },
+        ]));
+
+        return {data: response};
+    };
 }
 
 export function createTeam(team: Team): ActionFunc {
@@ -183,7 +210,7 @@ export function createTeam(team: Team): ActionFunc {
                 type: TeamTypes.SELECT_TEAM,
                 data: created.id,
             },
-        ]), getState);
+        ]));
         dispatch(loadRolesIfNeeded(member.roles.split(' ')));
 
         return {data: created};
@@ -214,10 +241,10 @@ export function deleteTeam(teamId: string): ActionFunc {
             {
                 type: TeamTypes.RECEIVED_TEAM_DELETED,
                 data: {id: teamId},
-            }
+            },
         );
 
-        dispatch(batchActions(actions), getState);
+        dispatch(batchActions(actions));
 
         return {data: true};
     };
@@ -278,7 +305,7 @@ export function getMyTeamMembers(): ActionFunc {
     };
 }
 
-export function getTeamMembers(teamId: string, page = 0, perPage: number = General.TEAMS_CHUNK_SIZE): ActionFunc {
+export function getTeamMembers(teamId: string, page = 0, perPage: number = General.TEAMS_CHUNK_SIZE, options: GetTeamMembersOpts): ActionFunc {
     return bindClientFunc({
         clientFunc: Client4.getTeamMembers,
         onRequest: TeamTypes.GET_TEAM_MEMBERS_REQUEST,
@@ -288,6 +315,7 @@ export function getTeamMembers(teamId: string, page = 0, perPage: number = Gener
             teamId,
             page,
             perPage,
+            options,
         ],
     });
 }
@@ -405,7 +433,7 @@ export function addUserToTeam(teamId: string, userId: string): ActionFunc {
                 type: TeamTypes.RECEIVED_MEMBER_IN_TEAM,
                 data: member,
             },
-        ]), getState);
+        ]));
 
         return {data: member};
     };
@@ -435,9 +463,39 @@ export function addUsersToTeam(teamId: string, userIds: Array<string>): ActionFu
                 type: TeamTypes.RECEIVED_MEMBERS_IN_TEAM,
                 data: members,
             },
-        ]), getState);
+        ]));
 
         return {data: members};
+    };
+}
+
+export function addUsersToTeamGracefully(teamId: string, userIds: Array<string>): ActionFunc {
+    return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
+        let result: Array<TeamMemberWithError>;
+        try {
+            result = await Client4.addUsersToTeamGracefully(teamId, userIds);
+        } catch (error) {
+            forceLogoutIfNecessary(error, dispatch, getState);
+            dispatch(logError(error));
+            return {error};
+        }
+
+        const addedMembers = result ? result.filter((m) => !m.error) : [];
+        const profiles: Partial<UserProfile>[] = addedMembers.map((m) => ({id: m.user_id}));
+        const members = addedMembers.map((m) => m.member);
+        dispatch(batchActions([
+            {
+                type: UserTypes.RECEIVED_PROFILES_LIST_IN_TEAM,
+                data: profiles,
+                id: teamId,
+            },
+            {
+                type: TeamTypes.RECEIVED_MEMBERS_IN_TEAM,
+                data: members,
+            },
+        ]));
+
+        return {data: result};
     };
 }
 
@@ -489,7 +547,7 @@ export function removeUserFromTeam(teamId: string, userId: string): ActionFunc {
             }
         }
 
-        dispatch(batchActions(actions), getState);
+        dispatch(batchActions(actions));
 
         return {data: true};
     };
@@ -538,6 +596,27 @@ export function sendEmailGuestInvitesToChannels(teamId: string, channelIds: Arra
         ],
     });
 }
+export function sendEmailInvitesToTeamGracefully(teamId: string, emails: Array<string>): ActionFunc {
+    return bindClientFunc({
+        clientFunc: Client4.sendEmailInvitesToTeamGracefully,
+        params: [
+            teamId,
+            emails,
+        ],
+    });
+}
+
+export function sendEmailGuestInvitesToChannelsGracefully(teamId: string, channelIds: Array<string>, emails: Array<string>, message: string): ActionFunc {
+    return bindClientFunc({
+        clientFunc: Client4.sendEmailGuestInvitesToChannelsGracefully,
+        params: [
+            teamId,
+            channelIds,
+            emails,
+            message,
+        ],
+    });
+}
 
 export function getTeamInviteInfo(inviteId: string): ActionFunc {
     return bindClientFunc({
@@ -568,7 +647,7 @@ export function checkIfTeamExists(teamName: string): ActionFunc {
 
 export function joinTeam(inviteId: string, teamId: string): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
-        dispatch({type: TeamTypes.JOIN_TEAM_REQUEST, data: null}, getState);
+        dispatch({type: TeamTypes.JOIN_TEAM_REQUEST, data: null});
 
         const state = getState();
         try {
@@ -594,7 +673,7 @@ export function joinTeam(inviteId: string, teamId: string): ActionFunc {
             getMyTeamMembers()(dispatch, getState),
         ]);
 
-        dispatch({type: TeamTypes.JOIN_TEAM_SUCCESS, data: null}, getState);
+        dispatch({type: TeamTypes.JOIN_TEAM_SUCCESS, data: null});
         return {data: true};
     };
 }
@@ -632,7 +711,7 @@ export function updateTeamMemberSchemeRoles(
     teamId: string,
     userId: string,
     isSchemeUser: boolean,
-    isSchemeAdmin: boolean
+    isSchemeAdmin: boolean,
 ): ActionFunc {
     return bindClientFunc({
         clientFunc: async () => {

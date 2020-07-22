@@ -10,6 +10,7 @@ import {GroupSearchOpts} from 'types/groups';
 
 import {bindClientFunc, forceLogoutIfNecessary} from './helpers';
 import {logError} from './errors';
+
 export function getLogs(page = 0, perPage: number = General.LOGS_PAGE_SIZE_DEFAULT): ActionFunc {
     return bindClientFunc({
         clientFunc: Client4.getLogs,
@@ -401,7 +402,7 @@ export function removeLicense(): ActionFunc {
 
 export function getAnalytics(name: string, teamId = ''): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
-        dispatch({type: AdminTypes.GET_ANALYTICS_REQUEST, data: null}, getState);
+        dispatch({type: AdminTypes.GET_ANALYTICS_REQUEST, data: null});
 
         let data;
         try {
@@ -411,7 +412,7 @@ export function getAnalytics(name: string, teamId = ''): ActionFunc {
             dispatch(batchActions([
                 {type: AdminTypes.GET_ANALYTICS_FAILURE, error},
                 logError(error),
-            ]), getState);
+            ]));
             return {error};
         }
 
@@ -422,7 +423,7 @@ export function getAnalytics(name: string, teamId = ''): ActionFunc {
             actions.push({type: AdminTypes.RECEIVED_TEAM_ANALYTICS, data, name, teamId});
         }
 
-        dispatch(batchActions(actions), getState);
+        dispatch(batchActions(actions));
 
         return {data};
     };
@@ -582,4 +583,24 @@ export function disablePlugin(pluginId: string): ActionFunc {
 
         return {data: true};
     };
+}
+
+export function getSamlMetadataFromIdp(samlMetadataURL: string): ActionFunc {
+    return bindClientFunc({
+        clientFunc: Client4.getSamlMetadataFromIdp,
+        onSuccess: AdminTypes.RECEIVED_SAML_METADATA_RESPONSE,
+        params: [
+            samlMetadataURL,
+        ],
+    });
+}
+
+export function setSamlIdpCertificateFromMetadata(certData: string): ActionFunc {
+    return bindClientFunc({
+        clientFunc: Client4.setSamlIdpCertificateFromMetadata,
+        onSuccess: AdminTypes.SET_SAML_IDP_SUCCESS,
+        params: [
+            certData,
+        ],
+    });
 }

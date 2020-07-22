@@ -1,13 +1,16 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
-import {ScopeTypes} from 'constants/schemes';
 
 import {createSelector} from 'reselect';
+
+import {ScopeTypes} from 'constants/schemes';
+
 import {getAllChannels} from 'selectors/entities/channels';
 import {getTeams} from 'selectors/entities/teams';
-import {GlobalState} from 'types/store';
-import {Scheme} from 'types/schemes';
+
 import {Channel} from 'types/channels';
+import {Scheme} from 'types/schemes';
+import {GlobalState} from 'types/store';
 import {Team} from 'types/teams';
 
 export function getSchemes(state: GlobalState): {

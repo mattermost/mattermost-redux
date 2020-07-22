@@ -1,14 +1,13 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
+
 import {combineReducers} from 'redux';
 import {GroupTypes} from 'action_types';
-import {GroupChannel, GroupSyncables, GroupTeam, Group} from 'types/groups';
+import {GroupChannel, GroupSyncablesState, GroupTeam, Group} from 'types/groups';
 import {GenericAction} from 'types/actions';
-import {Team, TeamMembership} from 'types/teams';
-import {ChannelMembership} from 'types/channels';
 import {Dictionary} from 'types/utilities';
 
-function syncables(state: Dictionary<GroupSyncables> = {}, action: GenericAction) {
+function syncables(state: Dictionary<GroupSyncablesState> = {}, action: GenericAction) {
     switch (action.type) {
     case GroupTypes.RECEIVED_GROUP_TEAMS: {
         return {
@@ -28,13 +27,14 @@ function syncables(state: Dictionary<GroupSyncables> = {}, action: GenericAction
             },
         };
     }
+    case GroupTypes.PATCHED_GROUP_TEAM:
     case GroupTypes.LINKED_GROUP_TEAM: {
         let nextGroupTeams: GroupTeam[] = [];
-
-        if (!state[action.data.group_id] || !state[action.data.group_id].teams) {
+        if (!state[action.data.group_id] || !state[action.data.group_id].teams || state[action.data.group_id].teams.length === 0) {
             nextGroupTeams = [action.data];
         } else {
-            nextGroupTeams = {...state}[action.data.group_id].teams;
+            nextGroupTeams = {...state}[action.data.group_id].teams.slice();
+
             for (let i = 0, len = nextGroupTeams.length; i < len; i++) {
                 if (nextGroupTeams[i].team_id === action.data.team_id) {
                     nextGroupTeams[i] = action.data;
@@ -50,13 +50,14 @@ function syncables(state: Dictionary<GroupSyncables> = {}, action: GenericAction
             },
         };
     }
+    case GroupTypes.PATCHED_GROUP_CHANNEL:
     case GroupTypes.LINKED_GROUP_CHANNEL: {
         let nextGroupChannels: GroupChannel[] = [];
 
         if (!state[action.data.group_id] || !state[action.data.group_id].channels) {
             nextGroupChannels = [action.data];
         } else {
-            nextGroupChannels = {...state}[action.data.group_id].channels;
+            nextGroupChannels = {...state}[action.data.group_id].channels.slice();
             for (let i = 0, len = nextGroupChannels.length; i < len; i++) {
                 if (nextGroupChannels[i].channel_id === action.data.channel_id) {
                     nextGroupChannels[i] = action.data;
@@ -121,15 +122,27 @@ function syncables(state: Dictionary<GroupSyncables> = {}, action: GenericAction
     }
 }
 
-function members(state: any = {}, action: GenericAction) {
+function myGroups(state: any = {}, action: GenericAction) {
     switch (action.type) {
-    case GroupTypes.RECEIVED_GROUP_MEMBERS: {
+    case GroupTypes.RECEIVED_MY_GROUPS: {
+        const nextState = {...state};
+        for (const group of action.data) {
+            nextState[group.id] = group;
+        }
+        return nextState;
+    }
+    default:
+        return state;
+    }
+}
+
+function stats(state: any = {}, action: GenericAction) {
+    switch (action.type) {
+    case GroupTypes.RECEIVED_GROUP_STATS: {
+        const stat = action.data;
         return {
             ...state,
-            [action.group_id]: {
-                members: action.data.members,
-                totalMemberCount: action.data.total_member_count,
-            },
+            [stat.group_id]: stat,
         };
     }
     default:
@@ -139,6 +152,7 @@ function members(state: any = {}, action: GenericAction) {
 
 function groups(state: Dictionary<Group> = {}, action: GenericAction) {
     switch (action.type) {
+    case GroupTypes.PATCHED_GROUP:
     case GroupTypes.RECEIVED_GROUP: {
         return {
             ...state,
@@ -152,12 +166,28 @@ function groups(state: Dictionary<Group> = {}, action: GenericAction) {
         }
         return nextState;
     }
+    case GroupTypes.RECEIVED_ALL_GROUPS_ASSOCIATED_TO_CHANNELS_IN_TEAM: {
+        const nextState = {...state};
+        const {groupsByChannelId} = action.data;
+
+        for (const channelID of Object.keys(groupsByChannelId)) {
+            if (groupsByChannelId[channelID]) {
+                for (const group of groupsByChannelId[channelID]) {
+                    nextState[group.id] = group;
+                }
+            }
+        }
+        return nextState;
+    }
     case GroupTypes.RECEIVED_GROUPS_ASSOCIATED_TO_TEAM:
+    case GroupTypes.RECEIVED_ALL_GROUPS_ASSOCIATED_TO_TEAM:
+    case GroupTypes.RECEIVED_ALL_GROUPS_ASSOCIATED_TO_CHANNEL:
     case GroupTypes.RECEIVED_GROUPS_ASSOCIATED_TO_CHANNEL: {
         const nextState = {...state};
         for (const group of action.data.groups) {
             nextState[group.id] = group;
         }
+
         return nextState;
     }
     default:
@@ -167,6 +197,7 @@ function groups(state: Dictionary<Group> = {}, action: GenericAction) {
 
 export default combineReducers({
     syncables,
-    members,
     groups,
+    stats,
+    myGroups,
 });

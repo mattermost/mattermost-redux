@@ -3,7 +3,7 @@
 
 import assert from 'assert';
 
-import {Posts, Preferences} from 'constants';
+import {Posts, Preferences} from '../constants';
 import deepFreeze from 'utils/deep_freeze';
 import {getPreferenceKey} from 'utils/preference_utils';
 
@@ -30,11 +30,13 @@ describe('makeFilterPostsAndAddSeparators', () => {
     it('filter join/leave posts', () => {
         const filterPostsAndAddSeparators = makeFilterPostsAndAddSeparators();
         const time = Date.now();
-        const today = new Date();
-        today.setHours(0, 0, 0, 0);
+        const today = new Date(time);
 
         let state = {
             entities: {
+                general: {
+                    config: {},
+                },
                 posts: {
                     posts: {
                         1001: {id: '1001', create_at: time, type: ''},
@@ -142,11 +144,13 @@ describe('makeFilterPostsAndAddSeparators', () => {
     it('new messages indicator', () => {
         const filterPostsAndAddSeparators = makeFilterPostsAndAddSeparators();
         const time = Date.now();
-        const today = new Date();
-        today.setHours(0, 0, 0, 0);
+        const today = new Date(time);
 
         const state = {
             entities: {
+                general: {
+                    config: {},
+                },
                 posts: {
                     posts: {
                         1000: {id: '1000', create_at: time + 1000, type: ''},
@@ -174,7 +178,7 @@ describe('makeFilterPostsAndAddSeparators', () => {
             '1010',
             '1005',
             '1000',
-            'date-' + today.getTime(),
+            'date-' + (today.getTime() + 1000),
         ]);
 
         now = filterPostsAndAddSeparators(state, {postIds, indicateNewMessages: true});
@@ -182,7 +186,7 @@ describe('makeFilterPostsAndAddSeparators', () => {
             '1010',
             '1005',
             '1000',
-            'date-' + today.getTime(),
+            'date-' + (today.getTime() + 1000),
         ]);
 
         now = filterPostsAndAddSeparators(state, {postIds, lastViewedAt: time + 999, indicateNewMessages: false});
@@ -190,7 +194,7 @@ describe('makeFilterPostsAndAddSeparators', () => {
             '1010',
             '1005',
             '1000',
-            'date-' + today.getTime(),
+            'date-' + (today.getTime() + 1000),
         ]);
 
         // Show new messages indicator before all posts
@@ -200,7 +204,7 @@ describe('makeFilterPostsAndAddSeparators', () => {
             '1005',
             '1000',
             START_OF_NEW_MESSAGES,
-            'date-' + today.getTime(),
+            'date-' + (today.getTime() + 1000),
         ]);
 
         // Show indicator between posts
@@ -210,7 +214,7 @@ describe('makeFilterPostsAndAddSeparators', () => {
             '1005',
             START_OF_NEW_MESSAGES,
             '1000',
-            'date-' + today.getTime(),
+            'date-' + (today.getTime() + 1000),
         ]);
 
         now = filterPostsAndAddSeparators(state, {postIds, lastViewedAt: time + 1006, indicateNewMessages: true});
@@ -219,7 +223,7 @@ describe('makeFilterPostsAndAddSeparators', () => {
             START_OF_NEW_MESSAGES,
             '1005',
             '1000',
-            'date-' + today.getTime(),
+            'date-' + (today.getTime() + 1000),
         ]);
 
         // Don't show indicator when all posts are read
@@ -228,17 +232,15 @@ describe('makeFilterPostsAndAddSeparators', () => {
             '1010',
             '1005',
             '1000',
-            'date-' + today.getTime(),
+            'date-' + (today.getTime() + 1000),
         ]);
     });
 
     it('memoization', () => {
         const filterPostsAndAddSeparators = makeFilterPostsAndAddSeparators();
         const time = Date.now();
-        const today = new Date();
+        const today = new Date(time);
         const tomorrow = new Date((24 * 60 * 60 * 1000) + today.getTime());
-        today.setHours(0, 0, 0, 0);
-        tomorrow.setHours(0, 0, 0, 0);
 
         // Posts 7 hours apart so they should appear on multiple days
         const initialPosts = {
@@ -251,6 +253,9 @@ describe('makeFilterPostsAndAddSeparators', () => {
         };
         let state = {
             entities: {
+                general: {
+                    config: {},
+                },
                 posts: {
                     posts: initialPosts,
                 },
@@ -903,19 +908,19 @@ describe('getLastPostId', () => {
 });
 
 describe('getLastPostIndex', () => {
-    test.only('should return index of last post for list of all regular posts', () => {
+    test('should return index of last post for list of all regular posts', () => {
         expect(getLastPostIndex(['post1', 'post2', 'post3'])).toBe(2);
     });
 
-    test.only('should return index of last combined post', () => {
+    test('should return index of last combined post', () => {
         expect(getLastPostIndex(['user-activity-post2_post3', 'post4', 'user-activity-post5_post6'])).toBe(2);
     });
 
-    test.only('should skip date separators and return index of last post', () => {
+    test('should skip date separators and return index of last post', () => {
         expect(getLastPostIndex(['date-1234', 'user-activity-post1_post2', 'post3', 'post4', 'date-1000'])).toBe(3);
     });
 
-    test.only('should skip the new message line and return index of last post', () => {
+    test('should skip the new message line and return index of last post', () => {
         expect(getLastPostIndex(['post2', 'post3', 'post4', START_OF_NEW_MESSAGES])).toBe(2);
     });
 });

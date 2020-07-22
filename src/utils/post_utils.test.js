@@ -9,10 +9,12 @@ import {Permissions} from '../constants';
 import {
     canEditPost,
     isSystemMessage,
+    shouldIgnorePost,
     isMeMessage,
     isUserActivityPost,
     shouldFilterJoinLeavePost,
     isPostCommentMention,
+    getEmbedFromMetadata,
 } from 'utils/post_utils';
 
 describe('PostUtils', () => {
@@ -230,8 +232,8 @@ describe('PostUtils', () => {
             assert.ok(!canEditPost(newVersionState, {PostEditTimeLimit: -1}, licensed, teamId, channelId, userId, {user_id: userId}));
             assert.ok(!canEditPost(newVersionState, {PostEditTimeLimit: 300}, licensed, teamId, channelId, userId, {user_id: userId, create_at: Date.now() - 100}));
             assert.ok(!canEditPost(newVersionState, {PostEditTimeLimit: 300}, licensed, teamId, channelId, userId, {user_id: userId, create_at: Date.now() - 6000000}));
-            assert.ok(!canEditPost(newVersionState, {PostEditTimeLimit: -1}, licensed, teamId, channelId, userId, {user_id: 'other'}));
-            assert.ok(!canEditPost(newVersionState, {PostEditTimeLimit: 300}, licensed, teamId, channelId, userId, {user_id: 'other', create_at: Date.now() - 100}));
+            assert.ok(canEditPost(newVersionState, {PostEditTimeLimit: -1}, licensed, teamId, channelId, userId, {user_id: 'other'}));
+            assert.ok(canEditPost(newVersionState, {PostEditTimeLimit: 300}, licensed, teamId, channelId, userId, {user_id: 'other', create_at: Date.now() - 100}));
             assert.ok(!canEditPost(newVersionState, {PostEditTimeLimit: 300}, licensed, teamId, channelId, userId, {user_id: 'other', create_at: Date.now() - 6000000}));
 
             newVersionState.entities.roles = {
@@ -244,8 +246,8 @@ describe('PostUtils', () => {
             assert.ok(!canEditPost(newVersionState, {PostEditTimeLimit: -1}, licensed, teamId, channelId, userId, {user_id: userId}));
             assert.ok(!canEditPost(newVersionState, {PostEditTimeLimit: 300}, licensed, teamId, channelId, userId, {user_id: userId, create_at: Date.now() - 100}));
             assert.ok(!canEditPost(newVersionState, {PostEditTimeLimit: 300}, licensed, teamId, channelId, userId, {user_id: userId, create_at: Date.now() - 6000000}));
-            assert.ok(!canEditPost(newVersionState, {PostEditTimeLimit: -1}, licensed, teamId, channelId, userId, {user_id: 'other'}));
-            assert.ok(!canEditPost(newVersionState, {PostEditTimeLimit: 300}, licensed, teamId, channelId, userId, {user_id: 'other', create_at: Date.now() - 100}));
+            assert.ok(canEditPost(newVersionState, {PostEditTimeLimit: -1}, licensed, teamId, channelId, userId, {user_id: 'other'}));
+            assert.ok(canEditPost(newVersionState, {PostEditTimeLimit: 300}, licensed, teamId, channelId, userId, {user_id: 'other', create_at: Date.now() - 100}));
             assert.ok(!canEditPost(newVersionState, {PostEditTimeLimit: 300}, licensed, teamId, channelId, userId, {user_id: 'other', create_at: Date.now() - 6000000}));
 
             newVersionState.entities.roles = {
@@ -258,8 +260,8 @@ describe('PostUtils', () => {
             assert.ok(!canEditPost(newVersionState, {PostEditTimeLimit: -1}, licensed, teamId, channelId, userId, {user_id: userId}));
             assert.ok(!canEditPost(newVersionState, {PostEditTimeLimit: 300}, licensed, teamId, channelId, userId, {user_id: userId, create_at: Date.now() - 100}));
             assert.ok(!canEditPost(newVersionState, {PostEditTimeLimit: 300}, licensed, teamId, channelId, userId, {user_id: userId, create_at: Date.now() - 6000000}));
-            assert.ok(!canEditPost(newVersionState, {PostEditTimeLimit: -1}, licensed, teamId, channelId, userId, {user_id: 'other'}));
-            assert.ok(!canEditPost(newVersionState, {PostEditTimeLimit: 300}, licensed, teamId, channelId, userId, {user_id: 'other', create_at: Date.now() - 100}));
+            assert.ok(canEditPost(newVersionState, {PostEditTimeLimit: -1}, licensed, teamId, channelId, userId, {user_id: 'other'}));
+            assert.ok(canEditPost(newVersionState, {PostEditTimeLimit: 300}, licensed, teamId, channelId, userId, {user_id: 'other', create_at: Date.now() - 100}));
             assert.ok(!canEditPost(newVersionState, {PostEditTimeLimit: 300}, licensed, teamId, channelId, userId, {user_id: 'other', create_at: Date.now() - 6000000}));
 
             newVersionState.entities.roles = {
@@ -312,6 +314,7 @@ describe('PostUtils', () => {
                 {input: {type: ''}, output: false},
 
                 {input: {type: PostTypes.CHANNEL_DELETED}, output: true},
+                {input: {type: PostTypes.CHANNEL_UNARCHIVED}, output: true},
                 {input: {type: PostTypes.DISPLAYNAME_CHANGE}, output: true},
                 {input: {type: PostTypes.CONVERT_CHANNEL}, output: true},
                 {input: {type: PostTypes.EPHEMERAL}, output: true},
@@ -341,6 +344,32 @@ describe('PostUtils', () => {
                     `isSystemMessage('${testCase.input}') should return ${testCase.output}`,
                 );
             });
+        });
+    });
+
+    describe('shouldIgnorePost', () => {
+        it('should return false if system message is adding current user', () => {
+            const currentUserId = 'czduet3upjfupy9xnqswrxaqea';
+            const post = {
+                type: PostTypes.ADD_TO_CHANNEL,
+                user_id: 'anotherUserId',
+                props: {
+                    addedUserId: 'czduet3upjfupy9xnqswrxaqea',
+                },
+            };
+            const evalShouldIgnorePost = shouldIgnorePost(post, currentUserId);
+            assert.equal(evalShouldIgnorePost, false);
+        });
+        it('should return true if system message is adding a different user', () => {
+            const currentUserId = 'czduet3upjfupy9xnqswrxaqea';
+            const post = {
+                type: PostTypes.ADD_TO_CHANNEL,
+                props: {
+                    addedUserId: 'mrbijaq9mjr3ue569kake9m6do',
+                },
+            };
+            const evalShouldIgnorePost = shouldIgnorePost(post, currentUserId);
+            assert.equal(evalShouldIgnorePost, true);
         });
     });
 
@@ -505,6 +534,29 @@ describe('PostUtils', () => {
                 const confirmation = isMeMessage(data.post);
                 assert.equal(confirmation, data.result, data.post);
             }
+        });
+    });
+
+    describe('getEmbedFromMetadata', () => {
+        it('should return null if no metadata is not passed as argument', () => {
+            const embedData = getEmbedFromMetadata();
+            assert.equal(embedData, null);
+        });
+
+        it('should return null if argument does not contain embed key', () => {
+            const embedData = getEmbedFromMetadata({});
+            assert.equal(embedData, null);
+        });
+
+        it('should return null if embed key in argument is empty', () => {
+            const embedData = getEmbedFromMetadata({embeds: []});
+            assert.equal(embedData, null);
+        });
+
+        it('should return first entry in embed key', () => {
+            const embedValue = {type: 'opengraph', url: 'url'};
+            const embedData = getEmbedFromMetadata({embeds: [embedValue, {type: 'image', url: 'url1'}]});
+            assert.equal(embedData, embedValue);
         });
     });
 });

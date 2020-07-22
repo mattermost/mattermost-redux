@@ -19,7 +19,7 @@ export function receivedTheme(theme: Theme) {
     };
 }
 
-export function receivedThemes(themes: {[id: string]: Theme}) {
+export function receivedThemes(themes: Record<string, Theme>) {
     return {
         type: ThemeTypes.RECEIVED_THEMES,
         themes,

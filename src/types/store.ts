@@ -1,6 +1,6 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
-import {AlertType} from './alerts';
+
 import {GeneralState} from './general';
 import {UsersState} from './users';
 import {TeamsState} from './teams';
@@ -15,10 +15,11 @@ import {EmojisState} from './emojis';
 import {SchemesState} from './schemes';
 import {Typing} from './typing';
 import {GroupsState} from './groups';
-import {ChannelsRequestsStatuses, GeneralRequestsStatuses, PostsRequestsStatuses, TeamsRequestsStatuses, UsersRequestsStatuses, PreferencesRequestsStatuses, AdminRequestsStatuses, FilesRequestsStatuses, IntegrationsRequestsStatuses, RolesRequestsStatuses, SchemesRequestsStatuses, GroupsRequestsStatuses, JobsRequestsStatuses, SearchRequestsStatuses} from './requests';
+import {ChannelsRequestsStatuses, GeneralRequestsStatuses, PostsRequestsStatuses, TeamsRequestsStatuses, UsersRequestsStatuses, AdminRequestsStatuses, FilesRequestsStatuses, RolesRequestsStatuses, JobsRequestsStatuses} from './requests';
 import {Role} from './roles';
 import {PreferenceType} from './preferences';
 import {Bot} from './bots';
+import {ChannelCategoriesState} from './channel_categories';
 import {ThemesState} from './themes';
 import {Dictionary} from './utilities';
 
@@ -39,9 +40,6 @@ export type GlobalState = {
         };
         admin: AdminState;
         jobs: JobsState;
-        alerts: {
-            alertStack: Array<AlertType>;
-        };
         search: SearchState;
         integrations: IntegrationsState;
         files: FilesState;
@@ -56,6 +54,7 @@ export type GlobalState = {
         schemes: SchemesState;
         gifs: any;
         groups: GroupsState;
+        channelCategories: ChannelCategoriesState;
         themes: ThemesState;
     };
     errors: Array<any>;
@@ -65,15 +64,10 @@ export type GlobalState = {
         posts: PostsRequestsStatuses;
         teams: TeamsRequestsStatuses;
         users: UsersRequestsStatuses;
-        preferences: PreferencesRequestsStatuses;
         admin: AdminRequestsStatuses;
         files: FilesRequestsStatuses;
-        integrations: IntegrationsRequestsStatuses;
         roles: RolesRequestsStatuses;
-        schemes: SchemesRequestsStatuses;
-        groups: GroupsRequestsStatuses;
         jobs: JobsRequestsStatuses;
-        search: SearchRequestsStatuses;
     };
     websocket: {
         connected: boolean;

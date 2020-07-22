@@ -59,8 +59,8 @@ export function editRole(role: Role) {
 }
 
 export function setPendingRoles(roles: Array<string>) {
-    return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
-        dispatch({type: RoleTypes.SET_PENDING_ROLES, data: roles}, getState);
+    return async (dispatch: DispatchFunc) => {
+        dispatch({type: RoleTypes.SET_PENDING_ROLES, data: roles});
         return {data: roles};
     };
 }
@@ -72,20 +72,20 @@ export function loadRolesIfNeeded(roles: Iterable<string>): ActionFunc {
 
         try {
             pendingRoles = new Set<string>(state.entities.roles.pending);
-    } catch (e) {// eslint-disable-line
+        } catch (e) {// eslint-disable-line
         }
 
         for (const role of roles) {
             pendingRoles.add(role);
         }
         if (!state.entities.general.serverVersion) {
-            setPendingRoles(Array.from(pendingRoles))(dispatch, getState);
+            dispatch(setPendingRoles(Array.from(pendingRoles)));
             setTimeout(() => dispatch(loadRolesIfNeeded([])), 500);
             return {data: []};
         }
         if (!hasNewPermissions(state)) {
             if (state.entities.roles.pending) {
-                await setPendingRoles([])(dispatch, getState);
+                await dispatch(setPendingRoles([]));
             }
             return {data: []};
         }
@@ -99,7 +99,7 @@ export function loadRolesIfNeeded(roles: Iterable<string>): ActionFunc {
         }
 
         if (state.entities.roles.pending) {
-            await setPendingRoles([])(dispatch, getState);
+            await dispatch(setPendingRoles([]));
         }
         if (newRoles.size > 0) {
             return getRolesByNames(Array.from(newRoles))(dispatch, getState);

@@ -3,7 +3,7 @@
 import {combineReducers} from 'redux';
 import {ChannelTypes, TeamTypes, UserTypes, SchemeTypes, GroupTypes} from 'action_types';
 import {teamListToMap} from 'utils/team_utils';
-import {Team, TeamMembership} from 'types/teams';
+import {Team, TeamMembership, TeamUnread} from 'types/teams';
 import {UserProfile} from 'types/users';
 import {RelationOneToOne, IDMappedObjects} from 'types/utilities';
 import {GenericAction} from 'types/actions';
@@ -25,6 +25,8 @@ function teams(state: IDMappedObjects<Team> = {}, action: GenericAction) {
     case TeamTypes.RECEIVED_TEAMS_LIST:
     case SchemeTypes.RECEIVED_SCHEME_TEAMS:
         return Object.assign({}, state, teamListToMap(action.data));
+    case UserTypes.LOGIN: // Used by the mobile app
+        return Object.assign({}, state, teamListToMap(action.data.teams));
     case TeamTypes.RECEIVED_TEAMS:
         return Object.assign({}, state, action.data);
 
@@ -229,6 +231,23 @@ function myMembers(state: RelationOneToOne<Team, TeamMembership> = {}, action: G
         return {...state, [teamId]: newTeamState};
     }
 
+    case UserTypes.LOGIN: {// Used by the mobile app
+        const {teamMembers, teamUnreads} = action.data;
+        const nextState = {...state};
+
+        for (const m of teamMembers) {
+            if (m.delete_at == null || m.delete_at === 0) {
+                const unread = teamUnreads.find((u: TeamUnread) => u.team_id === m.team_id);
+                if (unread) {
+                    m.mention_count = unread.mention_count;
+                    m.msg_count = unread.msg_count;
+                }
+                nextState[m.team_id] = m;
+            }
+        }
+
+        return nextState;
+    }
     case UserTypes.LOGOUT_SUCCESS:
         return {};
     default:
@@ -344,6 +363,17 @@ function stats(state: any = {}, action: GenericAction) {
 
 function groupsAssociatedToTeam(state: RelationOneToOne<Team, {ids: string[]; totalCount: number}> = {}, action: GenericAction) {
     switch (action.type) {
+    case GroupTypes.RECEIVED_GROUP_ASSOCIATED_TO_TEAM: {
+        const {teamID, groups} = action.data;
+        const nextState = {...state};
+        const associatedGroupIDs = new Set(state[teamID] ? state[teamID].ids : []);
+        for (const group of groups) {
+            associatedGroupIDs.add(group.id);
+        }
+        nextState[teamID] = {ids: Array.from(associatedGroupIDs), totalCount: associatedGroupIDs.size};
+
+        return nextState;
+    }
     case GroupTypes.RECEIVED_GROUPS_ASSOCIATED_TO_TEAM: {
         const {teamID, groups, totalGroupCount} = action.data;
         const nextState = {...state};
@@ -365,6 +395,7 @@ function groupsAssociatedToTeam(state: RelationOneToOne<Team, {ids: string[]; to
         nextState[teamID] = {ids, totalCount: ids.length};
         return nextState;
     }
+    case GroupTypes.RECEIVED_GROUP_NOT_ASSOCIATED_TO_TEAM:
     case GroupTypes.RECEIVED_GROUPS_NOT_ASSOCIATED_TO_TEAM: {
         const {teamID, groups} = action.data;
         const nextState = {...state};
@@ -403,7 +434,7 @@ function updateTeamMemberSchemeRoles(state: RelationOneToOne<Team, RelationOneTo
 }
 
 function updateMyTeamMemberSchemeRoles(state: RelationOneToOne<Team, TeamMembership>, action: GenericAction) {
-    const {teamId, userId, isSchemeUser, isSchemeAdmin} = action.data;
+    const {teamId, isSchemeUser, isSchemeAdmin} = action.data;
     const member = state[teamId];
     if (member) {
         return {

@@ -7,5 +7,4 @@ export default {
     PLUGIN_STATE_FAILED_TO_START: 3,
     PLUGIN_STATE_FAILED_TO_STAY_RUNNING: 4,
     PLUGIN_STATE_STOPPING: 5,
-    PREPACKAGED_PLUGINS: ['zoom', 'jira', 'mattermost-autolink', 'com.mattermost.nps', 'com.mattermost.custom-attributes', 'github', 'com.mattermost.welcomebot', 'com.mattermost.aws-sns', 'com.github.manland.mattermost-plugin-gitlab', 'antivirus'],
 };

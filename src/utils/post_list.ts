@@ -92,8 +92,6 @@ export function makeFilterPostsAndAddSeparators() {
                     }
                 }
 
-                postDate.setHours(0, 0, 0, 0);
-
                 if (!lastDate || lastDate.toDateString() !== postDate.toDateString()) {
                     out.push(DATE_LINE + postDate.getTime());
 
@@ -116,7 +114,7 @@ export function makeFilterPostsAndAddSeparators() {
 
             // Flip it back to newest to oldest
             return out.reverse();
-        }
+        },
     );
 }
 
@@ -292,7 +290,7 @@ export function makeGenerateCombinedPost() {
                 user_id: '',
                 metadata: {},
             };
-        }
+        },
     );
 }
 
@@ -311,8 +309,9 @@ export const postTypePriority = {
     [Posts.POST_TYPES.DISPLAYNAME_CHANGE]: 11,
     [Posts.POST_TYPES.CONVERT_CHANNEL]: 12,
     [Posts.POST_TYPES.CHANNEL_DELETED]: 13,
-    [Posts.POST_TYPES.ADD_REMOVE]: 14,
-    [Posts.POST_TYPES.EPHEMERAL]: 15,
+    [Posts.POST_TYPES.CHANNEL_UNARCHIVED]: 14,
+    [Posts.POST_TYPES.ADD_REMOVE]: 15,
+    [Posts.POST_TYPES.EPHEMERAL]: 16,
 };
 
 export function comparePostTypes(a: typeof postTypePriority, b: typeof postTypePriority) {

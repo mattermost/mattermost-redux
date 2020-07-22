@@ -4,7 +4,7 @@ import {ChannelTypes, GeneralTypes, PostTypes, UserTypes} from 'action_types';
 import {Posts} from '../../constants';
 import {comparePosts} from 'utils/post_utils';
 import {Post, PostsState, PostOrderBlock, MessageHistory} from 'types/posts';
-import {RelationOneToOne, Dictionary, IDMappedObjects, RelationOneToMany} from 'types/utilities';
+import {$ID, RelationOneToOne, Dictionary, IDMappedObjects, RelationOneToMany} from 'types/utilities';
 import {GenericAction} from 'types/actions';
 import {Reaction} from 'types/reactions';
 
@@ -65,20 +65,70 @@ export function removeUnneededMetadata(post: Post) {
     };
 }
 
-export function handlePosts(state: RelationOneToOne<Post, Post> = {}, action: GenericAction) {
+export function nextPostsReplies(state: {[x in $ID<Post>]: number} = {}, action: GenericAction) {
     switch (action.type) {
     case PostTypes.RECEIVED_POST:
     case PostTypes.RECEIVED_NEW_POST: {
         const post = action.data;
-        const newState = {...state};
-
-        if (action.type === PostTypes.RECEIVED_NEW_POST && post.root_id && state[post.root_id] && post.pending_post_id && post.id !== post.pending_post_id) {
-            const rootPost = state[post.root_id];
-
-            newState[post.root_id] = {...rootPost, reply_count: (rootPost.reply_count || 0) + 1};
+        if (!post.id || !post.root_id || !post.reply_count) {
+            // Ignoring pending posts and root posts
+            return state;
         }
 
-        return handlePostReceived(newState, post);
+        const newState = {...state};
+        newState[post.root_id] = post.reply_count;
+        return newState;
+    }
+
+    case PostTypes.RECEIVED_POSTS: {
+        const posts = Object.values(action.data.posts) as Post[];
+
+        if (posts.length === 0) {
+            return state;
+        }
+
+        const nextState = {...state};
+
+        for (const post of posts) {
+            if (post.root_id) {
+                nextState[post.root_id] = post.reply_count;
+            } else {
+                nextState[post.id] = post.reply_count;
+            }
+        }
+
+        return nextState;
+    }
+
+    case PostTypes.POST_DELETED: {
+        const post: Post = action.data;
+
+        if (!state[post.root_id] && !state[post.id]) {
+            return state;
+        }
+
+        const nextState = {...state};
+        if (post.root_id && state[post.root_id]) {
+            nextState[post.root_id] -= 1;
+        }
+        if (!post.root_id && state[post.id]) {
+            Reflect.deleteProperty(nextState, post.id);
+        }
+
+        return nextState;
+    }
+    case UserTypes.LOGOUT_SUCCESS:
+        return {};
+    default:
+        return state;
+    }
+}
+
+export function handlePosts(state: RelationOneToOne<Post, Post> = {}, action: GenericAction) {
+    switch (action.type) {
+    case PostTypes.RECEIVED_POST:
+    case PostTypes.RECEIVED_NEW_POST: {
+        return handlePostReceived({...state}, action.data);
     }
 
     case PostTypes.RECEIVED_POSTS: {
@@ -114,10 +164,6 @@ export function handlePosts(state: RelationOneToOne<Post, Post> = {}, action: Ge
                 has_reactions: false,
             },
         };
-        if (post.root_id && state[post.root_id]) {
-            const rootPost = state[post.root_id];
-            nextState[post.root_id] = {...rootPost, reply_count: (rootPost.reply_count || 0) - 1};
-        }
 
         // Remove any of its comments
         for (const otherPost of Object.values(state)) {
@@ -1110,9 +1156,10 @@ function storeOpenGraphForPost(state: any, post: Post) {
             return nextState;
         }
 
+        const postIdState = nextState[post.id] ? {...nextState[post.id], [embed.url]: embed.data} : {[embed.url]: embed.data};
         return {
             ...nextState,
-            [embed.url]: embed.data,
+            [post.id]: postIdState,
         };
     }, state);
 }
@@ -1217,6 +1264,9 @@ export default function(state: Partial<PostsState> = {}, action: GenericAction) 
 
         // Object mapping post ids to post objects
         posts: nextPosts,
+
+        // Object mapping post ids to replies count
+        postsReplies: nextPostsReplies(state.postsReplies, action),
 
         // Array that contains the pending post ids for those messages that are in transition to being created
         pendingPostIds: handlePendingPosts(state.pendingPostIds, action),

@@ -9,7 +9,7 @@ import Client4 from 'client/client4';
 import {DEFAULT_LOCALE} from 'constants/general';
 import {generateId} from 'utils/helpers';
 
-const DEFAULT_SERVER = 'http://localhost:8065';
+export const DEFAULT_SERVER = 'http://localhost:8065';
 const PASSWORD = 'password1';
 
 class TestHelper {
@@ -69,10 +69,10 @@ class TestHelper {
         };
     };
 
-    fakeUserWithId = () => {
+    fakeUserWithId = (id = this.generateId()) => {
         return {
             ...this.fakeUser(),
-            id: this.generateId(),
+            id,
             create_at: 1507840900004,
             update_at: 1507840900004,
             delete_at: 0,
@@ -246,7 +246,7 @@ class TestHelper {
 
     fakeDmChannel = (userId, otherUserId) => {
         return {
-            name: `${userId}__${otherUserId}`,
+            name: userId > otherUserId ? otherUserId + '__' + userId : userId + '__' + otherUserId,
             team_id: '',
             display_name: `${otherUserId}`,
             type: 'D',
@@ -330,25 +330,46 @@ class TestHelper {
         };
     }
 
+    fakeGroup = (groupId) => {
+        const name = 'software-engineers';
+
+        return {
+            name,
+            id: groupId,
+            display_name: 'software engineers',
+            delete_at: 0,
+        };
+    };
+
+    fakeGroupWithId = (groupId) => {
+        return {
+            ...this.fakeGroup(groupId),
+            id: this.generateId(),
+            create_at: 1507840900004,
+            update_at: 1507840900004,
+            delete_at: 0,
+        };
+    };
+
     mockLogin = () => {
-        nock(this.basicClient4.getUsersRoute()).
-            post('/login').
+        nock(this.basicClient4.getBaseRoute()).
+            post('/users/login').
             reply(200, this.basicUser, {'X-Version-Id': 'Server Version'});
 
-        nock(this.basicClient4.getUserRoute('me')).
-            get('/teams/members').
+        nock(this.basicClient4.getBaseRoute()).
+            get('/users/me/teams/members').
             reply(200, [this.basicTeamMember]);
 
-        nock(this.basicClient4.getUserRoute('me')).
-            get('/teams/unread').
+        nock(this.basicClient4.getBaseRoute()).
+            get('/users/me/teams/unread').
             reply(200, [{team_id: this.basicTeam.id, msg_count: 0, mention_count: 0}]);
 
-        nock(this.basicClient4.getUserRoute('me')).
-            get('/teams').
+        nock(this.basicClient4.getBaseRoute()).
+            get('/users/me/teams').
             reply(200, [this.basicTeam]);
 
-        nock(this.basicClient4.getPreferencesRoute('me')).
-            get('').
+        nock(this.basicClient4.getBaseRoute()).
+            get('/users/me/preferences').
             reply(200, [{user_id: this.basicUser.id, category: 'tutorial_step', name: this.basicUser.id, value: '999'}]);
     }
 
@@ -429,6 +450,7 @@ class TestHelper {
             },
         };
         this.basicScheme = this.mockSchemeWithId();
+        this.basicGroup = this.fakeGroupWithId();
     }
 
     initBasic = async (client4 = this.createClient4()) => {

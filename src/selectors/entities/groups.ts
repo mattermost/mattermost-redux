@@ -1,7 +1,19 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
-import * as reselect from 'reselect';
+import {Permissions} from '../../constants';
+import {Group} from 'types/groups';
+import {filterGroupsMatchingTerm} from 'utils/group_utils';
+import {getChannel} from 'selectors/entities/channels';
+import {haveIChannelPermission} from 'selectors/entities/roles';
+import {getTeam} from 'selectors/entities/teams';
+import {UserMentionKey} from 'selectors/entities/users';
+
+import {createSelector} from 'reselect';
+
 import {GlobalState} from 'types/store';
+
+import {Dictionary, NameMappedObjects} from 'types/utilities';
+
 const emptyList: any[] = [];
 const emptySyncables = {
     teams: [],
@@ -12,17 +24,24 @@ export function getAllGroups(state: GlobalState) {
     return state.entities.groups.groups;
 }
 
+export function getMyGroups(state: GlobalState) {
+    return state.entities.groups.myGroups;
+}
+
+export function getAllGroupStats(state: GlobalState) {
+    return state.entities.groups.stats;
+}
+
+export function getGroupStats(state: GlobalState, id: string) {
+    return getAllGroupStats(state)[id] || {};
+}
+
 export function getGroup(state: GlobalState, id: string) {
     return getAllGroups(state)[id];
 }
 
 export function getGroupMemberCount(state: GlobalState, id: string) {
-    const memberData = state.entities.groups.members;
-    const groupMemberData = memberData[id];
-    if (!groupMemberData) {
-        return 0;
-    }
-    return memberData[id].totalMemberCount;
+    return getGroupStats(state, id).total_member_count;
 }
 
 function getGroupSyncables(state: GlobalState, id: string) {
@@ -37,56 +56,154 @@ export function getGroupChannels(state: GlobalState, id: string) {
     return getGroupSyncables(state, id).channels;
 }
 
-export function getGroupMembers(state: GlobalState, id: string) {
-    const groupMemberData = state.entities.groups.members[id];
-    if (!groupMemberData) {
+export const getGroupsByName: (state: GlobalState) => NameMappedObjects<Group> = createSelector(
+    getAllGroups,
+    (groups) => {
+        const groupsByName: Dictionary<Group> = {};
+
+        for (const id in groups) {
+            if (groups.hasOwnProperty(id)) {
+                const group = groups[id];
+                groupsByName[group.name] = group;
+            }
+        }
+
+        return groupsByName;
+    },
+);
+
+export function searchAssociatedGroupsForReferenceLocal(state: GlobalState, term: string, teamId: string, channelId: string): Array<Group> {
+    if (!haveIChannelPermission(state, {
+        permission: Permissions.USE_GROUP_MENTIONS,
+        channel: channelId,
+        team: teamId,
+    })) {
         return emptyList;
     }
-    return groupMemberData.members;
+
+    const groups = getAssociatedGroupsForReference(state, teamId, channelId);
+    if (!groups) {
+        return emptyList;
+    }
+    const filteredGroups = filterGroupsMatchingTerm(groups, term);
+    return filteredGroups;
 }
 
-const teamGroupIDs = (state: GlobalState, teamID: string) => (state.entities.teams.groupsAssociatedToTeam[teamID] == null ? undefined : state.entities.teams.groupsAssociatedToTeam[teamID].ids == null ? undefined : state.entities.teams.groupsAssociatedToTeam[teamID].ids) || [];
+export function getAssociatedGroupsForReference(state: GlobalState, teamId: string, channelId: string): Array<Group> {
+    const team = getTeam(state, teamId);
+    const channel = getChannel(state, channelId);
 
-const channelGroupIDs = (state: GlobalState, channelID: string) => (state.entities.channels.groupsAssociatedToChannel[channelID] == null ? undefined : state.entities.channels.groupsAssociatedToChannel[channelID].ids == null ? undefined : state.entities.channels.groupsAssociatedToChannel[channelID].ids) || [];
+    if (!haveIChannelPermission(state, {
+        permission: Permissions.USE_GROUP_MENTIONS,
+        channel: channelId,
+        team: teamId,
+    })) {
+        return emptyList;
+    }
 
-const getTeamGroupIDSet = reselect.createSelector(
+    let groupsForReference = [];
+    if (team && team.group_constrained && channel && channel.group_constrained) {
+        const groupsFromChannel = getGroupsAssociatedToChannelForReference(state, channelId);
+        const groupsFromTeam = getGroupsAssociatedToTeamForReference(state, teamId);
+        groupsForReference = groupsFromChannel.concat(groupsFromTeam.filter((item) => groupsFromChannel.indexOf(item) < 0));
+    } else if (team && team.group_constrained) {
+        groupsForReference = getGroupsAssociatedToTeamForReference(state, teamId);
+    } else if (channel && channel.group_constrained) {
+        groupsForReference = getGroupsAssociatedToChannelForReference(state, channelId);
+    } else {
+        groupsForReference = getAllAssociatedGroupsForReference(state);
+    }
+    return groupsForReference;
+}
+
+const teamGroupIDs = (state: GlobalState, teamID: string) => state.entities.teams.groupsAssociatedToTeam[teamID]?.ids || [];
+
+const channelGroupIDs = (state: GlobalState, channelID: string) => state.entities.channels.groupsAssociatedToChannel[channelID]?.ids || [];
+
+const getTeamGroupIDSet = createSelector(
     teamGroupIDs,
     (teamIDs) => new Set(teamIDs),
 );
 
-const getChannelGroupIDSet = reselect.createSelector(
+const getChannelGroupIDSet = createSelector(
     channelGroupIDs,
     (channelIDs) => new Set(channelIDs),
 );
 
-export const getGroupsNotAssociatedToTeam = reselect.createSelector(
+export const getGroupsNotAssociatedToTeam: (state: GlobalState, teamID: string) => Group[] = createSelector(
     getAllGroups,
     (state: GlobalState, teamID: string) => getTeamGroupIDSet(state, teamID),
     (allGroups, teamGroupIDSet) => {
         return Object.entries(allGroups).filter(([groupID]) => !teamGroupIDSet.has(groupID)).map((entry) => entry[1]);
-    }
+    },
 );
 
-export const getGroupsAssociatedToTeam = reselect.createSelector(
+export const getGroupsAssociatedToTeam: (state: GlobalState, teamID: string) => Group[] = createSelector(
     getAllGroups,
     (state: GlobalState, teamID: string) => getTeamGroupIDSet(state, teamID),
     (allGroups, teamGroupIDSet) => {
         return Object.entries(allGroups).filter(([groupID]) => teamGroupIDSet.has(groupID)).map((entry) => entry[1]);
-    }
+    },
 );
 
-export const getGroupsNotAssociatedToChannel = reselect.createSelector(
+export const getGroupsNotAssociatedToChannel: (state: GlobalState, channelID: string, teamID: string) => Group[] = createSelector(
     getAllGroups,
     (state: GlobalState, channelID: string) => getChannelGroupIDSet(state, channelID),
-    (allGroups, channelGroupIDSet) => {
-        return Object.entries(allGroups).filter(([groupID]) => !channelGroupIDSet.has(groupID)).map((entry) => entry[1]);
-    }
+    (state: GlobalState, _: string, teamID: string) => getTeam(state, teamID),
+    (state: GlobalState, _: string, teamID: string) => getGroupsAssociatedToTeam(state, teamID),
+    (allGroups, channelGroupIDSet, team, teamGroups) => {
+        let result = Object.values(allGroups).filter((group) => !channelGroupIDSet.has(group.id));
+        if (team.group_constrained) {
+            const gids = teamGroups.map((group) => group.id);
+            result = result.filter((group) => gids?.includes(group.id));
+        }
+        return result;
+    },
 );
 
-export const getGroupsAssociatedToChannel = reselect.createSelector(
+export const getGroupsAssociatedToChannel: (state: GlobalState, channelID: string) => Group[] = createSelector(
     getAllGroups,
     (state: GlobalState, channelID: string) => getChannelGroupIDSet(state, channelID),
     (allGroups, channelGroupIDSet) => {
         return Object.entries(allGroups).filter(([groupID]) => channelGroupIDSet.has(groupID)).map((entry) => entry[1]);
-    }
+    },
+);
+
+export const getGroupsAssociatedToTeamForReference: (state: GlobalState, teamID: string) => Group[] = createSelector(
+    getAllGroups,
+    (state: GlobalState, teamID: string) => getTeamGroupIDSet(state, teamID),
+    (allGroups, teamGroupIDSet) => {
+        return Object.entries(allGroups).filter(([groupID]) => teamGroupIDSet.has(groupID)).filter((entry) => (entry[1].allow_reference && entry[1].delete_at === 0)).map((entry) => entry[1]);
+    },
+);
+
+export const getGroupsAssociatedToChannelForReference: (state: GlobalState, channelID: string) => Group[] = createSelector(
+    getAllGroups,
+    (state: GlobalState, channelID: string) => getChannelGroupIDSet(state, channelID),
+    (allGroups, channelGroupIDSet) => {
+        return Object.entries(allGroups).filter(([groupID]) => channelGroupIDSet.has(groupID)).filter((entry) => (entry[1].allow_reference && entry[1].delete_at === 0)).map((entry) => entry[1]);
+    },
+);
+
+export const getAllAssociatedGroupsForReference: (state: GlobalState) => Group[] = createSelector(
+    getAllGroups,
+    (allGroups) => {
+        return Object.entries(allGroups).filter((entry) => (entry[1].allow_reference && entry[1].delete_at === 0)).map((entry) => entry[1]);
+    },
+);
+
+export const getMyAllowReferencedGroups: (state: GlobalState) => Group[] = createSelector(
+    getMyGroups,
+    (myGroups) => {
+        return Object.values(myGroups).filter((group) => group.allow_reference && group.delete_at === 0);
+    },
+);
+
+export const getCurrentUserGroupMentionKeys: (state: GlobalState) => UserMentionKey[] = createSelector(
+    getMyAllowReferencedGroups,
+    (groups: Array<Group>) => {
+        const keys: UserMentionKey[] = [];
+        groups.forEach((group) => keys.push({key: `@${group.name}`}));
+        return keys;
+    },
 );

@@ -1,14 +1,23 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
+
 import {Client4} from 'client';
 import {Emoji, SystemEmoji, CustomEmoji} from 'types/emojis';
+
+export function isSystemEmoji(emoji: Emoji): emoji is SystemEmoji {
+    return 'batch' in emoji;
+}
+
+export function isCustomEmoji(emoji: Emoji): emoji is CustomEmoji {
+    return 'id' in emoji;
+}
+
 export function getEmojiImageUrl(emoji: Emoji): string {
-    if (emoji.id) {
+    if (isCustomEmoji(emoji)) {
         return Client4.getEmojiRoute(emoji.id) + '/image';
     }
 
-    const systemEmoji = ((emoji as any) as SystemEmoji);
-    const filename = systemEmoji.filename || systemEmoji.aliases[0];
+    const filename = emoji.filename || emoji.aliases[0];
     return Client4.getSystemEmojiImageUrl(filename);
 }
 

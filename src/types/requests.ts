@@ -39,12 +39,6 @@ export type UsersRequestsStatuses = {
     updateMe: RequestStatusType;
 };
 
-export type PreferencesRequestsStatuses = {
-    getMyPreferences: RequestStatusType;
-    savePreferences: RequestStatusType;
-    deletePreferences: RequestStatusType;
-};
-
 export type AdminRequestsStatuses = {
     getLogs: RequestStatusType;
     getAudits: RequestStatusType;
@@ -100,60 +94,11 @@ export type FilesRequestsStatuses = {
     uploadFiles: RequestStatusType;
 };
 
-export type IntegrationsRequestsStatuses = {
-    createIncomingHook: RequestStatusType;
-    getIncomingHooks: RequestStatusType;
-    deleteIncomingHook: RequestStatusType;
-    updateIncomingHook: RequestStatusType;
-    createOutgoingHook: RequestStatusType;
-    getOutgoingHooks: RequestStatusType;
-    deleteOutgoingHook: RequestStatusType;
-    updateOutgoingHook: RequestStatusType;
-    getCommands: RequestStatusType;
-    getAutocompleteCommands: RequestStatusType;
-    getCustomTeamCommands: RequestStatusType;
-    addCommand: RequestStatusType;
-    regenCommandToken: RequestStatusType;
-    editCommand: RequestStatusType;
-    deleteCommand: RequestStatusType;
-    addOAuthApp: RequestStatusType;
-    updateOAuthApp: RequestStatusType;
-    getOAuthApp: RequestStatusType;
-    getOAuthApps: RequestStatusType;
-    deleteOAuthApp: RequestStatusType;
-    executeCommand: RequestStatusType;
-    submitInteractiveDialog: RequestStatusType;
-};
-
 export type RolesRequestsStatuses = {
     getRolesByNames: RequestStatusType;
     getRoleByName: RequestStatusType;
     getRole: RequestStatusType;
     editRole: RequestStatusType;
-};
-
-export type SchemesRequestsStatuses = {
-    getSchemes: RequestStatusType;
-    getScheme: RequestStatusType;
-    createScheme: RequestStatusType;
-    deleteScheme: RequestStatusType;
-    patchScheme: RequestStatusType;
-    getSchemeTeams: RequestStatusType;
-    getSchemeChannels: RequestStatusType;
-};
-
-export type GroupsRequestsStatuses = {
-    linkGroupSyncable: RequestStatusType;
-    unlinkGroupSyncable: RequestStatusType;
-    getGroupSyncables: RequestStatusType;
-    getGroupMembers: RequestStatusType;
-    getGroup: RequestStatusType;
-    getAllGroupsAssociatedToTeam: RequestStatusType;
-    getAllGroupsAssociatedToChannel: RequestStatusType;
-    getGroupsAssociatedToTeam: RequestStatusType;
-    getGroupsAssociatedToChannel: RequestStatusType;
-    getGroupsNotAssociatedToTeam: RequestStatusType;
-    getGroupsNotAssociatedToChannel: RequestStatusType;
 };
 
 export type JobsRequestsStatuses = {
@@ -166,6 +111,4 @@ export type JobsRequestsStatuses = {
 export type SearchRequestsStatuses = {
     flaggedPosts: RequestStatusType;
     pinnedPosts: RequestStatusType;
-    recentMentions: RequestStatusType;
-    searchPosts: RequestStatusType;
 };

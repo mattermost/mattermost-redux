@@ -2,6 +2,8 @@
 // See LICENSE.txt for license information.
 import {General, Preferences} from '../constants';
 import {localizeMessage} from 'utils/i18n_utils';
+import {ChannelMembership} from 'types/channels';
+import {TeamMembership} from 'types/teams';
 import {UserProfile} from 'types/users';
 import {IDMappedObjects, $ID, Dictionary} from 'types/utilities';
 export function getFullName(user: UserProfile): string {
@@ -20,15 +22,12 @@ export function displayUsername(
     user: UserProfile,
     teammateNameDisplay: string,
     useFallbackUsername = true,
-    useAdminTemmateNameDisplaySetting = false,
-    adminTeammateNameDisplaySetting = '',
 ): string {
     let name = useFallbackUsername ? localizeMessage('channel_loader.someone', 'Someone') : '';
-    const nameDisplay = useAdminTemmateNameDisplaySetting ? adminTeammateNameDisplaySetting : teammateNameDisplay;
     if (user) {
-        if (nameDisplay === Preferences.DISPLAY_PREFER_NICKNAME) {
+        if (teammateNameDisplay === Preferences.DISPLAY_PREFER_NICKNAME) {
             name = user.nickname || getFullName(user);
-        } else if (nameDisplay === Preferences.DISPLAY_PREFER_FULL_NAME) {
+        } else if (teammateNameDisplay === Preferences.DISPLAY_PREFER_FULL_NAME) {
             name = getFullName(user);
         } else {
             name = user.username;
@@ -49,6 +48,10 @@ export function rolesIncludePermission(roles: string, permission: string): boole
 
 export function isAdmin(roles: string): boolean {
     return isSystemAdmin(roles) || isTeamAdmin(roles);
+}
+
+export function isGuest(roles: string): boolean {
+    return rolesIncludePermission(roles, 'system_guest');
 }
 
 export function isTeamAdmin(roles: string): boolean {
@@ -149,9 +152,9 @@ export function filterProfilesMatchingTerm(users: Array<UserProfile>, term: stri
         const full = first + ' ' + last;
         profileSuggestions.push(first, last, full);
         profileSuggestions.push((user.nickname || '').toLowerCase());
+        profileSuggestions.push((user.position || '').toLowerCase());
         const email = (user.email || '').toLowerCase();
         profileSuggestions.push(email);
-        profileSuggestions.push((user.nickname || '').toLowerCase());
 
         const split = email.split('@');
         if (split.length > 1) {
@@ -169,4 +172,30 @@ export function sortByUsername(a: UserProfile, b: UserProfile): number {
     const nameB = b.username;
 
     return nameA.localeCompare(nameB);
+}
+
+export function applyRolesFilters(user: UserProfile, filterRoles: string[], membership?: TeamMembership | ChannelMembership): boolean {
+    const userIsNotAdminOrGuest = !user.roles.includes(General.SYSTEM_ADMIN_ROLE) && !user.roles.includes(General.SYSTEM_GUEST_ROLE);
+    return filterRoles.some((role: string) => {
+        const isSystemRole = role.includes('system');
+        return (
+            (
+
+                // If role is system user then user cannot have system admin or system guest roles
+                isSystemRole && user.roles.includes(role) && (
+                    (role === General.SYSTEM_USER_ROLE && userIsNotAdminOrGuest) ||
+                    role !== General.SYSTEM_USER_ROLE
+                )
+            ) || (
+
+                // If user is a system admin or a system guest then ignore team and channel memberships
+                !isSystemRole && userIsNotAdminOrGuest && (
+                    (role === General.TEAM_ADMIN_ROLE && membership?.scheme_admin) ||
+                    (role === General.CHANNEL_ADMIN_ROLE && membership?.scheme_admin) ||
+                    (role === General.TEAM_USER_ROLE && membership?.scheme_user && !membership?.scheme_admin) ||
+                    (role === General.CHANNEL_USER_ROLE && membership?.scheme_user && !membership?.scheme_admin)
+                )
+            )
+        );
+    });
 }

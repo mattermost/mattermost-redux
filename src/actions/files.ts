@@ -3,7 +3,7 @@
 import {Client4} from 'client';
 import {FileTypes} from 'action_types';
 
-import {Action, batchActions, DispatchFunc, GetStateFunc, ActionFunc} from 'types/actions';
+import {batchActions, DispatchFunc, GetStateFunc, ActionFunc} from 'types/actions';
 
 import {logError} from './errors';
 import {bindClientFunc, forceLogoutIfNecessary} from './helpers';
@@ -33,7 +33,7 @@ export function getFilesForPost(postId: string): ActionFunc {
 
 export function uploadFile(channelId: string, rootId: string, clientIds: Array<string>, fileFormData: File, formBoundary: string): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
-        dispatch({type: FileTypes.UPLOAD_FILES_REQUEST, data: {}}, getState);
+        dispatch({type: FileTypes.UPLOAD_FILES_REQUEST, data: {}});
 
         let files: FileUploadResponse;
         try {
@@ -49,7 +49,7 @@ export function uploadFile(channelId: string, rootId: string, clientIds: Array<s
                 error,
             };
 
-            dispatch(batchActions([failure, logError(error)]), getState);
+            dispatch(batchActions([failure, logError(error)]));
             return {error};
         }
 
@@ -70,7 +70,7 @@ export function uploadFile(channelId: string, rootId: string, clientIds: Array<s
             {
                 type: FileTypes.UPLOAD_FILES_SUCCESS,
             },
-        ]), getState);
+        ]));
 
         return {data: files};
     };

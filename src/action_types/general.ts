@@ -37,4 +37,5 @@ export default keyMirror({
 
     REDIRECT_LOCATION_SUCCESS: null,
     REDIRECT_LOCATION_FAILURE: null,
+    SET_CONFIG_AND_LICENSE: null,
 });

@@ -1,29 +1,100 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
+import {General} from '../constants';
+
+import {ClusterInfo, AnalyticsRow} from 'types/admin';
+import {Audit} from 'types/audits';
+import {UserAutocomplete, AutocompleteSuggestion} from 'types/autocomplete';
+import {Bot, BotPatch} from 'types/bots';
+import {ChannelCategory, OrderedChannelCategories} from 'types/channel_categories';
+import {
+    Channel,
+    ChannelMemberCountsByGroup,
+    ChannelMembership,
+    ChannelModeration,
+    ChannelModerationPatch,
+    ChannelStats,
+    ChannelsWithTotalCount,
+    ChannelUnread,
+    ChannelViewResponse,
+    ChannelWithTeamData,
+} from 'types/channels';
+import {Options, StatusOK, ClientResponse} from 'types/client4';
+import {Compliance} from 'types/compliance';
+import {
+    ClientConfig,
+    ClientLicense,
+    DataRetentionPolicy,
+    License,
+    AdminConfig,
+    EnvironmentConfig,
+} from 'types/config';
+import {CustomEmoji} from 'types/emojis';
+import {ServerError} from 'types/errors';
+import {FileInfo, FileUploadResponse} from 'types/files';
+import {
+    Group,
+    GroupPatch,
+    GroupSyncable,
+    MixedUnlinkedGroup,
+    SyncablePatch,
+    UsersWithGroupsAndCount,
+    GroupsWithCount,
+} from 'types/groups';
+import {PostActionResponse} from 'types/integration_actions';
+import {
+    Command,
+    CommandResponse,
+    DialogSubmission,
+    IncomingWebhook,
+    OAuthApp,
+    OutgoingWebhook,
+    SubmitDialogResponse,
+} from 'types/integrations';
+import {Job} from 'types/jobs';
+import {MfaSecret} from 'types/mfa';
+import {
+    ClientPluginManifest,
+    MarketplacePlugin,
+    PluginManifest,
+    PluginsResponse,
+    PluginStatus,
+} from 'types/plugins';
+import {Post, PostList, PostSearchResults, OpenGraphMetadata} from 'types/posts';
+import {PreferenceType} from 'types/preferences';
+import {Reaction} from 'types/reactions';
+import {Role} from 'types/roles';
+import {SamlCertificateStatus, SamlMetadataResponse} from 'types/saml';
+import {Scheme} from 'types/schemes';
+import {Session} from 'types/sessions';
+import {
+    GetTeamMembersOpts,
+    Team,
+    TeamInviteWithError,
+    TeamMembership,
+    TeamMemberWithError,
+    TeamStats,
+    TeamsWithCount,
+    TeamUnread,
+} from 'types/teams';
+import {TermsOfService} from 'types/terms_of_service';
+import {Theme} from 'types/themes';
+import {
+    AuthChangeResponse,
+    UserAccessToken,
+    UserProfile,
+    UsersStats,
+    UserStatus,
+    GetFilteredUsersStatsOpts,
+} from 'types/users';
+import {$ID, RelationOneToOne} from 'types/utilities';
 
 import {buildQueryString, isMinimumServerVersion} from 'utils/helpers';
 import {cleanUrlForLogging} from 'utils/sentry';
-import {General} from '../constants';
-
 import {isSystemAdmin} from 'utils/user_utils';
 
 import fetch from './fetch_etag';
-import {UserProfile, UserStatus} from 'types/users';
-import {Team} from 'types/teams';
-import {Channel} from 'types/channels';
-import {Post} from 'types/posts';
-import {Job} from 'types/jobs';
-import {Role} from 'types/roles';
-import {Scheme} from 'types/schemes';
-import {Options} from 'types/client4';
-import {PreferenceType} from 'types/preferences';
-import {IncomingWebhook, OutgoingWebhook, Command, OAuthApp, DialogSubmission} from 'types/integrations';
-import {CustomEmoji} from 'types/emojis';
-import {Config} from 'types/config';
-import {Bot, BotPatch} from 'types/bots';
-import {Dictionary} from 'types/utilities';
-import {SyncablePatch} from 'types/groups';
-import {Theme} from 'types/themes';
+import {rudderAnalytics} from './rudder';
 
 const FormData = require('form-data');
 const HEADER_AUTH = 'Authorization';
@@ -53,6 +124,7 @@ export default class Client4 {
     userId = '';
     diagnosticId = '';
     includeCookies = true;
+    isRudderKeySet = false;
     translations = {
         connectionError: 'There appears to be a problem with your internet connection.',
         unknownError: 'We received an unexpected status code from the server.',
@@ -112,6 +184,10 @@ export default class Client4 {
 
     setDiagnosticId(diagnosticId: string) {
         this.diagnosticId = diagnosticId;
+    }
+
+    enableRudderEvents() {
+        this.isRudderKeySet = true;
     }
 
     getServerVersion() {
@@ -176,6 +252,10 @@ export default class Client4 {
 
     getChannelSchemeRoute(channelId: string) {
         return `${this.getChannelRoute(channelId)}/scheme`;
+    }
+
+    getChannelCategoriesRoute(userId: string, teamId: string) {
+        return `${this.getBaseRoute()}/users/${userId}/teams/${teamId}/channels/categories`;
     }
 
     getPostsRoute() {
@@ -294,6 +374,14 @@ export default class Client4 {
         return `${this.getBotsRoute()}/${botUserId}`;
     }
 
+    getGroupsRoute() {
+        return `${this.getBaseRoute()}/groups`;
+    }
+
+    getGroupRoute(groupID: string) {
+        return `${this.getGroupsRoute()}/${groupID}`;
+    }
+
     getThemesRoute() {
         return `${this.getBaseRoute()}/themes`;
     }
@@ -348,7 +436,7 @@ export default class Client4 {
 
     // User Routes
 
-    createUser = async (user: UserProfile, token: string, inviteId: string) => {
+    createUser = (user: UserProfile, token: string, inviteId: string, redirect: string) => {
         this.trackEvent('api', 'api_users_create');
 
         const queryParams: any = {};
@@ -361,64 +449,69 @@ export default class Client4 {
             queryParams.iid = inviteId;
         }
 
-        return this.doFetch(
+        if (redirect) {
+            queryParams.r = redirect;
+        }
+
+        return this.doFetch<UserProfile>(
             `${this.getUsersRoute()}${buildQueryString(queryParams)}`,
-            {method: 'post', body: JSON.stringify(user)}
+            {method: 'post', body: JSON.stringify(user)},
         );
     }
 
-    patchMe = async (userPatch: Partial<UserProfile>) => {
-        return this.doFetch(
+    patchMe = (userPatch: Partial<UserProfile>) => {
+        return this.doFetch<UserProfile>(
             `${this.getUserRoute('me')}/patch`,
-            {method: 'put', body: JSON.stringify(userPatch)}
+            {method: 'put', body: JSON.stringify(userPatch)},
         );
     }
 
-    patchUser = async (userPatch: Partial<UserProfile> & {id: string}) => {
+    patchUser = (userPatch: Partial<UserProfile> & {id: string}) => {
         this.trackEvent('api', 'api_users_patch');
 
-        return this.doFetch(
+        return this.doFetch<UserProfile>(
             `${this.getUserRoute(userPatch.id)}/patch`,
-            {method: 'put', body: JSON.stringify(userPatch)}
+            {method: 'put', body: JSON.stringify(userPatch)},
         );
     }
 
-    updateUser = async (user: UserProfile) => {
+    updateUser = (user: UserProfile) => {
         this.trackEvent('api', 'api_users_update');
 
-        return this.doFetch(
+        return this.doFetch<UserProfile>(
             `${this.getUserRoute(user.id)}`,
-            {method: 'put', body: JSON.stringify(user)}
+            {method: 'put', body: JSON.stringify(user)},
         );
     }
 
-    promoteGuestToUser = async (userId: string) => {
+    promoteGuestToUser = (userId: string) => {
         this.trackEvent('api', 'api_users_promote_guest_to_user');
 
-        return this.doFetch(
+        return this.doFetch<StatusOK>(
             `${this.getUserRoute(userId)}/promote`,
-            {method: 'post'}
+            {method: 'post'},
         );
     }
 
-    demoteUserToGuest = async (userId: string) => {
+    demoteUserToGuest = (userId: string) => {
         this.trackEvent('api', 'api_users_demote_user_to_guest');
 
-        return this.doFetch(
+        return this.doFetch<StatusOK>(
             `${this.getUserRoute(userId)}/demote`,
-            {method: 'post'}
+            {method: 'post'},
         );
     }
 
-    updateUserRoles = async (userId: string, roles: string) => {
+    updateUserRoles = (userId: string, roles: string) => {
         this.trackEvent('api', 'api_users_update_roles');
 
-        return this.doFetch(
+        return this.doFetch<StatusOK>(
             `${this.getUserRoute(userId)}/roles`,
-            {method: 'put', body: JSON.stringify({roles})}
+            {method: 'put', body: JSON.stringify({roles})},
         );
     };
-    updateUserMfa = async (userId: string, activate: boolean, code: string) => {
+
+    updateUserMfa = (userId: string, activate: boolean, code: string) => {
         const body: any = {
             activate,
         };
@@ -427,49 +520,58 @@ export default class Client4 {
             body.code = code;
         }
 
-        return this.doFetch(
+        return this.doFetch<StatusOK>(
             `${this.getUserRoute(userId)}/mfa`,
-            {method: 'put', body: JSON.stringify(body)}
+            {method: 'put', body: JSON.stringify(body)},
         );
     }
 
-    updateUserPassword = async (userId: string, currentPassword: string, newPassword: string) => {
+    updateUserPassword = (userId: string, currentPassword: string, newPassword: string) => {
         this.trackEvent('api', 'api_users_newpassword');
 
-        return this.doFetch(
+        return this.doFetch<StatusOK>(
             `${this.getUserRoute(userId)}/password`,
-            {method: 'put', body: JSON.stringify({current_password: currentPassword, new_password: newPassword})}
+            {method: 'put', body: JSON.stringify({current_password: currentPassword, new_password: newPassword})},
         );
     }
 
-    resetUserPassword = async (token: string, newPassword: string) => {
+    resetUserPassword = (token: string, newPassword: string) => {
         this.trackEvent('api', 'api_users_reset_password');
 
-        return this.doFetch(
+        return this.doFetch<StatusOK>(
             `${this.getUsersRoute()}/password/reset`,
-            {method: 'post', body: JSON.stringify({token, new_password: newPassword})}
+            {method: 'post', body: JSON.stringify({token, new_password: newPassword})},
         );
     }
 
-    sendPasswordResetEmail = async (email: string) => {
+    getKnownUsers = () => {
+        this.trackEvent('api', 'api_get_known_users');
+
+        return this.doFetch<$ID<UserProfile>[]>(
+            `${this.getUsersRoute()}/known`,
+            {method: 'get'},
+        );
+    }
+
+    sendPasswordResetEmail = (email: string) => {
         this.trackEvent('api', 'api_users_send_password_reset');
 
-        return this.doFetch(
+        return this.doFetch<StatusOK>(
             `${this.getUsersRoute()}/password/reset/send`,
-            {method: 'post', body: JSON.stringify({email})}
+            {method: 'post', body: JSON.stringify({email})},
         );
     }
 
-    updateUserActive = async (userId: string, active: boolean) => {
+    updateUserActive = (userId: string, active: boolean) => {
         this.trackEvent('api', 'api_users_update_active');
 
-        return this.doFetch(
+        return this.doFetch<StatusOK>(
             `${this.getUserRoute(userId)}/active`,
-            {method: 'put', body: JSON.stringify({active})}
+            {method: 'put', body: JSON.stringify({active})},
         );
     }
 
-    uploadProfileImage = async (userId: string, imageData: File) => {
+    uploadProfileImage = (userId: string, imageData: File) => {
         this.trackEvent('api', 'api_users_update_profile_picture');
 
         const formData = new FormData();
@@ -485,57 +587,57 @@ export default class Client4 {
             };
         }
 
-        return this.doFetch(
+        return this.doFetch<StatusOK>(
             `${this.getUserRoute(userId)}/image`,
-            request
+            request,
         );
     };
 
-    setDefaultProfileImage = async (userId: string) => {
+    setDefaultProfileImage = (userId: string) => {
         this.trackEvent('api', 'api_users_set_default_profile_picture');
 
-        return this.doFetch(
+        return this.doFetch<StatusOK>(
             `${this.getUserRoute(userId)}/image`,
-            {method: 'delete'}
+            {method: 'delete'},
         );
     };
 
-    verifyUserEmail = async (token: string) => {
-        return this.doFetch(
+    verifyUserEmail = (token: string) => {
+        return this.doFetch<StatusOK>(
             `${this.getUsersRoute()}/email/verify`,
-            {method: 'post', body: JSON.stringify({token})}
+            {method: 'post', body: JSON.stringify({token})},
         );
     }
 
-    updateMyTermsOfServiceStatus = async (termsOfServiceId: string, accepted: boolean) => {
-        return this.doFetch(
+    updateMyTermsOfServiceStatus = (termsOfServiceId: string, accepted: boolean) => {
+        return this.doFetch<StatusOK>(
             `${this.getUserRoute('me')}/terms_of_service`,
-            {method: 'post', body: JSON.stringify({termsOfServiceId, accepted})}
+            {method: 'post', body: JSON.stringify({termsOfServiceId, accepted})},
         );
     }
 
-    getTermsOfService = async () => {
-        return this.doFetch(
+    getTermsOfService = () => {
+        return this.doFetch<TermsOfService>(
             `${this.getBaseRoute()}/terms_of_service`,
-            {method: 'get'}
+            {method: 'get'},
         );
     }
 
-    createTermsOfService = async (text: string) => {
-        return this.doFetch(
+    createTermsOfService = (text: string) => {
+        return this.doFetch<TermsOfService>(
             `${this.getBaseRoute()}/terms_of_service`,
-            {method: 'post', body: JSON.stringify({text})}
+            {method: 'post', body: JSON.stringify({text})},
         );
     }
 
-    sendVerificationEmail = async (email: string) => {
-        return this.doFetch(
+    sendVerificationEmail = (email: string) => {
+        return this.doFetch<StatusOK>(
             `${this.getUsersRoute()}/email/verify/send`,
-            {method: 'post', body: JSON.stringify({email})}
+            {method: 'post', body: JSON.stringify({email})},
         );
     }
 
-    login = async (loginId: string, password: string, token = '', deviceId = '', ldapOnly = false) => {
+    login = (loginId: string, password: string, token = '', deviceId = '', ldapOnly = false) => {
         this.trackEvent('api', 'api_users_login');
 
         if (ldapOnly) {
@@ -553,15 +655,13 @@ export default class Client4 {
             body.ldap_only = 'true';
         }
 
-        const {data} = await this.doFetchWithResponse(
+        return this.doFetch<UserProfile>(
             `${this.getUsersRoute()}/login`,
-            {method: 'post', body: JSON.stringify(body)}
+            {method: 'post', body: JSON.stringify(body)},
         );
-
-        return data;
     };
 
-    loginById = async (id: string, password: string, token = '', deviceId = '') => {
+    loginById = (id: string, password: string, token = '', deviceId = '') => {
         this.trackEvent('api', 'api_users_login');
         const body: any = {
             device_id: deviceId,
@@ -570,12 +670,10 @@ export default class Client4 {
             token,
         };
 
-        const {data} = await this.doFetchWithResponse(
+        return this.doFetch<UserProfile>(
             `${this.getUsersRoute()}/login`,
-            {method: 'post', body: JSON.stringify(body)}
+            {method: 'post', body: JSON.stringify(body)},
         );
-
-        return data;
     };
 
     logout = async () => {
@@ -583,7 +681,7 @@ export default class Client4 {
 
         const {response} = await this.doFetchWithResponse(
             `${this.getUsersRoute()}/logout`,
-            {method: 'post'}
+            {method: 'post'},
         );
 
         if (response.ok) {
@@ -595,43 +693,43 @@ export default class Client4 {
         return response;
     };
 
-    getProfiles = async (page = 0, perPage = PER_PAGE_DEFAULT, options = {}) => {
+    getProfiles = (page = 0, perPage = PER_PAGE_DEFAULT, options = {}) => {
         this.trackEvent('api', 'api_profiles_get');
 
-        return this.doFetch(
+        return this.doFetch<UserProfile[]>(
             `${this.getUsersRoute()}${buildQueryString({page, per_page: perPage, ...options})}`,
-            {method: 'get'}
+            {method: 'get'},
         );
     };
 
-    getProfilesByIds = async (userIds: string[], options = {}) => {
+    getProfilesByIds = (userIds: string[], options = {}) => {
         this.trackEvent('api', 'api_profiles_get_by_ids');
 
-        return this.doFetch(
+        return this.doFetch<UserProfile[]>(
             `${this.getUsersRoute()}/ids${buildQueryString(options)}`,
-            {method: 'post', body: JSON.stringify(userIds)}
+            {method: 'post', body: JSON.stringify(userIds)},
         );
     };
 
-    getProfilesByUsernames = async (usernames: string[]) => {
+    getProfilesByUsernames = (usernames: string[]) => {
         this.trackEvent('api', 'api_profiles_get_by_usernames');
 
-        return this.doFetch(
+        return this.doFetch<UserProfile[]>(
             `${this.getUsersRoute()}/usernames`,
-            {method: 'post', body: JSON.stringify(usernames)}
+            {method: 'post', body: JSON.stringify(usernames)},
         );
     };
 
-    getProfilesInTeam = async (teamId: string, page = 0, perPage = PER_PAGE_DEFAULT, sort = '', options = {}) => {
+    getProfilesInTeam = (teamId: string, page = 0, perPage = PER_PAGE_DEFAULT, sort = '', options = {}) => {
         this.trackEvent('api', 'api_profiles_get_in_team', {team_id: teamId, sort});
 
-        return this.doFetch(
+        return this.doFetch<UserProfile[]>(
             `${this.getUsersRoute()}${buildQueryString({...options, in_team: teamId, page, per_page: perPage, sort})}`,
-            {method: 'get'}
+            {method: 'get'},
         );
     };
 
-    getProfilesNotInTeam = async (teamId: string, groupConstrained: boolean, page = 0, perPage = PER_PAGE_DEFAULT) => {
+    getProfilesNotInTeam = (teamId: string, groupConstrained: boolean, page = 0, perPage = PER_PAGE_DEFAULT) => {
         this.trackEvent('api', 'api_profiles_get_not_in_team', {team_id: teamId, group_constrained: groupConstrained});
 
         const queryStringObj: any = {not_in_team: teamId, page, per_page: perPage};
@@ -639,22 +737,22 @@ export default class Client4 {
             queryStringObj.group_constrained = true;
         }
 
-        return this.doFetch(
+        return this.doFetch<UserProfile[]>(
             `${this.getUsersRoute()}${buildQueryString(queryStringObj)}`,
-            {method: 'get'}
+            {method: 'get'},
         );
     };
 
-    getProfilesWithoutTeam = async (page = 0, perPage = PER_PAGE_DEFAULT, options = {}) => {
+    getProfilesWithoutTeam = (page = 0, perPage = PER_PAGE_DEFAULT, options = {}) => {
         this.trackEvent('api', 'api_profiles_get_without_team');
 
-        return this.doFetch(
+        return this.doFetch<UserProfile[]>(
             `${this.getUsersRoute()}${buildQueryString({...options, without_team: 1, page, per_page: perPage})}`,
-            {method: 'get'}
+            {method: 'get'},
         );
     };
 
-    getProfilesInChannel = async (channelId: string, page = 0, perPage = PER_PAGE_DEFAULT, sort = '') => {
+    getProfilesInChannel = (channelId: string, page = 0, perPage = PER_PAGE_DEFAULT, sort = '') => {
         this.trackEvent('api', 'api_profiles_get_in_channel', {channel_id: channelId});
 
         const serverVersion = this.getServerVersion();
@@ -664,22 +762,22 @@ export default class Client4 {
         } else {
             queryStringObj = {in_channel: channelId, page, per_page: perPage};
         }
-        return this.doFetch(
+        return this.doFetch<UserProfile[]>(
             `${this.getUsersRoute()}${buildQueryString(queryStringObj)}`,
-            {method: 'get'}
+            {method: 'get'},
         );
     };
 
-    getProfilesInGroupChannels = async (channelsIds: string[]) => {
+    getProfilesInGroupChannels = (channelsIds: string[]) => {
         this.trackEvent('api', 'api_profiles_get_in_group_channels', {channelsIds});
 
-        return this.doFetch(
+        return this.doFetch<Record<string, UserProfile[]>>(
             `${this.getUsersRoute()}/group_channels`,
-            {method: 'post', body: JSON.stringify(channelsIds)}
+            {method: 'post', body: JSON.stringify(channelsIds)},
         );
     };
 
-    getProfilesNotInChannel = async (teamId: string, channelId: string, groupConstrained: boolean, page = 0, perPage = PER_PAGE_DEFAULT) => {
+    getProfilesNotInChannel = (teamId: string, channelId: string, groupConstrained: boolean, page = 0, perPage = PER_PAGE_DEFAULT) => {
         this.trackEvent('api', 'api_profiles_get_not_in_channel', {team_id: teamId, channel_id: channelId, group_constrained: groupConstrained});
 
         const queryStringObj: any = {in_team: teamId, not_in_channel: channelId, page, per_page: perPage};
@@ -687,37 +785,44 @@ export default class Client4 {
             queryStringObj.group_constrained = true;
         }
 
-        return this.doFetch(
+        return this.doFetch<UserProfile[]>(
             `${this.getUsersRoute()}${buildQueryString(queryStringObj)}`,
-            {method: 'get'}
+            {method: 'get'},
         );
     };
 
-    getMe = async () => {
-        return this.doFetch(
+    getProfilesInGroup = (groupId: string, page = 0, perPage = PER_PAGE_DEFAULT) => {
+        return this.doFetch<UserProfile[]>(
+            `${this.getUsersRoute()}${buildQueryString({in_group: groupId, page, per_page: perPage})}`,
+            {method: 'get'},
+        );
+    };
+
+    getMe = () => {
+        return this.doFetch<UserProfile>(
             `${this.getUserRoute('me')}`,
-            {method: 'get'}
+            {method: 'get'},
         );
     };
 
-    getUser = async (userId: string) => {
-        return this.doFetch(
+    getUser = (userId: string) => {
+        return this.doFetch<UserProfile>(
             `${this.getUserRoute(userId)}`,
-            {method: 'get'}
+            {method: 'get'},
         );
     };
 
-    getUserByUsername = async (username: string) => {
-        return this.doFetch(
+    getUserByUsername = (username: string) => {
+        return this.doFetch<UserProfile>(
             `${this.getUsersRoute()}/username/${username}`,
-            {method: 'get'}
+            {method: 'get'},
         );
     };
 
-    getUserByEmail = async (email: string) => {
-        return this.doFetch(
+    getUserByEmail = (email: string) => {
+        return this.doFetch<UserProfile>(
             `${this.getUsersRoute()}/email/${email}`,
-            {method: 'get'}
+            {method: 'get'},
         );
     };
 
@@ -730,13 +835,15 @@ export default class Client4 {
 
         return `${this.getUserRoute(userId)}/image${buildQueryString(params)}`;
     };
+
     getDefaultProfilePictureUrl = (userId: string) => {
         return `${this.getUserRoute(userId)}/image/default`;
     };
-    autocompleteUsers = async (name: string, teamId: string, channelId: string, options = {
+
+    autocompleteUsers = (name: string, teamId: string, channelId: string, options = {
         limit: General.AUTOCOMPLETE_LIMIT_DEFAULT,
     }) => {
-        return this.doFetch(`${this.getUsersRoute()}/autocomplete${buildQueryString({
+        return this.doFetch<UserAutocomplete>(`${this.getUsersRoute()}/autocomplete${buildQueryString({
             in_team: teamId,
             in_channel: channelId,
             name,
@@ -745,459 +852,501 @@ export default class Client4 {
             method: 'get',
         });
     };
-    getSessions = async (userId: string) => {
-        return this.doFetch(
+
+    getSessions = (userId: string) => {
+        return this.doFetch<Session[]>(
             `${this.getUserRoute(userId)}/sessions`,
-            {method: 'get'}
+            {method: 'get'},
         );
     };
 
-    revokeSession = async (userId: string, sessionId: string) => {
-        return this.doFetch(
+    revokeSession = (userId: string, sessionId: string) => {
+        return this.doFetch<StatusOK>(
             `${this.getUserRoute(userId)}/sessions/revoke`,
-            {method: 'post', body: JSON.stringify({session_id: sessionId})}
+            {method: 'post', body: JSON.stringify({session_id: sessionId})},
         );
     };
 
-    revokeAllSessionsForUser = async (userId: string) => {
-        return this.doFetch(
+    revokeAllSessionsForUser = (userId: string) => {
+        return this.doFetch<StatusOK>(
             `${this.getUserRoute(userId)}/sessions/revoke/all`,
-            {method: 'post'}
+            {method: 'post'},
         );
     };
 
-    revokeSessionsForAllUsers = async () => {
-        return this.doFetch(
+    revokeSessionsForAllUsers = () => {
+        return this.doFetch<StatusOK>(
             `${this.getUsersRoute()}/sessions/revoke/all`,
-            {method: 'post'}
+            {method: 'post'},
         );
     };
 
-    getUserAudits = async (userId: string, page = 0, perPage = PER_PAGE_DEFAULT) => {
-        return this.doFetch(
+    getUserAudits = (userId: string, page = 0, perPage = PER_PAGE_DEFAULT) => {
+        return this.doFetch<Audit[]>(
             `${this.getUserRoute(userId)}/audits${buildQueryString({page, per_page: perPage})}`,
-            {method: 'get'}
+            {method: 'get'},
         );
     };
 
-    checkUserMfa = async (loginId: string) => {
-        return this.doFetch(
+    checkUserMfa = (loginId: string) => {
+        return this.doFetch<{mfa_required: boolean}>(
             `${this.getUsersRoute()}/mfa`,
-            {method: 'post', body: JSON.stringify({login_id: loginId})}
+            {method: 'post', body: JSON.stringify({login_id: loginId})},
         );
     };
 
-    generateMfaSecret = async (userId: string) => {
-        return this.doFetch(
+    generateMfaSecret = (userId: string) => {
+        return this.doFetch<MfaSecret>(
             `${this.getUserRoute(userId)}/mfa/generate`,
-            {method: 'post'}
+            {method: 'post'},
         );
     };
 
-    attachDevice = async (deviceId: string) => {
-        return this.doFetch(
+    attachDevice = (deviceId: string) => {
+        return this.doFetch<StatusOK>(
             `${this.getUsersRoute()}/sessions/device`,
-            {method: 'put', body: JSON.stringify({device_id: deviceId})}
+            {method: 'put', body: JSON.stringify({device_id: deviceId})},
         );
     };
 
     searchUsers = (term: string, options: any) => {
         this.trackEvent('api', 'api_search_users');
 
-        return this.doFetch(
+        return this.doFetch<UserProfile[]>(
             `${this.getUsersRoute()}/search`,
-            {method: 'post', body: JSON.stringify({term, ...options})}
+            {method: 'post', body: JSON.stringify({term, ...options})},
         );
     };
 
-    getStatusesByIds = async (userIds: string[]) => {
-        return this.doFetch(
+    getStatusesByIds = (userIds: string[]) => {
+        return this.doFetch<UserStatus[]>(
             `${this.getUsersRoute()}/status/ids`,
-            {method: 'post', body: JSON.stringify(userIds)}
+            {method: 'post', body: JSON.stringify(userIds)},
         );
     };
 
-    getStatus = async (userId: string) => {
-        return this.doFetch(
+    getStatus = (userId: string) => {
+        return this.doFetch<UserStatus>(
             `${this.getUserRoute(userId)}/status`,
-            {method: 'get'}
+            {method: 'get'},
         );
     };
 
-    updateStatus = async (status: UserStatus) => {
-        return this.doFetch(
+    updateStatus = (status: UserStatus) => {
+        return this.doFetch<UserStatus>(
             `${this.getUserRoute(status.user_id)}/status`,
-            {method: 'put', body: JSON.stringify(status)}
+            {method: 'put', body: JSON.stringify(status)},
         );
     };
 
-    switchEmailToOAuth = async (service: string, email: string, password: string, mfaCode = '') => {
+    switchEmailToOAuth = (service: string, email: string, password: string, mfaCode = '') => {
         this.trackEvent('api', 'api_users_email_to_oauth');
 
-        return this.doFetch(
+        return this.doFetch<AuthChangeResponse>(
             `${this.getUsersRoute()}/login/switch`,
-            {method: 'post', body: JSON.stringify({current_service: 'email', new_service: service, email, password, mfa_code: mfaCode})}
+            {method: 'post', body: JSON.stringify({current_service: 'email', new_service: service, email, password, mfa_code: mfaCode})},
         );
     };
 
-    switchOAuthToEmail = async (currentService: string, email: string, password: string) => {
+    switchOAuthToEmail = (currentService: string, email: string, password: string) => {
         this.trackEvent('api', 'api_users_oauth_to_email');
 
-        return this.doFetch(
+        return this.doFetch<AuthChangeResponse>(
             `${this.getUsersRoute()}/login/switch`,
-            {method: 'post', body: JSON.stringify({current_service: currentService, new_service: 'email', email, new_password: password})}
+            {method: 'post', body: JSON.stringify({current_service: currentService, new_service: 'email', email, new_password: password})},
         );
     };
 
-    switchEmailToLdap = async (email: string, emailPassword: string, ldapId: string, ldapPassword: string, mfaCode = '') => {
+    switchEmailToLdap = (email: string, emailPassword: string, ldapId: string, ldapPassword: string, mfaCode = '') => {
         this.trackEvent('api', 'api_users_email_to_ldap');
 
-        return this.doFetch(
+        return this.doFetch<AuthChangeResponse>(
             `${this.getUsersRoute()}/login/switch`,
-            {method: 'post', body: JSON.stringify({current_service: 'email', new_service: 'ldap', email, password: emailPassword, ldap_id: ldapId, new_password: ldapPassword, mfa_code: mfaCode})}
+            {method: 'post', body: JSON.stringify({current_service: 'email', new_service: 'ldap', email, password: emailPassword, ldap_id: ldapId, new_password: ldapPassword, mfa_code: mfaCode})},
         );
     };
 
-    switchLdapToEmail = async (ldapPassword: string, email: string, emailPassword: string, mfaCode = '') => {
+    switchLdapToEmail = (ldapPassword: string, email: string, emailPassword: string, mfaCode = '') => {
         this.trackEvent('api', 'api_users_ldap_to_email');
 
-        return this.doFetch(
+        return this.doFetch<AuthChangeResponse>(
             `${this.getUsersRoute()}/login/switch`,
-            {method: 'post', body: JSON.stringify({current_service: 'ldap', new_service: 'email', email, password: ldapPassword, new_password: emailPassword, mfa_code: mfaCode})}
+            {method: 'post', body: JSON.stringify({current_service: 'ldap', new_service: 'email', email, password: ldapPassword, new_password: emailPassword, mfa_code: mfaCode})},
         );
     };
 
-    getAuthorizedOAuthApps = async (userId: string) => {
-        return this.doFetch(
+    getAuthorizedOAuthApps = (userId: string) => {
+        return this.doFetch<OAuthApp[]>(
             `${this.getUserRoute(userId)}/oauth/apps/authorized`,
-            {method: 'get'}
+            {method: 'get'},
         );
     }
 
-    authorizeOAuthApp = async (responseType: string, clientId: string, redirectUri: string, state: string, scope: string) => {
-        return this.doFetch(
+    authorizeOAuthApp = (responseType: string, clientId: string, redirectUri: string, state: string, scope: string) => {
+        return this.doFetch<void>(
             `${this.url}/oauth/authorize`,
-            {method: 'post', body: JSON.stringify({client_id: clientId, response_type: responseType, redirect_uri: redirectUri, state, scope})}
+            {method: 'post', body: JSON.stringify({client_id: clientId, response_type: responseType, redirect_uri: redirectUri, state, scope})},
         );
     }
 
-    deauthorizeOAuthApp = async (clientId: string) => {
-        return this.doFetch(
+    deauthorizeOAuthApp = (clientId: string) => {
+        return this.doFetch<StatusOK>(
             `${this.url}/oauth/deauthorize`,
-            {method: 'post', body: JSON.stringify({client_id: clientId})}
+            {method: 'post', body: JSON.stringify({client_id: clientId})},
         );
     }
 
-    createUserAccessToken = async (userId: string, description: string) => {
+    createUserAccessToken = (userId: string, description: string) => {
         this.trackEvent('api', 'api_users_create_access_token');
 
-        return this.doFetch(
+        return this.doFetch<UserAccessToken>(
             `${this.getUserRoute(userId)}/tokens`,
-            {method: 'post', body: JSON.stringify({description})}
+            {method: 'post', body: JSON.stringify({description})},
         );
     }
 
-    getUserAccessToken = async (tokenId: string) => {
-        return this.doFetch(
+    getUserAccessToken = (tokenId: string) => {
+        return this.doFetch<UserAccessToken>(
             `${this.getUsersRoute()}/tokens/${tokenId}`,
-            {method: 'get'}
+            {method: 'get'},
         );
     }
 
-    getUserAccessTokensForUser = async (userId: string, page = 0, perPage = PER_PAGE_DEFAULT) => {
-        return this.doFetch(
+    getUserAccessTokensForUser = (userId: string, page = 0, perPage = PER_PAGE_DEFAULT) => {
+        return this.doFetch<UserAccessToken[]>(
             `${this.getUserRoute(userId)}/tokens${buildQueryString({page, per_page: perPage})}`,
-            {method: 'get'}
+            {method: 'get'},
         );
     }
 
-    getUserAccessTokens = async (page = 0, perPage = PER_PAGE_DEFAULT) => {
-        return this.doFetch(
+    getUserAccessTokens = (page = 0, perPage = PER_PAGE_DEFAULT) => {
+        return this.doFetch<UserAccessToken[]>(
             `${this.getUsersRoute()}/tokens${buildQueryString({page, per_page: perPage})}`,
-            {method: 'get'}
+            {method: 'get'},
         );
     }
 
-    revokeUserAccessToken = async (tokenId: string) => {
+    revokeUserAccessToken = (tokenId: string) => {
         this.trackEvent('api', 'api_users_revoke_access_token');
 
-        return this.doFetch(
+        return this.doFetch<StatusOK>(
             `${this.getUsersRoute()}/tokens/revoke`,
-            {method: 'post', body: JSON.stringify({token_id: tokenId})}
+            {method: 'post', body: JSON.stringify({token_id: tokenId})},
         );
     }
 
-    disableUserAccessToken = async (tokenId: string) => {
-        return this.doFetch(
+    disableUserAccessToken = (tokenId: string) => {
+        return this.doFetch<StatusOK>(
             `${this.getUsersRoute()}/tokens/disable`,
-            {method: 'post', body: JSON.stringify({token_id: tokenId})}
+            {method: 'post', body: JSON.stringify({token_id: tokenId})},
         );
     }
 
-    enableUserAccessToken = async (tokenId: string) => {
-        return this.doFetch(
+    enableUserAccessToken = (tokenId: string) => {
+        return this.doFetch<StatusOK>(
             `${this.getUsersRoute()}/tokens/enable`,
-            {method: 'post', body: JSON.stringify({token_id: tokenId})}
+            {method: 'post', body: JSON.stringify({token_id: tokenId})},
         );
     }
 
     // Team Routes
 
-    createTeam = async (team: Team) => {
+    createTeam = (team: Team) => {
         this.trackEvent('api', 'api_teams_create');
 
-        return this.doFetch(
+        return this.doFetch<Team>(
             `${this.getTeamsRoute()}`,
-            {method: 'post', body: JSON.stringify(team)}
+            {method: 'post', body: JSON.stringify(team)},
         );
     };
 
-    deleteTeam = async (teamId: string) => {
+    deleteTeam = (teamId: string) => {
         this.trackEvent('api', 'api_teams_delete');
 
-        return this.doFetch(
+        return this.doFetch<StatusOK>(
             `${this.getTeamRoute(teamId)}`,
-            {method: 'delete'}
+            {method: 'delete'},
         );
     };
 
-    updateTeam = async (team: Team) => {
+    updateTeam = (team: Team) => {
         this.trackEvent('api', 'api_teams_update_name', {team_id: team.id});
 
-        return this.doFetch(
+        return this.doFetch<Team>(
             `${this.getTeamRoute(team.id)}`,
-            {method: 'put', body: JSON.stringify(team)}
+            {method: 'put', body: JSON.stringify(team)},
         );
     };
 
-    patchTeam = async (team: Partial<Team> & {id: string}) => {
+    patchTeam = (team: Partial<Team> & {id: string}) => {
         this.trackEvent('api', 'api_teams_patch_name', {team_id: team.id});
 
-        return this.doFetch(
+        return this.doFetch<Team>(
             `${this.getTeamRoute(team.id)}/patch`,
-            {method: 'put', body: JSON.stringify(team)}
+            {method: 'put', body: JSON.stringify(team)},
         );
     };
 
-    regenerateTeamInviteId = async (teamId: string) => {
+    regenerateTeamInviteId = (teamId: string) => {
         this.trackEvent('api', 'api_teams_regenerate_invite_id', {team_id: teamId});
 
-        return this.doFetch(
+        return this.doFetch<Team>(
             `${this.getTeamRoute(teamId)}/regenerate_invite_id`,
-            {method: 'post'}
+            {method: 'post'},
         );
     };
 
-    updateTeamScheme = async (teamId: string, schemeId: string) => {
+    updateTeamScheme = (teamId: string, schemeId: string) => {
         const patch = {scheme_id: schemeId};
 
         this.trackEvent('api', 'api_teams_update_scheme', {team_id: teamId, ...patch});
 
-        return this.doFetch(
+        return this.doFetch<StatusOK>(
             `${this.getTeamSchemeRoute(teamId)}`,
-            {method: 'put', body: JSON.stringify(patch)}
+            {method: 'put', body: JSON.stringify(patch)},
         );
     };
 
-    checkIfTeamExists = async (teamName: string) => {
-        return this.doFetch(
+    checkIfTeamExists = (teamName: string) => {
+        return this.doFetch<{exists: boolean}>(
             `${this.getTeamNameRoute(teamName)}/exists`,
-            {method: 'get'}
+            {method: 'get'},
         );
     };
 
-    getTeams = async (page = 0, perPage = PER_PAGE_DEFAULT, includeTotalCount = false) => {
-        return this.doFetch(
+    getTeams = (page = 0, perPage = PER_PAGE_DEFAULT, includeTotalCount = false) => {
+        return this.doFetch<Team[] | TeamsWithCount>(
             `${this.getTeamsRoute()}${buildQueryString({page, per_page: perPage, include_total_count: includeTotalCount})}`,
-            {method: 'get'}
+            {method: 'get'},
         );
     };
 
-    searchTeams = (term: string) => {
+    searchTeams = (term: string, page?: number, perPage?: number) => {
         this.trackEvent('api', 'api_search_teams');
 
-        return this.doFetch(
+        return this.doFetch<Team[] | TeamsWithCount>(
             `${this.getTeamsRoute()}/search`,
-            {method: 'post', body: JSON.stringify({term})}
+            {method: 'post', body: JSON.stringify({term, page, per_page: perPage})},
         );
     };
 
-    getTeam = async (teamId: string) => {
-        return this.doFetch(
+    getTeam = (teamId: string) => {
+        return this.doFetch<Team>(
             this.getTeamRoute(teamId),
-            {method: 'get'}
+            {method: 'get'},
         );
     };
 
-    getTeamByName = async (teamName: string) => {
+    getTeamByName = (teamName: string) => {
         this.trackEvent('api', 'api_teams_get_team_by_name');
 
-        return this.doFetch(
+        return this.doFetch<Team>(
             this.getTeamNameRoute(teamName),
-            {method: 'get'}
+            {method: 'get'},
         );
     };
 
-    getMyTeams = async () => {
-        return this.doFetch(
+    getMyTeams = () => {
+        return this.doFetch<Team[]>(
             `${this.getUserRoute('me')}/teams`,
-            {method: 'get'}
+            {method: 'get'},
         );
     };
 
-    getTeamsForUser = async (userId: string) => {
-        return this.doFetch(
+    getTeamsForUser = (userId: string) => {
+        return this.doFetch<Team[]>(
             `${this.getUserRoute(userId)}/teams`,
-            {method: 'get'}
+            {method: 'get'},
         );
     };
 
-    getMyTeamMembers = async () => {
-        return this.doFetch(
+    getMyTeamMembers = () => {
+        return this.doFetch<TeamMembership[]>(
             `${this.getUserRoute('me')}/teams/members`,
-            {method: 'get'}
+            {method: 'get'},
         );
     };
 
-    getMyTeamUnreads = async () => {
-        return this.doFetch(
+    getMyTeamUnreads = () => {
+        return this.doFetch<TeamUnread[]>(
             `${this.getUserRoute('me')}/teams/unread`,
-            {method: 'get'}
+            {method: 'get'},
         );
     };
 
-    getTeamMembers = async (teamId: string, page = 0, perPage = PER_PAGE_DEFAULT) => {
-        return this.doFetch(
-            `${this.getTeamMembersRoute(teamId)}${buildQueryString({page, per_page: perPage})}`,
-            {method: 'get'}
+    getTeamMembers = (teamId: string, page = 0, perPage = PER_PAGE_DEFAULT, options: GetTeamMembersOpts) => {
+        return this.doFetch<TeamMembership>(
+            `${this.getTeamMembersRoute(teamId)}${buildQueryString({page, per_page: perPage, ...options})}`,
+            {method: 'get'},
         );
     };
 
-    getTeamMembersForUser = async (userId: string) => {
-        return this.doFetch(
+    getTeamMembersForUser = (userId: string) => {
+        return this.doFetch<TeamMembership[]>(
             `${this.getUserRoute(userId)}/teams/members`,
-            {method: 'get'}
+            {method: 'get'},
         );
     };
 
-    getTeamMember = async (teamId: string, userId: string) => {
-        return this.doFetch(
+    getTeamMember = (teamId: string, userId: string) => {
+        return this.doFetch<TeamMembership>(
             `${this.getTeamMemberRoute(teamId, userId)}`,
-            {method: 'get'}
+            {method: 'get'},
         );
     };
 
-    getTeamMembersByIds = async (teamId: string, userIds: string[]) => {
-        return this.doFetch(
+    getTeamMembersByIds = (teamId: string, userIds: string[]) => {
+        return this.doFetch<TeamMembership[]>(
             `${this.getTeamMembersRoute(teamId)}/ids`,
-            {method: 'post', body: JSON.stringify(userIds)}
+            {method: 'post', body: JSON.stringify(userIds)},
         );
     };
 
-    addToTeam = async (teamId: string, userId: string) => {
+    addToTeam = (teamId: string, userId: string) => {
         this.trackEvent('api', 'api_teams_invite_members', {team_id: teamId});
 
         const member = {user_id: userId, team_id: teamId};
-        return this.doFetch(
+        return this.doFetch<TeamMembership>(
             `${this.getTeamMembersRoute(teamId)}`,
-            {method: 'post', body: JSON.stringify(member)}
+            {method: 'post', body: JSON.stringify(member)},
         );
     };
 
-    addToTeamFromInvite = async (token = '', inviteId = '') => {
+    addToTeamFromInvite = (token = '', inviteId = '') => {
         this.trackEvent('api', 'api_teams_invite_members');
 
         const query = buildQueryString({token, invite_id: inviteId});
-        return this.doFetch(
+        return this.doFetch<TeamMembership>(
             `${this.getTeamsRoute()}/members/invite${query}`,
-            {method: 'post'}
+            {method: 'post'},
         );
     };
 
-    addUsersToTeam = async (teamId: string, userIds: string[]) => {
+    addUsersToTeam = (teamId: string, userIds: string[]) => {
         this.trackEvent('api', 'api_teams_batch_add_members', {team_id: teamId, count: userIds.length});
 
         const members: any = [];
         userIds.forEach((id) => members.push({team_id: teamId, user_id: id}));
-        return this.doFetch(
+        return this.doFetch<TeamMembership[]>(
             `${this.getTeamMembersRoute(teamId)}/batch`,
-            {method: 'post', body: JSON.stringify(members)}
+            {method: 'post', body: JSON.stringify(members)},
         );
     };
 
-    joinTeam = async (inviteId: string) => {
+    addUsersToTeamGracefully = (teamId: string, userIds: string[]) => {
+        this.trackEvent('api', 'api_teams_batch_add_members', {team_id: teamId, count: userIds.length});
+
+        const members: any = [];
+        userIds.forEach((id) => members.push({team_id: teamId, user_id: id}));
+        return this.doFetch<TeamMemberWithError[]>(
+            `${this.getTeamMembersRoute(teamId)}/batch?graceful=true`,
+            {method: 'post', body: JSON.stringify(members)},
+        );
+    };
+
+    joinTeam = (inviteId: string) => {
         const query = buildQueryString({invite_id: inviteId});
-        return this.doFetch(
+        return this.doFetch<TeamMembership>(
             `${this.getTeamsRoute()}/members/invite${query}`,
-            {method: 'post'}
+            {method: 'post'},
         );
     };
 
-    removeFromTeam = async (teamId: string, userId: string) => {
+    removeFromTeam = (teamId: string, userId: string) => {
         this.trackEvent('api', 'api_teams_remove_members', {team_id: teamId});
 
-        return this.doFetch(
+        return this.doFetch<StatusOK>(
             `${this.getTeamMemberRoute(teamId, userId)}`,
-            {method: 'delete'}
+            {method: 'delete'},
         );
     };
 
-    getTeamStats = async (teamId: string) => {
-        return this.doFetch(
+    getTeamStats = (teamId: string) => {
+        return this.doFetch<TeamStats>(
             `${this.getTeamRoute(teamId)}/stats`,
-            {method: 'get'}
+            {method: 'get'},
         );
     };
 
-    getTotalUsersStats = async () => {
-        return this.doFetch(
+    getTotalUsersStats = () => {
+        return this.doFetch<UsersStats>(
             `${this.getUsersRoute()}/stats`,
-            {method: 'get'}
+            {method: 'get'},
         );
     };
 
-    invalidateAllEmailInvites = async () => {
-        return this.doFetch(
+    getFilteredUsersStats = (options: GetFilteredUsersStatsOpts) => {
+        return this.doFetch<UsersStats>(
+            `${this.getUsersRoute()}/stats/filtered${buildQueryString(options)}`,
+            {method: 'get'},
+        );
+    };
+
+    invalidateAllEmailInvites = () => {
+        return this.doFetch<StatusOK>(
             `${this.getTeamsRoute()}/invites/email`,
-            {method: 'delete'}
+            {method: 'delete'},
         );
     };
 
-    getTeamInviteInfo = async (inviteId: string) => {
-        return this.doFetch(
+    getTeamInviteInfo = (inviteId: string) => {
+        return this.doFetch<{
+            display_name: string;
+            description: string;
+            name: string;
+            id: string;
+        }>(
             `${this.getTeamsRoute()}/invite/${inviteId}`,
-            {method: 'get'}
+            {method: 'get'},
         );
     };
 
-    updateTeamMemberRoles = async (teamId: string, userId: string, roles: string[]) => {
+    updateTeamMemberRoles = (teamId: string, userId: string, roles: string[]) => {
         this.trackEvent('api', 'api_teams_update_member_roles', {team_id: teamId});
 
-        return this.doFetch(
+        return this.doFetch<StatusOK>(
             `${this.getTeamMemberRoute(teamId, userId)}/roles`,
-            {method: 'put', body: JSON.stringify({roles})}
+            {method: 'put', body: JSON.stringify({roles})},
         );
     };
 
-    sendEmailInvitesToTeam = async (teamId: string, emails: string[]) => {
+    sendEmailInvitesToTeam = (teamId: string, emails: string[]) => {
         this.trackEvent('api', 'api_teams_invite_members', {team_id: teamId});
 
-        return this.doFetch(
+        return this.doFetch<StatusOK>(
             `${this.getTeamRoute(teamId)}/invite/email`,
-            {method: 'post', body: JSON.stringify(emails)}
+            {method: 'post', body: JSON.stringify(emails)},
         );
     };
 
-    sendEmailGuestInvitesToChannels = async (teamId: string, channelIds: string[], emails: string[], message: string) => {
+    sendEmailGuestInvitesToChannels = (teamId: string, channelIds: string[], emails: string[], message: string) => {
         this.trackEvent('api', 'api_teams_invite_guests', {team_id: teamId, channel_ids: channelIds});
 
-        return this.doFetch(
+        return this.doFetch<StatusOK>(
             `${this.getTeamRoute(teamId)}/invite-guests/email`,
-            {method: 'post', body: JSON.stringify({emails, channels: channelIds, message})}
+            {method: 'post', body: JSON.stringify({emails, channels: channelIds, message})},
         );
     };
 
-    importTeam = async (teamId: string, file: File, importFrom: string) => {
+    sendEmailInvitesToTeamGracefully = (teamId: string, emails: string[]) => {
+        this.trackEvent('api', 'api_teams_invite_members', {team_id: teamId});
+
+        return this.doFetch<TeamInviteWithError>(
+            `${this.getTeamRoute(teamId)}/invite/email?graceful=true`,
+            {method: 'post', body: JSON.stringify(emails)},
+        );
+    };
+
+    sendEmailGuestInvitesToChannelsGracefully = async (teamId: string, channelIds: string[], emails: string[], message: string) => {
+        this.trackEvent('api', 'api_teams_invite_guests', {team_id: teamId, channel_ids: channelIds});
+
+        return this.doFetch<TeamInviteWithError>(
+            `${this.getTeamRoute(teamId)}/invite-guests/email?graceful=true`,
+            {method: 'post', body: JSON.stringify({emails, channels: channelIds, message})},
+        );
+    };
+
+    importTeam = (teamId: string, file: File, importFrom: string) => {
         const formData = new FormData();
         formData.append('file', file, file.name);
         formData.append('filesize', file.size);
@@ -1214,9 +1363,11 @@ export default class Client4 {
             };
         }
 
-        return this.doFetch(
+        return this.doFetch<{
+            results: string;
+        }>(
             `${this.getTeamRoute(teamId)}/import`,
-            request
+            request,
         );
     };
 
@@ -1229,7 +1380,7 @@ export default class Client4 {
         return `${this.getTeamRoute(teamId)}/image${buildQueryString(params)}`;
     };
 
-    setTeamIcon = async (teamId: string, imageData: File) => {
+    setTeamIcon = (teamId: string, imageData: File) => {
         this.trackEvent('api', 'api_team_set_team_icon');
 
         const formData = new FormData();
@@ -1246,294 +1397,326 @@ export default class Client4 {
             };
         }
 
-        return this.doFetch(
+        return this.doFetch<StatusOK>(
             `${this.getTeamRoute(teamId)}/image`,
-            request
+            request,
         );
     };
 
-    removeTeamIcon = async (teamId: string) => {
+    removeTeamIcon = (teamId: string) => {
         this.trackEvent('api', 'api_team_remove_team_icon');
 
-        return this.doFetch(
+        return this.doFetch<StatusOK>(
             `${this.getTeamRoute(teamId)}/image`,
-            {method: 'delete'}
+            {method: 'delete'},
         );
     };
 
-    updateTeamMemberSchemeRoles = async (teamId: string, userId: string, isSchemeUser: boolean, isSchemeAdmin: boolean) => {
+    updateTeamMemberSchemeRoles = (teamId: string, userId: string, isSchemeUser: boolean, isSchemeAdmin: boolean) => {
         const body = {scheme_user: isSchemeUser, scheme_admin: isSchemeAdmin};
-        return this.doFetch(
+        return this.doFetch<StatusOK>(
             `${this.getTeamRoute(teamId)}/members/${userId}/schemeRoles`,
-            {method: 'put', body: JSON.stringify(body)}
+            {method: 'put', body: JSON.stringify(body)},
         );
     };
 
     // Channel Routes
 
-    getAllChannels = async (page = 0, perPage = PER_PAGE_DEFAULT, notAssociatedToGroup = '', excludeDefaultChannels = false, includeTotalCount = false) => {
+    getAllChannels = (page = 0, perPage = PER_PAGE_DEFAULT, notAssociatedToGroup = '', excludeDefaultChannels = false, includeTotalCount = false, includeDeleted = false) => {
         const queryData = {
             page,
             per_page: perPage,
             not_associated_to_group: notAssociatedToGroup,
             exclude_default_channels: excludeDefaultChannels,
             include_total_count: includeTotalCount,
+            include_deleted: includeDeleted,
         };
-        return this.doFetch(
+        return this.doFetch<ChannelWithTeamData[] | ChannelsWithTotalCount>(
             `${this.getChannelsRoute()}${buildQueryString(queryData)}`,
-            {method: 'get'}
+            {method: 'get'},
         );
     };
 
-    createChannel = async (channel: Channel) => {
+    createChannel = (channel: Channel) => {
         this.trackEvent('api', 'api_channels_create', {team_id: channel.team_id});
 
-        return this.doFetch(
+        return this.doFetch<Channel>(
             `${this.getChannelsRoute()}`,
-            {method: 'post', body: JSON.stringify(channel)}
+            {method: 'post', body: JSON.stringify(channel)},
         );
     };
 
-    createDirectChannel = async (userIds: string[]) => {
+    createDirectChannel = (userIds: string[]) => {
         this.trackEvent('api', 'api_channels_create_direct');
 
-        return this.doFetch(
+        return this.doFetch<Channel>(
             `${this.getChannelsRoute()}/direct`,
-            {method: 'post', body: JSON.stringify(userIds)}
+            {method: 'post', body: JSON.stringify(userIds)},
         );
     };
 
-    createGroupChannel = async (userIds: string[]) => {
+    createGroupChannel = (userIds: string[]) => {
         this.trackEvent('api', 'api_channels_create_group');
 
-        return this.doFetch(
+        return this.doFetch<Channel>(
             `${this.getChannelsRoute()}/group`,
-            {method: 'post', body: JSON.stringify(userIds)}
+            {method: 'post', body: JSON.stringify(userIds)},
         );
     };
 
-    deleteChannel = async (channelId: string) => {
+    deleteChannel = (channelId: string) => {
         this.trackEvent('api', 'api_channels_delete', {channel_id: channelId});
 
-        return this.doFetch(
+        return this.doFetch<StatusOK>(
             `${this.getChannelRoute(channelId)}`,
-            {method: 'delete'}
+            {method: 'delete'},
         );
     };
 
-    updateChannel = async (channel: Channel) => {
+    unarchiveChannel = (channelId: string) => {
+        this.trackEvent('api', 'api_channels_unarchive', {channel_id: channelId});
+
+        return this.doFetch<Channel>(
+            `${this.getChannelRoute(channelId)}/restore`,
+            {method: 'post'},
+        );
+    };
+
+    updateChannel = (channel: Channel) => {
         this.trackEvent('api', 'api_channels_update', {channel_id: channel.id});
 
-        return this.doFetch(
+        return this.doFetch<Channel>(
             `${this.getChannelRoute(channel.id)}`,
-            {method: 'put', body: JSON.stringify(channel)}
+            {method: 'put', body: JSON.stringify(channel)},
         );
     };
 
-    convertChannelToPrivate = async (channelId: string) => {
+    convertChannelToPrivate = (channelId: string) => {
         this.trackEvent('api', 'api_channels_convert_to_private', {channel_id: channelId});
 
-        return this.doFetch(
+        return this.doFetch<Channel>(
             `${this.getChannelRoute(channelId)}/convert`,
-            {method: 'post'}
+            {method: 'post'},
         );
     };
 
-    updateChannelPrivacy = async (channelId: string, privacy: any) => {
+    updateChannelPrivacy = (channelId: string, privacy: any) => {
         this.trackEvent('api', 'api_channels_update_privacy', {channel_id: channelId, privacy});
 
-        return this.doFetch(
+        return this.doFetch<Channel>(
             `${this.getChannelRoute(channelId)}/privacy`,
-            {method: 'put', body: JSON.stringify({privacy})}
+            {method: 'put', body: JSON.stringify({privacy})},
         );
     };
 
-    patchChannel = async (channelId: string, channelPatch: Partial<Channel>) => {
+    patchChannel = (channelId: string, channelPatch: Partial<Channel>) => {
         this.trackEvent('api', 'api_channels_patch', {channel_id: channelId});
 
-        return this.doFetch(
+        return this.doFetch<Channel>(
             `${this.getChannelRoute(channelId)}/patch`,
-            {method: 'put', body: JSON.stringify(channelPatch)}
+            {method: 'put', body: JSON.stringify(channelPatch)},
         );
     };
 
-    updateChannelNotifyProps = async (props: any) => {
-        this.trackEvent('api', 'api_users_update_channel_notifcations', {channel_id: props.channel_id});
+    updateChannelNotifyProps = (props: any) => {
+        this.trackEvent('api', 'api_users_update_channel_notifications', {channel_id: props.channel_id});
 
-        return this.doFetch(
+        return this.doFetch<StatusOK>(
             `${this.getChannelMemberRoute(props.channel_id, props.user_id)}/notify_props`,
-            {method: 'put', body: JSON.stringify(props)}
+            {method: 'put', body: JSON.stringify(props)},
         );
     };
 
-    updateChannelScheme = async (channelId: string, schemeId: string) => {
+    updateChannelScheme = (channelId: string, schemeId: string) => {
         const patch = {scheme_id: schemeId};
 
         this.trackEvent('api', 'api_channels_update_scheme', {channel_id: channelId, ...patch});
 
-        return this.doFetch(
+        return this.doFetch<StatusOK>(
             `${this.getChannelSchemeRoute(channelId)}`,
-            {method: 'put', body: JSON.stringify(patch)}
+            {method: 'put', body: JSON.stringify(patch)},
         );
     };
 
-    getChannel = async (channelId: string) => {
+    getChannel = (channelId: string) => {
         this.trackEvent('api', 'api_channel_get', {channel_id: channelId});
 
-        return this.doFetch(
+        return this.doFetch<Channel>(
             `${this.getChannelRoute(channelId)}`,
-            {method: 'get'}
+            {method: 'get'},
         );
     };
 
-    getChannelByName = async (teamId: string, channelName: string, includeDeleted = false) => {
-        return this.doFetch(
+    getChannelByName = (teamId: string, channelName: string, includeDeleted = false) => {
+        return this.doFetch<Channel>(
             `${this.getTeamRoute(teamId)}/channels/name/${channelName}?include_deleted=${includeDeleted}`,
-            {method: 'get'}
+            {method: 'get'},
         );
     };
 
-    getChannelByNameAndTeamName = async (teamName: string, channelName: string, includeDeleted = false) => {
-        this.trackEvent('api', 'api_channel_get_by_name_and_teamName', {channel_name: channelName, team_name: teamName, include_deleted: includeDeleted});
+    getChannelByNameAndTeamName = (teamName: string, channelName: string, includeDeleted = false) => {
+        this.trackEvent('api', 'api_channel_get_by_name_and_teamName', {include_deleted: includeDeleted});
 
-        return this.doFetch(
+        return this.doFetch<Channel>(
             `${this.getTeamNameRoute(teamName)}/channels/name/${channelName}?include_deleted=${includeDeleted}`,
-            {method: 'get'}
+            {method: 'get'},
         );
     };
 
-    getChannels = async (teamId: string, page = 0, perPage = PER_PAGE_DEFAULT) => {
-        return this.doFetch(
+    getChannels = (teamId: string, page = 0, perPage = PER_PAGE_DEFAULT) => {
+        return this.doFetch<Channel[]>(
             `${this.getTeamRoute(teamId)}/channels${buildQueryString({page, per_page: perPage})}`,
-            {method: 'get'}
+            {method: 'get'},
         );
     };
-    getArchivedChannels = async (teamId: string, page = 0, perPage = PER_PAGE_DEFAULT) => {
-        return this.doFetch(
+
+    getArchivedChannels = (teamId: string, page = 0, perPage = PER_PAGE_DEFAULT) => {
+        return this.doFetch<Channel[]>(
             `${this.getTeamRoute(teamId)}/channels/deleted${buildQueryString({page, per_page: perPage})}`,
-            {method: 'get'}
+            {method: 'get'},
         );
     };
 
-    getMyChannels = async (teamId: string) => {
-        return this.doFetch(
-            `${this.getUserRoute('me')}/teams/${teamId}/channels`,
-            {method: 'get'}
+    getMyChannels = (teamId: string, includeDeleted = false) => {
+        return this.doFetch<Channel[]>(
+            `${this.getUserRoute('me')}/teams/${teamId}/channels${buildQueryString({include_deleted: includeDeleted})}`,
+            {method: 'get'},
         );
     };
 
-    getMyChannelMember = async (channelId: string) => {
-        return this.doFetch(
+    getMyChannelMember = (channelId: string) => {
+        return this.doFetch<ChannelMembership>(
             `${this.getChannelMemberRoute(channelId, 'me')}`,
-            {method: 'get'}
+            {method: 'get'},
         );
     };
 
-    getMyChannelMembers = async (teamId: string) => {
-        return this.doFetch(
+    getMyChannelMembers = (teamId: string) => {
+        return this.doFetch<ChannelMembership[]>(
             `${this.getUserRoute('me')}/teams/${teamId}/channels/members`,
-            {method: 'get'}
+            {method: 'get'},
         );
     };
 
-    getChannelMembers = async (channelId: string, page = 0, perPage = PER_PAGE_DEFAULT) => {
-        return this.doFetch(
+    getChannelMembers = (channelId: string, page = 0, perPage = PER_PAGE_DEFAULT) => {
+        return this.doFetch<ChannelMembership[]>(
             `${this.getChannelMembersRoute(channelId)}${buildQueryString({page, per_page: perPage})}`,
-            {method: 'get'}
+            {method: 'get'},
         );
     };
 
-    getChannelTimezones = async (channelId: string) => {
-        return this.doFetch(
+    getChannelTimezones = (channelId: string) => {
+        return this.doFetch<string[]>(
             `${this.getChannelRoute(channelId)}/timezones`,
-            {method: 'get'}
+            {method: 'get'},
         );
     };
 
-    getChannelMember = async (channelId: string, userId: string) => {
-        return this.doFetch(
+    getChannelMember = (channelId: string, userId: string) => {
+        return this.doFetch<ChannelMembership>(
             `${this.getChannelMemberRoute(channelId, userId)}`,
-            {method: 'get'}
+            {method: 'get'},
         );
     };
 
-    getChannelMembersByIds = async (channelId: string, userIds: string[]) => {
-        return this.doFetch(
+    getChannelMembersByIds = (channelId: string, userIds: string[]) => {
+        return this.doFetch<ChannelMembership[]>(
             `${this.getChannelMembersRoute(channelId)}/ids`,
-            {method: 'post', body: JSON.stringify(userIds)}
+            {method: 'post', body: JSON.stringify(userIds)},
         );
     };
 
-    addToChannel = async (userId: string, channelId: string, postRootId = '') => {
+    addToChannel = (userId: string, channelId: string, postRootId = '') => {
         this.trackEvent('api', 'api_channels_add_member', {channel_id: channelId});
 
         const member = {user_id: userId, channel_id: channelId, post_root_id: postRootId};
-        return this.doFetch(
+        return this.doFetch<ChannelMembership>(
             `${this.getChannelMembersRoute(channelId)}`,
-            {method: 'post', body: JSON.stringify(member)}
+            {method: 'post', body: JSON.stringify(member)},
         );
     };
 
-    removeFromChannel = async (userId: string, channelId: string) => {
+    removeFromChannel = (userId: string, channelId: string) => {
         this.trackEvent('api', 'api_channels_remove_member', {channel_id: channelId});
 
-        return this.doFetch(
+        return this.doFetch<StatusOK>(
             `${this.getChannelMemberRoute(channelId, userId)}`,
-            {method: 'delete'}
+            {method: 'delete'},
         );
     };
 
-    updateChannelMemberRoles = async (channelId: string, userId: string, roles: string) => {
-        return this.doFetch(
+    updateChannelMemberRoles = (channelId: string, userId: string, roles: string) => {
+        return this.doFetch<StatusOK>(
             `${this.getChannelMemberRoute(channelId, userId)}/roles`,
-            {method: 'put', body: JSON.stringify({roles})}
+            {method: 'put', body: JSON.stringify({roles})},
         );
     };
 
-    getChannelStats = async (channelId: string) => {
-        return this.doFetch(
+    getChannelStats = (channelId: string) => {
+        return this.doFetch<ChannelStats>(
             `${this.getChannelRoute(channelId)}/stats`,
-            {method: 'get'}
+            {method: 'get'},
         );
     };
 
-    viewMyChannel = async (channelId: string, prevChannelId?: string) => {
+    getChannelModerations = (channelId: string) => {
+        return this.doFetch<ChannelModeration[]>(
+            `${this.getChannelRoute(channelId)}/moderations`,
+            {method: 'get'},
+        );
+    };
+
+    patchChannelModerations = (channelId: string, channelModerationsPatch: Array<ChannelModerationPatch>) => {
+        return this.doFetch<ChannelModeration[]>(
+            `${this.getChannelRoute(channelId)}/moderations/patch`,
+            {method: 'put', body: JSON.stringify(channelModerationsPatch)},
+        );
+    };
+
+    getChannelMemberCountsByGroup = (channelId: string, includeTimezones: boolean) => {
+        return this.doFetch<ChannelMemberCountsByGroup>(
+            `${this.getChannelRoute(channelId)}/member_counts_by_group?include_timezones=${includeTimezones}`,
+            {method: 'get'},
+        );
+    };
+
+    viewMyChannel = (channelId: string, prevChannelId?: string) => {
         const data = {channel_id: channelId, prev_channel_id: prevChannelId};
-        return this.doFetch(
+        return this.doFetch<ChannelViewResponse>(
             `${this.getChannelsRoute()}/members/me/view`,
-            {method: 'post', body: JSON.stringify(data)}
+            {method: 'post', body: JSON.stringify(data)},
         );
     };
 
-    autocompleteChannels = async (teamId: string, name: string) => {
-        return this.doFetch(
+    autocompleteChannels = (teamId: string, name: string) => {
+        return this.doFetch<Channel[]>(
             `${this.getTeamRoute(teamId)}/channels/autocomplete${buildQueryString({name})}`,
-            {method: 'get'}
+            {method: 'get'},
         );
     };
 
-    autocompleteChannelsForSearch = async (teamId: string, name: string) => {
-        return this.doFetch(
+    autocompleteChannelsForSearch = (teamId: string, name: string) => {
+        return this.doFetch<Channel[]>(
             `${this.getTeamRoute(teamId)}/channels/search_autocomplete${buildQueryString({name})}`,
-            {method: 'get'}
+            {method: 'get'},
         );
     };
 
-    searchChannels = async (teamId: string, term: string) => {
-        return this.doFetch(
+    searchChannels = (teamId: string, term: string) => {
+        return this.doFetch<Channel[]>(
             `${this.getTeamRoute(teamId)}/channels/search`,
-            {method: 'post', body: JSON.stringify({term})}
+            {method: 'post', body: JSON.stringify({term})},
         );
     };
 
-    searchArchivedChannels = async (teamId: string, term: string) => {
-        return this.doFetch(
+    searchArchivedChannels = (teamId: string, term: string) => {
+        return this.doFetch<Channel[]>(
             `${this.getTeamRoute(teamId)}/channels/search_archived`,
-            {method: 'post', body: JSON.stringify({term})}
+            {method: 'post', body: JSON.stringify({term})},
         );
     };
 
-    searchAllChannels = async (term: string, notAssociatedToGroup = '', excludeDefaultChannels = false, page?: number, perPage?: number) => {
+    searchAllChannels = (term: string, notAssociatedToGroup = '', excludeDefaultChannels = false, page?: number, perPage?: number, includeDeleted = false) => {
         const body = {
             term,
             not_associated_to_group: notAssociatedToGroup,
@@ -1541,223 +1724,282 @@ export default class Client4 {
             page,
             per_page: perPage,
         };
-        return this.doFetch(
-            `${this.getChannelsRoute()}/search`,
-            {method: 'post', body: JSON.stringify(body)}
+        return this.doFetch<Channel[] | ChannelsWithTotalCount>(
+            `${this.getChannelsRoute()}/search?include_deleted=${includeDeleted}`,
+            {method: 'post', body: JSON.stringify(body)},
         );
     };
 
-    searchGroupChannels = async (term: string) => {
-        return this.doFetch(
+    searchGroupChannels = (term: string) => {
+        return this.doFetch<Channel[]>(
             `${this.getChannelsRoute()}/group/search`,
-            {method: 'post', body: JSON.stringify({term})}
+            {method: 'post', body: JSON.stringify({term})},
         );
     };
 
-    updateChannelMemberSchemeRoles = async (channelId: string, userId: string, isSchemeUser: boolean, isSchemeAdmin: boolean) => {
+    updateChannelMemberSchemeRoles = (channelId: string, userId: string, isSchemeUser: boolean, isSchemeAdmin: boolean) => {
         const body = {scheme_user: isSchemeUser, scheme_admin: isSchemeAdmin};
-        return this.doFetch(
+        return this.doFetch<StatusOK>(
             `${this.getChannelRoute(channelId)}/members/${userId}/schemeRoles`,
-            {method: 'put', body: JSON.stringify(body)}
+            {method: 'put', body: JSON.stringify(body)},
         );
     };
+
+    // Channel Category Routes
+
+    getChannelCategories = (userId: string, teamId: string) => {
+        return this.doFetch<OrderedChannelCategories>(
+            `${this.getChannelCategoriesRoute(userId, teamId)}`,
+            {method: 'get'},
+        );
+    };
+
+    createChannelCategory = (userId: string, teamId: string, category: Partial<ChannelCategory>) => {
+        return this.doFetch<ChannelCategory>(
+            `${this.getChannelCategoriesRoute(userId, teamId)}`,
+            {method: 'post', body: JSON.stringify(category)},
+        );
+    };
+
+    updateChannelCategories = (userId: string, teamId: string, categories: ChannelCategory[]) => {
+        return this.doFetch<ChannelCategory[]>(
+            `${this.getChannelCategoriesRoute(userId, teamId)}`,
+            {method: 'put', body: JSON.stringify(categories)},
+        );
+    };
+
+    getChannelCategoryOrder = (userId: string, teamId: string) => {
+        return this.doFetch<string[]>(
+            `${this.getChannelCategoriesRoute(userId, teamId)}/order`,
+            {method: 'get'},
+        );
+    };
+
+    updateChannelCategoryOrder = (userId: string, teamId: string, categoryOrder: string[]) => {
+        return this.doFetch<string[]>(
+            `${this.getChannelCategoriesRoute(userId, teamId)}/order`,
+            {method: 'put', body: JSON.stringify(categoryOrder)},
+        );
+    };
+
+    getChannelCategory = (userId: string, teamId: string, categoryId: string) => {
+        return this.doFetch<ChannelCategory>(
+            `${this.getChannelCategoriesRoute(userId, teamId)}/${categoryId}`,
+            {method: 'get'},
+        );
+    };
+
+    updateChannelCategory = (userId: string, teamId: string, category: ChannelCategory) => {
+        return this.doFetch<ChannelCategory>(
+            `${this.getChannelCategoriesRoute(userId, teamId)}/${category.id}`,
+            {method: 'put', body: JSON.stringify(category)},
+        );
+    };
+
+    deleteChannelCategory = (userId: string, teamId: string, categoryId: string) => {
+        return this.doFetch<ChannelCategory>(
+            `${this.getChannelCategoriesRoute(userId, teamId)}/${categoryId}`,
+            {method: 'delete'},
+        );
+    }
 
     // Post Routes
 
     createPost = async (post: Post) => {
-        this.trackEvent('api', 'api_posts_create', {channel_id: post.channel_id});
-
-        if (post.root_id != null && post.root_id !== '') {
-            this.trackEvent('api', 'api_posts_replied', {channel_id: post.channel_id});
-        }
-
-        return this.doFetch(
+        const result = await this.doFetch<Post>(
             `${this.getPostsRoute()}`,
-            {method: 'post', body: JSON.stringify(post)}
+            {method: 'post', body: JSON.stringify(post)},
         );
+        const analyticsData = {channel_id: result.channel_id, post_id: result.id, user_actual_id: result.user_id, root_id: result.root_id};
+        this.trackEvent('api', 'api_posts_create', analyticsData);
+
+        if (result.root_id != null && result.root_id !== '') {
+            this.trackEvent('api', 'api_posts_replied', analyticsData);
+        }
+        return result;
     };
 
-    updatePost = async (post: Post) => {
-        this.trackEvent('api', 'api_posts_update', {channel_id: post.channel_id});
+    updatePost = (post: Post) => {
+        this.trackEvent('api', 'api_posts_update', {channel_id: post.channel_id, post_id: post.id});
 
-        return this.doFetch(
+        return this.doFetch<Post>(
             `${this.getPostRoute(post.id)}`,
-            {method: 'put', body: JSON.stringify(post)}
+            {method: 'put', body: JSON.stringify(post)},
         );
     };
 
-    getPost = async (postId: string) => {
-        return this.doFetch(
+    getPost = (postId: string) => {
+        return this.doFetch<Post>(
             `${this.getPostRoute(postId)}`,
-            {method: 'get'}
+            {method: 'get'},
         );
     };
 
-    patchPost = async (postPatch: Partial<Post> & {id: string}) => {
-        this.trackEvent('api', 'api_posts_patch', {channel_id: postPatch.channel_id});
+    patchPost = (postPatch: Partial<Post> & {id: string}) => {
+        this.trackEvent('api', 'api_posts_patch', {channel_id: postPatch.channel_id, post_id: postPatch.id});
 
-        return this.doFetch(
+        return this.doFetch<Post>(
             `${this.getPostRoute(postPatch.id)}/patch`,
-            {method: 'put', body: JSON.stringify(postPatch)}
+            {method: 'put', body: JSON.stringify(postPatch)},
         );
     };
 
-    deletePost = async (postId: string) => {
+    deletePost = (postId: string) => {
         this.trackEvent('api', 'api_posts_delete');
 
-        return this.doFetch(
+        return this.doFetch<StatusOK>(
             `${this.getPostRoute(postId)}`,
-            {method: 'delete'}
+            {method: 'delete'},
         );
     };
 
-    getPostThread = async (postId: string, fetchThreads = true) => {
-        return this.doFetch(
-            `${this.getPostRoute(postId)}/thread${buildQueryString({fetchThreads})}`,
-            {method: 'get'}
+    getPostThread = (postId: string, fetchThreads = true) => {
+        return this.doFetch<PostList>(
+            `${this.getPostRoute(postId)}/thread${buildQueryString({skipFetchThreads: !fetchThreads})}`,
+            {method: 'get'},
         );
     };
 
-    getPosts = async (channelId: string, page = 0, perPage = PER_PAGE_DEFAULT, fetchThreads = true) => {
-        return this.doFetch(
-            `${this.getChannelRoute(channelId)}/posts${buildQueryString({page, per_page: perPage, fetchThreads})}`,
-            {method: 'get'}
+    getPosts = (channelId: string, page = 0, perPage = PER_PAGE_DEFAULT, fetchThreads = true) => {
+        return this.doFetch<PostList>(
+            `${this.getChannelRoute(channelId)}/posts${buildQueryString({page, per_page: perPage, skipFetchThreads: !fetchThreads})}`,
+            {method: 'get'},
         );
     };
 
-    getPostsUnread = async (channelId: string, userId: string, limitAfter = DEFAULT_LIMIT_AFTER, limitBefore = DEFAULT_LIMIT_BEFORE, fetchThreads = true) => {
-        return this.doFetch(
-            `${this.getUserRoute(userId)}/channels/${channelId}/posts/unread${buildQueryString({limit_after: limitAfter, limit_before: limitBefore, fetchThreads})}`,
-            {method: 'get'}
+    getPostsUnread = (channelId: string, userId: string, limitAfter = DEFAULT_LIMIT_AFTER, limitBefore = DEFAULT_LIMIT_BEFORE, fetchThreads = true) => {
+        return this.doFetch<PostList>(
+            `${this.getUserRoute(userId)}/channels/${channelId}/posts/unread${buildQueryString({limit_after: limitAfter, limit_before: limitBefore, skipFetchThreads: !fetchThreads})}`,
+            {method: 'get'},
         );
     };
 
-    getPostsSince = async (channelId: string, since: number, fetchThreads = true) => {
-        return this.doFetch(
-            `${this.getChannelRoute(channelId)}/posts${buildQueryString({since, fetchThreads})}`,
-            {method: 'get'}
+    getPostsSince = (channelId: string, since: number, fetchThreads = true) => {
+        return this.doFetch<PostList>(
+            `${this.getChannelRoute(channelId)}/posts${buildQueryString({since, skipFetchThreads: !fetchThreads})}`,
+            {method: 'get'},
         );
     };
 
-    getPostsBefore = async (channelId: string, postId: string, page = 0, perPage = PER_PAGE_DEFAULT, fetchThreads = true) => {
+    getPostsBefore = (channelId: string, postId: string, page = 0, perPage = PER_PAGE_DEFAULT, fetchThreads = true) => {
         this.trackEvent('api', 'api_posts_get_before', {channel_id: channelId});
 
-        return this.doFetch(
-            `${this.getChannelRoute(channelId)}/posts${buildQueryString({before: postId, page, per_page: perPage, fetchThreads})}`,
-            {method: 'get'}
+        return this.doFetch<PostList>(
+            `${this.getChannelRoute(channelId)}/posts${buildQueryString({before: postId, page, per_page: perPage, skipFetchThreads: !fetchThreads})}`,
+            {method: 'get'},
         );
     };
 
-    getPostsAfter = async (channelId: string, postId: string, page = 0, perPage = PER_PAGE_DEFAULT, fetchThreads = true) => {
+    getPostsAfter = (channelId: string, postId: string, page = 0, perPage = PER_PAGE_DEFAULT, fetchThreads = true) => {
         this.trackEvent('api', 'api_posts_get_after', {channel_id: channelId});
 
-        return this.doFetch(
-            `${this.getChannelRoute(channelId)}/posts${buildQueryString({after: postId, page, per_page: perPage, fetchThreads})}`,
-            {method: 'get'}
+        return this.doFetch<PostList>(
+            `${this.getChannelRoute(channelId)}/posts${buildQueryString({after: postId, page, per_page: perPage, skipFetchThreads: !fetchThreads})}`,
+            {method: 'get'},
         );
     };
 
-    getFileInfosForPost = async (postId: string) => {
-        return this.doFetch(
+    getFileInfosForPost = (postId: string) => {
+        return this.doFetch<FileInfo[]>(
             `${this.getPostRoute(postId)}/files/info`,
-            {method: 'get'}
+            {method: 'get'},
         );
     };
 
-    getFlaggedPosts = async (userId: string, channelId = '', teamId = '', page = 0, perPage = PER_PAGE_DEFAULT) => {
+    getFlaggedPosts = (userId: string, channelId = '', teamId = '', page = 0, perPage = PER_PAGE_DEFAULT) => {
         this.trackEvent('api', 'api_posts_get_flagged', {team_id: teamId});
 
-        return this.doFetch(
+        return this.doFetch<PostList>(
             `${this.getUserRoute(userId)}/posts/flagged${buildQueryString({channel_id: channelId, team_id: teamId, page, per_page: perPage})}`,
-            {method: 'get'}
+            {method: 'get'},
         );
     };
 
-    getPinnedPosts = async (channelId: string) => {
+    getPinnedPosts = (channelId: string) => {
         this.trackEvent('api', 'api_posts_get_pinned', {channel_id: channelId});
-        return this.doFetch(
+        return this.doFetch<PostList>(
             `${this.getChannelRoute(channelId)}/pinned`,
-            {method: 'get'}
+            {method: 'get'},
         );
     };
 
-    markPostAsUnread = async (userId: string, postId: string) => {
+    markPostAsUnread = (userId: string, postId: string) => {
         this.trackEvent('api', 'api_post_set_unread_post');
 
-        return this.doFetch(
+        return this.doFetch<ChannelUnread>(
             `${this.getUserRoute(userId)}/posts/${postId}/set_unread`,
-            {method: 'post'}
+            {method: 'post'},
         );
     }
 
-    pinPost = async (postId: string) => {
+    pinPost = (postId: string) => {
         this.trackEvent('api', 'api_posts_pin');
 
-        return this.doFetch(
+        return this.doFetch<StatusOK>(
             `${this.getPostRoute(postId)}/pin`,
-            {method: 'post'}
+            {method: 'post'},
         );
     };
 
-    unpinPost = async (postId: string) => {
+    unpinPost = (postId: string) => {
         this.trackEvent('api', 'api_posts_unpin');
 
-        return this.doFetch(
+        return this.doFetch<StatusOK>(
             `${this.getPostRoute(postId)}/unpin`,
-            {method: 'post'}
+            {method: 'post'},
         );
     };
 
-    addReaction = async (userId: string, postId: string, emojiName: string) => {
+    addReaction = (userId: string, postId: string, emojiName: string) => {
         this.trackEvent('api', 'api_reactions_save', {post_id: postId});
 
-        return this.doFetch(
+        return this.doFetch<Reaction>(
             `${this.getReactionsRoute()}`,
-            {method: 'post', body: JSON.stringify({user_id: userId, post_id: postId, emoji_name: emojiName})}
+            {method: 'post', body: JSON.stringify({user_id: userId, post_id: postId, emoji_name: emojiName})},
         );
     };
 
-    removeReaction = async (userId: string, postId: string, emojiName: string) => {
+    removeReaction = (userId: string, postId: string, emojiName: string) => {
         this.trackEvent('api', 'api_reactions_delete', {post_id: postId});
 
-        return this.doFetch(
+        return this.doFetch<StatusOK>(
             `${this.getUserRoute(userId)}/posts/${postId}/reactions/${emojiName}`,
-            {method: 'delete'}
+            {method: 'delete'},
         );
     };
 
-    getReactionsForPost = async (postId: string) => {
-        return this.doFetch(
+    getReactionsForPost = (postId: string) => {
+        return this.doFetch<Reaction[]>(
             `${this.getPostRoute(postId)}/reactions`,
-            {method: 'get'}
+            {method: 'get'},
         );
     };
 
-    searchPostsWithParams = async (teamId: string, params: any) => {
+    searchPostsWithParams = (teamId: string, params: any) => {
         this.trackEvent('api', 'api_posts_search', {team_id: teamId});
 
-        return this.doFetch(
+        return this.doFetch<PostSearchResults>(
             `${this.getTeamRoute(teamId)}/posts/search`,
-            {method: 'post', body: JSON.stringify(params)}
+            {method: 'post', body: JSON.stringify(params)},
         );
     };
 
-    searchPosts = async (teamId: string, terms: string, isOrSearch: boolean) => {
+    searchPosts = (teamId: string, terms: string, isOrSearch: boolean) => {
         return this.searchPostsWithParams(teamId, {terms, is_or_search: isOrSearch});
     };
 
-    getOpenGraphMetadata = async (url: string) => {
-        return this.doFetch(
+    getOpenGraphMetadata = (url: string) => {
+        return this.doFetch<OpenGraphMetadata>(
             `${this.getBaseRoute()}/opengraph`,
-            {method: 'post', body: JSON.stringify({url})}
+            {method: 'post', body: JSON.stringify({url})},
         );
     };
 
-    doPostAction = async (postId: string, actionId: string, selectedOption = '') => {
+    doPostAction = (postId: string, actionId: string, selectedOption = '') => {
         return this.doPostActionWithCookie(postId, actionId, '', selectedOption);
     };
 
-    doPostActionWithCookie = async (postId: string, actionId: string, actionCookie: string, selectedOption = '') => {
+    doPostActionWithCookie = (postId: string, actionId: string, actionCookie: string, selectedOption = '') => {
         if (selectedOption) {
             this.trackEvent('api', 'api_interactive_messages_menu_selected');
         } else {
@@ -1770,9 +2012,9 @@ export default class Client4 {
         if (actionCookie !== '') {
             msg.cookie = actionCookie;
         }
-        return this.doFetch(
+        return this.doFetch<PostActionResponse>(
             `${this.getPostRoute(postId)}/actions/${encodeURIComponent(actionId)}`,
-            {method: 'post', body: JSON.stringify(msg)}
+            {method: 'post', body: JSON.stringify(msg)},
         );
     };
 
@@ -1805,7 +2047,7 @@ export default class Client4 {
         return url;
     }
 
-    uploadFile = async (fileFormData: any, formBoundary: string) => {
+    uploadFile = (fileFormData: any, formBoundary: string) => {
         this.trackEvent('api', 'api_files_upload');
         const request: any = {
             method: 'post',
@@ -1818,52 +2060,56 @@ export default class Client4 {
             };
         }
 
-        return this.doFetch(
+        return this.doFetch<FileUploadResponse>(
             `${this.getFilesRoute()}`,
-            request
+            request,
         );
     };
 
-    getFilePublicLink = async (fileId: string) => {
-        return this.doFetch(
+    getFilePublicLink = (fileId: string) => {
+        return this.doFetch<{
+            link: string;
+        }>(
             `${this.getFileRoute(fileId)}/link`,
-            {method: 'get'}
+            {method: 'get'},
         );
     }
 
     // Preference Routes
 
-    savePreferences = async (userId: string, preferences: PreferenceType[]) => {
-        return this.doFetch(
+    savePreferences = (userId: string, preferences: PreferenceType[]) => {
+        return this.doFetch<StatusOK>(
             `${this.getPreferencesRoute(userId)}`,
-            {method: 'put', body: JSON.stringify(preferences)}
+            {method: 'put', body: JSON.stringify(preferences)},
         );
     };
 
-    getMyPreferences = async () => {
-        return this.doFetch(
+    getMyPreferences = () => {
+        return this.doFetch<PreferenceType>(
             `${this.getPreferencesRoute('me')}`,
-            {method: 'get'}
+            {method: 'get'},
         );
     };
 
-    deletePreferences = async (userId: string, preferences: PreferenceType[]) => {
-        return this.doFetch(
+    deletePreferences = (userId: string, preferences: PreferenceType[]) => {
+        return this.doFetch<StatusOK>(
             `${this.getPreferencesRoute(userId)}/delete`,
-            {method: 'post', body: JSON.stringify(preferences)}
+            {method: 'post', body: JSON.stringify(preferences)},
         );
     };
 
     // General Routes
 
-    ping = async () => {
-        return this.doFetch(
+    ping = () => {
+        return this.doFetch<{
+            status: string;
+        }>(
             `${this.getBaseRoute()}/system/ping?time=${Date.now()}`,
-            {method: 'get'}
+            {method: 'get'},
         );
     };
 
-    logClientError = async (message: string, level = 'ERROR') => {
+    logClientError = (message: string, level = 'ERROR') => {
         const url = `${this.getBaseRoute()}/logs`;
 
         if (!this.enableLogging) {
@@ -1873,30 +2119,32 @@ export default class Client4 {
             });
         }
 
-        return this.doFetch(
+        return this.doFetch<{
+            message: string;
+        }>(
             url,
-            {method: 'post', body: JSON.stringify({message, level})}
+            {method: 'post', body: JSON.stringify({message, level})},
         );
     };
 
-    getClientConfigOld = async () => {
-        return this.doFetch(
+    getClientConfigOld = () => {
+        return this.doFetch<ClientConfig>(
             `${this.getBaseRoute()}/config/client?format=old`,
-            {method: 'get'}
+            {method: 'get'},
         );
     };
 
-    getClientLicenseOld = async () => {
-        return this.doFetch(
+    getClientLicenseOld = () => {
+        return this.doFetch<ClientLicense>(
             `${this.getBaseRoute()}/license/client?format=old`,
-            {method: 'get'}
+            {method: 'get'},
         );
     };
 
-    getTranslations = async (url: string) => {
-        return this.doFetch(
+    getTranslations = (url: string) => {
+        return this.doFetch<Record<string, string>>(
             url,
-            {method: 'get'}
+            {method: 'get'},
         );
     };
 
@@ -1904,32 +2152,25 @@ export default class Client4 {
         return `${this.getBaseRoute()}/websocket`;
     }
 
-    webrtcToken = async () => {
-        return this.doFetch(
-            `${this.getBaseRoute()}/webrtc/token`,
-            {method: 'get'}
-        );
-    };
-
     // Integration Routes
 
-    createIncomingWebhook = async (hook: IncomingWebhook) => {
+    createIncomingWebhook = (hook: IncomingWebhook) => {
         this.trackEvent('api', 'api_integrations_created', {team_id: hook.team_id});
 
-        return this.doFetch(
+        return this.doFetch<IncomingWebhook>(
             `${this.getIncomingHooksRoute()}`,
-            {method: 'post', body: JSON.stringify(hook)}
+            {method: 'post', body: JSON.stringify(hook)},
         );
     };
 
-    getIncomingWebhook = async (hookId: string) => {
-        return this.doFetch(
+    getIncomingWebhook = (hookId: string) => {
+        return this.doFetch<IncomingWebhook>(
             `${this.getIncomingHookRoute(hookId)}`,
-            {method: 'get'}
+            {method: 'get'},
         );
     };
 
-    getIncomingWebhooks = async (teamId = '', page = 0, perPage = PER_PAGE_DEFAULT) => {
+    getIncomingWebhooks = (teamId = '', page = 0, perPage = PER_PAGE_DEFAULT) => {
         const queryParams: any = {
             page,
             per_page: perPage,
@@ -1939,47 +2180,47 @@ export default class Client4 {
             queryParams.team_id = teamId;
         }
 
-        return this.doFetch(
+        return this.doFetch<IncomingWebhook[]>(
             `${this.getIncomingHooksRoute()}${buildQueryString(queryParams)}`,
-            {method: 'get'}
+            {method: 'get'},
         );
     };
 
-    removeIncomingWebhook = async (hookId: string) => {
+    removeIncomingWebhook = (hookId: string) => {
         this.trackEvent('api', 'api_integrations_deleted');
 
-        return this.doFetch(
+        return this.doFetch<StatusOK>(
             `${this.getIncomingHookRoute(hookId)}`,
-            {method: 'delete'}
+            {method: 'delete'},
         );
     };
 
-    updateIncomingWebhook = async (hook: IncomingWebhook) => {
+    updateIncomingWebhook = (hook: IncomingWebhook) => {
         this.trackEvent('api', 'api_integrations_updated', {team_id: hook.team_id});
 
-        return this.doFetch(
+        return this.doFetch<IncomingWebhook>(
             `${this.getIncomingHookRoute(hook.id)}`,
-            {method: 'put', body: JSON.stringify(hook)}
+            {method: 'put', body: JSON.stringify(hook)},
         );
     };
 
-    createOutgoingWebhook = async (hook: OutgoingWebhook) => {
+    createOutgoingWebhook = (hook: OutgoingWebhook) => {
         this.trackEvent('api', 'api_integrations_created', {team_id: hook.team_id});
 
-        return this.doFetch(
+        return this.doFetch<OutgoingWebhook>(
             `${this.getOutgoingHooksRoute()}`,
-            {method: 'post', body: JSON.stringify(hook)}
+            {method: 'post', body: JSON.stringify(hook)},
         );
     };
 
-    getOutgoingWebhook = async (hookId: string) => {
-        return this.doFetch(
+    getOutgoingWebhook = (hookId: string) => {
+        return this.doFetch<OutgoingWebhook>(
             `${this.getOutgoingHookRoute(hookId)}`,
-            {method: 'get'}
+            {method: 'get'},
         );
     };
 
-    getOutgoingWebhooks = async (channelId = '', teamId = '', page = 0, perPage = PER_PAGE_DEFAULT) => {
+    getOutgoingWebhooks = (channelId = '', teamId = '', page = 0, perPage = PER_PAGE_DEFAULT) => {
         const queryParams: any = {
             page,
             per_page: perPage,
@@ -1993,157 +2234,166 @@ export default class Client4 {
             queryParams.team_id = teamId;
         }
 
-        return this.doFetch(
+        return this.doFetch<OutgoingWebhook[]>(
             `${this.getOutgoingHooksRoute()}${buildQueryString(queryParams)}`,
-            {method: 'get'}
+            {method: 'get'},
         );
     };
 
-    removeOutgoingWebhook = async (hookId: string) => {
+    removeOutgoingWebhook = (hookId: string) => {
         this.trackEvent('api', 'api_integrations_deleted');
 
-        return this.doFetch(
+        return this.doFetch<StatusOK>(
             `${this.getOutgoingHookRoute(hookId)}`,
-            {method: 'delete'}
+            {method: 'delete'},
         );
     };
 
-    updateOutgoingWebhook = async (hook: OutgoingWebhook) => {
+    updateOutgoingWebhook = (hook: OutgoingWebhook) => {
         this.trackEvent('api', 'api_integrations_updated', {team_id: hook.team_id});
 
-        return this.doFetch(
+        return this.doFetch<OutgoingWebhook>(
             `${this.getOutgoingHookRoute(hook.id)}`,
-            {method: 'put', body: JSON.stringify(hook)}
+            {method: 'put', body: JSON.stringify(hook)},
         );
     };
 
-    regenOutgoingHookToken = async (id: string) => {
-        return this.doFetch(
+    regenOutgoingHookToken = (id: string) => {
+        return this.doFetch<OutgoingWebhook>(
             `${this.getOutgoingHookRoute(id)}/regen_token`,
-            {method: 'post'}
+            {method: 'post'},
         );
     };
 
-    getCommandsList = async (teamId: string) => {
-        return this.doFetch(
+    getCommandsList = (teamId: string) => {
+        return this.doFetch<Command[]>(
             `${this.getCommandsRoute()}?team_id=${teamId}`,
-            {method: 'get'}
+            {method: 'get'},
         );
     };
 
-    getAutocompleteCommandsList = async (teamId: string, page = 0, perPage = PER_PAGE_DEFAULT) => {
-        return this.doFetch(
+    getCommandAutocompleteSuggestionsList = (userInput: string, teamId: string, commandArgs: {}) => {
+        return this.doFetch<AutocompleteSuggestion[]>(
+            `${this.getTeamRoute(teamId)}/commands/autocomplete_suggestions${buildQueryString({...commandArgs, user_input: userInput})}`,
+            {method: 'get'},
+        );
+    };
+
+    getAutocompleteCommandsList = (teamId: string, page = 0, perPage = PER_PAGE_DEFAULT) => {
+        return this.doFetch<Command[]>(
             `${this.getTeamRoute(teamId)}/commands/autocomplete${buildQueryString({page, per_page: perPage})}`,
-            {method: 'get'}
+            {method: 'get'},
         );
     };
 
-    getCustomTeamCommands = async (teamId: string) => {
-        return this.doFetch(
+    getCustomTeamCommands = (teamId: string) => {
+        return this.doFetch<Command[]>(
             `${this.getCommandsRoute()}?team_id=${teamId}&custom_only=true`,
-            {method: 'get'}
+            {method: 'get'},
         );
     };
 
-    executeCommand = async (command: Command, commandArgs = {}) => {
+    executeCommand = (command: Command, commandArgs = {}) => {
         this.trackEvent('api', 'api_integrations_used');
 
-        return this.doFetch(
+        return this.doFetch<CommandResponse>(
             `${this.getCommandsRoute()}/execute`,
-            {method: 'post', body: JSON.stringify({command, ...commandArgs})}
+            {method: 'post', body: JSON.stringify({command, ...commandArgs})},
         );
     };
 
-    addCommand = async (command: Command) => {
+    addCommand = (command: Command) => {
         this.trackEvent('api', 'api_integrations_created');
 
-        return this.doFetch(
+        return this.doFetch<Command>(
             `${this.getCommandsRoute()}`,
-            {method: 'post', body: JSON.stringify(command)}
+            {method: 'post', body: JSON.stringify(command)},
         );
     };
 
-    editCommand = async (command: Command) => {
+    editCommand = (command: Command) => {
         this.trackEvent('api', 'api_integrations_created');
 
-        return this.doFetch(
+        return this.doFetch<Command>(
             `${this.getCommandsRoute()}/${command.id}`,
-            {method: 'put', body: JSON.stringify(command)}
+            {method: 'put', body: JSON.stringify(command)},
         );
     };
 
-    regenCommandToken = async (id: string) => {
-        return this.doFetch(
+    regenCommandToken = (id: string) => {
+        return this.doFetch<{
+            token: string;
+        }>(
             `${this.getCommandsRoute()}/${id}/regen_token`,
-            {method: 'put'}
+            {method: 'put'},
         );
     };
 
-    deleteCommand = async (id: string) => {
+    deleteCommand = (id: string) => {
         this.trackEvent('api', 'api_integrations_deleted');
 
-        return this.doFetch(
+        return this.doFetch<StatusOK>(
             `${this.getCommandsRoute()}/${id}`,
-            {method: 'delete'}
+            {method: 'delete'},
         );
     };
 
-    createOAuthApp = async (app: OAuthApp) => {
+    createOAuthApp = (app: OAuthApp) => {
         this.trackEvent('api', 'api_apps_register');
 
-        return this.doFetch(
+        return this.doFetch<OAuthApp>(
             `${this.getOAuthAppsRoute()}`,
-            {method: 'post', body: JSON.stringify(app)}
+            {method: 'post', body: JSON.stringify(app)},
         );
     };
 
-    editOAuthApp = async (app: OAuthApp) => {
-        return this.doFetch(
+    editOAuthApp = (app: OAuthApp) => {
+        return this.doFetch<OAuthApp>(
             `${this.getOAuthAppsRoute()}/${app.id}`,
-            {method: 'put', body: JSON.stringify(app)}
+            {method: 'put', body: JSON.stringify(app)},
         );
     };
 
-    getOAuthApps = async (page = 0, perPage = PER_PAGE_DEFAULT) => {
-        return this.doFetch(
+    getOAuthApps = (page = 0, perPage = PER_PAGE_DEFAULT) => {
+        return this.doFetch<OAuthApp[]>(
             `${this.getOAuthAppsRoute()}${buildQueryString({page, per_page: perPage})}`,
-            {method: 'get'}
+            {method: 'get'},
         );
     };
 
-    getOAuthApp = async (appId: string) => {
-        return this.doFetch(
+    getOAuthApp = (appId: string) => {
+        return this.doFetch<OAuthApp>(
             `${this.getOAuthAppRoute(appId)}`,
-            {method: 'get'}
+            {method: 'get'},
         );
     };
 
-    getOAuthAppInfo = async (appId: string) => {
-        return this.doFetch(
+    getOAuthAppInfo = (appId: string) => {
+        return this.doFetch<OAuthApp>(
             `${this.getOAuthAppRoute(appId)}/info`,
-            {method: 'get'}
+            {method: 'get'},
         );
     };
 
-    deleteOAuthApp = async (appId: string) => {
+    deleteOAuthApp = (appId: string) => {
         this.trackEvent('api', 'api_apps_delete');
 
-        return this.doFetch(
+        return this.doFetch<StatusOK>(
             `${this.getOAuthAppRoute(appId)}`,
-            {method: 'delete'}
+            {method: 'delete'},
         );
     };
 
-    regenOAuthAppSecret = async (appId: string) => {
-        return this.doFetch(
+    regenOAuthAppSecret = (appId: string) => {
+        return this.doFetch<OAuthApp>(
             `${this.getOAuthAppRoute(appId)}/regen_secret`,
-            {method: 'post'}
+            {method: 'post'},
         );
     };
 
-    submitInteractiveDialog = async (data: DialogSubmission) => {
+    submitInteractiveDialog = (data: DialogSubmission) => {
         this.trackEvent('api', 'api_interactive_messages_dialog_submitted');
-        return this.doFetch(
+        return this.doFetch<SubmitDialogResponse>(
             `${this.getBaseRoute()}/actions/dialogs/submit`,
             {method: 'post', body: JSON.stringify(data)},
         );
@@ -2151,7 +2401,7 @@ export default class Client4 {
 
     // Emoji Routes
 
-    createCustomEmoji = async (emoji: CustomEmoji, imageData: File) => {
+    createCustomEmoji = (emoji: CustomEmoji, imageData: File) => {
         this.trackEvent('api', 'api_emoji_custom_add');
 
         const formData = new FormData();
@@ -2168,39 +2418,39 @@ export default class Client4 {
             };
         }
 
-        return this.doFetch(
+        return this.doFetch<CustomEmoji>(
             `${this.getEmojisRoute()}`,
-            request
+            request,
         );
     };
 
-    getCustomEmoji = async (id: string) => {
-        return this.doFetch(
+    getCustomEmoji = (id: string) => {
+        return this.doFetch<CustomEmoji>(
             `${this.getEmojisRoute()}/${id}`,
-            {method: 'get'}
+            {method: 'get'},
         );
     };
 
-    getCustomEmojiByName = async (name: string) => {
-        return this.doFetch(
+    getCustomEmojiByName = (name: string) => {
+        return this.doFetch<CustomEmoji>(
             `${this.getEmojisRoute()}/name/${name}`,
-            {method: 'get'}
+            {method: 'get'},
         );
     };
 
-    getCustomEmojis = async (page = 0, perPage = PER_PAGE_DEFAULT, sort = '') => {
-        return this.doFetch(
+    getCustomEmojis = (page = 0, perPage = PER_PAGE_DEFAULT, sort = '') => {
+        return this.doFetch<CustomEmoji[]>(
             `${this.getEmojisRoute()}${buildQueryString({page, per_page: perPage, sort})}`,
-            {method: 'get'}
+            {method: 'get'},
         );
     };
 
-    deleteCustomEmoji = async (emojiId: string) => {
+    deleteCustomEmoji = (emojiId: string) => {
         this.trackEvent('api', 'api_emoji_custom_delete');
 
-        return this.doFetch(
+        return this.doFetch<StatusOK>(
             `${this.getEmojiRoute(emojiId)}`,
-            {method: 'delete'}
+            {method: 'delete'},
         );
     };
 
@@ -2212,176 +2462,176 @@ export default class Client4 {
         return `${this.getEmojiRoute(id)}/image`;
     };
 
-    searchCustomEmoji = async (term: string, options = {}) => {
-        return this.doFetch(
+    searchCustomEmoji = (term: string, options = {}) => {
+        return this.doFetch<CustomEmoji[]>(
             `${this.getEmojisRoute()}/search`,
-            {method: 'post', body: JSON.stringify({term, ...options})}
+            {method: 'post', body: JSON.stringify({term, ...options})},
         );
     };
 
-    autocompleteCustomEmoji = async (name: string) => {
-        return this.doFetch(
+    autocompleteCustomEmoji = (name: string) => {
+        return this.doFetch<CustomEmoji[]>(
             `${this.getEmojisRoute()}/autocomplete${buildQueryString({name})}`,
-            {method: 'get'}
+            {method: 'get'},
         );
     };
 
     // Timezone Routes
 
-    getTimezones = async () => {
-        return this.doFetch(
+    getTimezones = () => {
+        return this.doFetch<string[]>(
             `${this.getTimezonesRoute()}`,
-            {method: 'get'}
+            {method: 'get'},
         );
     };
 
     // Data Retention
 
     getDataRetentionPolicy = () => {
-        return this.doFetch(
+        return this.doFetch<DataRetentionPolicy>(
             `${this.getDataRetentionRoute()}/policy`,
-            {method: 'get'}
+            {method: 'get'},
         );
     };
 
     // Jobs Routes
 
-    getJob = async (id: string) => {
-        return this.doFetch(
+    getJob = (id: string) => {
+        return this.doFetch<Job>(
             `${this.getJobsRoute()}/${id}`,
-            {method: 'get'}
+            {method: 'get'},
         );
     };
 
-    getJobs = async (page = 0, perPage = PER_PAGE_DEFAULT) => {
-        return this.doFetch(
+    getJobs = (page = 0, perPage = PER_PAGE_DEFAULT) => {
+        return this.doFetch<Job[]>(
             `${this.getJobsRoute()}${buildQueryString({page, per_page: perPage})}`,
-            {method: 'get'}
+            {method: 'get'},
         );
     };
 
-    getJobsByType = async (type: string, page = 0, perPage = PER_PAGE_DEFAULT) => {
-        return this.doFetch(
+    getJobsByType = (type: string, page = 0, perPage = PER_PAGE_DEFAULT) => {
+        return this.doFetch<Job[]>(
             `${this.getJobsRoute()}/type/${type}${buildQueryString({page, per_page: perPage})}`,
-            {method: 'get'}
+            {method: 'get'},
         );
     };
 
-    createJob = async (job: Job) => {
-        return this.doFetch(
+    createJob = (job: Job) => {
+        return this.doFetch<Job>(
             `${this.getJobsRoute()}`,
-            {method: 'post', body: JSON.stringify(job)}
+            {method: 'post', body: JSON.stringify(job)},
         );
     };
 
-    cancelJob = async (id: string) => {
-        return this.doFetch(
+    cancelJob = (id: string) => {
+        return this.doFetch<StatusOK>(
             `${this.getJobsRoute()}/${id}/cancel`,
-            {method: 'post'}
+            {method: 'post'},
         );
     };
 
     // Admin Routes
 
-    getLogs = async (page = 0, perPage = LOGS_PER_PAGE_DEFAULT) => {
-        return this.doFetch(
+    getLogs = (page = 0, perPage = LOGS_PER_PAGE_DEFAULT) => {
+        return this.doFetch<string[]>(
             `${this.getBaseRoute()}/logs${buildQueryString({page, logs_per_page: perPage})}`,
-            {method: 'get'}
+            {method: 'get'},
         );
     };
 
-    getAudits = async (page = 0, perPage = PER_PAGE_DEFAULT) => {
-        return this.doFetch(
+    getAudits = (page = 0, perPage = PER_PAGE_DEFAULT) => {
+        return this.doFetch<Audit[]>(
             `${this.getBaseRoute()}/audits${buildQueryString({page, per_page: perPage})}`,
-            {method: 'get'}
+            {method: 'get'},
         );
     };
 
-    getConfig = async () => {
-        return this.doFetch(
+    getConfig = () => {
+        return this.doFetch<AdminConfig>(
             `${this.getBaseRoute()}/config`,
-            {method: 'get'}
+            {method: 'get'},
         );
     };
 
-    updateConfig = async (config: Config) => {
-        return this.doFetch(
+    updateConfig = (config: AdminConfig) => {
+        return this.doFetch<AdminConfig>(
             `${this.getBaseRoute()}/config`,
-            {method: 'put', body: JSON.stringify(config)}
+            {method: 'put', body: JSON.stringify(config)},
         );
     };
 
-    reloadConfig = async () => {
-        return this.doFetch(
+    reloadConfig = () => {
+        return this.doFetch<StatusOK>(
             `${this.getBaseRoute()}/config/reload`,
-            {method: 'post'}
+            {method: 'post'},
         );
     };
 
-    getEnvironmentConfig = async () => {
-        return this.doFetch(
+    getEnvironmentConfig = () => {
+        return this.doFetch<EnvironmentConfig>(
             `${this.getBaseRoute()}/config/environment`,
-            {method: 'get'}
+            {method: 'get'},
         );
     };
 
-    testEmail = async (config: Config) => {
-        return this.doFetch(
+    testEmail = (config: AdminConfig) => {
+        return this.doFetch<StatusOK>(
             `${this.getBaseRoute()}/email/test`,
-            {method: 'post', body: JSON.stringify(config)}
+            {method: 'post', body: JSON.stringify(config)},
         );
     };
 
-    testSiteURL = async (siteURL: string) => {
-        return this.doFetch(
+    testSiteURL = (siteURL: string) => {
+        return this.doFetch<StatusOK>(
             `${this.getBaseRoute()}/site_url/test`,
-            {method: 'post', body: JSON.stringify({site_url: siteURL})}
+            {method: 'post', body: JSON.stringify({site_url: siteURL})},
         );
     };
 
-    testS3Connection = async (config: Config) => {
-        return this.doFetch(
+    testS3Connection = (config: ClientConfig) => {
+        return this.doFetch<StatusOK>(
             `${this.getBaseRoute()}/file/s3_test`,
-            {method: 'post', body: JSON.stringify(config)}
+            {method: 'post', body: JSON.stringify(config)},
         );
     };
 
-    invalidateCaches = async () => {
-        return this.doFetch(
+    invalidateCaches = () => {
+        return this.doFetch<StatusOK>(
             `${this.getBaseRoute()}/caches/invalidate`,
-            {method: 'post'}
+            {method: 'post'},
         );
     };
 
-    recycleDatabase = async () => {
-        return this.doFetch(
+    recycleDatabase = () => {
+        return this.doFetch<StatusOK>(
             `${this.getBaseRoute()}/database/recycle`,
-            {method: 'post'}
+            {method: 'post'},
         );
     };
 
-    createComplianceReport = async (job: Job) => {
-        return this.doFetch(
+    createComplianceReport = (job: Job) => {
+        return this.doFetch<Compliance>(
             `${this.getBaseRoute()}/compliance/reports`,
-            {method: 'post', body: JSON.stringify(job)}
+            {method: 'post', body: JSON.stringify(job)},
         );
     };
 
-    getComplianceReport = async (reportId: string) => {
-        return this.doFetch(
+    getComplianceReport = (reportId: string) => {
+        return this.doFetch<Compliance>(
             `${this.getBaseRoute()}/compliance/reports/${reportId}`,
-            {method: 'get'}
+            {method: 'get'},
         );
     };
 
-    getComplianceReports = async (page = 0, perPage = PER_PAGE_DEFAULT) => {
-        return this.doFetch(
+    getComplianceReports = (page = 0, perPage = PER_PAGE_DEFAULT) => {
+        return this.doFetch<Compliance[]>(
             `${this.getBaseRoute()}/compliance/reports${buildQueryString({page, per_page: perPage})}`,
-            {method: 'get'}
+            {method: 'get'},
         );
     };
 
-    uploadBrandImage = async (imageData: File) => {
+    uploadBrandImage = (imageData: File) => {
         const formData = new FormData();
         formData.append('image', imageData);
         const request: any = {
@@ -2395,144 +2645,154 @@ export default class Client4 {
             };
         }
 
-        return this.doFetch(
+        return this.doFetch<StatusOK>(
             `${this.getBrandRoute()}/image`,
-            request
+            request,
         );
     };
 
-    deleteBrandImage = async () => {
-        return this.doFetch(
+    deleteBrandImage = () => {
+        return this.doFetch<StatusOK>(
             `${this.getBrandRoute()}/image`,
-            {method: 'delete'}
+            {method: 'delete'},
         );
     };
 
-    getClusterStatus = async () => {
-        return this.doFetch(
+    getClusterStatus = () => {
+        return this.doFetch<ClusterInfo[]>(
             `${this.getBaseRoute()}/cluster/status`,
-            {method: 'get'}
+            {method: 'get'},
         );
     };
 
-    testLdap = async () => {
-        return this.doFetch(
+    testLdap = () => {
+        return this.doFetch<StatusOK>(
             `${this.getBaseRoute()}/ldap/test`,
-            {method: 'post'}
+            {method: 'post'},
         );
     };
 
-    syncLdap = async () => {
-        return this.doFetch(
+    syncLdap = () => {
+        return this.doFetch<StatusOK>(
             `${this.getBaseRoute()}/ldap/sync`,
-            {method: 'post'}
+            {method: 'post'},
         );
     };
 
-    getLdapGroups = async (page = 0, perPage = PER_PAGE_DEFAULT, opts = {}) => {
+    getLdapGroups = (page = 0, perPage = PER_PAGE_DEFAULT, opts = {}) => {
         const query = {page, per_page: perPage, ...opts};
-        return this.doFetch(
+        return this.doFetch<{
+            count: number;
+            groups: MixedUnlinkedGroup[];
+        }>(
             `${this.getBaseRoute()}/ldap/groups${buildQueryString(query)}`,
-            {method: 'get'}
+            {method: 'get'},
         );
     };
 
-    linkLdapGroup = async (key: string) => {
-        return this.doFetch(
+    linkLdapGroup = (key: string) => {
+        return this.doFetch<Group>(
             `${this.getBaseRoute()}/ldap/groups/${encodeURI(key)}/link`,
-            {method: 'post'}
+            {method: 'post'},
         );
     };
 
-    unlinkLdapGroup = async (key: string) => {
-        return this.doFetch(
+    unlinkLdapGroup = (key: string) => {
+        return this.doFetch<StatusOK>(
             `${this.getBaseRoute()}/ldap/groups/${encodeURI(key)}/link`,
-            {method: 'delete'}
+            {method: 'delete'},
         );
     };
 
-    getSamlCertificateStatus = async () => {
-        return this.doFetch(
+    getSamlCertificateStatus = () => {
+        return this.doFetch<SamlCertificateStatus>(
             `${this.getBaseRoute()}/saml/certificate/status`,
-            {method: 'get'}
+            {method: 'get'},
         );
     };
 
-    uploadPublicSamlCertificate = async (fileData: File) => {
+    uploadPublicSamlCertificate = (fileData: File) => {
         const formData = new FormData();
         formData.append('certificate', fileData);
 
-        return this.doFetch(
+        return this.doFetch<StatusOK>(
             `${this.getBaseRoute()}/saml/certificate/public`,
             {
                 method: 'post',
                 body: formData,
-            }
+            },
         );
     };
 
-    uploadPrivateSamlCertificate = async (fileData: File) => {
+    uploadPrivateSamlCertificate = (fileData: File) => {
         const formData = new FormData();
         formData.append('certificate', fileData);
 
-        return this.doFetch(
+        return this.doFetch<StatusOK>(
             `${this.getBaseRoute()}/saml/certificate/private`,
             {
                 method: 'post',
                 body: formData,
-            }
+            },
         );
     };
 
-    uploadIdpSamlCertificate = async (fileData: File) => {
+    uploadIdpSamlCertificate = (fileData: File) => {
         const formData = new FormData();
         formData.append('certificate', fileData);
 
-        return this.doFetch(
+        return this.doFetch<StatusOK>(
             `${this.getBaseRoute()}/saml/certificate/idp`,
             {
                 method: 'post',
                 body: formData,
-            }
+            },
         );
     };
 
-    deletePublicSamlCertificate = async () => {
-        return this.doFetch(
+    deletePublicSamlCertificate = () => {
+        return this.doFetch<StatusOK>(
             `${this.getBaseRoute()}/saml/certificate/public`,
-            {method: 'delete'}
+            {method: 'delete'},
         );
     };
 
-    deletePrivateSamlCertificate = async () => {
-        return this.doFetch(
+    deletePrivateSamlCertificate = () => {
+        return this.doFetch<StatusOK>(
             `${this.getBaseRoute()}/saml/certificate/private`,
-            {method: 'delete'}
+            {method: 'delete'},
         );
     };
 
-    deleteIdpSamlCertificate = async () => {
-        return this.doFetch(
+    deleteIdpSamlCertificate = () => {
+        return this.doFetch<StatusOK>(
             `${this.getBaseRoute()}/saml/certificate/idp`,
-            {method: 'delete'}
+            {method: 'delete'},
         );
     };
 
-    testElasticsearch = async (config: Config) => {
-        return this.doFetch(
+    testElasticsearch = (config: ClientConfig) => {
+        return this.doFetch<StatusOK>(
             `${this.getBaseRoute()}/elasticsearch/test`,
-            {method: 'post', body: JSON.stringify(config)}
+            {method: 'post', body: JSON.stringify(config)},
         );
     };
 
-    purgeElasticsearchIndexes = async () => {
-        return this.doFetch(
+    purgeElasticsearchIndexes = () => {
+        return this.doFetch<StatusOK>(
             `${this.getBaseRoute()}/elasticsearch/purge_indexes`,
-            {method: 'post'}
+            {method: 'post'},
         );
     };
 
-    uploadLicense = async (fileData: File) => {
+    purgeBleveIndexes = () => {
+        return this.doFetch<StatusOK>(
+            `${this.getBaseRoute()}/bleve/purge_indexes`,
+            {method: 'post'},
+        );
+    };
+
+    uploadLicense = (fileData: File) => {
         this.trackEvent('api', 'api_license_upload');
 
         const formData = new FormData();
@@ -2549,110 +2809,110 @@ export default class Client4 {
             };
         }
 
-        return this.doFetch(
+        return this.doFetch<License>(
             `${this.getBaseRoute()}/license`,
-            request
+            request,
         );
     };
 
-    removeLicense = async () => {
-        return this.doFetch(
+    removeLicense = () => {
+        return this.doFetch<StatusOK>(
             `${this.getBaseRoute()}/license`,
-            {method: 'delete'}
+            {method: 'delete'},
         );
     };
 
-    getAnalytics = async (name = 'standard', teamId = '') => {
-        return this.doFetch(
+    getAnalytics = (name = 'standard', teamId = '') => {
+        return this.doFetch<AnalyticsRow[]>(
             `${this.getBaseRoute()}/analytics/old${buildQueryString({name, team_id: teamId})}`,
-            {method: 'get'}
+            {method: 'get'},
         );
     };
 
     // Role Routes
 
-    getRole = async (roleId: string) => {
-        return this.doFetch(
+    getRole = (roleId: string) => {
+        return this.doFetch<Role>(
             `${this.getRolesRoute()}/${roleId}`,
-            {method: 'get'}
+            {method: 'get'},
         );
     };
 
-    getRoleByName = async (roleName: string) => {
-        return this.doFetch(
+    getRoleByName = (roleName: string) => {
+        return this.doFetch<Role>(
             `${this.getRolesRoute()}/name/${roleName}`,
-            {method: 'get'}
+            {method: 'get'},
         );
     };
 
-    getRolesByNames = async (rolesNames: string[]) => {
-        return this.doFetch(
+    getRolesByNames = (rolesNames: string[]) => {
+        return this.doFetch<Role[]>(
             `${this.getRolesRoute()}/names`,
-            {method: 'post', body: JSON.stringify(rolesNames)}
+            {method: 'post', body: JSON.stringify(rolesNames)},
         );
     };
 
-    patchRole = async (roleId: string, rolePatch: Partial<Role>) => {
-        return this.doFetch(
+    patchRole = (roleId: string, rolePatch: Partial<Role>) => {
+        return this.doFetch<Role>(
             `${this.getRolesRoute()}/${roleId}/patch`,
-            {method: 'put', body: JSON.stringify(rolePatch)}
+            {method: 'put', body: JSON.stringify(rolePatch)},
         );
     };
 
     // Scheme Routes
 
-    getSchemes = async (scope = '', page = 0, perPage = PER_PAGE_DEFAULT) => {
-        return this.doFetch(
+    getSchemes = (scope = '', page = 0, perPage = PER_PAGE_DEFAULT) => {
+        return this.doFetch<Scheme[]>(
             `${this.getSchemesRoute()}${buildQueryString({scope, page, per_page: perPage})}`,
-            {method: 'get'}
+            {method: 'get'},
         );
     };
 
-    createScheme = async (scheme: Scheme) => {
+    createScheme = (scheme: Scheme) => {
         this.trackEvent('api', 'api_schemes_create');
 
-        return this.doFetch(
+        return this.doFetch<Scheme>(
             `${this.getSchemesRoute()}`,
-            {method: 'post', body: JSON.stringify(scheme)}
+            {method: 'post', body: JSON.stringify(scheme)},
         );
     };
 
-    getScheme = async (schemeId: string) => {
-        return this.doFetch(
+    getScheme = (schemeId: string) => {
+        return this.doFetch<Scheme>(
             `${this.getSchemesRoute()}/${schemeId}`,
-            {method: 'get'}
+            {method: 'get'},
         );
     };
 
-    deleteScheme = async (schemeId: string) => {
+    deleteScheme = (schemeId: string) => {
         this.trackEvent('api', 'api_schemes_delete');
 
-        return this.doFetch(
+        return this.doFetch<StatusOK>(
             `${this.getSchemesRoute()}/${schemeId}`,
-            {method: 'delete'}
+            {method: 'delete'},
         );
     };
 
-    patchScheme = async (schemeId: string, schemePatch: Partial<Scheme>) => {
+    patchScheme = (schemeId: string, schemePatch: Partial<Scheme>) => {
         this.trackEvent('api', 'api_schemes_patch', {scheme_id: schemeId});
 
-        return this.doFetch(
+        return this.doFetch<Scheme>(
             `${this.getSchemesRoute()}/${schemeId}/patch`,
-            {method: 'put', body: JSON.stringify(schemePatch)}
+            {method: 'put', body: JSON.stringify(schemePatch)},
         );
     };
 
-    getSchemeTeams = async (schemeId: string, page = 0, perPage = PER_PAGE_DEFAULT) => {
-        return this.doFetch(
+    getSchemeTeams = (schemeId: string, page = 0, perPage = PER_PAGE_DEFAULT) => {
+        return this.doFetch<Team[]>(
             `${this.getSchemesRoute()}/${schemeId}/teams${buildQueryString({page, per_page: perPage})}`,
-            {method: 'get'}
+            {method: 'get'},
         );
     };
 
-    getSchemeChannels = async (schemeId: string, page = 0, perPage = PER_PAGE_DEFAULT) => {
-        return this.doFetch(
+    getSchemeChannels = (schemeId: string, page = 0, perPage = PER_PAGE_DEFAULT) => {
+        return this.doFetch<Channel[]>(
             `${this.getSchemesRoute()}/${schemeId}/channels${buildQueryString({page, per_page: perPage})}`,
-            {method: 'get'}
+            {method: 'get'},
         );
     };
 
@@ -2678,294 +2938,370 @@ export default class Client4 {
             };
         }
 
-        return this.doFetch(
+        return this.doFetch<PluginManifest>(
             this.getPluginsRoute(),
-            request
+            request,
         );
     };
 
-    installPluginFromUrl = async (pluginDownloadUrl: string, force = false) => {
+    installPluginFromUrl = (pluginDownloadUrl: string, force = false) => {
         this.trackEvent('api', 'api_install_plugin');
 
         const queryParams = {plugin_download_url: pluginDownloadUrl, force};
 
-        return this.doFetch(
+        return this.doFetch<PluginManifest>(
             `${this.getPluginsRoute()}/install_from_url${buildQueryString(queryParams)}`,
-            {method: 'post'}
+            {method: 'post'},
         );
     };
 
-    getPlugins = async () => {
-        return this.doFetch(
+    getPlugins = () => {
+        return this.doFetch<PluginsResponse>(
             this.getPluginsRoute(),
-            {method: 'get'}
+            {method: 'get'},
         );
     };
 
-    getMarketplacePlugins = async (filter: string) => {
-        return this.doFetch(
-            `${this.getPluginsMarketplaceRoute()}${buildQueryString({filter: filter || ''})}`,
-            {method: 'get'}
+    getMarketplacePlugins = (filter: string, localOnly = false) => {
+        return this.doFetch<MarketplacePlugin>(
+            `${this.getPluginsMarketplaceRoute()}${buildQueryString({filter: filter || '', local_only: localOnly})}`,
+            {method: 'get'},
         );
     }
 
-    installMarketplacePlugin = async (id: string, version: string) => {
+    installMarketplacePlugin = (id: string, version: string) => {
         this.trackEvent('api', 'api_install_marketplace_plugin');
 
-        return this.doFetch(
+        return this.doFetch<MarketplacePlugin>(
             `${this.getPluginsMarketplaceRoute()}`,
-            {method: 'post', body: JSON.stringify({id, version})}
+            {method: 'post', body: JSON.stringify({id, version})},
         );
     }
 
-    getPluginStatuses = async () => {
-        return this.doFetch(
+    getPluginStatuses = () => {
+        return this.doFetch<PluginStatus[]>(
             `${this.getPluginsRoute()}/statuses`,
-            {method: 'get'}
+            {method: 'get'},
         );
     };
 
-    removePlugin = async (pluginId: string) => {
-        return this.doFetch(
+    removePlugin = (pluginId: string) => {
+        return this.doFetch<StatusOK>(
             this.getPluginRoute(pluginId),
-            {method: 'delete'}
+            {method: 'delete'},
         );
     };
 
-    getWebappPlugins = async () => {
-        return this.doFetch(
+    getWebappPlugins = () => {
+        return this.doFetch<ClientPluginManifest[]>(
             `${this.getPluginsRoute()}/webapp`,
-            {method: 'get'}
+            {method: 'get'},
         );
     };
 
-    enablePlugin = async (pluginId: string) => {
-        return this.doFetch(
+    enablePlugin = (pluginId: string) => {
+        return this.doFetch<StatusOK>(
             `${this.getPluginRoute(pluginId)}/enable`,
-            {method: 'post'}
+            {method: 'post'},
         );
     };
 
-    disablePlugin = async (pluginId: string) => {
-        return this.doFetch(
+    disablePlugin = (pluginId: string) => {
+        return this.doFetch<StatusOK>(
             `${this.getPluginRoute(pluginId)}/disable`,
-            {method: 'post'}
+            {method: 'post'},
         );
     };
 
     // Groups
 
-    linkGroupSyncable = async (groupID: string, syncableID: string, syncableType: string, patch: SyncablePatch) => {
-        return this.doFetch(
-            `${this.getBaseRoute()}/groups/${groupID}/${syncableType}s/${syncableID}/link`,
-            {method: 'post', body: JSON.stringify(patch)}
+    linkGroupSyncable = (groupID: string, syncableID: string, syncableType: string, patch: SyncablePatch) => {
+        return this.doFetch<GroupSyncable>(
+            `${this.getGroupRoute(groupID)}/${syncableType}s/${syncableID}/link`,
+            {method: 'post', body: JSON.stringify(patch)},
         );
     };
 
-    unlinkGroupSyncable = async (groupID: string, syncableID: string, syncableType: string) => {
-        return this.doFetch(
-            `${this.getBaseRoute()}/groups/${groupID}/${syncableType}s/${syncableID}/link`,
-            {method: 'delete'}
+    unlinkGroupSyncable = (groupID: string, syncableID: string, syncableType: string) => {
+        return this.doFetch<StatusOK>(
+            `${this.getGroupRoute(groupID)}/${syncableType}s/${syncableID}/link`,
+            {method: 'delete'},
         );
     };
 
-    getGroupSyncables = async (groupID: string, syncableType: string) => {
-        return this.doFetch(
-            `${this.getBaseRoute()}/groups/${groupID}/${syncableType}s`,
-            {method: 'get'}
+    getGroupSyncables = (groupID: string, syncableType: string) => {
+        return this.doFetch<GroupSyncable[]>(
+            `${this.getGroupRoute(groupID)}/${syncableType}s`,
+            {method: 'get'},
         );
     };
 
-    getGroupMembers = async (groupID: string, page = 0, perPage = PER_PAGE_DEFAULT) => {
-        return this.doFetch(
-            `${this.getBaseRoute()}/groups/${groupID}/members${buildQueryString({page, per_page: perPage})}`,
-            {method: 'get'}
+    getGroup = (groupID: string) => {
+        return this.doFetch<Group>(
+            this.getGroupRoute(groupID),
+            {method: 'get'},
         );
     };
 
-    getGroup = async (groupID: string) => {
-        return this.doFetch(
-            `${this.getBaseRoute()}/groups/${groupID}`,
-            {method: 'get'}
+    getGroupStats = (groupID: string) => {
+        return this.doFetch<Group>(
+            `${this.getGroupRoute(groupID)}/stats`,
+            {method: 'get'},
         );
     };
 
-    getGroupsNotAssociatedToTeam = async (teamID: string, q = '', page = 0, perPage = PER_PAGE_DEFAULT) => {
+    getGroups = (filterAllowReference = false) => {
+        return this.doFetch<Group[]>(
+            `${this.getGroupsRoute()}${buildQueryString({filter_allow_reference: filterAllowReference})}`,
+            {method: 'get'},
+        );
+    };
+
+    getGroupsByUserId = (userID: string) => {
+        return this.doFetch<Group[]>(
+            `${this.getUsersRoute()}/${userID}/groups`,
+            {method: 'get'},
+        );
+    };
+
+    getGroupsNotAssociatedToTeam = (teamID: string, q = '', page = 0, perPage = PER_PAGE_DEFAULT) => {
         this.trackEvent('api', 'api_groups_get_not_associated_to_team', {team_id: teamID});
-        return this.doFetch(
-            `${this.getBaseRoute()}/groups${buildQueryString({not_associated_to_team: teamID, page, per_page: perPage, q, include_member_count: true})}`,
-            {method: 'get'}
+        return this.doFetch<Group[]>(
+            `${this.getGroupsRoute()}${buildQueryString({not_associated_to_team: teamID, page, per_page: perPage, q, include_member_count: true})}`,
+            {method: 'get'},
         );
     };
 
-    getGroupsNotAssociatedToChannel = async (channelID: string, q = '', page = 0, perPage = PER_PAGE_DEFAULT) => {
+    getGroupsNotAssociatedToChannel = (channelID: string, q = '', page = 0, perPage = PER_PAGE_DEFAULT, filterParentTeamPermitted = false) => {
         this.trackEvent('api', 'api_groups_get_not_associated_to_channel', {channel_id: channelID});
-        return this.doFetch(
-            `${this.getBaseRoute()}/groups${buildQueryString({not_associated_to_channel: channelID, page, per_page: perPage, q, include_member_count: true})}`,
-            {method: 'get'}
+        const query = {
+            not_associated_to_channel: channelID,
+            page,
+            per_page: perPage,
+            q,
+            include_member_count: true,
+            filter_parent_team_permitted: filterParentTeamPermitted,
+        };
+        return this.doFetch<Group[]>(
+            `${this.getGroupsRoute()}${buildQueryString(query)}`,
+            {method: 'get'},
         );
     };
 
-    getGroupsAssociatedToTeam = async (teamID: string, q = '', page = 0, perPage = PER_PAGE_DEFAULT) => {
+    getGroupsAssociatedToTeam = (teamID: string, q = '', page = 0, perPage = PER_PAGE_DEFAULT, filterAllowReference = false) => {
         this.trackEvent('api', 'api_groups_get_associated_to_team', {team_id: teamID});
-        return this.doFetch(
-            `${this.getBaseRoute()}/teams/${teamID}/groups${buildQueryString({page, per_page: perPage, q, include_member_count: true})}`,
-            {method: 'get'}
+
+        return this.doFetch<{
+            groups: Group[];
+            total_group_count: number;
+        }>(
+            `${this.getBaseRoute()}/teams/${teamID}/groups${buildQueryString({page, per_page: perPage, q, include_member_count: true, filter_allow_reference: filterAllowReference})}`,
+            {method: 'get'},
         );
     };
 
-    getGroupsAssociatedToChannel = async (channelID: string, q = '', page = 0, perPage = PER_PAGE_DEFAULT) => {
+    getGroupsAssociatedToChannel = (channelID: string, q = '', page = 0, perPage = PER_PAGE_DEFAULT, filterAllowReference = false) => {
         this.trackEvent('api', 'api_groups_get_associated_to_channel', {channel_id: channelID});
-        return this.doFetch(
-            `${this.getBaseRoute()}/channels/${channelID}/groups${buildQueryString({page, per_page: perPage, q, include_member_count: true})}`,
-            {method: 'get'}
+
+        return this.doFetch<{
+            groups: Group[];
+            total_group_count: number;
+        }>(
+            `${this.getBaseRoute()}/channels/${channelID}/groups${buildQueryString({page, per_page: perPage, q, include_member_count: true, filter_allow_reference: filterAllowReference})}`,
+            {method: 'get'},
         );
     };
 
-    getAllGroupsAssociatedToTeam = async (teamID: string) => {
-        return this.doFetch(
-            `${this.getBaseRoute()}/teams/${teamID}/groups?paginate=false`,
-            {method: 'get'}
+    getAllGroupsAssociatedToTeam = (teamID: string, filterAllowReference = false) => {
+        return this.doFetch<GroupsWithCount>(
+            `${this.getBaseRoute()}/teams/${teamID}/groups${buildQueryString({paginate: false, filter_allow_reference: filterAllowReference})}`,
+            {method: 'get'},
         );
     };
 
-    getAllGroupsAssociatedToChannel = async (channelID: string) => {
-        return this.doFetch(
-            `${this.getBaseRoute()}/channels/${channelID}/groups?paginate=false`,
-            {method: 'get'}
+    getAllGroupsAssociatedToChannelsInTeam = (teamID: string, filterAllowReference = false) => {
+        return this.doFetch<{
+            groups: RelationOneToOne<Channel, Group>;
+        }>(
+            `${this.getBaseRoute()}/teams/${teamID}/groups_by_channels${buildQueryString({paginate: false, filter_allow_reference: filterAllowReference})}`,
+            {method: 'get'},
+        );
+    };
+
+    getAllGroupsAssociatedToChannel = (channelID: string, filterAllowReference = false) => {
+        return this.doFetch<GroupsWithCount>(
+            `${this.getBaseRoute()}/channels/${channelID}/groups${buildQueryString({paginate: false, filter_allow_reference: filterAllowReference})}`,
+            {method: 'get'},
+        );
+    };
+
+    patchGroupSyncable = (groupID: string, syncableID: string, syncableType: string, patch: SyncablePatch) => {
+        return this.doFetch<GroupSyncable>(
+            `${this.getGroupRoute(groupID)}/${syncableType}s/${syncableID}/patch`,
+            {method: 'put', body: JSON.stringify(patch)},
+        );
+    };
+
+    patchGroup = (groupID: string, patch: GroupPatch) => {
+        return this.doFetch<Group>(
+            `${this.getGroupRoute(groupID)}/patch`,
+            {method: 'put', body: JSON.stringify(patch)},
         );
     };
 
     // Redirect Location
-
-    getRedirectLocation = async (urlParam: string) => {
+    getRedirectLocation = (urlParam: string) => {
         if (!urlParam.length) {
             return Promise.resolve();
         }
         const url = `${this.getRedirectLocationRoute()}${buildQueryString({url: urlParam})}`;
-        return this.doFetch(url, {method: 'get'});
+        return this.doFetch<{
+            location: string;
+        }>(url, {method: 'get'});
     };
 
     // Bot Routes
 
-    createBot = async (bot: Bot) => {
-        return this.doFetch(
+    createBot = (bot: Bot) => {
+        return this.doFetch<Bot>(
             `${this.getBotsRoute()}`,
-            {method: 'post', body: JSON.stringify(bot)}
+            {method: 'post', body: JSON.stringify(bot)},
         );
     }
 
-    patchBot = async (botUserId: string, botPatch: BotPatch) => {
-        return this.doFetch(
+    patchBot = (botUserId: string, botPatch: BotPatch) => {
+        return this.doFetch<Bot>(
             `${this.getBotRoute(botUserId)}`,
-            {method: 'put', body: JSON.stringify(botPatch)}
+            {method: 'put', body: JSON.stringify(botPatch)},
         );
     }
 
-    getBot = async (botUserId: string) => {
-        return this.doFetch(
+    getBot = (botUserId: string) => {
+        return this.doFetch<Bot>(
             `${this.getBotRoute(botUserId)}`,
-            {method: 'get'}
+            {method: 'get'},
         );
     }
 
-    getBots = async (page = 0, perPage = PER_PAGE_DEFAULT) => {
-        return this.doFetch(
+    getBots = (page = 0, perPage = PER_PAGE_DEFAULT) => {
+        return this.doFetch<Bot[]>(
             `${this.getBotsRoute()}${buildQueryString({page, per_page: perPage})}`,
-            {method: 'get'}
+            {method: 'get'},
         );
     }
 
-    getBotsIncludeDeleted = async (page = 0, perPage = PER_PAGE_DEFAULT) => {
-        return this.doFetch(
+    getBotsIncludeDeleted = (page = 0, perPage = PER_PAGE_DEFAULT) => {
+        return this.doFetch<Bot>(
             `${this.getBotsRoute()}${buildQueryString({include_deleted: true, page, per_page: perPage})}`,
-            {method: 'get'}
+            {method: 'get'},
         );
     }
 
-    getBotsOrphaned = async (page = 0, perPage = PER_PAGE_DEFAULT) => {
-        return this.doFetch(
+    getBotsOrphaned = (page = 0, perPage = PER_PAGE_DEFAULT) => {
+        return this.doFetch<Bot>(
             `${this.getBotsRoute()}${buildQueryString({only_orphaned: true, page, per_page: perPage})}`,
-            {method: 'get'}
+            {method: 'get'},
         );
     }
 
-    disableBot = async (botUserId: string) => {
-        return this.doFetch(
+    disableBot = (botUserId: string) => {
+        return this.doFetch<Bot>(
             `${this.getBotRoute(botUserId)}/disable`,
-            {method: 'post'}
+            {method: 'post'},
         );
     }
 
-    enableBot = async (botUserId: string) => {
-        return this.doFetch(
+    enableBot = (botUserId: string) => {
+        return this.doFetch<Bot>(
             `${this.getBotRoute(botUserId)}/enable`,
-            {method: 'post'}
+            {method: 'post'},
         );
     }
 
-    assignBot = async (botUserId: string, newOwnerId: string) => {
-        return this.doFetch(
+    assignBot = (botUserId: string, newOwnerId: string) => {
+        return this.doFetch<Bot>(
             `${this.getBotRoute(botUserId)}/assign/${newOwnerId}`,
-            {method: 'post'}
+            {method: 'post'},
         );
     }
 
-    teamMembersMinusGroupMembers = async (teamID: string, groupIDs: string[], page: number, perPage: number) => {
+    teamMembersMinusGroupMembers = (teamID: string, groupIDs: string[], page: number, perPage: number) => {
         const query = `group_ids=${groupIDs.join(',')}&page=${page}&per_page=${perPage}`;
-        return this.doFetch(
+        return this.doFetch<UsersWithGroupsAndCount>(
             `${this.getTeamRoute(teamID)}/members_minus_group_members?${query}`,
             {method: 'get'},
         );
     }
 
-    channelMembersMinusGroupMembers = async (channelID: string, groupIDs: string[], page: number, perPage: number) => {
+    channelMembersMinusGroupMembers = (channelID: string, groupIDs: string[], page: number, perPage: number) => {
         const query = `group_ids=${groupIDs.join(',')}&page=${page}&per_page=${perPage}`;
-        return this.doFetch(
+        return this.doFetch<UsersWithGroupsAndCount>(
             `${this.getChannelRoute(channelID)}/members_minus_group_members?${query}`,
             {method: 'get'},
         );
     }
 
+    getSamlMetadataFromIdp = (samlMetadataURL: string) => {
+        return this.doFetch<SamlMetadataResponse>(
+            `${this.getBaseRoute()}/saml/metadatafromidp`, {method: 'post', body: JSON.stringify({saml_metadata_url: samlMetadataURL})},
+        );
+    };
+
+    setSamlIdpCertificateFromMetadata = (certData: string) => {
+        const request: any = {
+            method: 'post',
+            body: certData,
+        };
+
+        request.headers = {
+            'Content-Type': 'application/x-pem-file',
+        };
+
+        return this.doFetch<StatusOK>(
+            `${this.getBaseRoute()}/saml/certificate/idp`,
+            request,
+        );
+    };
+
     // Theme Routes
 
     getAllThemes = () => {
-        return this.doFetch(
+        return this.doFetch<Record<string, Theme>>(
             this.getThemesRoute(),
-            {method: 'get'}
+            {method: 'get'},
         );
     }
 
     getTheme = (id: string) => {
-        return this.doFetch(
+        return this.doFetch<Theme>(
             `${this.getThemesRoute()}/${id}`,
-            {method: 'get'}
+            {method: 'get'},
         );
     }
 
     saveTheme = (theme: Theme) => {
-        return this.doFetch(
+        return this.doFetch<Theme>(
             this.getThemesRoute(),
-            {method: 'put', body: JSON.stringify(theme)}
+            {method: 'put', body: JSON.stringify(theme)},
         );
     }
 
     deleteTheme = (id: string) => {
-        return this.doFetch(
+        return this.doFetch<StatusOK>(
             `${this.getThemesRoute()}/${id}`,
-            {method: 'delete'}
+            {method: 'delete'},
         );
     }
 
     // Client Helpers
 
-    doFetch = async (url: string, options: Options) => {
-        const {data} = await this.doFetchWithResponse(url, options);
+    doFetch = async <T>(url: string, options: Options): Promise<T> => {
+        const {data} = await this.doFetchWithResponse<T>(url, options);
 
         return data;
     };
 
-    doFetchWithResponse = async (url: string, options: Options) => {
+    doFetchWithResponse = async <T>(url: string, options: Options): Promise<ClientResponse<T>> => {
         const response = await fetch(url, this.getOptions(options));
         const headers = parseAndMergeNestedHeaders(response.headers);
 
@@ -3020,19 +3356,7 @@ export default class Client4 {
     };
 
     trackEvent(category: string, event: string, props?: any) {
-        // Temporary change to allow only certain events to reduce data rate - see MM-13062
-        if (![
-            'api_posts_create',
-            'api_interactive_messages_button_clicked',
-            'api_interactive_messages_menu_selected',
-            'api_interactive_messages_dialog_submitted',
-            'ui_marketplace_download',
-            'ui_marketplace_download_update',
-            'ui_marketplace_configure',
-            'ui_marketplace_opened',
-            'ui_marketplace_closed',
-            'ui_marketplace_search',
-        ].includes(event)) {
+        if (!this.isRudderKeySet) {
             return;
         }
 
@@ -3055,19 +3379,8 @@ export default class Client4 {
             },
             anonymousId: '00000000000000000000000000',
         };
-        const globalAny: any = global;
-        if (globalAny && globalAny.window && globalAny.window.analytics && globalAny.window.analytics.initialized) {
-            globalAny.window.analytics.track('event', properties, options);
-        } else if (globalAny && globalAny.analytics) {
-            if (globalAny.analytics_context) {
-                options.context = globalAny.analytics_context;
-            }
 
-            globalAny.analytics.track(Object.assign({
-                event: 'event',
-                userId: this.diagnosticId,
-            }, {properties}, options));
-        }
+        rudderAnalytics.track('event', properties, options);
     }
 }
 
@@ -3081,7 +3394,7 @@ function parseAndMergeNestedHeaders(originalHeaders: any) {
             const nestedHeaderStrings = val.split('\n');
             realVal = nestedHeaderStrings.shift() as string;
             const moreNestedHeaders = new Map(
-                nestedHeaderStrings.map((h: any) => h.split(/:\s/))
+                nestedHeaderStrings.map((h: any) => h.split(/:\s/)),
             );
             nestedHeaders = new Map([...nestedHeaders, ...moreNestedHeaders]);
         }
@@ -3090,13 +3403,18 @@ function parseAndMergeNestedHeaders(originalHeaders: any) {
     return new Map([...headers, ...nestedHeaders]);
 }
 
-export class ClientError extends Error {
-    url: string;
-    intl: { defaultMessage: string; id: string } | { defaultMessage: string; id: string } | { id: string; defaultMessage: string; values: any } | { id: string; defaultMessage: string };
-    server_error_id: any;
-    status_code: any;
-    constructor(baseUrl: string, data: any) {
-        super(data.message + ': ' + cleanUrlForLogging(baseUrl, data.url));
+export class ClientError extends Error implements ServerError {
+    url?: string;
+    intl?: {
+        id: string;
+        defaultMessage: string;
+        values?: any;
+    };
+    server_error_id?: string;
+    status_code?: number;
+
+    constructor(baseUrl: string, data: ServerError) {
+        super(data.message + ': ' + cleanUrlForLogging(baseUrl, data.url || ''));
 
         this.message = data.message;
         this.url = data.url;

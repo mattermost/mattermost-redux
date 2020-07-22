@@ -10,11 +10,10 @@ import {forceLogoutIfNecessary} from './helpers';
 import {logError} from './errors';
 import {getProfilesAndStatusesForPosts, receivedPosts} from './posts';
 import {ActionResult, batchActions, DispatchFunc, GetStateFunc, ActionFunc} from 'types/actions';
-import {RelationOneToOne} from 'types/utilities';
 import {Post} from 'types/posts';
 import {SearchParameter} from 'types/search';
 const WEBAPP_SEARCH_PER_PAGE = 20;
-export function getMissingChannelsFromPosts(posts: RelationOneToOne<Post, Post>): ActionFunc {
+export function getMissingChannelsFromPosts(posts: Map<string, Post>): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         const {
             channels,
@@ -55,10 +54,7 @@ export function searchPostsWithParams(teamId: string, params: SearchParameter): 
             await Promise.all(arr);
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch, getState);
-            dispatch(batchActions([
-                {type: SearchTypes.SEARCH_POSTS_FAILURE, error},
-                logError(error),
-            ]));
+            dispatch(logError(error));
             return {error};
         }
 
@@ -205,8 +201,6 @@ export function getRecentMentions(): ActionFunc {
         const state = getState();
         const teamId = getCurrentTeamId(state);
 
-        dispatch({type: SearchTypes.SEARCH_RECENT_MENTIONS_REQUEST});
-
         let posts;
         try {
             const termKeys = getCurrentUserMentionKeys(state).filter(({key}) => {
@@ -224,10 +218,7 @@ export function getRecentMentions(): ActionFunc {
             await Promise.all(arr);
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch, getState);
-            dispatch(batchActions([
-                {type: SearchTypes.SEARCH_RECENT_MENTIONS_FAILURE, error},
-                logError(error),
-            ]));
+            dispatch(logError(error));
             return {error};
         }
 
@@ -237,9 +228,6 @@ export function getRecentMentions(): ActionFunc {
                 data: posts,
             },
             receivedPosts(posts),
-            {
-                type: SearchTypes.SEARCH_RECENT_MENTIONS_SUCCESS,
-            },
         ], 'SEARCH_RECENT_MENTIONS_BATCH'));
 
         return {data: posts};

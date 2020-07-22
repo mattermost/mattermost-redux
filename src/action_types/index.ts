@@ -13,7 +13,6 @@ import IntegrationTypes from './integrations';
 import EmojiTypes from './emojis';
 import GifTypes from './gifs';
 import AdminTypes from './admin';
-import AlertTypes from './alerts';
 import JobTypes from './jobs';
 import SearchTypes from './search';
 import RoleTypes from './roles';
@@ -21,6 +20,7 @@ import SchemeTypes from './schemes';
 import GroupTypes from './groups';
 import BotTypes from './bots';
 import PluginTypes from './plugins';
+import ChannelCategoryTypes from './channel_categories';
 import ThemeTypes from './themes';
 
 export {
@@ -36,7 +36,6 @@ export {
     EmojiTypes,
     GifTypes,
     AdminTypes,
-    AlertTypes,
     JobTypes,
     SearchTypes,
     RoleTypes,
@@ -44,5 +43,6 @@ export {
     GroupTypes,
     BotTypes,
     PluginTypes,
+    ChannelCategoryTypes,
     ThemeTypes,
 };

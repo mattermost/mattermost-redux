@@ -1,4 +1,4 @@
-.PHONY: check-style clean pre-run test install
+.PHONY: check-style clean pre-run test install update-dependencies
 
 node_modules: package.json
 	@if ! [ $(shell which npm) ]; then \
@@ -28,8 +28,16 @@ pre-run:
 test: check-style
 	npm test
 
+check-types: | pre-run node_modules
+	npm run tsc
 
 install: node_modules
 
 bundle: | pre-run node_modules
 	npm run build
+
+update-dependencies: # Updates the dependencies
+	npm update --depth 9999
+	npm audit fix
+	@echo Automatic dependency update complete.
+	@echo You should manually inspect changes to package.json and pin exact versions of packages where appropriate.

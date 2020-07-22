@@ -1,7 +1,7 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
 import {Preferences} from '../constants';
-export function getEmailInterval(enableEmailNotification: boolean, enableEmailBatching: number, emailIntervalPreference: number): number {
+export function getEmailInterval(enableEmailNotification: boolean, enableEmailBatching: boolean, emailIntervalPreference: number): number {
     const {
         INTERVAL_NEVER,
         INTERVAL_IMMEDIATE,
@@ -19,6 +19,9 @@ export function getEmailInterval(enableEmailNotification: boolean, enableEmailBa
         return INTERVAL_FIFTEEN_MINUTES;
     } else if (!enableEmailBatching && validValuesWithoutEmailBatching.indexOf(emailIntervalPreference) === -1) {
         // When email batching is not enabled, the default interval is immediately
+        return INTERVAL_IMMEDIATE;
+    } else if (enableEmailNotification && emailIntervalPreference === INTERVAL_NEVER) {
+        // When email notification is enabled, the default interval is immediately
         return INTERVAL_IMMEDIATE;
     }
 

@@ -14,6 +14,7 @@ import {getCurrentUserId, getUsersByUsername} from 'selectors/entities/users';
 import {getUserIdFromChannelName} from 'utils/channel_utils';
 import {parseNeededCustomEmojisFromText} from 'utils/emoji_utils';
 import {isFromWebhook, isSystemMessage, shouldIgnorePost} from 'utils/post_utils';
+import {isCombinedUserActivityPost} from 'utils/post_list';
 
 import {getMyChannelMember, markChannelAsUnread, markChannelAsRead, markChannelAsViewed} from './channels';
 import {systemEmojis, getCustomEmojiByName, getCustomEmojisByName} from './emojis';
@@ -27,11 +28,11 @@ import {
     savePreferences,
 } from './preferences';
 import {getProfilesByIds, getProfilesByUsernames, getStatusesByIds} from './users';
-import {Action, ActionFunc, ActionResult, batchActions, DispatchFunc, GetStateFunc, GenericAction} from 'types/actions';
+import {Action, ActionResult, batchActions, DispatchFunc, GetStateFunc, GenericAction} from 'types/actions';
 import {ChannelUnread} from 'types/channels';
 import {GlobalState} from 'types/store';
-import {Post} from 'types/posts';
-import {Error} from 'types/errors';
+import {Post, PostList} from 'types/posts';
+import {ServerError} from 'types/errors';
 import {Reaction} from 'types/reactions';
 import {UserProfile} from 'types/users';
 import {Dictionary} from 'types/utilities';
@@ -57,7 +58,7 @@ export function receivedNewPost(post: Post) {
 
 // receivedPosts should be dispatched when receiving multiple posts from the server that may or may not be ordered.
 // This will typically be used alongside other actions like receivedPostsAfter which require the posts to be ordered.
-export function receivedPosts(posts: CombinedPostList) {
+export function receivedPosts(posts: PostList) {
     return {
         type: PostTypes.RECEIVED_POSTS,
         data: posts,
@@ -65,7 +66,7 @@ export function receivedPosts(posts: CombinedPostList) {
 }
 
 // receivedPostsAfter should be dispatched when receiving an ordered list of posts that come before a given post.
-export function receivedPostsAfter(posts: Array<Post>, channelId: string, afterPostId: string, recent = false) {
+export function receivedPostsAfter(posts: PostList, channelId: string, afterPostId: string, recent = false) {
     return {
         type: PostTypes.RECEIVED_POSTS_AFTER,
         channelId,
@@ -76,7 +77,7 @@ export function receivedPostsAfter(posts: Array<Post>, channelId: string, afterP
 }
 
 // receivedPostsBefore should be dispatched when receiving an ordered list of posts that come after a given post.
-export function receivedPostsBefore(posts: Array<Post>, channelId: string, beforePostId: string, oldest = false) {
+export function receivedPostsBefore(posts: PostList, channelId: string, beforePostId: string, oldest = false) {
     return {
         type: PostTypes.RECEIVED_POSTS_BEFORE,
         channelId,
@@ -89,7 +90,7 @@ export function receivedPostsBefore(posts: Array<Post>, channelId: string, befor
 // receivedPostsSince should be dispatched when receiving a list of posts that have been updated since a certain time.
 // Due to how the API endpoint works, some of these posts will be ordered, but others will not, so this needs special
 // handling from the reducers.
-export function receivedPostsSince(posts: Array<Post>, channelId: string) {
+export function receivedPostsSince(posts: PostList, channelId: string) {
     return {
         type: PostTypes.RECEIVED_POSTS_SINCE,
         channelId,
@@ -99,7 +100,7 @@ export function receivedPostsSince(posts: Array<Post>, channelId: string) {
 
 // receivedPostsInChannel should be dispatched when receiving a list of ordered posts within a channel when the
 // the adjacent posts are not known.
-export function receivedPostsInChannel(posts: CombinedPostList, channelId: string, recent = false, oldest = false) {
+export function receivedPostsInChannel(posts: PostList, channelId: string, recent = false, oldest = false) {
     return {
         type: PostTypes.RECEIVED_POSTS_IN_CHANNEL,
         channelId,
@@ -110,7 +111,7 @@ export function receivedPostsInChannel(posts: CombinedPostList, channelId: strin
 }
 
 // receivedPostsInThread should be dispatched when receiving a list of unordered posts in a thread.
-export function receivedPostsInThread(posts: Array<Post>, rootId: string) {
+export function receivedPostsInThread(posts: PostList, rootId: string) {
     return {
         type: PostTypes.RECEIVED_POSTS_IN_THREAD,
         data: posts,
@@ -148,7 +149,7 @@ export function getPost(postId: string) {
             dispatch(batchActions([
                 {type: PostTypes.GET_POSTS_FAILURE, error},
                 logError(error),
-            ]), getState);
+            ]));
             return {error};
         }
 
@@ -180,7 +181,12 @@ export function createPost(post: Post, files: any[] = []) {
             pending_post_id: pendingPostId,
             create_at: timestamp,
             update_at: timestamp,
+            reply_count: 0,
         };
+
+        if (post.root_id) {
+            newPost.reply_count = Selectors.getPostRepliesCount(state, post.root_id) + 1;
+        }
 
         // We are retrying a pending post that had files
         if (newPost.file_ids && !files.length) {
@@ -245,7 +251,7 @@ export function createPost(post: Post, files: any[] = []) {
                     },
                     maxRetry: 0,
                     offlineRollback: true,
-                    rollback: (result: any, error: Error) => {
+                    rollback: (result: any, error: ServerError) => {
                         const data = {
                             ...newPost,
                             id: pendingPostId,
@@ -277,7 +283,6 @@ export function createPostImmediately(post: Post, files: any[] = []) {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         const state = getState();
         const currentUserId = state.entities.users.currentUserId;
-
         const timestamp = Date.now();
         const pendingPostId = `${currentUserId}:${timestamp}`;
 
@@ -286,7 +291,12 @@ export function createPostImmediately(post: Post, files: any[] = []) {
             pending_post_id: pendingPostId,
             create_at: timestamp,
             update_at: timestamp,
+            reply_count: 0,
         };
+
+        if (post.root_id) {
+            newPost.reply_count = Selectors.getPostRepliesCount(state, post.root_id) + 1;
+        }
 
         if (files.length) {
             const fileIds = files.map((file) => file.id);
@@ -311,13 +321,14 @@ export function createPostImmediately(post: Post, files: any[] = []) {
         try {
             const created = await Client4.createPost({...newPost, create_at: 0});
             newPost.id = created.id;
+            newPost.reply_count = created.reply_count;
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch, getState);
             dispatch(batchActions([
-                {type: PostTypes.CREATE_POST_FAILURE, error},
+                {type: PostTypes.CREATE_POST_FAILURE, data: newPost, error},
                 removePost({id: pendingPostId, ...newPost}) as any,
                 logError(error),
-            ]), getState);
+            ]));
             return {error};
         }
 
@@ -350,7 +361,7 @@ export function createPostImmediately(post: Post, files: any[] = []) {
             });
         }
 
-        dispatch(batchActions(actions), getState);
+        dispatch(batchActions(actions));
 
         return {data: newPost};
     };
@@ -419,16 +430,34 @@ export function getUnreadPostData(unreadChan: ChannelUnread, state: GlobalState)
 
 export function setUnreadPost(userId: string, postId: string) {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
+        let state = getState();
+        const post = Selectors.getPost(state, postId);
         let unreadChan;
+
         try {
+            if (isCombinedUserActivityPost(postId)) {
+                return {};
+            }
             unreadChan = await Client4.markPostAsUnread(userId, postId);
+            dispatch({
+                type: ChannelTypes.ADD_MANUALLY_UNREAD,
+                data: {
+                    channelId: post.channel_id,
+                },
+            });
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch, getState);
             dispatch(logError(error));
+            dispatch({
+                type: ChannelTypes.REMOVE_MANUALLY_UNREAD,
+                data: {
+                    channelId: post.channel_id,
+                },
+            });
             return {error};
         }
 
-        const state = getState();
+        state = getState();
         const data = getUnreadPostData(unreadChan, state);
         dispatch({
             type: ChannelTypes.POST_UNREAD_SUCCESS,
@@ -440,7 +469,7 @@ export function setUnreadPost(userId: string, postId: string) {
 
 export function pinPost(postId: string) {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
-        dispatch({type: PostTypes.EDIT_POST_REQUEST}, getState);
+        dispatch({type: PostTypes.EDIT_POST_REQUEST});
         let posts;
 
         try {
@@ -450,7 +479,7 @@ export function pinPost(postId: string) {
             dispatch(batchActions([
                 {type: PostTypes.EDIT_POST_FAILURE, error},
                 logError(error),
-            ]), getState);
+            ]));
             return {error};
         }
 
@@ -462,14 +491,20 @@ export function pinPost(postId: string) {
 
         const post = Selectors.getPost(getState(), postId);
         if (post) {
-            actions.push(receivedPost({
-                ...post,
-                is_pinned: true,
-                update_at: Date.now(),
-            }));
+            actions.push(
+                receivedPost({
+                    ...post,
+                    is_pinned: true,
+                    update_at: Date.now(),
+                }),
+                {
+                    type: ChannelTypes.INCREMENT_PINNED_POST_COUNT,
+                    id: post.channel_id,
+                },
+            );
         }
 
-        dispatch(batchActions(actions), getState);
+        dispatch(batchActions(actions));
 
         return {data: posts};
     };
@@ -477,7 +512,7 @@ export function pinPost(postId: string) {
 
 export function unpinPost(postId: string) {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
-        dispatch({type: PostTypes.EDIT_POST_REQUEST}, getState);
+        dispatch({type: PostTypes.EDIT_POST_REQUEST});
         let posts;
 
         try {
@@ -487,7 +522,7 @@ export function unpinPost(postId: string) {
             dispatch(batchActions([
                 {type: PostTypes.EDIT_POST_FAILURE, error},
                 logError(error),
-            ]), getState);
+            ]));
             return {error};
         }
 
@@ -499,14 +534,20 @@ export function unpinPost(postId: string) {
 
         const post = Selectors.getPost(getState(), postId);
         if (post) {
-            actions.push(receivedPost({
-                ...post,
-                is_pinned: false,
-                update_at: Date.now(),
-            }));
+            actions.push(
+                receivedPost({
+                    ...post,
+                    is_pinned: false,
+                    update_at: Date.now(),
+                }),
+                {
+                    type: ChannelTypes.DECREMENT_PINNED_POST_COUNT,
+                    id: post.channel_id,
+                },
+            );
         }
 
-        dispatch(batchActions(actions), getState);
+        dispatch(batchActions(actions));
 
         return {data: posts};
     };
@@ -646,7 +687,7 @@ export function flagPost(postId: string) {
 
 export function getPostThread(rootId: string, fetchThreads = true) {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
-        dispatch({type: PostTypes.GET_POST_THREAD_REQUEST}, getState);
+        dispatch({type: PostTypes.GET_POST_THREAD_REQUEST});
 
         let posts;
         try {
@@ -657,7 +698,7 @@ export function getPostThread(rootId: string, fetchThreads = true) {
             dispatch(batchActions([
                 {type: PostTypes.GET_POST_THREAD_FAILURE, error},
                 logError(error),
-            ]), getState);
+            ]));
             return {error};
         }
 
@@ -787,12 +828,6 @@ export function getPostsAfter(channelId: string, postId: string, page = 0, perPa
         return {data: posts};
     };
 }
-export type CombinedPostList = {
-    posts: Array<Post>;
-    order: Array<string>;
-    next_post_id: string;
-    prev_post_id: string;
-}
 
 export function getPostsAround(channelId: string, postId: string, perPage = Posts.POST_CHUNK_SIZE / 2, fetchThreads = true) {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
@@ -813,7 +848,7 @@ export function getPostsAround(channelId: string, postId: string, perPage = Post
         }
 
         // Dispatch a combined post list so that the order is correct for postsInChannel
-        const posts: CombinedPostList = {
+        const posts: PostList = {
             posts: {
                 ...after.posts,
                 ...thread.posts,
@@ -1051,16 +1086,24 @@ export function removePost(post: ExtendedPost) {
             }
         } else {
             dispatch(postRemoved(post));
+            if (post.is_pinned) {
+                dispatch(
+                    {
+                        type: ChannelTypes.DECREMENT_PINNED_POST_COUNT,
+                        id: post.channel_id,
+                    },
+                );
+            }
         }
     };
 }
 
 export function selectPost(postId: string) {
-    return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
+    return async (dispatch: DispatchFunc) => {
         dispatch({
             type: PostTypes.RECEIVED_POST_SELECTED,
             data: postId,
-        }, getState);
+        });
 
         return {data: true};
     };
@@ -1138,44 +1181,44 @@ export function doPostActionWithCookie(postId: string, actionId: string, actionC
 }
 
 export function addMessageIntoHistory(message: string) {
-    return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
+    return async (dispatch: DispatchFunc) => {
         dispatch({
             type: PostTypes.ADD_MESSAGE_INTO_HISTORY,
             data: message,
-        }, getState);
+        });
 
         return {data: true};
     };
 }
 
 export function resetHistoryIndex(index: number) {
-    return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
+    return async (dispatch: DispatchFunc) => {
         dispatch({
             type: PostTypes.RESET_HISTORY_INDEX,
             data: index,
-        }, getState);
+        });
 
         return {data: true};
     };
 }
 
 export function moveHistoryIndexBack(index: number) {
-    return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
+    return async (dispatch: DispatchFunc) => {
         dispatch({
             type: PostTypes.MOVE_HISTORY_INDEX_BACK,
             data: index,
-        }, getState);
+        });
 
         return {data: true};
     };
 }
 
 export function moveHistoryIndexForward(index: number) {
-    return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
+    return async (dispatch: DispatchFunc) => {
         dispatch({
             type: PostTypes.MOVE_HISTORY_INDEX_FORWARD,
             data: index,
-        }, getState);
+        });
 
         return {data: true};
     };

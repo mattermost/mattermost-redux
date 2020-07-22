@@ -7,7 +7,7 @@ import nock from 'nock';
 import * as Actions from 'actions/preferences';
 import {login} from 'actions/users';
 import {Client4} from 'client';
-import {Preferences, RequestStatus} from '../constants';
+import {Preferences} from '../constants';
 
 import TestHelper from 'test/test_helper';
 import configureStore from 'test/test_store';
@@ -56,12 +56,7 @@ describe('Actions.Preferences', () => {
         await Actions.getMyPreferences()(store.dispatch, store.getState);
 
         const state = store.getState();
-        const request = state.requests.preferences.getMyPreferences;
         const {myPreferences} = state.entities.preferences;
-
-        if (request.status === RequestStatus.FAILURE) {
-            throw new Error(JSON.stringify(request.error));
-        }
 
         assert.ok(myPreferences['test--test1'], 'first preference doesn\'t exist');
         assert.deepEqual(existingPreferences[0], myPreferences['test--test1']);
@@ -111,12 +106,7 @@ describe('Actions.Preferences', () => {
         await Actions.savePreferences(user.id, preferences)(store.dispatch, store.getState);
 
         const state = store.getState();
-        const request = state.requests.preferences.savePreferences;
         const {myPreferences} = state.entities.preferences;
-
-        if (request.status === RequestStatus.FAILURE) {
-            throw new Error(JSON.stringify(request.error));
-        }
 
         assert.ok(myPreferences['test--test1'], 'first preference doesn\'t exist');
         assert.deepEqual(existingPreferences[0], myPreferences['test--test1']);
@@ -168,12 +158,7 @@ describe('Actions.Preferences', () => {
         ])(store.dispatch, store.getState);
 
         const state = store.getState();
-        const request = state.requests.preferences.deletePreferences;
         const {myPreferences} = state.entities.preferences;
-
-        if (request.status === RequestStatus.FAILURE) {
-            throw new Error(JSON.stringify(request.error));
-        }
 
         assert.ok(!myPreferences['test--test1'], 'deleted preference still exists');
         assert.ok(myPreferences['test--test2'], 'second preference doesn\'t exist');
@@ -184,8 +169,8 @@ describe('Actions.Preferences', () => {
     it('makeDirectChannelVisibleIfNecessary', async () => {
         const user = TestHelper.basicUser;
 
-        nock(Client4.getUsersRoute()).
-            post('').
+        nock(Client4.getBaseRoute()).
+            post('/users').
             reply(201, TestHelper.fakeUserWithId());
         const user2 = await TestHelper.createClient4().createUser(TestHelper.fakeUser());
 
@@ -267,12 +252,7 @@ describe('Actions.Preferences', () => {
         await Actions.saveTheme(team.id, newTheme)(store.dispatch, store.getState);
 
         const state = store.getState();
-        const request = state.requests.preferences.savePreferences;
         const {myPreferences} = state.entities.preferences;
-
-        if (request.status === RequestStatus.FAILURE) {
-            throw new Error(JSON.stringify(request.error));
-        }
 
         assert.ok(myPreferences[`theme--${team.id}`], 'theme preference doesn\'t exist');
         assert.deepEqual(myPreferences[`theme--${team.id}`].value, JSON.stringify(newTheme));
@@ -327,12 +307,7 @@ describe('Actions.Preferences', () => {
         await Actions.deleteTeamSpecificThemes()(store.dispatch, store.getState);
 
         const state = store.getState();
-        const request = state.requests.preferences.savePreferences;
         const {myPreferences} = state.entities.preferences;
-
-        if (request.status === RequestStatus.FAILURE) {
-            throw new Error(JSON.stringify(request.error));
-        }
 
         assert.equal(Object.entries(myPreferences).length, 1);
         assert.ok(myPreferences['theme--'], 'theme preference doesn\'t exist');

@@ -1,26 +1,24 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
 import {combineReducers} from 'redux';
-import {ChannelTypes, UserTypes, SchemeTypes, GroupTypes} from 'action_types';
+import {ChannelTypes, UserTypes, SchemeTypes, GroupTypes, PostTypes} from 'action_types';
 import {General} from '../../constants';
 import {GenericAction} from 'types/actions';
-import {Channel, ChannelMembership, ChannelStats} from 'types/channels';
+import {Channel, ChannelMembership, ChannelStats, ChannelMemberCountByGroup, ChannelMemberCountsByGroup} from 'types/channels';
 import {RelationOneToMany, RelationOneToOne, IDMappedObjects, UserIDMappedObjects} from 'types/utilities';
 import {Team} from 'types/teams';
 
+function removeMemberFromChannels(state: RelationOneToOne<Channel, UserIDMappedObjects<ChannelMembership>>, action: GenericAction) {
+    const nextState = {...state};
+    Object.keys(state).forEach((channel) => {
+        nextState[channel] = {...nextState[channel]};
+        delete nextState[channel][action.data.user_id];
+    });
+    return nextState;
+}
+
 function channelListToSet(state: any, action: GenericAction) {
     const nextState = {...state};
-    const teamChannelIds = nextState[action.teamId];
-
-    // Remove existing channels that are no longer
-    if (action.sync && teamChannelIds && teamChannelIds.size) {
-        teamChannelIds.forEach((id: string) => {
-            if (!action.data.find((c: any) => c.id === id)) {
-                teamChannelIds.delete(id);
-            }
-        });
-        nextState[action.teamId] = teamChannelIds;
-    }
 
     action.data.forEach((channel: Channel) => {
         const nextSet = new Set(nextState[channel.team_id]);
@@ -66,23 +64,10 @@ function channels(state: IDMappedObjects<Channel> = {}, action: GenericAction) {
     case ChannelTypes.RECEIVED_ALL_CHANNELS:
     case SchemeTypes.RECEIVED_SCHEME_CHANNELS: {
         const nextState = {...state};
-        const currentChannels = Object.values(nextState);
 
-        // Remove existing channels that are no longer
-        if (action.sync) {
-            currentChannels.forEach((channel) => {
-                if (channel.team_id === action.teamId) {
-                    const id: string = channel.id;
-                    if (!action.data.find((c: any) => c.id === id)) {
-                        Reflect.deleteProperty(nextState, id);
-                    }
-                }
-            });
-        }
-
-        for (const channel of action.data) {
-            if (state[channel.id] && channel.type === General.DM_CHANNEL) {
-                channel.display_name = channel.display_name || state[channel.id].display_name;
+        for (let channel of action.data) {
+            if (state[channel.id] && channel.type === General.DM_CHANNEL && !channel.display_name) {
+                channel = {...channel, display_name: state[channel.id].display_name};
             }
             nextState[channel.id] = channel;
         }
@@ -100,6 +85,21 @@ function channels(state: IDMappedObjects<Channel> = {}, action: GenericAction) {
             [id]: {
                 ...state[id],
                 delete_at: deleteAt,
+            },
+        };
+    }
+    case ChannelTypes.RECEIVED_CHANNEL_UNARCHIVED: {
+        const {id} = action.data;
+
+        if (!state[id]) {
+            return state;
+        }
+
+        return {
+            ...state,
+            [id]: {
+                ...state[id],
+                delete_at: 0,
             },
         };
     }
@@ -157,6 +157,24 @@ function channels(state: IDMappedObjects<Channel> = {}, action: GenericAction) {
             },
         };
     }
+
+    case PostTypes.RECEIVED_NEW_POST: {
+        const {channel_id, create_at} = action.data; //eslint-disable-line @typescript-eslint/camelcase
+        const channel = state[channel_id];
+
+        if (!channel) {
+            return state;
+        }
+
+        return {
+            ...state,
+            [channel_id]: {
+                ...channel,
+                last_post_at: Math.max(create_at, channel.last_post_at),
+            },
+        };
+    }
+
     case ChannelTypes.UPDATED_CHANNEL_SCHEME: {
         const {channelId, schemeId} = action.data;
         const channel = state[channelId];
@@ -166,6 +184,21 @@ function channels(state: IDMappedObjects<Channel> = {}, action: GenericAction) {
         }
 
         return {...state, [channelId]: {...channel, scheme_id: schemeId}};
+    }
+
+    case ChannelTypes.RECEIVED_MY_CHANNELS_WITH_MEMBERS: { // Used by the mobile app
+        const nextState = {...state};
+        const myChannels: Array<Channel> = action.data.channels;
+        let hasNewValues = false;
+
+        if (myChannels && myChannels.length) {
+            hasNewValues = true;
+            myChannels.forEach((c: Channel) => {
+                nextState[c.id] = c;
+            });
+        }
+
+        return hasNewValues ? nextState : state;
     }
 
     case UserTypes.LOGOUT_SUCCESS:
@@ -193,6 +226,15 @@ function channelsInTeam(state: RelationOneToMany<Team, Channel> = {}, action: Ge
             return removeChannelFromSet(state, action);
         }
         return state;
+    }
+    case ChannelTypes.RECEIVED_MY_CHANNELS_WITH_MEMBERS: { // Used by the mobile app
+        const values: GenericAction = {
+            type: action.type,
+            teamId: action.data.teamId,
+            sync: action.data.sync,
+            data: action.data.channels,
+        };
+        return channelListToSet(state, values);
     }
     case UserTypes.LOGOUT_SUCCESS:
         return {};
@@ -222,6 +264,7 @@ function myMembers(state: RelationOneToOne<Channel, ChannelMembership> = {}, act
         for (const cm of action.data) {
             nextState[cm.channel_id] = cm;
         }
+
         return nextState;
     }
     case ChannelTypes.RECEIVED_CHANNEL_PROPS: {
@@ -342,6 +385,36 @@ function myMembers(state: RelationOneToOne<Channel, ChannelMembership> = {}, act
         }
         return {...state, [data.channelId]: {...channelState, msg_count: data.msgCount, mention_count: data.mentionCount, last_viewed_at: data.lastViewedAt}};
     }
+
+    case ChannelTypes.RECEIVED_MY_CHANNELS_WITH_MEMBERS: { // Used by the mobile app
+        const nextState: any = {...state};
+        const current = Object.values(nextState);
+        const {sync, channelMembers} = action.data;
+        let hasNewValues = channelMembers && channelMembers.length > 0;
+
+        // Remove existing channel memberships when the user is no longer a member
+        if (sync) {
+            current.forEach((member: ChannelMembership) => {
+                const id = member.channel_id;
+                if (channelMembers.find((cm: ChannelMembership) => cm.channel_id === id)) {
+                    delete nextState[id];
+                    hasNewValues = true;
+                }
+            });
+        }
+
+        if (hasNewValues) {
+            channelMembers.forEach((cm: ChannelMembership) => {
+                const id: string = cm.channel_id;
+                nextState[id] = cm;
+            });
+
+            return nextState;
+        }
+
+        return state;
+    }
+
     case UserTypes.LOGOUT_SUCCESS:
         return {};
     default:
@@ -384,6 +457,10 @@ function membersInChannel(state: RelationOneToOne<Channel, UserIDMappedObjects<C
         }
         return nextState;
     }
+
+    case UserTypes.PROFILE_NO_LONGER_VISIBLE:
+        return removeMemberFromChannels(state, action);
+
     case ChannelTypes.LEAVE_CHANNEL:
     case ChannelTypes.REMOVE_MEMBER_FROM_CHANNEL:
     case UserTypes.RECEIVED_PROFILE_NOT_IN_CHANNEL: {
@@ -454,6 +531,40 @@ function stats(state: RelationOneToOne<Channel, ChannelStats> = {}, action: Gene
 
         return state;
     }
+    case ChannelTypes.INCREMENT_PINNED_POST_COUNT: {
+        const nextState = {...state};
+        const id = action.id;
+        const nextStat = nextState[id];
+        if (nextStat) {
+            const count = nextStat.pinnedpost_count + 1;
+            return {
+                ...nextState,
+                [id]: {
+                    ...nextStat,
+                    pinnedpost_count: count,
+                },
+            };
+        }
+
+        return state;
+    }
+    case ChannelTypes.DECREMENT_PINNED_POST_COUNT: {
+        const nextState = {...state};
+        const id = action.id;
+        const nextStat = nextState[id];
+        if (nextStat) {
+            const count = nextStat.pinnedpost_count - 1;
+            return {
+                ...nextState,
+                [id]: {
+                    ...nextStat,
+                    pinnedpost_count: count,
+                },
+            };
+        }
+
+        return state;
+    }
     case UserTypes.LOGOUT_SUCCESS:
         return {};
     default:
@@ -463,14 +574,43 @@ function stats(state: RelationOneToOne<Channel, ChannelStats> = {}, action: Gene
 
 function groupsAssociatedToChannel(state: any = {}, action: GenericAction) {
     switch (action.type) {
-    case GroupTypes.RECEIVED_GROUPS_ASSOCIATED_TO_CHANNEL: {
-        const {channelID, groups, totalGroupCount} = action.data;
+    case GroupTypes.RECEIVED_ALL_GROUPS_ASSOCIATED_TO_CHANNELS_IN_TEAM: {
+        const {groupsByChannelId} = action.data;
+        const nextState = {...state};
+
+        for (const channelID of Object.keys(groupsByChannelId)) {
+            if (groupsByChannelId[channelID]) {
+                const associatedGroupIDs = new Set<string>([]);
+                for (const group of groupsByChannelId[channelID]) {
+                    associatedGroupIDs.add(group.id);
+                }
+                const ids = Array.from(associatedGroupIDs);
+                nextState[channelID] = {ids, totalCount: ids.length};
+            }
+        }
+
+        return nextState;
+    }
+    case GroupTypes.RECEIVED_GROUP_ASSOCIATED_TO_CHANNEL: {
+        const {channelID, groups} = action.data;
         const nextState = {...state};
         const associatedGroupIDs = new Set(state[channelID] ? state[channelID].ids : []);
         for (const group of groups) {
             associatedGroupIDs.add(group.id);
         }
+        nextState[channelID] = {ids: Array.from(associatedGroupIDs), totalCount: associatedGroupIDs.size};
+
+        return nextState;
+    }
+    case GroupTypes.RECEIVED_GROUPS_ASSOCIATED_TO_CHANNEL: {
+        const {channelID, groups, totalGroupCount} = action.data;
+        const nextState = {...state};
+        const associatedGroupIDs = new Set<string>([]);
+        for (const group of groups) {
+            associatedGroupIDs.add(group.id);
+        }
         nextState[channelID] = {ids: Array.from(associatedGroupIDs), totalCount: totalGroupCount};
+
         return nextState;
     }
     case GroupTypes.RECEIVED_ALL_GROUPS_ASSOCIATED_TO_CHANNEL: {
@@ -482,16 +622,21 @@ function groupsAssociatedToChannel(state: any = {}, action: GenericAction) {
         }
         const ids = Array.from(associatedGroupIDs);
         nextState[channelID] = {ids, totalCount: ids.length};
+
         return nextState;
     }
+    case GroupTypes.RECEIVED_GROUP_NOT_ASSOCIATED_TO_CHANNEL:
     case GroupTypes.RECEIVED_GROUPS_NOT_ASSOCIATED_TO_CHANNEL: {
         const {channelID, groups} = action.data;
+
         const nextState = {...state};
         const associatedGroupIDs = new Set(state[channelID] ? state[channelID].ids : []);
+
         for (const group of groups) {
             associatedGroupIDs.delete(group.id);
         }
-        nextState[channelID] = Array.from(associatedGroupIDs);
+        nextState[channelID] = {ids: Array.from(associatedGroupIDs), totalCount: associatedGroupIDs.size};
+
         return nextState;
     }
     default:
@@ -546,8 +691,42 @@ export function manuallyUnread(state: RelationOneToOne<Channel, boolean> = {}, a
         return {};
     }
 
+    case ChannelTypes.ADD_MANUALLY_UNREAD:
     case ChannelTypes.POST_UNREAD_SUCCESS: {
         return {...state, [action.data.channelId]: true};
+    }
+    default:
+        return state;
+    }
+}
+
+export function channelModerations(state: any = {}, action: GenericAction) {
+    switch (action.type) {
+    case ChannelTypes.RECEIVED_CHANNEL_MODERATIONS: {
+        const {channelId, moderations} = action.data;
+        return {
+            ...state,
+            [channelId]: moderations,
+        };
+    }
+    default:
+        return state;
+    }
+}
+
+export function channelMemberCountsByGroup(state: any = {}, action: GenericAction) {
+    switch (action.type) {
+    case ChannelTypes.RECEIVED_CHANNEL_MEMBER_COUNTS_BY_GROUP: {
+        const {channelId, memberCounts} = action.data;
+        const memberCountsByGroup: ChannelMemberCountsByGroup = {};
+        memberCounts.forEach((channelMemberCount: ChannelMemberCountByGroup) => {
+            memberCountsByGroup[channelMemberCount.group_id] = channelMemberCount;
+        });
+
+        return {
+            ...state,
+            [channelId]: memberCountsByGroup,
+        };
     }
     default:
         return state;
@@ -580,4 +759,10 @@ export default combineReducers({
 
     // object where every key is the channel id, if present means a user requested to mark that channel as unread.
     manuallyUnread,
+
+    // object where every key is the channel id and has an object with the channel moderations
+    channelModerations,
+
+    // object where every key is the channel id containing map of <group_id: ChannelMemberCountByGroup>
+    channelMemberCountsByGroup,
 });

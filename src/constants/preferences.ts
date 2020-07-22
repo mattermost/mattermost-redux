@@ -1,6 +1,7 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
 
+import {Theme} from 'types/preferences';
 import {Dictionary} from 'types/utilities';
 
 const Preferences: Dictionary<any> = {
@@ -33,10 +34,15 @@ const Preferences: Dictionary<any> = {
     MENTION_KEYS: 'mention_keys',
     USE_MILITARY_TIME: 'use_military_time',
     CATEGORY_SIDEBAR_SETTINGS: 'sidebar_settings',
+    CHANNEL_SIDEBAR_ORGANIZATION: 'channel_sidebar_organization',
+    CHANNEL_SIDEBAR_AUTOCLOSE_DMS: 'close_unused_direct_messages',
+    AUTOCLOSE_DMS_ENABLED: 'after_seven_days',
     CATEGORY_ADVANCED_SETTINGS: 'advanced_settings',
     ADVANCED_FILTER_JOIN_LEAVE: 'join_leave',
     ADVANCED_CODE_BLOCK_ON_CTRL_ENTER: 'code_block_ctrl_enter',
     ADVANCED_SEND_ON_CTRL_ENTER: 'send_on_ctrl_enter',
+    CATEGORY_WHATS_NEW_MODAL: 'whats_new_modal',
+    HAS_SEEN_SIDEBAR_WHATS_NEW_MODAL: 'has_seen_sidebar_whats_new_modal',
     CATEGORY_THEME: 'theme',
     THEMES: {
         default: {
@@ -65,7 +71,7 @@ const Preferences: Dictionary<any> = {
             mentionHighlightBg: '#ffe577',
             mentionHighlightLink: '#166de0',
             codeTheme: 'github',
-        },
+        } as Theme,
         organization: {
             type: 'Organization',
             sidebarBg: '#2071a7',
@@ -92,7 +98,7 @@ const Preferences: Dictionary<any> = {
             mentionHighlightBg: '#f3e197',
             mentionHighlightLink: '#2f81b7',
             codeTheme: 'github',
-        },
+        } as Theme,
         mattermostDark: {
             type: 'Mattermost Dark',
             sidebarBg: '#1b2c3e',
@@ -119,7 +125,7 @@ const Preferences: Dictionary<any> = {
             mentionHighlightBg: '#984063',
             mentionHighlightLink: '#a4ffeb',
             codeTheme: 'solarized-dark',
-        },
+        } as Theme,
         windows10: {
             type: 'Windows Dark',
             sidebarBg: '#171717',
@@ -146,7 +152,7 @@ const Preferences: Dictionary<any> = {
             mentionHighlightBg: '#784098',
             mentionHighlightLink: '#a4ffeb',
             codeTheme: 'monokai',
-        },
+        } as Theme,
     },
 };
 
