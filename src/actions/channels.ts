@@ -17,7 +17,9 @@ import {
     isManuallyUnread,
 } from 'selectors/entities/channels';
 import {getConfig, getServerVersion} from 'selectors/entities/general';
+import {getNewSidebarPreference} from 'selectors/entities/preferences';
 import {getCurrentTeamId} from 'selectors/entities/teams';
+import {getCurrentUserId} from 'selectors/entities/users';
 
 import {Action, ActionFunc, batchActions, DispatchFunc, GetStateFunc} from 'types/actions';
 
@@ -1408,7 +1410,9 @@ export function getMyChannelMember(channelId: string) {
 
 export function favoriteChannel(channelId: string, updateCategories = true): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
-        const {currentUserId} = getState().entities.users;
+        const state = getState();
+        const currentUserId = getCurrentUserId(state);
+
         const preference: PreferenceType = {
             user_id: currentUserId,
             category: Preferences.CATEGORY_FAVORITE_CHANNEL,
@@ -1418,23 +1422,33 @@ export function favoriteChannel(channelId: string, updateCategories = true): Act
 
         Client4.trackEvent('action', 'action_channels_favorite');
 
-        // Add the channel to the Favorites category, unless this has been called from the categories update logic
-        if (updateCategories) {
-            const channel = getChannelSelector(getState(), channelId);
-            const category = getCategoryInTeamByType(getState(), channel.team_id || getCurrentTeamId(getState()), CategoryTypes.FAVORITES);
-            if (category) {
-                await dispatch(addChannelToCategory(category.id, channel.id));
+        if (getNewSidebarPreference(state)) {
+            // The new sidebar is enabled, so favorite the channel by moving it into the current team's Favorites category
+            if (updateCategories) {
+                const channel = getChannelSelector(state, channelId);
+                const category = getCategoryInTeamByType(state, channel.team_id || getCurrentTeamId(state), CategoryTypes.FAVORITES);
+
+                if (category) {
+                    await dispatch(addChannelToCategory(category.id, channelId));
+                }
             }
+
+            return dispatch({
+                type: PreferenceTypes.RECEIVED_PREFERENCES,
+                data: [preference],
+            });
         }
 
-        // And favorite it using the old preferences method.
+        // The old sidebar is enabled, so favorite the channel by calling the preferences API
         return dispatch(savePreferences(currentUserId, [preference]));
     };
 }
 
 export function unfavoriteChannel(channelId: string, updateCategories = true): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
-        const {currentUserId} = getState().entities.users;
+        const state = getState();
+        const currentUserId = getCurrentUserId(state);
+
         const preference: PreferenceType = {
             user_id: currentUserId,
             category: Preferences.CATEGORY_FAVORITE_CHANNEL,
@@ -1444,23 +1458,29 @@ export function unfavoriteChannel(channelId: string, updateCategories = true): A
 
         Client4.trackEvent('action', 'action_channels_unfavorite');
 
-        // Remove the channel from the Favorites category by adding it to its initial category, unless this has been
-        // called from the categories update logic
-        if (updateCategories) {
-            const channel = getChannelSelector(getState(), channelId);
-            const category = getCategoryInTeamByType(
-                getState(),
-                channel.team_id || getCurrentTeamId(getState()),
-                channel.type === General.DM_CHANNEL || channel.type === General.GM_CHANNEL ? CategoryTypes.DIRECT_MESSAGES : CategoryTypes.CHANNELS,
-            );
-            if (category) {
-                await dispatch(addChannelToCategory(category.id, channel.id));
+        if (getNewSidebarPreference(state)) {
+            // The new sidebar is enabled, so unfavorite the channel by moving it into the current team's Channels/DMs category
+            if (updateCategories) {
+                const channel = getChannelSelector(state, channelId);
+                const category = getCategoryInTeamByType(
+                    state,
+                    channel.team_id || getCurrentTeamId(state),
+                    channel.type === General.DM_CHANNEL || channel.type === General.GM_CHANNEL ? CategoryTypes.DIRECT_MESSAGES : CategoryTypes.CHANNELS,
+                );
+
+                if (category) {
+                    await dispatch(addChannelToCategory(category.id, channel.id));
+                }
             }
+
+            return dispatch({
+                type: PreferenceTypes.DELETED_PREFERENCES,
+                data: [preference],
+            });
         }
 
-        // And unfavorite using the old preferences method. Note that this is inconsistent for DMs since the channel is
-        // unfavorited on all teams using the preferences method and on the the current team using the new method.
-        return deletePreferences(currentUserId, [preference])(dispatch, getState);
+        // The old sidebar is enabled, so unfavorite the channel by calling the preferences API
+        return dispatch(deletePreferences(currentUserId, [preference]));
     };
 }
 
