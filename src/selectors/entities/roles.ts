@@ -9,15 +9,12 @@ import {
     getMySystemRoles,
     getRoles,
     PermissionsOptions,
-    SysConsoleItemOptions,
 } from 'selectors/entities/roles_helpers';
 import {getTeamMemberships, getCurrentTeamId} from 'selectors/entities/teams';
 
 import {Role} from 'types/roles';
 import {GlobalState} from 'types/store';
 import {Dictionary} from 'types/utilities';
-
-import {ResourceToSysConsolePermissionsTable} from '../../constants/permissions_sysconsole';
 
 export {getMySystemPermissions, getMySystemRoles, getRoles};
 
@@ -208,42 +205,5 @@ export const haveICurrentChannelPermission: (state: GlobalState, options: Permis
     (state: GlobalState, options: PermissionsOptions) => options.permission,
     (permissions, permission) => {
         return permissions.has(permission);
-    },
-);
-
-//gets the permission set mapped to the current resource
-export const getPermissionsOnSystemConsoleResource: (state: GlobalState, options: SysConsoleItemOptions) => string[] = createSelector(
-    (state: GlobalState, options: SysConsoleItemOptions) => options.resourceId,
-    (resourceId: string) => {
-        return ResourceToSysConsolePermissionsTable[resourceId];
-    },
-);
-
-//return true if the current user has no permission on the resource
-export const haveINoPermissionOnSysConsoleItem: (state: GlobalState, options: SysConsoleItemOptions) => boolean = createSelector(
-    getMySystemPermissions,
-    getPermissionsOnSystemConsoleResource,
-    (mySystemPermissions, permissionsOnResource) => {
-        //go over the permissions mapped to the resource and check if the current user has any permission matching
-        const commonPermissions = permissionsOnResource.filter((x) => mySystemPermissions.has(x));
-        return (commonPermissions.length === 0);
-    },
-);
-
-//return true if current user has no permission on the resource or only read permission
-export const haveINoWritePermissionOnSysConsoleItem: (state: GlobalState, options: SysConsoleItemOptions) => boolean = createSelector(
-    getMySystemPermissions,
-    getPermissionsOnSystemConsoleResource,
-    (mySystemPermissions, permissionsOnResource) => {
-        //go over the permissions mapped to the resource and check if the current user has any permission matching
-        const commonPermissions = permissionsOnResource.filter((x) => mySystemPermissions.has(x));
-
-        const noHaveRWPermission = commonPermissions.length === 0;
-
-        //go over the result permissions set and check if it contains a write permission
-        const haveWPermission = commonPermissions.some((permission) => permission.startsWith('write'));
-
-        //return true if current user has no permission or he has a permission which is not write(hence read)
-        return (noHaveRWPermission || !haveWPermission);
     },
 );
