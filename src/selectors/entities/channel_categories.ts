@@ -357,7 +357,7 @@ export function makeSortChannels() {
 
         if (category.sorting === CategorySorting.Recency) {
             channels = sortChannelsByRecency(state, channels);
-        } else if (category.sorting === CategorySorting.Alphabetical) {
+        } else if (category.sorting === CategorySorting.Alphabetical || category.sorting === CategorySorting.Default) {
             if (channels.some((channel) => channel.type === General.DM_CHANNEL || channel.type === General.GM_CHANNEL)) {
                 channels = sortChannelsByNameWithDMs(state, channels);
             } else {
