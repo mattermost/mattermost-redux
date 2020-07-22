@@ -807,7 +807,7 @@ export type EnvironmentConfig = {
 
 export type WarnMetricStatus = {
     id: string;
-    aae_id: string;
     limit: number;
     acked: boolean;
+    store_status: string;
 };

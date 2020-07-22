@@ -256,6 +256,7 @@ function handlePostReceived(nextState: any, post: Post) {
     if (post.pending_post_id && post.id !== post.pending_post_id && nextState[post.pending_post_id]) {
         Reflect.deleteProperty(nextState, post.pending_post_id);
     }
+
     return nextState;
 }
 
