@@ -19,17 +19,15 @@ import {
     getCategoryInTeamByType,
     getCategoryInTeamWithChannel,
 } from 'selectors/entities/channel_categories';
-import {makeGetChannelsForIds} from 'selectors/entities/channels';
 import {getCurrentUserId} from 'selectors/entities/users';
 
 import {
     ActionFunc,
-    Action,
     batchActions,
     DispatchFunc,
     GetStateFunc,
 } from 'types/actions';
-import {CategorySorting, OrderedChannelCategories} from 'types/channel_categories';
+import {CategorySorting, OrderedChannelCategories, ChannelCategory} from 'types/channel_categories';
 import {Channel} from 'types/channels';
 import {$ID} from 'types/utilities';
 
@@ -50,27 +48,34 @@ export function collapseCategory(categoryId: string) {
 }
 
 export function setCategorySorting(categoryId: string, sorting: CategorySorting) {
+    return (dispatch: DispatchFunc, getState: GetStateFunc) => {
+        const state = getState();
+        const category = getCategory(state, categoryId);
+
+        return dispatch(updateCategory({
+            ...category,
+            sorting,
+        }));
+    };
+}
+
+export function updateCategory(category: ChannelCategory): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         const state = getState();
         const currentUserId = getCurrentUserId(state);
-        const category = getCategory(state, categoryId);
 
         let updatedCategory;
         try {
-            updatedCategory = await Client4.updateChannelCategory(currentUserId, category.team_id, {
-                ...category,
-                sorting,
-            });
+            updatedCategory = await Client4.updateChannelCategory(currentUserId, category.team_id, category);
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch, getState);
             dispatch(logError(error));
             return {error};
         }
 
-        return dispatch({
-            type: ChannelCategoryTypes.RECEIVED_CATEGORY,
-            data: updatedCategory,
-        });
+        // The updated category will be added to the state after receiving the corresponding websocket event.
+
+        return {data: updatedCategory};
     };
 }
 
@@ -209,12 +214,13 @@ export function moveChannelToCategory(categoryId: string, channelId: string, new
             return {error};
         }
 
-        // And update the favorite preferences locally on the client in case we have any logic relying on that
+        // Update the favorite preferences locally on the client in case we have any logic relying on that
         if (targetCategory.type === CategoryTypes.FAVORITES) {
             await dispatch(favoriteChannel(channelId, false));
         } else if (sourceCategory && sourceCategory.type === CategoryTypes.FAVORITES) {
             await dispatch(unfavoriteChannel(channelId, false));
         }
+
         return result;
     };
 }
@@ -236,13 +242,19 @@ export function moveCategory(teamId: string, categoryId: string, newIndex: numbe
             return {error};
         }
 
-        return dispatch({
-            type: ChannelCategoryTypes.RECEIVED_CATEGORY_ORDER,
-            data: {
-                teamId,
-                order: updatedOrder,
-            },
-        });
+        // The order will be updated in the state after receiving the corresponding websocket event.
+
+        return {data: updatedOrder};
+    };
+}
+
+export function receivedCategoryOrder(teamId: string, order: string[]) {
+    return {
+        type: ChannelCategoryTypes.RECEIVED_CATEGORY_ORDER,
+        data: {
+            teamId,
+            order,
+        },
     };
 }
 
@@ -264,85 +276,28 @@ export function createCategory(teamId: string, displayName: string, channelIds: 
             return {error};
         }
 
-        const state = getState();
-        const categoryIds = getCategoryIdsForTeam(state, teamId);
-        const favoritesIsFirst = categoryIds.length > 0 && getCategory(state, categoryIds[0]).type === CategoryTypes.FAVORITES;
-
-        const newCategoryIds = [...categoryIds];
-
-        // Place the new category relative to other categories
-        if (favoritesIsFirst) {
-            // Place the new category after the favorites category if it comes first
-            newCategoryIds.splice(1, 0, newCategory.id);
-        } else {
-            // Place the new category first
-            newCategoryIds.unshift(newCategory.id);
-        }
-
-        const categoriesToUpdate = [newCategory];
-
-        // Remove the provided channels from any existing categories they may have existed in
-        if (channelIds.length > 0) {
-            for (const categoryId of categoryIds) {
-                const category = getCategory(state, categoryId);
-
-                // Only modify categories that have to be changed
-                if (category.channel_ids.some((channelId) => channelIds.includes(channelId))) {
-                    categoriesToUpdate.push({
-                        ...category,
-                        channel_ids: category.channel_ids.filter((channelId) => !channelIds.includes(channelId)),
-                    });
-                }
-            }
-        }
-
-        dispatch(batchActions([
-            {
-                type: ChannelCategoryTypes.RECEIVED_CATEGORIES,
-                data: categoriesToUpdate,
-            },
-            {
-                type: ChannelCategoryTypes.RECEIVED_CATEGORY_ORDER,
-                data: {
-                    teamId,
-                    order: newCategoryIds,
-                },
-            },
-        ]));
+        // The new category will be added to the state after receiving the corresponding websocket event.
 
         return {data: newCategory};
     };
 }
 
 export function renameCategory(categoryId: string, displayName: string): ActionFunc {
-    return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
+    return (dispatch: DispatchFunc, getState: GetStateFunc) => {
         const state = getState();
         const category = getCategory(state, categoryId);
-        const currentUserId = getCurrentUserId(state);
 
-        let updatedCategory;
-        try {
-            updatedCategory = await Client4.updateChannelCategory(currentUserId, category.team_id, {
-                ...category,
-                display_name: displayName,
-            });
-        } catch (error) {
-            forceLogoutIfNecessary(error, dispatch, getState);
-            dispatch(logError(error));
-            return {error};
-        }
-
-        return dispatch({
-            type: ChannelCategoryTypes.RECEIVED_CATEGORY,
-            data: updatedCategory,
-        });
+        return dispatch(updateCategory({
+            ...category,
+            display_name: displayName,
+        }));
     };
 }
 
 export function deleteCategory(categoryId: string): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
-        let state = getState();
-        let category = getCategory(state, categoryId);
+        const state = getState();
+        const category = getCategory(state, categoryId);
         const currentUserId = getCurrentUserId(state);
 
         try {
@@ -353,48 +308,8 @@ export function deleteCategory(categoryId: string): ActionFunc {
             return {error};
         }
 
-        const actions: Action[] = [{
-            type: ChannelCategoryTypes.CATEGORY_DELETED,
-            data: categoryId,
-        }];
+        // The category will be deleted from the state after receiving the corresponding websocket event.
 
-        // Get the category again just in case something has changed since before we sent the request
-        state = getState();
-        category = getCategory(state, categoryId);
-
-        // Remove the channels from this category and add them to their default Channels/Direct Messages categories
-        if (category.channel_ids.length > 0) {
-            const channels = makeGetChannelsForIds()(state, category.channel_ids);
-
-            const channelsCategory = getCategoryInTeamByType(state, category.team_id, CategoryTypes.CHANNELS);
-            const dmsCategory = getCategoryInTeamByType(state, category.team_id, CategoryTypes.DIRECT_MESSAGES);
-
-            const nextChannelsCategory = {
-                ...channelsCategory,
-                channel_ids: [...channelsCategory?.channel_ids],
-            };
-            const nextDmsCategory = {
-                ...dmsCategory,
-                channel_ids: [...dmsCategory?.channel_ids],
-            };
-
-            for (const channel of channels) {
-                if (channel.type === General.DM_CHANNEL || channel.type === General.GM_CHANNEL) {
-                    nextDmsCategory.channel_ids = insertWithoutDuplicates(nextDmsCategory.channel_ids, channel.id, 0);
-                } else {
-                    nextChannelsCategory.channel_ids = insertWithoutDuplicates(nextChannelsCategory.channel_ids, channel.id, 0);
-                }
-            }
-
-            actions.push({
-                type: ChannelCategoryTypes.RECEIVED_CATEGORIES,
-                data: [
-                    nextDmsCategory,
-                    nextChannelsCategory,
-                ],
-            });
-        }
-
-        return dispatch(batchActions(actions));
+        return {data: true};
     };
 }
