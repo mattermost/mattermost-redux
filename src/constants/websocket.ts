@@ -46,5 +46,7 @@ const WebsocketEvents = {
     RECEIVED_GROUP_NOT_ASSOCIATED_TO_TEAM: 'group_not_associated_to_team',
     RECEIVED_GROUP_ASSOCIATED_TO_CHANNEL: 'group_associated_to_channel',
     RECEIVED_GROUP_NOT_ASSOCIATED_TO_CHANNEL: 'group_not_associated_to_channel',
+    WARN_METRIC_STATUS_RECEIVED: 'warn_metric_status_received',
+    WARN_METRIC_STATUS_REMOVED: 'warn_metric_status_removed',
 };
 export default WebsocketEvents;

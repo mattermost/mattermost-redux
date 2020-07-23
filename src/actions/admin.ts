@@ -604,3 +604,16 @@ export function setSamlIdpCertificateFromMetadata(certData: string): ActionFunc 
         ],
     });
 }
+
+export function sendWarnMetricAck(warnMetricId: string, forceAck: boolean) {
+    return async (dispatch: DispatchFunc) => {
+        try {
+            Client4.trackEvent('api', 'api_request_send_metric_ack', {warnMetricId});
+            await Client4.sendWarnMetricAck(warnMetricId, forceAck);
+            return {data: true};
+        } catch (e) {
+            dispatch(logError(e));
+            return {error: e.message};
+        }
+    };
+}

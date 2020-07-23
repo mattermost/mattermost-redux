@@ -348,6 +348,12 @@ function handleEvent(msg: WebSocketMessage) {
     case WebsocketEvents.RECEIVED_GROUP_NOT_ASSOCIATED_TO_CHANNEL:
         doDispatch(handleReceivedGroupNotAssociatedToChannelEvent(msg));
         break;
+    case WebsocketEvents.WARN_METRIC_STATUS_RECEIVED:
+        doDispatch(handleWarnMetricStatusReceivedEvent(msg));
+        break;
+    case WebsocketEvents.WARN_METRIC_STATUS_REMOVED:
+        doDispatch(handleWarnMetricStatusRemovedEvent(msg));
+        break;
     }
 }
 
@@ -1056,6 +1062,28 @@ function handleReceivedGroupNotAssociatedToChannelEvent(msg: WebSocketMessage) {
         dispatch({
             type: GroupTypes.RECEIVED_GROUP_NOT_ASSOCIATED_TO_CHANNEL,
             data: {channelID: msg.broadcast.channel_id, groups: [{id: msg.data.group_id}]}});
+
+        return {data: true};
+    };
+}
+
+function handleWarnMetricStatusReceivedEvent(msg: WebSocketMessage) {
+    return (dispatch: DispatchFunc) => {
+        dispatch({
+            type: GeneralTypes.WARN_METRIC_STATUS_RECEIVED,
+            data: JSON.parse(msg.data.warnMetricStatus),
+        });
+
+        return {data: true};
+    };
+}
+
+function handleWarnMetricStatusRemovedEvent(msg: WebSocketMessage) {
+    return (dispatch: DispatchFunc) => {
+        dispatch({
+            type: GeneralTypes.WARN_METRIC_STATUS_REMOVED,
+            data: {id: msg.data.warnMetricId},
+        });
 
         return {data: true};
     };
