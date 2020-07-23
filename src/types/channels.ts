@@ -127,3 +127,17 @@ export type ChannelViewResponse = {
     status: string;
     last_viewed_at_times: RelationOneToOne<Channel, number>;
 };
+
+export type ChannelSearchOpts = {
+    exclude_default_channels?: boolean;
+    not_associated_to_group?: string;
+    team_ids?: string[];
+    group_constrained?: boolean;
+    exclude_group_constrained?: boolean;
+    public?: boolean;
+    private?: boolean;
+    include_deleted?: boolean;
+    deleted?: boolean;
+    page?: number;
+    per_page?: number;
+};

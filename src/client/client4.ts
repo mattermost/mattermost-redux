@@ -18,6 +18,7 @@ import {
     ChannelUnread,
     ChannelViewResponse,
     ChannelWithTeamData,
+    ChannelSearchOpts,
 } from 'types/channels';
 import {Options, StatusOK, ClientResponse} from 'types/client4';
 import {Compliance} from 'types/compliance';
@@ -1711,14 +1712,12 @@ export default class Client4 {
         );
     };
 
-    searchAllChannels = (term: string, notAssociatedToGroup = '', excludeDefaultChannels = false, page?: number, perPage?: number, includeDeleted = false) => {
+    searchAllChannels = (term: string, opts: ChannelSearchOpts = {}) => {
         const body = {
             term,
-            not_associated_to_group: notAssociatedToGroup,
-            exclude_default_channels: excludeDefaultChannels,
-            page,
-            per_page: perPage,
+            ...opts,
         };
+        const includeDeleted = Boolean(opts.include_deleted);
         return this.doFetch<Channel[] | ChannelsWithTotalCount>(
             `${this.getChannelsRoute()}/search?include_deleted=${includeDeleted}`,
             {method: 'post', body: JSON.stringify(body)},
