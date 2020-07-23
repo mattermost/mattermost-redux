@@ -678,7 +678,7 @@ describe('Actions.Admin', () => {
             get('/analytics/old').
             query(true).
             times(2).
-            reply(200, [{name: 'channel_open_count', value: 495}, {name: 'channel_private_count', value: 19}, {name: 'post_count', value: 2763}, {name: 'unique_user_count', value: 316}, {name: 'team_count', value: 159}, {name: 'total_websocket_connections', value: 1}, {name: 'total_master_db_connections', value: 8}, {name: 'total_read_db_connections', value: 0}, {name: 'daily_active_users', value: 22}, {name: 'monthly_active_users', value: 114}]);
+            reply(200, [{name: 'channel_open_count', value: 495}, {name: 'channel_private_count', value: 19}, {name: 'post_count', value: 2763}, {name: 'unique_user_count', value: 316}, {name: 'team_count', value: 159}, {name: 'total_websocket_connections', value: 1}, {name: 'total_master_db_connections', value: 8}, {name: 'total_read_db_connections', value: 0}, {name: 'daily_active_users', value: 22}, {name: 'monthly_active_users', value: 114}, {name: 'registered_users', value: 500}]);
 
         await Actions.getStandardAnalytics()(store.dispatch, store.getState);
         await Actions.getStandardAnalytics(TestHelper.basicTeam.id)(store.dispatch, store.getState);
@@ -1208,5 +1208,16 @@ describe('Actions.Admin', () => {
         await Actions.setSamlIdpCertificateFromMetadata(samlIdpPublicCertificateText)(store.dispatch, store.getState);
 
         // This test doesn't appear to actually check anything?
+    });
+
+    it('sendWarnMetricAck', async () => {
+        const warnMetricAck = {
+            id: 'metric1',
+        };
+        nock(Client4.getBaseRoute()).
+            post('/warn_metrics/ack').
+            reply(200, OK_RESPONSE);
+
+        await Actions.sendWarnMetricAck(warnMetricAck.id, false)(store.dispatch, store.getState);
     });
 });
