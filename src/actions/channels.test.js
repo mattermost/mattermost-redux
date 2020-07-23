@@ -1663,7 +1663,7 @@ describe('Actions.Channels', () => {
             post('/channels/search?include_deleted=false').
             reply(200, [TestHelper.basicChannel, userChannel]);
 
-        await store.dispatch(Actions.searchAllChannels('test', 0));
+        await store.dispatch(Actions.searchAllChannels('test', {}));
 
         const moreRequest = store.getState().requests.channels.getAllChannels;
         if (moreRequest.status === RequestStatus.FAILURE) {
@@ -1674,7 +1674,7 @@ describe('Actions.Channels', () => {
             post('/channels/search?include_deleted=false').
             reply(200, {channels: [TestHelper.basicChannel, userChannel], total_count: 2});
 
-        let response = await store.dispatch(Actions.searchAllChannels('test', '', false, 0, 100));
+        let response = await store.dispatch(Actions.searchAllChannels('test', {exclude_default_channels: false, page: 0, per_page: 100}));
 
         const paginatedRequest = store.getState().requests.channels.getAllChannels;
         if (paginatedRequest.status === RequestStatus.FAILURE) {
@@ -1687,7 +1687,7 @@ describe('Actions.Channels', () => {
             post('/channels/search?include_deleted=true').
             reply(200, {channels: [TestHelper.basicChannel, userChannel], total_count: 2});
 
-        response = await store.dispatch(Actions.searchAllChannels('test', '', false, 0, 100, true));
+        response = await store.dispatch(Actions.searchAllChannels('test', {exclude_default_channels: false, page: 0, per_page: 100, include_deleted: true}));
 
         assert.ok(response.data.channels.length === 2);
     });
