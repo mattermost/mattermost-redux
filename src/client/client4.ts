@@ -3121,9 +3121,9 @@ export default class Client4 {
         );
     };
 
-    getAllGroupsAssociatedToTeam = (teamID: string, filterAllowReference = false) => {
+    getAllGroupsAssociatedToTeam = (teamID: string, filterAllowReference = false, includeMemberCount = false) => {
         return this.doFetch<GroupsWithCount>(
-            `${this.getBaseRoute()}/teams/${teamID}/groups${buildQueryString({paginate: false, filter_allow_reference: filterAllowReference})}`,
+            `${this.getBaseRoute()}/teams/${teamID}/groups${buildQueryString({paginate: false, filter_allow_reference: filterAllowReference, include_member_count: includeMemberCount})}`,
             {method: 'get'},
         );
     };
@@ -3137,9 +3137,9 @@ export default class Client4 {
         );
     };
 
-    getAllGroupsAssociatedToChannel = (channelID: string, filterAllowReference = false) => {
+    getAllGroupsAssociatedToChannel = (channelID: string, filterAllowReference = false, includeMemberCount = false) => {
         return this.doFetch<GroupsWithCount>(
-            `${this.getBaseRoute()}/channels/${channelID}/groups${buildQueryString({paginate: false, filter_allow_reference: filterAllowReference})}`,
+            `${this.getBaseRoute()}/channels/${channelID}/groups${buildQueryString({paginate: false, filter_allow_reference: filterAllowReference, include_member_count: includeMemberCount})}`,
             {method: 'get'},
         );
     };
