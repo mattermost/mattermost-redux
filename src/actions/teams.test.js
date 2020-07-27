@@ -747,7 +747,7 @@ describe('Actions.Teams', () => {
             post('/teams/search').
             reply(200, [TestHelper.basicTeam, userTeam]);
 
-        await store.dispatch(Actions.searchTeams('test', 0));
+        await store.dispatch(Actions.searchTeams('test', {page: 0}));
 
         const moreRequest = store.getState().requests.teams.getTeams;
         if (moreRequest.status === RequestStatus.FAILURE) {
@@ -758,7 +758,7 @@ describe('Actions.Teams', () => {
             post('/teams/search').
             reply(200, {teams: [TestHelper.basicTeam, userTeam], total_count: 2});
 
-        const response = await store.dispatch(Actions.searchTeams('test', '', false, true));
+        const response = await store.dispatch(Actions.searchTeams('test', {page: '', per_page: true}));
 
         const paginatedRequest = store.getState().requests.teams.getTeams;
         if (paginatedRequest.status === RequestStatus.FAILURE) {

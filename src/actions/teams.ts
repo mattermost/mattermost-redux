@@ -13,7 +13,7 @@ import {getCurrentUserId} from 'selectors/entities/users';
 
 import {GetStateFunc, DispatchFunc, ActionFunc, ActionResult, batchActions, Action} from 'types/actions';
 
-import {Team, TeamMembership, TeamMemberWithError, GetTeamMembersOpts, TeamsWithCount} from 'types/teams';
+import {Team, TeamMembership, TeamMemberWithError, GetTeamMembersOpts, TeamsWithCount, TeamSearchOpts} from 'types/teams';
 
 import {selectChannel} from './channels';
 import {logError} from './errors';
@@ -139,13 +139,13 @@ export function getTeams(page = 0, perPage: number = General.TEAMS_CHUNK_SIZE, i
     };
 }
 
-export function searchTeams(term: string, page?: number, perPage?: number): ActionFunc {
+export function searchTeams(term: string, opts: TeamSearchOpts = {}): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         dispatch({type: TeamTypes.GET_TEAMS_REQUEST, data: null});
 
         let response;
         try {
-            response = await Client4.searchTeams(term, page, perPage);
+            response = await Client4.searchTeams(term, opts);
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch, getState);
             dispatch(batchActions([
@@ -157,7 +157,7 @@ export function searchTeams(term: string, page?: number, perPage?: number): Acti
 
         // The type of the response is determined by whether or not page/perPage were set
         let teams;
-        if (page == null || perPage == null) {
+        if (!opts.page || !opts.per_page) {
             teams = response as Team[];
         } else {
             teams = (response as TeamsWithCount).teams;
