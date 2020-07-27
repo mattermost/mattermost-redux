@@ -705,6 +705,7 @@ export type DataRetentionSettings = {
 
 export type MessageExportSettings = {
     EnableExport: boolean;
+    DownloadExportResults: boolean;
     ExportFormat: string;
     DailyRunTime: string;
     ExportFromTimestamp: number;

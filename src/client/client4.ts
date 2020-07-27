@@ -77,6 +77,7 @@ import {
     TeamStats,
     TeamsWithCount,
     TeamUnread,
+    TeamSearchOpts,
 } from 'types/teams';
 import {TermsOfService} from 'types/terms_of_service';
 import {
@@ -1117,12 +1118,12 @@ export default class Client4 {
         );
     };
 
-    searchTeams = (term: string, page?: number, perPage?: number) => {
+    searchTeams = (term: string, opts: TeamSearchOpts) => {
         this.trackEvent('api', 'api_search_teams');
 
         return this.doFetch<Team[] | TeamsWithCount>(
             `${this.getTeamsRoute()}/search`,
-            {method: 'post', body: JSON.stringify({term, page, per_page: perPage})},
+            {method: 'post', body: JSON.stringify({term, ...opts})},
         );
     };
 
