@@ -103,6 +103,27 @@ function serverVersion(state = '', action: GenericAction) {
     }
 }
 
+function warnMetricsStatus(state: any = {}, action: GenericAction) {
+    switch (action.type) {
+    case GeneralTypes.WARN_METRICS_STATUS_RECEIVED:
+        return action.data;
+    case GeneralTypes.WARN_METRIC_STATUS_RECEIVED: {
+        const nextState = {...state};
+        nextState[action.data.id] = action.data;
+        return nextState;
+    }
+    case GeneralTypes.WARN_METRIC_STATUS_REMOVED: {
+        const nextState = {...state};
+        const newParams = Object.assign({}, nextState[action.data.id]);
+        newParams.acked = true;
+        nextState[action.data.id] = newParams;
+        return nextState;
+    }
+    default:
+        return state;
+    }
+}
+
 export default combineReducers({
     appState,
     credentials,
@@ -112,4 +133,5 @@ export default combineReducers({
     license,
     serverVersion,
     timezones,
+    warnMetricsStatus,
 });
