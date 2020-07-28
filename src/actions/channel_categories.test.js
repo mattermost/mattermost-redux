@@ -164,7 +164,7 @@ describe('addChannelToInitialCategory', () => {
         expect(categoriesById.channelsCategory1.channel_ids).toEqual(['publicChannel1', 'privateChannel1']);
     });
 
-    test('should not add GM channel to DIRECT_MESSAGES categories on team if it exists in a catetgory', async () => {
+    test('should not add GM channel to DIRECT_MESSAGES categories on team if it exists in a category', async () => {
         const store = await configureStore({
             entities: {
                 channelCategories: {
