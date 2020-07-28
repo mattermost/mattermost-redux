@@ -14,10 +14,6 @@ export type PermissionsOptions = {
     permission: string;
 };
 
-export type SysConsoleItemOptions = {
-    resourceId: string;
-};
-
 export function getRoles(state: GlobalState) {
     return state.entities.roles.roles;
 }
