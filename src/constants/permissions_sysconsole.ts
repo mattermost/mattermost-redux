@@ -5,7 +5,6 @@ import Permissions from './permissions';
 export const ResourceToSysConsolePermissionsTable: Record<string, Array<string>> = {
     about: [Permissions.READ_SYSCONSOLE_ABOUT, Permissions.WRITE_SYSCONSOLE_ABOUT],
     reporting: [Permissions.READ_SYSCONSOLE_REPORTING, Permissions.WRITE_SYSCONSOLE_REPORTING],
-    user_management: [Permissions.READ_SYSCONSOLE_USERMANAGEMENT, Permissions.WRITE_SYSCONSOLE_USERMANAGEMENT],
     'user_management.users': [Permissions.READ_SYSCONSOLE_USERMANAGEMENT_USERS, Permissions.WRITE_SYSCONSOLE_USERMANAGEMENT_USERS],
     'user_management.groups': [Permissions.READ_SYSCONSOLE_USERMANAGEMENT_GROUPS, Permissions.WRITE_SYSCONSOLE_USERMANAGEMENT_GROUPS],
     'user_management.teams': [Permissions.READ_SYSCONSOLE_USERMANAGEMENT_TEAMS, Permissions.WRITE_SYSCONSOLE_USERMANAGEMENT_TEAMS],
