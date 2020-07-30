@@ -477,6 +477,34 @@ export function isPrivateChannel(channel: Channel): boolean {
     return channel.type === General.PRIVATE_CHANNEL;
 }
 
+export function sortChannelsByTypeListAndDisplayName(locale: string, typeList: string[], a: Channel, b: Channel): number {
+    const idxA = typeList.indexOf(a.type);
+    const idxB = typeList.indexOf(b.type);
+
+    if (idxA === -1 && idxB !== -1) {
+        return 1;
+    }
+    if (idxB === -1 && idxA !== -1) {
+        return -1;
+    }
+
+    if (idxA !== idxB) {
+        if (idxA < idxB) {
+            return -1;
+        }
+        return 1;
+    }
+
+    const aDisplayName = filterName(a.display_name);
+    const bDisplayName = filterName(b.display_name);
+
+    if (aDisplayName !== bDisplayName) {
+        return aDisplayName.toLowerCase().localeCompare(bDisplayName.toLowerCase(), locale, {numeric: true});
+    }
+
+    return a.name.toLowerCase().localeCompare(b.name.toLowerCase(), locale, {numeric: true});
+}
+
 export function sortChannelsByTypeAndDisplayName(locale: string, a: Channel, b: Channel): number {
     if (channelTypeOrder[a.type] !== channelTypeOrder[b.type]) {
         if (channelTypeOrder[a.type] < channelTypeOrder[b.type]) {
