@@ -120,8 +120,17 @@ export function addChannelToInitialCategory(channel: Channel, setOnServer = fals
         const categories = Object.values(getAllCategoriesByIds(state));
 
         if (channel.type === General.DM_CHANNEL || channel.type === General.GM_CHANNEL) {
-            // Add the new channel to the DM category on each team
-            const dmCategories = categories.filter((category) => category.type === CategoryTypes.DIRECT_MESSAGES);
+            const allDmCategories = categories.filter((category) => category.type === CategoryTypes.DIRECT_MESSAGES);
+
+            // Get all the categories in which channel exists
+            const channelInCategories = categories.filter((category) => {
+                return category.channel_ids.findIndex((channelId) => channelId === channel.id) !== -1;
+            });
+
+            // Skip DM categories where channel already exists in a different category
+            const dmCategories = allDmCategories.filter((dmCategory) => {
+                return channelInCategories.findIndex((category) => dmCategory.team_id === category.team_id) === -1;
+            });
 
             return dispatch({
                 type: ChannelCategoryTypes.RECEIVED_CATEGORIES,
