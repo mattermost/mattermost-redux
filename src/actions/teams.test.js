@@ -260,6 +260,26 @@ describe('Actions.Teams', () => {
         assert.strictEqual(patched.description, description);
     });
 
+    it('regenerateTeamInviteId', async () => {
+        const patchedInviteId = TestHelper.generateId();
+        const team = TestHelper.basicTeam;
+        const patchedTeam = {
+            ...team,
+            invite_id: patchedInviteId,
+        };
+        nock(Client4.getBaseRoute()).
+            post(`/teams/${team.id}/regenerate_invite_id`).
+            reply(200, patchedTeam);
+        await Actions.regenerateTeamInviteId(team.id)(store.dispatch, store.getState);
+        const {teams} = store.getState().entities.teams;
+
+        const patched = teams[TestHelper.basicTeam.id];
+
+        assert.ok(patched);
+        assert.notStrictEqual(patched.invite_id, team.invite_id);
+        assert.strictEqual(patched.invite_id, patchedInviteId);
+    });
+
     it('Join Open Team', async () => {
         const client = TestHelper.createClient4();
 
