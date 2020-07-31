@@ -192,6 +192,29 @@ describe('addChannelToInitialCategory', () => {
         const categoriesById = getAllCategoriesByIds(store.getState());
         expect(categoriesById.channelsCategory1.channel_ids).toEqual(['publicChannel1', 'privateChannel1']);
     });
+
+    test('should not add GM channel to DIRECT_MESSAGES categories on team if it exists in a category', async () => {
+        const store = await configureStore({
+            entities: {
+                channelCategories: {
+                    byId: {
+                        dmCategory1: {id: 'dmCategory1', team_id: 'team1', type: CategoryTypes.DIRECT_MESSAGES, channel_ids: ['dmChannel1', 'dmChannel2']},
+                        dmCategory2: {id: 'dmCategory2', team_id: 'team2', type: CategoryTypes.DIRECT_MESSAGES, channel_ids: ['dmChannel1', 'dmChannel2']},
+                        channelsCategory1: {id: 'custom', team_id: 'team1', type: CategoryTypes.CUSTOM, channel_ids: ['publicChannel1', 'gmChannel']},
+                    },
+                },
+            },
+        });
+
+        const newDmChannel = {id: 'gmChannel', type: General.GM_CHANNEL};
+
+        store.dispatch(Actions.addChannelToInitialCategory(newDmChannel));
+
+        const categoriesById = getAllCategoriesByIds(store.getState());
+        expect(categoriesById.dmCategory1.channel_ids).toEqual(['dmChannel1', 'dmChannel2']);
+        expect(categoriesById.dmCategory2.channel_ids).toEqual(['gmChannel', 'dmChannel1', 'dmChannel2']);
+        expect(categoriesById.channelsCategory1.channel_ids).toEqual(['publicChannel1', 'gmChannel']);
+    });
 });
 
 describe('addChannelToCategory', () => {
