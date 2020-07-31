@@ -11,6 +11,7 @@ const values = {
     CREATE_PRIVATE_CHANNEL: 'create_private_channel',
     MANAGE_PUBLIC_CHANNEL_MEMBERS: 'manage_public_channel_members',
     MANAGE_PRIVATE_CHANNEL_MEMBERS: 'manage_private_channel_members',
+    READ_CHANNEL_GROUPS: 'read_channel_groups',
     ASSIGN_SYSTEM_ADMIN_ROLE: 'assign_system_admin_role',
     MANAGE_ROLES: 'manage_roles',
     MANAGE_TEAM_ROLES: 'manage_team_roles',
