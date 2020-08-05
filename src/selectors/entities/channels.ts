@@ -787,11 +787,7 @@ export const getAllRecentChannels: (state: GlobalState) => Array<Channel> = crea
             const c = channels[id];
             const m = members[id];
 
-            if (c && m) {
-                return true;
-            }
-
-            return false;
+            return Boolean(c && m);
         });
 
         if (!currentUser) {
