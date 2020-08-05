@@ -2642,6 +2642,88 @@ describe('Selectors.Channels.getUnreadChannelIds', () => {
     });
 });
 
+describe('Selectors.channels.getAllRecentChannels', () => {
+    const team1 = TestHelper.fakeTeamWithId();
+
+    const channel1 = TestHelper.fakeChannelWithId(team1.id);
+    const channel2 = TestHelper.fakeChannelWithId(team1.id);
+
+    const channels = {
+        [channel1.id]: channel1,
+        [channel2.id]: channel2,
+    };
+
+    const channelsInTeam = {
+        [team1.id]: [channel1.id, channel2.id],
+    };
+
+    const myChannelMembers = {
+        [channel1.id]: {},
+        [channel2.id]: {},
+    };
+
+    const testState = deepFreezeAndThrowOnMutation({
+        entities: {
+            teams: {
+                currentTeamId: team1.id,
+            },
+            channels: {
+                channels,
+                channelsInTeam,
+                myMembers: myChannelMembers,
+            },
+        },
+    });
+    it('get all recent channels in current team strict equal', () => {
+        const chan2 = {...testState.entities.channels.channels[channel2.id]};
+        chan2.total_msg_count = 10;
+
+        const modifiedState = {
+            ...testState,
+            entities: {
+                ...testState.entities,
+                channels: {
+                    ...testState.entities.channels,
+                    channels: {
+                        ...testState.entities.channels.channels,
+                        [channel2.id]: chan2,
+                    },
+                },
+            },
+        };
+
+        const fromOriginalState = Selectors.getAllRecentChannels(testState);
+        const fromModifiedState = Selectors.getAllRecentChannels(modifiedState);
+
+        assert.ok(fromOriginalState === fromModifiedState);
+    });
+
+    it('get all recent channels in current team and keep specified channel as unread', () => {
+        const chan2 = {...testState.entities.channels.channels[channel2.id]};
+        chan2.total_msg_count = 10;
+
+        const modifiedState = {
+            ...testState,
+            entities: {
+                ...testState.entities,
+                channels: {
+                    ...testState.entities.channels,
+                    channels: {
+                        ...testState.entities.channels.channels,
+                        [channel2.id]: chan2,
+                    },
+                },
+            },
+        };
+
+        const fromOriginalState = Selectors.getAllRecentChannels(testState);
+        const fromModifiedState = Selectors.getAllRecentChannels(modifiedState, {id: channel1.id});
+
+        assert.ok(fromOriginalState !== fromModifiedState);
+        assert.ok(fromModifiedState.includes(channel1.id));
+    });
+});
+
 describe('Selectors.Channels.getDirectChannelIds', () => {
     const team1 = TestHelper.fakeTeamWithId();
 
