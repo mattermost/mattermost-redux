@@ -2644,6 +2644,7 @@ describe('Selectors.Channels.getUnreadChannelIds', () => {
 
 describe('Selectors.channels.getAllRecentChannels', () => {
     const team1 = TestHelper.fakeTeamWithId();
+    const team2 = TestHelper.fakeTeamWithId();
 
     const channel1 = TestHelper.fakeChannelWithId(team1.id);
     const channel2 = TestHelper.fakeChannelWithId(team1.id);
@@ -2655,6 +2656,7 @@ describe('Selectors.channels.getAllRecentChannels', () => {
 
     const channelsInTeam = {
         [team1.id]: [channel1.id, channel2.id],
+        [team2.id]: [channel1.id, channel2.id],
     };
 
     const myChannelMembers = {
@@ -2667,16 +2669,29 @@ describe('Selectors.channels.getAllRecentChannels', () => {
             teams: {
                 currentTeamId: team1.id,
             },
+            users: {
+                currentUserId: TestHelper.generateId(),
+                profiles: {},
+            },
             channels: {
                 channels,
                 channelsInTeam,
                 myMembers: myChannelMembers,
             },
+            posts: {
+                posts: {},
+                postsInChannel: {},
+            },
+            general: {
+                config: {},
+            },
+            preferences: {
+                myPreferences: {},
+            },
         },
     });
     it('get all recent channels in current team strict equal', () => {
-        const chan2 = {...testState.entities.channels.channels[channel2.id]};
-        chan2.total_msg_count = 10;
+        const newChannel = TestHelper.fakeChannelWithId(team2.id);
 
         const modifiedState = {
             ...testState,
@@ -2684,16 +2699,19 @@ describe('Selectors.channels.getAllRecentChannels', () => {
                 ...testState.entities,
                 channels: {
                     ...testState.entities.channels,
-                    channels: {
-                        ...testState.entities.channels.channels,
-                        [channel2.id]: chan2,
+                    channelsInTeam: {
+                        ...testState.entities.channels.channelsInTeam,
+                        [team2.id]: [
+                            ...testState.entities.channels.channelsInTeam[team2.id],
+                            newChannel.id,
+                        ],
                     },
                 },
             },
         };
 
-        const fromOriginalState = Selectors.getAllRecentChannels(testState);
-        const fromModifiedState = Selectors.getAllRecentChannels(modifiedState);
+        const fromOriginalState = Selectors.getAllChannels(testState);
+        const fromModifiedState = Selectors.getAllChannels(modifiedState);
 
         assert.ok(fromOriginalState === fromModifiedState);
     });
@@ -2720,7 +2738,6 @@ describe('Selectors.channels.getAllRecentChannels', () => {
         const fromModifiedState = Selectors.getAllRecentChannels(modifiedState, {id: channel1.id});
 
         assert.ok(fromOriginalState !== fromModifiedState);
-        assert.ok(fromModifiedState.includes(channel1.id));
     });
 });
 
