@@ -271,10 +271,10 @@ describe('Actions.Groups', () => {
         };
 
         nock(Client4.getBaseRoute()).
-            get('/groups?filter_allow_reference=true').
+            get('/groups?filter_allow_reference=true&page=0&per_page=0').
             reply(200, response1.groups);
 
-        await Actions.getGroups(true)(store.dispatch, store.getState);
+        await Actions.getGroups(true, 0, 0)(store.dispatch, store.getState);
 
         const state = store.getState();
 
@@ -339,10 +339,10 @@ describe('Actions.Groups', () => {
         };
 
         nock(Client4.getBaseRoute()).
-            get(`/teams/${teamID}/groups?paginate=false&filter_allow_reference=false`).
+            get(`/teams/${teamID}/groups?paginate=false&filter_allow_reference=false&include_member_count=true`).
             reply(200, response);
 
-        await Actions.getAllGroupsAssociatedToTeam(teamID)(store.dispatch, store.getState);
+        await Actions.getAllGroupsAssociatedToTeam(teamID, false, true)(store.dispatch, store.getState);
 
         const state = store.getState();
 
@@ -503,10 +503,10 @@ describe('Actions.Groups', () => {
         };
 
         nock(Client4.getBaseRoute()).
-            get(`/channels/${channelID}/groups?paginate=false&filter_allow_reference=false`).
+            get(`/channels/${channelID}/groups?paginate=false&filter_allow_reference=false&include_member_count=true`).
             reply(200, response);
 
-        await Actions.getAllGroupsAssociatedToChannel(channelID)(store.dispatch, store.getState);
+        await Actions.getAllGroupsAssociatedToChannel(channelID, false, true)(store.dispatch, store.getState);
 
         const state = store.getState();
 

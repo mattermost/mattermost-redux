@@ -18,6 +18,7 @@ import {
     ChannelUnread,
     ChannelViewResponse,
     ChannelWithTeamData,
+    ChannelSearchOpts,
 } from 'types/channels';
 import {Options, StatusOK, ClientResponse} from 'types/client4';
 import {Compliance} from 'types/compliance';
@@ -76,6 +77,7 @@ import {
     TeamStats,
     TeamsWithCount,
     TeamUnread,
+    TeamSearchOpts,
 } from 'types/teams';
 import {TermsOfService} from 'types/terms_of_service';
 import {
@@ -1116,12 +1118,12 @@ export default class Client4 {
         );
     };
 
-    searchTeams = (term: string, page?: number, perPage?: number) => {
+    searchTeams = (term: string, opts: TeamSearchOpts) => {
         this.trackEvent('api', 'api_search_teams');
 
         return this.doFetch<Team[] | TeamsWithCount>(
             `${this.getTeamsRoute()}/search`,
-            {method: 'post', body: JSON.stringify({term, page, per_page: perPage})},
+            {method: 'post', body: JSON.stringify({term, ...opts})},
         );
     };
 
@@ -1711,14 +1713,12 @@ export default class Client4 {
         );
     };
 
-    searchAllChannels = (term: string, notAssociatedToGroup = '', excludeDefaultChannels = false, page?: number, perPage?: number, includeDeleted = false) => {
+    searchAllChannels = (term: string, opts: ChannelSearchOpts = {}) => {
         const body = {
             term,
-            not_associated_to_group: notAssociatedToGroup,
-            exclude_default_channels: excludeDefaultChannels,
-            page,
-            per_page: perPage,
+            ...opts,
         };
+        const includeDeleted = Boolean(opts.include_deleted);
         return this.doFetch<Channel[] | ChannelsWithTotalCount>(
             `${this.getChannelsRoute()}/search?include_deleted=${includeDeleted}`,
             {method: 'post', body: JSON.stringify(body)},
@@ -2159,6 +2159,20 @@ export default class Client4 {
             {method: 'get'},
         );
     };
+
+    getWarnMetricsStatus = async () => {
+        return this.doFetch(
+            `${this.getBaseRoute()}/warn_metrics/status`,
+            {method: 'get'},
+        );
+    };
+
+    sendWarnMetricAck = async (warnMetricId: string, forceAckVal: boolean) => {
+        return this.doFetch(
+            `${this.getBaseRoute()}/warn_metrics/ack/${encodeURI(warnMetricId)}`,
+            {method: 'post', body: JSON.stringify({forceAck: forceAckVal})},
+        );
+    }
 
     getTranslations = (url: string) => {
         return this.doFetch<Record<string, string>>(
@@ -3069,9 +3083,9 @@ export default class Client4 {
         );
     };
 
-    getGroups = (filterAllowReference = false) => {
+    getGroups = (filterAllowReference = false, page = 0, perPage = PER_PAGE_DEFAULT) => {
         return this.doFetch<Group[]>(
-            `${this.getGroupsRoute()}${buildQueryString({filter_allow_reference: filterAllowReference})}`,
+            `${this.getGroupsRoute()}${buildQueryString({filter_allow_reference: filterAllowReference, page, per_page: perPage})}`,
             {method: 'get'},
         );
     };
@@ -3131,9 +3145,9 @@ export default class Client4 {
         );
     };
 
-    getAllGroupsAssociatedToTeam = (teamID: string, filterAllowReference = false) => {
+    getAllGroupsAssociatedToTeam = (teamID: string, filterAllowReference = false, includeMemberCount = false) => {
         return this.doFetch<GroupsWithCount>(
-            `${this.getBaseRoute()}/teams/${teamID}/groups${buildQueryString({paginate: false, filter_allow_reference: filterAllowReference})}`,
+            `${this.getBaseRoute()}/teams/${teamID}/groups${buildQueryString({paginate: false, filter_allow_reference: filterAllowReference, include_member_count: includeMemberCount})}`,
             {method: 'get'},
         );
     };
@@ -3147,9 +3161,9 @@ export default class Client4 {
         );
     };
 
-    getAllGroupsAssociatedToChannel = (channelID: string, filterAllowReference = false) => {
+    getAllGroupsAssociatedToChannel = (channelID: string, filterAllowReference = false, includeMemberCount = false) => {
         return this.doFetch<GroupsWithCount>(
-            `${this.getBaseRoute()}/channels/${channelID}/groups${buildQueryString({paginate: false, filter_allow_reference: filterAllowReference})}`,
+            `${this.getBaseRoute()}/channels/${channelID}/groups${buildQueryString({paginate: false, filter_allow_reference: filterAllowReference, include_member_count: includeMemberCount})}`,
             {method: 'get'},
         );
     };

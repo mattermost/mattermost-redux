@@ -132,6 +132,23 @@ describe('Actions.General', () => {
         assert.equal(timezones.length === 0, false);
     });
 
+    it('getWarnMetricsStatus', async () => {
+        const responseData = {
+            metric1: true,
+            metric2: false,
+        };
+
+        nock(Client4.getBaseRoute()).
+            get('/warn_metrics/status').
+            query(true).
+            reply(200, responseData);
+
+        await Actions.getWarnMetricsStatus()(store.dispatch, store.getState);
+        const {warnMetricsStatus} = store.getState().entities.general;
+        assert.deepEqual(warnMetricsStatus.metric1, true);
+        assert.deepEqual(warnMetricsStatus.metric2, false);
+    });
+
     describe('getRedirectLocation', () => {
         it('old server', async () => {
             store.dispatch({type: GeneralTypes.RECEIVED_SERVER_VERSION, data: '5.0.0'});

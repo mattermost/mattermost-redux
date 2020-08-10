@@ -33,6 +33,7 @@ function teams(state: IDMappedObjects<Team> = {}, action: GenericAction) {
     case TeamTypes.CREATED_TEAM:
     case TeamTypes.UPDATED_TEAM:
     case TeamTypes.PATCHED_TEAM:
+    case TeamTypes.REGENERATED_TEAM_INVITE_ID:
     case TeamTypes.RECEIVED_TEAM:
         return {
             ...state,

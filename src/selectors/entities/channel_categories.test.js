@@ -1009,7 +1009,7 @@ describe('makeGetChannelsForCategory', () => {
         expect(getChannelsForCategory(baseState, favoritesCategory)).toMatchObject([dmChannel2, channel1]);
     });
 
-    test('should return sorted and filtered channels for channels category', () => {
+    test('should return sorted and filtered channels for channels category with manual sorting', () => {
         const getChannelsForCategory = Selectors.makeGetChannelsForCategory();
 
         const publicCategory = {
@@ -1017,7 +1017,7 @@ describe('makeGetChannelsForCategory', () => {
             team_id: 'team1',
             display_name: 'Public Channels',
             type: CategoryTypes.PUBLIC,
-            sorting: CategorySorting.Default,
+            sorting: CategorySorting.Manual,
             channel_ids: [channel3.id, channel2.id],
         };
 
@@ -1037,6 +1037,31 @@ describe('makeGetChannelsForCategory', () => {
         };
 
         expect(getChannelsForCategory(baseState, publicCategory)).toMatchObject([channel2, channel3]);
+    });
+
+    test('should return sorted and filtered channels for channels category with alphabetical sorting and a muted channel', () => {
+        const getChannelsForCategory = Selectors.makeGetChannelsForCategory();
+
+        const state = mergeObjects(baseState, {
+            entities: {
+                channels: {
+                    myMembers: {
+                        [channel2.id]: {notify_props: {mark_unread: General.MENTION}},
+                    },
+                },
+            },
+        });
+
+        const publicCategory = {
+            id: 'publicCategory',
+            team_id: 'team1',
+            display_name: 'Public Channels',
+            type: CategoryTypes.PUBLIC,
+            sorting: CategorySorting.Alphabetical,
+            channel_ids: [channel2.id, channel3.id],
+        };
+
+        expect(getChannelsForCategory(state, publicCategory)).toMatchObject([channel3, channel2]);
     });
 
     test('should return sorted and filtered channels for direct messages category with alphabetical sorting', () => {

@@ -151,15 +151,17 @@ export function getGroup(id: string): ActionFunc {
     });
 }
 
-export function getGroups(filterAllowReference: false): ActionFunc {
+export function getGroups(filterAllowReference: false, page = 0, perPage: number = General.PAGE_SIZE_DEFAULT): ActionFunc {
     return bindClientFunc({
-        clientFunc: async (param1) => {
-            const result = await Client4.getGroups(param1);
+        clientFunc: async (param1, param2, param3) => {
+            const result = await Client4.getGroups(param1, param2, param3);
             return result;
         },
         onSuccess: [GroupTypes.RECEIVED_GROUPS],
         params: [
             filterAllowReference,
+            page,
+            perPage,
         ],
     });
 }
@@ -191,10 +193,10 @@ export function getGroupsNotAssociatedToChannel(channelID: string, q = '', page 
     });
 }
 
-export function getAllGroupsAssociatedToTeam(teamID: string, filterAllowReference: false): ActionFunc {
+export function getAllGroupsAssociatedToTeam(teamID: string, filterAllowReference: false, includeMemberCount: false): ActionFunc {
     return bindClientFunc({
-        clientFunc: async (param1, param2) => {
-            const result = await Client4.getAllGroupsAssociatedToTeam(param1, param2);
+        clientFunc: async (param1, param2, param3) => {
+            const result = await Client4.getAllGroupsAssociatedToTeam(param1, param2, param3);
             result.teamID = param1;
             return result;
         },
@@ -202,6 +204,7 @@ export function getAllGroupsAssociatedToTeam(teamID: string, filterAllowReferenc
         params: [
             teamID,
             filterAllowReference,
+            includeMemberCount,
         ],
     });
 }
@@ -220,10 +223,10 @@ export function getAllGroupsAssociatedToChannelsInTeam(teamID: string, filterAll
     });
 }
 
-export function getAllGroupsAssociatedToChannel(channelID: string, filterAllowReference: false): ActionFunc {
+export function getAllGroupsAssociatedToChannel(channelID: string, filterAllowReference: false, includeMemberCount: false): ActionFunc {
     return bindClientFunc({
-        clientFunc: async (param1, param2) => {
-            const result = await Client4.getAllGroupsAssociatedToChannel(param1, param2);
+        clientFunc: async (param1, param2, param3) => {
+            const result = await Client4.getAllGroupsAssociatedToChannel(param1, param2, param3);
             result.channelID = param1;
             return result;
         },
@@ -231,6 +234,7 @@ export function getAllGroupsAssociatedToChannel(channelID: string, filterAllowRe
         params: [
             channelID,
             filterAllowReference,
+            includeMemberCount,
         ],
     });
 }

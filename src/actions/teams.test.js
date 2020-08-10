@@ -260,6 +260,26 @@ describe('Actions.Teams', () => {
         assert.strictEqual(patched.description, description);
     });
 
+    it('regenerateTeamInviteId', async () => {
+        const patchedInviteId = TestHelper.generateId();
+        const team = TestHelper.basicTeam;
+        const patchedTeam = {
+            ...team,
+            invite_id: patchedInviteId,
+        };
+        nock(Client4.getBaseRoute()).
+            post(`/teams/${team.id}/regenerate_invite_id`).
+            reply(200, patchedTeam);
+        await Actions.regenerateTeamInviteId(team.id)(store.dispatch, store.getState);
+        const {teams} = store.getState().entities.teams;
+
+        const patched = teams[TestHelper.basicTeam.id];
+
+        assert.ok(patched);
+        assert.notStrictEqual(patched.invite_id, team.invite_id);
+        assert.strictEqual(patched.invite_id, patchedInviteId);
+    });
+
     it('Join Open Team', async () => {
         const client = TestHelper.createClient4();
 
@@ -747,7 +767,7 @@ describe('Actions.Teams', () => {
             post('/teams/search').
             reply(200, [TestHelper.basicTeam, userTeam]);
 
-        await store.dispatch(Actions.searchTeams('test', 0));
+        await store.dispatch(Actions.searchTeams('test', {page: 0}));
 
         const moreRequest = store.getState().requests.teams.getTeams;
         if (moreRequest.status === RequestStatus.FAILURE) {
@@ -758,7 +778,7 @@ describe('Actions.Teams', () => {
             post('/teams/search').
             reply(200, {teams: [TestHelper.basicTeam, userTeam], total_count: 2});
 
-        const response = await store.dispatch(Actions.searchTeams('test', '', false, true));
+        const response = await store.dispatch(Actions.searchTeams('test', {page: '', per_page: true}));
 
         const paginatedRequest = store.getState().requests.teams.getTeams;
         if (paginatedRequest.status === RequestStatus.FAILURE) {
