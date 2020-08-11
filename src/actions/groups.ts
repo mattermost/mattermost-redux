@@ -151,15 +151,17 @@ export function getGroup(id: string): ActionFunc {
     });
 }
 
-export function getGroups(filterAllowReference: false): ActionFunc {
+export function getGroups(filterAllowReference: false, page = 0, perPage: number = General.PAGE_SIZE_DEFAULT): ActionFunc {
     return bindClientFunc({
-        clientFunc: async (param1) => {
-            const result = await Client4.getGroups(param1);
+        clientFunc: async (param1, param2, param3) => {
+            const result = await Client4.getGroups(param1, param2, param3);
             return result;
         },
         onSuccess: [GroupTypes.RECEIVED_GROUPS],
         params: [
             filterAllowReference,
+            page,
+            perPage,
         ],
     });
 }

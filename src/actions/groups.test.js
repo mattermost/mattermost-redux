@@ -271,10 +271,10 @@ describe('Actions.Groups', () => {
         };
 
         nock(Client4.getBaseRoute()).
-            get('/groups?filter_allow_reference=true').
+            get('/groups?filter_allow_reference=true&page=0&per_page=0').
             reply(200, response1.groups);
 
-        await Actions.getGroups(true)(store.dispatch, store.getState);
+        await Actions.getGroups(true, 0, 0)(store.dispatch, store.getState);
 
         const state = store.getState();
 
