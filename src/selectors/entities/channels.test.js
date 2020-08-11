@@ -2642,6 +2642,105 @@ describe('Selectors.Channels.getUnreadChannelIds', () => {
     });
 });
 
+describe('Selectors.channels.getAllRecentChannels', () => {
+    const team1 = TestHelper.fakeTeamWithId();
+    const team2 = TestHelper.fakeTeamWithId();
+
+    const channel1 = TestHelper.fakeChannelWithId(team1.id);
+    const channel2 = TestHelper.fakeChannelWithId(team1.id);
+
+    const channels = {
+        [channel1.id]: channel1,
+        [channel2.id]: channel2,
+    };
+
+    const channelsInTeam = {
+        [team1.id]: [channel1.id, channel2.id],
+        [team2.id]: [channel1.id, channel2.id],
+    };
+
+    const myChannelMembers = {
+        [channel1.id]: {},
+        [channel2.id]: {},
+    };
+
+    const testState = deepFreezeAndThrowOnMutation({
+        entities: {
+            teams: {
+                currentTeamId: team1.id,
+            },
+            users: {
+                currentUserId: TestHelper.generateId(),
+                profiles: {},
+            },
+            channels: {
+                channels,
+                channelsInTeam,
+                myMembers: myChannelMembers,
+            },
+            posts: {
+                posts: {},
+                postsInChannel: {},
+            },
+            general: {
+                config: {},
+            },
+            preferences: {
+                myPreferences: {},
+            },
+        },
+    });
+    it('get all recent channels in current team strict equal', () => {
+        const newChannel = TestHelper.fakeChannelWithId(team2.id);
+
+        const modifiedState = {
+            ...testState,
+            entities: {
+                ...testState.entities,
+                channels: {
+                    ...testState.entities.channels,
+                    channelsInTeam: {
+                        ...testState.entities.channels.channelsInTeam,
+                        [team2.id]: [
+                            ...testState.entities.channels.channelsInTeam[team2.id],
+                            newChannel.id,
+                        ],
+                    },
+                },
+            },
+        };
+
+        const fromOriginalState = Selectors.getAllChannels(testState);
+        const fromModifiedState = Selectors.getAllChannels(modifiedState);
+
+        assert.ok(fromOriginalState === fromModifiedState);
+    });
+
+    it('get all recent channels in current team and keep specified channel as unread', () => {
+        const chan2 = {...testState.entities.channels.channels[channel2.id]};
+        chan2.total_msg_count = 10;
+
+        const modifiedState = {
+            ...testState,
+            entities: {
+                ...testState.entities,
+                channels: {
+                    ...testState.entities.channels,
+                    channels: {
+                        ...testState.entities.channels.channels,
+                        [channel2.id]: chan2,
+                    },
+                },
+            },
+        };
+
+        const fromOriginalState = Selectors.getAllRecentChannels(testState);
+        const fromModifiedState = Selectors.getAllRecentChannels(modifiedState, {id: channel1.id});
+
+        assert.ok(fromOriginalState !== fromModifiedState);
+    });
+});
+
 describe('Selectors.Channels.getDirectChannelIds', () => {
     const team1 = TestHelper.fakeTeamWithId();
 
