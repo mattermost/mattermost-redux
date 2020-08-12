@@ -35,6 +35,7 @@
         "noUnusedParameters": false,
         "noImplicitReturns": true,
         "noFallthroughCasesInSwitch": true,
+        "skipLibCheck": true,
         "moduleResolution": "node",
         "baseUrl": "./",
         "paths": {
