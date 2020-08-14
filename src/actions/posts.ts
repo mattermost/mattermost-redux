@@ -2,33 +2,28 @@
 // See LICENSE.txt for license information.
 
 import {Client4, DEFAULT_LIMIT_AFTER, DEFAULT_LIMIT_BEFORE} from 'client';
-import {General, Preferences, Posts, WebsocketEvents} from '../constants';
+import {General, Preferences, Posts} from '../constants';
 import {PostTypes, ChannelTypes, FileTypes, IntegrationTypes} from 'action_types';
 
-import {getCurrentChannelId, getMyChannelMember as getMyChannelMemberSelector, isManuallyUnread} from 'selectors/entities/channels';
+import {getMyChannelMember as getMyChannelMemberSelector} from 'selectors/entities/channels';
 import {getCustomEmojisByName as selectCustomEmojisByName} from 'selectors/entities/emojis';
 import {getConfig} from 'selectors/entities/general';
 import * as Selectors from 'selectors/entities/posts';
 import {getCurrentUserId, getUsersByUsername} from 'selectors/entities/users';
 
-import {getUserIdFromChannelName} from 'utils/channel_utils';
 import {parseNeededCustomEmojisFromText} from 'utils/emoji_utils';
-import {isFromWebhook, isSystemMessage, shouldIgnorePost} from 'utils/post_utils';
 import {isCombinedUserActivityPost} from 'utils/post_list';
 
-import {getMyChannelMember, markChannelAsUnread, markChannelAsRead, markChannelAsViewed} from './channels';
 import {systemEmojis, getCustomEmojiByName, getCustomEmojisByName} from './emojis';
 import {logError} from './errors';
 import {bindClientFunc, forceLogoutIfNecessary} from './helpers';
 
 import {
     deletePreferences,
-    makeDirectChannelVisibleIfNecessary,
-    makeGroupMessageVisibleIfNecessary,
     savePreferences,
 } from './preferences';
 import {getProfilesByIds, getProfilesByUsernames, getStatusesByIds} from './users';
-import {Action, ActionResult, batchActions, DispatchFunc, GetStateFunc, GenericAction} from 'types/actions';
+import {Action, ActionResult, batchActions, DispatchFunc, GetStateFunc} from 'types/actions';
 import {ChannelUnread} from 'types/channels';
 import {GlobalState} from 'types/store';
 import {Post, PostList} from 'types/posts';
