@@ -8,21 +8,6 @@ import {getCurrentUserId, getUsers} from 'selectors/entities/users';
 import {ActionFunc, DispatchFunc, GetStateFunc, batchActions} from 'types/actions';
 
 import {getKnownUsers} from './users';
-import {Dictionary} from 'types/utilities';
-
-export type WebsocketBroadcast = {
-    omit_users: Dictionary<boolean>;
-    user_id: string;
-    channel_id: string;
-    team_id: string;
-}
-
-export type WebSocketMessage = {
-    event: string;
-    data: any;
-    broadcast: WebsocketBroadcast;
-    seq: number;
-}
 
 export function removeNotVisibleUsers(): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
