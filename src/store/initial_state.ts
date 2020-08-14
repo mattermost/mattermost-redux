@@ -14,6 +14,7 @@ const state: GlobalState = {
             license: {},
             serverVersion: '',
             timezones: [],
+            warnMetricsStatus: {},
         },
         users: {
             currentUserId: '',
@@ -87,6 +88,7 @@ const state: GlobalState = {
             ldapGroupsCount: 0,
             userAccessTokens: {},
             clusterInfo: [],
+            analytics: {},
         },
         jobs: {
             jobs: {},

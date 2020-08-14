@@ -42,6 +42,7 @@ export type ClientConfig = {
     EmailLoginButtonColor: string;
     EmailLoginButtonTextColor: string;
     EmailNotificationContentsType: string;
+    EnableAskCommunityLink: string;
     EnableBanner: string;
     EnableBotAccountCreation: string;
     EnableChannelViewedMessages: string;
@@ -704,6 +705,7 @@ export type DataRetentionSettings = {
 
 export type MessageExportSettings = {
     EnableExport: boolean;
+    DownloadExportResults: boolean;
     ExportFormat: string;
     DailyRunTime: string;
     ExportFromTimestamp: number;
@@ -803,3 +805,10 @@ export type EnvironmentConfigSettings<T> = {
 export type EnvironmentConfig = {
     [P in keyof AdminConfig]: EnvironmentConfigSettings<AdminConfig[P]>;
 }
+
+export type WarnMetricStatus = {
+    id: string;
+    limit: number;
+    acked: boolean;
+    store_status: string;
+};

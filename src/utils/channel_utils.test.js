@@ -13,6 +13,7 @@ import {
     filterChannelsMatchingTerm,
     sortChannelsByRecency,
     sortChannelsByDisplayName,
+    sortChannelsByTypeListAndDisplayName,
 } from 'utils/channel_utils';
 
 describe('ChannelUtils', () => {
@@ -259,5 +260,63 @@ describe('ChannelUtils', () => {
         Reflect.deleteProperty(channelB, 'display_name');
         assert.equal(sortChannelsByDisplayName('en', channelA, channelB), -1);
         assert.equal(sortChannelsByDisplayName('en', channelB, channelA), 1);
+    });
+
+    it('sortChannelsByTypeListAndDisplayName', () => {
+        const channelOpen1 = {
+            name: 'channelA',
+            team_id: 'teamId',
+            display_name: 'Unit Test channelA',
+            type: General.OPEN_CHANNEL,
+            delete_at: 0,
+            total_msg_count: 0,
+        };
+
+        const channelOpen2 = {
+            name: 'channelB',
+            team_id: 'teamId',
+            display_name: 'Unit Test channelB',
+            type: General.OPEN_CHANNEL,
+            delete_at: 0,
+            total_msg_count: 0,
+        };
+
+        const channelPrivate = {
+            name: 'channelC',
+            team_id: 'teamId',
+            display_name: 'Unit Test channelC',
+            type: General.PRIVATE_CHANNEL,
+            delete_at: 0,
+            total_msg_count: 0,
+        };
+
+        const channelDM = {
+            name: 'channelD',
+            team_id: 'teamId',
+            display_name: 'Unit Test channelD',
+            type: General.DM_CHANNEL,
+            delete_at: 0,
+            total_msg_count: 0,
+        };
+
+        const channelGM = {
+            name: 'channelE',
+            team_id: 'teamId',
+            display_name: 'Unit Test channelE',
+            type: General.GM_CHANNEL,
+            delete_at: 0,
+            total_msg_count: 0,
+        };
+
+        let sortfn = sortChannelsByTypeListAndDisplayName.bind(null, 'en', [General.OPEN_CHANNEL, General.PRIVATE_CHANNEL, General.DM_CHANNEL, General.GM_CHANNEL]);
+        let actual = [channelOpen1, channelPrivate, channelDM, channelGM, channelOpen2].sort(sortfn);
+        let expected = [channelOpen1, channelOpen2, channelPrivate, channelDM, channelGM];
+        expect(actual).toEqual(expected);
+
+        // Skipped Open Channel type should sort last but open channels should still sort in alphabetical order
+        sortfn = sortChannelsByTypeListAndDisplayName.bind(null, 'en', [General.DM_CHANNEL, General.GM_CHANNEL, General.PRIVATE_CHANNEL]);
+        actual = JSON.stringify([channelOpen1, channelPrivate, channelDM, channelGM, channelOpen2].sort(sortfn));
+        expected = JSON.stringify([channelDM, channelGM, channelPrivate, channelOpen1, channelOpen2]);
+        assert.equal(actual, expected);
     });
 });

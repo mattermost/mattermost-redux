@@ -18,6 +18,7 @@ import {
     ChannelUnread,
     ChannelViewResponse,
     ChannelWithTeamData,
+    ChannelSearchOpts,
 } from 'types/channels';
 import {Options, StatusOK, ClientResponse} from 'types/client4';
 import {Compliance} from 'types/compliance';
@@ -76,6 +77,7 @@ import {
     TeamStats,
     TeamsWithCount,
     TeamUnread,
+    TeamSearchOpts,
 } from 'types/teams';
 import {TermsOfService} from 'types/terms_of_service';
 import {
@@ -84,6 +86,7 @@ import {
     UserProfile,
     UsersStats,
     UserStatus,
+    GetFilteredUsersStatsOpts,
 } from 'types/users';
 import {$ID, RelationOneToOne} from 'types/utilities';
 
@@ -122,6 +125,7 @@ export default class Client4 {
     userId = '';
     diagnosticId = '';
     includeCookies = true;
+    isRudderKeySet = false;
     translations = {
         connectionError: 'There appears to be a problem with your internet connection.',
         unknownError: 'We received an unexpected status code from the server.',
@@ -181,6 +185,10 @@ export default class Client4 {
 
     setDiagnosticId(diagnosticId: string) {
         this.diagnosticId = diagnosticId;
+    }
+
+    enableRudderEvents() {
+        this.isRudderKeySet = true;
     }
 
     getServerVersion() {
@@ -425,7 +433,7 @@ export default class Client4 {
 
     // User Routes
 
-    createUser = (user: UserProfile, token: string, inviteId: string) => {
+    createUser = (user: UserProfile, token: string, inviteId: string, redirect: string) => {
         this.trackEvent('api', 'api_users_create');
 
         const queryParams: any = {};
@@ -436,6 +444,10 @@ export default class Client4 {
 
         if (inviteId) {
             queryParams.iid = inviteId;
+        }
+
+        if (redirect) {
+            queryParams.r = redirect;
         }
 
         return this.doFetch<UserProfile>(
@@ -1106,12 +1118,12 @@ export default class Client4 {
         );
     };
 
-    searchTeams = (term: string, page?: number, perPage?: number) => {
+    searchTeams = (term: string, opts: TeamSearchOpts) => {
         this.trackEvent('api', 'api_search_teams');
 
         return this.doFetch<Team[] | TeamsWithCount>(
             `${this.getTeamsRoute()}/search`,
-            {method: 'post', body: JSON.stringify({term, page, per_page: perPage})},
+            {method: 'post', body: JSON.stringify({term, ...opts})},
         );
     };
 
@@ -1256,6 +1268,13 @@ export default class Client4 {
     getTotalUsersStats = () => {
         return this.doFetch<UsersStats>(
             `${this.getUsersRoute()}/stats`,
+            {method: 'get'},
+        );
+    };
+
+    getFilteredUsersStats = (options: GetFilteredUsersStatsOpts) => {
+        return this.doFetch<UsersStats>(
+            `${this.getUsersRoute()}/stats/filtered${buildQueryString(options)}`,
             {method: 'get'},
         );
     };
@@ -1694,14 +1713,12 @@ export default class Client4 {
         );
     };
 
-    searchAllChannels = (term: string, notAssociatedToGroup = '', excludeDefaultChannels = false, page?: number, perPage?: number, includeDeleted = false) => {
+    searchAllChannels = (term: string, opts: ChannelSearchOpts = {}) => {
         const body = {
             term,
-            not_associated_to_group: notAssociatedToGroup,
-            exclude_default_channels: excludeDefaultChannels,
-            page,
-            per_page: perPage,
+            ...opts,
         };
+        const includeDeleted = Boolean(opts.include_deleted);
         return this.doFetch<Channel[] | ChannelsWithTotalCount>(
             `${this.getChannelsRoute()}/search?include_deleted=${includeDeleted}`,
             {method: 'post', body: JSON.stringify(body)},
@@ -2118,6 +2135,20 @@ export default class Client4 {
             {method: 'get'},
         );
     };
+
+    getWarnMetricsStatus = async () => {
+        return this.doFetch(
+            `${this.getBaseRoute()}/warn_metrics/status`,
+            {method: 'get'},
+        );
+    };
+
+    sendWarnMetricAck = async (warnMetricId: string, forceAckVal: boolean) => {
+        return this.doFetch(
+            `${this.getBaseRoute()}/warn_metrics/ack/${encodeURI(warnMetricId)}`,
+            {method: 'post', body: JSON.stringify({forceAck: forceAckVal})},
+        );
+    }
 
     getTranslations = (url: string) => {
         return this.doFetch<Record<string, string>>(
@@ -3028,9 +3059,9 @@ export default class Client4 {
         );
     };
 
-    getGroups = (filterAllowReference = false) => {
+    getGroups = (filterAllowReference = false, page = 0, perPage = PER_PAGE_DEFAULT) => {
         return this.doFetch<Group[]>(
-            `${this.getGroupsRoute()}${buildQueryString({filter_allow_reference: filterAllowReference})}`,
+            `${this.getGroupsRoute()}${buildQueryString({filter_allow_reference: filterAllowReference, page, per_page: perPage})}`,
             {method: 'get'},
         );
     };
@@ -3104,9 +3135,9 @@ export default class Client4 {
         );
     };
 
-    getAllGroupsAssociatedToTeam = (teamID: string, filterAllowReference = false) => {
+    getAllGroupsAssociatedToTeam = (teamID: string, filterAllowReference = false, includeMemberCount = false) => {
         return this.doFetch<GroupsWithCount>(
-            `${this.getBaseRoute()}/teams/${teamID}/groups${buildQueryString({paginate: false, filter_allow_reference: filterAllowReference})}`,
+            `${this.getBaseRoute()}/teams/${teamID}/groups${buildQueryString({paginate: false, filter_allow_reference: filterAllowReference, include_member_count: includeMemberCount})}`,
             {method: 'get'},
         );
     };
@@ -3120,9 +3151,9 @@ export default class Client4 {
         );
     };
 
-    getAllGroupsAssociatedToChannel = (channelID: string, filterAllowReference = false) => {
+    getAllGroupsAssociatedToChannel = (channelID: string, filterAllowReference = false, includeMemberCount = false) => {
         return this.doFetch<GroupsWithCount>(
-            `${this.getBaseRoute()}/channels/${channelID}/groups${buildQueryString({paginate: false, filter_allow_reference: filterAllowReference})}`,
+            `${this.getBaseRoute()}/channels/${channelID}/groups${buildQueryString({paginate: false, filter_allow_reference: filterAllowReference, include_member_count: includeMemberCount})}`,
             {method: 'get'},
         );
     };
@@ -3183,14 +3214,14 @@ export default class Client4 {
     }
 
     getBotsIncludeDeleted = (page = 0, perPage = PER_PAGE_DEFAULT) => {
-        return this.doFetch<Bot>(
+        return this.doFetch<Bot[]>(
             `${this.getBotsRoute()}${buildQueryString({include_deleted: true, page, per_page: perPage})}`,
             {method: 'get'},
         );
     }
 
     getBotsOrphaned = (page = 0, perPage = PER_PAGE_DEFAULT) => {
-        return this.doFetch<Bot>(
+        return this.doFetch<Bot[]>(
             `${this.getBotsRoute()}${buildQueryString({only_orphaned: true, page, per_page: perPage})}`,
             {method: 'get'},
         );
@@ -3318,6 +3349,10 @@ export default class Client4 {
     };
 
     trackEvent(category: string, event: string, props?: any) {
+        if (!this.isRudderKeySet) {
+            return;
+        }
+
         const properties = Object.assign({
             category,
             type: event,
