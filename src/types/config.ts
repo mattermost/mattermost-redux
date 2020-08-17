@@ -99,6 +99,7 @@ export type ClientConfig = {
     ExperimentalChannelSidebarOrganization: string;
     ExperimentalClientSideCertCheck: string;
     ExperimentalClientSideCertEnable: string;
+    ExperimentalCloudUserLimit: string;
     ExperimentalDataPrefetch: string;
     ExperimentalEnableAuthenticationTransfer: string;
     ExperimentalEnableAutomaticReplies: string;
@@ -654,6 +655,7 @@ export type ExperimentalSettings = {
     ClientSideCertEnable: boolean;
     ClientSideCertCheck: string;
     EnableClickToReply: boolean;
+    CloudUserLimit: string;
     LinkMetadataTimeoutMilliseconds: number;
     RestrictSystemAdmin: boolean;
     UseNewSAMLLibrary: boolean;
