@@ -19,7 +19,6 @@ export const getExternalBotAccounts: (state: GlobalState) => Dictionary<Bot> = c
     (botAccounts, userProfiles) => {
         const nextState: Dictionary<Bot> = {};
         Object.values(botAccounts).forEach((botAccount) => {
-            //console.log('CITOMAI::botAccount ' + botAccount.display_name);
             const botUser = userProfiles[botAccount.user_id];
             if (botUser && !ExternalBotAccountNames.includes(botUser.username)) {
                 nextState[botAccount.user_id] = botAccount;
