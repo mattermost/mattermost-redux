@@ -210,6 +210,7 @@ export type LicenseFeatures = {
     guest_accounts_permissions?: boolean;
     id_loaded?: boolean;
     lock_teammate_name_display?: boolean;
+    cloud?: boolean;
     future_features?: boolean;
 };
 
