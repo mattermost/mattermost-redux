@@ -765,6 +765,52 @@ export const getSortedUnreadChannelIds: (state: GlobalState, lastUnreadChannel: 
     (unreadChannelIds, mappedAndSortedUnreadChannelIds) => mappedAndSortedUnreadChannelIds,
 );
 
+//recent channels
+
+export const getAllRecentChannels: (state: GlobalState) => Array<Channel> = createSelector(
+    getUsers,
+    getCurrentUser,
+    getAllChannels,
+    getUserIdsInChannels,
+    getLastPostPerChannel,
+    getMyChannelMemberships,
+    getChannelIdsForCurrentTeam,
+    getTeammateNameDisplaySetting,
+    (profiles, currentUser: UserProfile, channels: IDMappedObjects<Channel>, userIdsInChannels: any,
+        lastPosts: RelationOneToOne<Channel, Post>,
+        members: RelationOneToOne<Channel, ChannelMembership>,
+        teamChannelIds: Array<string>,
+        settings,
+    ): Array<Channel> => {
+        const sorting = 'recent';
+        const recentIds = teamChannelIds.filter((id) => {
+            const c = channels[id];
+            const m = members[id];
+
+            return Boolean(c && m);
+        });
+
+        if (!currentUser) {
+            return [];
+        }
+
+        const Channels = recentIds.filter((id) => channels[id] && channels[id].delete_at === 0).map((id) => {
+            const c = channels[id];
+
+            if (c.type === General.DM_CHANNEL || c.type === General.GM_CHANNEL) {
+                return completeDirectChannelDisplayName(currentUser.id, profiles, userIdsInChannels[id], settings!, c);
+            }
+
+            return c;
+        });
+
+        const locale = currentUser.locale || General.DEFAULT_LOCALE;
+        const recentChannels = Channels.
+            sort(sortChannelsByRecencyOrAlpha.bind(null, locale, lastPosts, sorting));
+        return recentChannels;
+    },
+);
+
 // Favorites
 
 export const getFavoriteChannels: (state: GlobalState) => Array<Channel> = createIdsSelector(

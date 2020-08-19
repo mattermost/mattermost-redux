@@ -3200,14 +3200,14 @@ export default class Client4 {
     }
 
     getBotsIncludeDeleted = (page = 0, perPage = PER_PAGE_DEFAULT) => {
-        return this.doFetch<Bot>(
+        return this.doFetch<Bot[]>(
             `${this.getBotsRoute()}${buildQueryString({include_deleted: true, page, per_page: perPage})}`,
             {method: 'get'},
         );
     }
 
     getBotsOrphaned = (page = 0, perPage = PER_PAGE_DEFAULT) => {
-        return this.doFetch<Bot>(
+        return this.doFetch<Bot[]>(
             `${this.getBotsRoute()}${buildQueryString({only_orphaned: true, page, per_page: perPage})}`,
             {method: 'get'},
         );
