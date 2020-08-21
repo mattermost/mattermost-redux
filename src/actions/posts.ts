@@ -2,33 +2,28 @@
 // See LICENSE.txt for license information.
 
 import {Client4, DEFAULT_LIMIT_AFTER, DEFAULT_LIMIT_BEFORE} from 'client';
-import {General, Preferences, Posts, WebsocketEvents} from '../constants';
+import {General, Preferences, Posts} from '../constants';
 import {PostTypes, ChannelTypes, FileTypes, IntegrationTypes} from 'action_types';
 
-import {getCurrentChannelId, getMyChannelMember as getMyChannelMemberSelector, isManuallyUnread} from 'selectors/entities/channels';
+import {getMyChannelMember as getMyChannelMemberSelector} from 'selectors/entities/channels';
 import {getCustomEmojisByName as selectCustomEmojisByName} from 'selectors/entities/emojis';
 import {getConfig} from 'selectors/entities/general';
 import * as Selectors from 'selectors/entities/posts';
 import {getCurrentUserId, getUsersByUsername} from 'selectors/entities/users';
 
-import {getUserIdFromChannelName} from 'utils/channel_utils';
 import {parseNeededCustomEmojisFromText} from 'utils/emoji_utils';
-import {isFromWebhook, isSystemMessage, shouldIgnorePost} from 'utils/post_utils';
 import {isCombinedUserActivityPost} from 'utils/post_list';
 
-import {getMyChannelMember, markChannelAsUnread, markChannelAsRead, markChannelAsViewed} from './channels';
 import {systemEmojis, getCustomEmojiByName, getCustomEmojisByName} from './emojis';
 import {logError} from './errors';
 import {bindClientFunc, forceLogoutIfNecessary} from './helpers';
 
 import {
     deletePreferences,
-    makeDirectChannelVisibleIfNecessary,
-    makeGroupMessageVisibleIfNecessary,
     savePreferences,
 } from './preferences';
 import {getProfilesByIds, getProfilesByUsernames, getStatusesByIds} from './users';
-import {Action, ActionResult, batchActions, DispatchFunc, GetStateFunc, GenericAction} from 'types/actions';
+import {Action, ActionResult, batchActions, DispatchFunc, GetStateFunc} from 'types/actions';
 import {ChannelUnread} from 'types/channels';
 import {GlobalState} from 'types/store';
 import {Post, PostList} from 'types/posts';
@@ -412,7 +407,7 @@ export function editPost(post: Post) {
     });
 }
 
-export function getUnreadPostData(unreadChan: ChannelUnread, state: GlobalState) {
+function getUnreadPostData(unreadChan: ChannelUnread, state: GlobalState) {
     const member = getMyChannelMemberSelector(state, unreadChan.channel_id);
     const delta = member ? member.msg_count - unreadChan.msg_count : unreadChan.msg_count;
 
@@ -1221,89 +1216,5 @@ export function moveHistoryIndexForward(index: number) {
         });
 
         return {data: true};
-    };
-}
-
-export function handleNewPost(msg: Omit<GenericAction, 'type'>) {
-    return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
-        const state = getState();
-        const currentUserId = getCurrentUserId(state);
-        const post = JSON.parse(msg.data.post);
-        const myChannelMember = getMyChannelMemberSelector(state, post.channel_id);
-        const websocketMessageProps = msg.data;
-
-        if (myChannelMember && Object.keys(myChannelMember).length === 0 && (myChannelMember as any).constructor === 'Object') {
-            await dispatch(getMyChannelMember(post.channel_id));
-        }
-
-        dispatch(completePostReceive(post, websocketMessageProps) as any);
-
-        if (msg.data.channel_type === General.DM_CHANNEL) {
-            const otherUserId = getUserIdFromChannelName(currentUserId, msg.data.channel_name);
-            dispatch(makeDirectChannelVisibleIfNecessary(otherUserId));
-        } else if (msg.data.channel_type === General.GM_CHANNEL) {
-            dispatch(makeGroupMessageVisibleIfNecessary(post.channel_id));
-        }
-
-        return {data: true};
-    };
-}
-
-function completePostReceive(post: Post, websocketMessageProps: any) {
-    return (dispatch: DispatchFunc, getState: GetStateFunc) => {
-        const state = getState();
-        const rootPost = Selectors.getPost(state, post.root_id);
-
-        if (post.root_id && !rootPost) {
-            dispatch(getPostThread(post.root_id, true));
-        }
-
-        dispatch(lastPostActions(post, websocketMessageProps) as any);
-    };
-}
-
-export function lastPostActions(post: Post, websocketMessageProps: any) {
-    return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
-        const state = getState();
-        const actions = [
-            receivedNewPost(post),
-            {
-                type: WebsocketEvents.STOP_TYPING,
-                data: {
-                    id: post.channel_id + post.root_id,
-                    userId: post.user_id,
-                    now: Date.now(),
-                },
-            },
-        ];
-
-        await dispatch(batchActions(actions));
-
-        if (shouldIgnorePost(post)) {
-            return;
-        }
-
-        let markAsRead = false;
-        let markAsReadOnServer = false;
-        if (!isManuallyUnread(getState(), post.channel_id)) {
-            if (
-                post.user_id === getCurrentUserId(state) &&
-                !isSystemMessage(post) &&
-                !isFromWebhook(post)
-            ) {
-                markAsRead = true;
-                markAsReadOnServer = false;
-            } else if (post.channel_id === getCurrentChannelId(state)) {
-                markAsRead = true;
-                markAsReadOnServer = true;
-            }
-        }
-
-        if (markAsRead) {
-            await dispatch(markChannelAsRead(post.channel_id, undefined, markAsReadOnServer));
-            await dispatch(markChannelAsViewed(post.channel_id));
-        } else {
-            await dispatch(markChannelAsUnread(websocketMessageProps.team_id, post.channel_id, websocketMessageProps.mentions));
-        }
     };
 }
