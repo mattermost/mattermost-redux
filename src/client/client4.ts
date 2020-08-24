@@ -2104,6 +2104,30 @@ export default class Client4 {
         );
     };
 
+    upgradeToEnterprise = async () => {
+        return this.doFetch<StatusOK>(
+            `${this.getBaseRoute()}/upgrade_to_enterprise`,
+            {method: 'post'},
+        );
+    }
+
+    upgradeToEnterpriseStatus = async () => {
+        return this.doFetch<{
+            percentage: number;
+            error: string | null;
+        }>(
+            `${this.getBaseRoute()}/upgrade_to_enterprise/status`,
+            {method: 'get'},
+        );
+    }
+
+    restartServer = async () => {
+        return this.doFetch<StatusOK>(
+            `${this.getBaseRoute()}/restart`,
+            {method: 'post'},
+        );
+    }
+
     logClientError = (message: string, level = 'ERROR') => {
         const url = `${this.getBaseRoute()}/logs`;
 
@@ -3200,14 +3224,14 @@ export default class Client4 {
     }
 
     getBotsIncludeDeleted = (page = 0, perPage = PER_PAGE_DEFAULT) => {
-        return this.doFetch<Bot>(
+        return this.doFetch<Bot[]>(
             `${this.getBotsRoute()}${buildQueryString({include_deleted: true, page, per_page: perPage})}`,
             {method: 'get'},
         );
     }
 
     getBotsOrphaned = (page = 0, perPage = PER_PAGE_DEFAULT) => {
-        return this.doFetch<Bot>(
+        return this.doFetch<Bot[]>(
             `${this.getBotsRoute()}${buildQueryString({only_orphaned: true, page, per_page: perPage})}`,
             {method: 'get'},
         );

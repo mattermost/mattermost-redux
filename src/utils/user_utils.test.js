@@ -9,6 +9,7 @@ import {
     filterProfilesMatchingTerm,
     getSuggestionsSplitBy,
     getSuggestionsSplitByMultiple,
+    includesAnAdminRole,
     applyRolesFilters,
 } from 'utils/user_utils';
 
@@ -203,6 +204,24 @@ describe('user utils', () => {
             assert.equal(applyRolesFilters(guestUser, [General.SYSTEM_USER_ROLE, General.TEAM_USER_ROLE, General.TEAM_ADMIN_ROLE, General.CHANNEL_USER_ROLE, General.CHANNEL_ADMIN_ROLE], nonAdminMembership), false);
             assert.equal(applyRolesFilters(guestUser, [General.SYSTEM_GUEST_ROLE], adminMembership), true);
             assert.equal(applyRolesFilters(guestUser, [General.SYSTEM_USER_ROLE, General.TEAM_USER_ROLE, General.TEAM_ADMIN_ROLE, General.CHANNEL_USER_ROLE, General.CHANNEL_ADMIN_ROLE], adminMembership), false);
+        });
+    });
+
+    describe('includesAnAdminRole', () => {
+        test('returns expected result', () => {
+            [
+                [General.SYSTEM_ADMIN_ROLE, true],
+                [General.SYSTEM_USER_MANAGER_ROLE, true],
+                [General.SYSTEM_READ_ONLY_ADMIN_ROLE, true],
+                [General.SYSTEM_MANAGER_ROLE, true],
+                ['non_existent', false],
+                ['foo', false],
+                ['bar', false],
+            ].forEach(([role, expected]) => {
+                const mockRoles = `foo ${role} bar`;
+                const actual = includesAnAdminRole(mockRoles);
+                assert.equal(actual, expected);
+            });
         });
     });
 });

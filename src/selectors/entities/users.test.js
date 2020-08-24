@@ -774,5 +774,22 @@ describe('Selectors.Users', () => {
             },
         }), false);
     });
+
+    describe('currentUserHasAnAdminRole', () => {
+        it('returns the expected result', () => {
+            assert.equal(Selectors.currentUserHasAnAdminRole(testState), true);
+            const state = {
+                ...testState,
+                entities: {
+                    ...testState.entities,
+                    users: {
+                        ...testState.entities.users,
+                        currentUserId: user2.id,
+                    },
+                },
+            };
+            assert.equal(Selectors.currentUserHasAnAdminRole(state), false);
+        });
+    });
 });
 
