@@ -181,6 +181,22 @@ export const getAllAssociatedGroupsForReference: (state: GlobalState) => Group[]
     },
 );
 
+export const getAllGroupsForReferenceByName: (state: GlobalState) => NameMappedObjects<Group> = createSelector(
+    getAllAssociatedGroupsForReference,
+    (groups) => {
+        const groupsByName: Dictionary<Group> = {};
+
+        for (const id in groups) {
+            if (groups.hasOwnProperty(id)) {
+                const group = groups[id];
+                groupsByName[group.name] = group;
+            }
+        }
+
+        return groupsByName;
+    },
+);
+
 export const getMyAllowReferencedGroups: (state: GlobalState) => Group[] = createSelector(
     getMyGroups,
     (myGroups) => {
