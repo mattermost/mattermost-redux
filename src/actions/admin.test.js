@@ -615,6 +615,66 @@ describe('Actions.Admin', () => {
         }
     });
 
+    it('uploadPublicLdapCertificate', async () => {
+        const testFileData = fs.createReadStream('test/assets/images/test.png');
+
+        nock(Client4.getBaseRoute()).
+            post('/ldap/certificate/public').
+            reply(200, OK_RESPONSE);
+
+        await Actions.uploadPublicLdapCertificate(testFileData)(store.dispatch, store.getState);
+
+        const state = store.getState();
+        const request = state.requests.admin.uploadPublicLdapCertificate;
+        if (request.status === RequestStatus.FAILURE) {
+            throw new Error('uploadPublicLdapCertificate request failed err=' + request.error);
+        }
+    });
+
+    it('uploadPrivateLdapCertificate', async () => {
+        const testFileData = fs.createReadStream('test/assets/images/test.png');
+
+        nock(Client4.getBaseRoute()).
+            post('/ldap/certificate/private').
+            reply(200, OK_RESPONSE);
+
+        await Actions.uploadPrivateLdapCertificate(testFileData)(store.dispatch, store.getState);
+
+        const state = store.getState();
+        const request = state.requests.admin.uploadPrivateLdapCertificate;
+        if (request.status === RequestStatus.FAILURE) {
+            throw new Error('uploadPrivateLdapCertificate request failed err=' + request.error);
+        }
+    });
+
+    it('removePublicLdapCertificate', async () => {
+        nock(Client4.getBaseRoute()).
+            delete('/ldap/certificate/public').
+            reply(200, OK_RESPONSE);
+
+        await Actions.removePublicLdapCertificate()(store.dispatch, store.getState);
+
+        const state = store.getState();
+        const request = state.requests.admin.removePublicLdapCertificate;
+        if (request.status === RequestStatus.FAILURE) {
+            throw new Error('removePublicLdapCertificate request failed err=' + request.error);
+        }
+    });
+
+    it('removePrivateLdapCertificate', async () => {
+        nock(Client4.getBaseRoute()).
+            delete('/ldap/certificate/private').
+            reply(200, OK_RESPONSE);
+
+        await Actions.removePrivateLdapCertificate()(store.dispatch, store.getState);
+
+        const state = store.getState();
+        const request = state.requests.admin.removePrivateLdapCertificate;
+        if (request.status === RequestStatus.FAILURE) {
+            throw new Error('removePrivateLdapCertificate request failed err=' + request.error);
+        }
+    });
+
     it('testElasticsearch', async () => {
         nock(Client4.getBaseRoute()).
             post('/elasticsearch/test').

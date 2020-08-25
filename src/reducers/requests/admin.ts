@@ -248,6 +248,26 @@ function uploadPrivateSamlCertificate(state: RequestStatusType = initialRequestS
     );
 }
 
+function uploadPublicLdapCertificate(state: RequestStatusType = initialRequestState(), action: GenericAction): RequestStatusType {
+    return handleRequest(
+        AdminTypes.UPLOAD_LDAP_PUBLIC_REQUEST,
+        AdminTypes.UPLOAD_LDAP_PUBLIC_SUCCESS,
+        AdminTypes.UPLOAD_LDAP_PUBLIC_FAILURE,
+        state,
+        action,
+    );
+}
+
+function uploadPrivateLdapCertificate(state: RequestStatusType = initialRequestState(), action: GenericAction): RequestStatusType {
+    return handleRequest(
+        AdminTypes.UPLOAD_LDAP_PRIVATE_REQUEST,
+        AdminTypes.UPLOAD_LDAP_PRIVATE_SUCCESS,
+        AdminTypes.UPLOAD_LDAP_PRIVATE_FAILURE,
+        state,
+        action,
+    );
+}
+
 function uploadIdpSamlCertificate(state: RequestStatusType = initialRequestState(), action: GenericAction): RequestStatusType {
     return handleRequest(
         AdminTypes.UPLOAD_SAML_IDP_REQUEST,
@@ -273,6 +293,26 @@ function removePrivateSamlCertificate(state: RequestStatusType = initialRequestS
         AdminTypes.DELETE_SAML_PRIVATE_REQUEST,
         AdminTypes.DELETE_SAML_PRIVATE_SUCCESS,
         AdminTypes.DELETE_SAML_PRIVATE_FAILURE,
+        state,
+        action,
+    );
+}
+
+function removePublicLdapCertificate(state: RequestStatusType = initialRequestState(), action: GenericAction): RequestStatusType {
+    return handleRequest(
+        AdminTypes.DELETE_LDAP_PUBLIC_REQUEST,
+        AdminTypes.DELETE_LDAP_PUBLIC_SUCCESS,
+        AdminTypes.DELETE_LDAP_PUBLIC_FAILURE,
+        state,
+        action,
+    );
+}
+
+function removePrivateLdapCertificate(state: RequestStatusType = initialRequestState(), action: GenericAction): RequestStatusType {
+    return handleRequest(
+        AdminTypes.DELETE_LDAP_PRIVATE_REQUEST,
+        AdminTypes.DELETE_LDAP_PRIVATE_SUCCESS,
+        AdminTypes.DELETE_LDAP_PRIVATE_FAILURE,
         state,
         action,
     );
@@ -433,9 +473,13 @@ export default (combineReducers({
     getSamlCertificateStatus,
     uploadPublicSamlCertificate,
     uploadPrivateSamlCertificate,
+    uploadPublicLdapCertificate,
+    uploadPrivateLdapCertificate,
     uploadIdpSamlCertificate,
     removePublicSamlCertificate,
     removePrivateSamlCertificate,
+    removePublicLdapCertificate,
+    removePrivateLdapCertificate,
     removeIdpSamlCertificate,
     testElasticsearch,
     purgeElasticsearchIndexes,

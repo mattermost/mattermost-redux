@@ -71,6 +71,8 @@ export type AdminRequestsStatuses = {
     removePlugin: RequestStatusType;
     removePrivateSamlCertificate: RequestStatusType;
     removePublicSamlCertificate: RequestStatusType;
+    removePrivateLdapCertificate: RequestStatusType;
+    removePublicLdapCertificate: RequestStatusType;
     syncLdap: RequestStatusType;
     testElasticsearch: RequestStatusType;
     testLdap: RequestStatusType;
@@ -80,6 +82,8 @@ export type AdminRequestsStatuses = {
     uploadPlugin: RequestStatusType;
     uploadPrivateSamlCertificate: RequestStatusType;
     uploadPublicSamlCertificate: RequestStatusType;
+    uploadPrivateLdapCertificate: RequestStatusType;
+    uploadPublicLdapCertificate: RequestStatusType;
 };
 
 export type EmojisRequestsStatuses = {

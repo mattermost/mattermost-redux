@@ -348,6 +348,14 @@ const state: GlobalState = {
                 status: 'not_started',
                 error: null,
             },
+            removePrivateLdapCertificate: {
+                status: 'not_started',
+                error: null,
+            },
+            removePublicLdapCertificate: {
+                status: 'not_started',
+                error: null,
+            },
             syncLdap: {
                 status: 'not_started',
                 error: null,
@@ -373,6 +381,14 @@ const state: GlobalState = {
                 error: null,
             },
             uploadPlugin: {
+                status: 'not_started',
+                error: null,
+            },
+            uploadPrivateLdapCertificate: {
+                status: 'not_started',
+                error: null,
+            },
+            uploadPublicLdapCertificate: {
                 status: 'not_started',
                 error: null,
             },
