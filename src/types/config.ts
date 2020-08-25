@@ -129,6 +129,7 @@ export type ClientConfig = {
     LdapLoginFieldName: string;
     LdapNicknameAttributeSet: string;
     LdapPositionAttributeSet: string;
+    LdapPictureAttributeSet: string;
     LockTeammateNameDisplay: string;
     MaxFileSize: string;
     MaxNotificationsPerChannel: string;
