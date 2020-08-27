@@ -8,7 +8,7 @@ import {getBool} from 'selectors/entities/preferences';
 import {isTimezoneEnabled} from 'selectors/entities/timezone';
 import {getCurrentUser} from 'selectors/entities/users';
 import {createIdsSelector, memoizeResult} from 'utils/helpers';
-import {isUserActivityPost, shouldFilterJoinLeavePost} from 'utils/post_utils';
+import {isUserActivityPost, shouldFilterJoinLeavePost, isFromWebhook} from 'utils/post_utils';
 import {getUserCurrentTimezone} from 'utils/timezone_utils';
 import * as types from 'types';
 export const COMBINED_USER_ACTIVITY = 'user-activity-';
@@ -101,7 +101,7 @@ export function makeFilterPostsAndAddSeparators() {
                 if (
                     lastViewedAt &&
                     post.create_at > lastViewedAt &&
-                    post.user_id !== currentUser.id &&
+                    (post.user_id !== currentUser.id || isFromWebhook(post)) &&
                     !addedNewMessagesIndicator &&
                     indicateNewMessages
                 ) {
