@@ -2104,6 +2104,30 @@ export default class Client4 {
         );
     };
 
+    upgradeToEnterprise = async () => {
+        return this.doFetch<StatusOK>(
+            `${this.getBaseRoute()}/upgrade_to_enterprise`,
+            {method: 'post'},
+        );
+    }
+
+    upgradeToEnterpriseStatus = async () => {
+        return this.doFetch<{
+            percentage: number;
+            error: string | null;
+        }>(
+            `${this.getBaseRoute()}/upgrade_to_enterprise/status`,
+            {method: 'get'},
+        );
+    }
+
+    restartServer = async () => {
+        return this.doFetch<StatusOK>(
+            `${this.getBaseRoute()}/restart`,
+            {method: 'post'},
+        );
+    }
+
     logClientError = (message: string, level = 'ERROR') => {
         const url = `${this.getBaseRoute()}/logs`;
 

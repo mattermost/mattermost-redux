@@ -19,6 +19,7 @@ import {
     displayUsername,
     filterProfilesMatchingTerm,
     isSystemAdmin,
+    includesAnAdminRole,
     profileListToMap,
     sortByUsername,
     applyRolesFilters,
@@ -138,7 +139,15 @@ export const isCurrentUserSystemAdmin: (state: GlobalState) => boolean = createS
     },
 );
 
-export const getCurrentUserRoles: (state: GlobalState) => UserProfile['roles'] = createSelector(
+export const currentUserHasAnAdminRole: (state: GlobalState) => boolean = createSelector(
+    getCurrentUser,
+    (user) => {
+        const roles = user.roles || '';
+        return includesAnAdminRole(roles);
+    },
+);
+
+export const getCurrentUserRoles: (a: GlobalState) => UserProfile['roles'] = createSelector(
     getMyCurrentChannelMembership,
     (state) => state.entities.teams.myMembers[state.entities.teams.currentTeamId],
     getCurrentUser,
