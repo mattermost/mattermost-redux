@@ -98,20 +98,27 @@ describe('Selectors.Groups', () => {
                 },
             },
             channels: {
+                channels: {
+                    [channelID]: {team_id: teamID, id: channelID},
+                },
                 groupsAssociatedToChannel: {
                     [channelID]: {ids: channelAssociatedGroupIDs},
                 },
             },
+            general: {
+                config: {},
+            },
+            preferences: {
+                myPreferences: {},
+            },
         },
     });
 
-    it('getGroupsByName', () => {
-        const groupsByName = Selectors.getGroupsByName(testState);
+    it('getAssociatedGroupsByName', () => {
+        const groupsByName = Selectors.getAssociatedGroupsByName(testState, teamID, channelID);
         assert.equal(groupsByName[group1.name], group1);
-        assert.equal(groupsByName[group2.name], group2);
-        assert.equal(groupsByName[group3.name], group3);
         assert.equal(groupsByName[group4.name], group4);
-        assert.equal(Object.keys(groupsByName).length, 4);
+        assert.equal(Object.keys(groupsByName).length, 2);
     });
 
     it('getGroupsAssociatedToTeam', () => {
@@ -167,10 +174,10 @@ describe('Selectors.Groups', () => {
             group1,
             group4,
         ];
-        assert.deepEqual(Selectors.getAllAssociatedGroupsForReference(testState, channelID), expected);
+        assert.deepEqual(Selectors.getAllAssociatedGroupsForReference(testState), expected);
     });
 
-    it('getCurrentUserGroupMentionKeys', () => {
+    it('getMyGroupMentionKeys', () => {
         const expected = [
             {
                 key: `@${group1.name}`,
@@ -179,6 +186,18 @@ describe('Selectors.Groups', () => {
                 key: `@${group4.name}`,
             },
         ];
-        assert.deepEqual(Selectors.getCurrentUserGroupMentionKeys(testState), expected);
+        assert.deepEqual(Selectors.getMyGroupMentionKeys(testState), expected);
+    });
+
+    it('getMyGroupMentionKeysForChannel', () => {
+        const expected = [
+            {
+                key: `@${group1.name}`,
+            },
+            {
+                key: `@${group4.name}`,
+            },
+        ];
+        assert.deepEqual(Selectors.getMyGroupMentionKeysForChannel(testState, teamID, channelID), expected);
     });
 });
