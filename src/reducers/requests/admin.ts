@@ -248,7 +248,6 @@ function uploadPrivateSamlCertificate(state: RequestStatusType = initialRequestS
     );
 }
 
-
 function uploadIdpSamlCertificate(state: RequestStatusType = initialRequestState(), action: GenericAction): RequestStatusType {
     return handleRequest(
         AdminTypes.UPLOAD_SAML_IDP_REQUEST,
@@ -278,7 +277,6 @@ function removePrivateSamlCertificate(state: RequestStatusType = initialRequestS
         action,
     );
 }
-
 
 function removeIdpSamlCertificate(state: RequestStatusType = initialRequestState(), action: GenericAction): RequestStatusType {
     return handleRequest(
