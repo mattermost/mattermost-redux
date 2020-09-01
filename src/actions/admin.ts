@@ -323,8 +323,6 @@ export function uploadPublicLdapCertificate(fileData: File): ActionFunc {
     return bindClientFunc({
         clientFunc: Client4.uploadPublicLdapCertificate,
         onRequest: AdminTypes.UPLOAD_LDAP_PUBLIC_REQUEST,
-        onSuccess: AdminTypes.UPLOAD_LDAP_PUBLIC_SUCCESS,
-        onFailure: AdminTypes.UPLOAD_LDAP_PUBLIC_FAILURE,
         params: [
             fileData,
         ],
@@ -335,8 +333,6 @@ export function uploadPrivateLdapCertificate(fileData: File): ActionFunc {
     return bindClientFunc({
         clientFunc: Client4.uploadPrivateLdapCertificate,
         onRequest: AdminTypes.UPLOAD_LDAP_PRIVATE_REQUEST,
-        onSuccess: AdminTypes.UPLOAD_LDAP_PRIVATE_SUCCESS,
-        onFailure: AdminTypes.UPLOAD_LDAP_PRIVATE_FAILURE,
         params: [
             fileData,
         ],
@@ -377,8 +373,6 @@ export function removePublicLdapCertificate(): ActionFunc {
     return bindClientFunc({
         clientFunc: Client4.deletePublicLdapCertificate,
         onRequest: AdminTypes.DELETE_LDAP_PUBLIC_REQUEST,
-        onSuccess: AdminTypes.DELETE_LDAP_PUBLIC_SUCCESS,
-        onFailure: AdminTypes.DELETE_LDAP_PUBLIC_FAILURE,
     });
 }
 
@@ -386,8 +380,6 @@ export function removePrivateLdapCertificate(): ActionFunc {
     return bindClientFunc({
         clientFunc: Client4.deletePrivateLdapCertificate,
         onRequest: AdminTypes.DELETE_LDAP_PRIVATE_REQUEST,
-        onSuccess: AdminTypes.DELETE_LDAP_PRIVATE_SUCCESS,
-        onFailure: AdminTypes.DELETE_LDAP_PRIVATE_FAILURE,
     });
 }
 

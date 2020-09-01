@@ -622,10 +622,7 @@ describe('Actions.Admin', () => {
             post('/ldap/certificate/public').
             reply(200, OK_RESPONSE);
 
-        await Actions.uploadPublicLdapCertificate(testFileData)(store.dispatch, store.getState);
-
-        const state = store.getState();
-        const request = state.requests.admin.uploadPublicLdapCertificate;
+        const request = await Actions.uploadPublicLdapCertificate(testFileData)(store.dispatch, store.getState);
         if (request.status === RequestStatus.FAILURE) {
             throw new Error('uploadPublicLdapCertificate request failed err=' + request.error);
         }
@@ -638,10 +635,7 @@ describe('Actions.Admin', () => {
             post('/ldap/certificate/private').
             reply(200, OK_RESPONSE);
 
-        await Actions.uploadPrivateLdapCertificate(testFileData)(store.dispatch, store.getState);
-
-        const state = store.getState();
-        const request = state.requests.admin.uploadPrivateLdapCertificate;
+        const request = await Actions.uploadPrivateLdapCertificate(testFileData)(store.dispatch, store.getState);
         if (request.status === RequestStatus.FAILURE) {
             throw new Error('uploadPrivateLdapCertificate request failed err=' + request.error);
         }
@@ -652,10 +646,7 @@ describe('Actions.Admin', () => {
             delete('/ldap/certificate/public').
             reply(200, OK_RESPONSE);
 
-        await Actions.removePublicLdapCertificate()(store.dispatch, store.getState);
-
-        const state = store.getState();
-        const request = state.requests.admin.removePublicLdapCertificate;
+        const request = await Actions.removePublicLdapCertificate()(store.dispatch, store.getState);
         if (request.status === RequestStatus.FAILURE) {
             throw new Error('removePublicLdapCertificate request failed err=' + request.error);
         }
@@ -666,10 +657,7 @@ describe('Actions.Admin', () => {
             delete('/ldap/certificate/private').
             reply(200, OK_RESPONSE);
 
-        await Actions.removePrivateLdapCertificate()(store.dispatch, store.getState);
-
-        const state = store.getState();
-        const request = state.requests.admin.removePrivateLdapCertificate;
+        const request = await Actions.removePrivateLdapCertificate()(store.dispatch, store.getState);
         if (request.status === RequestStatus.FAILURE) {
             throw new Error('removePrivateLdapCertificate request failed err=' + request.error);
         }
