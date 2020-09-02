@@ -322,7 +322,6 @@ export function uploadPrivateSamlCertificate(fileData: File): ActionFunc {
 export function uploadPublicLdapCertificate(fileData: File): ActionFunc {
     return bindClientFunc({
         clientFunc: Client4.uploadPublicLdapCertificate,
-        onRequest: AdminTypes.UPLOAD_LDAP_PUBLIC_REQUEST,
         params: [
             fileData,
         ],
@@ -332,7 +331,6 @@ export function uploadPublicLdapCertificate(fileData: File): ActionFunc {
 export function uploadPrivateLdapCertificate(fileData: File): ActionFunc {
     return bindClientFunc({
         clientFunc: Client4.uploadPrivateLdapCertificate,
-        onRequest: AdminTypes.UPLOAD_LDAP_PRIVATE_REQUEST,
         params: [
             fileData,
         ],
@@ -372,14 +370,12 @@ export function removePrivateSamlCertificate(): ActionFunc {
 export function removePublicLdapCertificate(): ActionFunc {
     return bindClientFunc({
         clientFunc: Client4.deletePublicLdapCertificate,
-        onRequest: AdminTypes.DELETE_LDAP_PUBLIC_REQUEST,
     });
 }
 
 export function removePrivateLdapCertificate(): ActionFunc {
     return bindClientFunc({
         clientFunc: Client4.deletePrivateLdapCertificate,
-        onRequest: AdminTypes.DELETE_LDAP_PRIVATE_REQUEST,
     });
 }
 
