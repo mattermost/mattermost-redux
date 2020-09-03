@@ -29,6 +29,8 @@ const values = {
     LIST_TEAM_CHANNELS: 'list_team_channels',
     JOIN_PUBLIC_CHANNELS: 'join_public_channels',
     DELETE_PUBLIC_CHANNEL: 'delete_public_channel',
+    CONVERT_PUBLIC_CHANNEL_TO_PRIVATE: 'convert_public_channel_to_private',
+    CONVERT_PRIVATE_CHANNEL_TO_PUBLIC: 'convert_private_channel_to_public',
     DELETE_PRIVATE_CHANNEL: 'delete_private_channel',
     EDIT_OTHER_USERS: 'edit_other_users',
     READ_CHANNEL: 'read_channel',
