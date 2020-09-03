@@ -3385,6 +3385,33 @@ export default class Client4 {
 
         rudderAnalytics.track('event', properties, options);
     }
+
+    pageVisited(category: string, name: string) {
+        rudderAnalytics.page(
+            category,
+            name,
+            {
+                path: '',
+                referrer: '',
+                search: '',
+                title: '',
+                url: '',
+            },
+            {
+                context: {
+                    ip: '0.0.0.0',
+                },
+                page: {
+                    path: '',
+                    referrer: '',
+                    search: '',
+                    title: '',
+                    url: '',
+                },
+                anonymousId: '00000000000000000000000000',
+            },
+        );
+    }
 }
 
 function parseAndMergeNestedHeaders(originalHeaders: any) {
