@@ -203,10 +203,18 @@ function dialogTriggerId(state = '', action: GenericAction) {
     }
 }
 
-function dialog(state = '', action: GenericAction) {
+function dialog(state: any = null, action: GenericAction) {
     switch (action.type) {
     case IntegrationTypes.RECEIVED_DIALOG:
         return action.data;
+    case IntegrationTypes.UPDATE_DIALOG_ELEMENTS:
+        return {
+            ...state,
+            dialog: {
+                ...state.dialog,
+                elements: action.data,
+            },
+        };
     default:
         return state;
     }
