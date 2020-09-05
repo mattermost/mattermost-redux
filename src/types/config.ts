@@ -99,6 +99,7 @@ export type ClientConfig = {
     ExperimentalChannelSidebarOrganization: string;
     ExperimentalClientSideCertCheck: string;
     ExperimentalClientSideCertEnable: string;
+    ExperimentalCloudBilling: string;
     ExperimentalCloudUserLimit: string;
     ExperimentalDataPrefetch: string;
     ExperimentalEnableAuthenticationTransfer: string;
@@ -659,6 +660,7 @@ export type ExperimentalSettings = {
     LinkMetadataTimeoutMilliseconds: number;
     RestrictSystemAdmin: boolean;
     UseNewSAMLLibrary: boolean;
+    CloudBilling: boolean;
 };
 
 export type AnalyticsSettings = {

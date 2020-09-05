@@ -29,6 +29,8 @@ const values = {
     LIST_TEAM_CHANNELS: 'list_team_channels',
     JOIN_PUBLIC_CHANNELS: 'join_public_channels',
     DELETE_PUBLIC_CHANNEL: 'delete_public_channel',
+    CONVERT_PUBLIC_CHANNEL_TO_PRIVATE: 'convert_public_channel_to_private',
+    CONVERT_PRIVATE_CHANNEL_TO_PUBLIC: 'convert_private_channel_to_public',
     DELETE_PRIVATE_CHANNEL: 'delete_private_channel',
     EDIT_OTHER_USERS: 'edit_other_users',
     READ_CHANNEL: 'read_channel',
@@ -77,6 +79,8 @@ const values = {
 
     SYSCONSOLE_READ_ABOUT: 'sysconsole_read_about',
     SYSCONSOLE_WRITE_ABOUT: 'sysconsole_write_about',
+    SYSCONSOLE_READ_BILLING: 'sysconsole_read_billing',
+    SYSCONSOLE_WRITE_BILLING: 'sysconsole_write_billing',
     SYSCONSOLE_READ_REPORTING: 'sysconsole_read_reporting',
     SYSCONSOLE_WRITE_REPORTING: 'sysconsole_write_reporting',
     SYSCONSOLE_READ_USERMANAGEMENT_USERS: 'sysconsole_read_user_management_users',
@@ -118,6 +122,7 @@ const values = {
 
 values.SYSCONSOLE_READ_PERMISSIONS = [
     values.SYSCONSOLE_READ_ABOUT,
+    values.SYSCONSOLE_READ_BILLING,
     values.SYSCONSOLE_READ_REPORTING,
     values.SYSCONSOLE_READ_USERMANAGEMENT_USERS,
     values.SYSCONSOLE_READ_USERMANAGEMENT_GROUPS,
@@ -135,6 +140,7 @@ values.SYSCONSOLE_READ_PERMISSIONS = [
 
 values.SYSCONSOLE_WRITE_PERMISSIONS = [
     values.SYSCONSOLE_WRITE_ABOUT,
+    values.SYSCONSOLE_WRITE_BILLING,
     values.SYSCONSOLE_WRITE_REPORTING,
     values.SYSCONSOLE_WRITE_USERMANAGEMENT_USERS,
     values.SYSCONSOLE_WRITE_USERMANAGEMENT_GROUPS,

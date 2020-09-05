@@ -2424,6 +2424,15 @@ export default class Client4 {
         );
     };
 
+    // these types are wrong
+    dispatchSelectInteractiveDialog = (data: DialogSubmission) => {
+        this.trackEvent('api', 'api_interactive_messages_dialog_select');
+        return this.doFetch<SubmitDialogResponse>(
+            `${this.getBaseRoute()}/actions/dialogs/select`,
+            {method: 'post', body: JSON.stringify(data)},
+        );
+    };
+
     submitInteractiveDialog = (data: DialogSubmission) => {
         this.trackEvent('api', 'api_interactive_messages_dialog_submitted');
         return this.doFetch<SubmitDialogResponse>(

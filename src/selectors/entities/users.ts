@@ -134,7 +134,7 @@ export function getUserByEmail(state: GlobalState, email: $Email<UserProfile>): 
 export const isCurrentUserSystemAdmin: (state: GlobalState) => boolean = createSelector(
     getCurrentUser,
     (user) => {
-        const roles = user.roles || '';
+        const roles = user?.roles || '';
         return isSystemAdmin(roles);
     },
 );

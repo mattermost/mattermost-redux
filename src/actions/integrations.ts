@@ -7,9 +7,9 @@ import {getCurrentUserId} from 'selectors/entities/users';
 import {getCurrentChannelId} from 'selectors/entities/channels';
 import {getCurrentTeamId} from 'selectors/entities/teams';
 
-import {batchActions, DispatchFunc, GetStateFunc, ActionFunc} from 'types/actions';
+import {batchActions, DispatchFunc, GetStateFunc, ActionFunc, Action} from 'types/actions';
 
-import {Command, DialogSubmission, IncomingWebhook, OAuthApp, OutgoingWebhook} from 'types/integrations';
+import {Command, DialogSubmission, IncomingWebhook, OAuthApp, OutgoingWebhook, DialogElement} from 'types/integrations';
 
 import {logError} from './errors';
 import {bindClientFunc, forceLogoutIfNecessary} from './helpers';
@@ -360,6 +360,33 @@ export function regenOAuthAppSecret(appId: string): ActionFunc {
             appId,
         ],
     });
+}
+
+export function dispatchSelectInteractiveDialog(submission: DialogSubmission): ActionFunc {
+    return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
+        const state = getState();
+        submission.channel_id = getCurrentChannelId(state);
+        submission.team_id = getCurrentTeamId(state);
+
+        let data;
+        try {
+            data = await Client4.dispatchSelectInteractiveDialog(submission);
+        } catch (error) {
+            forceLogoutIfNecessary(error, dispatch, getState);
+
+            dispatch(logError(error));
+            return {error};
+        }
+
+        return {data};
+    };
+}
+
+export function updateInteractiveDialogElements(elements: DialogElement[]): Action {
+    return {
+        type: IntegrationTypes.UPDATE_DIALOG_ELEMENTS,
+        data: elements,
+    };
 }
 
 export function submitInteractiveDialog(submission: DialogSubmission): ActionFunc {
