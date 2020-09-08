@@ -3387,6 +3387,10 @@ export default class Client4 {
     }
 
     pageVisited(category: string, name: string) {
+        if (!this.isRudderKeySet) {
+            return;
+        }
+
         rudderAnalytics.page(
             category,
             name,
@@ -3400,13 +3404,6 @@ export default class Client4 {
             {
                 context: {
                     ip: '0.0.0.0',
-                },
-                page: {
-                    path: '',
-                    referrer: '',
-                    search: '',
-                    title: '',
-                    url: '',
                 },
                 anonymousId: '00000000000000000000000000',
             },
