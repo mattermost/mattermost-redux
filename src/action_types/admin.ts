@@ -192,5 +192,4 @@ export default keyMirror({
     UPLOAD_LDAP_PRIVATE_SUCCESS: null,
     DELETE_LDAP_PUBLIC_SUCCESS: null,
     DELETE_LDAP_PRIVATE_SUCCESS: null,
-    
 });
