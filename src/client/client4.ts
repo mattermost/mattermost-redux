@@ -749,7 +749,7 @@ export default class Client4 {
         );
     };
 
-    getProfilesInChannel = (channelId: string, page = 0, perPage = PER_PAGE_DEFAULT, sort = '') => {
+    getProfilesInChannel = (channelId: string, page = 0, perPage = PER_PAGE_DEFAULT, sort = '', options: {active?: boolean} = {}) => {
         this.trackEvent('api', 'api_profiles_get_in_channel', {channel_id: channelId});
 
         const serverVersion = this.getServerVersion();
@@ -760,7 +760,7 @@ export default class Client4 {
             queryStringObj = {in_channel: channelId, page, per_page: perPage};
         }
         return this.doFetch<UserProfile[]>(
-            `${this.getUsersRoute()}${buildQueryString(queryStringObj)}`,
+            `${this.getUsersRoute()}${buildQueryString({...queryStringObj, ...options})}`,
             {method: 'get'},
         );
     };
