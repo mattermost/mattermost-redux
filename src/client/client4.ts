@@ -89,6 +89,7 @@ import {
     GetFilteredUsersStatsOpts,
 } from 'types/users';
 import {$ID, RelationOneToOne} from 'types/utilities';
+import {ProductNotices} from 'types/product_notices';
 
 import {buildQueryString, isMinimumServerVersion} from 'utils/helpers';
 import {cleanUrlForLogging} from 'utils/sentry';
@@ -381,6 +382,10 @@ export default class Client4 {
 
     getGroupRoute(groupID: string) {
         return `${this.getGroupsRoute()}/${groupID}`;
+    }
+
+    getNoticesRoute() {
+        return `${this.getBaseRoute()}/system/notices`;
     }
 
     getCSRFFromCookie() {
@@ -3295,6 +3300,20 @@ export default class Client4 {
             request,
         );
     };
+
+    getInProductNotices = (teamId: string, client: string, clientVersion: string) => {
+        return this.doFetch<ProductNotices>(
+            `${this.getNoticesRoute()}/${teamId}?client=${client}&clientVersion=${clientVersion}`,
+            {method: 'get'},
+        );
+    };
+
+    updateNoticeAsViewed = (noticeIds: string[]) => {
+        return this.doFetch<StatusOK>(
+            `${this.getNoticesRoute()}/view`,
+            {method: 'put', body: JSON.stringify(noticeIds)},
+        );
+    }
 
     // Client Helpers
 
