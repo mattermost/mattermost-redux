@@ -617,3 +617,16 @@ export function sendWarnMetricAck(warnMetricId: string, forceAck: boolean) {
         }
     };
 }
+
+export function requestTrialLicenseAndAckWarnMetric(warnMetricId: string) {
+    return async (dispatch: DispatchFunc) => {
+        try {
+            Client4.trackEvent('api', 'api_request_trial_license_and_warn_metric_ack', {warnMetricId});
+            await Client4.requestTrialLicenseAndAckWarnMetric(warnMetricId);
+            return {data: true};
+        } catch (e) {
+            dispatch(logError(e));
+            return {error: e.message};
+        }
+    };
+}

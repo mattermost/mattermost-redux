@@ -1220,4 +1220,15 @@ describe('Actions.Admin', () => {
 
         await Actions.sendWarnMetricAck(warnMetricAck.id, false)(store.dispatch, store.getState);
     });
+
+    it('requestTrialLicenseAndAckWarnMetric', async () => {
+        const warnMetricAck = {
+            id: 'metric1',
+        };
+        nock(Client4.getBaseRoute()).
+            post('/warn_metrics/trial-license-ack').
+            reply(200, OK_RESPONSE);
+
+        await Actions.requestTrialLicenseAndAckWarnMetric(warnMetricAck.id, false)(store.dispatch, store.getState);
+    });
 });

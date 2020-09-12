@@ -2174,6 +2174,13 @@ export default class Client4 {
         );
     }
 
+    requestTrialLicenseAndAckWarnMetric = async (warnMetricId: string) => {
+        return this.doFetch(
+            `${this.getBaseRoute()}/warn_metrics/trial-license-ack/${encodeURI(warnMetricId)}`,
+            {method: 'post'},
+        );
+    }
+
     getTranslations = (url: string) => {
         return this.doFetch<Record<string, string>>(
             url,
