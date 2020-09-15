@@ -15,3 +15,6 @@ export type AddOn = {
     display_name: string;
     dollars_per_seat: number;
 };
+
+export type CloudState = {
+}
