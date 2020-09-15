@@ -155,6 +155,7 @@ const state: GlobalState = {
             byId: {},
             orderByTeam: {},
         },
+        cloud: {},
     },
     errors: [],
     requests: {

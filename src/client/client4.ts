@@ -6,6 +6,7 @@ import {ClusterInfo, AnalyticsRow} from 'types/admin';
 import {Audit} from 'types/audits';
 import {UserAutocomplete, AutocompleteSuggestion} from 'types/autocomplete';
 import {Bot, BotPatch} from 'types/bots';
+import {Subscription} from 'types/cloud';
 import {ChannelCategory, OrderedChannelCategories} from 'types/channel_categories';
 import {
     Channel,
@@ -3300,6 +3301,14 @@ export default class Client4 {
         return this.doFetch<Bot>(
             `${this.getBotRoute(botUserId)}/assign/${newOwnerId}`,
             {method: 'post'},
+        );
+    }
+
+
+    getSubscriptionByInstallationId = (installationId: string) => {
+        return this.doFetch<Subscription>(
+            `${this.getBaseRoute()}/cloud/subscriptionByInstallationId/${installationId}`,
+            {method: 'get'},
         );
     }
 
