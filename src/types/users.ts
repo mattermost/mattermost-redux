@@ -71,6 +71,7 @@ export type UsersState = {
     statuses: RelationOneToOne<UserProfile, string>;
     stats: RelationOneToOne<UserProfile, UsersStats>;
     filteredStats?: UsersStats;
+    myUserAccessTokens: Dictionary<UserAccessToken>;
 };
 
 export type UserTimezone = {

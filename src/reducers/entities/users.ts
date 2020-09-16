@@ -5,8 +5,8 @@ import {combineReducers} from 'redux';
 import {UserTypes, ChannelTypes} from 'action_types';
 import {profileListToMap} from 'utils/user_utils';
 import {GenericAction} from 'types/actions';
-import {UserProfile, UserStatus} from 'types/users';
-import {RelationOneToMany, IDMappedObjects, RelationOneToOne} from 'types/utilities';
+import {UserAccessToken, UserProfile, UserStatus} from 'types/users';
+import {RelationOneToMany, IDMappedObjects, RelationOneToOne, Dictionary} from 'types/utilities';
 import {Team} from 'types/teams';
 import {Channel} from 'types/channels';
 import {Group} from 'types/groups';
@@ -509,7 +509,7 @@ function isManualStatus(state: RelationOneToOne<UserProfile, boolean> = {}, acti
     }
 }
 
-function myUserAccessTokens(state: any = {}, action: GenericAction) {
+function myUserAccessTokens(state: Dictionary<UserAccessToken> = {}, action: GenericAction) {
     switch (action.type) {
     case UserTypes.RECEIVED_MY_USER_ACCESS_TOKEN: {
         const nextState = {...state};

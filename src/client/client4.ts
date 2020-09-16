@@ -2777,6 +2777,32 @@ export default class Client4 {
         );
     };
 
+    uploadPublicLdapCertificate = (fileData: File) => {
+        const formData = new FormData();
+        formData.append('certificate', fileData);
+
+        return this.doFetch<StatusOK>(
+            `${this.getBaseRoute()}/ldap/certificate/public`,
+            {
+                method: 'post',
+                body: formData,
+            },
+        );
+    };
+
+    uploadPrivateLdapCertificate = (fileData: File) => {
+        const formData = new FormData();
+        formData.append('certificate', fileData);
+
+        return this.doFetch<StatusOK>(
+            `${this.getBaseRoute()}/ldap/certificate/private`,
+            {
+                method: 'post',
+                body: formData,
+            },
+        );
+    };
+
     uploadIdpSamlCertificate = (fileData: File) => {
         const formData = new FormData();
         formData.append('certificate', fileData);
@@ -2800,6 +2826,20 @@ export default class Client4 {
     deletePrivateSamlCertificate = () => {
         return this.doFetch<StatusOK>(
             `${this.getBaseRoute()}/saml/certificate/private`,
+            {method: 'delete'},
+        );
+    };
+
+    deletePublicLdapCertificate = () => {
+        return this.doFetch<StatusOK>(
+            `${this.getBaseRoute()}/ldap/certificate/public`,
+            {method: 'delete'},
+        );
+    };
+
+    deletePrivateLdapCertificate = () => {
+        return this.doFetch<StatusOK>(
+            `${this.getBaseRoute()}/ldap/certificate/private`,
             {method: 'delete'},
         );
     };

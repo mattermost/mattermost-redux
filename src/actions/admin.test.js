@@ -615,6 +615,54 @@ describe('Actions.Admin', () => {
         }
     });
 
+    it('uploadPublicLdapCertificate', async () => {
+        const testFileData = fs.createReadStream('test/assets/images/test.png');
+
+        nock(Client4.getBaseRoute()).
+            post('/ldap/certificate/public').
+            reply(200, OK_RESPONSE);
+
+        const request = await Actions.uploadPublicLdapCertificate(testFileData)(store.dispatch, store.getState);
+        if (request.status === RequestStatus.FAILURE) {
+            throw new Error('uploadPublicLdapCertificate request failed err=' + request.error);
+        }
+    });
+
+    it('uploadPrivateLdapCertificate', async () => {
+        const testFileData = fs.createReadStream('test/assets/images/test.png');
+
+        nock(Client4.getBaseRoute()).
+            post('/ldap/certificate/private').
+            reply(200, OK_RESPONSE);
+
+        const request = await Actions.uploadPrivateLdapCertificate(testFileData)(store.dispatch, store.getState);
+        if (request.status === RequestStatus.FAILURE) {
+            throw new Error('uploadPrivateLdapCertificate request failed err=' + request.error);
+        }
+    });
+
+    it('removePublicLdapCertificate', async () => {
+        nock(Client4.getBaseRoute()).
+            delete('/ldap/certificate/public').
+            reply(200, OK_RESPONSE);
+
+        const request = await Actions.removePublicLdapCertificate()(store.dispatch, store.getState);
+        if (request.status === RequestStatus.FAILURE) {
+            throw new Error('removePublicLdapCertificate request failed err=' + request.error);
+        }
+    });
+
+    it('removePrivateLdapCertificate', async () => {
+        nock(Client4.getBaseRoute()).
+            delete('/ldap/certificate/private').
+            reply(200, OK_RESPONSE);
+
+        const request = await Actions.removePrivateLdapCertificate()(store.dispatch, store.getState);
+        if (request.status === RequestStatus.FAILURE) {
+            throw new Error('removePrivateLdapCertificate request failed err=' + request.error);
+        }
+    });
+
     it('testElasticsearch', async () => {
         nock(Client4.getBaseRoute()).
             post('/elasticsearch/test').
