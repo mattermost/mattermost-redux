@@ -7,7 +7,7 @@ import {CloudTypes} from 'action_types';
 import {GenericAction} from 'types/actions';
 import {Subscription} from 'types/cloud';
 
-function subscription(state: Subscription | undefined = undefined, action: GenericAction) {
+function subscription(state: Subscription | null = null, action: GenericAction) {
     switch (action.type) {
     case CloudTypes.RECEIVED_CLOUD_SUBSCRIPTION: {
         return action.data;
