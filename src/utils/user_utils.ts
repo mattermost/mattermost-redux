@@ -161,7 +161,8 @@ export function filterProfilesMatchingTerm(users: Array<UserProfile>, term: stri
 
         return profileSuggestions.
             filter((suggestion) => suggestion !== '').
-            some((suggestion) => suggestion.startsWith(trimmedTerm));
+            // some((suggestion) => suggestion.startsWith(trimmedTerm));
+            some((suggestion) => suggestion.indexOf(trimmedTerm) >= 0);
     });
 }
 
