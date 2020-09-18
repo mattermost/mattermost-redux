@@ -3170,10 +3170,10 @@ export default class Client4 {
         );
     };
 
-    executePluginIntegration = async (pluginId: string, requestURL: string, body?: any) => {
+    executePluginIntegration = async (pluginId: string, body?: any) => {
         return this.doFetch(
-            requestURL,
-            {method: 'post', body: JSON.stringify(body)},
+            this.getBaseRoute() + '/actions/integration',
+            {method: 'post', body: JSON.stringify(body), headers: {'Content-Type': 'application/json'}},
         );
     }
 
