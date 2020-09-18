@@ -1336,7 +1336,7 @@ export function markChannelAsRead(channelId: string, prevChannelId?: string, upd
 
 // Increments the number of posts in the channel by 1 and marks it as unread if necessary
 
-export function markChannelAsUnread(teamId: string, channelId: string, mentions: Array<string>, fetchedChannelMember: boolean = false): ActionFunc {
+export function markChannelAsUnread(teamId: string, channelId: string, mentions: Array<string>, fetchedChannelMember = false): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         const state = getState();
         const {myMembers} = state.entities.channels;
