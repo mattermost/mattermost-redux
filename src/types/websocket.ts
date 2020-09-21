@@ -14,3 +14,9 @@ export type WebSocketMessage<T> = {
     broadcast: WebSocketBroadcast;
     seq: number;
 }
+
+export type WebsocketStatus = {
+    connected: boolean;
+    lastConnectAt: number;
+    lastDisconnectAt: number;
+}
