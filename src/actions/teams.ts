@@ -740,3 +740,23 @@ export function membersMinusGroupMembers(teamID: string, groupIDs: Array<string>
         ],
     });
 }
+
+export function getInProductNotices(teamId: string, client: string, clientVersion: string): ActionFunc {
+    return bindClientFunc({
+        clientFunc: Client4.getInProductNotices,
+        params: [
+            teamId,
+            client,
+            clientVersion,
+        ],
+    });
+}
+
+export function updateNoticesAsViewed(noticeIds: string[]): ActionFunc {
+    return bindClientFunc({
+        clientFunc: Client4.updateNoticesAsViewed,
+        params: [
+            noticeIds,
+        ],
+    });
+}
