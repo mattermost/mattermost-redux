@@ -752,9 +752,9 @@ export function getInProductNotices(teamId: string, client: string, clientVersio
     });
 }
 
-export function updateNoticeAsViewed(noticeIds: string[]): ActionFunc {
+export function updateNoticesAsViewed(noticeIds: string[]): ActionFunc {
     return bindClientFunc({
-        clientFunc: Client4.updateNoticeAsViewed,
+        clientFunc: Client4.updateNoticesAsViewed,
         params: [
             noticeIds,
         ],

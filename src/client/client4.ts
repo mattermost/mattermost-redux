@@ -3348,7 +3348,7 @@ export default class Client4 {
         );
     };
 
-    updateNoticeAsViewed = (noticeIds: string[]) => {
+    updateNoticesAsViewed = (noticeIds: string[]) => {
         return this.doFetch<StatusOK>(
             `${this.getNoticesRoute()}/view`,
             {method: 'put', body: JSON.stringify(noticeIds)},
