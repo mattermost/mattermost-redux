@@ -208,7 +208,7 @@ function checkUserHasRole(user: UserProfile, userIsNotAdminOrGuest: boolean, mem
 }
 
 export function applyRolesFilters(user: UserProfile, filterRoles: string[], excludeRoles: string[], membership: TeamMembership | ChannelMembership | undefined): boolean {
-    const userIsNotAdminOrGuest = user.roles === General.SYSTEM_USER_ROLE;
+    const userIsNotAdminOrGuest = !(user.roles.includes(General.SYSTEM_ADMIN_ROLE) || user.roles.includes(General.SYSTEM_GUEST_ROLE));
     const userHasExcludedRole = excludeRoles.some(checkUserHasRole.bind(this, user, userIsNotAdminOrGuest, membership));
     if (userHasExcludedRole) {
         return false;
