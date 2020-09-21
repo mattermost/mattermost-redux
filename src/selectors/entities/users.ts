@@ -50,6 +50,7 @@ type Filters = {
     inactive?: boolean;
     active?: boolean;
     roles?: string[];
+    exclude_roles?: string[];
     channel_roles?: string[];
     team_roles?: string[];
 };
@@ -273,9 +274,10 @@ export function filterProfiles(profiles: IDMappedObjects<UserProfile>, filters?:
 
     const filterRole = (filters.role && filters.role !== '') ? [filters.role] : [];
     const filterRoles = [...filterRole, ...(filters.roles || []), ...(filters.team_roles || []), ...(filters.channel_roles || [])];
-    if (filterRoles.length > 0) {
+    const excludeRoles = filters.exclude_roles || [];
+    if (filterRoles.length > 0 || excludeRoles.length > 0) {
         users = users.filter((user) => {
-            return user.roles.length > 0 && applyRolesFilters(user, filterRoles, memberships?.[user.id]);
+            return user.roles.length > 0 && applyRolesFilters(user, filterRoles, excludeRoles, memberships?.[user.id]);
         });
     }
 

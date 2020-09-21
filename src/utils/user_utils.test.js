@@ -174,36 +174,49 @@ describe('user utils', () => {
 
         it('Non admin user with non admin membership', () => {
             const nonAdminMembership = {...TestHelper.fakeTeamMember(nonAdminUser.id, team.id), scheme_admin: false, scheme_user: true};
-            assert.equal(applyRolesFilters(nonAdminUser, [General.SYSTEM_USER_ROLE], nonAdminMembership), true);
-            assert.equal(applyRolesFilters(nonAdminUser, [General.TEAM_USER_ROLE], nonAdminMembership), true);
-            assert.equal(applyRolesFilters(nonAdminUser, [General.CHANNEL_USER_ROLE], nonAdminMembership), true);
-            assert.equal(applyRolesFilters(nonAdminUser, [General.SYSTEM_ADMIN_ROLE, General.TEAM_ADMIN_ROLE, General.CHANNEL_ADMIN_ROLE], nonAdminMembership), false);
+            assert.equal(applyRolesFilters(nonAdminUser, [General.SYSTEM_USER_ROLE], [], nonAdminMembership), true);
+            assert.equal(applyRolesFilters(nonAdminUser, [General.TEAM_USER_ROLE], [], nonAdminMembership), true);
+            assert.equal(applyRolesFilters(nonAdminUser, [General.CHANNEL_USER_ROLE], [], nonAdminMembership), true);
+            assert.equal(applyRolesFilters(nonAdminUser, [General.SYSTEM_ADMIN_ROLE, General.TEAM_ADMIN_ROLE, General.CHANNEL_ADMIN_ROLE], [], nonAdminMembership), false);
+            assert.equal(applyRolesFilters(nonAdminUser, [], [General.SYSTEM_ADMIN_ROLE], nonAdminMembership), true);
+            assert.equal(applyRolesFilters(nonAdminUser, [], [General.SYSTEM_USER_ROLE], nonAdminMembership), false);
+            assert.equal(applyRolesFilters(nonAdminUser, [], [General.TEAM_USER_ROLE], nonAdminMembership), false);
+            assert.equal(applyRolesFilters(nonAdminUser, [], [General.CHANNEL_USER_ROLE], nonAdminMembership), false);
+            assert.equal(applyRolesFilters(nonAdminUser, [General.TEAM_USER_ROLE], [General.SYSTEM_ADMIN_ROLE], nonAdminMembership), true);
+            assert.equal(applyRolesFilters(nonAdminUser, [General.TEAM_ADMIN_ROLE], [General.SYSTEM_ADMIN_ROLE], nonAdminMembership), false);
+            assert.equal(applyRolesFilters(nonAdminUser, [General.TEAM_USER_ROLE], [General.SYSTEM_USER_ROLE], nonAdminMembership), false);
         });
 
         it('Non admin user with admin membership', () => {
             const adminMembership = {...TestHelper.fakeTeamMember(nonAdminUser.id, team.id), scheme_admin: true, scheme_user: true};
-            assert.equal(applyRolesFilters(nonAdminUser, [General.SYSTEM_USER_ROLE], adminMembership), true);
-            assert.equal(applyRolesFilters(nonAdminUser, [General.TEAM_ADMIN_ROLE], adminMembership), true);
-            assert.equal(applyRolesFilters(nonAdminUser, [General.CHANNEL_ADMIN_ROLE], adminMembership), true);
-            assert.equal(applyRolesFilters(nonAdminUser, [General.SYSTEM_ADMIN_ROLE, General.TEAM_USER_ROLE, General.CHANNEL_USER_ROLE], adminMembership), false);
+            assert.equal(applyRolesFilters(nonAdminUser, [General.SYSTEM_USER_ROLE], [], adminMembership), true);
+            assert.equal(applyRolesFilters(nonAdminUser, [General.TEAM_ADMIN_ROLE], [], adminMembership), true);
+            assert.equal(applyRolesFilters(nonAdminUser, [General.CHANNEL_ADMIN_ROLE], [], adminMembership), true);
+            assert.equal(applyRolesFilters(nonAdminUser, [General.SYSTEM_ADMIN_ROLE, General.TEAM_USER_ROLE, General.CHANNEL_USER_ROLE], [], adminMembership), false);
+            assert.equal(applyRolesFilters(nonAdminUser, [], [General.TEAM_ADMIN_ROLE], adminMembership), false);
+            assert.equal(applyRolesFilters(nonAdminUser, [], [General.CHANNEL_ADMIN_ROLE], adminMembership), false);
+            assert.equal(applyRolesFilters(nonAdminUser, [General.SYSTEM_USER_ROLE], [General.CHANNEL_ADMIN_ROLE], adminMembership), false);
         });
 
         it('Admin user with any membership', () => {
             const nonAdminMembership = {...TestHelper.fakeTeamMember(adminUser.id, team.id), scheme_admin: false, scheme_user: true};
             const adminMembership = {...TestHelper.fakeTeamMember(adminUser.id, team.id), scheme_admin: true, scheme_user: true};
-            assert.equal(applyRolesFilters(adminUser, [General.SYSTEM_ADMIN_ROLE], nonAdminMembership), true);
-            assert.equal(applyRolesFilters(adminUser, [General.SYSTEM_USER_ROLE, General.TEAM_USER_ROLE, General.TEAM_ADMIN_ROLE, General.CHANNEL_USER_ROLE, General.CHANNEL_ADMIN_ROLE], nonAdminMembership), false);
-            assert.equal(applyRolesFilters(adminUser, [General.SYSTEM_ADMIN_ROLE], adminMembership), true);
-            assert.equal(applyRolesFilters(adminUser, [General.SYSTEM_USER_ROLE, General.TEAM_USER_ROLE, General.TEAM_ADMIN_ROLE, General.CHANNEL_USER_ROLE, General.CHANNEL_ADMIN_ROLE], adminMembership), false);
+            assert.equal(applyRolesFilters(adminUser, [General.SYSTEM_ADMIN_ROLE], [], nonAdminMembership), true);
+            assert.equal(applyRolesFilters(adminUser, [General.SYSTEM_USER_ROLE, General.TEAM_USER_ROLE, General.TEAM_ADMIN_ROLE, General.CHANNEL_USER_ROLE, General.CHANNEL_ADMIN_ROLE], [], nonAdminMembership), false);
+            assert.equal(applyRolesFilters(adminUser, [General.SYSTEM_ADMIN_ROLE], [], adminMembership), true);
+            assert.equal(applyRolesFilters(adminUser, [General.SYSTEM_USER_ROLE, General.TEAM_USER_ROLE, General.TEAM_ADMIN_ROLE, General.CHANNEL_USER_ROLE, General.CHANNEL_ADMIN_ROLE], [], adminMembership), false);
+            assert.equal(applyRolesFilters(adminUser, [], [General.SYSTEM_ADMIN_ROLE], nonAdminMembership), false);
+            assert.equal(applyRolesFilters(adminUser, [], [General.SYSTEM_USER_ROLE], nonAdminMembership), true);
         });
 
         it('Guest user with any membership', () => {
             const nonAdminMembership = {...TestHelper.fakeTeamMember(guestUser.id, team.id), scheme_admin: false, scheme_user: true};
             const adminMembership = {...TestHelper.fakeTeamMember(guestUser.id, team.id), scheme_admin: true, scheme_user: true};
-            assert.equal(applyRolesFilters(guestUser, [General.SYSTEM_GUEST_ROLE], nonAdminMembership), true);
-            assert.equal(applyRolesFilters(guestUser, [General.SYSTEM_USER_ROLE, General.TEAM_USER_ROLE, General.TEAM_ADMIN_ROLE, General.CHANNEL_USER_ROLE, General.CHANNEL_ADMIN_ROLE], nonAdminMembership), false);
-            assert.equal(applyRolesFilters(guestUser, [General.SYSTEM_GUEST_ROLE], adminMembership), true);
-            assert.equal(applyRolesFilters(guestUser, [General.SYSTEM_USER_ROLE, General.TEAM_USER_ROLE, General.TEAM_ADMIN_ROLE, General.CHANNEL_USER_ROLE, General.CHANNEL_ADMIN_ROLE], adminMembership), false);
+            assert.equal(applyRolesFilters(guestUser, [General.SYSTEM_GUEST_ROLE], [], nonAdminMembership), true);
+            assert.equal(applyRolesFilters(guestUser, [General.SYSTEM_USER_ROLE, General.TEAM_USER_ROLE, General.TEAM_ADMIN_ROLE, General.CHANNEL_USER_ROLE, General.CHANNEL_ADMIN_ROLE], [], nonAdminMembership), false);
+            assert.equal(applyRolesFilters(guestUser, [General.SYSTEM_GUEST_ROLE], [], adminMembership), true);
+            assert.equal(applyRolesFilters(guestUser, [General.SYSTEM_USER_ROLE, General.TEAM_USER_ROLE, General.TEAM_ADMIN_ROLE, General.CHANNEL_USER_ROLE, General.CHANNEL_ADMIN_ROLE], [], adminMembership), false);
+            assert.equal(applyRolesFilters(guestUser, [], [General.SYSTEM_GUEST_ROLE], adminMembership), false);
         });
     });
 
