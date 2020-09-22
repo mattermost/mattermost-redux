@@ -184,6 +184,11 @@ values.SYSCONSOLE_ANCILLARY_PERMISSIONS = {
     [values.SYSCONSOLE_READ_REPORTING]: [
         values.VIEW_TEAM,
     ],
+    [values.SYSCONSOLE_WRITE_USERMANAGEMENT_USERS]: [
+        values.EDIT_OTHER_USERS,
+        values.DEMOTE_TO_GUEST,
+        values.PROMOTE_GUEST,
+    ],
     [values.SYSCONSOLE_WRITE_USERMANAGEMENT_CHANNELS]: [
         values.MANAGE_TEAM,
         values.MANAGE_PUBLIC_CHANNEL_PROPERTIES,
@@ -195,6 +200,7 @@ values.SYSCONSOLE_ANCILLARY_PERMISSIONS = {
         values.CONVERT_PRIVATE_CHANNEL_TO_PUBLIC,
     ],
     [values.SYSCONSOLE_WRITE_USERMANAGEMENT_TEAMS]: [
+        values.MANAGE_TEAM,
         values.MANAGE_TEAM_ROLES,
         values.REMOVE_USER_FROM_TEAM,
         values.JOIN_PRIVATE_TEAMS,
