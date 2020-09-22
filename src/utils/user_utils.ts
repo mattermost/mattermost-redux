@@ -159,8 +159,9 @@ export function filterProfilesMatchingTerm(users: Array<UserProfile>, term: stri
             profileSuggestions.push(split[1]);
         }
 
-        return profileSuggestions.
-            filter((suggestion) => suggestion !== '')      .some((suggestion) => suggestion.indexOf(trimmedTerm) >= 0);
+    return profileSuggestions
+      .filter((suggestion) => suggestion !== "")
+      .some((suggestion) => suggestion.indexOf(trimmedTerm) >= 0);
     });
 }
 
