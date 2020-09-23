@@ -71,5 +71,6 @@ export default {
     DISABLED: 'disabled',
     DEFAULT_ON: 'default_on',
     DEFAULT_OFF: 'default_off',
+    ALWAYS_ON: 'always_on',
     DEFAULT_GROUP: 'board',
 };
