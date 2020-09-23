@@ -131,6 +131,10 @@ describe('user utils', () => {
             assert.deepEqual(filterProfilesMatchingTerm(users, 'some'), [userB]);
         });
 
+        it('should match by nickname by substring', () => {
+            assert.deepEqual(filterProfilesMatchingTerm(users, 'body'), [userB]);
+        });
+
         it('should match by email prefix', () => {
             assert.deepEqual(filterProfilesMatchingTerm(users, 'left'), [userB]);
         });
