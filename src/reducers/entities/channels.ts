@@ -277,7 +277,12 @@ function myMembers(state: RelationOneToOne<Channel, ChannelMembership> = {}, act
         };
     }
     case ChannelTypes.INCREMENT_UNREAD_MSG_COUNT: {
-        const {channelId, amount, onlyMentions} = action.data;
+        const {
+            channelId,
+            amount,
+            onlyMentions,
+            fetchedChannelMember,
+        } = action.data;
         const member = state[channelId];
 
         if (!member) {
@@ -287,6 +292,11 @@ function myMembers(state: RelationOneToOne<Channel, ChannelMembership> = {}, act
 
         if (!onlyMentions) {
             // Incrementing the msg_count marks the channel as read, so don't do that if these posts should be unread
+            return state;
+        }
+
+        if (fetchedChannelMember) {
+            // We've already updated the channel member with the correct msg_count
             return state;
         }
 
@@ -317,11 +327,20 @@ function myMembers(state: RelationOneToOne<Channel, ChannelMembership> = {}, act
         };
     }
     case ChannelTypes.INCREMENT_UNREAD_MENTION_COUNT: {
-        const {channelId, amount} = action.data;
+        const {
+            channelId,
+            amount,
+            fetchedChannelMember,
+        } = action.data;
         const member = state[channelId];
 
         if (!member) {
             // Don't keep track of unread posts until we've loaded the actual channel member
+            return state;
+        }
+
+        if (fetchedChannelMember) {
+            // We've already updated the channel member with the correct msg_count
             return state;
         }
 
