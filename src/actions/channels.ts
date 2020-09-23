@@ -1336,19 +1336,13 @@ export function markChannelAsRead(channelId: string, prevChannelId?: string, upd
 
 // Increments the number of posts in the channel by 1 and marks it as unread if necessary
 
-export function markChannelAsUnread(teamId: string, channelId: string, mentions: Array<string>): ActionFunc {
+export function markChannelAsUnread(teamId: string, channelId: string, mentions: Array<string>, fetchedChannelMember = false): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         const state = getState();
         const {myMembers} = state.entities.channels;
         const {currentUserId} = state.entities.users;
 
         const actions: Action[] = [{
-            type: ChannelTypes.INCREMENT_TOTAL_MSG_COUNT,
-            data: {
-                channelId,
-                amount: 1,
-            },
-        }, {
             type: ChannelTypes.INCREMENT_UNREAD_MSG_COUNT,
             data: {
                 teamId,
@@ -1356,8 +1350,19 @@ export function markChannelAsUnread(teamId: string, channelId: string, mentions:
                 amount: 1,
                 onlyMentions: myMembers[channelId] && myMembers[channelId].notify_props &&
                     myMembers[channelId].notify_props.mark_unread === General.MENTION,
+                fetchedChannelMember,
             },
         }];
+
+        if (!fetchedChannelMember) {
+            actions.push({
+                type: ChannelTypes.INCREMENT_TOTAL_MSG_COUNT,
+                data: {
+                    channelId,
+                    amount: 1,
+                },
+            });
+        }
 
         if (mentions && mentions.indexOf(currentUserId) !== -1) {
             actions.push({
@@ -1366,6 +1371,7 @@ export function markChannelAsUnread(teamId: string, channelId: string, mentions:
                     teamId,
                     channelId,
                     amount: 1,
+                    fetchedChannelMember,
                 },
             });
         }
