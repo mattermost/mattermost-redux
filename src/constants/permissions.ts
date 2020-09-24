@@ -118,6 +118,7 @@ const values = {
     MANAGE_OTHERS_BOTS: 'manage_others_bots',
     SYSCONSOLE_READ_PERMISSIONS: [] as string[],
     SYSCONSOLE_WRITE_PERMISSIONS: [] as string[],
+    MANAGE_SHARED_CHANNELS: 'manage_shared_channels',
 };
 
 values.SYSCONSOLE_READ_PERMISSIONS = [
