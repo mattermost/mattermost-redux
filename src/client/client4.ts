@@ -3304,7 +3304,6 @@ export default class Client4 {
         );
     }
 
-
     getSubscriptionByInstallationId = (installationId: string) => {
         return this.doFetch<Subscription>(
             `${this.getBaseRoute()}/cloud/subscriptionByInstallationId/${installationId}`,
