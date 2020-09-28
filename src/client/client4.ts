@@ -6,6 +6,7 @@ import {ClusterInfo, AnalyticsRow} from 'types/admin';
 import {Audit} from 'types/audits';
 import {UserAutocomplete, AutocompleteSuggestion} from 'types/autocomplete';
 import {Bot, BotPatch} from 'types/bots';
+import {Product} from 'types/cloud';
 import {ChannelCategory, OrderedChannelCategories} from 'types/channel_categories';
 import {
     Channel,
@@ -3300,6 +3301,27 @@ export default class Client4 {
         return this.doFetch<Bot>(
             `${this.getBotRoute(botUserId)}/assign/${newOwnerId}`,
             {method: 'post'},
+        );
+    }
+
+    // Cloud routes
+    getCloudProducts = () => {
+        return this.doFetch<Product[]>(
+            `${this.getBaseRoute()}/cloud/products`, {method: 'get'},
+        );
+    };
+
+    createPaymentMethod = async () => {
+        return this.doFetch(
+            `${this.getBaseRoute()}/cloud/payment`,
+            {method: 'post'},
+        );
+    }
+
+    confirmPaymentMethod = async (stripeSetupIntentID: string) => {
+        return this.doFetch(
+            `${this.getBaseRoute()}/cloud/payment/confirm`,
+            {method: 'post', body: JSON.stringify({stripe_setup_intent_id: stripeSetupIntentID})},
         );
     }
 
