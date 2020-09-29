@@ -5,11 +5,11 @@ import {combineReducers} from 'redux';
 import {CloudTypes} from 'action_types';
 
 import {GenericAction} from 'types/actions';
-import {Subscription} from 'types/cloud';
+import {CloudCustomer} from 'types/cloud';
 
-function subscription(state: Subscription | undefined = undefined, action: GenericAction) {
+function customer(state: CloudCustomer | null = null, action: GenericAction) {
     switch (action.type) {
-    case CloudTypes.RECEIVED_CLOUD_SUBSCRIPTION: {
+    case CloudTypes.RECEIVED_CLOUD_CUSTOMER: {
         return action.data;
     }
     default:
@@ -20,5 +20,5 @@ function subscription(state: Subscription | undefined = undefined, action: Gener
 export default combineReducers({
 
     // represents the current cloud subscription
-    subscription,
+    customer,
 });

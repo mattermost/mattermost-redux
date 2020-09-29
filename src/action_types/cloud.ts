@@ -3,5 +3,5 @@
 import keyMirror from 'utils/key_mirror';
 
 export default keyMirror({
-    RECEIVED_CLOUD_SUBSCRIPTION: null,
+    RECEIVED_CLOUD_CUSTOMER: null,
 });
