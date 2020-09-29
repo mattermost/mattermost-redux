@@ -7,12 +7,9 @@ import {ActionFunc} from 'types/actions';
 
 import {bindClientFunc} from './helpers';
 
-export function getCloudSubscriptionByInstallationId(installationId: string): ActionFunc {
+export function getCloudSubscription(): ActionFunc {
     return bindClientFunc({
-        clientFunc: Client4.getSubscriptionByInstallationId,
+        clientFunc: Client4.getSubscription,
         onSuccess: [CloudTypes.RECEIVED_CLOUD_SUBSCRIPTION],
-        params: [
-            installationId,
-        ],
     });
 }
