@@ -1,8 +1,11 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
 
+import {Dictionary} from './utilities';
+
 export type CloudState = {
     subscription?: Subscription;
+    products?: Dictionary<Product>;
 }
 
 export type Subscription = {

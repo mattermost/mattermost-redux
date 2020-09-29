@@ -13,3 +13,10 @@ export function getCloudSubscription(): ActionFunc {
         onSuccess: [CloudTypes.RECEIVED_CLOUD_SUBSCRIPTION],
     });
 }
+
+export function getCloudProducts(): ActionFunc {
+    return bindClientFunc({
+        clientFunc: Client4.getCloudProducts,
+        onSuccess: [CloudTypes.RECEIVED_CLOUD_PRODUCTS],
+    });
+}
