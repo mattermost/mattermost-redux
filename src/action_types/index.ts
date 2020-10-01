@@ -21,6 +21,7 @@ import GroupTypes from './groups';
 import BotTypes from './bots';
 import PluginTypes from './plugins';
 import ChannelCategoryTypes from './channel_categories';
+import CloudTypes from './cloud';
 
 export {
     ErrorTypes,
@@ -43,4 +44,5 @@ export {
     BotTypes,
     PluginTypes,
     ChannelCategoryTypes,
+    CloudTypes,
 };
