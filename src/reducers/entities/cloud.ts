@@ -43,10 +43,10 @@ function products(state: Dictionary<Product> | null = null, action: GenericActio
 }
 
 export default combineReducers({
-    
+
     // represents the current cloud subscription
     customer,
-  
+
     // represents the current cloud subscription
     subscription,
 
