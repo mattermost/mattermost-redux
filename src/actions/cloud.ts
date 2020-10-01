@@ -20,3 +20,10 @@ export function getCloudProducts(): ActionFunc {
         onSuccess: [CloudTypes.RECEIVED_CLOUD_PRODUCTS],
     });
 }
+
+export function getCloudCustomer(): ActionFunc {
+    return bindClientFunc({
+        clientFunc: Client4.getCloudCustomer,
+        onSuccess: [CloudTypes.RECEIVED_CLOUD_CUSTOMER],
+    });
+}
