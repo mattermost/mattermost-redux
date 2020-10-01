@@ -5,7 +5,8 @@ import {Dictionary} from './utilities';
 
 export type CloudState = {
     subscription?: Subscription;
-    products?: Dictionary<Product>;
+	products?: Dictionary<Product>;
+	customer?: CloudCustomer;
 }
 
 export type Subscription = {
@@ -33,10 +34,6 @@ export type AddOn = {
     display_name: string;
     dollars_per_seat: number;
 };
-
-export type CloudState = {
-    customer?: CloudCustomer;
-}
 
 // Customer model represents a customer on the system.
 export type CloudCustomer = {
