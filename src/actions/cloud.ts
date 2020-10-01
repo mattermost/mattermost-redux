@@ -7,6 +7,20 @@ import {ActionFunc} from 'types/actions';
 
 import {bindClientFunc} from './helpers';
 
+export function getCloudSubscription(): ActionFunc {
+    return bindClientFunc({
+        clientFunc: Client4.getSubscription,
+        onSuccess: [CloudTypes.RECEIVED_CLOUD_SUBSCRIPTION],
+    });
+}
+
+export function getCloudProducts(): ActionFunc {
+    return bindClientFunc({
+        clientFunc: Client4.getCloudProducts,
+        onSuccess: [CloudTypes.RECEIVED_CLOUD_PRODUCTS],
+    });
+}
+
 export function getCloudCustomer(): ActionFunc {
     return bindClientFunc({
         clientFunc: Client4.getCloudCustomer,

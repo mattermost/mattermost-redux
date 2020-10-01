@@ -6,7 +6,7 @@ import {ClusterInfo, AnalyticsRow} from 'types/admin';
 import {Audit} from 'types/audits';
 import {UserAutocomplete, AutocompleteSuggestion} from 'types/autocomplete';
 import {Bot, BotPatch} from 'types/bots';
-import {Product, CloudCustomer} from 'types/cloud';
+import {Product, Subscription, CloudCustomer} from 'types/cloud';
 import {ChannelCategory, OrderedChannelCategories} from 'types/channel_categories';
 import {
     Channel,
@@ -3328,6 +3328,13 @@ export default class Client4 {
         return this.doFetch(
             `${this.getBaseRoute()}/cloud/payment/confirm`,
             {method: 'post', body: JSON.stringify({stripe_setup_intent_id: stripeSetupIntentID})},
+        );
+    }
+
+    getSubscription = () => {
+        return this.doFetch<Subscription>(
+            `${this.getBaseRoute()}/cloud/subscription`,
+            {method: 'get'},
         );
     }
 

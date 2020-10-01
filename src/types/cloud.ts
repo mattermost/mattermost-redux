@@ -1,6 +1,25 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
 
+import {Dictionary} from './utilities';
+
+export type CloudState = {
+    subscription?: Subscription;
+	products?: Dictionary<Product>;
+	customer?: CloudCustomer;
+}
+
+export type Subscription = {
+	id: string;
+	customer_id: string;
+	product_id: string;
+	add_ons: string[];
+	start_at: number;
+	end_at: number;
+	create_at: number;
+	seats: number;
+}
+
 export type Product = {
     id: string;
     name: string;
@@ -15,10 +34,6 @@ export type AddOn = {
     display_name: string;
     price_per_seat: number;
 };
-
-export type CloudState = {
-    customer?: CloudCustomer;
-}
 
 // Customer model represents a customer on the system.
 export type CloudCustomer = {
