@@ -36,6 +36,23 @@ function results(state: Array<string> = [], action: GenericAction) {
     }
 }
 
+function fileResults(state: Array<string> = [], action: GenericAction) {
+    switch (action.type) {
+    case SearchTypes.RECEIVED_SEARCH_POSTS: {
+        if (action.isGettingMore) {
+            return [...new Set(state.concat(action.data.order))];
+        }
+        return action.data.order;
+    }
+    case SearchTypes.REMOVE_SEARCH_POSTS:
+    case UserTypes.LOGOUT_SUCCESS:
+        return [];
+
+    default:
+        return state;
+    }
+}
+
 function matches(state: Dictionary<Array<string>> = {}, action: GenericAction) {
     switch (action.type) {
     case SearchTypes.RECEIVED_SEARCH_POSTS:
@@ -294,6 +311,9 @@ export default combineReducers({
 
     // An ordered array with posts ids from the search results
     results,
+
+    // An ordered array with files ids from the search results
+    fileResults,
 
     // Object where every key is a post id mapping to an array of matched words in that post
     matches,
