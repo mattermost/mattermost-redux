@@ -59,16 +59,33 @@ describe('Actions.Search', () => {
 
         await Actions.searchPosts(TestHelper.basicTeam.id, search1)(dispatch, getState);
 
-        const state = getState();
-        const {recent, results} = state.entities.search;
+        let state = getState();
+        let {recent, results} = state.entities.search;
         const {posts} = state.entities.posts;
-        const current = state.entities.search.current[TestHelper.basicTeam.id];
+        let current = state.entities.search.current[TestHelper.basicTeam.id];
         assert.ok(recent[TestHelper.basicTeam.id]);
-        const searchIsPresent = recent[TestHelper.basicTeam.id].findIndex((r) => r.terms === search1);
+        let searchIsPresent = recent[TestHelper.basicTeam.id].findIndex((r) => r.terms === search1);
         assert.ok(searchIsPresent !== -1);
         assert.equal(Object.keys(recent[TestHelper.basicTeam.id]).length, 1);
         assert.equal(results.length, 1);
         assert.ok(posts[results[0]]);
+        assert.ok(!current.isEnd);
+
+        // Search the next page and check the end of the search
+        nock(Client4.getTeamsRoute()).
+            post(`/${TestHelper.basicTeam.id}/posts/search`).
+            reply(200, {order: [], posts: {}});
+
+        await Actions.searchPostsWithParams(TestHelper.basicTeam.id, {terms: search1, page: 1})(dispatch, getState);
+        state = getState();
+        current = state.entities.search.current[TestHelper.basicTeam.id];
+        recent = state.entities.search.recent;
+        results = state.entities.search.results;
+        assert.ok(recent[TestHelper.basicTeam.id]);
+        searchIsPresent = recent[TestHelper.basicTeam.id].findIndex((r) => r.terms === search1);
+        assert.ok(searchIsPresent !== -1);
+        assert.equal(Object.keys(recent[TestHelper.basicTeam.id]).length, 1);
+        assert.equal(results.length, 1);
         assert.ok(current.isEnd);
 
         // DISABLED
