@@ -18,6 +18,7 @@ export type Subscription = {
 	end_at: number;
 	create_at: number;
 	seats: number;
+	is_paid_tier: string;
 }
 
 export type Product = {
