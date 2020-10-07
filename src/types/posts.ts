@@ -123,4 +123,17 @@ export type PostsState = {
     expandedURLs: Dictionary<string>;
 };
 
-export type OpenGraphMetadata = any;
+export declare type OpenGraphMetadataImage = {
+    secure_url?: string;
+    url: string;
+    height?: number;
+    width?: number;
+}
+
+export declare type OpenGraphMetadata = {
+    title?: string;
+    description?: string;
+    site_name?: string;
+    url?: string;
+    images: OpenGraphMetadataImage[];
+};
