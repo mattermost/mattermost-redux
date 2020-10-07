@@ -75,7 +75,7 @@ export function getOpenGraphMetadata(state: GlobalState): RelationOneToOne<Post,
     return state.entities.posts.openGraph;
 }
 
-export function getOpenGraphMetadataForUrl(state: GlobalState, postId: string, url: string): object {
+export function getOpenGraphMetadataForUrl(state: GlobalState, postId: string, url: string) {
     const openGraphForPost = state.entities.posts.openGraph[postId];
     return openGraphForPost ? openGraphForPost[url] : undefined;
 }
