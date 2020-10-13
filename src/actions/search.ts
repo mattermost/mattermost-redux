@@ -70,7 +70,7 @@ export function searchPostsWithParams(teamId: string, params: SearchParameter): 
                 data: {
                     teamId,
                     params,
-                    isEnd: (posts.order.length < params.per_page),
+                    isEnd: posts.order.length === 0,
                 },
             },
             {

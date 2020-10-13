@@ -115,7 +115,7 @@ export type PostsState = {
     postsInChannel: Dictionary<Array<PostOrderBlock>>;
     postsInThread: RelationOneToMany<Post, Post>;
     reactions: RelationOneToOne<Post, Dictionary<Reaction>>;
-    openGraph: RelationOneToOne<Post, OpenGraphMetadata>;
+    openGraph: RelationOneToOne<Post, Dictionary<OpenGraphMetadata>>;
     pendingPostIds: Array<string>;
     selectedPostId: string;
     currentFocusedPostId: string;
@@ -123,4 +123,18 @@ export type PostsState = {
     expandedURLs: Dictionary<string>;
 };
 
-export type OpenGraphMetadata = any;
+export declare type OpenGraphMetadataImage = {
+    secure_url?: string;
+    url: string;
+    height?: number;
+    width?: number;
+}
+
+export declare type OpenGraphMetadata = {
+    type?: string;
+    title?: string;
+    description?: string;
+    site_name?: string;
+    url?: string;
+    images: OpenGraphMetadataImage[];
+};
