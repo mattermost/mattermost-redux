@@ -28,6 +28,7 @@ export type ClientConfig = {
     CustomTermsOfServiceId: string;
     CustomTermsOfServiceReAcceptancePeriod: string;
     CustomUrlSchemes: string;
+    CWSUrl: string;
     DataRetentionEnableFileDeletion: string;
     DataRetentionEnableMessageDeletion: string;
     DataRetentionFileRetentionDays: string;
