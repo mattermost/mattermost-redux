@@ -22,6 +22,7 @@ import {Bot} from './bots';
 import {ChannelCategoriesState} from './channel_categories';
 import {Dictionary} from './utilities';
 import {PluginsState} from './plugins';
+import {CloudState} from './cloud';
 
 export type GlobalState = {
     entities: {
@@ -56,6 +57,7 @@ export type GlobalState = {
         groups: GroupsState;
         channelCategories: ChannelCategoriesState;
         plugins: PluginsState;
+        cloud: CloudState;
     };
     errors: Array<any>;
     requests: {

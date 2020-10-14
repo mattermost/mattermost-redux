@@ -259,6 +259,8 @@ export const getNewSidebarPreference: (state: GlobalState) => boolean = createSe
         switch (globalSetting) {
         case General.DISABLED:
             return false;
+        case General.ALWAYS_ON:
+            return true;
         case General.DEFAULT_ON:
             return userSetting ? (userSetting === 'true') : true;
         case General.DEFAULT_OFF:

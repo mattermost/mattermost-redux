@@ -28,6 +28,7 @@ export type ClientConfig = {
     CustomTermsOfServiceId: string;
     CustomTermsOfServiceReAcceptancePeriod: string;
     CustomUrlSchemes: string;
+    CWSUrl: string;
     DataRetentionEnableFileDeletion: string;
     DataRetentionEnableMessageDeletion: string;
     DataRetentionFileRetentionDays: string;
@@ -99,6 +100,7 @@ export type ClientConfig = {
     ExperimentalChannelSidebarOrganization: string;
     ExperimentalClientSideCertCheck: string;
     ExperimentalClientSideCertEnable: string;
+    ExperimentalCloudBilling: string;
     ExperimentalCloudUserLimit: string;
     ExperimentalDataPrefetch: string;
     ExperimentalEnableAuthenticationTransfer: string;
@@ -129,6 +131,7 @@ export type ClientConfig = {
     LdapLoginFieldName: string;
     LdapNicknameAttributeSet: string;
     LdapPositionAttributeSet: string;
+    LdapPictureAttributeSet: string;
     LockTeammateNameDisplay: string;
     MaxFileSize: string;
     MaxNotificationsPerChannel: string;
@@ -659,6 +662,7 @@ export type ExperimentalSettings = {
     LinkMetadataTimeoutMilliseconds: number;
     RestrictSystemAdmin: boolean;
     UseNewSAMLLibrary: boolean;
+    CloudBilling: boolean;
 };
 
 export type AnalyticsSettings = {

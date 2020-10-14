@@ -23,6 +23,7 @@ import groups from './groups';
 import bots from './bots';
 import channelCategories from './channel_categories';
 import plugins from './plugins';
+import cloud from './cloud';
 
 export default combineReducers({
     general,
@@ -45,4 +46,5 @@ export default combineReducers({
     bots,
     channelCategories,
     plugins,
+    cloud,
 });
