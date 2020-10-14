@@ -6,9 +6,9 @@ import {Client4} from '../client';
 import {ActionFunc} from '../types/actions';
 
 import {bindClientFunc} from './helpers';
-export function fetchMobilePluginIntegrations(): ActionFunc {
+export function fetchMobilePluginIntegrations(userID: string, channelID: string): ActionFunc {
     return bindClientFunc({
-        clientFunc: Client4.getMobilePluginIntegrations,
+        clientFunc: () => Client4.getMobilePluginIntegrations(userID, channelID),
         onSuccess: PluginTypes.RECEIVED_PLUGIN_INTEGRATIONS,
     });
 }

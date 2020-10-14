@@ -110,13 +110,28 @@ export type MarketplacePlugin = {
     installed_version: string;
 }
 
-export type PluginIntegration = {
-    id: string;
-    location: string;
-    requestURL: string;
-    extra: any;
-}
+export type PluginIntegrationBase = {
+    location_type: string;
+    location_id: string;
+    wish: {
+        app_id: string;
+        url: string;
+    }
+};
+
+export type PluginIntegrationPostMenuItem = PluginIntegrationBase & {
+    icon: string,
+    text: string,
+};
+
+export type PluginIntegrationChannelHeaderIcon = PluginIntegrationBase & {
+    dropdown_text: string,
+    aria_text: string,
+    icon: string,
+};
+
+export type PluginIntegration = PluginIntegrationPostMenuItem | PluginIntegrationChannelHeaderIcon;
 
 export type PluginsState = {
     mobilePluginIntegrations: PluginIntegration[];
-}
+};

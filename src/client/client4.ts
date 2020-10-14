@@ -205,6 +205,10 @@ export default class Client4 {
         return `${this.url}${this.urlVersion}`;
     }
 
+    getAppsProxyRoute() {
+        return `${this.url}/plugins/com.mattermost.apps/`
+    }
+
     getUsersRoute() {
         return `${this.getBaseRoute()}/users`;
     }
@@ -3167,16 +3171,16 @@ export default class Client4 {
         );
     };
 
-    executePluginIntegration = async (pluginId: string, requestURL: string, body?: any) => {
+    executePluginIntegration = async (body?: any) => {
         return this.doFetch(
-            requestURL,
+            `${this.getAppsProxyRoute()}/wish`,
             {method: 'post', body: JSON.stringify(body)},
         );
     }
 
-    getMobilePluginIntegrations = async () => {
+    getMobilePluginIntegrations = async (userID: string, channelID: string) => {
         return this.doFetch(
-            this.getBaseRoute() + '/pluginIntegrations?scope=webapp',
+            this.getAppsProxyRoute() + `/locations?user_id=${userID}&channel_id=${channelID}&scope=webapp`,
             {method: 'get'},
         );
     }
