@@ -3180,7 +3180,7 @@ export default class Client4 {
 
     getMobilePluginIntegrations = async (userID: string, channelID: string) => {
         return this.doFetch(
-            this.getAppsProxyRoute() + `/locations?user_id=${userID}&channel_id=${channelID}&scope=webapp`,
+            this.getAppsProxyRoute() + `/api/v1/locations?user_id=${userID}&channel_id=${channelID}&scope=webapp`,
             {method: 'get'},
         );
     }
