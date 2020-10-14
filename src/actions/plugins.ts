@@ -10,5 +10,6 @@ export function fetchMobilePluginIntegrations(userID: string, channelID: string)
     return bindClientFunc({
         clientFunc: () => Client4.getMobilePluginIntegrations(userID, channelID),
         onSuccess: PluginTypes.RECEIVED_PLUGIN_INTEGRATIONS,
+        onFailure: PluginTypes.RECEIVED_404_PLUGIN_INTEGRATIONS,
     });
 }
