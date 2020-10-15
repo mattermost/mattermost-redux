@@ -53,11 +53,11 @@ export type CloudCustomer = {
 
 // CustomerPatch model represents a customer patch on the system.
 export type CloudCustomerPatch = {
-	email: string;
-	name: string;
-	num_employees: number;
-	contact_first_name: string;
-	contact_last_name: string;
+	email?: string;
+	name?: string;
+	num_employees?: number;
+	contact_first_name?: string;
+	contact_last_name?: string;
 }
 
 // Address model represents a customer's address.
