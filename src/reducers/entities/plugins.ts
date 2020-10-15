@@ -10,12 +10,6 @@ function mobilePluginIntegrations(state: PluginIntegration[] = [], action: Gener
     case PluginTypes.RECEIVED_PLUGIN_INTEGRATIONS: {
         return action.data;
     }
-    case PluginTypes.RECEIVED_404_PLUGIN_INTEGRATIONS: {
-        if (action.data.status_code === 404) {
-            return [];
-        }
-        return state;
-    }
     default:
         return state;
     }
