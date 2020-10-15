@@ -206,7 +206,7 @@ export default class Client4 {
     }
 
     getAppsProxyRoute() {
-        return `${this.url}/plugins/com.mattermost.apps/`
+        return `${this.url}/plugins/com.mattermost.apps/`;
     }
 
     getUsersRoute() {

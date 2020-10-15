@@ -116,18 +116,18 @@ export type PluginIntegrationBase = {
     wish: {
         app_id: string;
         url: string;
-    }
+    };
 };
 
 export type PluginIntegrationPostMenuItem = PluginIntegrationBase & {
-    icon: string,
-    text: string,
+    icon: string;
+    text: string;
 };
 
 export type PluginIntegrationChannelHeaderIcon = PluginIntegrationBase & {
-    dropdown_text: string,
-    aria_text: string,
-    icon: string,
+    dropdown_text: string;
+    aria_text: string;
+    icon: string;
 };
 
 export type PluginIntegration = PluginIntegrationPostMenuItem | PluginIntegrationChannelHeaderIcon;
