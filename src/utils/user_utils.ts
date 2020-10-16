@@ -184,28 +184,34 @@ export function sortByUsername(a: UserProfile, b: UserProfile): number {
     return nameA.localeCompare(nameB);
 }
 
-export function applyRolesFilters(user: UserProfile, filterRoles: string[], membership?: TeamMembership | ChannelMembership): boolean {
-    const userIsNotAdminOrGuest = !user.roles.includes(General.SYSTEM_ADMIN_ROLE) && !user.roles.includes(General.SYSTEM_GUEST_ROLE);
-    return filterRoles.some((role: string) => {
-        const isSystemRole = role.includes('system');
-        return (
-            (
+function checkUserHasRole(user: UserProfile, userIsNotAdminOrGuest: boolean, membership: TeamMembership | ChannelMembership | undefined, role: string) {
+    const isSystemRole = role.includes('system');
+    return (
+        (
 
-                // If role is system user then user cannot have system admin or system guest roles
-                isSystemRole && user.roles.includes(role) && (
-                    (role === General.SYSTEM_USER_ROLE && userIsNotAdminOrGuest) ||
-                    role !== General.SYSTEM_USER_ROLE
-                )
-            ) || (
-
-                // If user is a system admin or a system guest then ignore team and channel memberships
-                !isSystemRole && userIsNotAdminOrGuest && (
-                    (role === General.TEAM_ADMIN_ROLE && membership?.scheme_admin) ||
-                    (role === General.CHANNEL_ADMIN_ROLE && membership?.scheme_admin) ||
-                    (role === General.TEAM_USER_ROLE && membership?.scheme_user && !membership?.scheme_admin) ||
-                    (role === General.CHANNEL_USER_ROLE && membership?.scheme_user && !membership?.scheme_admin)
-                )
+            // If role is system user then user cannot have system admin or system guest roles
+            isSystemRole && user.roles.includes(role) && (
+                (role === General.SYSTEM_USER_ROLE && userIsNotAdminOrGuest) ||
+                role !== General.SYSTEM_USER_ROLE
             )
-        );
-    });
+        ) || (
+
+            // If user is a system admin or a system guest then ignore team and channel memberships
+            !isSystemRole && userIsNotAdminOrGuest && (
+                (role === General.TEAM_ADMIN_ROLE && membership?.scheme_admin) ||
+                (role === General.CHANNEL_ADMIN_ROLE && membership?.scheme_admin) ||
+                (role === General.TEAM_USER_ROLE && membership?.scheme_user && !membership?.scheme_admin) ||
+                (role === General.CHANNEL_USER_ROLE && membership?.scheme_user && !membership?.scheme_admin)
+            )
+        )
+    );
+}
+
+export function applyRolesFilters(user: UserProfile, filterRoles: string[], excludeRoles: string[], membership: TeamMembership | ChannelMembership | undefined): boolean {
+    const userIsNotAdminOrGuest = !(user.roles.includes(General.SYSTEM_ADMIN_ROLE) || user.roles.includes(General.SYSTEM_GUEST_ROLE));
+    const userHasExcludedRole = excludeRoles.some(checkUserHasRole.bind(this, user, userIsNotAdminOrGuest, membership));
+    if (userHasExcludedRole) {
+        return false;
+    }
+    return filterRoles.length === 0 || filterRoles.some(checkUserHasRole.bind(this, user, userIsNotAdminOrGuest, membership));
 }

@@ -76,6 +76,9 @@ const values = {
     DEMOTE_TO_GUEST: 'demote_to_guest',
     USE_CHANNEL_MENTIONS: 'use_channel_mentions',
     USE_GROUP_MENTIONS: 'use_group_mentions',
+    READ_OTHER_USERS_TEAMS: 'read_other_users_teams',
+    EDIT_BRAND: 'edit_brand',
+    READ_JOBS: 'read_jobs',
 
     SYSCONSOLE_READ_ABOUT: 'sysconsole_read_about',
     SYSCONSOLE_WRITE_ABOUT: 'sysconsole_write_about',
@@ -118,6 +121,7 @@ const values = {
     MANAGE_OTHERS_BOTS: 'manage_others_bots',
     SYSCONSOLE_READ_PERMISSIONS: [] as string[],
     SYSCONSOLE_WRITE_PERMISSIONS: [] as string[],
+    SYSCONSOLE_ANCILLARY_PERMISSIONS: {} as Record<string, string[]>,
 };
 
 values.SYSCONSOLE_READ_PERMISSIONS = [
@@ -155,5 +159,69 @@ values.SYSCONSOLE_WRITE_PERMISSIONS = [
     values.SYSCONSOLE_WRITE_COMPLIANCE,
     values.SYSCONSOLE_WRITE_EXPERIMENTAL,
 ];
+
+values.SYSCONSOLE_ANCILLARY_PERMISSIONS = {
+    [values.SYSCONSOLE_READ_USERMANAGEMENT_CHANNELS]: [
+        values.READ_PUBLIC_CHANNEL,
+        values.READ_CHANNEL,
+        values.READ_PUBLIC_CHANNEL_GROUPS,
+        values.READ_PRIVATE_CHANNEL_GROUPS,
+    ],
+    [values.SYSCONSOLE_READ_USERMANAGEMENT_USERS]: [
+        values.READ_OTHER_USERS_TEAMS,
+    ],
+    [values.SYSCONSOLE_READ_USERMANAGEMENT_TEAMS]: [
+        values.LIST_PRIVATE_TEAMS,
+        values.LIST_PUBLIC_TEAMS,
+        values.VIEW_TEAM,
+    ],
+    [values.SYSCONSOLE_READ_ENVIRONMENT]: [
+        values.READ_JOBS,
+    ],
+    [values.SYSCONSOLE_READ_AUTHENTICATION]: [
+        values.READ_JOBS,
+    ],
+    [values.SYSCONSOLE_READ_REPORTING]: [
+        values.VIEW_TEAM,
+    ],
+    [values.SYSCONSOLE_WRITE_USERMANAGEMENT_USERS]: [
+        values.EDIT_OTHER_USERS,
+        values.DEMOTE_TO_GUEST,
+        values.PROMOTE_GUEST,
+    ],
+    [values.SYSCONSOLE_WRITE_USERMANAGEMENT_CHANNELS]: [
+        values.MANAGE_TEAM,
+        values.MANAGE_PUBLIC_CHANNEL_PROPERTIES,
+        values.MANAGE_PRIVATE_CHANNEL_PROPERTIES,
+        values.MANAGE_PRIVATE_CHANNEL_MEMBERS,
+        values.MANAGE_PUBLIC_CHANNEL_MEMBERS,
+        values.DELETE_PRIVATE_CHANNEL,
+        values.DELETE_PUBLIC_CHANNEL,
+        values.MANAGE_CHANNEL_ROLES,
+        values.CONVERT_PUBLIC_CHANNEL_TO_PRIVATE,
+        values.CONVERT_PRIVATE_CHANNEL_TO_PUBLIC,
+    ],
+    [values.SYSCONSOLE_WRITE_USERMANAGEMENT_TEAMS]: [
+        values.MANAGE_TEAM,
+        values.MANAGE_TEAM_ROLES,
+        values.REMOVE_USER_FROM_TEAM,
+        values.JOIN_PRIVATE_TEAMS,
+        values.JOIN_PUBLIC_TEAMS,
+        values.ADD_USER_TO_TEAM,
+    ],
+    [values.SYSCONSOLE_WRITE_USERMANAGEMENT_GROUPS]: [
+        values.MANAGE_TEAM,
+        values.MANAGE_PRIVATE_CHANNEL_MEMBERS,
+        values.MANAGE_PUBLIC_CHANNEL_MEMBERS,
+        values.CONVERT_PUBLIC_CHANNEL_TO_PRIVATE,
+        values.CONVERT_PRIVATE_CHANNEL_TO_PUBLIC,
+    ],
+    [values.SYSCONSOLE_WRITE_ENVIRONMENT]: [
+        values.MANAGE_JOBS,
+    ],
+    [values.SYSCONSOLE_WRITE_SITE]: [
+        values.EDIT_BRAND,
+    ],
+};
 
 export default values;
