@@ -382,13 +382,13 @@ export function submitInteractiveDialog(submission: DialogSubmission): ActionFun
     };
 }
 
-export function submitEmbeddedForm(submission: DialogSubmission, post_id: string, app_id: string): ActionFunc {
+export function submitEmbeddedForm(submission: DialogSubmission, postID: string, appID: string): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         const state = getState();
         submission.channel_id = getCurrentChannelId(state);
         submission.team_id = getCurrentTeamId(state);
-        submission.submission["__postID__"] = post_id
-        submission.submission["__appID__"] = app_id
+        submission.submission.mm_postID = postID;
+        submission.submission.mm_appID = appID;
 
         let data;
         try {

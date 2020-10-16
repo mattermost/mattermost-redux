@@ -2445,7 +2445,7 @@ export default class Client4 {
     submitEmbeddedForm = (data: DialogSubmission) => {
         this.trackEvent('api', 'api_embedded_form_dialog_submitted');
         return this.doFetch<SubmitDialogResponse>(
-            `${this.getAppsProxyRoute()}/api/v1/dialog`,
+            `${this.getAppsProxyRoute()}api/v1/dialog`,
             {method: 'post', body: JSON.stringify(data)},
         );
     };
