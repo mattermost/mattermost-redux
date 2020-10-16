@@ -205,6 +205,10 @@ export default class Client4 {
         return `${this.url}${this.urlVersion}`;
     }
 
+    getAppsProxyRoute() {
+        return `${this.url}/plugins/com.mattermost.apps/`;
+    }
+
     getUsersRoute() {
         return `${this.getBaseRoute()}/users`;
     }
@@ -2434,6 +2438,14 @@ export default class Client4 {
         this.trackEvent('api', 'api_interactive_messages_dialog_submitted');
         return this.doFetch<SubmitDialogResponse>(
             `${this.getBaseRoute()}/actions/dialogs/submit`,
+            {method: 'post', body: JSON.stringify(data)},
+        );
+    };
+
+    submitEmbeddedForm = (data: DialogSubmission) => {
+        this.trackEvent('api', 'api_embedded_form_dialog_submitted');
+        return this.doFetch<SubmitDialogResponse>(
+            `${this.getAppsProxyRoute()}/api/v1/dialog`,
             {method: 'post', body: JSON.stringify(data)},
         );
     };

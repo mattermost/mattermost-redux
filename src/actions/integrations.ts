@@ -381,3 +381,25 @@ export function submitInteractiveDialog(submission: DialogSubmission): ActionFun
         return {data};
     };
 }
+
+export function submitEmbeddedForm(submission: DialogSubmission, post_id: string, app_id: string): ActionFunc {
+    return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
+        const state = getState();
+        submission.channel_id = getCurrentChannelId(state);
+        submission.team_id = getCurrentTeamId(state);
+        submission.submission["__postID__"] = post_id
+        submission.submission["__appID__"] = app_id
+
+        let data;
+        try {
+            data = await Client4.submitEmbeddedForm(submission);
+        } catch (error) {
+            forceLogoutIfNecessary(error, dispatch, getState);
+
+            dispatch(logError(error));
+            return {error};
+        }
+
+        return {data};
+    };
+}
