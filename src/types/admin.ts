@@ -29,7 +29,7 @@ export type AdminState = {
     samlCertStatus?: SamlCertificateStatus;
     analytics?: Dictionary<number | AnalyticsRow[]>;
     teamAnalytics?: RelationOneToOne<Team, Dictionary<number | AnalyticsRow[]>>;
-    userAccessTokensForUser?: RelationOneToOne<UserProfile, Dictionary<UserAccessToken>>;
+    userAccessTokensByUser?: RelationOneToOne<UserProfile, Dictionary<UserAccessToken>>;
     plugins?: Dictionary<PluginRedux>;
     pluginStatuses?: Dictionary<PluginStatusRedux>;
     samlMetadataResponse?: SamlMetadataResponse;

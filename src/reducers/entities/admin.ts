@@ -299,7 +299,7 @@ function userAccessTokens(state: Dictionary<UserAccessToken> = {}, action: Gener
     }
 }
 
-function userAccessTokensForUser(state: RelationOneToOne<UserProfile, Dictionary<UserAccessToken>> = {}, action: GenericAction) {
+function userAccessTokensByUser(state: RelationOneToOne<UserProfile, Dictionary<UserAccessToken>> = {}, action: GenericAction) {
     switch (action.type) {
     case AdminTypes.RECEIVED_USER_ACCESS_TOKEN: { // UserAccessToken
         const nextUserState: UserAccessToken | Dictionary<UserAccessToken> = {...(state[action.data.user_id] || {})};
@@ -614,7 +614,7 @@ export default combineReducers({
 
     // object with user ids as keys and objects, with token ids as keys, and
     // user access tokens as values without actual token
-    userAccessTokensByUser: userAccessTokensForUser,
+    userAccessTokensByUser,
 
     // object with token ids as keys, and user access tokens as values without actual token
     userAccessTokens,
