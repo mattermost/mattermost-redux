@@ -3494,6 +3494,8 @@ export default class Client4 {
                 search: '',
                 title: '',
                 url: '',
+                user_actual_role: this.userRoles && isSystemAdmin(this.userRoles) ? 'system_admin, system_user' : 'system_user',
+                user_actual_id: this.userId,
             },
             {
                 context: {
