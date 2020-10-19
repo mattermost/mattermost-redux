@@ -29,6 +29,13 @@ export function getCloudCustomer(): ActionFunc {
     });
 }
 
+export function getInvoices(): ActionFunc {
+    return bindClientFunc({
+        clientFunc: Client4.getInvoices,
+        onSuccess: [CloudTypes.RECEIVED_CLOUD_INVOICES],
+    });
+}
+
 export function updateCloudCustomer(customerPatch: CloudCustomerPatch): ActionFunc {
     return bindClientFunc({
         clientFunc: Client4.updateCloudCustomer,

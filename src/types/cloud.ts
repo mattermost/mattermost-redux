@@ -7,6 +7,7 @@ export type CloudState = {
     subscription?: Subscription;
 	products?: Dictionary<Product>;
 	customer?: CloudCustomer;
+	invoices?: Dictionary<Invoice>;
 }
 
 export type Subscription = {
@@ -78,4 +79,27 @@ export type PaymentMethod = {
 	exp_year: number;
 	card_brand: string;
 	name: string;
+}
+
+// Invoice model represents a invoice on the system.
+export type Invoice = {
+	id: string;
+	number: string;
+	create_at: number;
+	total: number;
+	status: string;
+	description: string;
+	period_start: number;
+	period_end: number;
+	subscription_id: string;
+	line_items: InvoiceLineItem[];
+}
+
+// InvoiceLineItem model represents a invoice lineitem tied to an invoice.
+export type InvoiceLineItem = {
+	price_id: string;
+	total: number;
+	quantity: number;
+	description: string;
+	metadata: Dictionary<string>;
 }
