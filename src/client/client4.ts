@@ -6,7 +6,7 @@ import {ClusterInfo, AnalyticsRow} from 'types/admin';
 import {Audit} from 'types/audits';
 import {UserAutocomplete, AutocompleteSuggestion} from 'types/autocomplete';
 import {Bot, BotPatch} from 'types/bots';
-import {Product, Subscription, CloudCustomer} from 'types/cloud';
+import {Product, Subscription, CloudCustomer, Address, CloudCustomerPatch} from 'types/cloud';
 import {ChannelCategory, OrderedChannelCategories} from 'types/channel_categories';
 import {
     Channel,
@@ -3321,6 +3321,20 @@ export default class Client4 {
     getCloudCustomer = () => {
         return this.doFetch<CloudCustomer>(
             `${this.getBaseRoute()}/cloud/customer`, {method: 'get'},
+        );
+    }
+
+    updateCloudCustomer = (customerPatch: CloudCustomerPatch) => {
+        return this.doFetch<CloudCustomer>(
+            `${this.getBaseRoute()}/cloud/customer`,
+            {method: 'put', body: JSON.stringify(customerPatch)},
+        );
+    }
+
+    updateCloudCustomerAddress = (address: Address) => {
+        return this.doFetch<CloudCustomer>(
+            `${this.getBaseRoute()}/cloud/customer/address`,
+            {method: 'put', body: JSON.stringify(address)},
         );
     }
 
