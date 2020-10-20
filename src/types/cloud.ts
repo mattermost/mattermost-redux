@@ -20,7 +20,7 @@ export type Subscription = {
 	create_at: number;
 	seats: number;
 	is_paid_tier: string;
-	last_invoice: Invoice;
+	last_invoice?: Invoice;
 }
 
 export type Product = {
