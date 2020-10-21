@@ -96,6 +96,8 @@ const values = {
     SYSCONSOLE_WRITE_USERMANAGEMENT_CHANNELS: 'sysconsole_write_user_management_channels',
     SYSCONSOLE_READ_USERMANAGEMENT_PERMISSIONS: 'sysconsole_read_user_management_permissions',
     SYSCONSOLE_WRITE_USERMANAGEMENT_PERMISSIONS: 'sysconsole_write_user_management_permissions',
+    SYSCONSOLE_READ_USERMANAGEMENT_SYSTEM_ROLES: 'sysconsole_read_user_management_system_roles',
+    SYSCONSOLE_WRITE_USERMANAGEMENT_SYSTEM_ROLES: 'sysconsole_write_user_management_system_roles',
     SYSCONSOLE_READ_ENVIRONMENT: 'sysconsole_read_environment',
     SYSCONSOLE_WRITE_ENVIRONMENT: 'sysconsole_write_environment',
     SYSCONSOLE_READ_SITE: 'sysconsole_read_site',
