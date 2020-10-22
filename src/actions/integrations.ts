@@ -387,8 +387,8 @@ export function submitEmbeddedForm(submission: DialogSubmission, postID: string,
         const state = getState();
         submission.channel_id = getCurrentChannelId(state);
         submission.team_id = getCurrentTeamId(state);
-        submission.submission.mm_postID = postID;
-        submission.submission.mm_appID = appID;
+        submission.submission.mm_post_id = postID;
+        submission.submission.mm_app_id = appID;
 
         let data;
         try {
