@@ -3171,10 +3171,11 @@ export default class Client4 {
         );
     };
 
-    executePluginCall = async (body?: any) => {
+    // TODO type call
+    executePluginCall = async (call?: any) => {
         return this.doFetch(
             `${this.getAppsProxyRoute()}/proxy/call`,
-            {method: 'post', body: JSON.stringify(body)},
+            {method: 'post', body: JSON.stringify(call)},
         );
     }
 
