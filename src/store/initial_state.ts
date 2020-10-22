@@ -156,7 +156,7 @@ const state: GlobalState = {
             orderByTeam: {},
         },
         plugins: {
-            mobilePluginIntegrations: [],
+            locations: [],
         },
         cloud: {},
     },

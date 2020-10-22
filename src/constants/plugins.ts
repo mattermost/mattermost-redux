@@ -8,6 +8,6 @@ export default {
     PLUGIN_STATE_FAILED_TO_STAY_RUNNING: 4,
     PLUGIN_STATE_STOPPING: 5,
 
-    PLUGIN_LOCATION_POST_ACTION: 'post_menu_item',
-    PLUGIN_LOCATION_CHANNEL_HEADER: 'channel_header_icon',
+    PLUGIN_LOCATION_POST_MENU_ITEM: 'post_menu_item',
+    PLUGIN_LOCATION_CHANNEL_HEADER_ICON: 'channel_header_icon',
 };

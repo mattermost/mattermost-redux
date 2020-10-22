@@ -206,7 +206,7 @@ export default class Client4 {
     }
 
     getAppsProxyRoute() {
-        return `${this.url}/plugins/com.mattermost.apps/`;
+        return `${this.url}/plugins/com.mattermost.apps`;
     }
 
     getUsersRoute() {
@@ -3171,14 +3171,14 @@ export default class Client4 {
         );
     };
 
-    executePluginIntegration = async (body?: any) => {
+    executePluginCall = async (body?: any) => {
         return this.doFetch(
-            `${this.getAppsProxyRoute()}/wish`,
+            `${this.getAppsProxyRoute()}/proxy/call`,
             {method: 'post', body: JSON.stringify(body)},
         );
     }
 
-    getMobilePluginIntegrations = async (userID: string, channelID: string) => {
+    getPluginLocations = async (userID: string, channelID: string) => {
         return this.doFetch(
             this.getAppsProxyRoute() + `/api/v1/locations?user_id=${userID}&channel_id=${channelID}&scope=webapp`,
             {method: 'get'},

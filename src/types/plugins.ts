@@ -110,28 +110,26 @@ export type MarketplacePlugin = {
     installed_version: string;
 }
 
-export type PluginIntegrationBase = {
+export type PluginLocationBase = {
     location_type: string;
     location_id: string;
-    wish: {
-        app_id: string;
-        url: string;
-    };
+    form_url: string;
+    app_id: string;
 };
 
-export type PluginIntegrationPostMenuItem = PluginIntegrationBase & {
+export type PluginLocationPostMenuItem = PluginLocationBase & {
     icon: string;
     text: string;
 };
 
-export type PluginIntegrationChannelHeaderIcon = PluginIntegrationBase & {
+export type PluginLocationChannelHeaderIcon = PluginLocationBase & {
     dropdown_text: string;
     aria_text: string;
     icon: string;
 };
 
-export type PluginIntegration = PluginIntegrationPostMenuItem | PluginIntegrationChannelHeaderIcon;
+export type PluginLocation = PluginLocationPostMenuItem | PluginLocationChannelHeaderIcon;
 
 export type PluginsState = {
-    mobilePluginIntegrations: PluginIntegration[];
+    locations: PluginLocation[];
 };
