@@ -7,6 +7,7 @@ export type CloudState = {
     subscription?: Subscription;
 	products?: Dictionary<Product>;
 	customer?: CloudCustomer;
+	invoices?: Dictionary<Invoice>;
 }
 
 export type Subscription = {
@@ -19,6 +20,7 @@ export type Subscription = {
 	create_at: number;
 	seats: number;
 	is_paid_tier: string;
+	last_invoice?: Invoice;
 }
 
 export type Product = {
@@ -51,6 +53,15 @@ export type CloudCustomer = {
 	payment_method: PaymentMethod;
 }
 
+// CustomerPatch model represents a customer patch on the system.
+export type CloudCustomerPatch = {
+	email?: string;
+	name?: string;
+	num_employees?: number;
+	contact_first_name?: string;
+	contact_last_name?: string;
+}
+
 // Address model represents a customer's address.
 export type Address = {
 	city: string;
@@ -69,4 +80,27 @@ export type PaymentMethod = {
 	exp_year: number;
 	card_brand: string;
 	name: string;
+}
+
+// Invoice model represents a invoice on the system.
+export type Invoice = {
+	id: string;
+	number: string;
+	create_at: number;
+	total: number;
+	status: string;
+	description: string;
+	period_start: number;
+	period_end: number;
+	subscription_id: string;
+	line_items: InvoiceLineItem[];
+}
+
+// InvoiceLineItem model represents a invoice lineitem tied to an invoice.
+export type InvoiceLineItem = {
+	price_id: string;
+	total: number;
+	quantity: number;
+	description: string;
+	metadata: Dictionary<string>;
 }
