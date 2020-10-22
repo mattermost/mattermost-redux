@@ -346,22 +346,40 @@ describe('Selectors.Users', () => {
         assert.deepEqual(Selectors.getProfilesInGroup(testState, group2.id), users);
     });
 
-    describe('searchProfiles', () => {
+    describe('searchProfilesStartingWithTerm', () => {
         it('searchProfiles without filter', () => {
-            assert.deepEqual(Selectors.searchProfiles(testState, user1.username), [user1]);
-            assert.deepEqual(Selectors.searchProfiles(testState, user2.first_name + ' ' + user2.last_name), [user2]);
-            assert.deepEqual(Selectors.searchProfiles(testState, user1.username, true), []);
+            assert.deepEqual(Selectors.searchProfilesStartingWithTerm(testState, user1.username), [user1]);
+            assert.deepEqual(Selectors.searchProfilesStartingWithTerm(testState, user2.first_name + ' ' + user2.last_name), [user2]);
+            assert.deepEqual(Selectors.searchProfilesStartingWithTerm(testState, user1.username, true), []);
         });
 
         it('searchProfiles with filters', () => {
-            assert.deepEqual(Selectors.searchProfiles(testState, user1.username, false, {role: 'system_admin'}), [user1]);
-            assert.deepEqual(Selectors.searchProfiles(testState, user3.username, false, {role: 'system_admin'}), []);
-            assert.deepEqual(Selectors.searchProfiles(testState, user1.username, false, {roles: ['system_user']}), []);
-            assert.deepEqual(Selectors.searchProfiles(testState, user3.username, false, {roles: ['system_user']}), [user3]);
-            assert.deepEqual(Selectors.searchProfiles(testState, user3.username, false, {inactive: true}), []);
-            assert.deepEqual(Selectors.searchProfiles(testState, user2.username, false, {inactive: true}), [user2]);
-            assert.deepEqual(Selectors.searchProfiles(testState, user2.username, false, {active: true}), []);
-            assert.deepEqual(Selectors.searchProfiles(testState, user3.username, false, {active: true}), [user3]);
+            assert.deepEqual(Selectors.searchProfilesStartingWithTerm(testState, user1.username, false, {role: 'system_admin'}), [user1]);
+            assert.deepEqual(Selectors.searchProfilesStartingWithTerm(testState, user3.username, false, {role: 'system_admin'}), []);
+            assert.deepEqual(Selectors.searchProfilesStartingWithTerm(testState, user1.username, false, {roles: ['system_user']}), []);
+            assert.deepEqual(Selectors.searchProfilesStartingWithTerm(testState, user3.username, false, {roles: ['system_user']}), [user3]);
+            assert.deepEqual(Selectors.searchProfilesStartingWithTerm(testState, user3.username, false, {inactive: true}), []);
+            assert.deepEqual(Selectors.searchProfilesStartingWithTerm(testState, user2.username, false, {inactive: true}), [user2]);
+            assert.deepEqual(Selectors.searchProfilesStartingWithTerm(testState, user2.username, false, {active: true}), []);
+            assert.deepEqual(Selectors.searchProfilesStartingWithTerm(testState, user3.username, false, {active: true}), [user3]);
+        });
+    });
+
+    describe('searchProfilesMatchingWithTerm', () => {
+        it('searchProfiles without filter', () => {
+            assert.deepEqual(Selectors.searchProfilesMatchingWithTerm(testState, user1.username.slice(1, user1.username.length)), [user1]);
+            assert.deepEqual(Selectors.searchProfilesMatchingWithTerm(testState, ' ' + user2.last_name), [user2]);
+        });
+
+        it('searchProfiles with filters', () => {
+            assert.deepEqual(Selectors.searchProfilesMatchingWithTerm(testState, user1.username.slice(2, user1.username.length), false, {role: 'system_admin'}), [user1]);
+            assert.deepEqual(Selectors.searchProfilesMatchingWithTerm(testState, user3.username.slice(3, user3.username.length), false, {role: 'system_admin'}), []);
+            assert.deepEqual(Selectors.searchProfilesMatchingWithTerm(testState, user1.username.slice(0, user1.username.length), false, {roles: ['system_user']}), []);
+            assert.deepEqual(Selectors.searchProfilesMatchingWithTerm(testState, user3.username, false, {roles: ['system_user']}), [user3]);
+            assert.deepEqual(Selectors.searchProfilesMatchingWithTerm(testState, user3.username, false, {inactive: true}), []);
+            assert.deepEqual(Selectors.searchProfilesMatchingWithTerm(testState, user2.username, false, {inactive: true}), [user2]);
+            assert.deepEqual(Selectors.searchProfilesMatchingWithTerm(testState, user2.username, false, {active: true}), []);
+            assert.deepEqual(Selectors.searchProfilesMatchingWithTerm(testState, user3.username, false, {active: true}), [user3]);
         });
     });
 
@@ -792,4 +810,3 @@ describe('Selectors.Users', () => {
         });
     });
 });
-
