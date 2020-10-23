@@ -372,9 +372,7 @@ export function getFilteredUsersStats(state: GlobalState): any {
     return state.entities.users.filteredStats;
 }
 
-export function searchProfilesStartingWithTerm(state: GlobalState, term: string, skipCurrent = false, filters?: Filters): Array<UserProfile> {
-    const users = getUsers(state);
-    const profiles = filterProfilesStartingWithTerm(Object.keys(users).map((key) => users[key]), term);
+function filterFromProfiles(state: GlobalState, profiles: Array<UserProfile>, skipCurrent = false, filters?: Filters): Array<UserProfile> {
     const filteredProfilesMap = filterProfiles(profileListToMap(profiles), filters);
     const filteredProfiles = Object.keys(filteredProfilesMap).map((key) => filteredProfilesMap[key]);
 
@@ -385,17 +383,16 @@ export function searchProfilesStartingWithTerm(state: GlobalState, term: string,
     return filteredProfiles;
 }
 
+export function searchProfilesStartingWithTerm(state: GlobalState, term: string, skipCurrent = false, filters?: Filters): Array<UserProfile> {
+    const users = getUsers(state);
+    const profiles = filterProfilesStartingWithTerm(Object.keys(users).map((key) => users[key]), term);
+    return filterFromProfiles(state, profiles, skipCurrent, filters);
+}
+
 export function searchProfilesMatchingWithTerm(state: GlobalState, term: string, skipCurrent = false, filters?: Filters): Array<UserProfile> {
     const users = getUsers(state);
     const profiles = filterProfilesMatchingWithTerm(Object.keys(users).map((key) => users[key]), term);
-    const filteredProfilesMap = filterProfiles(profileListToMap(profiles), filters);
-    const filteredProfiles = Object.keys(filteredProfilesMap).map((key) => filteredProfilesMap[key]);
-
-    if (skipCurrent) {
-        removeCurrentUserFromList(filteredProfiles, getCurrentUserId(state));
-    }
-
-    return filteredProfiles;
+    return filterFromProfiles(state, profiles, skipCurrent, filters);
 }
 
 export function makeSearchProfilesInChannel() {
