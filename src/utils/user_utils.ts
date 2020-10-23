@@ -175,10 +175,7 @@ export function filterProfilesStartingWithTerm(users: Array<UserProfile>, term: 
         }
 
         const profileSuggestions = nameSuggestionsForUser(user);
-
-        return profileSuggestions.
-            filter((suggestion) => suggestion !== '').
-            some((suggestion) => suggestion.startsWith(trimmedTerm));
+        return profileSuggestions.filter((suggestion) => suggestion !== '').some((suggestion) => suggestion.startsWith(trimmedTerm));
     });
 }
 
@@ -195,10 +192,7 @@ export function filterProfilesMatchingWithTerm(users: Array<UserProfile>, term: 
         }
 
         const profileSuggestions = nameSuggestionsForUser(user);
-
-        return profileSuggestions.
-            filter((suggestion) => suggestion !== '').
-            some((suggestion) => suggestion.includes(trimmedTerm));
+        return profileSuggestions.filter((suggestion) => suggestion !== '').some((suggestion) => suggestion.includes(trimmedTerm));
     });
 }
 
