@@ -88,6 +88,7 @@ export type Invoice = {
 	number: string;
 	create_at: number;
 	total: number;
+	tax: number;
 	status: string;
 	description: string;
 	period_start: number;
@@ -101,6 +102,8 @@ export type InvoiceLineItem = {
 	price_id: string;
 	total: number;
 	quantity: number;
+	price_per_unit: number;
 	description: string;
+	type: string;
 	metadata: Dictionary<string>;
 }
