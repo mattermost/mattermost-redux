@@ -10,4 +10,5 @@ export default {
 
     PLUGIN_LOCATION_POST_MENU_ITEM: 'post_menu_item',
     PLUGIN_LOCATION_CHANNEL_HEADER_ICON: 'channel_header_icon',
+    PLUGIN_LOCATION_SLASH_COMMAND: 'slash_command',
 };
