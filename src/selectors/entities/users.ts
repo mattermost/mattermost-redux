@@ -372,31 +372,43 @@ export function getFilteredUsersStats(state: GlobalState): any {
     return state.entities.users.filteredStats;
 }
 
-function filterFromProfiles(state: GlobalState, profiles: Array<UserProfile>, skipCurrent = false, filters?: Filters): Array<UserProfile> {
+function filterFromProfiles(currentUserId: $ID<UserProfile>, profiles: Array<UserProfile>, skipCurrent = false, filters?: Filters): Array<UserProfile> {
     const filteredProfilesMap = filterProfiles(profileListToMap(profiles), filters);
     const filteredProfiles = Object.keys(filteredProfilesMap).map((key) => filteredProfilesMap[key]);
 
     if (skipCurrent) {
-        removeCurrentUserFromList(filteredProfiles, getCurrentUserId(state));
+        removeCurrentUserFromList(filteredProfiles, currentUserId);
     }
 
     return filteredProfiles;
 }
 
-export function makeSearchProfilesStartingWithTerm() {
-    return (state: GlobalState, term: string, skipCurrent = false, filters?: Filters): Array<UserProfile> => {
-        const users = getUsers(state);
-        const profiles = filterProfilesStartingWithTerm(Object.values(users), term);
-        return filterFromProfiles(state, profiles, skipCurrent, filters);
-    };
+export function makeSearchProfilesStartingWithTerm(): (state: GlobalState, term: string, skipCurrent?: boolean, filters?: Filters) => Array<UserProfile> {
+    return createSelector(
+        getUsers,
+        getCurrentUserId,
+        (state: GlobalState, term: string) => term,
+        (state: GlobalState, term: string, skipCurrent?: boolean) => skipCurrent || false,
+        (stateGlobalState, term: string, skipCurrent?: boolean, filters?: Filters) => filters,
+        (users, currentUserId, term, skipCurrent, filters) => {
+            const profiles = filterProfilesStartingWithTerm(Object.values(users), term);
+            return filterFromProfiles(currentUserId, profiles, skipCurrent, filters);
+        },
+    );
 }
 
-export function makeSearchProfilesMatchingWithTerm() {
-    return (state: GlobalState, term: string, skipCurrent = false, filters?: Filters): Array<UserProfile> => {
-        const users = getUsers(state);
-        const profiles = filterProfilesMatchingWithTerm(Object.values(users), term);
-        return filterFromProfiles(state, profiles, skipCurrent, filters);
-    };
+export function makeSearchProfilesMatchingWithTerm(): (state: GlobalState, term: string, skipCurrent?: boolean, filters?: Filters) => Array<UserProfile> {
+    return createSelector(
+        getUsers,
+        getCurrentUserId,
+        (state: GlobalState, term: string) => term,
+        (state: GlobalState, term: string, skipCurrent?: boolean) => skipCurrent || false,
+        (stateGlobalState, term: string, skipCurrent?: boolean, filters?: Filters) => filters,
+        (users, currentUserId, term, skipCurrent, filters) => {
+            const profiles = filterProfilesMatchingWithTerm(Object.values(users), term);
+            return filterFromProfiles(currentUserId, profiles, skipCurrent, filters);
+        },
+    );
 }
 
 export function makeSearchProfilesInChannel() {
