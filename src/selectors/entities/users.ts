@@ -383,16 +383,20 @@ function filterFromProfiles(state: GlobalState, profiles: Array<UserProfile>, sk
     return filteredProfiles;
 }
 
-export function searchProfilesStartingWithTerm(state: GlobalState, term: string, skipCurrent = false, filters?: Filters): Array<UserProfile> {
-    const users = getUsers(state);
-    const profiles = filterProfilesStartingWithTerm(Object.keys(users).map((key) => users[key]), term);
-    return filterFromProfiles(state, profiles, skipCurrent, filters);
+export function makeSearchProfilesStartingWithTerm() {
+    return (state: GlobalState, term: string, skipCurrent = false, filters?: Filters): Array<UserProfile> => {
+        const users = getUsers(state);
+        const profiles = filterProfilesStartingWithTerm(Object.values(users), term);
+        return filterFromProfiles(state, profiles, skipCurrent, filters);
+    };
 }
 
-export function searchProfilesMatchingWithTerm(state: GlobalState, term: string, skipCurrent = false, filters?: Filters): Array<UserProfile> {
-    const users = getUsers(state);
-    const profiles = filterProfilesMatchingWithTerm(Object.keys(users).map((key) => users[key]), term);
-    return filterFromProfiles(state, profiles, skipCurrent, filters);
+export function makeSearchProfilesMatchingWithTerm() {
+    return (state: GlobalState, term: string, skipCurrent = false, filters?: Filters): Array<UserProfile> => {
+        const users = getUsers(state);
+        const profiles = filterProfilesMatchingWithTerm(Object.values(users), term);
+        return filterFromProfiles(state, profiles, skipCurrent, filters);
+    };
 }
 
 export function makeSearchProfilesInChannel() {
