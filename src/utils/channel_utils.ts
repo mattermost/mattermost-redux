@@ -20,7 +20,7 @@ const channelTypeOrder = {
     [General.OPEN_CHANNEL]: 0,
     [General.PRIVATE_CHANNEL]: 1,
     [General.DM_CHANNEL]: 2,
-    [General.GM_CHANNEL]: 2,
+    [General.GM_CHANNEL]: 3,
 };
 
 export function completeDirectChannelInfo(usersState: UsersState, teammateNameDisplay: string, channel: Channel): Channel {
