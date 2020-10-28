@@ -142,7 +142,27 @@ export function getSuggestionsSplitByMultiple(term: string, splitStrs: Array<str
     return [...suggestions];
 }
 
-export function filterProfilesMatchingTerm(users: Array<UserProfile>, term: string): Array<UserProfile> {
+export function nameSuggestionsForUser(user: UserProfile): string[] {
+    const profileSuggestions: string[] = [];
+    const usernameSuggestions = getSuggestionsSplitByMultiple((user.username || '').toLowerCase(), General.AUTOCOMPLETE_SPLIT_CHARACTERS);
+    profileSuggestions.push(...usernameSuggestions);
+    const first = (user.first_name || '').toLowerCase();
+    const last = (user.last_name || '').toLowerCase();
+    const full = first + ' ' + last;
+    profileSuggestions.push(first, last, full);
+    profileSuggestions.push((user.nickname || '').toLowerCase());
+    profileSuggestions.push((user.position || '').toLowerCase());
+    const email = (user.email || '').toLowerCase();
+    profileSuggestions.push(email);
+
+    const split = email.split('@');
+    if (split.length > 1) {
+        profileSuggestions.push(split[1]);
+    }
+    return profileSuggestions;
+}
+
+export function filterProfilesStartingWithTerm(users: Array<UserProfile>, term: string): Array<UserProfile> {
     const lowercasedTerm = term.toLowerCase();
     let trimmedTerm = lowercasedTerm;
     if (trimmedTerm.startsWith('@')) {
@@ -154,26 +174,25 @@ export function filterProfilesMatchingTerm(users: Array<UserProfile>, term: stri
             return false;
         }
 
-        const profileSuggestions: string[] = [];
-        const usernameSuggestions = getSuggestionsSplitByMultiple((user.username || '').toLowerCase(), General.AUTOCOMPLETE_SPLIT_CHARACTERS);
-        profileSuggestions.push(...usernameSuggestions);
-        const first = (user.first_name || '').toLowerCase();
-        const last = (user.last_name || '').toLowerCase();
-        const full = first + ' ' + last;
-        profileSuggestions.push(first, last, full);
-        profileSuggestions.push((user.nickname || '').toLowerCase());
-        profileSuggestions.push((user.position || '').toLowerCase());
-        const email = (user.email || '').toLowerCase();
-        profileSuggestions.push(email);
+        const profileSuggestions = nameSuggestionsForUser(user);
+        return profileSuggestions.filter((suggestion) => suggestion !== '').some((suggestion) => suggestion.startsWith(trimmedTerm));
+    });
+}
 
-        const split = email.split('@');
-        if (split.length > 1) {
-            profileSuggestions.push(split[1]);
+export function filterProfilesMatchingWithTerm(users: Array<UserProfile>, term: string): Array<UserProfile> {
+    const lowercasedTerm = term.toLowerCase();
+    let trimmedTerm = lowercasedTerm;
+    if (trimmedTerm.startsWith('@')) {
+        trimmedTerm = trimmedTerm.substr(1);
+    }
+
+    return users.filter((user: UserProfile) => {
+        if (!user) {
+            return false;
         }
 
-        return profileSuggestions.
-            filter((suggestion) => suggestion !== '').
-            some((suggestion) => suggestion.startsWith(trimmedTerm));
+        const profileSuggestions = nameSuggestionsForUser(user);
+        return profileSuggestions.filter((suggestion) => suggestion !== '').some((suggestion) => suggestion.includes(trimmedTerm));
     });
 }
 
