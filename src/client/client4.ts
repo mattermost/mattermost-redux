@@ -3349,6 +3349,8 @@ export default class Client4 {
     };
 
     updateNoticesAsViewed = (noticeIds: string[]) => {
+        // Only one notice is marked as viewed at a time so using 0 index
+        this.trackEvent('ui', `notice_seen_${noticeIds[0]}`);
         return this.doFetch<StatusOK>(
             `${this.getNoticesRoute()}/view`,
             {method: 'put', body: JSON.stringify(noticeIds)},
