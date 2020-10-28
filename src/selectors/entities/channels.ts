@@ -175,6 +175,10 @@ export function filterChannels(
     return channels;
 }
 
+// makeGetChannel returns a selector that returns a channel from the store with the following filled in for DM/GM channels:
+// - The display_name set to the other user(s) names, following the Teammate Name Display setting
+// - The teammate_id for DM channels
+// - The status of the other user in a DM channel
 export function makeGetChannel(): (state: GlobalState, props: {id: string}) => Channel {
     return createSelector(
         getAllChannels,
@@ -193,21 +197,11 @@ export function makeGetChannel(): (state: GlobalState, props: {id: string}) => C
     );
 }
 
-export const getChannel: (state: GlobalState, id: string) => Channel = createSelector(
-    getAllChannels,
-    (state: GlobalState, id: string): string => id,
-    (state: GlobalState): UsersState => state.entities.users,
-    getTeammateNameDisplaySetting,
-    (allChannels: IDMappedObjects<Channel>, channelId: string, users: UsersState, teammateNameDisplay: string): Channel => {
-        const channel = allChannels[channelId];
-
-        if (channel) {
-            return completeDirectChannelInfo(users, teammateNameDisplay, channel);
-        }
-
-        return channel;
-    },
-);
+// getChannel returns a channel as it exists in the store without filling in any additional details such as the
+// display_name for DM/GM channels.
+export function getChannel(state: GlobalState, id: string) {
+    return getAllChannels(state)[id];
+}
 
 // makeGetChannelsForIds returns a selector that, given an array of channel IDs, returns a list of the corresponding
 // channels. Channels are returned in the same order as the given IDs with undefined entries replacing any invalid IDs.
