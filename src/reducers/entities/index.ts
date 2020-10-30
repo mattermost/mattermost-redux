@@ -22,7 +22,7 @@ import schemes from './schemes';
 import groups from './groups';
 import bots from './bots';
 import channelCategories from './channel_categories';
-import plugins from './plugins';
+import apps from './apps';
 import cloud from './cloud';
 
 export default combineReducers({
@@ -45,6 +45,6 @@ export default combineReducers({
     groups,
     bots,
     channelCategories,
-    plugins,
+    apps,
     cloud,
 });

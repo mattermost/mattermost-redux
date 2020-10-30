@@ -155,8 +155,8 @@ const state: GlobalState = {
             byId: {},
             orderByTeam: {},
         },
-        plugins: {
-            locations: [],
+        apps: {
+            bindings: [],
         },
         cloud: {},
     },

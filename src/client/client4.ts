@@ -3172,16 +3172,16 @@ export default class Client4 {
     };
 
     // TODO type call
-    executePluginCall = async (call?: any) => {
+    executeAppCall = async (call?: any) => {
         return this.doFetch(
-            `${this.getAppsProxyRoute()}/proxy/call`,
+            `${this.getAppsProxyRoute()}/api/v1/call`,
             {method: 'post', body: JSON.stringify(call)},
         );
     }
 
-    getPluginLocations = async (userID: string, channelID: string) => {
+    getAppsBindings = async (userID: string, channelID: string) => {
         return this.doFetch(
-            this.getAppsProxyRoute() + `/api/v1/locations?user_id=${userID}&channel_id=${channelID}&scope=webapp`,
+            this.getAppsProxyRoute() + `/api/v1/bindings?user_id=${userID}&channel_id=${channelID}&scope=webapp`,
             {method: 'get'},
         );
     }

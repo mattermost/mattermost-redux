@@ -109,27 +109,3 @@ export type MarketplacePlugin = {
     };
     installed_version: string;
 }
-
-export type PluginLocationBase = {
-    location_type: string;
-    location_id: string;
-    form_url: string;
-    app_id: string;
-};
-
-export type PluginLocationPostMenuItem = PluginLocationBase & {
-    icon: string;
-    text: string;
-};
-
-export type PluginLocationChannelHeaderIcon = PluginLocationBase & {
-    dropdown_text: string;
-    aria_text: string;
-    icon: string;
-};
-
-export type PluginLocation = PluginLocationPostMenuItem | PluginLocationChannelHeaderIcon;
-
-export type PluginsState = {
-    locations: PluginLocation[];
-};

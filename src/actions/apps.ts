@@ -1,15 +1,15 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
-import {PluginTypes} from 'action_types';
+import {AppsTypes} from 'action_types';
 import {Client4} from 'client';
 
 import {ActionFunc} from 'types/actions';
 
 import {bindClientFunc} from './helpers';
 
-export function fetchPluginLocations(userID: string, channelID: string): ActionFunc {
+export function fetchAppBindings(userID: string, channelID: string): ActionFunc {
     return bindClientFunc({
-        clientFunc: () => Client4.getPluginLocations(userID, channelID),
-        onSuccess: PluginTypes.RECEIVED_PLUGIN_LOCATIONS,
+        clientFunc: () => Client4.getAppsBindings(userID, channelID),
+        onSuccess: AppsTypes.RECEIVED_APP_BINDINGS,
     });
 }

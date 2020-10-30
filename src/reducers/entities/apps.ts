@@ -2,13 +2,13 @@
 // See LICENSE.txt for license information.
 import {combineReducers} from 'redux';
 
-import {PluginTypes} from 'action_types';
-import {PluginLocation, PluginsState} from 'types/plugins';
+import {AppsTypes} from 'action_types';
+import {Binding, AppsState} from 'types/apps';
 import {GenericAction} from 'types/actions';
 
-function locations(state: PluginLocation[] = [], action: GenericAction): PluginLocation[] {
+function bindings(state: Binding[] = [], action: GenericAction): Binding[] {
     switch (action.type) {
-    case PluginTypes.RECEIVED_PLUGIN_LOCATIONS: {
+    case AppsTypes.RECEIVED_APP_BINDINGS: {
         return action.data;
     }
     default:
@@ -17,5 +17,5 @@ function locations(state: PluginLocation[] = [], action: GenericAction): PluginL
 }
 
 export default (combineReducers({
-    locations,
-}) as (b: PluginsState, a: GenericAction) => PluginsState);
+    bindings,
+}) as (b: AppsState, a: GenericAction) => AppsState);
