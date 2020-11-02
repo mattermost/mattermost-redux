@@ -2,7 +2,7 @@ stages:
   - test
 
 include:
-  project: mattermost/ci/${CI_PROJECT_NAME}
+  project: mattermost/ci/mattermost-redux
   ref: master
   file: private.yml
 
