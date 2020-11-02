@@ -2,7 +2,7 @@ stages:
   - test
 
 include:
-  project: mattermost/ci/mmctl
+  project: mattermost/ci/${CI_PROJECT_NAME}
   ref: master
   file: private.yml
 
