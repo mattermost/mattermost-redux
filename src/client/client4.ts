@@ -663,7 +663,16 @@ export default class Client4 {
         );
     };
 
-    loginById = (id: string, password: string, token = '', deviceId = '') => {
+    casLogIn = async (queryString: string) => {
+        this.trackEvent('api', 'api_users_login');
+
+        return this.doFetch<UserProfile>(
+            `${this.getUsersRoute()}/cas_login?${queryString}`,
+            {method: 'get'},
+        );
+    };
+
+    loginById = async (id: string, password: string, token = '', deviceId = '') => {
         this.trackEvent('api', 'api_users_login');
         const body: any = {
             device_id: deviceId,
