@@ -3,10 +3,10 @@
 import {combineReducers} from 'redux';
 
 import {AppsTypes} from 'action_types';
-import {Binding, AppsState} from 'types/apps';
+import {AppBinding, AppsState} from 'types/apps';
 import {GenericAction} from 'types/actions';
 
-function bindings(state: Binding[] = [], action: GenericAction): Binding[] {
+function bindings(state: AppBinding[] = [], action: GenericAction): AppBinding[] {
     switch (action.type) {
     case AppsTypes.RECEIVED_APP_BINDINGS: {
         return action.data;

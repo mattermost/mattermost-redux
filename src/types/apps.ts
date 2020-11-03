@@ -1,3 +1,6 @@
+// Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
+// See LICENSE.txt for license information.
+
 export type AppsState = {
     bindings: AppBinding[];
 };
@@ -131,6 +134,7 @@ export const AppFieldTypes: {[name: string]: AppFieldType} = {
 
 // This should go in mattermost-redux
 export type AppField = {
+
     // Name is the name of the JSON field to use.
     name: string;
     type: AppFieldType;
