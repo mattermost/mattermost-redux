@@ -142,7 +142,27 @@ export function getSuggestionsSplitByMultiple(term: string, splitStrs: Array<str
     return [...suggestions];
 }
 
-export function filterProfilesMatchingTerm(users: Array<UserProfile>, term: string): Array<UserProfile> {
+export function nameSuggestionsForUser(user: UserProfile): string[] {
+    const profileSuggestions: string[] = [];
+    const usernameSuggestions = getSuggestionsSplitByMultiple((user.username || '').toLowerCase(), General.AUTOCOMPLETE_SPLIT_CHARACTERS);
+    profileSuggestions.push(...usernameSuggestions);
+    const first = (user.first_name || '').toLowerCase();
+    const last = (user.last_name || '').toLowerCase();
+    const full = first + ' ' + last;
+    profileSuggestions.push(first, last, full);
+    profileSuggestions.push((user.nickname || '').toLowerCase());
+    profileSuggestions.push((user.position || '').toLowerCase());
+    const email = (user.email || '').toLowerCase();
+    profileSuggestions.push(email);
+
+    const split = email.split('@');
+    if (split.length > 1) {
+        profileSuggestions.push(split[1]);
+    }
+    return profileSuggestions;
+}
+
+export function filterProfilesStartingWithTerm(users: Array<UserProfile>, term: string): Array<UserProfile> {
     const lowercasedTerm = term.toLowerCase();
     let trimmedTerm = lowercasedTerm;
     if (trimmedTerm.startsWith('@')) {
@@ -154,26 +174,25 @@ export function filterProfilesMatchingTerm(users: Array<UserProfile>, term: stri
             return false;
         }
 
-        const profileSuggestions: string[] = [];
-        const usernameSuggestions = getSuggestionsSplitByMultiple((user.username || '').toLowerCase(), General.AUTOCOMPLETE_SPLIT_CHARACTERS);
-        profileSuggestions.push(...usernameSuggestions);
-        const first = (user.first_name || '').toLowerCase();
-        const last = (user.last_name || '').toLowerCase();
-        const full = first + ' ' + last;
-        profileSuggestions.push(first, last, full);
-        profileSuggestions.push((user.nickname || '').toLowerCase());
-        profileSuggestions.push((user.position || '').toLowerCase());
-        const email = (user.email || '').toLowerCase();
-        profileSuggestions.push(email);
+        const profileSuggestions = nameSuggestionsForUser(user);
+        return profileSuggestions.filter((suggestion) => suggestion !== '').some((suggestion) => suggestion.startsWith(trimmedTerm));
+    });
+}
 
-        const split = email.split('@');
-        if (split.length > 1) {
-            profileSuggestions.push(split[1]);
+export function filterProfilesMatchingWithTerm(users: Array<UserProfile>, term: string): Array<UserProfile> {
+    const lowercasedTerm = term.toLowerCase();
+    let trimmedTerm = lowercasedTerm;
+    if (trimmedTerm.startsWith('@')) {
+        trimmedTerm = trimmedTerm.substr(1);
+    }
+
+    return users.filter((user: UserProfile) => {
+        if (!user) {
+            return false;
         }
 
-        return profileSuggestions.
-            filter((suggestion) => suggestion !== '').
-            some((suggestion) => suggestion.startsWith(trimmedTerm));
+        const profileSuggestions = nameSuggestionsForUser(user);
+        return profileSuggestions.filter((suggestion) => suggestion !== '').some((suggestion) => suggestion.includes(trimmedTerm));
     });
 }
 
@@ -184,28 +203,34 @@ export function sortByUsername(a: UserProfile, b: UserProfile): number {
     return nameA.localeCompare(nameB);
 }
 
-export function applyRolesFilters(user: UserProfile, filterRoles: string[], membership?: TeamMembership | ChannelMembership): boolean {
-    const userIsNotAdminOrGuest = !user.roles.includes(General.SYSTEM_ADMIN_ROLE) && !user.roles.includes(General.SYSTEM_GUEST_ROLE);
-    return filterRoles.some((role: string) => {
-        const isSystemRole = role.includes('system');
-        return (
-            (
+function checkUserHasRole(user: UserProfile, userIsNotAdminOrGuest: boolean, membership: TeamMembership | ChannelMembership | undefined, role: string) {
+    const isSystemRole = role.includes('system');
+    return (
+        (
 
-                // If role is system user then user cannot have system admin or system guest roles
-                isSystemRole && user.roles.includes(role) && (
-                    (role === General.SYSTEM_USER_ROLE && userIsNotAdminOrGuest) ||
-                    role !== General.SYSTEM_USER_ROLE
-                )
-            ) || (
-
-                // If user is a system admin or a system guest then ignore team and channel memberships
-                !isSystemRole && userIsNotAdminOrGuest && (
-                    (role === General.TEAM_ADMIN_ROLE && membership?.scheme_admin) ||
-                    (role === General.CHANNEL_ADMIN_ROLE && membership?.scheme_admin) ||
-                    (role === General.TEAM_USER_ROLE && membership?.scheme_user && !membership?.scheme_admin) ||
-                    (role === General.CHANNEL_USER_ROLE && membership?.scheme_user && !membership?.scheme_admin)
-                )
+            // If role is system user then user cannot have system admin or system guest roles
+            isSystemRole && user.roles.includes(role) && (
+                (role === General.SYSTEM_USER_ROLE && userIsNotAdminOrGuest) ||
+                role !== General.SYSTEM_USER_ROLE
             )
-        );
-    });
+        ) || (
+
+            // If user is a system admin or a system guest then ignore team and channel memberships
+            !isSystemRole && userIsNotAdminOrGuest && (
+                (role === General.TEAM_ADMIN_ROLE && membership?.scheme_admin) ||
+                (role === General.CHANNEL_ADMIN_ROLE && membership?.scheme_admin) ||
+                (role === General.TEAM_USER_ROLE && membership?.scheme_user && !membership?.scheme_admin) ||
+                (role === General.CHANNEL_USER_ROLE && membership?.scheme_user && !membership?.scheme_admin)
+            )
+        )
+    );
+}
+
+export function applyRolesFilters(user: UserProfile, filterRoles: string[], excludeRoles: string[], membership: TeamMembership | ChannelMembership | undefined): boolean {
+    const userIsNotAdminOrGuest = !(user.roles.includes(General.SYSTEM_ADMIN_ROLE) || user.roles.includes(General.SYSTEM_GUEST_ROLE));
+    const userHasExcludedRole = excludeRoles.some(checkUserHasRole.bind(this, user, userIsNotAdminOrGuest, membership));
+    if (userHasExcludedRole) {
+        return false;
+    }
+    return filterRoles.length === 0 || filterRoles.some(checkUserHasRole.bind(this, user, userIsNotAdminOrGuest, membership));
 }
