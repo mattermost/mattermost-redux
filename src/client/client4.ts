@@ -205,6 +205,10 @@ export default class Client4 {
         return `${this.url}${this.urlVersion}`;
     }
 
+    getAppsProxyRoute() {
+        return `${this.url}/plugins/com.mattermost.apps`;
+    }
+
     getUsersRoute() {
         return `${this.getBaseRoute()}/users`;
     }
@@ -3166,6 +3170,21 @@ export default class Client4 {
             {method: 'get'},
         );
     };
+
+    // TODO type call
+    executeAppCall = async (call?: any) => {
+        return this.doFetch(
+            `${this.getAppsProxyRoute()}/api/v1/call`,
+            {method: 'post', body: JSON.stringify(call)},
+        );
+    }
+
+    getAppsBindings = async (userID: string, channelID: string) => {
+        return this.doFetch(
+            this.getAppsProxyRoute() + `/api/v1/bindings?user_id=${userID}&channel_id=${channelID}&scope=webapp`,
+            {method: 'get'},
+        );
+    }
 
     getGroupsAssociatedToTeam = (teamID: string, q = '', page = 0, perPage = PER_PAGE_DEFAULT, filterAllowReference = false) => {
         this.trackEvent('api', 'api_groups_get_associated_to_team', {team_id: teamID});
