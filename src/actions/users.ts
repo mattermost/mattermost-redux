@@ -75,9 +75,9 @@ export function createUser(user: UserProfile, token: string, inviteId: string, r
 
 export function casLogIn(queryString: string): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
-        dispatch({type: UserTypes.LOGIN_REQUEST, data: null}, getState);
+        dispatch({type: UserTypes.LOGIN_REQUEST, data: null});
 
-        const deviceId = getState().entities.general.deviceToken;
+        // const deviceId = getState().entities.general.deviceToken;
         let data;
 
         try {
@@ -89,7 +89,7 @@ export function casLogIn(queryString: string): ActionFunc {
                     error,
                 },
                 logError(error),
-            ]), getState);
+            ]));
             return {error};
         }
 
@@ -145,7 +145,7 @@ export function loginById(id: string, password: string, mfaToken = ''): ActionFu
     };
 }
 
-export function completeLogin(data: UserProfile): ActionFunc {
+function completeLogin(data: UserProfile): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         dispatch({
             type: UserTypes.RECEIVED_ME,
