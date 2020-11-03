@@ -95,6 +95,21 @@ export type IntegrationsState = {
     commands: IDMappedObjects<Command>;
 };
 
+export type InteractiveDialogConfig = {
+    app_id: string;
+    trigger_id: string;
+    url: string;
+    dialog: {
+        callback_id: string;
+        title: string;
+        introduction_text: string;
+        elements: DialogElement[];
+        submit_label: string;
+        notify_on_cancel: boolean;
+        state: string;
+    };
+};
+
 export type DialogSubmission = {
     url: string;
     callback_id: string;

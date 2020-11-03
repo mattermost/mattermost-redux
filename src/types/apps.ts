@@ -1,49 +1,74 @@
-// Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
-// See LICENSE.txt for license information.
-
 export type AppsState = {
-    bindings: Binding[];
+    bindings: AppBinding[];
 };
 
-export type CallExpandLevel = string;
-export type CallResponseType = string;
+export type AppBinding = {
+    app_id: string;
+    location_id?: string;
+    icon?: string;
 
-export const CallResponseTypes: {[name: string]: CallResponseType} = {
-    CALL: 'call',
-    MODAL: 'modal',
+    // Label is the (usually short) primary text to display at the location.
+    // - For LocationPostMenu is the menu item text.
+    // - For LocationChannelHeader is the dropdown text.
+    // - For LocationCommand is the name of the command
+    label: string;
+
+    // Hint is the secondary text to display
+    // - LocationPostMenu: not used
+    // - LocationChannelHeader: tooltip
+    // - LocationCommand: the "Hint" line
+    hint?: string;
+
+    // Description is the (optional) extended help text, used in modals and autocomplete
+    description?: string;
+
+    role_id?: string;
+    depends_on_team?: boolean;
+    depends_on_channel?: boolean;
+    depends_on_user?: boolean;
+    depends_on_post?: boolean;
+
+    // A Binding is either to a Call, or is a "container" for other locations -
+    // i.e. menu sub-items or subcommands.
+    call?: AppCall;
+    bindings?: AppBinding[];
+};
+
+export type AppCallValues = {
+    [name: string]: string;
+ };
+
+export type AppCall = {
+    url: string;
+    context: AppContext;
+    values?: AppCallValues;
+    as_modal?: boolean;
+    raw_command?: string;
+    from?: AppBinding[];
+};
+
+export type AppCallResponseType = string;
+
+export const AppCallResponseTypes: {[name: string]: AppCallResponseType} = {
     OK: 'ok',
-    NAVIGATE: 'navigate',
     ERROR: 'error',
+    MODAL: 'modal',
+    NAVIGATE: 'navigate',
+    CALL: 'call',
     COMMAND: 'command',
 };
 
-export const CallExpandLevels: {[name: string]: CallExpandLevel} = {
-    EXPAND_ALL: 'All',
-    EXPAND_SUMMARY: 'Summary',
+export type AppCallResponse<Res = {}> = {
+    type: AppCallResponseType;
+    markdown?: string;
+    data?: Res;
+    error?: string;
+    url?: string;
+    use_external_browser?: boolean;
+    call?: AppCall;
 };
 
-export type DialogElement = {};
-
-export type InteractiveDialogConfig = {
-    trigger_id: string;
-    url: string;
-    app_id: string;
-    dialog: {
-        callback_id: string;
-        title: string;
-        introduction_text: string;
-        elements: DialogElement[];
-        submit_label: string;
-        notify_on_cancel: boolean;
-        state: string;
-    };
-}
-
-export type CallValues = {
-   [name: string]: string;
-}
-
-export type Context = {
+export type AppContext = {
     app_id: string;
     acting_user_id?: string;
     user_id?: string;
@@ -51,44 +76,84 @@ export type Context = {
     team_id?: string;
     post_id?: string;
     root_id?: string;
-    props?: ContextProps;
-}
-
-export type ContextProps = {
-    [name: string]: string;
-}
-
-export type Call = {
-    url: string;
-    context: Context;
-    values?: CallValues;
-    as_modal?: boolean;
-    raw_command?: string;
-    from?: Binding[];
+    props?: AppContextProps;
 };
 
-export type CallResponse = {
-	type: CallResponseType;
-    markdown?: string;
-	data?: any;
-    error?: string;
-    url?: string;
-	use_external_browser?: boolean;
-    call?: Call;
-}
+export type AppContextProps = {
+    [name: string]: string;
+};
 
-export type Binding = {
-    app_id: string;
-    location_id: string;
+export type AppExpandLevel = string;
+
+export const AppExpandLevels: {[name: string]: AppExpandLevel} = {
+    EXPAND_ALL: 'All',
+    EXPAND_SUMMARY: 'Summary',
+};
+
+export type AppExpand = {
+    app?: AppExpandLevel;
+    acting_user?: AppExpandLevel;
+    channel?: AppExpandLevel;
+    config?: AppExpandLevel;
+    mentioned?: AppExpandLevel;
+    parent_post?: AppExpandLevel;
+    post?: AppExpandLevel;
+    root_post?: AppExpandLevel;
+    team?: AppExpandLevel;
+    user?: AppExpandLevel;
+};
+
+export type AppForm = {
+    title?: string;
+    header?: string;
+    footer?: string;
     icon?: string;
-    label?: string;
+    fields: AppField[];
+    depends_on?: string[];
+};
+
+export type AppSelectOption = {
+    label: string;
+    value: string;
+    icon_data?: string;
+};
+
+export type AppFieldType = string;
+
+export const AppFieldTypes: {[name: string]: AppFieldType} = {
+    TEXT: 'text',
+    STATIC_SELECT: 'static_select',
+    DYNAMIC_SELECT: 'dynamic_select',
+    BOOL: 'bool',
+    USER: 'user',
+    CHANNEL: 'channel',
+};
+
+// This should go in mattermost-redux
+export type AppField = {
+    // Name is the name of the JSON field to use.
+    name: string;
+    type: AppFieldType;
+    is_required?: boolean;
+
+    // Present (default) value of the field
+    value?: string;
+
+    description: string;
+
+    autocomplete_label?: string;
     hint?: string;
-    description?: string;
-    role_id?: string;
-    depends_on_team: boolean;
-    depends_on_channel: boolean;
-    depends_on_user: boolean;
-    depends_on_post: boolean;
-    call?: Call;
-    bindings?: Binding[];
-}
+    position?: number;
+
+    modal_label?: string;
+
+    // Select props
+    refresh_on_change_to?: string[];
+    source_url?: string;
+    options?: AppSelectOption[];
+
+    // Text props
+    subtype?: string;
+    min_length?: number;
+    max_length?: number;
+};
