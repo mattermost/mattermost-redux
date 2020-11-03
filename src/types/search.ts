@@ -11,6 +11,7 @@ export type Search = {
 export type SearchState = {
     current: any;
     results: Array<string>;
+    fileResults: Array<string>;
     flagged: Array<string>;
     pinned: Dictionary<Array<string>>;
     isSearchingTerm: boolean;

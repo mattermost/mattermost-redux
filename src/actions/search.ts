@@ -12,7 +12,7 @@ import {getProfilesAndStatusesForPosts, receivedPosts} from './posts';
 import {receivedFiles} from './files';
 import {ActionResult, batchActions, DispatchFunc, GetStateFunc, ActionFunc} from 'types/actions';
 import {Post} from 'types/posts';
-import {FileSearchResultItem} from 'types/files';
+import {FileSearchResults, FileSearchResultItem} from 'types/files';
 import {SearchParameter} from 'types/search';
 const WEBAPP_SEARCH_PER_PAGE = 20;
 export function getMissingChannelsFromPosts(posts: Map<string, Post>): ActionFunc {
@@ -95,7 +95,7 @@ export function searchPostsWithParams(teamId: string, params: SearchParameter): 
                 data: {
                     teamId,
                     params,
-                    isEnd: posts.order.length === 0,
+                    isEnd: !posts.next_post_id,
                 },
             },
             {
@@ -127,6 +127,7 @@ export function getMorePostsForSearch(): ActionFunc {
 export function clearSearch(): ActionFunc {
     return async (dispatch) => {
         dispatch({type: SearchTypes.REMOVE_SEARCH_POSTS});
+        dispatch({type: SearchTypes.REMOVE_SEARCH_FILES});
 
         return {data: true};
     };
@@ -139,11 +140,12 @@ export function searchFilesWithParams(teamId: string, params: SearchParameter): 
             type: SearchTypes.SEARCH_FILES_REQUEST,
             isGettingMore,
         });
-        let files;
 
+        let files: FileSearchResults;
         try {
             files = await Client4.searchFilesWithParams(teamId, params);
-            await dispatch(getMissingChannelsFromFiles(files.files));
+
+            // await dispatch(getMissingChannelsFromFiles(files.file_infos));
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch, getState);
             dispatch(logError(error));
@@ -156,13 +158,13 @@ export function searchFilesWithParams(teamId: string, params: SearchParameter): 
                 data: files,
                 isGettingMore,
             },
-            receivedFiles(files),
+            receivedFiles(files.file_infos),
             {
                 type: SearchTypes.RECEIVED_SEARCH_TERM,
                 data: {
                     teamId,
                     params,
-                    isFilesEnd: files.order.length === 0,
+                    isFilesEnd: !files.next_file_info_id,
                 },
             },
             {

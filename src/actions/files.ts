@@ -7,9 +7,9 @@ import {batchActions, DispatchFunc, GetStateFunc, ActionFunc} from 'types/action
 
 import {logError} from './errors';
 import {bindClientFunc, forceLogoutIfNecessary} from './helpers';
-import {FileUploadResponse, FileSearchResults} from 'types/files';
+import {FileUploadResponse, FileSearchResultItem} from 'types/files';
 
-export function receivedFiles(files: FileSearchResults) {
+export function receivedFiles(files: Map<string, FileSearchResultItem>) {
     return {
         type: FileTypes.RECEIVED_FILES_FOR_SEARCH,
         data: files,

@@ -5,7 +5,7 @@ import {combineReducers} from 'redux';
 import {FileTypes, PostTypes, UserTypes} from 'action_types';
 import {GenericAction} from 'types/actions';
 import {Post} from 'types/posts';
-import {FileInfo} from 'types/files';
+import {FileInfo, FileSearchResultItem} from 'types/files';
 import {Dictionary} from 'types/utilities';
 
 export function files(state: Dictionary<FileInfo> = {}, action: GenericAction) {
@@ -48,6 +48,21 @@ export function files(state: Dictionary<FileInfo> = {}, action: GenericAction) {
         }
 
         return state;
+    }
+
+    case UserTypes.LOGOUT_SUCCESS:
+        return {};
+    default:
+        return state;
+    }
+}
+
+export function filesFromSearch(state: Dictionary<FileSearchResultItem> = {}, action: GenericAction) {
+    switch (action.type) {
+    case FileTypes.RECEIVED_FILES_FOR_SEARCH: {
+        return {...state,
+            ...action.data,
+        };
     }
 
     case UserTypes.LOGOUT_SUCCESS:
@@ -142,6 +157,7 @@ function filePublicLink(state: {link: string} = {link: ''}, action: GenericActio
 
 export default combineReducers({
     files,
+    filesFromSearch,
     fileIdsByPostId,
     filePublicLink,
 });

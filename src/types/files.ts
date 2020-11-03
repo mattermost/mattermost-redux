@@ -21,6 +21,7 @@ export type FileInfo = {
 };
 export type FilesState = {
     files: Dictionary<FileInfo>;
+    filesFromSearch: Dictionary<FileSearchResultItem>;
     fileIdsByPostId: Dictionary<Array<string>>;
     filePublicLink?: string;
 };
@@ -36,7 +37,7 @@ export type FileSearchResultItem = FileInfo & {
 
 export type FileSearchResults = {
     order: $ID<FileSearchResultItem>[];
-    files: Map<string, FileSearchResultItem>;
-    next_post_id: string;
-    prev_post_id: string;
+    file_infos: Map<string, FileSearchResultItem>;
+    next_file_info_id: string;
+    prev_file_info_id: string;
 };

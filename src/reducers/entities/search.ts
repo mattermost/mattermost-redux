@@ -38,13 +38,13 @@ function results(state: Array<string> = [], action: GenericAction) {
 
 function fileResults(state: Array<string> = [], action: GenericAction) {
     switch (action.type) {
-    case SearchTypes.RECEIVED_SEARCH_POSTS: {
+    case SearchTypes.RECEIVED_SEARCH_FILES: {
         if (action.isGettingMore) {
             return [...new Set(state.concat(action.data.order))];
         }
         return action.data.order;
     }
-    case SearchTypes.REMOVE_SEARCH_POSTS:
+    case SearchTypes.REMOVE_SEARCH_FILES:
     case UserTypes.LOGOUT_SUCCESS:
         return [];
 
@@ -262,12 +262,13 @@ function current(state: any = {}, action: GenericAction) {
     switch (type) {
     case SearchTypes.RECEIVED_SEARCH_TERM: {
         const nextState = {...state};
-        const {teamId, params, isEnd} = data;
+        const {teamId, params, isEnd, isFilesEnd} = data;
         return {
             ...nextState,
             [teamId]: {
                 params,
-                isEnd,
+                isEnd: typeof isEnd === 'undefined' && state[teamId] ? state[teamId].isEnd : isEnd,
+                isFilesEnd: typeof isFilesEnd === 'undefined' && state[teamId] ? state[teamId].isFilesEnd : isFilesEnd,
             },
         };
     }
