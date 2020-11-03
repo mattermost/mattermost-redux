@@ -3,4 +3,5 @@
 export default {
     APPS_BINDINGS_POST_MENU_ITEM: '/post_menu',
     APPS_BINDINGS_CHANNEL_HEADER_ICON: '/channel_header',
+    APPS_BINDINGS_COMMAND: '/command',
 };
