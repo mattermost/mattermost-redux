@@ -339,5 +339,34 @@ describe('Selectors.General', () => {
             assert.equal(Selectors.getAutolinkedUrlSchemes(state), Selectors.getAutolinkedUrlSchemes(state));
         });
     });
+
+    describe('getManagedResourcePaths', () => {
+        test('should return empty array when the setting doesn\'t exist', () => {
+            const state = {
+                entities: {
+                    general: {
+                        config: {
+                        },
+                    },
+                },
+            };
+
+            expect(Selectors.getManagedResourcePaths(state)).toEqual([]);
+        });
+
+        test('should return an array of trusted paths', () => {
+            const state = {
+                entities: {
+                    general: {
+                        config: {
+                            ManagedResourcePaths: 'trusted,jitsi , test',
+                        },
+                    },
+                },
+            };
+
+            expect(Selectors.getManagedResourcePaths(state)).toEqual(['trusted', 'jitsi', 'test']);
+        });
+    });
 });
 
