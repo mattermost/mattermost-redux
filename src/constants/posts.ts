@@ -31,7 +31,7 @@ export const PostTypes = {
     SYSTEM_WARN_METRIC_STATUS: 'warn_metric_status',
 };
 
-export default {
+const Posts = {
     POST_CHUNK_SIZE: 60,
     POST_DELETED: 'DELETED',
     SYSTEM_MESSAGE_PREFIX: 'system_',
@@ -68,3 +68,5 @@ export default {
         PostTypes.REMOVE_FROM_TEAM,
     ],
 };
+
+export default Posts;

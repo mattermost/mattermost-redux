@@ -1,6 +1,7 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
-export default {
+
+const General = {
     CONFIG_CHANGED: 'config_changed',
     SERVER_VERSION_CHANGED: 'server_version_changed',
     PAGE_SIZE_DEFAULT: 60,
@@ -74,3 +75,5 @@ export default {
     ALWAYS_ON: 'always_on',
     DEFAULT_GROUP: 'board',
 };
+
+export default General;
