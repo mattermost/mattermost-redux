@@ -59,6 +59,37 @@ describe('setCategorySorting', () => {
     });
 });
 
+describe('setCategoryMuted', () => {
+    test('should call the correct API', async () => {
+        const currentUserId = TestHelper.generateId();
+        const teamId = TestHelper.generateId();
+
+        const category1 = {id: 'category1', team_id: teamId};
+
+        const store = await configureStore({
+            entities: {
+                channelCategories: {
+                    byId: {
+                        category1,
+                    },
+                },
+                users: {
+                    currentUserId,
+                },
+            },
+        });
+
+        const mock = nock(Client4.getBaseRoute()).
+            put(`/users/${currentUserId}/teams/${teamId}/channels/categories/${category1.id}`).
+            reply(200, {...category1, muted: true});
+
+        await store.dispatch(Actions.setCategoryMuted('category1', true));
+
+        // The response to this is handled in the websocket code, so just confirm that the mock was called correctly
+        expect(mock.isDone());
+    });
+});
+
 describe('fetchMyCategories', () => {
     test('should populate state correctly', async () => {
         const currentUserId = TestHelper.generateId();

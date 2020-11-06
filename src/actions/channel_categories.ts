@@ -59,6 +59,18 @@ export function setCategorySorting(categoryId: string, sorting: CategorySorting)
     };
 }
 
+export function setCategoryMuted(categoryId: string, muted: boolean) {
+    return (dispatch: DispatchFunc, getState: GetStateFunc) => {
+        const state = getState();
+        const category = getCategory(state, categoryId);
+
+        return dispatch(updateCategory({
+            ...category,
+            muted,
+        }));
+    };
+}
+
 export function updateCategory(category: ChannelCategory): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         const state = getState();
