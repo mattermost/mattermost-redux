@@ -9,6 +9,7 @@ import {Client4} from 'client';
 
 import {General} from '../constants';
 import {CategoryTypes} from '../constants/channel_categories';
+import {MarkUnread} from '../constants/channels';
 
 import {getAllCategoriesByIds} from 'selectors/entities/channel_categories';
 import {isFavoriteChannel} from 'selectors/entities/channels';
@@ -64,7 +65,7 @@ describe('setCategoryMuted', () => {
         const currentUserId = TestHelper.generateId();
         const teamId = TestHelper.generateId();
 
-        const category1 = {id: 'category1', team_id: teamId};
+        const category1 = {id: 'category1', team_id: teamId, channel_ids: []};
 
         const store = await configureStore({
             entities: {
@@ -87,6 +88,91 @@ describe('setCategoryMuted', () => {
 
         // The response to this is handled in the websocket code, so just confirm that the mock was called correctly
         expect(mock.isDone());
+    });
+
+    test('should mute the category and all of its channels', async () => {
+        const currentUserId = TestHelper.generateId();
+        const teamId = TestHelper.generateId();
+
+        const category1 = {
+            id: 'category1',
+            team_id: teamId,
+            channel_ids: ['channel1', 'channel2'],
+        };
+
+        const store = await configureStore({
+            entities: {
+                channelCategories: {
+                    byId: {
+                        category1,
+                    },
+                },
+                channels: {
+                    myMembers: {
+                        channel1: {notify_props: {mark_unread: MarkUnread.ALL}},
+                        channel2: {notify_props: {mark_unread: MarkUnread.ALL}},
+                    },
+                },
+                users: {
+                    currentUserId,
+                },
+            },
+        });
+
+        nock(Client4.getBaseRoute()).
+            put(`/users/${currentUserId}/teams/${teamId}/channels/categories/${category1.id}`).
+            reply(200, {...category1, muted: true});
+
+        await store.dispatch(Actions.setCategoryMuted('category1', true));
+
+        const state = store.getState();
+
+        expect(state.entities.channelCategories.byId.category1.muted).toBe(true);
+        expect(state.entities.channels.myMembers.channel1.notify_props.mark_unread).toBe(MarkUnread.MENTION);
+        expect(state.entities.channels.myMembers.channel2.notify_props.mark_unread).toBe(MarkUnread.MENTION);
+    });
+
+    test('should unmute the category and all of its channels', async () => {
+        const currentUserId = TestHelper.generateId();
+        const teamId = TestHelper.generateId();
+
+        const category1 = {
+            id: 'category1',
+            team_id: teamId,
+            channel_ids: ['channel1', 'channel2'],
+            muted: true,
+        };
+
+        const store = await configureStore({
+            entities: {
+                channelCategories: {
+                    byId: {
+                        category1,
+                    },
+                },
+                channels: {
+                    myMembers: {
+                        channel1: {notify_props: {mark_unread: MarkUnread.MENTION}},
+                        channel2: {notify_props: {mark_unread: MarkUnread.MENTION}},
+                    },
+                },
+                users: {
+                    currentUserId,
+                },
+            },
+        });
+
+        nock(Client4.getBaseRoute()).
+            put(`/users/${currentUserId}/teams/${teamId}/channels/categories/${category1.id}`).
+            reply(200, {...category1, muted: false});
+
+        await store.dispatch(Actions.setCategoryMuted('category1', false));
+
+        const state = store.getState();
+
+        expect(state.entities.channelCategories.byId.category1.muted).toBe(false);
+        expect(state.entities.channels.myMembers.channel1.notify_props.mark_unread).toBe(MarkUnread.ALL);
+        expect(state.entities.channels.myMembers.channel2.notify_props.mark_unread).toBe(MarkUnread.ALL);
     });
 });
 

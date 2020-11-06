@@ -1,7 +1,7 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
 
-import {ChannelCategoryTypes} from 'action_types';
+import {ChannelCategoryTypes, ChannelTypes} from 'action_types';
 
 import {Client4} from 'client';
 
@@ -52,7 +52,7 @@ export function setCategorySorting(categoryId: string, sorting: CategorySorting)
         const state = getState();
         const category = getCategory(state, categoryId);
 
-        return dispatch(updateCategory({
+        dispatch(updateCategory({
             ...category,
             sorting,
         }));
@@ -60,14 +60,34 @@ export function setCategorySorting(categoryId: string, sorting: CategorySorting)
 }
 
 export function setCategoryMuted(categoryId: string, muted: boolean) {
-    return (dispatch: DispatchFunc, getState: GetStateFunc) => {
+    return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         const state = getState();
         const category = getCategory(state, categoryId);
 
-        return dispatch(updateCategory({
+        const result = await dispatch(updateCategory({
             ...category,
             muted,
         }));
+
+        if ('error' in result) {
+            return result;
+        }
+
+        const updated = result.data as ChannelCategory;
+
+        return dispatch(batchActions([
+            {
+                type: ChannelCategoryTypes.RECEIVED_CATEGORY,
+                data: updated,
+            },
+            ...(updated.channel_ids.map((channelId) => ({
+                type: ChannelTypes.SET_CHANNEL_MUTED,
+                data: {
+                    channelId,
+                    muted,
+                },
+            }))),
+        ]));
     };
 }
 
