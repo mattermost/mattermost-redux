@@ -52,7 +52,7 @@ export const AppCallTypes: { [name: string]: AppCallType } = {
 
 export type AppCall = {
     url: string;
-    type: string;
+    type?: AppCallType;
     values?: AppCallValues;
     context: AppContext;
     raw_command?: string;
