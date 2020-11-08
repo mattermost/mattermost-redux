@@ -58,6 +58,7 @@ export type Post = {
     user_id: string;
     channel_id: string;
     root_id: string;
+    root_create_at?: number;
     parent_id: string;
     original_id: string;
     message: string;
