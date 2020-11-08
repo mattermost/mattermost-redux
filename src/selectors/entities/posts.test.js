@@ -2418,7 +2418,7 @@ describe('getExpandedLink', () => {
     });
 });
 
-describe('getExpandedLink', () => {
+describe('makeGetProfilesForThread', () => {
     it('should return profiles for threads in the right order and exclude current user', () => {
         const getProfilesForThread = Selectors.makeGetProfilesForThread();
         const user1 = {id: 'user1', update_at: 1000};
