@@ -8,13 +8,13 @@ import {getCurrentUserId} from 'selectors/entities/users';
 
 import {GlobalState} from 'types/store';
 import {Channel} from 'types/channels';
-import {UserProfile, userProfileWithLastViewAt} from 'types/users';
+import {UserProfile, UserProfileWithLastViewAt} from 'types/users';
 import {getDirectChannelName} from 'utils/channel_utils';
 import {General} from '../../constants';
 
 import {NameMappedObjects} from 'types/utilities';
 
-export function makeAddLastViewAtToProfiles(): (state: GlobalState, profiles: UserProfile[]) => Array<userProfileWithLastViewAt> {
+export function makeAddLastViewAtToProfiles(): (state: GlobalState, profiles: UserProfile[]) => Array<UserProfileWithLastViewAt> {
     return createSelector(
         getCurrentUserId,
         getMyChannelMemberships,
@@ -31,7 +31,7 @@ export function makeAddLastViewAtToProfiles(): (state: GlobalState, profiles: Us
                 return acc;
             }, {});
 
-            const formattedProfiles: userProfileWithLastViewAt[] = profiles.map((profile) => {
+            const formattedProfiles: UserProfileWithLastViewAt[] = profiles.map((profile) => {
                 const channelName = getDirectChannelName(currentUserId, profile.id);
                 const channel = DMchannels[channelName];
                 const membership = channel ? memberships[channel.id] : null;

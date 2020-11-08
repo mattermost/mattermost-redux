@@ -56,7 +56,7 @@ export type UserProfile = {
     terms_of_service_create_at: number;
 };
 
-export type userProfileWithLastViewAt = UserProfile & {
+export type UserProfileWithLastViewAt = UserProfile & {
     last_viewed_at: number;
 };
 
