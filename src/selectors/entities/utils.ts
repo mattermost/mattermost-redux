@@ -3,23 +3,37 @@
 
 import {createSelector} from 'reselect';
 
-import {getMyChannelMemberships, getAllDirectChannelsNameMapInCurrentTeam} from 'selectors/entities/channels';
+import {getMyChannelMemberships, getAllChannels} from 'selectors/entities/channels';
 import {getCurrentUserId} from 'selectors/entities/users';
 
 import {GlobalState} from 'types/store';
+import {Channel} from 'types/channels';
 import {UserProfile, userProfileWithLastViewAt} from 'types/users';
 import {getDirectChannelName} from 'utils/channel_utils';
+import {General} from '../../constants';
+
+import {NameMappedObjects} from 'types/utilities';
 
 export function makeAddLastViewAtToProfiles(): (state: GlobalState, profiles: UserProfile[]) => Array<userProfileWithLastViewAt> {
     return createSelector(
         getCurrentUserId,
         getMyChannelMemberships,
-        getAllDirectChannelsNameMapInCurrentTeam,
+        getAllChannels,
         (state: GlobalState, profiles: UserProfile[]) => profiles,
-        (currentUserId, memberships, allDmChannels, profiles) => {
+        (currentUserId, memberships, allChannels, profiles) => {
+            const DMchannels = Object.values(allChannels).reduce((acc: NameMappedObjects<Channel>, channel) => {
+                if (channel.type === General.DM_CHANNEL) {
+                    return {
+                        ...acc,
+                        [channel.name]: channel,
+                    };
+                }
+                return acc;
+            }, {});
+
             const formattedProfiles: userProfileWithLastViewAt[] = profiles.map((profile) => {
                 const channelName = getDirectChannelName(currentUserId, profile.id);
-                const channel = allDmChannels[channelName];
+                const channel = DMchannels[channelName];
                 const membership = channel ? memberships[channel.id] : null;
                 return {
                     ...profile,
