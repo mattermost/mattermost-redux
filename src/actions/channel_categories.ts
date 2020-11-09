@@ -52,7 +52,7 @@ export function setCategorySorting(categoryId: string, sorting: CategorySorting)
         const state = getState();
         const category = getCategory(state, categoryId);
 
-        dispatch(updateCategory({
+        return dispatch(updateCategory({
             ...category,
             sorting,
         }));
