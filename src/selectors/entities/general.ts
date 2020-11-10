@@ -79,6 +79,17 @@ export const getAutolinkedUrlSchemes: (a: GlobalState) => string[] = createSelec
     },
 );
 
+export const getManagedResourcePaths: (state: GlobalState) => string[] = createSelector(
+    getConfig,
+    (config) => {
+        if (!config.ManagedResourcePaths) {
+            return [];
+        }
+
+        return config.ManagedResourcePaths.split(',').map((path) => path.trim());
+    },
+);
+
 export const getServerVersion = (state: GlobalState): string => {
     return state.entities.general.serverVersion;
 };

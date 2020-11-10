@@ -27,7 +27,7 @@ export type PostType = 'system_add_remove' |
     'system_purpose_change' |
     'system_remove_from_channel';
 
-export type PostEmbedType = 'image' | 'message_attachment' | 'opengraph';
+export type PostEmbedType = 'image' | 'link' | 'message_attachment' | 'opengraph';
 
 export type PostEmbed = {
     type: PostEmbedType;
