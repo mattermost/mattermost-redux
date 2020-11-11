@@ -97,7 +97,7 @@ import {cleanUrlForLogging} from 'utils/sentry';
 import {isSystemAdmin} from 'utils/user_utils';
 
 import fetch from './fetch_etag';
-import {rudderAnalytics} from './rudder';
+import {TelemetryHandler} from './telemetry';
 
 const FormData = require('form-data');
 const HEADER_AUTH = 'Authorization';
@@ -127,12 +127,13 @@ export default class Client4 {
     userId = '';
     diagnosticId = '';
     includeCookies = true;
-    isRudderKeySet = false;
     translations = {
         connectionError: 'There appears to be a problem with your internet connection.',
         unknownError: 'We received an unexpected status code from the server.',
     };
     userRoles?: string;
+
+    telemetryHandler?: TelemetryHandler;
 
     getUrl() {
         return this.url;
@@ -189,8 +190,8 @@ export default class Client4 {
         this.diagnosticId = diagnosticId;
     }
 
-    enableRudderEvents() {
-        this.isRudderKeySet = true;
+    setTelemetryHandler(telemetryHandler?: TelemetryHandler) {
+        this.telemetryHandler = telemetryHandler;
     }
 
     getServerVersion() {
@@ -3484,57 +3485,17 @@ export default class Client4 {
     };
 
     trackEvent(category: string, event: string, props?: any) {
-        if (!this.isRudderKeySet) {
-            return;
+        if (this.telemetryHandler) {
+            const userRoles = this.userRoles && isSystemAdmin(this.userRoles) ? 'system_admin, system_user' : 'system_user';
+            this.telemetryHandler.trackEvent(this.userId, userRoles, category, event, props);
         }
-
-        const properties = Object.assign({
-            category,
-            type: event,
-            user_actual_role: this.userRoles && isSystemAdmin(this.userRoles) ? 'system_admin, system_user' : 'system_user',
-            user_actual_id: this.userId,
-        }, props);
-        const options = {
-            context: {
-                ip: '0.0.0.0',
-            },
-            page: {
-                path: '',
-                referrer: '',
-                search: '',
-                title: '',
-                url: '',
-            },
-            anonymousId: '00000000000000000000000000',
-        };
-
-        rudderAnalytics.track('event', properties, options);
     }
 
     pageVisited(category: string, name: string) {
-        if (!this.isRudderKeySet) {
-            return;
+        if (this.telemetryHandler) {
+            const userRoles = this.userRoles && isSystemAdmin(this.userRoles) ? 'system_admin, system_user' : 'system_user';
+            this.telemetryHandler.pageVisited(this.userId, userRoles, category, name);
         }
-
-        rudderAnalytics.page(
-            category,
-            name,
-            {
-                path: '',
-                referrer: '',
-                search: '',
-                title: '',
-                url: '',
-                user_actual_role: this.userRoles && isSystemAdmin(this.userRoles) ? 'system_admin, system_user' : 'system_user',
-                user_actual_id: this.userId,
-            },
-            {
-                context: {
-                    ip: '0.0.0.0',
-                },
-                anonymousId: '00000000000000000000000000',
-            },
-        );
     }
 }
 
