@@ -7,7 +7,7 @@ export function getAppsBindings(state: GlobalState, location?: string): AppBindi
     if (location) {
         const headerBindings = state.entities.apps.bindings.find((b) => b.location_id === location);
         if (headerBindings && headerBindings.bindings) {
-            return headerBindings.bindings!;
+            return headerBindings.bindings;
         }
     }
     return state.entities.apps.bindings;
