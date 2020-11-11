@@ -1,6 +1,11 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
 
+export type AppModalState = {
+    form: AppForm;
+    call: AppCall;
+}
+
 export type AppsState = {
     bindings: AppBinding[];
 };
@@ -77,6 +82,7 @@ export type AppCallResponse<Res = {}> = {
     url?: string;
     use_external_browser?: boolean;
     call?: AppCall;
+    form?: AppForm;
 };
 
 export type AppContext = {
