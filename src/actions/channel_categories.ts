@@ -31,7 +31,7 @@ import {CategorySorting, OrderedChannelCategories, ChannelCategory} from 'types/
 import {Channel} from 'types/channels';
 import {$ID} from 'types/utilities';
 
-import {insertWithoutDuplicates, removeItem} from 'utils/array_utils';
+import {insertMultipleWithoutDuplicates, insertWithoutDuplicates, removeItem} from 'utils/array_utils';
 
 export function expandCategory(categoryId: string) {
     return {
@@ -230,6 +230,85 @@ export function moveChannelToCategory(categoryId: string, channelId: string, new
             await dispatch(unfavoriteChannel(channelId, false));
         }
 
+        return result;
+    };
+}
+
+export function moveChannelsToCategory(categoryId: string, channelIds: string[], newIndex: number, setManualSorting = true) {
+    return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
+        const state = getState();
+        const targetCategory = getCategory(state, categoryId);
+        const currentUserId = getCurrentUserId(state);
+
+        // Add the channel to the new category
+        let categories = {
+            [targetCategory.id]: {
+                ...targetCategory,
+                sorting: (setManualSorting && targetCategory.type !== CategoryTypes.DIRECT_MESSAGES) ? CategorySorting.Manual : targetCategory.sorting,
+                channel_ids: insertMultipleWithoutDuplicates(targetCategory.channel_ids, channelIds, newIndex),
+            },
+        };
+
+        // Needed if we have to revert categories and for checking for favourites
+        let unmodifiedCategories = {[targetCategory.id]: targetCategory};
+        let sourceCategories: Record<string, string> = {};
+
+        // And remove it from the old category
+        channelIds.forEach((channelId) => {
+            const sourceCategory = getCategoryInTeamWithChannel(getState(), targetCategory.team_id, channelId);
+            if (sourceCategory && sourceCategory.id !== targetCategory.id) {
+                unmodifiedCategories = {
+                    ...unmodifiedCategories,
+                    [sourceCategory.id]: sourceCategory,
+                };
+                sourceCategories = {...sourceCategories, [channelId]: sourceCategory.id};
+                categories = {
+                    ...categories,
+                    [sourceCategory.id]: {
+                        ...(categories[sourceCategory.id] || sourceCategory),
+                        channel_ids: removeItem((categories[sourceCategory.id] || sourceCategory).channel_ids, channelId),
+                    },
+                };
+            }
+        });
+
+        const categoriesArray = Object.values(categories).reduce((allCategories: ChannelCategory[], category) => {
+            allCategories.push(category);
+            return allCategories;
+        }, []);
+
+        const result = dispatch({
+            type: ChannelCategoryTypes.RECEIVED_CATEGORIES,
+            data: categoriesArray,
+        });
+
+        try {
+            await Client4.updateChannelCategories(currentUserId, targetCategory.team_id, categoriesArray);
+        } catch (error) {
+            forceLogoutIfNecessary(error, dispatch, getState);
+            dispatch(logError(error));
+
+            const originalCategories = Object.values(unmodifiedCategories).reduce((allCategories: ChannelCategory[], category) => {
+                allCategories.push(category);
+                return allCategories;
+            }, []);
+
+            dispatch({
+                type: ChannelCategoryTypes.RECEIVED_CATEGORIES,
+                data: originalCategories,
+            });
+            return {error};
+        }
+
+        // Update the favorite preferences locally on the client in case we have any logic relying on that
+        await Promise.all(channelIds.map(async (channelId) => {
+            const sourceCategory = unmodifiedCategories[sourceCategories[channelId]];
+            if (targetCategory.type === CategoryTypes.FAVORITES) {
+                await dispatch(favoriteChannel(channelId, false));
+            } else if (sourceCategory && sourceCategory.type === CategoryTypes.FAVORITES) {
+                await dispatch(unfavoriteChannel(channelId, false));
+            }
+        }));
         return result;
     };
 }
