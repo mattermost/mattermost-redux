@@ -124,6 +124,7 @@ const values = {
     SYSCONSOLE_READ_PERMISSIONS: [] as string[],
     SYSCONSOLE_WRITE_PERMISSIONS: [] as string[],
     MANAGE_SHARED_CHANNELS: 'manage_shared_channels',
+    MANAGE_REMOTE_CLUSTERS: 'manage_remote_clusters',
     SYSCONSOLE_ANCILLARY_PERMISSIONS: {} as Record<string, string[]>,
 };
 
