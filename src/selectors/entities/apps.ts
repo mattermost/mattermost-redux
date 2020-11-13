@@ -5,9 +5,13 @@ import {AppBinding} from 'types/apps';
 
 export function getAppsBindings(state: GlobalState, location?: string): AppBinding[] {
     if (location) {
-        return state.entities.apps.bindings.filter((p) => {
-            return p.location_id === location;
-        });
+        const bindings = state.entities.apps.bindings.find((p) => {
+            return p.location === location;
+        })?.bindings;
+        if (bindings) {
+            return bindings;
+        }
+        return [];
     }
     return state.entities.apps.bindings;
 }

@@ -9,7 +9,10 @@ import {GenericAction} from 'types/actions';
 function bindings(state: AppBinding[] = [], action: GenericAction): AppBinding[] {
     switch (action.type) {
     case AppsTypes.RECEIVED_APP_BINDINGS: {
-        return action.data;
+        if (action.data) {
+            return action.data;
+        }
+        return [];
     }
     default:
         return state;
