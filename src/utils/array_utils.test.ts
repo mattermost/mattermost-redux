@@ -52,6 +52,16 @@ describe('insertMultipleWithoutDuplicates', () => {
 
         expect(insertMultipleWithoutDuplicates(input, ['a', 'b', 'c'], 0)).toStrictEqual(input);
     });
+
+    test('should just return the array if either the input or items to insert is blank', () => {
+        expect(insertMultipleWithoutDuplicates([], ['a', 'b', 'c'], 0)).toStrictEqual(['a', 'b', 'c']);
+        expect(insertMultipleWithoutDuplicates(['a', 'b', 'c'], [], 0)).toStrictEqual(['a', 'b', 'c']);
+    });
+
+    test('should handle invalid index inputs', () => {
+        expect(insertMultipleWithoutDuplicates(['a', 'b', 'c', 'd'], ['e', 'f'], 10)).toStrictEqual(['a', 'b', 'c', 'd', 'e', 'f']);
+        expect(insertMultipleWithoutDuplicates(['a', 'b', 'c', 'd'], ['e', 'f'], -2)).toStrictEqual(['a', 'b', 'e', 'f', 'c', 'd']);
+    });
 });
 
 describe('removeItem', () => {
