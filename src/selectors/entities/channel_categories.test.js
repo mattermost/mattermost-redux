@@ -130,7 +130,7 @@ describe('makeGetCategoriesForTeam', () => {
     });
 });
 
-describe('makeFilterAutoclosedDMs', () => {
+describe('legacyMakeFilterAutoclosedDMs', () => {
     const currentUser = {id: 'currentUser'};
 
     const baseState = {
@@ -184,7 +184,7 @@ describe('makeFilterAutoclosedDMs', () => {
     }
 
     test('should hide an inactive GM channel', () => {
-        const filterAutoclosedDMs = Selectors.makeFilterAutoclosedDMs(() => cutoff);
+        const filterAutoclosedDMs = Selectors.legacyMakeFilterAutoclosedDMs(() => cutoff);
 
         const gmChannel = {id: 'gmChannel', type: General.GM_CHANNEL};
 
@@ -206,7 +206,7 @@ describe('makeFilterAutoclosedDMs', () => {
     });
 
     test('should show a GM channel if it was opened recently', () => {
-        const filterAutoclosedDMs = Selectors.makeFilterAutoclosedDMs(() => cutoff);
+        const filterAutoclosedDMs = Selectors.legacyMakeFilterAutoclosedDMs(() => cutoff);
 
         const gmChannel = {id: 'gmChannel', type: General.GM_CHANNEL};
 
@@ -228,7 +228,7 @@ describe('makeFilterAutoclosedDMs', () => {
     });
 
     test('should show a GM channel if it was viewed recently', () => {
-        const filterAutoclosedDMs = Selectors.makeFilterAutoclosedDMs(() => cutoff);
+        const filterAutoclosedDMs = Selectors.legacyMakeFilterAutoclosedDMs(() => cutoff);
 
         const gmChannel = {id: 'gmChannel', type: General.GM_CHANNEL};
 
@@ -250,7 +250,7 @@ describe('makeFilterAutoclosedDMs', () => {
     });
 
     test('should show a GM channel if it had an unloaded post made recently', () => {
-        const filterAutoclosedDMs = Selectors.makeFilterAutoclosedDMs(() => cutoff);
+        const filterAutoclosedDMs = Selectors.legacyMakeFilterAutoclosedDMs(() => cutoff);
 
         const gmChannel = {id: 'gmChannel', type: General.GM_CHANNEL, last_post_at: cutoff + 1};
 
@@ -272,7 +272,7 @@ describe('makeFilterAutoclosedDMs', () => {
     });
 
     test('should show a GM channel if it had a loaded post made recently', () => {
-        const filterAutoclosedDMs = Selectors.makeFilterAutoclosedDMs(() => cutoff);
+        const filterAutoclosedDMs = Selectors.legacyMakeFilterAutoclosedDMs(() => cutoff);
 
         const gmChannel = {id: 'gmChannel', type: General.GM_CHANNEL};
 
@@ -302,7 +302,7 @@ describe('makeFilterAutoclosedDMs', () => {
     });
 
     test('should show an inactive GM channel if autoclosing DMs is disabled for the user', () => {
-        const filterAutoclosedDMs = Selectors.makeFilterAutoclosedDMs(() => cutoff);
+        const filterAutoclosedDMs = Selectors.legacyMakeFilterAutoclosedDMs(() => cutoff);
 
         const gmChannel = {id: 'gmChannel', type: General.GM_CHANNEL};
 
@@ -325,7 +325,7 @@ describe('makeFilterAutoclosedDMs', () => {
     });
 
     test('should show an inactive GM channel if autoclosing DMs is disabled for the server', () => {
-        const filterAutoclosedDMs = Selectors.makeFilterAutoclosedDMs(() => cutoff);
+        const filterAutoclosedDMs = Selectors.legacyMakeFilterAutoclosedDMs(() => cutoff);
 
         const gmChannel = {id: 'gmChannel', type: General.GM_CHANNEL};
 
@@ -353,7 +353,7 @@ describe('makeFilterAutoclosedDMs', () => {
     });
 
     test('should show a GM channel if it has unread messages', () => {
-        const filterAutoclosedDMs = Selectors.makeFilterAutoclosedDMs(() => cutoff);
+        const filterAutoclosedDMs = Selectors.legacyMakeFilterAutoclosedDMs(() => cutoff);
 
         const gmChannel = {id: 'gmChannel', type: General.GM_CHANNEL, total_msg_count: 1};
 
@@ -380,7 +380,7 @@ describe('makeFilterAutoclosedDMs', () => {
     });
 
     test('should hide an inactive DM channel', () => {
-        const filterAutoclosedDMs = Selectors.makeFilterAutoclosedDMs(() => cutoff);
+        const filterAutoclosedDMs = Selectors.legacyMakeFilterAutoclosedDMs(() => cutoff);
 
         const otherUser = {id: 'otherUser', delete_at: 0};
         const dmChannel = {id: 'dmChannel', name: `${currentUser.id}__${otherUser.id}`, type: General.DM_CHANNEL};
@@ -408,7 +408,7 @@ describe('makeFilterAutoclosedDMs', () => {
     });
 
     test('should show a DM channel if it was opened recently', () => {
-        const filterAutoclosedDMs = Selectors.makeFilterAutoclosedDMs(() => cutoff);
+        const filterAutoclosedDMs = Selectors.legacyMakeFilterAutoclosedDMs(() => cutoff);
 
         const otherUser = {id: 'otherUser', delete_at: 0};
         const dmChannel = {id: 'dmChannel', name: `${currentUser.id}__${otherUser.id}`, type: General.DM_CHANNEL};
@@ -436,7 +436,7 @@ describe('makeFilterAutoclosedDMs', () => {
     });
 
     test('should show a DM channel with a deactivated user if its the current channel', () => {
-        const filterAutoclosedDMs = Selectors.makeFilterAutoclosedDMs(() => cutoff);
+        const filterAutoclosedDMs = Selectors.legacyMakeFilterAutoclosedDMs(() => cutoff);
 
         const otherUser = {id: 'otherUser', delete_at: cutoff + 2};
         const dmChannel = {id: 'dmChannel', name: `${currentUser.id}__${otherUser.id}`, type: General.DM_CHANNEL};
@@ -467,7 +467,7 @@ describe('makeFilterAutoclosedDMs', () => {
     });
 
     test('should hide a DM channel with a deactivated user if it is not the current channel', () => {
-        const filterAutoclosedDMs = Selectors.makeFilterAutoclosedDMs(() => cutoff);
+        const filterAutoclosedDMs = Selectors.legacyMakeFilterAutoclosedDMs(() => cutoff);
 
         const otherUser = {id: 'otherUser', delete_at: cutoff + 2};
         const dmChannel = {id: 'dmChannel', name: `${currentUser.id}__${otherUser.id}`, type: General.DM_CHANNEL};
@@ -498,7 +498,7 @@ describe('makeFilterAutoclosedDMs', () => {
     });
 
     test('should show a DM channel with a deactivated user if it is not the current channel but it has been opened since the user was deactivated', () => {
-        const filterAutoclosedDMs = Selectors.makeFilterAutoclosedDMs(() => cutoff);
+        const filterAutoclosedDMs = Selectors.legacyMakeFilterAutoclosedDMs(() => cutoff);
 
         const otherUser = {id: 'otherUser', delete_at: cutoff + 2};
         const dmChannel = {id: 'dmChannel', name: `${currentUser.id}__${otherUser.id}`, type: General.DM_CHANNEL};
@@ -529,7 +529,7 @@ describe('makeFilterAutoclosedDMs', () => {
     });
 
     test('should return the original array when no items are removed', () => {
-        const filterAutoclosedDMs = Selectors.makeFilterAutoclosedDMs(() => cutoff);
+        const filterAutoclosedDMs = Selectors.legacyMakeFilterAutoclosedDMs(() => cutoff);
 
         const channel1 = {id: 'channel1', type: General.PUBLIC_CHANNEL};
 
