@@ -240,7 +240,7 @@ export function moveChannelsToCategory(categoryId: string, channelIds: string[],
         const targetCategory = getCategory(state, categoryId);
         const currentUserId = getCurrentUserId(state);
 
-        // Add the channel to the new category
+        // Add the channels to the new category
         let categories = {
             [targetCategory.id]: {
                 ...targetCategory,
@@ -253,7 +253,7 @@ export function moveChannelsToCategory(categoryId: string, channelIds: string[],
         let unmodifiedCategories = {[targetCategory.id]: targetCategory};
         let sourceCategories: Record<string, string> = {};
 
-        // And remove it from the old category
+        // And remove it from the old categories
         channelIds.forEach((channelId) => {
             const sourceCategory = getCategoryInTeamWithChannel(getState(), targetCategory.team_id, channelId);
             if (sourceCategory && sourceCategory.id !== targetCategory.id) {
