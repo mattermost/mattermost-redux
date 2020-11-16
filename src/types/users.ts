@@ -56,6 +56,10 @@ export type UserProfile = {
     terms_of_service_create_at: number;
 };
 
+export type UserProfileWithLastViewAt = UserProfile & {
+    last_viewed_at: number;
+};
+
 export type UsersState = {
     currentUserId: string;
     isManualStatus: RelationOneToOne<UserProfile, boolean>;
