@@ -15,7 +15,6 @@ export default {
     STATUS_INTERVAL: 60000,
     AUTOCOMPLETE_LIMIT_DEFAULT: 25,
     AUTOCOMPLETE_SPLIT_CHARACTERS: ['.', '-', '_'],
-    MENTION: 'mention',
     OUT_OF_OFFICE: 'ooo',
     OFFLINE: 'offline',
     AWAY: 'away',
