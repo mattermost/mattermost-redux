@@ -13,6 +13,7 @@ import {Client4} from 'client';
 
 import {General, RequestStatus, Preferences, Permissions} from '../constants';
 import {CategoryTypes} from '../constants/channel_categories';
+import {MarkUnread} from '../constants/channels';
 
 import TestHelper from 'test/test_helper';
 import configureStore from 'test/test_store';
@@ -366,7 +367,7 @@ describe('Actions.Channels', () => {
 
     it('updateChannelNotifyProps', async () => {
         const notifyProps = {
-            mark_unread: 'mention',
+            mark_unread: MarkUnread.MENTION,
             desktop: 'none',
         };
 
@@ -393,7 +394,7 @@ describe('Actions.Channels', () => {
         const members = store.getState().entities.channels.myMembers;
         const member = members[TestHelper.basicChannel.id];
         assert.ok(member);
-        assert.equal(member.notify_props.mark_unread, 'mention');
+        assert.equal(member.notify_props.mark_unread, MarkUnread.MENTION);
         assert.equal(member.notify_props.desktop, 'none');
     });
 
@@ -843,7 +844,7 @@ describe('Actions.Channels', () => {
                             [channelId]: {team_id: teamId, total_msg_count: 10},
                         },
                         myMembers: {
-                            [channelId]: {msg_count: 10, mention_count: 0, notify_props: {mark_unread: General.MENTION}},
+                            [channelId]: {msg_count: 10, mention_count: 0, notify_props: {mark_unread: MarkUnread.MENTION}},
                         },
                     },
                     teams: {
@@ -879,7 +880,7 @@ describe('Actions.Channels', () => {
                             [channelId]: {team_id: teamId, total_msg_count: 10},
                         },
                         myMembers: {
-                            [channelId]: {msg_count: 10, mention_count: 0, notify_props: {mark_unread: General.MENTION}},
+                            [channelId]: {msg_count: 10, mention_count: 0, notify_props: {mark_unread: MarkUnread.MENTION}},
                         },
                     },
                     teams: {
