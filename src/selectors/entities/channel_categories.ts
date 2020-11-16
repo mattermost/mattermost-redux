@@ -10,7 +10,7 @@ import {CategoryTypes} from '../../constants/channel_categories';
 import {getCurrentChannelId, getMyChannelMemberships, makeGetChannelsForIds} from 'selectors/entities/channels';
 import {getCurrentUserLocale} from 'selectors/entities/i18n';
 import {getLastPostPerChannel} from 'selectors/entities/posts';
-import {getMyPreferences, getTeammateNameDisplaySetting, shouldAutocloseDMs} from 'selectors/entities/preferences';
+import {getMyPreferences, getTeammateNameDisplaySetting, shouldAutocloseDMs, getNewSidebarPreference} from 'selectors/entities/preferences';
 import {getCurrentUserId} from 'selectors/entities/users';
 
 import {Channel, ChannelMembership} from 'types/channels';
@@ -96,11 +96,11 @@ function getDefaultAutocloseCutoff() {
     return Date.now() - (7 * 24 * 60 * 60 * 1000);
 }
 
-// makeFilterAutoclosedDMs returns a selector that filters a given list of channels based on whether or not the channel has
+// legacyMakeFilterAutoclosedDMs returns a selector that filters a given list of channels based on whether or not the channel has
 // been autoclosed by either being an inactive DM/GM or a DM with a deactivated user. The exact requirements for being
 // inactive are complicated, but they are intended to include the channel not having been opened, posted in, or viewed
 // recently. The selector returns the original array if no channels are filtered out.
-export function makeFilterAutoclosedDMs(getAutocloseCutoff = getDefaultAutocloseCutoff): (state: GlobalState, channels: Channel[], categoryType: string) => Channel[] {
+export function legacyMakeFilterAutoclosedDMs(getAutocloseCutoff = getDefaultAutocloseCutoff): (state: GlobalState, channels: Channel[], categoryType: string) => Channel[] {
     return createSelector(
         (state: GlobalState, channels: Channel[]) => channels,
         (state: GlobalState, channels: Channel[], categoryType: string) => categoryType,
@@ -185,6 +185,74 @@ export function makeFilterAutoclosedDMs(getAutocloseCutoff = getDefaultAutoclose
             });
 
             return filtered.length === channels.length ? channels : filtered;
+        },
+    );
+}
+
+export function makeFilterAutoclosedDMs(): (state: GlobalState, channels: Channel[], categoryType: string) => Channel[] {
+    return createSelector(
+        (state: GlobalState, channels: Channel[]) => channels,
+        (state: GlobalState, channels: Channel[], categoryType: string) => categoryType,
+        getMyPreferences,
+        shouldAutocloseDMs,
+        getCurrentChannelId,
+        (state: GlobalState) => state.entities.users.profiles,
+        getCurrentUserId,
+        getMyChannelMemberships,
+        (channels, categoryType, myPreferences, autocloseDMs, currentChannelId, profiles, currentUserId, myMembers) => {
+            if (categoryType !== CategoryTypes.DIRECT_MESSAGES) {
+                // Only autoclose DMs that haven't been assigned to a category
+                return channels;
+            }
+
+            let unreadCount = 0;
+
+            const filtered = channels.filter((channel) => {
+                if (channel.type !== General.DM_CHANNEL && channel.type !== General.GM_CHANNEL) {
+                    return true;
+                }
+
+                if (isUnreadChannel(myMembers, channel)) {
+                    unreadCount++;
+
+                    // Unread DMs/GMs are always visible
+                    return true;
+                }
+
+                if (currentChannelId === channel.id) {
+                    // The current channel is always visible
+                    return true;
+                }
+
+                // openTime is the time the channel was last opened (like from the More DMs list) after having been closed
+                const openTimePref = myPreferences[getPreferenceKey(Preferences.CATEGORY_CHANNEL_OPEN_TIME, channel.id)];
+                const openTime = parseInt(openTimePref ? openTimePref.value! : '0', 10);
+
+                // DMs with deactivated users will be visible if you're currently viewing them and they were opened
+                // since the user was deactivated
+                if (channel.type === General.DM_CHANNEL) {
+                    const teammateId = getUserIdFromChannelName(currentUserId, channel.name);
+                    const teammate = profiles[teammateId];
+
+                    if (!teammate || teammate.delete_at > openTime) {
+                        return false;
+                    }
+                }
+
+                // Skip the rest of the checks if autoclosing inactive DMs is disabled
+                if (!autocloseDMs) {
+                    return true;
+                }
+
+                return false;
+            });
+
+            // The limit of DMs user specifies to be rendered in the sidebar
+            const limitPref = myPreferences[getPreferenceKey(Preferences.CATEGORY_SIDEBAR_SETTINGS, Preferences.LIMIT_VISIBLE_DMS_GMS)];
+            const limit = parseInt(limitPref?.value || '0', 10);
+
+            const remaining = limit - unreadCount;
+            return filtered.slice(0, remaining);
         },
     );
 }
@@ -384,18 +452,20 @@ export function makeGetChannelsForCategory() {
 // with inactive DMs/GMs and archived channels filtered out.
 export function makeFilterAndSortChannelsForCategory() {
     const filterArchivedChannels = makeFilterArchivedChannels();
-
+    const legacyFilterAutoclosedDMs = legacyMakeFilterAutoclosedDMs();
     const filterAutoclosedDMs = makeFilterAutoclosedDMs();
+
     const filterManuallyClosedDMs = makeFilterManuallyClosedDMs();
 
     const sortChannels = makeSortChannels();
 
     return (state: GlobalState, originalChannels: Channel[], category: ChannelCategory) => {
+        const sidebarOrganisationPreference = getNewSidebarPreference(state);
         let channels = originalChannels;
 
         channels = filterArchivedChannels(state, channels);
 
-        channels = filterAutoclosedDMs(state, channels, category.type);
+        channels = sidebarOrganisationPreference ? filterAutoclosedDMs(state, channels, category.type) : legacyFilterAutoclosedDMs(state, channels, category.type);
         channels = filterManuallyClosedDMs(state, channels);
 
         channels = sortChannels(state, channels, category);
