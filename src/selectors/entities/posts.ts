@@ -7,6 +7,7 @@ import {Posts, Preferences} from '../../constants';
 
 import {getCurrentUser} from 'selectors/entities/common';
 import {getMyPreferences} from 'selectors/entities/preferences';
+import {getUsers, getCurrentUserId} from 'selectors/entities/users';
 
 import {Channel} from 'types/channels';
 import {
@@ -362,6 +363,29 @@ export function makeGetPostsForThread(): (state: GlobalState, props: {rootId: $I
             });
             thread.sort(comparePosts);
             return thread;
+        },
+    );
+}
+
+// The selector below filters current user if it exists. Excluding currentUser is just for convinience
+export function makeGetProfilesForThread(): (state: GlobalState, props: {rootId: $ID<Post>}) => Array<UserProfile> {
+    const getPostsForThread = makeGetPostsForThread();
+    return createSelector(
+        getUsers,
+        getCurrentUserId,
+        getPostsForThread,
+        (allUsers, currentUserId, posts) => {
+            const profileIds = posts.map((post) => post.user_id);
+            const uniqueIds = [...new Set(profileIds)];
+            return uniqueIds.reduce((acc, id) => {
+                if (allUsers[id] && currentUserId !== id) {
+                    return [
+                        ...acc,
+                        allUsers[id],
+                    ];
+                }
+                return acc;
+            }, []);
         },
     );
 }
