@@ -2,6 +2,7 @@
 // See LICENSE.txt for license information.
 
 import {General, Preferences, Permissions, Users} from '../constants';
+import {MarkUnread} from 'constants/channels';
 
 import {hasNewPermissions} from 'selectors/entities/general';
 import {haveITeamPermission, haveIChannelPermission} from 'selectors/entities/roles';
@@ -462,7 +463,7 @@ export function isUnreadChannel(members: RelationOneToOne<Channel, ChannelMember
     const member = members[channel.id];
     if (member) {
         const msgCount = channel.total_msg_count - member.msg_count;
-        const onlyMentions = member.notify_props && member.notify_props.mark_unread === General.MENTION;
+        const onlyMentions = member.notify_props && member.notify_props.mark_unread === MarkUnread.MENTION;
         return (member.mention_count > 0 || (Boolean(msgCount) && !onlyMentions));
     }
 
@@ -567,7 +568,7 @@ export function sortChannelsByRecency(lastPosts: RelationOneToOne<Channel, Post>
 }
 
 export function isChannelMuted(member: ChannelMembership): boolean {
-    return member && member.notify_props ? (member.notify_props.mark_unread === 'mention') : false;
+    return member && member.notify_props ? (member.notify_props.mark_unread === MarkUnread.MENTION) : false;
 }
 
 export function areChannelMentionsIgnored(channelMemberNotifyProps: ChannelNotifyProps, currentUserNotifyProps: UserNotifyProps) {

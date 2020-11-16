@@ -23,6 +23,7 @@ export type ChannelCategory = {
     display_name: string;
     sorting: CategorySorting;
     channel_ids: $ID<Channel>[];
+    muted: boolean;
 };
 
 export type OrderedChannelCategories = {
