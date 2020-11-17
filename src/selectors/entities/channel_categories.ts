@@ -239,19 +239,21 @@ export function makeFilterAutoclosedDMs(): (state: GlobalState, channels: Channe
                     }
                 }
 
-                // Skip the rest of the checks if autoclosing inactive DMs is disabled
-                if (!autocloseDMs) {
-                    return true;
-                }
-
-                return false;
+                return true;
             });
 
             // The limit of DMs user specifies to be rendered in the sidebar
             const limitPref = myPreferences[getPreferenceKey(Preferences.CATEGORY_SIDEBAR_SETTINGS, Preferences.LIMIT_VISIBLE_DMS_GMS)];
             const limit = parseInt(limitPref ? limitPref.value! : '0', 10);
 
-            const remaining = limit - unreadCount;
+            let remaining;
+
+            if (limit < unreadCount) {
+                remaining = unreadCount;
+            } else {
+                remaining = limit;
+            }
+
             return filtered.slice(0, remaining);
         },
     );
