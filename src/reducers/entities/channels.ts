@@ -1,11 +1,28 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
+
 import {combineReducers} from 'redux';
+
 import {ChannelTypes, UserTypes, SchemeTypes, GroupTypes, PostTypes} from 'action_types';
+
 import {General} from '../../constants';
+import {MarkUnread} from 'constants/channels';
+
 import {GenericAction} from 'types/actions';
-import {Channel, ChannelMembership, ChannelStats, ChannelMemberCountByGroup, ChannelMemberCountsByGroup} from 'types/channels';
-import {RelationOneToMany, RelationOneToOne, IDMappedObjects, UserIDMappedObjects} from 'types/utilities';
+import {
+    Channel,
+    ChannelMembership,
+    ChannelStats,
+    ChannelMemberCountByGroup,
+    ChannelMemberCountsByGroup,
+} from 'types/channels';
+import {
+    RelationOneToMany,
+    RelationOneToOne,
+    IDMappedObjects,
+    UserIDMappedObjects,
+} from 'types/utilities';
+
 import {Team} from 'types/teams';
 
 function removeMemberFromChannels(state: RelationOneToOne<Channel, UserIDMappedObjects<ChannelMembership>>, action: GenericAction) {
@@ -274,6 +291,24 @@ function myMembers(state: RelationOneToOne<Channel, ChannelMembership> = {}, act
         return {
             ...state,
             [action.data.channel_id]: member,
+        };
+    }
+    case ChannelTypes.SET_CHANNEL_MUTED: {
+        const {channelId, muted} = action.data;
+
+        if (!state[channelId]) {
+            return state;
+        }
+
+        return {
+            ...state,
+            [channelId]: {
+                ...state[channelId],
+                notify_props: {
+                    ...state[channelId].notify_props,
+                    mark_unread: muted ? MarkUnread.MENTION : MarkUnread.ALL,
+                },
+            },
         };
     }
     case ChannelTypes.INCREMENT_UNREAD_MSG_COUNT: {
