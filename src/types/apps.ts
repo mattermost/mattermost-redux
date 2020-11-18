@@ -1,6 +1,11 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
 
+export type AppModalState = {
+    form: AppForm;
+    call: AppCall;
+}
+
 export type AppsState = {
     bindings: AppBinding[];
 };
@@ -35,30 +40,38 @@ export type AppBinding = {
     // i.e. menu sub-items or subcommands.
     call?: AppCall;
     bindings?: AppBinding[];
+    form?: AppForm;
 };
 
 export type AppCallValues = {
     [name: string]: string;
- };
+};
+
+export type AppCallType = string;
+
+export const AppCallTypes: { [name: string]: AppCallType } = {
+    SUBMIT: '',
+    FORM: 'form',
+    CANCEL: 'cancel',
+};
 
 export type AppCall = {
     url: string;
-    context: AppContext;
+    type?: AppCallType;
     values?: AppCallValues;
-    as_modal?: boolean;
+    context: AppContext;
     raw_command?: string;
-    from?: AppBinding[];
+    expand?: AppExpand;
 };
 
 export type AppCallResponseType = string;
 
-export const AppCallResponseTypes: {[name: string]: AppCallResponseType} = {
-    OK: 'ok',
+export const AppCallResponseTypes: { [name: string]: AppCallResponseType } = {
+    OK: '',
     ERROR: 'error',
-    MODAL: 'modal',
-    NAVIGATE: 'navigate',
+    FORM: 'form',
     CALL: 'call',
-    COMMAND: 'command',
+    NAVIGATE: 'navigate',
 };
 
 export type AppCallResponse<Res = {}> = {
@@ -69,10 +82,12 @@ export type AppCallResponse<Res = {}> = {
     url?: string;
     use_external_browser?: boolean;
     call?: AppCall;
+    form?: AppForm;
 };
 
 export type AppContext = {
     app_id: string;
+    location_id?: string;
     acting_user_id?: string;
     user_id?: string;
     channel_id?: string;
@@ -88,7 +103,7 @@ export type AppContextProps = {
 
 export type AppExpandLevel = string;
 
-export const AppExpandLevels: {[name: string]: AppExpandLevel} = {
+export const AppExpandLevels: { [name: string]: AppExpandLevel } = {
     EXPAND_ALL: 'All',
     EXPAND_SUMMARY: 'Summary',
 };
@@ -111,6 +126,9 @@ export type AppForm = {
     header?: string;
     footer?: string;
     icon?: string;
+    submit_buttons?: string;
+    cancel_button?: boolean;
+    submit_on_cancel?: boolean;
     fields: AppField[];
     depends_on?: string[];
 };
@@ -123,7 +141,7 @@ export type AppSelectOption = {
 
 export type AppFieldType = string;
 
-export const AppFieldTypes: {[name: string]: AppFieldType} = {
+export const AppFieldTypes: { [name: string]: AppFieldType } = {
     TEXT: 'text',
     STATIC_SELECT: 'static_select',
     DYNAMIC_SELECT: 'dynamic_select',
@@ -145,7 +163,7 @@ export type AppField = {
 
     description: string;
 
-    autocomplete_label?: string;
+    label?: string;
     hint?: string;
     position?: number;
 

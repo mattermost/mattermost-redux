@@ -103,6 +103,7 @@ export type InteractiveDialogConfig = {
         callback_id: string;
         title: string;
         introduction_text: string;
+        icon_url?: string;
         elements: DialogElement[];
         submit_label: string;
         notify_on_cancel: boolean;
