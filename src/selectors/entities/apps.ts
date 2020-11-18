@@ -5,10 +5,13 @@ import {AppBinding} from 'types/apps';
 
 export function getAppsBindings(state: GlobalState, location?: string): AppBinding[] {
     if (location) {
-        const headerBindings = state.entities.apps.bindings.find((b) => b.location_id === location);
-        if (headerBindings && headerBindings.bindings) {
-            return headerBindings.bindings;
+        const bindings = state.entities.apps.bindings.find((p) => {
+            return p.location === location;
+        })?.bindings;
+        if (bindings) {
+            return bindings;
         }
+        return [];
     }
     return state.entities.apps.bindings;
 }
