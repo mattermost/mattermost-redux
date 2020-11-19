@@ -549,8 +549,11 @@ describe('makeFilterAutoclosedDMs', () => {
             channels: {
                 currentChannelId: 'channel1',
                 myMembers: {
+                    channel2: {
+                        channel_id: 'channel2',
+                        last_viewed_at: 0,
+                    },
                     channel1: {},
-                    channel2: {},
                     channel3: {},
                 },
             },
@@ -601,7 +604,9 @@ describe('makeFilterAutoclosedDMs', () => {
     test('Should always show the current channel', () => {
         const filterAutoclosedDMs = Selectors.makeFilterAutoclosedDMs();
 
-        const dmChannel1 = {id: 'dmChannel1', type: General.DM_CHANNEL, name: 'Tiger King'};
+        const jeffWinger = {id: 'jeffWinger'};
+
+        const dmChannel1 = {id: 'dmChannel1', type: General.DM_CHANNEL, name: `${currentUser.id}__${jeffWinger.id}`};
         const gmChannel1 = {id: 'gmChannel1', type: General.GM_CHANNEL};
 
         let state = mergeObjects(baseState, {
@@ -651,6 +656,11 @@ describe('makeFilterAutoclosedDMs', () => {
             entities: {
                 channels: {
                     currentChannelId: dmChannel1.id,
+                    myMembers: {
+                        [dmChannel1.id]: {last_viewed_at: 1000},
+                        [dmChannel2.id]: {last_viewed_at: 500},
+                        [dmChannel3.id]: {last_viewed_at: 0},
+                    },
                 },
                 preferences: {
                     myPreferences: {
@@ -675,10 +685,24 @@ describe('makeFilterAutoclosedDMs', () => {
             entities: {
                 channels: {
                     currentChannelId: dmChannel1.id,
+                    myMembers: {
+                        [dmChannel1.id]: {last_viewed_at: 1000},
+                        [dmChannel2.id]: {last_viewed_at: 500},
+                        [dmChannel3.id]: {last_viewed_at: 0},
+                    },
                 },
                 preferences: {
                     myPreferences: {
-                        [getPreferenceKey(Preferences.CATEGORY_SIDEBAR_SETTINGS, Preferences.LIMIT_VISIBLE_DMS_GMS)]: {value: 2},
+                        [getPreferenceKey(Preferences.CATEGORY_SIDEBAR_SETTINGS, Preferences.LIMIT_VISIBLE_DMS_GMS)]: {value: '2'},
+                    },
+                },
+                users: {
+                    currentUserId: currentUser.id,
+                    profiles: {
+                        currentUser,
+                        tigerKing,
+                        bojackHorseman,
+                        jeffWinger,
                     },
                 },
             },
@@ -1215,6 +1239,16 @@ describe('makeGetChannelsForCategory', () => {
     test('should return sorted and filtered channels for direct messages category with alphabetical sorting', () => {
         const getChannelsForCategory = Selectors.makeGetChannelsForCategory();
 
+        const state = mergeObjects(baseState, {
+            entities: {
+                preferences: {
+                    myPreferences: {
+                        [getPreferenceKey(Preferences.CATEGORY_SIDEBAR_SETTINGS, Preferences.LIMIT_VISIBLE_DMS_GMS)]: {value: '2'},
+                    },
+                },
+            },
+        });
+
         const directMessagesCategory = {
             id: 'directMessagesCategory',
             team_id: 'team1',
@@ -1224,7 +1258,7 @@ describe('makeGetChannelsForCategory', () => {
             channel_ids: [gmChannel1.id, dmChannel1.id],
         };
 
-        expect(getChannelsForCategory(baseState, directMessagesCategory)).toMatchObject([gmChannel1, dmChannel1]);
+        expect(getChannelsForCategory(state, directMessagesCategory)).toMatchObject([gmChannel1, dmChannel1]);
     });
 
     test('should return sorted and filtered channels for direct messages category with recency sorting', () => {
@@ -1256,6 +1290,7 @@ describe('makeGetChannelsForCategory', () => {
                 },
                 preferences: {
                     myPreferences: {
+                        [getPreferenceKey(Preferences.CATEGORY_SIDEBAR_SETTINGS, Preferences.LIMIT_VISIBLE_DMS_GMS)]: {value: '3'},
                         [getPreferenceKey(Preferences.CATEGORY_GROUP_CHANNEL_SHOW, gmChannel2.id)]: {value: 'true'},
                     },
                 },
@@ -1355,6 +1390,7 @@ describe('makeGetChannelsByCategory', () => {
                     [getPreferenceKey(Preferences.CATEGORY_DIRECT_CHANNEL_SHOW, otherUser1.id)]: {value: 'true'},
                     [getPreferenceKey(Preferences.CATEGORY_DIRECT_CHANNEL_SHOW, otherUser2.id)]: {value: 'true'},
                     [getPreferenceKey(Preferences.CATEGORY_GROUP_CHANNEL_SHOW, gmChannel1.id)]: {value: 'true'},
+                    [getPreferenceKey(Preferences.CATEGORY_SIDEBAR_SETTINGS, Preferences.LIMIT_VISIBLE_DMS_GMS)]: {value: '3'},
                 },
             },
             users: {
@@ -1371,7 +1407,16 @@ describe('makeGetChannelsByCategory', () => {
     test('should return channels for all categories', () => {
         const getChannelsByCategory = Selectors.makeGetChannelsByCategory();
 
-        const result = getChannelsByCategory(baseState, 'team1');
+        const state = mergeObjects(baseState, {
+            entities: {
+                preferences: {
+                    myPreferences: {
+                        [getPreferenceKey(Preferences.CATEGORY_SIDEBAR_SETTINGS, Preferences.LIMIT_VISIBLE_DMS_GMS)]: {value: '2'},
+                    },
+                },
+            },
+        });
+        const result = getChannelsByCategory(state, 'team1');
         expect(result.favoritesCategory).toEqual([dmChannel2, channel1]);
         expect(result.channelsCategory).toEqual([channel2, channel3]);
         expect(result.directMessagesCategory).toEqual([dmChannel1, gmChannel1]);

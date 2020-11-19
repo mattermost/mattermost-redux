@@ -230,7 +230,7 @@ export function makeFilterAutoclosedDMs(): (state: GlobalState, channels: Channe
                     const teammateId = getUserIdFromChannelName(currentUserId, channel.name);
                     const teammate = profiles[teammateId];
 
-                    const lastViewedAt = myMembers[channel.id].last_viewed_at;
+                    const lastViewedAt = myMembers[channel.id]?.last_viewed_at;
 
                     if (!teammate || teammate.delete_at > lastViewedAt) {
                         return false;
@@ -252,8 +252,9 @@ export function makeFilterAutoclosedDMs(): (state: GlobalState, channels: Channe
                 remaining = limit;
             }
 
-            filtered.slice(0, remaining);
-            return filtered.length === channels.length ? channels : filtered;
+            const slicedChannels = filtered.slice(0, remaining);
+
+            return slicedChannels.length === channels.length ? channels : slicedChannels;
         },
     );
 }
