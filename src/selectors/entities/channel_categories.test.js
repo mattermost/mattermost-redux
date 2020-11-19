@@ -568,7 +568,7 @@ describe('makeFilterAutoclosedDMs', () => {
             preferences: {
                 myPreferences: {
                     [getPreferenceKey(Preferences.CATEGORY_SIDEBAR_SETTINGS, Preferences.CHANNEL_SIDEBAR_AUTOCLOSE_DMS)]: {value: Preferences.AUTOCLOSE_DMS_ENABLED},
-                    [getPreferenceKey(Preferences.CATEGORY_SIDEBAR_SETTINGS, Preferences.LIMIT_VISIBLE_DMS_GMS)]: {value: 0},
+                    [getPreferenceKey(Preferences.CATEGORY_SIDEBAR_SETTINGS, Preferences.LIMIT_VISIBLE_DMS_GMS)]: {value: '0'},
                 },
             },
             users: {
@@ -611,7 +611,7 @@ describe('makeFilterAutoclosedDMs', () => {
                 },
                 preferences: {
                     myPreferences: {
-                        [getPreferenceKey(Preferences.CATEGORY_SIDEBAR_SETTINGS, Preferences.LIMIT_VISIBLE_DMS_GMS)]: {value: 1},
+                        [getPreferenceKey(Preferences.CATEGORY_SIDEBAR_SETTINGS, Preferences.LIMIT_VISIBLE_DMS_GMS)]: {value: '1'},
                     },
                 },
             },
@@ -626,7 +626,7 @@ describe('makeFilterAutoclosedDMs', () => {
                 },
                 preferences: {
                     myPreferences: {
-                        [getPreferenceKey(Preferences.CATEGORY_SIDEBAR_SETTINGS, Preferences.LIMIT_VISIBLE_DMS_GMS)]: {value: 1},
+                        [getPreferenceKey(Preferences.CATEGORY_SIDEBAR_SETTINGS, Preferences.LIMIT_VISIBLE_DMS_GMS)]: {value: '1'},
                     },
                 },
             },
@@ -635,7 +635,7 @@ describe('makeFilterAutoclosedDMs', () => {
         expect(filterAutoclosedDMs(state, [dmChannel1, gmChannel1], CategoryTypes.DIRECT_MESSAGES)).toEqual([gmChannel1]);
     });
 
-    test.only('Should always show the exact number of channels specified by the user', () => {
+    test('Should always show the exact number of channels specified by the user', () => {
         const filterAutoclosedDMs = Selectors.makeFilterAutoclosedDMs();
         const tigerKing = {id: 'tigerKing'};
         const bojackHorseman = {id: 'bojackHorseman'};
@@ -654,7 +654,7 @@ describe('makeFilterAutoclosedDMs', () => {
                 },
                 preferences: {
                     myPreferences: {
-                        [getPreferenceKey(Preferences.CATEGORY_SIDEBAR_SETTINGS, Preferences.LIMIT_VISIBLE_DMS_GMS)]: {value: 5},
+                        [getPreferenceKey(Preferences.CATEGORY_SIDEBAR_SETTINGS, Preferences.LIMIT_VISIBLE_DMS_GMS)]: {value: '5'},
                     },
                 },
                 users: {

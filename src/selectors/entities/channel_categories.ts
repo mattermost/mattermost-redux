@@ -10,7 +10,7 @@ import {CategoryTypes} from '../../constants/channel_categories';
 import {getCurrentChannelId, getMyChannelMemberships, makeGetChannelsForIds} from 'selectors/entities/channels';
 import {getCurrentUserLocale} from 'selectors/entities/i18n';
 import {getLastPostPerChannel} from 'selectors/entities/posts';
-import {getMyPreferences, getTeammateNameDisplaySetting, shouldAutocloseDMs, getNewSidebarPreference} from 'selectors/entities/preferences';
+import {getMyPreferences, getTeammateNameDisplaySetting, shouldAutocloseDMs} from 'selectors/entities/preferences';
 import {getCurrentUserId} from 'selectors/entities/users';
 
 import {Channel, ChannelMembership} from 'types/channels';
@@ -224,17 +224,15 @@ export function makeFilterAutoclosedDMs(): (state: GlobalState, channels: Channe
                     return true;
                 }
 
-                // openTime is the time the channel was last opened (like from the More DMs list) after having been closed
-                const openTimePref = myPreferences[getPreferenceKey(Preferences.CATEGORY_CHANNEL_OPEN_TIME, channel.id)];
-                const openTime = parseInt(openTimePref ? openTimePref.value! : '0', 10);
-
                 // DMs with deactivated users will be visible if you're currently viewing them and they were opened
                 // since the user was deactivated
                 if (channel.type === General.DM_CHANNEL) {
                     const teammateId = getUserIdFromChannelName(currentUserId, channel.name);
                     const teammate = profiles[teammateId];
 
-                    if (!teammate || teammate.delete_at > openTime) {
+                    const lastViewedAt = myMembers[channel.id].last_viewed_at;
+
+                    if (!teammate || teammate.delete_at > lastViewedAt) {
                         return false;
                     }
                 }
@@ -254,7 +252,8 @@ export function makeFilterAutoclosedDMs(): (state: GlobalState, channels: Channe
                 remaining = limit;
             }
 
-            return filtered.slice(0, remaining);
+            filtered.slice(0, remaining);
+            return filtered.length === channels.length ? channels : filtered;
         },
     );
 }
@@ -454,7 +453,6 @@ export function makeGetChannelsForCategory() {
 // with inactive DMs/GMs and archived channels filtered out.
 export function makeFilterAndSortChannelsForCategory() {
     const filterArchivedChannels = makeFilterArchivedChannels();
-    const legacyFilterAutoclosedDMs = legacyMakeFilterAutoclosedDMs();
     const filterAutoclosedDMs = makeFilterAutoclosedDMs();
 
     const filterManuallyClosedDMs = makeFilterManuallyClosedDMs();
@@ -462,12 +460,11 @@ export function makeFilterAndSortChannelsForCategory() {
     const sortChannels = makeSortChannels();
 
     return (state: GlobalState, originalChannels: Channel[], category: ChannelCategory) => {
-        const sidebarOrganisationPreference = getNewSidebarPreference(state);
         let channels = originalChannels;
 
         channels = filterArchivedChannels(state, channels);
 
-        channels = sidebarOrganisationPreference ? filterAutoclosedDMs(state, channels, category.type) : legacyFilterAutoclosedDMs(state, channels, category.type);
+        channels = filterAutoclosedDMs(state, channels, category.type);
         channels = filterManuallyClosedDMs(state, channels);
 
         channels = sortChannels(state, channels, category);
