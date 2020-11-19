@@ -10,7 +10,7 @@ import {CategoryTypes} from '../../constants/channel_categories';
 import {getCurrentChannelId, getMyChannelMemberships, makeGetChannelsForIds} from 'selectors/entities/channels';
 import {getCurrentUserLocale} from 'selectors/entities/i18n';
 import {getLastPostPerChannel} from 'selectors/entities/posts';
-import {getMyPreferences, getTeammateNameDisplaySetting, shouldAutocloseDMs} from 'selectors/entities/preferences';
+import {getMyPreferences, getTeammateNameDisplaySetting, shouldAutocloseDMs, getInt} from 'selectors/entities/preferences';
 import {getCurrentUserId} from 'selectors/entities/users';
 
 import {Channel, ChannelMembership} from 'types/channels';
@@ -193,13 +193,12 @@ export function makeFilterAutoclosedDMs(): (state: GlobalState, channels: Channe
     return createSelector(
         (state: GlobalState, channels: Channel[]) => channels,
         (state: GlobalState, channels: Channel[], categoryType: string) => categoryType,
-        getMyPreferences,
-        shouldAutocloseDMs,
         getCurrentChannelId,
         (state: GlobalState) => state.entities.users.profiles,
         getCurrentUserId,
         getMyChannelMemberships,
-        (channels, categoryType, myPreferences, autocloseDMs, currentChannelId, profiles, currentUserId, myMembers) => {
+        (state: GlobalState) => getInt(state, Preferences.CATEGORY_SIDEBAR_SETTINGS, Preferences.LIMIT_VISIBLE_DMS_GMS),
+        (channels, categoryType, currentChannelId, profiles, currentUserId, myMembers, limitPref) => {
             if (categoryType !== CategoryTypes.DIRECT_MESSAGES) {
                 // Only autoclose DMs that haven't been assigned to a category
                 return channels;
@@ -241,15 +240,12 @@ export function makeFilterAutoclosedDMs(): (state: GlobalState, channels: Channe
             });
 
             // The limit of DMs user specifies to be rendered in the sidebar
-            const limitPref = myPreferences[getPreferenceKey(Preferences.CATEGORY_SIDEBAR_SETTINGS, Preferences.LIMIT_VISIBLE_DMS_GMS)];
-            const limit = parseInt(limitPref ? limitPref.value! : '0', 10);
-
             let remaining;
 
-            if (limit < unreadCount) {
+            if (limitPref < unreadCount) {
                 remaining = unreadCount;
             } else {
-                remaining = limit;
+                remaining = limitPref;
             }
 
             const slicedChannels = filtered.slice(0, remaining);
