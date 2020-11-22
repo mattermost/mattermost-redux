@@ -161,7 +161,7 @@ export type AppField = {
     // Present (default) value of the field
     value?: string;
 
-    description: string;
+    description?: string;
 
     label?: string;
     hint?: string;
