@@ -4,14 +4,13 @@ import {GlobalState} from 'types/store';
 import {AppBinding} from 'types/apps';
 
 export function getAppsBindings(state: GlobalState, location?: string): AppBinding[] {
-    if (location) {
-        const bindings = state.entities.apps.bindings.find((p) => {
-            return p.location === location;
-        })?.bindings;
-        if (bindings) {
-            return bindings;
-        }
+    if (!state.entities.apps.bindings) {
         return [];
+    }
+
+    if (location) {
+        const headerBindings = state.entities.apps.bindings.filter((b) => b.location === location);
+        return headerBindings.reduce((accum: AppBinding[], current: AppBinding) => accum.concat(current.bindings || []), []);
     }
     return state.entities.apps.bindings;
 }
