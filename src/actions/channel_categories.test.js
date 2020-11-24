@@ -9,6 +9,7 @@ import {Client4} from 'client';
 
 import {General} from '../constants';
 import {CategoryTypes} from '../constants/channel_categories';
+import {MarkUnread} from '../constants/channels';
 
 import {getAllCategoriesByIds} from 'selectors/entities/channel_categories';
 import {isFavoriteChannel} from 'selectors/entities/channels';
@@ -56,6 +57,122 @@ describe('setCategorySorting', () => {
 
         // The response to this is handled in the websocket code, so just confirm that the mock was called correctly
         expect(mock.isDone());
+    });
+});
+
+describe('setCategoryMuted', () => {
+    test('should call the correct API', async () => {
+        const currentUserId = TestHelper.generateId();
+        const teamId = TestHelper.generateId();
+
+        const category1 = {id: 'category1', team_id: teamId, channel_ids: []};
+
+        const store = await configureStore({
+            entities: {
+                channelCategories: {
+                    byId: {
+                        category1,
+                    },
+                },
+                users: {
+                    currentUserId,
+                },
+            },
+        });
+
+        const mock = nock(Client4.getBaseRoute()).
+            put(`/users/${currentUserId}/teams/${teamId}/channels/categories/${category1.id}`).
+            reply(200, {...category1, muted: true});
+
+        await store.dispatch(Actions.setCategoryMuted('category1', true));
+
+        // The response to this is handled in the websocket code, so just confirm that the mock was called correctly
+        expect(mock.isDone());
+    });
+
+    test('should mute the category and all of its channels', async () => {
+        const currentUserId = TestHelper.generateId();
+        const teamId = TestHelper.generateId();
+
+        const category1 = {
+            id: 'category1',
+            team_id: teamId,
+            channel_ids: ['channel1', 'channel2'],
+        };
+
+        const store = await configureStore({
+            entities: {
+                channelCategories: {
+                    byId: {
+                        category1,
+                    },
+                },
+                channels: {
+                    myMembers: {
+                        channel1: {notify_props: {mark_unread: MarkUnread.ALL}},
+                        channel2: {notify_props: {mark_unread: MarkUnread.ALL}},
+                    },
+                },
+                users: {
+                    currentUserId,
+                },
+            },
+        });
+
+        nock(Client4.getBaseRoute()).
+            put(`/users/${currentUserId}/teams/${teamId}/channels/categories/${category1.id}`).
+            reply(200, {...category1, muted: true});
+
+        await store.dispatch(Actions.setCategoryMuted('category1', true));
+
+        const state = store.getState();
+
+        expect(state.entities.channelCategories.byId.category1.muted).toBe(true);
+        expect(state.entities.channels.myMembers.channel1.notify_props.mark_unread).toBe(MarkUnread.MENTION);
+        expect(state.entities.channels.myMembers.channel2.notify_props.mark_unread).toBe(MarkUnread.MENTION);
+    });
+
+    test('should unmute the category and all of its channels', async () => {
+        const currentUserId = TestHelper.generateId();
+        const teamId = TestHelper.generateId();
+
+        const category1 = {
+            id: 'category1',
+            team_id: teamId,
+            channel_ids: ['channel1', 'channel2'],
+            muted: true,
+        };
+
+        const store = await configureStore({
+            entities: {
+                channelCategories: {
+                    byId: {
+                        category1,
+                    },
+                },
+                channels: {
+                    myMembers: {
+                        channel1: {notify_props: {mark_unread: MarkUnread.MENTION}},
+                        channel2: {notify_props: {mark_unread: MarkUnread.MENTION}},
+                    },
+                },
+                users: {
+                    currentUserId,
+                },
+            },
+        });
+
+        nock(Client4.getBaseRoute()).
+            put(`/users/${currentUserId}/teams/${teamId}/channels/categories/${category1.id}`).
+            reply(200, {...category1, muted: false});
+
+        await store.dispatch(Actions.setCategoryMuted('category1', false));
+
+        const state = store.getState();
+
+        expect(state.entities.channelCategories.byId.category1.muted).toBe(false);
+        expect(state.entities.channels.myMembers.channel1.notify_props.mark_unread).toBe(MarkUnread.ALL);
+        expect(state.entities.channels.myMembers.channel2.notify_props.mark_unread).toBe(MarkUnread.ALL);
     });
 });
 
@@ -626,6 +743,316 @@ describe('moveCategory', () => {
 
         // The response to this is handled in the websocket code, so just confirm that the mock was called correctly
         expect(mock.isDone());
+    });
+});
+
+describe('moveChannelsToCategory', () => {
+    const currentUserId = TestHelper.generateId();
+    const teamId = TestHelper.generateId();
+
+    test('should add channels to the given category at the correct index', async () => {
+        const category1 = {id: 'category1', team_id: teamId, channel_ids: ['channel1', 'channel2']};
+        const category2 = {id: 'category2', team_id: teamId, channel_ids: ['channel3', 'channel4']};
+        const otherTeamCategory = {id: 'otherTeamCategory', team_id: 'team2', channel_ids: ['channel1', 'channel2']};
+
+        const store = await configureStore({
+            entities: {
+                channelCategories: {
+                    byId: {
+                        category1,
+                        category2,
+                        otherTeamCategory,
+                    },
+                },
+                users: {
+                    currentUserId,
+                },
+            },
+        });
+
+        nock(Client4.getBaseRoute()).
+            put(`/users/${currentUserId}/teams/${teamId}/channels/categories`).
+            reply(200, [{...category1, channel_ids: ['channel1', 'channel5', 'channel6', 'channel2']}]);
+
+        await store.dispatch(Actions.moveChannelsToCategory('category1', ['channel5', 'channel6'], 1));
+
+        let state = store.getState();
+
+        expect(state.entities.channelCategories.byId.category1.channel_ids).toEqual(['channel1', 'channel5', 'channel6', 'channel2']);
+        expect(state.entities.channelCategories.byId.category2).toBe(category2);
+        expect(state.entities.channelCategories.byId.otherTeamCategory).toBe(otherTeamCategory);
+
+        nock(Client4.getBaseRoute()).
+            put(`/users/${currentUserId}/teams/${teamId}/channels/categories`).
+            reply(200, [{...category1, channel_ids: ['channel1', 'channel5', 'channel6', 'channel7', 'channel8', 'channel2']}]);
+
+        await store.dispatch(Actions.moveChannelsToCategory('category1', ['channel7', 'channel8'], 3));
+
+        state = store.getState();
+
+        expect(state.entities.channelCategories.byId.category1.channel_ids).toEqual(['channel1', 'channel5', 'channel6', 'channel7', 'channel8', 'channel2']);
+        expect(state.entities.channelCategories.byId.category2).toBe(category2);
+        expect(state.entities.channelCategories.byId.otherTeamCategory).toBe(otherTeamCategory);
+    });
+
+    test('should remove the channels from their previous category', async () => {
+        const category1 = {id: 'category1', team_id: teamId, channel_ids: ['channel1', 'channel2', 'channel3']};
+        const category2 = {id: 'category2', team_id: teamId, channel_ids: ['channel4', 'channel5', 'channel6']};
+        const otherTeamCategory = {id: 'otherTeamCategory', team_id: 'team2', channel_ids: ['channel1', 'channel2']};
+
+        const store = await configureStore({
+            entities: {
+                channelCategories: {
+                    byId: {
+                        category1,
+                        category2,
+                        otherTeamCategory,
+                    },
+                },
+                users: {
+                    currentUserId,
+                },
+            },
+        });
+
+        nock(Client4.getBaseRoute()).
+            put(`/users/${currentUserId}/teams/${teamId}/channels/categories`).
+            reply(200, [
+                {...category1, channel_ids: ['channel2']},
+                {...category2, channel_ids: ['channel4', 'channel5', 'channel6', 'channel1', 'channel3']},
+            ]);
+
+        await store.dispatch(Actions.moveChannelsToCategory('category2', ['channel1', 'channel3'], 3));
+
+        const state = store.getState();
+
+        expect(state.entities.channelCategories.byId.category1.channel_ids).toEqual(['channel2']);
+        expect(state.entities.channelCategories.byId.category2.channel_ids).toEqual(['channel4', 'channel5', 'channel6', 'channel1', 'channel3']);
+        expect(state.entities.channelCategories.byId.otherTeamCategory).toBe(otherTeamCategory);
+    });
+
+    test('should move channel within its current category', async () => {
+        const category1 = {id: 'category1', team_id: teamId, channel_ids: ['channel1', 'channel2', 'channel3', 'channel4', 'channel5']};
+
+        const store = await configureStore({
+            entities: {
+                channelCategories: {
+                    byId: {
+                        category1,
+                    },
+                },
+                users: {
+                    currentUserId,
+                },
+            },
+        });
+
+        nock(Client4.getBaseRoute()).
+            put(`/users/${currentUserId}/teams/${teamId}/channels/categories`).
+            reply(200, [{...category1, channel_ids: ['channel1', 'channel5', 'channel3', 'channel2', 'channel4']}]);
+
+        await store.dispatch(Actions.moveChannelsToCategory('category1', ['channel5', 'channel3'], 1));
+
+        let state = store.getState();
+
+        expect(state.entities.channelCategories.byId.category1.channel_ids).toEqual(['channel1', 'channel5', 'channel3', 'channel2', 'channel4']);
+
+        nock(Client4.getBaseRoute()).
+            put(`/users/${currentUserId}/teams/${teamId}/channels/categories`).
+            reply(200, [{...category1, channel_ids: ['channel5', 'channel3', 'channel2', 'channel1', 'channel4']}]);
+
+        await store.dispatch(Actions.moveChannelsToCategory('category1', ['channel1', 'channel4'], 3));
+
+        state = store.getState();
+
+        expect(state.entities.channelCategories.byId.category1.channel_ids).toEqual(['channel5', 'channel3', 'channel2', 'channel1', 'channel4']);
+    });
+
+    test('moving a channel to the favorites category should also favorite the channel in preferences', async () => {
+        const favoritesCategory = {id: 'favoritesCategory', team_id: teamId, type: CategoryTypes.FAVORITES, channel_ids: []};
+        const otherCategory = {id: 'otherCategory', team_id: teamId, type: CategoryTypes.CUSTOM, channel_ids: ['channel1', 'channel2']};
+
+        const store = await configureStore({
+            entities: {
+                channelCategories: {
+                    byId: {
+                        favoritesCategory,
+                        otherCategory,
+                    },
+                },
+                preferences: {
+                    myPreferences: {},
+                },
+                users: {
+                    currentUserId,
+                },
+            },
+        });
+
+        let state = store.getState();
+
+        expect(isFavoriteChannel(state, 'channel1')).toBe(false);
+
+        nock(Client4.getBaseRoute()).
+            put(`/users/${currentUserId}/teams/${teamId}/channels/categories`).
+            reply(200, [
+                {...favoritesCategory, channel_ids: ['channel1', 'channel2']},
+                {...otherCategory, channel_ids: []},
+            ]);
+
+        // Move the channel into favorites
+        await store.dispatch(Actions.moveChannelsToCategory('favoritesCategory', ['channel1', 'channel2'], 0));
+
+        state = store.getState();
+
+        expect(state.entities.channelCategories.byId.favoritesCategory.channel_ids).toEqual(['channel1', 'channel2']);
+        expect(state.entities.channelCategories.byId.otherCategory.channel_ids).toEqual([]);
+        expect(isFavoriteChannel(state, 'channel1')).toBe(true);
+        expect(isFavoriteChannel(state, 'channel2')).toBe(true);
+
+        nock(Client4.getBaseRoute()).
+            put(`/users/${currentUserId}/teams/${teamId}/channels/categories`).
+            reply(200, [
+                {...favoritesCategory, channel_ids: []},
+                {...otherCategory, channel_ids: ['channel1']},
+            ]);
+
+        // And back out
+        await store.dispatch(Actions.moveChannelsToCategory('otherCategory', ['channel1', 'channel2'], 0));
+
+        state = store.getState();
+
+        expect(state.entities.channelCategories.byId.favoritesCategory.channel_ids).toEqual([]);
+        expect(state.entities.channelCategories.byId.otherCategory.channel_ids).toEqual(['channel1', 'channel2']);
+        expect(isFavoriteChannel(state, 'channel1')).toBe(false);
+        expect(isFavoriteChannel(state, 'channel2')).toBe(false);
+    });
+
+    test('should set the destination category to manual sorting', async () => {
+        const category1 = {id: 'category1', team_id: teamId, channel_ids: ['channel1', 'channel2'], sorting: CategorySorting.Default};
+        const category2 = {id: 'category2', team_id: teamId, channel_ids: ['channel3', 'channel4'], sorting: CategorySorting.Default};
+
+        const store = await configureStore({
+            entities: {
+                channelCategories: {
+                    byId: {
+                        category1,
+                        category2,
+                    },
+                },
+                users: {
+                    currentUserId,
+                },
+            },
+        });
+
+        nock(Client4.getBaseRoute()).
+            put(`/users/${currentUserId}/teams/${teamId}/channels/categories`).
+            reply(200, [
+                {...category1, channel_ids: ['channel2']},
+                {...category2, channel_ids: ['channel1', 'channel3', 'channel4'], sorting: CategorySorting.Manual},
+            ]);
+
+        await store.dispatch(Actions.moveChannelsToCategory(category2.id, ['channel1'], 0));
+
+        let state = store.getState();
+        expect(state.entities.channelCategories.byId.category1.sorting).toBe(CategorySorting.Default);
+        expect(state.entities.channelCategories.byId.category2.sorting).toBe(CategorySorting.Manual);
+
+        nock(Client4.getBaseRoute()).
+            put(`/users/${currentUserId}/teams/${teamId}/channels/categories`).
+            reply(200, [
+                {...category1, channel_ids: ['channel2', 'channel1'], sorting: CategorySorting.Manual},
+                {...category2, channel_ids: ['channel3', 'channel4'], sorting: CategorySorting.Manual},
+            ]);
+
+        await store.dispatch(Actions.moveChannelsToCategory(category1.id, ['channel1'], 2));
+
+        state = store.getState();
+        expect(state.entities.channelCategories.byId.category1.sorting).toBe(CategorySorting.Manual);
+        expect(state.entities.channelCategories.byId.category2.sorting).toBe(CategorySorting.Manual);
+    });
+
+    test('should optimistically update the modified categories', async () => {
+        const category1 = {id: 'category1', team_id: teamId, channel_ids: ['channel1', 'channel2'], sorting: CategorySorting.Default};
+        const favoritesCategory = {id: 'favoritesCategory', type: CategoryTypes.FAVORITES, team_id: teamId, channel_ids: [], sorting: CategorySorting.Default};
+
+        const store = await configureStore({
+            entities: {
+                channelCategories: {
+                    byId: {
+                        category1,
+                        favoritesCategory,
+                    },
+                },
+                users: {
+                    currentUserId,
+                },
+            },
+        });
+
+        nock(Client4.getBaseRoute()).
+            put(`/users/${currentUserId}/teams/${teamId}/channels/categories`).
+            delayBody(100).
+            reply(200, [
+                {...category1, channel_ids: ['channel2']},
+                {...favoritesCategory, channel_ids: ['channel1'], sorting: CategorySorting.Manual},
+            ]);
+
+        const moveRequest = store.dispatch(Actions.moveChannelsToCategory(favoritesCategory.id, ['channel1'], 0));
+
+        // At this point, the category should have already been optimistically updated, but the favorites preferences
+        // won't be updated until after the request completes
+        let state = store.getState();
+        expect(state.entities.channelCategories.byId.category1.channel_ids).toEqual(['channel2']);
+        expect(state.entities.channelCategories.byId.favoritesCategory.channel_ids).toEqual(['channel1']);
+        expect(isFavoriteChannelOld(getMyPreferences(state), 'channel1')).toBe(false);
+
+        await moveRequest;
+
+        // And now that the request has finished, the favorites should have been updated
+        state = store.getState();
+        expect(state.entities.channelCategories.byId.category1.channel_ids).toEqual(['channel2']);
+        expect(state.entities.channelCategories.byId.favoritesCategory.channel_ids).toEqual(['channel1']);
+        expect(isFavoriteChannelOld(getMyPreferences(state), 'channel1')).toBe(true);
+    });
+
+    test('should optimistically update the modified categories - failure case', async () => {
+        const category1 = {id: 'category1', team_id: teamId, channel_ids: ['channel1', 'channel2'], sorting: CategorySorting.Default};
+        const favoritesCategory = {id: 'favoritesCategory', type: CategoryTypes.FAVORITES, team_id: teamId, channel_ids: [], sorting: CategorySorting.Default};
+
+        const store = await configureStore({
+            entities: {
+                channelCategories: {
+                    byId: {
+                        category1,
+                        favoritesCategory,
+                    },
+                },
+                users: {
+                    currentUserId,
+                },
+            },
+        });
+
+        nock(Client4.getBaseRoute()).
+            put(`/users/${currentUserId}/teams/${teamId}/channels/categories`).
+            delayBody(100).
+            reply(400);
+
+        const moveRequest = store.dispatch(Actions.moveChannelsToCategory(favoritesCategory.id, ['channel1'], 0));
+
+        // At this point, the category should have already been optimistically updated, even though it will fail
+        let state = store.getState();
+        expect(state.entities.channelCategories.byId.category1.channel_ids).toEqual(['channel2']);
+        expect(state.entities.channelCategories.byId.favoritesCategory.channel_ids).toEqual(['channel1']);
+
+        await moveRequest;
+
+        // And now that the request has finished, the changes should've been rolled back
+        state = store.getState();
+        expect(state.entities.channelCategories.byId.category1.channel_ids).toEqual(['channel1', 'channel2']);
+        expect(state.entities.channelCategories.byId.favoritesCategory.channel_ids).toEqual([]);
     });
 });
 

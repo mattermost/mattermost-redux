@@ -7,16 +7,14 @@ import nock from 'nock';
 import {ClientError, HEADER_X_VERSION_ID} from 'client/client4';
 import TestHelper from 'test/test_helper';
 import {isMinimumServerVersion} from 'utils/helpers';
-import {rudderAnalytics} from './rudder';
+import {rudderAnalytics, RudderTelemetryHandler} from './rudder';
 
-jest.mock('./rudder', () => {
-    const original = require.requireActual('./rudder');
+jest.mock('rudder-sdk-js', () => {
+    const original = jest.requireActual('rudder-sdk-js');
 
     return {
-        rudderAnalytics: {
-            ...original.rudderAnalytics,
-            track: jest.fn(),
-        },
+        ...original,
+        track: jest.fn(),
     };
 });
 
@@ -84,12 +82,16 @@ describe('ClientError', () => {
 });
 
 describe('trackEvent', () => {
-    it('should call for analytics track event based on isRudderKeySet', () => {
+    it('should call Rudder\'s track when a RudderTelemetryHandler is attached to Client4', () => {
         const client = TestHelper.createClient4();
+
         client.trackEvent('test', 'onClick');
+
         expect(rudderAnalytics.track).not.toHaveBeenCalled();
-        client.enableRudderEvents();
+
+        client.setTelemetryHandler(new RudderTelemetryHandler());
         client.trackEvent('test', 'onClick');
+
         expect(rudderAnalytics.track).toHaveBeenCalledTimes(1);
     });
 });
