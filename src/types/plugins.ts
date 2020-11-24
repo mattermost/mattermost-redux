@@ -97,6 +97,13 @@ export type ClientPluginManifest = {
     };
 }
 
+export type MarketplaceLabel = {
+    name: string;
+    description?: string;
+    url?: string;
+    color?: string;
+}
+
 export type MarketplacePlugin = {
     homepage_url: string;
     download_url: string;
