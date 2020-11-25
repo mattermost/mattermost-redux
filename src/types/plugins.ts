@@ -105,11 +105,11 @@ export type MarketplaceLabel = {
 }
 
 export type MarketplacePlugin = {
-    homepage_url: string;
-    icon_data: string;
-    download_url: string;
-    release_notes_url: string;
-    labels: MarketplaceLabel[];
+    homepage_url?: string;
+    icon_data?: string;
+    download_url?: string;
+    release_notes_url?: string;
+    labels?: MarketplaceLabel[];
     manifest: PluginManifest;
-    installed_version: string;
+    installed_version?: string;
 }
