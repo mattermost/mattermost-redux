@@ -3,6 +3,7 @@
 import {General} from '../constants';
 
 import {ClusterInfo, AnalyticsRow} from 'types/admin';
+import {AppBinding, AppCall, AppCallResponse} from 'types/apps';
 import {Audit} from 'types/audits';
 import {UserAutocomplete, AutocompleteSuggestion} from 'types/autocomplete';
 import {Bot, BotPatch} from 'types/bots';
@@ -3171,16 +3172,15 @@ export default class Client4 {
         );
     };
 
-    // TODO type call
-    executeAppCall = async (call?: any) => {
-        return this.doFetch(
+    executeAppCall = async (call: AppCall) => {
+        return this.doFetch<AppCallResponse>(
             `${this.getAppsProxyRoute()}/api/v1/call`,
             {method: 'post', body: JSON.stringify(call)},
         );
     }
 
     getAppsBindings = async (userID: string, channelID: string) => {
-        return this.doFetch(
+        return this.doFetch<AppBinding[]>(
             this.getAppsProxyRoute() + `/api/v1/bindings?user_id=${userID}&channel_id=${channelID}&scope=webapp`,
             {method: 'get'},
         );

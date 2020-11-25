@@ -73,6 +73,14 @@ export type CommandResponse = {
     extra_responses: CommandResponse[];
 };
 
+export type ServerAutocompleteSuggestion = {
+    Complete: string;
+    Suggestion: string;
+    Hint: string;
+    Description: string;
+    IconData: string;
+}
+
 export type OAuthApp = {
     'id': string;
     'creator_id': string;

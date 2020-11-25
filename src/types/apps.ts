@@ -49,12 +49,6 @@ export type AppCallValues = {
 
 export type AppCallType = string;
 
-export const AppCallTypes: { [name: string]: AppCallType } = {
-    SUBMIT: '',
-    FORM: 'form',
-    CANCEL: 'cancel',
-};
-
 export type AppCall = {
     url: string;
     type?: AppCallType;
@@ -65,14 +59,6 @@ export type AppCall = {
 };
 
 export type AppCallResponseType = string;
-
-export const AppCallResponseTypes: { [name: string]: AppCallResponseType } = {
-    OK: '',
-    ERROR: 'error',
-    FORM: 'form',
-    CALL: 'call',
-    NAVIGATE: 'navigate',
-};
 
 export type AppCallResponse<Res = {}> = {
     type: AppCallResponseType;
@@ -87,7 +73,7 @@ export type AppCallResponse<Res = {}> = {
 
 export type AppContext = {
     app_id: string;
-    location_id?: string;
+    location?: string;
     acting_user_id?: string;
     user_id?: string;
     channel_id?: string;
@@ -102,11 +88,6 @@ export type AppContextProps = {
 };
 
 export type AppExpandLevel = string;
-
-export const AppExpandLevels: { [name: string]: AppExpandLevel } = {
-    EXPAND_ALL: 'All',
-    EXPAND_SUMMARY: 'Summary',
-};
 
 export type AppExpand = {
     app?: AppExpandLevel;
@@ -141,15 +122,6 @@ export type AppSelectOption = {
 
 export type AppFieldType = string;
 
-export const AppFieldTypes: { [name: string]: AppFieldType } = {
-    TEXT: 'text',
-    STATIC_SELECT: 'static_select',
-    DYNAMIC_SELECT: 'dynamic_select',
-    BOOL: 'bool',
-    USER: 'user',
-    CHANNEL: 'channel',
-};
-
 // This should go in mattermost-redux
 export type AppField = {
 
@@ -179,3 +151,32 @@ export type AppField = {
     min_length?: number;
     max_length?: number;
 };
+
+export type AutocompleteSuggestion = {
+    suggestion: string;
+    complete?: string;
+    description?: string;
+    hint?: string;
+    iconData?: string;
+}
+
+export type AutocompleteSuggestionWithComplete = AutocompleteSuggestion & {
+    complete: string;
+}
+
+export type AutocompleteElement = AppField;
+export type AutocompleteStaticSelect = AutocompleteElement & {
+    options: {
+        label: string;
+        value: string;
+        hint?: string;
+    }[];
+};
+
+export type AutocompleteDynamicSelect = AutocompleteElement & {
+    call: AppCall;
+};
+
+export type AutocompleteUserSelect = AutocompleteElement & {}
+
+export type AutocompleteChannelSelect = AutocompleteElement & {}
