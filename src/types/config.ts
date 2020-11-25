@@ -216,6 +216,8 @@ export type LicenseFeatures = {
     id_loaded?: boolean;
     lock_teammate_name_display?: boolean;
     cloud?: boolean;
+    shared_channels?: boolean;
+    remote_cluster_service?: boolean;
     future_features?: boolean;
 };
 
