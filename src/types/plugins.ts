@@ -97,15 +97,19 @@ export type ClientPluginManifest = {
     };
 }
 
+export type MarketplaceLabel = {
+    name: string;
+    description?: string;
+    url?: string;
+    color?: string;
+}
+
 export type MarketplacePlugin = {
-    homepage_url: string;
-    download_url: string;
-    manifest: {
-        id: string;
-        name: string;
-        description: string;
-        version: string;
-        minServerVersion: string;
-    };
-    installed_version: string;
+    homepage_url?: string;
+    icon_data?: string;
+    download_url?: string;
+    release_notes_url?: string;
+    labels?: MarketplaceLabel[];
+    manifest: PluginManifest;
+    installed_version?: string;
 }

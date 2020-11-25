@@ -123,6 +123,7 @@ export type ClientConfig = {
     IosAppDownloadLink: string;
     IosLatestVersion: string;
     IosMinVersion: string;
+    IsDefaultMarketplace: string;
     LdapFirstNameAttributeSet: string;
     LdapLastNameAttributeSet: string;
     LdapLoginButtonBorderColor: string;
