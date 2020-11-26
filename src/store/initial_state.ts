@@ -73,6 +73,10 @@ const state: GlobalState = {
                 },
             },
         },
+        threads: {
+            threads: {},
+            selectedThreadId: '',
+        },
         preferences: {
             myPreferences: {},
         },
@@ -201,6 +205,13 @@ const state: GlobalState = {
                 error: null,
             },
         },
+        threads: {
+            getThreads: {
+                status: 'not_started',
+                error: null,
+            },
+        },
+
         teams: {
             getMyTeams: {
                 status: 'not_started',

@@ -15,13 +15,25 @@ import {EmojisState} from './emojis';
 import {SchemesState} from './schemes';
 import {Typing} from './typing';
 import {GroupsState} from './groups';
-import {ChannelsRequestsStatuses, GeneralRequestsStatuses, PostsRequestsStatuses, TeamsRequestsStatuses, UsersRequestsStatuses, AdminRequestsStatuses, FilesRequestsStatuses, RolesRequestsStatuses, JobsRequestsStatuses} from './requests';
+import {
+    ChannelsRequestsStatuses,
+    GeneralRequestsStatuses,
+    PostsRequestsStatuses,
+    ThreadsRequestStatuses,
+    TeamsRequestsStatuses,
+    UsersRequestsStatuses,
+    AdminRequestsStatuses,
+    FilesRequestsStatuses,
+    RolesRequestsStatuses,
+    JobsRequestsStatuses,
+} from './requests';
 import {Role} from './roles';
 import {PreferenceType} from './preferences';
 import {Bot} from './bots';
 import {ChannelCategoriesState} from './channel_categories';
 import {Dictionary} from './utilities';
 import {CloudState} from './cloud';
+import {ThreadsState} from './threads';
 
 export type GlobalState = {
     entities: {
@@ -30,6 +42,7 @@ export type GlobalState = {
         teams: TeamsState;
         channels: ChannelsState;
         posts: PostsState;
+        threads: ThreadsState;
         bots: {
             accounts: Dictionary<Bot>;
         };
@@ -62,6 +75,7 @@ export type GlobalState = {
         channels: ChannelsRequestsStatuses;
         general: GeneralRequestsStatuses;
         posts: PostsRequestsStatuses;
+        threads: ThreadsRequestStatuses;
         teams: TeamsRequestsStatuses;
         users: UsersRequestsStatuses;
         admin: AdminRequestsStatuses;

@@ -8,6 +8,7 @@ import general from './general';
 import users from './users';
 import teams from './teams';
 import posts from './posts';
+import threads from './threads';
 import files from './files';
 import preferences from './preferences';
 import typing from './typing';
@@ -30,6 +31,7 @@ export default combineReducers({
     teams,
     channels,
     posts,
+    threads,
     files,
     preferences,
     typing,
