@@ -3,7 +3,7 @@
 
 type Plugin = {
     id: string;
-    name?: string;
+    name: string;
     description?: string;
     homepage_url?: string;
     support_url?: string;
