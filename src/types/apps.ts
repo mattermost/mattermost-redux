@@ -44,7 +44,7 @@ export type AppBinding = {
 };
 
 export type AppCallValues = {
-    [name: string]: string;
+    [name: string]: any;
 };
 
 export type AppCallType = string;
@@ -129,6 +129,7 @@ export type AppField = {
     name: string;
     type: AppFieldType;
     is_required?: boolean;
+    readonly?: boolean;
 
     // Present (default) value of the field
     value?: string;
@@ -145,6 +146,8 @@ export type AppField = {
     refresh_on_change_to?: string[];
     source_url?: string;
     options?: AppSelectOption[];
+    multiselect?: boolean;
+    refresh_url?: string;
 
     // Text props
     subtype?: string;
