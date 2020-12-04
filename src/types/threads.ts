@@ -18,5 +18,11 @@ export type Thread = {
 
 export type ThreadsState = {
     threads: IDMappedObjects<Thread>;
+    order: $ID<Thread>[];
     selectedThreadId: string;
+};
+
+export type ThreadList = {
+    total: number;
+    threads: Thread[];
 };

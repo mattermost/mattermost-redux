@@ -7,6 +7,7 @@ import GeneralTypes from './general';
 import UserTypes from './users';
 import TeamTypes from './teams';
 import PostTypes from './posts';
+import ThreadTypes from './threads';
 import FileTypes from './files';
 import PreferenceTypes from './preferences';
 import IntegrationTypes from './integrations';
@@ -30,6 +31,7 @@ export {
     TeamTypes,
     ChannelTypes,
     PostTypes,
+    ThreadTypes,
     FileTypes,
     PreferenceTypes,
     IntegrationTypes,

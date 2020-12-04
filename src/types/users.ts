@@ -23,7 +23,7 @@ export type UserNotifyProps = {
 };
 
 export type UserProfile = {
-    id: string;
+    id: 'me' | string;
     create_at: number;
     update_at: number;
     delete_at: number;

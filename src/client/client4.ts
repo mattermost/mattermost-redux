@@ -63,6 +63,7 @@ import {
     PluginStatus,
 } from 'types/plugins';
 import {Post, PostList, PostSearchResults, OpenGraphMetadata} from 'types/posts';
+import {ThreadList} from 'types/threads';
 import {PreferenceType} from 'types/preferences';
 import {Reaction} from 'types/reactions';
 import {Role} from 'types/roles';
@@ -214,6 +215,9 @@ export default class Client4 {
         return `${this.getUsersRoute()}/${userId}`;
     }
 
+    getUserTeamRoute(userId: string, teamId: string) {
+        return `${this.getUserRoute(userId)}/teams/${teamId}`;
+    }
     getTeamsRoute() {
         return `${this.getBaseRoute()}/teams`;
     }
@@ -2023,6 +2027,24 @@ export default class Client4 {
             {method: 'post', body: JSON.stringify(msg)},
         );
     };
+
+    // Threads Routes
+
+    getThreads = (
+        userId: $ID<UserProfile> = 'me',
+        teamId: $ID<Team>,
+        {
+            page = 0,
+            perPage = PER_PAGE_DEFAULT,
+            extended = true,
+            deleted = false,
+        },
+    ) => {
+        return this.doFetch<ThreadList>(
+            `${this.getUserTeamRoute(userId, teamId)}/threads${buildQueryString({page, pageSize: perPage, extended, deleted})}`,
+            {method: 'get'},
+        );
+    }
 
     // Files Routes
 

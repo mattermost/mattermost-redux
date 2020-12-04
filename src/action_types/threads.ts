@@ -4,6 +4,9 @@
 import keyMirror from 'utils/key_mirror';
 
 export default keyMirror({
+    GET_THREADS_SUCCESS: null,
+    GET_THREADS_FAILURE: null,
+
     FOLLOW_THREAD_REQUEST: null,
     FOLLOW_THREAD_SUCCESS: null,
     FOLLOW_THREAD_FAILURE: null,
@@ -11,4 +14,7 @@ export default keyMirror({
     UNFOLLOW_THREAD_REQUEST: null,
     UNFOLLOW_THREAD_SUCCESS: null,
     UNFOLLOW_THREAD_FAILURE: null,
+
+    RECEIVED_THREAD: null,
+    RECEIVED_THREADS: null,
 });

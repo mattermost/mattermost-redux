@@ -12,3 +12,7 @@ export function getThreads(state: GlobalState) {
 export function getThread(state: GlobalState, threadId: $ID<Thread>): Thread {
     return getThreads(state)[threadId];
 }
+
+export function getThreadOrder(state: GlobalState): $ID<Thread>[] {
+    return state.entities.threads.order;
+}

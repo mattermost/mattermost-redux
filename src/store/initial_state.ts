@@ -75,6 +75,7 @@ const state: GlobalState = {
         },
         threads: {
             threads: {},
+            order: [],
             selectedThreadId: '',
         },
         preferences: {
