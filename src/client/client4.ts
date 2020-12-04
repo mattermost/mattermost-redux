@@ -2654,7 +2654,7 @@ export default class Client4 {
         );
     };
 
-    createComplianceReport = (job: Job) => {
+    createComplianceReport = (job: Partial<Compliance>) => {
         return this.doFetch<Compliance>(
             `${this.getBaseRoute()}/compliance/reports`,
             {method: 'post', body: JSON.stringify(job)},

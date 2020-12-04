@@ -5,7 +5,7 @@ import {General} from '../constants';
 import {Client4} from 'client';
 
 import {Action, ActionFunc, batchActions, DispatchFunc, GetStateFunc} from 'types/actions';
-import {Job} from 'types/jobs';
+import {Compliance} from 'types/compliance';
 import {GroupSearchOpts} from 'types/groups';
 
 import {bindClientFunc, forceLogoutIfNecessary} from './helpers';
@@ -130,7 +130,7 @@ export function recycleDatabase(): ActionFunc {
     });
 }
 
-export function createComplianceReport(job: Job): ActionFunc {
+export function createComplianceReport(job: Partial<Compliance>): ActionFunc {
     return bindClientFunc({
         clientFunc: Client4.createComplianceReport,
         onRequest: AdminTypes.CREATE_COMPLIANCE_REQUEST,
