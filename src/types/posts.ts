@@ -11,6 +11,7 @@ import {
     IDMappedObjects,
     Dictionary,
 } from './utilities';
+import {UserProfile} from 'types/users';
 
 export type PostType = 'system_add_remove' |
     'system_add_to_channel' |
@@ -75,6 +76,24 @@ export type Post = {
     state?: 'DELETED';
     filenames?: string[];
 };
+
+export type ThreadResponse = {
+    id: string;
+    reply_count: number;
+    last_reply_at: number;
+    last_viewed_at: number;
+    participants: UserProfile[];
+    post: Post;
+    unread_replies: number;
+    unread_mentions: number;
+}
+
+export type ThreadsResponse = {
+    total: number;
+    total_unread_replies: number;
+    total_unread_mentions: number;
+    threads: ThreadResponse[];
+}
 
 export type PostList = {
     order: $ID<Post>[];

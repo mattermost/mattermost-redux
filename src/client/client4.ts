@@ -62,7 +62,7 @@ import {
     PluginsResponse,
     PluginStatus,
 } from 'types/plugins';
-import {Post, PostList, PostSearchResults, OpenGraphMetadata} from 'types/posts';
+import {Post, PostList, PostSearchResults, OpenGraphMetadata, ThreadsResponse} from 'types/posts';
 import {PreferenceType} from 'types/preferences';
 import {Reaction} from 'types/reactions';
 import {Role} from 'types/roles';
@@ -392,6 +392,14 @@ export default class Client4 {
 
     getCloudRoute() {
         return `${this.getBaseRoute()}/cloud`;
+    }
+
+    getUserThreadsRoute(userID: string, teamID: string): string {
+        return `${this.getUserRoute(userID)}/${this.getTeamRoute(teamID)}/threads`;
+    }
+
+    getUserThreadRoute(userId: string, teamId: string, threadId: string): string {
+        return `${this.getUserThreadsRoute(userId, teamId)}/${threadId}`;
     }
 
     getCSRFFromCookie() {
@@ -1859,49 +1867,80 @@ export default class Client4 {
         );
     };
 
-    getPostThread = (postId: string, fetchThreads = true) => {
+    getPostThread = (postId: string, fetchThreads = true, collapsedThreads = false) => {
         return this.doFetch<PostList>(
-            `${this.getPostRoute(postId)}/thread${buildQueryString({skipFetchThreads: !fetchThreads})}`,
+            `${this.getPostRoute(postId)}/thread${buildQueryString({skipFetchThreads: !fetchThreads, collapsedThreads})}`,
             {method: 'get'},
         );
     };
 
-    getPosts = (channelId: string, page = 0, perPage = PER_PAGE_DEFAULT, fetchThreads = true) => {
+    getPosts = (channelId: string, page = 0, perPage = PER_PAGE_DEFAULT, fetchThreads = true, collapsedThreads = false) => {
         return this.doFetch<PostList>(
-            `${this.getChannelRoute(channelId)}/posts${buildQueryString({page, per_page: perPage, skipFetchThreads: !fetchThreads})}`,
+            `${this.getChannelRoute(channelId)}/posts${buildQueryString({page, per_page: perPage, skipFetchThreads: !fetchThreads, collapsedThreads})}`,
             {method: 'get'},
         );
     };
 
-    getPostsUnread = (channelId: string, userId: string, limitAfter = DEFAULT_LIMIT_AFTER, limitBefore = DEFAULT_LIMIT_BEFORE, fetchThreads = true) => {
+    getPostsUnread = (channelId: string, userId: string, limitAfter = DEFAULT_LIMIT_AFTER, limitBefore = DEFAULT_LIMIT_BEFORE, fetchThreads = true, collapsedThreads = false) => {
         return this.doFetch<PostList>(
-            `${this.getUserRoute(userId)}/channels/${channelId}/posts/unread${buildQueryString({limit_after: limitAfter, limit_before: limitBefore, skipFetchThreads: !fetchThreads})}`,
+            `${this.getUserRoute(userId)}/channels/${channelId}/posts/unread${buildQueryString({limit_after: limitAfter, limit_before: limitBefore, skipFetchThreads: !fetchThreads, collapsedThreads})}`,
             {method: 'get'},
         );
     };
 
-    getPostsSince = (channelId: string, since: number, fetchThreads = true) => {
+    getPostsSince = (channelId: string, since: number, fetchThreads = true, collapsedThreads = false) => {
         return this.doFetch<PostList>(
-            `${this.getChannelRoute(channelId)}/posts${buildQueryString({since, skipFetchThreads: !fetchThreads})}`,
+            `${this.getChannelRoute(channelId)}/posts${buildQueryString({since, skipFetchThreads: !fetchThreads, collapsedThreads})}`,
             {method: 'get'},
         );
     };
 
-    getPostsBefore = (channelId: string, postId: string, page = 0, perPage = PER_PAGE_DEFAULT, fetchThreads = true) => {
+    getPostsBefore = (channelId: string, postId: string, page = 0, perPage = PER_PAGE_DEFAULT, fetchThreads = true, collapsedThreads = false) => {
         this.trackEvent('api', 'api_posts_get_before', {channel_id: channelId});
 
         return this.doFetch<PostList>(
-            `${this.getChannelRoute(channelId)}/posts${buildQueryString({before: postId, page, per_page: perPage, skipFetchThreads: !fetchThreads})}`,
+            `${this.getChannelRoute(channelId)}/posts${buildQueryString({before: postId, page, per_page: perPage, skipFetchThreads: !fetchThreads, collapsedThreads})}`,
             {method: 'get'},
         );
     };
 
-    getPostsAfter = (channelId: string, postId: string, page = 0, perPage = PER_PAGE_DEFAULT, fetchThreads = true) => {
+    getPostsAfter = (channelId: string, postId: string, page = 0, perPage = PER_PAGE_DEFAULT, fetchThreads = true, collapsedThreads = false) => {
         this.trackEvent('api', 'api_posts_get_after', {channel_id: channelId});
 
         return this.doFetch<PostList>(
-            `${this.getChannelRoute(channelId)}/posts${buildQueryString({after: postId, page, per_page: perPage, skipFetchThreads: !fetchThreads})}`,
+            `${this.getChannelRoute(channelId)}/posts${buildQueryString({after: postId, page, per_page: perPage, skipFetchThreads: !fetchThreads, collapsedThreads})}`,
             {method: 'get'},
+        );
+    };
+
+    getUserThreads = (userId: string, teamId: string, page = 0, pageSize = PER_PAGE_DEFAULT, extended = true, deleted = true, since = 0) => {
+        return this.doFetch<ThreadsResponse>(
+            `${this.getUserThreadsRoute(userId, teamId)}/${buildQueryString({page, pageSize, extended, deleted, since})}`,
+            {method: 'get'},
+        );
+    };
+
+    updateThreadsReadForUser = (userId: string, teamId: string, timestamp: number) => {
+        const url = `${this.getUserThreadsRoute(userId, teamId)}/read/${timestamp}`;
+        return this.doFetch<StatusOK>(
+            url,
+            {method: 'put'},
+        );
+    };
+
+    updateThreadReadForUser = (userId: string, teamId: string, threadId: string, timestamp: number) => {
+        const url = `${this.getUserThreadRoute(userId, teamId, threadId)}/read/${timestamp}`;
+        return this.doFetch<StatusOK>(
+            url,
+            {method: 'put'},
+        );
+    };
+
+    updateThreadFollowForUser = (userId: string, teamId: string, threadId: string, state: boolean) => {
+        const url = this.getUserThreadRoute(userId, teamId, threadId) + '/following';
+        return this.doFetch<StatusOK>(
+            url,
+            {method: state ? 'put' : 'delete'},
         );
     };
 
