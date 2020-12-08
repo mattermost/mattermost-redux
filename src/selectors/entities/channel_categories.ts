@@ -248,7 +248,7 @@ export function makeFilterAutoclosedDMs(): (state: GlobalState, channels: Channe
                 remaining = limitPref;
             }
 
-            const currentChannel = filtered.find((x) => x.id === currentChannelId);
+            const currentChannel = filtered.find((channel) => channel.id === currentChannelId);
             const slicedChannels = filtered.slice(0, remaining);
             if (currentChannel && !slicedChannels.includes(currentChannel)) {
                 slicedChannels.pop();
