@@ -73,6 +73,11 @@ const state: GlobalState = {
                 },
             },
         },
+        threads: {
+            threads: {},
+            order: [],
+            selectedThreadId: '',
+        },
         preferences: {
             myPreferences: {},
         },
@@ -197,6 +202,12 @@ const state: GlobalState = {
                 error: null,
             },
             getPostThread: {
+                status: 'not_started',
+                error: null,
+            },
+        },
+        threads: {
+            getThreads: {
                 status: 'not_started',
                 error: null,
             },

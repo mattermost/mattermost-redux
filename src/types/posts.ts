@@ -75,25 +75,9 @@ export type Post = {
     user_activity_posts?: Array<Post>;
     state?: 'DELETED';
     filenames?: string[];
+    last_reply_at?: number;
+    participants: (UserProfile | $ID<UserProfile>)[];
 };
-
-export type ThreadResponse = {
-    id: string;
-    reply_count: number;
-    last_reply_at: number;
-    last_viewed_at: number;
-    participants: UserProfile[];
-    post: Post;
-    unread_replies: number;
-    unread_mentions: number;
-}
-
-export type ThreadsResponse = {
-    total: number;
-    total_unread_replies: number;
-    total_unread_mentions: number;
-    threads: ThreadResponse[];
-}
 
 export type PostList = {
     order: $ID<Post>[];

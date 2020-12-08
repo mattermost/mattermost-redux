@@ -62,7 +62,7 @@ import {
     PluginsResponse,
     PluginStatus,
 } from 'types/plugins';
-import {Post, PostList, PostSearchResults, OpenGraphMetadata, ThreadsResponse} from 'types/posts';
+import {Post, PostList, PostSearchResults, OpenGraphMetadata} from 'types/posts';
 import {PreferenceType} from 'types/preferences';
 import {Reaction} from 'types/reactions';
 import {Role} from 'types/roles';
@@ -98,6 +98,7 @@ import {isSystemAdmin} from 'utils/user_utils';
 
 import fetch from './fetch_etag';
 import {TelemetryHandler} from './telemetry';
+import {UserThreadList} from 'types/threads';
 
 const FormData = require('form-data');
 const HEADER_AUTH = 'Authorization';
@@ -1913,8 +1914,8 @@ export default class Client4 {
         );
     };
 
-    getUserThreads = (userId: string, teamId: string, page = 0, pageSize = PER_PAGE_DEFAULT, extended = true, deleted = true, since = 0) => {
-        return this.doFetch<ThreadsResponse>(
+    getUserThreads = (userId: $ID<UserProfile> = 'me', teamId: $ID<Team>, page = 0, pageSize = PER_PAGE_DEFAULT, extended = false, deleted = false, since = 0) => {
+        return this.doFetch<UserThreadList>(
             `${this.getUserThreadsRoute(userId, teamId)}/${buildQueryString({page, pageSize, extended, deleted, since})}`,
             {method: 'get'},
         );

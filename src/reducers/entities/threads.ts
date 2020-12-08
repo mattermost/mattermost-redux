@@ -1,32 +1,27 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
 
-import {combineReducers} from 'redux';
-import {ThreadTypes} from 'action_types';
+import {ThreadsState, UserThread} from 'types/threads';
 import {GenericAction} from 'types/actions';
-import {Dictionary} from 'types/utilities';
-import {ThreadsResponse} from 'types/posts';
+import {ThreadTypes} from 'action_types';
 
-function myThreads(state: Dictionary<ThreadsResponse> = {}, action: GenericAction) {
-    switch (action.type) {
-    case ThreadTypes.RECEIVED_USER_THREADS: {
-        const nextState = {...state};
+export default function threadsReducer(state: Partial<ThreadsState> = {}, action: GenericAction) {
+    if (action.type === ThreadTypes.RECEIVED_THREADS) {
+        const threads: ThreadsState['threads'] = {
+            ...state.threads,
+            ...action.data.threads.reduce((results: ThreadsState['threads'], thread: UserThread) => {
+                results[thread.id] = thread;
+                return results;
+            }, {}),
+        };
 
-        if (action.data) {
-            for (const thread of action.data.threads) {
-                nextState[thread.id] = thread;
-            }
-        }
+        const order = Object.keys(threads).sort((a, b) => threads[b].last_reply_at - threads[a].last_reply_at);
 
-        return nextState;
+        return {
+            ...state,
+            threads,
+            order,
+        };
     }
-    default:
-        return state;
-    }
+    return state;
 }
-
-export default combineReducers({
-
-    // object where the key is the root post id
-    myThreads,
-});
