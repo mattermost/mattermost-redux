@@ -256,7 +256,7 @@ export function getGroupsAssociatedToTeam(teamID: string, q = '', page = 0, perP
     });
 }
 
-export function getGroupsAssociatedToChannel(channelID: string, q = '', page = 0, perPage: number = General.PAGE_SIZE_DEFAULT, filterAllowReference: false): ActionFunc {
+export function getGroupsAssociatedToChannel(channelID: string, q = '', page = 0, perPage: number = General.PAGE_SIZE_DEFAULT, filterAllowReference = false): ActionFunc {
     return bindClientFunc({
         clientFunc: async (param1, param2, param3, param4, param5) => {
             const result = await Client4.getGroupsAssociatedToChannel(param1, param2, param3, param4, param5);

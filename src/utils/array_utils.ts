@@ -24,6 +24,19 @@ export function insertWithoutDuplicates<T>(array: T[], item: T, newIndex: number
     return newArray;
 }
 
+export function insertMultipleWithoutDuplicates<T>(array: T[], items: T[], newIndex: number) {
+    let newArray = [...array];
+
+    items.forEach((item) => {
+        newArray = removeItem(newArray, item);
+    });
+
+    // And re-add it in its new location
+    newArray.splice(newIndex, 0, ...items);
+
+    return newArray;
+}
+
 // removeItem removes an item from an array and returns the result. The provided array is not modified. If the array
 // did not originally contain the given item, the original array is returned.
 export function removeItem<T>(array: T[], item: T) {

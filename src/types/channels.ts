@@ -104,6 +104,10 @@ export type ChannelModeration = {
             value: boolean;
             enabled: boolean;
         };
+        admins: {
+            value: boolean;
+            enabled: boolean;
+        };
     };
 };
 

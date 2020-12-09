@@ -7,7 +7,7 @@ import {AppBinding, AppCall, AppCallResponse} from 'types/apps';
 import {Audit} from 'types/audits';
 import {UserAutocomplete, AutocompleteSuggestion} from 'types/autocomplete';
 import {Bot, BotPatch} from 'types/bots';
-import {Product, Subscription, CloudCustomer} from 'types/cloud';
+import {Product, Subscription, CloudCustomer, Address, CloudCustomerPatch, Invoice} from 'types/cloud';
 import {ChannelCategory, OrderedChannelCategories} from 'types/channel_categories';
 import {
     Channel,
@@ -98,7 +98,7 @@ import {cleanUrlForLogging} from 'utils/sentry';
 import {isSystemAdmin} from 'utils/user_utils';
 
 import fetch from './fetch_etag';
-import {rudderAnalytics} from './rudder';
+import {TelemetryHandler} from './telemetry';
 
 const FormData = require('form-data');
 const HEADER_AUTH = 'Authorization';
@@ -128,12 +128,13 @@ export default class Client4 {
     userId = '';
     diagnosticId = '';
     includeCookies = true;
-    isRudderKeySet = false;
     translations = {
         connectionError: 'There appears to be a problem with your internet connection.',
         unknownError: 'We received an unexpected status code from the server.',
     };
     userRoles?: string;
+
+    telemetryHandler?: TelemetryHandler;
 
     getUrl() {
         return this.url;
@@ -190,8 +191,8 @@ export default class Client4 {
         this.diagnosticId = diagnosticId;
     }
 
-    enableRudderEvents() {
-        this.isRudderKeySet = true;
+    setTelemetryHandler(telemetryHandler?: TelemetryHandler) {
+        this.telemetryHandler = telemetryHandler;
     }
 
     getServerVersion() {
@@ -392,6 +393,10 @@ export default class Client4 {
 
     getNoticesRoute() {
         return `${this.getBaseRoute()}/system/notices`;
+    }
+
+    getCloudRoute() {
+        return `${this.getBaseRoute()}/cloud`;
     }
 
     getCSRFFromCookie() {
@@ -2654,7 +2659,7 @@ export default class Client4 {
         );
     };
 
-    createComplianceReport = (job: Job) => {
+    createComplianceReport = (job: Partial<Compliance>) => {
         return this.doFetch<Compliance>(
             `${this.getBaseRoute()}/compliance/reports`,
             {method: 'post', body: JSON.stringify(job)},
@@ -3326,35 +3331,60 @@ export default class Client4 {
     // Cloud routes
     getCloudProducts = () => {
         return this.doFetch<Product[]>(
-            `${this.getBaseRoute()}/cloud/products`, {method: 'get'},
+            `${this.getCloudRoute()}/products`, {method: 'get'},
         );
     };
 
     createPaymentMethod = async () => {
         return this.doFetch(
-            `${this.getBaseRoute()}/cloud/payment`,
+            `${this.getCloudRoute()}/payment`,
             {method: 'post'},
         );
     }
 
     getCloudCustomer = () => {
         return this.doFetch<CloudCustomer>(
-            `${this.getBaseRoute()}/cloud/customer`, {method: 'get'},
+            `${this.getCloudRoute()}/customer`, {method: 'get'},
+        );
+    }
+
+    updateCloudCustomer = (customerPatch: CloudCustomerPatch) => {
+        return this.doFetch<CloudCustomer>(
+            `${this.getCloudRoute()}/customer`,
+            {method: 'put', body: JSON.stringify(customerPatch)},
+        );
+    }
+
+    updateCloudCustomerAddress = (address: Address) => {
+        return this.doFetch<CloudCustomer>(
+            `${this.getCloudRoute()}/customer/address`,
+            {method: 'put', body: JSON.stringify(address)},
         );
     }
 
     confirmPaymentMethod = async (stripeSetupIntentID: string) => {
         return this.doFetch(
-            `${this.getBaseRoute()}/cloud/payment/confirm`,
+            `${this.getCloudRoute()}/payment/confirm`,
             {method: 'post', body: JSON.stringify({stripe_setup_intent_id: stripeSetupIntentID})},
         );
     }
 
     getSubscription = () => {
         return this.doFetch<Subscription>(
-            `${this.getBaseRoute()}/cloud/subscription`,
+            `${this.getCloudRoute()}/subscription`,
             {method: 'get'},
         );
+    }
+
+    getInvoices = () => {
+        return this.doFetch<Invoice[]>(
+            `${this.getCloudRoute()}/subscription/invoices`,
+            {method: 'get'},
+        );
+    }
+
+    getInvoicePdfUrl = (invoiceId: string) => {
+        return `${this.getCloudRoute()}/subscription/invoices/${invoiceId}/pdf`;
     }
 
     teamMembersMinusGroupMembers = (teamID: string, groupIDs: string[], page: number, perPage: number) => {
@@ -3403,6 +3433,8 @@ export default class Client4 {
     };
 
     updateNoticesAsViewed = (noticeIds: string[]) => {
+        // Only one notice is marked as viewed at a time so using 0 index
+        this.trackEvent('ui', `notice_seen_${noticeIds[0]}`);
         return this.doFetch<StatusOK>(
             `${this.getNoticesRoute()}/view`,
             {method: 'put', body: JSON.stringify(noticeIds)},
@@ -3472,55 +3504,17 @@ export default class Client4 {
     };
 
     trackEvent(category: string, event: string, props?: any) {
-        if (!this.isRudderKeySet) {
-            return;
+        if (this.telemetryHandler) {
+            const userRoles = this.userRoles && isSystemAdmin(this.userRoles) ? 'system_admin, system_user' : 'system_user';
+            this.telemetryHandler.trackEvent(this.userId, userRoles, category, event, props);
         }
-
-        const properties = Object.assign({
-            category,
-            type: event,
-            user_actual_role: this.userRoles && isSystemAdmin(this.userRoles) ? 'system_admin, system_user' : 'system_user',
-            user_actual_id: this.userId,
-        }, props);
-        const options = {
-            context: {
-                ip: '0.0.0.0',
-            },
-            page: {
-                path: '',
-                referrer: '',
-                search: '',
-                title: '',
-                url: '',
-            },
-            anonymousId: '00000000000000000000000000',
-        };
-
-        rudderAnalytics.track('event', properties, options);
     }
 
     pageVisited(category: string, name: string) {
-        if (!this.isRudderKeySet) {
-            return;
+        if (this.telemetryHandler) {
+            const userRoles = this.userRoles && isSystemAdmin(this.userRoles) ? 'system_admin, system_user' : 'system_user';
+            this.telemetryHandler.pageVisited(this.userId, userRoles, category, name);
         }
-
-        rudderAnalytics.page(
-            category,
-            name,
-            {
-                path: '',
-                referrer: '',
-                search: '',
-                title: '',
-                url: '',
-            },
-            {
-                context: {
-                    ip: '0.0.0.0',
-                },
-                anonymousId: '00000000000000000000000000',
-            },
-        );
     }
 }
 

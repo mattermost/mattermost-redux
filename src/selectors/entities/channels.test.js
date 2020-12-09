@@ -355,7 +355,7 @@ describe('Selectors.Channels.getOtherChannels', () => {
     });
 });
 
-describe('Selectors.Channels.getChannel', () => {
+describe('getChannel', () => {
     const team1 = TestHelper.fakeTeamWithId();
     const team2 = TestHelper.fakeTeamWithId();
 
@@ -413,14 +413,95 @@ describe('Selectors.Channels.getChannel', () => {
         },
     });
 
-    it('get channel', () => {
-        assert.deepEqual(Selectors.getChannel(testState, channel1.id), channel1);
+    test('should return channels directly from the store', () => {
+        expect(Selectors.getChannel(testState, channel1.id)).toBe(channel1);
+        expect(Selectors.getChannel(testState, channel2.id)).toBe(channel2);
+        expect(Selectors.getChannel(testState, channel3.id)).toBe(channel3);
     });
-    it('get channel as Direct Channel', () => {
-        assert.deepEqual(Selectors.getChannel(testState, channel2.id), {...channel2, display_name: user2.username, status: 'offline', teammate_id: user2.id});
+});
+
+describe('makeGetChannel', () => {
+    const team1 = TestHelper.fakeTeamWithId();
+    const team2 = TestHelper.fakeTeamWithId();
+
+    const user = TestHelper.fakeUserWithId();
+    const user2 = TestHelper.fakeUserWithId();
+    const user3 = TestHelper.fakeUserWithId();
+
+    const profiles = {
+        [user.id]: user,
+        [user2.id]: user2,
+        [user3.id]: user3,
+    };
+
+    const channel1 = {
+        ...TestHelper.fakeChannelWithId(team1.id),
+        type: General.OPEN_CHANNEL,
+    };
+    const channel2 = {
+        ...TestHelper.fakeChannelWithId(team2.id),
+        type: General.DM_CHANNEL,
+        name: getDirectChannelName(user.id, user2.id),
+    };
+    const channel3 = {
+        ...TestHelper.fakeChannelWithId(team2.id),
+        type: General.GM_CHANNEL,
+        display_name: [user.username, user2.username, user3.username].join(', '),
+    };
+
+    const channels = {
+        [channel1.id]: channel1,
+        [channel2.id]: channel2,
+        [channel3.id]: channel3,
+    };
+
+    const testState = deepFreezeAndThrowOnMutation({
+        entities: {
+            users: {
+                currentUserId: user.id,
+                profiles,
+                statuses: {},
+                profilesInChannel: {
+                    [channel2.id]: new Set([user.id, user2.id]),
+                    [channel3.id]: new Set([user.id, user2.id, user3.id]),
+                },
+            },
+            channels: {
+                channels,
+            },
+            preferences: {
+                myPreferences: {},
+            },
+            general: {
+                config: {},
+            },
+        },
     });
-    it('get channel as Group Message Channel', () => {
-        assert.deepEqual(Selectors.getChannel(testState, channel3.id), {...channel3, display_name: [user2.username, user3.username].sort(sortUsernames).join(', ')});
+
+    test('should return non-DM/non-GM channels directly from the store', () => {
+        const getChannel = Selectors.makeGetChannel();
+
+        expect(getChannel(testState, {id: channel1.id})).toBe(channel1);
+    });
+
+    test('should return DMs with computed data added', () => {
+        const getChannel = Selectors.makeGetChannel();
+
+        expect(getChannel(testState, {id: channel2.id})).toEqual({
+            ...channel2,
+            display_name: user2.username,
+            status: 'offline',
+            teammate_id: user2.id,
+        });
+    });
+
+    test('should return GMs with computed data added', () => {
+        const getChannel = Selectors.makeGetChannel();
+
+        expect(getChannel(testState, {id: channel3.id})).toEqual({
+            ...channel3,
+            display_name: [user2.username, user3.username].sort(sortUsernames).join(', '),
+        });
     });
 });
 

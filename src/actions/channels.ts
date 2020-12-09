@@ -7,6 +7,7 @@ import {Client4} from 'client';
 
 import {General, Preferences} from '../constants';
 import {CategoryTypes} from 'constants/channel_categories';
+import {MarkUnread} from 'constants/channels';
 
 import {getCategoryInTeamByType} from 'selectors/entities/channel_categories';
 import {
@@ -1349,7 +1350,7 @@ export function markChannelAsUnread(teamId: string, channelId: string, mentions:
                 channelId,
                 amount: 1,
                 onlyMentions: myMembers[channelId] && myMembers[channelId].notify_props &&
-                    myMembers[channelId].notify_props.mark_unread === General.MENTION,
+                    myMembers[channelId].notify_props.mark_unread === MarkUnread.MENTION,
                 fetchedChannelMember,
             },
         }];
