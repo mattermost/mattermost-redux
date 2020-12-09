@@ -10,7 +10,7 @@ import {CategoryTypes} from '../../constants/channel_categories';
 import {getCurrentChannelId, getMyChannelMemberships, makeGetChannelsForIds} from 'selectors/entities/channels';
 import {getCurrentUserLocale} from 'selectors/entities/i18n';
 import {getLastPostPerChannel} from 'selectors/entities/posts';
-import {getMyPreferences, getTeammateNameDisplaySetting, shouldAutocloseDMs, getInt} from 'selectors/entities/preferences';
+import {getMyPreferences, getTeammateNameDisplaySetting, shouldAutocloseDMs} from 'selectors/entities/preferences';
 import {getCurrentUserId} from 'selectors/entities/users';
 
 import {Channel, ChannelMembership} from 'types/channels';
@@ -96,11 +96,11 @@ function getDefaultAutocloseCutoff() {
     return Date.now() - (7 * 24 * 60 * 60 * 1000);
 }
 
-// legacyMakeFilterAutoclosedDMs returns a selector that filters a given list of channels based on whether or not the channel has
+// makeFilterAutoclosedDMs returns a selector that filters a given list of channels based on whether or not the channel has
 // been autoclosed by either being an inactive DM/GM or a DM with a deactivated user. The exact requirements for being
 // inactive are complicated, but they are intended to include the channel not having been opened, posted in, or viewed
 // recently. The selector returns the original array if no channels are filtered out.
-export function legacyMakeFilterAutoclosedDMs(getAutocloseCutoff = getDefaultAutocloseCutoff): (state: GlobalState, channels: Channel[], categoryType: string) => Channel[] {
+export function makeFilterAutoclosedDMs(getAutocloseCutoff = getDefaultAutocloseCutoff): (state: GlobalState, channels: Channel[], categoryType: string) => Channel[] {
     return createSelector(
         (state: GlobalState, channels: Channel[]) => channels,
         (state: GlobalState, channels: Channel[], categoryType: string) => categoryType,
@@ -185,72 +185,6 @@ export function legacyMakeFilterAutoclosedDMs(getAutocloseCutoff = getDefaultAut
             });
 
             return filtered.length === channels.length ? channels : filtered;
-        },
-    );
-}
-
-export function makeFilterAutoclosedDMs(): (state: GlobalState, channels: Channel[], categoryType: string) => Channel[] {
-    return createSelector(
-        (state: GlobalState, channels: Channel[]) => channels,
-        (state: GlobalState, channels: Channel[], categoryType: string) => categoryType,
-        getCurrentChannelId,
-        (state: GlobalState) => state.entities.users.profiles,
-        getCurrentUserId,
-        getMyChannelMemberships,
-        (state: GlobalState) => getInt(state, Preferences.CATEGORY_SIDEBAR_SETTINGS, Preferences.LIMIT_VISIBLE_DMS_GMS),
-        (channels, categoryType, currentChannelId, profiles, currentUserId, myMembers, limitPref) => {
-            if (categoryType !== CategoryTypes.DIRECT_MESSAGES) {
-                // Only autoclose DMs that haven't been assigned to a category
-                return channels;
-            }
-
-            let unreadCount = 0;
-
-            const filtered = channels.filter((channel) => {
-                if (channel.type !== General.DM_CHANNEL && channel.type !== General.GM_CHANNEL) {
-                    return true;
-                }
-
-                if (isUnreadChannel(myMembers, channel)) {
-                    unreadCount++;
-
-                    // Unread DMs/GMs are always visible
-                    return true;
-                }
-
-                if (currentChannelId === channel.id) {
-                    // The current channel is always visible
-                    return true;
-                }
-
-                // DMs with deactivated users will be visible if you're currently viewing them and they were opened
-                // since the user was deactivated
-                if (channel.type === General.DM_CHANNEL) {
-                    const teammateId = getUserIdFromChannelName(currentUserId, channel.name);
-                    const teammate = profiles[teammateId];
-
-                    const lastViewedAt = myMembers[channel.id]?.last_viewed_at;
-
-                    if (!teammate || teammate.delete_at > lastViewedAt) {
-                        return false;
-                    }
-                }
-
-                return true;
-            });
-
-            // The limit of DMs user specifies to be rendered in the sidebar
-            let remaining;
-
-            if (limitPref < unreadCount) {
-                remaining = unreadCount;
-            } else {
-                remaining = limitPref;
-            }
-
-            const slicedChannels = filtered.slice(0, remaining);
-
-            return slicedChannels.length === channels.length ? channels : slicedChannels;
         },
     );
 }
@@ -450,8 +384,8 @@ export function makeGetChannelsForCategory() {
 // with inactive DMs/GMs and archived channels filtered out.
 export function makeFilterAndSortChannelsForCategory() {
     const filterArchivedChannels = makeFilterArchivedChannels();
-    const filterAutoclosedDMs = makeFilterAutoclosedDMs();
 
+    const filterAutoclosedDMs = makeFilterAutoclosedDMs();
     const filterManuallyClosedDMs = makeFilterManuallyClosedDMs();
 
     const sortChannels = makeSortChannels();
