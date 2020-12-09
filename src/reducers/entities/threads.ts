@@ -1,7 +1,7 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
 
-import {ThreadTypes} from 'action_types';
+import {TeamTypes, ThreadTypes, UserTypes} from 'action_types';
 import {combineReducers} from 'redux';
 import {GenericAction} from 'types/actions';
 import {Team} from 'types/teams';
@@ -9,7 +9,8 @@ import {ThreadsState, UserThread} from 'types/threads';
 import {IDMappedObjects, RelationOneToMany} from 'types/utilities';
 
 export const threadsReducer = (state: IDMappedObjects<UserThread> = {}, action: GenericAction) => {
-    if (action.type === ThreadTypes.RECEIVED_THREADS) {
+    switch (action.type) {
+    case ThreadTypes.RECEIVED_THREADS: {
         return {
             ...state,
             ...action.data.threads.reduce((results: IDMappedObjects<UserThread>, thread: UserThread) => {
@@ -18,11 +19,15 @@ export const threadsReducer = (state: IDMappedObjects<UserThread> = {}, action: 
             }, {}),
         };
     }
+    case UserTypes.LOGOUT_SUCCESS:
+        return {};
+    }
     return state;
 };
 
 export const threadsInTeamReducer = (state: RelationOneToMany<Team, UserThread> = {}, action: GenericAction) => {
-    if (action.type === ThreadTypes.RECEIVED_THREADS) {
+    switch (action.type) {
+    case ThreadTypes.RECEIVED_THREADS: {
         const nextSet = new Set(state[action.data.team_id]);
 
         action.data.threads.forEach((thread: UserThread) => {
@@ -33,6 +38,21 @@ export const threadsInTeamReducer = (state: RelationOneToMany<Team, UserThread> 
             ...state,
             [action.data.team_id]: [...nextSet],
         };
+    }
+    case TeamTypes.LEAVE_TEAM: {
+        const team: Team = action.data;
+
+        if (!state[team.id]) {
+            return state;
+        }
+
+        const nextState = {...state};
+        Reflect.deleteProperty(nextState, team.id);
+
+        return nextState;
+    }
+    case UserTypes.LOGOUT_SUCCESS:
+        return {};
     }
     return state;
 };
@@ -45,7 +65,8 @@ export const selectedThreadIdInTeamReducer = (state: string | null = null, actio
 };
 
 export const countsReducer = (state: ThreadsState['counts'] = {}, action: GenericAction) => {
-    if (action.type === ThreadTypes.RECEIVED_THREADS) {
+    switch (action.type) {
+    case ThreadTypes.RECEIVED_THREADS: {
         return {
             ...state,
             [action.data.team_id]: {
@@ -53,6 +74,26 @@ export const countsReducer = (state: ThreadsState['counts'] = {}, action: Generi
                 total_unread_replies: action.data.total_unread_replies,
                 total_unread_mentions: action.data.total,
             },
+        };
+    }
+    case TeamTypes.LEAVE_TEAM: {
+        const team: Team = action.data;
+
+        if (!state[team.id]) {
+            return state;
+        }
+
+        const nextState = {...state};
+        Reflect.deleteProperty(nextState, team.id);
+
+        return nextState;
+    }
+
+    case UserTypes.LOGOUT_SUCCESS:
+        return {
+            total_unread_replies: 0,
+            total: 0,
+            total_unread_mentions: 0,
         };
     }
     return state;
