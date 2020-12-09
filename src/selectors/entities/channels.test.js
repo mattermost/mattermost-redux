@@ -890,7 +890,9 @@ describe('Selectors.Channels.isCurrentChannelFavorite', () => {
                     currentChannelId: channel2.id,
                 },
                 general: {
-                    config: {},
+                    config: {
+                        EnableLegacySidebar: 'true',
+                    },
                 },
                 preferences: {
                     myPreferences,
@@ -3628,7 +3630,9 @@ describe('isFavoriteChannel', () => {
         let state = {
             entities: {
                 general: {
-                    config: {},
+                    config: {
+                        EnableLegacySidebar: 'true',
+                    },
                 },
                 preferences: {
                     myPreferences: {},
@@ -3693,16 +3697,14 @@ describe('isFavoriteChannel', () => {
                         [currentTeamId]: [favoritesCategory.id],
                     },
                 },
-                general: {
-                    config: {
-                        ExperimentalChannelSidebarOrganization: 'default_on',
-                    },
-                },
                 preferences: {
                     myPreferences: {},
                 },
                 teams: {
                     currentTeamId,
+                },
+                general: {
+                    config: {},
                 },
             },
         };
