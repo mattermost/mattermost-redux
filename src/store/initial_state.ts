@@ -74,9 +74,10 @@ const state: GlobalState = {
             },
         },
         threads: {
+            threadsInTeam: {},
             threads: {},
-            order: [],
-            selectedThreadId: '',
+            selectedThreadIdInTeam: {},
+            counts: {},
         },
         preferences: {
             myPreferences: {},

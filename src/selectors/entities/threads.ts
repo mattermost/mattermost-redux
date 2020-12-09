@@ -1,12 +1,12 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
 
-import {UserThread} from 'types/threads';
-import {GlobalState} from 'types/store';
-import {$ID, IDMappedObjects, RelationOneToMany} from 'types/utilities';
 import {createSelector} from 'reselect';
 import {getCurrentTeamId} from 'selectors/entities/teams';
+import {GlobalState} from 'types/store';
 import {Team} from 'types/teams';
+import {UserThread} from 'types/threads';
+import {$ID, IDMappedObjects, RelationOneToMany} from 'types/utilities';
 
 export function getThreadsInTeam(state: GlobalState): RelationOneToMany<Team, UserThread> {
     return state.entities.threads.threadsInTeam;
@@ -32,6 +32,7 @@ export const getThreadOrderInCurrentTeam: (state: GlobalState) => Array<string> 
     getThreadsInCurrentTeam,
     getThreads,
     (threadsInTeam: Array<string>, threads: IDMappedObjects<UserThread>): Array<string> => {
-        return threadsInTeam.sort((a, b) => threads[b].last_reply_at - threads[a].last_reply_at);
+        const ids = [...threadsInTeam];
+        return ids.sort((a, b) => threads[b].last_reply_at - threads[a].last_reply_at);
     },
 );

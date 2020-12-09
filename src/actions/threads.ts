@@ -2,11 +2,11 @@
 // See LICENSE.txt for license information.
 
 import {ThreadTypes} from 'action_types';
+import {Client4} from 'client';
 import ThreadConstants from 'constants/threads';
 import {DispatchFunc, GetStateFunc} from 'types/actions';
-import {Client4} from 'client';
-import {forceLogoutIfNecessary} from './helpers';
 import {logError} from './errors';
+import {forceLogoutIfNecessary} from './helpers';
 
 export function getThreads(userId: string, teamId: string, {page = 0, perPage = ThreadConstants.THREADS_CHUNK_SIZE} = {}) {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
@@ -22,8 +22,7 @@ export function getThreads(userId: string, teamId: string, {page = 0, perPage = 
 
         dispatch({
             type: ThreadTypes.RECEIVED_THREADS,
-            data: threads,
-            team_id: teamId,
+            data: {threads, team_id: teamId},
         });
 
         return {data: threads};
