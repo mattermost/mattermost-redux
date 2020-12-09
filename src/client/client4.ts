@@ -1921,8 +1921,8 @@ export default class Client4 {
         );
     };
 
-    updateThreadsReadForUser = (userId: string, teamId: string, timestamp: number) => {
-        const url = `${this.getUserThreadsRoute(userId, teamId)}/read/${timestamp}`;
+    updateThreadsReadForUser = (userId: string, teamId: string) => {
+        const url = `${this.getUserThreadsRoute(userId, teamId)}/read`;
         return this.doFetch<StatusOK>(
             url,
             {method: 'put'},
