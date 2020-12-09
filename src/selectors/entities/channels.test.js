@@ -873,7 +873,9 @@ describe('Selectors.Channels.isCurrentChannelFavorite', () => {
                 currentChannelId: channel1.id,
             },
             general: {
-                config: {},
+                config: {
+                    EnableLegacySidebar: 'true',
+                },
             },
             preferences: {
                 myPreferences,
@@ -889,13 +891,13 @@ describe('Selectors.Channels.isCurrentChannelFavorite', () => {
                 channels: {
                     currentChannelId: channel2.id,
                 },
+                preferences: {
+                    myPreferences,
+                },
                 general: {
                     config: {
                         EnableLegacySidebar: 'true',
                     },
-                },
-                preferences: {
-                    myPreferences,
                 },
             },
         };
