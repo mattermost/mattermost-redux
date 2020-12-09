@@ -4,8 +4,9 @@
 import {ThreadsState, UserThread} from 'types/threads';
 import {GenericAction} from 'types/actions';
 import {ThreadTypes} from 'action_types';
+import {combineReducers} from 'redux';
 
-export default function threadsReducer(state: Partial<ThreadsState> = {}, action: GenericAction) {
+function threadsReducer(state: Partial<ThreadsState> = {}, action: GenericAction) {
     if (action.type === ThreadTypes.RECEIVED_THREADS) {
         const threads: ThreadsState['threads'] = {
             ...state.threads,
@@ -25,3 +26,7 @@ export default function threadsReducer(state: Partial<ThreadsState> = {}, action
     }
     return state;
 }
+
+export default combineReducers({
+    threads: threadsReducer,
+});
