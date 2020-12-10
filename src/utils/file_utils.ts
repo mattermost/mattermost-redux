@@ -75,7 +75,7 @@ export function lookupMimeType(filename: string): string {
 }
 
 export function getFileUrl(fileId: string): string {
-    return Client4.getFileRoute(fileId);
+    return `${Client4.getFileRoute(fileId)}?${new Date().getTime()}`;
 }
 
 export function getFileDownloadUrl(fileId: string): string {
