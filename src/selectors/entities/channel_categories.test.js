@@ -605,7 +605,6 @@ describe('makeFilterAutoclosedDMs', () => {
         const filterAutoclosedDMs = Selectors.makeFilterAutoclosedDMs();
 
         const jeffWinger = {id: 'jeffWinger'};
-
         const dmChannel1 = {id: 'dmChannel1', type: General.DM_CHANNEL, name: `${currentUser.id}__${jeffWinger.id}`};
         const gmChannel1 = {id: 'gmChannel1', type: General.GM_CHANNEL};
 
@@ -613,6 +612,9 @@ describe('makeFilterAutoclosedDMs', () => {
             entities: {
                 channels: {
                     currentChannelId: dmChannel1.id,
+                    myMembers: {
+                        [gmChannel1.id]: {last_viewed_at: 1000},
+                    },
                 },
                 preferences: {
                     myPreferences: {
@@ -628,6 +630,9 @@ describe('makeFilterAutoclosedDMs', () => {
             entities: {
                 channels: {
                     currentChannelId: gmChannel1.id,
+                    myMembers: {
+                        [dmChannel1.id]: {last_viewed_at: 1000},
+                    },
                 },
                 preferences: {
                     myPreferences: {
