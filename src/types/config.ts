@@ -86,6 +86,7 @@ export type ClientConfig = {
     EnableSignUpWithGitLab: string;
     EnableSignUpWithGoogle: string;
     EnableSignUpWithOffice365: string;
+    EnableSignUpWithOpenId: string;
     EnableSVGs: string;
     EnableTesting: string;
     EnableThemeSelection: string;
@@ -138,6 +139,8 @@ export type ClientConfig = {
     MaxFileSize: string;
     MaxNotificationsPerChannel: string;
     MinimumHashtagLength: string;
+    OpenIdButtonText: string;
+    OpenIdButtonColor: string;
     PasswordMinimumLength: string;
     PasswordRequireLowercase: string;
     PasswordRequireNumber: string;
@@ -531,6 +534,9 @@ export type SSOSettings = {
     AuthEndpoint: string;
     TokenEndpoint: string;
     UserApiEndpoint: string;
+    DiscoveryEndpoint: string;
+    ButtonText: string;
+    ButtonColor: string;
 };
 
 export type Office365Settings = {
@@ -541,6 +547,7 @@ export type Office365Settings = {
     AuthEndpoint: string;
     TokenEndpoint: string;
     UserApiEndpoint: string;
+    DiscoveryEndpoint: string;
     DirectoryId: string;
 };
 
@@ -596,6 +603,7 @@ export type SamlSettings = {
     Enable: boolean;
     EnableSyncWithLdap: boolean;
     EnableSyncWithLdapIncludeAuth: boolean;
+    IgnoreGuestsLdapSync: boolean;
     Verify: boolean;
     Encrypt: boolean;
     SignRequest: boolean;
@@ -788,6 +796,7 @@ export type AdminConfig = {
     GitLabSettings: SSOSettings;
     GoogleSettings: SSOSettings;
     Office365Settings: Office365Settings;
+    OpenIdSettings: SSOSettings;
     LdapSettings: LdapSettings;
     ComplianceSettings: ComplianceSettings;
     LocalizationSettings: LocalizationSettings;
