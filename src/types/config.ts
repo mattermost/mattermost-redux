@@ -81,6 +81,7 @@ export type ClientConfig = {
     EnablePublicLink: string;
     EnableSaml: string;
     EnableSignInWithEmail: string;
+    EnableSignInWithMagicLink: string;
     EnableSignInWithUsername: string;
     EnableSignUpWithEmail: string;
     EnableSignUpWithGitLab: string;

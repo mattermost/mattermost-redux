@@ -93,7 +93,7 @@ export function login(loginId: string, password: string, mfaToken = '', ldapOnly
             return {error};
         }
 
-        return completeLogin(data)(dispatch, getState);
+        return dispatch(completeLogin(data));
     };
 }
 
@@ -117,7 +117,7 @@ export function loginById(id: string, password: string, mfaToken = ''): ActionFu
             return {error};
         }
 
-        return completeLogin(data)(dispatch, getState);
+        return dispatch(completeLogin(data));
     };
 }
 
@@ -1500,6 +1500,32 @@ export function checkForModifiedUsers() {
 
         await dispatch(getProfilesByIds(Object.keys(users), {since: lastDisconnectAt}));
         return {data: true};
+    };
+}
+
+export function sendMagicLinkEmail(loginId: string): ActionFunc {
+    return bindClientFunc({
+        clientFunc: Client4.sendMagicLinkEmail,
+        params: [
+            loginId,
+        ],
+    });
+}
+
+export function loginByMagicLink(token: string): ActionFunc {
+    return async (dispatch: DispatchFunc) => {
+        // TODO device ID?
+
+        let data;
+        try {
+            data = await Client4.loginByMagicLink(token);
+        } catch (error) {
+            dispatch(logError(error));
+
+            return {error};
+        }
+
+        return dispatch(completeLogin(data));
     };
 }
 

@@ -671,7 +671,7 @@ export default class Client4 {
 
     loginById = (id: string, password: string, token = '', deviceId = '') => {
         this.trackEvent('api', 'api_users_login');
-        const body: any = {
+        const body = {
             device_id: deviceId,
             id,
             password,
@@ -700,6 +700,24 @@ export default class Client4 {
 
         return response;
     };
+
+    sendMagicLinkEmail = (loginId: string) => {
+        this.trackEvent('api', 'api_users_send_magic_link');
+
+        return this.doFetch<StatusOK>(
+            `${this.getUsersRoute()}/login/magic_link/send`,
+            {method: 'post', body: JSON.stringify({login_id: loginId})},
+        );
+    };
+
+    loginByMagicLink = (token: string) => {
+        this.trackEvent('api', 'api_users_login_magic_link');
+
+        return this.doFetch<UserProfile>(
+            `${this.getUsersRoute()}/login/magic_link`,
+            {method: 'post', body: JSON.stringify({token})},
+        );
+    }
 
     getProfiles = (page = 0, perPage = PER_PAGE_DEFAULT, options = {}) => {
         this.trackEvent('api', 'api_profiles_get');
