@@ -11,7 +11,7 @@ function getKey(preference: PreferenceType) {
     return `${preference.category}--${preference.name}`;
 }
 
-function setAllPreferences(preferences: Array<PreferenceType>): any {
+function setAllPreferences(preferences: PreferenceType[]): any {
     const nextState: any = {};
 
     if (preferences) {

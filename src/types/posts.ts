@@ -43,11 +43,11 @@ export type PostImage = {
 };
 
 export type PostMetadata = {
-    embeds: Array<PostEmbed>;
-    emojis: Array<CustomEmoji>;
-    files: Array<FileInfo>;
+    embeds: PostEmbed[];
+    emojis: CustomEmoji[];
+    files: FileInfo[];
     images: Dictionary<PostImage>;
-    reactions: Array<Reaction>;
+    reactions: Reaction[];
 };
 
 export type Post = {
@@ -71,13 +71,13 @@ export type Post = {
     file_ids?: any[];
     metadata: PostMetadata;
     failed?: boolean;
-    user_activity_posts?: Array<Post>;
+    user_activity_posts?: Post[];
     state?: 'DELETED';
     filenames?: string[];
 };
 
 export type PostList = {
-    order: $ID<Post>[];
+    order: Array<$ID<Post>>;
     posts: Map<string, Post>;
     next_post_id: string;
     prev_post_id: string;
@@ -99,13 +99,13 @@ export type PostWithFormatData = Post & {
 };
 
 export type PostOrderBlock = {
-    order: Array<string>;
+    order: string[];
     recent?: boolean;
     oldest?: boolean;
 };
 
 export type MessageHistory = {
-    messages: Array<string>;
+    messages: string[];
     index: {
         post: number;
         comment: number;
@@ -115,11 +115,11 @@ export type MessageHistory = {
 export type PostsState = {
     posts: IDMappedObjects<Post>;
     postsReplies: {[x in $ID<Post>]: number};
-    postsInChannel: Dictionary<Array<PostOrderBlock>>;
+    postsInChannel: Dictionary<PostOrderBlock[]>;
     postsInThread: RelationOneToMany<Post, Post>;
     reactions: RelationOneToOne<Post, Dictionary<Reaction>>;
     openGraph: RelationOneToOne<Post, Dictionary<OpenGraphMetadata>>;
-    pendingPostIds: Array<string>;
+    pendingPostIds: string[];
     selectedPostId: string;
     currentFocusedPostId: string;
     messagesHistory: MessageHistory;

@@ -88,7 +88,7 @@ export function hasPostAllPublicRole(roles: string): boolean {
     return spaceSeparatedStringIncludes(roles, General.SYSTEM_POST_ALL_PUBLIC_ROLE);
 }
 
-export function profileListToMap(profileList: Array<UserProfile>): IDMappedObjects<UserProfile> {
+export function profileListToMap(profileList: UserProfile[]): IDMappedObjects<UserProfile> {
     const profiles: Dictionary<UserProfile> = {};
     for (let i = 0; i < profileList.length; i++) {
         profiles[profileList[i].id] = profileList[i];
@@ -96,7 +96,7 @@ export function profileListToMap(profileList: Array<UserProfile>): IDMappedObjec
     return profiles;
 }
 
-export function removeUserFromList(userId: $ID<UserProfile>, list: Array<UserProfile>): Array<UserProfile> {
+export function removeUserFromList(userId: $ID<UserProfile>, list: UserProfile[]): UserProfile[] {
     for (let i = list.length - 1; i >= 0; i--) {
         if (list[i].id === userId) {
             list.splice(i, 1);
@@ -113,7 +113,7 @@ export function removeUserFromList(userId: $ID<UserProfile>, list: Array<UserPro
 //
 // E.g.: for "one.two.three" by "." it would yield
 // ["one.two.three", ".two.three", "two.three", ".three", "three"]
-export function getSuggestionsSplitBy(term: string, splitStr: string): Array<string> {
+export function getSuggestionsSplitBy(term: string, splitStr: string): string[] {
     const splitTerm = term.split(splitStr);
     const initialSuggestions = splitTerm.map((st, i) => splitTerm.slice(i).join(splitStr));
     let suggestions: string[] = [];
@@ -133,7 +133,7 @@ export function getSuggestionsSplitBy(term: string, splitStr: string): Array<str
     return suggestions;
 }
 
-export function getSuggestionsSplitByMultiple(term: string, splitStrs: Array<string>): Array<string> {
+export function getSuggestionsSplitByMultiple(term: string, splitStrs: string[]): string[] {
     const suggestions = splitStrs.reduce((acc, val) => {
         getSuggestionsSplitBy(term, val).forEach((suggestion) => acc.add(suggestion));
         return acc;
@@ -162,7 +162,7 @@ export function nameSuggestionsForUser(user: UserProfile): string[] {
     return profileSuggestions;
 }
 
-export function filterProfilesStartingWithTerm(users: Array<UserProfile>, term: string): Array<UserProfile> {
+export function filterProfilesStartingWithTerm(users: UserProfile[], term: string): UserProfile[] {
     const lowercasedTerm = term.toLowerCase();
     let trimmedTerm = lowercasedTerm;
     if (trimmedTerm.startsWith('@')) {
@@ -179,7 +179,7 @@ export function filterProfilesStartingWithTerm(users: Array<UserProfile>, term: 
     });
 }
 
-export function filterProfilesMatchingWithTerm(users: Array<UserProfile>, term: string): Array<UserProfile> {
+export function filterProfilesMatchingWithTerm(users: UserProfile[], term: string): UserProfile[] {
     const lowercasedTerm = term.toLowerCase();
     let trimmedTerm = lowercasedTerm;
     if (trimmedTerm.startsWith('@')) {

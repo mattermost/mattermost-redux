@@ -13,7 +13,7 @@ import {IDMappedObjects} from 'types/utilities';
 
 import {displayUsername} from 'utils/user_utils';
 
-const getUsersTypingImpl = (profiles: IDMappedObjects<UserProfile>, teammateNameDisplay: string, channelId: string, parentPostId: string, typing: Typing): Array<string> => {
+const getUsersTypingImpl = (profiles: IDMappedObjects<UserProfile>, teammateNameDisplay: string, channelId: string, parentPostId: string, typing: Typing): string[] => {
     const id = channelId + parentPostId;
 
     if (typing[id]) {
@@ -29,7 +29,7 @@ const getUsersTypingImpl = (profiles: IDMappedObjects<UserProfile>, teammateName
     return [];
 };
 
-export function makeGetUsersTypingByChannelAndPost(): (state: GlobalState, props: {channelId: string; postId: string}) => Array<string> {
+export function makeGetUsersTypingByChannelAndPost(): (state: GlobalState, props: {channelId: string; postId: string}) => string[] {
     return createSelector(
         getUsers,
         getTeammateNameDisplaySetting,
@@ -40,7 +40,7 @@ export function makeGetUsersTypingByChannelAndPost(): (state: GlobalState, props
     );
 }
 
-export const getUsersTyping: (state: GlobalState) => Array<string> = createSelector(
+export const getUsersTyping: (state: GlobalState) => string[] = createSelector(
     getUsers,
     getTeammateNameDisplaySetting,
     getCurrentChannelId,

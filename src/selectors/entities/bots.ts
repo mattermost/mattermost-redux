@@ -7,7 +7,7 @@ import {GlobalState} from 'types/store';
 import {Dictionary} from 'types/utilities';
 import {getUsers} from 'selectors/entities/common';
 
-export const ExternalBotAccountNames: Array<string> = ['mattermost-advisor'];
+export const ExternalBotAccountNames: string[] = ['mattermost-advisor'];
 
 export function getBotAccounts(state: GlobalState) {
     return state.entities.bots.accounts;
