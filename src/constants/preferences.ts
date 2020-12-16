@@ -34,6 +34,7 @@ const Preferences: Dictionary<any> = {
     MENTION_KEYS: 'mention_keys',
     USE_MILITARY_TIME: 'use_military_time',
     CATEGORY_SIDEBAR_SETTINGS: 'sidebar_settings',
+    CHANNEL_SIDEBAR_ORGANIZATION: 'channel_sidebar_organization',
     CHANNEL_SIDEBAR_AUTOCLOSE_DMS: 'close_unused_direct_messages',
     AUTOCLOSE_DMS_ENABLED: 'after_seven_days',
     CATEGORY_ADVANCED_SETTINGS: 'advanced_settings',
