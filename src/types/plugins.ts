@@ -104,12 +104,33 @@ export type MarketplaceLabel = {
     color?: string;
 }
 
+export enum HostingType {
+    OnPrem = 'on-prem',
+    Cloud = 'cloud',
+}
+
+export enum AuthorType {
+    Mattermost = 'mattermost',
+    Partner = 'partner',
+    Community = 'community',
+}
+
+export enum ReleaseStage {
+    Production = 'production',
+    Beta = 'beta',
+    Experimental = 'experimental',
+}
+
 export type MarketplacePlugin = {
     homepage_url?: string;
     icon_data?: string;
     download_url?: string;
     release_notes_url?: string;
     labels?: MarketplaceLabel[];
+    hosting?: HostingType;
+    author_type: AuthorType;
+    release_stage: ReleaseStage;
+    enterprise: boolean;
     manifest: PluginManifest;
     installed_version?: string;
 }
