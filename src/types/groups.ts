@@ -72,8 +72,8 @@ export type GroupSyncable = {
 };
 
 export type GroupSyncablesState = {
-    teams: Array<GroupTeam>;
-    channels: Array<GroupChannel>;
+    teams: GroupTeam[];
+    channels: GroupChannel[];
 };
 
 export type GroupsState = {

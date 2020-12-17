@@ -14,7 +14,7 @@ import {PreferenceType} from 'types/preferences';
 import {bindClientFunc} from './helpers';
 import {getProfilesByIds, getProfilesInChannel} from './users';
 import {getChannelAndMyMember, getMyChannelMember} from './channels';
-export function deletePreferences(userId: string, preferences: Array<PreferenceType>): ActionFunc {
+export function deletePreferences(userId: string, preferences: PreferenceType[]): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         const state = getState();
         const myPreferences = getMyPreferencesSelector(state);
@@ -102,7 +102,7 @@ export function makeGroupMessageVisibleIfNecessary(channelId: string): ActionFun
     };
 }
 
-export function savePreferences(userId: string, preferences: Array<PreferenceType>) {
+export function savePreferences(userId: string, preferences: PreferenceType[]) {
     return async (dispatch: DispatchFunc) => {
         dispatch({
             type: PreferenceTypes.RECEIVED_PREFERENCES,
@@ -145,8 +145,8 @@ export function deleteTeamSpecificThemes(): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         const state = getState();
 
-        const getCategory: (state: any, preferenceId: string) => Array<PreferenceType> = makeGetCategory();
-        const themePreferences: Array<PreferenceType> = getCategory(state, Preferences.CATEGORY_THEME);
+        const getCategory: (state: any, preferenceId: string) => PreferenceType[] = makeGetCategory();
+        const themePreferences: PreferenceType[] = getCategory(state, Preferences.CATEGORY_THEME);
         const currentUserId = getCurrentUserId(state);
 
         const toDelete = themePreferences.filter((pref) => pref.name !== '');

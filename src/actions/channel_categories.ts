@@ -394,7 +394,7 @@ export function receivedCategoryOrder(teamId: string, order: string[]) {
     };
 }
 
-export function createCategory(teamId: string, displayName: string, channelIds: $ID<Channel>[] = []): ActionFunc {
+export function createCategory(teamId: string, displayName: string, channelIds: Array<$ID<Channel>> = []): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         const currentUserId = getCurrentUserId(getState());
 
