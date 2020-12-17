@@ -137,7 +137,7 @@ export type AppField = {
     readonly?: boolean;
 
     // Present (default) value of the field
-    value?: string;
+    value?: AppFormValue;
 
     description?: string;
 
@@ -149,7 +149,6 @@ export type AppField = {
 
     // Select props
     refresh?: boolean;
-    source_url?: string;
     options?: AppSelectOption[];
     multiselect?: boolean;
 
