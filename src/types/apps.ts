@@ -39,6 +39,7 @@ export type AppBinding = {
     // A Binding is either to a Call, or is a "container" for other locations -
     // i.e. menu sub-items or subcommands.
     call?: AppCall;
+    presentation?: string;
     bindings?: AppBinding[];
     form?: AppForm;
 };
@@ -52,7 +53,6 @@ export type AppCallType = string;
 export type AppCall = {
     url: string;
     type?: AppCallType;
-    presentation?: string;
     values?: AppCallValues;
     context: AppContext;
     raw_command?: string;
