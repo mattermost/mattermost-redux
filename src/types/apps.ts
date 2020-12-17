@@ -52,6 +52,7 @@ export type AppCallType = string;
 export type AppCall = {
     url: string;
     type?: AppCallType;
+    presentation?: string;
     values?: AppCallValues;
     context: AppContext;
     raw_command?: string;
@@ -111,6 +112,7 @@ export type AppForm = {
     cancel_button?: boolean;
     submit_on_cancel?: boolean;
     fields: AppField[];
+    call?: AppCall;
     depends_on?: string[];
 };
 
@@ -146,11 +148,10 @@ export type AppField = {
     modal_label?: string;
 
     // Select props
-    refresh_on_change_to?: string[];
+    refresh?: boolean;
     source_url?: string;
     options?: AppSelectOption[];
     multiselect?: boolean;
-    refresh_url?: string;
 
     // Text props
     subtype?: string;
