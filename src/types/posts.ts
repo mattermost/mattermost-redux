@@ -74,6 +74,7 @@ export type Post = {
     user_activity_posts?: Post[];
     state?: 'DELETED';
     filenames?: string[];
+    message_source?: string;
 };
 
 export type PostList = {
