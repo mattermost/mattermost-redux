@@ -188,3 +188,9 @@ export type AutocompleteDynamicSelect = AutocompleteElement & {
 export type AutocompleteUserSelect = AutocompleteElement & {}
 
 export type AutocompleteChannelSelect = AutocompleteElement & {}
+
+export type AppLookupCallValues = {
+    user_input: string;
+    values: AppFormValues;
+    name: string;
+}

@@ -4,6 +4,7 @@ import {AppsTypes} from 'action_types';
 import {Client4} from 'client';
 
 import {ActionFunc} from 'types/actions';
+import {AppFormValues, AppLookupCallValues} from 'types/apps';
 
 import {bindClientFunc} from './helpers';
 
@@ -12,4 +13,12 @@ export function fetchAppBindings(userID: string, channelID: string): ActionFunc 
         clientFunc: () => Client4.getAppsBindings(userID, channelID),
         onSuccess: AppsTypes.RECEIVED_APP_BINDINGS,
     });
+}
+
+export function makeLookupCallPayload(name: string, userInput: string, formValues: AppFormValues): AppLookupCallValues {
+    return {
+        name,
+        user_input: userInput,
+        values: formValues,
+    };
 }
