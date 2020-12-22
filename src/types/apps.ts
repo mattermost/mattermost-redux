@@ -39,10 +39,12 @@ export type AppBinding = {
     // A Binding is either to a Call, or is a "container" for other locations -
     // i.e. menu sub-items or subcommands.
     call?: AppCall;
-    presentation?: string;
+    presentation?: AppBindingPresentation;
     bindings?: AppBinding[];
     form?: AppForm;
 };
+
+export type AppBindingPresentation = string;
 
 export type AppCallValues = {
     [name: string]: any;

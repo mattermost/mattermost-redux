@@ -10,6 +10,10 @@ export const AppsBindings = {
     IN_POST: '/in_post',
 };
 
+export const AppBindingPresentations = {
+    MODAL: 'modal',
+};
+
 export const AppCallResponseTypes: { [name: string]: AppCallResponseType } = {
     OK: '',
     ERROR: 'error',
