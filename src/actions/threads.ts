@@ -32,7 +32,11 @@ export function getThreads(userId: string, teamId: string, {page = 0, perPage = 
 
         dispatch({
             type: ThreadTypes.RECEIVED_THREADS,
-            data: {...userThreadList, team_id: teamId},
+            data: {
+                ...userThreadList,
+                threads: userThreadList.threads.map((thread) => ({...thread, is_following: true})),
+                team_id: teamId,
+            },
         });
 
         return {data: userThreadList};

@@ -11,12 +11,20 @@ import {IDMappedObjects} from 'types/utilities';
 export const threadsReducer = (state: ThreadsState['threads'] = {}, action: GenericAction) => {
     switch (action.type) {
     case ThreadTypes.RECEIVED_THREADS: {
+        const {threads} = action.data;
         return {
             ...state,
-            ...action.data.threads.reduce((results: IDMappedObjects<UserThread>, thread: UserThread) => {
+            ...threads.reduce((results: IDMappedObjects<UserThread>, thread: UserThread) => {
                 results[thread.id] = thread;
                 return results;
             }, {}),
+        };
+    }
+    case ThreadTypes.FOLLOW_CHANGED_THREAD: {
+        const {id, following} = action.data;
+        return {
+            ...state,
+            [id]: {...state[id], is_following: following},
         };
     }
     case UserTypes.LOGOUT_SUCCESS:
