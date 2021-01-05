@@ -63,8 +63,8 @@ export type UserProfileWithLastViewAt = UserProfile & {
 export type UsersState = {
     currentUserId: string;
     isManualStatus: RelationOneToOne<UserProfile, boolean>;
-    mySessions: Array<Session>;
-    myAudits: Array<Audit>;
+    mySessions: Session[];
+    myAudits: Audit[];
     profiles: IDMappedObjects<UserProfile>;
     profilesInTeam: RelationOneToMany<Team, UserProfile>;
     profilesNotInTeam: RelationOneToMany<Team, UserProfile>;

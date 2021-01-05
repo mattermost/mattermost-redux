@@ -39,7 +39,7 @@ export function makeGetSchemeChannels() {
                 return [];
             }
 
-            const schemeChannels: Array<Channel> = [];
+            const schemeChannels: Channel[] = [];
 
             Object.entries(allChannels).forEach((item: [string, Channel]) => {
                 const [, channel] = item;
@@ -51,7 +51,7 @@ export function makeGetSchemeChannels() {
             return schemeChannels;
         }) as (b: GlobalState, a: {
         schemeId: string;
-    }) => Array<Channel>);
+    }) => Channel[]);
 }
 
 export function makeGetSchemeTeams() {
@@ -69,7 +69,7 @@ export function makeGetSchemeTeams() {
                 return [];
             }
 
-            const schemeTeams: Array<Team> = [];
+            const schemeTeams: Team[] = [];
 
             Object.entries(allTeams).forEach((item: [string, Team]) => {
                 const [, team] = item;
@@ -81,5 +81,5 @@ export function makeGetSchemeTeams() {
             return schemeTeams;
         }) as (b: GlobalState, a: {
         schemeId: string;
-    }) => Array<Team>);
+    }) => Team[]);
 }
