@@ -17,7 +17,7 @@ export type ConsoleAccess = {
 }
 
 export type AdminState = {
-    logs: Array<string>;
+    logs: string[];
     audits: Dictionary<Audit>;
     config: Partial<AdminConfig>;
     environmentConfig: Partial<EnvironmentConfig>;
