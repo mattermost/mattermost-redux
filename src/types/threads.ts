@@ -10,10 +10,11 @@ export type UserThread = {
     reply_count: number;
     last_reply_at: number;
     last_viewed_at: number;
-    participants: (UserProfile | $ID<UserProfile>)[];
+    participants: Array<{id: $ID<UserProfile>} | UserProfile>;
     post: Post;
     unread_replies: number;
     unread_mentions: number;
+    is_following?: boolean;
 }
 
 export type UserThreadList = {
@@ -26,7 +27,6 @@ export type UserThreadList = {
 export type ThreadsState = {
     threadsInTeam: RelationOneToMany<Team, UserThread>;
     threads: IDMappedObjects<UserThread>;
-    selectedThreadIdInTeam: RelationOneToOne<Team, string|null>;
     counts: RelationOneToOne<Team, {
         total: number;
         total_unread_replies: number;

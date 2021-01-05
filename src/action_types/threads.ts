@@ -3,7 +3,6 @@
 import keyMirror from 'utils/key_mirror';
 
 export default keyMirror({
-    CHANGED_SELECTED_THREAD: null,
     RECEIVED_THREAD: null,
     RECEIVED_THREADS: null,
     FOLLOW_CHANGED_THREAD: null,

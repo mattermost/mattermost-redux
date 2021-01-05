@@ -396,7 +396,7 @@ export default class Client4 {
     }
 
     getUserThreadsRoute(userID: string, teamID: string): string {
-        return `${this.getUserRoute(userID)}/${this.getTeamRoute(teamID)}/threads`;
+        return `${this.getUserRoute(userID)}/teams/${teamID}/threads`;
     }
 
     getUserThreadRoute(userId: string, teamId: string, threadId: string): string {
@@ -1914,9 +1914,19 @@ export default class Client4 {
         );
     };
 
-    getUserThreads = (userId: $ID<UserProfile> = 'me', teamId: $ID<Team>, page = 0, pageSize = PER_PAGE_DEFAULT, extended = false, deleted = false, since = 0) => {
+    getUserThreads = (
+        userId: $ID<UserProfile> = 'me',
+        teamId: $ID<Team>,
+        {
+            page = 0,
+            pageSize = PER_PAGE_DEFAULT,
+            extended = false,
+            deleted = false,
+            since = 0,
+        },
+    ) => {
         return this.doFetch<UserThreadList>(
-            `${this.getUserThreadsRoute(userId, teamId)}/${buildQueryString({page, pageSize, extended, deleted, since})}`,
+            `${this.getUserThreadsRoute(userId, teamId)}${buildQueryString({page, pageSize, extended, deleted, since})}`,
             {method: 'get'},
         );
     };

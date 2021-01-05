@@ -1,19 +1,24 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
 
-import {ThreadTypes} from 'action_types';
+import {ThreadTypes, PostTypes} from 'action_types';
 import {Client4} from 'client';
+
 import ThreadConstants from 'constants/threads';
+
 import {DispatchFunc, GetStateFunc} from 'types/actions';
+
+import {UserThreadList} from 'types/threads';
+
 import {logError} from './errors';
 import {forceLogoutIfNecessary} from './helpers';
 
 export function getThreads(userId: string, teamId: string, {page = 0, perPage = ThreadConstants.THREADS_CHUNK_SIZE} = {}) {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
-        let threads;
+        let userThreadList: undefined | UserThreadList;
 
         try {
-            threads = await Client4.getUserThreads(userId, teamId, page, perPage);
+            userThreadList = await Client4.getUserThreads(userId, teamId, {page, pageSize: perPage, extended: true});
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch, getState);
             dispatch(logError(error));
@@ -21,11 +26,16 @@ export function getThreads(userId: string, teamId: string, {page = 0, perPage = 
         }
 
         dispatch({
-            type: ThreadTypes.RECEIVED_THREADS,
-            data: {threads, team_id: teamId},
+            type: PostTypes.RECEIVED_POSTS,
+            data: {posts: userThreadList.threads.map(({post}) => post)},
         });
 
-        return {data: threads};
+        dispatch({
+            type: ThreadTypes.RECEIVED_THREADS,
+            data: {...userThreadList, team_id: teamId},
+        });
+
+        return {data: userThreadList};
     };
 }
 
@@ -70,18 +80,6 @@ export function updateThreadRead(userId: string, teamId: string, threadId: strin
         });
 
         return {};
-    };
-}
-
-export function setSelectedThreadId(userId: string, teamId: string, threadId: string|undefined) {
-    return async (dispatch: DispatchFunc) => {
-        dispatch({
-            type: ThreadTypes.CHANGED_SELECTED_THREAD,
-            data: {
-                id: threadId,
-                team_id: teamId,
-            },
-        });
     };
 }
 
