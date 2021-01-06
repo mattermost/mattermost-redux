@@ -9,7 +9,7 @@ import {DispatchFunc, GetStateFunc, ActionFunc} from 'types/actions';
 import {Role} from 'types/roles';
 
 import {bindClientFunc} from './helpers';
-export function getRolesByNames(rolesNames: Array<string>) {
+export function getRolesByNames(rolesNames: string[]) {
     return bindClientFunc({
         clientFunc: Client4.getRolesByNames,
         onRequest: RoleTypes.ROLES_BY_NAMES_REQUEST,
@@ -58,7 +58,7 @@ export function editRole(role: Role) {
     });
 }
 
-export function setPendingRoles(roles: Array<string>) {
+export function setPendingRoles(roles: string[]) {
     return async (dispatch: DispatchFunc) => {
         dispatch({type: RoleTypes.SET_PENDING_ROLES, data: roles});
         return {data: roles};

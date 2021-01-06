@@ -100,7 +100,7 @@ export function byId(state: IDMappedObjects<ChannelCategory> = {}, action: Gener
     }
 }
 
-export function orderByTeam(state: RelationOneToOne<Team, $ID<ChannelCategory>[]> = {}, action: GenericAction) {
+export function orderByTeam(state: RelationOneToOne<Team, Array<$ID<ChannelCategory>>> = {}, action: GenericAction) {
     switch (action.type) {
     case ChannelCategoryTypes.RECEIVED_CATEGORY_ORDER: {
         const teamId: string = action.data.teamId;

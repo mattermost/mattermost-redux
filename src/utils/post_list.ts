@@ -368,7 +368,7 @@ function extractUserActivityData(userActivities: any) {
     };
 }
 
-export function combineUserActivitySystemPost(systemPosts: Array<types.posts.Post> = []) {
+export function combineUserActivitySystemPost(systemPosts: types.posts.Post[] = []) {
     if (systemPosts.length === 0) {
         return null;
     }
