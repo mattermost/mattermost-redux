@@ -12,7 +12,7 @@ export function getThreadsInTeam(state: GlobalState): RelationOneToMany<Team, Us
     return state.entities.threads.threadsInTeam;
 }
 
-export const getThreadsInCurrentTeam: (state: GlobalState) => $ID<UserThread>[] = createSelector(
+export const getThreadsInCurrentTeam: (state: GlobalState) => Array<$ID<UserThread>> = createSelector(
     getCurrentTeamId,
     getThreadsInTeam,
     (
@@ -53,7 +53,7 @@ export function getThread(state: GlobalState, threadId: $ID<UserThread> | undefi
     return getThreads(state)[threadId];
 }
 
-export const getThreadOrderInCurrentTeam: (state: GlobalState) => $ID<UserThread>[] = createSelector(
+export const getThreadOrderInCurrentTeam: (state: GlobalState) => Array<$ID<UserThread>> = createSelector(
     getThreadsInCurrentTeam,
     getThreads,
     (
@@ -65,7 +65,7 @@ export const getThreadOrderInCurrentTeam: (state: GlobalState) => $ID<UserThread
     },
 );
 
-export const getUnreadThreadOrderInCurrentTeam: (state: GlobalState) => $ID<UserThread>[] = createSelector(
+export const getUnreadThreadOrderInCurrentTeam: (state: GlobalState) => Array<$ID<UserThread>> = createSelector(
     getThreadsInCurrentTeam,
     getThreads,
     (
@@ -81,7 +81,7 @@ export const getUnreadThreadOrderInCurrentTeam: (state: GlobalState) => $ID<User
     },
 );
 
-function sortByLastReply(ids: $ID<UserThread>[], threads: ReturnType<typeof getThreads>) {
+function sortByLastReply(ids: Array<$ID<UserThread>>, threads: ReturnType<typeof getThreads>) {
     return ids.sort((a, b) => threads[b].last_reply_at - threads[a].last_reply_at);
 }
 
