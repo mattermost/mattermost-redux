@@ -79,7 +79,7 @@ export function getFavoritesPreferences(state: GlobalState) {
     return favorites.filter((f) => f.value === 'true').map((f) => f.name);
 }
 
-export const getVisibleTeammate: (state: GlobalState) => $ID<UserProfile>[] = createSelector(
+export const getVisibleTeammate: (state: GlobalState) => Array<$ID<UserProfile>> = createSelector(
     getDirectShowPreferences,
     (direct) => {
         return direct.filter((dm) => dm.value === 'true' && dm.name).map((dm) => dm.name);

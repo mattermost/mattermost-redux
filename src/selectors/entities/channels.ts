@@ -116,13 +116,13 @@ function sortChannelsByRecencyOrAlpha(locale: string, lastPosts: RelationOneToOn
 //     c. Remaining unread channels
 //   And then secondary by alphabetical ("alpha") or chronological ("recency") order
 export const mapAndSortChannelIds = (
-    channels: Array<Channel>,
+    channels: Channel[],
     currentUser: UserProfile,
     myMembers: RelationOneToOne<Channel, ChannelMembership>,
     lastPosts: RelationOneToOne<Channel, Post>,
     sorting: SortingType,
     sortMentionsFirst = false,
-): Array<string> => {
+): string[] => {
     const locale = currentUser.locale || General.DEFAULT_LOCALE;
 
     const mutedChannelIds = channels.
@@ -152,13 +152,13 @@ export const mapAndSortChannelIds = (
 };
 
 export function filterChannels(
-    unreadIds: Array<string>,
-    favoriteIds: Array<string>,
-    channelIds: Array<string>,
+    unreadIds: string[],
+    favoriteIds: string[],
+    channelIds: string[],
     unreadsAtTop: boolean,
     favoritesAtTop: boolean,
-): Array<string> {
-    let channels: Array<string> = channelIds;
+): string[] {
+    let channels: string[] = channelIds;
 
     if (unreadsAtTop) {
         channels = channels.filter((id) => {
@@ -306,15 +306,15 @@ export function getChannelByName(state: GlobalState, channelName: string): Chann
     return getChannelByNameHelper(getAllChannels(state), channelName);
 }
 
-export const getChannelSetInCurrentTeam: (state: GlobalState) => Array<string> = createSelector(
+export const getChannelSetInCurrentTeam: (state: GlobalState) => string[] = createSelector(
     getCurrentTeamId,
     getChannelsInTeam,
-    (currentTeamId: string, channelsInTeam: RelationOneToMany<Team, Channel>): Array<string> => {
+    (currentTeamId: string, channelsInTeam: RelationOneToMany<Team, Channel>): string[] => {
         return (channelsInTeam && channelsInTeam[currentTeamId]) || [];
     },
 );
 
-function sortAndInjectChannels(channels: IDMappedObjects<Channel>, channelSet: Array<string>, locale: string): Array<Channel> {
+function sortAndInjectChannels(channels: IDMappedObjects<Channel>, channelSet: string[], locale: string): Channel[] {
     const currentChannels: Channel[] = [];
 
     if (typeof channelSet === 'undefined') {
@@ -328,11 +328,11 @@ function sortAndInjectChannels(channels: IDMappedObjects<Channel>, channelSet: A
     return currentChannels.sort(sortChannelsByDisplayName.bind(null, locale));
 }
 
-export const getChannelsInCurrentTeam: (state: GlobalState) => Array<Channel> = createSelector(
+export const getChannelsInCurrentTeam: (state: GlobalState) => Channel[] = createSelector(
     getAllChannels,
     getChannelSetInCurrentTeam,
     getCurrentUser,
-    (channels: IDMappedObjects<Channel>, currentTeamChannelSet: Array<string>, currentUser: UserProfile): Array<Channel> => {
+    (channels: IDMappedObjects<Channel>, currentTeamChannelSet: string[], currentUser: UserProfile): Channel[] => {
         let locale = General.DEFAULT_LOCALE;
 
         if (currentUser && currentUser.locale) {
@@ -361,7 +361,7 @@ export const getChannelsNameMapInTeam: (state: GlobalState, teamId: string) => N
 export const getChannelsNameMapInCurrentTeam: (state: GlobalState) => NameMappedObjects<Channel> = createSelector(
     getAllChannels,
     getChannelSetInCurrentTeam,
-    (channels: IDMappedObjects<Channel>, currentTeamChannelSet: Array<string>): NameMappedObjects<Channel> => {
+    (channels: IDMappedObjects<Channel>, currentTeamChannelSet: string[]): NameMappedObjects<Channel> => {
         const channelMap: NameMappedObjects<Channel> = {};
         currentTeamChannelSet.forEach((id) => {
             const channel = channels[id];
@@ -372,12 +372,12 @@ export const getChannelsNameMapInCurrentTeam: (state: GlobalState) => NameMapped
 );
 
 // Returns both DMs and GMs
-export const getAllDirectChannels: (state: GlobalState) => Array<Channel> = createSelector(
+export const getAllDirectChannels: (state: GlobalState) => Channel[] = createSelector(
     getAllChannels,
     getDirectChannelsSet,
     (state: GlobalState): UsersState => state.entities.users,
     getTeammateNameDisplaySetting,
-    (channels: IDMappedObjects<Channel>, channelSet: Set<string>, users: UsersState, teammateNameDisplay: string): Array<Channel> => {
+    (channels: IDMappedObjects<Channel>, channelSet: Set<string>, users: UsersState, teammateNameDisplay: string): Channel[] => {
         const dmChannels: Channel[] = [];
         channelSet.forEach((c) => {
             dmChannels.push(completeDirectChannelInfo(users, teammateNameDisplay, channels[c]));
@@ -402,12 +402,12 @@ export const getAllDirectChannelsNameMapInCurrentTeam: (state: GlobalState) => N
 );
 
 // Returns only GMs
-export const getGroupChannels: (state: GlobalState) => Array<Channel> = createSelector(
+export const getGroupChannels: (state: GlobalState) => Channel[] = createSelector(
     getAllChannels,
     getDirectChannelsSet,
     (state: GlobalState): UsersState => state.entities.users,
     getTeammateNameDisplaySetting,
-    (channels: IDMappedObjects<Channel>, channelSet: Set<string>, users: UsersState, teammateNameDisplay: string): Array<Channel> => {
+    (channels: IDMappedObjects<Channel>, channelSet: Set<string>, users: UsersState, teammateNameDisplay: string): Channel[] => {
         const gmChannels: Channel[] = [];
         channelSet.forEach((id) => {
             const channel = channels[id];
@@ -420,20 +420,20 @@ export const getGroupChannels: (state: GlobalState) => Array<Channel> = createSe
     },
 );
 
-export const getMyChannels: (state: GlobalState) => Array<Channel> = createSelector(
+export const getMyChannels: (state: GlobalState) => Channel[] = createSelector(
     getChannelsInCurrentTeam,
     getAllDirectChannels,
     getMyChannelMemberships,
-    (channels: Array<Channel>, directChannels: Array<Channel>, myMembers: RelationOneToOne<Channel, ChannelMembership>): Array<Channel> => {
+    (channels: Channel[], directChannels: Channel[], myMembers: RelationOneToOne<Channel, ChannelMembership>): Channel[] => {
         return [...channels, ...directChannels].filter((c) => myMembers.hasOwnProperty(c.id));
     },
 );
 
-export const getOtherChannels: (state: GlobalState, archived?: boolean | null) => Array<Channel> = createSelector(
+export const getOtherChannels: (state: GlobalState, archived?: boolean | null) => Channel[] = createSelector(
     getChannelsInCurrentTeam,
     getMyChannelMemberships,
     (state: GlobalState, archived: boolean | undefined | null = true) => archived,
-    (channels: Array<Channel>, myMembers: RelationOneToOne<Channel, ChannelMembership>, archived?: boolean | null): Array<Channel> => {
+    (channels: Channel[], myMembers: RelationOneToOne<Channel, ChannelMembership>, archived?: boolean | null): Channel[] => {
         return channels.filter((c) => !myMembers.hasOwnProperty(c.id) && c.type === General.OPEN_CHANNEL && (archived ? true : c.delete_at === 0));
     },
 );
@@ -465,7 +465,7 @@ export const getUnreads: (state: GlobalState) => {
     getCurrentTeamId,
     getMyTeams,
     getTeamMemberships,
-    (channels: IDMappedObjects<Channel>, myMembers: RelationOneToOne<Channel, ChannelMembership>, users: IDMappedObjects<UserProfile>, currentUserId: string, currentTeamId: string, myTeams: Array<Team>, myTeamMemberships: RelationOneToOne<Team, TeamMembership>): {
+    (channels: IDMappedObjects<Channel>, myMembers: RelationOneToOne<Channel, ChannelMembership>, users: IDMappedObjects<UserProfile>, currentUserId: string, currentTeamId: string, myTeams: Team[], myTeamMemberships: RelationOneToOne<Team, TeamMembership>): {
         messageCount: number;
         mentionCount: number;
     } => {
@@ -534,7 +534,7 @@ export const getUnreads: (state: GlobalState) => {
 export const getUnreadsInCurrentTeam: (a: GlobalState) => {
     messageCount: number;
     mentionCount: number;
-} = createSelector(getCurrentChannelId, getMyChannels, getMyChannelMemberships, getUsers, getCurrentUserId, (currentChannelId: string, channels: Array<Channel>, myMembers: RelationOneToOne<Channel, ChannelMembership>, users: IDMappedObjects<UserProfile>, currentUserId: string): {
+} = createSelector(getCurrentChannelId, getMyChannels, getMyChannelMemberships, getUsers, getCurrentUserId, (currentChannelId: string, channels: Channel[], myMembers: RelationOneToOne<Channel, ChannelMembership>, users: IDMappedObjects<UserProfile>, currentUserId: string): {
     messageCount: number;
     mentionCount: number;
 } => {
@@ -660,22 +660,22 @@ export const canManageAnyChannelMembersInCurrentTeam: (state: GlobalState) => bo
     },
 );
 
-export const getAllDirectChannelIds: (state: GlobalState) => Array<string> = createIdsSelector(
+export const getAllDirectChannelIds: (state: GlobalState) => string[] = createIdsSelector(
     getDirectChannelsSet,
-    (directIds: Set<string>): Array<string> => {
+    (directIds: Set<string>): string[] => {
         return Array.from(directIds);
     },
 );
 
-export const getChannelIdsInCurrentTeam: (state: GlobalState) => Array<string> = createIdsSelector(
+export const getChannelIdsInCurrentTeam: (state: GlobalState) => string[] = createIdsSelector(
     getCurrentTeamId,
     getChannelsInTeam,
-    (currentTeamId: string, channelsInTeam: RelationOneToMany<Team, Channel>): Array<string> => {
+    (currentTeamId: string, channelsInTeam: RelationOneToMany<Team, Channel>): string[] => {
         return Array.from(channelsInTeam[currentTeamId] || []);
     },
 );
 
-export const getChannelIdsForCurrentTeam: (state: GlobalState) => Array<string> = createIdsSelector(
+export const getChannelIdsForCurrentTeam: (state: GlobalState) => string[] = createIdsSelector(
     getChannelIdsInCurrentTeam,
     getAllDirectChannelIds,
     (channels, direct) => {
@@ -683,12 +683,12 @@ export const getChannelIdsForCurrentTeam: (state: GlobalState) => Array<string> 
     },
 );
 
-export const getUnreadChannelIds: (state: GlobalState, lastUnreadChannel?: Channel | null) => Array<string> = createIdsSelector(
+export const getUnreadChannelIds: (state: GlobalState, lastUnreadChannel?: Channel | null) => string[] = createIdsSelector(
     getAllChannels,
     getMyChannelMemberships,
     getChannelIdsForCurrentTeam,
     (state: GlobalState, lastUnreadChannel: Channel | undefined | null = null): Channel | undefined | null => lastUnreadChannel,
-    (channels: IDMappedObjects<Channel>, members: RelationOneToOne<Channel, ChannelMembership>, teamChannelIds: Array<string>, lastUnreadChannel?: Channel | null): Array<string> => {
+    (channels: IDMappedObjects<Channel>, members: RelationOneToOne<Channel, ChannelMembership>, teamChannelIds: string[], lastUnreadChannel?: Channel | null): string[] => {
         const unreadIds = teamChannelIds.filter((id) => {
             const c = channels[id];
             const m = members[id];
@@ -713,7 +713,7 @@ export const getUnreadChannelIds: (state: GlobalState, lastUnreadChannel?: Chann
     },
 );
 
-export const getUnreadChannels: (state: GlobalState, lastUnreadChannel?: Channel | null) => Array<Channel> = createIdsSelector(
+export const getUnreadChannels: (state: GlobalState, lastUnreadChannel?: Channel | null) => Channel[] = createIdsSelector(
     getCurrentUser,
     getUsers,
     getUserIdsInChannels,
@@ -740,7 +740,7 @@ export const getUnreadChannels: (state: GlobalState, lastUnreadChannel?: Channel
     },
 );
 
-export const getMapAndSortedUnreadChannelIds: (state: GlobalState, lastUnreadChannel: Channel, sorting: SortingType) => Array<string> = createIdsSelector(
+export const getMapAndSortedUnreadChannelIds: (state: GlobalState, lastUnreadChannel: Channel, sorting: SortingType) => string[] = createIdsSelector(
     getUnreadChannels,
     getCurrentUser,
     getMyChannelMemberships,
@@ -751,7 +751,7 @@ export const getMapAndSortedUnreadChannelIds: (state: GlobalState, lastUnreadCha
     },
 );
 
-export const getSortedUnreadChannelIds: (state: GlobalState, lastUnreadChannel: Channel|null, unreadsAtTop: boolean, favoritesAtTop: boolean, sorting: SortingType) => Array<string> = createIdsSelector(
+export const getSortedUnreadChannelIds: (state: GlobalState, lastUnreadChannel: Channel|null, unreadsAtTop: boolean, favoritesAtTop: boolean, sorting: SortingType) => string[] = createIdsSelector(
     getUnreadChannelIds,
     (state: GlobalState, lastUnreadChannel: Channel, unreadsAtTop: boolean, favoritesAtTop: boolean, sorting: SortingType = 'alpha') => {
         return getMapAndSortedUnreadChannelIds(state, lastUnreadChannel, sorting);
@@ -761,7 +761,7 @@ export const getSortedUnreadChannelIds: (state: GlobalState, lastUnreadChannel: 
 
 //recent channels
 
-export const getAllRecentChannels: (state: GlobalState) => Array<Channel> = createSelector(
+export const getAllRecentChannels: (state: GlobalState) => Channel[] = createSelector(
     getUsers,
     getCurrentUser,
     getAllChannels,
@@ -773,9 +773,9 @@ export const getAllRecentChannels: (state: GlobalState) => Array<Channel> = crea
     (profiles, currentUser: UserProfile, channels: IDMappedObjects<Channel>, userIdsInChannels: any,
         lastPosts: RelationOneToOne<Channel, Post>,
         members: RelationOneToOne<Channel, ChannelMembership>,
-        teamChannelIds: Array<string>,
+        teamChannelIds: string[],
         settings,
-    ): Array<Channel> => {
+    ): Channel[] => {
         const sorting = 'recent';
         const recentIds = teamChannelIds.filter((id) => {
             const c = channels[id];
@@ -807,7 +807,7 @@ export const getAllRecentChannels: (state: GlobalState) => Array<Channel> = crea
 
 // Favorites
 
-export const getFavoriteChannels: (state: GlobalState) => Array<Channel> = createIdsSelector(
+export const getFavoriteChannels: (state: GlobalState) => Channel[] = createIdsSelector(
     getCurrentUser,
     getUsers,
     getUserIdsInChannels,
@@ -825,15 +825,15 @@ export const getFavoriteChannels: (state: GlobalState) => Array<Channel> = creat
         userIdsInChannels: any,
         channels: IDMappedObjects<Channel>,
         myMembers: RelationOneToOne<Channel, ChannelMembership>,
-        favoriteIds: Array<string>,
-        teamChannelIds: Array<string>,
+        favoriteIds: string[],
+        teamChannelIds: string[],
         settings: string,
         config: ClientConfig,
         prefs: {
             [x: string]: PreferenceType;
         },
         currentChannelId: string,
-    ): Array<Channel> => {
+    ): Channel[] => {
         if (!currentUser) {
             return [];
         }
@@ -877,7 +877,7 @@ export const getFavoriteChannels: (state: GlobalState) => Array<Channel> = creat
     },
 );
 
-export const getFavoriteChannelIds: (state: GlobalState, lastUnreadChannel: Channel, unreadsAtTop: boolean, favoritesAtTop: boolean, sorting: SortingType) => Array<string> = createIdsSelector(
+export const getFavoriteChannelIds: (state: GlobalState, lastUnreadChannel: Channel, unreadsAtTop: boolean, favoritesAtTop: boolean, sorting: SortingType) => string[] = createIdsSelector(
     getFavoriteChannels,
     getCurrentUser,
     getMyChannelMemberships,
@@ -886,7 +886,7 @@ export const getFavoriteChannelIds: (state: GlobalState, lastUnreadChannel: Chan
     mapAndSortChannelIds,
 );
 
-export const getSortedFavoriteChannelIds: (state: GlobalState, lastUnreadChannel: Channel | null, favoritesAtTop: boolean, unreadsAtTop: boolean, sorting: SortingType) => Array<string> = createIdsSelector(
+export const getSortedFavoriteChannelIds: (state: GlobalState, lastUnreadChannel: Channel | null, favoritesAtTop: boolean, unreadsAtTop: boolean, sorting: SortingType) => string[] = createIdsSelector(
     getUnreadChannelIds,
     getFavoritesPreferences,
     (state: GlobalState, lastUnreadChannel: Channel, unreadsAtTop: boolean, favoritesAtTop: boolean, sorting: SortingType) => getFavoriteChannelIds(state, lastUnreadChannel, unreadsAtTop, favoritesAtTop, sorting),
@@ -897,7 +897,7 @@ export const getSortedFavoriteChannelIds: (state: GlobalState, lastUnreadChannel
 );
 
 // Public Channels
-export const getPublicChannels: (state: GlobalState) => Array<Channel> = createSelector(
+export const getPublicChannels: (state: GlobalState) => Channel[] = createSelector(
     getCurrentUser,
     getAllChannels,
     getMyChannelMemberships,
@@ -919,7 +919,7 @@ export const getPublicChannels: (state: GlobalState) => Array<Channel> = createS
     },
 );
 
-export const getPublicChannelIds: (state: GlobalState, lastUnreadChannel: Channel, unreadsAtTop: boolean, favoritesAtTop: boolean, sorting: SortingType) => Array<string> = createIdsSelector(
+export const getPublicChannelIds: (state: GlobalState, lastUnreadChannel: Channel, unreadsAtTop: boolean, favoritesAtTop: boolean, sorting: SortingType) => string[] = createIdsSelector(
     getPublicChannels,
     getCurrentUser,
     getMyChannelMemberships,
@@ -928,7 +928,7 @@ export const getPublicChannelIds: (state: GlobalState, lastUnreadChannel: Channe
     mapAndSortChannelIds,
 );
 
-export const getSortedPublicChannelIds: (state: GlobalState, lastUnreadChannel: Channel | null, unreadsAtTop: boolean, favoritesAtTop: boolean, sorting: SortingType) => Array<string> = createIdsSelector(
+export const getSortedPublicChannelIds: (state: GlobalState, lastUnreadChannel: Channel | null, unreadsAtTop: boolean, favoritesAtTop: boolean, sorting: SortingType) => string[] = createIdsSelector(
     getUnreadChannelIds,
     getFavoritesPreferences,
     (state: GlobalState, lastUnreadChannel: Channel, unreadsAtTop: boolean, favoritesAtTop: boolean, sorting: SortingType = 'alpha') => getPublicChannelIds(state, lastUnreadChannel, unreadsAtTop, favoritesAtTop, sorting),
@@ -939,7 +939,7 @@ export const getSortedPublicChannelIds: (state: GlobalState, lastUnreadChannel: 
 
 // Private Channels
 
-export const getPrivateChannels: (a: GlobalState) => Array<Channel> = createSelector(
+export const getPrivateChannels: (a: GlobalState) => Channel[] = createSelector(
     getCurrentUser,
     getAllChannels,
     getMyChannelMemberships,
@@ -962,7 +962,7 @@ export const getPrivateChannels: (a: GlobalState) => Array<Channel> = createSele
     },
 );
 
-export const getPrivateChannelIds: (state: GlobalState, lastUnreadChannel: Channel, unreadsAtTop: boolean, favoritesAtTop: boolean, sorting: SortingType) => Array<string> = createIdsSelector(
+export const getPrivateChannelIds: (state: GlobalState, lastUnreadChannel: Channel, unreadsAtTop: boolean, favoritesAtTop: boolean, sorting: SortingType) => string[] = createIdsSelector(
     getPrivateChannels,
     getCurrentUser,
     getMyChannelMemberships,
@@ -971,7 +971,7 @@ export const getPrivateChannelIds: (state: GlobalState, lastUnreadChannel: Chann
     mapAndSortChannelIds,
 );
 
-export const getSortedPrivateChannelIds: (state: GlobalState, lastUnreadChannel: Channel | null, unreadsAtTop: boolean, favoritesAtTop: boolean, sorting: SortingType) => Array<string> = createIdsSelector(
+export const getSortedPrivateChannelIds: (state: GlobalState, lastUnreadChannel: Channel | null, unreadsAtTop: boolean, favoritesAtTop: boolean, sorting: SortingType) => string[] = createIdsSelector(
     getUnreadChannelIds,
     getFavoritesPreferences,
     (state: GlobalState, lastUnreadChannel: Channel, unreadsAtTop: boolean, favoritesAtTop: boolean, sorting: SortingType = 'alpha') => getPrivateChannelIds(state, lastUnreadChannel, unreadsAtTop, favoritesAtTop, sorting),
@@ -982,7 +982,7 @@ export const getSortedPrivateChannelIds: (state: GlobalState, lastUnreadChannel:
 
 // Direct Messages
 
-export const getDirectChannels: (state: GlobalState) => Array<Channel> = createSelector(
+export const getDirectChannels: (state: GlobalState) => Channel[] = createSelector(
     getCurrentUser,
     getUsers,
     getUserIdsInChannels,
@@ -999,8 +999,8 @@ export const getDirectChannels: (state: GlobalState) => Array<Channel> = createS
         profiles: IDMappedObjects<UserProfile>,
         userIdsInChannels: any,
         channels: IDMappedObjects<Channel>,
-        teammates: Array<string>,
-        groupIds: Array<string>,
+        teammates: string[],
+        groupIds: string[],
         settings,
         config,
         preferences: {
@@ -1008,7 +1008,7 @@ export const getDirectChannels: (state: GlobalState) => Array<Channel> = createS
         },
         lastPosts: RelationOneToOne<Channel, Post>,
         currentChannelId: string,
-    ): Array<Channel> => {
+    ): Channel[] => {
         if (!currentUser) {
             return [];
         }
@@ -1054,13 +1054,13 @@ export const getDirectChannels: (state: GlobalState) => Array<Channel> = createS
 // but suppresses manually closed group channels but not manually closed direct channels.) This
 // method does away with all the suppression, since the webapp client downstream uses this for
 // the channel switcher and puts such suppressed channels in a separate category.
-export const getDirectAndGroupChannels: (a: GlobalState) => Array<Channel> = createSelector(
+export const getDirectAndGroupChannels: (a: GlobalState) => Channel[] = createSelector(
     getCurrentUser,
     getUsers,
     getUserIdsInChannels,
     getAllChannels,
     getTeammateNameDisplaySetting,
-    (currentUser: UserProfile, profiles: IDMappedObjects<UserProfile>, userIdsInChannels: any, channels: IDMappedObjects<Channel>, settings): Array<Channel> => {
+    (currentUser: UserProfile, profiles: IDMappedObjects<UserProfile>, userIdsInChannels: any, channels: IDMappedObjects<Channel>, settings): Channel[] => {
         if (!currentUser) {
             return [];
         }
@@ -1073,7 +1073,7 @@ export const getDirectAndGroupChannels: (a: GlobalState) => Array<Channel> = cre
     },
 );
 
-export const getDirectChannelIds: (state: GlobalState, lastUnreadChannel: Channel, unreadsAtTop: boolean, favoritesAtTop: boolean, sorting: SortingType) => Array<string> = createIdsSelector(
+export const getDirectChannelIds: (state: GlobalState, lastUnreadChannel: Channel, unreadsAtTop: boolean, favoritesAtTop: boolean, sorting: SortingType) => string[] = createIdsSelector(
     getDirectChannels,
     getCurrentUser,
     getMyChannelMemberships,
@@ -1095,7 +1095,7 @@ export const getSortedDirectChannelIds: (state: GlobalState, lastUnreadChannel: 
     },
 );
 
-const getProfiles = (currentUserId: string, usersIdsInChannel: Array<string>, users: IDMappedObjects<UserProfile>): Array<UserProfile> => {
+const getProfiles = (currentUserId: string, usersIdsInChannel: string[], users: IDMappedObjects<UserProfile>): UserProfile[] => {
     const profiles: UserProfile[] = [];
     usersIdsInChannel.forEach((userId) => {
         if (userId !== currentUserId) {
@@ -1106,15 +1106,15 @@ const getProfiles = (currentUserId: string, usersIdsInChannel: Array<string>, us
 };
 
 export const getChannelsWithUserProfiles: (state: GlobalState) => Array<{
-    profiles: Array<UserProfile>;
+    profiles: UserProfile[];
 } & Channel> = createSelector(
     getUserIdsInChannels,
     getUsers,
     getGroupChannels,
     getCurrentUserId,
-    (channelUserMap: RelationOneToMany<Channel, UserProfile>, users: IDMappedObjects<UserProfile>, channels: Array<Channel>, currentUserId: string) => {
+    (channelUserMap: RelationOneToMany<Channel, UserProfile>, users: IDMappedObjects<UserProfile>, channels: Channel[], currentUserId: string) => {
         return channels.map((channel: Channel): {
-            profiles: Array<UserProfile>;
+            profiles: UserProfile[];
         } & Channel => {
             const profiles = getProfiles(currentUserId, channelUserMap[channel.id] || [], users);
             return {
@@ -1135,7 +1135,7 @@ const getAllActiveChannels = createSelector(
     },
 );
 
-export const getAllChannelIds: (state: GlobalState, lastUnreadChannel: Channel, unreadsAtTop: boolean, favoritesAtTop: boolean, sorting: SortingType) => Array<string> = createIdsSelector(
+export const getAllChannelIds: (state: GlobalState, lastUnreadChannel: Channel, unreadsAtTop: boolean, favoritesAtTop: boolean, sorting: SortingType) => string[] = createIdsSelector(
     getAllActiveChannels,
     getCurrentUser,
     getMyChannelMemberships,
@@ -1144,7 +1144,7 @@ export const getAllChannelIds: (state: GlobalState, lastUnreadChannel: Channel, 
     mapAndSortChannelIds,
 );
 
-export const getAllSortedChannelIds: (state: GlobalState, lastUnreadChannel: Channel | null, unreadsAtTop: boolean, favoritesAtTop: boolean, sorting: SortingType) => Array<string> = createIdsSelector(
+export const getAllSortedChannelIds: (state: GlobalState, lastUnreadChannel: Channel | null, unreadsAtTop: boolean, favoritesAtTop: boolean, sorting: SortingType) => string[] = createIdsSelector(
     getUnreadChannelIds,
     getFavoritesPreferences,
     (state: GlobalState, lastUnreadChannel: Channel, unreadsAtTop: boolean, favoritesAtTop: boolean, sorting: SortingType = 'alpha') => getAllChannelIds(state, lastUnreadChannel, unreadsAtTop, favoritesAtTop, sorting),
@@ -1254,7 +1254,7 @@ export const getMyFirstChannelForTeams: (state: GlobalState) => RelationOneToOne
     getMyChannelMemberships,
     getMyTeams,
     getCurrentUser,
-    (allChannels: IDMappedObjects<Channel>, myChannelMemberships: RelationOneToOne<Channel, ChannelMembership>, myTeams: Array<Team>, currentUser: UserProfile): RelationOneToOne<Team, Channel> => {
+    (allChannels: IDMappedObjects<Channel>, myChannelMemberships: RelationOneToOne<Channel, ChannelMembership>, myTeams: Team[], currentUser: UserProfile): RelationOneToOne<Team, Channel> => {
         const locale = currentUser.locale || General.DEFAULT_LOCALE;
         const result: RelationOneToOne<Team, Channel> = {};
 
@@ -1299,7 +1299,7 @@ export function isManuallyUnread(state: GlobalState, channelId?: string): boolea
     return Boolean(state.entities.channels.manuallyUnread[channelId]);
 }
 
-export function getChannelModerations(state: GlobalState, channelId: string): Array<ChannelModeration> {
+export function getChannelModerations(state: GlobalState, channelId: string): ChannelModeration[] {
     return state.entities.channels.channelModerations[channelId];
 }
 

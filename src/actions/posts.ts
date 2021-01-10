@@ -871,14 +871,14 @@ export function getPostsAround(channelId: string, postId: string, perPage = Post
 
 // getThreadsForPosts is intended for an array of posts that have been batched
 // (see the actions/websocket_actions/handleNewPostEvents function in the webapp)
-export function getThreadsForPosts(posts: Array<Post>, fetchThreads = true) {
+export function getThreadsForPosts(posts: Post[], fetchThreads = true) {
     return (dispatch: DispatchFunc, getState: GetStateFunc) => {
         if (!Array.isArray(posts) || !posts.length) {
             return {data: true};
         }
 
         const state = getState();
-        const promises: Promise<ActionResult>[] = [];
+        const promises: Array<Promise<ActionResult>> = [];
 
         posts.forEach((post) => {
             if (!post.root_id) {
@@ -896,7 +896,7 @@ export function getThreadsForPosts(posts: Array<Post>, fetchThreads = true) {
 }
 
 // Note that getProfilesAndStatusesForPosts can take either an array of posts or a map of ids to posts
-export function getProfilesAndStatusesForPosts(postsArrayOrMap: Array<Post>|Map<string, Post>, dispatch: DispatchFunc, getState: GetStateFunc) {
+export function getProfilesAndStatusesForPosts(postsArrayOrMap: Post[]|Map<string, Post>, dispatch: DispatchFunc, getState: GetStateFunc) {
     if (!postsArrayOrMap) {
         // Some API methods return {error} for no results
         return Promise.resolve();
@@ -957,7 +957,7 @@ export function getProfilesAndStatusesForPosts(postsArrayOrMap: Array<Post>|Map<
     return Promise.all(promises);
 }
 
-export function getNeededAtMentionedUsernames(state: GlobalState, posts: Array<Post>): Set<string> {
+export function getNeededAtMentionedUsernames(state: GlobalState, posts: Post[]): Set<string> {
     let usersByUsername: Dictionary<UserProfile>; // Populate this lazily since it's relatively expensive
 
     const usernamesToLoad = new Set<string>();
@@ -995,7 +995,7 @@ export function getNeededAtMentionedUsernames(state: GlobalState, posts: Array<P
     return usernamesToLoad;
 }
 
-function buildPostAttachmentText(attachments: Array<any>) {
+function buildPostAttachmentText(attachments: any[]) {
     let attachmentText = '';
 
     attachments.forEach((a) => {
@@ -1017,7 +1017,7 @@ function buildPostAttachmentText(attachments: Array<any>) {
     return attachmentText;
 }
 
-export function getNeededCustomEmojis(state: GlobalState, posts: Array<Post>): Set<string> {
+export function getNeededCustomEmojis(state: GlobalState, posts: Post[]): Set<string> {
     if (getConfig(state).EnableCustomEmoji !== 'true') {
         return new Set<string>();
     }

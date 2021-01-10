@@ -21,7 +21,7 @@ export type FileInfo = {
 };
 export type FilesState = {
     files: Dictionary<FileInfo>;
-    fileIdsByPostId: Dictionary<Array<string>>;
+    fileIdsByPostId: Dictionary<string[]>;
     filePublicLink?: string;
 };
 

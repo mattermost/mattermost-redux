@@ -205,7 +205,7 @@ function channels(state: IDMappedObjects<Channel> = {}, action: GenericAction) {
 
     case ChannelTypes.RECEIVED_MY_CHANNELS_WITH_MEMBERS: { // Used by the mobile app
         const nextState = {...state};
-        const myChannels: Array<Channel> = action.data.channels;
+        const myChannels: Channel[] = action.data.channels;
         let hasNewValues = false;
 
         if (myChannels && myChannels.length) {

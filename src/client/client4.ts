@@ -564,7 +564,7 @@ export default class Client4 {
     getKnownUsers = () => {
         this.trackEvent('api', 'api_get_known_users');
 
-        return this.doFetch<$ID<UserProfile>[]>(
+        return this.doFetch<Array<$ID<UserProfile>>>(
             `${this.getUsersRoute()}/known`,
             {method: 'get'},
         );
@@ -1683,7 +1683,7 @@ export default class Client4 {
         );
     };
 
-    patchChannelModerations = (channelId: string, channelModerationsPatch: Array<ChannelModerationPatch>) => {
+    patchChannelModerations = (channelId: string, channelModerationsPatch: ChannelModerationPatch[]) => {
         return this.doFetch<ChannelModeration[]>(
             `${this.getChannelRoute(channelId)}/moderations/patch`,
             {method: 'put', body: JSON.stringify(channelModerationsPatch)},
