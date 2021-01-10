@@ -6,17 +6,25 @@ import {combineReducers} from 'redux';
 import {GenericAction} from 'types/actions';
 import {Team} from 'types/teams';
 import {ThreadsState, UserThread} from 'types/threads';
-import {IDMappedObjects, RelationOneToMany} from 'types/utilities';
+import {IDMappedObjects} from 'types/utilities';
 
-export const threadsReducer = (state: IDMappedObjects<UserThread> = {}, action: GenericAction) => {
+export const threadsReducer = (state: ThreadsState['threads'] = {}, action: GenericAction) => {
     switch (action.type) {
     case ThreadTypes.RECEIVED_THREADS: {
+        const {threads} = action.data;
         return {
             ...state,
-            ...action.data.threads.reduce((results: IDMappedObjects<UserThread>, thread: UserThread) => {
+            ...threads.reduce((results: IDMappedObjects<UserThread>, thread: UserThread) => {
                 results[thread.id] = thread;
                 return results;
             }, {}),
+        };
+    }
+    case ThreadTypes.FOLLOW_CHANGED_THREAD: {
+        const {id, following} = action.data;
+        return {
+            ...state,
+            [id]: {...state[id], is_following: following},
         };
     }
     case UserTypes.LOGOUT_SUCCESS:
@@ -25,7 +33,7 @@ export const threadsReducer = (state: IDMappedObjects<UserThread> = {}, action: 
     return state;
 };
 
-export const threadsInTeamReducer = (state: RelationOneToMany<Team, UserThread> = {}, action: GenericAction) => {
+export const threadsInTeamReducer = (state: ThreadsState['threadsInTeam'] = {}, action: GenericAction) => {
     switch (action.type) {
     case ThreadTypes.RECEIVED_THREADS: {
         const nextSet = new Set(state[action.data.team_id]);
@@ -56,14 +64,6 @@ export const threadsInTeamReducer = (state: RelationOneToMany<Team, UserThread> 
     }
     return state;
 };
-
-export const selectedThreadIdInTeamReducer = (state: string | null = null, action: GenericAction) => {
-    if (action.type === ThreadTypes.CHANGED_SELECTED_THREAD) {
-        return action.data;
-    }
-    return state;
-};
-
 export const countsReducer = (state: ThreadsState['counts'] = {}, action: GenericAction) => {
     switch (action.type) {
     case ThreadTypes.RECEIVED_THREADS: {
@@ -72,7 +72,7 @@ export const countsReducer = (state: ThreadsState['counts'] = {}, action: Generi
             [action.data.team_id]: {
                 total: action.data.total,
                 total_unread_replies: action.data.total_unread_replies,
-                total_unread_mentions: action.data.total,
+                total_unread_mentions: action.data.total_unread_mentions,
             },
         };
     }
@@ -102,6 +102,5 @@ export const countsReducer = (state: ThreadsState['counts'] = {}, action: Generi
 export default combineReducers({
     threads: threadsReducer,
     threadsInTeam: threadsInTeamReducer,
-    selectedThreadIdInTeam: selectedThreadIdInTeamReducer,
     counts: countsReducer,
 });

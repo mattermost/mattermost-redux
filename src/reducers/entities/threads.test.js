@@ -11,7 +11,6 @@ describe('threads', () => {
             const state = deepFreeze({
                 threadsInTeam: {},
                 threads: {},
-                selectedThreadIdInTeam: {},
                 counts: {},
             });
 

@@ -2,9 +2,8 @@
 // See LICENSE.txt for license information.
 
 import {Theme} from 'types/preferences';
-import {Dictionary} from 'types/utilities';
 
-const Preferences: Dictionary<any> = {
+const Preferences = {
     CATEGORY_CHANNEL_OPEN_TIME: 'channel_open_time',
     CATEGORY_CHANNEL_APPROXIMATE_VIEW_TIME: 'channel_approximate_view_time',
     CATEGORY_DIRECT_CHANNEL_SHOW: 'direct_channel_show',
