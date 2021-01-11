@@ -583,22 +583,29 @@ describe('makeFilterAutoclosedDMs', () => {
         },
     };
 
-    test('Should show an unread channel even if its above the specified limit count', () => {
+    test('Should always show an unread channel', () => {
         const filterAutoclosedDMs = Selectors.makeFilterAutoclosedDMs();
 
         const gmChannel1 = {id: 'gmChannel1', type: General.GM_CHANNEL, total_msg_count: 5};
+        const gmChannel2 = {id: 'gmChannel2', type: General.GM_CHANNEL};
 
         const state = mergeObjects(baseState, {
             entities: {
                 channels: {
                     myMembers: {
                         gmChannel1: {msg_count: 1, notify_props: {mark_unread: MarkUnread.ALL}},
+                        gmChannel2: {msg_count: 0, notify_props: {mark_unread: MarkUnread.ALL}},
+                    },
+                },
+                preferences: {
+                    myPreferences: {
+                        [getPreferenceKey(Preferences.CATEGORY_SIDEBAR_SETTINGS, Preferences.LIMIT_VISIBLE_DMS_GMS)]: {value: '1'},
                     },
                 },
             },
         });
 
-        expect(filterAutoclosedDMs(state, [gmChannel1], CategoryTypes.DIRECT_MESSAGES)).toEqual([gmChannel1]);
+        expect(filterAutoclosedDMs(state, [gmChannel1, gmChannel2], CategoryTypes.DIRECT_MESSAGES)).toEqual([gmChannel1]);
     });
 
     test('Should always show the current channel', () => {
