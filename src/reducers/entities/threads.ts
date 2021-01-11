@@ -24,7 +24,7 @@ export const threadsReducer = (state: ThreadsState['threads'] = {}, action: Gene
         const {id, following} = action.data;
         return {
             ...state,
-            [id]: {...state[id], is_following: following},
+            [id]: {...(state[id] || {}), is_following: following},
         };
     }
     case UserTypes.LOGOUT_SUCCESS:

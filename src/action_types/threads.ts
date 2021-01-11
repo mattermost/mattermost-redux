@@ -7,5 +7,5 @@ export default keyMirror({
     RECEIVED_THREADS: null,
     FOLLOW_CHANGED_THREAD: null,
     READ_CHANGED_THREAD: null,
-    THREADS_READ: null,
+    ALL_TEAM_THREADS_READ: null,
 });

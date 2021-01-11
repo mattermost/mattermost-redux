@@ -43,7 +43,7 @@ export function getThreads(userId: string, teamId: string, {page = 0, perPage = 
     };
 }
 
-export function markThreadsRead(userId: string, teamId: string) {
+export function markAllThreadsInTeamRead(userId: string, teamId: string) {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         try {
             await Client4.updateThreadsReadForUser(userId, teamId);
@@ -54,7 +54,7 @@ export function markThreadsRead(userId: string, teamId: string) {
         }
 
         dispatch({
-            type: ThreadTypes.THREADS_READ,
+            type: ThreadTypes.ALL_TEAM_THREADS_READ,
             data: {
                 team_id: teamId,
             },
