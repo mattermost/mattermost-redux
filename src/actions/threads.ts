@@ -89,14 +89,6 @@ export function updateThreadRead(userId: string, teamId: string, threadId: strin
 
 export function setThreadFollow(userId: string, teamId: string, threadId: string, newState: boolean) {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
-        try {
-            await Client4.updateThreadFollowForUser(userId, teamId, threadId, newState);
-        } catch (error) {
-            forceLogoutIfNecessary(error, dispatch, getState);
-            dispatch(logError(error));
-            return {error};
-        }
-
         dispatch({
             type: ThreadTypes.FOLLOW_CHANGED_THREAD,
             data: {
@@ -106,6 +98,13 @@ export function setThreadFollow(userId: string, teamId: string, threadId: string
             },
         });
 
+        try {
+            await Client4.updateThreadFollowForUser(userId, teamId, threadId, newState);
+        } catch (error) {
+            forceLogoutIfNecessary(error, dispatch, getState);
+            dispatch(logError(error));
+            return {error};
+        }
         return {};
     };
 }
