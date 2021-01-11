@@ -231,11 +231,7 @@ export function makeFilterAutoclosedDMs(): (state: GlobalState, channels: Channe
 
                     const lastViewedAt = myMembers[channel.id]?.last_viewed_at;
 
-                    if (!teammate) {
-                        return false;
-                    }
-
-                    if (teammate.delete_at > lastViewedAt && !isUnreadChannel(myMembers, channel)) {
+                    if (!teammate || teammate.delete_at > lastViewedAt) {
                         return false;
                     }
                 }
