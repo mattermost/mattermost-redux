@@ -204,15 +204,11 @@ export function makeFilterAutoclosedDMs(): (state: GlobalState, channels: Channe
                 return channels;
             }
 
-            let unreadCount = 0;
+            let lastUnreadPosition = 0;
 
-            const filtered = channels.filter((channel) => {
-                if (channel.type !== General.DM_CHANNEL && channel.type !== General.GM_CHANNEL) {
-                    return true;
-                }
-
+            const filtered = channels.filter((channel, index) => {
                 if (isUnreadChannel(myMembers, channel)) {
-                    unreadCount++;
+                    lastUnreadPosition = index;
 
                     // Unread DMs/GMs are always visible
                     return true;
@@ -240,14 +236,7 @@ export function makeFilterAutoclosedDMs(): (state: GlobalState, channels: Channe
             });
 
             // The limit of DMs user specifies to be rendered in the sidebar
-            let remaining;
-
-            if (limitPref < unreadCount) {
-                remaining = unreadCount;
-            } else {
-                remaining = limitPref;
-            }
-
+            const remaining = Math.max(limitPref, lastUnreadPosition);
             const currentChannel = filtered.find((channel) => channel.id === currentChannelId);
             const slicedChannels = filtered.slice(0, remaining);
             if (currentChannel && !slicedChannels.includes(currentChannel)) {
