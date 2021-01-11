@@ -198,17 +198,54 @@ export function makeFilterAutoclosedDMs(): (state: GlobalState, channels: Channe
         getCurrentUserId,
         getMyChannelMemberships,
         (state: GlobalState) => getInt(state, Preferences.CATEGORY_SIDEBAR_SETTINGS, Preferences.LIMIT_VISIBLE_DMS_GMS),
-        (channels, categoryType, currentChannelId, profiles, currentUserId, myMembers, limitPref) => {
+        (originalChannels, categoryType, currentChannelId, profiles, currentUserId, myMembers, limitPref) => {
             if (categoryType !== CategoryTypes.DIRECT_MESSAGES) {
                 // Only autoclose DMs that haven't been assigned to a category
-                return channels;
+                return originalChannels;
             }
 
-            let lastUnreadPosition = 0;
+            const channels = originalChannels.slice();
 
-            const filtered = channels.filter((channel, index) => {
+            function sortByLastViewedAt(channelA: Channel, channelB: Channel) {
+                const channelALastViewedAt = myMembers[channelA.id]?.last_viewed_at || 0;
+                const channelBLastViewedAt = myMembers[channelB.id]?.last_viewed_at || 0;
+
+                if (channelBLastViewedAt === channelALastViewedAt) {
+                    return 0;
+                }
+
+                if (channelALastViewedAt === 0) {
+                    return -1;
+                }
+
+                if (channelBLastViewedAt === 0) {
+                    return 1;
+                }
+
+                return Math.sign(channelBLastViewedAt - channelALastViewedAt);
+            }
+
+            channels.sort((channelA, channelB) => {
+                if (isUnreadChannel(myMembers, channelA)) {
+                    if (isUnreadChannel(myMembers, channelB)) {
+                        return sortByLastViewedAt(channelA, channelB);
+                    }
+
+                    return -1;
+                }
+
+                if (isUnreadChannel(myMembers, channelB)) {
+                    return 1;
+                }
+
+                return sortByLastViewedAt(channelA, channelB);
+            });
+
+            let unreadCount = 0;
+
+            const filtered = channels.filter((channel) => {
                 if (isUnreadChannel(myMembers, channel)) {
-                    lastUnreadPosition = index;
+                    unreadCount++;
 
                     // Unread DMs/GMs are always visible
                     return true;
@@ -236,13 +273,9 @@ export function makeFilterAutoclosedDMs(): (state: GlobalState, channels: Channe
             });
 
             // The limit of DMs user specifies to be rendered in the sidebar
-            const remaining = Math.max(limitPref, lastUnreadPosition);
-            const currentChannel = filtered.find((channel) => channel.id === currentChannelId);
-            const slicedChannels = filtered.slice(0, remaining);
-            if (currentChannel && !slicedChannels.includes(currentChannel)) {
-                slicedChannels.push(currentChannel);
-            }
+            const remaining = Math.max(limitPref, unreadCount);
 
+            const slicedChannels = filtered.slice(0, remaining);
             return slicedChannels.length === channels.length ? channels : slicedChannels;
         },
     );
