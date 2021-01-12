@@ -222,7 +222,7 @@ export function makeFilterAutoclosedDMs(): (state: GlobalState, channels: Channe
                     return 1;
                 }
 
-                return channelBLastViewedAt - channelALastViewedAt;
+                return Math.sign(channelBLastViewedAt - channelALastViewedAt);
             }
 
             channels.sort((channelA, channelB) => {
