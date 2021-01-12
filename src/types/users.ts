@@ -98,7 +98,8 @@ export type UserStatus = {
 	status: string;
 	manual: boolean;
 	last_activity_at: number;
-	active_channel?: string;
+    active_channel?: string;
+    dnd_end_time: string;
 };
 
 export type UserCustomStatus = {
