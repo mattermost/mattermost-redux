@@ -17,7 +17,7 @@ export type ConsoleAccess = {
 }
 
 export type AdminState = {
-    logs: Array<string>;
+    logs: string[];
     audits: Dictionary<Audit>;
     config: Partial<AdminConfig>;
     environmentConfig: Partial<EnvironmentConfig>;
@@ -29,7 +29,7 @@ export type AdminState = {
     samlCertStatus?: SamlCertificateStatus;
     analytics?: Dictionary<number | AnalyticsRow[]>;
     teamAnalytics?: RelationOneToOne<Team, Dictionary<number | AnalyticsRow[]>>;
-    userAccessTokensForUser?: RelationOneToOne<UserProfile, Dictionary<UserAccessToken>>;
+    userAccessTokensByUser?: RelationOneToOne<UserProfile, Dictionary<UserAccessToken>>;
     plugins?: Dictionary<PluginRedux>;
     pluginStatuses?: Dictionary<PluginStatusRedux>;
     samlMetadataResponse?: SamlMetadataResponse;

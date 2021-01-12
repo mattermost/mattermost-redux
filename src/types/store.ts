@@ -59,7 +59,7 @@ export type GlobalState = {
         apps: AppsState;
         cloud: CloudState;
     };
-    errors: Array<any>;
+    errors: any[];
     requests: {
         channels: ChannelsRequestsStatuses;
         general: GeneralRequestsStatuses;

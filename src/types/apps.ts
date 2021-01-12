@@ -166,11 +166,11 @@ export type AutocompleteSuggestionWithComplete = AutocompleteSuggestion & {
 
 export type AutocompleteElement = AppField;
 export type AutocompleteStaticSelect = AutocompleteElement & {
-    options: {
+    options: Array<{
         label: string;
         value: string;
         hint?: string;
-    }[];
+    }>;
 };
 
 export type AutocompleteDynamicSelect = AutocompleteElement & {

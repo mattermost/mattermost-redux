@@ -6,7 +6,8 @@ import assert from 'assert';
 import {Preferences, General} from '../constants';
 import {
     displayUsername,
-    filterProfilesMatchingTerm,
+    filterProfilesStartingWithTerm,
+    filterProfilesMatchingWithTerm,
     getSuggestionsSplitBy,
     getSuggestionsSplitByMultiple,
     includesAnAdminRole,
@@ -60,7 +61,7 @@ describe('user utils', () => {
         });
     });
 
-    describe('filterProfilesMatchingTerm', () => {
+    describe('filterProfilesStartingWithTerm', () => {
         const userA = {
             id: 100,
             username: 'testUser.split_10-',
@@ -79,72 +80,154 @@ describe('user utils', () => {
         const users = [userA, userB];
 
         it('should match all for empty filter', () => {
-            assert.deepEqual(filterProfilesMatchingTerm(users, ''), [userA, userB]);
+            assert.deepEqual(filterProfilesStartingWithTerm(users, ''), [userA, userB]);
         });
 
         it('should filter out results which do not match', () => {
-            assert.deepEqual(filterProfilesMatchingTerm(users, 'testBad'), []);
+            assert.deepEqual(filterProfilesStartingWithTerm(users, 'testBad'), []);
         });
 
         it('should match by username', () => {
-            assert.deepEqual(filterProfilesMatchingTerm(users, 'testUser'), [userA]);
+            assert.deepEqual(filterProfilesStartingWithTerm(users, 'testUser'), [userA]);
         });
 
         it('should match by split part of the username', () => {
-            assert.deepEqual(filterProfilesMatchingTerm(users, 'split'), [userA, userB]);
-            assert.deepEqual(filterProfilesMatchingTerm(users, '10'), [userA]);
+            assert.deepEqual(filterProfilesStartingWithTerm(users, 'split'), [userA, userB]);
+            assert.deepEqual(filterProfilesStartingWithTerm(users, '10'), [userA]);
         });
 
         it('should match by firstname', () => {
-            assert.deepEqual(filterProfilesMatchingTerm(users, 'First'), [userA, userB]);
+            assert.deepEqual(filterProfilesStartingWithTerm(users, 'First'), [userA, userB]);
         });
 
         it('should match by lastname prefix', () => {
-            assert.deepEqual(filterProfilesMatchingTerm(users, 'Last'), [userA, userB]);
+            assert.deepEqual(filterProfilesStartingWithTerm(users, 'Last'), [userA, userB]);
         });
 
         it('should match by lastname fully', () => {
-            assert.deepEqual(filterProfilesMatchingTerm(users, 'Last2'), [userB]);
+            assert.deepEqual(filterProfilesStartingWithTerm(users, 'Last2'), [userB]);
         });
 
         it('should match by fullname prefix', () => {
-            assert.deepEqual(filterProfilesMatchingTerm(users, 'First Last'), [userA, userB]);
+            assert.deepEqual(filterProfilesStartingWithTerm(users, 'First Last'), [userA, userB]);
         });
 
         it('should match by fullname fully', () => {
-            assert.deepEqual(filterProfilesMatchingTerm(users, 'First Last1'), [userA]);
+            assert.deepEqual(filterProfilesStartingWithTerm(users, 'First Last1'), [userA]);
         });
 
         it('should match by fullname case-insensitive', () => {
-            assert.deepEqual(filterProfilesMatchingTerm(users, 'first LAST'), [userA, userB]);
+            assert.deepEqual(filterProfilesStartingWithTerm(users, 'first LAST'), [userA, userB]);
         });
 
         it('should match by nickname', () => {
-            assert.deepEqual(filterProfilesMatchingTerm(users, 'some'), [userB]);
+            assert.deepEqual(filterProfilesStartingWithTerm(users, 'some'), [userB]);
         });
 
         it('should not match by nickname substring', () => {
-            assert.deepEqual(filterProfilesMatchingTerm(users, 'body'), []);
+            assert.deepEqual(filterProfilesStartingWithTerm(users, 'body'), []);
         });
 
         it('should match by email prefix', () => {
-            assert.deepEqual(filterProfilesMatchingTerm(users, 'left'), [userB]);
+            assert.deepEqual(filterProfilesStartingWithTerm(users, 'left'), [userB]);
         });
 
         it('should match by email domain', () => {
-            assert.deepEqual(filterProfilesMatchingTerm(users, 'right'), [userB]);
+            assert.deepEqual(filterProfilesStartingWithTerm(users, 'right'), [userB]);
         });
 
         it('should match by full email', () => {
-            assert.deepEqual(filterProfilesMatchingTerm(users, 'left@right.com'), [userB]);
+            assert.deepEqual(filterProfilesStartingWithTerm(users, 'left@right.com'), [userB]);
         });
 
         it('should ignore leading @ for username', () => {
-            assert.deepEqual(filterProfilesMatchingTerm(users, '@testUser'), [userA]);
+            assert.deepEqual(filterProfilesStartingWithTerm(users, '@testUser'), [userA]);
         });
 
         it('should ignore leading @ for firstname', () => {
-            assert.deepEqual(filterProfilesMatchingTerm(users, '@first'), [userA, userB]);
+            assert.deepEqual(filterProfilesStartingWithTerm(users, '@first'), [userA, userB]);
+        });
+    });
+
+    describe('filterProfilesMatchingWithTerm', () => {
+        const userA = {
+            id: 100,
+            username: 'testUser.split_10-',
+            nickname: 'nick',
+            first_name: 'First',
+            last_name: 'Last1',
+        };
+        const userB = {
+            id: 101,
+            username: 'extraPerson-split',
+            nickname: 'somebody',
+            first_name: 'First',
+            last_name: 'Last2',
+            email: 'left@right.com',
+        };
+        const users = [userA, userB];
+
+        it('should match all for empty filter', () => {
+            assert.deepEqual(filterProfilesMatchingWithTerm(users, ''), [userA, userB]);
+        });
+
+        it('should filter out results which do not match', () => {
+            assert.deepEqual(filterProfilesMatchingWithTerm(users, 'testBad'), []);
+        });
+
+        it('should match by username', () => {
+            assert.deepEqual(filterProfilesMatchingWithTerm(users, 'estUser'), [userA]);
+        });
+
+        it('should match by split part of the username', () => {
+            assert.deepEqual(filterProfilesMatchingWithTerm(users, 'split'), [userA, userB]);
+            assert.deepEqual(filterProfilesMatchingWithTerm(users, '10'), [userA]);
+        });
+
+        it('should match by firstname substring', () => {
+            assert.deepEqual(filterProfilesMatchingWithTerm(users, 'rst'), [userA, userB]);
+        });
+
+        it('should match by lastname substring', () => {
+            assert.deepEqual(filterProfilesMatchingWithTerm(users, 'as'), [userA, userB]);
+            assert.deepEqual(filterProfilesMatchingWithTerm(users, 'st2'), [userB]);
+        });
+
+        it('should match by fullname substring', () => {
+            assert.deepEqual(filterProfilesMatchingWithTerm(users, 'rst Last'), [userA, userB]);
+        });
+
+        it('should match by fullname fully', () => {
+            assert.deepEqual(filterProfilesMatchingWithTerm(users, 'First Last1'), [userA]);
+        });
+
+        it('should match by fullname case-insensitive', () => {
+            assert.deepEqual(filterProfilesMatchingWithTerm(users, 'first LAST'), [userA, userB]);
+        });
+
+        it('should match by nickname substring', () => {
+            assert.deepEqual(filterProfilesMatchingWithTerm(users, 'ome'), [userB]);
+            assert.deepEqual(filterProfilesMatchingWithTerm(users, 'body'), [userB]);
+        });
+
+        it('should match by email prefix', () => {
+            assert.deepEqual(filterProfilesMatchingWithTerm(users, 'left'), [userB]);
+        });
+
+        it('should match by email domain', () => {
+            assert.deepEqual(filterProfilesMatchingWithTerm(users, 'right'), [userB]);
+        });
+
+        it('should match by full email', () => {
+            assert.deepEqual(filterProfilesMatchingWithTerm(users, 'left@right.com'), [userB]);
+        });
+
+        it('should ignore leading @ for username', () => {
+            assert.deepEqual(filterProfilesMatchingWithTerm(users, '@testUser'), [userA]);
+        });
+
+        it('should ignore leading @ for firstname', () => {
+            assert.deepEqual(filterProfilesMatchingWithTerm(users, '@first'), [userA, userB]);
         });
     });
 
@@ -174,36 +257,49 @@ describe('user utils', () => {
 
         it('Non admin user with non admin membership', () => {
             const nonAdminMembership = {...TestHelper.fakeTeamMember(nonAdminUser.id, team.id), scheme_admin: false, scheme_user: true};
-            assert.equal(applyRolesFilters(nonAdminUser, [General.SYSTEM_USER_ROLE], nonAdminMembership), true);
-            assert.equal(applyRolesFilters(nonAdminUser, [General.TEAM_USER_ROLE], nonAdminMembership), true);
-            assert.equal(applyRolesFilters(nonAdminUser, [General.CHANNEL_USER_ROLE], nonAdminMembership), true);
-            assert.equal(applyRolesFilters(nonAdminUser, [General.SYSTEM_ADMIN_ROLE, General.TEAM_ADMIN_ROLE, General.CHANNEL_ADMIN_ROLE], nonAdminMembership), false);
+            assert.equal(applyRolesFilters(nonAdminUser, [General.SYSTEM_USER_ROLE], [], nonAdminMembership), true);
+            assert.equal(applyRolesFilters(nonAdminUser, [General.TEAM_USER_ROLE], [], nonAdminMembership), true);
+            assert.equal(applyRolesFilters(nonAdminUser, [General.CHANNEL_USER_ROLE], [], nonAdminMembership), true);
+            assert.equal(applyRolesFilters(nonAdminUser, [General.SYSTEM_ADMIN_ROLE, General.TEAM_ADMIN_ROLE, General.CHANNEL_ADMIN_ROLE], [], nonAdminMembership), false);
+            assert.equal(applyRolesFilters(nonAdminUser, [], [General.SYSTEM_ADMIN_ROLE], nonAdminMembership), true);
+            assert.equal(applyRolesFilters(nonAdminUser, [], [General.SYSTEM_USER_ROLE], nonAdminMembership), false);
+            assert.equal(applyRolesFilters(nonAdminUser, [], [General.TEAM_USER_ROLE], nonAdminMembership), false);
+            assert.equal(applyRolesFilters(nonAdminUser, [], [General.CHANNEL_USER_ROLE], nonAdminMembership), false);
+            assert.equal(applyRolesFilters(nonAdminUser, [General.TEAM_USER_ROLE], [General.SYSTEM_ADMIN_ROLE], nonAdminMembership), true);
+            assert.equal(applyRolesFilters(nonAdminUser, [General.TEAM_ADMIN_ROLE], [General.SYSTEM_ADMIN_ROLE], nonAdminMembership), false);
+            assert.equal(applyRolesFilters(nonAdminUser, [General.TEAM_USER_ROLE], [General.SYSTEM_USER_ROLE], nonAdminMembership), false);
         });
 
         it('Non admin user with admin membership', () => {
             const adminMembership = {...TestHelper.fakeTeamMember(nonAdminUser.id, team.id), scheme_admin: true, scheme_user: true};
-            assert.equal(applyRolesFilters(nonAdminUser, [General.SYSTEM_USER_ROLE], adminMembership), true);
-            assert.equal(applyRolesFilters(nonAdminUser, [General.TEAM_ADMIN_ROLE], adminMembership), true);
-            assert.equal(applyRolesFilters(nonAdminUser, [General.CHANNEL_ADMIN_ROLE], adminMembership), true);
-            assert.equal(applyRolesFilters(nonAdminUser, [General.SYSTEM_ADMIN_ROLE, General.TEAM_USER_ROLE, General.CHANNEL_USER_ROLE], adminMembership), false);
+            assert.equal(applyRolesFilters(nonAdminUser, [General.SYSTEM_USER_ROLE], [], adminMembership), true);
+            assert.equal(applyRolesFilters(nonAdminUser, [General.TEAM_ADMIN_ROLE], [], adminMembership), true);
+            assert.equal(applyRolesFilters(nonAdminUser, [General.CHANNEL_ADMIN_ROLE], [], adminMembership), true);
+            assert.equal(applyRolesFilters(nonAdminUser, [General.SYSTEM_ADMIN_ROLE, General.TEAM_USER_ROLE, General.CHANNEL_USER_ROLE], [], adminMembership), false);
+            assert.equal(applyRolesFilters(nonAdminUser, [], [General.TEAM_ADMIN_ROLE], adminMembership), false);
+            assert.equal(applyRolesFilters(nonAdminUser, [], [General.CHANNEL_ADMIN_ROLE], adminMembership), false);
+            assert.equal(applyRolesFilters(nonAdminUser, [General.SYSTEM_USER_ROLE], [General.CHANNEL_ADMIN_ROLE], adminMembership), false);
         });
 
         it('Admin user with any membership', () => {
             const nonAdminMembership = {...TestHelper.fakeTeamMember(adminUser.id, team.id), scheme_admin: false, scheme_user: true};
             const adminMembership = {...TestHelper.fakeTeamMember(adminUser.id, team.id), scheme_admin: true, scheme_user: true};
-            assert.equal(applyRolesFilters(adminUser, [General.SYSTEM_ADMIN_ROLE], nonAdminMembership), true);
-            assert.equal(applyRolesFilters(adminUser, [General.SYSTEM_USER_ROLE, General.TEAM_USER_ROLE, General.TEAM_ADMIN_ROLE, General.CHANNEL_USER_ROLE, General.CHANNEL_ADMIN_ROLE], nonAdminMembership), false);
-            assert.equal(applyRolesFilters(adminUser, [General.SYSTEM_ADMIN_ROLE], adminMembership), true);
-            assert.equal(applyRolesFilters(adminUser, [General.SYSTEM_USER_ROLE, General.TEAM_USER_ROLE, General.TEAM_ADMIN_ROLE, General.CHANNEL_USER_ROLE, General.CHANNEL_ADMIN_ROLE], adminMembership), false);
+            assert.equal(applyRolesFilters(adminUser, [General.SYSTEM_ADMIN_ROLE], [], nonAdminMembership), true);
+            assert.equal(applyRolesFilters(adminUser, [General.SYSTEM_USER_ROLE, General.TEAM_USER_ROLE, General.TEAM_ADMIN_ROLE, General.CHANNEL_USER_ROLE, General.CHANNEL_ADMIN_ROLE], [], nonAdminMembership), false);
+            assert.equal(applyRolesFilters(adminUser, [General.SYSTEM_ADMIN_ROLE], [], adminMembership), true);
+            assert.equal(applyRolesFilters(adminUser, [General.SYSTEM_USER_ROLE, General.TEAM_USER_ROLE, General.TEAM_ADMIN_ROLE, General.CHANNEL_USER_ROLE, General.CHANNEL_ADMIN_ROLE], [], adminMembership), false);
+            assert.equal(applyRolesFilters(adminUser, [], [General.SYSTEM_ADMIN_ROLE], nonAdminMembership), false);
+            assert.equal(applyRolesFilters(adminUser, [], [General.SYSTEM_USER_ROLE], nonAdminMembership), true);
         });
 
         it('Guest user with any membership', () => {
             const nonAdminMembership = {...TestHelper.fakeTeamMember(guestUser.id, team.id), scheme_admin: false, scheme_user: true};
             const adminMembership = {...TestHelper.fakeTeamMember(guestUser.id, team.id), scheme_admin: true, scheme_user: true};
-            assert.equal(applyRolesFilters(guestUser, [General.SYSTEM_GUEST_ROLE], nonAdminMembership), true);
-            assert.equal(applyRolesFilters(guestUser, [General.SYSTEM_USER_ROLE, General.TEAM_USER_ROLE, General.TEAM_ADMIN_ROLE, General.CHANNEL_USER_ROLE, General.CHANNEL_ADMIN_ROLE], nonAdminMembership), false);
-            assert.equal(applyRolesFilters(guestUser, [General.SYSTEM_GUEST_ROLE], adminMembership), true);
-            assert.equal(applyRolesFilters(guestUser, [General.SYSTEM_USER_ROLE, General.TEAM_USER_ROLE, General.TEAM_ADMIN_ROLE, General.CHANNEL_USER_ROLE, General.CHANNEL_ADMIN_ROLE], adminMembership), false);
+            assert.equal(applyRolesFilters(guestUser, [General.SYSTEM_GUEST_ROLE], [], nonAdminMembership), true);
+            assert.equal(applyRolesFilters(guestUser, [General.SYSTEM_USER_ROLE, General.TEAM_USER_ROLE, General.TEAM_ADMIN_ROLE, General.CHANNEL_USER_ROLE, General.CHANNEL_ADMIN_ROLE], [], nonAdminMembership), false);
+            assert.equal(applyRolesFilters(guestUser, [General.SYSTEM_GUEST_ROLE], [], adminMembership), true);
+            assert.equal(applyRolesFilters(guestUser, [General.SYSTEM_USER_ROLE, General.TEAM_USER_ROLE, General.TEAM_ADMIN_ROLE, General.CHANNEL_USER_ROLE, General.CHANNEL_ADMIN_ROLE], [], adminMembership), false);
+            assert.equal(applyRolesFilters(guestUser, [], [General.SYSTEM_GUEST_ROLE], adminMembership), false);
         });
     });
 

@@ -204,7 +204,7 @@ export function editCommand(command: Command): ActionFunc {
     });
 }
 
-export function executeCommand(command: Command, args: Array<string>): ActionFunc {
+export function executeCommand(command: Command, args: string[]): ActionFunc {
     return bindClientFunc({
         clientFunc: Client4.executeCommand,
         params: [

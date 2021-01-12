@@ -39,7 +39,7 @@ async function getProfilesAndStatusesForMembers(userIds: string[], dispatch: Dis
             statusesToLoad.push(userId);
         }
     });
-    const requests: Promise<ActionResult|ActionResult[]>[] = [];
+    const requests: Array<Promise<ActionResult|ActionResult[]>> = [];
 
     if (profilesToLoad.length) {
         requests.push(dispatch(getProfilesByIds(profilesToLoad)));
@@ -344,7 +344,7 @@ export function getTeamMember(teamId: string, userId: string): ActionFunc {
     };
 }
 
-export function getTeamMembersByIds(teamId: string, userIds: Array<string>): ActionFunc {
+export function getTeamMembersByIds(teamId: string, userIds: string[]): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         let members;
         try {
@@ -439,7 +439,7 @@ export function addUserToTeam(teamId: string, userId: string): ActionFunc {
     };
 }
 
-export function addUsersToTeam(teamId: string, userIds: Array<string>): ActionFunc {
+export function addUsersToTeam(teamId: string, userIds: string[]): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         let members;
         try {
@@ -450,7 +450,7 @@ export function addUsersToTeam(teamId: string, userIds: Array<string>): ActionFu
             return {error};
         }
 
-        const profiles: Partial<UserProfile>[] = [];
+        const profiles: Array<Partial<UserProfile>> = [];
         members.forEach((m: TeamMembership) => profiles.push({id: m.user_id}));
 
         dispatch(batchActions([
@@ -469,9 +469,9 @@ export function addUsersToTeam(teamId: string, userIds: Array<string>): ActionFu
     };
 }
 
-export function addUsersToTeamGracefully(teamId: string, userIds: Array<string>): ActionFunc {
+export function addUsersToTeamGracefully(teamId: string, userIds: string[]): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
-        let result: Array<TeamMemberWithError>;
+        let result: TeamMemberWithError[];
         try {
             result = await Client4.addUsersToTeamGracefully(teamId, userIds);
         } catch (error) {
@@ -481,7 +481,7 @@ export function addUsersToTeamGracefully(teamId: string, userIds: Array<string>)
         }
 
         const addedMembers = result ? result.filter((m) => !m.error) : [];
-        const profiles: Partial<UserProfile>[] = addedMembers.map((m) => ({id: m.user_id}));
+        const profiles: Array<Partial<UserProfile>> = addedMembers.map((m) => ({id: m.user_id}));
         const members = addedMembers.map((m) => m.member);
         dispatch(batchActions([
             {
@@ -575,7 +575,7 @@ export function updateTeamMemberRoles(teamId: string, userId: string, roles: str
     };
 }
 
-export function sendEmailInvitesToTeam(teamId: string, emails: Array<string>): ActionFunc {
+export function sendEmailInvitesToTeam(teamId: string, emails: string[]): ActionFunc {
     return bindClientFunc({
         clientFunc: Client4.sendEmailInvitesToTeam,
         params: [
@@ -585,7 +585,7 @@ export function sendEmailInvitesToTeam(teamId: string, emails: Array<string>): A
     });
 }
 
-export function sendEmailGuestInvitesToChannels(teamId: string, channelIds: Array<string>, emails: Array<string>, message: string): ActionFunc {
+export function sendEmailGuestInvitesToChannels(teamId: string, channelIds: string[], emails: string[], message: string): ActionFunc {
     return bindClientFunc({
         clientFunc: Client4.sendEmailGuestInvitesToChannels,
         params: [
@@ -596,7 +596,7 @@ export function sendEmailGuestInvitesToChannels(teamId: string, channelIds: Arra
         ],
     });
 }
-export function sendEmailInvitesToTeamGracefully(teamId: string, emails: Array<string>): ActionFunc {
+export function sendEmailInvitesToTeamGracefully(teamId: string, emails: string[]): ActionFunc {
     return bindClientFunc({
         clientFunc: Client4.sendEmailInvitesToTeamGracefully,
         params: [
@@ -606,7 +606,7 @@ export function sendEmailInvitesToTeamGracefully(teamId: string, emails: Array<s
     });
 }
 
-export function sendEmailGuestInvitesToChannelsGracefully(teamId: string, channelIds: Array<string>, emails: Array<string>, message: string): ActionFunc {
+export function sendEmailGuestInvitesToChannelsGracefully(teamId: string, channelIds: string[], emails: string[], message: string): ActionFunc {
     return bindClientFunc({
         clientFunc: Client4.sendEmailGuestInvitesToChannelsGracefully,
         params: [
@@ -728,7 +728,7 @@ export function invalidateAllEmailInvites(): ActionFunc {
     });
 }
 
-export function membersMinusGroupMembers(teamID: string, groupIDs: Array<string>, page = 0, perPage: number = General.PROFILE_CHUNK_SIZE): ActionFunc {
+export function membersMinusGroupMembers(teamID: string, groupIDs: string[], page = 0, perPage: number = General.PROFILE_CHUNK_SIZE): ActionFunc {
     return bindClientFunc({
         clientFunc: Client4.teamMembersMinusGroupMembers,
         onSuccess: TeamTypes.RECEIVED_TEAM_MEMBERS_MINUS_GROUP_MEMBERS,
