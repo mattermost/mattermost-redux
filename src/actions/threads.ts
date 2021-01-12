@@ -1,7 +1,7 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
 
-import {ThreadTypes, PostTypes} from 'action_types';
+import {ThreadTypes, PostTypes, UserTypes} from 'action_types';
 import {Client4} from 'client';
 
 import ThreadConstants from 'constants/threads';
@@ -24,6 +24,11 @@ export function getThreads(userId: string, teamId: string, {page = 0, perPage = 
             dispatch(logError(error));
             return {error};
         }
+
+        dispatch({
+            type: UserTypes.RECEIVED_PROFILES_LIST,
+            data: userThreadList.threads.map(({participants: users}) => users).flat(),
+        });
 
         dispatch({
             type: PostTypes.RECEIVED_POSTS,
