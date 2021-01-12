@@ -222,11 +222,10 @@ export function makeFilterAutoclosedDMs(): (state: GlobalState, channels: Channe
                     return 1;
                 }
 
-                return Math.sign(channelBLastViewedAt - channelALastViewedAt);
+                return channelBLastViewedAt - channelALastViewedAt;
             }
 
             channels.sort((channelA, channelB) => {
-                
                 if (isUnreadChannel(myMembers, channelA) && !isUnreadChannel(myMembers, channelB)) {
                     return -1;
                 } else if (!isUnreadChannel(myMembers, channelA) && isUnreadChannel(myMembers, channelB)) {
