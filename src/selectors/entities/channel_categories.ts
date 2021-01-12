@@ -226,15 +226,10 @@ export function makeFilterAutoclosedDMs(): (state: GlobalState, channels: Channe
             }
 
             channels.sort((channelA, channelB) => {
-                if (isUnreadChannel(myMembers, channelA)) {
-                    if (isUnreadChannel(myMembers, channelB)) {
-                        return sortByLastViewedAt(channelA, channelB);
-                    }
-
+                
+                if (isUnreadChannel(myMembers, channelA) && !isUnreadChannel(myMembers, channelB)) {
                     return -1;
-                }
-
-                if (isUnreadChannel(myMembers, channelB)) {
+                } else if (!isUnreadChannel(myMembers, channelA) && isUnreadChannel(myMembers, channelB)) {
                     return 1;
                 }
 
