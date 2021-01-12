@@ -22,7 +22,7 @@ export type ChannelCategory = {
     type: ChannelCategoryType;
     display_name: string;
     sorting: CategorySorting;
-    channel_ids: $ID<Channel>[];
+    channel_ids: Array<$ID<Channel>>;
     muted: boolean;
 };
 
@@ -33,5 +33,5 @@ export type OrderedChannelCategories = {
 
 export type ChannelCategoriesState = {
     byId: IDMappedObjects<ChannelCategory>;
-    orderByTeam: RelationOneToOne<Team, $ID<ChannelCategory>[]>;
+    orderByTeam: RelationOneToOne<Team, Array<$ID<ChannelCategory>>>;
 };

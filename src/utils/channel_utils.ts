@@ -394,7 +394,7 @@ export function canManageMembersOldPermissions(channel: Channel, user: UserProfi
     return true;
 }
 
-export function getChannelsIdForTeam(state: GlobalState, teamId: string): Array<string> {
+export function getChannelsIdForTeam(state: GlobalState, teamId: string): string[] {
     const {channels} = state.entities.channels;
 
     return Object.keys(channels).map((key) => channels[key]).reduce((res, channel: Channel) => {
@@ -405,7 +405,7 @@ export function getChannelsIdForTeam(state: GlobalState, teamId: string): Array<
     }, [] as string[]);
 }
 
-export function getGroupDisplayNameFromUserIds(userIds: Array<string>, profiles: IDMappedObjects<UserProfile>, currentUserId: string, teammateNameDisplay: string): string {
+export function getGroupDisplayNameFromUserIds(userIds: string[], profiles: IDMappedObjects<UserProfile>, currentUserId: string, teammateNameDisplay: string): string {
     const names: string[] = [];
     userIds.forEach((id) => {
         if (id !== currentUserId) {
@@ -595,7 +595,7 @@ function getUserLocale(userId: string, profiles: IDMappedObjects<UserProfile>) {
     return locale;
 }
 
-export function filterChannelsMatchingTerm(channels: Array<Channel>, term: string): Array<Channel> {
+export function filterChannelsMatchingTerm(channels: Channel[], term: string): Channel[] {
     const lowercasedTerm = term.toLowerCase();
 
     return channels.filter((channel: Channel): boolean => {

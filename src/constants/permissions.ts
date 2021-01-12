@@ -79,6 +79,7 @@ const values = {
     READ_OTHER_USERS_TEAMS: 'read_other_users_teams',
     EDIT_BRAND: 'edit_brand',
     READ_JOBS: 'read_jobs',
+    DOWNLOAD_COMPLIANCE_EXPORT_RESULT: 'download_compliance_export_result',
 
     SYSCONSOLE_READ_ABOUT: 'sysconsole_read_about',
     SYSCONSOLE_WRITE_ABOUT: 'sysconsole_write_about',
@@ -178,6 +179,13 @@ values.SYSCONSOLE_ANCILLARY_PERMISSIONS = {
         values.LIST_PRIVATE_TEAMS,
         values.LIST_PUBLIC_TEAMS,
         values.VIEW_TEAM,
+    ],
+    [values.SYSCONSOLE_WRITE_COMPLIANCE]: [
+        values.MANAGE_JOBS,
+    ],
+    [values.SYSCONSOLE_READ_COMPLIANCE]: [
+        values.READ_JOBS,
+        values.DOWNLOAD_COMPLIANCE_EXPORT_RESULT,
     ],
     [values.SYSCONSOLE_READ_ENVIRONMENT]: [
         values.READ_JOBS,

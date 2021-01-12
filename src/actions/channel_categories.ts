@@ -353,18 +353,34 @@ export function moveCategory(teamId: string, categoryId: string, newIndex: numbe
 
         const newOrder = insertWithoutDuplicates(order, categoryId, newIndex);
 
-        let updatedOrder;
+        // Optimistically update the category order
+        const result = dispatch({
+            type: ChannelCategoryTypes.RECEIVED_CATEGORY_ORDER,
+            data: {
+                teamId,
+                order: newOrder,
+            },
+        });
+
         try {
-            updatedOrder = await Client4.updateChannelCategoryOrder(currentUserId, teamId, newOrder);
+            await Client4.updateChannelCategoryOrder(currentUserId, teamId, newOrder);
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch, getState);
             dispatch(logError(error));
+
+            // Restore original order
+            dispatch({
+                type: ChannelCategoryTypes.RECEIVED_CATEGORY_ORDER,
+                data: {
+                    teamId,
+                    order,
+                },
+            });
+
             return {error};
         }
 
-        // The order will be updated in the state after receiving the corresponding websocket event.
-
-        return {data: updatedOrder};
+        return result;
     };
 }
 
@@ -378,7 +394,7 @@ export function receivedCategoryOrder(teamId: string, order: string[]) {
     };
 }
 
-export function createCategory(teamId: string, displayName: string, channelIds: $ID<Channel>[] = []): ActionFunc {
+export function createCategory(teamId: string, displayName: string, channelIds: Array<$ID<Channel>> = []): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         const currentUserId = getCurrentUserId(getState());
 
