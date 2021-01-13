@@ -14,11 +14,3 @@ export function fetchAppBindings(userID: string, channelID: string): ActionFunc 
         onSuccess: AppsTypes.RECEIVED_APP_BINDINGS,
     });
 }
-
-export function makeLookupCallPayload(name: string, userInput: string, formValues: AppFormValues): AppLookupCallValues {
-    return {
-        name,
-        user_input: userInput,
-        values: formValues,
-    };
-}

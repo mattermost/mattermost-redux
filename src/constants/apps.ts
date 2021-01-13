@@ -3,7 +3,7 @@
 
 import {AppCallResponseType, AppCallType, AppExpandLevel, AppFieldType} from 'types/apps';
 
-export const AppsBindings = {
+export const AppBindingLocations = {
     POST_MENU_ITEM: '/post_menu',
     CHANNEL_HEADER_ICON: '/channel_header',
     COMMAND: '/command',
@@ -24,6 +24,7 @@ export const AppCallResponseTypes: { [name: string]: AppCallResponseType } = {
 
 export const AppCallTypes: { [name: string]: AppCallType } = {
     SUBMIT: '',
+    LOOKUP: 'lookup',
     FORM: 'form',
     CANCEL: 'cancel',
 };

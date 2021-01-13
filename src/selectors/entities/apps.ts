@@ -3,7 +3,7 @@
 import {GlobalState} from 'types/store';
 import {AppBinding} from 'types/apps';
 
-export function getAppsBindings(state: GlobalState, location?: string): AppBinding[] {
+export function getAppBindings(state: GlobalState, location?: string): AppBinding[] {
     if (!state.entities.apps.bindings) {
         return [];
     }
