@@ -4,7 +4,6 @@ import {AppsTypes} from 'action_types';
 import {Client4} from 'client';
 
 import {ActionFunc} from 'types/actions';
-import {AppFormValues, AppLookupCallValues} from 'types/apps';
 
 import {bindClientFunc} from './helpers';
 
