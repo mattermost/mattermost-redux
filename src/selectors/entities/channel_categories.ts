@@ -461,9 +461,9 @@ export function makeFilterAndSortChannelsForCategory() {
         let channels = originalChannels;
 
         channels = filterArchivedChannels(state, channels);
+        channels = filterManuallyClosedDMs(state, channels);
 
         channels = filterAutoclosedDMs(state, channels, category.type);
-        channels = filterManuallyClosedDMs(state, channels);
 
         channels = sortChannels(state, channels, category);
 
