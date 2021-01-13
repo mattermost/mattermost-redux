@@ -15,7 +15,7 @@ export function getJobsByType(state: GlobalState): JobsByType {
     return state.entities.jobs.jobsByTypeList;
 }
 
-export function makeGetJobsByType(type: JobType): (state: GlobalState) => Array<Job> {
+export function makeGetJobsByType(type: JobType): (state: GlobalState) => Job[] {
     return createSelector(
         getJobsByType,
         (jobsByType) => {

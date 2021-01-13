@@ -3,19 +3,25 @@
 
 import {createSelector} from 'reselect';
 
+import {getConfig} from 'selectors/entities/general';
+
 import {CustomEmoji} from 'types/emojis';
 import {GlobalState} from 'types/store';
 import {IDMappedObjects} from 'types/utilities';
 
 import {createIdsSelector} from 'utils/helpers';
 
-export function getCustomEmojis(state: GlobalState): IDMappedObjects<CustomEmoji> {
-    if (state.entities.general.config.EnableCustomEmoji !== 'true') {
-        return {};
-    }
+export const getCustomEmojis: (state: GlobalState) => IDMappedObjects<CustomEmoji> = createSelector(
+    getConfig,
+    (state) => state.entities.emojis.customEmoji,
+    (config, customEmoji) => {
+        if (config.EnableCustomEmoji !== 'true') {
+            return {};
+        }
 
-    return state.entities.emojis.customEmoji;
-}
+        return customEmoji;
+    },
+);
 
 export const getCustomEmojisAsMap: (state: GlobalState) => Map<string, CustomEmoji> = createSelector(
     getCustomEmojis,
@@ -41,9 +47,9 @@ export const getCustomEmojisByName: (state: GlobalState) => Map<string, CustomEm
     },
 );
 
-export const getCustomEmojiIdsSortedByName: (state: GlobalState) => Array<string> = createIdsSelector(
-    (state) => state.entities.emojis.customEmoji,
-    (emojis: IDMappedObjects<CustomEmoji>): Array<string> => {
+export const getCustomEmojiIdsSortedByName: (state: GlobalState) => string[] = createIdsSelector(
+    getCustomEmojis,
+    (emojis: IDMappedObjects<CustomEmoji>): string[] => {
         return Object.keys(emojis).sort(
             (a: string, b: string): number => emojis[a].name.localeCompare(emojis[b].name),
         );

@@ -4,7 +4,7 @@ import {General} from '../constants';
 import {Group} from 'types/groups';
 import {getSuggestionsSplitByMultiple} from './user_utils';
 
-export function filterGroupsMatchingTerm(groups: Array<Group>, term: string): Array<Group> {
+export function filterGroupsMatchingTerm(groups: Group[], term: string): Group[] {
     const lowercasedTerm = term.toLowerCase();
     let trimmedTerm = lowercasedTerm;
     if (trimmedTerm.startsWith('@')) {

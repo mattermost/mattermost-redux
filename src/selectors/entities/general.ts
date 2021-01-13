@@ -18,7 +18,7 @@ export function getLicense(state: GlobalState): any {
     return state.entities.general.license;
 }
 
-export function getSupportedTimezones(state: GlobalState): Array<string> {
+export function getSupportedTimezones(state: GlobalState): string[] {
     return state.entities.general.timezones;
 }
 
@@ -76,6 +76,17 @@ export const getAutolinkedUrlSchemes: (a: GlobalState) => string[] = createSelec
             ...General.DEFAULT_AUTOLINKED_URL_SCHEMES,
             ...config.CustomUrlSchemes.split(','),
         ];
+    },
+);
+
+export const getManagedResourcePaths: (state: GlobalState) => string[] = createSelector(
+    getConfig,
+    (config) => {
+        if (!config.ManagedResourcePaths) {
+            return [];
+        }
+
+        return config.ManagedResourcePaths.split(',').map((path) => path.trim());
     },
 );
 

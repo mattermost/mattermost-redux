@@ -2,9 +2,8 @@
 // See LICENSE.txt for license information.
 
 import {Theme} from 'types/preferences';
-import {Dictionary} from 'types/utilities';
 
-const Preferences: Dictionary<any> = {
+const Preferences = {
     CATEGORY_CHANNEL_OPEN_TIME: 'channel_open_time',
     CATEGORY_CHANNEL_APPROXIMATE_VIEW_TIME: 'channel_approximate_view_time',
     CATEGORY_DIRECT_CHANNEL_SHOW: 'direct_channel_show',
@@ -33,10 +32,13 @@ const Preferences: Dictionary<any> = {
     DISPLAY_PREFER_USERNAME: 'username',
     MENTION_KEYS: 'mention_keys',
     USE_MILITARY_TIME: 'use_military_time',
+
     CATEGORY_SIDEBAR_SETTINGS: 'sidebar_settings',
     CHANNEL_SIDEBAR_ORGANIZATION: 'channel_sidebar_organization',
     CHANNEL_SIDEBAR_AUTOCLOSE_DMS: 'close_unused_direct_messages',
     AUTOCLOSE_DMS_ENABLED: 'after_seven_days',
+    SHOW_UNREAD_SECTION: 'show_unread_section',
+
     CATEGORY_ADVANCED_SETTINGS: 'advanced_settings',
     ADVANCED_FILTER_JOIN_LEAVE: 'join_leave',
     ADVANCED_CODE_BLOCK_ON_CTRL_ENTER: 'code_block_ctrl_enter',
@@ -71,7 +73,7 @@ const Preferences: Dictionary<any> = {
             mentionHighlightBg: '#ffe577',
             mentionHighlightLink: '#166de0',
             codeTheme: 'github',
-        } as Theme,
+        },
         organization: {
             type: 'Organization',
             sidebarBg: '#2071a7',
@@ -98,7 +100,7 @@ const Preferences: Dictionary<any> = {
             mentionHighlightBg: '#f3e197',
             mentionHighlightLink: '#2f81b7',
             codeTheme: 'github',
-        } as Theme,
+        },
         mattermostDark: {
             type: 'Mattermost Dark',
             sidebarBg: '#1b2c3e',
@@ -125,7 +127,7 @@ const Preferences: Dictionary<any> = {
             mentionHighlightBg: '#984063',
             mentionHighlightLink: '#a4ffeb',
             codeTheme: 'solarized-dark',
-        } as Theme,
+        },
         windows10: {
             type: 'Windows Dark',
             sidebarBg: '#171717',
@@ -152,8 +154,8 @@ const Preferences: Dictionary<any> = {
             mentionHighlightBg: '#784098',
             mentionHighlightLink: '#a4ffeb',
             codeTheme: 'monokai',
-        } as Theme,
-    },
+        },
+    } as Record<string, Theme>,
 };
 
 export default Preferences;

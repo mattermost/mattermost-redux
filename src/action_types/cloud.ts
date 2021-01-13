@@ -6,4 +6,5 @@ export default keyMirror({
     RECEIVED_CLOUD_CUSTOMER: null,
     RECEIVED_CLOUD_PRODUCTS: null,
     RECEIVED_CLOUD_SUBSCRIPTION: null,
+    RECEIVED_CLOUD_INVOICES: null,
 });

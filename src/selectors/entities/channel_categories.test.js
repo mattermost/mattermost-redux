@@ -3,6 +3,7 @@
 
 import {General, Preferences} from '../../constants';
 import {CategoryTypes} from '../../constants/channel_categories';
+import {MarkUnread} from '../../constants/channels';
 
 import {getCurrentChannelId, getMyChannelMemberships} from 'selectors/entities/channels';
 import {getConfig} from 'selectors/entities/general';
@@ -732,9 +733,9 @@ describe('makeSortChannelsByName', () => {
             entities: {
                 channels: {
                     myMembers: {
-                        channel1: {notify_props: {mark_unread: General.MENTION}},
-                        channel3: {notify_props: {mark_unread: General.MENTION}},
-                        channel4: {notify_props: {mark_unread: 'all'}},
+                        channel1: {notify_props: {mark_unread: MarkUnread.MENTION}},
+                        channel3: {notify_props: {mark_unread: MarkUnread.MENTION}},
+                        channel4: {notify_props: {mark_unread: MarkUnread.ALL}},
                     },
                 },
             },
@@ -863,10 +864,10 @@ describe('makeSortChannelsByNameWithDMs', () => {
             entities: {
                 channels: {
                     myMembers: {
-                        channel3: {notify_props: {mark_unread: General.MENTION}},
-                        dmChannel1: {notify_props: {mark_unread: General.MENTION}},
-                        dmChannel2: {notify_props: {mark_unread: 'all'}},
-                        gmChannel1: {notify_props: {mark_unread: General.MENTION}},
+                        channel3: {notify_props: {mark_unread: MarkUnread.MENTION}},
+                        dmChannel1: {notify_props: {mark_unread: MarkUnread.MENTION}},
+                        dmChannel2: {notify_props: {mark_unread: MarkUnread.ALL}},
+                        gmChannel1: {notify_props: {mark_unread: MarkUnread.MENTION}},
                     },
                 },
             },
@@ -1046,7 +1047,7 @@ describe('makeGetChannelsForCategory', () => {
             entities: {
                 channels: {
                     myMembers: {
-                        [channel2.id]: {notify_props: {mark_unread: General.MENTION}},
+                        [channel2.id]: {notify_props: {mark_unread: MarkUnread.MENTION}},
                     },
                 },
             },

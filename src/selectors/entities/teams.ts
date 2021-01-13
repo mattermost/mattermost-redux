@@ -147,7 +147,7 @@ export function getTeamMember(state: GlobalState, teamId: string, userId: string
     return null;
 }
 
-export const getListableTeamIds: (state: GlobalState) => $ID<Team>[] = createIdsSelector(
+export const getListableTeamIds: (state: GlobalState) => Array<$ID<Team>> = createIdsSelector(
     getTeams,
     getTeamMemberships,
     (state) => haveISystemPermission(state, {permission: Permissions.LIST_PUBLIC_TEAMS}),
@@ -189,7 +189,7 @@ export const getSortedListableTeams: (state: GlobalState, locale: string) => Tea
     },
 );
 
-export const getJoinableTeamIds: (state: GlobalState) => $ID<Team>[] = createIdsSelector(
+export const getJoinableTeamIds: (state: GlobalState) => Array<$ID<Team>> = createIdsSelector(
     getTeams,
     getTeamMemberships,
     (state: GlobalState) => haveISystemPermission(state, {permission: Permissions.JOIN_PUBLIC_TEAMS}),
@@ -231,7 +231,7 @@ export const getSortedJoinableTeams: (state: GlobalState, locale: string) => Tea
     },
 );
 
-export const getMySortedTeamIds: (state: GlobalState, locale: string) => $ID<Team>[] = createIdsSelector(
+export const getMySortedTeamIds: (state: GlobalState, locale: string) => Array<$ID<Team>> = createIdsSelector(
     getMyTeams,
     (state: GlobalState, locale: string) => locale,
     (teams, locale) => {

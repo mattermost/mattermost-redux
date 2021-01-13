@@ -2417,3 +2417,65 @@ describe('getExpandedLink', () => {
         assert.equal(Selectors.getExpandedLink(state, ''), undefined);
     });
 });
+
+describe('makeGetProfilesForThread', () => {
+    it('should return profiles for threads in the right order and exclude current user', () => {
+        const getProfilesForThread = Selectors.makeGetProfilesForThread();
+        const user1 = {id: 'user1', update_at: 1000};
+        const user2 = {id: 'user2', update_at: 1000};
+        const user3 = {id: 'user3', update_at: 1000};
+
+        const state = {
+            entities: {
+                posts: {
+                    posts: {
+                        1001: {id: '1001', create_at: 1001, user_id: 'user1'},
+                        1002: {id: '1002', create_at: 1002, root_id: '1001', user_id: 'user2'},
+                        1003: {id: '1003', create_at: 1003},
+                        1004: {id: '1004', create_at: 1004, root_id: '1001', user_id: 'user3'},
+                        1005: {id: '1005', create_at: 1005},
+                    },
+                    postsInThread: {
+                        1001: ['1002', '1004'],
+                    },
+                },
+                users: {
+                    profiles: {
+                        user1,
+                        user2,
+                        user3,
+                    },
+                    currentUserId: 'user1',
+                },
+            },
+        };
+
+        assert.deepEqual(getProfilesForThread(state, {rootId: '1001'}), [user3, user2]);
+    });
+
+    it('should return empty array if profiles data does not exist', () => {
+        const getProfilesForThread = Selectors.makeGetProfilesForThread();
+        const user2 = {id: 'user2', update_at: 1000};
+
+        const state = {
+            entities: {
+                posts: {
+                    posts: {
+                        1001: {id: '1001', create_at: 1001, user_id: 'user1'},
+                    },
+                    postsInThread: {
+                        1001: [],
+                    },
+                },
+                users: {
+                    profiles: {
+                        user2,
+                    },
+                    currentUserId: 'user2',
+                },
+            },
+        };
+
+        assert.deepEqual(getProfilesForThread(state, {rootId: '1001'}), []);
+    });
+});

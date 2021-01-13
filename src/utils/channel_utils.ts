@@ -2,6 +2,7 @@
 // See LICENSE.txt for license information.
 
 import {General, Preferences, Permissions, Users} from '../constants';
+import {MarkUnread} from 'constants/channels';
 
 import {hasNewPermissions} from 'selectors/entities/general';
 import {haveITeamPermission, haveIChannelPermission} from 'selectors/entities/roles';
@@ -20,7 +21,7 @@ const channelTypeOrder = {
     [General.OPEN_CHANNEL]: 0,
     [General.PRIVATE_CHANNEL]: 1,
     [General.DM_CHANNEL]: 2,
-    [General.GM_CHANNEL]: 2,
+    [General.GM_CHANNEL]: 3,
 };
 
 export function completeDirectChannelInfo(usersState: UsersState, teammateNameDisplay: string, channel: Channel): Channel {
@@ -393,7 +394,7 @@ export function canManageMembersOldPermissions(channel: Channel, user: UserProfi
     return true;
 }
 
-export function getChannelsIdForTeam(state: GlobalState, teamId: string): Array<string> {
+export function getChannelsIdForTeam(state: GlobalState, teamId: string): string[] {
     const {channels} = state.entities.channels;
 
     return Object.keys(channels).map((key) => channels[key]).reduce((res, channel: Channel) => {
@@ -404,7 +405,7 @@ export function getChannelsIdForTeam(state: GlobalState, teamId: string): Array<
     }, [] as string[]);
 }
 
-export function getGroupDisplayNameFromUserIds(userIds: Array<string>, profiles: IDMappedObjects<UserProfile>, currentUserId: string, teammateNameDisplay: string): string {
+export function getGroupDisplayNameFromUserIds(userIds: string[], profiles: IDMappedObjects<UserProfile>, currentUserId: string, teammateNameDisplay: string): string {
     const names: string[] = [];
     userIds.forEach((id) => {
         if (id !== currentUserId) {
@@ -462,7 +463,7 @@ export function isUnreadChannel(members: RelationOneToOne<Channel, ChannelMember
     const member = members[channel.id];
     if (member) {
         const msgCount = channel.total_msg_count - member.msg_count;
-        const onlyMentions = member.notify_props && member.notify_props.mark_unread === General.MENTION;
+        const onlyMentions = member.notify_props && member.notify_props.mark_unread === MarkUnread.MENTION;
         return (member.mention_count > 0 || (Boolean(msgCount) && !onlyMentions));
     }
 
@@ -567,7 +568,7 @@ export function sortChannelsByRecency(lastPosts: RelationOneToOne<Channel, Post>
 }
 
 export function isChannelMuted(member: ChannelMembership): boolean {
-    return member && member.notify_props ? (member.notify_props.mark_unread === 'mention') : false;
+    return member && member.notify_props ? (member.notify_props.mark_unread === MarkUnread.MENTION) : false;
 }
 
 export function areChannelMentionsIgnored(channelMemberNotifyProps: ChannelNotifyProps, currentUserNotifyProps: UserNotifyProps) {
@@ -594,7 +595,7 @@ function getUserLocale(userId: string, profiles: IDMappedObjects<UserProfile>) {
     return locale;
 }
 
-export function filterChannelsMatchingTerm(channels: Array<Channel>, term: string): Array<Channel> {
+export function filterChannelsMatchingTerm(channels: Channel[], term: string): Channel[] {
     const lowercasedTerm = term.toLowerCase();
 
     return channels.filter((channel: Channel): boolean => {

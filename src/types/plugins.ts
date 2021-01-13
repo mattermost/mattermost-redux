@@ -3,7 +3,7 @@
 
 type Plugin = {
     id: string;
-    name?: string;
+    name: string;
     description?: string;
     homepage_url?: string;
     support_url?: string;
@@ -97,15 +97,40 @@ export type ClientPluginManifest = {
     };
 }
 
+export type MarketplaceLabel = {
+    name: string;
+    description?: string;
+    url?: string;
+    color?: string;
+}
+
+export enum HostingType {
+    OnPrem = 'on-prem',
+    Cloud = 'cloud',
+}
+
+export enum AuthorType {
+    Mattermost = 'mattermost',
+    Partner = 'partner',
+    Community = 'community',
+}
+
+export enum ReleaseStage {
+    Production = 'production',
+    Beta = 'beta',
+    Experimental = 'experimental',
+}
+
 export type MarketplacePlugin = {
-    homepage_url: string;
-    download_url: string;
-    manifest: {
-        id: string;
-        name: string;
-        description: string;
-        version: string;
-        minServerVersion: string;
-    };
-    installed_version: string;
+    homepage_url?: string;
+    icon_data?: string;
+    download_url?: string;
+    release_notes_url?: string;
+    labels?: MarketplaceLabel[];
+    hosting?: HostingType;
+    author_type: AuthorType;
+    release_stage: ReleaseStage;
+    enterprise: boolean;
+    manifest: PluginManifest;
+    installed_version?: string;
 }
