@@ -197,7 +197,7 @@ export function makeFilterAutoclosedDMs(): (state: GlobalState, channels: Channe
         (state: GlobalState) => state.entities.users.profiles,
         getCurrentUserId,
         getMyChannelMemberships,
-        (state: GlobalState) => getInt(state, Preferences.CATEGORY_SIDEBAR_SETTINGS, Preferences.LIMIT_VISIBLE_DMS_GMS),
+        (state: GlobalState) => getInt(state, Preferences.CATEGORY_SIDEBAR_SETTINGS, Preferences.LIMIT_VISIBLE_DMS_GMS, 20),
         (channels, categoryType, currentChannelId, profiles, currentUserId, myMembers, limitPref) => {
             if (categoryType !== CategoryTypes.DIRECT_MESSAGES) {
                 // Only autoclose DMs that haven't been assigned to a category
