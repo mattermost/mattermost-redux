@@ -649,7 +649,7 @@ describe('makeFilterAutoclosedDMs', () => {
             },
         });
 
-        expect(filterAutoclosedDMs(state, [dmChannel1, gmChannel1], CategoryTypes.DIRECT_MESSAGES)).toEqual([gmChannel1]);
+        expect(filterAutoclosedDMs(state, [gmChannel1, dmChannel1], CategoryTypes.DIRECT_MESSAGES)).toEqual([gmChannel1]);
     });
 
     describe('Should always show the exact number of channels specified by the user', () => {
@@ -692,7 +692,7 @@ describe('makeFilterAutoclosedDMs', () => {
                 },
             });
 
-            expect(filterAutoclosedDMs(state, [dmChannel1, gmChannel1, gmChannel2, dmChannel2, dmChannel3], CategoryTypes.DIRECT_MESSAGES)).toEqual([gmChannel1, gmChannel2, dmChannel3, dmChannel1, dmChannel2]);
+            expect(filterAutoclosedDMs(state, [dmChannel1, gmChannel1, gmChannel2, dmChannel2, dmChannel3], CategoryTypes.DIRECT_MESSAGES)).toEqual([dmChannel1, gmChannel1, gmChannel2, dmChannel2, dmChannel3]);
         });
 
         it('User specified 2 DMs to be shown', () => {
@@ -723,7 +723,7 @@ describe('makeFilterAutoclosedDMs', () => {
                 },
             });
 
-            expect(filterAutoclosedDMs(state, [dmChannel1, gmChannel1, gmChannel2, dmChannel2, dmChannel3], CategoryTypes.DIRECT_MESSAGES)).toEqual([gmChannel1, gmChannel2]);
+            expect(filterAutoclosedDMs(state, [dmChannel1, gmChannel1, gmChannel2, dmChannel2, dmChannel3], CategoryTypes.DIRECT_MESSAGES)).toEqual([dmChannel1, gmChannel1]);
         });
     });
 });
