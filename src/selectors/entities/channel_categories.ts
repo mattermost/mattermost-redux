@@ -207,9 +207,27 @@ export function makeFilterAutoclosedDMs(): (state: GlobalState, channels: Channe
             const filteredChannels = channels.slice();
 
             filteredChannels.sort((channelA, channelB) => {
+                // Should always prioritise the current channel
+                if (channelA.id === currentChannelId) {
+                    return -1;
+                } else if (channelB.id === currentChannelId) {
+                    return 1;
+                }
+
+                // Second priority is for unread channels
                 if (isUnreadChannel(myMembers, channelA) && !isUnreadChannel(myMembers, channelB)) {
                     return -1;
                 } else if (!isUnreadChannel(myMembers, channelA) && isUnreadChannel(myMembers, channelB)) {
+                    return 1;
+                }
+
+                // Third priority is last_viewed_at
+                const channelAlastViewed = myMembers[channelA.id]?.last_viewed_at || 0;
+                const channelBlastViewed = myMembers[channelB.id]?.last_viewed_at || 0;
+
+                if (channelAlastViewed > channelBlastViewed) {
+                    return -1;
+                } else if (channelBlastViewed > channelAlastViewed) {
                     return 1;
                 }
 
@@ -223,11 +241,6 @@ export function makeFilterAutoclosedDMs(): (state: GlobalState, channels: Channe
                     unreadCount++;
 
                     // Unread DMs/GMs are always visible
-                    return true;
-                }
-
-                if (currentChannelId === channel.id) {
-                    // The current channel is always visible
                     return true;
                 }
 
