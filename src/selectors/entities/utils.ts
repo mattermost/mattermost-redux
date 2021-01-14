@@ -14,7 +14,7 @@ import {General} from '../../constants';
 
 import {NameMappedObjects} from 'types/utilities';
 
-export function makeAddLastViewAtToProfiles(): (state: GlobalState, profiles: UserProfile[]) => Array<UserProfileWithLastViewAt> {
+export function makeAddLastViewAtToProfiles(): (state: GlobalState, profiles: UserProfile[]) => UserProfileWithLastViewAt[] {
     return createSelector(
         getCurrentUserId,
         getMyChannelMemberships,

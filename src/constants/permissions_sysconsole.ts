@@ -2,7 +2,7 @@
 // See LICENSE.txt for license information.
 import Permissions from './permissions';
 
-export const ResourceToSysConsolePermissionsTable: Record<string, Array<string>> = {
+export const ResourceToSysConsolePermissionsTable: Record<string, string[]> = {
     about: [Permissions.SYSCONSOLE_READ_ABOUT, Permissions.SYSCONSOLE_WRITE_ABOUT],
     billing: [Permissions.SYSCONSOLE_READ_BILLING, Permissions.SYSCONSOLE_WRITE_BILLING],
     reporting: [Permissions.SYSCONSOLE_READ_REPORTING, Permissions.SYSCONSOLE_WRITE_REPORTING],

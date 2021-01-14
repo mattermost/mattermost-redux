@@ -13,6 +13,6 @@ export type GeneralState = {
     deviceToken: string;
     license: ClientLicense;
     serverVersion: string;
-    timezones: Array<string>;
+    timezones: string[];
     warnMetricsStatus: Dictionary<WarnMetricStatus>;
 };

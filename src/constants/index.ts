@@ -15,5 +15,6 @@ import Plugins from './plugins';
 import Groups from './groups';
 import Users from './users';
 import Roles from './roles';
+import Threads from './threads';
 
-export {General, Preferences, Posts, Files, RequestStatus, WebsocketEvents, Teams, Stats, Permissions, Emoji, Plugins, Groups, Users, Roles};
+export {General, Preferences, Posts, Files, RequestStatus, WebsocketEvents, Teams, Stats, Permissions, Emoji, Plugins, Groups, Users, Roles, Threads};

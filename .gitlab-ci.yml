@@ -7,9 +7,13 @@ include:
   file: private.yml
 
 cache:
-  key: ${CI_COMMIT_REF_SLUG}
+  key:
+    files:
+      - package.json
+    prefix: ${CI_COMMIT_REF_SLUG}
   paths:
     - .npm/
+    - node_modules/
 
 lint:
   stage: test

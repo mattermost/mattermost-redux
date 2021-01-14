@@ -31,7 +31,7 @@ export function getFilesForPost(postId: string): ActionFunc {
     };
 }
 
-export function uploadFile(channelId: string, rootId: string, clientIds: Array<string>, fileFormData: File, formBoundary: string): ActionFunc {
+export function uploadFile(channelId: string, rootId: string, clientIds: string[], fileFormData: File, formBoundary: string): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         dispatch({type: FileTypes.UPLOAD_FILES_REQUEST, data: {}});
 

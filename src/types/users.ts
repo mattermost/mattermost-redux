@@ -3,11 +3,11 @@
 
 import {Audit} from './audits';
 import {Channel} from './channels';
-import {Team} from './teams';
+import {Group} from './groups';
 import {PostType} from './posts';
 import {Session} from './sessions';
-import {Group} from './groups';
-import {$ID, IDMappedObjects, RelationOneToMany, RelationOneToOne, Dictionary} from './utilities';
+import {Team} from './teams';
+import {$ID, Dictionary, IDMappedObjects, RelationOneToMany, RelationOneToOne} from './utilities';
 
 export type UserNotifyProps = {
     desktop: 'default' | 'all' | 'mention' | 'none';
@@ -63,8 +63,8 @@ export type UserProfileWithLastViewAt = UserProfile & {
 export type UsersState = {
     currentUserId: string;
     isManualStatus: RelationOneToOne<UserProfile, boolean>;
-    mySessions: Array<Session>;
-    myAudits: Array<Audit>;
+    mySessions: Session[];
+    myAudits: Audit[];
     profiles: IDMappedObjects<UserProfile>;
     profilesInTeam: RelationOneToMany<Team, UserProfile>;
     profilesNotInTeam: RelationOneToMany<Team, UserProfile>;

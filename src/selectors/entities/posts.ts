@@ -89,7 +89,7 @@ export function getPostIdsInCurrentChannel(state: GlobalState): Array<$ID<Post>>
 
 // getPostsInCurrentChannel returns the posts loaded at the bottom of the channel. It does not include older posts
 // such as those loaded by viewing a thread or a permalink.
-export const getPostsInCurrentChannel: (state: GlobalState) => Array<PostWithFormatData> | undefined | null = (() => {
+export const getPostsInCurrentChannel: (state: GlobalState) => PostWithFormatData[] | undefined | null = (() => {
     const getPostsInChannel = makeGetPostsInChannel();
     return (state: GlobalState) => getPostsInChannel(state, state.entities.channels.currentChannelId, -1);
 })();
@@ -261,7 +261,7 @@ function formatPostInChannel(post: Post, previousPost: Post | undefined | null, 
 // makeGetPostsInChannel creates a selector that returns up to the given number of posts loaded at the bottom of the
 // given channel. It does not include older posts such as those loaded by viewing a thread or a permalink.
 
-export function makeGetPostsInChannel(): (state: GlobalState, channelId: $ID<Channel>, numPosts: number) => Array<PostWithFormatData> | undefined | null {
+export function makeGetPostsInChannel(): (state: GlobalState, channelId: $ID<Channel>, numPosts: number) => PostWithFormatData[] | undefined | null {
     return createSelector(
         getAllPosts,
         getPostsInThread,
@@ -297,7 +297,7 @@ export function makeGetPostsInChannel(): (state: GlobalState, channelId: $ID<Cha
     );
 }
 
-export function makeGetPostsAroundPost(): (state: GlobalState, postId: $ID<Post>, channelId: $ID<Channel>) => Array<PostWithFormatData> | undefined | null {
+export function makeGetPostsAroundPost(): (state: GlobalState, postId: $ID<Post>, channelId: $ID<Channel>) => PostWithFormatData[] | undefined | null {
     const getPostIdsAroundPost = makeGetPostIdsAroundPost();
     const options = {
         postsBeforeCount: -1, // Where this is used in the web app, view state is used to determine how far back to display
@@ -342,7 +342,7 @@ export function makeGetPostsAroundPost(): (state: GlobalState, postId: $ID<Post>
 // That selector will take a props object (containing a rootId field) as its
 // only argument and will be memoized based on that argument.
 
-export function makeGetPostsForThread(): (state: GlobalState, props: {rootId: $ID<Post>}) => Array<Post> {
+export function makeGetPostsForThread(): (state: GlobalState, props: {rootId: $ID<Post>}) => Post[] {
     return createSelector(
         getAllPosts,
         (state: GlobalState, props: {rootId: $ID<Post>}) => state.entities.posts.postsInThread[props.rootId] || [],
@@ -368,7 +368,7 @@ export function makeGetPostsForThread(): (state: GlobalState, props: {rootId: $I
 }
 
 // The selector below filters current user if it exists. Excluding currentUser is just for convinience
-export function makeGetProfilesForThread(): (state: GlobalState, props: {rootId: $ID<Post>}) => Array<UserProfile> {
+export function makeGetProfilesForThread(): (state: GlobalState, props: {rootId: $ID<Post>}) => UserProfile[] {
     const getPostsForThread = makeGetPostsForThread();
     return createSelector(
         getUsers,
@@ -412,7 +412,7 @@ export function makeGetCommentCountForPost(): (state: GlobalState, props: {post:
     );
 }
 
-export const getSearchResults: (state: GlobalState) => Array<Post> = createSelector(
+export const getSearchResults: (state: GlobalState) => Post[] = createSelector(
     getAllPosts,
     (state: GlobalState) => state.entities.search.results,
     (posts, postIds) => {
@@ -428,7 +428,7 @@ export const getSearchResults: (state: GlobalState) => Array<Post> = createSelec
 // These matches will only be present if the server is running Mattermost 5.1 or higher
 // with Elasticsearch enabled to search posts. Otherwise, null will be returned.
 export function getSearchMatches(state: GlobalState): {
-  [x: string]: Array<string>;
+  [x: string]: string[];
 } {
     return state.entities.search.matches;
 }
@@ -447,7 +447,7 @@ export function makeGetMessageInHistoryItem(type: 'post'|'comment'): (state: Glo
     );
 }
 
-export function makeGetPostsForIds(): (state: GlobalState, postIds: Array<$ID<Post>>) => Array<Post> {
+export function makeGetPostsForIds(): (state: GlobalState, postIds: Array<$ID<Post>>) => Post[] {
     return createIdsSelector(
         getAllPosts,
         (state: GlobalState, postIds: Array<$ID<Post>>) => postIds,
