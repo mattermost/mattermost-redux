@@ -11,6 +11,7 @@ import {
     IDMappedObjects,
     Dictionary,
 } from './utilities';
+import {UserProfile} from 'types/users';
 
 export type PostType = 'system_add_remove' |
     'system_add_to_channel' |
@@ -74,6 +75,8 @@ export type Post = {
     user_activity_posts?: Post[];
     state?: 'DELETED';
     filenames?: string[];
+    last_reply_at?: number;
+    participants: Array<UserProfile | $ID<UserProfile>>;
     message_source?: string;
 };
 

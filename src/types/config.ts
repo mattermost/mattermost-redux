@@ -2,6 +2,7 @@
 // See LICENSE.txt for license information.
 
 import {Dictionary} from './utilities';
+import {Preferences} from '../constants';
 
 export type ClientConfig = {
     AboutLink: string;
@@ -34,7 +35,7 @@ export type ClientConfig = {
     DataRetentionFileRetentionDays: string;
     DataRetentionMessageRetentionDays: string;
     DefaultClientLocale: string;
-    DefaultTheme: string;
+    DefaultTheme: keyof typeof Preferences['THEMES'];
     DesktopLatestVersion: string;
     DesktopMinVersion: string;
     DiagnosticId: string;

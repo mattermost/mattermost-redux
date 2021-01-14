@@ -8,7 +8,7 @@ import {General, Preferences} from '../../constants';
 import {getConfig, getLicense} from 'selectors/entities/general';
 import {getCurrentTeamId} from 'selectors/entities/teams';
 
-import {PreferenceType} from 'types/preferences';
+import {PreferenceType, Theme} from 'types/preferences';
 import {UserProfile} from 'types/users';
 import {GlobalState} from 'types/store';
 import {$ID} from 'types/utilities';
@@ -128,9 +128,9 @@ const getThemePreference = createSelector(
     },
 );
 
-const getDefaultTheme = createSelector(getConfig, (config) => {
+const getDefaultTheme = createSelector(getConfig, (config): Theme => {
     if (config.DefaultTheme && config.DefaultTheme in Preferences.THEMES) {
-        const theme = Preferences.THEMES[config.DefaultTheme];
+        const theme: Theme = Preferences.THEMES[config.DefaultTheme];
         if (theme) {
             return theme;
         }
@@ -140,27 +140,19 @@ const getDefaultTheme = createSelector(getConfig, (config) => {
     return Preferences.THEMES.default;
 });
 
-export const getTheme: (state: GlobalState) => any = createShallowSelector(
+export const getTheme = createShallowSelector(
     getThemePreference,
     getDefaultTheme,
-    (themePreference, defaultTheme) => {
-        let theme: any;
-        if (themePreference) {
-            theme = themePreference.value;
-        } else {
-            theme = defaultTheme;
-        }
+    (themePreference, defaultTheme): Theme => {
+        const themeValue: Theme | string = themePreference?.value ?? defaultTheme;
 
-        if (typeof theme === 'string') {
-            // A custom theme will be a JSON-serialized object stored in a preference
-            theme = JSON.parse(theme);
-        }
-
+        // A custom theme will be a JSON-serialized object stored in a preference
         // At this point, the theme should be a plain object
+        const theme: Theme = typeof themeValue === 'string' ? JSON.parse(themeValue) : themeValue;
 
         // If this is a system theme, find it in case the user's theme is missing any fields
         if (theme.type && theme.type !== 'custom') {
-            const match = Object.values(Preferences.THEMES).find((v: any) => v.type === theme.type) as any;
+            const match = Object.values(Preferences.THEMES).find((v) => v.type === theme.type);
             if (match) {
                 if (!match.mentionBg) {
                     match.mentionBg = match.mentionBj;
@@ -173,7 +165,7 @@ export const getTheme: (state: GlobalState) => any = createShallowSelector(
         for (const key of Object.keys(defaultTheme)) {
             if (theme[key]) {
                 // Fix a case where upper case theme colours are rendered as black
-                theme[key] = theme[key].toLowerCase();
+                theme[key] = theme[key]?.toLowerCase();
             }
         }
 
@@ -186,10 +178,10 @@ export const getTheme: (state: GlobalState) => any = createShallowSelector(
     },
 );
 
-export function makeGetStyleFromTheme<Style>(): (state: GlobalState, getStyleFromTheme: (theme: any) => Style) => Style {
+export function makeGetStyleFromTheme<Style>(): (state: GlobalState, getStyleFromTheme: (theme: Theme) => Style) => Style {
     return createSelector(
         getTheme,
-        (state: GlobalState, getStyleFromTheme: (theme: any) => Style) => getStyleFromTheme,
+        (state: GlobalState, getStyleFromTheme: (theme: Theme) => Style) => getStyleFromTheme,
         (theme, getStyleFromTheme) => {
             return getStyleFromTheme(theme);
         },
