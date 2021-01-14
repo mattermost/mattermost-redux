@@ -44,7 +44,7 @@ export type AppBinding = {
 };
 
 export type AppCallValues = {
-    [name: string]: string;
+    [name: string]: any;
 };
 
 export type AppCallType = string;
@@ -111,8 +111,12 @@ export type AppForm = {
     cancel_button?: boolean;
     submit_on_cancel?: boolean;
     fields: AppField[];
+    call?: AppCall;
     depends_on?: string[];
 };
+
+export type AppFormValue = string | AppSelectOption | null;
+export type AppFormValues = {[name: string]: AppFormValue};
 
 export type AppSelectOption = {
     label: string;
@@ -129,9 +133,10 @@ export type AppField = {
     name: string;
     type: AppFieldType;
     is_required?: boolean;
+    readonly?: boolean;
 
     // Present (default) value of the field
-    value?: string;
+    value?: AppFormValue;
 
     description?: string;
 
@@ -142,9 +147,9 @@ export type AppField = {
     modal_label?: string;
 
     // Select props
-    refresh_on_change_to?: string[];
-    source_url?: string;
+    refresh?: boolean;
     options?: AppSelectOption[];
+    multiselect?: boolean;
 
     // Text props
     subtype?: string;
@@ -180,3 +185,9 @@ export type AutocompleteDynamicSelect = AutocompleteElement & {
 export type AutocompleteUserSelect = AutocompleteElement & {}
 
 export type AutocompleteChannelSelect = AutocompleteElement & {}
+
+export type AppLookupCallValues = {
+    user_input: string;
+    values: AppFormValues;
+    name: string;
+}
