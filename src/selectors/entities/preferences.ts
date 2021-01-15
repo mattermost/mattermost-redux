@@ -140,7 +140,7 @@ const getDefaultTheme = createSelector(getConfig, (config): Theme => {
     return Preferences.THEMES.default;
 });
 
-export const getTheme = createShallowSelector(
+export const getTheme: (state: GlobalState) => Theme = createShallowSelector(
     getThemePreference,
     getDefaultTheme,
     (themePreference, defaultTheme): Theme => {
