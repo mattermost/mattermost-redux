@@ -204,9 +204,36 @@ export function makeFilterAutoclosedDMs(): (state: GlobalState, channels: Channe
                 return channels;
             }
 
-            const filteredChannels = channels.slice();
+            let unreadCount = 0;
+            let visibleChannels = channels.filter((channel) => {
+                if (isUnreadChannel(myMembers, channel)) {
+                    unreadCount++;
 
-            filteredChannels.sort((channelA, channelB) => {
+                    // Unread DMs/GMs are always visible
+                    return true;
+                }
+
+                if (channel.id === currentChannelId) {
+                    return true;
+                }
+
+                // DMs with deactivated users will be visible if you're currently viewing them and they were opened
+                // since the user was deactivated
+                if (channel.type === General.DM_CHANNEL) {
+                    const teammateId = getUserIdFromChannelName(currentUserId, channel.name);
+                    const teammate = profiles[teammateId];
+
+                    const lastViewedAt = myMembers[channel.id]?.last_viewed_at;
+
+                    if (!teammate || teammate.delete_at > lastViewedAt) {
+                        return false;
+                    }
+                }
+
+                return true;
+            });
+
+            visibleChannels.sort((channelA, channelB) => {
                 // Should always prioritise the current channel
                 if (channelA.id === currentChannelId) {
                     return -1;
@@ -234,37 +261,14 @@ export function makeFilterAutoclosedDMs(): (state: GlobalState, channels: Channe
                 return 0;
             });
 
-            let unreadCount = 0;
-
-            filteredChannels.filter((channel) => {
-                if (isUnreadChannel(myMembers, channel)) {
-                    unreadCount++;
-
-                    // Unread DMs/GMs are always visible
-                    return true;
-                }
-
-                // DMs with deactivated users will be visible if you're currently viewing them and they were opened
-                // since the user was deactivated
-                if (channel.type === General.DM_CHANNEL) {
-                    const teammateId = getUserIdFromChannelName(currentUserId, channel.name);
-                    const teammate = profiles[teammateId];
-
-                    const lastViewedAt = myMembers[channel.id]?.last_viewed_at;
-
-                    if (!teammate || teammate.delete_at > lastViewedAt) {
-                        return false;
-                    }
-                }
-
-                return true;
-            });
-
             // The limit of DMs user specifies to be rendered in the sidebar
             const remaining = Math.max(limitPref, unreadCount);
-            const visibleChannels = filteredChannels.slice(0, remaining);
+            visibleChannels = visibleChannels.slice(0, remaining);
 
-            return visibleChannels;
+            const visibleChannelsSet = new Set(visibleChannels);
+            const filteredChannels = channels.filter((channel) => visibleChannelsSet.has(channel));
+
+            return filteredChannels.length === channels.length ? channels : filteredChannels;
         },
     );
 }
