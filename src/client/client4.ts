@@ -3407,6 +3407,13 @@ export default class Client4 {
         );
     }
 
+    getRenewalLink = () => {
+        return this.doFetch<{renewal_link: string}>(
+            `${this.getBaseRoute()}/license/renewal`,
+            {method: 'get'},
+        );
+    }
+
     getInvoices = () => {
         return this.doFetch<Invoice[]>(
             `${this.getCloudRoute()}/subscription/invoices`,
