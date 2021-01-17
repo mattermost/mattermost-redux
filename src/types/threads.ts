@@ -1,9 +1,9 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
-import {Post} from 'types/posts';
-import {Team} from 'types/teams';
-import {UserProfile} from 'types/users';
-import {$ID, IDMappedObjects, RelationOneToMany, RelationOneToOne} from 'types/utilities';
+import type {Post} from './posts';
+import type {Team} from './teams';
+import type {UserProfile} from './users';
+import type {$ID, IDMappedObjects, RelationOneToMany, RelationOneToOne} from './utilities';
 
 export type UserThread = {
     id: string;
