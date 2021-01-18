@@ -1,27 +1,34 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
 
-import {GeneralState} from './general';
-import {UsersState} from './users';
-import {TeamsState} from './teams';
-import {ChannelsState} from './channels';
-import {PostsState} from './posts';
 import {AdminState} from './admin';
-import {JobsState} from './jobs';
-import {SearchState} from './search';
-import {IntegrationsState} from './integrations';
-import {FilesState} from './files';
-import {EmojisState} from './emojis';
-import {SchemesState} from './schemes';
-import {Typing} from './typing';
-import {GroupsState} from './groups';
-import {ChannelsRequestsStatuses, GeneralRequestsStatuses, PostsRequestsStatuses, TeamsRequestsStatuses, UsersRequestsStatuses, AdminRequestsStatuses, FilesRequestsStatuses, RolesRequestsStatuses, JobsRequestsStatuses} from './requests';
-import {Role} from './roles';
-import {PreferenceType} from './preferences';
 import {Bot} from './bots';
+import {ChannelsState} from './channels';
 import {ChannelCategoriesState} from './channel_categories';
-import {Dictionary} from './utilities';
 import {CloudState} from './cloud';
+import {EmojisState} from './emojis';
+import {FilesState} from './files';
+import {GeneralState} from './general';
+import {GroupsState} from './groups';
+import {IntegrationsState} from './integrations';
+import {JobsState} from './jobs';
+import {PostsState} from './posts';
+import {PreferenceType} from './preferences';
+import {
+    AdminRequestsStatuses, ChannelsRequestsStatuses,
+    FilesRequestsStatuses, GeneralRequestsStatuses,
+    JobsRequestsStatuses, PostsRequestsStatuses,
+    RolesRequestsStatuses, TeamsRequestsStatuses,
+    UsersRequestsStatuses,
+} from './requests';
+import {Role} from './roles';
+import {SchemesState} from './schemes';
+import {SearchState} from './search';
+import {TeamsState} from './teams';
+import {ThreadsState} from './threads';
+import {Typing} from './typing';
+import {UsersState} from './users';
+import {Dictionary} from './utilities';
 
 export type GlobalState = {
     entities: {
@@ -30,6 +37,7 @@ export type GlobalState = {
         teams: TeamsState;
         channels: ChannelsState;
         posts: PostsState;
+        threads: ThreadsState;
         bots: {
             accounts: Dictionary<Bot>;
         };

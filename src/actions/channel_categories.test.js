@@ -549,6 +549,18 @@ describe('moveChannelToCategory', () => {
                 users: {
                     currentUserId,
                 },
+                channels: {
+                    channels: {
+                        channel1: {
+                            id: 'channel1',
+                            team_id: teamId,
+                        },
+                        channel2: {
+                            id: 'channel2',
+                            team_id: teamId,
+                        },
+                    },
+                },
             },
         });
 
@@ -885,6 +897,18 @@ describe('moveChannelsToCategory', () => {
                 },
                 users: {
                     currentUserId,
+                },
+                channels: {
+                    channels: {
+                        channel1: {
+                            id: 'channel1',
+                            team_id: teamId,
+                        },
+                        channel2: {
+                            id: 'channel2',
+                            team_id: teamId,
+                        },
+                    },
                 },
             },
         });
