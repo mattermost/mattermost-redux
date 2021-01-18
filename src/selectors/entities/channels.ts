@@ -22,7 +22,6 @@ import {
     getTeammateNameDisplaySetting,
     getVisibleTeammate,
     getVisibleGroupIds,
-    getNewSidebarPreference,
 } from 'selectors/entities/preferences';
 import {haveICurrentChannelPermission, haveIChannelPermission, haveITeamPermission} from 'selectors/entities/roles';
 import {
@@ -1308,20 +1307,21 @@ export function getChannelMemberCountsByGroup(state: GlobalState, channelId: str
 }
 
 export function isFavoriteChannel(state: GlobalState, channelId: string): boolean {
-    if (getNewSidebarPreference(state)) {
-        const channel = getChannel(state, channelId);
-        if (!channel) {
-            return false;
-        }
-
-        const category = getCategoryInTeamByType(state, channel.team_id || getCurrentTeamId(state), CategoryTypes.FAVORITES);
-
-        if (!category) {
-            return false;
-        }
-
-        return category.channel_ids.includes(channel.id);
+    const config = getConfig(state);
+    if (config.EnableLegacySidebar === 'true') {
+        return isFavoriteChannelOld(getMyPreferences(state), channelId);
     }
 
-    return isFavoriteChannelOld(getMyPreferences(state), channelId);
+    const channel = getChannel(state, channelId);
+    if (!channel) {
+        return false;
+    }
+
+    const category = getCategoryInTeamByType(state, channel.team_id || getCurrentTeamId(state), CategoryTypes.FAVORITES);
+
+    if (!category) {
+        return false;
+    }
+
+    return category.channel_ids.includes(channel.id);
 }
