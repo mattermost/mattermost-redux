@@ -24,6 +24,7 @@ import bots from './bots';
 import channelCategories from './channel_categories';
 import apps from './apps';
 import cloud from './cloud';
+import threads from './threads';
 
 export default combineReducers({
     general,
@@ -44,6 +45,7 @@ export default combineReducers({
     schemes,
     groups,
     bots,
+    threads,
     channelCategories,
     apps,
     cloud,

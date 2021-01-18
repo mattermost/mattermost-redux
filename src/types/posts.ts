@@ -74,6 +74,8 @@ export type Post = {
     user_activity_posts?: Post[];
     state?: 'DELETED';
     filenames?: string[];
+    last_reply_at?: number;
+    participants?: any; //Array<UserProfile | $ID<UserProfile>>;
     message_source?: string;
 };
 

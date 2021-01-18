@@ -23,6 +23,7 @@ import PluginTypes from './plugins';
 import ChannelCategoryTypes from './channel_categories';
 import CloudTypes from './cloud';
 import AppsTypes from './apps';
+import ThreadTypes from './threads';
 
 export {
     ErrorTypes,
@@ -47,4 +48,5 @@ export {
     ChannelCategoryTypes,
     CloudTypes,
     AppsTypes,
+    ThreadTypes,
 };

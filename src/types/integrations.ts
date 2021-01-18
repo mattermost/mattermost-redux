@@ -79,7 +79,7 @@ export type ServerAutocompleteSuggestion = {
     Hint: string;
     Description: string;
     IconData: string;
-}
+};
 
 export type OAuthApp = {
     'id': string;
