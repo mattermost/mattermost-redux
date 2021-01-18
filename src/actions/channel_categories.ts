@@ -281,11 +281,20 @@ export function moveChannelsToCategory(categoryId: string, channelIds: string[],
         const targetCategory = getCategory(state, categoryId);
         const currentUserId = getCurrentUserId(state);
 
+        // The default sorting needs to behave like alphabetical sorting until the point that the user rearranges their
+        // channels at which point, it becomes manual. Other than that, we never change the sorting method automatically.
+        let sorting = targetCategory.sorting;
+        if (setManualSorting &&
+            targetCategory.type !== CategoryTypes.DIRECT_MESSAGES &&
+            targetCategory.sorting === CategorySorting.Default) {
+            sorting = CategorySorting.Manual;
+        }
+
         // Add the channels to the new category
         let categories = {
             [targetCategory.id]: {
                 ...targetCategory,
-                sorting: (setManualSorting && targetCategory.type !== CategoryTypes.DIRECT_MESSAGES) ? CategorySorting.Manual : targetCategory.sorting,
+                sorting,
                 channel_ids: insertMultipleWithoutDuplicates(targetCategory.channel_ids, channelIds, newIndex),
             },
         };
