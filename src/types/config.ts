@@ -34,7 +34,7 @@ export type ClientConfig = {
     DataRetentionFileRetentionDays: string;
     DataRetentionMessageRetentionDays: string;
     DefaultClientLocale: string;
-    DefaultTheme: string;
+    DefaultTheme: 'default' | 'organization' | 'mattermostDark' | 'windows10';
     DesktopLatestVersion: string;
     DesktopMinVersion: string;
     DiagnosticId: string;
@@ -65,6 +65,7 @@ export type ClientConfig = {
     EnableIncomingWebhooks: string;
     EnableLatex: string;
     EnableLdap: string;
+    EnableLegacySidebar: string;
     EnableLinkPreviews: string;
     EnableMarketplace: string;
     EnableMetrics: string;
@@ -86,6 +87,7 @@ export type ClientConfig = {
     EnableSignUpWithGitLab: string;
     EnableSignUpWithGoogle: string;
     EnableSignUpWithOffice365: string;
+    EnableSignUpWithOpenId: string;
     EnableSVGs: string;
     EnableTesting: string;
     EnableThemeSelection: string;
@@ -97,7 +99,6 @@ export type ClientConfig = {
     EnableXToLeaveChannelsFromLHS: string;
     EnforceMultifactorAuthentication: string;
     ExperimentalChannelOrganization: string;
-    ExperimentalChannelSidebarOrganization: string;
     ExperimentalClientSideCertCheck: string;
     ExperimentalClientSideCertEnable: string;
     ExperimentalCloudBilling: string;
@@ -123,6 +124,7 @@ export type ClientConfig = {
     IosAppDownloadLink: string;
     IosLatestVersion: string;
     IosMinVersion: string;
+    IsDefaultMarketplace: string;
     LdapFirstNameAttributeSet: string;
     LdapLastNameAttributeSet: string;
     LdapLoginButtonBorderColor: string;
@@ -133,9 +135,12 @@ export type ClientConfig = {
     LdapPositionAttributeSet: string;
     LdapPictureAttributeSet: string;
     LockTeammateNameDisplay: string;
+    ManagedResourcePaths: string;
     MaxFileSize: string;
     MaxNotificationsPerChannel: string;
     MinimumHashtagLength: string;
+    OpenIdButtonText: string;
+    OpenIdButtonColor: string;
     PasswordMinimumLength: string;
     PasswordRequireLowercase: string;
     PasswordRequireNumber: string;
@@ -303,7 +308,6 @@ export type ServiceSettings = {
     ExperimentalEnableDefaultChannelLeaveJoinMessages: boolean;
     ExperimentalGroupUnreadChannels: string;
     ExperimentalChannelOrganization: boolean;
-    ExperimentalChannelSidebarOrganization: string;
     ExperimentalDataPrefetch: boolean;
     ImageProxyType: string;
     ImageProxyURL: string;
@@ -319,6 +323,7 @@ export type ServiceSettings = {
     EnableLatex: boolean;
     EnableLocalMode: boolean;
     LocalModeSocketLocation: string;
+    EnableLegacySidebar: boolean;
 };
 
 export type TeamSettings = {
@@ -529,6 +534,9 @@ export type SSOSettings = {
     AuthEndpoint: string;
     TokenEndpoint: string;
     UserApiEndpoint: string;
+    DiscoveryEndpoint: string;
+    ButtonText: string;
+    ButtonColor: string;
 };
 
 export type Office365Settings = {
@@ -539,6 +547,7 @@ export type Office365Settings = {
     AuthEndpoint: string;
     TokenEndpoint: string;
     UserApiEndpoint: string;
+    DiscoveryEndpoint: string;
     DirectoryId: string;
 };
 
@@ -594,6 +603,7 @@ export type SamlSettings = {
     Enable: boolean;
     EnableSyncWithLdap: boolean;
     EnableSyncWithLdapIncludeAuth: boolean;
+    IgnoreGuestsLdapSync: boolean;
     Verify: boolean;
     Encrypt: boolean;
     SignRequest: boolean;
@@ -786,6 +796,7 @@ export type AdminConfig = {
     GitLabSettings: SSOSettings;
     GoogleSettings: SSOSettings;
     Office365Settings: Office365Settings;
+    OpenIdSettings: SSOSettings;
     LdapSettings: LdapSettings;
     ComplianceSettings: ComplianceSettings;
     LocalizationSettings: LocalizationSettings;

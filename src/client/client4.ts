@@ -97,7 +97,8 @@ import {cleanUrlForLogging} from 'utils/sentry';
 import {isSystemAdmin} from 'utils/user_utils';
 
 import fetch from './fetch_etag';
-import {rudderAnalytics} from './rudder';
+import {TelemetryHandler} from './telemetry';
+import {UserThreadList} from 'types/threads';
 
 const FormData = require('form-data');
 const HEADER_AUTH = 'Authorization';
@@ -127,12 +128,13 @@ export default class Client4 {
     userId = '';
     diagnosticId = '';
     includeCookies = true;
-    isRudderKeySet = false;
     translations = {
         connectionError: 'There appears to be a problem with your internet connection.',
         unknownError: 'We received an unexpected status code from the server.',
     };
     userRoles?: string;
+
+    telemetryHandler?: TelemetryHandler;
 
     getUrl() {
         return this.url;
@@ -189,8 +191,8 @@ export default class Client4 {
         this.diagnosticId = diagnosticId;
     }
 
-    enableRudderEvents() {
-        this.isRudderKeySet = true;
+    setTelemetryHandler(telemetryHandler?: TelemetryHandler) {
+        this.telemetryHandler = telemetryHandler;
     }
 
     getServerVersion() {
@@ -393,6 +395,14 @@ export default class Client4 {
         return `${this.getBaseRoute()}/cloud`;
     }
 
+    getUserThreadsRoute(userID: string, teamID: string): string {
+        return `${this.getUserRoute(userID)}/teams/${teamID}/threads`;
+    }
+
+    getUserThreadRoute(userId: string, teamId: string, threadId: string): string {
+        return `${this.getUserThreadsRoute(userId, teamId)}/${threadId}`;
+    }
+
     getCSRFFromCookie() {
         if (typeof document !== 'undefined' && typeof document.cookie !== 'undefined') {
             const cookies = document.cookie.split(';');
@@ -554,7 +564,7 @@ export default class Client4 {
     getKnownUsers = () => {
         this.trackEvent('api', 'api_get_known_users');
 
-        return this.doFetch<$ID<UserProfile>[]>(
+        return this.doFetch<Array<$ID<UserProfile>>>(
             `${this.getUsersRoute()}/known`,
             {method: 'get'},
         );
@@ -1673,7 +1683,7 @@ export default class Client4 {
         );
     };
 
-    patchChannelModerations = (channelId: string, channelModerationsPatch: Array<ChannelModerationPatch>) => {
+    patchChannelModerations = (channelId: string, channelModerationsPatch: ChannelModerationPatch[]) => {
         return this.doFetch<ChannelModeration[]>(
             `${this.getChannelRoute(channelId)}/moderations/patch`,
             {method: 'put', body: JSON.stringify(channelModerationsPatch)},
@@ -1858,49 +1868,90 @@ export default class Client4 {
         );
     };
 
-    getPostThread = (postId: string, fetchThreads = true) => {
+    getPostThread = (postId: string, fetchThreads = true, collapsedThreads = false, collapsedThreadsExtended = false) => {
         return this.doFetch<PostList>(
-            `${this.getPostRoute(postId)}/thread${buildQueryString({skipFetchThreads: !fetchThreads})}`,
+            `${this.getPostRoute(postId)}/thread${buildQueryString({skipFetchThreads: !fetchThreads, collapsedThreads, collapsedThreadsExtended})}`,
             {method: 'get'},
         );
     };
 
-    getPosts = (channelId: string, page = 0, perPage = PER_PAGE_DEFAULT, fetchThreads = true) => {
+    getPosts = (channelId: string, page = 0, perPage = PER_PAGE_DEFAULT, fetchThreads = true, collapsedThreads = false, collapsedThreadsExtended = false) => {
         return this.doFetch<PostList>(
-            `${this.getChannelRoute(channelId)}/posts${buildQueryString({page, per_page: perPage, skipFetchThreads: !fetchThreads})}`,
+            `${this.getChannelRoute(channelId)}/posts${buildQueryString({page, per_page: perPage, skipFetchThreads: !fetchThreads, collapsedThreads, collapsedThreadsExtended})}`,
             {method: 'get'},
         );
     };
 
-    getPostsUnread = (channelId: string, userId: string, limitAfter = DEFAULT_LIMIT_AFTER, limitBefore = DEFAULT_LIMIT_BEFORE, fetchThreads = true) => {
+    getPostsUnread = (channelId: string, userId: string, limitAfter = DEFAULT_LIMIT_AFTER, limitBefore = DEFAULT_LIMIT_BEFORE, fetchThreads = true, collapsedThreads = false, collapsedThreadsExtended = false) => {
         return this.doFetch<PostList>(
-            `${this.getUserRoute(userId)}/channels/${channelId}/posts/unread${buildQueryString({limit_after: limitAfter, limit_before: limitBefore, skipFetchThreads: !fetchThreads})}`,
+            `${this.getUserRoute(userId)}/channels/${channelId}/posts/unread${buildQueryString({limit_after: limitAfter, limit_before: limitBefore, skipFetchThreads: !fetchThreads, collapsedThreads, collapsedThreadsExtended})}`,
             {method: 'get'},
         );
     };
 
-    getPostsSince = (channelId: string, since: number, fetchThreads = true) => {
+    getPostsSince = (channelId: string, since: number, fetchThreads = true, collapsedThreads = false, collapsedThreadsExtended = false) => {
         return this.doFetch<PostList>(
-            `${this.getChannelRoute(channelId)}/posts${buildQueryString({since, skipFetchThreads: !fetchThreads})}`,
+            `${this.getChannelRoute(channelId)}/posts${buildQueryString({since, skipFetchThreads: !fetchThreads, collapsedThreads, collapsedThreadsExtended})}`,
             {method: 'get'},
         );
     };
 
-    getPostsBefore = (channelId: string, postId: string, page = 0, perPage = PER_PAGE_DEFAULT, fetchThreads = true) => {
+    getPostsBefore = (channelId: string, postId: string, page = 0, perPage = PER_PAGE_DEFAULT, fetchThreads = true, collapsedThreads = false, collapsedThreadsExtended = false) => {
         this.trackEvent('api', 'api_posts_get_before', {channel_id: channelId});
 
         return this.doFetch<PostList>(
-            `${this.getChannelRoute(channelId)}/posts${buildQueryString({before: postId, page, per_page: perPage, skipFetchThreads: !fetchThreads})}`,
+            `${this.getChannelRoute(channelId)}/posts${buildQueryString({before: postId, page, per_page: perPage, skipFetchThreads: !fetchThreads, collapsedThreads, collapsedThreadsExtended})}`,
             {method: 'get'},
         );
     };
 
-    getPostsAfter = (channelId: string, postId: string, page = 0, perPage = PER_PAGE_DEFAULT, fetchThreads = true) => {
+    getPostsAfter = (channelId: string, postId: string, page = 0, perPage = PER_PAGE_DEFAULT, fetchThreads = true, collapsedThreads = false, collapsedThreadsExtended = false) => {
         this.trackEvent('api', 'api_posts_get_after', {channel_id: channelId});
 
         return this.doFetch<PostList>(
-            `${this.getChannelRoute(channelId)}/posts${buildQueryString({after: postId, page, per_page: perPage, skipFetchThreads: !fetchThreads})}`,
+            `${this.getChannelRoute(channelId)}/posts${buildQueryString({after: postId, page, per_page: perPage, skipFetchThreads: !fetchThreads, collapsedThreads, collapsedThreadsExtended})}`,
             {method: 'get'},
+        );
+    };
+
+    getUserThreads = (
+        userId: $ID<UserProfile> = 'me',
+        teamId: $ID<Team>,
+        {
+            page = 0,
+            pageSize = PER_PAGE_DEFAULT,
+            extended = false,
+            deleted = false,
+            since = 0,
+        },
+    ) => {
+        return this.doFetch<UserThreadList>(
+            `${this.getUserThreadsRoute(userId, teamId)}${buildQueryString({page, pageSize, extended, deleted, since})}`,
+            {method: 'get'},
+        );
+    };
+
+    updateThreadsReadForUser = (userId: string, teamId: string) => {
+        const url = `${this.getUserThreadsRoute(userId, teamId)}/read`;
+        return this.doFetch<StatusOK>(
+            url,
+            {method: 'put'},
+        );
+    };
+
+    updateThreadReadForUser = (userId: string, teamId: string, threadId: string, timestamp: number) => {
+        const url = `${this.getUserThreadRoute(userId, teamId, threadId)}/read/${timestamp}`;
+        return this.doFetch<StatusOK>(
+            url,
+            {method: 'put'},
+        );
+    };
+
+    updateThreadFollowForUser = (userId: string, teamId: string, threadId: string, state: boolean) => {
+        const url = this.getUserThreadRoute(userId, teamId, threadId) + '/following';
+        return this.doFetch<StatusOK>(
+            url,
+            {method: state ? 'put' : 'delete'},
         );
     };
 
@@ -2666,7 +2717,7 @@ export default class Client4 {
         );
     };
 
-    createComplianceReport = (job: Job) => {
+    createComplianceReport = (job: Partial<Compliance>) => {
         return this.doFetch<Compliance>(
             `${this.getBaseRoute()}/compliance/reports`,
             {method: 'post', body: JSON.stringify(job)},
@@ -3497,57 +3548,17 @@ export default class Client4 {
     };
 
     trackEvent(category: string, event: string, props?: any) {
-        if (!this.isRudderKeySet) {
-            return;
+        if (this.telemetryHandler) {
+            const userRoles = this.userRoles && isSystemAdmin(this.userRoles) ? 'system_admin, system_user' : 'system_user';
+            this.telemetryHandler.trackEvent(this.userId, userRoles, category, event, props);
         }
-
-        const properties = Object.assign({
-            category,
-            type: event,
-            user_actual_role: this.userRoles && isSystemAdmin(this.userRoles) ? 'system_admin, system_user' : 'system_user',
-            user_actual_id: this.userId,
-        }, props);
-        const options = {
-            context: {
-                ip: '0.0.0.0',
-            },
-            page: {
-                path: '',
-                referrer: '',
-                search: '',
-                title: '',
-                url: '',
-            },
-            anonymousId: '00000000000000000000000000',
-        };
-
-        rudderAnalytics.track('event', properties, options);
     }
 
     pageVisited(category: string, name: string) {
-        if (!this.isRudderKeySet) {
-            return;
+        if (this.telemetryHandler) {
+            const userRoles = this.userRoles && isSystemAdmin(this.userRoles) ? 'system_admin, system_user' : 'system_user';
+            this.telemetryHandler.pageVisited(this.userId, userRoles, category, name);
         }
-
-        rudderAnalytics.page(
-            category,
-            name,
-            {
-                path: '',
-                referrer: '',
-                search: '',
-                title: '',
-                url: '',
-                user_actual_role: this.userRoles && isSystemAdmin(this.userRoles) ? 'system_admin, system_user' : 'system_user',
-                user_actual_id: this.userId,
-            },
-            {
-                context: {
-                    ip: '0.0.0.0',
-                },
-                anonymousId: '00000000000000000000000000',
-            },
-        );
     }
 }
 

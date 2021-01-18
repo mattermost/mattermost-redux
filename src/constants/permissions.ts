@@ -79,6 +79,7 @@ const values = {
     READ_OTHER_USERS_TEAMS: 'read_other_users_teams',
     EDIT_BRAND: 'edit_brand',
     READ_JOBS: 'read_jobs',
+    DOWNLOAD_COMPLIANCE_EXPORT_RESULT: 'download_compliance_export_result',
 
     SYSCONSOLE_READ_ABOUT: 'sysconsole_read_about',
     SYSCONSOLE_WRITE_ABOUT: 'sysconsole_write_about',
@@ -96,6 +97,8 @@ const values = {
     SYSCONSOLE_WRITE_USERMANAGEMENT_CHANNELS: 'sysconsole_write_user_management_channels',
     SYSCONSOLE_READ_USERMANAGEMENT_PERMISSIONS: 'sysconsole_read_user_management_permissions',
     SYSCONSOLE_WRITE_USERMANAGEMENT_PERMISSIONS: 'sysconsole_write_user_management_permissions',
+    SYSCONSOLE_READ_USERMANAGEMENT_SYSTEM_ROLES: 'sysconsole_read_user_management_system_roles',
+    SYSCONSOLE_WRITE_USERMANAGEMENT_SYSTEM_ROLES: 'sysconsole_write_user_management_system_roles',
     SYSCONSOLE_READ_ENVIRONMENT: 'sysconsole_read_environment',
     SYSCONSOLE_WRITE_ENVIRONMENT: 'sysconsole_write_environment',
     SYSCONSOLE_READ_SITE: 'sysconsole_read_site',
@@ -122,6 +125,7 @@ const values = {
     SYSCONSOLE_READ_PERMISSIONS: [] as string[],
     SYSCONSOLE_WRITE_PERMISSIONS: [] as string[],
     MANAGE_SHARED_CHANNELS: 'manage_shared_channels',
+    MANAGE_REMOTE_CLUSTERS: 'manage_remote_clusters',
     SYSCONSOLE_ANCILLARY_PERMISSIONS: {} as Record<string, string[]>,
 };
 
@@ -175,6 +179,13 @@ values.SYSCONSOLE_ANCILLARY_PERMISSIONS = {
         values.LIST_PRIVATE_TEAMS,
         values.LIST_PUBLIC_TEAMS,
         values.VIEW_TEAM,
+    ],
+    [values.SYSCONSOLE_WRITE_COMPLIANCE]: [
+        values.MANAGE_JOBS,
+    ],
+    [values.SYSCONSOLE_READ_COMPLIANCE]: [
+        values.READ_JOBS,
+        values.DOWNLOAD_COMPLIANCE_EXPORT_RESULT,
     ],
     [values.SYSCONSOLE_READ_ENVIRONMENT]: [
         values.READ_JOBS,

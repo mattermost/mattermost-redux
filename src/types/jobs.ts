@@ -15,7 +15,7 @@ export type Job = {
     data: any;
 };
 export type JobsByType = {
-    [x in JobType]?: Array<Job>;
+    [x in JobType]?: Job[];
 };
 export type JobsState = {
     jobs: IDMappedObjects<Job>;

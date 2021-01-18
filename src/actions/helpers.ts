@@ -70,9 +70,9 @@ export function bindClientFunc({
 }: {
     clientFunc: (...args: any[]) => Promise<any>;
     onRequest?: ActionType;
-    onSuccess?: ActionType | Array<ActionType>;
+    onSuccess?: ActionType | ActionType[];
     onFailure?: ActionType;
-    params?: Array<any>;
+    params?: any[];
 }): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         if (onRequest) {
@@ -108,7 +108,7 @@ export function bindClientFunc({
 
 export function debounce(func: (...args: any) => unknown, wait: number, immediate: boolean, cb: () => unknown) {
     let timeout: NodeJS.Timeout|null;
-    return function fx(...args: Array<any>) {
+    return function fx(...args: any[]) {
         const runLater = () => {
             timeout = null;
             if (!immediate) {

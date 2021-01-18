@@ -7,6 +7,7 @@ import {Client4} from 'client';
 
 import {General, Preferences} from '../constants';
 import {CategoryTypes} from 'constants/channel_categories';
+import {MarkUnread} from 'constants/channels';
 
 import {getCategoryInTeamByType} from 'selectors/entities/channel_categories';
 import {
@@ -17,7 +18,6 @@ import {
     isManuallyUnread,
 } from 'selectors/entities/channels';
 import {getConfig, getServerVersion} from 'selectors/entities/general';
-import {getNewSidebarPreference} from 'selectors/entities/preferences';
 import {getCurrentTeamId} from 'selectors/entities/teams';
 import {getCurrentUserId} from 'selectors/entities/users';
 
@@ -166,7 +166,7 @@ export function markGroupChannelOpen(channelId: string): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         const {currentUserId} = getState().entities.users;
 
-        const preferences: Array<PreferenceType> = [
+        const preferences: PreferenceType[] = [
             {user_id: currentUserId, category: Preferences.CATEGORY_GROUP_CHANNEL_SHOW, name: channelId, value: 'true'},
             {user_id: currentUserId, category: Preferences.CATEGORY_CHANNEL_OPEN_TIME, name: channelId, value: new Date().getTime().toString()},
         ];
@@ -175,7 +175,7 @@ export function markGroupChannelOpen(channelId: string): ActionFunc {
     };
 }
 
-export function createGroupChannel(userIds: Array<string>): ActionFunc {
+export function createGroupChannel(userIds: string[]): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         dispatch({type: ChannelTypes.CREATE_CHANNEL_REQUEST, data: null});
 
@@ -1336,7 +1336,7 @@ export function markChannelAsRead(channelId: string, prevChannelId?: string, upd
 
 // Increments the number of posts in the channel by 1 and marks it as unread if necessary
 
-export function markChannelAsUnread(teamId: string, channelId: string, mentions: Array<string>, fetchedChannelMember = false): ActionFunc {
+export function markChannelAsUnread(teamId: string, channelId: string, mentions: string[], fetchedChannelMember = false): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         const state = getState();
         const {myMembers} = state.entities.channels;
@@ -1349,7 +1349,7 @@ export function markChannelAsUnread(teamId: string, channelId: string, mentions:
                 channelId,
                 amount: 1,
                 onlyMentions: myMembers[channelId] && myMembers[channelId].notify_props &&
-                    myMembers[channelId].notify_props.mark_unread === General.MENTION,
+                    myMembers[channelId].notify_props.mark_unread === MarkUnread.MENTION,
                 fetchedChannelMember,
             },
         }];
@@ -1382,7 +1382,7 @@ export function markChannelAsUnread(teamId: string, channelId: string, mentions:
     };
 }
 
-export function getChannelMembersByIds(channelId: string, userIds: Array<string>) {
+export function getChannelMembersByIds(channelId: string, userIds: string[]) {
     return bindClientFunc({
         clientFunc: Client4.getChannelMembersByIds,
         onSuccess: ChannelTypes.RECEIVED_CHANNEL_MEMBERS,
@@ -1417,6 +1417,7 @@ export function getMyChannelMember(channelId: string) {
 export function favoriteChannel(channelId: string, updateCategories = true): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         const state = getState();
+        const config = getConfig(state);
         const currentUserId = getCurrentUserId(state);
 
         const preference: PreferenceType = {
@@ -1428,31 +1429,32 @@ export function favoriteChannel(channelId: string, updateCategories = true): Act
 
         Client4.trackEvent('action', 'action_channels_favorite');
 
-        if (getNewSidebarPreference(state)) {
-            // The new sidebar is enabled, so favorite the channel by moving it into the current team's Favorites category
-            if (updateCategories) {
-                const channel = getChannelSelector(state, channelId);
-                const category = getCategoryInTeamByType(state, channel.team_id || getCurrentTeamId(state), CategoryTypes.FAVORITES);
-
-                if (category) {
-                    await dispatch(addChannelToCategory(category.id, channelId));
-                }
-            }
-
-            return dispatch({
-                type: PreferenceTypes.RECEIVED_PREFERENCES,
-                data: [preference],
-            });
+        if (config.EnableLegacySidebar === 'true') {
+            // The old sidebar is enabled, so favorite the channel by calling the preferences API
+            return dispatch(savePreferences(currentUserId, [preference]));
         }
 
-        // The old sidebar is enabled, so favorite the channel by calling the preferences API
-        return dispatch(savePreferences(currentUserId, [preference]));
+        // The new sidebar is enabled, so favorite the channel by moving it into the current team's Favorites category
+        if (updateCategories) {
+            const channel = getChannelSelector(state, channelId);
+            const category = getCategoryInTeamByType(state, channel.team_id || getCurrentTeamId(state), CategoryTypes.FAVORITES);
+
+            if (category) {
+                await dispatch(addChannelToCategory(category.id, channelId));
+            }
+        }
+
+        return dispatch({
+            type: PreferenceTypes.RECEIVED_PREFERENCES,
+            data: [preference],
+        });
     };
 }
 
 export function unfavoriteChannel(channelId: string, updateCategories = true): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         const state = getState();
+        const config = getConfig(state);
         const currentUserId = getCurrentUserId(state);
 
         const preference: PreferenceType = {
@@ -1464,29 +1466,29 @@ export function unfavoriteChannel(channelId: string, updateCategories = true): A
 
         Client4.trackEvent('action', 'action_channels_unfavorite');
 
-        if (getNewSidebarPreference(state)) {
-            // The new sidebar is enabled, so unfavorite the channel by moving it into the current team's Channels/DMs category
-            if (updateCategories) {
-                const channel = getChannelSelector(state, channelId);
-                const category = getCategoryInTeamByType(
-                    state,
-                    channel.team_id || getCurrentTeamId(state),
-                    channel.type === General.DM_CHANNEL || channel.type === General.GM_CHANNEL ? CategoryTypes.DIRECT_MESSAGES : CategoryTypes.CHANNELS,
-                );
-
-                if (category) {
-                    await dispatch(addChannelToCategory(category.id, channel.id));
-                }
-            }
-
-            return dispatch({
-                type: PreferenceTypes.DELETED_PREFERENCES,
-                data: [preference],
-            });
+        if (config.EnableLegacySidebar === 'true') {
+            // The old sidebar is enabled, so unfavorite the channel by calling the preferences API
+            return dispatch(deletePreferences(currentUserId, [preference]));
         }
 
-        // The old sidebar is enabled, so unfavorite the channel by calling the preferences API
-        return dispatch(deletePreferences(currentUserId, [preference]));
+        // The new sidebar is enabled, so unfavorite the channel by moving it into the current team's Channels/DMs category
+        if (updateCategories) {
+            const channel = getChannelSelector(state, channelId);
+            const category = getCategoryInTeamByType(
+                state,
+                channel.team_id || getCurrentTeamId(state),
+                channel.type === General.DM_CHANNEL || channel.type === General.GM_CHANNEL ? CategoryTypes.DIRECT_MESSAGES : CategoryTypes.CHANNELS,
+            );
+
+            if (category) {
+                await dispatch(addChannelToCategory(category.id, channel.id));
+            }
+        }
+
+        return dispatch({
+            type: PreferenceTypes.DELETED_PREFERENCES,
+            data: [preference],
+        });
     };
 }
 
@@ -1510,7 +1512,7 @@ export function updateChannelMemberSchemeRoles(channelId: string, userId: string
     });
 }
 
-export function membersMinusGroupMembers(channelID: string, groupIDs: Array<string>, page = 0, perPage: number = General.PROFILE_CHUNK_SIZE): ActionFunc {
+export function membersMinusGroupMembers(channelID: string, groupIDs: string[], page = 0, perPage: number = General.PROFILE_CHUNK_SIZE): ActionFunc {
     return bindClientFunc({
         clientFunc: Client4.channelMembersMinusGroupMembers,
         onSuccess: ChannelTypes.RECEIVED_CHANNEL_MEMBERS_MINUS_GROUP_MEMBERS,
@@ -1536,7 +1538,7 @@ export function getChannelModerations(channelId: string): ActionFunc {
     });
 }
 
-export function patchChannelModerations(channelId: string, patch: Array<ChannelModerationPatch>): ActionFunc {
+export function patchChannelModerations(channelId: string, patch: ChannelModerationPatch[]): ActionFunc {
     return bindClientFunc({
         clientFunc: async () => {
             const moderations = await Client4.patchChannelModerations(channelId, patch);

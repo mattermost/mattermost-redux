@@ -10,7 +10,7 @@ import {CategoryTypes} from '../../constants/channel_categories';
 import {getCurrentChannelId, getMyChannelMemberships, makeGetChannelsForIds} from 'selectors/entities/channels';
 import {getCurrentUserLocale} from 'selectors/entities/i18n';
 import {getLastPostPerChannel} from 'selectors/entities/posts';
-import {getMyPreferences, getTeammateNameDisplaySetting, shouldAutocloseDMs} from 'selectors/entities/preferences';
+import {getMyPreferences, getTeammateNameDisplaySetting, shouldAutocloseDMs, getInt} from 'selectors/entities/preferences';
 import {getCurrentUserId} from 'selectors/entities/users';
 
 import {Channel, ChannelMembership} from 'types/channels';
@@ -96,11 +96,11 @@ function getDefaultAutocloseCutoff() {
     return Date.now() - (7 * 24 * 60 * 60 * 1000);
 }
 
-// makeFilterAutoclosedDMs returns a selector that filters a given list of channels based on whether or not the channel has
+// legacyMakeFilterAutoclosedDMs returns a selector that filters a given list of channels based on whether or not the channel has
 // been autoclosed by either being an inactive DM/GM or a DM with a deactivated user. The exact requirements for being
 // inactive are complicated, but they are intended to include the channel not having been opened, posted in, or viewed
 // recently. The selector returns the original array if no channels are filtered out.
-export function makeFilterAutoclosedDMs(getAutocloseCutoff = getDefaultAutocloseCutoff): (state: GlobalState, channels: Channel[], categoryType: string) => Channel[] {
+export function legacyMakeFilterAutoclosedDMs(getAutocloseCutoff = getDefaultAutocloseCutoff): (state: GlobalState, channels: Channel[], categoryType: string) => Channel[] {
     return createSelector(
         (state: GlobalState, channels: Channel[]) => channels,
         (state: GlobalState, channels: Channel[], categoryType: string) => categoryType,
@@ -185,6 +185,90 @@ export function makeFilterAutoclosedDMs(getAutocloseCutoff = getDefaultAutoclose
             });
 
             return filtered.length === channels.length ? channels : filtered;
+        },
+    );
+}
+
+export function makeFilterAutoclosedDMs(): (state: GlobalState, channels: Channel[], categoryType: string) => Channel[] {
+    return createSelector(
+        (state: GlobalState, channels: Channel[]) => channels,
+        (state: GlobalState, channels: Channel[], categoryType: string) => categoryType,
+        getCurrentChannelId,
+        (state: GlobalState) => state.entities.users.profiles,
+        getCurrentUserId,
+        getMyChannelMemberships,
+        (state: GlobalState) => getInt(state, Preferences.CATEGORY_SIDEBAR_SETTINGS, Preferences.LIMIT_VISIBLE_DMS_GMS, 20),
+        (channels, categoryType, currentChannelId, profiles, currentUserId, myMembers, limitPref) => {
+            if (categoryType !== CategoryTypes.DIRECT_MESSAGES) {
+                // Only autoclose DMs that haven't been assigned to a category
+                return channels;
+            }
+
+            let unreadCount = 0;
+            let visibleChannels = channels.filter((channel) => {
+                if (isUnreadChannel(myMembers, channel)) {
+                    unreadCount++;
+
+                    // Unread DMs/GMs are always visible
+                    return true;
+                }
+
+                if (channel.id === currentChannelId) {
+                    return true;
+                }
+
+                // DMs with deactivated users will be visible if you're currently viewing them and they were opened
+                // since the user was deactivated
+                if (channel.type === General.DM_CHANNEL) {
+                    const teammateId = getUserIdFromChannelName(currentUserId, channel.name);
+                    const teammate = profiles[teammateId];
+
+                    const lastViewedAt = myMembers[channel.id]?.last_viewed_at;
+
+                    if (!teammate || teammate.delete_at > lastViewedAt) {
+                        return false;
+                    }
+                }
+
+                return true;
+            });
+
+            visibleChannels.sort((channelA, channelB) => {
+                // Should always prioritise the current channel
+                if (channelA.id === currentChannelId) {
+                    return -1;
+                } else if (channelB.id === currentChannelId) {
+                    return 1;
+                }
+
+                // Second priority is for unread channels
+                if (isUnreadChannel(myMembers, channelA) && !isUnreadChannel(myMembers, channelB)) {
+                    return -1;
+                } else if (!isUnreadChannel(myMembers, channelA) && isUnreadChannel(myMembers, channelB)) {
+                    return 1;
+                }
+
+                // Third priority is last_viewed_at
+                const channelAlastViewed = myMembers[channelA.id]?.last_viewed_at || 0;
+                const channelBlastViewed = myMembers[channelB.id]?.last_viewed_at || 0;
+
+                if (channelAlastViewed > channelBlastViewed) {
+                    return -1;
+                } else if (channelBlastViewed > channelAlastViewed) {
+                    return 1;
+                }
+
+                return 0;
+            });
+
+            // The limit of DMs user specifies to be rendered in the sidebar
+            const remaining = Math.max(limitPref, unreadCount);
+            visibleChannels = visibleChannels.slice(0, remaining);
+
+            const visibleChannelsSet = new Set(visibleChannels);
+            const filteredChannels = channels.filter((channel) => visibleChannelsSet.has(channel));
+
+            return filteredChannels.length === channels.length ? channels : filteredChannels;
         },
     );
 }
@@ -384,8 +468,8 @@ export function makeGetChannelsForCategory() {
 // with inactive DMs/GMs and archived channels filtered out.
 export function makeFilterAndSortChannelsForCategory() {
     const filterArchivedChannels = makeFilterArchivedChannels();
-
     const filterAutoclosedDMs = makeFilterAutoclosedDMs();
+
     const filterManuallyClosedDMs = makeFilterManuallyClosedDMs();
 
     const sortChannels = makeSortChannels();
@@ -394,9 +478,9 @@ export function makeFilterAndSortChannelsForCategory() {
         let channels = originalChannels;
 
         channels = filterArchivedChannels(state, channels);
+        channels = filterManuallyClosedDMs(state, channels);
 
         channels = filterAutoclosedDMs(state, channels, category.type);
-        channels = filterManuallyClosedDMs(state, channels);
 
         channels = sortChannels(state, channels, category);
 
