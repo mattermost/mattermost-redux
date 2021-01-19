@@ -130,7 +130,7 @@ describe('makeGetCategoriesForTeam', () => {
     });
 });
 
-describe('makeFilterAutoclosedDMs', () => {
+describe('legacyMakeFilterAutoclosedDMs', () => {
     const currentUser = {id: 'currentUser'};
 
     const baseState = {
@@ -184,7 +184,7 @@ describe('makeFilterAutoclosedDMs', () => {
     }
 
     test('should hide an inactive GM channel', () => {
-        const filterAutoclosedDMs = Selectors.makeFilterAutoclosedDMs(() => cutoff);
+        const filterAutoclosedDMs = Selectors.legacyMakeFilterAutoclosedDMs(() => cutoff);
 
         const gmChannel = {id: 'gmChannel', type: General.GM_CHANNEL};
 
@@ -206,7 +206,7 @@ describe('makeFilterAutoclosedDMs', () => {
     });
 
     test('should show a GM channel if it was opened recently', () => {
-        const filterAutoclosedDMs = Selectors.makeFilterAutoclosedDMs(() => cutoff);
+        const filterAutoclosedDMs = Selectors.legacyMakeFilterAutoclosedDMs(() => cutoff);
 
         const gmChannel = {id: 'gmChannel', type: General.GM_CHANNEL};
 
@@ -228,7 +228,7 @@ describe('makeFilterAutoclosedDMs', () => {
     });
 
     test('should show a GM channel if it was viewed recently', () => {
-        const filterAutoclosedDMs = Selectors.makeFilterAutoclosedDMs(() => cutoff);
+        const filterAutoclosedDMs = Selectors.legacyMakeFilterAutoclosedDMs(() => cutoff);
 
         const gmChannel = {id: 'gmChannel', type: General.GM_CHANNEL};
 
@@ -250,7 +250,7 @@ describe('makeFilterAutoclosedDMs', () => {
     });
 
     test('should show a GM channel if it had an unloaded post made recently', () => {
-        const filterAutoclosedDMs = Selectors.makeFilterAutoclosedDMs(() => cutoff);
+        const filterAutoclosedDMs = Selectors.legacyMakeFilterAutoclosedDMs(() => cutoff);
 
         const gmChannel = {id: 'gmChannel', type: General.GM_CHANNEL, last_post_at: cutoff + 1};
 
@@ -272,7 +272,7 @@ describe('makeFilterAutoclosedDMs', () => {
     });
 
     test('should show a GM channel if it had a loaded post made recently', () => {
-        const filterAutoclosedDMs = Selectors.makeFilterAutoclosedDMs(() => cutoff);
+        const filterAutoclosedDMs = Selectors.legacyMakeFilterAutoclosedDMs(() => cutoff);
 
         const gmChannel = {id: 'gmChannel', type: General.GM_CHANNEL};
 
@@ -302,7 +302,7 @@ describe('makeFilterAutoclosedDMs', () => {
     });
 
     test('should show an inactive GM channel if autoclosing DMs is disabled for the user', () => {
-        const filterAutoclosedDMs = Selectors.makeFilterAutoclosedDMs(() => cutoff);
+        const filterAutoclosedDMs = Selectors.legacyMakeFilterAutoclosedDMs(() => cutoff);
 
         const gmChannel = {id: 'gmChannel', type: General.GM_CHANNEL};
 
@@ -325,7 +325,7 @@ describe('makeFilterAutoclosedDMs', () => {
     });
 
     test('should show an inactive GM channel if autoclosing DMs is disabled for the server', () => {
-        const filterAutoclosedDMs = Selectors.makeFilterAutoclosedDMs(() => cutoff);
+        const filterAutoclosedDMs = Selectors.legacyMakeFilterAutoclosedDMs(() => cutoff);
 
         const gmChannel = {id: 'gmChannel', type: General.GM_CHANNEL};
 
@@ -353,7 +353,7 @@ describe('makeFilterAutoclosedDMs', () => {
     });
 
     test('should show a GM channel if it has unread messages', () => {
-        const filterAutoclosedDMs = Selectors.makeFilterAutoclosedDMs(() => cutoff);
+        const filterAutoclosedDMs = Selectors.legacyMakeFilterAutoclosedDMs(() => cutoff);
 
         const gmChannel = {id: 'gmChannel', type: General.GM_CHANNEL, total_msg_count: 1};
 
@@ -380,7 +380,7 @@ describe('makeFilterAutoclosedDMs', () => {
     });
 
     test('should hide an inactive DM channel', () => {
-        const filterAutoclosedDMs = Selectors.makeFilterAutoclosedDMs(() => cutoff);
+        const filterAutoclosedDMs = Selectors.legacyMakeFilterAutoclosedDMs(() => cutoff);
 
         const otherUser = {id: 'otherUser', delete_at: 0};
         const dmChannel = {id: 'dmChannel', name: `${currentUser.id}__${otherUser.id}`, type: General.DM_CHANNEL};
@@ -408,7 +408,7 @@ describe('makeFilterAutoclosedDMs', () => {
     });
 
     test('should show a DM channel if it was opened recently', () => {
-        const filterAutoclosedDMs = Selectors.makeFilterAutoclosedDMs(() => cutoff);
+        const filterAutoclosedDMs = Selectors.legacyMakeFilterAutoclosedDMs(() => cutoff);
 
         const otherUser = {id: 'otherUser', delete_at: 0};
         const dmChannel = {id: 'dmChannel', name: `${currentUser.id}__${otherUser.id}`, type: General.DM_CHANNEL};
@@ -436,7 +436,7 @@ describe('makeFilterAutoclosedDMs', () => {
     });
 
     test('should show a DM channel with a deactivated user if its the current channel', () => {
-        const filterAutoclosedDMs = Selectors.makeFilterAutoclosedDMs(() => cutoff);
+        const filterAutoclosedDMs = Selectors.legacyMakeFilterAutoclosedDMs(() => cutoff);
 
         const otherUser = {id: 'otherUser', delete_at: cutoff + 2};
         const dmChannel = {id: 'dmChannel', name: `${currentUser.id}__${otherUser.id}`, type: General.DM_CHANNEL};
@@ -467,7 +467,7 @@ describe('makeFilterAutoclosedDMs', () => {
     });
 
     test('should hide a DM channel with a deactivated user if it is not the current channel', () => {
-        const filterAutoclosedDMs = Selectors.makeFilterAutoclosedDMs(() => cutoff);
+        const filterAutoclosedDMs = Selectors.legacyMakeFilterAutoclosedDMs(() => cutoff);
 
         const otherUser = {id: 'otherUser', delete_at: cutoff + 2};
         const dmChannel = {id: 'dmChannel', name: `${currentUser.id}__${otherUser.id}`, type: General.DM_CHANNEL};
@@ -498,7 +498,7 @@ describe('makeFilterAutoclosedDMs', () => {
     });
 
     test('should show a DM channel with a deactivated user if it is not the current channel but it has been opened since the user was deactivated', () => {
-        const filterAutoclosedDMs = Selectors.makeFilterAutoclosedDMs(() => cutoff);
+        const filterAutoclosedDMs = Selectors.legacyMakeFilterAutoclosedDMs(() => cutoff);
 
         const otherUser = {id: 'otherUser', delete_at: cutoff + 2};
         const dmChannel = {id: 'dmChannel', name: `${currentUser.id}__${otherUser.id}`, type: General.DM_CHANNEL};
@@ -529,7 +529,7 @@ describe('makeFilterAutoclosedDMs', () => {
     });
 
     test('should return the original array when no items are removed', () => {
-        const filterAutoclosedDMs = Selectors.makeFilterAutoclosedDMs(() => cutoff);
+        const filterAutoclosedDMs = Selectors.legacyMakeFilterAutoclosedDMs(() => cutoff);
 
         const channel1 = {id: 'channel1', type: General.PUBLIC_CHANNEL};
 
@@ -538,6 +538,193 @@ describe('makeFilterAutoclosedDMs', () => {
         const channels = [channel1];
 
         expect(filterAutoclosedDMs(state, channels, CategoryTypes.DIRECT_MESSAGES)).toBe(channels);
+    });
+});
+
+describe('makeFilterAutoclosedDMs', () => {
+    const currentUser = {id: 'currentUser'};
+
+    const baseState = {
+        entities: {
+            channels: {
+                currentChannelId: 'channel1',
+                myMembers: {
+                    channel2: {
+                        channel_id: 'channel2',
+                        last_viewed_at: 0,
+                    },
+                    channel1: {},
+                    channel3: {},
+                },
+            },
+            general: {
+                config: {
+                    CloseUnusedDirectMessages: 'true',
+                },
+            },
+            posts: {
+                posts: {},
+                postsInChannel: {
+                    channel1: [],
+                },
+            },
+            preferences: {
+                myPreferences: {
+                    [getPreferenceKey(Preferences.CATEGORY_SIDEBAR_SETTINGS, Preferences.CHANNEL_SIDEBAR_AUTOCLOSE_DMS)]: {value: Preferences.AUTOCLOSE_DMS_ENABLED},
+                    [getPreferenceKey(Preferences.CATEGORY_SIDEBAR_SETTINGS, Preferences.LIMIT_VISIBLE_DMS_GMS)]: {value: '0'},
+                },
+            },
+            users: {
+                currentUserId: currentUser.id,
+                profiles: {
+                    currentUser,
+                },
+            },
+        },
+    };
+
+    test('Should always show an unread channel', () => {
+        const filterAutoclosedDMs = Selectors.makeFilterAutoclosedDMs();
+
+        const gmChannel1 = {id: 'gmChannel1', type: General.GM_CHANNEL, total_msg_count: 5};
+        const gmChannel2 = {id: 'gmChannel2', type: General.GM_CHANNEL};
+
+        const state = mergeObjects(baseState, {
+            entities: {
+                channels: {
+                    myMembers: {
+                        gmChannel1: {msg_count: 1, notify_props: {mark_unread: MarkUnread.ALL}},
+                        gmChannel2: {msg_count: 0, notify_props: {mark_unread: MarkUnread.ALL}},
+                    },
+                },
+                preferences: {
+                    myPreferences: {
+                        [getPreferenceKey(Preferences.CATEGORY_SIDEBAR_SETTINGS, Preferences.LIMIT_VISIBLE_DMS_GMS)]: {value: '1'},
+                    },
+                },
+            },
+        });
+
+        expect(filterAutoclosedDMs(state, [gmChannel1, gmChannel2], CategoryTypes.DIRECT_MESSAGES)).toEqual([gmChannel1]);
+    });
+
+    test('Should always show the current channel', () => {
+        const filterAutoclosedDMs = Selectors.makeFilterAutoclosedDMs();
+
+        const jeffWinger = {id: 'jeffWinger'};
+        const dmChannel1 = {id: 'dmChannel1', type: General.DM_CHANNEL, name: `${currentUser.id}__${jeffWinger.id}`};
+        const gmChannel1 = {id: 'gmChannel1', type: General.GM_CHANNEL};
+
+        let state = mergeObjects(baseState, {
+            entities: {
+                channels: {
+                    currentChannelId: dmChannel1.id,
+                    myMembers: {
+                        [gmChannel1.id]: {last_viewed_at: 1000},
+                    },
+                },
+                preferences: {
+                    myPreferences: {
+                        [getPreferenceKey(Preferences.CATEGORY_SIDEBAR_SETTINGS, Preferences.LIMIT_VISIBLE_DMS_GMS)]: {value: '1'},
+                    },
+                },
+            },
+        });
+
+        expect(filterAutoclosedDMs(state, [dmChannel1, gmChannel1], CategoryTypes.DIRECT_MESSAGES)).toEqual([dmChannel1]);
+
+        state = mergeObjects(baseState, {
+            entities: {
+                channels: {
+                    currentChannelId: gmChannel1.id,
+                    myMembers: {
+                        [dmChannel1.id]: {last_viewed_at: 1000},
+                    },
+                },
+                preferences: {
+                    myPreferences: {
+                        [getPreferenceKey(Preferences.CATEGORY_SIDEBAR_SETTINGS, Preferences.LIMIT_VISIBLE_DMS_GMS)]: {value: '1'},
+                    },
+                },
+            },
+        });
+
+        expect(filterAutoclosedDMs(state, [gmChannel1, dmChannel1], CategoryTypes.DIRECT_MESSAGES)).toEqual([gmChannel1]);
+    });
+
+    describe('Should always show the exact number of channels specified by the user', () => {
+        const filterAutoclosedDMs = Selectors.makeFilterAutoclosedDMs();
+        const tigerKing = {id: 'tigerKing'};
+        const bojackHorseman = {id: 'bojackHorseman'};
+        const jeffWinger = {id: 'jeffWinger'};
+
+        const dmChannel1 = {id: 'dmChannel1', type: General.DM_CHANNEL, name: `${currentUser.id}__${tigerKing.id}`};
+        const gmChannel1 = {id: 'gmChannel1', type: General.GM_CHANNEL, name: 'WhatsApp'};
+        const gmChannel2 = {id: 'gmChannel2', type: General.GM_CHANNEL, name: 'Telegram'};
+        const dmChannel2 = {id: 'dmChannel2', type: General.DM_CHANNEL, name: `${currentUser.id}__${bojackHorseman.id}`};
+        const dmChannel3 = {id: 'dmChannel3', type: General.DM_CHANNEL, name: `${currentUser.id}__${jeffWinger.id}`};
+
+        it('User specified 5 DMs to be shown', () => {
+            const state = mergeObjects(baseState, {
+                entities: {
+                    channels: {
+                        currentChannelId: dmChannel1.id,
+                        myMembers: {
+                            [dmChannel1.id]: {last_viewed_at: 1000},
+                            [dmChannel2.id]: {last_viewed_at: 500},
+                            [dmChannel3.id]: {last_viewed_at: 0},
+                        },
+                    },
+                    preferences: {
+                        myPreferences: {
+                            [getPreferenceKey(Preferences.CATEGORY_SIDEBAR_SETTINGS, Preferences.LIMIT_VISIBLE_DMS_GMS)]: {value: '5'},
+                        },
+                    },
+                    users: {
+                        currentUserId: currentUser.id,
+                        profiles: {
+                            currentUser,
+                            tigerKing,
+                            bojackHorseman,
+                            jeffWinger,
+                        },
+                    },
+                },
+            });
+
+            expect(filterAutoclosedDMs(state, [dmChannel1, gmChannel1, gmChannel2, dmChannel2, dmChannel3], CategoryTypes.DIRECT_MESSAGES)).toEqual([dmChannel1, gmChannel1, gmChannel2, dmChannel2, dmChannel3]);
+        });
+
+        it('User specified 2 DMs to be shown', () => {
+            const state = mergeObjects(baseState, {
+                entities: {
+                    channels: {
+                        currentChannelId: dmChannel1.id,
+                        myMembers: {
+                            [dmChannel1.id]: {last_viewed_at: 1000},
+                            [dmChannel2.id]: {last_viewed_at: 500},
+                            [dmChannel3.id]: {last_viewed_at: 0},
+                        },
+                    },
+                    preferences: {
+                        myPreferences: {
+                            [getPreferenceKey(Preferences.CATEGORY_SIDEBAR_SETTINGS, Preferences.LIMIT_VISIBLE_DMS_GMS)]: {value: '2'},
+                        },
+                    },
+                    users: {
+                        currentUserId: currentUser.id,
+                        profiles: {
+                            currentUser,
+                            tigerKing,
+                            bojackHorseman,
+                            jeffWinger,
+                        },
+                    },
+                },
+            });
+
+            expect(filterAutoclosedDMs(state, [dmChannel1, gmChannel1, gmChannel2, dmChannel2, dmChannel3], CategoryTypes.DIRECT_MESSAGES)).toEqual([dmChannel1, dmChannel2]);
+        });
     });
 });
 
@@ -1068,6 +1255,16 @@ describe('makeGetChannelsForCategory', () => {
     test('should return sorted and filtered channels for direct messages category with alphabetical sorting', () => {
         const getChannelsForCategory = Selectors.makeGetChannelsForCategory();
 
+        const state = mergeObjects(baseState, {
+            entities: {
+                preferences: {
+                    myPreferences: {
+                        [getPreferenceKey(Preferences.CATEGORY_SIDEBAR_SETTINGS, Preferences.LIMIT_VISIBLE_DMS_GMS)]: {value: '2'},
+                    },
+                },
+            },
+        });
+
         const directMessagesCategory = {
             id: 'directMessagesCategory',
             team_id: 'team1',
@@ -1077,7 +1274,7 @@ describe('makeGetChannelsForCategory', () => {
             channel_ids: [gmChannel1.id, dmChannel1.id],
         };
 
-        expect(getChannelsForCategory(baseState, directMessagesCategory)).toMatchObject([gmChannel1, dmChannel1]);
+        expect(getChannelsForCategory(state, directMessagesCategory)).toMatchObject([gmChannel1, dmChannel1]);
     });
 
     test('should return sorted and filtered channels for direct messages category with recency sorting', () => {
@@ -1109,6 +1306,7 @@ describe('makeGetChannelsForCategory', () => {
                 },
                 preferences: {
                     myPreferences: {
+                        [getPreferenceKey(Preferences.CATEGORY_SIDEBAR_SETTINGS, Preferences.LIMIT_VISIBLE_DMS_GMS)]: {value: '3'},
                         [getPreferenceKey(Preferences.CATEGORY_GROUP_CHANNEL_SHOW, gmChannel2.id)]: {value: 'true'},
                     },
                 },
@@ -1208,6 +1406,7 @@ describe('makeGetChannelsByCategory', () => {
                     [getPreferenceKey(Preferences.CATEGORY_DIRECT_CHANNEL_SHOW, otherUser1.id)]: {value: 'true'},
                     [getPreferenceKey(Preferences.CATEGORY_DIRECT_CHANNEL_SHOW, otherUser2.id)]: {value: 'true'},
                     [getPreferenceKey(Preferences.CATEGORY_GROUP_CHANNEL_SHOW, gmChannel1.id)]: {value: 'true'},
+                    [getPreferenceKey(Preferences.CATEGORY_SIDEBAR_SETTINGS, Preferences.LIMIT_VISIBLE_DMS_GMS)]: {value: '3'},
                 },
             },
             users: {
@@ -1224,7 +1423,16 @@ describe('makeGetChannelsByCategory', () => {
     test('should return channels for all categories', () => {
         const getChannelsByCategory = Selectors.makeGetChannelsByCategory();
 
-        const result = getChannelsByCategory(baseState, 'team1');
+        const state = mergeObjects(baseState, {
+            entities: {
+                preferences: {
+                    myPreferences: {
+                        [getPreferenceKey(Preferences.CATEGORY_SIDEBAR_SETTINGS, Preferences.LIMIT_VISIBLE_DMS_GMS)]: {value: '2'},
+                    },
+                },
+            },
+        });
+        const result = getChannelsByCategory(state, 'team1');
         expect(result.favoritesCategory).toEqual([dmChannel2, channel1]);
         expect(result.channelsCategory).toEqual([channel2, channel3]);
         expect(result.directMessagesCategory).toEqual([dmChannel1, gmChannel1]);
@@ -1277,7 +1485,7 @@ describe('makeGetChannelsByCategory', () => {
             expect(result.favoritesCategory).not.toBe(previousResult.favoritesCategory);
             expect(result.favoritesCategory).toEqual(previousResult.favoritesCategory);
             expect(result.channelsCategory).toBe(previousResult.channelsCategory);
-            expect(result.directMessagesCategory).toBe(previousResult.directMessagesCategory);
+            expect(result.directMessagesCategory).toEqual(previousResult.directMessagesCategory);
             expect(result.directMessagesCategory).toEqual(previousResult.directMessagesCategory);
         });
 

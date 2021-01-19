@@ -549,6 +549,18 @@ describe('moveChannelToCategory', () => {
                 users: {
                     currentUserId,
                 },
+                channels: {
+                    channels: {
+                        channel1: {
+                            id: 'channel1',
+                            team_id: teamId,
+                        },
+                        channel2: {
+                            id: 'channel2',
+                            team_id: teamId,
+                        },
+                    },
+                },
             },
         });
 
@@ -589,49 +601,108 @@ describe('moveChannelToCategory', () => {
         expect(isFavoriteChannel(state, 'channel1')).toBe(false);
     });
 
-    test('should set the destination category to manual sorting', async () => {
-        const category1 = {id: 'category1', team_id: teamId, channel_ids: ['channel1', 'channel2'], sorting: CategorySorting.Default};
-        const category2 = {id: 'category2', team_id: teamId, channel_ids: ['channel3', 'channel4'], sorting: CategorySorting.Default};
+    describe('changes to sorting method', () => {
+        test('if the category was sorted by default, should set the destination category to manual sorting', async () => {
+            const category1 = {id: 'category1', team_id: teamId, channel_ids: ['channel1', 'channel2'], sorting: CategorySorting.Default};
+            const category2 = {id: 'category2', team_id: teamId, channel_ids: ['channel3', 'channel4'], sorting: CategorySorting.Default};
 
-        const store = await configureStore({
-            entities: {
-                channelCategories: {
-                    byId: {
-                        category1,
-                        category2,
+            const store = await configureStore({
+                entities: {
+                    channelCategories: {
+                        byId: {
+                            category1,
+                            category2,
+                        },
+                    },
+                    users: {
+                        currentUserId,
                     },
                 },
-                users: {
-                    currentUserId,
-                },
-            },
+            });
+
+            nock(Client4.getBaseRoute()).
+                put(`/users/${currentUserId}/teams/${teamId}/channels/categories`, (body) => {
+                    return body.find((category) => category.id === 'category1').sorting !== CategorySorting.Manual &&
+                        body.find((category) => category.id === 'category2').sorting === CategorySorting.Manual;
+                }).
+                reply(200, [
+                    {...category1, channel_ids: ['channel2']},
+                    {...category2, channel_ids: ['channel1', 'channel3', 'channel4'], sorting: CategorySorting.Manual},
+                ]);
+
+            await store.dispatch(Actions.moveChannelToCategory(category2.id, 'channel1', 0));
+
+            let state = store.getState();
+            expect(state.entities.channelCategories.byId.category1.sorting).toBe(CategorySorting.Default);
+            expect(state.entities.channelCategories.byId.category2.sorting).toBe(CategorySorting.Manual);
+
+            nock(Client4.getBaseRoute()).
+                put(`/users/${currentUserId}/teams/${teamId}/channels/categories`, (body) => {
+                    return body.find((category) => category.id === 'category1').sorting === CategorySorting.Manual &&
+                        body.find((category) => category.id === 'category2').sorting === CategorySorting.Manual;
+                }).
+                reply(200, [
+                    {...category1, channel_ids: ['channel2', 'channel1'], sorting: CategorySorting.Manual},
+                    {...category2, channel_ids: ['channel3', 'channel4'], sorting: CategorySorting.Manual},
+                ]);
+
+            await store.dispatch(Actions.moveChannelToCategory(category1.id, 'channel1', 2));
+
+            state = store.getState();
+            expect(state.entities.channelCategories.byId.category1.sorting).toBe(CategorySorting.Manual);
+            expect(state.entities.channelCategories.byId.category2.sorting).toBe(CategorySorting.Manual);
         });
 
-        nock(Client4.getBaseRoute()).
-            put(`/users/${currentUserId}/teams/${teamId}/channels/categories`).
-            reply(200, [
-                {...category1, channel_ids: ['channel2']},
-                {...category2, channel_ids: ['channel1', 'channel3', 'channel4'], sorting: CategorySorting.Manual},
-            ]);
+        test('if the category was sorted automatically, should not change the sorting method', async () => {
+            const category1 = {id: 'category1', team_id: teamId, channel_ids: ['channel1', 'channel2'], sorting: CategorySorting.Alphabetical};
+            const category2 = {id: 'category2', team_id: teamId, channel_ids: ['channel3', 'channel4'], sorting: CategorySorting.Recency};
 
-        await store.dispatch(Actions.moveChannelToCategory(category2.id, 'channel1', 0));
+            const store = await configureStore({
+                entities: {
+                    channelCategories: {
+                        byId: {
+                            category1,
+                            category2,
+                        },
+                    },
+                    users: {
+                        currentUserId,
+                    },
+                },
+            });
 
-        let state = store.getState();
-        expect(state.entities.channelCategories.byId.category1.sorting).toBe(CategorySorting.Default);
-        expect(state.entities.channelCategories.byId.category2.sorting).toBe(CategorySorting.Manual);
+            nock(Client4.getBaseRoute()).
+                put(`/users/${currentUserId}/teams/${teamId}/channels/categories`, (body) => {
+                    return body.find((category) => category.id === 'category1').sorting !== CategorySorting.Manual &&
+                        body.find((category) => category.id === 'category2').sorting !== CategorySorting.Manual;
+                }).
+                reply(200, [
+                    {...category1, channel_ids: ['channel2']},
+                    {...category2, channel_ids: ['channel1', 'channel3', 'channel4']},
+                ]);
 
-        nock(Client4.getBaseRoute()).
-            put(`/users/${currentUserId}/teams/${teamId}/channels/categories`).
-            reply(200, [
-                {...category1, channel_ids: ['channel2', 'channel1'], sorting: CategorySorting.Manual},
-                {...category2, channel_ids: ['channel3', 'channel4'], sorting: CategorySorting.Manual},
-            ]);
+            await store.dispatch(Actions.moveChannelToCategory(category2.id, 'channel1', 0));
 
-        await store.dispatch(Actions.moveChannelToCategory(category1.id, 'channel1', 2));
+            let state = store.getState();
+            expect(state.entities.channelCategories.byId.category1.sorting).toBe(CategorySorting.Alphabetical);
+            expect(state.entities.channelCategories.byId.category2.sorting).toBe(CategorySorting.Recency);
 
-        state = store.getState();
-        expect(state.entities.channelCategories.byId.category1.sorting).toBe(CategorySorting.Manual);
-        expect(state.entities.channelCategories.byId.category2.sorting).toBe(CategorySorting.Manual);
+            nock(Client4.getBaseRoute()).
+                put(`/users/${currentUserId}/teams/${teamId}/channels/categories`, (body) => {
+                    return body.find((category) => category.id === 'category1').sorting !== CategorySorting.Manual &&
+                        body.find((category) => category.id === 'category2').sorting !== CategorySorting.Manual;
+                }).
+                reply(200, [
+                    {...category1, channel_ids: ['channel2', 'channel1']},
+                    {...category2, channel_ids: ['channel3', 'channel4']},
+                ]);
+
+            await store.dispatch(Actions.moveChannelToCategory(category1.id, 'channel1', 2));
+
+            state = store.getState();
+            expect(state.entities.channelCategories.byId.category1.sorting).toBe(CategorySorting.Alphabetical);
+            expect(state.entities.channelCategories.byId.category2.sorting).toBe(CategorySorting.Recency);
+        });
     });
 
     test('should optimistically update the modified categories', async () => {
@@ -886,6 +957,18 @@ describe('moveChannelsToCategory', () => {
                 users: {
                     currentUserId,
                 },
+                channels: {
+                    channels: {
+                        channel1: {
+                            id: 'channel1',
+                            team_id: teamId,
+                        },
+                        channel2: {
+                            id: 'channel2',
+                            team_id: teamId,
+                        },
+                    },
+                },
             },
         });
 
@@ -928,6 +1011,109 @@ describe('moveChannelsToCategory', () => {
         expect(isFavoriteChannel(state, 'channel2')).toBe(false);
     });
 
+    describe('changes to sorting method', () => {
+        test('if the category was sorted by default, should set the destination category to manual sorting', async () => {
+            const category1 = {id: 'category1', team_id: teamId, channel_ids: ['channel1', 'channel2'], sorting: CategorySorting.Default};
+            const category2 = {id: 'category2', team_id: teamId, channel_ids: ['channel3', 'channel4'], sorting: CategorySorting.Default};
+
+            const store = await configureStore({
+                entities: {
+                    channelCategories: {
+                        byId: {
+                            category1,
+                            category2,
+                        },
+                    },
+                    users: {
+                        currentUserId,
+                    },
+                },
+            });
+
+            nock(Client4.getBaseRoute()).
+                put(`/users/${currentUserId}/teams/${teamId}/channels/categories`, (body) => {
+                    return body.find((category) => category.id === 'category1').sorting !== CategorySorting.Manual &&
+                        body.find((category) => category.id === 'category2').sorting === CategorySorting.Manual;
+                }).
+                reply(200, [
+                    {...category1, channel_ids: ['channel2']},
+                    {...category2, channel_ids: ['channel1', 'channel3', 'channel4'], sorting: CategorySorting.Manual},
+                ]);
+
+            await store.dispatch(Actions.moveChannelsToCategory(category2.id, ['channel1'], 0));
+
+            let state = store.getState();
+            expect(state.entities.channelCategories.byId.category1.sorting).toBe(CategorySorting.Default);
+            expect(state.entities.channelCategories.byId.category2.sorting).toBe(CategorySorting.Manual);
+
+            nock(Client4.getBaseRoute()).
+                put(`/users/${currentUserId}/teams/${teamId}/channels/categories`, (body) => {
+                    return body.find((category) => category.id === 'category1').sorting === CategorySorting.Manual &&
+                        body.find((category) => category.id === 'category2').sorting === CategorySorting.Manual;
+                }).
+                reply(200, [
+                    {...category1, channel_ids: ['channel2', 'channel1'], sorting: CategorySorting.Manual},
+                    {...category2, channel_ids: ['channel3', 'channel4'], sorting: CategorySorting.Manual},
+                ]);
+
+            await store.dispatch(Actions.moveChannelsToCategory(category1.id, ['channel1'], 2));
+
+            state = store.getState();
+            expect(state.entities.channelCategories.byId.category1.sorting).toBe(CategorySorting.Manual);
+            expect(state.entities.channelCategories.byId.category2.sorting).toBe(CategorySorting.Manual);
+        });
+
+        test('if the category was sorted automatically, should not change the sorting method', async () => {
+            const category1 = {id: 'category1', team_id: teamId, channel_ids: ['channel1', 'channel2'], sorting: CategorySorting.Alphabetical};
+            const category2 = {id: 'category2', team_id: teamId, channel_ids: ['channel3', 'channel4'], sorting: CategorySorting.Recency};
+
+            const store = await configureStore({
+                entities: {
+                    channelCategories: {
+                        byId: {
+                            category1,
+                            category2,
+                        },
+                    },
+                    users: {
+                        currentUserId,
+                    },
+                },
+            });
+
+            nock(Client4.getBaseRoute()).
+                put(`/users/${currentUserId}/teams/${teamId}/channels/categories`, (body) => {
+                    return body.find((category) => category.id === 'category1').sorting !== CategorySorting.Manual &&
+                        body.find((category) => category.id === 'category2').sorting !== CategorySorting.Manual;
+                }).
+                reply(200, [
+                    {...category1, channel_ids: ['channel2']},
+                    {...category2, channel_ids: ['channel1', 'channel3', 'channel4']},
+                ]);
+
+            await store.dispatch(Actions.moveChannelsToCategory(category2.id, ['channel1'], 0));
+
+            let state = store.getState();
+            expect(state.entities.channelCategories.byId.category1.sorting).toBe(CategorySorting.Alphabetical);
+            expect(state.entities.channelCategories.byId.category2.sorting).toBe(CategorySorting.Recency);
+
+            nock(Client4.getBaseRoute()).
+                put(`/users/${currentUserId}/teams/${teamId}/channels/categories`, (body) => {
+                    return body.find((category) => category.id === 'category1').sorting !== CategorySorting.Manual &&
+                        body.find((category) => category.id === 'category2').sorting !== CategorySorting.Manual;
+                }).
+                reply(200, [
+                    {...category1, channel_ids: ['channel2', 'channel1']},
+                    {...category2, channel_ids: ['channel3', 'channel4']},
+                ]);
+
+            await store.dispatch(Actions.moveChannelsToCategory(category1.id, ['channel1'], 2));
+
+            state = store.getState();
+            expect(state.entities.channelCategories.byId.category1.sorting).toBe(CategorySorting.Alphabetical);
+            expect(state.entities.channelCategories.byId.category2.sorting).toBe(CategorySorting.Recency);
+        });
+    });
     test('should set the destination category to manual sorting', async () => {
         const category1 = {id: 'category1', team_id: teamId, channel_ids: ['channel1', 'channel2'], sorting: CategorySorting.Default};
         const category2 = {id: 'category2', team_id: teamId, channel_ids: ['channel3', 'channel4'], sorting: CategorySorting.Default};

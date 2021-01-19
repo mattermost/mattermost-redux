@@ -73,6 +73,14 @@ export type CommandResponse = {
     extra_responses: CommandResponse[];
 };
 
+export type CommandAutocompleteSuggestion = {
+    Complete: string;
+    Suggestion: string;
+    Hint: string;
+    Description: string;
+    IconData: string;
+};
+
 export type OAuthApp = {
     'id': string;
     'creator_id': string;
@@ -93,6 +101,22 @@ export type IntegrationsState = {
     oauthApps: IDMappedObjects<OAuthApp>;
     systemCommands: IDMappedObjects<Command>;
     commands: IDMappedObjects<Command>;
+};
+
+export type InteractiveDialogConfig = {
+    app_id: string;
+    trigger_id: string;
+    url: string;
+    dialog: {
+        callback_id: string;
+        title: string;
+        introduction_text: string;
+        icon_url?: string;
+        elements: DialogElement[];
+        submit_label: string;
+        notify_on_cancel: boolean;
+        state: string;
+    };
 };
 
 export type DialogSubmission = {

@@ -7,6 +7,8 @@ import {General, Preferences} from '../../constants';
 
 import * as Selectors from 'selectors/entities/preferences';
 
+import mergeObjects from 'test/merge_objects';
+
 import deepFreezeAndThrowOnMutation from 'utils/deep_freeze';
 import {getPreferenceKey} from 'utils/preference_utils';
 
@@ -590,171 +592,140 @@ describe('Selectors.Preferences', () => {
     it('get visible groups', () => {
         assert.deepEqual(Selectors.getVisibleGroupIds(testState), [gp1]);
     });
+});
 
-    describe('get new sidebar preference', () => {
-        it('setting disabled, no user setting', () => {
-            assert.equal(
-                Selectors.getNewSidebarPreference({
-                    entities: {
-                        general: {
-                            config: {
-                                ExperimentalChannelSidebarOrganization: General.DISABLED,
-                            },
-                        },
-                        preferences: {
-                            myPreferences: {},
-                        },
+describe('shouldShowUnreadsCategory', () => {
+    test('should return value from the preference if set', () => {
+        const state = {
+            entities: {
+                general: {
+                    config: {},
+                },
+                preferences: {
+                    myPreferences: {
+                        [getPreferenceKey(Preferences.CATEGORY_SIDEBAR_SETTINGS, Preferences.SHOW_UNREAD_SECTION)]: {value: 'true'},
                     },
-                }),
-                false,
-            );
+                },
+            },
+        };
+
+        expect(Selectors.shouldShowUnreadsCategory(state)).toBe(true);
+    });
+
+    test('should fall back properly from the new preference to the old one and then to the server default', () => {
+        // With the new preference set
+        let state = {
+            entities: {
+                general: {
+                    config: {
+                        ExperimentalChannelSidebarOrganization: 'default_on',
+                        ExperimentalGroupUnreadChannels: 'default_off',
+                    },
+                },
+                preferences: {
+                    myPreferences: {
+                        [getPreferenceKey(Preferences.CATEGORY_SIDEBAR_SETTINGS, Preferences.SHOW_UNREAD_SECTION)]: {value: 'true'},
+                        [getPreferenceKey(Preferences.CATEGORY_SIDEBAR_SETTINGS, '')]: {value: JSON.stringify({unreads_at_top: 'false'})},
+                    },
+                },
+            },
+        };
+
+        expect(Selectors.shouldShowUnreadsCategory(state)).toBe(true);
+
+        state = mergeObjects(state, {
+            entities: {
+                preferences: {
+                    myPreferences: {
+                        [getPreferenceKey(Preferences.CATEGORY_SIDEBAR_SETTINGS, Preferences.SHOW_UNREAD_SECTION)]: {value: 'false'},
+                    },
+                },
+            },
         });
 
-        it('setting disabled, user set to on', () => {
-            assert.equal(
-                Selectors.getNewSidebarPreference({
-                    entities: {
-                        general: {
-                            config: {
-                                ExperimentalChannelSidebarOrganization: General.DISABLED,
-                            },
-                        },
-                        preferences: {
-                            myPreferences: {
-                                [getPreferenceKey(Preferences.CATEGORY_SIDEBAR_SETTINGS, Preferences.CHANNEL_SIDEBAR_ORGANIZATION)]: {
-                                    category: Preferences.CATEGORY_SIDEBAR_SETTINGS, name: Preferences.CHANNEL_SIDEBAR_ORGANIZATION, value: 'true',
-                                },
-                            },
-                        },
+        expect(Selectors.shouldShowUnreadsCategory(state)).toBe(false);
+
+        // With only the old preference set
+        state = {
+            entities: {
+                general: {
+                    config: {
+                        ExperimentalChannelSidebarOrganization: 'default_on',
+                        ExperimentalGroupUnreadChannels: 'default_off',
                     },
-                }),
-                false,
-            );
+                },
+                preferences: {
+                    myPreferences: {
+                        [getPreferenceKey(Preferences.CATEGORY_SIDEBAR_SETTINGS, '')]: {value: JSON.stringify({unreads_at_top: 'true'})},
+                    },
+                },
+            },
+        };
+
+        expect(Selectors.shouldShowUnreadsCategory(state)).toBe(true);
+
+        state = mergeObjects(state, {
+            entities: {
+                preferences: {
+                    myPreferences: {
+                        [getPreferenceKey(Preferences.CATEGORY_SIDEBAR_SETTINGS, '')]: {value: JSON.stringify({unreads_at_top: 'false'})},
+                    },
+                },
+            },
         });
 
-        it('setting default_off, no user setting', () => {
-            assert.equal(
-                Selectors.getNewSidebarPreference({
-                    entities: {
-                        general: {
-                            config: {
-                                ExperimentalChannelSidebarOrganization: General.DEFAULT_OFF,
-                            },
-                        },
-                        preferences: {
-                            myPreferences: {},
-                        },
+        expect(Selectors.shouldShowUnreadsCategory(state)).toBe(false);
+
+        // Fall back from there to the server default
+        state = {
+            entities: {
+                general: {
+                    config: {
+                        ExperimentalChannelSidebarOrganization: 'default_on',
+                        ExperimentalGroupUnreadChannels: 'default_on',
                     },
-                }),
-                false,
-            );
+                },
+                preferences: {
+                    myPreferences: {},
+                },
+            },
+        };
+
+        expect(Selectors.shouldShowUnreadsCategory(state)).toBe(true);
+
+        state = mergeObjects(state, {
+            entities: {
+                general: {
+                    config: {
+                        ExperimentalGroupUnreadChannels: 'default_off',
+                    },
+                },
+            },
         });
 
-        it('setting default_off, user set to off', () => {
-            assert.equal(
-                Selectors.getNewSidebarPreference({
-                    entities: {
-                        general: {
-                            config: {
-                                ExperimentalChannelSidebarOrganization: General.DEFAULT_OFF,
-                            },
-                        },
-                        preferences: {
-                            myPreferences: {
-                                [getPreferenceKey(Preferences.CATEGORY_SIDEBAR_SETTINGS, Preferences.CHANNEL_SIDEBAR_ORGANIZATION)]: {
-                                    category: Preferences.CATEGORY_SIDEBAR_SETTINGS, name: Preferences.CHANNEL_SIDEBAR_ORGANIZATION, value: 'false',
-                                },
-                            },
-                        },
-                    },
-                }),
-                false,
-            );
-        });
+        expect(Selectors.shouldShowUnreadsCategory(state)).toBe(false);
+    });
 
-        it('setting default_off, user set to on', () => {
-            assert.equal(
-                Selectors.getNewSidebarPreference({
-                    entities: {
-                        general: {
-                            config: {
-                                ExperimentalChannelSidebarOrganization: General.DEFAULT_OFF,
-                            },
-                        },
-                        preferences: {
-                            myPreferences: {
-                                [getPreferenceKey(Preferences.CATEGORY_SIDEBAR_SETTINGS, Preferences.CHANNEL_SIDEBAR_ORGANIZATION)]: {
-                                    category: Preferences.CATEGORY_SIDEBAR_SETTINGS, name: Preferences.CHANNEL_SIDEBAR_ORGANIZATION, value: 'true',
-                                },
-                            },
-                        },
+    test('should not let admins fully disable the unread section', () => {
+        // With the old sidebar, setting ExperimentalGroupUnreadChannels to disabled has an effect
+        const state = {
+            entities: {
+                general: {
+                    config: {
+                        ExperimentalChannelSidebarOrganization: 'default_on',
+                        ExperimentalGroupUnreadChannels: 'disabled',
                     },
-                }),
-                true,
-            );
-        });
+                },
+                preferences: {
+                    myPreferences: {
+                        [getPreferenceKey(Preferences.CATEGORY_SIDEBAR_SETTINGS, Preferences.SHOW_UNREAD_SECTION)]: {value: 'true'},
+                        [getPreferenceKey(Preferences.CATEGORY_SIDEBAR_SETTINGS, '')]: {value: JSON.stringify({unreads_at_top: 'true'})},
+                    },
+                },
+            },
+        };
 
-        it('setting default_on, no user setting', () => {
-            assert.equal(
-                Selectors.getNewSidebarPreference({
-                    entities: {
-                        general: {
-                            config: {
-                                ExperimentalChannelSidebarOrganization: General.DEFAULT_ON,
-                            },
-                        },
-                        preferences: {
-                            myPreferences: {},
-                        },
-                    },
-                }),
-                true,
-            );
-        });
-
-        it('setting default_on, user set to off', () => {
-            assert.equal(
-                Selectors.getNewSidebarPreference({
-                    entities: {
-                        general: {
-                            config: {
-                                ExperimentalChannelSidebarOrganization: General.DEFAULT_ON,
-                            },
-                        },
-                        preferences: {
-                            myPreferences: {
-                                [getPreferenceKey(Preferences.CATEGORY_SIDEBAR_SETTINGS, Preferences.CHANNEL_SIDEBAR_ORGANIZATION)]: {
-                                    category: Preferences.CATEGORY_SIDEBAR_SETTINGS, name: Preferences.CHANNEL_SIDEBAR_ORGANIZATION, value: 'false',
-                                },
-                            },
-                        },
-                    },
-                }),
-                false,
-            );
-        });
-
-        it('setting default_on, user set to on', () => {
-            assert.equal(
-                Selectors.getNewSidebarPreference({
-                    entities: {
-                        general: {
-                            config: {
-                                ExperimentalChannelSidebarOrganization: General.DEFAULT_ON,
-                            },
-                        },
-                        preferences: {
-                            myPreferences: {
-                                [getPreferenceKey(Preferences.CATEGORY_SIDEBAR_SETTINGS, Preferences.CHANNEL_SIDEBAR_ORGANIZATION)]: {
-                                    category: Preferences.CATEGORY_SIDEBAR_SETTINGS, name: Preferences.CHANNEL_SIDEBAR_ORGANIZATION, value: 'true',
-                                },
-                            },
-                        },
-                    },
-                }),
-                true,
-            );
-        });
+        expect(Selectors.shouldShowUnreadsCategory(state)).toBe(true);
     });
 });
 
