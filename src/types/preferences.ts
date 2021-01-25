@@ -22,6 +22,7 @@ export type Theme = {
     sidebarTextActiveBorder: string;
     sidebarTextActiveColor: string;
     sidebarHeaderBg: string;
+    sidebarTeamBarColor: string;
     sidebarHeaderTextColor: string;
     onlineIndicator: string;
     awayIndicator: string;
