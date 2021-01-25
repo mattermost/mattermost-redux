@@ -372,6 +372,10 @@ export function getFilteredUsersStats(state: GlobalState): any {
     return state.entities.users.filteredStats;
 }
 
+export function getGeneralUserStats(state: GlobalState): any {
+    return state.entities.users.generalUserStats;
+}
+
 function filterFromProfiles(currentUserId: $ID<UserProfile>, profiles: UserProfile[], skipCurrent = false, filters?: Filters): UserProfile[] {
     const filteredProfilesMap = filterProfiles(profileListToMap(profiles), filters);
     const filteredProfiles = Object.keys(filteredProfilesMap).map((key) => filteredProfilesMap[key]);

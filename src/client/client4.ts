@@ -1299,6 +1299,13 @@ export default class Client4 {
         );
     };
 
+    getGeneralUserStats = () => {
+        return this.doFetch<UsersStats>(
+            `${this.getUsersRoute()}/stats/general`,
+            {method: 'get'},
+        );
+    };
+
     invalidateAllEmailInvites = () => {
         return this.doFetch<StatusOK>(
             `${this.getTeamsRoute()}/invites/email`,
