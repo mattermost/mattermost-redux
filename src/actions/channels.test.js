@@ -2107,11 +2107,6 @@ describe('Actions.Channels', () => {
                             [channel.id]: {channel_id: channel.id, user_id: user.id},
                         },
                     },
-                    general: {
-                        config: {
-                            ExperimentalChannelSidebarOrganization: 'default_on',
-                        },
-                    },
                     users: {
                         currentUserId: user.id,
                     },
@@ -2147,11 +2142,6 @@ describe('Actions.Channels', () => {
                     },
                     orderByTeam: {
                         [team.id]: ['channelsCategory'],
-                    },
-                },
-                general: {
-                    config: {
-                        ExperimentalChannelSidebarOrganization: 'default_on',
                     },
                 },
                 users: {
@@ -2249,11 +2239,6 @@ describe('Actions.Channels', () => {
                         [team.id]: ['favoritesCategory', 'channelsCategory'],
                     },
                 },
-                general: {
-                    config: {
-                        ExperimentalChannelSidebarOrganization: 'default_on',
-                    },
-                },
                 users: {
                     currentUserId,
                 },
@@ -2293,7 +2278,7 @@ describe('Actions.Channels', () => {
                 },
                 general: {
                     config: {
-                        ExperimentalChannelSidebarOrganization: 'disabled',
+                        EnableLegacySidebar: 'true',
                     },
                 },
                 users: {
@@ -2341,11 +2326,6 @@ describe('Actions.Channels', () => {
                         [team.id]: ['favoritesCategory', 'channelsCategory'],
                     },
                 },
-                general: {
-                    config: {
-                        ExperimentalChannelSidebarOrganization: 'default_on',
-                    },
-                },
                 preferences: {
                     myPreferences: {
                         [prefKey]: {value: 'true'},
@@ -2391,7 +2371,7 @@ describe('Actions.Channels', () => {
                 },
                 general: {
                     config: {
-                        ExperimentalChannelSidebarOrganization: 'disabled',
+                        EnableLegacySidebar: 'true',
                     },
                 },
                 preferences: {

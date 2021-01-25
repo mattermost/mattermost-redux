@@ -18,7 +18,6 @@ import {
     isManuallyUnread,
 } from 'selectors/entities/channels';
 import {getConfig, getServerVersion} from 'selectors/entities/general';
-import {getNewSidebarPreference} from 'selectors/entities/preferences';
 import {getCurrentTeamId} from 'selectors/entities/teams';
 import {getCurrentUserId} from 'selectors/entities/users';
 
@@ -1418,6 +1417,7 @@ export function getMyChannelMember(channelId: string) {
 export function favoriteChannel(channelId: string, updateCategories = true): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         const state = getState();
+        const config = getConfig(state);
         const currentUserId = getCurrentUserId(state);
 
         const preference: PreferenceType = {
@@ -1429,31 +1429,32 @@ export function favoriteChannel(channelId: string, updateCategories = true): Act
 
         Client4.trackEvent('action', 'action_channels_favorite');
 
-        if (getNewSidebarPreference(state)) {
-            // The new sidebar is enabled, so favorite the channel by moving it into the current team's Favorites category
-            if (updateCategories) {
-                const channel = getChannelSelector(state, channelId);
-                const category = getCategoryInTeamByType(state, channel.team_id || getCurrentTeamId(state), CategoryTypes.FAVORITES);
-
-                if (category) {
-                    await dispatch(addChannelToCategory(category.id, channelId));
-                }
-            }
-
-            return dispatch({
-                type: PreferenceTypes.RECEIVED_PREFERENCES,
-                data: [preference],
-            });
+        if (config.EnableLegacySidebar === 'true') {
+            // The old sidebar is enabled, so favorite the channel by calling the preferences API
+            return dispatch(savePreferences(currentUserId, [preference]));
         }
 
-        // The old sidebar is enabled, so favorite the channel by calling the preferences API
-        return dispatch(savePreferences(currentUserId, [preference]));
+        // The new sidebar is enabled, so favorite the channel by moving it into the current team's Favorites category
+        if (updateCategories) {
+            const channel = getChannelSelector(state, channelId);
+            const category = getCategoryInTeamByType(state, channel.team_id || getCurrentTeamId(state), CategoryTypes.FAVORITES);
+
+            if (category) {
+                await dispatch(addChannelToCategory(category.id, channelId));
+            }
+        }
+
+        return dispatch({
+            type: PreferenceTypes.RECEIVED_PREFERENCES,
+            data: [preference],
+        });
     };
 }
 
 export function unfavoriteChannel(channelId: string, updateCategories = true): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         const state = getState();
+        const config = getConfig(state);
         const currentUserId = getCurrentUserId(state);
 
         const preference: PreferenceType = {
@@ -1465,29 +1466,29 @@ export function unfavoriteChannel(channelId: string, updateCategories = true): A
 
         Client4.trackEvent('action', 'action_channels_unfavorite');
 
-        if (getNewSidebarPreference(state)) {
-            // The new sidebar is enabled, so unfavorite the channel by moving it into the current team's Channels/DMs category
-            if (updateCategories) {
-                const channel = getChannelSelector(state, channelId);
-                const category = getCategoryInTeamByType(
-                    state,
-                    channel.team_id || getCurrentTeamId(state),
-                    channel.type === General.DM_CHANNEL || channel.type === General.GM_CHANNEL ? CategoryTypes.DIRECT_MESSAGES : CategoryTypes.CHANNELS,
-                );
-
-                if (category) {
-                    await dispatch(addChannelToCategory(category.id, channel.id));
-                }
-            }
-
-            return dispatch({
-                type: PreferenceTypes.DELETED_PREFERENCES,
-                data: [preference],
-            });
+        if (config.EnableLegacySidebar === 'true') {
+            // The old sidebar is enabled, so unfavorite the channel by calling the preferences API
+            return dispatch(deletePreferences(currentUserId, [preference]));
         }
 
-        // The old sidebar is enabled, so unfavorite the channel by calling the preferences API
-        return dispatch(deletePreferences(currentUserId, [preference]));
+        // The new sidebar is enabled, so unfavorite the channel by moving it into the current team's Channels/DMs category
+        if (updateCategories) {
+            const channel = getChannelSelector(state, channelId);
+            const category = getCategoryInTeamByType(
+                state,
+                channel.team_id || getCurrentTeamId(state),
+                channel.type === General.DM_CHANNEL || channel.type === General.GM_CHANNEL ? CategoryTypes.DIRECT_MESSAGES : CategoryTypes.CHANNELS,
+            );
+
+            if (category) {
+                await dispatch(addChannelToCategory(category.id, channel.id));
+            }
+        }
+
+        return dispatch({
+            type: PreferenceTypes.DELETED_PREFERENCES,
+            data: [preference],
+        });
     };
 }
 
