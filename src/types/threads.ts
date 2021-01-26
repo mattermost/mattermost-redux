@@ -19,7 +19,7 @@ export type UserThread = {
 
 export type UserThreadList = {
     total: number;
-    total_unread_replies: number;
+    total_unread_threads: number;
     total_unread_mentions: number;
     threads: UserThread[];
 }
@@ -29,7 +29,7 @@ export type ThreadsState = {
     threads: IDMappedObjects<UserThread>;
     counts: RelationOneToOne<Team, {
         total: number;
-        total_unread_replies: number;
+        total_unread_threads: number;
         total_unread_mentions: number;
     }>;
 };

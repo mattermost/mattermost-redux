@@ -14,6 +14,13 @@ export function getConfig(state: GlobalState): Partial<ClientConfig> {
     return state.entities.general.config;
 }
 
+/**
+ * Safely get value of a specific or known FeatureFlag
+ */
+export function getFeatureFlagValue(state: GlobalState, key: string): string | undefined {
+    return getConfig(state)?.[`FeatureFlag${key}` as keyof Partial<ClientConfig>];
+}
+
 export function getLicense(state: GlobalState): any {
     return state.entities.general.license;
 }
