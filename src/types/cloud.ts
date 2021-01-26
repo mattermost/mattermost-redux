@@ -111,4 +111,5 @@ export type InvoiceLineItem = {
 
 export type FreeTierStats = {
 	remaining_seats: number;
+	tier_status: string;
 }
