@@ -8,6 +8,7 @@ export type CloudState = {
 	products?: Dictionary<Product>;
 	customer?: CloudCustomer;
 	invoices?: Dictionary<Invoice>;
+	freeTierStats?: FreeTierStats;
 }
 
 export type Subscription = {
@@ -106,4 +107,8 @@ export type InvoiceLineItem = {
 	description: string;
 	type: string;
 	metadata: Dictionary<string>;
+}
+
+export type FreeTierStats = {
+	remaining_seats: number;
 }

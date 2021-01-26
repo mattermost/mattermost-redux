@@ -6,7 +6,7 @@ import {ClusterInfo, AnalyticsRow} from 'types/admin';
 import {Audit} from 'types/audits';
 import {UserAutocomplete, AutocompleteSuggestion} from 'types/autocomplete';
 import {Bot, BotPatch} from 'types/bots';
-import {Product, Subscription, CloudCustomer, Address, CloudCustomerPatch, Invoice} from 'types/cloud';
+import {Product, Subscription, CloudCustomer, Address, CloudCustomerPatch, Invoice, FreeTierStats} from 'types/cloud';
 import {ChannelCategory, OrderedChannelCategories} from 'types/channel_categories';
 import {
     Channel,
@@ -1295,13 +1295,6 @@ export default class Client4 {
     getFilteredUsersStats = (options: GetFilteredUsersStatsOpts) => {
         return this.doFetch<UsersStats>(
             `${this.getUsersRoute()}/stats/filtered${buildQueryString(options)}`,
-            {method: 'get'},
-        );
-    };
-
-    getGeneralUserStats = () => {
-        return this.doFetch<UsersStats>(
-            `${this.getUsersRoute()}/stats/general`,
             {method: 'get'},
         );
     };
@@ -3410,6 +3403,13 @@ export default class Client4 {
     getSubscription = () => {
         return this.doFetch<Subscription>(
             `${this.getCloudRoute()}/subscription`,
+            {method: 'get'},
+        );
+    }
+
+    getFreeTierStats = () => {
+        return this.doFetch<FreeTierStats>(
+            `${this.getCloudRoute()}/free_tier/stats`,
             {method: 'get'},
         );
     }

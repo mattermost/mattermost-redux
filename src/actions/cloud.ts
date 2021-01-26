@@ -22,6 +22,13 @@ export function getCloudProducts(): ActionFunc {
     });
 }
 
+export function getFreeTierStats(): ActionFunc {
+    return bindClientFunc({
+        clientFunc: Client4.getFreeTierStats,
+        onSuccess: CloudTypes.RECEIVED_CLOUD_FREE_TIER_STATS,
+    });
+}
+
 export function getCloudCustomer(): ActionFunc {
     return bindClientFunc({
         clientFunc: Client4.getCloudCustomer,

@@ -588,20 +588,6 @@ function filteredStats(state = {}, action: GenericAction) {
     }
 }
 
-function generalUserStats(state = {}, action: GenericAction) {
-    switch (action.type) {
-    case UserTypes.RECEIVED_GENERAL_USER_STATS: {
-        const data = action.data;
-        return {
-            ...state,
-            ...data,
-        };
-    }
-    default:
-        return state;
-    }
-}
-
 export default combineReducers({
 
     // the current selected user
@@ -648,7 +634,4 @@ export default combineReducers({
 
     // Total user stats after filters have been applied
     filteredStats,
-
-    // User stats that're safe for all users to view and are not permissions restricted. No filters applied either
-    generalUserStats,
 });

@@ -287,13 +287,6 @@ export function getFilteredUsersStats(options: GetFilteredUsersStatsOpts = {}): 
     };
 }
 
-export function getGeneralUserStats(): ActionFunc {
-    return bindClientFunc({
-        clientFunc: Client4.getGeneralUserStats,
-        onSuccess: UserTypes.RECEIVED_GENERAL_USER_STATS,
-    });
-}
-
 export function getProfiles(page = 0, perPage: number = General.PROFILE_CHUNK_SIZE, options: any = {}): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         const {currentUserId} = getState().entities.users;
