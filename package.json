@@ -25,10 +25,10 @@
     "dev-mobile:watch": "ttsc --watch --outDir ${MOBILE_DIR:-../mattermost-mobile}/node_modules/mattermost-redux"
   },
   "dependencies": {
-    "core-js": "3.6.5",
+    "core-js": "3.8.3",
     "form-data": "3.0.0",
     "gfycat-sdk": "1.4.18",
-    "moment-timezone": "0.5.31",
+    "moment-timezone": "0.5.32",
     "redux": "4.0.5",
     "redux-action-buffer": "1.2.0",
     "redux-offline": "git+https://github.com/enahum/redux-offline.git#885024de96b6ec73650c340c8928066585c413df",
@@ -37,8 +37,8 @@
     "redux-thunk": "2.3.0",
     "remote-redux-devtools": "0.5.16",
     "reselect": "4.0.0",
-    "rudder-sdk-js": "1.0.6",
-    "serialize-error": "6.0.0",
+    "rudder-sdk-js": "1.0.14",
+    "serialize-error": "8.0.1",
     "shallow-equals": "1.0.0"
   },
   "husky": {
