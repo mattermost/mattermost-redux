@@ -6,7 +6,7 @@ import {createSelector} from 'reselect';
 import {General} from '../../constants';
 
 import {GlobalState} from 'types/store';
-import {ClientConfig} from 'types/config';
+import {ClientConfig, FeatureFlags} from 'types/config';
 
 import {isMinimumServerVersion} from 'utils/helpers';
 
@@ -17,7 +17,7 @@ export function getConfig(state: GlobalState): Partial<ClientConfig> {
 /**
  * Safely get value of a specific or known FeatureFlag
  */
-export function getFeatureFlagValue(state: GlobalState, key: string): string | undefined {
+export function getFeatureFlagValue(state: GlobalState, key: keyof FeatureFlags): string | undefined {
     return getConfig(state)?.[`FeatureFlag${key}` as keyof Partial<ClientConfig>];
 }
 
