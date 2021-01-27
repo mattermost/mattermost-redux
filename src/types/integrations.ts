@@ -73,6 +73,12 @@ export type CommandResponse = {
     extra_responses: CommandResponse[];
 };
 
+export type CommandArgs = {
+    channel_id?: string;
+    root_id?: string;
+    parent_id?: string;
+};
+
 export type CommandAutocompleteSuggestion = {
     Complete: string;
     Suggestion: string;

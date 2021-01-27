@@ -1,12 +1,28 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
+
 import {ChannelTypes, GeneralTypes, PostTypes, UserTypes} from 'action_types';
+
 import {Posts} from '../../constants';
-import {comparePosts} from 'utils/post_utils';
-import {Post, PostsState, PostOrderBlock, MessageHistory} from 'types/posts';
-import {$ID, RelationOneToOne, Dictionary, IDMappedObjects, RelationOneToMany} from 'types/utilities';
+
 import {GenericAction} from 'types/actions';
+import {
+    OpenGraphMetadata,
+    Post,
+    PostsState,
+    PostOrderBlock,
+    MessageHistory,
+} from 'types/posts';
 import {Reaction} from 'types/reactions';
+import {
+    $ID,
+    RelationOneToOne,
+    Dictionary,
+    IDMappedObjects,
+    RelationOneToMany,
+} from 'types/utilities';
+
+import {comparePosts} from 'utils/post_utils';
 
 export function removeUnneededMetadata(post: Post) {
     if (!post.metadata) {
@@ -1117,7 +1133,7 @@ function storeReactionsForPost(state: any, post: Post) {
     };
 }
 
-export function openGraph(state: RelationOneToOne<Post, any> = {}, action: GenericAction) {
+export function openGraph(state: RelationOneToOne<Post, Dictionary<OpenGraphMetadata>> = {}, action: GenericAction) {
     switch (action.type) {
     case PostTypes.RECEIVED_OPEN_GRAPH_METADATA: {
         const nextState = {...state};

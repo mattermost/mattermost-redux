@@ -46,6 +46,7 @@ import {
 import {PostActionResponse} from 'types/integration_actions';
 import {
     Command,
+    CommandArgs,
     CommandResponse,
     DialogSubmission,
     IncomingWebhook,
@@ -2376,7 +2377,7 @@ export default class Client4 {
         );
     };
 
-    getCommandAutocompleteSuggestionsList = (userInput: string, teamId: string, commandArgs: {}) => {
+    getCommandAutocompleteSuggestionsList = (userInput: string, teamId: string, commandArgs: CommandArgs) => {
         return this.doFetch<AutocompleteSuggestion[]>(
             `${this.getTeamRoute(teamId)}/commands/autocomplete_suggestions${buildQueryString({...commandArgs, user_input: userInput})}`,
             {method: 'get'},
