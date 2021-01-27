@@ -8,7 +8,7 @@ export type CloudState = {
 	products?: Dictionary<Product>;
 	customer?: CloudCustomer;
 	invoices?: Dictionary<Invoice>;
-	freeTierStats?: FreeTierStats;
+	subscriptionStats?: SubscriptionStats;
 }
 
 export type Subscription = {
@@ -109,7 +109,7 @@ export type InvoiceLineItem = {
 	metadata: Dictionary<string>;
 }
 
-export type FreeTierStats = {
+export type SubscriptionStats = {
 	remaining_seats: number;
-	tier_status: string;
+	is_paid_tier: string;
 }

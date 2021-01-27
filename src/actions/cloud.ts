@@ -22,10 +22,10 @@ export function getCloudProducts(): ActionFunc {
     });
 }
 
-export function getFreeTierStats(): ActionFunc {
+export function getSubscriptionStats(): ActionFunc {
     return bindClientFunc({
-        clientFunc: Client4.getFreeTierStats,
-        onSuccess: CloudTypes.RECEIVED_CLOUD_FREE_TIER_STATS,
+        clientFunc: Client4.getSubscriptionStats,
+        onSuccess: CloudTypes.RECEIVED_CLOUD_SUBSCRIPTION_STATS,
     });
 }
 

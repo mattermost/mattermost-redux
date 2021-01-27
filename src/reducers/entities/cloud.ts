@@ -64,9 +64,9 @@ function invoices(state: Dictionary<Invoice> | null = null, action: GenericActio
     }
 }
 
-function freeTierStats(state = {}, action: GenericAction) {
+function subscriptionStats(state = {}, action: GenericAction) {
     switch (action.type) {
-    case CloudTypes.RECEIVED_CLOUD_FREE_TIER_STATS: {
+    case CloudTypes.RECEIVED_CLOUD_SUBSCRIPTION_STATS: {
         const data = action.data;
         return {
             ...state,
@@ -92,5 +92,5 @@ export default combineReducers({
     // represents the invoices tied to the current subscription
     invoices,
 
-    freeTierStats,
+    subscriptionStats,
 });
