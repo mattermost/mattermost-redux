@@ -1934,7 +1934,7 @@ export default class Client4 {
     };
 
     getUserThread = (userId: string, teamId: string, threadId: string, extended = false) => {
-        const url = `${this.getUserThreadRoute(userId, teamId, threadId)}}`;
+        const url = `${this.getUserThreadRoute(userId, teamId, threadId)}`;
         return this.doFetch<UserThread>(
             `${url}${buildQueryString({extended})}`,
             {method: 'get'},

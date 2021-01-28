@@ -28,12 +28,12 @@ export function getThreads(userId: string, teamId: string, {before = '', after =
         if (userThreadList?.threads?.length) {
             dispatch({
                 type: UserTypes.RECEIVED_PROFILES_LIST,
-                data: userThreadList.threads?.map(({participants: users}) => users).flat(),
+                data: userThreadList.threads.map(({participants: users}) => users).flat(),
             });
 
             dispatch({
                 type: PostTypes.RECEIVED_POSTS,
-                data: {posts: userThreadList?.threads.map(({post}) => post)},
+                data: {posts: userThreadList.threads.map(({post}) => post)},
             });
         }
 
@@ -62,6 +62,8 @@ export function getThread(userId: string, teamId: string, threadId: string, exte
         }
 
         if (thread) {
+            thread = {...thread, is_following: true};
+
             dispatch({
                 type: UserTypes.RECEIVED_PROFILES_LIST,
                 data: thread.participants,
@@ -71,17 +73,17 @@ export function getThread(userId: string, teamId: string, threadId: string, exte
                 type: PostTypes.RECEIVED_POSTS,
                 data: {posts: [thread.post]},
             });
+
+            dispatch({
+                type: ThreadTypes.RECEIVED_THREAD,
+                data: {
+                    thread,
+                    team_id: teamId,
+                },
+            });
         }
 
-        dispatch({
-            type: ThreadTypes.RECEIVED_THREAD,
-            data: {
-                thread: {...thread, is_following: true},
-                team_id: teamId,
-            },
-        });
-
-        return {};
+        return {data: thread};
     };
 }
 

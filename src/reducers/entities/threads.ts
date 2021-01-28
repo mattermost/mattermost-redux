@@ -55,7 +55,7 @@ export const threadsInTeamReducer = (state: ThreadsState['threadsInTeam'] = {}, 
         };
     }
     case ThreadTypes.RECEIVED_THREAD: {
-        if (state[action.data.team_id].includes(action.data.thread.id)) {
+        if (state[action.data.team_id]?.includes(action.data.thread.id)) {
             return state;
         }
 
