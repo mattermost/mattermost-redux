@@ -198,11 +198,26 @@ export function makeFilterAutoclosedDMs(): (state: GlobalState, channels: Channe
         getCurrentUserId,
         getMyChannelMemberships,
         (state: GlobalState) => getInt(state, Preferences.CATEGORY_SIDEBAR_SETTINGS, Preferences.LIMIT_VISIBLE_DMS_GMS, 20),
-        (channels, categoryType, currentChannelId, profiles, currentUserId, myMembers, limitPref) => {
+        getMyPreferences,
+        (channels, categoryType, currentChannelId, profiles, currentUserId, myMembers, limitPref, myPreferences) => {
             if (categoryType !== CategoryTypes.DIRECT_MESSAGES) {
                 // Only autoclose DMs that haven't been assigned to a category
                 return channels;
             }
+
+            const getTimestampFromPrefs = (category: string, name: string) => {
+                const pref = myPreferences[getPreferenceKey(category, name)];
+                return parseInt(pref ? pref.value! : '0', 10);
+            };
+            const getLastViewedAt = (channel: Channel) => {
+                // The server only ever sets the last_viewed_at to the time of the last post in channel, so we may need
+                // to use the preferences added for the previous version of autoclosing DMs.
+                return Math.max(
+                    myMembers[channel.id]?.last_viewed_at,
+                    getTimestampFromPrefs(Preferences.CATEGORY_CHANNEL_APPROXIMATE_VIEW_TIME, channel.id),
+                    getTimestampFromPrefs(Preferences.CATEGORY_CHANNEL_OPEN_TIME, channel.id),
+                );
+            };
 
             let unreadCount = 0;
             let visibleChannels = channels.filter((channel) => {
@@ -223,7 +238,7 @@ export function makeFilterAutoclosedDMs(): (state: GlobalState, channels: Channe
                     const teammateId = getUserIdFromChannelName(currentUserId, channel.name);
                     const teammate = profiles[teammateId];
 
-                    const lastViewedAt = myMembers[channel.id]?.last_viewed_at;
+                    const lastViewedAt = getLastViewedAt(channel);
 
                     if (!teammate || teammate.delete_at > lastViewedAt) {
                         return false;
@@ -249,8 +264,8 @@ export function makeFilterAutoclosedDMs(): (state: GlobalState, channels: Channe
                 }
 
                 // Third priority is last_viewed_at
-                const channelAlastViewed = myMembers[channelA.id]?.last_viewed_at || 0;
-                const channelBlastViewed = myMembers[channelB.id]?.last_viewed_at || 0;
+                const channelAlastViewed = getLastViewedAt(channelA) || 0;
+                const channelBlastViewed = getLastViewedAt(channelB) || 0;
 
                 if (channelAlastViewed > channelBlastViewed) {
                     return -1;
