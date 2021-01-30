@@ -60,6 +60,7 @@ export type ClientConfig = {
     EnableEmailInvitations: boolean;
     EnableEmojiPicker: boolean;
     EnableFileAttachments: string;
+    EnableFile: string;
     EnableGifPicker: boolean;
     EnableGuestAccounts: string;
     EnableIncomingWebhooks: boolean;
@@ -115,6 +116,7 @@ export type ClientConfig = {
     ExperimentalTimezone: boolean;
     ExperimentalTownSquareIsReadOnly: boolean;
     ExperimentalViewArchivedChannels: boolean;
+    FileLevel: string;
     GfycatApiKey: string;
     GfycatApiSecret: string;
     GoogleDeveloperKey: string;
