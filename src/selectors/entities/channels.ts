@@ -283,11 +283,11 @@ export function isChannelReadOnlyById(state: GlobalState, channelId: string): bo
 }
 
 export function isChannelReadOnly(state: GlobalState, channel: Channel): boolean {
-    return channel && channel.name === General.DEFAULT_CHANNEL && !isCurrentUserSystemAdmin(state) && getConfig(state).ExperimentalTownSquareIsReadOnly === 'true';
+    return channel && channel.name === General.DEFAULT_CHANNEL && !isCurrentUserSystemAdmin(state) && getConfig(state).ExperimentalTownSquareIsReadOnly === true;
 }
 
 export function shouldHideDefaultChannel(state: GlobalState, channel: Channel): boolean {
-    return channel && channel.name === General.DEFAULT_CHANNEL && !isCurrentUserSystemAdmin(state) && getConfig(state).ExperimentalHideTownSquareinLHS === 'true';
+    return channel && channel.name === General.DEFAULT_CHANNEL && !isCurrentUserSystemAdmin(state) && getConfig(state).ExperimentalHideTownSquareinLHS === true;
 }
 
 export const countCurrentChannelUnreadMessages: (state: GlobalState) => number = createSelector(
@@ -1308,7 +1308,7 @@ export function getChannelMemberCountsByGroup(state: GlobalState, channelId: str
 
 export function isFavoriteChannel(state: GlobalState, channelId: string): boolean {
     const config = getConfig(state);
-    if (config.EnableLegacySidebar === 'true') {
+    if (config.EnableLegacySidebar === true) {
         return isFavoriteChannelOld(getMyPreferences(state), channelId);
     }
 

@@ -52,7 +52,7 @@ export const canUploadFilesOnMobile: (a: GlobalState) => boolean = createSelecto
     (config: ClientConfig, license: any): boolean => {
         // Defaults to true if either setting doesn't exist
         return config.EnableFileAttachments !== 'false' &&
-           (license.IsLicensed === 'false' || license.Compliance === 'false' || config.EnableMobileFileUpload !== 'false');
+        (license.IsLicensed === 'false' || license.Compliance === 'false' || config.EnableMobileFileUpload !== 'false');
     },
 );
 

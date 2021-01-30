@@ -98,7 +98,7 @@ export const getTeammateNameDisplaySetting: (state: GlobalState) => string | und
     getMyPreferences,
     getLicense,
     (config, preferences, license) => {
-        const useAdminTeammateNameDisplaySetting = (license && license.LockTeammateNameDisplay === 'true') && config.LockTeammateNameDisplay === 'true';
+        const useAdminTeammateNameDisplaySetting = (license && license.LockTeammateNameDisplay === 'true') && config.LockTeammateNameDisplay === true;
         const key = getPreferenceKey(Preferences.CATEGORY_DISPLAY_SETTINGS, Preferences.NAME_NAME_FORMAT);
         if (preferences[key] && !useAdminTeammateNameDisplaySetting) {
             return preferences[key].value;
@@ -256,7 +256,7 @@ export const shouldShowUnreadsCategory: (state: GlobalState) => boolean = create
 
 export function shouldAutocloseDMs(state: GlobalState) {
     const config = getConfig(state);
-    if (!config.CloseUnusedDirectMessages || config.CloseUnusedDirectMessages === 'false') {
+    if (!config.CloseUnusedDirectMessages) {
         return false;
     }
 

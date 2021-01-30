@@ -1018,7 +1018,7 @@ function buildPostAttachmentText(attachments: any[]) {
 }
 
 export function getNeededCustomEmojis(state: GlobalState, posts: Post[]): Set<string> {
-    if (getConfig(state).EnableCustomEmoji !== 'true') {
+    if (getConfig(state).EnableCustomEmoji !== true) {
         return new Set<string>();
     }
 

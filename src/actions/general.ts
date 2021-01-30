@@ -58,7 +58,7 @@ export function getClientConfig(): ActionFunc {
             return {error};
         }
 
-        Client4.setEnableLogging(data.EnableDeveloper === 'true');
+        Client4.setEnableLogging(data.EnableDeveloper === true);
         Client4.setDiagnosticId(data.DiagnosticId);
 
         dispatch(batchActions([

@@ -22,5 +22,5 @@ export function getUserTimezone(state: GlobalState, id: string) {
 
 export function isTimezoneEnabled(state: GlobalState) {
     const {config} = state.entities.general;
-    return config.ExperimentalTimezone === 'true';
+    return config.ExperimentalTimezone === true;
 }

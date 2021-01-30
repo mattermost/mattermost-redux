@@ -726,7 +726,7 @@ export function joinChannel(userId: string, teamId: string, channelId: string, c
 export function deleteChannel(channelId: string): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         let state = getState();
-        const viewArchivedChannels = state.entities.general.config.ExperimentalViewArchivedChannels === 'true';
+        const viewArchivedChannels = state.entities.general.config.ExperimentalViewArchivedChannels === true;
 
         try {
             await Client4.deleteChannel(channelId);
@@ -765,7 +765,7 @@ export function unarchiveChannel(channelId: string): ActionFunc {
 
         const state = getState();
         const config = getConfig(state);
-        const viewArchivedChannels = config.ExperimentalViewArchivedChannels === 'true';
+        const viewArchivedChannels = config.ExperimentalViewArchivedChannels === true;
         dispatch({type: ChannelTypes.UNARCHIVED_CHANNEL_SUCCESS, data: {id: channelId, viewArchivedChannels}});
 
         return {data: true};
@@ -1429,7 +1429,7 @@ export function favoriteChannel(channelId: string, updateCategories = true): Act
 
         Client4.trackEvent('action', 'action_channels_favorite');
 
-        if (config.EnableLegacySidebar === 'true') {
+        if (config.EnableLegacySidebar === true) {
             // The old sidebar is enabled, so favorite the channel by calling the preferences API
             return dispatch(savePreferences(currentUserId, [preference]));
         }
@@ -1466,7 +1466,7 @@ export function unfavoriteChannel(channelId: string, updateCategories = true): A
 
         Client4.trackEvent('action', 'action_channels_unfavorite');
 
-        if (config.EnableLegacySidebar === 'true') {
+        if (config.EnableLegacySidebar === true) {
             // The old sidebar is enabled, so unfavorite the channel by calling the preferences API
             return dispatch(deletePreferences(currentUserId, [preference]));
         }

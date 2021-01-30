@@ -15,7 +15,7 @@ export const getCustomEmojis: (state: GlobalState) => IDMappedObjects<CustomEmoj
     getConfig,
     (state) => state.entities.emojis.customEmoji,
     (config, customEmoji) => {
-        if (config.EnableCustomEmoji !== 'true') {
+        if (config.EnableCustomEmoji !== true) {
             return {};
         }
 
