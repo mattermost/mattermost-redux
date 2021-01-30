@@ -59,7 +59,7 @@ export type ClientConfig = {
     EnableEmailBatching: boolean;
     EnableEmailInvitations: boolean;
     EnableEmojiPicker: boolean;
-    EnableFileAttachments: boolean;
+    EnableFileAttachments: string;
     EnableGifPicker: boolean;
     EnableGuestAccounts: string;
     EnableIncomingWebhooks: boolean;
