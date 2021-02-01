@@ -3,7 +3,7 @@
 import {General} from '../constants';
 
 import {ClusterInfo, AnalyticsRow} from 'types/admin';
-import {AppBinding, AppCall, AppCallResponse} from 'types/apps';
+import type {AppBinding, AppCall, AppCallResponse} from 'types/apps';
 import {Audit} from 'types/audits';
 import {UserAutocomplete, AutocompleteSuggestion} from 'types/autocomplete';
 import {Bot, BotPatch} from 'types/bots';
@@ -58,11 +58,14 @@ import {Job} from 'types/jobs';
 import {MfaSecret} from 'types/mfa';
 import {
     ClientPluginManifest,
-    MarketplacePlugin,
     PluginManifest,
     PluginsResponse,
     PluginStatus,
 } from 'types/plugins';
+import type {
+    MarketplaceApp,
+    MarketplacePlugin,
+} from 'types/marketplace';
 import {Post, PostList, PostSearchResults, OpenGraphMetadata} from 'types/posts';
 import {PreferenceType} from 'types/preferences';
 import {Reaction} from 'types/reactions';
@@ -3112,7 +3115,7 @@ export default class Client4 {
     };
 
     getMarketplacePlugins = (filter: string, localOnly = false) => {
-        return this.doFetch<MarketplacePlugin>(
+        return this.doFetch<MarketplacePlugin[]>(
             `${this.getPluginsMarketplaceRoute()}${buildQueryString({filter: filter || '', local_only: localOnly})}`,
             {method: 'get'},
         );
@@ -3124,6 +3127,13 @@ export default class Client4 {
         return this.doFetch<MarketplacePlugin>(
             `${this.getPluginsMarketplaceRoute()}`,
             {method: 'post', body: JSON.stringify({id, version})},
+        );
+    }
+
+    getMarketplaceApps = (filter: string) => {
+        return this.doFetch<MarketplaceApp[]>(
+            `${this.getAppsProxyRoute()}/api/v1/marketplace${buildQueryString({filter: filter || ''})}`,
+            {method: 'get'},
         );
     }
 
