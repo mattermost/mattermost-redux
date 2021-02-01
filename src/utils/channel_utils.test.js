@@ -106,8 +106,8 @@ describe('ChannelUtils', () => {
     });
 
     it('isAutoClosed', () => {
-        const autoCloseEnabled = {CloseUnusedDirectMessages: 'true'};
-        const autoCloseDisabled = {CloseUnusedDirectMessages: 'false'};
+        const autoCloseEnabled = {CloseUnusedDirectMessages: true};
+        const autoCloseDisabled = {CloseUnusedDirectMessages: false};
         const activeChannel = {id: 'channelid', last_post_at: new Date().getTime()};
         const inactiveChannel = {id: 'channelid', last_post_at: 1};
         const now = new Date().getTime();

@@ -22,7 +22,7 @@ describe('getCustomEmojis', () => {
             },
             general: {
                 config: {
-                    EnableCustomEmoji: 'true',
+                    EnableCustomEmoji: true,
                 },
             },
         },
@@ -37,7 +37,7 @@ describe('getCustomEmojis', () => {
             entities: {
                 general: {
                     config: {
-                        EnableCustomEmoji: 'false',
+                        EnableCustomEmoji: false,
                     },
                 },
             },
@@ -55,7 +55,7 @@ describe('getCustomEmojis', () => {
             entities: {
                 general: {
                     config: {
-                        EnableCustomEmoji: 'false',
+                        EnableCustomEmoji: false,
                     },
                 },
             },
@@ -81,7 +81,7 @@ describe('getCustomEmojiIdsSortedByName', () => {
             },
             general: {
                 config: {
-                    EnableCustomEmoji: 'true',
+                    EnableCustomEmoji: true,
                 },
             },
         },

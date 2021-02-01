@@ -143,7 +143,7 @@ describe('legacyMakeFilterAutoclosedDMs', () => {
             },
             general: {
                 config: {
-                    CloseUnusedDirectMessages: 'true',
+                    CloseUnusedDirectMessages: true,
                 },
             },
             posts: {
@@ -333,7 +333,7 @@ describe('legacyMakeFilterAutoclosedDMs', () => {
             entities: {
                 general: {
                     config: {
-                        CloseUnusedDirectMessages: 'false',
+                        CloseUnusedDirectMessages: false,
                     },
                 },
                 preferences: {
@@ -563,7 +563,7 @@ describe('makeFilterAutoclosedDMs', () => {
             },
             general: {
                 config: {
-                    CloseUnusedDirectMessages: 'true',
+                    CloseUnusedDirectMessages: true,
                 },
             },
             posts: {

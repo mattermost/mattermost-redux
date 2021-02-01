@@ -568,10 +568,10 @@ describe('Selectors.Users', () => {
                     general: {
                         config: {
                             TeammateNameDisplay: General.TEAMMATE_NAME_DISPLAY.SHOW_USERNAME,
-                            LockTeammateNameDisplay: 'false',
+                            LockTeammateNameDisplay: false,
                         },
                         license: {
-                            LockTeammateNameDisplay: 'true',
+                            LockTeammateNameDisplay: true,
                         },
                     },
                 },
@@ -592,15 +592,15 @@ describe('Selectors.Users', () => {
                     general: {
                         config: {
                             TeammateNameDisplay: General.TEAMMATE_NAME_DISPLAY.SHOW_USERNAME,
-                            LockTeammateNameDisplay: 'true',
+                            LockTeammateNameDisplay: true,
                         },
                         license: {
-                            LockTeammateNameDisplay: 'true',
+                            LockTeammateNameDisplay: true,
                         },
                     },
                 },
             };
-            assert.deepEqual(Selectors.makeGetDisplayName()(newTestState, testUser1.id), 'username');
+            assert.deepEqual(Selectors.makeGetDisplayName()(newTestState, testUser1.id), 'First Last');
         });
         it('Should show full name since license is false', () => {
             const newTestState = {
@@ -616,10 +616,10 @@ describe('Selectors.Users', () => {
                     general: {
                         config: {
                             TeammateNameDisplay: General.TEAMMATE_NAME_DISPLAY.SHOW_USERNAME,
-                            LockTeammateNameDisplay: 'true',
+                            LockTeammateNameDisplay: true,
                         },
                         license: {
-                            LockTeammateNameDisplay: 'false',
+                            LockTeammateNameDisplay: false,
                         },
                     },
                 },
@@ -640,7 +640,7 @@ describe('Selectors.Users', () => {
                     general: {
                         config: {
                             TeammateNameDisplay: General.TEAMMATE_NAME_DISPLAY.SHOW_USERNAME,
-                            LockTeammateNameDisplay: 'true',
+                            LockTeammateNameDisplay: true,
                         },
                     },
                 },
@@ -661,7 +661,7 @@ describe('Selectors.Users', () => {
                     general: {
                         config: {
                             TeammateNameDisplay: General.TEAMMATE_NAME_DISPLAY.SHOW_USERNAME,
-                            LockTeammateNameDisplay: 'false',
+                            LockTeammateNameDisplay: false,
                         },
                     },
                 },

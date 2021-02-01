@@ -614,7 +614,7 @@ describe('Actions.Posts', () => {
                 },
                 general: {
                     config: {
-                        EnableCustomEmoji: 'true',
+                        EnableCustomEmoji: true,
                     },
                 },
             },
@@ -774,7 +774,7 @@ describe('Actions.Posts', () => {
                         ...state.entities,
                         general: {
                             config: {
-                                EnableCustomEmoji: 'false',
+                                EnableCustomEmoji: false,
                             },
                         },
                     },
@@ -1637,7 +1637,7 @@ describe('Actions.Posts', () => {
                 entities: {
                     general: {
                         config: {
-                            EnableCustomEmoji: 'false',
+                            EnableCustomEmoji: false,
                         },
                     },
                     users: {

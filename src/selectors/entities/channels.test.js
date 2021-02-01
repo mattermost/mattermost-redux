@@ -874,7 +874,7 @@ describe('Selectors.Channels.isCurrentChannelFavorite', () => {
             },
             general: {
                 config: {
-                    EnableLegacySidebar: 'true',
+                    EnableLegacySidebar: true,
                 },
             },
             preferences: {
@@ -896,7 +896,7 @@ describe('Selectors.Channels.isCurrentChannelFavorite', () => {
                 },
                 general: {
                     config: {
-                        EnableLegacySidebar: 'true',
+                        EnableLegacySidebar: true,
                     },
                 },
             },
@@ -3633,7 +3633,7 @@ describe('isFavoriteChannel', () => {
             entities: {
                 general: {
                     config: {
-                        EnableLegacySidebar: 'true',
+                        EnableLegacySidebar: true,
                     },
                 },
                 preferences: {

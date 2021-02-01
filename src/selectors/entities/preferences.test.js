@@ -735,7 +735,7 @@ describe('shouldAutocloseDMs', () => {
             entities: {
                 general: {
                     config: {
-                        CloseUnusedDirectMessages: 'false',
+                        CloseUnusedDirectMessages: false,
                     },
                 },
                 preferences: {
@@ -752,7 +752,7 @@ describe('shouldAutocloseDMs', () => {
             entities: {
                 general: {
                     config: {
-                        CloseUnusedDirectMessages: 'true',
+                        CloseUnusedDirectMessages: true,
                     },
                 },
                 preferences: {
@@ -769,7 +769,7 @@ describe('shouldAutocloseDMs', () => {
             entities: {
                 general: {
                     config: {
-                        CloseUnusedDirectMessages: 'true',
+                        CloseUnusedDirectMessages: true,
                     },
                 },
                 preferences: {
@@ -788,7 +788,7 @@ describe('shouldAutocloseDMs', () => {
             entities: {
                 general: {
                     config: {
-                        CloseUnusedDirectMessages: 'true',
+                        CloseUnusedDirectMessages: true,
                     },
                 },
                 preferences: {
@@ -807,7 +807,7 @@ describe('shouldAutocloseDMs', () => {
             entities: {
                 general: {
                     config: {
-                        CloseUnusedDirectMessages: 'false',
+                        CloseUnusedDirectMessages: false,
                     },
                 },
                 preferences: {
