@@ -64,6 +64,20 @@ function invoices(state: Dictionary<Invoice> | null = null, action: GenericActio
     }
 }
 
+function subscriptionStats(state = {}, action: GenericAction) {
+    switch (action.type) {
+    case CloudTypes.RECEIVED_CLOUD_SUBSCRIPTION_STATS: {
+        const data = action.data;
+        return {
+            ...state,
+            ...data,
+        };
+    }
+    default:
+        return state;
+    }
+}
+
 export default combineReducers({
 
     // represents the current cloud customer
@@ -77,4 +91,6 @@ export default combineReducers({
 
     // represents the invoices tied to the current subscription
     invoices,
+
+    subscriptionStats,
 });
