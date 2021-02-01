@@ -111,8 +111,13 @@ const values = {
     SYSCONSOLE_WRITE_INTEGRATIONS: 'sysconsole_write_integrations',
     SYSCONSOLE_READ_COMPLIANCE: 'sysconsole_read_compliance',
     SYSCONSOLE_WRITE_COMPLIANCE: 'sysconsole_write_compliance',
-    SYSCONSOLE_READ_EXPERIMENTAL: 'sysconsole_read_experimental',
-    SYSCONSOLE_WRITE_EXPERIMENTAL: 'sysconsole_write_experimental',
+    SYSCONSOLE_READ_EXPERIMENTAL_FEATURES: 'sysconsole_read_experimental_features',
+    SYSCONSOLE_WRITE_EXPERIMENTAL_FEATURES: 'sysconsole_write_experimental_features',
+    SYSCONSOLE_READ_EXPERIMENTAL_FEATURE_FLAG: 'sysconsole_read_experimental_feature_flag',
+    SYSCONSOLE_WRITE_EXPERIMENTAL_FEATURE_FLAG: 'sysconsole_write_experimental_feature_flag',
+    SYSCONSOLE_READ_EXPERIMENTAL_BLEVE: 'sysconsole_read_experimental_bleve',
+    SYSCONSOLE_WRITE_EXPERIMENTAL_BLEVE:'sysconsole_write_experimental_bleve',
+
 
     CHANNEL_MODERATED_PERMISSIONS: {
         CREATE_POST: 'create_post',
