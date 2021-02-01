@@ -6,7 +6,7 @@ import {ClusterInfo, AnalyticsRow} from 'types/admin';
 import {Audit} from 'types/audits';
 import {UserAutocomplete, AutocompleteSuggestion} from 'types/autocomplete';
 import {Bot, BotPatch} from 'types/bots';
-import {Product, Subscription, CloudCustomer, Address, CloudCustomerPatch, Invoice} from 'types/cloud';
+import {Product, Subscription, CloudCustomer, Address, CloudCustomerPatch, Invoice, SubscriptionStats} from 'types/cloud';
 import {ChannelCategory, OrderedChannelCategories} from 'types/channel_categories';
 import {
     Channel,
@@ -3403,6 +3403,13 @@ export default class Client4 {
     getSubscription = () => {
         return this.doFetch<Subscription>(
             `${this.getCloudRoute()}/subscription`,
+            {method: 'get'},
+        );
+    }
+
+    getSubscriptionStats = () => {
+        return this.doFetch<SubscriptionStats>(
+            `${this.getCloudRoute()}/subscription/stats`,
             {method: 'get'},
         );
     }
