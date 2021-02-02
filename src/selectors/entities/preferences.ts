@@ -15,6 +15,7 @@ import {$ID} from 'types/utilities';
 
 import {createShallowSelector} from 'utils/helpers';
 import {getPreferenceKey} from 'utils/preference_utils';
+import {blendColors} from 'utils/theme_utils';
 
 export function getMyPreferences(state: GlobalState) {
     return state.entities.preferences.myPreferences;
@@ -174,7 +175,13 @@ export const getTheme: (state: GlobalState) => Theme = createShallowSelector(
             theme.mentionBg = theme.mentionBj;
         }
 
-        return Object.assign({}, defaultTheme, theme);
+        return {
+            ...defaultTheme,
+
+            // If users using a custom theme don't have the new "sidebarTeamBarBg" variable
+            sidebarTeamBarBg: blendColors(theme.sidebarHeaderBg, '#000000', 0.2),
+            ...theme,
+        };
     },
 );
 
