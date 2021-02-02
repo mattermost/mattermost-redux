@@ -17,6 +17,9 @@ module.exports = {
     testMatch: [
         '<rootDir>/src/**/?(*.)(spec|test).(ts|js)?(x)',
     ],
+    setupFiles: [
+        'core-js',
+    ],
     setupFilesAfterEnv: [
         '<rootDir>/test/setup.js',
     ],

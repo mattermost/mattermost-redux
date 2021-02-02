@@ -98,7 +98,7 @@ import {isSystemAdmin} from 'utils/user_utils';
 
 import fetch from './fetch_etag';
 import {TelemetryHandler} from './telemetry';
-import {UserThreadList} from 'types/threads';
+import {UserThreadList, UserThread} from 'types/threads';
 
 const FormData = require('form-data');
 const HEADER_AUTH = 'Authorization';
@@ -1918,15 +1918,25 @@ export default class Client4 {
         userId: $ID<UserProfile> = 'me',
         teamId: $ID<Team>,
         {
-            page = 0,
+            before = '',
+            after = '',
             pageSize = PER_PAGE_DEFAULT,
             extended = false,
             deleted = false,
+            unread = false,
             since = 0,
         },
     ) => {
         return this.doFetch<UserThreadList>(
-            `${this.getUserThreadsRoute(userId, teamId)}${buildQueryString({page, pageSize, extended, deleted, since})}`,
+            `${this.getUserThreadsRoute(userId, teamId)}${buildQueryString({before, after, pageSize, extended, deleted, unread, since})}`,
+            {method: 'get'},
+        );
+    };
+
+    getUserThread = (userId: string, teamId: string, threadId: string, extended = false) => {
+        const url = `${this.getUserThreadRoute(userId, teamId, threadId)}`;
+        return this.doFetch<UserThread>(
+            `${url}${buildQueryString({extended})}`,
             {method: 'get'},
         );
     };
