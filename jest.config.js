@@ -34,7 +34,6 @@ module.exports = {
     ],
     reporters: [
         'default',
-        'jest-junit',
     ],
     verbose: true,
     moduleNameMapper: {
