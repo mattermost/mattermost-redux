@@ -37,7 +37,7 @@ export function warnMetricsStatus(state: GlobalState): any {
     return state.entities.general.warnMetricsStatus;
 }
 
-export function subscriptionStatsFromState(state: GlobalState): any {
+export function getSubscriptionStats(state: GlobalState): any {
     return state.entities.cloud.subscriptionStats;
 }
 
