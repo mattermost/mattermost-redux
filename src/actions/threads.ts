@@ -50,6 +50,29 @@ export function getThreads(userId: string, teamId: string, {before = '', after =
     };
 }
 
+export function getThreadMentionCountsByChannel(userId: string, teamId: string) {
+    return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
+        let result: Record<string, number>;
+
+        try {
+            result = await Client4.getThreadMentionCountsByChannel(userId, teamId);
+        } catch (error) {
+            forceLogoutIfNecessary(error, dispatch, getState);
+            dispatch(logError(error));
+            return {error};
+        }
+
+        dispatch({
+            type: ThreadTypes.RECEIVED_PER_CHANNEL_MENTION_COUNTS,
+            data: {
+                counts: result,
+                team_id: teamId,
+            },
+        });
+
+        return {data: result};
+    };
+}
 export function getThread(userId: string, teamId: string, threadId: string, extended = false) {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         let thread;

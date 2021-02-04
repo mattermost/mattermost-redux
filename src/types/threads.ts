@@ -31,5 +31,6 @@ export type ThreadsState = {
         total: number;
         total_unread_threads: number;
         total_unread_mentions: number;
+        unread_mentions_per_channel: Record<string, number>;
     }>;
 };

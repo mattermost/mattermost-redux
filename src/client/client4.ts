@@ -1941,6 +1941,14 @@ export default class Client4 {
         );
     };
 
+    getThreadMentionCountsByChannel = (userId: string, teamId: string) => {
+        const url = `${this.getUserThreadsRoute(userId, teamId)}`;
+        return this.doFetch<Record<string, number>>(
+            url,
+            {method: 'get'},
+        );
+    };
+
     updateThreadsReadForUser = (userId: string, teamId: string) => {
         const url = `${this.getUserThreadsRoute(userId, teamId)}/read`;
         return this.doFetch<StatusOK>(
