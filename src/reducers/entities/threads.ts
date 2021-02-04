@@ -20,6 +20,13 @@ export const threadsReducer = (state: ThreadsState['threads'] = {}, action: Gene
             }, {}),
         };
     }
+    case ThreadTypes.RECEIVED_THREAD: {
+        const {thread} = action.data;
+        return {
+            ...state,
+            [thread.id]: thread,
+        };
+    }
     case ThreadTypes.FOLLOW_CHANGED_THREAD: {
         const {id, following} = action.data;
         return {
@@ -41,6 +48,20 @@ export const threadsInTeamReducer = (state: ThreadsState['threadsInTeam'] = {}, 
         action.data.threads.forEach((thread: UserThread) => {
             nextSet.add(thread.id);
         });
+
+        return {
+            ...state,
+            [action.data.team_id]: [...nextSet],
+        };
+    }
+    case ThreadTypes.RECEIVED_THREAD: {
+        if (state[action.data.team_id]?.includes(action.data.thread.id)) {
+            return state;
+        }
+
+        const nextSet = new Set(state[action.data.team_id]);
+
+        nextSet.add(action.data.thread.id);
 
         return {
             ...state,
@@ -71,7 +92,7 @@ export const countsReducer = (state: ThreadsState['counts'] = {}, action: Generi
             ...state,
             [action.data.team_id]: {
                 total: action.data.total,
-                total_unread_replies: action.data.total_unread_replies,
+                total_unread_threads: action.data.total_unread_threads,
                 total_unread_mentions: action.data.total_unread_mentions,
             },
         };
@@ -91,8 +112,8 @@ export const countsReducer = (state: ThreadsState['counts'] = {}, action: Generi
 
     case UserTypes.LOGOUT_SUCCESS:
         return {
-            total_unread_replies: 0,
             total: 0,
+            total_unread_threads: 0,
             total_unread_mentions: 0,
         };
     }
