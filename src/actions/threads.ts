@@ -13,38 +13,77 @@ import {UserThreadList} from 'types/threads';
 import {logError} from './errors';
 import {forceLogoutIfNecessary} from './helpers';
 
-export function getThreads(userId: string, teamId: string, {page = 0, perPage = ThreadConstants.THREADS_CHUNK_SIZE} = {}) {
+export function getThreads(userId: string, teamId: string, {before = '', after = '', perPage = ThreadConstants.THREADS_CHUNK_SIZE, unread = false} = {}) {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         let userThreadList: undefined | UserThreadList;
 
         try {
-            userThreadList = await Client4.getUserThreads(userId, teamId, {page, pageSize: perPage, extended: true});
+            userThreadList = await Client4.getUserThreads(userId, teamId, {before, after, pageSize: perPage, extended: true, unread});
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch, getState);
             dispatch(logError(error));
             return {error};
         }
 
-        dispatch({
-            type: UserTypes.RECEIVED_PROFILES_LIST,
-            data: userThreadList.threads.map(({participants: users}) => users).flat(),
-        });
+        if (userThreadList?.threads?.length) {
+            dispatch({
+                type: UserTypes.RECEIVED_PROFILES_LIST,
+                data: userThreadList.threads.map(({participants: users}) => users).flat(),
+            });
 
-        dispatch({
-            type: PostTypes.RECEIVED_POSTS,
-            data: {posts: userThreadList.threads.map(({post}) => post)},
-        });
+            dispatch({
+                type: PostTypes.RECEIVED_POSTS,
+                data: {posts: userThreadList.threads.map(({post}) => post)},
+            });
+        }
 
         dispatch({
             type: ThreadTypes.RECEIVED_THREADS,
             data: {
                 ...userThreadList,
-                threads: userThreadList.threads.map((thread) => ({...thread, is_following: true})),
+                threads: userThreadList?.threads?.map((thread) => ({...thread, is_following: true})) ?? [],
                 team_id: teamId,
             },
         });
 
         return {data: userThreadList};
+    };
+}
+
+export function getThread(userId: string, teamId: string, threadId: string, extended = false) {
+    return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
+        let thread;
+        try {
+            thread = await Client4.getUserThread(userId, teamId, threadId, extended);
+        } catch (error) {
+            forceLogoutIfNecessary(error, dispatch, getState);
+            dispatch(logError(error));
+            return {error};
+        }
+
+        if (thread) {
+            thread = {...thread, is_following: true};
+
+            dispatch({
+                type: UserTypes.RECEIVED_PROFILES_LIST,
+                data: thread.participants,
+            });
+
+            dispatch({
+                type: PostTypes.RECEIVED_POSTS,
+                data: {posts: [thread.post]},
+            });
+
+            dispatch({
+                type: ThreadTypes.RECEIVED_THREAD,
+                data: {
+                    thread,
+                    team_id: teamId,
+                },
+            });
+        }
+
+        return {data: thread};
     };
 }
 
