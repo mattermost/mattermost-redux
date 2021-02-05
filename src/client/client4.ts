@@ -2398,7 +2398,7 @@ export default class Client4 {
         );
     };
 
-    executeCommand = (command: Command, commandArgs = {}) => {
+    executeCommand = (command: string, commandArgs: CommandArgs) => {
         this.trackEvent('api', 'api_integrations_used');
 
         return this.doFetch<CommandResponse>(
