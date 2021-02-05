@@ -46,6 +46,7 @@ import {
 import {PostActionResponse} from 'types/integration_actions';
 import {
     Command,
+    CommandArgs,
     CommandResponse,
     DialogSubmission,
     IncomingWebhook,
@@ -2397,7 +2398,7 @@ export default class Client4 {
         );
     };
 
-    executeCommand = (command: Command, commandArgs = {}) => {
+    executeCommand = (command: string, commandArgs: CommandArgs) => {
         this.trackEvent('api', 'api_integrations_used');
 
         return this.doFetch<CommandResponse>(
