@@ -47,7 +47,7 @@
     }
   },
   "jest-junit": {
-    "outputDirectory": "./build",
+    "outputDirectory": "build",
     "outputName": "test-results.xml"
   },
   "devDependencies": {
