@@ -58,6 +58,13 @@ export type Command = {
     'url': string;
 };
 
+export type CommandArgs = {
+    channel_id: string;
+    team_id?: string;
+    root_id?: string;
+    parent_id?: string;
+}
+
 export type CommandResponse = {
     response_type: string;
     text: string;
