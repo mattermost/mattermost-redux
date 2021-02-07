@@ -50,12 +50,13 @@ export function getThreads(userId: string, teamId: string, {before = '', after =
     };
 }
 
-export function getThreadMentionCountsByChannel(userId: string, teamId: string) {
+export function getThreadMentionCountsByChannel(teamId: string) {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         let result: Record<string, number>;
 
         try {
-            result = await Client4.getThreadMentionCountsByChannel(userId, teamId);
+            const {currentUserId} = getState().entities.users;
+            result = await Client4.getThreadMentionCountsByChannel(currentUserId, teamId);
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch, getState);
             dispatch(logError(error));
