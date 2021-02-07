@@ -1942,7 +1942,7 @@ export default class Client4 {
     };
 
     getThreadMentionCountsByChannel = (userId: string, teamId: string) => {
-        const url = `${this.getUserThreadsRoute(userId, teamId)}`;
+        const url = `${this.getUserThreadsRoute(userId, teamId)}/mention_counts`;
         return this.doFetch<Record<string, number>>(
             url,
             {method: 'get'},

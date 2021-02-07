@@ -6,7 +6,7 @@ import deepFreeze from 'utils/deep_freeze';
 import threadsReducer from './threads';
 
 describe('threads', () => {
-    test('RECEIVED_THREADSshould  update the state', () => {
+    test('RECEIVED_THREADS should update the state', () => {
         const state = deepFreeze({
             threadsInTeam: {},
             threads: {},
@@ -43,7 +43,13 @@ describe('threads', () => {
         const state = deepFreeze({
             threadsInTeam: {},
             threads: {},
-            counts: {},
+            counts: {
+                a: {
+                    total: 3,
+                    total_unread_threads: 0,
+                    total_unread_mentions: 2,
+                },
+            },
         });
 
         const nextState = threadsReducer(state, {
@@ -55,8 +61,11 @@ describe('threads', () => {
         });
 
         expect(nextState).not.toBe(state);
-        expect(nextState.counts.a.unread_mentions_per_channel).toEqual({
-            a: 2,
+        expect(nextState.counts.a).toEqual({
+            total: 3,
+            total_unread_threads: 0,
+            unread_mentions_per_channel: {a: 2},
+            total_unread_mentions: 2,
         });
     });
     test('LEAVE_TEAM should clean the state', () => {
