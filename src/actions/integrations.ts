@@ -9,7 +9,7 @@ import {getCurrentTeamId} from 'selectors/entities/teams';
 
 import {batchActions, DispatchFunc, GetStateFunc, ActionFunc} from 'types/actions';
 
-import {Command, DialogSubmission, IncomingWebhook, OAuthApp, OutgoingWebhook} from 'types/integrations';
+import {Command, CommandArgs, DialogSubmission, IncomingWebhook, OAuthApp, OutgoingWebhook} from 'types/integrations';
 
 import {logError} from './errors';
 import {bindClientFunc, forceLogoutIfNecessary} from './helpers';
@@ -204,7 +204,7 @@ export function editCommand(command: Command): ActionFunc {
     });
 }
 
-export function executeCommand(command: Command, args: string[]): ActionFunc {
+export function executeCommand(command: string, args: CommandArgs): ActionFunc {
     return bindClientFunc({
         clientFunc: Client4.executeCommand,
         params: [
