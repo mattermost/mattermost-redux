@@ -116,8 +116,7 @@ const values = {
     SYSCONSOLE_READ_EXPERIMENTAL_FEATURE_FLAGS: 'sysconsole_read_experimental_feature_flags',
     SYSCONSOLE_WRITE_EXPERIMENTAL_FEATURE_FLAGS: 'sysconsole_write_experimental_feature_flags',
     SYSCONSOLE_READ_EXPERIMENTAL_BLEVE: 'sysconsole_read_experimental_bleve',
-    SYSCONSOLE_WRITE_EXPERIMENTAL_BLEVE:'sysconsole_write_experimental_bleve',
-
+    SYSCONSOLE_WRITE_EXPERIMENTAL_BLEVE: 'sysconsole_write_experimental_bleve',
 
     CHANNEL_MODERATED_PERMISSIONS: {
         CREATE_POST: 'create_post',
