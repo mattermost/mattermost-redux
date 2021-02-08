@@ -37,6 +37,10 @@ export function warnMetricsStatus(state: GlobalState): any {
     return state.entities.general.warnMetricsStatus;
 }
 
+export function getSubscriptionStats(state: GlobalState): any {
+    return state.entities.cloud.subscriptionStats;
+}
+
 export function isCompatibleWithJoinViewTeamPermissions(state: GlobalState): boolean {
     const version = state.entities.general.serverVersion;
     return isMinimumServerVersion(version, 5, 10, 0) ||
