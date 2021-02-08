@@ -3497,6 +3497,13 @@ export default class Client4 {
         );
     }
 
+    sendOverLimitAlert = () => {
+        return this.doFetch<StatusOK>(
+            `${this.getCloudRoute()}/alert/admin`,
+            {method: 'post'},
+        );
+    }
+
     // Client Helpers
 
     doFetch = async <T>(url: string, options: Options): Promise<T> => {
