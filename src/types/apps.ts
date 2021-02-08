@@ -1,6 +1,14 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
 
+export type AppManifest = {
+    app_id: string;
+    display_name: string;
+    description?: string;
+    homepage_url?: string;
+    root_url: string;
+}
+
 export type AppModalState = {
     form: AppForm;
     call: AppCall;
