@@ -8,7 +8,7 @@ import ThreadConstants from 'constants/threads';
 
 import {DispatchFunc, GetStateFunc} from 'types/actions';
 
-import {UserThreadList} from 'types/threads';
+import type {UserThread, UserThreadList} from 'types/threads';
 
 import {logError} from './errors';
 import {forceLogoutIfNecessary} from './helpers';
@@ -74,6 +74,30 @@ export function getThreadMentionCountsByChannel(teamId: string) {
         return {data: result};
     };
 }
+
+export function handleThreadArrived(dispatch: DispatchFunc, threadData: UserThread, teamId: string) {
+    const thread = {...threadData, is_following: true};
+
+    dispatch({
+        type: UserTypes.RECEIVED_PROFILES_LIST,
+        data: thread.participants,
+    });
+
+    dispatch({
+        type: PostTypes.RECEIVED_POSTS,
+        data: {posts: [thread.post]},
+    });
+
+    dispatch({
+        type: ThreadTypes.RECEIVED_THREAD,
+        data: {
+            thread,
+            team_id: teamId,
+        },
+    });
+    return thread;
+}
+
 export function getThread(userId: string, teamId: string, threadId: string, extended = false) {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         let thread;
@@ -86,25 +110,7 @@ export function getThread(userId: string, teamId: string, threadId: string, exte
         }
 
         if (thread) {
-            thread = {...thread, is_following: true};
-
-            dispatch({
-                type: UserTypes.RECEIVED_PROFILES_LIST,
-                data: thread.participants,
-            });
-
-            dispatch({
-                type: PostTypes.RECEIVED_POSTS,
-                data: {posts: [thread.post]},
-            });
-
-            dispatch({
-                type: ThreadTypes.RECEIVED_THREAD,
-                data: {
-                    thread,
-                    team_id: teamId,
-                },
-            });
+            thread = handleThreadArrived(dispatch, thread, teamId);
         }
 
         return {data: thread};
