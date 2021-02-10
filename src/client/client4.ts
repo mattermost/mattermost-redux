@@ -1960,7 +1960,7 @@ export default class Client4 {
 
     updateThreadReadForUser = (userId: string, teamId: string, threadId: string, timestamp: number) => {
         const url = `${this.getUserThreadRoute(userId, teamId, threadId)}/read/${timestamp}`;
-        return this.doFetch<StatusOK>(
+        return this.doFetch<UserThread>(
             url,
             {method: 'put'},
         );

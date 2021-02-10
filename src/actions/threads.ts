@@ -111,6 +111,15 @@ export function getThread(userId: string, teamId: string, threadId: string, exte
     };
 }
 
+export function handleAllMarkedRead(dispatch: DispatchFunc, teamId: string) {
+    dispatch({
+        type: ThreadTypes.ALL_TEAM_THREADS_READ,
+        data: {
+            team_id: teamId,
+        },
+    });
+}
+
 export function markAllThreadsInTeamRead(userId: string, teamId: string) {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         try {
@@ -121,12 +130,7 @@ export function markAllThreadsInTeamRead(userId: string, teamId: string) {
             return {error};
         }
 
-        dispatch({
-            type: ThreadTypes.ALL_TEAM_THREADS_READ,
-            data: {
-                team_id: teamId,
-            },
-        });
+        handleAllMarkedRead(dispatch, teamId);
 
         return {};
     };
@@ -135,36 +139,45 @@ export function markAllThreadsInTeamRead(userId: string, teamId: string) {
 export function updateThreadRead(userId: string, teamId: string, threadId: string, timestamp: number) {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         try {
-            await Client4.updateThreadReadForUser(userId, teamId, threadId, timestamp);
+            const oldThreadData = getState().entities.threads.threads[threadId];
+            const thread = await Client4.updateThreadReadForUser(userId, teamId, threadId, timestamp);
+            handleReadChanged(dispatch, threadId, teamId, oldThreadData.unread_mentions - thread.unread_mentions, thread.post.channel_id);
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch, getState);
             dispatch(logError(error));
             return {error};
         }
 
-        dispatch({
-            type: ThreadTypes.READ_CHANGED_THREAD,
-            data: {
-                id: threadId,
-                team_id: teamId,
-                timestamp,
-            },
-        });
-
         return {};
     };
 }
 
+export function handleReadChanged(dispatch: DispatchFunc, threadId: string, teamId: string, unreadMentionDiff: number, channelId: string) {
+    dispatch({
+        type: ThreadTypes.READ_CHANGED_THREAD,
+        data: {
+            id: threadId,
+            teamId,
+            channelId,
+            unreadMentionDiff,
+        },
+    });
+}
+
+export function handleFollowChanged(dispatch: DispatchFunc, threadId: string, teamId: string, following: boolean) {
+    dispatch({
+        type: ThreadTypes.FOLLOW_CHANGED_THREAD,
+        data: {
+            id: threadId,
+            team_id: teamId,
+            following,
+        },
+    });
+}
+
 export function setThreadFollow(userId: string, teamId: string, threadId: string, newState: boolean) {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
-        dispatch({
-            type: ThreadTypes.FOLLOW_CHANGED_THREAD,
-            data: {
-                id: threadId,
-                team_id: teamId,
-                following: newState,
-            },
-        });
+        handleFollowChanged(dispatch, threadId, teamId, newState);
 
         try {
             await Client4.updateThreadFollowForUser(userId, teamId, threadId, newState);
