@@ -3497,9 +3497,9 @@ export default class Client4 {
         );
     }
 
-    sendOverLimitAlert = () => {
+    sendAdminUpgradeRequestEmail = () => {
         return this.doFetch<StatusOK>(
-            `${this.getCloudRoute()}/alert/admin`,
+            `${this.getCloudRoute()}/subscription/limitreached/invite`,
             {method: 'post'},
         );
     }
