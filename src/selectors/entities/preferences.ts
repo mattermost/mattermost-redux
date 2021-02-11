@@ -15,7 +15,7 @@ import {$ID} from 'types/utilities';
 
 import {createShallowSelector} from 'utils/helpers';
 import {getPreferenceKey} from 'utils/preference_utils';
-import {blendColors} from 'utils/theme_utils';
+import {setThemeDefaults} from 'utils/theme_utils';
 
 export function getMyPreferences(state: GlobalState) {
     return state.entities.preferences.myPreferences;
@@ -151,37 +151,7 @@ export const getTheme: (state: GlobalState) => Theme = createShallowSelector(
         // At this point, the theme should be a plain object
         const theme: Theme = typeof themeValue === 'string' ? JSON.parse(themeValue) : themeValue;
 
-        // If this is a system theme, find it in case the user's theme is missing any fields
-        if (theme.type && theme.type !== 'custom') {
-            const match = Object.values(Preferences.THEMES).find((v) => v.type === theme.type);
-            if (match) {
-                if (!match.mentionBg) {
-                    match.mentionBg = match.mentionBj;
-                }
-
-                return match;
-            }
-        }
-
-        for (const key of Object.keys(defaultTheme)) {
-            if (theme[key]) {
-                // Fix a case where upper case theme colours are rendered as black
-                theme[key] = theme[key]?.toLowerCase();
-            }
-        }
-
-        // Backwards compatability with old name
-        if (!theme.mentionBg) {
-            theme.mentionBg = theme.mentionBj;
-        }
-
-        return {
-            ...defaultTheme,
-
-            // If users using a custom theme don't have the new "sidebarTeamBarBg" variable
-            sidebarTeamBarBg: blendColors(theme.sidebarHeaderBg, '#000000', 0.2),
-            ...theme,
-        };
+        return setThemeDefaults(theme);
     },
 );
 

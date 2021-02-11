@@ -326,10 +326,7 @@ describe('Selectors.Preferences', () => {
                     preferences: {
                         myPreferences: {
                             [getPreferenceKey(Preferences.CATEGORY_THEME, '')]: {
-                                category: Preferences.CATEGORY_THEME, name: '', value: JSON.stringify({}),
-                            },
-                            [getPreferenceKey(Preferences.CATEGORY_THEME, currentTeamId)]: {
-                                category: Preferences.CATEGORY_THEME, name: currentTeamId, value: JSON.stringify(theme),
+                                category: Preferences.CATEGORY_THEME, name: '', value: JSON.stringify(theme),
                             },
                         },
                     },
