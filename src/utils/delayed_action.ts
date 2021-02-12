@@ -1,10 +1,11 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
-export default class DelayedAction {
-    action: Function;
+
+export default class DelayedAction<F extends (...args: any) => any> {
+    action: F;
     timer: NodeJS.Timeout | null;
 
-    constructor(action: Function) {
+    constructor(action: F) {
         this.action = action;
 
         this.timer = null;
