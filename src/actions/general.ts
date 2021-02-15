@@ -7,7 +7,7 @@ import {GeneralTypes} from 'action_types';
 import {getServerVersion} from 'selectors/entities/general';
 import {isMinimumServerVersion} from 'utils/helpers';
 import {GeneralState} from 'types/general';
-import {logLevel} from 'types/client4';
+import {LogLevel} from 'types/client4';
 import {GetStateFunc, DispatchFunc, ActionFunc, batchActions} from 'types/actions';
 
 import {logError} from './errors';
@@ -101,7 +101,7 @@ export function getLicenseConfig(): ActionFunc {
     });
 }
 
-export function logClientError(message: string, level: logLevel = 'ERROR') {
+export function logClientError(message: string, level: LogLevel = 'ERROR') {
     return bindClientFunc({
         clientFunc: Client4.logClientError,
         onRequest: GeneralTypes.LOG_CLIENT_ERROR_REQUEST,

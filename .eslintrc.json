@@ -1,7 +1,6 @@
 {
     "extends": [
         "plugin:mattermost/base",
-        "plugin:@typescript-eslint/eslint-recommended",
         "plugin:@typescript-eslint/recommended"
     ],
     "parser": "@typescript-eslint/parser",
@@ -13,20 +12,29 @@
         "jest": true
     },
     "rules": {
+        "camelcase": 0,
+        "no-shadow": 0,
         "no-undefined": 0,
-        "@typescript-eslint/camelcase": [
-          2,
-          {
-            "properties": "never"
-          }
+        "no-use-before-define": 0,
+        "@typescript-eslint/naming-convention": [
+            2,
+            {
+                "selector": "variableLike",
+                "format": ["camelCase", "PascalCase", "UPPER_CASE"]
+            },
+            {
+                "selector": "memberLike",
+                "format": null
+            }
         ],
         "@typescript-eslint/no-non-null-assertion": 0,
+        "@typescript-eslint/no-shadow": 2,
         "@typescript-eslint/no-unused-vars": [
-          2,
-          {
-            "vars": "all",
-            "args": "after-used"
-          }
+            2,
+            {
+                "vars": "all",
+                "args": "after-used"
+            }
         ],
         "@typescript-eslint/no-explicit-any": "warn",
         "@typescript-eslint/no-use-before-define": 0,
