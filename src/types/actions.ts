@@ -13,7 +13,6 @@ export type GenericAction = {
     postId?: string;
     sessionId?: string;
     currentUserId?: string;
-    remove?: Function|string[];
     timestamp?: number;
     [extraProps: string]: any;
 };
