@@ -20,6 +20,13 @@ export const threadsReducer = (state: ThreadsState['threads'] = {}, action: Gene
             }, {}),
         };
     }
+    case ThreadTypes.RECEIVED_THREAD: {
+        const {thread} = action.data;
+        return {
+            ...state,
+            [thread.id]: thread,
+        };
+    }
     case ThreadTypes.FOLLOW_CHANGED_THREAD: {
         const {id, following} = action.data;
         return {
@@ -47,6 +54,20 @@ export const threadsInTeamReducer = (state: ThreadsState['threadsInTeam'] = {}, 
             [action.data.team_id]: [...nextSet],
         };
     }
+    case ThreadTypes.RECEIVED_THREAD: {
+        if (state[action.data.team_id]?.includes(action.data.thread.id)) {
+            return state;
+        }
+
+        const nextSet = new Set(state[action.data.team_id]);
+
+        nextSet.add(action.data.thread.id);
+
+        return {
+            ...state,
+            [action.data.team_id]: [...nextSet],
+        };
+    }
     case TeamTypes.LEAVE_TEAM: {
         const team: Team = action.data;
 
@@ -66,12 +87,22 @@ export const threadsInTeamReducer = (state: ThreadsState['threadsInTeam'] = {}, 
 };
 export const countsReducer = (state: ThreadsState['counts'] = {}, action: GenericAction) => {
     switch (action.type) {
+    case ThreadTypes.RECEIVED_PER_CHANNEL_MENTION_COUNTS: {
+        return {
+            ...state,
+            [action.data.team_id]: {
+                ...state[action.data.team_id] ?? {},
+                unread_mentions_per_channel: action.data.counts,
+            },
+        };
+    }
     case ThreadTypes.RECEIVED_THREADS: {
         return {
             ...state,
             [action.data.team_id]: {
+                unread_mentions_per_channel: state[action.data.team_id]?.unread_mentions_per_channel ?? {},
                 total: action.data.total,
-                total_unread_replies: action.data.total_unread_replies,
+                total_unread_threads: action.data.total_unread_threads,
                 total_unread_mentions: action.data.total_unread_mentions,
             },
         };
@@ -91,8 +122,9 @@ export const countsReducer = (state: ThreadsState['counts'] = {}, action: Generi
 
     case UserTypes.LOGOUT_SUCCESS:
         return {
-            total_unread_replies: 0,
             total: 0,
+            unread_mentions_per_channel: {},
+            total_unread_threads: 0,
             total_unread_mentions: 0,
         };
     }

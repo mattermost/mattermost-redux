@@ -23,6 +23,7 @@ export type ClientConfig = {
     BuildHashEnterprise: string;
     BuildNumber: string;
     CloseUnusedDirectMessages: string;
+    CollapsedThreads: 'disabled' | 'default_off' | 'default_on';
     CustomBrandText: string;
     CustomDescriptionText: string;
     CustomTermsOfServiceId: string;
@@ -60,6 +61,7 @@ export type ClientConfig = {
     EnableEmailInvitations: string;
     EnableEmojiPicker: string;
     EnableFileAttachments: string;
+    EnableFile: string;
     EnableGifPicker: string;
     EnableGuestAccounts: string;
     EnableIncomingWebhooks: string;
@@ -115,6 +117,7 @@ export type ClientConfig = {
     ExperimentalTimezone: string;
     ExperimentalTownSquareIsReadOnly: string;
     ExperimentalViewArchivedChannels: string;
+    FileLevel: string;
     GfycatApiKey: string;
     GfycatApiSecret: string;
     GoogleDeveloperKey: string;
@@ -324,6 +327,7 @@ export type ServiceSettings = {
     EnableLocalMode: boolean;
     LocalModeSocketLocation: string;
     EnableLegacySidebar: boolean;
+    CollapsedThreads: 'disabled' | 'default_on' | 'default_off';
 };
 
 export type TeamSettings = {

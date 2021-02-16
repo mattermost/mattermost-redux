@@ -1,11 +1,16 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
+
 import {combineReducers} from 'redux';
+
 import {General} from '../constants';
-import reducerRegistry from './reducer_registry';
+
 import {enableBatching, Action, Reducer} from 'types/actions';
+
+import reducerRegistry from './reducer_registry';
+
 export const offlineConfig = {
-    effect: (effect: Function, action: Action) => {
+    effect: <T>(effect: () => T, action: Action): T => {
         if (typeof effect !== 'function') {
             throw new Error('Offline Action: effect must be a function.');
         } else if (!('meta' in action && action.meta && action.meta.offline.commit)) {
