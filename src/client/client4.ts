@@ -3505,6 +3505,13 @@ export default class Client4 {
         );
     }
 
+    sendAdminUpgradeRequestEmail = () => {
+        return this.doFetch<StatusOK>(
+            `${this.getCloudRoute()}/subscription/limitreached/invite`,
+            {method: 'post'},
+        );
+    }
+
     // Client Helpers
 
     doFetch = async <T>(url: string, options: Options): Promise<T> => {
