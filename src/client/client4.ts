@@ -46,6 +46,7 @@ import {
 import {PostActionResponse} from 'types/integration_actions';
 import {
     Command,
+    CommandArgs,
     CommandResponse,
     DialogSubmission,
     IncomingWebhook,
@@ -98,7 +99,7 @@ import {isSystemAdmin} from 'utils/user_utils';
 
 import fetch from './fetch_etag';
 import {TelemetryHandler} from './telemetry';
-import {UserThreadList} from 'types/threads';
+import {UserThreadList, UserThread} from 'types/threads';
 
 const FormData = require('form-data');
 const HEADER_AUTH = 'Authorization';
@@ -1918,15 +1919,33 @@ export default class Client4 {
         userId: $ID<UserProfile> = 'me',
         teamId: $ID<Team>,
         {
-            page = 0,
+            before = '',
+            after = '',
             pageSize = PER_PAGE_DEFAULT,
             extended = false,
             deleted = false,
+            unread = false,
             since = 0,
         },
     ) => {
         return this.doFetch<UserThreadList>(
-            `${this.getUserThreadsRoute(userId, teamId)}${buildQueryString({page, pageSize, extended, deleted, since})}`,
+            `${this.getUserThreadsRoute(userId, teamId)}${buildQueryString({before, after, pageSize, extended, deleted, unread, since})}`,
+            {method: 'get'},
+        );
+    };
+
+    getUserThread = (userId: string, teamId: string, threadId: string, extended = false) => {
+        const url = `${this.getUserThreadRoute(userId, teamId, threadId)}`;
+        return this.doFetch<UserThread>(
+            `${url}${buildQueryString({extended})}`,
+            {method: 'get'},
+        );
+    };
+
+    getThreadMentionCountsByChannel = (userId: string, teamId: string) => {
+        const url = `${this.getUserThreadsRoute(userId, teamId)}/mention_counts`;
+        return this.doFetch<Record<string, number>>(
+            url,
             {method: 'get'},
         );
     };
@@ -2366,7 +2385,7 @@ export default class Client4 {
         );
     };
 
-    getCommandAutocompleteSuggestionsList = (userInput: string, teamId: string, commandArgs: {}) => {
+    getCommandAutocompleteSuggestionsList = (userInput: string, teamId: string, commandArgs: CommandArgs) => {
         return this.doFetch<AutocompleteSuggestion[]>(
             `${this.getTeamRoute(teamId)}/commands/autocomplete_suggestions${buildQueryString({...commandArgs, user_input: userInput})}`,
             {method: 'get'},
@@ -2387,7 +2406,7 @@ export default class Client4 {
         );
     };
 
-    executeCommand = (command: Command, commandArgs = {}) => {
+    executeCommand = (command: string, commandArgs: CommandArgs) => {
         this.trackEvent('api', 'api_integrations_used');
 
         return this.doFetch<CommandResponse>(
@@ -3483,6 +3502,13 @@ export default class Client4 {
         return this.doFetch<StatusOK>(
             `${this.getNoticesRoute()}/view`,
             {method: 'put', body: JSON.stringify(noticeIds)},
+        );
+    }
+
+    sendAdminUpgradeRequestEmail = () => {
+        return this.doFetch<StatusOK>(
+            `${this.getCloudRoute()}/subscription/limitreached/invite`,
+            {method: 'post'},
         );
     }
 
