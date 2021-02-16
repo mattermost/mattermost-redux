@@ -119,9 +119,7 @@ export const countsReducer = (state: ThreadsState['counts'] = {}, action: Generi
         }
         counts.total_unread_mentions = (counts.total_unread_mentions ?? 0) + unreadMentionDiff;
 
-        counts.total_unread_threads = unreadMentionDiff > 0 ?
-            (counts.total_unread_threads || 0) + 1 :
-            (counts.total_unread_threads || 1) - 1;
+        counts.total_unread_threads = unreadMentionDiff > 0 ? (counts.total_unread_threads || 0) + 1 : (counts.total_unread_threads || 1) - 1;
 
         return {
             ...state,
