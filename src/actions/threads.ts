@@ -147,7 +147,7 @@ export function updateThreadRead(userId: string, teamId: string, threadId: strin
         try {
             const oldThreadData = getState().entities.threads.threads[threadId];
             const thread = await Client4.updateThreadReadForUser(userId, teamId, threadId, timestamp);
-            handleReadChanged(dispatch, threadId, teamId, oldThreadData.unread_mentions - thread.unread_mentions, thread.post.channel_id);
+            handleReadChanged(dispatch, threadId, teamId, thread.unread_mentions - oldThreadData.unread_mentions, thread.post.channel_id);
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch, getState);
             dispatch(logError(error));
