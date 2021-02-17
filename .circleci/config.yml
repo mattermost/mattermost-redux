@@ -91,6 +91,7 @@ jobs:
   test:
     executor:
       name: default
+    working_directory: ~/mattermost-redux
     steps:
       - checkout
       - *restore_cache

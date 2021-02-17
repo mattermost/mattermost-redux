@@ -70,7 +70,7 @@ function blendComponent(background: number, foreground: number, opacity: number)
     return ((1 - opacity) * background) + (opacity * foreground);
 }
 
-export function blendColors(background: string, foreground: string, opacity: number): string {
+export const blendColors = (background: string, foreground: string, opacity: number, hex = false): string => {
     const backgroundComponents = getComponents(background);
     const foregroundComponents = getComponents(foreground);
 
@@ -95,20 +95,66 @@ export function blendColors(background: string, foreground: string, opacity: num
         opacity,
     );
 
+    if (hex) {
+        let r = red.toString(16);
+        let g = green.toString(16);
+        let b = blue.toString(16);
+
+        if (r.length === 1) {
+            r = '0' + r;
+        }
+        if (g.length === 1) {
+            g = '0' + g;
+        }
+        if (b.length === 1) {
+            b = '0' + b;
+        }
+
+        return `#${r + g + b}`;
+    }
+
     return `rgba(${red},${green},${blue},${alpha})`;
-}
+};
 
 // setThemeDefaults will set defaults on the theme for any unset properties.
 export function setThemeDefaults(theme: Theme): Theme {
     const defaultTheme = Preferences.THEMES.default;
 
+    // If this is a system theme, find it in case the user's theme is missing any fields
+    if (theme.type && theme.type !== 'custom') {
+        const match = Object.values(Preferences.THEMES).find((v) => v.type === theme.type);
+        if (match) {
+            if (!match.mentionBg) {
+                match.mentionBg = match.mentionBj;
+            }
+
+            return match;
+        }
+    }
+
+    for (const key of Object.keys(defaultTheme)) {
+        if (theme[key]) {
+            // Fix a case where upper case theme colours are rendered as black
+            theme[key] = theme[key]?.toLowerCase();
+        }
+    }
+
     for (const property in defaultTheme) {
-        if (property === 'type') {
+        if (property === 'type' || property === 'sidebarTeamBarBg') {
             continue;
         }
         if (theme[property] == null) {
             theme[property] = defaultTheme[property];
         }
+
+        // Backwards compatability with old name
+        if (!theme.mentionBg) {
+            theme.mentionBg = theme.mentionBj;
+        }
+    }
+
+    if (!theme.sidebarTeamBarBg) {
+        theme.sidebarTeamBarBg = blendColors(theme.sidebarHeaderBg, '#000000', 0.2, true);
     }
 
     return theme;
