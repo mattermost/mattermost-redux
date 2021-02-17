@@ -571,7 +571,7 @@ describe('Selectors.Users', () => {
                             LockTeammateNameDisplay: false,
                         },
                         license: {
-                            LockTeammateNameDisplay: true,
+                            LockTeammateNameDisplay: 'true',
                         },
                     },
                 },
@@ -595,12 +595,12 @@ describe('Selectors.Users', () => {
                             LockTeammateNameDisplay: true,
                         },
                         license: {
-                            LockTeammateNameDisplay: true,
+                            LockTeammateNameDisplay: 'true',
                         },
                     },
                 },
             };
-            assert.deepEqual(Selectors.makeGetDisplayName()(newTestState, testUser1.id), 'First Last');
+            assert.deepEqual(Selectors.makeGetDisplayName()(newTestState, testUser1.id), 'username');
         });
         it('Should show full name since license is false', () => {
             const newTestState = {
@@ -619,7 +619,7 @@ describe('Selectors.Users', () => {
                             LockTeammateNameDisplay: true,
                         },
                         license: {
-                            LockTeammateNameDisplay: false,
+                            LockTeammateNameDisplay: 'false',
                         },
                     },
                 },
