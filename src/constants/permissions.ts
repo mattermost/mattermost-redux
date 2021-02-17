@@ -111,8 +111,12 @@ const values = {
     SYSCONSOLE_WRITE_INTEGRATIONS: 'sysconsole_write_integrations',
     SYSCONSOLE_READ_COMPLIANCE: 'sysconsole_read_compliance',
     SYSCONSOLE_WRITE_COMPLIANCE: 'sysconsole_write_compliance',
-    SYSCONSOLE_READ_EXPERIMENTAL: 'sysconsole_read_experimental',
-    SYSCONSOLE_WRITE_EXPERIMENTAL: 'sysconsole_write_experimental',
+    SYSCONSOLE_READ_EXPERIMENTAL_FEATURES: 'sysconsole_read_experimental_features',
+    SYSCONSOLE_WRITE_EXPERIMENTAL_FEATURES: 'sysconsole_write_experimental_features',
+    SYSCONSOLE_READ_EXPERIMENTAL_FEATURE_FLAGS: 'sysconsole_read_experimental_feature_flags',
+    SYSCONSOLE_WRITE_EXPERIMENTAL_FEATURE_FLAGS: 'sysconsole_write_experimental_feature_flags',
+    SYSCONSOLE_READ_EXPERIMENTAL_BLEVE: 'sysconsole_read_experimental_bleve',
+    SYSCONSOLE_WRITE_EXPERIMENTAL_BLEVE: 'sysconsole_write_experimental_bleve',
 
     CHANNEL_MODERATED_PERMISSIONS: {
         CREATE_POST: 'create_post',
@@ -144,7 +148,9 @@ values.SYSCONSOLE_READ_PERMISSIONS = [
     values.SYSCONSOLE_READ_PLUGINS,
     values.SYSCONSOLE_READ_INTEGRATIONS,
     values.SYSCONSOLE_READ_COMPLIANCE,
-    values.SYSCONSOLE_READ_EXPERIMENTAL,
+    values.SYSCONSOLE_READ_EXPERIMENTAL_FEATURES,
+    values.SYSCONSOLE_READ_EXPERIMENTAL_FEATURE_FLAGS,
+    values.SYSCONSOLE_READ_EXPERIMENTAL_BLEVE,
 ];
 
 values.SYSCONSOLE_WRITE_PERMISSIONS = [
@@ -162,7 +168,9 @@ values.SYSCONSOLE_WRITE_PERMISSIONS = [
     values.SYSCONSOLE_WRITE_PLUGINS,
     values.SYSCONSOLE_WRITE_INTEGRATIONS,
     values.SYSCONSOLE_WRITE_COMPLIANCE,
-    values.SYSCONSOLE_WRITE_EXPERIMENTAL,
+    values.SYSCONSOLE_WRITE_EXPERIMENTAL_FEATURES,
+    values.SYSCONSOLE_WRITE_EXPERIMENTAL_FEATURE_FLAGS,
+    values.SYSCONSOLE_WRITE_EXPERIMENTAL_BLEVE,
 ];
 
 values.SYSCONSOLE_ANCILLARY_PERMISSIONS = {
