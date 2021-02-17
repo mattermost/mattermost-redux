@@ -99,7 +99,7 @@ export const countsReducer = (state: ThreadsState['counts'] = {}, action: Generi
         };
     }
     case ThreadTypes.READ_CHANGED_THREAD: {
-        const {channelId, unreadMentionDiff, teamId} = action.data;
+        const {channelId, newUnreadMentions, prevUnreadMentions, teamId} = action.data;
         const counts = state[teamId] ? {
             ...state[teamId],
         } : {
@@ -110,16 +110,22 @@ export const countsReducer = (state: ThreadsState['counts'] = {}, action: Generi
             total: 0,
             total_unread_mentions: 0,
         };
+        const unreadMentionDiff = newUnreadMentions - prevUnreadMentions;
         if (counts.unread_mentions_per_channel[channelId]) {
             const nc = {...counts.unread_mentions_per_channel};
             nc[channelId] += unreadMentionDiff;
             counts.unread_mentions_per_channel = nc;
         } else {
-            counts.unread_mentions_per_channel = {[channelId]: unreadMentionDiff};
+            counts.unread_mentions_per_channel = {[channelId]: newUnreadMentions};
         }
         counts.total_unread_mentions = (counts.total_unread_mentions ?? 0) + unreadMentionDiff;
 
-        counts.total_unread_threads = unreadMentionDiff > 0 ? (counts.total_unread_threads || 0) + 1 : (counts.total_unread_threads || 1) - 1;
+        if (newUnreadMentions === 0 && prevUnreadMentions > 0) { // thread was marked read, reduce global count
+            counts.total_unread_threads = (counts.total_unread_threads || 1) - 1;
+        }
+        if (newUnreadMentions > 0 && prevUnreadMentions === 0) { // new mentions appear, incread global count if needed
+            counts.total_unread_threads = (counts.total_unread_threads || 0) + 1;
+        }
 
         return {
             ...state,
