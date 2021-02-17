@@ -75,7 +75,7 @@ export function getThreadMentionCountsByChannel(teamId: string) {
     };
 }
 
-export function handleThreadArrived(dispatch: DispatchFunc, threadData: UserThread, teamId: string) {
+export function handleThreadArrived(dispatch: DispatchFunc, getState: GetStateFunc, threadData: UserThread, teamId: string) {
     const thread = {...threadData, is_following: true};
 
     dispatch({
@@ -95,6 +95,10 @@ export function handleThreadArrived(dispatch: DispatchFunc, threadData: UserThre
             team_id: teamId,
         },
     });
+    const oldThreadData = getState().entities.threads.threads[thread.id];
+    if (oldThreadData) {
+        handleReadChanged(dispatch, thread.id, teamId, oldThreadData.unread_mentions, thread.unread_mentions, thread.post.channel_id);
+    }
     return thread;
 }
 
@@ -110,7 +114,7 @@ export function getThread(userId: string, teamId: string, threadId: string, exte
         }
 
         if (thread) {
-            thread = handleThreadArrived(dispatch, thread, teamId);
+            thread = handleThreadArrived(dispatch, getState, thread, teamId);
         }
 
         return {data: thread};
