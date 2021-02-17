@@ -335,6 +335,7 @@ export type TeamSettings = {
     SiteName: string;
     MaxUsersPerTeam: number;
     EnableTeamCreation: boolean;
+    EnableCustomUserStatuses: boolean;
     EnableUserCreation: boolean;
     EnableOpenServer: boolean;
     EnableUserDeactivation: boolean;
