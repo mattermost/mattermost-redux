@@ -107,7 +107,7 @@ export function makeGroupMessageVisibleIfNecessary(channelId: string): ActionFun
     };
 }
 
-export function setCustomStatusInitialisationState(initializationState: string) {
+export function setCustomStatusInitialisationState(initializationState: Record<string, boolean>) {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         const state = getState();
         const currentUserId = getCurrentUserId(state);
@@ -115,7 +115,7 @@ export function setCustomStatusInitialisationState(initializationState: string) 
             user_id: currentUserId,
             category: Preferences.CATEGORY_CUSTOM_STATUS,
             name: Preferences.NAME_CUSTOM_STATUS_TUTORIAL_STATE,
-            value: initializationState,
+            value: JSON.stringify(initializationState),
         };
         await dispatch(savePreferences(currentUserId, [preference]));
     };
