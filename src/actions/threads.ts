@@ -83,6 +83,11 @@ export function handleThreadArrived(dispatch: DispatchFunc, getState: GetStateFu
         data: thread.participants,
     });
 
+    const oldThreadData = getState().entities.threads.threads[thread.id];
+    if (oldThreadData) {
+        handleReadChanged(dispatch, thread.id, teamId, oldThreadData.unread_mentions, thread.unread_mentions, thread.post.channel_id);
+    }
+
     dispatch({
         type: PostTypes.RECEIVED_POSTS,
         data: {posts: [thread.post]},
@@ -95,10 +100,7 @@ export function handleThreadArrived(dispatch: DispatchFunc, getState: GetStateFu
             team_id: teamId,
         },
     });
-    const oldThreadData = getState().entities.threads.threads[thread.id];
-    if (oldThreadData) {
-        handleReadChanged(dispatch, thread.id, teamId, oldThreadData.unread_mentions, thread.unread_mentions, thread.post.channel_id);
-    }
+
     return thread;
 }
 
