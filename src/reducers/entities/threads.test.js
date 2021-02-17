@@ -77,7 +77,7 @@ describe('threads', () => {
                         a: 3,
                     },
                     total: 3,
-                    total_unread_threads: 0,
+                    total_unread_threads: 1,
                     total_unread_mentions: 3,
                 },
             },
@@ -86,7 +86,8 @@ describe('threads', () => {
             type: ThreadTypes.READ_CHANGED_THREAD,
             data: {
                 teamId: 'a',
-                unreadMentionDiff: -3,
+                prevUnreadMentions: 3,
+                newUnreadMentions: 0,
                 channelId: 'a',
             },
         });
@@ -105,7 +106,8 @@ describe('threads', () => {
             type: ThreadTypes.READ_CHANGED_THREAD,
             data: {
                 teamId: 'a',
-                unreadMentionDiff: 3,
+                prevUnreadMentions: 0,
+                newUnreadMentions: 3,
                 channelId: 'a',
             },
         });
