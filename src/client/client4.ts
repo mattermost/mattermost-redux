@@ -2385,7 +2385,7 @@ export default class Client4 {
         );
     };
 
-    getCommandAutocompleteSuggestionsList = (userInput: string, teamId: string, commandArgs: {}) => {
+    getCommandAutocompleteSuggestionsList = (userInput: string, teamId: string, commandArgs: CommandArgs) => {
         return this.doFetch<AutocompleteSuggestion[]>(
             `${this.getTeamRoute(teamId)}/commands/autocomplete_suggestions${buildQueryString({...commandArgs, user_input: userInput})}`,
             {method: 'get'},
@@ -3502,6 +3502,13 @@ export default class Client4 {
         return this.doFetch<StatusOK>(
             `${this.getNoticesRoute()}/view`,
             {method: 'put', body: JSON.stringify(noticeIds)},
+        );
+    }
+
+    sendAdminUpgradeRequestEmail = () => {
+        return this.doFetch<StatusOK>(
+            `${this.getCloudRoute()}/subscription/limitreached/invite`,
+            {method: 'post'},
         );
     }
 
