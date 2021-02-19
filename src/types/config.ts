@@ -54,6 +54,7 @@ export type ClientConfig = {
     EnableConfirmNotificationsToChannel: boolean;
     EnableCustomBrand: boolean;
     EnableCustomEmoji: boolean;
+    EnableCustomUserStatuses: string;
     EnableCustomTermsOfService: string;
     EnableDeveloper: boolean;
     EnableDiagnostics: string;

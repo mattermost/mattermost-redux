@@ -2,7 +2,7 @@
 // See LICENSE.txt for license information.
 
 import {Action, ActionFunc, ActionResult, batchActions, DispatchFunc, GetStateFunc} from 'types/actions';
-import {UserProfile, UserStatus, GetFilteredUsersStatsOpts, UsersStats} from 'types/users';
+import {UserProfile, UserStatus, GetFilteredUsersStatsOpts, UsersStats, UserCustomStatus} from 'types/users';
 import {TeamMembership} from 'types/teams';
 import {Client4} from 'client';
 import {General} from '../constants';
@@ -777,6 +777,30 @@ export function setStatus(status: UserStatus): ActionFunc {
 
         return {data: status};
     };
+}
+
+export function setCustomStatus(customStatus: UserCustomStatus): ActionFunc {
+    return bindClientFunc({
+        clientFunc: Client4.updateCustomStatus,
+        params: [
+            customStatus,
+        ],
+    });
+}
+
+export function unsetCustomStatus(): ActionFunc {
+    return bindClientFunc({
+        clientFunc: Client4.unsetCustomStatus,
+    });
+}
+
+export function removeRecentCustomStatus(customStatus: UserCustomStatus): ActionFunc {
+    return bindClientFunc({
+        clientFunc: Client4.removeRecentCustomStatus,
+        params: [
+            customStatus,
+        ],
+    });
 }
 
 export function getSessions(userId: string): ActionFunc {
