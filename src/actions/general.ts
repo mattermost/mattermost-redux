@@ -200,6 +200,37 @@ export function getWarnMetricsStatus(): ActionFunc {
     };
 }
 
+export function setFirstAdminVisitMarketplaceStatus(): ActionFunc {
+    return async (dispatch: DispatchFunc) => {
+        try {
+            Client4.trackEvent('api', 'api_request_set_first_admin_visit_marketplace_status');
+            await Client4.setFirstAdminVisitMarketplaceStatus();
+        } catch (e) {
+            dispatch(logError(e));
+            return {error: e.message};
+        }
+
+        dispatch({type: GeneralTypes.RECEIVED_FIRST_ADMIN_VISIT_MARKETPLACE_STATUS, data: true});
+        return {data: true};
+    };
+}
+
+export function getFirstAdminVisitMarketplaceStatus(): ActionFunc {
+    return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
+        let data;
+        try {
+            data = await Client4.getFirstAdminVisitMarketplaceStatus();
+        } catch (error) {
+            forceLogoutIfNecessary(error, dispatch, getState);
+            return {error};
+        }
+
+        data = JSON.parse(data.value);
+        dispatch({type: GeneralTypes.RECEIVED_FIRST_ADMIN_VISIT_MARKETPLACE_STATUS, data});
+        return {data};
+    };
+}
+
 export default {
     getPing,
     getClientConfig,
@@ -214,4 +245,5 @@ export default {
     setUrl,
     getRedirectLocation,
     getWarnMetricsStatus,
+    getFirstAdminVisitMarketplaceStatus,
 };

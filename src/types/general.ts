@@ -15,4 +15,10 @@ export type GeneralState = {
     serverVersion: string;
     timezones: string[];
     warnMetricsStatus: Dictionary<WarnMetricStatus>;
+    firstAdminVisitMarketplaceStatus: boolean;
 };
+
+export type SystemSetting = {
+    name: string;
+    value: string;
+ };

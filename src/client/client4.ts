@@ -35,6 +35,9 @@ import {CustomEmoji} from 'types/emojis';
 import {ServerError} from 'types/errors';
 import {FileInfo, FileUploadResponse} from 'types/files';
 import {
+    SystemSetting,
+} from 'types/general';
+import {
     Group,
     GroupPatch,
     GroupSyncable,
@@ -2253,6 +2256,20 @@ export default class Client4 {
             {method: 'post', body: JSON.stringify({forceAck: forceAckVal})},
         );
     }
+
+    setFirstAdminVisitMarketplaceStatus = async () => {
+        return this.doFetch<StatusOK>(
+            `${this.getBaseRoute()}/first_admin_visit_marketplace`,
+            {method: 'post', body: JSON.stringify({first_admin_visit_marketplace_status: true})},
+        );
+    }
+
+    getFirstAdminVisitMarketplaceStatus = async () => {
+        return this.doFetch<SystemSetting>(
+            `${this.getBaseRoute()}/first_admin_visit_marketplace`,
+            {method: 'get'},
+        );
+    };
 
     getTranslations = (url: string) => {
         return this.doFetch<Record<string, string>>(

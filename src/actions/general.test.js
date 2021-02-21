@@ -12,6 +12,8 @@ import {Client4} from 'client';
 import TestHelper from 'test/test_helper';
 import configureStore from 'test/test_store';
 
+const OK_RESPONSE = {status: 'OK'};
+
 describe('Actions.General', () => {
     let store;
     beforeAll(async () => {
@@ -185,5 +187,32 @@ describe('Actions.General', () => {
             const nonexistingURL = store.getState().entities.posts.expandedURLs['http://nonexisting.url'];
             assert.equal(nonexistingURL, 'http://nonexisting.url');
         });
+    });
+
+    it('getFirstAdminVisitMarketplaceStatus', async () => {
+        const responseData = {
+            name: 'FirstAdminVisitMarketplace',
+            value: 'false',
+        };
+
+        nock(Client4.getBaseRoute()).
+            get('/first_admin_visit_marketplace').
+            query(true).
+            reply(200, responseData);
+
+        await Actions.getFirstAdminVisitMarketplaceStatus()(store.dispatch, store.getState);
+        const {firstAdminVisitMarketplaceStatus} = store.getState().entities.general;
+        assert.strictEqual(firstAdminVisitMarketplaceStatus, false);
+    });
+
+    it('setFirstAdminVisitMarketplaceStatus', async () => {
+        nock(Client4.getBaseRoute()).
+            post('/first_admin_visit_marketplace').
+            reply(200, OK_RESPONSE);
+
+        await Actions.setFirstAdminVisitMarketplaceStatus()(store.dispatch, store.getState);
+
+        const {firstAdminVisitMarketplaceStatus} = store.getState().entities.general;
+        assert.strictEqual(firstAdminVisitMarketplaceStatus, true);
     });
 });
