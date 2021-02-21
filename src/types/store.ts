@@ -18,8 +18,7 @@ import {
     AdminRequestsStatuses, ChannelsRequestsStatuses,
     FilesRequestsStatuses, GeneralRequestsStatuses,
     JobsRequestsStatuses, PostsRequestsStatuses,
-    RolesRequestsStatuses, TeamsRequestsStatuses,
-    UsersRequestsStatuses,
+    TeamsRequestsStatuses, UsersRequestsStatuses,
 } from './requests';
 import {Role} from './roles';
 import {SchemesState} from './schemes';
@@ -74,7 +73,6 @@ export type GlobalState = {
         users: UsersRequestsStatuses;
         admin: AdminRequestsStatuses;
         files: FilesRequestsStatuses;
-        roles: RolesRequestsStatuses;
         jobs: JobsRequestsStatuses;
     };
     websocket: {

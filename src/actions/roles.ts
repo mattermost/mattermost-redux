@@ -12,9 +12,6 @@ import {bindClientFunc} from './helpers';
 export function getRolesByNames(rolesNames: string[]) {
     return bindClientFunc({
         clientFunc: Client4.getRolesByNames,
-        onRequest: RoleTypes.ROLES_BY_NAMES_REQUEST,
-        onSuccess: [RoleTypes.RECEIVED_ROLES, RoleTypes.ROLES_BY_NAMES_SUCCESS],
-        onFailure: RoleTypes.ROLES_BY_NAMES_FAILURE,
         params: [
             rolesNames,
         ],
@@ -24,9 +21,6 @@ export function getRolesByNames(rolesNames: string[]) {
 export function getRoleByName(roleName: string) {
     return bindClientFunc({
         clientFunc: Client4.getRoleByName,
-        onRequest: RoleTypes.ROLE_BY_NAME_REQUEST,
-        onSuccess: [RoleTypes.RECEIVED_ROLE, RoleTypes.ROLE_BY_NAME_SUCCESS],
-        onFailure: RoleTypes.ROLE_BY_NAME_FAILURE,
         params: [
             roleName,
         ],
@@ -36,9 +30,6 @@ export function getRoleByName(roleName: string) {
 export function getRole(roleId: string) {
     return bindClientFunc({
         clientFunc: Client4.getRole,
-        onRequest: RoleTypes.ROLE_BY_ID_REQUEST,
-        onSuccess: [RoleTypes.RECEIVED_ROLE, RoleTypes.ROLE_BY_ID_SUCCESS],
-        onFailure: RoleTypes.ROLE_BY_ID_FAILURE,
         params: [
             roleId,
         ],
@@ -48,9 +39,6 @@ export function getRole(roleId: string) {
 export function editRole(role: Role) {
     return bindClientFunc({
         clientFunc: Client4.patchRole,
-        onRequest: RoleTypes.EDIT_ROLE_REQUEST,
-        onSuccess: [RoleTypes.RECEIVED_ROLE, RoleTypes.EDIT_ROLE_SUCCESS],
-        onFailure: RoleTypes.EDIT_ROLE_FAILURE,
         params: [
             role.id,
             role,

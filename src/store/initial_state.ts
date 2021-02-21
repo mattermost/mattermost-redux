@@ -410,24 +410,6 @@ const state: GlobalState = {
                 error: null,
             },
         },
-        roles: {
-            getRolesByNames: {
-                status: 'not_started',
-                error: null,
-            },
-            getRoleByName: {
-                status: 'not_started',
-                error: null,
-            },
-            getRole: {
-                status: 'not_started',
-                error: null,
-            },
-            editRole: {
-                status: 'not_started',
-                error: null,
-            },
-        },
         jobs: {
             createJob: {
                 status: 'not_started',
