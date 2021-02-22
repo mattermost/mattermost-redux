@@ -409,7 +409,7 @@ describe('Selectors.General', () => {
                 },
             };
 
-            expect(Selectors.firstAdminVisitMarketplaceStatus(state)).toEqual({});
+            expect(Selectors.getFirstAdminVisitMarketplaceStatus(state)).toEqual({});
         });
 
         test('should return the value of the status', () => {
@@ -421,9 +421,9 @@ describe('Selectors.General', () => {
                 },
             };
 
-            expect(Selectors.firstAdminVisitMarketplaceStatus(state)).toEqual(true);
+            expect(Selectors.getFirstAdminVisitMarketplaceStatus(state)).toEqual(true);
             state.entities.general.firstAdminVisitMarketplaceStatus = false;
-            expect(Selectors.firstAdminVisitMarketplaceStatus(state)).toEqual(false);
+            expect(Selectors.getFirstAdminVisitMarketplaceStatus(state)).toEqual(false);
         });
     });
 });
