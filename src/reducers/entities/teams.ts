@@ -1,7 +1,7 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
 import {combineReducers} from 'redux';
-import {ChannelTypes, TeamTypes, UserTypes, SchemeTypes, GroupTypes} from 'action_types';
+import {AdminTypes, ChannelTypes, TeamTypes, UserTypes, SchemeTypes, GroupTypes} from 'action_types';
 import {teamListToMap} from 'utils/team_utils';
 import {Team, TeamMembership, TeamUnread} from 'types/teams';
 import {UserProfile} from 'types/users';
@@ -23,6 +23,8 @@ function currentTeamId(state = '', action: GenericAction) {
 function teams(state: IDMappedObjects<Team> = {}, action: GenericAction) {
     switch (action.type) {
     case TeamTypes.RECEIVED_TEAMS_LIST:
+    case AdminTypes.RECEIVED_DATA_RETENTION_CUSTOM_POLICY_TEAMS:
+        return Object.assign({}, state, teamListToMap(action.data));
     case SchemeTypes.RECEIVED_SCHEME_TEAMS:
         return Object.assign({}, state, teamListToMap(action.data));
     case UserTypes.LOGIN: // Used by the mobile app

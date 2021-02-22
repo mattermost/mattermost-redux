@@ -651,3 +651,79 @@ export function sendWarnMetricAck(warnMetricId: string, forceAck: boolean) {
         }
     };
 }
+
+
+export function getDataRetentionCustomPolicies(): ActionFunc {
+    return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
+        let data;
+        try {
+            data = await Client4.getDataRetentionCustomPolicies();
+        } catch (error) {
+            forceLogoutIfNecessary(error, dispatch, getState);
+            dispatch(batchActions([
+                {
+                    type: AdminTypes.RECEIVED_DATA_RETENTION_CUSTOM_POLICIES,
+                    error,
+                },
+                logError(error),
+            ]));
+            return {error};
+        }
+
+        dispatch(batchActions([
+            {type: AdminTypes.RECEIVED_DATA_RETENTION_CUSTOM_POLICIES, data},
+        ]));
+
+        return {data};
+    };
+}
+
+export function getDataRetentionCustomPolicy(id: string): ActionFunc {
+    return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
+        let data;
+        try {
+            data = await Client4.getDataRetentionCustomPolicy(id);
+        } catch (error) {
+            forceLogoutIfNecessary(error, dispatch, getState);
+            dispatch(batchActions([
+                {
+                    type: AdminTypes.RECEIVED_DATA_RETENTION_CUSTOM_POLICY,
+                    error,
+                },
+                logError(error),
+            ]));
+            return {error};
+        }
+
+        dispatch(batchActions([
+            {type: AdminTypes.RECEIVED_DATA_RETENTION_CUSTOM_POLICY, data},
+        ]));
+
+        return {data};
+    };
+}
+
+export function getDataRetentionCustomPolicyTeams(id: string, page = 0, perPage: number = General.TEAMS_CHUNK_SIZE, includeTotalCount = false): ActionFunc {
+    return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
+        let data;
+        try {
+            data = await Client4.getDataRetentionCustomPolicyTeams(id, page, perPage, includeTotalCount);
+        } catch (error) {
+            forceLogoutIfNecessary(error, dispatch, getState);
+            dispatch(batchActions([
+                {
+                    type: AdminTypes.RECEIVED_DATA_RETENTION_CUSTOM_POLICY_TEAMS,
+                    error,
+                },
+                logError(error),
+            ]));
+            return {error};
+        }
+
+        dispatch(batchActions([
+            {type: AdminTypes.RECEIVED_DATA_RETENTION_CUSTOM_POLICY_TEAMS, data},
+        ]));
+
+        return {data};
+    };
+}

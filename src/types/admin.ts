@@ -4,6 +4,7 @@
 import {Audit} from './audits';
 import {Compliance} from './compliance';
 import {AdminConfig, EnvironmentConfig} from './config';
+import { DataRetentionCustomPolicies } from './data_retention';
 import {MixedUnlinkedGroupRedux} from './groups';
 import {PluginRedux, PluginStatusRedux} from './plugins';
 import {SamlCertificateStatus, SamlMetadataResponse} from './saml';
@@ -33,6 +34,7 @@ export type AdminState = {
     plugins?: Dictionary<PluginRedux>;
     pluginStatuses?: Dictionary<PluginStatusRedux>;
     samlMetadataResponse?: SamlMetadataResponse;
+    dataRetentionCustomPolicies: DataRetentionCustomPolicies;
 };
 
 export type ClusterInfo = {

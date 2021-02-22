@@ -95,6 +95,7 @@ const state: GlobalState = {
             userAccessTokens: {},
             clusterInfo: [],
             analytics: {},
+            dataRetentionCustomPolicies: {},
         },
         jobs: {
             jobs: {},

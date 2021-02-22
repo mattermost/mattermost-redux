@@ -92,6 +92,7 @@ import {
 } from 'types/users';
 import {$ID, RelationOneToOne} from 'types/utilities';
 import {ProductNotices} from 'types/product_notices';
+import {DataRetentionCustomPolicies} from 'types/data_retention';
 
 import {buildQueryString, isMinimumServerVersion} from 'utils/helpers';
 import {cleanUrlForLogging} from 'utils/sentry';
@@ -2603,6 +2604,27 @@ export default class Client4 {
     getDataRetentionPolicy = () => {
         return this.doFetch<DataRetentionPolicy>(
             `${this.getDataRetentionRoute()}/policy`,
+            {method: 'get'},
+        );
+    };
+
+    getDataRetentionCustomPolicies = () => {
+        return this.doFetch<DataRetentionCustomPolicies>(
+            `${this.getDataRetentionRoute()}/policies`,
+            {method: 'get'},
+        );
+    };
+
+    getDataRetentionCustomPolicy = (id: string) => {
+        return this.doFetch<DataRetentionCustomPolicies>(
+            `${this.getDataRetentionRoute()}/policies/${id}`,
+            {method: 'get'},
+        );
+    };
+
+    getDataRetentionCustomPolicyTeams = (id: string, page = 0, perPage = PER_PAGE_DEFAULT, includeTotalCount = false) => {
+        return this.doFetch<Team[]>(
+            `${this.getDataRetentionRoute()}/policies/${id}/teams${buildQueryString({page, per_page: perPage, include_total_count: includeTotalCount})}`,
             {method: 'get'},
         );
     };
