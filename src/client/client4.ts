@@ -89,6 +89,7 @@ import {
     UsersStats,
     UserStatus,
     GetFilteredUsersStatsOpts,
+    UserCustomStatus,
 } from 'types/users';
 import {$ID, RelationOneToOne} from 'types/utilities';
 import {ProductNotices} from 'types/product_notices';
@@ -956,6 +957,27 @@ export default class Client4 {
             {method: 'put', body: JSON.stringify(status)},
         );
     };
+
+    updateCustomStatus = (customStatus: UserCustomStatus) => {
+        return this.doFetch(
+            `${this.getUserRoute('me')}/status/custom`,
+            {method: 'put', body: JSON.stringify(customStatus)},
+        );
+    };
+
+    unsetCustomStatus = () => {
+        return this.doFetch(
+            `${this.getUserRoute('me')}/status/custom`,
+            {method: 'delete'},
+        );
+    }
+
+    removeRecentCustomStatus = (customStatus: UserCustomStatus) => {
+        return this.doFetch(
+            `${this.getUserRoute('me')}/status/custom/recent`,
+            {method: 'delete', body: JSON.stringify(customStatus)},
+        );
+    }
 
     switchEmailToOAuth = (service: string, email: string, password: string, mfaCode = '') => {
         this.trackEvent('api', 'api_users_email_to_oauth');
