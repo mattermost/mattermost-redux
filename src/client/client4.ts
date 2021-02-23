@@ -34,9 +34,7 @@ import {
 import {CustomEmoji} from 'types/emojis';
 import {ServerError} from 'types/errors';
 import {FileInfo, FileUploadResponse} from 'types/files';
-import {
-    SystemSetting,
-} from 'types/general';
+import {SystemSetting} from 'types/general';
 import {
     Group,
     GroupPatch,
