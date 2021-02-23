@@ -83,7 +83,7 @@ export function handleThreadArrived(dispatch: DispatchFunc, getState: GetStateFu
         data: thread.participants,
     });
 
-    const oldThreadData = getState().entities.threads.threads[thread.id];
+    const oldThreadData = getState().entities.threads.threads[threadData.id];
     if (oldThreadData) {
         handleReadChanged(dispatch, thread.id, teamId, oldThreadData.unread_mentions, thread.unread_mentions, thread.post.channel_id);
     }
@@ -152,8 +152,19 @@ export function updateThreadRead(userId: string, teamId: string, threadId: strin
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         try {
             const oldThreadData = getState().entities.threads.threads[threadId];
-            const thread = await Client4.updateThreadReadForUser(userId, teamId, threadId, timestamp);
-            handleReadChanged(dispatch, threadId, teamId, oldThreadData.unread_mentions, thread.unread_mentions, thread.post.channel_id);
+
+            // here, participants only have an ID, would nuke other details
+            // eslint-disable-next-line
+            const {participants, ...thread} = await Client4.updateThreadReadForUser(userId, teamId, threadId, timestamp);
+
+            // TODO move updating to thread_read_changed or thread_updated websocket event
+            dispatch({
+                type: ThreadTypes.RECEIVED_THREAD,
+                data: {
+                    thread: {...oldThreadData, ...thread},
+                    team_id: teamId,
+                },
+            });
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch, getState);
             dispatch(logError(error));
@@ -164,7 +175,14 @@ export function updateThreadRead(userId: string, teamId: string, threadId: strin
     };
 }
 
-export function handleReadChanged(dispatch: DispatchFunc, threadId: string, teamId: string, prevUnreadMentions: number, newUnreadMentions: number, channelId: string) {
+export function handleReadChanged(
+    dispatch: DispatchFunc,
+    threadId: string,
+    teamId: string,
+    prevUnreadMentions: number,
+    newUnreadMentions: number,
+    channelId: string,
+) {
     dispatch({
         type: ThreadTypes.READ_CHANGED_THREAD,
         data: {
