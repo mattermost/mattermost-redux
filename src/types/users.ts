@@ -101,6 +101,11 @@ export type UserStatus = {
 	active_channel?: string;
 };
 
+export type UserCustomStatus = {
+    emoji: string;
+    text: string;
+};
+
 export type UserAccessToken = {
     id: string;
     token?: string;
