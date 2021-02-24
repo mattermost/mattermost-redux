@@ -190,9 +190,9 @@ export type AutocompleteDynamicSelect = AutocompleteElement & {
     call: AppCall;
 };
 
-export type AutocompleteUserSelect = AutocompleteElement & unknown
+export type AutocompleteUserSelect = AutocompleteElement
 
-export type AutocompleteChannelSelect = AutocompleteElement & unknown
+export type AutocompleteChannelSelect = AutocompleteElement
 
 export type AppLookupCallValues = {
     user_input: string;
