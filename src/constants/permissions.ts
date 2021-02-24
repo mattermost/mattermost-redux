@@ -81,8 +81,8 @@ const values = {
     READ_JOBS: 'read_jobs',
     DOWNLOAD_COMPLIANCE_EXPORT_RESULT: 'download_compliance_export_result',
 
-    SYSCONSOLE_READ_ABOUT: 'sysconsole_read_about',
-    SYSCONSOLE_WRITE_ABOUT: 'sysconsole_write_about',
+    SYSCONSOLE_READ_ABOUT_EDITION_AND_LICENSE: 'sysconsole_read_about_edition_and_license',
+    SYSCONSOLE_WRITE_ABOUT_EDITION_AND_LICENSE: 'sysconsole_write_about_edition_and_license',
     SYSCONSOLE_READ_BILLING: 'sysconsole_read_billing',
     SYSCONSOLE_WRITE_BILLING: 'sysconsole_write_billing',
     SYSCONSOLE_READ_REPORTING: 'sysconsole_read_reporting',
@@ -134,7 +134,7 @@ const values = {
 };
 
 values.SYSCONSOLE_READ_PERMISSIONS = [
-    values.SYSCONSOLE_READ_ABOUT,
+    values.SYSCONSOLE_READ_ABOUT_EDITION_AND_LICENSE,
     values.SYSCONSOLE_READ_BILLING,
     values.SYSCONSOLE_READ_REPORTING,
     values.SYSCONSOLE_READ_USERMANAGEMENT_USERS,
@@ -154,7 +154,7 @@ values.SYSCONSOLE_READ_PERMISSIONS = [
 ];
 
 values.SYSCONSOLE_WRITE_PERMISSIONS = [
-    values.SYSCONSOLE_WRITE_ABOUT,
+    values.SYSCONSOLE_WRITE_ABOUT_EDITION_AND_LICENSE,
     values.SYSCONSOLE_WRITE_BILLING,
     values.SYSCONSOLE_WRITE_REPORTING,
     values.SYSCONSOLE_WRITE_USERMANAGEMENT_USERS,

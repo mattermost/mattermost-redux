@@ -3,6 +3,9 @@
 import Permissions from './permissions';
 
 export const RESOURCE_KEYS = {
+    ABOUT: {
+        EDITION_AND_LICENSE: 'about.edition_and_license',
+    },
     USER_MANAGEMENT: {
         USERS: 'user_management.users',
         GROUPS: 'user_management.groups',
@@ -19,7 +22,7 @@ export const RESOURCE_KEYS = {
 };
 
 export const ResourceToSysConsolePermissionsTable: Record<string, string[]> = {
-    about: [Permissions.SYSCONSOLE_READ_ABOUT, Permissions.SYSCONSOLE_WRITE_ABOUT],
+    [RESOURCE_KEYS.ABOUT.EDITION_AND_LICENSE]: [Permissions.SYSCONSOLE_READ_ABOUT_EDITION_AND_LICENSE, Permissions.SYSCONSOLE_WRITE_ABOUT_EDITION_AND_LICENSE],
     billing: [Permissions.SYSCONSOLE_READ_BILLING, Permissions.SYSCONSOLE_WRITE_BILLING],
     reporting: [Permissions.SYSCONSOLE_READ_REPORTING, Permissions.SYSCONSOLE_WRITE_REPORTING],
     [RESOURCE_KEYS.USER_MANAGEMENT.USERS]: [Permissions.SYSCONSOLE_READ_USERMANAGEMENT_USERS, Permissions.SYSCONSOLE_WRITE_USERMANAGEMENT_USERS],
