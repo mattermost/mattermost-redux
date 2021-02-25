@@ -209,7 +209,6 @@ export function setFirstAdminVisitMarketplaceStatus(): ActionFunc {
             dispatch(logError(e));
             return {error: e.message};
         }
-
         dispatch({type: GeneralTypes.RECEIVED_FIRST_ADMIN_VISIT_MARKETPLACE_STATUS, data: true});
         return {data: true};
     };

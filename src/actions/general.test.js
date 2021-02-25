@@ -196,7 +196,7 @@ describe('Actions.General', () => {
         };
 
         nock(Client4.getBaseRoute()).
-            get('/first_admin_visit_marketplace').
+            get('/marketplace/first_admin_visit').
             query(true).
             reply(200, responseData);
 
@@ -207,7 +207,7 @@ describe('Actions.General', () => {
 
     it('setFirstAdminVisitMarketplaceStatus', async () => {
         nock(Client4.getBaseRoute()).
-            post('/first_admin_visit_marketplace').
+            post('/marketplace/first_admin_visit').
             reply(200, OK_RESPONSE);
 
         await Actions.setFirstAdminVisitMarketplaceStatus()(store.dispatch, store.getState);
