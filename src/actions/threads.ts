@@ -84,9 +84,19 @@ export function handleThreadArrived(dispatch: DispatchFunc, getState: GetStateFu
     });
 
     const oldThreadData = getState().entities.threads.threads[threadData.id];
-    if (oldThreadData) {
-        handleReadChanged(dispatch, thread.id, teamId, oldThreadData.unread_mentions, thread.unread_mentions, thread.post.channel_id);
-    }
+    handleReadChanged(
+        dispatch,
+        thread.id,
+        teamId,
+        thread.post.channel_id,
+        {
+            lastViewedAt: threadData.last_viewed_at,
+            prevUnreadMentions: oldThreadData.unread_mentions,
+            newUnreadMentions: thread.unread_mentions,
+            prevUnreadReplies: oldThreadData.unread_replies,
+            newUnreadReplies: thread.unread_replies,
+        },
+    );
 
     dispatch({
         type: PostTypes.RECEIVED_POSTS,
@@ -151,20 +161,7 @@ export function markAllThreadsInTeamRead(userId: string, teamId: string) {
 export function updateThreadRead(userId: string, teamId: string, threadId: string, timestamp: number) {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         try {
-            const oldThreadData = getState().entities.threads.threads[threadId];
-
-            // here, participants only have an ID, would nuke other details
-            // eslint-disable-next-line
-            const {participants, ...thread} = await Client4.updateThreadReadForUser(userId, teamId, threadId, timestamp);
-
-            // TODO move updating to thread_read_changed or thread_updated websocket event
-            dispatch({
-                type: ThreadTypes.RECEIVED_THREAD,
-                data: {
-                    thread: {...oldThreadData, ...thread},
-                    team_id: teamId,
-                },
-            });
+            await Client4.updateThreadReadForUser(userId, teamId, threadId, timestamp);
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch, getState);
             dispatch(logError(error));
@@ -179,9 +176,20 @@ export function handleReadChanged(
     dispatch: DispatchFunc,
     threadId: string,
     teamId: string,
-    prevUnreadMentions: number,
-    newUnreadMentions: number,
     channelId: string,
+    {
+        lastViewedAt,
+        prevUnreadMentions,
+        newUnreadMentions,
+        prevUnreadReplies,
+        newUnreadReplies,
+    }: {
+        lastViewedAt: number;
+        prevUnreadMentions: number;
+        newUnreadMentions: number;
+        prevUnreadReplies: number;
+        newUnreadReplies: number;
+    },
 ) {
     dispatch({
         type: ThreadTypes.READ_CHANGED_THREAD,
@@ -189,8 +197,11 @@ export function handleReadChanged(
             id: threadId,
             teamId,
             channelId,
+            lastViewedAt,
             prevUnreadMentions,
             newUnreadMentions,
+            prevUnreadReplies,
+            newUnreadReplies,
         },
     });
 }
