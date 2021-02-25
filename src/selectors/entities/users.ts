@@ -611,12 +611,16 @@ export function makeGetProfilesByIdsAndUsernames(): (
     );
 }
 
-export const getDisplayName: (state: GlobalState, userId: $ID<UserProfile>, useFallbackUsername: boolean) => string = createSelector(
-    (state: GlobalState, userId: string) => getUser(state, userId),
-    getTeammateNameDisplaySetting,
-    (state, userId, useFallbackUsername = true) => useFallbackUsername,
-    displayUsername,
-);
+export function makeGetDisplayName(): (state: GlobalState, userId: $ID<UserProfile>, useFallbackUsername: boolean) => string {
+    return createSelector(
+        (state: GlobalState, userId: string) => getUser(state, userId),
+        getTeammateNameDisplaySetting,
+        (state, userId, useFallbackUsername = true) => useFallbackUsername,
+        (user, teammateNameDisplaySetting, useFallbackUsername) => {
+            return displayUsername(user, teammateNameDisplaySetting!, useFallbackUsername);
+        },
+    );
+}
 
 export const getProfilesInGroup: (state: GlobalState, groupId: $ID<Group>, filters?: Filters) => UserProfile[] = createSelector(
     getUsers,
