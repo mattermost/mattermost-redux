@@ -203,7 +203,7 @@ export function getWarnMetricsStatus(): ActionFunc {
 export function setFirstAdminVisitMarketplaceStatus(): ActionFunc {
     return async (dispatch: DispatchFunc) => {
         try {
-            Client4.trackEvent('api', 'api_request_set_first_admin_visit_marketplace_status');
+            Client4.trackEvent('plugins', 'set_first_admin_visit_marketplace_status');
             await Client4.setFirstAdminVisitMarketplaceStatus();
         } catch (e) {
             dispatch(logError(e));
