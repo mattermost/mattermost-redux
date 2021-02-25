@@ -95,7 +95,7 @@ describe('threads', () => {
         expect(nextState2).not.toBe(state);
         expect(nextState2.counts.a).toEqual({
             total: 3,
-            total_unread_threads: 0,
+            total_unread_threads: 1,
             unread_mentions_per_channel: {
                 a: 0,
             },

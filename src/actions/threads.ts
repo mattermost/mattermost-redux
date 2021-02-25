@@ -91,9 +91,9 @@ export function handleThreadArrived(dispatch: DispatchFunc, getState: GetStateFu
         thread.post.channel_id,
         {
             lastViewedAt: threadData.last_viewed_at,
-            prevUnreadMentions: oldThreadData.unread_mentions,
+            prevUnreadMentions: oldThreadData ? oldThreadData.unread_mentions : thread.unread_mentions,
             newUnreadMentions: thread.unread_mentions,
-            prevUnreadReplies: oldThreadData.unread_replies,
+            prevUnreadReplies: oldThreadData ? oldThreadData.unread_replies : thread.unread_replies,
             newUnreadReplies: thread.unread_replies,
         },
     );
