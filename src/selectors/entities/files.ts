@@ -43,7 +43,7 @@ export function makeGetFilesForPost(): (state: GlobalState, postId: string) => F
     );
 }
 
-export const getSearchFilesResults: (state: GlobalState) => Array<FileSearchResultItem> = createSelector(
+export const getSearchFilesResults: (state: GlobalState) => FileSearchResultItem[] = createSelector(
     getAllFilesFromSearch,
     (state: GlobalState) => state.entities.search.fileResults,
     (files, fileIds) => {

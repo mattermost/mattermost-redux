@@ -36,7 +36,7 @@ export type FileSearchResultItem = FileInfo & {
 }
 
 export type FileSearchResults = {
-    order: $ID<FileSearchResultItem>[];
+    order: Array<$ID<FileSearchResultItem>>;
     file_infos: Map<string, FileSearchResultItem>;
     next_file_info_id: string;
     prev_file_info_id: string;

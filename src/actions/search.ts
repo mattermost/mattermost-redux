@@ -45,7 +45,7 @@ export function getMissingChannelsFromFiles(files: Map<string, FileSearchResultI
             membersInChannel,
             myMembers,
         } = getState().entities.channels;
-        const promises: Promise<ActionResult>[] = [];
+        const promises: Array<Promise<ActionResult>> = [];
         Object.values(files).forEach((file) => {
             const id = file.channel_id;
 
