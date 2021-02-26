@@ -3,8 +3,8 @@
 
 import assert from 'assert';
 
-import {Preferences} from '../constants';
 import * as ThemeUtils from 'utils/theme_utils';
+import {Preferences} from '../constants';
 
 describe('ThemeUtils', () => {
     describe('getComponents', () => {
@@ -68,12 +68,26 @@ describe('ThemeUtils', () => {
     });
 
     describe('setThemeDefaults', () => {
+        beforeEach(async () => {
+            jest.spyOn(ThemeUtils, 'blendColors').mockReturnValue('#efefef');
+        });
+
         it('blank theme', () => {
+            jest.spyOn(ThemeUtils, 'blendColors').mockReturnValue('#0b428c');
+
             const input = {};
             const expected = {...Preferences.THEMES.default};
             delete expected.type;
 
             assert.deepEqual(ThemeUtils.setThemeDefaults(input), expected);
+        });
+
+        it('correctly updates the sidebarTeamBarBg variable', () => {
+            const input = {sidebarHeaderBg: '#ff0000'};
+            const expected = ThemeUtils.blendColors(input, '#000000', 0.2);
+
+            console.log(expected);
+            assert.equal(ThemeUtils.setThemeDefaults(input).sidebarTeamBarBg, expected);
         });
 
         it('set defaults on unset properties only', () => {

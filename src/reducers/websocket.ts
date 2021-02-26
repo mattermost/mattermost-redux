@@ -12,7 +12,7 @@ function getInitialState() {
     };
 }
 
-export default function(state = getInitialState(), action: GenericAction) {
+export default function reducer(state = getInitialState(), action: GenericAction) {
     if (!state.connected && action.type === GeneralTypes.WEBSOCKET_SUCCESS) {
         return {
             ...state,

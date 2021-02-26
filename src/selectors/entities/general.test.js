@@ -368,5 +368,34 @@ describe('Selectors.General', () => {
             expect(Selectors.getManagedResourcePaths(state)).toEqual(['trusted', 'jitsi', 'test']);
         });
     });
+
+    describe('getFeatureFlagValue', () => {
+        test('should return undefined when feature flag does not exist', () => {
+            const state = {
+                entities: {
+                    general: {
+                        config: {
+                        },
+                    },
+                },
+            };
+
+            expect(Selectors.getFeatureFlagValue(state, 'CoolFeature')).toBeUndefined();
+        });
+
+        test('should return the value of a valid feature flag', () => {
+            const state = {
+                entities: {
+                    general: {
+                        config: {
+                            FeatureFlagCoolFeature: 'true',
+                        },
+                    },
+                },
+            };
+
+            expect(Selectors.getFeatureFlagValue(state, 'CoolFeature')).toEqual('true');
+        });
+    });
 });
 

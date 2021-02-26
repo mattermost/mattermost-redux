@@ -67,30 +67,30 @@ describe('Actions.Posts', () => {
 
     it('maintain postReplies', async () => {
         const channelId = TestHelper.basicChannel.id;
-        const post = TestHelper.fakePostWithId(channelId);
-        const post2 = TestHelper.fakePostWithId(channelId);
-
-        post2.root_id = post.id;
+        const post = TestHelper.fakePost(channelId);
+        const postId = TestHelper.generateId();
 
         nock(Client4.getBaseRoute()).
             post('/posts').
-            reply(201, post);
+            reply(201, {...post, id: postId});
 
-        await Actions.createPost(post)(store.dispatch, store.getState);
+        await Actions.createPostImmediately(post)(store.dispatch, store.getState);
+
+        const post2 = TestHelper.fakePostWithId(channelId);
+        post2.root_id = postId;
 
         nock(Client4.getBaseRoute()).
             post('/posts').
             reply(201, post2);
 
-        await Actions.createPost(post2)(store.dispatch, store.getState);
+        await Actions.createPostImmediately(post2)(store.dispatch, store.getState);
 
-        assert.equal(store.getState().entities.posts.postsReplies[post.id], 1);
+        assert.equal(store.getState().entities.posts.postsReplies[postId], 1);
 
         await Actions.deletePost(post2)(store.dispatch, store.getState);
         await Actions.removePost(post2)(store.dispatch, store.getState);
 
-        assert.equal(store.getState().entities.posts.postsReplies[post.id], 0);
-        nock.cleanAll();
+        assert.equal(store.getState().entities.posts.postsReplies[postId], 0);
     });
 
     it('resetCreatePostRequest', async () => {

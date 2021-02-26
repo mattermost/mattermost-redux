@@ -23,6 +23,7 @@ export type ClientConfig = {
     BuildHashEnterprise: string;
     BuildNumber: string;
     CloseUnusedDirectMessages: string;
+    CollapsedThreads: 'disabled' | 'default_off' | 'default_on';
     CustomBrandText: string;
     CustomDescriptionText: string;
     CustomTermsOfServiceId: string;
@@ -53,6 +54,7 @@ export type ClientConfig = {
     EnableConfirmNotificationsToChannel: string;
     EnableCustomBrand: string;
     EnableCustomEmoji: string;
+    EnableCustomUserStatuses: string;
     EnableCustomTermsOfService: string;
     EnableDeveloper: string;
     EnableDiagnostics: string;
@@ -326,6 +328,7 @@ export type ServiceSettings = {
     EnableLocalMode: boolean;
     LocalModeSocketLocation: string;
     EnableLegacySidebar: boolean;
+    CollapsedThreads: 'disabled' | 'default_on' | 'default_off';
 };
 
 export type TeamSettings = {

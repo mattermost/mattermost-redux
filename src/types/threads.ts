@@ -2,6 +2,7 @@
 // See LICENSE.txt for license information.
 import type {Post} from './posts';
 import type {Team} from './teams';
+import type {Channel} from './channels';
 import type {UserProfile} from './users';
 import type {$ID, IDMappedObjects, RelationOneToMany, RelationOneToOne} from './utilities';
 
@@ -19,7 +20,7 @@ export type UserThread = {
 
 export type UserThreadList = {
     total: number;
-    total_unread_replies: number;
+    total_unread_threads: number;
     total_unread_mentions: number;
     threads: UserThread[];
 }
@@ -29,7 +30,8 @@ export type ThreadsState = {
     threads: IDMappedObjects<UserThread>;
     counts: RelationOneToOne<Team, {
         total: number;
-        total_unread_replies: number;
+        total_unread_threads: number;
         total_unread_mentions: number;
+        unread_mentions_per_channel: Record<$ID<Channel>, number>;
     }>;
 };

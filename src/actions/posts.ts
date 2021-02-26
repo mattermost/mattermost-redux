@@ -206,8 +206,8 @@ export function createPost(post: Post, files: any[] = []) {
         dispatch({
             type: PostTypes.RECEIVED_NEW_POST,
             data: {
-                id: pendingPostId,
                 ...newPost,
+                id: pendingPostId,
             },
             meta: {
                 offline: {
@@ -309,8 +309,8 @@ export function createPostImmediately(post: Post, files: any[] = []) {
         }
 
         dispatch(receivedNewPost({
-            id: pendingPostId,
             ...newPost,
+            id: pendingPostId,
         }));
 
         try {
@@ -321,7 +321,10 @@ export function createPostImmediately(post: Post, files: any[] = []) {
             forceLogoutIfNecessary(error, dispatch, getState);
             dispatch(batchActions([
                 {type: PostTypes.CREATE_POST_FAILURE, data: newPost, error},
-                removePost({id: pendingPostId, ...newPost}) as any,
+                removePost({
+                    ...newPost,
+                    id: pendingPostId,
+                }) as any,
                 logError(error),
             ]));
             return {error};

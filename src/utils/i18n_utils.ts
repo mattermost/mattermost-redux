@@ -1,7 +1,11 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
-let localizeFunction: Function|null = null;
-export function setLocalizeFunction(func: Function) {
+
+type LocalizeFunc = (id: string, defaultMessage: string) => string;
+
+let localizeFunction: LocalizeFunc;
+
+export function setLocalizeFunction(func: LocalizeFunc) {
     localizeFunction = func;
 }
 

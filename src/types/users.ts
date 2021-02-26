@@ -85,8 +85,8 @@ export type UserTimezone = {
 };
 
 export type UserActivity = {
-    [x in PostType]: {
-        [x in $ID<UserProfile>]: | {
+    [postType in PostType]: {
+        [userId in $ID<UserProfile>]: | {
             ids: Array<$ID<UserProfile>>;
             usernames: Array<UserProfile['username']>;
         } | Array<$ID<UserProfile>>;
@@ -99,6 +99,11 @@ export type UserStatus = {
 	manual: boolean;
 	last_activity_at: number;
 	active_channel?: string;
+};
+
+export type UserCustomStatus = {
+    emoji: string;
+    text: string;
 };
 
 export type UserAccessToken = {

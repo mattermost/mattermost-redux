@@ -47,7 +47,7 @@ export function getThreads(state: GlobalState) {
 }
 
 export function getThread(state: GlobalState, threadId: $ID<UserThread> | undefined): UserThread | null {
-    if (!threadId || !getThreadsInCurrentTeam(state).includes(threadId)) {
+    if (!threadId || !getThreadsInCurrentTeam(state)?.includes(threadId)) {
         return null;
     }
     return getThreads(state)[threadId];
