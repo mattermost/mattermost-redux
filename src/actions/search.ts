@@ -95,7 +95,7 @@ export function searchPostsWithParams(teamId: string, params: SearchParameter): 
                 data: {
                     teamId,
                     params,
-                    isEnd: !posts.next_post_id,
+                    isEnd: posts.order.length === 0,
                 },
             },
             {
@@ -164,7 +164,7 @@ export function searchFilesWithParams(teamId: string, params: SearchParameter): 
                 data: {
                     teamId,
                     params,
-                    isFilesEnd: !files.next_file_info_id,
+                    isFilesEnd: files.order.length === 0,
                 },
             },
             {
