@@ -3,6 +3,10 @@
 
 import {AppCallResponseType, AppCallType, AppExpandLevel, AppFieldType} from 'types/apps';
 
+// This file contents belong to the Apps Framework feature.
+// Apps Framework feature is experimental, and all the contents on this file are
+// susceptible to breaking changes without pushing the major version of this package.
+
 export const AppBindingLocations = {
     POST_MENU_ITEM: '/post_menu',
     CHANNEL_HEADER_ICON: '/channel_header',
