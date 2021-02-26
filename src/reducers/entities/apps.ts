@@ -5,10 +5,12 @@ import {combineReducers} from 'redux';
 import {AppsTypes} from 'action_types';
 import {AppBinding, AppsState} from 'types/apps';
 import {GenericAction} from 'types/actions';
+import {validateBindings} from 'utils/apps'
 
-function bindings(state: AppBinding[] = [], action: GenericAction): AppBinding[] {
+export function bindings(state: AppBinding[] = [], action: GenericAction): AppBinding[] {
     switch (action.type) {
     case AppsTypes.RECEIVED_APP_BINDINGS: {
+        validateBindings(action.data);
         return action.data || [];
     }
     default:
