@@ -38,7 +38,7 @@
     "remote-redux-devtools": "0.5.16",
     "reselect": "4.0.0",
     "rudder-sdk-js": "1.0.14",
-    "serialize-error": "8.0.1",
+    "serialize-error": "6.0.0",
     "shallow-equals": "1.0.0"
   },
   "husky": {
