@@ -1,8 +1,8 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
 
-import {AppBinding} from '../types/apps'
-import {AppBindingLocations} from '../constants/apps'
+import {AppBinding} from '../types/apps';
+import {AppBindingLocations} from '../constants/apps';
 
 export function fillBindingsInformation(binding?: AppBinding) {
     if (!binding) {
@@ -49,7 +49,7 @@ export function fillBindingsInformation(binding?: AppBinding) {
 
 export function validateBindings(binding?: AppBinding) {
     filterInvalidChannelHeaderBindings(binding);
-    filterInvalidCommands(binding)
+    filterInvalidCommands(binding);
     filterInvalidPostMenuBindings(binding);
     binding?.bindings?.forEach(fillBindingsInformation);
 }
@@ -60,13 +60,13 @@ function filterInvalidCommands(binding?: AppBinding) {
     }
 
     const isValidCommand = (b: AppBinding): boolean => {
-        return Boolean(b.label)
-    }
+        return Boolean(b.label);
+    };
 
     const validateCommand = (b: AppBinding) => {
-        b.bindings = b.bindings?.filter(isValidCommand)
+        b.bindings = b.bindings?.filter(isValidCommand);
         b.bindings?.forEach(validateCommand);
-    }
+    };
 
     binding.bindings?.filter((b) => b.location === AppBindingLocations.COMMAND).forEach(validateCommand);
 }
@@ -77,13 +77,13 @@ function filterInvalidChannelHeaderBindings(binding?: AppBinding) {
     }
 
     const isValidChannelHeaderBindings = (b: AppBinding): boolean => {
-        return Boolean(b.icon && b.label)
-    }
+        return Boolean(b.icon && b.label);
+    };
 
     const validateChannelHeaderBinding = (b: AppBinding) => {
         b.bindings = b.bindings?.filter(isValidChannelHeaderBindings);
         b.bindings?.forEach(validateChannelHeaderBinding);
-    }
+    };
 
     binding.bindings?.filter((b) => b.location === AppBindingLocations.CHANNEL_HEADER_ICON).forEach(validateChannelHeaderBinding);
 }
@@ -94,13 +94,13 @@ function filterInvalidPostMenuBindings(binding?: AppBinding) {
     }
 
     const isValidPostMenuBinding = (b: AppBinding): boolean => {
-        return Boolean(b.label)
-    }
+        return Boolean(b.label);
+    };
 
     const validatePostMenuBinding = (b: AppBinding) => {
-        b.bindings = b.bindings?.filter(isValidPostMenuBinding)
+        b.bindings = b.bindings?.filter(isValidPostMenuBinding);
         b.bindings?.forEach(validatePostMenuBinding);
-    }
+    };
 
     binding.bindings?.filter((b) => b.location === AppBindingLocations.POST_MENU_ITEM).forEach(validatePostMenuBinding);
 }

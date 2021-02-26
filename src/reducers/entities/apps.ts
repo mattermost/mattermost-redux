@@ -5,7 +5,7 @@ import {combineReducers} from 'redux';
 import {AppsTypes} from 'action_types';
 import {AppBinding, AppsState} from 'types/apps';
 import {GenericAction} from 'types/actions';
-import {validateBindings} from 'utils/apps'
+import {validateBindings} from 'utils/apps';
 
 export function bindings(state: AppBinding[] = [], action: GenericAction): AppBinding[] {
     switch (action.type) {

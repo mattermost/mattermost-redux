@@ -1,8 +1,8 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
 
-import {AppsTypes} from '../../action_types'
-import {AppBinding} from '../../types/apps'
+import {AppsTypes} from '../../action_types';
+import {AppBinding} from '../../types/apps';
 import * as Reducers from './apps';
 
 describe('bindings', () => {
@@ -18,9 +18,9 @@ describe('bindings', () => {
                         {
                             location: 'locA',
                             label: 'a',
-                            call: {}
-                        }
-                    ]
+                            call: {},
+                        },
+                    ],
                 },
                 {
                     app_id: '2',
@@ -29,9 +29,9 @@ describe('bindings', () => {
                         {
                             location: 'locA',
                             label: 'a',
-                            call: {}
-                        }
-                    ]
+                            call: {},
+                        },
+                    ],
                 },
                 {
                     app_id: '1',
@@ -42,7 +42,7 @@ describe('bindings', () => {
                             label: 'b',
                             icon: 'icon',
                             call: {},
-                        }
+                        },
                     ],
                 },
                 {
@@ -53,17 +53,17 @@ describe('bindings', () => {
                             location: 'locC',
                             label: 'c',
                             call: {},
-                        }
+                        },
                     ],
-                }
-            ]
-        }
+                },
+            ],
+        };
 
         const state = Reducers.bindings(
             initialState,
             {
                 type: AppsTypes.RECEIVED_APP_BINDINGS,
-                data
+                data,
             },
         );
 
@@ -80,9 +80,9 @@ describe('bindings', () => {
                         {
                             location: 'locA',
                             label: 'a',
-                            call: {}
-                        }
-                    ]
+                            call: {},
+                        },
+                    ],
                 },
                 {
                     app_id: '2',
@@ -91,9 +91,9 @@ describe('bindings', () => {
                         {
                             location: 'locA',
                             label: 'a',
-                            call: {}
-                        }
-                    ]
+                            call: {},
+                        },
+                    ],
                 },
                 {
                     app_id: '1',
@@ -109,7 +109,7 @@ describe('bindings', () => {
                             location: 'locC',
                             label: 'c',
                             call: {},
-                        }
+                        },
                     ],
                 },
                 {
@@ -126,7 +126,7 @@ describe('bindings', () => {
                             label: 'c',
                             icon: 'icon',
                             call: {},
-                        }
+                        },
                     ],
                 },
                 {
@@ -141,7 +141,7 @@ describe('bindings', () => {
                             location: 'locC',
                             label: 'c',
                             call: {},
-                        }
+                        },
                     ],
                 },
                 {
@@ -152,17 +152,17 @@ describe('bindings', () => {
                             location: 'locC',
                             label: 'c',
                             call: {},
-                        }
+                        },
                     ],
-                }
-            ]
-        }
+                },
+            ],
+        };
 
         const state = Reducers.bindings(
             initialState,
             {
                 type: AppsTypes.RECEIVED_APP_BINDINGS,
-                data
+                data,
             },
         );
 
@@ -178,14 +178,14 @@ describe('bindings', () => {
                     bindings: [
                         {
                             location: 'locA',
-                            call: {}
+                            call: {},
                         },
                         {
                             location: 'locB',
                             label: 'a',
-                            call: {}
-                        }
-                    ]
+                            call: {},
+                        },
+                    ],
                 },
                 {
                     app_id: '2',
@@ -194,14 +194,14 @@ describe('bindings', () => {
                         {
                             location: 'locA',
                             label: 'a',
-                            call: {}
+                            call: {},
                         },
                         {
                             location: 'locB',
                             label: 'b',
-                            call: {}
-                        }
-                    ]
+                            call: {},
+                        },
+                    ],
                 },
                 {
                     app_id: '3',
@@ -209,9 +209,9 @@ describe('bindings', () => {
                     bindings: [
                         {
                             location: 'locA',
-                            call: {}
-                        }
-                    ]
+                            call: {},
+                        },
+                    ],
                 },
                 {
                     app_id: '1',
@@ -222,7 +222,7 @@ describe('bindings', () => {
                             label: 'b',
                             icon: 'icon',
                             call: {},
-                        }
+                        },
                     ],
                 },
                 {
@@ -233,17 +233,17 @@ describe('bindings', () => {
                             location: 'locC',
                             label: 'c',
                             call: {},
-                        }
+                        },
                     ],
-                }
-            ]
-        }
+                },
+            ],
+        };
 
         const state = Reducers.bindings(
             initialState,
             {
                 type: AppsTypes.RECEIVED_APP_BINDINGS,
-                data
+                data,
             },
         );
 
@@ -260,14 +260,14 @@ describe('bindings', () => {
                         {
                             location: 'locA',
                             label: 'a',
-                            call: {}
+                            call: {},
                         },
                         {
                             location: 'locB',
                             label: 'a',
-                            call: {}
-                        }
-                    ]
+                            call: {},
+                        },
+                    ],
                 },
                 {
                     app_id: '1',
@@ -278,7 +278,7 @@ describe('bindings', () => {
                             label: 'b',
                             icon: 'icon',
                             call: {},
-                        }
+                        },
                     ],
                 },
                 {
@@ -319,7 +319,7 @@ describe('bindings', () => {
                         {
                             location: 'locC',
                             call: {},
-                        }
+                        },
                     ],
                 },
                 {
@@ -342,17 +342,17 @@ describe('bindings', () => {
                                     call: {},
                                 },
                             ],
-                        }
+                        },
                     ],
-                }
-            ]
-        }
+                },
+            ],
+        };
 
         const state = Reducers.bindings(
             initialState,
             {
                 type: AppsTypes.RECEIVED_APP_BINDINGS,
-                data
+                data,
             },
         );
 
