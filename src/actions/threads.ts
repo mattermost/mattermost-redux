@@ -15,6 +15,7 @@ import {forceLogoutIfNecessary} from './helpers';
 
 export function getThreads(userId: string, teamId: string, {before = '', after = '', perPage = ThreadConstants.THREADS_CHUNK_SIZE, unread = false} = {}) {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
+        const {entities} = getState();
         let userThreadList: undefined | UserThreadList;
 
         try {
@@ -28,7 +29,7 @@ export function getThreads(userId: string, teamId: string, {before = '', after =
         if (userThreadList?.threads?.length) {
             dispatch({
                 type: UserTypes.RECEIVED_PROFILES_LIST,
-                data: userThreadList.threads.map(({participants: users}) => users).flat(),
+                data: userThreadList.threads.map(({participants}) => participants.filter((user) => user.id !== entities.users.currentUserId)).flat(),
             });
 
             dispatch({
@@ -76,27 +77,13 @@ export function getThreadMentionCountsByChannel(teamId: string) {
 }
 
 export function handleThreadArrived(dispatch: DispatchFunc, getState: GetStateFunc, threadData: UserThread, teamId: string) {
+    const {entities} = getState();
     const thread = {...threadData, is_following: true};
 
     dispatch({
         type: UserTypes.RECEIVED_PROFILES_LIST,
-        data: thread.participants,
+        data: thread.participants.filter((user) => user.id !== entities.users.currentUserId),
     });
-
-    const oldThreadData = getState().entities.threads.threads[threadData.id];
-    handleReadChanged(
-        dispatch,
-        thread.id,
-        teamId,
-        thread.post.channel_id,
-        {
-            lastViewedAt: threadData.last_viewed_at,
-            prevUnreadMentions: oldThreadData ? oldThreadData.unread_mentions : thread.unread_mentions,
-            newUnreadMentions: thread.unread_mentions,
-            prevUnreadReplies: oldThreadData ? oldThreadData.unread_replies : thread.unread_replies,
-            newUnreadReplies: thread.unread_replies,
-        },
-    );
 
     dispatch({
         type: PostTypes.RECEIVED_POSTS,
@@ -110,6 +97,21 @@ export function handleThreadArrived(dispatch: DispatchFunc, getState: GetStateFu
             team_id: teamId,
         },
     });
+
+    const oldThreadData = entities.threads.threads[threadData.id];
+    handleReadChanged(
+        dispatch,
+        thread.id,
+        teamId,
+        thread.post.channel_id,
+        {
+            lastViewedAt: thread.last_viewed_at,
+            prevUnreadMentions: oldThreadData?.unread_mentions,
+            newUnreadMentions: thread.unread_mentions,
+            prevUnreadReplies: oldThreadData?.unread_replies,
+            newUnreadReplies: thread.unread_replies,
+        },
+    );
 
     return thread;
 }
