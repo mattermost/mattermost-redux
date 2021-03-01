@@ -145,7 +145,7 @@ export function searchFilesWithParams(teamId: string, params: SearchParameter): 
         try {
             files = await Client4.searchFilesWithParams(teamId, params);
 
-            // await dispatch(getMissingChannelsFromFiles(files.file_infos));
+            await dispatch(getMissingChannelsFromFiles(files.file_infos));
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch, getState);
             dispatch(logError(error));

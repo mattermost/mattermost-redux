@@ -139,6 +139,8 @@ describe('Actions.Search', () => {
         const {dispatch, getState} = store;
 
         const files = TestHelper.fakeFiles(2);
+        files[0].channel_id = TestHelper.basicChannel.id;
+        files[1].channel_id = TestHelper.basicChannel.id;
 
         // Test for a couple of words
         const search1 = 'try word';
