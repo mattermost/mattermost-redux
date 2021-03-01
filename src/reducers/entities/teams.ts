@@ -23,15 +23,13 @@ function currentTeamId(state = '', action: GenericAction) {
 function teams(state: IDMappedObjects<Team> = {}, action: GenericAction) {
     switch (action.type) {
     case TeamTypes.RECEIVED_TEAMS_LIST:
-    case AdminTypes.RECEIVED_DATA_RETENTION_CUSTOM_POLICY_TEAMS:
+    case SchemeTypes.RECEIVED_SCHEME_TEAMS: {
         return Object.assign({}, state, teamListToMap(action.data));
-    case SchemeTypes.RECEIVED_SCHEME_TEAMS:
-        return Object.assign({}, state, teamListToMap(action.data));
+    }
     case UserTypes.LOGIN: // Used by the mobile app
         return Object.assign({}, state, teamListToMap(action.data.teams));
     case TeamTypes.RECEIVED_TEAMS:
         return Object.assign({}, state, action.data);
-
     case TeamTypes.CREATED_TEAM:
     case TeamTypes.UPDATED_TEAM:
     case TeamTypes.PATCHED_TEAM:
@@ -462,6 +460,16 @@ function totalCount(state = 0, action: GenericAction) {
     }
 }
 
+function teamsInPolicy(state: IDMappedObjects<Team> = {}, action: GenericAction) {
+    switch (action.type) {
+    case AdminTypes.RECEIVED_DATA_RETENTION_CUSTOM_POLICY_TEAMS: {
+        return Object.assign({}, state, teamListToMap(action.data));
+    }
+    default:
+        return state;   
+    }
+}
+
 export default combineReducers({
 
     // the current selected team
@@ -482,4 +490,6 @@ export default combineReducers({
     groupsAssociatedToTeam,
 
     totalCount,
+
+    teamsInPolicy,
 });

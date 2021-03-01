@@ -660,19 +660,18 @@ export function getDataRetentionCustomPolicies(): ActionFunc {
             data = await Client4.getDataRetentionCustomPolicies();
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch, getState);
-            dispatch(batchActions([
+            dispatch(
                 {
                     type: AdminTypes.RECEIVED_DATA_RETENTION_CUSTOM_POLICIES,
                     error,
-                },
-                logError(error),
-            ]));
+                }
+            );
             return {error};
         }
 
-        dispatch(batchActions([
+        dispatch(
             {type: AdminTypes.RECEIVED_DATA_RETENTION_CUSTOM_POLICIES, data},
-        ]));
+        );
 
         return {data};
     };
@@ -685,19 +684,18 @@ export function getDataRetentionCustomPolicy(id: string): ActionFunc {
             data = await Client4.getDataRetentionCustomPolicy(id);
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch, getState);
-            dispatch(batchActions([
+            dispatch(
                 {
                     type: AdminTypes.RECEIVED_DATA_RETENTION_CUSTOM_POLICY,
                     error,
-                },
-                logError(error),
-            ]));
+                }
+            );
             return {error};
         }
 
-        dispatch(batchActions([
+        dispatch(
             {type: AdminTypes.RECEIVED_DATA_RETENTION_CUSTOM_POLICY, data},
-        ]));
+        );
 
         return {data};
     };
@@ -710,19 +708,18 @@ export function getDataRetentionCustomPolicyTeams(id: string, page = 0, perPage:
             data = await Client4.getDataRetentionCustomPolicyTeams(id, page, perPage, includeTotalCount);
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch, getState);
-            dispatch(batchActions([
+            dispatch(
                 {
                     type: AdminTypes.RECEIVED_DATA_RETENTION_CUSTOM_POLICY_TEAMS,
                     error,
-                },
-                logError(error),
-            ]));
+                }
+            );
             return {error};
         }
 
-        dispatch(batchActions([
+        dispatch(
             {type: AdminTypes.RECEIVED_DATA_RETENTION_CUSTOM_POLICY_TEAMS, data},
-        ]));
+        );
 
         return {data};
     };

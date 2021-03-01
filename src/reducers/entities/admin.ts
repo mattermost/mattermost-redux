@@ -16,7 +16,7 @@ import {PluginRedux, PluginStatusRedux} from 'types/plugins';
 import {SamlCertificateStatus, SamlMetadataResponse} from 'types/saml';
 import {Team} from 'types/teams';
 import {UserAccessToken, UserProfile} from 'types/users';
-import {Dictionary, RelationOneToOne} from 'types/utilities';
+import {Dictionary, RelationOneToOne, IDMappedObjects} from 'types/utilities';
 import {DataRetentionCustomPolicy} from 'types/data_retention';
 
 function logs(state: string[] = [], action: GenericAction) {
@@ -584,11 +584,7 @@ function samlMetadataResponse(state: Partial<SamlMetadataResponse> = {}, action:
     }
 }
 
-function dataRetentionCustomPolicies(state: {
-    [x: string]: DataRetentionCustomPolicy;
-} = {}, action: GenericAction): {
-        [x: string]: DataRetentionCustomPolicy;
-    } {
+function dataRetentionCustomPolicies(state: IDMappedObjects<DataRetentionCustomPolicy> = {}, action: GenericAction): IDMappedObjects<DataRetentionCustomPolicy>{
     switch (action.type) {
     case AdminTypes.RECEIVED_DATA_RETENTION_CUSTOM_POLICY: {
         return {
