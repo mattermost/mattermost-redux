@@ -4,7 +4,12 @@
 import {AppBinding} from '../types/apps';
 import {AppBindingLocations} from '../constants/apps';
 
-export function fillBindingsInformation(binding?: AppBinding) {
+// fillAndTrimBindingsInformation does:
+// - Build the location (e.g. channel_header/binding)
+// - Inherit app calls
+// - Inherit app ids
+// - Trim invalid bindings (do not have an app call or app id at the leaf)
+export function fillAndTrimBindingsInformation(binding?: AppBinding) {
     if (!binding) {
         return;
     }
@@ -23,7 +28,7 @@ export function fillBindingsInformation(binding?: AppBinding) {
             b.call = binding.call;
         }
 
-        fillBindingsInformation(b);
+        fillAndTrimBindingsInformation(b);
     });
 
     // Trim branches without app_id
@@ -51,9 +56,10 @@ export function validateBindings(binding?: AppBinding) {
     filterInvalidChannelHeaderBindings(binding);
     filterInvalidCommands(binding);
     filterInvalidPostMenuBindings(binding);
-    binding?.bindings?.forEach(fillBindingsInformation);
+    binding?.bindings?.forEach(fillAndTrimBindingsInformation);
 }
 
+// filterInvalidCommands remove commands without a label
 function filterInvalidCommands(binding?: AppBinding) {
     if (!binding) {
         return;
@@ -71,6 +77,8 @@ function filterInvalidCommands(binding?: AppBinding) {
     binding.bindings?.filter((b) => b.location === AppBindingLocations.COMMAND).forEach(validateCommand);
 }
 
+// filterInvalidChannelHeaderBindings remove bindings
+// without a label or without an icon.
 function filterInvalidChannelHeaderBindings(binding?: AppBinding) {
     if (!binding) {
         return;
@@ -88,6 +96,8 @@ function filterInvalidChannelHeaderBindings(binding?: AppBinding) {
     binding.bindings?.filter((b) => b.location === AppBindingLocations.CHANNEL_HEADER_ICON).forEach(validateChannelHeaderBinding);
 }
 
+// filterInvalidPostMenuBindings remove bindings
+// without a label.
 function filterInvalidPostMenuBindings(binding?: AppBinding) {
     if (!binding) {
         return;
@@ -104,4 +114,3 @@ function filterInvalidPostMenuBindings(binding?: AppBinding) {
 
     binding.bindings?.filter((b) => b.location === AppBindingLocations.POST_MENU_ITEM).forEach(validatePostMenuBinding);
 }
-
