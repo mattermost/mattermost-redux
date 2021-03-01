@@ -1,12 +1,15 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
 
+import Preferences from 'constants/preferences';
 import {createSelector} from 'reselect';
 import {getCurrentTeamId} from 'selectors/entities/teams';
 import {GlobalState} from 'types/store';
 import {Team} from 'types/teams';
 import {UserThread, ThreadsState} from 'types/threads';
-import {$ID, RelationOneToMany} from 'types/utilities';
+import {$ID, IDMappedObjects, RelationOneToMany} from 'types/utilities';
+import {getConfig, getFeatureFlagValue} from './general';
+import {get} from 'selectors/entities/preferences';
 
 export function getThreadsInTeam(state: GlobalState): RelationOneToMany<Team, UserThread> {
     return state.entities.threads.threadsInTeam;
@@ -42,7 +45,7 @@ export const getThreadCountsInCurrentTeam: (state: GlobalState) => ThreadsState[
     },
 );
 
-export function getThreads(state: GlobalState) {
+export function getThreads(state: GlobalState): IDMappedObjects<UserThread> {
     return state.entities.threads.threads;
 }
 
@@ -85,3 +88,37 @@ function sortByLastReply(ids: Array<$ID<UserThread>>, threads: ReturnType<typeof
     return ids.sort((a, b) => threads[b].last_reply_at - threads[a].last_reply_at);
 }
 
+export function getCollapsedThreadsPreference(state: GlobalState): string {
+    const configValue = getConfig(state).CollapsedThreads;
+    let preferenceDefault;
+
+    switch (configValue) {
+    case 'default_off':
+        preferenceDefault = Preferences.COLLAPSED_REPLY_THREADS_OFF;
+        break;
+    case 'default_on':
+        preferenceDefault = Preferences.COLLAPSED_REPLY_THREADS_ON;
+        break;
+    }
+
+    return get(
+        state,
+        Preferences.CATEGORY_DISPLAY_SETTINGS,
+        Preferences.COLLAPSED_REPLY_THREADS,
+        preferenceDefault ?? Preferences.COLLAPSED_REPLY_THREADS_FALLBACK_DEFAULT,
+    );
+}
+
+export function isCollapsedThreadsAllowed(state: GlobalState): boolean {
+    return (
+        getFeatureFlagValue(state, 'CollapsedThreads') === 'true' &&
+        getConfig(state).CollapsedThreads !== 'disabled'
+    );
+}
+
+export function isCollapsedThreadsEnabled(state: GlobalState): boolean {
+    const isAllowed = isCollapsedThreadsAllowed(state);
+    const userPreference = getCollapsedThreadsPreference(state);
+
+    return isAllowed && (userPreference === Preferences.COLLAPSED_REPLY_THREADS_ON || getConfig(state).CollapsedThreads as string === 'always_on');
+}
