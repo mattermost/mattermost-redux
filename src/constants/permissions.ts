@@ -85,8 +85,12 @@ const values = {
     SYSCONSOLE_WRITE_ABOUT: 'sysconsole_write_about',
     SYSCONSOLE_READ_BILLING: 'sysconsole_read_billing',
     SYSCONSOLE_WRITE_BILLING: 'sysconsole_write_billing',
-    SYSCONSOLE_READ_REPORTING: 'sysconsole_read_reporting',
-    SYSCONSOLE_WRITE_REPORTING: 'sysconsole_write_reporting',
+    SYSCONSOLE_READ_REPORTING_SITE_STATISTICS: 'sysconsole_read_reporting_site_statistics',
+    SYSCONSOLE_WRITE_REPORTING_SITE_STATISTICS: 'sysconsole_write_reporting_site_statistics',
+    SYSCONSOLE_READ_REPORTING_TEAM_STATISTICS: 'sysconsole_read_reporting_team_statistics',
+    SYSCONSOLE_WRITE_REPORTING_TEAM_STATISTICS: 'sysconsole_write_reporting_statistics',
+    SYSCONSOLE_READ_REPORTING_SERVER_LOGS: 'sysconsole_read_reporting_server_logs',
+    SYSCONSOLE_WRITE_REPORTING_SERVER_LOGS: 'sysconsole_write_reporting_server_logs',
     SYSCONSOLE_READ_USERMANAGEMENT_USERS: 'sysconsole_read_user_management_users',
     SYSCONSOLE_WRITE_USERMANAGEMENT_USERS: 'sysconsole_write_user_management_users',
     SYSCONSOLE_READ_USERMANAGEMENT_GROUPS: 'sysconsole_read_user_management_groups',
@@ -136,7 +140,9 @@ const values = {
 values.SYSCONSOLE_READ_PERMISSIONS = [
     values.SYSCONSOLE_READ_ABOUT,
     values.SYSCONSOLE_READ_BILLING,
-    values.SYSCONSOLE_READ_REPORTING,
+    values.SYSCONSOLE_READ_REPORTING_SITE_STATISTICS,
+    values.SYSCONSOLE_READ_REPORTING_TEAM_STATISTICS,
+    values.SYSCONSOLE_READ_REPORTING_SERVER_LOGS,
     values.SYSCONSOLE_READ_USERMANAGEMENT_USERS,
     values.SYSCONSOLE_READ_USERMANAGEMENT_GROUPS,
     values.SYSCONSOLE_READ_USERMANAGEMENT_TEAMS,
@@ -156,7 +162,9 @@ values.SYSCONSOLE_READ_PERMISSIONS = [
 values.SYSCONSOLE_WRITE_PERMISSIONS = [
     values.SYSCONSOLE_WRITE_ABOUT,
     values.SYSCONSOLE_WRITE_BILLING,
-    values.SYSCONSOLE_WRITE_REPORTING,
+    values.SYSCONSOLE_WRITE_REPORTING_SITE_STATISTICS,
+    values.SYSCONSOLE_WRITE_REPORTING_TEAM_STATISTICS,
+    values.SYSCONSOLE_WRITE_REPORTING_SERVER_LOGS,
     values.SYSCONSOLE_WRITE_USERMANAGEMENT_USERS,
     values.SYSCONSOLE_WRITE_USERMANAGEMENT_GROUPS,
     values.SYSCONSOLE_WRITE_USERMANAGEMENT_TEAMS,
@@ -201,9 +209,9 @@ values.SYSCONSOLE_ANCILLARY_PERMISSIONS = {
     [values.SYSCONSOLE_READ_AUTHENTICATION]: [
         values.READ_JOBS,
     ],
-    [values.SYSCONSOLE_READ_REPORTING]: [
-        values.VIEW_TEAM,
-    ],
+    // [values.SYSCONSOLE_READ_REPORTING]: [
+    //     values.VIEW_TEAM,
+    // ],
     [values.SYSCONSOLE_WRITE_USERMANAGEMENT_USERS]: [
         values.EDIT_OTHER_USERS,
         values.DEMOTE_TO_GUEST,
