@@ -33,7 +33,7 @@ import {
 } from 'types/config';
 import {CustomEmoji} from 'types/emojis';
 import {ServerError} from 'types/errors';
-import {FileInfo, FileUploadResponse} from 'types/files';
+import {FileInfo, FileUploadResponse, FileSearchResults} from 'types/files';
 import {
     Group,
     GroupPatch,
@@ -2083,6 +2083,19 @@ export default class Client4 {
 
     searchPosts = (teamId: string, terms: string, isOrSearch: boolean) => {
         return this.searchPostsWithParams(teamId, {terms, is_or_search: isOrSearch});
+    };
+
+    searchFilesWithParams = (teamId: string, params: any) => {
+        this.trackEvent('api', 'api_files_search', {team_id: teamId});
+
+        return this.doFetch<FileSearchResults>(
+            `${this.getTeamRoute(teamId)}/files/search`,
+            {method: 'post', body: JSON.stringify(params)},
+        );
+    };
+
+    searchFiles = (teamId: string, terms: string, isOrSearch: boolean) => {
+        return this.searchFilesWithParams(teamId, {terms, is_or_search: isOrSearch});
     };
 
     getOpenGraphMetadata = (url: string) => {

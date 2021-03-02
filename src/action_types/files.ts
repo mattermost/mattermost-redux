@@ -8,6 +8,7 @@ export default keyMirror({
     UPLOAD_FILES_FAILURE: null,
     UPLOAD_FILES_CANCEL: null,
 
+    RECEIVED_FILES_FOR_SEARCH: null,
     RECEIVED_FILES_FOR_POST: null,
     RECEIVED_UPLOAD_FILES: null,
     RECEIVED_FILE_PUBLIC_LINK: null,
