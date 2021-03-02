@@ -32,7 +32,7 @@ import {Reaction} from 'types/reactions';
 import {UserProfile} from 'types/users';
 import {Dictionary} from 'types/utilities';
 import {CustomEmoji} from 'types/emojis';
-import {isCollapsedThreadsEnabled} from 'selectors/entities/threads';
+import {isCollapsedThreadsEnabled} from 'selectors/entities/preferences';
 
 // receivedPost should be dispatched after a single post from the server. This typically happens when an existing post
 // is updated.
@@ -684,14 +684,13 @@ export function flagPost(postId: string) {
     };
 }
 
-export function getPostThread(rootId: string, fetchThreads = true, collapsedThreadsExtended = false) {
+export function getPostThread(rootId: string, fetchThreads = true) {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
-        const collapsedThreadsEnabled = isCollapsedThreadsEnabled(getState());
         dispatch({type: PostTypes.GET_POST_THREAD_REQUEST});
 
         let posts;
         try {
-            posts = await Client4.getPostThread(rootId, fetchThreads, collapsedThreadsEnabled, collapsedThreadsExtended);
+            posts = await Client4.getPostThread(rootId, fetchThreads);
             getProfilesAndStatusesForPosts(posts.posts, dispatch, getState);
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch, getState);
