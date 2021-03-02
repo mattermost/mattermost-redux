@@ -713,12 +713,12 @@ export function getPostThread(rootId: string, fetchThreads = true) {
     };
 }
 
-export function getPosts(channelId: string, page = 0, perPage = Posts.POST_CHUNK_SIZE, fetchThreads = true) {
+export function getPosts(channelId: string, page = 0, perPage = Posts.POST_CHUNK_SIZE, fetchThreads = true, collapsedThreadsExtended = false) {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         let posts;
         const collapsedThreadsEnabled = isCollapsedThreadsEnabled(getState());
         try {
-            posts = await Client4.getPosts(channelId, page, perPage, fetchThreads, collapsedThreadsEnabled, collapsedThreadsEnabled);
+            posts = await Client4.getPosts(channelId, page, perPage, fetchThreads, collapsedThreadsEnabled, collapsedThreadsExtended);
             getProfilesAndStatusesForPosts(posts.posts, dispatch, getState);
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch, getState);
