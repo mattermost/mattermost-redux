@@ -90,6 +90,8 @@ const values = {
     RECYCLE_DATABASE_CONNECTIONS: 'recycle_database_connections',
     CREATE_ELASTICSEARCH_POST_INDEXING_JOB: 'create_elasticsearch_post_indexing_job',
     CREATE_ELASTICSEARCH_POST_AGGREGATION_JOB: 'create_elasticsearch_post_aggregation_job',
+    READ_ELASTICSEARCH_POST_INDEXING_JOB: 'read_elasticsearch_post_indexing_job',
+    READ_ELASTICSEARCH_POST_AGGREGATION_JOB: 'read_elasticsearch_post_aggregation_job',
 
     SYSCONSOLE_READ_ABOUT: 'sysconsole_read_about',
     SYSCONSOLE_WRITE_ABOUT: 'sysconsole_write_about',
@@ -250,6 +252,8 @@ values.SYSCONSOLE_ANCILLARY_PERMISSIONS = {
     ],
     [values.SYSCONSOLE_READ_ENVIRONMENT_ELASTICSEARCH]: [
         values.TEST_ELASTICSEARCH,
+        values.READ_ELASTICSEARCH_POST_INDEXING_JOB,
+        values.READ_ELASTICSEARCH_POST_AGGREGATION_JOB,
     ],
     [values.SYSCONSOLE_READ_ENVIRONMENT_FILE_STORAGE]: [
         values.TEST_S3,
