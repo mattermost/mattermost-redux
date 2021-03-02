@@ -100,7 +100,7 @@ import {isSystemAdmin} from 'utils/user_utils';
 
 import fetch from './fetch_etag';
 import {TelemetryHandler} from './telemetry';
-import {UserThreadList, UserThread} from 'types/threads';
+import {UserThreadList, UserThread, UserThreadWithPost} from 'types/threads';
 
 const FormData = require('form-data');
 const HEADER_AUTH = 'Authorization';
@@ -1958,7 +1958,7 @@ export default class Client4 {
 
     getUserThread = (userId: string, teamId: string, threadId: string, extended = false) => {
         const url = `${this.getUserThreadRoute(userId, teamId, threadId)}`;
-        return this.doFetch<UserThread>(
+        return this.doFetch<UserThreadWithPost>(
             `${url}${buildQueryString({extended})}`,
             {method: 'get'},
         );
@@ -1982,7 +1982,7 @@ export default class Client4 {
 
     updateThreadReadForUser = (userId: string, teamId: string, threadId: string, timestamp: number) => {
         const url = `${this.getUserThreadRoute(userId, teamId, threadId)}/read/${timestamp}`;
-        return this.doFetch<StatusOK>(
+        return this.doFetch<UserThread>(
             url,
             {method: 'put'},
         );
