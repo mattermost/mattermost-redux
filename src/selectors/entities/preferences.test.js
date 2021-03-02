@@ -9,10 +9,16 @@ import * as Selectors from 'selectors/entities/preferences';
 
 import mergeObjects from 'test/merge_objects';
 
+import * as ThemeUtils from 'utils/theme_utils';
+
 import deepFreezeAndThrowOnMutation from 'utils/deep_freeze';
 import {getPreferenceKey} from 'utils/preference_utils';
 
 describe('Selectors.Preferences', () => {
+    afterAll(() => {
+        jest.restoreAllMocks();
+    });
+
     const category1 = 'testcategory1';
     const category2 = 'testcategory2';
     const directCategory = Preferences.CATEGORY_DIRECT_CHANNEL_SHOW;
@@ -175,6 +181,10 @@ describe('Selectors.Preferences', () => {
     });
 
     describe('get theme', () => {
+        beforeEach(async () => {
+            jest.spyOn(ThemeUtils, 'blendColors').mockReturnValue('#efefef');
+        });
+
         it('default theme', () => {
             const currentTeamId = '1234';
 
@@ -297,6 +307,31 @@ describe('Selectors.Preferences', () => {
                     },
                 },
             }).mentionBg, theme.mentionBg);
+        });
+
+        it('updates sideBarTeamBarBg variable when its not present', () => {
+            const currentTeamId = '1234';
+            const theme = {sidebarHeaderBg: '#ff0000'};
+
+            assert.deepEqual(Selectors.getTheme({
+                entities: {
+                    general: {
+                        config: {
+                            DefaultTheme: 'default',
+                        },
+                    },
+                    teams: {
+                        currentTeamId,
+                    },
+                    preferences: {
+                        myPreferences: {
+                            [getPreferenceKey(Preferences.CATEGORY_THEME, '')]: {
+                                category: Preferences.CATEGORY_THEME, name: '', value: JSON.stringify(theme),
+                            },
+                        },
+                    },
+                },
+            }).sidebarTeamBarBg, ThemeUtils.blendColors(theme.sidebarHeaderBg, '#000000', 0.2));
         });
 
         it('memoization', () => {

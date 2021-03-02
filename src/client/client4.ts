@@ -3534,6 +3534,13 @@ export default class Client4 {
         );
     }
 
+    sendAdminUpgradeRequestEmailOnJoin = () => {
+        return this.doFetch<StatusOK>(
+            `${this.getCloudRoute()}/subscription/limitreached/join`,
+            {method: 'post'},
+        );
+    }
+
     // Client Helpers
 
     doFetch = async <T>(url: string, options: Options): Promise<T> => {
