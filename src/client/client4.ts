@@ -3300,7 +3300,7 @@ export default class Client4 {
     // to breaking changes without pushing the major version of this package.
     getAppsBindings = async (userID: string, channelID: string) => {
         return this.doFetch<AppBinding[]>(
-            this.getAppsProxyRoute() + `/api/v1/bindings?user_id=${userID}&channel_id=${channelID}&scope=webapp`,
+            this.getAppsProxyRoute() + `/api/v1/bindings?user_id=${userID}&channel_id=${channelID}&user_agent_type=webapp`,
             {method: 'get'},
         );
     }
