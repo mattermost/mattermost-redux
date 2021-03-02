@@ -3279,6 +3279,7 @@ export default class Client4 {
     };
 
     executeAppCall = async (call: AppCall) => {
+        call.context.user_agent = 'webapp';
         return this.doFetch<AppCallResponse>(
             `${this.getAppsProxyRoute()}/api/v1/call`,
             {method: 'post', body: JSON.stringify(call)},
