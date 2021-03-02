@@ -213,6 +213,9 @@ export default class Client4 {
         return `${this.url}${this.urlVersion}`;
     }
 
+    // This function belongs to the Apps Framework feature.
+    // Apps Framework feature is experimental, and this function is susceptible
+    // to breaking changes without pushing the major version of this package.
     getAppsProxyRoute() {
         return `${this.url}/plugins/com.mattermost.apps`;
     }
@@ -3161,6 +3164,9 @@ export default class Client4 {
         );
     }
 
+    // This function belongs to the Apps Framework feature.
+    // Apps Framework feature is experimental, and this function is susceptible
+    // to breaking changes without pushing the major version of this package.
     getMarketplaceApps = (filter: string) => {
         return this.doFetch<MarketplaceApp[]>(
             `${this.getAppsProxyRoute()}/api/v1/marketplace${buildQueryString({filter: filter || ''})}`,
@@ -3278,6 +3284,9 @@ export default class Client4 {
         );
     };
 
+    // This function belongs to the Apps Framework feature.
+    // Apps Framework feature is experimental, and this function is susceptible
+    // to breaking changes without pushing the major version of this package.
     executeAppCall = async (call: AppCall) => {
         call.context.user_agent = 'webapp';
         return this.doFetch<AppCallResponse>(
@@ -3286,6 +3295,9 @@ export default class Client4 {
         );
     }
 
+    // This function belongs to the Apps Framework feature.
+    // Apps Framework feature is experimental, and this function is susceptible
+    // to breaking changes without pushing the major version of this package.
     getAppsBindings = async (userID: string, channelID: string) => {
         return this.doFetch<AppBinding[]>(
             this.getAppsProxyRoute() + `/api/v1/bindings?user_id=${userID}&channel_id=${channelID}&scope=webapp`,
