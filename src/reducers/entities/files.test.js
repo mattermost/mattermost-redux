@@ -6,6 +6,7 @@ import assert from 'assert';
 import {PostTypes} from 'action_types';
 import {
     files as filesReducer,
+    filesFromSearch as filesFromSearchReducer,
     fileIdsByPostId as fileIdsByPostIdReducer,
 } from 'reducers/entities/files';
 import deepFreeze from 'utils/deep_freeze';
@@ -179,6 +180,22 @@ describe('reducers/entities/files', () => {
                     file4: {id: 'file4', post_id: 'post2'},
                 });
             });
+        });
+    });
+
+    describe('filesFromSearch', () => {
+        const state = deepFreeze({});
+        const action = {
+            type: 'RECEIVED_FILES_FOR_SEARCH',
+            data: {
+                file1: {id: 'file1', post_id: 'post'},
+                file2: {id: 'file2', post_id: 'post'},
+            },
+        };
+        const nextState = filesFromSearchReducer(state, action);
+        assert.deepEqual(nextState, {
+            file1: {id: 'file1', post_id: 'post'},
+            file2: {id: 'file2', post_id: 'post'},
         });
     });
 
