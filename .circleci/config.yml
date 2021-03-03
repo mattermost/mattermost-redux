@@ -10,12 +10,12 @@ executors:
 aliases:
   - &restore_cache
     restore_cache:
-      key: dependencies-{{ checksum "package-lock.json" }}
+      key: yarn-packages-{{ checksum "yarn.lock" }}
   - &save_cache
     save_cache:
-      key: dependencies-{{ checksum "package-lock.json" }}
+      key: yarn-packages-{{ checksum "yarn.lock" }}
       paths:
-        - node_modules
+        - ~/.cache/yarn
 
 jobs:
   install:
@@ -25,7 +25,7 @@ jobs:
       - checkout
       - run: ls -la
       - *restore_cache
-      - run: npm ci
+      - run: yarn install
       - run: ls -la
       - *save_cache
 
@@ -85,8 +85,8 @@ jobs:
     steps:
       - checkout
       - *restore_cache
-      - run: npm run check
-      - run: npm run tsc
+      - run: yarn run check
+      - run: yarn run tsc
 
   test:
     executor:
@@ -95,7 +95,7 @@ jobs:
     steps:
       - checkout
       - *restore_cache
-      - run: npm test
+      - run: yarn test
       - store_test_results:
           path: build/
 
