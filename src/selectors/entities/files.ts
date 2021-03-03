@@ -5,13 +5,17 @@ import {createSelector} from 'reselect';
 
 import {getCurrentUserLocale} from 'selectors/entities/i18n';
 
-import {FileInfo} from 'types/files';
+import {FileInfo, FileSearchResultItem} from 'types/files';
 import {GlobalState} from 'types/store';
 
 import {sortFileInfos} from 'utils/file_utils';
 
 function getAllFiles(state: GlobalState) {
     return state.entities.files.files;
+}
+
+function getAllFilesFromSearch(state: GlobalState) {
+    return state.entities.files.filesFromSearch;
 }
 
 function getFilesIdsForPost(state: GlobalState, postId: string) {
@@ -38,3 +42,16 @@ export function makeGetFilesForPost(): (state: GlobalState, postId: string) => F
         },
     );
 }
+
+export const getSearchFilesResults: (state: GlobalState) => FileSearchResultItem[] = createSelector(
+    getAllFilesFromSearch,
+    (state: GlobalState) => state.entities.search.fileResults,
+    (files, fileIds) => {
+        if (!fileIds) {
+            return [];
+        }
+
+        return fileIds.map((id) => files[id]);
+    },
+);
+

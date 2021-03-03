@@ -113,6 +113,77 @@ describe('reducers.entities.search', () => {
         });
     });
 
+    describe('fileResults', () => {
+        it('initial state', () => {
+            const inputState = undefined; // eslint-disable-line no-undef
+            const action = {};
+            const expectedState = [];
+
+            const actualState = reducer({fileResults: inputState}, action);
+            assert.deepEqual(actualState.fileResults, expectedState);
+        });
+
+        describe('SearchTypes.RECEIVED_SEARCH_POSTS', () => {
+            it('first file results received', () => {
+                const inputState = [];
+                const action = {
+                    type: SearchTypes.RECEIVED_SEARCH_FILES,
+                    data: {
+                        order: ['abcd', 'efgh'],
+                        file_infos: {
+                            abcd: {id: 'abcd'},
+                            efgh: {id: 'efgh'},
+                        },
+                    },
+                };
+                const expectedState = ['abcd', 'efgh'];
+
+                const actualState = reducer({fileResults: inputState}, action);
+                assert.deepEqual(actualState.fileResults, expectedState);
+            });
+
+            it('multiple file results received', () => {
+                const inputState = ['1234', '1235'];
+                const action = {
+                    type: SearchTypes.RECEIVED_SEARCH_FILES,
+                    data: {
+                        order: ['abcd', 'efgh'],
+                        file_infos: {
+                            abcd: {id: 'abcd'},
+                            efgh: {id: 'efgh'},
+                        },
+                    },
+                };
+                const expectedState = ['abcd', 'efgh'];
+
+                const actualState = reducer({fileResults: inputState}, action);
+                assert.deepEqual(actualState.fileResults, expectedState);
+            });
+        });
+
+        describe('SearchTypes.REMOVE_SEARCH_FILES', () => {
+            const inputState = ['abcd', 'efgh'];
+            const action = {
+                type: SearchTypes.REMOVE_SEARCH_FILES,
+            };
+            const expectedState = [];
+
+            const actualState = reducer({fileResults: inputState}, action);
+            assert.deepEqual(actualState.fileResults, expectedState);
+        });
+
+        describe('UserTypes.LOGOUT_SUCCESS', () => {
+            const inputState = ['abcd', 'efgh'];
+            const action = {
+                type: UserTypes.LOGOUT_SUCCESS,
+            };
+            const expectedState = [];
+
+            const actualState = reducer({fileResults: inputState}, action);
+            assert.deepEqual(actualState.fileResults, expectedState);
+        });
+    });
+
     describe('matches', () => {
         it('initial state', () => {
             const inputState = undefined; // eslint-disable-line no-undef
