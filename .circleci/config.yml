@@ -5,7 +5,7 @@ executors:
   default:
     working_directory: ~/mattermost-redux
     docker:
-      - image: circleci/node:11.3.0
+      - image: circleci/node:14.16.0
 
 aliases:
   - &restore_cache
@@ -25,7 +25,10 @@ jobs:
       - checkout
       - run: ls -la
       - *restore_cache
-      - run: yarn install
+      - run: |
+        node --version
+        yarn --version
+        yarn install
       - run: ls -la
       - *save_cache
 
