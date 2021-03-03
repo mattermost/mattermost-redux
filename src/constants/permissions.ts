@@ -209,6 +209,7 @@ values.SYSCONSOLE_ANCILLARY_PERMISSIONS = {
     [values.SYSCONSOLE_READ_AUTHENTICATION]: [
         values.READ_JOBS,
     ],
+
     // [values.SYSCONSOLE_READ_REPORTING]: [
     //     values.VIEW_TEAM,
     // ],
