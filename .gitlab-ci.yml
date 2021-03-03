@@ -12,22 +12,22 @@ cache:
       - package.json
     prefix: ${CI_COMMIT_REF_SLUG}
   paths:
-    - .npm/
+    - .yarn/
     - node_modules/
 
 lint:
   stage: test
   image: $CI_REGISTRY/mattermost/ci/images/mattermost-build-webapp:20200829_node-10.22
   before_script:
-    - npm ci --cache .npm --prefer-offline
+    - yarn install
   script:
-    - npm run check
-    - npm run tsc
+    - yarn run check
+    - yarn run tsc
 
 test:
   stage: test
   image: $CI_REGISTRY/mattermost/ci/images/mattermost-build-webapp:20200829_node-10.22
   before_script:
-    - npm ci --cache .npm --prefer-offline
+    - yarn install
   script:
-    - npm test
+    - yarn test
