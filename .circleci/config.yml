@@ -15,6 +15,7 @@ aliases:
     save_cache:
       key: yarn-packages-{{ checksum "yarn.lock" }}
       paths:
+        - node_modules
         - ~/.cache/yarn
 
 jobs:
