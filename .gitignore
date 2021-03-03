@@ -9,9 +9,15 @@
 # node.js
 #
 node_modules/
-npm-debug.log
-.npminstall
-.yarninstall
+
+# Yarn
+.yarn/*
+!.yarn/patches
+!.yarn/releases
+!.yarn/plugins
+!.yarn/sdks
+!.yarn/versions
+.pnp.*
 
 # Vim
 [._]*.s[a-w][a-z]

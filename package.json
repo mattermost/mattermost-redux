@@ -18,7 +18,7 @@
     "test": "jest --forceExit --detectOpenHandles --maxWorkers=2",
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage",
-    "prepare": "npm run build",
+    "prepare": "yarn run build",
     "dev": "ttsc --outDir ${WEBAPP_DIR:-../mattermost-webapp}/node_modules/mattermost-redux",
     "dev-mobile": "ttsc --outDir ${MOBILE_DIR:-../mattermost-mobile}/node_modules/mattermost-redux",
     "dev:watch": "ttsc --watch --outDir ${WEBAPP_DIR:-../mattermost-webapp}/node_modules/mattermost-redux",
@@ -43,7 +43,7 @@
   },
   "husky": {
     "hooks": {
-      "pre-commit": "npm run check && npm run tsc"
+      "pre-commit": "yarn run check && yarn run tsc"
     }
   },
   "jest-junit": {
