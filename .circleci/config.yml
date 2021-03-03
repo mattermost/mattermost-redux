@@ -26,9 +26,9 @@ jobs:
       - run: ls -la
       - *restore_cache
       - run: |
-        node --version
-        yarn --version
-        yarn install
+          node --version
+          yarn --version
+          yarn install --immutable
       - run: ls -la
       - *save_cache
 
