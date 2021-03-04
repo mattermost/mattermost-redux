@@ -9,7 +9,7 @@ export type AppManifest = {
     display_name: string;
     description?: string;
     homepage_url?: string;
-    root_url: string;
+    root_url?: string;
 }
 
 export type AppModalState = {
