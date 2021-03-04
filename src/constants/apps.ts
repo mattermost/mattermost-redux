@@ -19,7 +19,7 @@ export const AppBindingPresentations = {
 };
 
 export const AppCallResponseTypes: { [name: string]: AppCallResponseType } = {
-    OK: '',
+    OK: 'ok',
     ERROR: 'error',
     FORM: 'form',
     CALL: 'call',
@@ -27,7 +27,7 @@ export const AppCallResponseTypes: { [name: string]: AppCallResponseType } = {
 };
 
 export const AppCallTypes: { [name: string]: AppCallType } = {
-    SUBMIT: '',
+    SUBMIT: 'submit',
     LOOKUP: 'lookup',
     FORM: 'form',
     CANCEL: 'cancel',
