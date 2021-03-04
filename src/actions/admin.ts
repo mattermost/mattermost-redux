@@ -7,6 +7,13 @@ import {Client4} from 'client';
 import {Action, ActionFunc, batchActions, DispatchFunc, GetStateFunc} from 'types/actions';
 import {Compliance} from 'types/compliance';
 import {GroupSearchOpts} from 'types/groups';
+import {
+    DataRetentionCustomPolicies, 
+    CreateDataRetentionCustomPolicy, 
+    PatchDataRetentionCustomPolicy, 
+    PatchDataRetentionCustomPolicyTeams, 
+    PatchDataRetentionCustomPolicyChannels
+} from 'types/data_retention';
 
 import {bindClientFunc, forceLogoutIfNecessary} from './helpers';
 import {logError} from './errors';
@@ -723,4 +730,93 @@ export function getDataRetentionCustomPolicyTeams(id: string, page = 0, perPage:
 
         return {data};
     };
+}
+
+export function getDataRetentionCustomPolicyChannels(id: string, page = 0, perPage: number = General.TEAMS_CHUNK_SIZE): ActionFunc {
+    return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
+        let data;
+        try {
+            data = await Client4.getDataRetentionCustomPolicyChannels(id, page, perPage);
+        } catch (error) {
+            forceLogoutIfNecessary(error, dispatch, getState);
+            dispatch(
+                {
+                    type: AdminTypes.RECEIVED_DATA_RETENTION_CUSTOM_POLICY_CHANNELS,
+                    error,
+                }
+            );
+            return {error};
+        }
+
+        dispatch(
+            {type: AdminTypes.RECEIVED_DATA_RETENTION_CUSTOM_POLICY_CHANNELS, data},
+        );
+
+        return {data};
+    };
+}
+
+export function createDataRetentionCustomPolicy(policy: CreateDataRetentionCustomPolicy): ActionFunc {
+    return bindClientFunc({
+        clientFunc: Client4.createDataRetentionPolicy,
+        onSuccess: AdminTypes.CREATE_DATA_RETENTION_CUSTOM_POLICY_SUCCESS,
+        params: [
+            policy,
+        ],
+    });
+}
+
+export function updateDataRetentionCustomPolicy(id: string, policy: CreateDataRetentionCustomPolicy): ActionFunc {
+    return bindClientFunc({
+        clientFunc: Client4.updateDataRetentionPolicy,
+        onSuccess: AdminTypes.UPDATE_DATA_RETENTION_CUSTOM_POLICY_SUCCESS,
+        params: [
+            id,
+            policy,
+        ],
+    });
+}
+
+export function addDataRetentionCustomPolicyTeams(id: string, policy: PatchDataRetentionCustomPolicyTeams): ActionFunc {
+    return bindClientFunc({
+        clientFunc: Client4.addDataRetentionPolicyTeams,
+        onSuccess: AdminTypes.ADD_DATA_RETENTION_CUSTOM_POLICY_TEAMS_SUCCESS,
+        params: [
+            id,
+            policy,
+        ],
+    });
+}
+
+export function removeDataRetentionCustomPolicyTeams(id: string, policy: PatchDataRetentionCustomPolicyTeams): ActionFunc {
+    return bindClientFunc({
+        clientFunc: Client4.removeDataRetentionPolicyTeams,
+        onSuccess: AdminTypes.REMOVE_DATA_RETENTION_CUSTOM_POLICY_TEAMS_SUCCESS,
+        params: [
+            id,
+            policy,
+        ],
+    });
+}
+
+export function addDataRetentionCustomPolicyChannels(id: string, policy: PatchDataRetentionCustomPolicyChannels): ActionFunc {
+    return bindClientFunc({
+        clientFunc: Client4.addDataRetentionPolicyChannels,
+        onSuccess: AdminTypes.ADD_DATA_RETENTION_CUSTOM_POLICY_CHANNELS_SUCCESS,
+        params: [
+            id,
+            policy,
+        ],
+    });
+}
+
+export function removeDataRetentionCustomPolicyChannels(id: string, policy: PatchDataRetentionCustomPolicyChannels): ActionFunc {
+    return bindClientFunc({
+        clientFunc: Client4.removeDataRetentionPolicyChannels,
+        onSuccess: AdminTypes.REMOVE_DATA_RETENTION_CUSTOM_POLICY_CHANNELS_SUCCESS,
+        params: [
+            id,
+            policy,
+        ],
+    });
 }
