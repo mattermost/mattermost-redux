@@ -10,10 +10,10 @@ executors:
 aliases:
   - &restore_cache
     restore_cache:
-      key: yarn-packages-{{ checksum "yarn.lock" }}
+      key: yarn-packages-{{ checksum "yarn.lock" }}-aaa
   - &save_cache
     save_cache:
-      key: yarn-packages-{{ checksum "yarn.lock" }}
+      key: yarn-packages-{{ checksum "yarn.lock" }}-aaa
       paths:
         - node_modules
         - ~/.cache/yarn
