@@ -2,7 +2,7 @@
 // See LICENSE.txt for license information.
 
 import * as redux from 'redux';
-import {createOfflineReducer, networkStatusChangedAction, offlineCompose} from 'redux-offline';
+import {createOfflineReducer, offlineCompose} from 'redux-offline';
 import defaultOfflineConfig from 'redux-offline/lib/defaults';
 import reducerRegistry from './reducer_registry';
 
@@ -44,12 +44,6 @@ export default function configureServiceStore(preloadedState: any, appReducer: a
     // launch store persistor
     if (baseOfflineConfig.persist) {
         baseOfflineConfig.persist(store, baseOfflineConfig.persistOptions, baseOfflineConfig.persistCallback);
-    }
-
-    if (baseOfflineConfig.detectNetwork) {
-        baseOfflineConfig.detectNetwork((online: boolean) => {
-            store.dispatch(networkStatusChangedAction(online));
-        });
     }
 
     if ((module as any).hot) {

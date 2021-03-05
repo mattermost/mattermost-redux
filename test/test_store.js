@@ -12,7 +12,6 @@ export default async function testConfigureStore(preloadedState) {
     );
 
     const offlineConfig = {
-        detectNetwork: (callback) => callback(true),
         persist: (store, options) => {
             return persistStore(store, {storage: new AsyncNodeStorage('./.tmp'), ...options});
         },

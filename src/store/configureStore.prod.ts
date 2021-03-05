@@ -10,7 +10,7 @@ import {offlineConfig, createReducer} from './helpers';
 import initialState from './initial_state';
 import {createMiddleware} from './middleware';
 
-import {createOfflineReducer, networkStatusChangedAction, offlineCompose} from 'redux-offline';
+import {createOfflineReducer, offlineCompose} from 'redux-offline';
 import defaultOfflineConfig from 'redux-offline/lib/defaults';
 
 /**
@@ -44,12 +44,6 @@ export default function configureOfflineServiceStore(preloadedState: any, appRed
     // launch store persistor
     if (baseOfflineConfig.persist) {
         baseOfflineConfig.persist(store, baseOfflineConfig.persistOptions, baseOfflineConfig.persistCallback);
-    }
-
-    if (baseOfflineConfig.detectNetwork) {
-        baseOfflineConfig.detectNetwork((online: boolean) => {
-            store.dispatch(networkStatusChangedAction(online));
-        });
     }
 
     return store;
