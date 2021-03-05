@@ -1,15 +1,13 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
 
-import * as redux from 'redux';
-import {createOfflineReducer, offlineCompose} from 'redux-offline';
-import defaultOfflineConfig from 'redux-offline/lib/defaults';
+import {createStore, applyMiddleware} from 'redux';
 import reducerRegistry from './reducer_registry';
 
 import serviceReducer from '../reducers';
 import deepFreezeAndThrowOnMutation from 'utils/deep_freeze';
 import initialState from './initial_state';
-import {offlineConfig, createReducer} from './helpers';
+import {createReducer} from './helpers';
 import {createMiddleware} from './middleware';
 import {Reducer, Action} from 'types/actions';
 import {GlobalState} from 'types/store';
@@ -18,32 +16,28 @@ import {GlobalState} from 'types/store';
  * Configures and constructs the redux store. Accepts the following parameters:
  * preloadedState - Any preloaded state to be applied to the store after it is initially configured.
  * appReducer - An object containing any app-specific reducer functions that the client needs.
- * userOfflineConfig - Any additional configuration data to be passed into redux-offline aside from the default values.
+ * persistConfig - Any additional configuration data to be passed into redux-persist aside from the default values.
  * getAppReducer - A function that returns the appReducer as defined above. Only used in development to enable hot reloading.
  * clientOptions - An object containing additional options used when configuring the redux store. The following options are available:
  *     additionalMiddleware - func | array - Allows for single or multiple additional middleware functions to be passed in from the client side.
  *     enableThunk - bool - default = true - If true, include the thunk middleware automatically. If false, thunk must be provided as part of additionalMiddleware.
  */
-export default function configureServiceStore(preloadedState: any, appReducer: any, userOfflineConfig: any, getAppReducer: any, clientOptions: any) {
-    const baseOfflineConfig = Object.assign({}, defaultOfflineConfig, offlineConfig, userOfflineConfig);
+export default function configureServiceStore(preloadedState: any, appReducer: any, persistConfig: any, getAppReducer: any, clientOptions: any) {
     const baseState = Object.assign({}, initialState, preloadedState);
 
-    const store = redux.createStore(
-        enableFreezing(createOfflineReducer(createDevReducer(baseState, serviceReducer, appReducer))),
+    const store = createStore(
+        enableFreezing(createDevReducer(baseState, serviceReducer, appReducer)),
         baseState,
-        offlineCompose(baseOfflineConfig)(
-            createMiddleware(clientOptions),
-            [],
-        ),
+        applyMiddleware(...createMiddleware(clientOptions)),
     );
 
     reducerRegistry.setChangeListener((reducers: any) => {
-        store.replaceReducer(enableFreezing(createOfflineReducer(createDevReducer(baseState, reducers))));
+        store.replaceReducer(enableFreezing(createDevReducer(baseState, reducers)));
     });
 
     // launch store persistor
-    if (baseOfflineConfig.persist) {
-        baseOfflineConfig.persist(store, baseOfflineConfig.persistOptions, baseOfflineConfig.persistCallback);
+    if (persistConfig.persist) {
+        persistConfig.persist(store, persistConfig.persistOptions, persistConfig.persistCallback);
     }
 
     if ((module as any).hot) {
