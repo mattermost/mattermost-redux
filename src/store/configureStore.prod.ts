@@ -1,7 +1,7 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
 
-import {createStore, applyMiddleware} from 'redux';
+import {createStore, applyMiddleware, Store} from 'redux';
 import reducerRegistry from './reducer_registry';
 
 import serviceReducer from '../reducers';
@@ -20,7 +20,7 @@ import {createMiddleware} from './middleware';
  *     additionalMiddleware - func | array - Allows for single or multiple additional middleware functions to be passed in from the client side.
  *     enableThunk - bool - default = true - If true, include the thunk middleware automatically. If false, thunk must be provided as part of additionalMiddleware.
  */
-export default function configureOfflineServiceStore(preloadedState: any, appReducer: any, persistConfig: any, getAppReducer: any, clientOptions = {}) {
+export default function configureOfflineServiceStore(preloadedState: any, appReducer: any, persistConfig: any, getAppReducer: any, clientOptions = {}): Store {
     const baseState = Object.assign({}, initialState, preloadedState);
 
     const store = createStore(
