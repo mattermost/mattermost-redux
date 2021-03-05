@@ -181,59 +181,6 @@ describe('Actions.Posts', () => {
         assert.equal(postIdForFiles.length, files.length);
     });
 
-    // it('retry failed post', async () => {
-    //     const channelId = TestHelper.basicChannel.id;
-    //     const post = TestHelper.fakePost(channelId);
-
-    //     nock(Client4.getBaseRoute()).
-    //         post('/posts').
-    //         reply(400, {});
-
-    //     nock(Client4.getBaseRoute()).
-    //         post('').
-    //         reply(201, {...post, id: TestHelper.generateId()});
-
-    //     await Actions.createPost(post)(store.dispatch, store.getState);
-
-    //     await TestHelper.wait(200);
-
-    //     let state = store.getState();
-
-    //     const {posts} = state.entities.posts;
-    //     assert.ok(posts);
-
-    //     let failedPost;
-    //     for (const storedPost of Object.values(posts)) {
-    //         if (storedPost.failed) {
-    //             failedPost = storedPost;
-    //             break;
-    //         }
-    //     }
-
-    //     assert.ok(failedPost, 'failed to find failed post');
-
-    //     // Retry the post
-    //     const {id, failed, ...retryPost} = failedPost; // eslint-disable-line
-    //     await Actions.createPost(retryPost)(store.dispatch, store.getState);
-
-    //     await TestHelper.wait(500);
-
-    //     state = store.getState();
-    //     const {posts: nextPosts} = state.entities.posts;
-
-    //     let found = false;
-    //     for (const storedPost of Object.values(nextPosts)) {
-    //         if (storedPost.pending_post_id === failedPost.pending_post_id) {
-    //             if (!storedPost.failed) {
-    //                 found = true;
-    //                 break;
-    //             }
-    //         }
-    //     }
-
-    //     assert.ok(found, 'Retried post failed again.');
-    // });
-
     it('editPost', async () => {
         const channelId = TestHelper.basicChannel.id;
 
