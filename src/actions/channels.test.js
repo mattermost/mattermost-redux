@@ -2027,7 +2027,7 @@ describe('Actions.Channels', () => {
 
     describe('leaveChannel', () => {
         const team = TestHelper.fakeTeam();
-        const user = TestHelper.fakeUser();
+        const user = TestHelper.fakeUserWithId();
 
         test('should delete the channel member when leaving a public channel', async () => {
             const channel = {id: 'channel', team_id: team.id, type: General.OPEN_CHANNEL};
@@ -2041,6 +2041,9 @@ describe('Actions.Channels', () => {
                         myMembers: {
                             [channel.id]: {channel_id: channel.id, user_id: user.id},
                         },
+                    },
+                    users: {
+                        currentUserId: user.id,
                     },
                 },
             });
@@ -2069,6 +2072,9 @@ describe('Actions.Channels', () => {
                         myMembers: {
                             [channel.id]: {channel_id: channel.id, user_id: user.id},
                         },
+                    },
+                    users: {
+                        currentUserId: user.id,
                     },
                 },
             });
@@ -2288,7 +2294,7 @@ describe('Actions.Channels', () => {
         });
 
         nock(Client4.getBaseRoute()).
-            put(`/users/${TestHelper.basicUser.id}/preferences`).
+            put(`/users/${currentUserId}/preferences`).
             reply(200, OK_RESPONSE);
 
         await store.dispatch(Actions.favoriteChannel(channel.id));
@@ -2499,9 +2505,18 @@ describe('Actions.Channels', () => {
     it('markGroupChannelOpen', async () => {
         const channelId = TestHelper.generateId();
         const now = new Date().getTime();
+        const currentUserId = TestHelper.generateId();
+
+        store = await configureStore({
+            entities: {
+                users: {
+                    currentUserId,
+                },
+            },
+        });
 
         nock(Client4.getBaseRoute()).
-            put(`/users/${TestHelper.basicUser.id}/preferences`).
+            put(`/users/${currentUserId}/preferences`).
             reply(200, OK_RESPONSE);
 
         await Actions.markGroupChannelOpen(channelId)(store.dispatch, store.getState);
