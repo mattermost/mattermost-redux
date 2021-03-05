@@ -2,6 +2,7 @@
 // See LICENSE.txt for license information.
 
 import {createStore, applyMiddleware} from 'redux';
+import {composeWithDevTools} from 'redux-devtools-extension';
 import reducerRegistry from './reducer_registry';
 
 import serviceReducer from '../reducers';
@@ -28,7 +29,9 @@ export default function configureServiceStore(preloadedState: any, appReducer: a
     const store = createStore(
         enableFreezing(createDevReducer(baseState, serviceReducer, appReducer)),
         baseState,
-        applyMiddleware(...createMiddleware(clientOptions)),
+        composeWithDevTools(
+            applyMiddleware(...createMiddleware(clientOptions)),
+        ),
     );
 
     reducerRegistry.setChangeListener((reducers: any) => {
