@@ -2131,6 +2131,47 @@ describe('Actions.Channels', () => {
             expect(state.entities.channels.myMembers[channel.id]).not.toBeDefined();
             expect(state.entities.channelCategories.byId[category.id].channel_ids).toEqual([]);
         });
+
+        test('should restore a channel when failing to leave it (non-custom category)', async () => {
+            const channel = {id: 'channel', team_id: team.id, type: General.OPEN_CHANNEL};
+            const category = {id: 'category', team_id: team.id, type: CategoryTypes.CHANNELS, channel_ids: [channel.id]};
+
+            store = await configureStore({
+                entities: {
+                    channelCategories: {
+                        byId: {
+                            category,
+                        },
+                        orderByTeam: {
+                            [team.id]: [category.id],
+                        },
+                    },
+                    channels: {
+                        channels: {
+                            channel,
+                        },
+                        myMembers: {
+                            [channel.id]: {channel_id: channel.id, user_id: user.id},
+                        },
+                    },
+                    users: {
+                        currentUserId: user.id,
+                    },
+                },
+            });
+
+            nock(Client4.getBaseRoute()).
+                delete(`/channels/${channel.id}/members/${user.id}`).
+                reply(500, {});
+
+            await store.dispatch(Actions.leaveChannel(channel.id));
+
+            const state = store.getState();
+
+            expect(state.entities.channels.channels[channel.id]).toBeDefined();
+            expect(state.entities.channels.myMembers[channel.id]).toBeDefined();
+            expect(state.entities.channelCategories.byId[category.id].channel_ids).toEqual([channel.id]);
+        });
     });
 
     test('joinChannel', async () => {
