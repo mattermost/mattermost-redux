@@ -103,7 +103,9 @@ describe('threads', () => {
             unread_mentions_per_channel: {
                 a: 0,
             },
-            unread_replies_per_channel: {},
+            unread_replies_per_channel: {
+                a: 0,
+            },
             total_unread_mentions: 0,
         });
 
@@ -113,6 +115,8 @@ describe('threads', () => {
                 teamId: 'a',
                 prevUnreadMentions: 0,
                 newUnreadMentions: 3,
+                prevUnreadReplies: 1,
+                newUnreadReplies: 2,
                 channelId: 'a',
             },
         });
@@ -124,7 +128,9 @@ describe('threads', () => {
             unread_mentions_per_channel: {
                 a: 3,
             },
-            unread_replies_per_channel: {},
+            unread_replies_per_channel: {
+                a: 2,
+            },
             total_unread_mentions: 3,
         });
     });
@@ -154,7 +160,6 @@ describe('threads', () => {
             total: 3,
             total_unread_threads: 0,
             unread_mentions_per_channel: {a: 2},
-            unread_replies_per_channel: {},
             total_unread_mentions: 2,
         });
     });
