@@ -6,7 +6,6 @@ import nock from 'nock';
 
 import * as Actions from 'actions/roles';
 import {Client4} from 'client';
-import {RequestStatus} from '../constants';
 
 import TestHelper from 'test/test_helper';
 import configureStore from 'test/test_store';
@@ -30,36 +29,28 @@ describe('Actions.Roles', () => {
         nock(Client4.getRolesRoute()).
             post('/names').
             reply(200, [TestHelper.basicRoles.system_admin]);
+
         await Actions.getRolesByNames(['system_admin'])(store.dispatch, store.getState);
 
         const state = store.getState();
-        const request = state.requests.roles.getRolesByNames;
         const {roles} = state.entities.roles;
 
-        if (request.status === RequestStatus.FAILURE) {
-            throw new Error(JSON.stringify(request.error));
-        }
-
-        assert.equal(roles.system_admin.name, 'system_admin');
-        assert.deepEqual(roles.system_admin.permissions, TestHelper.basicRoles.system_admin.permissions);
+        assert.strictEqual(roles.system_admin.name, 'system_admin');
+        assert.deepStrictEqual(roles.system_admin.permissions, TestHelper.basicRoles.system_admin.permissions);
     });
 
     it('getRoleByName', async () => {
         nock(Client4.getRolesRoute()).
             get('/name/system_admin').
             reply(200, TestHelper.basicRoles.system_admin);
+
         await Actions.getRoleByName('system_admin')(store.dispatch, store.getState);
 
         const state = store.getState();
-        const request = state.requests.roles.getRolesByNames;
         const {roles} = state.entities.roles;
 
-        if (request.status === RequestStatus.FAILURE) {
-            throw new Error(JSON.stringify(request.error));
-        }
-
-        assert.equal(roles.system_admin.name, 'system_admin');
-        assert.deepEqual(roles.system_admin.permissions, TestHelper.basicRoles.system_admin.permissions);
+        assert.strictEqual(roles.system_admin.name, 'system_admin');
+        assert.deepStrictEqual(roles.system_admin.permissions, TestHelper.basicRoles.system_admin.permissions);
     });
 
     it('getRole', async () => {
@@ -70,15 +61,10 @@ describe('Actions.Roles', () => {
         await Actions.getRole(TestHelper.basicRoles.system_admin.id)(store.dispatch, store.getState);
 
         const state = store.getState();
-        const request = state.requests.roles.getRole;
         const {roles} = state.entities.roles;
 
-        if (request.status === RequestStatus.FAILURE) {
-            throw new Error(JSON.stringify(request.error));
-        }
-
-        assert.equal(roles.system_admin.name, 'system_admin');
-        assert.deepEqual(roles.system_admin.permissions, TestHelper.basicRoles.system_admin.permissions);
+        assert.strictEqual(roles.system_admin.name, 'system_admin');
+        assert.deepStrictEqual(roles.system_admin.permissions, TestHelper.basicRoles.system_admin.permissions);
     });
 
     it('loadRolesIfNeeded', async () => {
