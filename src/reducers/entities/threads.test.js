@@ -22,6 +22,7 @@ describe('threads', () => {
                 ],
                 total: 3,
                 unread_mentions_per_channel: {},
+                unread_replies_per_channel: {},
                 total_unread_threads: 0,
                 total_unread_mentions: 1,
             },
@@ -35,6 +36,7 @@ describe('threads', () => {
             total: 3,
             total_unread_threads: 0,
             unread_mentions_per_channel: {},
+            unread_replies_per_channel: {},
             total_unread_mentions: 1,
         });
         expect(nextState.threadsInTeam.a).toContain('t1');
@@ -63,6 +65,7 @@ describe('threads', () => {
             total: 3,
             total_unread_threads: 0,
             unread_mentions_per_channel: {},
+            unread_replies_per_channel: {},
             total_unread_mentions: 0,
         });
     });
@@ -76,6 +79,7 @@ describe('threads', () => {
                     unread_mentions_per_channel: {
                         a: 3,
                     },
+                    unread_replies_per_channel: {},
                     total: 3,
                     total_unread_threads: 1,
                     total_unread_mentions: 3,
@@ -99,6 +103,7 @@ describe('threads', () => {
             unread_mentions_per_channel: {
                 a: 0,
             },
+            unread_replies_per_channel: {},
             total_unread_mentions: 0,
         });
 
@@ -119,6 +124,7 @@ describe('threads', () => {
             unread_mentions_per_channel: {
                 a: 3,
             },
+            unread_replies_per_channel: {},
             total_unread_mentions: 3,
         });
     });
@@ -148,6 +154,7 @@ describe('threads', () => {
             total: 3,
             total_unread_threads: 0,
             unread_mentions_per_channel: {a: 2},
+            unread_replies_per_channel: {},
             total_unread_mentions: 2,
         });
     });
@@ -167,6 +174,7 @@ describe('threads', () => {
                 ],
                 total: 3,
                 unread_mentions_per_channel: {},
+                unread_replies_per_channel: {},
                 total_unread_threads: 0,
                 total_unread_mentions: 1,
             },

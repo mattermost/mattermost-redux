@@ -120,12 +120,13 @@ export const threadsInTeamReducer = (state: ThreadsState['threadsInTeam'] = {}, 
 export const countsReducer = (state: ThreadsState['counts'] = {}, action: GenericAction) => {
     switch (action.type) {
     case ThreadTypes.ALL_TEAM_THREADS_READ: {
-        const counts = state[action.data.team_id] ?? {unread_mentions_per_channel: {}};
+        const counts = state[action.data.team_id] ?? {unread_mentions_per_channel: {}, unread_replies_per_channel: {}};
         return {
             ...state,
             [action.data.team_id]: {
                 ...counts,
                 unread_mentions_per_channel: {},
+                unread_replies_per_channel: {},
                 total_unread_mentions: 0,
                 total_unread_threads: 0,
             },
@@ -146,6 +147,9 @@ export const countsReducer = (state: ThreadsState['counts'] = {}, action: Generi
             unread_mentions_per_channel: {
                 [channelId]: 0,
             },
+            unread_replies_per_channel: {
+                [channelId]: 0,
+            },
             total_unread_threads: 0,
             total: 0,
             total_unread_mentions: 0,
@@ -161,6 +165,14 @@ export const countsReducer = (state: ThreadsState['counts'] = {}, action: Generi
         }
 
         counts.total_unread_mentions += unreadMentionDiff;
+
+        if (counts.unread_replies_per_channel[channelId]) {
+            const nc = {...counts.unread_replies_per_channel};
+            nc[channelId] += newUnreadReplies - prevUnreadReplies;
+            counts.unread_replies_per_channel = nc;
+        } else {
+            counts.unread_replies_per_channel = {[channelId]: newUnreadReplies};
+        }
 
         if (newUnreadReplies > 0 && prevUnreadReplies === 0) {
             counts.total_unread_threads += 1;
@@ -187,6 +199,7 @@ export const countsReducer = (state: ThreadsState['counts'] = {}, action: Generi
             ...state,
             [action.data.team_id]: {
                 unread_mentions_per_channel: state[action.data.team_id]?.unread_mentions_per_channel ?? {},
+                unread_replies_per_channel: state[action.data.team_id]?.unread_replies_per_channel ?? {},
                 total: action.data.total,
                 total_unread_threads: action.data.total_unread_threads,
                 total_unread_mentions: action.data.total_unread_mentions,
@@ -210,6 +223,7 @@ export const countsReducer = (state: ThreadsState['counts'] = {}, action: Generi
         return {
             total: 0,
             unread_mentions_per_channel: {},
+            unread_replies_per_channel: {},
             total_unread_threads: 0,
             total_unread_mentions: 0,
         };

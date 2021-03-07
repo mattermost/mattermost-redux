@@ -44,5 +44,6 @@ export type ThreadsState = {
         total_unread_threads: number;
         total_unread_mentions: number;
         unread_mentions_per_channel: Record<$ID<Channel>, number>;
+        unread_replies_per_channel: Record<$ID<Channel>, number>;
     }>;
 };
