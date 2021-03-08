@@ -109,6 +109,7 @@ const state: GlobalState = {
         },
         files: {
             files: {},
+            filesFromSearch: {},
             fileIdsByPostId: {},
         },
         emojis: {
@@ -117,6 +118,7 @@ const state: GlobalState = {
         },
         search: {
             results: [],
+            fileResults: [],
             current: {},
             recent: {},
             matches: {},

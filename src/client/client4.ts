@@ -34,7 +34,7 @@ import {
 } from 'types/config';
 import {CustomEmoji} from 'types/emojis';
 import {ServerError} from 'types/errors';
-import {FileInfo, FileUploadResponse} from 'types/files';
+import {FileInfo, FileUploadResponse, FileSearchResults} from 'types/files';
 import {
     Group,
     GroupPatch,
@@ -104,7 +104,7 @@ import {isSystemAdmin} from 'utils/user_utils';
 
 import fetch from './fetch_etag';
 import {TelemetryHandler} from './telemetry';
-import {UserThreadList, UserThread} from 'types/threads';
+import {UserThreadList, UserThread, UserThreadWithPost} from 'types/threads';
 
 const FormData = require('form-data');
 const HEADER_AUTH = 'Authorization';
@@ -213,6 +213,9 @@ export default class Client4 {
         return `${this.url}${this.urlVersion}`;
     }
 
+    // This function belongs to the Apps Framework feature.
+    // Apps Framework feature is experimental, and this function is susceptible
+    // to breaking changes without pushing the major version of this package.
     getAppsProxyRoute() {
         return `${this.url}/plugins/com.mattermost.apps`;
     }
@@ -1966,7 +1969,7 @@ export default class Client4 {
 
     getUserThread = (userId: string, teamId: string, threadId: string, extended = false) => {
         const url = `${this.getUserThreadRoute(userId, teamId, threadId)}`;
-        return this.doFetch<UserThread>(
+        return this.doFetch<UserThreadWithPost>(
             `${url}${buildQueryString({extended})}`,
             {method: 'get'},
         );
@@ -1990,7 +1993,7 @@ export default class Client4 {
 
     updateThreadReadForUser = (userId: string, teamId: string, threadId: string, timestamp: number) => {
         const url = `${this.getUserThreadRoute(userId, teamId, threadId)}/read/${timestamp}`;
-        return this.doFetch<StatusOK>(
+        return this.doFetch<UserThread>(
             url,
             {method: 'put'},
         );
@@ -2091,6 +2094,19 @@ export default class Client4 {
 
     searchPosts = (teamId: string, terms: string, isOrSearch: boolean) => {
         return this.searchPostsWithParams(teamId, {terms, is_or_search: isOrSearch});
+    };
+
+    searchFilesWithParams = (teamId: string, params: any) => {
+        this.trackEvent('api', 'api_files_search', {team_id: teamId});
+
+        return this.doFetch<FileSearchResults>(
+            `${this.getTeamRoute(teamId)}/files/search`,
+            {method: 'post', body: JSON.stringify(params)},
+        );
+    };
+
+    searchFiles = (teamId: string, terms: string, isOrSearch: boolean) => {
+        return this.searchFilesWithParams(teamId, {terms, is_or_search: isOrSearch});
     };
 
     getOpenGraphMetadata = (url: string) => {
@@ -3161,6 +3177,9 @@ export default class Client4 {
         );
     }
 
+    // This function belongs to the Apps Framework feature.
+    // Apps Framework feature is experimental, and this function is susceptible
+    // to breaking changes without pushing the major version of this package.
     getMarketplaceApps = (filter: string) => {
         return this.doFetch<MarketplaceApp[]>(
             `${this.getAppsProxyRoute()}/api/v1/marketplace${buildQueryString({filter: filter || ''})}`,
@@ -3278,16 +3297,23 @@ export default class Client4 {
         );
     };
 
+    // This function belongs to the Apps Framework feature.
+    // Apps Framework feature is experimental, and this function is susceptible
+    // to breaking changes without pushing the major version of this package.
     executeAppCall = async (call: AppCall) => {
+        call.context.user_agent = 'webapp';
         return this.doFetch<AppCallResponse>(
             `${this.getAppsProxyRoute()}/api/v1/call`,
             {method: 'post', body: JSON.stringify(call)},
         );
     }
 
+    // This function belongs to the Apps Framework feature.
+    // Apps Framework feature is experimental, and this function is susceptible
+    // to breaking changes without pushing the major version of this package.
     getAppsBindings = async (userID: string, channelID: string) => {
         return this.doFetch<AppBinding[]>(
-            this.getAppsProxyRoute() + `/api/v1/bindings?user_id=${userID}&channel_id=${channelID}&scope=webapp`,
+            this.getAppsProxyRoute() + `/api/v1/bindings?user_id=${userID}&channel_id=${channelID}&user_agent_type=webapp`,
             {method: 'get'},
         );
     }
@@ -3559,6 +3585,13 @@ export default class Client4 {
     sendAdminUpgradeRequestEmail = () => {
         return this.doFetch<StatusOK>(
             `${this.getCloudRoute()}/subscription/limitreached/invite`,
+            {method: 'post'},
+        );
+    }
+
+    sendAdminUpgradeRequestEmailOnJoin = () => {
+        return this.doFetch<StatusOK>(
+            `${this.getCloudRoute()}/subscription/limitreached/join`,
             {method: 'post'},
         );
     }

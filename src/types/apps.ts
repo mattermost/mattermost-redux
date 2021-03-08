@@ -1,12 +1,15 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
 
+// This file's contents belong to the Apps Framework feature.
+// Apps Framework feature is experimental, and the contents of this file are
+// susceptible to breaking changes without pushing the major version of this package.
 export type AppManifest = {
     app_id: string;
     display_name: string;
     description?: string;
     homepage_url?: string;
-    root_url: string;
+    root_url?: string;
 }
 
 export type AppModalState = {
@@ -58,7 +61,7 @@ export type AppCallValues = {
 export type AppCallType = string;
 
 export type AppCall = {
-    url: string;
+    path: string;
     type?: AppCallType;
     values?: AppCallValues;
     context: AppContext;
@@ -89,6 +92,7 @@ export type AppContext = {
     post_id?: string;
     root_id?: string;
     props?: AppContextProps;
+    user_agent?: string;
 };
 
 export type AppContextProps = {

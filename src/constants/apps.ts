@@ -3,6 +3,10 @@
 
 import {AppCallResponseType, AppCallType, AppExpandLevel, AppFieldType} from 'types/apps';
 
+// This file's contents belong to the Apps Framework feature.
+// Apps Framework feature is experimental, and the contents of this file are
+// susceptible to breaking changes without pushing the major version of this package.
+
 export const AppBindingLocations = {
     POST_MENU_ITEM: '/post_menu',
     CHANNEL_HEADER_ICON: '/channel_header',
@@ -15,7 +19,7 @@ export const AppBindingPresentations = {
 };
 
 export const AppCallResponseTypes: { [name: string]: AppCallResponseType } = {
-    OK: '',
+    OK: 'ok',
     ERROR: 'error',
     FORM: 'form',
     CALL: 'call',
@@ -23,7 +27,7 @@ export const AppCallResponseTypes: { [name: string]: AppCallResponseType } = {
 };
 
 export const AppCallTypes: { [name: string]: AppCallType } = {
-    SUBMIT: '',
+    SUBMIT: 'submit',
     LOOKUP: 'lookup',
     FORM: 'form',
     CANCEL: 'cancel',
