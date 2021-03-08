@@ -5,6 +5,7 @@ import fs from 'fs';
 import assert from 'assert';
 import nock from 'nock';
 
+import {FileTypes} from 'action_types';
 import * as Actions from 'actions/files';
 import {Client4} from 'client';
 import {RequestStatus} from '../constants';
@@ -119,5 +120,16 @@ describe('Actions.Files', () => {
         assert.equal('https://mattermost.com/files/ndans23ry2rtjd1z73g6i5f3fc/public?h=rE1-b2N1VVVMsAQssjwlfNawbVOwUy1TRDuTeGC_tys', filePublicLink);
         assert.ok(filePublicLink);
         assert.ok(filePublicLink.length > 0);
+    });
+
+    it('receivedFiles', async () => {
+        const files = {
+            filename: {data: 'data'},
+        };
+        const result = Actions.receivedFiles(files);
+        assert.deepEqual(result, {
+            type: FileTypes.RECEIVED_FILES_FOR_SEARCH,
+            data: files,
+        });
     });
 });
