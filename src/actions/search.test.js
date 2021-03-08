@@ -134,4 +134,53 @@ describe('Actions.Search', () => {
         //assert.equal(Object.keys(recent[TestHelper.basicTeam.id]).length, 1);
         //assert.equal(results.length, 0);
     });
+
+    it('Perform Files Search', async () => {
+        const {dispatch, getState} = store;
+
+        const files = TestHelper.fakeFiles(2);
+        files[0].channel_id = TestHelper.basicChannel.id;
+        files[1].channel_id = TestHelper.basicChannel.id;
+
+        // Test for a couple of words
+        const search1 = 'try word';
+
+        nock(Client4.getTeamsRoute()).
+            post(`/${TestHelper.basicTeam.id}/files/search`).
+            reply(200, {order: [files[0].id], file_infos: {[files[0].id]: files[0]}});
+        nock(Client4.getChannelsRoute()).
+            get(`/${TestHelper.basicChannel.id}/members/me`).
+            reply(201, {user_id: TestHelper.basicUser.id, channel_id: TestHelper.basicChannel.id});
+
+        await Actions.searchFiles(TestHelper.basicTeam.id, search1)(dispatch, getState);
+
+        let state = getState();
+        let {recent, fileResults} = state.entities.search;
+        const {filesFromSearch} = state.entities.files;
+        let current = state.entities.search.current[TestHelper.basicTeam.id];
+        assert.ok(recent[TestHelper.basicTeam.id]);
+        let searchIsPresent = recent[TestHelper.basicTeam.id].findIndex((r) => r.terms === search1);
+        assert.ok(searchIsPresent !== -1);
+        assert.equal(Object.keys(recent[TestHelper.basicTeam.id]).length, 1);
+        assert.equal(fileResults.length, 1);
+        assert.ok(filesFromSearch[fileResults[0]]);
+        assert.ok(!current.isFilesEnd);
+
+        // Search the next page and check the end of the search
+        nock(Client4.getTeamsRoute()).
+            post(`/${TestHelper.basicTeam.id}/files/search`).
+            reply(200, {order: [], file_infos: {}});
+
+        await Actions.searchFilesWithParams(TestHelper.basicTeam.id, {terms: search1, page: 1})(dispatch, getState);
+        state = getState();
+        current = state.entities.search.current[TestHelper.basicTeam.id];
+        recent = state.entities.search.recent;
+        fileResults = state.entities.search.fileResults;
+        assert.ok(recent[TestHelper.basicTeam.id]);
+        searchIsPresent = recent[TestHelper.basicTeam.id].findIndex((r) => r.terms === search1);
+        assert.ok(searchIsPresent !== -1);
+        assert.equal(Object.keys(recent[TestHelper.basicTeam.id]).length, 1);
+        assert.equal(fileResults.length, 1);
+        assert.ok(current.isFilesEnd);
+    });
 });
