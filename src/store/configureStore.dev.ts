@@ -27,7 +27,7 @@ export default function configureServiceStore(preloadedState: any, appReducer: a
     const baseState = Object.assign({}, initialState, preloadedState);
 
     const store = createStore(
-        enableFreezing(createDevReducer(baseState, serviceReducer, appReducer)),
+        createDevReducer(baseState, serviceReducer, appReducer),
         baseState,
         composeWithDevTools(
             applyMiddleware(...createMiddleware(clientOptions)),
@@ -35,7 +35,7 @@ export default function configureServiceStore(preloadedState: any, appReducer: a
     );
 
     reducerRegistry.setChangeListener((reducers: any) => {
-        store.replaceReducer(enableFreezing(createDevReducer(baseState, reducers)));
+        store.replaceReducer(createDevReducer(baseState, reducers));
     });
 
     // launch store persistor
@@ -51,7 +51,7 @@ export default function configureServiceStore(preloadedState: any, appReducer: a
             if (getAppReducer) {
                 nextAppReducer = getAppReducer(); // eslint-disable-line global-require
             }
-            store.replaceReducer(enableFreezing(createDevReducer(baseState, reducerRegistry.getReducers(), nextServiceReducer, nextAppReducer)));
+            store.replaceReducer(createDevReducer(baseState, reducerRegistry.getReducers(), nextServiceReducer, nextAppReducer));
         });
     }
 
@@ -59,7 +59,7 @@ export default function configureServiceStore(preloadedState: any, appReducer: a
 }
 
 function createDevReducer(baseState: any, ...reducers: any) {
-    return createReducer(baseState, ...reducers);
+    return enableFreezing(createReducer(baseState, ...reducers));
 }
 
 function enableFreezing(reducer: Reducer) {
