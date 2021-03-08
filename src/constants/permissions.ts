@@ -166,7 +166,6 @@ const values = {
     SYSCONSOLE_WRITE_PERMISSIONS: [] as string[],
     MANAGE_SHARED_CHANNELS: 'manage_shared_channels',
     MANAGE_REMOTE_CLUSTERS: 'manage_remote_clusters',
-    SYSCONSOLE_ANCILLARY_PERMISSIONS: {} as Record<string, string[]>,
 };
 
 values.SYSCONSOLE_READ_PERMISSIONS = [
@@ -232,94 +231,5 @@ values.SYSCONSOLE_WRITE_PERMISSIONS = [
     values.SYSCONSOLE_WRITE_EXPERIMENTAL_FEATURE_FLAGS,
     values.SYSCONSOLE_WRITE_EXPERIMENTAL_BLEVE,
 ];
-
-values.SYSCONSOLE_ANCILLARY_PERMISSIONS = {
-    [values.SYSCONSOLE_READ_USERMANAGEMENT_CHANNELS]: [
-        values.READ_PUBLIC_CHANNEL,
-        values.READ_CHANNEL,
-        values.READ_PUBLIC_CHANNEL_GROUPS,
-        values.READ_PRIVATE_CHANNEL_GROUPS,
-    ],
-    [values.SYSCONSOLE_READ_USERMANAGEMENT_USERS]: [
-        values.READ_OTHER_USERS_TEAMS,
-    ],
-    [values.SYSCONSOLE_READ_USERMANAGEMENT_TEAMS]: [
-        values.LIST_PRIVATE_TEAMS,
-        values.LIST_PUBLIC_TEAMS,
-        values.VIEW_TEAM,
-    ],
-    [values.SYSCONSOLE_WRITE_COMPLIANCE]: [
-        values.MANAGE_JOBS,
-    ],
-    [values.SYSCONSOLE_READ_COMPLIANCE]: [
-        values.READ_JOBS,
-        values.DOWNLOAD_COMPLIANCE_EXPORT_RESULT,
-    ],
-    [values.SYSCONSOLE_READ_ENVIRONMENT_ELASTICSEARCH]: [
-        values.READ_ELASTICSEARCH_POST_INDEXING_JOB,
-        values.READ_ELASTICSEARCH_POST_AGGREGATION_JOB,
-    ],
-    [values.SYSCONSOLE_READ_AUTHENTICATION]: [
-        values.READ_JOBS,
-    ],
-    [values.SYSCONSOLE_READ_REPORTING]: [
-        values.VIEW_TEAM,
-    ],
-    [values.SYSCONSOLE_WRITE_USERMANAGEMENT_USERS]: [
-        values.EDIT_OTHER_USERS,
-        values.DEMOTE_TO_GUEST,
-        values.PROMOTE_GUEST,
-    ],
-    [values.SYSCONSOLE_WRITE_USERMANAGEMENT_CHANNELS]: [
-        values.MANAGE_TEAM,
-        values.MANAGE_PUBLIC_CHANNEL_PROPERTIES,
-        values.MANAGE_PRIVATE_CHANNEL_PROPERTIES,
-        values.MANAGE_PRIVATE_CHANNEL_MEMBERS,
-        values.MANAGE_PUBLIC_CHANNEL_MEMBERS,
-        values.DELETE_PRIVATE_CHANNEL,
-        values.DELETE_PUBLIC_CHANNEL,
-        values.MANAGE_CHANNEL_ROLES,
-        values.CONVERT_PUBLIC_CHANNEL_TO_PRIVATE,
-        values.CONVERT_PRIVATE_CHANNEL_TO_PUBLIC,
-    ],
-    [values.SYSCONSOLE_WRITE_USERMANAGEMENT_TEAMS]: [
-        values.MANAGE_TEAM,
-        values.MANAGE_TEAM_ROLES,
-        values.REMOVE_USER_FROM_TEAM,
-        values.JOIN_PRIVATE_TEAMS,
-        values.JOIN_PUBLIC_TEAMS,
-        values.ADD_USER_TO_TEAM,
-    ],
-    [values.SYSCONSOLE_WRITE_USERMANAGEMENT_GROUPS]: [
-        values.MANAGE_TEAM,
-        values.MANAGE_PRIVATE_CHANNEL_MEMBERS,
-        values.MANAGE_PUBLIC_CHANNEL_MEMBERS,
-        values.CONVERT_PUBLIC_CHANNEL_TO_PRIVATE,
-        values.CONVERT_PRIVATE_CHANNEL_TO_PUBLIC,
-    ],
-    [values.SYSCONSOLE_WRITE_ENVIRONMENT_WEB_SERVER]: [
-        values.TEST_SITE_URL,
-        values.RELOAD_CONFIG,
-        values.INVALIDATE_CACHES,
-    ],
-    [values.SYSCONSOLE_WRITE_ENVIRONMENT_DATABASE]: [
-        values.RECYCLE_DATABASE_CONNECTIONS,
-    ],
-    [values.SYSCONSOLE_WRITE_ENVIRONMENT_ELASTICSEARCH]: [
-        values.TEST_ELASTICSEARCH,
-        values.CREATE_ELASTICSEARCH_POST_INDEXING_JOB,
-        values.CREATE_ELASTICSEARCH_POST_AGGREGATION_JOB,
-        values.PURGE_ELASTICSEARCH_INDEXES,
-    ],
-    [values.SYSCONSOLE_WRITE_ENVIRONMENT_FILE_STORAGE]: [
-        values.TEST_S3,
-    ],
-    [values.SYSCONSOLE_WRITE_ENVIRONMENT_SMTP]: [
-        values.TEST_EMAIL,
-    ],
-    [values.SYSCONSOLE_WRITE_SITE]: [
-        values.EDIT_BRAND,
-    ],
-};
 
 export default values;
