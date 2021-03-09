@@ -6,7 +6,7 @@ import {getCurrentTeamId} from 'selectors/entities/teams';
 import {GlobalState} from 'types/store';
 import {Team} from 'types/teams';
 import {UserThread, ThreadsState} from 'types/threads';
-import {$ID, RelationOneToMany} from 'types/utilities';
+import {$ID, IDMappedObjects, RelationOneToMany} from 'types/utilities';
 
 export function getThreadsInTeam(state: GlobalState): RelationOneToMany<Team, UserThread> {
     return state.entities.threads.threadsInTeam;
@@ -42,7 +42,7 @@ export const getThreadCountsInCurrentTeam: (state: GlobalState) => ThreadsState[
     },
 );
 
-export function getThreads(state: GlobalState) {
+export function getThreads(state: GlobalState): IDMappedObjects<UserThread> {
     return state.entities.threads.threads;
 }
 
@@ -101,4 +101,3 @@ export const getUnreadThreadOrderInCurrentTeam: (
 function sortByLastReply(ids: Array<$ID<UserThread>>, threads: ReturnType<typeof getThreads>) {
     return ids.sort((a, b) => threads[b].last_reply_at - threads[a].last_reply_at);
 }
-
