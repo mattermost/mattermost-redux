@@ -27,7 +27,7 @@ export const RESOURCE_KEYS = {
         POSTS: 'site.posts',
         FILE_SHARING_AND_DOWNLOADS: 'site.file_sharing_and_downloads',
         PUBLIC_LINKS: 'site.public_links',
-        NOTICES: 'site.notices'
+        NOTICES: 'site.notices',
     },
     EXPERIMENTAL: {
         FEATURES: 'experimental.features',
