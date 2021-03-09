@@ -109,10 +109,20 @@ const values = {
     SYSCONSOLE_WRITE_PLUGINS: 'sysconsole_write_plugins',
     SYSCONSOLE_READ_INTEGRATIONS: 'sysconsole_read_integrations',
     SYSCONSOLE_WRITE_INTEGRATIONS: 'sysconsole_write_integrations',
-    SYSCONSOLE_READ_COMPLIANCE: 'sysconsole_read_compliance',
-    SYSCONSOLE_WRITE_COMPLIANCE: 'sysconsole_write_compliance',
-    SYSCONSOLE_READ_EXPERIMENTAL: 'sysconsole_read_experimental',
-    SYSCONSOLE_WRITE_EXPERIMENTAL: 'sysconsole_write_experimental',
+    SYSCONSOLE_READ_COMPLIANCE_DATA_RETENTION_POLICY: 'sysconsole_read_compliance_data_retention_policy',
+    SYSCONSOLE_WRITE_COMPLIANCE_DATA_RETENTION_POLICY: 'sysconsole_write_compliance_data_retention_policy',
+    SYSCONSOLE_READ_COMPLIANCE_COMPLIANCE_EXPORT: 'sysconsole_read_compliance_compliance_export',
+    SYSCONSOLE_WRITE_COMPLIANCE_COMPLIANCE_EXPORT: 'sysconsole_write_compliance_compliance_export',
+    SYSCONSOLE_READ_COMPLIANCE_COMPLIANCE_MONITORING: 'sysconsole_read_compliance_compliance_monitoring',
+    SYSCONSOLE_WRITE_COMPLIANCE_COMPLIANCE_MONITORING: 'sysconsole_write_compliance_compliance_monitoring',
+    SYSCONSOLE_READ_COMPLIANCE_CUSTOM_TERMS_OF_SERVICE: 'sysconsole_read_compliance_custom_terms_of_service',
+    SYSCONSOLE_WRITE_COMPLIANCE_CUSTOM_TERMS_OF_SERVICE: 'sysconsole_read_compliance_custom_terms_of_service',
+    SYSCONSOLE_READ_EXPERIMENTAL_FEATURES: 'sysconsole_read_experimental_features',
+    SYSCONSOLE_WRITE_EXPERIMENTAL_FEATURES: 'sysconsole_write_experimental_features',
+    SYSCONSOLE_READ_EXPERIMENTAL_FEATURE_FLAGS: 'sysconsole_read_experimental_feature_flags',
+    SYSCONSOLE_WRITE_EXPERIMENTAL_FEATURE_FLAGS: 'sysconsole_write_experimental_feature_flags',
+    SYSCONSOLE_READ_EXPERIMENTAL_BLEVE: 'sysconsole_read_experimental_bleve',
+    SYSCONSOLE_WRITE_EXPERIMENTAL_BLEVE: 'sysconsole_write_experimental_bleve',
 
     CHANNEL_MODERATED_PERMISSIONS: {
         CREATE_POST: 'create_post',
@@ -126,7 +136,6 @@ const values = {
     SYSCONSOLE_WRITE_PERMISSIONS: [] as string[],
     MANAGE_SHARED_CHANNELS: 'manage_shared_channels',
     MANAGE_REMOTE_CLUSTERS: 'manage_remote_clusters',
-    SYSCONSOLE_ANCILLARY_PERMISSIONS: {} as Record<string, string[]>,
 };
 
 values.SYSCONSOLE_READ_PERMISSIONS = [
@@ -143,8 +152,13 @@ values.SYSCONSOLE_READ_PERMISSIONS = [
     values.SYSCONSOLE_READ_AUTHENTICATION,
     values.SYSCONSOLE_READ_PLUGINS,
     values.SYSCONSOLE_READ_INTEGRATIONS,
-    values.SYSCONSOLE_READ_COMPLIANCE,
-    values.SYSCONSOLE_READ_EXPERIMENTAL,
+    values.SYSCONSOLE_READ_COMPLIANCE_DATA_RETENTION_POLICY,
+    values.SYSCONSOLE_READ_COMPLIANCE_COMPLIANCE_EXPORT,
+    values.SYSCONSOLE_READ_COMPLIANCE_COMPLIANCE_MONITORING,
+    values.SYSCONSOLE_READ_COMPLIANCE_CUSTOM_TERMS_OF_SERVICE,
+    values.SYSCONSOLE_READ_EXPERIMENTAL_FEATURES,
+    values.SYSCONSOLE_READ_EXPERIMENTAL_FEATURE_FLAGS,
+    values.SYSCONSOLE_READ_EXPERIMENTAL_BLEVE,
 ];
 
 values.SYSCONSOLE_WRITE_PERMISSIONS = [
@@ -161,79 +175,13 @@ values.SYSCONSOLE_WRITE_PERMISSIONS = [
     values.SYSCONSOLE_WRITE_AUTHENTICATION,
     values.SYSCONSOLE_WRITE_PLUGINS,
     values.SYSCONSOLE_WRITE_INTEGRATIONS,
-    values.SYSCONSOLE_WRITE_COMPLIANCE,
-    values.SYSCONSOLE_WRITE_EXPERIMENTAL,
+    values.SYSCONSOLE_WRITE_COMPLIANCE_DATA_RETENTION_POLICY,
+    values.SYSCONSOLE_WRITE_COMPLIANCE_COMPLIANCE_EXPORT,
+    values.SYSCONSOLE_WRITE_COMPLIANCE_COMPLIANCE_MONITORING,
+    values.SYSCONSOLE_WRITE_COMPLIANCE_CUSTOM_TERMS_OF_SERVICE,
+    values.SYSCONSOLE_WRITE_EXPERIMENTAL_FEATURES,
+    values.SYSCONSOLE_WRITE_EXPERIMENTAL_FEATURE_FLAGS,
+    values.SYSCONSOLE_WRITE_EXPERIMENTAL_BLEVE,
 ];
-
-values.SYSCONSOLE_ANCILLARY_PERMISSIONS = {
-    [values.SYSCONSOLE_READ_USERMANAGEMENT_CHANNELS]: [
-        values.READ_PUBLIC_CHANNEL,
-        values.READ_CHANNEL,
-        values.READ_PUBLIC_CHANNEL_GROUPS,
-        values.READ_PRIVATE_CHANNEL_GROUPS,
-    ],
-    [values.SYSCONSOLE_READ_USERMANAGEMENT_USERS]: [
-        values.READ_OTHER_USERS_TEAMS,
-    ],
-    [values.SYSCONSOLE_READ_USERMANAGEMENT_TEAMS]: [
-        values.LIST_PRIVATE_TEAMS,
-        values.LIST_PUBLIC_TEAMS,
-        values.VIEW_TEAM,
-    ],
-    [values.SYSCONSOLE_WRITE_COMPLIANCE]: [
-        values.MANAGE_JOBS,
-    ],
-    [values.SYSCONSOLE_READ_COMPLIANCE]: [
-        values.READ_JOBS,
-        values.DOWNLOAD_COMPLIANCE_EXPORT_RESULT,
-    ],
-    [values.SYSCONSOLE_READ_ENVIRONMENT]: [
-        values.READ_JOBS,
-    ],
-    [values.SYSCONSOLE_READ_AUTHENTICATION]: [
-        values.READ_JOBS,
-    ],
-    [values.SYSCONSOLE_READ_REPORTING]: [
-        values.VIEW_TEAM,
-    ],
-    [values.SYSCONSOLE_WRITE_USERMANAGEMENT_USERS]: [
-        values.EDIT_OTHER_USERS,
-        values.DEMOTE_TO_GUEST,
-        values.PROMOTE_GUEST,
-    ],
-    [values.SYSCONSOLE_WRITE_USERMANAGEMENT_CHANNELS]: [
-        values.MANAGE_TEAM,
-        values.MANAGE_PUBLIC_CHANNEL_PROPERTIES,
-        values.MANAGE_PRIVATE_CHANNEL_PROPERTIES,
-        values.MANAGE_PRIVATE_CHANNEL_MEMBERS,
-        values.MANAGE_PUBLIC_CHANNEL_MEMBERS,
-        values.DELETE_PRIVATE_CHANNEL,
-        values.DELETE_PUBLIC_CHANNEL,
-        values.MANAGE_CHANNEL_ROLES,
-        values.CONVERT_PUBLIC_CHANNEL_TO_PRIVATE,
-        values.CONVERT_PRIVATE_CHANNEL_TO_PUBLIC,
-    ],
-    [values.SYSCONSOLE_WRITE_USERMANAGEMENT_TEAMS]: [
-        values.MANAGE_TEAM,
-        values.MANAGE_TEAM_ROLES,
-        values.REMOVE_USER_FROM_TEAM,
-        values.JOIN_PRIVATE_TEAMS,
-        values.JOIN_PUBLIC_TEAMS,
-        values.ADD_USER_TO_TEAM,
-    ],
-    [values.SYSCONSOLE_WRITE_USERMANAGEMENT_GROUPS]: [
-        values.MANAGE_TEAM,
-        values.MANAGE_PRIVATE_CHANNEL_MEMBERS,
-        values.MANAGE_PUBLIC_CHANNEL_MEMBERS,
-        values.CONVERT_PUBLIC_CHANNEL_TO_PRIVATE,
-        values.CONVERT_PRIVATE_CHANNEL_TO_PUBLIC,
-    ],
-    [values.SYSCONSOLE_WRITE_ENVIRONMENT]: [
-        values.MANAGE_JOBS,
-    ],
-    [values.SYSCONSOLE_WRITE_SITE]: [
-        values.EDIT_BRAND,
-    ],
-};
 
 export default values;
