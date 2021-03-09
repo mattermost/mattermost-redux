@@ -38,3 +38,7 @@ export function getClusterInfo(state: GlobalState) {
 export function getUserAccessTokens(state: GlobalState) {
     return state.entities.admin.userAccessTokens;
 }
+
+export function getAdminAnalytics(state: GlobalState) {
+    return state.entities.admin.analytics;
+}
