@@ -20,6 +20,7 @@ const devToolsEnhancer = typeof windowAny !== 'undefined' && windowAny.__REDUX_D
         });
     };
 import serviceReducer from '../reducers';
+import rootEpic from '../epics';
 import deepFreezeAndThrowOnMutation from 'utils/deep_freeze';
 import initialState from './initial_state';
 import {offlineConfig, createReducer} from './helpers';
@@ -43,14 +44,23 @@ export default function configureServiceStore(preloadedState: any, appReducer: a
 
     const loadReduxDevtools = process.env.NODE_ENV !== 'test'; //eslint-disable-line no-process-env
 
+    const middlewares = createMiddleware(clientOptions);
+
+    // TODO: There's a chance that it might not be epicMiddleWare. Find better way
+    // const epicMiddleW = clientOptions?.enableThunk ? middlewares[1] : middlewares[0];
+    const epicMiddleW: any = middlewares[1];
+    console.log("MIDDLEWARES", middlewares.length, epicMiddleW);
+
     const store = redux.createStore(
         createOfflineReducer(createDevReducer(baseState, serviceReducer, appReducer)),
         baseState,
         offlineCompose(baseOfflineConfig)(
-            createMiddleware(clientOptions),
+            middlewares,
             loadReduxDevtools ? [devToolsEnhancer()] : [],
         ),
     );
+
+    epicMiddleW.run(rootEpic);
 
     reducerRegistry.setChangeListener((reducers: any) => {
         store.replaceReducer(createOfflineReducer(createDevReducer(baseState, reducers)));

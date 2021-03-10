@@ -30,6 +30,7 @@
     "gfycat-sdk": "1.4.18",
     "moment-timezone": "0.5.32",
     "redux": "4.0.5",
+    "redux-observable": "^1.2.0",
     "redux-offline": "git+https://github.com/enahum/redux-offline.git#885024de96b6ec73650c340c8928066585c413df",
     "redux-persist": "4.9.1",
     "redux-persist-node-storage": "2.0.0",
@@ -37,6 +38,8 @@
     "remote-redux-devtools": "0.5.16",
     "reselect": "4.0.0",
     "rudder-sdk-js": "1.0.14",
+    "rxjs": "^6.6.6",
+    "rxjs-compat": "^6.6.6",
     "serialize-error": "6.0.0",
     "shallow-equals": "1.0.0"
   },

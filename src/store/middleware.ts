@@ -1,6 +1,7 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
 import thunk, {ThunkMiddleware} from 'redux-thunk';
+import {createEpicMiddleware} from 'redux-observable';
 
 const defaultOptions = {
     additionalMiddleware: [],
@@ -17,6 +18,9 @@ export function createMiddleware(clientOptions: any): ThunkMiddleware[] {
     if (enableThunk) {
         middleware.push(thunk);
     }
+
+    const epicMiddleware = createEpicMiddleware();
+    middleware.push(epicMiddleware);
 
     if (additionalMiddleware) {
         if (typeof additionalMiddleware === 'function') {
