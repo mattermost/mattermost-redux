@@ -13,8 +13,8 @@ import configureStore from 'test/test_store';
 
 describe('Actions.Bots', () => {
     let store;
-    beforeAll(async () => {
-        await TestHelper.initBasic(Client4);
+    beforeAll(() => {
+        TestHelper.initBasic(Client4);
     });
 
     beforeEach(() => {

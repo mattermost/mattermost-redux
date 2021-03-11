@@ -20,8 +20,8 @@ const OK_RESPONSE = {status: 'OK'};
 
 describe('Actions.Posts', () => {
     let store;
-    beforeAll(async () => {
-        await TestHelper.initBasic(Client4);
+    beforeAll(() => {
+        TestHelper.initBasic(Client4);
     });
 
     beforeEach(() => {
@@ -1670,11 +1670,11 @@ describe('Actions.Posts', () => {
     });
 
     describe('getThreadsForPosts', () => {
-        beforeAll(async () => {
-            await TestHelper.initBasic(Client4);
+        beforeAll(() => {
+            TestHelper.initBasic(Client4);
         });
 
-        afterAll(async () => {
+        afterAll(() => {
             TestHelper.tearDown();
         });
 

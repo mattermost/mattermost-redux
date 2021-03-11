@@ -74,8 +74,8 @@ function mockUserThread({
 
 describe('Actions.Threads', () => {
     let store;
-    beforeAll(async () => {
-        await TestHelper.initBasic(Client4);
+    beforeAll(() => {
+        TestHelper.initBasic(Client4);
     });
 
     const currentTeamId = 'currentTeamId'.padEnd(26, ID_PAD);

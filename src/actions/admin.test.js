@@ -21,8 +21,8 @@ const samlIdpPublicCertificateText = 'MIIC4jCCAcqgAwIBAgIQE9soWni/eL9ChsWeJCEKND
 
 describe('Actions.Admin', () => {
     let store;
-    beforeAll(async () => {
-        await TestHelper.initBasic(Client4);
+    beforeAll(() => {
+        TestHelper.initBasic(Client4);
     });
 
     beforeEach(() => {

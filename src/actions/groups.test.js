@@ -14,8 +14,8 @@ import configureStore from 'test/test_store';
 describe('Actions.Groups', () => {
     let store;
 
-    beforeEach(async () => {
-        await TestHelper.initBasic(Client4);
+    beforeEach(() => {
+        TestHelper.initBasic(Client4);
         store = configureStore();
     });
 

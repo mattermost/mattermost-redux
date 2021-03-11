@@ -16,8 +16,8 @@ const OK_RESPONSE = {status: 'OK'};
 
 describe('Actions.Preferences', () => {
     let store;
-    beforeAll(async () => {
-        await TestHelper.initBasic(Client4);
+    beforeAll(() => {
+        TestHelper.initBasic(Client4);
     });
 
     beforeEach(() => {
