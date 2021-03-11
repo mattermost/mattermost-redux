@@ -16,8 +16,8 @@ describe('Actions.Search', () => {
         await TestHelper.initBasic(Client4);
     });
 
-    beforeEach(async () => {
-        store = await configureStore();
+    beforeEach(() => {
+        store = configureStore();
     });
 
     afterAll(async () => {

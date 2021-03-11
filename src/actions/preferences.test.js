@@ -20,8 +20,8 @@ describe('Actions.Preferences', () => {
         await TestHelper.initBasic(Client4);
     });
 
-    beforeEach(async () => {
-        store = await configureStore();
+    beforeEach(() => {
+        store = configureStore();
     });
 
     afterAll(async () => {

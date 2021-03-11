@@ -16,7 +16,7 @@ describe('Actions.Groups', () => {
 
     beforeEach(async () => {
         await TestHelper.initBasic(Client4);
-        store = await configureStore();
+        store = configureStore();
     });
 
     afterEach(async () => {
@@ -413,7 +413,7 @@ describe('Actions.Groups', () => {
     it('getGroupsNotAssociatedToTeam', async () => {
         const teamID = '5rgoajywb3nfbdtyafbod47ryb';
 
-        store = await configureStore({
+        store = configureStore({
             entities: {
                 teams: {
                     groupsAssociatedToTeam: {
@@ -687,7 +687,7 @@ describe('Actions.Groups', () => {
     it('getGroupsNotAssociatedToChannel', async () => {
         const channelID = '5rgoajywb3nfbdtyafbod47ryb';
 
-        store = await configureStore({
+        store = configureStore({
             entities: {
                 channels: {
                     groupsAssociatedToChannel: {

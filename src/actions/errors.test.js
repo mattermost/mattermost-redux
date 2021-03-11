@@ -17,8 +17,8 @@ describe('Actions.Errors', () => {
         Client4.setEnableLogging(true);
     });
 
-    beforeEach(async () => {
-        store = await configureStore();
+    beforeEach(() => {
+        store = configureStore();
     });
 
     afterAll(async () => {
