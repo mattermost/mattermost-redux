@@ -3,7 +3,7 @@
 import {General} from '../constants';
 
 import {ClusterInfo, AnalyticsRow} from 'types/admin';
-import type {AppBinding, AppCall, AppCallResponse} from 'types/apps';
+import type {AppBinding, AppCallRequest, AppCallResponse, AppCallType} from 'types/apps';
 import {Audit} from 'types/audits';
 import {UserAutocomplete, AutocompleteSuggestion} from 'types/autocomplete';
 import {Bot, BotPatch} from 'types/bots';
@@ -3300,11 +3300,13 @@ export default class Client4 {
     // This function belongs to the Apps Framework feature.
     // Apps Framework feature is experimental, and this function is susceptible
     // to breaking changes without pushing the major version of this package.
-    executeAppCall = async (call: AppCall) => {
-        call.context.user_agent = 'webapp';
+    executeAppCall = async (call: AppCallRequest, type: AppCallType) => {
+        const callCopy = JSON.parse(JSON.stringify(call)) as AppCallRequest;
+        callCopy.path = `${callCopy.path}/${type}`;
+        callCopy.context.user_agent = 'webapp';
         return this.doFetch<AppCallResponse>(
             `${this.getAppsProxyRoute()}/api/v1/call`,
-            {method: 'post', body: JSON.stringify(call)},
+            {method: 'post', body: JSON.stringify(callCopy)},
         );
     }
 
