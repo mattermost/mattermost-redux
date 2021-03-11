@@ -15,10 +15,6 @@ import deepFreezeAndThrowOnMutation from 'utils/deep_freeze';
 import {getPreferenceKey} from 'utils/preference_utils';
 
 describe('Selectors.Preferences', () => {
-    afterAll(() => {
-        jest.restoreAllMocks();
-    });
-
     const category1 = 'testcategory1';
     const category2 = 'testcategory2';
     const directCategory = Preferences.CATEGORY_DIRECT_CHANNEL_SHOW;
@@ -181,10 +177,6 @@ describe('Selectors.Preferences', () => {
     });
 
     describe('get theme', () => {
-        beforeEach(async () => {
-            jest.spyOn(ThemeUtils, 'blendColors').mockReturnValue('#efefef');
-        });
-
         it('default theme', () => {
             const currentTeamId = '1234';
 
@@ -331,7 +323,7 @@ describe('Selectors.Preferences', () => {
                         },
                     },
                 },
-            }).sidebarTeamBarBg, ThemeUtils.blendColors(theme.sidebarHeaderBg, '#000000', 0.2));
+            }).sidebarTeamBarBg, ThemeUtils.blendColors(theme.sidebarHeaderBg, '#000000', 0.2, true));
         });
 
         it('memoization', () => {
