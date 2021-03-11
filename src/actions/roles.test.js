@@ -22,8 +22,8 @@ describe('Actions.Roles', () => {
         store = configureStore();
     });
 
-    afterAll(async () => {
-        await TestHelper.tearDown();
+    afterAll(() => {
+        TestHelper.tearDown();
     });
 
     it('getRolesByNames', async () => {

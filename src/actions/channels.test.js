@@ -32,8 +32,8 @@ describe('Actions.Channels', () => {
         store = configureStore();
     });
 
-    afterAll(async () => {
-        await TestHelper.tearDown();
+    afterAll(() => {
+        TestHelper.tearDown();
     });
 
     it('selectChannel', async () => {

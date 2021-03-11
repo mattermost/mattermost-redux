@@ -23,8 +23,8 @@ describe('Actions.Integrations', () => {
         store = configureStore();
     });
 
-    afterAll(async () => {
-        await TestHelper.tearDown();
+    afterAll(() => {
+        TestHelper.tearDown();
     });
 
     it('createIncomingHook', async () => {

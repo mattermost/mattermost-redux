@@ -469,7 +469,7 @@ class TestHelper {
         };
     };
 
-    tearDown = async () => {
+    tearDown = () => {
         nock.restore();
 
         this.basicClient4 = null;

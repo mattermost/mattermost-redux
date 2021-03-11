@@ -22,8 +22,8 @@ describe('Actions.General', () => {
         store = configureStore();
     });
 
-    afterAll(async () => {
-        await TestHelper.tearDown();
+    afterAll(() => {
+        TestHelper.tearDown();
     });
 
     it('getPing - Invalid URL', async () => {

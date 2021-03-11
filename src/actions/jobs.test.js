@@ -23,8 +23,8 @@ describe('Actions.Jobs', () => {
         store = configureStore();
     });
 
-    afterAll(async () => {
-        await TestHelper.tearDown();
+    afterAll(() => {
+        TestHelper.tearDown();
     });
 
     it('createJob', async () => {

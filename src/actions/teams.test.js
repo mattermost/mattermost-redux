@@ -25,8 +25,8 @@ describe('Actions.Teams', () => {
         store = configureStore();
     });
 
-    afterAll(async () => {
-        await TestHelper.tearDown();
+    afterAll(() => {
+        TestHelper.tearDown();
     });
 
     it('selectTeam', async () => {

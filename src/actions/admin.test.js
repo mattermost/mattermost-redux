@@ -29,8 +29,8 @@ describe('Actions.Admin', () => {
         store = configureStore();
     });
 
-    afterAll(async () => {
-        await TestHelper.tearDown();
+    afterAll(() => {
+        TestHelper.tearDown();
     });
 
     it('getLogs', async () => {

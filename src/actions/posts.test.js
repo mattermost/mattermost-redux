@@ -28,8 +28,8 @@ describe('Actions.Posts', () => {
         store = configureStore();
     });
 
-    afterAll(async () => {
-        await TestHelper.tearDown();
+    afterAll(() => {
+        TestHelper.tearDown();
     });
 
     it('createPost', async () => {
@@ -1675,7 +1675,7 @@ describe('Actions.Posts', () => {
         });
 
         afterAll(async () => {
-            await TestHelper.tearDown();
+            TestHelper.tearDown();
         });
 
         let channelId;

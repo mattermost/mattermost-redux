@@ -24,8 +24,8 @@ describe('Actions.Preferences', () => {
         store = configureStore();
     });
 
-    afterAll(async () => {
-        await TestHelper.tearDown();
+    afterAll(() => {
+        TestHelper.tearDown();
     });
 
     it('getMyPreferences', async () => {

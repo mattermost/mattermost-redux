@@ -20,8 +20,8 @@ describe('Actions.Search', () => {
         store = configureStore();
     });
 
-    afterAll(async () => {
-        await TestHelper.tearDown();
+    afterAll(() => {
+        TestHelper.tearDown();
     });
 
     it('Perform Search', async () => {

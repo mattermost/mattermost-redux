@@ -19,8 +19,8 @@ describe('Actions.Groups', () => {
         store = configureStore();
     });
 
-    afterEach(async () => {
-        await TestHelper.tearDown();
+    afterEach(() => {
+        TestHelper.tearDown();
     });
 
     it('getGroupSyncables', async () => {

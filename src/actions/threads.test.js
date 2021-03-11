@@ -94,8 +94,8 @@ describe('Actions.Threads', () => {
         });
     });
 
-    afterAll(async () => {
-        await TestHelper.tearDown();
+    afterAll(() => {
+        TestHelper.tearDown();
     });
 
     test('getThread', async () => {

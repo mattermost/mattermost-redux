@@ -21,8 +21,8 @@ describe('Actions.Schemes', () => {
         store = configureStore();
     });
 
-    afterAll(async () => {
-        await TestHelper.tearDown();
+    afterAll(() => {
+        TestHelper.tearDown();
     });
 
     it('getSchemes', async () => {

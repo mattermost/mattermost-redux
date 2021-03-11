@@ -21,8 +21,8 @@ describe('Actions.Errors', () => {
         store = configureStore();
     });
 
-    afterAll(async () => {
-        await TestHelper.tearDown();
+    afterAll(() => {
+        TestHelper.tearDown();
         Client4.setEnableLogging(false);
     });
 
