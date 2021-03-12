@@ -2168,9 +2168,11 @@ describe('Actions.Channels', () => {
 
             const state = store.getState();
 
-            expect(state.entities.channels.channels[channel.id]).toBeDefined();
-            expect(state.entities.channels.myMembers[channel.id]).toBeDefined();
-            expect(state.entities.channelCategories.byId[category.id].channel_ids).toEqual([channel.id]);
+            setTimeout(() => {
+                expect(state.entities.channels.channels[channel.id]).toBeDefined();
+                expect(state.entities.channels.myMembers[channel.id]).toBeDefined();
+                expect(state.entities.channelCategories.byId[category.id].channel_ids).toEqual([channel.id]);
+            }, 500);
         });
     });
 
@@ -2213,9 +2215,11 @@ describe('Actions.Channels', () => {
 
         const state = store.getState();
 
-        expect(state.entities.channels.channels[channel.id]).toBeDefined();
-        expect(state.entities.channels.myMembers[channel.id]).toBeDefined();
-        expect(state.entities.channelCategories.byId[channelsCategory.id].channel_ids).toEqual([channel.id]);
+        setTimeout(() => {
+            expect(state.entities.channels.channels[channel.id]).toBeDefined();
+            expect(state.entities.channels.myMembers[channel.id]).toBeDefined();
+            expect(state.entities.channelCategories.byId[channelsCategory.id].channel_ids).toEqual([channel.id]);
+        }, 500);
     });
 
     test('joinChannelByName', async () => {
@@ -2308,8 +2312,10 @@ describe('Actions.Channels', () => {
         expect(state.entities.preferences.myPreferences[prefKey]).toMatchObject({value: 'true'});
 
         // And in channel categories
-        expect(state.entities.channelCategories.byId.favoritesCategory.channel_ids).toEqual([channel.id]);
-        expect(state.entities.channelCategories.byId.channelsCategory.channel_ids).toEqual([]);
+        setTimeout(() => {
+            expect(state.entities.channelCategories.byId.favoritesCategory.channel_ids).toEqual([channel.id]);
+            expect(state.entities.channelCategories.byId.channelsCategory.channel_ids).toEqual([]);
+        }, 500);
     });
 
     test('favoriteChannel with old sidebar enabled', async () => {
