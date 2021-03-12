@@ -487,7 +487,7 @@ function completeDirectGroupInfo(usersState: UsersState, teammateNameDisplay: st
 // data required instead of depending on the entirety of state.entities.users. This allows the
 // calling selector to have fewer dependencies, reducing its need to recompute when memoized.
 //
-// See also newCompleteDirectGroupInfo.
+// See also newCompleteDirectChannelInfo.
 function newCompleteDirectGroupInfo(currentUserId: string, profiles: IDMappedObjects<UserProfile>, profilesInChannel: RelationOneToMany<Channel, UserProfile>, teammateNameDisplay: string, channel: Channel) {
     const profilesIds = profilesInChannel[channel.id];
     const gm = {...channel};
