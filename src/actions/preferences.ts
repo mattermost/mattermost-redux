@@ -25,19 +25,21 @@ export function deletePreferences(userId: string, preferences: PreferenceType[])
         const myPreferences = getMyPreferencesSelector(state);
         const currentPreferences = preferences.map((pref) => myPreferences[getPreferenceKey(pref.category, pref.name)]);
 
-        try {
-            dispatch({
-                type: PreferenceTypes.DELETED_PREFERENCES,
-                data: preferences,
-            });
+        (async function deletePreferencesWrapper() {
+            try {
+                dispatch({
+                    type: PreferenceTypes.DELETED_PREFERENCES,
+                    data: preferences,
+                });
 
-            await Client4.deletePreferences(userId, preferences);
-        } catch {
-            dispatch({
-                type: PreferenceTypes.RECEIVED_PREFERENCES,
-                data: currentPreferences,
-            });
-        }
+                await Client4.deletePreferences(userId, preferences);
+            } catch {
+                dispatch({
+                    type: PreferenceTypes.RECEIVED_PREFERENCES,
+                    data: currentPreferences,
+                });
+            }
+        }());
 
         return {data: true};
     };
@@ -120,19 +122,21 @@ export function setCustomStatusInitialisationState(initializationState: Record<s
 
 export function savePreferences(userId: string, preferences: PreferenceType[]) {
     return async (dispatch: DispatchFunc) => {
-        try {
-            dispatch({
-                type: PreferenceTypes.RECEIVED_PREFERENCES,
-                data: preferences,
-            });
+        (async function savePreferencesWrapper() {
+            try {
+                dispatch({
+                    type: PreferenceTypes.RECEIVED_PREFERENCES,
+                    data: preferences,
+                });
 
-            await Client4.savePreferences(userId, preferences);
-        } catch {
-            dispatch({
-                type: PreferenceTypes.DELETED_PREFERENCES,
-                data: preferences,
-            });
-        }
+                await Client4.savePreferences(userId, preferences);
+            } catch {
+                dispatch({
+                    type: PreferenceTypes.DELETED_PREFERENCES,
+                    data: preferences,
+                });
+            }
+        }());
 
         return {data: true};
     };

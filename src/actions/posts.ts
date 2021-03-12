@@ -213,61 +213,63 @@ export function createPost(post: Post, files: any[] = []) {
 
         dispatch(batchActions(actions, 'BATCH_CREATE_POST_INIT'));
 
-        try {
-            const created = await Client4.createPost({...newPost, create_at: 0});
+        (async function createPostWrapper() {
+            try {
+                const created = await Client4.createPost({...newPost, create_at: 0});
 
-            actions = [
-                receivedPost(created),
-                {
-                    type: PostTypes.CREATE_POST_SUCCESS,
-                },
-                {
-                    type: ChannelTypes.INCREMENT_TOTAL_MSG_COUNT,
-                    data: {
-                        channelId: newPost.channel_id,
-                        amount: 1,
+                actions = [
+                    receivedPost(created),
+                    {
+                        type: PostTypes.CREATE_POST_SUCCESS,
                     },
-                },
-                {
-                    type: ChannelTypes.DECREMENT_UNREAD_MSG_COUNT,
-                    data: {
-                        channelId: newPost.channel_id,
-                        amount: 1,
+                    {
+                        type: ChannelTypes.INCREMENT_TOTAL_MSG_COUNT,
+                        data: {
+                            channelId: newPost.channel_id,
+                            amount: 1,
+                        },
                     },
-                },
-            ];
+                    {
+                        type: ChannelTypes.DECREMENT_UNREAD_MSG_COUNT,
+                        data: {
+                            channelId: newPost.channel_id,
+                            amount: 1,
+                        },
+                    },
+                ];
 
-            if (files) {
-                actions.push({
-                    type: FileTypes.RECEIVED_FILES_FOR_POST,
-                    postId: created.id,
-                    data: files,
-                });
+                if (files) {
+                    actions.push({
+                        type: FileTypes.RECEIVED_FILES_FOR_POST,
+                        postId: created.id,
+                        data: files,
+                    });
+                }
+
+                dispatch(batchActions(actions, 'BATCH_CREATE_POST'));
+            } catch (error) {
+                const data = {
+                    ...newPost,
+                    id: pendingPostId,
+                    failed: true,
+                    update_at: Date.now(),
+                };
+                actions = [{type: PostTypes.CREATE_POST_FAILURE, error}];
+
+                // If the failure was because: the root post was deleted or
+                // TownSquareIsReadOnly=true then remove the post
+                if (error.server_error_id === 'api.post.create_post.root_id.app_error' ||
+                    error.server_error_id === 'api.post.create_post.town_square_read_only' ||
+                    error.server_error_id === 'plugin.message_will_be_posted.dismiss_post'
+                ) {
+                    actions.push(removePost(data) as any);
+                } else {
+                    actions.push(receivedPost(data));
+                }
+
+                dispatch(batchActions(actions, 'BATCH_CREATE_POST_FAILED'));
             }
-
-            dispatch(batchActions(actions, 'BATCH_CREATE_POST'));
-        } catch (error) {
-            const data = {
-                ...newPost,
-                id: pendingPostId,
-                failed: true,
-                update_at: Date.now(),
-            };
-            actions = [{type: PostTypes.CREATE_POST_FAILURE, error}];
-
-            // If the failure was because: the root post was deleted or
-            // TownSquareIsReadOnly=true then remove the post
-            if (error.server_error_id === 'api.post.create_post.root_id.app_error' ||
-                error.server_error_id === 'api.post.create_post.town_square_read_only' ||
-                error.server_error_id === 'plugin.message_will_be_posted.dismiss_post'
-            ) {
-                actions.push(removePost(data) as any);
-            } else {
-                actions.push(receivedPost(data));
-            }
-
-            dispatch(batchActions(actions, 'BATCH_CREATE_POST_FAILED'));
-        }
+        }());
 
         return {data: true};
     };
@@ -380,21 +382,23 @@ export function deletePost(post: ExtendedPost) {
                 }
             });
         } else {
-            try {
-                dispatch({
-                    type: PostTypes.POST_DELETED,
-                    data: delPost,
-                });
+            (async function deletePostWrapper() {
+                try {
+                    dispatch({
+                        type: PostTypes.POST_DELETED,
+                        data: delPost,
+                    });
 
-                await Client4.deletePost(post.id);
-            } catch (e) {
-                // Recovering from this state doesn't actually work. The deleteAndRemovePost action
-                // in the webapp needs to get an error in order to not call removePost, but then
-                // the delete modal needs to handle this to show something to the user. Since none
-                // of that ever worked (even with redux-offline in play), leave the behaviour here
-                // unresolved.
-                console.error('failed to delete post', e); // eslint-disable-line no-console
-            }
+                    await Client4.deletePost(post.id);
+                } catch (e) {
+                    // Recovering from this state doesn't actually work. The deleteAndRemovePost action
+                    // in the webapp needs to get an error in order to not call removePost, but then
+                    // the delete modal needs to handle this to show something to the user. Since none
+                    // of that ever worked (even with redux-offline in play), leave the behaviour here
+                    // unresolved.
+                    console.error('failed to delete post', e); // eslint-disable-line no-console
+                }
+            }());
         }
 
         return {data: true};

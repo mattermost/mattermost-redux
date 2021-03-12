@@ -652,25 +652,27 @@ export function leaveChannel(channelId: string): ActionFunc {
             },
         });
 
-        try {
-            await Client4.removeFromChannel(currentUserId, channelId);
-        } catch {
-            dispatch(batchActions([
-                {
-                    type: ChannelTypes.RECEIVED_CHANNEL,
-                    data: channel,
-                },
-                {
-                    type: ChannelTypes.RECEIVED_MY_CHANNEL_MEMBER,
-                    data: member,
-                },
-            ]));
+        (async function removeFromChannelWrapper() {
+            try {
+                await Client4.removeFromChannel(currentUserId, channelId);
+            } catch {
+                dispatch(batchActions([
+                    {
+                        type: ChannelTypes.RECEIVED_CHANNEL,
+                        data: channel,
+                    },
+                    {
+                        type: ChannelTypes.RECEIVED_MY_CHANNEL_MEMBER,
+                        data: member,
+                    },
+                ]));
 
-            // The category here may not be the one in which the channel was originally located,
-            // much less the order in which it was placed. Treating this as a transient issue
-            // for the user to resolve by refreshing or leaving again.
-            dispatch(addChannelToInitialCategory(channel, false));
-        }
+                // The category here may not be the one in which the channel was originally located,
+                // much less the order in which it was placed. Treating this as a transient issue
+                // for the user to resolve by refreshing or leaving again.
+                dispatch(addChannelToInitialCategory(channel, false));
+            }
+        }());
 
         return {data: true};
     };
