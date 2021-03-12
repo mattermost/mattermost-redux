@@ -10,6 +10,7 @@ export const RESOURCE_KEYS = {
         SITE_STATISTICS: 'reporting.site_statistics',
         TEAM_STATISTICS: 'reporting.team_statistics',
         SERVER_LOGS: 'reporting.server_logs',
+    },
     USER_MANAGEMENT: {
         USERS: 'user_management.users',
         GROUPS: 'user_management.groups',
