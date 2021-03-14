@@ -1,7 +1,7 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
 
-import {Dictionary} from './utilities';
+import { Dictionary } from './utilities';
 
 export type ClientConfig = {
     AboutLink: string;
@@ -143,6 +143,7 @@ export type ClientConfig = {
     MaxFileSize: string;
     MaxNotificationsPerChannel: string;
     MinimumHashtagLength: string;
+    NoAccounts: string;
     OpenIdButtonText: string;
     OpenIdButtonColor: string;
     PasswordMinimumLength: string;
@@ -752,7 +753,7 @@ export type PluginSettings = {
     Directory: string;
     ClientDirectory: string;
     Plugins: Dictionary<any>;
-    PluginStates: Dictionary<{Enable: boolean}>;
+    PluginStates: Dictionary<{ Enable: boolean }>;
     EnableMarketplace: boolean;
     EnableRemoteMarketplace: boolean;
     AutomaticPrepackagedPlugins: boolean;
