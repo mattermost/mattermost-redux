@@ -104,10 +104,10 @@ workflows:
   pr-build:
     jobs:
       - install
-      - check-deps:
-          context: sast-webhook
-          requires:
-            - install
+      # - check-deps:
+      #     context: sast-webhook
+      #     requires:
+      #       - install
       - lint:
           requires:
             - install

@@ -35,7 +35,6 @@ import {GlobalState} from 'types/store';
  * getAppReducer - A function that returns the appReducer as defined above. Only used in development to enable hot reloading.
  * clientOptions - An object containing additional options used when configuring the redux store. The following options are available:
  *     additionalMiddleware - func | array - Allows for single or multiple additional middleware functions to be passed in from the client side.
- *     enableBuffer - bool - default = true - If true, the store will buffer all actions until offline state rehydration occurs.
  *     enableThunk - bool - default = true - If true, include the thunk middleware automatically. If false, thunk must be provided as part of additionalMiddleware.
  */
 export default function configureServiceStore(preloadedState: any, appReducer: any, userOfflineConfig: any, getAppReducer: any, clientOptions: any) {
