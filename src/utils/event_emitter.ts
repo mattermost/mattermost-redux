@@ -1,17 +1,20 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
+
 function isFunction(obj: any): boolean {
     return typeof obj === 'function';
 }
 
+type Listener = (...args: any[]) => void;
+
 class EventEmitter {
-    listeners: Map<string, Function[]>;
+    listeners: Map<string, Listener[]>;
 
     constructor() {
         this.listeners = new Map();
     }
 
-    addListener(label: string, callback: Function): void {
+    addListener(label: string, callback: Listener): void {
         if (!this.listeners.has(label)) {
             this.listeners.set(label, []);
         }
@@ -19,11 +22,11 @@ class EventEmitter {
         this.listeners.get(label)!.push(callback);
     }
 
-    on(label: string, callback: Function): void {
+    on(label: string, callback: Listener): void {
         this.addListener(label, callback);
     }
 
-    removeListener(label: string, callback: Function): boolean {
+    removeListener(label: string, callback: Listener): boolean {
         const listeners = this.listeners.get(label);
         let index;
 
@@ -41,7 +44,7 @@ class EventEmitter {
         return false;
     }
 
-    off(label: string, callback: Function): void {
+    off(label: string, callback: Listener): void {
         this.removeListener(label, callback);
     }
 

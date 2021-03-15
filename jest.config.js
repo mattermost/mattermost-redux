@@ -4,7 +4,7 @@
 module.exports = {
     globals: {
         'ts-jest': {
-            tsConfig: 'tsconfig.json',
+            tsconfig: 'tsconfig.json',
             diagnostics: true,
         },
         NODE_ENV: 'test',
@@ -43,7 +43,6 @@ module.exports = {
         '^utils/(.*)$': '<rootDir>/src/utils/$1',
         '^actions/(.*)$': '<rootDir>/src/actions/$1',
         '^action_types$': '<rootDir>/src/action_types',
-        '^constants$': '<rootDir>/src/constants',
         '^action_types/(.*)$': '<rootDir>/src/action_types/$1',
     },
 };

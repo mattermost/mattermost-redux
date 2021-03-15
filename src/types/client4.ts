@@ -1,8 +1,8 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
 
-// I assume these are the loglevels
-export type logLevel = 'ERROR' | 'WARNING' | 'INFO';
+// I assume these are the log levels
+export type LogLevel = 'ERROR' | 'WARNING' | 'INFO';
 
 export type ClientResponse<T> = {
     response: Response;

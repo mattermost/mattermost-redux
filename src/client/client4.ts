@@ -33,7 +33,7 @@ import {
 } from 'types/config';
 import {CustomEmoji} from 'types/emojis';
 import {ServerError} from 'types/errors';
-import {FileInfo, FileUploadResponse} from 'types/files';
+import {FileInfo, FileUploadResponse, FileSearchResults} from 'types/files';
 import {
     Group,
     GroupPatch,
@@ -89,6 +89,7 @@ import {
     UsersStats,
     UserStatus,
     GetFilteredUsersStatsOpts,
+    UserCustomStatus,
 } from 'types/users';
 import {$ID, RelationOneToOne} from 'types/utilities';
 import {ProductNotices} from 'types/product_notices';
@@ -106,7 +107,7 @@ import {isSystemAdmin} from 'utils/user_utils';
 
 import fetch from './fetch_etag';
 import {TelemetryHandler} from './telemetry';
-import {UserThreadList, UserThread} from 'types/threads';
+import {UserThreadList, UserThread, UserThreadWithPost} from 'types/threads';
 
 const FormData = require('form-data');
 const HEADER_AUTH = 'Authorization';
@@ -963,6 +964,27 @@ export default class Client4 {
             {method: 'put', body: JSON.stringify(status)},
         );
     };
+
+    updateCustomStatus = (customStatus: UserCustomStatus) => {
+        return this.doFetch(
+            `${this.getUserRoute('me')}/status/custom`,
+            {method: 'put', body: JSON.stringify(customStatus)},
+        );
+    };
+
+    unsetCustomStatus = () => {
+        return this.doFetch(
+            `${this.getUserRoute('me')}/status/custom`,
+            {method: 'delete'},
+        );
+    }
+
+    removeRecentCustomStatus = (customStatus: UserCustomStatus) => {
+        return this.doFetch(
+            `${this.getUserRoute('me')}/status/custom/recent`,
+            {method: 'delete', body: JSON.stringify(customStatus)},
+        );
+    }
 
     switchEmailToOAuth = (service: string, email: string, password: string, mfaCode = '') => {
         this.trackEvent('api', 'api_users_email_to_oauth');
@@ -1943,7 +1965,7 @@ export default class Client4 {
 
     getUserThread = (userId: string, teamId: string, threadId: string, extended = false) => {
         const url = `${this.getUserThreadRoute(userId, teamId, threadId)}`;
-        return this.doFetch<UserThread>(
+        return this.doFetch<UserThreadWithPost>(
             `${url}${buildQueryString({extended})}`,
             {method: 'get'},
         );
@@ -1967,7 +1989,7 @@ export default class Client4 {
 
     updateThreadReadForUser = (userId: string, teamId: string, threadId: string, timestamp: number) => {
         const url = `${this.getUserThreadRoute(userId, teamId, threadId)}/read/${timestamp}`;
-        return this.doFetch<StatusOK>(
+        return this.doFetch<UserThread>(
             url,
             {method: 'put'},
         );
@@ -2068,6 +2090,19 @@ export default class Client4 {
 
     searchPosts = (teamId: string, terms: string, isOrSearch: boolean) => {
         return this.searchPostsWithParams(teamId, {terms, is_or_search: isOrSearch});
+    };
+
+    searchFilesWithParams = (teamId: string, params: any) => {
+        this.trackEvent('api', 'api_files_search', {team_id: teamId});
+
+        return this.doFetch<FileSearchResults>(
+            `${this.getTeamRoute(teamId)}/files/search`,
+            {method: 'post', body: JSON.stringify(params)},
+        );
+    };
+
+    searchFiles = (teamId: string, terms: string, isOrSearch: boolean) => {
+        return this.searchFilesWithParams(teamId, {terms, is_or_search: isOrSearch});
     };
 
     getOpenGraphMetadata = (url: string) => {
@@ -2392,7 +2427,7 @@ export default class Client4 {
         );
     };
 
-    getCommandAutocompleteSuggestionsList = (userInput: string, teamId: string, commandArgs: {}) => {
+    getCommandAutocompleteSuggestionsList = (userInput: string, teamId: string, commandArgs: CommandArgs) => {
         return this.doFetch<AutocompleteSuggestion[]>(
             `${this.getTeamRoute(teamId)}/commands/autocomplete_suggestions${buildQueryString({...commandArgs, user_input: userInput})}`,
             {method: 'get'},
@@ -3576,6 +3611,20 @@ export default class Client4 {
         return this.doFetch<StatusOK>(
             `${this.getNoticesRoute()}/view`,
             {method: 'put', body: JSON.stringify(noticeIds)},
+        );
+    }
+
+    sendAdminUpgradeRequestEmail = () => {
+        return this.doFetch<StatusOK>(
+            `${this.getCloudRoute()}/subscription/limitreached/invite`,
+            {method: 'post'},
+        );
+    }
+
+    sendAdminUpgradeRequestEmailOnJoin = () => {
+        return this.doFetch<StatusOK>(
+            `${this.getCloudRoute()}/subscription/limitreached/join`,
+            {method: 'post'},
         );
     }
 

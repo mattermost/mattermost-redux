@@ -1,14 +1,18 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
+
 import * as reselect from 'reselect';
 import shallowEqual from 'shallow-equals';
+
 import {Dictionary} from 'types/utilities';
-export function memoizeResult<F extends Function>(func: F): any {
+
+// eslint-disable-next-line @typescript-eslint/ban-types
+export function memoizeResult<F extends Function>(func: F): F {
     let lastArgs: IArguments|null = null;
     let lastResult: any = null;
 
     // we reference arguments instead of spreading them for performance reasons
-    return function shallowCompare() {
+    return function memoizedFunc() {
         if (!shallowEqual(lastArgs, arguments)) { //eslint-disable-line prefer-rest-params
             //eslint-disable-line prefer-rest-params
             // apply arguments instead of spreading for performance.
@@ -20,7 +24,7 @@ export function memoizeResult<F extends Function>(func: F): any {
 
         lastArgs = arguments; //eslint-disable-line prefer-rest-params
         return lastResult;
-    };
+    } as unknown as F;
 }
 
 // Use this selector when you want a shallow comparison of the arguments and you want to memoize the result

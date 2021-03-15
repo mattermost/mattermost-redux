@@ -48,3 +48,7 @@ export function getDataRetentionCustomPolicy(state: GlobalState, id: string): Da
     const policy = getDataRetentionCustomPolicies(state);
     return policy[id];
 }
+
+export function getAdminAnalytics(state: GlobalState) {
+    return state.entities.admin.analytics;
+}

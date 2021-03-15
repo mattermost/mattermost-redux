@@ -42,6 +42,7 @@ export type Channel = {
     status?: string;
     fake?: boolean;
     group_constrained: boolean;
+    props?: Record<string, any>;
 };
 
 export type ChannelWithTeamData = Channel & {

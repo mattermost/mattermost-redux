@@ -5,7 +5,7 @@ import {createSelector} from 'reselect';
 
 import {General, Preferences} from '../../constants';
 
-import {getConfig, getLicense} from 'selectors/entities/general';
+import {getConfig, getFeatureFlagValue, getLicense} from 'selectors/entities/general';
 import {getCurrentTeamId} from 'selectors/entities/teams';
 
 import {PreferenceType, Theme} from 'types/preferences';
@@ -15,8 +15,9 @@ import {$ID} from 'types/utilities';
 
 import {createShallowSelector} from 'utils/helpers';
 import {getPreferenceKey} from 'utils/preference_utils';
+import {setThemeDefaults} from 'utils/theme_utils';
 
-export function getMyPreferences(state: GlobalState) {
+export function getMyPreferences(state: GlobalState): { [x: string]: PreferenceType } {
     return state.entities.preferences.myPreferences;
 }
 
@@ -31,12 +32,12 @@ export function get(state: GlobalState, category: string, name: string, defaultV
     return prefs[key].value;
 }
 
-export function getBool(state: GlobalState, category: string, name: string, defaultValue = false) {
+export function getBool(state: GlobalState, category: string, name: string, defaultValue = false): boolean {
     const value = get(state, category, name, String(defaultValue));
     return value !== 'false';
 }
 
-export function getInt(state: GlobalState, category: string, name: string, defaultValue = 0) {
+export function getInt(state: GlobalState, category: string, name: string, defaultValue = 0): number {
     const value = get(state, category, name, defaultValue);
     return parseInt(value, 10);
 }
@@ -150,31 +151,7 @@ export const getTheme: (state: GlobalState) => Theme = createShallowSelector(
         // At this point, the theme should be a plain object
         const theme: Theme = typeof themeValue === 'string' ? JSON.parse(themeValue) : themeValue;
 
-        // If this is a system theme, find it in case the user's theme is missing any fields
-        if (theme.type && theme.type !== 'custom') {
-            const match = Object.values(Preferences.THEMES).find((v) => v.type === theme.type);
-            if (match) {
-                if (!match.mentionBg) {
-                    match.mentionBg = match.mentionBj;
-                }
-
-                return match;
-            }
-        }
-
-        for (const key of Object.keys(defaultTheme)) {
-            if (theme[key]) {
-                // Fix a case where upper case theme colours are rendered as black
-                theme[key] = theme[key]?.toLowerCase();
-            }
-        }
-
-        // Backwards compatability with old name
-        if (!theme.mentionBg) {
-            theme.mentionBg = theme.mentionBj;
-        }
-
-        return Object.assign({}, defaultTheme, theme);
+        return setThemeDefaults(theme);
     },
 );
 
@@ -262,4 +239,39 @@ export function shouldAutocloseDMs(state: GlobalState) {
 
     const preference = get(state, Preferences.CATEGORY_SIDEBAR_SETTINGS, Preferences.CHANNEL_SIDEBAR_AUTOCLOSE_DMS, Preferences.AUTOCLOSE_DMS_ENABLED);
     return preference === Preferences.AUTOCLOSE_DMS_ENABLED;
+}
+
+export function getCollapsedThreadsPreference(state: GlobalState): string {
+    const configValue = getConfig(state).CollapsedThreads;
+    let preferenceDefault;
+
+    switch (configValue) {
+    case 'default_off':
+        preferenceDefault = Preferences.COLLAPSED_REPLY_THREADS_OFF;
+        break;
+    case 'default_on':
+        preferenceDefault = Preferences.COLLAPSED_REPLY_THREADS_ON;
+        break;
+    }
+
+    return get(
+        state,
+        Preferences.CATEGORY_DISPLAY_SETTINGS,
+        Preferences.COLLAPSED_REPLY_THREADS,
+        preferenceDefault ?? Preferences.COLLAPSED_REPLY_THREADS_FALLBACK_DEFAULT,
+    );
+}
+
+export function isCollapsedThreadsAllowed(state: GlobalState): boolean {
+    return (
+        getFeatureFlagValue(state, 'CollapsedThreads') === 'true' &&
+        getConfig(state).CollapsedThreads !== 'disabled'
+    );
+}
+
+export function isCollapsedThreadsEnabled(state: GlobalState): boolean {
+    const isAllowed = isCollapsedThreadsAllowed(state);
+    const userPreference = getCollapsedThreadsPreference(state);
+
+    return isAllowed && (userPreference === Preferences.COLLAPSED_REPLY_THREADS_ON || getConfig(state).CollapsedThreads as string === 'always_on');
 }
