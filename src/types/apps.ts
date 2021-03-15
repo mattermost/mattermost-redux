@@ -62,11 +62,17 @@ export type AppCallType = string;
 
 export type AppCall = {
     path: string;
-    type?: AppCallType;
-    values?: AppCallValues;
-    context: AppContext;
-    raw_command?: string;
     expand?: AppExpand;
+    state?: any;
+};
+
+export type AppCallRequest = AppCall & {
+    type: AppCallType;
+    context: AppContext;
+    values?: AppCallValues;
+    raw_command?: string;
+    selected_field?: string;
+    query?: string;
 };
 
 export type AppCallResponseType = string;
@@ -76,7 +82,7 @@ export type AppCallResponse<Res = unknown> = {
     markdown?: string;
     data?: Res;
     error?: string;
-    url?: string;
+    navigate_to_url?: string;
     use_external_browser?: boolean;
     call?: AppCall;
     form?: AppForm;
@@ -127,7 +133,7 @@ export type AppForm = {
     depends_on?: string[];
 };
 
-export type AppFormValue = string | AppSelectOption | null;
+export type AppFormValue = string | AppSelectOption | boolean | null;
 export type AppFormValues = {[name: string]: AppFormValue};
 
 export type AppSelectOption = {
@@ -183,23 +189,21 @@ export type AutocompleteSuggestionWithComplete = AutocompleteSuggestion & {
 
 export type AutocompleteElement = AppField;
 export type AutocompleteStaticSelect = AutocompleteElement & {
-    options: Array<{
-        label: string;
-        value: string;
-        hint?: string;
-    }>;
+    options: AppSelectOption[];
 };
 
-export type AutocompleteDynamicSelect = AutocompleteElement & {
-    call: AppCall;
-};
+export type AutocompleteDynamicSelect = AutocompleteElement;
 
-export type AutocompleteUserSelect = AutocompleteElement
+export type AutocompleteUserSelect = AutocompleteElement;
 
-export type AutocompleteChannelSelect = AutocompleteElement
+export type AutocompleteChannelSelect = AutocompleteElement;
 
-export type AppLookupCallValues = {
-    user_input: string;
-    values: AppFormValues;
-    name: string;
+export type FormResponseData = {
+    errors?: {
+        [field: string]: string;
+    };
+}
+
+export type AppLookupResponse = {
+    items: AppSelectOption[];
 }
