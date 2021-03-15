@@ -14,13 +14,13 @@ import configureStore from 'test/test_store';
 describe('Actions.Groups', () => {
     let store;
 
-    beforeEach(async () => {
-        await TestHelper.initBasic(Client4);
-        store = await configureStore();
+    beforeEach(() => {
+        TestHelper.initBasic(Client4);
+        store = configureStore();
     });
 
-    afterEach(async () => {
-        await TestHelper.tearDown();
+    afterEach(() => {
+        TestHelper.tearDown();
     });
 
     it('getGroupSyncables', async () => {
@@ -413,7 +413,7 @@ describe('Actions.Groups', () => {
     it('getGroupsNotAssociatedToTeam', async () => {
         const teamID = '5rgoajywb3nfbdtyafbod47ryb';
 
-        store = await configureStore({
+        store = configureStore({
             entities: {
                 teams: {
                     groupsAssociatedToTeam: {
@@ -687,7 +687,7 @@ describe('Actions.Groups', () => {
     it('getGroupsNotAssociatedToChannel', async () => {
         const channelID = '5rgoajywb3nfbdtyafbod47ryb';
 
-        store = await configureStore({
+        store = configureStore({
             entities: {
                 channels: {
                     groupsAssociatedToChannel: {

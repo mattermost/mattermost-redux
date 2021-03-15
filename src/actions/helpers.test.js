@@ -18,7 +18,7 @@ describe('Actions.Helpers', () => {
         });
 
         it('should do nothing when passed a client error', async () => {
-            const store = await configureStore({
+            const store = configureStore({
                 entities: {
                     users: {
                         currentUserId: 'user',
@@ -39,7 +39,7 @@ describe('Actions.Helpers', () => {
         });
 
         it('should do nothing when passed a non-401 server error', async () => {
-            const store = await configureStore({
+            const store = configureStore({
                 entities: {
                     users: {
                         currentUserId: 'user',
@@ -61,7 +61,7 @@ describe('Actions.Helpers', () => {
         });
 
         it('should trigger logout when passed a 401 server error', async () => {
-            const store = await configureStore({
+            const store = configureStore({
                 entities: {
                     users: {
                         currentUserId: 'user',
@@ -83,7 +83,7 @@ describe('Actions.Helpers', () => {
         });
 
         it('should do nothing when failing to log in', async () => {
-            const store = await configureStore({
+            const store = configureStore({
                 entities: {
                     users: {
                         currentUserId: 'user',
@@ -105,7 +105,7 @@ describe('Actions.Helpers', () => {
         });
 
         it('should do nothing when not logged in', async () => {
-            const store = await configureStore({
+            const store = configureStore({
                 entities: {
                     users: {
                         currentUserId: '',

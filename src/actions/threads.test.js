@@ -74,15 +74,15 @@ function mockUserThread({
 
 describe('Actions.Threads', () => {
     let store;
-    beforeAll(async () => {
-        await TestHelper.initBasic(Client4);
+    beforeAll(() => {
+        TestHelper.initBasic(Client4);
     });
 
     const currentTeamId = 'currentTeamId'.padEnd(26, ID_PAD);
     const currentUserId = 'currentUserId'.padEnd(26, ID_PAD);
 
-    beforeEach(async () => {
-        store = await configureStore({
+    beforeEach(() => {
+        store = configureStore({
             entities: {
                 teams: {
                     currentTeamId,
@@ -94,8 +94,8 @@ describe('Actions.Threads', () => {
         });
     });
 
-    afterAll(async () => {
-        await TestHelper.tearDown();
+    afterAll(() => {
+        TestHelper.tearDown();
     });
 
     test('getThread', async () => {
