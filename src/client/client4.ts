@@ -3301,9 +3301,14 @@ export default class Client4 {
     // Apps Framework feature is experimental, and this function is susceptible
     // to breaking changes without pushing the major version of this package.
     executeAppCall = async (call: AppCallRequest, type: AppCallType) => {
-        const callCopy = JSON.parse(JSON.stringify(call)) as AppCallRequest;
-        callCopy.path = `${callCopy.path}/${type}`;
-        callCopy.context.user_agent = 'webapp';
+        const callCopy: AppCallRequest = {
+            ...call,
+            path: `${call.path}/${type}`,
+            context: {
+                ...call.context,
+                user_agent: 'webapp',
+            },
+        };
         return this.doFetch<AppCallResponse>(
             `${this.getAppsProxyRoute()}/api/v1/call`,
             {method: 'post', body: JSON.stringify(callCopy)},
