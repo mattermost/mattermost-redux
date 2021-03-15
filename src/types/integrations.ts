@@ -80,7 +80,7 @@ export type CommandResponse = {
     extra_responses: CommandResponse[];
 };
 
-export type ServerAutocompleteSuggestion = {
+export type AutocompleteSuggestion = {
     Complete: string;
     Suggestion: string;
     Hint: string;

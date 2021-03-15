@@ -132,7 +132,7 @@ export type AppForm = {
     depends_on?: string[];
 };
 
-export type AppFormValue = string | AppSelectOption | null;
+export type AppFormValue = string | AppSelectOption | boolean | null;
 export type AppFormValues = {[name: string]: AppFormValue};
 
 export type AppSelectOption = {
@@ -188,17 +188,21 @@ export type AutocompleteSuggestionWithComplete = AutocompleteSuggestion & {
 
 export type AutocompleteElement = AppField;
 export type AutocompleteStaticSelect = AutocompleteElement & {
-    options: Array<{
-        label: string;
-        value: string;
-        hint?: string;
-    }>;
+    options: AppSelectOption[];
 };
 
-export type AutocompleteDynamicSelect = AutocompleteElement & {
-    call: AppCall;
-};
+export type AutocompleteDynamicSelect = AutocompleteElement;
 
-export type AutocompleteUserSelect = AutocompleteElement
+export type AutocompleteUserSelect = AutocompleteElement;
 
-export type AutocompleteChannelSelect = AutocompleteElement
+export type AutocompleteChannelSelect = AutocompleteElement;
+
+export type FormResponseData = {
+    errors?: {
+        [field: string]: string;
+    };
+}
+
+export type AppLookupResponse = {
+    items: AppSelectOption[];
+}
