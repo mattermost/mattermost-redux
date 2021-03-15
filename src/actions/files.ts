@@ -3,11 +3,18 @@
 import {Client4} from 'client';
 import {FileTypes} from 'action_types';
 
-import {batchActions, DispatchFunc, GetStateFunc, ActionFunc} from 'types/actions';
+import {batchActions, DispatchFunc, GetStateFunc, ActionFunc, Action} from 'types/actions';
 
 import {logError} from './errors';
 import {bindClientFunc, forceLogoutIfNecessary} from './helpers';
-import {FileUploadResponse} from 'types/files';
+import {FileUploadResponse, FileSearchResultItem} from 'types/files';
+
+export function receivedFiles(files: Map<string, FileSearchResultItem>): Action {
+    return {
+        type: FileTypes.RECEIVED_FILES_FOR_SEARCH,
+        data: files,
+    };
+}
 
 export function getFilesForPost(postId: string): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
