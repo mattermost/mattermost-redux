@@ -81,7 +81,7 @@ export type AppCallResponse<Res = unknown> = {
     markdown?: string;
     data?: Res;
     error?: string;
-    url?: string;
+    navigate_to_url?: string;
     use_external_browser?: boolean;
     call?: AppCall;
     form?: AppForm;
