@@ -179,6 +179,7 @@ export type ClientConfig = {
     WebsocketPort: string;
     WebsocketSecurePort: string;
     WebsocketURL: string;
+    NoAccounts: string;
 };
 
 export type License = {
