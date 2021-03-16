@@ -110,6 +110,6 @@ export type InvoiceLineItem = {
 }
 
 export type SubscriptionStats = {
-	remainingSeats: number;
-	isPaidTier: string;
+	remaining_seats: number;
+	is_paid_tier: string;
 }
