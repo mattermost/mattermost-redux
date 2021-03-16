@@ -35,6 +35,7 @@ export type AdminState = {
     pluginStatuses?: Dictionary<PluginStatusRedux>;
     samlMetadataResponse?: SamlMetadataResponse;
     dataRetentionCustomPolicies: DataRetentionCustomPolicies;
+    dataRetentionCustomPoliciesCount: number;
 };
 
 export type ClusterInfo = {

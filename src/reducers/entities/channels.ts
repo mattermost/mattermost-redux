@@ -789,16 +789,20 @@ export function channelMemberCountsByGroup(state: any = {}, action: GenericActio
 
 export function channelsInPolicy(state: IDMappedObjects<Channel> = {}, action: GenericAction) {
     switch (action.type) {
+    case AdminTypes.RECEIVED_DATA_RETENTION_CUSTOM_POLICY_CHANNELS_SEARCH:
     case AdminTypes.RECEIVED_DATA_RETENTION_CUSTOM_POLICY_CHANNELS: {
         const nextState: IDMappedObjects<Channel> = {...state};
 
-        for (let channel of action.data) {
+        for (let channel of action.data.channels) {
             if (state[channel.id] && channel.type === General.DM_CHANNEL && !channel.display_name) {
                 channel = {...channel, display_name: state[channel.id].display_name};
             }
             nextState[channel.id] = channel;
         }
         return nextState;
+    }
+    case AdminTypes.CLEAR_DATA_RETENTION_CUSTOM_POLICY_CHANNELS: {
+        return {};
     }
     default:
         return state;   

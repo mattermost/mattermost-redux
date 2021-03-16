@@ -32,3 +32,8 @@ export type PatchDataRetentionCustomPolicyChannels = {
 export type DataRetentionCustomPolicies = {
     [x: string]: DataRetentionCustomPolicy;
 };
+
+export type GetDataRetentionCustomPoliciesRequest = {
+    policies: DataRetentionCustomPolicy[];
+    total_count: number;
+};

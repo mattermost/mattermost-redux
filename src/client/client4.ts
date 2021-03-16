@@ -98,7 +98,8 @@ import {
     CreateDataRetentionCustomPolicy, 
     PatchDataRetentionCustomPolicy, 
     PatchDataRetentionCustomPolicyTeams, 
-    PatchDataRetentionCustomPolicyChannels
+    PatchDataRetentionCustomPolicyChannels,
+    GetDataRetentionCustomPoliciesRequest,
 } from 'types/data_retention';
 
 import {buildQueryString, isMinimumServerVersion} from 'utils/helpers';
@@ -2649,9 +2650,9 @@ export default class Client4 {
         );
     };
 
-    getDataRetentionCustomPolicies = () => {
-        return this.doFetch<DataRetentionCustomPolicies>(
-            `${this.getDataRetentionRoute()}/policies`,
+    getDataRetentionCustomPolicies = (page = 0, perPage = PER_PAGE_DEFAULT) => {
+        return this.doFetch<GetDataRetentionCustomPoliciesRequest>(
+            `${this.getDataRetentionRoute()}/policies${buildQueryString({page, per_page: perPage})}`,
             {method: 'get'},
         );
     };
@@ -2663,6 +2664,20 @@ export default class Client4 {
         );
     };
 
+    searchDataRetentionCustomPolicyChannels = (policyId: string, term: string, opts: ChannelSearchOpts) => {
+        return this.doFetch<DataRetentionCustomPolicies>(
+            `${this.getDataRetentionRoute()}/policies/${policyId}/channels/search`,
+            {method: 'post', body: JSON.stringify({term, ...opts})},
+        );
+    }
+
+    searchDataRetentionCustomPolicyTeams = (policyId: string, term: string, opts: TeamSearchOpts) => {
+        return this.doFetch<DataRetentionCustomPolicies>(
+            `${this.getDataRetentionRoute()}/policies/${policyId}/teams/search`,
+            {method: 'post', body: JSON.stringify({term, ...opts})},
+        );
+    }
+
     getDataRetentionCustomPolicyTeams = (id: string, page = 0, perPage = PER_PAGE_DEFAULT, includeTotalCount = false) => {
         return this.doFetch<Team[]>(
             `${this.getDataRetentionRoute()}/policies/${id}/teams${buildQueryString({page, per_page: perPage, include_total_count: includeTotalCount})}`,
@@ -2671,7 +2686,7 @@ export default class Client4 {
     };
 
     getDataRetentionCustomPolicyChannels = (id: string, page = 0, perPage = PER_PAGE_DEFAULT) => {
-        return this.doFetch<Team[]>(
+        return this.doFetch<{channels: Channel[], total_count: number}>(
             `${this.getDataRetentionRoute()}/policies/${id}/channels${buildQueryString({page, per_page: perPage})}`,
             {method: 'get'},
         );

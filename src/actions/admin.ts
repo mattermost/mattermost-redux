@@ -14,6 +14,12 @@ import {
     PatchDataRetentionCustomPolicyTeams, 
     PatchDataRetentionCustomPolicyChannels
 } from 'types/data_retention';
+import {
+    TeamSearchOpts,
+} from 'types/teams';
+import {
+    ChannelSearchOpts,
+} from 'types/channels';
 
 import {bindClientFunc, forceLogoutIfNecessary} from './helpers';
 import {logError} from './errors';
@@ -660,11 +666,11 @@ export function sendWarnMetricAck(warnMetricId: string, forceAck: boolean) {
 }
 
 
-export function getDataRetentionCustomPolicies(): ActionFunc {
+export function getDataRetentionCustomPolicies(page = 0, perPage = 10): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         let data;
         try {
-            data = await Client4.getDataRetentionCustomPolicies();
+            data = await Client4.getDataRetentionCustomPolicies(page, perPage);
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch, getState);
             dispatch(
@@ -756,6 +762,54 @@ export function getDataRetentionCustomPolicyChannels(id: string, page = 0, perPa
     };
 }
 
+export function searchDataRetentionCustomPolicyTeams(id: string, term: string, opts: TeamSearchOpts): ActionFunc {
+    return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
+        let data;
+        try {
+            data = await Client4.searchDataRetentionCustomPolicyTeams(id, term, opts);
+        } catch (error) {
+            forceLogoutIfNecessary(error, dispatch, getState);
+            dispatch(
+                {
+                    type: AdminTypes.RECEIVED_DATA_RETENTION_CUSTOM_POLICY_TEAMS_SEARCH,
+                    error,
+                }
+            );
+            return {error};
+        }
+
+        dispatch(
+            {type: AdminTypes.RECEIVED_DATA_RETENTION_CUSTOM_POLICY_TEAMS_SEARCH, data},
+        );
+
+        return {data};
+    };
+}
+
+export function searchDataRetentionCustomPolicyChannels(id: string, term: string, opts: ChannelSearchOpts): ActionFunc {
+    return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
+        let data;
+        try {
+            data = await Client4.searchDataRetentionCustomPolicyChannels(id, term, opts);
+        } catch (error) {
+            forceLogoutIfNecessary(error, dispatch, getState);
+            dispatch(
+                {
+                    type: AdminTypes.RECEIVED_DATA_RETENTION_CUSTOM_POLICY_CHANNELS_SEARCH,
+                    error,
+                }
+            );
+            return {error};
+        }
+
+        dispatch(
+            {type: AdminTypes.RECEIVED_DATA_RETENTION_CUSTOM_POLICY_CHANNELS_SEARCH, data},
+        );
+
+        return {data};
+    };
+}
+
 export function createDataRetentionCustomPolicy(policy: CreateDataRetentionCustomPolicy): ActionFunc {
     return bindClientFunc({
         clientFunc: Client4.createDataRetentionPolicy,
@@ -819,4 +873,22 @@ export function removeDataRetentionCustomPolicyChannels(id: string, policy: Patc
             policy,
         ],
     });
+}
+
+export function clearDataRetentionCustomPolicyTeams(): ActionFunc  {
+    return (dispatch: DispatchFunc) => {
+        dispatch(
+            {type: AdminTypes.CLEAR_DATA_RETENTION_CUSTOM_POLICY_TEAMS, data: {}},
+        );
+        return {data: {}};
+    }
+}
+
+export function clearDataRetentionCustomPolicyChannels(): ActionFunc  {
+    return (dispatch: DispatchFunc) => {
+        dispatch(
+            {type: AdminTypes.CLEAR_DATA_RETENTION_CUSTOM_POLICY_CHANNELS, data: {}},
+        );
+        return {data: {}};
+    }
 }

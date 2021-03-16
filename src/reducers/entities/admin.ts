@@ -608,6 +608,16 @@ function dataRetentionCustomPolicies(state: IDMappedObjects<DataRetentionCustomP
         return state;
     }
 }
+function dataRetentionCustomPoliciesCount(state = 0, action: GenericAction) {
+    switch (action.type) {
+    case AdminTypes.RECEIVED_DATA_RETENTION_CUSTOM_POLICIES:
+        return action.data.total_count;
+    case UserTypes.LOGOUT_SUCCESS:
+        return 0;
+    default:
+        return state;
+    }
+}
 
 export default combineReducers({
 
@@ -662,4 +672,7 @@ export default combineReducers({
 
     // object representing the custom data retention policies
     dataRetentionCustomPolicies,
+
+    // total custom retention policies
+    dataRetentionCustomPoliciesCount,
 });

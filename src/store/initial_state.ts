@@ -98,6 +98,7 @@ const state: GlobalState = {
             clusterInfo: [],
             analytics: {},
             dataRetentionCustomPolicies: {},
+            dataRetentionCustomPoliciesCount: 0,
         },
         jobs: {
             jobs: {},
