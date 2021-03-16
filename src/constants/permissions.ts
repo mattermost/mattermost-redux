@@ -163,7 +163,7 @@ const values = {
     SYSCONSOLE_WRITE_ENVIRONMENT_PERFORMANCE_MONITORING: 'sysconsole_write_environment_performance_monitoring',
     SYSCONSOLE_READ_ENVIRONMENT_DEVELOPER: 'sysconsole_read_environment_developer',
     SYSCONSOLE_WRITE_ENVIRONMENT_DEVELOPER: 'sysconsole_write_environment_developer',
-   SYSCONSOLE_READ_AUTHENTICATION: 'sysconsole_read_authentication',
+    SYSCONSOLE_READ_AUTHENTICATION: 'sysconsole_read_authentication',
     SYSCONSOLE_WRITE_AUTHENTICATION: 'sysconsole_write_authentication',
     SYSCONSOLE_READ_PLUGINS: 'sysconsole_read_plugins',
     SYSCONSOLE_WRITE_PLUGINS: 'sysconsole_write_plugins',
