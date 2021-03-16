@@ -143,6 +143,7 @@ export type ClientConfig = {
     MaxFileSize: string;
     MaxNotificationsPerChannel: string;
     MinimumHashtagLength: string;
+    NoAccounts: string;
     OpenIdButtonText: string;
     OpenIdButtonColor: string;
     PasswordMinimumLength: string;
@@ -179,7 +180,6 @@ export type ClientConfig = {
     WebsocketPort: string;
     WebsocketSecurePort: string;
     WebsocketURL: string;
-    NoAccounts: string;
 };
 
 export type License = {
