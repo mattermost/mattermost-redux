@@ -23,9 +23,8 @@ function currentTeamId(state = '', action: GenericAction) {
 function teams(state: IDMappedObjects<Team> = {}, action: GenericAction) {
     switch (action.type) {
     case TeamTypes.RECEIVED_TEAMS_LIST:
-    case SchemeTypes.RECEIVED_SCHEME_TEAMS: {
+    case SchemeTypes.RECEIVED_SCHEME_TEAMS:
         return Object.assign({}, state, teamListToMap(action.data));
-    }
     case UserTypes.LOGIN: // Used by the mobile app
         return Object.assign({}, state, teamListToMap(action.data.teams));
     case TeamTypes.RECEIVED_TEAMS:
