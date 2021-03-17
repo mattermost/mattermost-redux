@@ -5,14 +5,13 @@ import {createTransform, persistStore} from 'redux-persist';
 
 import configureStore from 'store';
 
-export default async function testConfigureStore(preloadedState) {
+export default function testConfigureStore(preloadedState) {
     const storageTransform = createTransform(
         () => ({}),
-        () => ({})
+        () => ({}),
     );
 
-    const offlineConfig = {
-        detectNetwork: (callback) => callback(true),
+    const persistConfig = {
         persist: (store, options) => {
             return persistStore(store, {storage: new AsyncNodeStorage('./.tmp'), ...options});
         },
@@ -23,20 +22,9 @@ export default async function testConfigureStore(preloadedState) {
             ],
             whitelist: [],
         },
-        retry: (action, retries) => 200 * (retries + 1),
-        discard: (error, action, retries) => {
-            if (action.meta && action.meta.offline.hasOwnProperty('maxRetry')) {
-                return retries >= action.meta.offline.maxRetry;
-            }
-
-            return retries >= 1;
-        },
     };
 
-    const store = configureStore(preloadedState, {}, offlineConfig, () => ({}), {enableBuffer: false});
-
-    const wait = () => new Promise((resolve) => setTimeout(resolve), 300); //eslint-disable-line
-    await wait();
+    const store = configureStore(preloadedState, {}, persistConfig, () => ({}));
 
     return store;
 }

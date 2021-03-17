@@ -36,7 +36,7 @@ describe('setCategorySorting', () => {
 
         const category1 = {id: 'category1', team_id: teamId};
 
-        const store = await configureStore({
+        const store = configureStore({
             entities: {
                 channelCategories: {
                     byId: {
@@ -67,7 +67,7 @@ describe('setCategoryMuted', () => {
 
         const category1 = {id: 'category1', team_id: teamId, channel_ids: []};
 
-        const store = await configureStore({
+        const store = configureStore({
             entities: {
                 channelCategories: {
                     byId: {
@@ -100,7 +100,7 @@ describe('setCategoryMuted', () => {
             channel_ids: ['channel1', 'channel2'],
         };
 
-        const store = await configureStore({
+        const store = configureStore({
             entities: {
                 channelCategories: {
                     byId: {
@@ -143,7 +143,7 @@ describe('setCategoryMuted', () => {
             muted: true,
         };
 
-        const store = await configureStore({
+        const store = configureStore({
             entities: {
                 channelCategories: {
                     byId: {
@@ -194,7 +194,7 @@ describe('fetchMyCategories', () => {
             },
         ];
 
-        const store = await configureStore({
+        const store = configureStore({
             entities: {
                 users: {
                     currentUserId,
@@ -216,8 +216,8 @@ describe('fetchMyCategories', () => {
 });
 
 describe('addChannelToInitialCategory', () => {
-    test('should add new DM channel to Direct Messages categories on all teams', async () => {
-        const store = await configureStore({
+    test('should add new DM channel to Direct Messages categories on all teams', () => {
+        const store = configureStore({
             entities: {
                 channelCategories: {
                     byId: {
@@ -239,8 +239,8 @@ describe('addChannelToInitialCategory', () => {
         expect(categoriesById.channelsCategory1.channel_ids).not.toContain('newDmChannel');
     });
 
-    test('should do nothing if categories have not been loaded yet for the given team', async () => {
-        const store = await configureStore({
+    test('should do nothing if categories have not been loaded yet for the given team', () => {
+        const store = configureStore({
             entities: {
                 channelCategories: {
                     byId: {
@@ -261,8 +261,8 @@ describe('addChannelToInitialCategory', () => {
         expect(categoriesById.channelsCategory1.channel_ids).toEqual(['publicChannel1', 'privateChannel1']);
     });
 
-    test('should add new channel to Channels category', async () => {
-        const store = await configureStore({
+    test('should add new channel to Channels category', () => {
+        const store = configureStore({
             entities: {
                 channelCategories: {
                     byId: {
@@ -288,8 +288,8 @@ describe('addChannelToInitialCategory', () => {
         expect(categoriesById.channelsCategory2.channel_ids).not.toContain('newChannel');
     });
 
-    test('should not add duplicate channel to Channels category', async () => {
-        const store = await configureStore({
+    test('should not add duplicate channel to Channels category', () => {
+        const store = configureStore({
             entities: {
                 channelCategories: {
                     byId: {
@@ -310,8 +310,8 @@ describe('addChannelToInitialCategory', () => {
         expect(categoriesById.channelsCategory1.channel_ids).toEqual(['publicChannel1', 'privateChannel1']);
     });
 
-    test('should not add GM channel to DIRECT_MESSAGES categories on team if it exists in a category', async () => {
-        const store = await configureStore({
+    test('should not add GM channel to DIRECT_MESSAGES categories on team if it exists in a category', () => {
+        const store = configureStore({
             entities: {
                 channelCategories: {
                     byId: {
@@ -342,7 +342,7 @@ describe('addChannelToCategory', () => {
         const category1 = {id: 'category1', team_id: teamId, channel_ids: ['channel1', 'channel2'], sorting: CategorySorting.Default};
         const category2 = {id: 'category2', team_id: teamId, channel_ids: ['channel3', 'channel4'], sorting: CategorySorting.Default};
 
-        const store = await configureStore({
+        const store = configureStore({
             entities: {
                 channelCategories: {
                     byId: {
@@ -375,7 +375,7 @@ describe('addChannelToCategory', () => {
         const category1 = {id: 'category1', team_id: teamId, channel_ids: ['channel1', 'channel2'], sorting: CategorySorting.Default};
         const category2 = {id: 'category2', team_id: teamId, channel_ids: ['channel3', 'channel4'], sorting: CategorySorting.Default};
 
-        const store = await configureStore({
+        const store = configureStore({
             entities: {
                 channelCategories: {
                     byId: {
@@ -418,7 +418,7 @@ describe('moveChannelToCategory', () => {
         const category2 = {id: 'category2', team_id: teamId, channel_ids: ['channel3', 'channel4']};
         const otherTeamCategory = {id: 'otherTeamCategory', team_id: 'team2', channel_ids: ['channel1', 'channel2']};
 
-        const store = await configureStore({
+        const store = configureStore({
             entities: {
                 channelCategories: {
                     byId: {
@@ -463,7 +463,7 @@ describe('moveChannelToCategory', () => {
         const category2 = {id: 'category2', team_id: teamId, channel_ids: ['channel3', 'channel4']};
         const otherTeamCategory = {id: 'otherTeamCategory', team_id: 'team2', channel_ids: ['channel1', 'channel2']};
 
-        const store = await configureStore({
+        const store = configureStore({
             entities: {
                 channelCategories: {
                     byId: {
@@ -497,7 +497,7 @@ describe('moveChannelToCategory', () => {
     test('should move channel within its current category', async () => {
         const category1 = {id: 'category1', team_id: teamId, channel_ids: ['channel1', 'channel2', 'channel3', 'channel4', 'channel5']};
 
-        const store = await configureStore({
+        const store = configureStore({
             entities: {
                 channelCategories: {
                     byId: {
@@ -535,7 +535,7 @@ describe('moveChannelToCategory', () => {
         const favoritesCategory = {id: 'favoritesCategory', team_id: teamId, type: CategoryTypes.FAVORITES, channel_ids: []};
         const otherCategory = {id: 'otherCategory', team_id: teamId, type: CategoryTypes.CUSTOM, channel_ids: ['channel1']};
 
-        const store = await configureStore({
+        const store = configureStore({
             entities: {
                 channelCategories: {
                     byId: {
@@ -606,7 +606,7 @@ describe('moveChannelToCategory', () => {
             const category1 = {id: 'category1', team_id: teamId, channel_ids: ['channel1', 'channel2'], sorting: CategorySorting.Default};
             const category2 = {id: 'category2', team_id: teamId, channel_ids: ['channel3', 'channel4'], sorting: CategorySorting.Default};
 
-            const store = await configureStore({
+            const store = configureStore({
                 entities: {
                     channelCategories: {
                         byId: {
@@ -657,7 +657,7 @@ describe('moveChannelToCategory', () => {
             const category1 = {id: 'category1', team_id: teamId, channel_ids: ['channel1', 'channel2'], sorting: CategorySorting.Alphabetical};
             const category2 = {id: 'category2', team_id: teamId, channel_ids: ['channel3', 'channel4'], sorting: CategorySorting.Recency};
 
-            const store = await configureStore({
+            const store = configureStore({
                 entities: {
                     channelCategories: {
                         byId: {
@@ -709,7 +709,7 @@ describe('moveChannelToCategory', () => {
         const category1 = {id: 'category1', team_id: teamId, channel_ids: ['channel1', 'channel2'], sorting: CategorySorting.Default};
         const favoritesCategory = {id: 'favoritesCategory', type: CategoryTypes.FAVORITES, team_id: teamId, channel_ids: [], sorting: CategorySorting.Default};
 
-        const store = await configureStore({
+        const store = configureStore({
             entities: {
                 channelCategories: {
                     byId: {
@@ -753,7 +753,7 @@ describe('moveChannelToCategory', () => {
         const category1 = {id: 'category1', team_id: teamId, channel_ids: ['channel1', 'channel2'], sorting: CategorySorting.Default};
         const favoritesCategory = {id: 'favoritesCategory', type: CategoryTypes.FAVORITES, team_id: teamId, channel_ids: [], sorting: CategorySorting.Default};
 
-        const store = await configureStore({
+        const store = configureStore({
             entities: {
                 channelCategories: {
                     byId: {
@@ -792,7 +792,7 @@ describe('moveCategory', () => {
     const currentUserId = TestHelper.generateId();
 
     test('should call the correct API', async () => {
-        const store = await configureStore({
+        const store = configureStore({
             entities: {
                 channelCategories: {
                     orderByTeam: {
@@ -826,7 +826,7 @@ describe('moveChannelsToCategory', () => {
         const category2 = {id: 'category2', team_id: teamId, channel_ids: ['channel3', 'channel4']};
         const otherTeamCategory = {id: 'otherTeamCategory', team_id: 'team2', channel_ids: ['channel1', 'channel2']};
 
-        const store = await configureStore({
+        const store = configureStore({
             entities: {
                 channelCategories: {
                     byId: {
@@ -871,7 +871,7 @@ describe('moveChannelsToCategory', () => {
         const category2 = {id: 'category2', team_id: teamId, channel_ids: ['channel4', 'channel5', 'channel6']};
         const otherTeamCategory = {id: 'otherTeamCategory', team_id: 'team2', channel_ids: ['channel1', 'channel2']};
 
-        const store = await configureStore({
+        const store = configureStore({
             entities: {
                 channelCategories: {
                     byId: {
@@ -905,7 +905,7 @@ describe('moveChannelsToCategory', () => {
     test('should move channel within its current category', async () => {
         const category1 = {id: 'category1', team_id: teamId, channel_ids: ['channel1', 'channel2', 'channel3', 'channel4', 'channel5']};
 
-        const store = await configureStore({
+        const store = configureStore({
             entities: {
                 channelCategories: {
                     byId: {
@@ -943,7 +943,7 @@ describe('moveChannelsToCategory', () => {
         const favoritesCategory = {id: 'favoritesCategory', team_id: teamId, type: CategoryTypes.FAVORITES, channel_ids: []};
         const otherCategory = {id: 'otherCategory', team_id: teamId, type: CategoryTypes.CUSTOM, channel_ids: ['channel1', 'channel2']};
 
-        const store = await configureStore({
+        const store = configureStore({
             entities: {
                 channelCategories: {
                     byId: {
@@ -1016,7 +1016,7 @@ describe('moveChannelsToCategory', () => {
             const category1 = {id: 'category1', team_id: teamId, channel_ids: ['channel1', 'channel2'], sorting: CategorySorting.Default};
             const category2 = {id: 'category2', team_id: teamId, channel_ids: ['channel3', 'channel4'], sorting: CategorySorting.Default};
 
-            const store = await configureStore({
+            const store = configureStore({
                 entities: {
                     channelCategories: {
                         byId: {
@@ -1067,7 +1067,7 @@ describe('moveChannelsToCategory', () => {
             const category1 = {id: 'category1', team_id: teamId, channel_ids: ['channel1', 'channel2'], sorting: CategorySorting.Alphabetical};
             const category2 = {id: 'category2', team_id: teamId, channel_ids: ['channel3', 'channel4'], sorting: CategorySorting.Recency};
 
-            const store = await configureStore({
+            const store = configureStore({
                 entities: {
                     channelCategories: {
                         byId: {
@@ -1118,7 +1118,7 @@ describe('moveChannelsToCategory', () => {
         const category1 = {id: 'category1', team_id: teamId, channel_ids: ['channel1', 'channel2'], sorting: CategorySorting.Default};
         const category2 = {id: 'category2', team_id: teamId, channel_ids: ['channel3', 'channel4'], sorting: CategorySorting.Default};
 
-        const store = await configureStore({
+        const store = configureStore({
             entities: {
                 channelCategories: {
                     byId: {
@@ -1163,7 +1163,7 @@ describe('moveChannelsToCategory', () => {
         const category1 = {id: 'category1', team_id: teamId, channel_ids: ['channel1', 'channel2'], sorting: CategorySorting.Default};
         const favoritesCategory = {id: 'favoritesCategory', type: CategoryTypes.FAVORITES, team_id: teamId, channel_ids: [], sorting: CategorySorting.Default};
 
-        const store = await configureStore({
+        const store = configureStore({
             entities: {
                 channelCategories: {
                     byId: {
@@ -1207,7 +1207,7 @@ describe('moveChannelsToCategory', () => {
         const category1 = {id: 'category1', team_id: teamId, channel_ids: ['channel1', 'channel2'], sorting: CategorySorting.Default};
         const favoritesCategory = {id: 'favoritesCategory', type: CategoryTypes.FAVORITES, team_id: teamId, channel_ids: [], sorting: CategorySorting.Default};
 
-        const store = await configureStore({
+        const store = configureStore({
             entities: {
                 channelCategories: {
                     byId: {
@@ -1248,7 +1248,7 @@ describe('createCategory', () => {
     const categoryName = 'new category';
 
     test('should call the correct API', async () => {
-        const store = await configureStore({
+        const store = configureStore({
             entities: {
                 channelCategories: {
                     orderByTeam: {
@@ -1286,7 +1286,7 @@ describe('renameCategory', () => {
             display_name: 'original name',
         };
 
-        const store = await configureStore({
+        const store = configureStore({
             entities: {
                 channelCategories: {
                     byId: {
@@ -1318,7 +1318,7 @@ describe('deleteCategory', () => {
     const teamId = TestHelper.generateId();
 
     test('should call the correct API', async () => {
-        const store = await configureStore({
+        const store = configureStore({
             entities: {
                 channelCategories: {
                     byId: {

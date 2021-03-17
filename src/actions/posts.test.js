@@ -20,16 +20,16 @@ const OK_RESPONSE = {status: 'OK'};
 
 describe('Actions.Posts', () => {
     let store;
-    beforeAll(async () => {
-        await TestHelper.initBasic(Client4);
+    beforeAll(() => {
+        TestHelper.initBasic(Client4);
     });
 
-    beforeEach(async () => {
-        store = await configureStore();
+    beforeEach(() => {
+        store = configureStore();
     });
 
-    afterAll(async () => {
-        await TestHelper.tearDown();
+    afterAll(() => {
+        TestHelper.tearDown();
     });
 
     it('createPost', async () => {
@@ -86,6 +86,10 @@ describe('Actions.Posts', () => {
         await Actions.createPostImmediately(post2)(store.dispatch, store.getState);
 
         assert.equal(store.getState().entities.posts.postsReplies[postId], 1);
+
+        nock(Client4.getBaseRoute()).
+            delete(`/posts/${post2.id}`).
+            reply(200, OK_RESPONSE);
 
         await Actions.deletePost(post2)(store.dispatch, store.getState);
         await Actions.removePost(post2)(store.dispatch, store.getState);
@@ -177,59 +181,6 @@ describe('Actions.Posts', () => {
         assert.equal(postIdForFiles.length, files.length);
     });
 
-    // it('retry failed post', async () => {
-    //     const channelId = TestHelper.basicChannel.id;
-    //     const post = TestHelper.fakePost(channelId);
-
-    //     nock(Client4.getBaseRoute()).
-    //         post('/posts').
-    //         reply(400, {});
-
-    //     nock(Client4.getBaseRoute()).
-    //         post('').
-    //         reply(201, {...post, id: TestHelper.generateId()});
-
-    //     await Actions.createPost(post)(store.dispatch, store.getState);
-
-    //     await TestHelper.wait(200);
-
-    //     let state = store.getState();
-
-    //     const {posts} = state.entities.posts;
-    //     assert.ok(posts);
-
-    //     let failedPost;
-    //     for (const storedPost of Object.values(posts)) {
-    //         if (storedPost.failed) {
-    //             failedPost = storedPost;
-    //             break;
-    //         }
-    //     }
-
-    //     assert.ok(failedPost, 'failed to find failed post');
-
-    //     // Retry the post
-    //     const {id, failed, ...retryPost} = failedPost; // eslint-disable-line
-    //     await Actions.createPost(retryPost)(store.dispatch, store.getState);
-
-    //     await TestHelper.wait(500);
-
-    //     state = store.getState();
-    //     const {posts: nextPosts} = state.entities.posts;
-
-    //     let found = false;
-    //     for (const storedPost of Object.values(nextPosts)) {
-    //         if (storedPost.pending_post_id === failedPost.pending_post_id) {
-    //             if (!storedPost.failed) {
-    //                 found = true;
-    //                 break;
-    //             }
-    //         }
-    //     }
-
-    //     assert.ok(found, 'Retried post failed again.');
-    // });
-
     it('editPost', async () => {
         const channelId = TestHelper.basicChannel.id;
 
@@ -278,6 +229,11 @@ describe('Actions.Posts', () => {
         await Actions.createPost(TestHelper.fakePost(channelId))(store.dispatch, store.getState);
         const initialPosts = store.getState().entities.posts;
         const postId = Object.keys(initialPosts.posts)[0];
+
+        nock(Client4.getBaseRoute()).
+            delete(`/posts/${postId}`).
+            reply(200, OK_RESPONSE);
+
         await Actions.deletePost(initialPosts.posts[postId])(store.dispatch, store.getState);
 
         const state = store.getState();
@@ -315,6 +271,10 @@ describe('Actions.Posts', () => {
         assert.ok(reactions[post1.id]);
         assert.ok(reactions[post1.id][TestHelper.basicUser.id + '-' + emojiName]);
 
+        nock(Client4.getBaseRoute()).
+            delete(`/posts/${post1.id}`).
+            reply(200, OK_RESPONSE);
+
         await Actions.deletePost(post1)(store.dispatch, store.getState);
 
         reactions = store.getState().entities.posts.reactions;
@@ -328,7 +288,7 @@ describe('Actions.Posts', () => {
         const post3 = {id: 'post3', channel_id: 'channel1', root_id: 'post2', create_at: 1003, message: ''};
         const post4 = {id: 'post4', channel_id: 'channel1', root_id: 'post1', create_at: 1004, message: ''};
 
-        store = await configureStore({
+        store = configureStore({
             entities: {
                 posts: {
                     posts: {
@@ -807,7 +767,7 @@ describe('Actions.Posts', () => {
         const post3 = {id: 'post3', channel_id: 'channel1', create_at: 1003, message: ''};
         const post4 = {id: 'post4', channel_id: 'channel1', root_id: 'post0', create_at: 1004, message: ''};
 
-        store = await configureStore({
+        store = configureStore({
             entities: {
                 posts: {
                     posts: {
@@ -868,7 +828,7 @@ describe('Actions.Posts', () => {
         const post2 = {id: 'post2', channel_id: channelId, root_id: 'post1', create_at: 1002, message: ''};
         const post3 = {id: 'post3', channel_id: channelId, create_at: 1003, message: ''};
 
-        store = await configureStore({
+        store = configureStore({
             entities: {
                 posts: {
                     posts: {
@@ -920,7 +880,7 @@ describe('Actions.Posts', () => {
         const post2 = {id: 'post2', channel_id: channelId, root_id: 'post1', create_at: 1002, message: ''};
         const post3 = {id: 'post3', channel_id: channelId, create_at: 1003, message: ''};
 
-        store = await configureStore({
+        store = configureStore({
             entities: {
                 posts: {
                     posts: {
@@ -970,7 +930,7 @@ describe('Actions.Posts', () => {
         const post2 = {id: 'post2', channel_id: channelId, root_id: 'post1', create_at: 1002, message: ''};
         const post3 = {id: 'post3', channel_id: channelId, create_at: 1003, message: ''};
 
-        store = await configureStore({
+        store = configureStore({
             entities: {
                 posts: {
                     posts: {
@@ -1164,7 +1124,7 @@ describe('Actions.Posts', () => {
         const userId = TestHelper.generateId();
         const postId = TestHelper.generateId();
 
-        store = await configureStore({
+        store = configureStore({
             entities: {
                 channels: {
                     channels: {
@@ -1670,12 +1630,12 @@ describe('Actions.Posts', () => {
     });
 
     describe('getThreadsForPosts', () => {
-        beforeAll(async () => {
-            await TestHelper.initBasic(Client4);
+        beforeAll(() => {
+            TestHelper.initBasic(Client4);
         });
 
-        afterAll(async () => {
-            await TestHelper.tearDown();
+        afterAll(() => {
+            TestHelper.tearDown();
         });
 
         let channelId;
@@ -1685,7 +1645,7 @@ describe('Actions.Posts', () => {
         let comment;
 
         beforeEach(async () => {
-            store = await configureStore();
+            store = configureStore();
 
             channelId = TestHelper.basicChannel.id;
             post1 = {id: TestHelper.generateId(), channel_id: channelId, message: ''};
