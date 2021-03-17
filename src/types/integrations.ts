@@ -88,6 +88,8 @@ export type AutocompleteSuggestion = {
     IconData: string;
 };
 
+export type CommandAutocompleteSuggestion = AutocompleteSuggestion; // TODO remove this alias after the mattermost-redux migration
+
 export type OAuthApp = {
     'id': string;
     'creator_id': string;

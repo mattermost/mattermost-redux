@@ -96,3 +96,41 @@ export type ClientPluginManifest = {
         bundle_path: string;
     };
 }
+
+export type MarketplaceLabel = { // TODO remove this in favour of the definition in types/marketplace after the mattermost-redux migration
+    name: string;
+    description?: string;
+    url?: string;
+    color?: string;
+}
+
+export enum HostingType { // TODO remove this in favour of the definition in types/marketplace after the mattermost-redux migration
+    OnPrem = 'on-prem',
+    Cloud = 'cloud',
+}
+
+export enum AuthorType { // TODO remove this in favour of the definition in types/marketplace after the mattermost-redux migration
+    Mattermost = 'mattermost',
+    Partner = 'partner',
+    Community = 'community',
+}
+
+export enum ReleaseStage { // TODO remove this in favour of the definition in types/marketplace after the mattermost-redux migration
+    Production = 'production',
+    Beta = 'beta',
+    Experimental = 'experimental',
+}
+
+export type MarketplacePlugin = { // TODO remove this in favour of the definition in types/marketplace after the mattermost-redux migration
+    homepage_url?: string;
+    icon_data?: string;
+    download_url?: string;
+    release_notes_url?: string;
+    labels?: MarketplaceLabel[];
+    hosting?: HostingType;
+    author_type: AuthorType;
+    release_stage: ReleaseStage;
+    enterprise: boolean;
+    manifest: PluginManifest;
+    installed_version?: string;
+}
