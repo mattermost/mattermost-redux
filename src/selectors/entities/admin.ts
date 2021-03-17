@@ -1,7 +1,7 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
 
-import { DataRetentionCustomPolicies, DataRetentionCustomPolicy } from 'types/data_retention';
+import {DataRetentionCustomPolicies, DataRetentionCustomPolicy} from 'types/data_retention';
 import {GlobalState} from 'types/store';
 
 export function getLogs(state: GlobalState) {

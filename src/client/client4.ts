@@ -94,10 +94,10 @@ import {
 import {$ID, RelationOneToOne} from 'types/utilities';
 import {ProductNotices} from 'types/product_notices';
 import {
-    DataRetentionCustomPolicies, 
-    CreateDataRetentionCustomPolicy, 
-    PatchDataRetentionCustomPolicy, 
-    PatchDataRetentionCustomPolicyTeams, 
+    DataRetentionCustomPolicies,
+    CreateDataRetentionCustomPolicy,
+    PatchDataRetentionCustomPolicy,
+    PatchDataRetentionCustomPolicyTeams,
     PatchDataRetentionCustomPolicyChannels,
     GetDataRetentionCustomPoliciesRequest,
 } from 'types/data_retention';
@@ -2686,7 +2686,7 @@ export default class Client4 {
     };
 
     getDataRetentionCustomPolicyChannels = (id: string, page = 0, perPage = PER_PAGE_DEFAULT) => {
-        return this.doFetch<{channels: Channel[], total_count: number}>(
+        return this.doFetch<{channels: Channel[]; total_count: number;}>(
             `${this.getDataRetentionRoute()}/policies/${id}/channels${buildQueryString({page, per_page: perPage})}`,
             {method: 'get'},
         );
@@ -2730,9 +2730,7 @@ export default class Client4 {
         );
     };
 
-
     // Jobs Routes
-
     getJob = (id: string) => {
         return this.doFetch<Job>(
             `${this.getJobsRoute()}/${id}`,

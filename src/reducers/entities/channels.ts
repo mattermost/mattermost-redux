@@ -805,7 +805,7 @@ export function channelsInPolicy(state: IDMappedObjects<Channel> = {}, action: G
         return {};
     }
     default:
-        return state;   
+        return state;
     }
 }
 

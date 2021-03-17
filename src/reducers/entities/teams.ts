@@ -472,7 +472,7 @@ function teamsInPolicy(state: IDMappedObjects<Team> = {}, action: GenericAction)
         return {};
     }
     default:
-        return state;   
+        return state;
     }
 }
 

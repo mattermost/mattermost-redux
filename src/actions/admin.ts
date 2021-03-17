@@ -8,11 +8,9 @@ import {Action, ActionFunc, batchActions, DispatchFunc, GetStateFunc} from 'type
 import {Compliance} from 'types/compliance';
 import {GroupSearchOpts} from 'types/groups';
 import {
-    DataRetentionCustomPolicies, 
-    CreateDataRetentionCustomPolicy, 
-    PatchDataRetentionCustomPolicy, 
-    PatchDataRetentionCustomPolicyTeams, 
-    PatchDataRetentionCustomPolicyChannels
+    CreateDataRetentionCustomPolicy,
+    PatchDataRetentionCustomPolicyTeams,
+    PatchDataRetentionCustomPolicyChannels,
 } from 'types/data_retention';
 import {
     TeamSearchOpts,
@@ -665,7 +663,6 @@ export function sendWarnMetricAck(warnMetricId: string, forceAck: boolean) {
     };
 }
 
-
 export function getDataRetentionCustomPolicies(page = 0, perPage = 10): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         let data;
@@ -677,7 +674,7 @@ export function getDataRetentionCustomPolicies(page = 0, perPage = 10): ActionFu
                 {
                     type: AdminTypes.RECEIVED_DATA_RETENTION_CUSTOM_POLICIES,
                     error,
-                }
+                },
             );
             return {error};
         }
@@ -701,7 +698,7 @@ export function getDataRetentionCustomPolicy(id: string): ActionFunc {
                 {
                     type: AdminTypes.RECEIVED_DATA_RETENTION_CUSTOM_POLICY,
                     error,
-                }
+                },
             );
             return {error};
         }
@@ -725,7 +722,7 @@ export function getDataRetentionCustomPolicyTeams(id: string, page = 0, perPage:
                 {
                     type: AdminTypes.RECEIVED_DATA_RETENTION_CUSTOM_POLICY_TEAMS,
                     error,
-                }
+                },
             );
             return {error};
         }
@@ -749,7 +746,7 @@ export function getDataRetentionCustomPolicyChannels(id: string, page = 0, perPa
                 {
                     type: AdminTypes.RECEIVED_DATA_RETENTION_CUSTOM_POLICY_CHANNELS,
                     error,
-                }
+                },
             );
             return {error};
         }
@@ -773,7 +770,7 @@ export function searchDataRetentionCustomPolicyTeams(id: string, term: string, o
                 {
                     type: AdminTypes.RECEIVED_DATA_RETENTION_CUSTOM_POLICY_TEAMS_SEARCH,
                     error,
-                }
+                },
             );
             return {error};
         }
@@ -797,7 +794,7 @@ export function searchDataRetentionCustomPolicyChannels(id: string, term: string
                 {
                     type: AdminTypes.RECEIVED_DATA_RETENTION_CUSTOM_POLICY_CHANNELS_SEARCH,
                     error,
-                }
+                },
             );
             return {error};
         }
@@ -875,20 +872,20 @@ export function removeDataRetentionCustomPolicyChannels(id: string, policy: Patc
     });
 }
 
-export function clearDataRetentionCustomPolicyTeams(): ActionFunc  {
+export function clearDataRetentionCustomPolicyTeams(): ActionFunc {
     return (dispatch: DispatchFunc) => {
         dispatch(
             {type: AdminTypes.CLEAR_DATA_RETENTION_CUSTOM_POLICY_TEAMS, data: {}},
         );
         return {data: {}};
-    }
+    };
 }
 
-export function clearDataRetentionCustomPolicyChannels(): ActionFunc  {
+export function clearDataRetentionCustomPolicyChannels(): ActionFunc {
     return (dispatch: DispatchFunc) => {
         dispatch(
             {type: AdminTypes.CLEAR_DATA_RETENTION_CUSTOM_POLICY_CHANNELS, data: {}},
         );
         return {data: {}};
-    }
+    };
 }

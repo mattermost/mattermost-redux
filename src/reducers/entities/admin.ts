@@ -584,7 +584,7 @@ function samlMetadataResponse(state: Partial<SamlMetadataResponse> = {}, action:
     }
 }
 
-function dataRetentionCustomPolicies(state: IDMappedObjects<DataRetentionCustomPolicy> = {}, action: GenericAction): IDMappedObjects<DataRetentionCustomPolicy>{
+function dataRetentionCustomPolicies(state: IDMappedObjects<DataRetentionCustomPolicy> = {}, action: GenericAction): IDMappedObjects<DataRetentionCustomPolicy> {
     switch (action.type) {
     case AdminTypes.RECEIVED_DATA_RETENTION_CUSTOM_POLICY: {
         return {
@@ -595,8 +595,8 @@ function dataRetentionCustomPolicies(state: IDMappedObjects<DataRetentionCustomP
 
     case AdminTypes.RECEIVED_DATA_RETENTION_CUSTOM_POLICIES: {
         const nextState = {...state};
-        for (const data_retention of action.data.policies) {
-            nextState[data_retention.id] = data_retention;
+        for (const dataRetention of action.data.policies) {
+            nextState[dataRetention.id] = dataRetention;
         }
         return nextState;
     }
