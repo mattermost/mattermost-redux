@@ -27,7 +27,6 @@ import {Action, ActionResult, batchActions, DispatchFunc, GetStateFunc} from 'ty
 import {ChannelUnread} from 'types/channels';
 import {GlobalState} from 'types/store';
 import {Post, PostList} from 'types/posts';
-import {ServerError} from 'types/errors';
 import {Reaction} from 'types/reactions';
 import {UserProfile} from 'types/users';
 import {Dictionary} from 'types/utilities';
@@ -167,6 +166,7 @@ export function createPost(post: Post, files: any[] = []) {
 
         const timestamp = Date.now();
         const pendingPostId = post.pending_post_id || `${currentUserId}:${timestamp}`;
+        let actions: Action[] = [];
 
         if (Selectors.isPostIdSending(state, pendingPostId)) {
             return {data: true};
@@ -197,79 +197,80 @@ export function createPost(post: Post, files: any[] = []) {
                 file_ids: fileIds,
             };
 
-            dispatch({
+            actions.push({
                 type: FileTypes.RECEIVED_FILES_FOR_POST,
                 postId: pendingPostId,
                 data: files,
             });
         }
 
-        dispatch({
+        actions.push({
             type: PostTypes.RECEIVED_NEW_POST,
             data: {
                 ...newPost,
                 id: pendingPostId,
             },
-            meta: {
-                offline: {
-                    effect: () => Client4.createPost({...newPost, create_at: 0}),
-                    commit: (result: any, payload: any) => {
-                        const actions: Action[] = [
-                            receivedPost(payload),
-                            {
-                                type: PostTypes.CREATE_POST_SUCCESS,
-                            },
-                            {
-                                type: ChannelTypes.INCREMENT_TOTAL_MSG_COUNT,
-                                data: {
-                                    channelId: newPost.channel_id,
-                                    amount: 1,
-                                },
-                            },
-                            {
-                                type: ChannelTypes.DECREMENT_UNREAD_MSG_COUNT,
-                                data: {
-                                    channelId: newPost.channel_id,
-                                    amount: 1,
-                                },
-                            },
-                        ];
-
-                        if (files) {
-                            actions.push({
-                                type: FileTypes.RECEIVED_FILES_FOR_POST,
-                                postId: payload.id,
-                                data: files,
-                            });
-                        }
-
-                        dispatch(batchActions(actions));
-                    },
-                    maxRetry: 0,
-                    offlineRollback: true,
-                    rollback: (result: any, error: ServerError) => {
-                        const data = {
-                            ...newPost,
-                            id: pendingPostId,
-                            failed: true,
-                            update_at: Date.now(),
-                        };
-                        dispatch({type: PostTypes.CREATE_POST_FAILURE, error});
-
-                        // If the failure was because: the root post was deleted or
-                        // TownSquareIsReadOnly=true then remove the post
-                        if (error.server_error_id === 'api.post.create_post.root_id.app_error' ||
-                            error.server_error_id === 'api.post.create_post.town_square_read_only' ||
-                            error.server_error_id === 'plugin.message_will_be_posted.dismiss_post'
-                        ) {
-                            dispatch(removePost(data) as any);
-                        } else {
-                            dispatch(receivedPost(data));
-                        }
-                    },
-                },
-            },
         });
+
+        dispatch(batchActions(actions, 'BATCH_CREATE_POST_INIT'));
+
+        (async function createPostWrapper() {
+            try {
+                const created = await Client4.createPost({...newPost, create_at: 0});
+
+                actions = [
+                    receivedPost(created),
+                    {
+                        type: PostTypes.CREATE_POST_SUCCESS,
+                    },
+                    {
+                        type: ChannelTypes.INCREMENT_TOTAL_MSG_COUNT,
+                        data: {
+                            channelId: newPost.channel_id,
+                            amount: 1,
+                        },
+                    },
+                    {
+                        type: ChannelTypes.DECREMENT_UNREAD_MSG_COUNT,
+                        data: {
+                            channelId: newPost.channel_id,
+                            amount: 1,
+                        },
+                    },
+                ];
+
+                if (files) {
+                    actions.push({
+                        type: FileTypes.RECEIVED_FILES_FOR_POST,
+                        postId: created.id,
+                        data: files,
+                    });
+                }
+
+                dispatch(batchActions(actions, 'BATCH_CREATE_POST'));
+            } catch (error) {
+                const data = {
+                    ...newPost,
+                    id: pendingPostId,
+                    failed: true,
+                    update_at: Date.now(),
+                };
+                actions = [{type: PostTypes.CREATE_POST_FAILURE, error}];
+
+                // If the failure was because: the root post was deleted or
+                // TownSquareIsReadOnly=true then remove the post
+                if (error.server_error_id === 'api.post.create_post.root_id.app_error' ||
+                    error.server_error_id === 'api.post.create_post.town_square_read_only' ||
+                    error.server_error_id === 'plugin.message_will_be_posted.dismiss_post'
+                ) {
+                    actions.push(removePost(data) as any);
+                } else {
+                    actions.push(receivedPost(data));
+                }
+
+                dispatch(batchActions(actions, 'BATCH_CREATE_POST_FAILED'));
+            }
+        }());
 
         return {data: true};
     };
@@ -371,7 +372,7 @@ export function resetCreatePostRequest() {
 }
 
 export function deletePost(post: ExtendedPost) {
-    return (dispatch: DispatchFunc, getState: GetStateFunc) => {
+    return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         const state = getState();
         const delPost = {...post};
         if (delPost.type === Posts.POST_TYPES.COMBINED_USER_ACTIVITY && delPost.system_post_ids) {
@@ -382,17 +383,23 @@ export function deletePost(post: ExtendedPost) {
                 }
             });
         } else {
-            dispatch({
-                type: PostTypes.POST_DELETED,
-                data: delPost,
-                meta: {
-                    offline: {
-                        effect: () => Client4.deletePost(post.id),
-                        commit: {type: 'do_nothing'}, // redux-offline always needs to dispatch something on commit
-                        rollback: receivedPost(delPost),
-                    },
-                },
-            });
+            (async function deletePostWrapper() {
+                try {
+                    dispatch({
+                        type: PostTypes.POST_DELETED,
+                        data: delPost,
+                    });
+
+                    await Client4.deletePost(post.id);
+                } catch (e) {
+                    // Recovering from this state doesn't actually work. The deleteAndRemovePost action
+                    // in the webapp needs to get an error in order to not call removePost, but then
+                    // the delete modal needs to handle this to show something to the user. Since none
+                    // of that ever worked (even with redux-offline in play), leave the behaviour here
+                    // unresolved.
+                    console.error('failed to delete post', e); // eslint-disable-line no-console
+                }
+            }());
         }
 
         return {data: true};

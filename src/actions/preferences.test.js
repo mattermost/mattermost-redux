@@ -21,7 +21,13 @@ describe('Actions.Preferences', () => {
     });
 
     beforeEach(() => {
-        store = configureStore();
+        store = configureStore({
+            entities: {
+                users: {
+                    currentUserId: TestHelper.basicUser.id,
+                },
+            },
+        });
     });
 
     afterAll(() => {

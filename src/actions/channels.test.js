@@ -2027,7 +2027,7 @@ describe('Actions.Channels', () => {
 
     describe('leaveChannel', () => {
         const team = TestHelper.fakeTeam();
-        const user = TestHelper.fakeUser();
+        const user = TestHelper.fakeUserWithId();
 
         test('should delete the channel member when leaving a public channel', async () => {
             const channel = {id: 'channel', team_id: team.id, type: General.OPEN_CHANNEL};
@@ -2041,6 +2041,9 @@ describe('Actions.Channels', () => {
                         myMembers: {
                             [channel.id]: {channel_id: channel.id, user_id: user.id},
                         },
+                    },
+                    users: {
+                        currentUserId: user.id,
                     },
                 },
             });
@@ -2069,6 +2072,9 @@ describe('Actions.Channels', () => {
                         myMembers: {
                             [channel.id]: {channel_id: channel.id, user_id: user.id},
                         },
+                    },
+                    users: {
+                        currentUserId: user.id,
                     },
                 },
             });
@@ -2125,6 +2131,50 @@ describe('Actions.Channels', () => {
             expect(state.entities.channels.myMembers[channel.id]).not.toBeDefined();
             expect(state.entities.channelCategories.byId[category.id].channel_ids).toEqual([]);
         });
+
+        test('should restore a channel when failing to leave it (non-custom category)', async () => {
+            const channel = {id: 'channel', team_id: team.id, type: General.OPEN_CHANNEL};
+            const category = {id: 'category', team_id: team.id, type: CategoryTypes.CHANNELS, channel_ids: [channel.id]};
+
+            store = await configureStore({
+                entities: {
+                    channelCategories: {
+                        byId: {
+                            category,
+                        },
+                        orderByTeam: {
+                            [team.id]: [category.id],
+                        },
+                    },
+                    channels: {
+                        channels: {
+                            channel,
+                        },
+                        myMembers: {
+                            [channel.id]: {channel_id: channel.id, user_id: user.id},
+                        },
+                    },
+                    users: {
+                        currentUserId: user.id,
+                    },
+                },
+            });
+
+            nock(Client4.getBaseRoute()).
+                delete(`/channels/${channel.id}/members/${user.id}`).
+                reply(500, {});
+
+            await store.dispatch(Actions.leaveChannel(channel.id));
+
+            // Allow async Client4 API calls to the dispatched action to run first.
+            await new Promise((resolve) => setTimeout(resolve, 500));
+
+            const state = store.getState();
+
+            expect(state.entities.channels.channels[channel.id]).toBeDefined();
+            expect(state.entities.channels.myMembers[channel.id]).toBeDefined();
+            expect(state.entities.channelCategories.byId[category.id].channel_ids).toEqual([channel.id]);
+        });
     });
 
     test('joinChannel', async () => {
@@ -2163,6 +2213,9 @@ describe('Actions.Channels', () => {
             reply(200, [{...channelsCategory, channel_ids: []}]);
 
         await store.dispatch(Actions.joinChannel(user.id, team.id, channel.id));
+
+        // Allow async Client4 API calls to the dispatched action to run first.
+        await new Promise((resolve) => setTimeout(resolve, 500));
 
         const state = store.getState();
 
@@ -2254,6 +2307,9 @@ describe('Actions.Channels', () => {
 
         await store.dispatch(Actions.favoriteChannel(channel.id));
 
+        // Allow async Client4 API calls to the dispatched action to run first.
+        await new Promise((resolve) => setTimeout(resolve, 500));
+
         const state = store.getState();
 
         // Should favorite the channel in preferences
@@ -2288,7 +2344,7 @@ describe('Actions.Channels', () => {
         });
 
         nock(Client4.getBaseRoute()).
-            put(`/users/${TestHelper.basicUser.id}/preferences`).
+            put(`/users/${currentUserId}/preferences`).
             reply(200, OK_RESPONSE);
 
         await store.dispatch(Actions.favoriteChannel(channel.id));
@@ -2499,9 +2555,18 @@ describe('Actions.Channels', () => {
     it('markGroupChannelOpen', async () => {
         const channelId = TestHelper.generateId();
         const now = new Date().getTime();
+        const currentUserId = TestHelper.generateId();
+
+        store = await configureStore({
+            entities: {
+                users: {
+                    currentUserId,
+                },
+            },
+        });
 
         nock(Client4.getBaseRoute()).
-            put(`/users/${TestHelper.basicUser.id}/preferences`).
+            put(`/users/${currentUserId}/preferences`).
             reply(200, OK_RESPONSE);
 
         await Actions.markGroupChannelOpen(channelId)(store.dispatch, store.getState);

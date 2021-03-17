@@ -11,8 +11,7 @@ export default function testConfigureStore(preloadedState) {
         () => ({}),
     );
 
-    const offlineConfig = {
-        detectNetwork: (callback) => callback(true),
+    const persistConfig = {
         persist: (store, options) => {
             return persistStore(store, {storage: new AsyncNodeStorage('./.tmp'), ...options});
         },
@@ -23,17 +22,9 @@ export default function testConfigureStore(preloadedState) {
             ],
             whitelist: [],
         },
-        retry: (action, retries) => 200 * (retries + 1),
-        discard: (error, action, retries) => {
-            if (action.meta && action.meta.offline.hasOwnProperty('maxRetry')) {
-                return retries >= action.meta.offline.maxRetry;
-            }
-
-            return retries >= 1;
-        },
     };
 
-    const store = configureStore(preloadedState, {}, offlineConfig, () => ({}), {enableBuffer: false});
+    const store = configureStore(preloadedState, {}, persistConfig, () => ({}));
 
     return store;
 }
