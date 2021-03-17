@@ -17,16 +17,16 @@ const OK_RESPONSE = {status: 'OK'};
 
 describe('Actions.Teams', () => {
     let store;
-    beforeAll(async () => {
-        await TestHelper.initBasic(Client4);
+    beforeAll(() => {
+        TestHelper.initBasic(Client4);
     });
 
-    beforeEach(async () => {
-        store = await configureStore();
+    beforeEach(() => {
+        store = configureStore();
     });
 
-    afterAll(async () => {
-        await TestHelper.tearDown();
+    afterAll(() => {
+        TestHelper.tearDown();
     });
 
     it('selectTeam', async () => {
@@ -527,7 +527,7 @@ describe('Actions.Teams', () => {
         const user = {id: 'user'};
 
         test('should remove the user from the team', async () => {
-            store = await configureStore({
+            store = configureStore({
                 entities: {
                     teams: {
                         membersInTeam: {
@@ -563,7 +563,7 @@ describe('Actions.Teams', () => {
             const channel1 = {id: 'channel1', team_id: team.id};
             const channel2 = {id: 'channel2', team_id: 'team2'};
 
-            store = await configureStore({
+            store = configureStore({
                 entities: {
                     channels: {
                         channels: {
@@ -594,7 +594,7 @@ describe('Actions.Teams', () => {
         test('should clear the current channel when leaving a team', async () => {
             const channel = {id: 'channel'};
 
-            store = await configureStore({
+            store = configureStore({
                 entities: {
                     channels: {
                         channels: {

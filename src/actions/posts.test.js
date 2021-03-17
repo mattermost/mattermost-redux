@@ -20,16 +20,16 @@ const OK_RESPONSE = {status: 'OK'};
 
 describe('Actions.Posts', () => {
     let store;
-    beforeAll(async () => {
-        await TestHelper.initBasic(Client4);
+    beforeAll(() => {
+        TestHelper.initBasic(Client4);
     });
 
-    beforeEach(async () => {
-        store = await configureStore();
+    beforeEach(() => {
+        store = configureStore();
     });
 
-    afterAll(async () => {
-        await TestHelper.tearDown();
+    afterAll(() => {
+        TestHelper.tearDown();
     });
 
     it('createPost', async () => {
@@ -288,7 +288,7 @@ describe('Actions.Posts', () => {
         const post3 = {id: 'post3', channel_id: 'channel1', root_id: 'post2', create_at: 1003, message: ''};
         const post4 = {id: 'post4', channel_id: 'channel1', root_id: 'post1', create_at: 1004, message: ''};
 
-        store = await configureStore({
+        store = configureStore({
             entities: {
                 posts: {
                     posts: {
@@ -767,7 +767,7 @@ describe('Actions.Posts', () => {
         const post3 = {id: 'post3', channel_id: 'channel1', create_at: 1003, message: ''};
         const post4 = {id: 'post4', channel_id: 'channel1', root_id: 'post0', create_at: 1004, message: ''};
 
-        store = await configureStore({
+        store = configureStore({
             entities: {
                 posts: {
                     posts: {
@@ -828,7 +828,7 @@ describe('Actions.Posts', () => {
         const post2 = {id: 'post2', channel_id: channelId, root_id: 'post1', create_at: 1002, message: ''};
         const post3 = {id: 'post3', channel_id: channelId, create_at: 1003, message: ''};
 
-        store = await configureStore({
+        store = configureStore({
             entities: {
                 posts: {
                     posts: {
@@ -880,7 +880,7 @@ describe('Actions.Posts', () => {
         const post2 = {id: 'post2', channel_id: channelId, root_id: 'post1', create_at: 1002, message: ''};
         const post3 = {id: 'post3', channel_id: channelId, create_at: 1003, message: ''};
 
-        store = await configureStore({
+        store = configureStore({
             entities: {
                 posts: {
                     posts: {
@@ -930,7 +930,7 @@ describe('Actions.Posts', () => {
         const post2 = {id: 'post2', channel_id: channelId, root_id: 'post1', create_at: 1002, message: ''};
         const post3 = {id: 'post3', channel_id: channelId, create_at: 1003, message: ''};
 
-        store = await configureStore({
+        store = configureStore({
             entities: {
                 posts: {
                     posts: {
@@ -1124,7 +1124,7 @@ describe('Actions.Posts', () => {
         const userId = TestHelper.generateId();
         const postId = TestHelper.generateId();
 
-        store = await configureStore({
+        store = configureStore({
             entities: {
                 channels: {
                     channels: {
@@ -1630,12 +1630,12 @@ describe('Actions.Posts', () => {
     });
 
     describe('getThreadsForPosts', () => {
-        beforeAll(async () => {
-            await TestHelper.initBasic(Client4);
+        beforeAll(() => {
+            TestHelper.initBasic(Client4);
         });
 
-        afterAll(async () => {
-            await TestHelper.tearDown();
+        afterAll(() => {
+            TestHelper.tearDown();
         });
 
         let channelId;
@@ -1645,7 +1645,7 @@ describe('Actions.Posts', () => {
         let comment;
 
         beforeEach(async () => {
-            store = await configureStore();
+            store = configureStore();
 
             channelId = TestHelper.basicChannel.id;
             post1 = {id: TestHelper.generateId(), channel_id: channelId, message: ''};

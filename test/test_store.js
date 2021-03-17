@@ -5,7 +5,7 @@ import {createTransform, persistStore} from 'redux-persist';
 
 import configureStore from 'store';
 
-export default async function testConfigureStore(preloadedState) {
+export default function testConfigureStore(preloadedState) {
     const storageTransform = createTransform(
         () => ({}),
         () => ({}),
@@ -25,9 +25,6 @@ export default async function testConfigureStore(preloadedState) {
     };
 
     const store = configureStore(preloadedState, {}, persistConfig, () => ({}));
-
-    const wait = () => new Promise((resolve) => setTimeout(resolve), 300); //eslint-disable-line
-    await wait();
 
     return store;
 }
