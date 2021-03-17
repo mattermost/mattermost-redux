@@ -2166,13 +2166,14 @@ describe('Actions.Channels', () => {
 
             await store.dispatch(Actions.leaveChannel(channel.id));
 
+            // Allow async Client4 API calls to the dispatched action to run first.
+            await new Promise((resolve) => setTimeout(resolve, 500));
+
             const state = store.getState();
 
-            setTimeout(() => {
-                expect(state.entities.channels.channels[channel.id]).toBeDefined();
-                expect(state.entities.channels.myMembers[channel.id]).toBeDefined();
-                expect(state.entities.channelCategories.byId[category.id].channel_ids).toEqual([channel.id]);
-            }, 500);
+            expect(state.entities.channels.channels[channel.id]).toBeDefined();
+            expect(state.entities.channels.myMembers[channel.id]).toBeDefined();
+            expect(state.entities.channelCategories.byId[category.id].channel_ids).toEqual([channel.id]);
         });
     });
 
@@ -2213,13 +2214,14 @@ describe('Actions.Channels', () => {
 
         await store.dispatch(Actions.joinChannel(user.id, team.id, channel.id));
 
+        // Allow async Client4 API calls to the dispatched action to run first.
+        await new Promise((resolve) => setTimeout(resolve, 500));
+
         const state = store.getState();
 
-        setTimeout(() => {
-            expect(state.entities.channels.channels[channel.id]).toBeDefined();
-            expect(state.entities.channels.myMembers[channel.id]).toBeDefined();
-            expect(state.entities.channelCategories.byId[channelsCategory.id].channel_ids).toEqual([channel.id]);
-        }, 500);
+        expect(state.entities.channels.channels[channel.id]).toBeDefined();
+        expect(state.entities.channels.myMembers[channel.id]).toBeDefined();
+        expect(state.entities.channelCategories.byId[channelsCategory.id].channel_ids).toEqual([channel.id]);
     });
 
     test('joinChannelByName', async () => {
@@ -2305,6 +2307,9 @@ describe('Actions.Channels', () => {
 
         await store.dispatch(Actions.favoriteChannel(channel.id));
 
+        // Allow async Client4 API calls to the dispatched action to run first.
+        await new Promise((resolve) => setTimeout(resolve, 500));
+
         const state = store.getState();
 
         // Should favorite the channel in preferences
@@ -2312,10 +2317,8 @@ describe('Actions.Channels', () => {
         expect(state.entities.preferences.myPreferences[prefKey]).toMatchObject({value: 'true'});
 
         // And in channel categories
-        setTimeout(() => {
-            expect(state.entities.channelCategories.byId.favoritesCategory.channel_ids).toEqual([channel.id]);
-            expect(state.entities.channelCategories.byId.channelsCategory.channel_ids).toEqual([]);
-        }, 500);
+        expect(state.entities.channelCategories.byId.favoritesCategory.channel_ids).toEqual([channel.id]);
+        expect(state.entities.channelCategories.byId.channelsCategory.channel_ids).toEqual([]);
     });
 
     test('favoriteChannel with old sidebar enabled', async () => {
