@@ -96,8 +96,6 @@ const values = {
     REMOVE_LDAP_PUBLIC_CERT: 'remove_ldap_public_cert',
     REMOVE_LDAP_PRIVATE_CERT: 'remove_ldap_private_cert',
     INVALIDATE_EMAIL_INVITE: 'invalidate_email_invite',
-    SYSCONSOLE_READ_ABOUT: 'sysconsole_read_about',
-    SYSCONSOLE_WRITE_ABOUT: 'sysconsole_write_about',
     SYSCONSOLE_READ_ABOUT_EDITION_AND_LICENSE: 'sysconsole_read_about_edition_and_license',
     SYSCONSOLE_WRITE_ABOUT_EDITION_AND_LICENSE: 'sysconsole_write_about_edition_and_license',
     SYSCONSOLE_READ_BILLING: 'sysconsole_read_billing',
