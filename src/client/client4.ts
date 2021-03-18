@@ -3,10 +3,11 @@
 import {General} from '../constants';
 
 import {ClusterInfo, AnalyticsRow} from 'types/admin';
+import type {AppBinding, AppCallRequest, AppCallResponse, AppCallType} from 'types/apps';
 import {Audit} from 'types/audits';
 import {UserAutocomplete, AutocompleteSuggestion} from 'types/autocomplete';
 import {Bot, BotPatch} from 'types/bots';
-import {Product, Subscription, CloudCustomer, Address, CloudCustomerPatch, Invoice} from 'types/cloud';
+import {Product, Subscription, CloudCustomer, Address, CloudCustomerPatch, Invoice, SubscriptionStats} from 'types/cloud';
 import {ChannelCategory, OrderedChannelCategories} from 'types/channel_categories';
 import {
     Channel,
@@ -33,7 +34,7 @@ import {
 } from 'types/config';
 import {CustomEmoji} from 'types/emojis';
 import {ServerError} from 'types/errors';
-import {FileInfo, FileUploadResponse} from 'types/files';
+import {FileInfo, FileUploadResponse, FileSearchResults} from 'types/files';
 import {
     Group,
     GroupPatch,
@@ -46,6 +47,7 @@ import {
 import {PostActionResponse} from 'types/integration_actions';
 import {
     Command,
+    CommandArgs,
     CommandResponse,
     DialogSubmission,
     IncomingWebhook,
@@ -57,11 +59,14 @@ import {Job} from 'types/jobs';
 import {MfaSecret} from 'types/mfa';
 import {
     ClientPluginManifest,
-    MarketplacePlugin,
     PluginManifest,
     PluginsResponse,
     PluginStatus,
 } from 'types/plugins';
+import type {
+    MarketplaceApp,
+    MarketplacePlugin,
+} from 'types/marketplace';
 import {Post, PostList, PostSearchResults, OpenGraphMetadata} from 'types/posts';
 import {PreferenceType} from 'types/preferences';
 import {Reaction} from 'types/reactions';
@@ -88,6 +93,7 @@ import {
     UsersStats,
     UserStatus,
     GetFilteredUsersStatsOpts,
+    UserCustomStatus,
 } from 'types/users';
 import {$ID, RelationOneToOne} from 'types/utilities';
 import {ProductNotices} from 'types/product_notices';
@@ -98,7 +104,7 @@ import {isSystemAdmin} from 'utils/user_utils';
 
 import fetch from './fetch_etag';
 import {TelemetryHandler} from './telemetry';
-import {UserThreadList} from 'types/threads';
+import {UserThreadList, UserThread, UserThreadWithPost} from 'types/threads';
 
 const FormData = require('form-data');
 const HEADER_AUTH = 'Authorization';
@@ -205,6 +211,13 @@ export default class Client4 {
 
     getBaseRoute() {
         return `${this.url}${this.urlVersion}`;
+    }
+
+    // This function belongs to the Apps Framework feature.
+    // Apps Framework feature is experimental, and this function is susceptible
+    // to breaking changes without pushing the major version of this package.
+    getAppsProxyRoute() {
+        return `${this.url}/plugins/com.mattermost.apps`;
     }
 
     getUsersRoute() {
@@ -955,6 +968,27 @@ export default class Client4 {
             {method: 'put', body: JSON.stringify(status)},
         );
     };
+
+    updateCustomStatus = (customStatus: UserCustomStatus) => {
+        return this.doFetch(
+            `${this.getUserRoute('me')}/status/custom`,
+            {method: 'put', body: JSON.stringify(customStatus)},
+        );
+    };
+
+    unsetCustomStatus = () => {
+        return this.doFetch(
+            `${this.getUserRoute('me')}/status/custom`,
+            {method: 'delete'},
+        );
+    }
+
+    removeRecentCustomStatus = (customStatus: UserCustomStatus) => {
+        return this.doFetch(
+            `${this.getUserRoute('me')}/status/custom/recent`,
+            {method: 'delete', body: JSON.stringify(customStatus)},
+        );
+    }
 
     switchEmailToOAuth = (service: string, email: string, password: string, mfaCode = '') => {
         this.trackEvent('api', 'api_users_email_to_oauth');
@@ -1918,15 +1952,33 @@ export default class Client4 {
         userId: $ID<UserProfile> = 'me',
         teamId: $ID<Team>,
         {
-            page = 0,
+            before = '',
+            after = '',
             pageSize = PER_PAGE_DEFAULT,
             extended = false,
             deleted = false,
+            unread = false,
             since = 0,
         },
     ) => {
         return this.doFetch<UserThreadList>(
-            `${this.getUserThreadsRoute(userId, teamId)}${buildQueryString({page, pageSize, extended, deleted, since})}`,
+            `${this.getUserThreadsRoute(userId, teamId)}${buildQueryString({before, after, pageSize, extended, deleted, unread, since})}`,
+            {method: 'get'},
+        );
+    };
+
+    getUserThread = (userId: string, teamId: string, threadId: string, extended = false) => {
+        const url = `${this.getUserThreadRoute(userId, teamId, threadId)}`;
+        return this.doFetch<UserThreadWithPost>(
+            `${url}${buildQueryString({extended})}`,
+            {method: 'get'},
+        );
+    };
+
+    getThreadMentionCountsByChannel = (userId: string, teamId: string) => {
+        const url = `${this.getUserThreadsRoute(userId, teamId)}/mention_counts`;
+        return this.doFetch<Record<string, number>>(
+            url,
             {method: 'get'},
         );
     };
@@ -1941,7 +1993,7 @@ export default class Client4 {
 
     updateThreadReadForUser = (userId: string, teamId: string, threadId: string, timestamp: number) => {
         const url = `${this.getUserThreadRoute(userId, teamId, threadId)}/read/${timestamp}`;
-        return this.doFetch<StatusOK>(
+        return this.doFetch<UserThread>(
             url,
             {method: 'put'},
         );
@@ -2042,6 +2094,19 @@ export default class Client4 {
 
     searchPosts = (teamId: string, terms: string, isOrSearch: boolean) => {
         return this.searchPostsWithParams(teamId, {terms, is_or_search: isOrSearch});
+    };
+
+    searchFilesWithParams = (teamId: string, params: any) => {
+        this.trackEvent('api', 'api_files_search', {team_id: teamId});
+
+        return this.doFetch<FileSearchResults>(
+            `${this.getTeamRoute(teamId)}/files/search`,
+            {method: 'post', body: JSON.stringify(params)},
+        );
+    };
+
+    searchFiles = (teamId: string, terms: string, isOrSearch: boolean) => {
+        return this.searchFilesWithParams(teamId, {terms, is_or_search: isOrSearch});
     };
 
     getOpenGraphMetadata = (url: string) => {
@@ -2366,7 +2431,7 @@ export default class Client4 {
         );
     };
 
-    getCommandAutocompleteSuggestionsList = (userInput: string, teamId: string, commandArgs: {}) => {
+    getCommandAutocompleteSuggestionsList = (userInput: string, teamId: string, commandArgs: CommandArgs) => {
         return this.doFetch<AutocompleteSuggestion[]>(
             `${this.getTeamRoute(teamId)}/commands/autocomplete_suggestions${buildQueryString({...commandArgs, user_input: userInput})}`,
             {method: 'get'},
@@ -2387,7 +2452,7 @@ export default class Client4 {
         );
     };
 
-    executeCommand = (command: Command, commandArgs = {}) => {
+    executeCommand = (command: string, commandArgs: CommandArgs) => {
         this.trackEvent('api', 'api_integrations_used');
 
         return this.doFetch<CommandResponse>(
@@ -3097,7 +3162,7 @@ export default class Client4 {
     };
 
     getMarketplacePlugins = (filter: string, localOnly = false) => {
-        return this.doFetch<MarketplacePlugin>(
+        return this.doFetch<MarketplacePlugin[]>(
             `${this.getPluginsMarketplaceRoute()}${buildQueryString({filter: filter || '', local_only: localOnly})}`,
             {method: 'get'},
         );
@@ -3109,6 +3174,16 @@ export default class Client4 {
         return this.doFetch<MarketplacePlugin>(
             `${this.getPluginsMarketplaceRoute()}`,
             {method: 'post', body: JSON.stringify({id, version})},
+        );
+    }
+
+    // This function belongs to the Apps Framework feature.
+    // Apps Framework feature is experimental, and this function is susceptible
+    // to breaking changes without pushing the major version of this package.
+    getMarketplaceApps = (filter: string) => {
+        return this.doFetch<MarketplaceApp[]>(
+            `${this.getAppsProxyRoute()}/api/v1/marketplace${buildQueryString({filter: filter || ''})}`,
+            {method: 'get'},
         );
     }
 
@@ -3221,6 +3296,34 @@ export default class Client4 {
             {method: 'get'},
         );
     };
+
+    // This function belongs to the Apps Framework feature.
+    // Apps Framework feature is experimental, and this function is susceptible
+    // to breaking changes without pushing the major version of this package.
+    executeAppCall = async (call: AppCallRequest, type: AppCallType) => {
+        const callCopy: AppCallRequest = {
+            ...call,
+            path: `${call.path}/${type}`,
+            context: {
+                ...call.context,
+                user_agent: 'webapp',
+            },
+        };
+        return this.doFetch<AppCallResponse>(
+            `${this.getAppsProxyRoute()}/api/v1/call`,
+            {method: 'post', body: JSON.stringify(callCopy)},
+        );
+    }
+
+    // This function belongs to the Apps Framework feature.
+    // Apps Framework feature is experimental, and this function is susceptible
+    // to breaking changes without pushing the major version of this package.
+    getAppsBindings = async (userID: string, channelID: string) => {
+        return this.doFetch<AppBinding[]>(
+            this.getAppsProxyRoute() + `/api/v1/bindings?user_id=${userID}&channel_id=${channelID}&user_agent_type=webapp`,
+            {method: 'get'},
+        );
+    }
 
     getGroupsAssociatedToTeam = (teamID: string, q = '', page = 0, perPage = PER_PAGE_DEFAULT, filterAllowReference = false) => {
         this.trackEvent('api', 'api_groups_get_associated_to_team', {team_id: teamID});
@@ -3407,6 +3510,13 @@ export default class Client4 {
         );
     }
 
+    getSubscriptionStats = () => {
+        return this.doFetch<SubscriptionStats>(
+            `${this.getCloudRoute()}/subscription/stats`,
+            {method: 'get'},
+        );
+    }
+
     getRenewalLink = () => {
         return this.doFetch<{renewal_link: string}>(
             `${this.getBaseRoute()}/license/renewal`,
@@ -3476,6 +3586,20 @@ export default class Client4 {
         return this.doFetch<StatusOK>(
             `${this.getNoticesRoute()}/view`,
             {method: 'put', body: JSON.stringify(noticeIds)},
+        );
+    }
+
+    sendAdminUpgradeRequestEmail = () => {
+        return this.doFetch<StatusOK>(
+            `${this.getCloudRoute()}/subscription/limitreached/invite`,
+            {method: 'post'},
+        );
+    }
+
+    sendAdminUpgradeRequestEmailOnJoin = () => {
+        return this.doFetch<StatusOK>(
+            `${this.getCloudRoute()}/subscription/limitreached/join`,
+            {method: 'post'},
         );
     }
 

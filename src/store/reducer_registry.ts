@@ -6,7 +6,7 @@ import {Dictionary} from 'types/utilities';
 
 // Based on http://nicolasgallagher.com/redux-modules-and-code-splitting/
 export class ReducerRegistry {
-    emitChange?: Function;
+    emitChange?: (reducers: Dictionary<Reducer>) => void;
     reducers: Dictionary<Reducer> = {};
 
     setReducers = (reducers: Dictionary<Reducer>) => {
@@ -24,7 +24,7 @@ export class ReducerRegistry {
         }
     }
 
-    setChangeListener = (listener: Function) => {
+    setChangeListener = (listener: (reducers: Dictionary<Reducer>) => void) => {
         this.emitChange = listener;
     }
 }

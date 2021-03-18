@@ -4,9 +4,10 @@
 import {combineReducers} from 'redux';
 import {GifTypes} from 'action_types';
 import {GenericAction} from 'types/actions';
-import {Dictionary} from 'types/utilities';
 
-const SEARCH_SELECTORS: Dictionary<Function> = {
+type ReducerMap = {[actionType: string]: (state: any, action: GenericAction) => any};
+
+const SEARCH_SELECTORS: ReducerMap = {
     [GifTypes.SELECT_SEARCH_TEXT]: (state: any, action: GenericAction) => ({
         ...state,
         searchText: action.searchText,
@@ -65,7 +66,7 @@ const SEARCH_SELECTORS: Dictionary<Function> = {
     }),
 };
 
-const CATEGORIES_SELECTORS: Dictionary<Function> = {
+const CATEGORIES_SELECTORS: ReducerMap = {
     [GifTypes.REQUEST_CATEGORIES_LIST]: (state: any) => ({
         ...state,
         isFetching: true,
@@ -99,7 +100,7 @@ const CATEGORIES_SELECTORS: Dictionary<Function> = {
     }),
 };
 
-const TERM_SELECTOR: Dictionary<Function> = {
+const TERM_SELECTOR: ReducerMap = {
     [GifTypes.REQUEST_SEARCH]: (state: any, action: GenericAction) => ({
         ...state,
         [action.searchText]: {
@@ -181,7 +182,7 @@ const TERM_SELECTOR: Dictionary<Function> = {
         },
     }),
 };
-const PAGE_SELECTOR: Dictionary<Function> = {
+const PAGE_SELECTOR: ReducerMap = {
     [GifTypes.REQUEST_SEARCH]: (state: {pages?: any} = {}) => {
         if (typeof state.pages == 'undefined') {
             return {};
@@ -194,7 +195,7 @@ const PAGE_SELECTOR: Dictionary<Function> = {
     }),
 };
 
-const CACHE_SELECTORS: Dictionary<Function> = {
+const CACHE_SELECTORS: ReducerMap = {
     [GifTypes.CACHE_GIFS]: (state: any, action: GenericAction) => ({
         ...state,
         gifs: CACHE_GIF_SELECTOR[action.type](state.gifs, action),
@@ -206,7 +207,7 @@ const CACHE_SELECTORS: Dictionary<Function> = {
     }),
 };
 
-const CACHE_GIF_SELECTOR: Dictionary<Function> = {
+const CACHE_GIF_SELECTOR: ReducerMap = {
     [GifTypes.CACHE_GIFS]: (state: any, action: GenericAction) => ({
         ...state,
         ...action.gifs.reduce((map: any, obj: any) => {

@@ -138,8 +138,8 @@ export const getGroupsAssociatedToTeam: (state: GlobalState, teamID: string) => 
 export const getGroupsNotAssociatedToChannel: (state: GlobalState, channelID: string, teamID: string) => Group[] = createSelector(
     getAllGroups,
     (state: GlobalState, channelID: string) => getChannelGroupIDSet(state, channelID),
-    (state: GlobalState, _: string, teamID: string) => getTeam(state, teamID),
-    (state: GlobalState, _: string, teamID: string) => getGroupsAssociatedToTeam(state, teamID),
+    (state: GlobalState, channelID: string, teamID: string) => getTeam(state, teamID),
+    (state: GlobalState, channelID: string, teamID: string) => getGroupsAssociatedToTeam(state, teamID),
     (allGroups, channelGroupIDSet, team, teamGroups) => {
         let result = Object.values(allGroups).filter((group) => !channelGroupIDSet.has(group.id));
         if (team.group_constrained) {

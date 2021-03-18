@@ -16,16 +16,16 @@ const OK_RESPONSE = {status: 'OK'};
 
 describe('Actions.Users', () => {
     let store;
-    beforeAll(async () => {
-        await TestHelper.initBasic(Client4);
+    beforeAll(() => {
+        TestHelper.initBasic(Client4);
     });
 
-    beforeEach(async () => {
-        store = await configureStore();
+    beforeEach(() => {
+        store = configureStore();
     });
 
-    afterAll(async () => {
-        await TestHelper.tearDown();
+    afterAll(() => {
+        TestHelper.tearDown();
     });
 
     it('createUser', async () => {
@@ -1422,7 +1422,7 @@ describe('Actions.Users', () => {
                 query({since: lastDisconnectAt}).
                 reply(200, [{...user2, update_at: 2000}]);
 
-            store = await configureStore({
+            store = configureStore({
                 entities: {
                     general: {
                         serverVersion: '5.14.0',
@@ -1463,7 +1463,7 @@ describe('Actions.Users', () => {
                 },
             });
 
-            store = await configureStore(originalState);
+            store = configureStore(originalState);
 
             await store.dispatch(Actions.checkForModifiedUsers());
 

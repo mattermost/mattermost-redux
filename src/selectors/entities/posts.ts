@@ -12,6 +12,7 @@ import {getUsers, getCurrentUserId} from 'selectors/entities/users';
 import {Channel} from 'types/channels';
 import {
     MessageHistory,
+    OpenGraphMetadata,
     Post,
     PostOrderBlock,
     PostWithFormatData,
@@ -72,7 +73,7 @@ export function makeGetReactionsForPost(): (state: GlobalState, postId: $ID<Post
     });
 }
 
-export function getOpenGraphMetadata(state: GlobalState): RelationOneToOne<Post, object> {
+export function getOpenGraphMetadata(state: GlobalState): RelationOneToOne<Post, Dictionary<OpenGraphMetadata>> {
     return state.entities.posts.openGraph;
 }
 
@@ -585,7 +586,7 @@ export function getPostIdsInChannel(state: GlobalState, channelId: $ID<Channel>)
     return recentBlock.order;
 }
 
-export function getPostsChunkInChannelAroundTime(state: GlobalState, channelId: $ID<Channel>, timeStamp: number): object | undefined | null {
+export function getPostsChunkInChannelAroundTime(state: GlobalState, channelId: $ID<Channel>, timeStamp: number): PostOrderBlock | undefined | null {
     const postsEntity = state.entities.posts;
     const postsForChannel = postsEntity.postsInChannel[channelId];
     const posts = postsEntity.posts;
@@ -606,7 +607,7 @@ export function getPostsChunkInChannelAroundTime(state: GlobalState, channelId: 
     return blockAroundTimestamp;
 }
 
-export function getUnreadPostsChunk(state: GlobalState, channelId: $ID<Channel>, timeStamp: number): object | undefined | null {
+export function getUnreadPostsChunk(state: GlobalState, channelId: $ID<Channel>, timeStamp: number): PostOrderBlock | undefined | null {
     const postsEntity = state.entities.posts;
     const posts = postsEntity.posts;
     const recentChunk = getRecentPostsChunkInChannel(state, channelId);

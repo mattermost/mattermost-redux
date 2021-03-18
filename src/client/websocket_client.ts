@@ -1,5 +1,6 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
+
 const MAX_WEBSOCKET_FAILS = 7;
 const MIN_WEBSOCKET_RETRY_TIME = 3000; // 3 sec
 
@@ -13,12 +14,12 @@ class WebSocketClient {
     token: string|null;
     sequence: number;
     connectFailCount: number;
-    eventCallback?: Function;
-    firstConnectCallback?: Function;
-    reconnectCallback?: Function;
-    errorCallback?: Function;
-    closeCallback?: Function;
-    connectingCallback?: Function;
+    eventCallback?: (message: any) => void;
+    firstConnectCallback?: () => void;
+    reconnectCallback?: () => void;
+    errorCallback?: (event: Event) => void;
+    closeCallback?: (connectFailCount: number) => void;
+    connectingCallback?: () => void;
     stop: boolean;
     platform: string;
     connectionTimeout: any;
@@ -49,7 +50,7 @@ class WebSocketClient {
             this.stop = false;
         }
 
-        return new Promise((resolve, reject) => {
+        return new Promise<void>((resolve, reject) => {
             if (this.conn) {
                 resolve();
                 return;
@@ -182,27 +183,27 @@ class WebSocketClient {
         });
     }
 
-    setConnectingCallback(callback: Function) {
+    setConnectingCallback(callback: () => void) {
         this.connectingCallback = callback;
     }
 
-    setEventCallback(callback: Function) {
+    setEventCallback(callback: (message: any) => void) {
         this.eventCallback = callback;
     }
 
-    setFirstConnectCallback(callback: Function) {
+    setFirstConnectCallback(callback: () => void) {
         this.firstConnectCallback = callback;
     }
 
-    setReconnectCallback(callback: Function) {
+    setReconnectCallback(callback: () => void) {
         this.reconnectCallback = callback;
     }
 
-    setErrorCallback(callback: Function) {
+    setErrorCallback(callback: (event: Event) => void) {
         this.errorCallback = callback;
     }
 
-    setCloseCallback(callback: Function) {
+    setCloseCallback(callback: (connectFailCount: number) => void) {
         this.closeCallback = callback;
     }
 

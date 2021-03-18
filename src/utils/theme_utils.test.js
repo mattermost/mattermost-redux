@@ -3,8 +3,8 @@
 
 import assert from 'assert';
 
-import {Preferences} from '../constants';
 import * as ThemeUtils from 'utils/theme_utils';
+import {Preferences} from '../constants';
 
 describe('ThemeUtils', () => {
     describe('getComponents', () => {
@@ -73,12 +73,21 @@ describe('ThemeUtils', () => {
             const expected = {...Preferences.THEMES.default};
             delete expected.type;
 
-            assert.deepEqual(ThemeUtils.setThemeDefaults(input), expected);
+            assert.deepEqual(ThemeUtils.setThemeDefaults(input), {
+                ...expected,
+                sidebarTeamBarBg: '#0d4288',
+            });
+        });
+
+        it('correctly updates the sidebarTeamBarBg variable', () => {
+            const input = {sidebarHeaderBg: '#ffaa55'};
+
+            assert.equal(ThemeUtils.setThemeDefaults(input).sidebarTeamBarBg, '#cc8844');
         });
 
         it('set defaults on unset properties only', () => {
-            const input = {buttonColor: 'green'};
-            assert.equal(ThemeUtils.setThemeDefaults(input).buttonColor, 'green');
+            const input = {buttonColor: '#7600ff'};
+            assert.equal(ThemeUtils.setThemeDefaults(input).buttonColor, '#7600ff');
         });
 
         it('ignore type', () => {

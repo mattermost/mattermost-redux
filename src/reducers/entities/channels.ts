@@ -176,7 +176,7 @@ function channels(state: IDMappedObjects<Channel> = {}, action: GenericAction) {
     }
 
     case PostTypes.RECEIVED_NEW_POST: {
-        const {channel_id, create_at} = action.data; //eslint-disable-line @typescript-eslint/camelcase
+        const {channel_id, create_at} = action.data; //eslint-disable-line @typescript-eslint/naming-convention
         const channel = state[channel_id];
 
         if (!channel) {

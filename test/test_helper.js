@@ -453,7 +453,7 @@ class TestHelper {
         this.basicGroup = this.fakeGroupWithId();
     }
 
-    initBasic = async (client4 = this.createClient4()) => {
+    initBasic = (client4 = this.createClient4()) => {
         client4.setUrl(DEFAULT_SERVER);
         this.basicClient4 = client4;
 
@@ -469,7 +469,7 @@ class TestHelper {
         };
     };
 
-    tearDown = async () => {
+    tearDown = () => {
         nock.restore();
 
         this.basicClient4 = null;

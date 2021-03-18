@@ -5,7 +5,7 @@ import {combineReducers} from 'redux';
 import {CloudTypes} from 'action_types';
 
 import {GenericAction} from 'types/actions';
-import {Product, Subscription, CloudCustomer, Invoice} from 'types/cloud';
+import {Product, Subscription, CloudCustomer, Invoice, SubscriptionStats} from 'types/cloud';
 import {Dictionary} from 'types/utilities';
 
 function subscription(state: Subscription | null = null, action: GenericAction) {
@@ -64,6 +64,20 @@ function invoices(state: Dictionary<Invoice> | null = null, action: GenericActio
     }
 }
 
+function subscriptionStats(state: SubscriptionStats | null = null, action: GenericAction) {
+    switch (action.type) {
+    case CloudTypes.RECEIVED_CLOUD_SUBSCRIPTION_STATS: {
+        const data = action.data;
+        return {
+            ...state,
+            ...data,
+        };
+    }
+    default:
+        return state;
+    }
+}
+
 export default combineReducers({
 
     // represents the current cloud customer
@@ -77,4 +91,6 @@ export default combineReducers({
 
     // represents the invoices tied to the current subscription
     invoices,
+
+    subscriptionStats,
 });

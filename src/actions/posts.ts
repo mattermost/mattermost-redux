@@ -27,11 +27,11 @@ import {Action, ActionResult, batchActions, DispatchFunc, GetStateFunc} from 'ty
 import {ChannelUnread} from 'types/channels';
 import {GlobalState} from 'types/store';
 import {Post, PostList} from 'types/posts';
-import {ServerError} from 'types/errors';
 import {Reaction} from 'types/reactions';
 import {UserProfile} from 'types/users';
 import {Dictionary} from 'types/utilities';
 import {CustomEmoji} from 'types/emojis';
+import {isCollapsedThreadsEnabled} from 'selectors/entities/preferences';
 
 // receivedPost should be dispatched after a single post from the server. This typically happens when an existing post
 // is updated.
@@ -166,6 +166,7 @@ export function createPost(post: Post, files: any[] = []) {
 
         const timestamp = Date.now();
         const pendingPostId = post.pending_post_id || `${currentUserId}:${timestamp}`;
+        let actions: Action[] = [];
 
         if (Selectors.isPostIdSending(state, pendingPostId)) {
             return {data: true};
@@ -196,79 +197,80 @@ export function createPost(post: Post, files: any[] = []) {
                 file_ids: fileIds,
             };
 
-            dispatch({
+            actions.push({
                 type: FileTypes.RECEIVED_FILES_FOR_POST,
                 postId: pendingPostId,
                 data: files,
             });
         }
 
-        dispatch({
+        actions.push({
             type: PostTypes.RECEIVED_NEW_POST,
             data: {
-                id: pendingPostId,
                 ...newPost,
-            },
-            meta: {
-                offline: {
-                    effect: () => Client4.createPost({...newPost, create_at: 0}),
-                    commit: (result: any, payload: any) => {
-                        const actions: Action[] = [
-                            receivedPost(payload),
-                            {
-                                type: PostTypes.CREATE_POST_SUCCESS,
-                            },
-                            {
-                                type: ChannelTypes.INCREMENT_TOTAL_MSG_COUNT,
-                                data: {
-                                    channelId: newPost.channel_id,
-                                    amount: 1,
-                                },
-                            },
-                            {
-                                type: ChannelTypes.DECREMENT_UNREAD_MSG_COUNT,
-                                data: {
-                                    channelId: newPost.channel_id,
-                                    amount: 1,
-                                },
-                            },
-                        ];
-
-                        if (files) {
-                            actions.push({
-                                type: FileTypes.RECEIVED_FILES_FOR_POST,
-                                postId: payload.id,
-                                data: files,
-                            });
-                        }
-
-                        dispatch(batchActions(actions));
-                    },
-                    maxRetry: 0,
-                    offlineRollback: true,
-                    rollback: (result: any, error: ServerError) => {
-                        const data = {
-                            ...newPost,
-                            id: pendingPostId,
-                            failed: true,
-                            update_at: Date.now(),
-                        };
-                        dispatch({type: PostTypes.CREATE_POST_FAILURE, error});
-
-                        // If the failure was because: the root post was deleted or
-                        // TownSquareIsReadOnly=true then remove the post
-                        if (error.server_error_id === 'api.post.create_post.root_id.app_error' ||
-                            error.server_error_id === 'api.post.create_post.town_square_read_only' ||
-                            error.server_error_id === 'plugin.message_will_be_posted.dismiss_post'
-                        ) {
-                            dispatch(removePost(data) as any);
-                        } else {
-                            dispatch(receivedPost(data));
-                        }
-                    },
-                },
+                id: pendingPostId,
             },
         });
+
+        dispatch(batchActions(actions, 'BATCH_CREATE_POST_INIT'));
+
+        (async function createPostWrapper() {
+            try {
+                const created = await Client4.createPost({...newPost, create_at: 0});
+
+                actions = [
+                    receivedPost(created),
+                    {
+                        type: PostTypes.CREATE_POST_SUCCESS,
+                    },
+                    {
+                        type: ChannelTypes.INCREMENT_TOTAL_MSG_COUNT,
+                        data: {
+                            channelId: newPost.channel_id,
+                            amount: 1,
+                        },
+                    },
+                    {
+                        type: ChannelTypes.DECREMENT_UNREAD_MSG_COUNT,
+                        data: {
+                            channelId: newPost.channel_id,
+                            amount: 1,
+                        },
+                    },
+                ];
+
+                if (files) {
+                    actions.push({
+                        type: FileTypes.RECEIVED_FILES_FOR_POST,
+                        postId: created.id,
+                        data: files,
+                    });
+                }
+
+                dispatch(batchActions(actions, 'BATCH_CREATE_POST'));
+            } catch (error) {
+                const data = {
+                    ...newPost,
+                    id: pendingPostId,
+                    failed: true,
+                    update_at: Date.now(),
+                };
+                actions = [{type: PostTypes.CREATE_POST_FAILURE, error}];
+
+                // If the failure was because: the root post was deleted or
+                // TownSquareIsReadOnly=true then remove the post
+                if (error.server_error_id === 'api.post.create_post.root_id.app_error' ||
+                    error.server_error_id === 'api.post.create_post.town_square_read_only' ||
+                    error.server_error_id === 'plugin.message_will_be_posted.dismiss_post'
+                ) {
+                    actions.push(removePost(data) as any);
+                } else {
+                    actions.push(receivedPost(data));
+                }
+
+                dispatch(batchActions(actions, 'BATCH_CREATE_POST_FAILED'));
+            }
+        }());
 
         return {data: true};
     };
@@ -309,8 +311,8 @@ export function createPostImmediately(post: Post, files: any[] = []) {
         }
 
         dispatch(receivedNewPost({
-            id: pendingPostId,
             ...newPost,
+            id: pendingPostId,
         }));
 
         try {
@@ -321,7 +323,10 @@ export function createPostImmediately(post: Post, files: any[] = []) {
             forceLogoutIfNecessary(error, dispatch, getState);
             dispatch(batchActions([
                 {type: PostTypes.CREATE_POST_FAILURE, data: newPost, error},
-                removePost({id: pendingPostId, ...newPost}) as any,
+                removePost({
+                    ...newPost,
+                    id: pendingPostId,
+                }) as any,
                 logError(error),
             ]));
             return {error};
@@ -367,7 +372,7 @@ export function resetCreatePostRequest() {
 }
 
 export function deletePost(post: ExtendedPost) {
-    return (dispatch: DispatchFunc, getState: GetStateFunc) => {
+    return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         const state = getState();
         const delPost = {...post};
         if (delPost.type === Posts.POST_TYPES.COMBINED_USER_ACTIVITY && delPost.system_post_ids) {
@@ -378,17 +383,23 @@ export function deletePost(post: ExtendedPost) {
                 }
             });
         } else {
-            dispatch({
-                type: PostTypes.POST_DELETED,
-                data: delPost,
-                meta: {
-                    offline: {
-                        effect: () => Client4.deletePost(post.id),
-                        commit: {type: 'do_nothing'}, // redux-offline always needs to dispatch something on commit
-                        rollback: receivedPost(delPost),
-                    },
-                },
-            });
+            (async function deletePostWrapper() {
+                try {
+                    dispatch({
+                        type: PostTypes.POST_DELETED,
+                        data: delPost,
+                    });
+
+                    await Client4.deletePost(post.id);
+                } catch (e) {
+                    // Recovering from this state doesn't actually work. The deleteAndRemovePost action
+                    // in the webapp needs to get an error in order to not call removePost, but then
+                    // the delete modal needs to handle this to show something to the user. Since none
+                    // of that ever worked (even with redux-offline in play), leave the behaviour here
+                    // unresolved.
+                    console.error('failed to delete post', e); // eslint-disable-line no-console
+                }
+            }());
         }
 
         return {data: true};
@@ -680,13 +691,13 @@ export function flagPost(postId: string) {
     };
 }
 
-export function getPostThread(rootId: string, fetchThreads = true, collapsedThreads = false, collapsedThreadsExtended = false) {
+export function getPostThread(rootId: string, fetchThreads = true) {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         dispatch({type: PostTypes.GET_POST_THREAD_REQUEST});
 
         let posts;
         try {
-            posts = await Client4.getPostThread(rootId, fetchThreads, collapsedThreads, collapsedThreadsExtended);
+            posts = await Client4.getPostThread(rootId, fetchThreads);
             getProfilesAndStatusesForPosts(posts.posts, dispatch, getState);
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch, getState);
@@ -709,12 +720,12 @@ export function getPostThread(rootId: string, fetchThreads = true, collapsedThre
     };
 }
 
-export function getPosts(channelId: string, page = 0, perPage = Posts.POST_CHUNK_SIZE, fetchThreads = true, collapsedThreads = false, collapsedThreadsExtended = false) {
+export function getPosts(channelId: string, page = 0, perPage = Posts.POST_CHUNK_SIZE, fetchThreads = true, collapsedThreadsExtended = false) {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         let posts;
-
+        const collapsedThreadsEnabled = isCollapsedThreadsEnabled(getState());
         try {
-            posts = await Client4.getPosts(channelId, page, perPage, fetchThreads, collapsedThreads, collapsedThreadsExtended);
+            posts = await Client4.getPosts(channelId, page, perPage, fetchThreads, collapsedThreadsEnabled, collapsedThreadsExtended);
             getProfilesAndStatusesForPosts(posts.posts, dispatch, getState);
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch, getState);
@@ -731,12 +742,13 @@ export function getPosts(channelId: string, page = 0, perPage = Posts.POST_CHUNK
     };
 }
 
-export function getPostsUnread(channelId: string, fetchThreads = true, collapsedThreads = false, collapsedThreadsExtended = false) {
+export function getPostsUnread(channelId: string, fetchThreads = true, collapsedThreadsExtended = false) {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
+        const collapsedThreadsEnabled = isCollapsedThreadsEnabled(getState());
         const userId = getCurrentUserId(getState());
         let posts;
         try {
-            posts = await Client4.getPostsUnread(channelId, userId, DEFAULT_LIMIT_BEFORE, DEFAULT_LIMIT_AFTER, fetchThreads, collapsedThreads, collapsedThreadsExtended);
+            posts = await Client4.getPostsUnread(channelId, userId, DEFAULT_LIMIT_BEFORE, DEFAULT_LIMIT_AFTER, fetchThreads, collapsedThreadsEnabled, collapsedThreadsExtended);
             getProfilesAndStatusesForPosts(posts.posts, dispatch, getState);
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch, getState);
@@ -758,11 +770,12 @@ export function getPostsUnread(channelId: string, fetchThreads = true, collapsed
     };
 }
 
-export function getPostsSince(channelId: string, since: number, fetchThreads = true, collapsedThreads = false, collapsedThreadsExtended = false) {
+export function getPostsSince(channelId: string, since: number, fetchThreads = true, collapsedThreadsExtended = false) {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         let posts;
         try {
-            posts = await Client4.getPostsSince(channelId, since, fetchThreads, collapsedThreads, collapsedThreadsExtended);
+            const collapsedThreadsEnabled = isCollapsedThreadsEnabled(getState());
+            posts = await Client4.getPostsSince(channelId, since, fetchThreads, collapsedThreadsEnabled, collapsedThreadsExtended);
             getProfilesAndStatusesForPosts(posts.posts, dispatch, getState);
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch, getState);
@@ -782,11 +795,12 @@ export function getPostsSince(channelId: string, since: number, fetchThreads = t
     };
 }
 
-export function getPostsBefore(channelId: string, postId: string, page = 0, perPage = Posts.POST_CHUNK_SIZE, fetchThreads = true, collapsedThreads = false, collapsedThreadsExtended = false) {
+export function getPostsBefore(channelId: string, postId: string, page = 0, perPage = Posts.POST_CHUNK_SIZE, fetchThreads = true, collapsedThreadsExtended = false) {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         let posts;
         try {
-            posts = await Client4.getPostsBefore(channelId, postId, page, perPage, fetchThreads, collapsedThreads, collapsedThreadsExtended);
+            const collapsedThreadsEnabled = isCollapsedThreadsEnabled(getState());
+            posts = await Client4.getPostsBefore(channelId, postId, page, perPage, fetchThreads, collapsedThreadsEnabled, collapsedThreadsExtended);
             getProfilesAndStatusesForPosts(posts.posts, dispatch, getState);
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch, getState);
@@ -803,11 +817,12 @@ export function getPostsBefore(channelId: string, postId: string, page = 0, perP
     };
 }
 
-export function getPostsAfter(channelId: string, postId: string, page = 0, perPage = Posts.POST_CHUNK_SIZE, fetchThreads = true, collapsedThreads = false, collapsedThreadsExtended = false) {
+export function getPostsAfter(channelId: string, postId: string, page = 0, perPage = Posts.POST_CHUNK_SIZE, fetchThreads = true, collapsedThreadsExtended = false) {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         let posts;
         try {
-            posts = await Client4.getPostsAfter(channelId, postId, page, perPage, fetchThreads, collapsedThreads, collapsedThreadsExtended);
+            const collapsedThreadsEnabled = isCollapsedThreadsEnabled(getState());
+            posts = await Client4.getPostsAfter(channelId, postId, page, perPage, fetchThreads, collapsedThreadsEnabled, collapsedThreadsExtended);
             getProfilesAndStatusesForPosts(posts.posts, dispatch, getState);
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch, getState);
@@ -824,17 +839,18 @@ export function getPostsAfter(channelId: string, postId: string, page = 0, perPa
     };
 }
 
-export function getPostsAround(channelId: string, postId: string, perPage = Posts.POST_CHUNK_SIZE / 2, fetchThreads = true, collapsedThreads = false, collapsedThreadsExtended = false) {
+export function getPostsAround(channelId: string, postId: string, perPage = Posts.POST_CHUNK_SIZE / 2, fetchThreads = true, collapsedThreadsExtended = false) {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
         let after;
         let thread;
         let before;
 
         try {
+            const collapsedThreadsEnabled = isCollapsedThreadsEnabled(getState());
             [after, thread, before] = await Promise.all([
-                Client4.getPostsAfter(channelId, postId, 0, perPage, fetchThreads, collapsedThreads, collapsedThreadsExtended),
-                Client4.getPostThread(postId, fetchThreads, collapsedThreads, collapsedThreadsExtended),
-                Client4.getPostsBefore(channelId, postId, 0, perPage, fetchThreads, collapsedThreads, collapsedThreadsExtended),
+                Client4.getPostsAfter(channelId, postId, 0, perPage, fetchThreads, collapsedThreadsEnabled, collapsedThreadsExtended),
+                Client4.getPostThread(postId, fetchThreads, collapsedThreadsEnabled, collapsedThreadsExtended),
+                Client4.getPostsBefore(channelId, postId, 0, perPage, fetchThreads, collapsedThreadsEnabled, collapsedThreadsExtended),
             ]);
         } catch (error) {
             forceLogoutIfNecessary(error, dispatch, getState);

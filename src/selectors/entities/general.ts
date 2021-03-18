@@ -6,12 +6,19 @@ import {createSelector} from 'reselect';
 import {General} from '../../constants';
 
 import {GlobalState} from 'types/store';
-import {ClientConfig} from 'types/config';
+import {ClientConfig, FeatureFlags} from 'types/config';
 
 import {isMinimumServerVersion} from 'utils/helpers';
 
 export function getConfig(state: GlobalState): Partial<ClientConfig> {
     return state.entities.general.config;
+}
+
+/**
+ * Safely get value of a specific or known FeatureFlag
+ */
+export function getFeatureFlagValue(state: GlobalState, key: keyof FeatureFlags): string | undefined {
+    return getConfig(state)?.[`FeatureFlag${key}` as keyof Partial<ClientConfig>];
 }
 
 export function getLicense(state: GlobalState): any {
@@ -28,6 +35,10 @@ export function getCurrentUrl(state: GlobalState): string {
 
 export function warnMetricsStatus(state: GlobalState): any {
     return state.entities.general.warnMetricsStatus;
+}
+
+export function getSubscriptionStats(state: GlobalState): any {
+    return state.entities.cloud.subscriptionStats;
 }
 
 export function isCompatibleWithJoinViewTeamPermissions(state: GlobalState): boolean {

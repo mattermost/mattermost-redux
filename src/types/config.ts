@@ -23,6 +23,7 @@ export type ClientConfig = {
     BuildHashEnterprise: string;
     BuildNumber: string;
     CloseUnusedDirectMessages: string;
+    CollapsedThreads: 'disabled' | 'default_off' | 'default_on';
     CustomBrandText: string;
     CustomDescriptionText: string;
     CustomTermsOfServiceId: string;
@@ -53,6 +54,7 @@ export type ClientConfig = {
     EnableConfirmNotificationsToChannel: string;
     EnableCustomBrand: string;
     EnableCustomEmoji: string;
+    EnableCustomUserStatuses: string;
     EnableCustomTermsOfService: string;
     EnableDeveloper: string;
     EnableDiagnostics: string;
@@ -60,6 +62,7 @@ export type ClientConfig = {
     EnableEmailInvitations: string;
     EnableEmojiPicker: string;
     EnableFileAttachments: string;
+    EnableFile: string;
     EnableGifPicker: string;
     EnableGuestAccounts: string;
     EnableIncomingWebhooks: string;
@@ -115,6 +118,7 @@ export type ClientConfig = {
     ExperimentalTimezone: string;
     ExperimentalTownSquareIsReadOnly: string;
     ExperimentalViewArchivedChannels: string;
+    FileLevel: string;
     GfycatApiKey: string;
     GfycatApiSecret: string;
     GoogleDeveloperKey: string;
@@ -139,6 +143,7 @@ export type ClientConfig = {
     MaxFileSize: string;
     MaxNotificationsPerChannel: string;
     MinimumHashtagLength: string;
+    NoAccounts: string;
     OpenIdButtonText: string;
     OpenIdButtonColor: string;
     PasswordMinimumLength: string;
@@ -326,12 +331,14 @@ export type ServiceSettings = {
     EnableLocalMode: boolean;
     LocalModeSocketLocation: string;
     EnableLegacySidebar: boolean;
+    CollapsedThreads: 'disabled' | 'default_on' | 'default_off';
 };
 
 export type TeamSettings = {
     SiteName: string;
     MaxUsersPerTeam: number;
     EnableTeamCreation: boolean;
+    EnableCustomUserStatuses: boolean;
     EnableUserCreation: boolean;
     EnableOpenServer: boolean;
     EnableUserDeactivation: boolean;

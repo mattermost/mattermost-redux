@@ -15,7 +15,7 @@ To hook up your application to the mattermost-redux store:
 ```
 import configureServiceStore from 'mattermost-redux/store';
 
-configureServiceStore(yourInitialState, yourAppReducers, yourOfflineOptions);
+configureServiceStore(yourInitialState, yourAppReducers);
 
 const store = configureStore();
 
@@ -24,7 +24,6 @@ const store = configureStore();
 
 * `yourInitialState` - any initial state for any extra reducers you may have (set to `{}` if none)
 * `yourAppReducers` - any reducers from your app (set to `{}` if none)
-* `yourOfflineOptions` - any offline options, specified using [this redux-offline configuration object](https://github.com/jevakallio/redux-offline#configuration-object)
 
 ### Web Client Usage
 
@@ -157,30 +156,30 @@ client.login(username, password)
 
 ### How to Build mattermost-redux
 
-You only need to build mattermost-redux if you are developing it. 
+You only need to build mattermost-redux if you are developing it.
 
 #### Webapp Development
-If your mattermost-webapp and mattermost-redux are in the same directory, you only 
+If your mattermost-webapp and mattermost-redux are in the same directory, you only
 need to run `npm run dev` or `npm run dev:watch`.
- 
-If you have mattermost-webapp in other directory or you are developing your own 
-application, you can define the environment variable `WEBAPP_DIR` to change the 
+
+If you have mattermost-webapp in other directory or you are developing your own
+application, you can define the environment variable `WEBAPP_DIR` to change the
 destination app
 (e. g. `WEBAPP_DIR=/tmp/mattermost-webapp`).
 
 #### React Native (Mobile) Development
-If your mattermost-mobile and mattermost-redux are in the same directory, you only 
+If your mattermost-mobile and mattermost-redux are in the same directory, you only
 need to run `npm run dev-mobile` or `npm run dev-mobile:watch`.
- 
-If you have mattermost-mobile in other directory or you are developing your own 
-application, you can define the environment variable `MOBILE_DIR` to change the 
+
+If you have mattermost-mobile in other directory or you are developing your own
+application, you can define the environment variable `MOBILE_DIR` to change the
 destination app
 (e. g. `MOBILE_DIR=/tmp/mattermost-mobile`).
 
 #### Resetting apps to use package redux
 If you want to go back to using the package specified redux in your web or mobile
 app you can stop the server and run `rm -rf .npminstall` to force
-your project to reset to the specified package version on next server start.  
+your project to reset to the specified package version on next server start.
 
 ### Contribute Code
 
