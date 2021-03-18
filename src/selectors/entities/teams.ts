@@ -31,6 +31,10 @@ export function getTeams(state: GlobalState): IDMappedObjects<Team> {
     return state.entities.teams.teams;
 }
 
+export function getTeamsInPolicy(state: GlobalState): IDMappedObjects<Team> {
+    return state.entities.teams.teamsInPolicy;
+}
+
 export function getTeamStats(state: GlobalState) {
     return state.entities.teams.stats;
 }

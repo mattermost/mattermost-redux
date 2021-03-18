@@ -97,6 +97,14 @@ import {
 } from 'types/users';
 import {$ID, RelationOneToOne} from 'types/utilities';
 import {ProductNotices} from 'types/product_notices';
+import {
+    DataRetentionCustomPolicies,
+    CreateDataRetentionCustomPolicy,
+    PatchDataRetentionCustomPolicy,
+    PatchDataRetentionCustomPolicyTeams,
+    PatchDataRetentionCustomPolicyChannels,
+    GetDataRetentionCustomPoliciesRequest,
+} from 'types/data_retention';
 
 import {buildQueryString, isMinimumServerVersion} from 'utils/helpers';
 import {cleanUrlForLogging} from 'utils/sentry';
@@ -2653,8 +2661,87 @@ export default class Client4 {
         );
     };
 
-    // Jobs Routes
+    getDataRetentionCustomPolicies = (page = 0, perPage = PER_PAGE_DEFAULT) => {
+        return this.doFetch<GetDataRetentionCustomPoliciesRequest>(
+            `${this.getDataRetentionRoute()}/policies${buildQueryString({page, per_page: perPage})}`,
+            {method: 'get'},
+        );
+    };
 
+    getDataRetentionCustomPolicy = (id: string) => {
+        return this.doFetch<DataRetentionCustomPolicies>(
+            `${this.getDataRetentionRoute()}/policies/${id}`,
+            {method: 'get'},
+        );
+    };
+
+    searchDataRetentionCustomPolicyChannels = (policyId: string, term: string, opts: ChannelSearchOpts) => {
+        return this.doFetch<DataRetentionCustomPolicies>(
+            `${this.getDataRetentionRoute()}/policies/${policyId}/channels/search`,
+            {method: 'post', body: JSON.stringify({term, ...opts})},
+        );
+    }
+
+    searchDataRetentionCustomPolicyTeams = (policyId: string, term: string, opts: TeamSearchOpts) => {
+        return this.doFetch<DataRetentionCustomPolicies>(
+            `${this.getDataRetentionRoute()}/policies/${policyId}/teams/search`,
+            {method: 'post', body: JSON.stringify({term, ...opts})},
+        );
+    }
+
+    getDataRetentionCustomPolicyTeams = (id: string, page = 0, perPage = PER_PAGE_DEFAULT, includeTotalCount = false) => {
+        return this.doFetch<Team[]>(
+            `${this.getDataRetentionRoute()}/policies/${id}/teams${buildQueryString({page, per_page: perPage, include_total_count: includeTotalCount})}`,
+            {method: 'get'},
+        );
+    };
+
+    getDataRetentionCustomPolicyChannels = (id: string, page = 0, perPage = PER_PAGE_DEFAULT) => {
+        return this.doFetch<{channels: Channel[]; total_count: number}>(
+            `${this.getDataRetentionRoute()}/policies/${id}/channels${buildQueryString({page, per_page: perPage})}`,
+            {method: 'get'},
+        );
+    };
+
+    createDataRetentionPolicy = (policy: CreateDataRetentionCustomPolicy) => {
+        return this.doFetch<DataRetentionCustomPolicies>(
+            `${this.getDataRetentionRoute()}/policies`,
+            {method: 'post', body: JSON.stringify(policy)},
+        );
+    };
+
+    updateDataRetentionPolicy = (id: string, policy: PatchDataRetentionCustomPolicy) => {
+        return this.doFetch<DataRetentionCustomPolicies>(
+            `${this.getDataRetentionRoute()}/policies/${id}`,
+            {method: 'PATCH', body: JSON.stringify(policy)},
+        );
+    };
+    addDataRetentionPolicyTeams = (id: string, policy: PatchDataRetentionCustomPolicyTeams) => {
+        return this.doFetch<DataRetentionCustomPolicies>(
+            `${this.getDataRetentionRoute()}/policies/${id}/teams`,
+            {method: 'post', body: JSON.stringify(policy)},
+        );
+    };
+    removeDataRetentionPolicyTeams = (id: string, policy: PatchDataRetentionCustomPolicyTeams) => {
+        return this.doFetch<DataRetentionCustomPolicies>(
+            `${this.getDataRetentionRoute()}/policies/${id}/teams`,
+            {method: 'delete', body: JSON.stringify(policy)},
+        );
+    };
+    addDataRetentionPolicyChannels = (id: string, policy: PatchDataRetentionCustomPolicyChannels) => {
+        return this.doFetch<DataRetentionCustomPolicies>(
+            `${this.getDataRetentionRoute()}/policies/${id}/channels`,
+            {method: 'post', body: JSON.stringify(policy)},
+        );
+    };
+    removeDataRetentionPolicyChannels = (id: string, policy: PatchDataRetentionCustomPolicyChannels) => {
+        return this.doFetch<DataRetentionCustomPolicies>(
+            `${this.getDataRetentionRoute()}/policies/${id}/channels`,
+            {method: 'delete', body: JSON.stringify(policy)},
+        );
+    };
+
+    // Jobs Routes
     getJob = (id: string) => {
         return this.doFetch<Job>(
             `${this.getJobsRoute()}/${id}`,

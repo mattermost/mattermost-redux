@@ -1,7 +1,7 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
 import {combineReducers} from 'redux';
-import {ChannelTypes, TeamTypes, UserTypes, SchemeTypes, GroupTypes} from 'action_types';
+import {AdminTypes, ChannelTypes, TeamTypes, UserTypes, SchemeTypes, GroupTypes} from 'action_types';
 import {teamListToMap} from 'utils/team_utils';
 import {Team, TeamMembership, TeamUnread} from 'types/teams';
 import {UserProfile} from 'types/users';
@@ -29,7 +29,6 @@ function teams(state: IDMappedObjects<Team> = {}, action: GenericAction) {
         return Object.assign({}, state, teamListToMap(action.data.teams));
     case TeamTypes.RECEIVED_TEAMS:
         return Object.assign({}, state, action.data);
-
     case TeamTypes.CREATED_TEAM:
     case TeamTypes.UPDATED_TEAM:
     case TeamTypes.PATCHED_TEAM:
@@ -460,6 +459,22 @@ function totalCount(state = 0, action: GenericAction) {
     }
 }
 
+function teamsInPolicy(state: IDMappedObjects<Team> = {}, action: GenericAction) {
+    switch (action.type) {
+    case AdminTypes.RECEIVED_DATA_RETENTION_CUSTOM_POLICY_TEAMS_SEARCH: {
+        return Object.assign({}, state, teamListToMap(action.data));
+    }
+    case AdminTypes.RECEIVED_DATA_RETENTION_CUSTOM_POLICY_TEAMS: {
+        return Object.assign({}, state, teamListToMap(action.data.teams));
+    }
+    case AdminTypes.CLEAR_DATA_RETENTION_CUSTOM_POLICY_TEAMS: {
+        return {};
+    }
+    default:
+        return state;
+    }
+}
+
 export default combineReducers({
 
     // the current selected team
@@ -480,4 +495,6 @@ export default combineReducers({
     groupsAssociatedToTeam,
 
     totalCount,
+
+    teamsInPolicy,
 });

@@ -84,6 +84,10 @@ export function getChannelsInTeam(state: GlobalState): RelationOneToMany<Team, C
     return state.entities.channels.channelsInTeam;
 }
 
+export function getChannelsInPolicy(state: GlobalState): IDMappedObjects<Channel> {
+    return state.entities.channels.channelsInPolicy;
+}
+
 export const getDirectChannelsSet: (state: GlobalState) => Set<string> = createSelector(
     getChannelsInTeam,
     (channelsInTeam: RelationOneToMany<Team, Channel>): Set<string> => {
