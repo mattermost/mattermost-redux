@@ -80,13 +80,15 @@ export type CommandResponse = {
     extra_responses: CommandResponse[];
 };
 
-export type CommandAutocompleteSuggestion = {
+export type AutocompleteSuggestion = {
     Complete: string;
     Suggestion: string;
     Hint: string;
     Description: string;
     IconData: string;
 };
+
+export type CommandAutocompleteSuggestion = AutocompleteSuggestion; // TODO remove this alias after the mattermost-redux migration
 
 export type OAuthApp = {
     'id': string;

@@ -162,6 +162,9 @@ const state: GlobalState = {
             byId: {},
             orderByTeam: {},
         },
+        apps: {
+            bindings: [],
+        },
         cloud: {},
     },
     errors: [],
