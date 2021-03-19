@@ -46,10 +46,9 @@ export default function configureServiceStore(preloadedState: any, appReducer: a
 
     const middlewares = createMiddleware(clientOptions);
 
-    // TODO: There's a chance that it might not be epicMiddleWare. Find better way
+    // There's a chance that it might not be epicMiddleWare. Find better way
     // const epicMiddleW = clientOptions?.enableThunk ? middlewares[1] : middlewares[0];
     const epicMiddleW: any = middlewares[1];
-    console.log("MIDDLEWARES", middlewares.length, epicMiddleW);
 
     const store = redux.createStore(
         createOfflineReducer(createDevReducer(baseState, serviceReducer, appReducer)),

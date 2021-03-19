@@ -5,12 +5,27 @@ import {Observable} from 'rxjs/Observable';
 import {switchMap} from 'rxjs/operators';
 import {ofType} from 'redux-observable';
 import 'rxjs/add/observable/empty';
+import 'rxjs/add/observable/of';
 
-export const changeLicenseEpic = (action$: any) =>
+import {AdminTypes} from 'action_types';
+import {getLicense, getSubscriptionStats as selectSubscriptionStats} from 'selectors/entities/general';
+import {getSubscriptionStats} from 'actions/cloud';
+
+export const changeLicenseEpic = (action$: any, state$: any) =>
     action$.pipe(
-        ofType('UPLOAD_LICENSE_SUCCESS'),
+        ofType(AdminTypes.UPLOAD_LICENSE_SUCCESS),
         switchMap(() => {
-            console.log('I AM AN EPIC BEING CALLED');
+            const state = state$.value;
+            const license = getLicense(state);
+
+            const isCloud = license.Cloud === 'true';
+            const subscriptionStats = selectSubscriptionStats(state);
+
+            if (subscriptionStats === null && isCloud) {
+                return Observable.of(getSubscriptionStats());
+            }
+
+            console.log("ISCLOUD", isCloud);
             return Observable.empty();
         }),
     );
