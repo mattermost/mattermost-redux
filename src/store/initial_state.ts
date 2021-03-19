@@ -40,6 +40,7 @@ const state: GlobalState = {
             stats: {},
             groupsAssociatedToTeam: {},
             totalCount: 0,
+            teamsInPolicy: {},
         },
         channels: {
             currentChannelId: '',
@@ -53,6 +54,7 @@ const state: GlobalState = {
             manuallyUnread: {},
             channelModerations: {},
             channelMemberCountsByGroup: {},
+            channelsInPolicy: {},
         },
         posts: {
             expandedURLs: {},
@@ -95,6 +97,8 @@ const state: GlobalState = {
             userAccessTokens: {},
             clusterInfo: [],
             analytics: {},
+            dataRetentionCustomPolicies: {},
+            dataRetentionCustomPoliciesCount: 0,
         },
         jobs: {
             jobs: {},
@@ -161,6 +165,9 @@ const state: GlobalState = {
         channelCategories: {
             byId: {},
             orderByTeam: {},
+        },
+        apps: {
+            bindings: [],
         },
         cloud: {},
     },

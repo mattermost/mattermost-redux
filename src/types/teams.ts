@@ -50,6 +50,7 @@ export type TeamsState = {
     stats: RelationOneToOne<Team, TeamStats>;
     groupsAssociatedToTeam: any;
     totalCount: number;
+    teamsInPolicy: Dictionary<Team>;
 };
 
 export type TeamUnread = {

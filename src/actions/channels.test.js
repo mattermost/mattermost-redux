@@ -24,16 +24,16 @@ const OK_RESPONSE = {status: 'OK'};
 
 describe('Actions.Channels', () => {
     let store;
-    beforeAll(async () => {
-        await TestHelper.initBasic(Client4);
+    beforeAll(() => {
+        TestHelper.initBasic(Client4);
     });
 
-    beforeEach(async () => {
-        store = await configureStore();
+    beforeEach(() => {
+        store = configureStore();
     });
 
-    afterAll(async () => {
-        await TestHelper.tearDown();
+    afterAll(() => {
+        TestHelper.tearDown();
     });
 
     it('selectChannel', async () => {
@@ -605,7 +605,7 @@ describe('Actions.Channels', () => {
 
             const currentUserId = TestHelper.generateId();
 
-            store = await configureStore({
+            store = configureStore({
                 entities: {
                     channels: {
                         myMembers: {
@@ -646,7 +646,7 @@ describe('Actions.Channels', () => {
 
             const currentUserId = TestHelper.generateId();
 
-            store = await configureStore({
+            store = configureStore({
                 entities: {
                     channels: {
                         manuallyUnread: {
@@ -683,7 +683,7 @@ describe('Actions.Channels', () => {
 
             const currentUserId = TestHelper.generateId();
 
-            store = await configureStore({
+            store = configureStore({
                 entities: {
                     channels: {
                         manuallyUnread: {
@@ -760,12 +760,12 @@ describe('Actions.Channels', () => {
     });
 
     describe('markChannelAsUnread', () => {
-        it('plain message', async () => {
+        it('plain message', () => {
             const teamId = TestHelper.generateId();
             const channelId = TestHelper.generateId();
             const userId = TestHelper.generateId();
 
-            store = await configureStore({
+            store = configureStore({
                 entities: {
                     channels: {
                         channels: {
@@ -796,12 +796,12 @@ describe('Actions.Channels', () => {
             assert.equal(state.entities.teams.myMembers[teamId].mention_count, 0);
         });
 
-        it('message mentioning current user', async () => {
+        it('message mentioning current user', () => {
             const teamId = TestHelper.generateId();
             const channelId = TestHelper.generateId();
             const userId = TestHelper.generateId();
 
-            store = await configureStore({
+            store = configureStore({
                 entities: {
                     channels: {
                         channels: {
@@ -832,12 +832,12 @@ describe('Actions.Channels', () => {
             assert.equal(state.entities.teams.myMembers[teamId].mention_count, 1);
         });
 
-        it('plain message with mark_unread="mention"', async () => {
+        it('plain message with mark_unread="mention"', () => {
             const teamId = TestHelper.generateId();
             const channelId = TestHelper.generateId();
             const userId = TestHelper.generateId();
 
-            store = await configureStore({
+            store = configureStore({
                 entities: {
                     channels: {
                         channels: {
@@ -868,12 +868,12 @@ describe('Actions.Channels', () => {
             assert.equal(state.entities.teams.myMembers[teamId].mention_count, 0);
         });
 
-        it('message mentioning current user with mark_unread="mention"', async () => {
+        it('message mentioning current user with mark_unread="mention"', () => {
             const teamId = TestHelper.generateId();
             const channelId = TestHelper.generateId();
             const userId = TestHelper.generateId();
 
-            store = await configureStore({
+            store = configureStore({
                 entities: {
                     channels: {
                         channels: {
@@ -904,12 +904,12 @@ describe('Actions.Channels', () => {
             assert.equal(state.entities.teams.myMembers[teamId].mention_count, 1);
         });
 
-        it('channel member should not be updated if it has already been fetched', async () => {
+        it('channel member should not be updated if it has already been fetched', () => {
             const teamId = TestHelper.generateId();
             const channelId = TestHelper.generateId();
             const userId = TestHelper.generateId();
 
-            store = await configureStore({
+            store = configureStore({
                 entities: {
                     channels: {
                         channels: {
@@ -946,7 +946,7 @@ describe('Actions.Channels', () => {
             const channelId = TestHelper.generateId();
             const teamId = TestHelper.generateId();
 
-            store = await configureStore({
+            store = configureStore({
                 entities: {
                     channels: {
                         channels: {
@@ -991,7 +991,7 @@ describe('Actions.Channels', () => {
             const channelId = TestHelper.generateId();
             const teamId = TestHelper.generateId();
 
-            store = await configureStore({
+            store = configureStore({
                 entities: {
                     channels: {
                         channels: {
@@ -1035,7 +1035,7 @@ describe('Actions.Channels', () => {
         it('one unread DM channel', async () => {
             const channelId = TestHelper.generateId();
 
-            store = await configureStore({
+            store = configureStore({
                 entities: {
                     channels: {
                         channels: {
@@ -1073,7 +1073,7 @@ describe('Actions.Channels', () => {
             const channelId2 = TestHelper.generateId();
             const teamId = TestHelper.generateId();
 
-            store = await configureStore({
+            store = configureStore({
                 entities: {
                     channels: {
                         channels: {
@@ -1132,7 +1132,7 @@ describe('Actions.Channels', () => {
             const channelId2 = TestHelper.generateId();
             const teamId = TestHelper.generateId();
 
-            store = await configureStore({
+            store = configureStore({
                 entities: {
                     channels: {
                         channels: {
@@ -1191,7 +1191,7 @@ describe('Actions.Channels', () => {
             const channelId2 = TestHelper.generateId();
             const teamId = TestHelper.generateId();
 
-            store = await configureStore({
+            store = configureStore({
                 entities: {
                     channels: {
                         channels: {
@@ -1251,7 +1251,7 @@ describe('Actions.Channels', () => {
             const teamId1 = TestHelper.generateId();
             const teamId2 = TestHelper.generateId();
 
-            store = await configureStore({
+            store = configureStore({
                 entities: {
                     channels: {
                         channels: {
@@ -1319,7 +1319,7 @@ describe('Actions.Channels', () => {
             const teamId1 = TestHelper.generateId();
             const teamId2 = TestHelper.generateId();
 
-            store = await configureStore({
+            store = configureStore({
                 entities: {
                     channels: {
                         channels: {
@@ -1387,7 +1387,7 @@ describe('Actions.Channels', () => {
             const teamId1 = TestHelper.generateId();
             const teamId2 = TestHelper.generateId();
 
-            store = await configureStore({
+            store = configureStore({
                 entities: {
                     channels: {
                         channels: {
@@ -2027,12 +2027,12 @@ describe('Actions.Channels', () => {
 
     describe('leaveChannel', () => {
         const team = TestHelper.fakeTeam();
-        const user = TestHelper.fakeUser();
+        const user = TestHelper.fakeUserWithId();
 
         test('should delete the channel member when leaving a public channel', async () => {
             const channel = {id: 'channel', team_id: team.id, type: General.OPEN_CHANNEL};
 
-            store = await configureStore({
+            store = configureStore({
                 entities: {
                     channels: {
                         channels: {
@@ -2041,6 +2041,9 @@ describe('Actions.Channels', () => {
                         myMembers: {
                             [channel.id]: {channel_id: channel.id, user_id: user.id},
                         },
+                    },
+                    users: {
+                        currentUserId: user.id,
                     },
                 },
             });
@@ -2060,7 +2063,7 @@ describe('Actions.Channels', () => {
         test('should delete the channel member and channel when leaving a private channel', async () => {
             const channel = {id: 'channel', team_id: team.id, type: General.PRIVATE_CHANNEL};
 
-            store = await configureStore({
+            store = configureStore({
                 entities: {
                     channels: {
                         channels: {
@@ -2069,6 +2072,9 @@ describe('Actions.Channels', () => {
                         myMembers: {
                             [channel.id]: {channel_id: channel.id, user_id: user.id},
                         },
+                    },
+                    users: {
+                        currentUserId: user.id,
                     },
                 },
             });
@@ -2089,7 +2095,7 @@ describe('Actions.Channels', () => {
             const channel = {id: 'channel', team_id: team.id, type: General.OPEN_CHANNEL};
             const category = {id: 'category', team_id: team.id, type: CategoryTypes.CUSTOM, channel_ids: [channel.id]};
 
-            store = await configureStore({
+            store = configureStore({
                 entities: {
                     channelCategories: {
                         byId: {
@@ -2125,6 +2131,50 @@ describe('Actions.Channels', () => {
             expect(state.entities.channels.myMembers[channel.id]).not.toBeDefined();
             expect(state.entities.channelCategories.byId[category.id].channel_ids).toEqual([]);
         });
+
+        test('should restore a channel when failing to leave it (non-custom category)', async () => {
+            const channel = {id: 'channel', team_id: team.id, type: General.OPEN_CHANNEL};
+            const category = {id: 'category', team_id: team.id, type: CategoryTypes.CHANNELS, channel_ids: [channel.id]};
+
+            store = await configureStore({
+                entities: {
+                    channelCategories: {
+                        byId: {
+                            category,
+                        },
+                        orderByTeam: {
+                            [team.id]: [category.id],
+                        },
+                    },
+                    channels: {
+                        channels: {
+                            channel,
+                        },
+                        myMembers: {
+                            [channel.id]: {channel_id: channel.id, user_id: user.id},
+                        },
+                    },
+                    users: {
+                        currentUserId: user.id,
+                    },
+                },
+            });
+
+            nock(Client4.getBaseRoute()).
+                delete(`/channels/${channel.id}/members/${user.id}`).
+                reply(500, {});
+
+            await store.dispatch(Actions.leaveChannel(channel.id));
+
+            // Allow async Client4 API calls to the dispatched action to run first.
+            await new Promise((resolve) => setTimeout(resolve, 500));
+
+            const state = store.getState();
+
+            expect(state.entities.channels.channels[channel.id]).toBeDefined();
+            expect(state.entities.channels.myMembers[channel.id]).toBeDefined();
+            expect(state.entities.channelCategories.byId[category.id].channel_ids).toEqual([channel.id]);
+        });
     });
 
     test('joinChannel', async () => {
@@ -2134,7 +2184,7 @@ describe('Actions.Channels', () => {
 
         const channelsCategory = {id: 'channelsCategory', team_id: team.id, type: CategoryTypes.CHANNELS, channel_ids: []};
 
-        store = await configureStore({
+        store = configureStore({
             entities: {
                 channelCategories: {
                     byId: {
@@ -2164,6 +2214,9 @@ describe('Actions.Channels', () => {
 
         await store.dispatch(Actions.joinChannel(user.id, team.id, channel.id));
 
+        // Allow async Client4 API calls to the dispatched action to run first.
+        await new Promise((resolve) => setTimeout(resolve, 500));
+
         const state = store.getState();
 
         expect(state.entities.channels.channels[channel.id]).toBeDefined();
@@ -2178,7 +2231,7 @@ describe('Actions.Channels', () => {
 
         const channelsCategory = {id: 'channelsCategory', team_id: team.id, type: CategoryTypes.CHANNELS, channel_ids: []};
 
-        store = await configureStore({
+        store = configureStore({
             entities: {
                 channelCategories: {
                     byId: {
@@ -2223,7 +2276,7 @@ describe('Actions.Channels', () => {
         const favoritesCategory = {id: 'favoritesCategory', team_id: team.id, type: CategoryTypes.FAVORITES, channel_ids: []};
         const channelsCategory = {id: 'channelsCategory', team_id: team.id, type: CategoryTypes.CHANNELS, channel_ids: [channel.id]};
 
-        store = await configureStore({
+        store = configureStore({
             entities: {
                 channels: {
                     channels: {
@@ -2254,6 +2307,9 @@ describe('Actions.Channels', () => {
 
         await store.dispatch(Actions.favoriteChannel(channel.id));
 
+        // Allow async Client4 API calls to the dispatched action to run first.
+        await new Promise((resolve) => setTimeout(resolve, 500));
+
         const state = store.getState();
 
         // Should favorite the channel in preferences
@@ -2269,7 +2325,7 @@ describe('Actions.Channels', () => {
         const channel = TestHelper.basicChannel;
         const currentUserId = TestHelper.generateId();
 
-        store = await configureStore({
+        store = configureStore({
             entities: {
                 channels: {
                     channels: {
@@ -2288,7 +2344,7 @@ describe('Actions.Channels', () => {
         });
 
         nock(Client4.getBaseRoute()).
-            put(`/users/${TestHelper.basicUser.id}/preferences`).
+            put(`/users/${currentUserId}/preferences`).
             reply(200, OK_RESPONSE);
 
         await store.dispatch(Actions.favoriteChannel(channel.id));
@@ -2310,7 +2366,7 @@ describe('Actions.Channels', () => {
         const favoritesCategory = {id: 'favoritesCategory', team_id: team.id, type: CategoryTypes.FAVORITES, channel_ids: [channel.id]};
         const channelsCategory = {id: 'channelsCategory', team_id: team.id, type: CategoryTypes.CHANNELS, channel_ids: []};
 
-        store = await configureStore({
+        store = configureStore({
             entities: {
                 channels: {
                     channels: {
@@ -2362,7 +2418,7 @@ describe('Actions.Channels', () => {
 
         const prefKey = getPreferenceKey(Preferences.CATEGORY_FAVORITE_CHANNEL, channel.id);
 
-        store = await configureStore({
+        store = configureStore({
             entities: {
                 channels: {
                     channels: {
@@ -2499,9 +2555,18 @@ describe('Actions.Channels', () => {
     it('markGroupChannelOpen', async () => {
         const channelId = TestHelper.generateId();
         const now = new Date().getTime();
+        const currentUserId = TestHelper.generateId();
+
+        store = await configureStore({
+            entities: {
+                users: {
+                    currentUserId,
+                },
+            },
+        });
 
         nock(Client4.getBaseRoute()).
-            put(`/users/${TestHelper.basicUser.id}/preferences`).
+            put(`/users/${currentUserId}/preferences`).
             reply(200, OK_RESPONSE);
 
         await Actions.markGroupChannelOpen(channelId)(store.dispatch, store.getState);

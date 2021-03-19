@@ -68,31 +68,26 @@ describe('ThemeUtils', () => {
     });
 
     describe('setThemeDefaults', () => {
-        beforeEach(async () => {
-            jest.spyOn(ThemeUtils, 'blendColors').mockReturnValue('#efefef');
-        });
-
         it('blank theme', () => {
-            jest.spyOn(ThemeUtils, 'blendColors').mockReturnValue('#0b428c');
-
             const input = {};
             const expected = {...Preferences.THEMES.default};
             delete expected.type;
 
-            assert.deepEqual(ThemeUtils.setThemeDefaults(input), expected);
+            assert.deepEqual(ThemeUtils.setThemeDefaults(input), {
+                ...expected,
+                sidebarTeamBarBg: '#0d4288',
+            });
         });
 
         it('correctly updates the sidebarTeamBarBg variable', () => {
-            const input = {sidebarHeaderBg: '#ff0000'};
-            const expected = ThemeUtils.blendColors(input, '#000000', 0.2);
+            const input = {sidebarHeaderBg: '#ffaa55'};
 
-            console.log(expected);
-            assert.equal(ThemeUtils.setThemeDefaults(input).sidebarTeamBarBg, expected);
+            assert.equal(ThemeUtils.setThemeDefaults(input).sidebarTeamBarBg, '#cc8844');
         });
 
         it('set defaults on unset properties only', () => {
-            const input = {buttonColor: 'green'};
-            assert.equal(ThemeUtils.setThemeDefaults(input).buttonColor, 'green');
+            const input = {buttonColor: '#7600ff'};
+            assert.equal(ThemeUtils.setThemeDefaults(input).buttonColor, '#7600ff');
         });
 
         it('ignore type', () => {

@@ -3,6 +3,7 @@
 import {General} from '../constants';
 
 import {ClusterInfo, AnalyticsRow} from 'types/admin';
+import type {AppBinding, AppCallRequest, AppCallResponse, AppCallType} from 'types/apps';
 import {Audit} from 'types/audits';
 import {UserAutocomplete, AutocompleteSuggestion} from 'types/autocomplete';
 import {Bot, BotPatch} from 'types/bots';
@@ -58,11 +59,14 @@ import {Job} from 'types/jobs';
 import {MfaSecret} from 'types/mfa';
 import {
     ClientPluginManifest,
-    MarketplacePlugin,
     PluginManifest,
     PluginsResponse,
     PluginStatus,
 } from 'types/plugins';
+import type {
+    MarketplaceApp,
+    MarketplacePlugin,
+} from 'types/marketplace';
 import {Post, PostList, PostSearchResults, OpenGraphMetadata} from 'types/posts';
 import {PreferenceType} from 'types/preferences';
 import {Reaction} from 'types/reactions';
@@ -93,6 +97,14 @@ import {
 } from 'types/users';
 import {$ID, RelationOneToOne} from 'types/utilities';
 import {ProductNotices} from 'types/product_notices';
+import {
+    DataRetentionCustomPolicies,
+    CreateDataRetentionCustomPolicy,
+    PatchDataRetentionCustomPolicy,
+    PatchDataRetentionCustomPolicyTeams,
+    PatchDataRetentionCustomPolicyChannels,
+    GetDataRetentionCustomPoliciesRequest,
+} from 'types/data_retention';
 
 import {buildQueryString, isMinimumServerVersion} from 'utils/helpers';
 import {cleanUrlForLogging} from 'utils/sentry';
@@ -207,6 +219,13 @@ export default class Client4 {
 
     getBaseRoute() {
         return `${this.url}${this.urlVersion}`;
+    }
+
+    // This function belongs to the Apps Framework feature.
+    // Apps Framework feature is experimental, and this function is susceptible
+    // to breaking changes without pushing the major version of this package.
+    getAppsProxyRoute() {
+        return `${this.url}/plugins/com.mattermost.apps`;
     }
 
     getUsersRoute() {
@@ -2642,8 +2661,87 @@ export default class Client4 {
         );
     };
 
-    // Jobs Routes
+    getDataRetentionCustomPolicies = (page = 0, perPage = PER_PAGE_DEFAULT) => {
+        return this.doFetch<GetDataRetentionCustomPoliciesRequest>(
+            `${this.getDataRetentionRoute()}/policies${buildQueryString({page, per_page: perPage})}`,
+            {method: 'get'},
+        );
+    };
 
+    getDataRetentionCustomPolicy = (id: string) => {
+        return this.doFetch<DataRetentionCustomPolicies>(
+            `${this.getDataRetentionRoute()}/policies/${id}`,
+            {method: 'get'},
+        );
+    };
+
+    searchDataRetentionCustomPolicyChannels = (policyId: string, term: string, opts: ChannelSearchOpts) => {
+        return this.doFetch<DataRetentionCustomPolicies>(
+            `${this.getDataRetentionRoute()}/policies/${policyId}/channels/search`,
+            {method: 'post', body: JSON.stringify({term, ...opts})},
+        );
+    }
+
+    searchDataRetentionCustomPolicyTeams = (policyId: string, term: string, opts: TeamSearchOpts) => {
+        return this.doFetch<DataRetentionCustomPolicies>(
+            `${this.getDataRetentionRoute()}/policies/${policyId}/teams/search`,
+            {method: 'post', body: JSON.stringify({term, ...opts})},
+        );
+    }
+
+    getDataRetentionCustomPolicyTeams = (id: string, page = 0, perPage = PER_PAGE_DEFAULT, includeTotalCount = false) => {
+        return this.doFetch<Team[]>(
+            `${this.getDataRetentionRoute()}/policies/${id}/teams${buildQueryString({page, per_page: perPage, include_total_count: includeTotalCount})}`,
+            {method: 'get'},
+        );
+    };
+
+    getDataRetentionCustomPolicyChannels = (id: string, page = 0, perPage = PER_PAGE_DEFAULT) => {
+        return this.doFetch<{channels: Channel[]; total_count: number}>(
+            `${this.getDataRetentionRoute()}/policies/${id}/channels${buildQueryString({page, per_page: perPage})}`,
+            {method: 'get'},
+        );
+    };
+
+    createDataRetentionPolicy = (policy: CreateDataRetentionCustomPolicy) => {
+        return this.doFetch<DataRetentionCustomPolicies>(
+            `${this.getDataRetentionRoute()}/policies`,
+            {method: 'post', body: JSON.stringify(policy)},
+        );
+    };
+
+    updateDataRetentionPolicy = (id: string, policy: PatchDataRetentionCustomPolicy) => {
+        return this.doFetch<DataRetentionCustomPolicies>(
+            `${this.getDataRetentionRoute()}/policies/${id}`,
+            {method: 'PATCH', body: JSON.stringify(policy)},
+        );
+    };
+    addDataRetentionPolicyTeams = (id: string, policy: PatchDataRetentionCustomPolicyTeams) => {
+        return this.doFetch<DataRetentionCustomPolicies>(
+            `${this.getDataRetentionRoute()}/policies/${id}/teams`,
+            {method: 'post', body: JSON.stringify(policy)},
+        );
+    };
+    removeDataRetentionPolicyTeams = (id: string, policy: PatchDataRetentionCustomPolicyTeams) => {
+        return this.doFetch<DataRetentionCustomPolicies>(
+            `${this.getDataRetentionRoute()}/policies/${id}/teams`,
+            {method: 'delete', body: JSON.stringify(policy)},
+        );
+    };
+    addDataRetentionPolicyChannels = (id: string, policy: PatchDataRetentionCustomPolicyChannels) => {
+        return this.doFetch<DataRetentionCustomPolicies>(
+            `${this.getDataRetentionRoute()}/policies/${id}/channels`,
+            {method: 'post', body: JSON.stringify(policy)},
+        );
+    };
+    removeDataRetentionPolicyChannels = (id: string, policy: PatchDataRetentionCustomPolicyChannels) => {
+        return this.doFetch<DataRetentionCustomPolicies>(
+            `${this.getDataRetentionRoute()}/policies/${id}/channels`,
+            {method: 'delete', body: JSON.stringify(policy)},
+        );
+    };
+
+    // Jobs Routes
     getJob = (id: string) => {
         return this.doFetch<Job>(
             `${this.getJobsRoute()}/${id}`,
@@ -3151,7 +3249,7 @@ export default class Client4 {
     };
 
     getMarketplacePlugins = (filter: string, localOnly = false) => {
-        return this.doFetch<MarketplacePlugin>(
+        return this.doFetch<MarketplacePlugin[]>(
             `${this.getPluginsMarketplaceRoute()}${buildQueryString({filter: filter || '', local_only: localOnly})}`,
             {method: 'get'},
         );
@@ -3163,6 +3261,16 @@ export default class Client4 {
         return this.doFetch<MarketplacePlugin>(
             `${this.getPluginsMarketplaceRoute()}`,
             {method: 'post', body: JSON.stringify({id, version})},
+        );
+    }
+
+    // This function belongs to the Apps Framework feature.
+    // Apps Framework feature is experimental, and this function is susceptible
+    // to breaking changes without pushing the major version of this package.
+    getMarketplaceApps = (filter: string) => {
+        return this.doFetch<MarketplaceApp[]>(
+            `${this.getAppsProxyRoute()}/api/v1/marketplace${buildQueryString({filter: filter || ''})}`,
+            {method: 'get'},
         );
     }
 
@@ -3275,6 +3383,34 @@ export default class Client4 {
             {method: 'get'},
         );
     };
+
+    // This function belongs to the Apps Framework feature.
+    // Apps Framework feature is experimental, and this function is susceptible
+    // to breaking changes without pushing the major version of this package.
+    executeAppCall = async (call: AppCallRequest, type: AppCallType) => {
+        const callCopy: AppCallRequest = {
+            ...call,
+            path: `${call.path}/${type}`,
+            context: {
+                ...call.context,
+                user_agent: 'webapp',
+            },
+        };
+        return this.doFetch<AppCallResponse>(
+            `${this.getAppsProxyRoute()}/api/v1/call`,
+            {method: 'post', body: JSON.stringify(callCopy)},
+        );
+    }
+
+    // This function belongs to the Apps Framework feature.
+    // Apps Framework feature is experimental, and this function is susceptible
+    // to breaking changes without pushing the major version of this package.
+    getAppsBindings = async (userID: string, channelID: string) => {
+        return this.doFetch<AppBinding[]>(
+            this.getAppsProxyRoute() + `/api/v1/bindings?user_id=${userID}&channel_id=${channelID}&user_agent_type=webapp`,
+            {method: 'get'},
+        );
+    }
 
     getGroupsAssociatedToTeam = (teamID: string, q = '', page = 0, perPage = PER_PAGE_DEFAULT, filterAllowReference = false) => {
         this.trackEvent('api', 'api_groups_get_associated_to_team', {team_id: teamID});

@@ -22,6 +22,7 @@ import BotTypes from './bots';
 import PluginTypes from './plugins';
 import ChannelCategoryTypes from './channel_categories';
 import CloudTypes from './cloud';
+import AppsTypes from './apps';
 import ThreadTypes from './threads';
 
 export {
@@ -46,5 +47,6 @@ export {
     PluginTypes,
     ChannelCategoryTypes,
     CloudTypes,
+    AppsTypes,
     ThreadTypes,
 };

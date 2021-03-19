@@ -16,7 +16,8 @@ import {PluginRedux, PluginStatusRedux} from 'types/plugins';
 import {SamlCertificateStatus, SamlMetadataResponse} from 'types/saml';
 import {Team} from 'types/teams';
 import {UserAccessToken, UserProfile} from 'types/users';
-import {Dictionary, RelationOneToOne} from 'types/utilities';
+import {Dictionary, RelationOneToOne, IDMappedObjects} from 'types/utilities';
+import {DataRetentionCustomPolicy} from 'types/data_retention';
 
 function logs(state: string[] = [], action: GenericAction) {
     switch (action.type) {
@@ -583,6 +584,41 @@ function samlMetadataResponse(state: Partial<SamlMetadataResponse> = {}, action:
     }
 }
 
+function dataRetentionCustomPolicies(state: IDMappedObjects<DataRetentionCustomPolicy> = {}, action: GenericAction): IDMappedObjects<DataRetentionCustomPolicy> {
+    switch (action.type) {
+    case AdminTypes.RECEIVED_DATA_RETENTION_CUSTOM_POLICY: {
+        return {
+            ...state,
+            [action.data.id]: action.data,
+        };
+    }
+
+    case AdminTypes.RECEIVED_DATA_RETENTION_CUSTOM_POLICIES: {
+        const nextState = {...state};
+        for (const dataRetention of action.data.policies) {
+            nextState[dataRetention.id] = dataRetention;
+        }
+        return nextState;
+    }
+
+    case UserTypes.LOGOUT_SUCCESS:
+        return {};
+
+    default:
+        return state;
+    }
+}
+function dataRetentionCustomPoliciesCount(state = 0, action: GenericAction) {
+    switch (action.type) {
+    case AdminTypes.RECEIVED_DATA_RETENTION_CUSTOM_POLICIES:
+        return action.data.total_count;
+    case UserTypes.LOGOUT_SUCCESS:
+        return 0;
+    default:
+        return state;
+    }
+}
+
 export default combineReducers({
 
     // array of strings each representing a log entry
@@ -633,4 +669,10 @@ export default combineReducers({
 
     // object representing the metadata response obtained from the IdP
     samlMetadataResponse,
+
+    // object representing the custom data retention policies
+    dataRetentionCustomPolicies,
+
+    // total custom retention policies
+    dataRetentionCustomPoliciesCount,
 });

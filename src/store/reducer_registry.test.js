@@ -12,8 +12,8 @@ describe('ReducerRegistry', () => {
         return 'teststate';
     }
 
-    beforeEach(async () => {
-        store = await configureStore();
+    beforeEach(() => {
+        store = configureStore();
     });
 
     it('register reducer', () => {

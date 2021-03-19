@@ -1,6 +1,7 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
 
+import {DataRetentionCustomPolicies, DataRetentionCustomPolicy} from 'types/data_retention';
 import {GlobalState} from 'types/store';
 
 export function getLogs(state: GlobalState) {
@@ -37,6 +38,19 @@ export function getClusterInfo(state: GlobalState) {
 
 export function getUserAccessTokens(state: GlobalState) {
     return state.entities.admin.userAccessTokens;
+}
+
+export function getDataRetentionCustomPolicies(state: GlobalState): DataRetentionCustomPolicies {
+    return state.entities.admin.dataRetentionCustomPolicies;
+}
+
+export function getDataRetentionCustomPoliciesCount(state: GlobalState): number {
+    return state.entities.admin.dataRetentionCustomPoliciesCount;
+}
+
+export function getDataRetentionCustomPolicy(state: GlobalState, id: string): DataRetentionCustomPolicy {
+    const policy = getDataRetentionCustomPolicies(state);
+    return policy[id];
 }
 
 export function getAdminAnalytics(state: GlobalState) {
