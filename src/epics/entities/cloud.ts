@@ -25,7 +25,6 @@ export const changeLicenseEpic = (action$: any, state$: any) =>
                 return Observable.of(getSubscriptionStats());
             }
 
-            console.log("ISCLOUD", isCloud);
             return Observable.empty();
         }),
     );
