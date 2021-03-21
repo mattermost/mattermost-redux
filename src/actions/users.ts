@@ -145,6 +145,8 @@ function completeLogin(data: UserProfile): ActionFunc {
                     const member = teamMembers[index];
                     member.mention_count = u.mention_count;
                     member.msg_count = u.msg_count;
+                    member.mention_count_root = u.mention_count_root;
+                    member.msg_count_root = u.msg_count_root;
                 }
             }
         } catch (error) {

@@ -152,14 +152,6 @@ export const countsReducer = (state: ThreadsState['counts'] = {}, action: Generi
         };
         const unreadMentionDiff = newUnreadMentions - prevUnreadMentions;
 
-        if (counts.unread_mentions_per_channel[channelId]) {
-            const nc = {...counts.unread_mentions_per_channel};
-            nc[channelId] += unreadMentionDiff;
-            counts.unread_mentions_per_channel = nc;
-        } else {
-            counts.unread_mentions_per_channel = {[channelId]: newUnreadMentions};
-        }
-
         counts.total_unread_mentions += unreadMentionDiff;
 
         if (newUnreadReplies > 0 && prevUnreadReplies === 0) {
@@ -173,20 +165,10 @@ export const countsReducer = (state: ThreadsState['counts'] = {}, action: Generi
             [action.data.teamId]: counts,
         };
     }
-    case ThreadTypes.RECEIVED_PER_CHANNEL_MENTION_COUNTS: {
-        return {
-            ...state,
-            [action.data.team_id]: {
-                ...state[action.data.team_id] ?? {},
-                unread_mentions_per_channel: action.data.counts,
-            },
-        };
-    }
     case ThreadTypes.RECEIVED_THREADS: {
         return {
             ...state,
             [action.data.team_id]: {
-                unread_mentions_per_channel: state[action.data.team_id]?.unread_mentions_per_channel ?? {},
                 total: action.data.total,
                 total_unread_threads: action.data.total_unread_threads,
                 total_unread_mentions: action.data.total_unread_mentions,
