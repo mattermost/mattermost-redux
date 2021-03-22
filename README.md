@@ -1,3 +1,11 @@
+## Mattermost Redux is now located at [mattermost/mattermost-webapp](https://github.com/mattermost/mattermost-webapp/tree/master/packages/mattermost-redux)
+
+This repository is being left open for the time being while we set up proper monorepo infrastructure to be able to release mattermost-redux from there, but it will be archived once that has been set up.
+
+New releases of mattermost-redux will be on hold while that is done, but feel free to continue using existing versions.
+
+---
+
 # Mattermost Redux ![CircleCI branch](https://img.shields.io/circleci/project/github/mattermost/mattermost-redux/master.svg)
 
 The project purpose is consolidating the storage, web utilities and logic of the webapp and React Native mobile clients into a single driver. We encourage you to use mattermost-redux to power your own Mattermost clients or integrations.
