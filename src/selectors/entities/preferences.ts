@@ -6,7 +6,6 @@ import {createSelector} from 'reselect';
 import {General, Preferences} from '../../constants';
 
 import {getConfig, getFeatureFlagValue, getLicense} from 'selectors/entities/general';
-import {getCurrentTeamId} from 'selectors/entities/teams';
 
 import {PreferenceType, Theme} from 'types/preferences';
 import {UserProfile} from 'types/users';
@@ -112,7 +111,7 @@ export const getTeammateNameDisplaySetting: (state: GlobalState) => string | und
 
 const getThemePreference = createSelector(
     getMyPreferences,
-    getCurrentTeamId,
+    (state) => state.entities.teams.currentTeamId,
     (myPreferences, currentTeamId) => {
         // Prefer the user's current team-specific theme over the user's current global theme
         let themePreference;
