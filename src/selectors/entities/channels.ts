@@ -31,7 +31,7 @@ import {
     getMyTeams,
     getTeamMemberships,
 } from 'selectors/entities/teams';
-import {isCurrentUserSystemAdmin, getCurrentUserId, getUserIdsInChannels} from 'selectors/entities/users';
+import {isCurrentUserSystemAdmin, getCurrentUserId, getUserIdsInChannels, getStatusForUserId} from 'selectors/entities/users';
 
 import {Channel, ChannelStats, ChannelMembership, ChannelModeration, ChannelMemberCountsByGroup} from 'types/channels';
 import {ClientConfig} from 'types/config';
@@ -52,6 +52,7 @@ import {
 import {
     canManageMembersOldPermissions,
     completeDirectChannelInfo,
+    newCompleteDirectChannelInfo,
     completeDirectChannelDisplayName,
     getUserIdFromChannelName,
     getChannelByName as getChannelByNameHelper,
@@ -64,6 +65,7 @@ import {
     isFavoriteChannelOld,
     isDefault,
     sortChannelsByRecency,
+    isDirectChannel,
 } from 'utils/channel_utils';
 import {createIdsSelector} from 'utils/helpers';
 
@@ -181,15 +183,26 @@ export function filterChannels(
 // - The status of the other user in a DM channel
 export function makeGetChannel(): (state: GlobalState, props: {id: string}) => Channel {
     return createSelector(
-        getAllChannels,
-        (state: GlobalState, props: {id: string}) => props.id,
-        (state: GlobalState) => state.entities.users,
-        getTeammateNameDisplaySetting,
-        (allChannels, channelId, users, teammateNameDisplay) => {
-            const channel = allChannels[channelId];
+        getCurrentUserId,
+        (state: GlobalState) => state.entities.users.profiles,
+        (state: GlobalState) => state.entities.users.profilesInChannel,
+        (state: GlobalState, props: {id: string}) => {
+            const channel = getChannel(state, props.id);
+            if (!channel || !isDirectChannel(channel)) {
+                return '';
+            }
 
+            const currentUserId = getCurrentUserId(state);
+            const teammateId = getUserIdFromChannelName(currentUserId, channel.name);
+            const teammateStatus = getStatusForUserId(state, teammateId);
+
+            return teammateStatus || 'offline';
+        },
+        (state: GlobalState, props: {id: string}) => getChannel(state, props.id),
+        getTeammateNameDisplaySetting,
+        (currentUserId, profiles, profilesInChannel, teammateStatus, channel, teammateNameDisplay) => {
             if (channel) {
-                return completeDirectChannelInfo(users, teammateNameDisplay!, channel);
+                return newCompleteDirectChannelInfo(currentUserId, profiles, profilesInChannel, teammateStatus, teammateNameDisplay!, channel);
             }
 
             return channel;

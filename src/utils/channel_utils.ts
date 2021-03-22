@@ -8,11 +8,11 @@ import {hasNewPermissions} from 'selectors/entities/general';
 import {haveITeamPermission, haveIChannelPermission} from 'selectors/entities/roles';
 import {Channel, ChannelMembership, ChannelType, ChannelNotifyProps} from 'types/channels';
 import {Post} from 'types/posts';
-import {UserProfile, UsersState, UserNotifyProps} from 'types/users';
+import {UsersState, UserProfile, UserNotifyProps} from 'types/users';
 import {GlobalState} from 'types/store';
 import {TeamMembership} from 'types/teams';
 import {PreferenceType} from 'types/preferences';
-import {RelationOneToOne, IDMappedObjects} from 'types/utilities';
+import {IDMappedObjects, RelationOneToMany, RelationOneToOne} from 'types/utilities';
 
 import {getPreferenceKey} from './preference_utils';
 import {displayUsername} from './user_utils';
@@ -37,6 +37,30 @@ export function completeDirectChannelInfo(usersState: UsersState, teammateNameDi
         };
     } else if (isGroupChannel(channel)) {
         return completeDirectGroupInfo(usersState, teammateNameDisplay, channel);
+    }
+
+    return channel;
+}
+
+// newCompleteDirectChannelInfo is a variant of completeDirectChannelInfo that accepts the minimal
+// data required instead of depending on the entirety of state.entities.users. This allows the
+// calling selector to have fewer dependencies, reducing its need to recompute when memoized.
+//
+// Ideally, this would replace completeDirectChannelInfo altogether, but is currently factored out
+// to minimize changes while addressing a critical performance issue.
+export function newCompleteDirectChannelInfo(currentUserId: string, profiles: IDMappedObjects<UserProfile>, profilesInChannel: RelationOneToMany<Channel, UserProfile>, teammateStatus: string, teammateNameDisplay: string, channel: Channel): Channel {
+    if (isDirectChannel(channel)) {
+        const teammateId = getUserIdFromChannelName(currentUserId, channel.name);
+
+        // return empty string instead of `someone` default string for display_name
+        return {
+            ...channel,
+            display_name: displayUsername(profiles[teammateId], teammateNameDisplay, false),
+            teammate_id: teammateId,
+            status: teammateStatus,
+        };
+    } else if (isGroupChannel(channel)) {
+        return newCompleteDirectGroupInfo(currentUserId, profiles, profilesInChannel, teammateNameDisplay, channel);
     }
 
     return channel;
@@ -434,6 +458,37 @@ export function isDefault(channel: Channel): boolean {
 
 function completeDirectGroupInfo(usersState: UsersState, teammateNameDisplay: string, channel: Channel) {
     const {currentUserId, profiles, profilesInChannel} = usersState;
+    const profilesIds = profilesInChannel[channel.id];
+    const gm = {...channel};
+
+    if (profilesIds) {
+        gm.display_name = getGroupDisplayNameFromUserIds(profilesIds, profiles, currentUserId, teammateNameDisplay);
+        return gm;
+    }
+
+    const usernames = gm.display_name.split(', ');
+    const users = Object.keys(profiles).map((key) => profiles[key]);
+    const userIds: string[] = [];
+    usernames.forEach((username: string) => {
+        const u = users.find((p): boolean => p.username === username);
+        if (u) {
+            userIds.push(u.id);
+        }
+    });
+    if (usernames.length === userIds.length) {
+        gm.display_name = getGroupDisplayNameFromUserIds(userIds, profiles, currentUserId, teammateNameDisplay);
+        return gm;
+    }
+
+    return channel;
+}
+
+// newCompleteDirectGroupInfo is a variant of completeDirectGroupInfo that accepts the minimal
+// data required instead of depending on the entirety of state.entities.users. This allows the
+// calling selector to have fewer dependencies, reducing its need to recompute when memoized.
+//
+// See also newCompleteDirectChannelInfo.
+function newCompleteDirectGroupInfo(currentUserId: string, profiles: IDMappedObjects<UserProfile>, profilesInChannel: RelationOneToMany<Channel, UserProfile>, teammateNameDisplay: string, channel: Channel) {
     const profilesIds = profilesInChannel[channel.id];
     const gm = {...channel};
 
