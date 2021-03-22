@@ -17,7 +17,7 @@ import {getPreferenceKey} from 'utils/preference_utils';
 import {setThemeDefaults} from 'utils/theme_utils';
 
 export function getMyPreferences(state: GlobalState): { [x: string]: PreferenceType } {
-    return state.entities.preferences.myPreferences;
+    return state.entities.preferences?.myPreferences ?? {};
 }
 
 export function get(state: GlobalState, category: string, name: string, defaultValue: any = '') {
@@ -241,16 +241,11 @@ export function shouldAutocloseDMs(state: GlobalState) {
 }
 
 export function getCollapsedThreadsPreference(state: GlobalState): string {
-    const configValue = getConfig(state).CollapsedThreads;
-    let preferenceDefault;
+    const configValue = getConfig(state)?.CollapsedThreads;
+    let preferenceDefault = Preferences.COLLAPSED_REPLY_THREADS_OFF;
 
-    switch (configValue) {
-    case 'default_off':
-        preferenceDefault = Preferences.COLLAPSED_REPLY_THREADS_OFF;
-        break;
-    case 'default_on':
+    if (configValue === 'default_on') {
         preferenceDefault = Preferences.COLLAPSED_REPLY_THREADS_ON;
-        break;
     }
 
     return get(

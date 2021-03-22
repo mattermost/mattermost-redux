@@ -1,5 +1,9 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
+/* eslint-disable max-lines */
+/* eslint-disable @typescript-eslint/explicit-module-boundary-types */
+/* eslint-disable no-prototype-builtins */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 
 import {createSelector} from 'reselect';
 
@@ -511,23 +515,37 @@ export const getUnreads: (state: GlobalState) => {
 
                 if (users[otherUserId] && users[otherUserId].delete_at === 0) {
                     mentionCountForCurrentTeam += m.mention_count;
-                    mentionCountForCurrentTeamRoot += m.mention_count_root;
+                    mentionCountForCurrentTeamRoot += m.mention_count_root ?? 0;
                 }
-            } else if (m.mention_count > 0 && channel.delete_at === 0) {
-                mentionCountForCurrentTeam += m.mention_count;
-                mentionCountForCurrentTeamRoot += m.mention_count_root;
+            } else if (channel.delete_at === 0) {
+                if (m.mention_count > 0) {
+                    mentionCountForCurrentTeam += m.mention_count;
+                }
+                if (m.mention_count_root > 0) {
+                    mentionCountForCurrentTeamRoot += m.mention_count_root ?? 0;
+                }
             }
 
-            if (m.notify_props && m.notify_props.mark_unread !== 'mention' && channel.total_msg_count - m.msg_count > 0) {
-                if (channel.type === General.DM_CHANNEL) {
-                    // otherUserId is guaranteed to have been set above
-                    if (users[otherUserId] && users[otherUserId].delete_at === 0) {
+            if (m.notify_props && m.notify_props.mark_unread !== 'mention') {
+                if (channel.total_msg_count - m.msg_count > 0) {
+                    if (channel.type === General.DM_CHANNEL) {
+                        // otherUserId is guaranteed to have been set above
+                        if (users[otherUserId] && users[otherUserId].delete_at === 0) {
+                            messageCountForCurrentTeam += 1;
+                        }
+                    } else if (channel.delete_at === 0) {
                         messageCountForCurrentTeam += 1;
+                    }
+                }
+                if (channel.total_msg_count_root - m.msg_count_root > 0) {
+                    if (channel.type === General.DM_CHANNEL) {
+                        // otherUserId is guaranteed to have been set above
+                        if (users[otherUserId] && users[otherUserId].delete_at === 0) {
+                            messageCountForCurrentTeamRoot += 1;
+                        }
+                    } else if (channel.delete_at === 0) {
                         messageCountForCurrentTeamRoot += 1;
                     }
-                } else if (channel.delete_at === 0) {
-                    messageCountForCurrentTeam += 1;
-                    messageCountForCurrentTeamRoot += 1;
                 }
             }
         });
@@ -539,8 +557,8 @@ export const getUnreads: (state: GlobalState) => {
                 const member = myTeamMemberships[team.id];
                 acc.messageCount += member.msg_count;
                 acc.mentionCount += member.mention_count;
-                acc.messageCountRoot += member.msg_count_root;
-                acc.mentionCountRoot += member.mention_count_root;
+                acc.messageCountRoot += member.msg_count_root ?? 0;
+                acc.mentionCountRoot += member.mention_count_root ?? 0;
             }
 
             return acc;
