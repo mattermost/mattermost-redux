@@ -90,14 +90,18 @@ export type AppCallResponse<Res = unknown> = {
 export type AppContext = {
     app_id: string;
     location?: string;
+    subject?: string;
+    bot_user_id?: string;
     acting_user_id?: string;
     user_id?: string;
+    team_id: string;
     channel_id?: string;
-    team_id?: string;
     post_id?: string;
-    root_id?: string;
-    props?: AppContextProps;
+    root_post_id?: string;
+    mattermost_site_url: string;
+    app_path: string;
     user_agent?: string;
+    props?: AppContextProps;
 };
 
 export type AppContextProps = {
