@@ -1,3 +1,4 @@
+import {Post} from Posts
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
 
@@ -101,6 +102,7 @@ export type AppContext = {
     mattermost_site_url: string;
     app_path: string;
     user_agent?: string;
+    post?: Post;
     props?: AppContextProps;
 };
 
