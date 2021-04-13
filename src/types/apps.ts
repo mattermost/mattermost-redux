@@ -92,7 +92,7 @@ export type AppContext = {
     app_id: string;
     location?: string;
     subject?: string;
-    bot_user_id?: string;
+    bot_user_id: string;
     acting_user_id?: string;
     user_id?: string;
     team_id: string;
