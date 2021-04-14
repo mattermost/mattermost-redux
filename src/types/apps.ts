@@ -114,6 +114,9 @@ export type AppExpandLevel = string;
 
 export type AppExpand = {
     app?: AppExpandLevel;
+    acting_user_access_token?: AppExpandLevel;
+    oauth2_app? : AppExpandLevel;
+    oauth2_user? : AppExpandLevel;
     acting_user?: AppExpandLevel;
     channel?: AppExpandLevel;
     config?: AppExpandLevel;
