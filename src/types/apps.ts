@@ -138,7 +138,7 @@ export type AppForm = {
     submit_buttons?: string;
     cancel_button?: boolean;
     submit_on_cancel?: boolean;
-    fields: AppField[];
+    fields?: AppField[];
     call?: AppCall;
     depends_on?: string[];
 };
