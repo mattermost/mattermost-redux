@@ -97,7 +97,7 @@ export type AppContext = {
     acting_user_id?: string;
     user_id?: string;
     team_id: string;
-    channel_id?: string;
+    channel_id: string;
     post_id?: string;
     root_post_id?: string;
     mattermost_site_url: string;
