@@ -2,6 +2,7 @@
 // See LICENSE.txt for license information.
 
 import {createSelector} from 'reselect';
+import deepEqual from 'fast-deep-equal';
 
 import {General, Permissions} from '../../constants';
 import {CategoryTypes} from 'constants/channel_categories';
@@ -30,7 +31,7 @@ import {
     getMyTeams,
     getTeamMemberships,
 } from 'selectors/entities/teams';
-import {isCurrentUserSystemAdmin, getCurrentUserId, getUserIdsInChannels} from 'selectors/entities/users';
+import {isCurrentUserSystemAdmin, getCurrentUserId, getUserIdsInChannels, getStatusForUserId} from 'selectors/entities/users';
 
 import {Channel, ChannelStats, ChannelMembership, ChannelModeration, ChannelMemberCountsByGroup} from 'types/channels';
 import {ClientConfig} from 'types/config';
@@ -41,6 +42,7 @@ import {TeamMembership, Team} from 'types/teams';
 import {UsersState, UserProfile} from 'types/users';
 import {
     $ID,
+    Dictionary,
     IDMappedObjects,
     NameMappedObjects,
     RelationOneToMany,
@@ -51,6 +53,7 @@ import {
 import {
     canManageMembersOldPermissions,
     completeDirectChannelInfo,
+    newCompleteDirectChannelInfo,
     completeDirectChannelDisplayName,
     getUserIdFromChannelName,
     getChannelByName as getChannelByNameHelper,
@@ -63,6 +66,7 @@ import {
     isFavoriteChannelOld,
     isDefault,
     sortChannelsByRecency,
+    isDirectChannel,
 } from 'utils/channel_utils';
 import {createIdsSelector} from 'utils/helpers';
 
@@ -180,15 +184,26 @@ export function filterChannels(
 // - The status of the other user in a DM channel
 export function makeGetChannel(): (state: GlobalState, props: {id: string}) => Channel {
     return createSelector(
-        getAllChannels,
-        (state: GlobalState, props: {id: string}) => props.id,
-        (state: GlobalState) => state.entities.users,
-        getTeammateNameDisplaySetting,
-        (allChannels, channelId, users, teammateNameDisplay) => {
-            const channel = allChannels[channelId];
+        getCurrentUserId,
+        (state: GlobalState) => state.entities.users.profiles,
+        (state: GlobalState) => state.entities.users.profilesInChannel,
+        (state: GlobalState, props: {id: string}) => {
+            const channel = getChannel(state, props.id);
+            if (!channel || !isDirectChannel(channel)) {
+                return '';
+            }
 
+            const currentUserId = getCurrentUserId(state);
+            const teammateId = getUserIdFromChannelName(currentUserId, channel.name);
+            const teammateStatus = getStatusForUserId(state, teammateId);
+
+            return teammateStatus || 'offline';
+        },
+        (state: GlobalState, props: {id: string}) => getChannel(state, props.id),
+        getTeammateNameDisplaySetting,
+        (currentUserId, profiles, profilesInChannel, teammateStatus, channel, teammateNameDisplay) => {
             if (channel) {
-                return completeDirectChannelInfo(users, teammateNameDisplay!, channel);
+                return newCompleteDirectChannelInfo(currentUserId, profiles, profilesInChannel, teammateStatus, teammateNameDisplay!, channel);
             }
 
             return channel;
@@ -357,15 +372,30 @@ export const getChannelsNameMapInTeam: (state: GlobalState, teamId: string) => N
     },
 );
 
+let prevChannelMap: NameMappedObjects<Channel> = {};
+let prevChannelDisplayNameMap: Dictionary<string> = {};
+
 export const getChannelsNameMapInCurrentTeam: (state: GlobalState) => NameMappedObjects<Channel> = createSelector(
     getAllChannels,
     getChannelSetInCurrentTeam,
     (channels: IDMappedObjects<Channel>, currentTeamChannelSet: string[]): NameMappedObjects<Channel> => {
         const channelMap: NameMappedObjects<Channel> = {};
+        const channelDisplayNameMap: Dictionary<string> = {};
         currentTeamChannelSet.forEach((id) => {
             const channel = channels[id];
             channelMap[channel.name] = channel;
+            channelDisplayNameMap[channel.name] = channel.display_name;
         });
+
+        // getAllChannels will almost never return a memoized result.
+        // Assumption here is that the added comparison computation is more beneficial
+        // than the cost of returning a non memoized result.
+        if (deepEqual(channelDisplayNameMap, prevChannelDisplayNameMap)) {
+            return prevChannelMap;
+        }
+
+        prevChannelDisplayNameMap = channelDisplayNameMap;
+        prevChannelMap = channelMap;
         return channelMap;
     },
 );
