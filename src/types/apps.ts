@@ -5,12 +5,28 @@
 // Apps Framework feature is experimental, and the contents of this file are
 // susceptible to breaking changes without pushing the major version of this package.
 export type AppManifest = {
-    app_id: string;
-    display_name: string;
-    description?: string;
-    homepage_url?: string;
-    root_url?: string;
-}
+  app_id: string;
+  app_type: string;
+  version: string;
+  homepage_url: string;
+  display_name?: string;
+  description?: string;
+  icon?: string;
+  bindings?: AppBinding;
+  on_install?: AppBinding;
+  on_version_changed?: AppBinding;
+  on_uninstall?: AppBinding;
+  on_disable?: AppBinding;
+  on_enable?: AppBinding;
+  get_oauth2_connect_url?: AppBinding;
+  on_oauth2_complete?: AppBinding;
+  requested_permissions?: string[];
+  requested_locations?: string[];
+  root_url?: string;
+  aws_lambda?: string;
+  kubeless_functions?: string;
+  plugin_id?: string;
+};
 
 export type AppModalState = {
     form: AppForm;
